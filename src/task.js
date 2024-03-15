@@ -153,7 +153,7 @@ module.exports = class Task {
   }
 
   once(eventName, callback) {
-    var disposable = this.on(eventName, function(...args) {
+    var disposable = this.on(eventName, function (...args) {
       disposable.dispose();
       callback(...args);
     });

@@ -1,3 +1,4 @@
+
 ; PREPROCESSOR
 ; ============
 
@@ -16,20 +17,47 @@
 (["#if" "#ifdef" "#ifndef" "#endif" "#elif" "#else" "#define" "#include"] @punctuation.definition.directive.c
   (#set! adjust.endAfterFirstMatchOf "^#"))
 
-
-; This will match if the more specific rules above haven't matched. The
-; anonymous nodes will match under ideal conditions, but might not be present
-; if the parser is flummoxed.
+; `preproc_directive` will be used when the parser doesn't recognize the
+; directive as one of the above. It's permissive; `#afdfafsdfdfad` would be
+; parsed as a `preproc_directive`.
+;
+; Hence this rule will match if the more specific rules above haven't matched.
+; The anonymous nodes will match under ideal conditions, but might not be
+; present even when they ought to be _if_ the parser is flummoxed; so this'll
+; sometimes catch `#ifdef` and others.
 ((preproc_directive) @keyword.control.directive.c
   (#set! capture.shy true))
 
-((preproc_ifdef
-  (identifier) @entity.name.function.preprocessor.c
-  (#match? @entity.name.function.preprocessor.c "[a-zA-Z_$][\\w$]*")))
+((preproc_directive) @punctuation.definition.directive.c
+  (#set! capture.shy true)
+  (#set! adjust.endAfterFirstMatchOf "^#"))
 
+; Macro functions are definitely entities.
 (preproc_function_def
   (identifier) @entity.name.function.preprocessor.c
   (#set! capture.final true))
+
+; Identifiers in macro definitions are definitely constants.
+((preproc_def
+  name: (identifier) @constant.preprocessor.c))
+
+; We can also safely treat identifiers as constants in `#ifdef`…
+((preproc_ifdef
+  (identifier) @constant.preprocessor.c))
+
+; …and `#if` and `#elif`…
+(preproc_if
+  (binary_expression
+    (identifier) @constant.preprocessor.c))
+(preproc_elif
+  (binary_expression
+    (identifier) @constant.preprocessor.c))
+
+; …and `#undef`.
+((preproc_call
+  directive: (preproc_directive) @_IGNORE_
+  argument: (preproc_arg) @constant.preprocessor.c)
+  (#eq? @_IGNORE_ "#undef"))
 
 (system_lib_string) @string.quoted.other.lt-gt.include.c
 ((system_lib_string) @punctuation.definition.string.begin.c
@@ -48,6 +76,15 @@
   (#set! capture.final true))
 
 (primitive_type) @support.storage.type.builtin.c
+
+; When the user has typed `#define FOO`, the macro injection thinks that `FOO`
+; is a type declaration (for some reason). This node structure seems to exist
+; only in that unusual and incorrect scenario, so we'll stop it from happening
+; so that it doesn't override the underlying `constant.other.c` scope.
+(translation_unit
+  (type_identifier) @_IGNORE_
+  (#set! capture.final))
+
 (type_identifier) @support.other.storage.type.c
 
 ; These types are all reserved words; if we see an identifier with this name,
@@ -133,27 +170,31 @@
 
 ; The "x" in `int x;`
 (declaration
-  declarator: (identifier) @variable.declaration.c)
+  declarator: (identifier) @variable.other.declaration.c)
 
 ; The "x" in `int x = y;`
 (init_declarator
-  declarator: (identifier) @variable.declaration.c)
+  declarator: (identifier) @variable.other.declaration.c)
 
 ; The "x" in `SomeType *x;`
 ; (Should work no matter how many pointers deep we are.)
 (pointer_declarator
-  declarator: [(identifier) (field_identifier)] @variable.declaration.pointer.c
+  declarator: [(identifier) (field_identifier)] @variable.other.declaration.pointer.c
   (#is? test.descendantOfType "declaration field_declaration"))
+
+; An array declarator: the "table" in `int table[4];`
+(array_declarator
+  declarator: (identifier) @variable.other.declaration.c)
 
 ; A member of a struct.
 (field_declaration
-  (field_identifier) @variable.declaration.member.c)
+  (field_identifier) @variable.other.declaration.member.c)
 
 ; An attribute in a C99 struct designated initializer:
 ; the "foo" in `MY_TYPE a = { .foo = true };
 (initializer_pair
   (field_designator
-    (field_identifier) @variable.declaration.member.c))
+    (field_identifier) @variable.other.declaration.member.c))
 
 ; (and the associated ".")
 (initializer_pair
@@ -162,15 +203,15 @@
 
 (field_declaration
   (pointer_declarator
-    (field_identifier) @variable.declaration.member.c))
+    (field_identifier) @variable.other.declaration.member.c))
 
 (field_declaration
   (array_declarator
-    (field_identifier) @variable.declaration.member.c))
+    (field_identifier) @variable.other.declaration.member.c))
 
 (init_declarator
   (pointer_declarator
-    (identifier) @variable.declaration.member.c))
+    (identifier) @variable.other.declaration.member.c))
 
 ; The "x" in `x = y;`
 (assignment_expression
@@ -253,8 +294,19 @@
   (false)
 ] @constant.language._TYPE_.c
 
-((identifier) @constant.c
-  (#match? @constant.c "[_A-Z][_A-Z0-9]*$"))
+; Don't try to scope (e.g.) `int FOO = 1` as a constant when the user types `=`
+; but has not typed the value yet.
+(ERROR
+  (identifier) @_IGNORE_
+  (#set! capture.final))
+
+; In most languages we wouldn't be making the assumption that an all-caps
+; identifier should be treated as a constant. But those languages don't have
+; macro preprocessors. The convention is decently strong in C/C++ that all-caps
+; identifiers will refer to `#define`d things.
+((identifier) @constant.other.c
+  (#match? @constant.other.c "^[_A-Z][_A-Z0-9]*$")
+  (#set! capture.shy))
 
 
 ; COMMENTS

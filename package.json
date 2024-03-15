@@ -2,7 +2,7 @@
   "name": "pulsar",
   "author": "Pulsar-Edit <admin@pulsar-edit.dev>",
   "productName": "Pulsar",
-  "version": "1.113.0-dev",
+  "version": "1.114.0-dev",
   "description": "A Community-led Hyper-Hackable Text Editor",
   "branding": {
     "id": "pulsar",
@@ -216,7 +216,7 @@
     "exception-reporting": "file:./packages/exception-reporting",
     "find-and-replace": "file:./packages/find-and-replace",
     "fuzzy-finder": "file:packages/fuzzy-finder",
-    "github": "0.36.19",
+    "github": "0.36.20",
     "git-diff": "file:./packages/git-diff",
     "go-to-line": "file:./packages/go-to-line",
     "grammar-selector": "file:./packages/grammar-selector",

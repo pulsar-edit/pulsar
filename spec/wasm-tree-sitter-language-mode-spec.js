@@ -17,6 +17,11 @@ function resolve(modulePath) {
   return require.resolve(`${PATH}/${modulePath}`)
 }
 
+// Just for syntax highlighting.
+function scm(strings) {
+  return strings.join('');
+}
+
 const cGrammarPath = resolve('language-c/grammars/modern-tree-sitter-c.cson');
 const pythonGrammarPath = resolve(
   'language-python/grammars/modern-tree-sitter-python.cson'
@@ -1761,20 +1766,6 @@ describe('WASMTreeSitterLanguageMode', () => {
       ] @fold
       `);
 
-      // {
-      //   parser: 'tree-sitter-javascript',
-      //   folds: [
-      //     {
-      //       start: { type: '{', index: 0 },
-      //       end: { type: '}', index: -1 }
-      //     },
-      //     {
-      //       start: { type: '(', index: 0 },
-      //       end: { type: ')', index: -1 }
-      //     }
-      //   ]
-      // }
-
       buffer.setText(dedent`
         module.exports =
         class A {
@@ -1934,6 +1925,121 @@ describe('WASMTreeSitterLanguageMode', () => {
         const element2 = <Element>…
         </Element>
       `);
+    });
+
+    it('updates its fold cache properly when `fold.invalidateOnChange` is specified', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, htmlConfig);
+
+      await grammar.setQueryForTest('foldsQuery', scm`
+        ((element
+          (start_tag
+            (tag_name) @_IGNORE_) @fold)
+          (#match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
+          (#set! fold.invalidateOnChange true)
+        )
+
+        (element
+          (start_tag
+            (tag_name) @_IGNORE_
+             ">" @fold)
+          (#not-match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
+          (#set! fold.endAt parent.parent.lastNamedChild.startPosition)
+          (#set! fold.adjustToEndOfPreviousRow true)
+        )
+
+        (element
+          (start_tag
+            (tag_name) @_IGNORE_) @fold
+          (#not-match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
+          (#set! fold.invalidateOnChange true)
+          (#set! fold.endAt lastChild.startPosition)
+          (#set! fold.adjustToEndOfPreviousRow true))
+      `);
+
+      buffer.setText(dedent`
+        <div
+          foo="bar">
+          <span>hello</span>
+          <span>world</span>
+        </div>
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      expect(editor.isFoldableAtBufferRow(0)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(1)).toBe(true);
+      expect(editor.isFoldableAtBufferRow(2)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(3)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(4)).toBe(false);
+
+      editor.setCursorBufferPosition([1, 11]);
+      editor.insertText('\n');
+      await languageMode.atTransactionEnd();
+
+      expect(editor.getText()).toBe(dedent`
+        <div
+          foo="bar"
+        >
+          <span>hello</span>
+          <span>world</span>
+        </div>
+      `)
+
+      // Making that buffer change on line 1 should invalidate the fold cache
+      // on line 0.
+      expect(editor.isFoldableAtBufferRow(0)).toBe(true);
+      expect(editor.isFoldableAtBufferRow(1)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(2)).toBe(true);
+      expect(editor.isFoldableAtBufferRow(3)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(4)).toBe(false);
+    });
+
+    it('understands custom predicates', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, htmlConfig);
+
+      await grammar.setQueryForTest('foldsQuery', scm`
+        ((element
+          (start_tag
+            (tag_name) @_IGNORE_.tag)) @_IGNORE_.element
+            (#eq? @_IGNORE_.tag "div")
+            (#set! isDiv true))
+
+        ; Make self-closing elements foldable only when they're ancestors of
+        ; DIVs. This is a very silly thing to do.
+        ((element
+          (start_tag
+            (tag_name) @_IGNORE_) @fold)
+          (#match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
+          (#set! test.descendantOfNodeWithData "isDiv")
+          (#set! capture.final)
+        )
+
+      `);
+
+      buffer.setText(dedent`
+        <img
+          foo="bar"
+          baz="thud"
+          troz="zort"
+        >
+
+        <div>
+          <img
+            foo="bar"
+            baz="thud"
+            troz="zort"
+          >
+        </div>
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      expect(editor.isFoldableAtBufferRow(0)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(7)).toBe(true);
     });
 
     it('can fold entire nodes when no start or end parameters are specified', async () => {

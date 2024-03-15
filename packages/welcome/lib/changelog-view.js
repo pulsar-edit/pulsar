@@ -50,25 +50,31 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Enabled Modern Tree-sitter Grammars by default
+                Prevented an exception raised in the command palette in certain unusual filtering scenarios.
               </li>
               <li>
-                Added a modern Tree-sitter grammar for PHP.
+                Refrain from rendering anchor icons when showing a package's README file in `settings-view`.
               </li>
               <li>
-                Fix a measurement issue that was causing visual glitches in the `github` package's diff views.
+                Build Linux binaries on Debian 10, for older glibc and compatibility with older Linux distros.
               </li>
               <li>
-                Enabled the core `symbols-view` package to accept symbols from a number of sources, including Tree-sitter grammars and IDE packages.
+                Fixed a rendering error in `atom.ui.markdown.render` when `disableMode` was set to `"strict"` and the input contained HTML line breaks.
               </li>
               <li>
-                Switch default to false for converting ASCII emoticons to emoji when rendering Markdown.
+                Added support for the semanticolor package in modern tree-sitter grammars.
               </li>
               <li>
-                Fix certain find-and-replace scenarios when the "Preserve Case During Replace" setting is enabled.
+                Added new `--force` flag to `ppm link` command that will uninstall any conflicting package already installed.
               </li>
               <li>
-                Fix an issue in `symbols-view` when returning from visiting a symbol declaration.
+                Added language entity colors to `syntax-variables.less`.
+              </li>
+              <li>
+                Numerous Tree-Sitter Grammar syntax highlighting fixes.
+              </li>
+              <li>
+                Bumped dugite to make the github package compatible with ARM Linux.
               </li>
             </ul>
 
