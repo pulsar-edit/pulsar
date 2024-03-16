@@ -12,6 +12,8 @@
   (hash)
   (argument_list)
   (array)
+  (symbol_array)
+  (string_array)
 ] @fold
 
 
