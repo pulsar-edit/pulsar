@@ -7,19 +7,6 @@ CompileCache.install(`${process.resourcesPath}`, require);
 
 const setupGlobals = function() {
   global.attachEvent = function() {};
-  const console = {
-    warn() {
-      return global.emit('task:warn', ...arguments);
-    },
-    log() {
-      return global.emit('task:log', ...arguments);
-    },
-    error() {
-      return global.emit('task:error', ...arguments);
-    },
-    trace() {}
-  };
-  global.__defineGetter__('console', () => console);
 
   global.document = {
     createElement() {

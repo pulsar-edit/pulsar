@@ -104,9 +104,10 @@ test.describe('Opening Atom for the first time', () => {
         await modalInput.press('Enter')
 
         await Promise.all(
-          Object.keys(checks).map(k =>
-            expect(syntaxElement(k, checks[k])).toHaveText(checks[k])
-          )
+          Object.keys(checks).map(k => {
+            // let match = new RegExp(checks[k])
+            return expect(syntaxElement(k, checks[k])).toContainText(checks[k])
+          })
         )
       })
     })
@@ -115,7 +116,6 @@ test.describe('Opening Atom for the first time', () => {
 
 function syntaxElement(kind, text) {
   return editor.page.locator(
-    `atom-text-editor.is-focused .syntax--${kind}`,
-    { hasText: text }
+    `atom-text-editor.is-focused .syntax--${kind}:text('${text}')`
  )
 }

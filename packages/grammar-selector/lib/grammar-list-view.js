@@ -26,14 +26,6 @@ module.exports = class GrammarListView {
           let badgeColor = 'badge-success';
           let badgeText = 'Tree-sitter';
 
-          if (isLegacyTreeSitterMode()) {
-            // Color the legacy badge green to represent the user's preference.
-            badgeColor = isLegacyTreeSitter(grammar) ?
-              'badge-success' : 'badge-warning';
-            badgeText = isLegacyTreeSitter(grammar) ?
-              'Legacy Tree-sitter' : 'Modern Tree-sitter';
-          }
-
           parser.classList.add(
             'grammar-selector-parser',
             'badge',
@@ -119,12 +111,6 @@ module.exports = class GrammarListView {
           return grammar !== atom.grammars.nullGrammar && grammar.name;
         });
 
-      // Don't show legacy Tree-sitter grammars in the selector unless the user
-      // has opted into it.
-      if (!isLegacyTreeSitterMode()) {
-        grammars = grammars.filter(grammar => !isLegacyTreeSitter(grammar));
-      }
-
       if (atom.config.get('grammar-selector.hideDuplicateTextMateGrammars')) {
         // Filter out all TextMate grammars for which there is a Tree-sitter
         // grammar with the exact same name.
@@ -168,15 +154,7 @@ function isLegacyTreeSitterMode() {
 }
 
 function isTreeSitter(grammar) {
-  return isLegacyTreeSitter(grammar) || isModernTreeSitter(grammar);
-}
-
-function isModernTreeSitter(grammar) {
   return grammar.constructor.name === 'WASMTreeSitterGrammar';
-}
-
-function isLegacyTreeSitter(grammar) {
-  return grammar.constructor.name === 'TreeSitterGrammar';
 }
 
 function compareGrammarType(a, b) {
@@ -185,11 +163,7 @@ function compareGrammarType(a, b) {
 
 function getGrammarScore(grammar) {
   let languageParser = getLanguageModeConfig();
-  if (isModernTreeSitter(grammar)) {
-    return languageParser === 'node-tree-sitter' ? -1 : -2;
-  }
-  if (isLegacyTreeSitter(grammar)) {
-    return languageParser === 'node-tree-sitter' ? -2 : -1;
-  }
-  return languageParser === 'textmate' ? -3 : 0;
+  const useTreeSitter = atom.config.get('core.useTreeSitterParsers');
+  if (isTreeSitter(grammar)) { return -1; }
+  return useTreeSitter ? 0 : -3;
 }
