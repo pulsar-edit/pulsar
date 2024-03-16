@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+- Fixed some folds in Ruby like `unless`, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.
+
 ## 1.114.0
 
 - Prevented an exception raised in the command palette in certain unusual filtering scenarios.
