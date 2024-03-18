@@ -16,10 +16,10 @@ const {ipcRenderer} = require('electron');
 temp.track();
 
 module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) {
-  const object = require('../vendor/jasmine');
-  for (let key in object) { const value = object[key]; window[key] = value; }
+  require('./helpers/jasmine-singleton');
 
-  require('jasmine-tagged');
+  const normalizeComments = require('./helpers/normalize-comments');
+  for (let key in normalizeComments) { window[key] = normalizeComments[key]; }
 
   // Rewrite global jasmine functions to have support for async tests.
   // This way packages can create async specs without having to import these from the

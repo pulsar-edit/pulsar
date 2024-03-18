@@ -8,7 +8,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 let specDirectory, specPackageName, specPackagePath, specProjectPath;
-require('jasmine-json');
+require('./helpers/jasmine-singleton');
 require('../src/window');
 require('../vendor/jasmine-jquery');
 const path = require('path');
