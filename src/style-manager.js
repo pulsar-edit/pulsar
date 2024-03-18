@@ -232,8 +232,20 @@ module.exports = class StyleManager {
     }
   }
 
-  // Wrapper function useful for applying any upgrades due to deprecations 
-  upgradeStyleSheet(styleSheet, context, cb) {
+  // Wrapper function useful for applying any upgrades due to deprecations
+  upgradeStyleSheet(styleSheet, context, upgradeName) {
+    let cb;
+
+    // Allows us to utilize a direct callback, or if calling from outside
+    // StyleManager we can define a string that works
+    if (upgradeName === "math") {
+      cb = upgradeDeprecatedMathUsageForStyleSheet;
+    } else if (upgradeName === "selector") {
+      cb = transformDeprecatedShadowDOMSelectors;
+    } else if (typeof upgradeName === "function") {
+      cb = upgradeName;
+    }
+
     if (this.cacheDirPath != null) {
       const hash = crypto.createHash("sha1");
       if (context != null) {
