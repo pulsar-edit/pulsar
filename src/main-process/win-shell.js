@@ -74,27 +74,17 @@ class ShellOption {
 }
 
 class PathOption {
-  constructor(installType) {
-    // installType MUST be 'User' or 'Machine'
+  constructor() {
     this.HKPATH;
     this.hive;
     this.installReg = "\\SOFTWARE\\0949b555-c22c-56b7-873a-a960bdefa81f";
     this.installMode = installType;
 
-    if (installType === "User") {
-      this.HKPATH = "\\Environment";
-      this.hive = "HKCU";
-    } else if (installType === "Machine") {
-      this.HKPATH = "\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment";
-      this.hive = "HKLM";
-    }
+    // We no longer support an `installType`
+    // Only managing the path of the current user
+    this.HKPATH = "\\Environment";
+    this.hive = "HKCU";
 
-    // Unfortunately, we can only manage the PATH for a per user installation.
-    // While the PowerShell script does support setting the PATH for a Machine
-    // install, we can't yet check that.
-    // https://github.com/fresc81/node-winreg/tree/1.2.1#troubleshooting
-    // This can only be done if Pulsar is run as Admin, with a user with Admin privs
-    // So we will pretend a user install is all that matters here
     this.isRegistered = this.isRegistered.bind(this);
     this.register = this.register.bind(this);
     this.deregister = this.deregister.bind(this);
@@ -129,8 +119,8 @@ class PathOption {
   register(callback) {
     this.getPulsarPath().then((pulsarPath) => {
       const child = ChildProcess.execFile(
-          `${pulsarPath}\\resources\\modifyWindowsPath.ps1`,
-          ['-installMode', this.installMode, '-installdir', `"${pulsarPath}"`, '-remove', '0'],
+          `"${pulsarPath}\\resources\\modifyWindowsPath.ps1"`,
+          ['-installdir', `"${pulsarPath}"`, '-remove', '0'],
           { shell: "powershell.exe" },
           (error, stdout, stderr) =>
           {
@@ -151,8 +141,8 @@ class PathOption {
       if (isRegistered) {
         this.getPulsarPath().then((pulsarPath) => {
           const child = ChildProcess.execFile(
-              `${pulsarPath}\\resources\\modifyWindowsPath.ps1`,
-              ['-installMode', this.installMode, '-installdir', `"${pulsarPath}"`, '-remove', '1'],
+              `"${pulsarPath}\\resources\\modifyWindowsPath.ps1"`,
+              ['-installdir', `"${pulsarPath}"`, '-remove', '1'],
               { shell: "powershell.exe" },
               (error, stdout, stderr) =>
               {
@@ -188,12 +178,7 @@ class PathOption {
             reject("Unable to find Pulsar Install Path");
           }
 
-          // When we are modifying Machine values, we can't accept spaces in the
-          // path. There's likely some combination of escapes to fix this, but
-          // I was unable to find them. For now we will check for the default
-          // Machine install location, and remove the space.
-          let safePulsarPath = pulsarPath.replace("Program Files", "PROGRA~1");
-          resolve(safePulsarPath);
+          resolve(pulsarPath);
         }
       });
     });
@@ -241,4 +226,3 @@ exports.folderBackgroundContextMenu = new ShellOption(
   JSON.parse(JSON.stringify(contextParts).replace('%1', '%V'))
 );
 exports.pathUser = new PathOption("User");
-exports.pathMachine = new PathOption("Machine");
