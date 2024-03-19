@@ -1,25 +1,27 @@
 // A definition for all Pulsar Constants that are ubiquitous throughout the codebase
+const CONSTANTS = {};
 
-module.exports = {
-  PROTOCOL_NAME: "atom",
-  PROTOCOL: `${this.PROTOCOL_NAME}:`,
-  PROTOCOL_PATH: `${this.PROTOCOL}//`,
-  // ^^ atom://
-  // If changing the protocol name, it must be changed in ./static/index.html
-  DOT_FOLDER: ".pulsar", // The folder where all user data and configuration data is stored
-  APP_IDENTIFIER: "dev.pulsar-edit.pulsar",
-  // atom://.pulsar/stylesheet
-  STYLESHEET_URI: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/stylesheet`,
-  // atom://.pulsar/keymap
-  KEYMAP_URI: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/keymap`,
-  // atom://.pulsar/config
-  CONFIG_URI: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/config`,
-  // atom://.pulsar/init-script
-  INIT_SCRIPT_URI: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/init-script`,
-  // atom://.pulsar/snippets
-  SNIPPETS_URI: `${this.PROTOCOL_PATH}${this.DOT_FOLDER}/snippets`,
-  // atom://config
-  CONFIG_UI_URI: `${this.PROTOCOL_PATH}config`,
-  // atom://about
-  ABOUT_UI_URI: `${this.PROTOCOL_PATH}about`
-};
+CONSTANTS.PROTOCOL = "atom";
+CONSTANTS.PROTOCOL_COLON = `${CONSTANTS.PROTOCOL}:`;
+CONSTANTS.PROTOCOL_COLON_SLASHES = `${CONSTANTS.PROTOCOL_COLON}//`;
+// ^^ atom://
+// If changing the protocol name, it must be changed in ./static/index.html
+CONSTANTS.DOT_FOLDER = ".pulsar";
+// ^^ The folder where all user data and configuration data is stored
+CONSTANTS.APP_IDENTIFIER = "dev.pulsar-edit.pulsar";
+CONSTANTS.STYLESHEET_URI = `${CONSTANTS.PROTOCOL_COLON_SLASHES}${CONSTANTS.DOT_FOLDER}/stylesheet`;
+// ^^ atom://.pulsar/stylesheet
+CONSTANTS.KEYMAP_URI = `${CONSTANTS.PROTOCOL_COLON_SLASHES}${CONSTANTS.DOT_FOLDER}/keymap`;
+// ^^ atom://.pulsar/keymap
+CONSTANTS.CONFIG_URI = `${CONSTANTS.PROTOCOL_COLON_SLASHES}${CONSTANTS.DOT_FOLDER}/config`;
+// ^^ atom://.pulsar/config
+CONSTANTS.INIT_SCRIPT_URI = `${CONSTANTS.PROTOCOL_COLON_SLASHES}${CONSTANTS.DOT_FOLDER}/init-script`;
+// ^^ atom://.pulsar/init-script
+CONSTANTS.SNIPPETS_URI = `${CONSTANTS.PROTOCOL_COLON_SLASHES}${CONSTANTS.DOT_FOLDER}/snippets`;
+// ^^ atom://.pulsar/snippets
+CONSTANTS.CONFIG_UI_URI = `${CONSTANTS.PROTOCOL_COLON_SLASHES}config`;
+// ^^ atom://config
+CONSTANTS.ABOUT_UI_URI = `${CONSTANTS.PROTOCOL_COLON_SLASHES}about`;
+// ^^ atom://about
+
+module.exports = CONSTANTS;

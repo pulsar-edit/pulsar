@@ -96,7 +96,7 @@ module.exports = class URIHandlerRegistry {
   async handleURI(uri) {
     const parsed = url.parse(uri, true);
     const { protocol, slashes, auth, port, host } = parsed;
-    if (protocol !== CONSTANTS.PROTOCOL || slashes !== true || auth || port) {
+    if (protocol !== CONSTANTS.PROTOCOL_COLON || slashes !== true || auth || port) {
       throw new Error(
         `URIHandlerRegistry#handleURI asked to handle an invalid URI: ${uri}`
       );

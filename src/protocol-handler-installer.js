@@ -13,7 +13,7 @@ module.exports = class ProtocolHandlerInstaller {
 
   async isDefaultProtocolClient() {
     return ipcRenderer.invoke('isDefaultProtocolClient', {
-      protocol: CONSTANTS.PROTOCOL_NAME,
+      protocol: CONSTANTS.PROTOCOL,
       path: process.execPath,
       args: ['--uri-handler', '--']
     });
@@ -25,7 +25,7 @@ module.exports = class ProtocolHandlerInstaller {
     return (
       this.isSupported() &&
       ipcRenderer.invoke('setAsDefaultProtocolClient', {
-        protocol: CONSTANTS.PROTOCOL_NAME,
+        protocol: CONSTANTS.PROTOCOL,
         path: process.execPath,
         args: ['--uri-handler', '--']
       })
@@ -83,13 +83,13 @@ module.exports = class ProtocolHandlerInstaller {
     };
 
     notification = notifications.addInfo(
-      `Register as default ${CONSTANTS.PROTOCOL_PATH} URI handler?`,
+      `Register as default ${CONSTANTS.PROTOCOL_COLON_SLASHES} URI handler?`,
       {
         dismissable: true,
         icon: 'link',
         description:
-          `Pulsar is not currently set as the default handler for ${CONSTANTS.PROTOCOL_PATH} URIs. Would you like Pulsar to handle ` +
-          `${CONSTANTS.PROTOCOL_PATH} URIs?`,
+          `Pulsar is not currently set as the default handler for ${CONSTANTS.PROTOCOL_COLON_SLASHES} URIs. Would you like Pulsar to handle ` +
+          `${CONSTANTS.PROTOCOL_COLON_SLASHES} URIs?`,
         buttons: [
           {
             text: 'Yes',

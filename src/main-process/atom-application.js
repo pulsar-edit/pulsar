@@ -1528,7 +1528,7 @@ module.exports = class AtomApplication extends EventEmitter {
   //   :safeMode - Boolean to control the opened window's safe mode.
   openUrl({ urlToOpen, devMode, safeMode, env }) {
     const parsedUrl = url.parse(urlToOpen, true);
-    if (parsedUrl.protocol !== CONSTANTS.PROTOCOL) return;
+    if (parsedUrl.protocol !== CONSTANTS.PROTOCOL_COLON) return;
 
     const pack = this.findPackageWithName(parsedUrl.host, devMode);
     if (pack && pack.urlMain) {

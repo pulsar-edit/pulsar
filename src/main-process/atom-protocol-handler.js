@@ -31,7 +31,7 @@ module.exports = class AtomProtocolHandler {
 
   // Creates the 'atom' custom protocol handler.
   registerAtomProtocol() {
-    protocol.registerFileProtocol(CONSTANTS.PROTOCOL_NAME, (request, callback) => {
+    protocol.registerFileProtocol(CONSTANTS.PROTOCOL, (request, callback) => {
       const relativePath = path.normalize(request.url.substr(7));
 
       let filePath;

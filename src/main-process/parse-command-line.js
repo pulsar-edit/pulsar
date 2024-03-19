@@ -29,7 +29,7 @@ module.exports = function parseCommandLine(processArgs) {
     A file may be opened at the desired line (and optionally column) by
     appending the numbers right after the file name, e.g. \`pulsar file:5:8\`.
 
-    Paths that start with \`${CONSTANTS.PROTOCOL_PATH}\` will be interpreted as URLs.
+    Paths that start with \`${CONSTANTS.PROTOCOL_COLON_SLASHES}\` will be interpreted as URLs.
 
     Environment Variables:
 
@@ -172,7 +172,7 @@ module.exports = function parseCommandLine(processArgs) {
     args = {
       uriHandler: true,
       'uri-handler': true,
-      _: args._.filter(str => str.startsWith(CONSTANTS.PROTOCOL_PATH)).slice(0, 1)
+      _: args._.filter(str => str.startsWith(CONSTANTS.PROTOCOL_COLON_SLASHES)).slice(0, 1)
     };
   }
 
@@ -220,7 +220,7 @@ module.exports = function parseCommandLine(processArgs) {
       // In the next block, .startsWith() only works on strings. So, skip non-string arguments.
       continue;
     }
-    if (path.startsWith(CONSTANTS.PROTOCOL_PATH)) {
+    if (path.startsWith(CONSTANTS.PROTOCOL_COLON_SLASHES)) {
       urlsToOpen.push(path);
     } else {
       pathsToOpen.push(path);
