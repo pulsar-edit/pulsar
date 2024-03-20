@@ -9,6 +9,8 @@
   (lambda)
   (hash)
   (array)
+  (string_array)
+  (symbol_array)
 ] @fold
 
 

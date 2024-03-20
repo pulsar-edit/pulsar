@@ -1931,18 +1931,10 @@ describe('WASMTreeSitterLanguageMode', () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, htmlConfig);
 
       await grammar.setQueryForTest('foldsQuery', scm`
-        ((element
-          (start_tag
-            (tag_name) @_IGNORE_) @fold)
-          (#match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
-          (#set! fold.invalidateOnChange true)
-        )
-
         (element
           (start_tag
             (tag_name) @_IGNORE_
              ">" @fold)
-          (#not-match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
           (#set! fold.endAt parent.parent.lastNamedChild.startPosition)
           (#set! fold.adjustToEndOfPreviousRow true)
         )
@@ -1950,12 +1942,14 @@ describe('WASMTreeSitterLanguageMode', () => {
         (element
           (start_tag
             (tag_name) @_IGNORE_) @fold
-          (#not-match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
           (#set! fold.invalidateOnChange true)
           (#set! fold.endAt lastChild.startPosition)
           (#set! fold.adjustToEndOfPreviousRow true))
       `);
 
+      // This is almost the exact scenario that created the need for this
+      // predicate. Since we use `adjustToEndOfPreviousRow`, this fold won't be
+      // valid in the below scenario because it'd start and end on row 0.
       buffer.setText(dedent`
         <div
           foo="bar">
@@ -1978,6 +1972,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       editor.insertText('\n');
       await languageMode.atTransactionEnd();
 
+      // It's only after we make this edit — and `start_tag` ends on row 2
+      // instead of row 1 — that the fold becomes valid, since now the fold
+      // range will start at row 0 and end at row 1. But without
+      // `fold.invalidateOnChange`, we wouldn't know that the change on line 1
+      // could have any effect on whether row 0 was foldable.
       expect(editor.getText()).toBe(dedent`
         <div
           foo="bar"
@@ -1987,8 +1986,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         </div>
       `)
 
-      // Making that buffer change on line 1 should invalidate the fold cache
-      // on line 0.
       expect(editor.isFoldableAtBufferRow(0)).toBe(true);
       expect(editor.isFoldableAtBufferRow(1)).toBe(false);
       expect(editor.isFoldableAtBufferRow(2)).toBe(true);
@@ -3883,7 +3880,6 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(editor.getText()).toEqual(emptyClassText);
     });
 
-    // This test is known to fail (and expected to fail) without async-indent enabled.
     it('auto-indents correctly if any change in a transaction wants auto-indentation', async () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
@@ -3907,19 +3903,46 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setText(emptyClassText);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      // Force this test to use async indent in all cases.
+      languageMode.transactionReparseBudgetMs = 0;
+      languageMode.currentTransactionReparseBudgetMs = 0;
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
       await wait(0);
 
-      editor.setCursorBufferPosition([1, 0]);
+      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+
+      editor.setCursorBufferPosition([0, 15]);
       editor.transact(() => {
-        editor.insertText('// this is a comment', { autoIndent: true });
+        // This is a transaction in which each indentation decision is
+        // contingent on the previous indentation decisions that have been
+        // made. But in async indent mode, we cannot make any indentation
+        // suggestions until the end of the transaction.
+        //
+        // Still, in some scenarios, this will be OK. Either we can make each
+        // of these indentation decisions in order once the transaction is
+        // done, or we can give up and auto-indent the whole range covered by
+        // the transaction when we're done.
+        //
+        // This is an imperfect heuristic and won't produce good results in
+        // many cases, which is why we flip to async indent reluctantly and
+        // only in certain scenarios. But it's better than committing to N
+        // re-parses (where N equals the number of indentation suggestions
+        // we're asked to make during a given transaction) no matter how high N
+        // may be. And it's also better than performing no indentation at all
+        // in these cases.
         editor.insertNewline();
-        editor.insertText('// and this is another', { autoIndent: true });
+        editor.insertText('// this is a comment', { autoIndent: true, autoDecreaseIndent: true });
+        editor.insertNewline();
+        editor.insertText('// and this is another', { autoIndent: true, autoDecreaseIndent: true });
         editor.insertNewline();
       });
 
       await wait(0);
+
+      expect(
+        languageMode.suggestedIndentForBufferRows
+      ).toHaveBeenCalled();
 
       expect(editor.lineTextForBufferRow(1)).toEqual(
         `  // this is a comment`
@@ -4078,7 +4101,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         ["}"] @dedent
       `);
 
-      // let textToPaste = `// this is a comment\n  // and this is another`;
       let textToPaste = `a comment`;
       buffer.setText(textToPaste);
 
@@ -4123,42 +4145,100 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('indentsQuery', `
         ["{"] @indent
         ["}"] @dedent
-        `);
+      `);
 
-        let emptyClassText = dedent`
-        class Example {
+      let emptyClassText = dedent`
+      class Example {
 
-        }
-        `;
+      }
+      `;
 
-        buffer.setText(emptyClassText);
+      buffer.setText(emptyClassText);
 
-        const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-        buffer.setLanguageMode(languageMode);
-        await languageMode.ready;
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
 
-        editor.setCursorBufferPosition([1, 0]);
-        editor.indent();
-        await languageMode.atTransactionEnd();
-        editor.insertText('// this is a comment', { autoIndent: true });
-        await languageMode.atTransactionEnd();
-        expect(editor.lineTextForBufferRow(1)).toEqual('  // this is a comment');
+      editor.setCursorBufferPosition([1, 0]);
+      editor.indent();
+      await languageMode.atTransactionEnd();
+      editor.insertText('// this is a comment', { autoIndent: true });
+      await languageMode.atTransactionEnd();
+      expect(editor.lineTextForBufferRow(1)).toEqual('  // this is a comment');
 
-        editor.insertNewline();
-        await languageMode.atTransactionEnd();
-        await wait(0);
-        expect(editor.lineTextForBufferRow(2)).toEqual('  ');
+      editor.insertNewline();
+      await languageMode.atTransactionEnd();
+      await wait(0);
+      expect(editor.lineTextForBufferRow(2)).toEqual('  ');
 
-        editor.insertNewline();
-        await languageMode.atTransactionEnd();
-        await wait(0);
-        expect(editor.lineTextForBufferRow(3)).toEqual('  ');
+      editor.insertNewline();
+      await languageMode.atTransactionEnd();
+      await wait(0);
+      expect(editor.lineTextForBufferRow(3)).toEqual('  ');
 
-        editor.insertNewline();
-        await languageMode.atTransactionEnd();
-        await wait(0);
-        expect(editor.lineTextForBufferRow(4)).toEqual('  ');
+      editor.insertNewline();
+      await languageMode.atTransactionEnd();
+      await wait(0);
+      expect(editor.lineTextForBufferRow(4)).toEqual('  ');
     });
+
+    it(`can indent properly in a multi-cursor environment without auto-indenting large ranges of the buffer`, async () => {
+      jasmine.useRealClock();
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      expect(editor.getUndoGroupingInterval()).toBe(300);
+
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      // Force this test to use async indent in all cases.
+      languageMode.transactionReparseBudgetMs = 0;
+      languageMode.currentTransactionReparseBudgetMs = 0;
+      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      // No spaces after the `{`s in these examples so that we can more easily
+      // compare expected output to actual output.
+      buffer.setText(dedent`
+        function test () {return }
+
+        function test () {return }
+
+        function test () {return }
+      `);
+
+      expect(
+        languageMode.suggestedIndentForBufferRows
+      ).not.toHaveBeenCalled();
+
+      editor.setCursorBufferPosition([0, 18])
+      editor.addCursorAtBufferPosition([2, 18])
+      editor.addCursorAtBufferPosition([4, 18])
+
+      editor.insertNewline({
+        autoIndent: true,
+        autoIndentNewline: true,
+        autoDecreaseIndent: true
+      })
+
+      await wait(0);
+
+      expect(buffer.getText()).toBe(dedent`
+        function test () {
+          return }
+
+        function test () {
+          return }
+
+        function test () {
+          return }
+      `)
+
+    })
 
   });
 });

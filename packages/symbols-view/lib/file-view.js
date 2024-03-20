@@ -170,7 +170,7 @@ class FileView extends SymbolsView {
     let populated = this.populate(editor);
     if (!populated) return;
     this.attach();
-    this.selectListView.update({ query: filterTerm });
+    this.selectListView.update({ query: filterTerm, selectQuery: true });
   }
 
   serializeEditorState(editor) {

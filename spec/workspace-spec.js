@@ -2027,9 +2027,12 @@ describe('Workspace', () => {
       'source.coffee',
       'source.js', // Tree-sitter grammars also load
       'source.js',
+      'source.js',
+      'source.js.regexp',
       'source.js.regexp',
       'source.js.regexp',
       'source.js.regexp.replacement',
+      'source.jsdoc',
       'source.jsdoc',
       'source.jsdoc',
       'source.litcoffee',
@@ -2277,11 +2280,11 @@ describe('Workspace', () => {
     Ctor.prototype = HTMLElement.prototype;
     TestItemElement.prototype = new Ctor();
     TestItemElement.__super__ = HTMLElement.prototype;
-    TestItemElement.prototype.initialize = function(model) {
+    TestItemElement.prototype.initialize = function (model) {
       this.model = model;
       return this;
     };
-    TestItemElement.prototype.getModel = function() {
+    TestItemElement.prototype.getModel = function () {
       return this.model;
     };
 

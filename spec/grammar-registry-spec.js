@@ -478,6 +478,14 @@ describe('GrammarRegistry', () => {
       );
     });
 
+    it(`returns a legacy Tree-sitter grammar if the user opted into it via a scope-specific setting`, async () => {
+      await atom.packages.activatePackage('language-javascript');
+      setConfigForLanguageMode('node-tree-sitter', { scopeSelector: '.source.js' })
+      let grammar = atom.grammars.selectGrammar('file.js');
+      expect(grammar.name).toBe('JavaScript');
+      expect(grammar.constructor.name).toBe('TreeSitterGrammar');
+    })
+
     it("uses the filePath's shebang line if the grammar cannot be determined by the extension or basename", async () => {
       await atom.packages.activatePackage('language-javascript');
       await atom.packages.activatePackage('language-ruby');

@@ -157,6 +157,12 @@ describe('SymbolsView', () => {
 
       expect(symbolsView.element.querySelector('li:first-child .primary-line')).toHaveText('Symbol on Row 13');
       expect(symbolsView.element.querySelector('li:first-child .secondary-line')).toHaveText('Line 13');
+
+      // We reach inside of the `SelectListView` instance to its `TextEditor`
+      // so that we can assert that the text in the query field is selected.
+      // This allows the user to start typing and replace the prefilled
+      // selection if they didn't mean to prefill the query.
+      expect(symbolsView.selectListView.refs.queryEditor.getSelectedText()).toBe('Symbol on Row 13');
     });
 
     it('does not prefill the query field if `prefillSelectedText` is `false`', async () => {
