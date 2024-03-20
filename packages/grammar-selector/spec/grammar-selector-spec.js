@@ -299,7 +299,7 @@ describe('GrammarSelector', () => {
           }
         }
 
-        expect(cppCount).toBe(3); // ensure we actually saw two grammars
+        expect(cppCount).toBe(3); // ensure we actually saw three grammars
       });
 
       it('shows all three if false (in proper order when language parser is textmate)', async () => {
