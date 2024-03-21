@@ -1,9 +1,11 @@
+const { Disposable, CompositeDisposable, TextEditor } = require("atom");
+const _ = require("underscore-plus");
 const BaseSettingValue = require("./base.js");
 
 module.exports =
-class ArraySettingValue {
+class ArraySettingValue extends BaseSettingValue {
   constructor(namespace, name, value, opts) {
-    super(namespace, name, value, ops);
+    super(namespace, name, value, opts);
   }
 
   render() {
@@ -14,10 +16,10 @@ class ArraySettingValue {
     const label = document.createElement("label");
     label.classList.add("control-label");
 
-    const titleDiv = this.createTitleDiv();
+    const titleDiv = this.renderTitleDiv();
     label.appendChild(titleDiv);
 
-    const descriptionDiv = this.createDescriptionDiv();
+    const descriptionDiv = this.renderDescriptionDiv();
     label.appendChild(descriptionDiv);
     fragment.appendChild(label);
 
@@ -30,7 +32,7 @@ class ArraySettingValue {
     const editor = new TextEditor({ mini: true });
     editor.element.id = this.keyPath;
     editor.element.setAttribute("type", type);
-    editorContaienr.appendChild(editor.element);
+    editorContainer.appendChild(editor.element);
     controls.appendChild(editorContainer);
     fragment.appendChild(controls);
 
@@ -41,6 +43,8 @@ class ArraySettingValue {
   bindInput() {
     const editorElement = this.element.querySelector("atom-text-editor");
 
+    if (!editorElement) { return; }
+    
     let editor = editorElement.getModel();
     let name = editorElement.id;
     let type = editorElement.getAttribute("type");
@@ -70,7 +74,7 @@ class ArraySettingValue {
 
     this.observe(name, (value) => {
       this.setText(editor, name, type, value);
-      // TODO difficult to update override message here
+      this.opts.updateOverrideMessage(name);
     });
 
     subscriptions.add(editor.onDidStopChanging(() => {
@@ -91,5 +95,21 @@ class ArraySettingValue {
     subscriptions.add(editorElement);
 
     return subscriptions;
+  }
+
+  setText(editor, name, type, value) {
+    let stringValue;
+    if (this.isDefault(name)) {
+      stringValue = "";
+    } else {
+      stringValue = this.valueToString(value) || "";
+    }
+
+    if (stringValue === editor.getText() || _.isEqual(value, this.parseValue(type, editor.getText()))) {
+      return;
+    }
+
+    editor.setText(stringValue);
+    editor.moveToEndOfLine();
   }
 }

@@ -1,3 +1,4 @@
+const { Disposable } = require("atom");
 const BaseSettingValue = require("./base.js");
 
 module.exports =
@@ -32,7 +33,7 @@ class ColorSettingValue extends BaseSettingValue {
   bindInput() {
     let input = this.element.querySelector(`input[id='${this.keyPath}']`);
     this.observe(this.keyPath, (value) => {
-      // TODO no easy way to update an override message from here
+      this.opts.updateOverrideMessage(name);
       if (value && typeof value.toHexString === "function") {
         input.value = value.toHexString();
       } else {

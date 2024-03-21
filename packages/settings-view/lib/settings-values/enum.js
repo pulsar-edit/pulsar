@@ -1,7 +1,8 @@
+const { CompositeDisposable } = require("atom");
 const BaseSettingValue = require("./base.js");
 
 module.exports =
-class EnumSettingValue {
+class EnumSettingValue extends BaseSettingValue {
   constructor(namespace, name, value, opts) {
     super(namespace, name, value, opts);
 
@@ -15,7 +16,7 @@ class EnumSettingValue {
     label.classList.add("control-label");
 
     const titleDiv = this.renderTitleDiv();
-    label.apendChild(titleDiv);
+    label.appendChild(titleDiv);
 
     const descriptionDiv = this.renderDescriptionDiv();
     label.appendChild(descriptionDiv);
@@ -36,7 +37,7 @@ class EnumSettingValue {
       let name = input.name;
 
       this.observe(name, (value) => {
-        // TODO no easy way to update override message
+        this.opts.updateOverrideMessage(name);
         input.checked = (value === this.parseValue(atom.config.getSchema(name).type, input.value));
       });
 
