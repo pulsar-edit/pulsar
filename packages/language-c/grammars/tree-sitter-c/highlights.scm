@@ -1,4 +1,3 @@
-
 ; PREPROCESSOR
 ; ============
 
@@ -223,6 +222,14 @@
     field: (field_identifier) @variable.other.member.assignment.c)
     (#set! capture.final))
 
+; Goto label definitions: the "foo" in `foo:` before a statement.
+(labeled_statement
+  label: (statement_identifier) @entity.name.label.c)
+
+; Goto statements — the "foo" in `goto foo;`
+(goto_statement
+  label: (statement_identifier) @support.other.label.c)
+
 
 ; Function parameters
 ; -------------------
@@ -255,6 +262,12 @@
 (field_expression
   "->"
   field: (field_identifier) @variable.other.member.c)
+
+; The "bar" in `foo.bar`.
+(field_expression
+  operator: "."
+  field: (field_identifier) @variable.other.member.c)
+
 
 
 ; FUNCTIONS

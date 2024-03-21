@@ -3,7 +3,7 @@ scopeName: 'source.tsx'
 type: 'modern-tree-sitter'
 parser: 'tree-sitter-typescript/tsx'
 
-fileTypes: ['tsx']
+fileTypes: ['tsx', 'ctsx', 'mtsx']
 
 injectionRegex: '^(tsx|TSX)$'
 

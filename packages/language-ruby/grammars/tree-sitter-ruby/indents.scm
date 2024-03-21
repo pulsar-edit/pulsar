@@ -25,7 +25,6 @@
   "while"
   "until"
   "for"
-  ; (for)
   "begin"
   "do"
   "rescue"
@@ -33,6 +32,11 @@
   "("
   "{"
   "["
+  ; “Special” array notations. (Currently, they all have the same anonymous
+  ; node, even if they’re delimited with another character pair instead of
+  ; parentheses.)
+  "%w("
+  "%i("
 ] @indent
 
 [

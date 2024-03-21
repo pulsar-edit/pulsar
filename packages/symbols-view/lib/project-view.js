@@ -26,7 +26,7 @@ module.exports = class ProjectView extends SymbolsView {
     } else {
       this.populate();
       this.attach();
-      this.selectListView.update({ query: filterTerm });
+      this.selectListView.update({ query: filterTerm, selectQuery: true });
     }
   }
 
