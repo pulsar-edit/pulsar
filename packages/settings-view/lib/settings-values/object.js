@@ -1,4 +1,7 @@
+const _ = require("underscore-plus");
 const BaseSettingValue = require("./base.js");
+const { getSettingTitle } = require("../rich-title.js");
+const elementForSetting = require("./elementForSetting.js");
 
 module.exports =
 class ObjectSettingValue extends BaseSettingValue {
@@ -34,7 +37,7 @@ class ObjectSettingValue extends BaseSettingValue {
       const div = document.createElement("div");
       div.classList.add("sub-section-body");
       for (const key of this.opts.sortSettings(this.keyPath, this.value)) {
-        div.appendChild(elementForSetting(namespace, `${name}.${key}`, value[key], this.opts.compositeDisposable));
+        div.appendChild(elementForSetting(this.namespace, `${this.name}.${key}`, this.value[key], this.opts));
       }
 
       section.appendChild(div);

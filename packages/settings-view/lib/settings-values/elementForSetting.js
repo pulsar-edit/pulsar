@@ -1,9 +1,13 @@
 // Creates an HTML element for a given setting
 const _ = require("underscore-plus");
+
+const ArraySettingValue = require("./array.js");
 const CheckboxSettingValue = require("./checkbox.js");
 const ColorSettingValue = require("./color.js");
+const ElementSettingValue = require("./element.js");
 const EnumSettingValue = require("./enum.js");
-const ArraySettingValue = require("./array.js");
+const ObjectSettingValue = require("./object.js");
+
 
 module.exports =
 function elementForSetting(namespace, name, value, opts = {}) {
@@ -52,12 +56,26 @@ function elementForSetting(namespace, name, value, opts = {}) {
   } else if (_.isObject(value) || (schema && schema.type === 'object')) {
     settingsClass = new ObjectSettingValue(namespace, name, value, opts);
   } else {
-    settingClass = new ElementSettingValue(namespace, name, value, opts);
+    settingsClass = new ElementSettingValue(namespace, name, value, opts);
+  }
+
+  if (settingsClass === undefined) {
+    console.log(`Unknown SettingValue Class for: '${namespace}:${name}.${value}'`);
+    return controlGroup;
   }
 
   controls.appendChild(settingsClass.render());
-  opts.compositeDisposable.add(settingsClass.bindTooltips());
-  opts.compositeDisposable.add(settingsClass.bindInput());
+  
+  let bindTooltips = settingsClass.bindTooltips();
+  if (bindTooltips) {
+    opts.compositeDisposable.add(bindTooltips);
+  }
+
+  let bindInput = settingsClass.bindInput();
+  if (bindInput) {
+    // Since these classes may return unexpected data we guard against it here
+    opts.compositeDisposable.add(bindInput);
+  }
 
   return controlGroup;
 }

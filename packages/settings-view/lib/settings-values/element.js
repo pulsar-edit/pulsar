@@ -2,6 +2,7 @@ const { CompositeDisposable } = require("atom");
 const _ = require("underscore-plus");
 const BaseSettingValue = require("./base.js");
 const elementForSetting = require("./elementForSetting.js");
+const { getSettingTitle } = require("../rich-title.js");
 
 module.exports =
 class ElementSettingValue extends BaseSettingValue {
@@ -11,7 +12,7 @@ class ElementSettingValue extends BaseSettingValue {
   }
 
   render() {
-    if (_.keys(value).length === 0) {
+    if (_.keys(this.value).length === 0) {
       this.element = document.createDocumentFragment();
       return this.element;
     } else {
