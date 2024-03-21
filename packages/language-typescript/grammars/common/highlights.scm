@@ -793,6 +793,22 @@
   "debugger"
 ] @keyword.control._TYPE_._LANG_
 
+
+; REGEX
+; =====
+
+(regex) @string.regexp.js
+(regex
+  "/" @punctuation.definition.string.begin.js
+  (#is? test.first))
+
+(regex
+  "/" @punctuation.definition.string.end.js
+  (#is? test.last))
+
+(regex_flags) @keyword.other.js
+
+
 ; OPERATORS
 ; =========
 
