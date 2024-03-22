@@ -16,7 +16,8 @@ const {
   dialog,
   ipcMain,
   shell,
-  screen
+  screen,
+  nativeTheme
 } = require('electron');
 const { CompositeDisposable, Disposable } = require('event-kit');
 const crypto = require('crypto');
@@ -799,6 +800,14 @@ module.exports = class AtomApplication extends EventEmitter {
           const { webContents } = atomWindow.browserWindow;
           if (webContents !== event.sender)
             webContents.send('did-change-history-manager');
+        }
+      })
+    );
+
+    this.disposable.add(
+      ipcHelpers.on(ipcMain, 'setWindowTheme', (event, options) => {
+        if (options && typeof options === 'string') {
+          nativeTheme.themeSource = options;
         }
       })
     );
