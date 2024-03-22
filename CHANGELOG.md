@@ -36,7 +36,7 @@
 - Bumped dugite to make the github package compatible with ARM Linux.
 
 ### Pulsar
-- Fixed: fix(tree-sitter): pass node text to grammar [@claytoncarter](https://github.com/pulsar-edit/pulsar/pull/860)
+- Fixed: fix(tree-sitter): pass node text to grammar [@claytonrcarter](https://github.com/pulsar-edit/pulsar/pull/860)
 - Fixed: Fix issue with Markdown rendering after line break in strict mode [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/889)
 - Updated: Update README badges [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/891)
 - Updated: Update copyright year to 2024 [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/870)
@@ -57,7 +57,7 @@
 ### PPM
 - Fixed: Fix test failure due to missing atom command [@toddy15](https://github.com/pulsar-edit/ppm/pull/124)
 - Updated: Update syntax-variables.less to include language entity colors [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/123)
-- Added: feat(link): add --force flag [@claytoncarter](https://github.com/pulsar-edit/ppm/pull/122)
+- Added: feat(link): add --force flag [@claytonrcarter](https://github.com/pulsar-edit/ppm/pull/122)
 
 ### github
 - Updated: Bump dugite to 2.5.2 [@DeeDeeG](https://github.com/pulsar-edit/github/pull/39)
