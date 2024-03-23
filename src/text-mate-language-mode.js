@@ -30,12 +30,13 @@ class TextMateLanguageMode {
     this.buffer = params.buffer;
     this.largeFileMode = params.largeFileMode;
     this.config = params.config;
+    this.grammar = params.grammar || NullGrammar;
+    this.largeFileModeThreshold = atom.config.get('editor.largeFileModeThreshold', {
+      scope: [this.grammar.scopeName]});
     this.largeFileMode =
       params.largeFileMode != null
         ? params.largeFileMode
-        : this.buffer.buffer.getLength() >= 2 * 1024 * 1024;
-
-    this.grammar = params.grammar || NullGrammar;
+        : this.buffer.buffer.getLength() >= this.largeFileModeThreshold;
     this.rootScopeDescriptor = new ScopeDescriptor({
       scopes: [this.grammar.scopeName]
     });

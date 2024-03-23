@@ -617,6 +617,13 @@ const configSchema = {
         default: true,
         description:
           'Add multiple cursors when pressing the Ctrl key (Command key on macOS) and clicking the editor.'
+      },
+      largeFileModeThreshold: {
+        type: 'integer',
+        default: 2 * 1024 * 1024,
+        minimum: 0,
+        description:
+          'Set threshold number of characters to activate large file mode'
       }
     }
   }
