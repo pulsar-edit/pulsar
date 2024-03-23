@@ -50,6 +50,9 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
+                Fixed some folds in Ruby like <code>unless</code>, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.
+              </li>
+              <li>
                 Improved the accuracy of indentation hinting in modern Tree-sitter grammars, especially in multi-cursor scenarios.
               </li>
               <li>

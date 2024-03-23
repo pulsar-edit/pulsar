@@ -6,8 +6,9 @@
 
 ## [Unreleased]
 
-- Fixed some folds in Ruby like `unless`, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.
 ## 1.115.0
+
+- Fixed some folds in Ruby like `unless`, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.
 - Improved the accuracy of indentation hinting in modern Tree-sitter grammars, especially in multi-cursor scenarios.
 - Improved the ability of the user to opt into a specific kind of grammar for a specific language.
 - Changed the behavior of the `grammar-selector` package so that it will show the user's preferred grammar for a specific language.
