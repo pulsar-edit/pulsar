@@ -163,6 +163,7 @@
     "solarized-dark-syntax": "file:packages/solarized-dark-syntax",
     "solarized-light-syntax": "file:packages/solarized-light-syntax",
     "spell-check": "file:packages/spell-check",
+    "sqlite3": "^5.1.7",
     "status-bar": "file:packages/status-bar",
     "styleguide": "file:./packages/styleguide",
     "superstring": "^2.4.4",
