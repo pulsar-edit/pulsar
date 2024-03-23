@@ -19,6 +19,7 @@ const DeserializerManager = require('./deserializer-manager');
 const ViewRegistry = require('./view-registry');
 const NotificationManager = require('./notification-manager');
 const Config = require('./config');
+const SignalManager = require('./signal-manager');
 const KeymapManager = require('./keymap-extensions');
 const TooltipManager = require('./tooltip-manager');
 const CommandRegistry = require('./command-registry');
@@ -104,6 +105,9 @@ class AtomEnvironment {
       type: 'object',
       properties: _.clone(ConfigSchema)
     });
+
+    /** @type {SignalManager} */
+    this.signal = new SignalManager();
 
     /** @type {KeymapManager} */
     this.keymaps = new KeymapManager({
@@ -1746,7 +1750,7 @@ or use Pane::saveItemAs for programmatic saving.`);
   }
 
   resolveProxy(url) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const requestId = this.nextProxyRequestId++;
       const disposable = this.applicationDelegate.onDidResolveProxy(
         (id, proxy) => {

@@ -18,6 +18,7 @@ const {
   shell,
   screen
 } = require('electron');
+const signalBroker = require('./signal-broker');
 const { CompositeDisposable, Disposable } = require('event-kit');
 const crypto = require('crypto');
 const fs = require('fs-plus');
@@ -263,6 +264,9 @@ module.exports = class AtomApplication extends EventEmitter {
 
     const result = await this.launch(options);
 
+    signalBroker.start();
+    this.disposable.add(() => signalBroker.stop());
+
     StartupTime.addMarker('main-process:atom-application:initialize:end');
 
     return result;
@@ -372,7 +376,7 @@ module.exports = class AtomApplication extends EventEmitter {
       if (this.getAllWindows().length === 0) {
         console.log("Quitting.");
         app.quit();
-      };
+      }
     } else if (
       (pathsToOpen && pathsToOpen.length > 0) ||
       (foldersToOpen && foldersToOpen.length > 0)
@@ -651,7 +655,7 @@ module.exports = class AtomApplication extends EventEmitter {
         const window = this.focusedWindow();
         if (window) window.minimize();
       });
-      this.on('application:zoom', function() {
+      this.on('application:zoom', function () {
         const window = this.focusedWindow();
         if (window) window.maximize();
       });
@@ -1681,7 +1685,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
     const timeoutInSeconds = Number.parseFloat(timeout);
     if (!Number.isNaN(timeoutInSeconds)) {
-      const timeoutHandler = function() {
+      const timeoutHandler = function () {
         console.log(
           `The test suite has timed out because it has been running for more than ${timeoutInSeconds} seconds.`
         );
