@@ -50,31 +50,22 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Prevented an exception raised in the command palette in certain unusual filtering scenarios.
+                Fixed some folds in Ruby like <code>unless</code>, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.
               </li>
               <li>
-                Refrain from rendering anchor icons when showing a package's README file in `settings-view`.
+                Improved the accuracy of indentation hinting in modern Tree-sitter grammars, especially in multi-cursor scenarios.
               </li>
               <li>
-                Build Linux binaries on Debian 10, for older glibc and compatibility with older Linux distros.
+                Improved the ability of the user to opt into a specific kind of grammar for a specific language.
               </li>
               <li>
-                Fixed a rendering error in `atom.ui.markdown.render` when `disableMode` was set to `"strict"` and the input contained HTML line breaks.
+                Changed the behavior of the <code>grammar-selector</code> package so that it will show the user's preferred grammar for a specific language.
               </li>
               <li>
-                Added support for the semanticolor package in modern tree-sitter grammars.
+                Updated to version <code>0.20.9</code> of <code>web-tree-sitter</code>.
               </li>
               <li>
-                Added new `--force` flag to `ppm link` command that will uninstall any conflicting package already installed.
-              </li>
-              <li>
-                Added language entity colors to `syntax-variables.less`.
-              </li>
-              <li>
-                Numerous Tree-Sitter Grammar syntax highlighting fixes.
-              </li>
-              <li>
-                Bumped dugite to make the github package compatible with ARM Linux.
+                Improved syntax highlighting, indentation, and code folding in various languages, including TypeScript, shell scripts, Ruby, and C/C++.
               </li>
             </ul>
 
