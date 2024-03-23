@@ -7,14 +7,15 @@ parser: 'tree-sitter-clojure'
 'fileTypes': [
   'boot'
   'clj'
+  'clje'
+  'cljr'
   'clj.hl'
   'cljc'
   'cljs'
   'cljs.hl'
   'cljx'
   'clojure'
-  'org'
-  'bb'
+  'edn'
   'joke'
   'joker'
 ]
@@ -39,5 +40,8 @@ parser: 'tree-sitter-clojure'
 '''
 treeSitter:
   grammar: 'ts/grammar.wasm'
-  highlightsQuery: 'ts/highlights.scm'
+  highlightsQuery: [
+    'ts/highlights.scm'
+    'ts/edn-highlights.scm'
+  ]
   foldsQuery: 'ts/folds.scm'

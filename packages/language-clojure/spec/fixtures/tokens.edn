@@ -1,0 +1,68 @@
+(ns foobar)
+; <- punctuation.section.list.begin
+; ^ meta.symbol
+;   ^ meta.symbol
+;         ^ punctuation.section.list.end
+
+"A STRING"
+; <- punctuation.definition.string.begin
+; ^ string.quoted.double
+;        ^ punctuation.definition.string.end
+
+#{foo}
+; <- punctuation.section.set.begin
+;   ^ meta.symbol
+;    ^ punctuation.section.set.end
+
+{:key "value"}
+; <- punctuation.section.map.begin
+; ^ constant.keyword
+;    ^ meta.map
+;            ^ punctuation.section.map.end
+
+;; Primitives
+10
+; <- constant.numeric
+10.2
+; <- constant.numeric
+10M
+; <- constant.numeric
+10N
+; <- constant.numeric
+10/2
+; <- constant.numeric
+:key
+; <- constant.keyword
+symbol
+; <- meta.symbol
+"A string"
+; ^ string.quoted.double
+#"A regular expression"
+; <- string.regexp
+nil
+; <- constant.language
+true
+; <- constant.language
+false
+; <- constant.language
+error/
+; <- meta.symbol
+;    ^ invalid.illegal
+
+;; Comments
+;   ^ comment.line.semicolon
+
+#_
+(+ 1 2 3 (+ 4 5))
+;  ^ comment.block
+;           ^ comment.block
+
+#_
+(+ '1 '(:foo))
+;   ^ comment.block
+;   ^ !constant.numeric
+;       ^ comment.block
+;       ^ !constant.keyword
+
+^{:some :meta} (def foo 10)
+;  ^ meta.metadata.clojure
