@@ -147,58 +147,65 @@ describe('StyleManager', () => {
       // go looking for cached files, and will always use the css provided
 
       it('does not upgrade already wrapped math', () => {
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { padding: calc(10px/2); }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual("p { padding: calc(10px/2); }");
       });
 
       it('does not upgrade negative numbers', () => {
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { padding: 0 -1px; }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual("p { padding: 0 -1px; }");
       });
 
       it('upgrades simple division', () => {
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { padding: 10px/2; }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual("p { padding: calc(10px/2); }");
       });
 
       it('upgrades multi parameter math', () => {
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { padding: 0 10px/2 5em; }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual("p { padding: 0 calc(10px/2) 5em; }");
       });
 
       it('upgrades math with spaces', () => {
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { padding: 10px / 2; }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual("p { padding: calc(10px / 2); }");
       });
 
       it('upgrades multiple math expressions in a single line', () => {
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { padding: 10px/2 10px/3; }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual("p { padding: calc(10px/2) calc(10px/3); }");
       });
 
       it('does not upgrade base64 strings', () => {
         // Regression Check
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { cursor: -webkit-image-set(url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=')); }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual(
           "p { cursor: -webkit-image-set(url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=')); }"
@@ -206,9 +213,10 @@ describe('StyleManager', () => {
       });
 
       it('does not modify hsl function where `/` is valid', () => {
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { caret-color: hsl(228deg 4% 24% / 0.8); }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual(
           "p { caret-color: hsl(228deg 4% 24% / 0.8); }"
@@ -216,9 +224,10 @@ describe('StyleManager', () => {
       });
 
       it('does not modify acos function, where math is valid', () => {
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { transform: rotate(acos(2 * 0.125)); }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual(
           "p { transform: rotate(acos(2 * 0.125)); }"
@@ -226,9 +235,10 @@ describe('StyleManager', () => {
       });
 
       it('recognizes valid less variables: right side', () => {
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { padding: @size + 12px; }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual(
           "p { padding: calc(@size + 12px); }"
@@ -236,9 +246,10 @@ describe('StyleManager', () => {
       });
 
       it('recognizes valid less variables: left side', () => {
-        let upgradedSheet = mathStyleManager.upgradeDeprecatedMathUsageForStyleSheet(
+        let upgradedSheet = mathStyleManager.upgradeStyleSheet(
           "p { padding: 12px + @size; }",
-          {}
+          {},
+          "math"
         );
         expect(upgradedSheet.source).toEqual(
           "p { padding: calc(12px + @size); }"
