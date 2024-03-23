@@ -35,7 +35,7 @@ jobs:
       run: yarn build
 
     - name: build dependencies
-      run: yarn build:apm
+      run: "yarn build:apm"
 
     - name: build the editor
       run: (yarn dist deb || yarn dist deb) && mv binaries/*deb pulsar.deb
