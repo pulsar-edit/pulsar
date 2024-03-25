@@ -78,7 +78,6 @@ class PathOption {
     this.HKPATH;
     this.hive;
     this.installReg = "\\SOFTWARE\\0949b555-c22c-56b7-873a-a960bdefa81f";
-    this.installMode = installType;
 
     // We no longer support an `installType`
     // Only managing the path of the current user
