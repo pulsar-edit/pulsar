@@ -118,13 +118,13 @@ class PathOption {
   register(callback) {
     this.getPulsarPath().then((pulsarPath) => {
       const child = ChildProcess.execFile(
-          `"${pulsarPath}\\resources\\modifyWindowsPath.ps1"`,
-          ['-installdir', `"${pulsarPath}"`, '-remove', '0'],
+          `powershell.exe '${pulsarPath}\\resources\\modifyWindowsPath.ps1'`,
+          ['-installdir', `'${pulsarPath}'`, '-remove', '0'],
           { shell: "powershell.exe" },
           (error, stdout, stderr) =>
           {
         if (error) {
-          atom.notifications.addError(`Error Running Script: ${error.toString()}`);
+          atom.notifications.addError(`Error Running Script: ${error.toString()}`, { dismissable: true });
           callback(error);
         } else {
           return callback();
@@ -140,13 +140,13 @@ class PathOption {
       if (isRegistered) {
         this.getPulsarPath().then((pulsarPath) => {
           const child = ChildProcess.execFile(
-              `"${pulsarPath}\\resources\\modifyWindowsPath.ps1"`,
+              `powershell.exe "${pulsarPath}\\resources\\modifyWindowsPath.ps1"`,
               ['-installdir', `"${pulsarPath}"`, '-remove', '1'],
               { shell: "powershell.exe" },
               (error, stdout, stderr) =>
               {
             if (error) {
-              atom.notifications.addError(`Error Running Script: ${error.toString()}`);
+              atom.notifications.addError(`Error Running Script: ${error.toString()}`, { dismissable: true });
               callback(error);
             } else {
               return callback();

@@ -129,7 +129,7 @@ export default class SystemPanel {
                 }} />
               <div className='setting-title'>Add Pulsar to PATH</div>
               <div className='setting-description'>
-                Add Pulsar to Windows PATH to enable CLI usage.
+                Add Pulsar to Windows PATH to enable CLI usage. (May require a reboot to take effect.)
               </div>
             </label>
           </div>

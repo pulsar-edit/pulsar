@@ -25,7 +25,7 @@ if (-not $remove) {
   # We want to add Pulsar path values
 
   # Lets first save a copy of the users current path
-  $env:Path >> prior2addition.txt;
+  $env:Path > prior2addition.txt;
 
   $originalPathToInstall = $installdir
 
@@ -67,7 +67,7 @@ if (-not $remove) {
   # We want to remove Pulsar from the user path
 
   # Lets first save a copy of the users current path
-  $env:Path >> prior2removal.txt;
+  $env:Path > prior2removal.txt;
 
   $pulsarPath = $installdir + "\resources";
   $ppmPath = $installdir + "\resources\app\ppm\bin";
