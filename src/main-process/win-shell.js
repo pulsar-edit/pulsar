@@ -118,19 +118,24 @@ class PathOption {
   register(callback) {
     this.getPulsarPath().then((pulsarPath) => {
       const child = ChildProcess.execFile(
-          `powershell.exe '${pulsarPath}\\resources\\modifyWindowsPath.ps1'`,
-          ['-installdir', `'${pulsarPath}'`, '-remove', '0'],
+          `powershell.exe -File '${pulsarPath}\\resources\\modifyWindowsPath.ps1'`,
+          ['-installdir', `'${pulsarPath}'`, '-remove', 'FALSE'],
           { shell: "powershell.exe" },
           (error, stdout, stderr) =>
           {
         if (error) {
+          console.log(`Add Pulsar to PATH: ${error}`);
           atom.notifications.addError(`Error Running Script: ${error.toString()}`, { dismissable: true });
           callback(error);
         } else {
+          console.log("Add Pulsar to PATH:");
+          console.log(`stdout: ${stdout}`);
+          console.log(`stderr: ${stderr}`);
           return callback();
         }
       });
     }).catch((err) => {
+      console.error(`Add Pulsar to PATH error caught: ${err}`);
       return callback(err);
     });
   }
@@ -140,19 +145,24 @@ class PathOption {
       if (isRegistered) {
         this.getPulsarPath().then((pulsarPath) => {
           const child = ChildProcess.execFile(
-              `powershell.exe "${pulsarPath}\\resources\\modifyWindowsPath.ps1"`,
-              ['-installdir', `"${pulsarPath}"`, '-remove', '1'],
+              `powershell.exe -File '${pulsarPath}\\resources\\modifyWindowsPath.ps1'`,
+              ['-installdir', `'${pulsarPath}'`, '-remove', 'TRUE'],
               { shell: "powershell.exe" },
               (error, stdout, stderr) =>
               {
             if (error) {
+              console.error(`Remove Pulsar from PATH: ${error}`);
               atom.notifications.addError(`Error Running Script: ${error.toString()}`, { dismissable: true });
               callback(error);
             } else {
+              console.log("Remove Pulsar from PATH:");
+              console.log(`stdout: ${stdout}`);
+              console.log(`stderr: ${stderr}`);
               return callback();
             }
           });
         }).catch((err) => {
+          console.error(`Remove Pulsar from PATH error caught: ${err}`);
           return callback(err);
         });
       } else {
@@ -169,12 +179,26 @@ class PathOption {
         key: this.installReg
       }).get("InstallLocation", (err, val) => {
         if (err) {
-          reject(err);
+          console.error(err);
+          let location = process.resourcesPath;
+          if (typeof location !== "string" || location.length < 1) {
+            console.error(`Unable to locate Pulsar PATH via fallback methods: '${location}'`);
+            reject(err);
+          } else {
+            resolve(Path.dirname(location));
+          }
         } else {
           pulsarPath = val.value;
 
           if (pulsarPath.length === 0) {
-            reject("Unable to find Pulsar Install Path");
+            console.error("Unable to find Pulsar Install Path");
+            let location = process.resourcesPath;
+            if (typeof location !== "string" || location.length < 1) {
+              console.error(`Unable to locate Pulsar PATH via fallback methods: '${location}'`);
+              reject("Unable to find Pulsar Install Path");
+            } else {
+              resolve(Path.dirname(location));
+            }
           }
 
           resolve(pulsarPath);

@@ -3,13 +3,13 @@
 
 # Example Usage:
 # Pulsar User Installation:
-# .\_.ps1 -installdir "$INSTDIR" -remove 0
+# .\_.ps1 -installdir "$INSTDIR" -remove FALSE
 # Pulsar Machine Installation:
-# .\_.ps1 -installdir "$INSTDIR" -remove 0
+# .\_.ps1 -installdir "$INSTDIR" -remove FALSE
 # Pulsar User Uninstallation:
-# .\_.ps1 -installdir "$INSTDIR" -remove 1
+# .\_.ps1 -installdir "$INSTDIR" -remove TRUE
 # Pulsar Machine Uninstallation:
-# .\_.ps1 -installdir "$INSTDIR" -remove 1
+# .\_.ps1 -installdir "$INSTDIR" -remove TRUE
 
 # For safe interaction with environment variables taken from:
 # https://github.com/chocolatey/choco/blob/HEAD/src/chocolatey.resources/helpers/functions/Set-EnvironmentVariable.ps1
