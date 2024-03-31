@@ -770,18 +770,16 @@ module.exports = class GrammarRegistry {
     let result = this.textmateRegistry.getGrammars();
     if (!(params && params.includeTreeSitter)) return result;
 
-    let includeLegacyTreeSitterGrammars =
-      atom.config.get('core.useLegacyTreeSitter') === true;
-
     let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById)
       .filter(g => g.scopeName);
     result = result.concat(modernTsGrammars);
 
-    if (includeLegacyTreeSitterGrammars) {
-      const legacyTsGrammars = Object.values(this.treeSitterGrammarsById)
-        .filter(g => g.scopeName);
-      result = result.concat(legacyTsGrammars);
-    }
+    // We must include all legacy Tree-sitter grammars here just in case the
+    // user has opted into `useTreeSitterGrammars` via a scope-specific
+    // setting.
+    const legacyTsGrammars = Object.values(this.treeSitterGrammarsById)
+      .filter(g => g.scopeName);
+    result = result.concat(legacyTsGrammars);
 
     return result;
   }

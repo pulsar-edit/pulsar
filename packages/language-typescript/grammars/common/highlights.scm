@@ -44,10 +44,11 @@
 (required_parameter
   pattern: (identifier) @variable.parameter.with-default._LANG_
   value: (_)
-  (#set! capture.final true))
+  (#set! capture.final))
 
 (required_parameter
-  pattern: (identifier) @variable.parameter._LANG_)
+  pattern: (identifier) @variable.parameter._LANG_
+  (#set! capture.final))
 
 (required_parameter
   pattern: (rest_pattern
@@ -56,16 +57,17 @@
 (required_parameter
   pattern: (object_pattern
     (shorthand_property_identifier_pattern) @variable.parameter.destructuring._LANG_)
-    (#set! capture.final true))
+    (#set! capture.final))
 
 (required_parameter
   pattern: (object_pattern
     (object_assignment_pattern
       (shorthand_property_identifier_pattern) @variable.parameter.destructuring.with-default._LANG_))
-    (#set! capture.final true))
+    (#set! capture.final))
 
 (optional_parameter
-  pattern: (identifier) @variable.parameter.optional._LANG_)
+  pattern: (identifier) @variable.parameter.optional._LANG_
+  (#set! capture.final))
 
 (optional_parameter "?" @keyword.operator.type.optional._LANG_)
 
@@ -819,6 +821,8 @@
 
 (binary_expression
   ["+" "-" "*" "/" "%"] @keyword.operator.arithmetic._LANG_)
+
+(unary_expression ["+" "-"] @keyword.operator.unary._LANG_)
 
 (binary_expression
   [

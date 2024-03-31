@@ -3,7 +3,7 @@ scopeName: 'source.ts'
 type: 'modern-tree-sitter'
 parser: 'tree-sitter-typescript/typescript'
 
-fileTypes: ['ts']
+fileTypes: ['ts', 'cts', 'mts']
 
 injectionRegex: '^(typescript|TYPESCRIPT|ts|TS)$'
 

@@ -6,6 +6,24 @@
 
 ## [Unreleased]
 
+## 1.115.0
+
+- Fixed some folds in Ruby like `unless`, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.
+- Improved the accuracy of indentation hinting in modern Tree-sitter grammars, especially in multi-cursor scenarios.
+- Improved the ability of the user to opt into a specific kind of grammar for a specific language.
+- Changed the behavior of the `grammar-selector` package so that it will show the user's preferred grammar for a specific language.
+- Updated to version `0.20.9` of `web-tree-sitter`.
+- Improved syntax highlighting, indentation, and code folding in various languages, including TypeScript, shell scripts, Ruby, and C/C++.
+
+### Pulsar
+- Fixed: Fixed folds for Ruby [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/956)
+- Fixed: Tree-sitter fixes: 1.115 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/941)
+- Updated: cirrus: Update Rolling upload token again [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/960)
+- Fixed: cirrus: Various fixes for macOS Cirrus CI [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/961)
+- Fixed: Fix(fuzzy-finder) fs.lstatSync throws Exception if not a file or dir [@schadomi7](https://github.com/pulsar-edit/pulsar/pull/944)
+- Updated: CI: Update Rolling upload token for Cirrus CI [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/936)
+- Updated: Cirrus: Install older dotenv gem version ~> 2.8 (< 3) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/937)
+
 ## 1.114.0
 
 - Prevented an exception raised in the command palette in certain unusual filtering scenarios.
@@ -19,7 +37,7 @@
 - Bumped dugite to make the github package compatible with ARM Linux.
 
 ### Pulsar
-- Fixed: fix(tree-sitter): pass node text to grammar [@claytoncarter](https://github.com/pulsar-edit/pulsar/pull/860)
+- Fixed: fix(tree-sitter): pass node text to grammar [@claytonrcarter](https://github.com/pulsar-edit/pulsar/pull/860)
 - Fixed: Fix issue with Markdown rendering after line break in strict mode [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/889)
 - Updated: Update README badges [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/891)
 - Updated: Update copyright year to 2024 [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/870)
@@ -40,7 +58,7 @@
 ### PPM
 - Fixed: Fix test failure due to missing atom command [@toddy15](https://github.com/pulsar-edit/ppm/pull/124)
 - Updated: Update syntax-variables.less to include language entity colors [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/123)
-- Added: feat(link): add --force flag [@claytoncarter](https://github.com/pulsar-edit/ppm/pull/122)
+- Added: feat(link): add --force flag [@claytonrcarter](https://github.com/pulsar-edit/ppm/pull/122)
 
 ### github
 - Updated: Bump dugite to 2.5.2 [@DeeDeeG](https://github.com/pulsar-edit/github/pull/39)

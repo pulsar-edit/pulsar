@@ -1,9 +1,9 @@
 var Module = typeof Module != "undefined" ? Module : {};
 var TreeSitter = function() {
     function checkForAsmVersion(prop) {
-      if (!(prop in Module['asm'])) {
-        console.warn(`Warning: parser wants to call function ${prop}, but it is not defined. If parsing fails, this is probably the reason why. Please report this to the Pulsar team so that this parser can be supported properly.`);
-      }
+        if (!(prop in Module['asm'])) {
+            console.warn(`Warning: parser wants to call function ${prop}, but it is not defined. If parsing fails, this is probably the reason why. Please report this to the Pulsar team so that this parser can be supported properly.`);
+        }
     }
     var initPromise;
     var document = typeof window == "object" ? {
@@ -57,11 +57,11 @@ var TreeSitter = function() {
                         }
                         return ret
                     };
-                    readAsync = (filename, onload, onerror) => {
+                    readAsync = (filename, onload, onerror, binary = true) => {
                         filename = isFileURI(filename) ? new URL(filename) : nodePath.normalize(filename);
-                        fs.readFile(filename, function(err, data) {
+                        fs.readFile(filename, binary ? undefined : "utf8", (err, data) => {
                             if (err) onerror(err);
-                            else onload(data.buffer)
+                            else onload(binary ? data.buffer : data)
                         })
                     };
                     if (!Module["thisProgram"] && process.argv.length > 1) {
@@ -75,9 +75,7 @@ var TreeSitter = function() {
                         process.exitCode = status;
                         throw toThrow
                     };
-                    Module["inspect"] = function() {
-                        return "[Emscripten Module object]"
-                    }
+                    Module["inspect"] = () => "[Emscripten Module object]"
                 } else if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
                     if (ENVIRONMENT_IS_WORKER) {
                         scriptDirectory = self.location.href
@@ -230,6 +228,10 @@ var TreeSitter = function() {
                 var runDependencyWatcher = null;
                 var dependenciesFulfilled = null;
 
+                function getUniqueRunDependency(id) {
+                    return id
+                }
+
                 function addRunDependency(id) {
                     runDependencies++;
                     if (Module["monitorRunDependencies"]) {
@@ -301,35 +303,29 @@ var TreeSitter = function() {
                         if (typeof fetch == "function" && !isFileURI(binaryFile)) {
                             return fetch(binaryFile, {
                                 credentials: "same-origin"
-                            }).then(function(response) {
+                            }).then(response => {
                                 if (!response["ok"]) {
                                     throw "failed to load wasm binary file at '" + binaryFile + "'"
                                 }
                                 return response["arrayBuffer"]()
-                            }).catch(function() {
-                                return getBinary(binaryFile)
-                            })
+                            }).catch(() => getBinary(binaryFile))
                         } else {
                             if (readAsync) {
-                                return new Promise(function(resolve, reject) {
-                                    readAsync(binaryFile, function(response) {
-                                        resolve(new Uint8Array(response))
-                                    }, reject)
+                                return new Promise((resolve, reject) => {
+                                    readAsync(binaryFile, response => resolve(new Uint8Array(response)), reject)
                                 })
                             }
                         }
                     }
-                    return Promise.resolve().then(function() {
-                        return getBinary(binaryFile)
-                    })
+                    return Promise.resolve().then(() => getBinary(binaryFile))
                 }
 
                 function instantiateArrayBuffer(binaryFile, imports, receiver) {
-                    return getBinaryPromise(binaryFile).then(function(binary) {
+                    return getBinaryPromise(binaryFile).then(binary => {
                         return WebAssembly.instantiate(binary, imports)
-                    }).then(function(instance) {
+                    }).then(instance => {
                         return instance
-                    }).then(receiver, function(reason) {
+                    }).then(receiver, reason => {
                         err("failed to asynchronously prepare wasm: " + reason);
                         abort(reason)
                     })
@@ -339,7 +335,7 @@ var TreeSitter = function() {
                     if (!binary && typeof WebAssembly.instantiateStreaming == "function" && !isDataURI(binaryFile) && !isFileURI(binaryFile) && !ENVIRONMENT_IS_NODE && typeof fetch == "function") {
                         return fetch(binaryFile, {
                             credentials: "same-origin"
-                        }).then(function(response) {
+                        }).then(response => {
                             var result = WebAssembly.instantiateStreaming(response, imports);
                             return result.then(callback, function(reason) {
                                 err("wasm streaming compile failed: " + reason);
@@ -1001,26 +997,20 @@ var TreeSitter = function() {
                                 var instance = new WebAssembly.Instance(binary, info);
                                 return Promise.resolve(postInstantiation(instance))
                             }
-                            return WebAssembly.instantiate(binary, info).then(function(result) {
-                                return postInstantiation(result.instance)
-                            })
+                            return WebAssembly.instantiate(binary, info).then(result => postInstantiation(result.instance))
                         }
                         var module = binary instanceof WebAssembly.Module ? binary : new WebAssembly.Module(binary);
                         var instance = new WebAssembly.Instance(module, info);
                         return postInstantiation(instance)
                     }
                     if (flags.loadAsync) {
-                        return metadata.neededDynlibs.reduce(function(chain, dynNeeded) {
-                            return chain.then(function() {
+                        return metadata.neededDynlibs.reduce((chain, dynNeeded) => {
+                            return chain.then(() => {
                                 return loadDynamicLibrary(dynNeeded, flags)
                             })
-                        }, Promise.resolve()).then(function() {
-                            return loadModule()
-                        })
+                        }, Promise.resolve()).then(loadModule)
                     }
-                    metadata.neededDynlibs.forEach(function(dynNeeded) {
-                        loadDynamicLibrary(dynNeeded, flags, localScope)
-                    });
+                    metadata.neededDynlibs.forEach(needed => loadDynamicLibrary(needed, flags, localScope));
                     return loadModule()
                 }
 
@@ -1046,6 +1036,22 @@ var TreeSitter = function() {
                             Module[sym] = exports[sym]
                         }
                     }
+                }
+
+                function asyncLoad(url, onload, onerror, noRunDep) {
+                    var dep = !noRunDep ? getUniqueRunDependency("al " + url) : "";
+                    readAsync(url, arrayBuffer => {
+                        assert(arrayBuffer, 'Loading data file "' + url + '" failed (no arrayBuffer).');
+                        onload(new Uint8Array(arrayBuffer));
+                        if (dep) removeRunDependency(dep)
+                    }, event => {
+                        if (onerror) {
+                            onerror()
+                        } else {
+                            throw 'Loading data file "' + url + '" failed.'
+                        }
+                    });
+                    if (dep) addRunDependency(dep)
                 }
 
                 function loadDynamicLibrary(libName, flags = {
@@ -1086,7 +1092,7 @@ var TreeSitter = function() {
                         var libFile = locateFile(libName);
                         if (flags.loadAsync) {
                             return new Promise(function(resolve, reject) {
-                                readAsync(libFile, data => resolve(new Uint8Array(data)), reject)
+                                asyncLoad(libFile, data => resolve(data), reject)
                             })
                         }
                         if (!readBinary) {
@@ -1148,8 +1154,8 @@ var TreeSitter = function() {
                         return
                     }
                     addRunDependency("loadDylibs");
-                    dynamicLibraries.reduce(function(chain, lib) {
-                        return chain.then(function() {
+                    dynamicLibraries.reduce((chain, lib) => {
+                        return chain.then(() => {
                             return loadDynamicLibrary(lib, {
                                 loadAsync: true,
                                 global: true,
@@ -1157,7 +1163,7 @@ var TreeSitter = function() {
                                 allowUndefined: true
                             })
                         })
-                    }, Promise.resolve()).then(function() {
+                    }, Promise.resolve()).then(() => {
                         reportUndefinedSymbols();
                         removeRunDependency("loadDylibs")
                     })
@@ -1179,7 +1185,7 @@ var TreeSitter = function() {
                             HEAP32[ptr >> 2] = value;
                             break;
                         case "i64":
-                            tempI64 = [value >>> 0, (tempDouble = value, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[ptr >> 2] = tempI64[0], HEAP32[ptr + 4 >> 2] = tempI64[1];
+                            tempI64 = [value >>> 0, (tempDouble = value, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? +Math.floor(tempDouble / 4294967296) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[ptr >> 2] = tempI64[0], HEAP32[ptr + 4 >> 2] = tempI64[1];
                             break;
                         case "float":
                             HEAPF32[ptr >> 2] = value;
@@ -1307,19 +1313,19 @@ var TreeSitter = function() {
                         HEAP32[buf + 20 >> 2] = stat.uid;
                         HEAP32[buf + 24 >> 2] = stat.gid;
                         HEAP32[buf + 28 >> 2] = stat.rdev;
-                        tempI64 = [stat.size >>> 0, (tempDouble = stat.size, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[buf + 40 >> 2] = tempI64[0], HEAP32[buf + 44 >> 2] = tempI64[1];
+                        tempI64 = [stat.size >>> 0, (tempDouble = stat.size, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? +Math.floor(tempDouble / 4294967296) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[buf + 40 >> 2] = tempI64[0], HEAP32[buf + 44 >> 2] = tempI64[1];
                         HEAP32[buf + 48 >> 2] = 4096;
                         HEAP32[buf + 52 >> 2] = stat.blocks;
                         var atime = stat.atime.getTime();
                         var mtime = stat.mtime.getTime();
                         var ctime = stat.ctime.getTime();
-                        tempI64 = [Math.floor(atime / 1e3) >>> 0, (tempDouble = Math.floor(atime / 1e3), +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[buf + 56 >> 2] = tempI64[0], HEAP32[buf + 60 >> 2] = tempI64[1];
+                        tempI64 = [Math.floor(atime / 1e3) >>> 0, (tempDouble = Math.floor(atime / 1e3), +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? +Math.floor(tempDouble / 4294967296) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[buf + 56 >> 2] = tempI64[0], HEAP32[buf + 60 >> 2] = tempI64[1];
                         HEAPU32[buf + 64 >> 2] = atime % 1e3 * 1e3;
-                        tempI64 = [Math.floor(mtime / 1e3) >>> 0, (tempDouble = Math.floor(mtime / 1e3), +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[buf + 72 >> 2] = tempI64[0], HEAP32[buf + 76 >> 2] = tempI64[1];
+                        tempI64 = [Math.floor(mtime / 1e3) >>> 0, (tempDouble = Math.floor(mtime / 1e3), +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? +Math.floor(tempDouble / 4294967296) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[buf + 72 >> 2] = tempI64[0], HEAP32[buf + 76 >> 2] = tempI64[1];
                         HEAPU32[buf + 80 >> 2] = mtime % 1e3 * 1e3;
-                        tempI64 = [Math.floor(ctime / 1e3) >>> 0, (tempDouble = Math.floor(ctime / 1e3), +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[buf + 88 >> 2] = tempI64[0], HEAP32[buf + 92 >> 2] = tempI64[1];
+                        tempI64 = [Math.floor(ctime / 1e3) >>> 0, (tempDouble = Math.floor(ctime / 1e3), +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? +Math.floor(tempDouble / 4294967296) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[buf + 88 >> 2] = tempI64[0], HEAP32[buf + 92 >> 2] = tempI64[1];
                         HEAPU32[buf + 96 >> 2] = ctime % 1e3 * 1e3;
-                        tempI64 = [stat.ino >>> 0, (tempDouble = stat.ino, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[buf + 104 >> 2] = tempI64[0], HEAP32[buf + 108 >> 2] = tempI64[1];
+                        tempI64 = [stat.ino >>> 0, (tempDouble = stat.ino, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? +Math.floor(tempDouble / 4294967296) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[buf + 104 >> 2] = tempI64[0], HEAP32[buf + 108 >> 2] = tempI64[1];
                         return 0
                     },
                     doMsync: function(addr, stream, len, flags, offset) {
@@ -1371,7 +1377,7 @@ var TreeSitter = function() {
                         if (isNaN(offset)) return 61;
                         var stream = SYSCALLS.getStreamFromFD(fd);
                         FS.llseek(stream, offset, whence);
-                        tempI64 = [stream.position >>> 0, (tempDouble = stream.position, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? (Math.min(+Math.floor(tempDouble / 4294967296), 4294967295) | 0) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[newOffset >> 2] = tempI64[0], HEAP32[newOffset + 4 >> 2] = tempI64[1];
+                        tempI64 = [stream.position >>> 0, (tempDouble = stream.position, +Math.abs(tempDouble) >= 1 ? tempDouble > 0 ? +Math.floor(tempDouble / 4294967296) >>> 0 : ~~+Math.ceil((tempDouble - +(~~tempDouble >>> 0)) / 4294967296) >>> 0 : 0)], HEAP32[newOffset >> 2] = tempI64[0], HEAP32[newOffset + 4 >> 2] = tempI64[1];
                         if (stream.getdents && offset === 0 && whence === 0) stream.getdents = null;
                         return 0
                     } catch (e) {
@@ -2896,8 +2902,7 @@ var TreeSitter = function() {
                                 }))
                             }
                         }
-                        const loadModule = typeof loadSideModule === "function" ? loadSideModule : loadWebAssemblyModule;
-                        return bytes.then(bytes => loadModule(bytes, {
+                        return bytes.then(bytes => loadWebAssemblyModule(bytes, {
                             loadAsync: true
                         })).then(mod => {
                             const symbolNames = Object.keys(mod);
