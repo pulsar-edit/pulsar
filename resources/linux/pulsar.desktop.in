@@ -11,7 +11,6 @@ MimeType=application/javascript;application/json;application/x-httpd-eruby;appli
 StartupWMClass=pulsar
 Actions=new-window
 
-
 [Desktop Action new-window]
 Name=New Window
 Exec=pulsar --new-window
