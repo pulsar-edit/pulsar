@@ -25,8 +25,12 @@
   </description>
   <screenshots>
     <screenshot type="default">
+      <image type="source">https://raw.githubusercontent.com/pulsar-edit/pulsar/master/resources/linux/linux-screenshot.png</image>
+      <caption>Pulsar welcome window in the middle, an open file on the right, and project on the left</caption>
+    </screenshot>
+    <screenshot>
       <image type="source">https://raw.githubusercontent.com/pulsar-edit/pulsar/master/resources/readme.png</image>
-      <caption>Pulsar Edit welcome window with an open project</caption>
+      <caption>Pulsar welcome window with an open project</caption>
     </screenshot>
   </screenshots>
   <keywords>
