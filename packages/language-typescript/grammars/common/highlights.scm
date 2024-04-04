@@ -17,6 +17,18 @@
 (namespace_import
   (identifier) @variable.other.assignment.import.namespace._LANG_)
 
+; The "*" in `export * from 'bar'`
+(export_statement "*" @variable.other.assignment.export.all.js)
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export "*" @variable.other.assignment.export.all.js))
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export
+    (identifier) @variable.other.assignment.export.alias.js))
+
 ; The "Foo" in `export { Foo }`
 (export_specifier
   name: (identifier) @variable.other.assignment.export._LANG_)
