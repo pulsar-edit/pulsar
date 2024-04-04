@@ -1,6 +1,6 @@
 scopeName: 'source.gfm'
 type: 'modern-tree-sitter'
-name: 'GitHub Flavored Markdown'
+name: 'GitHub Markdown'
 parser: 'tree-sitter-markdown'
 
 injectionRegex: '^(markdown|MARKDOWN|gfm|GFM)$'
