@@ -38,7 +38,7 @@ firstLineRegex: [
 
 # Try to match `bash` exactly, or failing that, anything that ends in `sh`
 # (for zsh/fish/etc.).
-injectionRegex: '(^(bash|BASH)$|sh^|SH^)'
+injectionRegex: '(^(bash|BASH)$|sh$|SH$)'
 
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-bash#8df9ea875d557a150d025d3a15b6e6a58624379a'
