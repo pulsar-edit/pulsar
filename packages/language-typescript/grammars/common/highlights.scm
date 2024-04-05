@@ -413,7 +413,8 @@
 
 ; The "bar" and "thud" in `const foo: bar.thud.Baz`.
 (nested_identifier
-  (identifier) @support.storage.other.property._LANG_)
+  (identifier) @support.storage.other.property._LANG_
+  (#is? test.descendantOfType "type_annotation"))
 
 ; Any other type identifiers; the "Bar" in `const foo: Bar`.
 (type_identifier) @support.storage.other.type._LANG_
