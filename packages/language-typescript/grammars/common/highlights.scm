@@ -758,8 +758,8 @@
 
 ; Interpolations inside of template strings.
 (template_substitution
-  "${" @punctuation.definition.template-expression.begin._LANG_
-  "}" @punctuation.definition.template-expression.end._LANG_
+  "${" @punctuation.section.embedded.begin._LANG_
+  "}" @punctuation.section.embedded.end._LANG_
 ) @meta.embedded.line.interpolation._LANG_
 
 (string
