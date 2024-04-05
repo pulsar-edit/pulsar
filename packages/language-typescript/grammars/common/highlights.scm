@@ -407,9 +407,16 @@
 ; TODO: We could add a special scope name to the entire suite of DOM types, but
 ; I don't have the strength for that right now.
 
-;
-((type_identifier) @support.storage.other.type._LANG_
-  )
+; The "bar" in `const foo: bar.Baz`.
+(nested_type_identifier
+  module: (identifier) @support.storage.other.property._LANG_)
+
+; The "bar" and "thud" in `const foo: bar.thud.Baz`.
+(nested_identifier
+  (identifier) @support.storage.other.property._LANG_)
+
+; Any other type identifiers; the "Bar" in `const foo: Bar`.
+(type_identifier) @support.storage.other.type._LANG_
 
 ; SUPPORT
 ; =======
@@ -952,6 +959,10 @@
 
 ; All other sorts of blocks.
 (statement_block) @meta.block._LANG_
+
+; The entirety of a type annotation, no matter how simple or complex (e.g.,
+; `Event`, `foo.Event`, `foo.bar.Event, foo.Event<MethodDispatcherFactory>`).
+(type_annotation (_) @meta.type.annotation._LANG_)
 
 ; The inside of a parameter definition list.
 ((formal_parameters) @meta.parameters._LANG_
