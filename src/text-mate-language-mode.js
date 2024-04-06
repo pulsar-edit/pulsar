@@ -11,7 +11,7 @@ const {
   fromFirstMateScopeId
 } = require('./first-mate-helpers');
 const { selectorMatchesAnyScope } = require('./selectors');
-const { normalizeDelimiters, commentStringsFromDelimiters } = require('./comment-delimiter-utils.js');
+const { normalizeDelimiters, commentStringsFromDelimiters } = require('./comment-utils.js');
 
 const NON_WHITESPACE_REGEX = /\S/;
 

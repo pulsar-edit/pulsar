@@ -8,7 +8,7 @@ const ScopeResolver = require('./scope-resolver');
 const Token = require('./token');
 const TokenizedLine = require('./tokenized-line');
 const { matcherForSelector } = require('./selectors');
-const { normalizeDelimiters, commentStringsFromDelimiters } = require('./comment-delimiter-utils.js');
+const { normalizeDelimiters, commentStringsFromDelimiters } = require('./comment-utils.js');
 
 const createTree = require('./rb-tree');
 

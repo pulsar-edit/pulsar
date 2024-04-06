@@ -3,7 +3,7 @@ const path = require('path');
 const Parser = require('./web-tree-sitter');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const { File } = require('pathwatcher');
-const { normalizeDelimiters } = require('./comment-delimiter-utils.js');
+const { normalizeDelimiters } = require('./comment-utils.js');
 
 const parserInitPromise = Parser.init();
 
