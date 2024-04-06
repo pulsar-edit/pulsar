@@ -1,6 +1,9 @@
 '.source.php':
   'editor':
     'commentStart': '// '
+    'commentDelimiters':
+      'line': '//'
+      'block': ['/*', '*/']
     'completions': [
       'APCIterator'
       'AppendIterator'

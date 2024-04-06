@@ -8,6 +8,7 @@ const ScopeResolver = require('./scope-resolver');
 const Token = require('./token');
 const TokenizedLine = require('./tokenized-line');
 const { matcherForSelector } = require('./selectors');
+const { normalizeDelimiterMetadata, interpretDelimiterMetadata } = require('./comment-delimiter-utils.js');
 
 const createTree = require('./rb-tree');
 
@@ -1105,6 +1106,16 @@ class WASMTreeSitterLanguageMode {
     const commentEndEntries = this.config.getAll(
       'editor.commentEnd', { scope });
 
+    // If a `commentDelimiters` setting exists, return it in its entirety. This
+    // can contain more comprehensive delimiter metadata for snippets and other
+    // purposes.
+    const commentDelimiters = this.config.get('editor.commentDelimiters', {
+      // This is just general metadata. We don't know the user's intended use
+      // case. So we should look up the scope descriptor of the original
+      // position, not the one at the beginning of the line.
+      scope: this.scopeDescriptorForPosition(position)
+    });
+
     const commentStartEntry = commentStartEntries[0];
     const commentEndEntry = commentEndEntries.find(entry => (
       entry.scopeSelector === commentStartEntry.scopeSelector
@@ -1113,19 +1124,25 @@ class WASMTreeSitterLanguageMode {
     if (commentStartEntry) {
       return {
         commentStartString: commentStartEntry && commentStartEntry.value,
-        commentEndString: commentEndEntry && commentEndEntry.value
+        commentEndString: commentEndEntry && commentEndEntry.value,
+        commentDelimiters: commentDelimiters && normalizeDelimiterMetadata(commentDelimiters)
       };
+    } else if (commentDelimiters) {
+      return interpretDelimiterMetadata(commentDelimiters);
     }
 
     // Fall back to looking up this information on the grammar.
     const { grammar } = this.getSyntaxNodeAndGrammarContainingRange(range);
 
     if (grammar) {
-      let { commentStrings } = grammar;
+      let { commentStrings, comments, commentDelimiters } = grammar;
       // Some languages don't have block comments, so only check for the start
       // delimiter.
       if (commentStrings && commentStrings.commentStartString) {
         return commentStrings;
+      }
+      if (comments || commentDelimiters) {
+        return interpretDelimiterMetadata(comments ?? commentDelimiters);
       }
     }
   }
@@ -4341,6 +4358,7 @@ class LanguageLayer {
           );
 
           marker.parentLanguageLayer = this;
+          // eslint-disable-next-line no-unused-vars
           newLanguageLayers++;
         }
 
@@ -4362,6 +4380,7 @@ class LanguageLayer {
       if (!markersToUpdate.has(marker)) {
         this.languageMode.emitRangeUpdate(marker.getRange());
         marker.languageLayer.destroy();
+        // eslint-disable-next-line no-unused-vars
         staleLanguageLayers++;
       }
     }

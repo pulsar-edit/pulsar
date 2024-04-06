@@ -11,6 +11,7 @@ const {
   fromFirstMateScopeId
 } = require('./first-mate-helpers');
 const { selectorMatchesAnyScope } = require('./selectors');
+const { normalizeDelimiterMetadata, interpretDelimiterMetadata } = require('./comment-delimiter-utils.js');
 
 const NON_WHITESPACE_REGEX = /\S/;
 
@@ -236,10 +237,19 @@ class TextMateLanguageMode {
     const commentEndEntry = commentEndEntries.find(entry => {
       return entry.scopeSelector === commentStartEntry.scopeSelector;
     });
-    return {
-      commentStartString: commentStartEntry && commentStartEntry.value,
-      commentEndString: commentEndEntry && commentEndEntry.value
-    };
+    // If a `commentDelimiters` setting exists, return it in its entirety. This
+    // can contain more comprehensive delimiter metadata for snippets and other
+    // purposes.
+    const commentDelimiters = this.config.get('editor.commentDelimiters', { scope });
+    if (commentStartEntry) {
+      return {
+        commentStartString: commentStartEntry && commentStartEntry.value,
+        commentEndString: commentEndEntry && commentEndEntry.value,
+        commentDelimiters: commentDelimiters && normalizeDelimiterMetadata(commentDelimiters)
+      };
+    } else if (commentDelimiters) {
+      return interpretDelimiterMetadata(commentDelimiters);
+    }
   }
 
   /*

@@ -24,6 +24,9 @@
   'editor':
     'nonWordCharacters': '/\\()"\':,.;<>~!#%^&*|+=[]{}`?…'
     'commentStart': '// '
+    'commentDelimiters':
+      'line': '//'
+      'block': ['/*', '*/']
   'autocomplete':
     'symbols':
       'mixin':
