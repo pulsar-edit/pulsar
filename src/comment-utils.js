@@ -62,7 +62,8 @@ function getDelimitersForScope(scope) {
   let mapped = reversed.map(scope => {
     return atom.config.get('editor.commentDelimiters', { scope: [scope] })
   })
-  return mapped.find(setting => !!setting)
+  let result = mapped.find(setting => !!setting)
+  return result ? normalizeDelimiters(result) : result
 }
 
 module.exports = {

@@ -1151,7 +1151,7 @@ class WASMTreeSitterLanguageMode {
       return {
         commentStartString: commentStartEntry && commentStartEntry.value,
         commentEndString: commentEndEntry && commentEndEntry.value,
-        commentDelimiters: commentDelimiters && normalizeDelimiters(commentDelimiters)
+        commentDelimiters: commentDelimiters
       };
     } else {
       // If we have only comment delimiter data, rather than the legacy
