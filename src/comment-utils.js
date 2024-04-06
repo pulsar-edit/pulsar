@@ -31,7 +31,7 @@ function normalizeDelimiters(meta = {}) {
   return { line, block };
 }
 
-// Converts comment delimiter metadata to the format expected by
+// Convert comment delimiter metadata to the format expected by
 // `LanguageMode::getCommentStringsForPosition`. We can act as a provider of
 // this data if the traditional sources are empty.
 function commentStringsFromDelimiters(meta) {
@@ -42,7 +42,7 @@ function commentStringsFromDelimiters(meta) {
   let blockIsValid = block != null && Array.isArray(block);
   let lineIsValid = typeof line === 'string';
   if (lineIsValid || blockIsValid) {
-    commentDelimiters = block;
+    commentDelimiters = { line, block };
     if (lineIsValid) {
       // The “Toggle Line Comment” command obviously prefers a line comment if
       // one is present.
@@ -54,7 +54,19 @@ function commentStringsFromDelimiters(meta) {
   return { commentStartString, commentEndString, commentDelimiters };
 }
 
+// Given a scope, return a single object of `editor.commentDelimiters` data.
+// Needed because an ordinary config lookup will “blend” objects from cascading
+// scopes — which is usually the behavior we want! Just not this time.
+function getDelimitersForScope(scope) {
+  let reversed = [...scope.scopes].reverse();
+  let mapped = reversed.map(scope => {
+    return atom.config.get('editor.commentDelimiters', { scope: [scope] })
+  })
+  return mapped.find(setting => !!setting)
+}
+
 module.exports = {
   normalizeDelimiters,
-  commentStringsFromDelimiters
+  commentStringsFromDelimiters,
+  getDelimitersForScope
 };
