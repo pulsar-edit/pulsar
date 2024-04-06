@@ -30,7 +30,7 @@ class TextMateLanguageMode {
     this.id = params.id != null ? params.id : nextId++;
     this.buffer = params.buffer;
     this.largeFileMode = params.largeFileMode;
-    this.config = params.config;
+    this.config = params.config ?? atom.config;
     this.largeFileMode =
       params.largeFileMode != null
         ? params.largeFileMode

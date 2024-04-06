@@ -155,7 +155,7 @@ class WASMTreeSitterLanguageMode {
     this.id = nextLanguageModeId++;
     this.buffer = buffer;
     this.grammar = grammar;
-    this.config = config;
+    this.config = config ?? atom.config;
     this.grammarRegistry = grammars;
 
     this.syncTimeoutMicros = syncTimeoutMicros ?? PARSE_JOB_LIMIT_MICROS;

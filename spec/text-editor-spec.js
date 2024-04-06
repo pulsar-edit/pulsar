@@ -9,7 +9,7 @@ const TextBuffer = require('text-buffer');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
 const WASMTreeSitterLanguageMode = require('../src/wasm-tree-sitter-language-mode');
 
-async function languageModeReady (editor) {
+async function languageModeReady(editor) {
   let languageMode = editor.getBuffer().getLanguageMode();
   if (languageMode.ready) {
     await languageMode.ready;
@@ -1586,7 +1586,7 @@ describe('TextEditor', () => {
       it("doesn't get stuck in a infinite loop when called from ::onDidAddCursor after the last selection has been destroyed (regression)", () => {
         let callCount = 0;
         editor.getLastSelection().destroy();
-        editor.onDidAddCursor(function(cursor) {
+        editor.onDidAddCursor(function (cursor) {
           callCount++;
           editor.getLastSelection();
         });
@@ -2250,7 +2250,7 @@ describe('TextEditor', () => {
         spyOn(
           editor.getBuffer().getLanguageMode(),
           'getNonWordCharacters'
-        ).andCallFake(function(position) {
+        ).andCallFake(function (position) {
           const result = '/()"\':,.;<>~!@#$%^&*|+=[]{}`?';
           const scopes = this.scopeDescriptorForPosition(
             position
@@ -5313,7 +5313,7 @@ describe('TextEditor', () => {
 
         it('notifies ::onWillInsertText observers', () => {
           const insertedStrings = [];
-          editor.onWillInsertText(function({ text, cancel }) {
+          editor.onWillInsertText(function ({ text, cancel }) {
             insertedStrings.push(text);
             cancel();
           });
@@ -8210,6 +8210,64 @@ describe('TextEditor', () => {
       expect(scopeDescriptor.getScopesArray()).toEqual(['text']);
     });
   });
+
+  describe('.getCommentDelimitersForPosition', () => {
+    it('returns comment delimiters on a TextMate grammar', async () => {
+      atom.config.set('core.useTreeSitterParsers', false);
+
+      editor = await atom.workspace.open('sample.js', { autoIndent: false });
+      await atom.packages.activatePackage('language-javascript');
+
+      let buffer = editor.getBuffer();
+
+      let languageMode = new TextMateLanguageMode({
+        buffer,
+        grammar: atom.grammars.grammarForScopeName('source.js')
+      });
+
+      buffer.setLanguageMode(languageMode);
+
+      languageMode.startTokenizing();
+      while (languageMode.firstInvalidRow() != null) {
+        advanceClock();
+      }
+
+      let delimiters = editor.getCommentDelimitersForPosition([8, 0]);
+      expect(delimiters).toEqual({
+        line: '//',
+        block: ['/*', '*/']
+      })
+    })
+
+    it('returns comment delimiters on a modern Tree-sitter grammar', async () => {
+      jasmine.useRealClock();
+      atom.config.set('core.useTreeSitterParsers', true);
+
+      editor = await atom.workspace.open('sample.js', { autoIndent: false });
+      await atom.packages.activatePackage('language-javascript');
+
+      let buffer = editor.getBuffer();
+
+      let languageMode = new WASMTreeSitterLanguageMode({
+        buffer,
+        grammar: atom.grammars.grammarForScopeName('source.js'),
+        grammars: atom.grammars
+      });
+
+      languageMode.useAsyncParsing = false;
+      languageMode.useAsyncIndent = false;
+
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+
+      let delimiters = editor.getCommentDelimitersForPosition([8, 0]);
+      expect(delimiters).toEqual({
+        line: '//',
+        block: ['/*', '*/']
+      })
+    })
+  })
 
   describe('.syntaxTreeScopeDescriptorForBufferPosition(position)', () => {
     it('returns the result of scopeDescriptorForBufferPosition() when textmate language mode is used', async () => {
