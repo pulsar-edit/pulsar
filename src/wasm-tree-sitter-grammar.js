@@ -79,7 +79,7 @@ module.exports = class WASMTreeSitterGrammar {
   //
   // Some grammars may have different delimiters for different parts of a file
   // (such as JSX within JavaScript). In these cases, you might want to call
-  // {TextEditor::getCommentDelimitersForPosition} with a `{Point}` in the
+  // {TextEditor::getCommentDelimitersForBufferPosition} with a `{Point}` in the
   // buffer.
   //
   // Returns an {Object} with the following properties:

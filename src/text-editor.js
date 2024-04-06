@@ -5954,7 +5954,7 @@ module.exports = class TextEditor {
   //   `undefined`, there are no known block comment delimiters for the given
   //   buffer position.)
   //
-  getCommentDelimitersForPosition(point) {
+  getCommentDelimitersForBufferPosition(point) {
     point = Point.fromObject(point);
     const languageMode = this.buffer.getLanguageMode();
     let {

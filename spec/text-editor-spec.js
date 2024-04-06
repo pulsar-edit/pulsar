@@ -8211,7 +8211,7 @@ describe('TextEditor', () => {
     });
   });
 
-  describe('.getCommentDelimitersForPosition', () => {
+  describe('.getCommentDelimitersForBufferPosition', () => {
     it('returns comment delimiters on a TextMate grammar', async () => {
       atom.config.set('core.useTreeSitterParsers', false);
 
@@ -8232,7 +8232,7 @@ describe('TextEditor', () => {
         advanceClock();
       }
 
-      let delimiters = editor.getCommentDelimitersForPosition([8, 0]);
+      let delimiters = editor.getCommentDelimitersForBufferPosition([8, 0]);
       expect(delimiters).toEqual({
         line: '//',
         block: ['/*', '*/']
@@ -8261,7 +8261,7 @@ describe('TextEditor', () => {
       await languageMode.ready;
 
 
-      let delimiters = editor.getCommentDelimitersForPosition([8, 0]);
+      let delimiters = editor.getCommentDelimitersForBufferPosition([8, 0]);
       expect(delimiters).toEqual({
         line: '//',
         block: ['/*', '*/']
