@@ -11,7 +11,7 @@ const {
   fromFirstMateScopeId
 } = require('./first-mate-helpers');
 const { selectorMatchesAnyScope } = require('./selectors');
-const { normalizeDelimiterMetadata, interpretDelimiterMetadata } = require('./comment-delimiter-utils.js');
+const { normalizeDelimiters, commentStringsFromDelimiters } = require('./comment-delimiter-utils.js');
 
 const NON_WHITESPACE_REGEX = /\S/;
 
@@ -245,10 +245,10 @@ class TextMateLanguageMode {
       return {
         commentStartString: commentStartEntry && commentStartEntry.value,
         commentEndString: commentEndEntry && commentEndEntry.value,
-        commentDelimiters: commentDelimiters && normalizeDelimiterMetadata(commentDelimiters)
+        commentDelimiters: commentDelimiters && normalizeDelimiters(commentDelimiters)
       };
     } else if (commentDelimiters) {
-      return interpretDelimiterMetadata(commentDelimiters);
+      return commentStringsFromDelimiters(commentDelimiters);
     }
   }
 

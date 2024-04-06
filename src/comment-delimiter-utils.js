@@ -9,7 +9,7 @@
 //
 // Some grammars also specify block comments as `{ start: string, end: string
 // }`, so we'll normalize that to the `[string, string]` variant.
-function normalizeDelimiterMetadata(meta = {}) {
+function normalizeDelimiters(meta = {}) {
   let { line, block } = meta;
   if (block && (!Array.isArray(block))) {
     let { start, end } = block;
@@ -34,8 +34,8 @@ function normalizeDelimiterMetadata(meta = {}) {
 // Converts comment delimiter metadata to the format expected by
 // `LanguageMode::getCommentStringsForPosition`. We can act as a provider of
 // this data if the traditional sources are empty.
-function interpretDelimiterMetadata(meta) {
-  let { line, block } = normalizeDelimiterMetadata(meta);
+function commentStringsFromDelimiters(meta) {
+  let { line, block } = normalizeDelimiters(meta);
   let commentStartString;
   let commentEndString;
   let commentDelimiters;
@@ -55,6 +55,6 @@ function interpretDelimiterMetadata(meta) {
 }
 
 module.exports = {
-  normalizeDelimiterMetadata,
-  interpretDelimiterMetadata
+  normalizeDelimiters,
+  commentStringsFromDelimiters
 };

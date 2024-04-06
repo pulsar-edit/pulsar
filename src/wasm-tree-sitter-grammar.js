@@ -3,7 +3,7 @@ const path = require('path');
 const Parser = require('./web-tree-sitter');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const { File } = require('pathwatcher');
-const { normalizeDelimiterMetadata } = require('./comment-delimiter-utils.js');
+const { normalizeDelimiters } = require('./comment-delimiter-utils.js');
 
 const parserInitPromise = Parser.init();
 
@@ -102,7 +102,7 @@ module.exports = class WASMTreeSitterGrammar {
 
     // Failing that, try to extract useful information from this metadata.
     if (this.commentMetadata) {
-      return normalizeDelimiterMetadata(this.commentMetadata);
+      return normalizeDelimiters(this.commentMetadata);
     }
 
     // If even that doesn't exist, we can fall back onto the older config
@@ -110,7 +110,7 @@ module.exports = class WASMTreeSitterGrammar {
     let start = atom.config.get('editor.commentStart', { scope: [this.scope] });
     let end = atom.config.get('editor.commentEnd', { scope: [this.scope] });
 
-    return normalizeDelimiterMetadata({ start, end });
+    return normalizeDelimiters({ start, end });
   }
 
   classNameForScopeId(id) {

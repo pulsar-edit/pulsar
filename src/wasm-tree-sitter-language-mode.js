@@ -8,7 +8,7 @@ const ScopeResolver = require('./scope-resolver');
 const Token = require('./token');
 const TokenizedLine = require('./tokenized-line');
 const { matcherForSelector } = require('./selectors');
-const { normalizeDelimiterMetadata, interpretDelimiterMetadata } = require('./comment-delimiter-utils.js');
+const { normalizeDelimiters, commentStringsFromDelimiters } = require('./comment-delimiter-utils.js');
 
 const createTree = require('./rb-tree');
 
@@ -1125,10 +1125,10 @@ class WASMTreeSitterLanguageMode {
       return {
         commentStartString: commentStartEntry && commentStartEntry.value,
         commentEndString: commentEndEntry && commentEndEntry.value,
-        commentDelimiters: commentDelimiters && normalizeDelimiterMetadata(commentDelimiters)
+        commentDelimiters: commentDelimiters && normalizeDelimiters(commentDelimiters)
       };
     } else if (commentDelimiters) {
-      return interpretDelimiterMetadata(commentDelimiters);
+      return commentStringsFromDelimiters(commentDelimiters);
     }
 
     // Fall back to looking up this information on the grammar.
@@ -1142,7 +1142,7 @@ class WASMTreeSitterLanguageMode {
         return commentStrings;
       }
       if (comments || commentDelimiters) {
-        return interpretDelimiterMetadata(comments ?? commentDelimiters);
+        return commentStringsFromDelimiters(comments ?? commentDelimiters);
       }
     }
   }
