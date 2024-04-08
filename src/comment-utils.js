@@ -10,7 +10,16 @@
 // Some grammars also specify block comments as `{ start: string, end: string
 // }`, so we'll normalize that to the `[string, string]` variant.
 function normalizeDelimiters(meta = {}) {
+  // Adapt the style used in `TreeSitterGrammar`.
+  if (
+    ('commentStartString' in meta && 'commentEndString' in meta) && !('line' in meta || 'block' in meta)
+  ) {
+    let { commentStartString: start, commentEndString: end } = meta;
+    meta = { start, end };
+  }
   let { line, block } = meta;
+  // Normalize the `{ start: string, end: string }` version to `[string,
+  // string].`
   if (block && (!Array.isArray(block))) {
     let { start, end } = block;
     block = [start, end];
@@ -38,7 +47,7 @@ function commentStringsFromDelimiters(meta) {
   let { line, block } = normalizeDelimiters(meta);
   let commentStartString;
   let commentEndString;
-  let commentDelimiters;
+  let commentDelimiters = { line, block };
   let blockIsValid = block != null && Array.isArray(block);
   let lineIsValid = typeof line === 'string';
   if (lineIsValid || blockIsValid) {
@@ -51,8 +60,11 @@ function commentStringsFromDelimiters(meta) {
       [commentStartString, commentEndString] = block;
     }
   }
-  return { commentStartString, commentEndString, commentDelimiters };
+  let result = { commentStartString, commentEndString, commentDelimiters };
+  return result;
 }
+
+
 
 // Given a scope, return a single object of `editor.commentDelimiters` data.
 // Needed because an ordinary config lookup will “blend” objects from cascading
