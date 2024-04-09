@@ -54,8 +54,7 @@ const stat = util.promisify(fs.stat);
 let nextId = 0;
 
 /**
- * @class AtomEnvironment
- * @classdesc Pulsar global for dealing with packages, themes, menus, and the window.
+ * Essential: Pulsar global for dealing with packages, themes, menus, and the window.
  *
  * An instance of this class is always available as the `atom` global.
  */
@@ -109,6 +108,7 @@ class AtomEnvironment {
     this.keymaps = new KeymapManager({
       notificationManager: this.notifications
     });
+
 
     /** @type {TooltipManager} */
     this.tooltips = new TooltipManager({

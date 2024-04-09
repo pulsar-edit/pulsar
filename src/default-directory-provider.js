@@ -3,15 +3,19 @@ const fs = require('fs-plus');
 const path = require('path');
 const url = require('url');
 
+/**
+ * @class DefaultDirectoryProvider
+ */
 module.exports = class DefaultDirectoryProvider {
-  // Public: Create a Directory that corresponds to the specified URI.
-  //
-  // * `uri` {String} The path to the directory to add. This is guaranteed not to
-  // be contained by a {Directory} in `atom.project`.
-  //
-  // Returns:
-  // * {Directory} if the given URI is compatible with this provider.
-  // * `null` if the given URI is not compatible with this provider.
+  /**
+   * @name directoryForURISync
+   * @memberof DefaultDirectoryProvider
+   * @desc Public: Create a Directory that corresponds to the specified URI.
+   * @param {string} uri - The path to the directory to add. This is guaranteed
+   * not to be contained by a {Directory} in `atom.project`.
+   * @returns {Directory|null} Directory if the given URI is compatible with
+   * this provider. `null` if the given URI is not compatible with this provider.
+   */
   directoryForURISync(uri) {
     const normalizedPath = this.normalizePath(uri);
     const {host} = url.parse(uri);
@@ -36,23 +40,27 @@ module.exports = class DefaultDirectoryProvider {
     return directory;
   }
 
-  // Public: Create a Directory that corresponds to the specified URI.
-  //
-  // * `uri` {String} The path to the directory to add. This is guaranteed not to
-  // be contained by a {Directory} in `atom.project`.
-  //
-  // Returns a {Promise} that resolves to:
-  // * {Directory} if the given URI is compatible with this provider.
-  // * `null` if the given URI is not compatible with this provider.
+  /**
+   * @name directoryForURI
+   * @memberof DefaultDirectoryProvider
+   * @desc Public: Create a Directory that corresponds to the specified URI.
+   * @param {string} uri - The path to the directory to add. This is guaranteed
+   * not to be contained by a {Directory} in `atom.project`.
+   * @returns {Promise} - A promise that resolves to:
+   *    * {Directory} if the given URI is compatible with this provider.
+   *    * `null` if the given URI is not compatible with this provider.
+   */
   directoryForURI(uri) {
     return Promise.resolve(this.directoryForURISync(uri));
   }
 
-  // Public: Normalizes path.
-  //
-  // * `uri` {String} The path that should be normalized.
-  //
-  // Returns a {String} with normalized path.
+  /**
+   * @name normalizePath
+   * @memberof DefaultDirectoryProvider
+   * @desc Public: Normalizes path.
+   * @param {string} uri - The path that should be normalized.
+   * @returns {string} A normalized path.
+   */
   normalizePath(uri) {
     let matchData, pathWithNormalizedDiskDriveLetter;
     // Normalize disk drive letter on Windows to avoid opening two buffers for the same file
