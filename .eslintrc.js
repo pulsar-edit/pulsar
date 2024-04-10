@@ -19,6 +19,14 @@ module.exports = {
       asyncArrow: "always",
       named: "never"
     }],
+    "no-constant-condition": "off",
+    "no-unused-vars": [
+      "warn",
+      {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_'
+      }
+    ],
     "node/no-missing-require": [
       "error",
       {

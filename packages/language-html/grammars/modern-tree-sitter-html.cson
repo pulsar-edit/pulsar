@@ -21,3 +21,4 @@ fileTypes: [
 comments:
   start: '<!-- '
   end: ' -->'
+  block: ['<!--', '-->']

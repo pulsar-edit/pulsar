@@ -305,6 +305,13 @@
   (identifier) @variable.declaration.cpp)
   (#is-not? test.descendantOfType parameter_declaration))
 
+; Goto label definitions like `foo:` before a statement.
+(labeled_statement
+  label: (statement_identifier) @entity.name.label.cpp)
+
+(goto_statement
+  label: (statement_identifier) @support.other.label.cpp)
+
 ; Function parameters
 ; -------------------
 
@@ -341,6 +348,11 @@
   "->"
   field: (field_identifier) @variable.other.member.cpp)
 
+; The "bar" in `foo.bar`.
+(field_expression
+  operator: "."
+  field: (field_identifier) @variable.other.member.cpp)
+
 ; Common naming idiom for C++ instanced vars: "fMemberName"
 ; ((identifier) @variable.other.readwrite.member.cpp
 ;   (#match? @variable.other.readwrite.member.cpp "^(f|m)[A-Z]\\w*$"))
@@ -372,7 +384,7 @@
 ; macro preprocessors. The convention is decently strong in C/C++ that all-caps
 ; identifiers will refer to `#define`d things.
 ((identifier) @constant.other.cpp
-  (#match? @constant.other.cpp "[_A-Z][_A-Z0-9]*$")
+  (#match? @constant.other.cpp "^[_A-Z][_A-Z0-9]*$")
   (#set! capture.shy))
 
 

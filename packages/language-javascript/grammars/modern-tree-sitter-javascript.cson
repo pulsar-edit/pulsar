@@ -31,3 +31,5 @@ fileTypes: [
 
 comments:
   start: '// '
+  block: ['/*', '*/']
+  line: '//'

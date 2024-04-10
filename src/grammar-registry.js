@@ -724,14 +724,9 @@ module.exports = class GrammarRegistry {
     let result = this.textmateRegistry.getGrammars();
     if (!(params && params.includeTreeSitter)) return result;
 
-    const tsGrammars = Object.values(this.treeSitterGrammarsById)
-      .filter(g => g.scopeName);
-    result = result.concat(tsGrammars);
-
     let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById)
       .filter(g => g.scopeName);
     result = result.concat(modernTsGrammars);
-
     return result;
   }
 

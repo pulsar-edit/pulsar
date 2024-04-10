@@ -1,5 +1,7 @@
 '.source.clojure':
   'editor':
     'commentStart': '; '
+    'commentDelimiters':
+      'line': ';'
   'autocomplete':
     'extraWordCharacters': '-'
