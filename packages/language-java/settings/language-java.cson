@@ -1,6 +1,9 @@
 '.source.java':
   'editor':
     'commentStart': '// '
+    'commentDelimiters':
+      'block': ['/*', '*/']
+      'line': '//'
     'foldEndPattern': '^\\s*(\\}|// \\}\\}\\}$)'
     'increaseIndentPattern': '^.*\\{(\\}|[^}"\']*)$|^\\s*(public|private|protected):\\s*$'
     'decreaseIndentPattern': '^(.*\\*/)?\\s*\\}|^\\s*(public|private|protected):\\s*$'
@@ -9,6 +12,8 @@
     'foldEndPattern': '\\*\\*/|^\\s*\\}'
     'commentStart': '<%-- '
     'commentEnd': ' --%>'
+    'commentDelimiters':
+      'block': ['<%--', '-->']
     'increaseIndentPattern': '^\\s*<(([^!/?]|%)(?!.+?([/%]>|</.+?>))|[%!]--\\s*$)'
     'decreaseIndentPattern': '^\\s*(</[^>]+>|-->|--%>)'
 '.text.junit-test-report':
@@ -17,6 +22,8 @@
 '.source.java-properties':
   'editor':
     'commentStart': '# '
+    'commentDelimiters':
+      'line': '#'
 '.keyword.other.documentation.javadoc.java':
   'editor':
     'completions': [
