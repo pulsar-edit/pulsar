@@ -398,6 +398,11 @@ const configSchema = {
         description: 'Add the current tab title to the Pulsar Window title.',
         type: 'boolean',
         default: true
+      },
+      syncWindowThemeWithPulsarTheme: {
+        description: 'When changing the theme within Pulsar also change the theme of the window on the operating system.',
+        type: 'boolean',
+        default: false
       }
     }
   },
