@@ -1,0 +1,15 @@
+scopeName: 'source.php'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-php'
+
+# Give it a precise injectionRegex that won't get accidentally matched with
+# anything.
+injectionRegex: '^(internal-php)$'
+
+treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-php#b569a5f2c0d592e67430520d1a0e1f765d83ceb0'
+  grammar: 'tree-sitter/tree-sitter-php.wasm'
+  highlightsQuery: 'tree-sitter/queries/highlights.scm'
+  tagsQuery: 'tree-sitter/queries/tags.scm'
+  foldsQuery: 'tree-sitter/queries/folds.scm'
+  indentsQuery: 'tree-sitter/queries/indents.scm'

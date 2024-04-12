@@ -22,12 +22,13 @@
     "showOnRightSideOfStatusBar": {
       "type": "boolean",
       "default": true,
-      "description": "Show the active pane item's language on the right side of Pulsar's status bar, instead of the left."
+      "description": "Show the active pane item’s language on the right side of Pulsar’s status bar, instead of the left."
     },
     "hideDuplicateTextMateGrammars": {
       "type": "boolean",
       "default": true,
-      "description": "Hides the TextMate grammar when there is an existing Tree-sitter grammar"
+      "title": "Hide Duplicate Grammars",
+      "description": "Hides non-preferred grammars when there is more than one grammar. When checked, whichever grammar is preferred for a given scope name (TextMate or Tree-sitter) will be the only one shown. When unchecked, all grammars will always be shown in the list, regardless of the user’s settings."
     }
   }
 }

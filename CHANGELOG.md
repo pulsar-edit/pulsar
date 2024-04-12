@@ -18,6 +18,183 @@
   better support for "def" elements (example - don't syntax `default` or
   `definition` as a `def`, but highlights `p/defresolver`)
 
+## 1.115.0
+
+- Fixed some folds in Ruby like `unless`, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.
+- Improved the accuracy of indentation hinting in modern Tree-sitter grammars, especially in multi-cursor scenarios.
+- Improved the ability of the user to opt into a specific kind of grammar for a specific language.
+- Changed the behavior of the `grammar-selector` package so that it will show the user's preferred grammar for a specific language.
+- Updated to version `0.20.9` of `web-tree-sitter`.
+- Improved syntax highlighting, indentation, and code folding in various languages, including TypeScript, shell scripts, Ruby, and C/C++.
+
+### Pulsar
+- Fixed: Fixed folds for Ruby [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/956)
+- Fixed: Tree-sitter fixes: 1.115 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/941)
+- Updated: cirrus: Update Rolling upload token again [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/960)
+- Fixed: cirrus: Various fixes for macOS Cirrus CI [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/961)
+- Fixed: Fix(fuzzy-finder) fs.lstatSync throws Exception if not a file or dir [@schadomi7](https://github.com/pulsar-edit/pulsar/pull/944)
+- Updated: CI: Update Rolling upload token for Cirrus CI [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/936)
+- Updated: Cirrus: Install older dotenv gem version ~> 2.8 (< 3) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/937)
+
+## 1.114.0
+
+- Prevented an exception raised in the command palette in certain unusual filtering scenarios.
+- Refrain from rendering anchor icons when showing a package's README file in `settings-view`.
+- Build Linux binaries on Debian 10, for older glibc and compatibility with older Linux distros.
+- Fixed a rendering error in `atom.ui.markdown.render` when `disableMode` was set to `"strict"` and the input contained HTML line breaks.
+- Added support for the semanticolor package in modern tree-sitter grammars.
+- Added new `--force` flag to `ppm link` command that will uninstall any conflicting package already installed.
+- Added language entity colors to `syntax-variables.less`.
+- Numerous Tree-Sitter Grammar syntax highlighting fixes.
+- Bumped dugite to make the github package compatible with ARM Linux.
+
+### Pulsar
+- Fixed: fix(tree-sitter): pass node text to grammar [@claytonrcarter](https://github.com/pulsar-edit/pulsar/pull/860)
+- Fixed: Fix issue with Markdown rendering after line break in strict mode [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/889)
+- Updated: Update README badges [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/891)
+- Updated: Update copyright year to 2024 [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/870)
+- Added: CI: build Linux x86-64 binaries on older Linux [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/858)
+- Fixed: Tree-sitter rolling fixes (January edition) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/859)
+- Fixed: Fix failing spec [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/902)
+- Fixed: [settings-view] Don't display heading anchor icons within a README [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/905)
+- Updated: ppm: Update ppm to commit 241d794f326b63b5abdb9769 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/908)
+- Fixed: script: Update version check in Rolling release binary upload script to exclude '-dev' versions [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/903)
+- Fixed: CI: Fix tag Linux binaries are uploaded to for Rolling [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/901)
+- Fixed: [command-palette] Guard against failure to highlight a match [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/913)
+- Fixed: `symbols-view` rolling fixes [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/861)
+- Fixed: Tree-sitter rolling fixes (February) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/906)
+- Updated: [meta] Update Cirrus `GITHUB_TOKEN` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/924)
+- Updated: deps: Update github to v0.36.20-pretranspiled to bump dugite [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/925)
+- Fixed: [symbols-view] Remap go-to-declaration commands on Windows/Linux [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/926)
+
+### PPM
+- Fixed: Fix test failure due to missing atom command [@toddy15](https://github.com/pulsar-edit/ppm/pull/124)
+- Updated: Update syntax-variables.less to include language entity colors [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/123)
+- Added: feat(link): add --force flag [@claytonrcarter](https://github.com/pulsar-edit/ppm/pull/122)
+
+### github
+- Updated: Bump dugite to 2.5.2 [@DeeDeeG](https://github.com/pulsar-edit/github/pull/39)
+
+## 1.113.0
+
+- Enabled Modern Tree-sitter Grammars by default
+- Added a modern Tree-sitter grammar for PHP.
+- Fix a measurement issue that was causing visual glitches in the `github` package's diff views.
+- Enabled the core `symbols-view` package to accept symbols from a number of sources, including Tree-sitter grammars and IDE packages.
+- Switch default to false for converting ASCII emoticons to emoji when rendering Markdown.
+- Fix certain find-and-replace scenarios when the "Preserve Case During Replace" setting is enabled.
+- Fix an issue in `symbols-view` when returning from visiting a symbol declaration.
+
+### Pulsar
+- Fixed: Tree-sitter fixes for December (including a PHP grammar!) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/852)
+- Added: Make `useExperimentalModernTreeSitter` the default... [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/855)
+- Fixed: Ensure editor is visible before measuring block decorations [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/854)
+- Added: Overhaul `symbols-view` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/829)
+- Added: Default to no emoji when rendering Markdown [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/850)
+
+### find-and-replace
+- Fixed: [find-and-replace] Fix `capitalize` utility [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/849)
+
+### symbols-view
+- Fixed: [symbols-view] Fix issue with returning from a declaration [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/864)
+
+## 1.112.1
+
+- Fixed a bug in PPM that prevented package publishing.
+
+### Pulsar
+- Bumped: ppm: Update ppm to commit 0bc207133b26de82aa28500e [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/845)
+- Bumped: ppm: Update ppm to commit 7dfd9ca8cf877391fc6ef1d5 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/842)
+
+### PPM
+- Fixed: Fix placement of `setTimeout` [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/118)
+- Fixed: Fix bugs found in `publish` after 1.112 release [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/116)
+
+## 1.112.0
+
+- Fixed github package not giving feedback when a token with the wrong scopes was entered, tweak scope-checking logic to match expectations, and log incorrect scopes.
+- Various cleanups, maintenance and upkeep of the PPM repo.
+- Added options for a user to control when to automatically show or hide the wrap-guide; "Always", "When soft wrap is enabled", and "When soft wrap at preferred line length is enabled".
+- Updated network handling in PPM to something newer and more secure.
+- Updated most of PPM's code to use async/await and promises internally.
+- Created `atom.ui.fuzzyMatcher` API, moving the Pulsar `fuzzy-finder` module into the core of the editor for community packages to utilize.
+- Fixed an issue that prevented Pulsar from inheriting the directory from which the `pulsar` binary was run.
+
+### Pulsar
+- Added: [tree-sitter] Share config caches between `ScopeResolver`s [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/836)
+- Bumped: deps: Update github to v0.36.19-pretranspiled (fix silent failure when inputting a token with incorrect scopes) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/838)
+- Bumped: ppm: Update ppm to commit 957acbd90cfc9f361c183b3c [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/837)
+- Added: Return to original logic for `ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/831)
+- Added: Moving fuzzy-native to core [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/774)
+- Fixed: Tree-sitter rolling fixes for November [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/819)
+- Fixed: CI: Update Rolling upload token for Cirrus [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/812)
+- Bumped: ppm: Update to commit 13fb2845e00d7e04c2461f93 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/809)
+- Added: Ability to indicate when to automatically show or hide the wrap-guide [@Trigan2025](https://github.com/pulsar-edit/pulsar/pull/780)
+
+### PPM
+- Bumped: fix(deps): update dependency semver to v7.5.2 [security] [@renovate](https://github.com/pulsar-edit/ppm/pull/114)
+- Added: Configure Renovate [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/110)
+- Added: Migrate from `rimraf` to NodeJS `fs` [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/108)
+- Added: Implement Codacy Recommendations [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/113)
+- Removed: Prune outdated Deps [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/109)
+- Removed: Remove unused Variables [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/112)
+- Added: Add Codacy and Friends Configuration [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/111)
+- Removed: src: Delete unused code in uninstall.js [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/104)
+- Fixed: src: Fix usage/help text (and error message) for -b/-t flags for ppm install [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/105)
+- Added: Repository Cleanup [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/107)
+- Fixed: Fix Newer NodeJS CI [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/106)
+- Fixed: src: Stop pinging backend during package uninstalls [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/103)
+- Added: Asyncify without topmost interface [@2colours](https://github.com/pulsar-edit/ppm/pull/95)
+- Fixed: CI: Work around a weird bug in Yarn v1.x [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/101)
+- Fixed: src: Rebrand two lines of "ppm --version" output [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/100)
+- Bumped: deps: Bump nan for compatibility with newer NodeJS [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/97)
+- Fixed: Fix Error Handling [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/99)
+- Removed: Remove `request` Migrate to `superagent` && Fix CI [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/87)
+
+### github
+- Added: lib: Allow parent scopes when checking if each required scope is set [@DeeDeeG](https://github.com/pulsar-edit/github/pull/38)
+
+## 1.111.0
+
+- Added a new "UI" API to `atom`, accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
+- Fine-tuned/deduped dependencies to remove ~35.5 MB from Pulsar's installed size.
+- Fixed an issue that sometimes caused text to shift or disappear after an editor pane regains focus.
+- Fixed scoping/highlighting of single-quoted (`'...'`) and C-style (`$'...'`) strings in shell scripts.
+- Fixed an issue with the "Dismiss this Version" button (in the `pulsar-updater` package).
+- Fixed an issue with how Linux Pulsar binaries were built, to ensure compatibility with non-bleeding edge glibc versions. (Compatibility with even older glibc versions is still being looked into, for the folks on older or RHEL-compatible distros.)
+
+### Pulsar
+- Fixed: meta: Update CirrusCI GitHub Token [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/804)
+- Bumped: deps: Update `github`, for `dugite` deduping purposes [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/799)
+- Fixed: Tree-sitter running fixes (October) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/789)
+- Fixed: Prevent "half screen" bug by resetting scroll position when editor regains focus [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/798)
+- Added: [core] New `UI` API [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/763)
+- Fixed: CI: Build binaries for tag pushes (GitHub Actions) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/782)
+- Added: [DOCS] Add non-macOS keybindings for fuzzy-finder readme [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/796)
+- Removed: Remove Teletype from Welcome guide [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/793)
+- Fixed: CI: Python 3.12-related fixes on Cirrus CI [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/794)
+- Fixed: CI: Work around missing 'distutils' for Python 3.12+ (GHA round two) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/795)
+- Added: [meta] Create Workflow to validate WASM Grammar Changes [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/740)
+- Fixed: 🐛 ✅ Fix caching for "Dismiss this Version" in pulsar-updater [@kiskoza](https://github.com/pulsar-edit/pulsar/pull/785)
+- Fixed: [tree-sitter] Fix proliferation of extra injection layers [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/783)
+- Added: CI: Increase timeout length for macOS binary builds [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/781)
+- Fixed: Fix the matching of `$'...'` strings. [@danfuzz](https://github.com/pulsar-edit/pulsar/pull/776)
+- Fixed: [meta] Install Python package `setuptools` && Use Python `3.12.x` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/779)
+- Fixed: Update `web-tree-sitter` to include `isalnum` builtin [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/770)
+- Fixed: [meta] Build x86 Linux binaries on Ubuntu 20.04, for older (more compatible) glibc [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/760)
+- Bumped: [core] Bump `git-utils`: `5.7.1` => `^5.7.3` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/772)
+- Removed: [core] Cleanup Unused Deps [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/771)
+
+### github
+- Bumped: deps: Update `whats-my-line` to bump `dugite` to 2.1.0 [@DeeDeeG](https://github.com/pulsar-edit/github/pull/36)
+
+### whats-my-line
+- Bumped: Pin `dugite` to `2.1.0` [@confused-Techie](https://github.com/pulsar-edit/whats-my-line/pull/7)
+- Bumped: Bump dugite && Bump `package.json` version [@confused-Techie](https://github.com/pulsar-edit/whats-my-line/pull/2)
+- Added: Add dugite tests [@confused-Techie](https://github.com/pulsar-edit/whats-my-line/pull/4)
+- Removed: Remove TypeScript [@confused-Techie](https://github.com/pulsar-edit/whats-my-line/pull/3)
+- Added: Setup Tests and Modernize [@confused-Techie](https://github.com/pulsar-edit/whats-my-line/pull/1)
+
 ## 1.110.0
 
 - Made the modification of `editor.preferredLineLength` configurable within `wrap-guide` when changing `wrap-guide.columns`

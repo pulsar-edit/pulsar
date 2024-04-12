@@ -1,0 +1,37 @@
+name: 'Ruby'
+scopeName: 'source.ruby'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-ruby'
+
+injectionRegex: 'rb|ruby|RB|RUBY'
+
+treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-ruby#4d9ad3f010fdc47a8433adcf9ae30c8eb8475ae7'
+  grammar: 'tree-sitter-ruby/tree-sitter-ruby.wasm'
+  highlightsQuery: 'tree-sitter-ruby/highlights.scm'
+  localsQuery: 'tree-sitter-ruby/locals.scm'
+  foldsQuery: 'tree-sitter-ruby/folds.scm'
+  indentsQuery: 'tree-sitter-ruby/indents.scm'
+  tagsQuery: 'tree-sitter-ruby/tags.scm'
+
+firstLineRegex: [
+  # shebang line
+  '^#!.*\\b(\w*ruby|rake)\\r?\\n'
+
+  # vim modeline
+  'vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=ruby'
+]
+
+fileTypes: [
+  'rb',
+  'ru',
+  'rake',
+  'gemspec',
+  'Podfile',
+  'Brewfile',
+  'Rakefile',
+  'Gemfile'
+]
+
+comments:
+  start: '# '

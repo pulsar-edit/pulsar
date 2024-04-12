@@ -18,34 +18,87 @@ const emojiFolder = path.join(
 )
 
 exports.toDOMFragment = async function (text, filePath, grammar, callback) {
-  if (text == null) {
-    text = ''
+
+  text ??= "";
+
+  if (atom.config.get("markdown-preview.useOriginalParser")) {
+    const domFragment = render(text, filePath);
+
+    await highlightCodeBlocks(domFragment, grammar, makeAtomEditorNonInteractive);
+
+    return domFragment;
+
+  } else {
+    // We use the new parser!
+    const domFragment = atom.ui.markdown.render(text,
+      {
+        renderMode: "fragment",
+        filePath: filePath,
+        breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
+        useDefaultEmoji: true,
+        sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
+      }
+    );
+    const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
+    await atom.ui.markdown.applySyntaxHighlighting(domHTMLFragment,
+      {
+        renderMode: "fragment",
+        syntaxScopeNameFunc: scopeForFenceName,
+        grammar: grammar
+      }
+    );
+
+    return domHTMLFragment;
   }
-
-  const domFragment = render(text, filePath)
-
-  await highlightCodeBlocks(domFragment, grammar, makeAtomEditorNonInteractive)
-
-  return domFragment
 }
 
 exports.toHTML = async function (text, filePath, grammar) {
-  if (text == null) {
-    text = ''
+
+  text ??= "";
+
+  if (atom.config.get("markdown-preview.useOriginalParser")) {
+    const domFragment = render(text, filePath)
+    const div = document.createElement('div')
+
+    div.appendChild(domFragment)
+    document.body.appendChild(div)
+
+    await highlightCodeBlocks(div, grammar, convertAtomEditorToStandardElement)
+
+    const result = div.innerHTML
+    div.remove()
+
+    return result
+  } else {
+    // We use the new parser!
+    const domFragment = atom.ui.markdown.render(text,
+      {
+        renderMode: "full",
+        filePath: filePath,
+        breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
+        useDefaultEmoji: true,
+        sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
+      }
+    );
+    const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
+
+    const div = document.createElement("div");
+    div.appendChild(domHTMLFragment);
+    document.body.appendChild(div);
+
+    await atom.ui.markdown.applySyntaxHighlighting(div,
+      {
+        renderMode: "full",
+        syntaxScopeNameFunc: scopeForFenceName,
+        grammar: grammar
+      }
+    );
+
+    const result = div.innerHTML;
+    div.remove();
+
+    return result;
   }
-
-  const domFragment = render(text, filePath)
-  const div = document.createElement('div')
-
-  div.appendChild(domFragment)
-  document.body.appendChild(div)
-
-  await highlightCodeBlocks(div, grammar, convertAtomEditorToStandardElement)
-
-  const result = div.innerHTML
-  div.remove()
-
-  return result
 }
 
 var render = function (text, filePath) {
@@ -97,7 +150,7 @@ var render = function (text, filePath) {
   return fragment
 }
 
-function renderYamlTable (variables) {
+function renderYamlTable(variables) {
   const entries = Object.entries(variables)
 
   if (!entries.length) {

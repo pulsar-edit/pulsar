@@ -1,6 +1,8 @@
 '.source.ruby':
   'editor':
     'commentStart': '# '
+    'commentDelimiters':
+      'line': '#'
     'increaseIndentPattern': '(?x)^\n    (\\s*\n        (module|class|(private\\s+)?def\n        |unless|if|else|elsif\n        |case|when\n        |begin|rescue|ensure\n        |for|while|until\n        |(?= .*? \\b(do|begin|case|if|unless)\\b )\n         # the look-ahead above is to quickly discard non-candidates\n         (  "(\\\\.|[^\\\\"])*+"        # eat a double quoted string\n         | \'(\\\\.|[^\\\\\'])*+\'      # eat a single quoted string\n         |   [^#"\']                # eat all but comments and strings\n         )*\n         (                         \\s   (do|begin|case)\n         | [-+=&|*/~%^<>~](?<!\\$.) \\s*+ (if|unless)\n         )\n        )\\b\n        (?! [^;]*+ ; .*? \\bend\\b )\n    |(  "(\\\\.|[^\\\\"])*+"            # eat a double quoted string\n     | \'(\\\\.|[^\\\\\'])*+\'          # eat a single quoted string\n     |   [^#"\']                    # eat all but comments and strings\n     )*\n     (\\( (?!  [^\\)]*+ \\) )\n      | \\{ (?!  [^}]*+ \\} )\n     | \\[ (?! [^\\]]*+ \\] )\n     )\n    ).*$'
     'decreaseIndentPattern': '^\\s*([}\\]\\)](,?\\s*(#|$)|\\.[a-zA-Z_]\\w*\\b)|(end|rescue|ensure|else|elsif|when)\\b)'
 '.text.html.erb':

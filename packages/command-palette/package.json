@@ -16,8 +16,6 @@
   "atomTestRunner": "atom-mocha-test-runner",
   "dependencies": {
     "atom-select-list": "^0.7.1",
-    "fuzzaldrin": "^2.1.0",
-    "fuzzaldrin-plus": "^0.6.0",
     "underscore-plus": "^1.0.0"
   },
   "devDependencies": {
@@ -27,11 +25,6 @@
     "sinon": "^3.2.1"
   },
   "configSchema": {
-    "useAlternateScoring": {
-      "type": "boolean",
-      "default": true,
-      "description": "Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words."
-    },
     "preserveLastSearch": {
       "type": "boolean",
       "default": false,

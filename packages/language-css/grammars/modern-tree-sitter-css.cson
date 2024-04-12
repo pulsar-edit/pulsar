@@ -8,6 +8,7 @@ fileTypes: [
 ]
 
 treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-css#98c7b3dceb24f1ee17f1322f3947e55638251c37'
   grammar: 'tree-sitter/tree-sitter-css.wasm'
   highlightsQuery: 'tree-sitter/queries/highlights.scm'
   foldsQuery: 'tree-sitter/queries/folds.scm'

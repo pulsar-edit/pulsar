@@ -1,6 +1,8 @@
 '.source.plist':
   'editor':
     'commentStart': '// '
+    'commentDelimiters':
+      'line': '//'
     'foldEndPattern': '^\\s*(\\}|\\))'
     'increaseIndentPattern': '^\\s*(([a-zA-Z_-]+|"[^"]+"|\'[^\']+\')\\s+=\\s+)?[{(](?!.*[)}][;,]?\\s*$)'
     'decreaseIndentPattern': '^\\s*(\\}|\\))'

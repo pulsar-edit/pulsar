@@ -1,0 +1,26 @@
+name: 'PHP'
+scopeName: 'text.html.php'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-php'
+
+injectionRegex: 'php|PHP'
+
+treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-php#b569a5f2c0d592e67430520d1a0e1f765d83ceb0'
+  grammar: 'tree-sitter/tree-sitter-php.wasm'
+
+fileTypes: [
+  'aw'
+  'ctp'
+  'inc'
+  'install'
+  'module'
+  'php'
+  'php_cs'
+  'php3'
+  'php4'
+  'php5'
+  'phpt'
+  'phtml'
+  'profile'
+]

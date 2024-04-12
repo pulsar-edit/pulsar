@@ -33,7 +33,7 @@ const packagesToTest = {
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const whenEditorReady = function(editor) {
+const whenEditorReady = function (editor) {
   const languageMode = editor.getBuffer().getLanguageMode();
   if (!languageMode.constructor.name.includes('TreeSitter')) {
     return Promise.resolve();
@@ -105,8 +105,6 @@ describe("CSS property name and value autocompletions", async () => {
         await atom.workspace.open(packagesToTest[packageLabel].file);
         editor = atom.workspace.getActiveTextEditor();
         await whenEditorReady(editor);
-        console.warn('USING TREE SITTER?!?', packageLabel, meta.useTreeSitter);
-        atom.config.set('core.useExperimentalModernTreeSitter', meta.useTreeSitter ?? false);
         atom.config.set('core.useTreeSitterParsers', meta.useTreeSitter ?? false);
       });
 
@@ -738,7 +736,7 @@ div:nth {
     })
   );
 
-  Object.keys(packagesToTest).forEach(function(packageLabel) {
+  Object.keys(packagesToTest).forEach(function (packageLabel) {
     if (packagesToTest[packageLabel].name !== 'language-css') {
       describe(`${packageLabel} files`, async () => {
         beforeEach(async () => {

@@ -7,6 +7,7 @@ describe('Wrap Guide', () => {
 
   beforeEach(async () => {
     await atom.packages.activatePackage('wrap-guide')
+    atom.config.set('wrap-guide.showWrapGuide', 'always')
 
     editor = await atom.workspace.open('sample.js')
     editorElement = editor.getElement()

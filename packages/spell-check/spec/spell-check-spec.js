@@ -12,7 +12,7 @@ const {
 } = require('./async-spec-helpers');
 
 describe('Spell check', function () {
-    let workspaceElement, editor, editorElement, spellCheckModule;
+    let workspaceElement, editor, editorElement, spellCheckModule, languageMode;
 
     const textForMarker = (marker) =>
         editor.getTextInBufferRange(marker.getBufferRange());
@@ -42,9 +42,14 @@ describe('Spell check', function () {
         jasmine.attachToDOM(workspaceElement);
         editor = atom.workspace.getActiveTextEditor();
         editorElement = atom.views.getView(editor);
+        languageMode = editor.getBuffer().getLanguageMode();
+        languageMode.useAsyncParsing = false;
     });
 
-    afterEach(() => SpellCheckTask.clear());
+    afterEach(async () => {
+      await languageMode.atTransactionEnd();
+      SpellCheckTask.clear();
+    });
 
     it('decorates all misspelled words', async function () {
         atom.config.set('spell-check.useLocales', true);
@@ -72,11 +77,11 @@ describe('Spell check', function () {
         expect(textForMarker(misspellingMarkers[1])).toEqual('bok');
     });
 
-    it('allows certains scopes to be excluded from spell checking', async function () {
+    it('allows certain scopes to be excluded from spell checking', async function () {
         editor.setText(
-            'speledWrong = 5;\n' +
-                'function speledWrong() {}\n' +
-                'class SpeledWrong {}'
+`speledWrong = 5;
+function speledWrong() {}
+class SpeledWrong {}`
         );
         atom.config.set('spell-check.useLocales', true);
         atom.config.set('spell-check.grammars', [
@@ -121,7 +126,7 @@ describe('Spell check', function () {
         }
 
         {
-            atom.config.set('spell-check.excludedScopes', ['.meta.class']);
+            atom.config.set('spell-check.excludedScopes', ['.entity.name.type.class']);
             await conditionPromise(() => getMisspellingMarkers().length === 2);
             const markers = getMisspellingMarkers();
             expect(markers.map((marker) => marker.getBufferRange())).toEqual([

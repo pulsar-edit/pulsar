@@ -39,7 +39,7 @@
 
 (paragraph) @markup.paragraph.gfm
 
-(thematic_break) @punctuation.definition.horizontal-rule.gfm
+(thematic_break) @markup.horizontal-rule.gfm
 
 (block_quote) @markup.quote.blockquote.gfm
 ((block_quote) @punctuation.definition.blockquote.gfm
@@ -140,8 +140,9 @@
 (code_span) @meta.embedded.line.inline-code.gfm @markup.raw.inline.gfm
 (info_string) @storage.modifier.language._TEXT_.gfm
 
-(fenced_code_block) @markup.code.fenced.gfm @meta.embedded.block.fenced-code.gfm
-(indented_code_block) @markup.code.indented.gfm @meta.embedded.block.indented-code.gfm
+(fenced_code_block
+  (code_fence_content) @markup.raw.block.fenced.gfm) @meta.embedded.block.fenced-code.gfm
+(indented_code_block) @markup.raw.block.indented.gfm @meta.embedded.block.indented-code.gfm
 
 
 ; BOLD/ITALIC/OTHER

@@ -1,6 +1,8 @@
 '.source.coffee, .source.litcoffee, .source.coffee.md':
   'editor':
     'commentStart': '# '
+    'commentDelimiters':
+      'line': '#'
 '.source.coffee':
   'editor':
     'autoIndentOnPaste': false

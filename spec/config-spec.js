@@ -150,6 +150,41 @@ describe('Config', () => {
         ).toBe(4);
       });
 
+      it("merges project-specific settings with other settings when the keypath is an object", () => {
+        atom.config.set('x.y', 1);
+        atom.config.set('x.z', "fibrinolysis");
+
+        atom.project.replace({
+          originPath: 'TEST',
+          paths: atom.project.getPaths(),
+          config: {
+            "*": {
+              "x": {
+                "y": 4
+              }
+            }
+          }
+        });
+
+        // Project-specific settings work fine, as the spec below shows, when
+        // the value being retrieved is a primitive. But until recently, Pulsar
+        // didn't know what to do if the value being retrieved was an object.
+        //
+        // Imagine asking for _all_ config settings. The non-project-specific
+        // lookup returns everything. The project-specific lookup returns only
+        // a few overrides. Pulsar needs to _blend_ these two objects, but was
+        // previously choosing the project-specific lookup just because it
+        // wasn't undefined.
+
+        // Here we demonstrate that it now retrieves an object for the given
+        // key path at the normal location and applies a project-specific
+        // “patch…”
+        expect(atom.config.get('x')).toEqual({ y: 4, z: "fibrinolysis" })
+
+        // …without any general settings leaking into the project config.
+        expect(atom.config.projectSettings.x.z).toBeUndefined();
+      });
+
       it("ignores the project-specific source when 'excludeSources' tells it to", () => {
         atom.config.set('x.y', 1);
 

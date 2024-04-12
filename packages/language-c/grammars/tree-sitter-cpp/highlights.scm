@@ -13,29 +13,55 @@
 "#define" @keyword.control.directive.define.cpp
 "#include" @keyword.control.directive.include.cpp
 
-; This will match if the more specific rules above haven't matched. The
-; anonymous nodes will match under ideal conditions, but might not be present
-; if the parser is flummoxed.
-((preproc_directive) @keyword.control.directive.c
+(["#if" "#ifdef" "#ifndef" "#endif" "#elif" "#else" "#define" "#include"] @punctuation.definition.directive.cpp
+  (#set! adjust.endAfterFirstMatchOf "^#"))
+
+; `preproc_directive` will be used when the parser doesn't recognize the
+; directive as one of the above. It's permissive; `#afdfafsdfdfad` would be
+; parsed as a `preproc_directive`.
+;
+; Hence this rule will match if the more specific rules above haven't matched.
+; The anonymous nodes will match under ideal conditions, but might not be
+; present even when they ought to be _if_ the parser is flummoxed; so this'll
+; sometimes catch `#ifdef` and others.
+((preproc_directive) @keyword.control.directive.cpp
   (#set! capture.shy true))
 
-((preproc_ifdef
-  (identifier) @entity.name.function.preprocessor.c
-  (#match? @entity.name.function.preprocessor.c "[a-zA-Z_$][\\w$]*")))
+((preproc_directive) @punctuation.definition.directive.cpp
+  (#set! capture.shy true)
+  (#set! adjust.endAfterFirstMatchOf "^#"))
 
-(preproc_function_def
-  (identifier) @entity.name.function.preprocessor.c
-  (#set! capture.final true))
-
+; Macro functions are definitely entities.
 (preproc_function_def
   (identifier) @entity.name.function.preprocessor.cpp
-  (#set! capture.final true)
-)
+  (#set! capture.final true))
 
-(system_lib_string) @string.quoted.other.lt-gt.include.c
-((system_lib_string) @punctuation.definition.string.begin.c
+; Identifiers in macro definitions are definitely constants.
+((preproc_def
+  name: (identifier) @constant.preprocessor.cpp))
+
+; We can also safely treat identifiers as constants in `#ifdef`…
+((preproc_ifdef
+  (identifier) @constant.preprocessor.cpp))
+
+; …and `#if` and `#elif`…
+(preproc_if
+  (binary_expression
+    (identifier) @constant.preprocessor.cpp))
+(preproc_elif
+  (binary_expression
+    (identifier) @constant.preprocessor.cpp))
+
+; …and `#undef`.
+((preproc_call
+  directive: (preproc_directive) @_IGNORE_
+  argument: (preproc_arg) @constant.preprocessor.cpp)
+  (#eq? @_IGNORE_ "#undef"))
+
+(system_lib_string) @string.quoted.other.lt-gt.include.cpp
+((system_lib_string) @punctuation.definition.string.begin.cpp
   (#set! adjust.endAfterFirstMatchOf "^<"))
-((system_lib_string) @punctuation.definition.string.end.c
+((system_lib_string) @punctuation.definition.string.end.cpp
   (#set! adjust.startBeforeFirstMatchOf ">$"))
 
 
@@ -48,15 +74,24 @@
   (type_identifier) @_IGNORE_
   (#set! capture.final true))
 
+; When the user has typed `#define FOO`, the macro injection thinks that `FOO`
+; is a type declaration (for some reason). This node structure seems to exist
+; only in that unusual and incorrect scenario, so we'll stop it from happening
+; so that it doesn't override the underlying `constant.other.c` scope.
+(translation_unit
+  (type_identifier) @_IGNORE_
+  (#set! capture.final))
 
 (primitive_type) @support.type.builtin.cpp
 
-; Type parameters
-(template_argument_list
-  (type_descriptor
-    type: (type_identifier) @variable.parameter.type.cpp
-    (#set! capture.final true)))
+; Mark all function definition types with data…
+(function_definition
+  type: (_) @_IGNORE_
+  (#set! functionDefinitionType true))
 
+; …so that we can detect when a type identifier is part of a template/generic.
+((type_identifier) @variable.parameter.type.cpp
+  (#is? test.descendantOfNodeWithData functionDefinitionType))
 
 (class_specifier
   (type_identifier) @entity.name.class.cpp
@@ -67,28 +102,38 @@
 
 ; These types are all reserved words; if we see an identifier with this name,
 ; it must be a type.
-((identifier) @support.type.builtin.cpp
-  (#match? @support.type.builtin.cpp "^(char|int|float|double|long)$"))
+((identifier) @support.storage.type.builtin.cpp
+  (#match? @support.storage.type.builtin.cpp "^(char|int|float|double|long)$"))
 
 ; Assume any identifier that ends in `_t` is a type. This convention is not
 ; always followed, but it's a very strong indicator when it's present.
-((identifier) @support.type.other.cpp
-  (#match? @support.type.other.cpp "_t$"))
+((identifier) @support.other.storage.type.cpp
+  (#match? @support.other.storage.type.cpp "_t$"))
 
 
+; These refer to language constructs and remain in the `storage` namespace.
 [
   "enum"
-  "long"
-  "short"
-  "signed"
   "struct"
   "typedef"
   "union"
-  "unsigned"
-
   "template"
 ] @storage.type.cpp
 
+; These refer to value types and go under `support`.
+[
+  "long"
+  "short"
+] @support.storage.type.builtin.cpp
+
+; These act as modifiers to value types and also go under `support`.
+[
+  "signed"
+  "unsigned"
+] @support.storage.modifier.builtin.cpp
+
+; These act as general language modifiers and remain in the `storage`
+; namespace.
 [
   "const"
   "extern"
@@ -108,14 +153,14 @@
   "override"
   "final"
   "noexcept"
-] @storage.modifier.cpp
+
+  "typename"
+] @storage.modifier._TYPE_.cpp
 
 (
-  (primitive_type) @support.type.stdint.cpp
-  (#match? @support.type.stdint.cpp "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$")
+  (primitive_type) @support.storage.type.stdint.cpp
+  (#match? @support.storage.type.stdint.cpp "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$")
 )
-
-"typename" @storage.modifier.typename.cpp
 
 
 ; FUNCTIONS
@@ -125,7 +170,19 @@
   (identifier) @entity.name.function.cpp)
 
 (function_declarator
+  (destructor_name
+    (identifier) @entity.name.function.cpp))
+
+; The "foo" in `void Bar::foo () {`.
+(function_declarator
+  declarator: (qualified_identifier
+    name: (identifier) @entity.name.function.cpp))
+
+(function_declarator
   (field_identifier) @entity.name.function.method.cpp)
+
+(field_initializer
+  (field_identifier) @entity.name.function.cpp)
 
 (call_expression
   (identifier) @support.function.c99.cpp
@@ -137,6 +194,19 @@
 (call_expression
   (field_expression
     field: (field_identifier) @support.other.function.cpp)
+  (#set! capture.final true))
+
+; The "foo" in `troz::foo(...)`.
+(call_expression
+  function: (qualified_identifier
+    name: (identifier) @support.other.function.cpp)
+  (#set! capture.final true))
+
+; The "foo" in `troz::foo<SomeType>(...)`.
+(call_expression
+  function: (qualified_identifier
+    name: (template_function
+      name: (identifier) @support.other.function.cpp))
   (#set! capture.final true))
 
 (call_expression
@@ -180,34 +250,67 @@
 ; Declarations and assignments
 ; ----------------------------
 
-; The "x" in `int x`;
+; The "x" in `int x;`
 (declaration
   declarator: (identifier) @variable.declaration.cpp)
 
-; The "x" in `int x = y`;
+; The "x" in `int x = y;`
 (init_declarator
   declarator: (identifier) @variable.declaration.cpp)
 
+; The "x" in `SomeType *x;`
+; (Should work no matter how many pointers deep we are.)
+(pointer_declarator
+  declarator: [(identifier) (field_identifier)] @variable.declaration.pointer.cpp
+  (#is? test.descendantOfType "declaration field_declaration"))
+
+; A member of a struct.
 (field_declaration
-  (field_identifier) @variable.declaration.cpp)
+  (field_identifier) @variable.declaration.member.cpp)
+
+; An attribute in a C99 struct designated initializer:
+; the "foo" in `MY_TYPE a = { .foo = true };
+(initializer_pair
+  (field_designator
+    (field_identifier) @variable.declaration.member.cpp))
+
+; (and the associated ".")
+(initializer_pair
+  (field_designator
+    "." @keyword.operator.accessor.cpp))
 
 (field_declaration
   (pointer_declarator
-  	(field_identifier) @variable.declaration.cpp))
+  	(field_identifier) @variable.declaration.member.cpp))
 
 (field_declaration
   (array_declarator
-  	(field_identifier) @variable.declaration.cpp))
+  	(field_identifier) @variable.declaration.member.cpp))
 
 (init_declarator
   (pointer_declarator
-    (identifier) @variable.declaration.cpp))
+    (identifier) @variable.declaration.member.cpp))
 
+; The "x" in `x = y;`
 (assignment_expression
   left: (identifier) @variable.other.assignment.cpp)
 
-(reference_declarator
+; The "foo" in `something->foo = "bar";`
+(assignment_expression
+  left: (field_expression
+    field: (field_identifier) @variable.other.member.assignment.cpp)
+    (#set! capture.final))
+
+((reference_declarator
   (identifier) @variable.declaration.cpp)
+  (#is-not? test.descendantOfType parameter_declaration))
+
+; Goto label definitions like `foo:` before a statement.
+(labeled_statement
+  label: (statement_identifier) @entity.name.label.cpp)
+
+(goto_statement
+  label: (statement_identifier) @support.other.label.cpp)
 
 ; Function parameters
 ; -------------------
@@ -215,12 +318,19 @@
 (preproc_params
   (identifier) @variable.parameter.preprocessor.cpp)
 
+; The "foo" in `const char foo` within a parameter list.
 (parameter_declaration
   declarator: (identifier) @variable.parameter.cpp)
 
+; The "foo" in `const char *foo` within a parameter list.
+; (Should work no matter how many pointers deep we are.)
+(pointer_declarator
+  declarator: [(identifier) (field_identifier)] @variable.parameter.pointer.cpp
+  (#is? test.descendantOfType "parameter_declaration"))
+
 (parameter_declaration
-  declarator: (pointer_declarator
-    declarator: (identifier) @variable.parameter.cpp))
+  declarator: (reference_declarator
+    (identifier) @variable.parameter.cpp))
 
 ; The "foo" in `const char foo[]` within a parameter list.
 (parameter_declaration
@@ -236,6 +346,11 @@
 ; The "size" in `finfo->size`.
 (field_expression
   "->"
+  field: (field_identifier) @variable.other.member.cpp)
+
+; The "bar" in `foo.bar`.
+(field_expression
+  operator: "."
   field: (field_identifier) @variable.other.member.cpp)
 
 ; Common naming idiom for C++ instanced vars: "fMemberName"
@@ -256,11 +371,21 @@
   (null)
   (true)
   (false)
-  (nullptr)
 ] @constant.language._TYPE_.cpp
 
-((identifier) @constant.cpp
-  (#match? @constant.cpp "[_A-Z][_A-Z0-9]*$"))
+; Don't try to scope (e.g.) `int FOO = 1` as a constant when the user types `=`
+; but has not typed the value yet.
+(ERROR
+  (identifier) @_IGNORE_
+  (#set! capture.final))
+
+; In most languages we wouldn't be making the assumption that an all-caps
+; identifier should be treated as a constant. But those languages don't have
+; macro preprocessors. The convention is decently strong in C/C++ that all-caps
+; identifiers will refer to `#define`d things.
+((identifier) @constant.other.cpp
+  (#match? @constant.other.cpp "^[_A-Z][_A-Z0-9]*$")
+  (#set! capture.shy))
 
 
 ; COMMENTS
@@ -315,6 +440,7 @@
   "throw"
   "using"
   "namespace"
+  "class"
 ] @keyword.control._TYPE_.cpp
 
 ; OPERATORS
@@ -324,6 +450,7 @@
 (abstract_pointer_declarator "*" @keyword.operator.pointer.cpp)
 (pointer_expression "*" @keyword.operator.pointer.cpp)
 
+(destructor_name "~" @keyword.operator.destructor.cpp)
 
 "sizeof" @keyword.operator.sizeof.cpp
 (pointer_expression "&" @keyword.operator.pointer.cpp)
@@ -381,8 +508,10 @@
 
 ";" @punctuation.terminator.statement.cpp
 
-"," @punctuation.separator.comma.cpp
-"->" @keyword.operator.accessor.cpp
+("," @punctuation.separator.comma.cpp
+  (#set! capture.shy))
+("->" @keyword.operator.accessor.pointer-access.cpp
+  (#set! capture.shy))
 
 (parameter_list
   "(" @punctuation.definition.parameters.begin.bracket.round.cpp
@@ -406,6 +535,22 @@
 ")" @punctuation.definition.end.bracket.round.cpp
 "[" @punctuation.definition.array.begin.bracket.square.cpp
 "]" @punctuation.definition.array.end.bracket.square.cpp
+
+; META
+; ====
+
+((compound_statement) @meta.block.cpp
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+((enumerator_list) @meta.block.enum.cpp
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+((field_declaration_list) @meta.block.field.cpp
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
 
 ; TODO:
 ;

@@ -74,9 +74,12 @@
 ((list_lit
   "(" @punctuation.section.expression.begin (#is-not? test.descendantOfNodeWithData "clojure.dismissTag")
   .
-  (sym_lit) @meta.definition.global @keyword.control (#eq? @meta.definition.global "ns")
+  (sym_lit) @meta.definition.global @keyword.control
+    (#eq? @meta.definition.global "ns")
   .
-  (sym_lit) @meta.definition.global @entity.global
+  ; We need to distinguish this `@meta.definition.global` from the one above or
+  ; else this query will fail.
+  (sym_lit) @meta.definition.global.__TEXT__ @entity.global
   ")" @punctuation.section.expression.end)
  @meta.namespace.clojure
  (#set! isNamespace true))

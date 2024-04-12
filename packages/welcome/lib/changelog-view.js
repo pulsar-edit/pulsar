@@ -50,30 +50,23 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Made the modification of `editor.preferredLineLength` configurable within `wrap-guide` when changing `wrap-guide.columns`
+                Fixed some folds in Ruby like <code>unless</code>, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.
               </li>
               <li>
-                Fixed Snippets from `language-php` that would lose the `$` character
+                Improved the accuracy of indentation hinting in modern Tree-sitter grammars, especially in multi-cursor scenarios.
               </li>
               <li>
-                Fixed a condition where an invalid config may crash Pulsar before fully starting up, but not registering that it's crashed
+                Improved the ability of the user to opt into a specific kind of grammar for a specific language.
               </li>
               <li>
-                Reduced error notifications that may appear from `autocomplete-html` when handling EJS files
+                Changed the behavior of the <code>grammar-selector</code> package so that it will show the user's preferred grammar for a specific language.
               </li>
               <li>
-                Fixed macOS binary signing after moving over to GitHub Actions for CI
+                Updated to version <code>0.20.9</code> of <code>web-tree-sitter</code>.
               </li>
               <li>
-                Updated PPM to a newer `node-gyp`, allowing newer versions of C/C++ compiler toolchains and Python to be used (also dropped support for Python 2.x!)
+                Improved syntax highlighting, indentation, and code folding in various languages, including TypeScript, shell scripts, Ruby, and C/C++.
               </li>
-              <li>
-                Fully decaffed the entire PPM codebase
-              </li>
-              <li>
-                Added a new autocomplete API that does not uses prefixes and instead declares the range it'll replace (better LSP support)
-              </li>
-
             </ul>
 
             <section className="welcome-panel">

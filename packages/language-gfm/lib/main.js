@@ -38,30 +38,31 @@ exports.activate = () => {
     includeChildren: true
   });
 
-  // Highlight inline HTML within paragraphs.
-  atom.grammars.addInjectionPoint('source.gfm.embedded', {
-    type: 'paragraph',
-    language(node) {
-      let html = node.descendantsOfType([
-        'html_open_tag',
-        'html_close_tag',
-        'html_self_closing_tag'
-      ]);
-      if (html.length === 0) { return null; }
-      return 'html';
-    },
+  for (let nodeType of ['paragraph', 'table_cell']) {
+    atom.grammars.addInjectionPoint('source.gfm.embedded', {
+      type: nodeType,
+      language(node) {
+        let html = node.descendantsOfType([
+          'html_open_tag',
+          'html_close_tag',
+          'html_self_closing_tag'
+        ]);
+        if (html.length === 0) { return null; }
+        return 'html';
+      },
 
-    content(node) {
-      let html = node.descendantsOfType([
-        'html_open_tag',
-        'html_close_tag',
-        'html_self_closing_tag'
-      ]);
-      return html;
-    },
+      content(node) {
+        let html = node.descendantsOfType([
+          'html_open_tag',
+          'html_close_tag',
+          'html_self_closing_tag'
+        ]);
+        return html;
+      },
 
-    includeChildren: true
-  });
+      includeChildren: true
+    });
+  }
 
   // All code blocks of the form
   //
@@ -86,4 +87,41 @@ exports.activate = () => {
     languageScope: (grammar) => `${grammar.scopeName}.embedded`,
     includeChildren: true
   });
+};
+
+
+// Since this parser isn't guaranteed to detect all URLs in paragraphs (see
+// https://github.com/pulsar-edit/pulsar/issues/885), we'll inject the
+// `hyperlink` parser into `text` nodes in paragraphs when there appear to be
+// URLs in them.
+exports.consumeHyperlinkInjection = (hyperlink) => {
+
+  function textChildren(node) {
+    let results = [];
+    for (let i = 0; i < node.namedChildCount; i++) {
+      let child = node.child(i);
+      if (child.type === 'text') {
+        results.push(child);
+      }
+    }
+    return results;
+  }
+
+  hyperlink.addInjectionPoint('source.gfm.embedded', {
+    types: ['paragraph'],
+    // Override the language callback so that it doesn't test URLs that are
+    // already handled in `uri_autolink` nodes.
+    language(node) {
+      for (let child of textChildren(node)) {
+        if (hyperlink.test(child)) {
+          return 'hyperlink';
+        }
+      }
+      return null;
+    },
+    content(node) {
+      return textChildren(node);
+    }
+  });
+
 };

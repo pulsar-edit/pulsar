@@ -1,7 +1,6 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import fuzzaldrin from 'fuzzaldrin'
 import etch from 'etch'
 import _ from 'underscore-plus'
 import {CompositeDisposable, TextEditor} from 'atom'
@@ -356,7 +355,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
         } else {
           const owner = pack.owner != null ? pack.owner : ownerFromRepository(pack.repository)
           const filterText = `${pack.name} ${owner}`
-          return fuzzaldrin.score(filterText, text) > 0
+          return atom.ui.fuzzyMatcher.score(filterText, text) > 0
         }
       })
 

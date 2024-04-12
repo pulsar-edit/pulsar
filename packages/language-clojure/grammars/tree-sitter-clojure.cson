@@ -39,6 +39,7 @@ parser: 'tree-sitter-clojure'
   )
 '''
 treeSitter:
+  parserSource: 'github:mauricioszabo/tree-sitter-clojure#inner-strings'
   grammar: 'ts/grammar.wasm'
   highlightsQuery: [
     'ts/highlights.scm'
