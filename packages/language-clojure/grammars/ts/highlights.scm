@@ -88,8 +88,8 @@
   "("
   .
   (kwd_lit) @invalid.deprecated (#eq? @invalid.deprecated ":use")
-  (#is? test.descendantOfNodeWithData isNamespace)
-  (#is? test.config language-clojure.markDeprecations))
+  (#is? test.config language-clojure.markDeprecations)
+  (#is? test.descendantOfNodeWithData isNamespace))
 
 ;; Definition
 (list_lit
