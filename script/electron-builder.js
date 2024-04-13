@@ -154,10 +154,9 @@ let options = {
     fpm: ['--rpm-rpmbuild-define=_build_id_links none']
   },
   "linux": {
-    // Giving a single PNG icon to electron-builder prevents the correct
-    // construction of the icon path, so we have to specify a folder containing
-    // multiple icons named each with its size.
-    "icon": "resources/icons",
+    // A single SVG can be placed under /usr/share/icons/hicolor/scalable
+    // For Linux desktops
+    "icon": "resources/linux/pulsar.svg",
     "category": "Development",
     "synopsis": "A Community-led Hyper-Hackable Text Editor",
     "target": [
@@ -171,7 +170,6 @@ let options = {
         // Extra SVG icon included in the resources folder to give a chance to
         // Linux packagers to add a scalable desktop icon under
         // /usr/share/icons/hicolor/scalable
-        // (used only by desktops to show it on bar/switcher and app menus).
         "from": svgIcon,
         "to": "pulsar.svg"
       },
