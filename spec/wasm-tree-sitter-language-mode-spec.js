@@ -3238,7 +3238,142 @@ describe('WASMTreeSitterLanguageMode', () => {
   });
 
   describe('.commentStringsForPosition(position)', () => {
+    beforeEach(() => {
+      atom.config.unset('editor.commentDelimiters', { scopeSelector: '.source.js' });
+      atom.config.unset('editor.commentStart',      { scopeSelector: '.source.js' });
+      atom.config.unset('editor.commentEnd',        { scopeSelector: '.source.js' });
+      atom.config.unset('editor.commentDelimiters', { scopeSelector: '.text.html.basic' });
+      atom.config.unset('editor.commentStart',      { scopeSelector: '.text.html.basic' });
+      atom.config.unset('editor.commentEnd',        { scopeSelector: '.text.html.basic' });
+    });
+
     it('returns the correct comment strings for nested languages', async () => {
+      jasmine.useRealClock();
+      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
+
+      const htmlGrammar = new WASMTreeSitterGrammar(
+        atom.grammars,
+        htmlGrammarPath,
+        htmlConfig
+      );
+
+      htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
+
+      atom.grammars.addGrammar(jsGrammar);
+      atom.grammars.addGrammar(htmlGrammar);
+
+      atom.config.set(
+        'editor.commentDelimiters',
+        {
+          line: '//',
+          block: ['/*', '*/']
+        },
+        { scopeSelector: '.source.js' }
+      );
+
+      atom.config.set(
+        'editor.commentStart',
+        '//',
+        { scopeSelector: '.source.js' }
+      );
+
+
+      atom.config.set(
+        'editor.commentDelimiters',
+        {
+          block: ['<!--', '-->']
+        },
+        { scopeSelector: '.text.html.basic' }
+      );
+
+      atom.config.set(
+        'editor.commentStart',
+        '<!--',
+        { scopeSelector: '.text.html.basic' }
+      );
+
+      atom.config.set(
+        'editor.commentEnd',
+        '-->',
+        { scopeSelector: '.text.html.basic' }
+      );
+
+      const languageMode = new WASMTreeSitterLanguageMode({
+        grammar: htmlGrammar,
+        buffer,
+        config: atom.config,
+        grammars: atom.grammars
+      });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      buffer.setText(
+        `
+<div>hi</div>
+<script>
+  const node = document.getElementById('some-id');
+  node.innerHTML = html \`
+    <span>bye</span>
+  \`
+</script>
+      `.trim()
+      );
+
+      const htmlCommentStrings = {
+        commentStartString: '<!--',
+        commentEndString: '-->',
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      };
+      const jsCommentStrings = {
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: '//',
+          block: ['/*', '*/']
+        }
+      };
+
+      // Needs a short delay to allow injection grammars to be loaded.
+      await languageMode.nextTransaction;
+
+      expect(languageMode.commentStringsForPosition(new Point(0, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(1, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(2, 0))).toEqual(
+        jsCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(3, 0))).toEqual(
+        jsCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(4, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(5, 0))).toEqual({
+        // This is the curveball. Original position is inside the HTML, so
+        // that's what the delimiters will be. But `commentStartString` will be
+        // `// ` because it looks up the scope of the first non-whitespace
+        // content on the row.
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      });
+      expect(languageMode.commentStringsForPosition(new Point(6, 0))).toEqual(
+        htmlCommentStrings
+      );
+    });
+
+    it('uses grammar comment settings when config data is missing', async () => {
       jasmine.useRealClock();
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3277,12 +3412,20 @@ describe('WASMTreeSitterLanguageMode', () => {
       );
 
       const htmlCommentStrings = {
-        commentStartString: '<!-- ',
-        commentEndString: ' -->'
+        commentStartString: '<!--',
+        commentEndString: '-->',
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
       };
       const jsCommentStrings = {
-        commentStartString: '// ',
-        commentEndString: undefined
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: '//',
+          block: ['/*', '*/']
+        }
       };
 
       // Needs a short delay to allow injection grammars to be loaded.
@@ -3303,13 +3446,133 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(languageMode.commentStringsForPosition(new Point(4, 0))).toEqual(
         htmlCommentStrings
       );
-      expect(languageMode.commentStringsForPosition(new Point(5, 0))).toEqual(
-        jsCommentStrings
-      );
+      expect(languageMode.commentStringsForPosition(new Point(5, 0))).toEqual({
+        // This is the curveball. Original position is inside the HTML, so
+        // that's what the delimiters will be. But `commentStartString` will be
+        // `// ` because it looks up the scope of the first non-whitespace
+        // content on the row.
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      });
       expect(languageMode.commentStringsForPosition(new Point(6, 0))).toEqual(
         htmlCommentStrings
       );
     });
+
+    it('constructs the right comment settings when grammar data is missing', async () => {
+      jasmine.useRealClock();
+      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
+
+      const htmlGrammar = new WASMTreeSitterGrammar(
+        atom.grammars,
+        htmlGrammarPath,
+        htmlConfig
+      );
+
+      spyOn(jsGrammar, 'getCommentDelimiters').andReturn({ line: undefined, block: undefined });
+      spyOn(htmlGrammar, 'getCommentDelimiters').andReturn({ line: undefined, block: undefined });
+
+      atom.config.set(
+        'editor.commentDelimiters',
+        {
+          line: '//',
+          block: ['/*', '*/']
+        },
+        { scopeSelector: '.source.js' }
+      );
+
+      atom.config.set(
+        'editor.commentDelimiters',
+        {
+          block: ['<!--', '-->']
+        },
+        { scopeSelector: '.text.html.basic' }
+      );
+
+      htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
+
+      atom.grammars.addGrammar(jsGrammar);
+      atom.grammars.addGrammar(htmlGrammar);
+
+      const languageMode = new WASMTreeSitterLanguageMode({
+        grammar: htmlGrammar,
+        buffer,
+        config: atom.config,
+        grammars: atom.grammars
+      });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      buffer.setText(
+        `
+<div>hi</div>
+<script>
+  const node = document.getElementById('some-id');
+  node.innerHTML = html \`
+    <span>bye</span>
+  \`
+</script>
+      `.trim()
+      );
+
+      const htmlCommentStrings = {
+        commentStartString: '<!--',
+        commentEndString: '-->',
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      };
+      const jsCommentStrings = {
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: '//',
+          block: ['/*', '*/']
+        }
+      };
+
+      // Needs a short delay to allow injection grammars to be loaded.
+      await languageMode.nextTransaction;
+
+      expect(languageMode.commentStringsForPosition(new Point(0, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(1, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(2, 0))).toEqual(
+        jsCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(3, 0))).toEqual(
+        jsCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(4, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(5, 0))).toEqual({
+        // This is the curveball. Original position is inside the HTML, so
+        // that's what the delimiters will be. But `commentStartString` will be
+        // `// ` because it looks up the scope of the first non-whitespace
+        // content on the row.
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      });
+      expect(languageMode.commentStringsForPosition(new Point(6, 0))).toEqual(
+        htmlCommentStrings
+      );
+    });
+
   });
 
   describe('TextEditor.selectLargerSyntaxNode and .selectSmallerSyntaxNode', () => {
@@ -3319,11 +3582,6 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('highlightsQuery', `
         (program) @source
       `);
-
-      // {
-      //   parser: 'tree-sitter-javascript',
-      //   scopes: { program: 'source' }
-      // });
 
       buffer.setText(dedent`
         function a (b, c, d) {

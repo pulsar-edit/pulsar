@@ -8,6 +8,7 @@ const TokenizedLine = require('./tokenized-line');
 const TextMateLanguageMode = require('./text-mate-language-mode');
 const { matcherForSelector } = require('./selectors');
 const TreeIndenter = require('./tree-indenter');
+const { normalizeDelimiters, commentStringsFromDelimiters } = require('./comment-utils.js');
 
 let nextId = 0;
 const MAX_RANGE = new Range(Point.ZERO, Point.INFINITY).freeze();
@@ -169,7 +170,16 @@ class TreeSitterLanguageMode {
       this.firstNonWhitespaceRange(position.row) ||
       new Range(position, position);
     const { grammar } = this.getSyntaxNodeAndGrammarContainingRange(range);
-    return grammar.commentStrings;
+    const { grammar: originalPositionGrammar } = this.getSyntaxNodeAndGrammarContainingRange(new Range(position, position));
+
+    let result = commentStringsFromDelimiters(grammar.commentStrings);
+    console.log('result???', result, grammar.commentStrings);
+    if (originalPositionGrammar !== grammar) {
+      result.commentDelimiters = commentStringsFromDelimiters(
+        originalPositionGrammar.commentStrings
+      ).commentDelimiters;
+    }
+    return result;
   }
 
   isRowCommented(row) {
@@ -1127,6 +1137,7 @@ class LayerHighlightIterator {
   }
 
   seek(targetIndex, containingTags, containingTagStartIndices) {
+    // eslint-disable-next-line no-empty
     while (this.treeCursor.gotoParent()) {}
 
     this.atEnd = true;

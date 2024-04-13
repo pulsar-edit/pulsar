@@ -4,6 +4,8 @@
   'editor':
     'commentStart': '/*'
     'commentEnd': '*/'
+    'commentDelimiters':
+      'block': ['/*', '*/']
     'foldEndPattern': '(?<!\\*)\\*\\*/|^\\s*\\}|\\/*\\s*@end\\s*\\*\\/'
   'autocomplete':
     'extraWordCharacters': '-'

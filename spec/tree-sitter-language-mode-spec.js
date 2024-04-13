@@ -87,7 +87,7 @@ describe('TreeSitterLanguageMode', () => {
       });
       const original = grammar.idForScope.bind(grammar);
       let tokens = [];
-      grammar.idForScope = function(scope, text) {
+      grammar.idForScope = function (scope, text) {
         if (text && tokens[tokens.length - 1] !== text) {
           tokens.push(text);
         }
@@ -2342,12 +2342,29 @@ describe('TreeSitterLanguageMode', () => {
 
       const htmlCommentStrings = {
         commentStartString: '<!--',
-        commentEndString: '-->'
+        commentEndString: '-->',
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
       };
       const jsCommentStrings = {
         commentStartString: '//',
-        commentEndString: undefined
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: '//',
+          block: undefined
+        }
       };
+
+      const hybridCommentStrings = {
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      }
 
       expect(languageMode.commentStringsForPosition(new Point(0, 0))).toEqual(
         htmlCommentStrings
@@ -2356,16 +2373,16 @@ describe('TreeSitterLanguageMode', () => {
         htmlCommentStrings
       );
       expect(languageMode.commentStringsForPosition(new Point(2, 0))).toEqual(
-        jsCommentStrings
+        hybridCommentStrings
       );
       expect(languageMode.commentStringsForPosition(new Point(3, 0))).toEqual(
-        jsCommentStrings
+        hybridCommentStrings
       );
       expect(languageMode.commentStringsForPosition(new Point(4, 0))).toEqual(
         htmlCommentStrings
       );
       expect(languageMode.commentStringsForPosition(new Point(5, 0))).toEqual(
-        jsCommentStrings
+        hybridCommentStrings
       );
       expect(languageMode.commentStringsForPosition(new Point(6, 0))).toEqual(
         htmlCommentStrings
