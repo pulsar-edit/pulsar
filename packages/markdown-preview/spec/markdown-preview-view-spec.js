@@ -601,4 +601,39 @@ enc\
       })
     })
   })
+
+  describe('when GitHub styles are enabled', () => {
+    beforeEach(() => {
+      atom.config.set('markdown-preview.useGitHubStyle', true)
+      atom.config.set('markdown-preview.gitHubStyleMode', 'light')
+    })
+    it('uses the GitHub styles', () => {
+      jasmine.attachToDOM(preview.element)
+
+      // It's possible that these values will need to change when the GitHub
+      // CSS is updated.
+      const expectedColors = {
+        light: `rgb(31, 35, 40)`,
+        dark: `rgb(230, 237, 243)`
+      }
+
+      waitsForPromise(() => preview.renderMarkdown())
+
+      // Perform some basic sanity checks about these modes.
+      expect(preview.element.dataset.useGithubStyle).toBe('light')
+      let paragraph = preview.element.querySelector('p')
+      expect(getComputedStyle(paragraph).color).toBe(expectedColors.light)
+
+      atom.config.set('markdown-preview.gitHubStyleMode', 'dark')
+      expect(preview.element.dataset.useGithubStyle).toBe('dark')
+      expect(getComputedStyle(paragraph).color).toBe(expectedColors.dark)
+
+      atom.config.set('markdown-preview.gitHubStyleMode', 'auto')
+      expect(preview.element.dataset.useGithubStyle).toBe('auto')
+      // We don't know which mode will be preferred on the system we're running
+      // on, but as a sanity check we can at least verify that the style value
+      // is one of the two values we just asserted.
+      expect([expectedColors.light, expectedColors.dark]).toContain(getComputedStyle(paragraph).color)
+    })
+  })
 })
