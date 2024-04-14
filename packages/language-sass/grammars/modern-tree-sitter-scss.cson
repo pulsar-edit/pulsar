@@ -1,0 +1,28 @@
+name: 'SCSS'
+scopeName: 'source.css.scss'
+type: 'modern-tree-sitter'
+# Built from the fork at savetheclocktower/tree-sitter-scss.
+parser: 'tree-sitter-scss'
+
+fileTypes: [
+  'scss'
+  'css.scss'
+  'css.scss.erb'
+  'scss.erb'
+  'scss.liquid'
+]
+
+injectionRegex: '^(scss|SCSS)$'
+
+treeSitter:
+  parserSource: 'github:savetheclocktower/tree-sitter-scss#e91dcb2c91b3e8853cccf7079b6a09fdeead75a3'
+  grammar: 'tree-sitter/tree-sitter-scss.wasm'
+  highlightsQuery: 'tree-sitter/highlights.scm'
+  foldsQuery: 'tree-sitter/folds.scm'
+  indentsQuery: 'tree-sitter/indents.scm'
+  tagsQuery: 'tree-sitter/tags.scm'
+
+comments:
+  start: '//'
+  line: '//'
+  block: ['/*', '*/']
