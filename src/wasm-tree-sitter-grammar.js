@@ -367,12 +367,10 @@ module.exports = class WASMTreeSitterGrammar {
     return this.emitter.on('did-change-query-file', callback);
   }
 
-  // TODO: Why is this here?
   activate() {
     this.registration = this.registry.addGrammar(this);
   }
 
-  // TODO: Why is this here?
   deactivate() {
     this.registration?.dispose();
     this.subscriptions?.dispose();
