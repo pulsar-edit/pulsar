@@ -34,7 +34,23 @@ mkdir -p "%{buildroot}/<%= installDir %>/share/polkit-1/actions/"
 cp "<%= policyFileName %>" "%{buildroot}/<%= installDir %>/share/polkit-1/actions/<%= policyFileName %>"
 
 mkdir -p "%{buildroot}/<%= installDir %>/share/icons/hicolor/1024x1024/apps"
-cp "linux/pulsar.svg" "%{buildroot}/<%= installDir %>/share/icons/hicolor/scalable/apps/<%= appFileName %>.svg"
+cp "icons/1024.png" "%{buildroot}/<%= installDir %>/share/icons/hicolor/1024x1024/apps/<%= appFileName %>.png"
+mkdir -p "%{buildroot}/<%= installDir %>/share/icons/hicolor/512x512/apps"
+cp "icons/512.png" "%{buildroot}/<%= installDir %>/share/icons/hicolor/512x512/apps/<%= appFileName %>.png"
+mkdir -p "%{buildroot}/<%= installDir %>/share/icons/hicolor/256x256/apps"
+cp "icons/256.png" "%{buildroot}/<%= installDir %>/share/icons/hicolor/256x256/apps/<%= appFileName %>.png"
+mkdir -p "%{buildroot}/<%= installDir %>/share/icons/hicolor/128x128/apps"
+cp "icons/128.png" "%{buildroot}/<%= installDir %>/share/icons/hicolor/128x128/apps/<%= appFileName %>.png"
+mkdir -p "%{buildroot}/<%= installDir %>/share/icons/hicolor/64x64/apps"
+cp "icons/64.png" "%{buildroot}/<%= installDir %>/share/icons/hicolor/64x64/apps/<%= appFileName %>.png"
+mkdir -p "%{buildroot}/<%= installDir %>/share/icons/hicolor/48x48/apps"
+cp "icons/48.png" "%{buildroot}/<%= installDir %>/share/icons/hicolor/48x48/apps/<%= appFileName %>.png"
+mkdir -p "%{buildroot}/<%= installDir %>/share/icons/hicolor/32x32/apps"
+cp "icons/32.png" "%{buildroot}/<%= installDir %>/share/icons/hicolor/32x32/apps/<%= appFileName %>.png"
+mkdir -p "%{buildroot}/<%= installDir %>/share/icons/hicolor/24x24/apps"
+cp "icons/24.png" "%{buildroot}/<%= installDir %>/share/icons/hicolor/24x24/apps/<%= appFileName %>.png"
+mkdir -p "%{buildroot}/<%= installDir %>/share/icons/hicolor/16x16/apps"
+cp "icons/16.png" "%{buildroot}/<%= installDir %>/share/icons/hicolor/16x16/apps/<%= appFileName %>.png"
 
 %files
 <%= installDir %>/bin/<%= appFileName %>
@@ -42,5 +58,5 @@ cp "linux/pulsar.svg" "%{buildroot}/<%= installDir %>/share/icons/hicolor/scalab
 <%= installDir %>/share/<%= appFileName %>/
 <%= installDir %>/share/applications/<%= appFileName %>.desktop
 <%= installDir %>/share/polkit-1/actions/<%= policyFileName %>
-<%= installDir %>/share/icons/hicolor/scalable/<%= appFileName %>.svg
+<%= installDir %>/share/icons/hicolor/
 %attr(4755, root, root) <%= installDir %>/share/<%= appFileName %>/chrome-sandbox
