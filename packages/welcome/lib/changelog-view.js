@@ -67,6 +67,9 @@ export default class ChangeLogView {
               <li>
                 Removed Machine PATH handling for Pulsar on Windows, ensuring to only ever attempt PATH manipulation per user. Added additional safety mechanisms when handling a user's PATH variable.
               </li>
+              <li>
+                Update (Linux) metainfo from downstream Pulsar Flatpak
+              </li>
             </ul>
 
             <section className="welcome-panel">

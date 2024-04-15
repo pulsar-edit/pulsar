@@ -14,8 +14,10 @@
 * Replaced our underlying Tree-sitter parser for Markdown files with one that’s more stable.
 * Fixed issues in Python with unwanted indentation after type annotations and applying scope names to constructor functions.
 * Removed Machine PATH handling for Pulsar on Windows, ensuring to only ever attempt PATH manipulation per user. Added additional safety mechanisms when handling a user's PATH variable.
+* Update (Linux) metainfo from downstream Pulsar Flatpak 
 
 ### Pulsar
+- Updated: Update Pulsar's Linux desktop & metainfo mostly from Flatpak [@cat-master21](https://github.com/pulsar-edit/pulsar/pull/935)
 - Updated: [core] Simplify/Cleanup `StyleManager` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/959)
 - Fixed: Tree-sitter fixes (1.116 edition) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/968)
 - Bumped: Bump `snippets` dependency to 1.8.0 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/972)
