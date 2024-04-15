@@ -16,6 +16,7 @@
 * Removed Machine PATH handling for Pulsar on Windows, ensuring to only ever attempt PATH manipulation per user. Added additional safety mechanisms when handling a user's PATH variable.
 
 ### Pulsar
+- Updated: [core] Simplify/Cleanup `StyleManager` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/959)
 - Fixed: Tree-sitter fixes (1.116 edition) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/968)
 - Bumped: Bump `snippets` dependency to 1.8.0 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/972)
 - Added: Add a `TextEditor` method for retrieving comment delimiters... [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/970)
