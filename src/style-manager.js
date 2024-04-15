@@ -144,10 +144,8 @@ module.exports = class StyleManager {
       }
     }
 
-    let textContent;
+    let textContent = source
     let deprecationMessages = [];
-
-    textContent = source;
 
     if (!params.skipDeprecatedSelectorsTransformation) {
       const transformed = this.upgradeStyleSheet(
