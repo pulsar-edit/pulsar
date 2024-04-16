@@ -237,7 +237,7 @@ module.exports = class StyleManager {
     // Allows us to utilize a direct callback, or if calling from outside
     // StyleManager we can define a string that works
     if (upgradeName === "math") {
-      cb = upgradeDeprecatedMathUsageForStyleSheet;
+      cb = transformDeprecatedMathUsage;
     } else if (upgradeName === "selector") {
       cb = transformDeprecatedShadowDOMSelectors;
     } else if (typeof upgradeName === "function") {
