@@ -399,6 +399,12 @@ const configSchema = {
         description: 'Add the current tab title to the Pulsar Window title.',
         type: 'boolean',
         default: true
+      },
+      allowWindowTransparency: {
+        type: 'boolean',
+        default: false,
+        title: 'Allow Window Transparency',
+        description: `Allows editor windows to be see-through. When this setting is enabled, UI themes and user stylesheets can use background colors with an alpha channel to make editor windows translucent. Takes effect after a restart of Pulsar.`
       }
     }
   },
