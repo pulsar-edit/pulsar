@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 16
 
@@ -42,14 +42,14 @@ jobs:
 
     - name: Cache pulsar
       id: cache-pulsar
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: pulsar.deb
         key: pulsar-${{ github.sha }}
 
     - name: Cache dependencies
       id: cache-dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           node_modules
@@ -163,15 +163,15 @@ jobs:
 
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Setup NodeJS
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 16
 
     - name: Restore dependencies from Cache
       id: restore-dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           node_modules
@@ -188,7 +188,7 @@ jobs:
 
     - name: Restore pulsar from Cache
       id: restore-pulsar
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: pulsar.deb
         key: pulsar-${{ github.sha }}
