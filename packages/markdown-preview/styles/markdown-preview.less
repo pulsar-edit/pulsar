@@ -2,6 +2,13 @@
 // Global Markdown Preview styles
 
 .markdown-preview {
+
+  // Hide a `pre` that comes directly after an `atom-text-editor` because the
+  // `atom-text-editor` is the syntax-highlighted representation.
+  atom-text-editor + pre {
+    display: none;
+  }
+
   atom-text-editor {
     // only show scrollbars on hover
     .scrollbars-visible-always & {

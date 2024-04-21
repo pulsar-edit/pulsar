@@ -6,7 +6,8 @@
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
-    "atom": "*"
+    "atom": "*",
+    "node": ">=12"
   },
   "scripts": {
     "generate-github-markdown-css": "node scripts/generate-github-markdown-css.js"
@@ -19,6 +20,7 @@
     "fs-plus": "^3.0.0",
     "github-markdown-css": "^5.5.1",
     "marked": "5.0.3",
+    "morphdom": "^2.7.2",
     "underscore-plus": "^1.0.0",
     "yaml-front-matter": "^4.1.1"
   },

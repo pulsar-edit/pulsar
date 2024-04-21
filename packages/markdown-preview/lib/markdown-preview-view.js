@@ -1,4 +1,5 @@
 const path = require('path')
+const morphdom = require('morphdom')
 
 const { Emitter, Disposable, CompositeDisposable, File } = require('atom')
 const _ = require('underscore-plus')
@@ -17,6 +18,7 @@ module.exports = class MarkdownPreviewView {
     this.element = document.createElement('div')
     this.element.classList.add('markdown-preview')
     this.element.tabIndex = -1
+
     this.emitter = new Emitter()
     this.loaded = false
     this.disposables = new CompositeDisposable()
@@ -32,6 +34,7 @@ module.exports = class MarkdownPreviewView {
         })
       )
     }
+    this.editorCache = new renderer.EditorCache(editorId)
   }
 
   serialize() {
@@ -52,6 +55,7 @@ module.exports = class MarkdownPreviewView {
   destroy() {
     this.disposables.dispose()
     this.element.remove()
+    this.editorCache.destroy()
   }
 
   registerScrollCommands() {
@@ -83,7 +87,7 @@ module.exports = class MarkdownPreviewView {
     return this.emitter.on('did-change-title', callback)
   }
 
-  onDidChangeModified(callback) {
+  onDidChangeModified(_callback) {
     // No op to suppress deprecation warning
     return new Disposable()
   }
@@ -309,18 +313,33 @@ module.exports = class MarkdownPreviewView {
 
   async renderMarkdownText(text) {
     const { scrollTop } = this.element
-
     try {
-      const domFragment = await renderer.toDOMFragment(
+      const [domFragment, done] = await renderer.toDOMFragment(
         text,
         this.getPath(),
-        this.getGrammar()
+        this.getGrammar(),
+        this.editorId
       )
 
       this.loading = false
       this.loaded = true
-      this.element.textContent = ''
-      this.element.appendChild(domFragment)
+
+      // Clone the existing container
+      let newElement = this.element.cloneNode(false)
+      newElement.appendChild(domFragment)
+
+      morphdom(this.element, newElement, {
+        onBeforeNodeDiscarded(node) {
+          // Don't discard `atom-text-editor` elements despite the fact that
+          // they don't exist in the new content.
+          if (node.nodeName === 'ATOM-TEXT-EDITOR') {
+            return false
+          }
+        }
+      })
+
+      await done(this.element)
+
       this.emitter.emit('did-change-markdown')
       this.element.scrollTop = scrollTop
     } catch (error) {
@@ -400,7 +419,7 @@ module.exports = class MarkdownPreviewView {
       .join('\n')
       .replace(/atom-text-editor/g, 'pre.editor-colors')
       .replace(/:host/g, '.host') // Remove shadow-dom :host selector causing problem on FF
-      .replace(cssUrlRegExp, function (match, assetsName, offset, string) {
+      .replace(cssUrlRegExp, function (_match, assetsName, _offset, _string) {
         // base64 encode assets
         const assetPath = path.join(__dirname, '../assets', assetsName)
         const originalData = fs.readFileSync(assetPath, 'binary')
