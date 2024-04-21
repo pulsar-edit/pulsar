@@ -722,7 +722,7 @@ world\
       expectPreviewInSplitPane()
 
       runs(() =>
-        expect(preview.element.getAttribute('data-use-github-style')).toBe('')
+        expect(preview.element.getAttribute('data-use-github-style')).toBe('auto')
       )
     })
 

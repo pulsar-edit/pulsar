@@ -9,7 +9,6 @@
   'cljx'
   'clojure'
   'edn'
-  'org'
   'joke'
   'joker'
 ]
