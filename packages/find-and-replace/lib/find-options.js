@@ -90,7 +90,7 @@ module.exports = class FindOptions {
       expression = escapeRegExp(this.findPattern);
     }
 
-    if (this.wholeWord) { expression = `\\b${expression}\\b`; }
+    if (this.wholeWord) { expression = `(?:^|\\W)${expression}(?:$|\\W)`; }
 
     return new RegExp(expression, flags);
   }
