@@ -11,6 +11,9 @@ describe("FindView", () => {
     return workspaceElement.querySelector(".find-and-replace").parentNode;
   }
 
+  // usage:
+  // getResultDecorations(editor, "current-result") --> length = number of currently selected results
+  // getResultDecorations(editor, "find-result") --> length = number of results that are not currently selected
   function getResultDecorations(editor, clazz) {
     const result = [];
     const decorations = editor.decorationsStateForScreenRowRange(0, editor.getLineCount())
@@ -454,6 +457,30 @@ describe("FindView", () => {
 
       it("doesn't highlight the search inside words", () => {
         findView.findEditor.setText("word");
+        atom.commands.dispatch(findView.findEditor.element, "core:confirm");
+        expect(getResultDecorations(editor, "find-result")).toHaveLength(1);
+        expect(getResultDecorations(editor, "current-result")).toHaveLength(1);
+      });
+
+      it("finds the whole words even when the word starts or ends with a non-word character", () => {
+        findView.findEditor.setText("-word");
+        atom.commands.dispatch(findView.findEditor.element, "core:confirm");
+        expect(editor.getSelectedBufferRange()).toEqual([[2, 5], [2, 10]]);
+
+        findView.findEditor.setText("whole-");
+        atom.commands.dispatch(findView.findEditor.element, "core:confirm");
+        expect(editor.getSelectedBufferRange()).toEqual([[2, 0], [2, 6]]);
+      });
+
+      it("doesn't highlight the search inside words (non-word character at start)", () => {
+        findView.findEditor.setText("-word");
+        atom.commands.dispatch(findView.findEditor.element, "core:confirm");
+        expect(getResultDecorations(editor, "find-result")).toHaveLength(0);
+        expect(getResultDecorations(editor, "current-result")).toHaveLength(1);
+      });
+
+      it("doesn't highlight the search inside words (non-word character at end)", () => {
+        findView.findEditor.setText("whole-");
         atom.commands.dispatch(findView.findEditor.element, "core:confirm");
         expect(getResultDecorations(editor, "find-result")).toHaveLength(1);
         expect(getResultDecorations(editor, "current-result")).toHaveLength(1);
