@@ -274,7 +274,22 @@ module.exports = class MarkdownPreviewView {
     return this.getMarkdownSource()
       .then(source => {
         if (source != null) {
-          return this.renderMarkdownText(source)
+          if (this.loaded) {
+            return this.renderMarkdownText(source);
+          } else {
+            // If we haven't loaded yet, defer before we render the Markdown
+            // for the first time. This allows the pane to appear and to
+            // display the loading indicator. Otherwise the first render
+            // happens before the pane is even visible.
+            //
+            // This doesn't slow anything down; it just shifts the work around
+            // so that the pane appears earlier in the cycle.
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                resolve(this.renderMarkdownText(source))
+              }, 0)
+            })
+          }
         }
       })
       .catch(reason => this.showError({ message: reason }))
@@ -339,6 +354,7 @@ module.exports = class MarkdownPreviewView {
       })
 
       await done(this.element)
+      this.element.classList.remove('loading')
 
       this.emitter.emit('did-change-markdown')
       this.element.scrollTop = scrollTop
@@ -444,11 +460,7 @@ module.exports = class MarkdownPreviewView {
 
   showLoading() {
     this.loading = true
-    this.element.textContent = ''
-    const div = document.createElement('div')
-    div.classList.add('markdown-spinner')
-    div.textContent = 'Loading Markdown\u2026'
-    this.element.appendChild(div)
+    this.element.classList.add('loading')
   }
 
   selectAll() {

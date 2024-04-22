@@ -41,6 +41,13 @@ describe('Markdown Preview', function () {
           .getActiveItem())
     )
 
+    waitsFor(
+      'preview to finish loading',
+      () => {
+        return !preview.element.classList.contains('loading')
+      }
+    )
+
     runs(() => {
       expect(preview).toBeInstanceOf(MarkdownPreviewView)
       expect(preview.getPath()).toBe(
