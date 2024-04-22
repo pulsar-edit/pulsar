@@ -322,7 +322,6 @@ function highlightCodeBlocks(element, grammar, cache, editorCallback) {
     if (!editor) {
       editor = new TextEditor({ keyboardInputEnabled: false })
       editorElement = editor.getElement()
-      editorElement.setUpdatedSynchronously(true)
       editor.setReadOnly(true)
       cache?.addEditor(preElement, editor)
     } else {
