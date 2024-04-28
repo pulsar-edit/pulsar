@@ -3,7 +3,7 @@
   "version": "1.8.0",
   "main": "./lib/snippets",
   "description": "Expand snippets matching the current prefix with `tab`.",
-  "repository": "https://github.com/pulsar-edit/snippets",
+  "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
     "atom": "*"
