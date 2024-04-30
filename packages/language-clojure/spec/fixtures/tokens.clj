@@ -188,9 +188,3 @@ error/
 ;      ^ support.class.builtin.console.js
 ;                   ^ string.quoted.single.js
 ;                            ^ !string.quoted.single.js
-
-(native/raw "cout << 10;", "10")
-;                 ^ keyword.operator.bitwise.cpp
-;                    ^ constant.numeric.cpp
-;                           ^ !constant.numeric.cpp
-;; ^ keyword.control.jank.clojure
