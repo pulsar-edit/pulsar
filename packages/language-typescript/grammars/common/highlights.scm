@@ -17,6 +17,18 @@
 (namespace_import
   (identifier) @variable.other.assignment.import.namespace._LANG_)
 
+; The "*" in `export * from 'bar'`
+(export_statement "*" @variable.other.assignment.export.all.js)
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export "*" @variable.other.assignment.export.all.js))
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export
+    (identifier) @variable.other.assignment.export.alias.js))
+
 ; The "Foo" in `export { Foo }`
 (export_specifier
   name: (identifier) @variable.other.assignment.export._LANG_)
@@ -395,9 +407,17 @@
 ; TODO: We could add a special scope name to the entire suite of DOM types, but
 ; I don't have the strength for that right now.
 
-;
-((type_identifier) @support.storage.other.type._LANG_
-  )
+; The "bar" in `const foo: bar.Baz`.
+(nested_type_identifier
+  module: (identifier) @support.storage.other.property._LANG_)
+
+; The "bar" and "thud" in `const foo: bar.thud.Baz`.
+(nested_identifier
+  (identifier) @support.storage.other.property._LANG_
+  (#is? test.descendantOfType "type_annotation"))
+
+; Any other type identifiers; the "Bar" in `const foo: Bar`.
+(type_identifier) @support.storage.other.type._LANG_
 
 ; SUPPORT
 ; =======
@@ -739,8 +759,8 @@
 
 ; Interpolations inside of template strings.
 (template_substitution
-  "${" @punctuation.definition.template-expression.begin._LANG_
-  "}" @punctuation.definition.template-expression.end._LANG_
+  "${" @punctuation.section.embedded.begin._LANG_
+  "}" @punctuation.section.embedded.end._LANG_
 ) @meta.embedded.line.interpolation._LANG_
 
 (string
@@ -792,6 +812,22 @@
   "await"
   "debugger"
 ] @keyword.control._TYPE_._LANG_
+
+
+; REGEX
+; =====
+
+(regex) @string.regexp.js
+(regex
+  "/" @punctuation.definition.string.begin.js
+  (#is? test.first))
+
+(regex
+  "/" @punctuation.definition.string.end.js
+  (#is? test.last))
+
+(regex_flags) @keyword.other.js
+
 
 ; OPERATORS
 ; =========
@@ -924,6 +960,10 @@
 
 ; All other sorts of blocks.
 (statement_block) @meta.block._LANG_
+
+; The entirety of a type annotation, no matter how simple or complex (e.g.,
+; `Event`, `foo.Event`, `foo.bar.Event, foo.Event<MethodDispatcherFactory>`).
+(type_annotation (_) @meta.type.annotation._LANG_)
 
 ; The inside of a parameter definition list.
 ((formal_parameters) @meta.parameters._LANG_

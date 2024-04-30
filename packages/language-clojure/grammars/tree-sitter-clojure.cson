@@ -16,6 +16,7 @@ parser: 'tree-sitter-clojure'
   'cljx'
   'clojure'
   'edn'
+  'bb'
   'joke'
   'joker'
 ]

@@ -21,10 +21,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 16
 
@@ -41,6 +41,9 @@ jobs:
       run: yarn build
 
     - name: Run Tests
-      uses: coactions/setup-xvfb@v1.0.1
-      with:
-        run: node script/run-tests.js spec
+      if: runner.os != 'Linux'
+      run: node script/run-tests.js spec
+
+    - name: Run Tests with xvfb-run (Linux)
+      if: runner.os == 'Linux'
+      run: xvfb-run --auto-servernum node script/run-tests.js spec

@@ -145,7 +145,8 @@ class AtomEnvironment {
       config: this.config,
       styleManager: this.styles,
       notificationManager: this.notifications,
-      viewRegistry: this.views
+      viewRegistry: this.views,
+      applicationDelegate: this.applicationDelegate
     });
 
     /** @type {MenuManager} */

@@ -50,22 +50,25 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed some folds in Ruby like <code>unless</code>, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.
+                Added <code>TextEditor::getCommentDelimitersForBufferPosition</code> for retrieving comment delimiter strings appropriate for a given buffer position. This allows us to support three new snippet variables: <code>LINE_COMMENT</code>, <code>BLOCK_COMMENT_START</code>, and <code>BLOCK_COMMENT_END</code>.
               </li>
               <li>
-                Improved the accuracy of indentation hinting in modern Tree-sitter grammars, especially in multi-cursor scenarios.
+                Added ability to use “simple” transformation flags in snippets (like <code>/upcase</code> and <code>/camelcase</code>) within <code>sed</code>-style snippet transformation replacements.
               </li>
               <li>
-                Improved the ability of the user to opt into a specific kind of grammar for a specific language.
+                Improved TypeScript syntax highlighting of regular expressions, TSX fragments, wildcard export identifiers, namespaced types, and template string punctuation.
               </li>
               <li>
-                Changed the behavior of the <code>grammar-selector</code> package so that it will show the user's preferred grammar for a specific language.
+                Replaced our underlying Tree-sitter parser for Markdown files with one that’s more stable.
               </li>
               <li>
-                Updated to version <code>0.20.9</code> of <code>web-tree-sitter</code>.
+                Fixed issues in Python with unwanted indentation after type annotations and applying scope names to constructor functions.
               </li>
               <li>
-                Improved syntax highlighting, indentation, and code folding in various languages, including TypeScript, shell scripts, Ruby, and C/C++.
+                Removed Machine PATH handling for Pulsar on Windows, ensuring to only ever attempt PATH manipulation per user. Added additional safety mechanisms when handling a user's PATH variable.
+              </li>
+              <li>
+                Update (Linux) metainfo from downstream Pulsar Flatpak
               </li>
             </ul>
 

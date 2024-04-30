@@ -7,11 +7,11 @@ const fs = require('fs-plus')
 const renderer = require('./renderer')
 
 module.exports = class MarkdownPreviewView {
-  static deserialize (params) {
+  static deserialize(params) {
     return new MarkdownPreviewView(params)
   }
 
-  constructor ({ editorId, filePath }) {
+  constructor({ editorId, filePath }) {
     this.editorId = editorId
     this.filePath = filePath
     this.element = document.createElement('div')
@@ -34,7 +34,7 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  serialize () {
+  serialize() {
     return {
       deserializer: 'MarkdownPreviewView',
       filePath: this.getPath() != null ? this.getPath() : this.filePath,
@@ -42,19 +42,19 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  copy () {
+  copy() {
     return new MarkdownPreviewView({
       editorId: this.editorId,
       filePath: this.getPath() != null ? this.getPath() : this.filePath
     })
   }
 
-  destroy () {
+  destroy() {
     this.disposables.dispose()
     this.element.remove()
   }
 
-  registerScrollCommands () {
+  registerScrollCommands() {
     this.disposables.add(
       atom.commands.add(this.element, {
         'core:move-up': () => {
@@ -79,20 +79,20 @@ module.exports = class MarkdownPreviewView {
     )
   }
 
-  onDidChangeTitle (callback) {
+  onDidChangeTitle(callback) {
     return this.emitter.on('did-change-title', callback)
   }
 
-  onDidChangeModified (callback) {
+  onDidChangeModified(callback) {
     // No op to suppress deprecation warning
     return new Disposable()
   }
 
-  onDidChangeMarkdown (callback) {
+  onDidChangeMarkdown(callback) {
     return this.emitter.on('did-change-markdown', callback)
   }
 
-  subscribeToFilePath (filePath) {
+  subscribeToFilePath(filePath) {
     this.file = new File(filePath)
     this.emitter.emit('did-change-title')
     this.disposables.add(
@@ -102,7 +102,7 @@ module.exports = class MarkdownPreviewView {
     return this.renderMarkdown()
   }
 
-  resolveEditor (editorId) {
+  resolveEditor(editorId) {
     const resolve = () => {
       this.editor = this.editorForId(editorId)
 
@@ -127,7 +127,7 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  editorForId (editorId) {
+  editorForId(editorId) {
     for (const editor of atom.workspace.getTextEditors()) {
       if (editor.id != null && editor.id.toString() === editorId.toString()) {
         return editor
@@ -136,7 +136,7 @@ module.exports = class MarkdownPreviewView {
     return null
   }
 
-  handleEvents () {
+  handleEvents() {
     const lazyRenderMarkdown = _.debounce(() => this.renderMarkdown(), 250)
     this.disposables.add(
       atom.grammars.onDidAddGrammar(() => lazyRenderMarkdown())
@@ -171,11 +171,11 @@ module.exports = class MarkdownPreviewView {
       'markdown-preview:reset-zoom': () => {
         this.element.style.zoom = 1
       },
-      'markdown-preview:toggle-break-on-single-newline' () {
+      'markdown-preview:toggle-break-on-single-newline'() {
         const keyPath = 'markdown-preview.breakOnSingleNewline'
         atom.config.set(keyPath, !atom.config.get(keyPath))
       },
-      'markdown-preview:toggle-github-style' () {
+      'markdown-preview:toggle-github-style'() {
         const keyPath = 'markdown-preview.useGitHubStyle'
         atom.config.set(keyPath, !atom.config.get(keyPath))
       }
@@ -227,9 +227,19 @@ module.exports = class MarkdownPreviewView {
     )
 
     this.disposables.add(
+      atom.config.observe('markdown-preview.gitHubStyleMode', gitHubStyleMode => {
+        this.gitHubStyleMode = gitHubStyleMode
+        if (this.useGitHubStyle) {
+          this.element.setAttribute('data-use-github-style', gitHubStyleMode)
+        }
+      })
+    )
+
+    this.disposables.add(
       atom.config.observe('markdown-preview.useGitHubStyle', useGitHubStyle => {
+        this.useGitHubStyle = useGitHubStyle
         if (useGitHubStyle) {
-          this.element.setAttribute('data-use-github-style', '')
+          this.element.setAttribute('data-use-github-style', this.gitHubStyleMode)
         } else {
           this.element.removeAttribute('data-use-github-style')
         }
@@ -253,7 +263,7 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  renderMarkdown () {
+  renderMarkdown() {
     if (!this.loaded) {
       this.showLoading()
     }
@@ -266,7 +276,7 @@ module.exports = class MarkdownPreviewView {
       .catch(reason => this.showError({ message: reason }))
   }
 
-  getMarkdownSource () {
+  getMarkdownSource() {
     if (this.file && this.file.getPath()) {
       return this.file
         .read()
@@ -287,7 +297,7 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  async getHTML () {
+  async getHTML() {
     const source = await this.getMarkdownSource()
 
     if (source == null) {
@@ -297,7 +307,7 @@ module.exports = class MarkdownPreviewView {
     return renderer.toHTML(source, this.getPath(), this.getGrammar())
   }
 
-  async renderMarkdownText (text) {
+  async renderMarkdownText(text) {
     const { scrollTop } = this.element
 
     try {
@@ -318,7 +328,7 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  getTitle () {
+  getTitle() {
     if (this.file != null && this.getPath() != null) {
       return `${path.basename(this.getPath())} Preview`
     } else if (this.editor != null) {
@@ -328,11 +338,11 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  getIconName () {
+  getIconName() {
     return 'markdown'
   }
 
-  getURI () {
+  getURI() {
     if (this.file != null) {
       return `markdown-preview://${this.getPath()}`
     } else {
@@ -340,7 +350,7 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  getPath () {
+  getPath() {
     if (this.file != null) {
       return this.file.getPath()
     } else if (this.editor != null) {
@@ -348,16 +358,16 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  getGrammar () {
+  getGrammar() {
     return this.editor != null ? this.editor.getGrammar() : undefined
   }
 
-  getDocumentStyleSheets () {
+  getDocumentStyleSheets() {
     // This function exists so we can stub it
     return document.styleSheets
   }
 
-  getTextEditorStyles () {
+  getTextEditorStyles() {
     const textEditorStyles = document.createElement('atom-styles')
     textEditorStyles.initialize(atom.styles)
     textEditorStyles.setAttribute('context', 'atom-text-editor')
@@ -369,7 +379,7 @@ module.exports = class MarkdownPreviewView {
       .map(styleElement => styleElement.innerText)
   }
 
-  getMarkdownPreviewCSS () {
+  getMarkdownPreviewCSS() {
     const markdownPreviewRules = []
     const ruleRegExp = /\.markdown-preview/
     const cssUrlRegExp = /url\(atom:\/\/markdown-preview\/assets\/(.*)\)/
@@ -401,7 +411,7 @@ module.exports = class MarkdownPreviewView {
       })
   }
 
-  showError (result) {
+  showError(result) {
     this.element.textContent = ''
     const h2 = document.createElement('h2')
     h2.textContent = 'Previewing Markdown Failed'
@@ -413,7 +423,7 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  showLoading () {
+  showLoading() {
     this.loading = true
     this.element.textContent = ''
     const div = document.createElement('div')
@@ -422,7 +432,7 @@ module.exports = class MarkdownPreviewView {
     this.element.appendChild(div)
   }
 
-  selectAll () {
+  selectAll() {
     if (this.loading) {
       return
     }
@@ -434,7 +444,7 @@ module.exports = class MarkdownPreviewView {
     selection.addRange(range)
   }
 
-  async copyToClipboard () {
+  async copyToClipboard() {
     if (this.loading) {
       return
     }
@@ -464,7 +474,7 @@ module.exports = class MarkdownPreviewView {
     }
   }
 
-  getSaveDialogOptions () {
+  getSaveDialogOptions() {
     let defaultPath = this.getPath()
     if (defaultPath) {
       defaultPath += '.html'
@@ -479,7 +489,7 @@ module.exports = class MarkdownPreviewView {
     return { defaultPath }
   }
 
-  async saveAs (htmlFilePath) {
+  async saveAs(htmlFilePath) {
     if (this.loading) {
       atom.notifications.addWarning(
         'Please wait until the Markdown Preview has finished loading before saving'
@@ -504,7 +514,7 @@ module.exports = class MarkdownPreviewView {
       <title>${title}</title>
       <style>${this.getMarkdownPreviewCSS()}</style>
   </head>
-  <body class='markdown-preview' data-use-github-style>${htmlBody}</body>
+  <body class='markdown-preview' data-use-github-style="${this.gitHubStyleMode}">${htmlBody}</body>
 </html>` + '\n' // Ensure trailing newline
 
     fs.writeFileSync(htmlFilePath, html)
