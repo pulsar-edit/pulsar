@@ -38,6 +38,15 @@
 ;  ^ keyword.control
 ;       ^ entity.global
 
+(defprotocol FooBar
+  ;  ^ keyword.control
+  ;          ^ entity.global
+  (-eq [this other]))
+
+(defrecord Lol [a b])
+  ;  ^ keyword.control
+  ;        ^ entity.global
+
 (def a "A STRING")
   ; <- keyword.control
   ;  ^ entity.global
