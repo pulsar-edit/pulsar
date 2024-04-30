@@ -48,3 +48,4 @@ treeSitter:
     'ts/edn-highlights.scm'
   ]
   foldsQuery: 'ts/folds.scm'
+  tagsQuery: 'ts/tags.scm'

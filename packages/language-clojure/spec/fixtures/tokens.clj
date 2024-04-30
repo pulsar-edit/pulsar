@@ -26,6 +26,10 @@
 ;  ^ keyword.control
 ;         ^ entity.global
 
+(defonce a "A STRING")
+  ; <- keyword.control
+  ;      ^ entity.global
+
 (defaults a)
 ;  ^ !keyword.control
 ;         ^ !entity.global
