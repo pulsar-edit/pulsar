@@ -19,6 +19,7 @@ parser: 'tree-sitter-clojure'
   'bb'
   'joke'
   'joker'
+  'jank'
 ]
 'firstLineMatch': '''(?x)
   # Hashbang
