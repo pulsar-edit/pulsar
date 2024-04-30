@@ -50,13 +50,4 @@ exports.activate = function() {
     languageScope: 'source.js',
     coverShallowerScopes: true
   });
-
-  atom.grammars.addInjectionPoint('source.clojure', {
-    type: 'str_content',
-    language: (node) => checkFormCall('native/raw', node) && 'cpp',
-    content: notDisChild,
-    includeChildren: true,
-    languageScope: 'source.cpp',
-    coverShallowerScopes: true
-  });
 }
