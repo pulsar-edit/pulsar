@@ -95,19 +95,21 @@ function rangeFromDescriptor(rawRange) {
 describe('ScopeResolver', () => {
   let editor, buffer, grammar;
 
-  beforeEach(async () => {
+  beforeEach(async (done) => {
     grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
     editor = await atom.workspace.open('');
     buffer = editor.getBuffer();
     atom.grammars.addGrammar(grammar);
     atom.config.set('core.useTreeSitterParsers', true);
+
+    done();
   });
 
   afterEach(() => {
     ScopeResolver.clearConfigCache();
   });
 
-  it('resolves all scopes in absence of any tests or adjustments', async () => {
+  it('resolves all scopes in absence of any tests or adjustments', async (done) => {
     await grammar.setQueryForTest('highlightsQuery', `
       (comment) @comment
       (string) @string
@@ -130,9 +132,11 @@ describe('ScopeResolver', () => {
       expect(stringForNodeRange(range))
         .toBe(stringForNodeRange(node));
     }
+
+    done();
   });
 
-  it('provides the grammar with the text of leaf nodes only', async () => {
+  it('provides the grammar with the text of leaf nodes only', async (done) => {
     await grammar.setQueryForTest('highlightsQuery', `
       (expression_statement) @not_leaf_node
       (call_expression) @also_not_leaf_node
@@ -162,9 +166,11 @@ describe('ScopeResolver', () => {
         'cc',
         'dd',
     ]);
+
+    done();
   });
 
-  it('interpolates magic tokens in scope names', async () => {
+  it('interpolates magic tokens in scope names', async (done) => {
     await grammar.setQueryForTest('highlightsQuery', `
       (lexical_declaration kind: _ @declaration._TYPE_)
     `);
@@ -189,9 +195,11 @@ describe('ScopeResolver', () => {
       'declaration.const',
       'declaration.let'
     ]);
+
+    done();
   });
 
-  it('does not apply any scopes when @_IGNORE_ is used', async () => {
+  it('does not apply any scopes when @_IGNORE_ is used', async (done) => {
     await grammar.setQueryForTest('highlightsQuery', `
       (lexical_declaration kind: _ @_IGNORE_
         (#match? @_IGNORE_ "const"))
@@ -219,9 +227,11 @@ describe('ScopeResolver', () => {
         expect(!!result).toBe(true);
       }
     }
+
+    done();
   });
 
-  it('does not apply any scopes when multiple @_IGNORE_s are used', async () => {
+  it('does not apply any scopes when multiple @_IGNORE_s are used', async (done) => {
     await grammar.setQueryForTest('highlightsQuery', `
       (variable_declarator
         (identifier) @_IGNORE_.identifier
@@ -249,11 +259,13 @@ describe('ScopeResolver', () => {
         expect(!!result).toBe(true);
       }
     }
+
+    done();
   });
 
 
   describe('adjustments', () => {
-    it('adjusts ranges with (#set! adjust.startAt)', async () => {
+    it('adjusts ranges with (#set! adjust.startAt)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
       ((try_statement) @try.plus.brace
         (#set! adjust.endAt
@@ -274,9 +286,11 @@ describe('ScopeResolver', () => {
 
       expect(buffer.getTextInRange(rangeFromDescriptor(range)))
         .toBe('try {');
+
+      done();
     });
 
-    it('adjusts ranges with (#set! adjust.endAt)', async () => {
+    it('adjusts ranges with (#set! adjust.endAt)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((object) @object.interior
           (#set! adjust.startAt firstChild.endPosition)
@@ -299,9 +313,11 @@ describe('ScopeResolver', () => {
       expect(
         buffer.getTextInRange(rangeFromDescriptor(range))
       ).toBe(`from: 'x', to: 'y'`);
+
+      done();
     });
 
-    it('adjusts ranges with (#set! adjust.offset(Start|End))', async () => {
+    it('adjusts ranges with (#set! adjust.offset(Start|End))', async (done) => {
       // Same result as the previous test, but with a different technique.
       await grammar.setQueryForTest('highlightsQuery', `
         ((object) @object.interior
@@ -324,9 +340,11 @@ describe('ScopeResolver', () => {
       expect(
         buffer.getTextInRange(rangeFromDescriptor(range))
       ).toBe(`from: 'x', to: 'y'`);
+
+      done();
     });
 
-    it('prevents adjustments outside the original capture', async () => {
+    it('prevents adjustments outside the original capture', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((comment) @too-early
           (#set! adjust.startAt previousSibling.startPosition))
@@ -347,7 +365,7 @@ describe('ScopeResolver', () => {
       `);
       // Prevent an exception from being thrown before we can even check the
       // scopeResolver.
-      spyOn(languageMode, 'isRowCommented').andReturn(false);
+      spyOn(languageMode, 'isRowCommented').and.returnValue(false);
       await languageMode.ready;
 
       let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
@@ -357,9 +375,11 @@ describe('ScopeResolver', () => {
           scopeResolver.store(capture);
         }).toThrow();
       }
+
+      done();
     });
 
-    it("adjusts a range around a regex match with `adjust.startAndEndAroundFirstMatchOf`", async () => {
+    it("adjusts a range around a regex match with `adjust.startAndEndAroundFirstMatchOf`", async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
       ((comment) @todo
         (#set! adjust.startAndEndAroundFirstMatchOf "\\\\sTODO(?=:)"))
@@ -389,12 +409,14 @@ describe('ScopeResolver', () => {
       expect(
         buffer.getTextInRange(rangeFromDescriptor(matched[0]))
       ).toBe(` TODO`);
+
+      done();
     });
   });
 
   describe('tests', () => {
 
-    it('rejects scopes for ranges that have already been claimed by another capture with (#set! capture.final)', async () => {
+    it('rejects scopes for ranges that have already been claimed by another capture with (#set! capture.final)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string) @string0
@@ -428,9 +450,11 @@ describe('ScopeResolver', () => {
           expect(!!result).toBe(false);
         }
       }
+
+      done();
     });
 
-    it('temporarily supports the deprecated (#set! test.final true)', async () => {
+    it('temporarily supports the deprecated (#set! test.final true)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string) @string0
@@ -464,9 +488,11 @@ describe('ScopeResolver', () => {
           expect(!!result).toBe(false);
         }
       }
+
+      done();
     });
 
-    it('rejects scopes for ranges that have already been claimed by another capture with (#set! capture.final)', async () => {
+    it('rejects scopes for ranges that have already been claimed by another capture with (#set! capture.final)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string) @string0
@@ -500,9 +526,11 @@ describe('ScopeResolver', () => {
           expect(!!result).toBe(false);
         }
       }
+
+      done();
     });
 
-    it('rejects scopes for ranges that have already been claimed if set with (#set! capture.shy true)', async () => {
+    it('rejects scopes for ranges that have already been claimed if set with (#set! capture.shy true)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string "\\"") @string.double
@@ -532,9 +560,11 @@ describe('ScopeResolver', () => {
           expect(!!result).toBe(expected);
         }
       }
+
+      done();
     });
 
-    it('temporarily supports the deprecated (#set! test.shy true)', async () => {
+    it('temporarily supports the deprecated (#set! test.shy true)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         (comment) @comment
         (string "\\"") @string.double
@@ -564,9 +594,11 @@ describe('ScopeResolver', () => {
           expect(!!result).toBe(expected);
         }
       }
+
+      done();
     });
 
-    it('rejects scopes for ranges that fail test.first or test.last', async () => {
+    it('rejects scopes for ranges that fail test.first or test.last', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((string_fragment) @impossible.first
           (#is? test.first true))
@@ -603,9 +635,11 @@ describe('ScopeResolver', () => {
           expect(node.id).toBe(node.parent.firstChild.id);
         }
       }
+
+      done();
     });
 
-    it('temporarily supports the deprecated (#set! test.onlyIfFirst) and (#set! test.onlyIfLast)', async () => {
+    it('temporarily supports the deprecated (#set! test.onlyIfFirst) and (#set! test.onlyIfLast)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((string_fragment) @impossible.first
           (#is? test.onlyIfFirst true))
@@ -642,9 +676,11 @@ describe('ScopeResolver', () => {
           expect(node.id).toBe(node.parent.firstChild.id);
         }
       }
+
+      done();
     });
 
-    it('supports test.firstOfType and test.lastOfType', async () => {
+    it('supports test.firstOfType and test.lastOfType', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         (formal_parameters (identifier) @first-param
           (#is? test.firstOfType identifier))
@@ -677,9 +713,11 @@ describe('ScopeResolver', () => {
       expect(matched.map(pair => {
         return pair[0].name;
       })).toEqual(["first-param", "first-comma", "last-comma", "last-param"]);
+
+      done();
     });
 
-    it('supports test.lastTextOnRow', async () => {
+    it('supports test.lastTextOnRow', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ("||" @hanging-logical-operator
           (#is? test.lastTextOnRow true))
@@ -708,9 +746,11 @@ describe('ScopeResolver', () => {
 
       expect(matched.map(capture => capture.name)).toEqual(
         ["hanging-logical-operator"]);
+
+      done();
     });
 
-    it('supports test.firstTextOnRow', async () => {
+    it('supports test.firstTextOnRow', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ("||" @hanging-logical-operator
           (#is? test.firstTextOnRow true))
@@ -739,9 +779,11 @@ describe('ScopeResolver', () => {
 
       expect(matched.map(capture => capture.name)).toEqual(
         ["hanging-logical-operator"]);
+
+      done();
     });
 
-    it('supports test.descendantOfType', async () => {
+    it('supports test.descendantOfType', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ("," @comma-inside-function
           (#is? test.descendantOfType function_declaration))
@@ -761,9 +803,11 @@ describe('ScopeResolver', () => {
       expect(matched.every(cap => {
         return cap.node.startPosition.row === 1;
       })).toBe(true);
+
+      done();
     });
 
-    it('supports test.descendantOfType (multiple values)', async () => {
+    it('supports test.descendantOfType (multiple values)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ("," @comma-inside-function
           (#is? test.descendantOfType "function_declaration generator_function_declaration"))
@@ -785,10 +829,12 @@ describe('ScopeResolver', () => {
         let expectedRow = index >= 2 ? 2 : 1;
         return cap.node.startPosition.row === expectedRow;
       })).toBe(true);
+
+      done();
     });
 
 
-    it('supports test.ancestorOfType', async () => {
+    it('supports test.ancestorOfType', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @function-with-semicolons
           (#is? test.ancestorOfType ";"))
@@ -808,9 +854,11 @@ describe('ScopeResolver', () => {
 
       expect(matched.length).toBe(1);
       expect(matched[0].node.text.includes("function bar")).toBe(true);
+
+      done();
     });
 
-    it('supports test.ancestorOfType (multiple values)', async () => {
+    it('supports test.ancestorOfType (multiple values)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @function-with-semicolons-or-booleans
           (#is? test.ancestorOfType "; false"))
@@ -834,9 +882,11 @@ describe('ScopeResolver', () => {
       expect(matched.length).toBe(2);
       expect(matched[0].node.text.includes("function ba")).toBe(true);
       expect(matched[1].node.text.includes("function ba")).toBe(true);
+
+      done();
     });
 
-    it('supports test.descendantOfNodeWithData (without value)', async () => {
+    it('supports test.descendantOfNodeWithData (without value)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @_IGNORE_
           (#match? @_IGNORE_ "foo")
@@ -861,9 +911,11 @@ describe('ScopeResolver', () => {
         return cap.node.startPosition.row === 0 &&
           cap.node.text === ",";
       })).toBe(true);
+
+      done();
     });
 
-    it('supports test.descendantOfNodeWithData (with right value)', async () => {
+    it('supports test.descendantOfNodeWithData (with right value)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @_IGNORE_
           (#match? @_IGNORE_ "foo" )
@@ -888,9 +940,11 @@ describe('ScopeResolver', () => {
         return cap.node.startPosition.row === 0 &&
           cap.node.text === ",";
       })).toBe(true);
+
+      done();
     });
 
-    it('supports test.descendantOfNodeWithData (with wrong value)', async () => {
+    it('supports test.descendantOfNodeWithData (with wrong value)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((function_declaration) @_IGNORE_
           (#match? @_IGNORE_ "foo")
@@ -912,9 +966,11 @@ describe('ScopeResolver', () => {
 
       // Wrong value, so test shouldn't pass.
       expect(matched.length).toBe(0);
+
+      done();
     });
 
-    it('supports test.type', async () => {
+    it('supports test.type', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         (formal_parameters _ @function-comma
           (#is? test.type ","))
@@ -933,9 +989,11 @@ describe('ScopeResolver', () => {
       expect(matched.every(cap => {
         return cap.node.text === ",";
       })).toBe(true);
+
+      done();
     });
 
-    it('supports test.type with multiple types', async () => {
+    it('supports test.type with multiple types', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         (formal_parameters _ @thing
           (#is? test.type ", identifier"))
@@ -951,9 +1009,11 @@ describe('ScopeResolver', () => {
       let matched = await getAllMatches(grammar, languageMode);
 
       expect(matched.length).toBe(5);
+
+      done();
     });
 
-    it('supports test.hasError', async () => {
+    it('supports test.hasError', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((statement_block) @messed-up-statement-block
           (#is? test.hasError true))
@@ -974,9 +1034,11 @@ describe('ScopeResolver', () => {
       expect(matched.every(cap => {
         return cap.name === 'messed-up-statement-block' && cap.node.hasError();
       })).toBe(true);
+
+      done();
     });
 
-    it('supports test.root', async () => {
+    it('supports test.root', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((_) @is-root
           (#is? test.root true))
@@ -998,9 +1060,11 @@ describe('ScopeResolver', () => {
         return cap.name === 'is-root' && cap.node.type === 'program' &&
           !cap.node.parent;
       })).toBe(true);
+
+      done();
     });
 
-    it('supports test.lastTextOnRow', async () => {
+    it('supports test.lastTextOnRow', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ("||" @orphaned-operator
           (#is? test.lastTextOnRow true))
@@ -1024,9 +1088,11 @@ describe('ScopeResolver', () => {
         expect(cap.node.type).toBe('||');
         expect(cap.node.startPosition.row).toBe(2);
       }
+
+      done();
     });
 
-    it('supports test.rangeWithData (without value)', async () => {
+    it('supports test.rangeWithData (without value)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((true) @_IGNORE_ (#set! isTrue true))
         ([ (true) (false) ] @optimistic-boolean
@@ -1050,9 +1116,11 @@ describe('ScopeResolver', () => {
         expect(cap.name).toBe('optimistic-boolean');
         expect(cap.node.text).toBe('true');
       }
+
+      done();
     });
 
-    it('supports test.rangeWithData (with right value)', async () => {
+    it('supports test.rangeWithData (with right value)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((true) @_IGNORE_ (#set! isTrue "exactly"))
         ([ (true) (false) ] @optimistic-boolean
@@ -1076,9 +1144,11 @@ describe('ScopeResolver', () => {
         expect(cap.name).toBe('optimistic-boolean');
         expect(cap.node.text).toBe('true');
       }
+
+      done();
     });
 
-    it('supports test.rangeWithData (with wrong value)', async () => {
+    it('supports test.rangeWithData (with wrong value)', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((true) @_IGNORE_ (#set! isTrue "perhaps"))
         ([ (true) (false) ] @optimistic-boolean
@@ -1099,9 +1169,11 @@ describe('ScopeResolver', () => {
 
       // Values don't match, so the test shouldn't pass.
       expect(matched.length).toBe(0);
+
+      done();
     });
 
-    it('supports test.startsOnSameRowAs', async () => {
+    it('supports test.startsOnSameRowAs', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((false) @non-hanging-false
           (#is? test.startsOnSameRowAs parent.startPosition))
@@ -1126,9 +1198,11 @@ describe('ScopeResolver', () => {
         expect(cap.node.text).toBe('false');
         expect(cap.node.startPosition.row).toBe(1);
       }
+
+      done();
     });
 
-    it('supports test.endsOnSameRowAs', async () => {
+    it('supports test.endsOnSameRowAs', async (done) => {
       await grammar.setQueryForTest('highlightsQuery', `
         ((true) @non-hanging-true
           (#is? test.endsOnSameRowAs parent.endPosition))
@@ -1153,9 +1227,11 @@ describe('ScopeResolver', () => {
         expect(cap.node.text).toBe('true');
         expect(cap.node.startPosition.row).toBe(1);
       }
+
+      done();
     });
 
-    it('supports test.config (with no arguments)', async () => {
+    it('supports test.config (with no arguments)', async (done) => {
       atom.config.set('core.careAboutBooleans', true);
 
       await grammar.setQueryForTest('highlightsQuery', `
@@ -1180,9 +1256,11 @@ describe('ScopeResolver', () => {
 
       matched = await getAllMatches(grammar, languageMode);
       expect(matched.length).toBe(0);
+
+      done();
     });
 
-    it('supports test.config (with boolean arguments)', async () => {
+    it('supports test.config (with boolean arguments)', async (done) => {
       atom.config.set('core.careAboutBooleans', true);
 
       await grammar.setQueryForTest('highlightsQuery', `
@@ -1207,9 +1285,11 @@ describe('ScopeResolver', () => {
 
       matched = await getAllMatches(grammar, languageMode);
       expect(matched.length).toBe(0);
+
+      done();
     });
 
-    it('supports test.config (with number arguments)', async () => {
+    it('supports test.config (with number arguments)', async (done) => {
       atom.config.set('core.careAboutBooleans', 0);
 
       await grammar.setQueryForTest('highlightsQuery', `
@@ -1234,9 +1314,11 @@ describe('ScopeResolver', () => {
 
       matched = await getAllMatches(grammar, languageMode);
       expect(matched.length).toBe(0);
+
+      done();
     });
 
-    it('supports test.config (with string arguments)', async () => {
+    it('supports test.config (with string arguments)', async (done) => {
       atom.config.set('core.careAboutBooleans', "something");
 
       await grammar.setQueryForTest('highlightsQuery', `
@@ -1282,9 +1364,11 @@ describe('ScopeResolver', () => {
       );
       matched = await getAllMatchesWithScopeResolver(grammar, languageMode, scopeResolver);
       expect(matched.length).toBe(0);
+
+      done();
     });
 
-    it('supports test.injection', async () => {
+    it('supports test.injection', async (done) => {
       jasmine.useRealClock();
       await grammar.setQueryForTest('highlightsQuery', `
         ((escape_sequence) @regex-escape
@@ -1333,6 +1417,8 @@ describe('ScopeResolver', () => {
       for (let cap of matched) {
         expect(cap.node.startPosition.row).toBe(3);
       }
+
+      done();
     });
 
   });

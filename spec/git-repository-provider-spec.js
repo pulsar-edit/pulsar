@@ -26,20 +26,22 @@ describe('GitRepositoryProvider', () => {
 
   describe('.repositoryForDirectory(directory)', () => {
     describe('when specified a Directory with a Git repository', () => {
-      it('resolves with a GitRepository', async () => {
+      it('resolves with a GitRepository', async (done) => {
         const directory = new Directory(
           path.join(__dirname, 'fixtures', 'git', 'master.git')
         );
         const result = await provider.repositoryForDirectory(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
 
         // Refresh should be started
         await new Promise(resolve => result.onDidChangeStatuses(resolve));
+
+        done();
       });
 
-      it('resolves with the same GitRepository for different Directory objects in the same repo', async () => {
+      it('resolves with the same GitRepository for different Directory objects in the same repo', async (done) => {
         const firstRepo = await provider.repositoryForDirectory(
           new Directory(path.join(__dirname, 'fixtures', 'git', 'master.git'))
         );
@@ -49,21 +51,25 @@ describe('GitRepositoryProvider', () => {
           )
         );
 
-        expect(firstRepo).toBeInstanceOf(GitRepository);
+        expect(firstRepo).toEqual(jasmine.any(GitRepository));
         expect(firstRepo).toBe(secondRepo);
+
+        done();
       });
     });
 
     describe('when specified a Directory without a Git repository', () => {
-      it('resolves with null', async () => {
+      it('resolves with null', async (done) => {
         const directory = new Directory(temp.mkdirSync('dir'));
         const repo = await provider.repositoryForDirectory(directory);
         expect(repo).toBe(null);
+
+        done();
       });
     });
 
     describe('when specified a Directory with an invalid Git repository', () => {
-      it('resolves with null', async () => {
+      it('resolves with null', async (done) => {
         const dirPath = temp.mkdirSync('dir');
         fs.writeFileSync(path.join(dirPath, '.git', 'objects'), '');
         fs.writeFileSync(path.join(dirPath, '.git', 'HEAD'), '');
@@ -72,11 +78,13 @@ describe('GitRepositoryProvider', () => {
         const directory = new Directory(dirPath);
         const repo = await provider.repositoryForDirectory(directory);
         expect(repo).toBe(null);
+
+        done();
       });
     });
 
     describe('when specified a Directory with a valid gitfile-linked repository', () => {
-      it('returns a Promise that resolves to a GitRepository', async () => {
+      it('returns a Promise that resolves to a GitRepository', async (done) => {
         const gitDirPath = path.join(
           __dirname,
           'fixtures',
@@ -91,14 +99,16 @@ describe('GitRepositoryProvider', () => {
 
         const directory = new Directory(workDirPath);
         const result = await provider.repositoryForDirectory(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
+
+        done();
       });
     });
 
     describe('when specified a Directory with a commondir file for a worktree', () => {
-      it('returns a Promise that resolves to a GitRepository', async () => {
+      it('returns a Promise that resolves to a GitRepository', async (done) => {
         const directory = new Directory(
           path.join(
             __dirname,
@@ -110,9 +120,11 @@ describe('GitRepositoryProvider', () => {
           )
         );
         const result = await provider.repositoryForDirectory(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
+
+        done();
       });
     });
 
@@ -128,30 +140,34 @@ describe('GitRepositoryProvider', () => {
             return true;
           }
         };
-        spyOn(directory, 'getSubdirectory').andReturn(subdirectory);
+        spyOn(directory, 'getSubdirectory').and.returnValue(subdirectory);
       });
 
-      it('returns a Promise that resolves to null', async () => {
+      it('returns a Promise that resolves to null', async (done) => {
         const repo = await provider.repositoryForDirectory(directory);
         expect(repo).toBe(null);
         expect(directory.getSubdirectory).toHaveBeenCalledWith('.git');
+
+        done();
       });
     });
   });
 
   describe('.repositoryForDirectorySync(directory)', () => {
     describe('when specified a Directory with a Git repository', () => {
-      it('resolves with a GitRepository', async () => {
+      it('resolves with a GitRepository', async (done) => {
         const directory = new Directory(
           path.join(__dirname, 'fixtures', 'git', 'master.git')
         );
         const result = provider.repositoryForDirectorySync(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
 
         // Refresh should be started
         await new Promise(resolve => result.onDidChangeStatuses(resolve));
+
+        done();
       });
 
       it('resolves with the same GitRepository for different Directory objects in the same repo', () => {
@@ -164,7 +180,7 @@ describe('GitRepositoryProvider', () => {
           )
         );
 
-        expect(firstRepo).toBeInstanceOf(GitRepository);
+        expect(firstRepo).toEqual(jasmine.any(GitRepository));
         expect(firstRepo).toBe(secondRepo);
       });
     });
@@ -206,7 +222,7 @@ describe('GitRepositoryProvider', () => {
 
         const directory = new Directory(workDirPath);
         const result = provider.repositoryForDirectorySync(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
       });
@@ -225,7 +241,7 @@ describe('GitRepositoryProvider', () => {
           )
         );
         const result = provider.repositoryForDirectorySync(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
       });
@@ -243,7 +259,7 @@ describe('GitRepositoryProvider', () => {
             return true;
           }
         };
-        spyOn(directory, 'getSubdirectory').andReturn(subdirectory);
+        spyOn(directory, 'getSubdirectory').and.returnValue(subdirectory);
       });
 
       it('returns null', () => {

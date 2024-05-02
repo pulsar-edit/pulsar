@@ -11,7 +11,7 @@ describe('DefaultDirectorySearcher', function() {
     searcher = new DefaultDirectorySearcher();
   });
 
-  it('terminates the task after running a search', async function() {
+  it('terminates the task after running a search', async function(done) {
     const options = {
       ignoreCase: false,
       includeHidden: false,
@@ -23,7 +23,7 @@ describe('DefaultDirectorySearcher', function() {
       didSearchPaths() {}
     };
 
-    spyOn(Task.prototype, 'terminate').andCallThrough();
+    spyOn(Task.prototype, 'terminate').and.callThrough();
 
     await searcher.search(
       [
@@ -38,5 +38,7 @@ describe('DefaultDirectorySearcher', function() {
     );
 
     expect(Task.prototype.terminate).toHaveBeenCalled();
+
+    done();
   });
 });

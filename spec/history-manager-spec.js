@@ -5,10 +5,10 @@ describe('HistoryManager', () => {
   let historyManager, commandRegistry, project, stateStore;
   let commandDisposable, projectDisposable;
 
-  beforeEach(async () => {
+  beforeEach(async (done) => {
     commandDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
     commandRegistry = jasmine.createSpyObj('CommandRegistry', ['add']);
-    commandRegistry.add.andReturn(commandDisposable);
+    commandRegistry.add.and.returnValue(commandDisposable);
 
     stateStore = new StateStore('history-manager-test', 1);
     await stateStore.save('history-manager', {
@@ -23,7 +23,7 @@ describe('HistoryManager', () => {
 
     projectDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
     project = jasmine.createSpyObj('Project', ['onDidChangePaths']);
-    project.onDidChangePaths.andCallFake(f => {
+    project.onDidChangePaths.and.callFake(f => {
       project.didChangePathsListener = f;
       return projectDisposable;
     });
@@ -34,16 +34,18 @@ describe('HistoryManager', () => {
       commands: commandRegistry
     });
     await historyManager.loadState();
+    done();
   });
 
-  afterEach(async () => {
+  afterEach(async (done) => {
     await stateStore.clear();
+    done();
   });
 
   describe('constructor', () => {
     it("registers the 'clear-project-history' command function", () => {
       expect(commandRegistry.add).toHaveBeenCalled();
-      const cmdCall = commandRegistry.add.calls[0];
+      const cmdCall = commandRegistry.add.calls.first();
       expect(cmdCall.args.length).toBe(3);
       expect(cmdCall.args[0]).toBe('atom-workspace');
       expect(typeof cmdCall.args[1]['application:clear-project-history']).toBe(
@@ -74,13 +76,14 @@ describe('HistoryManager', () => {
     });
 
     describe('clearProjects', () => {
-      it('clears the list of projects', async () => {
+      it('clears the list of projects', async (done) => {
         expect(historyManager.getProjects().length).not.toBe(0);
         await historyManager.clearProjects();
         expect(historyManager.getProjects().length).toBe(0);
+        done();
       });
 
-      it('saves the state', async () => {
+      it('saves the state', async (done) => {
         await historyManager.clearProjects();
         const historyManager2 = new HistoryManager({
           stateStore,
@@ -89,14 +92,16 @@ describe('HistoryManager', () => {
         });
         await historyManager2.loadState();
         expect(historyManager.getProjects().length).toBe(0);
+        done();
       });
 
-      it('fires the onDidChangeProjects event', async () => {
+      it('fires the onDidChangeProjects event', async (done) => {
         const didChangeSpy = jasmine.createSpy();
         historyManager.onDidChangeProjects(didChangeSpy);
         await historyManager.clearProjects();
         expect(historyManager.getProjects().length).toBe(0);
         expect(didChangeSpy).toHaveBeenCalled();
+        done();
       });
     });
 
@@ -120,63 +125,70 @@ describe('HistoryManager', () => {
   });
 
   describe('loadState', () => {
-    it('defaults to an empty array if no state', async () => {
+    it('defaults to an empty array if no state', async (done) => {
       await stateStore.clear();
       await historyManager.loadState();
       expect(historyManager.getProjects()).toEqual([]);
+      done();
     });
 
-    it('defaults to an empty array if no projects', async () => {
+    it('defaults to an empty array if no projects', async (done) => {
       await stateStore.save('history-manager', {});
       await historyManager.loadState();
       expect(historyManager.getProjects()).toEqual([]);
+      done();
     });
   });
 
   describe('addProject', () => {
-    it('adds a new project to the end', async () => {
+    it('adds a new project to the end', async (done) => {
       const date = new Date(2010, 10, 9, 8, 7, 6);
       await historyManager.addProject(['/a/b'], date);
       const projects = historyManager.getProjects();
       expect(projects.length).toBe(3);
       expect(projects[2].paths).toEqual(['/a/b']);
       expect(projects[2].lastOpened).toBe(date);
+      done();
     });
 
-    it('adds a new project to the start', async () => {
+    it('adds a new project to the start', async (done) => {
       const date = new Date();
       await historyManager.addProject(['/so/new'], date);
       const projects = historyManager.getProjects();
       expect(projects.length).toBe(3);
       expect(projects[0].paths).toEqual(['/so/new']);
       expect(projects[0].lastOpened).toBe(date);
+      done();
     });
 
-    it('updates an existing project and moves it to the start', async () => {
+    it('updates an existing project and moves it to the start', async (done) => {
       const date = new Date();
       await historyManager.addProject(['/test'], date);
       const projects = historyManager.getProjects();
       expect(projects.length).toBe(2);
       expect(projects[0].paths).toEqual(['/test']);
       expect(projects[0].lastOpened).toBe(date);
+      done();
     });
 
-    it('fires the onDidChangeProjects event when adding a project', async () => {
+    it('fires the onDidChangeProjects event when adding a project', async (done) => {
       const didChangeSpy = jasmine.createSpy();
       const beforeCount = historyManager.getProjects().length;
       historyManager.onDidChangeProjects(didChangeSpy);
       await historyManager.addProject(['/test-new'], new Date());
       expect(didChangeSpy).toHaveBeenCalled();
       expect(historyManager.getProjects().length).toBe(beforeCount + 1);
+      done();
     });
 
-    it('fires the onDidChangeProjects event when updating a project', async () => {
+    it('fires the onDidChangeProjects event when updating a project', async (done) => {
       const didChangeSpy = jasmine.createSpy();
       const beforeCount = historyManager.getProjects().length;
       historyManager.onDidChangeProjects(didChangeSpy);
       await historyManager.addProject(['/test'], new Date());
       expect(didChangeSpy).toHaveBeenCalled();
       expect(historyManager.getProjects().length).toBe(beforeCount);
+      done();
     });
   });
 
@@ -202,13 +214,13 @@ describe('HistoryManager', () => {
       // so that no data is actually stored to it.
       jasmine.unspy(historyManager, 'saveState');
 
-      spyOn(historyManager.stateStore, 'save').andCallFake((name, history) => {
+      spyOn(historyManager.stateStore, 'save').and.callFake((name, history) => {
         savedHistory = history;
         return Promise.resolve();
       });
     });
 
-    it('saves the state', async () => {
+    it('saves the state', async (done) => {
       await historyManager.addProject(['/save/state']);
       await historyManager.saveState();
       const historyManager2 = new HistoryManager({
@@ -216,11 +228,12 @@ describe('HistoryManager', () => {
         project,
         commands: commandRegistry
       });
-      spyOn(historyManager2.stateStore, 'load').andCallFake(name =>
+      spyOn(historyManager2.stateStore, 'load').and.callFake(name =>
         Promise.resolve(savedHistory)
       );
       await historyManager2.loadState();
       expect(historyManager2.getProjects()[0].paths).toEqual(['/save/state']);
+      done();
     });
   });
 });

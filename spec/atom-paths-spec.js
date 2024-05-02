@@ -42,7 +42,7 @@ describe('AtomPaths', () => {
       });
 
       it('uses ATOM_HOME if no write access to portable .atom folder', () => {
-        if (process.platform === 'win32') return;
+        jasmine.filterByPlatform({except: ['win32']});
 
         const readOnlyPath = temp.mkdirSync('atom-path-spec-no-write-access');
         process.env.ATOM_HOME = readOnlyPath;
@@ -120,7 +120,7 @@ describe('AtomPaths', () => {
       });
 
       it('leaves userData unchanged if no write access to electronUserData folder', () => {
-        if (process.platform === 'win32') return;
+        jasmine.filterByPlatform({except: ['win32']});
 
         fs.mkdirSync(electronUserDataPath);
         fs.chmodSync(electronUserDataPath, 444);

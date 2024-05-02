@@ -2,16 +2,18 @@ const DecorationManager = require('../src/decoration-manager');
 const TextEditor = require('../src/text-editor');
 
 describe('DecorationManager', function() {
-  let [decorationManager, buffer, editor, markerLayer1, markerLayer2] = [];
+  let decorationManager, buffer, editor, markerLayer1, markerLayer2;
 
-  beforeEach(function() {
+  beforeEach(async function(done) {
     buffer = atom.project.bufferForPathSync('sample.js');
     editor = new TextEditor({ buffer });
     markerLayer1 = editor.addMarkerLayer();
     markerLayer2 = editor.addMarkerLayer();
     decorationManager = new DecorationManager(editor);
 
-    waitsForPromise(() => atom.packages.activatePackage('language-javascript'));
+    await atom.packages.activatePackage('language-javascript');
+
+    done();
   });
 
   afterEach(() => buffer.destroy());
@@ -68,7 +70,7 @@ describe('DecorationManager', function() {
           type: 'overlay',
           item: document.createElement('div')
         })
-      ).toThrow('Cannot decorate a destroyed marker');
+      ).toThrowError('Cannot decorate a destroyed marker');
       expect(decorationManager.getOverlayDecorations()).toEqual([]);
     });
 
@@ -77,7 +79,7 @@ describe('DecorationManager', function() {
       layer.destroy();
       expect(() =>
         decorationManager.decorateMarkerLayer(layer, { type: 'highlight' })
-      ).toThrow('Cannot decorate a destroyed marker layer');
+      ).toThrowError('Cannot decorate a destroyed marker layer');
     });
 
     describe('when a decoration is updated via Decoration::update()', () =>
@@ -94,7 +96,7 @@ describe('DecorationManager', function() {
         const {
           oldProperties,
           newProperties
-        } = updatedSpy.mostRecentCall.args[0];
+        } = updatedSpy.calls.mostRecent().args[0];
         expect(oldProperties).toEqual(decorationProperties);
         expect(newProperties.type).toBe('line-number');
         expect(newProperties.gutterName).toBe('line-number');

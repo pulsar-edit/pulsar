@@ -46,27 +46,36 @@ describe('StateStore', () => {
   });
 
   describe('when there is an error reading from the database', () => {
-    it('rejects the promise returned by load', () => {
+    it('rejects the promise returned by load', async (done) => {
       const store = new StateStore(databaseName, version);
 
       const fakeErrorEvent = {
         target: { errorCode: 'Something bad happened' }
       };
 
-      spyOn(IDBObjectStore.prototype, 'get').andCallFake(key => {
-        let request = {};
-        process.nextTick(() => request.onerror(fakeErrorEvent));
-        return request;
-      });
+      const fakeIDBObjectStore = {};
+      let loadStorePromise;
 
-      return store
-        .load('nonexistentKey')
+      await new Promise((resolve) => {
+        spyOn(IDBObjectStore.prototype, 'get').and.callFake(key => {
+          resolve();
+          return fakeIDBObjectStore;
+        });
+
+        loadStorePromise = store.load('nonexistentKey');
+      })
+
+      fakeIDBObjectStore.onerror(fakeErrorEvent);
+
+      loadStorePromise
         .then(() => {
           throw new Error('Promise should have been rejected');
         })
         .catch(event => {
           expect(event).toBe(fakeErrorEvent);
         });
+
+      done();
     });
   });
 });
