@@ -36,7 +36,7 @@ describe('updateProcessEnv(launchEnv)', function() {
   });
 
   describe('when the launch environment appears to come from a shell', function() {
-    it('updates process.env to match the launch environment because PWD is set', async function() {
+    it('updates process.env to match the launch environment because PWD is set', async function(done) {
       process.env = {
         WILL_BE_DELETED: 'hi',
         NODE_ENV: 'the-node-env',
@@ -68,9 +68,11 @@ describe('updateProcessEnv(launchEnv)', function() {
       // case-insensitive environment variable matching, so we cannot replace it
       // with another object.
       expect(process.env).toBe(initialProcessEnv);
+
+      done();
     });
 
-    it('updates process.env to match the launch environment because PROMPT is set', async function() {
+    it('updates process.env to match the launch environment because PROMPT is set', async function(done) {
       process.env = {
         WILL_BE_DELETED: 'hi',
         NODE_ENV: 'the-node-env',
@@ -100,9 +102,11 @@ describe('updateProcessEnv(launchEnv)', function() {
       // case-insensitive environment variable matching, so we cannot replace it
       // with another object.
       expect(process.env).toBe(initialProcessEnv);
+
+      done();
     });
 
-    it('updates process.env to match the launch environment because PSModulePath is set', async function() {
+    it('updates process.env to match the launch environment because PSModulePath is set', async function(done) {
       process.env = {
         WILL_BE_DELETED: 'hi',
         NODE_ENV: 'the-node-env',
@@ -134,9 +138,11 @@ describe('updateProcessEnv(launchEnv)', function() {
       // case-insensitive environment variable matching, so we cannot replace it
       // with another object.
       expect(process.env).toBe(initialProcessEnv);
+
+      done();
     });
 
-    it('allows ATOM_HOME to be overwritten only if the new value is a valid path', async function() {
+    it('allows ATOM_HOME to be overwritten only if the new value is a valid path', async function(done) {
       let newAtomHomePath = temp.mkdirSync('atom-home');
 
       process.env = {
@@ -183,9 +189,11 @@ describe('updateProcessEnv(launchEnv)', function() {
         NODE_PATH: '/the/node/path',
         ATOM_HOME: newAtomHomePath
       });
+
+      done();
     });
 
-    it('allows ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT to be preserved if set', async function() {
+    it('allows ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT to be preserved if set', async function(done) {
       process.env = {
         WILL_BE_DELETED: 'hi',
         NODE_ENV: 'the-node-env',
@@ -221,9 +229,11 @@ describe('updateProcessEnv(launchEnv)', function() {
         NODE_PATH: '/the/node/path',
         ATOM_HOME: '/the/atom/home'
       });
+
+      done();
     });
 
-    it('allows an existing env variable to be updated', async function() {
+    it('allows an existing env variable to be updated', async function(done) {
       process.env = {
         WILL_BE_UPDATED: 'old-value',
         NODE_ENV: 'the-node-env',
@@ -245,15 +255,16 @@ describe('updateProcessEnv(launchEnv)', function() {
 
       await updateProcessEnv(updatedEnv);
       expect(process.env).toEqual(updatedEnv);
+
+      done();
     });
   });
 
   describe('when the launch environment does not come from a shell', function() {
     describe('on macOS', function() {
-      it("updates process.env to match the environment in the user's login shell", async function() {
-        if (process.platform === 'win32') return; // TestsThatFailOnWin32
+      it("updates process.env to match the environment in the user's login shell", async function(done) {
+        jasmine.filterByPlatform({only: ['darwin']}, done); // TestsThatFailOnWin32
 
-        process.platform = 'darwin';
         process.env.SHELL = '/my/custom/bash';
         spawn.setDefault(
           spawn.simple(
@@ -277,14 +288,15 @@ describe('updateProcessEnv(launchEnv)', function() {
 
         // Doesn't error
         await updateProcessEnv(null);
+
+        done();
       });
     });
 
     describe('on linux', function() {
-      it("updates process.env to match the environment in the user's login shell", async function() {
-        if (process.platform === 'win32') return; // TestsThatFailOnWin32
+      it("updates process.env to match the environment in the user's login shell", async function(done) {
+        jasmine.filterByPlatform({only: ['linux']}, done); // TestsThatFailOnWin32
 
-        process.platform = 'linux';
         process.env.SHELL = '/my/custom/bash';
         spawn.setDefault(
           spawn.simple(
@@ -308,24 +320,27 @@ describe('updateProcessEnv(launchEnv)', function() {
 
         // Doesn't error
         await updateProcessEnv(null);
+
+        done();
       });
     });
 
     describe('on windows', function() {
-      it('does not update process.env', async function() {
+      it('does not update process.env', async function(done) {
         process.platform = 'win32';
-        spyOn(childProcess, 'spawn');
         process.env = { FOO: 'bar' };
 
         await updateProcessEnv(process.env);
-        expect(childProcess.spawn).not.toHaveBeenCalled();
+        expect(spawn.calls.length).toBe(0);
         expect(process.env).toEqual({ FOO: 'bar' });
+
+        done();
       });
     });
 
     describe('shouldGetEnvFromShell()', function() {
       it('indicates when the environment should be fetched from the shell', function() {
-        if (process.platform === 'win32') return; // TestsThatFailOnWin32
+        jasmine.filterByPlatform({except: ['win32']}); // TestsThatFailOnWin32
 
         process.platform = 'darwin';
         expect(shouldGetEnvFromShell({ SHELL: '/bin/sh' })).toBe(true);

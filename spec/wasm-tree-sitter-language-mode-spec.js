@@ -63,12 +63,14 @@ function wait(ms) {
 describe('WASMTreeSitterLanguageMode', () => {
   let editor, buffer, grammar;
 
-  beforeEach(async () => {
+  beforeEach(async (done) => {
     grammar = null;
     editor = await atom.workspace.open('');
     buffer = editor.getBuffer();
     editor.displayLayer.reset({ foldCharacter: '…' });
     atom.config.set('core.useTreeSitterParsers', true);
+
+    done();
   });
 
   afterEach(() => {
@@ -76,7 +78,7 @@ describe('WASMTreeSitterLanguageMode', () => {
   });
 
   describe('highlighting', () => {
-    it('applies the most specific scope mapping to each node in the syntax tree', async () => {
+    it('applies the most specific scope mapping to each node in the syntax tree', async (done) => {
       jasmine.useRealClock();
       grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -122,9 +124,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           { text: ';', scopes: ['punctuation'] }
         ]
       ]);
+
+      done();
     });
 
-    it('can start or end multiple scopes at the same position', async () => {
+    it('can start or end multiple scopes at the same position', async (done) => {
       jasmine.useRealClock();
       grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -171,9 +175,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           { text: ';', scopes: [] }
         ]
       ]);
+
+      done();
     });
 
-    it('can resume highlighting on a line that starts with whitespace', async () => {
+    it('can resume highlighting on a line that starts with whitespace', async (done) => {
       jasmine.useRealClock();
       grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -200,9 +206,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           { text: '();', scopes: [] }
         ]
       ]);
+
+      done();
     });
 
-    it('correctly skips over tokens with zero size', async () => {
+    it('correctly skips over tokens with zero size', async (done) => {
       jasmine.useRealClock();
       grammar = new WASMTreeSitterGrammar(atom.grammars, cGrammarPath, cConfig);
 
@@ -252,9 +260,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         ],
         [{ text: '}', scopes: [] }]
       ]);
+
+      done();
     });
 
-    it("updates lines' highlighting when they are affected by distant changes", async () => {
+    it("updates lines' highlighting when they are affected by distant changes", async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -292,9 +302,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         [{ text: 'c', scopes: [] }],
         [{ text: ')', scopes: [] }]
       ]);
+
+      done();
     });
 
-    it('updates the range of the current node in the tree when highlight.invalidateOnChange is set', async () => {
+    it('updates the range of the current node in the tree when highlight.invalidateOnChange is set', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -370,9 +382,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           { text: '`', scopes: ['lorem'] },
         ]
       ]);
+
+      done();
     })
 
-    it('handles edits after tokens that end between CR and LF characters (regression)', async () => {
+    it('handles edits after tokens that end between CR and LF characters (regression)', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -416,9 +430,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           { text: 'c', scopes: ['property'] }
         ]
       ]);
+
+      done();
     });
 
-    it('handles multi-line nodes with children on different lines (regression)', async () => {
+    it('handles multi-line nodes with children on different lines (regression)', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -450,9 +466,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         ],
         [{ text: '`', scopes: ['string'] }, { text: ';', scopes: [] }]
       ]);
+
+      done();
     });
 
-    it('handles folds inside of highlighted tokens', async () => {
+    it('handles folds inside of highlighted tokens', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -488,9 +506,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           { text: '();', scopes: [] }
         ]
       ]);
+
+      done();
     });
 
-    it('applies regex match rules when specified', async () => {
+    it('applies regex match rules when specified', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -527,9 +547,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           { text: ')', scopes: [] }
         ]
       ]);
+
+      done();
     });
 
-    it('handles nodes that start before their first child and end after their last child', async () => {
+    it('handles nodes that start before their first child and end after their last child', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, rubyGrammarPath, rubyConfig);
 
@@ -559,12 +581,14 @@ describe('WASMTreeSitterLanguageMode', () => {
           { text: ' )', scopes: [] }
         ]
       ]);
+
+      done();
     });
 
     // TODO: Ignoring these specs because web-tree-sitter doesn't seem to do
     // async. We can rehabilitate them if we ever figure it out.
     xdescribe('when the buffer changes during a parse', () => {
-      it('immediately parses again when the current parse completes', async () => {
+      it('immediately parses again when the current parse completes', async (done) => {
         jasmine.useRealClock();
         const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -635,11 +659,13 @@ describe('WASMTreeSitterLanguageMode', () => {
         await languageMode.atTransactionEnd();
 
         // await wait(2000);
+
+        done();
       });
     });
 
     describe('when changes are small enough to be re-parsed synchronously', () => {
-      it('can incorporate multiple consecutive synchronous updates', async () => {
+      it('can incorporate multiple consecutive synchronous updates', async (done) => {
         jasmine.useRealClock();
         const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -693,13 +719,15 @@ describe('WASMTreeSitterLanguageMode', () => {
         expectTokensToEqual(editor, [
           [{ text: 'ab', scopes: ['function'] }, { text: '()', scopes: [] }]
         ]);
+
+        done();
       });
     });
 
     describe('injectionPoints and injectionPatterns', () => {
       let jsGrammar, htmlGrammar;
 
-      beforeEach(async () => {
+      beforeEach(async (done) => {
         let tempJsConfig = { ...jsConfig };
         jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, tempJsConfig);
 
@@ -725,9 +753,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         `);
 
         htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
+
+        done();
       });
 
-      it('highlights code inside of injection points', async () => {
+      it('highlights code inside of injection points', async (done) => {
         jasmine.useRealClock();
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(htmlGrammar);
@@ -791,9 +821,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           ],
           [{ text: '`', scopes: ['string'] }, { text: ';', scopes: [] }]
         ]);
+
+        done();
       });
 
-      it('highlights the content after injections', async () => {
+      it('highlights the content after injections', async (done) => {
         jasmine.useRealClock();
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(htmlGrammar);
@@ -834,9 +866,11 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: '>', scopes: ['html'] }
           ]
         ]);
+
+        done();
       });
 
-      it('updates a buffer\'s highlighting when a grammar with injectionRegex is added', async () => {
+      it('updates a buffer\'s highlighting when a grammar with injectionRegex is added', async (done) => {
         jasmine.useRealClock();
         atom.grammars.addGrammar(jsGrammar);
 
@@ -896,9 +930,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           ],
           [{ text: '`', scopes: ['string'] }, { text: ';', scopes: [] }]
         ]);
+
+        done();
       });
 
-      it('handles injections that intersect', async () => {
+      it('handles injections that intersect', async (done) => {
 
         const ejsGrammar = new WASMTreeSitterGrammar(
           atom.grammars,
@@ -967,9 +1003,11 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: '>', scopes: ['html'] }
           ]
         ]);
+
+        done();
       });
 
-      it('handles injections that are empty', async () => {
+      it('handles injections that are empty', async (done) => {
         jasmine.useRealClock();
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(htmlGrammar);
@@ -1029,15 +1067,17 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: ';', scopes: [] }
           ]
         ]);
+
+        done();
       });
 
-      it('handles injections with no highlights query', async () => {
+      it('handles injections with no highlights query', async (done) => {
         jasmine.useRealClock();
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(htmlGrammar);
         htmlGrammar.highlightsQuery = false;
         // Pretend this grammar doesn't have a highlights query.
-        spyOn(htmlGrammar, 'getQuery').andReturn(Promise.resolve(null));
+        spyOn(htmlGrammar, 'getQuery').and.returnValue(Promise.resolve(null));
         const languageMode = new WASMTreeSitterLanguageMode({
           grammar: jsGrammar,
           buffer,
@@ -1055,9 +1095,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         let descriptor = editor.scopeDescriptorForBufferPosition([0, 15]);
 
         expect(descriptor.getScopesArray()).toContain('text.html.basic');
+
+        done();
       });
 
-      it('terminates comment token at the end of an injection, so that the next injection is NOT a continuation of the comment', async () => {
+      it('terminates comment token at the end of an injection, so that the next injection is NOT a continuation of the comment', async (done) => {
         jasmine.useRealClock();
         const ejsGrammar = new WASMTreeSitterGrammar(
           atom.grammars,
@@ -1112,9 +1154,11 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: '%>', scopes: ['directive'] }
           ]
         ]);
+
+        done();
       });
 
-      it('only covers scope boundaries in parent layers if a nested layer has a boundary at the same position', async () => {
+      it('only covers scope boundaries in parent layers if a nested layer has a boundary at the same position', async (done) => {
         const jsdocGrammar = new WASMTreeSitterGrammar(
           atom.grammars,
           jsdocGrammarPath,
@@ -1144,9 +1188,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           [{ text: '{', scopes: [] }],
           [{ text: '}', scopes: [] }]
         ]);
+
+        done();
       });
 
-      it('reports scopes from shallower layers when they are at the start or end of an injection', async () => {
+      it('reports scopes from shallower layers when they are at the start or end of an injection', async (done) => {
         jasmine.useRealClock();
         await atom.packages.activatePackage('language-javascript');
 
@@ -1200,9 +1246,11 @@ describe('WASMTreeSitterLanguageMode', () => {
             }
           ]
         ]);
+
+        done();
       });
 
-      it('respects the `includeChildren` property of injection points', async () => {
+      it('respects the `includeChildren` property of injection points', async (done) => {
         const rustGrammar = new WASMTreeSitterGrammar(
           atom.grammars,
           rustGrammarPath,
@@ -1279,9 +1327,11 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: '();', scopes: [] }
           ]
         ]);
+
+        done();
       });
 
-      it('omits the injected grammar\'s base scope when `languageScope` is `null`', async () => {
+      it('omits the injected grammar\'s base scope when `languageScope` is `null`', async (done) => {
 
         let customJsConfig = { ...jsConfig };
         let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
@@ -1327,9 +1377,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         expect(
           descriptor.getScopesArray().includes('source.js')
         ).toBe(false);
+
+        done();
       });
 
-      it('uses a custom base scope on the injected layer when `languageScope` is a string', async () => {
+      it('uses a custom base scope on the injected layer when `languageScope` is a string', async (done) => {
 
         let customJsConfig = { ...jsConfig };
         let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
@@ -1378,9 +1430,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         expect(
           descriptor.getScopesArray().includes('source.js.embedded')
         ).toBe(true);
+
+        done();
       });
 
-      it('uses a custom base scope on the injected layer when `languageScope` is a function', async () => {
+      it('uses a custom base scope on the injected layer when `languageScope` is a function', async (done) => {
 
         let customJsConfig = { ...jsConfig };
         let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
@@ -1431,9 +1485,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         expect(
           descriptor.getScopesArray().includes(`source.js.custom-${timestamp}`)
         ).toBe(true);
+
+        done();
       });
 
-      it('allows multiple base scopes on the injected layer when `languageScope` is a function', async () => {
+      it('allows multiple base scopes on the injected layer when `languageScope` is a function', async (done) => {
 
         let customJsConfig = { ...jsConfig };
         let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
@@ -1498,9 +1554,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         expect(
           descriptor.getScopesArray().includes(`meta.line0`)
         ).toBe(false);
+
+        done();
       });
 
-      it('notifies onDidTokenize listeners the first time all syntax highlighting is done', async () => {
+      it('notifies onDidTokenize listeners the first time all syntax highlighting is done', async (done) => {
         const promise = new Promise(resolve => {
           editor.onDidTokenize(event => {
             expectTokensToEqual(editor, [
@@ -1535,6 +1593,8 @@ describe('WASMTreeSitterLanguageMode', () => {
         });
         buffer.setLanguageMode(languageMode);
         await promise;
+
+        done();
       });
     });
   });
@@ -1543,15 +1603,15 @@ describe('WASMTreeSitterLanguageMode', () => {
     let originalTimeout;
 
     beforeEach(() => {
-      originalTimeout = jasmine.getEnv().defaultTimeoutInterval;
-      jasmine.getEnv().defaultTimeoutInterval = 60 * 1000;
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
     });
 
     afterEach(() => {
-      jasmine.getEnv().defaultTimeoutInterval = originalTimeout;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     });
 
-    it('matches the highlighting of a freshly-opened editor', async () => {
+    it('matches the highlighting of a freshly-opened editor', async (done) => {
       jasmine.useRealClock();
 
       const text = fs.readFileSync(
@@ -1633,16 +1693,10 @@ describe('WASMTreeSitterLanguageMode', () => {
           const tokens1 = editor.tokensForScreenRow(j);
           const tokens2 = editor2.tokensForScreenRow(j);
           expect(tokens1).toEqual(tokens2, `Seed: ${seed}, screen line: ${j}`);
-          if (jasmine.getEnv().currentSpec.results().failedCount > 0) {
-            console.log(tokens1);
-            console.log(tokens2);
-            debugger; // eslint-disable-line no-debugger
-            break;
-          }
         }
-
-        if (jasmine.getEnv().currentSpec.results().failedCount > 0) break;
       }
+
+      done();
     });
   });
 
@@ -1650,10 +1704,12 @@ describe('WASMTreeSitterLanguageMode', () => {
     let editor;
 
     describe('javascript', () => {
-      beforeEach(async () => {
+      beforeEach(async (done) => {
         editor = await atom.workspace.open('sample.js', { autoIndent: false });
         await atom.packages.activatePackage('language-javascript');
         await editor.getBuffer().getLanguageMode().ready;
+
+        done();
       });
 
       it('bases indentation off of the previous non-blank line', () => {
@@ -1679,14 +1735,16 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     describe('css', () => {
-      beforeEach(async () => {
+      beforeEach(async (done) => {
         editor = await atom.workspace.open('css.css', { autoIndent: true });
         await atom.packages.activatePackage('language-source');
         await atom.packages.activatePackage('language-css');
         await editor.getBuffer().getLanguageMode().ready;
+
+        done();
       });
 
-      it('does not return negative values (regression)', async () => {
+      it('does not return negative values (regression)', async (done) => {
         jasmine.useRealClock();
         editor.setText('.test {\npadding: 0;\n}');
         await wait(0);
@@ -1695,16 +1753,20 @@ describe('WASMTreeSitterLanguageMode', () => {
         editor.setText('@media screen {\n  .test {\n    padding: 0;\n  }\n}');
         await wait(0);
         expect(editor.suggestedIndentForBufferRow(3)).toBe(1);
+
+        done();
       });
     });
   });
 
   describe('.suggestedIndentForBufferRows', () => {
-    beforeEach(async () => {
+    beforeEach(async (done) => {
       await atom.packages.activatePackage('language-javascript');
+
+      done();
     })
 
-    it('works correctly when straddling an injection boundary', async () => {
+    it('works correctly when straddling an injection boundary', async (done) => {
 
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -1749,11 +1811,13 @@ describe('WASMTreeSitterLanguageMode', () => {
       let map = languageMode.suggestedIndentForBufferRows(0, 5, editor.getTabLength());
 
       expect(Array.from(map.values())).toEqual([0, 1, 1, 2, 1, 0]);
+
+      done();
     });
   });
 
   describe('folding', () => {
-    it('can fold nodes that start and end with specified tokens', async () => {
+    it('can fold nodes that start and end with specified tokens', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('foldsQuery', `
@@ -1805,9 +1869,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           getB (c,…) {…}
         }
       `);
+
+      done();
     });
 
-    it('folds entire buffer rows when necessary to keep words on separate lines', async () => {
+    it('folds entire buffer rows when necessary to keep words on separate lines', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('foldsQuery', `
@@ -1866,9 +1932,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         } else if (c) {…
         } else {…}
       `);
+
+      done();
     });
 
-    it('can fold nodes of specified types', async () => {
+    it('can fold nodes of specified types', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('foldsQuery', `
@@ -1925,9 +1993,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         const element2 = <Element>…
         </Element>
       `);
+
+      done();
     });
 
-    it('updates its fold cache properly when `fold.invalidateOnChange` is specified', async () => {
+    it('updates its fold cache properly when `fold.invalidateOnChange` is specified', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, htmlConfig);
 
       await grammar.setQueryForTest('foldsQuery', scm`
@@ -1991,9 +2061,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(editor.isFoldableAtBufferRow(2)).toBe(true);
       expect(editor.isFoldableAtBufferRow(3)).toBe(false);
       expect(editor.isFoldableAtBufferRow(4)).toBe(false);
+
+      done();
     });
 
-    it('understands custom predicates', async () => {
+    it('understands custom predicates', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, htmlConfig);
 
       await grammar.setQueryForTest('foldsQuery', scm`
@@ -2037,9 +2109,11 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.isFoldableAtBufferRow(0)).toBe(false);
       expect(editor.isFoldableAtBufferRow(7)).toBe(true);
+
+      done();
     });
 
-    it('can fold entire nodes when no start or end parameters are specified', async () => {
+    it('can fold entire nodes when no start or end parameters are specified', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('foldsQuery', `
@@ -2080,9 +2154,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         /**… */
         const x = 1 /*…*/
       `);
+
+      done();
     });
 
-    it('folds between arbitrary points in the buffer with @fold.start and @fold.end markers', async () => {
+    it('folds between arbitrary points in the buffer with @fold.start and @fold.end markers', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, cGrammarPath, cConfig);
 
       await grammar.setQueryForTest('foldsQuery', `
@@ -2178,9 +2254,11 @@ describe('WASMTreeSitterLanguageMode', () => {
 
         #endif
       `);
+
+      done();
     });
 
-    it('does not fold when the start and end parameters match the same child', async () => {
+    it('does not fold when the start and end parameters match the same child', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, htmlConfig);
 
       await grammar.setQueryForTest('foldsQuery', `
@@ -2206,9 +2284,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(getDisplayText(editor)).toBe(dedent`
         <head>…</head>
       `);
+
+      done();
     });
 
-    it('can target named vs anonymous nodes as fold boundaries', async () => {
+    it('can target named vs anonymous nodes as fold boundaries', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, rubyGrammarPath, rubyConfig);
 
       await grammar.setQueryForTest('foldsQuery', `
@@ -2269,9 +2349,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         else…
         end
       `);
+
+      done();
     });
 
-    it('updates fold locations when the buffer changes', async () => {
+    it('updates fold locations when the buffer changes', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('foldsQuery', `
@@ -2311,10 +2393,12 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(languageMode.isFoldableAtRow(2)).toBe(false);
       expect(languageMode.isFoldableAtRow(3)).toBe(true);
       expect(languageMode.isFoldableAtRow(4)).toBe(false);
+
+      done();
     });
 
     describe('when folding a node that ends with a line break', () => {
-      it('ends the fold at the end of the previous line', async () => {
+      it('ends the fold at the end of the previous line', async (done) => {
         const grammar = new WASMTreeSitterGrammar(atom.grammars,
           pythonGrammarPath,
           CSON.readFileSync(pythonGrammarPath)
@@ -2378,10 +2462,12 @@ describe('WASMTreeSitterLanguageMode', () => {
             print 'c'
             print 'd'
         `);
+
+        done();
       });
     });
 
-    it('folds code in injected languages', async () => {
+    it('folds code in injected languages', async (done) => {
       jasmine.useRealClock();
       const htmlGrammar = new WASMTreeSitterGrammar(
         atom.grammars,
@@ -2452,11 +2538,13 @@ describe('WASMTreeSitterLanguageMode', () => {
         `a = html \`…\`
         `
       );
+
+      done();
     });
   });
 
   describe('.scopeDescriptorForPosition', () => {
-    it('returns a scope descriptor representing the given position in the syntax tree', async () => {
+    it('returns a scope descriptor representing the given position in the syntax tree', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('highlightsQuery', `
@@ -2499,9 +2587,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           .scopeDescriptorForBufferPosition([0, '// baz'.length])
           .getScopesArray()
       ).toEqual(['source.js', 'comment.block']);
+
+      done();
     });
 
-    it('includes nodes in injected syntax trees', async () => {
+    it('includes nodes in injected syntax trees', async (done) => {
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await jsGrammar.setQueryForTest('highlightsQuery', `
@@ -2556,9 +2646,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         'string.quoted',
         'property.name'
       ]);
+
+      done();
     });
 
-    it('reports scopes correctly at boundaries where more than one layer adds a scope', async () => {
+    it('reports scopes correctly at boundaries where more than one layer adds a scope', async (done) => {
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await jsGrammar.setQueryForTest('highlightsQuery', `
@@ -2611,9 +2703,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         'text.html.basic',
         'tag'
       ]);
+
+      done();
     });
 
-    it('includes the root scope name even when the given position is in trailing whitespace at EOF', async () => {
+    it('includes the root scope name even when the given position is in trailing whitespace at EOF', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('highlightsQuery', `
@@ -2629,9 +2723,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(
         editor.scopeDescriptorForBufferPosition([0, 3]).getScopesArray()
       ).toEqual(['source.js']);
+
+      done();
     });
 
-    it('works when the given position is between tokens', async () => {
+    it('works when the given position is between tokens', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('highlightsQuery', `
@@ -2650,9 +2746,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(
         editor.scopeDescriptorForBufferPosition([0, 3]).getScopesArray()
       ).toEqual(['source.js', 'comment.block']);
+
+      done();
     });
 
-    it('works when a scope range has been adjusted', async () => {
+    it('works when a scope range has been adjusted', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('highlightsQuery', `
@@ -2676,9 +2774,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(
         editor.scopeDescriptorForBufferPosition([1, 2]).getScopesArray()
       ).toEqual(['source.js', 'comment.block']);
+
+      done();
     });
 
-    it('ignores a parent\'s scopes if an injection layer sets `coverShallowerScopes`', async () => {
+    it('ignores a parent\'s scopes if an injection layer sets `coverShallowerScopes`', async (done) => {
       jasmine.useRealClock();
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -2740,9 +2840,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(scopes.includes('gadfly')).toBe(false);
       expect(scopes.includes('regex-outer')).toBe(true);
       expect(scopes.includes('regex-inner')).toBe(false);
+
+      done();
     });
 
-    it('arranges scopes in the proper order when scopes from several layers were already open at a given point', async () => {
+    it('arranges scopes in the proper order when scopes from several layers were already open at a given point', async (done) => {
       jasmine.useRealClock();
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -2806,12 +2908,14 @@ describe('WASMTreeSitterLanguageMode', () => {
         "string.regexp",
         "gadfly"
       ]);
+
+      done();
     });
 
   });
 
   describe('.syntaxTreeScopeDescriptorForPosition', () => {
-    it('returns a scope descriptor representing the given position in the syntax tree', async () => {
+    it('returns a scope descriptor representing the given position in the syntax tree', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -2847,9 +2951,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           .syntaxTreeScopeDescriptorForBufferPosition([0, 5])
           .getScopesArray()
       ).toEqual(['source.js', 'program', 'comment']);
+
+      done();
     });
 
-    it('includes nodes in injected syntax trees', async () => {
+    it('includes nodes in injected syntax trees', async (done) => {
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
@@ -2905,12 +3011,14 @@ describe('WASMTreeSitterLanguageMode', () => {
         'member_expression',
         'property_identifier'
       ]);
+
+      done();
     });
   });
 
   describe('.bufferRangeForScopeAtPosition(selector?, position)', () => {
     describe('when selector = null', () => {
-      it('returns the range of the smallest node at position', async () => {
+      it('returns the range of the smallest node at position', async (done) => {
         const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
         buffer.setText('foo({bar: baz});');
@@ -2927,9 +3035,11 @@ describe('WASMTreeSitterLanguageMode', () => {
           [0, 8],
           [0, 9]
         ]);
+
+        done();
       });
 
-      it('includes nodes in injected syntax trees', async () => {
+      it('includes nodes in injected syntax trees', async (done) => {
         const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
         jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
@@ -2977,11 +3087,13 @@ describe('WASMTreeSitterLanguageMode', () => {
         expect(
           languageMode.bufferRangeForScopeAtPosition(null, position)
         ).toEqual(nameProperty);
+
+        done();
       });
     });
 
     describe('with a selector', () => {
-      it('returns the range of the smallest matching node at position', async () => {
+      it('returns the range of the smallest matching node at position', async (done) => {
         const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
         await grammar.setQueryForTest('highlightsQuery', `
@@ -3001,9 +3113,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         expect(
           editor.bufferRangeForScopeAtPosition('.string.quoted', [0, 6])
         ).toEqual([[0, 2], [0, 24]]);
+
+        done();
       });
 
-      it('includes nodes in injected syntax trees', async () => {
+      it('includes nodes in injected syntax trees', async (done) => {
         const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
         jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
         await jsGrammar.setQueryForTest('highlightsQuery', `
@@ -3058,9 +3172,11 @@ describe('WASMTreeSitterLanguageMode', () => {
             position
           )
         ).toEqual(buffer.findSync('<span>\\${person\\.name}</span>'));
+
+        done();
       });
 
-      it('reports results correctly when scope ranges have been adjusted', async () => {
+      it('reports results correctly when scope ranges have been adjusted', async (done) => {
         jasmine.useRealClock();
         const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3097,9 +3213,11 @@ describe('WASMTreeSitterLanguageMode', () => {
 
         range = languageMode.bufferRangeForScopeAtPosition('comment.block', new Point(1, 0));
         expect(range.toString()).toBe(`[(1, 0) - (1, 29)]`);
+
+        done();
       });
 
-      it('ignores scopes that are not present because they are covered by a deeper layer', async () => {
+      it('ignores scopes that are not present because they are covered by a deeper layer', async (done) => {
         // A similar test to the one above, except now we expect not to see the
         // scope because it's being covered by the injection layer.
         jasmine.useRealClock();
@@ -3155,9 +3273,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         let point = new Point(0, 15);
         let range = languageMode.bufferRangeForScopeAtPosition('keyword', point);
         expect(range).toBe(undefined);
+
+        done();
       });
 
-      it('accepts node-matching functions as selectors', async () => {
+      it('accepts node-matching functions as selectors', async (done) => {
         const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
         jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
@@ -3207,12 +3327,14 @@ describe('WASMTreeSitterLanguageMode', () => {
             position
           )
         ).toEqual([[3, 19], [5, 15]]);
+
+        done();
       });
     });
   });
 
   describe('.getSyntaxNodeAtPosition(position, where?)', () => {
-    it('returns the range of the smallest matching node at position', async () => {
+    it('returns the range of the smallest matching node at position', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       buffer.setText('foo(bar({x: 2}));');
@@ -3234,6 +3356,8 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(
         languageMode.getSyntaxNodeAtPosition([0, 6], findFoo).range
       ).toEqual([[0, 0], [0, buffer.getText().length - 1]]);
+
+      done();
     });
   });
 
@@ -3247,7 +3371,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       atom.config.unset('editor.commentEnd',        { scopeSelector: '.text.html.basic' });
     });
 
-    it('returns the correct comment strings for nested languages', async () => {
+    it('returns the correct comment strings for nested languages', async (done) => {
       jasmine.useRealClock();
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3371,9 +3495,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(languageMode.commentStringsForPosition(new Point(6, 0))).toEqual(
         htmlCommentStrings
       );
+
+      done();
     });
 
-    it('uses grammar comment settings when config data is missing', async () => {
+    it('uses grammar comment settings when config data is missing', async (done) => {
       jasmine.useRealClock();
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3461,9 +3587,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(languageMode.commentStringsForPosition(new Point(6, 0))).toEqual(
         htmlCommentStrings
       );
+
+      done();
     });
 
-    it('constructs the right comment settings when grammar data is missing', async () => {
+    it('constructs the right comment settings when grammar data is missing', async (done) => {
       jasmine.useRealClock();
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3475,8 +3603,8 @@ describe('WASMTreeSitterLanguageMode', () => {
         htmlConfig
       );
 
-      spyOn(jsGrammar, 'getCommentDelimiters').andReturn({ line: undefined, block: undefined });
-      spyOn(htmlGrammar, 'getCommentDelimiters').andReturn({ line: undefined, block: undefined });
+      spyOn(jsGrammar, 'getCommentDelimiters').and.returnValue({ line: undefined, block: undefined });
+      spyOn(htmlGrammar, 'getCommentDelimiters').and.returnValue({ line: undefined, block: undefined });
 
       atom.config.set(
         'editor.commentDelimiters',
@@ -3571,12 +3699,14 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(languageMode.commentStringsForPosition(new Point(6, 0))).toEqual(
         htmlCommentStrings
       );
+
+      done();
     });
 
   });
 
   describe('TextEditor.selectLargerSyntaxNode and .selectSmallerSyntaxNode', () => {
-    it('expands and contracts the selection based on the syntax tree', async () => {
+    it('expands and contracts the selection based on the syntax tree', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('highlightsQuery', `
@@ -3618,9 +3748,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(editor.getSelectedText()).toBe('eee');
       editor.selectSmallerSyntaxNode();
       expect(editor.getSelectedBufferRange()).toEqual([[1, 3], [1, 3]]);
+
+      done();
     });
 
-    it('handles injected languages', async () => {
+    it('handles injected languages', async (done) => {
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await jsGrammar.setQueryForTest('highlightsQuery', `
@@ -3676,11 +3808,13 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(editor.getSelectedText()).toBe('` <b>c${def()}e${f}g</b> `');
       editor.selectLargerSyntaxNode();
       expect(editor.getSelectedText()).toBe('html ` <b>c${def()}e${f}g</b> `');
+
+      done();
     });
   });
 
   describe('.tokenizedLineForRow(row)', () => {
-    it('returns a shimmed TokenizedLine with tokens', async () => {
+    it('returns a shimmed TokenizedLine with tokens', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       await grammar.setQueryForTest('highlightsQuery', `
@@ -3737,16 +3871,20 @@ describe('WASMTreeSitterLanguageMode', () => {
         { value: '  ', scopes: ['source'] },
         { value: 'b', scopes: ['source', 'variable'] }
       ]);
+
+      done();
     });
   });
 
   describe('indentation', () => {
-    beforeEach(async () => {
+    beforeEach(async (done) => {
       await atom.packages.activatePackage('whitespace');
       atom.config.set('whitespace.removeTrailingWhitespace', false);
+
+      done();
     });
 
-    it('interprets @indent and @dedent captures', async () => {
+    it('interprets @indent and @dedent captures', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3787,9 +3925,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       editor.undo();
 
       expect(buffer.getText()).toEqual(originalText);
+
+      done();
     });
 
-    it('allows @dedents to cancel out @indents when appropriate', async () => {
+    it('allows @dedents to cancel out @indents when appropriate', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3822,9 +3962,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(
         editor.getLastCursor().getBufferPosition().toString()
       ).toEqual('(1, 2)');
+
+      done();
     });
 
-    it('allows @dedent.next to decrease the indent of the next line before any typing takes place', async () => {
+    it('allows @dedent.next to decrease the indent of the next line before any typing takes place', async (done) => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       // Pretend we're in a universe where lines after comments should be
@@ -3844,9 +3986,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(
         editor.getLastCursor().getBufferPosition().toString()
       ).toEqual('(1, 0)');
+
+      done();
     });
 
-    it('resolves @match captures', async () => {
+    it('resolves @match captures', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3880,9 +4024,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(
         editor.getLastCursor().getBufferPosition().toString()
       ).toEqual('(2, 1)');
+
+      done();
     });
 
-    it('prefers a @match capture even if a @dedent matches first', async () => {
+    it('prefers a @match capture even if a @dedent matches first', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3916,9 +4062,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(
         editor.getLastCursor().getBufferPosition().toString()
       ).toEqual('(2, 1)');
+
+      done();
     });
 
-    it('adjusts correctly when text is pasted', async () => {
+    it('adjusts correctly when text is pasted', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3938,7 +4086,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       spyOn(
         languageMode,
         'suggestedIndentForLineAtBufferRow'
-      ).andReturn(9);
+      ).and.returnValue(9);
 
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
@@ -3972,9 +4120,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       await wait(0);
 
       expect(editor.getText()).toEqual(emptyClassText);
+
+      done();
     });
 
-    it('skips trying to insert at the correct indentation level when "paste without formatting" is invoked', async () => {
+    it('skips trying to insert at the correct indentation level when "paste without formatting" is invoked', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -4028,10 +4178,12 @@ describe('WASMTreeSitterLanguageMode', () => {
       await wait(0);
 
       expect(editor.getText()).toEqual(emptyClassText);
+
+      done();
     });
 
 
-    it('preserves relative indentation across pasted text', async () => {
+    it('preserves relative indentation across pasted text', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -4083,9 +4235,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       await wait(0);
 
       expect(editor.getText()).toEqual(emptyClassText);
+
+      done();
     });
 
-    it('preserves relative indentation across pasted text (when the pasted text ends in a newline)', async () => {
+    it('preserves relative indentation across pasted text (when the pasted text ends in a newline)', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -4136,9 +4290,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       await wait(0);
 
       expect(editor.getText()).toEqual(emptyClassText);
+
+      done();
     });
 
-    it('auto-indents correctly if any change in a transaction wants auto-indentation', async () => {
+    it('auto-indents correctly if any change in a transaction wants auto-indentation', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
       editor.updateAutoIndent(true);
@@ -4168,7 +4324,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       await languageMode.ready;
       await wait(0);
 
-      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+      spyOn(languageMode, 'suggestedIndentForBufferRows').and.callThrough();
 
       editor.setCursorBufferPosition([0, 15]);
       editor.transact(() => {
@@ -4214,9 +4370,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       await wait(0);
 
       expect(editor.getText()).toEqual(emptyClassText);
+
+      done();
     });
 
-    it('does not auto-indent if no change in a transaction wants auto-indentation', async () => {
+    it('does not auto-indent if no change in a transaction wants auto-indentation', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -4263,9 +4421,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       await wait(0);
 
       expect(editor.getText()).toEqual(emptyClassText);
+
+      done();
     });
 
-    it('auto-dedents exactly once and not after each new insertion on a line', async () => {
+    it('auto-dedents exactly once and not after each new insertion on a line', async (done) => {
       jasmine.useRealClock();
       editor.updateAutoIndent(true);
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
@@ -4300,9 +4460,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       editor.insertText(' ', { autoIndent: true });
       await languageMode.atTransactionEnd();
       expect(editor.lineTextForBufferRow(2)).toEqual(`    } `);
+
+      done();
     });
 
-    it('maintains indent level through multiple newlines (removeTrailingWhitespace: true)', async () => {
+    it('maintains indent level through multiple newlines (removeTrailingWhitespace: true)', async (done) => {
       jasmine.useRealClock();
       editor.updateAutoIndent(true);
       atom.config.set('whitespace.removeTrailingWhitespace', true);
@@ -4346,9 +4508,11 @@ describe('WASMTreeSitterLanguageMode', () => {
         await languageMode.atTransactionEnd();
         await wait(0);
         expect(editor.lineTextForBufferRow(4)).toEqual('  ');
+
+        done();
     });
 
-    it('does not attempt to adjust indent on pasted text without a newline', async () => {
+    it('does not attempt to adjust indent on pasted text without a newline', async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -4392,9 +4556,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       await wait(0);
 
       expect(editor.getText()).toEqual(emptyClassText);
+
+      done();
     });
 
-    it('maintains indent level through multiple newlines (removeTrailingWhitespace: false)', async () => {
+    it('maintains indent level through multiple newlines (removeTrailingWhitespace: false)', async (done) => {
       jasmine.useRealClock();
       editor.updateAutoIndent(true);
       atom.config.set('whitespace.removeTrailingWhitespace', false);
@@ -4438,9 +4604,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       await languageMode.atTransactionEnd();
       await wait(0);
       expect(editor.lineTextForBufferRow(4)).toEqual('  ');
+
+      done();
     });
 
-    it(`can indent properly in a multi-cursor environment without auto-indenting large ranges of the buffer`, async () => {
+    it(`can indent properly in a multi-cursor environment without auto-indenting large ranges of the buffer`, async (done) => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -4455,7 +4623,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       // Force this test to use async indent in all cases.
       languageMode.transactionReparseBudgetMs = 0;
       languageMode.currentTransactionReparseBudgetMs = 0;
-      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+      spyOn(languageMode, 'suggestedIndentForBufferRows').and.callThrough();
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
 
@@ -4496,6 +4664,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           return }
       `)
 
+      done();
     })
 
   });

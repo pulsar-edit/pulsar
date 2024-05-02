@@ -665,7 +665,7 @@ describe('WorkspaceElement', () => {
       );
     });
 
-    it('shows the toggle button when the dock is open', async () => {
+    it('shows the toggle button when the dock is open', async (done) => {
       await Promise.all([
         atom.workspace.open({
           element: document.createElement('div'),
@@ -835,6 +835,8 @@ describe('WorkspaceElement', () => {
       await getNextUpdatePromise();
       expect(bottomDock.isVisible()).toBe(true);
       expectToggleButtonVisible(bottomDock, 'icon-chevron-down');
+
+      done();
     });
 
     function moveMouse(coordinates) {
@@ -864,7 +866,7 @@ describe('WorkspaceElement', () => {
     it('has a class based on the style of the scrollbar', () => {
       let observeCallback;
       const scrollbarStyle = require('scrollbar-style');
-      spyOn(scrollbarStyle, 'observePreferredScrollbarStyle').andCallFake(
+      spyOn(scrollbarStyle, 'observePreferredScrollbarStyle').and.callFake(
         cb => {
           observeCallback = cb;
           return new Disposable(() => {});
@@ -883,52 +885,71 @@ describe('WorkspaceElement', () => {
   describe('editor font styling', () => {
     let editor, editorElement, workspaceElement;
 
-    beforeEach(async () => {
+    beforeEach(async (done) => {
       await atom.workspace.open('sample.js');
 
       workspaceElement = atom.workspace.getElement();
       jasmine.attachToDOM(workspaceElement);
       editor = atom.workspace.getActiveTextEditor();
       editorElement = editor.getElement();
+
+      done();
     });
 
-    it("updates the font-size based on the 'editor.fontSize' config value", async () => {
+    it("updates the font-size based on the 'editor.fontSize' config value", async (done) => {
       const initialCharWidth = editor.getDefaultCharWidth();
       expect(getComputedStyle(editorElement).fontSize).toBe(
         atom.config.get('editor.fontSize') + 'px'
       );
 
-      atom.config.set(
-        'editor.fontSize',
-        atom.config.get('editor.fontSize') + 5
-      );
-      await editorElement.component.getNextUpdatePromise();
+      await new Promise((resolve) => {
+        editorElement.component.getNextUpdatePromise().then(() => resolve());
+
+        atom.config.set(
+          'editor.fontSize',
+          atom.config.get('editor.fontSize') + 5
+        );
+      })
+
       expect(getComputedStyle(editorElement).fontSize).toBe(
         atom.config.get('editor.fontSize') + 'px'
       );
       expect(editor.getDefaultCharWidth()).toBeGreaterThan(initialCharWidth);
+
+      done();
     });
 
-    it("updates the font-family based on the 'editor.fontFamily' config value", async () => {
+    it("updates the font-family based on the 'editor.fontFamily' config value", async (done) => {
       const initialCharWidth = editor.getDefaultCharWidth();
       let fontFamily = atom.config.get('editor.fontFamily');
       expect(getComputedStyle(editorElement).fontFamily).toBe(fontFamily);
 
-      atom.config.set('editor.fontFamily', 'sans-serif');
+      await new Promise((resolve) => {
+        editorElement.component.getNextUpdatePromise().then(() => resolve());
+        atom.config.set('editor.fontFamily', 'sans-serif');
+      })
+
       fontFamily = atom.config.get('editor.fontFamily');
-      await editorElement.component.getNextUpdatePromise();
       expect(getComputedStyle(editorElement).fontFamily).toBe(fontFamily);
       expect(editor.getDefaultCharWidth()).not.toBe(initialCharWidth);
+
+      done();
     });
 
-    it("updates the line-height based on the 'editor.lineHeight' config value", async () => {
+    it("updates the line-height based on the 'editor.lineHeight' config value", async (done) => {
       const initialLineHeight = editor.getLineHeightInPixels();
-      atom.config.set('editor.lineHeight', '30px');
-      await editorElement.component.getNextUpdatePromise();
+
+      await new Promise((resolve) => {
+        editorElement.component.getNextUpdatePromise().then(() => resolve());
+        atom.config.set('editor.lineHeight', '30px');
+      });
+
       expect(getComputedStyle(editorElement).lineHeight).toBe(
         atom.config.get('editor.lineHeight')
       );
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
+
+      done();
     });
 
     it('increases or decreases the font size when a ctrl-mousewheel event occurs', () => {
@@ -1098,7 +1119,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[0], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
 
       // Active item doesn't implement ::getPath(). Use first project directory.
       const item = document.createElement('div');
@@ -1109,7 +1130,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[0], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
 
       // Active item has no path. Use first project directory.
       item.getPath = () => null;
@@ -1119,7 +1140,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[0], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
 
       // Active item has path. Use project path for item path.
       item.getPath = () => path.join(projectPaths[1], 'a-file.txt');
@@ -1129,7 +1150,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[1], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
     });
 
     it('passes additional options to the spec window', () => {

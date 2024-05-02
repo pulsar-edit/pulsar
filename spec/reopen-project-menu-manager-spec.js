@@ -18,17 +18,17 @@ describe('ReopenProjectMenuManager', () => {
 
   beforeEach(() => {
     menuManager = jasmine.createSpyObj('MenuManager', ['add']);
-    menuManager.add.andReturn(new Disposable());
+    menuManager.add.and.returnValue(new Disposable());
 
     commandRegistry = jasmine.createSpyObj('CommandRegistry', ['add']);
     commandDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
-    commandRegistry.add.andReturn(commandDisposable);
+    commandRegistry.add.and.returnValue(commandDisposable);
 
     config = jasmine.createSpyObj('Config', ['onDidChange', 'get']);
-    config.get.andReturn(10);
+    config.get.and.returnValue(10);
     configDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
     config.didChangeListener = {};
-    config.onDidChange.andCallFake((key, fn) => {
+    config.onDidChange.and.callFake((key, fn) => {
       config.didChangeListener[key] = fn;
       return configDisposable;
     });
@@ -37,9 +37,9 @@ describe('ReopenProjectMenuManager', () => {
       'getProjects',
       'onDidChangeProjects'
     ]);
-    historyManager.getProjects.andReturn([]);
+    historyManager.getProjects.and.returnValue([]);
     historyDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
-    historyManager.onDidChangeProjects.andCallFake(fn => {
+    historyManager.onDidChangeProjects.and.callFake(fn => {
       historyManager.changeProjectsListener = fn;
       return historyDisposable;
     });
@@ -57,7 +57,7 @@ describe('ReopenProjectMenuManager', () => {
   describe('constructor', () => {
     it("registers the 'reopen-project' command function", () => {
       expect(commandRegistry.add).toHaveBeenCalled();
-      const cmdCall = commandRegistry.add.calls[0];
+      const cmdCall = commandRegistry.add.calls.all()[0];
       expect(cmdCall.args.length).toBe(2);
       expect(cmdCall.args[0]).toBe('atom-workspace');
       expect(typeof cmdCall.args[1]['application:reopen-project']).toBe(
@@ -76,7 +76,7 @@ describe('ReopenProjectMenuManager', () => {
 
     it('disposes of the menu disposable once used', () => {
       const menuDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
-      menuManager.add.andReturn(menuDisposable);
+      menuManager.add.and.returnValue(menuDisposable);
       reopenProjects.update();
       expect(menuDisposable.dispose).not.toHaveBeenCalled();
       reopenProjects.dispose();
@@ -86,23 +86,23 @@ describe('ReopenProjectMenuManager', () => {
 
   describe('the command', () => {
     it('calls open with the paths of the project specified by the detail index', () => {
-      historyManager.getProjects.andReturn([
+      historyManager.getProjects.and.returnValue([
         { paths: ['/a'] },
         { paths: ['/b', 'c:\\'] }
       ]);
       reopenProjects.update();
 
       const reopenProjectCommand =
-        commandRegistry.add.calls[0].args[1]['application:reopen-project'];
+        commandRegistry.add.calls.all()[0].args[1]['application:reopen-project'];
       reopenProjectCommand({ detail: { index: 1 } });
 
       expect(openFunction).toHaveBeenCalled();
-      expect(openFunction.calls[0].args[0]).toEqual(['/b', 'c:\\']);
+      expect(openFunction.calls.all()[0].args[0]).toEqual(['/b', 'c:\\']);
     });
 
     it('does not call open when no command detail is supplied', () => {
       const reopenProjectCommand =
-        commandRegistry.add.calls[0].args[1]['application:reopen-project'];
+        commandRegistry.add.calls.all()[0].args[1]['application:reopen-project'];
       reopenProjectCommand({});
 
       expect(openFunction).not.toHaveBeenCalled();
@@ -110,7 +110,7 @@ describe('ReopenProjectMenuManager', () => {
 
     it('does not call open when no command detail index is supplied', () => {
       const reopenProjectCommand =
-        commandRegistry.add.calls[0].args[1]['application:reopen-project'];
+        commandRegistry.add.calls.all()[0].args[1]['application:reopen-project'];
       reopenProjectCommand({ detail: { anything: 'here' } });
 
       expect(openFunction).not.toHaveBeenCalled();
@@ -119,14 +119,14 @@ describe('ReopenProjectMenuManager', () => {
 
   describe('update', () => {
     it('adds menu items to MenuManager based on projects from HistoryManager', () => {
-      historyManager.getProjects.andReturn([
+      historyManager.getProjects.and.returnValue([
         { paths: ['/a'] },
         { paths: ['/b', 'c:\\'] }
       ]);
       reopenProjects.update();
       expect(historyManager.getProjects).toHaveBeenCalled();
       expect(menuManager.add).toHaveBeenCalled();
-      const menuArg = menuManager.add.calls[0].args[0];
+      const menuArg = menuManager.add.calls.all()[0].args[0];
       expect(menuArg.length).toBe(1);
       expect(menuArg[0].label).toBe('File');
       expect(menuArg[0].submenu.length).toBe(1);
@@ -146,12 +146,12 @@ describe('ReopenProjectMenuManager', () => {
     });
 
     it("adds only the number of menu items specified in the 'core.reopenProjectMenuCount' config", () => {
-      historyManager.getProjects.andReturn(
+      historyManager.getProjects.and.returnValue(
         numberRange(1, 100).map(i => ({ paths: ['/test/' + i] }))
       );
       reopenProjects.update();
       expect(menuManager.add).toHaveBeenCalled();
-      const menu = menuManager.add.calls[0].args[0][0];
+      const menu = menuManager.add.calls.all()[0].args[0][0];
       expect(menu.label).toBe('File');
       expect(menu.submenu.length).toBe(1);
       expect(menu.submenu[0].label).toBe('Reopen Project');
@@ -160,7 +160,7 @@ describe('ReopenProjectMenuManager', () => {
 
     it('disposes the previously menu built', () => {
       const menuDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
-      menuManager.add.andReturn(menuDisposable);
+      menuManager.add.and.returnValue(menuDisposable);
       reopenProjects.update();
       expect(menuDisposable.dispose).not.toHaveBeenCalled();
       reopenProjects.update();
@@ -168,17 +168,17 @@ describe('ReopenProjectMenuManager', () => {
     });
 
     it("is called when the Config changes for 'core.reopenProjectMenuCount'", () => {
-      historyManager.getProjects.andReturn(
+      historyManager.getProjects.and.returnValue(
         numberRange(1, 100).map(i => ({ paths: ['/test/' + i] }))
       );
       reopenProjects.update();
-      config.get.andReturn(25);
+      config.get.and.returnValue(25);
       config.didChangeListener['core.reopenProjectMenuCount']({
         oldValue: 10,
         newValue: 25
       });
 
-      const finalArgs = menuManager.add.calls[1].args[0];
+      const finalArgs = menuManager.add.calls.all()[1].args[0];
       const projectsMenu = finalArgs[0].submenu[0].submenu;
 
       expect(projectsMenu.length).toBe(25);
@@ -186,14 +186,14 @@ describe('ReopenProjectMenuManager', () => {
 
     it("is called when the HistoryManager's projects change", () => {
       reopenProjects.update();
-      historyManager.getProjects.andReturn([
+      historyManager.getProjects.and.returnValue([
         { paths: ['/a'] },
         { paths: ['/b', 'c:\\'] }
       ]);
       historyManager.changeProjectsListener();
-      expect(menuManager.add.calls.length).toBe(2);
+      expect(menuManager.add.calls.count()).toBe(2);
 
-      const finalArgs = menuManager.add.calls[1].args[0];
+      const finalArgs = menuManager.add.calls.all()[1].args[0];
       const projectsMenu = finalArgs[0].submenu[0];
 
       const first = projectsMenu.submenu[0];
@@ -278,19 +278,19 @@ describe('ReopenProjectMenuManager', () => {
       });
 
       it('returns the standard base name for a relative Windows path', () => {
-        if (process.platform === 'win32') {
-          const name = ReopenProjectMenuManager.betterBaseName('.\\one\\two');
-          expect(name).toBe('two');
-        }
+        jasmine.filterByPlatform({only: ['win32']});
+
+        const name = ReopenProjectMenuManager.betterBaseName('.\\one\\two');
+        expect(name).toBe('two');
       });
 
       it('returns the standard base name for an absolute Windows path', () => {
-        if (process.platform === 'win32') {
-          const name = ReopenProjectMenuManager.betterBaseName(
-            'c:\\missions\\apollo\\11'
-          );
-          expect(name).toBe('11');
-        }
+        jasmine.filterByPlatform({only: ['win32']});
+
+        const name = ReopenProjectMenuManager.betterBaseName(
+          'c:\\missions\\apollo\\11'
+        );
+        expect(name).toBe('11');
       });
 
       it('returns the drive root for a Windows drive name', () => {

@@ -11,7 +11,7 @@ describe('URIHandlerRegistry', () => {
     registry = new URIHandlerRegistry(5);
   });
 
-  it('handles URIs on a per-host basis', async () => {
+  it('handles URIs on a per-host basis', async (done) => {
     const testPackageSpy = jasmine.createSpy();
     const otherPackageSpy = jasmine.createSpy();
     registry.registerHostHandler('test-package', testPackageSpy);
@@ -33,9 +33,11 @@ describe('URIHandlerRegistry', () => {
       url.parse('atom://other-package/path', true),
       'atom://other-package/path'
     );
+
+    done();
   });
 
-  it('keeps track of the most recent URIs', async () => {
+  it('keeps track of the most recent URIs', async (done) => {
     const spy1 = jasmine.createSpy();
     const spy2 = jasmine.createSpy();
     const changeSpy = jasmine.createSpy();
@@ -55,7 +57,7 @@ describe('URIHandlerRegistry', () => {
       await registry.handleURI(u);
     }
 
-    expect(changeSpy.callCount).toBe(5);
+    expect(changeSpy.calls.count()).toBe(5);
     expect(registry.getRecentlyHandledURIs()).toEqual(
       uris
         .map((u, idx) => {
@@ -70,14 +72,16 @@ describe('URIHandlerRegistry', () => {
     );
 
     await registry.handleURI('atom://another/url');
-    expect(changeSpy.callCount).toBe(6);
+    expect(changeSpy.calls.count()).toBe(6);
     const history = registry.getRecentlyHandledURIs();
     expect(history.length).toBe(5);
     expect(history[0].uri).toBe('atom://another/url');
     expect(history[4].uri).toBe(uris[1]);
+
+    done();
   });
 
-  it('refuses to handle bad URLs', async () => {
+  it('refuses to handle bad URLs', async (done) => {
     const invalidUris = [
       'atom:package/path',
       'atom:8080://package/path',
@@ -96,5 +100,7 @@ describe('URIHandlerRegistry', () => {
     }
 
     expect(numErrors).toBe(invalidUris.length);
+
+    done();
   });
 });

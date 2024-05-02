@@ -9,7 +9,7 @@ describe('WindowEventHandler', () => {
     atom.uninstallWindowEventHandler();
     spyOn(atom, 'hide');
     const initialPath = atom.project.getPaths()[0];
-    spyOn(atom, 'getLoadSettings').andCallFake(() => {
+    spyOn(atom, 'getLoadSettings').and.callFake(() => {
       const loadSettings = atom.getLoadSettings.originalValue.call(atom);
       loadSettings.initialPath = initialPath;
       return loadSettings;
@@ -29,9 +29,7 @@ describe('WindowEventHandler', () => {
 
   describe('when the window is loaded', () =>
     it("doesn't have .is-blurred on the body tag", () => {
-      if (process.platform === 'win32') {
-        return;
-      } // Win32TestFailures - can not steal focus
+      jasmine.filterByPlatform({except: ['win32']}); // Win32TestFailures - can not steal focus
       expect(document.body.className).not.toMatch('is-blurred');
     }));
 
@@ -51,13 +49,13 @@ describe('WindowEventHandler', () => {
   });
 
   describe('resize event', () =>
-    it('calls storeWindowDimensions', async () => {
+    it('calls storeWindowDimensions', async (done) => {
       jasmine.useRealClock();
 
-      spyOn(atom, 'storeWindowDimensions');
+      spyOn(atom, 'storeWindowDimensions').and.callFake(() => {
+        done();
+      });
       window.dispatchEvent(new CustomEvent('resize'));
-
-      await conditionPromise(() => atom.storeWindowDimensions.callCount > 0);
     }));
 
   describe('window:close event', () =>
@@ -85,19 +83,19 @@ describe('WindowEventHandler', () => {
 
       windowEventHandler.handleLinkClick(fakeEvent);
       expect(shell.openExternal).toHaveBeenCalled();
-      expect(shell.openExternal.argsForCall[0][0]).toBe('http://github.com');
-      shell.openExternal.reset();
+      expect(shell.openExternal.calls.argsFor(0)[0]).toBe('http://github.com');
+      shell.openExternal.calls.reset();
 
       link.href = 'https://github.com';
       windowEventHandler.handleLinkClick(fakeEvent);
       expect(shell.openExternal).toHaveBeenCalled();
-      expect(shell.openExternal.argsForCall[0][0]).toBe('https://github.com');
-      shell.openExternal.reset();
+      expect(shell.openExternal.calls.argsFor(0)[0]).toBe('https://github.com');
+      shell.openExternal.calls.reset();
 
       link.href = '';
       windowEventHandler.handleLinkClick(fakeEvent);
       expect(shell.openExternal).not.toHaveBeenCalled();
-      shell.openExternal.reset();
+      shell.openExternal.calls.reset();
 
       link.href = '#scroll-me';
       windowEventHandler.handleLinkClick(fakeEvent);
@@ -122,7 +120,7 @@ describe('WindowEventHandler', () => {
 
       windowEventHandler.handleLinkClick(fakeEvent);
       expect(uriHandler.handleURI).toHaveBeenCalled();
-      expect(uriHandler.handleURI.argsForCall[0][0]).toBe('atom://github.com');
+      expect(uriHandler.handleURI.calls.argsFor(0)[0]).toBe('atom://github.com');
     });
   });
 
@@ -263,7 +261,7 @@ describe('WindowEventHandler', () => {
         'copy',
         'paste'
       ]);
-      spyOn(atom.applicationDelegate, 'getCurrentWindow').andReturn({
+      spyOn(atom.applicationDelegate, 'getCurrentWindow').and.returnValue({
         webContents: webContentsSpy,
         on: () => {}
       });
@@ -279,8 +277,8 @@ describe('WindowEventHandler', () => {
       expect(webContentsSpy.copy).toHaveBeenCalled();
       expect(webContentsSpy.paste).toHaveBeenCalled();
 
-      webContentsSpy.copy.reset();
-      webContentsSpy.paste.reset();
+      webContentsSpy.copy.calls.reset();
+      webContentsSpy.paste.calls.reset();
 
       const normalInput = document.createElement('input');
       jasmine.attachToDOM(normalInput);

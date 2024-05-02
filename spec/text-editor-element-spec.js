@@ -70,7 +70,7 @@ describe('TextEditorElement', () => {
     expect(element.getModel().isLineNumberGutterVisible()).toBe(false);
   });
 
-  it("honors the 'readonly' attribute", async function() {
+  it("honors the 'readonly' attribute", async function(done) {
     jasmineContent.innerHTML = '<atom-text-editor readonly>';
     const element = jasmineContent.firstChild;
 
@@ -81,6 +81,8 @@ describe('TextEditorElement', () => {
 
     element.setAttribute('readonly', true);
     expect(element.getComponent().isInputEnabled()).toBe(false);
+
+    done();
   });
 
   it('honors the text content', () => {
@@ -106,11 +108,13 @@ describe('TextEditorElement', () => {
   });
 
   describe('when the model is assigned', () =>
-    it("adds the 'mini' attribute if .isMini() returns true on the model", async () => {
+    it("adds the 'mini' attribute if .isMini() returns true on the model", async (done) => {
       const element = buildTextEditorElement();
       element.getModel().update({ mini: true });
       await atom.views.getNextUpdatePromise();
       expect(element.hasAttribute('mini')).toBe(true);
+
+      done();
     }));
 
   describe('when the editor is attached to the DOM', () =>
@@ -270,7 +274,7 @@ describe('TextEditorElement', () => {
     });
 
     describe('when the element already has an editor', () => {
-      it('unbinds it and then swaps it with the supplied one', async () => {
+      it('unbinds it and then swaps it with the supplied one', async (done) => {
         const element = buildTextEditorElement({ attach: true });
         const previousEditor = element.getModel();
         expect(previousEditor.element).toBe(element);
@@ -280,6 +284,8 @@ describe('TextEditorElement', () => {
         expect(previousEditor.element).not.toBe(element);
         expect(newEditor.element).toBe(element);
         expect(element.getModel()).toBe(newEditor);
+
+        done();
       });
     });
   });
@@ -298,7 +304,7 @@ describe('TextEditorElement', () => {
       expect(attachedCallback).toHaveBeenCalled();
       expect(detachedCallback).not.toHaveBeenCalled();
 
-      attachedCallback.reset();
+      attachedCallback.calls.reset();
       element.remove();
 
       expect(attachedCallback).not.toHaveBeenCalled();
@@ -307,7 +313,7 @@ describe('TextEditorElement', () => {
 
   describe('::setUpdatedSynchronously', () => {
     it('controls whether the text editor is updated synchronously', () => {
-      spyOn(window, 'requestAnimationFrame').andCallFake(fn => fn());
+      spyOn(window, 'requestAnimationFrame').and.callFake(fn => fn());
 
       const element = buildTextEditorElement();
 
@@ -318,7 +324,7 @@ describe('TextEditorElement', () => {
 
       expect(element.textContent).toContain('hello');
 
-      window.requestAnimationFrame.reset();
+      window.requestAnimationFrame.calls.reset();
       element.setUpdatedSynchronously(true);
       element.getModel().setText('goodbye');
       expect(window.requestAnimationFrame).not.toHaveBeenCalled();
@@ -340,7 +346,7 @@ describe('TextEditorElement', () => {
   });
 
   describe('::getMaxScrollTop', () =>
-    it('returns the maximum scroll top that can be applied to the element', async () => {
+    it('returns the maximum scroll top that can be applied to the element', async (done) => {
       const editor = new TextEditor();
       editor.setText('1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16');
       const element = editor.getElement();
@@ -364,10 +370,12 @@ describe('TextEditorElement', () => {
       element.style.height = 200 + horizontalScrollbarHeight + 'px';
       await element.getNextUpdatePromise();
       expect(element.getMaxScrollTop()).toBe(0);
+
+      done();
     }));
 
   describe('::setScrollTop and ::setScrollLeft', () => {
-    it('changes the scroll position', async () => {
+    it('changes the scroll position', async (done) => {
       const element = buildTextEditorElement();
       element.getModel().update({ autoHeight: false });
       element.getModel().setText('lorem\nipsum\ndolor\nsit\namet');
@@ -383,11 +391,13 @@ describe('TextEditorElement', () => {
       element.setScrollLeft(32);
       await element.getNextUpdatePromise();
       expect(element.getScrollLeft()).toBe(32);
+
+      done();
     });
   });
 
   describe('on TextEditor::setMini', () =>
-    it("changes the element's 'mini' attribute", async () => {
+    it("changes the element's 'mini' attribute", async (done) => {
       const element = buildTextEditorElement();
       expect(element.hasAttribute('mini')).toBe(false);
       element.getModel().setMini(true);
@@ -396,10 +406,12 @@ describe('TextEditorElement', () => {
       element.getModel().setMini(false);
       await element.getNextUpdatePromise();
       expect(element.hasAttribute('mini')).toBe(false);
+
+      done();
     }));
 
   describe('::intersectsVisibleRowRange(start, end)', () => {
-    it('returns true if the given row range intersects the visible row range', async () => {
+    it('returns true if the given row range intersects the visible row range', async (done) => {
       const element = buildTextEditorElement();
       const editor = element.getModel();
       const horizontalScrollbarHeight = element.component.getHorizontalScrollbarHeight();
@@ -418,11 +430,13 @@ describe('TextEditorElement', () => {
       expect(element.intersectsVisibleRowRange(5, 8)).toBe(true);
       expect(element.intersectsVisibleRowRange(11, 12)).toBe(false);
       expect(element.intersectsVisibleRowRange(12, 13)).toBe(false);
+
+      done();
     });
   });
 
   describe('::pixelRectForScreenRange(range)', () => {
-    it('returns a {top/left/width/height} object describing the rectangle between two screen positions, even if they are not on screen', async () => {
+    it('returns a {top/left/width/height} object describing the rectangle between two screen positions, even if they are not on screen', async (done) => {
       const element = buildTextEditorElement();
       const editor = element.getModel();
       const horizontalScrollbarHeight = element.component.getHorizontalScrollbarHeight();
@@ -448,13 +462,15 @@ describe('TextEditorElement', () => {
         bottom + editor.getLineHeightInPixels() - top
       );
       expect(pixelRect.width).toBeNear(right - left);
+
+      done();
     });
   });
 
   describe('events', () => {
     let element = null;
 
-    beforeEach(async () => {
+    beforeEach(async (done) => {
       element = buildTextEditorElement();
       element.getModel().update({ autoHeight: false });
       element.getModel().setText('lorem\nipsum\ndolor\nsit\namet');
@@ -462,6 +478,8 @@ describe('TextEditorElement', () => {
       await element.getNextUpdatePromise();
       element.setWidth(20);
       await element.getNextUpdatePromise();
+
+      done();
     });
 
     describe('::onDidChangeScrollTop(callback)', () =>

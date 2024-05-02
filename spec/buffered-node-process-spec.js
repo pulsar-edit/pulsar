@@ -3,8 +3,7 @@ const path = require('path');
 const BufferedNodeProcess = require('../src/buffered-node-process');
 
 describe('BufferedNodeProcess', function() {
-  it('executes the script in a new process', function() {
-    const exit = jasmine.createSpy('exitCallback');
+  it('executes the script in a new process', async function(done) {
     let output = '';
     const stdout = lines => (output += lines);
     let error = '';
@@ -12,18 +11,18 @@ describe('BufferedNodeProcess', function() {
     const args = ['hi'];
     const command = path.join(__dirname, 'fixtures', 'script.js');
 
-    new BufferedNodeProcess({ command, args, stdout, stderr, exit });
+    await new Promise((resolve) => {
+      new BufferedNodeProcess({ command, args, stdout, stderr, exit: resolve });
+    })
 
-    waitsFor(() => exit.callCount === 1);
+    expect(output).toBe('hi');
+    expect(error).toBe('');
+    expect(args).toEqual(['hi']);
 
-    runs(function() {
-      expect(output).toBe('hi');
-      expect(error).toBe('');
-      expect(args).toEqual(['hi']);
-    });
+    done();
   });
 
-  it('suppresses deprecations in the new process', function() {
+  it('suppresses deprecations in the new process', async function(done) {
     const exit = jasmine.createSpy('exitCallback');
     let output = '';
     const stdout = lines => (output += lines);
@@ -35,13 +34,13 @@ describe('BufferedNodeProcess', function() {
       'script-with-deprecations.js'
     );
 
-    new BufferedNodeProcess({ command, stdout, stderr, exit });
+    await new Promise((resolve) => {
+      new BufferedNodeProcess({ command, stdout, stderr, exit: resolve });
+    })
 
-    waitsFor(() => exit.callCount === 1);
+    expect(output).toBe('hi');
+    expect(error).toBe('');
 
-    runs(function() {
-      expect(output).toBe('hi');
-      expect(error).toBe('');
-    });
+    done();
   });
 });

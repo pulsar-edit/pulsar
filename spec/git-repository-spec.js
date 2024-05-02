@@ -148,21 +148,21 @@ describe('GitRepository', () => {
       const statusHandler = jasmine.createSpy('statusHandler');
       repo.onDidChangeStatus(statusHandler);
       repo.checkoutHead(filePath);
-      expect(statusHandler.callCount).toBe(1);
-      expect(statusHandler.argsForCall[0][0]).toEqual({
+      expect(statusHandler.calls.count()).toBe(1);
+      expect(statusHandler.calls.argsFor(0)[0]).toEqual({
         path: filePath,
         pathStatus: 0
       });
 
       repo.checkoutHead(filePath);
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
     });
   });
 
   describe('.checkoutHeadForEditor(editor)', () => {
     let filePath, editor;
 
-    beforeEach(async () => {
+    beforeEach(async (done) => {
       spyOn(atom, 'confirm');
 
       const workingDirPath = copyRepository();
@@ -175,13 +175,14 @@ describe('GitRepository', () => {
       fs.writeFileSync(filePath, 'ch ch changes');
 
       editor = await atom.workspace.open(filePath);
+
+      done();
     });
 
     it('displays a confirmation dialog by default', () => {
-      // Permissions issues with this test on Windows
-      if (process.platform === 'win32') return;
+      jasmine.filterByPlatform({except: ['win32']}); // Permissions issues with this test on Windows
 
-      atom.confirm.andCallFake(({ buttons }) => buttons.OK());
+      atom.confirm.and.callFake(({ buttons }) => buttons.OK());
       atom.config.set('editor.confirmCheckoutHeadRevision', true);
 
       repo.checkoutHeadForEditor(editor);
@@ -190,8 +191,8 @@ describe('GitRepository', () => {
     });
 
     it('does not display a dialog when confirmation is disabled', () => {
-      // Flakey EPERM opening a.txt on Win32
-      if (process.platform === 'win32') return;
+      jasmine.filterByPlatform({except: ['win32']}); // Flakey EPERM opening a.txt on Win32
+
       atom.config.set('editor.confirmCheckoutHeadRevision', false);
 
       repo.checkoutHeadForEditor(editor);
@@ -225,15 +226,15 @@ describe('GitRepository', () => {
       repo.onDidChangeStatus(statusHandler);
       fs.writeFileSync(filePath, '');
       let status = repo.getPathStatus(filePath);
-      expect(statusHandler.callCount).toBe(1);
-      expect(statusHandler.argsForCall[0][0]).toEqual({
+      expect(statusHandler.calls.count()).toBe(1);
+      expect(statusHandler.calls.argsFor(0)[0]).toEqual({
         path: filePath,
         pathStatus: status
       });
 
       fs.writeFileSync(filePath, 'abc');
       status = repo.getPathStatus(filePath);
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
     });
   });
 
@@ -276,21 +277,23 @@ describe('GitRepository', () => {
       newPath = fs.absolute(newPath);
     });
 
-    it('returns status information for all new and modified files', async () => {
+    it('returns status information for all new and modified files', async (done) => {
       const statusHandler = jasmine.createSpy('statusHandler');
       repo.onDidChangeStatuses(statusHandler);
       fs.writeFileSync(modifiedPath, 'making this path modified');
 
       await repo.refreshStatus();
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
       expect(repo.getCachedPathStatus(cleanPath)).toBeUndefined();
       expect(repo.isStatusNew(repo.getCachedPathStatus(newPath))).toBeTruthy();
       expect(
         repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))
       ).toBeTruthy();
+
+      done();
     });
 
-    it('caches the proper statuses when a subdir is open', async () => {
+    it('caches the proper statuses when a subdir is open', async (done) => {
       const subDir = path.join(workingDirectory, 'dir');
       fs.mkdirSync(subDir);
       const filePath = path.join(subDir, 'b.txt');
@@ -303,9 +306,11 @@ describe('GitRepository', () => {
       const status = repo.getCachedPathStatus(filePath);
       expect(repo.isStatusModified(status)).toBe(false);
       expect(repo.isStatusNew(status)).toBe(false);
+
+      done();
     });
 
-    it('works correctly when the project has multiple folders (regression)', async () => {
+    it('works correctly when the project has multiple folders (regression)', async (done) => {
       atom.project.addPath(workingDirectory);
       atom.project.addPath(path.join(__dirname, 'fixtures', 'dir'));
 
@@ -315,9 +320,11 @@ describe('GitRepository', () => {
       expect(
         repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))
       ).toBeTruthy();
+
+      done();
     });
 
-    it('caches statuses that were looked up synchronously', async () => {
+    it('caches statuses that were looked up synchronously', async (done) => {
       const originalContent = 'undefined';
       fs.writeFileSync(modifiedPath, 'making this path modified');
       repo.getPathStatus('file.txt');
@@ -327,50 +334,58 @@ describe('GitRepository', () => {
       expect(
         repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))
       ).toBeFalsy();
+
+      done();
     });
   });
 
   describe('buffer events', () => {
     let editor;
 
-    beforeEach(async () => {
+    beforeEach(async (done) => {
       atom.project.setPaths([copyRepository()]);
       const refreshPromise = new Promise(resolve =>
         atom.project.getRepositories()[0].onDidChangeStatuses(resolve)
       );
       editor = await atom.workspace.open('other.txt');
       await refreshPromise;
+
+      done();
     });
 
-    it('emits a status-changed event when a buffer is saved', async () => {
+    it('emits a status-changed event when a buffer is saved', async (done) => {
       editor.insertNewline();
 
       const statusHandler = jasmine.createSpy('statusHandler');
       atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
 
       await editor.save();
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: editor.getPath(),
         pathStatus: 256
       });
+
+      done();
     });
 
-    it('emits a status-changed event when a buffer is reloaded', async () => {
+    it('emits a status-changed event when a buffer is reloaded', async (done) => {
       fs.writeFileSync(editor.getPath(), 'changed');
 
       const statusHandler = jasmine.createSpy('statusHandler');
       atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
 
       await editor.getBuffer().reload();
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: editor.getPath(),
         pathStatus: 256
       });
 
       await editor.getBuffer().reload();
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
+
+      done();
     });
 
     it("emits a status-changed event when a buffer's path changes", () => {
@@ -379,13 +394,13 @@ describe('GitRepository', () => {
       const statusHandler = jasmine.createSpy('statusHandler');
       atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
       editor.getBuffer().emitter.emit('did-change-path');
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: editor.getPath(),
         pathStatus: 256
       });
       editor.getBuffer().emitter.emit('did-change-path');
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
     });
 
     it('stops listening to the buffer when the repository is destroyed (regression)', () => {
@@ -401,7 +416,7 @@ describe('GitRepository', () => {
       if (project2) project2.destroy();
     });
 
-    it('subscribes to all the serialized buffers in the project', async () => {
+    it('subscribes to all the serialized buffers in the project', async (done) => {
       atom.project.setPaths([copyRepository()]);
 
       await atom.workspace.open('file.txt');
@@ -424,11 +439,13 @@ describe('GitRepository', () => {
       project2.getRepositories()[0].onDidChangeStatus(statusHandler);
       await buffer.save();
 
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: buffer.getPath(),
         pathStatus: 256
       });
+
+      done();
     });
   });
 });

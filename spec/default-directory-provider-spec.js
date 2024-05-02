@@ -33,7 +33,9 @@ describe('DefaultDirectoryProvider', function() {
       expect(directory.getPath()).toEqual(tmp);
     });
 
-    it('normalizes disk drive letter in path on #win32', function() {
+    it('normalizes disk drive letter in path on win32', function() {
+      jasmine.filterByPlatform({only: ['win32']});
+
       const provider = new DefaultDirectoryProvider();
       const nonNormalizedPath = tmp[0].toLowerCase() + tmp.slice(1);
       expect(tmp).not.toMatch(/^[a-z]:/);
@@ -61,13 +63,12 @@ describe('DefaultDirectoryProvider', function() {
   });
 
   describe('.directoryForURI(uri)', () =>
-    it('returns a Promise that resolves to a Directory with a path that matches the uri', function() {
+    it('returns a Promise that resolves to a Directory with a path that matches the uri', async function(done) {
       const provider = new DefaultDirectoryProvider();
 
-      waitsForPromise(() =>
-        provider
-          .directoryForURI(tmp)
-          .then(directory => expect(directory.getPath()).toEqual(tmp))
-      );
+      let directory = await provider.directoryForURI(tmp);
+      expect(directory.getPath()).toEqual(tmp);
+
+      done();
     }));
 });

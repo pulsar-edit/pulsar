@@ -49,7 +49,7 @@ describe('TreeIndenter', () => {
   let editor, buffer, grammar;
   let languageMode, treeIndenter;
 
-  beforeEach(async () => {
+  beforeEach(async (done) => {
     editor = await atom.workspace.open('');
     buffer = editor.getBuffer();
     editor.displayLayer.reset({ foldCharacter: '…' });
@@ -57,6 +57,8 @@ describe('TreeIndenter', () => {
     grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
       parser: 'tree-sitter-javascript'
     });
+
+    done();
   });
 
   /** load a file from disk and verify that our proposed indentation
