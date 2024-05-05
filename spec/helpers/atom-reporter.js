@@ -12,8 +12,8 @@ const path = require('path');
 const process = require('process');
 const _ = require('underscore-plus');
 const grim = require('grim');
-const listen = require('../src/delegated-listener');
-const ipcHelpers = require('../src/ipc-helpers');
+const listen = require('../../src/delegated-listener');
+const ipcHelpers = require('../../src/ipc-helpers');
 
 const formatStackTrace = function(spec, message, stackTrace) {
   if (message == null) { message = ''; }

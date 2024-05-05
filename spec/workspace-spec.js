@@ -5,12 +5,12 @@ const TextBuffer = require('text-buffer');
 const TextEditor = require('../src/text-editor');
 const Workspace = require('../src/workspace');
 const Project = require('../src/project');
-const platform = require('./spec-helper-platform');
+const platform = require('./helpers/platform');
 const _ = require('underscore-plus');
 const fstream = require('fstream');
 const fs = require('fs-plus');
 const AtomEnvironment = require('../src/atom-environment');
-const { conditionPromise } = require('./async-spec-helpers');
+const { conditionPromise } = require('./helpers/async-spec-helpers');
 
 describe('Workspace', () => {
   let workspace;

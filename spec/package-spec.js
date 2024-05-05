@@ -1,7 +1,7 @@
 const path = require('path');
 const Package = require('../src/package');
 const ThemePackage = require('../src/theme-package');
-const { mockLocalStorage } = require('./spec-helper');
+const { mockLocalStorage } = require('./helpers/jasmine1-spec-helper');
 
 describe('Package', function() {
   const build = (constructor, packagePath) =>

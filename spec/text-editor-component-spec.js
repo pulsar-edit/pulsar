@@ -1,4 +1,4 @@
-const { conditionPromise } = require('./async-spec-helpers');
+const { conditionPromise } = require('./helpers/async-spec-helpers');
 
 const Random = require('random-seed');
 const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
