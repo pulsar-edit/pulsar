@@ -61,11 +61,8 @@ let options = {
 
     // Core Repo Test Inclusions
     "spec/jasmine-test-runner.js",
-    "spec/spec-helper.js",
-    "spec/jasmine-junit-reporter.js",
-    "spec/spec-helper-functions.js",
-    "spec/atom-reporter.js",
-    "spec/jasmine-list-reporter.js",
+    "spec/helpers/**/*",
+    "spec/runners/**/*",
 
     // --- Exclusions ---
     // Core Repo Exclusions

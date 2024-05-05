@@ -14,7 +14,7 @@ module.exports = {
   // Returns nothing.
   generateEvilFiles() {
     let filenames;
-    const evilFilesPath = path.join(__dirname, 'fixtures', 'evil-files');
+    const evilFilesPath = path.join(__dirname, '..', 'fixtures', 'evil-files');
     if (fs.existsSync(evilFilesPath)) {
       fs.removeSync(evilFilesPath);
     }
