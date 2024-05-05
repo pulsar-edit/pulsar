@@ -6,7 +6,7 @@ const temp = require('temp').track();
 const fs = require('fs-plus');
 const { Disposable } = require('atom');
 const { buildKeydownEvent } = require('../src/keymap-extensions');
-const { mockLocalStorage } = require('./spec-helper');
+const { mockLocalStorage } = require('./helpers/jasmine1-spec-helper');
 const ModuleCache = require('../src/module-cache');
 
 describe('PackageManager', () => {
