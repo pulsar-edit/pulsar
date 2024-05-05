@@ -46,6 +46,7 @@ function normalizeTreeSitterTextData(editor, commentRegex) {
   })
 }
 exports.normalizeTreeSitterTextData = normalizeTreeSitterTextData;
+window.normalizeTreeSitterTextData = normalizeTreeSitterTextData
 
 async function openDocument(fullPath) {
   const editor = await atom.workspace.open(fullPath);
@@ -83,6 +84,7 @@ async function runGrammarTests(fullPath, commentRegex) {
   })
 }
 exports.runGrammarTests = runGrammarTests;
+window.runGrammarTests = runGrammarTests;
 
 async function runFoldsTests(fullPath, commentRegex) {
   const editor = await openDocument(fullPath);
@@ -136,3 +138,4 @@ async function runFoldsTests(fullPath, commentRegex) {
   }
 }
 exports.runFoldsTests = runFoldsTests;
+window.runFoldsTests = runFoldsTests;
