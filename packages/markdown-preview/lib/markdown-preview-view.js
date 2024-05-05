@@ -448,6 +448,7 @@ module.exports = class MarkdownPreviewView {
 
   showError(result) {
     this.element.textContent = ''
+    this.element.classList.remove('loading')
     const h2 = document.createElement('h2')
     h2.textContent = 'Previewing Markdown Failed'
     this.element.appendChild(h2)
