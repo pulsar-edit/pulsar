@@ -1750,37 +1750,60 @@ module.exports = class AtomApplication extends EventEmitter {
   }
 
   resolveTestRunnerPath(testPath) {
-    let packageRoot;
-    if (FindParentDir == null) {
-      FindParentDir = require('find-parent-dir');
+    FindParentDir ||= require('find-parent-dir');
+
+    let packageRoot = FindParentDir.sync(testPath, 'package.json');
+
+    if (!packageRoot) {
+      process.stderr.write('Error: Could not find root directory');
+      process.exit(1);
     }
 
-    if ((packageRoot = FindParentDir.sync(testPath, 'package.json'))) {
-      const packageMetadata = require(path.join(packageRoot, 'package.json'));
-      if (packageMetadata.atomTestRunner) {
-        let testRunnerPath;
-        if (Resolve == null) {
-          Resolve = require('resolve');
-        }
-        if (
-          (testRunnerPath = Resolve.sync(packageMetadata.atomTestRunner, {
-            basedir: packageRoot,
-            extensions: Object.keys(require.extensions)
-          }))
-        ) {
-          return testRunnerPath;
-        } else {
-          process.stderr.write(
-            `Error: Could not resolve test runner path '${
-              packageMetadata.atomTestRunner
-            }'`
-          );
-          process.exit(1);
-        }
+    const packageMetadata = require(path.join(packageRoot, 'package.json'));
+    let atomTestRunner = packageMetadata.atomTestRunner;
+
+    if (!atomTestRunner) {
+      process.stdout.write('atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.');
+      atomTestRunner = 'runners/jasmine1-test-runner';
+    }
+
+    let testRunnerPath;
+    Resolve ||= require('resolve');
+
+    // First try to run with local runners (e.g: `./test/runner.js`) or packages (e.g.: `atom-mocha-test-runner`)
+    try {
+      testRunnerPath = Resolve.sync(atomTestRunner, {
+        basedir: packageRoot,
+        extensions: Object.keys(require.extensions)
+      });
+
+      if (testRunnerPath) {
+        return testRunnerPath;
       }
+    } catch {
+      // Nothing to do, try the next strategy
     }
 
-    return this.resolveLegacyTestRunnerPath();
+    // Then try to use one of the runners defined in Pulsar
+    try {
+      testRunnerPath = Resolve.sync(`./spec/${atomTestRunner}`, {
+        basedir: this.devResourcePath,
+        extensions: Object.keys(require.extensions)
+      });
+
+      if (testRunnerPath) {
+        return testRunnerPath;
+      }
+    } catch {
+      // Nothing to do, try the next strategy
+    }
+
+    process.stderr.write(
+      `Error: Could not resolve test runner path '${
+        packageMetadata.atomTestRunner
+      }'`
+    );
+    process.exit(1);
   }
 
   resolveLegacyTestRunnerPath() {
