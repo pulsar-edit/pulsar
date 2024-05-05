@@ -87,6 +87,7 @@
     "incompatible-packages": "file:packages/incompatible-packages",
     "jasmine-json": "~0.0",
     "jasmine-tagged": "^1.1.4",
+    "jasmine": "2.5.3",
     "key-path-helpers": "^0.4.0",
     "keybinding-resolver": "file:./packages/keybinding-resolver",
     "language-c": "file:packages/language-c",
