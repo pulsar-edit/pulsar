@@ -22,6 +22,7 @@
   "engines": {
     "node": ">=14"
   },
+  "atomTestRunner": "runners/jasmine2-test-runner",
   "license": "MIT",
   "electronVersion": "12.2.3",
   "resolutions": {
