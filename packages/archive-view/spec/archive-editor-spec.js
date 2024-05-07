@@ -1,5 +1,3 @@
-const {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} = require('./async-spec-helpers') // eslint-disable-line no-unused-vars
-
 const path = require('path')
 const ArchiveEditor = require('../lib/archive-editor')
 const ArchiveEditorView = require('../lib/archive-editor-view')
@@ -26,7 +24,7 @@ describe('ArchiveEditor', () => {
   })
 
   describe('.deactivate()', () => {
-    it('removes all ArchiveEditorViews from the workspace and does not open any new ones', async () => {
+    it('removes all ArchiveEditorViews from the workspace and does not open any new ones', async (done) => {
       const getArchiveEditorViews = () => {
         return atom.workspace.getPaneItems().filter(item => item instanceof ArchiveEditorView)
       }
@@ -41,6 +39,8 @@ describe('ArchiveEditor', () => {
 
       await atom.workspace.open(path.join(__dirname, 'fixtures', 'nested.tar'))
       expect(getArchiveEditorViews().length).toBe(0)
+
+      done();
     })
   })
 })
