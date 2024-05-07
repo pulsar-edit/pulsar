@@ -94,7 +94,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **symbol-provider-ctags** | [`./symbol-provider-ctags`](./symbol-provider-ctags) | |
 | **symbol-provider-tree-sitter** | [`./symbol-provider-tree-sitter`](./symbol-provider-tree-sitter) | |
 | **styleguide** | [`./styleguide`](./styleguide) | |
-| **symbols-view** | [`./symbols-view`][./symbols-view] |  |
+| **symbols-view** | [`./symbols-view`](./symbols-view) |  |
 | **tabs** | [`./tabs`](./tabs) |  |
 | **timecop** | [`./timecop`](./timecop) | |
 | **tree-view** | [`./tree-view`](./tree-view) |  |
