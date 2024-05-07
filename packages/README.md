@@ -86,7 +86,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **settings-view** | [`./settings-view`](./settings-view) |  |
 | **package-generator** | [`./package-generator`](./package-generator) | |
 | **pulsar-updater** | [`./pulsar-updater`](./pulsar-updater) | |
-| **snippets** | [`./snippets`][./snippets] |  |
+| **snippets** | [`./snippets`](./snippets) |  |
 | **solarized-dark-syntax** | [`./solarized-dark-syntax`](./solarized-dark-syntax) | |
 | **solarized-light-syntax** | [`./solarized-light-syntax`](./solarized-light-syntax) | |
 | **spell-check** | [`./spell-check`](./spell-check) |  |
