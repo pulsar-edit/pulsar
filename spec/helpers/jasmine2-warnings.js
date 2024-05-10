@@ -4,14 +4,18 @@ const {
   warnIfLeakingPathSubscriptions
 } = require('./warnings')
 
-afterEach(async (done) => {
-  ensureNoDeprecatedFunctionCalls();
-  ensureNoDeprecatedStylesheets();
+exports.register = (jasmineEnv) => {
+  jasmineEnv.afterEach(async (done) => {
+    ensureNoDeprecatedFunctionCalls();
+    ensureNoDeprecatedStylesheets();
 
-  await atom.reset();
+    await atom.reset();
 
-  if (!window.debugContent) { document.getElementById('jasmine-content').innerHTML = ''; }
-  warnIfLeakingPathSubscriptions();
+    if (!window.debugContent) {
+      document.getElementById('jasmine-content').innerHTML = '';
+    }
+    warnIfLeakingPathSubscriptions();
 
-  done();
-});
+    done();
+  });
+}

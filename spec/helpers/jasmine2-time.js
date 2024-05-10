@@ -77,13 +77,15 @@ window.advanceClock = function(delta) {
   })();
 };
 
-beforeEach(() => {
-  resetTimeouts();
-  spyOn(_._, "now").and.callFake(() => now);
-  spyOn(Date, 'now').and.callFake(() => now);
-  spyOn(window, "setTimeout").and.callFake(fakeSetTimeout);
-  spyOn(window, "clearTimeout").and.callFake(fakeClearTimeout);
-  spyOn(window, 'setInterval').and.callFake(fakeSetInterval);
-  spyOn(window, 'clearInterval').and.callFake(fakeClearInterval);
-  spyOn(_, "debounce").and.callFake(mockDebounce);
-})
+exports.register = (jasmineEnv) => {
+  jasmineEnv.beforeEach(() => {
+    resetTimeouts();
+    spyOn(_._, "now").and.callFake(() => now);
+    spyOn(Date, 'now').and.callFake(() => now);
+    spyOn(window, "setTimeout").and.callFake(fakeSetTimeout);
+    spyOn(window, "clearTimeout").and.callFake(fakeClearTimeout);
+    spyOn(window, 'setInterval').and.callFake(fakeSetInterval);
+    spyOn(window, 'clearInterval').and.callFake(fakeClearInterval);
+    spyOn(_, "debounce").and.callFake(mockDebounce);
+  })
+}

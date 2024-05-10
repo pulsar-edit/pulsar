@@ -24,17 +24,19 @@ class DummyElement extends HTMLElement {
   }
 }
 
-window.customElements.define(
-  'text-editor-component-test-element',
-  DummyElement
-);
-
-document.createElement('text-editor-component-test-element');
-
 const editors = [];
 let verticalScrollbarWidth, horizontalScrollbarHeight;
 
 describe('TextEditorComponent', () => {
+  beforeEach(() => {
+    if(!window.customElements.get('text-editor-component-test-element')) {
+      window.customElements.define(
+        'text-editor-component-test-element',
+        DummyElement
+      );
+    }
+  })
+
   beforeEach(() => {
     jasmine.useRealClock();
 
