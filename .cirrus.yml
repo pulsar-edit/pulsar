@@ -134,7 +134,6 @@ silicon_mac_task:
     ROLLING_UPLOAD_TOKEN: ENCRYPTED[f935c396a9f4bca108ec2fdedb00dbc9be2f4c411f100d577acdab42db59ea134be059ce8535396db8222a2b1eb68c27]
   prepare_script:
     - brew update
-    - brew uninstall node
     - brew install git python@$PYTHON_VERSION python-setuptools
     - git submodule init
     - git submodule update
@@ -199,7 +198,6 @@ silicon_mac_task:
 #     - arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 #     - export PATH="/usr/local/bin:$PATH"
 #     - arch -x86_64 brew update
-#     - arch -x86_64 brew uninstall node
 #     - arch -x86_64 brew install node@16 git python@$PYTHON_VERSION python-setuptools
 #     - ln -s /usr/local/bin/python$PYTHON_VERSION /usr/local/bin/python
 #     - npm install -g yarn
