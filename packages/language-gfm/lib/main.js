@@ -23,13 +23,11 @@ exports.activate = () => {
     languageScope: null
   });
 
-  // Create one HTML injection layer for all block-level HTML nodes.
+  // A separate injection layer for each block-level HTML node.
   atom.grammars.addInjectionPoint('source.gfm', {
-    type: 'document',
+    type: 'html_block',
     language: () => 'html',
-    content(node) {
-      return node.descendantsOfType('html_block');
-    },
+    content: (node) => node,
     includeChildren: true
   });
 
