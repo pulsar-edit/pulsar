@@ -6654,6 +6654,7 @@ markdown-it@^13.0.2:
     fs-plus "^3.0.0"
     github-markdown-css "^5.5.1"
     marked "5.0.3"
+    morphdom "^2.7.2"
     underscore-plus "^1.0.0"
     yaml-front-matter "^4.1.1"
 
@@ -6971,6 +6972,11 @@ moment@^2.19.3:
   version "2.29.4"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
+
+morphdom@^2.7.2:
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/morphdom/-/morphdom-2.7.2.tgz#d48a87254f9b3031c0e1ec367736721fbaf22167"
+  integrity sha512-Dqb/lHFyTi7SZpY0a5R4I/0Edo+iPMbaUexsHHsLAByyixCDiLHPHyVoKVmrpL0THcT7V9Cgev9y21TQYq6wQg==
 
 ms@2.0.0:
   version "2.0.0"
