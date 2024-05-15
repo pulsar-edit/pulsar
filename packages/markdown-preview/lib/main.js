@@ -12,9 +12,17 @@ const isMarkdownPreviewView = function (object) {
 }
 
 module.exports = {
-  activate () {
+  activate() {
     this.disposables = new CompositeDisposable()
     this.commandSubscriptions = new CompositeDisposable()
+
+    this.style = new CSSStyleSheet()
+
+    // TODO: When we upgrade Electron, we can push onto `adoptedStyleSheets`
+    // directly. For now, we have to do this silly thing.
+    let styleSheets = Array.from(document.adoptedStyleSheets ?? [])
+    styleSheets.push(this.style)
+    document.adoptedStyleSheets = styleSheets
 
     this.disposables.add(
       atom.config.observe('markdown-preview.grammars', grammars => {
@@ -50,6 +58,22 @@ module.exports = {
             })
           )
         }
+      })
+    )
+
+    this.disposables.add(
+      atom.config.observe('editor.fontFamily', (fontFamily) => {
+        // Keep the user's `fontFamily` setting in sync with preview styles.
+        // `pre` blocks will use this font automatically, but `code` elements
+        // need a specific style rule.
+        //
+        // Since this applies to all content, we should declare this only once,
+        // instead of once per preview view.
+        this.style.replaceSync(`
+          .markdown-preview code {
+            font-family: ${fontFamily} !important;
+          }
+        `)
       })
     )
 
@@ -94,12 +118,12 @@ module.exports = {
     )
   },
 
-  deactivate () {
+  deactivate() {
     this.disposables.dispose()
     this.commandSubscriptions.dispose()
   },
 
-  createMarkdownPreviewView (state) {
+  createMarkdownPreviewView(state) {
     if (state.editorId || fs.isFileSync(state.filePath)) {
       if (MarkdownPreviewView == null) {
         MarkdownPreviewView = require('./markdown-preview-view')
@@ -108,7 +132,7 @@ module.exports = {
     }
   },
 
-  toggle () {
+  toggle() {
     if (isMarkdownPreviewView(atom.workspace.getActivePaneItem())) {
       atom.workspace.destroyActivePaneItem()
       return
@@ -129,11 +153,11 @@ module.exports = {
     }
   },
 
-  uriForEditor (editor) {
+  uriForEditor(editor) {
     return `markdown-preview://editor/${editor.id}`
   },
 
-  removePreviewForEditor (editor) {
+  removePreviewForEditor(editor) {
     const uri = this.uriForEditor(editor)
     const previewPane = atom.workspace.paneForURI(uri)
     if (previewPane != null) {
@@ -144,7 +168,7 @@ module.exports = {
     }
   },
 
-  addPreviewForEditor (editor) {
+  addPreviewForEditor(editor) {
     const uri = this.uriForEditor(editor)
     const previousActivePane = atom.workspace.getActivePane()
     const options = { searchAllPanes: true }
@@ -161,7 +185,7 @@ module.exports = {
       })
   },
 
-  previewFile ({ target }) {
+  previewFile({ target }) {
     const filePath = target.dataset.path
     if (!filePath) {
       return
@@ -178,7 +202,7 @@ module.exports = {
     })
   },
 
-  async copyHTML () {
+  async copyHTML() {
     const editor = atom.workspace.getActiveTextEditor()
     if (editor == null) {
       return
@@ -191,13 +215,14 @@ module.exports = {
     const html = await renderer.toHTML(
       text,
       editor.getPath(),
-      editor.getGrammar()
+      editor.getGrammar(),
+      editor.id
     )
 
     atom.clipboard.write(html)
   },
 
-  saveAsHTML () {
+  saveAsHTML() {
     const activePaneItem = atom.workspace.getActivePaneItem()
     if (isMarkdownPreviewView(activePaneItem)) {
       atom.workspace.getActivePane().saveItemAs(activePaneItem)

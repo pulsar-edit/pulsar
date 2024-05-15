@@ -249,8 +249,8 @@ function renderMarkdown(content, givenOpts = {}) {
 
   // Here we can add some simple additions that make code highlighting possible later on,
   // but doesn't actually preform any code highlighting.
-  md.options.highlight = function(str, lang) {
-    return `<pre><code class="language-${lang}">${str}</code></pre>`;
+  md.options.highlight = function (str, lang) {
+    return `<pre><code class="language-${lang}">${md.utils.escapeHtml(str)}</code></pre>`;
   };
 
   // Process disables
