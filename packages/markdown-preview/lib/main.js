@@ -18,7 +18,7 @@ module.exports = {
 
     this.style = new CSSStyleSheet()
 
-    // When we upgrade Electron, we can push onto `adoptedStyleSheets`
+    // TODO: When we upgrade Electron, we can push onto `adoptedStyleSheets`
     // directly. For now, we have to do this silly thing.
     let styleSheets = Array.from(document.adoptedStyleSheets ?? [])
     styleSheets.push(this.style)
