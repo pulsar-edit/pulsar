@@ -50,25 +50,25 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added <code>TextEditor::getCommentDelimitersForBufferPosition</code> for retrieving comment delimiter strings appropriate for a given buffer position. This allows us to support three new snippet variables: <code>LINE_COMMENT</code>, <code>BLOCK_COMMENT_START</code>, and <code>BLOCK_COMMENT_END</code>.
+                [markdown-preview] Improve rendering performance in preview panes, especially in documents with lots of fenced code blocks.
               </li>
               <li>
-                Added ability to use “simple” transformation flags in snippets (like <code>/upcase</code> and <code>/camelcase</code>) within <code>sed</code>-style snippet transformation replacements.
+                [markdown-preview] GitHub-style Markdown preview now uses up-to-date styles and supports dark mode.
               </li>
               <li>
-                Improved TypeScript syntax highlighting of regular expressions, TSX fragments, wildcard export identifiers, namespaced types, and template string punctuation.
+                Pulsar's OS level theme will now change according to the selected editor theme if <code>core.syncWindowThemeWithPulsarTheme</code> is enabled.
               </li>
               <li>
-                Replaced our underlying Tree-sitter parser for Markdown files with one that’s more stable.
+                [language-sass] Add SCSS Tree-sitter grammar.
               </li>
               <li>
-                Fixed issues in Python with unwanted indentation after type annotations and applying scope names to constructor functions.
+                [language-ruby] Update to latest Tree-sitter Ruby parser.
               </li>
               <li>
-                Removed Machine PATH handling for Pulsar on Windows, ensuring to only ever attempt PATH manipulation per user. Added additional safety mechanisms when handling a user's PATH variable.
+                [language-gfm] Make each block-level HTML tag its own injection.
               </li>
               <li>
-                Update (Linux) metainfo from downstream Pulsar Flatpak
+                [language-typescript] More highlighting fixes, especially for operators.
               </li>
             </ul>
 
