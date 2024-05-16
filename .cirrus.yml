@@ -72,6 +72,7 @@ arm_linux_task:
                 procps
                 curl
                 ruby
+                ruby-dev
                 rpm
                 build-essential
                 git
