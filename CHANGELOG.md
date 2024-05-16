@@ -17,6 +17,7 @@
 * [language-typescript] More highlighting fixes, especially for operators.
 
 ### Pulsar
+- Fixed: Cirrus: Fix gem install fpm on ARM Linux [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1008)
 - Updated: [ci] Update Cirrus CI Token [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1006)
 - Fixed: CI: Fix workaround for Homebrew node in Cirrus on macOS [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1002)
 - Added: [markdown-preview] Optimize re-rendering of content in a preview pane especially syntax highlighting [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/984)
