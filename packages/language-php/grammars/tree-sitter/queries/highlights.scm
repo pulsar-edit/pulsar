@@ -419,12 +419,12 @@
 
 (string
   "'" @punctuation.definition.string.begin.php
-  (string_value)?
+  (string_content)?
   "'" @punctuation.definition.string.end.php) @string.quoted.single.php
 
 (encapsed_string
   "\"" @punctuation.definition.string.begin.php
-  (string_value)?
+  (string_content)?
   "\"" @punctuation.definition.string.end.php) @string.quoted.double.php
 
 (encapsed_string
@@ -558,7 +558,7 @@
 (conditional_expression
   ["?" ":"] @keyword.operator.ternary.php)
 
-(unary_op_expression "@" @keyword.operator.error-control.php)
+(error_suppression_expression "@" @keyword.operator.error-control.php)
 
 [
   "=="

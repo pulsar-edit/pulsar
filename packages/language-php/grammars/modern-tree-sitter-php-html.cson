@@ -15,7 +15,7 @@ injectionRegex: 'php|PHP'
 firstLineRegex: '^\\s*<\\?(?:php|PHP|=|\\s|$)|^\\#!.*(?:\\s|\\/)php\\d?'
 
 treeSitter:
-  parserSource: 'github:tree-sitter/tree-sitter-php#b569a5f2c0d592e67430520d1a0e1f765d83ceb0'
+  parserSource: 'github:tree-sitter/tree-sitter-php#27afeb02e49ff30acd17b67897b1c0114561a38c'
   grammar: 'tree-sitter/tree-sitter-php.wasm'
 
 fileTypes: [
