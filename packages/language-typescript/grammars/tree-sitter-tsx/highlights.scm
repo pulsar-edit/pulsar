@@ -1,10 +1,31 @@
+; MISC
+; ====
+
+; In the JSX construct `<FOO.Bar>`, `FOO` should not be marked as
+; `constant.other.ts.tsx`. Block off identifiers within complex JSX tag names
+; early to prevent this.
+
+(jsx_opening_element
+  (nested_identifier
+    (identifier) @_IGNORE_
+      (#set! capture.final)))
+
+(jsx_closing_element
+  (nested_identifier
+    (identifier) @_IGNORE_
+      (#set! capture.final)))
+
+(jsx_self_closing_element
+  (nested_identifier
+    (identifier) @_IGNORE_
+      (#set! capture.final)))
 
 ; JSX
 ; ===
 
 ; The "Foo" in `<Foo />`.
 (jsx_self_closing_element
-  name: (identifier) @entity.name.tag.ts.tsx
+  name: (_) @entity.name.tag.ts.tsx
   ) @meta.tag.ts.tsx
 
 ; The "Foo" in `<Foo>`.

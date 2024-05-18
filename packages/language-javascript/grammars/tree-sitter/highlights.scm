@@ -1,3 +1,25 @@
+; MISC
+; ====
+
+; In the JSX construct `<FOO.Bar>`, `FOO` should not be marked as
+; `constant.other.js`. Block off identifiers within complex JSX tag names early
+; to prevent this.
+
+(jsx_opening_element
+  (member_expression
+    (identifier) @_IGNORE_
+      (#set! capture.final)))
+
+(jsx_closing_element
+  (member_expression
+    (identifier) @_IGNORE_
+      (#set! capture.final)))
+
+(jsx_self_closing_element
+  (member_expression
+    (identifier) @_IGNORE_
+      (#set! capture.final)))
+
 
 ; STRINGS
 ; =======
@@ -775,16 +797,16 @@
 
 ; The "Foo" in `<Foo />`.
 (jsx_self_closing_element
-  name: (identifier) @entity.name.tag.js
+  name: (_) @entity.name.tag.js
   ) @meta.tag.jsx.js
 
 ; The "Foo" in `<Foo>`.
 (jsx_opening_element
-  name: (identifier) @entity.name.tag.js)
+  name: (_) @entity.name.tag.js)
 
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
-  name: (identifier) @entity.name.tag.js)
+  name: (_) @entity.name.tag.js)
 
 ; The "bar" in `<Foo bar={true} />`.
 (jsx_attribute
