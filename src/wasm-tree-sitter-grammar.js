@@ -121,15 +121,18 @@ module.exports = class WASMTreeSitterGrammar {
     return this.scopeNamesById.get(id);
   }
 
-  // Returns the Tree-sitter language instance associated with this grammar
-  // _if_ it has already loaded. Call this only when you can be certain that
-  // it's present.
+  // Extended: Retrieves the Tree-sitter `Language` instance associated with
+  // this grammar _if_ it has already been loaded.
+  //
+  // Language instances cannot be retrieved synchrously, so this will return
+  // `undefined` if the instance has not yet been loaded. In that case, going
+  // async will be unavoidable, and you’ll need to call {::getLanguage}.
   getLanguageSync() {
     return this._language;
   }
 
-  // Extended: Returns the Tree-sitter language instance associated with this
-  // grammar once it loads.
+  // Extended: Retrieves the Tree-sitter language instance associated with this
+  // grammar.
   //
   // Returns a {Promise} that will resolve with a Tree-sitter `Language`
   // instance. Once it resolves, the grammar is ready to perform parsing and to
@@ -355,6 +358,11 @@ module.exports = class WASMTreeSitterGrammar {
 
   // Extended: Calls `callback` when any of this grammar's query files change.
   //
+  // Since a grammar’s query files won’t change during ordinary operation, this
+  // method’s main purpose is to aid the development of grammars by applying
+  // changes to query files in real time. This happens automatically when
+  // Pulsar is running in dev mode.
+  //
   // The callback is invoked with an object argument with two keys:
   //
   // * `callback`: The callback to be invoked. Takes one argument:
@@ -388,6 +396,10 @@ module.exports = class WASMTreeSitterGrammar {
   //
   // This differs from TextMate-style injections, which operate at the scope
   // level and are currently incompatible with Tree-sitter grammars.
+  //
+  // You should typically not call this method directly; instead, call
+  // {GrammarRegistry::addInjectionPoint} and pass a given grammar’s root
+  // language scope as the first argument.
   //
   // NOTE: Packages will call {::addInjectionPoint} with a given scope name,
   // and that call will be delegated to any Tree-sitter grammars that match
@@ -439,7 +451,6 @@ module.exports = class WASMTreeSitterGrammar {
   //     applied varies based on the grammar; the function will be called with
   //     a grammar instance as its only argument.
   //
-  //
   addInjectionPoint(injectionPoint) {
     let { type } = injectionPoint;
     let injectionPoints = this.injectionPointsByType[type];
@@ -468,15 +479,15 @@ module.exports = class WASMTreeSitterGrammar {
   Section - Backward compatibility shims
   */
   /* eslint-disable no-unused-vars */
-  onDidUpdate(callback) {
+  onDidUpdate(_callback) {
     // do nothing
   }
 
-  tokenizeLines(text, compatibilityMode = true) {
+  tokenizeLines(text, _compatibilityMode = true) {
     return text.split('\n').map(line => this.tokenizeLine(line, null, false));
   }
 
-  tokenizeLine(line, ruleStack, firstLine) {
+  tokenizeLine(line, _ruleStack, _firstLine) {
     return {
       value: line,
       scopes: [this.scopeName]
