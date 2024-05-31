@@ -24,7 +24,7 @@ describe('ArchiveEditor', () => {
   })
 
   describe('.deactivate()', () => {
-    it('removes all ArchiveEditorViews from the workspace and does not open any new ones', async (done) => {
+    it('removes all ArchiveEditorViews from the workspace and does not open any new ones', async () => {
       const getArchiveEditorViews = () => {
         return atom.workspace.getPaneItems().filter(item => item instanceof ArchiveEditorView)
       }
@@ -39,8 +39,6 @@ describe('ArchiveEditor', () => {
 
       await atom.workspace.open(path.join(__dirname, 'fixtures', 'nested.tar'))
       expect(getArchiveEditorViews().length).toBe(0)
-
-      done();
     })
   })
 })

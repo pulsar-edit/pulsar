@@ -277,20 +277,24 @@ describe('ReopenProjectMenuManager', () => {
         expect(name).toBe('three');
       });
 
-      it('returns the standard base name for a relative Windows path', () => {
-        jasmine.filterByPlatform({only: ['win32']});
+      it('returns the standard base name for a relative Windows path', (done) => {
+        jasmine.filterByPlatform({only: ['win32']}, done);
 
         const name = ReopenProjectMenuManager.betterBaseName('.\\one\\two');
         expect(name).toBe('two');
+
+        done();
       });
 
-      it('returns the standard base name for an absolute Windows path', () => {
-        jasmine.filterByPlatform({only: ['win32']});
+      it('returns the standard base name for an absolute Windows path', (done) => {
+        jasmine.filterByPlatform({only: ['win32']}, done);
 
         const name = ReopenProjectMenuManager.betterBaseName(
           'c:\\missions\\apollo\\11'
         );
         expect(name).toBe('11');
+
+        done();
       });
 
       it('returns the drive root for a Windows drive name', () => {

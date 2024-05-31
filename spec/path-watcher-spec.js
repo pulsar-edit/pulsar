@@ -24,11 +24,9 @@ describe('watchPath', function() {
     subs = new CompositeDisposable();
   });
 
-  afterEach(async function(done) {
+  afterEach(async function() {
     subs.dispose();
     await stopAllWatchers();
-
-    done();
   });
 
   function waitForChanges(watcher, ...fileNames) {
@@ -54,27 +52,23 @@ describe('watchPath', function() {
   }
 
   describe('watchPath()', function() {
-    it('resolves the returned promise when the watcher begins listening', async function(done) {
+    it('resolves the returned promise when the watcher begins listening', async function() {
       const rootDir = await tempMkdir('atom-fsmanager-test-');
 
       const watcher = await watchPath(rootDir, {}, () => {});
       expect(watcher.constructor.name).toBe('PathWatcher');
-
-      done();
     });
 
-    it('reuses an existing native watcher and resolves getStartPromise immediately if attached to a running watcher', async function(done) {
+    it('reuses an existing native watcher and resolves getStartPromise immediately if attached to a running watcher', async function() {
       const rootDir = await tempMkdir('atom-fsmanager-test-');
 
       const watcher0 = await watchPath(rootDir, {}, () => {});
       const watcher1 = await watchPath(rootDir, {}, () => {});
 
       expect(watcher0.native).toBe(watcher1.native);
-
-      done();
     });
 
-    it("reuses existing native watchers even while they're still starting", async function(done) {
+    it("reuses existing native watchers even while they're still starting", async function() {
       const rootDir = await tempMkdir('atom-fsmanager-test-');
 
       const [watcher0, watcher1] = await Promise.all([
@@ -82,11 +76,9 @@ describe('watchPath', function() {
         watchPath(rootDir, {}, () => {})
       ]);
       expect(watcher0.native).toBe(watcher1.native);
-
-      done();
     });
 
-    it("doesn't attach new watchers to a native watcher that's stopping", async function(done) {
+    it("doesn't attach new watchers to a native watcher that's stopping", async function() {
       const rootDir = await tempMkdir('atom-fsmanager-test-');
 
       const watcher0 = await watchPath(rootDir, {}, () => {});
@@ -96,11 +88,9 @@ describe('watchPath', function() {
       const watcher1 = await watchPath(rootDir, {}, () => {});
 
       expect(watcher1.native).not.toBe(native0);
-
-      done();
     });
 
-    it('reuses an existing native watcher on a parent directory and filters events', async function(done) {
+    it('reuses an existing native watcher on a parent directory and filters events', async function() {
       const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
       const rootFile = path.join(rootDir, 'rootfile.txt');
       const subDir = path.join(rootDir, 'subdir');
@@ -125,11 +115,9 @@ describe('watchPath', function() {
       const nextRootEvent = waitForChanges(rootWatcher, rootFile);
       await writeFile(rootFile, 'rootfile\n', { encoding: 'utf8' });
       await nextRootEvent;
-
-      done();
     });
 
-    it('adopts existing child watchers and filters events appropriately to them', async function(done) {
+    it('adopts existing child watchers and filters events appropriately to them', async function() {
       const parentDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
 
       // Create the directory tree
@@ -180,8 +168,6 @@ describe('watchPath', function() {
         subWatcherChanges1,
         parentWatcherChanges
       ]);
-
-      done();
     });
   });
 });

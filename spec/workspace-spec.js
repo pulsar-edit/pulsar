@@ -19,7 +19,7 @@ describe('Workspace', () => {
   let fsGetSizeSyncSpy;
   let fsOpenSyncSpy;
 
-  beforeEach(async (done) => {
+  beforeEach(async () => {
     fsGetSizeSyncSpy ||= spyOn(fs, 'getSizeSync').and.callThrough();
     fsOpenSyncSpy ||= spyOn(fs, 'openSync').and.callThrough();
 
@@ -33,8 +33,6 @@ describe('Workspace', () => {
     atom.project.setPaths([atom.project.getDirectories()[0].resolve('dir')]);
 
     await atom.workspace.itemLocationStore.clear();
-
-    done();
   });
 
   afterEach(() => {
@@ -81,7 +79,7 @@ describe('Workspace', () => {
 
   describe('serialization', () => {
     describe('when the workspace contains text editors', () => {
-      it('constructs the view with the same panes', async (done) => {
+      it('constructs the view with the same panes', async () => {
         const pane1 = atom.workspace.getActivePane();
         const pane2 = pane1.splitRight({ copyActiveItem: true });
         const pane3 = pane2.splitRight({ copyActiveItem: true });
@@ -138,20 +136,16 @@ describe('Workspace', () => {
             `^${path.basename(editor3.getLongTitle())} \\u2014 ${pathEscaped}`
           )
         );
-
-        done();
       });
     });
 
     describe('where there are no open panes or editors', () => {
-      it('constructs the view with no open editors', async (done) => {
+      it('constructs the view with no open editors', async () => {
         atom.workspace.getActivePane().destroy();
         expect(atom.workspace.getTextEditors().length).toBe(0);
         await simulateReload();
 
         expect(atom.workspace.getTextEditors().length).toBe(0);
-
-        done();
       });
     });
   });
@@ -167,7 +161,7 @@ describe('Workspace', () => {
 
     describe("when the 'searchAllPanes' option is false (default)", () => {
       describe('when called without a uri or item', () => {
-        it('adds and activates an empty editor on the active pane', async (done) => {
+        it('adds and activates an empty editor on the active pane', async () => {
           let editor1;
           let editor2;
 
@@ -201,14 +195,12 @@ describe('Workspace', () => {
               index: 1
             }
           ]);
-
-          done();
         });
       });
 
       describe('when called with a uri', () => {
         describe('when the active pane already has an editor for the given uri', () => {
-          it('activates the existing editor on the active pane', async (done) => {
+          it('activates the existing editor on the active pane', async () => {
             let editor = null;
             let editor1 = null;
             let editor2 = null;
@@ -242,11 +234,9 @@ describe('Workspace', () => {
                 index: 0
               }
             ]);
-
-            done();
           });
 
-          it('finds items in docks', async (done) => {
+          it('finds items in docks', async () => {
             const dock = atom.workspace.getRightDock();
             const ITEM_URI = 'atom://test';
             const item = {
@@ -262,13 +252,11 @@ describe('Workspace', () => {
             expect(atom.workspace.getPaneItems()).toHaveLength(1);
             expect(dock.getPaneItems()).toHaveLength(1);
             expect(dock.getPaneItems()[0]).toBe(item);
-
-            done();
           });
         });
 
         describe("when the 'activateItem' option is false", () => {
-          it('adds the item to the workspace', async (done) => {
+          it('adds the item to the workspace', async () => {
             let editor;
 
             await workspace.open('a');
@@ -276,8 +264,6 @@ describe('Workspace', () => {
 
             expect(workspace.getPaneItems()).toContain(editor);
             expect(workspace.getActivePaneItem()).not.toBe(editor);
-
-            done();
           });
         });
 
@@ -286,14 +272,12 @@ describe('Workspace', () => {
             atom.workspace.enablePersistence = true;
           });
 
-          afterEach(async (done) => {
+          afterEach(async () => {
             await atom.workspace.itemLocationStore.clear();
             atom.workspace.enablePersistence = false;
-
-            done();
           });
 
-          it('adds and activates a new editor for the given path on the active pane', async (done) => {
+          it('adds and activates a new editor for the given path on the active pane', async () => {
             let editor = await workspace.open('a');
 
             const firstDirectory = atom.project.getDirectories()[0];
@@ -302,11 +286,9 @@ describe('Workspace', () => {
             expect(workspace.getActivePaneItem()).toBe(editor);
             expect(workspace.getActivePane().items).toEqual([editor]);
             expect(workspace.getActivePane().activate).toHaveBeenCalled();
-
-            done();
           });
 
-          it('discovers existing editors that are still opening', async (done) => {
+          it('discovers existing editors that are still opening', async () => {
             let editor0 = null;
             let editor1 = null;
 
@@ -321,11 +303,9 @@ describe('Workspace', () => {
 
             expect(editor0).toEqual(editor1);
             expect(workspace.getActivePane().items).toEqual([editor0]);
-
-            done();
           });
 
-          it("uses the location specified by the model's `getDefaultLocation()` method", async (done) => {
+          it("uses the location specified by the model's `getDefaultLocation()` method", async () => {
             const item = {
               getDefaultLocation: jasmine.createSpy().and.returnValue('right'),
               getElement: () => document.createElement('div')
@@ -343,11 +323,9 @@ describe('Workspace', () => {
             expect(dock.getPaneItems()).toHaveLength(1);
             expect(opener).toHaveBeenCalled();
             expect(item.getDefaultLocation).toHaveBeenCalled();
-
-            done();
           });
 
-          it('prefers the last location the user used for that item', async (done) => {
+          it('prefers the last location the user used for that item', async () => {
             const ITEM_URI = 'atom://test';
             const item = {
               getURI: () => ITEM_URI,
@@ -368,14 +346,12 @@ describe('Workspace', () => {
 
             expect(dock.getPaneItems()).toHaveLength(1);
             expect(dock.getPaneItems()[0]).toBe(item);
-
-            done();
           });
         });
       });
 
       describe('when an item with the given uri exists in an inactive pane container', () => {
-        it("activates that item if it is in that container's active pane", async (done) => {
+        it("activates that item if it is in that container's active pane", async () => {
           const item = await atom.workspace.open('a');
           atom.workspace.getLeftDock().activate();
           expect(
@@ -396,15 +372,13 @@ describe('Workspace', () => {
             'center'
           );
           expect(atom.workspace.getPaneItems()).toEqual([item, item2]);
-
-          done();
         });
       });
     });
 
     describe("when the 'searchAllPanes' option is true", () => {
       describe('when an editor for the given uri is already open on an inactive pane', () => {
-        it('activates the existing editor on the inactive pane, then activates that pane', async (done) => {
+        it('activates the existing editor on the inactive pane, then activates that pane', async () => {
           let editor1 = null;
           let editor2 = null;
           const pane1 = workspace.getActivePane();
@@ -422,11 +396,9 @@ describe('Workspace', () => {
 
           expect(workspace.getActivePane()).toBe(pane1);
           expect(workspace.getActivePaneItem()).toBe(editor1);
-
-          done();
         });
 
-        it('discovers existing editors that are still opening in an inactive pane', async (done) => {
+        it('discovers existing editors that are still opening in an inactive pane', async () => {
           let editor0 = null;
           let editor1 = null;
           const pane0 = workspace.getActivePane();
@@ -452,11 +424,9 @@ describe('Workspace', () => {
 
           expect(editor0).toEqual(editor1);
           expect(workspace.getActivePane().items).toEqual([editor0]);
-
-          done();
         });
 
-        it('activates the pane in the dock with the matching item', async (done) => {
+        it('activates the pane in the dock with the matching item', async () => {
           const dock = atom.workspace.getRightDock();
           const ITEM_URI = 'atom://test';
           const item = {
@@ -470,24 +440,20 @@ describe('Workspace', () => {
           await atom.workspace.open(ITEM_URI, { searchAllPanes: true });
 
           expect(dock.paneForItem(item).activate).toHaveBeenCalled()
-
-          done();
         });
       });
 
       describe('when no editor for the given uri is open in any pane', () => {
-        it('opens an editor for the given uri in the active pane', async (done) => {
+        it('opens an editor for the given uri in the active pane', async () => {
           let editor = await workspace.open('a', { searchAllPanes: true });
 
           expect(workspace.getActivePaneItem()).toBe(editor);
-
-          done();
         });
       });
     });
 
     describe('when attempting to open an editor in a dock', () => {
-      it('opens the editor in the workspace center', async (done) => {
+      it('opens the editor in the workspace center', async () => {
         await atom.workspace.open('sample.txt', { location: 'right' });
         expect(
           atom.workspace
@@ -495,22 +461,18 @@ describe('Workspace', () => {
             .getActivePaneItem()
             .getFileName()
         ).toEqual('sample.txt');
-
-        done();
       });
     });
 
     describe('when called with an item rather than a URI', () => {
-      it('adds the item itself to the workspace', async (done) => {
+      it('adds the item itself to the workspace', async () => {
         const item = document.createElement('div');
         await atom.workspace.open(item);
         expect(atom.workspace.getActivePaneItem()).toBe(item);
-
-        done();
       });
 
       describe('when the active pane already contains the item', () => {
-        it('activates the item', async (done) => {
+        it('activates the item', async () => {
           const item = document.createElement('div');
 
           await atom.workspace.open(item);
@@ -521,13 +483,11 @@ describe('Workspace', () => {
           await atom.workspace.open(item);
           expect(atom.workspace.getActivePaneItem()).toBe(item);
           expect(atom.workspace.getActivePane().getItems().length).toBe(2);
-
-          done();
         });
       });
 
       describe('when the item already exists in another pane', () => {
-        it('rejects the promise', async (done) => {
+        it('rejects the promise', async () => {
           const item = document.createElement('div');
 
           await atom.workspace.open(item);
@@ -545,15 +505,13 @@ describe('Workspace', () => {
           expect(rejection.message).toMatch(
             /The workspace can only contain one instance of item/
           );
-
-          done();
         });
       });
     });
 
     describe("when the 'split' option is set", () => {
       describe("when the 'split' option is 'left'", () => {
-        it('opens the editor in the leftmost pane of the current pane axis', async (done) => {
+        it('opens the editor in the leftmost pane of the current pane axis', async () => {
           const pane1 = workspace.getActivePane();
           const pane2 = pane1.splitRight();
           expect(workspace.getActivePane()).toBe(pane2);
@@ -571,13 +529,11 @@ describe('Workspace', () => {
           expect(workspace.getActivePane()).toBe(pane1);
           expect(pane1.items).toEqual([editor]);
           expect(pane2.items).toEqual([]);
-
-          done();
         });
       });
 
       describe('when a pane axis is the leftmost sibling of the current pane', () => {
-        it('opens the new item in the current pane', async (done) => {
+        it('opens the new item in the current pane', async () => {
           let editor = null;
           const pane1 = workspace.getActivePane();
           const pane2 = pane1.splitLeft();
@@ -589,13 +545,11 @@ describe('Workspace', () => {
 
           expect(workspace.getActivePane()).toBe(pane1);
           expect(pane1.items).toEqual([editor]);
-
-          done();
         });
       });
 
       describe("when the 'split' option is 'right'", () => {
-        it('opens the editor in the rightmost pane of the current pane axis', async (done) => {
+        it('opens the editor in the rightmost pane of the current pane axis', async () => {
           let editor = null;
           const pane1 = workspace.getActivePane();
           let pane2 = null;
@@ -614,12 +568,10 @@ describe('Workspace', () => {
           expect(workspace.getActivePane()).toBe(pane2);
           expect(pane1.items).toEqual([]);
           expect(pane2.items).toEqual([editor]);
-
-          done();
         });
 
         describe('when a pane axis is the rightmost sibling of the current pane', () => {
-          it('opens the new item in a new pane split to the right of the current pane', async (done) => {
+          it('opens the new item in a new pane split to the right of the current pane', async () => {
             let editor = null;
             const pane1 = workspace.getActivePane();
             const pane2 = pane1.splitRight();
@@ -639,14 +591,12 @@ describe('Workspace', () => {
             expect(workspace.getCenter().paneContainer.root.children[1]).toBe(
               pane4
             );
-
-            done();
           });
         });
       });
 
       describe("when the 'split' option is 'up'", () => {
-        it('opens the editor in the topmost pane of the current pane axis', async (done) => {
+        it('opens the editor in the topmost pane of the current pane axis', async () => {
           const pane1 = workspace.getActivePane();
           const pane2 = pane1.splitDown();
           expect(workspace.getActivePane()).toBe(pane2);
@@ -664,13 +614,11 @@ describe('Workspace', () => {
           expect(workspace.getActivePane()).toBe(pane1);
           expect(pane1.items).toEqual([editor]);
           expect(pane2.items).toEqual([]);
-
-          done();
         });
       });
 
       describe('when a pane axis is the topmost sibling of the current pane', () => {
-        it('opens the new item in the current pane', async (done) => {
+        it('opens the new item in the current pane', async () => {
           let editor = null;
           const pane1 = workspace.getActivePane();
           const pane2 = pane1.splitUp();
@@ -682,13 +630,11 @@ describe('Workspace', () => {
 
           expect(workspace.getActivePane()).toBe(pane1);
           expect(pane1.items).toEqual([editor]);
-
-          done();
         });
       });
 
       describe("when the 'split' option is 'down'", () => {
-        it('opens the editor in the bottommost pane of the current pane axis', async (done) => {
+        it('opens the editor in the bottommost pane of the current pane axis', async () => {
           let editor = null;
           const pane1 = workspace.getActivePane();
           let pane2 = null;
@@ -707,12 +653,10 @@ describe('Workspace', () => {
           expect(workspace.getActivePane()).toBe(pane2);
           expect(pane1.items).toEqual([]);
           expect(pane2.items).toEqual([editor]);
-
-          done();
         });
 
         describe('when a pane axis is the bottommost sibling of the current pane', () => {
-          it('opens the new item in a new pane split to the bottom of the current pane', async (done) => {
+          it('opens the new item in a new pane split to the bottom of the current pane', async () => {
             let editor = null;
             const pane1 = workspace.getActivePane();
             const pane2 = pane1.splitDown();
@@ -731,15 +675,13 @@ describe('Workspace', () => {
             expect(workspace.getCenter().paneContainer.root.children[1]).toBe(
               pane2
             );
-
-            done();
           });
         });
       });
     });
 
     describe('when an initialLine and initialColumn are specified', () => {
-      it('moves the cursor to the indicated location', async (done) => {
+      it('moves the cursor to the indicated location', async () => {
         await workspace.open('a', { initialLine: 1, initialColumn: 5 });
 
         expect(
@@ -778,11 +720,9 @@ describe('Workspace', () => {
         expect(
           workspace.getActiveTextEditor().getCursorBufferPosition()
         ).toEqual([2, 11])
-
-        done();
       });
 
-      it('unfolds the fold containing the line', async (done) => {
+      it('unfolds the fold containing the line', async () => {
         let editor;
 
         await workspace.open('../sample-with-many-folds.js');
@@ -796,8 +736,6 @@ describe('Workspace', () => {
         });
         expect(editor.isFoldedAtBufferRow(2)).toBe(false);
         expect(editor.isFoldedAtBufferRow(3)).toBe(false);
-
-        done();
       });
     });
 
@@ -826,30 +764,24 @@ describe('Workspace', () => {
         }
       };
 
-      it('prompts before opening the file', async (done) => {
+      it('prompts before opening the file', async () => {
         atom.config.set('core.warnOnLargeFileLimit', 20);
         await shouldPromptForFileOfSize(20, true);
-
-        done();
       });
 
-      it("doesn't prompt on files below the limit", async (done) => {
+      it("doesn't prompt on files below the limit", async () => {
         atom.config.set('core.warnOnLargeFileLimit', 30);
         await shouldPromptForFileOfSize(20, false);
-
-        done();
       });
 
-      it('prompts for smaller files with a lower limit', async (done) => {
+      it('prompts for smaller files with a lower limit', async () => {
         atom.config.set('core.warnOnLargeFileLimit', 5);
         await shouldPromptForFileOfSize(10, true);
-
-        done();
       });
     });
 
     describe('when passed a path that matches a custom opener', () => {
-      it('returns the resource returned by the custom opener', async (done) => {
+      it('returns the resource returned by the custom opener', async () => {
         const fooOpener = (pathToOpen, options) => {
           if (pathToOpen != null ? pathToOpen.match(/\.foo/) : undefined) {
             return { foo: pathToOpen, options };
@@ -870,8 +802,6 @@ describe('Workspace', () => {
         })
 
         expect(await workspace.open('bar://baz')).toEqual({ bar: 'bar://baz' })
-
-        done();
       });
     });
 
@@ -901,7 +831,7 @@ describe('Workspace', () => {
       done();
     });
 
-    it('notifies ::onDidAddTextEditor observers', async (done) => {
+    it('notifies ::onDidAddTextEditor observers', async () => {
       const absolutePath = require.resolve('./fixtures/dir/a');
       const newEditorHandler = jasmine.createSpy('newEditorHandler');
       workspace.onDidAddTextEditor(newEditorHandler);
@@ -909,8 +839,6 @@ describe('Workspace', () => {
       let editor = await workspace.open(absolutePath);
 
       expect(newEditorHandler.calls.argsFor(0)[0].textEditor).toBe(editor);
-
-      done();
     });
 
     describe('when there is an error opening the file', () => {
@@ -922,14 +850,12 @@ describe('Workspace', () => {
       );
 
       describe('when a file does not exist', () => {
-        it('creates an empty buffer for the specified path', async (done) => {
+        it('creates an empty buffer for the specified path', async () => {
           await workspace.open('not-a-file.md');
 
           const editor = workspace.getActiveTextEditor();
           expect(notificationSpy).not.toHaveBeenCalled();
           expect(editor.getPath()).toContain('not-a-file.md');
-
-          done();
         });
       });
 
@@ -943,7 +869,7 @@ describe('Workspace', () => {
           });
         });
 
-        it('creates a notification', async (done) => {
+        it('creates a notification', async () => {
           await workspace.open('file1');
 
           expect(notificationSpy).toHaveBeenCalled();
@@ -951,8 +877,6 @@ describe('Workspace', () => {
           expect(notification.getType()).toBe('warning');
           expect(notification.getMessage()).toContain('Permission denied');
           expect(notification.getMessage()).toContain('file1');
-
-          done();
         });
       });
 
@@ -966,7 +890,7 @@ describe('Workspace', () => {
           });
         });
 
-        it('creates a notification', async (done) => {
+        it('creates a notification', async () => {
           await workspace.open('file1');
 
           expect(notificationSpy).toHaveBeenCalled();
@@ -974,8 +898,6 @@ describe('Workspace', () => {
           expect(notification.getType()).toBe('warning');
           expect(notification.getMessage()).toContain('Unable to open');
           expect(notification.getMessage()).toContain('file1');
-
-          done();
         });
       });
 
@@ -989,7 +911,7 @@ describe('Workspace', () => {
           })
         });
 
-        it('creates a notification', async (done) => {
+        it('creates a notification', async () => {
           await workspace.open('file1');
 
           expect(notificationSpy).toHaveBeenCalled();
@@ -997,8 +919,6 @@ describe('Workspace', () => {
           expect(notification.getType()).toBe('warning');
           expect(notification.getMessage()).toContain('Unable to open');
           expect(notification.getMessage()).toContain('file1');
-
-          done();
         });
       });
 
@@ -1021,7 +941,7 @@ describe('Workspace', () => {
     });
 
     describe('when the file is already open in pending state', () => {
-      it('should terminate the pending state', async (done) => {
+      it('should terminate the pending state', async () => {
         let editor = null;
         let pane = null;
 
@@ -1033,13 +953,11 @@ describe('Workspace', () => {
         await atom.workspace.open('sample.js');
 
         expect(pane.getPendingItem()).toBeNull();
-
-        done();
       });
     });
 
     describe('when opening will switch from a pending tab to a permanent tab', () => {
-      it('keeps the pending tab open', async (done) => {
+      it('keeps the pending tab open', async () => {
         let editor1 = null;
         let editor2 = null;
 
@@ -1050,13 +968,11 @@ describe('Workspace', () => {
         pane.activateItem(editor1);
         expect(pane.getItems().length).toBe(2);
         expect(pane.getItems()).toEqual([editor1, editor2]);
-
-        done();
       });
     });
 
     describe('when replacing a pending item which is the last item in a second pane', () => {
-      it('does not destroy the pane even if core.destroyEmptyPanes is on', async (done) => {
+      it('does not destroy the pane even if core.destroyEmptyPanes is on', async () => {
         atom.config.set('core.destroyEmptyPanes', true);
         let editor1 = null;
         let editor2 = null;
@@ -1076,13 +992,11 @@ describe('Workspace', () => {
 
         expect(rightPane.getPendingItem()).toBe(editor2);
         expect(rightPane.destroy.calls.count()).toBe(0);
-
-        done();
       });
     });
 
     describe("when opening an editor with a buffer that isn't part of the project", () => {
-      it('adds the buffer to the project', async (done) => {
+      it('adds the buffer to the project', async () => {
         const buffer = new TextBuffer();
         const editor = new TextEditor({ buffer });
 
@@ -1094,8 +1008,6 @@ describe('Workspace', () => {
         expect(buffer.getLanguageMode().getLanguageId()).toBe(
           'text.plain.null-grammar'
         );
-
-        done();
       });
     });
   });
@@ -1200,7 +1112,7 @@ describe('Workspace', () => {
 
   describe('::toggle(itemOrUri)', () => {
     describe('when the location resolves to a dock', () => {
-      it('adds or shows the item and its dock if it is not currently visible, and otherwise hides the containing dock', async (done) => {
+      it('adds or shows the item and its dock if it is not currently visible, and otherwise hides the containing dock', async () => {
         const item1 = {
           getDefaultLocation() {
             return 'left';
@@ -1241,13 +1153,11 @@ describe('Workspace', () => {
         await workspace.toggle(item2);
         expect(dock.isVisible()).toBe(true);
         expect(dock.getActivePaneItem()).toBe(item2);
-
-        done();
       });
     });
 
     describe('when the location resolves to the center', () => {
-      it('adds or shows the item if it is not currently the active pane item, and otherwise removes the item', async (done) => {
+      it('adds or shows the item if it is not currently the active pane item, and otherwise removes the item', async () => {
         const item1 = {
           getDefaultLocation() {
             return 'center';
@@ -1276,8 +1186,6 @@ describe('Workspace', () => {
         await workspace.toggle(item1);
         expect(workspace.paneForItem(item1)).toBeUndefined();
         expect(workspace.getActivePaneItem()).toBe(item2);
-
-        done();
       });
     });
   });
@@ -1444,7 +1352,7 @@ describe('Workspace', () => {
   });
 
   describe('the grammar-used hook', () => {
-    it('fires when opening a file or changing the grammar of an open file', async (done) => {
+    it('fires when opening a file or changing the grammar of an open file', async () => {
       await atom.packages.activatePackage('language-javascript');
       await atom.packages.activatePackage('language-coffee-script');
 
@@ -1476,13 +1384,11 @@ describe('Workspace', () => {
       expect(coffeeScriptGrammarUsed).not.toHaveBeenCalled();
       atom.grammars.assignLanguageMode(editor, 'source.coffee');
       expect(coffeeScriptGrammarUsed).toHaveBeenCalled();
-
-      done();
     });
   });
 
   describe('the root-scope-used hook', () => {
-    it('fires when opening a file or changing the grammar of an open file', async (done) => {
+    it('fires when opening a file or changing the grammar of an open file', async () => {
       await atom.packages.activatePackage('language-javascript');
       await atom.packages.activatePackage('language-coffee-script');
 
@@ -1514,13 +1420,11 @@ describe('Workspace', () => {
       expect(coffeeScriptGrammarUsed).not.toHaveBeenCalled();
       atom.grammars.assignLanguageMode(editor, 'source.coffee');
       expect(coffeeScriptGrammarUsed).toHaveBeenCalled();
-
-      done();
     });
   });
 
   describe('the file opened hook', () => {
-    it('fires when opening a file', async (done) => {
+    it('fires when opening a file', async () => {
       const packageUsed = jasmine.createSpy('my-fake-package');
 
       atom.packages.triggerDeferredActivationHooks();
@@ -1534,13 +1438,11 @@ describe('Workspace', () => {
         autoIndent: false
       });
       expect(packageUsed).toHaveBeenCalled();
-
-      done();
     })
   });
 
   describe('::reopenItem()', () => {
-    it("opens the uri associated with the last closed pane that isn't currently open", async (done) => {
+    it("opens the uri associated with the last closed pane that isn't currently open", async () => {
       const pane = workspace.getActivePane();
 
       await workspace.open('a');
@@ -1594,8 +1496,6 @@ describe('Workspace', () => {
       expect(workspace.getActivePaneItem().getURI()).toBe(
         firstDirectory.resolve('file1')
       )
-
-      done();
     });
   });
 
@@ -1658,11 +1558,9 @@ describe('Workspace', () => {
   });
 
   describe('::openLicense()', () => {
-    it('opens the license as plain-text in a buffer', async (done) => {
+    it('opens the license as plain-text in a buffer', async () => {
       await workspace.openLicense();
       expect(workspace.getActivePaneItem().getText()).toMatch(/Copyright/)
-
-      done();
     });
   });
 
@@ -1712,7 +1610,7 @@ describe('Workspace', () => {
   });
 
   describe('::observeTextEditors()', () => {
-    it('invokes the observer with current and future text editors', async (done) => {
+    it('invokes the observer with current and future text editors', async () => {
       const observed = [];
 
       await workspace.open();
@@ -1724,8 +1622,6 @@ describe('Workspace', () => {
       await workspace.open();
 
       expect(observed).toEqual(workspace.getTextEditors());
-
-      done();
     });
   });
 
@@ -1804,7 +1700,7 @@ describe('Workspace', () => {
       expect(observed).toEqual([]);
     });
 
-    it('invokes the observer when closing the one and only text editor after deserialization', async (done) => {
+    it('invokes the observer when closing the one and only text editor after deserialization', async () => {
       pane.activateItem(new TextEditor());
 
       await simulateReload();
@@ -1812,24 +1708,20 @@ describe('Workspace', () => {
       workspace.onDidChangeActiveTextEditor(editor => observed.push(editor));
       workspace.closeActivePaneItemOrEmptyPaneOrWindow();
       expect(observed).toEqual([undefined]);
-
-      done();
     });
   });
 
   describe('when an editor is destroyed', () => {
-    it('removes the editor', async (done) => {
+    it('removes the editor', async () => {
       const editor = await workspace.open('a');
       expect(workspace.getTextEditors()).toHaveLength(1);
       editor.destroy();
       expect(workspace.getTextEditors()).toHaveLength(0);
-
-      done();
     });
   });
 
   describe('when an editor is copied because its pane is split', () => {
-    it('sets up the new editor to be configured by the text editor registry', async (done) => {
+    it('sets up the new editor to be configured by the text editor registry', async () => {
       await atom.packages.activatePackage('language-javascript');
 
       const editor = await workspace.open('a');
@@ -1841,12 +1733,10 @@ describe('Workspace', () => {
       const newEditor = workspace.getActiveTextEditor();
       expect(newEditor).not.toBe(editor);
       expect(newEditor.getGrammar().name).toBe('JavaScript');
-
-      done();
     });
   });
 
-  it('stores the active grammars used by all the open editors', async (done) => {
+  it('stores the active grammars used by all the open editors', async () => {
     await Promise.all([
       atom.packages.activatePackage('language-javascript'),
       atom.packages.activatePackage('language-coffee-script'),
@@ -1905,8 +1795,6 @@ describe('Workspace', () => {
     ]);
 
     atom2.destroy();
-
-    done();
   });
 
   describe('document.title', () => {
@@ -1923,10 +1811,9 @@ describe('Workspace', () => {
     });
 
     describe("when the active pane item's path is not inside a project path", () => {
-      beforeEach(async (done) => {
+      beforeEach(async () => {
         await atom.workspace.open('b');
         atom.project.setPaths([]);
-        done();
       });
 
       it("sets the title to the pane item's title plus the item's path", () => {
@@ -1993,10 +1880,8 @@ describe('Workspace', () => {
     });
 
     describe('when the active pane item is inside a project path', () => {
-      beforeEach(async (done) => {
+      beforeEach(async () => {
         await atom.workspace.open('b');
-
-        done();
       });
 
       describe('when there is an active pane item', () => {
@@ -2059,13 +1944,11 @@ describe('Workspace', () => {
     });
 
     describe('when the workspace is deserialized', () => {
-      beforeEach(async (done) => {
+      beforeEach(async () => {
         await atom.workspace.open('a');
-
-        done();
       });
 
-      it("updates the title to contain the project's path", async (done) => {
+      it("updates the title to contain the project's path", async () => {
         document.title = null;
 
         const atom2 = new AtomEnvironment({
@@ -2094,8 +1977,6 @@ describe('Workspace', () => {
         );
 
         atom2.destroy();
-
-        done();
       });
     });
   });
@@ -2104,13 +1985,11 @@ describe('Workspace', () => {
     let item1;
     let item2;
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       await atom.workspace.open('a');
       await atom.workspace.open('b');
 
       [item1, item2] = atom.workspace.getPaneItems();
-
-      done();
     });
 
     it('calls setDocumentEdited when the active item changes', () => {
@@ -2340,7 +2219,7 @@ describe('Workspace', () => {
       }
 
       describe('when called with a regex', () => {
-        it('calls the callback with all regex results in all files in the project', async (done) => {
+        it('calls the callback with all regex results in all files in the project', async () => {
           const results = [];
           await scan(
             /(a)+/,
@@ -2363,11 +2242,9 @@ describe('Workspace', () => {
             leadingContextLines: [],
             trailingContextLines: ['cc aa cc']
           });
-
-          done();
         });
 
-        it('works with with escaped literals (like $ and ^)', async (done) => {
+        it('works with with escaped literals (like $ and ^)', async () => {
           const results = [];
           await scan(
             /\$\w+/,
@@ -2387,11 +2264,9 @@ describe('Workspace', () => {
             leadingContextLines: ['cc aa cc'],
             trailingContextLines: []
           });
-
-          done();
         });
 
-        it('works on evil filenames', async (done) => {
+        it('works on evil filenames', async () => {
           atom.config.set('core.excludeVcsIgnoredPaths', false);
           platform.generateEvilFiles();
           atom.project.setPaths([
@@ -2423,21 +2298,17 @@ describe('Workspace', () => {
             expect(paths[3]).toMatch(/quote".txt$/m);
             expect(path.basename(paths[4])).toBe('utfa\u0306.md');
           }
-
-          done();
         });
 
-        it('ignores case if the regex includes the `i` flag', async (done) => {
+        it('ignores case if the regex includes the `i` flag', async () => {
           const results = [];
           await scan(/DOLLAR/i, {}, result => results.push(result));
 
           expect(results).toHaveLength(1);
-
-          done();
         });
 
         if (ripgrep) {
-          it('returns empty text matches', async (done) => {
+          it('returns empty text matches', async () => {
             const results = [];
             await scan(
               /^\s{0}/,
@@ -2463,12 +2334,10 @@ describe('Workspace', () => {
               leadingContextLines: [],
               trailingContextLines: []
             });
-
-            done();
           });
 
           describe('newlines on regexps', () => {
-            it('returns multiline results from regexps', async (done) => {
+            it('returns multiline results from regexps', async () => {
               const results = [];
 
               await scan(/first\nsecond/, {}, result => results.push(result));
@@ -2489,11 +2358,9 @@ describe('Workspace', () => {
                 leadingContextLines: [],
                 trailingContextLines: []
               });
-
-              done();
             });
 
-            it('returns correctly the context lines', async (done) => {
+            it('returns correctly the context lines', async () => {
               const results = [];
 
               await scan(
@@ -2521,11 +2388,9 @@ describe('Workspace', () => {
                 leadingContextLines: ['newline2', 'newline3'],
                 trailingContextLines: ['newline4', 'newline5']
               });
-
-              done();
             });
 
-            it('returns multiple results from the same line', async (done) => {
+            it('returns multiple results from the same line', async () => {
               const results = [];
 
               await scan(/line\d\nne/, {}, result => results.push(result));
@@ -2565,11 +2430,9 @@ describe('Workspace', () => {
                 leadingContextLines: [],
                 trailingContextLines: []
               });
-
-              done();
             });
 
-            it('works with escaped newlines', async (done) => {
+            it('works with escaped newlines', async () => {
               const results = [];
 
               await scan(/second\\nthird/, {}, result => results.push(result));
@@ -2589,11 +2452,9 @@ describe('Workspace', () => {
                 leadingContextLines: [],
                 trailingContextLines: []
               });
-
-              done();
             });
 
-            it('matches a regexp ending with a newline', async (done) => {
+            it('matches a regexp ending with a newline', async () => {
               const results = [];
 
               await scan(/newline3\n/, {}, result => results.push(result));
@@ -2613,12 +2474,10 @@ describe('Workspace', () => {
                 leadingContextLines: [],
                 trailingContextLines: []
               });
-
-              done();
             });
           });
           describe('pcre2 enabled', () => {
-            it('supports lookbehind searches', async (done) => {
+            it('supports lookbehind searches', async () => {
               const results = [];
 
               await scan(/(?<!a)aa\b/, { PCRE2: true }, result =>
@@ -2639,13 +2498,11 @@ describe('Workspace', () => {
                 leadingContextLines: [],
                 trailingContextLines: []
               });
-
-              done();
             });
           });
         }
 
-        it('returns results on lines with unicode strings', async (done) => {
+        it('returns results on lines with unicode strings', async () => {
           const results = [];
 
           await scan(/line with unico/, {}, result => results.push(result));
@@ -2663,11 +2520,9 @@ describe('Workspace', () => {
             leadingContextLines: [],
             trailingContextLines: []
           });
-
-          done();
         });
 
-        it('returns results on files detected as binary', async (done) => {
+        it('returns results on files detected as binary', async () => {
           const results = [];
 
           await scan(
@@ -2691,15 +2546,13 @@ describe('Workspace', () => {
             leadingContextLines: [],
             trailingContextLines: ['utf8Property=Fòò', 'latin1Property=F��']
           });
-
-          done();
         });
 
         describe('when the core.excludeVcsIgnoredPaths config is used', () => {
           let projectPath;
           let ignoredPath;
 
-          beforeEach(async (done) => {
+          beforeEach(async () => {
             const sourceProjectPath = path.join(
               __dirname,
               'fixtures',
@@ -2722,8 +2575,6 @@ describe('Workspace', () => {
             );
             ignoredPath = path.join(projectPath, 'ignored.txt');
             fs.writeFileSync(ignoredPath, 'this match should not be included');
-
-            done();
           });
 
           afterEach(() => {
@@ -2732,7 +2583,7 @@ describe('Workspace', () => {
             }
           });
 
-          it('excludes ignored files when core.excludeVcsIgnoredPaths is true', async (done) => {
+          it('excludes ignored files when core.excludeVcsIgnoredPaths is true', async () => {
             atom.project.setPaths([projectPath]);
             atom.config.set('core.excludeVcsIgnoredPaths', true);
             const resultHandler = jasmine.createSpy('result found');
@@ -2740,11 +2591,9 @@ describe('Workspace', () => {
             await scan(/match/, {}, ({ filePath }) => resultHandler(filePath));
 
             expect(resultHandler).not.toHaveBeenCalled();
-
-            done();
           });
 
-          it('does not exclude ignored files when core.excludeVcsIgnoredPaths is false', async (done) => {
+          it('does not exclude ignored files when core.excludeVcsIgnoredPaths is false', async () => {
             atom.project.setPaths([projectPath]);
             atom.config.set('core.excludeVcsIgnoredPaths', false);
             const resultHandler = jasmine.createSpy('result found');
@@ -2754,11 +2603,9 @@ describe('Workspace', () => {
             expect(resultHandler).toHaveBeenCalledWith(
               path.join(projectPath, 'ignored.txt')
             );
-
-            done();
           });
 
-          it('does not exclude files when searching on an ignored folder even when core.excludeVcsIgnoredPaths is true', async (done) => {
+          it('does not exclude files when searching on an ignored folder even when core.excludeVcsIgnoredPaths is true', async () => {
             fs.mkdirSync(path.join(projectPath, 'poop'));
             ignoredPath = path.join(
               path.join(projectPath, 'poop', 'whatever.txt')
@@ -2774,15 +2621,13 @@ describe('Workspace', () => {
             );
 
             expect(resultHandler).toHaveBeenCalledWith(ignoredPath);
-
-            done();
           });
         });
 
         describe('when the core.followSymlinks config is used', () => {
           let projectPath;
 
-          beforeEach(async (done) => {
+          beforeEach(async () => {
             const sourceProjectPath = path.join(
               __dirname,
               'fixtures',
@@ -2803,8 +2648,6 @@ describe('Workspace', () => {
               path.join(__dirname, 'fixtures', 'dir', 'b'),
               path.join(projectPath, 'symlink')
             );
-
-            done();
           });
 
           afterEach(() => {
@@ -2813,7 +2656,7 @@ describe('Workspace', () => {
             }
           });
 
-          it('follows symlinks when core.followSymlinks is true', async (done) => {
+          it('follows symlinks when core.followSymlinks is true', async () => {
             atom.project.setPaths([projectPath]);
             atom.config.set('core.followSymlinks', true);
             const resultHandler = jasmine.createSpy('result found');
@@ -2823,11 +2666,9 @@ describe('Workspace', () => {
             expect(resultHandler).toHaveBeenCalledWith(
               path.join(projectPath, 'symlink')
             );
-
-            done();
           });
 
-          it('does not follow symlinks when core.followSymlinks is false', async (done) => {
+          it('does not follow symlinks when core.followSymlinks is false', async () => {
             atom.project.setPaths([projectPath]);
             atom.config.set('core.followSymlinks', false);
             const resultHandler = jasmine.createSpy('result found');
@@ -2835,15 +2676,13 @@ describe('Workspace', () => {
             await scan(/ccc/, {}, ({ filePath }) => resultHandler(filePath));
 
             expect(resultHandler).not.toHaveBeenCalled();
-
-            done();
           });
         });
 
         describe('when there are hidden files', () => {
           let projectPath;
 
-          beforeEach(async (done) => {
+          beforeEach(async () => {
             const sourceProjectPath = path.join(
               __dirname,
               'fixtures',
@@ -2864,8 +2703,6 @@ describe('Workspace', () => {
             // accurately test this behaviour there, we should either use a package
             // like `fswin` or manually spawn an `ATTRIB` command.
             fs.writeFileSync(path.join(projectPath, '.hidden'), 'ccc');
-
-            done();
           });
 
           afterEach(() => {
@@ -2874,7 +2711,7 @@ describe('Workspace', () => {
             }
           });
 
-          it('searches on hidden files', async (done) => {
+          it('searches on hidden files', async () => {
             atom.project.setPaths([projectPath]);
             const resultHandler = jasmine.createSpy('result found');
 
@@ -2883,12 +2720,10 @@ describe('Workspace', () => {
             expect(resultHandler).toHaveBeenCalledWith(
               path.join(projectPath, '.hidden')
             );
-
-            done();
           });
         });
 
-        it('includes only files when a directory filter is specified', async (done) => {
+        it('includes only files when a directory filter is specified', async () => {
           const projectPath = path.join(
             path.join(__dirname, 'fixtures', 'dir')
           );
@@ -2907,11 +2742,9 @@ describe('Workspace', () => {
           expect(paths.length).toBe(1);
           expect(paths[0]).toBe(filePath);
           expect(matches.length).toBe(1);
-
-          done();
         });
 
-        it("includes files and folders that begin with a '.'", async (done) => {
+        it("includes files and folders that begin with a '.'", async () => {
           const projectPath = temp.mkdirSync('atom-spec-workspace');
           const filePath = path.join(projectPath, '.text');
           fs.writeFileSync(filePath, 'match this');
@@ -2927,11 +2760,9 @@ describe('Workspace', () => {
           expect(paths.length).toBe(1);
           expect(paths[0]).toBe(filePath);
           expect(matches.length).toBe(1);
-
-          done();
         });
 
-        it('excludes values in core.ignoredNames', async (done) => {
+        it('excludes values in core.ignoredNames', async () => {
           const ignoredNames = atom.config.get('core.ignoredNames');
           ignoredNames.push('a');
           atom.config.set('core.ignoredNames', ignoredNames);
@@ -2940,11 +2771,9 @@ describe('Workspace', () => {
           await scan(/dollar/, {}, () => resultHandler());
 
           expect(resultHandler).not.toHaveBeenCalled();
-
-          done();
         });
 
-        it('scans buffer contents if the buffer is modified', async (done) => {
+        it('scans buffer contents if the buffer is modified', async () => {
           const results = [];
           const editor = await atom.workspace.open('a');
 
@@ -2959,11 +2788,9 @@ describe('Workspace', () => {
           );
           expect(resultForA.matches).toHaveLength(1);
           expect(resultForA.matches[0].matchText).toBe('Elephant');
-
-          done();
         });
 
-        it('ignores buffers outside the project', async (done) => {
+        it('ignores buffers outside the project', async () => {
           const results = [];
           const editor = await atom.workspace.open(temp.openSync().path);
 
@@ -2972,8 +2799,6 @@ describe('Workspace', () => {
           await scan(/Elephant/, {}, result => results.push(result));
 
           expect(results).toHaveLength(0);
-
-          done();
         });
 
         describe('when the project has multiple root directories', () => {
@@ -2995,7 +2820,7 @@ describe('Workspace', () => {
             atom.project.addPath(dir2);
           });
 
-          it("searches matching files in all of the project's root directories", async (done) => {
+          it("searches matching files in all of the project's root directories", async () => {
             const resultPaths = [];
 
             await scan(/aaaa/, {}, ({ filePath }) =>
@@ -3003,12 +2828,10 @@ describe('Workspace', () => {
             );
 
             expect(resultPaths.sort()).toEqual([file1, file2].sort());
-
-            done();
           });
 
           describe('when an inclusion path starts with the basename of a root directory', () => {
-            it('interprets the inclusion path as starting from that directory', async (done) => {
+            it('interprets the inclusion path as starting from that directory', async () => {
               let resultPaths = [];
               await scan(/aaaa/, { paths: ['dir'] }, ({ filePath }) => {
                 if (!resultPaths.includes(filePath)) {
@@ -3056,8 +2879,6 @@ describe('Workspace', () => {
               );
 
               expect(resultPaths).toEqual([file2]);
-
-              done();
             });
           });
 
@@ -3107,7 +2928,7 @@ describe('Workspace', () => {
               );
             });
 
-            it('can override the DefaultDirectorySearcher on a per-directory basis', async (done) => {
+            it('can override the DefaultDirectorySearcher on a per-directory basis', async () => {
               const foreignFilePath = 'ssh://foreign-directory:8080/hello.txt';
               const numPathsSearchedInDir2 = 1;
               const numPathsToPretendToSearchInCustomDirectorySearcher = 10;
@@ -3148,11 +2969,9 @@ describe('Workspace', () => {
                 numPathsToPretendToSearchInCustomDirectorySearcher +
                   numPathsSearchedInDir2
               );
-
-              done();
             });
 
-            it('can be cancelled when the object returned by scan() has its cancel() method invoked', async (done) => {
+            it('can be cancelled when the object returned by scan() has its cancel() method invoked', async () => {
               const thenable = scan(/aaaa/, {}, () => {});
               let resultOfPromiseSearch = null;
 
@@ -3163,11 +2982,9 @@ describe('Workspace', () => {
               resultOfPromiseSearch = await thenable;
 
               expect(resultOfPromiseSearch).toBe('cancelled');
-
-              done();
             });
 
-            it('will have the side-effect of failing the overall search if it fails', async (done) => {
+            it('will have the side-effect of failing the overall search if it fails', async () => {
               // This provider's search should be cancelled when the first provider fails
               let cancelableSearch;
               let fakeSearch2 = null;
@@ -3198,8 +3015,6 @@ describe('Workspace', () => {
 
               expect(cancelableSearchCatchSpy).toHaveBeenCalled();
               expect(fakeSearch2.cancelled).toBe(true);
-
-              done();
             });
           });
         });
@@ -3240,7 +3055,7 @@ describe('Workspace', () => {
           ['line 13', 'line 14', 'line 15']
         ];
 
-        it('returns valid contexts no matter how many lines are requested', async (done) => {
+        it('returns valid contexts no matter how many lines are requested', async () => {
           expect(await search({})).toEqual({
             leadingContext: [[], [], [], []],
             trailingContext: [[], [], [], []]
@@ -3301,8 +3116,6 @@ describe('Workspace', () => {
               result.slice(0, 3)
             )
           });
-
-          done();
         });
       });
     }); // Cancels other ongoing searches
@@ -3318,7 +3131,7 @@ describe('Workspace', () => {
     });
 
     describe("when a file doesn't exist", () => {
-      it('calls back with an error', async (done) => {
+      it('calls back with an error', async () => {
         const errors = [];
         const missingPath = path.resolve('/not-a-file.js');
         expect(fs.existsSync(missingPath)).toBeFalsy();
@@ -3332,13 +3145,11 @@ describe('Workspace', () => {
 
         expect(errors).toHaveLength(1);
         expect(errors[0].path).toBe(missingPath);
-
-        done();
       });
     });
 
     describe('when called with unopened files', () => {
-      it('replaces properly', async (done) => {
+      it('replaces properly', async () => {
         const filePath = path.join(projectDir, 'sample.js');
         fs.copyFileSync(path.join(fixturesDir, 'sample.js'), filePath);
 
@@ -3350,11 +3161,9 @@ describe('Workspace', () => {
         expect(results).toHaveLength(1);
         expect(results[0].filePath).toBe(filePath);
         expect(results[0].replacements).toBe(6);
-
-        done();
       });
 
-      it('does not discard the multiline flag', async (done) => {
+      it('does not discard the multiline flag', async () => {
         const filePath = path.join(projectDir, 'sample.js');
         fs.copyFileSync(path.join(fixturesDir, 'sample.js'), filePath);
 
@@ -3366,13 +3175,11 @@ describe('Workspace', () => {
         expect(results).toHaveLength(1);
         expect(results[0].filePath).toBe(filePath);
         expect(results[0].replacements).toBe(8);
-
-        done();
       });
     });
 
     describe('when a buffer is already open', () => {
-      it('replaces properly and saves when not modified', async (done) => {
+      it('replaces properly and saves when not modified', async () => {
         const filePath = path.join(projectDir, 'sample.js');
         fs.copyFileSync(
           path.join(fixturesDir, 'sample.js'),
@@ -3395,11 +3202,9 @@ describe('Workspace', () => {
         expect(results[0].replacements).toBe(6);
 
         expect(editor.isModified()).toBeFalsy();
-
-        done();
       });
 
-      it('does not replace when the path is not specified', async (done) => {
+      it('does not replace when the path is not specified', async () => {
         const filePath = path.join(projectDir, 'sample.js');
         const commentFilePath = path.join(
           projectDir,
@@ -3423,11 +3228,9 @@ describe('Workspace', () => {
 
         expect(results).toHaveLength(1);
         expect(results[0].filePath).toBe(commentFilePath);
-
-        done();
       });
 
-      it('does NOT save when modified', async (done) => {
+      it('does NOT save when modified', async () => {
         const filePath = path.join(projectDir, 'sample.js');
         fs.copyFileSync(path.join(fixturesDir, 'sample.js'), filePath);
 
@@ -3448,8 +3251,6 @@ describe('Workspace', () => {
         expect(results[0].replacements).toBe(6);
 
         expect(editor.isModified()).toBeTruthy();
-
-        done();
       });
     });
   });
@@ -3457,17 +3258,15 @@ describe('Workspace', () => {
   describe('::saveActivePaneItem()', () => {
     let editor, notificationSpy;
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       editor = await atom.workspace.open('sample.js');
 
       notificationSpy = jasmine.createSpy('did-add-notification');
       atom.notifications.onDidAddNotification(notificationSpy);
-
-      done();
     });
 
     describe('when there is an error', () => {
-      it('emits a warning notification when the file cannot be saved', async (done) => {
+      it('emits a warning notification when the file cannot be saved', async () => {
         spyOn(editor, 'save').and.callFake(() => {
           throw new Error("'/some/file' is a directory");
         });
@@ -3481,11 +3280,9 @@ describe('Workspace', () => {
         expect(
           notificationSpy.calls.mostRecent().args[0].getMessage()
         ).toContain('Unable to save');
-
-        done();
       });
 
-      it('emits a warning notification when the directory cannot be written to', async (done) => {
+      it('emits a warning notification when the directory cannot be written to', async () => {
         spyOn(editor, 'save').and.callFake(() => {
           throw new Error("ENOTDIR, not a directory '/Some/dir/and-a-file.js'");
         });
@@ -3499,11 +3296,9 @@ describe('Workspace', () => {
         expect(
           notificationSpy.calls.mostRecent().args[0].getMessage()
         ).toContain('Unable to save');
-
-        done();
       });
 
-      it('emits a warning notification when the user does not have permission', async (done) => {
+      it('emits a warning notification when the user does not have permission', async () => {
         spyOn(editor, 'save').and.callFake(() => {
           const error = new Error(
             "EACCES, permission denied '/Some/dir/and-a-file.js'"
@@ -3522,11 +3317,9 @@ describe('Workspace', () => {
         expect(
           notificationSpy.calls.mostRecent().args[0].getMessage()
         ).toContain('Unable to save');
-
-        done();
       });
 
-      it('emits a warning notification when the operation is not permitted', async (done) => {
+      it('emits a warning notification when the operation is not permitted', async () => {
         spyOn(editor, 'save').and.callFake(() => {
           const error = new Error(
             "EPERM, operation not permitted '/Some/dir/and-a-file.js'"
@@ -3545,11 +3338,9 @@ describe('Workspace', () => {
         expect(
           notificationSpy.calls.mostRecent().args[0].getMessage()
         ).toContain('Unable to save');
-
-        done();
       });
 
-      it('emits a warning notification when the file is already open by another app', async (done) => {
+      it('emits a warning notification when the file is already open by another app', async () => {
         spyOn(editor, 'save').and.callFake(() => {
           const error = new Error(
             "EBUSY, resource busy or locked '/Some/dir/and-a-file.js'"
@@ -3568,11 +3359,9 @@ describe('Workspace', () => {
         expect(
           notificationSpy.calls.mostRecent().args[0].getMessage()
         ).toContain('Unable to save');
-
-        done();
       });
 
-      it('emits a warning notification when the file system is read-only', async (done) => {
+      it('emits a warning notification when the file system is read-only', async () => {
         spyOn(editor, 'save').and.callFake(() => {
           const error = new Error(
             "EROFS, read-only file system '/Some/dir/and-a-file.js'"
@@ -3591,11 +3380,9 @@ describe('Workspace', () => {
         expect(
           notificationSpy.calls.mostRecent().args[0].getMessage()
         ).toContain('Unable to save');
-
-        done();
       });
 
-      it('emits a warning notification when the file cannot be saved', async (done) => {
+      it('emits a warning notification when the file cannot be saved', async () => {
         spyOn(editor, 'save').and.callFake(() => {
           throw new Error('no one knows');
         });
@@ -3604,21 +3391,17 @@ describe('Workspace', () => {
         await atom.workspace.saveActivePaneItem().catch(catchSpy)
 
         expect(catchSpy).toHaveBeenCalled();
-
-        done();
       });
     });
   });
 
   describe('::closeActivePaneItemOrEmptyPaneOrWindow', () => {
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       spyOn(atom, 'close');
       await atom.workspace.open();
-
-      done();
     });
 
-    it('closes the active center pane item, or the active center pane if it is empty, or the current window if there is only the empty root pane in the center', async (done) => {
+    it('closes the active center pane item, or the active center pane if it is empty, or the current window if there is only the empty root pane in the center', async () => {
       atom.config.set('core.destroyEmptyPanes', false);
 
       const pane1 = atom.workspace.getActivePane();
@@ -3657,8 +3440,6 @@ describe('Workspace', () => {
       expect(atom.workspace.getLeftDock().getPaneItems().length).toBe(2);
       atom.workspace.closeActivePaneItemOrEmptyPaneOrWindow();
       expect(atom.close).toHaveBeenCalled();
-
-      done();
     });
   });
 
@@ -3794,7 +3575,7 @@ describe('Workspace', () => {
   });
 
   describe('when the core.allowPendingPaneItems option is falsy', () => {
-    it('does not open item with `pending: true` option as pending', async (done) => {
+    it('does not open item with `pending: true` option as pending', async () => {
       let pane = null;
       atom.config.set('core.allowPendingPaneItems', false);
 
@@ -3802,13 +3583,11 @@ describe('Workspace', () => {
       pane = atom.workspace.getActivePane();
 
       expect(pane.getPendingItem()).toBeFalsy();
-
-      done();
     });
   });
 
   describe('grammar activation', () => {
-    it('notifies the workspace of which grammar is used', async (done) => {
+    it('notifies the workspace of which grammar is used', async () => {
       atom.packages.triggerDeferredActivationHooks();
 
       const javascriptGrammarUsed = jasmine.createSpy('js grammar used');
@@ -3850,23 +3629,19 @@ describe('Workspace', () => {
         'source.ruby'
       );
       expect(rubyGrammarUsed).toHaveBeenCalled();
-
-      done();
     });
   });
 
   describe('.checkoutHeadRevision()', () => {
     let editor = null;
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       jasmine.useRealClock();
       atom.config.set('editor.confirmCheckoutHeadRevision', false);
 
       editor = await atom.workspace.open('sample-with-comments.js');
-
-      done();
     });
 
-    it('reverts to the version of its file checked into the project repository', async (done) => {
+    it('reverts to the version of its file checked into the project repository', async () => {
       editor.setCursorBufferPosition([0, 0]);
       editor.insertText('---\n');
       expect(editor.lineTextForBufferRow(0)).toBe('---');
@@ -3874,8 +3649,6 @@ describe('Workspace', () => {
       atom.workspace.checkoutHeadRevision(editor);
 
       await conditionPromise(() => editor.lineTextForBufferRow(0) === '');
-
-      done();
     });
 
     describe("when there's no repository for the editor's file", () => {
@@ -3894,11 +3667,9 @@ describe('Workspace', () => {
       atom.workspace.enablePersistence = true;
     });
 
-    afterEach(async (done) => {
+    afterEach(async () => {
       await atom.workspace.itemLocationStore.clear();
       atom.workspace.enablePersistence = false;
-
-      done();
     });
 
     it("stores the new location if it's not the default", () => {

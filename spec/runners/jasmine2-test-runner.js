@@ -18,6 +18,7 @@ temp.track();
 module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) {
   // Load Jasmine 2.x
   require('../helpers/jasmine2-singleton');
+  defineJasmineHelpersOnWindow(jasmine.getEnv())
 
   // Build Atom Environment
   const { atomHome, applicationDelegate } = require('../helpers/build-atom-environment');
@@ -59,9 +60,7 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
       jasmine.currentEnv_ = null;
 
       // As all the jasmine helpers (it, describe, etc..) were registered to the previous environment, we need to re-set them on window
-      for (let key in jasmine.getEnv()) {
-        window[key] = jasmine.getEnv()[key];
-      }
+      defineJasmineHelpersOnWindow(jasmine.getEnv());
 
       // Set up a specFilter to disable all passing spec and re-run only the flaky ones
       jasmine.getEnv().specFilter = (spec) => {
@@ -84,6 +83,38 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
       return 0;
     })
 };
+
+const defineJasmineHelpersOnWindow = (jasmineEnv) => {
+  for (let key in jasmineEnv) {
+    window[key] = jasmineEnv[key];
+  }
+
+  ['it', 'fit', 'xit'].forEach((key) => {
+    window[key] = (name, originalFn) => {
+      jasmineEnv[key](name, async (done) => {
+        if(originalFn.length === 0) {
+          await originalFn()
+          done();
+        } else {
+          originalFn(done);
+        }
+      });
+    }
+  });
+
+  ['beforeEach', 'afterEach'].forEach((key) => {
+    window[key] = (originalFn) => {
+      jasmineEnv[key](async (done) => {
+        if(originalFn.length === 0) {
+          await originalFn()
+          done();
+        } else {
+          originalFn(done);
+        }
+      })
+    }
+  });
+}
 
 const loadSpecsAndRunThem = (logFile, headless, testPaths) => {
   return new Promise((resolve) => {

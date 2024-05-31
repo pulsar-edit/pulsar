@@ -100,7 +100,7 @@ describe('Package', function() {
 
     afterEach(() => (atom.packages.devMode = true));
 
-    it('returns a promise resolving to the results of `apm rebuild`', async function(done) {
+    it('returns a promise resolving to the results of `apm rebuild`', async function() {
       const packagePath = __guard__(atom.project.getDirectories()[0], x =>
         x.resolve('packages/package-with-index')
       );
@@ -122,8 +122,6 @@ describe('Package', function() {
         stdout: 'stdout output',
         stderr: 'stderr output'
       });
-
-      done();
     });
 
     it('persists build failures in local storage', function() {
@@ -168,12 +166,10 @@ describe('Package', function() {
       jasmine.attachToDOM(editorElement);
     });
 
-    afterEach(async (done) => {
+    afterEach(async () => {
       if (theme != null) {
         await theme.deactivate();
       }
-
-      done();
     });
 
     describe('when the theme contains a single style file', function() {
@@ -259,13 +255,11 @@ describe('Package', function() {
         theme.activate();
       });
 
-      it('deactivated event fires on .deactivate()', async function(done) {
+      it('deactivated event fires on .deactivate()', async function() {
         let spy = jasmine.createSpy();
         theme.onDidDeactivate(spy);
         await theme.deactivate();
         expect(spy).toHaveBeenCalled();
-
-        done();
       });
     });
   });

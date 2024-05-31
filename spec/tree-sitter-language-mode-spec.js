@@ -37,14 +37,12 @@ const rustGrammarPath = require.resolve(
 describe('TreeSitterLanguageMode', () => {
   let editor, buffer;
 
-  beforeEach(async (done) => {
+  beforeEach(async () => {
     editor = await atom.workspace.open('');
     buffer = editor.getBuffer();
     editor.displayLayer.reset({ foldCharacter: '…' });
     atom.config.set('core.useTreeSitterParsers', true);
     atom.config.set('core.useLegacyTreeSitter', true);
-
-    done();
   });
 
   describe('highlighting', () => {
@@ -464,7 +462,7 @@ describe('TreeSitterLanguageMode', () => {
     });
 
     describe('when the buffer changes during a parse', () => {
-      it('immediately parses again when the current parse completes', async (done) => {
+      it('immediately parses again when the current parse completes', async () => {
         const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
           parser: 'tree-sitter-javascript',
           scopes: {
@@ -526,8 +524,6 @@ describe('TreeSitterLanguageMode', () => {
             { text: '();', scopes: [] }
           ]
         ]);
-
-        done();
       });
     });
 
@@ -607,7 +603,7 @@ describe('TreeSitterLanguageMode', () => {
         });
       });
 
-      it('highlights code inside of injection points', async (done) => {
+      it('highlights code inside of injection points', async () => {
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(htmlGrammar);
         buffer.setText('node.innerHTML = html `\na ${b}<img src="d">\n`;');
@@ -664,8 +660,6 @@ describe('TreeSitterLanguageMode', () => {
           ],
           [{ text: '`', scopes: ['string'] }, { text: ';', scopes: [] }]
         ]);
-
-        done();
       });
 
       it('highlights the content after injections', () => {
@@ -708,7 +702,7 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('updates buffers highlighting when a grammar with injectionRegExp is added', async (done) => {
+      it('updates buffers highlighting when a grammar with injectionRegExp is added', async () => {
         atom.grammars.addGrammar(jsGrammar);
 
         buffer.setText('node.innerHTML = html `\na ${b}<img src="d">\n`;');
@@ -762,8 +756,6 @@ describe('TreeSitterLanguageMode', () => {
           ],
           [{ text: '`', scopes: ['string'] }, { text: ';', scopes: [] }]
         ]);
-
-        done();
       });
 
       it('handles injections that intersect', () => {
@@ -845,7 +837,7 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('handles injections that are empty', async (done) => {
+      it('handles injections that are empty', async () => {
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(htmlGrammar);
         buffer.setText('text = html');
@@ -900,8 +892,6 @@ describe('TreeSitterLanguageMode', () => {
             { text: ';', scopes: [] }
           ]
         ]);
-
-        done();
       });
 
       it('terminates comment token at the end of an injection, so that the next injection is NOT a continuation of the comment', () => {
@@ -994,7 +984,7 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('reports scopes from shallower layers when they are at the start or end of an injection', async (done) => {
+      it('reports scopes from shallower layers when they are at the start or end of an injection', async () => {
         await atom.packages.activatePackage('language-javascript');
 
         editor.setGrammar(atom.grammars.grammarForScopeName('source.js'));
@@ -1031,8 +1021,6 @@ describe('TreeSitterLanguageMode', () => {
             }
           ]
         ]);
-
-        done();
       });
 
       it('respects the `includeChildren` property of injection points', () => {
@@ -1110,7 +1098,7 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('notifies onDidTokenize listeners the first time all syntax highlighting is done', async (done) => {
+      it('notifies onDidTokenize listeners the first time all syntax highlighting is done', async () => {
         const promise = new Promise(resolve => {
           editor.onDidTokenize(event => {
             expectTokensToEqual(editor, [
@@ -1146,8 +1134,6 @@ describe('TreeSitterLanguageMode', () => {
         buffer.setLanguageMode(languageMode);
 
         await promise;
-
-        done();
       });
     });
   });
@@ -1164,7 +1150,7 @@ describe('TreeSitterLanguageMode', () => {
       jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     });
 
-    it('matches the highlighting of a freshly-opened editor', async (done) => {
+    it('matches the highlighting of a freshly-opened editor', async () => {
       jasmine.useRealClock();
 
       const text = fs.readFileSync(
@@ -1239,8 +1225,6 @@ describe('TreeSitterLanguageMode', () => {
           expect(tokens1).toEqual(tokens2, `Seed: ${seed}, screen line: ${j}`);
         }
       }
-
-      done();
     });
   });
 

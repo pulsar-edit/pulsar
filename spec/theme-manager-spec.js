@@ -8,14 +8,12 @@ describe('atom.themes', function() {
     spyOn(console, 'warn');
   });
 
-  afterEach(async function(done) {
+  afterEach(async function() {
     await atom.themes.deactivateThemes();
 
     try {
       temp.cleanupSync();
     } catch (error) {}
-
-    done();
   });
 
   describe('theme getters and setters', function() {
@@ -33,15 +31,13 @@ describe('atom.themes', function() {
       }));
 
     describe('getActiveThemes', () =>
-      it('gets all the active themes', async function(done) {
+      it('gets all the active themes', async function() {
         await atom.themes.activateThemes();
 
         const names = atom.config.get('core.themes');
         expect(names.length).toBeGreaterThan(0);
         const themes = atom.themes.getActiveThemes();
         expect(themes).toHaveLength(names.length);
-
-        done();
       }));
   });
 
@@ -88,7 +84,7 @@ describe('atom.themes', function() {
   });
 
   describe('when the core.themes config value changes', function() {
-    it('add/removes stylesheets to reflect the new config value', async function(done) {
+    it('add/removes stylesheets to reflect the new config value', async function() {
       let didChangeActiveThemesHandler = jasmine.createSpy();
       atom.themes.onDidChangeActiveThemes(didChangeActiveThemesHandler);
       spyOn(atom.styles, 'getUserStyleSheetPath').and.callFake(() => null);
@@ -152,11 +148,9 @@ describe('atom.themes', function() {
       const importPaths = atom.themes.getImportPaths();
       expect(importPaths.length).toBe(1);
       expect(importPaths[0]).toContain('atom-dark-ui');
-
-      done();
     });
 
-    it('adds theme-* classes to the workspace for each active theme', async function(done) {
+    it('adds theme-* classes to the workspace for each active theme', async function() {
       atom.config.set('core.themes', ['atom-dark-ui', 'atom-dark-syntax']);
 
       let didChangeActiveThemesHandler = jasmine.createSpy();
@@ -186,8 +180,6 @@ describe('atom.themes', function() {
       );
       expect(workspaceElement).not.toHaveClass('theme-atom-dark-ui');
       expect(workspaceElement).not.toHaveClass('theme-atom-dark-syntax');
-
-      done();
     });
   });
 
@@ -332,17 +324,15 @@ h2 {
   });
 
   describe('base style sheet loading', function() {
-    beforeEach(async function(done) {
+    beforeEach(async function() {
       const workspaceElement = atom.workspace.getElement();
       jasmine.attachToDOM(atom.workspace.getElement());
       workspaceElement.appendChild(document.createElement('atom-text-editor'));
 
       await atom.themes.activateThemes();
-
-      done();
     });
 
-    it("loads the correct values from the theme's ui-variables file", async function(done) {
+    it("loads the correct values from the theme's ui-variables file", async function() {
       await new Promise((resolve) => {
         atom.themes.onDidChangeActiveThemes(resolve);
         atom.config.set('core.themes', [
@@ -369,12 +359,10 @@ h2 {
         getComputedStyle(document.querySelector('atom-text-editor'))
           .paddingBottom
       ).toBe('150px');
-
-      done();
     });
 
     describe('when there is a theme with incomplete variables', () =>
-      it('loads the correct values from the fallback ui-variables', async function(done) {
+      it('loads the correct values from the fallback ui-variables', async function() {
         await new Promise((resolve) => {
           atom.themes.onDidChangeActiveThemes(resolve);
           atom.config.set('core.themes', [
@@ -393,8 +381,6 @@ h2 {
           getComputedStyle(document.querySelector('atom-text-editor'))
             .backgroundColor
         ).toBe('rgb(0, 152, 255)');
-
-        done();
       }));
   });
 
@@ -414,7 +400,7 @@ h2 {
 
       afterEach(() => jasmine.restoreDeprecationsSnapshot());
 
-      it('reloads it', async function(done) {
+      it('reloads it', async function() {
         let styleElementAddedHandler = jasmine.createSpy('styleElementRemovedHandler');
         let styleElementRemovedHandler = jasmine.createSpy('styleElementAddedHandler');
 
@@ -463,8 +449,6 @@ h2 {
           styleElementRemovedHandler.calls.argsFor(0)[0].textContent
         ).toContain('dashed');
         expect(getComputedStyle(document.body).borderStyle).toBe('none');
-
-        done();
       });
     });
 
@@ -534,7 +518,7 @@ h2 {
   });
 
   describe('when a non-existent theme is present in the config', function() {
-    beforeEach(async function(done) {
+    beforeEach(async function() {
       console.warn.calls.reset();
       atom.config.set('core.themes', [
         'non-existent-dark-ui',
@@ -542,8 +526,6 @@ h2 {
       ]);
 
       await atom.themes.activateThemes();
-
-      done();
     });
 
     it('uses the default one-dark UI and syntax themes and logs a warning', function() {
@@ -557,12 +539,10 @@ h2 {
 
   describe('when in safe mode', function() {
     describe('when the enabled UI and syntax themes are bundled with Atom', function() {
-      beforeEach(async function(done) {
+      beforeEach(async function() {
         atom.config.set('core.themes', ['atom-light-ui', 'atom-dark-syntax']);
 
         await atom.themes.activateThemes();
-
-        done();
       });
 
       it('uses the enabled themes', function() {
@@ -574,15 +554,13 @@ h2 {
     });
 
     describe('when the enabled UI and syntax themes are not bundled with Atom', function() {
-      beforeEach(async function(done) {
+      beforeEach(async function() {
         atom.config.set('core.themes', [
           'installed-dark-ui',
           'installed-dark-syntax'
         ]);
 
         await atom.themes.activateThemes();
-
-        done();
       });
 
       it('uses the default dark UI and syntax themes', function() {
@@ -594,15 +572,13 @@ h2 {
     });
 
     describe('when the enabled UI theme is not bundled with Atom', function() {
-      beforeEach(async function(done) {
+      beforeEach(async function() {
         atom.config.set('core.themes', [
           'installed-dark-ui',
           'atom-light-syntax'
         ]);
 
         await atom.themes.activateThemes();
-
-        done();
       });
 
       it('uses the default one-dark UI theme', function() {
@@ -614,15 +590,13 @@ h2 {
     });
 
     describe('when the enabled syntax theme is not bundled with Atom', function() {
-      beforeEach(async function(done) {
+      beforeEach(async function() {
         atom.config.set('core.themes', [
           'atom-light-ui',
           'installed-dark-syntax'
         ]);
 
         await atom.themes.activateThemes();
-
-        done();
       });
 
       it('uses the default one-dark syntax theme', function() {

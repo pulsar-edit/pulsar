@@ -190,7 +190,7 @@ describe('ViewRegistry', () => {
   });
 
   describe('::getNextUpdatePromise()', () =>
-    it('returns a promise that resolves at the end of the next update cycle', async (done) => {
+    it('returns a promise that resolves at the end of the next update cycle', async () => {
       let updateDocumentSpy = jasmine.createSpy('update document');
       let readDocumentSpy = jasmine.createSpy('read document');
 
@@ -201,7 +201,5 @@ describe('ViewRegistry', () => {
 
       expect(updateDocumentSpy).toHaveBeenCalled();
       expect(readDocumentSpy).toHaveBeenCalled();
-
-      done();
     }));
 });

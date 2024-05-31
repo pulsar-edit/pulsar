@@ -665,7 +665,7 @@ describe('WorkspaceElement', () => {
       );
     });
 
-    it('shows the toggle button when the dock is open', async (done) => {
+    it('shows the toggle button when the dock is open', async () => {
       await Promise.all([
         atom.workspace.open({
           element: document.createElement('div'),
@@ -835,8 +835,6 @@ describe('WorkspaceElement', () => {
       await getNextUpdatePromise();
       expect(bottomDock.isVisible()).toBe(true);
       expectToggleButtonVisible(bottomDock, 'icon-chevron-down');
-
-      done();
     });
 
     function moveMouse(coordinates) {
@@ -885,18 +883,16 @@ describe('WorkspaceElement', () => {
   describe('editor font styling', () => {
     let editor, editorElement, workspaceElement;
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       await atom.workspace.open('sample.js');
 
       workspaceElement = atom.workspace.getElement();
       jasmine.attachToDOM(workspaceElement);
       editor = atom.workspace.getActiveTextEditor();
       editorElement = editor.getElement();
-
-      done();
     });
 
-    it("updates the font-size based on the 'editor.fontSize' config value", async (done) => {
+    it("updates the font-size based on the 'editor.fontSize' config value", async () => {
       const initialCharWidth = editor.getDefaultCharWidth();
       expect(getComputedStyle(editorElement).fontSize).toBe(
         atom.config.get('editor.fontSize') + 'px'
@@ -915,11 +911,9 @@ describe('WorkspaceElement', () => {
         atom.config.get('editor.fontSize') + 'px'
       );
       expect(editor.getDefaultCharWidth()).toBeGreaterThan(initialCharWidth);
-
-      done();
     });
 
-    it("updates the font-family based on the 'editor.fontFamily' config value", async (done) => {
+    it("updates the font-family based on the 'editor.fontFamily' config value", async () => {
       const initialCharWidth = editor.getDefaultCharWidth();
       let fontFamily = atom.config.get('editor.fontFamily');
       expect(getComputedStyle(editorElement).fontFamily).toBe(fontFamily);
@@ -932,11 +926,9 @@ describe('WorkspaceElement', () => {
       fontFamily = atom.config.get('editor.fontFamily');
       expect(getComputedStyle(editorElement).fontFamily).toBe(fontFamily);
       expect(editor.getDefaultCharWidth()).not.toBe(initialCharWidth);
-
-      done();
     });
 
-    it("updates the line-height based on the 'editor.lineHeight' config value", async (done) => {
+    it("updates the line-height based on the 'editor.lineHeight' config value", async () => {
       const initialLineHeight = editor.getLineHeightInPixels();
 
       await new Promise((resolve) => {
@@ -948,8 +940,6 @@ describe('WorkspaceElement', () => {
         atom.config.get('editor.lineHeight')
       );
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
-
-      done();
     });
 
     it('increases or decreases the font size when a ctrl-mousewheel event occurs', () => {

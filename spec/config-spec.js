@@ -1042,7 +1042,7 @@ describe('Config', () => {
       atom.config.onDidChange('foo.bar.baz', changeSpy);
     });
 
-    it('allows only one change event for the duration of the given promise if it gets resolved', async (done) => {
+    it('allows only one change event for the duration of the given promise if it gets resolved', async () => {
       let promiseResult = null;
       const transactionPromise = atom.config.transactAsync(() => {
         atom.config.set('foo.bar.baz', 1);
@@ -1059,11 +1059,9 @@ describe('Config', () => {
         newValue: 3,
         oldValue: undefined
       });
-
-      done();
     });
 
-    it('allows only one change event for the duration of the given promise if it gets rejected', async (done) => {
+    it('allows only one change event for the duration of the given promise if it gets rejected', async () => {
       let promiseError = null;
       const transactionPromise = atom.config.transactAsync(() => {
         atom.config.set('foo.bar.baz', 1);
@@ -1082,11 +1080,9 @@ describe('Config', () => {
         newValue: 3,
         oldValue: undefined
       });
-
-      done();
     });
 
-    it('allows only one change event even when the given callback throws', async (done) => {
+    it('allows only one change event even when the given callback throws', async () => {
       const error = new Error('Oops!');
       let promiseError = null;
       const transactionPromise = atom.config.transactAsync(() => {
@@ -1106,8 +1102,6 @@ describe('Config', () => {
         newValue: 3,
         oldValue: undefined
       });
-
-      done();
     });
   });
 

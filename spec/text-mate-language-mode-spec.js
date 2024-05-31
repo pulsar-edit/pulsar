@@ -8,15 +8,13 @@ const dedent = require('dedent');
 describe('TextMateLanguageMode', () => {
   let languageMode, buffer, config;
 
-  beforeEach(async (done) => {
+  beforeEach(async () => {
     config = atom.config;
     config.set('core.useTreeSitterParsers', false);
     // enable async tokenization
     TextMateLanguageMode.prototype.chunkSize = 5;
     jasmine.unspy(TextMateLanguageMode.prototype, 'tokenizeInBackground');
     await atom.packages.activatePackage('language-javascript');
-
-    done();
   });
 
   afterEach(() => {
@@ -26,7 +24,7 @@ describe('TextMateLanguageMode', () => {
   });
 
   describe('when the editor is constructed with the largeFileMode option set to true', () => {
-    it("loads the editor but doesn't tokenize", async (done) => {
+    it("loads the editor but doesn't tokenize", async () => {
       const line = 'a b c d\n';
       buffer = new TextBuffer(line.repeat(256 * 1024));
       expect(buffer.getText().length).toBe(2 * 1024 * 1024);
@@ -50,8 +48,6 @@ describe('TextMateLanguageMode', () => {
       iterator.seek({ row: 0, column: 0 });
       iterator.moveToSuccessor();
       expect(iterator.getPosition()).toEqual({ row: 0, column: 11 });
-
-      done();
     });
   });
 
@@ -431,7 +427,7 @@ describe('TextMateLanguageMode', () => {
     });
 
     describe('when the buffer contains hard-tabs', () => {
-      beforeEach(async (done) => {
+      beforeEach(async () => {
         atom.packages.activatePackage('language-coffee-script');
 
         buffer = atom.project.bufferForPathSync('sample-with-tabs.coffee');
@@ -441,8 +437,6 @@ describe('TextMateLanguageMode', () => {
           grammar: atom.grammars.grammarForScopeName('source.coffee')
         });
         languageMode.startTokenizing();
-
-        done();
       });
 
       afterEach(() => {
@@ -456,18 +450,16 @@ describe('TextMateLanguageMode', () => {
     });
 
     describe('when tokenization completes', () => {
-      it('emits the `tokenized` event', async (done) => {
+      it('emits the `tokenized` event', async () => {
         const editor = await atom.workspace.open('sample.js');
 
         const tokenizedHandler = jasmine.createSpy('tokenized handler');
         editor.languageMode.onDidTokenize(tokenizedHandler);
         fullyTokenize(editor.getBuffer().getLanguageMode());
         expect(tokenizedHandler.calls.count()).toBe(1);
-
-        done();
       });
 
-      it("doesn't re-emit the `tokenized` event when it is re-tokenized", async (done) => {
+      it("doesn't re-emit the `tokenized` event when it is re-tokenized", async () => {
         const editor = await atom.workspace.open('sample.js');
         fullyTokenize(editor.languageMode);
 
@@ -476,13 +468,11 @@ describe('TextMateLanguageMode', () => {
         editor.getBuffer().insert([0, 0], "'");
         fullyTokenize(editor.languageMode);
         expect(tokenizedHandler).not.toHaveBeenCalled();
-
-        done();
       });
     });
 
     describe('when the grammar is updated because a grammar it includes is activated', () => {
-      it('re-emits the `tokenized` event', async (done) => {
+      it('re-emits the `tokenized` event', async () => {
         let tokenizationCount = 0;
 
         const editor = await atom.workspace.open('coffee.coffee');
@@ -495,11 +485,9 @@ describe('TextMateLanguageMode', () => {
         await atom.packages.activatePackage('language-coffee-script');
         fullyTokenize(editor.getBuffer().getLanguageMode());
         expect(tokenizationCount).toBe(1);
-
-        done();
       });
 
-      it('retokenizes the buffer', async (done) => {
+      it('retokenizes the buffer', async () => {
         await atom.packages.activatePackage('language-ruby-on-rails');
         await atom.packages.activatePackage('language-ruby');
 
@@ -527,8 +515,6 @@ describe('TextMateLanguageMode', () => {
             'punctuation.definition.tag.begin.html'
           ]
         });
-
-        done();
       });
     });
 
@@ -846,7 +832,7 @@ describe('TextMateLanguageMode', () => {
       iterator.moveToSuccessor();
     }); // ensure we don't infinitely loop (regression test)
 
-    it('does not report columns beyond the length of the line', async (done) => {
+    it('does not report columns beyond the length of the line', async () => {
       await atom.packages.activatePackage('language-coffee-script');
 
       buffer = new TextBuffer({ text: '# hello\n# world' });
@@ -871,8 +857,6 @@ describe('TextMateLanguageMode', () => {
 
       iterator.seek(Point(0, 8));
       expect(iterator.getPosition().column).toBe(7);
-
-      done();
     });
 
     it('correctly terminates scopes at the beginning of the line (regression)', () => {
@@ -1014,11 +998,9 @@ describe('TextMateLanguageMode', () => {
     let editor;
 
     describe('javascript', () => {
-      beforeEach(async (done) => {
+      beforeEach(async () => {
         editor = await atom.workspace.open('sample.js', { autoIndent: false });
         await atom.packages.activatePackage('language-javascript');
-
-        done();
       });
 
       it('bases indentation off of the previous non-blank line', () => {
@@ -1044,12 +1026,10 @@ describe('TextMateLanguageMode', () => {
     });
 
     describe('css', () => {
-      beforeEach(async (done) => {
+      beforeEach(async () => {
         editor = await atom.workspace.open('css.css', { autoIndent: true });
         await atom.packages.activatePackage('language-source');
         await atom.packages.activatePackage('language-css');
-
-        done();
       });
 
       it('does not return negative values (regression)', () => {
@@ -1137,7 +1117,7 @@ describe('TextMateLanguageMode', () => {
       expect(languageMode.isFoldableAtRow(8)).toBe(false);
     });
 
-    it('returns true if the line starts a multi-line comment', async (done) => {
+    it('returns true if the line starts a multi-line comment', async () => {
       editor = await atom.workspace.open('sample-with-comments.js');
       fullyTokenize(editor.getBuffer().getLanguageMode());
 
@@ -1150,27 +1130,21 @@ describe('TextMateLanguageMode', () => {
       expect(editor.isFoldableAtBufferRow(21)).toBe(true);
       expect(editor.isFoldableAtBufferRow(24)).toBe(true);
       expect(editor.isFoldableAtBufferRow(28)).toBe(false);
-
-      done();
     });
 
-    it('returns true for lines that end with a comment and are followed by an indented line', async (done) => {
+    it('returns true for lines that end with a comment and are followed by an indented line', async () => {
       editor = await atom.workspace.open('sample-with-comments.js');
 
       expect(editor.isFoldableAtBufferRow(5)).toBe(true);
-
-      done();
     });
 
-    it("does not return true for a line in the middle of a comment that's followed by an indented line", async (done) => {
+    it("does not return true for a line in the middle of a comment that's followed by an indented line", async () => {
       editor = await atom.workspace.open('sample-with-comments.js');
       fullyTokenize(editor.getBuffer().getLanguageMode());
 
       expect(editor.isFoldableAtBufferRow(7)).toBe(false);
       editor.buffer.insert([8, 0], '  ');
       expect(editor.isFoldableAtBufferRow(7)).toBe(false);
-
-      done();
     });
   });
 
@@ -1240,7 +1214,7 @@ describe('TextMateLanguageMode', () => {
       `);
     });
 
-    it('folds every foldable range at a given indentLevel', async (done) => {
+    it('folds every foldable range at a given indentLevel', async () => {
       editor = await atom.workspace.open('sample-with-comments.js');
       fullyTokenize(editor.getBuffer().getLanguageMode());
 
@@ -1252,8 +1226,6 @@ describe('TextMateLanguageMode', () => {
       expect([folds[2].start.row, folds[2].end.row]).toEqual([17, 20]);
       expect([folds[3].start.row, folds[3].end.row]).toEqual([21, 22]);
       expect([folds[4].start.row, folds[4].end.row]).toEqual([24, 25]);
-
-      done();
     });
   });
 
@@ -1290,7 +1262,7 @@ describe('TextMateLanguageMode', () => {
       );
     });
 
-    it('works with multi-line comments', async (done) => {
+    it('works with multi-line comments', async () => {
       await atom.packages.activatePackage('language-javascript');
       const editor = await atom.workspace.open('sample-with-comments.js', {
         autoIndent: false
@@ -1308,8 +1280,6 @@ describe('TextMateLanguageMode', () => {
       expect([folds[5].start.row, folds[5].end.row]).toEqual([17, 20]);
       expect([folds[6].start.row, folds[6].end.row]).toEqual([21, 22]);
       expect([folds[7].start.row, folds[7].end.row]).toEqual([24, 25]);
-
-      done();
     });
   });
 
@@ -1391,7 +1361,7 @@ describe('TextMateLanguageMode', () => {
       `);
     });
 
-    it('works for coffee-script', async (done) => {
+    it('works for coffee-script', async () => {
       const editor = await atom.workspace.open('coffee.coffee');
       await atom.packages.activatePackage('language-coffee-script');
       buffer = editor.buffer;
@@ -1409,11 +1379,9 @@ describe('TextMateLanguageMode', () => {
       expect(
         languageMode.getFoldableRangeContainingPoint(Point(19, Infinity), 2)
       ).toEqual([[19, Infinity], [20, Infinity]]);
-
-      done();
     });
 
-    it('works for javascript', async (done) => {
+    it('works for javascript', async () => {
       const editor = await atom.workspace.open('sample.js');
       await atom.packages.activatePackage('language-javascript');
       buffer = editor.buffer;
@@ -1443,11 +1411,9 @@ describe('TextMateLanguageMode', () => {
           2
         )
       ).toEqual([[4, Infinity], [7, Infinity]]);
-
-      done();
     });
 
-    it('searches upward and downward for surrounding comment lines and folds them as a single fold', async (done) => {
+    it('searches upward and downward for surrounding comment lines and folds them as a single fold', async () => {
       await atom.packages.activatePackage('language-javascript');
       const editor = await atom.workspace.open('sample-with-comments.js');
       editor.buffer.insert(
@@ -1458,8 +1424,6 @@ describe('TextMateLanguageMode', () => {
       editor.foldBufferRow(1);
       const [fold] = editor.unfoldAll();
       expect([fold.start.row, fold.end.row]).toEqual([1, 3]);
-
-      done();
     });
   });
 

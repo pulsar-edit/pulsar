@@ -46,7 +46,7 @@ describe('StateStore', () => {
   });
 
   describe('when there is an error reading from the database', () => {
-    it('rejects the promise returned by load', async (done) => {
+    it('rejects the promise returned by load', async () => {
       const store = new StateStore(databaseName, version);
 
       const fakeErrorEvent = {
@@ -74,8 +74,6 @@ describe('StateStore', () => {
         .catch(event => {
           expect(event).toBe(fakeErrorEvent);
         });
-
-      done();
     });
   });
 });

@@ -387,7 +387,7 @@ describe('CommandRegistry', () => {
       expect(registry.dispatch(parent, 'command')).toBe(null);
     });
 
-    it('returns a promise that resolves when the listeners resolve', async (done) => {
+    it('returns a promise that resolves when the listeners resolve', async () => {
       jasmine.useRealClock();
       registry.add('.grandchild', 'command', () => 1);
       registry.add('.grandchild', 'command', () => Promise.resolve(2));
@@ -404,10 +404,9 @@ describe('CommandRegistry', () => {
 
       const values = await registry.dispatch(grandchild, 'command');
       expect(values).toEqual([3, 2, 1]);
-      done();
     });
 
-    it('returns a promise that rejects when a listener is rejected', async (done) => {
+    it('returns a promise that rejects when a listener is rejected', async () => {
       jasmine.useRealClock();
       registry.add('.grandchild', 'command', () => 1);
       registry.add('.grandchild', 'command', () => Promise.resolve(2));
@@ -429,7 +428,6 @@ describe('CommandRegistry', () => {
         value = err;
       }
       expect(value).toBe(3);
-      done();
     });
   });
 

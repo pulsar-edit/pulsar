@@ -28,9 +28,11 @@ describe('WindowEventHandler', () => {
   });
 
   describe('when the window is loaded', () =>
-    it("doesn't have .is-blurred on the body tag", () => {
-      jasmine.filterByPlatform({except: ['win32']}); // Win32TestFailures - can not steal focus
+    it("doesn't have .is-blurred on the body tag", (done) => {
+      jasmine.filterByPlatform({except: ['win32']}, done); // Win32TestFailures - can not steal focus
       expect(document.body.className).not.toMatch('is-blurred');
+
+      done();
     }));
 
   describe('when the window is blurred', () => {

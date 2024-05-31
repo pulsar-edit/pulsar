@@ -79,7 +79,7 @@ describe('Dock', () => {
   });
 
   describe('when a pane in a dock is activated', () => {
-    it('opens the dock', async (done) => {
+    it('opens the dock', async () => {
       const item = {
         element: document.createElement('div'),
         getDefaultLocation() {
@@ -95,8 +95,6 @@ describe('Dock', () => {
         .getPanes()[0]
         .activate();
       expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
-
-      done();
     });
   });
 
@@ -166,7 +164,7 @@ describe('Dock', () => {
 
   describe('when the dock resize handle is double-clicked', () => {
     describe('when the dock is open', () => {
-      it("resizes a vertically-oriented dock to the current item's preferred width", async (done) => {
+      it("resizes a vertically-oriented dock to the current item's preferred width", async () => {
         jasmine.attachToDOM(atom.workspace.getElement());
 
         const item = {
@@ -195,11 +193,9 @@ describe('Dock', () => {
         await getNextUpdatePromise();
 
         expect(dockElement.offsetWidth).toBe(item.getPreferredWidth());
-
-        done();
       });
 
-      it("resizes a horizontally-oriented dock to the current item's preferred width", async (done) => {
+      it("resizes a horizontally-oriented dock to the current item's preferred width", async () => {
         jasmine.attachToDOM(atom.workspace.getElement());
 
         const item = {
@@ -228,13 +224,11 @@ describe('Dock', () => {
         await getNextUpdatePromise();
 
         expect(dockElement.offsetHeight).toBe(item.getPreferredHeight());
-
-        done();
       });
     });
 
     describe('when the dock is closed', () => {
-      it('does nothing', async (done) => {
+      it('does nothing', async () => {
         jasmine.attachToDOM(atom.workspace.getElement());
 
         const item = {
@@ -264,15 +258,13 @@ describe('Dock', () => {
         expect(dockElement.querySelector('.atom-dock-mask').offsetHeight).toBe(
           0
         );
-
-        done();
       });
     });
   });
 
   describe('when you add an item to an empty dock', () => {
     describe('when the item has a preferred size', () => {
-      it('is takes the preferred size of the item', async (done) => {
+      it('is takes the preferred size of the item', async () => {
         jasmine.attachToDOM(atom.workspace.getElement());
 
         const createItem = preferredWidth => ({
@@ -307,13 +299,11 @@ describe('Dock', () => {
         const item3 = createItem(333);
         await atom.workspace.open(item3);
         expect(dockElement.offsetWidth).toBe(222);
-
-        done();
       });
     });
 
     describe('when the item has no preferred size', () => {
-      it('is still has an explicit size', async (done) => {
+      it('is still has an explicit size', async () => {
         jasmine.attachToDOM(atom.workspace.getElement());
 
         const item = {
@@ -328,14 +318,12 @@ describe('Dock', () => {
         expect(dock.state.size).toBe(null);
         await atom.workspace.open(item);
         expect(dock.state.size).not.toBe(null);
-
-        done();
       });
     });
   });
 
   describe('a deserialized dock', () => {
-    it('restores the serialized size', async (done) => {
+    it('restores the serialized size', async () => {
       jasmine.attachToDOM(atom.workspace.getElement());
 
       const item = {
@@ -364,11 +352,9 @@ describe('Dock', () => {
       dock.destroyActivePane();
       dock.deserialize(serialized, atom.deserializers);
       expect(dockElement.offsetWidth).toBe(150);
-
-      done();
     });
 
-    it("isn't visible if it has no items", async (done) => {
+    it("isn't visible if it has no items", async () => {
       jasmine.attachToDOM(atom.workspace.getElement());
 
       const item = {
@@ -388,13 +374,11 @@ describe('Dock', () => {
       dock.deserialize(serialized, atom.deserializers);
       expect(dock.getPaneItems()).toHaveLength(0);
       expect(dock.isVisible()).toBe(false);
-
-      done();
     });
   });
 
   describe('drag handling', () => {
-    it('expands docks to match the preferred size of the dragged item', async (done) => {
+    it('expands docks to match the preferred size of the dragged item', async () => {
       jasmine.attachToDOM(atom.workspace.getElement());
 
       const element = document.createElement('div');
@@ -417,8 +401,6 @@ describe('Dock', () => {
       expect(atom.workspace.getLeftDock().refs.wrapperElement.offsetWidth).toBe(
         144
       );
-
-      done();
     });
 
     it('does nothing when text nodes are dragged', () => {

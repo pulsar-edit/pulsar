@@ -41,14 +41,16 @@ describe('AtomPaths', () => {
         expect(process.env.ATOM_HOME).toEqual(portableAtomHomePath);
       });
 
-      it('uses ATOM_HOME if no write access to portable .atom folder', () => {
-        jasmine.filterByPlatform({except: ['win32']});
+      it('uses ATOM_HOME if no write access to portable .atom folder', (done) => {
+        jasmine.filterByPlatform({except: ['win32']}, done);
 
         const readOnlyPath = temp.mkdirSync('atom-path-spec-no-write-access');
         process.env.ATOM_HOME = readOnlyPath;
         fs.chmodSync(portableAtomHomePath, 444);
         atomPaths.setAtomHome(app.getPath('home'));
         expect(process.env.ATOM_HOME).toEqual(readOnlyPath);
+
+        done();
       });
     });
 
@@ -119,14 +121,16 @@ describe('AtomPaths', () => {
         expect(app.getPath('userData')).toEqual(electronUserDataPath);
       });
 
-      it('leaves userData unchanged if no write access to electronUserData folder', () => {
-        jasmine.filterByPlatform({except: ['win32']});
+      it('leaves userData unchanged if no write access to electronUserData folder', (done) => {
+        jasmine.filterByPlatform({except: ['win32']}, done);
 
         fs.mkdirSync(electronUserDataPath);
         fs.chmodSync(electronUserDataPath, 444);
         atomPaths.setUserData(app);
         fs.chmodSync(electronUserDataPath, 666);
         expect(app.getPath('userData')).toEqual(defaultElectronUserDataPath);
+
+        done();
       });
     });
 
