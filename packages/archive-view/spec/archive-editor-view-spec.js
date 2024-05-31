@@ -12,7 +12,7 @@ async function condition (handler) {
 describe('ArchiveEditorView', () => {
   let archiveEditorView, onDidChangeCallback, onDidRenameCallback, onDidDeleteCallback
 
-  beforeEach(async (done) => {
+  beforeEach(async () => {
     spyOn(File.prototype, 'onDidChange').and.callFake(function (callback) {
       if (/\.tar$/.test(this.getPath())) {
         onDidChangeCallback = callback
@@ -36,12 +36,10 @@ describe('ArchiveEditorView', () => {
 
     await atom.packages.activatePackage('archive-view')
     archiveEditorView = await atom.workspace.open('nested.tar')
-
-    done();
   })
 
   describe('.constructor()', () => {
-    it('displays the files and folders in the archive file', async (done) => {
+    it('displays the files and folders in the archive file', async () => {
       expect(archiveEditorView.element).toExist()
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
 
@@ -59,15 +57,11 @@ describe('ArchiveEditorView', () => {
       expect(fileElements[0].textContent).toBe('f1.txt')
       expect(fileElements[1].textContent).toBe('f2.txt')
       expect(fileElements[2].textContent).toBe('fa.txt')
-
-      done();
     })
 
-    it('selects the first file', async (done) => {
+    it('selects the first file', async () => {
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
       expect(archiveEditorView.element.querySelector('.selected').textContent).toBe('f1.txt')
-
-      done();
     })
   })
 
@@ -79,21 +73,17 @@ describe('ArchiveEditorView', () => {
   })
 
   describe('archive summary', () => {
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       await atom.workspace.open('multiple-entries.zip')
       archiveEditorView = atom.workspace.getActivePaneItem()
       jasmine.attachToDOM(atom.views.getView(atom.workspace))
-
-      done();
     })
 
-    it('shows correct statistics', async (done) => {
+    it('shows correct statistics', async () => {
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
       const heading = archiveEditorView.element.querySelector('.inset-panel .panel-heading')
       expect(heading).not.toBe(null)
       expect(heading.textContent).toBe('704 bytes with 4 files and 1 folder')
-
-      done();
     })
   })
 
@@ -105,7 +95,7 @@ describe('ArchiveEditorView', () => {
       return true
     }
 
-    it('selects the next/previous file', async (done) => {
+    it('selects the next/previous file', async () => {
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
       expect(archiveEditorView.element).toBeDefined()
       dispatch('core:move-up') && expect(selectedEntry).toBe('f1.txt')
@@ -114,25 +104,21 @@ describe('ArchiveEditorView', () => {
       dispatch('core:move-down') && expect(selectedEntry).toBe('fa.txt')
       dispatch('core:move-up') && expect(selectedEntry).toBe('f2.txt')
       dispatch('core:move-up') && expect(selectedEntry).toBe('f1.txt')
-
-      done();
     })
   })
 
   describe('when a file is clicked', () => {
-    it('copies the contents to a temp file and opens it in a new editor', async (done) => {
+    it('copies the contents to a temp file and opens it in a new editor', async () => {
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
       archiveEditorView.element.querySelectorAll('.file')[2].click()
       await condition(() => atom.workspace.getActivePane().getItems().length > 1)
       expect(atom.workspace.getActivePaneItem().getText()).toBe('hey there\n')
       expect(atom.workspace.getActivePaneItem().getTitle()).toBe('fa.txt')
-
-      done();
     })
   })
 
   describe('when a directory is clicked', () => {
-    it('collapses/expands itself', async (done) => {
+    it('collapses/expands itself', async () => {
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
       let directory = archiveEditorView.element.querySelectorAll('.list-nested-item.entry')[0]
       expect(directory.classList.contains('collapsed')).toBeFalsy()
@@ -140,36 +126,30 @@ describe('ArchiveEditorView', () => {
       expect(directory.classList.contains('collapsed')).toBeTruthy()
       directory.querySelector('.list-item').click()
       expect(directory.classList.contains('collapsed')).toBeFalsy()
-
-      done();
     })
   })
 
   describe('when core:confirm is triggered', () => {
-    it('copies the contents to a temp file and opens it in a new editor', async (done) => {
+    it('copies the contents to a temp file and opens it in a new editor', async () => {
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
       atom.commands.dispatch(archiveEditorView.element.querySelector('.file'), 'core:confirm')
       await condition(() => atom.workspace.getActivePane().getItems().length > 1)
       expect(atom.workspace.getActivePaneItem().getText()).toBe('')
       expect(atom.workspace.getActivePaneItem().getTitle()).toBe('f1.txt')
-
-      done();
     })
   })
 
   describe('when the file is modified', () => {
-    it('refreshes the view', async (done) => {
+    it('refreshes the view', async () => {
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
       spyOn(archiveEditorView, 'refresh')
       onDidChangeCallback()
       expect(archiveEditorView.refresh).toHaveBeenCalled()
-
-      done();
     })
   })
 
   describe('when the file is renamed', () => {
-    it('refreshes the view and updates the title', async (done) => {
+    it('refreshes the view and updates the title', async () => {
       spyOn(File.prototype, 'getPath').and.returnValue('nested-renamed.tar')
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
       spyOn(archiveEditorView, 'refresh').and.callThrough()
@@ -177,36 +157,28 @@ describe('ArchiveEditorView', () => {
       onDidRenameCallback()
       expect(archiveEditorView.refresh).toHaveBeenCalled()
       expect(archiveEditorView.getTitle).toHaveBeenCalled()
-
-      done();
     })
   })
 
   describe('when the file is removed', () => {
-    it('destroys the view', async (done) => {
+    it('destroys the view', async () => {
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
       expect(atom.workspace.getActivePane().getItems().length).toBe(1)
       onDidDeleteCallback()
       expect(atom.workspace.getActivePaneItem()).toBeUndefined()
-
-      done();
     })
   })
 
   describe('when the file is invalid', () => {
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       await atom.workspace.open('invalid.zip')
       archiveEditorView = atom.workspace.getActivePaneItem()
       jasmine.attachToDOM(atom.views.getView(atom.workspace))
-
-      done();
     })
 
-    it('shows the error', async (done) => {
+    it('shows the error', async () => {
       await condition(() => archiveEditorView.refs.errorMessage.offsetHeight > 0)
       expect(archiveEditorView.refs.errorMessage.textContent.length).toBeGreaterThan(0)
-
-      done();
     })
   })
 
@@ -252,17 +224,15 @@ describe('ArchiveEditorView', () => {
         expect(findEntryContainingText('font.ttf').querySelector('.file.icon').className).toBe('file icon binary ttf-icon font')
       }
 
-      it('displays default file-icons', async (done) => {
+      it('displays default file-icons', async () => {
         await openFile()
         await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
         expect(findEntryContainingText('adobe.pdf').querySelector('.file.icon.icon-file-pdf').length).not.toBe(0)
         expect(findEntryContainingText('spacer.gif').querySelector('.file.icon.icon-file-media').length).not.toBe(0)
         expect(findEntryContainingText('sunn.o').querySelector('.file.icon.icon-file-binary').length).not.toBe(0)
-
-        done();
       })
 
-      it('allows multiple classes to be passed', async (done) => {
+      it('allows multiple classes to be passed', async () => {
         getIconServices().setFileIcons({
           iconClassForPath: (path) => {
             switch (path.match(/\w*$/)[0]) {
@@ -275,11 +245,9 @@ describe('ArchiveEditorView', () => {
         await openFile()
         await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
         checkMultiClass()
-
-        done();
       })
 
-      it('allows an array of classes to be passed', async (done) => {
+      it('allows an array of classes to be passed', async () => {
         getIconServices().setFileIcons({
           iconClassForPath: (path) => {
             switch (path.match(/\w*$/)[0]) {
@@ -292,11 +260,9 @@ describe('ArchiveEditorView', () => {
         await openFile()
         await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
         checkMultiClass()
-
-        done();
       })
 
-      it('identifies context to icon-service providers', async (done) => {
+      it('identifies context to icon-service providers', async () => {
         getIconServices().setFileIcons({
           iconClassForPath: (path, context) => `icon-${context}`
         })
@@ -304,8 +270,6 @@ describe('ArchiveEditorView', () => {
         await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
         const icons = findEntryContainingText('adobe.pdf').querySelectorAll('.file.icon-archive-view')
         expect(icons.length).not.toBe(0)
-
-        done();
       })
     })
   })
