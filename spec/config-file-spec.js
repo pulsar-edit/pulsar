@@ -18,28 +18,24 @@ describe('ConfigFile', () => {
   });
 
   describe('when the file does not exist', () => {
-    it('returns an empty object from .get()', async (done) => {
+    it('returns an empty object from .get()', async () => {
       configFile = new ConfigFile(filePath);
       subscription = await configFile.watch();
       expect(configFile.get()).toEqual({});
-
-      done();
     });
   });
 
   describe('when the file is empty', () => {
-    it('returns an empty object from .get()', async (done) => {
+    it('returns an empty object from .get()', async () => {
       writeFileSync(filePath, '');
       configFile = new ConfigFile(filePath);
       subscription = await configFile.watch();
       expect(configFile.get()).toEqual({});
-
-      done();
     });
   });
 
   describe('when the file is updated with valid CSON', () => {
-    it('notifies onDidChange observers with the data', async (done) => {
+    it('notifies onDidChange observers with the data', async () => {
       configFile = new ConfigFile(filePath);
       subscription = await configFile.watch();
 
@@ -65,13 +61,11 @@ describe('ConfigFile', () => {
         '*': { foo: 'bar' },
         javascript: { foo: 'baz' }
       });
-
-      done();
     });
   });
 
   describe('when the file is updated with invalid CSON', () => {
-    it('notifies onDidError observers', async (done) => {
+    it('notifies onDidError observers', async () => {
       configFile = new ConfigFile(filePath);
       subscription = await configFile.watch();
 
@@ -105,8 +99,6 @@ describe('ConfigFile', () => {
         '*': { foo: 'bar' },
         javascript: { foo: 'baz' }
       });
-
-      done();
     });
   });
 

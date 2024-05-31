@@ -392,7 +392,7 @@ describe('Pane', () => {
       expect(callbackCalled).toBeTruthy();
     });
 
-    it("isn't called when a pending item is replaced with a new one", async (done) => {
+    it("isn't called when a pending item is replaced with a new one", async () => {
       pane = null;
       const pendingSpy = jasmine.createSpy('onItemDidTerminatePendingState');
       const destroySpy = jasmine.createSpy('onWillDestroyItem');
@@ -407,8 +407,6 @@ describe('Pane', () => {
 
       expect(destroySpy).toHaveBeenCalled();
       expect(pendingSpy).not.toHaveBeenCalled();
-
-      done();
     });
   });
 
@@ -594,7 +592,7 @@ describe('Pane', () => {
       expect(pane.getActiveItem()).toBe(item1);
     });
 
-    it('invokes ::onWillDestroyItem() and PaneContainer::onWillDestroyPaneItem observers before destroying the item', async (done) => {
+    it('invokes ::onWillDestroyItem() and PaneContainer::onWillDestroyPaneItem observers before destroying the item', async () => {
       jasmine.useRealClock();
       pane.container = new PaneContainer({ config: atom.config, confirm });
       const events = [];
@@ -625,8 +623,6 @@ describe('Pane', () => {
       expect(events[1][1].index).toEqual(1);
       expect(typeof events[1][1].prevent).toEqual('function');
       expect(events[1][1].pane).toEqual(pane);
-
-      done();
     });
 
     it('invokes ::onWillRemoveItem() observers', () => {
@@ -677,7 +673,7 @@ describe('Pane', () => {
 
       describe('if the [Save] option is selected', () => {
         describe('when the item has a uri', () => {
-          it('saves the item before destroying it', async (done) => {
+          it('saves the item before destroying it', async () => {
             itemURI = 'test';
             confirm.and.callFake((options, callback) => callback(0));
 
@@ -686,13 +682,11 @@ describe('Pane', () => {
             expect(pane.getItems().includes(item1)).toBe(false);
             expect(item1.isDestroyed()).toBe(true);
             expect(success).toBe(true);
-
-            done();
           });
         });
 
         describe('when the item has no uri', () => {
-          it('presents a save-as dialog, then saves the item with the given uri before removing and destroying it', async (done) => {
+          it('presents a save-as dialog, then saves the item with the given uri before removing and destroying it', async () => {
             jasmine.useRealClock();
 
             itemURI = null;
@@ -710,14 +704,12 @@ describe('Pane', () => {
             expect(pane.getItems().includes(item1)).toBe(false);
             expect(item1.isDestroyed()).toBe(true);
             expect(success).toBe(true);
-
-            done();
           });
         });
       });
 
       describe("if the [Don't Save] option is selected", () => {
-        it('removes and destroys the item without saving it', async (done) => {
+        it('removes and destroys the item without saving it', async () => {
           confirm.and.callFake((options, callback) => callback(2));
 
           const success = await pane.destroyItem(item1);
@@ -725,13 +717,11 @@ describe('Pane', () => {
           expect(pane.getItems().includes(item1)).toBe(false);
           expect(item1.isDestroyed()).toBe(true);
           expect(success).toBe(true);
-
-          done();
         });
       });
 
       describe('if the [Cancel] option is selected', () => {
-        it('does not save, remove, or destroy the item', async (done) => {
+        it('does not save, remove, or destroy the item', async () => {
           confirm.and.callFake((options, callback) => callback(1));
 
           const success = await pane.destroyItem(item1);
@@ -739,20 +729,16 @@ describe('Pane', () => {
           expect(pane.getItems().includes(item1)).toBe(true);
           expect(item1.isDestroyed()).toBe(false);
           expect(success).toBe(false);
-
-          done();
         });
       });
 
       describe('when force=true', () => {
-        it('destroys the item immediately', async (done) => {
+        it('destroys the item immediately', async () => {
           const success = await pane.destroyItem(item1, true);
           expect(item1.save).not.toHaveBeenCalled();
           expect(pane.getItems().includes(item1)).toBe(false);
           expect(item1.isDestroyed()).toBe(true);
           expect(success).toBe(true);
-
-          done();
         });
       });
     });
@@ -783,24 +769,20 @@ describe('Pane', () => {
     });
 
     describe('when passed a permanent dock item', () => {
-      it("doesn't destroy the item", async (done) => {
+      it("doesn't destroy the item", async () => {
         spyOn(item1, 'isPermanentDockItem').and.returnValue(true);
         const success = await pane.destroyItem(item1);
         expect(pane.getItems().includes(item1)).toBe(true);
         expect(item1.isDestroyed()).toBe(false);
         expect(success).toBe(false);
-
-        done();
       });
 
-      it('destroy the item if force=true', async (done) => {
+      it('destroy the item if force=true', async () => {
         spyOn(item1, 'isPermanentDockItem').and.returnValue(true);
         const success = await pane.destroyItem(item1, true);
         expect(pane.getItems().includes(item1)).toBe(false);
         expect(item1.isDestroyed()).toBe(true);
         expect(success).toBe(true);
-
-        done();
       });
     });
   });
@@ -823,7 +805,7 @@ describe('Pane', () => {
   });
 
   describe('::destroyItems()', () => {
-    it('destroys all items', async (done) => {
+    it('destroys all items', async () => {
       const pane = new Pane(
         paneParams({ items: [new Item('A'), new Item('B'), new Item('C')] })
       );
@@ -834,8 +816,6 @@ describe('Pane', () => {
       expect(item2.isDestroyed()).toBe(true);
       expect(item3.isDestroyed()).toBe(true);
       expect(pane.getItems()).toEqual([]);
-
-      done();
     });
   });
 
@@ -910,35 +890,29 @@ describe('Pane', () => {
 
     describe('when the current item has no uri', () => {
       describe('when the current item has a saveAs method', () => {
-        it('opens a save dialog and saves the current item as the selected path', async (done) => {
+        it('opens a save dialog and saves the current item as the selected path', async () => {
           pane.getActiveItem().saveAs = jasmine.createSpy('saveAs');
           await pane.saveActiveItem();
           expect(showSaveDialog.calls.mostRecent().args[0]).toEqual({});
           expect(pane.getActiveItem().saveAs).toHaveBeenCalledWith(
             '/selected/path'
           );
-
-          done();
         });
       });
 
       describe('when the current item has no saveAs method', () => {
-        it('does nothing', async (done) => {
+        it('does nothing', async () => {
           expect(pane.getActiveItem().saveAs).toBeUndefined();
           await pane.saveActiveItem();
           expect(showSaveDialog).not.toHaveBeenCalled();
-
-          done();
         });
       });
 
-      it('does nothing if the user cancels choosing a path', async (done) => {
+      it('does nothing if the user cancels choosing a path', async () => {
         pane.getActiveItem().saveAs = jasmine.createSpy('saveAs');
         showSaveDialog.and.callFake((options, callback) => callback(undefined));
         await pane.saveActiveItem();
         expect(pane.getActiveItem().saveAs).not.toHaveBeenCalled();
-
-        done();
       });
     });
 
@@ -994,7 +968,7 @@ describe('Pane', () => {
     });
 
     describe('when the current item has a saveAs method', () => {
-      it('opens the save dialog and calls saveAs on the item with the selected path', async (done) => {
+      it('opens the save dialog and calls saveAs on the item with the selected path', async () => {
         jasmine.useRealClock();
 
         pane.getActiveItem().path = __filename;
@@ -1010,8 +984,6 @@ describe('Pane', () => {
         expect(pane.getActiveItem().saveAs).toHaveBeenCalledWith(
           '/selected/path'
         );
-
-        done();
       });
     });
 
@@ -1387,7 +1359,7 @@ describe('Pane', () => {
   });
 
   describe('::close()', () => {
-    it('prompts to save unsaved items before destroying the pane', async (done) => {
+    it('prompts to save unsaved items before destroying the pane', async () => {
       const pane = new Pane(
         paneParams({ items: [new Item('A'), new Item('B')] })
       );
@@ -1402,11 +1374,9 @@ describe('Pane', () => {
       expect(confirm).toHaveBeenCalled();
       expect(item1.save).toHaveBeenCalled();
       expect(pane.isDestroyed()).toBe(true);
-
-      done();
     });
 
-    it('does not destroy the pane if the user clicks cancel', async (done) => {
+    it('does not destroy the pane if the user clicks cancel', async () => {
       const pane = new Pane(
         paneParams({ items: [new Item('A'), new Item('B')] })
       );
@@ -1422,11 +1392,9 @@ describe('Pane', () => {
       expect(confirm).toHaveBeenCalled();
       expect(item1.save).not.toHaveBeenCalled();
       expect(pane.isDestroyed()).toBe(false);
-
-      done();
     });
 
-    it('does not destroy the pane if the user starts to save but then does not choose a path', async (done) => {
+    it('does not destroy the pane if the user starts to save but then does not choose a path', async () => {
       const pane = new Pane(
         paneParams({ items: [new Item('A'), new Item('B')] })
       );
@@ -1443,8 +1411,6 @@ describe('Pane', () => {
       expect(confirm.calls.count()).toBe(1);
       expect(item1.saveAs).not.toHaveBeenCalled();
       expect(pane.isDestroyed()).toBe(false);
-
-      done();
     });
 
     describe('when item fails to save', () => {
@@ -1469,7 +1435,7 @@ describe('Pane', () => {
         });
       });
 
-      it('does not destroy the pane if save fails and user clicks cancel', async (done) => {
+      it('does not destroy the pane if save fails and user clicks cancel', async () => {
         let confirmations = 0;
         confirm.and.callFake((options, callback) => {
           confirmations++;
@@ -1485,11 +1451,9 @@ describe('Pane', () => {
         expect(confirmations).toBe(2);
         expect(item1.save).toHaveBeenCalled();
         expect(pane.isDestroyed()).toBe(false);
-
-        done();
       });
 
-      it('does destroy the pane if the user saves the file under a new name', async (done) => {
+      it('does destroy the pane if the user saves the file under a new name', async () => {
         item1.saveAs = jasmine.createSpy('saveAs').and.returnValue(true);
 
         let confirmations = 0;
@@ -1509,11 +1473,9 @@ describe('Pane', () => {
         expect(item1.save).toHaveBeenCalled();
         expect(item1.saveAs).toHaveBeenCalled();
         expect(pane.isDestroyed()).toBe(true);
-
-        done();
       });
 
-      it('asks again if the saveAs also fails', async (done) => {
+      it('asks again if the saveAs also fails', async () => {
         item1.saveAs = jasmine.createSpy('saveAs').and.callFake(() => {
           const error = new Error("EACCES, permission denied '/test/path'");
           error.path = '/test/path';
@@ -1542,8 +1504,6 @@ describe('Pane', () => {
         expect(item1.save).toHaveBeenCalled();
         expect(item1.saveAs).toHaveBeenCalled();
         expect(pane.isDestroyed()).toBe(true);
-
-        done();
       });
     });
   });
@@ -1609,20 +1569,16 @@ describe('Pane', () => {
   describe('pending state', () => {
     let editor1, pane, eventCount;
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       editor1 = await atom.workspace.open('sample.txt', { pending: true });
       pane = atom.workspace.getActivePane();
       eventCount = 0;
       editor1.onDidTerminatePendingState(() => eventCount++);
-
-      done();
     });
 
-    it('does not open file in pending state by default', async (done) => {
+    it('does not open file in pending state by default', async () => {
       await atom.workspace.open('sample.js');
       expect(pane.getPendingItem()).toBeNull();
-
-      done();
     });
 
     it("opens file in pending state if 'pending' option is true", () => {
@@ -1644,7 +1600,7 @@ describe('Pane', () => {
       expect(eventCount).toBe(1);
     });
 
-    it('only calls terminate handler once when text is modified twice', async (done) => {
+    it('only calls terminate handler once when text is modified twice', async () => {
       const originalText = editor1.getText();
       editor1.insertText('Some text');
       advanceClock(editor1.getBuffer().stoppedChangingDelay);
@@ -1660,8 +1616,6 @@ describe('Pane', () => {
       // Reset fixture back to original state
       editor1.setText(originalText);
       await editor1.save();
-
-      done();
     });
 
     it('only calls clearPendingItem if there is a pending item to clear', () => {

@@ -152,7 +152,7 @@ describe('PaneContainerElement', function() {
     const getPaneElement = i =>
       containerElement.querySelectorAll('atom-pane')[i];
 
-    it('adds and removes panes in the direction that the pane is being dragged', async function(done) {
+    it('adds and removes panes in the direction that the pane is being dragged', async function() {
       const leftPane = container.getActivePane();
       expectPaneScale([leftPane, 1]);
 
@@ -180,11 +180,9 @@ describe('PaneContainerElement', function() {
 
       await leftPane.close();
       expectPaneScale([rightPane, 1]);
-
-      done();
     });
 
-    it('splits or closes panes in orthogonal direction that the pane is being dragged', async function(done) {
+    it('splits or closes panes in orthogonal direction that the pane is being dragged', async function() {
       const leftPane = container.getActivePane();
       expectPaneScale([leftPane, 1]);
 
@@ -209,8 +207,6 @@ describe('PaneContainerElement', function() {
       await lowerPane.close();
 
       expectPaneScale([leftPane, 0.5], [rightPane, 1.5]);
-
-      done();
     });
 
     describe('when the pane is detached', () => {

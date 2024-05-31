@@ -14,7 +14,7 @@ describe('BufferedProcess', function() {
 
     describe('when there is an error handler specified', function() {
       describe('when an error event is emitted by the process', () =>
-        it('calls the error handler and does not throw an exception', async function(done) {
+        it('calls the error handler and does not throw an exception', async function() {
           const bufferedProcess = new BufferedProcess({
             command: 'bad-command-nope1',
             args: ['nothing'],
@@ -36,12 +36,10 @@ describe('BufferedProcess', function() {
           expect(errorSpy.calls.mostRecent().args[0].error.message).toContain(
             'spawn bad-command-nope1 ENOENT'
           );
-
-          done();
         }));
 
       describe('when an error is thrown spawning the process', () =>
-        it('calls the error handler and does not throw an exception', async function(done) {
+        it('calls the error handler and does not throw an exception', async function() {
           spyOn(ChildProcess, 'spawn').and.callFake(function() {
             const error = new Error('Something is really wrong');
             error.code = 'EAGAIN';
@@ -69,13 +67,11 @@ describe('BufferedProcess', function() {
           expect(errorSpy.calls.mostRecent().args[0].error.message).toContain(
             'Something is really wrong'
           );
-
-          done();
         }));
     });
 
     describe('when there is not an error handler specified', () =>
-      it('does throw an exception', async function(done) {
+      it('does throw an exception', async function() {
         await new Promise((resolve) => {
           window.onerror.and.callFake(resolve);
 
@@ -93,8 +89,6 @@ describe('BufferedProcess', function() {
         expect(window.onerror.calls.mostRecent().args[4].name).toBe(
           'BufferedProcessError'
         );
-
-        done();
       }));
   });
 
@@ -103,7 +97,7 @@ describe('BufferedProcess', function() {
     * TODO: FAILING TEST - This test fails with the following output:
     * timeout: timed out after 120000 msec waiting for condition
     */
-    xit('doesnt start unless start method is called', async function(done) {
+    xit('doesnt start unless start method is called', async function() {
       let stdout = '';
       let stderr = '';
       const exitCallback = jasmine.createSpy('exit callback');
@@ -134,14 +128,12 @@ describe('BufferedProcess', function() {
 
       expect(stderr).toContain('apm - Atom Package Manager');
       expect(stdout).toEqual('');
-
-      done();
     }));
   /**
   * TODO: FAILING TEST - This test fails with the following output:
   * timeout: timed out after 120000 msec waiting for condition
   */
-  xit('calls the specified stdout, stderr, and exit callbacks', async function(done) {
+  xit('calls the specified stdout, stderr, and exit callbacks', async function() {
     let stdout = '';
     let stderr = '';
 
@@ -164,7 +156,7 @@ describe('BufferedProcess', function() {
     expect(stdout).toEqual('');
   });
 
-  it('calls the specified stdout callback with whole lines', async function(done) {
+  it('calls the specified stdout callback with whole lines', async function() {
     const exitCallback = jasmine.createSpy('exit callback');
     const loremPath = require.resolve('./fixtures/lorem.txt');
     const content = fs.readFileSync(loremPath).toString();
@@ -191,8 +183,6 @@ describe('BufferedProcess', function() {
 
     expect(allLinesEndWithNewline).toBe(true);
     expect(stdout).toBe(content);
-
-    done();
   });
 
   describe('on Windows', function() {

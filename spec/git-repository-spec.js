@@ -162,7 +162,7 @@ describe('GitRepository', () => {
   describe('.checkoutHeadForEditor(editor)', () => {
     let filePath, editor;
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       spyOn(atom, 'confirm');
 
       const workingDirPath = copyRepository();
@@ -175,12 +175,10 @@ describe('GitRepository', () => {
       fs.writeFileSync(filePath, 'ch ch changes');
 
       editor = await atom.workspace.open(filePath);
-
-      done();
     });
 
-    it('displays a confirmation dialog by default', () => {
-      jasmine.filterByPlatform({except: ['win32']}); // Permissions issues with this test on Windows
+    it('displays a confirmation dialog by default', (done) => {
+      jasmine.filterByPlatform({except: ['win32']}, done); // Permissions issues with this test on Windows
 
       atom.confirm.and.callFake(({ buttons }) => buttons.OK());
       atom.config.set('editor.confirmCheckoutHeadRevision', true);
@@ -188,10 +186,12 @@ describe('GitRepository', () => {
       repo.checkoutHeadForEditor(editor);
 
       expect(fs.readFileSync(filePath, 'utf8')).toBe('');
+
+      done();
     });
 
-    it('does not display a dialog when confirmation is disabled', () => {
-      jasmine.filterByPlatform({except: ['win32']}); // Flakey EPERM opening a.txt on Win32
+    it('does not display a dialog when confirmation is disabled', (done) => {
+      jasmine.filterByPlatform({except: ['win32']}, done); // Flakey EPERM opening a.txt on Win32
 
       atom.config.set('editor.confirmCheckoutHeadRevision', false);
 
@@ -199,6 +199,8 @@ describe('GitRepository', () => {
 
       expect(fs.readFileSync(filePath, 'utf8')).toBe('');
       expect(atom.confirm).not.toHaveBeenCalled();
+
+      done();
     });
   });
 
@@ -277,7 +279,7 @@ describe('GitRepository', () => {
       newPath = fs.absolute(newPath);
     });
 
-    it('returns status information for all new and modified files', async (done) => {
+    it('returns status information for all new and modified files', async () => {
       const statusHandler = jasmine.createSpy('statusHandler');
       repo.onDidChangeStatuses(statusHandler);
       fs.writeFileSync(modifiedPath, 'making this path modified');
@@ -289,11 +291,9 @@ describe('GitRepository', () => {
       expect(
         repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))
       ).toBeTruthy();
-
-      done();
     });
 
-    it('caches the proper statuses when a subdir is open', async (done) => {
+    it('caches the proper statuses when a subdir is open', async () => {
       const subDir = path.join(workingDirectory, 'dir');
       fs.mkdirSync(subDir);
       const filePath = path.join(subDir, 'b.txt');
@@ -306,11 +306,9 @@ describe('GitRepository', () => {
       const status = repo.getCachedPathStatus(filePath);
       expect(repo.isStatusModified(status)).toBe(false);
       expect(repo.isStatusNew(status)).toBe(false);
-
-      done();
     });
 
-    it('works correctly when the project has multiple folders (regression)', async (done) => {
+    it('works correctly when the project has multiple folders (regression)', async () => {
       atom.project.addPath(workingDirectory);
       atom.project.addPath(path.join(__dirname, 'fixtures', 'dir'));
 
@@ -320,11 +318,9 @@ describe('GitRepository', () => {
       expect(
         repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))
       ).toBeTruthy();
-
-      done();
     });
 
-    it('caches statuses that were looked up synchronously', async (done) => {
+    it('caches statuses that were looked up synchronously', async () => {
       const originalContent = 'undefined';
       fs.writeFileSync(modifiedPath, 'making this path modified');
       repo.getPathStatus('file.txt');
@@ -334,26 +330,22 @@ describe('GitRepository', () => {
       expect(
         repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))
       ).toBeFalsy();
-
-      done();
     });
   });
 
   describe('buffer events', () => {
     let editor;
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       atom.project.setPaths([copyRepository()]);
       const refreshPromise = new Promise(resolve =>
         atom.project.getRepositories()[0].onDidChangeStatuses(resolve)
       );
       editor = await atom.workspace.open('other.txt');
       await refreshPromise;
-
-      done();
     });
 
-    it('emits a status-changed event when a buffer is saved', async (done) => {
+    it('emits a status-changed event when a buffer is saved', async () => {
       editor.insertNewline();
 
       const statusHandler = jasmine.createSpy('statusHandler');
@@ -365,11 +357,9 @@ describe('GitRepository', () => {
         path: editor.getPath(),
         pathStatus: 256
       });
-
-      done();
     });
 
-    it('emits a status-changed event when a buffer is reloaded', async (done) => {
+    it('emits a status-changed event when a buffer is reloaded', async () => {
       fs.writeFileSync(editor.getPath(), 'changed');
 
       const statusHandler = jasmine.createSpy('statusHandler');
@@ -384,8 +374,6 @@ describe('GitRepository', () => {
 
       await editor.getBuffer().reload();
       expect(statusHandler.calls.count()).toBe(1);
-
-      done();
     });
 
     it("emits a status-changed event when a buffer's path changes", () => {
@@ -416,7 +404,7 @@ describe('GitRepository', () => {
       if (project2) project2.destroy();
     });
 
-    it('subscribes to all the serialized buffers in the project', async (done) => {
+    it('subscribes to all the serialized buffers in the project', async () => {
       atom.project.setPaths([copyRepository()]);
 
       await atom.workspace.open('file.txt');
@@ -444,8 +432,6 @@ describe('GitRepository', () => {
         path: buffer.getPath(),
         pathStatus: 256
       });
-
-      done();
     });
   });
 });

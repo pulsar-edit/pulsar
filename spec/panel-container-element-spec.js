@@ -255,7 +255,7 @@ describe('PanelContainerElement', () => {
         panel.destroy()
       });
 
-      it('returns focus to the original activeElement', async (done) => {
+      it('returns focus to the original activeElement', async () => {
         const panel = createPanel();
         const previousActiveElement = document.activeElement;
         const panelEl = panel.getElement();
@@ -268,8 +268,6 @@ describe('PanelContainerElement', () => {
         await conditionPromise(() => document.activeElement === previousActiveElement);
 
         expect(document.activeElement).toBe(previousActiveElement);
-
-        done();
       });
     });
   });

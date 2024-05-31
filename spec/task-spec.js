@@ -3,7 +3,7 @@ const Grim = require('grim');
 
 describe('Task', function() {
   describe('@once(taskPath, args..., callback)', () =>
-    it('terminates the process after it completes', async function(done) {
+    it('terminates the process after it completes', async function() {
       let handlerResult = null;
       let task;
       let processErroredCallbak = jasmine.createSpy();
@@ -26,11 +26,9 @@ describe('Task', function() {
       expect(handlerResult).toBe('hello');
       expect(childProcess.kill).toHaveBeenCalled();
       expect(processErroredCallbak).not.toHaveBeenCalled();
-
-      done();
     }));
 
-  it('calls listeners registered with ::on when events are emitted in the task', async function(done) {
+  it('calls listeners registered with ::on when events are emitted in the task', async function() {
     const task = new Task(require.resolve('./fixtures/task-spec-handler'));
 
     const eventSpy = jasmine.createSpy('eventSpy');
@@ -39,11 +37,9 @@ describe('Task', function() {
     await new Promise((resolve) => task.start(resolve))
 
     expect(eventSpy).toHaveBeenCalledWith(1, 2, 3);
-
-    done();
   });
 
-  it('unregisters listeners when the Disposable returned by ::on is disposed', async function(done) {
+  it('unregisters listeners when the Disposable returned by ::on is disposed', async function() {
     const task = new Task(require.resolve('./fixtures/task-spec-handler'));
 
     const eventSpy = jasmine.createSpy('eventSpy');
@@ -53,11 +49,9 @@ describe('Task', function() {
     await new Promise((resolve) => task.start(resolve))
 
     expect(eventSpy).not.toHaveBeenCalled();
-
-    done();
   });
 
-  it('reports deprecations in tasks', async function(done) {
+  it('reports deprecations in tasks', async function() {
     jasmine.snapshotDeprecations();
     const handlerPath = require.resolve(
       './fixtures/task-handler-with-deprecations'
@@ -69,8 +63,6 @@ describe('Task', function() {
     expect(deprecations.length).toBe(1);
     expect(deprecations[0].getStacks()[0][1].fileName).toBe(handlerPath);
     jasmine.restoreDeprecationsSnapshot();
-
-    done();
   });
 
   it('adds data listeners to standard out and error to report output', function() {
@@ -114,7 +106,7 @@ describe('Task', function() {
       expect(completedEventSpy).not.toHaveBeenCalled();
     });
 
-    it("does not dispatch 'task:cancelled' when invoked on an inactive task", async function(done) {
+    it("does not dispatch 'task:cancelled' when invoked on an inactive task", async function() {
       let task = null;
 
       await new Promise(resolve => {
@@ -128,8 +120,6 @@ describe('Task', function() {
       task.on('task:cancelled', cancelledEventSpy);
       expect(task.cancel()).toBe(false);
       expect(cancelledEventSpy).not.toHaveBeenCalled();
-
-      done();
     });
   });
 });

@@ -26,7 +26,7 @@ describe('GitRepositoryProvider', () => {
 
   describe('.repositoryForDirectory(directory)', () => {
     describe('when specified a Directory with a Git repository', () => {
-      it('resolves with a GitRepository', async (done) => {
+      it('resolves with a GitRepository', async () => {
         const directory = new Directory(
           path.join(__dirname, 'fixtures', 'git', 'master.git')
         );
@@ -37,11 +37,9 @@ describe('GitRepositoryProvider', () => {
 
         // Refresh should be started
         await new Promise(resolve => result.onDidChangeStatuses(resolve));
-
-        done();
       });
 
-      it('resolves with the same GitRepository for different Directory objects in the same repo', async (done) => {
+      it('resolves with the same GitRepository for different Directory objects in the same repo', async () => {
         const firstRepo = await provider.repositoryForDirectory(
           new Directory(path.join(__dirname, 'fixtures', 'git', 'master.git'))
         );
@@ -53,23 +51,19 @@ describe('GitRepositoryProvider', () => {
 
         expect(firstRepo).toEqual(jasmine.any(GitRepository));
         expect(firstRepo).toBe(secondRepo);
-
-        done();
       });
     });
 
     describe('when specified a Directory without a Git repository', () => {
-      it('resolves with null', async (done) => {
+      it('resolves with null', async () => {
         const directory = new Directory(temp.mkdirSync('dir'));
         const repo = await provider.repositoryForDirectory(directory);
         expect(repo).toBe(null);
-
-        done();
       });
     });
 
     describe('when specified a Directory with an invalid Git repository', () => {
-      it('resolves with null', async (done) => {
+      it('resolves with null', async () => {
         const dirPath = temp.mkdirSync('dir');
         fs.writeFileSync(path.join(dirPath, '.git', 'objects'), '');
         fs.writeFileSync(path.join(dirPath, '.git', 'HEAD'), '');
@@ -78,13 +72,11 @@ describe('GitRepositoryProvider', () => {
         const directory = new Directory(dirPath);
         const repo = await provider.repositoryForDirectory(directory);
         expect(repo).toBe(null);
-
-        done();
       });
     });
 
     describe('when specified a Directory with a valid gitfile-linked repository', () => {
-      it('returns a Promise that resolves to a GitRepository', async (done) => {
+      it('returns a Promise that resolves to a GitRepository', async () => {
         const gitDirPath = path.join(
           __dirname,
           'fixtures',
@@ -102,13 +94,11 @@ describe('GitRepositoryProvider', () => {
         expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
-
-        done();
       });
     });
 
     describe('when specified a Directory with a commondir file for a worktree', () => {
-      it('returns a Promise that resolves to a GitRepository', async (done) => {
+      it('returns a Promise that resolves to a GitRepository', async () => {
         const directory = new Directory(
           path.join(
             __dirname,
@@ -123,8 +113,6 @@ describe('GitRepositoryProvider', () => {
         expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
-
-        done();
       });
     });
 
@@ -143,19 +131,17 @@ describe('GitRepositoryProvider', () => {
         spyOn(directory, 'getSubdirectory').and.returnValue(subdirectory);
       });
 
-      it('returns a Promise that resolves to null', async (done) => {
+      it('returns a Promise that resolves to null', async () => {
         const repo = await provider.repositoryForDirectory(directory);
         expect(repo).toBe(null);
         expect(directory.getSubdirectory).toHaveBeenCalledWith('.git');
-
-        done();
       });
     });
   });
 
   describe('.repositoryForDirectorySync(directory)', () => {
     describe('when specified a Directory with a Git repository', () => {
-      it('resolves with a GitRepository', async (done) => {
+      it('resolves with a GitRepository', async () => {
         const directory = new Directory(
           path.join(__dirname, 'fixtures', 'git', 'master.git')
         );
@@ -166,8 +152,6 @@ describe('GitRepositoryProvider', () => {
 
         // Refresh should be started
         await new Promise(resolve => result.onDidChangeStatuses(resolve));
-
-        done();
       });
 
       it('resolves with the same GitRepository for different Directory objects in the same repo', () => {

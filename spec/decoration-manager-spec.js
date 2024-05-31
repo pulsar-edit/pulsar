@@ -4,7 +4,7 @@ const TextEditor = require('../src/text-editor');
 describe('DecorationManager', function() {
   let decorationManager, buffer, editor, markerLayer1, markerLayer2;
 
-  beforeEach(async function(done) {
+  beforeEach(async function() {
     buffer = atom.project.bufferForPathSync('sample.js');
     editor = new TextEditor({ buffer });
     markerLayer1 = editor.addMarkerLayer();
@@ -12,8 +12,6 @@ describe('DecorationManager', function() {
     decorationManager = new DecorationManager(editor);
 
     await atom.packages.activatePackage('language-javascript');
-
-    done();
   });
 
   afterEach(() => buffer.destroy());

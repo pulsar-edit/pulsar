@@ -11,7 +11,7 @@ describe('DefaultDirectorySearcher', function() {
     searcher = new DefaultDirectorySearcher();
   });
 
-  it('terminates the task after running a search', async function(done) {
+  it('terminates the task after running a search', async function() {
     const options = {
       ignoreCase: false,
       includeHidden: false,
@@ -38,7 +38,5 @@ describe('DefaultDirectorySearcher', function() {
     );
 
     expect(Task.prototype.terminate).toHaveBeenCalled();
-
-    done();
   });
 });

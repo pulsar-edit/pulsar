@@ -285,22 +285,18 @@ describe('PaneContainer', () => {
       pane2.addItem(new TestItem());
     });
 
-    it('returns true if the user saves all modified files when prompted', async (done) => {
+    it('returns true if the user saves all modified files when prompted', async () => {
       confirm.and.callFake((options, callback) => callback(0));
       const saved = await container.confirmClose();
       expect(confirm).toHaveBeenCalled();
       expect(saved).toBeTruthy();
-
-      done();
     });
 
-    it('returns false if the user cancels saving any modified file', async (done) => {
+    it('returns false if the user cancels saving any modified file', async () => {
       confirm.and.callFake((options, callback) => callback(1));
       const saved = await container.confirmClose();
       expect(confirm).toHaveBeenCalled();
       expect(saved).toBeFalsy();
-
-      done();
     });
   });
 
@@ -396,7 +392,7 @@ describe('PaneContainer', () => {
   });
 
   describe('::onWillDestroyPaneItem() and ::onDidDestroyPaneItem()', () => {
-    it('invokes the given callbacks when an item will be destroyed on any pane', async (done) => {
+    it('invokes the given callbacks when an item will be destroyed on any pane', async () => {
       const container = new PaneContainer(params);
       const pane1 = container.getRoot();
       const item1 = {};
@@ -444,13 +440,11 @@ describe('PaneContainer', () => {
       expect(events[4][1].pane).toEqual(pane2);
       expect(events[4][1].index).toEqual(0);
       expect(typeof events[4][1].prevent).toEqual('function');
-
-      done();
     });
   });
 
   describe('::saveAll()', () =>
-    it('saves all modified pane items', async (done) => {
+    it('saves all modified pane items', async () => {
       const container = new PaneContainer(params);
       const pane1 = container.getRoot();
       pane1.splitRight();
@@ -501,8 +495,6 @@ describe('PaneContainer', () => {
       expect(item1.saved).toBe(true);
       expect(item2.saved).toBe(false);
       expect(item3.saved).toBe(true);
-
-      done();
     }));
 
   describe('::moveActiveItemToPane(destPane) and ::copyActiveItemToPane(destPane)', () => {
