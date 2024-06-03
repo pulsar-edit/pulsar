@@ -4501,7 +4501,7 @@ class NodeRangeSet {
   getNodeSpec(node, getChildren) {
     let { startIndex, endIndex, startPosition, endPosition, id } = node;
     let result = { startIndex, endIndex, startPosition, endPosition, id };
-    if (node.children && getChildren) {
+    if (getChildren && node.childCount > 0) {
       result.children = [];
       for (let child of node.children) {
         result.children.push(this.getNodeSpec(child, false));

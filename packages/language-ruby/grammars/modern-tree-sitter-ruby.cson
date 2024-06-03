@@ -6,7 +6,7 @@ parser: 'tree-sitter-ruby'
 injectionRegex: 'rb|ruby|RB|RUBY'
 
 treeSitter:
-  parserSource: 'github:tree-sitter/tree-sitter-ruby#4d9ad3f010fdc47a8433adcf9ae30c8eb8475ae7'
+  parserSource: 'github:tree-sitter/tree-sitter-ruby#9d86f3761bb30e8dcc81e754b81d3ce91848477e'
   grammar: 'tree-sitter-ruby/tree-sitter-ruby.wasm'
   highlightsQuery: 'tree-sitter-ruby/highlights.scm'
   localsQuery: 'tree-sitter-ruby/locals.scm'
