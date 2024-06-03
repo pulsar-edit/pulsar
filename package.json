@@ -309,7 +309,7 @@
     "keytar": "7.9.0",
     "nan": "2.19.0",
     "ctags": "https://github.com/pulsar-edit/node-ctags.git#c32ca6017dd3f4ea314d53b044225505820abbe3",
-    "superstring": "https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459",
+    "superstring": "https://github.com/pulsar-edit/superstring.git#a46a625",
     "pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1",
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244"
   }

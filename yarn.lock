@@ -9449,9 +9449,9 @@ superagent@^8.0.9:
     qs "^6.11.0"
     semver "^7.3.8"
 
-superstring@^2.4.4, "superstring@https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459":
+superstring@^2.4.4, "superstring@https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459", "superstring@https://github.com/pulsar-edit/superstring.git#a46a625":
   version "2.4.4"
-  resolved "https://github.com/bongnv/superstring.git#d2a885bd2756ce73391dec3e3fb060fbe9597459"
+  resolved "https://github.com/pulsar-edit/superstring.git#a46a62536454ddeecdcad58b9e146d5715eb18a4"
   dependencies:
     node-addon-api "^5.0.0"
 
