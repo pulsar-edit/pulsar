@@ -1,127 +1,72 @@
 exports.activate = () => {
-
-  // The top-level tree-sitter parser for `source.gfm` simply divides the text
-  // into front matter (if it exists) and the remainder, which is directly
-  // parsed as Markdown.
+  // Injection for YAML front matter.
   //
-  // We do this because the `ikatyang/tree-sitter-markdown` parser does not
-  // recognize YAML front matter, but is otherwise a very strong Markdown
-  // parser. If the `MDeiml/tree-sitter-markdown` parser became more stable,
-  // we could consider switching, and then we wouldn't need this extra parser.
-
-  // Hand off the front matter to the YAML injection.
+  // TODO: If people want fancy front matter support, like the ability to
+  // control the front matter description language, then we might try to employ
+  // the technique we used for the last Markdown parser and use
+  // `tree-sitter-frontmatter` as the outermost grammar.
   atom.grammars.addInjectionPoint('source.gfm', {
-    type: 'front_matter',
+    type: 'minus_metadata',
     language: () => 'yaml',
-    content(node) {
-      return node.descendantsOfType('text');
-    }
+    content: (node) => node
   });
 
-  // Hand off everything else to the Markdown injection.
+  // This is a two-phase parser. The outer parser handles block-level content;
+  // the inner parser handles inline content.
   atom.grammars.addInjectionPoint('source.gfm', {
-    type: 'remainder',
-    language: () => 'markdown',
+    type: 'inline',
+    language: () => {
+      return 'markdown-inline-internal';
+    },
     content: (node) => node,
+    includeChildren: true,
     languageScope: null
   });
 
-  // The markdown injection has a scope name of `source.gfm.embedded` so we can
-  // target it for the rest of these injections, but you can see above that we
-  // suppress that scope name when we inject it into a document.
-
-  // Highlight HTML blocks.
-  atom.grammars.addInjectionPoint('source.gfm.embedded', {
+  // A separate injection layer for each block-level HTML node.
+  atom.grammars.addInjectionPoint('source.gfm', {
     type: 'html_block',
     language: () => 'html',
     content: (node) => node,
     includeChildren: true
   });
 
-  for (let nodeType of ['paragraph', 'table_cell']) {
-    atom.grammars.addInjectionPoint('source.gfm.embedded', {
-      type: nodeType,
-      language(node) {
-        let html = node.descendantsOfType([
-          'html_open_tag',
-          'html_close_tag',
-          'html_self_closing_tag'
-        ]);
-        if (html.length === 0) { return null; }
-        return 'html';
-      },
-
-      content(node) {
-        let html = node.descendantsOfType([
-          'html_open_tag',
-          'html_close_tag',
-          'html_self_closing_tag'
-        ]);
-        return html;
-      },
-
-      includeChildren: true
-    });
-  }
-
-  // All code blocks of the form
-  //
-  // ```foo
-  // (code goes here)
-  // ```
-  //
-  // get injections on the theory that some grammar's `injectionRegex` will
-  // match `foo`.
-  atom.grammars.addInjectionPoint('source.gfm.embedded', {
+  // Injections for code blocks.
+  atom.grammars.addInjectionPoint('source.gfm', {
     type: 'fenced_code_block',
     language(node) {
-      let language = node?.firstNamedChild;
-      if (language?.type === 'info_string')
-        return language.text;
-
-      return null;
+      let infoString = node.descendantsOfType('language');
+      if (infoString.length === 0) return undefined;
+      return infoString[0]?.text;
     },
     content(node) {
-      return node.descendantsOfType('code_fence_content');
+      let codeFenceContent = node.descendantsOfType('code_fence_content');
+      if (codeFenceContent.length === 0) return undefined;
+      return codeFenceContent[0];
     },
-    languageScope: (grammar) => `${grammar.scopeName}.embedded`,
+    includeChildren: true
+  });
+
+  // Another HTML injection for each inline node that covers inline HTML.
+  atom.grammars.addInjectionPoint('source.gfm.inline', {
+    type: 'inline',
+    language(node) {
+      // Attempt to cut down on the number of injection layers by returning
+      // `html` here only when there are HTML nodes in the inline tree.
+      let html = node.descendantsOfType('html_tag');
+      return html.length > 0 ? 'html' : undefined;
+    },
+    content(node) {
+      return node.descendantsOfType('html_tag');
+    },
     includeChildren: true
   });
 };
 
-
-// Since this parser isn't guaranteed to detect all URLs in paragraphs (see
-// https://github.com/pulsar-edit/pulsar/issues/885), we'll inject the
-// `hyperlink` parser into `text` nodes in paragraphs when there appear to be
-// URLs in them.
 exports.consumeHyperlinkInjection = (hyperlink) => {
-
-  function textChildren(node) {
-    let results = [];
-    for (let i = 0; i < node.namedChildCount; i++) {
-      let child = node.child(i);
-      if (child.type === 'text') {
-        results.push(child);
-      }
-    }
-    return results;
-  }
-
-  hyperlink.addInjectionPoint('source.gfm.embedded', {
-    types: ['paragraph'],
-    // Override the language callback so that it doesn't test URLs that are
-    // already handled in `uri_autolink` nodes.
-    language(node) {
-      for (let child of textChildren(node)) {
-        if (hyperlink.test(child)) {
-          return 'hyperlink';
-        }
-      }
-      return null;
-    },
-    content(node) {
-      return textChildren(node);
-    }
+  hyperlink.addInjectionPoint('source.gfm.inline', {
+    types: ['inline'],
+    content: (node) => node,
+    includeChildren: true
   });
-
 };

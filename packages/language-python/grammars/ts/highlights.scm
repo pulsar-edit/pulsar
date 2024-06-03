@@ -37,13 +37,13 @@
 
 (call
   function: (identifier) @support.type.constructor.python
-  (#match? @support.type.constructor.python "^[A-Z][a-z_]+")
+  (#match? @support.type.constructor.python "^[A-Z][A-Za-z_]+")
   (#set! capture.final true))
 
 (call
   function: (attribute
     attribute: (identifier) @support.type.constructor.python)
-    (#match? @support.type.constructor.python "^[A-Z][a-z_]+")
+    (#match? @support.type.constructor.python "^[A-Z][A-Za-z_]+")
     (#set! capture.final true))
 
 (call

@@ -428,6 +428,8 @@ module.exports = class Package {
         methodName = versions[version];
         if (typeof this.mainModule[methodName] === 'function') {
           servicesByVersion[version] = this.mainModule[methodName]();
+        } else {
+          console.warn(`Package ${this.name} declares it provides ${name}@${version} but it doesn't expose a function in ${methodName}`)
         }
       }
       this.activationDisposables.add(
@@ -447,6 +449,8 @@ module.exports = class Package {
               this.mainModule[methodName].bind(this.mainModule)
             )
           );
+        } else {
+          console.warn(`Package ${this.name} declares it consumes ${name}@${version} but it doesn't expose a function in ${methodName}`)
         }
       }
     }

@@ -6,6 +6,53 @@
 
 ## [Unreleased]
 
+## 1.117.0
+
+* [markdown-preview] Improve rendering performance in preview panes, especially in documents with lots of fenced code blocks.
+* [markdown-preview] GitHub-style Markdown preview now uses up-to-date styles and supports dark mode.
+* Pulsar's OS level theme will now change according to the selected editor theme if `core.syncWindowThemeWithPulsarTheme` is enabled.
+* [language-sass] Add SCSS Tree-sitter grammar.
+* [language-ruby] Update to latest Tree-sitter Ruby parser.
+* [language-gfm] Make each block-level HTML tag its own injection.
+* [language-typescript] More highlighting fixes, especially for operators.
+
+### Pulsar
+- Fixed: Cirrus: Fix gem install fpm on ARM Linux [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1008)
+- Updated: [ci] Update Cirrus CI Token [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1006)
+- Fixed: CI: Fix workaround for Homebrew node in Cirrus on macOS [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1002)
+- Added: [markdown-preview] Optimize re-rendering of content in a preview pane especially syntax highlighting [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/984)
+- Fixed: Tree-sitter rolling fixes, 1.117 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/974)
+- Updated: Update Renovate preset name [@HonkingGoose](https://github.com/pulsar-edit/pulsar/pull/1000)
+- Added: Debugging when a package service is incorrect [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/995)
+- Added: Bundle snippets [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/993)
+- Fixed: CI: Pin to macOS 12 runner images instead of macos-latest (GitHub Actions) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/997)
+- Added: [markdown-preview] Add dark mode for GitHub-style preview [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/973)
+- Added: Change Window Theme with Pulsar Theme [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/545)
+- Updated: CI: Upgrade or replace all deprecated GH Actions [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/983)
+- Fixed: [language-clojure] Stop detecting `.org` files as `.language-clojure` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/980)
+
+## 1.116.0
+
+* Added `TextEditor::getCommentDelimitersForBufferPosition` for retrieving comment delimiter strings appropriate for a given buffer position. This allows us to support three new snippet variables: `LINE_COMMENT`, `BLOCK_COMMENT_START`, and `BLOCK_COMMENT_END`.
+* Added ability to use “simple” transformation flags in snippets (like `/upcase` and `/camelcase`) within `sed`-style snippet transformation replacements.
+* Improved TypeScript syntax highlighting of regular expressions, TSX fragments, wildcard export identifiers, namespaced types, and template string punctuation.
+* Replaced our underlying Tree-sitter parser for Markdown files with one that’s more stable.
+* Fixed issues in Python with unwanted indentation after type annotations and applying scope names to constructor functions.
+* Removed Machine PATH handling for Pulsar on Windows, ensuring to only ever attempt PATH manipulation per user. Added additional safety mechanisms when handling a user's PATH variable.
+* Update (Linux) metainfo from downstream Pulsar Flatpak
+
+### Pulsar
+- Updated: Update Pulsar's Linux desktop & metainfo mostly from Flatpak [@cat-master21](https://github.com/pulsar-edit/pulsar/pull/935)
+- Updated: [core] Simplify/Cleanup `StyleManager` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/959)
+- Fixed: Tree-sitter fixes (1.116 edition) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/968)
+- Bumped: Bump `snippets` dependency to 1.8.0 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/972)
+- Added: Add a `TextEditor` method for retrieving comment delimiters... [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/970)
+- Fixed: [core] (Windows) Remove all `Machine` PATH handling, add safety mechanisms [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/957)
+
+### snippets
+- Added: Add support for variables `LINE_COMMENT`, `BLOCK_COMMENT_START` and `BLOCK_COMMENT_END` [@savetheclocktower](https://github.com/pulsar-edit/snippets/pull/21)
+- Added: Extend support for simple transformation flags to sed-style replacements [@savetheclocktower](https://github.com/pulsar-edit/snippets/pull/20)
+
 ## 1.115.0
 
 - Fixed some folds in Ruby like `unless`, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.

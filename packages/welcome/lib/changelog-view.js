@@ -50,22 +50,25 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed some folds in Ruby like <code>unless</code>, some blocks, multiline comments, function calls, and different array syntaxes for strings and keywords.
+                [markdown-preview] Improve rendering performance in preview panes, especially in documents with lots of fenced code blocks.
               </li>
               <li>
-                Improved the accuracy of indentation hinting in modern Tree-sitter grammars, especially in multi-cursor scenarios.
+                [markdown-preview] GitHub-style Markdown preview now uses up-to-date styles and supports dark mode.
               </li>
               <li>
-                Improved the ability of the user to opt into a specific kind of grammar for a specific language.
+                Pulsar's OS level theme will now change according to the selected editor theme if <code>core.syncWindowThemeWithPulsarTheme</code> is enabled.
               </li>
               <li>
-                Changed the behavior of the <code>grammar-selector</code> package so that it will show the user's preferred grammar for a specific language.
+                [language-sass] Add SCSS Tree-sitter grammar.
               </li>
               <li>
-                Updated to version <code>0.20.9</code> of <code>web-tree-sitter</code>.
+                [language-ruby] Update to latest Tree-sitter Ruby parser.
               </li>
               <li>
-                Improved syntax highlighting, indentation, and code folding in various languages, including TypeScript, shell scripts, Ruby, and C/C++.
+                [language-gfm] Make each block-level HTML tag its own injection.
+              </li>
+              <li>
+                [language-typescript] More highlighting fixes, especially for operators.
               </li>
             </ul>
 

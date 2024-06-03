@@ -573,14 +573,26 @@
 (export_statement
   (identifier) @variable.other.assignment.export.js)
 
-; The "*" in `import * as Foo`
+; The "*" in `import * as Foo from 'bar'`
 (import_clause
   (namespace_import "*" @variable.other.assignment.import.all.js))
 
-; The "Foo" in `import * as Foo`
+; The "Foo" in `import * as Foo from 'bar'`
 (import_clause
   (namespace_import
     (identifier) @variable.other.assignment.import.alias.js))
+
+; The "*" in `export * from 'bar'`
+(export_statement "*" @variable.other.assignment.export.all.js)
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export "*" @variable.other.assignment.export.all.js))
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export
+    (identifier) @variable.other.assignment.export.alias.js))
 
 ; COMMENTS
 ; ========

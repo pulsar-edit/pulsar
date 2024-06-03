@@ -1,3 +1,4 @@
+const dedent = require('dedent');
 
 describe("Renders Markdown", () => {
   describe("properly when given no opts", () => {
@@ -6,6 +7,26 @@ describe("Renders Markdown", () => {
         .toBe("<p><strong>Hello World</strong></p>\n");
     });
   });
+
+  it(`escapes HTML in code blocks properly`, () => {
+    let input = dedent`
+    Lorem ipsum dolor.
+
+    \`\`\`html
+    <p>sit amet</p>
+    \`\`\`
+    `
+
+    let expected = dedent`
+    <p>Lorem ipsum dolor.</p>
+    <pre><code class="language-html">&lt;p&gt;sit amet&lt;/p&gt;
+    </code></pre>
+    `
+
+    expect(
+      atom.ui.markdown.render(input).trim()
+    ).toBe(expected);
+  })
 
   describe("transforms links correctly", () => {
     it("makes no changes to a fqdn link", () => {

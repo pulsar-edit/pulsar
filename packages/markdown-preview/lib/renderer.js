@@ -17,91 +17,147 @@ const emojiFolder = path.join(
   'pngs'
 )
 
-exports.toDOMFragment = async function (text, filePath, grammar, callback) {
+// Creating `TextEditor` instances is costly, so we'll try to re-use instances
+// when a preview changes.
+class EditorCache {
+  static BY_ID = new Map()
 
-  text ??= "";
-
-  if (atom.config.get("markdown-preview.useOriginalParser")) {
-    const domFragment = render(text, filePath);
-
-    await highlightCodeBlocks(domFragment, grammar, makeAtomEditorNonInteractive);
-
-    return domFragment;
-
-  } else {
-    // We use the new parser!
-    const domFragment = atom.ui.markdown.render(text,
-      {
-        renderMode: "fragment",
-        filePath: filePath,
-        breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
-        useDefaultEmoji: true,
-        sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
-      }
-    );
-    const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
-    await atom.ui.markdown.applySyntaxHighlighting(domHTMLFragment,
-      {
-        renderMode: "fragment",
-        syntaxScopeNameFunc: scopeForFenceName,
-        grammar: grammar
-      }
-    );
-
-    return domHTMLFragment;
+  static findOrCreateById(id) {
+    let cache = EditorCache.BY_ID.get(id)
+    if (!cache) {
+      cache = new EditorCache(id)
+      EditorCache.BY_ID.set(id, cache)
+    }
+    return cache
   }
+
+  constructor(id) {
+    this.id = id
+    this.editorsByPre = new Map()
+    this.possiblyUnusedEditors = new Set()
+  }
+
+  destroy() {
+    let editors = Array.from(this.editorsByPre.values())
+    for (let editor of editors) {
+      editor.destroy()
+    }
+    this.editorsByPre.clear()
+    this.possiblyUnusedEditors.clear()
+    EditorCache.BY_ID.delete(this.id)
+  }
+
+  // Called when we start a render. Every `TextEditor` is assumed to be stale,
+  // but any editor that is successfully looked up from the cache during this
+  // render is saved from culling.
+  beginRender() {
+    this.possiblyUnusedEditors.clear()
+    for (let editor of this.editorsByPre.values()) {
+      this.possiblyUnusedEditors.add(editor)
+    }
+  }
+
+  // Cache an editor by the PRE element that it's standing in for.
+  addEditor(pre, editor) {
+    this.editorsByPre.set(pre, editor)
+  }
+
+  getEditor(pre) {
+    let editor = this.editorsByPre.get(pre)
+    if (editor) {
+      // Cache hit! This editor will be reused, so we should prevent it from
+      // getting culled.
+      this.possiblyUnusedEditors.delete(editor)
+    }
+    return editor
+  }
+
+  endRender() {
+    // Any editor that didn't get claimed during the render is orphaned and
+    // should be disposed of.
+    let toBeDeleted = new Set()
+    for (let [pre, editor] of this.editorsByPre.entries()) {
+      if (!this.possiblyUnusedEditors.has(editor)) continue
+      toBeDeleted.add(pre)
+    }
+
+    this.possiblyUnusedEditors.clear()
+
+    for (let pre of toBeDeleted) {
+      let editor = this.editorsByPre.get(pre)
+      let element = editor.getElement()
+      if (element.parentNode) {
+        element.remove()
+      }
+      this.editorsByPre.delete(pre)
+      editor.destroy()
+    }
+  }
+}
+
+exports.EditorCache = EditorCache
+
+function chooseRender(text, filePath) {
+  if (atom.config.get("markdown-preview.useOriginalParser")) {
+    // Legacy rendering with `marked`.
+    return render(text, filePath)
+  } else {
+    // Built-in rendering with `markdown-it`.
+    let html = atom.ui.markdown.render(text, {
+      renderMode: "fragment",
+      filePath: filePath,
+      breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
+      useDefaultEmoji: true,
+      sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
+    })
+    return atom.ui.markdown.convertToDOM(html)
+  }
+}
+
+exports.toDOMFragment = async function (text, filePath, grammar, editorId) {
+  text ??= ""
+  let defaultLanguage = getDefaultLanguageForGrammar(grammar)
+
+  // We cache editor instances in this code path because it's the one used by
+  // the preview pane, so we expect it to be updated quite frequently.
+  let cache = EditorCache.findOrCreateById(editorId)
+  cache.beginRender()
+
+  const domFragment = chooseRender(text, filePath)
+  annotatePreElements(domFragment, defaultLanguage)
+
+  return [
+    domFragment,
+    async (element) => {
+      await highlightCodeBlocks(element, grammar, cache, makeAtomEditorNonInteractive)
+      cache.endRender()
+    }
+  ]
 }
 
 exports.toHTML = async function (text, filePath, grammar) {
-
   text ??= "";
 
-  if (atom.config.get("markdown-preview.useOriginalParser")) {
-    const domFragment = render(text, filePath)
-    const div = document.createElement('div')
+  // We don't cache editor instances in this code path because it's the one
+  // used by the “Copy HTML” command, so this is likely to be a one-off for
+  // which caches won't help.
 
-    div.appendChild(domFragment)
-    document.body.appendChild(div)
+  const domFragment = chooseRender(text, filePath)
+  const div = document.createElement('div')
+  annotatePreElements(domFragment, getDefaultLanguageForGrammar(grammar))
+  div.appendChild(domFragment)
+  document.body.appendChild(div)
 
-    await highlightCodeBlocks(div, grammar, convertAtomEditorToStandardElement)
+  await highlightCodeBlocks(div, grammar, null, convertAtomEditorToStandardElement)
 
-    const result = div.innerHTML
-    div.remove()
+  const result = div.innerHTML;
+  div.remove();
 
-    return result
-  } else {
-    // We use the new parser!
-    const domFragment = atom.ui.markdown.render(text,
-      {
-        renderMode: "full",
-        filePath: filePath,
-        breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
-        useDefaultEmoji: true,
-        sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
-      }
-    );
-    const domHTMLFragment = atom.ui.markdown.convertToDOM(domFragment);
-
-    const div = document.createElement("div");
-    div.appendChild(domHTMLFragment);
-    document.body.appendChild(div);
-
-    await atom.ui.markdown.applySyntaxHighlighting(div,
-      {
-        renderMode: "full",
-        syntaxScopeNameFunc: scopeForFenceName,
-        grammar: grammar
-      }
-    );
-
-    const result = div.innerHTML;
-    div.remove();
-
-    return result;
-  }
+  return result;
 }
 
-var render = function (text, filePath) {
+// Render with the package's own `marked` library.
+function render(text, filePath) {
   if (marked == null || yamlFrontMatter == null || cheerio == null) {
     marked = require('marked')
     yamlFrontMatter = require('yaml-front-matter')
@@ -124,12 +180,13 @@ var render = function (text, filePath) {
 
   let html = marked.parse(renderYamlTable(vars) + __content)
 
-  // emoji-images is too aggressive, so replace images in monospace tags with the actual emoji text.
+  // emoji-images is too aggressive, so replace images in monospace tags with
+  // the actual emoji text.
   const $ = cheerio.load(emoji(html, emojiFolder, 20))
-  $('pre img').each((index, element) =>
+  $('pre img').each((_index, element) =>
     $(element).replaceWith($(element).attr('title'))
   )
-  $('code img').each((index, element) =>
+  $('code img').each((_index, element) =>
     $(element).replaceWith($(element).attr('title'))
   )
 
@@ -159,7 +216,7 @@ function renderYamlTable(variables) {
 
   const markdownRows = [
     entries.map(entry => entry[0]),
-    entries.map(entry => '--'),
+    entries.map(_ => '--'),
     entries.map((entry) => {
       if (typeof entry[1] === "object" && !Array.isArray(entry[1])) {
         // Remove all newlines, or they ruin formatting of parent table
@@ -175,7 +232,7 @@ function renderYamlTable(variables) {
   )
 }
 
-var resolveImagePaths = function (element, filePath) {
+function resolveImagePaths(element, filePath) {
   const [rootDirectory] = atom.project.relativizePath(filePath)
 
   const result = []
@@ -219,55 +276,89 @@ var resolveImagePaths = function (element, filePath) {
   return result
 }
 
-var highlightCodeBlocks = function (domFragment, grammar, editorCallback) {
-  let defaultLanguage, fontFamily
-  if (
-    (grammar != null ? grammar.scopeName : undefined) === 'source.litcoffee'
-  ) {
-    defaultLanguage = 'coffee'
-  } else {
-    defaultLanguage = 'text'
-  }
+function getDefaultLanguageForGrammar(grammar) {
+  return grammar?.scopeName === 'source.litcoffee' ? 'coffee' : 'text'
+}
 
-  if ((fontFamily = atom.config.get('editor.fontFamily'))) {
-    for (const codeElement of domFragment.querySelectorAll('code')) {
-      codeElement.style.fontFamily = fontFamily
-    }
+function annotatePreElements(fragment, defaultLanguage) {
+  for (let preElement of fragment.querySelectorAll('pre')) {
+    const codeBlock = preElement.firstElementChild ?? preElement
+    const className = codeBlock.getAttribute('class')
+    const fenceName = className?.replace(/^language-/, '') ?? defaultLanguage
+    preElement.classList.add('editor-colors', `lang-${fenceName}`)
   }
+}
+
+function reassignEditorToLanguage(editor, languageScope) {
+  // When we successfully reassign the language on an editor, its
+  // `data-grammar` attribute updates on its own.
+  let result = atom.grammars.assignLanguageMode(editor, languageScope)
+  if (result) return true
+
+  // When we fail to assign the language on an editor — maybe its package is
+  // deactivated — it won't reset itself to the default grammar, so we have to
+  // do it ourselves.
+  result = atom.grammars.assignLanguageMode(editor, `text.plain.null-grammar`)
+  if (!result) return false
+}
+
+// After render, create an `atom-text-editor` for each `pre` element so that we
+// enjoy syntax highlighting.
+function highlightCodeBlocks(element, grammar, cache, editorCallback) {
+  let defaultLanguage = getDefaultLanguageForGrammar(grammar)
 
   const promises = []
-  for (const preElement of domFragment.querySelectorAll('pre')) {
-    const codeBlock =
-      preElement.firstElementChild != null
-        ? preElement.firstElementChild
-        : preElement
+
+  for (const preElement of element.querySelectorAll('pre')) {
+    const codeBlock = preElement.firstElementChild ?? preElement
     const className = codeBlock.getAttribute('class')
-    const fenceName =
-      className != null ? className.replace(/^language-/, '') : defaultLanguage
+    const fenceName = className?.replace(/^language-/, '') ?? defaultLanguage
+    let editorText = codeBlock.textContent.replace(/\r?\n$/, '')
 
-    const editor = new TextEditor({
-      readonly: true,
-      keyboardInputEnabled: false
-    })
-    const editorElement = editor.getElement()
+    // If this PRE element was present in the last render, then we should
+    // already have a cached text editor available for use.
+    let editor = cache?.getEditor(preElement) ?? null
+    let editorElement
+    if (!editor) {
+      editor = new TextEditor({ keyboardInputEnabled: false })
+      editorElement = editor.getElement()
+      editor.setReadOnly(true)
+      cache?.addEditor(preElement, editor)
+    } else {
+      editorElement = editor.getElement()
+    }
 
-    preElement.classList.add('editor-colors', `lang-${fenceName}`)
-    editorElement.setUpdatedSynchronously(true)
-    preElement.innerHTML = ''
-    preElement.parentNode.insertBefore(editorElement, preElement)
-    editor.setText(codeBlock.textContent.replace(/\r?\n$/, ''))
-    atom.grammars.assignLanguageMode(editor, scopeForFenceName(fenceName))
-    editor.setVisible(true)
+    // If the PRE changed its content, we need to change the content of its
+    // `TextEditor`.
+    if (editor.getText() !== editorText) {
+      editor.setReadOnly(false)
+      editor.setText(editorText)
+      editor.setReadOnly(true)
+    }
+
+    // If the PRE changed its language, we need to change the language of its
+    // `TextEditor`.
+    let scopeDescriptor = editor.getRootScopeDescriptor()[0]
+    let languageScope = scopeForFenceName(fenceName)
+    if (languageScope !== scopeDescriptor && `.${languageScope}` !== scopeDescriptor) {
+      reassignEditorToLanguage(editor, languageScope)
+    }
+
+    // If the editor is brand new, we'll have to insert it; otherwise it should
+    // already be in the right place.
+    if (!editorElement.parentNode) {
+      preElement.parentNode.insertBefore(editorElement, preElement)
+      editor.setVisible(true)
+    }
 
     promises.push(editorCallback(editorElement, preElement))
   }
   return Promise.all(promises)
 }
 
-var makeAtomEditorNonInteractive = function (editorElement, preElement) {
-  preElement.remove()
-  editorElement.setAttributeNode(document.createAttribute('gutter-hidden')) // Hide gutter
-  editorElement.removeAttribute('tabindex') // Make read-only
+function makeAtomEditorNonInteractive(editorElement) {
+  editorElement.setAttributeNode(document.createAttribute('gutter-hidden'))
+  editorElement.removeAttribute('tabindex')
 
   // Remove line decorations from code blocks.
   for (const cursorLineDecoration of editorElement.getModel()
@@ -276,9 +367,12 @@ var makeAtomEditorNonInteractive = function (editorElement, preElement) {
   }
 }
 
-var convertAtomEditorToStandardElement = (editorElement, preElement) => {
+function convertAtomEditorToStandardElement(editorElement, preElement) {
   return new Promise(function (resolve) {
     const editor = editorElement.getModel()
+    // In this code path, we're transplanting the highlighted editor HTML into
+    // the existing `pre` element, so we should empty its contents first.
+    preElement.innerHTML = ''
     const done = () =>
       editor.component.getNextUpdatePromise().then(function () {
         for (const line of editorElement.querySelectorAll(
