@@ -1832,15 +1832,10 @@
     tar "^6.0.5"
     yargs "^17.0.1"
 
-"@electron/remote@2.1.2":
+"@electron/remote@2.1.2", "@electron/remote@^2.1.0":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@electron/remote/-/remote-2.1.2.tgz#52a97c8faa5b769155b649ef262f2f8c851776e6"
   integrity sha512-EPwNx+nhdrTBxyCqXt/pftoQg/ybtWDW3DUWHafejvnB1ZGGfMpv6e15D8KeempocjXe78T7WreyGGb3mlZxdA==
-
-"@electron/remote@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@electron/remote/-/remote-2.1.0.tgz#7f3980840b5f4f3058ac7fd1da7a1167d10a9eaf"
-  integrity sha512-38jzz2beoYTo0DNS+aoaGyLS/fHeNTAc1Aom6HlYsxKnvVWjcg4xriC7J2IUkYSEDHGKX/D7jUst+mH4dHR6QA==
 
 "@electron/universal@1.2.1":
   version "1.2.1"
