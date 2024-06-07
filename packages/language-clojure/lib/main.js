@@ -25,7 +25,7 @@ exports.activate = function() {
     type: 'source',
     language: () => 'source-clojure-edn',
     content: (node, buffer) => {
-      if(path.extname(buffer.getPath()) === '.edn') {
+      if (path.extname(buffer.getPath() ?? '') === '.edn') {
         return node
       }
     },
