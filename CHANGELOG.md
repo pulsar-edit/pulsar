@@ -304,7 +304,6 @@
 - Prevented warnings in the developer console from appearing when autocomplete suggestions are shown.
 - Removed the last CoffeeScript code from Pulsar and core packages.
 - Migrated the majority of our CI to GitHub Actions.
-- Added `ppm` and `ppm.cmd` binaries/launchers within ppm. This allows easier integration of correctly named binaries on more systems in more contexts (especially Windows). Existing `apm` and `apm.cmd` binaries/launchers are still there for the time being.
 
 ### Pulsar
 - Added: about: Make the About page's CSS responsive for narrow panes [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/717)
