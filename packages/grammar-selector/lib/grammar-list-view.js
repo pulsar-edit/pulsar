@@ -165,17 +165,12 @@ module.exports = class GrammarListView {
 // manner.
 function getLanguageModeConfig() {
   let isTreeSitterMode = atom.config.get('core.useTreeSitterParsers');
-  let isLegacy = atom.config.get('core.useLegacyTreeSitter');
   if (!isTreeSitterMode) return 'textmate';
-  return isLegacy ? 'node-tree-sitter' : 'web-tree-sitter';
+  return 'wasm-tree-sitter';
 }
 
 function isModernTreeSitter(grammar) {
   return grammar.constructor.name === 'WASMTreeSitterGrammar';
-}
-
-function isLegacyTreeSitter(grammar) {
-  return grammar.constructor.name === 'TreeSitterGrammar';
 }
 
 function compareGrammarType(a, b) {
@@ -242,9 +237,6 @@ function getGrammarScore(grammar) {
   let languageParser = getParserPreferenceForScopeName(grammar.scopeName);
   if (isModernTreeSitter(grammar)) {
     return languageParser === 'node-tree-sitter' ? -1 : -2;
-  }
-  if (isLegacyTreeSitter(grammar)) {
-    return languageParser === 'node-tree-sitter' ? -2 : -1;
   }
   return languageParser === 'textmate' ? -3 : 0;
 }

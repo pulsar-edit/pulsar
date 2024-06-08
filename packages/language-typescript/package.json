@@ -12,9 +12,6 @@
   "main": "lib/main",
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "dependencies": {
-    "tree-sitter-typescript": "0.20.1"
-  },
   "configSchema": {
     "indentation": {
       "title": "Indentation",

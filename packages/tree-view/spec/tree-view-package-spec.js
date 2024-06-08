@@ -4,7 +4,8 @@ const fs = require('fs-plus');
 const path = require('path');
 const temp = require('temp').track();
 const os = require('os');
-const {remote, shell} = require('electron');
+const {shell} = require('electron');
+const remote = require('@electron/remote');
 const Directory = require('../lib/directory');
 const eventHelpers = require("./event-helpers");
 

@@ -8375,6 +8375,8 @@ describe('TextEditor', () => {
         'support.variable.property.js'
       ]);
     });
+<<<<<<< HEAD
+=======
 
     it('returns the result of syntaxTreeScopeDescriptorForBufferPosition() when tree-sitter language mode is used', async () => {
       jasmine.useRealClock();
@@ -8416,6 +8418,7 @@ describe('TextEditor', () => {
         'property_identifier'
       ]);
     });
+>>>>>>> origin/master
   });
 
   describe('.shouldPromptToSave()', () => {
