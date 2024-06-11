@@ -4351,7 +4351,7 @@ class LanguageLayer {
 
         // Does it offer us a node, or array of nodes, which a new injection
         // layer should use for its content?
-        const contentNodes = injectionPoint.content(node);
+        const contentNodes = injectionPoint.content(node, this.buffer);
         if (!contentNodes) { continue; }
 
         const injectionNodes = [].concat(contentNodes);
