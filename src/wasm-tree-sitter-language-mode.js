@@ -79,7 +79,7 @@ function resolveNodePosition(node, descriptor) {
   let result = parts.length === 0 ?
     node :
     resolveNodeDescriptor(node, parts.join('.'));
-
+  if (!result) { return null; }
   return result[lastPart];
 }
 
@@ -2535,6 +2535,7 @@ class FoldResolver {
         let value = options[key];
         end = this.applyFoldAdjustment(key, end, node, value, props, this.layer);
       }
+      if (!end) { return null; }
 
       end = Point.fromObject(end, true);
       end = this.buffer.clipPosition(end);
