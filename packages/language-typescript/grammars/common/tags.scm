@@ -7,11 +7,11 @@
   (#set! symbol.tag "function")) @definition.function
 
 (method_definition
-  name: (property_identifier) @name
+  name: [(property_identifier) (private_property_identifier)] @name
   (#set! symbol.tag "method")) @definition.method
 
 (abstract_method_signature
-  name: (property_identifier) @name
+  name: [(property_identifier) (private_property_identifier)] @name
   (#set! symbol.tag "method")) @definition.method
 
 (class_declaration
