@@ -5,6 +5,15 @@
 - Project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
+
+## 1.118.0
+
+- Various tree-sitter grammar improvements
+  - Docs fixes
+  - A parser update for PHP
+  - Miscellaneous grammar fixes and improvements
+- Add a preference `core.allowWindowTransparency` so that themes and user stylesheets
+  can make editor windows' backgrounds transparent.
 - Added a new modern tree sitter "test" for highlight query - `ancestorTypeNearerThan`
   that matches if it finds the _first_ type as an ancestor, but _not matches_ if
   any "other" ancestors are found before
@@ -17,6 +26,17 @@
   injection points on Clojure. Added support for highligting metadata, and added
   better support for "def" elements (example - don't syntax `default` or
   `definition` as a `def`, but highlights `p/defresolver`)
+- Fix `textChanged` property to be accurate when deleting characters
+- Fix `ppm publish` for publishing brand new packages
+
+### Pulsar
+
+- Fixed: Tree-sitter rolling fixes, 1.118 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1010)
+- Added: src: Allow windows to be transparent, behind a pref (off by default) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/982)
+- Added: Another batch of Clojure enhancements [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/729)
+- Fixed: Fix `onDidChangeCursorPosition` callback event property on deleting characters [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/810)
+- Bumped: Update ppm to commit 3542dee00f4622f7458f2f65f05e5 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1014)
+- Updated: Cirrus: Update Rolling upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1011)
 
 ## 1.117.0
 

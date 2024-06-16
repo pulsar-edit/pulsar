@@ -50,25 +50,42 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                [markdown-preview] Improve rendering performance in preview panes, especially in documents with lots of fenced code blocks.
+                Various tree-sitter grammar improvements
+                <ul>
+                  <li>
+                    Docs Fixes
+                  </li>
+                  <li>
+                    A parser update for PHP
+                  </li>
+                  <li>
+                    Miscellaneous grammar fixes and improvements
+                  </li>
+                </ul>
               </li>
               <li>
-                [markdown-preview] GitHub-style Markdown preview now uses up-to-date styles and supports dark mode.
+                Add a preference <code>core.allowWindowTransparency</code> so that themes and user stylesheets can make editor windows' backgrounds transparent.
               </li>
               <li>
-                Pulsar's OS level theme will now change according to the selected editor theme if <code>core.syncWindowThemeWithPulsarTheme</code> is enabled.
+                Added a new modern tree sitter "test" for highlight query - <code>ancestorTypeNearerThan</code> that matches if it finds the <i>first</i> type as an ancestor, but <i>not matches</i> if any "other" ancestors are found before
               </li>
               <li>
-                [language-sass] Add SCSS Tree-sitter grammar.
+                Syntax quoting and unquoting in Clojure now highlights correctly, and also highlights full qualified keywords differently than generated ones
               </li>
               <li>
-                [language-ruby] Update to latest Tree-sitter Ruby parser.
+                <code>content</code> field of addInjectionPoint for modern-tree-sitter now supports a second <code>buffer</code> argument, for better customization if one wants to
               </li>
               <li>
-                [language-gfm] Make each block-level HTML tag its own injection.
+                EDN is back to be detected as Clojure (for compatibility) but highlights as EDN
               </li>
               <li>
-                [language-typescript] More highlighting fixes, especially for operators.
+                Fixed syntax quoting on Clojure grammar (newer tree-sitter), fixed some injection points on Clojure. Added support for highligting metadata, and added better support for "def" elements (example - don't syntax <code>default</code> or <code>definition</code> as a <code>def</code>, but highlights <code>p/defresolver</code>)
+              </li>
+              <li>
+                Fix <code>textChanged</code> property to be accurate when deleting characters
+              </li>
+              <li>
+                Fix <code>ppm publish</code> for publishing brand new packages
               </li>
             </ul>
 
