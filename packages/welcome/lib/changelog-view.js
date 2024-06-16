@@ -64,10 +64,10 @@ export default class ChangeLogView {
                 </ul>
               </li>
               <li>
-                Add a preference <code>core.allowWindowTransparency</code> so that themes and user stylesheets can make editor windows' backgrounds transparent.
+                Added a preference <code>core.allowWindowTransparency</code> so that themes and user stylesheets can make editor windows' backgrounds transparent.
               </li>
               <li>
-                Added a new modern tree sitter "test" for highlight query - <code>ancestorTypeNearerThan</code> that matches if it finds the <i>first</i> type as an ancestor, but <i>not matches</i> if any "other" ancestors are found before
+                Added a new modern tree sitter "test" for highlight query - <code>ancestorTypeNearerThan</code> that matches if it finds the <i>first</i> type as an ancestor, but <i>doesn't match</i> if any "other" ancestors are found before
               </li>
               <li>
                 Syntax quoting and unquoting in Clojure now highlights correctly, and also highlights full qualified keywords differently than generated ones
@@ -76,16 +76,16 @@ export default class ChangeLogView {
                 <code>content</code> field of addInjectionPoint for modern-tree-sitter now supports a second <code>buffer</code> argument, for better customization if one wants to
               </li>
               <li>
-                EDN is back to be detected as Clojure (for compatibility) but highlights as EDN
+                EDN is back to being detected as Clojure (for compatibility) but highlights as EDN
               </li>
               <li>
-                Fixed syntax quoting on Clojure grammar (newer tree-sitter), fixed some injection points on Clojure. Added support for highligting metadata, and added better support for "def" elements (example - don't syntax <code>default</code> or <code>definition</code> as a <code>def</code>, but highlights <code>p/defresolver</code>)
+                Fixed syntax quoting on Clojure grammar (newer tree-sitter), fixed some injection points on Clojure. Added support for highligting metadata, and added better support for "def" elements (for example - doesn't scope <code>default</code> or <code>definition</code> as a <code>def</code>, but highlights <code>p/defresolver</code>)
               </li>
               <li>
-                Fix <code>textChanged</code> property to be accurate when deleting characters
+                Fixed <code>textChanged</code> property to be accurate when deleting characters
               </li>
               <li>
-                Fix <code>ppm publish</code> for publishing brand new packages
+                Fixed <code>ppm publish</code> for publishing brand new packages
               </li>
             </ul>
 

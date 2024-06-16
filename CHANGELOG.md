@@ -12,22 +12,22 @@
   - Docs fixes
   - A parser update for PHP
   - Miscellaneous grammar fixes and improvements
-- Add a preference `core.allowWindowTransparency` so that themes and user stylesheets
+- Added a preference `core.allowWindowTransparency` so that themes and user stylesheets
   can make editor windows' backgrounds transparent.
 - Added a new modern tree sitter "test" for highlight query - `ancestorTypeNearerThan`
-  that matches if it finds the _first_ type as an ancestor, but _not matches_ if
+  that matches if it finds the _first_ type as an ancestor, but _doesn't match_ if
   any "other" ancestors are found before
 - Syntax quoting and unquoting in Clojure now highlights correctly, and also
   highlights full qualified keywords differently than generated ones
 - `content` field of addInjectionPoint for modern-tree-sitter now supports a second
   `buffer` argument, for better customization if one wants to
-- EDN is back to be detected as Clojure (for compatibility) but highlights as EDN
+- EDN is back to being detected as Clojure (for compatibility) but highlights as EDN
 - Fixed syntax quoting on Clojure grammar (newer tree-sitter), fixed some
   injection points on Clojure. Added support for highligting metadata, and added
-  better support for "def" elements (example - don't syntax `default` or
+  better support for "def" elements (for example - doesn't scope `default` or
   `definition` as a `def`, but highlights `p/defresolver`)
-- Fix `textChanged` property to be accurate when deleting characters
-- Fix `ppm publish` for publishing brand new packages
+- Fixed `textChanged` property to be accurate when deleting characters
+- Fixed `ppm publish` for publishing brand new packages
 
 ### Pulsar
 
