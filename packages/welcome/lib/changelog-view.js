@@ -50,25 +50,42 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added <code>TextEditor::getCommentDelimitersForBufferPosition</code> for retrieving comment delimiter strings appropriate for a given buffer position. This allows us to support three new snippet variables: <code>LINE_COMMENT</code>, <code>BLOCK_COMMENT_START</code>, and <code>BLOCK_COMMENT_END</code>.
+                Various tree-sitter grammar improvements
+                <ul>
+                  <li>
+                    Docs Fixes
+                  </li>
+                  <li>
+                    A parser update for PHP
+                  </li>
+                  <li>
+                    Miscellaneous grammar fixes and improvements
+                  </li>
+                </ul>
               </li>
               <li>
-                Added ability to use “simple” transformation flags in snippets (like <code>/upcase</code> and <code>/camelcase</code>) within <code>sed</code>-style snippet transformation replacements.
+                Added a preference <code>core.allowWindowTransparency</code> so that themes and user stylesheets can make editor windows' backgrounds transparent.
               </li>
               <li>
-                Improved TypeScript syntax highlighting of regular expressions, TSX fragments, wildcard export identifiers, namespaced types, and template string punctuation.
+                Added a new modern tree sitter "test" for highlight query - <code>ancestorTypeNearerThan</code> that matches if it finds the <i>first</i> type as an ancestor, but <i>doesn't match</i> if any "other" ancestors are found before
               </li>
               <li>
-                Replaced our underlying Tree-sitter parser for Markdown files with one that’s more stable.
+                Syntax quoting and unquoting in Clojure now highlights correctly, and also highlights full qualified keywords differently than generated ones
               </li>
               <li>
-                Fixed issues in Python with unwanted indentation after type annotations and applying scope names to constructor functions.
+                <code>content</code> field of addInjectionPoint for modern-tree-sitter now supports a second <code>buffer</code> argument, for better customization if one wants to
               </li>
               <li>
-                Removed Machine PATH handling for Pulsar on Windows, ensuring to only ever attempt PATH manipulation per user. Added additional safety mechanisms when handling a user's PATH variable.
+                EDN is back to being detected as Clojure (for compatibility) but highlights as EDN
               </li>
               <li>
-                Update (Linux) metainfo from downstream Pulsar Flatpak
+                Fixed syntax quoting on Clojure grammar (newer tree-sitter), fixed some injection points on Clojure. Added support for highligting metadata, and added better support for "def" elements (for example - doesn't scope <code>default</code> or <code>definition</code> as a <code>def</code>, but highlights <code>p/defresolver</code>)
+              </li>
+              <li>
+                Fixed <code>textChanged</code> property to be accurate when deleting characters
+              </li>
+              <li>
+                Fixed <code>ppm publish</code> for publishing brand new packages
               </li>
             </ul>
 

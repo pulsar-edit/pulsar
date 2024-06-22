@@ -86,13 +86,15 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **settings-view** | [`./settings-view`](./settings-view) |  |
 | **package-generator** | [`./package-generator`](./package-generator) | |
 | **pulsar-updater** | [`./pulsar-updater`](./pulsar-updater) | |
-| **snippets** | [`pulsar-edit/snippets`][snippets] |  |
+| **snippets** | [`./snippets`](./snippets) |  |
 | **solarized-dark-syntax** | [`./solarized-dark-syntax`](./solarized-dark-syntax) | |
 | **solarized-light-syntax** | [`./solarized-light-syntax`](./solarized-light-syntax) | |
 | **spell-check** | [`./spell-check`](./spell-check) |  |
 | **status-bar** | [`./status-bar`](./status-bar) | |
+| **symbol-provider-ctags** | [`./symbol-provider-ctags`](./symbol-provider-ctags) | |
+| **symbol-provider-tree-sitter** | [`./symbol-provider-tree-sitter`](./symbol-provider-tree-sitter) | |
 | **styleguide** | [`./styleguide`](./styleguide) | |
-| **symbols-view** | [`pulsar-edit/symbols-view`][symbols-view] |  |
+| **symbols-view** | [`./symbols-view`](./symbols-view) |  |
 | **tabs** | [`./tabs`](./tabs) |  |
 | **timecop** | [`./timecop`](./timecop) | |
 | **tree-view** | [`./tree-view`](./tree-view) |  |
@@ -102,5 +104,3 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **wrap-guide** | [`./wrap-guide`](./wrap-guide) | |
 
 [github]: https://github.com/pulsar-edit/github
-[snippets]: https://github.com/pulsar-edit/snippets
-[symbols-view]: https://github.com/pulsar-edit/symbols-view

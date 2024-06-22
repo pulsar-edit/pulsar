@@ -79,7 +79,7 @@ function resolveNodePosition(node, descriptor) {
   let result = parts.length === 0 ?
     node :
     resolveNodeDescriptor(node, parts.join('.'));
-
+  if (!result) { return null; }
   return result[lastPart];
 }
 
@@ -2535,6 +2535,7 @@ class FoldResolver {
         let value = options[key];
         end = this.applyFoldAdjustment(key, end, node, value, props, this.layer);
       }
+      if (!end) { return null; }
 
       end = Point.fromObject(end, true);
       end = this.buffer.clipPosition(end);
@@ -4351,7 +4352,7 @@ class LanguageLayer {
 
         // Does it offer us a node, or array of nodes, which a new injection
         // layer should use for its content?
-        const contentNodes = injectionPoint.content(node);
+        const contentNodes = injectionPoint.content(node, this.buffer);
         if (!contentNodes) { continue; }
 
         const injectionNodes = [].concat(contentNodes);
@@ -4501,7 +4502,7 @@ class NodeRangeSet {
   getNodeSpec(node, getChildren) {
     let { startIndex, endIndex, startPosition, endPosition, id } = node;
     let result = { startIndex, endIndex, startPosition, endPosition, id };
-    if (node.children && getChildren) {
+    if (getChildren && node.childCount > 0) {
       result.children = [];
       for (let child of node.children) {
         result.children.push(this.getNodeSpec(child, false));

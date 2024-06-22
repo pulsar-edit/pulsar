@@ -198,12 +198,15 @@ function f(x) {
           () => renderSpy.callCount === 1
         )
 
-        runs(function () {
-          const rubyEditor = preview.element.querySelector(
-            "atom-text-editor[data-grammar='source ruby']"
-          )
-          expect(rubyEditor).toBeNull()
-        })
+        waitsFor(
+          'atom-text-editor to reassign all language modes after re-render',
+          () => {
+            let rubyEditor = preview.element.querySelector(
+              "atom-text-editor[data-grammar='source ruby']"
+            )
+            return rubyEditor == null
+          }
+        )
 
         waitsForPromise(() => atom.packages.activatePackage('language-ruby'))
 

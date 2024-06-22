@@ -1,0 +1,49 @@
+'.source.css.scss':
+  '!important':
+    prefix: '!'
+    body: 'i!important${:;}$0'
+  '@use':
+    prefix: 'use'
+    body: "@use '${1:file}'${2: as ${3:alias}};"
+  '@import':
+    prefix: 'import'
+    body: '@import "$0";'
+    description: "An enhanced version of CSS’s “@import” rule."
+    descriptionMoreURL: "https://sass-lang.com/documentation/at-rules/import/"
+  '@include':
+    prefix: 'include'
+    body: '@include ${1:mixin}${2:($3)};$0'
+    description: "Include a mixin into the current context."
+    descriptionMoreURL: "https://sass-lang.com/documentation/at-rules/mixin/"
+  '@extend':
+    prefix: 'extend'
+    body: '@extend ${1}$0';
+    description: "Tells one selector to inherit the styles of another."
+    descriptionMoreURL: "https://sass-lang.com/documentation/at-rules/extend/"
+  '@if':
+    prefix: 'if'
+    body: """
+    @if ${1:conditions} {
+      $0
+    }
+    """
+    description: "Controls whether or not its block gets evaluated."
+    descriptionMoreURL: "https://sass-lang.com/documentation/at-rules/control/if/"
+  '@mixin':
+    prefix: 'mixin'
+    body: """
+    @mixin ${1:name}${2:($3)} {
+      $0
+    }
+    """
+    description: "Include a mixin."
+    descriptionMoreURL: "https://sass-lang.com/documentation/at-rules/mixin/"
+  '@function':
+    prefix: 'fun'
+    body: """
+    @mixin ${1:name} {
+      $0
+    }
+    """
+    description: "Define your own function."
+    descriptionMoreURL: "https://sass-lang.com/documentation/at-rules/function/"

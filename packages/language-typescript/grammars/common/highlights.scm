@@ -18,16 +18,16 @@
   (identifier) @variable.other.assignment.import.namespace._LANG_)
 
 ; The "*" in `export * from 'bar'`
-(export_statement "*" @variable.other.assignment.export.all.js)
+(export_statement "*" @variable.other.assignment.export.all._LANG_)
 
 ; The "*" in `export * as Foo from 'bar'`
 (export_statement
-  (namespace_export "*" @variable.other.assignment.export.all.js))
+  (namespace_export "*" @variable.other.assignment.export.all._LANG_))
 
 ; The "*" in `export * as Foo from 'bar'`
 (export_statement
   (namespace_export
-    (identifier) @variable.other.assignment.export.alias.js))
+    (identifier) @variable.other.assignment.export.alias._LANG_))
 
 ; The "Foo" in `export { Foo }`
 (export_specifier
@@ -51,7 +51,7 @@
 ; =========
 
 (this) @variable.language.this._LANG_
-(super) @variable.language.super._LANG_._LANG_x
+(super) @variable.language.super._LANG_
 
 (required_parameter
   pattern: (identifier) @variable.parameter.with-default._LANG_
@@ -69,6 +69,11 @@
 (required_parameter
   pattern: (object_pattern
     (shorthand_property_identifier_pattern) @variable.parameter.destructuring._LANG_)
+    (#set! capture.final))
+
+(required_parameter
+  pattern: (object_pattern
+    (rest_pattern (identifier) @variable.parameter.destructuring.rest._LANG_))
     (#set! capture.final))
 
 (required_parameter
@@ -345,7 +350,7 @@
 
 "=>" @storage.type.arrow._LANG_
 
-; TODO: If I allow scopes like `storage.type.string._LANG_`, I will make a lot of
+; TODO: If I allow scopes like `storage.type.string.ts`, I will make a lot of
 ; text look like strings by accident. This really needs to be fixed in syntax
 ; themes.
 ;
@@ -764,10 +769,10 @@
 ) @meta.embedded.line.interpolation._LANG_
 
 (string
-  (escape_sequence) @constant.character.escape.js)
+  (escape_sequence) @constant.character.escape._LANG_)
 
 (template_string
-  (escape_sequence) @constant.character.escape.js)
+  (escape_sequence) @constant.character.escape._LANG_)
 
 
 ; CONSTANTS
@@ -817,16 +822,16 @@
 ; REGEX
 ; =====
 
-(regex) @string.regexp.js
+(regex) @string.regexp._LANG_
 (regex
-  "/" @punctuation.definition.string.begin.js
+  "/" @punctuation.definition.string.begin._LANG_
   (#is? test.first))
 
 (regex
-  "/" @punctuation.definition.string.end.js
+  "/" @punctuation.definition.string.end._LANG_
   (#is? test.last))
 
-(regex_flags) @keyword.other.js
+(regex_flags) @keyword.other._LANG_
 
 
 ; OPERATORS
@@ -837,28 +842,30 @@
 
 "=" @keyword.operator.assignment._LANG_
 (non_null_expression "!" @keyword.operator.non-null._LANG_)
-(unary_expression"!" @keyword.operator.unary._LANG_)
+(unary_expression "!" @keyword.operator.unary._LANG_)
 
 [
+  "&&="
+  "||="
+  "??="
   "+="
   "-="
   "*="
+  "**="
   "/="
   "%="
+  "^="
+  "&="
+  "|="
   "<<="
   ">>="
   ">>>="
-  "&="
-  "^="
-  "|="
-  "??="
-  "||="
 ] @keyword.operator.assignment.compound._LANG_
 
 (binary_expression
-  ["+" "-" "*" "/" "%"] @keyword.operator.arithmetic._LANG_)
+  ["/" "+" "-" "*" "**" "%"] @keyword.operator.arithmetic._LANG_)
 
-(unary_expression ["+" "-"] @keyword.operator.unary._LANG_)
+(unary_expression ["+" "-" "void"] @keyword.operator.unary._LANG_)
 
 (binary_expression
   [
@@ -866,14 +873,13 @@
     "==="
     "!="
     "!=="
-    ">="
-    "<="
-    ">"
-    "<"
   ] @keyword.operator.comparison._LANG_
 )
 
 ["++" "--"] @keyword.operator.increment._LANG_
+
+(binary_expression
+  [">=" "<=" ">" "<"] @keyword.operator.relational._LANG_)
 
 [
   "&&"
@@ -902,6 +908,20 @@
 "." @keyword.operator.accessor._LANG_
 "?." @keyword.operator.accessor.optional-chaining._LANG_
 
+; Optional chaining is illegal…
+
+; …on the left-hand side of an assignment.
+(assignment_expression
+  left: (_) @_IGNORE_
+    (#set! prohibitsOptionalChaining true))
+
+; …within a `new` expression.
+(new_expression
+  constructor: (_) @_IGNORE_
+    (#set! prohibitsOptionalChaining true))
+
+((optional_chain) @invalid.illegal.optional-chain._LANG_
+  (#is? test.descendantOfNodeWithData prohibitsOptionalChaining))
 
 (ternary_expression
   ["?" ":"] @keyword.operator.ternary._LANG_

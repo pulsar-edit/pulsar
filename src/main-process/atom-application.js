@@ -286,6 +286,9 @@ module.exports = class AtomApplication extends EventEmitter {
         this.config.onDidChange('core.colorProfile', () =>
           this.promptForRestart()
         );
+        this.config.onDidChange('core.allowWindowTransparency', () =>
+          this.promptForRestart()
+        );
       });
       await this.configFilePromise;
     }

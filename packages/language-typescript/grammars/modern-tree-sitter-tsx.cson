@@ -14,8 +14,8 @@ treeSitter:
   languageSegment: 'ts.tsx'
   grammar: 'tree-sitter-tsx/tree-sitter-tsx.wasm'
   highlightsQuery: [
-    'common/highlights.scm'
     'tree-sitter-tsx/highlights.scm'
+    'common/highlights.scm'
   ]
   indentsQuery: [
     'common/indents.scm'
