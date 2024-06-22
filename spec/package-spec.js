@@ -1,7 +1,7 @@
 const path = require('path');
 const Package = require('../src/package');
 const ThemePackage = require('../src/theme-package');
-const { mockLocalStorage } = require('./spec-helper');
+const { mockLocalStorage } = require('./helpers/mock-local-storage');
 
 describe('Package', function() {
   const build = (constructor, packagePath) =>
@@ -85,8 +85,8 @@ describe('Package', function() {
       buildPackage(packagePath).activateNow();
 
       expect(atom.notifications.addFatalError).not.toHaveBeenCalled();
-      expect(console.warn.callCount).toBe(1);
-      expect(console.warn.mostRecentCall.args[0]).toContain(
+      expect(console.warn.calls.count()).toBe(1);
+      expect(console.warn.calls.mostRecent().args[0]).toContain(
         'it requires one or more incompatible native modules (native-module)'
       );
     });
@@ -100,13 +100,13 @@ describe('Package', function() {
 
     afterEach(() => (atom.packages.devMode = true));
 
-    it('returns a promise resolving to the results of `apm rebuild`', function() {
+    it('returns a promise resolving to the results of `apm rebuild`', async function() {
       const packagePath = __guard__(atom.project.getDirectories()[0], x =>
         x.resolve('packages/package-with-index')
       );
       const pack = buildPackage(packagePath);
       const rebuildCallbacks = [];
-      spyOn(pack, 'runRebuildProcess').andCallFake(callback =>
+      spyOn(pack, 'runRebuildProcess').and.callFake(callback =>
         rebuildCallbacks.push(callback)
       );
 
@@ -117,16 +117,11 @@ describe('Package', function() {
         stderr: 'stderr output'
       });
 
-      waitsFor(done =>
-        promise.then(function(result) {
-          expect(result).toEqual({
-            code: 0,
-            stdout: 'stdout output',
-            stderr: 'stderr output'
-          });
-          done();
-        })
-      );
+      expect(await promise).toEqual({
+        code: 0,
+        stdout: 'stdout output',
+        stderr: 'stderr output'
+      });
     });
 
     it('persists build failures in local storage', function() {
@@ -139,7 +134,7 @@ describe('Package', function() {
       expect(pack.getBuildFailureOutput()).toBeNull();
 
       const rebuildCallbacks = [];
-      spyOn(pack, 'runRebuildProcess').andCallFake(callback =>
+      spyOn(pack, 'runRebuildProcess').and.callFake(callback =>
         rebuildCallbacks.push(callback)
       );
 
@@ -164,20 +159,18 @@ describe('Package', function() {
   });
 
   describe('theme', function() {
-    let [editorElement, theme] = [];
+    let editorElement, theme;
 
     beforeEach(function() {
       editorElement = document.createElement('atom-text-editor');
       jasmine.attachToDOM(editorElement);
     });
 
-    afterEach(() =>
-      waitsForPromise(function() {
-        if (theme != null) {
-          return Promise.resolve(theme.deactivate());
-        }
-      })
-    );
+    afterEach(async () => {
+      if (theme != null) {
+        await theme.deactivate();
+      }
+    });
 
     describe('when the theme contains a single style file', function() {
       it('loads and applies css', function() {
@@ -262,11 +255,11 @@ describe('Package', function() {
         theme.activate();
       });
 
-      it('deactivated event fires on .deactivate()', function() {
-        let spy;
-        theme.onDidDeactivate((spy = jasmine.createSpy()));
-        waitsForPromise(() => Promise.resolve(theme.deactivate()));
-        runs(() => expect(spy).toHaveBeenCalled());
+      it('deactivated event fires on .deactivate()', async function() {
+        let spy = jasmine.createSpy();
+        theme.onDidDeactivate(spy);
+        await theme.deactivate();
+        expect(spy).toHaveBeenCalled();
       });
     });
   });
@@ -297,7 +290,7 @@ describe('Package', function() {
       expect(mainModule.initialize).not.toHaveBeenCalled();
       pack.activate();
       expect(mainModule.initialize).toHaveBeenCalled();
-      expect(mainModule.initialize.callCount).toBe(1);
+      expect(mainModule.initialize.calls.count()).toBe(1);
     });
 
     it('gets called when a deserializer is used', function() {

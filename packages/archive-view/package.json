@@ -14,6 +14,7 @@
   "engines": {
     "atom": "*"
   },
+  "atomTestRunner": "runners/jasmine2-test-runner",
   "deserializers": {
     "ArchiveEditor": "deserialize",
     "ArchiveEditorView": "deserialize"
