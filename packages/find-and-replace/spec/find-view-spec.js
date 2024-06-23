@@ -12,7 +12,8 @@ describe("FindView", () => {
   }
 
   // usage:
-  // getResultDecorations(editor, "current-result") --> length = number of currently selected results (usually 1)
+  // getResultDecorations(editor, "current-result") --> length = number of currently selected results (usually 1, after a
+  //                                                                atom.commands.dispatch(findView.findEditor.element, "core:confirm");)
   // getResultDecorations(editor, "find-result") --> length = number of results that are not currently selected (usually = # results - 1)
   function getResultDecorations(editor, clazz) {
     const result = [];
@@ -463,7 +464,10 @@ describe("FindView", () => {
       });
 
       it("finds the whole words even when the word starts or ends with a non-word character", () => {
+        // Arguably, a non-symbol doesn't form a whole word when surrounded by the same non-symbols,
+        // but the current code doesn't check for that.
         findView.findEditor.setText("-");
+        atom.commands.dispatch(findView.findEditor.element, "core:confirm");
         expect(getResultDecorations(editor, "find-result")).toHaveLength(7);
         expect(getResultDecorations(editor, "current-result")).toHaveLength(1);
 
@@ -471,7 +475,10 @@ describe("FindView", () => {
         atom.commands.dispatch(findView.findEditor.element, "core:confirm");
         expect(editor.getSelectedBufferRange()).toEqual([[2, 5], [2, 10]]);
 
+        // The cursor is on line 2 because of ^^ so the first find is on line 4
         findView.findEditor.setText("whole-");
+        atom.commands.dispatch(findView.findEditor.element, "core:confirm");
+        expect(editor.getSelectedBufferRange()).toEqual([[4, 0], [4, 6]]);
         atom.commands.dispatch(findView.findEditor.element, "core:confirm");
         expect(editor.getSelectedBufferRange()).toEqual([[2, 0], [2, 6]]);
       });
