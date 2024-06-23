@@ -12,8 +12,8 @@ describe("FindView", () => {
   }
 
   // usage:
-  // getResultDecorations(editor, "current-result") --> length = number of currently selected results
-  // getResultDecorations(editor, "find-result") --> length = number of results that are not currently selected
+  // getResultDecorations(editor, "current-result") --> length = number of currently selected results (usually 1)
+  // getResultDecorations(editor, "find-result") --> length = number of results that are not currently selected (usually = # results - 1)
   function getResultDecorations(editor, clazz) {
     const result = [];
     const decorations = editor.decorationsStateForScreenRowRange(0, editor.getLineCount())
@@ -463,6 +463,10 @@ describe("FindView", () => {
       });
 
       it("finds the whole words even when the word starts or ends with a non-word character", () => {
+        findView.findEditor.setText("-");
+        expect(getResultDecorations(editor, "find-result")).toHaveLength(7);
+        expect(getResultDecorations(editor, "current-result")).toHaveLength(1);
+
         findView.findEditor.setText("-word");
         atom.commands.dispatch(findView.findEditor.element, "core:confirm");
         expect(editor.getSelectedBufferRange()).toEqual([[2, 5], [2, 10]]);
