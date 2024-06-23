@@ -99,7 +99,7 @@ module.exports = class FindOptions {
       // then, say, `$word` in ` $word ` isnt selected, as both the space and the dollar
       // are non-word characters. To allow this, we can either have a word boundary or
       // a lookahead/lookbehind for the start/end non-word character:
-      expression = `(?<=\\b|(?=\\W))${expression}(?=\\b|(?<=\\W))`;
+      expression = `(?:\\b|(?=\\W))${expression}(?:\\b|(?<=\\W))`;
     }
 
     return new RegExp(expression, flags);
