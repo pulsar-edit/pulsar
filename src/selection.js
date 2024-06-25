@@ -593,12 +593,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   backspace(options = {}) {
     if (!this.ensureWritable('backspace', options)) return;
-
-    const screenPosition = this.cursor.getPreviousColumnScreenPosition();
-    const bufferPosition = this.cursor.marker.layer.translateScreenPosition(
-      screenPosition, { clipDirection: 'backward' }
-    );
-    this._deleteToPreviousPoint(bufferPosition, options);
+    if (this.isEmpty()) this.selectLeft();
+    this.deleteSelectedText(options);
   }
 
   // Public: Removes the selection or, if nothing is selected, then all
@@ -609,10 +605,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToPreviousWordBoundary(options = {}) {
     if (!this.ensureWritable('deleteToPreviousWordBoundary', options)) return;
-    this._deleteToPreviousPoint(
-      this.cursor.getPreviousWordBoundaryBufferPosition(),
-      options
-    );
+    if (this.isEmpty()) this.selectToPreviousWordBoundary();
+    this.deleteSelectedText(options);
   }
 
   // Public: Removes the selection or, if nothing is selected, then all
@@ -623,8 +617,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToNextWordBoundary(options = {}) {
     if (!this.ensureWritable('deleteToNextWordBoundary', options)) return;
-    const position = this.cursor.getNextWordBoundaryBufferPosition();
-    this._deleteToNextPoint(position, options);
+    if (this.isEmpty()) this.selectToNextWordBoundary();
+    this.deleteSelectedText(options);
   }
 
   // Public: Removes from the start of the selection to the beginning of the
@@ -634,10 +628,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToBeginningOfWord(options = {}) {
     if (!this.ensureWritable('deleteToBeginningOfWord', options)) return;
-    this._deleteToPreviousPoint(
-      this.cursor.getBeginningOfCurrentWordBufferPosition(),
-      options
-    );
+    if (this.isEmpty()) this.selectToBeginningOfWord();
+    this.deleteSelectedText(options);
   }
 
   // Public: Removes from the beginning of the line which the selection begins on
@@ -647,22 +639,12 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToBeginningOfLine(options = {}) {
     if (!this.ensureWritable('deleteToBeginningOfLine', options)) return;
-    const startPoint = this.getBufferRange().start;
     if (this.isEmpty() && this.cursor.isAtBeginningOfLine()) {
-      const lastCharPoint = this.cursor.marker.layer.translateScreenPosition(
-        this.cursor.getPreviousColumnScreenPosition()
-      );
-      const prevRange = new Range( startPoint, lastCharPoint );
-      this.editor.buffer.setTextInRange(
-        prevRange, '', pick(options, 'undo', 'normalizeLineEndings')
-      );
+      this.selectLeft();
     } else {
-      const startOfLinePoint = new Point(this.cursor.getScreenRow(), 0);
-      const prevRange = new Range(startPoint, startOfLinePoint);
-      this.editor.buffer.setTextInRange(
-        prevRange, '', pick(options, 'undo', 'normalizeLineEndings')
-      );
+      this.selectToBeginningOfLine();
     }
+    this.deleteSelectedText(options);
   }
 
   // Public: Removes the selection or the next character after the start of the
@@ -672,11 +654,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   delete(options = {}) {
     if (!this.ensureWritable('delete', options)) return;
-    const screenPosition = this.cursor.getNextColumnScreenPosition();
-    const bufferPosition = this.cursor.marker.layer.translateScreenPosition(
-      screenPosition, { clipDirection: 'forward' }
-    );
-    this._deleteToNextPoint(bufferPosition, options);
+    if (this.isEmpty()) this.selectRight();
+    this.deleteSelectedText(options);
   }
 
   // Public: If the selection is empty, removes all text from the cursor to the
@@ -688,14 +667,14 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToEndOfLine(options = {}) {
     if (!this.ensureWritable('deleteToEndOfLine', options)) return;
-    if (this.isEmpty() && this.cursor.isAtEndOfLine()) {
-      this.delete(options);
-    } else {
-      this._deleteToNextPoint(
-        new Point(this.cursor.getScreenRow(), Infinity),
-        options
-      );
+    if (this.isEmpty()) {
+      if (this.cursor.isAtEndOfLine()) {
+        this.delete(options);
+        return;
+      }
+      this.selectToEndOfLine();
     }
+    this.deleteSelectedText(options);
   }
 
   // Public: Removes the selection or all characters from the start of the
@@ -705,8 +684,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToEndOfWord(options = {}) {
     if (!this.ensureWritable('deleteToEndOfWord', options)) return;
-    const position = this.cursor.getEndOfCurrentWordBufferPosition();
-    this._deleteToNextPoint(position, options);
+    if (this.isEmpty()) this.selectToEndOfWord();
+    this.deleteSelectedText(options);
   }
 
   // Public: Removes the selection or all characters from the start of the
@@ -716,10 +695,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToBeginningOfSubword(options = {}) {
     if (!this.ensureWritable('deleteToBeginningOfSubword', options)) return;
-    const position = this.cursor.getPreviousWordBoundaryBufferPosition({
-      wordRegex: this.cursor.subwordRegExp({ backwards: true })
-    });
-    this._deleteToPreviousPoint(position, options);
+    if (this.isEmpty()) this.selectToPreviousSubwordBoundary();
+    this.deleteSelectedText(options);
   }
 
   // Public: Removes the selection or all characters from the start of the
@@ -729,10 +706,8 @@ module.exports = class Selection {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToEndOfSubword(options = {}) {
     if (!this.ensureWritable('deleteToEndOfSubword', options)) return;
-    const position = this.cursor.getNextWordBoundaryBufferPosition(
-      { wordRegex: this.cursor.subwordRegExp() }
-    );
-    this._deleteToNextPoint(position, options);
+    if (this.isEmpty()) this.selectToNextSubwordBoundary();
+    this.deleteSelectedText(options);
   }
 
   // Public: Removes only the selected text.
@@ -746,28 +721,6 @@ module.exports = class Selection {
     if (this.cursor) this.cursor.setBufferPosition(bufferRange.start);
   }
 
-  _deleteToPreviousPoint(point, options) {
-    if (this.isEmpty()) {
-      const prevRange = new Range(this.getBufferRange().start, point);
-      this.editor.buffer.setTextInRange(
-        prevRange, '', pick(options, 'undo', 'normalizeLineEndings')
-      );
-    } else {
-      this.deleteSelectedText(options);
-    }
-  }
-
-  _deleteToNextPoint(point, options) {
-    if (this.isEmpty()) {
-      const nextRange = new Range(point, this.getBufferRange().end);
-      this.editor.buffer.setTextInRange(
-        nextRange, '', pick(options, 'undo', 'normalizeLineEndings')
-      );
-    } else {
-      this.deleteSelectedText(options);
-    }
-  }
-
   // Public: Removes the line at the beginning of the selection if the selection
   // is empty unless the selection spans multiple lines in which case all lines
   // are removed.
@@ -777,23 +730,21 @@ module.exports = class Selection {
   deleteLine(options = {}) {
     if (!this.ensureWritable('deleteLine', options)) return;
     const range = this.getBufferRange();
-    this.editor.transact(() => {
-      if (range.isEmpty()) {
-        const start = this.cursor.getScreenRow();
-        const range = this.editor.bufferRowsForScreenRows(start, start + 1);
-        if (range[1] > range[0]) {
-          this.editor.buffer.deleteRows(range[0], range[1] - 1);
-        } else {
-          this.editor.buffer.deleteRow(range[0]);
-        }
+    if (range.isEmpty()) {
+      const start = this.cursor.getScreenRow();
+      const range = this.editor.bufferRowsForScreenRows(start, start + 1);
+      if (range[1] > range[0]) {
+        this.editor.buffer.deleteRows(range[0], range[1] - 1);
       } else {
-        const start = range.start.row;
-        let end = range.end.row;
-        if (end !== this.editor.buffer.getLastRow() && range.end.column === 0)
-          end--;
-        this.editor.buffer.deleteRows(start, end);
+        this.editor.buffer.deleteRow(range[0]);
       }
-    })
+    } else {
+      const start = range.start.row;
+      let end = range.end.row;
+      if (end !== this.editor.buffer.getLastRow() && range.end.column === 0)
+        end--;
+      this.editor.buffer.deleteRows(start, end);
+    }
     this.cursor.setBufferPosition({
       row: this.cursor.getBufferRow(),
       column: range.start.column
@@ -810,10 +761,9 @@ module.exports = class Selection {
   joinLines(options = {}) {
     if (!this.ensureWritable('joinLines', options)) return;
     let joinMarker;
-    const buffer = this.editor.getBuffer();
     const selectedRange = this.getBufferRange();
     if (selectedRange.isEmpty()) {
-      if (selectedRange.start.row === buffer.getLastRow()) return;
+      if (selectedRange.start.row === this.editor.buffer.getLastRow()) return;
     } else {
       joinMarker = this.editor.markBufferRange(selectedRange, {
         invalidate: 'never'
@@ -821,51 +771,45 @@ module.exports = class Selection {
     }
 
     const rowCount = Math.max(1, selectedRange.getRowCount() - 1);
-    let cursorPositionAfterEdit = null;
-    buffer.transact(() => {
-      for (let i = 0; i < rowCount; i++) {
-        // Remove trailing whitespace from the current line
-        const scanRange = this.cursor.getCurrentLineBufferRange();
-        this.editor.scanInBufferRange(/[ \t]+$/, scanRange, ({ range }) => {
-          buffer.setTextInRange(range, '');
-        });
-        const currentRow = selectedRange.start.row;
-        const nextRow = currentRow + 1;
-        const haveNextLine = nextRow <= buffer.getLastRow();
+    for (let i = 0; i < rowCount; i++) {
+      this.cursor.setBufferPosition([selectedRange.start.row]);
+      this.cursor.moveToEndOfLine();
 
-        if(haveNextLine) {
-          // Remove leading whitespace from the line below
-          const nextLineRange = this.editor.bufferRangeForBufferRow(nextRow);
-          this.editor.scanInBufferRange(/^[ \t]+/, nextLineRange, ({ range }) => {
-            buffer.setTextInRange(range, '');
-          });
-
-          const nextLineIsntEmpty = buffer.lineLengthForRow(nextRow) > 0;
-          const insertSpace = nextLineIsntEmpty && buffer.lineLengthForRow(currentRow) > 0;
-
-          const endOfLine = new Point(currentRow, Infinity);
-          const startOfNextLine = new Point(nextRow, 0);
-          if(i === rowCount - 1) {
-            // We "trick" the editor into thinking we made a change to where
-            // the cursor was. Not ideal, but it fixes https://github.com/pulsar-edit/pulsar/issues/802
-            this.cursor.setBufferPosition(startOfNextLine);
-          }
-          const removeRange = new Range(endOfLine, startOfNextLine);
-          cursorPositionAfterEdit =
-            buffer.setTextInRange(removeRange, insertSpace ? ' ' : '').end;
-          if(nextLineIsntEmpty) {
-            cursorPositionAfterEdit = cursorPositionAfterEdit.traverse([0, -1]);
-          }
-        }
+      // Remove trailing whitespace from the current line
+      const scanRange = this.cursor.getCurrentLineBufferRange();
+      let trailingWhitespaceRange = null;
+      this.editor.scanInBufferRange(/[ \t]+$/, scanRange, ({ range }) => {
+        trailingWhitespaceRange = range;
+      });
+      if (trailingWhitespaceRange) {
+        this.setBufferRange(trailingWhitespaceRange);
+        this.deleteSelectedText(options);
       }
-    });
+
+      const currentRow = selectedRange.start.row;
+      const nextRow = currentRow + 1;
+      const insertSpace =
+        nextRow <= this.editor.buffer.getLastRow() &&
+        this.editor.buffer.lineLengthForRow(nextRow) > 0 &&
+        this.editor.buffer.lineLengthForRow(currentRow) > 0;
+      if (insertSpace) this.insertText(' ', options);
+
+      this.cursor.moveToEndOfLine();
+
+      // Remove leading whitespace from the line below
+      this.modifySelection(() => {
+        this.cursor.moveRight();
+        this.cursor.moveToFirstCharacterOfLine();
+      });
+      this.deleteSelectedText(options);
+
+      if (insertSpace) this.cursor.moveLeft();
+    }
 
     if (joinMarker) {
       const newSelectedRange = joinMarker.getBufferRange();
       this.setBufferRange(newSelectedRange);
       joinMarker.destroy();
-    } else if(cursorPositionAfterEdit) {
-      this.cursor.setBufferPosition(cursorPositionAfterEdit);
     }
   }
 
