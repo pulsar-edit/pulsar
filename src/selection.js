@@ -657,7 +657,7 @@ module.exports = class Selection {
         prevRange, '', pick(options, 'undo', 'normalizeLineEndings')
       );
     } else {
-      const startOfLinePoint = new Point(this.cursor.getScreenRow(), 0);
+      const startOfLinePoint = new Point(this.cursor.getBufferRow(), 0);
       const prevRange = new Range(startPoint, startOfLinePoint);
       this.editor.buffer.setTextInRange(
         prevRange, '', pick(options, 'undo', 'normalizeLineEndings')
@@ -692,7 +692,7 @@ module.exports = class Selection {
       this.delete(options);
     } else {
       this._deleteToNextPoint(
-        new Point(this.cursor.getScreenRow(), Infinity),
+        new Point(this.cursor.getBufferRow(), Infinity),
         options
       );
     }
