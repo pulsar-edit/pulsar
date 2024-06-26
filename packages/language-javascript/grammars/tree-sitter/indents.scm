@@ -18,14 +18,14 @@
 
 ; By default, `case` and `default` need to be indented one level more than their containing
 ; `switch`.
-(["case" "default"] @match
+([(switch_case "case") (switch_default "default")] @match
   (#set! indent.matchIndentOf parent.parent.startPosition)
   (#set! indent.offsetIndent 1)
   (#is-not? test.config "language-javascript.indentation.alignCaseWithSwitch"))
 
 ; When this config setting is enabled, `case` and `default` need to be indented
 ; to match their containing `switch`.
-(["case" "default"] @match
+([(switch_case "case") (switch_default "default")] @match
   (#set! indent.matchIndentOf parent.parent.startPosition)
   (#set! indent.offsetIndent 0)
   (#is? test.config "language-javascript.indentation.alignCaseWithSwitch"))
@@ -162,7 +162,7 @@
   (#is? test.config "language-javascript.indentation.indentParentheses"))
 
 
-["case" "default"] @indent
+[(switch_case "case") (switch_default "default")] @indent
 
 ; JSX
 ; ===
