@@ -301,25 +301,6 @@ module.exports = class Cursor extends Model {
     if (moveToEndOfSelection && !range.isEmpty()) {
       this.setScreenPosition(range.start);
     } else {
-      const point = this.getPreviousColumnScreenPosition(
-        columnCount, { moveToEndOfSelection }
-      )
-      this.setScreenPosition(point, { clipDirection: 'backward' });
-    }
-  }
-
-  // Public: Retrieves the screen position of where the previous column starts.
-  // * `columnCount` (optional) {Number} number of columns to move (default: 1)
-  // * `options` (optional) {Object} with the following keys:
-  //   * `moveToEndOfSelection` if true, move to the right of the selection if a
-  //     selection exists.
-  //
-  // Returns a {Point}.
-  getPreviousColumnScreenPosition(columnCount = 1, { moveToEndOfSelection } = {}) {
-    const range = this.marker.getScreenRange();
-    if (moveToEndOfSelection && !range.isEmpty()) {
-      return range.start;
-    } else {
       let { row, column } = this.getScreenPosition();
 
       while (columnCount > column && row > 0) {
@@ -329,7 +310,7 @@ module.exports = class Cursor extends Model {
       }
 
       column = column - columnCount;
-      return new Point( row, column )
+      this.setScreenPosition({ row, column }, { clipDirection: 'backward' });
     }
   }
 
@@ -343,25 +324,6 @@ module.exports = class Cursor extends Model {
     const range = this.marker.getScreenRange();
     if (moveToEndOfSelection && !range.isEmpty()) {
       this.setScreenPosition(range.end);
-    } else {
-      const point = this.getNextColumnScreenPosition(
-        columnCount, { moveToEndOfSelection }
-      )
-      this.setScreenPosition(point, { clipDirection: 'forward' });
-    }
-  }
-
-  // Public: Retrieves the screen position of where the next column starts.
-  // * `columnCount` (optional) {Number} number of columns to move (default: 1)
-  // * `options` (optional) {Object} with the following keys:
-  //   * `moveToEndOfSelection` if true, move to the right of the selection if a
-  //     selection exists.
-  //
-  // Returns a {Point}.
-  getNextColumnScreenPosition(columnCount = 1, { moveToEndOfSelection } = {}) {
-    const range = this.marker.getScreenRange();
-    if (moveToEndOfSelection && !range.isEmpty()) {
-      return range.end;
     } else {
       let { row, column } = this.getScreenPosition();
       const maxLines = this.editor.getScreenLineCount();
@@ -378,7 +340,7 @@ module.exports = class Cursor extends Model {
       }
 
       column = column + columnCount;
-      return new Point(row, column);
+      this.setScreenPosition({ row, column }, { clipDirection: 'forward' });
     }
   }
 
@@ -606,7 +568,7 @@ module.exports = class Cursor extends Model {
   //   * `allowPrevious` A {Boolean} indicating whether the beginning of the
   //     previous word can be returned.
   //
-  // Returns a {Point}.
+  // Returns a {Range}.
   getBeginningOfCurrentWordBufferPosition(options = {}) {
     const allowPrevious = options.allowPrevious !== false;
     const position = this.getBufferPosition();
@@ -667,7 +629,7 @@ module.exports = class Cursor extends Model {
   //   * `wordRegex` A {RegExp} indicating what constitutes a "word"
   //     (default: {::wordRegExp}).
   //
-  // Returns a {Point}
+  // Returns a {Range}
   getBeginningOfNextWordBufferPosition(options = {}) {
     const currentBufferPosition = this.getBufferPosition();
     const start = this.isInsideWord(options)
@@ -712,8 +674,6 @@ module.exports = class Cursor extends Model {
   // * `options` (optional) {Object}
   //   * `includeNewline` A {Boolean} which controls whether the Range should
   //     include the newline.
-  //
-  // Returns a {Range}.
   getCurrentLineBufferRange(options) {
     return this.editor.bufferRangeForBufferRow(this.getBufferRow(), options);
   }

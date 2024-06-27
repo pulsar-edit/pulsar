@@ -353,104 +353,27 @@ describe('TextEditor', () => {
         expect(editor.getCursorBufferPosition()).toEqual([1, 1]);
       });
 
-      describe('listening to cursor movements', () => {
-        it('emits an event with the old position, new position, and the cursor that moved', () => {
-          const cursorCallback = jasmine.createSpy('cursor-changed-position');
-          const editorCallback = jasmine.createSpy(
-            'editor-changed-cursor-position'
-          );
+      it('emits an event with the old position, new position, and the cursor that moved', () => {
+        const cursorCallback = jasmine.createSpy('cursor-changed-position');
+        const editorCallback = jasmine.createSpy(
+          'editor-changed-cursor-position'
+        );
 
-          editor.getLastCursor().onDidChangePosition(cursorCallback);
-          editor.onDidChangeCursorPosition(editorCallback);
+        editor.getLastCursor().onDidChangePosition(cursorCallback);
+        editor.onDidChangeCursorPosition(editorCallback);
 
-          editor.setCursorBufferPosition([2, 4]);
+        editor.setCursorBufferPosition([2, 4]);
 
-          expect(editorCallback).toHaveBeenCalled();
-          expect(cursorCallback).toHaveBeenCalled();
-          const eventObject = editorCallback.mostRecentCall.args[0];
-          expect(cursorCallback.mostRecentCall.args[0]).toEqual(eventObject);
+        expect(editorCallback).toHaveBeenCalled();
+        expect(cursorCallback).toHaveBeenCalled();
+        const eventObject = editorCallback.mostRecentCall.args[0];
+        expect(cursorCallback.mostRecentCall.args[0]).toEqual(eventObject);
 
-          expect(eventObject.oldBufferPosition).toEqual([0, 0]);
-          expect(eventObject.oldScreenPosition).toEqual([0, 0]);
-          expect(eventObject.newBufferPosition).toEqual([2, 4]);
-          expect(eventObject.newScreenPosition).toEqual([2, 4]);
-          expect(eventObject.cursor).toBe(editor.getLastCursor());
-        });
-
-        it('emits the event with textChanged: true if text was edited', () => {
-          let callbacks = []
-          let callback = evt => { callbacks.push(evt.textChanged) }
-          editor.getLastCursor().onDidChangePosition(callback);
-          editor.onDidChangeCursorPosition(callback);
-
-          editor.insertText('bar')
-          expect(callbacks).toEqual([true, true])
-
-          const cmds = [
-            'backspace',
-            'deleteToBeginningOfWord',
-            'deleteToBeginningOfSubword',
-            'deleteToPreviousWordBoundary',
-            'deleteToBeginningOfLine'
-          ]
-          cmds.forEach(command => {
-            editor.setText("HelloWorld!")
-            editor.setCursorBufferPosition([0, 5])
-            callbacks = []
-            editor[command].bind(editor)();
-            expect(callbacks).toEqual([true, true], `on command ${command}`)
-          })
-        });
-
-        it('emits the event with textChanged: true if whole lines were changed', () => {
-          let callbacks = [];
-          let callback = evt => { callbacks.push(evt.textChanged) };
-          editor.getLastCursor().onDidChangePosition(callback);
-          editor.onDidChangeCursorPosition(callback);
-
-          editor.setText("HelloWorld!\nGoodbye, world");
-          editor.setCursorBufferPosition([0, 5]);
-          // TODO: Ideally, we want this event to not be called. Unfortunately,
-          // the world doesn't work like that - there's no way to delete a line
-          // without changing the current cursor position on TextBuffer.
-          callbacks = [];
-          editor.deleteLine();
-          // One for the change, and another to reposition the cursor
-          expect(callbacks).toEqual([true, true, false, false], "on command deleteLine")
-
-          editor.setText("HelloWorld!\nGoodbye, world");
-          editor.setCursorBufferPosition([0, 5]);
-          callbacks = [];
-          editor.joinLines();
-          // TODO: Again, not ideal. But still...
-          // One for moving to the line that will be deleted, one for the actual change
-          // and one to move to the "join position" between the lines
-          expect(callbacks).toEqual([false, false, true, true, false, false], "on command joinLines")
-        });
-
-        it("doesn't emit the event if you deleted something forward", () => {
-          let callbacks = []
-          let callback = evt => {
-            callbacks.push(evt.textChanged)
-          }
-          editor.getLastCursor().onDidChangePosition(callback);
-          editor.onDidChangeCursorPosition(callback);
-
-          const cmds = [
-            'delete',
-            'deleteToEndOfSubword',
-            'deleteToEndOfWord',
-            'deleteToEndOfLine',
-            'deleteToNextWordBoundary'
-          ]
-          cmds.forEach(command => {
-            editor.setText("HelloWorld!")
-            editor.setCursorBufferPosition([0, 5])
-            callbacks = []
-            editor[command].bind(editor)();
-            expect(callbacks).toEqual([], `on command ${command}`)
-          })
-        });
+        expect(eventObject.oldBufferPosition).toEqual([0, 0]);
+        expect(eventObject.oldScreenPosition).toEqual([0, 0]);
+        expect(eventObject.newBufferPosition).toEqual([2, 4]);
+        expect(eventObject.newScreenPosition).toEqual([2, 4]);
+        expect(eventObject.cursor).toBe(editor.getLastCursor());
       });
     });
 
