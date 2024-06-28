@@ -152,8 +152,9 @@ silicon_mac_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
   install_script:
     - export PATH="/opt/homebrew/bin:$PATH"
-    - export LDFLAGS="-L/usr/local/opt/libiconv/lib"
-    - export CPPFLAGS="-I/usr/local/opt/libiconv/include"
+
+    - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
+    - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
     - export CXXFLAGS="-stdlib=libc++"
     - yarn install --ignore-engines || LDFLAGS="-L/usr/local/opt/libiconv/lib" CPPFLAGS="-I/usr/local/opt/libiconv/include" yarn install --ignore-engines
   build_script:
