@@ -283,7 +283,6 @@ silicon_mac_task:
 
 silently_mark_skipped_or_no_scheduled_tasks_builds_as_failed_task:
   skip_notifications: true
-  only_if: $CIRRUS_CRON == "" && $CIRRUS_TAG == ""
   ### !!! ^ Don't forget to update this appropriately if our `only_if:` or `skip:` logic changes for the other tasks! !!! ###
   ### !!! ^ We want this task to run [only] if all other tasks would have skipped. !!! ###
   container:
