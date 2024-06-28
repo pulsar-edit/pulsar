@@ -141,8 +141,8 @@ silicon_mac_task:
     - git submodule update
     - ln -s /opt/homebrew/bin/python$PYTHON_VERSION /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:$PATH"
-    - export LDFLAGS="-L/usr/local/opt/libiconv/lib"
-    - export CPPFLAGS="-I/usr/local/opt/libiconv/include"
+    - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
+    - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
     - mkdir tj_n && cd tj_n
     - curl -L https://github.com/tj/n/archive/0ce85771fdff8f4b3e09ade700461b4f58a64444.tar.gz -O
     - tar xf 0ce85771fdff8f4b3e09ade700461b4f58a64444.tar.gz
@@ -152,11 +152,9 @@ silicon_mac_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
   install_script:
     - export PATH="/opt/homebrew/bin:$PATH"
-
     - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
     - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
-    - export CXXFLAGS="-stdlib=libc++"
-    - yarn install --ignore-engines || LDFLAGS="-L/usr/local/opt/libiconv/lib" CPPFLAGS="-I/usr/local/opt/libiconv/include" yarn install --ignore-engines
+    - yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
     - export PATH="/opt/homebrew/bin:$PATH"
     - yarn build
