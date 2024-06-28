@@ -142,8 +142,6 @@ silicon_mac_task:
     - git submodule update
     - ln -s /opt/homebrew/bin/python$PYTHON_VERSION /opt/homebrew/bin/python
     - export PATH="/opt/homebrew/bin:$PATH"
-    - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
-    - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
     - mkdir tj_n && cd tj_n
     - curl -L https://github.com/tj/n/archive/0ce85771fdff8f4b3e09ade700461b4f58a64444.tar.gz -O
     - tar xf 0ce85771fdff8f4b3e09ade700461b4f58a64444.tar.gz
