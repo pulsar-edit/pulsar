@@ -157,6 +157,8 @@ silicon_mac_task:
     - yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
     - export PATH="/opt/homebrew/bin:$PATH"
+    - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
+    - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
     - yarn build
     - yarn run build:apm
   build_binary_script:
