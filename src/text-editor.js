@@ -2352,29 +2352,73 @@ module.exports = class TextEditor {
     );
   }
 
-  // Extended: For each selection, if the selection is empty, delete all characters
-  // of the containing line that precede the cursor. Otherwise delete the
-  // selected text.
+  // Extended: For each selection, if the selection is empty, delete all
+  // characters of the containing buffer line that precede the cursor.
+  // Otherwise delete the selected text.
+  //
+  // Deprecated; prefer {::deleteToBeginningOfBufferLine}.
+  deleteToBeginningOfLine() {
+    return this.deleteToBeginningOfBufferLine();
+  }
+
+  // Extended: For each selection, if the selection is empty, delete all
+  // characters of the containing buffer line that precede the cursor.
+  // Otherwise delete the selected text.
   //
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
-  deleteToBeginningOfLine(options = {}) {
-    if (!this.ensureWritable('deleteToBeginningOfLine', options)) return;
+  deleteToBeginningOfBufferLine(options = {}) {
+    if (!this.ensureWritable('deleteToBeginningOfBufferLine', options)) return;
     this.mutateSelectedText(selection =>
-      selection.deleteToBeginningOfLine(options)
+      selection.deleteToBeginningOfBufferLine(options)
+    );
+  }
+
+  // Extended: For each selection, if the selection is empty, delete all
+  // characters of the containing screen line that precede the cursor.
+  // Otherwise delete the selected text.
+  //
+  // * `options` (optional) {Object}
+  //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
+  deleteToBeginningOfScreenLine(options = {}) {
+    if (!this.ensureWritable('deleteToBeginningOfScreenLine', options)) return;
+    this.mutateSelectedText(selection =>
+      selection.deleteToBeginningOfScreenLine(options)
     );
   }
 
   // Extended: For each selection, if the selection is not empty, deletes the
-  // selection; otherwise, deletes all characters of the containing line
+  // selection; otherwise, deletes all characters of the containing screen line
+  // following the cursor. If the cursor is already at the end of the screen
+  // line, takes no action.
+  //
+  // Deprecated; prefer {::deleteToEndOfScreenLine}.
+  deleteToEndOfLine(options = {}) {
+    return this.deleteToEndOfScreenLine(options);
+  }
+
+  // Extended: For each selection, if the selection is not empty, deletes the
+  // selection; otherwise, deletes all characters of the containing screen line
+  // following the cursor. If the cursor is already at the end of the screen
+  // line, takes no action.
+  //
+  // * `options` (optional) {Object}
+  //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
+  deleteToEndOfScreenLine(options = {}) {
+    if (!this.ensureWritable('deleteToEndOfScreenLine', options)) return;
+    this.mutateSelectedText(selection => selection.deleteToEndOfScreenLine(options));
+  }
+
+  // Extended: For each selection, if the selection is not empty, deletes the
+  // selection; otherwise, deletes all characters of the containing buffer line
   // following the cursor. If the cursor is already at the end of the line,
   // deletes the following newline.
   //
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
-  deleteToEndOfLine(options = {}) {
-    if (!this.ensureWritable('deleteToEndOfLine', options)) return;
-    this.mutateSelectedText(selection => selection.deleteToEndOfLine(options));
+  deleteToEndOfBufferLine(options = {}) {
+    if (!this.ensureWritable('deleteToEndOfBufferLine', options)) return;
+    this.mutateSelectedText(selection => selection.deleteToEndOfBufferLine(options));
   }
 
   // Extended: For each selection, if the selection is empty, delete all characters
@@ -3726,13 +3770,31 @@ module.exports = class TextEditor {
     return this.expandSelectionsForward(selection => selection.selectAll());
   }
 
-  // Essential: Move the cursor of each selection to the beginning of its line
-  // while preserving the selection's tail position.
+  // Essential: Move the cursor of each selection to the beginning of its
+  // buffer line while preserving the selection's tail position.
+  //
+  // Deprecated; prefer {::selectToBeginningOfBufferLine}.
+  selectToBeginningOfLine() {
+    return this.selectToBeginningOfBufferLine();
+  }
+
+  // Essential: Move the cursor of each selection to the beginning of its
+  // screen line while preserving the selection's tail position.
   //
   // This method may merge selections that end up intersecting.
-  selectToBeginningOfLine() {
+  selectToBeginningOfScreenLine() {
     return this.expandSelectionsBackward(selection =>
-      selection.selectToBeginningOfLine()
+      selection.selectToBeginningOfScreenLine()
+    );
+  }
+
+  // Essential: Move the cursor of each selection to the beginning of its
+  // buffer line while preserving the selection's tail position.
+  //
+  // This method may merge selections that end up intersecting.
+  selectToBeginningOfBufferLine() {
+    return this.expandSelectionsBackward(selection =>
+      selection.selectToBeginningOfBufferLine()
     );
   }
 
@@ -3748,13 +3810,31 @@ module.exports = class TextEditor {
     );
   }
 
-  // Essential: Move the cursor of each selection to the end of its line while
-  // preserving the selection's tail position.
+  // Essential: Move the cursor of each selection to the end of its screen line
+  // while preserving the selection's tail position.
+  //
+  // Deprecated; prefer {::selectToEndOfScreenLine}.
+  selectToEndOfLine() {
+    return this.selectToEndOfScreenLine();
+  }
+
+  // Essential: Move the cursor of each selection to the end of its screen line
+  // while preserving the selection's tail position.
   //
   // This method may merge selections that end up intersecting.
-  selectToEndOfLine() {
+  selectToEndOfScreenLine() {
     return this.expandSelectionsForward(selection =>
-      selection.selectToEndOfLine()
+      selection.selectToEndOfScreenLine()
+    );
+  }
+
+  // Essential: Move the cursor of each selection to the end of its buffer line
+  // while preserving the selection's tail position.
+  //
+  // This method may merge selections that end up intersecting.
+  selectToEndOfBufferLine() {
+    return this.expandSelectionsForward(selection =>
+      selection.selectToEndOfBufferLine()
     );
   }
 
@@ -4788,13 +4868,22 @@ module.exports = class TextEditor {
   // of the containing screen line following the cursor. Otherwise cut the selected
   // text.
   //
+  // Deprecated; prefer {::cutToEndOfScreenLine}.
+  cutToEndOfLine(options = {}) {
+    return this.cutToEndOfScreenLine(options);
+  }
+
+  // Essential: For each selection, if the selection is empty, cut all characters
+  // of the containing screen line following the cursor. Otherwise cut the selected
+  // text.
+  //
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor.
-  cutToEndOfLine(options = {}) {
+  cutToEndOfScreenLine(options = {}) {
     if (!this.ensureWritable('cutToEndOfLine', options)) return;
     let maintainClipboard = false;
     this.mutateSelectedText(selection => {
-      selection.cutToEndOfLine(maintainClipboard, options);
+      selection.cutToEndOfScreenLine(maintainClipboard, options);
       maintainClipboard = true;
     });
   }
