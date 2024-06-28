@@ -154,7 +154,7 @@ silicon_mac_task:
     - export PATH="/opt/homebrew/bin:$PATH"
     - export LDFLAGS="-L/usr/local/opt/libiconv/lib"
     - export CPPFLAGS="-I/usr/local/opt/libiconv/include"
-    - yarn install --ignore-engines || yarn install --ignore-engines
+    - LDFLAGS="-L/usr/local/opt/libiconv/lib" CPPFLAGS="-I/usr/local/opt/libiconv/include" yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
     - export PATH="/opt/homebrew/bin:$PATH"
     - yarn build
