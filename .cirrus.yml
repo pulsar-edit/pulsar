@@ -137,6 +137,7 @@ silicon_mac_task:
     - brew update
     - brew uninstall node@20
     - brew install git python@$PYTHON_VERSION python-setuptools
+    - brew install libiconv
     - git submodule init
     - git submodule update
     - ln -s /opt/homebrew/bin/python$PYTHON_VERSION /opt/homebrew/bin/python
@@ -150,9 +151,13 @@ silicon_mac_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
   install_script:
     - export PATH="/opt/homebrew/bin:$PATH"
+    - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
+    - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
     - yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
     - export PATH="/opt/homebrew/bin:$PATH"
+    - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
+    - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
     - yarn build
     - yarn run build:apm
   build_binary_script:
