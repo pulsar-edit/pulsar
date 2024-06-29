@@ -2358,9 +2358,6 @@ module.exports = class TextEditor {
   //
   // Deprecated; prefer {::deleteToBeginningOfBufferLine}.
   deleteToBeginningOfLine(options = {}) {
-    Grim.deprecate(
-      'This method is deprecated. Call `deleteToBeginningOfBufferLine` instead.'
-    );
     if (!this.ensureWritable('deleteToBeginningOfLine', options)) return;
     return this.deleteToBeginningOfBufferLine(options);
   }
@@ -2398,9 +2395,6 @@ module.exports = class TextEditor {
   //
   // Deprecated; prefer {::deleteToEndOfScreenLine}.
   deleteToEndOfLine(options = {}) {
-    Grim.deprecate(
-      'This method is deprecated. Call TextEditor::deleteToEndOfScreenLine instead.'
-    );
     if (!this.ensureWritable('deleteToEndOfLine', options)) return;
     return this.deleteToEndOfScreenLine(options);
   }
@@ -3783,9 +3777,6 @@ module.exports = class TextEditor {
   //
   // Deprecated; prefer {::selectToBeginningOfBufferLine}.
   selectToBeginningOfLine() {
-    Grim.deprecate(
-      'This method is deprecated. Call TextEditor::selectToBeginningOfBufferLine instead.'
-    );
     return this.selectToBeginningOfBufferLine();
   }
 
@@ -3826,9 +3817,6 @@ module.exports = class TextEditor {
   //
   // Deprecated; prefer {::selectToEndOfScreenLine}.
   selectToEndOfLine() {
-    Grim.deprecate(
-      'This method is deprecated. Call TextEditor::selectToEndOfScreenLine instead.'
-    );
     return this.selectToEndOfScreenLine();
   }
 
@@ -4884,9 +4872,6 @@ module.exports = class TextEditor {
   //
   // Deprecated; prefer {::cutToEndOfScreenLine}.
   cutToEndOfLine(options = {}) {
-    Grim.deprecate(
-      'This method is deprecated. Call TextEditor::cutToEndOfScreenLine instead.'
-    );
     if (!this.ensureWritable('cutToEndOfLine', options)) return;
     return this.cutToEndOfScreenLine(options);
   }
