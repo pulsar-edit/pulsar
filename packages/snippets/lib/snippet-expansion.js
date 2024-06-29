@@ -215,10 +215,12 @@ module.exports = class SnippetExpansion {
     // markers are crucial for ensuring we adapt to those changes.
     for (const variable of this.snippet.variables) {
       const {point} = variable
-      const marker = this.getMarkerLayer(this.editor).markBufferRange([
-        startPosition.traverse(point),
-        startPosition.traverse(point)
-      ], {exclusive: false})
+      let markerRange = new Range(
+        startPosition.translate(point),
+        startPosition.translate(point)
+      )
+      const marker = this.getMarkerLayer(this.editor).markBufferRange(
+        markerRange, {exclusive: false})
       this.markersForVariables.set(variable, marker)
     }
   }
