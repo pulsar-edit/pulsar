@@ -659,6 +659,7 @@ module.exports = class Selection {
   //
   // Deprecated; prefer {::deleteToBeginningOfBufferLine}.
   deleteToBeginningOfLine(options = {}) {
+    if (!this.ensureWritable('deleteToBeginningOfLine', options)) return;
     return this.deleteToBeginningOfBufferLine(options);
   }
 
@@ -709,8 +710,8 @@ module.exports = class Selection {
 
   // Public: If the selection is empty, removes all text from the cursor to the
   // end of the screen line. If the cursor is already at the end of the screen
-  // line, it takes no action. If the selection isn't empty, only deletes the
-  // contents of the selection.
+  // line, deletes the following newline. If the selection isn't empty, only
+  // deletes the contents of the selection.
   //
   // Deprecated; prefer {::deleteToEndOfScreenLine}.
   deleteToEndOfLine(options = {}) {
@@ -719,14 +720,18 @@ module.exports = class Selection {
 
   // Public: If the selection is empty, removes all text from the cursor to the
   // end of the screen line. If the cursor is already at the end of the screen
-  // line, it takes no action. If the selection isn't empty, only deletes the
-  // contents of the selection.
+  // line, deletes the following newline. If the selection isn't empty, only
+  // deletes the contents of the selection.
   //
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
   deleteToEndOfScreenLine(options = {}) {
     if (!this.ensureWritable('deleteToEndOfScreenLine', options)) return;
     if (this.isEmpty()) {
+      if (this.cursor.isAtEndOfLine()) {
+        this.delete(options);
+        return;
+      }
       this.selectToEndOfScreenLine();
     }
     this.deleteSelectedText(options);
@@ -734,7 +739,7 @@ module.exports = class Selection {
 
   // Public: If the selection is empty, removes all text from the cursor to the
   // end of the buffer line. If the cursor is already at the end of the buffer
-  // line, it deletes the following newline. If the selection isn't empty, only
+  // line, deletes the following newline. If the selection isn't empty, only
   // deletes the contents of the selection.
   //
   // * `options` (optional) {Object}

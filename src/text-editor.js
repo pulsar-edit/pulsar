@@ -2357,8 +2357,12 @@ module.exports = class TextEditor {
   // Otherwise delete the selected text.
   //
   // Deprecated; prefer {::deleteToBeginningOfBufferLine}.
-  deleteToBeginningOfLine() {
-    return this.deleteToBeginningOfBufferLine();
+  deleteToBeginningOfLine(options = {}) {
+    Grim.deprecate(
+      'This method is deprecated. Call `deleteToBeginningOfBufferLine` instead.'
+    );
+    if (!this.ensureWritable('deleteToBeginningOfLine', options)) return;
+    return this.deleteToBeginningOfBufferLine(options);
   }
 
   // Extended: For each selection, if the selection is empty, delete all
@@ -2390,17 +2394,21 @@ module.exports = class TextEditor {
   // Extended: For each selection, if the selection is not empty, deletes the
   // selection; otherwise, deletes all characters of the containing screen line
   // following the cursor. If the cursor is already at the end of the screen
-  // line, takes no action.
+  // line, deletes the following newline.
   //
   // Deprecated; prefer {::deleteToEndOfScreenLine}.
   deleteToEndOfLine(options = {}) {
+    Grim.deprecate(
+      'This method is deprecated. Call TextEditor::deleteToEndOfScreenLine instead.'
+    );
+    if (!this.ensureWritable('deleteToEndOfLine', options)) return;
     return this.deleteToEndOfScreenLine(options);
   }
 
   // Extended: For each selection, if the selection is not empty, deletes the
   // selection; otherwise, deletes all characters of the containing screen line
   // following the cursor. If the cursor is already at the end of the screen
-  // line, takes no action.
+  // line, deletes the following newline.
   //
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor. (default: false)
@@ -3775,6 +3783,9 @@ module.exports = class TextEditor {
   //
   // Deprecated; prefer {::selectToBeginningOfBufferLine}.
   selectToBeginningOfLine() {
+    Grim.deprecate(
+      'This method is deprecated. Call TextEditor::selectToBeginningOfBufferLine instead.'
+    );
     return this.selectToBeginningOfBufferLine();
   }
 
@@ -3815,6 +3826,9 @@ module.exports = class TextEditor {
   //
   // Deprecated; prefer {::selectToEndOfScreenLine}.
   selectToEndOfLine() {
+    Grim.deprecate(
+      'This method is deprecated. Call TextEditor::selectToEndOfScreenLine instead.'
+    );
     return this.selectToEndOfScreenLine();
   }
 
@@ -4870,6 +4884,10 @@ module.exports = class TextEditor {
   //
   // Deprecated; prefer {::cutToEndOfScreenLine}.
   cutToEndOfLine(options = {}) {
+    Grim.deprecate(
+      'This method is deprecated. Call TextEditor::cutToEndOfScreenLine instead.'
+    );
+    if (!this.ensureWritable('cutToEndOfLine', options)) return;
     return this.cutToEndOfScreenLine(options);
   }
 
@@ -4880,7 +4898,7 @@ module.exports = class TextEditor {
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor.
   cutToEndOfScreenLine(options = {}) {
-    if (!this.ensureWritable('cutToEndOfLine', options)) return;
+    if (!this.ensureWritable('cutToEndOfScreenLine', options)) return;
     let maintainClipboard = false;
     this.mutateSelectedText(selection => {
       selection.cutToEndOfScreenLine(maintainClipboard, options);
