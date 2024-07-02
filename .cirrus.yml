@@ -121,7 +121,7 @@ arm_linux_task:
 
 silicon_mac_task:
   alias: mac
-  only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
+  # only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
   skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
   macos_instance:
     image: ghcr.io/cirruslabs/macos-ventura-xcode:latest
@@ -151,13 +151,13 @@ silicon_mac_task:
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
   install_script:
     - export PATH="/opt/homebrew/bin:$PATH"
-    - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
-    - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
+    # - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
+    # - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
     - yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
     - export PATH="/opt/homebrew/bin:$PATH"
-    - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
-    - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
+    # - export LDFLAGS="-L$(brew --prefix)/opt/libiconv/lib"
+    # - export CPPFLAGS="-I$(brew --prefix)/opt/libiconv/include"
     - yarn build
     - yarn run build:apm
   build_binary_script:
