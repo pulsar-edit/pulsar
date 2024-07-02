@@ -16,6 +16,23 @@ function comparePoints(a, b) {
 
 // Given a series of opening and closing PHP tags, pairs and groups them as a
 // series of node specs suitable for defining the bounds of an injection.
+//
+// NOTE: It is unusual, but still possible, for there to be more `<?php`s than
+// `?>`s, or vice versa.
+//
+// Given invalid input with unbalanced opening and closing PHP tags,
+// `tree-sitter-php` falls back to Tree-sitter's error recovery strategies;
+// among those strategies are (a) “skip over an invalid node and keep parsing
+// as though we’d never seen it” and (b) “figure out if there's a node that
+// would make this tree valid, then pretend it actually exists.”
+//
+// Strategy A would be ideal for us because it would solve the unbalanced-tags
+// problem before we even see it! But strategy B is just as likely and would
+// not result in balanced tags in this function, since `MISSING` nodes won't be
+// reflected in this list of nodes.
+//
+// Anyway, since it's possible for this list to be unbalanced, we need to do
+// our best to recover if we encounter two of the same node in a row.
 function interpret(nodes) {
   let sorted = [...nodes].sort((a, b) => {
     return comparePoints(a.startPosition, b.startPosition);
@@ -32,7 +49,14 @@ function interpret(nodes) {
 
     if (isStart) {
       if (currentStart) {
-        throw new Error('Unbalanced content!');
+        // This is invalid; we've found two straight `<?php` tokens without any
+        // `?>` between them.
+        //
+        // There's no “correct” behavior here, since this is bad syntax; but we
+        // can easily proceed by ignoring this tag and treating the next
+        // occurrence of `?>` as closing the original `<?php` rather than the
+        // one we just encountered.
+        continue;
       }
       currentStart = node;
 
@@ -59,7 +83,13 @@ function interpret(nodes) {
 
     if (isEnd) {
       if (!currentStart) {
-        throw new Error('Unbalanced content!');
+        // This is invalid; we've found two straight `?>` tokens without any
+        // `<?php` between them.
+        //
+        // There's no “correct” behavior here, since this is bad syntax; but we
+        // can easily proceed by ignoring this tag. If this closing tag truly
+        // has a matching `<?php`, we've already paired it with another `?>`,
+        // so this one is as useless as the heel at the end of a bread loaf.
       }
       let spec = {
         startIndex: currentStart.startIndex,

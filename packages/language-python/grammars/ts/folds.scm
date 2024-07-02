@@ -23,16 +23,22 @@
     (set_comprehension)
     (dictionary_comprehension)
 
-    (tuple)
-    (list)
-    (set)
-    (dictionary)
-
     (string)
   ] @fold
   ; No delimiter to preserve, so we want to fold all the way to this node's
   ; ending position.
   (#set! fold.endAt endPosition))
+
+(
+  ; All these data structures have opening and closing delimiters, so we can
+  ; use the default behavior.
+  [
+    (tuple)
+    (list)
+    (set)
+    (dictionary)
+  ] @fold
+)
 
 ((if_statement) @fold
   ; End at the end of the first (or only) consequence block.
