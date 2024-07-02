@@ -100,6 +100,13 @@ jobs:
       # for this issue. At that point this additional step can be removed.
       run: npx node-gyp install ${{ env.NODE_VERSION }}
 
+    - name: Install GNU libiconv (macOS)
+      if: ${{ runner.os == 'macOS' }}
+      # Now that macOS ships with FreeBSD's version of libiconv, we need to
+      # download the GNU version from Homebrew. `superstring` will detect its
+      # presence and use it when compiling.
+      run: brew install libiconv
+
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
