@@ -26,8 +26,8 @@
   "electronVersion": "12.2.3",
   "resolutions": {
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244",
-    "superstring": "https://github.com/savetheclocktower/superstring.git#1171e881619a2b4a5a4b20f47a9b66285b54bf24",
-    "text-buffer/superstring": "https://github.com/savetheclocktower/superstring.git#1171e881619a2b4a5a4b20f47a9b66285b54bf24"
+    "superstring": "https://github.com/savetheclocktower/superstring.git#77b9a673c969e935aeac977d9debb7566011921c",
+    "text-buffer/superstring": "https://github.com/savetheclocktower/superstring.git#77b9a673c969e935aeac977d9debb7566011921c"
   },
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
@@ -167,7 +167,7 @@
     "spell-check": "file:packages/spell-check",
     "status-bar": "file:packages/status-bar",
     "styleguide": "file:./packages/styleguide",
-    "superstring": "https://github.com/savetheclocktower/superstring.git#1171e881619a2b4a5a4b20f47a9b66285b54bf24",
+    "superstring": "https://github.com/savetheclocktower/superstring.git#77b9a673c969e935aeac977d9debb7566011921c",
     "symbol-provider-ctags": "file:./packages/symbol-provider-ctags",
     "symbol-provider-tree-sitter": "file:./packages/symbol-provider-tree-sitter",
     "symbols-view": "file:./packages/symbols-view",
