@@ -9027,10 +9027,9 @@ superagent@^8.0.9:
     qs "^6.11.0"
     semver "^7.3.8"
 
-superstring@^2.4.4, "superstring@https://github.com/savetheclocktower/superstring.git#77b9a673c969e935aeac977d9debb7566011921c":
+superstring@^2.4.4, "superstring@https://github.com/savetheclocktower/superstring.git#16e353d2cfc1b4eedd42059623040bd198811b4a":
   version "2.4.4"
-  uid "77b9a673c969e935aeac977d9debb7566011921c"
-  resolved "https://github.com/savetheclocktower/superstring.git#77b9a673c969e935aeac977d9debb7566011921c"
+  resolved "https://github.com/savetheclocktower/superstring.git#16e353d2cfc1b4eedd42059623040bd198811b4a"
   dependencies:
     nan "^2.14.2"
 
