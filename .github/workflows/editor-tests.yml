@@ -28,6 +28,10 @@ jobs:
       with:
         node-version: 16
 
+    - name: Install libiconv
+      if: runner.os != 'Linux'
+      run: brew install libiconv
+
     - name: Install Python setuptools
       # This is needed for Python 3.12+, since many versions of node-gyp
       # are incompatible with Python 3.12+, which no-longer ships 'distutils'
