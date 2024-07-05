@@ -137,7 +137,7 @@ jobs:
 
     # macOS Signing Stuff
     - name: Build Pulsar Binaries (macOS) (Signed)
-      if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
+      if: ${{ runner.os == 'macOS' && github.event_name == 'push' }}
       # Note: PRs generated from forks cannot access GitHub Secrets.
       # So if the PR is from a fork, we can still build, but cannot sign.
       # Note: We aren't attempting to sign for *any* PRs anymore, though.
@@ -155,7 +155,7 @@ jobs:
         command: yarn dist
 
     - name: Build Pulsar Binaries (macOS) (Unsigned)
-      if: ${{ runner.os == 'macOS' && github.event_name == 'push' }}
+      if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
         timeout_minutes: 45
