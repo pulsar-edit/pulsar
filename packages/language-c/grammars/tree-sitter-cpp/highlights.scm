@@ -84,6 +84,8 @@
 
 (primitive_type) @support.type.builtin.cpp
 
+(placeholder_type_specifier (auto) @support.type.builtin.auto.cpp)
+
 ; Mark all function definition types with data…
 (function_definition
   type: (_) @_IGNORE_
