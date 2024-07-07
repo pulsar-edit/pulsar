@@ -169,6 +169,7 @@
   ] @keyword.operator.redirect.shell)
 
 (test_operator) @keyword.operator.test.shell
+(unary_expression "!" @keyword.operator.unary.shell)
 
 ((file_descriptor) @constant.numeric.file-descriptor.shell
   (#match? @constant.numeric.file-descriptor.shell "^[12]$"))
