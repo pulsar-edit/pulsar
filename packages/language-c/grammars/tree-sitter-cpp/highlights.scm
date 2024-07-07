@@ -479,6 +479,8 @@
 
 
 ["&&" "||"] @keyword.operator.logical.cpp
+(binary_expression
+  ["and" "or"] @keyword.operator.logical.cpp)
 
 "++" @keyword.operator.increment.cpp
 "--" @keyword.operator.decrement.cpp
@@ -495,6 +497,7 @@
 
 (unary_expression
   ["+" "-" "!"] @keyword.operator.unary.cpp)
+(unary_expression "not" @keyword.operator.unary.cpp)
 
 (conditional_expression
   ["?" ":"] @keyword.operator.ternary.cpp)
