@@ -9027,10 +9027,9 @@ superagent@^8.0.9:
     qs "^6.11.0"
     semver "^7.3.8"
 
-superstring@^2.4.4:
+superstring@^2.4.4, "superstring@github:pulsar-edit/superstring#de97b496663fce40050bf2d66e1466ccfbd00943":
   version "2.4.4"
-  resolved "https://registry.yarnpkg.com/superstring/-/superstring-2.4.4.tgz#d5df5b080deb5605ffd88b6cdbaf17a0b30d5f0e"
-  integrity sha512-41LWIGzy6tkUM6jUwbXTeGOLui3gGBxgV6m8gIWRzv1WdW0HV6oANHdGanRrM04mwFXXExII9OQ/XxaqU+Ft9w==
+  resolved "https://codeload.github.com/pulsar-edit/superstring/tar.gz/de97b496663fce40050bf2d66e1466ccfbd00943"
   dependencies:
     nan "^2.14.2"
 
