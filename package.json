@@ -26,8 +26,8 @@
   "electronVersion": "12.2.3",
   "resolutions": {
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244",
-    "superstring": "github:pulsar-edit/superstring",
-    "text-buffer/superstring": "github:pulsar-edit/superstring"
+    "superstring": "github:pulsar-edit/superstring#de97b496663fce40050bf2d66e1466ccfbd00943",
+    "text-buffer/superstring": "github:pulsar-edit/superstring#de97b496663fce40050bf2d66e1466ccfbd00943"
   },
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
@@ -167,7 +167,7 @@
     "spell-check": "file:packages/spell-check",
     "status-bar": "file:packages/status-bar",
     "styleguide": "file:./packages/styleguide",
-    "superstring": "github:pulsar-edit/superstring",
+    "superstring": "github:pulsar-edit/superstring#de97b496663fce40050bf2d66e1466ccfbd00943",
     "symbol-provider-ctags": "file:./packages/symbol-provider-ctags",
     "symbol-provider-tree-sitter": "file:./packages/symbol-provider-tree-sitter",
     "symbols-view": "file:./packages/symbols-view",

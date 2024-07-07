@@ -9027,7 +9027,7 @@ superagent@^8.0.9:
     qs "^6.11.0"
     semver "^7.3.8"
 
-superstring@^2.4.4, "superstring@github:pulsar-edit/superstring":
+superstring@^2.4.4, "superstring@github:pulsar-edit/superstring#de97b496663fce40050bf2d66e1466ccfbd00943":
   version "2.4.4"
   resolved "https://codeload.github.com/pulsar-edit/superstring/tar.gz/de97b496663fce40050bf2d66e1466ccfbd00943"
   dependencies:
