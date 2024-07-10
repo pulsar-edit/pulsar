@@ -2290,24 +2290,26 @@ describe("TreeView", function () {
               });
             });
 
-            it("adds file in any project path", function () {
+            it("adds file in any project path", async () => {
               const newPath = path.join(dirPath3, "new-test-file.txt");
 
-              waitForWorkspaceOpenEvent(() => fileView4.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
+              await workspaceOpenPromise(() => {
+                fileView4.dispatchEvent(
+                  new MouseEvent('click', { bubbles: true, detail: 1 })
+                )
+              })
 
-              waitForWorkspaceOpenEvent(function () {
+              await workspaceOpenPromise(() => {
                 atom.commands.dispatch(treeView.element, "tree-view:add-file");
                 [addPanel] = atom.workspace.getModalPanels();
                 addDialog = addPanel.getItem();
                 addDialog.miniEditor.insertText(path.basename(newPath));
                 return atom.commands.dispatch(addDialog.element, 'core:confirm');
-              });
+              })
 
-              runs(function () {
-                expect(fs.isFileSync(newPath)).toBeTruthy();
-                expect(atom.workspace.getModalPanels().length).toBe(0);
-                expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(newPath);
-              });
+              expect(fs.isFileSync(newPath)).toBeTruthy();
+              expect(atom.workspace.getModalPanels().length).toBe(0);
+              expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(newPath);
 
               waitsFor("file to be added to tree view", () => dirView3.entries.querySelectorAll(".file").length > 1);
 

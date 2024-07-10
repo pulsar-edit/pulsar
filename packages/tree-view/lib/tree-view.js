@@ -93,14 +93,18 @@ class TreeView {
     }
 
     if (state.scrollTop != null || state.scrollLeft != null) {
-      this._observer = new IntersectionObserver(() => {
+      // We have to restore the last scroll offsets, but it's too early. We use
+      // an `IntersectionObserver` so that we can be notified when the element
+      // is rendered and visible. At that point, we can make the changes
+      // exactly once, then disconnect this observer.
+      let observer = new IntersectionObserver(() => {
         if (this.isVisible()) {
           this.element.scrollTop = state.scrollTop;
           this.element.scrollLeft = state.scrollLeft;
-          this._observer.disconnect();
+          observer.disconnect();
         }
       });
-      this._observer.observe(this.element);
+      observer.observe(this.element);
     }
 
     if (state.width > 0) {
@@ -283,6 +287,8 @@ class TreeView {
 
   handleEvents() {
     this.element.addEventListener('click', (e) => {
+      // This prevents accidental collapsing when an `.entries` element is the
+      // event target.
       if (e.target.classList.contains('entries')) return;
       if (!(e.shiftKy || e.metaKey || e.ctrlKey)) {
         return this.entryClicked(e);
@@ -298,12 +304,13 @@ class TreeView {
     this.element.addEventListener('drop',      e => this.onDrop(e));
 
     atom.commands.add(this.element, {
-      'core:move-up': (e) => this.moveUp(e),
-      'core:move-down': (e) => this.moveDown(e),
-      'core:page-up': (e) => this.pageUp(e),
-      'core:page-down': (e) => this.pageDown(e),
-      'core:move-to-top': (e) => this.scrollToTop(e),
+      'core:move-up':        (e) => this.moveUp(e),
+      'core:move-down':      (e) => this.moveDown(e),
+      'core:page-up':        (e) => this.pageUp(e),
+      'core:page-down':      (e) => this.pageDown(e),
+      'core:move-to-top':    (e) => this.scrollToTop(e),
       'core:move-to-bottom': (e) => this.scrollToBottom(e),
+
       'tree-view:expand-item': () => this.openSelectedEntry({ pending: true }, true),
       'tree-view:recursive-expand-directory': () => {
         this.expandDirectory(true);
@@ -313,42 +320,51 @@ class TreeView {
         this.collapseDirectory(true);
       },
       'tree-view:collapse-all': () => this.collapseDirectory(true, true),
-      'tree-view:open-selected-entry': () => this.openSelectedEntry(),
+
+      'tree-view:open-selected-entry':       () => this.openSelectedEntry(),
       'tree-view:open-selected-entry-right': () => this.openSelectedEntryRight(),
-      'tree-view:open-selected-entry-left': () => this.openSelectedEntryLeft(),
-      'tree-view:open-selected-entry-up': () => this.openSelectedEntryUp(),
-      'tree-view:open-selected-entry-down': () => this.openSelectedEntryDown(),
-      'tree-view:move': () => this.moveSelectedEntry(),
-      'tree-view:copy': () => this.copySelectedEntries(),
-      'tree-view:cut': () => this.cutSelectedEntries(),
+      'tree-view:open-selected-entry-left':  () => this.openSelectedEntryLeft(),
+      'tree-view:open-selected-entry-up':    () => this.openSelectedEntryUp(),
+      'tree-view:open-selected-entry-down':  () => this.openSelectedEntryDown(),
+
+      'tree-view:move':  () => this.moveSelectedEntry(),
+      'tree-view:copy':  () => this.copySelectedEntries(),
+      'tree-view:cut':   () => this.cutSelectedEntries(),
       'tree-view:paste': () => this.pasteEntries(),
-      'tree-view:copy-full-path': () => this.copySelectedEntryPath(false),
+
+      'tree-view:copy-full-path':       () => this.copySelectedEntryPath(false),
       'tree-view:show-in-file-manager': () => this.showSelectedEntryInFileManager(),
-      'tree-view:open-in-new-window': () => this.openSelectedEntryInNewWindow(),
-      'tree-view:copy-project-path': () => this.copySelectedEntryPath(true),
+      'tree-view:open-in-new-window':   () => this.openSelectedEntryInNewWindow(),
+      'tree-view:copy-project-path':    () => this.copySelectedEntryPath(true),
+
       'tree-view:unfocus': () => this.unfocus(),
+
       'tree-view:toggle-vcs-ignored-files': () => toggleConfig(`tree-view.hideVcsIgnoredFiles`),
-      'tree-view:toggle-ignored-names': () => toggleConfig(`tree-view.hideIgnoredNames`),
-      'tree-view:remove-project-folder': (e) => this.removeProjectFolder(e)
+      'tree-view:toggle-ignored-names':     () => toggleConfig(`tree-view.hideIgnoredNames`),
+      'tree-view:remove-project-folder':    (e) => this.removeProjectFolder(e)
     });
 
-    let _this = this
     for (let i = 0; i < 9; i++) {
       atom.commands.add(
         this.element,
         `tree-view:open-selected-entry-in-pane-${i + 1}`,
-        () => _this.openSelectedEntryInPane(i)
+        () => this.openSelectedEntryInPane(i)
       );
     }
 
+    // Update the tree view…
     this.disposables.add(
+      // …when the active pane changes.
       atom.workspace.getCenter().onDidChangeActivePaneItem(() => {
         this.selectActiveFile();
         if (atom.config.get('tree-view.autoReveal')) {
           this.revealActiveFile({ show: false, focus: false });
         }
       }),
+      // …when we detect new/deleted files in the project.
       atom.project.onDidChangePaths(() => this.updateRoots()),
+      // …when the user changes any of the settings that affect what gets shown
+      // (and in what order).
       atom.config.onDidChange(
         'tree-view.hideVcsIgnoredFiles',
         () => this.updateRoots()
@@ -463,6 +479,8 @@ class TreeView {
     }
   }
 
+  // Update the state of the tree view by synchronizing it with the state of
+  // the filesystem and the user's current settings.
   updateRoots(expansionStates = {}) {
     let selectedPaths = this.selectedPaths();
     let oldExpansionStates = {};
@@ -792,7 +810,6 @@ class TreeView {
         return this.emitter.emit('move-entry-failed', { initialPath, newPath });
       }
     });
-    console.log('dialog!', dialog);
     return dialog.attach();
   }
 
@@ -887,13 +904,18 @@ class TreeView {
       if (response === 0) { // Move to Trash
         let failedDeletions = [];
         for (let selectedPath of selectedPaths) {
-          // Don't delete entries which no longer exist. This can happen, for example, when
-          // * The entry is deleted outside of Atom before "Move to Trash" is selected
-          // * A folder and one of its children are both selected for deletion,
-          //   but the parent folder is deleted first
+          // Don't delete entries which no longer exist. This can happen, for
+          // example, when
+          //
+          // * the entry is deleted outside of Atom before "Move to Trash" is
+          //   selected;
+          // * a folder and one of its children are both selected for deletion,
+          //   but the parent folder is deleted first.
           if (!fs.existsSync(selectedPath)) continue;
 
           this.emitter.emit('will-delete-entry', { pathToDelete: selectedPath });
+
+          // TODO: `shell.trashItem` is the favored way to do this.
           if (shell.moveItemToTrash(selectedPath)) {
             this.emitter.emit('entry-deleted', { pathToDelete: selectedPath });
           } else {
@@ -939,8 +961,11 @@ class TreeView {
     }
   }
 
+  // Public: Copy the path of the selected entry or entries.
+  //
+  // Save the path in localStorage so that copying from two different instances
+  // of Pulsar works as intended.
   copySelectedEntries() {
-    console.log('copySelectedEntries');
     let selectedPaths = this.selectedPaths();
     if (!(selectedPaths && selectedPaths.length > 0)) return;
 
@@ -949,6 +974,10 @@ class TreeView {
     window.localStorage['tree-view:copyPath'] = JSON.stringify(selectedPaths);
   }
 
+  // Public: Cut the path of the selected entry or entries.
+  //
+  // Save the path in localStorage so that cutting from two different instances
+  // of Pulsar works as intended.
   cutSelectedEntries() {
     let selectedPaths = this.selectedPaths();
     if (!(selectedPaths && selectedPaths.length > 0)) return;
@@ -958,6 +987,11 @@ class TreeView {
     window.localStorage['tree-view:cutPath'] = JSON.stringify(selectedPaths);
   }
 
+
+  // Public: Paste a copied or cut item.
+  //
+  // If a file is selected, the file's parent directory is used as the paste
+  // destination.
   pasteEntries() {
     let selectedEntry = this.selectedEntry();
     if (!selectedEntry) return;
@@ -1347,17 +1381,20 @@ class TreeView {
     }
   }
 
+  // Public: Return an array of paths from all selected items.
+  //
+  // Example:
+  //
+  //     this.selectedPaths()
+  //     => ['selected/path/one', 'selected/path/two', 'selected/path/three']
+  //
+  // Returns Array of selected item paths.
   selectedPaths() {
     return Array.from(this.getSelectedEntries()).map(entry => entry.getPath());
   }
 
-  /**
-   * @memberof TreeView
-   * @function selectContinuousEntries
-   * @desc Public: Selects items within a range defined by a currently selected entry and
-   * a new given entry. This is shift+click functionality.
-   * @returns {Array} Selected elements
-   */
+  // Public: Selects items within a range defined by a currently selected entry
+  // and a new given entry. This is Shift+click functionality.
   selectContinuousEntries(entry, deselectOthers = true) {
     let currentSelectedEntry = this.lastFocusedEntry ?? this.selectedEntry();
     let parentContainer = entry.parentElement;
@@ -1380,16 +1417,23 @@ class TreeView {
     return elements;
   }
 
+  // Public: Selects an entry without clearing previously selected items. This
+  // is Cmd+click functionality.
   selectMultipleEntries(entry) {
     entry?.classList.toggle('selected');
     return entry;
   }
 
+  // Public: Toggle the `full-menu` class on the main list element to display
+  // the full context menu.
   showFullMenu() {
     this.list.classList.remove('multi-select');
     this.list.classList.add('full-menu');
   }
 
+  // Toggle the `multi-select` class on the main list element to display the
+  // context menu with only the items that make sense for multi-select
+  // functionality.
   showMultiSelectMenu() {
     this.list.classList.remove('full-menu');
     this.list.classList.add('multi-select');
@@ -1403,6 +1447,9 @@ class TreeView {
     }
   }
 
+  // Public: Check for the `multi-select` class on the main list.
+  //
+  // Returns Boolean
   multiSelectEnabled() {
     return this.list.classList.contains('multi-select');
   }
@@ -1437,6 +1484,7 @@ class TreeView {
     }
   }
 
+  // Handle entry name object dragstart event.
   onDragStart(event) {
     this.dragEventCounts = new WeakMap();
     this.selectOnMouseUp = null;
@@ -1457,7 +1505,6 @@ class TreeView {
     dragImage.style.willChange = 'transform';
     let initialPaths = [];
     for (let target of this.getSelectedEntries()) {
-      console.log('TARGET:', target);
       let entryPath = target.querySelector('.name').dataset.path;
       let parentSelected = target.parentNode.closest('.entry.selected');
       if (!parentSelected) {
@@ -1466,17 +1513,10 @@ class TreeView {
         if (newElement.classList.contains('directory')) {
           newElement.querySelector('.entries').remove();
         }
-        console.log('styleObject:', getStyleObject(target));
-        let ref3 = getStyleObject(target);
-        for (let key in ref3) {
-          let value = ref3[key];
+        for (let [key, value] of Object.entries(getStyleObject(target))) {
           if (value === "") continue;
           newElement.style[key] = value;
         }
-        // for (let [key, value] of Object.entries(getStyleObject(target))) {
-        //   if (value === "") continue;
-        //   newElement.style[key] = value;
-        // }
         newElement.style.paddingLeft = '1em';
         newElement.style.paddingRight = '1em';
         dragImage.append(newElement);
@@ -1490,8 +1530,8 @@ class TreeView {
     window.requestAnimationFrame(() => dragImage.remove());
   }
 
+  // Handle entry dragover event; reset default dragover actions.
   onDragOver(event) {
-    console.log('onDragOver!', event);
     let entry = event.target.closest('.entry.directory');
     if (!entry) return;
     if (this.rootDragAndDrop.isDragging(event)) return;
@@ -1503,6 +1543,7 @@ class TreeView {
     }
   }
 
+  // Handle entry drop event.
   onDrop(event) {
     this.dragEventCounts = new WeakMap();
     let entry = event.target.closest('.entry.directory');
@@ -1525,13 +1566,16 @@ class TreeView {
         // itself.
         for (let j = initialPaths.length - 1; j >= 0; j -= 1) {
           // Note: This is necessary on Windows to circumvent node-pathwatcher
-          // holding a lock on expanded folders and preventing them from
-          // being moved or deleted
-          // TODO: This can be removed when tree-view is switched to @atom/watcher
+          // holding a lock on expanded folders and preventing them from being
+          // moved or deleted.
+          //
+          // TODO: This can be removed when tree-view is switched to
+          // @atom/watcher.
           let initialPath = initialPaths[j];
-          let entry = this.entryForPath(initialPath);
           this.entryForPath(initialPath)?.collapse?.();
           if ((process.platform === 'darwin' && event.metaKey) || event.ctrlKey) {
+            // Mimic OS-specific conventions in which holding down a modifier
+            // key means that an entry is copied rather than moved.
             this.copyEntry(initialPath, newDirectoryPath);
           } else if (!this.moveEntry(initialPath, newDirectoryPath)) {
             break;
@@ -1549,8 +1593,9 @@ class TreeView {
         }
       }
     } else if (event.dataTransfer.files.length) {
-      // A drop event from the OS that isn't targeting a folder. Add a new
-      // project folder.
+      // A drop event from the OS that isn't targeting a specific folder in the
+      // tree view. This is probably the user dragging a folder into the tree
+      // view in order to add a new folder to the project.
       for (let entry of event.dataTransfer.files) {
         atom.project.addPath(entry.path);
       }
