@@ -1150,7 +1150,6 @@ class TreeView {
   // If the entry already exists in `newDirectoryPath`, a number is appended to
   // the basename.
   copyEntry(initialPath, newDirectoryPath) {
-    console.log('copyEntry');
     let initialPathIsDirectory = fs.isDirectorySync(initialPath);
     // Do not allow copying test/a/ into test/a/b/
     // Note: A trailing path.sep is added to prevent false positives, such as test/a -> test/ab
@@ -1338,7 +1337,6 @@ class TreeView {
       this.selectContinuousEntries(entryToSelect, false);
       this.showMultiSelectMenuIfNecessary();
     } else if (event.shiftKey) {
-      console.log('shift!', entryToSelect, this.lastFocusedEntry);
       // select continuous from this.lastFocusedEntry and deselect rest
       this.selectContinuousEntries(entryToSelect);
       this.showMultiSelectMenuIfNecessary();
@@ -1455,7 +1453,6 @@ class TreeView {
   }
 
   onDragEnter(event) {
-    console.log('onDragEnter', event);
     let entry = event.target.closest('.entry.directory');
     if (!entry) return;
     if (this.rootDragAndDrop.isDragging(event)) return;
