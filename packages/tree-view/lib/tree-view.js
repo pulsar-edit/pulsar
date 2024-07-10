@@ -529,7 +529,7 @@ class TreeView {
   }
 
   getActivePath() {
-    return atom.workspace.getCenter()?.getActivePaneItem()?.getPath();
+    return atom.workspace.getCenter()?.getActivePaneItem()?.getPath?.();
   }
 
   selectActiveFile() {
