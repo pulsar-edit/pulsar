@@ -8,6 +8,7 @@ const fs = require('fs');
 const CSON = require('season');
 const Config = require('../config');
 const StartupTime = require('../startup-time');
+const cp = require('child_process');
 
 StartupTime.setStartTime();
 
@@ -15,7 +16,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   global.shellStartTime = startTime;
   StartupTime.addMarker('main-process:start');
 
-  process.on('uncaughtException', function(error = {}) {
+  process.on('uncaughtException', function (error = {}) {
     if (error.message != null) {
       console.log(error.message);
     }
@@ -25,7 +26,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     }
   });
 
-  process.on('unhandledRejection', function(error = {}) {
+  process.on('unhandledRejection', function (error = {}) {
     if (error.message != null) {
       console.log(error.message);
     }
@@ -41,6 +42,14 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 
   const args = parseCommandLine(process.argv.slice(1));
+
+  if (args.packageMode) {
+    // Forward a command to `ppm`, then exit.
+    ppmCommand(args.ppmArgs).then((exitCode) => {
+      process.exit(exitCode);
+    });
+    return;
+  }
 
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
@@ -59,7 +68,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
       'userData',
       temp.mkdirSync('atom-user-data-dir-for-main-process-tests')
     );
-    app.on('ready', function() {
+    app.on('ready', function () {
       const testRunner = require(path.join(
         args.resourcePath,
         'spec/main-process/mocha-test-runner'
@@ -101,7 +110,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   }
 
   StartupTime.addMarker('main-process:electron-onready:start');
-  app.on('ready', function() {
+  app.on('ready', function () {
     StartupTime.addMarker('main-process:electron-onready:end');
     app.removeListener('open-file', addPathToOpen);
     app.removeListener('open-url', addUrlToOpen);
@@ -114,6 +123,19 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     AtomApplication.open(args);
   });
 };
+
+async function ppmCommand(ppmArgs) {
+  const PackageManager = require('../package-manager');
+  const ppmPath = PackageManager.possibleApmPaths();
+  return new Promise((resolve) => {
+    let child = cp.spawn(
+      ppmPath,
+      ppmArgs,
+      { stdio: 'inherit', encoding: 'utf-8' }
+    );
+    child.on('close', resolve);
+  });
+}
 
 function getConfig() {
   const config = new Config();

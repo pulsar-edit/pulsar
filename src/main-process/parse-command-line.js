@@ -10,7 +10,12 @@ module.exports = function parseCommandLine(processArgs) {
   // We don't need this flag, and yargs interprets it as many short flags. So, we filter it out.
   const filteredArgs = processArgs.filter(arg => !arg.startsWith('-psn_'));
 
-  const options = yargs(filteredArgs).wrap(yargs.terminalWidth());
+  // Disable the yargs behavior that exits early if `--help` or `--version` is
+  // detected. This prevents `pulsar -p --version` from working properly. We'll
+  // handle `--version` and `--help` manually.
+  const options = yargs(filteredArgs)
+    .exitProcess(false)
+    .wrap(yargs.terminalWidth());
   const version = app.getVersion();
   options.usage(
     dedent`Pulsar Editor v${version}
@@ -132,41 +137,60 @@ module.exports = function parseCommandLine(processArgs) {
       'package',
       'Delegate all commands to Pulsar\'s package management. Run with --package for more details'
     );
-  options.boolean('uri-handler');
+  // Disable automatic handling of `--version`; we'll handle it manually.
+  options.version(false);
   options
-    .version(
+    .alias('v', 'version')
+    .boolean('p')
+    .describe(
+      'version',
+      'Show the version number.'
+    );
+  options.boolean('uri-handler');
+
+  // NB: if --help or --version are given, this also displays the relevant
+  // message and exits.
+  let args = options.argv;
+
+  // Consider `--package` first; if it's present, then the user wants to run a
+  // command through `ppm`. All args that occur before `-p`/`--package` are
+  // ignored, and we'll return early in order to hand off to `ppm`.
+  //
+  // We handle this before `--version` so that someone can run `pulsar -p
+  // --version` and have it properly forwarded to `ppm --version`.
+  if (args['package']) {
+    let ppmArgs = [...processArgs];
+    while (true) {
+      const arg = ppmArgs.shift();
+      if (arg === '-p' || arg === '--package' || ppmArgs.length === 0) break;
+    }
+    return { packageMode: true, ppmArgs };
+  }
+
+  // The presence of `--version` is next most important. If it's present, we
+  // show the versions of our important components, ignore all other flags,
+  // and exit.
+  if (args['version']) {
+    console.error(
       dedent`Pulsar  : ${version}
              Electron: ${process.versions.electron}
              Chrome  : ${process.versions.chrome}
              Node    : ${process.versions.node}`
-    )
-    .alias('v', 'version');
-
-  // NB: if --help or --version are given, this also displays the relevant message and exits
-  let args = options.argv;
-
-  if (args['package']) {
-    const PackageManager = require('../package-manager');
-    const cp = require('child_process');
-    const ppmPath = PackageManager.possibleApmPaths();
-
-    let ppmArgs = [...processArgs]
-    while(true) {
-      const arg = ppmArgs.shift()
-      if(arg === '-p' || arg === '--package' || ppmArgs.length === 0) break;
-    }
-    const exitCode = cp.spawnSync(ppmPath, ppmArgs, {stdio: 'inherit'}).status;
-    process.exit(exitCode);
+    );
+    process.exit(0);
     return;
   }
 
+  // Next comes `--help`; if it's present, show the documentation and exit.
   if (args['help']) {
     options.showHelp();
     process.exit(0);
     return;
   }
 
-  // If --uri-handler is set, then we parse NOTHING else
+  // Next is `--uri-handler`; this is a special mode we use to emulate URI
+  // handling on Linux. If it's present, we rewrite `args` to remove all
+  // arguments not pertaining to URL handling. That's just how special it is.
   if (args.uriHandler) {
     args = {
       uriHandler: true,
@@ -195,8 +219,10 @@ module.exports = function parseCommandLine(processArgs) {
       `Only one of the --add and --new-window options may be specified at the same time.\n\n${options.help()}`
     );
 
-    // Exiting the main process with a nonzero exit code on macOS causes the app open to fail with the mysterious
-    // message "LSOpenURLsWithRole() failed for the application /Applications/Pulsar Dev.app with error -10810."
+    // Exiting the main process with a nonzero exit code on macOS causes the
+    // app open to fail with the mysterious message "LSOpenURLsWithRole()
+    // failed for the application /Applications/Pulsar Dev.app with error
+    // -10810."
     process.exit(0);
   }
 
@@ -215,8 +241,9 @@ module.exports = function parseCommandLine(processArgs) {
 
   for (const path of args._) {
     if (typeof path !== 'string') {
-      // Sometimes non-strings (such as numbers or boolean true) get into args._
-      // In the next block, .startsWith() only works on strings. So, skip non-string arguments.
+      // Sometimes non-strings (such as numbers or boolean true) get into
+      // args._ In the next block, .startsWith() only works on strings. So,
+      // skip non-string arguments.
       continue;
     }
     if (path.startsWith('atom://')) {
@@ -231,8 +258,8 @@ module.exports = function parseCommandLine(processArgs) {
   }
 
   if (args['path-environment']) {
-    // On Yosemite the $PATH is not inherited by the "open" command, so we have to
-    // explicitly pass it by command line, see http://git.io/YC8_Ew.
+    // On Yosemite the $PATH is not inherited by the "open" command, so we have
+    // to explicitly pass it by command line, see http://git.io/YC8_Ew.
     process.env.PATH = args['path-environment'];
   }
 
