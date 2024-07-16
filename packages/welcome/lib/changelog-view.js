@@ -53,6 +53,12 @@ export default class ChangeLogView {
                 Worked around API breakage (FreeBSD <code>libiconv</code> vs GNU <code>libiconv</code>) in the <code>iconv</code> library shipped in macOS 13+
               </li>
               <li>
+                Changed `language-php` to continue syntax-highlighting even when encountering unbalanced PHP tags.
+              </li>
+              <li>
+                Indentation, fold, and highlighting fixes in <code>language-python</code>, <code>language-javascript</code>, <code>language-typescript</code>, <code>language-shell</code> and <code>language-c</code>.
+              </li>
+              <li>
                 Fix <code>--no-sandbox</code> flag not being applied to the <code>.desktop</code> launcher on Linux (Fixes Dev Tools).
               </li>
             </ul>

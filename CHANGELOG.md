@@ -8,6 +8,8 @@
 
 ## 1.119.0
 
+- Changed `language-php` to continue syntax-highlighting even when encountering unbalanced PHP tags.
+- Indentation, fold, and highlighting fixes in `language-python`, `language-javascript`, `language-typescript`, `language-shell` and `language-c`.
 - Worked around API breakage (FreeBSD `libiconv` vs GNU `libiconv`) in the `iconv` library shipped in macOS 13+
 - Fix `--no-sandbox` flag not being applied to the `.desktop` launcher on Linux (Fixes Dev Tools)
 
