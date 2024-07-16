@@ -50,42 +50,10 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Various tree-sitter grammar improvements
-                <ul>
-                  <li>
-                    Docs Fixes
-                  </li>
-                  <li>
-                    A parser update for PHP
-                  </li>
-                  <li>
-                    Miscellaneous grammar fixes and improvements
-                  </li>
-                </ul>
+                Worked around API breakage (FreeBSD <code>libiconv</code> vs GNU <code>libiconv</code>) in the <code>iconv</code> library shipped in macOS 13+
               </li>
               <li>
-                Added a preference <code>core.allowWindowTransparency</code> so that themes and user stylesheets can make editor windows' backgrounds transparent.
-              </li>
-              <li>
-                Added a new modern tree sitter "test" for highlight query - <code>ancestorTypeNearerThan</code> that matches if it finds the <i>first</i> type as an ancestor, but <i>doesn't match</i> if any "other" ancestors are found before
-              </li>
-              <li>
-                Syntax quoting and unquoting in Clojure now highlights correctly, and also highlights full qualified keywords differently than generated ones
-              </li>
-              <li>
-                <code>content</code> field of addInjectionPoint for modern-tree-sitter now supports a second <code>buffer</code> argument, for better customization if one wants to
-              </li>
-              <li>
-                EDN is back to being detected as Clojure (for compatibility) but highlights as EDN
-              </li>
-              <li>
-                Fixed syntax quoting on Clojure grammar (newer tree-sitter), fixed some injection points on Clojure. Added support for highligting metadata, and added better support for "def" elements (for example - doesn't scope <code>default</code> or <code>definition</code> as a <code>def</code>, but highlights <code>p/defresolver</code>)
-              </li>
-              <li>
-                Fixed <code>textChanged</code> property to be accurate when deleting characters
-              </li>
-              <li>
-                Fixed <code>ppm publish</code> for publishing brand new packages
+                Fix <code>--no-sandbox</code> flag not being applied to the <code>.desktop</code> launcher on Linux (Fixes Dev Tools).
               </li>
             </ul>
 

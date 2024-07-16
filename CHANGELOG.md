@@ -6,6 +6,24 @@
 
 ## [Unreleased]
 
+## 1.119.0
+
+- Worked around API breakage (FreeBSD `libiconv` vs GNU `libiconv`) in the `iconv` library shipped in macOS 13+
+- Fix `--no-sandbox` flag not being applied to the `.desktop` launcher on Linux (Fixes Dev Tools)
+
+### Pulsar
+
+- Rewrite `tree-view.js` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1052)
+- Fix macOS binaries by vendorizing `libiconv` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1051)
+- Link to Homebrew version of `libiconv`... [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1039)
+- Revert "Merge pull request #810 from pulsar-edit/fix-on-change-cursor-pos" [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1035)
+- Fix `onDidChangeCursorPosition` callback event property on deleting characters [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/810)
+- electron-builder: Add '--no-sandbox' launch arg for Linux build targets [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1029)
+
+### superstring
+
+- Candidate for new `master` [@savetheclocktower](https://github.com/pulsar-edit/superstring/pull/15)
+
 ## 1.118.0
 
 - Various tree-sitter grammar improvements
