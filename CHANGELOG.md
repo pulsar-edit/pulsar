@@ -13,6 +13,7 @@
 
 ### Pulsar
 
+- Tree-sitter rolling fixes, 1.119.0 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1028)
 - Rewrite `tree-view.js` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1052)
 - Fix macOS binaries by vendorizing `libiconv` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1051)
 - Link to Homebrew version of `libiconv`... [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1039)
