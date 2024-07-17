@@ -419,12 +419,12 @@
 
 (string
   "'" @punctuation.definition.string.begin.php
-  (string_value)?
+  (string_content)?
   "'" @punctuation.definition.string.end.php) @string.quoted.single.php
 
 (encapsed_string
   "\"" @punctuation.definition.string.begin.php
-  (string_value)?
+  (string_content)?
   "\"" @punctuation.definition.string.end.php) @string.quoted.double.php
 
 (encapsed_string
@@ -511,15 +511,21 @@
   (#match? @punctuation.definition.comment.php "^#")
   (#set! adjust.startAndEndAroundFirstMatchOf "^#"))
 
+; All block comments get re-highlighted whenever a change takes place inside
+; them.
+((comment) @_IGNORE_
+  (#match? @_IGNORE_ "^/\\*")
+  (#set! highlight.invalidateOnChange true))
+
 ; Capture these because the PHPDoc injection won't process them…
 ((comment) @comment.block.documentation.php
-  (#match? @comment.block.documentation.php "^/\\*\\*\\*"))
+  (#match? @comment.block.documentation.php "^/\\*\\*\\*")
+  (#set! highlight.invalidateOnChange true))
 
 ; …but otherwise leave this style of comment to be handled by PHPDoc.
 ((comment) @_IGNORE_
   (#match? @_IGNORE_ "^/\\*\\*")
   (#set! capture.final true))
-
 
 ((comment) @comment.block.php
   (#match? @comment.block.php "^/\\*(?!\\*)"))
@@ -552,7 +558,7 @@
 (conditional_expression
   ["?" ":"] @keyword.operator.ternary.php)
 
-(unary_op_expression "@" @keyword.operator.error-control.php)
+(error_suppression_expression "@" @keyword.operator.error-control.php)
 
 [
   "=="

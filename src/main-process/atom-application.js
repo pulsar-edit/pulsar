@@ -16,7 +16,8 @@ const {
   dialog,
   ipcMain,
   shell,
-  screen
+  screen,
+  nativeTheme
 } = require('electron');
 const { CompositeDisposable, Disposable } = require('event-kit');
 const crypto = require('crypto');
@@ -283,6 +284,9 @@ module.exports = class AtomApplication extends EventEmitter {
         this.disposable.add(disposable);
         this.config.onDidChange('core.titleBar', () => this.promptForRestart());
         this.config.onDidChange('core.colorProfile', () =>
+          this.promptForRestart()
+        );
+        this.config.onDidChange('core.allowWindowTransparency', () =>
           this.promptForRestart()
         );
       });
@@ -799,6 +803,14 @@ module.exports = class AtomApplication extends EventEmitter {
           const { webContents } = atomWindow.browserWindow;
           if (webContents !== event.sender)
             webContents.send('did-change-history-manager');
+        }
+      })
+    );
+
+    this.disposable.add(
+      ipcHelpers.on(ipcMain, 'setWindowTheme', (event, options) => {
+        if (options && typeof options === 'string') {
+          nativeTheme.themeSource = options;
         }
       })
     );

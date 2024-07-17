@@ -3531,6 +3531,11 @@ dedent@^0.7.0:
   resolved "https://registry.yarnpkg.com/dedent/-/dedent-0.7.0.tgz#2495ddbaf6eb874abb0e1be9df22d2e5a544326c"
   integrity sha512-Q6fKUPqnAHAyhiUgFU7BUzLiv0kd8saH9al7tnu5Q/okj6dnupxyTgFIBjVzJATdfIAm9NAsvXNzjaKa+bxVyA==
 
+dedent@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/dedent/-/dedent-1.5.3.tgz#99aee19eb9bae55a67327717b6e848d0bf777e5a"
+  integrity sha512-NHQtfOOW68WD8lgypbLA5oT+Bt0xXJhiYvoR6SmmNXZfpzOGXwdKWmcwG8N7PwVVWV3eF/68nmD9BaJSsTBhyQ==
+
 deep-eql@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/deep-eql/-/deep-eql-3.0.1.tgz#dfc9404400ad1c8fe023e7da1df1c147c4b444df"
@@ -3830,10 +3835,10 @@ dotenv@^9.0.2:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.2.tgz#dacc20160935a37dea6364aa1bef819fb9b6ab05"
   integrity sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg==
 
-dugite@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/dugite/-/dugite-2.1.0.tgz#6f50c2244e57aaac2f36440aa7289815c73a688c"
-  integrity sha512-4l4jJz5zC6Q+/8doQNQZ9Ss3rmnO/JCHfOmQO+zGv+TIOUXimzfS02RvUOuFpEhZuaFTeFBSuK6ll/02TX3SxA==
+dugite@2.5.2:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/dugite/-/dugite-2.5.2.tgz#9a10f4ed7d3cd701e7b09c65faf78c231c7f4e23"
+  integrity sha512-qrS3RXFzWW3cyXVaqct665+JxuP1LFhE0DPV1DqmbabO/eLNLDMICRROaGDh/Hw9ssbyVERxNDF6HW7oCLXrCg==
   dependencies:
     progress "^2.0.3"
     tar "^6.1.11"
@@ -4900,14 +4905,19 @@ github-from-package@0.0.0:
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
   integrity sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==
 
+github-markdown-css@^5.5.1:
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/github-markdown-css/-/github-markdown-css-5.5.1.tgz#c2a609ca0b067552c8bfc09e797ace20d614f515"
+  integrity sha512-2osyhNgFt7DEHnGHbgIifWawAqlc68gjJiGwO1xNw/S48jivj8kVaocsVkyJqUi3fm7fdYIDi4C6yOtcqR/aEQ==
+
 github-slugger@^1.1.1:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/github-slugger/-/github-slugger-1.5.0.tgz#17891bbc73232051474d68bd867a34625c955f7d"
   integrity sha512-wIh+gKBI9Nshz2o46B0B3f5k/W+WI9ZAv6y5Dn5WJ5SK1t0TnDimB4WE5rmTD05ZAIn8HALCZVmCsvj0w0v0lw==
 
-"github@https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.19-pretranspiled.tar.gz":
-  version "0.36.19"
-  resolved "https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.19-pretranspiled.tar.gz#e2ec13277cc6a8db484192cb7ee3a1ff7fcc8048"
+"github@https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.20-pretranspiled.tar.gz":
+  version "0.36.20"
+  resolved "https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.20-pretranspiled.tar.gz#1f3edb9383940c72037b35cfa6081d59a160f6b8"
   dependencies:
     "@atom/babel-plugin-chai-assert-async" "1.0.0"
     "@atom/babel7-transpiler" "1.0.0-1"
@@ -4923,7 +4933,7 @@ github-slugger@^1.1.1:
     classnames "2.2.6"
     compare-sets "1.0.1"
     dompurify "2.0.17"
-    dugite "2.1.0"
+    dugite "2.5.2"
     event-kit "2.5.3"
     fs-extra "4.0.3"
     graphql "14.5.8"
@@ -4945,7 +4955,7 @@ github-slugger@^1.1.1:
     underscore-plus "1.7.0"
     what-the-diff "0.6.0"
     what-the-status "1.0.3"
-    whats-my-line "https://github.com/pulsar-edit/whats-my-line/archive/348e8d10d9b9a1fd717cd4cc1263297844732768.tar.gz"
+    whats-my-line "https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz"
     yubikiri "2.0.0"
 
 glob-parent@^6.0.2:
@@ -6660,10 +6670,13 @@ markdown-it@^13.0.2:
   version "0.160.2"
   dependencies:
     cheerio "^1.0.0-rc.3"
+    dedent "^1.5.3"
     dompurify "^2.0.17"
     emoji-images "^0.1.1"
     fs-plus "^3.0.0"
+    github-markdown-css "^5.5.1"
     marked "5.0.3"
+    morphdom "^2.7.2"
     underscore-plus "^1.0.0"
     yaml-front-matter "^4.1.1"
 
@@ -6981,6 +6994,11 @@ moment@^2.19.3:
   version "2.29.4"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
+
+morphdom@^2.7.2:
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/morphdom/-/morphdom-2.7.2.tgz#d48a87254f9b3031c0e1ec367736721fbaf22167"
+  integrity sha512-Dqb/lHFyTi7SZpY0a5R4I/0Edo+iPMbaUexsHHsLAByyixCDiLHPHyVoKVmrpL0THcT7V9Cgev9y21TQYq6wQg==
 
 ms@2.0.0:
   version "2.0.0"
@@ -8699,9 +8717,8 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
-"snippets@github:pulsar-edit/snippets#6b9163415270b8757b262f5dfaafaa05d47324a9":
-  version "1.7.0"
-  resolved "https://codeload.github.com/pulsar-edit/snippets/tar.gz/6b9163415270b8757b262f5dfaafaa05d47324a9"
+"snippets@file:./packages/snippets":
+  version "1.8.0"
   dependencies:
     async "~0.2.6"
     atom-select-list "^0.7.0"
@@ -9084,10 +9101,9 @@ superagent@^8.0.9:
     qs "^6.11.0"
     semver "^7.3.8"
 
-superstring@^2.4.4:
+superstring@^2.4.4, "superstring@github:pulsar-edit/superstring#de97b496663fce40050bf2d66e1466ccfbd00943":
   version "2.4.4"
-  resolved "https://registry.yarnpkg.com/superstring/-/superstring-2.4.4.tgz#d5df5b080deb5605ffd88b6cdbaf17a0b30d5f0e"
-  integrity sha512-41LWIGzy6tkUM6jUwbXTeGOLui3gGBxgV6m8gIWRzv1WdW0HV6oANHdGanRrM04mwFXXExII9OQ/XxaqU+Ft9w==
+  resolved "https://codeload.github.com/pulsar-edit/superstring/tar.gz/de97b496663fce40050bf2d66e1466ccfbd00943"
   dependencies:
     nan "^2.14.2"
 
@@ -9945,11 +9961,11 @@ what-the-status@1.0.3:
   dependencies:
     split "^1.0.0"
 
-"whats-my-line@https://github.com/pulsar-edit/whats-my-line/archive/348e8d10d9b9a1fd717cd4cc1263297844732768.tar.gz":
+"whats-my-line@https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz":
   version "0.2.0"
-  resolved "https://github.com/pulsar-edit/whats-my-line/archive/348e8d10d9b9a1fd717cd4cc1263297844732768.tar.gz#2e90f101d1179a36685fd1b948af361342e3c797"
+  resolved "https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz#1a504ee809e9ff86d1109de27c2e94fdf23f37d1"
   dependencies:
-    dugite "2.1.0"
+    dugite "2.5.2"
     superstring "^2.4.4"
     what-the-diff "^0.6.0"
 

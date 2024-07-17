@@ -2,6 +2,14 @@
 // Global Markdown Preview styles
 
 .markdown-preview {
+  contain: paint;
+
+  // Hide a `pre` that comes directly after an `atom-text-editor` because the
+  // `atom-text-editor` is the syntax-highlighted representation.
+  atom-text-editor + pre {
+    display: none;
+  }
+
   atom-text-editor {
     // only show scrollbars on hover
     .scrollbars-visible-always & {
@@ -28,14 +36,38 @@
   .task-list-item {
     list-style-type: none;
   }
+
+  &.loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    // `.loading` on the preview element automatically shows the spinner/text.
+    // We add a slight animation delay so that, when the preview content is
+    // quick to appear (as usually happens), the spinner won't be shown. It
+    // only shows up when preview content takes a while to render.
+    &:before {
+      display: block;
+      content: 'Loading Markdown…';
+      margin: auto;
+      background-image: url(images/octocat-spinner-128.gif);
+      background-repeat: no-repeat;
+      background-size: 64px;
+      background-position: top center;
+      padding-top: 70px;
+      text-align: center;
+      opacity: 0;
+      animation-duration: 1s;
+      animation-name: appear-after-short-delay;
+      animation-delay: 0.75s;
+      animation-fill-mode: forwards;
+    }
+  }
 }
 
-.markdown-spinner {
-  margin: auto;
-  background-image: url(images/octocat-spinner-128.gif);
-  background-repeat: no-repeat;
-  background-size: 64px;
-  background-position: top center;
-  padding-top: 70px;
-  text-align: center;
+// Not an actual animation; we just use an animation so that it can appear
+// after a short delay.
+@keyframes appear-after-short-delay {
+  0% { opacity: 1; }
+  100% { opacity: 1; }
 }

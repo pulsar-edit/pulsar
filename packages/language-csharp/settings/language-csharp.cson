@@ -1,5 +1,8 @@
 '.source.cs':
   'editor':
     'commentStart': '// '
+    'commentDelimiters':
+      'line': '//'
+      'block': ['/*', '*/']
     'increaseIndentPattern': '(?x)\n\t\t^ .* \\{ [^}"\']* $\n\t|   ^ \\s* \\{ \\} $\n\t'
     'decreaseIndentPattern': '(?x)\n\t\t^ (.*\\*/)? \\s* \\} ( [^}{"\']* \\{ | \\s* while \\s* \\( .* )? [;\\s]* (//.*|/\\*.*\\*/\\s*)? $\n\t'

@@ -1,3 +1,25 @@
+; MISC
+; ====
+
+; In the JSX construct `<FOO.Bar>`, `FOO` should not be marked as
+; `constant.other.js`. Block off identifiers within complex JSX tag names early
+; to prevent this.
+
+(jsx_opening_element
+  (member_expression
+    (identifier) @_IGNORE_
+      (#set! capture.final)))
+
+(jsx_closing_element
+  (member_expression
+    (identifier) @_IGNORE_
+      (#set! capture.final)))
+
+(jsx_self_closing_element
+  (member_expression
+    (identifier) @_IGNORE_
+      (#set! capture.final)))
+
 
 ; STRINGS
 ; =======
@@ -573,14 +595,26 @@
 (export_statement
   (identifier) @variable.other.assignment.export.js)
 
-; The "*" in `import * as Foo`
+; The "*" in `import * as Foo from 'bar'`
 (import_clause
   (namespace_import "*" @variable.other.assignment.import.all.js))
 
-; The "Foo" in `import * as Foo`
+; The "Foo" in `import * as Foo from 'bar'`
 (import_clause
   (namespace_import
     (identifier) @variable.other.assignment.import.alias.js))
+
+; The "*" in `export * from 'bar'`
+(export_statement "*" @variable.other.assignment.export.all.js)
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export "*" @variable.other.assignment.export.all.js))
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export
+    (identifier) @variable.other.assignment.export.alias.js))
 
 ; COMMENTS
 ; ========
@@ -763,16 +797,16 @@
 
 ; The "Foo" in `<Foo />`.
 (jsx_self_closing_element
-  name: (identifier) @entity.name.tag.js
+  name: (_) @entity.name.tag.js
   ) @meta.tag.jsx.js
 
 ; The "Foo" in `<Foo>`.
 (jsx_opening_element
-  name: (identifier) @entity.name.tag.js)
+  name: (_) @entity.name.tag.js)
 
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
-  name: (identifier) @entity.name.tag.js)
+  name: (_) @entity.name.tag.js)
 
 ; The "bar" in `<Foo bar={true} />`.
 (jsx_attribute
@@ -862,7 +896,7 @@
 ; use "?." to target it.
 (optional_chain) @keyword.operator.accessor.optional-chaining.js
 
-; Optional chaining is illegal…:
+; Optional chaining is illegal…
 
 ; …on the left-hand side of an assignment.
 (assignment_expression

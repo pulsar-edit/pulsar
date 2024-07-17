@@ -49,7 +49,8 @@ module.exports = {
             content(node) {
               return options.content ? options.content(node) : node;
             },
-            languageScope: null
+            languageScope: options.languageScope ?? null,
+            includeChildren: options.includeChildren ?? false
           });
         }
       },

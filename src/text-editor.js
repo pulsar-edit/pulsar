@@ -5925,6 +5925,60 @@ module.exports = class TextEditor {
     }
   }
 
+  // Public: Return information about the appropriate comment delimiters to use
+  // at a given point in the buffer.
+  //
+  // Pulsar allows language bundles to define comment delimiters in several
+  // places. For instance, a grammar author can place delimiter metadata in the
+  // grammar definition file, or as scope-specific settings in the ordinary
+  // config system — or a combination of the two.
+  //
+  // In some languages, comment delimiters vary based on position in the
+  // buffer. (For instance, line comments can't always be used in JavaScript
+  // JSX blocks, so block comments are much safer.) This method will look for
+  // any such overrides and return what it thinks are the best delimiters to
+  // use at a given point.
+  //
+  // Some languages don't specify all their delimiters in their configuration,
+  // but this method will return all the information that it can discern.
+  //
+  // * point - A {Point} or point-compatible {Array}.
+  //
+  // Returns an {Object} with the following properties:
+  //
+  // * `line`: If present, a {String} representing a line comment delimiter.
+  //   (If `undefined`, there is no known line comment delimiter for the given
+  //   buffer position.)
+  // * `block`: If present, a two-item {Array} containing {String}s
+  //   representing the starting and ending block comment delimiters. (If
+  //   `undefined`, there are no known block comment delimiters for the given
+  //   buffer position.)
+  //
+  getCommentDelimitersForBufferPosition(point) {
+    point = Point.fromObject(point);
+    const languageMode = this.buffer.getLanguageMode();
+    let {
+      commentStartString,
+      commentEndString,
+      commentDelimiters
+    } = languageMode.commentStringsForPosition(point);
+    if (commentDelimiters) {
+      return commentDelimiters;
+    } else {
+      // Build a delimiters object out of the other data we received. The
+      // `commentStartString` and `commentEndString` settings aren't meant to
+      // be comprehensive — they just tell you which delimiter(s) to use to
+      // comment out a given selection — but they're better than nothing.
+      if (commentStartString && commentEndString) {
+        return { block: [commentStartString.trim(), commentEndString.trim()] };
+      } else if (commentStartString && !commentEndString) {
+        return { line: commentStartString.trim() };
+      } else {
+        return null;
+      }
+    }
+  }
+
   rowRangeForParagraphAtBufferRow(bufferRow) {
     if (!NON_WHITESPACE_REGEXP.test(this.lineTextForBufferRow(bufferRow)))
       return;

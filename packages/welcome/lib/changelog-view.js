@@ -50,25 +50,16 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Enabled Modern Tree-sitter Grammars by default
+                Worked around API breakage (FreeBSD <code>libiconv</code> vs GNU <code>libiconv</code>) in the <code>iconv</code> library shipped in macOS 13+
               </li>
               <li>
-                Added a modern Tree-sitter grammar for PHP.
+                Changed `language-php` to continue syntax-highlighting even when encountering unbalanced PHP tags. (Avoid throwing a syntax error)
               </li>
               <li>
-                Fix a measurement issue that was causing visual glitches in the `github` package's diff views.
+                Indentation, fold, and highlighting fixes in <code>language-python</code>, <code>language-javascript</code>, <code>language-typescript</code>, <code>language-shell</code> and <code>language-c</code>.
               </li>
               <li>
-                Enabled the core `symbols-view` package to accept symbols from a number of sources, including Tree-sitter grammars and IDE packages.
-              </li>
-              <li>
-                Switch default to false for converting ASCII emoticons to emoji when rendering Markdown.
-              </li>
-              <li>
-                Fix certain find-and-replace scenarios when the "Preserve Case During Replace" setting is enabled.
-              </li>
-              <li>
-                Fix an issue in `symbols-view` when returning from visiting a symbol declaration.
+                Fix <code>--no-sandbox</code> flag not being applied to the <code>.desktop</code> launcher on Linux (Fixes Dev Tools).
               </li>
             </ul>
 

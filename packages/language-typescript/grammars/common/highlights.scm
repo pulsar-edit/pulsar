@@ -17,6 +17,18 @@
 (namespace_import
   (identifier) @variable.other.assignment.import.namespace._LANG_)
 
+; The "*" in `export * from 'bar'`
+(export_statement "*" @variable.other.assignment.export.all._LANG_)
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export "*" @variable.other.assignment.export.all._LANG_))
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export
+    (identifier) @variable.other.assignment.export.alias._LANG_))
+
 ; The "Foo" in `export { Foo }`
 (export_specifier
   name: (identifier) @variable.other.assignment.export._LANG_)
@@ -39,15 +51,16 @@
 ; =========
 
 (this) @variable.language.this._LANG_
-(super) @variable.language.super._LANG_._LANG_x
+(super) @variable.language.super._LANG_
 
 (required_parameter
   pattern: (identifier) @variable.parameter.with-default._LANG_
   value: (_)
-  (#set! capture.final true))
+  (#set! capture.final))
 
 (required_parameter
-  pattern: (identifier) @variable.parameter._LANG_)
+  pattern: (identifier) @variable.parameter._LANG_
+  (#set! capture.final))
 
 (required_parameter
   pattern: (rest_pattern
@@ -56,16 +69,22 @@
 (required_parameter
   pattern: (object_pattern
     (shorthand_property_identifier_pattern) @variable.parameter.destructuring._LANG_)
-    (#set! capture.final true))
+    (#set! capture.final))
+
+(required_parameter
+  pattern: (object_pattern
+    (rest_pattern (identifier) @variable.parameter.destructuring.rest._LANG_))
+    (#set! capture.final))
 
 (required_parameter
   pattern: (object_pattern
     (object_assignment_pattern
       (shorthand_property_identifier_pattern) @variable.parameter.destructuring.with-default._LANG_))
-    (#set! capture.final true))
+    (#set! capture.final))
 
 (optional_parameter
-  pattern: (identifier) @variable.parameter.optional._LANG_)
+  pattern: (identifier) @variable.parameter.optional._LANG_
+  (#set! capture.final))
 
 (optional_parameter "?" @keyword.operator.type.optional._LANG_)
 
@@ -295,6 +314,21 @@
   name: (_) @entity.name.type.interface._LANG_
   (#set! capture.final))
 
+; ENUMS
+; =====
+
+; The "Foo" in `enum Foo {`
+(enum_declaration
+  name: (_) @entity.name.type.enum._LANG_
+  (#set! capture.final))
+
+; The "foo" and "bar" in `enum Baz { foo, bar }`
+(enum_body
+  name: (property_identifier) @variable.declaration.enum._LANG_)
+
+; The "foo" in `enum Bar { foo = 1 }`
+(enum_assignment
+  name: (property_identifier) @variable.declaration.enum._LANG_)
 
 ; TYPES
 ; =====
@@ -316,7 +350,7 @@
 
 "=>" @storage.type.arrow._LANG_
 
-; TODO: If I allow scopes like `storage.type.string._LANG_`, I will make a lot of
+; TODO: If I allow scopes like `storage.type.string.ts`, I will make a lot of
 ; text look like strings by accident. This really needs to be fixed in syntax
 ; themes.
 ;
@@ -378,9 +412,17 @@
 ; TODO: We could add a special scope name to the entire suite of DOM types, but
 ; I don't have the strength for that right now.
 
-;
-((type_identifier) @support.storage.other.type._LANG_
-  )
+; The "bar" in `const foo: bar.Baz`.
+(nested_type_identifier
+  module: (identifier) @support.storage.other.property._LANG_)
+
+; The "bar" and "thud" in `const foo: bar.thud.Baz`.
+(nested_identifier
+  (identifier) @support.storage.other.property._LANG_
+  (#is? test.descendantOfType "type_annotation"))
+
+; Any other type identifiers; the "Bar" in `const foo: Bar`.
+(type_identifier) @support.storage.other.type._LANG_
 
 ; SUPPORT
 ; =======
@@ -722,9 +764,16 @@
 
 ; Interpolations inside of template strings.
 (template_substitution
-  "${" @punctuation.definition.template-expression.begin._LANG_
-  "}" @punctuation.definition.template-expression.end._LANG_
+  "${" @punctuation.section.embedded.begin._LANG_
+  "}" @punctuation.section.embedded.end._LANG_
 ) @meta.embedded.line.interpolation._LANG_
+
+(string
+  (escape_sequence) @constant.character.escape._LANG_)
+
+(template_string
+  (escape_sequence) @constant.character.escape._LANG_)
+
 
 ; CONSTANTS
 ; =========
@@ -769,6 +818,22 @@
   "debugger"
 ] @keyword.control._TYPE_._LANG_
 
+
+; REGEX
+; =====
+
+(regex) @string.regexp._LANG_
+(regex
+  "/" @punctuation.definition.string.begin._LANG_
+  (#is? test.first))
+
+(regex
+  "/" @punctuation.definition.string.end._LANG_
+  (#is? test.last))
+
+(regex_flags) @keyword.other._LANG_
+
+
 ; OPERATORS
 ; =========
 
@@ -777,26 +842,30 @@
 
 "=" @keyword.operator.assignment._LANG_
 (non_null_expression "!" @keyword.operator.non-null._LANG_)
-(unary_expression"!" @keyword.operator.unary._LANG_)
+(unary_expression "!" @keyword.operator.unary._LANG_)
 
 [
+  "&&="
+  "||="
+  "??="
   "+="
   "-="
   "*="
+  "**="
   "/="
   "%="
+  "^="
+  "&="
+  "|="
   "<<="
   ">>="
   ">>>="
-  "&="
-  "^="
-  "|="
-  "??="
-  "||="
 ] @keyword.operator.assignment.compound._LANG_
 
 (binary_expression
-  ["+" "-" "*" "/" "%"] @keyword.operator.arithmetic._LANG_)
+  ["/" "+" "-" "*" "**" "%"] @keyword.operator.arithmetic._LANG_)
+
+(unary_expression ["+" "-" "void"] @keyword.operator.unary._LANG_)
 
 (binary_expression
   [
@@ -804,14 +873,13 @@
     "==="
     "!="
     "!=="
-    ">="
-    "<="
-    ">"
-    "<"
   ] @keyword.operator.comparison._LANG_
 )
 
 ["++" "--"] @keyword.operator.increment._LANG_
+
+(binary_expression
+  [">=" "<=" ">" "<"] @keyword.operator.relational._LANG_)
 
 [
   "&&"
@@ -840,6 +908,20 @@
 "." @keyword.operator.accessor._LANG_
 "?." @keyword.operator.accessor.optional-chaining._LANG_
 
+; Optional chaining is illegal…
+
+; …on the left-hand side of an assignment.
+(assignment_expression
+  left: (_) @_IGNORE_
+    (#set! prohibitsOptionalChaining true))
+
+; …within a `new` expression.
+(new_expression
+  constructor: (_) @_IGNORE_
+    (#set! prohibitsOptionalChaining true))
+
+((optional_chain) @invalid.illegal.optional-chain._LANG_
+  (#is? test.descendantOfNodeWithData prohibitsOptionalChaining))
 
 (ternary_expression
   ["?" ":"] @keyword.operator.ternary._LANG_
@@ -898,6 +980,10 @@
 
 ; All other sorts of blocks.
 (statement_block) @meta.block._LANG_
+
+; The entirety of a type annotation, no matter how simple or complex (e.g.,
+; `Event`, `foo.Event`, `foo.bar.Event, foo.Event<MethodDispatcherFactory>`).
+(type_annotation (_) @meta.type.annotation._LANG_)
 
 ; The inside of a parameter definition list.
 ((formal_parameters) @meta.parameters._LANG_

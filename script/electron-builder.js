@@ -176,6 +176,7 @@ let options = {
         "to": "pulsar.svg"
       },
     ],
+    "executableArgs": ['--no-sandbox'],
   },
   "mac": {
     "icon": icnsIcon,

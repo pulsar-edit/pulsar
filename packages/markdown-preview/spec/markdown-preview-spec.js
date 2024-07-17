@@ -41,6 +41,13 @@ describe('Markdown Preview', function () {
           .getActiveItem())
     )
 
+    waitsFor(
+      'preview to finish loading',
+      () => {
+        return !preview.element.classList.contains('loading')
+      }
+    )
+
     runs(() => {
       expect(preview).toBeInstanceOf(MarkdownPreviewView)
       expect(preview.getPath()).toBe(
@@ -722,7 +729,7 @@ world\
       expectPreviewInSplitPane()
 
       runs(() =>
-        expect(preview.element.getAttribute('data-use-github-style')).toBe('')
+        expect(preview.element.getAttribute('data-use-github-style')).toBe('auto')
       )
     })
 

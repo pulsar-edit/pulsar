@@ -24,7 +24,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ ubuntu-latest, macos-12, windows-latest ]
         include:
           - os: ubuntu-latest
             image: "debian:10"
@@ -40,10 +40,10 @@ jobs:
       run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd
 
     - name: Checkout the latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -52,7 +52,7 @@ jobs:
       # which won't work in a Debian 10 Docker image.
       # Get Python from apt repos instead on Linux.
       if: ${{ runner.os != 'Linux' }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
@@ -101,7 +101,7 @@ jobs:
       run: npx node-gyp install ${{ env.NODE_VERSION }}
 
     - name: Install Pulsar Dependencies
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -110,7 +110,7 @@ jobs:
         on_retry_command: rm -R node_modules
 
     - name: Build Pulsar
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -121,7 +121,7 @@ jobs:
 
     - name: Cache Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         path: |
           node_modules
@@ -140,7 +140,7 @@ jobs:
         APPLEID: ${{ secrets.APPLEID }}
         APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
         TEAM_ID: ${{ secrets.TEAM_ID }}
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
         timeout_minutes: 45
         max_attempts: 3
@@ -149,7 +149,7 @@ jobs:
 
     - name: Build Pulsar Binaries (macOS) (Unsigned)
       if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
         timeout_minutes: 45
         max_attempts: 3
@@ -158,7 +158,7 @@ jobs:
 
     - name: Build Pulsar Binaries
       if: ${{ runner.os != 'macOS' }}
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -179,13 +179,13 @@ jobs:
 
     - name: Cache Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         path: ./binaries
         key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
 
     - name: Upload Binary Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }} Binaries
         path: ./binaries/*
@@ -219,7 +219,7 @@ jobs:
     - name: Upload Video Artifacts
       # Run whether this job passed or failed, unless explicitly cancelled.
       if: ${{ !cancelled() && runner.os != 'Linux' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }} Videos
         path: ./tests/videos/**
@@ -235,23 +235,23 @@ jobs:
 
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
 
     - name: Restore Cached Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ./binaries
         key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
 
     - name: Restore Cached Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: |
           node_modules
@@ -285,7 +285,7 @@ jobs:
     - name: Upload Video Artifacts - Linux
       # Run whether this job passed or failed, unless explicitly cancelled.
       if: ${{ !cancelled() && runner.os == 'Linux' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }} Videos
         path: ./tests/videos/**

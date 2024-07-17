@@ -515,6 +515,32 @@
 "[" @punctuation.definition.begin.array.bracket.square.ruby
 "]" @punctuation.definition.end.array.bracket.square.ruby
 
+; Some array delimiters don't use the correct anonymous nodes, so we have to test their content.
+;
+; Handle `%w[` and `%i[`.
+(["%w(" "%i("] @punctuation.definition.begin.array.bracket.square.ruby
+  (#match? @punctuation.definition.begin.array.bracket.square.ruby "%[a-z]\\["))
+
+; Handle `%w(` and `%i(`.
+(["%w(" "%i("] @punctuation.definition.begin.array.bracket.round.ruby
+  (#match? @punctuation.definition.begin.array.bracket.round.ruby "^%[a-z]\\("))
+
+; Handle ending delimiter of `%w(`.
+((string_array ")" @punctuation.definition.end.array.bracket.round.ruby)
+  (#eq? @punctuation.definition.end.array.bracket.round.ruby ")"))
+
+; Handle ending delimiter of `%i(`.
+((symbol_array ")" @punctuation.definition.end.array.bracket.round.ruby)
+  (#eq? @punctuation.definition.end.array.bracket.round.ruby ")"))
+
+; Any character can be used as the delimiter for a special percent-something! For the rest we can define catch-alls.
+(["%w(" "%i("] @punctuation.definition.begin.array.ruby
+  (#set! capture.shy true))
+((string_array ")" @punctuation.definition.end.array.ruby)
+  (#set! capture.shy true))
+((symbol_array ")" @punctuation.definition.end.array.ruby)
+  (#set! capture.shy true))
+
 (parenthesized_statements
  "(" @punctuation.definition.expression.begin.bracket.round.ruby
  ")" @punctuation.definition.expression.end.bracket.round.ruby)

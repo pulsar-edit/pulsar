@@ -228,7 +228,9 @@ export interface SymbolProvider {
   //
   // This method receives the same metadata bundle that will be present in the
   // subsequent call to `getSymbols`. The provider can inspect this metadata
-  // and decide whether it can fulfill the given symbols request.
+  // and decide whether it can fulfill the given symbols request. It _should
+  // not_ start the task of gathering symbols; the point of this method is to
+  // determine which provider is best for the task without starting the work.
   //
   // Examples:
   //
@@ -239,10 +241,16 @@ export interface SymbolProvider {
   //   the current unsaved contents of buffers, could return a slightly lower
   //   score if asked to complete symbols for a file that has been modified.
   //   This would indicate that it’d be a slightly worse than usual candidate.
+  // * If my provider can do project-wide symbol search but _can't_ do a
+  //   go-to-definition lookup, it can still serve as a fallback provider when
+  //   `type` is `project-find`. But it should return a lower score to reflect
+  //   that it's not the ideal choice.
   //
   // Since language server providers will have to ask their servers about
   // capabilities, this method can go async, though it’s strongly suggested to
-  // keep it synchronous if possible.
+  // keep it synchronous if possible. (The `timeoutMs` argument isn't yet
+  // enforced on `canProvideSymbols`, but we reserve the right to start
+  // enforcing it at any point without a bump in the service's version number.)
   //
   // To avoid a number war, any numeric value greater than `1` returned from
   // `canProvideSymbols` will be clamped to `1`. The user can break ties by
@@ -262,13 +270,40 @@ export interface SymbolProvider {
   //
   // This method can go async if needed. Whenever it performs an async task, it
   // should check `meta.signal` afterward to see if it should cancel.
+  //
+  // The `type` property of `meta` affects which symbols this method should
+  // return:
+  //
+  // * If `type` is `file`, this method should return a full list of symbols
+  //   for the current file.
+  //
+  // * If `type` is `project`, this method should return an _appropriate_ list
+  //   of symbols for the project. The ideal approach would be to return only
+  //   those results that match `meta.query`; you may choose not to return any
+  //   symbols at all until `meta.query` is of a minimum length. But you may
+  //   also return a full list of project symbols and rely on `symbols-view` to
+  //   do all of the filtering as the user types. (In the latter case,
+  //   `getSymbols` will still be called after each new keystroke; a future
+  //   version of this service may offer a way to control that behavior.)
+  //
+  //   If you return an empty list when `meta.query` is too short, you should
+  //   use `listController` to set a message in the UI so that users understand
+  //   why.
+  //
+  // * If `type` is `project-find`, the user is trying to find where
+  //   `meta.query` is defined (a go-to-definition request). If this provider
+  //   knows how to do that, it should find the answer and return it as the
+  //   _only_ symbol in the returned list. If it doesn't, it is allowed to
+  //   treat this similarly to a project-wide symbol search and return more
+  //   than one result.
+  //
   getSymbols(meta: FileSymbolMeta, listController?: ListController): MaybePromise<FileSymbol[] | null>
   getSymbols(meta: ProjectSymbolMeta, listController?: ListController): MaybePromise<ProjectSymbol[] | null>
 }
 
 export type SymbolProviderMainModule = {
   activate(): void,
-  deacivate(): void,
+  deactivate(): void,
 
   // No business logic should go in here. If a package wants to provide symbols
   // only under certain circumstances, it should decide those circumstances on

@@ -196,6 +196,11 @@ class ScopeResolver {
       ('highlight.invalidateOnChange' in capture.setProperties);
   }
 
+  shouldInvalidateFoldOnChange(capture) {
+    return capture.setProperties &&
+      ('fold.invalidateOnChange' in capture.setProperties);
+  }
+
   // We want to index scope data on buffer position, but each `Point` (or
   // ad-hoc point object) is a different object. We could normalize them to a
   // string and use the string as the map key, but we'd have to convert them
@@ -736,6 +741,20 @@ ScopeResolver.TESTS = {
       current = current.parent;
       if (multiple && target.includes(current.type)) { return true; }
       else if (!multiple && target === current.type) { return true; }
+    }
+    return false;
+  },
+
+  // Passes if there's an ancestor, but fails if the ancestor type matches
+  // the second,third,etc argument
+  ancestorTypeNearerThan(node, types) {
+    let [target, ...rejected] = types.split(/\s+/);
+    rejected = new Set(rejected)
+    let current = node;
+    while (current.parent) {
+      current = current.parent;
+      if (rejected.has(current.type)) { return false; }
+      if (target === current.type) { return true; }
     }
     return false;
   },

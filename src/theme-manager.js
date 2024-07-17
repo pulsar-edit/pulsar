@@ -6,6 +6,7 @@ const { Emitter, CompositeDisposable } = require('event-kit');
 const { File } = require('pathwatcher');
 const fs = require('fs-plus');
 const LessCompileCache = require('./less-compile-cache');
+const Color = require('./color');
 
 // Extended: Handles loading and activating available themes.
 //
@@ -16,8 +17,10 @@ module.exports = class ThemeManager {
     config,
     styleManager,
     notificationManager,
-    viewRegistry
+    viewRegistry,
+    applicationDelegate
   }) {
+    this.applicationDelegate = applicationDelegate;
     this.packageManager = packageManager;
     this.config = config;
     this.styleManager = styleManager;
@@ -372,6 +375,20 @@ On linux there are currently problems with watch sizes. See
     return this.styleSheetDisposablesBySourcePath[path];
   }
 
+  refreshWindowTheme() {
+    let bgColor = Color.parse(getComputedStyle(document.documentElement).backgroundColor);
+
+    let luminosity = 0.2126 * bgColor.red + 0.7152 * bgColor.green + 0.0722 * bgColor.blue;
+    // ^^ Luminosity per ITU-R BT.709
+    if (luminosity < 40) {
+      // Considered Dark
+      this.applicationDelegate.setWindowTheme("dark");
+    } else {
+      // Considered Bright
+      this.applicationDelegate.setWindowTheme("light");
+    }
+  }
+
   activateThemes() {
     return new Promise(resolve => {
       // @config.observe runs the callback once, then on subsequent changes.
@@ -396,6 +413,9 @@ On linux there are currently problems with watch sizes. See
             this.refreshLessCache(); // Update cache again now that @getActiveThemes() is populated
             this.loadUserStylesheet();
             this.reloadBaseStylesheets();
+            if (this.config.get("editor.syncWindowThemeWithPulsarTheme")) {
+              this.refreshWindowTheme();
+            }
             this.initialLoadComplete = true;
             this.emitter.emit('did-change-active-themes');
             resolve();
