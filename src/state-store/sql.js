@@ -1,6 +1,6 @@
 'use strict';
 
-const sqlite3 = require('sqlite3').verbose();
+const sqlite3 = require('better-sqlite3');
 const path = require('path');
 
 module.exports = class SQLStateStore {
@@ -12,7 +12,7 @@ module.exports = class SQLStateStore {
       const dbPath = path.join(atom.getConfigDirPath(), 'session-store.db');
       let db;
       try {
-        db = new sqlite3.Database(dbPath);
+        db = sqlite3(dbPath);
       } catch(error) {
         atom.notifications.addFatalError('Error loading database', {
           stack: new Error('Error loading SQLite database for state storage').stack,
@@ -21,10 +21,11 @@ module.exports = class SQLStateStore {
         console.error('Error loading SQLite database', error);
         return null
       }
-      await getOne(db,
+      db.pragma('journal_mode = WAL');
+      db.exec(
         `CREATE TABLE IF NOT EXISTS ${this.tableName} (key VARCHAR, value JSON)`
       );
-      await getOne(db,
+      db.exec(
         `CREATE UNIQUE INDEX IF NOT EXISTS "${table}_index" ON ${this.tableName}(key)`
       );
       return db;
@@ -44,7 +45,7 @@ module.exports = class SQLStateStore {
   save(key, value) {
     return this.dbPromise.then(db => {
       if(!db) return null;
-      return getOne(db,
+      return exec(db,
         `REPLACE INTO ${this.tableName} VALUES (?, ?)`,
         key,
         JSON.stringify({ value: value, storedAt: new Date().toString() })
@@ -67,13 +68,13 @@ module.exports = class SQLStateStore {
 
   delete(key) {
     return this.dbPromise.then(db =>
-      getOne(db, `DELETE FROM ${this.tableName} WHERE key = ?`, key )
+      exec(db, `DELETE FROM ${this.tableName} WHERE key = ?`, key )
     );
   }
 
   clear() {
     return this.dbPromise.then(db =>
-      getOne(db, `DELETE FROM ${this.tableName}`)
+      exec(db, `DELETE FROM ${this.tableName}`)
     );
   }
 
@@ -86,15 +87,13 @@ module.exports = class SQLStateStore {
 };
 
 function getOne(db, sql, ...params) {
-  return new Promise((resolve, reject) => {
-    db.get(sql, ...params, (error, result) => {
-      if(error) {
-        reject(error);
-      } else {
-        resolve(result);
-      }
-    });
-  });
+  const stmt = db.prepare(sql);
+  return stmt.get(params)
+}
+
+function exec(db, sql, ...params) {
+  const stmt = db.prepare(sql);
+  stmt.run(params)
 }
 
 function awaitForAtomGlobal() {
