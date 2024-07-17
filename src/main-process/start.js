@@ -131,8 +131,10 @@ async function ppmCommand(ppmArgs) {
     let child = cp.spawn(
       ppmPath,
       ppmArgs,
-      { stdio: 'inherit', encoding: 'utf-8' }
+      { stdio: 'pipe' }
     );
+    child.stdout.pipe(process.stdout);
+    child.stderr.pipe(process.stderr);
     child.on('close', resolve);
   });
 }

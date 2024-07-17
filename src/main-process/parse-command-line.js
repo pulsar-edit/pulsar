@@ -11,8 +11,8 @@ module.exports = function parseCommandLine(processArgs) {
   const filteredArgs = processArgs.filter(arg => !arg.startsWith('-psn_'));
 
   // Disable the yargs behavior that exits early if `--help` or `--version` is
-  // detected. This prevents `pulsar -p --version` from working properly. We'll
-  // handle `--version` and `--help` manually.
+  // detected, since it prevents `pulsar -p --version` from working properly.
+  // We'll handle `--version` and `--help` manually.
   const options = yargs(filteredArgs)
     .exitProcess(false)
     .wrap(yargs.terminalWidth());
