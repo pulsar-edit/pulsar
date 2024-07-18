@@ -1005,7 +1005,6 @@ class WASMTreeSitterLanguageMode {
     let layers = this.getAllLanguageLayers();
     for (let layer of layers) {
       let folds = layer.foldResolver.getAllFoldRanges();
-
       for (let fold of folds) {
         rangeTree = rangeTree.insert(fold.start, { start: fold });
         rangeTree = rangeTree.insert(fold.end, { end: fold });
@@ -2284,8 +2283,14 @@ class FoldResolver {
     let end = Point.fromObject({ row: row + 1, column: 0 });
 
     let tree = this.layer.getOrParseTree({ force: false });
+    // Search for folds that begin somewhere on the given row.
     let iterator = this.getOrCreateBoundariesIterator(tree.rootNode, start, end);
 
+    // More than one fold can match for a given row, so we'll stop as soon as
+    // we find the fold that starts earliest on the row. (The fold itself will
+    // be “resolved” in such a way that it doesn't begin until the end of the
+    // row, but we still consider the intrinsic range of the fold capture when
+    // deciding which one to honor.)
     while (iterator.key) {
       if (comparePoints(iterator.key.position, end) >= 0) { break; }
       let capture = iterator.value;
@@ -2308,22 +2313,42 @@ class FoldResolver {
   }
 
   // Returns all valid fold ranges in this language layer.
+  //
+  // There are two rules about folds that we can't change:
+  //
+  // 1. A fold must collapse at least one line’s worth of content.
+  // 2. The UI for expanding and collapsing folds envisions that each line can
+  //    manage a maximum of _one_ fold.
+  //
+  // Hence a fold range is “valid” when it
+  // * resolves to a range that spans more than one line;
+  // * starts on a line that hasn't already been promised to an earlier fold.
   getAllFoldRanges() {
     if (!this.layer.tree || !this.layer.foldsQuery) { return []; }
     let range = this.layer.getExtent();
+    // We use a Tree-sitter query to find folds; then we arrange the folds in
+    // buffer order. The first valid fold we find on a given line is included
+    // in the list; any other folds on the line are ignored.
     let iterator = this.getOrCreateBoundariesIterator(
       this.layer.tree.rootNode, range.start, range.end);
 
     let results = [];
+    let lastValidFoldRange = null;
     while (iterator.key) {
       let capture = iterator.value;
       let { name } = capture;
+      let range;
       if (name === 'fold') {
-        let range = this.resolveRangeForSimpleFold(capture);
-        if (this.isValidFold(range)) { results.push(range); }
+        range = this.resolveRangeForSimpleFold(capture);
       } else if (name === 'fold.start') {
-        let range = this.resolveRangeForDividedFold(capture);
-        if (this.isValidFold(range)) { results.push(range); }
+        range = this.resolveRangeForDividedFold(capture);
+      }
+      if (this.isValidFold(range)) {
+        // Recognize only the first fold for each row.
+        if (lastValidFoldRange?.start?.row !== range.start.row) {
+          results.push(range);
+          lastValidFoldRange = range;
+        }
       }
       iterator.next();
     }

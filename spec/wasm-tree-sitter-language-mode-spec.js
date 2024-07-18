@@ -2208,6 +2208,101 @@ describe('WASMTreeSitterLanguageMode', () => {
       `);
     });
 
+    it('does not enumerate redundant folds', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      await grammar.setQueryForTest('foldsQuery', `
+        (statement_block) @fold
+        (object) @fold
+      `);
+
+      // This odd way of formatting code produces a scenario where two folds
+      // would start on the same line. The second of the two folds would never
+      // be seen when toggling the fold on that line, so we shouldn't treat it
+      // as a valid fold for any other purpose.
+      buffer.setText(dedent`
+        if (foo) {results.push({
+          bar: 'baz'
+        })}
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      let ranges = languageMode.getFoldableRanges();
+      expect(ranges.length).toBe(1);
+    })
+
+    it('is not flummoxed by redundant folds when performing foldAllAtIndentLevel', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      await grammar.setQueryForTest('foldsQuery', `
+        (statement_block) @fold
+        (object) @fold
+      `);
+
+      buffer.setText(dedent`
+        function foo() {
+          if (true) {
+            if (foo) {results.push({
+              bar: 'baz'
+            })}
+          }
+        }
+
+        function bar() {
+          if (false) {
+            // TODO
+          }
+        }
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      editor.foldAllAtIndentLevel(1);
+      expect(getDisplayText(editor)).toBe(dedent`
+        function foo() {
+          if (true) {…}
+        }
+
+        function bar() {
+          if (false) {…}
+        }
+      `);
+
+      buffer.setText(dedent`
+        function foo() {
+          if (true) {
+            if (foo) {
+            results.push({
+              bar: 'baz'
+            })}
+          }
+        }
+
+        function bar() {
+          if (false) {
+            // TODO
+          }
+        }
+      `);
+      await languageMode.atTransactionEnd();
+
+      editor.foldAllAtIndentLevel(1);
+      expect(getDisplayText(editor)).toBe(dedent`
+        function foo() {
+          if (true) {…}
+        }
+
+        function bar() {
+          if (false) {…}
+        }
+      `);
+    })
+
     it('can target named vs anonymous nodes as fold boundaries', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, rubyGrammarPath, rubyConfig);
 
