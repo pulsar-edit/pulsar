@@ -356,18 +356,25 @@ module.exports = class Cursor extends Model {
     this.goalColumn = column;
   }
 
-  // Public: Moves the cursor to the beginning of the line.
+  // Public: Moves the cursor to the beginning of the screen line.
   moveToBeginningOfScreenLine() {
     this.setScreenPosition([this.getScreenRow(), 0]);
   }
 
   // Public: Moves the cursor to the beginning of the buffer line.
+  //
+  // Deprecated; prefer {::moveToBeginningOfBufferLine}.
   moveToBeginningOfLine() {
+    this.moveToBeginningOfBufferLine();
+  }
+
+  // Public: Moves the cursor to the beginning of the buffer line.
+  moveToBeginningOfBufferLine() {
     this.setBufferPosition([this.getBufferRow(), 0]);
   }
 
-  // Public: Moves the cursor to the beginning of the first character in the
-  // line.
+  // Public: Moves the cursor to the beginning of the first non-whitespace
+  // character in the screen line.
   moveToFirstCharacterOfLine() {
     let targetBufferColumn;
     const screenRow = this.getScreenRow();
@@ -405,13 +412,20 @@ module.exports = class Cursor extends Model {
     ]);
   }
 
-  // Public: Moves the cursor to the end of the line.
+  // Public: Moves the cursor to the end of the screen line.
   moveToEndOfScreenLine() {
     this.setScreenPosition([this.getScreenRow(), Infinity]);
   }
 
   // Public: Moves the cursor to the end of the buffer line.
+  //
+  // Deprecated; prefer {::moveToEndOfBufferLine}.
   moveToEndOfLine() {
+    this.moveToEndOfBufferLine();
+  }
+
+  // Public: Moves the cursor to the end of the buffer line.
+  moveToEndOfBufferLine() {
     this.setBufferPosition([this.getBufferRow(), Infinity]);
   }
 
