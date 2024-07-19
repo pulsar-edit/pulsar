@@ -764,7 +764,12 @@ describe('AtomEnvironment', () => {
           expect(atom.notifications.addWarning).toHaveBeenCalledWith(
             'Unable to open project folders',
             {
-              description: `The directories \`${nonExistent}\` and \`${existingFile}\` do not exist.`
+              description: `The directories \`${nonExistent}\` and \`${existingFile}\` do not exist.`,
+              dismissable: true,
+              buttons: [
+                { text: 'Remove all', onDidClick: jasmine.any(Function) },
+                { text: 'Skip for now', onDidClick: jasmine.any(Function) }
+              ]
             }
           );
         });
