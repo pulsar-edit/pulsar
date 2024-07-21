@@ -4,7 +4,6 @@ const temp = require('temp');
 const parseCommandLine = require('./parse-command-line');
 const { getReleaseChannel, getConfigFilePath } = require('../get-app-details.js');
 const atomPaths = require('../atom-paths');
-const fs = require('fs');
 const CSON = require('season');
 const Config = require('../config');
 const StartupTime = require('../startup-time');
