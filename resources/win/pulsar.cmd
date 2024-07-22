@@ -52,7 +52,6 @@ if "%PACKAGE_MODE%"=="YES" (
   goto :trim_args_for_package_mode
 
 :package_mode_return
-  REM echo "shelling out to ppm with args" "%PACKAGE_MODE_ARGS%"
   "%~dp0\app\ppm\bin\ppm.cmd" %PACKAGE_MODE_ARGS%
   exit 0
 )
