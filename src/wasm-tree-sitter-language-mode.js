@@ -1605,6 +1605,8 @@ class WASMTreeSitterLanguageMode {
     indentDelta -= clamp(dedentNextDelta, 0, 1);
 
     let dedentDelta = 0;
+    let line = this.buffer.lineForRow(row);
+    let rowStartingColumn = Math.max(line.search(/\S/), 0);
 
     if (!options.skipDedentCheck) {
       scopeResolver.reset();
@@ -1613,7 +1615,11 @@ class WASMTreeSitterLanguageMode {
       // starting indent is on the current line. But it might not extend to the
       // current line, so we should determine which layer is in charge of the
       // second phase.
-      let rowStart = new Point(row, 0);
+      //
+      // The comparison point we use is that of the first character on the
+      // line. If we start earlier than that, we might not pick up on the
+      // presence of an injection layer.
+      let rowStart = new Point(row, rowStartingColumn);
       let dedentControllingLayer = this.controllingLayerAtPoint(
         rowStart,
         (layer) => {
@@ -1885,8 +1891,11 @@ class WASMTreeSitterLanguageMode {
     // By the time this function runs, we probably know enough to be sure of
     // which layer controls the beginning of this row, even if we don't know
     // which one owns the position at the cursor.
+    //
+    // Use the position of the first text on the line as the reference point.
+    let rowStartingColumn = Math.max(line.search(/\S/), 0);
     let controllingLayer = this.controllingLayerAtPoint(
-      new Point(row, 0),
+      new Point(row, rowStartingColumn),
       (layer) => !!layer.indentsQuery
     );
 

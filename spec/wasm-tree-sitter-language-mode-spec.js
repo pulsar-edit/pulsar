@@ -1750,6 +1750,53 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(Array.from(map.values())).toEqual([0, 1, 1, 2, 1, 0]);
     });
+
+    it('works correctly when straddling an injection boundary, even in the presence of whitespace', async () => {
+      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
+
+      const htmlGrammar = new WASMTreeSitterGrammar(
+        atom.grammars,
+        htmlGrammarPath,
+        htmlConfig
+      );
+
+      htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
+
+      atom.grammars.addGrammar(jsGrammar);
+      atom.grammars.addGrammar(htmlGrammar);
+
+      // This is just like the test above, except that we're indented a bit.
+      // Now the edge of the injection isn't at the beginning of the line; it's
+      // at the beginning of the first _text_ on the line.
+      buffer.setText(dedent`
+        <html>
+          <head>
+            <script>
+              let foo;
+              if (foo) {
+                debug(true);
+              }
+            </script>
+          </head>
+        </html>
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({
+        grammar: htmlGrammar,
+        buffer,
+        config: atom.config,
+        grammars: atom.grammars
+      });
+
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      let map = languageMode.suggestedIndentForBufferRows(0, 9, editor.getTabLength());
+
+      expect(Array.from(map.values())).toEqual([0, 1, 2, 3, 3, 4, 3, 2, 1, 0]);
+    })
   });
 
   describe('folding', () => {
