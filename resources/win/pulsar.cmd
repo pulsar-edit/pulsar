@@ -75,9 +75,10 @@ REM First we trim any arguments that appear previous to `-p` or `--package` on
 REM the line.
 :trim_args_for_package_mode
 if not "%1"=="--package" (
-  if not "%1" == "-p" (
-REM Roughly the same as `ARGV.shift`. Everything except the initial argument
-REM moves forward, and the second argument is removed from the list.
+  if not "%1"=="-p" (
+    REM Roughly the same as `ARGV.shift`. Everything except the initial
+    REM argument moves forward, and the second argument is removed from the
+    REM list.
     SHIFT /1
     goto :trim_args_for_package_mode
   )
@@ -92,7 +93,7 @@ REM shifting we did above affected %*, that'd be perfect. But since it doesn't,
 REM we'll loop through the remaining arguments and concatenate them into a
 REM variable.
 if not "%1"=="" (
-  SET PACKAGE_MODE_ARGS=%PACKAGE_MODE_ARGS%%1%
+  SET PACKAGE_MODE_ARGS=%PACKAGE_MODE_ARGS% %1%
   SHIFT /1
   goto :build_args_for_package_mode
 )
