@@ -22,7 +22,7 @@ if [ "$(uname)" == 'Darwin' ]; then
 elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
   OS='Linux'
 else
-  echo "Your platform ($(uname -a)) is not supported."
+  echoerr "Your platform ($(uname -a)) is not supported."
   exit 1
 fi
 
@@ -99,46 +99,52 @@ if [ $OS == 'Mac' ]; then
   else
     SCRIPT="$0"
   fi
-
   ATOM_APP="$(dirname "$(dirname "$(dirname "$SCRIPT")")")"
 
-  if [ "$ATOM_APP" == . ]; then
+  # If this is a `pulsar.sh` from a built version of Pulsar, then `$ATOM_APP`
+  # should now be the path to the user's instance of Pulsar.app.
+  if [[ "$ATOM_APP" == . || "$ATOM_APP" != *".app" ]]; then
+    # This is a `pulsar.sh` that's in the source code of Pulsar or has been
+    # copied to a location outside of the app (instead of symlinked). We'll try
+    # another tactic.
     unset ATOM_APP
   else
+    # We found the location of the Pulsar.app that this script lives in.
     PULSAR_PATH="$(dirname "$ATOM_APP")"
     ATOM_APP_NAME="$(basename "$ATOM_APP")"
   fi
 
-  if [ -n "${ATOM_APP_NAME}" ]; then
-    # If ATOM_APP_NAME is known, use it as the executable name
-    ATOM_EXECUTABLE_NAME="${ATOM_APP_NAME%.*}"
-  else
-    # Else choose it from the inferred channel name
-    ATOM_EXECUTABLE_NAME="Pulsar"
-  fi
+  # Fall back to the default Pulsar.app as the app name.
+  ATOM_APP_NAME=${ATOM_APP_NAME:-Pulsar.app}
+  # The executable name will be the same thing but without the `.app` suffix.
+  ATOM_EXECUTABLE_NAME="${ATOM_APP_NAME%.*}"
 
   if [ -z "${PULSAR_PATH}" ]; then
-    # If PULSAR_PATH isn't set, check /Applications and then ~/Applications for Pulsar.app
-    if [ -x "/Applications/$ATOM_APP_NAME" ]; then
+    # If PULSAR_PATH isn't set, check /Applications and then ~/Applications for
+    # Pulsar.app.
+    if [ -x "/Applications/${ATOM_APP_NAME}" ]; then
       PULSAR_PATH="/Applications"
-    elif [ -x "$HOME/Applications/$ATOM_APP_NAME" ]; then
+    elif [ -x "$HOME/Applications/${ATOM_APP_NAME}" ]; then
       PULSAR_PATH="$HOME/Applications"
     else
-      # We still haven't found a Pulsar.app; use Spotlight to Search for Pulsar.
+      # We still haven't found a Pulsar.app. Let's try searching for it via
+      # Spotlight.
       PULSAR_APP_SEARCH_RESULT="$(mdfind "kMDItemCFBundleIdentifier == 'dev.pulsar-edit.pulsar'" | grep -v ShipIt | head -1)"
-      PULSAR_PATH="$(dirname "$PULSAR_APP_SEARCH_RESULT")"
-      ATOM_APP_NAME="$(basename "$PULSAR_APP_SEARCH_RESULT")"
-
-      # Exit if Pulsar can't be found.
-      if [ ! -x "$PULSAR_PATH/${ATOM_APP_NAME:-Pulsar.app}" ]; then
-        echoerr "Cannot locate ${ATOM_APP_NAME:-Pulsar.app}; it is usually located in /Applications. Set the PULSAR_PATH environment variable to the directory containing ${ATOM_APP_NAME:-Pulsar.app}."
-        exit 1
+      if [ ! -z "$PULSAR_APP_SEARCH_RESULT" ]; then
+        PULSAR_PATH="$(dirname "$PULSAR_APP_SEARCH_RESULT")"
+        ATOM_APP_NAME="$(basename "$PULSAR_APP_SEARCH_RESULT")"
       fi
     fi
   fi
 
   PULSAR_EXECUTABLE="$PULSAR_PATH/$ATOM_APP_NAME/Contents/MacOS/$ATOM_EXECUTABLE_NAME"
   PPM_EXECUTABLE="$PULSAR_PATH/$ATOM_APP_NAME/Contents/Resources/app/ppm/bin/ppm"
+
+  # Exit if Pulsar can't be found.
+  if [ ! -x "${PULSAR_EXECUTABLE}" ]; then
+    echoerr "Cannot locate ${ATOM_APP_NAME}; it is usually located in /Applications. Set the PULSAR_PATH environment variable to the directory containing ${ATOM_APP_NAME}."
+    exit 1
+  fi
 
   # If `-p` or `--package` was specified, call `ppm` with all the arguments
   # that followed it instead of calling the Pulsar executable directly.
@@ -167,44 +173,53 @@ elif [ $OS == 'Linux' ]; then
     SCRIPT="$0"
   fi
 
-  # Attempt to infer the installation directory of Pulsar from the location of
-  # this script.
-  SCRIPT=$(readlink -f "$0")
-  ATOM_APP="$(dirname "$(dirname "$(dirname "$SCRIPT")")")"
-
-  if [ "$ATOM_APP" == . ]; then
-    unset ATOM_APP
-  else
-    PULSAR_PATH="$(dirname "$ATOM_APP")/pulsar"
-  fi
-
   # Set tmpdir only if it's unset.
   : ${TMPDIR:=/tmp}
 
-  if [ -n "$PULSAR_PATH" ]; then
-    if [ -d "/opt/Pulsar/pulsar" ]; then
-      PULSAR_PATH="/opt/Pulsar/pulsar"
-    elif [ -d "$TMPDIR/pulsar-build/Pulsar/pulsar" ]; then
-      PULSAR_PATH="$TMPDIR/pulsar-build/Pulsar/pulsar"
+  ATOM_EXECUTABLE_NAME="pulsar"
+
+  # If `PULSAR_PATH` is set by the user, we'll assume they know what they're
+  # doing. Otherwise we should try to find it ourselves.
+  if [ -z "${PULSAR_PATH}" ]; then
+    # Attempt to infer the installation directory of Pulsar from the location of
+    # this script. When symlinked
+    SCRIPT=$(readlink -f "$0")
+    ATOM_APP="$(dirname "$(dirname "$(dirname "$SCRIPT")")")"
+
+    if [ "$ATOM_APP" == . ]; then
+      unset ATOM_APP
     else
-      : "${ATOM_APP_NAME:=Pulsar}"
-      echoerr "Cannot locate Pulsar. Set the PULSAR_PATH environment variable to the directory containing the \`pulsar\` executable."
-      exit 1
+      PULSAR_PATH="$(dirname "$ATOM_APP")"
+    fi
+
+    if [ -z "${PULSAR_PATH}" ]; then
+      if [ -d "/opt/Pulsar/pulsar" ]; then
+        # Check the default installation directory for RPM and DEB
+        # distributions.
+        PULSAR_PATH="/opt/Pulsar"
+      elif [ -d "$TMPDIR/pulsar-build/Pulsar/pulsar" ]; then
+        # This is where Pulsar can be found during some CI build tasks.
+        PULSAR_PATH="$TMPDIR/pulsar-build/Pulsar"
+      else
+        echoerr "Cannot locate Pulsar. Set the PULSAR_PATH environment variable to the directory containing the \`pulsar\` executable."
+        exit 1
+      fi
     fi
   fi
 
-  PPM_PATH="$(dirname "$PULSAR_PATH")/resources/app/ppm/bin/ppm"
+  PULSAR_EXECUTABLE="$PULSAR_PATH/$ATOM_EXECUTABLE"
+  PPM_EXECUTABLE="$(dirname "$PULSAR_PATH")/resources/app/ppm/bin/ppm"
 
   # If `-p` or `--package` was specified, call `ppm` with all the arguments
   # that followed it instead of calling the Pulsar executable directly.
   if [ $PACKAGE_MODE ]; then
     shift_args_for_package_mode
-    "$PPM_PATH" "$@"
+    "$PPM_EXECUTABLE" "$@"
     exit $?
   fi
 
   if [ $EXPECT_OUTPUT ]; then
-    "$PULSAR_PATH" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox
+    "$PULSAR_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox
     ATOM_EXIT=$?
     if [ ${ATOM_EXIT} -eq 0 ] && [ -n "${EXIT_CODE_OVERRIDE}" ]; then
       exit "${EXIT_CODE_OVERRIDE}"
@@ -213,7 +228,7 @@ elif [ $OS == 'Linux' ]; then
     fi
   else
     (
-    nohup "$PULSAR_PATH" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox > "$ATOM_HOME/nohup.out" 2>&1
+    nohup "$PULSAR_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox > "$ATOM_HOME/nohup.out" 2>&1
     if [ $? -ne 0 ]; then
       cat "$ATOM_HOME/nohup.out"
       exit $?
