@@ -181,15 +181,22 @@ elif [ $OS == 'Linux' ]; then
   # If `PULSAR_PATH` is set by the user, we'll assume they know what they're
   # doing. Otherwise we should try to find it ourselves.
   if [ -z "${PULSAR_PATH}" ]; then
-    # Attempt to infer the installation directory of Pulsar from the location of
-    # this script. When symlinked
-    SCRIPT=$(readlink -f "$0")
-    ATOM_APP="$(dirname "$(dirname "$(dirname "$SCRIPT")")")"
+    # Attempt to infer the installation directory of Pulsar from the location
+    # of this script. When symlinked to a common location like
+    # `/usr/local/bin`, this approach should find the true location of the
+    # Pulsar installation.
+    SCRIPT="$(readlink -f "$0")"
 
-    if [ "$ATOM_APP" == . ]; then
+    # The `pulsar.sh` file lives one directory deeper than the root directory
+    # that contains the `pulsar` binary.
+    ATOM_APP="$(dirname "$(dirname "$SCRIPT")")"
+    PULSAR_PATH="$(realpath "$ATOM_APP")"
+
+    if [ ! -d "$PULSAR_PATH/pulsar" ]; then
+      # If that path doesn't contain a `pulsar` executable, then it's not a
+      # valid path. We'll try something else.
       unset ATOM_APP
-    else
-      PULSAR_PATH="$(dirname "$ATOM_APP")"
+      unset PULSAR_PATH
     fi
 
     if [ -z "${PULSAR_PATH}" ]; then
@@ -207,7 +214,7 @@ elif [ $OS == 'Linux' ]; then
     fi
   fi
 
-  PULSAR_EXECUTABLE="$PULSAR_PATH/$ATOM_EXECUTABLE"
+  PULSAR_EXECUTABLE="$PULSAR_PATH/$ATOM_EXECUTABLE_NAME"
   PPM_EXECUTABLE="$(dirname "$PULSAR_PATH")/resources/app/ppm/bin/ppm"
 
   # If `-p` or `--package` was specified, call `ppm` with all the arguments
