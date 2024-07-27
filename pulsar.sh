@@ -200,11 +200,11 @@ elif [ $OS == 'Linux' ]; then
     fi
 
     if [ -z "${PULSAR_PATH}" ]; then
-      if [ -d "/opt/Pulsar/pulsar" ]; then
+      if [ -f "/opt/Pulsar/pulsar" ]; then
         # Check the default installation directory for RPM and DEB
         # distributions.
         PULSAR_PATH="/opt/Pulsar"
-      elif [ -d "$TMPDIR/pulsar-build/Pulsar/pulsar" ]; then
+      elif [ -f "$TMPDIR/pulsar-build/Pulsar/pulsar" ]; then
         # This is where Pulsar can be found during some CI build tasks.
         PULSAR_PATH="$TMPDIR/pulsar-build/Pulsar"
       else
