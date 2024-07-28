@@ -2,21 +2,6 @@
 
 echoerr() { echo "$@" 1>&2; }
 
-# Given a list of arguments, reduces them to the subset that follow the first
-# occurrence of `-p` or `--package`. These are the arguments that will be
-# passed to `ppm`.
-shift_args_for_package_mode() {
-  loop_done=0
-  while [ $loop_done -eq 0 ]
-  do
-    if [[ "$1" == "-p" || "$1" == "--package" || "$1" == "" ]]; then
-      # We'll shift one last time and then we'll be done.
-      loop_done=1
-    fi
-    shift
-  done
-}
-
 if [ "$(uname)" == 'Darwin' ]; then
   OS='Mac'
 elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]; then
@@ -26,7 +11,8 @@ else
   exit 1
 fi
 
-# Only set the ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT env var if it hasn't been set.
+# Only set the ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT env var if it hasn't
+# been set.
 if [ -z "$ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT" ]
 then
   export ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT=true
@@ -93,6 +79,20 @@ fi
 ATOM_HOME="${ATOM_HOME:-$HOME/.pulsar}"
 mkdir -p "$ATOM_HOME"
 
+if [ $PACKAGE_MODE ]; then
+  # If `-p` or `--package` is present, then we'll be discarding all arguments
+  # prior to (and including) `-p`/`--package` and passing the rest to `ppm`.
+  loop_done=0
+  while [ $loop_done -eq 0 ]
+  do
+    if [[ "$1" == "-p" || "$1" == "--package" || "$1" == "" ]]; then
+      # We'll shift one last time and then we'll be done.
+      loop_done=1
+    fi
+    shift
+  done
+fi
+
 if [ $OS == 'Mac' ]; then
   if [ -L "$0" ]; then
     SCRIPT="$(readlink "$0")"
@@ -149,7 +149,6 @@ if [ $OS == 'Mac' ]; then
   # If `-p` or `--package` was specified, call `ppm` with all the arguments
   # that followed it instead of calling the Pulsar executable directly.
   if [ $PACKAGE_MODE ]; then
-    shift_args_for_package_mode
     "$PPM_EXECUTABLE" "$@"
     exit $?
   fi
@@ -213,12 +212,11 @@ elif [ $OS == 'Linux' ]; then
   fi
 
   PULSAR_EXECUTABLE="$PULSAR_PATH/$ATOM_EXECUTABLE_NAME"
-  PPM_EXECUTABLE="$(dirname "$PULSAR_PATH")/resources/app/ppm/bin/ppm"
+  PPM_EXECUTABLE="$PULSAR_PATH/resources/app/ppm/bin/ppm"
 
   # If `-p` or `--package` was specified, call `ppm` with all the arguments
   # that followed it instead of calling the Pulsar executable directly.
   if [ $PACKAGE_MODE ]; then
-    shift_args_for_package_mode
     "$PPM_EXECUTABLE" "$@"
     exit $?
   fi
