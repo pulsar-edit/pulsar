@@ -17,6 +17,8 @@
 # things. Luckily, AppImage is straightforward enough as a tool that we can
 # do it manually.
 
+set -e
+
 if [[ "${0:x86_64}" == "x86_64" ]]; then
   APPIMAGE_ARCH="x86_64"
 else
@@ -25,12 +27,16 @@ fi
 
 APPIMAGETOOL="appimagetool-${APPIMAGE_ARCH}.AppImage"
 
+echo "Downloading appimagetool…"
 wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/${APPIMAGETOOL}"
-chmod a+x "${APPIMAGETOOL}"
+echo "Making appimagetool executable…"
+chmod +x "${APPIMAGETOOL}"
 
 PULSAR_APPIMAGE="$(ls *.AppImage | xargs)"
-chmod a+x "${PULSAR_APPIMAGE}"
+echo "Making ${PULSAR_APPIMAGE} executable…"
+chmod +x "${PULSAR_APPIMAGE}"
 
+echo "Extracting ${PULSAR_APPIMAGE}…"
 "./$(PULSAR_APPIMAGE)" "--appimage-extract"
 # Will extract to `squashfs-root`. Let's rename it just for sanity.
 mv "squashfs-root" "Pulsar.AppDir"
@@ -38,13 +44,23 @@ mv "${PULSAR_APPIMAGE}" "${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
 
 # Copy the old AppRun to a temporary path.
 cd "Pulsar.AppDir"
+echo "Moving AppRun to AppRun.old…"
 mv AppRun AppRun.old
+rm -f AppRun
 
 # Replace the reference to BIN to point to `pulsar.sh` rather than the `pulsar`
 # executable.
+echo "Making new AppRun…"
 awk '{sub(/BIN=(.*?)/,"BIN=\"$APPDIR/resources/pulsar.sh\""); print}' AppRun.old > AppRun
+echo "Removing AppRun.old…"
 rm -f AppRun.old
 
 # Now that we've made the change, we can bundle everything up with the original
 # file name and it'll just work.
+echo "Rebuilding AppImage at destination: ${PULSAR_APPIMAGE}"
 ARCH="${APPIMAGE_ARCH}" "${APPIMAGETOOL}" "${PULSAR_APPIMAGE}"
+
+echo "Removing old AppImage…"
+rm -f "${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
+
+echo "…done!"
