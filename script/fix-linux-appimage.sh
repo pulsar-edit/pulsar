@@ -37,7 +37,7 @@ echo "Making ${PULSAR_APPIMAGE} executable…"
 chmod +x "${PULSAR_APPIMAGE}"
 
 echo "Extracting ${PULSAR_APPIMAGE}…"
-"./$(PULSAR_APPIMAGE)" "--appimage-extract"
+"./${PULSAR_APPIMAGE}" "--appimage-extract"
 # Will extract to `squashfs-root`. Let's rename it just for sanity.
 mv "squashfs-root" "Pulsar.AppDir"
 mv "${PULSAR_APPIMAGE}" "${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
