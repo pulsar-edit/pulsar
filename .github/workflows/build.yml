@@ -179,11 +179,7 @@ jobs:
 
     - name: Fix AppImage target - Linux
       if: ${{ runner.os == 'Linux' }}
-      with:
-        timeout_minutes: 30
-        max_attempts: 3
-        retry_on: error
-        command: ./script/fix-linux-appimage.sh
+      run: ./script/fix-linux-appimage.sh
 
     - name: Cache Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
