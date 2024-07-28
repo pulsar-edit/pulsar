@@ -28,13 +28,13 @@ fi
 echo "Architecture is: ${APPIMAGE_ARCH}"
 
 APPIMAGETOOL="appimagetool-${APPIMAGE_ARCH}.AppImage"
+PULSAR_APPIMAGE="$(ls *.AppImage | xargs)"
 
 echo "Downloading appimagetool…"
 wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/${APPIMAGETOOL}"
 echo "Making appimagetool executable…"
 chmod +x "${APPIMAGETOOL}"
 
-PULSAR_APPIMAGE="$(ls *.AppImage | xargs)"
 echo "Making ${PULSAR_APPIMAGE} executable…"
 chmod +x "${PULSAR_APPIMAGE}"
 
