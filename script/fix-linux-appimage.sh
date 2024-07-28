@@ -19,11 +19,13 @@
 
 set -e
 
-if [[ "${0:x86_64}" == "x86_64" ]]; then
+if [[ "${1:x86_64}" == "x86_64" ]]; then
   APPIMAGE_ARCH="x86_64"
 else
   APPIMAGE_ARCH="aarch64"
 fi
+
+echo "Architecture is: ${APPIMAGE_ARCH}"
 
 APPIMAGETOOL="appimagetool-${APPIMAGE_ARCH}.AppImage"
 
