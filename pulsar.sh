@@ -167,12 +167,6 @@ if [ $OS == 'Mac' ]; then
   fi
 elif [ $OS == 'Linux' ]; then
 
-  if [ -L "$0" ]; then
-    SCRIPT="$(readlink -f "$0")"
-  else
-    SCRIPT="$0"
-  fi
-
   # Set tmpdir only if it's unset.
   : ${TMPDIR:=/tmp}
 
@@ -185,14 +179,18 @@ elif [ $OS == 'Linux' ]; then
     # of this script. When symlinked to a common location like
     # `/usr/local/bin`, this approach should find the true location of the
     # Pulsar installation.
-    SCRIPT="$(readlink -f "$0")"
+    if [ -L "$0" ]; then
+      SCRIPT="$(readlink -f "$0")"
+    else
+      SCRIPT="$0"
+    fi
 
     # The `pulsar.sh` file lives one directory deeper than the root directory
     # that contains the `pulsar` binary.
     ATOM_APP="$(dirname "$(dirname "$SCRIPT")")"
     PULSAR_PATH="$(realpath "$ATOM_APP")"
 
-    if [ ! -d "$PULSAR_PATH/pulsar" ]; then
+    if [ ! -f "$PULSAR_PATH/pulsar" ]; then
       # If that path doesn't contain a `pulsar` executable, then it's not a
       # valid path. We'll try something else.
       unset ATOM_APP
