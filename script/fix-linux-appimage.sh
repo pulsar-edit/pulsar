@@ -28,13 +28,14 @@ fi
 echo "Architecture is: ${APPIMAGE_ARCH}"
 
 APPIMAGETOOL="appimagetool-${APPIMAGE_ARCH}.AppImage"
-PULSAR_APPIMAGE="$(ls *.AppImage | xargs)"
 
 echo "Downloading appimagetool…"
 wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/${APPIMAGETOOL}"
 echo "Making appimagetool executable…"
 chmod +x "${APPIMAGETOOL}"
 
+cd dist
+PULSAR_APPIMAGE="$(ls *.AppImage | xargs)"
 echo "Making ${PULSAR_APPIMAGE} executable…"
 chmod +x "${PULSAR_APPIMAGE}"
 
@@ -59,8 +60,9 @@ rm -f AppRun.old
 
 # Now that we've made the change, we can bundle everything up with the original
 # file name and it'll just work.
+cd ..
 echo "Rebuilding AppImage at destination: ${PULSAR_APPIMAGE}"
-ARCH="${APPIMAGE_ARCH}" "./${APPIMAGETOOL}" "${PULSAR_APPIMAGE}"
+ARCH="${APPIMAGE_ARCH}" "./${APPIMAGETOOL}" "dist/Pulsar.AppDir" "dist/${PULSAR_APPIMAGE}"
 
 echo "Removing old AppImage…"
 rm -f "${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
