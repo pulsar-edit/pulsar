@@ -60,7 +60,7 @@ rm -f AppRun.old
 # Now that we've made the change, we can bundle everything up with the original
 # file name and it'll just work.
 echo "Rebuilding AppImage at destination: ${PULSAR_APPIMAGE}"
-ARCH="${APPIMAGE_ARCH}" "${APPIMAGETOOL}" "${PULSAR_APPIMAGE}"
+ARCH="${APPIMAGE_ARCH}" "./${APPIMAGETOOL}" "${PULSAR_APPIMAGE}"
 
 echo "Removing old AppImage…"
 rm -f "${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
