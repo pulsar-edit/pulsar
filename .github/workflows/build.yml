@@ -177,6 +177,14 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       run: node ./script/rename.js "Windows"
 
+    - name: Fix AppImage target - Linux
+      if: ${{ runner.os == 'Linux' }}
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: ./script/fix-linux-appimage.sh
+
     - name: Cache Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
       uses: actions/cache/save@v4
