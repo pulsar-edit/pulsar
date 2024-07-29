@@ -48,6 +48,7 @@ rm -f AppRun
 # executable.
 echo "Making new AppRun…"
 awk '{sub(/BIN=(.*?)/,"BIN=\"$APPDIR/resources/pulsar.sh\""); print}' AppRun.old > AppRun
+chmod a+x AppRun
 
 echo "Rewrote BIN to read:"
 cat AppRun | grep "BIN="
@@ -84,6 +85,9 @@ ARCH="${APPIMAGE_ARCH}" ./appimagetool --appimage-extract-and-run "binaries/Puls
 echo "Making binary executable…"
 chmod a+x "binaries/${PULSAR_APPIMAGE}"
 echo "…done building appimage at binaries/${PULSAR_APPIMAGE}."
+
+echo "Removing temporary Pulsar.AppDir…"
+rm -rf "binaries/Pulsar.AppDir"
 
 echo "Removing old AppImage…"
 rm -f "binaries/${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
