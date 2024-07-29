@@ -79,7 +79,7 @@ chmod +x appimagetool
 # Docker can't run AppImage apps natively, but we can use the
 # `--appimage-extract-and-run` option to extract the app to a location on disk
 # instead.
-./appimagetool --appimage-extract-and-run "binaries/Pulsar.AppDir" "binaries/${PULSAR_APPIMAGE}"
+ARCH="${APPIMAGE_ARCH}" ./appimagetool --appimage-extract-and-run "binaries/Pulsar.AppDir" "binaries/${PULSAR_APPIMAGE}"
 
 echo "Making binary executable…"
 chmod a+x "binaries/${PULSAR_APPIMAGE}"
