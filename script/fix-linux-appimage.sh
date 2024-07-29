@@ -61,10 +61,15 @@ cd ../..
 
 echo "Current directory is: $(pwd)"
 
+# echo "Downloading appimagetool…"
+# wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}.AppImage" -o appimagetool
+# echo "Making appimagetool executable…"
+# chmod +x appimagetool
+
 echo "Downloading runtime…"
-wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}.AppImage" -o appimagetool
+wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-${APPIMAGE_ARCH}.AppImage" -o runtime
 echo "Making runtime executable…"
-chmod +x appimagetool
+chmod +x runtime
 
 mksquashfs "binaries/Pulsar.AppDir" "Pulsar.squashfs" -root-owned -noappend
 cat runtime >> "binaries/${PULSAR_APPIMAGE}"
