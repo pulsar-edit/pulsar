@@ -25,9 +25,6 @@ else
   APPIMAGE_ARCH="aarch64"
 fi
 
-# Ensure FUSE is loaded
-modprobe fuse
-
 echo "Architecture is: ${APPIMAGE_ARCH}"
 
 cd dist
