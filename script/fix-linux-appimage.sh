@@ -53,19 +53,22 @@ rm -f AppRun.old
 
 # Now that we've made the change, we can bundle everything up with the original
 # file name and it'll just work.
-cd ..
+cd ../..
 
 echo "Current directory is: $(pwd)"
 
-APPIMAGETOOL="appimagetool-${APPIMAGE_ARCH}.AppImage"
+APPIMAGERUNTIME="runtime-${APPIMAGE_ARCH}"
 
-echo "Downloading appimagetool…"
-wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/${APPIMAGETOOL}"
-echo "Making appimagetool executable…"
-chmod +x "${APPIMAGETOOL}"
+echo "Downloading runtime…"
+wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/${APPIMAGERUNTIME}" -o runtime
+echo "Making runtime executable…"
+chmod +x runtime
 
-echo "Rebuilding AppImage at destination: ${PULSAR_APPIMAGE}"
-ARCH="${APPIMAGE_ARCH}" "./${APPIMAGETOOL}" "dist/Pulsar.AppDir" "dist/${PULSAR_APPIMAGE}"
+mksquashfs "dist/Pulsar.AppDir" "Pulsar.squashfs" -root-owned -noappend
+cat runtime >> "dist/${PULSAR_APPIMAGE}"
+cat "Pulsar.squashfs" >> "dist/${PULSAR_APPIMAGE}"
+chmod a+x "dist/${PULSAR_APPIMAGE}"
+
 
 echo "Removing old AppImage…"
 rm -f "${PULSAR_APPIMAGE%.AppImage}.old.AppImage"

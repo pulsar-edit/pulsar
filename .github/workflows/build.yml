@@ -37,7 +37,7 @@ jobs:
     steps:
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget libfuse2 sudo
+      run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools
 
     - name: Checkout the latest code
       uses: actions/checkout@v4
@@ -179,7 +179,7 @@ jobs:
 
     - name: Fix AppImage target - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: sudo /sbin/modprobe fuse && ./script/fix-linux-appimage.sh x86_64
+      run: ./script/fix-linux-appimage.sh x86_64
 
     - name: Cache Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
