@@ -61,22 +61,29 @@ cd ../..
 
 echo "Current directory is: $(pwd)"
 
-# echo "Downloading appimagetool…"
-# wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}.AppImage" -o appimagetool
-# echo "Making appimagetool executable…"
-# chmod +x appimagetool
+echo "Downloading appimagetool…"
+wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}.AppImage" -O appimagetool
+echo "Making appimagetool executable…"
+chmod +x appimagetool
 
-echo "Downloading AppImage runtime…"
-wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-${APPIMAGE_ARCH}" -o runtime
-echo "Making runtime executable…"
-chmod +x runtime
+# echo "Downloading AppImage runtime…"
+# wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-${APPIMAGE_ARCH}" -O runtime
+# echo "Making runtime executable…"
+# chmod +x runtime
 
-mksquashfs "binaries/Pulsar.AppDir" "Pulsar.squashfs" -root-owned -noappend
-cat runtime >> "binaries/${PULSAR_APPIMAGE}"
-cat "Pulsar.squashfs" >> "binaries/${PULSAR_APPIMAGE}"
+# echo "Manually building AppImage…"
+# mksquashfs "binaries/Pulsar.AppDir" "Pulsar.squashfs" -root-owned -noappend
+# cat runtime >> "binaries/${PULSAR_APPIMAGE}"
+# cat "Pulsar.squashfs" >> "binaries/${PULSAR_APPIMAGE}"
+
+# Docker can't run AppImage apps natively, but we can use the
+# `--appimage-extract-and-run` option to extract the app to a location on disk
+# instead.
+./appimagetool --appimage-extract-and-run "binaries/Pulsar.AppDir" "binaries/${PULSAR_APPIMAGE}"
+
+echo "Making binary executable…"
 chmod a+x "binaries/${PULSAR_APPIMAGE}"
-
-# ./appimagetool --appimage-extract-and-run "binaries/Pulsar.AppDir" "binaries/${PULSAR_APPIMAGE}"
+echo "…done building appimage at binaries/${PULSAR_APPIMAGE}."
 
 echo "Removing old AppImage…"
 rm -f "binaries/${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
