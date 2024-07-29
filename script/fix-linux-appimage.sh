@@ -27,7 +27,7 @@ fi
 
 echo "Architecture is: ${APPIMAGE_ARCH}"
 
-cd dist
+cd binaries
 PULSAR_APPIMAGE="$(ls *.AppImage | xargs)"
 echo "Making ${PULSAR_APPIMAGE} executable…"
 chmod +x "${PULSAR_APPIMAGE}"
@@ -66,14 +66,14 @@ wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appim
 echo "Making runtime executable…"
 chmod +x appimagetool
 
-# mksquashfs "dist/Pulsar.AppDir" "Pulsar.squashfs" -root-owned -noappend
-# cat runtime >> "dist/${PULSAR_APPIMAGE}"
-# cat "Pulsar.squashfs" >> "dist/${PULSAR_APPIMAGE}"
-# chmod a+x "dist/${PULSAR_APPIMAGE}"
+# mksquashfs "binaries/Pulsar.AppDir" "Pulsar.squashfs" -root-owned -noappend
+# cat runtime >> "binaries/${PULSAR_APPIMAGE}"
+# cat "Pulsar.squashfs" >> "binaries/${PULSAR_APPIMAGE}"
+# chmod a+x "binaries/${PULSAR_APPIMAGE}"
 
-appimagetool --appimage-extract-and-run "dist/Pulsar.AppDir" "dist/${PULSAR_APPIMAGE}"
+appimagetool --appimage-extract-and-run "binaries/Pulsar.AppDir" "binaries/${PULSAR_APPIMAGE}"
 
 echo "Removing old AppImage…"
-rm -f "dist/${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
+rm -f "binaries/${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
 
 echo "…done!"
