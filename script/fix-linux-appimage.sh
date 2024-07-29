@@ -66,12 +66,12 @@ wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appim
 echo "Making runtime executable…"
 chmod +x appimagetool
 
-# mksquashfs "binaries/Pulsar.AppDir" "Pulsar.squashfs" -root-owned -noappend
-# cat runtime >> "binaries/${PULSAR_APPIMAGE}"
-# cat "Pulsar.squashfs" >> "binaries/${PULSAR_APPIMAGE}"
-# chmod a+x "binaries/${PULSAR_APPIMAGE}"
+mksquashfs "binaries/Pulsar.AppDir" "Pulsar.squashfs" -root-owned -noappend
+cat runtime >> "binaries/${PULSAR_APPIMAGE}"
+cat "Pulsar.squashfs" >> "binaries/${PULSAR_APPIMAGE}"
+chmod a+x "binaries/${PULSAR_APPIMAGE}"
 
-./appimagetool --appimage-extract-and-run "binaries/Pulsar.AppDir" "binaries/${PULSAR_APPIMAGE}"
+# ./appimagetool --appimage-extract-and-run "binaries/Pulsar.AppDir" "binaries/${PULSAR_APPIMAGE}"
 
 echo "Removing old AppImage…"
 rm -f "binaries/${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
