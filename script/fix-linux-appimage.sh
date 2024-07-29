@@ -62,7 +62,7 @@ cd ../..
 echo "Current directory is: $(pwd)"
 
 echo "Downloading runtime…"
-wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}" -o appimagetool
+wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}.AppImage" -o appimagetool
 echo "Making runtime executable…"
 chmod +x appimagetool
 
