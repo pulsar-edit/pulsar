@@ -48,6 +48,10 @@ rm -f AppRun
 # executable.
 echo "Making new AppRun…"
 awk '{sub(/BIN=(.*?)/,"BIN=\"$APPDIR/resources/pulsar.sh\""); print}' AppRun.old > AppRun
+
+echo "Rewrote BIN to read:"
+cat AppRun | grep "BIN="
+
 echo "Removing AppRun.old…"
 rm -f AppRun.old
 
@@ -57,20 +61,19 @@ cd ../..
 
 echo "Current directory is: $(pwd)"
 
-APPIMAGERUNTIME="runtime-${APPIMAGE_ARCH}"
-
 echo "Downloading runtime…"
-wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/${APPIMAGERUNTIME}" -o runtime
+wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}" -o appimagetool
 echo "Making runtime executable…"
-chmod +x runtime
+chmod +x appimagetool
 
-mksquashfs "dist/Pulsar.AppDir" "Pulsar.squashfs" -root-owned -noappend
-cat runtime >> "dist/${PULSAR_APPIMAGE}"
-cat "Pulsar.squashfs" >> "dist/${PULSAR_APPIMAGE}"
-chmod a+x "dist/${PULSAR_APPIMAGE}"
+# mksquashfs "dist/Pulsar.AppDir" "Pulsar.squashfs" -root-owned -noappend
+# cat runtime >> "dist/${PULSAR_APPIMAGE}"
+# cat "Pulsar.squashfs" >> "dist/${PULSAR_APPIMAGE}"
+# chmod a+x "dist/${PULSAR_APPIMAGE}"
 
+appimagetool --appimage-extract-and-run "dist/Pulsar.AppDir" "dist/${PULSAR_APPIMAGE}"
 
 echo "Removing old AppImage…"
-rm -f "${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
+rm -f "dist/${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
 
 echo "…done!"
