@@ -31,7 +31,7 @@ XPStyle on
 
   Function AddToPathPage
 
-    !insertmacro MUI_HEADER_TEXT "Choose User PATH Options" "Choose what should be added to the User PATH"
+    !insertmacro MUI_HEADER_TEXT "Choose Installation Options" ""
 
     nsDialogs::Create 1018 ; Create custom dialog
     Pop $Dialog
