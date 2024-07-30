@@ -47,7 +47,7 @@ XPStyle on
     ${NSD_CreateCheckbox} 0 30u 100% 10u "&Add Pulsar to the User PATH"
     Pop $PulsarPathCheckbox
 
-    ${NSD_CreateCheckbox} 0 60u 100% 10u "&Add PPM to the User PATH"
+    ${NSD_CreateCheckbox} 0 45u 100% 10u "&Add PPM to the User PATH"
     Pop $PpmPathCheckbox
 
     ; The below 'If's add memory to the selection. Meaning if the user clicks
