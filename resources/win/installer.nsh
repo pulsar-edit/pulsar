@@ -41,7 +41,7 @@ XPStyle on
     ${EndIf}
 
     ; Enter our custom dialog controls
-    ${NSD_CreateLabel} 0 0 100% 12u "Please select whether you wish to add Pulsar and PPM to your User PATH"
+    ${NSD_CreateLabel} 0 0 100% 12u "You can choose to add the 'pulsar' and 'ppm' commands to your PATH. This allows you to easily invoke Pulsar and PPM (Pulsar Package Manager) from the shell."
     Pop $PulsarPathCheckbox_Label
 
     ${NSD_CreateCheckbox} 0 30u 100% 10u "&Add Pulsar to the User PATH"
