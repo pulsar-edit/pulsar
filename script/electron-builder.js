@@ -213,10 +213,6 @@ let options = {
       {
         "from": "resources/win/pulsar.js",
         "to": "pulsar.js"
-      },
-      {
-        "from": "resources/win/modifyWindowsPath.ps1",
-        "to": "modifyWindowsPath.ps1"
       }
     ],
     "target": [

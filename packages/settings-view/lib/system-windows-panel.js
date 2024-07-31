@@ -20,7 +20,6 @@ export default class SystemPanel {
     WinShell.fileHandler.isRegistered((i) => { this.refs.fileHandlerCheckbox.checked = i })
     WinShell.fileContextMenu.isRegistered((i) => { this.refs.fileContextMenuCheckbox.checked = i })
     WinShell.folderContextMenu.isRegistered((i) => { this.refs.folderContextMenuCheckbox.checked = i })
-    WinShell.pathUser.isRegistered((i) => { this.refs.addToPathCheckbox.checked = i })
   }
 
   destroy () {
@@ -114,22 +113,17 @@ export default class SystemPanel {
   }
 
   getPathUI() {
+    // TODO: This section is no longer useful. Should be removed a few versions
+    // after v1.120.0 to allow users to be informed.
     return (
       <div className='control-group'>
         <div className='controls'>
           <div className='checkbox'>
             <label for='system.windows.add-to-path'>
-              <input
-                ref='addToPathCheckbox'
-                id='system.windows.add-to-path'
-                className='input-checkbox'
-                type='checkbox'
-                onclick={(e) => {
-                  this.setRegistration(WinShell.pathUser, e.target.checked)
-                }} />
               <div className='setting-title'>Add Pulsar to PATH</div>
               <div className='setting-description'>
-                Add Pulsar to Windows PATH to enable CLI usage. (May require a reboot to take effect.)
+                Settings for adding Pulsar to the PATH have now been exclusively moved to the Pulsar windows installer.
+                If you'd like to change your PATH addition options please rerun your original, or a new installer.
               </div>
             </label>
           </div>
