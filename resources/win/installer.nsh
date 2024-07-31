@@ -41,7 +41,7 @@ XPStyle on
     ${EndIf}
 
     ; Enter our custom dialog controls
-    ${NSD_CreateLabel} 0 0 100% 12u "You can choose to add the 'pulsar' and 'ppm' commands to your PATH. This allows you to easily invoke Pulsar and PPM (Pulsar Package Manager) from the shell."
+    ${NSD_CreateLabel} 0 0 100% 24u "You can choose to add the 'pulsar' and 'ppm' commands to your PATH. This allows you to easily invoke Pulsar and PPM (Pulsar Package Manager) from the shell."
     Pop $PulsarPathCheckbox_Label
 
     ${NSD_CreateCheckbox} 0 30u 100% 10u "&Add Pulsar to the User PATH"
@@ -50,14 +50,18 @@ XPStyle on
     ${NSD_CreateCheckbox} 0 45u 100% 10u "&Add PPM to the User PATH"
     Pop $PpmPathCheckbox
 
+    ; Check the boxes by default
+    ${NSD_Check} $PulsarPathCheckbox
+    ${NSD_Check} $PpmPathCheckbox
+
     ; The below 'If's add memory to the selection. Meaning if the user clicks
     ; forward then returns, their selection will be remembered.
-    ${If} $PulsarPathCheckbox_State == ${BST_CHECKED}
-      ${NSD_Check} $PulsarPathCheckbox
+    ${If} $PulsarPathCheckbox_State == ${BST_UNCHECKED}
+      ${NSD_Uncheck} $PulsarPathCheckbox
     ${EndIf}
 
-    ${If} $PpmPathCheckbox_State == ${BST_CHECKED}
-      ${NSD_Check} $PpmPathCheckbox
+    ${If} $PpmPathCheckbox_State == ${BST_UNCHECKED}
+      ${NSD_Uncheck} $PpmPathCheckbox
     ${EndIf}
 
     nsDialogs::Show ; Show custom dialog
