@@ -6,14 +6,21 @@
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
-    "atom": "*"
+    "atom": "*",
+    "node": ">=12"
+  },
+  "scripts": {
+    "generate-github-markdown-css": "node scripts/generate-github-markdown-css.js"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
+    "dedent": "^1.5.3",
     "dompurify": "^2.0.17",
     "emoji-images": "^0.1.1",
     "fs-plus": "^3.0.0",
+    "github-markdown-css": "^5.5.1",
     "marked": "5.0.3",
+    "morphdom": "^2.7.2",
     "underscore-plus": "^1.0.0",
     "yaml-front-matter": "^4.1.1"
   },
@@ -26,25 +33,30 @@
   "configSchema": {
     "breakOnSingleNewline": {
       "type": "boolean",
+      "order": 1,
       "default": false,
       "description": "In Markdown, a single newline character doesn't cause a line break in the generated HTML. In GitHub Flavored Markdown, that is not true. Enable this config option to insert line breaks in rendered HTML for single newlines in Markdown source."
     },
     "liveUpdate": {
       "type": "boolean",
+      "order": 2,
       "default": true,
       "description": "Re-render the preview as the contents of the source changes, without requiring the source buffer to be saved. If disabled, the preview is re-rendered only when the buffer is saved to disk."
     },
     "openPreviewInSplitPane": {
+      "order": 3,
       "type": "boolean",
       "default": true,
       "description": "Open the preview in a split pane. If disabled, the preview is opened in a new tab in the same pane."
     },
     "allowUnsafeProtocols": {
+      "order": 4,
       "type": "boolean",
       "default": false,
       "description": "Allow HTML attributes to use protocols normally considered unsafe such as `file://` and absolute paths on Windows."
     },
     "grammars": {
+      "order": 0,
       "type": "array",
       "default": [
         "source.gfm",
@@ -57,12 +69,36 @@
       "description": "List of scopes for languages for which previewing is enabled. See [this README](https://github.com/pulsar-edit/spell-check#readme) for more information on finding the correct scope for a specific language."
     },
     "useGitHubStyle": {
-      "title": "Use GitHub.com style",
+      "order": 5,
+      "title": "Use GitHub.com Style",
       "type": "boolean",
       "default": false,
       "description": "Use the same CSS styles for preview as the ones used on GitHub.com."
     },
+    "gitHubStyleMode": {
+      "order": 6,
+      "title": "GitHub.com Style Mode",
+      "type": "string",
+      "default": "auto",
+      "description": "Whether to use light-mode GitHub CSS, dark-mode GitHub CSS, or system default (based on your operating system preferences). Has no effect unless **Use GitHub.com Style** is enabled.",
+      "enum": [
+        {
+          "value": "auto",
+          "description": "System Default"
+        },
+        {
+          "value": "light",
+          "description": "Light"
+        },
+        {
+          "value": "dark",
+          "description": "Dark"
+        }
+      ]
+    },
     "syntaxHighlightingLanguageIdentifier": {
+      "order": 7,
+      "title": "Syntax Highlighting Language Identifiers",
       "description": "Syntax Highlighting System to use for code block language identification. See [the README](https://github.com/pulsar-edit/pulsar/tree/master/packages/markdown-preview#readme) for details.",
       "type": "string",
       "default": "linguist",
@@ -86,14 +122,14 @@
       ]
     },
     "customSyntaxHighlightingLanguageIdentifiers": {
-      "description": "Custom comma seperated list of Syntax Language Identifiers to map to any language. See [the README](https://github.com/pulsar-edit/pulsar/tree/master/packages/markdown-preview#readme) for usage.",
+      "description": "Comma-separated list of syntax language identifiers to map to any language. See [the README](https://github.com/pulsar-edit/pulsar/tree/master/packages/markdown-preview#readme) for usage.",
       "type": "string",
       "default": ""
     },
     "useOriginalParser": {
-      "description": "Wether to use the original Markdown Parser, or the new Pulsar one.",
+      "description": "When checked, will use the original Markdown parser for `markdown-preview` (`marked`). When unchecked, will use the new Markdown parser built into Pulsar (`markdown-it`).",
       "type": "boolean",
-      "default": "true"
+      "default": true
     }
   }
 }

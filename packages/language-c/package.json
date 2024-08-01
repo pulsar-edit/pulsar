@@ -10,10 +10,22 @@
   "license": "MIT",
   "engines": {
     "atom": "*",
-    "node": "*"
+    "node": ">=12"
   },
   "dependencies": {
     "tree-sitter-c": "0.20.2",
     "tree-sitter-cpp": "0.20.0"
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
   }
 }

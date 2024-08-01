@@ -1,7 +1,6 @@
 const {CompositeDisposable} = require('atom')
 const SnippetParser = require('./snippet-parser')
 const {isString} = require('./type-helpers')
-const fuzzaldrinPlus = require('fuzzaldrin-plus')
 
 const createSuggestionFrag = () => {
   const frag = document.createDocumentFragment()
@@ -80,9 +79,6 @@ module.exports = class SuggestionListElement {
     }))
     this.subscriptions.add(atom.config.observe('autocomplete-plus.maxVisibleSuggestions', maxVisibleSuggestions => {
       this.maxVisibleSuggestions = maxVisibleSuggestions
-    }))
-    this.subscriptions.add(atom.config.observe('autocomplete-plus.useAlternateScoring', useAlternateScoring => {
-      this.useAlternateScoring = useAlternateScoring
     }))
     this.subscriptions.add(atom.config.observe('autocomplete-plus.moveToCancel', moveToCancel => {
       this.moveToCancel = moveToCancel
@@ -540,12 +536,8 @@ module.exports = class SuggestionListElement {
 
     if (!characterMatchIndices) {
       characterMatchIndices = this.findCharacterMatchIndices(replacementText, replacementPrefix)
-    } else {
-      characterMatchIndices = characterMatchIndices.reduce((matches, index) => {
-        matches[index] = true
-        return matches
-      }, {})
     }
+    characterMatchIndices = new Set(characterMatchIndices);
 
     const appendNonMatchChars = (el, nonMatchChars) => {
       if (nonMatchChars) {
@@ -568,7 +560,7 @@ module.exports = class SuggestionListElement {
         workingEl = s
       }
 
-      if (characterMatchIndices && characterMatchIndices[index]) {
+      if (characterMatchIndices && characterMatchIndices.has(index)) {
         appendNonMatchChars(workingEl, nonMatchChars)
         nonMatchChars = ''
 
@@ -664,26 +656,11 @@ module.exports = class SuggestionListElement {
   //
   // Returns an {Object}
   findCharacterMatchIndices (text, replacementPrefix) {
-    if (!text || !text.length || !replacementPrefix || !replacementPrefix.length) { return }
+    if (!text?.length || !replacementPrefix?.length) { return }
     const matches = {}
-    if (this.useAlternateScoring) {
-      const matchIndices = fuzzaldrinPlus.match(text, replacementPrefix)
-      for (const i of matchIndices) {
-        matches[i] = true
-      }
-    } else {
-      let wordIndex = 0
-      for (let i = 0; i < replacementPrefix.length; i++) {
-        const ch = replacementPrefix[i]
-        while (wordIndex < text.length && text[wordIndex].toLowerCase() !== ch.toLowerCase()) {
-          wordIndex += 1
-        }
-        if (wordIndex >= text.length) { break }
-        matches[wordIndex] = true
-        wordIndex += 1
-      }
-    }
-    return matches
+    return atom.ui.fuzzyMatcher.match(
+      text, replacementPrefix, {recordMatchIndexes: true}
+    )?.matchIndexes || [];
   }
 
   dispose () {

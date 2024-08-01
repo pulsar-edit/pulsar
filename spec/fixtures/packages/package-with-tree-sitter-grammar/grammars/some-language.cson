@@ -2,7 +2,7 @@ name: 'Some Language'
 
 scopeName: 'some-language'
 
-type: 'tree-sitter'
+type: 'modern-tree-sitter'
 
 parser: './fake-parser'
 
@@ -12,3 +12,7 @@ fileTypes: [
 
 scopes:
   'class > identifier': 'entity.name.type.class'
+
+treeSitter:
+  grammar: './tree-sitter-empty.wasm'
+  highlightsQuery: './tree-sitter-empty.scm'

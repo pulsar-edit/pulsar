@@ -37,13 +37,13 @@
 
 (call
   function: (identifier) @support.type.constructor.python
-  (#match? @support.type.constructor.python "^[A-Z][a-z_]+")
+  (#match? @support.type.constructor.python "^[A-Z][A-Za-z_]+")
   (#set! capture.final true))
 
 (call
   function: (attribute
     attribute: (identifier) @support.type.constructor.python)
-    (#match? @support.type.constructor.python "^[A-Z][a-z_]+")
+    (#match? @support.type.constructor.python "^[A-Z][A-Za-z_]+")
     (#set! capture.final true))
 
 (call
@@ -104,6 +104,11 @@
 
 ; An entire decorator without arguments, like `@foo`.
 (decorator "@" (identifier) .) @support.other.function.decorator.python
+
+; A namespaced decorator, like the `@foo` in `@foo.bar`, with or without a
+; function invocation.
+((decorator [(attribute) (call)]) @support.other.function.decorator.python
+  (#set! adjust.endAfterFirstMatchOf "\\."))
 
 ; The "@" and "foo" together in a decorator with arguments, like `@foo(True)`.
 ((decorator "@" (call function: (identifier))) @support.other.function.decorator.python
@@ -182,23 +187,26 @@
 ; similarly here. No need to account for the rawness of a string in the scope
 ; name unless someone requests that feature.
 
+((string) @string.quoted.triple.block.format.python
+  (#match? @string.quoted.triple.block.format.python "^[fFrR]+\"\"\"")
+  (#set! capture.final))
+
 ((string) @string.quoted.triple.block.python
   (#match? @string.quoted.triple.block.python "^[bBrRuU]*\"\"\""))
 
-((string) @string.quoted.triple.block.format.python
-  (#match? @string.quoted.triple.block.format.python "^[fFrR]*\"\"\""))
+((string) @string.quoted.double.single-line.format.python
+  (#match? @string.quoted.double.single-line.format.python "^[fFrR]+\"")
+  (#set! capture.final))
 
 ((string) @string.quoted.double.single-line.python
   (#match? @string.quoted.double.single-line.python "^[bBrRuU]*\"(?!\")"))
 
-((string) @string.quoted.double.single-line.format.python
-  (#match? @string.quoted.double.single-line.format.python "^[fFrR]*\""))
+((string) @string.quoted.single.single-line.format.python
+  (#match? @string.quoted.single.single-line.format.python "^[fFrR]+?\'")
+  (#set! capture.final))
 
 ((string) @string.quoted.single.single-line.python
   (#match? @string.quoted.single.single-line.python "^[bBrRuU]*\'"))
-
-((string) @string.quoted.single.single-line.format.python
-  (#match? @string.quoted.single.single-line.format.python "^[fFrR]*?\'"))
 
 (string_content (escape_sequence) @constant.character.escape.python)
 
@@ -214,7 +222,7 @@
   _ @punctuation.definition.string.end.python
   (#is? test.last true))
 
-(string prefix: _ @storage.type.string.python
+(string (string_start) @storage.type.string.python
   (#match? @storage.type.string.python "^[bBfFrRuU]+")
   (#set! adjust.endAfterFirstMatchOf "^[bBfFrRuU]+"))
 
@@ -250,6 +258,7 @@
 ] @keyword.control.statement._TYPE_.python
 
 [
+  "break"
   "continue"
   "for"
   "while"
@@ -331,6 +340,10 @@
 (assignment
   left: (identifier) @variable.other.assignment.python)
 
+; The "a" and "b" in `a, b = 2, 3`.
+(assignment
+  left: (pattern_list
+    (identifier) @variable.other.assignment.python))
 
 ; OPERATORS
 ; =========
@@ -384,6 +397,9 @@
   "or"
 ] @keyword.operator.logical._TYPE_.python
 
+; The 'not' and 'in' are each scoped separately, each one being an anonymous
+; node incorrectly named "not in".
+"not in" @keyword.operator.logical.not-in.python
 "is not" @keyword.operator.logical.is-not.python
 
 (call
@@ -424,6 +440,8 @@
 (parameters
   "," @punctuation.separator.parameters.comma.python
   (#set! capture.final true))
+
+(pattern_list "," @punctuation.separator.destructuring.comma.python)
 
 (argument_list
   "(" @punctuation.definition.arguments.begin.bracket.round.python

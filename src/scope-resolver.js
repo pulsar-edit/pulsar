@@ -1,3 +1,4 @@
+const { CompositeDisposable } = require('event-kit');
 const { Point } = require('text-buffer');
 const ScopeDescriptor = require('./scope-descriptor');
 
@@ -16,7 +17,7 @@ function comparePoints(a, b) {
   }
 }
 
-function rangeSpecToString (range) {
+function rangeSpecToString(range) {
   let [sp, ep] = [range.startPosition, range.endPosition];
   return `(${sp.row}, ${sp.column}) - (${ep.row}, ${ep.column})`;
 }
@@ -63,6 +64,71 @@ function interpretPossibleKeyValuePair(rawValue, coerceValue = false) {
   return [key, value];
 }
 
+// `ScopeResolver`s can share a config cache if they have the same grammar.
+// There are many such `ScopeResolver`s (because there are many such
+// `LanguageLayer`s), and this consolidation cuts down on the number of
+// `onDidChange` handlers (which are costly when observing all config values).
+class ConfigCache {
+  constructor(config) {
+    this.subscriptions = new CompositeDisposable();
+    this.cachesByGrammar = new Map();
+    this.config = config;
+
+    this.subscriptions.add(
+      this.config.onDidChange(() => this.clearAll()),
+      atom.grammars.onDidAddGrammar(() => this.clearAll()),
+      atom.grammars.onDidUpdateGrammar(() => this.clearAll())
+    );
+  }
+
+  dispose() {
+    this.subscriptions.dispose();
+  }
+
+  clearAll() {
+    for (let cache of this.cachesByGrammar.values()) {
+      cache.clear();
+    }
+  }
+
+  getCacheForGrammar(grammar) {
+    let { scopeName } = grammar;
+    // We key on the scope name rather than the grammar instance. We need to be
+    // able to iterate over grammars, so we can't use a `WeakSet` here, and we
+    // have no lifecycle event to keep the map from getting stale.
+    //
+    // To prevent two different incarnations of the same grammar (after
+    // disabling and reenabling) from incorrectly sharing a cache, we clear all
+    // caches whenever grammars are added or updated.
+    let cache = this.cachesByGrammar.get(scopeName);
+    if (!cache) {
+      cache = new Map();
+      this.cachesByGrammar.set(scopeName, cache);
+    }
+    return cache;
+  }
+}
+
+// We can technically have more than one configuration object, though in
+// practice this will only point to `atom.config`. We do it this way for ease
+// of testing (e.g., if a test mocks a config object) and to avoid silly hacks.
+ConfigCache.CACHES_FOR_CONFIG_OBJECTS = new Map();
+
+ConfigCache.forConfig = (config) => {
+  let { CACHES_FOR_CONFIG_OBJECTS } = ConfigCache;
+  let configCache = CACHES_FOR_CONFIG_OBJECTS.get(config);
+  if (!configCache) {
+    configCache = new ConfigCache(config);
+    CACHES_FOR_CONFIG_OBJECTS.set(config, configCache);
+  }
+  return configCache;
+};
+
+ConfigCache.clear = () => {
+  ConfigCache.CACHES_FOR_CONFIG_OBJECTS.clear();
+};
+
+
 // A data structure for storing scope information while processing capture
 // data. The data is reset in between each task.
 //
@@ -86,10 +152,8 @@ class ScopeResolver {
     this.rangeData = new Map;
     this.pointKeyCache = new Map;
     this.patternCache = new Map;
-    this.configCache = new Map;
-    this.configSubscription = this.config.onDidChange(() => {
-      this.configCache.clear();
-    });
+    this.configCache = ConfigCache.forConfig(this.config)
+      .getCacheForGrammar(this.grammar);
   }
 
   getOrCompilePattern(pattern) {
@@ -130,6 +194,11 @@ class ScopeResolver {
   shouldInvalidateOnChange(capture) {
     return capture.setProperties &&
       ('highlight.invalidateOnChange' in capture.setProperties);
+  }
+
+  shouldInvalidateFoldOnChange(capture) {
+    return capture.setProperties &&
+      ('fold.invalidateOnChange' in capture.setProperties);
   }
 
   // We want to index scope data on buffer position, but each `Point` (or
@@ -327,6 +396,11 @@ class ScopeResolver {
     return range;
   }
 
+  isFinal(existingData = {}) {
+    return ('capture.final' in existingData) ||
+      ('final' in existingData);
+  }
+
   // Given a syntax capture, test whether we should include its scope in the
   // document.
   test(capture, existingData) {
@@ -337,7 +411,7 @@ class ScopeResolver {
       refutedProperties: refuted = {}
     } = capture;
 
-    if (existingData?.final || existingData?.['capture.final']) {
+    if (this.isFinal(existingData)) {
       return false;
     }
 
@@ -418,16 +492,22 @@ class ScopeResolver {
       this.setDataForRange(range, props);
     }
 
-    if (name === '_IGNORE_') {
+    if (name === '_IGNORE_' || name.startsWith('_IGNORE_.')) {
       // "@_IGNORE_" is a magical variable in an SCM file that will not be
       // applied in the grammar, but which allows us to prevent other kinds of
       // scopes from matching. We purposefully allowed this syntax node to set
       // data for a given range, but not to apply its scope ID to any
       // boundaries.
+      //
+      // A query can also use multiple different @_IGNORE_-style variables by
+      // adding segments after the @_IGNORE_, such as @_IGNORE_.foo.bar.
       return false;
     }
 
-    let id = this.idForScope(name);
+    let id = this.idForScope(
+        name,
+        node.childCount === 0 ? node.text : undefined,
+    );
 
     let {
       startPosition: start,
@@ -477,8 +557,6 @@ class ScopeResolver {
     this.reset();
     this.patternCache.clear();
     this.pointKeyCache.clear();
-    this.configCache.clear();
-    this.configSubscription.dispose();
   }
 
   *[Symbol.iterator]() {
@@ -512,16 +590,16 @@ ScopeResolver.interpolateName = (name, node) => {
 // Special `#set!` predicates that work on “claimed” and “unclaimed” ranges.
 ScopeResolver.CAPTURE_SETTINGS = {
   // Passes only if another capture has not already declared `final` for the
-  // exact same range. If a capture is the first one to define `final`, then
+  // exact same range. If a capture is the first one to define `exact`, then
   // all other captures for that same range are ignored, whether they try to
   // define `final` or not.
-  final(node, existingData) {
-    let final = existingData?.final || existingData?.['capture.final'];
-    return !(existingData && final);
+  final(_node, existingData) {
+    if (!existingData) return true;
+    return !('capture.final' in existingData) && !('final' in existingData);
   },
 
   // Passes only if no earlier capture has occurred for the exact same range.
-  shy(node, existingData) {
+  shy(_node, existingData) {
     return existingData === undefined;
   }
 };
@@ -663,6 +741,20 @@ ScopeResolver.TESTS = {
       current = current.parent;
       if (multiple && target.includes(current.type)) { return true; }
       else if (!multiple && target === current.type) { return true; }
+    }
+    return false;
+  },
+
+  // Passes if there's an ancestor, but fails if the ancestor type matches
+  // the second,third,etc argument
+  ancestorTypeNearerThan(node, types) {
+    let [target, ...rejected] = types.split(/\s+/);
+    rejected = new Set(rejected)
+    let current = node;
+    while (current.parent) {
+      current = current.parent;
+      if (rejected.has(current.type)) { return false; }
+      if (target === current.type) { return true; }
     }
     return false;
   },
@@ -894,6 +986,10 @@ ScopeResolver.ADJUSTMENTS = {
 
     return position;
   }
+};
+
+ScopeResolver.clearConfigCache = () => {
+  ConfigCache.clear();
 };
 
 

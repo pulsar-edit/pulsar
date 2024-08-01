@@ -11,9 +11,9 @@ const { OnigScanner } = SecondMate;
 // Expects one of `textmate`, `node-tree-sitter`, or `wasm-tree-sitter`.
 function setConfigForLanguageMode(mode, options = {}) {
   let useTreeSitterParsers = mode !== 'textmate';
-  let useExperimentalModernTreeSitter = mode === 'wasm-tree-sitter';
+  let useLegacyTreeSitter = mode === 'node-tree-sitter';
   atom.config.set('core.useTreeSitterParsers', useTreeSitterParsers, options);
-  atom.config.set('core.useExperimentalModernTreeSitter', useExperimentalModernTreeSitter, options);
+  atom.config.set('core.useLegacyTreeSitter', useLegacyTreeSitter, options);
 }
 
 describe('GrammarRegistry', () => {
@@ -258,7 +258,7 @@ describe('GrammarRegistry', () => {
       // TODO: Why doesn't this path resolution work like the one above?
       const modernTreeSitterGrammar = grammarRegistry.loadGrammarSync(
         require.resolve(
-          '../packages/language-javascript/grammars/tree-sitter-2-javascript.cson'
+          '../packages/language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
       expect(buffer.getLanguageMode().grammar).toBe(modernTreeSitterGrammar);
@@ -285,7 +285,7 @@ describe('GrammarRegistry', () => {
       // TODO: Why doesn't this path resolution work like the one above?
       const modernTreeSitterGrammar = grammarRegistry.loadGrammarSync(
         require.resolve(
-          '../packages/language-javascript/grammars/tree-sitter-2-javascript.cson'
+          '../packages/language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
 
@@ -477,6 +477,14 @@ describe('GrammarRegistry', () => {
         'Null Grammar'
       );
     });
+
+    it(`returns a legacy Tree-sitter grammar if the user opted into it via a scope-specific setting`, async () => {
+      await atom.packages.activatePackage('language-javascript');
+      setConfigForLanguageMode('node-tree-sitter', { scopeSelector: '.source.js' })
+      let grammar = atom.grammars.selectGrammar('file.js');
+      expect(grammar.name).toBe('JavaScript');
+      expect(grammar.constructor.name).toBe('TreeSitterGrammar');
+    })
 
     it("uses the filePath's shebang line if the grammar cannot be determined by the extension or basename", async () => {
       await atom.packages.activatePackage('language-javascript');

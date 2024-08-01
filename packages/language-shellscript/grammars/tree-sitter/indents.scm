@@ -3,6 +3,7 @@
   "then"
   "do"
   "("
+  "else"
 ] @indent
 
 (compound_statement "{" @indent)

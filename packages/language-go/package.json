@@ -1,6 +1,7 @@
 {
   "name": "language-go",
   "description": "Go language support in Atom",
+  "main": "lib/main",
   "keywords": [
     "tree-sitter"
   ],
@@ -13,5 +14,17 @@
   "repository": "https://github.com/pulsar-edit/pulsar",
   "dependencies": {
     "tree-sitter-go": "0.19.1"
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
   }
 }

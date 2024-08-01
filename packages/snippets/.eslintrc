@@ -1,0 +1,13 @@
+{
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2022
+  },
+  "rules": {
+    "indent": ["error", 2],
+    "linebreak-style": ["error", "unix"],
+    "object-curly-spacing": ["error", "never"],
+    "space-before-function-paren": ["error", "always"],
+    "semi": ["error", "never"]
+  }
+}

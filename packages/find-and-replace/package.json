@@ -139,7 +139,7 @@
     "preserveCaseOnReplace": {
       "type": "boolean",
       "default": false,
-      "title": "Preserve case during replace.",
+      "title": "Preserve Case During Replace",
       "description": "Keep the replaced text case during replace: replacing 'user' with 'person' will replace 'User' with 'Person' and 'USER' with 'PERSON'."
     }
   }

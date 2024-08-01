@@ -1576,9 +1576,9 @@
     "@types/node" "*"
     playwright-core "1.22.2"
 
-"@pulsar-edit/fuzzy-native@https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f":
+"@pulsar-edit/fuzzy-native@https://github.com/pulsar-edit/fuzzy-native.git#c6ddd2e0ace7b3cfe8082fcbe5985c49f76da5b8":
   version "1.2.1"
-  resolved "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5fe348bc0a38bbec1de86d43940893010c8"
+  resolved "https://github.com/pulsar-edit/fuzzy-native.git#c6ddd2e0ace7b3cfe8082fcbe5985c49f76da5b8"
   dependencies:
     nan "2.17.0"
 
@@ -2340,8 +2340,6 @@ atom-slick@^2, atom-slick@^2.0.0:
   version "2.42.6"
   dependencies:
     atom-slick "^2.0.0"
-    fuzzaldrin "^2.1.0"
-    fuzzaldrin-plus "^0.6.0"
     grim "^2.0.1"
     minimatch "^3.0.3"
     selector-kit "^0.1.0"
@@ -3176,8 +3174,6 @@ command-line-usage@^4.1.0:
   version "0.43.5"
   dependencies:
     atom-select-list "^0.7.1"
-    fuzzaldrin "^2.1.0"
-    fuzzaldrin-plus "^0.6.0"
     underscore-plus "^1.0.0"
 
 commander@2.9.0:
@@ -3528,6 +3524,11 @@ dedent@^0.7.0:
   resolved "https://registry.yarnpkg.com/dedent/-/dedent-0.7.0.tgz#2495ddbaf6eb874abb0e1be9df22d2e5a544326c"
   integrity sha512-Q6fKUPqnAHAyhiUgFU7BUzLiv0kd8saH9al7tnu5Q/okj6dnupxyTgFIBjVzJATdfIAm9NAsvXNzjaKa+bxVyA==
 
+dedent@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/dedent/-/dedent-1.5.3.tgz#99aee19eb9bae55a67327717b6e848d0bf777e5a"
+  integrity sha512-NHQtfOOW68WD8lgypbLA5oT+Bt0xXJhiYvoR6SmmNXZfpzOGXwdKWmcwG8N7PwVVWV3eF/68nmD9BaJSsTBhyQ==
+
 deep-eql@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/deep-eql/-/deep-eql-3.0.1.tgz#dfc9404400ad1c8fe023e7da1df1c147c4b444df"
@@ -3822,10 +3823,10 @@ dotenv@^9.0.2:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-9.0.2.tgz#dacc20160935a37dea6364aa1bef819fb9b6ab05"
   integrity sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg==
 
-dugite@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/dugite/-/dugite-2.1.0.tgz#6f50c2244e57aaac2f36440aa7289815c73a688c"
-  integrity sha512-4l4jJz5zC6Q+/8doQNQZ9Ss3rmnO/JCHfOmQO+zGv+TIOUXimzfS02RvUOuFpEhZuaFTeFBSuK6ll/02TX3SxA==
+dugite@2.5.2:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/dugite/-/dugite-2.5.2.tgz#9a10f4ed7d3cd701e7b09c65faf78c231c7f4e23"
+  integrity sha512-qrS3RXFzWW3cyXVaqct665+JxuP1LFhE0DPV1DqmbabO/eLNLDMICRROaGDh/Hw9ssbyVERxNDF6HW7oCLXrCg==
   dependencies:
     progress "^2.0.3"
     tar "^6.1.11"
@@ -4760,12 +4761,7 @@ functions-have-names@^1.2.2:
   resolved "https://registry.yarnpkg.com/functions-have-names/-/functions-have-names-1.2.3.tgz#0404fe4ee2ba2f607f0e0ec3c80bae994133b834"
   integrity sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==
 
-fuzzaldrin-plus@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/fuzzaldrin-plus/-/fuzzaldrin-plus-0.6.0.tgz#832f6489fbe876769459599c914a670ec22947ee"
-  integrity sha512-srIDThJHkdp3aPwJpR/HNzYZCRJwm07b/igxseoHSB7qR8e/gQp4F6lMGknE3TQI1Aq14TiFf/wzrHOp9LY/EA==
-
-fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
+fuzzaldrin@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz#90204c3e2fdaa6941bb28d16645d418063a90e9b"
   integrity sha512-zgllBYwfHR5P3CncJiGbGVPpa3iFYW1yuPaIv8DiTVRrcg5/6uETNL5zvIoKflG1aifXVUZTlIroDehw4WygGA==
@@ -4773,7 +4769,6 @@ fuzzaldrin@^2.1, fuzzaldrin@^2.1.0:
 "fuzzy-finder@file:packages/fuzzy-finder":
   version "1.14.3"
   dependencies:
-    "@pulsar-edit/fuzzy-native" "https://github.com/pulsar-edit/fuzzy-native.git#13d2e5f"
     atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
     minimatch "~3.0.3"
@@ -4893,14 +4888,19 @@ github-from-package@0.0.0:
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
   integrity sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==
 
+github-markdown-css@^5.5.1:
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/github-markdown-css/-/github-markdown-css-5.5.1.tgz#c2a609ca0b067552c8bfc09e797ace20d614f515"
+  integrity sha512-2osyhNgFt7DEHnGHbgIifWawAqlc68gjJiGwO1xNw/S48jivj8kVaocsVkyJqUi3fm7fdYIDi4C6yOtcqR/aEQ==
+
 github-slugger@^1.1.1:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/github-slugger/-/github-slugger-1.5.0.tgz#17891bbc73232051474d68bd867a34625c955f7d"
   integrity sha512-wIh+gKBI9Nshz2o46B0B3f5k/W+WI9ZAv6y5Dn5WJ5SK1t0TnDimB4WE5rmTD05ZAIn8HALCZVmCsvj0w0v0lw==
 
-"github@https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.18-pretranspiled.tar.gz":
-  version "0.36.18"
-  resolved "https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.18-pretranspiled.tar.gz#4ebae479a441895e902a9c29def680c1ff8800ea"
+"github@https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.20-pretranspiled.tar.gz":
+  version "0.36.20"
+  resolved "https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.20-pretranspiled.tar.gz#1f3edb9383940c72037b35cfa6081d59a160f6b8"
   dependencies:
     "@atom/babel-plugin-chai-assert-async" "1.0.0"
     "@atom/babel7-transpiler" "1.0.0-1"
@@ -4916,7 +4916,7 @@ github-slugger@^1.1.1:
     classnames "2.2.6"
     compare-sets "1.0.1"
     dompurify "2.0.17"
-    dugite "2.1.0"
+    dugite "2.5.2"
     event-kit "2.5.3"
     fs-extra "4.0.3"
     graphql "14.5.8"
@@ -4938,7 +4938,7 @@ github-slugger@^1.1.1:
     underscore-plus "1.7.0"
     what-the-diff "0.6.0"
     what-the-status "1.0.3"
-    whats-my-line "https://github.com/pulsar-edit/whats-my-line/archive/348e8d10d9b9a1fd717cd4cc1263297844732768.tar.gz"
+    whats-my-line "https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz"
     yubikiri "2.0.0"
 
 glob-parent@^6.0.2:
@@ -5323,7 +5323,7 @@ humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-humanize-plus@^1.8.2, humanize-plus@~1.8.2:
+humanize-plus@~1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/humanize-plus/-/humanize-plus-1.8.2.tgz#a65b34459ad6367adbb3707a82a3c9f916167030"
   integrity sha512-jaLeQyyzjjINGv7O9JJegjsaUcWjSj/1dcXvLEgU3pGdqCdP1PiC/uwr+saJXhTNBHZtmKnmpXyazgh+eceRxA==
@@ -6507,11 +6507,6 @@ loglevel@^1.6.0:
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.8.1.tgz#5c621f83d5b48c54ae93b6156353f555963377b4"
   integrity sha512-tCRIJM51SHjAayKwC+QAg8hT8vg6z7GSgLJKGvzuPb1Wc+hLzqtuVLxp6/HzSPOozuK+8ErAhy7U/sVzw8Dgfg==
 
-loophole@^1:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/loophole/-/loophole-1.1.0.tgz#37949fea453b6256acc725c320ce0c5a7f70a2bd"
-  integrity sha512-zgLykD4MuL9HJRsoeKuGRXz4L9t1C0oDZPjFeUg5MLQyZjxWdxIbPHgRijVGN98DieVWJuo2fi9nEUDcdDbEiQ==
-
 loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
@@ -6653,10 +6648,13 @@ markdown-it@^13.0.2:
   version "0.160.2"
   dependencies:
     cheerio "^1.0.0-rc.3"
+    dedent "^1.5.3"
     dompurify "^2.0.17"
     emoji-images "^0.1.1"
     fs-plus "^3.0.0"
+    github-markdown-css "^5.5.1"
     marked "5.0.3"
+    morphdom "^2.7.2"
     underscore-plus "^1.0.0"
     yaml-front-matter "^4.1.1"
 
@@ -6975,6 +6973,11 @@ moment@^2.19.3:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
+morphdom@^2.7.2:
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/morphdom/-/morphdom-2.7.2.tgz#d48a87254f9b3031c0e1ec367736721fbaf22167"
+  integrity sha512-Dqb/lHFyTi7SZpY0a5R4I/0Edo+iPMbaUexsHHsLAByyixCDiLHPHyVoKVmrpL0THcT7V9Cgev9y21TQYq6wQg==
+
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
@@ -6999,6 +7002,11 @@ multi-integer-range@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/multi-integer-range/-/multi-integer-range-2.1.0.tgz#73675519ba2146dba22cd35960e9c5e804ffe2fc"
   integrity sha512-hhxJJyEXhLlsCgzMsX10NlPL35yM/v/ThBNlHgLP/84/Wkf6VugIMIVqEH1m0bvOwGYSmz92yhPLKdoPV87BBg==
+
+murmurhash-js@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/murmurhash-js/-/murmurhash-js-1.0.0.tgz#b06278e21fc6c37fa5313732b0412bcb6ae15f51"
+  integrity sha512-TvmkNhkv8yct0SVBSy+o8wYzXjE4Zz3PCesbfs8HiCXXdcTuocApFv11UWlNFWKYsP2okqrhb7JNlSm9InBhIw==
 
 nan@2.14.0:
   version "2.14.0"
@@ -7598,10 +7606,10 @@ pause-stream@0.0.11:
   dependencies:
     through "~2.3"
 
-pegjs@~0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/pegjs/-/pegjs-0.8.0.tgz#976f067da13e5c5b1501c017925668a253811561"
-  integrity sha512-GtAFD5WLxE0LjyhlpKwAnbi3NLJDrYsOvil95UCUQ6pzxlUtUGP/k0FnKGypTpM1WWdmoclfXb0dmMd5UUDkvA==
+pegjs@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/pegjs/-/pegjs-0.10.0.tgz#cf8bafae6eddff4b5a7efb185269eaaf4610ddbd"
+  integrity sha512-qI5+oFNEGi3L5HAxDwN2LA4Gg7irF70Zs25edhjld9QemOgp0CbvMtbFcMvFtEo1OityPrcCzkQFB8JP/hxgow==
 
 pend@~1.2.0:
   version "1.2.0"
@@ -8539,7 +8547,6 @@ setimmediate@^1.0.5:
     async "^3.2.0"
     etch "0.9.0"
     fs-plus "^3.0.0"
-    fuzzaldrin "^2.1"
     glob "5.0.15"
     hosted-git-info "^2.8.9"
     request "^2.83.0"
@@ -8649,14 +8656,12 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
-"snippets@github:pulsar-edit/snippets#ba70705":
-  version "1.7.0"
-  resolved "https://codeload.github.com/pulsar-edit/snippets/tar.gz/ba70705f72b6fbf61a9f6aaa943bac7387cb41c1"
+"snippets@file:./packages/snippets":
+  version "1.8.0"
   dependencies:
     async "~0.2.6"
     atom-select-list "^0.7.0"
-    loophole "^1"
-    pegjs "~0.8.0"
+    pegjs "^0.10.0"
     scoped-property-store "^0.17.0"
     season "^6.0.2"
     temp "~0.8.0"
@@ -9022,10 +9027,9 @@ superagent@^8.0.9:
     qs "^6.11.0"
     semver "^7.3.8"
 
-superstring@^2.4.4:
+superstring@^2.4.4, "superstring@github:pulsar-edit/superstring#de97b496663fce40050bf2d66e1466ccfbd00943":
   version "2.4.4"
-  resolved "https://registry.yarnpkg.com/superstring/-/superstring-2.4.4.tgz#d5df5b080deb5605ffd88b6cdbaf17a0b30d5f0e"
-  integrity sha512-41LWIGzy6tkUM6jUwbXTeGOLui3gGBxgV6m8gIWRzv1WdW0HV6oANHdGanRrM04mwFXXExII9OQ/XxaqU+Ft9w==
+  resolved "https://codeload.github.com/pulsar-edit/superstring/tar.gz/de97b496663fce40050bf2d66e1466ccfbd00943"
   dependencies:
     nan "^2.14.2"
 
@@ -9065,18 +9069,23 @@ sylvester@^0.0.12:
   resolved "https://registry.yarnpkg.com/sylvester/-/sylvester-0.0.12.tgz#5a884415cd2d002c57e7a3aac99462a75ce9fdb4"
   integrity sha512-SzRP5LQ6Ts2G5NyAa/jg16s8e3R7rfdFjizy1zeoecYWw+nGL+YA1xZvW/+iJmidBGSdLkuvdwTYEyJEb+EiUw==
 
-"symbols-view@https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4":
-  version "0.118.4"
-  resolved "https://codeload.github.com/atom/symbols-view/legacy.tar.gz/refs/tags/v0.118.4#cd1b515d4a3d720402b85301ea8e4d6c8815aaf2"
+"symbol-provider-ctags@file:./packages/symbol-provider-ctags":
+  version "1.0.0"
   dependencies:
     async "^0.2.6"
-    atom-select-list "^0.7.0"
     ctags "^3.1.0"
-    fs-plus "^3.0.0"
+    fs-plus "^3.1.1"
+
+"symbol-provider-tree-sitter@file:./packages/symbol-provider-tree-sitter":
+  version "1.0.0"
+
+"symbols-view@file:./packages/symbols-view":
+  version "1.0.0"
+  dependencies:
+    atom-select-list "^0.8.1"
+    fs-plus "^3.1.1"
     fuzzaldrin "^2.1.0"
-    humanize-plus "^1.8.2"
-    temp "^0.8.3"
-    underscore-plus "^1.6.6"
+    murmurhash-js "^1.0.0"
 
 tabbable@^5.1.5:
   version "5.3.3"
@@ -9593,7 +9602,7 @@ unbzip2-stream@1.4.3:
     buffer "^5.2.1"
     through "^2.3.8"
 
-underscore-plus@1.7.0, underscore-plus@1.x, underscore-plus@^1, underscore-plus@^1.0.0, underscore-plus@^1.0.6, underscore-plus@^1.6.3, underscore-plus@^1.6.6, underscore-plus@^1.7.0, underscore-plus@~1.x:
+underscore-plus@1.7.0, underscore-plus@1.x, underscore-plus@^1, underscore-plus@^1.0.0, underscore-plus@^1.0.6, underscore-plus@^1.6.3, underscore-plus@^1.7.0, underscore-plus@~1.x:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/underscore-plus/-/underscore-plus-1.7.0.tgz#107f1900c520ac1fefe4edec6580a7ff08a99d0f"
   integrity sha512-A3BEzkeicFLnr+U/Q3EyWwJAQPbA19mtZZ4h+lLq3ttm9kn8WC4R3YpuJZEXmWdLjYP47Zc8aLZm9kwdv+zzvA==
@@ -9878,11 +9887,11 @@ what-the-status@1.0.3:
   dependencies:
     split "^1.0.0"
 
-"whats-my-line@https://github.com/pulsar-edit/whats-my-line/archive/348e8d10d9b9a1fd717cd4cc1263297844732768.tar.gz":
+"whats-my-line@https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz":
   version "0.2.0"
-  resolved "https://github.com/pulsar-edit/whats-my-line/archive/348e8d10d9b9a1fd717cd4cc1263297844732768.tar.gz#2e90f101d1179a36685fd1b948af361342e3c797"
+  resolved "https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz#1a504ee809e9ff86d1109de27c2e94fdf23f37d1"
   dependencies:
-    dugite "2.1.0"
+    dugite "2.5.2"
     superstring "^2.4.4"
     what-the-diff "^0.6.0"
 
@@ -10047,7 +10056,7 @@ wrap-ansi@^7.0.0:
     strip-ansi "^6.0.0"
 
 "wrap-guide@file:./packages/wrap-guide":
-  version "0.41.0"
+  version "0.41.1"
 
 wrappy@1:
   version "1.0.2"

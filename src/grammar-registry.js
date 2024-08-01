@@ -46,7 +46,7 @@ module.exports = class GrammarRegistry {
     this.textmateRegistry.onDidUpdateGrammar(grammarAddedOrUpdated);
 
     let onLanguageModeChange = () => {
-      this.grammarScoresByBuffer.forEach((score, buffer) => {
+      this.grammarScoresByBuffer.forEach((_score, buffer) => {
         if (!this.languageOverridesByBufferId.has(buffer.id)) {
           this.autoAssignLanguageMode(buffer);
         }
@@ -55,7 +55,7 @@ module.exports = class GrammarRegistry {
 
     this.subscriptions.add(
       this.config.onDidChange('core.useTreeSitterParsers', onLanguageModeChange),
-      this.config.onDidChange('core.useExperimentalModernTreeSitter', onLanguageModeChange)
+      this.config.onDidChange('core.useLegacyTreeSitter', onLanguageModeChange)
     );
   }
 
@@ -253,14 +253,26 @@ module.exports = class GrammarRegistry {
       scope = new ScopeDescriptor({ scopes: [scope] })
     }
     let useTreeSitterParsers = this.config.get('core.useTreeSitterParsers', { scope });
-    let useExperimentalModernTreeSitter = this.config.get('core.useExperimentalModernTreeSitter', { scope });
+    let useLegacyTreeSitter = this.config.get('core.useLegacyTreeSitter', { scope });
 
     if (!useTreeSitterParsers) return 'textmate';
-    return useExperimentalModernTreeSitter ? 'wasm-tree-sitter' : 'node-tree-sitter';
+    return useLegacyTreeSitter ? 'node-tree-sitter' : 'wasm-tree-sitter';
   }
 
-  // Extended: Returns a {Number} representing how well the grammar matches the
-  // `filePath` and `contents`.
+  // Extended: Evaluates a grammar's fitness for use for a certain file.
+  //
+  // By analyzing the file's extension and contents — plus other criteria, like
+  // the user's configuration — Pulsar will assign a score to this grammar that
+  // represents how suitable it is for the given file.
+  //
+  // Ultimately, whichever grammar scores highest for this file will be used
+  // to highlight it.
+  //
+  // * `grammar`: A given {Grammar}.
+  // * `filePath`: A {String} path to the file.
+  // * `contents`: The {String} contents of the file.
+  //
+  // Returns a {Number}.
   getGrammarScore(grammar, filePath, contents) {
     if (contents == null && fs.isFileSync(filePath)) {
       contents = fs.readFileSync(filePath, 'utf8');
@@ -288,25 +300,25 @@ module.exports = class GrammarRegistry {
       if (isNewTreeSitter) {
         if (parserConfig === 'wasm-tree-sitter') {
           score += 0.1;
-        } else {
-          // Never automatically switch to a new Tree-sitter grammar unless the
-          // user has opted into the experimental setting.
-          score = -Infinity;
+        } else if (parserConfig === 'textmate') {
+          score = -1;
         }
       } else if (isOldTreeSitter) {
         if (parserConfig === 'node-tree-sitter') {
           score += 0.1;
         } else if (parserConfig === 'wasm-tree-sitter') {
-          // In experimental new-tree-sitter mode, we still would rather fall
-          // back to an old-tree-sitter grammar than a TM grammar. Bump the
+          // If `useLegacyTreeSitter` isn't checked, we probably still prefer a
+          // legacy Tree-sitter grammar over a TextMate-style grammar. Bump the
           // score, but just a bit less than we'd bump it if this were a
-          // new-tree-sitter grammar.
+          // modern Tree-sitter grammar.
           score += 0.09;
+        } else if (parserConfig === 'textmate') {
+          score = -1;
         }
       }
 
-      // Prefer grammars with matching content regexes. Prefer a grammar with no content regex
-      // over one with a non-matching content regex.
+      // Prefer grammars with matching content regexes. Prefer a grammar with
+      // no content regex over one with a non-matching content regex.
       if (grammar.contentRegex) {
         const contentMatch = isTreeSitter
           ? grammar.contentRegex.test(contents)
@@ -318,7 +330,8 @@ module.exports = class GrammarRegistry {
         }
       }
 
-      // Prefer grammars that the user has manually installed over bundled grammars.
+      // Prefer grammars that the user has manually installed over bundled
+      // grammars.
       if (!grammar.bundledPackage) score += 0.01;
     }
 
@@ -544,7 +557,7 @@ module.exports = class GrammarRegistry {
     return disposable;
   }
 
-  // Experimental: Specify a type of syntax node that may embed other languages.
+  // Public: Specify a type of syntax node that may embed other languages.
   //
   // * `grammarId` The {String} id of the parent language
   // * `injectionPoint` An {Object} with the following keys:
@@ -770,18 +783,16 @@ module.exports = class GrammarRegistry {
     let result = this.textmateRegistry.getGrammars();
     if (!(params && params.includeTreeSitter)) return result;
 
-    let includeModernTreeSitterGrammars =
-      atom.config.get('core.useExperimentalModernTreeSitter') === true;
-
-    const tsGrammars = Object.values(this.treeSitterGrammarsById)
+    let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById)
       .filter(g => g.scopeName);
-    result = result.concat(tsGrammars);
+    result = result.concat(modernTsGrammars);
 
-    if (includeModernTreeSitterGrammars) {
-      let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById)
-        .filter(g => g.scopeName);
-      result = result.concat(modernTsGrammars);
-    }
+    // We must include all legacy Tree-sitter grammars here just in case the
+    // user has opted into `useTreeSitterGrammars` via a scope-specific
+    // setting.
+    const legacyTsGrammars = Object.values(this.treeSitterGrammarsById)
+      .filter(g => g.scopeName);
+    result = result.concat(legacyTsGrammars);
 
     return result;
   }
@@ -790,8 +801,10 @@ module.exports = class GrammarRegistry {
     return this.textmateRegistry.scopeForId(id);
   }
 
-  // TODO: why is this being used? Can we remove it soon?
-  treeSitterGrammarForLanguageString(languageString, type = 'original') {
+  // Match up a language string (of the sort generated by an injection point)
+  // with a grammar. Checks the `injectionRegex` property on grammars and
+  // returns the one with the longest match.
+  treeSitterGrammarForLanguageString(languageString, type = 'wasm') {
     let longestMatchLength = 0;
     let grammarWithLongestMatch = null;
     let table = type === 'original' ? this.treeSitterGrammarsById : this.wasmTreeSitterGrammarsById;

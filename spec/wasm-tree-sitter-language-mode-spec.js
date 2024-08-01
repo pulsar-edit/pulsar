@@ -17,20 +17,25 @@ function resolve(modulePath) {
   return require.resolve(`${PATH}/${modulePath}`)
 }
 
+// Just for syntax highlighting.
+function scm(strings) {
+  return strings.join('');
+}
+
 const cGrammarPath = resolve('language-c/grammars/modern-tree-sitter-c.cson');
 const pythonGrammarPath = resolve(
   'language-python/grammars/modern-tree-sitter-python.cson'
 );
 const jsGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-javascript.cson'
+  'language-javascript/grammars/modern-tree-sitter-javascript.cson'
 );
 
 const jsRegexGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-regex.cson'
+  'language-javascript/grammars/modern-tree-sitter-regex.cson'
 );
 
 const jsdocGrammarPath = resolve(
-  'language-javascript/grammars/tree-sitter-2-jsdoc.cson'
+  'language-javascript/grammars/modern-tree-sitter-jsdoc.cson'
 );
 const htmlGrammarPath = resolve(
   'language-html/grammars/modern-tree-sitter-html.cson'
@@ -39,7 +44,7 @@ const ejsGrammarPath = resolve(
   'language-html/grammars/modern-tree-sitter-ejs.cson'
 );
 const rubyGrammarPath = resolve(
-  'language-ruby/grammars/tree-sitter-2-ruby.cson'
+  'language-ruby/grammars/modern-tree-sitter-ruby.cson'
 );
 const rustGrammarPath = resolve(
   'language-rust-bundled/grammars/modern-tree-sitter-rust.cson'
@@ -52,9 +57,7 @@ let rubyConfig = CSON.readFileSync(rubyGrammarPath);
 let htmlConfig = CSON.readFileSync(htmlGrammarPath);
 
 function wait(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 describe('WASMTreeSitterLanguageMode', () => {
@@ -66,7 +69,6 @@ describe('WASMTreeSitterLanguageMode', () => {
     buffer = editor.getBuffer();
     editor.displayLayer.reset({ foldCharacter: '…' });
     atom.config.set('core.useTreeSitterParsers', true);
-    atom.config.set('core.useExperimentalModernTreeSitter', true);
   });
 
   afterEach(() => {
@@ -590,9 +592,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           ]
         ]);
 
-        console.log('adding: ()');
         buffer.setTextInRange([[0, 3], [0, 3]], '()');
-        console.log('done: ()');
 
         expectTokensToEqual(editor, [
           [
@@ -601,9 +601,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           ]
         ]);
 
-        console.log('adding: new');
         buffer.setTextInRange([[0, 0], [0, 0]], 'new ');
-        console.log('done: new');
 
         expectTokensToEqual(editor, [
           [
@@ -616,7 +614,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         await nextHighlightingUpdate(languageMode);
         // await wait(0);
         // await languageMode.atTransactionEnd();
-        console.log('proceeding!');
 
         expectTokensToEqual(editor, [
           [
@@ -1034,6 +1031,32 @@ describe('WASMTreeSitterLanguageMode', () => {
         ]);
       });
 
+      it('handles injections with no highlights query', async () => {
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(jsGrammar);
+        atom.grammars.addGrammar(htmlGrammar);
+        htmlGrammar.highlightsQuery = false;
+        // Pretend this grammar doesn't have a highlights query.
+        spyOn(htmlGrammar, 'getQuery').andReturn(Promise.resolve(null));
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: jsGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        buffer.setText('text = html`<p></p>`');
+        await languageMode.atTransactionEnd();
+
+        // An injection should still be able to add its root scope even when
+        // its grammar has no `highlightsQuery`.
+        let descriptor = editor.scopeDescriptorForBufferPosition([0, 15]);
+
+        expect(descriptor.getScopesArray()).toContain('text.html.basic');
+      });
+
       it('terminates comment token at the end of an injection, so that the next injection is NOT a continuation of the comment', async () => {
         jasmine.useRealClock();
         const ejsGrammar = new WASMTreeSitterGrammar(
@@ -1410,6 +1433,73 @@ describe('WASMTreeSitterLanguageMode', () => {
         ).toBe(true);
       });
 
+      it('allows multiple base scopes on the injected layer when `languageScope` is a function', async () => {
+
+        let customJsConfig = { ...jsConfig };
+        let customJsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, customJsConfig);
+
+        await jsGrammar.setQueryForTest('highlightsQuery', `
+          (comment) @comment
+          (property_identifier) @property
+          (call_expression (identifier) @function)
+          (template_string) @string
+          (template_substitution
+            ["\${" "}"] @interpolation)
+        `);
+
+        let customHtmlConfig = { ...htmlConfig };
+        let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
+
+        await htmlGrammar.setQueryForTest('highlightsQuery', `
+          (fragment) @html
+          (tag_name) @tag
+          (attribute_name) @attr
+        `);
+
+        customHtmlGrammar.addInjectionPoint({
+          ...SCRIPT_TAG_INJECTION_POINT,
+          languageScope: (grammar, _buffer, range) => {
+            return [grammar.scopeName, `meta.line${range.start.row}`];
+          }
+        });
+
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(customJsGrammar);
+        atom.grammars.addGrammar(customHtmlGrammar);
+        buffer.setText('<script>\nhello();\n</script>\n<div>\n</div>\n<script>\ngoodbye();</script>');
+
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: customHtmlGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        let descriptor = languageMode.scopeDescriptorForPosition([1, 1]);
+        expect(
+          descriptor.getScopesArray().includes('source.js')
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line0`)
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line5`)
+        ).toBe(false);
+
+        descriptor = languageMode.scopeDescriptorForPosition([6, 1]);
+        expect(
+          descriptor.getScopesArray().includes('source.js')
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line5`)
+        ).toBe(true);
+        expect(
+          descriptor.getScopesArray().includes(`meta.line0`)
+        ).toBe(false);
+      });
+
       it('notifies onDidTokenize listeners the first time all syntax highlighting is done', async () => {
         const promise = new Promise(resolve => {
           editor.onDidTokenize(event => {
@@ -1610,7 +1700,12 @@ describe('WASMTreeSitterLanguageMode', () => {
   });
 
   describe('.suggestedIndentForBufferRows', () => {
+    beforeEach(async () => {
+      await atom.packages.activatePackage('language-javascript');
+    })
+
     it('works correctly when straddling an injection boundary', async () => {
+
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
       jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
@@ -1628,9 +1723,16 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       // `suggestedIndentForBufferRows` should use the HTML grammar to
       // determine the indent level of `let foo` rather than the JS grammar.
+      //
+      // And on line 5, it should use the JavaScript grammar to determine
+      // `</script>`'s _initial_ indentation level, but the HTML grammar to
+      // determine whether to dedent relative to that initial level.
       buffer.setText(dedent`
         <script>
           let foo;
+          if (foo) {
+            debug(true);
+          }
         </script>
       `);
 
@@ -1644,9 +1746,9 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
 
-      let map = languageMode.suggestedIndentForBufferRows(1, 1, editor.getTabLength());
+      let map = languageMode.suggestedIndentForBufferRows(0, 5, editor.getTabLength());
 
-      expect(map.get(1)).toBe(1);
+      expect(Array.from(map.values())).toEqual([0, 1, 1, 2, 1, 0]);
     });
   });
 
@@ -1663,20 +1765,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         (formal_parameters)
       ] @fold
       `);
-
-      // {
-      //   parser: 'tree-sitter-javascript',
-      //   folds: [
-      //     {
-      //       start: { type: '{', index: 0 },
-      //       end: { type: '}', index: -1 }
-      //     },
-      //     {
-      //       start: { type: '(', index: 0 },
-      //       end: { type: ')', index: -1 }
-      //     }
-      //   ]
-      // }
 
       buffer.setText(dedent`
         module.exports =
@@ -1795,7 +1883,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         (#set! fold.endAt lastChild.previousSibling.endPosition))
 
       ((jsx_self_closing_element) @fold
-        (#set! fold.endAt lastChild.previousSibling.startPosition))
+        (#set! fold.endAt lastChild.startPosition))
       `);
 
       buffer.setText(dedent`
@@ -1837,6 +1925,118 @@ describe('WASMTreeSitterLanguageMode', () => {
         const element2 = <Element>…
         </Element>
       `);
+    });
+
+    it('updates its fold cache properly when `fold.invalidateOnChange` is specified', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, htmlConfig);
+
+      await grammar.setQueryForTest('foldsQuery', scm`
+        (element
+          (start_tag
+            (tag_name) @_IGNORE_
+             ">" @fold)
+          (#set! fold.endAt parent.parent.lastNamedChild.startPosition)
+          (#set! fold.adjustToEndOfPreviousRow true)
+        )
+
+        (element
+          (start_tag
+            (tag_name) @_IGNORE_) @fold
+          (#set! fold.invalidateOnChange true)
+          (#set! fold.endAt lastChild.startPosition)
+          (#set! fold.adjustToEndOfPreviousRow true))
+      `);
+
+      // This is almost the exact scenario that created the need for this
+      // predicate. Since we use `adjustToEndOfPreviousRow`, this fold won't be
+      // valid in the below scenario because it'd start and end on row 0.
+      buffer.setText(dedent`
+        <div
+          foo="bar">
+          <span>hello</span>
+          <span>world</span>
+        </div>
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      expect(editor.isFoldableAtBufferRow(0)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(1)).toBe(true);
+      expect(editor.isFoldableAtBufferRow(2)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(3)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(4)).toBe(false);
+
+      editor.setCursorBufferPosition([1, 11]);
+      editor.insertText('\n');
+      await languageMode.atTransactionEnd();
+
+      // It's only after we make this edit — and `start_tag` ends on row 2
+      // instead of row 1 — that the fold becomes valid, since now the fold
+      // range will start at row 0 and end at row 1. But without
+      // `fold.invalidateOnChange`, we wouldn't know that the change on line 1
+      // could have any effect on whether row 0 was foldable.
+      expect(editor.getText()).toBe(dedent`
+        <div
+          foo="bar"
+        >
+          <span>hello</span>
+          <span>world</span>
+        </div>
+      `)
+
+      expect(editor.isFoldableAtBufferRow(0)).toBe(true);
+      expect(editor.isFoldableAtBufferRow(1)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(2)).toBe(true);
+      expect(editor.isFoldableAtBufferRow(3)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(4)).toBe(false);
+    });
+
+    it('understands custom predicates', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, htmlConfig);
+
+      await grammar.setQueryForTest('foldsQuery', scm`
+        ((element
+          (start_tag
+            (tag_name) @_IGNORE_.tag)) @_IGNORE_.element
+            (#eq? @_IGNORE_.tag "div")
+            (#set! isDiv true))
+
+        ; Make self-closing elements foldable only when they're ancestors of
+        ; DIVs. This is a very silly thing to do.
+        ((element
+          (start_tag
+            (tag_name) @_IGNORE_) @fold)
+          (#match? @_IGNORE_ "^(area|base|br|col|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$")
+          (#set! test.descendantOfNodeWithData "isDiv")
+          (#set! capture.final)
+        )
+
+      `);
+
+      buffer.setText(dedent`
+        <img
+          foo="bar"
+          baz="thud"
+          troz="zort"
+        >
+
+        <div>
+          <img
+            foo="bar"
+            baz="thud"
+            troz="zort"
+          >
+        </div>
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      expect(editor.isFoldableAtBufferRow(0)).toBe(false);
+      expect(editor.isFoldableAtBufferRow(7)).toBe(true);
     });
 
     it('can fold entire nodes when no start or end parameters are specified', async () => {
@@ -3038,7 +3238,142 @@ describe('WASMTreeSitterLanguageMode', () => {
   });
 
   describe('.commentStringsForPosition(position)', () => {
+    beforeEach(() => {
+      atom.config.unset('editor.commentDelimiters', { scopeSelector: '.source.js' });
+      atom.config.unset('editor.commentStart',      { scopeSelector: '.source.js' });
+      atom.config.unset('editor.commentEnd',        { scopeSelector: '.source.js' });
+      atom.config.unset('editor.commentDelimiters', { scopeSelector: '.text.html.basic' });
+      atom.config.unset('editor.commentStart',      { scopeSelector: '.text.html.basic' });
+      atom.config.unset('editor.commentEnd',        { scopeSelector: '.text.html.basic' });
+    });
+
     it('returns the correct comment strings for nested languages', async () => {
+      jasmine.useRealClock();
+      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
+
+      const htmlGrammar = new WASMTreeSitterGrammar(
+        atom.grammars,
+        htmlGrammarPath,
+        htmlConfig
+      );
+
+      htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
+
+      atom.grammars.addGrammar(jsGrammar);
+      atom.grammars.addGrammar(htmlGrammar);
+
+      atom.config.set(
+        'editor.commentDelimiters',
+        {
+          line: '//',
+          block: ['/*', '*/']
+        },
+        { scopeSelector: '.source.js' }
+      );
+
+      atom.config.set(
+        'editor.commentStart',
+        '//',
+        { scopeSelector: '.source.js' }
+      );
+
+
+      atom.config.set(
+        'editor.commentDelimiters',
+        {
+          block: ['<!--', '-->']
+        },
+        { scopeSelector: '.text.html.basic' }
+      );
+
+      atom.config.set(
+        'editor.commentStart',
+        '<!--',
+        { scopeSelector: '.text.html.basic' }
+      );
+
+      atom.config.set(
+        'editor.commentEnd',
+        '-->',
+        { scopeSelector: '.text.html.basic' }
+      );
+
+      const languageMode = new WASMTreeSitterLanguageMode({
+        grammar: htmlGrammar,
+        buffer,
+        config: atom.config,
+        grammars: atom.grammars
+      });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      buffer.setText(
+        `
+<div>hi</div>
+<script>
+  const node = document.getElementById('some-id');
+  node.innerHTML = html \`
+    <span>bye</span>
+  \`
+</script>
+      `.trim()
+      );
+
+      const htmlCommentStrings = {
+        commentStartString: '<!--',
+        commentEndString: '-->',
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      };
+      const jsCommentStrings = {
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: '//',
+          block: ['/*', '*/']
+        }
+      };
+
+      // Needs a short delay to allow injection grammars to be loaded.
+      await languageMode.nextTransaction;
+
+      expect(languageMode.commentStringsForPosition(new Point(0, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(1, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(2, 0))).toEqual(
+        jsCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(3, 0))).toEqual(
+        jsCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(4, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(5, 0))).toEqual({
+        // This is the curveball. Original position is inside the HTML, so
+        // that's what the delimiters will be. But `commentStartString` will be
+        // `// ` because it looks up the scope of the first non-whitespace
+        // content on the row.
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      });
+      expect(languageMode.commentStringsForPosition(new Point(6, 0))).toEqual(
+        htmlCommentStrings
+      );
+    });
+
+    it('uses grammar comment settings when config data is missing', async () => {
       jasmine.useRealClock();
       const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
@@ -3077,12 +3412,20 @@ describe('WASMTreeSitterLanguageMode', () => {
       );
 
       const htmlCommentStrings = {
-        commentStartString: '<!-- ',
-        commentEndString: ' -->'
+        commentStartString: '<!--',
+        commentEndString: '-->',
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
       };
       const jsCommentStrings = {
-        commentStartString: '// ',
-        commentEndString: undefined
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: '//',
+          block: ['/*', '*/']
+        }
       };
 
       // Needs a short delay to allow injection grammars to be loaded.
@@ -3103,13 +3446,133 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(languageMode.commentStringsForPosition(new Point(4, 0))).toEqual(
         htmlCommentStrings
       );
-      expect(languageMode.commentStringsForPosition(new Point(5, 0))).toEqual(
-        jsCommentStrings
-      );
+      expect(languageMode.commentStringsForPosition(new Point(5, 0))).toEqual({
+        // This is the curveball. Original position is inside the HTML, so
+        // that's what the delimiters will be. But `commentStartString` will be
+        // `// ` because it looks up the scope of the first non-whitespace
+        // content on the row.
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      });
       expect(languageMode.commentStringsForPosition(new Point(6, 0))).toEqual(
         htmlCommentStrings
       );
     });
+
+    it('constructs the right comment settings when grammar data is missing', async () => {
+      jasmine.useRealClock();
+      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
+
+      const htmlGrammar = new WASMTreeSitterGrammar(
+        atom.grammars,
+        htmlGrammarPath,
+        htmlConfig
+      );
+
+      spyOn(jsGrammar, 'getCommentDelimiters').andReturn({ line: undefined, block: undefined });
+      spyOn(htmlGrammar, 'getCommentDelimiters').andReturn({ line: undefined, block: undefined });
+
+      atom.config.set(
+        'editor.commentDelimiters',
+        {
+          line: '//',
+          block: ['/*', '*/']
+        },
+        { scopeSelector: '.source.js' }
+      );
+
+      atom.config.set(
+        'editor.commentDelimiters',
+        {
+          block: ['<!--', '-->']
+        },
+        { scopeSelector: '.text.html.basic' }
+      );
+
+      htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
+
+      atom.grammars.addGrammar(jsGrammar);
+      atom.grammars.addGrammar(htmlGrammar);
+
+      const languageMode = new WASMTreeSitterLanguageMode({
+        grammar: htmlGrammar,
+        buffer,
+        config: atom.config,
+        grammars: atom.grammars
+      });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      buffer.setText(
+        `
+<div>hi</div>
+<script>
+  const node = document.getElementById('some-id');
+  node.innerHTML = html \`
+    <span>bye</span>
+  \`
+</script>
+      `.trim()
+      );
+
+      const htmlCommentStrings = {
+        commentStartString: '<!--',
+        commentEndString: '-->',
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      };
+      const jsCommentStrings = {
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: '//',
+          block: ['/*', '*/']
+        }
+      };
+
+      // Needs a short delay to allow injection grammars to be loaded.
+      await languageMode.nextTransaction;
+
+      expect(languageMode.commentStringsForPosition(new Point(0, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(1, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(2, 0))).toEqual(
+        jsCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(3, 0))).toEqual(
+        jsCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(4, 0))).toEqual(
+        htmlCommentStrings
+      );
+      expect(languageMode.commentStringsForPosition(new Point(5, 0))).toEqual({
+        // This is the curveball. Original position is inside the HTML, so
+        // that's what the delimiters will be. But `commentStartString` will be
+        // `// ` because it looks up the scope of the first non-whitespace
+        // content on the row.
+        commentStartString: '//',
+        commentEndString: undefined,
+        commentDelimiters: {
+          line: undefined,
+          block: ['<!--', '-->']
+        }
+      });
+      expect(languageMode.commentStringsForPosition(new Point(6, 0))).toEqual(
+        htmlCommentStrings
+      );
+    });
+
   });
 
   describe('TextEditor.selectLargerSyntaxNode and .selectSmallerSyntaxNode', () => {
@@ -3119,11 +3582,6 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('highlightsQuery', `
         (program) @source
       `);
-
-      // {
-      //   parser: 'tree-sitter-javascript',
-      //   scopes: { program: 'source' }
-      // });
 
       buffer.setText(dedent`
         function a (b, c, d) {
@@ -3680,7 +4138,6 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(editor.getText()).toEqual(emptyClassText);
     });
 
-    // This test is known to fail (and expected to fail) without async-indent enabled.
     it('auto-indents correctly if any change in a transaction wants auto-indentation', async () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
@@ -3704,19 +4161,46 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setText(emptyClassText);
 
       const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      // Force this test to use async indent in all cases.
+      languageMode.transactionReparseBudgetMs = 0;
+      languageMode.currentTransactionReparseBudgetMs = 0;
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
       await wait(0);
 
-      editor.setCursorBufferPosition([1, 0]);
+      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+
+      editor.setCursorBufferPosition([0, 15]);
       editor.transact(() => {
-        editor.insertText('// this is a comment', { autoIndent: true });
+        // This is a transaction in which each indentation decision is
+        // contingent on the previous indentation decisions that have been
+        // made. But in async indent mode, we cannot make any indentation
+        // suggestions until the end of the transaction.
+        //
+        // Still, in some scenarios, this will be OK. Either we can make each
+        // of these indentation decisions in order once the transaction is
+        // done, or we can give up and auto-indent the whole range covered by
+        // the transaction when we're done.
+        //
+        // This is an imperfect heuristic and won't produce good results in
+        // many cases, which is why we flip to async indent reluctantly and
+        // only in certain scenarios. But it's better than committing to N
+        // re-parses (where N equals the number of indentation suggestions
+        // we're asked to make during a given transaction) no matter how high N
+        // may be. And it's also better than performing no indentation at all
+        // in these cases.
         editor.insertNewline();
-        editor.insertText('// and this is another', { autoIndent: true });
+        editor.insertText('// this is a comment', { autoIndent: true, autoDecreaseIndent: true });
+        editor.insertNewline();
+        editor.insertText('// and this is another', { autoIndent: true, autoDecreaseIndent: true });
         editor.insertNewline();
       });
 
       await wait(0);
+
+      expect(
+        languageMode.suggestedIndentForBufferRows
+      ).toHaveBeenCalled();
 
       expect(editor.lineTextForBufferRow(1)).toEqual(
         `  // this is a comment`
@@ -3803,10 +4287,12 @@ describe('WASMTreeSitterLanguageMode', () => {
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
       await wait(0);
-
-      editor.setCursorBufferPosition([2, 4]);
+      editor.setCursorBufferPosition([2, 0]);
+      editor.insertText('    ');
+      await wait(0);
       editor.insertText('}', { autoIndent: true });
 
+      await languageMode.atTransactionEnd();
       await wait(0);
       expect(editor.lineTextForBufferRow(2)).toEqual(`  }`);
 
@@ -3873,7 +4359,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         ["}"] @dedent
       `);
 
-      // let textToPaste = `// this is a comment\n  // and this is another`;
       let textToPaste = `a comment`;
       buffer.setText(textToPaste);
 
@@ -3918,42 +4403,100 @@ describe('WASMTreeSitterLanguageMode', () => {
       await grammar.setQueryForTest('indentsQuery', `
         ["{"] @indent
         ["}"] @dedent
-        `);
+      `);
 
-        let emptyClassText = dedent`
-        class Example {
+      let emptyClassText = dedent`
+      class Example {
 
-        }
-        `;
+      }
+      `;
 
-        buffer.setText(emptyClassText);
+      buffer.setText(emptyClassText);
 
-        const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-        buffer.setLanguageMode(languageMode);
-        await languageMode.ready;
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
 
-        editor.setCursorBufferPosition([1, 0]);
-        editor.indent();
-        await languageMode.atTransactionEnd();
-        editor.insertText('// this is a comment', { autoIndent: true });
-        await languageMode.atTransactionEnd();
-        expect(editor.lineTextForBufferRow(1)).toEqual('  // this is a comment');
+      editor.setCursorBufferPosition([1, 0]);
+      editor.indent();
+      await languageMode.atTransactionEnd();
+      editor.insertText('// this is a comment', { autoIndent: true });
+      await languageMode.atTransactionEnd();
+      expect(editor.lineTextForBufferRow(1)).toEqual('  // this is a comment');
 
-        editor.insertNewline();
-        await languageMode.atTransactionEnd();
-        await wait(0);
-        expect(editor.lineTextForBufferRow(2)).toEqual('  ');
+      editor.insertNewline();
+      await languageMode.atTransactionEnd();
+      await wait(0);
+      expect(editor.lineTextForBufferRow(2)).toEqual('  ');
 
-        editor.insertNewline();
-        await languageMode.atTransactionEnd();
-        await wait(0);
-        expect(editor.lineTextForBufferRow(3)).toEqual('  ');
+      editor.insertNewline();
+      await languageMode.atTransactionEnd();
+      await wait(0);
+      expect(editor.lineTextForBufferRow(3)).toEqual('  ');
 
-        editor.insertNewline();
-        await languageMode.atTransactionEnd();
-        await wait(0);
-        expect(editor.lineTextForBufferRow(4)).toEqual('  ');
+      editor.insertNewline();
+      await languageMode.atTransactionEnd();
+      await wait(0);
+      expect(editor.lineTextForBufferRow(4)).toEqual('  ');
     });
+
+    it(`can indent properly in a multi-cursor environment without auto-indenting large ranges of the buffer`, async () => {
+      jasmine.useRealClock();
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      expect(editor.getUndoGroupingInterval()).toBe(300);
+
+      await grammar.setQueryForTest('indentsQuery', `
+        ["{"] @indent
+        ["}"] @dedent
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      // Force this test to use async indent in all cases.
+      languageMode.transactionReparseBudgetMs = 0;
+      languageMode.currentTransactionReparseBudgetMs = 0;
+      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      // No spaces after the `{`s in these examples so that we can more easily
+      // compare expected output to actual output.
+      buffer.setText(dedent`
+        function test () {return }
+
+        function test () {return }
+
+        function test () {return }
+      `);
+
+      expect(
+        languageMode.suggestedIndentForBufferRows
+      ).not.toHaveBeenCalled();
+
+      editor.setCursorBufferPosition([0, 18])
+      editor.addCursorAtBufferPosition([2, 18])
+      editor.addCursorAtBufferPosition([4, 18])
+
+      editor.insertNewline({
+        autoIndent: true,
+        autoIndentNewline: true,
+        autoDecreaseIndent: true
+      })
+
+      await wait(0);
+
+      expect(buffer.getText()).toBe(dedent`
+        function test () {
+          return }
+
+        function test () {
+          return }
+
+        function test () {
+          return }
+      `)
+
+    })
 
   });
 });

@@ -50,24 +50,17 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added a new "UI" API to `atom`, accessible via `atom.ui`. This exposes a `markdown` object, allowing community packages to offload Markdown handling to the core editor.
+                Worked around API breakage (FreeBSD <code>libiconv</code> vs GNU <code>libiconv</code>) in the <code>iconv</code> library shipped in macOS 13+
               </li>
               <li>
-                Fine-tuned/deduped dependencies to remove ~35.5 MB from Pulsar's installed size.
+                Changed `language-php` to continue syntax-highlighting even when encountering unbalanced PHP tags. (Avoid throwing a syntax error)
               </li>
               <li>
-                Fixed an issue that sometimes caused text to shift or disappear after an editor pane regains focus.
+                Indentation, fold, and highlighting fixes in <code>language-python</code>, <code>language-javascript</code>, <code>language-typescript</code>, <code>language-shell</code> and <code>language-c</code>.
               </li>
               <li>
-                Fixed scoping/highlighting of single-quoted (`'...'`) and C-style (`$'...'`) strings in shell scripts.
+                Fix <code>--no-sandbox</code> flag not being applied to the <code>.desktop</code> launcher on Linux (Fixes Dev Tools).
               </li>
-              <li>
-                Fixed an issue with the "Dismiss this Version" button (In the `pulsar-updater` package).
-              </li>
-              <li>
-                Fixed an issue with how Linux Pulsar binaries were built, to ensure compatibility with non-bleeding edge glibc versions. (Compatibility with even older glibc versions is still being looked into, for the folks on older or RHEL-compatible distros.)
-              </li>
-
             </ul>
 
             <section className="welcome-panel">

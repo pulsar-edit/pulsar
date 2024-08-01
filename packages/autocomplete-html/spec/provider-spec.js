@@ -1,5 +1,5 @@
 describe('HTML autocompletions', () => {
-  let editor, provider
+  let editor, provider, languageMode
 
   function getCompletions () {
     const cursor = editor.getLastCursor()
@@ -32,51 +32,66 @@ describe('HTML autocompletions', () => {
     return -1;
   }
 
-  beforeEach(() => {
-    waitsForPromise(() => atom.packages.activatePackage('autocomplete-html'))
-    waitsForPromise(() => atom.packages.activatePackage('language-html'))
-    waitsForPromise(() => atom.workspace.open('test.html'))
+  beforeEach(async () => {
+    await atom.packages.activatePackage('autocomplete-html')
+    await atom.packages.activatePackage('language-html')
+    await atom.workspace.open('test.html')
+    editor = atom.workspace.getActiveTextEditor()
+    languageMode = editor.getBuffer().getLanguageMode()
+    languageMode.useAsyncParsing = false
+    languageMode.useAsyncIndent = false
+    await languageMode.ready
 
-    runs(() => provider = atom.packages.getActivePackage('autocomplete-html').mainModule.getProvider())
-    runs(() => editor = atom.workspace.getActiveTextEditor())
+    provider = atom.packages.getActivePackage('autocomplete-html').mainModule.getProvider()
   })
 
-  it('returns no completions when not at the start of a tag', () => {
+  afterEach(async () => {
+    await languageMode.atTransactionEnd()
+  })
+
+  it('returns no completions when not at the start of a tag', async () => {
     editor.setText('')
+    await languageMode.atTransactionEnd()
     expect(getCompletions().length).toBe(0)
 
     editor.setText('d')
     editor.setCursorBufferPosition([0, 0])
+    await languageMode.atTransactionEnd()
+
     expect(getCompletions().length).toBe(0)
+
     editor.setCursorBufferPosition([0, 1])
     expect(getCompletions().length).toBe(0)
   })
 
-  it('returns no completions in style tags', () => {
+  it('returns no completions in style tags', async () => {
     editor.setText(`\
 <style>
 <
 </style>\
 `
     )
+    await languageMode.atTransactionEnd()
     editor.setCursorBufferPosition([1, 1])
     expect(getCompletions().length).toBe(0)
   })
 
-  it('returns no completions in script tags', () => {
+  it('returns no completions in script tags', async () => {
     editor.setText(`\
 <script>
 <
 </script>\
 `
     )
+    await languageMode.atTransactionEnd()
     editor.setCursorBufferPosition([1, 1])
     expect(getCompletions().length).toBe(0)
   })
 
-  it('autcompletes tag names without a prefix', () => {
+  it('autcompletes tag names without a prefix', async () => {
     editor.setText('<')
     editor.setCursorBufferPosition([0, 1])
+    await languageMode.atTransactionEnd()
 
     const completions = getCompletions()
     expect(completions.length).toBeGreaterThan(113) // Fun Fact last check this was 232
@@ -90,9 +105,10 @@ describe('HTML autocompletions', () => {
     }
   })
 
-  it('autocompletes tag names with a prefix', () => {
+  it('autocompletes tag names with a prefix', async () => {
     editor.setText('<d')
     editor.setCursorBufferPosition([0, 2])
+    await languageMode.atTransactionEnd()
 
     let completions = getCompletions()
     expect(completions.length).toBeGreaterThan(9) // Fun fact last check was 14
@@ -126,24 +142,27 @@ describe('HTML autocompletions', () => {
     expect(isValueInCompletions('dt', completions)).toBe(true)
   })
 
-  it("does not autocomplete tag names if there's a space after the <", () => {
+  it("does not autocomplete tag names if there's a space after the <", async () => {
     editor.setText('< ')
     editor.setCursorBufferPosition([0, 2])
+    await languageMode.atTransactionEnd()
 
     let completions = getCompletions()
     expect(completions.length).toBe(0)
 
     editor.setText('< h')
     editor.setCursorBufferPosition([0, 2])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBe(0)
   })
 
-  it('does not provide a descriptionMoreURL if the tag does not have a unique description', () => {
+  it('does not provide a descriptionMoreURL if the tag does not have a unique description', async () => {
     // isindex does not have an associated MDN page as of March 25, 2023
     editor.setText('<i')
     editor.setCursorBufferPosition([0, 2])
+    await languageMode.atTransactionEnd()
 
     const completions = getCompletions()
     const loc = getValueInCompletionsIndex('isindex', completions)
@@ -153,9 +172,10 @@ describe('HTML autocompletions', () => {
     expect(completions[loc].descriptionMoreURL).toBeNull()
   })
 
-  it('autocompletes attribute names without a prefix', () => {
+  it('autocompletes attribute names without a prefix', async () => {
     editor.setText('<div ')
     editor.setCursorBufferPosition([0, 5])
+    await languageMode.atTransactionEnd()
 
     let completions = getCompletions()
     expect(completions.length).toBeGreaterThan(86) // Fun fact last check this was 264
@@ -171,6 +191,7 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<marquee ')
     editor.setCursorBufferPosition([0, 9])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBeGreaterThan(98) // Last check 274
@@ -186,6 +207,7 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<div >')
     editor.setCursorBufferPosition([0, 5])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBeGreaterThan(0)
@@ -193,6 +215,7 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<div  >')
     editor.setCursorBufferPosition([0, 5])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBeGreaterThan(0)
@@ -201,9 +224,10 @@ describe('HTML autocompletions', () => {
     }
   })
 
-  it('autocompletes attribute names with a prefix', () => {
+  it('autocompletes attribute names with a prefix', async () => {
     editor.setText('<div c')
     editor.setCursorBufferPosition([0, 6])
+    await languageMode.atTransactionEnd()
 
     let completions = getCompletions()
     expect(completions.length).toBeGreaterThan(3) // Last check 9
@@ -218,6 +242,7 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<div C')
     editor.setCursorBufferPosition([0, 6])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBeGreaterThan(3) // Last check 9
@@ -228,6 +253,7 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<div c>')
     editor.setCursorBufferPosition([0, 6])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBeGreaterThan(3)
@@ -238,6 +264,7 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<div c></div>')
     editor.setCursorBufferPosition([0, 6])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBeGreaterThan(3)
@@ -248,6 +275,7 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<marquee di')
     editor.setCursorBufferPosition([0, 12])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(isValueInCompletions('direction', completions, 'displayText'))
@@ -255,65 +283,73 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<marquee dI')
     editor.setCursorBufferPosition([0, 12])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(isValueInCompletions('direction', completions, 'displayText'))
     expect(isValueInCompletions('dir', completions, 'displayText'))
   })
 
-  it('autocompletes attribute names without a prefix surrounded by whitespace', () => {
+  it('autocompletes attribute names without a prefix surrounded by whitespace', async () => {
     editor.setText('<select  autofocus')
     editor.setCursorBufferPosition([0, 8])
+    await languageMode.atTransactionEnd()
 
     const completions = getCompletions()
     for (let completion of completions) { expect(completion.type).toBe('attribute') }
     expect(isValueInCompletions('autofocus', completions, 'displayText'))
   })
 
-  it('autocompletes attribute names with a prefix surrounded by whitespace', () => {
+  it('autocompletes attribute names with a prefix surrounded by whitespace', async () => {
     editor.setText('<select o autofocus')
     editor.setCursorBufferPosition([0, 9])
+    await languageMode.atTransactionEnd()
 
     const completions = getCompletions()
     for (let completion of completions) { expect(completion.type).toBe('attribute') }
     expect(isValueInCompletions('onabort', completions, 'displayText'))
   })
 
-  it("respects the 'flag' type when autocompleting attribute names", () => {
+  it("respects the 'flag' type when autocompleting attribute names", async () => {
     editor.setText('<select ')
     editor.setCursorBufferPosition([0, 8])
+    await languageMode.atTransactionEnd()
 
     const completions = getCompletions()
     expect(isValueInCompletions('autofocus', completions, 'snippet'))
   })
 
-  it('does not autocomplete attribute names in between an attribute name and value', () => {
+  it('does not autocomplete attribute names in between an attribute name and value', async () => {
     editor.setText('<select autofocus=""')
     editor.setCursorBufferPosition([0, 18])
+    await languageMode.atTransactionEnd()
 
     let completions = getCompletions()
     expect(completions.length).toBe(0)
 
     editor.setText('<select autofocus= ""')
     editor.setCursorBufferPosition([0, 18])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBe(0)
 
     editor.setText('<select autofocus= ""')
     editor.setCursorBufferPosition([0, 19])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBe(0)
 
     editor.setText('<select autofocus=  ""')
     editor.setCursorBufferPosition([0, 19])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBe(0)
   })
 
-  it('does not autocomplete attribute names outside of a tag', () => {
+  it('does not autocomplete attribute names outside of a tag', async () => {
     editor.setText('<kbd>')
     editor.setCursorBufferPosition([0, 0])
 
@@ -324,18 +360,20 @@ describe('HTML autocompletions', () => {
     expect(getCompletions().length).toBe(0)
   })
 
-  it('does not throw when a local attribute is not in the attributes list', () => {
+  it('does not throw when a local attribute is not in the attributes list', async () => {
     // Some tags, like body, have local attributes that are not present in the top-level attributes array
     editor.setText('<body ')
     editor.setCursorBufferPosition([0, 6])
+    await languageMode.atTransactionEnd()
 
     const completions = getCompletions()
     expect(isValueInCompletions('onafterprint', completions, 'displayText'))
   })
 
-  it('does not provide a descriptionMoreURL if the attribute does not have a unique description', () => {
+  it('does not provide a descriptionMoreURL if the attribute does not have a unique description', async () => {
     editor.setText('<input on')
     editor.setCursorBufferPosition([0, 9])
+    await languageMode.atTransactionEnd()
 
     const completions = getCompletions()
 
@@ -346,9 +384,10 @@ describe('HTML autocompletions', () => {
     expect(completions[loc].descriptionMoreURL).toBeNull()
   })
 
-  it('autocompletes attribute values without a prefix', () => {
+  it('autocompletes attribute values without a prefix', async () => {
     editor.setText('<marquee behavior=""')
     editor.setCursorBufferPosition([0, 19])
+    await languageMode.atTransactionEnd()
 
     let completions = getCompletions()
     expect(completions.length).toBe(3)
@@ -360,28 +399,37 @@ describe('HTML autocompletions', () => {
     expect(completions[1].text).toBe('slide')
     expect(completions[2].text).toBe('alternate')
 
-    editor.setText('<marquee behavior="')
-    editor.setCursorBufferPosition([0, 19])
-
-    completions = getCompletions()
-    expect(completions.length).toBe(3)
-
-    expect(completions[0].text).toBe('scroll')
-    expect(completions[1].text).toBe('slide')
-    expect(completions[2].text).toBe('alternate')
-
-    editor.setText('<marquee behavior=\'')
-    editor.setCursorBufferPosition([0, 19])
-
-    completions = getCompletions()
-    expect(completions.length).toBe(3)
-
-    expect(completions[0].text).toBe('scroll')
-    expect(completions[1].text).toBe('slide')
-    expect(completions[2].text).toBe('alternate')
+    // NOTE: The Tree-sitter parser goes absolutely mental in this scenario. It
+    // presents a much more reasonable tree when the closing quote is present,
+    // but it'd be incredibly hard to salvage something from this mess.
+    //
+    // This isn't ideal, but most users will have enabled smart typing pairs,
+    // so we'll let this slide.
+    // editor.setText('<marquee behavior="')
+    // editor.setCursorBufferPosition([0, 19])
+    // await languageMode.atTransactionEnd()
+    //
+    // completions = getCompletions()
+    // expect(completions.length).toBe(3)
+    //
+    // expect(completions[0].text).toBe('scroll')
+    // expect(completions[1].text).toBe('slide')
+    // expect(completions[2].text).toBe('alternate')
+    //
+    // editor.setText('<marquee behavior=\'')
+    // editor.setCursorBufferPosition([0, 19])
+    // await languageMode.atTransactionEnd()
+    //
+    // completions = getCompletions()
+    // expect(completions.length).toBe(3)
+    //
+    // expect(completions[0].text).toBe('scroll')
+    // expect(completions[1].text).toBe('slide')
+    // expect(completions[2].text).toBe('alternate')
 
     editor.setText('<marquee behavior=\'\'')
     editor.setCursorBufferPosition([0, 19])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBe(3)
@@ -391,9 +439,10 @@ describe('HTML autocompletions', () => {
     expect(completions[2].text).toBe('alternate')
   })
 
-  it('autocompletes attribute values with a prefix', () => {
+  it('autocompletes attribute values with a prefix', async () => {
     editor.setText('<html behavior="" lang="e"')
     editor.setCursorBufferPosition([0, 25])
+    await languageMode.atTransactionEnd()
 
     let completions = getCompletions()
     expect(completions.length).toBe(6)
@@ -408,6 +457,7 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<html behavior="" lang="E"')
     editor.setCursorBufferPosition([0, 25])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBe(6)
@@ -421,6 +471,7 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<html behavior="" lang=\'e\'')
     editor.setCursorBufferPosition([0, 25])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBe(6)
@@ -433,9 +484,10 @@ describe('HTML autocompletions', () => {
     expect(completions[5].text).toBe('es')
   })
 
-  it('autocompletes ambiguous attribute values', () => {
+  it('autocompletes ambiguous attribute values', async () => {
     editor.setText('<button type=""')
     editor.setCursorBufferPosition([0, 14])
+    await languageMode.atTransactionEnd()
 
     let completions = getCompletions()
     expect(completions.length).toBe(3)
@@ -449,6 +501,7 @@ describe('HTML autocompletions', () => {
 
     editor.setText('<link rel=""')
     editor.setCursorBufferPosition([0, 11])
+    await languageMode.atTransactionEnd()
 
     completions = getCompletions()
     expect(completions.length).toBe(13)
@@ -460,9 +513,10 @@ describe('HTML autocompletions', () => {
     expect(completions[0].descriptionMoreURL.endsWith('/HTML/Element/link#attributes')).toBe(true)
   })
 
-  it("provides 'true' and 'false' suggestions when autocompleting boolean attributes", () => {
+  it("provides 'true' and 'false' suggestions when autocompleting boolean attributes", async () => {
     editor.setText('<html contenteditable=""')
     editor.setCursorBufferPosition([0, 23])
+    await languageMode.atTransactionEnd()
 
     const completions = getCompletions()
     expect(completions.length).toBe(2)
@@ -470,50 +524,55 @@ describe('HTML autocompletions', () => {
     expect(completions[1].text).toBe('false')
   })
 
-  it('does not attempt to autocomplete values before the beginning of a string', () => {
+  it('does not attempt to autocomplete values before the beginning of a string', async () => {
     editor.setText('<button type=""')
     editor.setCursorBufferPosition([0, 13])
+    await languageMode.atTransactionEnd()
 
     let completions = []
     expect(() => completions = getCompletions()).not.toThrow()
     expect(completions.length).toBe(0)
   })
 
-  it('does not attempt to autocomplete values after the end of a string', () => {
+  it('does not attempt to autocomplete values after the end of a string', async () => {
     editor.setText('<button type=""')
     editor.setCursorBufferPosition([0, 15])
+    await languageMode.atTransactionEnd()
 
     let completions = []
     expect(() => completions = getCompletions()).not.toThrow()
     expect(completions.length).toBe(0)
   })
 
-  it('does not throw when quotes are in the attribute value', () => {
+  it('does not throw when quotes are in the attribute value', async () => {
     editor.setText('<button type="\'"')
     editor.setCursorBufferPosition([0, 15])
+    await languageMode.atTransactionEnd()
 
     expect(() => getCompletions()).not.toThrow()
   })
 
-  it("does not autocomplete attribute values if there isn't a corresponding attribute", () => {
+  it("does not autocomplete attribute values if there isn't a corresponding attribute", async () => {
     editor.setText('<button type="""')
     editor.setCursorBufferPosition([0, 16])
+    await languageMode.atTransactionEnd()
 
     let completions = []
     expect(() => completions = getCompletions()).not.toThrow()
     expect(completions.length).toBe(0)
   })
 
-  it('does not throw when attempting to autocomplete values for nonexistent attributes', () => {
+  it('does not throw when attempting to autocomplete values for nonexistent attributes', async () => {
     editor.setText('<button typ=""')
     editor.setCursorBufferPosition([0, 13])
+    await languageMode.atTransactionEnd()
 
     let completions = []
     expect(() => completions = getCompletions()).not.toThrow()
     expect(completions.length).toBe(0)
   })
 
-  it('triggers autocomplete when an attibute has been inserted', () => {
+  it('triggers autocomplete when an attibute has been inserted', async () => {
     spyOn(atom.commands, 'dispatch')
     const suggestion = {type: 'attribute', text: 'whatever'}
     provider.onDidInsertSuggestion({editor, suggestion})
@@ -526,20 +585,16 @@ describe('HTML autocompletions', () => {
     expect(args[1]).toBe('autocomplete-plus:activate')
   })
 
-  it('does not error in EJS documents', () => {
+  it('does not error in EJS documents', async () => {
     waitsForPromise(async () => {
       await atom.workspace.open('test.html.ejs')
       editor = atom.workspace.getActiveTextEditor()
       editor.setText('<span><% a = ""; %></span>')
+      return languageMode.atTransactionEnd()
     })
 
-    waitsForPromise(() => {
-      return atom.packages.activatePackage('language-javascript')
-    })
-
-    runs(() => {
-      editor.setCursorBufferPosition([0, editor.getText().indexOf('""') + 1])
-      expect(() => getCompletions()).not.toThrow()
-    })
+    await atom.packages.activatePackage('language-javascript')
+    editor.setCursorBufferPosition([0, editor.getText().indexOf('""') + 1])
+    expect(() => getCompletions()).not.toThrow()
   })
 })

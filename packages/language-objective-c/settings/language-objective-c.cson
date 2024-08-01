@@ -32,6 +32,7 @@
       'NSMutableString'
       'NSString'
     ]
+    # Comment settings are specified in the `language-c` package.
 '.source.objcpp, .source.objc':
   'editor':
     'foldEndPattern': '(?<!\\*)\\*\\*/|^\\s*\\}|^@end\\b'

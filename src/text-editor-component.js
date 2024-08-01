@@ -274,7 +274,7 @@ module.exports = class TextEditorComponent {
       this.remeasureCharacterDimensions = false;
     }
 
-    this.measureBlockDecorations();
+    if (this.isVisible()) this.measureBlockDecorations();
 
     this.updateSyncBeforeMeasuringContent();
     if (useScheduler === true) {
@@ -5121,7 +5121,7 @@ function debounce(fn, wait) {
     }
   }
 
-  return function() {
+  return function () {
     timestamp = Date.now();
     if (!timeout) timeout = setTimeout(later, wait);
   };

@@ -70,7 +70,9 @@ module.exports = class TreeSitterGrammar {
     return `TreeSitterGrammar {scopeName: ${this.scopeName}}`;
   }
 
-  idForScope(scopeName) {
+  // Though _text is unused here, some packages (eg semanticolor) use it to
+  // customize scopes on the fly.
+  idForScope(scopeName, _text) {
     if (!scopeName) {
       return undefined;
     }

@@ -27,8 +27,7 @@ fileTypes: [
 ]
 
 treeSitter:
-  # Built from tree-sitter-python 62827156d01c74dc1538266344e788da74536b8a
-  # to add support for `match` statements.
+  parserSource: 'github:tree-sitter/tree-sitter-python#4bfdd9033a2225cc95032ce77066b7aeca9e2efc'
   grammar: 'ts/tree-sitter-python.wasm'
   highlightsQuery: 'ts/highlights.scm'
   tagsQuery: 'ts/tags.scm'

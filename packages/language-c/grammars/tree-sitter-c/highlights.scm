@@ -13,19 +13,50 @@
 "#define" @keyword.control.directive.define.c
 "#include" @keyword.control.directive.include.c
 
-; This will match if the more specific rules above haven't matched. The
-; anonymous nodes will match under ideal conditions, but might not be present
-; if the parser is flummoxed.
+(["#if" "#ifdef" "#ifndef" "#endif" "#elif" "#else" "#define" "#include"] @punctuation.definition.directive.c
+  (#set! adjust.endAfterFirstMatchOf "^#"))
+
+; `preproc_directive` will be used when the parser doesn't recognize the
+; directive as one of the above. It's permissive; `#afdfafsdfdfad` would be
+; parsed as a `preproc_directive`.
+;
+; Hence this rule will match if the more specific rules above haven't matched.
+; The anonymous nodes will match under ideal conditions, but might not be
+; present even when they ought to be _if_ the parser is flummoxed; so this'll
+; sometimes catch `#ifdef` and others.
 ((preproc_directive) @keyword.control.directive.c
   (#set! capture.shy true))
 
-((preproc_ifdef
-  (identifier) @entity.name.function.preprocessor.c
-  (#match? @entity.name.function.preprocessor.c "[a-zA-Z_$][\\w$]*")))
+((preproc_directive) @punctuation.definition.directive.c
+  (#set! capture.shy true)
+  (#set! adjust.endAfterFirstMatchOf "^#"))
 
+; Macro functions are definitely entities.
 (preproc_function_def
   (identifier) @entity.name.function.preprocessor.c
   (#set! capture.final true))
+
+; Identifiers in macro definitions are definitely constants.
+((preproc_def
+  name: (identifier) @constant.preprocessor.c))
+
+; We can also safely treat identifiers as constants in `#ifdef`…
+((preproc_ifdef
+  (identifier) @constant.preprocessor.c))
+
+; …and `#if` and `#elif`…
+(preproc_if
+  (binary_expression
+    (identifier) @constant.preprocessor.c))
+(preproc_elif
+  (binary_expression
+    (identifier) @constant.preprocessor.c))
+
+; …and `#undef`.
+((preproc_call
+  directive: (preproc_directive) @_IGNORE_
+  argument: (preproc_arg) @constant.preprocessor.c)
+  (#eq? @_IGNORE_ "#undef"))
 
 (system_lib_string) @string.quoted.other.lt-gt.include.c
 ((system_lib_string) @punctuation.definition.string.begin.c
@@ -43,30 +74,50 @@
   (type_identifier) @_IGNORE_
   (#set! capture.final true))
 
-(primitive_type) @support.type.builtin.c
-(type_identifier) @support.type.other.c
+(primitive_type) @support.storage.type.builtin.c
+
+; When the user has typed `#define FOO`, the macro injection thinks that `FOO`
+; is a type declaration (for some reason). This node structure seems to exist
+; only in that unusual and incorrect scenario, so we'll stop it from happening
+; so that it doesn't override the underlying `constant.other.c` scope.
+(translation_unit
+  (type_identifier) @_IGNORE_
+  (#set! capture.final))
+
+(type_identifier) @support.other.storage.type.c
 
 ; These types are all reserved words; if we see an identifier with this name,
 ; it must be a type.
-((identifier) @support.type.builtin.c
-  (#match? @support.type.builtin.c "^(char|int|float|double|long)$"))
+((identifier) @support.storage.type.builtin.c
+  (#match? @support.storage.type.builtin.c "^(char|int|float|double|long)$"))
 
 ; Assume any identifier that ends in `_t` is a type. This convention is not
 ; always followed, but it's a very strong indicator when it's present.
-((identifier) @support.type.other.c
-  (#match? @support.type.other.c "_t$"))
+((identifier) @support.other.storage.type.c
+  (#match? @support.other.storage.type.c "_t$"))
 
+; These refer to language constructs and remain in the `storage` namespace.
 [
   "enum"
-  "long"
-  "short"
-  "signed"
   "struct"
   "typedef"
   "union"
-  "unsigned"
 ] @storage.type.c
 
+; These refer to value types and go under `support`.
+[
+  "long"
+  "short"
+] @support.storage.type.builtin.c
+
+; These act as modifiers to value types and also go under `support`.
+[
+  "signed"
+  "unsigned"
+] @support.storage.modifier.builtin.c
+
+; These act as general language modifiers and remain in the `storage`
+; namespace.
 [
   "const"
   "extern"
@@ -75,10 +126,10 @@
   "restrict"
   "static"
   "volatile"
-] @storage.modifier.c
+] @storage.modifier._TYPE_.c
 
-((primitive_type) @support.type.stdint.c
-  (#match? @support.type.stdint.c "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$"))
+((primitive_type) @support.storage.type.stdint.c
+  (#match? @support.storage.type.stdint.c "^(int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|int_least8_t|int_least16_t|int_least32_t|int_least64_t|uint_least8_t|uint_least16_t|uint_least32_t|uint_least64_t|int_fast8_t|int_fast16_t|int_fast32_t|int_fast64_t|uint_fast8_t|uint_fast16_t|uint_fast32_t|uint_fast64_t|intptr_t|uintptr_t|intmax_t|intmax_t|uintmax_t|uintmax_t)$"))
 
 (enum_specifier
   name: (type_identifier) @variable.other.declaration.type.c)
@@ -116,31 +167,68 @@
 ; Declarations and assignments
 ; ----------------------------
 
-; The "x" in `int x`;
+; The "x" in `int x;`
 (declaration
-  declarator: (identifier) @variable.declaration.c)
+  declarator: (identifier) @variable.other.declaration.c)
 
-; The "x" in `int x = y`;
+; The "x" in `int x = y;`
 (init_declarator
-  declarator: (identifier) @variable.declaration.c)
+  declarator: (identifier) @variable.other.declaration.c)
 
+; The "x" in `SomeType *x;`
+; (Should work no matter how many pointers deep we are.)
+(pointer_declarator
+  declarator: [(identifier) (field_identifier)] @variable.other.declaration.pointer.c
+  (#is? test.descendantOfType "declaration field_declaration"))
+
+; An array declarator: the "table" in `int table[4];`
+(array_declarator
+  declarator: (identifier) @variable.other.declaration.c)
+
+; A member of a struct.
 (field_declaration
-  (field_identifier) @entity.other.attribute-name.c)
+  (field_identifier) @variable.other.declaration.member.c)
+
+; An attribute in a C99 struct designated initializer:
+; the "foo" in `MY_TYPE a = { .foo = true };
+(initializer_pair
+  (field_designator
+    (field_identifier) @variable.other.declaration.member.c))
+
+; (and the associated ".")
+(initializer_pair
+  (field_designator
+    "." @keyword.operator.accessor.c))
 
 (field_declaration
   (pointer_declarator
-    (field_identifier) @entity.other.attribute-name.c))
+    (field_identifier) @variable.other.declaration.member.c))
 
 (field_declaration
   (array_declarator
-    (field_identifier) @entity.other.attribute-name.c))
+    (field_identifier) @variable.other.declaration.member.c))
 
 (init_declarator
   (pointer_declarator
-    (identifier) @entity.other.attribute-name.c))
+    (identifier) @variable.other.declaration.member.c))
 
+; The "x" in `x = y;`
 (assignment_expression
   left: (identifier) @variable.other.assignment.c)
+
+; The "foo" in `something->foo = "bar";`
+(assignment_expression
+  left: (field_expression
+    field: (field_identifier) @variable.other.member.assignment.c)
+    (#set! capture.final))
+
+; Goto label definitions: the "foo" in `foo:` before a statement.
+(labeled_statement
+  label: (statement_identifier) @entity.name.label.c)
+
+; Goto statements — the "foo" in `goto foo;`
+(goto_statement
+  label: (statement_identifier) @support.other.label.c)
 
 
 ; Function parameters
@@ -154,9 +242,10 @@
   declarator: (identifier) @variable.parameter.c)
 
 ; The "foo" in `const char *foo` within a parameter list.
-(parameter_declaration
-  declarator: (pointer_declarator
-    declarator: (identifier) @variable.parameter.c))
+; (Should work no matter how many pointers deep we are.)
+(pointer_declarator
+  declarator: [(identifier) (field_identifier)] @variable.parameter.pointer.c
+  (#is? test.descendantOfType "parameter_declaration"))
 
 ; The "foo" in `const char foo[]` within a parameter list.
 (parameter_declaration
@@ -172,7 +261,13 @@
 ; The "size" in `finfo->size`.
 (field_expression
   "->"
-  field: (field_identifier) @support.other.property.c)
+  field: (field_identifier) @variable.other.member.c)
+
+; The "bar" in `foo.bar`.
+(field_expression
+  operator: "."
+  field: (field_identifier) @variable.other.member.c)
+
 
 
 ; FUNCTIONS
@@ -212,8 +307,19 @@
   (false)
 ] @constant.language._TYPE_.c
 
-((identifier) @constant.c
-  (#match? @constant.c "[_A-Z][_A-Z0-9]*$"))
+; Don't try to scope (e.g.) `int FOO = 1` as a constant when the user types `=`
+; but has not typed the value yet.
+(ERROR
+  (identifier) @_IGNORE_
+  (#set! capture.final))
+
+; In most languages we wouldn't be making the assumption that an all-caps
+; identifier should be treated as a constant. But those languages don't have
+; macro preprocessors. The convention is decently strong in C/C++ that all-caps
+; identifiers will refer to `#define`d things.
+((identifier) @constant.other.c
+  (#match? @constant.other.c "^[_A-Z][_A-Z0-9]*$")
+  (#set! capture.shy))
 
 
 ; COMMENTS
@@ -309,8 +415,10 @@
 
 ";" @punctuation.terminator.statement.c
 
-"," @punctuation.separator.comma.c
-"->" @punctuation.separator.pointer-access.c
+("," @punctuation.separator.comma.c
+  (#set! capture.shy))
+("->" @keyword.operator.accessor.pointer-access.c
+  (#set! capture.shy))
 
 (parameter_list
   "(" @punctuation.definition.parameters.begin.bracket.round.c
@@ -334,6 +442,22 @@
 ")" @punctuation.definition.end.bracket.round.c
 "[" @punctuation.definition.array.begin.bracket.square.c
 "]" @punctuation.definition.array.end.bracket.square.c
+
+
+; META
+; ====
+
+((compound_statement) @meta.block.c
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+((enumerator_list) @meta.block.enum.c
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
+
+((field_declaration_list) @meta.block.field.c
+  (#set! adjust.startAt firstChild.endPosition)
+  (#set! adjust.endAt lastChild.startPosition))
 
 ; TODO:
 ;

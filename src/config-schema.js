@@ -360,13 +360,14 @@ const configSchema = {
       useTreeSitterParsers: {
         type: 'boolean',
         default: true,
+        title: 'Use Tree-sitter Parsers',
         description: 'Use Tree-sitter parsers for supported languages.'
       },
-      useExperimentalModernTreeSitter: {
+      useLegacyTreeSitter: {
         type: 'boolean',
         default: false,
-        title: 'Use Modern Tree-Sitter Implementation',
-        description: 'Experimental: Use the new query-file-based Tree-sitter system instead of the legacy system from Atom. (This system will eventually replace the legacy system.) Has no effect unless "Use Tree Sitter Parsers" is also checked.'
+        title: 'Use Legacy Tree-sitter Implementation',
+        description: 'Opt into the legacy Atom Tree-sitter system instead of the modern system added by Pulsar. (We plan to remove this legacy system soon.) Has no effect unless “Use Tree-sitter Parsers” is also checked.'
       },
       colorProfile: {
         description:
@@ -398,6 +399,17 @@ const configSchema = {
         description: 'Add the current tab title to the Pulsar Window title.',
         type: 'boolean',
         default: true
+      },
+      syncWindowThemeWithPulsarTheme: {
+        description: 'When changing the theme within Pulsar also change the theme of the window on the operating system.',
+        type: 'boolean',
+        default: false
+      },
+      allowWindowTransparency: {
+        type: 'boolean',
+        default: false,
+        title: 'Allow Window Transparency',
+        description: `Allows editor windows to be see-through. When this setting is enabled, UI themes and user stylesheets can use background colors with an alpha channel to make editor windows translucent. Takes effect after a restart of Pulsar.`
       }
     }
   },

@@ -1,11 +1,19 @@
 {
   "name": "language-hyperlink",
   "version": "0.17.1",
+  "main": "lib/main",
   "description": "Hyperlink colorization in Atom",
   "engines": {
     "atom": "*",
     "node": ">=14"
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
-  "license": "MIT"
+  "license": "MIT",
+  "providedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "provideHyperlinkInjection"
+      }
+    }
+  }
 }

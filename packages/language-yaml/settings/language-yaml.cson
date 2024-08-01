@@ -2,6 +2,8 @@
   'editor':
     'autoIndentOnPaste': false
     'commentStart': '# '
+    'commentDelimiters':
+      'line': '#'
     'foldEndPattern': '^\\s*$|^\\s*\\}|^\\s*\\]|^\\s*\\)'
     'increaseIndentPattern': '^\\s*.*(:|-) ?(&\\w+)?(\\{[^}"\']*|\\([^)"\']*)?$'
     'decreaseIndentPattern': '^\\s+\\}$'
