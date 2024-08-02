@@ -23,12 +23,12 @@ export default class SystemPanel {
     WinShell.pathUser.isRegistered((i) => { this.refs.addToPathCheckbox.checked = i })
 
     // File Extension Handler Setup
-    WinShell.FileExtHandlerAll.isRegistered((i) => { this.refs.fileExtHandlerAllCheckbox.checked = i });
-    WinShell.FileExtHandler_cplusplus.isRegistered((i) => { this.refs.fileExtHandler_cplusplusCheckbox.checked = i });
-    WinShell.FileExtHandler_cs.isRegistered((i) => { this.refs.fileExtHandler_csCheckbox.checked = i });
-    WinShell.FileExtHandler_js.isRegistered((i) => { this.refs.fileExtHandler_jsCheckbox.checked = i });
-    WinShell.FileExtHandler_less.isRegistered((i) => { this.refs.fileExtHandler_lessCheckbox.checked = i });
-    WinShell.FileExtHandler_rb.isRegistered((i) => { this.refs.fileExtHandler_rbCheckbox.checked = i });
+    this.refs.fileExtHandlerAllCheckbox.checked = WinShell.FileExtHandlerAll.isRegistered();
+    this.refs.fileExtHandler_cplusplusCheckbox.checked = WinShell.FileExtHandler_cplusplus.isRegistered();
+    this.refs.fileExtHandler_csCheckbox.checked = WinShell.FileExtHandler_cs.isRegistered();
+    this.refs.fileExtHandler_jsCheckbox.checked = WinShell.FileExtHandler_js.isRegistered();
+    this.refs.fileExtHandler_lessCheckbox.checked = WinShell.FileExtHandler_less.isRegistered();
+    this.refs.fileExtHandler_rbCheckbox.checked = WinShell.FileExtHandler_rb.isRegistered();
   }
 
   destroy () {
@@ -122,6 +122,14 @@ export default class SystemPanel {
     }
   }
 
+  setRegistrationNoCallback(option, shouldBeRegistered) {
+    if (shouldBeRegistered) {
+      return option.register();
+    } else {
+      return option.deregister();
+    }
+  }
+
   getPathUI() {
     return (
       <div className='control-group'>
@@ -170,7 +178,14 @@ export default class SystemPanel {
                         className='input-checkbox'
                         type='checkbox'
                         onclick={(e) => {
-                          this.setRegistration(WinShell.FileExtHandlerAll, e.target.checked)
+                          this.setRegistrationNoCallback(WinShell.FileExtHandlerAll, e.target.checked);
+
+                          // Update all other checkboxes
+                          this.refs.fileExtHandler_cplusplusCheckbox.checked = e.target.checked;
+                          this.refs.fileExtHandler_csCheckbox.checked = e.target.checked;
+                          this.refs.fileExtHandler_jsCheckbox.checked = e.target.checked;
+                          this.refs.fileExtHandler_lessCheckbox.checked = e.target.checked;
+                          this.refs.fileExtHandler_rbCheckbox.checked = e.target.checked;
                         }} />
                       <div className='setting-title'>Handle All supported file extensions</div>
                       <div className='setting-description'>
@@ -191,7 +206,12 @@ export default class SystemPanel {
                         className='input-checkbox'
                         type='checkbox'
                         onclick={(e) => {
-                          this.setRegistration(WinShell.FileExtHandler_cplusplus, e.target.checked)
+                          this.setRegistrationNoCallback(WinShell.FileExtHandler_cplusplus, e.target.checked);
+
+                          // Update AllCheckbox
+                          if (refs.fileExtHandlerAllCheckbox.checked && !e.target.checked) {
+                            refs.fileExtHandlerAllCheckbox.checked = false;
+                          }
                         }} />
                       <div className='setting-title'>Handle <code>.c++</code> file extensions</div>
                       <div className='setting-description'>
@@ -212,7 +232,12 @@ export default class SystemPanel {
                         className='input-checkbox'
                         type='checkbox'
                         onclick={(e) => {
-                          this.setRegistration(WinShell.FileExtHandler_cs, e.target.checked)
+                          this.setRegistrationNoCallback(WinShell.FileExtHandler_cs, e.target.checked);
+
+                          // Update AllCheckbox
+                          if (refs.fileExtHandlerAllCheckbox.checked && !e.target.checked) {
+                            refs.fileExtHandlerAllCheckbox.checked = false;
+                          }
                         }} />
                       <div className='setting-title'>Handle <code>.cs</code> file extensions</div>
                       <div className='setting-description'>
@@ -233,7 +258,12 @@ export default class SystemPanel {
                         className='input-checkbox'
                         type='checkbox'
                         onclick={(e) => {
-                          this.setRegistration(WinShell.FileExtHandler_js, e.target.checked)
+                          this.setRegistrationNoCallback(WinShell.FileExtHandler_js, e.target.checked);
+
+                          // Update AllCheckbox
+                          if (refs.fileExtHandlerAllCheckbox.checked && !e.target.checked) {
+                            refs.fileExtHandlerAllCheckbox.checked = false;
+                          }
                         }} />
                       <div className='setting-title'>Handle <code>.js</code> file extensions</div>
                       <div className='setting-description'>
@@ -254,7 +284,12 @@ export default class SystemPanel {
                         className='input-checkbox'
                         type='checkbox'
                         onclick={(e) => {
-                          this.setRegistration(WinShell.FileExtHandler_less, e.target.checked)
+                          this.setRegistrationNoCallback(WinShell.FileExtHandler_less, e.target.checked);
+
+                          // Update AllCheckbox
+                          if (refs.fileExtHandlerAllCheckbox.checked && !e.target.checked) {
+                            refs.fileExtHandlerAllCheckbox.checked = false;
+                          }
                         }} />
                       <div className='setting-title'>Handle <code>.less</code> file extensions</div>
                       <div className='setting-description'>
@@ -275,7 +310,12 @@ export default class SystemPanel {
                         className='input-checkbox'
                         type='checkbox'
                         onclick={(e) => {
-                          this.setRegistration(WinShell.FileExtHandler_rb, e.target.checked)
+                          this.setRegistrationNoCallback(WinShell.FileExtHandler_rb, e.target.checked);
+
+                          // Update AllCheckbox
+                          if (refs.fileExtHandlerAllCheckbox.checked && !e.target.checked) {
+                            refs.fileExtHandlerAllCheckbox.checked = false;
+                          }
                         }} />
                       <div className='setting-title'>Handle <code>.rb</code> file extensions</div>
                       <div className='setting-description'>

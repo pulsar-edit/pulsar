@@ -288,7 +288,7 @@ class FileExtHandler {
           { name: "FriendlyTypeName", value: `Pulsar ${fileType.desc}` },
           { name: "", key: "DefaultIcon", value: `${Path.join(process.execPath, "..", "resources", "icons", fileType.ico)}` },
           { name: "", key: "shell\\open\\command", value: `"${appPath}" "%1"` },
-          { name: "Icon", key: "shell\\open", value: `${appPath}` }
+          { name: "", key: "shell\\open", value: `"${appPath}"` }
         ]
       );
 
@@ -298,7 +298,7 @@ class FileExtHandler {
     }
   }
 
-  isRegistered(callback) {
+  isRegistered() {
     let allRegistered = true;
 
     for (const shell of this.shells) {
@@ -310,21 +310,19 @@ class FileExtHandler {
       });
     }
 
-    callback(allRegistered);
+    return allRegistered;
   }
 
-  register(callback) {
+  register() {
     for (const shell of this.shells) {
       shell.register(() => {});
     }
-    callback(null);
   }
 
-  deregister(callback) {
+  deregister() {
     for (const shell of this.shells) {
       shell.deregister(() => {});
     }
-    callback(null);
   }
 
 }
