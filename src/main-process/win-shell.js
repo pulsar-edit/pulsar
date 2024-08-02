@@ -287,8 +287,8 @@ class FileExtHandler {
           { name: "AppUserModelID", value: "dev.pulsar-edit.pulsar" },
           { name: "FriendlyTypeName", value: `Pulsar ${fileType.desc}` },
           { name: "", key: "DefaultIcon", value: `${Path.join(process.execPath, "..", "resources", "icons", fileType.ico)}` },
-          { name: "", key: "shell\\open\\command", value: `"${appPath}" "%1"` },
-          { name: "", key: "shell\\open", value: `"${appPath}"` }
+          { name: "", key: "shell\\open\\command", value: `${appPath} "%1"` },
+          { name: "Icon", key: "shell\\open", value: `${fileIconPath}` }
         ]
       );
 
