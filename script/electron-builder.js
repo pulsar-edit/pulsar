@@ -217,6 +217,10 @@ let options = {
       {
         "from": "resources/win/modifyWindowsPath.ps1",
         "to": "modifyWindowsPath.ps1"
+      },
+      {
+        "from": "resources/file-icons/win/icons",
+        "to": "icons"
       }
     ],
     "target": [

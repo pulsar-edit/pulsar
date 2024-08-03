@@ -221,6 +221,119 @@ exports.runningAsAdmin = (callback) => {
 
 exports.appName = appName;
 
+const supportedFileExtHandlerTypes = [
+  // ext: The extension of the file. This must be exact and will be applied to
+  //      this exact extension within the Windows registry.
+  // ico: This should be the filename of the specific icon within `./resources/file-icons/win/icons`
+  // progID: This is an arbitrary ID. But best to be in format of `Pulsar.<EXT>`
+  // desc: This is a human friendly description of the file type.
+  {
+    ext: ".c++",
+    ico: "cplusplus.ico",
+    progID: "Pulsar.c++",
+    desc: "C++ Source File"
+  },
+  {
+    ext: ".cs",
+    ico: "csharp.ico",
+    progID: "Pulsar.cs",
+    desc: "C Sharp Source File"
+  },
+  {
+    ext: ".js",
+    ico: "javascript.ico",
+    progID: "Pulsar.js",
+    desc: "JavaScript Source File"
+  },
+  {
+    ext: ".less",
+    ico: "less.ico",
+    progID: "Pulsar.less",
+    desc: "Less Source File"
+  },
+  {
+    ext: ".rb",
+    ico: "ruby.ico",
+    progID: "Pulsar.rb",
+    desc: "Ruby Source File"
+  }
+];
+
+class FileExtHandler {
+  constructor(fileTypes) {
+    this.fileTypes = Array.isArray(fileTypes) ? fileTypes : [ fileTypes ];
+    this.shells = [];
+
+    this.initialize();
+  }
+
+  initialize() {
+    for (const fileType of this.fileTypes) {
+      // Setup ShellOption for extension. This adds a custom program as the
+      // handler for a particular file extension.
+      const extShellOption = new ShellOption(
+        `\\Software\\Classes\\${fileType.ext}`,
+        [
+          { key: "OpenWithProgids", name: fileType.progID, value: "" }
+        ]
+      );
+
+      // Setup ShellOption for custom Program. This creates the custom program
+      // that will be used to handle the file extension.
+      const progIdShellOption = new ShellOption(
+        `\\Software\\Classes\\${fileType.progID}`,
+        [
+          { name: "", value: fileType.desc },
+          { name: "AppUserModelID", value: "dev.pulsar-edit.pulsar" },
+          { name: "FriendlyTypeName", value: `Pulsar ${fileType.desc}` },
+          { name: "", key: "DefaultIcon", value: `${Path.join(process.execPath, "..", "resources", "icons", fileType.ico)}` },
+          { name: "", key: "shell\\open\\command", value: `${appPath} "%1"` },
+          { name: "Icon", key: "shell\\open", value: `${fileIconPath}` }
+        ]
+      );
+
+      // Add both shells to `this.shells`
+      this.shells.push(extShellOption);
+      this.shells.push(progIdShellOption);
+    }
+  }
+
+  isRegistered() {
+    let allRegistered = true;
+
+    for (const shell of this.shells) {
+      shell.isRegistered((i) => {
+        if (!i) {
+          // We want allRegistered to be false, even if only one return is false
+          allRegistered = false;
+        }
+      });
+    }
+
+    return allRegistered;
+  }
+
+  register() {
+    for (const shell of this.shells) {
+      shell.register(() => {});
+    }
+  }
+
+  deregister() {
+    for (const shell of this.shells) {
+      shell.deregister(() => {});
+    }
+  }
+
+}
+
+exports.FileExtHandler_cplusplus = new FileExtHandler(supportedFileExtHandlerTypes[0]);
+exports.FileExtHandler_cs = new FileExtHandler(supportedFileExtHandlerTypes[1]);
+exports.FileExtHandler_js = new FileExtHandler(supportedFileExtHandlerTypes[2]);
+exports.FileExtHandler_less = new FileExtHandler(supportedFileExtHandlerTypes[3]);
+exports.FileExtHandler_rb = new FileExtHandler(supportedFileExtHandlerTypes[4]);
+exports.FileExtHandlerAll = new FileExtHandler(supportedFileExtHandlerTypes);
+
 exports.fileHandler = new ShellOption(
   `\\Software\\Classes\\Applications\\${exeName}`,
   [
