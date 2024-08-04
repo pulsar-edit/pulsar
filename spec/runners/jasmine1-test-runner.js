@@ -83,7 +83,9 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
     jasmineEnv.specFilter = (spec) => getFullDescription(spec, false).match(regex)
   }
 
-  jasmineEnv.setIncludedTags([process.platform]);
+  if (jasmineEnv.setIncludedTags) {
+    jasmineEnv.setIncludedTags([process.platform]);
+  }
 
   const jasmineContent = document.createElement('div');
   jasmineContent.setAttribute('id', 'jasmine-content');
@@ -167,7 +169,7 @@ var buildReporter = function({logFile, headless, resolveWithExitCode}) {
     return buildTerminalReporter(logFile, resolveWithExitCode);
   } else {
     let reporter;
-    const AtomReporter = require('../helpers/atom-reporter.js');
+    const AtomReporter = require('../helpers/jasmine1-atom-reporter.js');
     return reporter = new AtomReporter();
   }
 };
