@@ -46,6 +46,9 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
 
   return loadSpecsAndRunThem(logFile, headless, testPaths)
     .then((result) => {
+      // Retrying failures only really makes sense in headless mode,
+      // otherwise the whole HTML view is replaced before the user can inspect the details of the failures
+      if (!headless) return result;
       // All specs passed, don't need to rerun any of them - pass the results to handle possible Grim deprecations
       if (result.failedSpecs.length === 0) return result;
 
@@ -184,7 +187,7 @@ const buildReporter = ({logFile, headless}) => {
   if (headless) {
     return buildConsoleReporter(logFile);
   } else {
-    const AtomReporter = require('../helpers/atom-reporter.js');
+    const AtomReporter = require('../helpers/jasmine2-atom-reporter.js');
     return new AtomReporter();
   }
 };
