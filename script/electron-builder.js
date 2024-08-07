@@ -39,7 +39,7 @@ async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts
 const builder = require("electron-builder")
 
 const pngIcon = 'resources/app-icons/beta.png'
-const icoIcon = 'resources/app-icons/beta.ico'
+const icoIcon = 'resources/app-icons/pulsar.ico'
 const svgIcon = 'resources/app-icons/beta.svg'
 const icnsIcon = 'resources/app-icons/beta.icns'
 
