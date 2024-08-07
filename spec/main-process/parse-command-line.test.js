@@ -129,4 +129,29 @@ describe('parseCommandLine', () => {
       ]);
     });
   });
+
+  describe('when --package or -p is passed', () => {
+    it('returns only data relevant to ppm', () => {
+      let args = parseCommandLine([
+        '-d',
+        '--package',
+        'foo',
+        'bar',
+        '--version'
+      ]);
+
+      assert.deepEqual(
+        args,
+        {
+          packageMode: true,
+          ppmArgs: ['foo', 'bar', '--version']
+        }
+      );
+
+      assert.deepEqual(
+        args,
+        parseCommandLine(['-d', '-p', 'foo', 'bar', '--version'])
+      );
+    });
+  });
 });
