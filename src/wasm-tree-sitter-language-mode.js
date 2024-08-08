@@ -1371,7 +1371,7 @@ class WASMTreeSitterLanguageMode {
     let controllingLayer = this.controllingLayerAtPoint(
       comparisonRowEnd,
       (layer) => {
-        if (!layer.indentsQuery) return false;
+        if (!layer.queries.indentsQuery) return false;
         // We want to exclude layers with a content range that _begins at_ the
         // cursor position. Why? Because the content that starts at the cursor
         // is about to shift down to the next line. It'd be odd if that layer
@@ -1398,7 +1398,7 @@ class WASMTreeSitterLanguageMode {
       return comparisonRowIndent - existingIndent;
     }
 
-    let { indentsQuery, scopeResolver } = controllingLayer;
+    let { queries: { indentsQuery }, scopeResolver } = controllingLayer;
 
     // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
     // need a way to share those tests across different kinds of capture
@@ -1623,7 +1623,7 @@ class WASMTreeSitterLanguageMode {
       let dedentControllingLayer = this.controllingLayerAtPoint(
         rowStart,
         (layer) => {
-          if (!layer.indentsQuery) return false;
+          if (!layer.queries.indentsQuery) return false;
           // We're inverting the logic from above: now we want to allow layers
           // that _begin_ at the cursor and exclude layers that _end_ at the
           // cursor. Because we'll be analyzing content that comes _after_ the
@@ -1647,7 +1647,7 @@ class WASMTreeSitterLanguageMode {
         // should run this layer's indents query against its own tree. (If _no_
         // layers qualify at this position, we won't hit this code path, so
         // we'll reluctantly still use the original layer and tree.)
-        indentsQuery = dedentControllingLayer.indentsQuery;
+        indentsQuery = dedentControllingLayer.queries.indentsQuery;
         indentTree = dedentControllingLayer.getOrParseTree();
       }
 
@@ -1773,7 +1773,7 @@ class WASMTreeSitterLanguageMode {
         this.buffer.clipPosition(new Point(row - 1, Infinity)),
         // This query isn't as precise as the one we end up making later, but
         // that's OK. This is just a first pass.
-        (layer) => !!layer.indentsQuery && !!layer.tree
+        (layer) => !!layer.queries.indentsQuery && !!layer.tree
       );
       if (isPastedText) {
         // In this mode, we're not trying to auto-indent every line; instead,
@@ -1896,12 +1896,12 @@ class WASMTreeSitterLanguageMode {
     let rowStartingColumn = Math.max(line.search(/\S/), 0);
     let controllingLayer = this.controllingLayerAtPoint(
       new Point(row, rowStartingColumn),
-      (layer) => !!layer.indentsQuery
+      (layer) => !!layer.queries.indentsQuery
     );
 
     if (!controllingLayer) { return undefined; }
 
-    let { indentsQuery, scopeResolver } = controllingLayer;
+    let { queries: { indentsQuery }, scopeResolver } = controllingLayer;
     if (!indentsQuery) { return undefined; }
 
     // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
@@ -2287,7 +2287,7 @@ class FoldResolver {
   // Retrieve the first valid fold range for this row in this language layer —
   // that is, the first fold range that spans more than one row.
   getFoldRangeForRow(row) {
-    if (!this.layer.tree || !this.layer.foldsQuery) { return null; }
+    if (!this.layer.tree || !this.layer.queries.foldsQuery) { return null; }
     let start = Point.fromObject({ row, column: 0 });
     let end = Point.fromObject({ row: row + 1, column: 0 });
 
@@ -2333,7 +2333,7 @@ class FoldResolver {
   // * resolves to a range that spans more than one line;
   // * starts on a line that hasn't already been promised to an earlier fold.
   getAllFoldRanges() {
-    if (!this.layer.tree || !this.layer.foldsQuery) { return []; }
+    if (!this.layer.tree || !this.layer.queries.foldsQuery) { return []; }
     let range = this.layer.getExtent();
     // We use a Tree-sitter query to find folds; then we arrange the folds in
     // buffer order. The first valid fold we find on a given line is included
@@ -2380,7 +2380,7 @@ class FoldResolver {
   }
 
   prefillFoldCache(range) {
-    if (!this.layer.tree || !this.layer.foldsQuery) { return; }
+    if (!this.layer.tree || !this.layer.queries.foldsQuery) { return; }
     this.getOrCreateBoundariesIterator(
       this.layer.tree.rootNode,
       range.start,
@@ -2389,7 +2389,7 @@ class FoldResolver {
   }
 
   getOrCreateBoundariesIterator(rootNode, start, end) {
-    if (!this.layer.tree || !this.layer.foldsQuery) { return null; }
+    if (!this.layer.tree || !this.layer.queries.foldsQuery) { return null; }
     if (this.canReuseBoundaries(start, end)) {
       let result = this.boundaries.ge(start);
       return result;
@@ -2403,7 +2403,7 @@ class FoldResolver {
     // boundary ends at the same point that another one starts, the ending
     // boundary will be visited first.
     let boundaries = createTree(compareBoundaries);
-    let captures = this.layer.foldsQuery.captures(rootNode, start, end);
+    let captures = this.layer.queries.foldsQuery.captures(rootNode, start, end);
 
     for (let capture of captures) {
       // NOTE: Currently, the first fold to match for a given starting position
@@ -3258,6 +3258,7 @@ class LanguageLayer {
 
     this.currentRangesLayer = this.buffer.addMarkerLayer();
     this.ready = false;
+    this.queries = {};
 
     // A constructor can't go async, so all our async administrative tasks hang
     // off this promise. We can `await this.languageLoaded` later on.
@@ -3273,7 +3274,7 @@ class LanguageLayer {
       for (let queryType of queries) {
         if (grammar[queryType]) {
           let promise = this.grammar.getQuery(queryType).then(query => {
-            this[queryType] = query;
+            this.queries[queryType] = query;
           }).catch(() => {
             throw new GrammarLoadError(grammar, queryType);
           });
@@ -3298,12 +3299,13 @@ class LanguageLayer {
         throw err;
       }
     }).then(() => {
-      if (atom.inDevMode()) {
-        // In dev mode, changes to query files should be applied in real time.
-        // This allows someone to save, e.g., `highlights.scm` and immediately
-        // see the impact of their change.
-        this.observeQueryFileChanges();
-      }
+      // This used to be called only in dev mode. But there are other use cases
+      // for dynamically reloading queries, so now we observer for changes in a
+      // grammar's queries in all cases.
+      //
+      // The grammar itself, however, will still only watch the query files
+      // themselves for changes if we're in dev mode.
+      this.observeQueryChanges();
 
       this.tree = null;
       this.scopeResolver = new ScopeResolver(
@@ -3343,6 +3345,27 @@ class LanguageLayer {
       this.ready = true;
     });
   }
+
+  // Previously we were storing compiled queries directly on the language
+  // layer. Now we store them on a `queries` object instead.
+  //
+  // All internal usages have been changed, but packages might still try to
+  // find these queries at their old locations. For that reason, we'll define
+  // shims for backward compatibility.
+  get highlightsQuery() { return this.queries.highlightsQuery; }
+  set highlightsQuery(value) { this.queries.highlightsQuery = value; }
+
+  get indentsQuery() { return this.queries.indentsQuery; }
+  set indentsQuery(value) { this.queries.indentsQuery = value; }
+
+  get foldsQuery() { return this.queries.foldsQuery; }
+  set foldsQuery(value) { this.queries.foldsQuery = value; }
+
+  get tagsQuery() { return this.queries.tagsQuery; }
+  set tagsQuery(value) { this.queries.tagsQuery = value; }
+
+  get localsQuery() { return this.queries.localsQuery; }
+  set localsQuery(value) { this.queries.localsQuery = value; }
 
   isDirty() {
     if (!this.tree) { return false; }
@@ -3386,31 +3409,42 @@ class LanguageLayer {
     }
   }
 
-  observeQueryFileChanges() {
-    this.subscriptions.add(
-      this.grammar.onDidChangeQueryFile(async ({ queryType }) => {
-        if (this._pendingQueryFileChange) { return; }
-        this._pendingQueryFileChange = true;
+  // Reload a query of a given type from the grammar.
+  async reloadGrammarQuery(queryType) {
+    if (!this.queries[queryType]) { return; }
+    let originalQuery = this.queries[queryType];
+    try {
+      let query = await this.grammar.getQuery(queryType);
+      this.queries[queryType] = query;
 
-        try {
-          if (!this[queryType]) { return; }
+      // Force a re-highlight of this layer's entire region.
+      let range = this.getExtent();
+      this.languageMode.emitRangeUpdate(range);
+      this.nodesToInvalidateOnChange.clear();
+      this.foldNodesToInvalidateOnChange.clear();
+    } catch (error) {
+      this.queries[queryType] = originalQuery;
+      console.error(`Error parsing query file: ${queryType}`);
+      console.error(error);
+    }
+  }
 
-          let query = await this.grammar.getQuery(queryType);
-          this[queryType] = query;
-
-          // Force a re-highlight of this layer's entire region.
-          let range = this.getExtent();
-          this.languageMode.emitRangeUpdate(range);
-          this.nodesToInvalidateOnChange.clear();
-          this.foldNodesToInvalidateOnChange.clear();
-          this._pendingQueryFileChange = false;
-        } catch (error) {
-          console.error(`Error parsing query file: ${queryType}`);
-          console.error(error);
-          this._pendingQueryFileChange = false;
-        }
-      })
-    );
+  // Observe the grammar for changes in queries.
+  //
+  // This won't happen very often. It can happen if a user edits a grammar’s
+  // query files, but those edits are only monitored in dev mode.
+  //
+  // It can also happen if a community package uses an API on
+  // {WASMTreeSitterGrammar} to modify a query after initial load.
+  observeQueryChanges() {
+    this.grammar.onDidChangeQuery(async ({ queryType }) => {
+      if (this._pendingQueryFileChange) { return; }
+      // Debounce the reloading. Sometimes multiple callbacks fire when a query
+      // file is saved.
+      this._pendingQueryFileChange = true;
+      await this.reloadGrammarQuery(queryType);
+      this._pendingQueryFileChange = false;
+    })
   }
 
   getExtent() {
@@ -3431,7 +3465,7 @@ class LanguageLayer {
     let boundaries = createTree(compareBoundaries);
     let extent = this.getExtent();
 
-    let captures = this.highlightsQuery?.captures(this.tree.rootNode, from, to) ?? [];
+    let captures = this.queries.highlightsQuery?.captures(this.tree.rootNode, from, to) ?? [];
     this.scopeResolver.reset();
 
     for (let capture of captures) {
@@ -4242,7 +4276,7 @@ class LanguageLayer {
 
     // If the cursor is resting before column X, we want all scopes that cover
     // the character in column X.
-    let captures = this.highlightsQuery?.captures(
+    let captures = this.queries.highlightsQuery?.captures(
       this.tree.rootNode,
       point,
       { row: point.row, column: point.column + 1 }
