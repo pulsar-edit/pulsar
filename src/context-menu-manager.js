@@ -277,6 +277,18 @@ var ContextMenuItemSet = class ContextMenuItemSet {
     this.selector = selector1;
     this.items = items1;
     this.specificity = calculateSpecificity(this.selector);
+
+    this.localize();
+  }
+
+  localize() {
+    for (const item of this.items) {
+      if (/^%.+%$/.test(item.label)) {
+        // The item label begins and ends with `%` meaning it's a locale
+        // key that should be auto-translated
+        item.label = atom.i18n.t(item.label.replace(/%/g, "")) ?? item.label;
+      }
+    }
   }
 
 };
