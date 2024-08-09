@@ -122,6 +122,10 @@ class I18n {
     }
   }
 
+  shouldIncludeLocale(locale) {
+    return I18n.ShouldIncludeLocale(locale);
+  }
+
   addStrings(newObj, locale, stringObj = this.strings) {
     if (typeof newObj === "object") {
       for (const key in newObj) {
@@ -151,6 +155,12 @@ class I18n {
 
   translate(keyPath, opts = {}) {
     const stringLocales = keyPathHelpers.getValueAtKeyPath(this.strings, keyPath);
+
+    if (typeof stringLocales !== "object") {
+      // If the keypath requested doesn't exist, return null
+      return null;
+    }
+
     let bestLocale;
 
     if (this.localeFallbackList == null) {
@@ -169,6 +179,11 @@ class I18n {
           break localeFallbackListLoop;
         }
       }
+    }
+
+    if (!stringLocales[bestLocale]) {
+      // If we couldn't find any way to read the string, return null
+      return null;
     }
 
     const msg = new IntlMessageFormat(stringLocales[bestLocale], bestLocale);

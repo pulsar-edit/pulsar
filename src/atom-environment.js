@@ -128,6 +128,9 @@ class AtomEnvironment {
     /** @type {StyleManager} */
     this.styles = new StyleManager();
 
+    /** @type {I18n} */
+    this.i18n = new I18n();
+
     /** @type {PackageManager} */
     this.packages = new PackageManager({
       config: this.config,
@@ -220,9 +223,6 @@ class AtomEnvironment {
       commands: this.commands,
       stateStore: this.stateStore
     });
-
-    /** @type {I18n} */
-    this.i18n = new I18n();
 
     this.branding = {
       id: packagejson.branding.id,

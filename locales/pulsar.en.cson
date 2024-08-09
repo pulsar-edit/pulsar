@@ -1,0 +1,7 @@
+'core': {
+  'welcomeString': 'Hello Pulsar!'
+  'goodbyeString': 'Goodbye Pulsar!'
+}
+'context-menu': {
+  'core:undo': 'Undo... or something I guess'
+}
