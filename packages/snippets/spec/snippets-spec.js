@@ -1,7 +1,7 @@
 const path = require('path');
 const temp = require('temp').track();
 const Snippets = require('../lib/snippets');
-const {TextEditor} = require('atom');
+const { TextEditor } = require('atom');
 const crypto = require('crypto');
 
 const SUPPORTS_UUID = ('randomUUID' in crypto) && (typeof crypto.randomUUID === 'function');
@@ -14,8 +14,8 @@ describe("Snippets extension", () => {
     if (param == null) {
       param = {};
     }
-    const {shift} = param;
-    const event = atom.keymaps.constructor.buildKeydownEvent('tab', {shift, target: editorElement});
+    const { shift } = param;
+    const event = atom.keymaps.constructor.buildKeydownEvent('tab', { shift, target: editorElement });
     atom.keymaps.handleKeyboardEvent(event);
   };
 
@@ -113,7 +113,7 @@ describe("Snippets extension", () => {
     invalidSnippets = 3;
     expect(snippets.getSnippets(editor)).toEqual({});
 
-    invalidSnippets = {a: null};
+    invalidSnippets = { a: null };
     expect(snippets.getSnippets(editor)).toEqual({});
   });
 
@@ -499,14 +499,14 @@ third tabstop $3\
           expect(editor.getSelectedBufferRange()).toEqual([[2, 40], [2, 40]]);
 
           // tab backwards
-          simulateTabKeyEvent({shift: true});
+          simulateTabKeyEvent({ shift: true });
           expect(editor.getSelectedBufferRange()).toEqual([[2, 14], [2, 17]]); // should highlight text typed at tab stop
 
-          simulateTabKeyEvent({shift: true});
+          simulateTabKeyEvent({ shift: true });
           expect(editor.getSelectedBufferRange()).toEqual([[3, 15], [3, 15]]);
 
           // shift-tab on first tab-stop does nothing
-          simulateTabKeyEvent({shift: true});
+          simulateTabKeyEvent({ shift: true });
           expect(editor.getCursorScreenPosition()).toEqual([3, 15]);
 
           // tab through all tab stops, then tab on last stop to terminate snippet
@@ -575,7 +575,7 @@ third tabstop $3\
             simulateTabKeyEvent();
 
             editor.moveRight();
-            simulateTabKeyEvent({shift: true});
+            simulateTabKeyEvent({ shift: true });
             expect(editor.getCursorBufferPosition()).toEqual([4, 15]);
           });
         });
@@ -672,7 +672,7 @@ third tabstop $3\
 
       describe("when the snippet spans multiple lines", () => {
         beforeEach(async () => {
-          editor.update({autoIndent: true});
+          editor.update({ autoIndent: true });
           // editor.update() returns a Promise that never gets resolved, so we
           // need to return undefined to avoid a timeout in the spec.
           // TODO: Figure out why `editor.update({autoIndent: true})` never gets resolved.
@@ -1054,6 +1054,17 @@ foo\
           expect(editor.getText()).toBe("// \n// ");
           editor.insertText('TEST');
           expect(editor.getText()).toBe("// TEST\n// ====");
+        });
+
+        describe("and the editor is indented", () => {
+          it("traverses newlines properly", () => {
+            editor.setText('  bannerGeneric');
+            editor.setCursorScreenPosition([0, 15]);
+            simulateTabKeyEvent();
+            expect(editor.getText()).toBe("  // \n  // ");
+            editor.insertText('TEST');
+            expect(editor.getText()).toBe("  // TEST\n  // ====");
+          });
         });
       });
 
