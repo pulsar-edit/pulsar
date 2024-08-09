@@ -60,10 +60,11 @@ if (buildMetadata) {
 //
 // See {::add} for more info about adding menu's directly.
 module.exports = MenuManager = class MenuManager {
-  constructor({resourcePath, keymapManager, packageManager}) {
+  constructor({resourcePath, keymapManager, packageManager, i18n}) {
     this.resourcePath = resourcePath;
     this.keymapManager = keymapManager;
     this.packageManager = packageManager;
+    this.i18n = i18n;
     this.initialized = false;
     this.pendingUpdateOperation = null;
     this.template = [];
@@ -108,13 +109,13 @@ module.exports = MenuManager = class MenuManager {
       }
 
       // Localize item label
-      if (atom.i18n.isAutoTranslateLabel(item.label)) {
-        item.label = atom.i18n.translateLabel(item.label);
+      if (this.i18n.isAutoTranslateLabel(item.label)) {
+        item.label = this.i18n.translateLabel(item.label);
       }
       if (Array.isArray(item.submenu)) {
         for (let y = 0; y < item.submenu.length; y++) {
-          if (atom.i18n.isAutoTranslateLabel(item.submenu[y].label)) {
-            item.submenu[y].label = atom.i18n.translateLabel(item.submenu[y].label);
+          if (this.i18n.isAutoTranslateLabel(item.submenu[y].label)) {
+            item.submenu[y].label = this.i18n.translateLabel(item.submenu[y].label);
           }
         }
       }

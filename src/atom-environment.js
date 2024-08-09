@@ -129,7 +129,9 @@ class AtomEnvironment {
     this.styles = new StyleManager();
 
     /** @type {I18n} */
-    this.i18n = new I18n();
+    this.i18n = new I18n({
+      config: this.config
+    });
 
     /** @type {PackageManager} */
     this.packages = new PackageManager({
@@ -157,7 +159,8 @@ class AtomEnvironment {
     /** @type {MenuManager} */
     this.menu = new MenuManager({
       keymapManager: this.keymaps,
-      packageManager: this.packages
+      packageManager: this.packages,
+      i18n: this.i18n
     });
 
     /** @type {ContextMenuManager} */
@@ -283,8 +286,7 @@ class AtomEnvironment {
     }
 
     this.i18n.initialize({
-      resourcePath: resourcePath,
-      config: this.config
+      resourcePath: resourcePath
     });
 
     this.menu.initialize({ resourcePath });

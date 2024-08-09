@@ -98,16 +98,17 @@ class I18n {
     }
   }
 
-  constructor() {
+  constructor({ config }) {
+    this.config = config;
     this.strings = {};
     this.localeFallbackList = null;
   }
 
   // Helps along with initial setup
-  initialize({ resourcePath, config }) {
+  initialize({ resourcePath }) {
     this.localeFallbackList = I18n.LocaleNegotiation(
-      config.get("core.language.primary"),
-      config.get("core.language.priorityList")
+      this.config.get("core.language.primary"),
+      this.config.get("core.language.priorityList")
     );
 
     // Load Pulsar Core Locales
@@ -167,8 +168,8 @@ class I18n {
 
     if (this.localeFallbackList == null) {
       this.localeFallbackList = I18n.LocaleNegotiation(
-        atom.config.get("core.language.primary"),
-        atom.config.get("core.language.priorityList")
+        this.config.get("core.language.primary"),
+        this.config.get("core.language.priorityList")
       );
     }
 
