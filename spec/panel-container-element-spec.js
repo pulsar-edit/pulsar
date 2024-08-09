@@ -2,6 +2,7 @@
 
 const Panel = require('../src/panel');
 const PanelContainer = require('../src/panel-container');
+const { conditionPromise } = require('./helpers/async-spec-helpers');
 
 describe('PanelContainerElement', () => {
   let jasmineContent, element, container;
@@ -254,7 +255,7 @@ describe('PanelContainerElement', () => {
         panel.destroy()
       });
 
-      it('returns focus to the original activeElement', () => {
+      it('returns focus to the original activeElement', async () => {
         const panel = createPanel();
         const previousActiveElement = document.activeElement;
         const panelEl = panel.getElement();
@@ -263,10 +264,10 @@ describe('PanelContainerElement', () => {
         panel.show();
         panel.hide();
 
-        waitsFor(() => document.activeElement === previousActiveElement);
-        runs(() => {
-          expect(document.activeElement).toBe(previousActiveElement);
-        });
+        jasmine.useRealClock();
+        await conditionPromise(() => document.activeElement === previousActiveElement);
+
+        expect(document.activeElement).toBe(previousActiveElement);
       });
     });
   });

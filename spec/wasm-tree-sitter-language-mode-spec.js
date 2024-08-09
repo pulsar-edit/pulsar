@@ -1037,7 +1037,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         atom.grammars.addGrammar(htmlGrammar);
         htmlGrammar.highlightsQuery = false;
         // Pretend this grammar doesn't have a highlights query.
-        spyOn(htmlGrammar, 'getQuery').andReturn(Promise.resolve(null));
+        spyOn(htmlGrammar, 'getQuery').and.returnValue(Promise.resolve(null));
         const languageMode = new WASMTreeSitterLanguageMode({
           grammar: jsGrammar,
           buffer,
@@ -1543,12 +1543,12 @@ describe('WASMTreeSitterLanguageMode', () => {
     let originalTimeout;
 
     beforeEach(() => {
-      originalTimeout = jasmine.getEnv().defaultTimeoutInterval;
-      jasmine.getEnv().defaultTimeoutInterval = 60 * 1000;
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
     });
 
     afterEach(() => {
-      jasmine.getEnv().defaultTimeoutInterval = originalTimeout;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     });
 
     it('matches the highlighting of a freshly-opened editor', async () => {
@@ -1633,15 +1633,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           const tokens1 = editor.tokensForScreenRow(j);
           const tokens2 = editor2.tokensForScreenRow(j);
           expect(tokens1).toEqual(tokens2, `Seed: ${seed}, screen line: ${j}`);
-          if (jasmine.getEnv().currentSpec.results().failedCount > 0) {
-            console.log(tokens1);
-            console.log(tokens2);
-            debugger; // eslint-disable-line no-debugger
-            break;
-          }
         }
-
-        if (jasmine.getEnv().currentSpec.results().failedCount > 0) break;
       }
     });
   });
@@ -3475,8 +3467,8 @@ describe('WASMTreeSitterLanguageMode', () => {
         htmlConfig
       );
 
-      spyOn(jsGrammar, 'getCommentDelimiters').andReturn({ line: undefined, block: undefined });
-      spyOn(htmlGrammar, 'getCommentDelimiters').andReturn({ line: undefined, block: undefined });
+      spyOn(jsGrammar, 'getCommentDelimiters').and.returnValue({ line: undefined, block: undefined });
+      spyOn(htmlGrammar, 'getCommentDelimiters').and.returnValue({ line: undefined, block: undefined });
 
       atom.config.set(
         'editor.commentDelimiters',
@@ -3938,7 +3930,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       spyOn(
         languageMode,
         'suggestedIndentForLineAtBufferRow'
-      ).andReturn(9);
+      ).and.returnValue(9);
 
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
@@ -4168,7 +4160,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       await languageMode.ready;
       await wait(0);
 
-      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+      spyOn(languageMode, 'suggestedIndentForBufferRows').and.callThrough();
 
       editor.setCursorBufferPosition([0, 15]);
       editor.transact(() => {
@@ -4455,7 +4447,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       // Force this test to use async indent in all cases.
       languageMode.transactionReparseBudgetMs = 0;
       languageMode.currentTransactionReparseBudgetMs = 0;
-      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+      spyOn(languageMode, 'suggestedIndentForBufferRows').and.callThrough();
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
 
@@ -4495,7 +4487,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         function test () {
           return }
       `)
-
     })
 
   });

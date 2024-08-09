@@ -6,42 +6,41 @@ const BufferedProcess = require('../src/buffered-process');
 
 describe('BufferedProcess', function() {
   describe('when a bad command is specified', function() {
-    let [oldOnError] = [];
-    beforeEach(function() {
-      oldOnError = window.onerror;
-      window.onerror = jasmine.createSpy();
-    });
+    let windowOnErrorSpy;
 
-    afterEach(() => (window.onerror = oldOnError));
+    beforeEach(function() {
+      windowOnErrorSpy = spyOn(window, 'onerror');
+    });
 
     describe('when there is an error handler specified', function() {
       describe('when an error event is emitted by the process', () =>
-        it('calls the error handler and does not throw an exception', function() {
+        it('calls the error handler and does not throw an exception', async function() {
           const bufferedProcess = new BufferedProcess({
             command: 'bad-command-nope1',
             args: ['nothing'],
             options: { shell: false }
           });
 
-          const errorSpy = jasmine
-            .createSpy()
-            .andCallFake(error => error.handle());
-          bufferedProcess.onWillThrowError(errorSpy);
+          const errorSpy = jasmine.createSpy()
 
-          waitsFor(() => errorSpy.callCount > 0);
+          await new Promise((resolve) => {
+            errorSpy.and.callFake((error) => {
+              error.handle();
+              resolve();
+            });
+            bufferedProcess.onWillThrowError(errorSpy);;
+          })
 
-          runs(function() {
-            expect(window.onerror).not.toHaveBeenCalled();
-            expect(errorSpy).toHaveBeenCalled();
-            expect(errorSpy.mostRecentCall.args[0].error.message).toContain(
-              'spawn bad-command-nope1 ENOENT'
-            );
-          });
+          expect(window.onerror).not.toHaveBeenCalled();
+          expect(errorSpy).toHaveBeenCalled();
+          expect(errorSpy.calls.mostRecent().args[0].error.message).toContain(
+            'spawn bad-command-nope1 ENOENT'
+          );
         }));
 
       describe('when an error is thrown spawning the process', () =>
-        it('calls the error handler and does not throw an exception', function() {
-          spyOn(ChildProcess, 'spawn').andCallFake(function() {
+        it('calls the error handler and does not throw an exception', async function() {
+          spyOn(ChildProcess, 'spawn').and.callFake(function() {
             const error = new Error('Something is really wrong');
             error.code = 'EAGAIN';
             throw error;
@@ -53,42 +52,43 @@ describe('BufferedProcess', function() {
             options: {}
           });
 
-          const errorSpy = jasmine
-            .createSpy()
-            .andCallFake(error => error.handle());
-          bufferedProcess.onWillThrowError(errorSpy);
+          const errorSpy = jasmine.createSpy();
 
-          waitsFor(() => errorSpy.callCount > 0);
+          await new Promise((resolve) => {
+            errorSpy.and.callFake(error => {
+              error.handle();
+              resolve();
+            });
+            bufferedProcess.onWillThrowError(errorSpy);
+          })
 
-          runs(function() {
-            expect(window.onerror).not.toHaveBeenCalled();
-            expect(errorSpy).toHaveBeenCalled();
-            expect(errorSpy.mostRecentCall.args[0].error.message).toContain(
-              'Something is really wrong'
-            );
-          });
+          expect(window.onerror).not.toHaveBeenCalled();
+          expect(errorSpy).toHaveBeenCalled();
+          expect(errorSpy.calls.mostRecent().args[0].error.message).toContain(
+            'Something is really wrong'
+          );
         }));
     });
 
     describe('when there is not an error handler specified', () =>
-      it('does throw an exception', function() {
-        new BufferedProcess({
-          command: 'bad-command-nope2',
-          args: ['nothing'],
-          options: { shell: false }
+      it('does throw an exception', async function() {
+        await new Promise((resolve) => {
+          window.onerror.and.callFake(resolve);
+
+          new BufferedProcess({
+            command: 'bad-command-nope2',
+            args: ['nothing'],
+            options: {shell: false}
+          });
         });
 
-        waitsFor(() => window.onerror.callCount > 0);
-
-        runs(function() {
-          expect(window.onerror).toHaveBeenCalled();
-          expect(window.onerror.mostRecentCall.args[0]).toContain(
-            'Failed to spawn command `bad-command-nope2`'
-          );
-          expect(window.onerror.mostRecentCall.args[4].name).toBe(
-            'BufferedProcessError'
-          );
-        });
+        expect(window.onerror).toHaveBeenCalled();
+        expect(window.onerror.calls.mostRecent().args[0]).toContain(
+          'Failed to spawn command `bad-command-nope2`'
+        );
+        expect(window.onerror.calls.mostRecent().args[4].name).toBe(
+          'BufferedProcessError'
+        );
       }));
   });
 
@@ -97,7 +97,7 @@ describe('BufferedProcess', function() {
     * TODO: FAILING TEST - This test fails with the following output:
     * timeout: timed out after 120000 msec waiting for condition
     */
-    xit('doesnt start unless start method is called', function() {
+    xit('doesnt start unless start method is called', async function() {
       let stdout = '';
       let stderr = '';
       const exitCallback = jasmine.createSpy('exit callback');
@@ -116,70 +116,73 @@ describe('BufferedProcess', function() {
       });
 
       expect(apmProcess.started).not.toBe(true);
-      apmProcess.start();
-      expect(apmProcess.started).toBe(true);
 
-      waitsFor(() => exitCallback.callCount === 1);
-      runs(function() {
-        expect(stderr).toContain('apm - Atom Package Manager');
-        expect(stdout).toEqual('');
-      });
+      await new Promise((resolve) => {
+        exitCallback.and.callFake(() => {
+          expect(apmProcess.started).toBe(true);
+          resolve();
+        })
+
+        apmProcess.start();
+      })
+
+      expect(stderr).toContain('apm - Atom Package Manager');
+      expect(stdout).toEqual('');
     }));
   /**
   * TODO: FAILING TEST - This test fails with the following output:
-  * timeout: timed out after 120000 msec waiting for condition 
+  * timeout: timed out after 120000 msec waiting for condition
   */
-  xit('calls the specified stdout, stderr, and exit callbacks', function() {
+  xit('calls the specified stdout, stderr, and exit callbacks', async function() {
     let stdout = '';
     let stderr = '';
-    const exitCallback = jasmine.createSpy('exit callback');
-    new BufferedProcess({
-      command: atom.packages.getApmPath(),
-      args: ['-h'],
-      options: {},
-      stdout(lines) {
-        stdout += lines;
-      },
-      stderr(lines) {
-        stderr += lines;
-      },
-      exit: exitCallback
-    });
 
-    waitsFor(() => exitCallback.callCount === 1);
+    await new Promise((resolve) => {
+      new BufferedProcess({
+        command: atom.packages.getApmPath(),
+        args: ['-h'],
+        options: {},
+        stdout(lines) {
+          stdout += lines;
+        },
+        stderr(lines) {
+          stderr += lines;
+        },
+        exit: resolve
+      });
+    })
 
-    runs(function() {
-      expect(stderr).toContain('apm - Atom Package Manager');
-      expect(stdout).toEqual('');
-    });
+    expect(stderr).toContain('apm - Atom Package Manager');
+    expect(stdout).toEqual('');
   });
 
-  it('calls the specified stdout callback with whole lines', function() {
+  it('calls the specified stdout callback with whole lines', async function() {
     const exitCallback = jasmine.createSpy('exit callback');
     const loremPath = require.resolve('./fixtures/lorem.txt');
     const content = fs.readFileSync(loremPath).toString();
     let stdout = '';
     let allLinesEndWithNewline = true;
-    new BufferedProcess({
-      command: process.platform === 'win32' ? 'type' : 'cat',
-      args: [loremPath],
-      options: {},
-      stdout(lines) {
-        const endsWithNewline = lines.charAt(lines.length - 1) === '\n';
-        if (!endsWithNewline) {
-          allLinesEndWithNewline = false;
-        }
-        stdout += lines;
-      },
-      exit: exitCallback
+
+    await new Promise((resolve) => {
+      exitCallback.and.callFake(resolve)
+
+      new BufferedProcess({
+        command: process.platform === 'win32' ? 'type' : 'cat',
+        args: [loremPath],
+        options: {},
+        stdout(lines) {
+          const endsWithNewline = lines.charAt(lines.length - 1) === '\n';
+          if (!endsWithNewline) {
+            allLinesEndWithNewline = false;
+          }
+          stdout += lines;
+        },
+        exit: exitCallback
+      });
     });
 
-    waitsFor(() => exitCallback.callCount === 1);
-
-    runs(function() {
-      expect(allLinesEndWithNewline).toBe(true);
-      expect(stdout).toBe(content);
-    });
+    expect(allLinesEndWithNewline).toBe(true);
+    expect(stdout).toBe(content);
   });
 
   describe('on Windows', function() {
@@ -202,20 +205,20 @@ describe('BufferedProcess', function() {
           command: 'explorer.exe',
           args: ['/root,C:\\foo']
         });
-        expect(ChildProcess.spawn.argsForCall[0][1][3]).toBe(
+        expect(ChildProcess.spawn.calls.argsFor(0)[1][3]).toBe(
           '"explorer.exe /root,C:\\foo"'
         );
       }));
 
     it('spawns the command using a cmd.exe wrapper when options.shell is undefined', function() {
       new BufferedProcess({ command: 'dir' });
-      expect(path.basename(ChildProcess.spawn.argsForCall[0][0])).toBe(
+      expect(path.basename(ChildProcess.spawn.calls.argsFor(0)[0])).toBe(
         'cmd.exe'
       );
-      expect(ChildProcess.spawn.argsForCall[0][1][0]).toBe('/s');
-      expect(ChildProcess.spawn.argsForCall[0][1][1]).toBe('/d');
-      expect(ChildProcess.spawn.argsForCall[0][1][2]).toBe('/c');
-      expect(ChildProcess.spawn.argsForCall[0][1][3]).toBe('"dir"');
+      expect(ChildProcess.spawn.calls.argsFor(0)[1][0]).toBe('/s');
+      expect(ChildProcess.spawn.calls.argsFor(0)[1][1]).toBe('/d');
+      expect(ChildProcess.spawn.calls.argsFor(0)[1][2]).toBe('/c');
+      expect(ChildProcess.spawn.calls.argsFor(0)[1][3]).toBe('"dir"');
     });
   });
 });
