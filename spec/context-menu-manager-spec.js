@@ -5,7 +5,7 @@ describe('ContextMenuManager', function() {
 
   beforeEach(function() {
     const { resourcePath } = atom.getLoadSettings();
-    contextMenu = new ContextMenuManager({ keymapManager: atom.keymaps });
+    contextMenu = new ContextMenuManager({ keymapManager: atom.keymaps, i18n: atom.i18n });
     contextMenu.initialize({ resourcePath });
 
     parent = document.createElement('div');

@@ -7,7 +7,8 @@ describe('MenuManager', function() {
   beforeEach(function() {
     menu = new MenuManager({
       keymapManager: atom.keymaps,
-      packageManager: atom.packages
+      packageManager: atom.packages,
+      i18n: atom.i18n
     });
     spyOn(menu, 'sendToBrowserProcess'); // Do not modify Atom's actual menus
     menu.initialize({ resourcePath: atom.getLoadSettings().resourcePath });
