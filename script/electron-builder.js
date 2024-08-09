@@ -213,10 +213,6 @@ let options = {
       {
         "from": "resources/win/pulsar.js",
         "to": "pulsar.js"
-      },
-      {
-        "from": "resources/win/modifyWindowsPath.ps1",
-        "to": "modifyWindowsPath.ps1"
       }
     ],
     "target": [
@@ -237,7 +233,8 @@ let options = {
     // Hardcoding it here means it will always be used as generated from
     // the AppID 'dev.pulsar-edit.pulsar'. If this value ever changes,
     // A PR to GitHub Desktop must be made with the updated value
-    "include": "resources/win/installer.nsh"
+    "include": "resources/win/installer.nsh",
+    "warningsAsErrors": false
   },
   "extraMetadata": {
   },
