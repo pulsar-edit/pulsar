@@ -841,6 +841,9 @@
 "new" @keyword.operator.new._LANG_
 
 "=" @keyword.operator.assignment._LANG_
+
+["&" "|" "<<" ">>" ">>>" "~" "^"] @keyword.operator.bitwise.js
+
 (non_null_expression "!" @keyword.operator.non-null._LANG_)
 (unary_expression "!" @keyword.operator.unary._LANG_)
 

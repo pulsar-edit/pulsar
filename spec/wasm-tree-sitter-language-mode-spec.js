@@ -561,6 +561,59 @@ describe('WASMTreeSitterLanguageMode', () => {
       ]);
     });
 
+    describe('when a highlighting query changes after load', () => {
+      it('updates the highlighting to reflect the new content', async () => {
+        jasmine.useRealClock();
+        const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+        await grammar.setQueryForTest('highlightsQuery', scm`
+          (identifier) @variable
+        `);
+
+        buffer.setText('abc;');
+
+        const languageMode = new WASMTreeSitterLanguageMode({
+          buffer,
+          grammar
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+        await wait(0);
+
+        expectTokensToEqual(editor, [
+          [
+            { text: 'abc', scopes: ['variable'] },
+            { text: ';', scopes: [] }
+          ]
+        ]);
+
+        // Set up a promise that resolves when highlighting updates after a
+        // query change.
+        let highlightingDidUpdate = new Promise((resolve) => {
+          let disposable = languageMode.onDidChangeHighlighting(
+            () => {
+              disposable.dispose();
+              resolve();
+            }
+          )
+        });
+
+        // Change the highlighting query.
+        await grammar.setQueryForTest('highlightsQuery', scm`
+          (identifier) @constant
+        `);
+        await highlightingDidUpdate;
+
+        // The language mode should automatically reload the query.
+        expectTokensToEqual(editor, [
+          [
+            { text: 'abc', scopes: ['constant'] },
+            { text: ';', scopes: [] }
+          ]
+        ]);
+      });
+    });
+
     // TODO: Ignoring these specs because web-tree-sitter doesn't seem to do
     // async. We can rehabilitate them if we ever figure it out.
     xdescribe('when the buffer changes during a parse', () => {
@@ -1750,6 +1803,53 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(Array.from(map.values())).toEqual([0, 1, 1, 2, 1, 0]);
     });
+
+    it('works correctly when straddling an injection boundary, even in the presence of whitespace', async () => {
+      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
+
+      const htmlGrammar = new WASMTreeSitterGrammar(
+        atom.grammars,
+        htmlGrammarPath,
+        htmlConfig
+      );
+
+      htmlGrammar.addInjectionPoint(SCRIPT_TAG_INJECTION_POINT);
+
+      atom.grammars.addGrammar(jsGrammar);
+      atom.grammars.addGrammar(htmlGrammar);
+
+      // This is just like the test above, except that we're indented a bit.
+      // Now the edge of the injection isn't at the beginning of the line; it's
+      // at the beginning of the first _text_ on the line.
+      buffer.setText(dedent`
+        <html>
+          <head>
+            <script>
+              let foo;
+              if (foo) {
+                debug(true);
+              }
+            </script>
+          </head>
+        </html>
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({
+        grammar: htmlGrammar,
+        buffer,
+        config: atom.config,
+        grammars: atom.grammars
+      });
+
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      let map = languageMode.suggestedIndentForBufferRows(0, 9, editor.getTabLength());
+
+      expect(Array.from(map.values())).toEqual([0, 1, 2, 3, 3, 4, 3, 2, 1, 0]);
+    })
   });
 
   describe('folding', () => {
@@ -2207,6 +2307,101 @@ describe('WASMTreeSitterLanguageMode', () => {
         <head>…</head>
       `);
     });
+
+    it('does not enumerate redundant folds', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      await grammar.setQueryForTest('foldsQuery', `
+        (statement_block) @fold
+        (object) @fold
+      `);
+
+      // This odd way of formatting code produces a scenario where two folds
+      // would start on the same line. The second of the two folds would never
+      // be seen when toggling the fold on that line, so we shouldn't treat it
+      // as a valid fold for any other purpose.
+      buffer.setText(dedent`
+        if (foo) {results.push({
+          bar: 'baz'
+        })}
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      let ranges = languageMode.getFoldableRanges();
+      expect(ranges.length).toBe(1);
+    })
+
+    it('is not flummoxed by redundant folds when performing foldAllAtIndentLevel', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      await grammar.setQueryForTest('foldsQuery', `
+        (statement_block) @fold
+        (object) @fold
+      `);
+
+      buffer.setText(dedent`
+        function foo() {
+          if (true) {
+            if (foo) {results.push({
+              bar: 'baz'
+            })}
+          }
+        }
+
+        function bar() {
+          if (false) {
+            // TODO
+          }
+        }
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      editor.foldAllAtIndentLevel(1);
+      expect(getDisplayText(editor)).toBe(dedent`
+        function foo() {
+          if (true) {…}
+        }
+
+        function bar() {
+          if (false) {…}
+        }
+      `);
+
+      buffer.setText(dedent`
+        function foo() {
+          if (true) {
+            if (foo) {
+            results.push({
+              bar: 'baz'
+            })}
+          }
+        }
+
+        function bar() {
+          if (false) {
+            // TODO
+          }
+        }
+      `);
+      await languageMode.atTransactionEnd();
+
+      editor.foldAllAtIndentLevel(1);
+      expect(getDisplayText(editor)).toBe(dedent`
+        function foo() {
+          if (true) {…}
+        }
+
+        function bar() {
+          if (false) {…}
+        }
+      `);
+    })
 
     it('can target named vs anonymous nodes as fold boundaries', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, rubyGrammarPath, rubyConfig);
