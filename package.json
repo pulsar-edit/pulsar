@@ -85,6 +85,7 @@
     "grim": "2.0.3",
     "image-view": "file:packages/image-view",
     "incompatible-packages": "file:packages/incompatible-packages",
+    "intl-messageformat": "^10.5.14",
     "jasmine-json": "~0.0",
     "jasmine-reporters": "1.1.0",
     "jasmine-tagged": "^1.1.4",

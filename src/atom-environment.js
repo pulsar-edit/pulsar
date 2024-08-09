@@ -47,6 +47,7 @@ const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
 const { getReleaseChannel } = require('./get-app-details.js');
 const UI = require('./ui.js');
+const I18n = require("./i18n.js");
 const packagejson = require("../package.json");
 
 const stat = util.promisify(fs.stat);
@@ -219,6 +220,9 @@ class AtomEnvironment {
       stateStore: this.stateStore
     });
 
+    /** @type {I18n} */
+    this.i18n = new I18n();
+
     this.branding = {
       id: packagejson.branding.id,
       name: packagejson.branding.name,
@@ -274,6 +278,8 @@ class AtomEnvironment {
     if (projectSpecification != null && projectSpecification.config != null) {
       this.project.replace(projectSpecification);
     }
+
+    this.i18n.initialize();
 
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });
