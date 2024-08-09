@@ -3290,7 +3290,7 @@ class LanguageLayer {
           // propagate errors.
           //
           // TODO: Warning?
-          grammar.highlightsQuery = grammar.setQueryForTest(
+          grammar.setQueryForTest(
             'highlightsQuery',
             `; (placeholder)`
           );
@@ -3753,8 +3753,8 @@ class LanguageLayer {
   }
 
   getLocalReferencesAtPoint(point) {
-    if (!this.localsQuery) { return []; }
-    let captures = this.localsQuery.captures(
+    if (!this.queries.localsQuery) { return []; }
+    let captures = this.queries.localsQuery.captures(
       this.tree.rootNode,
       point,
       point + 1
@@ -3777,7 +3777,7 @@ class LanguageLayer {
   // EXPERIMENTAL: Given a local reference node, tries to find the node that
   // defines it.
   findDefinitionForLocalReference(node, captures = null) {
-    if (!this.localsQuery) { return []; }
+    if (!this.queries.localsQuery) { return []; }
     let name = node.text;
     if (!name) { return []; }
     let localRange = rangeForNode(node);
@@ -3785,7 +3785,7 @@ class LanguageLayer {
 
     if (!captures) {
       captures = this.groupLocalsCaptures(
-        this.localsQuery.captures(
+        this.queries.localsQuery.captures(
           globalScope,
           globalScope.startPosition,
           globalScope.endPosition

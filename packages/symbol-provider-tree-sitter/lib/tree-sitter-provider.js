@@ -1,6 +1,10 @@
 const CaptureOrganizer = require('./capture-organizer');
 const { Emitter } = require('atom');
 
+function layerHasTagsQuery(layer) {
+  return layer.queries?.tagsQuery ?? layer.tagsQuery;
+}
+
 class TreeSitterProvider {
   constructor() {
     this.packageName = 'symbol-provider-tree-sitter';
@@ -37,7 +41,7 @@ class TreeSitterProvider {
     }
 
     // This provider needs at least one layer to have a tags query.
-    let layers = languageMode.getAllLanguageLayers(l => !!l.tagsQuery);
+    let layers = languageMode.getAllLanguageLayers(layerHasTagsQuery);
     if (layers.length === 0) {
       return false;
     }
@@ -64,13 +68,14 @@ class TreeSitterProvider {
     // The symbols-view package might've cancelled us in the interim.
     if (signal.aborted) return null;
 
-    let layers = languageMode.getAllLanguageLayers(l => !!l.tagsQuery);
+    let layers = languageMode.getAllLanguageLayers(layerHasTagsQuery);
     if (layers.length === 0) return null;
 
     for (let layer of layers) {
       let extent = layer.getExtent();
 
-      let captures = layer.tagsQuery.captures(
+      let tagsQuery = layer.queries?.tagsQuery ?? layer.tagsQuery;
+      let captures = tagsQuery.captures(
         layer.tree.rootNode,
         extent.start,
         extent.end
