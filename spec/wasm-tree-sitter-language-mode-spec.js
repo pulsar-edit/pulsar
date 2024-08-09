@@ -561,6 +561,59 @@ describe('WASMTreeSitterLanguageMode', () => {
       ]);
     });
 
+    describe('when a highlighting query changes after load', () => {
+      it('updates the highlighting to reflect the new content', async () => {
+        jasmine.useRealClock();
+        const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+        await grammar.setQueryForTest('highlightsQuery', scm`
+          (identifier) @variable
+        `);
+
+        buffer.setText('abc;');
+
+        const languageMode = new WASMTreeSitterLanguageMode({
+          buffer,
+          grammar
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+        await wait(0);
+
+        expectTokensToEqual(editor, [
+          [
+            { text: 'abc', scopes: ['variable'] },
+            { text: ';', scopes: [] }
+          ]
+        ]);
+
+        // Set up a promise that resolves when highlighting updates after a
+        // query change.
+        let highlightingDidUpdate = new Promise((resolve) => {
+          let disposable = languageMode.onDidChangeHighlighting(
+            () => {
+              disposable.dispose();
+              resolve();
+            }
+          )
+        });
+
+        // Change the highlighting query.
+        await grammar.setQueryForTest('highlightsQuery', scm`
+          (identifier) @constant
+        `);
+        await highlightingDidUpdate;
+
+        // The language mode should automatically reload the query.
+        expectTokensToEqual(editor, [
+          [
+            { text: 'abc', scopes: ['constant'] },
+            { text: ';', scopes: [] }
+          ]
+        ]);
+      });
+    });
+
     // TODO: Ignoring these specs because web-tree-sitter doesn't seem to do
     // async. We can rehabilitate them if we ever figure it out.
     xdescribe('when the buffer changes during a parse', () => {
