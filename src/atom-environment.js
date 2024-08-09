@@ -279,7 +279,10 @@ class AtomEnvironment {
       this.project.replace(projectSpecification);
     }
 
-    this.i18n.initialize();
+    this.i18n.initialize({
+      resourcePath: resourcePath,
+      config: this.config
+    });
 
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });
