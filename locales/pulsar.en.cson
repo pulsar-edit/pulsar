@@ -2,6 +2,9 @@
   'welcomeString': 'Hello Pulsar!'
   'goodbyeString': 'Goodbye Pulsar!'
 }
+'menu': {
+  'settings-view:view-installed-packages': 'Open Package Manager'
+}
 'context-menu': {
-  'core:undo': 'Undo... or something I guess'
+  'core:undo': 'Undo'
 }

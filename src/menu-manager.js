@@ -106,6 +106,19 @@ module.exports = MenuManager = class MenuManager {
       if (item.label == null) {
         continue; // TODO: Should we emit a warning here?
       }
+
+      // Localize item label
+      if (atom.i18n.isAutoTranslateLabel(item.label)) {
+        item.label = atom.i18n.translateLabel(item.label);
+      }
+      if (Array.isArray(item.submenu)) {
+        for (let y = 0; y < item.submenu.length; y++) {
+          if (atom.i18n.isAutoTranslateLabel(item.submenu[y].label)) {
+            item.submenu[y].label = atom.i18n.translateLabel(item.submenu[y].label);
+          }
+        }
+      }
+
       this.merge(this.template, item);
     }
     this.update();
