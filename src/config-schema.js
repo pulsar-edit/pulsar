@@ -410,6 +410,28 @@ const configSchema = {
         description: 'When changing the theme within Pulsar also change the theme of the window on the operating system.',
         type: 'boolean',
         default: false
+      },
+      language: {
+        type: "object",
+        description: "Language and Locale options. Requires a restart of Pulsar to take effect.",
+        properties: {
+          primary: {
+            type: "string",
+            order: 1,
+            default: "en-US",
+            description: "The primary language/locale you prefer."
+          },
+          priorityList: {
+            type: "array",
+            order: 2,
+            description: "List of alternative languages to load. Highest priority to lowest. Use the most specific locale selectors possible.",
+            default: [],
+            items: {
+              type: "string",
+              // TODO consider enum options, maybe?
+            }
+          }
+        }
       }
     }
   },
