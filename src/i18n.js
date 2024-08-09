@@ -1,3 +1,6 @@
+const path = require("path");
+const fs = require("fs-plus");
+const CSON = require("season");
 const keyPathHelpers = require("key-path-helpers");
 const IntlMessageFormat = require("intl-messageformat").default;
 
@@ -99,13 +102,24 @@ class I18n {
   }
 
   // Helps along with initial setup
-  initialize() {
+  initialize({ resourcePath, config }) {
     this.localeFallbackList = I18n.LocaleNegotiation(
-      atom.config.get("core.language.primary"),
-      atom.config.get("core.language.priorityList")
+      config.get("core.language.primary"),
+      config.get("core.language.priorityList")
     );
 
-    // Maybe add loading of internal locales?
+    // Load Pulsar Core Locales
+    const localesPath = path.join(resourcePath, "locales");
+    const localesPaths = fs.listSync(localesPath, ["cson", "json"]);
+
+    for (const localePath of localesPaths) {
+      const localeFilePath = localePath.split(".");
+      // `pulsar.en-US.json` => `en-US`
+      const locale = localeFilePath[localeFilePath.length - 2] ?? "";
+      if (I18n.ShouldIncludeLocale(locale)) {
+        this.addStrings(CSON.readFileSync(localePath) || {}, locale);
+      }
+    }
   }
 
   addStrings(newObj, locale, stringObj = this.strings) {
