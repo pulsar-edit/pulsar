@@ -9,6 +9,8 @@ const IntlMessageFormat = require("intl-messageformat").default;
 // locale selectors alone.
 const LOCALE_LOOKUP_FILTER_TRUNCATE = /(-\w){0,1}-[\w*]*?$/g;
 
+const AUTO_TRANSLATE_LABEL = /^%.+%$/;
+
 function generateLocaleFallback(list, lang) {
   // Breakdown a lang provided into the fallback options
   let locale = lang;
@@ -197,6 +199,18 @@ class I18n {
 
   getTranslate(namespace) {
     return new NamespaceI18n(namespace, this);
+  }
+
+  // === Helper Methods
+  isAutoTranslateLabel(value) {
+    return AUTO_TRANSLATE_LABEL.test(value);
+  }
+
+  // Used in the menu and context-menu when auto-translating labels
+  translateLabel(label) {
+    // Since failing to translate menus could crash Pulsar
+    // We must ensure to fallback to the raw label value
+    return this.translate(label.replace(/%/g, "")) ?? label;
   }
 }
 

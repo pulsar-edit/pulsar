@@ -160,7 +160,7 @@ class AtomEnvironment {
     });
 
     /** @type {ContextMenuManager} */
-    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps });
+    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps, i18n: this.i18n });
 
     this.packages.setMenuManager(this.menu);
     this.packages.setContextMenuManager(this.contextMenu);
