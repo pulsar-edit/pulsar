@@ -18,9 +18,9 @@ describe("I18n", () => {
         "zh-Hant-CN-x-private1-private2",
         "en-US"
       ];
-      const fallbackArray = I18n.LocaleNegotiation(primaryLocale, priorityListLocale);
+      const fallbackSet = I18n.LocaleNegotiation(primaryLocale, priorityListLocale);
 
-      expect(fallbackArray).toEqual([
+      expect(Array.from(fallbackSet)).toEqual([
         "es-MX",
         "es",
         "zh-Hant-CN-x-private1-private2",
@@ -36,9 +36,9 @@ describe("I18n", () => {
     it("Locale Lookup Filtering Fallback Pattern Array: Excludes duplicates from hardcoded fallback", () => {
       const primaryLocale = "en-US";
       const priorityListLocale = [ "es-MX" ];
-      const fallbackArray = I18n.LocaleNegotiation(primaryLocale, priorityListLocale);
+      const fallbackSet = I18n.LocaleNegotiation(primaryLocale, priorityListLocale);
 
-      expect(fallbackArray).toEqual([
+      expect(Array.from(fallbackSet)).toEqual([
         "en-US",
         "en",
         "es-MX",
@@ -163,7 +163,7 @@ describe("I18n", () => {
         example: {
           stringKey: "Hello Pulsar"
         }
-      }, "en-US");
+      }, "en");
 
       i18n.addStrings({
         example: {
@@ -179,7 +179,7 @@ describe("I18n", () => {
         example: {
           stringKey: "Hello {value}"
         }
-      }, "en-US");
+      }, "en");
 
       expect(i18n.t("example.stringKey", { value: "confused-Techie" })).toEqual(
         "Hello confused-Techie"
@@ -191,7 +191,7 @@ describe("I18n", () => {
         example: {
           stringKey: "Hello Pulsar"
         }
-      }, "en-US");
+      }, "en");
 
       const t = i18n.getT("example");
 
@@ -221,14 +221,14 @@ describe("I18n", () => {
         example: {
           stringKey: "Hello Pulsar"
         }
-      }, "en-US");
+      }, "en");
 
       const localeLabel = "%example.stringKey%";
 
       expect(i18n.translateLabel(localeLabel)).toEqual("Hello Pulsar");
     });
 
-    it("Fallsback to the original label if unable to translate", () => {
+    it("Falls back to the original label if unable to translate", () => {
       const primary = "es-MX";
       const priorityListLocale = [ "zh-Hant" ];
       i18n.localeFallbackList = I18n.LocaleNegotiation(primary, priorityListLocale);
