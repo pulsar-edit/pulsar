@@ -25,7 +25,7 @@ const configSchema = {
       excludeVcsIgnoredPaths: {
         type: 'boolean',
         default: true,
-        title: '%config.excludeVcsIgnoredPaths.title%',
+        title: '%pulsar.config.excludeVcsIgnoredPaths.title%',
         description:
           "Files and directories ignored by the current project's VCS will be ignored by some packages, such as the fuzzy finder and find and replace. For example, projects using Git have these paths defined in the .gitignore file. Individual packages might have additional config settings for ignoring VCS ignored files and folders."
       },
