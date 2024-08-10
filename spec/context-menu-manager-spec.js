@@ -518,5 +518,58 @@ describe('ContextMenuManager', function() {
         }
       ]);
     });
+
+    it('translates labels when a LocaleLabel is present', function() {
+      const I18n = require("../src/i18n.js");
+      atom.i18n.localeFallbackList = I18n.LocaleNegotiation(
+        "es-MX",
+        [ "zh-Hant" ]
+      );
+      atom.i18n.addStrings({
+        example: {
+          stringKey: "Hello Pulsar",
+          otherStringKey: "Goodbye Pulsar"
+        }
+      }, "en-US");
+
+      contextMenu.add({
+        '.parent': [
+          {
+            label: '%example.stringKey%',
+            submenu: [
+              {
+                label: 'My Command',
+                command: 'test:my-command',
+                after: ['test:my-other-command']
+              },
+              {
+                label: '%example.otherStringKey%',
+                command: 'test:my-other-command'
+              }
+            ]
+          }
+        ]
+      });
+      const dispatchedEvent = { target: parent };
+      expect(contextMenu.templateForEvent(dispatchedEvent)).toEqual([
+        {
+          label: 'Hello Pulsar',
+          id: `Parent`,
+          submenu: [
+            {
+              label: 'My Other Command',
+              id: 'My Other Command',
+              command: 'test:my-other-command'
+            },
+            {
+              label: 'Goodbye Pulsar',
+              id: 'My Command',
+              command: 'test:my-command',
+              after: ['test:my-other-command']
+            }
+          ]
+        }
+      ]);
+    });
   });
 });
