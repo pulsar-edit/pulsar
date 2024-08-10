@@ -104,6 +104,33 @@ describe('MenuManager', function() {
         submenu: [{ label: 'B', id: 'B', command: 'b' }]
       });
     });
+
+    it('translates LocaleLabels', function() {
+      const I18n = require("../src/i18n.js");
+      atom.i18n.localeFallbackList = I18n.LocaleNegotiation(
+        "es-MX",
+        [ "zh-Hant" ]
+      );
+      atom.i18n.addStrings({
+        example: {
+          stringKey: "Hello Pulsar",
+          otherStringKey: "Goodbye Pulsar"
+        }
+      }, "en-US");
+
+      const disposable = menu.add([
+        { label: '%example.stringKey%', submenu: [{ label: '%example.otherStringKey%', command: 'b' }] }
+      ]);
+      expect(menu.template).toEqual([
+        {
+          label: 'Hello Pulsar',
+          id: 'A',
+          submenu: [{ label: 'Goodbye Pulsar', id: 'B', command: 'b' }]
+        }
+      ]);
+      disposable.dispose();
+      expect(menu.template).toEqual([]);
+    });
   });
 
   describe('::update()', function() {
