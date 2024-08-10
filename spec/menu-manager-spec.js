@@ -116,7 +116,7 @@ describe('MenuManager', function() {
           stringKey: "Hello Pulsar",
           otherStringKey: "Goodbye Pulsar"
         }
-      }, "en-US");
+      }, "en");
 
       const disposable = menu.add([
         { label: '%example.stringKey%', submenu: [{ label: '%example.otherStringKey%', command: 'b' }] }

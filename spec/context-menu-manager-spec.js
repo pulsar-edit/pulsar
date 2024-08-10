@@ -530,7 +530,7 @@ describe('ContextMenuManager', function() {
           stringKey: "Hello Pulsar",
           otherStringKey: "Goodbye Pulsar"
         }
-      }, "en-US");
+      }, "en");
 
       contextMenu.add({
         '.parent': [
