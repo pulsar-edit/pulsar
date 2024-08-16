@@ -13,6 +13,7 @@
 - [snippets] Fixed an issue with expanding snippet variables in certain scenarios if the snippet inserted new lines into the buffer.
 - Updated misconfigured links in the `CONTRIBUTING.md` file.
 - [ppm] Resolved in issue that could prevent renaming an existing package.
+- Various Tree-sitter improvements (folds, indents, custom queries, grammar updates...)
 
 ### Pulsar
 - Fixed: Tree-sitter rolling fixes 1.120 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1062)

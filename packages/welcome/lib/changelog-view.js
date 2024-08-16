@@ -64,6 +64,9 @@ export default class ChangeLogView {
               <li>
                 [ppm] Resolved in issue that could prevent renaming an existing package.
               </li>
+              <li>
+                Various Tree-sitter improvements (folds, indents, custom queries, grammar updates...)
+              </li>
             </ul>
 
             <section className="welcome-panel">
