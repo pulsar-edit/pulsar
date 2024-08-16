@@ -50,16 +50,19 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Worked around API breakage (FreeBSD <code>libiconv</code> vs GNU <code>libiconv</code>) in the <code>iconv</code> library shipped in macOS 13+
+                Resolved some issues of using <code>pulsar -p</code> to access <code>ppm</code> in the command line on Windows.
               </li>
               <li>
-                Changed `language-php` to continue syntax-highlighting even when encountering unbalanced PHP tags. (Avoid throwing a syntax error)
+                Added a new icon for Pulsar on Windows, increasing it's visual fidelity in most locations.
               </li>
               <li>
-                Indentation, fold, and highlighting fixes in <code>language-python</code>, <code>language-javascript</code>, <code>language-typescript</code>, <code>language-shell</code> and <code>language-c</code>.
+                [snippets] Fixed an issue with expanding snippet variables in certain scenarios if the snippet inserted new lines into the buffer.
               </li>
               <li>
-                Fix <code>--no-sandbox</code> flag not being applied to the <code>.desktop</code> launcher on Linux (Fixes Dev Tools).
+                Updated misconfigured links in the <code>CONTRIBUTING.md</code> file.
+              </li>
+              <li>
+                [ppm] Resolved in issue that could prevent renaming an existing package.
               </li>
             </ul>
 
