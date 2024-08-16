@@ -62,7 +62,7 @@ export default class ChangeLogView {
                 Updated misconfigured links in the <code>CONTRIBUTING.md</code> file.
               </li>
               <li>
-                [ppm] Resolved in issue that could prevent renaming an existing package.
+                [ppm] Resolved an issue that could prevent renaming an existing package.
               </li>
               <li>
                 Various Tree-sitter improvements (folds, indents, custom queries, grammar updates...)

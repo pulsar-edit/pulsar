@@ -12,7 +12,7 @@
 - Added a new icon for Pulsar on Windows, increasing it's visual fidelity in most locations.
 - [snippets] Fixed an issue with expanding snippet variables in certain scenarios if the snippet inserted new lines into the buffer.
 - Updated misconfigured links in the `CONTRIBUTING.md` file.
-- [ppm] Resolved in issue that could prevent renaming an existing package.
+- [ppm] Resolved an issue that could prevent renaming an existing package.
 - Various Tree-sitter improvements (folds, indents, custom queries, grammar updates...)
 
 ### Pulsar
