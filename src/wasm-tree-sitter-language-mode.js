@@ -4394,7 +4394,7 @@ class IndentResolver {
         dedentNextDelta++;
       } else if (name === 'match.next') {
         matchNextResult = this.resolveMatch(capture, {
-          row,
+          currentRow: row,
           comparisonRow,
           tabLength,
           indentationLevels: options.indentationLevels
@@ -4931,7 +4931,11 @@ class IndentResolver {
       // `@match` is authoritative; honor the first one we see and ignore other
       // captures.
       if (indent.name === 'match') {
-        let matchIndentLevel = this.resolveMatch(indent, row, tabLength);
+        let matchIndentLevel = this.resolveMatch(indent, {
+          // TODO: Pass `comparisonRow`?
+          currentRow: row,
+          tabLength
+        });
         if (typeof matchIndentLevel === 'number') {
           scopeResolver.reset();
           return matchIndentLevel;
