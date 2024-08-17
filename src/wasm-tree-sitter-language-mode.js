@@ -4176,17 +4176,7 @@ class IndentResolver {
 
     let originalControllingLayer = options.controllingLayer;
 
-    let comparisonRow = options.comparisonRow;
-    if (comparisonRow === undefined) {
-      comparisonRow = row - 1;
-      if (options.skipBlankLines) {
-        // It usually makes no sense to compare to a blank row, so we'll move
-        // upward until we find a line with text on it.
-        while (this.buffer.isRowBlank(comparisonRow) && comparisonRow > 0) {
-          comparisonRow--;
-        }
-      }
-    }
+    let comparisonRow = options.comparisonRow ?? this.getComparisonRow(row, options);
 
     let existingIndent = 0;
     if (options.preserveLeadingWhitespace) {
@@ -4817,6 +4807,7 @@ class IndentResolver {
     let { languageMode } = this;
     const line = this.buffer.lineForRow(row);
     const currentRowIndent = this.indentLevelForLine(line, tabLength);
+    let comparisonRow = options.comparisonRow ?? this.getComparisonRow(row, options);
 
     // If the row is not indented at all, we have nothing to do, because we can
     // only dedent a line at this phase.
@@ -4912,6 +4903,12 @@ class IndentResolver {
       if (node.startPosition.row !== row) { continue; }
       // Ignore captures that fail their scope tests.
       if (!scopeResolver.store(indent)) { continue; }
+      let passed = this.applyTests(indent, {
+        currentRow: row,
+        comparisonRow,
+        tabLength
+      });
+      if (!passed) return;
 
       let force = this.getProperty(indent, 'force', 'boolean', false);
 
@@ -4962,6 +4959,18 @@ class IndentResolver {
     return currentRowIndent;
   }
 
+  getComparisonRow(row, { skipBlankLines = true } = {}) {
+    let comparisonRow = row - 1;
+    if (skipBlankLines) {
+      // It usually makes no sense to compare to a blank row, so we'll move
+      // upward until we find a line with text on it.
+      while (this.buffer.isRowBlank(comparisonRow) && comparisonRow > 0) {
+        comparisonRow--;
+      }
+    }
+    return comparisonRow;
+  }
+
   indentLevelForLine(line, tabLength) {
     let indentLength = 0;
     for (let i = 0, { length } = line; i < length; i++) {
@@ -4990,7 +4999,9 @@ class IndentResolver {
       return undefined;
     }
 
+    // `indent.match` used to be called `indent.matchIndentOf`.
     let matchIndentOf = this.getProperty(capture, ['match', 'matchIndentOf'], 'string', null);
+    // `indent.offset` used to be called `indent.offsetIndent`.
     let offsetIndent = this.getProperty(capture, ['offset', 'offsetIndent'], 'number', 0);
 
     if (!matchIndentOf) return undefined;
@@ -5012,6 +5023,13 @@ class IndentResolver {
     return Math.max(result, 0);
   }
 
+  // Look up an `indent.` capture property applied with a `#set!` directive,
+  // optionally coercing to a specified type or falling back to a default
+  // value.
+  //
+  // `names` can be an array in cases where the property may have several
+  // aliases. The first one that exists will be returned. (Omit the leading
+  // `indent.` when passing property names.)
   getProperty(capture, names, coercion = null, fallback = null) {
     if (typeof names === 'string') {
       names = [names];
@@ -5019,9 +5037,7 @@ class IndentResolver {
     for (let name of names) {
       let fullName = `indent.${name}`;
       let { setProperties: props = {} } = capture;
-      if (!(fullName in props)) {
-        continue;
-      }
+      if (!(fullName in props)) { continue; }
       return this.coerce(props[fullName], coercion) ?? fallback;
     }
     return fallback;
@@ -5029,14 +5045,17 @@ class IndentResolver {
 
   coerce(value, coercion) {
     switch (coercion) {
+      case String:
       case 'string':
         if (value == null) return "";
         return value;
+      case Number:
       case 'number': {
         let number = Number(value);
         if (isNaN(number)) return null;
         return number;
       }
+      case Boolean:
       case 'boolean':
         if (value == null) return null;
         return true;
@@ -5064,6 +5083,7 @@ class IndentResolver {
     return true;
   }
 }
+
 
 IndentResolver.TESTS = {
   // Returns `true` if the position descriptor's row equals that of the current
