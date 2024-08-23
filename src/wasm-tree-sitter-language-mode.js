@@ -4929,8 +4929,8 @@ class IndentResolver {
       // captures.
       if (indent.name === 'match') {
         let matchIndentLevel = this.resolveMatch(indent, {
-          // TODO: Pass `comparisonRow`?
           currentRow: row,
+          comparisonRow,
           tabLength
         });
         if (typeof matchIndentLevel === 'number') {
