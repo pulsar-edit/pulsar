@@ -3988,7 +3988,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         "{" @indent
         "}" @dedent
       `);
@@ -4024,7 +4024,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       // Pretend we're in a universe where lines after comments should be
       // dedented.
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         (comment) @dedent.next
       `);
 
@@ -4041,11 +4041,45 @@ describe('WASMTreeSitterLanguageMode', () => {
       ).toEqual('(1, 0)');
     });
 
+    it('allows @match.next to decrease the indent of the next line before any typing takes place', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      // When the comparison row contains the end of a lexical declaration, we
+      // want the next line to match the indentation of whichever line _began_
+      // that lexical declaration. (But for this test we'll add an offset of 1
+      // so we can be sure we're not just defaulting to column 0 for some other
+      // reason.)
+      await grammar.setQueryForTest('indentsQuery', scm`
+        ((lexical_declaration) @match.next
+          (#is? indent.matchesComparisonRow endPosition)
+          (#set! indent.match startPosition)
+          (#set! indent.offset 1)
+        )
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      buffer.setText(dedent`
+        let foo = longMethodWithArguments(1, 2, 3, 4, 5,
+                    6, 7, 8);
+      `);
+
+      await languageMode.atTransactionEnd();
+
+      editor.setCursorBufferPosition([1, 21]);
+      editor.insertText('\n', { autoIndentNewline: true });
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(2, 2)');
+    });
+
     it('resolves @match captures', async () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         (template_string
           "\`" @match
           (#is? test.last true)
@@ -4081,11 +4115,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         (template_string
           "\`" @dedent @match
           (#is? test.last true)
-          (#set! indent.matchIndentOf parent.firstChild.startPosition))
+          (#set! indent.match parent.firstChild.startPosition))
       `);
 
       buffer.setText(dedent`
@@ -4119,7 +4153,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4175,7 +4209,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4232,7 +4266,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4286,7 +4320,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4340,7 +4374,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       // Pretend we're in a universe where a line comment should cause the next
       // line to be indented, but only in a class body.
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
         ((comment) @indent
@@ -4417,7 +4451,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       // Pretend we're in a universe where a line comment should cause the next
       // line to be indented, but only in a class body.
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
         ((comment) @indent
@@ -4464,7 +4498,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       editor.updateAutoIndent(true);
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4503,7 +4537,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       atom.config.set('whitespace.removeTrailingWhitespace', true);
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4549,7 +4583,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4595,7 +4629,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       atom.config.set('whitespace.removeTrailingWhitespace', false);
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4641,7 +4675,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);

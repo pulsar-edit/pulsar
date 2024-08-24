@@ -1270,6 +1270,9 @@ class WASMTreeSitterLanguageMode {
   shouldUseAsyncIndent() {
     let result = true;
     if (!this.useAsyncParsing || !this.useAsyncIndent) result = false;
+    // If `currentTransactionReparseBudgetMs` somehow isn’t initialized yet, we
+    // can initialize it here for this transaction.
+    this.currentTransactionReparseBudgetMs ??= this.transactionReparseBudgetMs;
     if (this.currentTransactionReparseBudgetMs > 0) {
       result = false;
     }
