@@ -4166,6 +4166,7 @@ class IndentResolver {
     if (!root || !root.tree || !root.ready) { return null; }
     let { languageMode } = this;
     let options = {
+      skipEvent: false,
       skipBlankLines: true,
       skipDedentCheck: false,
       preserveLeadingWhitespace: false,
@@ -4176,6 +4177,13 @@ class IndentResolver {
 
     let originalControllingLayer = options.controllingLayer;
 
+    // Indentation hinting is a two-phase process.
+    //
+    // In phase 1, we determine `row`’s starting indent considering only the
+    // content of the previous row.
+    //
+    // In phase 2, we consider `row`’s own content to see if any of it suggests
+    // an alteration from the phase 1 value.
     let comparisonRow = options.comparisonRow ?? this.getComparisonRow(row, options);
 
     let existingIndent = 0;
@@ -4210,6 +4218,13 @@ class IndentResolver {
       comparisonRow,
       this.buffer.lineLengthForRow(comparisonRow)
     );
+
+    // Phase 1
+    // -------
+    //
+    // Find the controlling layer and perform an indentation query that starts
+    // at the beginning of the comparison row and ends at the beginning of the
+    // current row.
 
     // Find the deepest layer that actually has an indents query. (Layers that
     // don't define one, such as specialized injection grammars, are telling us
@@ -4335,26 +4350,36 @@ class IndentResolver {
       }
     }
 
+    // Keep track of the range of each capture so we can filter out duplicates.
     let positionSet = new Set;
 
-    // Capture in two phases. The first phase covers any captures from the
-    // comparison row that can cause the _following_ row to be indented.
+    // Perform the Phase 1 capture.
     let indentCaptures = indentsQuery.captures(
       indentTree.rootNode,
       { row: comparisonRow, column: 0 },
       { row: row, column: 0 }
     );
 
+    // Keep track of the first `@indent` capture on the line. When balancing
+    // `@indent`s and `@dedent`s, any `@dedent`s that occur before the first
+    // `@indent` should be ignored.
     let indentCapturePosition = null;
+    // Three different capture styles can influence the Phase 1 output:
+    // the `@indent`/`@dedent` balancing…
     let indentDelta = 0;
+    // …the `@dedent.next` capture…
     let dedentNextDelta = 0;
+    // …and the `@match.next` capture, which acts as a special sort of override
+    // much like Phase 2’s `@match` capture.
     let matchNextResult = null;
 
     for (let capture of indentCaptures) {
       let { node, name } = capture;
+      // Captures that have no content are ignored by default because they
+      // typically are “phantom” nodes inserted by Tree-sitter as part of error
+      // recovery, but we'll allow them if the query file explicitly tells us
+      // to.
       let allowEmpty = this.getProperty(capture, 'allowEmpty', 'boolean', false);
-
-      // Ignore “phantom” nodes that aren't present in the buffer.
       if (node.text === '' && !allowEmpty) {
         continue;
       }
@@ -4363,8 +4388,17 @@ class IndentResolver {
       if (node.endPosition.row < comparisonRow) { continue; }
       if (node.startPosition.row > comparisonRow) { continue; }
 
-      // Ignore anything that fails a scope test.
+      // Ignore anything that fails a scope test. This applies all the tests of
+      // the form `(#is? test.foo)`.
       if (!scopeResolver.store(capture)) { continue; }
+      // Apply indentation-specific scope tests and skip this capture if any
+      // tests fail.
+      let passed = this.applyTests(capture, {
+        currentRow: row,
+        comparisonRow,
+        tabLength
+      });
+      if (!passed) { continue; }
 
       // Only consider a given combination of capture name and buffer range
       // once, even if it's captured more than once in `indents.scm`.
@@ -4383,13 +4417,20 @@ class IndentResolver {
         // content is.
         dedentNextDelta++;
       } else if (name === 'match.next') {
+        // `@match.next` tells us that the current row’s baseline should match
+        // that of a given position descriptor.
         matchNextResult = this.resolveMatch(capture, {
           currentRow: row,
           comparisonRow,
           tabLength,
           indentationLevels: options.indentationLevels
         }) ?? null;
-        if (matchNextResult !== null) { break; }
+        if (matchNextResult !== null) {
+          // If we succeed in resolving this value, it’ll supersede any other
+          // kinds of captures, so we can skip the rest of the capture
+          // processing.
+          break;
+        }
       } else if (name === 'dedent') {
         // `dedent` tokens don't count for anything unless they happen
         // after the first `indent` token. They only tell us whether an indent
@@ -4417,6 +4458,8 @@ class IndentResolver {
           // shouldn't cancel out the indent.
           continue;
         }
+        // Now that we've filtered out all the `@dedent`s we should ignore, we
+        // can decrement `indentDelta`.
         indentDelta--;
         if (indentDelta < 0) {
           // In the _indent_ phase, the delta won't ever go lower than `0`.
@@ -4428,6 +4471,10 @@ class IndentResolver {
           // So no matter how many `dedent` tokens we see on a particular line…
           // if the _last_ token we see is an `indent` token, then it hints
           // that the next line should be indented by one level.
+          //
+          // The only ways for Phase 1 to produce a baseline indent that’s
+          // _less_ than the comparison row’s indent are via `@dedent.next` and
+          // `@match.next`.
           indentDelta = 0;
         }
       }
@@ -4447,42 +4494,45 @@ class IndentResolver {
     // `@dedent`s.
     //
     // If there's a genuine need to dedent the current row based solely on the
-    // content of the comparison row, then `@dedent.next` can be used.
-    //
-    // And if a language needs to indent more than one level from one line to
-    // the next, then `@match` captures can be used to specify an exact level
-    // of indentation relative to another specific node. If a `@match` capture
-    // exists, we'll catch it in the dedent captures phase, and these
-    // heuristics will be ignored.
+    // content of the comparison row, then `@dedent.next` or `@match.next` can
+    // be used.
     //
     indentDelta = clamp(indentDelta, 0, 1);
 
-    // Process `@dedent.next` captures as a last step; they act as a strong
-    // hint about the next line's indentation.
+    // Process `@dedent.next` captures after the `@indent`/`@dedent` balancing;
+    // they act as a strong hint about the next line's indentation.
     indentDelta -= clamp(dedentNextDelta, 0, 1);
 
-    // If we got a result from a `match.next` capture, that supersedes any
-    // other results. Set `indentDelta` to `0`; we'll instead use
-    // `matchNextResult` as the baseline to which we'll add any further deltas.
+    // On the other hand, if we got a result from a `@match.next` capture, that
+    // supersedes any other results. Set `indentDelta` to `0`; we'll instead
+    // use `matchNextResult` as the baseline to which we'll add any further
+    // deltas.
     if (matchNextResult !== null) {
       indentDelta = 0;
     }
 
+    // Phase 2
+    // -------
+    //
+    // Find the controlling layer and perform an indentation query that starts
+    // at the beginning of the current row and ends at the beginning of the
+    // next row.
+
     let dedentDelta = 0;
-    let line = this.buffer.lineForRow(row);
-    let rowStartingColumn = Math.max(line.search(/\S/), 0);
+    let lineText = this.buffer.lineForRow(row);
+    let rowStartingColumn = Math.max(lineText.search(/\S/), 0);
 
     if (!options.skipDedentCheck) {
       scopeResolver.reset();
 
-      // The controlling layer on the previous line gets to decide what our
-      // starting indent is on the current line. But it might not extend to the
-      // current line, so we should determine which layer is in charge of the
-      // second phase.
+      // The controlling layer on the previous line got to decide what our
+      // starting indent was on the current line. But it might not extend to
+      // the current line, so we should determine which layer is in charge of
+      // the second phase.
       //
-      // The comparison point we use is that of the first character on the
-      // line. If we start earlier than that, we might not pick up on the
-      // presence of an injection layer.
+      // The comparison point we use is that of the first non-whitespace
+      // character on the line. If we start earlier than that, we might not
+      // pick up on the presence of an injection layer.
       let rowStart = new Point(row, rowStartingColumn);
       let dedentControllingLayer = languageMode.controllingLayerAtPoint(
         rowStart,
@@ -4515,27 +4565,30 @@ class IndentResolver {
         indentTree = dedentControllingLayer.getOrParseTree();
       }
 
-      // The second phase covers any captures on the current line that can
-      // cause the current line to be indented or dedented.
+      // Perform the Phase 2 capture.
       let dedentCaptures = indentsQuery.captures(
         indentTree.rootNode,
         { row: row - 1, column: Infinity },
         { row: row + 1, column: 0 }
       );
 
-      let currentRowText = this.buffer.lineForRow(row);
-      currentRowText = currentRowText.trim();
+      let currentRowText = lineText.trim();
+      // We can reuse the position set we created for Phase 1.
       positionSet.clear();
 
       for (let capture of dedentCaptures) {
         let { name, node } = capture;
         let { text } = node;
 
-        let force = this.getProperty(capture, 'force', 'boolean', false);
+        // As in Phase 1, we allow captures to opt into being recognized even
+        // when they're empty.
         let allowEmpty = this.getProperty(capture, 'allowEmpty', 'boolean', false);
-
-        // Ignore “phantom” nodes that aren't present in the buffer.
         if (text === '' && !allowEmpty) { continue; }
+
+        // `(#set! indent.force)` acts more aggressively, signaling dedent even
+        // when the capture isn't the first content on the row. This should be
+        // used with care.
+        let force = this.getProperty(capture, 'force', 'boolean', false);
 
         // Ignore anything that isn't actually on the row.
         if (node.endPosition.row < row) { continue; }
@@ -4543,6 +4596,14 @@ class IndentResolver {
 
         // Ignore anything that fails a scope test.
         if (!scopeResolver.store(capture)) { continue; }
+        // Apply indentation-specific scope tests and skip this capture if any
+        // tests fail.
+        let passed = this.applyTests(capture, {
+          currentRow: row,
+          comparisonRow,
+          tabLength
+        });
+        if (!passed) { continue; }
 
         // Imagine you've got:
         //
@@ -4561,31 +4622,47 @@ class IndentResolver {
         // of this behavior with `(#set! indent.force true)`.
         if (!force && !currentRowText.startsWith(text)) { continue; }
 
-        // The '@match' capture short-circuits a lot of this logic by pointing
-        // us to a different node and asking us to match the indentation of
-        // whatever row that node starts on.
+        // The `@match` capture short-circuits nearly all indentation logic by
+        // pointing us to a different node and asking us to match the
+        // indentation of whatever row that node starts on.
         if (name === 'match') {
           let matchIndentLevel = this.resolveMatch(
             capture, { row, comparisonRow, tabLength, indentationLevels: options.indentationLevels });
           if (typeof matchIndentLevel === 'number') {
+            // We were able to resolve the `@match` capture, so we’ll be
+            // returning early.
             scopeResolver.reset();
             let finalIndent = Math.max(matchIndentLevel - existingIndent, 0);
-            this.emitter.emit('did-suggest-indent', {
-              row,
-              comparisonRow,
-              matchIndentLevel,
-              finalIndent
-            });
+            if (!options.skipEvent) {
+              this.emitter.emit('did-suggest-indent', {
+                currentRow: row,
+                comparisonRow,
+                matchIndentLevel,
+                finalIndent,
+                captureMode: 'match'
+              });
+            }
             return finalIndent;
           }
         } else if (name === 'none') {
+          // TODO: `@none` is an experiment for any situation in which the
+          // current line’s indent should be reset to `0`. This is obviously
+          // rarely needed and I can’t remember exactly what the envisioned use
+          // case was, but we’ll leave it in for now.
           scopeResolver.reset();
+          if (!options.skipEvent) {
+            this.emitter.emit('did-suggest-indent', {
+              currentRow: row,
+              comparisonRow,
+              finalIndent: 0,
+              captureMode: 'none'
+            });
+          }
           return 0;
         }
 
-        // Only `@dedent` or `@match` captures can change this line's
-        // indentation. We handled `@match` above, so we'll filter out all non-
-        // `@dedent`s now.
+        // Only the captures handled above and `@dedent` can change this line's
+        // indentation. So now we’ll filter out all non-`@dedent`s.
         if (name !== 'dedent') { continue; }
 
         // Only consider a given range once, even if it's marked with multiple
@@ -4603,19 +4680,41 @@ class IndentResolver {
     }
 
     scopeResolver.reset();
+
+    // Both phases are complete, so let's put the pieces together.
+
+    // Where are we starting from? Most of the time it's the indentation level
+    // of the comparison row, but a `@match.next` capture can override this.
     let baseline = matchNextResult !== null ? matchNextResult : comparisonRowIndent;
+
+    // Now we add the deltas from the two phases. This will nearly always
+    // produce a difference of either `-1`, `0`, or `1` from `baseline`.
+    //
+    // When `@match.next` produces a baseline, `indentDelta` will always be `0`
+    // to signify that other Phase 1 logic was ignored altogether.
     let finalIndent = baseline + indentDelta + dedentDelta;
-    let resultIndent = Math.max(finalIndent - existingIndent, 0);
-    this.emitter.emit('did-suggest-indent', {
-      row,
-      comparisonRow,
-      comparisonRowIndent,
-      indentDelta,
-      dedentDelta,
-      finalIndent,
-      resultIndent
-    });
-    return resultIndent;
+
+    // Finally, we might have to adjust for the existing leading whitespace
+    // if `options.preserveLeadingWhitespace` is `true`.
+    let adjustedIndent = Math.max(finalIndent - existingIndent, 0);
+
+    // Emit an event with all this information. This makes it possible for
+    // tooling to help a grammar author understand the indentation logic
+    // without necessarily having to step through it in a debugger.
+    if (!options.skipEvent) {
+      this.emitter.emit('did-suggest-indent', {
+        currentRow: row,
+        comparisonRow,
+        comparisonRowIndent,
+        indentDelta,
+        dedentDelta,
+        finalIndent,
+        adjustedIndent,
+        captureMode: 'normal'
+      });
+    }
+
+    return adjustedIndent;
   }
 
   // Extended: Register a callback that fires when {IndentResolver} suggests an
@@ -4627,6 +4726,9 @@ class IndentResolver {
   // diagnose _why_ a particular indentation level is being suggested without
   // having to step through the logic in a debugger.
   //
+  // Nearly all exit paths for {::suggestedIndentForBufferRow} and
+  // {::suggestedIndentForEditedBufferRow} invoke this callback.
+  //
   // One indentation “level” consists of either (a) one tab character, or (b)
   // one multiple of `editor.tabLength` spaces (if `editor.softTabs` is
   // `true`).
@@ -4634,7 +4736,19 @@ class IndentResolver {
   // - `callback` A {Function} that takes one parameter:
   //   - `meta` An {Object} that consisting of _some subset_ of the following
   //     properties:
-  //     - `row` The {Number} of the row whose indentation was suggested.
+  //     - `captureMode` A {String} describing one of several different modes
+  //       which influence a capture:
+  //       - A value of `normal` means that an indentation level was determined
+  //         through the normal two-phase process.
+  //       - A value of `match` means that an indentation level was determined
+  //         when we encountered a `@match` capture. `@match` captures are
+  //         considered in Phase 2, but use the syntax tree to override earlier
+  //         logic and give a definitive answer on a row’s indentation level.
+  //       - A value of `none` means that a `@none` capture was encountered in
+  //         Phase 2. `@none` is an extremely rare capture that, when used,
+  //         instantly signals a suggested indent level of `0`, overriding all
+  //         other logic.
+  //     - `currentRow` The {Number} of the row whose indentation was suggested.
   //       (Zero-indexed, so you must add one to match the row number displayed
   //       in the gutter.)
   //     - `comparisonRow` The {Number} of the row that was consulted to
@@ -4670,13 +4784,14 @@ class IndentResolver {
   //       if `suggestedIndentForBufferRow` would return `5`, but the target
   //       row already has an indent level of `3`, `finalIndent` will instead
   //       be `2`.
-  //     - `resultIndent` {Number} A `finalIndent`, but takes existing
+  //     - `adjustedIndent` {Number} A `finalIndent`, but takes existing
   //       indentation level into account if the `preserveLeadingWhitespace`
   //       option was enabled. For instance, if `suggestedIndentForBufferRow`
   //       would return `5`, but the target row already has an indent level of
-  //       `3`, `resultIndent` will instead be `2`. If
-  //       `preserveLeadingWhitespace` is not enabled, `finalIndent` and
-  //       `resultIndent` will be identical.
+  //       `3`, `adjustedIndent` will instead be `2`. If
+  //       `preserveLeadingWhitespace` is `false`, `finalIndent` and
+  //       `adjustedIndent` will be identical.
+  //
   onDidSuggestIndent(callback) {
     return this.emitter.on('did-suggest-indent', callback);
   }
@@ -4893,6 +5008,7 @@ class IndentResolver {
     const originalRowIndent = this.suggestedIndentForBufferRow(row, tabLength, {
       skipBlankLines: true,
       skipDedentCheck: true,
+      skipEvent: true,
       tree: indentTree
     });
 
@@ -4903,6 +5019,8 @@ class IndentResolver {
       if (node.startPosition.row !== row) { continue; }
       // Ignore captures that fail their scope tests.
       if (!scopeResolver.store(indent)) { continue; }
+      // Apply indentation-specific scope tests and skip this capture if any
+      // tests fail.
       let passed = this.applyTests(indent, {
         currentRow: row,
         comparisonRow,
@@ -4935,10 +5053,23 @@ class IndentResolver {
         });
         if (typeof matchIndentLevel === 'number') {
           scopeResolver.reset();
+          this.emitter.emit('did-suggest-indent', {
+            currentRow: row,
+            comparisonRow,
+            matchIndentLevel,
+            finalIndent: matchIndentLevel,
+            captureMode: 'match'
+          });
           return matchIndentLevel;
         }
       } else if (indent.name === 'none') {
         scopeResolver.reset();
+        this.emitter.emit('did-suggest-indent', {
+          currentRow: row,
+          comparisonRow,
+          finalIndent: 0,
+          captureMode: 'none'
+        });
         return 0;
       }
 
@@ -4952,11 +5083,16 @@ class IndentResolver {
 
     scopeResolver.reset();
 
-    if (seenDedent) {
-      return Math.max(0, originalRowIndent - 1);
-    }
+    let finalIndent = seenDedent ? Math.max(0, originalRowIndent - 1) : currentRowIndent;
 
-    return currentRowIndent;
+    this.emitter.emit('did-suggest-indent', {
+      currentRow: row,
+      comparisonRow,
+      finalIndent,
+      captureMode: 'normal'
+    });
+
+    return finalIndent;
   }
 
   getComparisonRow(row, { skipBlankLines = true } = {}) {
@@ -4986,28 +5122,25 @@ class IndentResolver {
     return indentLength / tabLength
   }
 
-  resolveMatch(capture, { currentRow, comparisonRow, tabLength, indentationLevels }) {
+  resolveMatch(capture, { currentRow, tabLength, indentationLevels }) {
     let { node } = capture;
-    let meta = {
-      currentRow,
-      comparisonRow,
-      tabLength,
-      indentationLevels
-    }
-
-    if (!this.applyTests(capture, meta)) {
-      return undefined;
-    }
 
     // `indent.match` used to be called `indent.matchIndentOf`.
     let matchIndentOf = this.getProperty(capture, ['match', 'matchIndentOf'], 'string', null);
     // `indent.offset` used to be called `indent.offsetIndent`.
     let offsetIndent = this.getProperty(capture, ['offset', 'offsetIndent'], 'number', 0);
 
+    // A `@match` or `@match.next` capture must have an `indent.match`
+    // predicate. If it’s missing, the capture is invalid and we should pretend
+    // it wasn’t there at all.
     if (!matchIndentOf) return undefined;
 
+    // Turn an `indent.match` predicate into a node position.
     let targetPosition = resolveNodePosition(node, matchIndentOf);
     let targetRow = targetPosition?.row;
+    // If we fail to resolve the node position, it means the path described
+    // doesn't exist. We should behave as though this `@match` capture wasn’t
+    // present at all.
     if (typeof targetRow !== 'number' || targetRow >= currentRow) {
       return undefined;
     }
@@ -5020,6 +5153,9 @@ class IndentResolver {
       this.buffer.lineForRow(targetRow), tabLength);
 
     let result = baseIndent + offsetIndent;
+
+    // Because `indent.offset` can be any number, we can wind up with a
+    // negative number here, which is invalid.
     return Math.max(result, 0);
   }
 
@@ -5031,12 +5167,10 @@ class IndentResolver {
   // aliases. The first one that exists will be returned. (Omit the leading
   // `indent.` when passing property names.)
   getProperty(capture, names, coercion = null, fallback = null) {
-    if (typeof names === 'string') {
-      names = [names];
-    }
+    let { setProperties: props = {} } = capture;
+    if (typeof names === 'string') { names = [names]; }
     for (let name of names) {
       let fullName = `indent.${name}`;
-      let { setProperties: props = {} } = capture;
       if (!(fullName in props)) { continue; }
       return this.coerce(props[fullName], coercion) ?? fallback;
     }
@@ -5084,10 +5218,19 @@ class IndentResolver {
   }
 }
 
-
+// Indentation queries have a small number of query tests. These can't be
+// implemented as generic scope tests because they expose metadata that only
+// makes sense in an indentation context.
 IndentResolver.TESTS = {
   // Returns `true` if the position descriptor's row equals that of the current
   // row (the row whose indentation level is being suggested).
+  //
+  // For example:
+  //
+  //   (#is? indent.matchesCurrentRow startPosition)
+  //
+  // in a `@match` capture will pass if the captured node starts on the current
+  // row.
   matchesCurrentRow(node, value, { currentRow }) {
     let position = resolveNodePosition(node, value);
     if (!position) return null;
@@ -5097,6 +5240,13 @@ IndentResolver.TESTS = {
   // Returns `true` if the position descriptor's row equals that of the
   // comparison row (the row used as a reference when determining the
   // indentation level of the current row).
+  //
+  // For example:
+  //
+  //   (#is? indent.matchesComparisonRow endPosition)
+  //
+  // in a `@match` capture will pass if the captured node ends on the
+  // comparison row.
   matchesComparisonRow(node, value, { comparisonRow }) {
     let position = resolveNodePosition(node, value);
     if (!position) return null;
