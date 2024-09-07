@@ -12,6 +12,8 @@ const { commentStringsFromDelimiters, getDelimitersForScope } = require('./comme
 
 const createTree = require('./rb-tree');
 
+const ONE_CHAR_FORWARD_TRAVERSAL = Object.freeze(Point(0, 1));
+
 const FEATURE_ASYNC_INDENT = true;
 const FEATURE_ASYNC_PARSE = true;
 
@@ -83,7 +85,7 @@ function resolveNodePosition(node, descriptor) {
   return result[lastPart];
 }
 
-// Patch tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
+// Patch Tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
 // that we don't break anything that relied on `range` being present.
 function ensureNodeIsPatched(node) {
   let done = node.range && node.range instanceof Range;
@@ -108,7 +110,7 @@ function ensureNodeIsPatched(node) {
   });
 }
 
-// Compares “informal” points like the ones in a tree-sitter tree; saves us
+// Compares “informal” points like the ones in a Tree-sitter tree; saves us
 // from having to convert them to actual `Point`s.
 function comparePoints(a, b) {
   const rows = a.row - b.row;
@@ -429,7 +431,7 @@ class WASMTreeSitterLanguageMode {
     return true;
   }
 
-  // Resolves the next time that all tree-sitter trees are clean — or
+  // Resolves the next time that all Tree-sitter trees are clean — or
   // immediately, if they're clean at the time of invocation.
   //
   // Resolves with metadata about the previous transaction that may be useful
@@ -461,7 +463,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   // Alias for `atTransactionEnd` for packages that used the implementation
-  // details of the legacy tree-sitter system.
+  // details of the legacy Tree-sitter system.
   parseCompletePromise() {
     return this.atTransactionEnd();
   }
@@ -535,7 +537,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   // Behaves like `scopeDescriptorForPosition`, but returns a list of
-  // tree-sitter node names. Useful for understanding tree-sitter parsing or
+  // Tree-sitter node names. Useful for understanding Tree-sitter parsing or
   // for writing syntax highlighting query files.
   syntaxTreeScopeDescriptorForPosition(point) {
     point = this.normalizePointForPositionQuery(point);
@@ -573,7 +575,7 @@ class WASMTreeSitterLanguageMode {
     );
 
     let scopes = matches.map(({ node }) => (
-      node.isNamed() ? node.type : `"${node.type}"`
+      node.isNamed ? node.type : `"${node.type}"`
     ));
     scopes.unshift(this.grammar.scopeName);
 
@@ -1689,7 +1691,10 @@ class FoldResolver {
     // boundary ends at the same point that another one starts, the ending
     // boundary will be visited first.
     let boundaries = createTree(compareBoundaries);
-    let captures = this.layer.queries.foldsQuery.captures(rootNode, start, end);
+    let captures = this.layer.queries.foldsQuery.captures(
+      rootNode,
+      { startPosition: start, endPosition: end }
+    );
 
     for (let capture of captures) {
       // NOTE: Currently, the first fold to match for a given starting position
@@ -2021,7 +2026,7 @@ class HighlightIterator {
     //
     let [result, openScopes] = iterator.seek(start, endRow);
 
-    if (rootLanguageLayer?.tree?.rootNode.hasChanges()) {
+    if (rootLanguageLayer?.tree?.rootNode.hasChanges) {
       // The tree is dirty. We should keep going — if we stop now, then the
       // user will see a flash of unhighlighted text over this whole range. But
       // we should also schedule a re-highlight at the end of the transaction,
@@ -2655,7 +2660,7 @@ class LanguageLayer {
 
   isDirty() {
     if (!this.tree) { return false; }
-    return this.tree.rootNode.hasChanges();
+    return this.tree.rootNode.hasChanges;
   }
 
   inspect() {
@@ -2667,7 +2672,7 @@ class LanguageLayer {
     if (this.destroyed) { return; }
     this.destroyed = true;
 
-    // Clean up all tree-sitter trees.
+    // Clean up all Tree-sitter trees.
     let temporaryTrees = this.temporaryTrees ?? [];
     let trees = new Set([this.tree, this.lastSyntaxTree, ...temporaryTrees]);
     trees = [...trees];
@@ -2751,7 +2756,10 @@ class LanguageLayer {
     let boundaries = createTree(compareBoundaries);
     let extent = this.getExtent();
 
-    let captures = this.queries.highlightsQuery?.captures(this.tree.rootNode, from, to) ?? [];
+    let captures = this.queries.highlightsQuery?.captures(
+      this.tree.rootNode,
+      { startPosition: from, endPosition: to }
+    ) ?? [];
     this.scopeResolver.reset();
 
     for (let capture of captures) {
@@ -3003,7 +3011,7 @@ class LanguageLayer {
     if (!this.languageMode.useAsyncParsing) {
       // Practically speaking, updates that affect _only this layer_ will happen
       // synchronously, because we've made sure not to call this method until the
-      // root grammar's tree-sitter parser has been loaded. But we can't load any
+      // root grammar's Tree-sitter parser has been loaded. But we can't load any
       // potential injection layers' languages because we don't know which ones
       // we'll need _until_ we parse this layer's tree for the first time.
       //
@@ -3029,7 +3037,7 @@ class LanguageLayer {
         await this.currentParsePromise;
       } while (
         !this.destroyed &&
-        (!this.tree || this.tree.rootNode.hasChanges())
+        (!this.tree || this.tree.rootNode.hasChanges)
       );
 
       this.currentParsePromise = null;
@@ -3046,8 +3054,10 @@ class LanguageLayer {
     if (!this.queries.localsQuery) { return []; }
     let captures = this.queries.localsQuery.captures(
       this.tree.rootNode,
-      point,
-      point + 1
+      {
+        startPosition: point,
+        endPosition: point.translate(ONE_CHAR_FORWARD_TRAVERSAL)
+      }
     );
 
     captures = captures.filter(cap => {
@@ -3074,11 +3084,11 @@ class LanguageLayer {
     let globalScope = this.tree.rootNode;
 
     if (!captures) {
+      let { startPosition, endPosition } = globalScope;
       captures = this.groupLocalsCaptures(
         this.queries.localsQuery.captures(
           globalScope,
-          globalScope.startPosition,
-          globalScope.endPosition
+          { startPosition, endPosition }
         )
       );
     }
@@ -3382,7 +3392,7 @@ class LanguageLayer {
       // transaction's tree later on.
       this.lastSyntaxTree = tree;
 
-      // Like legacy tree-sitter, we're patching syntax nodes so that they have
+      // Like legacy Tree-sitter, we're patching syntax nodes so that they have
       // a `range` property that returns a `Range`. We're doing this for
       // compatibility, but we can't get a reference to the node class itself;
       // we have to wait until we have an instance and grab the prototype from
@@ -3568,8 +3578,10 @@ class LanguageLayer {
     // the character in column X.
     let captures = this.queries.highlightsQuery?.captures(
       this.tree.rootNode,
-      point,
-      { row: point.row, column: point.column + 1 }
+      {
+        startPosition: point,
+        endPosition: point.translate(ONE_CHAR_FORWARD_TRAVERSAL)
+      }
     ) ?? [];
 
     let results = [];
@@ -4063,16 +4075,19 @@ class OpenScopeMap extends Map {
   }
 
   removeLastOccurrenceOf(scopeId) {
-    let keys = [...this.keys()];
-    keys.reverse();
-    for (let key of keys) {
+    let candidateKey;
+    // Of the keys whose values include this scope, find the one that occurs
+    // latest in the document.
+    for (let key of this.keys()) {
       let value = this.get(key);
-      if (value.includes(scopeId)) {
-        removeLastOccurrenceOf(value, scopeId);
-        return true;
+      if (!value.includes(scopeId)) continue;
+      if (!candidateKey || comparePoints(key, candidateKey) === 1) {
+        candidateKey = key;
       }
     }
-    return false;
+    if (!candidateKey) return false;
+    removeLastOccurrenceOf(this.get(candidateKey), scopeId);
+    return true;
   }
 }
 
@@ -4098,7 +4113,7 @@ class Index extends Map {
 // intersections with range already in the list, those intersections are
 // combined into one larger range.
 //
-// Assumes all ranges are instances of `Range` rather than tree-sitter range
+// Assumes all ranges are instances of `Range` rather than Tree-sitter range
 // specs.
 class RangeList {
   constructor() {
@@ -4359,8 +4374,10 @@ class IndentResolver {
     // Perform the Phase 1 capture.
     let indentCaptures = indentsQuery.captures(
       indentTree.rootNode,
-      { row: comparisonRow, column: 0 },
-      { row: row, column: 0 }
+      {
+        startPosition: { row: comparisonRow, column: 0 },
+        endPosition: { row: row, column: 0 }
+      }
     );
 
     // Keep track of the first `@indent` capture on the line. When balancing
@@ -4571,8 +4588,10 @@ class IndentResolver {
       // Perform the Phase 2 capture.
       let dedentCaptures = indentsQuery.captures(
         indentTree.rootNode,
-        { row: row - 1, column: Infinity },
-        { row: row + 1, column: 0 }
+        {
+          startPosition: { row: row - 1, column: Infinity },
+          endPosition: { row: row + 1, column: 0 }
+        }
       );
 
       let currentRowText = lineText.trim();
@@ -4994,8 +5013,10 @@ class IndentResolver {
 
     const indents = indentsQuery.captures(
       indentTree.rootNode,
-      { row: row - 1, column: Infinity },
-      { row: row + 1, column: 0 }
+      {
+        startPosition: { row: row - 1, column: Infinity },
+        endPosition: { row: row + 1, column: 0 }
+      }
     );
 
     let lineText = this.buffer.lineForRow(row).trim();

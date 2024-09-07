@@ -38,7 +38,7 @@ async function getAllCapturesWithScopeResolver(grammar, languageMode, scopeResol
   let { start, end } = languageMode.buffer.getRange();
   let { tree } = layer;
   return {
-    captures: query.captures(tree.rootNode, start, end),
+    captures: query.captures(tree.rootNode, { startPosition: start, endPosition: end }),
     scopeResolver
   };
 }
@@ -142,7 +142,7 @@ describe('ScopeResolver', () => {
 
     let tokens = [];
     const original = grammar.idForScope.bind(grammar);
-    grammar.idForScope = function(scope, text) {
+    grammar.idForScope = function (scope, text) {
       if (text) {
         tokens.push(text);
       }
@@ -972,7 +972,7 @@ describe('ScopeResolver', () => {
 
       expect(matched.length).toBe(1);
       expect(matched.every(cap => {
-        return cap.name === 'messed-up-statement-block' && cap.node.hasError();
+        return cap.name === 'messed-up-statement-block' && cap.node.hasError;
       })).toBe(true);
     });
 

@@ -641,7 +641,7 @@ ScopeResolver.TESTS = {
 
   // Passes only if the node contains any descendant ERROR nodes.
   hasError(node) {
-    return node.hasError();
+    return node.hasError;
   },
 
   // Passes when the node's tree belongs to an injection layer, rather than the
