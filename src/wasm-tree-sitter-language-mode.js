@@ -2333,7 +2333,7 @@ class LayerHighlightIterator {
     if (!this.coverShallowerScopes) { return false; }
 
     // …and this iterator is deeper than the other…
-    if (iterator.depth > this.depth) { return false; }
+    if (iterator.depth >= this.depth) { return false; }
 
     // …and one of this iterator's content ranges actually includes this
     // position. (With caveats!)
