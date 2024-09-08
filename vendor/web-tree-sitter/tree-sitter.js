@@ -2027,9 +2027,7 @@ var TreeSitter = function() {
           static init() {
             TRANSFER_BUFFER = C._ts_init();
             VERSION = getValue(TRANSFER_BUFFER, "i32");
-            console.log('Version???????', VERSION);
             MIN_COMPATIBLE_VERSION = getValue(TRANSFER_BUFFER + SIZE_OF_INT, "i32");
-            console.log('MIN COMPAT:', MIN_COMPATIBLE_VERSION);
           }
           initialize() {
             C._ts_parser_new_wasm();
