@@ -4654,7 +4654,7 @@ class IndentResolver {
             // We were able to resolve the `@match` capture, so we’ll be
             // returning early.
             scopeResolver.reset();
-            let finalIndent = Math.max(matchIndentLevel - existingIndent, 0);
+            let finalIndent = Math.max(matchIndentLevel - Math.floor(existingIndent), 0);
             if (!options.skipEvent) {
               this.emitter.emit('did-suggest-indent', {
                 currentRow: row,
@@ -4716,9 +4716,13 @@ class IndentResolver {
     // to signify that other Phase 1 logic was ignored altogether.
     let finalIndent = baseline + indentDelta + dedentDelta;
 
-    // Finally, we might have to adjust for the existing leading whitespace
-    // if `options.preserveLeadingWhitespace` is `true`.
-    let adjustedIndent = Math.max(finalIndent - existingIndent, 0);
+    // Finally, we might have to adjust for the existing leading whitespace if
+    // `options.preserveLeadingWhitespace` is `true`.
+    //
+    // We call `Math.floor` because we should only subtract whole units of
+    // indentation here. “Leading whitespace” seems not to consider (for
+    // example) a single leading space character if `editor.tabLength` is `2`.
+    let adjustedIndent = Math.max(finalIndent - Math.floor(existingIndent), 0);
 
     // Emit an event with all this information. This makes it possible for
     // tooling to help a grammar author understand the indentation logic
