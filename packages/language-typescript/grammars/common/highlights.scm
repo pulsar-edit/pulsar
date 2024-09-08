@@ -116,9 +116,23 @@
 (augmented_assignment_expression
   left: (identifier) @variable.other.assignment._LANG_)
 
+; The "bar" in `foo.bar += 1`.
+(augmented_assignment_expression
+  left: (member_expression
+    property: (property_identifier) @variable.other.assignment.property._LANG_)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
+
 ; The "foo" in `foo++`.
 (update_expression
   argument: (identifier) @variable.other.assignment._LANG_)
+
+; The "bar" in `foo.bar++`.
+(update_expression
+  argument: (member_expression
+    property: (property_identifier) @variable.other.assignment.property._LANG_)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
 
 ; `object_pattern` appears to only be encountered in assignment expressions, so
 ; this won't match other uses of object/prop shorthand.

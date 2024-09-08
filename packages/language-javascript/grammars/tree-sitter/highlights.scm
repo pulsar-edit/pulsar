@@ -117,9 +117,24 @@
 (augmented_assignment_expression
   left: (identifier) @variable.other.assignment.js)
 
+; The "bar" in `foo.bar += 1`.
+(augmented_assignment_expression
+  left: (member_expression
+    property: (property_identifier) @variable.other.assignment.property.js)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
+
 ; The "foo" in `foo++`.
 (update_expression
   argument: (identifier) @variable.other.assignment.js)
+
+; The "bar" in `foo.bar++`.
+(update_expression
+  argument: (member_expression
+    property: (property_identifier) @variable.other.assignment.property.js)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
+
 
 ; Public field definition in a class body:
 ; The "foo" in `foo = "bar";`
