@@ -14,12 +14,6 @@
 // can continue to use Module afterwards as well.
 var Module = typeof Module != "undefined" ? Module : {};
 
-function checkForAsmVersion(prop) {
-  if (!(prop in Module['asm'])) {
-    console.warn(`Warning: parser wants to call function ${prop}, but it is not defined. If parsing fails, this is probably the reason why. Please report this to the Pulsar team so that this parser can be supported properly.`);
-  }
-}
-
 // Determine the runtime environment we are in. You can customize this by
 // setting the ENVIRONMENT setting at compile time (see settings.js).
 // Attempt to auto-detect the environment
@@ -1134,6 +1128,9 @@ var TreeSitter = function() {
               if (!resolved) {
                 resolved = moduleExports[sym];
               }
+              if (!resolved) {
+                console.warn(`Warning: parser wants to call function ${sym}, but it is not defined. If parsing fails, this is probably the reason why. Please report this to the Pulsar team so that this parser can be supported properly.`);
+              }
               return resolved;
             }
             // TODO kill ↓↓↓ (except "symbols local to this module", it will likely be
@@ -1166,7 +1163,6 @@ var TreeSitter = function() {
                   var resolved;
                   stubs[prop] = (...args) => {
                     resolved ||= resolveSymbol(prop);
-                    checkForAsmVersion(prop);
                     return resolved(...args);
                   };
                 }
