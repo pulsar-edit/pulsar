@@ -1,68 +1,63 @@
 ; MISC
 ; ====
 
-; In the JSX construct `<FOO.Bar>`, `FOO` should not be marked as
-; `constant.other.ts.tsx`. Block off identifiers within complex JSX tag names
-; early to prevent this.
+; In the JSX construct `<Foo.Bar>`, `Foo.Bar` is treated as a
+; `member_expression`. We don't want the ordinary rules for member expressions
+; to apply, so we block them off.
+;
+; TODO: If we wanted to give these segments individual scopes, we'd do that
+; here — replacing the `@_IGNORE_`s with scope names.
 
 (jsx_opening_element
-  (nested_identifier
+  (member_expression
     (identifier) @_IGNORE_
+    (property_identifier) @_IGNORE_
       (#set! capture.final)))
 
 (jsx_closing_element
-  (nested_identifier
+  (member_expression
     (identifier) @_IGNORE_
+    (property_identifier) @_IGNORE_
       (#set! capture.final)))
 
 (jsx_self_closing_element
-  (nested_identifier
+  (member_expression
     (identifier) @_IGNORE_
+    (property_identifier) @_IGNORE_
       (#set! capture.final)))
 
 ; JSX
 ; ===
 
+[
+  (jsx_self_closing_element)
+  (jsx_opening_element)
+  (jsx_closing_element)
+] @meta.tag.ts.tsx
+
 ; The "Foo" in `<Foo />`.
 (jsx_self_closing_element
-  name: (_) @entity.name.tag.ts.tsx
-  ) @meta.tag.ts.tsx
+  name: (_) @entity.name.tag.ts.tsx)
 
 ; The "Foo" in `<Foo>`.
 (jsx_opening_element
-  name: (identifier) @entity.name.tag.ts.tsx) @meta.tag.ts.tsx
+  name: (identifier) @entity.name.tag.ts.tsx)
 
 ; The "Foo.Bar" in `<Foo.Bar>`.
 (jsx_opening_element
-  name: (nested_identifier) @entity.name.tag.ts.tsx) @meta.tag.ts.tsx
+  name: (member_expression) @entity.name.tag.ts.tsx)
 
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
-  name: (identifier) @entity.name.tag.ts.tsx) @meta.tag.ts.tsx
+  name: (identifier) @entity.name.tag.ts.tsx)
 
 ; The "Foo.Bar" in `</Foo.Bar>`.
 (jsx_closing_element
-  name: (nested_identifier) @entity.name.tag.ts.tsx) @meta.tag.ts.tsx
+  name: (member_expression) @entity.name.tag.ts.tsx)
 
 ; The "bar" in `<Foo bar={true} />`.
 (jsx_attribute
   (property_identifier) @entity.other.attribute-name.ts.tsx)
-
-; The empty tag used as a shorthand for a fragment: `<>`.
-((jsx_fragment) @meta.tag.fragment.ts.tsx
-  (#set! adjust.endAfterFirstMatchOf "^<>"))
-
-; The closing fragment tag: `</>`.
-((jsx_fragment) @meta.tag.fragment.ts.tsx
-  (#set! adjust.startBeforeFirstMatchOf "</>$"))
-
-; (jsx_fragment)
-
-; The slashes in closing tags should not be interpreted as math operators.
-(jsx_self_closing_element "/" @punctuation.definition.tag.end.ts.tsx
-  (#set! capture.final))
-(jsx_closing_element "/" @punctuation.definition.tag.end.ts.tsx
-  (#set! capture.final))
 
 ; All JSX expressions/interpolations within braces.
 ((jsx_expression) @meta.embedded.block.ts.tsx
@@ -74,30 +69,15 @@
 (jsx_opening_element
   "<" @punctuation.definition.tag.begin.ts.tsx
   ">" @punctuation.definition.tag.end.ts.tsx)
-
+;
 (jsx_closing_element
-  "<" @punctuation.definition.tag.begin.ts.tsx
+  "</" @punctuation.definition.tag.begin.ts.tsx
   ">" @punctuation.definition.tag.end.ts.tsx)
-
-(jsx_fragment
-  "<" @punctuation.definition.tag.begin.ts.tsx
-  ">" @punctuation.definition.tag.end.ts.tsx)
-
-(jsx_fragment
-  "/" @punctuation.definition.tag.end.ts.tsx
-  (#set! capture.final))
 
 (jsx_self_closing_element
   "<" @punctuation.definition.tag.begin.ts.tsx
+  "/>" @punctuation.definition.tag.end.ts.tsx
   (#set! capture.final))
-
-((jsx_self_closing_element
-  ; The "/>" in `<Foo />`, extended to cover both anonymous nodes at once.
-  "/") @punctuation.definition.tag.end.ts.tsx
-  (#set! adjust.startAt lastChild.previousSibling.startPosition)
-  (#set! adjust.endAt lastChild.endPosition)
-  (#set! capture.final true))
-
 
 
 ; META
