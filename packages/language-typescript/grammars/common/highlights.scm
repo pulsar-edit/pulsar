@@ -110,7 +110,8 @@
 ; The "bar" in `foo.bar = true`
 (assignment_expression
   left: (member_expression
-    property: (property_identifier) @variable.other.assignment.property._LANG_))
+    property: (property_identifier) @variable.other.assignment.property._LANG_)
+    (#set! capture.final))
 
 ; The "foo" in `foo += 1`.
 (augmented_assignment_expression

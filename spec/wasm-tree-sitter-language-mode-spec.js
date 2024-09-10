@@ -766,6 +766,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         `);
 
         jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
+        jsGrammar.addInjectionPoint(HTML_INNERHTML_ASSIGNMENT_INJECTION_POINT);
         jsGrammar.addInjectionPoint(JSDOC_INJECTION_POINT);
 
         let tempHtmlConfig = { ...htmlConfig };
@@ -784,7 +785,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         jasmine.useRealClock();
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(htmlGrammar);
-        buffer.setText('node.innerHTML = html `\na ${b}<img src="d">\n`;');
+        buffer.setText('node.x = html `\na ${b}<img src="d">\n`;');
 
         const languageMode = new WASMTreeSitterLanguageMode({
           grammar: jsGrammar,
@@ -800,7 +801,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         expectTokensToEqual(editor, [
           [
             { text: 'node.', scopes: [] },
-            { text: 'innerHTML', scopes: ['property'] },
+            { text: 'x', scopes: ['property'] },
             { text: ' = ', scopes: [] },
             { text: 'html', scopes: ['function'] },
             { text: ' ', scopes: [] },
@@ -829,7 +830,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         expectTokensToEqual(editor, [
           [
             { text: 'node.', scopes: [] },
-            { text: 'innerHTML', scopes: ['property'] },
+            { text: 'x', scopes: ['property'] },
             { text: ' = ', scopes: [] },
             { text: 'xml', scopes: ['function'] },
             { text: ' ', scopes: [] },
@@ -893,7 +894,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         jasmine.useRealClock();
         atom.grammars.addGrammar(jsGrammar);
 
-        buffer.setText('node.innerHTML = html `\na ${b}<img src="d">\n`;');
+        buffer.setText('node.innerHTML = `\na ${b}<img src="d">\n`;');
         const languageMode = new WASMTreeSitterLanguageMode({
           grammar: jsGrammar,
           buffer,
@@ -908,8 +909,6 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: 'node.', scopes: [] },
             { text: 'innerHTML', scopes: ['property'] },
             { text: ' = ', scopes: [] },
-            { text: 'html', scopes: ['function'] },
-            { text: ' ', scopes: [] },
             { text: '`', scopes: ['string'] }
           ],
           [
@@ -931,8 +930,6 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: 'node.', scopes: [] },
             { text: 'innerHTML', scopes: ['property'] },
             { text: ' = ', scopes: [] },
-            { text: 'html', scopes: ['function'] },
-            { text: ' ', scopes: [] },
             { text: '`', scopes: ['string'] },
             { text: '', scopes: ['string', 'html'] }
           ],
@@ -1057,6 +1054,8 @@ describe('WASMTreeSitterLanguageMode', () => {
           '<div>'
         );
         await languageMode.nextTransaction;
+        expect(buffer.getText()).toEqual(`text = html \`<div>\`;`);
+        await wait(100);
         expectTokensToEqual(editor, [
           [
             { text: 'text = ', scopes: [] },
@@ -4822,6 +4821,27 @@ function expectTokensToEqual(editor, expectedTokenLines) {
   editor.displayLayer.getScreenLines(0, Infinity);
 }
 
+const HTML_INNERHTML_ASSIGNMENT_INJECTION_POINT = {
+  type: 'assignment_expression',
+
+  language(callExpression) {
+    const { firstChild } = callExpression;
+    if (firstChild.type === 'member_expression') {
+      if (firstChild.lastChild.text === 'innerHTML') {
+        return 'html';
+      }
+    }
+  },
+
+  content(callExpression) {
+    const { lastChild } = callExpression;
+    if (lastChild.type === 'template_string') {
+      return stringFragmentsOfTemplateString(lastChild);
+    }
+  },
+};
+
+
 const HTML_TEMPLATE_LITERAL_INJECTION_POINT = {
   type: 'call_expression',
   language(node) {
@@ -4833,7 +4853,7 @@ const HTML_TEMPLATE_LITERAL_INJECTION_POINT = {
     }
   },
   content(node) {
-    return node?.lastChild;
+    return stringFragmentsOfTemplateString(node.lastChild);
   }
 };
 
@@ -4856,3 +4876,10 @@ const JSDOC_INJECTION_POINT = {
     return comment;
   }
 };
+
+
+function stringFragmentsOfTemplateString(templateStringNode) {
+  return templateStringNode.children.filter(
+    c => c.type === 'string_fragment'
+  );
+}
