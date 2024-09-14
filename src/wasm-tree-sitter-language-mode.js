@@ -3031,6 +3031,9 @@ class LanguageLayer {
         if (!this.ready) {
           params.async = true;
           await this.languageLoaded;
+          // While we were waiting for this language to load, another update may
+          // have been scheduled.
+          if (this.currentParsePromise) return false;
         }
         this.currentParsePromise = this._performUpdate(nodeRangeSet, params);
         if (!params.async) { break; }
