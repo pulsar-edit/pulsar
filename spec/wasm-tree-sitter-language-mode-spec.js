@@ -773,7 +773,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         htmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, tempHtmlConfig);
 
         await htmlGrammar.setQueryForTest('highlightsQuery', `
-          (fragment) @html
+          (document) @html
           (tag_name) @tag
           (attribute_name) @attr
         `);
@@ -1351,7 +1351,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
         await htmlGrammar.setQueryForTest('highlightsQuery', `
-          (fragment) @html
+          (document) @html
           (tag_name) @tag
           (attribute_name) @attr
         `);
@@ -1399,7 +1399,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
         await htmlGrammar.setQueryForTest('highlightsQuery', `
-          (fragment) @html
+          (document) @html
           (tag_name) @tag
           (attribute_name) @attr
         `);
@@ -1450,7 +1450,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
         await htmlGrammar.setQueryForTest('highlightsQuery', `
-          (fragment) @html
+          (document) @html
           (tag_name) @tag
           (attribute_name) @attr
         `);
@@ -1503,7 +1503,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
         await htmlGrammar.setQueryForTest('highlightsQuery', `
-          (fragment) @html
+          (document) @html
           (tag_name) @tag
           (attribute_name) @attr
         `);
@@ -3085,7 +3085,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           .getScopesArray()
       ).toEqual([
         'text.html.basic',
-        'fragment',
+        'document',
         'element',
         'script_element',
         'raw_text',
@@ -3093,7 +3093,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         'expression_statement',
         'call_expression',
         'template_string',
-        'fragment',
+        'document',
         'element',
         'template_substitution',
         'member_expression',
@@ -3833,7 +3833,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         htmlConfig
       );
       await htmlGrammar.setQueryForTest('highlightsQuery', `
-        (fragment) @html
+        (document) @html
         (tag_name) @tag
         (attribute_name) @attr
       `);
