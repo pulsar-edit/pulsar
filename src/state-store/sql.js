@@ -19,7 +19,7 @@ module.exports = class SQLStateStore {
           dismissable: true
         });
         console.error('Error loading SQLite database', error);
-        return null
+        return null;
       }
       db.pragma('journal_mode = WAL');
       db.exec(
@@ -49,18 +49,18 @@ module.exports = class SQLStateStore {
         `REPLACE INTO ${this.tableName} VALUES (?, ?)`,
         key,
         JSON.stringify({ value: value, storedAt: new Date().toString() })
-      )
-    })
+      );
+    });
   }
 
   load(key) {
     return this.dbPromise.then(db => {
       if(!db) return null;
-      return getOne(db, `SELECT value FROM ${this.tableName} WHERE key = ?`, key )
+      return getOne(db, `SELECT value FROM ${this.tableName} WHERE key = ?`, key);
     }).then(result => {
       if(result) {
         const parsed = JSON.parse(result.value, reviver);
-        return parsed?.value
+        return parsed?.value;
       }
       return null;
     });
@@ -68,7 +68,7 @@ module.exports = class SQLStateStore {
 
   delete(key) {
     return this.dbPromise.then(db =>
-      exec(db, `DELETE FROM ${this.tableName} WHERE key = ?`, key )
+      exec(db, `DELETE FROM ${this.tableName} WHERE key = ?`, key)
     );
   }
 
@@ -81,7 +81,8 @@ module.exports = class SQLStateStore {
   count() {
     return this.dbPromise.then(db => {
       if(!db) return null;
-      return getOne(db, `SELECT COUNT(key) c FROM ${this.tableName}`).then(r => r.c)
+      const r = getOne(db, `SELECT COUNT(key) c FROM ${this.tableName}`);
+      return r.c;
     });
   }
 };
@@ -100,10 +101,10 @@ function awaitForAtomGlobal() {
   return new Promise(resolve => {
     const i = setInterval(() => {
       if(atom) {
-        clearInterval(i)
-        resolve()
+        clearInterval(i);
+        resolve();
       }
-    }, 50)
+    }, 50);
   })
 }
 
