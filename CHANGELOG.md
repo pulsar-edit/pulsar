@@ -6,6 +6,29 @@
 
 ## [Unreleased]
 
+## 1.120.0
+
+- Resolved some issues of using `pulsar -p` to access `ppm` in the command line on Windows.
+- Added a new icon for Pulsar on Windows, increasing it's visual fidelity in most locations.
+- [snippets] Fixed an issue with expanding snippet variables in certain scenarios if the snippet inserted new lines into the buffer.
+- Updated misconfigured links in the `CONTRIBUTING.md` file.
+- [ppm] Resolved an issue that could prevent renaming an existing package.
+- Various Tree-sitter improvements (folds, indents, custom queries, grammar updates...)
+
+### Pulsar
+- Fixed: Tree-sitter rolling fixes 1.120 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1062)
+- Updated: ppm: Update ppm to commit d9bcff111146547e1f4dec63 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1075)
+- Fixed: [snippets] Fix incorrect range traversal when resolving variables [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1043)
+- Added: [windows] Improve Icon [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1072)
+- Added: Use a different strategy for `pulsar -p` on Windows... [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1063)
+- Fixed: CONTRIBUTING.MD link to section fixed [@gsabatini2016](https://github.com/pulsar-edit/pulsar/pull/1067)
+
+### PPM
+- Updated: Begin less reliance on `async` package: Await as we go [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/134)
+- Fixed: Fix incorrect behavior on package rename [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/135)
+- Updated: Update many dependencies [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/133)
+- Revert: Revert "CI: Work around a weird bug in Yarn v1.x" [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/131)
+
 ## 1.119.0
 
 - Changed `language-php` to continue syntax-highlighting even when encountering unbalanced PHP tags. (Avoid throwing a syntax error)
