@@ -1,23 +1,29 @@
 ; MISC
 ; ====
 
-; In the JSX construct `<FOO.Bar>`, `FOO` should not be marked as
-; `constant.other.js`. Block off identifiers within complex JSX tag names early
-; to prevent this.
+; In the JSX construct `<Foo.Bar>`, `Foo.Bar` is treated as a
+; `member_expression`. We don't want the ordinary rules for member expressions
+; to apply, so we block them off.
+;
+; TODO: If we wanted to give these segments individual scopes, we'd do that
+; here — replacing the `@_IGNORE_`s with scope names.
 
 (jsx_opening_element
   (member_expression
     (identifier) @_IGNORE_
+    (property_identifier) @_IGNORE_
       (#set! capture.final)))
 
 (jsx_closing_element
   (member_expression
     (identifier) @_IGNORE_
+    (property_identifier) @_IGNORE_
       (#set! capture.final)))
 
 (jsx_self_closing_element
   (member_expression
     (identifier) @_IGNORE_
+    (property_identifier) @_IGNORE_
       (#set! capture.final)))
 
 
@@ -98,7 +104,7 @@
 (assignment_expression
   left: (member_expression
     property: (property_identifier) @variable.other.assignment.property.js)
-  right: [(arrow_function) (function)] @_IGNORE_
+  right: [(arrow_function) (function_expression)] @_IGNORE_
     (#set! isFunctionProperty true))
 
 ; The "bar" in `foo.bar = true`.
@@ -117,9 +123,24 @@
 (augmented_assignment_expression
   left: (identifier) @variable.other.assignment.js)
 
+; The "bar" in `foo.bar += 1`.
+(augmented_assignment_expression
+  left: (member_expression
+    property: (property_identifier) @variable.other.assignment.property.js)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
+
 ; The "foo" in `foo++`.
 (update_expression
   argument: (identifier) @variable.other.assignment.js)
+
+; The "bar" in `foo.bar++`.
+(update_expression
+  argument: (member_expression
+    property: (property_identifier) @variable.other.assignment.property.js)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
+
 
 ; Public field definition in a class body:
 ; The "foo" in `foo = "bar";`
@@ -264,7 +285,7 @@
 
 ; Named function expressions:
 ; the "foo" in `let bar = function foo () {`
-(function
+(function_expression
   name: (identifier) @entity.name.function.definition.js)
 
 ; Function definitions:
@@ -298,27 +319,27 @@
   left: (member_expression
     property: (property_identifier) @entity.name.function.definition.js
     (#set! capture.final true))
-  right: [(arrow_function) (function)])
+  right: [(arrow_function) (function_expression)])
 
 ; Function variable assignment:
 ; The "foo" in `let foo = function () {`
 (variable_declarator
   name: (identifier) @entity.name.function.definition.js
-  value: [(function) (arrow_function)])
+  value: [(function_expression) (arrow_function)])
 
 ; Function variable reassignment:
 ; The "foo" in `foo = function () {`
 (assignment_expression
   left: (identifier) @function
-  right: [(function) (arrow_function)])
+  right: [(function_expression) (arrow_function)])
 
 ; Object key-value pair function:
 ; The "foo" in `{ foo: function () {} }`
 (pair
   key: (property_identifier) @entity.name.function.method.definition.js
-  value: [(function) (arrow_function)])
+  value: [(function_expression) (arrow_function)])
 
-(function "function" @storage.type.function.js)
+(function_expression "function" @storage.type.function.js)
 (function_declaration "function" @storage.type.function.js)
 
 (generator_function "function" @storage.type.function.js)
@@ -995,7 +1016,7 @@
   (#set! adjust.endAt lastChild.startPosition)
   (#set! capture.final true))
 
-(function
+(function_expression
   body: (statement_block) @meta.block.function.js
   (#set! adjust.startAt firstChild.endPosition)
   (#set! adjust.endAt lastChild.startPosition)

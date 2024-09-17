@@ -77,8 +77,7 @@ class TreeSitterProvider {
       let tagsQuery = layer.queries?.tagsQuery ?? layer.tagsQuery;
       let captures = tagsQuery.captures(
         layer.tree.rootNode,
-        extent.start,
-        extent.end
+        { startPosition: extent.start, endPosition: extent.end }
       );
 
       results.push(

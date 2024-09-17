@@ -641,7 +641,7 @@ ScopeResolver.TESTS = {
 
   // Passes only if the node contains any descendant ERROR nodes.
   hasError(node) {
-    return node.hasError();
+    return node.hasError;
   },
 
   // Passes when the node's tree belongs to an injection layer, rather than the
@@ -803,6 +803,7 @@ ScopeResolver.TESTS = {
   // position. Accepts a node position descriptor.
   startsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
+    if (!otherNodePosition) return false
     return otherNodePosition.row === node.startPosition.row;
   },
 
@@ -810,6 +811,7 @@ ScopeResolver.TESTS = {
   // position. Accepts a node position descriptor.
   endsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
+    if (!otherNodePosition) return false
     return otherNodePosition.row === node.endPosition.row;
   },
 

@@ -5,6 +5,6 @@ parser: 'tree-sitter-markdown_inline'
 injectionRegex: '^(markdown-inline-internal)$'
 
 treeSitter:
-  parserSource: 'github:MDeiml/tree-sitter-markdown/tree-sitter-markdown-inline#28aa3baef73bd458d053b613b8bd10fd102b4405'
+  parserSource: 'github:tree-sitter-grammars/tree-sitter-markdown/tree-sitter-markdown-inline#a3481e1db0b5f9aecfa7124d362a6485286a8e72'
   grammar: 'tree-sitter-markdown-inline/tree-sitter-markdown-inline.wasm'
   highlightsQuery: 'tree-sitter-markdown-inline/highlights.scm'

@@ -179,7 +179,7 @@ describe('TreeSitterProvider', () => {
           (variable_declaration
             (variable_declarator
               name: (identifier) @name
-              value: [(arrow_function) (function)]))
+              value: [(arrow_function) (function_expression)]))
         ) @definition.function
         `
       );
@@ -211,7 +211,7 @@ describe('TreeSitterProvider', () => {
           (variable_declaration
             (variable_declarator
               name: (identifier) @name
-              value: [(arrow_function) (function)]))
+              value: [(arrow_function) (function_expression)]))
         ) @definition.function
 
         (
@@ -255,7 +255,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.context "something")
           )
         `);
@@ -303,7 +303,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.icon "book")
           )
 
@@ -325,7 +325,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.tag "class")
                 (#set! symbol.icon "book")
           )
@@ -346,7 +346,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.tag "class")
                 (#set! symbol.icon "book")
           ) @definition.namespace
@@ -369,7 +369,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.tag "class")
           )
         `);
@@ -391,7 +391,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.tag "class")
           ) @definition.namespace
         `);
@@ -415,7 +415,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.strip "ort$")
           )
         `);
@@ -438,7 +438,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.prepend "Foo: ")
           )
         `);
@@ -461,7 +461,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.append " (foo)")
           )
 
@@ -485,8 +485,8 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
-                (#set! test.onlyIfDescendantOfType function)
+                value: [(arrow_function) (function_expression)]))
+                (#set! test.onlyIfDescendantOfType function_expression)
                 (#set! symbol.prependTextForNode "parent.parent.parent.parent.parent.firstNamedChild")
                 (#set! symbol.joiner ".")
                 (#set! test.final true)
@@ -495,7 +495,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
           )
         `);
       });
@@ -518,8 +518,8 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
-                (#set! test.onlyIfNotDescendantOfType function)
+                value: [(arrow_function) (function_expression)]))
+                (#set! test.onlyIfNotDescendantOfType function_expression)
                 (#set! symbol.prepend "ROOT: ")
                 (#set! test.final true)
           )
@@ -528,8 +528,8 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
-                (#set! test.onlyIfDescendantOfType function)
+                value: [(arrow_function) (function_expression)]))
+                (#set! test.onlyIfDescendantOfType function_expression)
                 (#set! symbol.prependSymbolForNode "parent.parent.parent.parent.parent.firstNamedChild")
                 (#set! symbol.joiner ".")
                 (#set! test.final true)

@@ -766,13 +766,14 @@ describe('WASMTreeSitterLanguageMode', () => {
         `);
 
         jsGrammar.addInjectionPoint(HTML_TEMPLATE_LITERAL_INJECTION_POINT);
+        jsGrammar.addInjectionPoint(HTML_INNERHTML_ASSIGNMENT_INJECTION_POINT);
         jsGrammar.addInjectionPoint(JSDOC_INJECTION_POINT);
 
         let tempHtmlConfig = { ...htmlConfig };
         htmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, tempHtmlConfig);
 
         await htmlGrammar.setQueryForTest('highlightsQuery', `
-          (fragment) @html
+          (document) @html
           (tag_name) @tag
           (attribute_name) @attr
         `);
@@ -784,7 +785,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         jasmine.useRealClock();
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(htmlGrammar);
-        buffer.setText('node.innerHTML = html `\na ${b}<img src="d">\n`;');
+        buffer.setText('node.x = html `\na ${b}<img src="d">\n`;');
 
         const languageMode = new WASMTreeSitterLanguageMode({
           grammar: jsGrammar,
@@ -800,7 +801,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         expectTokensToEqual(editor, [
           [
             { text: 'node.', scopes: [] },
-            { text: 'innerHTML', scopes: ['property'] },
+            { text: 'x', scopes: ['property'] },
             { text: ' = ', scopes: [] },
             { text: 'html', scopes: ['function'] },
             { text: ' ', scopes: [] },
@@ -829,7 +830,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         expectTokensToEqual(editor, [
           [
             { text: 'node.', scopes: [] },
-            { text: 'innerHTML', scopes: ['property'] },
+            { text: 'x', scopes: ['property'] },
             { text: ' = ', scopes: [] },
             { text: 'xml', scopes: ['function'] },
             { text: ' ', scopes: [] },
@@ -893,7 +894,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         jasmine.useRealClock();
         atom.grammars.addGrammar(jsGrammar);
 
-        buffer.setText('node.innerHTML = html `\na ${b}<img src="d">\n`;');
+        buffer.setText('node.innerHTML = `\na ${b}<img src="d">\n`;');
         const languageMode = new WASMTreeSitterLanguageMode({
           grammar: jsGrammar,
           buffer,
@@ -908,8 +909,6 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: 'node.', scopes: [] },
             { text: 'innerHTML', scopes: ['property'] },
             { text: ' = ', scopes: [] },
-            { text: 'html', scopes: ['function'] },
-            { text: ' ', scopes: [] },
             { text: '`', scopes: ['string'] }
           ],
           [
@@ -931,8 +930,6 @@ describe('WASMTreeSitterLanguageMode', () => {
             { text: 'node.', scopes: [] },
             { text: 'innerHTML', scopes: ['property'] },
             { text: ' = ', scopes: [] },
-            { text: 'html', scopes: ['function'] },
-            { text: ' ', scopes: [] },
             { text: '`', scopes: ['string'] },
             { text: '', scopes: ['string', 'html'] }
           ],
@@ -1057,6 +1054,8 @@ describe('WASMTreeSitterLanguageMode', () => {
           '<div>'
         );
         await languageMode.nextTransaction;
+        expect(buffer.getText()).toEqual(`text = html \`<div>\`;`);
+        await wait(100);
         expectTokensToEqual(editor, [
           [
             { text: 'text = ', scopes: [] },
@@ -1352,7 +1351,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
         await htmlGrammar.setQueryForTest('highlightsQuery', `
-          (fragment) @html
+          (document) @html
           (tag_name) @tag
           (attribute_name) @attr
         `);
@@ -1400,7 +1399,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
         await htmlGrammar.setQueryForTest('highlightsQuery', `
-          (fragment) @html
+          (document) @html
           (tag_name) @tag
           (attribute_name) @attr
         `);
@@ -1451,7 +1450,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
         await htmlGrammar.setQueryForTest('highlightsQuery', `
-          (fragment) @html
+          (document) @html
           (tag_name) @tag
           (attribute_name) @attr
         `);
@@ -1504,7 +1503,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         let customHtmlGrammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, customHtmlConfig);
 
         await htmlGrammar.setQueryForTest('highlightsQuery', `
-          (fragment) @html
+          (document) @html
           (tag_name) @tag
           (attribute_name) @attr
         `);
@@ -3086,7 +3085,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           .getScopesArray()
       ).toEqual([
         'text.html.basic',
-        'fragment',
+        'document',
         'element',
         'script_element',
         'raw_text',
@@ -3094,7 +3093,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         'expression_statement',
         'call_expression',
         'template_string',
-        'fragment',
+        'document',
         'element',
         'template_substitution',
         'member_expression',
@@ -3834,7 +3833,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         htmlConfig
       );
       await htmlGrammar.setQueryForTest('highlightsQuery', `
-        (fragment) @html
+        (document) @html
         (tag_name) @tag
         (attribute_name) @attr
       `);
@@ -3988,7 +3987,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         "{" @indent
         "}" @dedent
       `);
@@ -4024,7 +4023,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       // Pretend we're in a universe where lines after comments should be
       // dedented.
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         (comment) @dedent.next
       `);
 
@@ -4041,11 +4040,45 @@ describe('WASMTreeSitterLanguageMode', () => {
       ).toEqual('(1, 0)');
     });
 
+    it('allows @match.next to decrease the indent of the next line before any typing takes place', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+
+      // When the comparison row contains the end of a lexical declaration, we
+      // want the next line to match the indentation of whichever line _began_
+      // that lexical declaration. (But for this test we'll add an offset of 1
+      // so we can be sure we're not just defaulting to column 0 for some other
+      // reason.)
+      await grammar.setQueryForTest('indentsQuery', scm`
+        ((lexical_declaration) @match.next
+          (#is? indent.matchesComparisonRow endPosition)
+          (#set! indent.match startPosition)
+          (#set! indent.offset 1)
+        )
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      buffer.setText(dedent`
+        let foo = longMethodWithArguments(1, 2, 3, 4, 5,
+                    6, 7, 8);
+      `);
+
+      await languageMode.atTransactionEnd();
+
+      editor.setCursorBufferPosition([1, 21]);
+      editor.insertText('\n', { autoIndentNewline: true });
+      expect(
+        editor.getLastCursor().getBufferPosition().toString()
+      ).toEqual('(2, 2)');
+    });
+
     it('resolves @match captures', async () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         (template_string
           "\`" @match
           (#is? test.last true)
@@ -4081,11 +4114,11 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         (template_string
           "\`" @dedent @match
           (#is? test.last true)
-          (#set! indent.matchIndentOf parent.firstChild.startPosition))
+          (#set! indent.match parent.firstChild.startPosition))
       `);
 
       buffer.setText(dedent`
@@ -4119,7 +4152,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4175,7 +4208,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4232,7 +4265,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4286,7 +4319,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4340,7 +4373,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       // Pretend we're in a universe where a line comment should cause the next
       // line to be indented, but only in a class body.
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
         ((comment) @indent
@@ -4417,7 +4450,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       // Pretend we're in a universe where a line comment should cause the next
       // line to be indented, but only in a class body.
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
         ((comment) @indent
@@ -4464,7 +4497,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       jasmine.useRealClock();
       editor.updateAutoIndent(true);
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4503,7 +4536,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       atom.config.set('whitespace.removeTrailingWhitespace', true);
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4549,7 +4582,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4595,7 +4628,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       atom.config.set('whitespace.removeTrailingWhitespace', false);
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4641,7 +4674,7 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       expect(editor.getUndoGroupingInterval()).toBe(300);
 
-      await grammar.setQueryForTest('indentsQuery', `
+      await grammar.setQueryForTest('indentsQuery', scm`
         ["{"] @indent
         ["}"] @dedent
       `);
@@ -4788,6 +4821,27 @@ function expectTokensToEqual(editor, expectedTokenLines) {
   editor.displayLayer.getScreenLines(0, Infinity);
 }
 
+const HTML_INNERHTML_ASSIGNMENT_INJECTION_POINT = {
+  type: 'assignment_expression',
+
+  language(callExpression) {
+    const { firstChild } = callExpression;
+    if (firstChild.type === 'member_expression') {
+      if (firstChild.lastChild.text === 'innerHTML') {
+        return 'html';
+      }
+    }
+  },
+
+  content(callExpression) {
+    const { lastChild } = callExpression;
+    if (lastChild.type === 'template_string') {
+      return stringFragmentsOfTemplateString(lastChild);
+    }
+  },
+};
+
+
 const HTML_TEMPLATE_LITERAL_INJECTION_POINT = {
   type: 'call_expression',
   language(node) {
@@ -4799,7 +4853,7 @@ const HTML_TEMPLATE_LITERAL_INJECTION_POINT = {
     }
   },
   content(node) {
-    return node?.lastChild;
+    return stringFragmentsOfTemplateString(node.lastChild);
   }
 };
 
@@ -4822,3 +4876,10 @@ const JSDOC_INJECTION_POINT = {
     return comment;
   }
 };
+
+
+function stringFragmentsOfTemplateString(templateStringNode) {
+  return templateStringNode.children.filter(
+    c => c.type === 'string_fragment'
+  );
+}

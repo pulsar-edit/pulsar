@@ -12,6 +12,8 @@ const { commentStringsFromDelimiters, getDelimitersForScope } = require('./comme
 
 const createTree = require('./rb-tree');
 
+const ONE_CHAR_FORWARD_TRAVERSAL = Object.freeze(Point(0, 1));
+
 const FEATURE_ASYNC_INDENT = true;
 const FEATURE_ASYNC_PARSE = true;
 
@@ -83,7 +85,7 @@ function resolveNodePosition(node, descriptor) {
   return result[lastPart];
 }
 
-// Patch tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
+// Patch Tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
 // that we don't break anything that relied on `range` being present.
 function ensureNodeIsPatched(node) {
   let done = node.range && node.range instanceof Range;
@@ -108,7 +110,7 @@ function ensureNodeIsPatched(node) {
   });
 }
 
-// Compares “informal” points like the ones in a tree-sitter tree; saves us
+// Compares “informal” points like the ones in a Tree-sitter tree; saves us
 // from having to convert them to actual `Point`s.
 function comparePoints(a, b) {
   const rows = a.row - b.row;
@@ -199,6 +201,24 @@ class WASMTreeSitterLanguageMode {
     // resolve until the tree is clean and all outstanding updates are
     // performed and injections are populated.
     this.resolveNextTransactionPromise();
+
+    // In contrast to `FoldResolver`s — which exist on each layer — we create a
+    // single `IndentResolver` per language mode.
+    //
+    // We do this because folds aggregate, so we can always either (a) delegate
+    // a job to an arbitrary layer's `FoldResolver`, or (b) ask _all_ layers to
+    // do something and then assemble the results.
+    //
+    // Indentation tasks, on the other hand, cannot be divided into work that
+    // considers only a single `LanguageLayer` at a time. For instance, a given
+    // indentation task might consult one layer's indentation query to know
+    // whether to indent a line, but another layer's indentation query to know
+    // whether to dedent the line. There are no simplicity gains to be made.
+    //
+    // `IndentResolver` _could_ therefore fold its methods into
+    // `WASMTreeSitterLanguageMode`, but is separate from it for reasons of
+    // code organization.
+    this.indentResolver = new IndentResolver(this.buffer, this);
 
     this.ready = this.grammar.getLanguage()
       .then(language => {
@@ -411,7 +431,7 @@ class WASMTreeSitterLanguageMode {
     return true;
   }
 
-  // Resolves the next time that all tree-sitter trees are clean — or
+  // Resolves the next time that all Tree-sitter trees are clean — or
   // immediately, if they're clean at the time of invocation.
   //
   // Resolves with metadata about the previous transaction that may be useful
@@ -443,7 +463,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   // Alias for `atTransactionEnd` for packages that used the implementation
-  // details of the legacy tree-sitter system.
+  // details of the legacy Tree-sitter system.
   parseCompletePromise() {
     return this.atTransactionEnd();
   }
@@ -517,7 +537,7 @@ class WASMTreeSitterLanguageMode {
   }
 
   // Behaves like `scopeDescriptorForPosition`, but returns a list of
-  // tree-sitter node names. Useful for understanding tree-sitter parsing or
+  // Tree-sitter node names. Useful for understanding Tree-sitter parsing or
   // for writing syntax highlighting query files.
   syntaxTreeScopeDescriptorForPosition(point) {
     point = this.normalizePointForPositionQuery(point);
@@ -555,7 +575,7 @@ class WASMTreeSitterLanguageMode {
     );
 
     let scopes = matches.map(({ node }) => (
-      node.isNamed() ? node.type : `"${node.type}"`
+      node.isNamed ? node.type : `"${node.type}"`
     ));
     scopes.unshift(this.grammar.scopeName);
 
@@ -1170,7 +1190,8 @@ class WASMTreeSitterLanguageMode {
     // than just returning `commentDelimiters` data because we still want to
     // take the adjusted range into account if we can.)
     const { grammar } = this.getSyntaxNodeAndGrammarContainingRange(range);
-    const { grammar: originalPositionGrammar } = this.getSyntaxNodeAndGrammarContainingRange(new Range(position, position));
+    const { grammar: originalPositionGrammar } = this.getSyntaxNodeAndGrammarContainingRange(
+      new Range(position, position));
 
     if (grammar && grammar.getCommentDelimiters) {
       let delimiters = grammar.getCommentDelimiters();
@@ -1251,45 +1272,49 @@ class WASMTreeSitterLanguageMode {
   shouldUseAsyncIndent() {
     let result = true;
     if (!this.useAsyncParsing || !this.useAsyncIndent) result = false;
+    // If `currentTransactionReparseBudgetMs` somehow isn’t initialized yet, we
+    // can initialize it here for this transaction.
+    this.currentTransactionReparseBudgetMs ??= this.transactionReparseBudgetMs;
     if (this.currentTransactionReparseBudgetMs > 0) {
       result = false;
     }
     return result;
   }
 
-  // Get the suggested indentation level for an existing line in the buffer.
+  // Essential: Get the suggested indentation level for an existing line in the
+  // buffer.
   //
-  // * `bufferRow` - A {Number} indicating the buffer row.
-  // * `tabLength` - A {Number} signifying the length of a tab, in spaces,
+  // * `bufferRow` A {Number} indicating the buffer row.
+  // * `tabLength` A {Number} signifying the length of a tab, in spaces,
   //   according to the current settings of the buffer.
-  // * `options` (optional) - An {Object} will the following properties,all of
-  //   which are optional:
-  // * `options.skipBlankLines`: {Boolean} indicating whether to ignore blank
-  //   lines when determining which row to use as a reference row. Default is
-  //   `true`. Irrelevant if `options.comparisonRow` is specified.
-  // * `options.skipDedentCheck`: {Boolean} indicationg whether to skip the
-  //   second phase of the check and determine only if the current row should
-  //   _start out_ indented from the reference row.
-  // * `options.preserveLeadingWhitespace`: {Boolean} indicating whether to
-  //   adjust the returned number to account for the indentation level of any
-  //   whitespace that may already be on the row. Defaults to `false`.
-  // * `options.forceTreeParse`: {Boolean} indicating whether to force this
-  //   method to synchronously parse the buffer into a tree, even if it
-  //   otherwise would not. Defaults to `false`.
-  // * `options.comparisonRow`: A {Number} specifying the row to use as a
-  //   reference row. Must be a valid row that occurs earlier in the buffer
-  //   than `row`. If omitted, this method will determine the reference row on
-  //   its own.
+  // * `options` An optional {Object} with the following properties, all of
+  //   which are themselves optional:
+  //   * `options.skipBlankLines`: {Boolean} indicating whether to ignore blank
+  //     lines when determining which row to use as a reference row. Default is
+  //     `true`. Irrelevant if `options.comparisonRow` is specified.
+  //   * `options.skipDedentCheck`: {Boolean} indicating whether to skip the
+  //     second phase of the check and determine only if the current row should
+  //     _start out_ indented from the reference row.
+  //   * `options.preserveLeadingWhitespace`: {Boolean} indicating whether to
+  //     adjust the returned number to account for the indentation level of any
+  //     whitespace that may already be on the row. Defaults to `false`.
+  //   * `options.forceTreeParse`: {Boolean} indicating whether to force this
+  //     method to synchronously parse the buffer into a tree, even if it
+  //     otherwise would not. Defaults to `false`.
+  //   * `options.comparisonRow`: A {Number} specifying the row to use as a
+  //     reference row. Must be a valid row that occurs earlier in the buffer
+  //     than `row`. If omitted, this method will determine the reference row
+  //     on its own.
   //
-  // Will return either an immediate result or a {Promise}, depending on
-  // whether it can make a synchronous decision.
+  // Returns a {Number}, {null}, or a {Promise} that will resolve with either
+  // a {Number} or {undefined}.
   //
-  // When acting synchronously, this method returns a {Number}, or {null} if
-  // this method cannot make a suggestion. It will return a synchronous result
-  // if (a) the tree is clean, (b) the language mode decides it can afford to
-  // do a synchronous re-parse of the buffer, or (c) `options.forceTreeParse`
-  // is `true`. Otherwise, this method will wait until the end of the current
-  // buffer transaction.
+  // This method will return a synchronous result if (a) the tree is clean, (b)
+  // the language mode decides it can afford to do a synchronous re-parse of
+  // the buffer, or (c) `options.forceTreeParse` is `true`. Otherwise, this
+  // method will wait until the end of the current buffer transaction. If this
+  // method synchronously returns {null}, it means that this method cannot make
+  // a suggestion.
   //
   // When acting asynchronously, this method may or may not be able to give an
   // answer. If it can, it will return a {Promise} that resolves with a
@@ -1299,573 +1324,25 @@ class WASMTreeSitterLanguageMode {
   // signalling that a fallback style of indentation adjustment should take
   // place.
   //
-  suggestedIndentForBufferRow(row, tabLength, rawOptions = {}) {
-    // NOTE: This method is hundreds of lines long, but so much of that total
-    // consists of comments like this one — because this is a hard thing to
-    // intuit. This code needs lots of explanation, but that doesn't mean
-    // that the logic is impossibly complex.
-    let root = this.rootLanguageLayer;
-    if (row === 0) { return 0; }
-    if (!root || !root.tree || !root.ready) { return null; }
-
-    let options = {
-      skipBlankLines: true,
-      skipDedentCheck: false,
-      preserveLeadingWhitespace: false,
-      indentationLevels: null,
-      forceTreeParse: false,
-      ...rawOptions
-    };
-
-    let originalControllingLayer = options.controllingLayer;
-
-    let comparisonRow = options.comparisonRow;
-    if (comparisonRow === undefined) {
-      comparisonRow = row - 1;
-      if (options.skipBlankLines) {
-        // It usually makes no sense to compare to a blank row, so we'll move
-        // upward until we find a line with text on it.
-        while (this.buffer.isRowBlank(comparisonRow) && comparisonRow > 0) {
-          comparisonRow--;
-        }
-      }
-    }
-
-    let existingIndent = 0;
-    if (options.preserveLeadingWhitespace) {
-      // When this option is true, the indent level we return will be _added
-      // to_ however much indentation is already present on the line. Whatever
-      // the purpose of this option, we can't just pretend it isn't there,
-      // because it will produce silly outcomes. Instead, let's account for
-      // that level of indentation and try to subtract it from whatever level
-      // we return later on.
-      //
-      // Sadly, if the row is _more_ indented than we need it to be, we won't
-      // be able to dedent it into the correct position. This option probably
-      // needs to be revisited.
-      existingIndent = this.indentLevelForLine(
-        this.buffer.lineForRow(row), tabLength);
-    }
-    let comparisonRowIndent = options.comparisonRowIndent;
-    if (comparisonRowIndent === undefined) {
-      comparisonRowIndent = this.indentLevelForLine(
-        this.buffer.lineForRow(comparisonRow), tabLength);
-    }
-
-    // What's the right place to measure from? Often we're here because the
-    // user just hit Enter, which means we'd run before injection layers have
-    // been re-parsed. Hence the injection's language layer might not know
-    // whether it controls the point at the cursor. So instead we look for the
-    // layer that controls the point at the end of the comparison row. This may
-    // not always be correct, but we'll find out.
-    let comparisonRowEnd = new Point(
-      comparisonRow,
-      this.buffer.lineLengthForRow(comparisonRow)
-    );
-
-    // Find the deepest layer that actually has an indents query. (Layers that
-    // don't define one, such as specialized injection grammars, are telling us
-    // they don't care about indentation. If a grammar wants to _prevent_ a
-    // shallower layer from controlling indentation, it should define an empty
-    // `indents.scm`, perhaps with an explanatory comment.)
-    let controllingLayer = this.controllingLayerAtPoint(
-      comparisonRowEnd,
-      (layer) => {
-        if (!layer.queries.indentsQuery) return false;
-        // We want to exclude layers with a content range that _begins at_ the
-        // cursor position. Why? Because the content that starts at the cursor
-        // is about to shift down to the next line. It'd be odd if that layer
-        // was in charge of the indentation hint if it didn't have any content
-        // on the preceding line.
-        //
-        // So first we test for containment exclusive of endpoints…
-        if (layer.containsPoint(comparisonRowEnd, true)) {
-          return true;
-        }
-
-        // …but we'll still accept layers that have a content range which
-        // _ends_ at the cursor position.
-        return layer.getCurrentRanges()?.some(r => {
-          return r.end.compare(comparisonRowEnd) === 0;
-        });
-      }
-    );
-
-    if (!controllingLayer) {
-      // There's no layer with an indents query to help us out. The default
-      // behavior in this situation with any grammar — even plain text — is to
-      // match the previous line's indentation.
-      return comparisonRowIndent - existingIndent;
-    }
-
-    let { queries: { indentsQuery }, scopeResolver } = controllingLayer;
-
-    // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
-    // need a way to share those tests across different kinds of capture
-    // resolvers.
-    scopeResolver.reset();
-
-    let indentTree = null;
-    if (options.tree && originalControllingLayer === controllingLayer) {
-      // Make sure this tree belongs to the layer we expect it to.
-      indentTree = options.tree;
-    }
-
-    if (!indentTree) {
-      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.shouldUseAsyncIndent()) {
-        // If we're in this code path, it either means the tree is clean (the
-        // `get` path) or that we're willing to spend the time to do a
-        // synchronous reparse (the `parse` path). Either way, we'll be able to
-        // deliver a synchronous answer to the question.
-        indentTree = controllingLayer.getOrParseTree();
-      } else {
-        // We can't answer this yet because we don't yet have a new syntax
-        // tree, and are unwilling to spend time doing a synchronous re-parse.
-        // Return a promise that will fulfill once the transaction is over.
-        //
-        // TODO: For async, we might need an approach where we suggest a
-        // preliminary indent level and then follow up later with a more
-        // accurate one. It's a bit disorienting that the editor falls back to
-        // an indent level of `0` when a newline is inserted.
-        let comparisonRowText = this.buffer.lineForRow(comparisonRow)
-        let rowText = this.buffer.lineForRow(row)
-        return this.atTransactionEnd().then(({ changeCount }) => {
-          let shouldFallback = false;
-          // If this was the only change in the transaction, then we can
-          // definitely adjust the indentation level after the fact. If not,
-          // then we might still be able to make indentation decisions in cases
-          // where they do not affect one another.
-          //
-          // Hence if neither the comparison row nor the current row has had
-          // its contents change in any way since we were first called, we will
-          // assume it's safe to adjust the indentation level after the fact.
-          // Otherwise we'll fall back to a single transaction-wide indentation
-          // adjustment — fewer tree parses, but more likely to produce unusual
-          // results.
-          if (changeCount > 1) {
-            if (comparisonRowText !== this.buffer.lineForRow(comparisonRow)) {
-              shouldFallback = true;
-            }
-            if (rowText !== this.buffer.lineForRow(row)) {
-              shouldFallback = true;
-            }
-          }
-          if (shouldFallback) {
-            // We're now revisiting this indentation question at the end of the
-            // transaction. Other changes may have taken place since we were
-            // first asked what the indent level should be for this line. So
-            // how do we know if the question is still relevant? After all, the
-            // text that was on this row earlier might be on some other row
-            // now.
-            //
-            // So we compare the text that was on the row when we were first
-            // called… to the text that is on the row now that the transaction
-            // is over. If they're the same, that's a _strong_ indicator that
-            // the result we return will still be relevant.
-            //
-            // If not, as is the case in this code path, we return `undefined`,
-            // signalling to the `TextEditor` that its only recourse is to
-            // auto-indent the whole extent of the transaction instead.
-            return undefined;
-          }
-
-          // If we get this far, it's safe to auto-indent this line. Either it
-          // was the only change in its transaction or the other changes
-          // happened on different lines. But we've retained the original
-          // values for `comparisonRow` and `comparisonRowIndent` because
-          // that's the proper basis from which to determine the given row's
-          // indent level.
-          let result = this.suggestedIndentForBufferRow(row, tabLength, {
-            ...rawOptions,
-            comparisonRow: comparisonRow,
-            comparisonRowIndent: comparisonRowIndent,
-            tree: controllingLayer.tree,
-            controllingLayer
-          });
-          return result;
-        });
-      }
-    }
-
-    let positionSet = new Set;
-
-    // Capture in two phases. The first phase covers any captures from the
-    // comparison row that can cause the _following_ row to be indented.
-    let indentCaptures = indentsQuery.captures(
-      indentTree.rootNode,
-      { row: comparisonRow, column: 0 },
-      { row: row, column: 0 }
-    );
-
-    let indentCapturePosition = null;
-    let indentDelta = 0;
-    let dedentNextDelta = 0;
-
-    for (let capture of indentCaptures) {
-      let { node, name, setProperties: props = {} } = capture;
-
-      // Ignore “phantom” nodes that aren't present in the buffer.
-      if (node.text === '' && !props['indent.allowEmpty']) {
-        continue;
-      }
-
-      // Ignore anything that isn't actually on the row.
-      if (node.endPosition.row < comparisonRow) { continue; }
-      if (node.startPosition.row > comparisonRow) { continue; }
-
-      // Ignore anything that fails a scope test.
-      if (!scopeResolver.store(capture)) { continue; }
-
-      // Only consider a given combination of capture name and buffer range
-      // once, even if it's captured more than once in `indents.scm`.
-      let key = `${name}/${node.startIndex}/${node.endIndex}`;
-      if (positionSet.has(key)) { continue; }
-      positionSet.add(key);
-
-      if (name === 'indent') {
-        if (indentCapturePosition === null) {
-          indentCapturePosition = node.endPosition;
-        }
-        indentDelta++;
-      } else if (name === 'dedent.next') {
-        // This isn't often needed, but it's a way for the current line to
-        // signal that the _next_ line should be dedented no matter what its
-        // content is.
-        dedentNextDelta++;
-      } else if (name === 'dedent') {
-        // `dedent` tokens don't count for anything unless they happen
-        // after the first `indent` token. They only tell us whether an indent
-        // that _seems_ like it should happen is cancelled out.
-        //
-        // Consider:
-        //
-        // } else if (foo) {
-        //
-        // We should still indent the succeeding line because the initial `}`
-        // does not cancel out the `{` at the end of the line. On the other
-        // hand:
-        //
-        // } else if (foo) {}
-        //
-        // The second `}` _does_ cancel out the first occurrence of `{` because
-        // it comes later.
-        if (!indentCapturePosition || comparePoints(node.startPosition, indentCapturePosition) < 0) {
-          // This capture either happened before the first indent capture on
-          // the row or is _the same node_ as the indent capture, in which case
-          // we should construe the dedent as happening _before_ the indent.
-          //
-          // For example: the "elsif" node in Ruby triggers a dedent on its own
-          // line, but also signals an indent on the next line. The dedent
-          // shouldn't cancel out the indent.
-          continue;
-        }
-        indentDelta--;
-        if (indentDelta < 0) {
-          // In the _indent_ phase, the delta won't ever go lower than `0`.
-          // This is because we assume that the previous line is correctly
-          // indented! The only function that `dedent` serves for us in this
-          // phase is canceling out an earlier `indent` and preventing false
-          // positives.
-          //
-          // So no matter how many `dedent` tokens we see on a particular line…
-          // if the _last_ token we see is an `indent` token, then it hints
-          // that the next line should be indented by one level.
-          indentDelta = 0;
-        }
-
-      }
-    }
-
-    // `@indent` and `@dedent` can increase the next line's indent level by one
-    // at most, and can't decrease the next line's indent level at all on their
-    // own.
-    //
-    // Why? There are few coding patterns in the wild that would cause us to
-    // indent more than one level based on tokens found on the _previous_ line.
-    // And there are also few scenarios in which we'd want to dedent a certain
-    // line before we even know the content of that line.
-    //
-    // Hence we distill the results above into a net indentation level change
-    // of either 1 or 0, depending on whether we saw more `@indent`s than
-    // `@dedent`s.
-    //
-    // If there's a genuine need to dedent the current row based solely on the
-    // content of the comparison row, then `@dedent.next` can be used.
-    //
-    // And if a language needs to indent more than one level from one line to
-    // the next, then `@match` captures can be used to specify an exact level
-    // of indentation relative to another specific node. If a `@match` capture
-    // exists, we'll catch it in the dedent captures phase, and these
-    // heuristics will be ignored.
-    //
-    indentDelta = clamp(indentDelta, 0, 1);
-
-    // Process `@dedent.next` captures as a last step; they act as a strong
-    // hint about the next line's indentation.
-    indentDelta -= clamp(dedentNextDelta, 0, 1);
-
-    let dedentDelta = 0;
-    let line = this.buffer.lineForRow(row);
-    let rowStartingColumn = Math.max(line.search(/\S/), 0);
-
-    if (!options.skipDedentCheck) {
-      scopeResolver.reset();
-
-      // The controlling layer on the previous line gets to decide what our
-      // starting indent is on the current line. But it might not extend to the
-      // current line, so we should determine which layer is in charge of the
-      // second phase.
-      //
-      // The comparison point we use is that of the first character on the
-      // line. If we start earlier than that, we might not pick up on the
-      // presence of an injection layer.
-      let rowStart = new Point(row, rowStartingColumn);
-      let dedentControllingLayer = this.controllingLayerAtPoint(
-        rowStart,
-        (layer) => {
-          if (!layer.queries.indentsQuery) return false;
-          // We're inverting the logic from above: now we want to allow layers
-          // that _begin_ at the cursor and exclude layers that _end_ at the
-          // cursor. Because we'll be analyzing content that comes _after_ the
-          // cursor to understand whether to dedent!
-          //
-          // So first we test for containment exclusive of endpoints…
-          if (layer.containsPoint(rowStart, true)) {
-            return true;
-          }
-
-          // …but we'll still accept layers that have a content range which
-          // _starts_ at the cursor position.
-          return layer.getCurrentRanges()?.some(r => {
-            return r.start.compare(rowStart) === 0;
-          });
-        }
-      );
-
-      if (dedentControllingLayer && dedentControllingLayer !== controllingLayer) {
-        // If this layer is different from the one we used above, then we
-        // should run this layer's indents query against its own tree. (If _no_
-        // layers qualify at this position, we won't hit this code path, so
-        // we'll reluctantly still use the original layer and tree.)
-        indentsQuery = dedentControllingLayer.queries.indentsQuery;
-        indentTree = dedentControllingLayer.getOrParseTree();
-      }
-
-      // The second phase covers any captures on the current line that can
-      // cause the current line to be indented or dedented.
-      let dedentCaptures = indentsQuery.captures(
-        indentTree.rootNode,
-        { row: row, column: 0 },
-        { row: row + 1, column: 0 }
-      );
-
-      let currentRowText = this.buffer.lineForRow(row);
-      currentRowText = currentRowText.trim();
-      positionSet.clear();
-
-      for (let capture of dedentCaptures) {
-        let { name, node, setProperties: props = {} } = capture;
-        let { text } = node;
-
-        // Ignore “phantom” nodes that aren't present in the buffer.
-        if (text === '' && !props['indent.allowEmpty']) { continue; }
-
-        // Ignore anything that isn't actually on the row.
-        if (node.endPosition.row < row) { continue; }
-        if (node.startPosition.row > row) { continue; }
-
-        // Ignore anything that fails a scope test.
-        if (!scopeResolver.store(capture)) { continue; }
-
-        // Imagine you've got:
-        //
-        // { ^foo, bar } = something
-        //
-        // and the caret represents the cursor. Pressing Enter will move
-        // everything after the cursor to a new line and _should_ indent the
-        // line, even though there's a closing brace on the new line that would
-        // otherwise mark a dedent.
-        //
-        // Thus we don't want to honor a `@dedent` or `@match` capture unless
-        // it's the first non-whitespace content in the line. We'll use similar
-        // logic for `suggestedIndentForEditedBufferRow`.
-        //
-        // If a capture is confident it knows what it's doing, it can opt out
-        // of this behavior with `(#set! indent.force true)`.
-        if (!props['indent.force'] && !currentRowText.startsWith(text)) { continue; }
-
-        // The '@match' capture short-circuits a lot of this logic by pointing
-        // us to a different node and asking us to match the indentation of
-        // whatever row that node starts on.
-        if (name === 'match') {
-          let matchIndentLevel = this.resolveIndentMatchCapture(
-            capture, row, tabLength, options.indentationLevels);
-          if (typeof matchIndentLevel === 'number') {
-            scopeResolver.reset();
-            return Math.max(matchIndentLevel - existingIndent, 0);
-          }
-        } else if (name === 'none') {
-          scopeResolver.reset();
-          return 0;
-        }
-
-        // Only `@dedent` or `@match` captures can change this line's
-        // indentation. We handled `@match` above, so we'll filter out all non-
-        // `@dedent`s now.
-        if (name !== 'dedent') { continue; }
-
-        // Only consider a given range once, even if it's marked with multiple
-        // captures.
-        let key = `${node.startIndex}/${node.endIndex}`;
-        if (positionSet.has(key)) { continue; }
-        positionSet.add(key);
-        dedentDelta--;
-      }
-
-      // `@indent`/`@dedent` captures, no matter how many there are, can
-      // dedent the current line by one level at most. To indent more than
-      // that, one must use a `@match` capture.
-      dedentDelta = clamp(dedentDelta, -1, 0);
-    }
-
-    scopeResolver.reset();
-    let finalIndent = comparisonRowIndent + indentDelta + dedentDelta + existingIndent;
-    // console.log('score:', comparisonRowIndent, '+', indentDelta, '-', ((dedentDelta < 0) ? -dedentDelta : dedentDelta), '=', finalIndent);
-
-    return Math.max(finalIndent - existingIndent, 0);
+  suggestedIndentForBufferRow(...args) {
+    return this.indentResolver.suggestedIndentForBufferRow(...args);
   }
 
   // Given a range of buffer rows, retrieves the suggested indent for each one
-  // while re-using the same tree. Prevents a tree re-parse after each
-  // individual line adjustment when auto-indenting.
+  // while re-using the same tree. Computing these results in bulk may prevent
+  // a tree re-parse after each individual line adjustment when auto-indenting
+  // multiple rows at once.
   //
-  // * startRow - The row {Number} to start at
-  // * endRow - The row {Number} to end at
+  // * `startRow` The row {Number} to start at.
+  // * `endRow` The row {Number} to end at.
   //
-  // Returns a {Map} whose keys are rows and whose values are desired
-  // indentation levels. May not return the entire range of requested rows, in
-  // which case the caller should auto-indent the remaining rows through
-  // another means. May also return {null} to signify that no auto-indent
-  // should be attempted at all for the given range.
-  suggestedIndentForBufferRows(startRow, endRow, tabLength, options = {}) {
-    let root = this.rootLanguageLayer;
-    if (!root || !root.tree) {
-      let results = new Map();
-      for (let row = startRow; row <= endRow; row++) {
-        results.set(row, null);
-      }
-      return results;
-    }
-
-    let results = new Map();
-    let comparisonRow = null;
-    let comparisonRowIndent = null;
-
-    let { isPastedText = false } = options;
-    let indentDelta;
-
-    for (let row = startRow; row <= endRow; row++) {
-      // If this row were being indented by `suggestedIndentForBufferRow`, it'd
-      // look at the end of the previous row to find the controlling layer,
-      // because we start at the previous row to find the suggested indent for
-      // the current row.
-      let controllingLayer = this.controllingLayerAtPoint(
-        this.buffer.clipPosition(new Point(row - 1, Infinity)),
-        // This query isn't as precise as the one we end up making later, but
-        // that's OK. This is just a first pass.
-        (layer) => !!layer.queries.indentsQuery && !!layer.tree
-      );
-      if (isPastedText) {
-        // In this mode, we're not trying to auto-indent every line; instead,
-        // we're trying to auto-indent the _first_ line of a region of text
-        // that's just been pasted, while trying to preserve the relative
-        // levels of indentation within the pasted region. So if the
-        // auto-indent of the first line increases its indent by one level,
-        // all other lines should also be increased by one level — without even
-        // consulting their own suggested indent levels.
-        if (row === startRow) {
-          // The only time we consult the indents query is for the first row,
-          // so we're not going to insist that the _entire range_ fall under
-          // the control of a layer with an indents query — just the row we
-          // need.
-          if (!controllingLayer) { return null; }
-          let tree = controllingLayer.getOrParseTree();
-
-          let firstLineCurrentIndent = this.indentLevelForLine(
-            this.buffer.lineForRow(row), tabLength);
-
-          let firstLineIdealIndent = this.suggestedIndentForBufferRow(
-            row,
-            tabLength,
-            {
-              ...options,
-              controllingLayer,
-              tree
-            }
-          );
-
-          if (firstLineIdealIndent == null) {
-            // If we decline to suggest an indent level for the first line,
-            // then there's no change to be made here. Keep the whole region
-            // the way it is.
-            return null;
-          } else {
-            indentDelta = firstLineIdealIndent - firstLineCurrentIndent;
-            if (indentDelta === 0) {
-              // If the first row doesn't have to be adjusted, neither do any
-              // others.
-              return null;
-            }
-            results.set(row, firstLineIdealIndent);
-          }
-          continue;
-        }
-
-        // All rows other than the first are easy — just apply the delta.
-        let actualIndent = this.indentLevelForLine(
-          this.buffer.lineForRow(row), tabLength);
-
-        results.set(row, actualIndent + indentDelta);
-        continue;
-      }
-
-      // For line X to know its appropriate indentation level, it needs row X-1,
-      // if it exists, to be indented properly. That's why `TextEditor` wants to
-      // indent each line atomically. Instead, we'll determine the right level
-      // for the first row, then supply the result for the previous row when we
-      // call `suggestedIndentForBufferRow` for the _next_ row, and so on, so
-      // that `suggestedIndentForBufferRow` doesn't try to look up the comparison
-      // row itself and find out we haven't actually fixed any of the previous
-      // rows' indentations yet.
-      let indent;
-      if (controllingLayer) {
-        let tree = controllingLayer.getOrParseTree();
-        let rowOptions = {
-          ...options,
-          tree,
-          comparisonRow: comparisonRow ?? undefined,
-          comparisonRowIndent: comparisonRowIndent ?? undefined,
-          indentationLevels: results
-        };
-        indent = this.suggestedIndentForBufferRow(row, tabLength, rowOptions);
-        if (indent === null) {
-          // We could not retrieve the correct indentation level for this row
-          // without re-parsing the tree. We should give up and return what we
-          // have so that `TextEditor` can finish the job through a less
-          // efficient means.
-          return results;
-        }
-      } else {
-        // We could not retrieve the correct indentation level for this row
-        // because it isn't governed by any layer that has an indents query.
-        return results;
-      }
-      results.set(row, indent);
-      comparisonRow = row;
-      comparisonRowIndent = indent;
-    }
-
-    return results;
+  // Returns either a {Map} or {null}. If a {Map}, its keys will be row numbers
+  // and its values will be desired indentation levels. May not return the
+  // entire range of requested rows, in which case the caller should
+  // auto-indent the remaining rows through another means. If {null}, signifies
+  // that no auto-indent should be attempted at all for the given range.
+  suggestedIndentForBufferRows(...args) {
+    return this.indentResolver.suggestedIndentForBufferRows(...args);
   }
 
   // Get the suggested indentation level for a line in the buffer on which the
@@ -1876,146 +1353,8 @@ class WASMTreeSitterLanguageMode {
   // * row - The row {Number}
   //
   // Returns a {Number}.
-  suggestedIndentForEditedBufferRow(row, tabLength, options = {}) {
-    const line = this.buffer.lineForRow(row);
-    const currentRowIndent = this.indentLevelForLine(line, tabLength);
-
-    // If the row is not indented at all, we have nothing to do, because we can
-    // only dedent a line at this phase.
-    if (currentRowIndent === 0) { return; }
-
-    // If we're on the first row, we have no preceding line to compare
-    // ourselves to. We should do nothing.
-    if (row === 0) { return; }
-
-    // By the time this function runs, we probably know enough to be sure of
-    // which layer controls the beginning of this row, even if we don't know
-    // which one owns the position at the cursor.
-    //
-    // Use the position of the first text on the line as the reference point.
-    let rowStartingColumn = Math.max(line.search(/\S/), 0);
-    let controllingLayer = this.controllingLayerAtPoint(
-      new Point(row, rowStartingColumn),
-      (layer) => !!layer.queries.indentsQuery
-    );
-
-    if (!controllingLayer) { return undefined; }
-
-    let { queries: { indentsQuery }, scopeResolver } = controllingLayer;
-    if (!indentsQuery) { return undefined; }
-
-    // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
-    // need a way to share those tests across different kinds of capture
-    // resolvers.
-    scopeResolver.reset();
-
-    // Ideally, we're running when the tree is clean, but if not, we must
-    // re-parse the tree in order to make an accurate indents query.
-    let indentTree = options.tree;
-    if (!indentTree) {
-      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncIndent || !this.useAsyncParsing) {
-        indentTree = controllingLayer.getOrParseTree();
-      } else {
-        return this.atTransactionEnd().then(({ changeCount }) => {
-          if (changeCount > 1) {
-            // Unlike `suggestedIndentForBufferRow`, we should not return
-            // `undefined` here and implicitly tell `TextEditor` to handle the
-            // auto-indent itself. If there were several changes in this
-            // transaction, we missed our chance to dedent this row, and should
-            // return `null` to signal that `TextEditor` should do nothing
-            // about it.
-            return null;
-          }
-          let result = this.suggestedIndentForEditedBufferRow(row, tabLength, {
-            ...options,
-            tree: controllingLayer.tree
-          });
-          if (currentRowIndent === result) {
-            // Return `null` here so that `TextEditor` realizes that no work
-            // needs to be done.
-            return null;
-          }
-          return result;
-        });
-      }
-    }
-
-    if (!indentTree) {
-      console.error(`No indent tree!`, controllingLayer.inspect());
-      return undefined;
-    }
-
-    const indents = indentsQuery.captures(
-      indentTree.rootNode,
-      { row: row, column: 0 },
-      { row: row + 1, column: 0 }
-    );
-
-    let lineText = this.buffer.lineForRow(row).trim();
-
-    // This is the indent level that is suggested from context — the level we'd
-    // have if this row were completely blank. We won't alter the indent level
-    // of the current row — even if it's “wrong” — unless typing triggers a
-    // dedent. But once a dedent is triggered, we should dedent one level from
-    // this value, not from the current row indent.
-    //
-    // If more than one level of dedent is needed, a `@match` capture must be
-    // used so that indent level can be expressed in absolute terms.
-    const originalRowIndent = this.suggestedIndentForBufferRow(row, tabLength, {
-      skipBlankLines: true,
-      skipDedentCheck: true,
-      tree: indentTree
-    });
-
-    let seenDedent = false;
-    for (let indent of indents) {
-      let { node, setProperties: props = {} } = indent;
-      // Ignore captures that aren't on this row.
-      if (node.startPosition.row !== row) { continue; }
-      // Ignore captures that fail their scope tests.
-      if (!scopeResolver.store(indent)) { continue; }
-
-      // For all captures — even `@match` captures — we get one bite at the
-      // apple, and it's when the text of the capture is the only
-      // non-whitespace text on the line.
-      //
-      // Otherwise, this capture will assert itself after every keystroke, and
-      // the user has no way to opt out of the correction.
-      //
-      // If the capture is confident it knows what it's doing, and is using
-      // some other mechanism to ensure the adjustment will happen exactly
-      // once, it can bypass this behavior with `(#set! indent.force true)`.
-      //
-      if (!props['indent.force'] && node.text !== lineText) { continue; }
-
-      // `@match` is authoritative; honor the first one we see and ignore other
-      // captures.
-      if (indent.name === 'match') {
-        let matchIndentLevel = this.resolveIndentMatchCapture(indent, row, tabLength);
-        if (typeof matchIndentLevel === 'number') {
-          scopeResolver.reset();
-          return matchIndentLevel;
-        }
-      } else if (indent.name === 'none') {
-        scopeResolver.reset();
-        return 0;
-      }
-
-      if (indent.name !== 'dedent') { continue; }
-
-      // Even after we've seen a `@dedent`, we allow the loop to continue,
-      // because we'd prefer a `@match` capture over this `@dedent` capture
-      // even if it happened to come later in the loop.
-      seenDedent = true;
-    }
-
-    scopeResolver.reset();
-
-    if (seenDedent) {
-      return Math.max(0, originalRowIndent - 1);
-    }
-
-    return currentRowIndent;
+  suggestedIndentForEditedBufferRow(...args) {
+    return this.indentResolver.suggestedIndentForEditedBufferRow(...args);
   }
 
   // Get the suggested indentation level for a given line of text, if it were
@@ -2024,7 +1363,7 @@ class WASMTreeSitterLanguageMode {
   // * bufferRow - A {Number} indicating the buffer row
   //
   // Returns a {Number}.
-  suggestedIndentForLineAtBufferRow(row, line, tabLength) {
+  suggestedIndentForLineAtBufferRow(row, _line, tabLength) {
     // We can't answer this question accurately for text that isn't yet in the
     // tree, so instead we'll just note that this request was made and try to
     // correct indentation when the transaction is over.
@@ -2033,57 +1372,6 @@ class WASMTreeSitterLanguageMode {
   }
 
   // Private
-
-  // Given a `@match` capture, attempts to resolve it to an absolute
-  // indentation level.
-  resolveIndentMatchCapture(capture, currentRow, tabLength, indentationLevels = null) {
-    let { node, setProperties: props = {} } = capture;
-
-    // A `@match` capture must specify
-    //
-    //  (#set! indent.matchIndentOf foo)
-    //
-    // where "foo" is a node descriptor. It may optionally specify
-    //
-    //  (#set! indent.offsetIndent X)
-    //
-    // where "X" is a number, positive or negative.
-    //
-    if (!props['indent.matchIndentOf']) { return undefined; }
-    let offsetIndent = props['indent.offsetIndent'] ?? "0";
-    offsetIndent = Number(offsetIndent);
-    if (isNaN(offsetIndent)) { offsetIndent = 0; }
-
-    // Follow a node descriptor to a target node.
-    let targetPosition = resolveNodePosition(node, props['indent.matchIndentOf']);
-
-    // That node must start on a row earlier than ours.
-    let targetRow = targetPosition?.row;
-    if (typeof targetRow !== 'number' || targetRow >= currentRow) {
-      return undefined;
-    }
-
-    let baseIndent;
-    if (indentationLevels) {
-      // If we were given this table of indentation levels, it means we're in a
-      // “batch” mode where we're trying to cut down on the number of tree
-      // re-parses. In this scenario, if the row we want is represented in the
-      // table, we should use the level indicated by the table. If it isn't,
-      // that's a sign that the line is outside of the range being
-      // batch-indented, which would mean that it's safe to look up its level
-      // directly.
-      baseIndent = indentationLevels.get(targetRow);
-    }
-    if (!baseIndent) {
-      baseIndent = this.indentLevelForLine(
-        this.buffer.lineForRow(targetRow), tabLength);
-    }
-
-    // An offset can optionally be applied to the target.
-    let result = baseIndent + offsetIndent;
-
-    return Math.max(result, 0);
-  }
 
   getAllInjectionLayers() {
     let markers =  this.injectionsMarkerLayer.getMarkers();
@@ -2106,8 +1394,8 @@ class WASMTreeSitterLanguageMode {
     return results;
   }
 
-  // Given a {Point}, returns all injection {LanguageLayer}s whose extent
-  // includes that point. Does not include the root language layer.
+  // Given a {Point}, returns all injection {LanguageLayer}s that include that
+  // point. Does not include the root language layer.
   //
   // A {LanguageLayer} can have multiple content ranges. Its “extent” is a
   // single contiguous {Range} that includes all of its content ranges. To
@@ -2116,7 +1404,9 @@ class WASMTreeSitterLanguageMode {
   //
   // * point - A {Point} representing a buffer position.
   // * options - An {Object} containing these keys:
-  //   * exact - {Boolean} that checks content ranges instead of extent.
+  //   * exact - {Boolean} that, when `true`, checks for containment within the
+  //     layer's _content ranges_ instead of its _extent_ (see description
+  //     above).
   injectionLayersAtPoint(point, { exact = false } = {}) {
     let injectionMarkers = this.injectionsMarkerLayer.findMarkers({
       containsPosition: point
@@ -2135,8 +1425,8 @@ class WASMTreeSitterLanguageMode {
     return results;
   }
 
-  // Given a {Point}, returns all {LanguageLayer}s whose extent includes that
-  // point.
+  // Given a {Point}, returns all {LanguageLayer}s that include that point,
+  // including the root language layer.
   //
   // A {LanguageLayer} can have multiple content ranges. Its “extent” is a
   // single contiguous {Range} that includes all of its content ranges. To
@@ -2144,8 +1434,9 @@ class WASMTreeSitterLanguageMode {
   // `{ exact: true }` as the second argument.
   //
   // * point - A {Point} representing a buffer position.
-  // * options - An {Object} containing these keys:
-  //   * exact - {Boolean} that checks content ranges instead of extent.
+  // * options - An {Object} containing these keys: * exact - {Boolean} that,
+  //   when `true`, checks for containment within the layer's _content ranges_
+  //   instead of its _extent_ (see description above).
   languageLayersAtPoint(point, { exact = false } = {}) {
     let injectionLayers = this.injectionLayersAtPoint(point, { exact });
     return [
@@ -2176,6 +1467,9 @@ class WASMTreeSitterLanguageMode {
 
   // DEPRECATED
 
+  // Implemented for parity with `TextMateLanguageMode`. If you want to analyze
+  // the content of a row or other buffer range, you can inspect a Tree-sitter
+  // tree or run queries against it.
   tokenizedLineForRow(row) {
     const lineText = this.buffer.lineForRow(row);
     const tokens = [];
@@ -2227,6 +1521,9 @@ class WASMTreeSitterLanguageMode {
     });
   }
 
+  // Implemented for parity with `TextMateLanguageMode`. If you want to analyze
+  // the content of a point, you can inspect a Tree-sitter tree or run queries
+  // against it.
   tokenForPosition(point) {
     if (Array.isArray(point)) {
       point = new Point(...point);
@@ -2403,7 +1700,10 @@ class FoldResolver {
     // boundary ends at the same point that another one starts, the ending
     // boundary will be visited first.
     let boundaries = createTree(compareBoundaries);
-    let captures = this.layer.queries.foldsQuery.captures(rootNode, start, end);
+    let captures = this.layer.queries.foldsQuery.captures(
+      rootNode,
+      { startPosition: start, endPosition: end }
+    );
 
     for (let capture of captures) {
       // NOTE: Currently, the first fold to match for a given starting position
@@ -2595,7 +1895,7 @@ FoldResolver.ADJUSTMENTS = {
 
   // Adjust the end point by a fixed number of characters in either direction.
   // Will cross rows if necessary.
-  offsetEnd(end, node, value, props, layer) {
+  offsetEnd(end, _node, value, _props, layer) {
     let { languageMode } = layer;
     value = Number(value);
     if (isNaN(value)) { return end; }
@@ -2604,7 +1904,7 @@ FoldResolver.ADJUSTMENTS = {
 
   // Adjust the column of the fold's end point. Use `0` to end the fold at the
   // start of the line.
-  adjustEndColumn(end, node, value, props, layer) {
+  adjustEndColumn(end, _node, value, _props, layer) {
     let column = Number(value);
     if (isNaN(column)) { return end; }
     let newEnd = Point.fromObject({ column, row: end.row });
@@ -2735,7 +2035,7 @@ class HighlightIterator {
     //
     let [result, openScopes] = iterator.seek(start, endRow);
 
-    if (rootLanguageLayer?.tree?.rootNode.hasChanges()) {
+    if (rootLanguageLayer?.tree?.rootNode.hasChanges) {
       // The tree is dirty. We should keep going — if we stop now, then the
       // user will see a flash of unhighlighted text over this whole range. But
       // we should also schedule a re-highlight at the end of the transaction,
@@ -3042,7 +2342,7 @@ class LayerHighlightIterator {
     if (!this.coverShallowerScopes) { return false; }
 
     // …and this iterator is deeper than the other…
-    if (iterator.depth > this.depth) { return false; }
+    if (iterator.depth >= this.depth) { return false; }
 
     // …and one of this iterator's content ranges actually includes this
     // position. (With caveats!)
@@ -3369,7 +2669,7 @@ class LanguageLayer {
 
   isDirty() {
     if (!this.tree) { return false; }
-    return this.tree.rootNode.hasChanges();
+    return this.tree.rootNode.hasChanges;
   }
 
   inspect() {
@@ -3381,7 +2681,7 @@ class LanguageLayer {
     if (this.destroyed) { return; }
     this.destroyed = true;
 
-    // Clean up all tree-sitter trees.
+    // Clean up all Tree-sitter trees.
     let temporaryTrees = this.temporaryTrees ?? [];
     let trees = new Set([this.tree, this.lastSyntaxTree, ...temporaryTrees]);
     trees = [...trees];
@@ -3465,7 +2765,10 @@ class LanguageLayer {
     let boundaries = createTree(compareBoundaries);
     let extent = this.getExtent();
 
-    let captures = this.queries.highlightsQuery?.captures(this.tree.rootNode, from, to) ?? [];
+    let captures = this.queries.highlightsQuery?.captures(
+      this.tree.rootNode,
+      { startPosition: from, endPosition: to }
+    ) ?? [];
     this.scopeResolver.reset();
 
     for (let capture of captures) {
@@ -3545,7 +2848,7 @@ class LanguageLayer {
     //
     // …will include `<?php`, `echo`, `"foo"`, and `?>`, but may exclude the
     // spaces between those tokens. This is a consequence of the design of
-    // a particular tree-sitter parser and should be mitigated with the
+    // a particular Tree-sitter parser and should be mitigated with the
     // `includeAdjacentWhitespace` option of `addInjectionPoint`.
     //
     let includedRanges = this.depth === 0 ? [extent] : this.getCurrentRanges();
@@ -3631,12 +2934,16 @@ class LanguageLayer {
       let OPEN_KEY = { position: point, boundary: 'start' };
       let CLOSE_KEY = { position: point, boundary: 'end' };
 
+      // Each point will contain either one or more scopes to _close_…
       if (data.close.length > 0) {
         boundaries = boundaries.insert(CLOSE_KEY, {
           scopeIds: Object.freeze(data.close)
         });
       }
 
+      // …or one or more scopes to _open_. One point is not allowed to close
+      // one scope and open another; there's always a chance that a different
+      // injection layer needs to act in between.
       if (data.open.length > 0) {
         boundaries = boundaries.insert(OPEN_KEY, {
           scopeIds: Object.freeze(data.open)
@@ -3713,7 +3020,7 @@ class LanguageLayer {
     if (!this.languageMode.useAsyncParsing) {
       // Practically speaking, updates that affect _only this layer_ will happen
       // synchronously, because we've made sure not to call this method until the
-      // root grammar's tree-sitter parser has been loaded. But we can't load any
+      // root grammar's Tree-sitter parser has been loaded. But we can't load any
       // potential injection layers' languages because we don't know which ones
       // we'll need _until_ we parse this layer's tree for the first time.
       //
@@ -3733,13 +3040,16 @@ class LanguageLayer {
         if (!this.ready) {
           params.async = true;
           await this.languageLoaded;
+          // While we were waiting for this language to load, another update may
+          // have been scheduled.
+          if (this.currentParsePromise) return false;
         }
         this.currentParsePromise = this._performUpdate(nodeRangeSet, params);
         if (!params.async) { break; }
         await this.currentParsePromise;
       } while (
         !this.destroyed &&
-        (!this.tree || this.tree.rootNode.hasChanges())
+        (!this.tree || this.tree.rootNode.hasChanges)
       );
 
       this.currentParsePromise = null;
@@ -3756,8 +3066,10 @@ class LanguageLayer {
     if (!this.queries.localsQuery) { return []; }
     let captures = this.queries.localsQuery.captures(
       this.tree.rootNode,
-      point,
-      point + 1
+      {
+        startPosition: point,
+        endPosition: point.translate(ONE_CHAR_FORWARD_TRAVERSAL)
+      }
     );
 
     captures = captures.filter(cap => {
@@ -3784,11 +3096,11 @@ class LanguageLayer {
     let globalScope = this.tree.rootNode;
 
     if (!captures) {
+      let { startPosition, endPosition } = globalScope;
       captures = this.groupLocalsCaptures(
         this.queries.localsQuery.captures(
           globalScope,
-          globalScope.startPosition,
-          globalScope.endPosition
+          { startPosition, endPosition }
         )
       );
     }
@@ -4092,7 +3404,7 @@ class LanguageLayer {
       // transaction's tree later on.
       this.lastSyntaxTree = tree;
 
-      // Like legacy tree-sitter, we're patching syntax nodes so that they have
+      // Like legacy Tree-sitter, we're patching syntax nodes so that they have
       // a `range` property that returns a `Range`. We're doing this for
       // compatibility, but we can't get a reference to the node class itself;
       // we have to wait until we have an instance and grab the prototype from
@@ -4278,8 +3590,10 @@ class LanguageLayer {
     // the character in column X.
     let captures = this.queries.highlightsQuery?.captures(
       this.tree.rootNode,
-      point,
-      { row: point.row, column: point.column + 1 }
+      {
+        startPosition: point,
+        endPosition: point.translate(ONE_CHAR_FORWARD_TRAVERSAL)
+      }
     ) ?? [];
 
     let results = [];
@@ -4559,7 +3873,7 @@ class NodeRangeSet {
     this.includeChildren = injectionPoint.includeChildren;
 
     // We shouldn't retain references to nodes here because the tree might get
-    // disposed of layer. Let's compile the information we need now while we're
+    // disposed of later. Let's compile the information we need now while we're
     // sure the tree is fresh.
     this.nodeSpecs = [];
     for (let node of nodes) {
@@ -4751,6 +4065,11 @@ class NodeRangeSet {
   }
 }
 
+// A subclass of map that associates a set of scope names with the editor
+// locations at which they are opened.
+//
+// In some complicated scenarios, we need to know where a scope was opened when
+// deciding how to handle it.
 class OpenScopeMap extends Map {
   constructor() {
     super();
@@ -4768,16 +4087,19 @@ class OpenScopeMap extends Map {
   }
 
   removeLastOccurrenceOf(scopeId) {
-    let keys = [...this.keys()];
-    keys.reverse();
-    for (let key of keys) {
+    let candidateKey;
+    // Of the keys whose values include this scope, find the one that occurs
+    // latest in the document.
+    for (let key of this.keys()) {
       let value = this.get(key);
-      if (value.includes(scopeId)) {
-        removeLastOccurrenceOf(value, scopeId);
-        return true;
+      if (!value.includes(scopeId)) continue;
+      if (!candidateKey || comparePoints(key, candidateKey) === 1) {
+        candidateKey = key;
       }
     }
-    return false;
+    if (!candidateKey) return false;
+    removeLastOccurrenceOf(this.get(candidateKey), scopeId);
+    return true;
   }
 }
 
@@ -4803,7 +4125,7 @@ class Index extends Map {
 // intersections with range already in the list, those intersections are
 // combined into one larger range.
 //
-// Assumes all ranges are instances of `Range` rather than tree-sitter range
+// Assumes all ranges are instances of `Range` rather than Tree-sitter range
 // specs.
 class RangeList {
   constructor() {
@@ -4848,6 +4170,1127 @@ class RangeList {
     for (let range of this.ranges) {
       yield range;
     }
+  }
+}
+
+// Private: A class that manages indentation hinting for a single editor.
+//
+// Each instance of `WASMTreeSitterLanguageMode` has exactly one instance of
+// `IndentResolver`; the purpose of this class is to encapsulate indentation
+// logic instead of having it dominate the language mode for those
+// familiarizing themselves with the code.
+class IndentResolver {
+  constructor(buffer, languageMode) {
+    this.buffer = buffer;
+    this.languageMode = languageMode;
+    this.emitter = new Emitter();
+  }
+
+  // Get the suggested indentation level for an existing line in the
+  // buffer.
+  //
+  // See {WASMTreeSitterLanguageMode::suggestedIndentForBufferRow}.
+  suggestedIndentForBufferRow(row, tabLength, rawOptions = {}) {
+    if (row === 0) { return 0; }
+    let root = this.languageMode.rootLanguageLayer;
+    if (!root || !root.tree || !root.ready) { return null; }
+    let { languageMode } = this;
+    let options = {
+      skipEvent: false,
+      skipBlankLines: true,
+      skipDedentCheck: false,
+      preserveLeadingWhitespace: false,
+      indentationLevels: null,
+      forceTreeParse: false,
+      ...rawOptions
+    };
+
+    let originalControllingLayer = options.controllingLayer;
+
+    // Indentation hinting is a two-phase process.
+    //
+    // In phase 1, we determine `row`’s starting indent considering only the
+    // content of the previous row.
+    //
+    // In phase 2, we consider `row`’s own content to see if any of it suggests
+    // an alteration from the phase 1 value.
+    let comparisonRow = options.comparisonRow ?? this.getComparisonRow(row, options);
+
+    let existingIndent = 0;
+    if (options.preserveLeadingWhitespace) {
+      // When this option is true, the indent level we return will be _added
+      // to_ however much indentation is already present on the line. Whatever
+      // the purpose of this option, we can't just pretend it isn't there,
+      // because it will produce silly outcomes. Instead, let's account for
+      // that level of indentation and try to subtract it from whatever level
+      // we return later on.
+      //
+      // Sadly, if the row is _more_ indented than we need it to be, we won't
+      // be able to dedent it into the correct position. This option probably
+      // needs to be revisited.
+      existingIndent = this.indentLevelForLine(
+        this.buffer.lineForRow(row), tabLength);
+    }
+
+    let comparisonRowIndent = options.comparisonRowIndent;
+    if (comparisonRowIndent === undefined) {
+      comparisonRowIndent = languageMode.indentLevelForLine(
+        this.buffer.lineForRow(comparisonRow), tabLength);
+    }
+
+    // What's the right place to measure from? Often we're here because the
+    // user just hit Enter, which means we'd run before injection layers have
+    // been re-parsed. Hence the injection's language layer might not know
+    // whether it controls the point at the cursor. So instead we look for the
+    // layer that controls the point at the end of the comparison row. This may
+    // not always be correct, but we'll find out.
+    let comparisonRowEnd = new Point(
+      comparisonRow,
+      this.buffer.lineLengthForRow(comparisonRow)
+    );
+
+    // Phase 1
+    // -------
+    //
+    // Find the controlling layer and perform an indentation query that starts
+    // at the beginning of the comparison row and ends at the beginning of the
+    // current row.
+
+    // Find the deepest layer that actually has an indents query. (Layers that
+    // don't define one, such as specialized injection grammars, are telling us
+    // they don't care about indentation. If a grammar wants to _prevent_ a
+    // shallower layer from controlling indentation, it should define an empty
+    // `indents.scm`, perhaps with an explanatory comment.)
+    let controllingLayer = languageMode.controllingLayerAtPoint(
+      comparisonRowEnd,
+      (layer) => {
+        if (!layer.queries.indentsQuery) return false;
+        // We want to exclude layers with a content range that _begins at_ the
+        // cursor position. Why? Because the content that starts at the cursor
+        // is about to shift down to the next line. It'd be odd if that layer
+        // was in charge of the indentation hint if it didn't have any content
+        // on the preceding line.
+        //
+        // So first we test for containment exclusive of endpoints…
+        if (layer.containsPoint(comparisonRowEnd, true)) {
+          return true;
+        }
+
+        // …but we'll still accept layers that have a content range which
+        // _ends_ at the cursor position.
+        return layer.getCurrentRanges()?.some(r => {
+          return r.end.compare(comparisonRowEnd) === 0;
+        });
+      }
+    );
+
+    if (!controllingLayer) {
+      // There's no layer with an indents query to help us out. The default
+      // behavior in this situation with any grammar — even plain text — is to
+      // match the previous line's indentation.
+      return comparisonRowIndent - existingIndent;
+    }
+
+    let { queries: { indentsQuery }, scopeResolver } = controllingLayer;
+
+    // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
+    // need a way to share those tests across different kinds of capture
+    // resolvers.
+    scopeResolver.reset();
+
+    let indentTree = null;
+    if (options.tree && originalControllingLayer === controllingLayer) {
+      // Make sure this tree belongs to the layer we expect it to.
+      indentTree = options.tree;
+    }
+
+    if (!indentTree) {
+      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !languageMode.shouldUseAsyncIndent()) {
+        // If we're in this code path, it either means the tree is clean (the
+        // `get` path) or that we're willing to spend the time to do a
+        // synchronous reparse (the `parse` path). Either way, we'll be able to
+        // deliver a synchronous answer to the question.
+        indentTree = controllingLayer.getOrParseTree();
+      } else {
+        // We can't answer this yet because we don't yet have a new syntax
+        // tree, and are unwilling to spend time doing a synchronous re-parse.
+        // Return a promise that will fulfill once the transaction is over.
+        //
+        // TODO: For async, we might need an approach where we suggest a
+        // preliminary indent level and then follow up later with a more
+        // accurate one. It's a bit disorienting that the editor falls back to
+        // an indent level of `0` when a newline is inserted.
+        let comparisonRowText = this.buffer.lineForRow(comparisonRow)
+        let rowText = this.buffer.lineForRow(row)
+        return languageMode.atTransactionEnd().then(({ changeCount }) => {
+          let shouldFallback = false;
+          // If this was the only change in the transaction, then we can
+          // definitely adjust the indentation level after the fact. If not,
+          // then we might still be able to make indentation decisions in cases
+          // where they do not affect one another.
+          //
+          // Hence if neither the comparison row nor the current row has had
+          // its contents change in any way since we were first called, we will
+          // assume it's safe to adjust the indentation level after the fact.
+          // Otherwise we'll fall back to a single transaction-wide indentation
+          // adjustment — fewer tree parses, but more likely to produce unusual
+          // results.
+          if (changeCount > 1) {
+            if (comparisonRowText !== this.buffer.lineForRow(comparisonRow)) {
+              shouldFallback = true;
+            }
+            if (rowText !== this.buffer.lineForRow(row)) {
+              shouldFallback = true;
+            }
+          }
+          if (shouldFallback) {
+            // We're now revisiting this indentation question at the end of the
+            // transaction. Other changes may have taken place since we were
+            // first asked what the indent level should be for this line. So
+            // how do we know if the question is still relevant? After all, the
+            // text that was on this row earlier might be on some other row
+            // now.
+            //
+            // So we compare the text that was on the row when we were first
+            // called… to the text that is on the row now that the transaction
+            // is over. If they're the same, that's a _strong_ indicator that
+            // the result we return will still be relevant.
+            //
+            // If not, as is the case in this code path, we return `undefined`,
+            // signalling to the `TextEditor` that its only recourse is to
+            // auto-indent the whole extent of the transaction instead.
+            return undefined;
+          }
+
+          // If we get this far, it's safe to auto-indent this line. Either it
+          // was the only change in its transaction or the other changes
+          // happened on different lines. But we've retained the original
+          // values for `comparisonRow` and `comparisonRowIndent` because
+          // that's the proper basis from which to determine the given row's
+          // indent level.
+          let result = this.suggestedIndentForBufferRow(row, tabLength, {
+            ...rawOptions,
+            comparisonRow: comparisonRow,
+            comparisonRowIndent: comparisonRowIndent,
+            tree: controllingLayer.tree,
+            controllingLayer
+          });
+          return result;
+        });
+      }
+    }
+
+    // Keep track of the range of each capture so we can filter out duplicates.
+    let positionSet = new Set;
+
+    // Perform the Phase 1 capture.
+    let indentCaptures = indentsQuery.captures(
+      indentTree.rootNode,
+      {
+        startPosition: { row: comparisonRow, column: 0 },
+        endPosition: { row: row, column: 0 }
+      }
+    );
+
+    // Keep track of the first `@indent` capture on the line. When balancing
+    // `@indent`s and `@dedent`s, any `@dedent`s that occur before the first
+    // `@indent` should be ignored.
+    let indentCapturePosition = null;
+    // Three different capture styles can influence the Phase 1 output:
+    // the `@indent`/`@dedent` balancing…
+    let indentDelta = 0;
+    // …the `@dedent.next` capture…
+    let dedentNextDelta = 0;
+    // …and the `@match.next` capture, which acts as a special sort of override
+    // much like Phase 2’s `@match` capture.
+    let matchNextResult = null;
+
+    for (let capture of indentCaptures) {
+      let { node, name } = capture;
+      // Captures that have no content are ignored by default because they
+      // typically are “phantom” nodes inserted by Tree-sitter as part of error
+      // recovery, but we'll allow them if the query file explicitly tells us
+      // to.
+      let allowEmpty = this.getProperty(capture, 'allowEmpty', 'boolean', false);
+      if (node.text === '' && !allowEmpty) {
+        continue;
+      }
+
+      // Ignore anything that isn't actually on the row.
+      if (node.endPosition.row < comparisonRow) { continue; }
+      if (node.startPosition.row > comparisonRow) { continue; }
+
+      // Ignore anything that fails a scope test. This applies all the tests of
+      // the form `(#is? test.foo)`.
+      if (!scopeResolver.store(capture)) { continue; }
+      // Apply indentation-specific scope tests and skip this capture if any
+      // tests fail.
+      let passed = this.applyTests(capture, {
+        currentRow: row,
+        comparisonRow,
+        tabLength
+      });
+      if (!passed) { continue; }
+
+      // Only consider a given combination of capture name and buffer range
+      // once, even if it's captured more than once in `indents.scm`.
+      let key = `${name}/${node.startIndex}/${node.endIndex}`;
+      if (positionSet.has(key)) { continue; }
+      positionSet.add(key);
+
+      if (name === 'indent') {
+        if (indentCapturePosition === null) {
+          indentCapturePosition = node.endPosition;
+        }
+        indentDelta++;
+      } else if (name === 'dedent.next') {
+        // This isn't often needed, but it's a way for the current line to
+        // signal that the _next_ line should be dedented no matter what its
+        // content is.
+        dedentNextDelta++;
+      } else if (name === 'match.next') {
+        // `@match.next` tells us that the current row’s baseline should match
+        // that of a given position descriptor.
+        matchNextResult = this.resolveMatch(capture, {
+          currentRow: row,
+          comparisonRow,
+          tabLength,
+          indentationLevels: options.indentationLevels
+        }) ?? null;
+        if (matchNextResult !== null) {
+          // If we succeed in resolving this value, it’ll supersede any other
+          // kinds of captures, so we can skip the rest of the capture
+          // processing.
+          break;
+        }
+      } else if (name === 'dedent') {
+        // `dedent` tokens don't count for anything unless they happen
+        // after the first `indent` token. They only tell us whether an indent
+        // that _seems_ like it should happen is cancelled out.
+        //
+        // Consider:
+        //
+        // } else if (foo) {
+        //
+        // We should still indent the succeeding line because the initial `}`
+        // does not cancel out the `{` at the end of the line. On the other
+        // hand:
+        //
+        // } else if (foo) {}
+        //
+        // The second `}` _does_ cancel out the first occurrence of `{` because
+        // it comes later.
+        if (!indentCapturePosition || comparePoints(node.startPosition, indentCapturePosition) < 0) {
+          // This capture either happened before the first indent capture on
+          // the row or is _the same node_ as the indent capture, in which case
+          // we should construe the dedent as happening _before_ the indent.
+          //
+          // For example: the "elsif" node in Ruby triggers a dedent on its own
+          // line, but also signals an indent on the next line. The dedent
+          // shouldn't cancel out the indent.
+          continue;
+        }
+        // Now that we've filtered out all the `@dedent`s we should ignore, we
+        // can decrement `indentDelta`.
+        indentDelta--;
+        if (indentDelta < 0) {
+          // In the _indent_ phase, the delta won't ever go lower than `0`.
+          // This is because we assume that the previous line is correctly
+          // indented! The only function that `dedent` serves for us in this
+          // phase is canceling out an earlier `indent` and preventing false
+          // positives.
+          //
+          // So no matter how many `dedent` tokens we see on a particular line…
+          // if the _last_ token we see is an `indent` token, then it hints
+          // that the next line should be indented by one level.
+          //
+          // The only ways for Phase 1 to produce a baseline indent that’s
+          // _less_ than the comparison row’s indent are via `@dedent.next` and
+          // `@match.next`.
+          indentDelta = 0;
+        }
+      }
+    }
+
+    // `@indent` and `@dedent` can increase the next line's indent level by one
+    // at most, and can't decrease the next line's indent level at all on their
+    // own.
+    //
+    // Why? There are few coding patterns in the wild that would cause us to
+    // indent more than one level based on tokens found on the _previous_ line.
+    // And there are also few scenarios in which we'd want to dedent a certain
+    // line before we even know the content of that line.
+    //
+    // Hence we distill the results above into a net indentation level change
+    // of either 1 or 0, depending on whether we saw more `@indent`s than
+    // `@dedent`s.
+    //
+    // If there's a genuine need to dedent the current row based solely on the
+    // content of the comparison row, then `@dedent.next` or `@match.next` can
+    // be used.
+    //
+    indentDelta = clamp(indentDelta, 0, 1);
+
+    // Process `@dedent.next` captures after the `@indent`/`@dedent` balancing;
+    // they act as a strong hint about the next line's indentation.
+    indentDelta -= clamp(dedentNextDelta, 0, 1);
+
+    // On the other hand, if we got a result from a `@match.next` capture, that
+    // supersedes any other results. Set `indentDelta` to `0`; we'll instead
+    // use `matchNextResult` as the baseline to which we'll add any further
+    // deltas.
+    if (matchNextResult !== null) {
+      indentDelta = 0;
+    }
+
+    // Phase 2
+    // -------
+    //
+    // Find the controlling layer and perform an indentation query that starts
+    // at the beginning of the current row and ends at the beginning of the
+    // next row.
+
+    let dedentDelta = 0;
+    let lineText = this.buffer.lineForRow(row);
+    let rowStartingColumn = Math.max(lineText.search(/\S/), 0);
+
+    if (!options.skipDedentCheck) {
+      scopeResolver.reset();
+
+      // The controlling layer on the previous line got to decide what our
+      // starting indent was on the current line. But it might not extend to
+      // the current line, so we should determine which layer is in charge of
+      // the second phase.
+      //
+      // The comparison point we use is that of the first non-whitespace
+      // character on the line. If we start earlier than that, we might not
+      // pick up on the presence of an injection layer.
+      let rowStart = new Point(row, rowStartingColumn);
+      let dedentControllingLayer = languageMode.controllingLayerAtPoint(
+        rowStart,
+        (layer) => {
+          if (!layer.queries.indentsQuery) return false;
+          // We're inverting the logic from above: now we want to allow layers
+          // that _begin_ at the cursor and exclude layers that _end_ at the
+          // cursor. Because we'll be analyzing content that comes _after_ the
+          // cursor to understand whether to dedent!
+          //
+          // So first we test for containment exclusive of endpoints…
+          if (layer.containsPoint(rowStart, true)) {
+            return true;
+          }
+
+          // …but we'll still accept layers that have a content range which
+          // _starts_ at the cursor position.
+          return layer.getCurrentRanges()?.some(r => {
+            return r.start.compare(rowStart) === 0;
+          });
+        }
+      );
+
+      if (dedentControllingLayer && dedentControllingLayer !== controllingLayer) {
+        // If this layer is different from the one we used above, then we
+        // should run this layer's indents query against its own tree. (If _no_
+        // layers qualify at this position, we won't hit this code path, so
+        // we'll reluctantly still use the original layer and tree.)
+        indentsQuery = dedentControllingLayer.queries.indentsQuery;
+        indentTree = dedentControllingLayer.getOrParseTree();
+      }
+
+      // Perform the Phase 2 capture.
+      let dedentCaptures = indentsQuery.captures(
+        indentTree.rootNode,
+        {
+          startPosition: { row: row - 1, column: Infinity },
+          endPosition: { row: row + 1, column: 0 }
+        }
+      );
+
+      let currentRowText = lineText.trim();
+      // We can reuse the position set we created for Phase 1.
+      positionSet.clear();
+
+      for (let capture of dedentCaptures) {
+        let { name, node } = capture;
+        let { text } = node;
+
+        // As in Phase 1, we allow captures to opt into being recognized even
+        // when they're empty.
+        let allowEmpty = this.getProperty(capture, 'allowEmpty', 'boolean', false);
+        if (text === '' && !allowEmpty) { continue; }
+
+        // `(#set! indent.force)` acts more aggressively, signaling dedent even
+        // when the capture isn't the first content on the row. This should be
+        // used with care.
+        let force = this.getProperty(capture, 'force', 'boolean', false);
+
+        // Ignore anything that isn't actually on the row.
+        if (node.endPosition.row < row) { continue; }
+        if (node.startPosition.row > row) { continue; }
+
+        // Ignore anything that fails a scope test.
+        if (!scopeResolver.store(capture)) { continue; }
+        // Apply indentation-specific scope tests and skip this capture if any
+        // tests fail.
+        let passed = this.applyTests(capture, {
+          currentRow: row,
+          comparisonRow,
+          tabLength
+        });
+        if (!passed) { continue; }
+
+        // Imagine you've got:
+        //
+        // { ^foo, bar } = something
+        //
+        // and the caret represents the cursor. Pressing Enter will move
+        // everything after the cursor to a new line and _should_ indent the
+        // line, even though there's a closing brace on the new line that would
+        // otherwise mark a dedent.
+        //
+        // Thus we don't want to honor a `@dedent` or `@match` capture unless
+        // it's the first non-whitespace content in the line. We'll use similar
+        // logic for `suggestedIndentForEditedBufferRow`.
+        //
+        // If a capture is confident it knows what it's doing, it can opt out
+        // of this behavior with `(#set! indent.force true)`.
+        if (!force && !currentRowText.startsWith(text)) { continue; }
+
+        // The `@match` capture short-circuits nearly all indentation logic by
+        // pointing us to a different node and asking us to match the
+        // indentation of whatever row that node starts on.
+        if (name === 'match') {
+          let matchIndentLevel = this.resolveMatch(
+            capture, { row, comparisonRow, tabLength, indentationLevels: options.indentationLevels });
+          if (typeof matchIndentLevel === 'number') {
+            // We were able to resolve the `@match` capture, so we’ll be
+            // returning early.
+            scopeResolver.reset();
+            let finalIndent = Math.max(matchIndentLevel - Math.floor(existingIndent), 0);
+            if (!options.skipEvent) {
+              this.emitter.emit('did-suggest-indent', {
+                currentRow: row,
+                comparisonRow,
+                matchIndentLevel,
+                finalIndent,
+                captureMode: 'match'
+              });
+            }
+            return finalIndent;
+          }
+        } else if (name === 'none') {
+          // TODO: `@none` is an experiment for any situation in which the
+          // current line’s indent should be reset to `0`. This is obviously
+          // rarely needed and I can’t remember exactly what the envisioned use
+          // case was, but we’ll leave it in for now.
+          scopeResolver.reset();
+          if (!options.skipEvent) {
+            this.emitter.emit('did-suggest-indent', {
+              currentRow: row,
+              comparisonRow,
+              finalIndent: 0,
+              captureMode: 'none'
+            });
+          }
+          return 0;
+        }
+
+        // Only the captures handled above and `@dedent` can change this line's
+        // indentation. So now we’ll filter out all non-`@dedent`s.
+        if (name !== 'dedent') { continue; }
+
+        // Only consider a given range once, even if it's marked with multiple
+        // captures.
+        let key = `${node.startIndex}/${node.endIndex}`;
+        if (positionSet.has(key)) { continue; }
+        positionSet.add(key);
+        dedentDelta--;
+      }
+
+      // `@indent`/`@dedent` captures, no matter how many there are, can
+      // dedent the current line by one level at most. To indent more than
+      // that, one must use a `@match` capture.
+      dedentDelta = clamp(dedentDelta, -1, 0);
+    }
+
+    scopeResolver.reset();
+
+    // Both phases are complete, so let's put the pieces together.
+
+    // Where are we starting from? Most of the time it's the indentation level
+    // of the comparison row, but a `@match.next` capture can override this.
+    let baseline = matchNextResult !== null ? matchNextResult : comparisonRowIndent;
+
+    // Now we add the deltas from the two phases. This will nearly always
+    // produce a difference of either `-1`, `0`, or `1` from `baseline`.
+    //
+    // When `@match.next` produces a baseline, `indentDelta` will always be `0`
+    // to signify that other Phase 1 logic was ignored altogether.
+    let finalIndent = baseline + indentDelta + dedentDelta;
+
+    // Finally, we might have to adjust for the existing leading whitespace if
+    // `options.preserveLeadingWhitespace` is `true`.
+    //
+    // We call `Math.floor` because we should only subtract whole units of
+    // indentation here. “Leading whitespace” seems not to consider (for
+    // example) a single leading space character if `editor.tabLength` is `2`.
+    let adjustedIndent = Math.max(finalIndent - Math.floor(existingIndent), 0);
+
+    // Emit an event with all this information. This makes it possible for
+    // tooling to help a grammar author understand the indentation logic
+    // without necessarily having to step through it in a debugger.
+    if (!options.skipEvent) {
+      this.emitter.emit('did-suggest-indent', {
+        currentRow: row,
+        comparisonRow,
+        comparisonRowIndent,
+        indentDelta,
+        dedentDelta,
+        finalIndent,
+        adjustedIndent,
+        captureMode: 'normal'
+      });
+    }
+
+    return adjustedIndent;
+  }
+
+  // Extended: Register a callback that fires when {IndentResolver} suggests an
+  // indentation level.
+  //
+  // This callback is merely a glimpse into the indentation life-cycle and does
+  // not offer the callback any opportunity to change the value being
+  // suggested. Its goal is to report metadata that may make it easier to
+  // diagnose _why_ a particular indentation level is being suggested without
+  // having to step through the logic in a debugger.
+  //
+  // Nearly all exit paths for {::suggestedIndentForBufferRow} and
+  // {::suggestedIndentForEditedBufferRow} invoke this callback.
+  //
+  // One indentation “level” consists of either (a) one tab character, or (b)
+  // one multiple of `editor.tabLength` spaces (if `editor.softTabs` is
+  // `true`).
+  //
+  // - `callback` A {Function} that takes one parameter:
+  //   - `meta` An {Object} that consisting of _some subset_ of the following
+  //     properties:
+  //     - `captureMode` A {String} describing one of several different modes
+  //       which influence a capture:
+  //       - A value of `normal` means that an indentation level was determined
+  //         through the normal two-phase process.
+  //       - A value of `match` means that an indentation level was determined
+  //         when we encountered a `@match` capture. `@match` captures are
+  //         considered in Phase 2, but use the syntax tree to override earlier
+  //         logic and give a definitive answer on a row’s indentation level.
+  //       - A value of `none` means that a `@none` capture was encountered in
+  //         Phase 2. `@none` is an extremely rare capture that, when used,
+  //         instantly signals a suggested indent level of `0`, overriding all
+  //         other logic.
+  //     - `currentRow` The {Number} of the row whose indentation was suggested.
+  //       (Zero-indexed, so you must add one to match the row number displayed
+  //       in the gutter.)
+  //     - `comparisonRow` The {Number} of the row that was consulted to
+  //       determine the baseline indentation of the target row. This is
+  //       often the row directly above `row`, but can be an earlier row if
+  //       the target row was preceded by whitespace.
+  //     - `comparisonRowIndent` {Number} The indentation level of the
+  //       comparison row.
+  //     - `indentDelta` {Number} The amount of indentation (in increments)
+  //       suggested during the first phase of indent analysis. This phase
+  //       determines the baseline indentation of the target row by querying
+  //       the content on the comparison row. (For instance, if the comparison
+  //       row ends with `(`, `indentDelta` will typically be `1`.) Since
+  //       the first phase can only maintain or increase the indentation level,
+  //       this value will be either `0` or `1`.
+  //     - `dedentDelta` {Number} The amount of indentation (in increments)
+  //       suggested during the second phase of indent analysis. This phase
+  //       determines whether any content on the target line suggests that we
+  //       should dedent the line by one level. (For instance, if the target
+  //       line starts with `)`, `dedentDelta` will often be `-1`.) Since the
+  //       second phase can only maintain or decrease the indentation level,
+  //       this value will be either `0` or `-1`.
+  //     - `matchIndentLevel` {Number} A number representing the ideal amount
+  //       of indentation as determined by a `@match` capture. A `@match`
+  //       capture tries to match the indentation level of a previous line in
+  //       the buffer — one that it has a semantic relationship with — instead
+  //       of determining indentation in relative terms. When it's present, it
+  //       overrides the conventional indentation logic.
+  //     - `finalIndent` {Number} A number representing the final value that
+  //       will shortly be returned from a call to
+  //       `suggestedIndentForBufferRow`. This value accounts for the possible
+  //       presence of the `preserveLeadingWhitespace` option. For instance,
+  //       if `suggestedIndentForBufferRow` would return `5`, but the target
+  //       row already has an indent level of `3`, `finalIndent` will instead
+  //       be `2`.
+  //     - `adjustedIndent` {Number} A `finalIndent`, but takes existing
+  //       indentation level into account if the `preserveLeadingWhitespace`
+  //       option was enabled. For instance, if `suggestedIndentForBufferRow`
+  //       would return `5`, but the target row already has an indent level of
+  //       `3`, `adjustedIndent` will instead be `2`. If
+  //       `preserveLeadingWhitespace` is `false`, `finalIndent` and
+  //       `adjustedIndent` will be identical.
+  //
+  onDidSuggestIndent(callback) {
+    return this.emitter.on('did-suggest-indent', callback);
+  }
+
+  suggestedIndentForBufferRows(startRow, endRow, tabLength, options = {}) {
+    let { languageMode } = this;
+    let root = languageMode.rootLanguageLayer;
+    if (!root || !root.tree) {
+      let results = new Map();
+      for (let row = startRow; row <= endRow; row++) {
+        results.set(row, null);
+      }
+      return results;
+    }
+
+    let results = new Map();
+    let comparisonRow = null;
+    let comparisonRowIndent = null;
+
+    let { isPastedText = false } = options;
+    let indentDelta;
+
+    for (let row = startRow; row <= endRow; row++) {
+      // If this row were being indented by `suggestedIndentForBufferRow`, it'd
+      // look at the end of the previous row to find the controlling layer,
+      // because we start at the previous row to find the suggested indent for
+      // the current row.
+      let controllingLayer = languageMode.controllingLayerAtPoint(
+        this.buffer.clipPosition(new Point(row - 1, Infinity)),
+        // This query isn't as precise as the one we end up making later, but
+        // that's OK. This is just a first pass.
+        (layer) => !!layer.queries.indentsQuery && !!layer.tree
+      );
+      if (isPastedText) {
+        // In this mode, we're not trying to auto-indent every line; instead,
+        // we're trying to auto-indent the _first_ line of a region of text
+        // that's just been pasted, while trying to preserve the relative
+        // levels of indentation within the pasted region. So if the
+        // auto-indent of the first line increases its indent by one level,
+        // all other lines should also be increased by one level — without even
+        // consulting their own suggested indent levels.
+        if (row === startRow) {
+          // The only time we consult the indents query is for the first row,
+          // so we're not going to insist that the _entire range_ fall under
+          // the control of a layer with an indents query — just the row we
+          // need.
+          if (!controllingLayer) { return null; }
+          let tree = controllingLayer.getOrParseTree();
+
+          let firstLineCurrentIndent = this.indentLevelForLine(
+            this.buffer.lineForRow(row), tabLength);
+
+          let firstLineIdealIndent = this.suggestedIndentForBufferRow(
+            row,
+            tabLength,
+            {
+              ...options,
+              controllingLayer,
+              tree
+            }
+          );
+
+          if (firstLineIdealIndent == null) {
+            // If we decline to suggest an indent level for the first line,
+            // then there's no change to be made here. Keep the whole region
+            // the way it is.
+            return null;
+          } else {
+            indentDelta = firstLineIdealIndent - firstLineCurrentIndent;
+            if (indentDelta === 0) {
+              // If the first row doesn't have to be adjusted, neither do any
+              // others.
+              return null;
+            }
+            results.set(row, firstLineIdealIndent);
+          }
+          continue;
+        }
+
+        // All rows other than the first are easy — just apply the delta.
+        let actualIndent = this.indentLevelForLine(
+          this.buffer.lineForRow(row), tabLength);
+
+        results.set(row, actualIndent + indentDelta);
+        continue;
+      }
+
+      // For line X to know its appropriate indentation level, it needs row X-1,
+      // if it exists, to be indented properly. That's why `TextEditor` wants to
+      // indent each line atomically. Instead, we'll determine the right level
+      // for the first row, then supply the result for the previous row when we
+      // call `suggestedIndentForBufferRow` for the _next_ row, and so on, so
+      // that `suggestedIndentForBufferRow` doesn't try to look up the comparison
+      // row itself and find out we haven't actually fixed any of the previous
+      // rows' indentations yet.
+      let indent;
+      if (controllingLayer) {
+        let tree = controllingLayer.getOrParseTree();
+        let rowOptions = {
+          ...options,
+          tree,
+          comparisonRow: comparisonRow ?? undefined,
+          comparisonRowIndent: comparisonRowIndent ?? undefined,
+          indentationLevels: results
+        };
+        indent = this.suggestedIndentForBufferRow(row, tabLength, rowOptions);
+        if (indent === null) {
+          // We could not retrieve the correct indentation level for this row
+          // without re-parsing the tree. We should give up and return what we
+          // have so that `TextEditor` can finish the job through a less
+          // efficient means.
+          return results;
+        }
+      } else {
+        // We could not retrieve the correct indentation level for this row
+        // because it isn't governed by any layer that has an indents query.
+        return results;
+      }
+      results.set(row, indent);
+      comparisonRow = row;
+      comparisonRowIndent = indent;
+    }
+
+    return results;
+  }
+
+  suggestedIndentForEditedBufferRow(row, tabLength, options = {}) {
+    let { languageMode } = this;
+    const line = this.buffer.lineForRow(row);
+    const currentRowIndent = this.indentLevelForLine(line, tabLength);
+    let comparisonRow = options.comparisonRow ?? this.getComparisonRow(row, options);
+
+    // If the row is not indented at all, we have nothing to do, because we can
+    // only dedent a line at this phase.
+    if (currentRowIndent === 0) { return; }
+
+    // If we're on the first row, we have no preceding line to compare
+    // ourselves to. We should do nothing.
+    if (row === 0) { return; }
+
+    // By the time this function runs, we probably know enough to be sure of
+    // which layer controls the beginning of this row, even if we don't know
+    // which one owns the position at the cursor.
+    //
+    // Use the position of the first text on the line as the reference point.
+    let rowStartingColumn = Math.max(line.search(/\S/), 0);
+    let controllingLayer = languageMode.controllingLayerAtPoint(
+      new Point(row, rowStartingColumn),
+      (layer) => !!layer.queries.indentsQuery
+    );
+
+    if (!controllingLayer) { return undefined; }
+
+    let { queries: { indentsQuery }, scopeResolver } = controllingLayer;
+    if (!indentsQuery) { return undefined; }
+
+    // TODO: We use `ScopeResolver` here so that we can use its tests. Maybe we
+    // need a way to share those tests across different kinds of capture
+    // resolvers.
+    scopeResolver.reset();
+
+    // Ideally, we're running when the tree is clean, but if not, we must
+    // re-parse the tree in order to make an accurate indents query.
+    let indentTree = options.tree;
+    if (!indentTree) {
+      if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncIndent || !this.useAsyncParsing) {
+        indentTree = controllingLayer.getOrParseTree();
+      } else {
+        return this.atTransactionEnd().then(({ changeCount }) => {
+          if (changeCount > 1) {
+            // Unlike `suggestedIndentForBufferRow`, we should not return
+            // `undefined` here and implicitly tell `TextEditor` to handle the
+            // auto-indent itself. If there were several changes in this
+            // transaction, we missed our chance to dedent this row, and should
+            // return `null` to signal that `TextEditor` should do nothing
+            // about it.
+            return null;
+          }
+          let result = this.suggestedIndentForEditedBufferRow(row, tabLength, {
+            ...options,
+            tree: controllingLayer.tree
+          });
+          if (currentRowIndent === result) {
+            // Return `null` here so that `TextEditor` realizes that no work
+            // needs to be done.
+            return null;
+          }
+          return result;
+        });
+      }
+    }
+
+    if (!indentTree) {
+      console.error(`No indent tree!`, controllingLayer.inspect());
+      return undefined;
+    }
+
+    const indents = indentsQuery.captures(
+      indentTree.rootNode,
+      {
+        startPosition: { row: row - 1, column: Infinity },
+        endPosition: { row: row + 1, column: 0 }
+      }
+    );
+
+    let lineText = this.buffer.lineForRow(row).trim();
+
+    // This is the indent level that is suggested from context — the level we'd
+    // have if this row were completely blank. We won't alter the indent level
+    // of the current row — even if it's “wrong” — unless typing triggers a
+    // dedent. But once a dedent is triggered, we should dedent one level from
+    // this value, not from the current row indent.
+    //
+    // If more than one level of dedent is needed, a `@match` capture must be
+    // used so that indent level can be expressed in absolute terms.
+    const originalRowIndent = this.suggestedIndentForBufferRow(row, tabLength, {
+      skipBlankLines: true,
+      skipDedentCheck: true,
+      skipEvent: true,
+      tree: indentTree
+    });
+
+    let seenDedent = false;
+    for (let indent of indents) {
+      let { node } = indent;
+      // Ignore captures that aren't on this row.
+      if (node.startPosition.row !== row) { continue; }
+      // Ignore captures that fail their scope tests.
+      if (!scopeResolver.store(indent)) { continue; }
+      // Apply indentation-specific scope tests and skip this capture if any
+      // tests fail.
+      let passed = this.applyTests(indent, {
+        currentRow: row,
+        comparisonRow,
+        tabLength
+      });
+      if (!passed) return;
+
+      let force = this.getProperty(indent, 'force', 'boolean', false);
+
+      // For all captures — even `@match` captures — we get one bite at the
+      // apple, and it's when the text of the capture is the only
+      // non-whitespace text on the line.
+      //
+      // Otherwise, this capture will assert itself after every keystroke, and
+      // the user has no way to opt out of the correction.
+      //
+      // If the capture is confident it knows what it's doing, and is using
+      // some other mechanism to ensure the adjustment will happen exactly
+      // once, it can bypass this behavior with `(#set! indent.force true)`.
+      //
+      if (!force && node.text !== lineText) { continue; }
+
+      // `@match` is authoritative; honor the first one we see and ignore other
+      // captures.
+      if (indent.name === 'match') {
+        let matchIndentLevel = this.resolveMatch(indent, {
+          currentRow: row,
+          comparisonRow,
+          tabLength
+        });
+        if (typeof matchIndentLevel === 'number') {
+          scopeResolver.reset();
+          this.emitter.emit('did-suggest-indent', {
+            currentRow: row,
+            comparisonRow,
+            matchIndentLevel,
+            finalIndent: matchIndentLevel,
+            captureMode: 'match'
+          });
+          return matchIndentLevel;
+        }
+      } else if (indent.name === 'none') {
+        scopeResolver.reset();
+        this.emitter.emit('did-suggest-indent', {
+          currentRow: row,
+          comparisonRow,
+          finalIndent: 0,
+          captureMode: 'none'
+        });
+        return 0;
+      }
+
+      if (indent.name !== 'dedent') { continue; }
+
+      // Even after we've seen a `@dedent`, we allow the loop to continue,
+      // because we'd prefer a `@match` capture over this `@dedent` capture
+      // even if it happened to come later in the loop.
+      seenDedent = true;
+    }
+
+    scopeResolver.reset();
+
+    let finalIndent = seenDedent ? Math.max(0, originalRowIndent - 1) : currentRowIndent;
+
+    this.emitter.emit('did-suggest-indent', {
+      currentRow: row,
+      comparisonRow,
+      finalIndent,
+      captureMode: 'normal'
+    });
+
+    return finalIndent;
+  }
+
+  getComparisonRow(row, { skipBlankLines = true } = {}) {
+    let comparisonRow = row - 1;
+    if (skipBlankLines) {
+      // It usually makes no sense to compare to a blank row, so we'll move
+      // upward until we find a line with text on it.
+      while (this.buffer.isRowBlank(comparisonRow) && comparisonRow > 0) {
+        comparisonRow--;
+      }
+    }
+    return comparisonRow;
+  }
+
+  indentLevelForLine(line, tabLength) {
+    let indentLength = 0;
+    for (let i = 0, { length } = line; i < length; i++) {
+      const char = line[i];
+      if (char === '\t') {
+        indentLength += tabLength - (indentLength % tabLength);
+      } else if (char === ' ') {
+        indentLength++;
+      } else {
+        break;
+      }
+    }
+    return indentLength / tabLength
+  }
+
+  resolveMatch(capture, { currentRow, tabLength, indentationLevels }) {
+    let { node } = capture;
+
+    // `indent.match` used to be called `indent.matchIndentOf`.
+    let matchIndentOf = this.getProperty(capture, ['match', 'matchIndentOf'], 'string', null);
+    // `indent.offset` used to be called `indent.offsetIndent`.
+    let offsetIndent = this.getProperty(capture, ['offset', 'offsetIndent'], 'number', 0);
+
+    // A `@match` or `@match.next` capture must have an `indent.match`
+    // predicate. If it’s missing, the capture is invalid and we should pretend
+    // it wasn’t there at all.
+    if (!matchIndentOf) return undefined;
+
+    // Turn an `indent.match` predicate into a node position.
+    let targetPosition = resolveNodePosition(node, matchIndentOf);
+    let targetRow = targetPosition?.row;
+    // If we fail to resolve the node position, it means the path described
+    // doesn't exist. We should behave as though this `@match` capture wasn’t
+    // present at all.
+    if (typeof targetRow !== 'number' || targetRow >= currentRow) {
+      return undefined;
+    }
+
+    let baseIndent;
+    if (indentationLevels) {
+      baseIndent = indentationLevels.get(targetRow);
+    }
+    baseIndent ??= this.languageMode.indentLevelForLine(
+      this.buffer.lineForRow(targetRow), tabLength);
+
+    let result = baseIndent + offsetIndent;
+
+    // Because `indent.offset` can be any number, we can wind up with a
+    // negative number here, which is invalid.
+    return Math.max(result, 0);
+  }
+
+  // Look up an `indent.` capture property applied with a `#set!` directive,
+  // optionally coercing to a specified type or falling back to a default
+  // value.
+  //
+  // `names` can be an array in cases where the property may have several
+  // aliases. The first one that exists will be returned. (Omit the leading
+  // `indent.` when passing property names.)
+  getProperty(capture, names, coercion = null, fallback = null) {
+    let { setProperties: props = {} } = capture;
+    if (typeof names === 'string') { names = [names]; }
+    for (let name of names) {
+      let fullName = `indent.${name}`;
+      if (!(fullName in props)) { continue; }
+      return this.coerce(props[fullName], coercion) ?? fallback;
+    }
+    return fallback;
+  }
+
+  coerce(value, coercion) {
+    switch (coercion) {
+      case String:
+      case 'string':
+        if (value == null) return "";
+        return value;
+      case Number:
+      case 'number': {
+        let number = Number(value);
+        if (isNaN(number)) return null;
+        return number;
+      }
+      case Boolean:
+      case 'boolean':
+        if (value == null) return null;
+        return true;
+      default:
+        return value;
+    }
+  }
+
+  applyTests(capture, meta) {
+    let {
+      node,
+      assertedProperties: asserted = {},
+      refutedProperties: refuted = {}
+    } = capture;
+    for (let [name, test] of Object.entries(IndentResolver.TESTS)) {
+      let fullName = `indent.${name}`
+      let passed = true;
+      if (asserted[fullName]) {
+        passed = test(node, asserted[fullName], meta);
+      } else if (refuted[fullName]) {
+        passed = !test(node, asserted[fullName], meta);
+      }
+      if (!passed) return false;
+    }
+    return true;
+  }
+}
+
+// Indentation queries have a small number of query tests. These can't be
+// implemented as generic scope tests because they expose metadata that only
+// makes sense in an indentation context.
+IndentResolver.TESTS = {
+  // Returns `true` if the position descriptor's row equals that of the current
+  // row (the row whose indentation level is being suggested).
+  //
+  // For example:
+  //
+  //   (#is? indent.matchesCurrentRow startPosition)
+  //
+  // in a `@match` capture will pass if the captured node starts on the current
+  // row.
+  matchesCurrentRow(node, value, { currentRow }) {
+    let position = resolveNodePosition(node, value);
+    if (!position) return null;
+    return position.row === currentRow;
+  },
+
+  // Returns `true` if the position descriptor's row equals that of the
+  // comparison row (the row used as a reference when determining the
+  // indentation level of the current row).
+  //
+  // For example:
+  //
+  //   (#is? indent.matchesComparisonRow endPosition)
+  //
+  // in a `@match` capture will pass if the captured node ends on the
+  // comparison row.
+  matchesComparisonRow(node, value, { comparisonRow }) {
+    let position = resolveNodePosition(node, value);
+    if (!position) return null;
+    return position.row === comparisonRow;
   }
 }
 

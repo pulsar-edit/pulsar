@@ -2,7 +2,7 @@
   name: (identifier) @name
   (#set! symbol.tag "function")) @definition.function
 
-(function
+(function_expression
   name: (identifier) @name
   (#set! symbol.tag "function")) @definition.function
 
@@ -36,7 +36,7 @@
   (lexical_declaration
     (variable_declarator
       name: (identifier) @name
-      value: [(arrow_function) (function)]) @definition.function)
+      value: [(arrow_function) (function_expression)]) @definition.function)
   (#strip! @doc "^[\\s\\*/]+|^[\\s\\*/]$")
   (#select-adjacent! @doc @definition.function)
 )
