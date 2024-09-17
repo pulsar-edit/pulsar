@@ -1287,12 +1287,12 @@ class WASMTreeSitterLanguageMode {
   // * `bufferRow` A {Number} indicating the buffer row.
   // * `tabLength` A {Number} signifying the length of a tab, in spaces,
   //   according to the current settings of the buffer.
-  // * `options` An optional {Object} will the following properties, all of
+  // * `options` An optional {Object} with the following properties, all of
   //   which are themselves optional:
   //   * `options.skipBlankLines`: {Boolean} indicating whether to ignore blank
   //     lines when determining which row to use as a reference row. Default is
   //     `true`. Irrelevant if `options.comparisonRow` is specified.
-  //   * `options.skipDedentCheck`: {Boolean} indicationg whether to skip the
+  //   * `options.skipDedentCheck`: {Boolean} indicating whether to skip the
   //     second phase of the check and determine only if the current row should
   //     _start out_ indented from the reference row.
   //   * `options.preserveLeadingWhitespace`: {Boolean} indicating whether to
@@ -1394,8 +1394,8 @@ class WASMTreeSitterLanguageMode {
     return results;
   }
 
-  // Given a {Point}, returns all injection {LanguageLayer}s whose extent
-  // includes that point. Does not include the root language layer.
+  // Given a {Point}, returns all injection {LanguageLayer}s that include that
+  // point. Does not include the root language layer.
   //
   // A {LanguageLayer} can have multiple content ranges. Its “extent” is a
   // single contiguous {Range} that includes all of its content ranges. To
@@ -1404,7 +1404,9 @@ class WASMTreeSitterLanguageMode {
   //
   // * point - A {Point} representing a buffer position.
   // * options - An {Object} containing these keys:
-  //   * exact - {Boolean} that checks content ranges instead of extent.
+  //   * exact - {Boolean} that, when `true`, checks for containment within the
+  //     layer's _content ranges_ instead of its _extent_ (see description
+  //     above).
   injectionLayersAtPoint(point, { exact = false } = {}) {
     let injectionMarkers = this.injectionsMarkerLayer.findMarkers({
       containsPosition: point
@@ -1423,8 +1425,8 @@ class WASMTreeSitterLanguageMode {
     return results;
   }
 
-  // Given a {Point}, returns all {LanguageLayer}s whose extent includes that
-  // point.
+  // Given a {Point}, returns all {LanguageLayer}s that include that point,
+  // including the root language layer.
   //
   // A {LanguageLayer} can have multiple content ranges. Its “extent” is a
   // single contiguous {Range} that includes all of its content ranges. To
@@ -1432,8 +1434,9 @@ class WASMTreeSitterLanguageMode {
   // `{ exact: true }` as the second argument.
   //
   // * point - A {Point} representing a buffer position.
-  // * options - An {Object} containing these keys:
-  //   * exact - {Boolean} that checks content ranges instead of extent.
+  // * options - An {Object} containing these keys: * exact - {Boolean} that,
+  //   when `true`, checks for containment within the layer's _content ranges_
+  //   instead of its _extent_ (see description above).
   languageLayersAtPoint(point, { exact = false } = {}) {
     let injectionLayers = this.injectionLayersAtPoint(point, { exact });
     return [
@@ -1464,6 +1467,9 @@ class WASMTreeSitterLanguageMode {
 
   // DEPRECATED
 
+  // Implemented for parity with `TextMateLanguageMode`. If you want to analyze
+  // the content of a row or other buffer range, you can inspect a Tree-sitter
+  // tree or run queries against it.
   tokenizedLineForRow(row) {
     const lineText = this.buffer.lineForRow(row);
     const tokens = [];
@@ -1515,6 +1521,9 @@ class WASMTreeSitterLanguageMode {
     });
   }
 
+  // Implemented for parity with `TextMateLanguageMode`. If you want to analyze
+  // the content of a point, you can inspect a Tree-sitter tree or run queries
+  // against it.
   tokenForPosition(point) {
     if (Array.isArray(point)) {
       point = new Point(...point);
