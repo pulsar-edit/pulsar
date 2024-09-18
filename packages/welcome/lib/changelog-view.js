@@ -50,22 +50,43 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Resolved some issues of using <code>pulsar -p</code> to access <code>ppm</code> in the command line on Windows.
+                Updated <code>web-tree-sitter</code> to version 0.23.0.
               </li>
               <li>
-                Added a new icon for Pulsar on Windows, increasing it's visual fidelity in most locations.
+                [language-css] Updated <code>tree-sitter-css</code> to the latest version
               </li>
               <li>
-                [snippets] Fixed an issue with expanding snippet variables in certain scenarios if the snippet inserted new lines into the buffer.
+                [language-gfm] Updated <code>tree-sitter-markdown</code> to the latest version.
               </li>
               <li>
-                Updated misconfigured links in the <code>CONTRIBUTING.md</code> file.
+                [language-html] Updated <code>tree-sitter-html</code> and <code>tree-sitter-embedded-template</code> to their latest versions.
               </li>
               <li>
-                [ppm] Resolved an issue that could prevent renaming an existing package.
+                [language-javascript] Updated <code>tree-sitter-javascript</code> to the latest version.
               </li>
               <li>
-                Various Tree-sitter improvements (folds, indents, custom queries, grammar updates...)
+                [language-typescript] Updated <code>tree-sitter-typescript</code> to the latest version.
+              </li>
+              <li>
+                Added a new <code>@match.next</code> capture for advanced control of how indentation should change from one line to the next.
+              </li>
+              <li>
+                Added new indentation-specific query predicates <code>indent.matchesComparisonRow</code> and <code>indent.matchesCurrentRow</code> for comparing arbitrary positions in a Tree-sitter node tree to the operative rows in an indentation suggestion query. Makes it possible to say things like “decrease the indent on line 10 if a statement ends on line 9.”
+              </li>
+              <li>
+                Renamed indentation directives <code>indent.matchIndentOf</code> and <code>indent.offsetIndent</code> to <code>indent.match</code> and <code>indent.offset</code>, respectively. The old names still work as aliases.
+              </li>
+              <li>
+                Improved the command-line <code>pulsar</code> script’s ability to find the user’s Pulsar installation location on Linux.
+              </li>
+              <li>
+                On macOS and Linux, <code>pulsar -p</code> now invokes <code>ppm</code> without having to launch Pulsar itself.
+              </li>
+              <li>
+                Added options to the Windows installer to add Pulsar and PPM to the PATH
+              </li>
+              <li>
+                Fixed <code>ppm rebuild<code> command on ARM (Apple Silicon) Macs
               </li>
             </ul>
 

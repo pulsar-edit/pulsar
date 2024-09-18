@@ -6,6 +6,35 @@
 
 ## [Unreleased]
 
+## 1.121.0
+
+- Updated `web-tree-sitter` to version 0.23.0.
+- [language-css] Updated `tree-sitter-css` to the latest version.
+- [language-gfm] Updated `tree-sitter-markdown` to the latest version.
+- [language-html] Updated `tree-sitter-html` and `tree-sitter-embedded-template` to their latest versions.
+- [language-javascript] Updated `tree-sitter-javascript` to the latest version.
+- [language-typescript] Updated `tree-sitter-typescript` to the latest version.
+- Added a new `@match.next` capture for advanced control of how indentation should change from one line to the next.
+- Added new indentation-specific query predicates `indent.matchesComparisonRow` and `indent.matchesCurrentRow` for comparing arbitrary positions in a Tree-sitter node tree to the operative rows in an indentation suggestion query. Makes it possible to say things like “decrease the indent on line 10 if a statement ends on line 9.”
+- Renamed indentation directives `indent.matchIndentOf` and `indent.offsetIndent` to `indent.match` and `indent.offset`, respectively. The old names still work as aliases.
+- Improved the command-line `pulsar` script’s ability to find the user’s Pulsar installation location on Linux.
+- On macOS and Linux, `pulsar -p` now invokes `ppm` without having to launch Pulsar itself.
+- Added options to the Windows installer to add Pulsar and PPM to the PATH
+- Fixed `ppm rebuild` command on ARM (Apple Silicon) Macs
+
+### Pulsar
+
+- Fixed: Tree-sitter rolling fixes: 1.121 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1085)
+- Updated: Update ppm to commit 97f4d201be013157756a76008bf0cb55e6a1fe35 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1094)
+- Fixed: Experiment: Redirect `-p`/`--package` to `ppm` via `pulsar.sh`… [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1066)
+- Added: [windows] Add PATH manipulation to Pulsar installer [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1071)
+- Updated: CI: Update Cirrus Rolling upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1086)
+
+### PPM
+
+- Fixed: Remove hard-coded architecture on Mac [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/141)
+- Updated: Begin less reliance on `async` package: Await as we go [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/134)
+
 ## 1.120.0
 
 - Resolved some issues of using `pulsar -p` to access `ppm` in the command line on Windows.
@@ -24,7 +53,6 @@
 - Fixed: CONTRIBUTING.MD link to section fixed [@gsabatini2016](https://github.com/pulsar-edit/pulsar/pull/1067)
 
 ### PPM
-- Updated: Begin less reliance on `async` package: Await as we go [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/134)
 - Fixed: Fix incorrect behavior on package rename [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/135)
 - Updated: Update many dependencies [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/133)
 - Revert: Revert "CI: Work around a weird bug in Yarn v1.x" [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/131)
