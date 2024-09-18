@@ -86,7 +86,7 @@ export default class ChangeLogView {
                 Added options to the Windows installer to add Pulsar and PPM to the PATH
               </li>
               <li>
-                Fixed <code>ppm rebuild<code> command on ARM (Apple Silicon) Macs
+                Fixed <code>ppm rebuild</code> command on ARM (Apple Silicon) Macs
               </li>
             </ul>
 
