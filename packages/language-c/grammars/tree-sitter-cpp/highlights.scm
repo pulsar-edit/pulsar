@@ -490,9 +490,6 @@
     @keyword.operator.bitwise.cpp)
 
 (binary_expression
-  ["<" ">"] @keyword.operator.comparison.cpp)
-
-(binary_expression
   ["+" "-" "*" "/" "%"] @keyword.operator.arithmetic.cpp)
 
 (unary_expression
@@ -533,6 +530,14 @@
     "(" @punctuation.definition.expression.begin.bracket.round.cpp
     ")" @punctuation.definition.expression.end.bracket.round.cpp
     (#set! capture.final true)))
+
+(template_argument_list
+  "<" @punctuation.definition.parameters.begin.bracket.angle.cpp
+  ">" @punctuation.definition.parameters.end.bracket.angle.cpp)
+
+(template_parameter_list
+  "<" @punctuation.definition.parameters.begin.bracket.angle.cpp
+  ">" @punctuation.definition.parameters.end.bracket.angle.cpp)
 
 "{" @punctuation.definition.block.begin.bracket.curly.cpp
 "}" @punctuation.definition.block.end.bracket.curly.cpp
