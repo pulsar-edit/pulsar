@@ -102,8 +102,13 @@ class SubsequenceProvider {
       '(){}[] :;,$@%',
       this.maxResultsPerBuffer
     ).then(matches => {
-      for (let k = 0; k < matches.length; k++) {
-        matches[k].configSuggestion = suggestions[matches[k].positions[0].row]
+      // The findWordsWithSubsequence method will return `null`
+      // if the async work was cancelled due to the buffer being
+      // mutated since it was enqueued.
+      if (matches) {
+        for (let k = 0; k < matches.length; k++) {
+          matches[k].configSuggestion = suggestions[matches[k].positions[0].row]
+        }
       }
       return matches
     })
