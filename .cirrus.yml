@@ -100,6 +100,8 @@ arm_linux_task:
     - yarn dist || yarn dist
   rename_binary_script:
     - node script/rename.js "ARM.Linux"
+  fix_linux_appimage_script:
+    - ./script/fix-linux-appimage.sh aarch64
   binary_artifacts:
     path: ./binaries/*
   test_script:
