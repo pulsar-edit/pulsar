@@ -302,9 +302,14 @@
 ; The "bar" in `$foo->bar()`.
 (member_call_expression
   name: (name) @support.other.function.method.php)
+(nullsafe_member_call_expression
+  name: (name) @support.other.function.method.php)
 
 ; The "bar" in `$foo->bar`.
 (member_access_expression
+  name: (name) @support.other.property.php
+  (#set! capture.final true))
+(nullsafe_member_access_expression
   name: (name) @support.other.property.php
   (#set! capture.final true))
 
@@ -312,9 +317,16 @@
 (member_call_expression
   name: (variable_name) @variable.other.method.php
   (#set! capture.final true))
+(nullsafe_member_call_expression
+  name: (variable_name) @variable.other.method.php
+  (#set! capture.final true))
 
 ; The "$bar" in `$foo->$bar`.
 (member_access_expression
+  name: (variable_name) @variable.other.property.php
+  (#set! capture.final true))
+; The "$bar" in `$foo->$bar`.
+(nullsafe_member_access_expression
   name: (variable_name) @variable.other.property.php
   (#set! capture.final true))
 
@@ -638,6 +650,7 @@
 ] @keyword.operator.assignment.compound.php
 
 "->" @keyword.operator.class.php
+"?->" @keyword.operator.class.null-safe.php
 "=>" @punctuation.separator.key-value.php
 
 "\\" @keyword.operator.namespace.php
