@@ -1,6 +1,6 @@
 const KeymapManager = require('atom-keymap');
 const WindowEventHandler = require('../src/window-event-handler');
-const { conditionPromise } = require('./async-spec-helpers');
+const { conditionPromise } = require('./helpers/async-spec-helpers');
 
 describe('WindowEventHandler', () => {
   let windowEventHandler;
