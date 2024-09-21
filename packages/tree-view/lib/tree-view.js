@@ -1,5 +1,5 @@
 const path = require('path');
-const { shell } = require('electron');
+const shell = require('electron').shell;
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const { CompositeDisposable, Emitter } = require('atom');
@@ -1291,15 +1291,6 @@ class TreeView {
           // moved everything in it
           fs.rmdirSync(initialPath);
         }
-        return result2;
-      })();
-    }
-  }
-
-  isAtomTreeViewEvent(e) {
-    for (let item of Array.from(e.dataTransfer.items)) {
-      if ((item.type === 'atom-tree-view-event') || (item.kind === 'file')) {
-        return true;
       }
     } catch (error) {
       this.emitter.emit('move-entry-failed', { initialPath, newPath });
