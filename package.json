@@ -309,7 +309,8 @@
     "keytar": "7.9.0",
     "nan": "2.19.0",
     "ctags": "https://github.com/pulsar-edit/node-ctags.git#c32ca6017dd3f4ea314d53b044225505820abbe3",
-    "superstring": "https://github.com/pulsar-edit/superstring.git#a46a625",
+    "superstring": "github:savetheclocktower/superstring#e5e848017f7a28fe250b45f8c7f8ed244371d33d",
+    "text-buffer/superstring": "github:savetheclocktower/superstring#e5e848017f7a28fe250b45f8c7f8ed244371d33d",
     "pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#567561f76e77333107a528c0aa0ee30863d796e1",
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244",
     "@electron/remote": "2.1.2"
