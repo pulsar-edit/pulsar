@@ -73,6 +73,11 @@
 
 (required_parameter
   pattern: (object_pattern
+    (rest_pattern (identifier) @variable.parameter.destructuring.rest._LANG_))
+    (#set! capture.final))
+
+(required_parameter
+  pattern: (object_pattern
     (object_assignment_pattern
       (shorthand_property_identifier_pattern) @variable.parameter.destructuring.with-default._LANG_))
     (#set! capture.final))
@@ -105,15 +110,30 @@
 ; The "bar" in `foo.bar = true`
 (assignment_expression
   left: (member_expression
-    property: (property_identifier) @variable.other.assignment.property._LANG_))
+    property: (property_identifier) @variable.other.assignment.property._LANG_)
+    (#set! capture.final))
 
 ; The "foo" in `foo += 1`.
 (augmented_assignment_expression
   left: (identifier) @variable.other.assignment._LANG_)
 
+; The "bar" in `foo.bar += 1`.
+(augmented_assignment_expression
+  left: (member_expression
+    property: (property_identifier) @variable.other.assignment.property._LANG_)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
+
 ; The "foo" in `foo++`.
 (update_expression
   argument: (identifier) @variable.other.assignment._LANG_)
+
+; The "bar" in `foo.bar++`.
+(update_expression
+  argument: (member_expression
+    property: (property_identifier) @variable.other.assignment.property._LANG_)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
 
 ; `object_pattern` appears to only be encountered in assignment expressions, so
 ; this won't match other uses of object/prop shorthand.
@@ -644,7 +664,7 @@
 
 ; Named function expressions:
 ; the "foo" in `let bar = function foo () {`
-(function
+(function_expression
   name: (identifier) @entity.name.function.definition._LANG_)
 
 ; Function definitions:
@@ -678,28 +698,28 @@
   left: (member_expression
     property: (property_identifier) @entity.name.function.definition._LANG_
     (#set! capture.final true))
-  right: [(arrow_function) (function)])
+  right: [(arrow_function) (function_expression)])
 
 ; Function variable assignment:
 ; The "foo" in `let foo = function () {`
 (variable_declarator
   name: (identifier) @entity.name.function.definition._LANG_
-  value: [(function) (arrow_function)])
+  value: [(function_expression) (arrow_function)])
 
 ; Function variable reassignment:
 ; The "foo" in `foo = function () {`
 (assignment_expression
   left: (identifier) @function
-  right: [(function) (arrow_function)])
+  right: [(function_expression) (arrow_function)])
 
 ; Object key-value pair function:
 ; The "foo" in `{ foo: function () {} }`
 (pair
   key: (property_identifier) @entity.name.function.method.definition._LANG_
-  value: [(function) (arrow_function)])
+  value: [(function_expression) (arrow_function)])
 
 ; Function is `storage.type` because it's a core language construct.
-(function "function" @storage.type.function._LANG_)
+(function_expression "function" @storage.type.function._LANG_)
 (function_declaration "function" @storage.type.function._LANG_)
 
 (generator_function "function" @storage.type.function._LANG_)
@@ -836,7 +856,11 @@
 "new" @keyword.operator.new._LANG_
 
 "=" @keyword.operator.assignment._LANG_
+
+["&" "|" "<<" ">>" ">>>" "~" "^"] @keyword.operator.bitwise.js
+
 (non_null_expression "!" @keyword.operator.non-null._LANG_)
+(variable_declarator "!" @keyword.operator.non-null._LANG_)
 (unary_expression "!" @keyword.operator.unary._LANG_)
 
 [
@@ -860,7 +884,7 @@
 (binary_expression
   ["/" "+" "-" "*" "**" "%"] @keyword.operator.arithmetic._LANG_)
 
-(unary_expression ["+" "-"] @keyword.operator.unary._LANG_)
+(unary_expression ["+" "-" "void"] @keyword.operator.unary._LANG_)
 
 (binary_expression
   [
@@ -962,7 +986,7 @@
   body: (statement_block) @meta.block.function._LANG_
   (#set! capture.final true))
 
-(function
+(function_expression
   body: (statement_block) @meta.block.function._LANG_
   (#set! capture.final true))
 

@@ -30,7 +30,7 @@ exports.activate = function () {
       content(callExpression) {
         const { lastChild } = callExpression;
         if (lastChild.type === 'template_string') {
-          return lastChild;
+          return stringFragmentsOfTemplateString(lastChild);
         }
       }
     });
@@ -50,7 +50,7 @@ exports.activate = function () {
       content(callExpression) {
         const { lastChild } = callExpression;
         if (lastChild.type === 'template_string') {
-          return lastChild;
+          return stringFragmentsOfTemplateString(lastChild);
         }
       }
     });
@@ -91,4 +91,10 @@ function languageStringForTemplateTag(tag) {
   } else {
     return tag;
   }
+}
+
+function stringFragmentsOfTemplateString(templateStringNode) {
+  return templateStringNode.children.filter(
+    c => c.type === 'string_fragment'
+  );
 }

@@ -16,16 +16,32 @@
     (#is? test.last true))
     (#set! indent.matchIndentOf parent.startPosition))
 
-; By default, `case` and `default` need to be indented one level more than their containing
-; `switch`.
-(["case" "default"] @match
+; By default, `case` and `default` need to be indented one level more than
+; their containing `switch`.
+([
+  (switch_case "case" @match)
+  (switch_default "default" @match)
+  ; We include this one (and check for a switch_statment ancestor) to handle
+  ; a commonly encountered error state when the user is in the middle of typing
+  ; a switch statement.
+  (ERROR "case" @match)
+]
+  (#is? test.descendantOfType switch_statement)
   (#set! indent.matchIndentOf parent.parent.startPosition)
   (#set! indent.offsetIndent 1)
   (#is-not? test.config "language-javascript.indentation.alignCaseWithSwitch"))
 
 ; When this config setting is enabled, `case` and `default` need to be indented
 ; to match their containing `switch`.
-(["case" "default"] @match
+([
+  (switch_case "case" @match)
+  (switch_default "default" @match)
+  ; We include this one (and check for a switch_statment ancestor) to handle
+  ; a commonly encountered error state when the user is in the middle of typing
+  ; a switch statement.
+  (ERROR "case" @match)
+]
+  (#is? test.descendantOfType switch_statement)
   (#set! indent.matchIndentOf parent.parent.startPosition)
   (#set! indent.offsetIndent 0)
   (#is? test.config "language-javascript.indentation.alignCaseWithSwitch"))
@@ -162,7 +178,8 @@
   (#is? test.config "language-javascript.indentation.indentParentheses"))
 
 
-["case" "default"] @indent
+(switch_case "case" @indent)
+(switch_default "default" @indent)
 
 ; JSX
 ; ===

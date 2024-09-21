@@ -252,8 +252,20 @@ module.exports = class GrammarRegistry {
     }
   }
 
-  // Extended: Returns a {Number} representing how well the grammar matches the
-  // `filePath` and `contents`.
+  // Extended: Evaluates a grammar's fitness for use for a certain file.
+  //
+  // By analyzing the file's extension and contents — plus other criteria, like
+  // the user's configuration — Pulsar will assign a score to this grammar that
+  // represents how suitable it is for the given file.
+  //
+  // Ultimately, whichever grammar scores highest for this file will be used
+  // to highlight it.
+  //
+  // * `grammar`: A given {Grammar}.
+  // * `filePath`: A {String} path to the file.
+  // * `contents`: The {String} contents of the file.
+  //
+  // Returns a {Number}.
   getGrammarScore(grammar, filePath, contents) {
     if (contents == null && fs.isFileSync(filePath)) {
       contents = fs.readFileSync(filePath, 'utf8');
@@ -284,8 +296,8 @@ module.exports = class GrammarRegistry {
         }
       }
 
-      // Prefer grammars with matching content regexes. Prefer a grammar with no content regex
-      // over one with a non-matching content regex.
+      // Prefer grammars with matching content regexes. Prefer a grammar with
+      // no content regex over one with a non-matching content regex.
       if (grammar.contentRegex) {
         const contentMatch = isTreeSitter
           ? grammar.contentRegex.test(contents)
@@ -297,7 +309,8 @@ module.exports = class GrammarRegistry {
         }
       }
 
-      // Prefer grammars that the user has manually installed over bundled grammars.
+      // Prefer grammars that the user has manually installed over bundled
+      // grammars.
       if (!grammar.bundledPackage) score += 0.01;
     }
 
@@ -515,7 +528,7 @@ module.exports = class GrammarRegistry {
     return disposable;
   }
 
-  // Experimental: Specify a type of syntax node that may embed other languages.
+  // Public: Specify a type of syntax node that may embed other languages.
   //
   // * `grammarId` The {String} id of the parent language
   // * `injectionPoint` An {Object} with the following keys:

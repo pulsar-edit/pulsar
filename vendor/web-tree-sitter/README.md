@@ -1,74 +1,84 @@
 # Building a custom web-tree-sitter
 
-Tree-sitter parsers often use external C scanners, and those scanners sometimes use functions in the C standard library. For this to work in a WASM environment, web-tree-sitter needs to have anticipated which stdlib functions will need to be available. If a tree-sitter parser uses stdlib function X, but X is not included in [this list of exports](https://github.com/tree-sitter/tree-sitter/blob/master/lib/binding_web/exports.json), the parser will fail to work and will throw an error whenever it hits a code path that uses the rogue function.
+Tree-sitter parsers often use external C scanners, and those scanners sometimes use functions in the C standard library. For this to work in a WASM environment, `web-tree-sitter` needs to have anticipated which stdlib functions will need to be available. If a Tree-sitter parser uses stdlib function X, but X is not included in [this list of symbols](https://github.com/tree-sitter/tree-sitter/blob/master/lib/src/wasm/stdlib-symbols.txt), the parser will fail to work and will throw an error whenever it hits a code path that uses the rogue function.
 
-For this reason, Pulsar builds a custom web-tree-sitter. Every time someone tries to integrate a new tree-sitter parser into a Pulsar grammar, they might find that the parser relies on some stdlib function we haven’t included yet — in which case they can let us know and we’ll be able to update our web-tree-sitter build so that it can export that function.
+For this reason, Pulsar builds a custom `web-tree-sitter`. Every time someone tries to integrate a new tree-sitter parser into a Pulsar grammar, they might find that the parser relies on some stdlib function we haven’t included yet — in which case they can let us know and we’ll be able to update our `web-tree-sitter` build so that it can export that function.
 
-Pulsar will need to do this until [tree-sitter#949](https://github.com/tree-sitter/tree-sitter/issues/949) is addressed in some way.
+The need to do this will decrease over time as C++ scanners are deprecated and as parsers are increasingly encouraged to use a fixed subset of possible stdlib exports, but it’s still necessary right now.
+
+We also take advantage of the custom build by adding a check for a common failure scenario — a parser trying to use a stdlib function that _hasn’t_ been exported — so that we can log a helpful error message to the console when it happens.
 
 ## Check out the modified branch for the version we’re targeting
 
-At time of writing, Pulsar was targeting web-tree-sitter version 0.20.7, so a branch exists [on our fork](https://github.com/pulsar-edit/tree-sitter/tree/v0-20-7-modified) called `v0-20-7-modified`. That branch contains a modified `exports.json` file and a modified script for building web-tree-sitter.
+At time of writing, Pulsar was targeting `web-tree-sitter` version **0.23.0**, so a branch exists [on our fork](https://github.com/pulsar-edit/tree-sitter/tree/v0-23-0-modified) called `v0-23-0-modified`. That branch contains a modified `stdlib-symbols.txt` file and a modified script for building `web-tree-sitter`.
 
-When we target a newer version of web-tree-sitter, a similar branch should be created against the corresponding upstream tag. The commits that were applied on the previous modified branch should be able to be cherry-picked onto the new one rather easily.
+When we target a newer version of `web-tree-sitter`, a similar branch should be created against the corresponding upstream tag. The commits that were applied on the previous modified branch should be able to be cherry-picked onto the new one rather easily.
 
-## Add whatever methods are needed to `exports.json`
+## Add whatever methods are needed to `stdlib-symbols.txt`
 
-For instance, tree-sitter-ruby introduced a new dependency on the C stdlib function `iswupper` a while back, and web-tree-sitter doesn’t export that one by default. So we can add the line
+For instance, one of the parsers we use depends on the C stdlib function `isalnum`, and `web-tree-sitter` doesn’t export that one by default. So we can add the line
 
 ```
-  "_iswupper",
+  "isalnum",
 ```
 
-in an appropriate place in `exports.json`, then rebuild web-tree-sitter so that the WASM-built version of the tree-sitter-ruby parser has that function available to it.
+in an appropriate place in `stdlib-symbols.txt`, then rebuild `web-tree-sitter` so that the WASM-built version of that parser has that function available to it.
 
-If a third-party tree-sitter grammar needs something more esoteric, our default position should be to add it to the build. If the export results in a major change in file size or — somehow — performance, then the change can be discussed.
+If a third-party tree-sitter grammar needs something more esoteric, we should encourage them to follow current best practices for Tree-sitter parsers. But we may still want to add that dependency to the build.
 
 ## Run `script/build-wasm` from the root
 
-To build web-tree-sitter for a particular version, make sure you’re using the appropriate version of Emscripten. [This document](https://github.com/sogaiu/ts-questions/blob/master/questions/which-version-of-emscripten-should-be-used-for-the-playground/README.md) is useful at matching up tree-sitter versions with Emscripten versions.
+To build `web-tree-sitter` for a particular version, make sure you’re using the appropriate version of Emscripten. [This document](https://github.com/sogaiu/ts-questions/blob/master/questions/which-version-of-emscripten-should-be-used-for-the-playground/README.md) is useful at matching up tree-sitter versions with Emscripten versions.
 
-The default `build-wasm` script performs minification with terser. That’s easy enough to turn off — and we do — but even without minifcation, emscripten generates a JS file that doesn’t have line breaks or indentation. We fix this by running `js-beautify` as a final step.
-
-Pulsar, as a desktop app, doesn’t gain a _lot_ from minification, and ultimately it’s better to have a source file that the user can more easily debug if necessary. And it makes the next change a bit easier:
+The default `build-wasm` script now skips minification, so we no longer have to un-minify the JavaScript output.
 
 ## Add a warning message
 
-When a parser tries to use a stdlib function that isn’t exported by web-tree-sitter, the error that’s thrown is not very useful. So we try to detect when that scenario is going to happen and insert a warning in the console to help users that might otherwise be befuddled.
+When a parser tries to use a stdlib function that isn’t exported by `web-tree-sitter`, the error that’s thrown is not very useful. So we try to detect when that scenario is going to happen and insert a warning in the console to help users that might otherwise be befuddled.
 
-This may be automated in the future, but for now you can modify `tree-sitter.js` to include the `checkForAsmVersion` function:
+This may be automated in the future, but for now you can modify `tree-sitter.js` so that this function…
 
 ```js
-var Module = typeof Module !== "undefined" ? Module : {};
-var TreeSitter = function() {
-
-  function checkForAsmVersion(prop) {
-    if (!(prop in Module['asm'])) {
-      console.warn(`Warning: parser wants to call function ${prop}, but it is not defined. If parsing fails, this is probably the reason why. Please report this to the Pulsar team so that this parser can be supported properly.`);
-    }
+function resolveSymbol(sym) {
+  var resolved = resolveGlobalSymbol(sym).sym;
+  if (!resolved && localScope) {
+    resolved = localScope[sym];
   }
-
-  var initPromise;
-  var document = typeof window == "object" ? {
-    currentScript: window.document.currentScript
-  } : null;
+  if (!resolved) {
+    resolved = moduleExports[sym];
+  }
+  return resolved;
+}
 
 ```
 
-You can then search for this line
+…has an extra check at the end:
 
 ```js
-if (!resolved) resolved = resolveSymbol(prop, true);
+function resolveSymbol(sym) {
+  var resolved = resolveGlobalSymbol(sym).sym;
+  if (!resolved && localScope) {
+    resolved = localScope[sym];
+  }
+  if (!resolved) {
+    resolved = moduleExports[sym];
+  }
+  if (!resolved) {
+    console.warn(`Warning: parser wants to call function ${sym}, but it is not defined. If parsing fails, this is probably the reason why. Please report this to the Pulsar team so that this parser can be supported properly.`);
+  }
+  return resolved;
+}
 ```
 
-and add the following line right below it:
 
-```js
-checkForAsmVersion(prop);
-```
-
-The line in question is [generated by emscripten](https://github.com/emscripten-core/emscripten/blob/67ebee3261629f7e3c2bd24b61098af0c730d8d9/src/library_dylink.js#L699), so if it changes in the future, you should be able to look up its equivalent in the correct version of emscripten.
+The function in question is [generated by emscripten](https://github.com/emscripten-core/emscripten/blob/127fb03dad7288a71f51bd46be49f1da8bdb0fa8/src/library_dylink.js#L665-L677) and is the rough equivalent of what we’d get if we built with assertions enabled (though less generic and more tailored to Pulsar). If the implementation changes on the emscripten side, you should still be able to find the equivalent logic.
 
 ## Copy it to `vendor`
 
 Under `lib/binding_web` you’ll find the built files `tree-sitter.js` and `tree-sitter.wasm`. Copy both to Pulsar’s `vendor/tree-sitter` directory. Relaunch Pulsar and do a smoke test with a couple of existing grammars to make sure you didn’t break anything.
+
+## Commit it
+
+Be sure to mention the version you’re upgrading to **in the commit message** so grammar authors have some way of discerning the version of `web-tree-sitter` they should target.
+
+(It’s a stretch goal to include this information in a more structured format so that it can be inspected at runtime.)

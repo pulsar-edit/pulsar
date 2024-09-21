@@ -1,14 +1,12 @@
-{
+module.exports = {
   "env": { "jasmine": true },
+  "globals": {
+    "waitsForPromise": true
+  },
   "rules": {
     "node/no-unpublished-require": "off",
     "node/no-extraneous-require": "off",
     "no-unused-vars": "off",
-    "no-empty": "off",
-    "object-curly-spacing": ["error", "always"],
-    "semi": ["error", "always"]
-  },
-  "globals": {
-    "waitsForPromise": true
+    "no-empty": "off"
   }
-}
+};

@@ -1,6 +1,5 @@
 [
   (method)
-  (comment)
   (singleton_method)
   (class)
   (module)
@@ -16,6 +15,10 @@
   (string_array)
 ] @fold
 
+; Multi-line comment syntax (=begin…=end) is obscure and out of favor, but we
+; might as well make it foldable.
+((comment) @fold
+  (#set! fold.endAt endPosition))
 
 ; Fold from `if` to the next `elsif` or `else` in the chain.
 ((if

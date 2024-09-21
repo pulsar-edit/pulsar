@@ -7,7 +7,7 @@ parser: 'tree-sitter-php'
 injectionRegex: '^(internal-php)$'
 
 treeSitter:
-  parserSource: 'github:tree-sitter/tree-sitter-php#b569a5f2c0d592e67430520d1a0e1f765d83ceb0'
+  parserSource: 'github:tree-sitter/tree-sitter-php#27afeb02e49ff30acd17b67897b1c0114561a38c'
   grammar: 'tree-sitter/tree-sitter-php.wasm'
   highlightsQuery: 'tree-sitter/queries/highlights.scm'
   tagsQuery: 'tree-sitter/queries/tags.scm'

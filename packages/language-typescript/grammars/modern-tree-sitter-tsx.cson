@@ -11,11 +11,12 @@ comments:
   start: '// '
 
 treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-typescript#v0.23.0'
   languageSegment: 'ts.tsx'
   grammar: 'tree-sitter-tsx/tree-sitter-tsx.wasm'
   highlightsQuery: [
-    'common/highlights.scm'
     'tree-sitter-tsx/highlights.scm'
+    'common/highlights.scm'
   ]
   indentsQuery: [
     'common/indents.scm'

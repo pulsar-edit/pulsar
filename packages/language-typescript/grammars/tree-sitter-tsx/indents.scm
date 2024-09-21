@@ -34,7 +34,7 @@
 ; point, so the usual heuristic won't work. Instead we set `indent.force` and
 ; use `test.lastTextOnRow` to ensure that the dedent fires exactly once while
 ; typing.
-((jsx_self_closing_element ">" @dedent)
+((jsx_self_closing_element "/>" @dedent)
   (#is-not? test.startsOnSameRowAs parent.firstChild.startPosition)
   (#is? test.lastTextOnRow)
   (#set! indent.force true))

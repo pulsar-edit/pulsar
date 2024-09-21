@@ -6,7 +6,7 @@ parser: 'tree-sitter-javascript'
 injectionRegex: '^(js|javascript|JS|JAVASCRIPT)$'
 
 treeSitter:
-  parserSource: 'github:tree-sitter/tree-sitter-javascript#f1e5a09b8d02f8209a68249c93f0ad647b228e6e'
+  parserSource: 'github:tree-sitter/tree-sitter-javascript#v0.23.0'
   grammar: 'tree-sitter/tree-sitter-javascript.wasm'
   highlightsQuery: 'tree-sitter/highlights.scm'
   localsQuery: 'tree-sitter/locals.scm'

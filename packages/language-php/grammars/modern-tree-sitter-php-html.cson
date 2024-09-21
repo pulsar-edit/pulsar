@@ -5,8 +5,17 @@ parser: 'tree-sitter-php'
 
 injectionRegex: 'php|PHP'
 
+# The TextMate grammar has an elaborate `firstLineMatch` pattern defined with
+# Oniguruma; it catches hashbang syntax and complex vim/emacs modelines along
+# with the typical `<?php` prefix.
+#
+# We can't compete with all that, but we can catch obvious instances of
+# shebangs and `<?php`s. In fact, we must, or else the TextMate grammar will be
+# ranked higher for certain files.
+firstLineRegex: '^\\s*<\\?(?:php|PHP|=|\\s|$)|^\\#!.*(?:\\s|\\/)php\\d?'
+
 treeSitter:
-  parserSource: 'github:tree-sitter/tree-sitter-php#b569a5f2c0d592e67430520d1a0e1f765d83ceb0'
+  parserSource: 'github:tree-sitter/tree-sitter-php#27afeb02e49ff30acd17b67897b1c0114561a38c'
   grammar: 'tree-sitter/tree-sitter-php.wasm'
 
 fileTypes: [

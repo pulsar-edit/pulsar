@@ -11,6 +11,7 @@ comments:
   start: '// '
 
 treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-typescript#v0.23.0'
   languageSegment: 'ts'
   grammar: 'tree-sitter-typescript/tree-sitter-typescript.wasm'
   highlightsQuery: 'common/highlights.scm'
