@@ -136,7 +136,7 @@
     "mock-spawn": "^0.2.6",
     "normalize-package-data": "3.0.2",
     "notifications": "file:./packages/notifications",
-    "nsfw": "2.2.2",
+    "nsfw": "^2.2.5",
     "one-dark-syntax": "file:packages/one-dark-syntax",
     "one-dark-ui": "file:packages/one-dark-ui",
     "one-light-syntax": "file:packages/one-light-syntax",
