@@ -764,10 +764,25 @@ module.exports = class TextEditorComponent {
         className: 'line dummy',
         style: { position: 'absolute', visibility: 'hidden' }
       },
-      $.span({ ref: 'normalWidthCharacterSpan' }, NORMAL_WIDTH_CHARACTER),
-      $.span({ ref: 'doubleWidthCharacterSpan' }, DOUBLE_WIDTH_CHARACTER),
-      $.span({ ref: 'halfWidthCharacterSpan' }, HALF_WIDTH_CHARACTER),
-      $.span({ ref: 'koreanCharacterSpan' }, KOREAN_CHARACTER)
+      // We used to put each of these characters inside the same block-level
+      // element, but that resulted in different, less-accurate measurements
+      // than when they each exist in isolation.
+      $.div(
+        {},
+        $.span({ ref: 'normalWidthCharacterSpan' }, NORMAL_WIDTH_CHARACTER)
+      ),
+      $.div(
+        {},
+        $.span({ ref: 'doubleWidthCharacterSpan' }, DOUBLE_WIDTH_CHARACTER)
+      ),
+      $.div(
+        {},
+        $.span({ ref: 'halfWidthCharacterSpan' }, HALF_WIDTH_CHARACTER)
+      ),
+      $.div(
+        {},
+        $.span({ ref: 'koreanCharacterSpan' }, KOREAN_CHARACTER)
+      )
     );
   }
 
@@ -2450,9 +2465,17 @@ module.exports = class TextEditorComponent {
   }
 
   measureCharacterDimensions() {
+    let lines = [
+      'normalWidthCharacterSpan',
+      'doubleWidthCharacterSpan',
+      'halfWidthCharacterSpan',
+      'koreanCharacterSpan'
+    ];
     this.measurements.lineHeight = Math.max(
       1,
-      this.refs.characterMeasurementLine.getBoundingClientRect().height
+      // Each of these characters exists in its own block-level element. Set
+      // the line height to the tallest of these four characters.
+      ...lines.map(l => this.refs[l].parentNode.getBoundingClientRect().height)
     );
     this.measurements.baseCharacterWidth = this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.doubleWidthCharacterWidth = this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;
