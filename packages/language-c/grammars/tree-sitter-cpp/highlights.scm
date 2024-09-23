@@ -87,21 +87,53 @@
 (call_expression
   function: (qualified_identifier
     name: (identifier) @support.other.function.cpp)
-  (#set! capture.final true))
+  (#set! capture.final))
+
+; The "foo" in `void Bar::foo () {`.
+(function_declarator
+  declarator: (qualified_identifier
+    name: (identifier) @entity.name.function.cpp)
+    (#set! capture.final))
+
+; The "foo" in `void Bar::foo () {`.
+(function_declarator
+  declarator: (qualified_identifier
+    name: (identifier) @entity.name.function.cpp)
+    (#set! capture.final))
+
+; The "foo" in `void Bar::Baz::foo () {`, regardless of namespace depth.
+(qualified_identifier
+  name: (identifier) @entity.name.function.cpp
+  (#set! capture.final)
+  (#is? test.descendantOfType "function_declarator"))
+
+; The "Bar" in `void Bar::~Bar () {`.
+(function_declarator
+  declarator: (qualified_identifier
+    name: (destructor_name) @entity.name.function.cpp)
+    (#set! capture.final))
 
 ; The "foo" in `foo<SomeType>(...)`.
 (call_expression
   function: (template_function
     name: (identifier) @support.other.function.cpp)
-  (#set! capture.final true))
+  (#set! capture.final))
 
 ; The "foo" in `troz::foo<SomeType>(...)`.
 (call_expression
   function: (qualified_identifier
     name: (template_function
       name: (identifier) @support.other.function.cpp))
-  (#set! capture.final true))
+  (#set! capture.final))
 
+; A function name in a method declaration within a class specifier.
+(function_declarator
+  (field_identifier) @entity.name.function.method.cpp)
+
+; The "Foo" in `void Foo::bar() {` and `Foo::bar();`, regardless of namespace
+; depth.
+(qualified_identifier
+  scope: (namespace_identifier) @support.other.namespace.cpp)
 
 (string_literal (escape_sequence) @constant.character.escape.cpp)
 (char_literal (escape_sequence) @constant.character.escape.cpp)

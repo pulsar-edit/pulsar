@@ -42,6 +42,9 @@ public:
 
   ~vulkan_instance();
   // <- keyword.operator.destructor.cpp
+
+  void some_function();
+    // ^ entity.name.function.method
 };
 // <- punctuation.definition.block.end.bracket.curly
  // <- punctuation.terminator.statement
@@ -53,9 +56,10 @@ struct queue_family_indices {
 int main() {
 // <- support.storage.type.builtin
 //  ^ entity.name.function.cpp
-    std::cout << "Hello World!";
+    std::cout << "Hello, \" World!";
     // ^ keyword.operator.accessor.namespace
            // ^ keyword.operator.bitwise.cpp
+                      // ^ constant.character.escape.cpp
     return 0;
  // ^ keyword.control.return.cpp
         // ^ constant.numeric
@@ -95,6 +99,19 @@ const char *get_string() {
   return "Hello, world!";
       // ^ punctuation.definition.string.begin
       // ^^^^^^^^^^^^^^^ string.quoted.double.cpp
+}
+
+void vulkan_instance::some_function () {
+  // ^ support.other.namespace.cpp
+                   // ^ entity.name.function
+}
+
+void foo::bar::baz () {
+  // ^ support.other.namespace.cpp
+       // ^ support.other.namespace.cpp
+            // ^ entity.name.function
+
+  vulkan_instance::some_function();
 }
 
 enum Color {

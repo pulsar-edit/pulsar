@@ -24,7 +24,8 @@ int table[4];
 int main() {
 // <- support.storage.type.builtin
   //^ entity.name.function
-  printf("Hello, World!");
+  printf("Hello,\" World!");
+             // ^ constant.character.escape.c
   // <- support.function.c99
       // ^ string.quoted.double.c
 

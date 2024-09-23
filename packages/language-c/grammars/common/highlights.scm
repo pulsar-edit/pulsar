@@ -143,6 +143,7 @@
 ; FUNCTIONS
 ; =========
 
+; The "foo" in `void foo() {`.
 (function_declarator
   (identifier) @entity.name.function._LANG_)
 
@@ -158,6 +159,7 @@
     field: (field_identifier) @support.other.function._LANG_)
     (#set! capture.final true))
 
+; The "foo" in `foo();`.
 (call_expression
   (identifier) @support.other.function._LANG_
   (#set! capture.final true))
