@@ -166,7 +166,7 @@ module.exports = class GrammarListView {
 function getLanguageModeConfig() {
   let isTreeSitterMode = atom.config.get('core.useTreeSitterParsers');
   if (!isTreeSitterMode) return 'textmate';
-  return 'wasm-tree-sitter';
+  return 'web-tree-sitter';
 }
 
 function isModernTreeSitter(grammar) {
