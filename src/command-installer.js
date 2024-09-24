@@ -18,7 +18,33 @@ module.exports = class CommandInstaller {
     return process.resourcesPath;
   }
 
-  installShellCommandsInteractively() {
+  getScriptBaseName() {
+    if (this.scriptBaseName) {
+      return this.scriptBaseName;
+    } else if (process.env.ATOM_BASE_NAME) {
+      // If we launched via shell script, this environment variable will tell
+      // us the right name.
+      return process.env.ATOM_BASE_NAME;
+    }
+    // TODO: For now we can infer it from the presence of a file in the
+    // resources directory, but a better way would be to bake it the right
+    // metadat at build time.
+    for (let name in ['pulsar', 'pulsar-next']) {
+      for (let ext in ['sh', 'cmd']) {
+        let candidate = path.join(
+          this.getResourcesDirectory(),
+          `${name}.${ext}`
+        );
+        if (fs.existsSync(candidate)) {
+          this.scriptBaseName = name;
+          return name;
+        }
+      }
+    }
+    return 'pulsar';
+  }
+
+  async installShellCommandsInteractively() {
     const showErrorDialog = error => {
       this.applicationDelegate.confirm(
         {
@@ -59,24 +85,27 @@ module.exports = class CommandInstaller {
   }
 
   installAtomCommand(askForPrivilege, callback) {
+    let scriptName = this.getScriptBaseName();
     this.installCommand(
-      path.join(this.getResourcesDirectory(), 'pulsar.sh'),
-      'pulsar',
+      path.join(this.getResourcesDirectory(), `${scriptName}.sh`),
+      scriptName,
       askForPrivilege,
       callback
     );
   }
 
   installApmCommand(askForPrivilege, callback) {
+    let isNextReleaseChannel = this.getScriptBaseName().endsWith('-next');
+    let ppmName = isNextReleaseChannel ? 'ppm-next' : 'ppm';
     this.installCommand(
       path.join(
         this.getResourcesDirectory(),
         'app',
         'ppm',
         'bin',
-        'apm'
+        ppmName
       ),
-      'ppm',
+      ppmName,
       askForPrivilege,
       callback
     );
