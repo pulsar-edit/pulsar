@@ -11,9 +11,9 @@ else
   exit 1
 fi
 
-BASENAME=$(basename $0)
-BASENAME=${BASENAME%.*}
-case BASENAME in
+ATOM_BASE_NAME=$(basename $0)
+ATOM_BASE_NAME=${ATOM_BASE_NAME%.*}
+case ATOM_BASE_NAME in
   pulsar-next)
     CHANNEL=next
     ;;
@@ -21,6 +21,8 @@ case BASENAME in
     CHANNEL=stable
     ;;
 esac
+# Capture the name of this script so that we can use it at runtime.
+export ATOM_BASE_NAME
 
 # Only set the ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT env var if it hasn't
 # been set.
@@ -90,7 +92,7 @@ fi
 # Keep a different $ATOM_HOME for each release channel.
 if [ -z "$ATOM_HOME" ]
 then
-  ATOM_HOME="$HOME/.$BASENAME"
+  ATOM_HOME="$HOME/.${ATOM_BASE_NAME}"
 fi
 mkdir -p "$ATOM_HOME"
 export ATOM_HOME
