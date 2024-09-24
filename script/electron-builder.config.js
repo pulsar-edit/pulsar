@@ -1,11 +1,24 @@
 const Path = require('path');
+const dedent = require('dedent');
 const normalizePackageData = require('normalize-package-data');
 const FS = require('fs/promises');
-const { existsSync } = require('fs');
+const { existsSync, writeFileSync } = require('fs');
 const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers')
 const generateMetadata = require('./generate-metadata-for-builder')
 const macBundleDocumentTypes = require("./mac-bundle-document-types.js");
+
+// Ensure the user has initialized the `ppm` submodule before they try to build
+// the app.
+if (!existsSync(Path.join('ppm', 'bin'))) {
+  console.error(dedent`
+    \`ppm\` not detected. Please run:
+
+      git submodule init
+      git submodule update
+  `);
+  process.exit(2);
+}
 
 // Monkey-patch to not remove things I explicitly didn't say to remove.
 // See: https://github.com/electron-userland/electron-builder/issues/6957
@@ -77,6 +90,8 @@ const ARGS = yargs(hideBin(process.argv))
 
 const displayName = ARGS.next ? 'PulsarNext' : 'Pulsar';
 const baseName = ARGS.next ? 'pulsar-next' : 'pulsar';
+const ppmBaseName = ARGS.next ? 'ppm-next' : 'ppm';
+
 let options = {
   appId: `dev.pulsar-edit.${baseName}`,
   npmRebuild: false,
@@ -202,7 +217,8 @@ let options = {
         // (used only by desktops to show it on bar/switcher and app menus).
         "from": ICONS.svg,
         "to": "pulsar.svg"
-      }
+      },
+      { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` }
     ]
   },
 
@@ -222,7 +238,10 @@ let options = {
         { "CFBundleURLSchemes": [ "atom" ] },
         { "CFBundleURLName": "Atom Shared Session Protocol" }
       ]
-    }
+    },
+    extraResources: [
+      { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` }
+    ]
   },
 
   dmg: { sign: false },
@@ -233,7 +252,8 @@ let options = {
       { from: ICONS.ico, to: 'pulsar.ico' },
       { from: 'resources/win/pulsar.cmd', to: `${baseName}.cmd` },
       { from: 'resources/win/pulsar.js', to: `${baseName}.js` },
-      { from: 'resources/win/modifyWindowsPath.ps1', to: 'modifyWindowsPath.ps1' }
+      { from: 'resources/win/modifyWindowsPath.ps1', to: 'modifyWindowsPath.ps1' },
+      { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
     ],
     target: [
       { target: 'nsis' },
