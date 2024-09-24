@@ -184,15 +184,9 @@ function getParserPreferenceForScopeName(scopeName) {
     'core.useTreeSitterParsers',
     { scope: [scopeName] }
   );
-  let useLegacyTreeSitter = atom.config.get(
-    'core.useLegacyTreeSitter',
-    { scope: [scopeName] }
-  );
 
   if (!useTreeSitterParsers) {
     return 'textmate';
-  } else if (useLegacyTreeSitter) {
-    return 'node-tree-sitter';
   } else {
     return 'web-tree-sitter';
   }
@@ -203,9 +197,7 @@ function getBadgeTextForGrammar(grammar) {
     case 'Grammar':
       return 'TextMate';
     case 'WASMTreeSitterGrammar':
-      return 'Modern Tree-sitter';
-    case 'TreeSitterGrammar':
-      return 'Legacy Tree-sitter';
+      return 'Tree-sitter';
   }
 }
 
@@ -219,11 +211,6 @@ const BADGE_COLORS_BY_LANGUAGE_MODE_CONFIG = {
     'WASMTreeSitterGrammar': 'badge-success',
     'TreeSitterGrammar': 'badge-warning',
     'Grammar': 'badge-info'
-  },
-  'node-tree-sitter': {
-    'TreeSitterGrammar': 'badge-success',
-    'WASMTreeSitterGrammar': 'badge-warning',
-    'Grammar': 'badge-info'
   }
 };
 
@@ -235,8 +222,6 @@ function getBadgeColorForGrammar(grammar) {
 
 function getGrammarScore(grammar) {
   let languageParser = getParserPreferenceForScopeName(grammar.scopeName);
-  if (isModernTreeSitter(grammar)) {
-    return languageParser === 'node-tree-sitter' ? -1 : -2;
-  }
+  if (isModernTreeSitter(grammar)) return -2;
   return languageParser === 'textmate' ? -3 : 0;
 }
