@@ -4,7 +4,8 @@ const { ipcRenderer } = require('electron');
 const path = require('path');
 const fs = require('fs-plus');
 const { CompositeDisposable, Disposable } = require('event-kit');
-const scrollbarStyle = require('scrollbar-style');
+// TEMP: Disabled until we can make it context-safe.
+// const scrollbarStyle = require('scrollbar-style');
 const _ = require('underscore-plus');
 
 class WorkspaceElement extends HTMLElement {
@@ -34,20 +35,21 @@ class WorkspaceElement extends HTMLElement {
   }
 
   observeScrollbarStyle() {
-    this.subscriptions.add(
-      scrollbarStyle.observePreferredScrollbarStyle(style => {
-        switch (style) {
-          case 'legacy':
-            this.classList.remove('scrollbars-visible-when-scrolling');
-            this.classList.add('scrollbars-visible-always');
-            break;
-          case 'overlay':
-            this.classList.remove('scrollbars-visible-always');
-            this.classList.add('scrollbars-visible-when-scrolling');
-            break;
-        }
-      })
-    );
+    // TEMP: Disabled until we can make it context-safe.
+    // this.subscriptions.add(
+    //   scrollbarStyle.observePreferredScrollbarStyle(style => {
+    //     switch (style) {
+    //       case 'legacy':
+    //         this.classList.remove('scrollbars-visible-when-scrolling');
+    //         this.classList.add('scrollbars-visible-always');
+    //         break;
+    //       case 'overlay':
+    //         this.classList.remove('scrollbars-visible-always');
+    //         this.classList.add('scrollbars-visible-when-scrolling');
+    //         break;
+    //     }
+    //   })
+    // );
   }
 
   observeTextEditorFontConfig() {
@@ -362,7 +364,7 @@ class WorkspaceElement extends HTMLElement {
   }
 
   nearestVisiblePaneInDirection(direction, pane) {
-    const distance = function(pointA, pointB) {
+    const distance = function (pointA, pointB) {
       const x = pointB.x - pointA.x;
       const y = pointB.y - pointA.y;
       return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
