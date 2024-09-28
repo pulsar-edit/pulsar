@@ -1,6 +1,7 @@
 const AtomWindow = require('./atom-window');
 const ApplicationMenu = require('./application-menu');
 const AtomProtocolHandler = require('./atom-protocol-handler');
+const { onDidChangeScrollbarStyle, getScrollbarStyle } = require('./scrollbar-style');
 const StorageFolder = require('../storage-folder');
 const Config = require('../config');
 const ConfigFile = require('../config-file');
@@ -122,6 +123,10 @@ const decryptOptions = (optionsMessage, secret) => {
 
   return JSON.parse(message);
 };
+
+ipcMain.handle('getScrollbarStyle', () => {
+  return getScrollbarStyle();
+});
 
 ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.isDefaultProtocolClient(protocol, path, args);
@@ -376,7 +381,7 @@ module.exports = class AtomApplication extends EventEmitter {
       if (this.getAllWindows().length === 0) {
         console.log("Quitting.");
         app.quit();
-      };
+      }
     } else if (
       (pathsToOpen && pathsToOpen.length > 0) ||
       (foldersToOpen && foldersToOpen.length > 0)
@@ -448,6 +453,9 @@ module.exports = class AtomApplication extends EventEmitter {
         window.browserWindow.removeListener('blur', blurHandler);
       });
       window.browserWindow.webContents.once('did-finish-load', blurHandler);
+      onDidChangeScrollbarStyle((newValue) => {
+        window.browserWindow.webContents.send('did-change-scrollbar-style', newValue);
+      });
       this.saveCurrentWindowOptions(false);
     }
   }
@@ -600,7 +608,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
       this.on('application:open', () => {
         const win = this.focusedWindow();
-        if(win) {
+        if (win) {
           win.sendCommand('application:open')
         } else {
           this.promptForPathToOpen(
@@ -611,7 +619,7 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       this.on('application:open-file', () => {
         const win = this.focusedWindow();
-        if(win) {
+        if (win) {
           win.sendCommand('application:open-file')
         } else {
           this.promptForPathToOpen(
@@ -622,7 +630,7 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       this.on('application:open-folder', () => {
         const win = this.focusedWindow();
-        if(win) {
+        if (win) {
           win.sendCommand('application:open-folder')
         } else {
           this.promptForPathToOpen(
@@ -655,7 +663,7 @@ module.exports = class AtomApplication extends EventEmitter {
         const window = this.focusedWindow();
         if (window) window.minimize();
       });
-      this.on('application:zoom', function() {
+      this.on('application:zoom', function () {
         const window = this.focusedWindow();
         if (window) window.maximize();
       });
@@ -1693,7 +1701,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
     const timeoutInSeconds = Number.parseFloat(timeout);
     if (!Number.isNaN(timeoutInSeconds)) {
-      const timeoutHandler = function() {
+      const timeoutHandler = function () {
         console.log(
           `The test suite has timed out because it has been running for more than ${timeoutInSeconds} seconds.`
         );

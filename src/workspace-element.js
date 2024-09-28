@@ -1,12 +1,28 @@
 'use strict';
 
+const ipcHelpers = require('./ipc-helpers');
 const { ipcRenderer } = require('electron');
 const path = require('path');
 const fs = require('fs-plus');
 const { CompositeDisposable, Disposable } = require('event-kit');
-// TEMP: Disabled until we can make it context-safe.
-// const scrollbarStyle = require('scrollbar-style');
 const _ = require('underscore-plus');
+
+// Asks for the current scrollbar style, then subscribes to a handler so it can
+// be notified of further changes. Returns a `Disposable`.
+function observeScrollbarStyle(callback) {
+  // We want to act like `atom.config.observe`: set up a change handler, but
+  // immediately invoke the callback with the current value as well. Since the
+  // main process knows the answer here, we've got to go async.
+  ipcRenderer.invoke('getScrollbarStyle').then((value) => {
+    if (value) callback(value);
+  });
+  let result = ipcHelpers.on(
+    ipcRenderer,
+    'did-change-scrollbar-style',
+    (_, style) => callback(style)
+  );
+  return result;
+}
 
 class WorkspaceElement extends HTMLElement {
   connectedCallback() {
@@ -35,21 +51,29 @@ class WorkspaceElement extends HTMLElement {
   }
 
   observeScrollbarStyle() {
-    // TEMP: Disabled until we can make it context-safe.
-    // this.subscriptions.add(
-    //   scrollbarStyle.observePreferredScrollbarStyle(style => {
-    //     switch (style) {
-    //       case 'legacy':
-    //         this.classList.remove('scrollbars-visible-when-scrolling');
-    //         this.classList.add('scrollbars-visible-always');
-    //         break;
-    //       case 'overlay':
-    //         this.classList.remove('scrollbars-visible-always');
-    //         this.classList.add('scrollbars-visible-when-scrolling');
-    //         break;
-    //     }
-    //   })
-    // );
+    this.subscriptions.add(
+      // On macOS, this will update the styles for all `WorkspaceElement`
+      // scrollbars when the user changes the “Show scroll bars…” setting in
+      // System Settings.
+      //
+      // This event isn't emitted by the main process on other platforms, so
+      // it won't do anything on Windows or Linux.
+      observeScrollbarStyle((style) => {
+        console.log('current scrollbar style is:', style);
+        switch (style) {
+          case 'legacy':
+            this.classList.remove('scrollbars-visible-when-scrolling');
+            this.classList.add('scrollbars-visible-always');
+            break;
+          case 'overlay':
+            this.classList.remove('scrollbars-visible-always');
+            this.classList.add('scrollbars-visible-when-scrolling');
+            break;
+          default:
+            console.warn('Unrecognized value for scrollbar style:', style);
+        }
+      })
+    );
   }
 
   observeTextEditorFontConfig() {
