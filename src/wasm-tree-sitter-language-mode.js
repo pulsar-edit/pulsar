@@ -1830,7 +1830,7 @@ class FoldResolver {
         // implied in the existing specs.
         return new Point(end.row - 1, Infinity);
       } else {
-        return new Point.fromObject(end, true);
+        return Point.fromObject(end, true);
       }
     } else {
       return null;
