@@ -3210,7 +3210,6 @@ describe("TreeView", function () {
           jasmine.useRealClock();
           const callback = jasmine.createSpy('onEntryDeleted');
           treeView.onEntryDeleted(callback);
-          console.log('hoping', root1, 'will be selected');
           dirView2.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
           treeView.focus();
 
