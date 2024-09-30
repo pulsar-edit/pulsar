@@ -59,7 +59,6 @@ class WorkspaceElement extends HTMLElement {
       // This event isn't emitted by the main process on other platforms, so
       // it won't do anything on Windows or Linux.
       observeScrollbarStyle((style) => {
-        console.log('current scrollbar style is:', style);
         switch (style) {
           case 'legacy':
             this.classList.remove('scrollbars-visible-when-scrolling');
