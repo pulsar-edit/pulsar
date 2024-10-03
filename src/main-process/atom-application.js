@@ -445,17 +445,18 @@ module.exports = class AtomApplication extends EventEmitter {
     if (!window.isSpec) {
       const focusHandler = () => this.windowStack.touch(window);
       const blurHandler = () => this.saveCurrentWindowOptions(false);
+      const scrollbarStyleChangeDisposable = onDidChangeScrollbarStyle((newValue) => {
+        window.browserWindow.webContents.send('did-change-scrollbar-style', newValue);
+      });
       window.browserWindow.on('focus', focusHandler);
       window.browserWindow.on('blur', blurHandler);
       window.browserWindow.once('closed', () => {
         this.windowStack.removeWindow(window);
         window.browserWindow.removeListener('focus', focusHandler);
         window.browserWindow.removeListener('blur', blurHandler);
+        scrollbarStyleChangeDisposable.dispose();
       });
       window.browserWindow.webContents.once('did-finish-load', blurHandler);
-      onDidChangeScrollbarStyle((newValue) => {
-        window.browserWindow.webContents.send('did-change-scrollbar-style', newValue);
-      });
       this.saveCurrentWindowOptions(false);
     }
   }

@@ -1,4 +1,5 @@
 const { EventEmitter } = require('events');
+const { Disposable } = require('event-kit');
 const { systemPreferences } = require('electron');
 
 // We've written a small Node module to help us get this value from macOS.
@@ -25,7 +26,10 @@ function observeScrollbarStyle(callback) {
 }
 
 function onDidChangeScrollbarStyle(callback) {
-  return EMITTER.on('did-change-scrollbar-style', callback);
+  EMITTER.on('did-change-scrollbar-style', callback);
+  return new Disposable(() => {
+    EMITTER.off('did-change-scrollbar-style', callback);
+  });
 }
 
 function initialize() {
