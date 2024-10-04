@@ -966,7 +966,7 @@ class WASMTreeSitterLanguageMode {
         // includes this point. So let's just pretend that the root node covers
         // this area.
         if (where(rootNode, grammar)) {
-          results.push({ rootNode: node, depth });
+          results.push({ node: rootNode, depth, grammar });
         }
         continue;
       }
