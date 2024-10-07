@@ -25,7 +25,7 @@ const configSchema = {
       excludeVcsIgnoredPaths: {
         type: 'boolean',
         default: true,
-        title: 'Exclude VCS Ignored Paths',
+        title: '%pulsar.config.excludeVcsIgnoredPaths.title%',
         description:
           "Files and directories ignored by the current project's VCS will be ignored by some packages, such as the fuzzy finder and find and replace. For example, projects using Git have these paths defined in the .gitignore file. Individual packages might have additional config settings for ignoring VCS ignored files and folders."
       },
@@ -410,6 +410,28 @@ const configSchema = {
         default: false,
         title: 'Allow Window Transparency',
         description: `Allows editor windows to be see-through. When this setting is enabled, UI themes and user stylesheets can use background colors with an alpha channel to make editor windows translucent. Takes effect after a restart of Pulsar.`
+      },
+      language: {
+        type: "object",
+        description: "Language and Locale options. Requires a restart of Pulsar to take effect.",
+        properties: {
+          primary: {
+            type: "string",
+            order: 1,
+            default: "en-US",
+            description: "The primary language/locale you prefer."
+          },
+          priorityList: {
+            type: "array",
+            order: 2,
+            description: "List of alternative languages to load. Highest priority to lowest. Use the most specific locale selectors possible.",
+            default: [],
+            items: {
+              type: "string",
+              // TODO consider enum options, maybe?
+            }
+          }
+        }
       }
     }
   },
