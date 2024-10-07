@@ -3042,7 +3042,10 @@ describe("TreeView", function () {
         fileView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         treeView.focus();
 
-        spyOn(shell, 'moveItemToTrash').andReturn(false);
+        spyOn(shell, 'trashItem').andCallFake(() => {
+          return Promise.reject(false);
+        })
+
         spyOn(atom, 'confirm').andCallFake((options, callback) => callback(0));
 
         atom.commands.dispatch(treeView.element, 'tree-view:remove');
@@ -3093,7 +3096,9 @@ describe("TreeView", function () {
             return atom.commands.dispatch(treeView.element, 'tree-view:remove');
           });
 
-          waitsFor('directory to be deleted', () => callback.mostRecentCall.args[0].pathToDelete === dirPath2);
+          waitsFor('directory to be deleted', () =>
+            callback.mostRecentCall?.args?.[0].pathToDelete === dirPath2
+          );
 
           return runs(function () {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
@@ -3122,7 +3127,9 @@ describe("TreeView", function () {
             return atom.commands.dispatch(treeView.element, 'tree-view:remove');
           });
 
-          waitsFor('directory to be deleted', () => callback.mostRecentCall.args[0].pathToDelete === dirPath2);
+          waitsFor('directory to be deleted', () =>
+            callback.mostRecentCall?.args?.[0].pathToDelete === dirPath2
+          );
 
           return runs(function () {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
@@ -3156,7 +3163,9 @@ describe("TreeView", function () {
             return atom.commands.dispatch(treeView.element, 'tree-view:remove');
           });
 
-          waitsFor('directory to be deleted', () => callback.mostRecentCall.args[0].pathToDelete === dirPath2);
+          waitsFor('directory to be deleted', () =>
+            callback.mostRecentCall?.args?.[0].pathToDelete === dirPath2
+          );
 
           return runs(function () {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
@@ -3187,7 +3196,9 @@ describe("TreeView", function () {
             return atom.commands.dispatch(treeView.element, 'tree-view:remove');
           });
 
-          waitsFor('directory to be deleted', () => callback.mostRecentCall.args[0].pathToDelete === dirPath2);
+          waitsFor('directory to be deleted', () =>
+            callback.mostRecentCall?.args?.[0].pathToDelete === dirPath2
+          );
 
           return runs(function () {
             const openFilePaths = atom.workspace.getTextEditors().map(editor => editor.getPath());
@@ -3195,10 +3206,10 @@ describe("TreeView", function () {
           });
         });
 
-        it("focuses the directory's parent folder", function () {
+        it("focuses the directory's parent folder", async function () {
+          jasmine.useRealClock();
           const callback = jasmine.createSpy('onEntryDeleted');
           treeView.onEntryDeleted(callback);
-
           dirView2.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
           treeView.focus();
 
@@ -3206,11 +3217,12 @@ describe("TreeView", function () {
 
           atom.commands.dispatch(treeView.element, 'tree-view:remove');
 
-          waitsFor('directory to be deleted', () => callback.mostRecentCall.args[0].pathToDelete === dirPath2);
+          waitsFor('directory to be deleted', () =>
+            callback.mostRecentCall?.args?.[0].pathToDelete === dirPath2
+          );
 
           runs(() => {
-            console.log('most recent', callback.mostRecentCall);
-            expect(root1).toHaveClass('selected')
+            expect(root1).toHaveClass('selected');
           });
         });
       });
@@ -3764,14 +3776,20 @@ describe("TreeView", function () {
         treeView.onEntryDeleted(callback);
 
         const pathToDelete = treeView.selectedEntry().getPath();
-        expect(treeView.selectedEntry().getPath()).toContain(path.join('dir2', 'new2'));
+        expect(
+          treeView.selectedEntry().getPath()
+        ).toContain(path.join('dir2', 'new2'));
+
         const dirView = findDirectoryContainingText(treeView.roots[0], 'dir2');
         expect(dirView).not.toBeNull();
         spyOn(dirView.directory, 'updateStatus');
+
         spyOn(atom, 'confirm').andCallFake((options, callback) => callback(0));
         atom.commands.dispatch(treeView.element, 'tree-view:remove');
 
-        waitsFor('onEntryDeleted to be called', () => callback.mostRecentCall.args[0].pathToDelete === pathToDelete);
+        waitsFor('onEntryDeleted to be called', () =>
+          callback.mostRecentCall?.args?.[0].pathToDelete === pathToDelete
+        );
 
         return runs(() => expect(dirView.directory.updateStatus).toHaveBeenCalled());
       }));
