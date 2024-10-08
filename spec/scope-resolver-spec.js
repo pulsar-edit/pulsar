@@ -347,7 +347,7 @@ describe('ScopeResolver', () => {
       `);
       // Prevent an exception from being thrown before we can even check the
       // scopeResolver.
-      spyOn(languageMode, 'isRowCommented').andReturn(false);
+      spyOn(languageMode, 'isRowCommented').and.returnValue(false);
       await languageMode.ready;
 
       let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
