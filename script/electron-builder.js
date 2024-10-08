@@ -149,7 +149,7 @@ let options = {
   },
   rpm: {
     afterInstall: "script/post-install.sh",
-    afterRemove: "script/post-uninstall.sh",
+    afterRemove: "script/post-uninstall-rpm.sh",
     compression: 'xz',
     fpm: ['--rpm-rpmbuild-define=_build_id_links none']
   },
