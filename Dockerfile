@@ -1,7 +1,7 @@
 # VERSION:        0.2
 # DESCRIPTION:    Image to build Pulsar
 
-FROM ubuntu:20.04
+FROM node:16-bookworm-slim
 
 # Install dependencies
 RUN apt-get update && \
@@ -13,19 +13,10 @@ RUN apt-get update && \
         fakeroot \
         rpm \
         libx11-dev \
-        libxkbfile-dev \
-        libgdk-pixbuf2.0-dev \
-        libgtk-3-dev \
-        libxss-dev \
-        libasound2-dev \
-        npm && \
+        libxkbfile-dev && \
     rm -rf /var/lib/apt/lists/*
 
-COPY . /pulsar
-WORKDIR /pulsar
-
-# Use python2 by default
-RUN npm config set python /usr/bin/python2 -g
+USER node
 
 ENTRYPOINT ["/usr/bin/env", "sh", "-c"]
 CMD ["bash"]
