@@ -497,16 +497,49 @@ describe('AtomEnvironment', () => {
       }
     })
 
-    it('loads the init script and applies the configurations', async () => {
-      pulsar = new AtomEnvironment({
-        applicationDelegate: atom.applicationDelegate
-      });
-      const initPath = path.join(__dirname, 'fixtures', 'init-script.js')
-      pulsar.getUserInitScriptPath = () => initPath
-      await pulsar.requireUserInitScript();
-      const commands = atom.commands.findCommands({target: window})
-      const command = commands.find(({name}) => name === 'test-case')
-      expect(command).toEqual({name: 'test-case', displayName: 'Test Case'})
+    describe('when the config to reload init scripts is not set', () => {
+      it('loads the script and requires it, but will not reload the init script', () => {
+        pulsar = new AtomEnvironment({
+          applicationDelegate: atom.applicationDelegate
+        });
+        pulsar.config.set('core.autoReloadInitScript', false)
+
+        let initPath = path.join(__dirname, 'fixtures', 'init-script.js')
+        pulsar.getUserInitScriptPath = () => initPath
+        pulsar.requireUserInitScript();
+        let commands = atom.commands.findCommands({target: window})
+          .filter(({name}) => name.match(/test-case/))
+        expect(commands).toEqual([{name: 'test-case', displayName: 'Test Case'}])
+
+        initPath = path.join(__dirname, 'fixtures', 'different-init-script.js')
+        pulsar.requireUserInitScript();
+        commands = atom.commands.findCommands({target: window})
+          .filter(({name}) => name.match(/test-case/))
+        expect(commands).toEqual([{name: 'test-case', displayName: 'Test Case'}])
+      })
+    })
+
+    describe('when the config to reload init scripts is set', () => {
+      it('allows for the init script to be reloaded', () => {
+        pulsar = new AtomEnvironment({
+          applicationDelegate: atom.applicationDelegate
+        });
+        pulsar.config.set('core.autoReloadInitScript', true)
+
+        let initPath = path.join(__dirname, 'fixtures', 'reloadable-init-script.js')
+        pulsar.getUserInitScriptPath = () => initPath
+        pulsar.requireUserInitScript();
+        let commands = atom.commands.findCommands({target: window})
+          .filter(({name}) => name.match(/test-case/))
+        expect(commands).toEqual([{name: 'test-case', displayName: 'Test Case'}])
+
+        initPath = path.join(__dirname, 'fixtures', 'different-init-script.js')
+        pulsar.getUserInitScriptPath = () => initPath
+        pulsar.requireUserInitScript();
+        commands = atom.commands.findCommands({target: window})
+          .filter(({name}) => name.match(/test-case/))
+        expect(commands).toEqual([{name: 'test-case-2', displayName: 'Test Case 2'}])
+      })
     })
   })
 
