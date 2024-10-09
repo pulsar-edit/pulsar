@@ -488,6 +488,28 @@ describe('AtomEnvironment', () => {
     });
   });
 
+  describe('init script handling', () => {
+    let pulsar
+    afterEach(() => {
+      if(pulsar) {
+        pulsar.unloadEditorWindow();
+        pulsar.destroy();
+      }
+    })
+
+    it('loads the init script and applies the configurations', async () => {
+      pulsar = new AtomEnvironment({
+        applicationDelegate: atom.applicationDelegate
+      });
+      const initPath = path.join(__dirname, 'fixtures', 'init-script.js')
+      pulsar.getUserInitScriptPath = () => initPath
+      await pulsar.requireUserInitScript();
+      const commands = atom.commands.findCommands({target: window})
+      const command = commands.find(({name}) => name === 'test-case')
+      expect(command).toEqual({name: 'test-case', displayName: 'Test Case'})
+    })
+  })
+
   describe('attemptRestoreProjectStateForPaths(state, projectPaths, filesToOpen)', () => {
     describe('when the window is clean (empty or has only unnamed, unmodified buffers)', () => {
       beforeEach(async () => {
