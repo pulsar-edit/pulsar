@@ -8,7 +8,11 @@ injectionRegex: '^(c|C)(\\+\\+|pp|PP)$'
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-cpp#a71474021410973b29bfe99440d57bcd750246b1'
   grammar: 'tree-sitter-cpp/tree-sitter-cpp.wasm'
-  highlightsQuery: 'tree-sitter-cpp/highlights.scm'
+  languageSegment: 'cpp'
+  highlightsQuery: [
+    'common/highlights.scm'
+    'tree-sitter-cpp/highlights.scm'
+  ]
   tagsQuery: 'tree-sitter-cpp/tags.scm'
   foldsQuery: 'tree-sitter-cpp/folds.scm'
   indentsQuery: 'tree-sitter-cpp/indents.scm'

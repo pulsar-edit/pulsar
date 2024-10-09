@@ -9,7 +9,11 @@ injectionRegex: '^(c|C)$'
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-c#212a80f86452bb1316324fa0db730cf52f29e05a'
   grammar: 'tree-sitter-c/tree-sitter-c.wasm'
-  highlightsQuery: 'tree-sitter-c/highlights.scm'
+  languageSegment: 'c'
+  highlightsQuery: [
+    'common/highlights.scm'
+    'tree-sitter-c/highlights.scm'
+  ]
   tagsQuery: 'tree-sitter-c/tags.scm'
   foldsQuery: 'tree-sitter-c/folds.scm'
   indentsQuery: 'tree-sitter-c/indents.scm'

@@ -121,6 +121,40 @@ function comparePoints(a, b) {
   }
 }
 
+// A comparison function for a red-black tree that uses a point/range tuple as
+// its key.
+//
+// We use this for folds. The primary indexing method of a fold is by point,
+// but that point is one end of a range; and when two folds share a boundary,
+// we need to be able to break the tie somehow.
+function comparePointAndRangeBundles(bundleA, bundleB) {
+  let [pointA, rangeA] = bundleA;
+  let [pointB, rangeB] = bundleB;
+  let pointComparison = comparePoints(pointA, pointB);
+  if (pointComparison !== 0) { return pointComparison; }
+
+  let aIsEnd = rangeA.end.isEqual(pointA);
+  let bIsEnd = rangeB.end.isEqual(pointB);
+
+  // If one range ends at the given point and the other starts at the given
+  // point, then the one that ends should be handled earlier.
+  if (aIsEnd !== bIsEnd) {
+    return aIsEnd ? -1 : 1;
+  }
+
+  // Otherwise, the larger of the two ranges should be considered to begin
+  // first and end last. (This comparison function does not envision ranges
+  // that overlap but where one is not contained by the other; it's up to the
+  // author of a `folds.scm` file to avoid those unusual scenarios, since they
+  // break the mental model of how folds work.)
+  if (rangeA.containsRange(rangeB)) {
+    return aIsEnd ? 1 : -1;
+  } else if (rangeB.containsRange(rangeA)) {
+    return bIsEnd ? -1 : 1;
+  }
+  return 0;
+}
+
 // Acts like `comparePoints`, but treats starting and ending boundaries
 // differently, making it so that ending boundaries are visited before starting
 // boundaries.
@@ -932,7 +966,7 @@ class WASMTreeSitterLanguageMode {
         // includes this point. So let's just pretend that the root node covers
         // this area.
         if (where(rootNode, grammar)) {
-          results.push({ rootNode: node, depth });
+          results.push({ node: rootNode, depth, grammar });
         }
         continue;
       }
@@ -1007,16 +1041,21 @@ class WASMTreeSitterLanguageMode {
   // violate that — perhaps most notably the C grammar in its use of nested
   // folds within `#ifdef` and its siblings.
   //
-  // Instead, a level of `0` means “all folds,” a level of `1` means “all folds
-  // that are contained by exactly one other fold,” and so on. This happens to
-  // work as expected if you're working in a language where nested folds are
-  // always indented relative to their enclosing fold, but it doesn't require
-  // it.
+  // Instead, a level of `0` means “all folds that are not contained by any
+  // other fold,” a level of `1` means “all folds that are contained by exactly
+  // one other fold,” and so on. This happens to work as expected if you're
+  // working in a language where nested folds are always indented relative to
+  // their enclosing fold, but it doesn't require it.
   //
   getFoldableRangesAtIndentLevel(goalLevel) {
     if (!this.tokenized) { return []; }
 
-    let rangeTree = createTree(comparePoints);
+    // The key for this red-black tree needs to be a combination of a point and
+    // a range. We do this because we want to order primarily by buffer
+    // position; but secondarily we need to consider whether the point is the
+    // start or the end of a range so that we can ensure that we visit the
+    // points in the order that properly expresses containment.
+    let rangeTree = createTree(comparePointAndRangeBundles);
 
     // No easy way around this. The way to pull it off is to get _all_ folds in
     // the document on all language layers, then place their boundaries into a
@@ -1026,8 +1065,8 @@ class WASMTreeSitterLanguageMode {
     for (let layer of layers) {
       let folds = layer.foldResolver.getAllFoldRanges();
       for (let fold of folds) {
-        rangeTree = rangeTree.insert(fold.start, { start: fold });
-        rangeTree = rangeTree.insert(fold.end, { end: fold });
+        rangeTree = rangeTree.insert([fold.start, fold], { start: fold });
+        rangeTree = rangeTree.insert([fold.end, fold], { end: fold });
       }
     }
 
@@ -1830,7 +1869,7 @@ class FoldResolver {
         // implied in the existing specs.
         return new Point(end.row - 1, Infinity);
       } else {
-        return new Point.fromObject(end, true);
+        return Point.fromObject(end, true);
       }
     } else {
       return null;

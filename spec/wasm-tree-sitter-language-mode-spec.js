@@ -2288,8 +2288,8 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       buffer.setText(dedent`
         <head>
-        <meta name='key-1', content='value-1'>
-        <meta name='key-2', content='value-2'>
+        <meta name='key-1' content='value-1'>
+        <meta name='key-2' content='value-2'>
         </head>
       `);
 
@@ -2399,6 +2399,35 @@ describe('WASMTreeSitterLanguageMode', () => {
         function bar() {
           if (false) {…}
         }
+      `);
+    })
+
+    it('can handle folds that share boundaries with other folds', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars,
+        pythonGrammarPath,
+        CSON.readFileSync(pythonGrammarPath)
+      );
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+
+      buffer.setText(dedent`
+        class Example:
+            def get_dimension_values(self):
+                while True:
+                    do_something()
+
+            def wont_fold(self):
+                pass
+      `);
+      await languageMode.ready;
+
+      editor.foldAllAtIndentLevel(1);
+
+      expect(getDisplayText(editor)).toBe(dedent`
+        class Example:
+            def get_dimension_values(self):…
+
+            def wont_fold(self):…
       `);
     })
 
