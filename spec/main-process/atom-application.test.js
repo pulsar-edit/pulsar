@@ -12,7 +12,7 @@ const parseCommandLine = require('../../src/main-process/parse-command-line');
 const {
   emitterEventPromise,
   conditionPromise
-} = require('../async-spec-helpers');
+} = require('../helpers/async-spec-helpers');
 
 // These tests use a utility class called LaunchScenario, defined below, to manipulate AtomApplication instances that
 // (1) are stubbed to only simulate AtomWindow creation and (2) allow you to use a shorthand notation to assert the
