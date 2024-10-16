@@ -21,6 +21,15 @@
 # things. Luckily, AppImage is straightforward enough as a tool that we can
 # do it manually.
 #
+# The workflow here is as follows:
+#
+# * Extract the AppImage (every AppImage has the ability to do this by itself).
+# * Modify the `AppRun` script whose purpose is to invoke the Electron
+#   executable; modify it to invoke our `pulsar.sh` script instead.
+# * Download and extract `appimagetool`.
+# * Use it to package everything back into an AppImage at the original location
+#   on disk.
+#
 # If you're unsure if this modification has worked, the best way to find out is
 # to run
 #
