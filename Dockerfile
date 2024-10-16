@@ -16,7 +16,14 @@ RUN apt-get update && \
         libxkbfile-dev && \
     rm -rf /var/lib/apt/lists/*
 
-USER node
+ARG PUID=1000 \
+    PGID=1000
+
+RUN userdel -r node && \
+    addgroup --gid "$PGID" pulsar && \
+    adduser --disabled-password --uid "$PUID" --gid "$PGID" --comment "" pulsar
+
+USER pulsar
 
 ENTRYPOINT ["/usr/bin/env", "sh", "-c"]
 CMD ["bash"]
