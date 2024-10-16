@@ -162,8 +162,9 @@
 
 ; A variable object destructuring with default value:
 ; The "foo" in `let { foo = true } = something`
-(object_assignment_pattern
+((object_assignment_pattern
   (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.js)
+  (#is-not? test.descendantOfType "formal_parameters"))
 
 ; A variable object alias destructuring:
 ; The "bar" and "foo" in `let { bar: foo } = something`
@@ -190,24 +191,34 @@
     ; TODO: This arguably isn't an object key.
     key: (_) @entity.other.attribute-name.js
     value: (assignment_pattern
-      left: (identifier) @variable.other.assignment.destructuring.js)))
+      left: (identifier) @_IGNORE_)))
+
+(object_pattern
+  (pair_pattern
+    key: (_) @_IGNORE_
+    value: (assignment_pattern
+      left: (identifier) @variable.other.assignment.destructuring.js))
+      (#is-not? test.descendantOfType "formal_parameters"))
 
 ; A "rest" parameter destructuring:
 ; The "bar" in `let { foo, ...bar } = something`
 (object_pattern
   (rest_pattern
-    (identifier) @variable.other.assignment.destructuring.rest.js))
+    (identifier) @variable.other.assignment.destructuring.rest.js)
+    (#is-not? test.descendantOfType "formal_parameters"))
 
 ; An array-destructured assignment or reassignment, regardless of depth:
 ; The "foo" in `[foo] = bar;` and `[[foo]] = bar;`.
-(array_pattern
+((array_pattern
   (identifier) @variable.other.assignment.destructuring.js)
+  (#is-not? test.descendantOfType "formal_parameters"))
 
 ; An array-destructured assignment or reassignment with a default, regardless of depth:
 ; The "baz" in `let [foo, bar, baz = false] = something;` and `let [[baz = 5]] = something`;
 (array_pattern
   (assignment_pattern
-    (identifier) @variable.other.assignment.destructuring.js))
+    (identifier) @variable.other.assignment.destructuring.js)
+    (#is-not? test.descendantOfType "formal_parameters"))
 
 
 ; A variable declaration in a for…(in|of) loop:
@@ -278,6 +289,21 @@
 (formal_parameters
   (assignment_pattern
     left: (identifier) @variable.parameter.js))
+
+; The "foo" in `function ({ foo = 3 }) {`.
+(object_assignment_pattern
+  (shorthand_property_identifier_pattern) @variable.parameter.destructuring.shorthand.js
+  (#is? test.descendantOfType "formal_parameters")
+  (#set! capture.final))
+
+; The "foo" in `function ({ key: foo = 3 }) {`.
+(pair_pattern
+  key: (property_identifier)
+  value: (assignment_pattern
+    left: (identifier) @variable.parameter.destructuring.value.js
+  )
+  (#is? test.descendantOfType "formal_parameters")
+  (#set! capture.final))
 
 
 ; FUNCTIONS
