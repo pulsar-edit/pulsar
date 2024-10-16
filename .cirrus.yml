@@ -85,6 +85,7 @@ arm_linux_task:
                 libxss-dev
                 libasound2-dev
                 libnss3
+                wget
                 xvfb
     - gem install dotenv -v '~>  2.8'
     - gem install fpm
