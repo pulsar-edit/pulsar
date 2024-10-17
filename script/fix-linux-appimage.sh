@@ -111,7 +111,7 @@ chmod +x appimagetool
 #
 # It makes us set an `ARCH` environment variable — no idea why, since these are
 # thin binaries, but whatever.
-echo "Building new AppImage at: binaries/${PULSAR_APPIMAGE}"
+echo "Building new AppImage at: binaries/${PULSAR_APPIMAGE} with ARCH value: ${APPIMAGE_ARCH}…"
 ARCH="${APPIMAGE_ARCH}" ./appimagetool --appimage-extract-and-run "binaries/Pulsar.AppDir" "binaries/${PULSAR_APPIMAGE}"
 chmod a+x "binaries/${PULSAR_APPIMAGE}"
 echo "…done building AppImage."
