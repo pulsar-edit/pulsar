@@ -1,141 +1,69 @@
 'use strict';
+const IndexedDB = require('./state-store/indexed-db');
+const SQL = require('./state-store/sql');
 
 module.exports = class StateStore {
   constructor(databaseName, version) {
-    this.connected = false;
     this.databaseName = databaseName;
     this.version = version;
   }
 
-  get dbPromise() {
-    if (!this._dbPromise) {
-      this._dbPromise = new Promise(resolve => {
-        const dbOpenRequest = indexedDB.open(this.databaseName, this.version);
-        dbOpenRequest.onupgradeneeded = event => {
-          let db = event.target.result;
-          db.onerror = error => {
-            atom.notifications.addFatalError('Error loading database', {
-              stack: new Error('Error loading database').stack,
-              dismissable: true
-            });
-            console.error('Error loading database', error);
-          };
-          db.createObjectStore('states');
-        };
-        dbOpenRequest.onsuccess = () => {
-          this.connected = true;
-          resolve(dbOpenRequest.result);
-        };
-        dbOpenRequest.onerror = error => {
-          atom.notifications.addFatalError('Could not connect to indexedDB', {
-            stack: new Error('Could not connect to indexedDB').stack,
-            dismissable: true
-          });
-          console.error('Could not connect to indexedDB', error);
-          this.connected = false;
-          resolve(null);
-        };
-      });
-    }
-
-    return this._dbPromise;
-  }
-
   isConnected() {
-    return this.connected;
+    // We don't need to wait for atom global here because this isConnected
+    // is only called on closing the editor
+    if(atom.config.get('core.useLegacySessionStore')) {
+      if(!this.indexed) return false;
+      return this.indexed.isConnected();
+    } else {
+      if(!this.sql) return false;
+      return this.sql.isConnected();
+    }
   }
 
   connect() {
-    return this.dbPromise.then(db => !!db);
+    return this._getCorrectImplementation().then(i => i.connect());
   }
 
   save(key, value) {
-    return new Promise((resolve, reject) => {
-      this.dbPromise.then(db => {
-        if (db == null) return resolve();
-
-        const request = db
-          .transaction(['states'], 'readwrite')
-          .objectStore('states')
-          .put({ value: value, storedAt: new Date().toString() }, key);
-
-        request.onsuccess = resolve;
-        request.onerror = reject;
-      });
-    });
+    return this._getCorrectImplementation().then(i => i.save(key, value));
   }
 
   load(key) {
-    return this.dbPromise.then(db => {
-      if (!db) return;
-
-      return new Promise((resolve, reject) => {
-        const request = db
-          .transaction(['states'])
-          .objectStore('states')
-          .get(key);
-
-        request.onsuccess = event => {
-          let result = event.target.result;
-          if (result && !result.isJSON) {
-            resolve(result.value);
-          } else {
-            resolve(null);
-          }
-        };
-
-        request.onerror = event => reject(event);
-      });
-    });
+    return this._getCorrectImplementation().then(i => i.load(key));
   }
 
   delete(key) {
-    return new Promise((resolve, reject) => {
-      this.dbPromise.then(db => {
-        if (db == null) return resolve();
-
-        const request = db
-          .transaction(['states'], 'readwrite')
-          .objectStore('states')
-          .delete(key);
-
-        request.onsuccess = resolve;
-        request.onerror = reject;
-      });
-    });
+    return this._getCorrectImplementation().then(i => i.delete(key));
   }
 
   clear() {
-    return this.dbPromise.then(db => {
-      if (!db) return;
-
-      return new Promise((resolve, reject) => {
-        const request = db
-          .transaction(['states'], 'readwrite')
-          .objectStore('states')
-          .clear();
-
-        request.onsuccess = resolve;
-        request.onerror = reject;
-      });
-    });
+    return this._getCorrectImplementation().then(i => i.clear());
   }
 
   count() {
-    return this.dbPromise.then(db => {
-      if (!db) return;
+    return this._getCorrectImplementation().then(i => i.count());
+  }
 
-      return new Promise((resolve, reject) => {
-        const request = db
-          .transaction(['states'])
-          .objectStore('states')
-          .count();
-
-        request.onsuccess = () => {
-          resolve(request.result);
-        };
-        request.onerror = reject;
-      });
+  _getCorrectImplementation() {
+    return awaitForAtomGlobal().then(() => {
+      if(atom.config.get('core.useLegacySessionStore')) {
+        this.indexed ||= new IndexedDB(this.databaseName, this.version);
+        return this.indexed;
+      } else {
+        this.sql ||= new SQL(this.databaseName, this.version);
+        return this.sql;
+      }
     });
   }
 };
+
+function awaitForAtomGlobal() {
+  return new Promise(resolve => {
+    const i = setInterval(() => {
+      if(atom) {
+        clearInterval(i)
+        resolve()
+      }
+    }, 50)
+  })
+}
