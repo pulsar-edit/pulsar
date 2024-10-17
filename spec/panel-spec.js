@@ -60,7 +60,7 @@ describe('Panel', () => {
       panel.hide();
       expect(panel.isVisible()).toBe(false);
       expect(spy).toHaveBeenCalledWith(false);
-      spy.reset();
+      spy.calls.reset();
 
       panel.show();
       expect(panel.isVisible()).toBe(true);
