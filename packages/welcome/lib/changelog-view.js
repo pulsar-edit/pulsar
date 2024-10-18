@@ -50,43 +50,34 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Updated <code>web-tree-sitter</code> to version 0.23.0.
+                Added a SQL State Storage alternative to IndexedDB (opt-in, off by default).
               </li>
               <li>
-                [language-css] Updated <code>tree-sitter-css</code> to the latest version
+                Repackaged the AppImage so it uses our launcher script internally (supports more CLI/launch flags).
               </li>
               <li>
-                [language-gfm] Updated <code>tree-sitter-markdown</code> to the latest version.
+                [language-php] Highlighted “null-safe” property access correctly.
               </li>
               <li>
-                [language-html] Updated <code>tree-sitter-html</code> and <code>tree-sitter-embedded-template</code> to their latest versions.
+                [language-c] Scoped template delimiters properly in C++.
               </li>
               <li>
-                [language-javascript] Updated <code>tree-sitter-javascript</code> to the latest version.
+                [language-c] Consolidated common highlighting queries between the C and C++ grammars for more consistency in syntax highlighting.
               </li>
               <li>
-                [language-typescript] Updated <code>tree-sitter-typescript</code> to the latest version.
+                Fixed incorrect behavior in certain scenarios for “Fold at Indent Level X” commands.
               </li>
               <li>
-                Added a new <code>@match.next</code> capture for advanced control of how indentation should change from one line to the next.
+                Fixed exception when resolving divided folds (e.g., <code>#ifdefs</code> in C/C++).
               </li>
               <li>
-                Added new indentation-specific query predicates <code>indent.matchesComparisonRow</code> and <code>indent.matchesCurrentRow</code> for comparing arbitrary positions in a Tree-sitter node tree to the operative rows in an indentation suggestion query. Makes it possible to say things like “decrease the indent on line 10 if a statement ends on line 9.”
+                Avoided "length of null" error in autocomplete-plus for the PHP Tree-sitter grammar.
               </li>
               <li>
-                Renamed indentation directives <code>indent.matchIndentOf</code> and <code>indent.offsetIndent</code> to <code>indent.match</code> and <code>indent.offset</code>, respectively. The old names still work as aliases.
+                Preserved <code>/usr/bin/pulsar</code> and <code>/usr/bin/ppm</code> on RPM updates.
               </li>
               <li>
-                Improved the command-line <code>pulsar</code> script’s ability to find the user’s Pulsar installation location on Linux.
-              </li>
-              <li>
-                On macOS and Linux, <code>pulsar -p</code> now invokes <code>ppm</code> without having to launch Pulsar itself.
-              </li>
-              <li>
-                Added options to the Windows installer to add Pulsar and PPM to the PATH
-              </li>
-              <li>
-                Fixed <code>ppm rebuild</code> command on ARM (Apple Silicon) Macs
+                [tree-view] Moved to a more modern API for file removal in preparation for an Electron upgrade.
               </li>
             </ul>
 
