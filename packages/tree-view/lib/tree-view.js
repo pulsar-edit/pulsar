@@ -290,7 +290,7 @@ class TreeView {
       // This prevents accidental collapsing when an `.entries` element is the
       // event target.
       if (e.target.classList.contains('entries')) return;
-      if (!(e.shiftKy || e.metaKey || e.ctrlKey)) {
+      if (!(e.shiftKey || e.metaKey || e.ctrlKey)) {
         return this.entryClicked(e);
       }
     });
