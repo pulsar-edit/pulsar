@@ -6,6 +6,29 @@
 
 ## [Unreleased]
 
+## 1.122.0
+
+- Added a SQL State Storage alternative to IndexedDB (opt-in, off by default).
+- Repackaged the AppImage so it uses our launcher script internally (supports more CLI/launch flags).
+- [language-php] Highlighted “null-safe” property access correctly.
+- [language-c] Scoped template delimiters properly in C++.
+- [language-c] Consolidated common highlighting queries between the C and C++ grammars for more consistency in syntax highlighting.
+- Fixed incorrect behavior in certain scenarios for “Fold at Indent Level X” commands.
+- Fixed exception when resolving divided folds (e.g., `#ifdefs` in C/C++).
+- Avoided "length of null" error in autocomplete-plus for the PHP Tree-sitter grammar.
+- Preserved `/usr/bin/pulsar` and `/usr/bin/ppm` on RPM updates.
+- [tree-view] Moved to a more modern API for file removal in preparation for an Electron upgrade.
+
+### Pulsar
+
+- Added: Adding a SQL State Storage instead of IndexedDB [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/917)
+- Fixed: Fix AppImage executable [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1069)
+- Fixed: Tree-sitter rolling fixes, 1.122 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1101)
+- Fixed: Fix reading error of length property on null [@Digitalone1](https://github.com/pulsar-edit/pulsar/pull/1058)
+- Fixed: Preserve `/usr/bin/pulsar` and `/usr/bin/ppm` on RPM updates [@am97](https://github.com/pulsar-edit/pulsar/pull/1091)
+- Updated: [tree-view] Remove deprecated usage of `shell.moveItemToTrash` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1109)
+
+
 ## 1.121.0
 
 - Updated `web-tree-sitter` to version 0.23.0.

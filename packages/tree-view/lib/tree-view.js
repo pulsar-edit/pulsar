@@ -904,6 +904,17 @@ class TreeView {
       if (response === 0) { // Move to Trash
         let failedDeletions = [];
         let deletionPromises = [];
+
+        // Since this goes async, all entries that correspond to paths we're
+        // about to delete will soon detach from the tree. So we should figure
+        // out ahead of time which element we're going to select when we're
+        // done.
+        let newSelectedEntry;
+        let firstSelectedEntry = selectedEntries[0];
+        if (firstSelectedEntry) {
+          newSelectedEntry = firstSelectedEntry.closest('.directory:not(.selected)');
+        }
+
         for (let selectedPath of selectedPaths) {
           // Don't delete entries which no longer exist. This can happen, for
           // example, when
@@ -943,10 +954,10 @@ class TreeView {
           );
         }
 
-        let firstSelectedEntry = selectedEntries[0];
-        if (firstSelectedEntry) {
-          this.selectEntry(firstSelectedEntry.closest('.directory:not(.selected)'));
+        if (newSelectedEntry) {
+          this.selectEntry(newSelectedEntry);
         }
+
         if (atom.config.get('tree-view.squashDirectoryNames')) {
           return this.updateRoots();
         }

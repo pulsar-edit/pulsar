@@ -50,6 +50,7 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
+<<<<<<< HEAD
                 Updated <code>web-tree-sitter</code> to version 0.23.0.
               </li>
               <li>
@@ -87,6 +88,36 @@ export default class ChangeLogView {
               </li>
               <li>
                 Fixed <code>ppm rebuild</code> command on ARM (Apple Silicon) Macs
+=======
+                Added a SQL State Storage alternative to IndexedDB (opt-in, off by default).
+              </li>
+              <li>
+                Repackaged the AppImage so it uses our launcher script internally (supports more CLI/launch flags).
+              </li>
+              <li>
+                [language-php] Highlighted “null-safe” property access correctly.
+              </li>
+              <li>
+                [language-c] Scoped template delimiters properly in C++.
+              </li>
+              <li>
+                [language-c] Consolidated common highlighting queries between the C and C++ grammars for more consistency in syntax highlighting.
+              </li>
+              <li>
+                Fixed incorrect behavior in certain scenarios for “Fold at Indent Level X” commands.
+              </li>
+              <li>
+                Fixed exception when resolving divided folds (e.g., <code>#ifdefs</code> in C/C++).
+              </li>
+              <li>
+                Avoided "length of null" error in autocomplete-plus for the PHP Tree-sitter grammar.
+              </li>
+              <li>
+                Preserved <code>/usr/bin/pulsar</code> and <code>/usr/bin/ppm</code> on RPM updates.
+              </li>
+              <li>
+                [tree-view] Moved to a more modern API for file removal in preparation for an Electron upgrade.
+>>>>>>> bce72212de5f12f4846b065f9379151dc23fc515
               </li>
             </ul>
 

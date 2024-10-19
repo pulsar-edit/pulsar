@@ -111,6 +111,20 @@ if [ $PACKAGE_MODE ]; then
   done
 fi
 
+if [ $PACKAGE_MODE ]; then
+  # If `-p` or `--package` is present, then we'll be discarding all arguments
+  # prior to (and including) `-p`/`--package` and passing the rest to `ppm`.
+  loop_done=0
+  while [ $loop_done -eq 0 ]
+  do
+    if [[ "$1" == "-p" || "$1" == "--package" || "$1" == "" ]]; then
+      # We'll shift one last time and then we'll be done.
+      loop_done=1
+    fi
+    shift
+  done
+fi
+
 if [ $OS == 'Mac' ]; then
   if [ -L "$0" ]; then
     SCRIPT="$(readlink "$0")"
