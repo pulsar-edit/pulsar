@@ -164,7 +164,7 @@
     "spell-check": "file:packages/spell-check",
     "status-bar": "file:packages/status-bar",
     "styleguide": "file:./packages/styleguide",
-    "superstring": "github:pulsar-edit/superstring#e5e848017f7a28fe250b45f8c7f8ed244371d33d",
+    "superstring": "github:savetheclocktower/superstring#e5e848017f7a28fe250b45f8c7f8ed244371d33d",
     "symbol-provider-ctags": "file:./packages/symbol-provider-ctags",
     "symbol-provider-tree-sitter": "file:./packages/symbol-provider-tree-sitter",
     "symbols-view": "file:./packages/symbols-view",
