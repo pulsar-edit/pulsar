@@ -49,6 +49,7 @@ const { getReleaseChannel } = require('./get-app-details.js');
 const UI = require('./ui.js');
 const packagejson = require("../package.json");
 
+const { closeAllWatchers } = require('pathwatcher');
 const stat = util.promisify(fs.stat);
 
 let nextId = 0;
@@ -1122,6 +1123,7 @@ class AtomEnvironment {
   }
 
   unloadEditorWindow() {
+    closeAllWatchers();
     if (!this.project) return;
 
     this.storeWindowBackground();
