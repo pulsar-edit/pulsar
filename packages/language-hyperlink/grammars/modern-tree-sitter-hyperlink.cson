@@ -5,6 +5,6 @@ parser: 'tree-sitter-hyperlink'
 
 injectionRegex: 'hyperlink'
 treeSitter:
-  parserSource: 'github:savetheclocktower/tree-sitter-hyperlink#04c3a667ba432236578ac99bbacd0412f88d6fac'
+  parserSource: 'github:savetheclocktower/tree-sitter-hyperlink#0704b3e5a72892495dd13b85a5064582414cb39a'
   grammar: 'ts/tree-sitter-hyperlink.wasm'
   highlightsQuery: 'ts/highlights.scm'
