@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'master'
+      - 'updated-latest-electron'
     tags:
       - '**'
   pull_request:
@@ -14,7 +15,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PYTHON_VERSION: '3.12'
   NODE_VERSION: 16
-  ROLLING_UPLOAD_TOKEN: ${{ secrets.ROLLING_RELEASE_UPLOAD_TOKEN }}
+  ROLLING_UPLOAD_TOKEN: ${{ secrets.ELECTRON_NEXT_BINARIES_UPLOAD_TOKEN }}
   # Below variables allow us to quickly control visual tests for each platform
   RUN_WINDOWS_VT: false
   RUN_LINUX_VT: true
@@ -88,11 +89,11 @@ jobs:
 
     - name: Check Pulsar Version
       if: ${{ runner.os != 'Windows' }}
-      run: sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+      run: sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`-electron-next/g" package.json
 
     - name: Check Pulsar Version - Windows
       if: ${{ runner.os == 'Windows' }}
-      run: (Get-Content package.json) -replace '[0-9]*-dev', (date -u +%Y%m%d%H) | Set-Content -Path package.json
+      run: (Get-Content package.json) -replace '[0-9]*-dev', "$(date -u +%Y%m%d%H)-electron-next" | Set-Content -Path package.json
 
     - name: Reinstall Current Node-GYP NodeJS Headers
       # Overwrite bad headers that get downloaded.
@@ -273,7 +274,7 @@ jobs:
 
     - name: Check Pulsar Version
       if: ${{ runner.os != 'Windows' }}
-      run: sed -i -e "s/[0-9]*-dev/${TIMESTAMP}/g" package.json
+      run: sed -i -e "s/[0-9]*-dev/${TIMESTAMP}-electron-next/g" package.json
       env:
         TIMESTAMP: ${{needs.build.outputs.timestamp}}
 
