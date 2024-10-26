@@ -146,7 +146,7 @@ jobs:
         timeout_minutes: 45
         max_attempts: 3
         retry_on: error
-        command: yarn dist
+        command: yarn dist --next
 
     - name: Build Pulsar Binaries (macOS) (Unsigned)
       if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
@@ -155,7 +155,7 @@ jobs:
         timeout_minutes: 45
         max_attempts: 3
         retry_on: error
-        command: yarn dist
+        command: yarn dist --next
 
     - name: Build Pulsar Binaries
       if: ${{ runner.os != 'macOS' }}
@@ -164,7 +164,7 @@ jobs:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
-        command: yarn dist
+        command: yarn dist --next
 
     - name: Rename Pulsar Binaries for Regular release (Linux)
       if: ${{ runner.os == 'Linux' }}
