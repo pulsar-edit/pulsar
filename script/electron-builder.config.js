@@ -1,8 +1,8 @@
+/* eslint-disable no-process-exit */
 const Path = require('path');
 const dedent = require('dedent');
-const normalizePackageData = require('normalize-package-data');
 const FS = require('fs/promises');
-const { existsSync, writeFileSync } = require('fs');
+const { existsSync } = require('fs');
 const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers')
 const generateMetadata = require('./generate-metadata-for-builder')
@@ -22,8 +22,11 @@ if (!existsSync(Path.join('ppm', 'bin'))) {
 
 // Monkey-patch to not remove things I explicitly didn't say to remove.
 // See: https://github.com/electron-userland/electron-builder/issues/6957
+
+/* eslint-disable node/no-extraneous-require */
 let transformer = require('app-builder-lib/out/fileTransformer')
 const builder_util_1 = require("builder-util");
+/* eslint-enable node/no-extraneous-require */
 
 transformer.createTransformer = function createTransformer(srcDir, configuration, extraMetadata, extraTransformer) {
   const mainPackageJson = Path.join(srcDir, "package.json");
@@ -60,6 +63,7 @@ async function modifyMainPackageJson(
 
 // END Monkey-patch.
 
+// eslint-disable-next-line node/no-unpublished-require
 const builder = require('electron-builder');
 
 const ICONS = {
@@ -87,7 +91,14 @@ const ARGS = yargs(hideBin(process.argv))
   })
   .parse();
 
-
+// The difference in base name matters for the app ID (which helps the OS
+// understand that PulsarNext is not the same as Pulsar), but also for other
+// reasons.
+//
+// The `pulsar-next` executable name is how it knows it's a canary release
+// channel and should use a different home directory from the stable release.
+// Same for `ppm-next`; it's identical to `ppm`, but the name of the script
+// tells it where to install packages.
 const displayName = ARGS.next ? 'PulsarNext' : 'Pulsar';
 const baseName = ARGS.next ? 'pulsar-next' : 'pulsar';
 const ppmBaseName = ARGS.next ? 'ppm-next' : 'ppm';
@@ -218,15 +229,24 @@ let options = {
         "from": ICONS.svg,
         "to": "pulsar.svg"
       },
-      { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` }
     ]
   },
 
   mac: {
     icon: ICONS.icns,
     category: "public.app-category.developer-tools",
-    minimumSystemVersion: "10.8",
+    // NOTE: Electron 27 uses a version of Chromium whose minimum supported
+    // version of macOS is 10.15.
+    //
+    // Electron 33 will drop support for 10.15, at which point the minimum
+    // supported version will be macOS 11.
+    minimumSystemVersion: "10.15",
     hardenedRuntime: true,
+    // Now that we're on a recent Electron, we no longer have to hide the
+    // `allow-jit` entitlement from Intel Macs in order to work around a
+    // `libuv` bug.
+    entitlements: "resources/mac/entitlements.plist",
+    entitlementsInherit: "resources/mac/entitlements.plist",
     extendInfo: {
       // Extra values that will be inserted into the app's plist.
       "CFBundleExecutable": displayName,
@@ -239,21 +259,20 @@ let options = {
         { "CFBundleURLName": "Atom Shared Session Protocol" }
       ]
     },
-    extraResources: [
-      { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` }
-    ]
+    extraResources: []
   },
 
   dmg: { sign: false },
 
+  // Earliest supported version of Windows is Windows 10. Electron 23 dropped
+  // support for 7/8/8.1.
   win: {
     icon: ICONS.ico,
     extraResources: [
       { from: ICONS.ico, to: 'pulsar.ico' },
       { from: 'resources/win/pulsar.cmd', to: `${baseName}.cmd` },
       { from: 'resources/win/pulsar.js', to: `${baseName}.js` },
-      { from: 'resources/win/modifyWindowsPath.ps1', to: 'modifyWindowsPath.ps1' },
-      { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
+      { from: 'resources/win/modifyWindowsPath.ps1', to: 'modifyWindowsPath.ps1' }
     ],
     target: [
       { target: 'nsis' },
@@ -269,10 +288,13 @@ let options = {
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
     guid: "0949b555-c22c-56b7-873a-a960bdefa81f", // TODO
-    // The GUID is generated from Electron-Builder based on our AppID
-    // Hardcoding it here means it will always be used as generated from
-    // the AppID 'dev.pulsar-edit.pulsar'. If this value ever changes,
-    // A PR to GitHub Desktop must be made with the updated value.
+    // The GUID is generated from Electron-Builder based on our AppID.
+    // Hardcoding it here means it will always be used as generated from the
+    // AppID 'dev.pulsar-edit.pulsar'. If this value ever changes, a PR to
+    // GitHub Desktop must be made with the updated value.
+    //
+    // TODO: On first look, this installer script seems not to need any
+    // updating for PulsarNext, but we should make sure.
     include: "resources/win/installer.nsh",
     warningsAsErrors: false
   },
@@ -289,17 +311,22 @@ let options = {
 };
 
 if (ARGS.next) {
+  // TODO: Should PulsarNext have its own guid? `electron-builder` docs suggest
+  // it will be generated from the `appId` if omitted, so I think this is fine.
   delete options.nsis.guid;
-}
 
-if (!ARGS.next) {
-  if (process.arch === 'x64') {
-    options.mac.entitlements = "resources/mac/entitlements.intel.plist";
-    options.mac.entitlementsInherit = "resources/mac/entitlements.intel.plist";
-  } else {
-    options.mac.entitlements = "resources/mac/entitlements.silicon.plist";
-    options.mac.entitlementsInherit = "resources/mac/entitlements.silicon.plist";
-  }
+  // We need to copy `ppm` over to `ppm-next` when `--next` is passed, but not
+  // copy `ppm` over to `ppm` when `--next` is omitted (because it's
+  // redundant).
+  options.linux.extraResources.push(
+    { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` }
+  );
+  options.win.extraResources.push(
+    { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
+  );
+  options.mac.extraResources.push(
+    { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` }
+  );
 }
 
 function whatToBuild() {
@@ -333,6 +360,7 @@ async function main() {
   } catch (error) {
     console.error(`Error building Pulsar:`);
     console.error(error);
+
     process.exit(1);
   }
 }
