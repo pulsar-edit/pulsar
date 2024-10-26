@@ -56,9 +56,9 @@ if (cirrusFlag === "cirrus") {
   publish({
     token: process.env.ROLLING_UPLOAD_TOKEN || process.env.GITHUB_TOKEN,
     owner: "pulsar-edit",
-    repo: "pulsar-rolling-releases",
+    repo: "pulsar-electron-next-binaries",
     name: packageJson.version,
-    notes: `Rolling Release: ${packageJson.version}`,
+    notes: `Pulsar Electron Next version: ${packageJson.version}`,
     tag: `v${packageJson.version}`,
     draft: false,
     prerelease: false,
