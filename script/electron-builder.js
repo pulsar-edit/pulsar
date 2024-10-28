@@ -241,6 +241,7 @@ let options = {
   "afterSign": "script/mac-notarise.js",
   "asarUnpack": [
     "node_modules/github/bin/*",
+    "node_modules/better-sqlite3/*",
     "node_modules/github/lib/*", // Resolves Error in console
     "**/node_modules/dugite/git/**", // Include dugite postInstall output (matching glob used for Atom)
     "**/node_modules/spellchecker/**", // Matching Atom Glob
