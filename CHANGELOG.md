@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+- Fixed SQL State Storage not loading when starting Pulsar from a self-contained binary like appImage, tar.gz, etc.
+
 ## 1.122.0
 
 - Added a SQL State Storage alternative to IndexedDB (opt-in, off by default).
