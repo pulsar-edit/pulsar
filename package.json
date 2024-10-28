@@ -145,7 +145,7 @@
     "one-light-ui": "file:packages/one-light-ui",
     "open-on-github": "file:packages/open-on-github",
     "package-generator": "file:packages/package-generator",
-    "pathwatcher": "https://github.com/savetheclocktower/node-pathwatcher#afd5512013b4d1bfd452212caaafd937b745418b",
+    "pathwatcher": "https://github.com/savetheclocktower/node-pathwatcher#f32158f3f8275df0b7e273326967141f21a494d9",
     "postcss": "8.4.31",
     "postcss-selector-parser": "6.0.4",
     "pulsar-updater": "file:packages/pulsar-updater",
@@ -314,8 +314,8 @@
     "**/superstring": "github:savetheclocktower/superstring#e5e848017f7a28fe250b45f8c7f8ed244371d33d",
     "superstring": "github:savetheclocktower/superstring#e5e848017f7a28fe250b45f8c7f8ed244371d33d",
     "text-buffer/superstring": "github:savetheclocktower/superstring#e5e848017f7a28fe250b45f8c7f8ed244371d33d",
-    "**/pathwatcher": "https://github.com/savetheclocktower/node-pathwatcher#afd5512013b4d1bfd452212caaafd937b745418b",
-    "pathwatcher": "https://github.com/savetheclocktower/node-pathwatcher#afd5512013b4d1bfd452212caaafd937b745418b",
+    "**/pathwatcher": "https://github.com/savetheclocktower/node-pathwatcher#f32158f3f8275df0b7e273326967141f21a494d9",
+    "pathwatcher": "https://github.com/savetheclocktower/node-pathwatcher#f32158f3f8275df0b7e273326967141f21a494d9",
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244",
     "@electron/remote": "2.1.2"
   }
