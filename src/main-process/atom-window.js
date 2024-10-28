@@ -345,6 +345,7 @@ module.exports = class AtomWindow extends EventEmitter {
       NODE_ENV,
       NODE_PATH,
       ATOM_HOME,
+      ATOM_CHANNEL,
       ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT
     } = env;
 
@@ -352,6 +353,7 @@ module.exports = class AtomWindow extends EventEmitter {
       NODE_ENV,
       NODE_PATH,
       ATOM_HOME,
+      ATOM_CHANNEL,
       ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT
     });
   }

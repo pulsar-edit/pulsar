@@ -45,6 +45,20 @@ module.exports = {
       return;
     }
 
+    // On Windows, we don’t try to set ATOM_HOME in `pulsar.cmd`; but we might
+    // set ATOM_CHANNEL to signal which location should be inferred as the
+    // default ATOM_HOME.
+    if (process.env.ATOM_CHANNEL) {
+      switch (process.env.ATOM_CHANNEL) {
+        case 'next':
+          process.env.ATOM_HOME = path.join(homePath, '.pulsar-next');
+          return;
+        default:
+          process.env.ATOM_HOME = path.join(homePath, '.pulsar');
+          return;
+      }
+    }
+
     // Fall back to default .atom folder in users home folder
     process.env.ATOM_HOME = path.join(homePath, '.pulsar');
   },

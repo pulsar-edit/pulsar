@@ -5,6 +5,7 @@ SET WAIT=
 SET PSARGS=%*
 SET ELECTRON_ENABLE_LOGGING=
 SET ATOM_ADD=
+SET ATOM_CHANNEL=
 SET ATOM_NEW_WINDOW=
 SET PACKAGE_MODE=
 SET PACKAGE_MODE_ARGS=
@@ -37,6 +38,27 @@ FOR %%a IN (%*) DO (
   )
 )
 
+set EXE_NAME=
+set SCRIPT_NAME=
+set PPM_NAME=
+
+set ATOM_BASE_NAME="%SCRIPT_NAME%"
+
+REM Use the name of the executable to infer a release channel.
+set SCRIPT_NAME=%~n0
+
+if "%SCRIPT_NAME%"=="pulsar-next" (
+  set ATOM_CHANNEL="next"
+  set EXE_NAME="PulsarNext"
+  set PPM_NAME="ppm-next"
+)
+
+if "%SCRIPT_NAME%"=="pulsar" (
+  set ATOM_CHANNEL="stable"
+  set EXE_NAME="Pulsar"
+  set PPM_NAME="ppm"
+)
+
 IF "%ATOM_ADD%"=="YES" (
   IF "%ATOM_NEW_WINDOW%"=="YES" (
     SET EXPECT_OUTPUT=YES
@@ -52,19 +74,19 @@ if "%PACKAGE_MODE%"=="YES" (
   goto :trim_args_for_package_mode
 
 :package_mode_return
-  "%~dp0\app\ppm\bin\ppm.cmd" %PACKAGE_MODE_ARGS%
+  "%~dp0\app\ppm\bin\%PPM_NAME%.cmd" %PACKAGE_MODE_ARGS%
   exit 0
 )
 
 IF "%EXPECT_OUTPUT%"=="YES" (
   IF "%WAIT%"=="YES" (
-    powershell -noexit "Start-Process -FilePath \"%~dp0\..\Pulsar.exe\" -ArgumentList \"--pid=$pid $env:PSARGS\" ; wait-event"
+    powershell -noexit "Start-Process -FilePath \"%~dp0\..\%EXE_NAME%.exe\" -ArgumentList \"--pid=$pid $env:PSARGS\" ; wait-event"
     exit 0
   ) ELSE (
-    "%~dp0\..\Pulsar.exe" %*
+    "%~dp0\..\%EXE_NAME%.exe" %*
   )
 ) ELSE (
-  "%~dp0\app\ppm\bin\node.exe" "%~dp0\pulsar.js" "Pulsar.exe" %*
+  "%~dp0\app\ppm\bin\node.exe" "%~dp0\%SCRIPT_NAME%.js" "%EXE_NAME%.exe" %*
 )
 
 REM Jump past the subroutines below.

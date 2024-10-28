@@ -23,6 +23,7 @@ case ATOM_BASE_NAME in
 esac
 # Capture the name of this script so that we can use it at runtime.
 export ATOM_BASE_NAME
+export ATOM_CHANNEL=$CHANNEL
 
 # Only set the ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT env var if it hasn't
 # been set.
