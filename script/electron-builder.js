@@ -111,9 +111,10 @@ let options = {
     // Other Exclusions
     "!**/._*",
     "!**/node_modules/*.d.ts",
+    "!**/node_modules/**/*.map",
     "!**/node_modules/.bin",
     "!**/node_modules/native-mate",
-    "!node_modules/fuzzy-native/node_modules", // node_modules of the fuzzy-native package are only required for building it
+    "!node_modules/@pulsar-edit/fuzzy-native/node_modules", // node_modules of the fuzzy-native package are only required for building it
     "!**/node_modules/spellchecker/vendor/hunspell/.*",
     "!**/git-utils/deps",
     "!**/oniguruma/deps",
@@ -241,7 +242,6 @@ let options = {
   "afterSign": "script/mac-notarise.js",
   "asarUnpack": [
     "node_modules/github/bin/*",
-    "node_modules/better-sqlite3/*",
     "node_modules/github/lib/*", // Resolves Error in console
     "**/node_modules/dugite/git/**", // Include dugite postInstall output (matching glob used for Atom)
     "**/node_modules/spellchecker/**", // Matching Atom Glob
