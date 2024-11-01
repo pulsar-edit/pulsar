@@ -198,7 +198,8 @@ let options = {
       //
       // Below we copy over `ppm` itself, but it might have its name changed in
       // the process depending on the release channel.
-      from: [
+      from: 'ppm',
+      filter: [
         // Everything below `ppm`…
         'ppm/**',
         // …except for files inside the `bin` directory.
