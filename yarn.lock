@@ -6725,13 +6725,12 @@ key-path-helpers@^0.4.0:
     fs-plus "^3.0.0"
     temp "^0.9.0"
 
-keyboard-layout@2.0.17:
+keyboard-layout@2.0.17, "keyboard-layout@https://github.com/savetheclocktower/keyboard-layout#5e3a07648c3fc97e2895b199ee5ad3852dbaaaa6":
   version "2.0.17"
-  resolved "https://registry.yarnpkg.com/keyboard-layout/-/keyboard-layout-2.0.17.tgz#32d35dc4196a88a3973b6c8863fd3c1b39643d43"
-  integrity sha512-W9LL+1e8CS9fi0s8ZHINDN1HZ6QpYjE4yLi4+faed7ozppNOAxINjv5w16zG9tJv8Jp5LJrCfO5PZ9aV1m5d4g==
+  resolved "https://github.com/savetheclocktower/keyboard-layout#5e3a07648c3fc97e2895b199ee5ad3852dbaaaa6"
   dependencies:
     event-kit "^2.0.0"
-    nan "^2.13.2"
+    node-addon-api "^7.1.1"
 
 keytar@4.13.0, keytar@7.9.0:
   version "7.9.0"
@@ -7636,7 +7635,7 @@ murmurhash-js@^1.0.0:
   resolved "https://registry.yarnpkg.com/murmurhash-js/-/murmurhash-js-1.0.0.tgz#b06278e21fc6c37fa5313732b0412bcb6ae15f51"
   integrity sha512-TvmkNhkv8yct0SVBSy+o8wYzXjE4Zz3PCesbfs8HiCXXdcTuocApFv11UWlNFWKYsP2okqrhb7JNlSm9InBhIw==
 
-nan@2.17.0, nan@2.19.0, nan@^2.13.2, nan@^2.14.2, nan@^2.18.0:
+nan@2.17.0, nan@2.19.0, nan@^2.14.2, nan@^2.18.0:
   version "2.19.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.19.0.tgz#bb58122ad55a6c5bc973303908d5b16cfdd5a8c0"
   integrity sha512-nO1xXxfh/RWNxfd/XPfbIfFk5vgLsAxUR9y5O0cHMJu/AW9U95JLXqthYHjEp+8gQ5p96K9jUp8nbVOxCdRbtw==
@@ -7742,6 +7741,11 @@ node-addon-api@^5.0.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-5.1.0.tgz#49da1ca055e109a23d537e9de43c09cca21eb762"
   integrity sha512-eh0GgfEkpnoWDq+VY8OyvYhFEzBk6jIYbRKdIlyTiAXIVJ8PyBaKb0rp7oDtoddbdoHWhq8wwr+XZ81F1rpNdA==
+
+node-addon-api@^7.1.1:
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-7.1.1.tgz#1aba6693b0f255258a049d621329329322aad558"
+  integrity sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==
 
 node-api-version@^0.2.0:
   version "0.2.0"
@@ -8202,9 +8206,9 @@ pathval@^1.1.1:
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.1.tgz#8534e77a77ce7ac5a2512ea21e0fdb8fcf6c3d8d"
   integrity sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==
 
-"pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f", "pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#e56a44c", "pathwatcher@https://github.com/savetheclocktower/node-pathwatcher#f32158f3f8275df0b7e273326967141f21a494d9":
+"pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#567561f", "pathwatcher@https://github.com/pulsar-edit/node-pathwatcher.git#e56a44c", "pathwatcher@https://github.com/savetheclocktower/node-pathwatcher#9eb8beb50a1b4f381ff65283e48fc9b23afefe71":
   version "8.1.2"
-  resolved "https://github.com/savetheclocktower/node-pathwatcher#f32158f3f8275df0b7e273326967141f21a494d9"
+  resolved "https://github.com/savetheclocktower/node-pathwatcher#9eb8beb50a1b4f381ff65283e48fc9b23afefe71"
   dependencies:
     async "~0.2.10"
     emissary "^1.3.2"
