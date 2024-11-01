@@ -191,7 +191,25 @@ let options = {
 
   extraResources: [
     { from: 'pulsar.sh', to: `${baseName}.sh` },
-    { from: 'ppm', to: 'app/ppm' },
+    {
+      // Be selective in what we copy over to PPM’s `bin` directory. On
+      // Windows, the contents of this entire folder will be available on the
+      // `PATH`, so we shouldn’t put stray stuff in here.
+      //
+      // Below we copy over `ppm` itself, but it might have its name changed in
+      // the process depending on the release channel.
+      from: [
+        // Everything below `ppm`…
+        'ppm/**',
+        // …except for files inside the `bin` directory.
+        '!ppm/bin'
+      ],
+      to: 'app/ppm'
+    },
+    // This shell script is used on macOS and Linux; it doesn't hurt to include
+    // it on Windows, and it might even be consumed in WSL or Cygwin
+    // environments.
+    { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
     { from: ICONS.png, to: 'pulsar.png' },
     { from: 'LICENSE.md', to: 'LICENSE.md' }
   ],
@@ -228,7 +246,7 @@ let options = {
         // (used only by desktops to show it on bar/switcher and app menus).
         "from": ICONS.svg,
         "to": "pulsar.svg"
-      },
+      }
     ]
   },
 
@@ -272,7 +290,10 @@ let options = {
       { from: ICONS.ico, to: 'pulsar.ico' },
       { from: 'resources/win/pulsar.cmd', to: `${baseName}.cmd` },
       { from: 'resources/win/pulsar.js', to: `${baseName}.js` },
-      { from: 'resources/win/modifyWindowsPath.ps1', to: 'modifyWindowsPath.ps1' }
+      { from: 'resources/win/modifyWindowsPath.ps1', to: 'modifyWindowsPath.ps1' },
+      // Copy `ppm.cmd` to the `ppm/bin` directory, possibly renaming it
+      // `ppm-next.cmd` depending on release channel.
+      { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
     ],
     target: [
       { target: 'nsis' },
@@ -292,6 +313,10 @@ let options = {
     // Hardcoding it here means it will always be used as generated from the
     // AppID 'dev.pulsar-edit.pulsar'. If this value ever changes, a PR to
     // GitHub Desktop must be made with the updated value.
+    //
+    // We delete this value when building PulsarNext so that it’s regenerated
+    // based on the app ID. Otherwise the OS might consider it equivalent to
+    // stable Pulsar in some ways.
     //
     // TODO: On first look, this installer script seems not to need any
     // updating for PulsarNext, but we should make sure.
@@ -314,19 +339,6 @@ if (ARGS.next) {
   // TODO: Should PulsarNext have its own guid? `electron-builder` docs suggest
   // it will be generated from the `appId` if omitted, so I think this is fine.
   delete options.nsis.guid;
-
-  // We need to copy `ppm` over to `ppm-next` when `--next` is passed, but not
-  // copy `ppm` over to `ppm` when `--next` is omitted (because it's
-  // redundant).
-  options.linux.extraResources.push(
-    { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` }
-  );
-  options.win.extraResources.push(
-    { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
-  );
-  options.mac.extraResources.push(
-    { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` }
-  );
 }
 
 function whatToBuild() {
