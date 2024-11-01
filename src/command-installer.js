@@ -27,8 +27,8 @@ module.exports = class CommandInstaller {
       return process.env.ATOM_BASE_NAME;
     }
     // TODO: For now we can infer it from the presence of a file in the
-    // resources directory, but a better way would be to bake it the right
-    // metadat at build time.
+    // resources directory, but a better way would be to bake in the right
+    // metadata at build time.
     for (let name in ['pulsar', 'pulsar-next']) {
       for (let ext in ['sh', 'cmd']) {
         let candidate = path.join(
