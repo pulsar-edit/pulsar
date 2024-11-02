@@ -8,14 +8,29 @@ const { hideBin } = require('yargs/helpers')
 const generateMetadata = require('./generate-metadata-for-builder')
 const macBundleDocumentTypes = require("./mac-bundle-document-types.js");
 
-// Ensure the user has initialized the `ppm` submodule before they try to build
-// the app.
+// Ensure the user has initialized and built the `ppm` submodule before they
+// try to build the app.
 if (!existsSync(Path.join('ppm', 'bin'))) {
   console.error(dedent`
     \`ppm\` not detected. Please run:
 
-      git submodule init
-      git submodule update
+      git submodule update --init
+      yarn run build:apm
+  `);
+  process.exit(2);
+} else if (
+  !existsSync(
+    Path.join(
+      'ppm',
+      'bin',
+      process.platform === 'win32' ? 'node.exe' : 'node'
+    )
+  )
+) {
+  console.error(dedent`
+    \`ppm\` not built. Please run:
+
+    yarn run build:apm
   `);
   process.exit(2);
 }
@@ -208,11 +223,6 @@ let options = {
       // intact.
       to: 'app'
     },
-    // This shell script is used on macOS and Linux; it doesn't hurt to include
-    // it on Windows, and it might even be consumed in WSL or Cygwin
-    // environments.
-    { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
-    { from: 'ppm/bin/node', to: `app/ppm/bin/node` },
     { from: ICONS.png, to: 'pulsar.png' },
     { from: 'LICENSE.md', to: 'LICENSE.md' }
   ],
@@ -229,6 +239,7 @@ let options = {
   },
 
   linux: {
+    executableName: baseName,
     // Giving a single PNG icon to electron-builder prevents the correct
     // construction of the icon path, so we have to specify a folder containing
     // multiple icons named each with its size.
@@ -249,7 +260,9 @@ let options = {
         // (used only by desktops to show it on bar/switcher and app menus).
         "from": ICONS.svg,
         "to": "pulsar.svg"
-      }
+      },
+      { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
+      { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
     ]
   },
 
@@ -280,7 +293,10 @@ let options = {
         { "CFBundleURLName": "Atom Shared Session Protocol" }
       ]
     },
-    extraResources: []
+    extraResources: [
+      { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
+      { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
+    ]
   },
 
   dmg: { sign: false },

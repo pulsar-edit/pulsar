@@ -203,9 +203,6 @@ elif [ $OS == 'Linux' ]; then
   # * `ATOM_EXECUTABLE_NAME` will refer to the executable we must run to launch
   #   it (`pulsar` or `pulsar-next`)
 
-  # We'll start out assuming that the executable name will match the name of
-  # this script (minus the `.sh`); this may or may not be true, but we'll make
-  # sure later.
   ATOM_EXECUTABLE_NAME=$ATOM_BASE_NAME
   if [ "$CHANNEL" == 'next' ]; then
     ATOM_APP_NAME="PulsarNext"
@@ -231,7 +228,7 @@ elif [ $OS == 'Linux' ]; then
     ATOM_APP="$(dirname "$(dirname "$SCRIPT")")"
     PULSAR_PATH="$(realpath "$ATOM_APP")"
 
-    if [ ! -f "$PULSAR_PATH/${ATOM_EXECUTABLE_NAME}" ] && [ ! -f "$PULSAR_PATH/pulsar" ]; then
+    if [ ! -f "$PULSAR_PATH/${ATOM_EXECUTABLE_NAME}" ]; then
       # If that path doesn't contain a `pulsar` executable, then it's not a
       # valid path. We'll try something else.
       unset ATOM_APP
@@ -239,11 +236,11 @@ elif [ $OS == 'Linux' ]; then
     fi
 
     if [ -z "${PULSAR_PATH}" ]; then
-      if [ -f "/opt/${ATOM_APP_NAME}/${ATOM_EXECUTABLE_NAME}" ] || [ -f "/opt/${ATOM_APP_NAME}/pulsar" ]; then
+      if [ -f "/opt/${ATOM_APP_NAME}/${ATOM_EXECUTABLE_NAME}" ]; then
         # Check the default installation directory for RPM and DEB
         # distributions.
         PULSAR_PATH="/opt/${ATOM_APP_NAME}"
-      elif [ -f "$TMPDIR/pulsar-build/${ATOM_APP_NAME}/${ATOM_EXECUTABLE_NAME}" ] || [ -f "$TMPDIR/pulsar-build/${ATOM_APP_NAME}/pulsar" ]; then
+      elif [ -f "$TMPDIR/pulsar-build/${ATOM_APP_NAME}/${ATOM_EXECUTABLE_NAME}" ]; then
         # This is where Pulsar can be found during some CI build tasks.
         PULSAR_PATH="$TMPDIR/pulsar-build/${ATOM_APP_NAME}"
       else
@@ -253,13 +250,7 @@ elif [ $OS == 'Linux' ]; then
     fi
   fi
 
-  # If we make it through the conditional above, then we know the Pulsar path
-  # and we know the executable is named either `$ATOM_EXECUTABLE_NAME` or
-  # `pulsar`. Here we'll discover which one is present.
   PULSAR_EXECUTABLE="$PULSAR_PATH/$ATOM_EXECUTABLE_NAME"
-  if [ ! -f "${PULSAR_EXECUTABLE}" ]; then
-    PULSAR_EXECUTABLE="$PULSAR_PATH/pulsar"
-  fi
 
   # The name of the `ppm` binary we should run will be named according to the
   # same convention as this script; that's how PPM itself knows which release
