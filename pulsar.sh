@@ -13,7 +13,7 @@ fi
 
 ATOM_BASE_NAME=$(basename $0)
 ATOM_BASE_NAME=${ATOM_BASE_NAME%.*}
-case ATOM_BASE_NAME in
+case $ATOM_BASE_NAME in
   pulsar-next)
     CHANNEL=next
     ;;
@@ -97,20 +97,6 @@ then
 fi
 mkdir -p "$ATOM_HOME"
 export ATOM_HOME
-
-if [ $PACKAGE_MODE ]; then
-  # If `-p` or `--package` is present, then we'll be discarding all arguments
-  # prior to (and including) `-p`/`--package` and passing the rest to `ppm`.
-  loop_done=0
-  while [ $loop_done -eq 0 ]
-  do
-    if [[ "$1" == "-p" || "$1" == "--package" || "$1" == "" ]]; then
-      # We'll shift one last time and then we'll be done.
-      loop_done=1
-    fi
-    shift
-  done
-fi
 
 if [ $PACKAGE_MODE ]; then
   # If `-p` or `--package` is present, then we'll be discarding all arguments
@@ -210,13 +196,22 @@ elif [ $OS == 'Linux' ]; then
   # Set tmpdir only if it's unset.
   : ${TMPDIR:=/tmp}
 
-  ATOM_EXECUTABLE_NAME=$BASENAME
+  # We think that
+  #
+  # * `ATOM_APP_NAME` will refer to the human-readable app name (“Pulsar” or
+  #   “PulsarNext”)
+  # * `ATOM_EXECUTABLE_NAME` will refer to the executable we must run to launch
+  #   it (`pulsar` or `pulsar-next`)
+
+  # We'll start out assuming that the executable name will match the name of
+  # this script (minus the `.sh`); this may or may not be true, but we'll make
+  # sure later.
+  ATOM_EXECUTABLE_NAME=$ATOM_BASE_NAME
   if [ "$CHANNEL" == 'next' ]; then
     ATOM_APP_NAME="PulsarNext"
   else
     ATOM_APP_NAME="Pulsar"
   fi
-
 
   # If `PULSAR_PATH` is set by the user, we'll assume they know what they're
   # doing. Otherwise we should try to find it ourselves.
@@ -236,7 +231,7 @@ elif [ $OS == 'Linux' ]; then
     ATOM_APP="$(dirname "$(dirname "$SCRIPT")")"
     PULSAR_PATH="$(realpath "$ATOM_APP")"
 
-    if [ ! -f "$PULSAR_PATH/${BASENAME}" ]; then
+    if [ ! -f "$PULSAR_PATH/${ATOM_EXECUTABLE_NAME}" ] && [ ! -f "$PULSAR_PATH/pulsar" ]; then
       # If that path doesn't contain a `pulsar` executable, then it's not a
       # valid path. We'll try something else.
       unset ATOM_APP
@@ -244,22 +239,41 @@ elif [ $OS == 'Linux' ]; then
     fi
 
     if [ -z "${PULSAR_PATH}" ]; then
-      if [ -f "/opt/${ATOM_APP_NAME}/${BASENAME}" ]; then
+      if [ -f "/opt/${ATOM_APP_NAME}/${ATOM_EXECUTABLE_NAME}" ] || [ -f "/opt/${ATOM_APP_NAME}/pulsar" ]; then
         # Check the default installation directory for RPM and DEB
         # distributions.
         PULSAR_PATH="/opt/${ATOM_APP_NAME}"
-      elif [ -f "$TMPDIR/pulsar-build/${ATOM_APP_NAME}/${BASENAME}" ]; then
+      elif [ -f "$TMPDIR/pulsar-build/${ATOM_APP_NAME}/${ATOM_EXECUTABLE_NAME}" ] || [ -f "$TMPDIR/pulsar-build/${ATOM_APP_NAME}/pulsar" ]; then
         # This is where Pulsar can be found during some CI build tasks.
         PULSAR_PATH="$TMPDIR/pulsar-build/${ATOM_APP_NAME}"
       else
-        echoerr "Cannot locate ${ATOM_APP_NAME}. Set the PULSAR_PATH environment variable to the directory containing the \`${BASENAME}\` executable."
+        echoerr "Cannot locate ${ATOM_APP_NAME}. Set the PULSAR_PATH environment variable to the directory containing the \`${ATOM_BASE_NAME}\` executable."
         exit 1
       fi
     fi
   fi
 
+  # If we make it through the conditional above, then we know the Pulsar path
+  # and we know the executable is named either `$ATOM_EXECUTABLE_NAME` or
+  # `pulsar`. Here we'll discover which one is present.
   PULSAR_EXECUTABLE="$PULSAR_PATH/$ATOM_EXECUTABLE_NAME"
-  PPM_EXECUTABLE="$PULSAR_PATH/resources/app/ppm/bin/ppm"
+  if [ ! -f "${PULSAR_EXECUTABLE}" ]; then
+    PULSAR_EXECUTABLE="$PULSAR_PATH/pulsar"
+  fi
+
+  # The name of the `ppm` binary we should run will be named according to the
+  # same convention as this script; that's how PPM itself knows which release
+  # channel it's using.
+  case $ATOM_BASE_NAME in
+    pulsar-next)
+      PPM_EXECUTABLE_NAME="ppm-next"
+      ;;
+    *)
+      PPM_EXECUTABLE_NAME="ppm"
+      ;;
+  esac
+
+  PPM_EXECUTABLE="$PULSAR_PATH/resources/app/ppm/bin/$PPM_EXECUTABLE_NAME"
 
   # If `-p` or `--package` was specified, call `ppm` with all the arguments
   # that followed it instead of calling the Pulsar executable directly.
