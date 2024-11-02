@@ -212,6 +212,7 @@ let options = {
     // it on Windows, and it might even be consumed in WSL or Cygwin
     // environments.
     { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
+    { from: 'ppm/bin/node', to: `app/ppm/bin/node` },
     { from: ICONS.png, to: 'pulsar.png' },
     { from: 'LICENSE.md', to: 'LICENSE.md' }
   ],
@@ -296,6 +297,7 @@ let options = {
       // Copy `ppm.cmd` to the `ppm/bin` directory, possibly renaming it
       // `ppm-next.cmd` depending on release channel.
       { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
+      { from: 'ppm/bin/node.exe', to: `app/ppm/bin/node.exe` },
     ],
     target: [
       { target: 'nsis' },
