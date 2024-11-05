@@ -1,7 +1,13 @@
 'use strict';
 
-const sqlite3 = require('better-sqlite3');
 const path = require('path');
+const nativeSQLite = require(path.join(
+  require.resolve('better-sqlite3'),
+  '..', '..',
+  'build', 'Release',
+  'better_sqlite3.node'
+));
+const sqlite3 = require('better-sqlite3');
 
 module.exports = class SQLStateStore {
   constructor(databaseName, version) {
@@ -12,7 +18,7 @@ module.exports = class SQLStateStore {
       const dbPath = path.join(atom.getConfigDirPath(), 'session-store.db');
       let db;
       try {
-        db = sqlite3(dbPath);
+        db = sqlite3(dbPath, {nativeBinding: nativeSQLite});
       } catch(error) {
         atom.notifications.addFatalError('Error loading database', {
           stack: new Error('Error loading SQLite database for state storage').stack,
