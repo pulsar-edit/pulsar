@@ -7,6 +7,7 @@ const SymbolsView = require('../lib/symbols-view');
 const { migrateOldConfigIfNeeded } = require('../lib/util');
 
 const DummyProvider = require('./fixtures/providers/dummy-provider');
+const SecondDummyProvider = require('./fixtures/providers/second-dummy-provider');
 const AsyncDummyProvider = require('./fixtures/providers/async-provider');
 const ProgressiveProjectProvider = require('./fixtures/providers/progressive-project-provider.js');
 const QuicksortProvider = require('./fixtures/providers/quicksort-provider.js');
@@ -694,6 +695,27 @@ describe('SymbolsView', () => {
 
       expect(symbolsView.element.querySelector('li:first-child .primary-line')).toHaveText('Symbol on Row 13');
       expect(symbolsView.element.querySelector('li:first-child .secondary-line')).toHaveText(`${relative}:13`);
+    });
+
+    it('includes results from all providers, even if they claim to be exclusive', async () => {
+      registerProvider(DummyProvider);
+      registerProvider(SecondDummyProvider);
+
+      await dispatchAndWaitForChoices('symbols-view:toggle-project-symbols');
+      symbolsView = atom.workspace.getModalPanels()[0].item;
+
+      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(document.body.contains(symbolsView.element)).toBe(true);
+      expect(symbolsView.element.querySelectorAll('li').length).toBe(10);
+
+      let root = atom.project.getPaths()[1];
+      let resolved = directory.resolve('other-file.js');
+      let relative = `${path.basename(root)}${resolved.replace(root, '')}`;
+
+      expect(symbolsView.element.querySelector('li:first-child .primary-line')).toHaveText('Symbol on Row 1');
+      expect(symbolsView.element.querySelector('li:first-child .secondary-line')).toHaveText(`${relative}:1`);
+      expect(symbolsView.element.querySelector('li:last-child .primary-line')).toHaveText('(Second) Symbol on Row 13');
+      expect(symbolsView.element.querySelector('li:last-child .secondary-line')).toHaveText(`${relative}:13`);
     });
 
     it('does not prefill the query field if `prefillSelectedText` is `false`', async () => {
