@@ -180,7 +180,7 @@ jobs:
 
     - name: Fix AppImage target - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: ./script/fix-linux-appimage.sh x86_64
+      run: ./script/fix-linux-appimage.sh x86_64 pulsar-next
 
     - name: Cache Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
