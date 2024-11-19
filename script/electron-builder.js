@@ -1,6 +1,7 @@
 const path = require('path')
 const normalizePackageData = require('normalize-package-data');
 const fs = require("fs/promises");
+const {mkdirSync} = require("fs");
 const generateMetadata = require('./generate-metadata-for-builder')
 const macBundleDocumentTypes = require("./mac-bundle-document-types.js");
 
@@ -289,7 +290,13 @@ async function main() {
     config: options
   }).then((result) => {
     console.log("Built binaries")
-    fs.mkdir('binaries').catch(() => "")
+    try {
+      mkdirSync('binaries', {recursive: true})
+    } catch (err) {
+      console.warn("Warning: error encountered when making the 'binaries' dir.")
+      console.warn("(HINT: If the 'binaries' folder already exists, then this error message is probably fine to ignore!)")
+      console.warn(err)
+    }
     Promise.all(result.map(r => fs.copyFile(r, path.join('binaries', path.basename(r)))))
   }).catch((error) => {
     console.error("Error building binaries")
