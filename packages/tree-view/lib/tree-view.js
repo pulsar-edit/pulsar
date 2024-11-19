@@ -874,7 +874,7 @@ class TreeView {
     return dialog.attach();
   }
 
-  async removeSelectedEntries() {
+  removeSelectedEntries() {
     let activePath = this.getActivePath();
     let selectedPaths, selectedEntries;
     if (this.hasFocus()) {
@@ -896,25 +896,13 @@ class TreeView {
       }
     }
 
-    atom.confirm({
+    return atom.confirm({
       message: `Are you sure you want to delete the selected ${selectedPaths.length > 1 ? 'items' : 'item'}?`,
       detailedMessage: `You are deleting:\n${selectedPaths.join('\n')}`,
       buttons: ['Move to Trash', 'Cancel']
-    }, async (response) => {
+    }, (response) => {
       if (response === 0) { // Move to Trash
         let failedDeletions = [];
-        let deletionPromises = [];
-
-        // Since this goes async, all entries that correspond to paths we're
-        // about to delete will soon detach from the tree. So we should figure
-        // out ahead of time which element we're going to select when we're
-        // done.
-        let newSelectedEntry;
-        let firstSelectedEntry = selectedEntries[0];
-        if (firstSelectedEntry) {
-          newSelectedEntry = firstSelectedEntry.closest('.directory:not(.selected)');
-        }
-
         for (let selectedPath of selectedPaths) {
           // Don't delete entries which no longer exist. This can happen, for
           // example, when
@@ -925,24 +913,17 @@ class TreeView {
           //   but the parent folder is deleted first.
           if (!fs.existsSync(selectedPath)) continue;
 
-          let meta = { pathToDelete: selectedPath };
+          this.emitter.emit('will-delete-entry', { pathToDelete: selectedPath });
 
-          this.emitter.emit('will-delete-entry', meta);
-
-          let promise = shell.trashItem(selectedPath).then(() => {
-            this.emitter.emit('entry-deleted', meta);
-          }).catch(() => {
-            this.emitter.emit('delete-entry-failed', meta);
+          // TODO: `shell.trashItem` is the favored way to do this.
+          if (shell.moveItemToTrash(selectedPath)) {
+            this.emitter.emit('entry-deleted', { pathToDelete: selectedPath });
+          } else {
+            this.emitter.emit('delete-entry-failed', { pathToDelete: selectedPath });
             failedDeletions.push(selectedPath);
-          }).finally(() => {
-            repoForPath(selectedPath)?.getPathStatus(selectedPath);
-          });
-
-          deletionPromises.push(promise);
+          }
+          repoForPath(selectedPath)?.getPathStatus(selectedPath);
         }
-
-        await Promise.allSettled(deletionPromises);
-
         if (failedDeletions.length > 0) {
           atom.notifications.addError(
             this.formatTrashFailureMessage(failedDeletions),
@@ -953,9 +934,9 @@ class TreeView {
             }
           );
         }
-
-        if (newSelectedEntry) {
-          this.selectEntry(newSelectedEntry);
+        let firstSelectedEntry = selectedEntries[0];
+        if (firstSelectedEntry) {
+          this.selectEntry(firstSelectedEntry.closest('.directory:not(.selected)'));
         }
 
         if (atom.config.get('tree-view.squashDirectoryNames')) {
