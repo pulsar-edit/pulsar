@@ -199,7 +199,8 @@ let options = {
     },
   },
   "dmg": {
-    "sign": false
+    "sign": false,
+    "writeUpdateInfo": false
   },
   "win": {
     "icon": icoIcon,
@@ -236,7 +237,8 @@ let options = {
     // the AppID 'dev.pulsar-edit.pulsar'. If this value ever changes,
     // A PR to GitHub Desktop must be made with the updated value
     "include": "resources/win/installer.nsh",
-    "warningsAsErrors": false
+    "warningsAsErrors": false,
+    "differentialPackage": false
   },
   "extraMetadata": {
   },
