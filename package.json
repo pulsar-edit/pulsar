@@ -300,7 +300,7 @@
     "@electron/notarize": "^1.2.3",
     "@playwright/test": "1.22.2",
     "electron": "12.2.3",
-    "electron-builder": "23.3.1",
+    "electron-builder": "23.6.0",
     "electron-rebuild": "3.2.7",
     "eslint": "^8.33.0",
     "eslint-plugin-jsdoc": "^39.7.4",
