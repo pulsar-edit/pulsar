@@ -143,7 +143,11 @@ module.exports = class ProjectView extends SymbolsView {
     // longer need the symbols we asked for.
     let signal = this.abortController.signal;
 
-    let providers = await this.broker.select(meta);
+    // A user would probably expect this search to return symbols from all
+    // files in the project, regardless of their language. Instead of picking a
+    // “winning” provider as we usually do, we should instead consult _all_
+    // providers that consider themselves up to the task.
+    let providers = await this.broker.select(meta, { enforceExclusivity: false });
     if (providers?.length === 0) {
       console.warn('No providers found!');
       return null;
