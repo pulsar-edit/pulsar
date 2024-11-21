@@ -50,34 +50,16 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added a SQL State Storage alternative to IndexedDB (opt-in, off by default).
+                Fixed SQL State Storage not loading when starting Pulsar from a self-contained binary like appImage, tar.gz, etc.
               </li>
               <li>
-                Repackaged the AppImage so it uses our launcher script internally (supports more CLI/launch flags).
+                [symbols-view] Allow project-wide symbol search to consider results from more than one provider.
               </li>
               <li>
-                [language-php] Highlighted “null-safe” property access correctly.
+                Tree-sitter fixes and enhancements for hyperlinks, C, and shell scripts.
               </li>
               <li>
-                [language-c] Scoped template delimiters properly in C++.
-              </li>
-              <li>
-                [language-c] Consolidated common highlighting queries between the C and C++ grammars for more consistency in syntax highlighting.
-              </li>
-              <li>
-                Fixed incorrect behavior in certain scenarios for “Fold at Indent Level X” commands.
-              </li>
-              <li>
-                Fixed exception when resolving divided folds (e.g., <code>#ifdefs</code> in C/C++).
-              </li>
-              <li>
-                Avoided "length of null" error in autocomplete-plus for the PHP Tree-sitter grammar.
-              </li>
-              <li>
-                Preserved <code>/usr/bin/pulsar</code> and <code>/usr/bin/ppm</code> on RPM updates.
-              </li>
-              <li>
-                [tree-view] Moved to a more modern API for file removal in preparation for an Electron upgrade.
+                Restore use of <code>shell.moveItemToTrash</code> API in tree-view, for Electron 12 compatibility.
               </li>
             </ul>
 
