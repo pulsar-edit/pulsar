@@ -178,6 +178,11 @@
 (init_declarator
   declarator: (identifier) @variable.other.declaration._LANG_)
 
+; The "x" in `FSEvent& x`;
+(reference_declarator
+  [(identifier) (field_identifier)] @variable.other.declaration._LANG_
+  (#is? test.descendantOfType "declaration field_declaration"))
+
 ; The "x" in `SomeType *x;`
 ; (Should work no matter how many pointers deep we are.)
 (pointer_declarator
