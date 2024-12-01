@@ -143,6 +143,12 @@
 ; VARIABLES
 ; =========
 
+; The "x" in `FSEvent& x`;
+(reference_declarator
+  [(identifier) (field_identifier)] @variable.other.declaration._LANG_
+  (#is? test.descendantOfType "declaration field_declaration"))
+
+
 ; Function parameters
 ; -------------------
 
@@ -154,7 +160,6 @@
 ; (Should work no matter how many pointers deep we are.)
 (reference_declarator (identifier) @variable.parameter.cpp
   (#is? test.descendantOfType "parameter_declaration"))
-
 
 ; KEYWORDS
 ; ========
