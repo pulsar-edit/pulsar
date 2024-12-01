@@ -42,23 +42,9 @@ module.exports = {
         // Hook up changes to the configuration settings.
         this.excludedScopeRegexLists = [];
         this.subs.add(
-            atom.config.observe(
-                'spell-check.excludedScopes',
-                (excludedScopes) => {
-                    this.excludedScopeRegexLists = excludedScopes.map(
-                        (excludedScope) =>
-                            excludedScope
-                                .split(/\s+/)[0]
-                                .split('.')
-                                .filter((className) => className)
-                                .map(
-                                    (className) =>
-                                        new RegExp(`\\b${className}\\b`)
-                                )
-                    );
-                    return this.updateViews();
-                }
-            )
+            atom.config.onDidChange('spell-check.excludedScopes', () => {
+                return this.updateViews();
+            })
         );
 
         this.subs.add(

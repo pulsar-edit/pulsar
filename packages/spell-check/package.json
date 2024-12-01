@@ -20,7 +20,8 @@
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
-    "atom": "*"
+    "atom": "*",
+    "node": ">=14"
   },
   "scripts": {
     "format": "prettier --write \"spec/*.js\" \"lib/**/*.js\" \"script/*.js\" --loglevel warn"
@@ -37,7 +38,7 @@
         "source.rst",
         "text.restructuredtext"
       ],
-      "description": "List of scopes for languages which will be checked for misspellings. See [the README](https://github.com/pulsar-edit/pulsar/blob/master/packages/spell-check/README.md) for more information on finding the correct scope for a specific language.",
+      "description": "List of scopes for languages which will be checked for misspellings. See [the README](https://github.com/pulsar-edit/pulsar/blob/master/packages/spell-check/README.md) for more information on finding the correct scope for a specific language. If you want to spell-check only parts of some languages, you may specify a more detailed scope selector (like `source.js comment.block` or `source string`); but the first part of the selector must match the language scope.",
       "order": 1
     },
     "excludedScopes": {
