@@ -79,7 +79,7 @@ module.exports = class ConfigFile {
           this.requestLoad();
         }
       })
-      watcher.start();
+      await watcher.start();
       return { dispose: () => watcher.stop() };
     } catch (error) {
       //TODO_PULSAR: Find out why the atom global variable isn't available at this point
