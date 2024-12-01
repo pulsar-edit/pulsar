@@ -152,10 +152,10 @@
 ; ((identifier) @variable.other.readwrite.member.cpp
 ;   (#match? @variable.other.readwrite.member.cpp "^(f|m)[A-Z]\\w*$"))
 
-; The "foo" in `int &foo` with in a parameter list.
-(parameter_declaration
-  declarator: (reference_declarator
-    (identifier) @variable.parameter.cpp))
+; The "foo" in `const char *foo` within a parameter list.
+; (Should work no matter how many pointers deep we are.)
+(reference_declarator (identifier) @variable.parameter.cpp
+  (#is? test.descendantOfType "parameter_declaration"))
 
 
 ; KEYWORDS

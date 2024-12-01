@@ -6,7 +6,22 @@
 
 ## [Unreleased]
 
+## 1.123.0
+
 - Fixed SQL State Storage not loading when starting Pulsar from a self-contained binary like appImage, tar.gz, etc.
+- [symbols-view] Allow project-wide symbol search to consider results from more than one provider.
+- Tree-sitter fixes and enhancements for hyperlinks, C, and shell scripts.
+- Restore use of `shell.moveItemToTrash` API in tree-view, for Electron 12 compatibility.
+
+### Pulsar
+
+- Tree-sitter rolling fixes, 1.123 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1118)
+- [symbols-view] Allow project-wide symbol searches to consider multiple providers [@savetheclocktower](github.com/pulsar-edit/pulsar/pull/1133)
+- electron-builder: Fix race condition when preparing to copy binaries [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1137)
+- [ci] Update GitHub Token in CirrusCI config [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1134)
+- Fixing requiring of better-sqlite3 [@mauricioszabo](github.com/pulsar-edit/pulsar/pull/1122)
+- Revert removal of `shell.moveItemToTrash` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1125)
+- CI: Bump macOS runner images from macos-12 to macos-13 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1120)
 
 ## 1.122.0
 
