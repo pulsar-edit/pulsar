@@ -47,8 +47,8 @@ describe('Spell check', function () {
     });
 
     afterEach(async () => {
-      await languageMode.atTransactionEnd();
-      SpellCheckTask.clear();
+        await languageMode.atTransactionEnd();
+        SpellCheckTask.clear();
     });
 
     it('decorates all misspelled words', async function () {
@@ -77,9 +77,124 @@ describe('Spell check', function () {
         expect(textForMarker(misspellingMarkers[1])).toEqual('bok');
     });
 
+    it('allows certain sub-scopes to be whitelisted into spell checking, implicitly excluding anything that does not match', async () => {
+        editor.setText(
+            `speledWrong = 5;
+function speledWrong() {}
+// We only care about mispelings in comments and strings!
+let foo = "this is speled wrong"
+class SpeledWrong {}`
+        );
+
+        atom.config.set('spell-check.useLocales', true);
+        atom.config.set('spell-check.grammars', [
+            'source.js comment',
+            'source.js string',
+            'text.plain.null-grammar',
+        ]);
+
+        {
+            await conditionPromise(() => getMisspellingMarkers().length > 0);
+            const markers = getMisspellingMarkers();
+            expect(markers.map((marker) => marker.getBufferRange())).toEqual([
+                [
+                    [2, 22],
+                    [2, 32],
+                ],
+                [
+                    [3, 19],
+                    [3, 25],
+                ],
+            ]);
+        }
+    });
+
+    it('interprets a bare root scope as opting out of scope whitelisting, even when other more specific segments are present', async () => {
+        editor.setText(
+            `speledWrong = 5;
+function speledWrong() {}
+// We only care about mispelings in comments and strings!
+let foo = "this is speled wrong"
+class SpeledWrong {}`
+        );
+
+        atom.config.set('spell-check.useLocales', true);
+        atom.config.set('spell-check.grammars', [
+            // Exactly as above, but with an extra `'source.js'` listing; this will
+            // supersede the more specific settings below.
+            'source.js',
+            'source.js comment',
+            'source.js string',
+            'text.plain.null-grammar',
+        ]);
+
+        {
+            await conditionPromise(() => getMisspellingMarkers().length > 0);
+            const markers = getMisspellingMarkers();
+            expect(markers.map((marker) => marker.getBufferRange())).toEqual([
+                [
+                    [0, 0],
+                    [0, 11],
+                ],
+                [
+                    [1, 9],
+                    [1, 20],
+                ],
+                [
+                    [2, 22],
+                    [2, 32],
+                ],
+                [
+                    [3, 4],
+                    [3, 7],
+                ],
+                [
+                    [3, 19],
+                    [3, 25],
+                ],
+                [
+                    [4, 6],
+                    [4, 17],
+                ],
+            ]);
+        }
+    });
+
+    it('allows a generic root scope like "source"', async () => {
+        editor.setText(
+            `speledWrong = 5;
+function speledWrong() {}
+// We only care about mispelings in comments and strings!
+let foo = "this is speled wrong"
+class SpeledWrong {}`
+        );
+
+        atom.config.set('spell-check.useLocales', true);
+        atom.config.set('spell-check.grammars', [
+            'source comment',
+            'source string',
+            'text.plain.null-grammar',
+        ]);
+
+        {
+            await conditionPromise(() => getMisspellingMarkers().length > 0);
+            const markers = getMisspellingMarkers();
+            expect(markers.map((marker) => marker.getBufferRange())).toEqual([
+                [
+                    [2, 22],
+                    [2, 32],
+                ],
+                [
+                    [3, 19],
+                    [3, 25],
+                ],
+            ]);
+        }
+    });
+
     it('allows certain scopes to be excluded from spell checking', async function () {
         editor.setText(
-`speledWrong = 5;
+            `speledWrong = 5;
 function speledWrong() {}
 class SpeledWrong {}`
         );
@@ -126,7 +241,9 @@ class SpeledWrong {}`
         }
 
         {
-            atom.config.set('spell-check.excludedScopes', ['.entity.name.type.class']);
+            atom.config.set('spell-check.excludedScopes', [
+                '.entity.name.type.class',
+            ]);
             await conditionPromise(() => getMisspellingMarkers().length === 2);
             const markers = getMisspellingMarkers();
             expect(markers.map((marker) => marker.getBufferRange())).toEqual([

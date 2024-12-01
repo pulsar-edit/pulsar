@@ -2,6 +2,18 @@ let SpellCheckView;
 const _ = require('underscore-plus');
 const { CompositeDisposable } = require('atom');
 const SpellCheckTask = require('./spell-check-task');
+const { scopeDescriptorMatchesSelector } = require('./scope-helper');
+
+// Tests whether a grammar's root scope matches a scope specified in the
+// `grammars` setting. Allows for a more generic name in the setting (e.g.,
+// `source` to match all `source.[x]` grammars).
+function topLevelScopeMatches(grammar, scope) {
+    if (scope === grammar) return true;
+    if (grammar.startsWith(`${scope}.`)) {
+        return true;
+    }
+    return false;
+}
 
 let CorrectionsView = null;
 
@@ -73,6 +85,15 @@ module.exports = SpellCheckView = class SpellCheckView {
             })
         );
 
+        this.disposables.add(
+            atom.config.observe(
+                'spell-check.excludedScopes',
+                (excludedScopes) => {
+                    this.excludedScopes = excludedScopes;
+                }
+            )
+        );
+
         this.subscribeToBuffer();
 
         this.disposables.add(this.editor.onDidDestroy(this.destroy.bind(this)));
@@ -118,6 +139,7 @@ module.exports = SpellCheckView = class SpellCheckView {
         this.unsubscribeFromBuffer();
 
         if (this.spellCheckCurrentGrammar()) {
+            this.scopesToSpellCheck = this.getSpellCheckScopesForCurrentGrammar();
             this.buffer = this.editor.getBuffer();
             this.bufferDisposable = new CompositeDisposable(
                 this.buffer.onDidStopChanging(
@@ -131,7 +153,69 @@ module.exports = SpellCheckView = class SpellCheckView {
 
     spellCheckCurrentGrammar() {
         const grammar = this.editor.getGrammar().scopeName;
-        return _.contains(atom.config.get('spell-check.grammars'), grammar);
+        let grammars = atom.config.get('spell-check.grammars');
+        let topLevelScopes = grammars.map((rawScope) => {
+            if (!rawScope.includes(' ')) return rawScope;
+            return rawScope.substring(0, rawScope.indexOf(' '));
+        });
+        return topLevelScopes.some((scope) => {
+            return topLevelScopeMatches(grammar, scope);
+        });
+        // return topLevelScopes.includes(grammar);
+    }
+
+    // Returns:
+    //
+    // * `true` if the entire buffer should be checked;
+    // * `false` if none of the buffer should be checked; or, if only certain
+    //   parts of the buffer should be checked,
+    // * an {Array} of scope names matching regions of the buffer that should
+    //   be checked.
+    getSpellCheckScopesForCurrentGrammar() {
+        const grammar = this.editor.getGrammar().scopeName;
+        let grammars = atom.config.get('spell-check.grammars');
+        let scopeList = [];
+        // Despite the name of this setting, spell-checking is no longer all or
+        // nothing on a per-grammar basis; we now allow users to opt into
+        // checking subsections of a buffer by adding descendant scopes. Each
+        // segment must begin with all or part of a root scope name (e.g.,
+        // `source.js`, `text.html`, but otherwise any valid scope selector is
+        // accepted here.)
+        //
+        // Examples:
+        //
+        // * `source.js comment.block`
+        // * `source comment, source string.quoted`
+        // * `text`
+        //
+        // The first example targets just JS block comments; the second targets
+        // all comments and quoted strings in _all_ source files; and the third
+        // targets any text format, whether HTML or Markdown or plaintext.
+        //
+        // This allows for more granular spell-checking than was possible
+        // before, even if the `excludeScopes` setting was utilized.
+        for (let rawScope of grammars) {
+            if (!rawScope.includes(' ')) {
+                // Any value that's just the bare root scope of the language
+                // (like `source.python`) means that we're spell-checking the
+                // entire buffer. This applies even if there's a later match
+                // for this grammar that's more restrictive.
+                if (topLevelScopeMatches(grammar, rawScope)) {
+                    return true;
+                }
+            } else {
+                // If the value also includes a descendant scope, it means we're
+                // spell-checking some subset of the buffer.
+                let index = rawScope.indexOf(' ');
+                let rootScope = rawScope.substring(0, index);
+                if (topLevelScopeMatches(grammar, rootScope)) {
+                    // There could be multiple of these — e.g., `source.python string,
+                    // source.python comment` — so we won't return early.
+                    scopeList.push(rawScope);
+                }
+            }
+        }
+        return scopeList.length > 0 ? scopeList : false;
     }
 
     destroyMarkers() {
@@ -147,6 +231,9 @@ module.exports = SpellCheckView = class SpellCheckView {
                 const scope = this.editor.scopeDescriptorForBufferPosition(
                     misspelling[0]
                 );
+                // Under the hood, we spell-check the entire document; but we
+                // might end up ignoring some of the misspellings based on
+                // their scope descriptor.
                 if (!this.scopeIsExcluded(scope)) {
                     result.push(
                         this.markerLayer.markBufferRange(misspelling, {
@@ -308,11 +395,31 @@ module.exports = SpellCheckView = class SpellCheckView {
         return (this.spellCheckModule.contextMenuEntries = []);
     }
 
-    scopeIsExcluded(scopeDescriptor, excludedScopes) {
-        return this.spellCheckModule.excludedScopeRegexLists.some((regexList) =>
-            scopeDescriptor.scopes.some((scopeName) =>
-                regexList.every((regex) => regex.test(scopeName))
-            )
-        );
+    scopeIsExcluded(scopeDescriptor) {
+        // Practically speaking, `this.scopesToSpellCheck` will either be `true`
+        // or an array of scope selectors. If it's the latter, then we should
+        // apply whitelisting and exclude anything that doesn't match.
+        if (Array.isArray(this.scopesToSpellCheck)) {
+            // If we know none of the subscopes match this region, we can
+            // exclude it even before we get to the `excludedScopes` setting.
+            let someMatch = this.scopesToSpellCheck.some(
+                (scopeToSpellCheck) => {
+                    return scopeDescriptorMatchesSelector(
+                        scopeDescriptor,
+                        scopeToSpellCheck
+                    );
+                }
+            );
+            if (!someMatch) return true;
+        }
+        // Whether or not we applied whitelisting above, excluded scopes take
+        // precedence; anything that doesn't make it through this gauntlet
+        // gets excluded.
+        return this.excludedScopes.some((excludedScope) => {
+            return scopeDescriptorMatchesSelector(
+                scopeDescriptor,
+                excludedScope
+            );
+        });
     }
 };
