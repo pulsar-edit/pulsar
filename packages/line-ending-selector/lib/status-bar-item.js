@@ -11,6 +11,7 @@ module.exports = class StatusBarItem {
   setLineEndings(lineEndings) {
     this.lineEndings = lineEndings;
     this.element.textContent = lineEndingName(lineEndings);
+    this.element.style.display = blockStyle(lineEndings);
     this.emitter.emit('did-change');
   }
 
@@ -53,5 +54,14 @@ function lineEndingDescription(lineEndings) {
       return 'CRLF (Windows)';
     default:
       return 'unknown';
+  }
+}
+
+function blockStyle(lineEndings) {
+  switch (lineEndingName(lineEndings)) {
+    case '':
+      return 'none';
+    default:
+      return 'inline-block';
   }
 }
