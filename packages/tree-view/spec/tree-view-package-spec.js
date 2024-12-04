@@ -3043,7 +3043,9 @@ describe("TreeView", function () {
         fileView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
         treeView.focus();
 
-        spyOn(shell, 'moveItemToTrash').andReturn(false);
+        spyOn(shell, 'trashItem').andCallFake(() => {
+          return Promise.reject(false);
+        });
 
         spyOn(atom, 'confirm').andCallFake((options, callback) => callback(0));
 
