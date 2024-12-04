@@ -874,7 +874,7 @@ class TreeView {
     return dialog.attach();
   }
 
-  removeSelectedEntries() {
+  async removeSelectedEntries() {
     let activePath = this.getActivePath();
     let selectedPaths, selectedEntries;
     if (this.hasFocus()) {
@@ -896,7 +896,7 @@ class TreeView {
       }
     }
 
-    return atom.confirm({
+    atom.confirm({
       message: `Are you sure you want to delete the selected ${selectedPaths.length > 1 ? 'items' : 'item'}?`,
       detailedMessage: `You are deleting:\n${selectedPaths.join('\n')}`,
       buttons: ['Move to Trash', 'Cancel']
@@ -916,7 +916,8 @@ class TreeView {
           this.emitter.emit('will-delete-entry', { pathToDelete: selectedPath });
 
           // TODO: `shell.trashItem` is the favored way to do this.
-          if (shell.moveItemToTrash(selectedPath)) {
+          const deleted = await shell.trashItem(selectedPath).then(() => true).catch(() => false)
+          if (deleted) {
             this.emitter.emit('entry-deleted', { pathToDelete: selectedPath });
           } else {
             this.emitter.emit('delete-entry-failed', { pathToDelete: selectedPath });
@@ -940,7 +941,7 @@ class TreeView {
         }
 
         if (atom.config.get('tree-view.squashDirectoryNames')) {
-          return this.updateRoots();
+          this.updateRoots();
         }
       }
     });
