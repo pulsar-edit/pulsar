@@ -90,7 +90,17 @@ module.exports = class FindOptions {
       expression = escapeRegExp(this.findPattern);
     }
 
-    if (this.wholeWord) { expression = `\\b${expression}\\b`; }
+    if (this.wholeWord) {
+      // https://github.com/pulsar-edit/pulsar/pull/987
+      // wholeWord is usually defined by `\\b${expression}\\b`,
+      // where \\b is a word boundary: a position between a word and non-word character.
+      //
+      // However, if the selection (the "word") starts or ends with a non-word character,
+      // then, say, `$word` in ` $word ` isnt selected, as both the space and the dollar
+      // are non-word characters. To allow this, we can either have a word boundary or
+      // a lookahead/lookbehind for the start/end non-word character:
+      expression = `(?:\\b|(?=\\W))${expression}(?:\\b|(?<=\\W))`;
+    }
 
     return new RegExp(expression, flags);
   }
