@@ -75,6 +75,7 @@ class AtomEnvironment {
     this.loadTime = null;
     this.emitter = new Emitter();
     this.disposables = new CompositeDisposable();
+    this.initScriptDisposables = new CompositeDisposable();
     this.pathsWithWaitSessions = new Set();
 
     /** @type {DeserializerManager} */
@@ -1563,7 +1564,19 @@ or use Pane::saveItemAs for programmatic saving.`);
     const userInitScriptPath = this.getUserInitScriptPath();
     if (userInitScriptPath) {
       try {
-        if (fs.isFileSync(userInitScriptPath)) require(userInitScriptPath);
+        if (fs.isFileSync(userInitScriptPath)) {
+          if(this.config.get('core.autoReloadInitScript')) {
+            this.disposables.delete(this.initScriptDisposables)
+            this.initScriptDisposables.dispose()
+            this.initScriptDisposables = new CompositeDisposable();
+            this.disposables.add(this.initScriptDisposables)
+            let contents = fs.readFileSync(userInitScriptPath, 'utf-8')
+            contents = `((disposable) => { ${contents}\n })(this.initScriptDisposables)`
+            eval(contents)
+          } else {
+            require(userInitScriptPath);
+          }
+        }
       } catch (error) {
         this.notifications.addError(
           `Failed to load \`${userInitScriptPath}\``,
