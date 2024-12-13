@@ -127,7 +127,7 @@ export default class PackageKeymapView {
         continue
       }
 
-      if (this.selectorIsNotCompatibleWithPlatform(selector)) {
+      if (!this.selectorIsCompatibleWithPlatform(selector)) {
         continue;
       }
 
@@ -183,10 +183,10 @@ export default class PackageKeymapView {
     atom.clipboard.write(content)
   }
 
-  selectorIsNotCompatibleWithPlatform(selector, platform = process.platform) {
+  selectorIsCompatibleWithPlatform(selector, platform = process.platform) {
     const otherPlatformPattern = new RegExp(`\\.platform-(?!${_.escapeRegExp(platform)}\\b)`);
     const currentPlatformPattern = new RegExp(`\\.platform-(${_.escapeRegExp(platform)}\\b)`);
 
-    return otherPlatformPattern.test(selector) && !currentPlatformPattern.test(selector);
+    return !(otherPlatformPattern.test(selector) && !currentPlatformPattern.test(selector));
   }
 }
