@@ -164,7 +164,10 @@ module.exports = class PackageManager {
     if (clearCache) {
       this.clearOutdatedCache();
     // Short circuit if we have cached data.
-    } else if (this.apmCache.loadOutdated.value && (this.apmCache.loadOutdated.expiry > Date.now())) {
+    } else if (
+      (this.apmCache.loadOutdated.value && (this.apmCache.loadOutdated.expiry > Date.now())) ||
+      atom.devMode
+    ) {
       return callback(null, this.apmCache.loadOutdated.value);
     }
 
