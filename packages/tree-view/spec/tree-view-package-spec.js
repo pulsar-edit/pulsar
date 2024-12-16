@@ -5,6 +5,7 @@ const path = require('path');
 const temp = require('temp').track();
 const os = require('os');
 const {remote, shell} = require('electron');
+const remoteShell = require('electron').remote.shell;
 const Directory = require('../lib/directory');
 const eventHelpers = require("./event-helpers");
 
@@ -4133,17 +4134,17 @@ describe("TreeView", function () {
   });
 
   describe("showSelectedEntryInFileManager()", function () {
-    beforeEach(() => spyOn(shell, 'showItemInFolder').andReturn(false));
+    beforeEach(() => spyOn(remoteShell, 'showItemInFolder').andReturn(false));
 
     it("does nothing if no entry is selected", function () {
       treeView.deselect();
       treeView.showSelectedEntryInFileManager();
-      expect(shell.showItemInFolder).not.toHaveBeenCalled();
+      expect(remoteShell.showItemInFolder).not.toHaveBeenCalled();
     });
 
     it("shows the selected entry in the OS's file manager", function () {
       treeView.showSelectedEntryInFileManager();
-      expect(shell.showItemInFolder).toHaveBeenCalled();
+      expect(remoteShell.showItemInFolder).toHaveBeenCalled();
     });
 
     it("displays a notification if showing the file fails", function () {
@@ -4155,13 +4156,13 @@ describe("TreeView", function () {
   });
 
   describe("showCurrentFileInFileManager()", function () {
-    beforeEach(() => spyOn(shell, 'showItemInFolder').andReturn(false));
+    beforeEach(() => spyOn(remoteShell, 'showItemInFolder').andReturn(false));
 
     it("does nothing when no file is opened", function () {
       expect(atom.workspace.getCenter().getPaneItems().length).toBe(0);
 
       treeView.showCurrentFileInFileManager();
-      expect(shell.showItemInFolder).not.toHaveBeenCalled();
+      expect(remoteShell.showItemInFolder).not.toHaveBeenCalled();
     });
 
     it("does nothing when only an untitled tab is opened", function () {
@@ -4170,7 +4171,7 @@ describe("TreeView", function () {
       return runs(function () {
         workspaceElement.focus();
         treeView.showCurrentFileInFileManager();
-        expect(shell.showItemInFolder).not.toHaveBeenCalled();
+        expect(remoteShell.showItemInFolder).not.toHaveBeenCalled();
       });
     });
 
@@ -4181,7 +4182,7 @@ describe("TreeView", function () {
 
       return runs(function () {
         treeView.showCurrentFileInFileManager();
-        expect(shell.showItemInFolder).toHaveBeenCalled();
+        expect(remoteShell.showItemInFolder).toHaveBeenCalled();
       });
     });
 
