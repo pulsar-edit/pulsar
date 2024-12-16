@@ -50,6 +50,10 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
+                Enhanced spellcheck to allow spellchecking on sections of a buffer.
+                Making it possible to spellcheck comments within code, which has been enabled by default.
+              </li>
+              <li>
                 Tree-sitter fixes and enhancements for <code>language-c</code>.
               </li>
               <li>
