@@ -30,6 +30,7 @@
     "grammars": {
       "type": "array",
       "default": [
+        "source comment",
         "source.asciidoc",
         "source.gfm",
         "text.git-commit",
