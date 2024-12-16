@@ -15,6 +15,7 @@
 
 ### Pulsar
 
+- CI: Add build dependencies for Linux 'test bins' job [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1165)
 - Tree-sitter rolling fixes, 1.124 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1148)
 - Fix Linux trash error message [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/1151)
 - electron-builder: Don't create differential update blockmaps [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1139)
