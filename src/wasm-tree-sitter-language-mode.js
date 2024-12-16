@@ -3529,7 +3529,7 @@ class LanguageLayer {
   // might be stale, pass `force: false` as an option.
   //
   // In certain circumstances, the new tree might be promoted to the canonical
-  // tree for this layer. To prevent this, pass `anonymous: false` as an option.
+  // tree for this layer. To prevent this, pass `anonymous: true` as an option.
   //
   // All trees returned by this method are managed by this language layer and
   // will be deleted when the next transaction is complete. Retaining a
@@ -3900,10 +3900,10 @@ class LanguageLayer {
   }
 }
 
-// An injection `LanguageLayer` may need to parse and highlight a strange
-// subset of its stated range — for instance, all the descendants within a
-// parent that are of a particular type. A `NodeRangeSet` is how that strange
-// subset is expressed.
+// Private: An injection `LanguageLayer` may need to parse and highlight a
+// strange subset of its stated range — for instance, all the descendants
+// within a parent that are of a particular type. A `NodeRangeSet` is how that
+// strange subset is expressed.
 class NodeRangeSet {
   constructor(previous, nodes, injectionPoint) {
     this.previous = previous;
@@ -3920,9 +3920,13 @@ class NodeRangeSet {
     }
   }
 
+  // Extracts the information we need from fresh tree nodes so that it's
+  // guaranteed to survive even if the tree is destroyed.
   getNodeSpec(node, getChildren) {
     let { startIndex, endIndex, startPosition, endPosition, id } = node;
     let result = { startIndex, endIndex, startPosition, endPosition, id };
+    // `children` is a getter, so checking `childCount` is cheaper than
+    // checking `children.length`.
     if (getChildren && node.childCount > 0) {
       result.children = [];
       for (let child of node.children) {
@@ -4104,8 +4108,8 @@ class NodeRangeSet {
   }
 }
 
-// A subclass of map that associates a set of scope names with the editor
-// locations at which they are opened.
+// Private: A subclass of `Map` that associates a set of scope names with the
+// editor locations at which they are opened.
 //
 // In some complicated scenarios, we need to know where a scope was opened when
 // deciding how to handle it.
@@ -4142,12 +4146,15 @@ class OpenScopeMap extends Map {
   }
 }
 
-// Like a map, but expects each key to have multiple values.
+// Private: A subclass of `Map` that anticipates multiple values at each key.
+// The main way to add a value at a given key is via a new `Index::add` method.
 class Index extends Map {
   constructor() {
     super();
   }
 
+  // Like `Map::set`, but adds one or more values at a given key. Initializes
+  // the key's value to be an empty array if necessary.
   add(key, ...values) {
     let existing = this.get(key);
     if (!existing) {
@@ -4159,10 +4166,12 @@ class Index extends Map {
 }
 
 
-// A class designed to aggregate and normalize a set of ranges. Each time a
-// buffer range is added, it's compared to the existing list; if there are
-// intersections with range already in the list, those intersections are
+// Private: A class designed to aggregate and normalize a set of ranges. Each
+// time a buffer range is added, it's compared to the existing list; if there
+// are intersections with range already in the list, those intersections are
 // combined into one larger range.
+//
+// The ranges can be iterated via `for..of`.
 //
 // Assumes all ranges are instances of `Range` rather than Tree-sitter range
 // specs.
@@ -4175,6 +4184,11 @@ class RangeList {
     this.ranges.length = 0;
   }
 
+  // Add a new `Range` to the list.
+  //
+  // If this range intersects with a range already in the list, it will merge
+  // with the existing range. Otherwise it'll insert itself such that the list
+  // maintains buffer ordering.
   add(newRange) {
     let intersecting = [];
     for (let range of this.ranges) {
@@ -4235,15 +4249,28 @@ class IndentResolver {
     if (!root || !root.tree || !root.ready) { return null; }
     let { languageMode } = this;
     let options = {
+      // Whether to skip emitting the `did-suggest-indent` event.
       skipEvent: false,
+      // Whether to skip blank lines when finding a comparison row.
       skipBlankLines: true,
+      // Whether to skip the second (dedent) phase of indentation hinting.
       skipDedentCheck: false,
+      // Whether to account for the leading whitespace that already exists on
+      // the row when returning an indentation level.
       preserveLeadingWhitespace: false,
+      // A cache of existing indentation levels to reduce work when resuming
+      // an indentation hint started earlier. Takes the form of a `Map` whose
+      // keys are line numbers and whose values are indentation levels.
       indentationLevels: null,
+      // Whether to force a re-parse of the tree if we think the tree is dirty.
       forceTreeParse: false,
       ...rawOptions
     };
 
+    // We can also pass a `tree` option to tell this method to re-use a
+    // specific tree. In those cases, we also include a `controllingLayer`
+    // option as a sanity check; the tree can only be reused if the controlling
+    // layer is still the one we expect.
     let originalControllingLayer = options.controllingLayer;
 
     // Indentation hinting is a two-phase process.
@@ -4253,6 +4280,9 @@ class IndentResolver {
     //
     // In phase 2, we consider `row`’s own content to see if any of it suggests
     // an alteration from the phase 1 value.
+    //
+    // To start, we check the previous row (typically the nearest row with text
+    // on it) to know what our indentation “baseline” ought to be.
     let comparisonRow = options.comparisonRow ?? this.getComparisonRow(row, options);
 
     let existingIndent = 0;
@@ -4265,8 +4295,9 @@ class IndentResolver {
       // we return later on.
       //
       // Sadly, if the row is _more_ indented than we need it to be, we won't
-      // be able to dedent it into the correct position. This option probably
-      // needs to be revisited.
+      // be able to dedent it into the correct position when
+      // `preserveLeadingWhitespace` is `true`. This option probably needs to
+      // be revisited.
       existingIndent = this.indentLevelForLine(
         this.buffer.lineForRow(row), tabLength);
     }
@@ -4327,7 +4358,15 @@ class IndentResolver {
       // There's no layer with an indents query to help us out. The default
       // behavior in this situation with any grammar — even plain text — is to
       // match the previous line's indentation.
-      return comparisonRowIndent - existingIndent;
+      let finalIndent = comparisonRowIndent - existingIndent;
+      if (!options.skipEvent) {
+        this.emitter.emit('did-suggest-indent', {
+          currentRow: row,
+          comparisonRow,
+          finalIndent
+        })
+      }
+      return finalIndent;
     }
 
     let { queries: { indentsQuery }, scopeResolver } = controllingLayer;
@@ -4343,6 +4382,29 @@ class IndentResolver {
       indentTree = options.tree;
     }
 
+    // In practice, we want to use synchronous hinting whenever we can. Here we
+    // opt into synchronous hinting when
+    //
+    // * we don't have to re-parse the tree;
+    // * we are explicitly told to re-parse the tree;
+    // * we think we can afford to spend the time to re-parse the tree.
+    //
+    // Indentation hinting can be expensive because it runs with every
+    // individual change, even within transactions! And since each individual
+    // change changes the tree, triggering hinting in the middle of a
+    // transaction forces a re-parse that otherwise wouldn't have happened
+    // until the transaction was finished. It's cheaper to wait until the end
+    // of a transaction and invoke auto-indentation over the entire transaction
+    // extent, but this can easily produce a different (and less accurate)
+    // outcome than synchronous hinting.
+    //
+    // We still need asynchronous hinting for edge cases. A re-parse costs
+    // time, and any package can programmaticaly create a buffer transaction
+    // that triggers indentation hinting an arbitrary number of times, so we
+    // must guard against those scenarios no matter how rare they are. The
+    // `shouldUseAsyncIndent` method on the language mode manages that; it
+    // tells us whether we can spare the time we'll spend to do a tree
+    // re-parse.
     if (!indentTree) {
       if (!controllingLayer.treeIsDirty || options.forceTreeParse || !languageMode.shouldUseAsyncIndent()) {
         // If we're in this code path, it either means the tree is clean (the
@@ -4359,8 +4421,8 @@ class IndentResolver {
         // preliminary indent level and then follow up later with a more
         // accurate one. It's a bit disorienting that the editor falls back to
         // an indent level of `0` when a newline is inserted.
-        let comparisonRowText = this.buffer.lineForRow(comparisonRow)
-        let rowText = this.buffer.lineForRow(row)
+        let comparisonRowText = this.buffer.lineForRow(comparisonRow);
+        let rowText = this.buffer.lineForRow(row);
         return languageMode.atTransactionEnd().then(({ changeCount }) => {
           let shouldFallback = false;
           // If this was the only change in the transaction, then we can
@@ -4383,21 +4445,10 @@ class IndentResolver {
             }
           }
           if (shouldFallback) {
-            // We're now revisiting this indentation question at the end of the
-            // transaction. Other changes may have taken place since we were
-            // first asked what the indent level should be for this line. So
-            // how do we know if the question is still relevant? After all, the
-            // text that was on this row earlier might be on some other row
-            // now.
-            //
-            // So we compare the text that was on the row when we were first
-            // called… to the text that is on the row now that the transaction
-            // is over. If they're the same, that's a _strong_ indicator that
-            // the result we return will still be relevant.
-            //
-            // If not, as is the case in this code path, we return `undefined`,
-            // signalling to the `TextEditor` that its only recourse is to
-            // auto-indent the whole extent of the transaction instead.
+            // When we think the buffer has changed too much for our hint to be
+            // relevant, we return `undefined`, signalling to the `TextEditor`
+            // that its only recourse is to auto-indent the whole extent of the
+            // transaction instead.
             return undefined;
           }
 
@@ -4463,7 +4514,7 @@ class IndentResolver {
       // the form `(#is? test.foo)`.
       if (!scopeResolver.store(capture)) { continue; }
       // Apply indentation-specific scope tests and skip this capture if any
-      // tests fail.
+      // tests fail. This applies all tests of the form `(#is? indent.foo)`.
       let passed = this.applyTests(capture, {
         currentRow: row,
         comparisonRow,
@@ -4478,6 +4529,7 @@ class IndentResolver {
       positionSet.add(key);
 
       if (name === 'indent') {
+        // This capture hints at an increase in indentation level.
         if (indentCapturePosition === null) {
           indentCapturePosition = node.endPosition;
         }
@@ -4632,6 +4684,21 @@ class IndentResolver {
         // should run this layer's indents query against its own tree. (If _no_
         // layers qualify at this position, we won't hit this code path, so
         // we'll reluctantly still use the original layer and tree.)
+        //
+        // NOTE: This strange edge case bypasses all of the heuristics we
+        // defined above that govern synchronous vs. asynchronous hinting.
+        //
+        // In our defense, the cost of this reparse is still accounted for in
+        // the reparse budget. Also, it's not clear that such a tree would even
+        // need a re-parse, since the buffer change that leads to this edge
+        // case will often happen outside of this language layer.
+        //
+        // Still, if we find an edge case in which this might be a problem, we
+        // should decide what to do here. It would feel a bit weird to go async
+        // this late in the hinting process, so one option might be to
+        // determine `dedentControllingLayer` at the same time as
+        // `controllingLayer` so that it can be considered when making the
+        // initial decision between sync/async hinting.
         indentsQuery = dedentControllingLayer.queries.indentsQuery;
         indentTree = dedentControllingLayer.getOrParseTree();
       }
@@ -4811,10 +4878,12 @@ class IndentResolver {
   // `true`).
   //
   // - `callback` A {Function} that takes one parameter:
-  //   - `meta` An {Object} that consisting of _some subset_ of the following
+  //   - `meta` An {Object} consisting of _some subset_ of the following
   //     properties:
   //     - `captureMode` A {String} describing one of several different modes
-  //       which influence a capture:
+  //       which influence a capture; when this property is absent, it means
+  //       that indentation level was determined in a simpler manner that
+  //       did not use any Tree-sitter features.
   //       - A value of `normal` means that an indentation level was determined
   //         through the normal two-phase process.
   //       - A value of `match` means that an indentation level was determined
@@ -4831,7 +4900,8 @@ class IndentResolver {
   //     - `comparisonRow` The {Number} of the row that was consulted to
   //       determine the baseline indentation of the target row. This is
   //       often the row directly above `row`, but can be an earlier row if
-  //       the target row was preceded by whitespace.
+  //       the target row was preceded by whitespace. (Zero-indexed just like
+  //       `currentRow`.)
   //     - `comparisonRowIndent` {Number} The indentation level of the
   //       comparison row.
   //     - `indentDelta` {Number} The amount of indentation (in increments)
@@ -4856,18 +4926,15 @@ class IndentResolver {
   //       overrides the conventional indentation logic.
   //     - `finalIndent` {Number} A number representing the final value that
   //       will shortly be returned from a call to
-  //       `suggestedIndentForBufferRow`. This value accounts for the possible
-  //       presence of the `preserveLeadingWhitespace` option. For instance,
-  //       if `suggestedIndentForBufferRow` would return `5`, but the target
-  //       row already has an indent level of `3`, `finalIndent` will instead
-  //       be `2`.
-  //     - `adjustedIndent` {Number} A `finalIndent`, but takes existing
+  //       `suggestedIndentForBufferRow`. This value does not account for the
+  //       `preserveLeadingWhitespace` option; it represents what the actual
+  //       indentation level of the line is going to be.
+  //     - `adjustedIndent` {Number} Like `finalIndent`, but takes existing
   //       indentation level into account if the `preserveLeadingWhitespace`
-  //       option was enabled. For instance, if `suggestedIndentForBufferRow`
-  //       would return `5`, but the target row already has an indent level of
-  //       `3`, `adjustedIndent` will instead be `2`. If
-  //       `preserveLeadingWhitespace` is `false`, `finalIndent` and
-  //       `adjustedIndent` will be identical.
+  //       option was enabled. For instance, if `finalIndent` is `5`, but the
+  //       target row already has an indent level of `3`, `adjustedIndent` will
+  //       instead be `2`. If `preserveLeadingWhitespace` is `false`,
+  //       `finalIndent` and `adjustedIndent` will always be identical.
   //
   onDidSuggestIndent(callback) {
     return this.emitter.on('did-suggest-indent', callback);
@@ -5034,6 +5101,9 @@ class IndentResolver {
     // re-parse the tree in order to make an accurate indents query.
     let indentTree = options.tree;
     if (!indentTree) {
+      // Unlike `suggestedIndentForBufferRow`, this method is not something
+      // that can run in the middle of a transaction. That means we don't need
+      // to consult the reparse budget.
       if (!controllingLayer.treeIsDirty || options.forceTreeParse || !this.useAsyncIndent || !this.useAsyncParsing) {
         indentTree = controllingLayer.getOrParseTree();
       } else {
