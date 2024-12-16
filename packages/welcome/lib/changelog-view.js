@@ -50,16 +50,13 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fixed SQL State Storage not loading when starting Pulsar from a self-contained binary like appImage, tar.gz, etc.
+                Tree-sitter fixes and enhancements for <code>language-c</code>.
               </li>
               <li>
-                [symbols-view] Allow project-wide symbol search to consider results from more than one provider.
+                Updated error message received when deleting a file in Linux to be more accurate.
               </li>
               <li>
-                Tree-sitter fixes and enhancements for hyperlinks, C, and shell scripts.
-              </li>
-              <li>
-                Restore use of <code>shell.moveItemToTrash</code> API in tree-view, for Electron 12 compatibility.
+                Fixed error that could cause some keymaps to not appear under a package in <code>settings-view</code>.
               </li>
             </ul>
 
