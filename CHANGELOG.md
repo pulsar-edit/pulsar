@@ -6,6 +6,28 @@
 
 ## [Unreleased]
 
+## 1.124.0
+
+- Enhanced spellcheck to allow spellchecking on sections of a buffer. Making it possible to spellcheck comments within code, which has been enabled by default.
+- Tree-sitter fixes and enhancements for `language-c`.
+- Updated error message received when deleting a file in Linux to be more accurate.
+- Fixed error that could cause some keymaps to not appear under a package in `settings-view`.
+
+### Pulsar
+
+- Tree-sitter rolling fixes, 1.124 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1148)
+- Fix Linux trash error message [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/1151)
+- electron-builder: Don't create differential update blockmaps [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1139)
+- CI: Update Cirrus Rolling release upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1141)
+
+#### spell-check
+
+- [spell-check] Allow the user to whitelist sections of a buffer for spellchecking on a per-language basis. [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1147)
+
+#### settings-view
+
+- [settings-view] Fix Package keymap compatibility check [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1161)
+
 ## 1.123.0
 
 - Fixed SQL State Storage not loading when starting Pulsar from a self-contained binary like appImage, tar.gz, etc.
