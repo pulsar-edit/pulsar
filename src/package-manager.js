@@ -596,7 +596,15 @@ module.exports = class PackageManager {
     return pack;
   }
 
+  setupPackageEnvironment() {
+    require("../exports/atom");
+    // We just lie, in case anyone needs it
+    this.initialPackagesLoaded = true;
+    this.emitter.emit("did-load-initial-packages");
+  }
+
   loadPackages() {
+    return; // should no longer be called
     // Ensure atom exports is already in the require cache so the load time
     // of the first package isn't skewed by being the first to require atom
     require('../exports/atom');
@@ -723,7 +731,89 @@ module.exports = class PackageManager {
   }
 
   // Activate all the packages that should be activated.
+  async activateAsync() {
+    // TODO implement new loading methodology, while being async,
+    // must handled loading of packages, and activation
+
+    // Since NOTHING is loaded/preloaded or prepared at all, we will handle it
+    // all here.
+    const availablePackages = this.getAvailablePackages();
+    const disabledPackageNames = new Set(
+      this.config.get("core.disabledPackages")
+    );
+
+    // Load all available packages
+    this.config.transact(() => {
+      for (const pack of availablePackages) {
+        this.loadAvailablePackage(pack, disabledPackageNames);
+      }
+    });
+
+    // Available Packages is now an array of items with:
+    //  - isBundled: A boolean on whether or not the package is bundled
+    //  - name: The name of the package
+    //  - path: A path to the top-level-directory of the package.
+
+    // We will now want to iterate packages, and begin loading them asyncronously
+    // depending on priority
+    const priorityMatrix = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [] };
+
+    const priorityZeroPackages = [
+      // A temporary hardcoded list of packages to always load first
+      "timecop", "tree-view", "background-tips", "status-bar", "tabs", "notifications"
+    ];
+
+    for (const pack of availablePackages) {
+      // Lets first handle some hardcoded items
+      if (priorityZeroPackages.includes(pack.name)) {
+        priorityMatrix["0"].push(pack);
+      } else if (this.config.get("core.themes").includes(pack.name)) {
+        // If the package is a by default enabled theme
+        priorityMatrix["0"].push(pack);
+      } else {
+        // Any other package
+        priorityMatrix["5"].push(pack);
+      }
+    }
+
+    // With our priority matrix settled, we now know how to handle loading our packages
+    const delay = (ms) => {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    };
+
+    for (let priorityLvl = 0; priorityLvl < 6; priorityLvl++) {
+      console.log(`Triggering package activation of priority lvl ${priorityLvl}`);
+      // Load the packages
+      // this.config.transact(() => {
+      //   for (const pack of priorityMatrix[priorityLvl]) {
+      //     this.loadAvailablePackage(pack, disabledPackageNames);
+      //   }
+      // });
+      // Use loaded package data to activate
+      for (let [activator, types] of this.packageActivators) {
+        const packages = this.getLoadedPackagesForTypes(types);
+        //await activator.activatePackages(packages);
+        if (typeof activator.activatePackagesAsync === "function") {
+          await activator.activatePackagesAsync(packages);
+        } else {
+          await activator.activatePackages(packages);
+        }
+      }
+
+      this.triggerDeferredActivationHooks();
+
+      this.initialPackagesActivated = true;
+      this.emitter.emit("did-activate-initial-packages");
+
+      // Wait some time before the next priority level occurs
+      await delay(2000);
+    }
+
+
+  }
+
   activate() {
+    return; // Should no longer be used
     let promises = [];
     for (let [activator, types] of this.packageActivators) {
       const packages = this.getLoadedPackagesForTypes(types);
@@ -746,6 +836,21 @@ module.exports = class PackageManager {
   // See ThemeManager
   registerPackageActivator(activator, types) {
     this.packageActivators.push([activator, types]);
+  }
+
+  async activatePackagesAsync(packages) {
+    for (const pack of packages) {
+      this.config.transactAsync(async () => {
+        await this.activatePackage(pack.name);
+      });
+    }
+    // this.config.transactAsync(async () => {
+    //   for (const pack of packages) {
+    //     await this.activatePackage(pack.name);
+    //   }
+    // });
+    this.observeDisabledPackages();
+    this.observePackagesWithKeymapsDisabled();
   }
 
   activatePackages(packages) {

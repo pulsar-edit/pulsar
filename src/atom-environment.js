@@ -346,7 +346,8 @@ class AtomEnvironment {
    * @desc Returns output of `preloadPackages()` for this Classes Instance of `Packages`.
    */
   preloadPackages() {
-    return this.packages.preloadPackages();
+    // Should no longer be preloading packages
+    //return this.packages.preloadPackages();
   }
 
   attachSaveStateListeners() {
@@ -970,7 +971,8 @@ class AtomEnvironment {
       StartupTime.addMarker(
         'window:environment:start-editor-window:load-packages'
       );
-      this.packages.loadPackages();
+      //this.packages.loadPackages();
+      this.packages.setupPackageEnvironment();
 
       const startTime = Date.now();
       StartupTime.addMarker(
@@ -1042,7 +1044,8 @@ class AtomEnvironment {
       StartupTime.addMarker(
         'window:environment:start-editor-window:activate-packages'
       );
-      this.packages.activate();
+      await this.packages.activateAsync();
+      //this.packages.activate();
       this.keymaps.loadUserKeymap();
       if (!this.getLoadSettings().safeMode) this.requireUserInitScript();
 
