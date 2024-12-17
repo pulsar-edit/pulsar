@@ -783,13 +783,7 @@ module.exports = class PackageManager {
 
     for (let priorityLvl = 0; priorityLvl < 6; priorityLvl++) {
       console.log(`Triggering package activation of priority lvl ${priorityLvl}`);
-      // Load the packages
-      // this.config.transact(() => {
-      //   for (const pack of priorityMatrix[priorityLvl]) {
-      //     this.loadAvailablePackage(pack, disabledPackageNames);
-      //   }
-      // });
-      // Use loaded package data to activate
+      // Packages now being loaded outside the activation step
       for (let [activator, types] of this.packageActivators) {
         const packages = this.getLoadedPackagesForTypes(types);
         //await activator.activatePackages(packages);
@@ -844,11 +838,6 @@ module.exports = class PackageManager {
         await this.activatePackage(pack.name);
       });
     }
-    // this.config.transactAsync(async () => {
-    //   for (const pack of packages) {
-    //     await this.activatePackage(pack.name);
-    //   }
-    // });
     this.observeDisabledPackages();
     this.observePackagesWithKeymapsDisabled();
   }
