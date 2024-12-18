@@ -99,7 +99,7 @@ fdescribe('Python indentation (modern Tree-sitter)', () => {
 
     await expectToAutoIndentAfter(`try:`)
 
-    // The assertions below don't work because `tree-sitter-python` don't
+    // The assertions below don't work because `tree-sitter-python` doesn't
     // parse them correctly unless they occur within an already intact
     // `try/except` block. This needs to be fixed upstream.
     // await expectToAutoIndentAfter(`try: # test`)
