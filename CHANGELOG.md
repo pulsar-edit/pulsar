@@ -6,7 +6,45 @@
 
 ## [Unreleased]
 
+## 1.124.0
+
+- Enhanced spellcheck to allow spellchecking on sections of a buffer. Making it possible to spellcheck comments within code, which has been enabled by default.
+- Tree-sitter fixes and enhancements for `language-c`.
+- Updated error message received when deleting a file in Linux to be more accurate.
+- Fixed error that could cause some keymaps to not appear under a package in `settings-view`.
+
+### Pulsar
+
+- CI: Add build dependencies for Linux 'test bins' job [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1165)
+- Tree-sitter rolling fixes, 1.124 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1148)
+- Fix Linux trash error message [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/1151)
+- electron-builder: Don't create differential update blockmaps [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1139)
+- CI: Update Cirrus Rolling release upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1141)
+
+#### spell-check
+
+- [spell-check] Allow the user to whitelist sections of a buffer for spellchecking on a per-language basis. [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1147)
+
+#### settings-view
+
+- [settings-view] Fix Package keymap compatibility check [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1161)
+
+## 1.123.0
+
 - Fixed SQL State Storage not loading when starting Pulsar from a self-contained binary like appImage, tar.gz, etc.
+- [symbols-view] Allow project-wide symbol search to consider results from more than one provider.
+- Tree-sitter fixes and enhancements for hyperlinks, C, and shell scripts.
+- Restore use of `shell.moveItemToTrash` API in tree-view, for Electron 12 compatibility.
+
+### Pulsar
+
+- Tree-sitter rolling fixes, 1.123 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1118)
+- [symbols-view] Allow project-wide symbol searches to consider multiple providers [@savetheclocktower](github.com/pulsar-edit/pulsar/pull/1133)
+- electron-builder: Fix race condition when preparing to copy binaries [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1137)
+- [ci] Update GitHub Token in CirrusCI config [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1134)
+- Fixing requiring of better-sqlite3 [@mauricioszabo](github.com/pulsar-edit/pulsar/pull/1122)
+- Revert removal of `shell.moveItemToTrash` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1125)
+- CI: Bump macOS runner images from macos-12 to macos-13 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1120)
 
 ## 1.122.0
 
