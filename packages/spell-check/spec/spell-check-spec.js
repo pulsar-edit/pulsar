@@ -114,7 +114,7 @@ class SpeledWrong {}`
             `speledWrong = 5;
 function speledWrong() {}
 // We only care about mispelings in comments and strings!
-let foo = "this is speled wrong"
+let fxo = "this is speled wrong"
 class SpeledWrong {}`
         );
 
