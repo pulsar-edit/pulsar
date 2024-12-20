@@ -50,6 +50,12 @@ describe('StateStore', () => {
         });
     });
 
+    it('returns a database instance via dbPromise', async () => {
+      const store = new StateStore(databaseName, version);
+      const instance = await store.dbPromise;
+      expect(instance instanceof IDBDatabase).toBe(true);
+    });
+
     describe('when there is an error reading from the database', () => {
       it('rejects the promise returned by load', () => {
         const store = new StateStore(databaseName, version);
@@ -118,6 +124,13 @@ describe('StateStore', () => {
         .then(count => {
           expect(count).toBe(0);
         });
+    });
+
+    it('returns a database instance via dbPromise', async () => {
+      const store = new StateStore(databaseName, version);
+      const instance = await store.dbPromise;
+      const Database = require("better-sqlite3");
+      expect(instance instanceof Database).toBe(true);
     });
   });
 });
