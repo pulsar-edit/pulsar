@@ -46,7 +46,7 @@ module.exports = class StateStore {
 
   get dbPromise() {
     // Exposed due to usage in [`project-plus`](https://web.pulsar-edit.dev/packages/project-plus)
-    return this._getCorrectImplementation().then(i => i.dbPromise());
+    return this._getCorrectImplementation().then(i => i.dbPromise);
   }
 
   _getCorrectImplementation() {
