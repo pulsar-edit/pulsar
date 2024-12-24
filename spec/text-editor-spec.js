@@ -7617,10 +7617,17 @@ describe('TextEditor', () => {
       editor.update({ autoHeight: false });
       const element = editor.getElement();
       jasmine.attachToDOM(element);
-      element.style.height = element.component.getLineHeight() * 5 + 'px';
+      // NOTE: When line height is a float, `getRowsPerPage` will round up and
+      // consider there to be an extra row per page. Font metrics are more
+      // complicated than they used to be, but in order to make this test
+      // happy, we'll make the editor height a bit shorter so that we don't try
+      // to make six rows instead of five.
+      element.style.height = Math.floor(element.component.getLineHeight() * 5) + 'px';
       element.measureDimensions();
 
       expect(editor.getCursorBufferPosition().row).toBe(0);
+
+      expect(editor.getRowsPerPage()).toBe(5);
 
       editor.pageDown();
       expect(editor.getCursorBufferPosition().row).toBe(5);
@@ -7641,7 +7648,12 @@ describe('TextEditor', () => {
       editor.update({ autoHeight: false });
       const element = editor.getElement();
       jasmine.attachToDOM(element);
-      element.style.height = element.component.getLineHeight() * 5 + 'px';
+      // NOTE: When line height is a float, `getRowsPerPage` will round up and
+      // consider there to be an extra row per page. Font metrics are more
+      // complicated than they used to be, but in order to make this test
+      // happy, we'll make the editor height a bit shorter so that we don't try
+      // to make six rows instead of five.
+      element.style.height = Math.floor(element.component.getLineHeight() * 5) + 'px';
       element.measureDimensions();
 
       expect(editor.getCursorBufferPosition().row).toBe(0);
