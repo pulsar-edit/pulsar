@@ -38,118 +38,106 @@ describe('Workspace', () => {
     }
   });
 
-  function simulateReload() {
-    waitsForPromise(() => {
-      const workspaceState = workspace.serialize();
-      const projectState = atom.project.serialize({ isUnloading: true });
-      workspace.destroy();
-      atom.project.destroy();
-      atom.project = new Project({
-        notificationManager: atom.notifications,
+  async function simulateReload() {
+    const workspaceState = workspace.serialize();
+    const projectState = atom.project.serialize({ isUnloading: true });
+    workspace.destroy();
+    atom.project.destroy();
+    atom.project = new Project({
+      notificationManager: atom.notifications,
+      packageManager: atom.packages,
+      confirm: atom.confirm.bind(atom),
+      applicationDelegate: atom.applicationDelegate,
+      grammarRegistry: atom.grammars
+    });
+
+    return atom.project.deserialize(projectState).then(() => {
+      workspace = atom.workspace = new Workspace({
+        config: atom.config,
+        project: atom.project,
         packageManager: atom.packages,
-        confirm: atom.confirm.bind(atom),
+        grammarRegistry: atom.grammars,
+        styleManager: atom.styles,
+        deserializerManager: atom.deserializers,
+        notificationManager: atom.notifications,
         applicationDelegate: atom.applicationDelegate,
-        grammarRegistry: atom.grammars
+        viewRegistry: atom.views,
+        assert: atom.assert.bind(atom),
+        textEditorRegistry: atom.textEditors
       });
-      return atom.project.deserialize(projectState).then(() => {
-        workspace = atom.workspace = new Workspace({
-          config: atom.config,
-          project: atom.project,
-          packageManager: atom.packages,
-          grammarRegistry: atom.grammars,
-          styleManager: atom.styles,
-          deserializerManager: atom.deserializers,
-          notificationManager: atom.notifications,
-          applicationDelegate: atom.applicationDelegate,
-          viewRegistry: atom.views,
-          assert: atom.assert.bind(atom),
-          textEditorRegistry: atom.textEditors
-        });
-        workspace.deserialize(workspaceState, atom.deserializers);
-      });
+      workspace.deserialize(workspaceState, atom.deserializers);
     });
   }
 
   describe('serialization', () => {
     describe('when the workspace contains text editors', () => {
-      it('constructs the view with the same panes', () => {
+      it('constructs the view with the same panes', async () => {
+        jasmine.useRealClock();
         const pane1 = atom.workspace.getActivePane();
         const pane2 = pane1.splitRight({ copyActiveItem: true });
         const pane3 = pane2.splitRight({ copyActiveItem: true });
         let pane4 = null;
 
-        waitsForPromise(() =>
-          atom.workspace
-            .open(null)
-            .then(editor => editor.setText('An untitled editor.'))
+        await atom.workspace
+          .open(null)
+          .then(editor => editor.setText('An untitled editor.'));
+
+        await atom.workspace
+          .open('b')
+          .then(editor => pane2.activateItem(editor.copy()));
+
+        await atom.workspace
+          .open('../sample.js')
+          .then(editor => pane3.activateItem(editor));
+
+
+        pane3.activeItem.setCursorScreenPosition([2, 4]);
+        pane4 = pane2.splitDown();
+
+        await atom.workspace
+          .open('../sample.txt')
+          .then(editor => pane4.activateItem(editor));
+
+
+        pane4.getActiveItem().setCursorScreenPosition([0, 2]);
+        pane2.activate();
+
+        await simulateReload();
+
+        expect(atom.workspace.getTextEditors().length).toBe(5);
+        const [
+          editor1,
+          editor2,
+          untitledEditor,
+          editor3,
+          editor4
+        ] = atom.workspace.getTextEditors();
+        const firstDirectory = atom.project.getDirectories()[0];
+        expect(firstDirectory).toBeDefined();
+        expect(editor1.getPath()).toBe(firstDirectory.resolve('b'));
+        expect(editor2.getPath()).toBe(
+          firstDirectory.resolve('../sample.txt')
         );
-
-        waitsForPromise(() =>
-          atom.workspace
-            .open('b')
-            .then(editor => pane2.activateItem(editor.copy()))
+        expect(editor2.getCursorScreenPosition()).toEqual([0, 2]);
+        expect(editor3.getPath()).toBe(firstDirectory.resolve('b'));
+        expect(editor4.getPath()).toBe(
+          firstDirectory.resolve('../sample.js')
         );
+        expect(editor4.getCursorScreenPosition()).toEqual([2, 4]);
+        expect(untitledEditor.getPath()).toBeUndefined();
+        expect(untitledEditor.getText()).toBe('An untitled editor.');
 
-        waitsForPromise(() =>
-          atom.workspace
-            .open('../sample.js')
-            .then(editor => pane3.activateItem(editor))
+        expect(atom.workspace.getActiveTextEditor().getPath()).toBe(
+          editor3.getPath()
         );
-
-        runs(() => {
-          pane3.activeItem.setCursorScreenPosition([2, 4]);
-          pane4 = pane2.splitDown();
-        });
-
-        waitsForPromise(() =>
-          atom.workspace
-            .open('../sample.txt')
-            .then(editor => pane4.activateItem(editor))
+        const pathEscaped = fs.tildify(
+          escapeStringRegex(atom.project.getPaths()[0])
         );
-
-        runs(() => {
-          pane4.getActiveItem().setCursorScreenPosition([0, 2]);
-          pane2.activate();
-        });
-
-        simulateReload();
-
-        runs(() => {
-          expect(atom.workspace.getTextEditors().length).toBe(5);
-          const [
-            editor1,
-            editor2,
-            untitledEditor,
-            editor3,
-            editor4
-          ] = atom.workspace.getTextEditors();
-          const firstDirectory = atom.project.getDirectories()[0];
-          expect(firstDirectory).toBeDefined();
-          expect(editor1.getPath()).toBe(firstDirectory.resolve('b'));
-          expect(editor2.getPath()).toBe(
-            firstDirectory.resolve('../sample.txt')
-          );
-          expect(editor2.getCursorScreenPosition()).toEqual([0, 2]);
-          expect(editor3.getPath()).toBe(firstDirectory.resolve('b'));
-          expect(editor4.getPath()).toBe(
-            firstDirectory.resolve('../sample.js')
-          );
-          expect(editor4.getCursorScreenPosition()).toEqual([2, 4]);
-          expect(untitledEditor.getPath()).toBeUndefined();
-          expect(untitledEditor.getText()).toBe('An untitled editor.');
-
-          expect(atom.workspace.getActiveTextEditor().getPath()).toBe(
-            editor3.getPath()
-          );
-          const pathEscaped = fs.tildify(
-            escapeStringRegex(atom.project.getPaths()[0])
-          );
-          expect(document.title).toMatch(
-            new RegExp(
-              `^${path.basename(editor3.getLongTitle())} \\u2014 ${pathEscaped}`
-            )
-          );
-        });
+        expect(document.title).toMatch(
+          new RegExp(
+            `^${path.basename(editor3.getLongTitle())} \\u2014 ${pathEscaped}`
+          )
+        );
       });
     });
 
@@ -1948,13 +1936,12 @@ describe('Workspace', () => {
     it('invokes the observer when closing the one and only text editor after deserialization', async () => {
       pane.activateItem(new TextEditor());
 
-      simulateReload();
+      await simulateReload();
 
-      runs(() => {
-        workspace.onDidChangeActiveTextEditor(editor => observed.push(editor));
-        workspace.closeActivePaneItemOrEmptyPaneOrWindow();
-        expect(observed).toEqual([undefined]);
-      });
+      workspace.onDidChangeActiveTextEditor(editor => observed.push(editor));
+      workspace.closeActivePaneItemOrEmptyPaneOrWindow();
+      expect(observed).toEqual([undefined]);
+
     });
   });
 
@@ -2027,12 +2014,9 @@ describe('Workspace', () => {
       'source.coffee',
       'source.js', // Tree-sitter grammars also load
       'source.js',
-      'source.js',
-      'source.js.regexp',
       'source.js.regexp',
       'source.js.regexp',
       'source.js.regexp.replacement',
-      'source.jsdoc',
       'source.jsdoc',
       'source.jsdoc',
       'source.litcoffee',
