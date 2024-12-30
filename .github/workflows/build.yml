@@ -184,18 +184,16 @@ jobs:
         TEAM_ID: ${{ secrets.TEAM_ID }}
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
-        timeout_minutes: 45
-        max_attempts: 3
-        retry_on: error
+        timeout_minutes: 37
+        max_attempts: 7
         command: yarn dist --next
 
     - name: Build Pulsar Binaries (macOS) (Unsigned)
       if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
-        timeout_minutes: 45
-        max_attempts: 3
-        retry_on: error
+        timeout_minutes: 37
+        max_attempts: 7
         command: yarn dist --next
 
     - name: Build Pulsar Binaries
