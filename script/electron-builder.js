@@ -197,6 +197,9 @@ let options = {
         { "CFBundleURLName": "Atom Shared Session Protocol" }
       ]
     },
+    "target": [
+      { "target": "dmg" }
+    ],
   },
   "dmg": {
     "sign": false,
