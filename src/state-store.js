@@ -44,6 +44,11 @@ module.exports = class StateStore {
     return this._getCorrectImplementation().then(i => i.count());
   }
 
+  get dbPromise() {
+    // Exposed due to usage in [`project-plus`](https://web.pulsar-edit.dev/packages/project-plus)
+    return this._getCorrectImplementation().then(i => i.dbPromise);
+  }
+
   _getCorrectImplementation() {
     return awaitForAtomGlobal().then(() => {
       if(atom.config.get('core.useLegacySessionStore')) {
