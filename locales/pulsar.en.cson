@@ -1,0 +1,13 @@
+'pulsar': {
+  'config': {
+    'excludeVcsIgnoredPaths': {
+      'title': 'Exclude VCS Ignored Paths'
+    }
+  }
+  'menu': {
+    'settings-view:view-installed-packages': 'Open Package Manager'
+  }
+  'context-menu': {
+    'core:undo': 'Undo'
+  }
+}
