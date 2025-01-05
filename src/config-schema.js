@@ -416,7 +416,13 @@ const configSchema = {
         default: false,
         title: 'Allow Window Transparency',
         description: `Allows editor windows to be see-through. When this setting is enabled, UI themes and user stylesheets can use background colors with an alpha channel to make editor windows translucent. Takes effect after a restart of Pulsar.`
-      }
+      },
+      autoReloadInitScript: {
+        type: 'boolean',
+        default: false,
+        description:
+          'Automatically reloads the init script when the file was changed. Adds a global `disposable` object that can be used at the init script to dispose old commands, old callbacks, etc. DO NOT enable this without using `disposable` in your init script, otherwise you will have duplicated commands.'
+      },
     }
   },
   editor: {
