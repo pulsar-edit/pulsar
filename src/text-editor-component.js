@@ -2471,12 +2471,12 @@ module.exports = class TextEditorComponent {
       'halfWidthCharacterSpan',
       'koreanCharacterSpan'
     ];
-    this.measurements.lineHeight = Math.max(
+    this.measurements.lineHeight = Math.ceil(Math.max(
       1,
       // Each of these characters exists in its own block-level element. Set
       // the line height to the tallest of these four characters.
       ...lines.map(l => this.refs[l].parentNode.getBoundingClientRect().height)
-    );
+    ));
     this.measurements.baseCharacterWidth = this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.doubleWidthCharacterWidth = this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.halfWidthCharacterWidth = this.refs.halfWidthCharacterSpan.getBoundingClientRect().width;
