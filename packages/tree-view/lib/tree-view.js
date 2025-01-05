@@ -929,7 +929,7 @@ class TreeView {
 
           this.emitter.emit('will-delete-entry', meta);
 
-          let promise = shell.trashItem(selectedPath).then(() => {
+          let promise = atom.trashItem(selectedPath).then(() => {
             this.emitter.emit('entry-deleted', meta);
           }).catch(() => {
             this.emitter.emit('delete-entry-failed', meta);

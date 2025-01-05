@@ -135,6 +135,30 @@ ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
 ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
 });
+
+// Handle file deletion requests.
+//
+// Works around https://github.com/electron/electron/issues/29598, which seems
+// to be the cause of failed deletion attempts on Windows.
+ipcMain.handle('trashItem', async (_, filePath) => {
+  // We can't toss a promise over the wall, so we'll `await` it on our side and
+  // report the progress back to the renderer.
+  //
+  // If we return an `Error` object from this handler in the case of error,
+  // `ipcRenderer.invoke` will detect it and wrap it with its own explanation.
+  // We want to preserve the original error and hide the implementation
+  // details, so we instead return an object with an explicit `outcome`
+  // property to avoid this behavior.
+  try {
+    // `shell.trashItem` resolves with an empty value on success…
+    let result = await shell.trashItem(filePath);
+    return { outcome: 'success', result };
+  } catch (error) {
+    // …and rejects on failure.
+    return { outcome: 'failure', error }
+  }
+});
+
 // The application's singleton class.
 //
 // It's the entry point into the Pulsar application and maintains the global state

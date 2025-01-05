@@ -34,7 +34,7 @@ module.exports = class ApplicationDelegate {
 
   pickFolder(callback) {
     const responseChannel = 'atom-pick-folder-response';
-    ipcRenderer.on(responseChannel, function(event, path) {
+    ipcRenderer.on(responseChannel, function (event, path) {
       ipcRenderer.removeAllListeners(responseChannel);
       return callback(path);
     });
@@ -130,6 +130,20 @@ module.exports = class ApplicationDelegate {
 
   onDidLeaveFullScreen(callback) {
     return ipcHelpers.on(ipcRenderer, 'did-leave-full-screen', callback);
+  }
+
+  trashItem(filePath) {
+    // A simple wrapper around `shell.trashItem`, which currently can only be
+    // called from the main process on Windows.
+    return ipcRenderer.invoke('trashItem', filePath).then(({ outcome, error, result }) => {
+      if (outcome === 'success') {
+        // `result` is undefined, but we might as well guard against an
+        // Electron API change in the future.
+        return result;
+      } else if (outcome === 'failure') {
+        return Promise.reject(error);
+      }
+    });
   }
 
   async openWindowDevTools() {
