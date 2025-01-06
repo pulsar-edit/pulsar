@@ -368,15 +368,50 @@ function whatToBuild() {
   return options;
 }
 
+function generateVersionNumber(existingVersion, channel = '') {
+  // This matches stable, dev (with or without commit hash) and any other
+  // release channel following the pattern '1.100.0-channel0'
+  const match = existingVersion.match(/(\d+\.\d+\.\d+)(?:-([a-z]+)(\d+|-\w{4,})?)?$/);
+  if (!match || !match[1]) {
+    // We can't parse this. Return it as-is.
+    return existingVersion;
+  }
+
+  let tag = channel ? `-${channel}` : ''
+  return `${match[1]}${tag}`
+}
+
 async function main() {
   if (ARGS.next) {
     console.log('Building PulsarNext!');
   }
   let pack = await FS.readFile('package.json', 'utf-8');
   let options = whatToBuild();
-  options.extraMetadata = generateMetadata(JSON.parse(pack));
+  let parsedPackageJson = JSON.parse(pack);
+  let rewrotePackageJson = false;
+  options.extraMetadata = generateMetadata(parsedPackageJson);
   if (ARGS.next) {
     options.extraMetadata.productName = displayName;
+    if (!process.env.CI && !parsedPackageJson.version.endsWith('-next')) {
+      // We want this local build to have a version number that ends in `-next`
+      // instead of `-dev` or something else. In order to use an arbitrary
+      // version number, we must write it to `package.json` and restore the
+      // original when we're done. This is silly, but it's what
+      // `electron-builder` mandates.
+      //
+      // In CI, we've already changed `package.json` to the version number we
+      // want, so we can skip this step.
+      let newVersionNumber = generateVersionNumber(parsedPackageJson.version, 'next');
+      let newParsedPackageJson = JSON.parse(pack);
+      newParsedPackageJson.version = newVersionNumber;
+      console.log('Temporarily changing package.json to use version:', newVersionNumber);
+      rewrotePackageJson = true;
+      await FS.writeFile(
+        'package.json',
+        JSON.stringify(newParsedPackageJson, null, 2),
+        'utf-8'
+      );
+    }
   }
 
   try {
@@ -394,6 +429,13 @@ async function main() {
     console.error(error);
 
     process.exit(1);
+  } finally {
+    // If we rewrote the version number, ensure we restore the original
+    // `package.json` contents.
+    if (rewrotePackageJson) {
+      console.log('Restoring original package.json');
+      await FS.writeFile('package.json', pack, 'utf-8');
+    }
   }
 }
 
