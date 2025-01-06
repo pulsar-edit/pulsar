@@ -218,7 +218,7 @@ module.exports = class WrapGuideElement {
     columnWidth -= this.editorElement.getScrollLeft();
     const guide = document.createElement('div');
     guide.classList.add('wrap-guide');
-    guide.style.left = `${Math.round(columnWidth)}px`;
+    guide.style.left = `${(columnWidth)}px`;
     return this.element.appendChild(guide);
   }
 };

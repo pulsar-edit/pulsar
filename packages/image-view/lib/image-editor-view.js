@@ -213,9 +213,9 @@ class ImageEditorView {
     }
 
     const factor = this.steps[percentageStep]
-    const newWidth = Math.round(this.originalWidth * factor)
-    const newHeight = Math.round(this.originalHeight * factor)
-    const percent = Math.max(1, Math.round((newWidth / this.originalWidth) * 100))
+    const newWidth = (this.originalWidth * factor)
+    const newHeight = (this.originalHeight * factor)
+    const percent = Math.max(1, ((newWidth / this.originalWidth) * 100))
 
     // Switch to pixelated rendering when image is bigger than 200%
     if (newWidth > (this.originalWidth * 2)) {

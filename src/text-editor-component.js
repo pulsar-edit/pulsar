@@ -1578,8 +1578,8 @@ module.exports = class TextEditorComponent {
       }
     }
 
-    decoration.pixelTop = Math.round(wrapperTop);
-    decoration.pixelLeft = Math.round(wrapperLeft);
+    decoration.pixelTop = (wrapperTop);
+    decoration.pixelLeft = (wrapperLeft);
   }
 
   updateOverlaysToRender() {
@@ -2684,7 +2684,7 @@ module.exports = class TextEditorComponent {
 
           positions.set(
             nextColumnToMeasure,
-            Math.round(clientPixelPosition - lineNodeClientLeft)
+            (clientPixelPosition - lineNodeClientLeft)
           );
           continue columnLoop; // eslint-disable-line no-labels
         } else {
@@ -2708,7 +2708,7 @@ module.exports = class TextEditorComponent {
 
       positions.set(
         nextColumnToMeasure,
-        Math.round(lastTextNodeRight - lineNodeClientLeft)
+        (lastTextNodeRight - lineNodeClientLeft)
       );
     }
   }
@@ -3100,7 +3100,7 @@ module.exports = class TextEditorComponent {
   }
 
   getContentWidth() {
-    return Math.ceil(this.getLongestLineWidth() + this.getBaseCharacterWidth());
+    return (this.getLongestLineWidth() + this.getBaseCharacterWidth());
   }
 
   getScrollContainerClientWidthInBaseCharacters() {
@@ -3241,7 +3241,7 @@ module.exports = class TextEditorComponent {
   }
 
   getMaxScrollTop() {
-    return Math.round(
+    return (
       Math.max(
         0,
         this.getScrollHeight() - this.getScrollContainerClientHeight()
@@ -3280,7 +3280,7 @@ module.exports = class TextEditorComponent {
   }
 
   getMaxScrollLeft() {
-    return Math.round(
+    return (
       Math.max(0, this.getScrollWidth() - this.getScrollContainerClientWidth())
     );
   }
@@ -5227,7 +5227,7 @@ class NodePool {
 function roundToPhysicalPixelBoundary(virtualPixelPosition) {
   const virtualPixelsPerPhysicalPixel = 1 / window.devicePixelRatio;
   return (
-    Math.round(virtualPixelPosition / virtualPixelsPerPhysicalPixel) *
+    (virtualPixelPosition / virtualPixelsPerPhysicalPixel) *
     virtualPixelsPerPhysicalPixel
   );
 }
@@ -5235,7 +5235,7 @@ function roundToPhysicalPixelBoundary(virtualPixelPosition) {
 function ceilToPhysicalPixelBoundary(virtualPixelPosition) {
   const virtualPixelsPerPhysicalPixel = 1 / window.devicePixelRatio;
   return (
-    Math.ceil(virtualPixelPosition / virtualPixelsPerPhysicalPixel) *
+    (virtualPixelPosition / virtualPixelsPerPhysicalPixel) *
     virtualPixelsPerPhysicalPixel
   );
 }
