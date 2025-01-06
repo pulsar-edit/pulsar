@@ -77,11 +77,14 @@ async function main() {
     returnValue = "Spec Mode";
   }
 
-  if (atom.getVersion().endsWith("-dev")) {
+  if (atom.getReleaseChannel() !== 'stable') {
     // This would only be the case if
-    // 1. `yarn start` was used by a developer
-    // 2. Someone built a local binary without removing `-dev` from the version
-    returnValue = "Developer Instance";
+    //
+    // * `yarn start` was used by a developer,
+    // * someone built a local binary without removing `-dev` from the version,
+    //   or
+    // * someone was using a preview build of PulsarNext.
+    returnValue = 'Custom Release Channel';
   }
 
   if (returnValue.length > 0) {
