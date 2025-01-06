@@ -89,11 +89,11 @@ jobs:
 
     - name: Check Pulsar Version
       if: ${{ runner.os != 'Windows' }}
-      run: sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`-electron-next/g" package.json
+      run: sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`-next/g" package.json
 
     - name: Check Pulsar Version - Windows
       if: ${{ runner.os == 'Windows' }}
-      run: (Get-Content package.json) -replace '[0-9]*-dev', "$(date -u +%Y%m%d%H)-electron-next" | Set-Content -Path package.json
+      run: (Get-Content package.json) -replace '[0-9]*-dev', "$(date -u +%Y%m%d%H)-next" | Set-Content -Path package.json
 
     - name: Reinstall Current Node-GYP NodeJS Headers
       # Overwrite bad headers that get downloaded.
@@ -278,7 +278,7 @@ jobs:
 
     - name: Check Pulsar Version
       if: ${{ runner.os != 'Windows' }}
-      run: sed -i -e "s/[0-9]*-dev/${TIMESTAMP}-electron-next/g" package.json
+      run: sed -i -e "s/[0-9]*-dev/${TIMESTAMP}-next/g" package.json
       env:
         TIMESTAMP: ${{needs.build.outputs.timestamp}}
 
