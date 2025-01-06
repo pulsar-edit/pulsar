@@ -45,6 +45,8 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
+  const releaseChannel = getReleaseChannel(app.getVersion());
+  process.env.ATOM_CHANNEL ??= releaseChannel;
   atomPaths.setAtomHome(app.getPath('home'));
   atomPaths.setUserData(app);
 
@@ -69,7 +71,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     return;
   }
 
-  const releaseChannel = getReleaseChannel(app.getVersion());
   let appUserModelId = 'dev.pulsar-edit.pulsar.' + process.arch;
 
   // If the release channel is not stable, we append it to the app user model id.

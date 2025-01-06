@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs-plus');
+const { getReleaseChannel } = require('./get-app-details.js');
 
 module.exports = class CommandInstaller {
   constructor(applicationDelegate) {
@@ -18,6 +19,10 @@ module.exports = class CommandInstaller {
     return process.resourcesPath;
   }
 
+  getReleaseChannel() {
+    return getReleaseChannel(this.appVersion);
+  }
+
   getScriptBaseName() {
     if (this.scriptBaseName) {
       return this.scriptBaseName;
@@ -26,22 +31,13 @@ module.exports = class CommandInstaller {
       // us the right name.
       return process.env.ATOM_BASE_NAME;
     }
-    // TODO: For now we can infer it from the presence of a file in the
-    // resources directory, but a better way would be to bake in the right
-    // metadata at build time.
-    for (let name in ['pulsar', 'pulsar-next']) {
-      for (let ext in ['sh', 'cmd']) {
-        let candidate = path.join(
-          this.getResourcesDirectory(),
-          `${name}.${ext}`
-        );
-        if (fs.existsSync(candidate)) {
-          this.scriptBaseName = name;
-          return name;
-        }
-      }
-    }
-    return 'pulsar';
+
+    // Otherwise we can make an educated guess from the name of the release
+    // channel.
+    let releaseChannel = this.getReleaseChannel();
+    this.scriptBaseName = releaseChannel === 'next' ? 'pulsar-next' : 'pulsar';
+
+    return this.scriptBaseName;
   }
 
   async installShellCommandsInteractively() {

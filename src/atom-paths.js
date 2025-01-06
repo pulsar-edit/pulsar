@@ -27,7 +27,9 @@ const getAppDirectory = () => {
 
 module.exports = {
   setAtomHome: homePath => {
-    // When a read-writeable .pulsar folder exists above app use that
+    // When a read-writeable `.pulsar` folder exists above the app directory,
+    // use that. The portability means that we don't have to use a different
+    // name to distinguish the release channel.
     const portableHomePath = path.join(getAppDirectory(), '..', '.pulsar');
     if (fs.existsSync(portableHomePath)) {
       if (hasWriteAccess(portableHomePath)) {
@@ -40,27 +42,30 @@ module.exports = {
       }
     }
 
-    // Check ATOM_HOME environment variable next
+    // Check the `ATOM_HOME` environment variable next.
     if (process.env.ATOM_HOME !== undefined) {
       return;
     }
 
-    // On Windows, we don’t try to set ATOM_HOME in `pulsar.cmd`; but we might
-    // set ATOM_CHANNEL to signal which location should be inferred as the
-    // default ATOM_HOME.
-    if (process.env.ATOM_CHANNEL) {
-      switch (process.env.ATOM_CHANNEL) {
-        case 'next':
-          process.env.ATOM_HOME = path.join(homePath, '.pulsar-next');
-          return;
-        default:
-          process.env.ATOM_HOME = path.join(homePath, '.pulsar');
-          return;
-      }
+    // We fall back to a `.pulsar` folder in the user's home folder — or a
+    // different folder name if we're not on the stable release channel.
+    //
+    // On macOS and Linux, `ATOM_HOME` gets set in `pulsar(-next).sh`, so we'd
+    // only get this far if the user launched via a non-shell method.
+    //
+    // On Windows, we don’t try to set `ATOM_HOME` in `pulsar.cmd`, so we'll
+    // always get this far.
+    //
+    // In these cases, we rely on `ATOM_CHANNEL`, which is defined either by
+    // the launcher script or by the main process shortly after launch
+    // (inferred via the version number).
+    //
+    let folderName = '.pulsar';
+    if (process.env.ATOM_CHANNEL === 'next') {
+      folderName = '.pulsar-next';
     }
 
-    // Fall back to default .atom folder in users home folder
-    process.env.ATOM_HOME = path.join(homePath, '.pulsar');
+    process.env.ATOM_HOME = path.join(homePath, folderName);
   },
 
   setUserData: app => {
@@ -80,5 +85,5 @@ module.exports = {
     }
   },
 
-  getAppDirectory: getAppDirectory
+  getAppDirectory
 };
