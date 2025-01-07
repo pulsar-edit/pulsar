@@ -60,7 +60,6 @@ class ScopeSelector {
             enforceSegmentOrder: false,
             ...rawOptions,
         };
-        console.log(this, 'matches', scopeDescriptorOrArray);
         let scopeList;
         if (Array.isArray(scopeDescriptorOrArray)) {
             scopeList = scopeDescriptorOrArray;
