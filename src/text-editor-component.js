@@ -2465,17 +2465,12 @@ module.exports = class TextEditorComponent {
   }
 
   measureCharacterDimensions() {
-    let lines = [
-      'normalWidthCharacterSpan',
-      'doubleWidthCharacterSpan',
-      'halfWidthCharacterSpan',
-      'koreanCharacterSpan'
-    ];
     this.measurements.lineHeight = Math.max(
       1,
-      // Each of these characters exists in its own block-level element. Set
-      // the line height to the tallest of these four characters.
-      ...lines.map(l => this.refs[l].parentNode.getBoundingClientRect().height)
+      // Each of the four characters below exists inside its own block-level
+      // element, but each of those containers should have the same height. We
+      // don't need to check more than one.
+      this.refs.normalWidthCharacterSpan.parentNode.getBoundingClientRect().height
     );
     this.measurements.baseCharacterWidth = this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.doubleWidthCharacterWidth = this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;

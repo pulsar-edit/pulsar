@@ -98,10 +98,32 @@ class WorkspaceElement extends HTMLElement {
   }
 
   updateGlobalTextEditorStyleSheet() {
+    // We multiply `editor.fontSize` by `editor.lineHeight` to determine how
+    // tall our lines will be. We could just pass `editor.lineHeight` into the
+    // CSS as a factor and let CSS do the math, but Chromium tends to make a
+    // mess of it, with the result being occasional tiny gaps between lines.
+    // (See https://github.com/pulsar-edit/pulsar/issues/1181.)
+    //
+    // The best way around this seems to be to compute the line height
+    // ourselves while rounding to the nearest device pixel, then specifying
+    // the editor `line-height` in CSS pixels instead of a bare number.
+    let fontSize = this.config.get('editor.fontSize');
+    let fontFamily = this.config.get('editor.fontFamily');
+    let lineHeight = this.config.get('editor.lineHeight');
+    let pixelRatio = window.devicePixelRatio;
+
+    // Most screens out there these days have a `devicePixelRatio` of `2`,
+    // meaning that `1px` in CSS will use two screen pixels. So this would have
+    // the effect of snapping the line height to the nearest half-CSS-pixel.
+    //
+    // On older displays with lower DPI, this will theoretically do the right
+    // thing and snap to the nearest whole pixel.
+    let computedLineHeight = Math.round(fontSize * lineHeight * pixelRatio) / pixelRatio;
+
     const styleSheetSource = `atom-workspace {
-  --editor-font-size: ${this.config.get('editor.fontSize')}px;
-  --editor-font-family: ${this.config.get('editor.fontFamily')};
-  --editor-line-height: ${this.config.get('editor.lineHeight')};
+  --editor-font-size: ${fontSize}px;
+  --editor-font-family: ${fontFamily};
+  --editor-line-height: ${computedLineHeight.toFixed(6)}px;
 }`;
     this.styleManager.addStyleSheet(styleSheetSource, {
       sourcePath: 'global-text-editor-styles',
