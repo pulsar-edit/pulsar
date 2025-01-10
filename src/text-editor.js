@@ -314,6 +314,10 @@ module.exports = class TextEditor {
       priority: 0,
       visible: params.lineNumberGutterVisible
     });
+
+    if (atom & atom.textEditors) {
+      this.disposables.add(atom.textEditors.add(this))
+    }
   }
 
   get element() {
