@@ -315,7 +315,7 @@ module.exports = class TextEditor {
       visible: params.lineNumberGutterVisible
     });
 
-    if (atom & atom.textEditors) {
+    if (atom && atom.textEditors) {
       this.disposables.add(atom.textEditors.add(this))
     }
   }
