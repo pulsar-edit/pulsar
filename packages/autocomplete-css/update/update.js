@@ -1,7 +1,7 @@
 /**
   This file will manage the updating of `autocomplete-css` `completions.json`.
   We will mainly utilize `@webref/css`.listAll() function that returns a full CSS
-  list of all properties seperated by their spec shortname. An example
+  list of all properties separated by their spec shortname. An example
   of this format is defined below for ease of future modifications.
 
   Some important notes about the data contained here:
@@ -16,7 +16,7 @@
       So this should be handled by the same parser.
     - Additionally an important note is that nowhere in this data do we get any kind
       of description about the data that could lend a hand in being documentation.
-      So the documentation must be gathered seperatly. Likely the best way to collect
+      So the documentation must be gathered separately. Likely the best way to collect
       our documentation data is via `mdn/content`.
       Within `content/files/en-us/web/css` is a directory of folders titled
       by the name of properties.
@@ -222,7 +222,7 @@ async function buildProperties(css) {
         } else {
           // So seems this happens way more often than assumed.
           // So instead of discard a previously entered entry, we will prioritize
-          // having values accomponing it. So whoever has the longer array of
+          // having values accompanying it. So whoever has the longer array of
           // values will be used as the tiebreaker.
           if (propertyObj[prop.name].values.length < propValues.length) {
             propertyObj[prop.name] = {
@@ -234,7 +234,7 @@ async function buildProperties(css) {
         // Unfortunately the no duplication guarantee of @webref/css seems
         // inaccurate. As there are duplicate `display` definitions.
         // The first containing all the data we want, and the later containing nothing.
-        // This protects against overriding previously definied definitions.
+        // This protects against overriding previously defined definitions.
 
       }
     } // else continue our loop
@@ -260,7 +260,7 @@ async function getDescriptionOfProp(name) {
   }
 
   if (file) {
-    // Here we will do a quick and dirty way to parse the markdown file to retreive a raw string
+    // Here we will do a quick and dirty way to parse the markdown file to retrieve a raw string
     let breaks = file.split("---");
 
     // The first two breaks should be the yaml metadata block
@@ -270,7 +270,7 @@ async function getDescriptionOfProp(name) {
     let summaryRaw = data.split("\n");
     // In case the first few lines is an empty line break
     for (let i = 0; i < summaryRaw.length; i++) {
-      // Filtering the starting character protects agains't collecting accidental
+      // Filtering the starting character protects against collecting accidental
       // warnings or other notices within the MDN site.
       if (summaryRaw[i].length > 1 && !summaryRaw[i].startsWith("> ") && !summaryRaw[i].startsWith("« ")) {
         return summaryRaw[i]
