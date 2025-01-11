@@ -85,6 +85,7 @@
   }
 */
 
+const downloadGitRepo = require("download-git-repo");
 const css = require("@webref/css");
 const fs = require("fs");
 const superagent = require("superagent");
@@ -252,7 +253,7 @@ async function getDescriptionOfProp(name) {
   // specs and may not be worth mentioning standalone.
   let file;
   let filePath = [ "css", "svg/attribute", "svg/element" ].map(path =>
-    `./node_modules/content/files/en-us/web/${path}/${name}/index.md`
+    `./content/files/en-us/web/${path}/${name}/index.md`
   ).find(f => fs.existsSync(f));
 
   if (filePath) {
@@ -397,7 +398,7 @@ async function getTagsHTML() {
 
   let tags = [];
 
-  let files = fs.readdirSync("./node_modules/content/files/en-us/web/html/element");
+  let files = fs.readdirSync("./content/files/en-us/web/html/element");
 
   files.forEach(file => {
     if (file != "index.md") {
@@ -435,4 +436,6 @@ function dedupPropValues(values) {
   return out;
 }
 
-update(process.argv.slice(2));
+downloadGitRepo("github:mdn/content", "./content", () => {
+  update(process.argv.slice(2));
+});
