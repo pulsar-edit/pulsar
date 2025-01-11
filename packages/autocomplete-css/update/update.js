@@ -284,6 +284,13 @@ async function getDescriptionOfProp(name) {
           .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, '$1');
       }
     }
+
+    // While we have successfully found a document from MDN that contains our
+    // description, lets check if we have a manual entry for this item. So we
+    // can warn of that and allow that manual entry to be deleted.
+    if (manualPropertyDesc[name]) {
+      console.log(`A manual property description has become outdated and should be removed: '${name}'`);
+    }
   } else {
     // A document doesn't yet exist, let's ensure it's not in our manual list first
     if (manualPropertyDesc[name]) {
