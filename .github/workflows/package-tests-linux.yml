@@ -196,7 +196,7 @@ jobs:
         key: pulsar-${{ github.sha }}
 
     - name: Install Pulsar
-      run: sudo dpkg -i pulsar.deb && sudo apt-get -f install -y
+      run: sudo apt-get install ./pulsar.deb
 
     - name: Install xvfb
       run: sudo apt-get install -y xvfb
