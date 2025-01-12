@@ -114,7 +114,7 @@ class SpeledWrong {}`
             `speledWrong = 5;
 function speledWrong() {}
 // We only care about mispelings in comments and strings!
-let foo = "this is speled wrong"
+let fxo = "this is speled wrong"
 class SpeledWrong {}`
         );
 
@@ -751,6 +751,7 @@ class SpeledWrong {}`
     // These tests are only run on Macs because the CI for Windows doesn't have
     // spelling provided.
     if (env.isSystemSupported() && env.isDarwin()) {
+        let markers;
         describe('when using system checker plugin', function () {
             it('marks chzz as not a valid word but cheese is', async function () {
                 atom.config.set('spell-check.useSystem', true);
@@ -759,7 +760,6 @@ class SpeledWrong {}`
 
                 await conditionPromise(() => {
                     markers = getMisspellingMarkers();
-                    console.log(markers);
                     return (
                         markers.length === 1 &&
                         markers[0].getBufferRange().start.column === 7 &&

@@ -162,13 +162,10 @@ class PulsarUpdater {
         break;
       case "Safe Mode":
         return null;
-        break;
       case "Spec Mode":
         return null;
-        break;
-      case "Developer Instance":
+      case "Custom Release Channel":
         return null;
-        break;
       case "Flatpak Installation":
         returnText += "Install the latest version by running `flatpak update`.";
         break;
