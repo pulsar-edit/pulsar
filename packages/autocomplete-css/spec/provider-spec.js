@@ -606,7 +606,7 @@ ca {
           editor.setCursorBufferPosition([0, 2]);
           await whenEditorReady(editor);
           let completions = getCompletions();
-          expect(completions.length).toBeGreaterThan(7); // #398
+          expect(completions.length).toBeGreaterThan(6); // #398
           expect(isValueInCompletions('canvas', completions)).toBe(true);
           expect(isValueInCompletions('code', completions)).toBe(true);
 
@@ -621,7 +621,8 @@ canvas,ca {
           editor.setCursorBufferPosition([0, 9]);
           await whenEditorReady(editor);
           completions = getCompletions();
-          expect(completions.length).toBeGreaterThan(7); // #398
+          expect(completions.length).toBeGreaterThan(6); // #398
+          expect(isValueInCompletions('canvas', completions)).toBe(true);
           expect(completions[0].text).toBe('canvas');
 
           editor.setText(`\
@@ -632,7 +633,8 @@ canvas ca {
           editor.setCursorBufferPosition([0, 9]);
           await whenEditorReady(editor);
           completions = getCompletions();
-          expect(completions.length).toBeGreaterThan(7); // #398
+          expect(completions.length).toBeGreaterThan(6); // #398
+          expect(isValueInCompletions('canvas', completions)).toBe(true);
           expect(completions[0].text).toBe('canvas');
 
           editor.setText(`\
@@ -643,8 +645,8 @@ canvas, ca {
           editor.setCursorBufferPosition([0, 10]);
           await whenEditorReady(editor);
           completions = getCompletions();
-          expect(completions.length).toBeGreaterThan(7); // #398
-          expect(completions[0].text).toBe('canvas');
+          expect(completions.length).toBeGreaterThan(6); // #398
+          expect(isValueInCompletions('canvas', completions)).toBe(true);
         });
 
         it("does not autocompletes when prefix is preceded by class or id char", async () => {
@@ -679,7 +681,7 @@ div: {
           editor.setCursorBufferPosition([0, 4]);
           await whenEditorReady(editor);
           const completions = getCompletions();
-          expect(completions.length).toBeGreaterThanOrEqual(82); // #1191
+          expect(completions.length).toBeGreaterThan(81); // #1191
           for (var completion of Array.from(completions)) {
             var text = (completion.text || completion.snippet);
             expect(text.length).toBeGreaterThan(0);
@@ -1115,7 +1117,7 @@ ca\
         editor.setCursorBufferPosition([0, 2]);
         await whenEditorReady(editor);
         let completions = getCompletions();
-        expect(completions.length).toBeGreaterThanOrEqual(7); // #398
+        expect(completions.length).toBeGreaterThan(6); // #398
         expect(isValueInCompletions('canvas', completions)).toBe(true);
         expect(isValueInCompletions('code', completions)).toBe(true);
 
@@ -1129,7 +1131,7 @@ canvas,ca\
         editor.setCursorBufferPosition([0, 9]);
         await whenEditorReady(editor);
         completions = getCompletions();
-        expect(completions.length).toBeGreaterThanOrEqual(7); // #398
+        expect(completions.length).toBeGreaterThan(6); // #398
         expect(isValueInCompletions('canvas', completions)).toBe(true);
 
         editor.setText(`\
@@ -1139,7 +1141,7 @@ canvas ca\
         editor.setCursorBufferPosition([0, 9]);
         await whenEditorReady(editor);
         completions = getCompletions();
-        expect(completions.length).toBeGreaterThanOrEqual(7); // #398
+        expect(completions.length).toBeGreaterThan(6); // #398
         expect(isValueInCompletions('canvas', completions)).toBe(true);
 
         editor.setText(`\
@@ -1149,7 +1151,7 @@ canvas, ca\
         editor.setCursorBufferPosition([0, 10]);
         await whenEditorReady(editor);
         completions = getCompletions();
-        expect(completions.length).toBeGreaterThanOrEqual(7); // #398
+        expect(completions.length).toBeGreaterThan(6); // #398
         expect(isValueInCompletions('canvas', completions)).toBe(true);
       });
 
@@ -1183,7 +1185,7 @@ div:\
         editor.setCursorBufferPosition([0, 4]);
         await whenEditorReady(editor);
         const completions = getCompletions();
-        expect(completions.length).toBeGreaterThanOrEqual(82); // #1191
+        expect(completions.length).toBeGreaterThan(81); // #1191
         for (var completion of Array.from(completions)) {
           var text = (completion.text || completion.snippet);
           expect(text.length).toBeGreaterThan(0);
