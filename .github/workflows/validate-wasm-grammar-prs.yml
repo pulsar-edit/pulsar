@@ -5,8 +5,8 @@ name: Validate WASM Grammar PR Changes
 
 on:
   pull_request:
-    # paths:
-    #   - '**.wasm'
+    paths:
+      - '**.wasm'
 
 jobs:
   validate:
