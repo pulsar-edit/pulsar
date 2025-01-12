@@ -51,8 +51,9 @@ const whenEditorReady = function (editor) {
 // combersome to maintain, to do Pulsar's best to avoid regressions in this aspect
 // these locations will now check for more than the last good value.
 // This of course assumes that the web won't start removing matching items faster
-// than adding. But locations of this behavior will be marked accordingly with: #398
-// https://github.com/pulsar-edit/pulsar/pull/398
+// than adding. But locations of this behavior will be marked accordingly with:
+// * #398: https://github.com/pulsar-edit/pulsar/pull/398
+// * #1191: https://github.com/pulsar-edit/pulsar/pull/1191
 
 Object.keys(packagesToTest).forEach(packageLabel => {
   if (!atom.packages.getAvailablePackageNames().includes(packagesToTest[packageLabel].name)) {
@@ -678,7 +679,7 @@ div: {
           editor.setCursorBufferPosition([0, 4]);
           await whenEditorReady(editor);
           const completions = getCompletions();
-          expect(completions.length).toBe(43);
+          expect(completions.length).toBeGreaterThanOrEqual(82); // #1191
           for (var completion of Array.from(completions)) {
             var text = (completion.text || completion.snippet);
             expect(text.length).toBeGreaterThan(0);
@@ -1114,7 +1115,7 @@ ca\
         editor.setCursorBufferPosition([0, 2]);
         await whenEditorReady(editor);
         let completions = getCompletions();
-        expect(completions.length).toBeGreaterThan(7); // #398
+        expect(completions.length).toBeGreaterThanOrEqual(7); // #398
         expect(isValueInCompletions('canvas', completions)).toBe(true);
         expect(isValueInCompletions('code', completions)).toBe(true);
 
@@ -1128,8 +1129,8 @@ canvas,ca\
         editor.setCursorBufferPosition([0, 9]);
         await whenEditorReady(editor);
         completions = getCompletions();
-        expect(completions.length).toBeGreaterThan(7); // #398
-        expect(completions[0].text).toBe('canvas');
+        expect(completions.length).toBeGreaterThanOrEqual(7); // #398
+        expect(isValueInCompletions('canvas', completions)).toBe(true);
 
         editor.setText(`\
 canvas ca\
@@ -1138,8 +1139,8 @@ canvas ca\
         editor.setCursorBufferPosition([0, 9]);
         await whenEditorReady(editor);
         completions = getCompletions();
-        expect(completions.length).toBeGreaterThan(7); // #398
-        expect(completions[0].text).toBe('canvas');
+        expect(completions.length).toBeGreaterThanOrEqual(7); // #398
+        expect(isValueInCompletions('canvas', completions)).toBe(true);
 
         editor.setText(`\
 canvas, ca\
@@ -1148,8 +1149,8 @@ canvas, ca\
         editor.setCursorBufferPosition([0, 10]);
         await whenEditorReady(editor);
         completions = getCompletions();
-        expect(completions.length).toBeGreaterThan(7); // #398
-        expect(completions[0].text).toBe('canvas');
+        expect(completions.length).toBeGreaterThanOrEqual(7); // #398
+        expect(isValueInCompletions('canvas', completions)).toBe(true);
       });
 
       it("does not autocomplete when prefix is preceded by class or id char", async () => {
@@ -1182,7 +1183,7 @@ div:\
         editor.setCursorBufferPosition([0, 4]);
         await whenEditorReady(editor);
         const completions = getCompletions();
-        expect(completions.length).toBe(43);
+        expect(completions.length).toBeGreaterThanOrEqual(82); // #1191
         for (var completion of Array.from(completions)) {
           var text = (completion.text || completion.snippet);
           expect(text.length).toBeGreaterThan(0);
