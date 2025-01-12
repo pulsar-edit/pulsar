@@ -12,6 +12,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
+    - name: Install build dependencies
+      run: apt-get update && apt-get install -y libx11-dev
     - name: Checkout the Latest Code
       uses: actions/checkout@v4
       with:
