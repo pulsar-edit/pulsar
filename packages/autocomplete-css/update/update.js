@@ -406,12 +406,42 @@ async function getTagsHTML() {
 }
 
 async function getPseudoSelectors() {
-  // For now since there is no best determined way to collect all modern psudoselectors
-  // We will just grab the existing list for our existing `completions.json`
+  // Update pseudo selectors with `@webref/css/selectors` & `@webref/css/css-pseudo`
+  // This data seems to be excluded from `@webref/css` so we will need to
+  // collect it manually.
 
-  let existingCompletions = require("../completions.json");
+  try {
+    const res = await superagent.get("https://github.com/w3c/webref/raw/main/ed/css/selectors.json");
+    if (res.status !== 200) {
+      console.error(res);
+      process.exit(1);
+    }
 
-  return existingCompletions.pseudoSelectors;
+    const selectors = JSON.parse(res.text);
+
+    let newObj = {};
+
+    for (const item of selectors.selectors) {
+      newObj[item.name] = { description: item.prose ?? "" };
+    }
+
+    const res2 = await superagent.get("https://github.com/w3c/webref/raw/main/ed/css/css-pseudo.json");
+    if (res2.status !== 200) {
+      console.error(res2);
+      process.exit(1);
+    }
+
+    const psuedoSelectors = JSON.parse(res2.text);
+
+    for (const item of psuedoSelectors.selectors) {
+      newObj[item.name] = { description: item.prose ?? "" };
+    }
+
+    return newObj;
+  } catch(err) {
+    console.error(err);
+    process.exit(1);
+  }
 }
 
 function dedupPropValues(values) {
