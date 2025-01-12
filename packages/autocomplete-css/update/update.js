@@ -402,7 +402,7 @@ async function getTagsHTML() {
     }
   }
 
-  return tags;
+  return tags.sort();
 }
 
 async function getPseudoSelectors() {
