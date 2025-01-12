@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@webref/css": "^6.18.1",
+    "@webref/elements": "^2.4.0",
     "download-git-repo": "^3.0.2",
     "superagent": "^10.1.1"
   }

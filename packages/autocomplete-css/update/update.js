@@ -87,6 +87,7 @@
 
 const downloadGitRepo = require("download-git-repo");
 const css = require("@webref/css");
+const elements = require("@webref/elements");
 const fs = require("fs");
 const superagent = require("superagent");
 const CSSParser = require("./cssValueDefinitionSyntaxExtractor.js");
@@ -386,29 +387,20 @@ function parseValueGroup(valueGroupName, allValues) {
 }
 
 async function getTagsHTML() {
-  // This will also use our dep of `mdn/content` to find all tags currently
-  // within their docs. By simply grabbing all folders of tag docs by their name
-
-  // Some of the page titles from MDN's docs don't accurately reflect what we
-  // would expect to appear. The object below is named after what the name of the
-  // folder from MDN's docs is called, whose value is then the array we would instead expect.
-  const replaceTags = {
-    "heading_elements": [ "h1", "h2", "h3", "h4", "h5", "h6" ],
-  };
+  // We use `@webref/elements` to get a full list of elements that can be
+  // targeted with CSS.
 
   let tags = [];
 
-  let files = fs.readdirSync("./content/files/en-us/web/html/element");
+  const webrefElements = await elements.listAll();
 
-  files.forEach(file => {
-    if (file != "index.md") {
-      if (Array.isArray(replaceTags[file])) {
-        tags = tags.concat(replaceTags[file]);
-      } else {
-        tags.push(file);
+  for (const spec in webrefElements) {
+    if (webrefElements[spec].spec.title === "HTML Standard") {
+      for (const el of webrefElements[spec].elements) {
+        tags.push(el.name);
       }
     }
-  });
+  }
 
   return tags;
 }
