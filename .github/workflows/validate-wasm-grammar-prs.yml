@@ -12,6 +12,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
+    - name: Install build dependencies
+      run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev
     - name: Checkout the Latest Code
       uses: actions/checkout@v4
       with:
