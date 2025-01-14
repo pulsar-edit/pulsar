@@ -19,7 +19,6 @@ class Directory {
     this.destroyed = false
     this.emitter = new Emitter()
     this.subscriptions = new CompositeDisposable()
-    this.compareFn = Intl.Collator(undefined, {numeric: true, sensitivity: 'base'}).compare
 
     if (atom.config.get('tree-view.squashDirectoryNames') && !this.isRoot) {
       fullPath = this.squashDirectoryNames(fullPath)
@@ -347,7 +346,7 @@ class Directory {
   }
 
   compareEntries(a, b) {
-    return this.compareFn(a, b)
+    return compareFn(a, b)
   }
 
   // Public: Perform a synchronous reload of the directory.
@@ -458,3 +457,5 @@ function throttle(func, timeout) {
     }, timeout)
   }
 }
+
+const compareFn = Intl.Collator(undefined, {numeric: true, sensitivity: 'base'}).compare
