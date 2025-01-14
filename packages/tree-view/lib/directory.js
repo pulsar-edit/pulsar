@@ -20,7 +20,6 @@ class Directory {
     this.emitter = new Emitter()
     this.subscriptions = new CompositeDisposable()
     this.compareFn = Intl.Collator(undefined, {numeric: true, sensitivity: 'base'}).compare
-    this.watchTimer = 20
 
     if (atom.config.get('tree-view.squashDirectoryNames') && !this.isRoot) {
       fullPath = this.squashDirectoryNames(fullPath)
@@ -258,10 +257,11 @@ class Directory {
   watch () {
     if (this.watchSubscription != null) return
     try {
+      let reload = this.reload.bind(this)
       this.watchSubscription = PathWatcher.watch(this.path, eventType => {
         switch (eventType) {
           case 'change':
-            throttle(this.reload, this.watchTimer)
+            throttle(reload, 20)
             break
           case 'delete':
             this.destroy()
