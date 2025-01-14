@@ -331,11 +331,7 @@ class Directory {
   }
 
   normalizeEntryName (value) {
-    let normalizedValue = value.name
-    if (normalizedValue == null) {
-      normalizedValue = value
-    }
-    return normalizedValue
+    return value.name ? value.name : value
   }
 
   sortEntries (combinedEntries) {
