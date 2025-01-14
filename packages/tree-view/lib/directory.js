@@ -340,7 +340,7 @@ class Directory {
       return combinedEntries.sort((first, second) => {
         const firstName = this.normalizeEntryName(first)
         const secondName = this.normalizeEntryName(second)
-        return this.getCompare(firstName, secondName)
+        return this.compareEntries(firstName, secondName)
       })
     }
   }
