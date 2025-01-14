@@ -19,6 +19,7 @@ class Directory {
     this.destroyed = false
     this.emitter = new Emitter()
     this.subscriptions = new CompositeDisposable()
+    this.compareFn = Intl.Collator(undefined, {numeric: true, sensitivity: 'base'}).compare
 
     if (atom.config.get('tree-view.squashDirectoryNames') && !this.isRoot) {
       fullPath = this.squashDirectoryNames(fullPath)
@@ -277,7 +278,7 @@ class Directory {
     } catch (error) {
       names = []
     }
-    names.sort(new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'}).compare)
+    names.sort(this.compareFn)
 
     const files = []
     const directories = []
@@ -347,7 +348,7 @@ class Directory {
       return combinedEntries.sort((first, second) => {
         const firstName = this.normalizeEntryName(first)
         const secondName = this.normalizeEntryName(second)
-        return firstName.localeCompare(secondName)
+        return this.compareFn(firstName, secondName)
       })
     }
   }
