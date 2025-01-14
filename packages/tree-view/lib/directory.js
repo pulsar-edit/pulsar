@@ -279,7 +279,7 @@ class Directory {
     } catch (error) {
       names = []
     }
-    names.sort(this.compareFn)
+    names.sort(this.compareEntries)
 
     const files = []
     const directories = []
@@ -341,9 +341,13 @@ class Directory {
       return combinedEntries.sort((first, second) => {
         const firstName = this.normalizeEntryName(first)
         const secondName = this.normalizeEntryName(second)
-        return this.compareFn(firstName, secondName)
+        return this.getCompare(firstName, secondName)
       })
     }
+  }
+
+  compareEntries(a, b) {
+    return this.compareFn(a, b)
   }
 
   // Public: Perform a synchronous reload of the directory.
