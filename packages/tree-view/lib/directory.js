@@ -453,7 +453,7 @@ function throttle(func, timeout) {
   return (...args) => {
     if (timer) { return }
     timer = setTimeout(() => {
-      func.apply(this, args)
+      func(...args)
       timer = false
     }, timeout)
   }
