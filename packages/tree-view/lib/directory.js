@@ -1,14 +1,13 @@
 const path = require('path')
 const _ = require('underscore-plus')
-const {CompositeDisposable, Emitter} = require('atom')
+const {CompositeDisposable, Emitter, watchPath} = require('atom')
 const fs = require('fs-plus')
-const PathWatcher = require('pathwatcher')
 const File = require('./file')
 const {repoForPath} = require('./helpers')
 
 module.exports =
 class Directory {
-  constructor ({name, fullPath, symlink, expansionState, isRoot, ignoredNames, useSyncFS, stats}) {
+  constructor({name, fullPath, symlink, expansionState, isRoot, ignoredNames, useSyncFS, stats}) {
     this.name = name
     this.symlink = symlink
     this.expansionState = expansionState
@@ -77,38 +76,38 @@ class Directory {
     this.loadRealPath()
   }
 
-  destroy () {
+  destroy() {
     this.destroyed = true
     this.unwatch()
     this.subscriptions.dispose()
     this.emitter.emit('did-destroy')
   }
 
-  onDidDestroy (callback) {
+  onDidDestroy(callback) {
     return this.emitter.on('did-destroy', callback)
   }
 
-  onDidStatusChange (callback) {
+  onDidStatusChange(callback) {
     return this.emitter.on('did-status-change', callback)
   }
 
-  onDidAddEntries (callback) {
+  onDidAddEntries(callback) {
     return this.emitter.on('did-add-entries', callback)
   }
 
-  onDidRemoveEntries (callback) {
+  onDidRemoveEntries(callback) {
     return this.emitter.on('did-remove-entries', callback)
   }
 
-  onDidCollapse (callback) {
+  onDidCollapse(callback) {
     return this.emitter.on('did-collapse', callback)
   }
 
-  onDidExpand (callback) {
+  onDidExpand(callback) {
     return this.emitter.on('did-expand', callback)
   }
 
-  loadRealPath () {
+  loadRealPath() {
     if (this.useSyncFS) {
       this.realPath = fs.realpathSync(this.path)
       if (fs.isCaseInsensitive()) {
@@ -130,7 +129,7 @@ class Directory {
   }
 
   // Subscribe to project's repo for changes to the Git status of this directory.
-  subscribeToRepo () {
+  subscribeToRepo() {
     const repo = repoForPath(this.path)
     if (repo == null) return
 
@@ -145,7 +144,7 @@ class Directory {
   }
 
   // Update the status property of this directory using the repo.
-  updateStatus () {
+  updateStatus() {
     const repo = repoForPath(this.path)
     if (repo == null) return
 
@@ -182,7 +181,7 @@ class Directory {
   }
 
   // Is the given path ignored?
-  isPathIgnored (filePath) {
+  isPathIgnored(filePath) {
     if (atom.config.get('tree-view.hideVcsIgnoredFiles')) {
       const repo = repoForPath(this.path)
       if (repo && repo.isProjectAtRoot() && repo.isPathIgnored(filePath)) return true
@@ -196,18 +195,18 @@ class Directory {
   }
 
   // Does given full path start with the given prefix?
-  isPathPrefixOf (prefix, fullPath) {
+  isPathPrefixOf(prefix, fullPath) {
     return fullPath.indexOf(prefix) === 0 && fullPath[prefix.length] === path.sep
   }
 
-  isPathEqual (pathToCompare) {
+  isPathEqual(pathToCompare) {
     return this.path === pathToCompare || this.realPath === pathToCompare
   }
 
   // Public: Does this directory contain the given path?
   //
   // See atom.Directory::contains for more details.
-  contains (pathToCheck) {
+  contains(pathToCheck) {
     if (!pathToCheck) return false
 
     // Normalize forward slashes to back slashes on Windows
@@ -240,11 +239,12 @@ class Directory {
   }
 
   // Public: Stop watching this directory for changes.
-  unwatch () {
-    if (this.watchSubscription != null) {
-      this.watchSubscription.close()
-      this.watchSubscription = null
-    }
+  unwatch() {
+    this.watchSubscription?.dispose()
+    this.watchSubscription = null
+
+    this.parentWatchSubscription?.dispose()
+    this.parentWatchSubscription = null
 
     for (let [key, entry] of this.entries) {
       entry.destroy()
@@ -253,23 +253,34 @@ class Directory {
   }
 
   // Public: Watch this directory for changes.
-  watch () {
+  async watch() {
     if (this.watchSubscription != null) return
     try {
-      this.watchSubscription = PathWatcher.watch(this.path, eventType => {
-        switch (eventType) {
-          case 'change':
-            this.reload()
-            break
-          case 'delete':
+      // These path-watchers are recursive, so it's redundant to have one for
+      // each directory. Luckily, `watchPath` itself consolidates redundant
+      // watchers so we don't have to.
+      this.watchSubscription = await watchPath(this.path, {}, events => {
+        // We get a batch of events, but we really only care about whether we
+        // should reload our subtree or remove it. We only need to do each
+        // action once.
+        let shouldReload = false
+        for (let event of events) {
+          if (event.path === this.path) {
             this.destroy()
             break
+          }
+          if (!shouldReload && this.filePathIsChildOfDirectory(event.path)) {
+            shouldReload = true
+          }
+        }
+        if (shouldReload) {
+          this.reload()
         }
       })
     } catch (error) {}
   }
 
-  getEntries () {
+  getEntries() {
     let names
     try {
       names = fs.readdirSync(this.path)
@@ -327,7 +338,7 @@ class Directory {
     return this.sortEntries(directories.concat(files))
   }
 
-  normalizeEntryName (value) {
+  normalizeEntryName(value) {
     let normalizedValue = value.name
     if (normalizedValue == null) {
       normalizedValue = value
@@ -339,7 +350,7 @@ class Directory {
     return normalizedValue
   }
 
-  sortEntries (combinedEntries) {
+  sortEntries(combinedEntries) {
     if (atom.config.get('tree-view.sortFoldersBeforeFiles')) {
       return combinedEntries
     } else {
@@ -352,7 +363,7 @@ class Directory {
   }
 
   // Public: Perform a synchronous reload of the directory.
-  reload () {
+  reload() {
     const newEntries = []
     const removedEntries = new Map(this.entries)
 
@@ -397,7 +408,7 @@ class Directory {
   }
 
   // Public: Collapse this directory and stop watching it.
-  collapse () {
+  collapse() {
     this.expansionState.isExpanded = false
     this.expansionState = this.serializeExpansionState()
     this.unwatch()
@@ -406,14 +417,14 @@ class Directory {
 
   // Public: Expand this directory, load its children, and start watching it for
   // changes.
-  expand () {
+  expand() {
     this.expansionState.isExpanded = true
     this.reload()
     this.watch()
     this.emitter.emit('did-expand')
   }
 
-  serializeExpansionState () {
+  serializeExpansionState() {
     const expansionState = {}
     expansionState.isExpanded = this.expansionState.isExpanded
     expansionState.entries = new Map()
@@ -424,7 +435,7 @@ class Directory {
     return expansionState
   }
 
-  squashDirectoryNames (fullPath) {
+  squashDirectoryNames(fullPath) {
     const squashedDirs = [this.name]
     let contents
     while (true) {
@@ -446,5 +457,10 @@ class Directory {
     }
 
     return fullPath
+  }
+
+  filePathIsChildOfDirectory(filePath) {
+    let dirname = path.dirname(filePath)
+    return this.path === dirname
   }
 }
