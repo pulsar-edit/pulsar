@@ -1,6 +1,6 @@
 #!/bin/sh
 
-FILESOURCE='/opt/${executable}/resources/${executable}.sh'
+FILESOURCE='/opt/${sanitizedProductName}/resources/${executable}.sh'
 FILEDEST='/usr/bin/${executable}'
 
 if [ -f "$FILEDEST" ]
@@ -18,7 +18,7 @@ case $executable in
     ;;
 esac
 
-SYMLINK_TARGET='/opt/${executable}/resources/app/ppm/bin/${ppm_executable}'
+SYMLINK_TARGET='/opt/${sanitizedProductName}/resources/app/ppm/bin/${ppm_executable}'
 SYMLINK_PATH='/usr/bin/${ppm_executable}'
 
 if [ -L "$SYMLINK_PATH" ]
