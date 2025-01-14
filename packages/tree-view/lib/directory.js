@@ -243,9 +243,6 @@ class Directory {
     this.watchSubscription?.dispose()
     this.watchSubscription = null
 
-    this.parentWatchSubscription?.dispose()
-    this.parentWatchSubscription = null
-
     for (let [key, entry] of this.entries) {
       entry.destroy()
       this.entries.delete(key)

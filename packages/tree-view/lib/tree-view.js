@@ -822,7 +822,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return atom.showItemInFolder(filePath);
   }
 
   showCurrentFileInFileManager() {
@@ -834,7 +834,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return atom.showItemInFolder(filePath);
   }
 
   getFileManagerName() {

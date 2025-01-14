@@ -146,6 +146,18 @@ module.exports = class ApplicationDelegate {
     });
   }
 
+  showItemInFolder(filePath) {
+    // A simple wrapper around `shell.trashItem`, which currently can only be
+    // called from the main process.
+    return ipcRenderer.invoke('showItemInFolder', filePath).then(({ outcome, error, result }) => {
+      if (outcome === 'success') {
+        return result;
+      } else if (outcome === 'failure') {
+        return Promise.reject(error);
+      }
+    });
+  }
+
   async openWindowDevTools() {
     // Defer DevTools interaction to the next tick, because using them during
     // event handling causes some wrong input events to be triggered on

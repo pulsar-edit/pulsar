@@ -155,9 +155,21 @@ ipcMain.handle('trashItem', async (_, filePath) => {
     return { outcome: 'success', result };
   } catch (error) {
     // …and rejects on failure.
-    return { outcome: 'failure', error }
+    return { outcome: 'failure', error };
   }
 });
+
+ipcMain.handle('showItemInFolder', async (_, filePath) => {
+  try {
+    // Result will be `undefined`, but might as well return it in case of a
+    // future Electron API change.
+    let result = shell.showItemInFolder(filePath);
+    return { outcome: 'success', result };
+  } catch (error) {
+    // Not sure whether this can even fail, but might as well handle it.
+    return { outcome: 'failure', error };
+  }
+})
 
 // The application's singleton class.
 //
