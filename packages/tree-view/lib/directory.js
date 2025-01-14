@@ -335,10 +335,6 @@ class Directory {
     if (normalizedValue == null) {
       normalizedValue = value
     }
-
-    if (normalizedValue != null) {
-      normalizedValue = normalizedValue.toLowerCase()
-    }
     return normalizedValue
   }
 
