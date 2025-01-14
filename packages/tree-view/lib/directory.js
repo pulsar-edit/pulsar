@@ -259,7 +259,7 @@ class Directory {
       this.watchSubscription = PathWatcher.watch(this.path, eventType => {
         switch (eventType) {
           case 'change':
-            this.reload()
+            throttle(this.reload, this.watchTimer)
             break
           case 'delete':
             this.destroy()
@@ -270,6 +270,7 @@ class Directory {
   }
 
   getEntries () {
+    if (this.destroyed) { return }
     let names
     try {
       names = fs.readdirSync(this.path)
@@ -446,5 +447,16 @@ class Directory {
     }
 
     return fullPath
+  }
+}
+
+function throttle(func, timeout) {
+  let timer = false
+  return (...args) => {
+    if (timer) { return }
+    timer = setTimeout(() => {
+      func.apply(this, args)
+      timer = false
+    }, timeout)
   }
 }
