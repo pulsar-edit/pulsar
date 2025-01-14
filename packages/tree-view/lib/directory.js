@@ -257,7 +257,7 @@ class Directory {
   watch () {
     if (this.watchSubscription != null) return
     try {
-      let reload = throttle(this.reload.bind(this), 20)
+      let reload = throttle(this.reload.bind(this), 50)
       this.watchSubscription = PathWatcher.watch(this.path, eventType => {
         switch (eventType) {
           case 'change':
