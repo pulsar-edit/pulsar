@@ -20,6 +20,7 @@ class Directory {
     this.emitter = new Emitter()
     this.subscriptions = new CompositeDisposable()
     this.compareFn = Intl.Collator(undefined, {numeric: true, sensitivity: 'base'}).compare
+    this.watchTimer = 20
 
     if (atom.config.get('tree-view.squashDirectoryNames') && !this.isRoot) {
       fullPath = this.squashDirectoryNames(fullPath)
