@@ -229,7 +229,8 @@ let options = {
   compression: 'normal',
   deb: {
     afterInstall: 'script/post-install.sh',
-    afterRemove: 'script/post-uninstall.sh'
+    afterRemove: 'script/post-uninstall.sh',
+    packageName: baseName
   },
   rpm: {
     afterInstall: 'script/post-install.sh',
