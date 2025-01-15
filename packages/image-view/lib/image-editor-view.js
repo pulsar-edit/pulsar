@@ -26,6 +26,8 @@ class ImageEditorView {
       'image-view:zoom-to-fit': () => this.zoomToFit(),
       'core:move-up': () => this.scrollUp(),
       'core:move-down': () => this.scrollDown(),
+      'core:move-left': () => this.scrollLeft(),
+      'core:move-right': () => this.scrollRight(),
       'core:page-up': () => this.pageUp(),
       'core:page-down': () => this.pageDown(),
       'core:move-to-top': () => this.scrollToTop(),
@@ -157,7 +159,7 @@ class ImageEditorView {
     this.refs.image.onload = () => {
       this.refs.image.onload = null
       this.originalHeight = this.refs.image.naturalHeight
-      this.originalWidth = this.refs.image.naturalWidth      
+      this.originalWidth = this.refs.image.naturalWidth
       this.imageSize = fs.statSync(this.editor.getPath()).size
       this.emitter.emit('did-update')
     }
@@ -235,11 +237,19 @@ class ImageEditorView {
   }
 
   scrollUp() {
-    this.refs.imageContainer.scrollTop -= this.refs.image.naturalHeight / 20
+    this.refs.imageContainer.scrollTop -= this.refs.imageContainer.offsetHeight / 20
   }
 
   scrollDown() {
-    this.refs.imageContainer.scrollTop += this.refs.image.naturalHeight / 20
+    this.refs.imageContainer.scrollTop += this.refs.imageContainer.offsetHeight / 20
+  }
+
+  scrollLeft() {
+    this.refs.imageContainer.scrollLeft -= this.refs.imageContainer.offsetWidth / 20
+  }
+
+  scrollRight() {
+    this.refs.imageContainer.scrollLeft += this.refs.imageContainer.offsetWidth / 20
   }
 
   pageUp() {
