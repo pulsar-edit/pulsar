@@ -9,6 +9,7 @@ class ImageEditorView {
     this.editor = editor
     this.emitter = new Emitter()
     this.disposables = new CompositeDisposable()
+    this.imageSize = fs.statSync(this.editor.getPath()).size
     this.loaded = false
     this.steps = [0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2, 3, 4, 5, 7.5, 10]
     this.zoomFactor = 1.00
@@ -33,6 +34,8 @@ class ImageEditorView {
 
     this.refs.image.onload = () => {
       this.refs.image.onload = null
+      this.originalHeight = this.refs.image.naturalHeight
+      this.originalWidth = this.refs.image.naturalWidth
       this.loaded = true
       this.refs.image.style.display = ''
       this.defaultBackgroundColor = atom.config.get('image-view.defaultBackgroundColor')
@@ -153,6 +156,9 @@ class ImageEditorView {
     this.refs.image.src = `${this.editor.getEncodedURI()}?time=${Date.now()}`
     this.refs.image.onload = () => {
       this.refs.image.onload = null
+      this.originalHeight = this.refs.image.naturalHeight
+      this.originalWidth = this.refs.image.naturalWidth      
+      this.imageSize = fs.statSync(this.editor.getPath()).size
       this.emitter.emit('did-update')
     }
   }
@@ -229,11 +235,11 @@ class ImageEditorView {
   }
 
   scrollUp() {
-    this.refs.imageContainer.scrollTop -= document.body.offsetHeight / 20
+    this.refs.imageContainer.scrollTop -= this.refs.image.naturalHeight / 20
   }
 
   scrollDown() {
-    this.refs.imageContainer.scrollTop += document.body.offsetHeight / 20
+    this.refs.imageContainer.scrollTop += this.refs.image.naturalHeight / 20
   }
 
   pageUp() {
