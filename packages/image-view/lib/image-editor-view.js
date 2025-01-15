@@ -3,21 +3,17 @@ const {Emitter, CompositeDisposable, Disposable} = require('atom')
 const etch = require('etch')
 const $ = etch.dom
 
-// View that renders the image of an {ImageEditor}.
 module.exports =
 class ImageEditorView {
   constructor (editor) {
     this.editor = editor
     this.emitter = new Emitter()
     this.disposables = new CompositeDisposable()
-    this.imageSize = fs.statSync(this.editor.getPath()).size
     this.loaded = false
-    this.mode = 'zoom-to-fit'
-    this.percentageStep = 4
     this.steps = [0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2, 3, 4, 5, 7.5, 10]
+    this.zoomFactor = 1.00
     etch.initialize(this)
 
-    this.refs.image.style.display = 'none'
     this.updateImageURI()
 
     this.disposables.add(this.editor.onDidChange(() => this.updateImageURI()))
@@ -25,24 +21,23 @@ class ImageEditorView {
       'image-view:reload': () => this.updateImageURI(),
       'image-view:zoom-in': () => this.zoomIn(),
       'image-view:zoom-out': () => this.zoomOut(),
-      'image-view:zoom-to-fit': () => this.zoomToFit(),
       'image-view:reset-zoom': () => this.resetZoom(),
-      'core:move-up': () => { this.scrollUp() },
-      'core:move-down': () => { this.scrollDown() },
-      'core:page-up': () => { this.pageUp() },
-      'core:page-down': () => { this.pageDown() },
-      'core:move-to-top': () => { this.scrollToTop() },
-      'core:move-to-bottom': () => { this.scrollToBottom() }
+      'image-view:zoom-to-fit': () => this.zoomToFit(),
+      'core:move-up': () => this.scrollUp(),
+      'core:move-down': () => this.scrollDown(),
+      'core:page-up': () => this.pageUp(),
+      'core:page-down': () => this.pageDown(),
+      'core:move-to-top': () => this.scrollToTop(),
+      'core:move-to-bottom': () => this.scrollToBottom()
     }))
 
     this.refs.image.onload = () => {
       this.refs.image.onload = null
-      this.originalHeight = this.refs.image.naturalHeight
-      this.originalWidth = this.refs.image.naturalWidth
       this.loaded = true
       this.refs.image.style.display = ''
       this.defaultBackgroundColor = atom.config.get('image-view.defaultBackgroundColor')
       this.refs.imageContainer.setAttribute('background', this.defaultBackgroundColor)
+      this.zoomToFit(1)
       this.emitter.emit('did-load')
     }
 
@@ -86,21 +81,36 @@ class ImageEditorView {
     }
     this.refs.zoomToFitButton.addEventListener('click', zoomToFitClickHandler)
     this.disposables.add(new Disposable(() => { this.refs.zoomToFitButton.removeEventListener('click', zoomToFitClickHandler) }))
+
+    const wheelHandler = (event) => {
+      if (event.ctrlKey) {
+        const zoomOld = this.zoomFactor
+        if (event.wheelDeltaY>0) {
+          this.zoomFactor += 0.025
+        } else {
+          this.zoomFactor -= 0.025
+        }
+        this.zoomFactor = Math.round(Math.max(this.zoomFactor, 0.025)/0.025)*0.025
+        this.updateSize()
+      }
+    }
+    this.refs.imageContainer.addEventListener('wheel', wheelHandler)
+    this.disposables.add(new Disposable(() => { this.refs.imageContainer.removeEventListener('wheel', wheelHandler) }))
   }
 
   onDidLoad (callback) {
     return this.emitter.on('did-load', callback)
   }
 
-  update () {}
+  update() {}
 
-  destroy () {
+  destroy() {
     this.disposables.dispose()
     this.emitter.dispose()
     etch.destroy(this)
   }
 
-  render () {
+  render() {
     return (
       $.div({className: 'image-view', tabIndex: -1},
         $.div({className: 'image-controls', ref: 'imageControls'},
@@ -127,25 +137,22 @@ class ImageEditorView {
             )
           ),
           $.div({className: 'image-controls-group btn-group'},
-            $.button({className: 'btn zoom-to-fit-button selected', ref: 'zoomToFitButton'},
+            $.button({className: 'btn zoom-to-fit-button', ref: 'zoomToFitButton'},
               'Zoom to fit'
             )
           )
         ),
-        $.div({className: 'image-container zoom-to-fit', ref: 'imageContainer'},
+        $.div({className: 'image-container', ref: 'imageContainer'},
           $.img({ref: 'image'})
         )
       )
     )
   }
 
-  updateImageURI () {
+  updateImageURI() {
     this.refs.image.src = `${this.editor.getEncodedURI()}?time=${Date.now()}`
     this.refs.image.onload = () => {
       this.refs.image.onload = null
-      this.originalHeight = this.refs.image.naturalHeight
-      this.originalWidth = this.refs.image.naturalWidth
-      this.imageSize = fs.statSync(this.editor.getPath()).size
       this.emitter.emit('did-update')
     }
   }
@@ -154,111 +161,94 @@ class ImageEditorView {
     return this.emitter.on('did-update', callback)
   }
 
-  // Zooms the image out by 25%.
-  zoomOut () {
-    this.percentageStep = Math.max(0, --this.percentageStep)
-    this.adjustSize(this.percentageStep)
+  zoomOut() {
+    for (let i = this.steps.length-1; i >= 0; i--) {
+      if (this.steps[i]<this.zoomFactor) {
+        this.zoomFactor = this.steps[i]
+        this.updateSize()
+        break
+      }
+    }
   }
 
-  // Zooms the image in by 25%.
-  zoomIn () {
-    this.percentageStep = Math.min(this.steps.length - 1, ++this.percentageStep)
-    this.adjustSize(this.percentageStep)
+  zoomIn() {
+    for (let i = 0; i < this.steps.length; i++) {
+      if (this.steps[i]>this.zoomFactor) {
+        this.zoomFactor = this.steps[i]
+        this.updateSize()
+        break
+      }
+    }
   }
 
-  // Zooms the image to its normal width and height.
-  resetZoom () {
+  resetZoom() {
+    if (!this.loaded || this.element.offsetHeight === 0) {
+      return
+    }
+    this.zoomFactor = 1
+    this.updateSize()
+  }
+
+  zoomToFit(zoomLimit) {
+    if (!this.loaded || this.element.offsetHeight === 0) {
+      return
+    }
+    this.zoomFactor = Math.min(
+      this.refs.imageContainer.offsetWidth/this.refs.image.naturalWidth,
+      this.refs.imageContainer.offsetHeight/this.refs.image.naturalHeight,
+    )
+    if (zoomLimit) { this.zoomFactor = Math.min(this.zoomFactor, zoomLimit) }
+    this.updateSize()
+  }
+
+  updateSize() {
     if (!this.loaded || this.element.offsetHeight === 0) {
       return
     }
 
-    this.mode = 'reset-zoom'
-    this.refs.imageContainer.classList.remove('zoom-to-fit')
-    this.refs.zoomToFitButton.classList.remove('selected')
-    this.refs.image.style.width = this.originalWidth + 'px'
-    this.refs.image.style.height = this.originalHeight + 'px'
-    this.refs.resetZoomButton.textContent = '100%'
-    this.percentageStep = 4
-  }
-
-  // Zooms to fit the image, doesn't scale beyond actual size
-  zoomToFit () {
-    if (!this.loaded || this.element.offsetHeight === 0) {
-      return
-    }
-
-    this.mode = 'zoom-to-fit'
-    this.refs.imageContainer.classList.add('zoom-to-fit')
-    this.refs.zoomToFitButton.classList.add('selected')
-    this.refs.image.style.width = ''
-    this.refs.image.style.height = ''
-    this.refs.resetZoomButton.textContent = 'Auto'
-    this.percentageStep = 4
-  }
-
-  // Adjust the size of the image by the given multiplying factor.
-  //
-  // factor - A {Number} to multiply against the current size.
-  adjustSize (percentageStep) {
-    if (!this.loaded || this.element.offsetHeight === 0) {
-      return
-    }
-
-    if (this.mode === 'zoom-to-fit') {
-      this.mode = 'zoom-manual'
-      this.refs.imageContainer.classList.remove('zoom-to-fit')
-      this.refs.zoomToFitButton.classList.remove('selected')
-    } else if (this.mode === 'reset-zoom') {
-      this.mode = 'zoom-manual'
-    }
-
-    const factor = this.steps[percentageStep]
-    const newWidth = Math.round(this.originalWidth * factor)
-    const newHeight = Math.round(this.originalHeight * factor)
-    const percent = Math.max(1, Math.round((newWidth / this.originalWidth) * 100))
-
-    // Switch to pixelated rendering when image is bigger than 200%
-    if (newWidth > (this.originalWidth * 2)) {
-      this.refs.image.style.imageRendering = 'pixelated'
-    } else {
-      this.refs.image.style.imageRendering = ''
-    }
+    const newWidth = Math.round(this.refs.image.naturalWidth * this.zoomFactor)
+    const newHeight = Math.round(this.refs.image.naturalHeight * this.zoomFactor)
+    const percent = Math.round((newWidth / this.refs.image.naturalWidth) * 1000)/10
 
     this.refs.image.style.width = newWidth + 'px'
     this.refs.image.style.height = newHeight + 'px'
     this.refs.resetZoomButton.textContent = percent + '%'
+
+    this.centerImage()
   }
 
-  // Changes the background color of the image view.
-  //
-  // color - A {String} that gets used as class name.
+  centerImage() {
+    this.refs.imageContainer.scrollTop = this.zoomFactor*this.refs.image.naturalHeight/2-this.refs.imageContainer.offsetHeight/2
+    this.refs.imageContainer.scrollLeft = this.zoomFactor*this.refs.image.naturalWidth/2-this.refs.imageContainer.offsetWidth/2
+  }
+
   changeBackground (color) {
     if (this.loaded && this.element.offsetHeight > 0 && color) {
       this.refs.imageContainer.setAttribute('background', color)
     }
   }
 
-  scrollUp () {
+  scrollUp() {
     this.refs.imageContainer.scrollTop -= document.body.offsetHeight / 20
   }
 
-  scrollDown () {
+  scrollDown() {
     this.refs.imageContainer.scrollTop += document.body.offsetHeight / 20
   }
 
-  pageUp () {
+  pageUp() {
     this.refs.imageContainer.scrollTop -= this.element.offsetHeight
   }
 
-  pageDown () {
+  pageDown() {
     this.refs.imageContainer.scrollTop += this.element.offsetHeight
   }
 
-  scrollToTop () {
+  scrollToTop() {
     this.refs.imageContainer.scrollTop = 0
   }
 
-  scrollToBottom () {
+  scrollToBottom() {
     this.refs.imageContainer.scrollTop = this.refs.imageContainer.scrollHeight
   }
 }
