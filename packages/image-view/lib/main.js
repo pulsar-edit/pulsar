@@ -9,7 +9,7 @@ module.exports = {
   config: {
     defaultBackgroundColor: {
       type: 'string',
-      enum: ['white', 'black', 'transparent'],
+      enum: ['white', 'black', 'transparent', 'native'],
       default: 'transparent'
     }
   },

@@ -54,6 +54,10 @@
       background-image: url(@transparent-background-image);
     }
 
+    &-color-native {
+      background-color: @app-background-color;
+    }
+
     .btn-group {
       margin: @spacing;
     }
@@ -75,6 +79,7 @@
       display: block;
       flex: none;
       margin: auto;
+      -webkit-user-drag: none;
     }
   }
 
@@ -86,6 +91,9 @@
   [background="black"] {
     background-color: black;
     background-image: url(@transparent-background-image);
+  }
+  [background="native"] {
+    background-color: @app-background-color;
   }
 
 }

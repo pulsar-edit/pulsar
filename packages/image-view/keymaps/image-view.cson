@@ -3,6 +3,7 @@
   'cmd-=': 'image-view:zoom-in'
   'cmd--': 'image-view:zoom-out'
   'cmd-_': 'image-view:zoom-out'
+  'cmd-8': 'image-view:center'
   'cmd-9': 'image-view:zoom-to-fit'
   'cmd-0': 'image-view:reset-zoom'
 
@@ -11,6 +12,7 @@
   'ctrl-=': 'image-view:zoom-in'
   'ctrl--': 'image-view:zoom-out'
   'ctrl-_': 'image-view:zoom-out'
+  'ctrl-8': 'image-view:center'
   'ctrl-9': 'image-view:zoom-to-fit'
   'ctrl-0': 'image-view:reset-zoom'
 
@@ -19,5 +21,6 @@
   'ctrl-=': 'image-view:zoom-in'
   'ctrl--': 'image-view:zoom-out'
   'ctrl-_': 'image-view:zoom-out'
+  'ctrl-8': 'image-view:center'
   'ctrl-9': 'image-view:zoom-to-fit'
   'ctrl-0': 'image-view:reset-zoom'
