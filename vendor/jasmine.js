@@ -2719,21 +2719,18 @@ jasmine.Matchers.prototype.toSatisfy = function(fn) {
 function normalizeTreeSitterTextData(editor, commentRegex, trailingCommentRegex) {
   let allMatches = [], lastNonComment = 0
   const checkAssert = new RegExp('^\\s*' + commentRegex.source + '\\s*[\\<\\-|\\^]')
-  console.log('editor:', editor.getText());
-  console.log('checkAssert', checkAssert);
   editor.getBuffer().getLines().forEach((row, i) => {
     const m = row.match(commentRegex)
-    console.log('does it match?', row, m);
     if (m) {
       if (trailingCommentRegex) {
         row = row.replace(trailingCommentRegex, '')
       }
-      row = row.trim()
+      // Strip extra space at the end of the line (but not the beginning!)
+      row = row.replace(/\s+$/, '')
       // const scope = editor.scopeDescriptorForBufferPosition([i, m.index])
       // FIXME: use editor.scopeDescriptorForBufferPosition when it works
       const scope = editor.tokensForScreenRow(i)
       const scopes = scope.flatMap(e => e.scopes)
-      console.log('scopes:', scopes);
       if (scopes.find(s => s.match(/comment/)) && row.match(checkAssert)) {
         allMatches.push({row: lastNonComment, text: row, col: m.index, testRow: i})
         return
@@ -2773,7 +2770,6 @@ async function runGrammarTests(fullPath, commentRegex, trailingCommentRegex = nu
   const editor = await openDocument(fullPath);
 
   const normalized = normalizeTreeSitterTextData(editor, commentRegex, trailingCommentRegex)
-  console.log('normalized', normalized);
   expect(normalized.length).toSatisfy((n, reason) => {
     reason("Tokenizer didn't run correctly - could not find any comment")
     return n > 0
