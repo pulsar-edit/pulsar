@@ -218,8 +218,9 @@ class ImageEditorView {
 
   zoomToMousePosition(zoom, event) {
     this.updateSize(zoom)
-    this.refs.imageContainer.scrollLeft = this.step * event.offsetX - event.layerX
-    this.refs.imageContainer.scrollTop = this.step * event.offsetY - (event.layerY - this.refs.imageControls.offsetHeight)
+    const {left, top} = this.refs.imageContainer.getBoundingClientRect()
+    this.refs.imageContainer.scrollLeft = this.step * event.offsetX - (event.pageX - left)
+    this.refs.imageContainer.scrollTop = this.step * event.offsetY - (event.pageY - top)
   }
 
   zoomToCenterPoint(zoom) {
