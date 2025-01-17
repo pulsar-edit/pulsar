@@ -101,6 +101,13 @@ describe('ImageEditorView', () => {
     })
   })
 
+  describe('.updateSize(zoom)', () => {
+    it('does not allow a zoom percentage lower than 0.1%', () => {
+      view.updateSize(0)
+      expect(view.refs.resetZoomButton.textContent).toBe('0.1%')
+    })
+  })
+
   describe('when special characters are used in the file name', () => {
     describe("when '?' exists in the file name", () => {
       it('is replaced with %3F', () => {

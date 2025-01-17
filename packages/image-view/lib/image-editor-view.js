@@ -111,7 +111,7 @@ class ImageEditorView {
 
     this.resizeObserver = new ResizeObserver(() => {
       if (this.auto) {
-        this.zoomToFit()
+        this.zoomToFit(1)
       }
     })
     this.resizeObserver.observe(this.refs.imageContainer)
