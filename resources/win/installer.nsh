@@ -10,8 +10,13 @@ XPStyle on
 !macro customUnInstall ; Macro called by electron-builder
   ; Since adding the PATH occurs during installation, we want to ensure to remove it.
   ; Luckily 'EnvVarUpdate' handles the case of it not being present
-  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources"
-  ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources\app\ppm\bin"
+  ${ifNot} ${isUpdated}
+    ; Only run uninstall steps if truly uninstalling. Prevents this step from
+    ; running during an upgrade, where it technically runs after the upgrade's
+    ; install steps, ultimately removing Pulsar from the PATH
+    ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources"
+    ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources\app\ppm\bin"
+  ${endIf}
 !macroend
 
 !macro MUI_PAGE_ADD_TO_PATH ; Define our custom macro
