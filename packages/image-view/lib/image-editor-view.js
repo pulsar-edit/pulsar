@@ -111,7 +111,7 @@ class ImageEditorView {
 
     this.resizeObserver = new ResizeObserver(() => {
       if (this.auto) {
-        this.zoomToFit(1)
+        this.zoomToFit(typeof this.auto === "number" ? this.auto : false)
       }
     })
     this.resizeObserver.observe(this.refs.imageContainer)
@@ -240,7 +240,7 @@ class ImageEditorView {
     )
     if (limit) { zoom = Math.min(zoom, limit) }
     this.updateSize(zoom)
-    this.auto = true
+    this.auto = limit ? limit : true
     this.refs.zoomToFitButton.classList.add('selected')
   }
 
