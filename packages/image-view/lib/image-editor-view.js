@@ -244,7 +244,7 @@ class ImageEditorView {
     this.refs.imageContainer.scrollTop = this.step * coorY - this.refs.imageContainer.offsetHeight / 2
   }
 
-  _zoomToFit(limit) {
+  _zoomToFit(limit, auto, element) {
     if (!this.loaded || this.element.offsetHeight === 0) {
       return
     }
@@ -254,18 +254,16 @@ class ImageEditorView {
     )
     if (limit) { zoom = Math.min(zoom, limit) }
     this.updateSize(zoom)
+    this.auto = auto
+    element.classList.add('selected')
   }
 
   zoomToFit() {
-    this._zoomToFit()
-    this.auto = true
-    this.refs.zoomToFitButton.classList.add('selected')
+    this._zoomToFit(false, true, this.refs.zoomToFitButton)
   }
 
   zoomTo100() {
-    this._zoomToFit(1)
-    this.auto = 1
-    this.refs.zoomTo100Button.classList.add('selected')
+    this._zoomToFit(1, 1, this.refs.zoomTo100Button)
   }
 
   zoomOut() {
