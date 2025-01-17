@@ -28,6 +28,7 @@ class ImageEditorView {
       'image-view:zoom-out': () => this.zoomOut(),
       'image-view:reset-zoom': () => this.resetZoom(),
       'image-view:zoom-to-fit': () => this.zoomToFit(),
+      'image-view:zoom-to-100': () => this.zoomTo100(),
       'image-view:center': () => this.centerImage(),
       'core:move-up': () => this.scrollUp(),
       'core:move-down': () => this.scrollDown(),
@@ -89,6 +90,12 @@ class ImageEditorView {
     this.refs.zoomToFitButton.addEventListener('click', zoomToFitClickHandler)
     this.disposables.add(new Disposable(() => { this.refs.zoomToFitButton.removeEventListener('click', zoomToFitClickHandler) }))
 
+    const zoomTo100ClickHandler = () => {
+      this.zoomTo100()
+    }
+    this.refs.zoomTo100Button.addEventListener('click', zoomTo100ClickHandler)
+    this.disposables.add(new Disposable(() => { this.refs.zoomTo100Button.removeEventListener('click', zoomTo100ClickHandler) }))
+
     const wheelContainerHandler = (event) => {
       if (event.ctrlKey) {
         event.stopPropagation()
@@ -110,8 +117,10 @@ class ImageEditorView {
     this.disposables.add(new Disposable(() => { this.refs.image.removeEventListener('wheel', wheelImageHandler) }))
 
     this.resizeObserver = new ResizeObserver(() => {
-      if (this.auto) {
-        this.zoomToFit(typeof this.auto === "number" ? this.auto : false)
+      if (this.auto===1) {
+        this.zoomTo100()
+      } else if (this.auto) {
+        this.zoomToFit()
       }
     })
     this.resizeObserver.observe(this.refs.imageContainer)
@@ -165,6 +174,9 @@ class ImageEditorView {
             ),
             $.button({className: 'btn zoom-to-fit-button', ref: 'zoomToFitButton'},
               'Zoom to fit'
+            ),
+            $.button({className: 'btn zoom-to-100-button', ref: 'zoomTo100Button'},
+              'Zoom to 100'
             )
           )
         ),
@@ -183,7 +195,7 @@ class ImageEditorView {
       this.originalWidth = this.refs.image.naturalWidth
       this.imageSize = fs.statSync(this.editor.getPath()).size
       this.loaded = true
-      this.zoomToFit(1)
+      this.zoomTo100()
       this.refs.image.style.display = ''
       this.emitter.emit('did-update')
       this.emitter.emit('did-load')
@@ -200,6 +212,7 @@ class ImageEditorView {
     }
     this.auto = false
     this.refs.zoomToFitButton.classList.remove('selected')
+    this.refs.zoomTo100Button.classList.remove('selected')
     const prev = this.zoom
     this.zoom = Math.min(Math.max(zoom, 0.001), 100)
     this.step = this.zoom/prev
@@ -231,7 +244,7 @@ class ImageEditorView {
     this.refs.imageContainer.scrollTop = this.step * coorY - this.refs.imageContainer.offsetHeight / 2
   }
 
-  zoomToFit(limit) {
+  _zoomToFit(limit) {
     if (!this.loaded || this.element.offsetHeight === 0) {
       return
     }
@@ -241,8 +254,18 @@ class ImageEditorView {
     )
     if (limit) { zoom = Math.min(zoom, limit) }
     this.updateSize(zoom)
-    this.auto = limit ? limit : true
+  }
+
+  zoomToFit() {
+    this._zoomToFit()
+    this.auto = true
     this.refs.zoomToFitButton.classList.add('selected')
+  }
+
+  zoomTo100() {
+    this._zoomToFit(1)
+    this.auto = 1
+    this.refs.zoomTo100Button.classList.add('selected')
   }
 
   zoomOut() {
