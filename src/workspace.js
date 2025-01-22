@@ -609,7 +609,6 @@ module.exports = class Workspace extends Model {
     this.onDidAddPaneItem(({ item, pane, index }) => {
       if (item instanceof TextEditor) {
         const subscriptions = new CompositeDisposable(
-          this.textEditorRegistry.add(item),
           this.textEditorRegistry.maintainConfig(item)
         );
         if (!this.project.findBufferForId(item.buffer.id)) {
