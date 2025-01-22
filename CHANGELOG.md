@@ -6,6 +6,32 @@
 
 ## [Unreleased]
 
+## 1.125.0
+
+- The Windows installer no longer removes `pulsar` and `ppm` from your path when you update Pulsar to a newer version.
+- [spell-check] Removed `source comment` from the list of automatically checked scopes because of reports of high CPU usage. This means that Pulsar will no longer automatically perform spell-checking for all code comments in all source files. (If you liked the behavior, you can add it back to the list in the `spell-check.grammars` config setting.)
+- [language-python] Improved indentation hinting in some unusual scenarios like on one-line blocks and after code comments.
+- [language-css] Updated `tree-sitter-css` to latest. Selector handling is now much better when typing incomplete selectors in a brand-new CSS file or at the bottom of an existing file.
+- Restored functionality of [project-plus](https://web.pulsar-edit.dev/packages/project-plus) via exposing previously removed internal APIs.
+
+### Pulsar
+
+- Tree-sitter rolling fixes, 1.125 (or 1.124.1) edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1172)
+- Windows: Only remove Pulsar/PPM from PATH during uninstall [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1183)
+- CI: Retry on timeout when building macOS bins [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1178)
+- Install dependencies for CI documentation job [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1193)
+- Attempt to install dependency on new Ubuntu CI images [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1192)
+- CI: No dpkg shenanigans for package tests workflow [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1188)
+- Expose `dbPromise` in `StateStore` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1171)
+
+### pulsar-updater
+
+- Don't prompt to update on non-default release channels [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1185)
+
+### spell-check
+
+- Fixes for a possible patch release [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1173)
+
 ## 1.124.0
 
 - Enhanced spellcheck to allow spellchecking on sections of a buffer. Making it possible to spellcheck comments within code, which has been enabled by default.
