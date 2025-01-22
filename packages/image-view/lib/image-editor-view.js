@@ -162,7 +162,7 @@ class ImageEditorView {
               '-'
             ),
             $.button({className: 'btn reset-zoom-button', ref: 'resetZoomButton'},
-              'Auto'
+              ''
             ),
             $.button({className: 'btn', ref: 'zoomInButton'},
               '+'
