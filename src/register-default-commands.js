@@ -344,11 +344,17 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
     'editor:move-to-beginning-of-line': function() {
       return this.moveToBeginningOfLine();
     },
+    'editor:move-to-beginning-of-buffer-line': function() {
+      return this.moveToBeginningOfBufferLine();
+    },
     'editor:move-to-end-of-screen-line': function() {
       return this.moveToEndOfScreenLine();
     },
     'editor:move-to-end-of-line': function() {
       return this.moveToEndOfLine();
+    },
+    'editor:move-to-end-of-buffer-line': function() {
+      return this.moveToEndOfBufferLine();
     },
     'editor:move-to-first-character-of-line': function() {
       return this.moveToFirstCharacterOfLine();
@@ -383,8 +389,14 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
     'editor:select-to-end-of-line': function() {
       return this.selectToEndOfLine();
     },
+    'editor:select-to-end-of-buffer-line': function() {
+      return this.selectToEndOfBufferLine();
+    },
     'editor:select-to-beginning-of-line': function() {
       return this.selectToBeginningOfLine();
+    },
+    'editor:select-to-beginning-of-buffer-line': function() {
+      return this.selectToBeginningOfBufferLine();
     },
     'editor:select-to-end-of-word': function() {
       return this.selectToEndOfWord();
@@ -468,8 +480,14 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
     'editor:delete-to-beginning-of-line': function() {
       return this.deleteToBeginningOfLine();
     },
+    'editor:delete-to-beginning-of-buffer-line': function() {
+      return this.deleteToBeginningOfBufferLine();
+    },
     'editor:delete-to-end-of-line': function() {
       return this.deleteToEndOfLine();
+    },
+    'editor:delete-to-end-of-buffer-line': function() {
+      return this.deleteToEndOfBufferLine();
     },
     'editor:delete-to-end-of-word': function() {
       return this.deleteToEndOfWord();
