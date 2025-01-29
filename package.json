@@ -23,7 +23,7 @@
     "node": ">=14"
   },
   "license": "MIT",
-  "electronVersion": "30.0.9",
+  "electronVersion": "34.0.1",
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
@@ -49,7 +49,7 @@
     "background-tips": "file:packages/background-tips",
     "base16-tomorrow-dark-theme": "file:packages/base16-tomorrow-dark-theme",
     "base16-tomorrow-light-theme": "file:packages/base16-tomorrow-light-theme",
-    "better-sqlite3": "11.1.2",
+    "better-sqlite3": "11.8.1",
     "bookmarks": "file:packages/bookmarks",
     "bracket-matcher": "file:packages/bracket-matcher",
     "chai": "4.3.4",
@@ -295,7 +295,7 @@
     "@electron/notarize": "^1.2.3",
     "@electron/rebuild": "3.6.0",
     "@playwright/test": "1.22.2",
-    "electron": "30.0.9",
+    "electron": "34.0.1",
     "electron-builder": "23.3.1",
     "eslint": "^8.33.0",
     "eslint-plugin-jsdoc": "^39.7.4",
@@ -307,9 +307,10 @@
     "webdriverio": "7.20.9"
   },
   "resolutions": {
-    "node-abi": "3.63.0",
+    "node-abi": "3.73.0",
+    "node-addon-api": "8.3.0",
     "keytar": "7.9.0",
-    "nan": "2.19.0",
+    "nan": "https://github.com/nodejs/nan.git#node23",
     "ctags": "https://github.com/pulsar-edit/node-ctags.git#c32ca6017dd3f4ea314d53b044225505820abbe3",
     "**/superstring": "github:savetheclocktower/superstring#e5e848017f7a28fe250b45f8c7f8ed244371d33d",
     "superstring": "github:savetheclocktower/superstring#e5e848017f7a28fe250b45f8c7f8ed244371d33d",
