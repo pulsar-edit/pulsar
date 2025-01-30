@@ -262,6 +262,9 @@ class Directory {
         // action once.
         let shouldReload = false
         for (let event of events) {
+          if (event.action === 'modified') {
+            continue
+          }
           if (event.path === this.path && event.action === 'deleted') {
             this.destroy()
             break
