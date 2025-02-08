@@ -883,6 +883,7 @@ describe('WorkspaceElement', () => {
 
   describe('editor font styling', () => {
     let editor, editorElement, workspaceElement;
+    let originalPixelRatio = window.devicePixelRatio;
 
     beforeEach(async () => {
       await atom.workspace.open('sample.js');
@@ -891,6 +892,10 @@ describe('WorkspaceElement', () => {
       jasmine.attachToDOM(workspaceElement);
       editor = atom.workspace.getActiveTextEditor();
       editorElement = editor.getElement();
+    });
+
+    afterEach(() => {
+      window.devicePixelRatio = originalPixelRatio;
     });
 
     it("updates the font-size based on the 'editor.fontSize' config value", async () => {
@@ -922,7 +927,9 @@ describe('WorkspaceElement', () => {
       expect(editor.getDefaultCharWidth()).not.toBe(initialCharWidth);
     });
 
-    it("updates the line-height based on the 'editor.lineHeight' config value", async () => {
+    // These next few specs may trigger the behavior that aims to preserve a
+    // `line-height` value that conforms to the hardware pixel grid.
+    it("updates the line-height based on the 'editor.lineHeight' config value (when the value is a pixel measurement string)", async () => {
       const initialLineHeight = editor.getLineHeightInPixels();
       atom.config.set('editor.lineHeight', '30px');
       await editorElement.component.getNextUpdatePromise();
@@ -931,6 +938,68 @@ describe('WorkspaceElement', () => {
       );
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
     });
+
+    it("updates the line-height based on the 'editor.lineHeight' config value (when the value is a number)", async () => {
+      const initialLineHeight = editor.getLineHeightInPixels();
+      atom.config.set('editor.fontSize', 16);
+      atom.config.set('editor.lineHeight', 1.875);
+      await editorElement.component.getNextUpdatePromise();
+      expect(getComputedStyle(editorElement).lineHeight).toBe(
+        `${atom.config.get('editor.fontSize') * atom.config.get('editor.lineHeight')}px`
+      );
+      expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
+    })
+
+    it("adjusts the line-height to a value that is appropriate for the display's pixel density (when the value is a number)", async () => {
+      const initialLineHeight = editor.getLineHeightInPixels();
+      // It's weird that browsers expose this as a writable getter, but we'll
+      // reset it to its original value when the tests are done.
+      window.devicePixelRatio = 2;
+      atom.config.set('editor.fontSize', 16);
+      atom.config.set('editor.lineHeight', '27.2px');
+      await editorElement.component.getNextUpdatePromise();
+      // The user has explicitly asked for a `line-height` of `27.2px`. When
+      // there are two hardware pixels per software pixel, we can tolerate
+      // values of 27px and 27.5px, but not 27.2px. Hence we round to the
+      // nearest acceptable value.
+      expect(getComputedStyle(editorElement).lineHeight).toBe('27px');
+      expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
+    })
+
+    it("adjusts the line-height to a value that is appropriate for the display's pixel density (when the value is a number)", async () => {
+      const initialLineHeight = editor.getLineHeightInPixels();
+      // It's weird that browsers expose this as a writable getter, but we'll
+      // reset it to its original value when the tests are done.
+      window.devicePixelRatio = 2;
+      atom.config.set('editor.fontSize', 16);
+      atom.config.set('editor.lineHeight', 1.7);
+      await editorElement.component.getNextUpdatePromise();
+      // The ratio expressed would result in a line height of 27.2px. When
+      // there are two hardware pixels per software pixel, we can tolerate
+      // values of 27px and 27.5px, but not 27.2px. Hence we round to the
+      // nearest acceptable value.
+      expect(getComputedStyle(editorElement).lineHeight).toBe('27px');
+      expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
+    })
+
+    // This last spec covers all cases where we opt out of adjusting the
+    // `line-height` value. Since it can technically be any valid CSS
+    // measurement, there are limits to our ability to adjust it.
+    it("respects the specified 'editor.lineHeight' when the value is more exotic", async () => {
+      const initialLineHeight = editor.getLineHeightInPixels();
+      // It's weird that browsers expose this as a writable getter, but we'll
+      // reset it to its original value when the tests are done.
+      window.devicePixelRatio = 2;
+      atom.config.set('editor.fontSize', 16);
+      atom.config.set('editor.lineHeight', '1.7em');
+      await editorElement.component.getNextUpdatePromise();
+      // The ratio expressed would result in a line height of 27.2px. Since it
+      // was specified in `em`, we don't try to normalize it to pixels, so
+      // we'll allow the value even though it doesn't conform to the hardware
+      // pixel grid.
+      expect(getComputedStyle(editorElement).lineHeight).toBe('27.2px');
+      expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
+    })
 
     it('increases or decreases the font size when a ctrl-mousewheel event occurs', () => {
       atom.config.set('editor.zoomFontWhenCtrlScrolling', true);
