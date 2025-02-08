@@ -8,6 +8,10 @@ const fs = require('fs-plus');
 const LessCompileCache = require('./less-compile-cache');
 const Color = require('./color');
 
+async function wait(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
 // Extended: Handles loading and activating available themes.
 //
 // An instance of this class is always available as the `atom.themes` global.
@@ -211,18 +215,27 @@ module.exports = class ThemeManager {
     }
   }
 
-  unwatchUserStylesheet() {
-    if (this.userStylesheetSubscriptions != null)
-      this.userStylesheetSubscriptions.dispose();
+  async unwatchUserStylesheet() {
+    this.userStylesheetSubscriptions?.dispose();
     this.userStylesheetSubscriptions = null;
+
     this.userStylesheetFile = null;
-    if (this.userStyleSheetDisposable != null)
-      this.userStyleSheetDisposable.dispose();
+
+    this.userStyleSheetDisposable?.dispose();
     this.userStyleSheetDisposable = null;
+
+    // Give `pathwatcher` a moment to clean up its file-watchers.
+    await wait(10);
   }
 
-  loadUserStylesheet() {
-    this.unwatchUserStylesheet();
+  async loadUserStylesheet() {
+    // The modern version of `pathwatcher` doesn't like having to unsubscribe
+    // and resubscribe to the same file in rapid succession.
+    //
+    // This is a candidate for conversion to `watchPath` — since we've made
+    // these methods async to accommodate `pathwatcher`, we might as well keep
+    // going.
+    await this.unwatchUserStylesheet();
 
     const userStylesheetPath = this.styleManager.getUserStyleSheetPath();
     if (!fs.isFileSync(userStylesheetPath)) {
@@ -232,7 +245,9 @@ module.exports = class ThemeManager {
     try {
       this.userStylesheetFile = new File(userStylesheetPath);
       this.userStylesheetSubscriptions = new CompositeDisposable();
+
       const reloadStylesheet = () => this.loadUserStylesheet();
+
       this.userStylesheetSubscriptions.add(
         this.userStylesheetFile.onDidChange(reloadStylesheet)
       );
@@ -243,14 +258,17 @@ module.exports = class ThemeManager {
         this.userStylesheetFile.onDidDelete(reloadStylesheet)
       );
     } catch (error) {
-      const message = `\
+      let message = `
 Unable to watch path: \`${path.basename(userStylesheetPath)}\`. Make sure
 you have permissions to \`${userStylesheetPath}\`.
+`;
+      if (process.platform === 'linux') {
+        message = `${message}
 
-On linux there are currently problems with watch sizes. See
-[this document][watches] for more info.
+On Linux there are currently problems with watch sizes. See [this document][watches] for more info.
 [watches]:https://pulsar-edit.dev/docs/atom-archive/hacking-atom/#typeerror-unable-to-watch-path
-`; //TODO: Update the above to Pulsar docs if we choose to add this
+`
+      }
       this.notificationManager.addError(message, { dismissable: true });
     }
 
@@ -408,10 +426,10 @@ On linux there are currently problems with watch sizes. See
             }
           }
 
-          return Promise.all(promises).then(() => {
+          return Promise.all(promises).then(async () => {
             this.addActiveThemeClasses();
             this.refreshLessCache(); // Update cache again now that @getActiveThemes() is populated
-            this.loadUserStylesheet();
+            await this.loadUserStylesheet();
             this.reloadBaseStylesheets();
             if (this.config.get("editor.syncWindowThemeWithPulsarTheme")) {
               this.refreshWindowTheme();
