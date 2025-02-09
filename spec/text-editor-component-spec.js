@@ -1694,7 +1694,7 @@ describe('TextEditorComponent', () => {
         scrollSensitivity
       });
       // stub in place for Event.preventDefault()
-      const eventPreventDefaultStub = function() {};
+      const eventPreventDefaultStub = function () {};
 
       {
         const expectedScrollTop = 20 * (scrollSensitivity / 100);
@@ -1767,7 +1767,7 @@ describe('TextEditorComponent', () => {
         scrollSensitivity
       });
       // stub in place for Event.preventDefault()
-      const eventPreventDefaultStub = function() {};
+      const eventPreventDefaultStub = function () {};
 
       component.props.platform = 'linux';
       {
@@ -3588,20 +3588,39 @@ describe('TextEditorComponent', () => {
     });
 
     it('does not attempt to render block decorations located outside the visible range', async () => {
-      const { editor, component } = buildComponent({
+      // Build a text editor with only two rows per tile.
+      const { editor, element, component } = buildComponent({
         autoHeight: false,
         rowsPerTile: 2
       });
+
+      // Set `line-height` to an integer to save us headaches later. (We
+      // believe that Chromium used to guarantee fixed increments of line
+      // height, but doesn't anymore — so we must specify it as an integer
+      // value ourselves if we want the math to be simpler.)
+      element.style.lineHeight = '20px';
+      component.measureCharacterDimensions();
+
+      // Make the editor tall enough to fit only two lines at a time.
       await setEditorHeightInLines(component, 2);
+
       expect(component.getRenderedStartRow()).toBe(0);
+
+      // This suggests one extra tile is rendered below the viewport just out
+      // of view. (But why is this `4` rather than `3`, since we're
+      // zero-indexed? This seems like a mistake in `getRenderedEndRow` logic.)
       expect(component.getRenderedEndRow()).toBe(4);
 
+      // Create a marker spanning the fourth and fifth rows…
       const marker1 = editor.markScreenRange([[3, 0], [5, 0]], {
         reversed: false
       });
+
+      // …and decorate it with a DIV.
       const item1 = document.createElement('div');
       editor.decorateMarker(marker1, { type: 'block', item: item1 });
 
+      // Repeat, but with the marker reversed.
       const marker2 = editor.markScreenRange([[3, 0], [5, 0]], {
         reversed: true
       });
@@ -3609,12 +3628,34 @@ describe('TextEditorComponent', () => {
       editor.decorateMarker(marker2, { type: 'block', item: item2 });
 
       await component.getNextUpdatePromise();
+
+      // We do not expect the first block decoration to be rendered; its head
+      // is outside the renderered range.
       expect(item1.parentElement).toBeNull();
+
+      // But we expect the second decoration to be present because its head
+      // _is_ within the rendered range. (Remember that a “reversed” marker has
+      // its head _before_ its tail, but a non-reversed marker starts with its
+      // tail and ends with its head. Read the text-buffer docs for `Marker`
+      // for further understanding.)
+      //
+      // This comment does not imply understanding of the reasoning behind
+      // this — just that this is the relevant difference in behavior between
+      // the two decorations.
       expect(item2.nextSibling).toBe(lineNodeForScreenRow(component, 3));
 
+      // Scroll down so that the fifth line is the first one visible.
       await setScrollTop(component, 4 * component.getLineHeight());
+
+      // Again, lines 4-5-6-7 (zero-indexed) are understood to be visible, but
+      // `getRenderedEndRow` will report an end row of `8`, which is its own
+      // quirk.
       expect(component.getRenderedStartRow()).toBe(4);
       expect(component.getRenderedEndRow()).toBe(8);
+
+      // Now the logic is reversed; the rendered range includes the head of
+      // the first decoration, but not of the second decoration. Hence the
+      // first decoration is renderered and the second isn't.
       expect(item1.nextSibling).toBe(lineNodeForScreenRow(component, 5));
       expect(item2.parentElement).toBeNull();
     });
@@ -4800,7 +4841,7 @@ describe('TextEditorComponent', () => {
       });
 
       it('pastes the previously selected text when clicking the middle mouse button on Linux', async () => {
-        spyOn(electron.ipcRenderer, 'send').andCallFake(function(
+        spyOn(electron.ipcRenderer, 'send').andCallFake(function (
           eventName,
           selectedText
         ) {
@@ -4854,7 +4895,7 @@ describe('TextEditorComponent', () => {
       });
 
       it('does not paste into a read only editor when clicking the middle mouse button on Linux', async () => {
-        spyOn(electron.ipcRenderer, 'send').andCallFake(function(
+        spyOn(electron.ipcRenderer, 'send').andCallFake(function (
           eventName,
           selectedText
         ) {
@@ -5604,6 +5645,9 @@ describe('TextEditorComponent', () => {
         rowsPerTile: 1,
         autoHeight: false
       });
+      // Set the initial line height to match that of the editor font size.
+      element.style.lineHeight = Math.ceil(parseFloat(getComputedStyle(element).fontSize)) + 'px'
+      component.measureCharacterDimensions();
       await setEditorHeightInLines(component, 3);
       await setEditorWidthInCharacters(component, 20);
       component.setScrollTopRow(4);
@@ -5983,6 +6027,8 @@ describe('TextEditorComponent', () => {
         rowsPerTile: 3,
         autoHeight: false
       });
+      element.style.lineHeight = '20px';
+      component.measureCharacterDimensions();
       element.style.height =
         4 * component.measurements.lineHeight +
         horizontalScrollbarHeight +
