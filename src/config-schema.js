@@ -369,6 +369,12 @@ const configSchema = {
         title: 'Use Legacy Tree-sitter Implementation',
         description: 'Opt into the legacy Atom Tree-sitter system instead of the modern system added by Pulsar. (We plan to remove this legacy system soon.) Has no effect unless “Use Tree-sitter Parsers” is also checked.'
       },
+      useLegacySessionStore: {
+        type: 'boolean',
+        default: true,
+        title: 'Use Legacy Session Store',
+        description: 'Opt into the legacy Atom session store (IndexedDB) instead of the new SQLite backend (We plan to remove this legacy system soon).'
+      },
       colorProfile: {
         description:
           "Specify whether Pulsar should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Pulsar to take effect.",

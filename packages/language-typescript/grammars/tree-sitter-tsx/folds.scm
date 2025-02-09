@@ -32,5 +32,5 @@
   (#set! fold.endAt lastChild.previousSibling.endPosition))
 
 ((jsx_self_closing_element) @fold
-  ; Exclude both the slash and angle bracket `/>` from the fold.
-  (#set! fold.endAt lastChild.previousSibling.startPosition))
+  ; Exclude the slash and angle bracket `/>` from the fold.
+  (#set! fold.endAt lastChild.startPosition))

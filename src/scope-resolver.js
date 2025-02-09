@@ -641,7 +641,7 @@ ScopeResolver.TESTS = {
 
   // Passes only if the node contains any descendant ERROR nodes.
   hasError(node) {
-    return node.hasError();
+    return node.hasError;
   },
 
   // Passes when the node's tree belongs to an injection layer, rather than the
@@ -745,8 +745,20 @@ ScopeResolver.TESTS = {
     return false;
   },
 
-  // Passes if there's an ancestor, but fails if the ancestor type matches
-  // the second,third,etc argument
+  // Passes if this node's parent is of the given type(s).
+  //
+  // Only rarely needed, but may be useful when dealing with ERROR nodes.
+  childOfType(node, type) {
+    if (!node.parent) return false;
+    let multiple = type.includes(' ');
+    let target = multiple ? type.split(/\s+/) : type;
+    return multiple ? target.includes(node.parent.type) : node.parent.type === type;
+  },
+
+  // Takes at least two node types (separated by spaces) and starts traversing
+  // up the node's parent chain. Passes if the first node type is encountered
+  // before any of the rest; fails if any of the rest are reached before the
+  // first.
   ancestorTypeNearerThan(node, types) {
     let [target, ...rejected] = types.split(/\s+/);
     rejected = new Set(rejected)
@@ -766,9 +778,21 @@ ScopeResolver.TESTS = {
     return descendants.length > 0;
   },
 
+  // Passes if this node has at least one child of the given type(s).
+  //
+  // Only rarely needed, but may be useful when dealing with ERROR nodes.
+  parentOfType(node, type) {
+    if (node.childCount === 0) return false;
+    let multiple = type.includes(' ');
+    let target = multiple ? type.split(/\s+/) : type;
+    return node.children.some(c => {
+      return multiple ? target.includes(c.type) : c.type === target;
+    });
+  },
+
   // Passes if this range (after adjustments) has previously had data stored at
   // the given key.
-  rangeWithData(node, rawValue, existingData) {
+  rangeWithData(_node, rawValue, existingData) {
     if (existingData === undefined) { return false; }
     let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
 
@@ -782,7 +806,7 @@ ScopeResolver.TESTS = {
 
   // Passes if one of this node's ancestors has stored data at the given key
   // for its inherent range (ignoring adjustments).
-  descendantOfNodeWithData(node, rawValue, existingData, instance) {
+  descendantOfNodeWithData(node, rawValue, _existingData, instance) {
     let current = node;
     let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
 
@@ -803,6 +827,7 @@ ScopeResolver.TESTS = {
   // position. Accepts a node position descriptor.
   startsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
+    if (!otherNodePosition) return false
     return otherNodePosition.row === node.startPosition.row;
   },
 
@@ -810,13 +835,14 @@ ScopeResolver.TESTS = {
   // position. Accepts a node position descriptor.
   endsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
+    if (!otherNodePosition) return false
     return otherNodePosition.row === node.endPosition.row;
   },
 
   // Passes only when a given config option is present and truthy. Accepts
   // either (a) a configuration key or (b) a configuration key and value
   // separated by a space.
-  config(node, rawValue, existingData, instance) {
+  config(_node, rawValue, _existingData, instance) {
     let [key, value] = interpretPossibleKeyValuePair(rawValue, true);
 
     // Invalid predicates should be ignored.

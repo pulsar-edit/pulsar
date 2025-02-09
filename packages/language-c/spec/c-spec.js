@@ -1,6 +1,6 @@
 
 let TextEditor = null;
-const buildTextEditor = function(params) {
+const buildTextEditor = function (params) {
   if (atom.workspace.buildTextEditor != null) {
     return atom.workspace.buildTextEditor(params);
   } else {
@@ -11,24 +11,24 @@ const buildTextEditor = function(params) {
   }
 };
 
-describe("Language-C", function() {
+describe("Language-C", function () {
   let grammar = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     atom.config.set('core.useTreeSitterParsers', false);
 
     return waitsForPromise(() => atom.packages.activatePackage('language-c'));
   });
 
-  describe("C", function() {
+  describe("C", function () {
     beforeEach(() => grammar = atom.grammars.grammarForScopeName('source.c'));
 
-    it("parses the grammar", function() {
+    it("parses the grammar", function () {
       expect(grammar).toBeTruthy();
       expect(grammar.scopeName).toBe('source.c');
     });
 
-    it("tokenizes punctuation", function() {
+    it("tokenizes punctuation", function () {
       let {tokens} = grammar.tokenizeLine('hi;');
       expect(tokens[1]).toEqual({value: ';', scopes: ['source.c', 'punctuation.terminator.statement.c']});
 
@@ -40,7 +40,7 @@ describe("Language-C", function() {
       expect(tokens[1]).toEqual({value: ',', scopes: ['source.c', 'punctuation.separator.delimiter.c']});
   });
 
-    it("tokenizes functions", function() {
+    it("tokenizes functions", function () {
       const lines = grammar.tokenizeLines(`\
 int something(int param) {
   return 0;
@@ -58,7 +58,7 @@ int something(int param) {
       expect(lines[2][0]).toEqual({value: '}', scopes: ['source.c', 'meta.block.c', 'punctuation.section.block.end.bracket.curly.c']});
   });
 
-    it("tokenizes varargs ellipses", function() {
+    it("tokenizes varargs ellipses", function () {
       const {tokens} = grammar.tokenizeLine('void function(...);');
       expect(tokens[0]).toEqual({value: 'void', scopes: ['source.c', 'storage.type.c']});
       expect(tokens[2]).toEqual({value: 'function', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']});
@@ -67,7 +67,7 @@ int something(int param) {
       expect(tokens[5]).toEqual({value: ')', scopes: ['source.c', 'meta.function.c', 'punctuation.section.parameters.end.bracket.round.c']});
   });
 
-    it("tokenizes various _t types", function() {
+    it("tokenizes various _t types", function () {
       let {tokens} = grammar.tokenizeLine('size_t var;');
       expect(tokens[0]).toEqual({value: 'size_t', scopes: ['source.c', 'support.type.sys-types.c']});
 
@@ -81,14 +81,14 @@ int something(int param) {
       expect(tokens[0]).toEqual({value: 'myType_t', scopes: ['source.c', 'support.type.posix-reserved.c']});
   });
 
-    it("tokenizes 'line continuation' character", function() {
+    it("tokenizes 'line continuation' character", function () {
       const {tokens} = grammar.tokenizeLine("ma\\\nin(){};");
       expect(tokens[0]).toEqual({value: 'ma', scopes: ['source.c']});
       expect(tokens[1]).toEqual({value: '\\', scopes: ['source.c', 'constant.character.escape.line-continuation.c']});
       expect(tokens[3]).toEqual({value: 'in', scopes: ['source.c', 'meta.function.c', 'entity.name.function.c']});
   });
 
-    describe("strings", () => it("tokenizes them", function() {
+    describe("strings", () => it("tokenizes them", function () {
       let tokens;
       const delimsByScope = {
         'string.quoted.double.c': '"',
@@ -131,7 +131,7 @@ int something(int param) {
       expect(tokens[2]).toEqual({value: '"', scopes: ['source.c', 'string.quoted.double.c', 'punctuation.definition.string.end.c']});
   }));
 
-    describe("comments", () => it("tokenizes them", function() {
+    describe("comments", () => it("tokenizes them", function () {
       let {tokens} = grammar.tokenizeLine('/**/');
       expect(tokens[0]).toEqual({value: '/*', scopes: ['source.c', 'comment.block.c', 'punctuation.definition.comment.begin.c']});
       expect(tokens[1]).toEqual({value: '*/', scopes: ['source.c', 'comment.block.c', 'punctuation.definition.comment.end.c']});
@@ -145,8 +145,8 @@ int something(int param) {
       expect(tokens[0]).toEqual({value: '*/*', scopes: ['source.c', 'invalid.illegal.stray-comment-end.c']});
   }));
 
-    describe("preprocessor directives", function() {
-      it("tokenizes '#line'", function() {
+    describe("preprocessor directives", function () {
+      it("tokenizes '#line'", function () {
         const {tokens} = grammar.tokenizeLine('#line 151 "copy.c"');
         expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.line.c', 'punctuation.definition.directive.c']});
         expect(tokens[1]).toEqual({value: 'line', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.line.c']});
@@ -156,7 +156,7 @@ int something(int param) {
         expect(tokens[7]).toEqual({value: '"', scopes: ['source.c', 'meta.preprocessor.c', 'string.quoted.double.c', 'punctuation.definition.string.end.c']});
     });
 
-      it("tokenizes '#undef'", function() {
+      it("tokenizes '#undef'", function () {
         const {tokens} = grammar.tokenizeLine('#undef FOO');
         expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.undef.c', 'punctuation.definition.directive.c']});
         expect(tokens[1]).toEqual({value: 'undef', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.undef.c']});
@@ -164,7 +164,7 @@ int something(int param) {
         expect(tokens[3]).toEqual({value: 'FOO', scopes: ['source.c', 'meta.preprocessor.c', 'entity.name.function.preprocessor.c']});
     });
 
-      it("tokenizes '#pragma'", function() {
+      it("tokenizes '#pragma'", function () {
         let {tokens} = grammar.tokenizeLine('#pragma once');
         expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.pragma.c', 'keyword.control.directive.pragma.c', 'punctuation.definition.directive.c']});
         expect(tokens[1]).toEqual({value: 'pragma', scopes: ['source.c', 'meta.preprocessor.pragma.c', 'keyword.control.directive.pragma.c']});
@@ -186,15 +186,15 @@ int something(int param) {
         expect(tokens[3]).toEqual({value: '– Initialization', scopes: ['source.c', 'meta.section',  'meta.preprocessor.pragma.c', 'entity.name.tag.pragma-mark.c']});
     });
 
-      describe("define", function() {
-        it("tokenizes '#define [identifier name]'", function() {
+      describe("define", function () {
+        it("tokenizes '#define [identifier name]'", function () {
           const {tokens} = grammar.tokenizeLine('#define _FILE_NAME_H_');
           expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.macro.c', 'keyword.control.directive.define.c', 'punctuation.definition.directive.c']});
           expect(tokens[1]).toEqual({value: 'define', scopes: ['source.c', 'meta.preprocessor.macro.c', 'keyword.control.directive.define.c']});
           expect(tokens[3]).toEqual({value: '_FILE_NAME_H_', scopes: ['source.c', 'meta.preprocessor.macro.c', 'entity.name.function.preprocessor.c']});
       });
 
-        it("tokenizes '#define [identifier name] [value]'", function() {
+        it("tokenizes '#define [identifier name] [value]'", function () {
           let {tokens} = grammar.tokenizeLine('#define WIDTH 80');
           expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.macro.c', 'keyword.control.directive.define.c', 'punctuation.definition.directive.c']});
           expect(tokens[1]).toEqual({value: 'define', scopes: ['source.c', 'meta.preprocessor.macro.c', 'keyword.control.directive.define.c']});
@@ -223,8 +223,8 @@ int something(int param) {
           expect(tokens[11]).toEqual({value: ')', scopes: ['source.c', 'meta.preprocessor.macro.c', 'punctuation.section.parens.end.bracket.round.c']});
       });
 
-        describe("macros", function() {
-          it("tokenizes them", function() {
+        describe("macros", function () {
+          it("tokenizes them", function () {
             let {tokens} = grammar.tokenizeLine('#define INCREMENT(x) x++');
             expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.macro.c', 'keyword.control.directive.define.c', 'punctuation.definition.directive.c']});
             expect(tokens[1]).toEqual({value: 'define', scopes: ['source.c', 'meta.preprocessor.macro.c', 'keyword.control.directive.define.c']});
@@ -287,7 +287,7 @@ int something(int param) {
             expect(tokens[34]).toEqual({value: ')', scopes: ['source.c', 'meta.preprocessor.macro.c', 'punctuation.section.parens.end.bracket.round.c']});
         });
 
-          it("tokenizes multiline macros", function() {
+          it("tokenizes multiline macros", function () {
             let lines = grammar.tokenizeLines(`\
 #define max(a,b) (a>b)? \\
                   a:b\
@@ -323,7 +323,7 @@ int something(int param) {
             expect(lines[4][0]).toEqual({value: '}', scopes: ['source.c', 'meta.preprocessor.macro.c', 'meta.block.c', 'punctuation.section.block.end.bracket.curly.c']});
         });
 
-          it("tokenizes complex definitions", function() {
+          it("tokenizes complex definitions", function () {
             const lines = grammar.tokenizeLines(`\
 #define MakeHook(name) struct HOOK name = {{false, 0L}, \\
 ((HOOKF)(*HookEnt)), ID("hook")}\
@@ -364,8 +364,8 @@ int something(int param) {
       });
     });
 
-      describe("includes", function() {
-        it("tokenizes '#include'", function() {
+      describe("includes", function () {
+        it("tokenizes '#include'", function () {
           let {tokens} = grammar.tokenizeLine('#include <stdio.h>');
           expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.include.c', 'keyword.control.directive.include.c', 'punctuation.definition.directive.c']});
           expect(tokens[1]).toEqual({value: 'include', scopes: ['source.c', 'meta.preprocessor.include.c', 'keyword.control.directive.include.c']});
@@ -391,7 +391,7 @@ int something(int param) {
           expect(tokens[5]).toEqual({value: '"', scopes: ['source.c', 'meta.preprocessor.include.c', 'string.quoted.double.include.c', 'punctuation.definition.string.end.c']});
       });
 
-        it("tokenizes '#import'", function() {
+        it("tokenizes '#import'", function () {
           const {tokens} = grammar.tokenizeLine('#import "file"');
           expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.include.c', 'keyword.control.directive.import.c', 'punctuation.definition.directive.c']});
           expect(tokens[1]).toEqual({value: 'import', scopes: ['source.c', 'meta.preprocessor.include.c', 'keyword.control.directive.import.c']});
@@ -400,7 +400,7 @@ int something(int param) {
           expect(tokens[5]).toEqual({value: '"', scopes: ['source.c', 'meta.preprocessor.include.c', 'string.quoted.double.include.c', 'punctuation.definition.string.end.c']});
       });
 
-        it("tokenizes '#include_next'", function() {
+        it("tokenizes '#include_next'", function () {
           const {tokens} = grammar.tokenizeLine('#include_next "next.h"');
           expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.include.c', 'keyword.control.directive.include_next.c', 'punctuation.definition.directive.c']});
           expect(tokens[1]).toEqual({value: 'include_next', scopes: ['source.c', 'meta.preprocessor.include.c', 'keyword.control.directive.include_next.c']});
@@ -410,15 +410,15 @@ int something(int param) {
       });
     });
 
-      describe("diagnostics", function() {
-        it("tokenizes '#error'", function() {
+      describe("diagnostics", function () {
+        it("tokenizes '#error'", function () {
           const {tokens} = grammar.tokenizeLine('#error "C++ compiler required."');
           expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'keyword.control.directive.diagnostic.error.c', 'punctuation.definition.directive.c']});
           expect(tokens[1]).toEqual({value: 'error', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'keyword.control.directive.diagnostic.error.c']});
           expect(tokens[4]).toEqual({value: 'C++ compiler required.', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'string.quoted.double.c']});
       });
 
-        it("tokenizes '#warning'", function() {
+        it("tokenizes '#warning'", function () {
           const {tokens} = grammar.tokenizeLine('#warning "This is a warning."');
           expect(tokens[0]).toEqual({value: '#', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'keyword.control.directive.diagnostic.warning.c', 'punctuation.definition.directive.c']});
           expect(tokens[1]).toEqual({value: 'warning', scopes: ['source.c', 'meta.preprocessor.diagnostic.c', 'keyword.control.directive.diagnostic.warning.c']});
@@ -426,8 +426,8 @@ int something(int param) {
       });
     });
 
-      describe("conditionals", function() {
-        it("tokenizes if-elif-else preprocessor blocks", function() {
+      describe("conditionals", function () {
+        it("tokenizes if-elif-else preprocessor blocks", function () {
           const lines = grammar.tokenizeLines(`\
 #if defined(CREDIT)
     credit();
@@ -461,7 +461,7 @@ int something(int param) {
           expect(lines[6][1]).toEqual({value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']});
       });
 
-        it("tokenizes if-true-else blocks", function() {
+        it("tokenizes if-true-else blocks", function () {
           const lines = grammar.tokenizeLines(`\
 #if 1
 int something() {
@@ -500,7 +500,7 @@ int something() {
           expect(lines[12][1]).toEqual({value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']});
       });
 
-        it("tokenizes if-false-else blocks", function() {
+        it("tokenizes if-false-else blocks", function () {
           let lines = grammar.tokenizeLines(`\
 int something() {
   #if 0
@@ -538,7 +538,7 @@ int something() {
           expect(lines[2][1]).toEqual({value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']});
       });
 
-        it("tokenizes ifdef-elif blocks", function() {
+        it("tokenizes ifdef-elif blocks", function () {
           const lines = grammar.tokenizeLines(`\
 #ifdef __unix__ /* is defined by compilers targeting Unix systems */
   # include <unistd.h>
@@ -574,7 +574,7 @@ int something() {
           expect(lines[4][1]).toEqual({value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']});
       });
 
-        it("tokenizes ifndef blocks", function() {
+        it("tokenizes ifndef blocks", function () {
           const lines = grammar.tokenizeLines(`\
 #ifndef _INCL_GUARD
   #define _INCL_GUARD
@@ -591,7 +591,7 @@ int something() {
           expect(lines[2][1]).toEqual({value: 'endif', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']});
       });
 
-        it("highlights stray elif, else and endif usages as invalid", function() {
+        it("highlights stray elif, else and endif usages as invalid", function () {
           const lines = grammar.tokenizeLines(`\
 #if defined SOMEMACRO
 #else
@@ -606,12 +606,12 @@ int something() {
           expect(lines[5][0]).toEqual({value: '#endif', scopes: ['source.c', 'invalid.illegal.stray-endif.c']});
       });
 
-        it("highlights errorneous defined usage as invalid", function() {
+        it("highlights errorneous defined usage as invalid", function () {
           const {tokens} = grammar.tokenizeLine('#if defined == VALUE');
           expect(tokens[3]).toEqual({value: 'defined', scopes: ['source.c', 'meta.preprocessor.c', 'invalid.illegal.macro-name.c']});
       });
 
-        it("tokenizes multi line conditional queries", function() {
+        it("tokenizes multi line conditional queries", function () {
           const lines = grammar.tokenizeLines(`\
 #if !defined (MACRO_A) \\
  || !defined MACRO_C
@@ -648,7 +648,7 @@ int something() {
           expect(lines[4][12]).toEqual({value: ' single line comment', scopes: ['source.c', 'comment.line.double-slash.cpp']});
       });
 
-        it("tokenizes ternary operator usage in preprocessor conditionals", function() {
+        it("tokenizes ternary operator usage in preprocessor conditionals", function () {
           const {tokens} = grammar.tokenizeLine('#if defined (__GNU_LIBRARY__) ? defined (__USE_GNU) : !defined (__STRICT_ANSI__)');
           expect(tokens[9]).toEqual({value: '?', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.operator.ternary.c']});
           expect(tokens[11]).toEqual({value: 'defined', scopes: ['source.c', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']});
@@ -657,15 +657,15 @@ int something() {
     });
   });
 
-    describe("indentation", function() {
+    describe("indentation", function () {
       let editor = null;
 
-      beforeEach(function() {
+      beforeEach(function () {
         editor = buildTextEditor();
         editor.setGrammar(grammar);
       });
 
-      const expectPreservedIndentation = function(text) {
+      const expectPreservedIndentation = function (text) {
         editor.setText(text);
         editor.autoIndentBufferRows(0, editor.getLineCount() - 1);
 
@@ -730,14 +730,14 @@ some_t a[3] = {
 `
       ));
 
-      it("tokenizes binary literal", function() {
+      it("tokenizes binary literal", function () {
         const {tokens} = grammar.tokenizeLine('0b101010');
         expect(tokens[0]).toEqual({value: '0b101010', scopes: ['source.c', 'constant.numeric.c']});
     });
   });
 
-    describe("access", function() {
-      it("tokenizes the dot access operator", function() {
+    describe("access", function () {
+      it("tokenizes the dot access operator", function () {
         let lines = grammar.tokenizeLines(`\
 {
   a.
@@ -795,7 +795,7 @@ some_t a[3] = {
         expect(lines[1][3]).toEqual({value: 'b', scopes: ['source.c', 'meta.block.c', 'variable.other.member.c']});
     });
 
-      it("tokenizes the pointer access operator", function() {
+      it("tokenizes the pointer access operator", function () {
         let lines = grammar.tokenizeLines(`\
 {
   a->b;
@@ -852,8 +852,8 @@ some_t a[3] = {
     });
   });
 
-    describe("operators", function() {
-      it("tokenizes the sizeof operator", function() {
+    describe("operators", function () {
+      it("tokenizes the sizeof operator", function () {
         let {tokens} = grammar.tokenizeLine('sizeof unary_expression');
         expect(tokens[0]).toEqual({value: 'sizeof', scopes: ['source.c', 'keyword.operator.sizeof.c']});
         expect(tokens[1]).toEqual({value: ' unary_expression', scopes: ['source.c']});
@@ -875,7 +875,7 @@ some_t a[3] = {
         expect(tokens[0]).not.toEqual({value: 'sizeof', scopes: ['source.c', 'keyword.operator.sizeof.c']});
     });
 
-      it("tokenizes the increment operator", function() {
+      it("tokenizes the increment operator", function () {
         let {tokens} = grammar.tokenizeLine('i++');
         expect(tokens[0]).toEqual({value: 'i', scopes: ['source.c']});
         expect(tokens[1]).toEqual({value: '++', scopes: ['source.c', 'keyword.operator.increment.c']});
@@ -885,7 +885,7 @@ some_t a[3] = {
         expect(tokens[1]).toEqual({value: 'i', scopes: ['source.c']});
     });
 
-      it("tokenizes the decrement operator", function() {
+      it("tokenizes the decrement operator", function () {
         let {tokens} = grammar.tokenizeLine('i--');
         expect(tokens[0]).toEqual({value: 'i', scopes: ['source.c']});
         expect(tokens[1]).toEqual({value: '--', scopes: ['source.c', 'keyword.operator.decrement.c']});
@@ -895,7 +895,7 @@ some_t a[3] = {
         expect(tokens[1]).toEqual({value: 'i', scopes: ['source.c']});
     });
 
-      it("tokenizes logical operators", function() {
+      it("tokenizes logical operators", function () {
         let {tokens} = grammar.tokenizeLine('!a');
         expect(tokens[0]).toEqual({value: '!', scopes: ['source.c', 'keyword.operator.logical.c']});
         expect(tokens[1]).toEqual({value: 'a', scopes: ['source.c']});
@@ -913,7 +913,7 @@ some_t a[3] = {
         })();
     });
 
-      it("tokenizes comparison operators", function() {
+      it("tokenizes comparison operators", function () {
         const operators = ['<=', '>=', '!=', '==', '<', '>' ];
 
         return (() => {
@@ -928,7 +928,7 @@ some_t a[3] = {
         })();
     });
 
-      it("tokenizes arithmetic operators", function() {
+      it("tokenizes arithmetic operators", function () {
         const operators = ['+', '-', '*', '/', '%'];
 
         return (() => {
@@ -943,7 +943,7 @@ some_t a[3] = {
         })();
     });
 
-      it("tokenizes ternary operators", function() {
+      it("tokenizes ternary operators", function () {
         const {tokens} = grammar.tokenizeLine('a ? b : c');
         expect(tokens[0]).toEqual({value: 'a ', scopes: ['source.c']});
         expect(tokens[1]).toEqual({value: '?', scopes: ['source.c', 'keyword.operator.ternary.c']});
@@ -952,7 +952,7 @@ some_t a[3] = {
         expect(tokens[4]).toEqual({value: ' c', scopes: ['source.c']});
     });
 
-      it("tokenizes ternary operators with member access", function() {
+      it("tokenizes ternary operators with member access", function () {
         const {tokens} = grammar.tokenizeLine('a ? b.c : d');
         expect(tokens[0]).toEqual({value: 'a ', scopes: ['source.c']});
         expect(tokens[1]).toEqual({value: '?', scopes: ['source.c', 'keyword.operator.ternary.c']});
@@ -964,7 +964,7 @@ some_t a[3] = {
         expect(tokens[7]).toEqual({value: ' d', scopes: ['source.c']});
     });
 
-      it("tokenizes ternary operators with pointer dereferencing", function() {
+      it("tokenizes ternary operators with pointer dereferencing", function () {
         const {tokens} = grammar.tokenizeLine('a ? b->c : d');
         expect(tokens[0]).toEqual({value: 'a ', scopes: ['source.c']});
         expect(tokens[1]).toEqual({value: '?', scopes: ['source.c', 'keyword.operator.ternary.c']});
@@ -976,7 +976,7 @@ some_t a[3] = {
         expect(tokens[7]).toEqual({value: ' d', scopes: ['source.c']});
     });
 
-      it("tokenizes ternary operators with function invocation", function() {
+      it("tokenizes ternary operators with function invocation", function () {
         const {tokens} = grammar.tokenizeLine('a ? f(b) : c');
         expect(tokens[0]).toEqual({value: 'a ', scopes: ['source.c']});
         expect(tokens[1]).toEqual({value: '?', scopes: ['source.c', 'keyword.operator.ternary.c']});
@@ -990,14 +990,14 @@ some_t a[3] = {
         expect(tokens[9]).toEqual({value: ' c', scopes: ['source.c']});
     });
 
-      describe("bitwise", function() {
-        it("tokenizes bitwise 'not'", function() {
+      describe("bitwise", function () {
+        it("tokenizes bitwise 'not'", function () {
           const {tokens} = grammar.tokenizeLine('~a');
           expect(tokens[0]).toEqual({value: '~', scopes: ['source.c', 'keyword.operator.c']});
           expect(tokens[1]).toEqual({value: 'a', scopes: ['source.c']});
       });
 
-        it("tokenizes shift operators", function() {
+        it("tokenizes shift operators", function () {
           let {tokens} = grammar.tokenizeLine('>>');
           expect(tokens[0]).toEqual({value: '>>', scopes: ['source.c', 'keyword.operator.bitwise.shift.c']});
 
@@ -1005,7 +1005,7 @@ some_t a[3] = {
           expect(tokens[0]).toEqual({value: '<<', scopes: ['source.c', 'keyword.operator.bitwise.shift.c']});
       });
 
-        it("tokenizes them", function() {
+        it("tokenizes them", function () {
           const operators = ['|', '^', '&'];
 
           return (() => {
@@ -1021,15 +1021,15 @@ some_t a[3] = {
       });
     });
 
-      describe("assignment", function() {
-        it("tokenizes the assignment operator", function() {
+      describe("assignment", function () {
+        it("tokenizes the assignment operator", function () {
           const {tokens} = grammar.tokenizeLine('a = b');
           expect(tokens[0]).toEqual({value: 'a ', scopes: ['source.c']});
           expect(tokens[1]).toEqual({value: '=', scopes: ['source.c', 'keyword.operator.assignment.c']});
           expect(tokens[2]).toEqual({value: ' b', scopes: ['source.c']});
       });
 
-        it("tokenizes compound assignment operators", function() {
+        it("tokenizes compound assignment operators", function () {
           const operators = ['+=', '-=', '*=', '/=', '%='];
           return (() => {
             const result = [];
@@ -1043,7 +1043,7 @@ some_t a[3] = {
           })();
       });
 
-        it("tokenizes bitwise compound operators", function() {
+        it("tokenizes bitwise compound operators", function () {
           const operators = ['<<=', '>>=', '&=', '^=', '|='];
           return (() => {
             const result = [];
@@ -1060,20 +1060,20 @@ some_t a[3] = {
   });
 });
 
-  describe("C++", function() {
+  describe("C++", function () {
     beforeEach(() => grammar = atom.grammars.grammarForScopeName('source.cpp'));
 
-    it("parses the grammar", function() {
+    it("parses the grammar", function () {
       expect(grammar).toBeTruthy();
       expect(grammar.scopeName).toBe('source.cpp');
     });
 
-    it("tokenizes this with `.this` class", function() {
+    it("tokenizes this with `.this` class", function () {
       const {tokens} = grammar.tokenizeLine('this.x');
       expect(tokens[0]).toEqual({value: 'this', scopes: ['source.cpp', 'variable.language.this.cpp']});
   });
 
-    it("tokenizes classes", function() {
+    it("tokenizes classes", function () {
       const lines = grammar.tokenizeLines(`\
 class Thing {
   int x;
@@ -1084,7 +1084,7 @@ class Thing {
       expect(lines[0][2]).toEqual({value: 'Thing', scopes: ['source.cpp', 'meta.class-struct-block.cpp', 'entity.name.type.cpp']});
   });
 
-    it("tokenizes 'extern C'", function() {
+    it("tokenizes 'extern C'", function () {
       let lines = grammar.tokenizeLines(`\
 extern "C" {
 #include "legacy_C_header.h"
@@ -1132,7 +1132,7 @@ extern "C" {
       expect(lines[6][1]).toEqual({value: 'endif', scopes: ['source.cpp', 'meta.preprocessor.c', 'keyword.control.directive.conditional.c']});
   });
 
-    it("tokenizes UTF string escapes", function() {
+    it("tokenizes UTF string escapes", function () {
       const lines = grammar.tokenizeLines(`\
 string str = U"\\U01234567\\u0123\\"\\0123\\x123";\
 `
@@ -1151,7 +1151,7 @@ string str = U"\\U01234567\\u0123\\"\\0123\\x123";\
       expect(lines[0][12]).toEqual({value: ';', scopes: ['source.cpp', 'punctuation.terminator.statement.c']});
   });
 
-    it("tokenizes % format specifiers", function() {
+    it("tokenizes % format specifiers", function () {
       let {tokens} = grammar.tokenizeLine('"%d"');
       expect(tokens[0]).toEqual({value: '"', scopes: ['source.cpp', 'string.quoted.double.cpp', 'punctuation.definition.string.begin.cpp']});
       expect(tokens[1]).toEqual({value: '%d', scopes: ['source.cpp', 'string.quoted.double.cpp', 'constant.other.placeholder.c']});
@@ -1168,13 +1168,15 @@ string str = U"\\U01234567\\u0123\\"\\0123\\x123";\
       expect(tokens[2]).toEqual({value: '"', scopes: ['source.cpp', 'string.quoted.double.cpp', 'punctuation.definition.string.end.cpp']});
   });
 
-    it("tokenizes raw string literals", function() {
+    it("tokenizes raw string literals", function () {
+      /* eslint-disable no-useless-escape */
       const lines = grammar.tokenizeLines(`\
 string str = R"test(
   this is \"a\" test 'string'
 )test";\
 `
       );
+      /* eslint-enable no-useless-escape */
       expect(lines[0][0]).toEqual({value: 'string str ', scopes: ['source.cpp']});
       expect(lines[0][3]).toEqual({value: 'R"test(', scopes: ['source.cpp', 'string.quoted.double.raw.cpp', 'punctuation.definition.string.begin.cpp']});
       expect(lines[1][0]).toEqual({value: '  this is "a" test \'string\'', scopes: ['source.cpp', 'string.quoted.double.raw.cpp']});
@@ -1182,7 +1184,7 @@ string str = R"test(
       expect(lines[2][1]).toEqual({value: ';', scopes: ['source.cpp', 'punctuation.terminator.statement.c']});
   });
 
-    it("errors on long raw string delimiters", function() {
+    it("errors on long raw string delimiters", function () {
       const lines = grammar.tokenizeLines(`\
 string str = R"01234567890123456()01234567890123456";\
 `
@@ -1197,7 +1199,7 @@ string str = R"01234567890123456()01234567890123456";\
       expect(lines[0][9]).toEqual({value: ';', scopes: ['source.cpp', 'punctuation.terminator.statement.c']});
   });
 
-    it("tokenizes destructors", function() {
+    it("tokenizes destructors", function () {
       let {tokens} = grammar.tokenizeLine('~Foo() {}');
       expect(tokens[0]).toEqual({value: '~Foo', scopes: ['source.cpp', 'meta.function.destructor.cpp', 'entity.name.function.cpp']});
       expect(tokens[1]).toEqual({value: '(', scopes: ['source.cpp', 'meta.function.destructor.cpp', 'punctuation.definition.parameters.begin.c']});
@@ -1213,8 +1215,8 @@ string str = R"01234567890123456()01234567890123456";\
       expect(tokens[5]).toEqual({value: '}', scopes: ['source.cpp', 'meta.block.c', 'punctuation.section.block.end.bracket.curly.c']});
   });
 
-    describe("digit separators", function() {
-      it("recognizes numbers with digit separators", function() {
+    describe("digit separators", function () {
+      it("recognizes numbers with digit separators", function () {
         let {tokens} = grammar.tokenizeLine("1'000");
         expect(tokens[0]).toEqual({value: "1'000", scopes: ['source.cpp', 'constant.numeric.c']});
 
@@ -1231,7 +1233,7 @@ string str = R"01234567890123456()01234567890123456";\
         expect(tokens[0]).toEqual({value: "0b1100'0011'1111'0000", scopes: ['source.cpp', 'constant.numeric.c']});
     });
 
-      it("does not tokenize single quotes at the beginning or end of numbers as digit separators", function() {
+      it("does not tokenize single quotes at the beginning or end of numbers as digit separators", function () {
         let {tokens} = grammar.tokenizeLine("'1000");
         expect(tokens[0]).toEqual({value: "'", scopes: ['source.cpp', 'string.quoted.single.c', 'punctuation.definition.string.begin.c']});
         expect(tokens[1]).toEqual({value: "1000", scopes: ['source.cpp', 'string.quoted.single.c']});
@@ -1242,7 +1244,7 @@ string str = R"01234567890123456()01234567890123456";\
     });
   });
 
-    describe("comments", () => it("tokenizes them", function() {
+    describe("comments", () => it("tokenizes them", function () {
       const {tokens} = grammar.tokenizeLine('// comment');
       expect(tokens[0]).toEqual({value: '//', scopes: ['source.cpp', 'comment.line.double-slash.cpp', 'punctuation.definition.comment.cpp']});
       expect(tokens[1]).toEqual({value: ' comment', scopes: ['source.cpp', 'comment.line.double-slash.cpp']});
@@ -1268,7 +1270,7 @@ comment\
       expect(lines[2][0]).toEqual({value: 'comment', scopes: ['source.cpp']});
   }));
 
-    describe("operators", () => it("tokenizes ternary operators with namespace resolution", function() {
+    describe("operators", () => it("tokenizes ternary operators with namespace resolution", function () {
       const {tokens} = grammar.tokenizeLine('a ? ns::b : ns::c');
       expect(tokens[0]).toEqual({value: 'a ', scopes: ['source.cpp']});
       expect(tokens[1]).toEqual({value: '?', scopes: ['source.cpp', 'keyword.operator.ternary.c']});

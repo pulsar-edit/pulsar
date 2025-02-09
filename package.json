@@ -2,7 +2,7 @@
   "name": "pulsar",
   "author": "Pulsar-Edit <admin@pulsar-edit.dev>",
   "productName": "Pulsar",
-  "version": "1.119.0-dev",
+  "version": "1.125.0-dev",
   "description": "A Community-led Hyper-Hackable Text Editor",
   "branding": {
     "id": "pulsar",
@@ -53,6 +53,7 @@
     "background-tips": "file:packages/background-tips",
     "base16-tomorrow-dark-theme": "file:packages/base16-tomorrow-dark-theme",
     "base16-tomorrow-light-theme": "file:packages/base16-tomorrow-light-theme",
+    "better-sqlite3": "^11.1.2",
     "bookmarks": "file:packages/bookmarks",
     "bracket-matcher": "file:packages/bracket-matcher",
     "chai": "4.3.4",

@@ -1,0 +1,10 @@
+div {
+/* <- entity.name.tag.css */
+/*  ^ punctuation.section.property-list.begin.bracket.curly.css */
+}
+
+/* Next test verifies that selectors are properly inferred at the end of a file before the `{` is typed. */
+
+div.foo
+/* <- entity.name.tag.css */
+/*  ^ entity.other.attribute-name.class.css */

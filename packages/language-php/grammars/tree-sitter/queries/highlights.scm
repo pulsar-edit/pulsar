@@ -302,9 +302,14 @@
 ; The "bar" in `$foo->bar()`.
 (member_call_expression
   name: (name) @support.other.function.method.php)
+(nullsafe_member_call_expression
+  name: (name) @support.other.function.method.php)
 
 ; The "bar" in `$foo->bar`.
 (member_access_expression
+  name: (name) @support.other.property.php
+  (#set! capture.final true))
+(nullsafe_member_access_expression
   name: (name) @support.other.property.php
   (#set! capture.final true))
 
@@ -312,9 +317,16 @@
 (member_call_expression
   name: (variable_name) @variable.other.method.php
   (#set! capture.final true))
+(nullsafe_member_call_expression
+  name: (variable_name) @variable.other.method.php
+  (#set! capture.final true))
 
 ; The "$bar" in `$foo->$bar`.
 (member_access_expression
+  name: (variable_name) @variable.other.property.php
+  (#set! capture.final true))
+; The "$bar" in `$foo->$bar`.
+(nullsafe_member_access_expression
   name: (variable_name) @variable.other.property.php
   (#set! capture.final true))
 
@@ -408,7 +420,11 @@
 (const_declaration (const_element) @variable.other.constant.php)
 
 ((name) @constant.language.php
- (#match? @constant.language.php "^__[A-Z][A-Z\d_]+__$"))
+  (#match? @constant.language.php "\\b(__(FILE|DIR|FUNCTION|CLASS|METHOD|LINE|NAMESPACE)__|ON|OFF|YES|NO|NL|BR|TAB)\\b")
+  (#set! capture.final))
+
+((name) @constant.language.php
+  (#match? @constant.language.php "^__[A-Z][A-Z\d_]+__$"))
 
 (argument
   name: (_) @variable.other.named-argument.php
@@ -489,7 +505,33 @@
 ; =========
 
 (boolean) @constant.language.boolean._TEXT_.php
+
+; In PHP, `true` is technically no different from `TRUE` or `True`; they appear
+; to be implemented as case-insensitive language constants. `tree-sitter-php`
+; treats `true` as a `boolean` node, but `TRUE` and `True` as `name` nodes.
+;
+; This is silly — but, as usual, the origin of the silliness is PHP.
+;
+; `#match?` is case-sensitive and there's no way to opt out of that. At some
+; point in the future, we might be able to fix that by defining a custom
+; predicate for case-insensitive `#match?`; for now we'll just write a silly
+; regex.
+
+((name) @constant.language.boolean.true.php
+  (#match? @constant.language.boolean.true.php "^[Tt][Rr][Uu][Ee]$")
+  (#set! capture.final))
+
+((name) @constant.language.boolean.false.php
+  (#match? @constant.language.boolean.false.php "^[Ff][Aa][Ll][Ss][Ee]$")
+  (#set! capture.final))
+
 (null) @constant.language.null.php
+
+; Likewise, `null` is a case-insensitive constant. `NULL` and `null` are common;
+; others are less common, but we might as well cover them.
+((name) @constant.language.null.php
+  (#match? @constant.language.null.php "^[Nn][Uu][Ll][Ll]")
+  (#set! capture.final))
 
 (integer) @constant.numeric.decimal.integer.php
 (float) @constant.numeric.decimal.float.php
@@ -608,6 +650,7 @@
 ] @keyword.operator.assignment.compound.php
 
 "->" @keyword.operator.class.php
+"?->" @keyword.operator.class.null-safe.php
 "=>" @punctuation.separator.key-value.php
 
 "\\" @keyword.operator.namespace.php

@@ -1,22 +1,45 @@
 
 
-; NOTE: `tree-sitter-css` recovers poorly from invalidity inside a block when
-; you're adding a new property-value pair above others in a list. When the user
-; is typing and the file is temporarily invalid, it will make incorrect guesses
-; about tokens that occur between the cursor and the end of the block.
+; WORKAROUNDS
+; ===========
+
+; Mark `ERROR` nodes that occur inside blocks. We are much more cautious about
+; inferences inside blocks because we're often wrong.
+(
+  (ERROR) @_IGNORE_
+  (#is? test.childOfType "block")
+  (#set! isErrorInsideBlock true)
+)
+
+; (stylesheet (ERROR)) can't be queried directly, but it's important that we be
+; able to detect it.
+(
+  (ERROR) @_IGNORE_
+  (#is? test.childOfType "stylesheet")
+  (#set! isErrorAtTopLevel true)
+)
+
+; This selector captures an empty file with (e.g.) the word `div` typed.
+(ERROR
+  (identifier) @entity.name.tag.css
+  (#set! capture.final)
+  (#is? test.descendantOfNodeWithData isErrorAtTopLevel)
+)
+
+; When there's a parsing error inside a `block` node, too many things get
+; incorrectly interpreted as `tag_name`s. Ignore all `tag_name` nodes until the
+; error is resolved.
 ;
-; The fix here is for `tree-sitter-css` to get better at recovering from its
-; parsing error, but parser authors don't currently have much control over
-; that. In the meantime, this query is a decent mitigation: it colors the
-; affected tokens like plain text instead of assuming (nearly always
-; incorrectly) them to be tag names.
+; This should be fixed upstream because it has undesirable effects on nested
+; selectors, but in the meantime this workaround is better than doing nothing.
 ;
-; Ideally, this is temporary, and we can remove it soon. Until then, it makes
-; syntax highlighting less obnoxious.
+; Keep an eye on https://github.com/tree-sitter/tree-sitter-css/issues/65 to
+; know when this workaround might no longer be necessary.
 
 ((tag_name) @_IGNORE_
-  (#is? test.descendantOfType "ERROR")
+  (#is? test.descendantOfNodeWithData isErrorInsideBlock)
   (#set! capture.final))
+
 
 (ERROR
   (attribute_name) @_IGNORE_
@@ -26,8 +49,6 @@
   (attribute_name) @invalid.illegal)
   (#set! capture.final))
 
-; WORKAROUND:
-;
 ; In `::after`, the "after" has a node type of `tag_name`. Unclear whether this
 ; is a bug or intended behavior. We want to catch it here so that it doesn't
 ; get scoped like an HTML tag name in a selector.
@@ -38,7 +59,7 @@
   (#set! adjust.startAt lastChild.previousSibling.startPosition)
   (#set! adjust.endAt lastChild.endPosition))
 
-; Claim this range and block it from being scoped as a tag name.
+; Claim the `tag_name` range and block it from being scoped as a tag name.
 (pseudo_element_selector
   (tag_name) @_IGNORE_
   (#is? test.last true)

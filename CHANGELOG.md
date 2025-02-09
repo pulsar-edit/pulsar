@@ -6,6 +6,146 @@
 
 ## [Unreleased]
 
+## 1.125.0
+
+- The Windows installer no longer removes `pulsar` and `ppm` from your path when you update Pulsar to a newer version.
+- [spell-check] Removed `source comment` from the list of automatically checked scopes because of reports of high CPU usage. This means that Pulsar will no longer automatically perform spell-checking for all code comments in all source files. (If you liked the behavior, you can add it back to the list in the `spell-check.grammars` config setting.)
+- [language-python] Improved indentation hinting in some unusual scenarios like on one-line blocks and after code comments.
+- [language-css] Updated `tree-sitter-css` to latest. Selector handling is now much better when typing incomplete selectors in a brand-new CSS file or at the bottom of an existing file.
+- Restored functionality of [project-plus](https://web.pulsar-edit.dev/packages/project-plus) via exposing previously removed internal APIs.
+
+### Pulsar
+
+- Tree-sitter rolling fixes, 1.125 (or 1.124.1) edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1172)
+- Windows: Only remove Pulsar/PPM from PATH during uninstall [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1183)
+- CI: Retry on timeout when building macOS bins [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1178)
+- Install dependencies for CI documentation job [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1193)
+- Attempt to install dependency on new Ubuntu CI images [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1192)
+- CI: No dpkg shenanigans for package tests workflow [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1188)
+- Expose `dbPromise` in `StateStore` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1171)
+
+### pulsar-updater
+
+- Don't prompt to update on non-default release channels [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1185)
+
+### spell-check
+
+- Fixes for a possible patch release [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1173)
+
+## 1.124.0
+
+- Enhanced spellcheck to allow spellchecking on sections of a buffer. Making it possible to spellcheck comments within code, which has been enabled by default.
+- Tree-sitter fixes and enhancements for `language-c`.
+- Updated error message received when deleting a file in Linux to be more accurate.
+- Fixed error that could cause some keymaps to not appear under a package in `settings-view`.
+
+### Pulsar
+
+- CI: Add build dependencies for Linux 'test bins' job [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1165)
+- Tree-sitter rolling fixes, 1.124 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1148)
+- Fix Linux trash error message [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/1151)
+- electron-builder: Don't create differential update blockmaps [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1139)
+- CI: Update Cirrus Rolling release upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1141)
+
+#### spell-check
+
+- [spell-check] Allow the user to whitelist sections of a buffer for spellchecking on a per-language basis. [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1147)
+
+#### settings-view
+
+- [settings-view] Fix Package keymap compatibility check [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1161)
+
+## 1.123.0
+
+- Fixed SQL State Storage not loading when starting Pulsar from a self-contained binary like appImage, tar.gz, etc.
+- [symbols-view] Allow project-wide symbol search to consider results from more than one provider.
+- Tree-sitter fixes and enhancements for hyperlinks, C, and shell scripts.
+- Restore use of `shell.moveItemToTrash` API in tree-view, for Electron 12 compatibility.
+
+### Pulsar
+
+- Tree-sitter rolling fixes, 1.123 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1118)
+- [symbols-view] Allow project-wide symbol searches to consider multiple providers [@savetheclocktower](github.com/pulsar-edit/pulsar/pull/1133)
+- electron-builder: Fix race condition when preparing to copy binaries [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1137)
+- [ci] Update GitHub Token in CirrusCI config [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1134)
+- Fixing requiring of better-sqlite3 [@mauricioszabo](github.com/pulsar-edit/pulsar/pull/1122)
+- Revert removal of `shell.moveItemToTrash` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1125)
+- CI: Bump macOS runner images from macos-12 to macos-13 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1120)
+
+## 1.122.0
+
+- Added a SQL State Storage alternative to IndexedDB (opt-in, off by default).
+- Repackaged the AppImage so it uses our launcher script internally (supports more CLI/launch flags).
+- [language-php] Highlighted “null-safe” property access correctly.
+- [language-c] Scoped template delimiters properly in C++.
+- [language-c] Consolidated common highlighting queries between the C and C++ grammars for more consistency in syntax highlighting.
+- Fixed incorrect behavior in certain scenarios for “Fold at Indent Level X” commands.
+- Fixed exception when resolving divided folds (e.g., `#ifdefs` in C/C++).
+- Avoided "length of null" error in autocomplete-plus for the PHP Tree-sitter grammar.
+- Preserved `/usr/bin/pulsar` and `/usr/bin/ppm` on RPM updates.
+- [tree-view] Moved to a more modern API for file removal in preparation for an Electron upgrade.
+
+### Pulsar
+
+- Added: Adding a SQL State Storage instead of IndexedDB [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/917)
+- Fixed: Fix AppImage executable [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1069)
+- Fixed: Tree-sitter rolling fixes, 1.122 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1101)
+- Fixed: Fix reading error of length property on null [@Digitalone1](https://github.com/pulsar-edit/pulsar/pull/1058)
+- Fixed: Preserve `/usr/bin/pulsar` and `/usr/bin/ppm` on RPM updates [@am97](https://github.com/pulsar-edit/pulsar/pull/1091)
+- Updated: [tree-view] Remove deprecated usage of `shell.moveItemToTrash` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1109)
+
+
+## 1.121.0
+
+- Updated `web-tree-sitter` to version 0.23.0.
+- [language-css] Updated `tree-sitter-css` to the latest version.
+- [language-gfm] Updated `tree-sitter-markdown` to the latest version.
+- [language-html] Updated `tree-sitter-html` and `tree-sitter-embedded-template` to their latest versions.
+- [language-javascript] Updated `tree-sitter-javascript` to the latest version.
+- [language-typescript] Updated `tree-sitter-typescript` to the latest version.
+- Added a new `@match.next` capture for advanced control of how indentation should change from one line to the next.
+- Added new indentation-specific query predicates `indent.matchesComparisonRow` and `indent.matchesCurrentRow` for comparing arbitrary positions in a Tree-sitter node tree to the operative rows in an indentation suggestion query. Makes it possible to say things like “decrease the indent on line 10 if a statement ends on line 9.”
+- Renamed indentation directives `indent.matchIndentOf` and `indent.offsetIndent` to `indent.match` and `indent.offset`, respectively. The old names still work as aliases.
+- Improved the command-line `pulsar` script’s ability to find the user’s Pulsar installation location on Linux.
+- On macOS and Linux, `pulsar -p` now invokes `ppm` without having to launch Pulsar itself.
+- Added options to the Windows installer to add Pulsar and PPM to the PATH
+- Fixed `ppm rebuild` command on ARM (Apple Silicon) Macs
+
+### Pulsar
+
+- Fixed: Tree-sitter rolling fixes: 1.121 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1085)
+- Updated: Update ppm to commit 97f4d201be013157756a76008bf0cb55e6a1fe35 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1094)
+- Fixed: Experiment: Redirect `-p`/`--package` to `ppm` via `pulsar.sh`… [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1066)
+- Added: [windows] Add PATH manipulation to Pulsar installer [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1071)
+- Updated: CI: Update Cirrus Rolling upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1086)
+
+### PPM
+
+- Fixed: Remove hard-coded architecture on Mac [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/141)
+- Updated: Begin less reliance on `async` package: Await as we go [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/134)
+
+## 1.120.0
+
+- Resolved some issues of using `pulsar -p` to access `ppm` in the command line on Windows.
+- Added a new icon for Pulsar on Windows, increasing it's visual fidelity in most locations.
+- [snippets] Fixed an issue with expanding snippet variables in certain scenarios if the snippet inserted new lines into the buffer.
+- Updated misconfigured links in the `CONTRIBUTING.md` file.
+- [ppm] Resolved an issue that could prevent renaming an existing package.
+- Various Tree-sitter improvements (folds, indents, custom queries, grammar updates...)
+
+### Pulsar
+- Fixed: Tree-sitter rolling fixes 1.120 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1062)
+- Updated: ppm: Update ppm to commit d9bcff111146547e1f4dec63 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1075)
+- Fixed: [snippets] Fix incorrect range traversal when resolving variables [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1043)
+- Added: [windows] Improve Icon [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1072)
+- Added: Use a different strategy for `pulsar -p` on Windows... [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1063)
+- Fixed: CONTRIBUTING.MD link to section fixed [@gsabatini2016](https://github.com/pulsar-edit/pulsar/pull/1067)
+
+### PPM
+- Fixed: Fix incorrect behavior on package rename [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/135)
+- Updated: Update many dependencies [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/133)
+- Revert: Revert "CI: Work around a weird bug in Yarn v1.x" [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/131)
+
 ## 1.119.0
 
 - Changed `language-php` to continue syntax-highlighting even when encountering unbalanced PHP tags. (Avoid throwing a syntax error)
