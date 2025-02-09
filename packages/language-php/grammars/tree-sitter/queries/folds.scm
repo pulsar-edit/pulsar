@@ -8,4 +8,5 @@
   (compound_statement)
   (switch_block)
   (declaration_list)
+  (array_creation_expression)
 ] @fold
