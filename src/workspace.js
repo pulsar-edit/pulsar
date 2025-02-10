@@ -713,7 +713,7 @@ module.exports = class Workspace extends Model {
       );
     }
     if (itemTitle == null) {
-      itemTitle = 'untitled';
+      itemTitle = atom.i18n.t("pulsar.src.workspace.untitled");
     }
     if (projectPath == null) {
       projectPath = itemPath ? path.dirname(itemPath) : projectPaths[0];
@@ -1419,7 +1419,7 @@ module.exports = class Workspace extends Model {
           return Promise.resolve();
         case 'EACCES':
           this.notificationManager.addWarning(
-            `Permission denied '${error.path}'`
+            atom.i18n.t("pulsar.src.workspace.permission-denied", { location: error.path })
           );
           return Promise.resolve();
         case 'EPERM':
@@ -1434,7 +1434,7 @@ module.exports = class Workspace extends Model {
         case 'ENOTDIR':
         case 'EAGAIN':
           this.notificationManager.addWarning(
-            `Unable to open '${error.path != null ? error.path : uri}'`,
+            atom.i18n.t("pulsar.src.workspace.unable-to-open", { location: error.path != null ? error.path : uri }),
             { detail: error.message }
           );
           return Promise.resolve();
@@ -1465,10 +1465,12 @@ module.exports = class Workspace extends Model {
       await new Promise((resolve, reject) => {
         this.applicationDelegate.confirm(
           {
-            message:
-              'Pulsar will be unresponsive during the loading of very large files.',
-            detail: 'Do you still want to load this file?',
-            buttons: ['Proceed', 'Cancel']
+            message: atom.i18n.t("pulsar.src.workspace.large-file-warning:message"),
+            detail: atom.i18n.t("pulsar.src.workspace.large-file-warning:detail"),
+            buttons: [
+              atom.i18n.t("pulsar.commons.proceed"),
+              atom.i18n.t("pulsar.commons.cancel")
+            ]
           },
           response => {
             if (response === 1) {
@@ -2298,9 +2300,9 @@ module.exports = class Workspace extends Model {
       if (this.config.get('editor.confirmCheckoutHeadRevision')) {
         this.applicationDelegate.confirm(
           {
-            message: 'Confirm Checkout HEAD Revision',
-            detail: `Are you sure you want to discard all changes to "${editor.getFileName()}" since the last Git commit?`,
-            buttons: ['OK', 'Cancel']
+            message: atom.i18n.t("pulsar.src.workspace.confirm-checkout-head-revision:message"),
+            detail: atom.i18n.t("pulsar.src.workspace.confirm-checkout-head-revision:detail", { fileName: editor.getFileName() }),
+            buttons: [atom.i18n.t("pulsar.commons.ok"), atom.i18n.t("pulsar.commons.cancel")]
           },
           response => {
             if (response === 0) checkoutHead();

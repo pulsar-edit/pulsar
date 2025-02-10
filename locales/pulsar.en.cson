@@ -10,4 +10,40 @@
   'context-menu': {
     'core:undo': 'Undo'
   }
+  'src': {
+    'theme-manager': {
+      'unable-to-watch-path-error': '''
+                                    Unable to watch path: `{path}`. Make sure
+                                    you have permissions to `{fullPath}`.
+
+                                    On linux there are currently problems with watch sizes. See
+                                    [this document][watches] for more info.
+                                    [watches]:https://pulsar-edit.dev/docs/atom-archive/hacking-atom/#typeerror-unable-to-watch-path
+                                    '''
+                                    # TODO: Update the above to Pulsar docs if we choose to add this
+     'compile-stylesheet-error:message': 'Error compiling Less stylesheet: `{path}`'
+     'compile-stylesheet-error:detail': 'Line number: {line}\n{message}'
+     'load-stylesheet-error': 'Error loading Less stylesheet: `{path}`'
+    }
+    'window-event-handler': {
+      'menu-bar-hidden:title': 'Menu bar hidden'
+      'menu-bar-hidden:message': 'To toggle, press the Alt key or execute the window:toggle-menu-bar command'
+    }
+    'workspace': {
+      'untitled': 'untitled'
+      'permission-denied': 'Permission denied \'{location}\''
+      'unable-to-open': 'Unable to open \'{location}\''
+      'large-file-warning:message': 'Pulsar will be unresponsive during the loading of very large files.'
+      'large-file-warning:detail': 'Do you still want to load this file?'
+      'confirm-checkout-head-revision:message': 'Confirm Checkout HEAD Revision'
+      'confirm-checkout-head-revision:detail': 'Are you sure you want to discard all changes to "{fileName}" since the last Git commit?'
+    }
+  }
+  # The commons section allows us to define common/simple strings that can be reused
+  # by community packages. We should guarantee their stability to always be the same thing
+  'commons': {
+    'proceed': 'Proceed'
+    'ok': 'OK'
+    'cancel': 'Cancel'
+  }
 }

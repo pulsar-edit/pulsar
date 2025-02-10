@@ -243,14 +243,10 @@ module.exports = class ThemeManager {
         this.userStylesheetFile.onDidDelete(reloadStylesheet)
       );
     } catch (error) {
-      const message = `\
-Unable to watch path: \`${path.basename(userStylesheetPath)}\`. Make sure
-you have permissions to \`${userStylesheetPath}\`.
-
-On linux there are currently problems with watch sizes. See
-[this document][watches] for more info.
-[watches]:https://pulsar-edit.dev/docs/atom-archive/hacking-atom/#typeerror-unable-to-watch-path
-`; //TODO: Update the above to Pulsar docs if we choose to add this
+      const message = atom.i18n.t("pulsar.src.theme-manager.unable-to-watch-path-error", {
+        path: path.basename(userStylesheetPath),
+        fullPath: userStylesheetPath
+      });
       this.notificationManager.addError(message, { dismissable: true });
     }
 
@@ -344,10 +340,10 @@ On linux there are currently problems with watch sizes. See
           error.line -= 2;
         }
 
-        message = `Error compiling Less stylesheet: \`${lessStylesheetPath}\``;
-        detail = `Line number: ${error.line}\n${error.message}`;
+        message = atom.i18n.t("pulsar.src.theme-manager.compile-stylesheet-error:message", { path: lessStylesheetPath });
+        detail = atom.i18n.t("pulsar.src.theme-manager.compile-stylesheet-error:detail", { line: error.line, message: error.message });
       } else {
-        message = `Error loading Less stylesheet: \`${lessStylesheetPath}\``;
+        message = atom.i18n.t("pulsar.src.theme-manager.load-stylesheet-error", { path: lessStylesheetPath });
         detail = error.message;
       }
 
