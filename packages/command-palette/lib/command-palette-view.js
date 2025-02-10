@@ -239,7 +239,7 @@ export default class CommandPaletteView {
       tagsEl.appendChild(tagEl)
       if (i < matchingTags.length - 1) {
         const commaSpace = document.createElement('span')
-        commaSpace.textContent = ', '
+        commaSpace.textContent = atom.i18n.t("command-palette.commandPaletteView.matchingTags");
         tagsEl.appendChild(commaSpace)
       }
     })
