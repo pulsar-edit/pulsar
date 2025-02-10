@@ -554,15 +554,15 @@ describe('ContextMenuManager', function() {
       expect(contextMenu.templateForEvent(dispatchedEvent)).toEqual([
         {
           label: 'Hello Pulsar',
-          id: `Parent`,
+          id: 'Hello Pulsar',
           submenu: [
             {
-              label: 'My Other Command',
-              id: 'My Other Command',
+              label: 'Goodbye Pulsar',
+              id: 'Goodbye Pulsar',
               command: 'test:my-other-command'
             },
             {
-              label: 'Goodbye Pulsar',
+              label: 'My Command',
               id: 'My Command',
               command: 'test:my-command',
               after: ['test:my-other-command']
