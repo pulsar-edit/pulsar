@@ -81,7 +81,13 @@ module.exports = class AtomWindow extends EventEmitter {
       options.titleBarStyle = 'hiddenInset';
     if (this.shouldHideTitleBar()) options.frame = false;
 
-    if(this.atomApplication.config.get('core.allowWindowTransparency')){
+    // Enabling window transparency creates several downstream issues relating
+    // to management of window size and maximixed state.
+    //
+    // Hence this option was removed from the config schema because it's a
+    // footgun, but we've left it in for those users who really know what
+    // they're doing.
+    if (this.atomApplication.config.get('core.allowWindowTransparency')){
       options.transparent = true;
     }
 
