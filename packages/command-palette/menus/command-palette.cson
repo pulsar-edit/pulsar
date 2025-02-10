@@ -1,21 +1,21 @@
 'menu': [
   {
-    'label': 'View'
+    'label': '%command-palette.menu.view%'
     'submenu': [
       {
-        'label': 'Toggle Command Palette'
+        'label': '%command-palette.menu.view:command-palette:toggle%'
         'command': 'command-palette:toggle'
       }
     ]
   }
   {
-    'label': 'Packages'
+    'label': '%command-palette.menu.packages%'
     'submenu': [
       {
-        'label': 'Command Palette',
+        'label': '%command-palette.menu.packages:command-palette%',
         'submenu': [
           {
-            'label': 'Toggle'
+            'label': '%command-palette.menu.packages:commnd-palette:toggle%'
             'command': 'command-palette:toggle'
           }
         ]

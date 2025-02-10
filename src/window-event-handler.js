@@ -294,9 +294,9 @@ module.exports = class WindowEventHandler {
     );
 
     if (this.atomEnvironment.config.get('core.autoHideMenuBar')) {
-      const detail =
-        'To toggle, press the Alt key or execute the window:toggle-menu-bar command';
-      this.atomEnvironment.notifications.addInfo('Menu bar hidden', { detail });
+      const detail = atom.i18n.t("pulsar.src.window-event-handler.menu-bar-hidden:message");
+      this.atomEnvironment.notifications.addInfo(
+        atom.i18n.t("pulsar.src.window-event-handler.menu-bar-hidden:title"), { detail });
     }
   }
 
