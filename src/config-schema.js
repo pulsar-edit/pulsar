@@ -20,20 +20,19 @@ const configSchema = {
           type: 'string'
         },
         description:
-          'List of [glob patterns](https://en.wikipedia.org/wiki/Glob_%28programming%29). Files and directories matching these patterns will be ignored by some packages, such as the fuzzy finder and tree view. Individual packages might have additional config settings for ignoring names.'
+          '%pulsar.config.ignoredNames.description%'
       },
       excludeVcsIgnoredPaths: {
         type: 'boolean',
         default: true,
         title: '%pulsar.config.excludeVcsIgnoredPaths.title%',
-        description:
-          "Files and directories ignored by the current project's VCS will be ignored by some packages, such as the fuzzy finder and find and replace. For example, projects using Git have these paths defined in the .gitignore file. Individual packages might have additional config settings for ignoring VCS ignored files and folders."
+        description: '%pulsar.config.excludeVcsIgnoredPaths.description%'
       },
       followSymlinks: {
         type: 'boolean',
         default: true,
         description:
-          'Follow symbolic links when searching files and when opening files with the fuzzy finder.'
+          '%pulsar.config.followSymlinks.description%'
       },
       disabledPackages: {
         type: 'array',
@@ -44,14 +43,14 @@ const configSchema = {
         },
 
         description:
-          'List of names of installed packages which are not loaded at startup.'
+          '%pulsar.config.disabledPackages.description%'
       },
       titleBar: {
         type: 'string',
         default: 'native',
         enum: ['native', 'hidden'],
         description:
-          'Experimental:  The title bar can  be completely `hidden`.<br>This setting will require a relaunch of Pulsar to take effect.'
+          '%pulsar.config.titleBar.description%'
       },
       versionPinnedPackages: {
         type: 'array',
@@ -62,13 +61,13 @@ const configSchema = {
         },
 
         description:
-          'List of names of installed packages which are not automatically updated.'
+          '%pulsar.config.versionPinnedPackages.description%'
       },
       customFileTypes: {
         type: 'object',
         default: {},
         description:
-          'Associates scope names (e.g. `"source.js"`) with arrays of file extensions and file names (e.g. `["Somefile", ".js2"]`)',
+          '%pulsar.config.customFileTypes.description%',
         additionalProperties: {
           type: 'array',
           items: {
@@ -80,21 +79,21 @@ const configSchema = {
         type: 'string',
         default: 'prompt',
         description:
-          'When should Pulsar register itself as the default handler for atom:// URIs',
+          '%pulsar.config.uriHandlerRegistration.description%',
         enum: [
           {
             value: 'prompt',
             description:
-              'Prompt to register Pulsar as the default atom:// URI handler'
+              '%pulsar.config.uriHandlerRegistration.prompt.description%'
           },
           {
             value: 'always',
             description:
-              'Always become the default atom:// URI handler automatically'
+              '%pulsar.config.uriHandlerRegistration.always.description%'
           },
           {
             value: 'never',
-            description: 'Never become the default atom:// URI handler'
+            description: '%pulsar.config.uriHandlerRegistration.never.description%'
           }
         ]
       },
@@ -105,37 +104,35 @@ const configSchema = {
           type: 'string'
         },
         description:
-          'Names of UI and syntax themes which will be used when Pulsar starts.'
+          '%pulsar.config.themes.description%'
       },
       audioBeep: {
         type: 'boolean',
         default: true,
-        description:
-          "Trigger the system's beep sound when certain actions cannot be executed or there are no results."
+        description: '%pulsar.config.audioBeep.description%'
       },
       closeDeletedFileTabs: {
         type: 'boolean',
         default: false,
-        title: 'Close Deleted File Tabs',
+        title: '%pulsar.config.closeDeletedFileTabs.title%',
         description:
-          'Close corresponding editors when a file is deleted outside Pulsar.'
+          '%pulsar.config.closeDeletedFileTabs.description%'
       },
       destroyEmptyPanes: {
         type: 'boolean',
         default: true,
-        title: 'Remove Empty Panes',
+        title: '%pulsar.config.destroyEmptyPanes.title%',
         description:
-          'When the last tab of a pane is closed, remove that pane as well.'
+          '%pulsar.config.destroyEmptyPanes.description%'
       },
       closeEmptyWindows: {
         type: 'boolean',
         default: true,
-        description:
-          "When a window with no open tabs or panes is given the 'Close Tab' command, close that window."
+        description: '%pulsar.config.closeEmptyWindows.description%'
       },
       fileEncoding: {
         description:
-          'Default character set encoding to use when reading and writing files.',
+          '%pulsar.config.fileEncoding.description%',
         type: 'string',
         default: 'utf8',
         enum: [
@@ -303,7 +300,7 @@ const configSchema = {
       },
       openEmptyEditorOnStart: {
         description:
-          'When checked opens an untitled editor when loading a blank environment (such as with _File > New Window_ or when "Restore Previous Windows On Start" is unchecked); otherwise no editor is opened when loading a blank environment. This setting has no effect when restoring a previous state.',
+          '%pulsar.config.openEmptyEditorOnStart.description%',
         type: 'boolean',
         default: true
       },
@@ -312,68 +309,68 @@ const configSchema = {
         enum: ['no', 'yes', 'always'],
         default: 'yes',
         description:
-          "When selected 'no', a blank environment is loaded. When selected 'yes' and Pulsar is started from the icon or `pulsar` by itself from the command line, restores the last state of all Pulsar windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Pulsar windows always, no matter how Pulsar is started."
+          "%pulsar.config.restorePreviousWindowsOnStart.description%"
       },
       reopenProjectMenuCount: {
         description:
-          'How many recent projects to show in the Reopen Project menu.',
+          '%pulsar.config.reopenProjectMenuCount.description%',
         type: 'integer',
         default: 15
       },
       automaticallyUpdate: {
         description:
-          'Automatically update Pulsar when a new release is available. **Note**: Currently not functional, please download new releases from [pulsar-edit.dev](https://pulsar-edit.dev/download.html)',
+          '%pulsar.config.automaticallyUpdate.description%',
         type: 'boolean',
         default: false
       },
       useProxySettingsWhenCallingApm: {
         title: 'Use Proxy Settings When Calling PPM',
         description:
-          'Use detected proxy settings when calling the `pulsar -p` or `ppm` command-line tool.',
+          '%pulsar.config.useProxySettingsWhenCallingApm.description%',
         type: 'boolean',
         default: true
       },
       allowPendingPaneItems: {
         description:
-          'Allow items to be previewed without adding them to a pane permanently, such as when single clicking files in the tree view.',
+          '%pulsar.config.allowPendingPaneItems.description%',
         type: 'boolean',
         default: true
       },
       warnOnLargeFileLimit: {
         description:
-          'Warn before opening files larger than this number of megabytes.',
+          '%pulsar.config.warnOnLargeFileLimit.description%',
         type: 'number',
         default: 40
       },
       fileSystemWatcher: {
         description:
-          'Choose the underlying implementation used to watch for filesystem changes. Emulating changes will miss any events caused by applications other than Pulsar, but may help prevent crashes or freezes.',
+          '%pulsar.config.fileSystemWatcher.description%',
         type: 'string',
         default: 'native',
         enum: [
           {
             value: 'native',
-            description: 'Native operating system APIs'
+            description: '%pulsar.config.fileSystemWatcher.native.description%'
           }
         ]
       },
       useTreeSitterParsers: {
         type: 'boolean',
         default: true,
-        title: 'Use Tree-sitter Parsers',
-        description: 'Use Tree-sitter parsers for supported languages.'
+        title: '%pulsar.config.useTreeSitterParsers.title%',
+        description: '%pulsar.config.useTreeSitterParsers.description%'
       },
       useLegacyTreeSitter: {
         type: 'boolean',
         default: false,
-        title: 'Use Legacy Tree-sitter Implementation',
-        description: 'Opt into the legacy Atom Tree-sitter system instead of the modern system added by Pulsar. (We plan to remove this legacy system soon.) Has no effect unless “Use Tree-sitter Parsers” is also checked.'
+        title: '%pulsar.config.useLegacyTreeSitter.title%',
+        description: '%pulsar.config.useLegacyTreeSitter.description%'
       },
       useLegacySessionStore: {
         type: 'boolean',
         default: true,
-        title: 'Use Legacy Session Store',
-        description: 'Opt into the legacy Atom session store (IndexedDB) instead of the new SQLite backend (We plan to remove this legacy system soon).'
+        title: '%pulsar.config.useLegacySessionStore.title%',
+        description: '%pulsar.config.useLegacySessionStore.description%.'
       },
       colorProfile: {
         description:

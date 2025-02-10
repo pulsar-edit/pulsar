@@ -94,7 +94,7 @@
     }
   },
   'menu': {
-    'settings-view:view-installed-packages': 'Open Package Manager'
+    'settings-view:view-installed-packages': 'Paketmanager öffnen'
   },
   'context-menu': {
     'core:undo': 'undo'
