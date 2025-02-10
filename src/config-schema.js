@@ -411,12 +411,6 @@ const configSchema = {
         type: 'boolean',
         default: false
       },
-      allowWindowTransparency: {
-        type: 'boolean',
-        default: false,
-        title: 'Allow Window Transparency',
-        description: `Allows editor windows to be see-through. When this setting is enabled, UI themes and user stylesheets can use background colors with an alpha channel to make editor windows translucent. Takes effect after a restart of Pulsar.`
-      },
       language: {
         type: "object",
         description: "Language and Locale options. Requires a restart of Pulsar to take effect.",
