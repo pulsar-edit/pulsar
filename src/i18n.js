@@ -3,6 +3,7 @@ const fs = require("fs-plus");
 const CSON = require("season");
 const keyPathHelpers = require("key-path-helpers");
 const IntlMessageFormat = require("intl-messageformat").default;
+const { memoize } = require("@formatjs/fast-memoize");
 
 // Truncate trailing subtag, as well as single letter or digit subtags
 // which introduce private-use sequences, and extensions, and are not valid
@@ -108,6 +109,19 @@ class I18n {
     this.config = config;
     this.strings = {};
     this.localeFallbackList = null;
+
+    // Generate our INTL formatters first to speed up later calls to `IntlMessageFormat`
+    this.formatters = {
+      getNumberFormat: memoize(
+        (locale, opts) => new Intl.NumberFormat(locale, opts)
+      ),
+      getDateTimeFormat: memoize(
+        (locale, opts) => new Intl.DateTimeFormat(locale, opts)
+      ),
+      getPluralRules: memoize(
+        (locale, opts) => new Intl.PluralRules(locale, opts)
+      )
+    };
   }
 
   // Helps along with initial setup
@@ -195,9 +209,10 @@ class I18n {
       return null;
     }
 
-    const msg = new IntlMessageFormat(stringLocales[bestLocale], bestLocale);
+    const msg = new IntlMessageFormat(stringLocales[bestLocale], bestLocale, undefined, { formatters: this.formatters });
 
-    return msg.format(opts);
+    const msgFormatted = msg.format(opts);
+    return msgFormatted;
   }
 
   getT(namespace) {
