@@ -693,11 +693,7 @@ function optionToRadio (option, keyPath) {
   let description = ''
   if (option.hasOwnProperty('value')) {
     value = option.value
-    if (atom.i18n.isAutoTranslateLabel(option.description)) {
-      description = atom.i18n.translateLabel(option.description);
-    } else {
-      description = option.description;
-    }
+    description = option.description
   } else {
     value = option
     description = option
@@ -716,11 +712,7 @@ function optionToSelect (option, keyPath) {
   const optionElement = document.createElement('option')
   if (option.hasOwnProperty('value')) {
     optionElement.value = option.value
-    if (atom.i18n.isAutoTranslateLabel(option.description)) {
-      optionElement.textContent = atom.i18n.translateLabel(option.description);
-    } else {
-      optionElement.textContent = option.description;
-    }
+    optionElement.textContent = option.description
   } else {
     optionElement.value = option
     optionElement.textContent = option
