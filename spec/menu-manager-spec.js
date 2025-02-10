@@ -124,8 +124,8 @@ describe('MenuManager', function() {
       expect(menu.template).toEqual([
         {
           label: 'Hello Pulsar',
-          id: 'A',
-          submenu: [{ label: 'Goodbye Pulsar', id: 'B', command: 'b' }]
+          id: 'Hello Pulsar',
+          submenu: [{ label: 'Goodbye Pulsar', id: 'Goodbye Pulsar', command: 'b' }]
         }
       ]);
       disposable.dispose();
