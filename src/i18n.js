@@ -62,8 +62,14 @@ class I18n {
 
   // Determines if the provided locale should be loaded. Based on the user's
   // current settings.
-  static ShouldIncludeLocale(locale, primary, priorityList, fallback) {
-    const localeList = I18n.LocaleNegotiation(primary, priorityList, fallback);
+  static ShouldIncludeLocale(locale, opts = {} ) {
+    let localeList;
+
+    if (opts.localeList) {
+      localeList = opts.localeList;
+    } else {
+      localeList = I18n.LocaleNegotiation(opts.primary, opts.priorityList, opts.fallback);
+    }
 
     for (const localeListItem of localeList) {
       if (I18n.DoLocalesMatch(localeListItem, locale)) {
@@ -119,14 +125,14 @@ class I18n {
       const localeFilePath = localePath.split(".");
       // `pulsar.en-US.json` => `en-US`
       const locale = localeFilePath[localeFilePath.length - 2] ?? "";
-      if (I18n.ShouldIncludeLocale(locale)) {
+      if (this.shouldIncludeLocale(locale)) {
         this.addStrings(CSON.readFileSync(localePath) || {}, locale);
       }
     }
   }
 
   shouldIncludeLocale(locale) {
-    return I18n.ShouldIncludeLocale(locale);
+    return I18n.ShouldIncludeLocale(locale, { localeList: this.localeFallbackList });
   }
 
   addStrings(newObj, locale, stringObj = this.strings) {
