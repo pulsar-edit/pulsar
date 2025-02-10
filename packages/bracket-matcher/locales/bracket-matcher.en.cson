@@ -1,0 +1,11 @@
+'menu': {
+  'packages:label': 'Packages'
+  'packages:submenu:label': 'Bracket Matcher'
+  'go-to-matching-bracket': 'Go To Matching Bracket'
+  'select-inside-brackets': 'Select Inside Brackets'
+  'remove-brackets-from-selection': 'Remove Brackets From Selection'
+  'close-tag': 'Close Current Tag'
+  'remove-matching-brackets': 'Remove Matching Brackets'
+  'select-matching-brackets': 'Select Matching Brackets'
+  'selection:label': 'Selection'
+}
