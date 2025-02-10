@@ -45,8 +45,9 @@ if (buildMetadata != null && buildMetadata._atomMenu != null && buildMetadata._a
 // The format for use in {::add} is the same minus the `context-menu` key. See
 // {::add} for more information.
 module.exports = class ContextMenuManager {
-  constructor({keymapManager}) {
+  constructor({keymapManager, i18n}) {
     this.keymapManager = keymapManager;
+    this.i18n = i18n;
     this.definitions = {
       '.overlayer': [] // TODO: Remove once color picker package stops touching private data
     };
@@ -130,7 +131,7 @@ module.exports = class ContextMenuManager {
       if (throwOnInvalidSelector) {
         validateSelector(selector);
       }
-      const itemSet = new ContextMenuItemSet(selector, items);
+      const itemSet = new ContextMenuItemSet(selector, items, this.i18n);
       addedItemSets.push(itemSet);
       this.itemSets.push(itemSet);
     }
@@ -273,10 +274,28 @@ module.exports = class ContextMenuManager {
 };
 
 var ContextMenuItemSet = class ContextMenuItemSet {
-  constructor(selector1, items1) {
+  constructor(selector1, items1, i18n) {
     this.selector = selector1;
     this.items = items1;
     this.specificity = calculateSpecificity(this.selector);
+
+    this.i18n = i18n;
+    this.localize();
+  }
+
+  localize() {
+    for (const item of this.items) {
+      if (this.i18n.isAutoTranslateLabel(item.label)) {
+        item.label = this.i18n.translateLabel(item.label);
+      }
+      if (Array.isArray(item.submenu)) {
+        for (let i = 0; i < item.submenu.length; i++) {
+          if (this.i18n.isAutoTranslateLabel(item.submenu[i].label)) {
+            item.submenu[i].label = this.i18n.translateLabel(item.submenu[i].label);
+          }
+        }
+      }
+    }
   }
 
 };
