@@ -2,7 +2,7 @@
   {
     'label': '%bracket-matcher.menu.packages:label%'
     'submenu': [
-      'label': '%bracket-matcher.menu.packages:submenu:label%'
+      'label': '%bracket-matcher.menu.bracket-matcher:label%'
       'submenu': [
         { 'label': '%bracket-matcher.menu.go-to-matching-bracket%', 'command': 'bracket-matcher:go-to-matching-bracket' }
         { 'label': '%bracket-matcher.menu.select-inside-brackets%', 'command': 'bracket-matcher:select-inside-brackets' }

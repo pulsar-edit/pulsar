@@ -1,6 +1,6 @@
 'menu': {
   'packages:label': 'Packages'
-  'packages:submenu:label': 'Bracket Matcher'
+  'bracket-matcher:label': 'Bracket Matcher'
   'go-to-matching-bracket': 'Go To Matching Bracket'
   'select-inside-brackets': 'Select Inside Brackets'
   'remove-brackets-from-selection': 'Remove Brackets From Selection'
