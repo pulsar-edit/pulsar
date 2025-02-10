@@ -288,6 +288,13 @@ var ContextMenuItemSet = class ContextMenuItemSet {
       if (this.i18n.isAutoTranslateLabel(item.label)) {
         item.label = this.i18n.translateLabel(item.label);
       }
+      if (Array.isArray(item.submenu)) {
+        for (let i = 0; i < item.submenu.length; i++) {
+          if (this.i18n.isAutoTranslateLabel(item.submenu[i].label)) {
+            item.submenu[i].label = this.i18n.translateLabel(item.submenu[i].label);
+          }
+        }
+      }
     }
   }
 
