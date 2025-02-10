@@ -1,16 +1,16 @@
 'menu': [
   {
-    'label': 'Edit'
+    'label': '%bookmarks.menu.edit:label%'
     'submenu': [
       {
-        'label': 'Bookmark'
+        'label': '%bookmarks.menu.bookmark:label%'
         'submenu': [
-          { 'label': 'View All', 'command': 'bookmarks:view-all' }
-          { 'label': 'Toggle Bookmark', 'command': 'bookmarks:toggle-bookmark' }
-          { 'label': 'Jump to Next Bookmark', 'command': 'bookmarks:jump-to-next-bookmark' }
-          { 'label': 'Jump to Previous Bookmark', 'command': 'bookmarks:jump-to-previous-bookmark' }
-          { 'label': 'Select to Next Bookmark', 'command': 'bookmarks:select-to-next-bookmark' }
-          { 'label': 'Select to Previous Bookmark', 'command': 'bookmarks:select-to-previous-bookmark' }
+          { 'label': '%bookmarks.menu.view-all%', 'command': 'bookmarks:view-all' }
+          { 'label': '%bookmarks.menu.toggle-bookmark%', 'command': 'bookmarks:toggle-bookmark' }
+          { 'label': '%bookmarks.menu.jump-to-next-bookmark%', 'command': 'bookmarks:jump-to-next-bookmark' }
+          { 'label': '%bookmarks.menu.jump-to-previous-bookmark%', 'command': 'bookmarks:jump-to-previous-bookmark' }
+          { 'label': '%bookmarks.menu.select-to-next-bookmark%', 'command': 'bookmarks:select-to-next-bookmark' }
+          { 'label': '%bookmarks.menu.select-to-previous-bookmark%', 'command': 'bookmarks:select-to-previous-bookmark' }
         ]
       }
     ]
@@ -18,6 +18,6 @@
 ]
 'context-menu': {
   'atom-text-editor': [
-    { 'label': 'Toggle bookmark', 'command': 'bookmarks:toggle-bookmark' }
+    { 'label': '%bookmarks.menu.toggle-bookmark%', 'command': 'bookmarks:toggle-bookmark' }
   ]
 }

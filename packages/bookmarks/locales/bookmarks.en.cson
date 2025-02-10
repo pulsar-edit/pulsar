@@ -1,0 +1,14 @@
+'bookmarksView': {
+  'no-bookmarks-found': 'No bookmarks found'
+  'untitled': 'Untitled'
+}
+'menu': {
+  'edit:label': 'Edit'
+  'bookmark:label': 'Bookmark'
+  'view-all': 'View All'
+  'toggle-bookmark': 'Toggle Bookmark'
+  'jump-to-next-bookmark': 'Jump to Next Bookmark'
+  'jump-to-previous-bookmark': 'Jump to Previous Bookmark'
+  'select-to-next-bookmark': 'Select to Next Bookmark'
+  'select-to-previous-bookmark': 'Select to Previous Bookmark'
+}
