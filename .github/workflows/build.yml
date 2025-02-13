@@ -101,6 +101,10 @@ jobs:
       # for this issue. At that point this additional step can be removed.
       run: npx node-gyp install ${{ env.NODE_VERSION }}
 
+    - name: Explicitly specify Python path (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      run: echo "PYTHON=\"${{env.Python_ROOT_DIR}}\python.exe\"" | Out-File -FilePath $env:GITHUB_ENV -Append
+
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
