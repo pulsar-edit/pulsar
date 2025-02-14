@@ -105,10 +105,9 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       # Temporary stuff in here just to debug
       run: |
-        Get-Command python | Format-Wide -Property Source
-        echo "PYTHON=C:\hostedtoolcache\windows\Python\3.12.8\x64\python.exe" >> $env:GITHUB_ENV
-        yarn config set python "C:\hostedtoolcache\windows\Python\3.12.8\x64\python.exe"
-        npm config set python "C:\hostedtoolcache\windows\Python\3.12.8\x64\python.exe"
+        Get-Command python3 | Format-Wide -Property Source
+        $pythonPath = (Get-Command python3)[0].Source
+        echo "PYTHON=$pythonPath" >> $env:GITHUB_ENV
 
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
