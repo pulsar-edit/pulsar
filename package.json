@@ -138,7 +138,7 @@
     "mock-spawn": "^0.2.6",
     "normalize-package-data": "3.0.2",
     "notifications": "file:./packages/notifications",
-    "nsfw": "^2.2.5",
+    "nsfw": "https://github.com/Axosoft/nsfw#b3308a9fcff0a0c4b0b17284e4fbaa1cab8ae8d",
     "one-dark-syntax": "file:packages/one-dark-syntax",
     "one-dark-ui": "file:packages/one-dark-ui",
     "one-light-syntax": "file:packages/one-light-syntax",
