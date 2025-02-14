@@ -101,6 +101,12 @@ jobs:
       # for this issue. At that point this additional step can be removed.
       run: npx node-gyp install ${{ env.NODE_VERSION }}
 
+    - name: Explicitly specify Python path (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      run: |
+        yarn config set python "C:\hostedtoolcache\windows\Python\3.12.8\x64\python.exe"
+        npm config set python "C:\hostedtoolcache\windows\Python\3.12.8\x64\python.exe"
+
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
