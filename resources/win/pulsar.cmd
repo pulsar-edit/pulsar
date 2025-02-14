@@ -84,7 +84,7 @@ IF "%EXPECT_OUTPUT%"=="YES" (
     "%~dp0\..\%EXE_NAME%.exe" %*
   )
 ) ELSE (
-  "%~dp0\app\ppm\bin\node.exe" "%~dp0\%SCRIPT_NAME%.js" "%EXE_NAME%.exe" %*
+  "%~dp0\app\ppm\bin\node.exe" "%~dp0\%ATOM_BASE_NAME%.js" "%EXE_NAME%.exe" %*
 )
 
 REM Jump past the subroutines below.
