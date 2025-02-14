@@ -105,8 +105,8 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       # Temporary stuff in here just to debug
       run: |
-        Get-Command python
-        echo "PYTHON=C:\hostedtoolcache\windows\Python\3.12.8\x64\python.exe" >> $GITHUB_ENV
+        Get-Command python | Format-Wide
+        echo "PYTHON=C:\hostedtoolcache\windows\Python\3.12.8\x64\python.exe" >> $env:GITHUB_ENV
         yarn config set python "C:\hostedtoolcache\windows\Python\3.12.8\x64\python.exe"
         npm config set python "C:\hostedtoolcache\windows\Python\3.12.8\x64\python.exe"
 
