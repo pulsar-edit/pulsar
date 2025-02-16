@@ -470,6 +470,11 @@ module.exports = class WASMTreeSitterGrammar {
   deactivate() {
     this.registration?.dispose();
     this.subscriptions?.dispose();
+    // A new `Query` object gets instantiated for each kind of query every time
+    // a grammar activates. Make sure they're cleaned up upon deactivation.
+    for (let value of this.queryCache.values()) {
+      value.delete();
+    }
     this.queryCache.clear();
   }
 

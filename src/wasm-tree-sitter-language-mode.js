@@ -272,6 +272,15 @@ class WASMTreeSitterLanguageMode {
     this.injectionsMarkerLayer?.destroy();
     this.rootLanguageLayer = null;
     this.subscriptions?.dispose();
+
+    // Clean up all `Parser` instances created during the lifetime of this
+    // buffer.
+    for (let parsers of this.parsersByLanguage.values()) {
+      for (let parser of parsers) {
+        parser.delete();
+      }
+    }
+    this.parsersByLanguage.clear();
   }
 
   getGrammar() {
