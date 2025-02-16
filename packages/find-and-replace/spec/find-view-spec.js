@@ -2,7 +2,7 @@
 
 const path = require("path");
 
-const { genPromiseToCheck } = require('./helpers')
+const { waitForCondition } = require('./helpers')
 
 describe("FindView", () => {
   let workspaceElement, editorView, editor, findView, activationPromise;
@@ -37,7 +37,7 @@ describe("FindView", () => {
     editor = atom.workspace.getCenter().getActiveTextEditor();
     editorView = editor.element;
 
-    activationPromise = atom.packages.activatePackage("find-and-replace").then(function({mainModule}) {
+    activationPromise = atom.packages.activatePackage("find-and-replace").then(function ({mainModule}) {
       mainModule.createViews();
       ({findView} = mainModule);
     });
@@ -277,7 +277,7 @@ describe("FindView", () => {
       findView.findNext(false);
 
       await atom.packages.deactivatePackage("find-and-replace");
-      activationPromise = atom.packages.activatePackage("find-and-replace").then(function({mainModule}) {
+      activationPromise = atom.packages.activatePackage("find-and-replace").then(function ({mainModule}) {
         mainModule.createViews();
         ({findView} = mainModule);
       });
@@ -315,7 +315,7 @@ describe("FindView", () => {
       expect(findView.refs.wholeWordOptionButton).toHaveClass("selected");
 
       await atom.packages.deactivatePackage("find-and-replace");
-      activationPromise = atom.packages.activatePackage("find-and-replace").then(function({mainModule}) {
+      activationPromise = atom.packages.activatePackage("find-and-replace").then(function ({mainModule}) {
         mainModule.createViews();
         ({findView} = mainModule);
       });
@@ -942,7 +942,7 @@ describe("FindView", () => {
         let openerDisposable;
 
         beforeEach(() => {
-          openerDisposable = atom.workspace.addOpener(function(pathToOpen, options) {
+          openerDisposable = atom.workspace.addOpener(function (pathToOpen, options) {
             return document.createElement("div");
           });
         });
@@ -1018,11 +1018,11 @@ describe("FindView", () => {
       it("re-runs the search", async () => {
         editor.setSelectedBufferRange([[1, 26], [1, 27]]);
         editor.insertText("");
-        await genPromiseToCheck(() => findView.refs.resultCounter.textContent.match(/5/))
+        await waitForCondition(() => findView.refs.resultCounter.textContent.match(/5/))
         expect(findView.refs.resultCounter.textContent).toEqual("5 found");
 
         editor.insertText("s");
-        await genPromiseToCheck(() => findView.refs.resultCounter.textContent.match(/6/))
+        await waitForCondition(() => findView.refs.resultCounter.textContent.match(/6/))
         expect(findView.refs.resultCounter.textContent).toEqual("6 found");
       });
 
@@ -1357,17 +1357,17 @@ describe("FindView", () => {
         expect(findView.refs.descriptionLabel.textContent).toContain("6 results");
 
         findView.findEditor.setText("");
-        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/Find in/))
+        await waitForCondition(() => findView.refs.descriptionLabel.textContent.match(/Find in/))
         expect(findView.refs.descriptionLabel.textContent).toContain("Find in Current Buffer");
         expect(findView.element).toHaveFocus();
 
         findView.findEditor.setText("sort");
-        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/5/))
+        await waitForCondition(() => findView.refs.descriptionLabel.textContent.match(/5/))
         expect(findView.refs.descriptionLabel.textContent).toContain("5 results");
         expect(findView.element).toHaveFocus();
 
         findView.findEditor.setText("items");
-        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/6/))
+        await waitForCondition(() => findView.refs.descriptionLabel.textContent.match(/6/))
         expect(findView.refs.descriptionLabel.textContent).toContain("6 results");
         expect(findView.element).toHaveFocus();
       });
@@ -1377,12 +1377,12 @@ describe("FindView", () => {
         atom.config.set("find-and-replace.liveSearchMinimumCharacters", 3);
 
         findView.findEditor.setText("");
-        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/Find in/))
+        await waitForCondition(() => findView.refs.descriptionLabel.textContent.match(/Find in/))
         expect(findView.refs.descriptionLabel.textContent).toContain("Find in Current Buffer");
         expect(findView.element).toHaveFocus();
 
         findView.findEditor.setText("ite");
-        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/6/))
+        await waitForCondition(() => findView.refs.descriptionLabel.textContent.match(/6/))
         expect(findView.refs.descriptionLabel.textContent).toContain("6 results");
         expect(findView.element).toHaveFocus();
 
@@ -1393,13 +1393,13 @@ describe("FindView", () => {
         expect(findView.element).toHaveFocus();
 
         findView.findEditor.setText("");
-        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/Find in/))
+        await waitForCondition(() => findView.refs.descriptionLabel.textContent.match(/Find in/))
         expect(findView.refs.descriptionLabel.textContent).toContain("Find in Current Buffer");
         expect(findView.element).toHaveFocus();
 
         atom.config.set("find-and-replace.liveSearchMinimumCharacters", 0);
         findView.findEditor.setText("i");
-        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/20/))
+        await waitForCondition(() => findView.refs.descriptionLabel.textContent.match(/20/))
         expect(findView.refs.descriptionLabel.textContent).toContain("20 results");
         expect(findView.element).toHaveFocus();
       });
@@ -1419,7 +1419,7 @@ describe("FindView", () => {
 
         atom.commands.dispatch(findView.findEditor.element, "find-and-replace:toggle-regex-option");
         findView.findEditor.setText("\\(.*)");
-        await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/Invalid/));
+        await waitForCondition(() => findView.refs.descriptionLabel.textContent.match(/Invalid/));
         expect(findView.refs.descriptionLabel).toHaveClass("text-error");
         expect(findView.refs.descriptionLabel.textContent).toContain("Invalid regular expression");
       });
@@ -1738,11 +1738,11 @@ describe("FindView", () => {
           expect(findView.refs.descriptionLabel.textContent).toContain("1 result");
 
           findView.findEditor.setText("nope");
-          await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/nope/))
+          await waitForCondition(() => findView.refs.descriptionLabel.textContent.match(/nope/))
           expect(findView.refs.descriptionLabel.textContent).toContain("nope");
 
           findView.findEditor.setText("zero");
-          await genPromiseToCheck(() => findView.refs.descriptionLabel.textContent.match(/zero/))
+          await waitForCondition(() => findView.refs.descriptionLabel.textContent.match(/zero/))
           expect(findView.refs.descriptionLabel.textContent).toContain("zero");
 
           atom.commands.dispatch(findView.findEditor.element, "core:move-up");
