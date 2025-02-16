@@ -100,6 +100,17 @@ jobs:
       # for this issue. At that point this additional step can be removed.
       run: npx node-gyp install ${{ env.NODE_VERSION }}
 
+    - name: Explicitly Specify Python Path (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      # The Windows image somehow gets confused about which Python it should
+      # use. Here we set the `PYTHON` env variable to whatever we get when we
+      # run `python3` in a shell, since that's the copy we used to install
+      # `setuptools` above.
+      run: |
+        Get-Command python3 | Format-Wide -Property Source
+        $pythonPath = (Get-Command python3)[0].Source
+        echo "PYTHON=$pythonPath" >> $env:GITHUB_ENV
+
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
