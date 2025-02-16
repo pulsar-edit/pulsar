@@ -66,7 +66,7 @@ describe('BufferSearch', () => {
     return ranges
       .sort((a, b) => a.compare(b))
       .map(range => range.serialize());
-  };
+  }
 
   function expectUpdateEvent() {
     expect(markersListener.callCount).toBe(1);
@@ -75,7 +75,7 @@ describe('BufferSearch', () => {
       .map(marker => marker.getBufferRange().serialize());
     expect(emittedMarkerRanges).toEqual(getHighlightedRanges());
     markersListener.reset();
-  };
+  }
 
   function expectNoUpdateEvent() {
     expect(markersListener).not.toHaveBeenCalled();
