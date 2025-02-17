@@ -1123,8 +1123,10 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         projectFindView.findEditor.setText('item');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await resultsPromise();
-        await waitForSearchResults();
+
+        await waitForCondition(() => {
+          return (getResultsView()?.refs.listView.element.querySelectorAll(".match-row").length ?? 0) >= 11
+        });
 
         const resultsView = getResultsView();
         resultsView.scrollToBottom(); // To load ALL the results
