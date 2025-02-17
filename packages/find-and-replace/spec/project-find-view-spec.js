@@ -773,6 +773,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           await waitForCondition(() => {
             return (getResultsView()?.resultRows.length ?? 0) >= 13;
           });
+          await wait(2000);
 
           const resultsView = getResultsView();
           const resultsPaneView = getExistingResultsPane();
