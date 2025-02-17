@@ -709,10 +709,9 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
 
-        // await waitForSearchResults();
-        // TEMP: Diagnosing test failure
-        await wait(1000);
-
+        await waitForCondition(() => {
+          return (getResultsView()?.refs.listView.element.querySelectorAll(".match-row").length ?? 0) >= 11
+        });
 
         const resultsView = getResultsView();
         expect(resultsView.element).toBeVisible();
@@ -765,14 +764,15 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
       describe("when results exist", () => {
         beforeEach(() => {
-          projectFindView.findEditor.setText('items')
+          projectFindView.findEditor.setText('items');
         });
 
         it("displays the results and no errors", async () => {
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          // TEMP: Diagnosing test failure
-          await wait(1000);
-          // await waitForSearchResults();
+
+          await waitForCondition(() => {
+            return getExistingResultsPane()?.refs.previewCount.textContent.includes('13 results')
+          });
 
           const resultsView = getResultsView();
           const resultsPaneView = getExistingResultsPane();
@@ -796,14 +796,18 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         });
 
         it("updates the results list when a buffer changes", async () => {
-          const editor = await atom.workspace.open('sample.js')
-
+          const editor = await atom.workspace.open('sample.js');
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await waitForSearchResults();
+
+          await waitForCondition(() => !!getExistingResultsPane());
 
           const resultsView = getResultsView();
           const listView = resultsView.refs.listView;
           const resultsPaneView = getExistingResultsPane();
+
+          await waitForCondition(() => {
+            return getExistingResultsPane()?.refs.previewCount.textContent.includes('13 results')
+          });
 
           expect(listView.element.querySelectorAll(".match-row")).toHaveLength(11);
           expect(listView.element.querySelectorAll(".match.highlight-info")).toHaveLength(13);
