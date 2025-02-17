@@ -709,7 +709,10 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
 
-        await waitForSearchResults();
+        // await waitForSearchResults();
+        // TEMP: Diagnosing test failure
+        await wait(1000);
+
 
         const resultsView = getResultsView();
         expect(resultsView.element).toBeVisible();
@@ -720,7 +723,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
     describe("when core:confirm is triggered", () => {
       beforeEach(() => {
-        atom.commands.dispatch(workspaceElement, 'project-find:show')
+        atom.commands.dispatch(workspaceElement, 'project-find:show');
       });
 
       describe("when the there search field is empty", () => {
@@ -767,7 +770,9 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
 
         it("displays the results and no errors", async () => {
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
-          await waitForSearchResults();
+          // TEMP: Diagnosing test failure
+          await wait(1000);
+          // await waitForSearchResults();
 
           const resultsView = getResultsView();
           const resultsPaneView = getExistingResultsPane();
