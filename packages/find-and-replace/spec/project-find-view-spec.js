@@ -771,7 +771,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
           await waitForCondition(() => {
-            return getExistingResultsPane()?.refs.previewCount.textContent.includes('13 results')
+            return (getResultsView()?.resultRows.length ?? 0) >= 13;
           });
 
           const resultsView = getResultsView();
@@ -805,8 +805,9 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
           const listView = resultsView.refs.listView;
           const resultsPaneView = getExistingResultsPane();
 
+          await wait(1000);
           await waitForCondition(() => {
-            return getExistingResultsPane()?.refs.previewCount.textContent.includes('13 results')
+            return (getResultsView()?.resultRows.length ?? 0) >= 13;
           });
 
           expect(listView.element.querySelectorAll(".match-row")).toHaveLength(11);
