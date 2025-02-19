@@ -1,7 +1,7 @@
 /**
   This file will manage the updating of `autocomplete-css` `completions.json`.
   We will mainly utilize `@webref/css`.listAll() function that returns a full CSS
-  list of all properties seperated by their spec shortname. An example
+  list of all properties separated by their spec shortname. An example
   of this format is defined below for ease of future modifications.
 
   Some important notes about the data contained here:
@@ -16,7 +16,7 @@
       So this should be handled by the same parser.
     - Additionally an important note is that nowhere in this data do we get any kind
       of description about the data that could lend a hand in being documentation.
-      So the documentation must be gathered seperatly. Likely the best way to collect
+      So the documentation must be gathered separately. Likely the best way to collect
       our documentation data is via `mdn/content`.
       Within `content/files/en-us/web/css` is a directory of folders titled
       by the name of properties.
@@ -85,7 +85,9 @@
   }
 */
 
+const downloadGitRepo = require("download-git-repo");
 const css = require("@webref/css");
+const elements = require("@webref/elements");
 const fs = require("fs");
 const superagent = require("superagent");
 const CSSParser = require("./cssValueDefinitionSyntaxExtractor.js");
@@ -222,7 +224,7 @@ async function buildProperties(css) {
         } else {
           // So seems this happens way more often than assumed.
           // So instead of discard a previously entered entry, we will prioritize
-          // having values accomponing it. So whoever has the longer array of
+          // having values accompanying it. So whoever has the longer array of
           // values will be used as the tiebreaker.
           if (propertyObj[prop.name].values.length < propValues.length) {
             propertyObj[prop.name] = {
@@ -234,7 +236,7 @@ async function buildProperties(css) {
         // Unfortunately the no duplication guarantee of @webref/css seems
         // inaccurate. As there are duplicate `display` definitions.
         // The first containing all the data we want, and the later containing nothing.
-        // This protects against overriding previously definied definitions.
+        // This protects against overriding previously defined definitions.
 
       }
     } // else continue our loop
@@ -252,7 +254,7 @@ async function getDescriptionOfProp(name) {
   // specs and may not be worth mentioning standalone.
   let file;
   let filePath = [ "css", "svg/attribute", "svg/element" ].map(path =>
-    `./node_modules/content/files/en-us/web/${path}/${name}/index.md`
+    `./content/files/en-us/web/${path}/${name}/index.md`
   ).find(f => fs.existsSync(f));
 
   if (filePath) {
@@ -260,7 +262,7 @@ async function getDescriptionOfProp(name) {
   }
 
   if (file) {
-    // Here we will do a quick and dirty way to parse the markdown file to retreive a raw string
+    // Here we will do a quick and dirty way to parse the markdown file to retrieve a raw string
     let breaks = file.split("---");
 
     // The first two breaks should be the yaml metadata block
@@ -270,7 +272,7 @@ async function getDescriptionOfProp(name) {
     let summaryRaw = data.split("\n");
     // In case the first few lines is an empty line break
     for (let i = 0; i < summaryRaw.length; i++) {
-      // Filtering the starting character protects agains't collecting accidental
+      // Filtering the starting character protects against collecting accidental
       // warnings or other notices within the MDN site.
       if (summaryRaw[i].length > 1 && !summaryRaw[i].startsWith("> ") && !summaryRaw[i].startsWith("« ")) {
         return summaryRaw[i]
@@ -283,6 +285,13 @@ async function getDescriptionOfProp(name) {
           .replace(/\_/g, "")
           .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, '$1');
       }
+    }
+
+    // While we have successfully found a document from MDN that contains our
+    // description, lets check if we have a manual entry for this item. So we
+    // can warn of that and allow that manual entry to be deleted.
+    if (manualPropertyDesc[name]) {
+      console.log(`A manual property description has become outdated and should be removed: '${name}'`);
     }
   } else {
     // A document doesn't yet exist, let's ensure it's not in our manual list first
@@ -378,40 +387,61 @@ function parseValueGroup(valueGroupName, allValues) {
 }
 
 async function getTagsHTML() {
-  // This will also use our dep of `mdn/content` to find all tags currently
-  // within their docs. By simply grabbing all folders of tag docs by their name
-
-  // Some of the page titles from MDN's docs don't accurately reflect what we
-  // would expect to appear. The object below is named after what the name of the
-  // folder from MDN's docs is called, whose value is then the array we would instead expect.
-  const replaceTags = {
-    "heading_elements": [ "h1", "h2", "h3", "h4", "h5", "h6" ],
-  };
+  // We use `@webref/elements` to get a full list of elements that can be
+  // targeted with CSS.
 
   let tags = [];
 
-  let files = fs.readdirSync("./node_modules/content/files/en-us/web/html/element");
+  const webrefElements = await elements.listAll();
 
-  files.forEach(file => {
-    if (file != "index.md") {
-      if (Array.isArray(replaceTags[file])) {
-        tags = tags.concat(replaceTags[file]);
-      } else {
-        tags.push(file);
+  for (const spec in webrefElements) {
+    if (webrefElements[spec].spec.title === "HTML Standard") {
+      for (const el of webrefElements[spec].elements) {
+        tags.push(el.name);
       }
     }
-  });
+  }
 
-  return tags;
+  return tags.sort();
 }
 
 async function getPseudoSelectors() {
-  // For now since there is no best determined way to collect all modern psudoselectors
-  // We will just grab the existing list for our existing `completions.json`
+  // Update pseudo selectors with `@webref/css/selectors` & `@webref/css/css-pseudo`
+  // This data seems to be excluded from `@webref/css` so we will need to
+  // collect it manually.
 
-  let existingCompletions = require("../completions.json");
+  try {
+    const res = await superagent.get("https://github.com/w3c/webref/raw/main/ed/css/selectors.json");
+    if (res.status !== 200) {
+      console.error(res);
+      process.exit(1);
+    }
 
-  return existingCompletions.pseudoSelectors;
+    const selectors = JSON.parse(res.text);
+
+    let newObj = {};
+
+    for (const item of selectors.selectors) {
+      newObj[item.name] = { description: item.prose ?? "" };
+    }
+
+    const res2 = await superagent.get("https://github.com/w3c/webref/raw/main/ed/css/css-pseudo.json");
+    if (res2.status !== 200) {
+      console.error(res2);
+      process.exit(1);
+    }
+
+    const psuedoSelectors = JSON.parse(res2.text);
+
+    for (const item of psuedoSelectors.selectors) {
+      newObj[item.name] = { description: item.prose ?? "" };
+    }
+
+    return newObj;
+  } catch(err) {
+    console.error(err);
+    process.exit(1);
+  }
 }
 
 function dedupPropValues(values) {
@@ -428,4 +458,6 @@ function dedupPropValues(values) {
   return out;
 }
 
-update(process.argv.slice(2));
+downloadGitRepo("github:mdn/content", "./content", () => {
+  update(process.argv.slice(2));
+});
