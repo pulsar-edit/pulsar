@@ -73,8 +73,9 @@ class ResultsPaneView {
   destroy() {
     this.model.setActive(false);
     this.subscriptions.dispose();
-    if(this.separatePane)
+    if (this.separatePane) {
       this.model = null;
+    }
   }
 
   render() {
@@ -115,7 +116,7 @@ class ResultsPaneView {
                 $.button(
                   {
                     ref: 'decrementLeadingContextLines',
-                    className: 'btn' + (this.model.getFindOptions().leadingContextLineCount === 0 ? ' disabled' : '')
+                    className: 'btn' + (this.model && this.model.getFindOptions().leadingContextLineCount === 0 ? ' disabled' : '')
                   }, '-'),
                 $.button(
                   {
@@ -132,7 +133,7 @@ class ResultsPaneView {
                 $.button(
                   {
                     ref: 'incrementLeadingContextLines',
-                    className: 'btn' + (this.model.getFindOptions().leadingContextLineCount >= this.searchContextLineCountBefore ? ' disabled' : '')
+                    className: 'btn' + (this.model && this.model.getFindOptions().leadingContextLineCount >= this.searchContextLineCountBefore ? ' disabled' : '')
                   }, '+')
               ) : null,
 
@@ -141,7 +142,7 @@ class ResultsPaneView {
                 $.button(
                   {
                     ref: 'decrementTrailingContextLines',
-                    className: 'btn' + (this.model.getFindOptions().trailingContextLineCount === 0 ? ' disabled' : '')
+                    className: 'btn' + (this.model && this.model.getFindOptions().trailingContextLineCount === 0 ? ' disabled' : '')
                   }, '-'),
                 $.button(
                   {
@@ -352,10 +353,10 @@ class ResultsPaneView {
     this.uri = ResultsPaneView.URI + "/" + this.model.getLastFindPattern();
     this.refs.dontOverrideTab.classList.add('disabled');
 
-    view.modelSupbscriptions.dispose();
+    view.modelSubscriptions.dispose();
     view.handleEvents.addModelHandlers();
     view.handleEventsForReplace.addReplaceModelHandlers();
-    this.separatePane=true;
+    this.separatePane = true;
   }
 }
 
