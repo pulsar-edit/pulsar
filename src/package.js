@@ -95,6 +95,7 @@ module.exports = class Package {
   preload() {
     this.loadKeymaps();
     this.loadMenus();
+    this.loadLocales();
     this.registerDeserializerMethods();
     this.activateCoreStartupServices();
     this.registerURIHandler();
@@ -130,6 +131,7 @@ module.exports = class Package {
 
         this.loadKeymaps();
         this.loadMenus();
+        this.loadLocales();
         this.loadStylesheets();
         this.registerDeserializerMethods();
         this.activateCoreStartupServices();
@@ -528,6 +530,25 @@ module.exports = class Package {
         menuPath,
         CSON.readFileSync(menuPath) || {}
       ]);
+    }
+  }
+
+  loadLocales() {
+    const localesDirPath = path.join(this.path, "locales");
+    const localesPaths = fs.listSync(localesDirPath, ["cson", "json"]);
+
+    for (const localePath of localesPaths) {
+      const localeFilePath = localePath.split(".");
+      // `package-name.en-US.json` => `en-US`
+      const locale = localeFilePath[localeFilePath.length - 2] ?? "";
+      if (atom.i18n.shouldIncludeLocale(locale)) {
+        const localeFile = CSON.readFileSync(localePath);
+        if (localeFile) {
+          const localeObj = {};
+          localeObj[this.name] = localeFile;
+          atom.i18n.addStrings(localeObj, locale);
+        }
+      }
     }
   }
 
