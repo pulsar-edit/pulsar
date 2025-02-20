@@ -3,7 +3,6 @@ const path = require('path');
 const Grim = require('grim');
 const dedent = require('dedent');
 const Parser = require('./web-tree-sitter');
-const Language = Parser.Language;
 const { CompositeDisposable, Emitter } = require('event-kit');
 const { File } = require('pathwatcher');
 const { normalizeDelimiters } = require('./comment-utils.js');
@@ -89,7 +88,7 @@ module.exports = class WASMTreeSitterGrammar {
     if (this.LANGUAGE_CACHE.has(grammarPath)) {
       return this.LANGUAGE_CACHE.get(grammarPath);
     }
-    let language = await Language.load(grammarPath);
+    let language = await Parser.Language.load(grammarPath);
     this.LANGUAGE_CACHE.set(grammarPath, language);
     return language;
   }
