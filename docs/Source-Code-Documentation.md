@@ -7,6 +7,9 @@
 </dd>
 <dt><a href="#Clipboard">Clipboard</a></dt>
 <dd></dd>
+<dt><a href="#SomeClass">SomeClass</a> ⇐ <code>AnotherClass</code></dt>
+<dd><p>Does something very important.</p>
+</dd>
 <dt><a href="#Container">Container</a></dt>
 <dd><p>A container capture. When another capture&#39;s node is contained by the
 definition capture&#39;s node, it gets added to this instance.</p>
@@ -402,6 +405,13 @@ atom.clipboard.write('hello');
 
 console.log(atom.clipboard.read());
 ```
+<a name="SomeClass"></a>
+
+## SomeClass ⇐ <code>AnotherClass</code>
+Does something very important.
+
+**Kind**: global class  
+**Extends**: <code>AnotherClass</code>  
 <a name="Container"></a>
 
 ## Container

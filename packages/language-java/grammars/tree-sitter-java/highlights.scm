@@ -177,7 +177,10 @@
 
 (throws "throws" @storage.modifier.throws.java)
 
-(method_invocation (identifier)
+(method_invocation object: (identifier)
+  @support.other.object.java)
+
+(method_invocation name: (identifier)
   @support.other.function.java)
 
 (field_access (identifier) @constant.other.java

@@ -175,7 +175,7 @@ module.exports = class ProviderBroker {
    * @returns {Promise<SymbolProvider[]>} A promise that resolves with a list
    *   of symbol providers.
    */
-  async select(meta) {
+  async select(meta, { enforceExclusivity = true } = {}) {
     let shouldLog = Config.get('enableDebugLogging');
     let exclusivesByScore = [];
     let results = [];
@@ -210,7 +210,14 @@ module.exports = class ProviderBroker {
       let { value: score } = outcome;
       let name = provider.name ?? 'unknown';
       let packageName = provider?.packageName ?? 'unknown';
-      let isExclusive = provider?.isExclusive ?? false;
+
+      // When `enforceExclusivity` is `false`, we'll treat all providers as
+      // non-exclusive, even the ones that indicate otherwise.
+      //
+      // It still falls on a provider to know whether to provide symbols or
+      // not. Any provider is free to inspect the metadata and return an empty
+      // set if it thinks it's inappropriate for its results to be considered.
+      let isExclusive = enforceExclusivity ? (provider?.isExclusive ?? false) : false;
 
       if (shouldLog)
         console.debug('Score for', provider.name, 'is:', score);

@@ -1,11 +1,69 @@
 const fs = require('fs');
 const path = require('path');
+const Grim = require('grim');
+const dedent = require('dedent');
 const Parser = require('./web-tree-sitter');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const { File } = require('pathwatcher');
 const { normalizeDelimiters } = require('./comment-utils.js');
 
 const parserInitPromise = Parser.init();
+
+function isPosition(obj) {
+  return ('row' in obj && 'column' in obj);
+}
+
+const ZERO_POINT = Object.freeze({ row: 0, column: 0 });
+
+const QUERY_CAPTURES_DEPRECATION_EXPLANATION = dedent`\
+  The \`captures\` method available on Tree-sitter query objects uses a new
+  function signature; the old signature is deprecated. The new signature is
+  \`(node, options)\`. If you want to limit a query to a specific range,
+  specify \`startPosition\` and \`endPosition\` properties within \`options\`.
+`;
+
+let didWrapQueryCaptures = false;
+
+// When `web-tree-sitter` harmonized its API with that of `node-tree-sitter`,
+// some function signatures changed. The most impactful one for us is probably
+// `Query#captures`, since two crucial positional arguments were moved into a
+// trailing options argument.
+//
+// We've changed all of our usages, but it's possible some community packages
+// won't have been able to update yet. We should emit a deprecation message in
+// those cases and restructure the arguments on the fly.
+function wrapQueryCaptures(query) {
+  didWrapQueryCaptures = true;
+  let QueryPrototype = Object.getPrototypeOf(query);
+  let originalCaptures = QueryPrototype.captures;
+  // We put `node` into its own argument so that this new function’s `length`
+  // property matches that of the old function. (Both are inaccurate, but they
+  // should nonetheless agree.)
+  QueryPrototype.captures = function captures(node, ...args) {
+    // When do we think a consumer is using the old signature?
+    if (
+      // If there are too many arguments and either the second or third
+      // argument looks like a position…
+      args.length >= 2 && (isPosition(args[0]) || isPosition(args[1])) ||
+      // …or if the second argument looks like a position instead of an options
+      // object.
+      isPosition(args[0])
+    ) {
+      Grim.deprecate(QUERY_CAPTURES_DEPRECATION_EXPLANATION);
+      let startPosition = isPosition(args[0]) ? args[0] : ZERO_POINT;
+      let endPosition = isPosition(args[1]) ? args[1] : args[0];
+      let originalOptions = args[2] ?? {};
+      let newOptions = {
+        ...originalOptions,
+        startPosition,
+        endPosition
+      };
+      return originalCaptures.call(this, node, newOptions);
+    } else {
+      return originalCaptures.call(this, node, ...args);
+    }
+  };
+}
 
 // Extended: This class holds an instance of a Tree-sitter grammar.
 module.exports = class WASMTreeSitterGrammar {
@@ -182,6 +240,7 @@ module.exports = class WASMTreeSitterGrammar {
     }).then(() => {
       this._queryFilesLoaded = true;
       this._loadQueryFilesPromise = null;
+      this.emitter.emit('did-load-query-files', this);
     });
 
     return this._loadQueryFilesPromise;
@@ -273,6 +332,15 @@ module.exports = class WASMTreeSitterGrammar {
           // if (inDevMode) { console.time(timeTag); }
           query = language.query(this[queryType]);
 
+          // We want to augment the `Query` class to add backward compatibility
+          // for the `captures` method. But since `web-tree-sitter` doesn’t
+          // export references to these inner Tree-sitter classes, we have to
+          // wait until we’re holding an instance of a `Query` and grab its
+          // prototype. Luckily, we still only have to do this once.
+          if (!didWrapQueryCaptures) {
+            wrapQueryCaptures(query);
+          }
+
           // if (inDevMode) { console.timeEnd(timeTag); }
           this.queryCache.set(queryType, query);
           resolve(query);
@@ -324,7 +392,7 @@ module.exports = class WASMTreeSitterGrammar {
     this.queryCache.delete(queryType);
     this[queryType] = contents;
     let query = await this.getQuery(queryType);
-    this.emitter.emit('did-change-query-file', { filePath: '', queryType });
+    this.emitter.emit('did-change-query', { filePath: '', queryType });
     return query;
   }
 
@@ -350,29 +418,49 @@ module.exports = class WASMTreeSitterGrammar {
             this.queryCache.delete(queryType);
             return;
           }
-          this.emitter.emit('did-change-query-file', { filePath, queryType });
+          this.emitter.emit('did-change-query', { filePath, queryType });
         });
       }));
     }
   }
 
-  // Extended: Calls `callback` when any of this grammar's query files change.
+  // Extended: Calls `callback` when any of this grammar's queries change.
   //
-  // Since a grammar’s query files won’t change during ordinary operation, this
-  // method’s main purpose is to aid the development of grammars by applying
-  // changes to query files in real time. This happens automatically when
-  // Pulsar is running in dev mode.
+  // A grammar's queries typically will not change after initial load. When
+  // they do, it may mean:
   //
-  // The callback is invoked with an object argument with two keys:
+  // - The user is editing query files in dev mode; Pulsar will automatically
+  //   reload queries in dev mode after changes.
+  // - A community package is altering a query file via an API like
+  //   {::setQueryForTest}.
   //
-  // * `callback`: The callback to be invoked. Takes one argument:
-  //   * `data`: An object with keys:
-  //     * `filePath`: The path to the query file on disk.
-  //     * `queryType`: The type of query file, as denoted by its
+  // * `callback` {Function}
+  //   * `data` {Object}
+  //     * `filePath` {String} The path to the query file on disk.
+  //     * `queryType` {String} The type of query file, as denoted by its
   //         configuration key in the grammar file. Usually one of
   //         `highlightsQuery`, `indentsQuery`, `foldsQuery`, or `tagsQuery`.
+  onDidChangeQuery(callback) {
+    return this.emitter.on('did-change-query', callback);
+  }
+
+  // Extended: Calls `callback` when any of this grammar's queries change.
+  //
+  // Alias of {::onDidChangeQuery}.
   onDidChangeQueryFile(callback) {
-    return this.emitter.on('did-change-query-file', callback);
+    return this.onDidChangeQuery(callback);
+  }
+
+  // Extended: Calls `callback` when this grammar first loads its query files.
+  //
+  // Since a grammar may not load immedately on startup, this method makes it
+  // easier to hook into the query life cycle in order to modify or augment a
+  // grammar's default queries.
+  //
+  // * callback A function with the following argument:
+  //   * grammar The {WASMTreeSitterGrammar} whose queries have loaded.
+  onDidLoadQueryFiles(callback) {
+    return this.emitter.on('did-load-query-files', callback);
   }
 
   activate() {

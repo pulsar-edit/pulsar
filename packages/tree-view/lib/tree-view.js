@@ -938,6 +938,7 @@ class TreeView {
         if (firstSelectedEntry) {
           this.selectEntry(firstSelectedEntry.closest('.directory:not(.selected)'));
         }
+
         if (atom.config.get('tree-view.squashDirectoryNames')) {
           return this.updateRoots();
         }
@@ -953,7 +954,7 @@ class TreeView {
   formatTrashEnabledMessage() {
     switch (process.platform) {
       case 'linux':
-        return 'Is `gvfs-trash` installed?';
+        return 'Do you have permission to delete, and Trash is enabled on the volume where the files are stored?';
       case 'darwin':
         return 'Is Trash enabled on the volume where the files are stored?';
       case 'win32':

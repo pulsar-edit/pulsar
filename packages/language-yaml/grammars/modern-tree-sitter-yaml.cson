@@ -6,6 +6,7 @@ parser: 'tree-sitter-yaml'
 injectionRegex: 'yml|yaml|YML|YAML'
 
 treeSitter:
+  parserSource: 'github:tree-sitter-grammars/tree-sitter-yaml#7b03feefd36b5f155465ca736c6304aca983b267'
   grammar: 'tree-sitter/tree-sitter-yaml.wasm'
   highlightsQuery: 'tree-sitter/highlights.scm'
   foldsQuery: 'tree-sitter/folds.scm'

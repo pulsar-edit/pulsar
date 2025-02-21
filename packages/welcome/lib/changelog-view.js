@@ -50,16 +50,19 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Worked around API breakage (FreeBSD <code>libiconv</code> vs GNU <code>libiconv</code>) in the <code>iconv</code> library shipped in macOS 13+
+                The Windows installer no longer removes <code>pulsar</code> and <code>ppm</code> from your path when you update Pulsar to a newer version.
               </li>
               <li>
-                Changed `language-php` to continue syntax-highlighting even when encountering unbalanced PHP tags. (Avoid throwing a syntax error)
+                [spell-check] Removed <code>source comment</code> from the list of automatically checked scopes because of reports of high CPU usage. This means that Pulsar will no longer automatically perform spell-checking for all code comments in all source files. (If you liked the behavior, you can add it back to the list in the <code>spell-check.grammars</code> config setting.)
               </li>
               <li>
-                Indentation, fold, and highlighting fixes in <code>language-python</code>, <code>language-javascript</code>, <code>language-typescript</code>, <code>language-shell</code> and <code>language-c</code>.
+                [language-python] Improved indentation hinting in some unusual scenarios like on one-line blocks and after code comments.
               </li>
               <li>
-                Fix <code>--no-sandbox</code> flag not being applied to the <code>.desktop</code> launcher on Linux (Fixes Dev Tools).
+                [language-css] Updated <code>tree-sitter-css</code> to latest. Selector handling is now much better when typing incomplete selectors in a brand-new CSS file or at the bottom of an existing file.
+              </li>
+              <li>
+                Restored functionality of <a href="https://web.pulsar-edit.dev/packages/project-plus">project-plus</a> via exposing previously removed internal APIs.
               </li>
             </ul>
 

@@ -6,7 +6,7 @@ parser: 'tree-sitter-markdown'
 injectionRegex: '^(markdown|MARKDOWN|gfm|GFM)$'
 
 treeSitter:
-  parserSource: 'github:MDeiml/tree-sitter-markdown/tree-sitter-markdown#28aa3baef73bd458d053b613b8bd10fd102b4405'
+  parserSource: 'github:tree-sitter-grammars/tree-sitter-markdown/tree-sitter-markdown#a3481e1db0b5f9aecfa7124d362a6485286a8e72'
   grammar: 'tree-sitter-markdown/tree-sitter-markdown.wasm'
   highlightsQuery: 'tree-sitter-markdown/highlights.scm'
   foldsQuery: 'tree-sitter-markdown/folds.scm'

@@ -369,6 +369,12 @@ const configSchema = {
         title: 'Use Legacy Tree-sitter Implementation',
         description: 'Opt into the legacy Atom Tree-sitter system instead of the modern system added by Pulsar. (We plan to remove this legacy system soon.) Has no effect unless “Use Tree-sitter Parsers” is also checked.'
       },
+      useLegacySessionStore: {
+        type: 'boolean',
+        default: true,
+        title: 'Use Legacy Session Store',
+        description: 'Opt into the legacy Atom session store (IndexedDB) instead of the new SQLite backend (We plan to remove this legacy system soon).'
+      },
       colorProfile: {
         description:
           "Specify whether Pulsar should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Pulsar to take effect.",
@@ -404,12 +410,6 @@ const configSchema = {
         description: 'When changing the theme within Pulsar also change the theme of the window on the operating system.',
         type: 'boolean',
         default: false
-      },
-      allowWindowTransparency: {
-        type: 'boolean',
-        default: false,
-        title: 'Allow Window Transparency',
-        description: `Allows editor windows to be see-through. When this setting is enabled, UI themes and user stylesheets can use background colors with an alpha channel to make editor windows translucent. Takes effect after a restart of Pulsar.`
       }
     }
   },
