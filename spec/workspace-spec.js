@@ -10,7 +10,7 @@ const _ = require('underscore-plus');
 const fstream = require('fstream');
 const fs = require('fs-plus');
 const AtomEnvironment = require('../src/atom-environment');
-const { conditionPromise } = require('./helpers/async-spec-helpers');
+const { conditionPromise, timeoutPromise } = require('./helpers/async-spec-helpers');
 
 describe('Workspace', () => {
   let workspace;
@@ -20,6 +20,7 @@ describe('Workspace', () => {
   let fsOpenSyncSpy;
 
   beforeEach(async () => {
+    jasmine.useRealClock();
     fsGetSizeSyncSpy ||= spyOn(fs, 'getSizeSync').and.callThrough();
     fsOpenSyncSpy ||= spyOn(fs, 'openSync').and.callThrough();
 
@@ -1324,7 +1325,7 @@ describe('Workspace', () => {
   });
 
   describe('::onDidStopChangingActivePaneItem()', () => {
-    it('invokes observers when the active item of the active pane stops changing', () => {
+    it('invokes observers when the active item of the active pane stops changing', async () => {
       const pane1 = atom.workspace.getCenter().getActivePane();
       const pane2 = pane1.splitRight({
         items: [document.createElement('div'), document.createElement('div')]
@@ -1344,7 +1345,7 @@ describe('Workspace', () => {
       pane1.activate();
       atom.workspace.getLeftDock().activate();
 
-      advanceClock(100);
+      await timeoutPromise(100);
       expect(emittedItems).toEqual([
         atom.workspace.getLeftDock().getActivePaneItem()
       ]);
@@ -2001,16 +2002,16 @@ describe('Workspace', () => {
       expect(setDocumentEdited).toHaveBeenCalledWith(true);
     });
 
-    it("calls atom.setDocumentEdited when the active item's modified status changes", () => {
+    it("calls atom.setDocumentEdited when the active item's modified status changes", async () => {
       expect(atom.workspace.getActivePaneItem()).toBe(item2);
       item2.insertText('a');
-      advanceClock(item2.getBuffer().getStoppedChangingDelay());
+      await timeoutPromise(item2.getBuffer().getStoppedChangingDelay());
 
       expect(item2.isModified()).toBe(true);
       expect(setDocumentEdited).toHaveBeenCalledWith(true);
 
       item2.undo();
-      advanceClock(item2.getBuffer().getStoppedChangingDelay());
+      await timeoutPromise(item2.getBuffer().getStoppedChangingDelay());
 
       expect(item2.isModified()).toBe(false);
       expect(setDocumentEdited).toHaveBeenCalledWith(false);
@@ -2020,8 +2021,8 @@ describe('Workspace', () => {
   describe('adding panels', () => {
     class TestItem {}
 
-    // Don't use ES6 classes because then we'll have to call `super()` which we can't do with
-    // HTMLElement
+    // Don't use ES6 classes because then we'll have to call `super()` which we
+    // can't do with HTMLElement
     function TestItemElement() {
       this.constructor = TestItemElement;
     }

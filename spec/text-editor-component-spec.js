@@ -1,4 +1,4 @@
-const { conditionPromise } = require('./helpers/async-spec-helpers');
+const { conditionPromise, timeoutPromise: wait } = require('./helpers/async-spec-helpers');
 
 const Random = require('random-seed');
 const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
@@ -1074,9 +1074,11 @@ describe('TextEditorComponent', () => {
       expect(element.className).toBe('editor a b');
       element.focus();
       await component.getNextUpdatePromise();
+      await wait(0);
       expect(element.className).toBe('editor a b is-focused');
       document.body.focus();
       await component.getNextUpdatePromise();
+      await wait(0);
       expect(element.className).toBe('editor a b');
     });
 
@@ -1696,7 +1698,7 @@ describe('TextEditorComponent', () => {
         scrollSensitivity
       });
       // stub in place for Event.preventDefault()
-      const eventPreventDefaultStub = function() {};
+      const eventPreventDefaultStub = function () {};
 
       {
         const expectedScrollTop = 20 * (scrollSensitivity / 100);
@@ -1769,7 +1771,7 @@ describe('TextEditorComponent', () => {
         scrollSensitivity
       });
       // stub in place for Event.preventDefault()
-      const eventPreventDefaultStub = function() {};
+      const eventPreventDefaultStub = function () {};
 
       component.props.platform = 'linux';
       {
@@ -4802,7 +4804,7 @@ describe('TextEditorComponent', () => {
       });
 
       it('pastes the previously selected text when clicking the middle mouse button on Linux', async () => {
-        spyOn(electron.ipcRenderer, 'send').and.callFake(function(
+        spyOn(electron.ipcRenderer, 'send').and.callFake(function (
           eventName,
           selectedText
         ) {
@@ -4856,7 +4858,7 @@ describe('TextEditorComponent', () => {
       });
 
       it('does not paste into a read only editor when clicking the middle mouse button on Linux', async () => {
-        spyOn(electron.ipcRenderer, 'send').and.callFake(function(
+        spyOn(electron.ipcRenderer, 'send').and.callFake(function (
           eventName,
           selectedText
         ) {

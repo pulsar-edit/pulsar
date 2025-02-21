@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const temp = require('temp').track();
 const AtomEnvironment = require('../src/atom-environment');
+const { timeoutPromise: wait } = require('./helpers/async-spec-helpers');
 
 describe('AtomEnvironment', () => {
   describe('window sizing methods', () => {
@@ -23,13 +24,13 @@ describe('AtomEnvironment', () => {
       beforeEach(() => (originalSize = atom.getSize()));
 
       afterEach(async () => {
-        await atom.setSize(originalSize.width, originalSize.height);
+        atom.setSize(originalSize.width, originalSize.height);
       });
 
       it('sets the size of the window, and can retrieve the size just set', async () => {
         const newWidth = originalSize.width - 12;
         const newHeight = originalSize.height - 23;
-        await atom.setSize(newWidth, newHeight);
+        atom.setSize(newWidth, newHeight);
         expect(atom.getSize()).toEqual({ width: newWidth, height: newHeight });
       });
     });
@@ -203,9 +204,14 @@ describe('AtomEnvironment', () => {
   });
 
   describe('saving and loading', () => {
-    beforeEach(() => (atom.enablePersistence = true));
+    beforeEach(() => {
+      jasmine.useRealClock();
+      atom.enablePersistence = true;
+    });
 
-    afterEach(() => (atom.enablePersistence = false));
+    afterEach(() => {
+      atom.enablePersistence = false;
+    });
 
     it('selects the state based on the current project paths', async () => {
       jasmine.useRealClock();
@@ -232,7 +238,8 @@ describe('AtomEnvironment', () => {
       expect(await atom.loadState()).toEqual({ stuff: 'cool' });
     });
 
-    it('saves state when the CPU is idle after a keydown or mousedown event', () => {
+    it('saves state when the CPU is idle after a keydown or mousedown event', async () => {
+      jasmine.useRealClock();
       const atomEnv = new AtomEnvironment({
         applicationDelegate: global.atom.applicationDelegate
       });
@@ -252,16 +259,16 @@ describe('AtomEnvironment', () => {
 
       const keydown = new KeyboardEvent('keydown');
       atomEnv.document.dispatchEvent(keydown);
-      advanceClock(atomEnv.saveStateDebounceInterval);
-      idleCallbacks.shift()();
+      await wait(atomEnv.saveStateDebounceInterval);
+      idleCallbacks.shift()?.();
       expect(atomEnv.saveState).toHaveBeenCalledWith({ isUnloading: false });
       expect(atomEnv.saveState).not.toHaveBeenCalledWith({ isUnloading: true });
 
       atomEnv.saveState.calls.reset();
       const mousedown = new MouseEvent('mousedown');
       atomEnv.document.dispatchEvent(mousedown);
-      advanceClock(atomEnv.saveStateDebounceInterval);
-      idleCallbacks.shift()();
+      await wait(atomEnv.saveStateDebounceInterval);
+      idleCallbacks.shift()?.();
       expect(atomEnv.saveState).toHaveBeenCalledWith({ isUnloading: false });
       expect(atomEnv.saveState).not.toHaveBeenCalledWith({ isUnloading: true });
 
@@ -292,13 +299,13 @@ describe('AtomEnvironment', () => {
       await atomEnv.prepareToUnloadEditorWindow();
       expect(atomEnv.saveState).toHaveBeenCalledWith({ isUnloading: true });
 
-      advanceClock(atomEnv.saveStateDebounceInterval);
+      await wait(atomEnv.saveStateDebounceInterval);
       idleCallbacks.shift()();
       expect(atomEnv.saveState.calls.count()).toBe(1);
 
       mousedown = new MouseEvent('mousedown');
       atomEnv.document.dispatchEvent(mousedown);
-      advanceClock(atomEnv.saveStateDebounceInterval);
+      await wait(atomEnv.saveStateDebounceInterval);
       idleCallbacks.shift()();
       expect(atomEnv.saveState.calls.count()).toBe(1);
 
@@ -636,6 +643,7 @@ describe('AtomEnvironment', () => {
 
   describe('::destroy()', () => {
     it('does not throw exceptions when unsubscribing from ipc events (regression)', async () => {
+      jasmine.useRealClock();
       const fakeDocument = {
         addEventListener() {},
         removeEventListener() {},
@@ -806,7 +814,7 @@ describe('AtomEnvironment', () => {
 
       beforeEach(() => {
         spyOn(atom, 'getStateKey').and.callFake(dirs => dirs.join(':'));
-        spyOn(atom, 'loadState').and.callFake(function(key) {
+        spyOn(atom, 'loadState').and.callFake(function (key) {
           if (key === __dirname) {
             return Promise.resolve(state);
           } else {
@@ -832,7 +840,7 @@ describe('AtomEnvironment', () => {
           const existingDir = path.join(__dirname, 'fixtures');
           const missingDir = path.join(__dirname, 'no');
 
-          atom.loadState.and.callFake(function(key) {
+          atom.loadState.and.callFake(function (key) {
             if (key === `${existingDir}:${missingDir}`) {
               return Promise.resolve(state);
             } else {

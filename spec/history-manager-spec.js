@@ -6,6 +6,7 @@ describe('HistoryManager', () => {
   let commandDisposable, projectDisposable;
 
   beforeEach(async () => {
+    jasmine.useRealClock();
     commandDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
     commandRegistry = jasmine.createSpyObj('CommandRegistry', ['add']);
     commandRegistry.add.and.returnValue(commandDisposable);
@@ -20,7 +21,6 @@ describe('HistoryManager', () => {
         { paths: ['/test'], lastOpened: new Date(2016, 9, 17, 11, 12, 13) }
       ]
     });
-
     projectDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
     project = jasmine.createSpyObj('Project', ['onDidChangePaths']);
     project.onDidChangePaths.and.callFake(f => {
