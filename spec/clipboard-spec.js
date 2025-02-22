@@ -38,25 +38,25 @@ describe('Clipboard', () => {
       });
     }
 
-    atom.config.set('editor.convertLineEndingOnCopy', 'off');
     it('does not convert line endings when the setting is off', () => {
+      atom.config.set('editor.convertLineEndingOnCopy', 'off');
       atom.clipboard.write('next\ndone\r\n\n');
       expect(atom.clipboard.read()).toEqual('next\ndone\r\n\n');
     });
 
-    atom.config.set('editor.convertLineEndingOnCopy', 'LF');
     it('converts line endings to LF when the setting is LF', () => {
+      atom.config.set('editor.convertLineEndingOnCopy', 'LF');
       atom.clipboard.write('next\ndone\r\n\n');
       expect(atom.clipboard.read()).toEqual('next\ndone\n\n');
     });
 
-    atom.config.set('editor.convertLineEndingOnCopy', 'CRLF');
     it('converts line endings to CRLF when the setting is CRLF', () => {
+      atom.config.set('editor.convertLineEndingOnCopy', 'CRLF');
       atom.clipboard.write('next\ndone\r\n\n');
       expect(atom.clipboard.read()).toEqual('next\r\ndone\r\n\r\n');
-    });
 
-    // Cleanup: Back to the default setting
-    atom.config.set('editor.convertLineEndingOnCopy', 'system');
+      // Cleanup: Back to the default setting
+      atom.config.set('editor.convertLineEndingOnCopy', 'system');
+    });
   });
 });
