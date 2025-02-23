@@ -8,12 +8,17 @@
 // position of the editor `expect` should be satisfied, and `testPosition`, that
 // is where in file the test actually happened. This makes it easier for us
 // to construct an error showing where EXACTLY was the assertion that failed
-function normalizeTreeSitterTextData(editor, commentRegex) {
+function normalizeTreeSitterTextData(editor, commentRegex, trailingCommentRegex) {
   let allMatches = [], lastNonComment = 0
   const checkAssert = new RegExp('^\\s*' + commentRegex.source + '\\s*[\\<\\-|\\^]')
   editor.getBuffer().getLines().forEach((row, i) => {
     const m = row.match(commentRegex)
-    if(m) {
+    if (m) {
+      if (trailingCommentRegex) {
+        row = row.replace(trailingCommentRegex, '')
+      }
+      // Strip extra space at the end of the line (but not the beginning!)
+      row = row.replace(/\s+$/, '')
       // const scope = editor.scopeDescriptorForBufferPosition([i, m.index])
       // FIXME: use editor.scopeDescriptorForBufferPosition when it works
       const scope = editor.tokensForScreenRow(i)
@@ -35,7 +40,7 @@ function normalizeTreeSitterTextData(editor, commentRegex) {
         testPosition: {row: testRow, column: col}
       }
     } else {
-      const pos = text.match(/\<-\s+(.*)/)
+      const pos = text.match(/<-\s+(.*)/)
       if(!pos) throw new Error(`Can't match ${text}`)
       return {
         expected: pos[1],
@@ -54,10 +59,10 @@ async function openDocument(fullPath) {
   return editor;
 }
 
-async function runGrammarTests(fullPath, commentRegex) {
+async function runGrammarTests(fullPath, commentRegex, trailingCommentRegex = null) {
   const editor = await openDocument(fullPath);
 
-  const normalized = normalizeTreeSitterTextData(editor, commentRegex)
+  const normalized = normalizeTreeSitterTextData(editor, commentRegex, trailingCommentRegex)
   expect(normalized.length).toSatisfy((n, reason) => {
     reason("Tokenizer didn't run correctly - could not find any comment")
     return n > 0
