@@ -40,6 +40,10 @@ module.exports = class ThemeManager {
         this.packageManager.reloadActivePackageStyleSheets()
       );
     });
+
+    this.reloadStylesheet = _.debounce(() => {
+      this.loadUserStylesheet();
+    }, 20);
   }
 
   initialize({ resourcePath, configDirPath, safeMode, devMode }) {
@@ -246,7 +250,7 @@ module.exports = class ThemeManager {
       this.userStylesheetFile = new File(userStylesheetPath);
       this.userStylesheetSubscriptions = new CompositeDisposable();
 
-      const reloadStylesheet = () => this.loadUserStylesheet();
+      const reloadStylesheet = () => this.reloadStylesheet();
 
       this.userStylesheetSubscriptions.add(
         this.userStylesheetFile.onDidChange(reloadStylesheet)
