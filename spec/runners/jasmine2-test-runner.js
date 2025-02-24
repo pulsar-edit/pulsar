@@ -12,10 +12,11 @@ const fs = require('fs-plus');
 const temp = require('temp');
 const path = require('path');
 const {ipcRenderer} = require('electron');
+const ListReporter = require('../helpers/jasmine2-list-reporter');
 
 temp.track();
 
-module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) {
+module.exports = function ({logFile, headless, testPaths, buildAtomEnvironment}) {
   // Load Jasmine 2.x
   require('../helpers/jasmine2-singleton');
   defineJasmineHelpersOnWindow(jasmine.getEnv())
@@ -208,15 +209,35 @@ const buildRetryReporter = (onCompleteCallback) => {
     },
 
     jasmineDone: () => {
-      onCompleteCallback({failedSpecs, hasDeprecations: Grim.getDeprecationsLength() > 0});
+      onCompleteCallback({
+        failedSpecs,
+        hasDeprecations: Grim.getDeprecationsLength() > 0
+      });
     }
   };
 }
 
+class Timer {
+  constructor() {
+    this.startTime = -1;
+  }
+
+  start() {
+    this.startTime = performance.now();
+  }
+
+  elapsed() {
+    return (performance.now() - this.startTime).toFixed(0);
+  }
+}
+
 const buildConsoleReporter = (logFile) => {
   let logStream;
-  if (logFile != null) { logStream = fs.openSync(logFile, 'w'); }
-  const log = function(str) {
+  if (logFile != null) {
+    logStream = fs.openSync(logFile, 'w');
+  }
+
+  const log = (str) => {
     if (logStream != null) {
       fs.writeSync(logStream, str);
     } else {
@@ -229,12 +250,19 @@ const buildConsoleReporter = (logFile) => {
       log(str);
     },
     onComplete() {
-      if (logStream != null) { fs.closeSync(logStream); }
+      if (logStream != null) {
+        fs.closeSync(logStream);
+      }
     },
     printDeprecation: (msg) => {
-      console.log(msg)
-    }
+      console.log(msg);
+    },
+    timer: new Timer()
   };
 
-  return new jasmine.ConsoleReporter(options);
+  if (process.env.ATOM_JASMINE_REPORTER === 'list') {
+    return new ListReporter(options);
+  } else {
+    return new jasmine.ConsoleReporter(options);
+  }
 };
