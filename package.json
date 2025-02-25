@@ -77,7 +77,7 @@
     "get-scrollbar-style": "https://github.com/pulsar-edit/get-scrollbar-style.git#9e8e2df",
     "git-diff": "file:packages/git-diff",
     "git-utils": "https://github.com/pulsar-edit/git-utils.git#f4e8c37",
-    "github": "https://github.com/savetheclocktower/github.git#5eb789bf93245727be3448163001c3b8866c7f2a",
+    "github": "https://github.com/savetheclocktower/github.git#812377e0d10ca58ea979746d9c7edc88cc28218f",
     "go-to-line": "file:packages/go-to-line",
     "grammar-selector": "file:packages/grammar-selector",
     "grim": "2.0.3",
