@@ -14,6 +14,10 @@ module.exports = {
   test: {},
 
   drag (e) {
+    if (e.clientX<0 || e.clientY<0) {
+      this.disableView()
+      return
+    }
     this.lastCoords = e
     const pane = this.getPaneAt(e)
     const itemView = this.getItemViewAt(e)
