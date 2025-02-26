@@ -1586,8 +1586,8 @@ class TreeView {
           // holding a lock on expanded folders and preventing them from being
           // moved or deleted.
           //
-          // TODO: This can be removed when tree-view is switched to
-          // @atom/watcher.
+          // TODO: Investigate whether this is still needed now that we're on
+          // the `watchPath` API.
           let initialPath = initialPaths[j];
           this.entryForPath(initialPath)?.collapse?.();
           if ((process.platform === 'darwin' && event.metaKey) || event.ctrlKey) {

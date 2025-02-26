@@ -13,7 +13,6 @@
   "dependencies": {
     "fs-plus": "^3.0.0",
     "minimatch": "~0.3.0",
-    "pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#567561f",
     "temp": "~0.9.0",
     "underscore-plus": "^1.0.0"
   },
