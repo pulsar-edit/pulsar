@@ -6,6 +6,30 @@
 
 ## [Unreleased]
 
+## 1.126.0
+
+- Python 3.12+ compatibility in ppm (installing packages with native C/C++ modules with Python 3.12+ on your system should "just work"TM). (Python 3.7 and older no-longer supported for installing Pulsar packages with native C/C++ modules with ppm. Does not affect anything other than installing certain Pulsar packages.)
+- PHP arrays spanning multiple lines are now foldable, as they always should have been.
+- Various dependency updates for ppm.
+- `core.allowWindowTransparency` setting is now hidden from the UI, as it has many limits and can cause unexpected issues, a situation which we inherit from the upstream Electron project. (Power-users who understand the drawbacks and still wish to enable transparency can add it to their user config files manually.)
+
+### Pulsar
+
+- CI: Compile newer Python for Cirrus ARM Linux [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1237)
+- CI: Update Rolling token for Cirrus CI [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1226)
+- ppm: Bump ppm to commit 6981ce79e0efdd9bae1fac9bd1 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1223)
+- Tree-sitter fixes, 1.126.0 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1207)
+- Specify a `PYTHON` env var on Windows so it doesn't get confused [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1220)
+- CI: Run `apt-get update` before installing Pulsar (for package tests) [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1209)
+- Remove `core.allowWindowTransparency` from the config schema [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1206)
+
+### ppm
+
+- Remove dependency on "request" package [@2colours](https://github.com/pulsar-edit/ppm/pull/149)
+- deps: Bump node-gyp to latest ^10.2.0 for Python 3.12 compat [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/137)
+- Eliminate trivial underscore [@2colours](https://github.com/pulsar-edit/ppm/pull/147)
+- chore(deps): update dependency express to v4.20.0 [security] [@renovate](https://github.com/pulsar-edit/ppm/pull/142)
+
 ## 1.125.0
 
 - The Windows installer no longer removes `pulsar` and `ppm` from your path when you update Pulsar to a newer version.

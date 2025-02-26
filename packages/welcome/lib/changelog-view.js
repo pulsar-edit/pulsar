@@ -50,19 +50,16 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                The Windows installer no longer removes <code>pulsar</code> and <code>ppm</code> from your path when you update Pulsar to a newer version.
+                Python 3.12+ compatibility in ppm (installing packages with native C/C++ modules with Python 3.12+ on your system should "just work"TM). (Python 3.7 and older no-longer supported for installing Pulsar packages with native C/C++ modules with ppm. Does not affect anything other than installing certain Pulsar packages.)
               </li>
               <li>
-                [spell-check] Removed <code>source comment</code> from the list of automatically checked scopes because of reports of high CPU usage. This means that Pulsar will no longer automatically perform spell-checking for all code comments in all source files. (If you liked the behavior, you can add it back to the list in the <code>spell-check.grammars</code> config setting.)
+                PHP arrays spanning multiple lines are now foldable, as they always should have been.
               </li>
               <li>
-                [language-python] Improved indentation hinting in some unusual scenarios like on one-line blocks and after code comments.
+                Various dependency updates for ppm.
               </li>
               <li>
-                [language-css] Updated <code>tree-sitter-css</code> to latest. Selector handling is now much better when typing incomplete selectors in a brand-new CSS file or at the bottom of an existing file.
-              </li>
-              <li>
-                Restored functionality of <a href="https://web.pulsar-edit.dev/packages/project-plus">project-plus</a> via exposing previously removed internal APIs.
+                <code>core.allowWindowTransparency</code> setting is now hidden from the UI, as it has many limits and can cause unexpected issues, a situation which we inherit from the upstream Electron project. (Power-users who understand the drawbacks and still wish to enable transparency can add it to their user config files manually.)
               </li>
             </ul>
 
