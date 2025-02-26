@@ -101,10 +101,10 @@ describe('ImageEditorView', () => {
     })
   })
 
-  describe('.adjustSize(factor)', () => {
-    it('does not allow a zoom percentage lower than 10%', () => {
-      view.adjustSize(0)
-      expect(view.refs.resetZoomButton.textContent).toBe('10%')
+  describe('.updateSize(zoom)', () => {
+    it('does not allow a zoom percentage lower than 0.1%', () => {
+      view.updateSize(0)
+      expect(view.refs.resetZoomButton.textContent).toBe('0.1%')
     })
   })
 
