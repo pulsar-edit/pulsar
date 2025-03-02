@@ -117,6 +117,7 @@ arm_linux_task:
     - python_fetch_and_build
   install_python_script:
     - cd "Python-${PYTHON_VERSION}.9" && make install
+    - python3 -m pip install setuptools
   install_script:
     - yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
