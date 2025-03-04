@@ -50,7 +50,7 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Python 3.12+ compatibility in ppm (installing packages with native C/C++ modules with Python 3.12+ on your system should "just work"TM). (Python 3.7 and older no-longer supported for installing Pulsar packages with native C/C++ modules with ppm. Does not affect anything other than installing certain Pulsar packages.)
+                Python 3.12+ compatibility in ppm (installing packages with native C/C++ modules with Python 3.12+ on your system should Just Work™). (Python 3.7 and older no-longer supported for installing Pulsar packages with native C/C++ modules with ppm. Does not affect anything other than installing certain Pulsar packages.)
               </li>
               <li>
                 PHP arrays spanning multiple lines are now foldable, as they always should have been.
