@@ -55,7 +55,7 @@ describe('URIHandlerRegistry', () => {
       await registry.handleURI(u);
     }
 
-    expect(changeSpy.callCount).toBe(5);
+    expect(changeSpy.calls.count()).toBe(5);
     expect(registry.getRecentlyHandledURIs()).toEqual(
       uris
         .map((u, idx) => {
@@ -70,7 +70,7 @@ describe('URIHandlerRegistry', () => {
     );
 
     await registry.handleURI('atom://another/url');
-    expect(changeSpy.callCount).toBe(6);
+    expect(changeSpy.calls.count()).toBe(6);
     const history = registry.getRecentlyHandledURIs();
     expect(history.length).toBe(5);
     expect(history[0].uri).toBe('atom://another/url');

@@ -1,5 +1,3 @@
-/* global ResizeObserver */
-
 const etch = require('etch');
 const { Point, Range } = require('text-buffer');
 const LineTopIndex = require('line-top-index');

@@ -17,9 +17,9 @@ describe("NativeCompileCache", function() {
     cachedFiles = [];
     fakeCacheStore = jasmine.createSpyObj("cache store", ["set", "get", "has", "delete"]);
 
-    fakeCacheStore.has.andCallFake(cacheKey => fakeCacheStore.get(cacheKey) != null);
+    fakeCacheStore.has.and.callFake(cacheKey => fakeCacheStore.get(cacheKey) != null);
 
-    fakeCacheStore.get.andCallFake(function(cacheKey) {
+    fakeCacheStore.get.and.callFake(function(cacheKey) {
       for (let i = cachedFiles.length - 1; i >= 0; i--) {
         const entry = cachedFiles[i];
         if (entry.cacheKey !== cacheKey) { continue; }
@@ -27,7 +27,7 @@ describe("NativeCompileCache", function() {
       }
     });
 
-    fakeCacheStore.set.andCallFake((cacheKey, cacheBuffer) => cachedFiles.push({cacheKey, cacheBuffer}));
+    fakeCacheStore.set.and.callFake((cacheKey, cacheBuffer) => cachedFiles.push({cacheKey, cacheBuffer}));
 
     nativeCompileCache.setCacheStore(fakeCacheStore);
     nativeCompileCache.setV8Version("a-v8-version");
@@ -39,11 +39,11 @@ describe("NativeCompileCache", function() {
     const fn2 = require('./fixtures/native-cache/file-2');
 
     expect(cachedFiles.length).toBe(2);
-    expect(cachedFiles[0].cacheBuffer).toBeInstanceOf(Uint8Array);
+    expect(cachedFiles[0].cacheBuffer).toEqual(jasmine.any(Uint8Array));
     expect(cachedFiles[0].cacheBuffer.length).toBeGreaterThan(0);
     expect(fn1()).toBe(1);
 
-    expect(cachedFiles[1].cacheBuffer).toBeInstanceOf(Uint8Array);
+    expect(cachedFiles[1].cacheBuffer).toEqual(jasmine.any(Uint8Array));
     expect(cachedFiles[1].cacheBuffer.length).toBeGreaterThan(0);
     expect(fn2()).toBe(2);
 
@@ -58,7 +58,7 @@ describe("NativeCompileCache", function() {
     let fn4 = require('./fixtures/native-cache/file-4');
 
     expect(cachedFiles.length).toBe(1);
-    expect(cachedFiles[0].cacheBuffer).toBeInstanceOf(Uint8Array);
+    expect(cachedFiles[0].cacheBuffer).toEqual(jasmine.any(Uint8Array));
     expect(cachedFiles[0].cacheBuffer.length).toBeGreaterThan(0);
     expect(fn4()).toBe("file-4");
 
@@ -67,7 +67,7 @@ describe("NativeCompileCache", function() {
     fn4 = require('./fixtures/native-cache/file-4');
 
     expect(cachedFiles.length).toBe(2);
-    expect(cachedFiles[1].cacheBuffer).toBeInstanceOf(Uint8Array);
+    expect(cachedFiles[1].cacheBuffer).toEqual(jasmine.any(Uint8Array));
     return expect(cachedFiles[1].cacheBuffer.length).toBeGreaterThan(0);
   }));
 
@@ -83,7 +83,7 @@ module.exports = function () { return "file-5" }\
       let fn5 = require('./fixtures/native-cache/file-5');
 
       expect(cachedFiles.length).toBe(1);
-      expect(cachedFiles[0].cacheBuffer).toBeInstanceOf(Uint8Array);
+      expect(cachedFiles[0].cacheBuffer).toEqual(jasmine.any(Uint8Array));
       expect(cachedFiles[0].cacheBuffer.length).toBeGreaterThan(0);
       expect(fn5()).toBe("file-5");
 
@@ -92,14 +92,14 @@ module.exports = function () { return "file-5" }\
       fn5 = require('./fixtures/native-cache/file-5');
 
       expect(cachedFiles.length).toBe(2);
-      expect(cachedFiles[1].cacheBuffer).toBeInstanceOf(Uint8Array);
+      expect(cachedFiles[1].cacheBuffer).toEqual(jasmine.any(Uint8Array));
       return expect(cachedFiles[1].cacheBuffer.length).toBeGreaterThan(0);
     });
   });
 
   return it("deletes previously cached code when the cache is an invalid file", function() {
-    fakeCacheStore.has.andReturn(true);
-    fakeCacheStore.get.andCallFake(() => Buffer.from("an invalid cache"));
+    fakeCacheStore.has.and.returnValue(true);
+    fakeCacheStore.get.and.callFake(() => Buffer.from("an invalid cache"));
 
     const fn3 = require('./fixtures/native-cache/file-3');
 

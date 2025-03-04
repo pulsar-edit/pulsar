@@ -31,7 +31,7 @@ describe('GitRepositoryProvider', () => {
           path.join(__dirname, 'fixtures', 'git', 'master.git')
         );
         const result = await provider.repositoryForDirectory(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
 
@@ -49,7 +49,7 @@ describe('GitRepositoryProvider', () => {
           )
         );
 
-        expect(firstRepo).toBeInstanceOf(GitRepository);
+        expect(firstRepo).toEqual(jasmine.any(GitRepository));
         expect(firstRepo).toBe(secondRepo);
       });
     });
@@ -91,7 +91,7 @@ describe('GitRepositoryProvider', () => {
 
         const directory = new Directory(workDirPath);
         const result = await provider.repositoryForDirectory(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
       });
@@ -110,7 +110,7 @@ describe('GitRepositoryProvider', () => {
           )
         );
         const result = await provider.repositoryForDirectory(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
       });
@@ -128,7 +128,7 @@ describe('GitRepositoryProvider', () => {
             return true;
           }
         };
-        spyOn(directory, 'getSubdirectory').andReturn(subdirectory);
+        spyOn(directory, 'getSubdirectory').and.returnValue(subdirectory);
       });
 
       it('returns a Promise that resolves to null', async () => {
@@ -146,7 +146,7 @@ describe('GitRepositoryProvider', () => {
           path.join(__dirname, 'fixtures', 'git', 'master.git')
         );
         const result = provider.repositoryForDirectorySync(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
 
@@ -164,7 +164,7 @@ describe('GitRepositoryProvider', () => {
           )
         );
 
-        expect(firstRepo).toBeInstanceOf(GitRepository);
+        expect(firstRepo).toEqual(jasmine.any(GitRepository));
         expect(firstRepo).toBe(secondRepo);
       });
     });
@@ -206,7 +206,7 @@ describe('GitRepositoryProvider', () => {
 
         const directory = new Directory(workDirPath);
         const result = provider.repositoryForDirectorySync(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
       });
@@ -225,7 +225,7 @@ describe('GitRepositoryProvider', () => {
           )
         );
         const result = provider.repositoryForDirectorySync(directory);
-        expect(result).toBeInstanceOf(GitRepository);
+        expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe('git');
       });
@@ -243,7 +243,7 @@ describe('GitRepositoryProvider', () => {
             return true;
           }
         };
-        spyOn(directory, 'getSubdirectory').andReturn(subdirectory);
+        spyOn(directory, 'getSubdirectory').and.returnValue(subdirectory);
       });
 
       it('returns null', () => {

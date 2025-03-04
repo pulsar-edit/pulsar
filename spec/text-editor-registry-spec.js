@@ -63,16 +63,16 @@ describe('TextEditorRegistry', function() {
       const [editor1, editor2, editor3] = [{}, {}, {}];
       registry.add(editor1);
       const subscription = registry.observe(spy);
-      expect(spy.calls.length).toBe(1);
+      expect(spy.calls.count()).toBe(1);
 
       registry.add(editor2);
-      expect(spy.calls.length).toBe(2);
-      expect(spy.argsForCall[0][0]).toBe(editor1);
-      expect(spy.argsForCall[1][0]).toBe(editor2);
+      expect(spy.calls.count()).toBe(2);
+      expect(spy.calls.argsFor(0)[0]).toBe(editor1);
+      expect(spy.calls.argsFor(1)[0]).toBe(editor2);
       subscription.dispose();
 
       registry.add(editor3);
-      expect(spy.calls.length).toBe(2);
+      expect(spy.calls.count()).toBe(2);
     });
   });
 
@@ -94,7 +94,7 @@ describe('TextEditorRegistry', function() {
 
       expect(editor.getTabLength()).toBe(8);
       expect(editor.getGrammar()).toEqual(NullGrammar);
-      expect(languageMode.onDidChangeHighlighting.calls.length).toBe(1);
+      expect(languageMode.onDidChangeHighlighting.calls.count()).toBe(1);
     });
   });
 

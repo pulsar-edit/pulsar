@@ -250,10 +250,9 @@ describe('updateProcessEnv(launchEnv)', function() {
 
   describe('when the launch environment does not come from a shell', function() {
     describe('on macOS', function() {
-      it("updates process.env to match the environment in the user's login shell", async function() {
-        if (process.platform === 'win32') return; // TestsThatFailOnWin32
+      it("updates process.env to match the environment in the user's login shell", async function(done) {
+        jasmine.filterByPlatform({only: ['darwin']}, done); // TestsThatFailOnWin32
 
-        process.platform = 'darwin';
         process.env.SHELL = '/my/custom/bash';
         spawn.setDefault(
           spawn.simple(
@@ -277,14 +276,15 @@ describe('updateProcessEnv(launchEnv)', function() {
 
         // Doesn't error
         await updateProcessEnv(null);
+
+        done();
       });
     });
 
     describe('on linux', function() {
-      it("updates process.env to match the environment in the user's login shell", async function() {
-        if (process.platform === 'win32') return; // TestsThatFailOnWin32
+      it("updates process.env to match the environment in the user's login shell", async function(done) {
+        jasmine.filterByPlatform({only: ['linux']}, done); // TestsThatFailOnWin32
 
-        process.platform = 'linux';
         process.env.SHELL = '/my/custom/bash';
         spawn.setDefault(
           spawn.simple(
@@ -308,24 +308,25 @@ describe('updateProcessEnv(launchEnv)', function() {
 
         // Doesn't error
         await updateProcessEnv(null);
+
+        done();
       });
     });
 
     describe('on windows', function() {
       it('does not update process.env', async function() {
         process.platform = 'win32';
-        spyOn(childProcess, 'spawn');
         process.env = { FOO: 'bar' };
 
         await updateProcessEnv(process.env);
-        expect(childProcess.spawn).not.toHaveBeenCalled();
+        expect(spawn.calls.length).toBe(0);
         expect(process.env).toEqual({ FOO: 'bar' });
       });
     });
 
     describe('shouldGetEnvFromShell()', function() {
-      it('indicates when the environment should be fetched from the shell', function() {
-        if (process.platform === 'win32') return; // TestsThatFailOnWin32
+      it('indicates when the environment should be fetched from the shell', function(done) {
+        jasmine.filterByPlatform({except: ['win32']}, done); // TestsThatFailOnWin32
 
         process.platform = 'darwin';
         expect(shouldGetEnvFromShell({ SHELL: '/bin/sh' })).toBe(true);
@@ -361,6 +362,8 @@ describe('updateProcessEnv(launchEnv)', function() {
         expect(shouldGetEnvFromShell({ SHELL: '/usr/local/bin/fish' })).toBe(
           true
         );
+
+        done();
       });
 
       it('returns false when the environment indicates that Atom was launched from a shell', function() {
