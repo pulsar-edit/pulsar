@@ -11,17 +11,18 @@ const $ = etch.dom;
 module.exports =
 class ProjectFindView {
   constructor(model, {findBuffer, replaceBuffer, pathsBuffer, findHistoryCycler, replaceHistoryCycler, pathsHistoryCycler}) {
-    this.model = model
-    this.findBuffer = findBuffer
-    this.replaceBuffer = replaceBuffer
-    this.pathsBuffer = pathsBuffer
+    this.model = model;
+    this.findBuffer = findBuffer;
+    this.replaceBuffer = replaceBuffer;
+    this.pathsBuffer = pathsBuffer;
     this.findHistoryCycler = findHistoryCycler;
     this.replaceHistoryCycler = replaceHistoryCycler;
     this.pathsHistoryCycler = pathsHistoryCycler;
-    this.subscriptions = new CompositeDisposable()
-    this.modelSupbscriptions = new CompositeDisposable()
+    this.subscriptions = new CompositeDisposable();
+    this.modelSubscriptions = new CompositeDisposable();
+    this.editorSubscriptions = new CompositeDisposable();
 
-    etch.initialize(this)
+    etch.initialize(this);
 
     this.handleEvents();
 
@@ -114,14 +115,16 @@ class ProjectFindView {
     );
   }
 
-  get findEditor() { return this.refs.findEditor }
-  get replaceEditor() { return this.refs.replaceEditor }
-  get pathsEditor() { return this.refs.pathsEditor }
+  get findEditor() { return this.refs.findEditor; }
+  get replaceEditor() { return this.refs.replaceEditor; }
+  get pathsEditor() { return this.refs.pathsEditor; }
 
   destroy() {
-    if (this.subscriptions) this.subscriptions.dispose();
-    if (this.tooltipSubscriptions) this.tooltipSubscriptions.dispose();
-    if (this.modelSupbscriptions) this.modelSupbscriptions.dispose();
+    this.subscriptions?.dispose();
+    this.tooltipSubscriptions?.dispose();
+    this.modelSubscriptions?.dispose();
+    this.editorSubscriptions?.dispose();
+
     this.model = null;
   }
 
@@ -235,15 +238,15 @@ class ProjectFindView {
     };
 
     const addModelHandlers = () => {
-      this.modelSupbscriptions.add(this.model.onDidClear(resetInterface));
-      this.modelSupbscriptions.add(this.model.onDidClearReplacementState(updateInterfaceForResults));
-      this.modelSupbscriptions.add(this.model.onDidStartSearching(updateInterfaceForSearching));
-      this.modelSupbscriptions.add(this.model.onDidNoopSearch(afterSearch));
-      this.modelSupbscriptions.add(this.model.onDidFinishSearching(searchFinished));
-      this.modelSupbscriptions.add(this.model.getFindOptions().onDidChange(this.updateOptionViews.bind(this)));
-      this.modelSupbscriptions.add(this.model.getFindOptions().onDidChangeUseRegex(this.updateSyntaxHighlighting.bind(this)));
-    }
-    this.handleEvents.addModelHandlers=addModelHandlers;
+      this.modelSubscriptions.add(this.model.onDidClear(resetInterface));
+      this.modelSubscriptions.add(this.model.onDidClearReplacementState(updateInterfaceForResults));
+      this.modelSubscriptions.add(this.model.onDidStartSearching(updateInterfaceForSearching));
+      this.modelSubscriptions.add(this.model.onDidNoopSearch(afterSearch));
+      this.modelSubscriptions.add(this.model.onDidFinishSearching(searchFinished));
+      this.modelSubscriptions.add(this.model.getFindOptions().onDidChange(this.updateOptionViews.bind(this)));
+      this.modelSubscriptions.add(this.model.getFindOptions().onDidChangeUseRegex(this.updateSyntaxHighlighting.bind(this)));
+    };
+    this.handleEvents.addModelHandlers = addModelHandlers;
     addModelHandlers();
 
     this.element.addEventListener('focus', () => this.findEditor.element.focus());
@@ -265,23 +268,27 @@ class ProjectFindView {
   }
 
   handleEventsForReplace() {
-    this.replaceEditor.getBuffer().onDidChange(() => this.model.clearReplacementState());
-    this.replaceEditor.onDidStopChanging(() => this.model.getFindOptions().set({replacePattern: this.replaceEditor.getText()}));
+    this.editorSubscriptions.add(
+      this.replaceEditor.getBuffer().onDidChange(() => this.model.clearReplacementState()),
+      this.replaceEditor.onDidStopChanging(() => {
+        this.model.getFindOptions().set({replacePattern: this.replaceEditor.getText()})
+      })
+    );
     this.replacementsMade = 0;
     const addReplaceModelHandlers = () => {
-      this.modelSupbscriptions.add(this.model.onDidStartReplacing(promise => {
+      this.modelSubscriptions.add(this.model.onDidStartReplacing(promise => {
         this.replacementsMade = 0;
         this.refs.replacmentInfoBlock.style.display = '';
         this.refs.replacementProgress.removeAttribute('value');
       }));
 
-      this.modelSupbscriptions.add(this.model.onDidReplacePath(result => {
+      this.modelSubscriptions.add(this.model.onDidReplacePath(result => {
         this.replacementsMade++;
         this.refs.replacementProgress.value = this.replacementsMade / this.model.getPathCount();
         this.refs.replacmentInfo.textContent = `Replaced ${this.replacementsMade} of ${_.pluralize(this.model.getPathCount(), 'file')}`;
       }));
 
-      this.modelSupbscriptions.add(this.model.onDidFinishReplacing(result => this.onFinishedReplacing(result)));
+      this.modelSubscriptions.add(this.model.onDidFinishReplacing(result => this.onFinishedReplacing(result)));
     }
     this.handleEventsForReplace.addReplaceModelHandlers=addReplaceModelHandlers;
     addReplaceModelHandlers();

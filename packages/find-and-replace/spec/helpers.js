@@ -1,9 +1,21 @@
-const genPromiseToCheck = fn => new Promise(resolve => {
-  const interval = setInterval(() => { if(fn()) resolve() }, 100)
-  setTimeout(() => {
-    resolve()
-    clearInterval(interval)
-  }, 4000)
-})
+function waitForCondition(fn) {
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(() => {
+      if (fn()) {
+        resolve();
+        clearInterval(interval);
+        clearTimeout(timeout);
+      }
+    }, 100);
+    let timeout = setTimeout(() => {
+      reject(new Error(`Timeout waiting for condition`));
+      clearInterval(interval);
+    }, 4000);
+  });
+}
 
-module.exports = { genPromiseToCheck }
+async function wait(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+module.exports = { waitForCondition, wait };
