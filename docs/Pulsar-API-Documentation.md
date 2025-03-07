@@ -196,7 +196,7 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dt><a href="#renderMarkdown">renderMarkdown(content, givenOpts)</a> ⇒ <code>string</code></dt>
 <dd><p>Takes a Markdown document and renders it as HTML.</p>
 </dd>
-<dt><a href="#beforeEach">beforeEach()</a></dt>
+<dt><a href="#conditionPromise">conditionPromise()</a></dt>
 <dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
@@ -631,9 +631,9 @@ This file aims to run some short simple tests against `update.js`. Focusing
 ## path
 **Kind**: global constant  
 **Babel**:   
-<a name="beforeEach"></a>
+<a name="conditionPromise"></a>
 
-## beforeEach()
+## conditionPromise()
 **Kind**: global function  
 **Babel**:   
 <a name="beforeEach"></a>
