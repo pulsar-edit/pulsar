@@ -34,7 +34,7 @@ async function waitForCondition(
 }
 
 
-fdescribe('atom.themes', () => {
+describe('atom.themes', () => {
   beforeEach(() => {
     jasmine.useRealClock();
     spyOn(atom, 'inSpecMode').andReturn(false);
