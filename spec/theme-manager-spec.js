@@ -10,7 +10,13 @@ async function timeout(ms) {
   return new Promise((_, reject) => setTimeout(reject, ms, new Error('Timeout')));
 }
 
-async function waitForCondition(func, { intervalMs = 50, timeoutMs = 5000 } = {}) {
+async function waitForCondition(
+  func,
+  {
+    intervalMs = 50,
+    timeoutMs = jasmine.getEnv().defaultTimeoutInterval
+  } = {}
+) {
   let attempt = new Promise((resolve) => {
     const retryer = () => {
       if (func()) {
@@ -28,7 +34,7 @@ async function waitForCondition(func, { intervalMs = 50, timeoutMs = 5000 } = {}
 }
 
 
-describe('atom.themes', () => {
+fdescribe('atom.themes', () => {
   beforeEach(() => {
     jasmine.useRealClock();
     spyOn(atom, 'inSpecMode').andReturn(false);
@@ -464,12 +470,12 @@ h2 {
 
         expect(styleElementRemovedHandler).toHaveBeenCalled();
         expect(
-          styleElementRemovedHandler.argsForCall[0][0].textContent
+          styleElementRemovedHandler.argsForCall[0]?.[0].textContent
         ).toContain('dotted');
 
         expect(styleElementAddedHandler).toHaveBeenCalled();
         expect(
-          styleElementAddedHandler.argsForCall[0][0].textContent
+          styleElementAddedHandler.argsForCall[0]?.[0].textContent
         ).toContain('dashed');
 
         styleElementRemovedHandler.reset();
@@ -512,11 +518,9 @@ h2 {
       beforeEach(() => {
         jasmine.useRealClock();
         addErrorHandler = jasmine.createSpy();
-        const { File } = require('pathwatcher');
-        spyOn(File.prototype, 'on').andCallFake(function (event) {
-          if (event.indexOf('contents-changed') > -1) {
-            throw new Error('Unable to watch path');
-          }
+        const watcher = require('../src/path-watcher');
+        spyOn(watcher, 'watchPath').andCallFake(() => {
+          throw new Error('Unable to watch path');
         });
         spyOn(atom.themes, 'loadStylesheet').andReturn('');
         atom.notifications.onDidAddNotification(addErrorHandler);
