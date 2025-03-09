@@ -1,42 +1,36 @@
 
-const path = require('path');
-const grammarTest = require('atom-grammar-test');
-
-describe("Python grammar", function() {
+describe("Python grammar", () => {
   let grammar = null;
 
-  beforeEach(function() {
+  beforeEach(async () => {
     atom.config.set('core.useTreeSitterParsers', false);
-
-
-    waitsForPromise(() => atom.packages.activatePackage("language-python"));
-
-    runs(() => grammar = atom.grammars.grammarForScopeName("source.python"));
+    await atom.packages.activatePackage("language-python");
+    grammar = atom.grammars.grammarForScopeName("source.python");
   });
 
-  it("recognises shebang on firstline", function() {
+  it("recognises shebang on firstline", () => {
     expect(grammar.firstLineRegex.findNextMatchSync("#!/usr/bin/env python")).not.toBeNull();
     expect(grammar.firstLineRegex.findNextMatchSync("#! /usr/bin/env python")).not.toBeNull();
   });
 
-  it("parses the grammar", function() {
+  it("parses the grammar", () => {
     expect(grammar).toBeDefined();
     expect(grammar.scopeName).toBe("source.python");
   });
 
-  it("tokenizes `yield`", function() {
+  it("tokenizes `yield`", () => {
     const {tokens} = grammar.tokenizeLine('yield v');
 
     expect(tokens[0]).toEqual({value: 'yield', scopes: ['source.python', 'keyword.control.statement.python']});
 });
 
-  it("tokenizes `yield from`", function() {
+  it("tokenizes `yield from`", () => {
     const {tokens} = grammar.tokenizeLine('yield from v');
 
     expect(tokens[0]).toEqual({value: 'yield from', scopes: ['source.python', 'keyword.control.statement.python']});
 });
 
-  it("tokenizes multi-line strings", function() {
+  it("tokenizes multi-line strings", () => {
     const tokens = grammar.tokenizeLines('"1\\\n2"');
 
     // Line 0
@@ -61,7 +55,7 @@ describe("Python grammar", function() {
     expect(tokens[1][2]).not.toBeDefined();
   });
 
-  it("terminates a single-quoted raw string containing opening parenthesis at closing quote", function() {
+  it("terminates a single-quoted raw string containing opening parenthesis at closing quote", () => {
     const tokens = grammar.tokenizeLines("r'%d(' #foo");
 
     expect(tokens[0][0].value).toBe('r');
@@ -82,7 +76,7 @@ describe("Python grammar", function() {
     expect(tokens[0][7].scopes).toEqual(['source.python', 'comment.line.number-sign.python']);
 });
 
-  it("terminates a single-quoted raw string containing opening bracket at closing quote", function() {
+  it("terminates a single-quoted raw string containing opening bracket at closing quote", () => {
     const tokens = grammar.tokenizeLines("r'%d[' #foo");
 
     expect(tokens[0][0].value).toBe('r');
@@ -103,7 +97,7 @@ describe("Python grammar", function() {
     expect(tokens[0][7].scopes).toEqual(['source.python', 'comment.line.number-sign.python']);
 });
 
-  it("terminates a double-quoted raw string containing opening parenthesis at closing quote", function() {
+  it("terminates a double-quoted raw string containing opening parenthesis at closing quote", () => {
     const tokens = grammar.tokenizeLines('r"%d(" #foo');
 
     expect(tokens[0][0].value).toBe('r');
@@ -124,7 +118,7 @@ describe("Python grammar", function() {
     expect(tokens[0][7].scopes).toEqual(['source.python', 'comment.line.number-sign.python']);
 });
 
-  it("terminates a double-quoted raw string containing opening bracket at closing quote", function() {
+  it("terminates a double-quoted raw string containing opening bracket at closing quote", () => {
     const tokens = grammar.tokenizeLines('r"%d[" #foo');
 
     expect(tokens[0][0].value).toBe('r');
@@ -145,7 +139,7 @@ describe("Python grammar", function() {
     expect(tokens[0][7].scopes).toEqual(['source.python', 'comment.line.number-sign.python']);
 });
 
-  it("terminates a unicode single-quoted raw string containing opening parenthesis at closing quote", function() {
+  it("terminates a unicode single-quoted raw string containing opening parenthesis at closing quote", () => {
     const tokens = grammar.tokenizeLines("ur'%d(' #foo");
 
     expect(tokens[0][0].value).toBe('ur');
@@ -166,7 +160,7 @@ describe("Python grammar", function() {
     expect(tokens[0][7].scopes).toEqual(['source.python', 'comment.line.number-sign.python']);
 });
 
-  it("terminates a unicode single-quoted raw string containing opening bracket at closing quote", function() {
+  it("terminates a unicode single-quoted raw string containing opening bracket at closing quote", () => {
     const tokens = grammar.tokenizeLines("ur'%d[' #foo");
 
     expect(tokens[0][0].value).toBe('ur');
@@ -187,7 +181,7 @@ describe("Python grammar", function() {
     expect(tokens[0][7].scopes).toEqual(['source.python', 'comment.line.number-sign.python']);
 });
 
-  it("terminates a unicode double-quoted raw string containing opening parenthesis at closing quote", function() {
+  it("terminates a unicode double-quoted raw string containing opening parenthesis at closing quote", () => {
     const tokens = grammar.tokenizeLines('ur"%d(" #foo');
 
     expect(tokens[0][0].value).toBe('ur');
@@ -208,7 +202,7 @@ describe("Python grammar", function() {
     expect(tokens[0][7].scopes).toEqual(['source.python', 'comment.line.number-sign.python']);
 });
 
-  it("terminates a unicode double-quoted raw string containing opening bracket at closing quote", function() {
+  it("terminates a unicode double-quoted raw string containing opening bracket at closing quote", () => {
     const tokens = grammar.tokenizeLines('ur"%d[" #foo');
 
     expect(tokens[0][0].value).toBe('ur');
@@ -229,7 +223,7 @@ describe("Python grammar", function() {
     expect(tokens[0][7].scopes).toEqual(['source.python', 'comment.line.number-sign.python']);
 });
 
-  it("terminates referencing an item in a list variable after a sequence of a closing and opening bracket", function() {
+  it("terminates referencing an item in a list variable after a sequence of a closing and opening bracket", () => {
     const tokens = grammar.tokenizeLines('foo[i[0]][j[0]]');
 
     expect(tokens[0][0].value).toBe('foo');
@@ -260,7 +254,7 @@ describe("Python grammar", function() {
     expect(tokens[0][12].scopes).toEqual(['source.python', 'meta.structure.list.python', 'punctuation.definition.list.end.python']);
 });
 
-  it("tokenizes a hex escape inside a string", function() {
+  it("tokenizes a hex escape inside a string", () => {
     let tokens = grammar.tokenizeLines('"\\x5A"');
 
     expect(tokens[0][0].value).toBe('"');
@@ -276,8 +270,8 @@ describe("Python grammar", function() {
     expect(tokens[0][1].scopes).toEqual(['source.python', 'string.quoted.double.single-line.python', 'constant.character.escape.hex.python']);
 });
 
-  describe("f-strings", function() {
-    it("tokenizes them", function() {
+  describe("f-strings", () => {
+    it("tokenizes them", () => {
       const {tokens} = grammar.tokenizeLine("f'hello'");
 
       expect(tokens[0]).toEqual({value: 'f', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'storage.type.string.python']});
@@ -286,7 +280,7 @@ describe("Python grammar", function() {
       expect(tokens[3]).toEqual({value: "'", scopes: ['source.python', "string.quoted.single.single-line.format.python", 'punctuation.definition.string.end.python']});
   });
 
-    it("tokenizes {{ and }} as escape characters", function() {
+    it("tokenizes {{ and }} as escape characters", () => {
       const {tokens} = grammar.tokenizeLine("f'he}}l{{lo'");
 
       expect(tokens[0]).toEqual({value: 'f', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'storage.type.string.python']});
@@ -299,7 +293,7 @@ describe("Python grammar", function() {
       expect(tokens[7]).toEqual({value: "'", scopes: ['source.python', "string.quoted.single.single-line.format.python", 'punctuation.definition.string.end.python']});
   });
 
-    it("tokenizes unmatched closing curly brackets as invalid", function() {
+    it("tokenizes unmatched closing curly brackets as invalid", () => {
       const {tokens} = grammar.tokenizeLine("f'he}llo'");
 
       expect(tokens[0]).toEqual({value: 'f', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'storage.type.string.python']});
@@ -310,8 +304,8 @@ describe("Python grammar", function() {
       expect(tokens[5]).toEqual({value: "'", scopes: ['source.python', "string.quoted.single.single-line.format.python", 'punctuation.definition.string.end.python']});
   });
 
-    describe("in expressions", function() {
-      it("tokenizes variables", function() {
+    describe("in expressions", () => {
+      it("tokenizes variables", () => {
         const {tokens} = grammar.tokenizeLine("f'{abc}'");
 
         expect(tokens[2]).toEqual({value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']});
@@ -319,7 +313,7 @@ describe("Python grammar", function() {
         expect(tokens[4]).toEqual({value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']});
     });
 
-      it("tokenizes arithmetic", function() {
+      it("tokenizes arithmetic", () => {
         const {tokens} = grammar.tokenizeLine("f'{5 - 3}'");
 
         expect(tokens[2]).toEqual({value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']});
@@ -329,7 +323,7 @@ describe("Python grammar", function() {
         expect(tokens[8]).toEqual({value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']});
     });
 
-      it("tokenizes function and method calls", function() {
+      it("tokenizes function and method calls", () => {
         const {tokens} = grammar.tokenizeLine("f'{name.decode(\"utf-8\").lower()}'");
 
         expect(tokens[2]).toEqual({value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']});
@@ -348,7 +342,7 @@ describe("Python grammar", function() {
         expect(tokens[15]).toEqual({value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']});
     });
 
-      it("tokenizes conversion flags", function() {
+      it("tokenizes conversion flags", () => {
         const {tokens} = grammar.tokenizeLine("f'{abc!r}'");
 
         expect(tokens[2]).toEqual({value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']});
@@ -357,7 +351,7 @@ describe("Python grammar", function() {
         expect(tokens[5]).toEqual({value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']});
     });
 
-      it("tokenizes format specifiers", function() {
+      it("tokenizes format specifiers", () => {
         const {tokens} = grammar.tokenizeLine("f'{abc:^d}'");
 
         expect(tokens[2]).toEqual({value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']});
@@ -366,7 +360,7 @@ describe("Python grammar", function() {
         expect(tokens[5]).toEqual({value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']});
     });
 
-      it("tokenizes nested replacement fields in top-level format specifiers", function() {
+      it("tokenizes nested replacement fields in top-level format specifiers", () => {
         const {tokens} = grammar.tokenizeLine("f'{abc:{align}d}'");
 
         expect(tokens[2]).toEqual({value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']});
@@ -377,7 +371,7 @@ describe("Python grammar", function() {
         expect(tokens[7]).toEqual({value: '}', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.end.bracket.curly.python']});
     });
 
-      it("tokenizes backslashes as invalid", function() {
+      it("tokenizes backslashes as invalid", () => {
         const {tokens} = grammar.tokenizeLine("f'{ab\\n}'");
 
         expect(tokens[2]).toEqual({value: '{', scopes: ['source.python', "string.quoted.single.single-line.format.python", 'meta.interpolation.python', 'punctuation.definition.interpolation.begin.bracket.curly.python']});
@@ -388,8 +382,8 @@ describe("Python grammar", function() {
   });
 });
 
-  describe("binary strings", function() {
-    it("tokenizes them", function() {
+  describe("binary strings", () => {
+    it("tokenizes them", () => {
       const {tokens} = grammar.tokenizeLine("b'test'");
 
       expect(tokens[0]).toEqual({value: 'b', scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'storage.type.string.python']});
@@ -398,7 +392,7 @@ describe("Python grammar", function() {
       expect(tokens[3]).toEqual({value: "'", scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'punctuation.definition.string.end.python']});
   });
 
-    it("tokenizes invalid characters", function() {
+    it("tokenizes invalid characters", () => {
       const {tokens} = grammar.tokenizeLine("b'tést'");
 
       expect(tokens[0]).toEqual({value: 'b', scopes: ['source.python', "string.quoted.single.single-line.binary.python", 'storage.type.string.python']});
@@ -410,7 +404,7 @@ describe("Python grammar", function() {
   });
 });
 
-  describe("docstrings", () => it("tokenizes them", function() {
+  describe("docstrings", () => it("tokenizes them", () => {
     let lines = grammar.tokenizeLines(`\
 """
   Bla bla bla "wow" what's this?
@@ -435,9 +429,9 @@ describe("Python grammar", function() {
 }));
 
 
-  describe("string formatting", function() {
-    describe("%-style formatting", function() {
-      it("tokenizes the conversion type", function() {
+  describe("string formatting", () => {
+    describe("%-style formatting", () => {
+      it("tokenizes the conversion type", () => {
         const {tokens} = grammar.tokenizeLine('"%d"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -445,7 +439,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes an optional mapping key", function() {
+      it("tokenizes an optional mapping key", () => {
         const {tokens} = grammar.tokenizeLine('"%(key)x"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -453,7 +447,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes an optional conversion flag", function() {
+      it("tokenizes an optional conversion flag", () => {
         const {tokens} = grammar.tokenizeLine('"% F"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -461,7 +455,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes an optional field width", function() {
+      it("tokenizes an optional field width", () => {
         const {tokens} = grammar.tokenizeLine('"%11s"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -469,7 +463,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes * as the optional field width", function() {
+      it("tokenizes * as the optional field width", () => {
         const {tokens} = grammar.tokenizeLine('"%*g"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -477,7 +471,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes an optional precision", function() {
+      it("tokenizes an optional precision", () => {
         const {tokens} = grammar.tokenizeLine('"%.4r"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -485,7 +479,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes * as the optional precision", function() {
+      it("tokenizes * as the optional precision", () => {
         const {tokens} = grammar.tokenizeLine('"%.*%"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -493,7 +487,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes an optional length modifier", function() {
+      it("tokenizes an optional length modifier", () => {
         const {tokens} = grammar.tokenizeLine('"%Lo"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -501,7 +495,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes complex formats", function() {
+      it("tokenizes complex formats", () => {
         const {tokens} = grammar.tokenizeLine('"%(key)#5.*hc"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -510,8 +504,8 @@ describe("Python grammar", function() {
     });
   });
 
-    describe("{}-style formatting", function() {
-      it("tokenizes the empty replacement field", function() {
+    describe("{}-style formatting", () => {
+      it("tokenizes the empty replacement field", () => {
         const {tokens} = grammar.tokenizeLine('"{}"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -519,7 +513,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes a number as the field name", function() {
+      it("tokenizes a number as the field name", () => {
         const {tokens} = grammar.tokenizeLine('"{1}"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -527,7 +521,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes a variable name as the field name", function() {
+      it("tokenizes a variable name as the field name", () => {
         const {tokens} = grammar.tokenizeLine('"{key}"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -535,7 +529,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes field name attributes", function() {
+      it("tokenizes field name attributes", () => {
         let {tokens} = grammar.tokenizeLine('"{key.length}"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -561,7 +555,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes multiple field name attributes", function() {
+      it("tokenizes multiple field name attributes", () => {
         const {tokens} = grammar.tokenizeLine('"{nested.a[2][\'val\'].value}"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -569,7 +563,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes conversions", function() {
+      it("tokenizes conversions", () => {
         const {tokens} = grammar.tokenizeLine('"{!r}"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -577,8 +571,8 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      describe("format specifiers", function() {
-        it("tokenizes alignment", function() {
+      describe("format specifiers", () => {
+        it("tokenizes alignment", () => {
           let {tokens} = grammar.tokenizeLine('"{:<}"');
 
           expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -592,7 +586,7 @@ describe("Python grammar", function() {
           expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
       });
 
-        it("tokenizes signs", function() {
+        it("tokenizes signs", () => {
           let {tokens} = grammar.tokenizeLine('"{:+}"');
 
           expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -606,7 +600,7 @@ describe("Python grammar", function() {
           expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
       });
 
-        it("tokenizes the alternate form indicator", function() {
+        it("tokenizes the alternate form indicator", () => {
           const {tokens} = grammar.tokenizeLine('"{:#}"');
 
           expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -614,7 +608,7 @@ describe("Python grammar", function() {
           expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
       });
 
-        it("tokenizes 0", function() {
+        it("tokenizes 0", () => {
           const {tokens} = grammar.tokenizeLine('"{:0}"');
 
           expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -622,7 +616,7 @@ describe("Python grammar", function() {
           expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
       });
 
-        it("tokenizes the width", function() {
+        it("tokenizes the width", () => {
           const {tokens} = grammar.tokenizeLine('"{:34}"');
 
           expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -630,7 +624,7 @@ describe("Python grammar", function() {
           expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
       });
 
-        it("tokenizes the grouping option", function() {
+        it("tokenizes the grouping option", () => {
           const {tokens} = grammar.tokenizeLine('"{:,}"');
 
           expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -638,7 +632,7 @@ describe("Python grammar", function() {
           expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
       });
 
-        it("tokenizes the precision", function() {
+        it("tokenizes the precision", () => {
           const {tokens} = grammar.tokenizeLine('"{:.5}"');
 
           expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -646,7 +640,7 @@ describe("Python grammar", function() {
           expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
       });
 
-        it("tokenizes the type", function() {
+        it("tokenizes the type", () => {
           const {tokens} = grammar.tokenizeLine('"{:b}"');
 
           expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -654,7 +648,7 @@ describe("Python grammar", function() {
           expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
       });
 
-        it("tokenizes nested replacement fields", function() {
+        it("tokenizes nested replacement fields", () => {
           const {tokens} = grammar.tokenizeLine('"{:{align}-.{precision}%}"');
 
           expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -667,7 +661,7 @@ describe("Python grammar", function() {
       });
     });
 
-      it("tokenizes complex formats", function() {
+      it("tokenizes complex formats", () => {
         const {tokens} = grammar.tokenizeLine('"{0.players[2]!a:2>-#01_.3d}"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -675,7 +669,7 @@ describe("Python grammar", function() {
         expect(tokens[2]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.end.python']});
     });
 
-      it("tokenizes {{ and }} as escape characters and not formatters", function() {
+      it("tokenizes {{ and }} as escape characters and not formatters", () => {
         const {tokens} = grammar.tokenizeLine('"{{hello}}"');
 
         expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
@@ -687,40 +681,36 @@ describe("Python grammar", function() {
   });
 });
 
-  it("tokenizes properties of self as self-type variables", function() {
+  it("tokenizes properties of self as self-type variables", () => {
     const tokens = grammar.tokenizeLines('self.foo');
 
     expect(tokens[0][0]).toEqual({value: 'self', scopes: ['source.python', 'variable.language.self.python']});
     expect(tokens[0][1]).toEqual({value: '.', scopes: ['source.python', 'punctuation.separator.property.period.python']});
     expect(tokens[0][2]).toEqual({value: 'foo', scopes: ['source.python', 'variable.other.property.python']});
-});
+  });
 
-  it("tokenizes cls as a self-type variable", function() {
+  it("tokenizes cls as a self-type variable", () => {
     const tokens = grammar.tokenizeLines('cls.foo');
 
     expect(tokens[0][0]).toEqual({value: 'cls', scopes: ['source.python', 'variable.language.self.python']});
     expect(tokens[0][1]).toEqual({value: '.', scopes: ['source.python', 'punctuation.separator.property.period.python']});
     expect(tokens[0][2]).toEqual({value: 'foo', scopes: ['source.python', 'variable.other.property.python']});
-});
+  });
 
-  it("tokenizes properties of a variable as variables", function() {
+  it("tokenizes properties of a variable as variables", () => {
     const tokens = grammar.tokenizeLines('bar.foo');
 
     expect(tokens[0][0]).toEqual({value: 'bar', scopes: ['source.python', 'variable.other.object.python']});
     expect(tokens[0][1]).toEqual({value: '.', scopes: ['source.python', 'punctuation.separator.property.period.python']});
     expect(tokens[0][2]).toEqual({value: 'foo', scopes: ['source.python', 'variable.other.property.python']});
-});
+  });
 
-  // Add the grammar test fixtures
-  grammarTest(path.join(__dirname, 'fixtures/grammar/syntax_test_python.py'));
-  grammarTest(path.join(__dirname, 'fixtures/grammar/syntax_test_python_functions.py'));
-  grammarTest(path.join(__dirname, 'fixtures/grammar/syntax_test_python_lambdas.py'));
-  grammarTest(path.join(__dirname, 'fixtures/grammar/syntax_test_python_typing.py'));
+  describe("SQL highlighting", () => {
+    beforeEach(async () => {
+      await atom.packages.activatePackage('language-sql');
+    });
 
-  describe("SQL highlighting", function() {
-    beforeEach(() => waitsForPromise(() => atom.packages.activatePackage('language-sql')));
-
-    it("tokenizes SQL inline highlighting on blocks", function() {
+    it("tokenizes SQL inline highlighting on blocks", () => {
       const delimsByScope = {
         "string.quoted.double.block.sql.python": '"""',
         "string.quoted.single.block.sql.python": "'''"
@@ -741,14 +731,14 @@ FROM foo`,
           expect(tokens[1][0]).toEqual({value: 'SELECT', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.DML.sql']});
           expect(tokens[1][1]).toEqual({value: ' bar', scopes: ['source.python', scope, 'meta.embedded.sql']});
           expect(tokens[2][0]).toEqual({value: 'FROM', scopes: ['source.python', scope, 'meta.embedded.sql', 'keyword.other.DML.sql']});
-          expect(tokens[2][1]).toEqual(value(' foo', {scopes: ['source.python', scope, 'meta.embedded.sql']}));
+          expect(tokens[2][1]).toEqual(({value: ' foo', scopes: ['source.python', scope, 'meta.embedded.sql']}));
           result.push(expect(tokens[3][0]).toEqual({value: delim, scopes: ['source.python', scope, 'punctuation.definition.string.end.python']}));
         }
         return result;
       })();
   });
 
-    it("tokenizes SQL inline highlighting on blocks with a CTE", function() {
+    it("tokenizes SQL inline highlighting on blocks with a CTE", () => {
       // Note that these scopes do not contain .sql because we can't definitively tell
       // if the string contains SQL or not
       const delimsByScope = {
@@ -794,7 +784,7 @@ ${delim}\
       })();
   });
 
-    it("tokenizes SQL inline highlighting on single line with a CTE", function() {
+    it("tokenizes SQL inline highlighting on single line with a CTE", () => {
       const {tokens} = grammar.tokenizeLine('\'WITH example_cte AS (SELECT bar FROM foo) SELECT COUNT(*) FROM example_cte\'');
 
       expect(tokens[0]).toEqual({value: '\'', scopes: ['source.python', 'string.quoted.single.single-line.sql.python', 'punctuation.definition.string.begin.python']});
@@ -821,7 +811,7 @@ ${delim}\
       expect(tokens[21]).toEqual({value: '\'', scopes: ['source.python', 'string.quoted.single.single-line.sql.python', 'punctuation.definition.string.end.python']});
   });
 
-    it("tokenizes Python escape characters and formatting specifiers in SQL strings", function() {
+    it("tokenizes Python escape characters and formatting specifiers in SQL strings", () => {
       const {tokens} = grammar.tokenizeLine('"INSERT INTO url (image_uri) VALUES (\\\'%s\\\');" % values');
 
       expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.sql.python', 'punctuation.definition.string.begin.python']});
@@ -833,7 +823,7 @@ ${delim}\
       expect(tokens[17]).toEqual({value: '%', scopes: ['source.python', 'keyword.operator.arithmetic.python']});
   });
 
-    it("recognizes DELETE as an HTTP method", function() {
+    it("recognizes DELETE as an HTTP method", () => {
       const {tokens} = grammar.tokenizeLine('"DELETE /api/v1/endpoint"');
 
       expect(tokens[0]).toEqual({value: '"', scopes: ['source.python', 'string.quoted.double.single-line.python', 'punctuation.definition.string.begin.python']});
