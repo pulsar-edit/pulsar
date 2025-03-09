@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Grim = require('grim');
 const dedent = require('dedent');
-const Parser = require('./web-tree-sitter');
+const { Language, Parser, Query } = require('./web-tree-sitter');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const { File } = require('pathwatcher');
 const { normalizeDelimiters } = require('./comment-utils.js');
@@ -199,7 +199,7 @@ module.exports = class WASMTreeSitterGrammar {
     await parserInitPromise;
     if (!this._language) {
       try {
-        this._language = await Parser.Language.load(this.treeSitterGrammarPath);
+        this._language = await Language.load(this.treeSitterGrammarPath);
       } catch (err) {
         console.error(`Error loading grammar for ${this.scopeName}; original error follows`);
         throw err;
@@ -299,7 +299,7 @@ module.exports = class WASMTreeSitterGrammar {
     if (!language) { return null; }
     let query = this.queryCache.get(queryType);
     if (!query) {
-      query = language.query(this[queryType]);
+      query = new Query(language, this[queryType]);
       this.queryCache.set(queryType, query);
     }
     return query;
@@ -330,7 +330,7 @@ module.exports = class WASMTreeSitterGrammar {
         // let timeTag = `${this.scopeName} ${queryType} load time`;
         try {
           // if (inDevMode) { console.time(timeTag); }
-          query = language.query(this[queryType]);
+          query = new Query(language, this[queryType]);
 
           // We want to augment the `Query` class to add backward compatibility
           // for the `captures` method. But since `web-tree-sitter` doesn’t
@@ -366,7 +366,7 @@ module.exports = class WASMTreeSitterGrammar {
   // Returns a {Promise} that will resolve to a Tree-sitter `Query` object.
   async createQuery(queryContents) {
     let language = await this.getLanguage();
-    return language.query(queryContents);
+    return new Query(language, queryContents);
   }
 
   // Extended: Creates an arbitrary query from this grammar. Package authors
@@ -383,7 +383,7 @@ module.exports = class WASMTreeSitterGrammar {
     if (!this._language) {
       throw new Error(`Language not loaded!`);
     }
-    return this._language.query(queryContents);
+    return new Query(this._language, queryContents);
   }
 
   // Used by the specs to override a particular query for testing.
