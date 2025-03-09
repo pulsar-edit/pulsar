@@ -15,5 +15,8 @@ require('etch').setScheduler({
 //
 // See more in https://github.com/atom/atom/pull/21335
 global.beforeEach(() => {
-  spyOn(atom, 'openDevTools').andReturn((console.error("ERROR: Dev tools attempted to open"), Promise.resolve()));
+  spyOn(atom, 'openDevTools').andCallFake(() => {
+    console.error("ERROR: Dev tools attempted to open");
+    return Promise.resolve();
+  });
 });
