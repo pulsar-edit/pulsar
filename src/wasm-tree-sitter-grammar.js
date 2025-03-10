@@ -22,8 +22,6 @@ const QUERY_CAPTURES_DEPRECATION_EXPLANATION = dedent`\
   specify \`startPosition\` and \`endPosition\` properties within \`options\`.
 `;
 
-let didWrapQueryCaptures = false;
-
 // When `web-tree-sitter` harmonized its API with that of `node-tree-sitter`,
 // some function signatures changed. The most impactful one for us is probably
 // `Query#captures`, since two crucial positional arguments were moved into a
@@ -32,9 +30,7 @@ let didWrapQueryCaptures = false;
 // We've changed all of our usages, but it's possible some community packages
 // won't have been able to update yet. We should emit a deprecation message in
 // those cases and restructure the arguments on the fly.
-function wrapQueryCaptures(query) {
-  didWrapQueryCaptures = true;
-  let QueryPrototype = Object.getPrototypeOf(query);
+function wrapQueryCaptures(QueryPrototype) {
   let originalCaptures = QueryPrototype.captures;
   // We put `node` into its own argument so that this new function’s `length`
   // property matches that of the old function. (Both are inaccurate, but they
@@ -64,6 +60,8 @@ function wrapQueryCaptures(query) {
     }
   };
 }
+
+wrapQueryCaptures(Query.prototype);
 
 // Extended: This class holds an instance of a Tree-sitter grammar.
 module.exports = class WASMTreeSitterGrammar {
@@ -331,15 +329,6 @@ module.exports = class WASMTreeSitterGrammar {
         try {
           // if (inDevMode) { console.time(timeTag); }
           query = new Query(language, this[queryType]);
-
-          // We want to augment the `Query` class to add backward compatibility
-          // for the `captures` method. But since `web-tree-sitter` doesn’t
-          // export references to these inner Tree-sitter classes, we have to
-          // wait until we’re holding an instance of a `Query` and grab its
-          // prototype. Luckily, we still only have to do this once.
-          if (!didWrapQueryCaptures) {
-            wrapQueryCaptures(query);
-          }
 
           // if (inDevMode) { console.timeEnd(timeTag); }
           this.queryCache.set(queryType, query);
