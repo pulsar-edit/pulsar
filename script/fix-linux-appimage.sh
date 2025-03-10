@@ -109,7 +109,7 @@ cd ../..
 # Now that we've made the change, we can use `appimagetool` to bundle
 # everything up with the original file name.
 echo "Downloading appimagetool…"
-wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}.AppImage" -O appimagetool
+wget "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${APPIMAGE_ARCH}.AppImage" -O appimagetool
 echo "Making appimagetool executable…"
 chmod +x appimagetool
 
