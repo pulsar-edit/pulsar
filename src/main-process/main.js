@@ -18,10 +18,23 @@ function createWindow() {
     },
     transparent: false,
     backgroundColor: '#FFF',
-    autoHideMenuBar: true,
+    hardwareAcceleration: false,
   });
 
   mainWindow.loadFile('index.html');
+}
+
+  mainWindow.on('minimize', () => {
+    mainWindow.hide();
+  });
+
+  mainWindow.on('restore', () => {
+    mainWindow.show();
+  });
+}
+
+if (process.argv.includes('--screen-capture-mode')) {
+  app.disableHardwareAcceleration();
 }
 
 app.whenReady().then(() => {
