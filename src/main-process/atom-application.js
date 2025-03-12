@@ -1827,7 +1827,7 @@ module.exports = class AtomApplication extends EventEmitter {
       if (testRunnerPath) {
         return testRunnerPath;
       }
-    } catch {
+    } catch (err) {
       // Nothing to do, try the next strategy
       process.stderr.write(`Failed to load: ./spec/${atomTestRunner}\n${err.message}`)
     }
