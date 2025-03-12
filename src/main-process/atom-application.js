@@ -1829,6 +1829,7 @@ module.exports = class AtomApplication extends EventEmitter {
       }
     } catch {
       // Nothing to do, try the next strategy
+      process.stderr.write(`Failed to load: ./spec/${atomTestRunner}\n${err.message}`)
     }
 
     // Then try to use one of the runners defined in Pulsar
