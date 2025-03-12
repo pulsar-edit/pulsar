@@ -8,6 +8,7 @@ describe('StateStore', () => {
 
   describe('with the default IndexedDB backend', () => {
     beforeEach(() => {
+      jasmine.useRealClock();
       atom.config.set('core.useLegacySessionStore', true)
     })
 
@@ -57,33 +58,33 @@ describe('StateStore', () => {
     });
 
     describe('when there is an error reading from the database', () => {
-      it('rejects the promise returned by load', () => {
+      it('rejects the promise returned by load', async () => {
+        jasmine.useRealClock();
         const store = new StateStore(databaseName, version);
 
         const fakeErrorEvent = {
           target: { errorCode: 'Something bad happened' }
         };
 
-        spyOn(IDBObjectStore.prototype, 'get').andCallFake(key => {
+        spyOn(IDBObjectStore.prototype, 'get').and.callFake(key => {
           let request = {};
           process.nextTick(() => request.onerror(fakeErrorEvent));
           return request;
         });
 
-        return store
-          .load('nonexistentKey')
-          .then(() => {
-            throw new Error('Promise should have been rejected');
-          })
-          .catch(event => {
-            expect(event).toBe(fakeErrorEvent);
-          });
+        try {
+          await store.load('nonExistentKey');
+          throw new Error(`Promise should have been rejected`);
+        } catch (event) {
+          expect(event).toBe(fakeErrorEvent);
+        }
       });
     });
   });
 
   describe('with the new SQLite3 backend', () => {
     beforeEach(() => {
+      jasmine.useRealClock();
       atom.config.set('core.useLegacySessionStore', false)
     })
 

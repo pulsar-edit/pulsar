@@ -95,7 +95,7 @@ describe('Selection', () => {
       buffer.insert([2, 5], 'abc');
       expect(changeScreenRangeHandler).toHaveBeenCalled();
       expect(
-        changeScreenRangeHandler.mostRecentCall.args[0]
+        changeScreenRangeHandler.calls.mostRecent().args[0]
       ).not.toBeUndefined();
     });
   });
@@ -111,7 +111,7 @@ describe('Selection', () => {
       buffer.insert([2, 5], 'abc');
       expect(changeScreenRangeHandler).toHaveBeenCalled();
       expect(
-        changeScreenRangeHandler.mostRecentCall.args[0]
+        changeScreenRangeHandler.calls.mostRecent().args[0]
       ).not.toBeUndefined();
     });
   });

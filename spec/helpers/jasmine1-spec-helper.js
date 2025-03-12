@@ -8,9 +8,9 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 let specDirectory, specPackageName, specPackagePath, specProjectPath;
-require('jasmine-json');
-require('../src/window');
-require('../vendor/jasmine-jquery');
+require('./jasmine-singleton');
+require('../../src/window');
+require('../../vendor/jasmine-jquery');
 const path = require('path');
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
@@ -19,17 +19,17 @@ const pathwatcher = require('pathwatcher');
 const FindParentDir = require('find-parent-dir');
 const {CompositeDisposable} = require('event-kit');
 
-const TextEditor = require('../src/text-editor');
-const TextEditorElement = require('../src/text-editor-element');
-const TextMateLanguageMode = require('../src/text-mate-language-mode');
+const TextEditor = require('../../src/text-editor');
+const TextEditorElement = require('../../src/text-editor-element');
+const TextMateLanguageMode = require('../../src/text-mate-language-mode');
 const {clipboard} = require('electron');
-const {mockDebounce} = require("./spec-helper-functions.js");
+const {mockDebounce} = require("./mock-debounce.js");
 
 const jasmineStyle = document.createElement('style');
 jasmineStyle.textContent = atom.themes.loadStylesheet(atom.themes.resolveStylesheet('../static/jasmine'));
 document.head.appendChild(jasmineStyle);
 
-const fixturePackagesPath = path.resolve(__dirname, './fixtures/packages');
+const fixturePackagesPath = path.resolve(__dirname, '../fixtures/packages');
 atom.packages.packageDirPaths.unshift(fixturePackagesPath);
 
 document.querySelector('html').style.overflow = 'auto';

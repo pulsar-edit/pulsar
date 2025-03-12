@@ -517,7 +517,7 @@ describe('GrammarRegistry', () => {
 
       const filePath = require.resolve('./fixtures/shebang');
       const filePathContents = fs.readFileSync(filePath, 'utf8');
-      spyOn(fs, 'read').andCallThrough();
+      spyOn(fs, 'read').and.callThrough();
       expect(atom.grammars.selectGrammar(filePath, filePathContents).name).toBe(
         'Ruby'
       );

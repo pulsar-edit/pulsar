@@ -22,6 +22,7 @@
   "engines": {
     "node": ">=14"
   },
+  "atomTestRunner": "runners/jasmine2-test-runner",
   "license": "MIT",
   "electronVersion": "30.0.9",
   "dependencies": {
@@ -84,8 +85,8 @@
     "image-view": "file:packages/image-view",
     "incompatible-packages": "file:packages/incompatible-packages",
     "jasmine-json": "~0.0",
-    "jasmine-reporters": "1.1.0",
     "jasmine-tagged": "^1.1.4",
+    "jasmine": "2.5.3",
     "key-path-helpers": "^0.4.0",
     "keybinding-resolver": "file:./packages/keybinding-resolver",
     "language-c": "file:packages/language-c",
@@ -289,7 +290,9 @@
     "start": "electron --no-sandbox --enable-logging . -f",
     "dist": "node script/electron-builder.config.js",
     "js-docs": "jsdoc2md --files src --configure docs/.jsdoc.json > ./docs/Pulsar-API-Documentation.md",
-    "private-js-docs": "jsdoc2md --private --files src --configure docs/.jsdoc.json > ./docs/Source-Code-Documentation.md"
+    "private-js-docs": "jsdoc2md --private --files src --configure docs/.jsdoc.json > ./docs/Source-Code-Documentation.md",
+    "test:editor": "yarn test:only spec",
+    "test:only": "yarn start --test"
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",

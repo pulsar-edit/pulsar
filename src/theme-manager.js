@@ -2,11 +2,14 @@
 
 const path = require('path');
 const _ = require('underscore-plus');
-const { Emitter, CompositeDisposable } = require('event-kit');
-const { File } = require('pathwatcher');
+const { Emitter } = require('event-kit');
 const fs = require('fs-plus');
 const LessCompileCache = require('./less-compile-cache');
 const Color = require('./color');
+
+// Keeping a reference to the entire object so that it can be mocked more
+// easily in the specs.
+const watcher = require('./path-watcher');
 
 async function wait(ms) {
   return new Promise(r => setTimeout(r, ms));
@@ -220,25 +223,17 @@ module.exports = class ThemeManager {
   }
 
   async unwatchUserStylesheet() {
-    this.userStylesheetSubscriptions?.dispose();
-    this.userStylesheetSubscriptions = null;
-
-    this.userStylesheetFile = null;
+    this.userStylesheetSubscription?.dispose();
+    this.userStylesheetSubscription = null;
 
     this.userStyleSheetDisposable?.dispose();
     this.userStyleSheetDisposable = null;
 
-    // Give `pathwatcher` a moment to clean up its file-watchers.
+    // Pause a moment for file-watcher cleanup.
     await wait(10);
   }
 
   async loadUserStylesheet() {
-    // The modern version of `pathwatcher` doesn't like having to unsubscribe
-    // and resubscribe to the same file in rapid succession.
-    //
-    // This is a candidate for conversion to `watchPath` — since we've made
-    // these methods async to accommodate `pathwatcher`, we might as well keep
-    // going.
     await this.unwatchUserStylesheet();
 
     const userStylesheetPath = this.styleManager.getUserStyleSheetPath();
@@ -247,20 +242,22 @@ module.exports = class ThemeManager {
     }
 
     try {
-      this.userStylesheetFile = new File(userStylesheetPath);
-      this.userStylesheetSubscriptions = new CompositeDisposable();
+      // `watchPath` is recursive, even though we don't need it to be. So the
+      // easiest way to be sure our stylesheet is the one that was modified
+      // (rather than some other file called `styles.less` deeper in the tree)
+      // is to determine its real path (without symlinks) before we start the
+      // watcher.
+      let realStylesheetPath = fs.realpathSync(userStylesheetPath);
+      let realStylesheetDirectory = path.dirname(realStylesheetPath);
 
-      const reloadStylesheet = () => this.reloadStylesheet();
-
-      this.userStylesheetSubscriptions.add(
-        this.userStylesheetFile.onDidChange(reloadStylesheet)
-      );
-      this.userStylesheetSubscriptions.add(
-        this.userStylesheetFile.onDidRename(reloadStylesheet)
-      );
-      this.userStylesheetSubscriptions.add(
-        this.userStylesheetFile.onDidDelete(reloadStylesheet)
-      );
+      this.userStylesheetSubscription = await watcher.watchPath(realStylesheetDirectory, {}, (events) => {
+        for (const event of events) {
+          if (event.path === realStylesheetPath) {
+            this.reloadStylesheet();
+            break;
+          }
+        }
+      });
     } catch (error) {
       let message = `
 Unable to watch path: \`${path.basename(userStylesheetPath)}\`. Make sure

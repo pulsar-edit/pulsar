@@ -63,7 +63,6 @@ module.exports = class AtomWindow extends EventEmitter {
         disableBlinkFeatures: 'Auxclick,ObservableAPI',
         nodeIntegration: true,
         contextIsolation: false,
-        enableRemoteModule: true,
         webviewTag: true,
 
         // node support in threads

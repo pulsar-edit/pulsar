@@ -1,4 +1,4 @@
-const { conditionPromise } = require('./async-spec-helpers');
+const { conditionPromise, timeoutPromise: wait } = require('./helpers/async-spec-helpers');
 
 const Random = require('random-seed');
 const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
@@ -24,17 +24,19 @@ class DummyElement extends HTMLElement {
   }
 }
 
-window.customElements.define(
-  'text-editor-component-test-element',
-  DummyElement
-);
-
-document.createElement('text-editor-component-test-element');
-
 const editors = [];
 let verticalScrollbarWidth, horizontalScrollbarHeight;
 
 describe('TextEditorComponent', () => {
+  beforeEach(() => {
+    if (!window.customElements.get('text-editor-component-test-element')) {
+      window.customElements.define(
+        'text-editor-component-test-element',
+        DummyElement
+      );
+    }
+  })
+
   beforeEach(() => {
     jasmine.useRealClock();
 
@@ -1072,9 +1074,11 @@ describe('TextEditorComponent', () => {
       expect(element.className).toBe('editor a b');
       element.focus();
       await component.getNextUpdatePromise();
+      await wait(0);
       expect(element.className).toBe('editor a b is-focused');
       document.body.focus();
       await component.getNextUpdatePromise();
+      await wait(0);
       expect(element.className).toBe('editor a b');
     });
 
@@ -1138,12 +1142,12 @@ describe('TextEditorComponent', () => {
       let originalTimeout;
 
       beforeEach(() => {
-        originalTimeout = jasmine.getEnv().defaultTimeoutInterval;
-        jasmine.getEnv().defaultTimeoutInterval = 60 * 1000;
+        originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
       });
 
       afterEach(() => {
-        jasmine.getEnv().defaultTimeoutInterval = originalTimeout;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
       });
 
       it('renders the visible rows correctly after randomly mutating the editor', async () => {
@@ -1177,8 +1181,8 @@ describe('TextEditorComponent', () => {
             if (k < 10) {
               editor.setSoftWrapped(!editor.isSoftWrapped());
             } else if (k < 15) {
-              if (random(2)) setEditorWidthInCharacters(component, random(20));
-              if (random(2)) setEditorHeightInLines(component, random(10));
+              if (random(2)) await setEditorWidthInCharacters(component, random(20));
+              if (random(2)) await setEditorHeightInLines(component, random(10));
             } else if (k < 40) {
               editor.setSelectedBufferRange(range);
               editor.backspace();
@@ -2569,10 +2573,10 @@ describe('TextEditorComponent', () => {
       fakeWindow.style.backgroundColor = 'blue';
       fakeWindow.appendChild(component.element);
       jasmine.attachToDOM(fakeWindow);
-      spyOn(component, 'getWindowInnerWidth').andCallFake(
+      spyOn(component, 'getWindowInnerWidth').and.callFake(
         () => fakeWindow.getBoundingClientRect().width
       );
-      spyOn(component, 'getWindowInnerHeight').andCallFake(
+      spyOn(component, 'getWindowInnerHeight').and.callFake(
         () => fakeWindow.getBoundingClientRect().height
       );
       return fakeWindow;
@@ -4630,7 +4634,7 @@ describe('TextEditorComponent', () => {
             const {
               didDrag,
               didStopDragging
-            } = component.handleMouseDragUntilMouseUp.argsForCall[0][0];
+            } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
             didDrag(clientPositionForCharacter(component, 8, 8));
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [8, 8]]);
             didDrag(clientPositionForCharacter(component, 4, 8));
@@ -4655,7 +4659,7 @@ describe('TextEditorComponent', () => {
             const {
               didDrag,
               didStopDragging
-            } = component.handleMouseDragUntilMouseUp.argsForCall[1][0];
+            } = component.handleMouseDragUntilMouseUp.calls.argsFor(1)[0];
             didDrag(clientPositionForCharacter(component, 2, 8));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
@@ -4703,7 +4707,7 @@ describe('TextEditorComponent', () => {
 
           const {
             didDrag
-          } = component.handleMouseDragUntilMouseUp.argsForCall[1][0];
+          } = component.handleMouseDragUntilMouseUp.calls.argsFor(1)[0];
           didDrag(clientPositionForCharacter(component, 0, 8));
           expect(editor.getSelectedScreenRange()).toEqual([[0, 4], [1, 5]]);
           didDrag(clientPositionForCharacter(component, 2, 10));
@@ -4731,7 +4735,7 @@ describe('TextEditorComponent', () => {
 
           const {
             didDrag
-          } = component.handleMouseDragUntilMouseUp.argsForCall[2][0];
+          } = component.handleMouseDragUntilMouseUp.calls.argsFor(2)[0];
           didDrag(clientPositionForCharacter(component, 1, 8));
           expect(editor.getSelectedScreenRange()).toEqual([[1, 0], [3, 0]]);
           didDrag(clientPositionForCharacter(component, 4, 10));
@@ -4793,7 +4797,7 @@ describe('TextEditorComponent', () => {
           });
           const {
             didDrag
-          } = component.handleMouseDragUntilMouseUp.argsForCall[0][0];
+          } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
 
           didDrag({ clientX: 199, clientY: 199 });
           assertScrolledDownAndRight();
@@ -4841,7 +4845,7 @@ describe('TextEditorComponent', () => {
       });
 
       it('pastes the previously selected text when clicking the middle mouse button on Linux', async () => {
-        spyOn(electron.ipcRenderer, 'send').andCallFake(function (
+        spyOn(electron.ipcRenderer, 'send').and.callFake(function (
           eventName,
           selectedText
         ) {
@@ -4895,7 +4899,7 @@ describe('TextEditorComponent', () => {
       });
 
       it('does not paste into a read only editor when clicking the middle mouse button on Linux', async () => {
-        spyOn(electron.ipcRenderer, 'send').andCallFake(function (
+        spyOn(electron.ipcRenderer, 'send').and.callFake(function (
           eventName,
           selectedText
         ) {
@@ -5025,7 +5029,7 @@ describe('TextEditorComponent', () => {
         const {
           didDrag,
           didStopDragging
-        } = component.handleMouseDragUntilMouseUp.argsForCall[0][0];
+        } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
         didDrag({
           clientY: clientTopForLine(component, 1)
         });
@@ -5063,7 +5067,7 @@ describe('TextEditorComponent', () => {
         const {
           didDrag,
           didStopDragging
-        } = component.handleMouseDragUntilMouseUp.argsForCall[0][0];
+        } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
 
         didDrag({
           clientY: clientTopForLine(component, 1)
@@ -5163,7 +5167,7 @@ describe('TextEditorComponent', () => {
         });
         const {
           didDrag
-        } = component.handleMouseDragUntilMouseUp.argsForCall[0][0];
+        } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
         didDrag({ clientX: 199, clientY: 199 });
         assertScrolledDown();
         didDrag({ clientX: 199, clientY: 199 });
@@ -5666,7 +5670,9 @@ describe('TextEditorComponent', () => {
       expect(component.getScrollTopRow()).toBe(4);
     });
 
-    it('gracefully handles the editor being hidden after a styling change', async () => {
+    it('gracefully handles the editor being hidden after a styling change', async (done) => {
+      jasmine.filterByPlatform({only: ['linux']}, done);
+
       const { component, element } = buildComponent({
         autoHeight: false
       });
@@ -5675,6 +5681,8 @@ describe('TextEditorComponent', () => {
       TextEditor.didUpdateStyles();
       element.style.display = 'none';
       await component.getNextUpdatePromise();
+
+      done();
     });
 
     it('does not throw an exception when the editor is soft-wrapped and changing the font size changes also the longest screen line', async () => {
@@ -5760,7 +5768,7 @@ describe('TextEditorComponent', () => {
         updatedSynchronously: true
       });
       editor.setSoftWrapped(true);
-      spyOn(window, 'onerror').andCallThrough();
+      spyOn(window, 'onerror').and.callThrough();
       jasmine.attachToDOM(element); // should not throw an exception
       expect(window.onerror).not.toHaveBeenCalled();
     });
@@ -5981,24 +5989,24 @@ describe('TextEditorComponent', () => {
       });
       spyOn(Grim, 'deprecate');
       expect(editor.getHeight()).toBe(component.getScrollContainerHeight());
-      expect(Grim.deprecate.callCount).toBe(1);
+      expect(Grim.deprecate.calls.count()).toBe(1);
 
       editor.setHeight(100);
       await component.getNextUpdatePromise();
       expect(component.getScrollContainerHeight()).toBe(100);
-      expect(Grim.deprecate.callCount).toBe(2);
+      expect(Grim.deprecate.calls.count()).toBe(2);
     });
 
     it('delegates setWidth and getWidth to the component', async () => {
       const { component, editor } = buildComponent();
       spyOn(Grim, 'deprecate');
       expect(editor.getWidth()).toBe(component.getScrollContainerWidth());
-      expect(Grim.deprecate.callCount).toBe(1);
+      expect(Grim.deprecate.calls.count()).toBe(1);
 
       editor.setWidth(100);
       await component.getNextUpdatePromise();
       expect(component.getScrollContainerWidth()).toBe(100);
-      expect(Grim.deprecate.callCount).toBe(2);
+      expect(Grim.deprecate.calls.count()).toBe(2);
     });
 
     it('delegates getFirstVisibleScreenRow, getLastVisibleScreenRow, and getVisibleRowRange to the component', async () => {

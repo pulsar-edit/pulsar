@@ -203,4 +203,3 @@ jobs:
 
     - name: Run ${{ matrix.package }} Tests
       run: Xvfb :1 & cd node_modules/${{ matrix.package }} && if test -d spec; then DISPLAY=:1 pulsar --test spec; fi
-        # run: node -e "require('./script/run-package-tests')(/${{ matrix.package }}/)"

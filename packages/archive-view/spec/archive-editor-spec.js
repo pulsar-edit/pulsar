@@ -1,5 +1,3 @@
-const {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} = require('./async-spec-helpers') // eslint-disable-line no-unused-vars
-
 const path = require('path')
 const ArchiveEditor = require('../lib/archive-editor')
 const ArchiveEditorView = require('../lib/archive-editor-view')

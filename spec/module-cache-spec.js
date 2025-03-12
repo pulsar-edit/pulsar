@@ -5,7 +5,7 @@ const temp = require('temp').track();
 const ModuleCache = require('../src/module-cache');
 
 describe('ModuleCache', function() {
-  beforeEach(() => spyOn(Module, '_findPath').andCallThrough());
+  beforeEach(() => spyOn(Module, '_findPath').and.callThrough());
 
   afterEach(function() {
     try {
@@ -23,7 +23,7 @@ describe('ModuleCache', function() {
       expect(fs.isFileSync(require.resolve(builtinName))).toBeTruthy();
     }
 
-    expect(Module._findPath.callCount).toBe(0);
+    expect(Module._findPath.calls.count()).toBe(0);
   });
 
   it('resolves relative core paths without hitting the filesystem', function() {
@@ -35,7 +35,7 @@ describe('ModuleCache', function() {
       }
     });
     expect(require('./fixtures/module-cache/file.json').foo).toBe('bar');
-    expect(Module._findPath.callCount).toBe(0);
+    expect(Module._findPath.calls.count()).toBe(0);
   });
 
   it('resolves module paths when a compatible version is provided by core', function() {
@@ -78,9 +78,9 @@ exports.load = function() { require('underscore-plus'); };\
     );
 
     const packageMain = require(indexPath);
-    Module._findPath.reset();
+    Module._findPath.calls.reset();
     packageMain.load();
-    expect(Module._findPath.callCount).toBe(0);
+    expect(Module._findPath.calls.count()).toBe(0);
   });
 
   it('does not resolve module paths when no compatible version is provided by core', function() {
@@ -122,10 +122,10 @@ exports.load = function() { require('underscore-plus'); };\
 `
     );
 
-    spyOn(process, 'cwd').andReturn('/'); // Required when running this test from CLI
+    spyOn(process, 'cwd').and.returnValue('/'); // Required when running this test from CLI
     const packageMain = require(indexPath);
-    Module._findPath.reset();
+    Module._findPath.calls.reset();
     expect(() => packageMain.load()).toThrow();
-    expect(Module._findPath.callCount).toBe(1);
+    expect(Module._findPath.calls.count()).toBe(1);
   });
 });

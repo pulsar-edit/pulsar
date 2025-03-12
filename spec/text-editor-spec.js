@@ -49,7 +49,7 @@ describe('TextEditor', () => {
 
     // The id generator should skip the id used up by the deserialized one:
     const fresh = new TextEditor();
-    expect(fresh.id).toNotEqual(deserialized.id);
+    expect(fresh.id).not.toEqual(deserialized.id);
   });
 
   describe('when the editor is deserialized', () => {
@@ -211,7 +211,7 @@ describe('TextEditor', () => {
       });
 
       expect(returnedPromise).toBe(element.component.getNextUpdatePromise());
-      expect(changeSpy.callCount).toBe(1);
+      expect(changeSpy.calls.count()).toBe(1);
       expect(editor.getTabLength()).toBe(6);
       expect(editor.getSoftTabs()).toBe(false);
       expect(editor.isSoftWrapped()).toBe(true);
@@ -366,8 +366,8 @@ describe('TextEditor', () => {
 
         expect(editorCallback).toHaveBeenCalled();
         expect(cursorCallback).toHaveBeenCalled();
-        const eventObject = editorCallback.mostRecentCall.args[0];
-        expect(cursorCallback.mostRecentCall.args[0]).toEqual(eventObject);
+        const eventObject = editorCallback.calls.mostRecent().args[0];
+        expect(cursorCallback.calls.mostRecent().args[0]).toEqual(eventObject);
 
         expect(eventObject.oldBufferPosition).toEqual([0, 0]);
         expect(eventObject.oldScreenPosition).toEqual([0, 0]);
@@ -1619,7 +1619,7 @@ describe('TextEditor', () => {
         editor.selectToBufferPosition([6, 2]);
 
         expect(rangeChangedHandler).toHaveBeenCalled();
-        const eventObject = rangeChangedHandler.mostRecentCall.args[0];
+        const eventObject = rangeChangedHandler.calls.mostRecent().args[0];
 
         expect(eventObject.oldBufferRange).toEqual([[3, 0], [4, 5]]);
         expect(eventObject.oldScreenRange).toEqual([[3, 0], [4, 5]]);
@@ -2250,7 +2250,7 @@ describe('TextEditor', () => {
         spyOn(
           editor.getBuffer().getLanguageMode(),
           'getNonWordCharacters'
-        ).andCallFake(function (position) {
+        ).and.callFake(function (position) {
           const result = '/()"\':,.;<>~!@#$%^&*|+=[]{}`?';
           const scopes = this.scopeDescriptorForPosition(
             position
@@ -4002,7 +4002,7 @@ describe('TextEditor', () => {
         it('notifies the observers when inserting text', () => {
           const willInsertSpy = jasmine
             .createSpy()
-            .andCallFake(() =>
+            .and.callFake(() =>
               expect(buffer.lineForRow(1)).toBe(
                 '  var sort = function(items) {'
               )
@@ -4010,7 +4010,7 @@ describe('TextEditor', () => {
 
           const didInsertSpy = jasmine
             .createSpy()
-            .andCallFake(() =>
+            .and.callFake(() =>
               expect(buffer.lineForRow(1)).toBe(
                 'xxxvar sort = function(items) {'
               )
@@ -4025,18 +4025,18 @@ describe('TextEditor', () => {
           expect(willInsertSpy).toHaveBeenCalled();
           expect(didInsertSpy).toHaveBeenCalled();
 
-          let options = willInsertSpy.mostRecentCall.args[0];
+          let options = willInsertSpy.calls.mostRecent().args[0];
           expect(options.text).toBe('xxx');
           expect(options.cancel).toBeDefined();
 
-          options = didInsertSpy.mostRecentCall.args[0];
+          options = didInsertSpy.calls.mostRecent().args[0];
           expect(options.text).toBe('xxx');
         });
 
         it('cancels text insertion when an ::onWillInsertText observer calls cancel on an event', () => {
           const willInsertSpy = jasmine
             .createSpy()
-            .andCallFake(({ cancel }) => cancel());
+            .and.callFake(({ cancel }) => cancel());
 
           const didInsertSpy = jasmine.createSpy();
 
@@ -8357,7 +8357,7 @@ describe('TextEditor', () => {
     beforeEach(async () => {
       editor = await atom.workspace.open('sample.js');
       jasmine.unspy(editor, 'shouldPromptToSave');
-      spyOn(atom.stateStore, 'isConnected').andReturn(true);
+      spyOn(atom.stateStore, 'isConnected').and.returnValue(true);
     });
 
     it('returns true when buffer has unsaved changes', () => {

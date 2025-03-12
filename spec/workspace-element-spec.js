@@ -1,10 +1,9 @@
-/** @babel */
-
 const { ipcRenderer } = require('electron');
 const etch = require('etch');
 const path = require('path');
 const temp = require('temp').track();
-const { Disposable } = require('event-kit');
+
+const { conditionPromise } = require('./helpers/async-spec-helpers');
 
 const getNextUpdatePromise = () => etch.getScheduler().nextUpdatePromise;
 
@@ -904,11 +903,15 @@ describe('WorkspaceElement', () => {
         atom.config.get('editor.fontSize') + 'px'
       );
 
-      atom.config.set(
-        'editor.fontSize',
-        atom.config.get('editor.fontSize') + 5
-      );
-      await editorElement.component.getNextUpdatePromise();
+      await new Promise((resolve) => {
+        editorElement.component.getNextUpdatePromise().then(() => resolve());
+
+        atom.config.set(
+          'editor.fontSize',
+          atom.config.get('editor.fontSize') + 5
+        );
+      })
+
       expect(getComputedStyle(editorElement).fontSize).toBe(
         atom.config.get('editor.fontSize') + 'px'
       );
@@ -920,9 +923,12 @@ describe('WorkspaceElement', () => {
       let fontFamily = atom.config.get('editor.fontFamily');
       expect(getComputedStyle(editorElement).fontFamily).toBe(fontFamily);
 
-      atom.config.set('editor.fontFamily', 'sans-serif');
+      await new Promise((resolve) => {
+        editorElement.component.getNextUpdatePromise().then(() => resolve());
+        atom.config.set('editor.fontFamily', 'sans-serif');
+      })
+
       fontFamily = atom.config.get('editor.fontFamily');
-      await editorElement.component.getNextUpdatePromise();
       expect(getComputedStyle(editorElement).fontFamily).toBe(fontFamily);
       expect(editor.getDefaultCharWidth()).not.toBe(initialCharWidth);
     });
@@ -931,75 +937,93 @@ describe('WorkspaceElement', () => {
     // `line-height` value that conforms to the hardware pixel grid.
     it("updates the line-height based on the 'editor.lineHeight' config value (when the value is a pixel measurement string)", async () => {
       const initialLineHeight = editor.getLineHeightInPixels();
-      atom.config.set('editor.lineHeight', '30px');
-      await editorElement.component.getNextUpdatePromise();
+
+      await new Promise((resolve) => {
+        editorElement.component.getNextUpdatePromise().then(() => resolve());
+        atom.config.set('editor.lineHeight', '30px');
+      });
+
       expect(getComputedStyle(editorElement).lineHeight).toBe(
         atom.config.get('editor.lineHeight')
       );
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
     });
 
-    it("updates the line-height based on the 'editor.lineHeight' config value (when the value is a number)", async () => {
+    it("updates the line-height based on the 'editor.lineHeight' config value (when the value is given as a bare number that needs no rounding)", async () => {
+      jasmine.useRealClock();
       const initialLineHeight = editor.getLineHeightInPixels();
       atom.config.set('editor.fontSize', 16);
       atom.config.set('editor.lineHeight', 1.875);
-      await editorElement.component.getNextUpdatePromise();
+      let expectedValue = `${atom.config.get('editor.fontSize') * atom.config.get('editor.lineHeight')}px`;
+      await conditionPromise(() => {
+        return getComputedStyle(editorElement).lineHeight === expectedValue;
+      })
       expect(getComputedStyle(editorElement).lineHeight).toBe(
-        `${atom.config.get('editor.fontSize') * atom.config.get('editor.lineHeight')}px`
+        expectedValue
       );
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
-    })
+    });
 
-    it("adjusts the line-height to a value that is appropriate for the display's pixel density (when the value is a number)", async () => {
+    it("adjusts the line-height to a value that is appropriate for the display's pixel density (when the value is given in pixels)", async () => {
+      jasmine.useRealClock();
       const initialLineHeight = editor.getLineHeightInPixels();
       // It's weird that browsers expose this as a writable getter, but we'll
       // reset it to its original value when the tests are done.
       window.devicePixelRatio = 2;
       atom.config.set('editor.fontSize', 16);
       atom.config.set('editor.lineHeight', '27.2px');
-      await editorElement.component.getNextUpdatePromise();
+      await conditionPromise(() => {
+        return getComputedStyle(editorElement).lineHeight === '27px'
+      });
       // The user has explicitly asked for a `line-height` of `27.2px`. When
       // there are two hardware pixels per software pixel, we can tolerate
       // values of 27px and 27.5px, but not 27.2px. Hence we round to the
       // nearest acceptable value.
       expect(getComputedStyle(editorElement).lineHeight).toBe('27px');
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
-    })
+    });
 
-    it("adjusts the line-height to a value that is appropriate for the display's pixel density (when the value is a number)", async () => {
+    it("adjusts the line-height to a value that is appropriate for the display's pixel density (when the value is given as a bare number and needs rounding)", async () => {
+      jasmine.useRealClock();
       const initialLineHeight = editor.getLineHeightInPixels();
       // It's weird that browsers expose this as a writable getter, but we'll
       // reset it to its original value when the tests are done.
       window.devicePixelRatio = 2;
       atom.config.set('editor.fontSize', 16);
       atom.config.set('editor.lineHeight', 1.7);
-      await editorElement.component.getNextUpdatePromise();
+      await conditionPromise(() => {
+        return getComputedStyle(editorElement).lineHeight === '27px'
+      });
       // The ratio expressed would result in a line height of 27.2px. When
       // there are two hardware pixels per software pixel, we can tolerate
       // values of 27px and 27.5px, but not 27.2px. Hence we round to the
       // nearest acceptable value.
       expect(getComputedStyle(editorElement).lineHeight).toBe('27px');
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
-    })
+    });
 
     // This last spec covers all cases where we opt out of adjusting the
     // `line-height` value. Since it can technically be any valid CSS
     // measurement, there are limits to our ability to adjust it.
     it("respects the specified 'editor.lineHeight' when the value is more exotic", async () => {
+      jasmine.useRealClock();
+      console.log('START TEST 4');
       const initialLineHeight = editor.getLineHeightInPixels();
       // It's weird that browsers expose this as a writable getter, but we'll
       // reset it to its original value when the tests are done.
       window.devicePixelRatio = 2;
       atom.config.set('editor.fontSize', 16);
       atom.config.set('editor.lineHeight', '1.7em');
-      await editorElement.component.getNextUpdatePromise();
+      await conditionPromise(() => {
+        return getComputedStyle(editorElement).lineHeight === '27.2px'
+      });
       // The ratio expressed would result in a line height of 27.2px. Since it
       // was specified in `em`, we don't try to normalize it to pixels, so
       // we'll allow the value even though it doesn't conform to the hardware
       // pixel grid.
       expect(getComputedStyle(editorElement).lineHeight).toBe('27.2px');
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
-    })
+    });
 
     it('increases or decreases the font size when a ctrl-mousewheel event occurs', () => {
       atom.config.set('editor.zoomFontWhenCtrlScrolling', true);
@@ -1168,7 +1192,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[0], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
 
       // Active item doesn't implement ::getPath(). Use first project directory.
       const item = document.createElement('div');
@@ -1179,7 +1203,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[0], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
 
       // Active item has no path. Use first project directory.
       item.getPath = () => null;
@@ -1189,7 +1213,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[0], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
 
       // Active item has path. Use project path for item path.
       item.getPath = () => path.join(projectPaths[1], 'a-file.txt');
@@ -1199,7 +1223,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[1], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
     });
 
     it('passes additional options to the spec window', () => {

@@ -81,13 +81,6 @@ async function modifyMainPackageJson(
 // eslint-disable-next-line node/no-unpublished-require
 const builder = require('electron-builder');
 
-const ICONS = {
-  png: 'resources/app-icons/beta.png',
-  ico: 'resources/app-icons/beta.ico',
-  svg: 'resources/app-icons/beta.svg',
-  icns: 'resources/app-icons/beta.icns'
-};
-
 const ARGS = yargs(hideBin(process.argv))
   .command('[platform]', 'build for a given platform', () => {
     return yargs.positional('platform', {
@@ -106,6 +99,7 @@ const ARGS = yargs(hideBin(process.argv))
   })
   .parse();
 
+
 // The difference in base name matters for the app ID (which helps the OS
 // understand that PulsarNext is not the same as Pulsar), but also for other
 // reasons.
@@ -117,6 +111,15 @@ const ARGS = yargs(hideBin(process.argv))
 const displayName = ARGS.next ? 'PulsarNext' : 'Pulsar';
 const baseName = ARGS.next ? 'pulsar-next' : 'pulsar';
 const ppmBaseName = ARGS.next ? 'ppm-next' : 'ppm';
+const iconName = ARGS.next ? 'beta-next' : 'beta';
+
+const ICONS = {
+  png: `resources/app-icons/${iconName}.png`,
+  ico: `resources/app-icons/${iconName}.ico`,
+  svg: `resources/app-icons/${iconName}.svg`,
+  icns: `resources/app-icons/${iconName}.icns`
+};
+
 
 let options = {
   appId: `dev.pulsar-edit.${baseName}`,
@@ -260,7 +263,7 @@ let options = {
         // `/usr/share/icons/hicolor/scalable`
         // (used only by desktops to show it on bar/switcher and app menus).
         "from": ICONS.svg,
-        "to": "pulsar.svg"
+        "to": `${ppmBaseName}.svg`
       },
       { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
       { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
