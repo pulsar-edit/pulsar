@@ -1808,9 +1808,11 @@ module.exports = class AtomApplication extends EventEmitter {
     let atomTestRunner = packageMetadata.atomTestRunner;
 
     if (!atomTestRunner) {
-      process.stdout.write('atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.');
+      process.stdout.write('atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.\n');
       atomTestRunner = 'runners/jasmine1-test-runner';
     }
+
+    process.stdout.write(`Using test runner: ${atomTestRunner}\n`)
 
     let testRunnerPath;
     Resolve ||= require('resolve');
