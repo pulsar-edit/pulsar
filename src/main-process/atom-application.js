@@ -376,7 +376,7 @@ module.exports = class AtomApplication extends EventEmitter {
       if (this.getAllWindows().length === 0) {
         console.log("Quitting.");
         app.quit();
-      };
+      }
     } else if (
       (pathsToOpen && pathsToOpen.length > 0) ||
       (foldersToOpen && foldersToOpen.length > 0)
@@ -655,7 +655,7 @@ module.exports = class AtomApplication extends EventEmitter {
         const window = this.focusedWindow();
         if (window) window.minimize();
       });
-      this.on('application:zoom', function() {
+      this.on('application:zoom', function () {
         const window = this.focusedWindow();
         if (window) window.maximize();
       });
@@ -1693,7 +1693,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
     const timeoutInSeconds = Number.parseFloat(timeout);
     if (!Number.isNaN(timeoutInSeconds)) {
-      const timeoutHandler = function() {
+      const timeoutHandler = function () {
         console.log(
           `The test suite has timed out because it has been running for more than ${timeoutInSeconds} seconds.`
         );
@@ -1770,7 +1770,8 @@ module.exports = class AtomApplication extends EventEmitter {
     let testRunnerPath;
     Resolve ||= require('resolve');
 
-    // First try to run with local runners (e.g: `./test/runner.js`) or packages (e.g.: `atom-mocha-test-runner`)
+    // First try to run with local runners (e.g: `./test/runner.js`) or
+    // packages (e.g.: `atom-mocha-test-runner`)
     try {
       testRunnerPath = Resolve.sync(atomTestRunner, {
         basedir: packageRoot,
@@ -1778,11 +1779,15 @@ module.exports = class AtomApplication extends EventEmitter {
       });
 
       if (testRunnerPath) {
+        process.stderr.write(`Strategy 1 succeeded: ${testRunnerPath}`)
         return testRunnerPath;
       }
-    } catch {
+    } catch (err) {
       // Nothing to do, try the next strategy
+      process.stderr.write(`Strategy 1 failed to load: ./spec/${atomTestRunner}\n${err.message}\n`)
     }
+
+    process.stderr.write(`Trying strategy 2 from ${this.devResourcePath}\n`)
 
     // Then try to use one of the runners defined in Pulsar
     try {
@@ -1792,10 +1797,12 @@ module.exports = class AtomApplication extends EventEmitter {
       });
 
       if (testRunnerPath) {
+        process.stderr.write(`Strategy 2 succeeded: ${testRunnerPath}\n`)
         return testRunnerPath;
       }
-    } catch {
+    } catch (err) {
       // Nothing to do, try the next strategy
+      process.stderr.write(`Strategy 2 failed to load: ./spec/${atomTestRunner}\n${err.message}\n`)
     }
 
     process.stderr.write(
