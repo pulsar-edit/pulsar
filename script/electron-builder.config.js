@@ -260,7 +260,7 @@ let options = {
         // `/usr/share/icons/hicolor/scalable`
         // (used only by desktops to show it on bar/switcher and app menus).
         "from": ICONS.svg,
-        "to": `${ppmBaseName}.svg`
+        "to": `${baseName}.svg`
       },
       { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
       { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
