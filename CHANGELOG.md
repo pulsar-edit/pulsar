@@ -79,6 +79,7 @@
 ### spell-check
 
 - Fixes for a possible patch release [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1173)
+- Adding `--enable-features=UseOzonePlatform` and `--ozone-platform=wayland` as parameters when running under Wayland on Linux (avoids using xwayland, which causes rendering problems on some systems, especially with NVidia)
 
 ## 1.124.0
 
