@@ -1729,7 +1729,13 @@ class FoldResolver {
     if (!this.layer.tree || !this.layer.queries.foldsQuery) { return null; }
     if (this.canReuseBoundaries(start, end)) {
       let result = this.boundaries.ge(start);
-      return result;
+      // Are the captures from this cached red-black-tree still fresh?
+      if (result?.value?.node?.tree?.rootNode) {
+        // If this node still exists, we have a fresh tree. If not, these
+        // captures were executed against a tree that's no longer valid, so we
+        // can't inspect them, and we should proceed with a new folds query.
+        return result;
+      }
     }
 
     let scopeResolver = this.layer.scopeResolver;
