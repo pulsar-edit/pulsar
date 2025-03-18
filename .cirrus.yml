@@ -91,24 +91,24 @@ arm_linux_task:
     - gem install fpm
     - git submodule init
     - git submodule update
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`-next/g" package.json
   install_script:
     - yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
     - yarn build
     - yarn run build:apm
   build_binary_script:
-    - yarn dist || yarn dist
+    - yarn dist --next || yarn dist --next
   rename_binary_script:
     - node script/rename.js "ARM.Linux"
   fix_linux_appimage_script:
-    - ./script/fix-linux-appimage.sh aarch64
+    - ./script/fix-linux-appimage.sh aarch64 pulsar-next
   binary_artifacts:
     path: ./binaries/*
   test_script:
     - rm -R node_modules/electron; yarn install --check-files
     - ./binaries/*AppImage --appimage-extract
-    - export BINARY_NAME='squashfs-root/pulsar'
+    - export BINARY_NAME='squashfs-root/pulsar-next'
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
   rolling_upload_script:
     - cd ./script/rolling-release-scripts
@@ -150,7 +150,7 @@ silicon_mac_task:
     - sudo bash ./n-0ce85771fdff8f4b3e09ade700461b4f58a64444/bin/n 16
     - cd ..
     - sudo npm install -g yarn
-    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
+    - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`-next/g" package.json
   install_script:
     - export PATH="/opt/homebrew/bin:$PATH"
     - yarn install --ignore-engines || yarn install --ignore-engines
@@ -160,7 +160,7 @@ silicon_mac_task:
     - yarn run build:apm
   build_binary_script:
     - export PATH="/opt/homebrew/bin:$PATH"
-    - yarn dist || yarn dist
+    - yarn dist --next || yarn dist --next
   rename_binary_script:
     - export PATH="/opt/homebrew/bin:$PATH"
     - node script/rename.js "Silicon.Mac"
