@@ -298,6 +298,7 @@
     "private-js-docs": "jsdoc2md --private --files src --configure docs/.jsdoc.json > ./docs/Source-Code-Documentation.md",
     "test:editor": "yarn test:only spec",
     "test:only": "yarn start --test"
+    "start": "electron . --enable-gpu"
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
