@@ -1478,13 +1478,46 @@ module.exports = class TextEditorComponent {
 
   updateHighlightsToRender() {
     this.decorationsToRender.highlights.length = 0;
+    let originRect = this.refs.lineTiles.getBoundingClientRect();
     for (let i = 0; i < this.decorationsToMeasure.highlights.length; i++) {
       const highlight = this.decorationsToMeasure.highlights[i];
       const { start, end } = highlight.screenRange;
+      let screenLineStart = this.renderedScreenLineForRow(start.row);
+      let screenLineEnd = this.renderedScreenLineForRow(end.row);
+      let { textNodes: startTextNodes } = this.lineComponentsByScreenLineId.get(screenLineStart.id);
+      let { textNodes: endTextNodes } = this.lineComponentsByScreenLineId.get(screenLineEnd.id);
+
+      let startClientRects;
+      let endClientRects = null;
+      if (start.row !== end.row) {
+        startClientRects = clientRectsForTextNodes(
+          startTextNodes,
+          start.column,
+          Math.max(0, screenLineStart.lineText.length)
+        );
+        endClientRects = clientRectsForTextNodes(
+          endTextNodes,
+          0,
+          end.column
+        );
+      } else {
+        startClientRects = clientRectsForTextNodes(
+          startTextNodes,
+          start.column,
+          end.column
+        );
+      }
+
+      // We can still use `startPixelTop` and `endPixelTop`, but we don't need
+      // `(start|end)PixelLeft`.
       highlight.startPixelTop = this.pixelPositionAfterBlocksForRow(start.row);
       highlight.startPixelLeft = this.pixelLeftForRowAndColumn(
         start.row,
         start.column
+      );
+      // We use these `ClientRect`s for their end coordinates.
+      highlight.startRects = [...startClientRects].map(
+        r => rectRelativeToOrigin(r, originRect)
       );
       highlight.endPixelTop =
         this.pixelPositionAfterBlocksForRow(end.row) + this.getLineHeight();
@@ -1492,6 +1525,11 @@ module.exports = class TextEditorComponent {
         end.row,
         end.column
       );
+      highlight.endRects = endClientRects ?
+        [...endClientRects].map(
+          r => rectRelativeToOrigin(r, originRect)
+        ) : null;
+
       this.decorationsToRender.highlights.push(highlight);
     }
   }
@@ -2544,8 +2582,6 @@ module.exports = class TextEditorComponent {
   }
 
   requestHorizontalMeasurement(row, column) {
-    if (column === 0) return;
-
     const screenLine = this.props.model.screenLineForScreenRow(row);
     if (screenLine) {
       this.requestLineToMeasure(row, screenLine);
@@ -2631,28 +2667,21 @@ module.exports = class TextEditorComponent {
     ) {
       const nextColumnToMeasure = columnsToMeasure[columnsIndex];
       while (textNodesIndex < textNodes.length) {
-        if (nextColumnToMeasure === 0) {
-          positions.set(0, 0);
-          continue columnLoop; // eslint-disable-line no-labels
-        }
-
         if (positions.has(nextColumnToMeasure)) continue columnLoop; // eslint-disable-line no-labels
         const textNode = textNodes[textNodesIndex];
         const textNodeEndColumn =
           textNodeStartColumn + textNode.textContent.length;
 
         if (nextColumnToMeasure < textNodeEndColumn) {
-          let clientPixelPosition;
-          if (nextColumnToMeasure === textNodeStartColumn) {
-            clientPixelPosition = clientRectForRange(textNode, 0, 1).left;
-          } else {
-            clientPixelPosition = clientRectForRange(
-              textNode,
-              0,
-              nextColumnToMeasure - textNodeStartColumn
-            ).right;
-          }
-
+          let rect = clientRectForRange(
+            textNode,
+            nextColumnToMeasure - textNodeStartColumn,
+            nextColumnToMeasure - textNodeStartColumn
+          )
+          // This ensures we get a proper cursor position at column 0 — which,
+          // if the line contains RTL text, may not correspond to an X-axis
+          // pixel position of 0.
+          let clientPixelPosition = rect.right - rect.width;
           if (lineNodeClientLeft === -1) {
             lineNodeClientLeft = lineNode.getBoundingClientRect().left;
           }
@@ -2715,16 +2744,20 @@ module.exports = class TextEditorComponent {
   }
 
   pixelLeftForRowAndColumn(row, column) {
-    if (column === 0) return 0;
     const screenLine = this.renderedScreenLineForRow(row);
+    if (column > screenLine.length - 1) {
+      column = screenLine.length - 1;
+    }
     if (screenLine) {
       const horizontalPositionsByColumn = this.horizontalPixelPositionsByScreenLineId.get(
         screenLine.id
       );
       if (horizontalPositionsByColumn) {
-        return horizontalPositionsByColumn.get(column);
+        let result = horizontalPositionsByColumn.get(column);
+        return result ?? 0;
       }
     }
+    return 0;
   }
 
   screenPositionForPixelPosition({ top, left }) {
@@ -2743,76 +2776,15 @@ module.exports = class TextEditorComponent {
       screenLine = this.renderedScreenLineForRow(row);
     }
 
-    const linesClientLeft = this.refs.lineTiles.getBoundingClientRect().left;
-    const targetClientLeft = linesClientLeft + Math.max(0, left);
-    const { textNodes } = this.lineComponentsByScreenLineId.get(screenLine.id);
+    let linesClientRect = this.refs.lineTiles.getBoundingClientRect();
+    let targetClientLeft = linesClientRect.left + Math.max(0, left);
+    let targetClientTop = linesClientRect.top + Math.max(0, top);
 
-    let containingTextNodeIndex;
-    {
-      let low = 0;
-      let high = textNodes.length - 1;
-      while (low <= high) {
-        const mid = low + ((high - low) >> 1);
-        const textNode = textNodes[mid];
-        const textNodeRect = clientRectForRange(textNode, 0, textNode.length);
+    // We can look up the DOM `Range` using Chromium’s nonstandard
+    // `caretRangeFromPoint` API.
+    let inherentRange = document.caretRangeFromPoint(targetClientLeft, targetClientTop);
 
-        if (targetClientLeft < textNodeRect.left) {
-          high = mid - 1;
-          containingTextNodeIndex = Math.max(0, mid - 1);
-        } else if (targetClientLeft > textNodeRect.right) {
-          low = mid + 1;
-          containingTextNodeIndex = Math.min(textNodes.length - 1, mid + 1);
-        } else {
-          containingTextNodeIndex = mid;
-          break;
-        }
-      }
-    }
-    const containingTextNode = textNodes[containingTextNodeIndex];
-    let characterIndex = 0;
-    {
-      let low = 0;
-      let high = containingTextNode.length - 1;
-      while (low <= high) {
-        const charIndex = low + ((high - low) >> 1);
-        const nextCharIndex = isPairedCharacter(
-          containingTextNode.textContent,
-          charIndex
-        )
-          ? charIndex + 2
-          : charIndex + 1;
-
-        const rangeRect = clientRectForRange(
-          containingTextNode,
-          charIndex,
-          nextCharIndex
-        );
-        if (targetClientLeft < rangeRect.left) {
-          high = charIndex - 1;
-          characterIndex = Math.max(0, charIndex - 1);
-        } else if (targetClientLeft > rangeRect.right) {
-          low = nextCharIndex;
-          characterIndex = Math.min(
-            containingTextNode.textContent.length,
-            nextCharIndex
-          );
-        } else {
-          if (targetClientLeft <= (rangeRect.left + rangeRect.right) / 2) {
-            characterIndex = charIndex;
-          } else {
-            characterIndex = nextCharIndex;
-          }
-          break;
-        }
-      }
-    }
-
-    let textNodeStartColumn = 0;
-    for (let i = 0; i < containingTextNodeIndex; i++) {
-      textNodeStartColumn = textNodeStartColumn + textNodes[i].length;
-    }
-    const column = textNodeStartColumn + characterIndex;
-
+    let { startOffset: column } = inherentRange;
     return Point(row, column);
   }
 
@@ -4824,6 +4796,10 @@ class HighlightsComponent {
         const newHighlight = newProps.highlightDecorations[i];
         if (oldHighlight.className !== newHighlight.className) return true;
         if (newHighlight.flashRequested) return true;
+        if (oldHighlight.startRects !== newHighlight.startRects)
+          return true;
+        if (oldHighlight.endRects !== newHighlight.endRects)
+          return true;
         if (oldHighlight.startPixelTop !== newHighlight.startPixelTop)
           return true;
         if (oldHighlight.startPixelLeft !== newHighlight.startPixelLeft)
@@ -4892,41 +4868,55 @@ class HighlightComponent {
       lineHeight,
       startPixelTop,
       startPixelLeft,
+      startRects,
       endPixelTop,
-      endPixelLeft
+      endPixelLeft,
+      endRects
     } = this.props;
     const regionClassName = 'region ' + className;
 
     let children;
     if (screenRange.start.row === screenRange.end.row) {
-      children = $.div({
-        className: regionClassName,
-        style: {
-          position: 'absolute',
-          boxSizing: 'border-box',
-          top: startPixelTop + 'px',
-          left: startPixelLeft + 'px',
-          width: endPixelLeft - startPixelLeft + 'px',
-          height: lineHeight + 'px'
-        }
-      });
-    } else {
-      children = [];
-      children.push(
-        $.div({
+      // We might need to draw more than one decoration on the starting line if
+      // there’s a mix of LTR and RTL text.
+      children = startRects.map(r => {
+        return $.div({
           className: regionClassName,
           style: {
             position: 'absolute',
             boxSizing: 'border-box',
+            // `startPixelTop` is the best indicator of where the decoration
+            // should start vertically; the `rect` just gets used for its
+            // `left` and `width`.
             top: startPixelTop + 'px',
-            left: startPixelLeft + 'px',
-            right: 0,
+            left: r.left + 'px',
+            width: r.width + 'px',
             height: lineHeight + 'px'
           }
+        });
+      });
+    } else {
+      children = [];
+      children.push(
+        ...startRects.map(r => {
+          return $.div({
+            className: regionClassName,
+            style: {
+              position: 'absolute',
+              boxSizing: 'border-box',
+              top: startPixelTop + 'px',
+              left: r.left + 'px',
+              width: r.width + 'px',
+              height: lineHeight + 'px'
+            }
+          });
         })
       );
 
       if (screenRange.end.row - screenRange.start.row > 1) {
+        // If there's at least one fully selected row in between the starting
+        // and ending lines of the selection, we can represent all of it with a
+        // single decoration.
         children.push(
           $.div({
             className: regionClassName,
@@ -4942,24 +4932,29 @@ class HighlightComponent {
         );
       }
 
-      if (endPixelLeft > 0) {
+      if (endRects) {
         children.push(
-          $.div({
-            className: regionClassName,
-            style: {
-              position: 'absolute',
-              boxSizing: 'border-box',
-              top: endPixelTop - lineHeight + 'px',
-              left: 0,
-              width: endPixelLeft + 'px',
-              height: lineHeight + 'px'
-            }
+          ...endRects.map(r => {
+            return $.div({
+              className: regionClassName,
+              style: {
+                position: 'absolute',
+                boxSizing: 'border-box',
+                top: endPixelTop - lineHeight + 'px',
+                left: r.left + 'px',
+                width: r.width + 'px',
+                height: lineHeight + 'px'
+              }
+            });
           })
         );
       }
     }
 
-    return $.div({ className: 'highlight ' + className }, children);
+    return $.div(
+      { className: 'highlight ' + className },
+      children
+    );
   }
 }
 
@@ -5047,10 +5042,62 @@ class OverlayComponent {
 
 let rangeForMeasurement;
 function clientRectForRange(textNode, startIndex, endIndex) {
-  if (!rangeForMeasurement) rangeForMeasurement = document.createRange();
+  rangeForMeasurement ??= document.createRange();
   rangeForMeasurement.setStart(textNode, startIndex);
   rangeForMeasurement.setEnd(textNode, endIndex);
   return rangeForMeasurement.getBoundingClientRect();
+}
+
+// Given the `TextNodes` that make up a screen line and a starting and ending
+// column on that screen line, returns the `ClientRect`s that make up that
+// range.
+function clientRectsForTextNodes(textNodes, startColumn, endColumn) {
+  rangeForMeasurement ??= document.createRange();
+  let [startTextNode, startOffset] = textNodeAndOffsetForColumn(textNodes, startColumn);
+  let [endTextNode, endOffset] = textNodeAndOffsetForColumn(textNodes, endColumn);
+
+  if (
+    startTextNode === undefined ||
+    endTextNode === undefined ||
+    startOffset === undefined ||
+    endOffset === undefined
+  ) {
+    return [];
+  }
+
+  rangeForMeasurement.setStart(startTextNode, startOffset);
+  rangeForMeasurement.setEnd(endTextNode, endOffset);
+  return rangeForMeasurement.getClientRects();
+}
+
+// Given the `TextNode`s that make up a line and a column offset, returns the
+// correct `TextNode` and its internal offset suitable for bringing into
+// `Range::setStart` or `Range::setEnd`.
+function textNodeAndOffsetForColumn(textNodes, column) {
+  let prev = 0;
+  if (column === 0) return [textNodes[0], 0];
+
+  for (let node of textNodes) {
+    if ((prev + node.length) >= column) {
+      return [node, column - prev];
+    }
+    // Not in this text node.
+    prev += node.length;
+  }
+  return [undefined, undefined];
+}
+
+// Given two `ClientRect`s, returns a `ClientRect`ish object that adjusts the
+// coordinates of the first to be relative to the second.
+function rectRelativeToOrigin(rect, origin) {
+  return {
+    left: rect.left - origin.left,
+    top: rect.top - origin.top,
+    width: rect.width,
+    height: rect.height,
+    bottom: rect.bottom - origin.top,
+    right: rect.right - origin.left
+  };
 }
 
 function textDecorationsEqual(oldDecorations, newDecorations) {
