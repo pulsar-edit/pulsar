@@ -1482,6 +1482,9 @@ module.exports = class TextEditorComponent {
     for (let i = 0; i < this.decorationsToMeasure.highlights.length; i++) {
       const highlight = this.decorationsToMeasure.highlights[i];
       const { start, end } = highlight.screenRange;
+
+      // To know where to draw the selection highlights, we'll inspect the text
+      // nodes themselves and get some `ClientRects`.
       let screenLineStart = this.renderedScreenLineForRow(start.row);
       let screenLineEnd = this.renderedScreenLineForRow(end.row);
       let { textNodes: startTextNodes } = this.lineComponentsByScreenLineId.get(screenLineStart.id);
@@ -1508,23 +1511,15 @@ module.exports = class TextEditorComponent {
         );
       }
 
-      // We can still use `startPixelTop` and `endPixelTop`, but we don't need
-      // `(start|end)PixelLeft`.
       highlight.startPixelTop = this.pixelPositionAfterBlocksForRow(start.row);
-      highlight.startPixelLeft = this.pixelLeftForRowAndColumn(
-        start.row,
-        start.column
-      );
-      // We use these `ClientRect`s for their end coordinates.
+      // We use these `ClientRect`s for their X-axis coordinates;
+      // `startPixelTop` above tells us where to start the highlight on the
+      // Y-axis.
       highlight.startRects = [...startClientRects].map(
         r => rectRelativeToOrigin(r, originRect)
       );
       highlight.endPixelTop =
         this.pixelPositionAfterBlocksForRow(end.row) + this.getLineHeight();
-      highlight.endPixelLeft = this.pixelLeftForRowAndColumn(
-        end.row,
-        end.column
-      );
       highlight.endRects = endClientRects ?
         [...endClientRects].map(
           r => rectRelativeToOrigin(r, originRect)
@@ -2745,10 +2740,10 @@ module.exports = class TextEditorComponent {
 
   pixelLeftForRowAndColumn(row, column) {
     const screenLine = this.renderedScreenLineForRow(row);
-    if (column > screenLine.length - 1) {
-      column = screenLine.length - 1;
-    }
     if (screenLine) {
+      if (column > screenLine.length - 1) {
+        column = screenLine.length - 1;
+      }
       const horizontalPositionsByColumn = this.horizontalPixelPositionsByScreenLineId.get(
         screenLine.id
       );
@@ -4802,11 +4797,7 @@ class HighlightsComponent {
           return true;
         if (oldHighlight.startPixelTop !== newHighlight.startPixelTop)
           return true;
-        if (oldHighlight.startPixelLeft !== newHighlight.startPixelLeft)
-          return true;
         if (oldHighlight.endPixelTop !== newHighlight.endPixelTop) return true;
-        if (oldHighlight.endPixelLeft !== newHighlight.endPixelLeft)
-          return true;
         if (!oldHighlight.screenRange.isEqual(newHighlight.screenRange))
           return true;
       }
@@ -4867,10 +4858,8 @@ class HighlightComponent {
       screenRange,
       lineHeight,
       startPixelTop,
-      startPixelLeft,
       startRects,
       endPixelTop,
-      endPixelLeft,
       endRects
     } = this.props;
     const regionClassName = 'region ' + className;
