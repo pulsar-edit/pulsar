@@ -4903,6 +4903,7 @@ describe('TextEditorComponent', () => {
         // Selects entire buffer line when clicked screen line is soft-wrapped
         component.didMouseDownOnLineNumberGutter({
           button: 0,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 3)
         });
         expect(editor.getSelectedScreenRange()).toEqual([[3, 0], [5, 0]]);
@@ -4912,6 +4913,7 @@ describe('TextEditorComponent', () => {
         // span multiple buffer lines
         component.didMouseDownOnLineNumberGutter({
           button: 0,
+          clientX: clientLeftForCharacter(component, 5, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
         expect(editor.getSelectedScreenRange()).toEqual([[5, 0], [6, 0]]);
@@ -4931,6 +4933,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           metaKey: true,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 3)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -4947,6 +4950,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           metaKey: true,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -4976,6 +4980,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           shiftKey: true,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
 
@@ -4990,6 +4995,7 @@ describe('TextEditorComponent', () => {
           didStopDragging
         } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
         didDrag({
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         expect(editor.getSelectedBufferRanges()).toEqual([
@@ -4998,6 +5004,7 @@ describe('TextEditorComponent', () => {
         ]);
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 5, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
 
@@ -5020,6 +5027,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           metaKey: true,
+          clientX: clientLeftForCharacter(component, 2, 0) - 15,
           clientY: clientTopForLine(component, 2)
         });
 
@@ -5029,6 +5037,7 @@ describe('TextEditorComponent', () => {
         } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -5037,6 +5046,7 @@ describe('TextEditorComponent', () => {
         ]);
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 5, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -5046,6 +5056,7 @@ describe('TextEditorComponent', () => {
         expect(editor.isFoldedAtBufferRow(4)).toBe(true);
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 3)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -5067,6 +5078,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           target,
           button: 0,
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         expect(editor.isFoldedAtScreenRow(1)).toBe(true);
@@ -5075,6 +5087,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           target,
           button: 0,
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         await component.getNextUpdatePromise();
@@ -5090,6 +5103,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           target,
           button: 0,
+          clientX: clientLeftForCharacter(component, 4, 0) - 15,
           clientY: clientTopForLine(component, 4)
         });
         expect(editor.isFoldedAtScreenRow(4)).toBe(false);
