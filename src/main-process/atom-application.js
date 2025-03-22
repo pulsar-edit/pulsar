@@ -1779,15 +1779,11 @@ module.exports = class AtomApplication extends EventEmitter {
       });
 
       if (testRunnerPath) {
-        process.stderr.write(`Strategy 1 succeeded: ${testRunnerPath}`)
         return testRunnerPath;
       }
     } catch (err) {
       // Nothing to do, try the next strategy
-      process.stderr.write(`Strategy 1 failed to load: ./spec/${atomTestRunner}\n${err.message}\n`)
     }
-
-    process.stderr.write(`Trying strategy 2 from ${this.devResourcePath}\n`)
 
     // Then try to use one of the runners defined in Pulsar
     try {
@@ -1797,12 +1793,10 @@ module.exports = class AtomApplication extends EventEmitter {
       });
 
       if (testRunnerPath) {
-        process.stderr.write(`Strategy 2 succeeded: ${testRunnerPath}\n`)
         return testRunnerPath;
       }
     } catch (err) {
       // Nothing to do, try the next strategy
-      process.stderr.write(`Strategy 2 failed to load: ./spec/${atomTestRunner}\n${err.message}\n`)
     }
 
     process.stderr.write(
