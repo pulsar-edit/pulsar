@@ -17,6 +17,7 @@
   ; (singleton_method)
   "module"
   "if"
+  "in"
   "elsif"
   "else"
   "unless"
@@ -44,6 +45,7 @@
   ")"
   "}"
   "]"
+  "in"
   "when"
   "elsif"
   "else"

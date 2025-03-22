@@ -376,7 +376,7 @@ module.exports = class AtomApplication extends EventEmitter {
       if (this.getAllWindows().length === 0) {
         console.log("Quitting.");
         app.quit();
-      };
+      }
     } else if (
       (pathsToOpen && pathsToOpen.length > 0) ||
       (foldersToOpen && foldersToOpen.length > 0)
@@ -655,7 +655,7 @@ module.exports = class AtomApplication extends EventEmitter {
         const window = this.focusedWindow();
         if (window) window.minimize();
       });
-      this.on('application:zoom', function() {
+      this.on('application:zoom', function () {
         const window = this.focusedWindow();
         if (window) window.maximize();
       });
@@ -1693,7 +1693,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
     const timeoutInSeconds = Number.parseFloat(timeout);
     if (!Number.isNaN(timeoutInSeconds)) {
-      const timeoutHandler = function() {
+      const timeoutHandler = function () {
         console.log(
           `The test suite has timed out because it has been running for more than ${timeoutInSeconds} seconds.`
         );
@@ -1770,7 +1770,8 @@ module.exports = class AtomApplication extends EventEmitter {
     let testRunnerPath;
     Resolve ||= require('resolve');
 
-    // First try to run with local runners (e.g: `./test/runner.js`) or packages (e.g.: `atom-mocha-test-runner`)
+    // First try to run with local runners (e.g: `./test/runner.js`) or
+    // packages (e.g.: `atom-mocha-test-runner`)
     try {
       testRunnerPath = Resolve.sync(atomTestRunner, {
         basedir: packageRoot,
@@ -1780,7 +1781,7 @@ module.exports = class AtomApplication extends EventEmitter {
       if (testRunnerPath) {
         return testRunnerPath;
       }
-    } catch {
+    } catch (err) {
       // Nothing to do, try the next strategy
     }
 
@@ -1794,7 +1795,7 @@ module.exports = class AtomApplication extends EventEmitter {
       if (testRunnerPath) {
         return testRunnerPath;
       }
-    } catch {
+    } catch (err) {
       // Nothing to do, try the next strategy
     }
 

@@ -4,33 +4,40 @@
 my_func2 = lambda x, y=2, *z, **kw: x + y + 1
 #        ^ keyword.operator.assignment
 #          ^^^^^^^^^^^^^^^^^^^^^^^ meta.function.inline
-#           ^^^^^ storage.type.function.inline
+#           ^^^^^ keyword.control.lambda
 #                 ^^^^^^^^^^^^^^^^ meta.function.inline.parameters
-#                 ^  ^     ^    ^^ variable.parameter.function
-#                  ^    ^   ^ punctuation.separator.parameters
+#                 ^                variable.parameter.function
+#                    ^             variable.parameter.function
+#                          ^       variable.parameter.function
+#                               ^^ variable.parameter.function
+#                  ^          punctuation.separator.parameters
+#                       ^     punctuation.separator.parameters
+#                           ^ punctuation.separator.parameters
 #                    ^ variable.parameter.function
 #                     ^ keyword.operator.assignment
 #                      ^ constant
-#                         ^   ^^ keyword.operator.unpacking.arguments
+#                         ^      keyword.operator.splat
+#                             ^^ keyword.operator.splat
 #                          ^ variable.parameter.function
-#                                 ^ punctuation.definition.function.begin
+#                                 ^ punctuation.definition.function.lambda.colon
 
 
 lambda x, z = 4: x * z
 # ^^^^^^^^^^^^^ meta.function.inline.python
-# <- storage.type.function.inline.python
+# <- keyword.control.lambda.python
 #      ^^^^^^^^ meta.function.inline.parameters.python
-#      ^  ^ variable.parameter.function.python
-#       ^ punctuation.separator.parameters.python
+#      ^    variable.parameter.function.lambda.python
+#         ^ variable.parameter.function.lambda.python
+#       ^ punctuation.separator.parameters.comma.python
 #           ^ keyword.operator.assignment.python
-#             ^ constant.numeric.integer.decimal.python
-#              ^ punctuation.definition.function.begin.python
+#             ^ constant.numeric.integer.python
+#              ^ punctuation.definition.function.lambda.colon.python
 
 
 lambda: None
 # ^^^^ meta.function.inline.python
-# <- storage.type.function.inline.python
-#     ^ punctuation.definition.function.begin.python
+# <- keyword.control.lambda.python
+#     ^ punctuation.definition.function.lambda.colon
 
 
 not_a_lambda.foo
