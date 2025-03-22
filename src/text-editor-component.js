@@ -2668,15 +2668,19 @@ module.exports = class TextEditorComponent {
           textNodeStartColumn + textNode.textContent.length;
 
         if (nextColumnToMeasure < textNodeEndColumn) {
+          // We grab a zero-width `DOMRect` at this position. This ensures we
+          // won't span any directional shifts in the text (LTR to RTL or vice
+          // versa), meaning we'll get a proper measurement for where this
+          // character starts.
+          //
+          // (If the line starts with RTL text, column 0 may not correspond to
+          // an X-axis pixel position of 0.)
           let rect = clientRectForRange(
             textNode,
             nextColumnToMeasure - textNodeStartColumn,
             nextColumnToMeasure - textNodeStartColumn
           )
-          // This ensures we get a proper cursor position at column 0 — which,
-          // if the line contains RTL text, may not correspond to an X-axis
-          // pixel position of 0.
-          let clientPixelPosition = rect.right - rect.width;
+          let clientPixelPosition = rect.left;
           if (lineNodeClientLeft === -1) {
             lineNodeClientLeft = lineNode.getBoundingClientRect().left;
           }
@@ -5132,20 +5136,30 @@ class HighlightComponent {
     } else {
       // Multi-line select.
       children = [];
-      // First highlight extends all the way to the end of the line.
+      // Rightmost highlight extends all the way to the end of the line.
+      let rightmostRect;
+      for (let startRect of startRects) {
+        if (!rightmostRect || startRect.right > rightmostRect.right) {
+          rightmostRect = startRect;
+        }
+      }
       children.push(
         ...startRects.map(r => {
-          return $.div({
-            className: regionClassName,
-            style: {
-              position: 'absolute',
-              boxSizing: 'border-box',
-              top: startPixelTop + 'px',
-              left: r.left + 'px',
-              right: 0,
-              height: lineHeight + 'px'
-            }
-          });
+          let style = {
+            position: 'absolute',
+            boxSizing: 'border-box',
+            top: startPixelTop + 'px',
+            left: r.left + 'px',
+            height: lineHeight + 'px'
+          };
+
+          if (r === rightmostRect) {
+            style.right = 0;
+          } else {
+            style.width = r.width + 'px';
+          }
+
+          return $.div({ className: regionClassName, style });
         })
       );
 
@@ -5169,19 +5183,29 @@ class HighlightComponent {
       }
 
       if (endRects) {
+        // TODO: Might not need this logic.
+        // Leftmost highlight extends all the way to the start of the line.
+        let leftmostRect;
+        for (let startRect of startRects) {
+          if (!leftmostRect || startRect.left < leftmostRect.left) {
+            leftmostRect = startRect;
+          }
+        }
         children.push(
           ...endRects.map(r => {
-            return $.div({
-              className: regionClassName,
-              style: {
-                position: 'absolute',
-                boxSizing: 'border-box',
-                top: endPixelTop - lineHeight + 'px',
-                left: r.left + 'px',
-                width: r.width + 'px',
-                height: lineHeight + 'px'
-              }
-            });
+            let style = {
+              position: 'absolute',
+              boxSizing: 'border-box',
+              top: endPixelTop - lineHeight + 'px',
+              left: r.left + 'px',
+              width: r.width + 'px',
+              height: lineHeight + 'px'
+            };
+            if (r === leftmostRect) {
+              style.width = (r.left + r.width) + 'px';
+              style.left = 0;
+            }
+            return $.div({ className: regionClassName, style });
           })
         );
       }
