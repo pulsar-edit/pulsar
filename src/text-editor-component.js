@@ -2,7 +2,7 @@ const etch = require('etch');
 const { Point, Range } = require('text-buffer');
 const LineTopIndex = require('line-top-index');
 const TextEditor = require('./text-editor');
-const { isPairedCharacter } = require('./text-utils');
+const { isPairedCharacter, hasRtlText } = require('./text-utils');
 const electron = require('electron');
 const clipboard = electron.clipboard;
 const $ = etch.dom;
@@ -198,7 +198,7 @@ module.exports = class TextEditorComponent {
 
   pixelPositionForScreenPosition({ row, column }) {
     const top = this.pixelPositionAfterBlocksForRow(row);
-    let left = column === 0 ? 0 : this.pixelLeftForRowAndColumn(row, column);
+    let left = this.pixelLeftForRowAndColumn(row, column);
     if (left == null) {
       this.requestHorizontalMeasurement(row, column);
       this.updateSync();
@@ -2741,23 +2741,18 @@ module.exports = class TextEditorComponent {
   pixelLeftForRowAndColumn(row, column) {
     const screenLine = this.renderedScreenLineForRow(row);
     if (screenLine) {
-      if (column > screenLine.length - 1) {
-        column = screenLine.length - 1;
-      }
       const horizontalPositionsByColumn = this.horizontalPixelPositionsByScreenLineId.get(
         screenLine.id
       );
       if (horizontalPositionsByColumn) {
         let result = horizontalPositionsByColumn.get(column);
-        return result ?? 0;
+        return result;
       }
     }
-    return 0;
   }
 
   screenPositionForPixelPosition({ top, left }) {
     const { model } = this.props;
-
     const row = Math.min(
       this.rowForPixelPosition(top),
       model.getApproximateScreenLineCount() - 1
@@ -2770,17 +2765,265 @@ module.exports = class TextEditorComponent {
       this.measureContentDuringUpdateSync();
       screenLine = this.renderedScreenLineForRow(row);
     }
+    let rowLength = model.lineLengthForScreenRow(row);
+
+    let { textNodes } = this.lineComponentsByScreenLineId.get(screenLine.id);
 
     let linesClientRect = this.refs.lineTiles.getBoundingClientRect();
     let targetClientLeft = linesClientRect.left + Math.max(0, left);
     let targetClientTop = linesClientRect.top + Math.max(0, top);
 
-    // We can look up the DOM `Range` using Chromium’s nonstandard
+    // STRATEGY 1:
+    //
+    // If the user actually clicked on a place where we can put a cursor, we
+    // can look up the DOM `Range` using Chromium’s nonstandard
     // `caretRangeFromPoint` API.
-    let inherentRange = document.caretRangeFromPoint(targetClientLeft, targetClientTop);
+    //
+    // This should work wherever the point in question is rendered and visible
+    // within the viewport — e.g., anywhere the user clicks.
+    let inherentRange = document.caretRangeFromPoint(
+      targetClientLeft,
+      targetClientTop
+    );
 
-    let { startOffset: column } = inherentRange;
-    return Point(row, column);
+    if (inherentRange && textNodes.includes(inherentRange.startContainer)) {
+      // The range identified a text node on this line. Now we can convert the
+      // range start offset to a screen column by adding the lengths of all the
+      // previous nodes.
+      let column = columnForTextNodeAndOffset(
+        inherentRange.startContainer,
+        inherentRange.startOffset,
+        textNodes
+      );
+      return Point(row, column);
+    }
+
+    // SECOND STRATEGY:
+    //
+    // We need this if the point on screen isn't visible. This can happen if a
+    // package calls `screenPositionForPixelPosition` programmatically for a
+    // point that is not currently in view.
+    //
+    // A multi-stage drill-down:
+    //
+    // * First we find the single text node that contains the position we want.
+    // * Next, if necessary, we divide the line further into fragments so that
+    //   each fragment is highly likely to have exactly one `DOMRect`; this
+    //   tells us that we can assume a single direction of text across that
+    //   fragment.
+    // * Do a binary search within that fragment until we drill down to the
+    //   exact character.
+    //
+    // Find the text node that contains the position we want.
+    {
+      let boundingClientRect = boundingClientRectForTextNodes(textNodes);
+      // Weed out cases where the pixel position is outside the left and right
+      // bounds of the text nodes’ bounding box. These should be clamped, in
+      // effect, to the beginning and end of the line.
+      if (targetClientLeft < boundingClientRect.left) {
+        return Point(row, 0);
+      }
+      if (targetClientLeft > boundingClientRect.right) {
+        return Point(row, rowLength);
+      }
+
+      // If we get this far, we effectively will have guaranteed that one of
+      // the remaining individual text nodes will have at least one `DOMRect`
+      // that contains the point horizontally…
+      let containingTextNode = textNodes.find((node) => {
+        let rects = clientRectsForTextNode(node);
+        return Array.from(rects).some(
+          r => targetClientLeft >= r.left && targetClientLeft <= r.right
+        );
+      });
+
+      // …but we'll handle the failure case just to be safe.
+      if (!containingTextNode) {
+        console.error(`Error: could not find a valid cursor position for coordinates: (${left}, ${top}) within the editor.`);
+        // Declare defeat and fall back to the 0th column.
+        return Point(row, 0);
+      }
+
+      let containingTextNodeIndex = textNodes.indexOf(containingTextNode);
+      let characterIndex = 0;
+
+      // The space we will search will be either a full text node or some
+      // subset of it. We will ensure that this range of the text node has
+      // exactly one text direction.
+      let containingTextNodeBounds;
+      let containingText;
+
+      if (clientRectsForTextNode(containingTextNode).length === 1) {
+        // The whole text node is a single-directional fragment. Great!
+        containingText = containingTextNode.textContent;
+        containingTextNodeBounds = [0, containingText.length - 1];
+      } else {
+        // There are multiple `DOMRect`s used to draw this text range. Since
+        // this is a single screen line, it won't be because of text wrapping;
+        // hence it's almost certainly because we're drawing text in two
+        // different directions.
+        //
+        // Let's divide this text node up along the likely boundaries of RTL
+        // text divisions.
+        let { textContent } = containingTextNode;
+
+        // Detect unbroken strings of RTL text. These will help us divide the
+        // string into fragments, each of which will be considered
+        // individually. We use a pattern designed to detect Arabic, Hebrew,
+        // and Persian characters in their standard unicode ranges.
+
+        // This pattern describes any number of RTL characters separated only
+        // by strings.
+        let textMatches = Array.from(
+          textContent.matchAll(
+            /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+(?:\s+[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+)*/g
+          )
+        );
+
+        // These matches identify the RTL sections. Using them, we'll divide
+        // the entire line up into fragments, each of which is unidrectional.
+        let fragments = [];
+        let lastMatchIndex = textMatches.length - 1;
+
+        for (let [i, match] of Array.from(textMatches).entries()) {
+          let { index } = match;
+          let matchLength = match[0].length;
+          if (fragments.length === 0 && index > 0) {
+            // The first match doesn't start the line, so add a fragment to
+            // represent everything until the first match.
+            fragments.push([0, index]);
+          }
+          let [_, lastFragmentEnd] = fragments[fragments.length - 1];
+          if (lastFragmentEnd < index) {
+            // A gap exists between the last fragment we added and this match,
+            // so add another fragment to represent the gap.
+            fragments.push([lastFragmentEnd, index]);
+          }
+          // Add a fragment for this match.
+          fragments.push([index, index + matchLength]);
+
+          if (i === lastMatchIndex && (index + matchLength) < (textContent.length - 1)) {
+            // This is the last match, but there's text on the line after this
+            // match, so we'll add one final fragment to represent that text.
+            fragments.push([index + matchLength, textContent.length - 1]);
+          }
+        }
+
+        for (let [index, endIndex] of fragments) {
+          let fragmentText = textContent.substring(index, endIndex);
+          let rects = Array.from(
+            clientRectsForRange(containingTextNode, index, endIndex)
+          );
+          if (rects.some(
+            r => targetClientLeft >= r.left && targetClientLeft <= r.right
+          )) {
+            containingTextNodeBounds = [index, endIndex];
+            containingText = fragmentText;
+            break;
+          }
+        }
+
+        let clientRects = clientRectsForTextNode(
+          containingTextNode,
+          containingTextNodeBounds[0],
+          containingTextNodeBounds[1]
+        );
+        if (clientRects.length > 1) {
+          // We've still got a bidirectional fragment somehow. Split the whole
+          // thing into individual words. This is a more aggressive way to
+          // ensure unidirectionality within a text.
+          let words = containingText.split(/\b/);
+          let index = containingTextNodeBounds[0];
+          let found = false;
+          let targetClientRects;
+          for (let word of words) {
+            let boundaries = [index, index + word.length];
+            let clientRects = clientRectsForTextNode(
+              containingTextNode,
+              boundaries[0],
+              boundaries[1]
+            );
+            if (clientRects.some(
+              r => targetClientLeft >= r.left && targetClientLeft <= r.right
+            )) {
+              found = true;
+              targetClientRects = clientRects;
+              containingTextNodeBounds = boundaries;
+              containingText = containingText.substring(...boundaries);
+              break;
+            }
+          }
+          // At this point, if we can't find one — or if we can't isolate it to
+          // a single contiguous `DOMRect` — then we should give up.
+          if (!found | targetClientRects.length > 1) {
+            console.error(`Error: could not find a valid cursor position for coordinates: (${left}, ${top}) within the editor.`);
+            // Declare defeat and fall back to the 0th column.
+            return Point(row, 0);
+          }
+        }
+      }
+
+      if (!containingTextNodeBounds) {
+        console.error(`Error: could not find a valid cursor position for coordinates: (${left}, ${top}) within the editor.`);
+        // Declare defeat and fall back to the 0th column.
+        return Point(row, 0);
+      }
+
+      let mode = hasRtlText(containingText) ? 'rtl' : 'ltr';
+
+      characterIndex = -1;
+      {
+        let low = containingTextNodeBounds[0];
+        let high = containingTextNodeBounds[1];
+        while (low <= high) {
+          let charIndex = low + ((high - low) >> 1);
+          const nextCharIndex = isPairedCharacter(
+            containingTextNode.textContent,
+            charIndex
+          ) ? charIndex + 2 : charIndex + 1;
+
+          const rangeRect = clientRectForRange(
+            containingTextNode,
+            charIndex,
+            nextCharIndex
+          );
+
+          if (
+            (mode === 'ltr' && targetClientLeft < rangeRect.left) ||
+            (mode === 'rtl' && targetClientLeft > rangeRect.right)
+          ) {
+            high = charIndex - 1;
+            characterIndex = Math.max(0, charIndex - 1);
+          } else if (
+            (mode === 'ltr' && targetClientLeft > rangeRect.right) ||
+            (mode === 'rtl' && targetClientLeft < rangeRect.left)
+          ) {
+            low = nextCharIndex;
+            characterIndex = Math.min(
+              containingTextNode.textContent.length,
+              nextCharIndex
+            );
+          } else {
+            let mid = (rangeRect.left + rangeRect.right) / 2;
+            if (
+              (mode === 'ltr' && targetClientLeft <= mid) ||
+              (mode === 'rtl' && targetClientLeft >= mid)
+            ) {
+              characterIndex = charIndex;
+            } else {
+              characterIndex = nextCharIndex;
+            }
+            break;
+          }
+        }
+        let textNodeStartColumn = 0;
+        for (let i = 0; i < containingTextNodeIndex; i++) {
+          textNodeStartColumn += textNodes[i].length;
+        }
+        const column = textNodeStartColumn + characterIndex;
+        return Point(row, column);
+      }
+    }
   }
 
   didResetDisplayLayer() {
@@ -4866,8 +5109,10 @@ class HighlightComponent {
 
     let children;
     if (screenRange.start.row === screenRange.end.row) {
-      // We might need to draw more than one decoration on the starting line if
-      // there’s a mix of LTR and RTL text.
+      // Single line select.
+      //
+      // On both the starting and ending lines, we might need to draw more than
+      // one decoration if there’s a mix of LTR and RTL text.
       children = startRects.map(r => {
         return $.div({
           className: regionClassName,
@@ -4885,7 +5130,9 @@ class HighlightComponent {
         });
       });
     } else {
+      // Multi-line select.
       children = [];
+      // First highlight extends all the way to the end of the line.
       children.push(
         ...startRects.map(r => {
           return $.div({
@@ -4895,7 +5142,7 @@ class HighlightComponent {
               boxSizing: 'border-box',
               top: startPixelTop + 'px',
               left: r.left + 'px',
-              width: r.width + 'px',
+              right: 0,
               height: lineHeight + 'px'
             }
           });
@@ -5037,8 +5284,37 @@ function clientRectForRange(textNode, startIndex, endIndex) {
   return rangeForMeasurement.getBoundingClientRect();
 }
 
+function clientRectsForRange(textNode, startIndex, endIndex) {
+  rangeForMeasurement ??= document.createRange();
+  rangeForMeasurement.setStart(textNode, startIndex);
+  rangeForMeasurement.setEnd(textNode, endIndex);
+  return rangeForMeasurement.getClientRects();
+}
+
+function clientRectsForTextNode(textNode, startIndex = null, endIndex = null) {
+  rangeForMeasurement ??= document.createRange();
+  if (startIndex === null) {
+    rangeForMeasurement.setStartBefore(textNode);
+  } else {
+    rangeForMeasurement.setStart(textNode, startIndex);
+  }
+  if (endIndex === null) {
+    rangeForMeasurement.setEndAfter(textNode);
+  } else {
+    rangeForMeasurement.setEnd(textNode, endIndex);
+  }
+  return rangeForMeasurement.getClientRects();
+}
+
+function boundingClientRectForTextNodes(textNodes) {
+  rangeForMeasurement ??= document.createRange();
+  rangeForMeasurement.setStartBefore(textNodes[0]);
+  rangeForMeasurement.setEndAfter(textNodes[textNodes.length - 1]);
+  return rangeForMeasurement.getBoundingClientRect();
+}
+
 // Given the `TextNodes` that make up a screen line and a starting and ending
-// column on that screen line, returns the `ClientRect`s that make up that
+// column on that screen line, returns the `DOMRect`s that make up that
 // range.
 function clientRectsForTextNodes(textNodes, startColumn, endColumn) {
   rangeForMeasurement ??= document.createRange();
@@ -5056,7 +5332,56 @@ function clientRectsForTextNodes(textNodes, startColumn, endColumn) {
 
   rangeForMeasurement.setStart(startTextNode, startOffset);
   rangeForMeasurement.setEnd(endTextNode, endOffset);
-  return rangeForMeasurement.getClientRects();
+  return consolidateClientRects(rangeForMeasurement.getClientRects());
+}
+
+// Detects whether the given set of text nodes contains at least one instance
+// of LTR- and RTL-mixed text.
+function hasMultipleTextDirections(textNodes) {
+  rangeForMeasurement ??= document.createRange();
+  if (textNodes.length === 0) return false;
+  rangeForMeasurement.setStartBefore(textNodes[0]);
+  rangeForMeasurement.setEndAfter(textNodes[textNodes.length - 1]);
+  let rects = rangeForMeasurement.getClientRects();
+  return rects.length > textNodes.length;
+}
+
+// Returns whether two `DOMRect`s overlap.
+function rectsOverlap(rectA, rectB) {
+  if (rectA.right < rectB.left) return false;
+  if (rectA.left > rectB.right) return false;
+  if (rectA.top > rectB.bottom) return false;
+  if (rectA.bottom < rectB.top) return false;
+  return true;
+}
+
+function mergeOverlappingRects(rectA, rectB) {
+  let x = Math.min(rectA.x, rectB.x);
+  let y = Math.min(rectA.top, rectB.top);
+  let left = Math.min(rectA.left, rectB.left);
+  let right = Math.max(rectA.right, rectB.right);
+  let width = right - left;
+  let top = Math.min(rectA.top, rectB.top);
+  let bottom = Math.max(rectA.bottom, rectB.bottom);
+  let height = bottom - top;
+
+  return { x, y, left, right, width, top, bottom, height };
+}
+
+// Given any number of `DOMRect`s that might overlap, consolidate them into
+// a discrete number of `DOMRect`s that do not overlap.
+function consolidateClientRects(clientRects) {
+  let results = [];
+  for (let i = 0; i < clientRects.length; i++) {
+    let rect = clientRects[i];
+    let previousRect = results[results.length - 1];
+    if (previousRect && rectsOverlap(previousRect, rect)) {
+      results[results.length - 1] = mergeOverlappingRects(previousRect, rect);
+    } else {
+      results.push(rect);
+    }
+  }
+  return results;
 }
 
 // Given the `TextNode`s that make up a line and a column offset, returns the
@@ -5076,7 +5401,24 @@ function textNodeAndOffsetForColumn(textNodes, column) {
   return [undefined, undefined];
 }
 
-// Given two `ClientRect`s, returns a `ClientRect`ish object that adjusts the
+// Reverses the logic above; given a text node and an offset (and a collection
+// of text nodes for a given line), figures out the correct column.
+function columnForTextNodeAndOffset(activeTextNode, offset, allTextNodes) {
+  if (allTextNodes.length === 1 && activeTextNode === allTextNodes[0])
+    return offset;
+
+  let delta = 0;
+  for (let i = 0; i < allTextNodes.length; i++) {
+    if (allTextNodes[i] === activeTextNode) {
+      return delta + offset;
+    }
+    delta += allTextNodes[i].length;
+  }
+  return -1;
+}
+
+
+// Given two `DOMRect`s, returns a `DOMRect`ish object that adjusts the
 // coordinates of the first to be relative to the second.
 function rectRelativeToOrigin(rect, origin) {
   return {
@@ -5088,6 +5430,7 @@ function rectRelativeToOrigin(rect, origin) {
     right: rect.right - origin.left
   };
 }
+
 
 function textDecorationsEqual(oldDecorations, newDecorations) {
   if (!oldDecorations && newDecorations) return false;
