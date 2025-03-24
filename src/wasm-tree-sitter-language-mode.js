@@ -1,4 +1,4 @@
-const Parser = require('./web-tree-sitter');
+const { Node, Parser } = require('./web-tree-sitter');
 const TokenIterator = require('./token-iterator');
 const { Point, Range, spliceArray } = require('text-buffer');
 const { Patch } = require('superstring');
@@ -85,18 +85,17 @@ function resolveNodePosition(node, descriptor) {
   return result[lastPart];
 }
 
-// Patch Tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
-// that we don't break anything that relied on `range` being present.
-function ensureNodeIsPatched(node) {
-  let done = node.range && node.range instanceof Range;
-  if (done) { return; }
-  let proto = Object.getPrototypeOf(node);
-
+// Define some additions to the `Node` class that we need for
+// backward-compatibility.
+function patchNodePrototype(proto) {
+  // The old `TreeSitterLanguageMode` added a `range` property to nodes that
+  // returns a `Range` instance. We do the same for reasons of backward
+  // compatibility — but it's also rather convenient.
   Object.defineProperty(proto, 'range', {
     get() { return rangeForNode(this); }
   });
 
-  // autocomplete-html expects a `closest` function to exist on nodes.
+  // `autocomplete-html` expects a `closest` function to exist on nodes.
   Object.defineProperty(proto, 'closest', {
     value: function closest(types) {
       if (!Array.isArray(types)) { types = [types]; }
@@ -109,6 +108,8 @@ function ensureNodeIsPatched(node) {
     }
   });
 }
+
+patchNodePrototype(Node.prototype);
 
 // Compares “informal” points like the ones in a Tree-sitter tree; saves us
 // from having to convert them to actual `Point`s.
@@ -1728,7 +1729,13 @@ class FoldResolver {
     if (!this.layer.tree || !this.layer.queries.foldsQuery) { return null; }
     if (this.canReuseBoundaries(start, end)) {
       let result = this.boundaries.ge(start);
-      return result;
+      // Are the captures from this cached red-black-tree still fresh?
+      if (result?.value?.node?.tree?.rootNode) {
+        // If this node still exists, we have a fresh tree. If not, these
+        // captures were executed against a tree that's no longer valid, so we
+        // can't inspect them, and we should proceed with a new folds query.
+        return result;
+      }
     }
 
     let scopeResolver = this.layer.scopeResolver;
@@ -3443,17 +3450,10 @@ class LanguageLayer {
       // transaction's tree later on.
       this.lastSyntaxTree = tree;
 
-      // Like legacy Tree-sitter, we're patching syntax nodes so that they have
-      // a `range` property that returns a `Range`. We're doing this for
-      // compatibility, but we can't get a reference to the node class itself;
-      // we have to wait until we have an instance and grab the prototype from
-      // there.
-      //
-      // This is the earliest place in the editor lifecycle where we're
-      // guaranteed to be holding an instance of `Node`. Once we patch it here,
-      // we're good to go.
-      //
-      ensureNodeIsPatched(tree.rootNode);
+      // We used to need to monkey-patch the `Node` class by grabbing a
+      // reference to its constructor from an actual node instance. But
+      // `web-tree-sitter` allows us to import the `Node` class directly now,
+      // so we can do this much earlier in the bootstrapping process.
 
       this.rangeList.add(rangeForNode(tree.rootNode));
       if (includedRanges) {

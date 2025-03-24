@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Grim = require('grim');
 const path = require('path');
 const dedent = require('dedent');
 const TextBuffer = require('text-buffer');
@@ -105,6 +106,40 @@ describe('ScopeResolver', () => {
 
   afterEach(() => {
     ScopeResolver.clearConfigCache();
+  });
+
+  it('generates deprecation message for old call signature of Query::captures', async () => {
+    // We monkey-patch a method in `web-tree-sitter` whose signature changed so
+    // that it accepts the old signature style and generates a deprecation
+    // message.
+    let query = await grammar.setQueryForTest('highlightsQuery', `
+      (comment) @comment
+      (string) @string
+      "=" @operator
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+    `);
+    await languageMode.ready;
+
+    let tree = languageMode.rootLanguageLayer.tree;
+
+    expect(Grim.getDeprecations()?.length).toBe(0);
+    // We'll use the old method signature and assert that it both (a) returns
+    // results and (b) generates a deprecation message.
+    let captures = query.captures(
+      tree.rootNode,
+      new Point(0, 0),
+      new Point(Infinity, Infinity)
+    );
+    expect(captures.length).toBeGreaterThan(0);
+    let deprecations = Grim.getDeprecations();
+    expect(deprecations.length).toBeGreaterThan(0);
+    Grim.clearDeprecations();
   });
 
   it('resolves all scopes in absence of any tests or adjustments', async () => {

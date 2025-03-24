@@ -61,32 +61,30 @@ async function openDocument(fullPath) {
 
 async function runGrammarTests(fullPath, commentRegex, trailingCommentRegex = null) {
   const editor = await openDocument(fullPath);
-
   const normalized = normalizeTreeSitterTextData(editor, commentRegex, trailingCommentRegex)
-  expect(normalized.length).toSatisfy((n, reason) => {
-    reason("Tokenizer didn't run correctly - could not find any comment")
-    return n > 0
-  })
+  expect(normalized.length).toBeGreaterThan(0, "Tokenizer didn't run correctly - could not find any comment");
+
   normalized.forEach(({expected, editorPosition, testPosition}) => {
-    expect(editor.scopeDescriptorForBufferPosition(editorPosition).scopes).toSatisfy((scopes, reason) => {
-      const dontFindScope = expected.startsWith("!");
-      expected = expected.replace(/^!/, "")
-      if(dontFindScope) {
-        reason(`Expected to NOT find scope "${expected}" but found it\n` +
-          `      at ${fullPath}:${testPosition.row+1}:${testPosition.column+1}`
-        );
-      } else {
-        reason(`Expected to find scope "${expected}" but found "${scopes}"\n` +
-          `      at ${fullPath}:${testPosition.row+1}:${testPosition.column+1}`
-        );
-      }
-      const normalized = expected.replace(/([\.\-])/g, '\\$1');
-      const scopeRegex = new RegExp('^' + normalized + '(\\..+)?$');
-      let result = scopes.find(e => e.match(scopeRegex)) !== undefined;
-      if(dontFindScope) result = !result;
-      return result
-    })
-  })
+    let descriptor = editor.scopeDescriptorForBufferPosition(editorPosition);
+    let scopes = descriptor.scopes;
+    let negate = expected.startsWith('!');
+    expected = expected.replace(/^!/, '');
+    let message;
+    if (negate) {
+      message = `Expected NOT to find scope "${expected}" but found it
+       at ${fullPath}:${testPosition.row+1}:${testPosition.column+1}`
+    } else {
+      message = `Expected to find scope (${expected}) but found (${scopes.join(', ')})
+      at ${fullPath}:${testPosition.row+1}:${testPosition.column+1}`
+    }
+
+    const normalized = expected.replace(/([.-])/g, '\\$1');
+    const scopeRegex = new RegExp('^' + normalized + '(\\..+)?$');
+    let result = scopes.find(e => e.match(scopeRegex)) !== undefined;
+    if (negate) result = !result;
+    expect(result).toBe(true, message);
+
+  });
 }
 exports.runGrammarTests = runGrammarTests;
 window.runGrammarTests = runGrammarTests;
