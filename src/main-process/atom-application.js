@@ -1817,7 +1817,8 @@ module.exports = class AtomApplication extends EventEmitter {
     let testRunnerPath;
     Resolve ||= require('resolve');
 
-    // First try to run with local runners (e.g: `./test/runner.js`) or packages (e.g.: `atom-mocha-test-runner`)
+    // First try to run with local runners (e.g: `./test/runner.js`) or
+    // packages (e.g.: `atom-mocha-test-runner`)
     try {
       testRunnerPath = Resolve.sync(atomTestRunner, {
         basedir: packageRoot,

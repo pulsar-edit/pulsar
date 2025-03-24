@@ -185,7 +185,7 @@
 ; should dedent one level so it's properly recognized as a new `case` keyword.
 (
   (identifier) @dedent
-  (#equals? @dedent "case")
+  (#eq? @dedent "case")
   (#is? test.descendantOfType "case_clause")
 )
 
