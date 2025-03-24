@@ -66,8 +66,7 @@
 ; Block comments. `/* */`
 ((comment) @comment.block.json
   (#match? @comment.block.json "^/\\*")
-  (#match? @comment.block.json "\\*/$")
-  (#set! highlight.invalidateOnChange true))
+  (#match? @comment.block.json "\\*/$"))
 
 
 ; ERROR HANDLING
