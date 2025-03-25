@@ -75,6 +75,7 @@ describe('Workspace', () => {
       assert: atom.assert.bind(atom),
       textEditorRegistry: atom.textEditors
     });
+    workspace.initialize({ configDirPath: atom.getConfigDirPath() });
     workspace.deserialize(workspaceState, atom.deserializers);
   }
 

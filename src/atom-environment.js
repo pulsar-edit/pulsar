@@ -87,8 +87,6 @@ class AtomEnvironment {
     /** @type {NotificationManager} */
     this.notifications = new NotificationManager();
 
-    this.stateStore = new StateStore('AtomEnvironments', 1);
-
     /** @type {Config} */
     this.config = new Config({
       saveCallback: settings => {
@@ -103,6 +101,10 @@ class AtomEnvironment {
     this.config.setSchema(null, {
       type: 'object',
       properties: _.clone(ConfigSchema)
+    });
+
+    this.stateStore = new StateStore('AtomEnvironments', 1, {
+      config: this.config
     });
 
     /** @type {KeymapManager} */
@@ -257,6 +259,10 @@ class AtomEnvironment {
       projectSpecification
     } = this.getLoadSettings();
 
+    this.stateStore.initialize({
+      configDirPath: this.getConfigDirPath()
+    });
+
     ConfigSchema.projectHome = {
       type: 'string',
       default: path.join(fs.getHomeDirectory(), 'github'),
@@ -323,7 +329,7 @@ class AtomEnvironment {
     this.attachSaveStateListeners();
     this.windowEventHandler.initialize(this.window, this.document);
 
-    this.workspace.initialize();
+    this.workspace.initialize({ configDirPath: this.getConfigDirPath() });
 
     const didChangeStyles = this.didChangeStyles.bind(this);
     this.disposables.add(this.styles.onDidAddStyleElement(didChangeStyles));
@@ -451,7 +457,7 @@ class AtomEnvironment {
     this.workspace.reset(this.packages);
     this.registerDefaultOpeners();
     this.project.reset(this.packages);
-    this.workspace.initialize();
+    this.workspace.initialize({ configDirPath: this.getConfigDirPath() });
     this.grammars.clear();
     this.textEditors.clear();
     this.views.clear();
