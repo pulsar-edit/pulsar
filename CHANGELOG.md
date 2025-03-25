@@ -6,6 +6,30 @@
 
 ## [Unreleased]
 
+## 1.127.0
+
+- Added a Jasmine 2-based test runner, migrated core editor tests to use it. Packages bundled into the core editor can migrate their tests to use this as well, over time. The Jasmine 1 test runner remains available.
+- Adding `--enable-features=UseOzonePlatform` and `--ozone-platform=wayland` as parameters when running under Wayland on Linux (avoids using xwayland, which causes rendering problems on some systems, especially with NVidia)
+- Many Tree-sitter/parser/grammar improvements.
+  - Updated to `web-tree-sitter` version `0.25.3`.
+  - Fixed a bug preventing folds from updating after code changes in some scenarios.
+  - Better folding behavior in Python.
+  - Better folding and syntax highlighting in Ruby of `case`/`in` statements.
+  - Better syntax highlighting of private members in JavScript.
+  - Better folding of multiline comments in PHP.
+- Updated the `read` dependency in ppm
+
+### Pulsar
+
+- ppm: Update ppm to commit a6f843f0381f64cb5865efc7 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1252)
+- Tree-sitter rolling fixes, 1.127 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1240)
+- Wayland pulsar script [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/1246)
+- Update jasmine to 2.x [@kiskoza](https://github.com/pulsar-edit/pulsar/pull/990)
+
+### ppm
+
+- Update to read v3 [@2colours](https://github.com/pulsar-edit/ppm/pull/150)
+
 ## 1.126.0
 
 - Python 3.12+ compatibility in ppm (installing packages with native C/C++ modules with Python 3.12+ on your system should Just Work™). (Python 3.7 and older no-longer supported for installing Pulsar packages with native C/C++ modules with ppm. Does not affect anything other than installing certain Pulsar packages.)
@@ -55,7 +79,6 @@
 ### spell-check
 
 - Fixes for a possible patch release [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1173)
-- Adding `--enable-features=UseOzonePlatform` and `--ozone-platform=wayland` as parameters when running under Wayland on Linux (avoids using xwayland, which causes rendering problems on some systems, especially with NVidia)
 
 ## 1.124.0
 
