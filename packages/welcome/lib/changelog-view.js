@@ -50,17 +50,36 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Enhanced spellcheck to allow spellchecking on sections of a buffer.
-                Making it possible to spellcheck comments within code, which has been enabled by default.
+                Added a Jasmine 2-based test runner, migrated core editor tests to use it. Packages bundled into the core editor can migrate their tests to use this as well, over time. The Jasmine 1 test runner remains available.
               </li>
               <li>
-                Tree-sitter fixes and enhancements for <code>language-c</code>.
+                Adding <code>--enable-features=UseOzonePlatform</code> and <code>--ozone-platform=wayland</code> as parameters when running under Wayland on Linux (avoids using xwayland, which causes rendering problems on some systems, especially with NVidia)
               </li>
               <li>
-                Updated error message received when deleting a file in Linux to be more accurate.
+                Many Tree-sitter/parser/grammar improvements.
+                <ul>
+                  <li>
+                    Updated to <code>web-tree-sitter</code> version <code>0.25.3</code>.
+                  </li>
+                  <li>
+                    Fixed a bug preventing folds from updating after code changes in some scenarios.
+                  </li>
+                  <li>
+                    Better folding behavior in Python.
+                  </li>
+                  <li>
+                    Better folding and syntax highlighting in Ruby of <code>case</code>/<code>in</code> statements.
+                  </li>
+                  <li>
+                    Better syntax highlighting of private members in JavScript.
+                  </li>
+                  <li>
+                    Better folding of multiline comments in PHP.
+                  </li>
+                </ul>
               </li>
               <li>
-                Fixed error that could cause some keymaps to not appear under a package in <code>settings-view</code>.
+                Updated the `read` dependency in ppm
               </li>
             </ul>
 
