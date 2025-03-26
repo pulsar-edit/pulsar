@@ -2855,13 +2855,13 @@ class LanguageLayer {
       return match === grammar;
     };
 
-    // Would this grammar have been a candidate for injection _instead_ of the
-    // grammar that handled an injection on this layer last time around?
+    // Would this grammar have been a candidate for injection _instead_ of a
+    // grammar that handled one of our active injections?
     for (let { languageString: lang } of this.childLayerMarkers) {
       if (matches(lang, grammar, cache)) return true;
     }
     // Would this grammar have matched a language string that we were unable to
-    // match to an injection on this layer the last time around?
+    // match to an injection on this layer previously?
     for (let lang of Array.from(this.unrecognizedLanguageStrings)) {
       if (matches(lang, grammar, cache)) return true;
     }
@@ -2871,10 +2871,15 @@ class LanguageLayer {
   // Determine whether a newly added or changed grammar warrants a
   // reexamination of this layer's injections.
   updateInjectionsForGrammar(grammar, cache = null) {
-    // Both buffer changes and injection point changes each independently
-    // trigger re-evaluation of injections. This code path is solely for
-    // deciding whether the presence of a specific new or altered grammar
-    // has implications for our current injections.
+    // Changes to both buffer contents and the grammar's injection points each
+    // independently trigger re-evaluation of injections. This code path is
+    // solely for deciding whether the presence of a specific new or altered
+    // grammar has implications for our current injections.
+    //
+    // Since reworking _all_ our injections is costly, we try to avoid it. If
+    // we can demonstrate that this grammar would not be used even if we _did_
+    // rebuild all injections on this layer from scratch, then we'll have
+    // proven that this step can be skipped.
     if (this.injectionPointsMatchGrammar(grammar, cache)) {
       this._populateInjections(MAX_RANGE, null);
     }
