@@ -50,16 +50,36 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Python 3.12+ compatibility in ppm (installing packages with native C/C++ modules with Python 3.12+ on your system should Just Work™). (Python 3.7 and older no-longer supported for installing Pulsar packages with native C/C++ modules with ppm. Does not affect anything other than installing certain Pulsar packages.)
+                Added a Jasmine 2-based test runner, migrated core editor tests to use it. Packages bundled into the core editor can migrate their tests to use this as well, over time. The Jasmine 1 test runner remains available.
               </li>
               <li>
-                PHP arrays spanning multiple lines are now foldable, as they always should have been.
+                Added <code>--enable-features=UseOzonePlatform</code> and <code>--ozone-platform=wayland</code> as parameters when running under Wayland on Linux (avoids using xwayland, which causes rendering problems on some systems, especially with NVidia)
               </li>
               <li>
-                Various dependency updates for ppm.
+                Many Tree-sitter/parser/grammar improvements.
+                <ul>
+                  <li>
+                    Updated to <code>web-tree-sitter</code> version <code>0.25.3</code>.
+                  </li>
+                  <li>
+                    Fixed a bug preventing folds from updating after code changes in some scenarios.
+                  </li>
+                  <li>
+                    Better folding behavior in Python.
+                  </li>
+                  <li>
+                    Better folding and syntax highlighting in Ruby of <code>case</code>/<code>in</code> statements.
+                  </li>
+                  <li>
+                    Better syntax highlighting of private members in JavScript.
+                  </li>
+                  <li>
+                    Better folding of multiline comments in PHP.
+                  </li>
+                </ul>
               </li>
               <li>
-                <code>core.allowWindowTransparency</code> setting is now hidden from the UI, as it has many limits and can cause unexpected issues, a situation which we inherit from the upstream Electron project. (Power-users who understand the drawbacks and still wish to enable transparency can add it to their user config files manually.)
+                Updated the `read` dependency in ppm
               </li>
             </ul>
 
