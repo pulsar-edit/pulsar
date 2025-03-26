@@ -2887,7 +2887,7 @@ class LanguageLayer {
 
     let childLayers = Array.from(this.childLayerMarkers).map(m => m.languageLayer);
     for (let child of childLayers) {
-      child.updateForInjection(grammar, cache);
+      child.updateInjectionsForGrammar(grammar, cache);
     }
   }
 
