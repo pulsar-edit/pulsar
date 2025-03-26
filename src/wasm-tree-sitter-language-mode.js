@@ -2627,10 +2627,9 @@ class LanguageLayer {
     this.injectionPointsChanged = false;
 
     const handleInjectionPointChanges = () => {
-      // Set a flag so we know that this grammar's injection points changed
-      // since the last time we populated our injections. This means we'll
-      // have to skip some shortcuts if a new grammar is added.
-      this.injectionPointsChanged = true;
+      // When we add or remove injection points on this grammar, this language
+      // layer must repopulate its injections.
+      this._populateInjections(MAX_RANGE, null);
     };
 
     this.subscriptions.add(
@@ -2872,16 +2871,11 @@ class LanguageLayer {
   // Determine whether a newly added or changed grammar warrants a
   // reexamination of this layer's injections.
   updateInjectionsForGrammar(grammar, cache = null) {
-    let shouldPopulateInjections = false;
-    if (this.injectionPointsChanged) {
-      // Injection points have been added or removed from this grammar since
-      // we last populated injections.
-      shouldPopulateInjections = true;
-    } else if (this.injectionPointsMatchGrammar(grammar, cache)) {
-      shouldPopulateInjections = true;
-    }
-
-    if (shouldPopulateInjections) {
+    // Both buffer changes and injection point changes each independently
+    // trigger re-evaluation of injections. This code path is solely for
+    // deciding whether the presence of a specific new or altered grammar
+    // has implications for our current injections.
+    if (this.injectionPointsMatchGrammar(grammar, cache)) {
       this._populateInjections(MAX_RANGE, null);
     }
 
