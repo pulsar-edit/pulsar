@@ -9,7 +9,7 @@
 ## 1.127.0
 
 - Added a Jasmine 2-based test runner, migrated core editor tests to use it. Packages bundled into the core editor can migrate their tests to use this as well, over time. The Jasmine 1 test runner remains available.
-- Adding `--enable-features=UseOzonePlatform` and `--ozone-platform=wayland` as parameters when running under Wayland on Linux (avoids using xwayland, which causes rendering problems on some systems, especially with NVidia)
+- Added `--enable-features=UseOzonePlatform` and `--ozone-platform=wayland` as parameters when running under Wayland on Linux (avoids using xwayland, which causes rendering problems on some systems, especially with NVidia)
 - Many Tree-sitter/parser/grammar improvements.
   - Updated to `web-tree-sitter` version `0.25.3`.
   - Fixed a bug preventing folds from updating after code changes in some scenarios.

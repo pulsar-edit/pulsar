@@ -53,7 +53,7 @@ export default class ChangeLogView {
                 Added a Jasmine 2-based test runner, migrated core editor tests to use it. Packages bundled into the core editor can migrate their tests to use this as well, over time. The Jasmine 1 test runner remains available.
               </li>
               <li>
-                Adding <code>--enable-features=UseOzonePlatform</code> and <code>--ozone-platform=wayland</code> as parameters when running under Wayland on Linux (avoids using xwayland, which causes rendering problems on some systems, especially with NVidia)
+                Added <code>--enable-features=UseOzonePlatform</code> and <code>--ozone-platform=wayland</code> as parameters when running under Wayland on Linux (avoids using xwayland, which causes rendering problems on some systems, especially with NVidia)
               </li>
               <li>
                 Many Tree-sitter/parser/grammar improvements.
