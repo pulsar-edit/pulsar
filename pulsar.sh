@@ -230,12 +230,8 @@ elif [ $OS == 'Linux' ]; then
       exit ${ATOM_EXIT}
     fi
   else
-    EXTRA_ARGS='--no-sandbox'
-    if [ -n "$WAYLAND_DISPLAY" ]; then
-      EXTRA_ARGS="$EXTRA_ARGS --enable-features=UseOzonePlatform --ozone-platform=wayland"
-    fi
     (
-    nohup "$PULSAR_EXECUTABLE" $EXTRA_ARGS --executed-from="$(pwd)" --pid=$$ "$@" > "$ATOM_HOME/nohup.out" 2>&1
+    nohup "$PULSAR_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox > "$ATOM_HOME/nohup.out" 2>&1
     if [ $? -ne 0 ]; then
       cat "$ATOM_HOME/nohup.out"
       exit $?
