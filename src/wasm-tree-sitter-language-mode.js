@@ -3810,7 +3810,7 @@ class LanguageLayer {
     // We won't touch _all_ injections, but we will touch any injection that
     // could possibly have been affected by this layer's update.
     let existingInjectionMarkers = Array.from(this.childLayerMarkers)
-      .filter(m => m.isValid() && m.getRange().intersectsWith(range));
+      .filter(m => m.getRange().intersectsWith(range));
 
     if (existingInjectionMarkers.length > 0) {
       // Enlarge our range to contain all of the injection zones in the
@@ -3844,7 +3844,7 @@ class LanguageLayer {
     // This time, though, we check for containment rather than intersection
     // so that we don't have to enlarge the range again.
     existingInjectionMarkers = Array.from(this.childLayerMarkers)
-      .filter(m => m.isValid() && range.containsRange(m.getRange()));
+      .filter(m => range.containsRange(m.getRange()));
     existingInjectionMarkers.sort((a, b) => a.compare(b));
 
     const markersToUpdate = new Map();
