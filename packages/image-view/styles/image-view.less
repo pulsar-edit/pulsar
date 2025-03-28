@@ -54,18 +54,16 @@
       background-image: url(@transparent-background-image);
     }
 
+    &-color-native {
+      background-color: @app-background-color;
+    }
+
     .btn-group {
       margin: @spacing;
     }
 
     .reset-zoom-button {
       min-width: 5em;
-    }
-
-    // disabled once the button is selected
-    .zoom-to-fit-button.selected {
-      pointer-events: none;
-      cursor: default;
     }
   }
 
@@ -78,9 +76,10 @@
     overflow: auto;
 
     img {
-      display: block !important;
+      display: block;
       flex: none;
       margin: auto;
+      -webkit-user-drag: none;
     }
   }
 
@@ -93,26 +92,8 @@
     background-color: black;
     background-image: url(@transparent-background-image);
   }
-
-
-
-  // Zoom to fit -------------------
-  // Scales the image to fit the available space.
-
-  .zoom-to-fit {
-    &.image-container {
-      padding: @component-padding;
-
-      img {
-        flex: 1 1 0;
-        min-width: 0;
-        margin: 0;
-
-        // Alternative: object-fit: contain;
-        // then it would also scale larger than its original size
-        object-fit: scale-down;
-      }
-    }
+  [background="native"] {
+    background-color: @app-background-color;
   }
 
 }
