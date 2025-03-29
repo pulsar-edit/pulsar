@@ -6,6 +6,14 @@
 
 ## [Unreleased]
 
+## 1.127.1
+
+- Hotfix: Reverted a Wayland-related change that Linux users reported issues with on Electron 12.
+
+### Pulsar
+
+- Revert "Wayland pulsar script" [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/1261)
+
 ## 1.127.0
 
 - Added a Jasmine 2-based test runner, migrated core editor tests to use it. Packages bundled into the core editor can migrate their tests to use this as well, over time. The Jasmine 1 test runner remains available.
