@@ -6337,7 +6337,7 @@ describe('TextEditorComponent', () => {
       }
     });
 
-    fit('measures each column of a bidirectional-text line at a different X-axis position', async () => {
+    it('measures each column of a bidirectional-text line at a different X-axis position', async () => {
       const { component, editor } = buildComponent({ text: SAMPLE_WITH_RTL_TEXT });
       editor.setSoftWrapped(true);
       await component.getNextUpdatePromise();
