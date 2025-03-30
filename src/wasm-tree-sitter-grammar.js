@@ -86,7 +86,7 @@ module.exports = class WASMTreeSitterGrammar {
     if (this.LANGUAGE_CACHE.has(grammarPath)) {
       return this.LANGUAGE_CACHE.get(grammarPath);
     }
-    let language = await Parser.Language.load(grammarPath);
+    let language = await Language.load(grammarPath);
     this.LANGUAGE_CACHE.set(grammarPath, language);
     return language;
   }
