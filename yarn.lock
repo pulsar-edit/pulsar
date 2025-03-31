@@ -6031,6 +6031,11 @@ jasmine-tagged@^1.1.4:
   dependencies:
     jasmine-focused "^1.0.7"
 
+jasmine2-focused@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/jasmine2-focused/-/jasmine2-focused-1.1.2.tgz#a9f8c5c23ece06e09416359a63a60c7ba0ffd4ee"
+  integrity sha512-qJZfxt4JysxmBYUWqMDi4v8SlKwYACNgpCCz1bNANbDkltDkdSnnLQ/l6YySgG/MNMaj3HQqek3m6Y4dAh8SbA==
+
 jasmine@2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-2.5.3.tgz#5441f254e1fc2269deb1dfd93e0e57d565ff4d22"

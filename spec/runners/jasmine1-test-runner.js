@@ -17,6 +17,7 @@ temp.track();
 
 module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) {
   require('../helpers/jasmine-singleton');
+  require('jasmine-focused');
 
   const normalizeComments = require('../helpers/normalize-comments');
   for (let key in normalizeComments) { window[key] = normalizeComments[key]; }
