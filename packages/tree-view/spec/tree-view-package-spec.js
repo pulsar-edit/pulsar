@@ -3922,9 +3922,7 @@ describe("TreeView", function () {
     describe('selecting multiple items', function () {
       it('switches the contextual menu to muli-select mode', function () {
         fileView1.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1}));
-        console.warn('1');
         fileView2.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, shiftKey: true}));
-        console.warn('2');
         expect(treeView.list).toHaveClass('multi-select');
         fileView3.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}));
         expect(treeView.list).toHaveClass('full-menu');
