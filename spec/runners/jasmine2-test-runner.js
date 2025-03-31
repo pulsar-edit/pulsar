@@ -45,6 +45,10 @@ module.exports = function ({logFile, headless, testPaths, buildAtomEnvironment})
   jasmineContent.setAttribute('id', 'jasmine-content');
   document.body.appendChild(jasmineContent);
 
+  if (process.env.CI) {
+    disableFocusMethods();
+  }
+
   return loadSpecsAndRunThem(logFile, headless, testPaths)
     .then((result) => {
       // Retrying failures only really makes sense in headless mode,
@@ -118,6 +122,16 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
       })
     }
   });
+}
+
+function disableFocusMethods() {
+  for (let methodName of ['fdescribe', 'fit']) {
+    let focusMethod = window[methodName];
+    window[methodName] = function (description) {
+      const error = new Error('Focused spec is running on CI');
+      return focusMethod(description, () => { throw error; });
+    }
+  }
 }
 
 const loadSpecsAndRunThem = (logFile, headless, testPaths) => {
