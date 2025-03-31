@@ -1,5 +1,5 @@
 const path = require('path');
-const shell = require('electron').shell;
+const { shell } = require('@electron/remote');
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const { CompositeDisposable, Emitter } = require('atom');
@@ -822,7 +822,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return atom.showItemInFolder(filePath);
+    return shell.showItemInFolder(filePath);
   }
 
   showCurrentFileInFileManager() {
@@ -834,7 +834,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return atom.showItemInFolder(filePath);
+    return shell.showItemInFolder(filePath);
   }
 
   getFileManagerName() {
@@ -927,9 +927,10 @@ class TreeView {
 
           let meta = { pathToDelete: selectedPath };
 
+          console.log('WILL DELETE:', meta);
           this.emitter.emit('will-delete-entry', meta);
 
-          let promise = atom.trashItem(selectedPath).then(() => {
+          let promise = shell.trashItem(selectedPath).then(() => {
             this.emitter.emit('entry-deleted', meta);
           }).catch(() => {
             this.emitter.emit('delete-entry-failed', meta);
@@ -1562,6 +1563,7 @@ class TreeView {
 
   // Handle entry drop event.
   onDrop(event) {
+    console.log('onDrop:', event);
     this.dragEventCounts = new WeakMap();
     let entry = event.target.closest('.entry.directory');
     if (entry) {
