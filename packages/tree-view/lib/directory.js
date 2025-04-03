@@ -284,7 +284,7 @@ class Directory {
     } catch (error) {
       names = []
     }
-    names.sort(new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'}).compare)
+    names.sort(this.compareEntries)
 
     const files = []
     const directories = []
@@ -335,16 +335,12 @@ class Directory {
     return this.sortEntries(directories.concat(files))
   }
 
-  normalizeEntryName(value) {
-    let normalizedValue = value.name
-    if (normalizedValue == null) {
-      normalizedValue = value
-    }
+  compareEntries(firstName, secondName) {
+    return compareFn(firstName, secondName)
+  }
 
-    if (normalizedValue != null) {
-      normalizedValue = normalizedValue.toLowerCase()
-    }
-    return normalizedValue
+  normalizeEntryName(value) {
+    return value.name ? value.name : value
   }
 
   sortEntries(combinedEntries) {
@@ -354,7 +350,7 @@ class Directory {
       return combinedEntries.sort((first, second) => {
         const firstName = this.normalizeEntryName(first)
         const secondName = this.normalizeEntryName(second)
-        return firstName.localeCompare(secondName)
+        return this.compareEntries(firstName, secondName)
       })
     }
   }
@@ -461,3 +457,5 @@ class Directory {
     return this.path === dirname
   }
 }
+
+const compareFn = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'}).compare
