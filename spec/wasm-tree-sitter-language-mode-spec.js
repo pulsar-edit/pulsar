@@ -948,6 +948,86 @@ describe('WASMTreeSitterLanguageMode', () => {
         ]);
       });
 
+      it('updates a buffer’s highlighting when a new injection point is added to its grammar', async () => {
+        const ejsGrammar = new WASMTreeSitterGrammar(
+          atom.grammars,
+          ejsGrammarPath,
+          CSON.readFileSync(ejsGrammarPath)
+        );
+
+        await ejsGrammar.setQueryForTest('highlightsQuery', `
+          ["<%=" "%>"] @directive
+        `);
+
+        ejsGrammar.addInjectionPoint({
+          type: 'template',
+          language: () => 'html',
+          content: (node) => node.descendantsOfType('content')
+        });
+
+        atom.grammars.addGrammar(jsGrammar);
+        atom.grammars.addGrammar(htmlGrammar);
+
+        buffer.setText('<body>\n<script>\nb(<%= c.d %>)\n</script>\n</body>');
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: ejsGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+
+        spyOn(languageMode.rootLanguageLayer, '_populateInjections').and.callThrough();
+
+        ejsGrammar.addInjectionPoint({
+          type: 'template',
+          language: () => 'javascript',
+          content: (node) => node.descendantsOfType('code')
+        });
+
+        expect(
+          languageMode.rootLanguageLayer._populateInjections
+        ).toHaveBeenCalled();
+      });
+
+      it('does not update a specific layer’s injections if a newly added grammar is irrelevant to them', async () => {
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(jsGrammar);
+
+        buffer.setText('node.innerHTML = `\na ${b}<img src="d">\n`;');
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: jsGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        spyOn(languageMode.rootLanguageLayer, '_populateInjections').and.callThrough();
+
+        const ejsGrammar = new WASMTreeSitterGrammar(
+          atom.grammars,
+          ejsGrammarPath,
+          CSON.readFileSync(ejsGrammarPath)
+        );
+
+        await ejsGrammar.setQueryForTest('highlightsQuery', `
+          ["<%=" "%>"] @directive
+        `);
+
+        atom.grammars.addGrammar(ejsGrammar);
+        await languageMode.nextTransaction;
+        // TODO: Still need a `wait(0)` here and I'm not sure why.
+        await wait(0);
+
+        expect(
+          languageMode.rootLanguageLayer._populateInjections
+        ).not.toHaveBeenCalled();
+      });
+
       it('handles injections that intersect', async () => {
 
         const ejsGrammar = new WASMTreeSitterGrammar(
