@@ -18,6 +18,11 @@ const SAMPLE_TEXT = fs.readFileSync(
   'utf8'
 );
 
+const SAMPLE_WITH_RTL_TEXT = fs.readFileSync(
+  path.join(__dirname, 'fixtures', 'sample-with-rtl-text.js'),
+  'utf8'
+);
+
 class DummyElement extends HTMLElement {
   connectedCallback() {
     this.didAttach();
@@ -4903,6 +4908,7 @@ describe('TextEditorComponent', () => {
         // Selects entire buffer line when clicked screen line is soft-wrapped
         component.didMouseDownOnLineNumberGutter({
           button: 0,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 3)
         });
         expect(editor.getSelectedScreenRange()).toEqual([[3, 0], [5, 0]]);
@@ -4912,6 +4918,7 @@ describe('TextEditorComponent', () => {
         // span multiple buffer lines
         component.didMouseDownOnLineNumberGutter({
           button: 0,
+          clientX: clientLeftForCharacter(component, 5, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
         expect(editor.getSelectedScreenRange()).toEqual([[5, 0], [6, 0]]);
@@ -4931,6 +4938,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           metaKey: true,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 3)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -4947,6 +4955,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           metaKey: true,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -4976,6 +4985,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           shiftKey: true,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
 
@@ -4990,6 +5000,7 @@ describe('TextEditorComponent', () => {
           didStopDragging
         } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
         didDrag({
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         expect(editor.getSelectedBufferRanges()).toEqual([
@@ -4998,6 +5009,7 @@ describe('TextEditorComponent', () => {
         ]);
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 5, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
 
@@ -5020,6 +5032,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           metaKey: true,
+          clientX: clientLeftForCharacter(component, 2, 0) - 15,
           clientY: clientTopForLine(component, 2)
         });
 
@@ -5029,6 +5042,7 @@ describe('TextEditorComponent', () => {
         } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -5037,6 +5051,7 @@ describe('TextEditorComponent', () => {
         ]);
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 5, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -5046,6 +5061,7 @@ describe('TextEditorComponent', () => {
         expect(editor.isFoldedAtBufferRow(4)).toBe(true);
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 3)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -5067,6 +5083,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           target,
           button: 0,
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         expect(editor.isFoldedAtScreenRow(1)).toBe(true);
@@ -5075,6 +5092,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           target,
           button: 0,
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         await component.getNextUpdatePromise();
@@ -5090,6 +5108,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           target,
           button: 0,
+          clientX: clientLeftForCharacter(component, 4, 0) - 15,
           clientY: clientTopForLine(component, 4)
         });
         expect(editor.isFoldedAtScreenRow(4)).toBe(false);
@@ -6155,6 +6174,204 @@ describe('TextEditorComponent', () => {
       return new Promise(resolve => requestAnimationFrame(resolve));
     }
   });
+
+  describe('RTL text handling', () => {
+
+    it('renders multiple decorations for a contiguous selection if line contains bidirectional text', async () => {
+      const { component, element, editor } = buildComponent({ text: SAMPLE_WITH_RTL_TEXT });
+      editor.setSoftWrapped(true);
+      await component.getNextUpdatePromise();
+      await setEditorWidthInCharacters(component, 60);
+
+      const marker = editor.markScreenRange([[1, 15], [1, 39]]);
+      editor.decorateMarker(marker, { type: 'highlight', class: 'a' });
+      await component.getNextUpdatePromise();
+
+      // Selection begins in an LTR text region and ends in an RTL text region;
+      // therefore there will be two non-contiguous highlights on the line.
+      {
+        let regions = Array.from(
+          element.querySelectorAll('.highlight.a .region.a')
+        );
+        expect(regions.length).toBe(2);
+        const regionRects = regions.map(r => r.getBoundingClientRect());
+        expect(regionRects[0].top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        expect(regionRects[1].top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        expect(Math.round(regionRects[0].left)).toBeNear(
+          clientLeftForCharacter(component, 1, 15)
+        );
+        expect(Math.round(regionRects[1].left)).toBeNear(
+          clientLeftForCharacter(component, 1, 39)
+        )
+      }
+
+      marker.setScreenRange([[1, 36], [1, 39]]);
+      await component.getNextUpdatePromise();
+
+      // Selection begins and ends in an RTL text region; therefore there will
+      // be one contiguous highlight on the line.
+
+      {
+        let regions = element.querySelectorAll('.highlight.a .region.a');
+        expect(regions.length).toBe(1);
+        const regionRect = regions[0].getBoundingClientRect();
+        expect(regionRect.top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        expect(regionRect.bottom).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().bottom
+        );
+        // The text rendering is “backwards,” so the left side of the selection
+        // will match the _later_ column index.
+        expect(Math.round(regionRect.left)).toBeNear(
+          clientLeftForCharacter(component, 1, 39)
+        );
+        expect(Math.round(regionRect.right)).toBeNear(
+          clientRectAroundCharacter(component, 1, 36).right
+        );
+      }
+
+      marker.setScreenRange([[1, 23], [1, 59]]);
+      await component.getNextUpdatePromise();
+
+      // Selection starts in LTR, passes through RTL, then ends in LTR. DOM
+      // methods on the actual text would report that it was drawn with three
+      // different `DOMRects`, but since they touch one another, we consolidate
+      // them into a single region.
+      {
+        let regions = element.querySelectorAll('.highlight.a .region.a');
+        expect(regions.length).toBe(1);
+        const regionRect = regions[0].getBoundingClientRect();
+        expect(regionRect.top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        expect(regionRect.bottom).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().bottom
+        );
+
+        expect(Math.round(regionRect.left)).toBeNear(
+          clientLeftForCharacter(component, 1, 23)
+        );
+        expect(Math.round(regionRect.right)).toBeNear(
+          clientRectAroundRange(component, 1, 58, 59).right
+        );
+      }
+    });
+
+    it('handles multi-line selections', async () => {
+      const { component, element, editor } = buildComponent({ text: SAMPLE_WITH_RTL_TEXT });
+      editor.setSoftWrapped(true);
+      await component.getNextUpdatePromise();
+      await setEditorWidthInCharacters(component, 60);
+
+      const marker = editor.markScreenRange([[1, 39], [2, 24]]);
+      editor.decorateMarker(marker, { type: 'highlight', class: 'a' });
+      await component.getNextUpdatePromise();
+
+      // Selection starts in RTL text and goes to the end of the line, passing
+      // through LTR text along the way. It ends at the end of a line that
+      // holds only LTR text.
+      //
+      // Thus the selection should have two regions on its initial line, the
+      // rightmost of which should extend all the way to the edge of the
+      // editor.
+      {
+        let regions = element.querySelectorAll('.highlight.a .region.a');
+        expect(regions.length).toBe(3);
+        let regionRects = Array.from(regions).map(r => r.getBoundingClientRect());
+        // At least one of the first two regions should have a CSS `right` of
+        // `0px` to signify that it goes all the way to the right edge of the
+        // editor.
+        expect(
+          [regions[0], regions[1]].some(
+            rect => rect.style.right === '0px'
+          )
+        ).toBe(true);
+        // First two `DOMRect`s should align with line 1…
+        expect(regionRects[0].top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        expect(regionRects[1].top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        // …and the third should align with line 2.
+        expect(regionRects[2].top).toBe(
+          lineNodeForScreenRow(component, 2).getBoundingClientRect().top
+        );
+      }
+
+      marker.setScreenRange([[11, 27], [14, 33]]);
+
+      await component.getNextUpdatePromise();
+
+      // Starts on an LTR line and ends on a line that contains RTL text. The
+      // ending line should have two highlighted regions. Starting and ending
+      // lines are nonconsecutive, so there'll be an extra selection
+      // representing the middle rows.
+      {
+        let regions = element.querySelectorAll('.highlight.a .region.a');
+        expect(regions.length).toBe(4);
+        let regionRects = Array.from(regions).map(r => r.getBoundingClientRect());
+        expect(regionRects[0].top).toBe(
+          lineNodeForScreenRow(component, 11).getBoundingClientRect().top
+        );
+        // Second `DOMRect` should represent the middle rows.
+        expect(regionRects[1].top).toBe(
+          lineNodeForScreenRow(component, 12).getBoundingClientRect().top
+        );
+        expect(regionRects[1].bottom).toBe(
+          lineNodeForScreenRow(component, 14).getBoundingClientRect().top
+        );
+        // Last two should represent the discontiguous selections on the last
+        // row.
+        expect(regionRects[2].top).toBe(
+          lineNodeForScreenRow(component, 14).getBoundingClientRect().top
+        );
+        expect(regionRects[3].top).toBe(
+          lineNodeForScreenRow(component, 14).getBoundingClientRect().top
+        );
+      }
+    });
+
+    it('measures each column of a bidirectional-text line at a different X-axis position', async () => {
+      const { component, editor } = buildComponent({ text: SAMPLE_WITH_RTL_TEXT });
+      editor.setSoftWrapped(true);
+      await component.getNextUpdatePromise();
+      await setEditorWidthInCharacters(component, 60);
+
+      let width = editor.lineLengthForScreenRow(14);
+      let positions = new Set();
+      // Schedule measurement of each position on the line.
+      for (let i = 0; i < width; i++) {
+        component.requestHorizontalMeasurement(14, i);
+      }
+      await component.getNextUpdatePromise();
+      for (let i = 0; i < width; i++) {
+        positions.add(
+          component.pixelLeftForRowAndColumn(14, i)
+        );
+      }
+      // Previous faulty logic for determining the pixel positions of RTL
+      // characters meant that multiple RTL characters incorrectly shared an
+      // X-axis pixel measurement. Here we're asserting that we get 46 distinct
+      // values for 46 columns.
+      expect(positions.size).toBe(width);
+
+      let original = [...positions];
+      let sorted = [...original].sort((a, b) => a - b);
+
+      // Here we're asserting that the pixel positions _do not_ monotonically
+      // increase as we'd expect on a line with only LTR text. Sorting the list
+      // by ascending pixel value should produce a different ordering than what
+      // we already have.
+      expect(original).not.toEqual(sorted);
+    });
+
+  });
 });
 
 function buildEditor(params = {}) {
@@ -6235,6 +6452,44 @@ function verifyCursorPosition(component, cursorNode, row, column) {
 
 function clientTopForLine(component, row) {
   return lineNodeForScreenRow(component, row).getBoundingClientRect().top;
+}
+
+function clientRectAroundRange(component, row, startColumn, endColumn, index = 0) {
+  const textNodes = textNodesForScreenRow(component, row);
+  let textNodeStartColumn = 0;
+  const range = document.createRange();
+  let didSetStart = false;
+  let didSetEnd = false;
+  for (const textNode of textNodes) {
+    const textNodeEndColumn = textNodeStartColumn + textNode.textContent.length;
+    if (startColumn < textNodeEndColumn && !didSetStart) {
+      range.setStart(textNode, startColumn - textNodeStartColumn);
+      didSetStart = true;
+    }
+    if (endColumn <= textNodeEndColumn && !didSetEnd) {
+      range.setEnd(textNode, endColumn - textNodeStartColumn);
+      didSetEnd = true;
+    }
+
+    if (didSetStart && didSetEnd) {
+      let rects = range.getClientRects();
+      return rects[index];
+    }
+    textNodeStartColumn = textNodeEndColumn;
+  }
+  throw new Error(`Invalid screen range: (${row}, ${startColumn}) — (${row}, ${endColumn})`);
+}
+
+// Given a row and column, attempts to extract a `ClientRect` for a single
+// character.
+function clientRectAroundCharacter(component, row, column, index = 0) {
+  return clientRectAroundRange(
+    component,
+    row,
+    column,
+    column + 1,
+    index
+  );
 }
 
 function clientLeftForCharacter(component, row, column) {
