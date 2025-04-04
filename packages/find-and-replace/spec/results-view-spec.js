@@ -9,11 +9,11 @@ const ResultsPaneView = require('../lib/project/results-pane');
 const getIconServices = require('../lib/get-icon-services');
 const DefaultFileIcons = require('../lib/default-file-icons');
 const {Disposable} = require('atom')
-const { genPromiseToCheck } = require('./helpers')
+const { waitForCondition } = require('./helpers')
 
 const origTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
-global.beforeEach(function() {
+global.beforeEach(function () {
   this.addMatchers({
     toBeWithin(value, delta) {
       this.message = `Expected ${this.actual} to be within ${delta} of ${value}`
@@ -83,7 +83,7 @@ describe('ResultsView', () => {
     atom.config.set('core.excludeVcsIgnoredPaths', false);
     atom.project.setPaths([path.join(__dirname, 'fixtures/project')]);
 
-    let activationPromise = atom.packages.activatePackage("find-and-replace").then(function({mainModule}) {
+    let activationPromise = atom.packages.activatePackage("find-and-replace").then(function ({mainModule}) {
       mainModule.createViews();
       ({projectFindView} = mainModule);
     });
@@ -98,7 +98,7 @@ describe('ResultsView', () => {
   })
 
   function resultsPromise() {
-    return genPromiseToCheck( () =>
+    return waitForCondition(() =>
       getResultsPane()?.refs?.resultsView?.refs?.listView?.element?.querySelector('.path-name')
     );
   }
@@ -163,7 +163,7 @@ describe('ResultsView', () => {
       expect(resultsView.refs.listView.element.querySelector('.replacement')).toBeHidden();
 
       projectFindView.replaceEditor.setText('cats');
-      await genPromiseToCheck( () =>
+      await waitForCondition(() =>
         resultsView.refs.listView.element.querySelector('.match')?.classList.contains('highlight-error')
       );
       expect(resultsView.refs.listView.element.querySelector('.match').textContent).toBe('ghijkl');
@@ -172,7 +172,7 @@ describe('ResultsView', () => {
       expect(resultsView.refs.listView.element.querySelector('.replacement')).toBeVisible();
 
       projectFindView.replaceEditor.setText('');
-      await genPromiseToCheck( () =>
+      await waitForCondition(() =>
         resultsView.refs.listView.element.querySelector('.match')?.classList.contains('highlight-info')
       );
       expect(resultsView.refs.listView.element.querySelector('.match').textContent).toBe('ghijkl');
@@ -317,12 +317,12 @@ describe('ResultsView', () => {
       expect(listView.element.querySelectorAll('li').length).toBeLessThan(resultsView.model.getPathCount() + resultsView.model.getMatchCount());
 
       resultsView.moveToBottom();
-      await genPromiseToCheck( () => listView.element.querySelector('.match-row.selected'));
+      await waitForCondition(() => listView.element.querySelector('.match-row.selected'));
       expect(_.last(listView.element.querySelectorAll('.match-row'))).toHaveClass('selected');
       expect(listView.element.scrollTop).not.toBe(0);
 
       resultsView.moveToTop();
-      await genPromiseToCheck( () => listView.element.querySelector('.path-row.selected'));
+      await waitForCondition(() => listView.element.querySelector('.selected'));
       expect(listView.element.querySelector('.path-row').parentElement).toHaveClass('selected');
       expect(listView.element.scrollTop).toBe(0);
     });
@@ -331,8 +331,8 @@ describe('ResultsView', () => {
       resultsView.moveToBottom();
       resultsView.collapseResult();
       resultsView.moveToBottom();
-      await genPromiseToCheck( () =>
-        resultsView.refs.listView.element.querySelector('.path-row.selected')
+      await waitForCondition(() =>
+        resultsView.refs.listView.element.querySelector('.path-row').parentElement.classList.contains('selected')
       );
 
       expect(_.last(resultsView.refs.listView.element.querySelectorAll('.path-row')).parentElement).toHaveClass('selected');
@@ -397,7 +397,7 @@ describe('ResultsView', () => {
 
       projectFindView.findEditor.setText('sort');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await genPromiseToCheck( () =>
+      await waitForCondition(() =>
         !resultsView.element.querySelector('.collapsed')
       );
       expect(resultsView.element.querySelector('.collapsed')).toBe(null);
@@ -696,7 +696,7 @@ describe('ResultsView', () => {
         clickOn(resultsView.refs.listView.element.querySelector('.path-row').parentElement);
 
         resultsView.expandResult();
-        await genPromiseToCheck( () =>
+        await waitForCondition(() =>
           resultsView?.element?.querySelector('.selected')?.classList?.contains('match-row')
         );
         let selectedItem = resultsView.element.querySelector('.selected');
@@ -706,9 +706,9 @@ describe('ResultsView', () => {
 
       it("expands all results if 'Expand All' button is pressed", async () => {
         await resultsView.expandAllResults();
-        await genPromiseToCheck( () => {
-          const classes = resultsView?.refs?.listView?.element?.querySelectorAll('.path-row')?.classList
-          if(classes) {
+        await waitForCondition(() => {
+          const classes = resultsView?.refs?.listView?.element?.querySelector('.path-row')?.classList
+          if (classes) {
             return !classes.contains('collapsed')
           }
         });
@@ -842,7 +842,7 @@ describe('ResultsView', () => {
         projectFindView.findEditor.setText('e');
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
 
-        await genPromiseToCheck( () =>
+        await waitForCondition(() =>
           !resultsView.element.querySelector('.first-icon-class.second-icon-class') &&
             resultsView.element.querySelector('.icon-file-text.icon')
         );
@@ -891,7 +891,7 @@ describe('ResultsView', () => {
         atom.commands.dispatch(projectFindView.element, 'core:confirm')
 
         resultsView = getResultsView()
-        await genPromiseToCheck( () =>
+        await waitForCondition(() =>
           !resultsView.element.querySelector('.foo, .bar, .baz, .qlux') &&
             resultsView.element.querySelector('.icon-file-text')
         );
@@ -910,14 +910,14 @@ describe('ResultsView', () => {
       await resultsPromise();
 
       const resultsPane = getResultsPane();
-      await genPromiseToCheck( () =>
+      await waitForCondition(() =>
         resultsPane?.refs?.previewCount?.textContent.match(/3 files/)
       );
       expect(resultsPane.refs.previewCount.textContent).toContain('3 files');
 
       projectFindView.findEditor.setText('');
       atom.commands.dispatch(projectFindView.element, 'core:confirm');
-      await genPromiseToCheck( () =>
+      await waitForCondition(() =>
         resultsPane.refs.previewCount.textContent.match(/Project/)
       );
       expect(resultsPane.refs.previewCount.textContent).toContain('Project search results');
