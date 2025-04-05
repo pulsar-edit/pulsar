@@ -37,4 +37,4 @@ to ensure it gets seen by as many maintainers as possible.
 ---
 
 To anyone reporting a security vulnerability, we greatly appreciate your dedication
-to improving the security of Pulsar for the entire community, thank you.
+to improving the security of Pulsar for the entire community. Thank you.
