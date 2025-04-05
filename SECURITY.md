@@ -10,12 +10,12 @@ package can let you check if you currently are on the latest, supported, version
 
 There are two primary methods of reporting a vulnerability about the Pulsar Text Editor:
 
-1) Discord: Reporting a vulnerability via Discord is encouraged as it's something
+1. Discord: Reporting a vulnerability via Discord is encouraged as it's something
   the entire team checks regularly. Once on Discord feel free to ping `@team` or
   `@Admins` to find someone online. Once you've found them ensure to get permission
   to privately message them, then in a private DM to whoever you have permission
   from you can include the details of your report.
-2) Email: If you don't have access to Discord, you may also send an email to
+2. Email: If you don't have access to Discord, you may also send an email to
   `admin@pulsar-edit.dev` with the details of your report. Please keep in mind
   that we collectively check this email less often, and it may take longer to get
   a response.
