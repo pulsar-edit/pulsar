@@ -92,6 +92,7 @@ module.exports = function ({logFile, headless, testPaths, buildAtomEnvironment})
     })
 };
 
+
 const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   for (let key in jasmineEnv) {
     window[key] = jasmineEnv[key];
@@ -102,7 +103,7 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
       jasmineEnv[key](name, async (done) => {
         try {
           if (originalFn.length === 0) {
-              await originalFn();
+            await originalFn();
             done();
           } else {
             originalFn(done);
@@ -118,6 +119,7 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
       });
     }
   });
+
 
   ['beforeEach', 'afterEach'].forEach((key) => {
     window[key] = (originalFn) => {
