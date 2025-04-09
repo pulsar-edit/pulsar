@@ -504,9 +504,25 @@ class ScopeResolver {
       return false;
     }
 
+    // We should not store any boundaries for an empty capture — one whose
+    // starting and ending positions are the same. This would not do the right
+    // thing anyway; at a given position, we close scopes _before_ opening
+    // them, so this would just create a scope that would incorrectly never get
+    // closed.
+    //
+    // But some consumers use this method to test whether a capture is _valid_,
+    // and do not care about its impact on the set of boundaries. We are happy
+    // to return a truthy range to indicate that it's otherwise valid; but they
+    // can discern for themselves that this will not result in any new
+    // boundaries, since the range we return is self-evidently empty.
+    //
+    // Or, for short: empty ranges “pass” this test, but are otherwise silently
+    // ignored.
+    let isEmpty = comparePoints(range.startPosition, range.endPosition) === 0;
+
     let id = this.idForScope(
-        name,
-        node.childCount === 0 ? node.text : undefined,
+      name,
+      node.childCount === 0 ? node.text : undefined,
     );
 
     let {
@@ -514,8 +530,10 @@ class ScopeResolver {
       endPosition: end
     } = range;
 
-    this.setBoundary(start, id, 'open');
-    this.setBoundary(end, id, 'close');
+    if (!isEmpty) {
+      this.setBoundary(start, id, 'open');
+      this.setBoundary(end, id, 'close');
+    }
 
     return range;
   }
