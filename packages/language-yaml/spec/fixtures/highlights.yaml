@@ -1,0 +1,49 @@
+simplekey:
+  somekey: somevalue
+  # <- entity.name.tag
+  # <- !string.other
+  #      ^ punctuation.separator.key-value
+  #        ^ !entity.name.tag
+  #        ^ string.other
+  "otherkey": "othervalue"
+  # <- punctuation.definition.string.begin
+  # ^ entity.name.tag
+  # ^ !string.quoted.double
+  #            ^ !entity.name.tag
+  #            ^ string.quoted.double
+  #        ^ punctuation.definition.string.end
+  'singlequotes': 'again, single value'
+  # <- punctuation.definition.string.begin
+  # ^ entity.name.tag
+  # ^ !string.quoted.single
+  #            ^ punctuation.definition.string.end
+  #                ^ !entity.name.tag
+  #                ^ string.quoted.single
+  1: no
+  # <- constant.numeric
+  #  ^ string.other
+  2: yes
+  # <- constant.numeric
+  #  ^ string.other
+  3: [true, false, null, 900]
+  # <- constant.numeric
+  #  ^ punctuation.definition.array.begin.bracket.square
+  #   ^ constant.language
+  #         ^ constant.language
+  #                ^ constant.language
+  #                      ^ constant.numeric
+  #                         ^ punctuation.definition.array.end.bracket.square
+  date: 2001-12-15T02:59:43.1Z
+  json: {"is": 1, "valid": true}
+  # <- entity.name.tag
+  # <- !string.other
+  #     ^ punctuation.definition.object.begin.bracket.curly
+  #      ^ punctuation.definition.string.begin
+  #       ^ !string.quoted.double
+  #       ^ entity.name.tag
+  #         ^ punctuation.definition.string.end
+  #          ^ punctuation.separator.key-value
+  #            ^ constant.numeric
+  #             ^ punctuation.separator.comma
+  #                        ^ constant.language
+  #                            ^ punctuation.definition.object.end.bracket.curly
