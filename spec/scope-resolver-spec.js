@@ -213,7 +213,7 @@ describe('ScopeResolver', () => {
     `);
     await languageMode.ready;
 
-    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+    let { captures } = await getAllCaptures(grammar, languageMode);
 
     let names = captures.map(({ name, node }) => {
       return ScopeResolver.interpolateName(name, node)
@@ -224,6 +224,36 @@ describe('ScopeResolver', () => {
       'declaration.const',
       'declaration.let'
     ]);
+  });
+
+  it('does not apply any scopes on an empty capture', async () => {
+    await grammar.setQueryForTest('highlightsQuery', `
+      (lexical_declaration kind: _ @let
+        (#match? @let "let"))
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+      let bar = 'troz'
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    // Build a fake capture whose `startPosition` is equal to its `endPosition`.
+    let fakeCapture = { ...captures[0] };
+    fakeCapture.node = {
+      ...fakeCapture.node,
+      endPosition: fakeCapture.node.startPosition
+    };
+
+    let prevBoundaries = scopeResolver.boundaries.size;
+    let result = scopeResolver.store(fakeCapture);
+    expect(result).not.toBe(false);
+    expect(scopeResolver.boundaries.size).toBe(prevBoundaries);
   });
 
   it('does not apply any scopes when @_IGNORE_ is used', async () => {
