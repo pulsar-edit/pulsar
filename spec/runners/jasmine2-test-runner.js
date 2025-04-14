@@ -45,6 +45,10 @@ module.exports = function ({logFile, headless, testPaths, buildAtomEnvironment})
   jasmineContent.setAttribute('id', 'jasmine-content');
   document.body.appendChild(jasmineContent);
 
+  if (process.env.CI) {
+    disableFocusMethods();
+  }
+
   return loadSpecsAndRunThem(logFile, headless, testPaths)
     .then((result) => {
       // Retrying failures only really makes sense in headless mode,
@@ -88,6 +92,7 @@ module.exports = function ({logFile, headless, testPaths, buildAtomEnvironment})
     })
 };
 
+
 const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   for (let key in jasmineEnv) {
     window[key] = jasmineEnv[key];
@@ -96,7 +101,7 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   ['it', 'fit', 'xit'].forEach((key) => {
     window[key] = (name, originalFn) => {
       jasmineEnv[key](name, async (done) => {
-        if(originalFn.length === 0) {
+        if (originalFn.length === 0) {
           await originalFn()
           done();
         } else {
@@ -106,10 +111,11 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
     }
   });
 
+
   ['beforeEach', 'afterEach'].forEach((key) => {
     window[key] = (originalFn) => {
       jasmineEnv[key](async (done) => {
-        if(originalFn.length === 0) {
+        if (originalFn.length === 0) {
           await originalFn()
           done();
         } else {
@@ -118,6 +124,16 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
       })
     }
   });
+}
+
+function disableFocusMethods() {
+  for (let methodName of ['fdescribe', 'fit']) {
+    let focusMethod = window[methodName];
+    window[methodName] = function (description) {
+      const error = new Error('Focused spec is running on CI');
+      return focusMethod(description, () => { throw error; });
+    }
+  }
 }
 
 const loadSpecsAndRunThem = (logFile, headless, testPaths) => {

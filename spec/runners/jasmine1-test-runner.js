@@ -15,8 +15,9 @@ const {ipcRenderer} = require('electron');
 
 temp.track();
 
-module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) {
+module.exports = function ({ logFile, headless, testPaths, buildAtomEnvironment }) {
   require('../helpers/jasmine-singleton');
+  require('jasmine-focused');
 
   const normalizeComments = require('../helpers/normalize-comments');
   for (let key in normalizeComments) { window[key] = normalizeComments[key]; }
@@ -58,8 +59,8 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
 
   const ApplicationDelegate = require('../../src/application-delegate');
   const applicationDelegate = new ApplicationDelegate();
-  applicationDelegate.setRepresentedFilename = function() {};
-  applicationDelegate.setWindowDocumentEdited = function() {};
+  applicationDelegate.setRepresentedFilename = function () {};
+  applicationDelegate.setWindowDocumentEdited = function () {};
   window.atom = buildAtomEnvironment({
     applicationDelegate, window, document,
     configDirPath: atomHome,
@@ -96,11 +97,11 @@ module.exports = function({logFile, headless, testPaths, buildAtomEnvironment}) 
   return promise;
 };
 
-var asyncifyJasmineFn = (fn, callbackPosition) => (function(...args) {
+var asyncifyJasmineFn = (fn, callbackPosition) => (function (...args) {
   if (typeof args[callbackPosition] === 'function') {
     const callback = args[callbackPosition];
 
-    args[callbackPosition] = function(...args) {
+    args[callbackPosition] = function (...args) {
       const result = callback.apply(this, args);
       if (result instanceof Promise) {
         return waitsForPromise(() => result);
@@ -111,24 +112,24 @@ var asyncifyJasmineFn = (fn, callbackPosition) => (function(...args) {
   return fn.apply(this, args);
 });
 
-var waitsForPromise = function(fn) {
+var waitsForPromise = function (fn) {
   const promise = fn();
 
-  return global.waitsFor('spec promise to resolve', done => promise.then(done, function(error) {
+  return global.waitsFor('spec promise to resolve', done => promise.then(done, function (error) {
     jasmine.getEnv().currentSpec.fail(error);
     return done();
   }));
 };
 
-var disableFocusMethods = () => ['fdescribe', 'ffdescribe', 'fffdescribe', 'fit', 'ffit', 'fffit'].forEach(function(methodName) {
+var disableFocusMethods = () => ['fdescribe', 'ffdescribe', 'fffdescribe', 'fit', 'ffit', 'fffit'].forEach(function (methodName) {
   const focusMethod = window[methodName];
-  return window[methodName] = function(description) {
+  return window[methodName] = function (description) {
     const error = new Error('Focused spec is running on CI');
-    return focusMethod(description, function() { throw error; });
+    return focusMethod(description, function () { throw error; });
   };
 });
 
-var requireSpecs = function(testPath, specType) {
+var requireSpecs = function (testPath, specType) {
   if (fs.isDirectorySync(testPath)) {
     return (() => {
       const result = [];
@@ -147,7 +148,7 @@ var requireSpecs = function(testPath, specType) {
   }
 };
 
-const setSpecField = function(name, value) {
+const setSpecField = function (name, value) {
   const specs = jasmine.getEnv().currentRunner().specs();
   if (specs.length === 0) { return; }
   return (() => {
@@ -164,7 +165,7 @@ var setSpecType = specType => setSpecField('specType', specType);
 
 var setSpecDirectory = specDirectory => setSpecField('specDirectory', specDirectory);
 
-var buildReporter = function({logFile, headless, resolveWithExitCode}) {
+var buildReporter = function ({logFile, headless, resolveWithExitCode}) {
   if (headless) {
     return buildTerminalReporter(logFile, resolveWithExitCode);
   } else {
@@ -174,10 +175,10 @@ var buildReporter = function({logFile, headless, resolveWithExitCode}) {
   }
 };
 
-var buildTerminalReporter = function(logFile, resolveWithExitCode) {
+var buildTerminalReporter = function (logFile, resolveWithExitCode) {
   let logStream;
   if (logFile != null) { logStream = fs.openSync(logFile, 'w'); }
-  const log = function(str) {
+  const log = function (str) {
     if (logStream != null) {
       return fs.writeSync(logStream, str);
     } else {
