@@ -87,11 +87,36 @@ arm_linux_task:
                 libnss3
                 wget
                 xvfb
+                libncursesw5-dev
+                libssl-dev
+                libsqlite3-dev
+                tk-dev
+                libgdbm-dev
+                libc6-dev
+                libbz2-dev
+                libffi-dev
+                zlib1g-dev
     - gem install dotenv -v '~>  2.8'
     - gem install fpm
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`-next/g" package.json
+  python_fetch_and_build_cache:
+    fingerprint_script: echo "${CIRRUS_OS}-$(uname -prsv)-Python-${PYTHON_VERSION}.9"
+    folder: Python-${PYTHON_VERSION}.9
+    populate_script:
+      - wget "https://www.python.org/ftp/python/${PYTHON_VERSION}.9/Python-${PYTHON_VERSION}.9.tgz"
+      - echo "45313e4c5f0e8acdec9580161d565cf5fea578e3eabf25df7cc6355bf4afa1ee  Python-${PYTHON_VERSION}.9.tgz" | sha256sum --check
+      - tar xzf "Python-${PYTHON_VERSION}.9.tgz"
+      - cd "Python-${PYTHON_VERSION}.9"
+      - ./configure --enable-optimizations
+      - make
+  upload_caches:
+    - python_fetch_and_build
+  install_python_script:
+    - cd "Python-${PYTHON_VERSION}.9" && make install
+    - python3 -m pip install setuptools
+>>>>>>> origin/master
   install_script:
     - yarn install --ignore-engines || yarn install --ignore-engines
   build_script:
@@ -135,7 +160,11 @@ silicon_mac_task:
     APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
     APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
     TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
+<<<<<<< HEAD
     ROLLING_UPLOAD_TOKEN: ENCRYPTED[41b279482c1b61c9129e410233cc5cd71bbfd60e33d03cefae451aff6bc9915d1706a6e8fefd0e0f9041a4bd287c84be] # <-- This is the Electron Next Bins token! Careful when resolving merge conflicts to not overrite to/from master. master branch keeps its token, updated-latest-electron branch keeps this one!
+=======
+    ROLLING_UPLOAD_TOKEN: ENCRYPTED[9cfac7b7c2b28c0979ddd587f7cda3ed1bbe893bbf7ec1d8df9808ef24cdb53c17c1edc572ee249d83c65529cea18a30]
+>>>>>>> origin/master
   prepare_script:
     - brew update
     - brew uninstall node@20

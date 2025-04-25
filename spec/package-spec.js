@@ -99,9 +99,10 @@ describe('Package', function () {
 
     afterEach(() => (atom.packages.devMode = true));
 
-    it('returns a promise resolving to the results of `apm rebuild`', async () => {
-      const packagePath = atom.project.getDirectories()?.[0]?.resolve('packages/package-with-index')
-
+    it('returns a promise resolving to the results of `apm rebuild`', async function() {
+      const packagePath = __guard__(atom.project.getDirectories()[0], x =>
+        x.resolve('packages/package-with-index')
+      );
       const pack = buildPackage(packagePath);
       const rebuildCallbacks = [];
       spyOn(pack, 'runRebuildProcess').and.callFake(callback =>
@@ -154,7 +155,7 @@ describe('Package', function () {
     });
   });
 
-  describe('theme', function () {
+  describe('theme', function() {
     let editorElement, theme;
 
     beforeEach(function () {
@@ -239,7 +240,7 @@ describe('Package', function () {
         theme.activate();
       });
 
-      it('deactivated event fires on .deactivate()', async function () {
+      it('deactivated event fires on .deactivate()', async function() {
         let spy = jasmine.createSpy();
         theme.onDidDeactivate(spy);
         await theme.deactivate();

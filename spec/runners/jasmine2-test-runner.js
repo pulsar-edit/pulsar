@@ -96,20 +96,11 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   ['it', 'fit', 'xit'].forEach((key) => {
     window[key] = (name, originalFn) => {
       jasmineEnv[key](name, async (done) => {
-        try {
-          if (originalFn.length === 0) {
-              await originalFn();
-            done();
-          } else {
-            originalFn(done);
-          }
-        } catch (err) {
-          if (typeof err === 'string' && err.includes('Pending')) {
-            // A test marked itself as pending. Swallow the exception and
-            // proceed.
-            return;
-          }
-          throw err;
+        if(originalFn.length === 0) {
+          await originalFn()
+          done();
+        } else {
+          originalFn(done);
         }
       });
     }
@@ -118,7 +109,7 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   ['beforeEach', 'afterEach'].forEach((key) => {
     window[key] = (originalFn) => {
       jasmineEnv[key](async (done) => {
-        if (originalFn.length === 0) {
+        if(originalFn.length === 0) {
           await originalFn()
           done();
         } else {

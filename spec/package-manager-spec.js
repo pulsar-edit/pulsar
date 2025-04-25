@@ -1729,7 +1729,6 @@ describe('PackageManager', () => {
     });
 
     it('sets hasActivatedInitialPackages', async () => {
-      jasmine.useRealClock();
       spyOn(atom.styles, 'getUserStyleSheetPath').and.returnValue(null);
       spyOn(atom.packages, 'activatePackages');
       expect(atom.packages.hasActivatedInitialPackages()).toBe(false);
