@@ -50,14 +50,8 @@ exports.register = (jasmineEnv) => {
     atom.config.set("editor.fontFamily", "Courier");
     atom.config.set("editor.fontSize", 16);
     atom.config.set("editor.autoIndent", false);
-    atom.config.set(
-      "core.disabledPackages",
-      [
-        "package-that-throws-an-exception",
-        "package-with-broken-package-json",
-        "package-with-broken-keymap"
-      ]
-    );
+    atom.config.set("core.disabledPackages", ["package-that-throws-an-exception",
+      "package-with-broken-package-json", "package-with-broken-keymap"]);
 
     // advanceClock(1000);
     // window.setTimeout.calls.reset();
@@ -98,6 +92,6 @@ exports.register = (jasmineEnv) => {
   });
 }
 
-jasmine.unspy = function (object, methodName) {
+jasmine.unspy = function(object, methodName) {
   object[methodName].and.callThrough();
 };

@@ -223,7 +223,7 @@ module.exports = class WASMTreeSitterGrammar {
     await parserInitPromise;
     if (!this._language) {
       try {
-        this._language = await WASMTreeSitterGrammar.loadLanguage(this.treeSitterGrammarPath);
+        this._language = await Language.load(this.treeSitterGrammarPath);
       } catch (err) {
         console.error(`Error loading grammar for ${this.scopeName}; original error follows`);
         console.error(err);

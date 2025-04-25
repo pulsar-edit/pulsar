@@ -1,7 +1,6 @@
 const AtomWindow = require('./atom-window');
 const ApplicationMenu = require('./application-menu');
 const AtomProtocolHandler = require('./atom-protocol-handler');
-const { onDidChangeScrollbarStyle, getScrollbarStyle } = require('./scrollbar-style');
 const StorageFolder = require('../storage-folder');
 const Config = require('../config');
 const ConfigFile = require('../config-file');
@@ -124,10 +123,6 @@ const decryptOptions = (optionsMessage, secret) => {
   return JSON.parse(message);
 };
 
-ipcMain.handle('getScrollbarStyle', () => {
-  return getScrollbarStyle();
-});
-
 ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.isDefaultProtocolClient(protocol, path, args);
 });
@@ -135,42 +130,6 @@ ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
 ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
 });
-
-// Handle file deletion requests.
-//
-// Works around https://github.com/electron/electron/issues/29598, which seems
-// to be the cause of failed deletion attempts on Windows.
-ipcMain.handle('trashItem', async (_, filePath) => {
-  // We can't toss a promise over the wall, so we'll `await` it on our side and
-  // report the progress back to the renderer.
-  //
-  // If we return an `Error` object from this handler in the case of error,
-  // `ipcRenderer.invoke` will detect it and wrap it with its own explanation.
-  // We want to preserve the original error and hide the implementation
-  // details, so we instead return an object with an explicit `outcome`
-  // property to avoid this behavior.
-  try {
-    // `shell.trashItem` resolves with an empty value on success…
-    let result = await shell.trashItem(filePath);
-    return { outcome: 'success', result };
-  } catch (error) {
-    // …and rejects on failure.
-    return { outcome: 'failure', error };
-  }
-});
-
-ipcMain.handle('showItemInFolder', async (_, filePath) => {
-  try {
-    // Result will be `undefined`, but might as well return it in case of a
-    // future Electron API change.
-    let result = shell.showItemInFolder(filePath);
-    return { outcome: 'success', result };
-  } catch (error) {
-    // Not sure whether this can even fail, but might as well handle it.
-    return { outcome: 'failure', error };
-  }
-})
-
 // The application's singleton class.
 //
 // It's the entry point into the Pulsar application and maintains the global state
@@ -481,16 +440,12 @@ module.exports = class AtomApplication extends EventEmitter {
     if (!window.isSpec) {
       const focusHandler = () => this.windowStack.touch(window);
       const blurHandler = () => this.saveCurrentWindowOptions(false);
-      const scrollbarStyleChangeDisposable = onDidChangeScrollbarStyle((newValue) => {
-        window.browserWindow.webContents.send('did-change-scrollbar-style', newValue);
-      });
       window.browserWindow.on('focus', focusHandler);
       window.browserWindow.on('blur', blurHandler);
       window.browserWindow.once('closed', () => {
         this.windowStack.removeWindow(window);
         window.browserWindow.removeListener('focus', focusHandler);
         window.browserWindow.removeListener('blur', blurHandler);
-        scrollbarStyleChangeDisposable.dispose();
       });
       window.browserWindow.webContents.once('did-finish-load', blurHandler);
       this.saveCurrentWindowOptions(false);
@@ -645,7 +600,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
       this.on('application:open', () => {
         const win = this.focusedWindow();
-        if (win) {
+        if(win) {
           win.sendCommand('application:open')
         } else {
           this.promptForPathToOpen(
@@ -656,7 +611,7 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       this.on('application:open-file', () => {
         const win = this.focusedWindow();
-        if (win) {
+        if(win) {
           win.sendCommand('application:open-file')
         } else {
           this.promptForPathToOpen(
@@ -667,7 +622,7 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       this.on('application:open-folder', () => {
         const win = this.focusedWindow();
-        if (win) {
+        if(win) {
           win.sendCommand('application:open-folder')
         } else {
           this.promptForPathToOpen(
@@ -1808,11 +1763,9 @@ module.exports = class AtomApplication extends EventEmitter {
     let atomTestRunner = packageMetadata.atomTestRunner;
 
     if (!atomTestRunner) {
-      process.stdout.write('atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.\n');
+      process.stdout.write('atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.');
       atomTestRunner = 'runners/jasmine1-test-runner';
     }
-
-    process.stdout.write(`Using test runner: ${atomTestRunner}\n`)
 
     let testRunnerPath;
     Resolve ||= require('resolve');
@@ -1826,15 +1779,11 @@ module.exports = class AtomApplication extends EventEmitter {
       });
 
       if (testRunnerPath) {
-        process.stderr.write(`Strategy 1 succeeded: ${testRunnerPath}`)
         return testRunnerPath;
       }
     } catch (err) {
       // Nothing to do, try the next strategy
-      process.stderr.write(`Strategy 1 failed to load: ./spec/${atomTestRunner}\n${err.message}`)
     }
-
-    process.stderr.write(`Trying strategy 2\n`)
 
     // Then try to use one of the runners defined in Pulsar
     try {
@@ -1844,12 +1793,10 @@ module.exports = class AtomApplication extends EventEmitter {
       });
 
       if (testRunnerPath) {
-        process.stderr.write(`Strategy 2 succeeded: ${testRunnerPath}\n`)
         return testRunnerPath;
       }
     } catch (err) {
       // Nothing to do, try the next strategy
-      process.stderr.write(`Strategy 2 failed to load: ./spec/${atomTestRunner}\n${err.message}\n`)
     }
 
     process.stderr.write(
