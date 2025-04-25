@@ -186,11 +186,7 @@ jobs:
       with:
         timeout_minutes: 31
         max_attempts: 7
-<<<<<<< HEAD
         command: yarn dist --next
-=======
-        command: yarn dist
->>>>>>> origin/master
 
     - name: Build Pulsar Binaries (macOS) (Unsigned)
       if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
@@ -198,11 +194,7 @@ jobs:
       with:
         timeout_minutes: 31
         max_attempts: 7
-<<<<<<< HEAD
         command: yarn dist --next
-=======
-        command: yarn dist
->>>>>>> origin/master
 
     - name: Build Pulsar Binaries
       if: ${{ runner.os != 'macOS' }}

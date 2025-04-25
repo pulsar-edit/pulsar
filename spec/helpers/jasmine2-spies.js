@@ -5,10 +5,6 @@ const TextEditorElement = require("../../src/text-editor-element");
 const pathwatcher = require("pathwatcher");
 const TextEditor = require("../../src/text-editor");
 const TextMateLanguageMode = require("../../src/text-mate-language-mode");
-<<<<<<< HEAD
-=======
-const TreeSitterLanguageMode = require("../../src/tree-sitter-language-mode");
->>>>>>> origin/master
 const {CompositeDisposable} = require("event-kit");
 const {clipboard} = require("electron");
 
@@ -54,19 +50,8 @@ exports.register = (jasmineEnv) => {
     atom.config.set("editor.fontFamily", "Courier");
     atom.config.set("editor.fontSize", 16);
     atom.config.set("editor.autoIndent", false);
-<<<<<<< HEAD
-    atom.config.set(
-      "core.disabledPackages",
-      [
-        "package-that-throws-an-exception",
-        "package-with-broken-package-json",
-        "package-with-broken-keymap"
-      ]
-    );
-=======
     atom.config.set("core.disabledPackages", ["package-that-throws-an-exception",
       "package-with-broken-package-json", "package-with-broken-keymap"]);
->>>>>>> origin/master
 
     // advanceClock(1000);
     // window.setTimeout.calls.reset();
@@ -81,10 +66,6 @@ exports.register = (jasmineEnv) => {
 
     // make tokenization synchronous
     TextMateLanguageMode.prototype.chunkSize = Infinity;
-<<<<<<< HEAD
-=======
-    TreeSitterLanguageMode.prototype.syncTimeoutMicros = Infinity;
->>>>>>> origin/master
     spyOn(TextMateLanguageMode.prototype, "tokenizeInBackground").and.callFake(function () {
       return this.tokenizeNextChunk();
     });
@@ -111,10 +92,6 @@ exports.register = (jasmineEnv) => {
   });
 }
 
-<<<<<<< HEAD
-jasmine.unspy = function (object, methodName) {
-=======
 jasmine.unspy = function(object, methodName) {
->>>>>>> origin/master
   object[methodName].and.callThrough();
 };
