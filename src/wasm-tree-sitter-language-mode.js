@@ -2052,6 +2052,21 @@ class HighlightIterator {
     let { buffer, rootLanguageLayer } = this.languageMode;
     if (!rootLanguageLayer) { return []; }
 
+    if (!endRow) {
+      // Creative consumers of `HighlightIterator` exist in the wild; some of
+      // them expect the `TextMateHighlightIterator::seek` signature that needs
+      // only a starting position.
+      //
+      // So if `endRow` isn’t specified, we should assume it wants to go to the
+      // end of the buffer. This is why `endRow` defaults to `Infinity`. It
+      // will get clipped to the end of the buffer or the end of the language
+      // layer as appropriate.
+      //
+      // This can theoretically get very costly — but it'd be the consumer's
+      // fault for using a private API and not doing its own chunking.
+      endRow = buffer.getEndPosition().row
+    }
+
     let end = {
       row: endRow,
       column: buffer.lineLengthForRow(endRow)
