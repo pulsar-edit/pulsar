@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Install build dependencies
-      run: sudo apt-get update && apt-get install -y libx11-dev libxkbfile-dev
+      run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbfile-dev
 
     - name: Checkout the latest code
       uses: actions/checkout@v4
