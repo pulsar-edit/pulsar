@@ -16,7 +16,7 @@
     "allowCommentsInJsonFiles": {
       "type": "boolean",
       "title": "Allow Comments in .json files",
-      "description": "When checked, will allow comment syntax in all files with the `.json` extension even though it’s not valid JSON. When unchecked, comments in `.json` files will be marked as invalid, and only files with the `.jsonc` extension will be allowed to show comments. (It’s recommended to reload your window or restart Pulsar after changing this setting.)",
+      "description": "When checked, will allow comments in `.json` files even though they’re not valid according to the official JSON specification. When unchecked, comments in `.json` files will be marked as invalid, and only files with the `.jsonc` extension will mark comments as valid and allowed. (It’s recommended to reload your window or restart Pulsar after changing this setting.)",
       "default": false
     }
   },
