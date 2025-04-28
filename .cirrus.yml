@@ -127,7 +127,7 @@ silicon_mac_task:
   only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
   skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
   macos_instance:
-    image: ghcr.io/cirruslabs/macos-ventura-xcode:latest
+    image: ghcr.io/cirruslabs/macos-runner:sonoma
     memory: 8G
   env:
     CSC_LINK: ENCRYPTED[0078015a03bb6cfdbd80113ae5bbb6f448fd4bbbc40efd81bf2cb1554373046b475a4d7c77e3e3e82ac1ce2f7e3d2da5]
