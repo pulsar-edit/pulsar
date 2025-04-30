@@ -526,18 +526,40 @@ class WASMTreeSitterLanguageMode {
     return result;
   }
 
+  // TODO: This is the original name for the method below. It makes no sense.
+  // Rename it everywhere when legacy Tree-sitter is retired.
+  updateForInjection(grammar) {
+    return this.updateInjectionsForGrammar(grammar);
+  }
+
   // Called when any grammar is added or changed, on the off chance that it
   // affects an injection of ours.
-  updateForInjection(grammar) {
-    if (!this.rootLanguageLayer) { return; }
-    if (!grammar.injectionRegex && !grammar.injectionRegExp) { return; }
-    if (grammar.type !== 'modern-tree-sitter') { return; }
-
-    let layers = this.getAllLanguageLayers();
-    for (let layer of layers) {
-      if (!layer.tree) continue;
-      layer._populateInjections(MAX_RANGE, null);
+  updateInjectionsForGrammar(grammar) {
+    if (!this.rootLanguageLayer) {
+      // We haven't gotten far enough for this to matter yet. Injections will
+      // be handled later.
+      return;
     }
+    if (!grammar.injectionRegex && !grammar.injectionRegExp) {
+      // This grammar has no injection regex, hence there's no way for another
+      // grammar to use it for injection.
+      return;
+    }
+    if (grammar.type !== 'modern-tree-sitter') {
+      // Only other `WASMTreeSitterGrammar`s can be injected into this language
+      // mode.
+      return;
+    }
+
+    // Now we'll visit every layer in the document in turn and see if any of
+    // them might be affected by the addition of this grammar. We keep a cache
+    // to cut down on redundant lookups.
+    let cache = new Map();
+
+    // Each layer calls `updateForInjection` on its children, so we need only
+    // start the process.
+    this.rootLanguageLayer.updateInjectionsForGrammar(grammar, cache);
+    cache.clear();
   }
 
   /*
@@ -2030,6 +2052,21 @@ class HighlightIterator {
     let { buffer, rootLanguageLayer } = this.languageMode;
     if (!rootLanguageLayer) { return []; }
 
+    if (!endRow) {
+      // Creative consumers of `HighlightIterator` exist in the wild; some of
+      // them expect the `TextMateHighlightIterator::seek` signature that needs
+      // only a starting position.
+      //
+      // So if `endRow` isn’t specified, we should assume it wants to go to the
+      // end of the buffer. This is why `endRow` defaults to `Infinity`. It
+      // will get clipped to the end of the buffer or the end of the language
+      // layer as appropriate.
+      //
+      // This can theoretically get very costly — but it'd be the consumer's
+      // fault for using a private API and not doing its own chunking.
+      endRow = buffer.getEndPosition().row
+    }
+
     let end = {
       row: endRow,
       column: buffer.lineLengthForRow(endRow)
@@ -2602,9 +2639,28 @@ class LanguageLayer {
 
     this.subscriptions = new CompositeDisposable;
 
+    this.injectionPointsChanged = false;
+
+    const handleInjectionPointChanges = () => {
+      // When we add or remove injection points on this grammar, this language
+      // layer must repopulate its injections.
+      this._populateInjections(MAX_RANGE, null);
+    };
+
+    this.subscriptions.add(
+      this.grammar.onDidAddInjectionPoint(handleInjectionPointChanges),
+      this.grammar.onDidRemoveInjectionPoint(handleInjectionPointChanges)
+    );
+
     this.currentRangesLayer = this.buffer.addMarkerLayer();
     this.ready = false;
     this.queries = {};
+
+    // The markers that hold all the language layer children of this layer.
+    this.childLayerMarkers = new Set();
+    // All language strings that were given to us by injection points in the
+    // past, but could not be matched to grammars.
+    this.unrecognizedLanguageStrings = new Set();
 
     // A constructor can't go async, so all our async administrative tasks hang
     // off this promise. We can `await this.languageLoaded` later on.
@@ -2795,6 +2851,58 @@ class LanguageLayer {
 
   getExtent() {
     return this.marker?.getRange() ?? this.languageMode.buffer.getRange();
+  }
+
+  // Given a grammar, returns whether the grammar might be used for this
+  // layer's current injection points.
+  //
+  // Optionally accepts a `Map` so that it can cache results across a large
+  // number of calls.
+  injectionPointsMatchGrammar(grammar, cache = null) {
+    let matches = (lang, grammar, cache) => {
+      if (cache && cache.has(lang)) {
+        return cache.get(lang) === grammar;
+      }
+      let match = this.languageMode.grammarForLanguageString(lang);
+      if (cache) {
+        cache.set(lang, match);
+      }
+      return match === grammar;
+    };
+
+    // Would this grammar have been a candidate for injection _instead_ of a
+    // grammar that handled one of our active injections?
+    for (let { languageString: lang } of this.childLayerMarkers) {
+      if (matches(lang, grammar, cache)) return true;
+    }
+    // Would this grammar have matched a language string that we were unable to
+    // match to an injection on this layer previously?
+    for (let lang of Array.from(this.unrecognizedLanguageStrings)) {
+      if (matches(lang, grammar, cache)) return true;
+    }
+    return false;
+  }
+
+  // Determine whether a newly added or changed grammar warrants a
+  // reexamination of this layer's injections.
+  updateInjectionsForGrammar(grammar, cache = null) {
+    // Changes to both buffer contents and the grammar's injection points each
+    // independently trigger re-evaluation of injections. This code path is
+    // solely for deciding whether the presence of a specific new or altered
+    // grammar has implications for our current injections.
+    //
+    // Since reworking _all_ our injections is costly, we try to avoid it. If
+    // we can demonstrate that this grammar would not be used even if we _did_
+    // rebuild all injections on this layer from scratch, then we'll have
+    // proven that this step can be skipped.
+    if (this.injectionPointsMatchGrammar(grammar, cache)) {
+      this._populateInjections(MAX_RANGE, null);
+    }
+
+    let childLayers = Array.from(this.childLayerMarkers).map(m => m.languageLayer);
+    for (let child of childLayers) {
+      child.updateInjectionsForGrammar(grammar, cache);
+    }
   }
 
   // Run a highlights query for the given range and process the raw captures
@@ -3706,15 +3814,18 @@ class LanguageLayer {
     return node ?? null;
   }
 
+  // Assuming a buffer change in the given range, decides which injections need
+  // to be created and where to create them, ideally reusing as many layers as
+  // possible from previous updates.
   _populateInjections(range, nodeRangeSet) {
     if (!this.tree) { return; }
+
     const promises = [];
 
     // We won't touch _all_ injections, but we will touch any injection that
     // could possibly have been affected by this layer's update.
-    let existingInjectionMarkers = this.languageMode.injectionsMarkerLayer
-      .findMarkers({ intersectsRange: range })
-      .filter(marker => marker.parentLanguageLayer === this);
+    let existingInjectionMarkers = Array.from(this.childLayerMarkers)
+      .filter(m => m.getRange().intersectsWith(range));
 
     if (existingInjectionMarkers.length > 0) {
       // Enlarge our range to contain all of the injection zones in the
@@ -3739,17 +3850,22 @@ class LanguageLayer {
     // inspection, this bug doesn't seem to be limited to `web-tree-sitter`.
     if (range.isEmpty()) { return; }
 
-    // Now that we've enlarged the range, we might have more existing injection
-    // markers to consider. But check for containment rather than intersection
-    // so that we don't have to enlarge it again.
-    existingInjectionMarkers = this.languageMode.injectionsMarkerLayer
-      .findMarkers({ startsInRange: range, endsInRange: range })
-      .filter(marker => marker.parentLanguageLayer === this);
+    // Imagine our original range touched the outer boundaries of some
+    // injection markers. Above, we widened the range so that it covered the
+    // full bounds of all those markers. But now that we've widened the range,
+    // we should look for markers again. It's possible there are some new ones
+    // that weren't caught in the first pass.
+    //
+    // This time, though, we check for containment rather than intersection
+    // so that we don't have to enlarge the range again.
+    existingInjectionMarkers = Array.from(this.childLayerMarkers)
+      .filter(m => range.containsRange(m.getRange()));
+    existingInjectionMarkers.sort((a, b) => a.compare(b));
 
     const markersToUpdate = new Map();
 
-    // Query for all the nodes that could possibly prompt the creation of
-    // injection points.
+    // Query for all the nodes within the original range that could possibly
+    // prompt the creation of injection points.
     const nodes = this.tree.rootNode.descendantsOfType(
       Object.keys(this.grammar.injectionPointsByType),
       range.start,
@@ -3769,7 +3885,16 @@ class LanguageLayer {
         // Does that string match up with a grammar that we recognize?
         const grammar = this.languageMode.grammarForLanguageString(
           languageName);
-        if (!grammar) { continue; }
+        if (!grammar) {
+          // Keep track of these failures. When a new grammar is added, some of
+          // them might match.
+          this.unrecognizedLanguageStrings.add(languageName);
+          continue;
+        }
+
+        // We matched a language string here, so remove it from this set just
+        // in case it was in there from a past failure.
+        this.unrecognizedLanguageStrings.delete(languageName);
 
         // Does it offer us a node, or array of nodes, which a new injection
         // layer should use for its content?
@@ -3851,6 +3976,13 @@ class LanguageLayer {
           );
 
           marker.parentLanguageLayer = this;
+
+          // Keep track of the language strings we attempt to match to
+          // grammars. This gives us a quick way to determine whether a newly
+          // added grammar will affect our injections.
+          marker.languageString = languageName;
+
+          this.childLayerMarkers.add(marker);
           // eslint-disable-next-line no-unused-vars
           newLanguageLayers++;
         }
@@ -3872,6 +4004,7 @@ class LanguageLayer {
       // stale and should be destroyed.
       if (!markersToUpdate.has(marker)) {
         this.languageMode.emitRangeUpdate(marker.getRange());
+        this.childLayerMarkers.delete(marker);
         marker.languageLayer.destroy();
         // eslint-disable-next-line no-unused-vars
         staleLanguageLayers++;
@@ -3883,6 +4016,47 @@ class LanguageLayer {
         promises.push(marker.languageLayer.update(nodeRangeSet));
       }
     }
+
+    // Now that we've identified all the injection points for this layer, we
+    // can consider them stable until one of these three things happens:
+    //
+    // 1. The buffer changes in any way.
+    // 2. A grammar is added or changed.
+    // 3. A new injection point is added via
+    //   `GrammarRegistry#addInjectionPoint`.
+    //
+    // If #1 happens, all bets are off. But given a buffer change, we know that
+    // only a subset of the buffer is meaningfully affected; hence only the
+    // injections within that range need reappraisal. The other two require
+    // re-assessment of this layer's _entire_ range.
+    //
+    // If #2 happens, we can use what we learned in our last trip through this
+    // function; it's still conclusive _if_ the grammar has not had any new
+    // injection points defined. We can look at all the injection language
+    // names generated in previous calls to this function (whether or not they
+    // were successfully matched with grammars in the past) and see if any of
+    // them would apply to the changed/added grammar. If not, we can skip this
+    // layer.
+    //
+    // On the other hand: if injection points have changed since the last trip
+    // through this function, then a future grammar addition or change must
+    // take the slow path — running this function all over again in case the
+    // different set of injection points produces different injection
+    // candidates. (This very grammar that's just been added could've had
+    // package initializer code that added an injection point to this layer's
+    // grammar.)
+    //
+    // Hence we set the flag below to `false`. Any changes to injection points
+    // will trigger a callback that flips it to `true`. If a new grammar
+    // activates after we're done, it can check this flag as part of its
+    // heuristic to decide if this new grammar would affect the injections
+    // defined on this layer.
+    //
+    // TODO: If adding an injection point is so meaningful, why don't we
+    // automatically re-populate injections whenever we add one for a given
+    // grammar? That's an excellent question. In the future we'll do that
+    // automatically and this logic will get marginally simpler.
+    this.injectionPointsChanged = false;
 
     return Promise.all(promises);
   }

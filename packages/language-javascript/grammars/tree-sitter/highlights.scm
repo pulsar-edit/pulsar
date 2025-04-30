@@ -957,6 +957,8 @@
     (#set! prohibitsOptionalChaining true))
 
 ((optional_chain) @invalid.illegal.optional-chain.js
+  ; Ensure this doesn't trigger on zero-content MISSING nodes.
+  (#eq? @invalid.illegal.optional-chain.js "?.")
   (#is? test.descendantOfNodeWithData prohibitsOptionalChaining))
 
 

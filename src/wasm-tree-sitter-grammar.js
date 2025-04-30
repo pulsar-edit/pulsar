@@ -452,6 +452,26 @@ module.exports = class WASMTreeSitterGrammar {
     return this.emitter.on('did-load-query-files', callback);
   }
 
+  // Extended: Calls `callback` when an injection point is added to this
+  // grammar.
+  //
+  // * callback A function with the following argument:
+  //   * injectionPoint The injection point added to the grammar. See
+  //     {WASMTreeSitterGrammar::addInjectionPoint}.
+  onDidAddInjectionPoint(callback) {
+    return this.emitter.on('did-add-injection-point', callback);
+  }
+
+  // Extended: Calls `callback` when an injection point is removed from this
+  // grammar.
+  //
+  // * callback A function with the following argument:
+  //   * injectionPoint The injection point removed from this grammar. See
+  //     {WASMTreeSitterGrammar::addInjectionPoint}.
+  onDidRemoveInjectionPoint(callback) {
+    return this.emitter.on('did-remove-injection-point', callback);
+  }
+
   activate() {
     this.registration = this.registry.addGrammar(this);
   }
@@ -535,6 +555,7 @@ module.exports = class WASMTreeSitterGrammar {
       injectionPoints = this.injectionPointsByType[type] = [];
     }
     injectionPoints.push(injectionPoint);
+    this.emitter.emit('did-add-injection-point', injectionPoint);
   }
 
   removeInjectionPoint(injectionPoint) {
@@ -546,6 +567,7 @@ module.exports = class WASMTreeSitterGrammar {
         delete this.injectionPointsByType[injectionPoint.type];
       }
     }
+    this.emitter.emit('did-remove-injection-point', injectionPoint);
   }
 
   inspect() {

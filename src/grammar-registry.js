@@ -522,6 +522,9 @@ module.exports = class GrammarRegistry {
         }
       }
 
+      // TODO: Still calling this `updateForInjection` for polymorphism, but
+      // we can rename it `updateInjectionsForGrammar` once legacy Tree-sitter
+      // is retired.
       languageMode.updateForInjection(grammar);
     });
   }
