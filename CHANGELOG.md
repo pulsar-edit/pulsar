@@ -6,6 +6,24 @@
 
 ## [Unreleased]
 
+## 1.128.0
+
+- Vastly improved support for right-to-left text editing — meaning languages like Arabic, Hebrew, and Farsi.
+- Added support for comments in JSON — both via a new grammar for `.jsonc` files and via a setting to enable comments in regular `.json` files.
+- Fixed performance issues that can arise when reopening a project with existing editor windows.
+- Updated DOMPurify. This is a security fix.
+
+### Pulsar
+
+- Tree-sitter rolling fixes, 1.128 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1251)
+- Cirrus: Pin macOS builds to using Sonoma images [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1280)
+- Bump Ubuntu in CI to `ubuntu-latest` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1279)
+- Restore ability for packages to focus specs on both Jasmine 1 and Jasmine 2 test runners [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1265)
+- [markdown-preview] Update `dompurify` to 2.5.7 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1271)
+- Create `SECURITY.md` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1253)
+- Improve support for RTL text input [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1249)
+- [find-and-replace] Fix some bugs in the spec suite [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1221)
+
 ## 1.127.1
 
 - Hotfix: Reverted a Wayland-related change that Linux users reported issues with on Electron 12.
