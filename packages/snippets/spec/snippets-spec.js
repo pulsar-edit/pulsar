@@ -6,7 +6,7 @@ const crypto = require('crypto');
 
 const SUPPORTS_UUID = ('randomUUID' in crypto) && (typeof crypto.randomUUID === 'function');
 
-fdescribe("Snippets extension", () => {
+describe("Snippets extension", () => {
   let editorElement, editor, languageMode;
   let modernTreeSitterIsDefault = null;
 
