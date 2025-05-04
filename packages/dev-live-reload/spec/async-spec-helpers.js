@@ -1,6 +1,4 @@
-/** @babel */
-
-export async function conditionPromise(
+async function conditionPromise(
   condition,
   description = 'anonymous condition'
 ) {
@@ -19,8 +17,10 @@ export async function conditionPromise(
   }
 }
 
-export function timeoutPromise(timeout) {
-  return new Promise(function(resolve) {
+function timeoutPromise(timeout) {
+  return new Promise(function (resolve) {
     global.setTimeout(resolve, timeout);
   });
 }
+
+module.exports = { conditionPromise, timeoutPromise };
