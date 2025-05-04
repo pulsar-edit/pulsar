@@ -19,7 +19,7 @@ const symlink = promisify(fs.symlink);
 
 const tempMkdir = promisify(temp.mkdir);
 
-fdescribe('watchPath', function() {
+describe('watchPath', function() {
   let subs;
 
   beforeEach(function() {
@@ -90,7 +90,7 @@ fdescribe('watchPath', function() {
       expect(watcher0.native).toBe(watcher1.native);
     });
 
-    it("returns paths that appear to descend from the given path, even when symlinks are involved", async () => {
+    it("returns paths that appear to descend from the given path, even when symlinks are involved, when `realPaths` is `false`", async () => {
       jasmine.useRealClock();
       const rootDir = await tempMkdir('atom-fsmanager-test-');
       const realRootDir = await realpath(rootDir)
@@ -98,11 +98,11 @@ fdescribe('watchPath', function() {
       await symlink(realRootDir, symlinkedPath)
 
       let events0 = [];
-      let watcher0 = await watchPath(realRootDir, {}, (events) => {
+      let watcher0 = await watchPath(realRootDir, { realPaths: false }, (events) => {
         events0.push(...events);
       });
       let events1 = [];
-      let watcher1 = await watchPath(symlinkedPath, {}, (events) => {
+      let watcher1 = await watchPath(symlinkedPath, { realPaths: false }, (events) => {
         events1.push(...events);
       });
 
@@ -124,21 +124,20 @@ fdescribe('watchPath', function() {
       expect(first1.path.startsWith(symlinkedPath)).toBe(true);
     })
 
-    it("returns real paths for events when the user opts into it via `rawPaths: true`", async () => {
+    it("returns real paths for events when `realPaths` is `true`", async () => {
       jasmine.useRealClock();
       const rootDir = await tempMkdir('atom-fsmanager-test-');
       const realRootDir = await realpath(rootDir)
       const symlinkedPath = temp.path({ suffix: '-symlinked' })
       await symlink(realRootDir, symlinkedPath)
       const realSymlinkedPath = await realpath(symlinkedPath)
-      console.log('Generated:', { rootDir, realRootDir, symlinkedPath, realSymlinkedPath });
 
       let events0 = [];
-      let watcher0 = await watchPath(realRootDir, { rawPaths: true }, (events) => {
+      let watcher0 = await watchPath(realRootDir, { realPaths: true }, (events) => {
         events0.push(...events);
       });
       let events1 = [];
-      let watcher1 = await watchPath(symlinkedPath, { rawPaths: true }, (events) => {
+      let watcher1 = await watchPath(symlinkedPath, { realPaths: true }, (events) => {
         events1.push(...events);
       });
 
@@ -153,14 +152,14 @@ fdescribe('watchPath', function() {
       let [first0] = events0;
       let [first1] = events1;
 
-      // Because `rawPaths` is `true`, these events will have identical `path`
+      // Because `realPaths` is `true`, these events will have identical `path`
       // properties that point to the file's true path on disk.
       expect(first0.path).toBe(first1.path);
       expect(first0.path.startsWith(realRootDir)).toBe(true);
       expect(first1.path.startsWith(symlinkedPath)).toBe(false);
     })
 
-    it("normalizes a path without resolving symlinks", async () => {
+    it("normalizes a path without resolving symlinks when `realPaths` is `false`", async () => {
       jasmine.useRealClock();
       const rootDir = await tempMkdir('atom-fsmanager-test-');
       const realRootDir = await realpath(rootDir);
@@ -170,7 +169,7 @@ fdescribe('watchPath', function() {
       const relativizedPath = `${symlinkedPath}${path.sep}..${path.sep}${path.basename(symlinkedPath)}`
 
       let events0 = [];
-      let watcher0 = await watchPath(relativizedPath, {}, (events) => {
+      let watcher0 = await watchPath(relativizedPath, { realPaths: false }, (events) => {
         events0.push(...events);
       });
       disposables.add(watcher0);

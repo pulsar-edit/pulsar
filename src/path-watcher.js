@@ -259,7 +259,7 @@ class PathWatcher {
   constructor(nativeWatcherRegistry, watchedPath, options) {
     this.watchedPath = watchedPath;
     this.nativeWatcherRegistry = nativeWatcherRegistry;
-    this.options = options;
+    this.options = { realPaths: true, ...options };
 
     this.normalizedPath = null;
     this.native = null;
@@ -426,7 +426,7 @@ class PathWatcher {
   // This saves the user from having to make their own calls to `fs.realpath`
   // on their end just to do path equality checks.
   denormalizePath(filePath) {
-    if (this.options.rawPaths) return filePath;
+    if (this.options.realPaths) return filePath;
     if (this.watchedPath === this.normalizedPath) return filePath;
     if (!filePath.startsWith(this.normalizedPath)) return filePath;
     let rest = filePath.substring(this.normalizedPath.length);
@@ -439,7 +439,7 @@ class PathWatcher {
   // This saves the user from having to make their own calls to `fs.realpath`
   // on their end just to do path equality checks.
   denormalizeEvent(event) {
-    if (this.options.rawPaths) return event;
+    if (this.options.realPaths) return event;
     if (this.watchedPath === this.normalizedPath) return event;
     let result = { ...event };
     result.path = this.denormalizePath(event.path);
@@ -577,7 +577,8 @@ class PathWatcherManager {
     this.isShuttingDown = false;
   }
 
-  // Private: Create a {PathWatcher} tied to this global state. See {watchPath} for detailed arguments.
+  // Private: Create a {PathWatcher} tied to this global state. See {watchPath}
+  // for detailed arguments.
   async createWatcher(rootPath, eventCallback, options) {
     if (this.isShuttingDown) {
       await this.constructor.transitionPromise;
@@ -618,12 +619,10 @@ class PathWatcherManager {
 // * `rootPath` {String} specifies the absolute path to the root of the
 //   filesystem content to watch.
 // * `options` Control the watcher's behavior:
-//   * `rawPaths` A {Boolean} that defaults to `false`. By default, this
-//     watcher will "de-normalize" any paths in filesystem events so that they
-//     are guaranteed to descend from `rootPath`, even if the true paths on
-//     disk differ due to symlinks. When this option is `true`, this step will
-//     be skipped, and all `path` and `oldPath` properties will refer to files'
-//     true paths on disk.
+//   * `realPaths` {Boolean} Whether to report real paths on disk for
+//     filesystem events. Default is `true`; a value of `false` will instead
+//     return paths on disk that will always descend from the given path, even
+//     if the real path of the file is different due to symlinks.
 // * `eventCallback` {Function} or other callable to be called each time a
 //   batch of filesystem events is observed.
 //    * `events` {Array} of objects that describe the events that have occurred.
