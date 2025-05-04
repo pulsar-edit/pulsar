@@ -4359,6 +4359,10 @@ describe("TreeView", function () {
       return atom.notifications.clear();
     });
 
+    // Not sure why, but slowing down seems to help. Might be related to
+    // `pathwatcher` churn.
+    afterEach(async () => await wait(50));
+
     describe("when dragging a FileView onto a DirectoryView's header", () => {
       it("should add the selected class to the DirectoryView", async () => {
         jasmine.useRealClock();
@@ -4388,9 +4392,6 @@ describe("TreeView", function () {
       })
     });
 
-    // Not sure why, but slowing down seems to help. Might be related to
-    // `pathwatcher` churn.
-    afterEach(async () => await wait(50));
 
     describe("when dragging a FileView onto a FileView", () => {
       it("should add the selected class to the parent DirectoryView", function () {
@@ -4826,7 +4827,7 @@ describe("TreeView", function () {
           await wait(100);
           // Dragging beta.txt and etaDir into alphaDir
           const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
-          alphaDir.expand();
+          await alphaDir.expand();
           const betaFile = alphaDir.entries.children[0];
           const etaDir = alphaDir.entries.children[1];
 
@@ -4841,6 +4842,9 @@ describe("TreeView", function () {
 
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
+          await conditionPromise(() => {
+            return fs.existsSync(path.join(alphaDirPath, 'beta.txt'));
+          }, 'wait for file to exist');
           expect(treeView.copyEntry).toHaveBeenCalled();
 
           await conditionPromise(() => {
@@ -4913,13 +4917,13 @@ describe("TreeView", function () {
         jasmine.useRealClock();
         // Dragging gammaDir from OS file explorer onto alphaDir
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
-        alphaDir.expand();
+        await alphaDir.expand();
 
         const alphaDirContents = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length;
 
         const dropEvent = eventHelpers.buildExternalDropEvent([gammaDirPath], alphaDir);
         treeView.onDrop(dropEvent);
-        expect(alphaDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
 
         await conditionPromise(() => {
           let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
