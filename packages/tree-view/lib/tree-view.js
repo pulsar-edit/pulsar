@@ -1209,7 +1209,8 @@ class TreeView {
       } else {
         // read the old file and write a new one at target location
         // TODO: replace with fs.copyFileSync
-        fs.writeFileSync(newPath, fs.readFileSync(initialPath));
+        fs.copyFileSync(initialPath, newPath);
+        // fs.writeFileSync(newPath, fs.readFileSync(initialPath));
       }
       this.emitter.emit('entry-copied', { initialPath, newPath });
       let repo = repoForPath(newPath);

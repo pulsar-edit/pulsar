@@ -107,12 +107,17 @@ class Directory {
     return this.emitter.on('did-expand', callback)
   }
 
-  loadRealPath() {
+  loadRealPathPromise() {
+    return new Promise((resolve) => this.loadRealPath(resolve));
+  }
+
+  loadRealPath(callback = null) {
     if (this.useSyncFS) {
       this.realPath = fs.realpathSync(this.path)
       if (fs.isCaseInsensitive()) {
         this.lowerCaseRealPath = this.realPath.toLowerCase()
       }
+      callback?.()
     } else {
       fs.realpath(this.path, (error, realPath) => {
         // FIXME: Add actual error handling
@@ -124,6 +129,7 @@ class Directory {
           }
           this.updateStatus()
         }
+        callback?.()
       })
     }
   }
@@ -253,6 +259,7 @@ class Directory {
   async watch() {
     if (this.watchSubscription != null) return
     try {
+      await this.loadRealPathPromise();
       // These path-watchers are recursive, so it's redundant to have one for
       // each directory. Luckily, `watchPath` itself consolidates redundant
       // watchers so we don't have to.
@@ -414,10 +421,10 @@ class Directory {
 
   // Public: Expand this directory, load its children, and start watching it for
   // changes.
-  expand() {
+  async expand() {
     this.expansionState.isExpanded = true
     this.reload()
-    this.watch()
+    await this.watch()
     this.emitter.emit('did-expand')
   }
 
@@ -458,6 +465,6 @@ class Directory {
 
   filePathIsChildOfDirectory(filePath) {
     let dirname = path.dirname(filePath)
-    return this.path === dirname
+    return this.path === dirname || this.realPath === dirname
   }
 }
