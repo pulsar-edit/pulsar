@@ -92,7 +92,7 @@ describe("TreeView", function () {
 
     await waitForPackageActivation();
 
-    const moduleInstance = atom.packages.getActivePackage('tree-view').mainModule.getTreeViewInstance();
+    atom.packages.getActivePackage('tree-view').mainModule.getTreeViewInstance();
     treeView = atom.workspace.getLeftDock().getActivePaneItem();
     const files = treeView.element.querySelectorAll('.file');
     root1 = treeView.roots[0];
@@ -1524,21 +1524,21 @@ describe("TreeView", function () {
       const paneNumber = index + 1;
       const command = `tree-view:open-selected-entry-in-pane-${paneNumber}`;
 
-      describe(command, () => describe("when a file is selected", function () {
-        beforeEach(function () {
-          console.error(`Selecting tree-view.txt for`, index);
-          selectEntry('tree-view.txt');
-          waitForWorkspaceOpenEvent(() => atom.commands.dispatch(treeView.element, command));
-        });
+      describe(command, () => {
+        describe("when a file is selected", function () {
+          beforeEach(function () {
+            selectEntry('tree-view.txt');
+            waitForWorkspaceOpenEvent(() => atom.commands.dispatch(treeView.element, command));
+          });
 
-        it(`opens the file in pane ${paneNumber} and focuses it`, function () {
-          const pane = atom.workspace.getCenter().getPanes()[index];
-          const item = atom.workspace.getCenter().getActivePaneItem();
-          expect(atom.views.getView(pane)).toHaveFocus();
-          expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
-          console.error(`done`, index);
-        });
-      }));
+          it(`opens the file in pane ${paneNumber} and focuses it`, function () {
+            const pane = atom.workspace.getCenter().getPanes()[index];
+            const item = atom.workspace.getCenter().getActivePaneItem();
+            expect(atom.views.getView(pane)).toHaveFocus();
+            expect(item.getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
+          });
+        })
+      });
     });
   });
 
@@ -2572,13 +2572,6 @@ describe("TreeView", function () {
 
           atom.commands.dispatch(treeView.element, "tree-view:move");
           moveDialog = atom.workspace.getModalPanels()[0].getItem();
-
-          // waitForWorkspaceOpenEvent(() => fileView.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
-
-          // return runs(function () {
-          //   atom.commands.dispatch(treeView.element, "tree-view:move");
-          //   return moveDialog = atom.workspace.getModalPanels()[0].getItem();
-          // });
         });
 
         it("opens a move dialog with the file's current path (excluding extension) populated", function () {
@@ -2597,6 +2590,8 @@ describe("TreeView", function () {
               jasmine.useRealClock();
               const newPath = path.join(rootDirPath, 'renamed-test-file.txt');
               moveDialog.miniEditor.setText(path.basename(newPath));
+              // Pause for a moment to allow for the file-watcher to catch up.
+              await wait(50);
 
               atom.commands.dispatch(moveDialog.element, 'core:confirm');
 
@@ -3465,9 +3460,10 @@ describe("TreeView", function () {
 
   describe("the hideVcsIgnoredFiles config option", function () {
     describe("when the project's path is the repository's working directory", function () {
+      let projectPath;
       beforeEach(function () {
         const dotGitFixture = path.join(__dirname, 'fixtures', 'git', 'working-dir', 'git.git');
-        const projectPath = temp.mkdirSync('tree-view-project');
+        projectPath = temp.mkdirSync('tree-view-project');
         const dotGit = path.join(projectPath, '.git');
         fs.copySync(dotGitFixture, dotGit);
         const ignoreFile = path.join(projectPath, '.gitignore');
@@ -3477,6 +3473,12 @@ describe("TreeView", function () {
 
         atom.project.setPaths([projectPath]);
         return atom.config.set("tree-view.hideVcsIgnoredFiles", false);
+      });
+
+      afterEach(() => {
+        for (let fileName of ['.gitignore', 'ignored.txt']) {
+          fs.removeSync(path.join(projectPath, fileName));
+        }
       });
 
       it("hides git-ignored files if the option is set, but otherwise shows them", function () {
@@ -3880,6 +3882,7 @@ describe("TreeView", function () {
 
       describe("when a file loses its modified status",() => {
         it("updates its and its parent directories' styles", async () => {
+          jasmine.useRealClock();
           fs.writeFileSync(modifiedFile, originalFileContent);
           atom.project.getRepositories()[0].getPathStatus(modifiedFile);
 
@@ -4119,7 +4122,7 @@ describe("TreeView", function () {
   });
 
   describe("the sortFoldersBeforeFiles config option", function () {
-    let [dirView, fileView, dirView2, fileView2, fileView3, rootDirPath, dirPath, filePath, dirPath2, filePath2, filePath3] = [];
+    let dirView, fileView, dirView2, fileView2, fileView3, rootDirPath, dirPath, filePath, dirPath2, filePath2, filePath3;
 
     beforeEach(function () {
       rootDirPath = fs.absolute(temp.mkdirSync('tree-view'));
@@ -4296,21 +4299,25 @@ describe("TreeView", function () {
   }));
 
   describe("Dragging and dropping files", function () {
-    let [rootDirPath, alphaDirPath, alphaFilePath, zetaFilePath, betaFilePath, etaDirPath, gammaDirPath,
-     deltaFilePath, epsilonFilePath, thetaDirPath, thetaFilePath] = [];
+    let rootDirPath, alphaDirPath, alphaFilePath, zetaFilePath, betaFilePath, etaDirPath, gammaDirPath,
+     deltaFilePath, epsilonFilePath, thetaDirPath, thetaFilePath;
 
-    beforeEach(function () {
+    /* eslint-disable no-irregular-whitespace */
+
+    beforeEach(() => {
       // tree-view
       // ├── alpha/
-      // │   ├── beta.txt
-      // │   └── eta/
+      // │   ├── beta.txt
+      // │   └── eta/
       // ├── alpha.txt
       // ├── gamma/
-      // │   ├── delta.txt
-      // │   ├── epsilon.txt
+      // │   ├── delta.txt
+      // │   ├── epsilon.txt
       // │   └── theta/
-      // │       └── theta.txt
+      // │     └── theta.txt
       // └── zeta.txt
+
+      /* eslint-enable no-irregular-whitespace */
 
       rootDirPath = fs.absolute(temp.mkdirSync('tree-view'));
 
@@ -4352,30 +4359,38 @@ describe("TreeView", function () {
       return atom.notifications.clear();
     });
 
-    describe("when dragging a FileView onto a DirectoryView's header", () => it("should add the selected class to the DirectoryView", function () {
-      // Dragging delta.txt onto alphaDir
-      const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
-      alphaDir.expand();
+    describe("when dragging a FileView onto a DirectoryView's header", () => {
+      it("should add the selected class to the DirectoryView", async () => {
+        jasmine.useRealClock();
+        await wait(100);
+        // Dragging delta.txt onto alphaDir
+        const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
+        alphaDir.expand();
 
-      const gammaDir = findDirectoryContainingText(treeView.roots[0], 'gamma');
-      gammaDir.expand();
-      const deltaFile = gammaDir.entries.children[1];
+        const gammaDir = findDirectoryContainingText(treeView.roots[0], 'gamma');
+        gammaDir.expand();
+        const deltaFile = gammaDir.entries.children[1];
 
-      const [dragStartEvent, dragEnterEvent, dropEvent] =
-          eventHelpers.buildInternalDragEvents([deltaFile], alphaDir.querySelector('.header'), null, treeView);
-      treeView.onDragStart(dragStartEvent);
-      expect(deltaFile).toHaveClass('selected');
-      treeView.onDragEnter(dragEnterEvent);
-      expect(alphaDir).toHaveClass('selected');
+        const [dragStartEvent, dragEnterEvent, dropEvent] =
+        eventHelpers.buildInternalDragEvents([deltaFile], alphaDir.querySelector('.header'), null, treeView);
+        treeView.onDragStart(dragStartEvent);
+        expect(deltaFile).toHaveClass('selected');
+        treeView.onDragEnter(dragEnterEvent);
+        expect(alphaDir).toHaveClass('selected');
 
-      // Remains selected when dragging to a child of the heading entry
-      treeView.onDragEnter(dragEnterEvent);
-      treeView.onDragLeave(dragEnterEvent);
-      expect(alphaDir).toHaveClass('selected');
+        // Remains selected when dragging to a child of the heading entry
+        treeView.onDragEnter(dragEnterEvent);
+        treeView.onDragLeave(dragEnterEvent);
+        expect(alphaDir).toHaveClass('selected');
 
-      treeView.onDragLeave(dragEnterEvent);
-      expect(alphaDir).not.toHaveClass('selected');
-    }));
+        treeView.onDragLeave(dragEnterEvent);
+        expect(alphaDir).not.toHaveClass('selected');
+      })
+    });
+
+    // Not sure why, but slowing down seems to help. Might be related to
+    // `pathwatcher` churn.
+    afterEach(async () => await wait(50));
 
     describe("when dragging a FileView onto a FileView", () => {
       it("should add the selected class to the parent DirectoryView", function () {
@@ -4405,8 +4420,10 @@ describe("TreeView", function () {
       })
     });
 
-    describe("when dropping a FileView onto a DirectoryView's header", function () {
-      it("should move the file to the hovered directory", function () {
+    describe("when dropping a FileView onto a DirectoryView's header", () => {
+      it("should move the file to the hovered directory", async () => {
+        jasmine.useRealClock();
+        await wait(100);
         // Dragging delta.txt onto alphaDir
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
@@ -4418,24 +4435,27 @@ describe("TreeView", function () {
         const alphaDirContents = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length;
         const gammaDirContents = findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length;
 
-        const [dragStartEvent, dragEnterEvent, dropEvent] =
+        const [dragStartEvent, _dragEnterEvent, dropEvent] =
             eventHelpers.buildInternalDragEvents([deltaFile], alphaDir.querySelector('.header'), alphaDir, treeView);
 
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(alphaDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
 
-        waitsFor("directory view contents to refresh", () => (findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents) &&
-        (findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length < gammaDirContents));
+        await conditionPromise(() => {
+          let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
+          let gammaEntries = findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry');
+          return alphaEntries.length > alphaDirContents && gammaEntries.length < gammaDirContents;
+        }, "directory view contents to refresh");
 
-        return runs(function () {
-          expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
-          expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents - 1);
-        });
+        expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
+        expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents - 1);
       });
 
       describe('when the ctrl/cmd modifier key is pressed', () => {
         it("should copy the file to the hovered directory", async () => {
+          jasmine.useRealClock();
+          await wait(100);
           // Dragging delta.txt onto alphaDir
           const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
           alphaDir.expand();
@@ -4452,7 +4472,7 @@ describe("TreeView", function () {
 
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
-          expect(alphaDir.children.length).toBe(2);
+          await conditionPromise(() => alphaDir.children.length === 2);
 
           await conditionPromise(() => {
             return findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents;
@@ -4464,6 +4484,7 @@ describe("TreeView", function () {
       });
 
       it("shouldn't update editors with similar file paths", async () => {
+        jasmine.useRealClock();
         const deltaFilePath2 = path.join(gammaDirPath, 'delta.txt2');
         fs.writeFileSync(deltaFilePath2, 'copy');
 
@@ -4483,7 +4504,7 @@ describe("TreeView", function () {
 
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(alphaDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
 
         const editors = atom.workspace.getTextEditors();
         expect(editors[0].getPath()).toBe(deltaFilePath.replace('gamma', 'alpha'));
@@ -4492,7 +4513,8 @@ describe("TreeView", function () {
     });
 
     describe("when dropping a FileView onto a FileView", function () {
-      it("should move the file to the parent directory", function () {
+      it("should move the file to the parent directory", async () => {
+        jasmine.useRealClock();
         // Dragging delta.txt onto alphaDir
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
@@ -4505,28 +4527,29 @@ describe("TreeView", function () {
         const alphaDirContents = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length;
         const gammaDirContents = findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length;
 
-        const [dragStartEvent, dragEnterEvent, dropEvent] =
+        const [dragStartEvent, _dragEnterEvent, dropEvent] =
             eventHelpers.buildInternalDragEvents([deltaFile], betaFile, alphaDir, treeView);
 
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(alphaDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
 
-        waitsFor("directory view contents to refresh", () => (findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents) &&
-        (findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length < gammaDirContents));
+        await conditionPromise(() => {
+          let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
+          let gammaEntries = findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry');
+          return alphaEntries.length > alphaDirContents && gammaEntries.length < gammaDirContents;
+        }, "directory view contents to refresh");
 
-        return runs(function () {
-          expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
-          expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents - 1);
-        });
+        expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
+        expect(findDirectoryContainingText(treeView.roots[0], 'gamma').querySelectorAll('.entry').length).toBe(gammaDirContents - 1);
       });
 
       it("shouldn't update editors with similar file paths", async () => {
+        jasmine.useRealClock();
         const deltaFilePath2 = path.join(gammaDirPath, 'delta.txt2');
         fs.writeFileSync(deltaFilePath2, 'copy');
 
         await waitForWorkspaceOpenEventPromise(() => atom.workspace.open(deltaFilePath));
-
         await waitForWorkspaceOpenEventPromise(() => atom.workspace.open(deltaFilePath2));
 
         // Dragging delta.txt onto alphaDir
@@ -4538,12 +4561,12 @@ describe("TreeView", function () {
         gammaDir.expand();
         const deltaFile = gammaDir.entries.children[1];
 
-        const [dragStartEvent, dragEnterEvent, dropEvent] =
+        const [dragStartEvent, _dragEnterEvent, dropEvent] =
         eventHelpers.buildInternalDragEvents([deltaFile], betaFile, alphaDir, treeView);
 
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(alphaDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
 
         const editors = atom.workspace.getTextEditors();
         expect(editors[0].getPath()).toBe(deltaFilePath.replace('gamma', 'alpha'));
@@ -4571,7 +4594,7 @@ describe("TreeView", function () {
 
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(alphaDir.entries.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
 
         await conditionPromise(() => {
           let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
@@ -4608,7 +4631,7 @@ describe("TreeView", function () {
 
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(thetaDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
 
         await conditionPromise(() => {
           let entries = findDirectoryContainingText(treeView.roots[0], 'theta').querySelectorAll('.entry');
@@ -4625,9 +4648,13 @@ describe("TreeView", function () {
     });
 
     describe("when dropping a DirectoryView onto a DirectoryView's header", function () {
-      beforeEach(() => waitForWorkspaceOpenEvent(() => atom.workspace.open(thetaFilePath)));
+      beforeEach(async () => {
+        await waitForWorkspaceOpenEventPromise(() => atom.workspace.open(thetaFilePath));
+      });
 
-      it("should move the directory to the hovered directory", function () {
+      it("should move the directory to the hovered directory", async () => {
+        jasmine.useRealClock();
+        await wait(100);
         // Dragging thetaDir onto alphaDir
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
@@ -4640,80 +4667,81 @@ describe("TreeView", function () {
         const alphaDirContents = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length;
         const thetaDirContents = findDirectoryContainingText(treeView.roots[0], 'theta').querySelectorAll('.entry').length;
 
-        const [dragStartEvent, dragEnterEvent, dropEvent] =
+        const [dragStartEvent, _dragEnterEvent, dropEvent] =
           eventHelpers.buildInternalDragEvents([thetaDir], alphaDir.querySelector('.header'), alphaDir, treeView);
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(alphaDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
 
-        waitsFor("directory view contents to refresh", () => findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents);
+        await conditionPromise(() => {
+          let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
+          return alphaEntries.length > alphaDirContents;
+        }, "directory view contents to refresh");
 
-        return runs(function () {
-          expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
+        expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
 
-          thetaDir = findDirectoryContainingText(alphaDir.entries, 'theta');
-          thetaDir.expand();
-          expect(thetaDir.querySelectorAll('.entry').length).toBe(thetaDirContents);
+        thetaDir = findDirectoryContainingText(alphaDir.entries, 'theta');
+        thetaDir.expand();
+        expect(thetaDir.querySelectorAll('.entry').length).toBe(thetaDirContents);
 
-          const editor = atom.workspace.getActiveTextEditor();
-          expect(editor.getPath()).toBe(thetaFilePath.replace('gamma', 'alpha'));
-        });
+        const editor = atom.workspace.getActiveTextEditor();
+        expect(editor.getPath()).toBe(thetaFilePath.replace('gamma', 'alpha'));
       });
 
-      it("shouldn't update editors with similar file paths", function () {
+      it("shouldn't update editors with similar file paths", async () => {
+        jasmine.useRealClock();
         const thetaDir2Path = path.join(gammaDirPath, 'theta2');
         fs.makeTreeSync(thetaDir2Path);
         const thetaFilePath2 = path.join(thetaDir2Path, 'theta.txt2');
         fs.writeFileSync(thetaFilePath2, 'copy');
 
-        waitForWorkspaceOpenEvent(() => atom.workspace.open(thetaFilePath2));
+        await waitForWorkspaceOpenEventPromise(() => atom.workspace.open(thetaFilePath2));
 
-        return runs(function () {
-          // Dragging thetaDir onto alphaDir
-          const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
-          alphaDir.expand();
+        // Dragging thetaDir onto alphaDir
+        const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
+        alphaDir.expand();
 
-          const gammaDir = findDirectoryContainingText(treeView.roots[0], 'gamma');
-          gammaDir.expand();
-          const thetaDir = gammaDir.entries.children[0];
-          thetaDir.expand();
+        const gammaDir = findDirectoryContainingText(treeView.roots[0], 'gamma');
+        gammaDir.expand();
+        const thetaDir = gammaDir.entries.children[0];
+        thetaDir.expand();
 
-          waitForWorkspaceOpenEvent(() => atom.workspace.open(thetaFilePath));
+        await waitForWorkspaceOpenEventPromise(() => atom.workspace.open(thetaFilePath));
 
-          return runs(function () {
-            const [dragStartEvent, dragEnterEvent, dropEvent] =
-              eventHelpers.buildInternalDragEvents([thetaDir], alphaDir.querySelector('.header'), alphaDir, treeView);
-            treeView.onDragStart(dragStartEvent);
-            treeView.onDrop(dropEvent);
-            expect(alphaDir.children.length).toBe(2);
+        const [dragStartEvent, _dragEnterEvent, dropEvent] =
+          eventHelpers.buildInternalDragEvents([thetaDir], alphaDir.querySelector('.header'), alphaDir, treeView);
+        treeView.onDragStart(dragStartEvent);
+        treeView.onDrop(dropEvent);
+        expect(alphaDir.children.length).toBe(2);
 
-            const editors = atom.workspace.getTextEditors();
-            expect(editors[0].getPath()).toBe(thetaFilePath.replace('gamma', 'alpha'));
-            expect(editors[1].getPath()).toBe(thetaFilePath2);
-          });
-        });
+        const editors = atom.workspace.getTextEditors();
+        expect(editors[0].getPath()).toBe(thetaFilePath.replace('gamma', 'alpha'));
+        expect(editors[1].getPath()).toBe(thetaFilePath2);
       });
 
-      it("shows a warning notification and does not move the directory if it would result in recursive copying", function () {
+      it("shows a warning notification and does not move the directory if it would result in recursive copying", async () => {
         // Dragging alphaDir onto etaDir, which is a child of alphaDir's
+        jasmine.useRealClock();
+        await wait(100);
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
 
         const etaDir = alphaDir.entries.children[0];
         etaDir.expand();
 
-        const [dragStartEvent, dragEnterEvent, dropEvent] =
+        const [dragStartEvent, _dragEnterEvent, dropEvent] =
           eventHelpers.buildInternalDragEvents([alphaDir], etaDir.querySelector('.header'), etaDir, treeView);
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(etaDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
         etaDir.expand();
         expect(etaDir.querySelector('.entries').children.length).toBe(0);
 
         expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot move a folder into itself');
       });
 
-      it("shows a warning notification and does not move the directory if it would result in recursive copying (symlink)", function () {
+      it("shows a warning notification and does not move the directory if it would result in recursive copying (symlink)", async () => {
+        jasmine.useRealClock();
         // Dragging alphaDir onto symalpha, which is a symlink to alphaDir
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
@@ -4721,35 +4749,37 @@ describe("TreeView", function () {
         const symlinkDir = treeView.roots[0].entries.children[3];
         symlinkDir.expand();
 
-        const [dragStartEvent, dragEnterEvent, dropEvent] =
+        const [dragStartEvent, _dragEnterEvent, dropEvent] =
           eventHelpers.buildInternalDragEvents([alphaDir], symlinkDir.querySelector('.header'), symlinkDir, treeView);
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(symlinkDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
         symlinkDir.expand();
         expect(symlinkDir.querySelector('.entries').children.length).toBe(2);
 
         expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot move a folder into itself');
       });
 
-      it("moves successfully when dragging a directory onto a sibling directory that starts with the same letter", function () {
+      it("moves successfully when dragging a directory onto a sibling directory that starts with the same letter", async () => {
+        jasmine.useRealClock();
         // Dragging alpha onto alpha2, which is a sibling of alpha's
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
 
         const alpha2Dir = findDirectoryContainingText(treeView.roots[0], 'alpha2');
-        const [dragStartEvent, dragEnterEvent, dropEvent] =
+        const [dragStartEvent, _dragEnterEvent, dropEvent] =
           eventHelpers.buildInternalDragEvents([alphaDir], alpha2Dir.querySelector('.header'), alpha2Dir, treeView);
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(alpha2Dir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
         alpha2Dir.expand();
         expect(alpha2Dir.querySelector('.entries').children.length).toBe(1);
 
         expect(atom.notifications.getNotifications()[0]).toBeUndefined();
       });
 
-      it("moves successfully when dragging a symlink into its target directory", function () {
+      it("moves successfully when dragging a symlink into its target directory", async () => {
+        jasmine.useRealClock();
         // Dragging alphaDir onto symalpha, which is a symlink to alphaDir
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
@@ -4757,11 +4787,11 @@ describe("TreeView", function () {
         const symlinkDir = treeView.roots[0].entries.children[3];
         symlinkDir.expand();
 
-        const [dragStartEvent, dragEnterEvent, dropEvent] =
+        const [dragStartEvent, _dragEnterEvent, dropEvent] =
           eventHelpers.buildInternalDragEvents([symlinkDir], alphaDir.querySelector('.header'), alphaDir, treeView);
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
-        expect(alphaDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
         alphaDir.reload();
         expect(alphaDir.querySelector('.entries').children.length).toBe(3);
 
@@ -4769,55 +4799,66 @@ describe("TreeView", function () {
       });
     });
 
-    describe("when dropping a DirectoryView and FileViews onto the same DirectoryView's header", () => it("should not move the files and directory", function () {
-      // Dragging alpha.txt and alphaDir into alphaDir
-      const alphaFile = treeView.roots[0].entries.children[2];
-      const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
-      alphaDir.expand();
+    describe("when dropping a DirectoryView and FileViews onto the same DirectoryView's header", () => {
+      it("should not move the files and directory", function () {
+        // Dragging alpha.txt and alphaDir into alphaDir
+        const alphaFile = treeView.roots[0].entries.children[2];
+        const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
+        alphaDir.expand();
 
-      const dragged = [alphaFile, alphaDir];
+        const dragged = [alphaFile, alphaDir];
 
-      const [dragStartEvent, dragEnterEvent, dropEvent] =
-          eventHelpers.buildInternalDragEvents(dragged, alphaDir.querySelector('.header'), alphaDir, treeView);
+        const [dragStartEvent, _dragEnterEvent, dropEvent] =
+        eventHelpers.buildInternalDragEvents(dragged, alphaDir.querySelector('.header'), alphaDir, treeView);
 
-      spyOn(treeView, 'moveEntry');
+        spyOn(treeView, 'moveEntry');
 
-      treeView.onDragStart(dragStartEvent);
-      treeView.onDrop(dropEvent);
-      expect(treeView.moveEntry).not.toHaveBeenCalled();
-    }));
+        treeView.onDragStart(dragStartEvent);
+        treeView.onDrop(dropEvent);
+        expect(treeView.moveEntry).not.toHaveBeenCalled();
+      })
+    });
 
-    describe("when dropping a DirectoryView and FileViews in the same parent DirectoryView", () => describe("when the ctrl/cmd modifier key is pressed", () => it("should copy the files and directory", function () {
-      // Dragging beta.txt and etaDir into alphaDir
-      const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
-      alphaDir.expand();
-      const betaFile = alphaDir.entries.children[0];
-      const etaDir = alphaDir.entries.children[1];
+    describe("when dropping a DirectoryView and FileViews in the same parent DirectoryView", () => {
+      describe("when the ctrl/cmd modifier key is pressed", () => {
+        it("should copy the files and directory", async () => {
+          jasmine.useRealClock();
+          await wait(100);
+          // Dragging beta.txt and etaDir into alphaDir
+          const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
+          alphaDir.expand();
+          const betaFile = alphaDir.entries.children[0];
+          const etaDir = alphaDir.entries.children[1];
 
-      const dragged = [betaFile, etaDir];
+          const dragged = [betaFile, etaDir];
 
-      const alphaDirContents = alphaDir.querySelectorAll('.entry').length;
+          const alphaDirContents = alphaDir.querySelectorAll('.entry').length;
 
-      const [dragStartEvent, dragEnterEvent, dropEvent] =
+          const [dragStartEvent, _dragEnterEvent, dropEvent] =
           eventHelpers.buildInternalDragEvents(dragged, alphaDir.querySelector('.header'), alphaDir, treeView, true);
 
-      spyOn(treeView, 'copyEntry').andCallThrough();
+          spyOn(treeView, 'copyEntry').andCallThrough();
 
-      treeView.onDragStart(dragStartEvent);
-      treeView.onDrop(dropEvent);
-      expect(treeView.copyEntry).toHaveBeenCalled();
+          treeView.onDragStart(dragStartEvent);
+          treeView.onDrop(dropEvent);
+          expect(treeView.copyEntry).toHaveBeenCalled();
 
-      waitsFor("directory view contents to refresh", () => findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents);
+          await conditionPromise(() => {
+            let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
+            return alphaEntries.length > alphaDirContents;
+          }, "directory view contents to refresh");
 
-      return runs(function () {
-        expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 2);
-        expect(fs.existsSync(path.join(alphaDirPath, 'beta0.txt'))).toBe(true);
-        expect(fs.existsSync(path.join(alphaDirPath, 'eta0'))).toBe(true);
-      });
-    })));
+          expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 2);
+          expect(fs.existsSync(path.join(alphaDirPath, 'beta0.txt'))).toBe(true);
+          expect(fs.existsSync(path.join(alphaDirPath, 'eta0'))).toBe(true);
+        })
+      })
+    });
 
     describe("when dragging a file from the OS onto a DirectoryView's header", function () {
-      it("should move the file to the hovered directory", function () {
+      it("should move the file to the hovered directory", async () => {
+        jasmine.useRealClock();
+        await wait(100);
         // Dragging delta.txt from OS file explorer onto alphaDir
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
@@ -4827,101 +4868,118 @@ describe("TreeView", function () {
         const dropEvent = eventHelpers.buildExternalDropEvent([deltaFilePath], alphaDir);
 
         treeView.onDrop(dropEvent);
-        expect(alphaDir.children.length).toBe(2);
+        await conditionPromise(() => alphaDir.children.length === 2);
 
-        waitsFor("directory view contents to refresh", () => findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents);
+        await conditionPromise(() => {
+          let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
+          return alphaEntries.length > alphaDirContents;
+        }, "directory view contents to refresh");
 
-        return runs(function () {
-          expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
-          expect(fs.existsSync(deltaFilePath)).toBe(false);
-        });
+        expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
+        expect(fs.existsSync(deltaFilePath)).toBe(false);
       });
 
-      describe("when the ctrl/cmd modifier key is pressed", () => it("should copy the file to the hovered directory", function () {
-        // Dragging delta.txt from OS file explorer onto alphaDir
+      describe("when the ctrl/cmd modifier key is pressed", () => {
+        it("should copy the file to the hovered directory", async () => {
+          jasmine.useRealClock();
+          // Dragging delta.txt from OS file explorer onto alphaDir
+          const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
+          alphaDir.expand();
+
+          const alphaDirContents = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length;
+
+          const dropEvent = eventHelpers.buildExternalDropEvent([deltaFilePath], alphaDir, true);
+
+          treeView.onDrop(dropEvent);
+          await conditionPromise(() => alphaDir.children.length === 2);
+
+          await conditionPromise(() => {
+            let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha')?.querySelectorAll('.entry');
+            return (alphaEntries?.length ?? 0) > alphaDirContents;
+          }, "directory view contents to refresh");
+
+          expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
+          expect(fs.existsSync(deltaFilePath)).toBe(true);
+        });
+      });
+    });
+
+    describe("when dragging a directory from the OS onto a DirectoryView's header", () => {
+      it("should move the directory to the hovered directory", async () => {
+        jasmine.useRealClock();
+        // Dragging gammaDir from OS file explorer onto alphaDir
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         alphaDir.expand();
 
         const alphaDirContents = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length;
 
-        const dropEvent = eventHelpers.buildExternalDropEvent([deltaFilePath], alphaDir, true);
+        const dropEvent = eventHelpers.buildExternalDropEvent([gammaDirPath], alphaDir);
+        treeView.onDrop(dropEvent);
+        expect(alphaDir.children.length).toBe(2);
 
-        runs(function () {
-          treeView.onDrop(dropEvent);
-          expect(alphaDir.children.length).toBe(2);
-        });
+        await conditionPromise(() => {
+          let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
+          return alphaEntries.length > alphaDirContents;
+        }, "directory view contents to refresh");
 
-        waitsFor("directory view contents to refresh", () => findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents);
-
-        return runs(function () {
-          expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
-          expect(fs.existsSync(deltaFilePath)).toBe(true);
-        });
-      }));
+        expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1);
+      })
     });
 
-    describe("when dragging a directory from the OS onto a DirectoryView's header", () => it("should move the directory to the hovered directory", function () {
-      // Dragging gammaDir from OS file explorer onto alphaDir
-      const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
-      alphaDir.expand();
+    describe("when dragging a file and directory from the OS onto a DirectoryView's header", () => {
+      it("should move the file and directory to the hovered directory", async () => {
+        jasmine.useRealClock();
+        await wait(100);
+        // Dragging delta.txt and gammaDir from OS file explorer onto alphaDir
+        const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
+        alphaDir.expand();
 
-      const alphaDirContents = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length;
+        const alphaDirContents = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length;
 
-      const dropEvent = eventHelpers.buildExternalDropEvent([gammaDirPath], alphaDir);
-      treeView.onDrop(dropEvent);
-      expect(alphaDir.children.length).toBe(2);
+        const dropEvent = eventHelpers.buildExternalDropEvent([deltaFilePath, gammaDirPath], alphaDir);
 
-      waitsFor("directory view contents to refresh", () => findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents);
+        treeView.onDrop(dropEvent);
+        await conditionPromise(() => alphaDir.children.length === 2);
 
-      return runs(() => expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1));
-    }));
+        await conditionPromise(() => {
+          let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
+          return alphaEntries.length > alphaDirContents;
+        }, "directory view contents to refresh");
 
-    describe("when dragging a file and directory from the OS onto a DirectoryView's header", () => it("should move the file and directory to the hovered directory", function () {
-      // Dragging delta.txt and gammaDir from OS file explorer onto alphaDir
-      const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
-      alphaDir.expand();
+        expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 2)
+      });
+    });
 
-      const alphaDirContents = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length;
+    describe("when dragging a directory from the OS onto a blank section of the Tree View", () => {
+      it("should create a new project folder", async () => {
+        // Dragging gammaDir from OS file explorer onto blank section of Tree View
+        const dropEvent = eventHelpers.buildExternalDropEvent([gammaDirPath], treeView.element);
+        treeView.onDrop(dropEvent);
 
-      const dropEvent = eventHelpers.buildExternalDropEvent([deltaFilePath, gammaDirPath], alphaDir);
+        await conditionPromise(() => treeView.roots.length === 2, "project folder to be added");
+        expect(treeView.roots[1].querySelector('.header .name')).toHaveText('gamma')
+      })
+    });
 
-      treeView.onDrop(dropEvent);
-      expect(alphaDir.children.length).toBe(2);
+    describe("when dragging a file from the OS onto a blank section of the Tree View", () => {
+      it("should create a new project folder using the file's parent directory", async () => {
+        // Dragging multiple entries from OS file explorer onto blank section of Tree View
+        // Should add gammaDir, alphaDir, etaDir to the project
+        const dropEvent = eventHelpers.buildExternalDropEvent([
+          deltaFilePath, epsilonFilePath, // directly under gammaDir
+          alphaDirPath, betaFilePath, etaDirPath // betaFile and etaDir directly under alphaDir
+        ], treeView.element);
+        treeView.onDrop(dropEvent);
 
-      waitsFor("directory view contents to refresh", () => findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length > alphaDirContents);
+        await conditionPromise(() => treeView.roots.length === 4, "project folder to be added");
 
-      return runs(() => expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 2));
-    }));
-
-    describe("when dragging a directory from the OS onto a blank section of the Tree View", () => it("should create a new project folder", function () {
-      // Dragging gammaDir from OS file explorer onto blank section of Tree View
-      const dropEvent = eventHelpers.buildExternalDropEvent([gammaDirPath], treeView.element);
-      treeView.onDrop(dropEvent);
-
-      waitsFor("project folder to be added", () => treeView.roots.length === 2);
-
-      return runs(() => expect(treeView.roots[1].querySelector('.header .name')).toHaveText('gamma'));
-    }));
-
-    describe("when dragging a file from the OS onto a blank section of the Tree View", () => it("should create a new project folder using the file's parent directory", function () {
-      // Dragging multiple entries from OS file explorer onto blank section of Tree View
-      // Should add gammaDir, alphaDir, etaDir to the project
-      const dropEvent = eventHelpers.buildExternalDropEvent([
-        deltaFilePath, epsilonFilePath, // directly under gammaDir
-        alphaDirPath, betaFilePath, etaDirPath // betaFile and etaDir directly under alphaDir
-      ], treeView.element);
-      treeView.onDrop(dropEvent);
-
-      waitsFor("project folder to be added", () => treeView.roots.length === 4);
-
-      return runs(function () {
         // Adding project folders is async - don't rely on a specific order
         const names = treeView.roots.map(root => root.querySelector('.header .name').innerText);
         expect(names.includes('gamma')).toBe(true);
         expect(names.includes('alpha')).toBe(true);
         expect(names.includes('eta')).toBe(true);
-      });
-    }));
+      })
+    });
 
     describe("when dragging entries that already exist", function () {
       let deltaAlphaFilePath = null;

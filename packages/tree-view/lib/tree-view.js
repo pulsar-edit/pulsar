@@ -927,7 +927,6 @@ class TreeView {
 
           let meta = { pathToDelete: selectedPath };
 
-          console.log('WILL DELETE:', meta);
           this.emitter.emit('will-delete-entry', meta);
 
           let promise = shell.trashItem(selectedPath).then(() => {
@@ -1563,7 +1562,6 @@ class TreeView {
 
   // Handle entry drop event.
   onDrop(event) {
-    console.log('onDrop:', event);
     this.dragEventCounts = new WeakMap();
     let entry = event.target.closest('.entry.directory');
     if (entry) {
