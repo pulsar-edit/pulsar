@@ -259,6 +259,7 @@ class PathWatcher {
   constructor(nativeWatcherRegistry, watchedPath, options) {
     this.watchedPath = watchedPath;
     this.nativeWatcherRegistry = nativeWatcherRegistry;
+    this.options = options;
 
     this.normalizedPath = null;
     this.native = null;
@@ -419,6 +420,35 @@ class PathWatcher {
     this.resolveAttachedPromise();
   }
 
+  // Private: Given a "real" filesystem path, adjusts it (if necesssary) to
+  // match the path that the user subscribed to.
+  //
+  // This saves the user from having to make their own calls to `fs.realpath`
+  // on their end just to do path equality checks.
+  denormalizePath(filePath) {
+    if (this.options.rawPaths) return filePath;
+    if (this.watchedPath === this.normalizedPath) return filePath;
+    if (!filePath.startsWith(this.normalizedPath)) return filePath;
+    let rest = filePath.substring(this.normalizedPath.length);
+    return path.join(this.watchedPath, rest);
+  }
+
+  // Private: Given an event that happened at a "real" filesystem path, adjusts
+  // it (if necessary) to match the path that the user subscribed to.
+  //
+  // This saves the user from having to make their own calls to `fs.realpath`
+  // on their end just to do path equality checks.
+  denormalizeEvent(event) {
+    if (this.options.rawPaths) return event;
+    if (this.watchedPath === this.normalizedPath) return event;
+    let result = { ...event };
+    result.path = this.denormalizePath(event.path);
+    if (event.oldPath) {
+      result.oldPath = this.denormalizePath(event.oldPath);
+    }
+    return result;
+  }
+
   // Private: Invoked when the attached native watcher creates a batch of native filesystem events. The native watcher's
   // events may include events for paths above this watcher's root path, so filter them to only include the relevant
   // ones, then re-broadcast them to our subscribers.
@@ -437,21 +467,21 @@ class PathWatcher {
         if (srcWatched && destWatched) {
           filtered.push(event);
         } else if (srcWatched && !destWatched) {
-          filtered.push({
+          filtered.push(this.denormalizeEvent({
             action: 'deleted',
             kind: event.kind,
             path: event.oldPath
-          });
+          }));
         } else if (!srcWatched && destWatched) {
-          filtered.push({
+          filtered.push(this.denormalizeEvent({
             action: 'created',
             kind: event.kind,
             path: event.path
-          });
+          }));
         }
       } else {
         if (isWatchedPath(event.path)) {
-          filtered.push(event);
+          filtered.push(this.denormalizeEvent(event));
         }
       }
     }
@@ -548,16 +578,17 @@ class PathWatcherManager {
   }
 
   // Private: Create a {PathWatcher} tied to this global state. See {watchPath} for detailed arguments.
-  async createWatcher(rootPath, eventCallback) {
+  async createWatcher(rootPath, eventCallback, options) {
     if (this.isShuttingDown) {
       await this.constructor.transitionPromise;
       return PathWatcherManager.active().createWatcher(
         rootPath,
-        eventCallback
+        eventCallback,
+        options
       );
     }
 
-    const w = new PathWatcher(this.nativeRegistry, rootPath);
+    const w = new PathWatcher(this.nativeRegistry, rootPath, options);
     w.onDidChange(eventCallback);
     await w.getStartPromise();
     return w;
@@ -576,23 +607,36 @@ class PathWatcherManager {
   }
 }
 
-// Extended: Invoke a callback with each filesystem event that occurs beneath a specified path. If you only need to
-// watch events within the project's root paths, use {Project::onDidChangeFiles} instead.
+// Extended: Invoke a callback with each filesystem event that occurs beneath a
+// specified path. If you only need to watch events within the project's root
+// paths, use {Project::onDidChangeFiles} instead.
 //
-// watchPath handles the efficient re-use of operating system resources across living watchers. Watching the same path
-// more than once, or the child of a watched path, will re-use the existing native watcher.
+// watchPath handles the efficient re-use of operating system resources across
+// living watchers. Watching the same path more than once, or the child of a
+// watched path, will re-use the existing native watcher.
 //
-// * `rootPath` {String} specifies the absolute path to the root of the filesystem content to watch.
-// * `options` Control the watcher's behavior.
-// * `eventCallback` {Function} or other callable to be called each time a batch of filesystem events is observed.
+// * `rootPath` {String} specifies the absolute path to the root of the
+//   filesystem content to watch.
+// * `options` Control the watcher's behavior:
+//   * `rawPaths` A {Boolean} that defaults to `false`. By default, this
+//     watcher will "de-normalize" any paths in filesystem events so that they
+//     are guaranteed to descend from `rootPath`, even if the true paths on
+//     disk differ due to symlinks. When this option is `true`, this step will
+//     be skipped, and all `path` and `oldPath` properties will refer to files'
+//     true paths on disk.
+// * `eventCallback` {Function} or other callable to be called each time a
+//   batch of filesystem events is observed.
 //    * `events` {Array} of objects that describe the events that have occurred.
-//      * `action` {String} describing the filesystem action that occurred. One of `"created"`, `"modified"`,
-//        `"deleted"`, or `"renamed"`.
-//      * `path` {String} containing the absolute path to the filesystem entry that was acted upon.
-//      * `oldPath` For rename events, {String} containing the filesystem entry's former absolute path.
+//      * `action` {String} describing the filesystem action that occurred. One
+//        of `"created"`, `"modified"`, `"deleted"`, or `"renamed"`.
+//      * `path` {String} containing the absolute path to the filesystem entry
+//        that was acted upon.
+//      * `oldPath` For rename events, {String} containing the filesystem
+//        entry's former absolute path.
 //
-// Returns a {Promise} that will resolve to a {PathWatcher} once it has started. Note that every {PathWatcher}
-// is a {Disposable}, so they can be managed by a {CompositeDisposable} if desired.
+// Returns a {Promise} that will resolve to a {PathWatcher} once it has
+// started. Note that every {PathWatcher} is a {Disposable}, so they can be
+// managed by a {CompositeDisposable} if desired.
 //
 // ```js
 // const {watchPath} = require('atom')
@@ -610,15 +654,17 @@ class PathWatcherManager {
 //   }
 // })
 //
-//  // Immediately stop receiving filesystem events. If this is the last watcher, asynchronously release any OS
-//  // resources required to subscribe to these events.
+//  // Immediately stop receiving filesystem events. If this is the last
+//  // watcher, asynchronously release any OS resources required to subscribe
+//  // to these events.
 //  disposable.dispose()
 // ```
 //
 function watchPath(rootPath, options, eventCallback) {
   return PathWatcherManager.active().createWatcher(
     rootPath,
-    eventCallback
+    eventCallback,
+    options
   );
 }
 
@@ -629,7 +675,7 @@ function stopAllWatchers() {
 }
 
 // Private: Show the currently active native watchers in a formatted {String}.
-watchPath.printWatchers = function() {
+watchPath.printWatchers = function () {
   return PathWatcherManager.active().print();
 };
 
