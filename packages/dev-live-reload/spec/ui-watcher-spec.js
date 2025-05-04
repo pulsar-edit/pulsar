@@ -2,7 +2,7 @@ const path = require('path');
 
 const UIWatcher = require('../lib/ui-watcher');
 
-const { conditionPromise } = require('./async-spec-helpers');
+const { conditionPromise, timeoutPromise: wait } = require('./async-spec-helpers');
 
 describe('UIWatcher', () => {
   let uiWatcher = null;
@@ -21,7 +21,8 @@ describe('UIWatcher', () => {
       uiWatcher = new UIWatcher();
     });
 
-    it('reloads all the base styles', () => {
+    it('reloads all the base styles', async () => {
+      jasmine.useRealClock();
       spyOn(atom.themes, 'reloadBaseStylesheets');
 
       expect(uiWatcher.baseTheme.entities[0].getPath()).toContain(
@@ -29,6 +30,7 @@ describe('UIWatcher', () => {
       );
 
       uiWatcher.baseTheme.entities[0].emitter.emit('did-change');
+      await wait(20);
       expect(atom.themes.reloadBaseStylesheets).toHaveBeenCalled();
     });
   });
@@ -68,13 +70,15 @@ describe('UIWatcher', () => {
       uiWatcher = new UIWatcher();
     });
 
-    it('reloads all package styles', () => {
+    it('reloads all package styles', async () => {
+      jasmine.useRealClock();
       const pack = atom.packages.getActivePackages()[0];
       spyOn(pack, 'reloadStylesheets');
 
       uiWatcher.watchers[
         uiWatcher.watchers.length - 1
       ].entities[1].emitter.emit('did-change');
+      await wait(20);
 
       expect(pack.reloadStylesheets).toHaveBeenCalled();
     });
@@ -93,18 +97,21 @@ describe('UIWatcher', () => {
 
   describe('when a package global file changes', () => {
     beforeEach(async () => {
+      jasmine.useRealClock();
       atom.config.set('core.themes', [
         'theme-with-ui-variables',
         'theme-with-multiple-imported-files'
       ]);
 
+      console.log('awaiting…');
       await atom.themes.activateThemes();
+      console.log('…awaited.');
       uiWatcher = new UIWatcher();
     });
 
     afterEach(() => atom.themes.deactivateThemes());
 
-    it('reloads every package when the variables file changes', () => {
+    it('reloads every package when the variables file changes', async () => {
       let varEntity;
       for (const theme of atom.themes.getActiveThemes()) {
         spyOn(theme, 'reloadStylesheets');
@@ -116,6 +123,7 @@ describe('UIWatcher', () => {
         if (entity.getPath().indexOf('variables') > -1) varEntity = entity;
       }
       varEntity.emitter.emit('did-change');
+      await wait(20);
 
       for (const theme of atom.themes.getActiveThemes()) {
         expect(theme.reloadStylesheets).toHaveBeenCalled();
@@ -171,6 +179,7 @@ describe('UIWatcher', () => {
   describe('minimal theme packages', () => {
     let pack = null;
     beforeEach(async () => {
+      jasmine.useRealClock();
       atom.config.set('core.themes', [
         'theme-with-syntax-variables',
         'theme-with-index-less'
@@ -182,7 +191,7 @@ describe('UIWatcher', () => {
 
     afterEach(() => atom.themes.deactivateThemes());
 
-    it('watches themes without a styles directory', () => {
+    it('watches themes without a styles directory', async () => {
       spyOn(pack, 'reloadStylesheets');
       spyOn(atom.themes, 'reloadBaseStylesheets');
 
@@ -191,6 +200,7 @@ describe('UIWatcher', () => {
       expect(watcher.entities.length).toBe(1);
 
       watcher.entities[0].emitter.emit('did-change');
+      await wait(20);
       expect(pack.reloadStylesheets).toHaveBeenCalled();
       expect(atom.themes.reloadBaseStylesheets).not.toHaveBeenCalled();
     });
@@ -199,6 +209,7 @@ describe('UIWatcher', () => {
   describe('theme packages', () => {
     let pack = null;
     beforeEach(async () => {
+      jasmine.useRealClock();
       atom.config.set('core.themes', [
         'theme-with-syntax-variables',
         'theme-with-multiple-imported-files'
@@ -211,7 +222,7 @@ describe('UIWatcher', () => {
 
     afterEach(() => atom.themes.deactivateThemes());
 
-    it('reloads the theme when anything within the theme changes', () => {
+    it('reloads the theme when anything within the theme changes', async () => {
       spyOn(pack, 'reloadStylesheets');
       spyOn(atom.themes, 'reloadBaseStylesheets');
 
@@ -222,10 +233,12 @@ describe('UIWatcher', () => {
       expect(watcher.entities.length).toBe(6);
 
       watcher.entities[2].emitter.emit('did-change');
+      await wait(20);
       expect(pack.reloadStylesheets).toHaveBeenCalled();
       expect(atom.themes.reloadBaseStylesheets).not.toHaveBeenCalled();
 
       watcher.entities[watcher.entities.length - 1].emitter.emit('did-change');
+      await wait(20);
       expect(atom.themes.reloadBaseStylesheets).toHaveBeenCalled();
     });
 
@@ -256,6 +269,7 @@ describe('UIWatcher', () => {
 
       const watcher = uiWatcher.watchedThemes.get('theme-with-package-file');
       watcher.entities[2].emitter.emit('did-change');
+      await wait(20);
       expect(pack.reloadStylesheets).toHaveBeenCalled();
     });
   });
