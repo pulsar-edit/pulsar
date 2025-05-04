@@ -352,20 +352,21 @@ end\
   })
 
   describe('text selections', function () {
-    it('adds the `has-selection` class to the preview depending on if there is a text selection', function () {
+    it('adds the `has-selection` class to the preview depending on if there is a text selection', async () => {
+      jasmine.useRealClock();
       expect(preview.element.classList.contains('has-selection')).toBe(false)
-
+      await conditionPromise(() => document.querySelector('atom-text-editor'));
       const selection = window.getSelection()
       selection.removeAllRanges()
       selection.selectAllChildren(document.querySelector('atom-text-editor'))
 
-      waitsFor(
+      await conditionPromise(
         () => preview.element.classList.contains('has-selection') === true
       )
 
-      runs(() => selection.removeAllRanges())
+      selection.removeAllRanges()
 
-      waitsFor(
+      await conditionPromise(
         () => preview.element.classList.contains('has-selection') === false
       )
     })
