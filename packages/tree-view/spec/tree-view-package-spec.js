@@ -68,7 +68,7 @@ const setupPaneFiles = function () {
 
 const getPaneFileName = index => `test-file-${index}.txt`;
 
-fdescribe("TreeView", function () {
+describe("TreeView", function () {
   let findFileContainingText;
   let [treeView, path1, path2, root1, root2, sampleJs, sampleTxt, workspaceElement] = [];
 
