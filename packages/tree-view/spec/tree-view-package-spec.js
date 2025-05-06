@@ -73,7 +73,7 @@ const setupPaneFiles = function () {
 const getPaneFileName = index => `test-file-${index}.txt`;
 
 describe("TreeView", function () {
-  let findFileContainingText;
+  let findFileContainingText, findDirectoryContainingText, findFileContainingPath;
   let treeView, path1, path2, root1, root2, sampleJs, sampleTxt, workspaceElement;
 
   function selectEntry(pathToSelect) {
@@ -5083,7 +5083,7 @@ describe("TreeView", function () {
 
           const gammaDir = findDirectoryContainingText(treeView.roots[0], 'gamma');
           await gammaDir.expand();
-          const deltaFile = findFileContainingText(treeView.roots[0], 'delta.txt');
+          const deltaFile = findFileContainingPath(treeView.roots[0], `gamma${path.sep}delta.txt`);
 
           [dragStartEvent, , dropEvent] =
             eventHelpers.buildInternalDragEvents(
@@ -5096,20 +5096,22 @@ describe("TreeView", function () {
 
         it("prompts to replace the file", async () => {
           jasmine.useRealClock();
-          spyOn(atom, 'confirm');
+          spyOn(atom, 'confirm').andReturn(2);
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
-          await conditionPromise(() => atom.confirm.callsCount > 0);
+          await conditionPromise(() => atom.confirm.callCount > 0);
         });
 
         describe("when selecting the replace option", () => {
           it("replaces the existing file", async () => {
+            jasmine.useRealClock();
             spyOn(atom, 'confirm').andReturn(0);
             treeView.onDragStart(dragStartEvent);
             treeView.onDrop(dropEvent);
+            await conditionPromise((() => atom.confirm.callCount > 0), 'confirm to be called');
             await conditionPromise(() => {
               return fs.readFileSync(deltaAlphaFilePath, 'utf8') === "doesn't matter";
-            });
+            }, 'file contents to change');
           });
         });
 
@@ -5830,15 +5832,22 @@ describe("TreeView", function () {
     })
   });
 
-  var findDirectoryContainingText = function (element, text) {
+  findDirectoryContainingText = function (element, text) {
     const directories = Array.from(element.querySelectorAll('.entries .directory'));
     return directories.find(directory => directory.header.textContent === text);
   };
 
-  return findFileContainingText = function (element, text) {
+  findFileContainingText = function (element, text) {
     const files = Array.from(element.querySelectorAll('.entries .file'));
     return files.find(file => file.fileName.textContent === text);
   };
+
+  findFileContainingPath = function (element, filePath) {
+    const files = Array.from(element.querySelectorAll('.entries .file'));
+    return files.find(file => (file?.getPath?.() ?? "").includes(filePath))
+  }
+
+
 });
 
 describe("Service provider", function () {
