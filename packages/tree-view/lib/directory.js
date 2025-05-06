@@ -3,7 +3,7 @@ const _ = require('underscore-plus')
 const {CompositeDisposable, Emitter, watchPath} = require('atom')
 const fs = require('fs-plus')
 const File = require('./file')
-const {repoForPath} = require('./helpers')
+const {repoForPath, isDebug} = require('./helpers')
 
 module.exports =
 class Directory {
@@ -258,9 +258,18 @@ class Directory {
 
   // Public: Watch this directory for changes.
   async watch() {
-    if (this.watchSubscription) return;
+    let shouldDebug = isDebug();
+    if (this.watchSubscription) {
+      if (shouldDebug) {
+        console.log('DEBUG: Watch subscription already exists!');
+      }
+      return;
+    }
     try {
       await this.loadRealPathPromise();
+      if (shouldDebug) {
+        console.log('DEBUG: Real path is', this.realPath);
+      }
       this.watcherAbortController = new AbortController();
       // We can get away with `fs.watch` here because we just care about when
       // to remove or reload this directory.
@@ -268,11 +277,17 @@ class Directory {
         this.realPath,
         { signal: this.watcherAbortController.signal },
         (eventType, filename) => {
+          if (isDebug()) {
+            console.log('DEBUG: File event!', eventType, filename);
+          }
           // Deletions are represented as `rename` events — so if this
-          // directory itself is “renamed,” that means it's been deleted.
+          // directory itself is “renamed,” that means it's probably been
+          // deleted.
           if ((filename === this.path || filename === this.realPath) && eventType === 'rename') {
-            this.destroy();
-            return;
+            if (!fs.existsSync(this.path)) {
+              this.destroy();
+              return;
+            }
           }
           this.reload();
         }

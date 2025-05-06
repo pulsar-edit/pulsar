@@ -8,6 +8,7 @@ const remote = require('@electron/remote');
 const {shell} = remote;
 const Directory = require('../lib/directory');
 const eventHelpers = require("./event-helpers");
+const { setDebug } = require('../lib/helpers');
 const { conditionPromise, timeoutPromise: wait } = require('./async-spec-helpers');
 
 let isCaseSensitive = null;
@@ -3465,8 +3466,13 @@ describe("TreeView", function () {
     let temporaryFilePath = null;
 
     beforeEach(function () {
+      setDebug(true);
       atom.project.setPaths([fs.absolute(temp.mkdirSync('tree-view'))]);
       temporaryFilePath = path.join(atom.project.getPaths()[0], 'temporary');
+    });
+
+    afterEach(() => {
+      setDebug(false);
     });
 
     describe("when a file is added or removed in an expanded directory", () => {
