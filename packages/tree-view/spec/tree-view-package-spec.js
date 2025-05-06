@@ -28,6 +28,10 @@ async function waitForPackageActivation() {
   await atom.packages.getActivePackage('tree-view').mainModule.treeViewOpenPromise;
 }
 
+async function waitForPackageDeactivation() {
+  await atom.packages.deactivatePackage('tree-view');
+}
+
 async function waitForWorkspaceOpenEventPromise(causeFileToOpen) {
   return new Promise((resolve) => {
     let disposable = atom.workspace.onDidOpen(() => { disposable.dispose(); resolve(); });
@@ -107,6 +111,7 @@ describe("TreeView", function () {
     if (treeViewOpenPromise) {
       await treeViewOpenPromise;
     }
+    await waitForPackageDeactivation();
   });
 
   describe("on package activation", function () {
@@ -5255,38 +5260,42 @@ describe("TreeView", function () {
       });
     });
 
-    describe("when the event does not originate from the Tree View", () => it("does nothing", function () {
-      const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
-      alphaDir.expand();
+    describe("when the event does not originate from the Tree View", () => {
+      it("does nothing", function () {
+        const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
+        alphaDir.expand();
 
-      const gammaDir = findDirectoryContainingText(treeView.roots[0], 'gamma');
-      gammaDir.expand();
-      const deltaFile = gammaDir.entries.children[1];
+        const gammaDir = findDirectoryContainingText(treeView.roots[0], 'gamma');
+        gammaDir.expand();
+        const deltaFile = gammaDir.entries.children[1];
 
-      const [dragStartEvent, dragEnterEvent, dropEvent] =
-          eventHelpers.buildInternalDragEvents([deltaFile], alphaDir.querySelector('.header'), alphaDir, treeView);
-      treeView.onDragStart(dragStartEvent);
-      dragEnterEvent.dataTransfer.clearData('atom-tree-view-event');
-      dropEvent.dataTransfer.clearData('atom-tree-view-event');
+        const [dragStartEvent, dragEnterEvent, dropEvent] =
+        eventHelpers.buildInternalDragEvents([deltaFile], alphaDir.querySelector('.header'), alphaDir, treeView);
+        treeView.onDragStart(dragStartEvent);
+        dragEnterEvent.dataTransfer.clearData('atom-tree-view-event');
+        dropEvent.dataTransfer.clearData('atom-tree-view-event');
 
-      treeView.onDragEnter(dragEnterEvent);
-      expect(alphaDir).not.toHaveClass('selected');
+        treeView.onDragEnter(dragEnterEvent);
+        expect(alphaDir).not.toHaveClass('selected');
 
-      treeView.onDragEnter(dragEnterEvent);
-      treeView.onDragLeave(dragEnterEvent);
-      expect(alphaDir).not.toHaveClass('selected');
+        treeView.onDragEnter(dragEnterEvent);
+        treeView.onDragLeave(dragEnterEvent);
+        expect(alphaDir).not.toHaveClass('selected');
 
-      treeView.onDragLeave(dragEnterEvent);
-      expect(alphaDir).not.toHaveClass('selected');
+        treeView.onDragLeave(dragEnterEvent);
+        expect(alphaDir).not.toHaveClass('selected');
 
-      spyOn(treeView, 'moveEntry');
-      treeView.onDrop(dropEvent);
-      expect(treeView.moveEntry).not.toHaveBeenCalled();
-    }));
+        spyOn(treeView, 'moveEntry');
+        treeView.onDrop(dropEvent);
+        expect(treeView.moveEntry).not.toHaveBeenCalled();
+      })
+    });
   });
 
   describe("the alwaysOpenExisting config option", function () {
-    it("defaults to unset", () => expect(atom.config.get("tree-view.alwaysOpenExisting")).toBeFalsy());
+    it("defaults to unset", () => {
+      expect(atom.config.get("tree-view.alwaysOpenExisting")).toBeFalsy()
+    });
 
     describe("when a file is single-clicked", function () {
       beforeEach(function () {
@@ -5294,25 +5303,34 @@ describe("TreeView", function () {
         return jasmine.attachToDOM(workspaceElement);
       });
 
-      it("selects the files and opens it in the active editor, without changing focus", function () {
+      it("selects the files and opens it in the active editor, without changing focus", async () => {
+        jasmine.useRealClock();
         treeView.focus();
 
-        waitForWorkspaceOpenEvent(() => sampleJs.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
-
-        runs(function () {
-          expect(sampleJs).toHaveClass('selected');
-          expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.js'));
-          expect(treeView.element).toHaveFocus();
+        await waitForWorkspaceOpenEventPromise(() => {
+          sampleJs.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
         });
 
-        waitForWorkspaceOpenEvent(() => sampleTxt.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
+        expect(sampleJs).toHaveClass('selected');
+        expect(
+          atom.workspace.getCenter().getActivePaneItem().getPath()
+        ).toBe(
+          atom.project.getDirectories()[0].resolve('tree-view.js')
+        );
+        expect(treeView.element).toHaveFocus();
 
-        return runs(function () {
-          expect(sampleTxt).toHaveClass('selected');
-          expect(treeView.element.querySelectorAll('.selected').length).toBe(1);
-          expect(atom.workspace.getCenter().getActivePaneItem().getPath()).toBe(atom.project.getDirectories()[0].resolve('tree-view.txt'));
-          expect(treeView.element).toHaveFocus();
+        await waitForWorkspaceOpenEventPromise(() => {
+          sampleTxt.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
         });
+
+        expect(sampleTxt).toHaveClass('selected');
+        expect(treeView.element.querySelectorAll('.selected').length).toBe(1);
+        expect(
+          atom.workspace.getCenter().getActivePaneItem().getPath()
+        ).toBe(
+          atom.project.getDirectories()[0].resolve('tree-view.txt')
+        );
+        expect(treeView.element).toHaveFocus();
       });
     });
 
@@ -5432,7 +5450,7 @@ describe("TreeView", function () {
   });
 
   describe("Dragging and dropping root folders", function () {
-    let [alphaDirPath, gammaDirPath, thetaDirPath, etaDirPath] = [];
+    let alphaDirPath, gammaDirPath, thetaDirPath, etaDirPath;
     beforeEach(function () {
       const rootDirPath = fs.absolute(temp.mkdirSync('tree-view'));
 
@@ -5469,129 +5487,149 @@ describe("TreeView", function () {
     afterEach(() => [alphaDirPath, gammaDirPath, thetaDirPath, etaDirPath] = []);
 
     describe("when dragging a project root's header onto a different project root", function () {
-      describe("when dragging on the top part of the root", () => it("should add the placeholder above the directory", function () {
-        // Dragging gammaDir onto alphaDir
-        const alphaDir = treeView.roots[0];
-        const gammaDir = treeView.roots[1];
-        const [dragStartEvent, dragOverEvents, dragEndEvent] =
+      describe("when dragging on the top part of the root", () => {
+        it("should add the placeholder above the directory", function () {
+          // Dragging gammaDir onto alphaDir
+          const alphaDir = treeView.roots[0];
+          const gammaDir = treeView.roots[1];
+          const [dragStartEvent, dragOverEvents, dragEndEvent] =
+          eventHelpers.buildPositionalDragEvents(
+            gammaDir.querySelector('.project-root-header'),
+            alphaDir,
+            '.tree-view'
+          );
+
+          treeView.rootDragAndDrop.onDragStart(dragStartEvent);
+          treeView.rootDragAndDrop.onDragOver(dragOverEvents.top);
+          expect(alphaDir.previousSibling).toHaveClass('placeholder');
+
+          // Is removed when drag ends
+          treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
+          expect(document.querySelector('.placeholder')).not.toExist();
+        })
+      });
+
+      describe("when dragging on the bottom part of the root", () => {
+        it("should add the placeholder below the directory", function () {
+          // Dragging gammaDir onto alphaDir
+          const alphaDir = treeView.roots[0];
+          const gammaDir = treeView.roots[1];
+          const [dragStartEvent, dragOverEvents, dragEndEvent] =
           eventHelpers.buildPositionalDragEvents(gammaDir.querySelector('.project-root-header'), alphaDir, '.tree-view');
 
-        treeView.rootDragAndDrop.onDragStart(dragStartEvent);
-        treeView.rootDragAndDrop.onDragOver(dragOverEvents.top);
-        expect(alphaDir.previousSibling).toHaveClass('placeholder');
+          treeView.rootDragAndDrop.onDragStart(dragStartEvent);
+          treeView.rootDragAndDrop.onDragOver(dragOverEvents.bottom);
+          expect(alphaDir.nextSibling).toHaveClass('placeholder');
 
-        // Is removed when drag ends
-        treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
-        expect(document.querySelector('.placeholder')).not.toExist();
-      }));
+          // Is removed when drag ends
+          treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
+          expect(document.querySelector('.placeholder')).not.toExist();
+        });
+      });
 
-      describe("when dragging on the bottom part of the root", () => it("should add the placeholder below the directory", function () {
-        // Dragging gammaDir onto alphaDir
-        const alphaDir = treeView.roots[0];
-        const gammaDir = treeView.roots[1];
-        const [dragStartEvent, dragOverEvents, dragEndEvent] =
-          eventHelpers.buildPositionalDragEvents(gammaDir.querySelector('.project-root-header'), alphaDir, '.tree-view');
-
-        treeView.rootDragAndDrop.onDragStart(dragStartEvent);
-        treeView.rootDragAndDrop.onDragOver(dragOverEvents.bottom);
-        expect(alphaDir.nextSibling).toHaveClass('placeholder');
-
-        // Is removed when drag ends
-        treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
-        expect(document.querySelector('.placeholder')).not.toExist();
-      }));
-
-      describe("when below all entries", () => it("should add the placeholder below the last directory", function () {
-        // Dragging gammaDir onto alphaDir
-        const alphaDir = treeView.roots[0];
-        const lastDir = treeView.roots[treeView.roots.length - 1];
-        const [dragStartEvent, dragOverEvents, dragEndEvent] =
+      describe("when below all entries", () => {
+        it("should add the placeholder below the last directory", function () {
+          // Dragging gammaDir onto alphaDir
+          const alphaDir = treeView.roots[0];
+          const lastDir = treeView.roots[treeView.roots.length - 1];
+          const [dragStartEvent, dragOverEvents, dragEndEvent] =
           eventHelpers.buildPositionalDragEvents(alphaDir.querySelector('.project-root-header'), treeView.list);
 
-        expect(alphaDir).not.toEqual(lastDir);
+          expect(alphaDir).not.toEqual(lastDir);
 
-        treeView.rootDragAndDrop.onDragStart(dragStartEvent);
-        treeView.rootDragAndDrop.onDragOver(dragOverEvents.bottom);
-        expect(lastDir.nextSibling).toHaveClass('placeholder');
+          treeView.rootDragAndDrop.onDragStart(dragStartEvent);
+          treeView.rootDragAndDrop.onDragOver(dragOverEvents.bottom);
+          expect(lastDir.nextSibling).toHaveClass('placeholder');
 
-        // Is removed when drag ends
-        treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
-        expect(document.querySelector('.placeholder')).not.toExist();
-      }));
+          // Is removed when drag ends
+          treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
+          expect(document.querySelector('.placeholder')).not.toExist();
+        })
+      });
     });
 
     describe("when dropping a project root's header onto a different project root", function () {
-      describe("when dropping on the top part of the header", () => it("should add the placeholder above the directory", function () {
-        // dropping gammaDir above alphaDir
-        const alphaDir = treeView.roots[0];
-        const gammaDir = treeView.roots[1];
-        const [dragStartEvent, dragDropEvents] =
+      describe("when dropping on the top part of the header", () => {
+        it("should add the placeholder above the directory", function () {
+          // dropping gammaDir above alphaDir
+          const alphaDir = treeView.roots[0];
+          const gammaDir = treeView.roots[1];
+          const [dragStartEvent, dragDropEvents] =
           eventHelpers.buildPositionalDragEvents(gammaDir.querySelector('.project-root-header'), alphaDir, '.tree-view');
 
-        treeView.rootDragAndDrop.onDragStart(dragStartEvent);
-        treeView.rootDragAndDrop.onDrop(dragDropEvents.top);
-        const projectPaths = atom.project.getPaths();
-        expect(projectPaths[0]).toEqual(gammaDirPath);
-        expect(projectPaths[1]).toEqual(alphaDirPath);
+          treeView.rootDragAndDrop.onDragStart(dragStartEvent);
+          treeView.rootDragAndDrop.onDrop(dragDropEvents.top);
+          const projectPaths = atom.project.getPaths();
+          expect(projectPaths[0]).toEqual(gammaDirPath);
+          expect(projectPaths[1]).toEqual(alphaDirPath);
 
-        // Is removed when drag ends
-        expect(document.querySelector('.placeholder')).not.toExist();
-      }));
+          // Is removed when drag ends
+          expect(document.querySelector('.placeholder')).not.toExist();
+        });
+      });
 
-      describe("when dropping on the bottom part of the header", () => it("should add the placeholder below the directory", function () {
-        // dropping thetaDir below alphaDir
-        const alphaDir = treeView.roots[0];
-        const thetaDir = treeView.roots[2];
-        const [dragStartEvent, dragDropEvents] =
+      describe("when dropping on the bottom part of the header", () => {
+        it("should add the placeholder below the directory", function () {
+          // dropping thetaDir below alphaDir
+          const alphaDir = treeView.roots[0];
+          const thetaDir = treeView.roots[2];
+          const [dragStartEvent, dragDropEvents] =
           eventHelpers.buildPositionalDragEvents(thetaDir.querySelector('.project-root-header'), alphaDir, '.tree-view');
 
-        treeView.rootDragAndDrop.onDragStart(dragStartEvent);
-        treeView.rootDragAndDrop.onDrop(dragDropEvents.bottom);
-        const projectPaths = atom.project.getPaths();
-        expect(projectPaths[0]).toEqual(alphaDirPath);
-        expect(projectPaths[1]).toEqual(thetaDirPath);
-        expect(projectPaths[2]).toEqual(gammaDirPath);
+          treeView.rootDragAndDrop.onDragStart(dragStartEvent);
+          treeView.rootDragAndDrop.onDrop(dragDropEvents.bottom);
+          const projectPaths = atom.project.getPaths();
+          expect(projectPaths[0]).toEqual(alphaDirPath);
+          expect(projectPaths[1]).toEqual(thetaDirPath);
+          expect(projectPaths[2]).toEqual(gammaDirPath);
 
-        // Is removed when drag ends
-        expect(document.querySelector('.placeholder')).not.toExist();
-      }));
+          // Is removed when drag ends
+          expect(document.querySelector('.placeholder')).not.toExist();
+        })
+      });
     });
 
-    describe("when a root folder is dragged out of application", () => it("should carry the folder's information", function () {
-      const gammaDir = treeView.roots[1];
-      const [dragStartEvent] = eventHelpers.buildPositionalDragEvents(gammaDir.querySelector('.project-root-header'));
-      treeView.rootDragAndDrop.onDragStart(dragStartEvent);
+    describe("when a root folder is dragged out of application", () => {
+      it("should carry the folder's information", function () {
+        const gammaDir = treeView.roots[1];
+        const [dragStartEvent] = eventHelpers.buildPositionalDragEvents(gammaDir.querySelector('.project-root-header'));
+        treeView.rootDragAndDrop.onDragStart(dragStartEvent);
 
-      expect(dragStartEvent.dataTransfer.getData("text/plain")).toEqual(gammaDirPath);
-      if (['darwin', 'linux'].includes(process.platform)) {
-        expect(dragStartEvent.dataTransfer.getData("text/uri-list")).toEqual(`file://${gammaDirPath}`);
-      }
-    }));
+        expect(dragStartEvent.dataTransfer.getData("text/plain")).toEqual(gammaDirPath);
+        if (['darwin', 'linux'].includes(process.platform)) {
+          expect(dragStartEvent.dataTransfer.getData("text/uri-list")).toEqual(`file://${gammaDirPath}`);
+        }
+      });
+    });
 
-    describe("when a root folder is dropped from another Atom window", () => it("adds the root folder to the window", function () {
-      let dragDropEvents;
-      const alphaDir = treeView.roots[0];
-      [_, dragDropEvents] = eventHelpers.buildPositionalDragEvents(null, alphaDir.querySelector('.project-root-header'), '.tree-view');
+    describe("when a root folder is dropped from another Atom window", () => {
+      it("adds the root folder to the window", async () => {
+        let dragDropEvents;
+        const alphaDir = treeView.roots[0];
+        [_, dragDropEvents] = eventHelpers.buildPositionalDragEvents(
+          null,
+          alphaDir.querySelector('.project-root-header'),
+          '.tree-view'
+        );
 
-      const dropEvent = dragDropEvents.bottom;
-      dropEvent.dataTransfer.setData('atom-tree-view-root-event', true);
-      dropEvent.dataTransfer.setData('from-window-id', treeView.rootDragAndDrop.getWindowId() + 1);
-      dropEvent.dataTransfer.setData('from-root-path', etaDirPath);
+        const dropEvent = dragDropEvents.bottom;
+        dropEvent.dataTransfer.setData('atom-tree-view-root-event', true);
+        dropEvent.dataTransfer.setData('from-window-id', treeView.rootDragAndDrop.getWindowId() + 1);
+        dropEvent.dataTransfer.setData('from-root-path', etaDirPath);
 
-      // mock browserWindowForId
-      const browserWindowMock = {webContents: {send() {}}};
-      spyOn(remote.BrowserWindow, 'fromId').andReturn(browserWindowMock);
-      spyOn(browserWindowMock.webContents, 'send');
+        // mock browserWindowForId
+        const browserWindowMock = {webContents: {send() {}}};
+        spyOn(remote.BrowserWindow, 'fromId').andReturn(browserWindowMock);
+        spyOn(browserWindowMock.webContents, 'send');
 
-      treeView.rootDragAndDrop.onDrop(dropEvent);
+        treeView.rootDragAndDrop.onDrop(dropEvent);
 
-      waitsFor(() => browserWindowMock.webContents.send.callCount > 0);
+        await conditionPromise(() => browserWindowMock.webContents.send.callCount > 0);
 
-      return runs(function () {
         expect(atom.project.getPaths()).toContain(etaDirPath);
         expect(document.querySelector('.placeholder')).not.toExist();
       });
-    }));
+    });
 
 
     describe("when a root folder is dropped to another Atom window", () => {
@@ -5606,49 +5644,55 @@ describe("TreeView", function () {
       })
     });
 
-    describe("when the event does not originate from the Tree View", () => it("does nothing", function () {
-      const alphaDir = treeView.roots[0];
-      const gammaDir = treeView.roots[1];
-      const [dragStartEvent, dragOverEvents, dragEndEvent] =
-        eventHelpers.buildPositionalDragEvents(gammaDir.querySelector('.project-root-header'), alphaDir, '.tree-view');
+    describe("when the event does not originate from the Tree View", () => {
+      it("does nothing", function () {
+        const alphaDir = treeView.roots[0];
+        const gammaDir = treeView.roots[1];
+        const [dragStartEvent, dragOverEvents, dragEndEvent] =
+        eventHelpers.buildPositionalDragEvents(
+          gammaDir.querySelector('.project-root-header'),
+          alphaDir,
+          '.tree-view'
+        );
 
-      treeView.rootDragAndDrop.onDragStart(dragStartEvent);
-      dragStartEvent.dataTransfer.clearData('atom-tree-view-root-event');
-      dragOverEvents.top.dataTransfer.clearData('atom-tree-view-root-event');
-      dragEndEvent.dataTransfer.clearData('atom-tree-view-root-event');
+        treeView.rootDragAndDrop.onDragStart(dragStartEvent);
+        dragStartEvent.dataTransfer.clearData('atom-tree-view-root-event');
+        dragOverEvents.top.dataTransfer.clearData('atom-tree-view-root-event');
+        dragEndEvent.dataTransfer.clearData('atom-tree-view-root-event');
 
-      treeView.rootDragAndDrop.onDragOver(dragOverEvents.top);
-      expect(alphaDir.previousSibling).not.toHaveClass('placeholder');
+        treeView.rootDragAndDrop.onDragOver(dragOverEvents.top);
+        expect(alphaDir.previousSibling).not.toHaveClass('placeholder');
 
-      treeView.rootDragAndDrop.onDrop(dragOverEvents.top);
-      const projectPaths = atom.project.getPaths();
-      expect(projectPaths[0]).toEqual(alphaDirPath);
-      expect(projectPaths[1]).toEqual(gammaDirPath);
+        treeView.rootDragAndDrop.onDrop(dragOverEvents.top);
+        const projectPaths = atom.project.getPaths();
+        expect(projectPaths[0]).toEqual(alphaDirPath);
+        expect(projectPaths[1]).toEqual(gammaDirPath);
 
-      treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
-      expect(document.querySelector('.placeholder')).not.toExist();
-    }));
+        treeView.rootDragAndDrop.onDragEnd(dragEndEvent);
+        expect(document.querySelector('.placeholder')).not.toExist();
+      });
+    });
   });
 
-  describe("when the active file path does not exist in the project", () => it("deselects all entries", function () {
-    const nonProjectPath = path.join(temp.mkdirSync(), 'new-file.txt');
-    fs.writeFileSync(nonProjectPath, 'test');
+  describe("when the active file path does not exist in the project", () => {
+    it("deselects all entries", async () => {
+      const nonProjectPath = path.join(temp.mkdirSync(), 'new-file.txt');
+      fs.writeFileSync(nonProjectPath, 'test');
 
-    waitForWorkspaceOpenEvent(() => sampleJs.dispatchEvent(new MouseEvent('click', {bubbles: true, detail: 1})));
+      await waitForWorkspaceOpenEventPromise(() => {
+        sampleJs.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+      });
 
-    runs(function () {
       expect(sampleJs).toHaveClass('selected');
       expect(treeView.getSelectedEntries().length).toBe(1);
-    });
 
-    waitsForPromise(() => atom.workspace.open(nonProjectPath));
+      await atom.workspace.open(nonProjectPath);
+      expect(treeView.getSelectedEntries().length).toBe(0);
 
-    runs(() => expect(treeView.getSelectedEntries().length).toBe(0));
-
-    waitsForPromise(() => atom.workspace.open(sampleJs.getPath()));
-
-    return runs(() => expect(sampleJs).toHaveClass('selected'));
-  }));
+      await atom.workspace.open(sampleJs.getPath());
+      expect(sampleJs).toHaveClass('selected');
+    })
+  });
 
   describe("when there is a __proto__ entry present", () => {
     it("does not break anything", function () {
@@ -5720,12 +5764,13 @@ describe("Service provider", function () {
   let [treeView, treeViewService] = [];
   beforeEach(async () => {
     await waitForPackageActivation();
-
     treeView = atom.workspace.getLeftDock().getActivePaneItem();
     return treeViewService = atom.packages.getActivePackage('tree-view').mainModule.provideTreeView();
   });
 
-  it("provides the `selectedPaths` method which should return the selected paths in the Tree View", () => expect(treeViewService.selectedPaths()).toEqual([atom.project.getPaths()[0]]));
+  it("provides the `selectedPaths` method which should return the selected paths in the Tree View", () => {
+    expect(treeViewService.selectedPaths()).toEqual([atom.project.getPaths()[0]]);
+  });
 
   it("provides the `entryForPath` method which should return the Tree View entry for a given path", function () {
     const root = atom.project.getPaths()[0];
@@ -5761,7 +5806,6 @@ describe('Icon class handling', () => {
     await waitForPackageActivation();
 
     jasmine.attachToDOM(workspaceElement);
-    // const _treeView = atom.packages.getActivePackage("tree-view").mainModule.getTreeViewInstance();
     let files = workspaceElement.querySelectorAll('li[is="tree-view-file"]');
 
     expect(files[0].fileName.className).toBe('name icon first-icon-class second-icon-class');
@@ -5775,33 +5819,27 @@ describe('Icon class handling', () => {
 });
 
 describe('Hidden on startup', function () {
-
-  describe('When not configured', () => it('defaults to false', () => expect(atom.config.get("tree-view.hiddenOnStartup")).toBeFalsy()));
-
-  describe('When set to true', function () {});
-  it('hides the tree view pane on startup', function () {
-    waitsForPromise(() => // First deactivate the package so that we can start from scratch
-    atom.packages.deactivatePackage('tree-view'));
-
-    runs(() => atom.config.set("tree-view.hiddenOnStartup", true));
-
-    // activate the package and wait for focus to settle on editor
-    beforeEach(function () {
-      waitsForPromise(() => atom.packages.activatePackage('tree-view'));
-      return waitsForPromise(() => atom.workspace.open());
+  describe('When not configured', () => {
+    it('defaults to false', () => {
+      expect(atom.config.get("tree-view.hiddenOnStartup")).toBeFalsy();
     });
-
-    return runs(() => expect(atom.workspace.getLeftDock().isVisible()).toBe(false));
   });
 
-  describe('When set to false', () => it('allows the pane to show up as normal', function () {
-    waitsForPromise(() => // First deactivate the package so that we can start from scratch
-    atom.packages.deactivatePackage('tree-view'));
-
-    runs(() => atom.config.set("tree-view.hiddenOnStartup", false));
-
-    waitForPackageActivation();
-
-    return runs(() => expect(atom.workspace.getLeftDock().isVisible()).toBe(true));
-  }));
+  describe('When set to true', function () {
+    it('hides the tree view pane on startup', async () => {
+      await atom.packages.deactivatePackage('tree-view');
+      atom.config.set("tree-view.hiddenOnStartup", true);
+      await atom.packages.activatePackage('tree-view');
+      await atom.workspace.open();
+      expect(atom.workspace.getLeftDock().isVisible()).toBe(false);
+    });
+  });
+  describe('When set to false', () => {
+    it('allows the pane to show up as normal', async () => {
+      await atom.packages.deactivatePackage('tree-view');
+      atom.config.set("tree-view.hiddenOnStartup", false);
+      await waitForPackageActivation();
+      expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
+    });
+  });
 });
