@@ -1617,7 +1617,8 @@ describe("TreeView", function () {
     }));
   });
 
-  describe("file modification", function () {
+  // TEMP: Tests skipped to see if this is the cause of crashes in CI.
+  xdescribe("file modification", function () {
     let [dirView, dirView2, dirView3, fileView, fileView2, fileView3, fileView4] = [];
     let [rootDirPath, rootDirPath2, dirPath, dirPath2, dirPath3, filePath, filePath2, filePath3, filePath4] = [];
 
