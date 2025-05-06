@@ -30,8 +30,9 @@ describe('UIWatcher', () => {
       );
 
       uiWatcher.baseTheme.entities[0].emitter.emit('did-change');
-      await wait(20);
-      expect(atom.themes.reloadBaseStylesheets).toHaveBeenCalled();
+      await conditionPromise(() => {
+        return atom.themes.reloadBaseStylesheets.callCount > 0;
+      });
     });
   });
 
@@ -78,7 +79,7 @@ describe('UIWatcher', () => {
       uiWatcher.watchers[
         uiWatcher.watchers.length - 1
       ].entities[1].emitter.emit('did-change');
-      await wait(20);
+      await conditionPromise(() => pack.reloadStylesheets.callCount > 0);
 
       expect(pack.reloadStylesheets).toHaveBeenCalled();
     });
@@ -123,11 +124,11 @@ describe('UIWatcher', () => {
         if (entity.getPath().indexOf('variables') > -1) varEntity = entity;
       }
       varEntity.emitter.emit('did-change');
-      await wait(20);
-
-      for (const theme of atom.themes.getActiveThemes()) {
-        expect(theme.reloadStylesheets).toHaveBeenCalled();
-      }
+      await conditionPromise(() => {
+        return atom.themes.getActiveThemes().every((t) => {
+          return t.reloadStylesheets.callCount > 0;
+        });
+      });
     });
   });
 
@@ -187,9 +188,13 @@ describe('UIWatcher', () => {
       await atom.themes.activateThemes();
       uiWatcher = new UIWatcher();
       pack = atom.themes.getActiveThemes()[0];
+      await wait(50);
     });
 
-    afterEach(() => atom.themes.deactivateThemes());
+    afterEach(async () => {
+      atom.themes.deactivateThemes();
+      await wait(50);
+    });
 
     it('watches themes without a styles directory', async () => {
       spyOn(pack, 'reloadStylesheets');
@@ -200,8 +205,7 @@ describe('UIWatcher', () => {
       expect(watcher.entities.length).toBe(1);
 
       watcher.entities[0].emitter.emit('did-change');
-      await wait(20);
-      expect(pack.reloadStylesheets).toHaveBeenCalled();
+      await conditionPromise(() => pack.reloadStylesheets.callCount > 0);
       expect(atom.themes.reloadBaseStylesheets).not.toHaveBeenCalled();
     });
   });
@@ -238,8 +242,7 @@ describe('UIWatcher', () => {
       expect(atom.themes.reloadBaseStylesheets).not.toHaveBeenCalled();
 
       watcher.entities[watcher.entities.length - 1].emitter.emit('did-change');
-      await wait(20);
-      expect(atom.themes.reloadBaseStylesheets).toHaveBeenCalled();
+      await conditionPromise(() => atom.themes.reloadBaseStylesheets.callCount > 0);
     });
 
     it('unwatches when a theme is deactivated', async () => {
@@ -269,8 +272,7 @@ describe('UIWatcher', () => {
 
       const watcher = uiWatcher.watchedThemes.get('theme-with-package-file');
       watcher.entities[2].emitter.emit('did-change');
-      await wait(20);
-      expect(pack.reloadStylesheets).toHaveBeenCalled();
+      await conditionPromise(() => pack.reloadStylesheets.callCount > 0);
     });
   });
 });
