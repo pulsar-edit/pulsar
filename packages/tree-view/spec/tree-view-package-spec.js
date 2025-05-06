@@ -3482,13 +3482,15 @@ describe("TreeView", function () {
 
         expect(fs.existsSync(temporaryFilePath)).toBeFalsy();
         entriesCountBefore = treeView.roots[0].querySelectorAll('.entry').length;
+        console.log('DEBUG!: Writing file to:', temporaryFilePath);
         fs.writeFileSync(temporaryFilePath, 'hi');
+        console.log('DEBUG!: Wrote file:', fs.readFileSync(temporaryFilePath, 'utf8'));
 
         await conditionPromise(
           () => {
             return treeView.roots[0].querySelectorAll('.entry').length === (entriesCountBefore + 1)
           },
-          "directory view contents to refresh"
+          "directory view contents to refresh after addition"
         );
 
         expect(treeView.entryForPath(temporaryFilePath)).toExist();
@@ -3498,7 +3500,7 @@ describe("TreeView", function () {
           () => {
             return treeView.roots[0].querySelectorAll('.entry').length === entriesCountBefore
           },
-          "directory view contents to refresh"
+          "directory view contents to refresh after removal"
         );
       })
     });
