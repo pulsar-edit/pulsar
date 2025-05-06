@@ -246,8 +246,9 @@ class Directory {
 
   // Public: Stop watching this directory for changes.
   unwatch() {
-    this.watchSubscription?.dispose()
-    this.watchSubscription = null
+    this.watcherAbortController?.abort();
+    this.watcherAbortController = null;
+    this.watchSubscription = null;
 
     for (let [key, entry] of this.entries) {
       entry.destroy()
@@ -257,31 +258,34 @@ class Directory {
 
   // Public: Watch this directory for changes.
   async watch() {
-    if (this.watchSubscription != null) return
+    if (this.watchSubscription) return;
     try {
       await this.loadRealPathPromise();
-      // These path-watchers are recursive, so it's redundant to have one for
-      // each directory. Luckily, `watchPath` itself consolidates redundant
-      // watchers so we don't have to.
-      this.watchSubscription = await watchPath(this.path, {}, events => {
-        // We get a batch of events, but we really only care about whether we
-        // should reload our subtree or remove it. We only need to do each
-        // action once.
-        let shouldReload = false
-        for (let event of events) {
-          if (event.path === this.path && event.action === 'deleted') {
-            this.destroy()
-            break
+      this.watcherAbortController = new AbortController();
+      // We can get away with `fs.watch` here because we just care about when
+      // to remove or reload this directory.
+      this.watchSubscription = fs.watch(
+        this.realPath,
+        { signal: this.watcherAbortController.signal },
+        (eventType, filename) => {
+          // Deletions are represented as `rename` events — so if this
+          // directory itself is “renamed,” that means it's been deleted.
+          if ((filename === this.path || filename === this.realPath) && eventType === 'rename') {
+            this.destroy();
+            return;
           }
-          if (!shouldReload && this.filePathIsChildOfDirectory(event.path)) {
-            shouldReload = true
-          }
+          this.reload();
         }
-        if (shouldReload) {
-          this.reload()
-        }
-      })
-    } catch (error) {}
+      );
+      // "On Windows, no events will be emitted if the watched directory is
+      // moved or renamed. An EPERM error is reported when the watched
+      // directory is deleted."
+      this.watchSubscription.on('error', (error) => {
+        if (error.code === 'EPERM') this.destroy();
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   getEntries() {
