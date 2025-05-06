@@ -35,7 +35,6 @@ const genPromiseToCheck = fn => new Promise(resolve => {
 })
 
 describe('FuzzyFinder', () => {
-  let disposable, reporterStub
   let rootDir1, rootDir2
   let fuzzyFinder, projectView, bufferView, gitStatusView, workspaceElement, fixturesPath
   const filesPromise = () => genPromiseToCheck( () =>
@@ -45,12 +44,6 @@ describe('FuzzyFinder', () => {
   )
 
   beforeEach(async () => {
-    reporterStub = {
-      addTiming: sinon.spy(),
-      incrementCounter: () => {}
-    }
-    disposable = fuzzyFinderPackage.consumeMetricsReporter(reporterStub)
-
     const ancestorDir = fs.realpathSync(temp.mkdirSync())
     rootDir1 = path.join(ancestorDir, 'root-dir1')
     rootDir2 = path.join(ancestorDir, 'root-dir2')
@@ -81,12 +74,6 @@ describe('FuzzyFinder', () => {
     gitStatusView = fuzzyFinder.createGitStatusView()
 
     jasmine.useRealClock()
-  })
-
-  afterEach(() => {
-    if (disposable) {
-      disposable.dispose()
-    }
   })
 
   async function waitForPathsToDisplay (fuzzyFinderView) {
@@ -835,21 +822,26 @@ describe('FuzzyFinder', () => {
           })
 
           it('passes the indexed paths into the project view when it is created', () => {
-            const {projectPaths} = fuzzyFinder
+            const {projectPaths, ignoredPaths} = fuzzyFinder
             expect(projectPaths.length).toBe(19)
+            expect(ignoredPaths.length).toBe(0)
+
             projectView = fuzzyFinder.createProjectView()
             expect(projectView.paths).toBe(projectPaths)
+            expect(projectView.ignoredPaths).toBe(ignoredPaths)
             expect(projectView.reloadPaths).toBe(false)
           })
 
           it('busts the cached paths when the project paths change', () => {
             atom.project.setPaths([])
 
-            const {projectPaths} = fuzzyFinder
+            const {projectPaths, ignoredPaths} = fuzzyFinder
             expect(projectPaths).toBe(null)
+            expect(ignoredPaths).toBe(null)
 
             projectView = fuzzyFinder.createProjectView()
             expect(projectView.paths).toBe(null)
+            expect(projectView.ignoredPaths).toBe(null)
             expect(projectView.reloadPaths).toBe(true)
           })
         })
@@ -1625,6 +1617,21 @@ describe('FuzzyFinder', () => {
 
               await waitForPathsToDisplay(projectView)
 
+              expect(projectView.paths.length).toBe(6)
+              expect(projectView.ignoredPaths.length).toBe(0)
+
+              expect(Array.from(projectView.element.querySelectorAll('li')).find(a => a.textContent.includes('ignored.txt'))).not.toBeDefined()
+            })
+
+            it('includes paths that are git ignored when indexIgnoredPaths is true', async () => {
+              atom.config.set('fuzzy-finder.indexIgnoredPaths', true)
+              await projectView.toggle()
+
+              await waitForPathsToDisplay(projectView)
+
+              expect(projectView.paths.length).toBe(6)
+              expect(projectView.ignoredPaths.length).toBe(1)
+
               expect(Array.from(projectView.element.querySelectorAll('li')).find(a => a.textContent.includes('ignored.txt'))).not.toBeDefined()
             })
           })
@@ -1637,7 +1644,7 @@ describe('FuzzyFinder', () => {
             })
 
             if (useRipGrep) {
-              it('does excludes paths that are git ignored', async () => {
+              it('excludes paths that are git ignored', async () => {
                 fs.writeFileSync(path.join(projectPath, 'dir', 'a.txt'), 'something')
 
                 await projectView.toggle()
@@ -1686,6 +1693,81 @@ describe('FuzzyFinder', () => {
                 a.textContent.includes('HEAD'))).not.toBeDefined()
             })
           })
+
+          describe('when the query starts with an exclamation point', () => {
+            beforeEach(() => {
+              const ignoreFile = path.join(projectPath, '.gitignore')
+              fs.writeFileSync(ignoreFile, "ignored.txt\nanother.txt")
+
+              fs.writeFileSync(
+                  path.join(projectPath, 'ignored.txt'),
+                  'this text is not important'
+              )
+              fs.writeFileSync(
+                  path.join(projectPath, 'another.txt'),
+                  'this text is not important'
+              )
+            })
+
+            it('excludes paths that are tracked when indexIgnoredPaths is true', async () => {
+              atom.config.set('fuzzy-finder.indexIgnoredPaths', true)
+              projectView.selectListView.refs.queryEditor.insertText('!')
+
+              await projectView.toggle()
+              await waitForPathsToDisplay(projectView)
+
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('a.txt'))
+              ).not.toBeDefined()
+            })
+
+            it('includes paths that are git ignored when indexIgnoredPaths is true', async () => {
+              atom.config.set('fuzzy-finder.indexIgnoredPaths', true)
+              projectView.selectListView.refs.queryEditor.insertText('!')
+
+              await projectView.toggle()
+              await waitForPathsToDisplay(projectView)
+
+              expect(projectView.queryOverridesIgnore()).toBe(true)
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('ignored.txt'))
+              ).toBeDefined()
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('another.txt'))
+              ).toBeDefined()
+            })
+
+            it('matches paths that are git ignored when indexIgnoredPaths is true', async () => {
+              atom.config.set('fuzzy-finder.indexIgnoredPaths', true)
+              projectView.selectListView.refs.queryEditor.insertText('!anoth')
+
+              await projectView.toggle()
+              await waitForPathsToDisplay(projectView)
+
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('ignored.txt'))
+              ).not.toBeDefined()
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('another.txt'))
+              ).toBeDefined()
+            })
+
+            it('excludes paths that are git ignored when indexIgnoredPaths is false', async () => {
+                atom.config.set('fuzzy-finder.indexIgnoredPaths', false)
+                projectView.selectListView.refs.queryEditor.insertText('!ig')
+
+                await projectView.toggle()
+                await waitForReCrawlerToFinish(projectView)
+
+                expect(projectView.queryOverridesIgnore()).toBe(true)
+                expect(projectView.element.querySelectorAll('li').length).toBe(0)
+            })
+          })
         })
 
         describe('when core.excludeVcsIgnoredPaths is set to false', () => {
@@ -1708,39 +1790,28 @@ describe('FuzzyFinder', () => {
               expect(Array.from(projectView.element.querySelectorAll('li')).find(a => a.textContent.includes('ignored.txt'))).toBeDefined()
             })
           })
-        })
 
-        describe('logging of metrics events', () => {
-          it('logs the crawling time', async () => {
-            // After setting the reporter it may receive some old events from previous tests
-            // that we want to discard.
-            reporterStub.addTiming.resetHistory()
+          describe('when the query starts with an exclamation point', () => {
+            beforeEach(() => {
+              const ignoreFile = path.join(projectPath, '.gitignore')
+              fs.writeFileSync(ignoreFile, 'ignored.txt')
 
-            await projectView.toggle()
+              const ignoredFile = path.join(projectPath, 'ignored.txt')
+              fs.writeFileSync(ignoredFile, 'ignored text')
+            })
 
-            await waitForPathsToDisplay(projectView)
+            it('excludes paths that are git ignored when indexIgnoredPaths is true', async () => {
+              atom.config.set('fuzzy-finder.indexIgnoredPaths', false)
+              projectView.selectListView.refs.queryEditor.insertText('!ig')
 
-            expect(reporterStub.addTiming.firstCall.args[0]).toEqual('fuzzy-finder-v1')
-            expect(reporterStub.addTiming.firstCall.args[2]).toEqual(
-              {ec: 'time-to-crawl', el: useRipGrep ? 'ripgrep' : 'fs', ev: 5}
-            )
-          })
+              await projectView.toggle()
+              await waitForReCrawlerToFinish(projectView)
 
-          it('queues the events until a reporter is set', async () => {
-            // After setting the reporter it may receive some old events from previous tests
-            // that we want to discard.
-            reporterStub.addTiming.resetHistory()
-
-            await projectView.toggle()
-
-            await waitForPathsToDisplay(projectView)
-
-            fuzzyFinderPackage.consumeMetricsReporter(reporterStub)
-
-            expect(reporterStub.addTiming.firstCall.args[0]).toEqual('fuzzy-finder-v1')
-            expect(reporterStub.addTiming.firstCall.args[2]).toEqual(
-              {ec: 'time-to-crawl', el: useRipGrep ? 'ripgrep' : 'fs', ev: 5}
-            )
+              expect(
+                Array.from(projectView.element.querySelectorAll('li'))
+                  .find(a => a.textContent.includes('ignored.txt'))
+              ).not.toBeDefined()
+            })
           })
         })
       })
