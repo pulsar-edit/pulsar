@@ -3465,10 +3465,14 @@ describe("TreeView", function () {
   describe("file system events", function () {
     let temporaryFilePath = null;
 
-    beforeEach(function () {
+    beforeEach(async () => {
       setDebug(true);
-      atom.project.setPaths([fs.absolute(temp.mkdirSync('tree-view'))]);
+      let rootPath = fs.absolute(temp.mkdirSync('tree-view'));
+      atom.project.setPaths([rootPath]);
       temporaryFilePath = path.join(atom.project.getPaths()[0], 'temporary');
+      treeView = atom.workspace.getLeftDock().getActivePaneItem();
+      root1 = treeView.roots[0];
+      await conditionPromise(() => !!root1.directory.watchSubscription, 'should have watch subscription');
     });
 
     afterEach(() => {
