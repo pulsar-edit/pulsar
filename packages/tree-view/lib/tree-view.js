@@ -927,7 +927,6 @@ class TreeView {
 
           let meta = { pathToDelete: selectedPath };
 
-          console.log('WILL DELETE:', meta);
           this.emitter.emit('will-delete-entry', meta);
 
           let promise = shell.trashItem(selectedPath).then(() => {
@@ -1208,9 +1207,7 @@ class TreeView {
         // directories
         fs.copySync(initialPath, newPath);
       } else {
-        // read the old file and write a new one at target location
-        // TODO: replace with fs.copyFileSync
-        fs.writeFileSync(newPath, fs.readFileSync(initialPath));
+        fs.copyFileSync(initialPath, newPath);
       }
       this.emitter.emit('entry-copied', { initialPath, newPath });
       let repo = repoForPath(newPath);
@@ -1563,7 +1560,6 @@ class TreeView {
 
   // Handle entry drop event.
   onDrop(event) {
-    console.log('onDrop:', event);
     this.dragEventCounts = new WeakMap();
     let entry = event.target.closest('.entry.directory');
     if (entry) {

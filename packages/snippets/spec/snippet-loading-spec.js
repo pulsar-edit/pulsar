@@ -1,7 +1,8 @@
 const path = require('path');
 const fs = require('fs');
 const temp = require('temp').track();
-const { conditionPromise } = require('./async-spec-helpers');
+const { conditionPromise, timeoutPromise: wait } = require('./async-spec-helpers');
+
 
 describe("Snippet Loading", () => {
   let configDirPath, snippetsService;
@@ -19,17 +20,19 @@ describe("Snippet Loading", () => {
     ]);
   });
 
-  afterEach(() => {
-    waitsForPromise(() => Promise.resolve(atom.packages.deactivatePackages('snippets')));
-    runs(() => {
-      jasmine.unspy(atom.packages, 'getLoadedPackages');
-    });
+  afterEach(async () => {
+    jasmine.useRealClock();
+    await atom.packages.deactivatePackage('snippets');
+    jasmine.unspy(atom.packages, 'getLoadedPackages');
+    // Give `pathwatcher` some room to breathe.
+    await wait(50);
   });
 
   async function activateSnippetsPackagePromise () {
     let { mainModule } = await atom.packages.activatePackage('snippets');
     snippetsService = mainModule.provideSnippets();
     mainModule.loaded = false;
+    await mainModule.waitForSnippetsLoaded();
 
     await conditionPromise(() => {
       return snippetsService.bundledSnippetsLoaded();
