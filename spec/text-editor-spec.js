@@ -140,7 +140,7 @@ describe('TextEditor', () => {
   });
 
   describe('.copy()', () => {
-    it('returns a different editor with the same initial state', () => {
+    it('returns a different editor with the same initial state', async () => {
       expect(editor.getAutoHeight()).toBeFalsy();
       expect(editor.getAutoWidth()).toBeFalsy();
       expect(editor.getShowCursorOnSelection()).toBeTruthy();
@@ -153,13 +153,15 @@ describe('TextEditor', () => {
       editor.update({ showCursorOnSelection: false });
       editor.setSelectedBufferRange([[1, 2], [3, 4]]);
       editor.addSelectionForBufferRange([[5, 6], [7, 8]], { reversed: true });
-      editor.setScrollTopRow(3);
-      expect(editor.getScrollTopRow()).toBe(3);
+      console.log('DEBUG: Setting first editor’s top row to 3');
+      editor.setScrollTopRow(3, true);
+      expect(editor.getScrollTopRow(true)).toBe(3);
       editor.setScrollLeftColumn(4);
       expect(editor.getScrollLeftColumn()).toBe(4);
       editor.foldBufferRow(4);
       expect(editor.isFoldedAtBufferRow(4)).toBeTruthy();
 
+      console.log('DEBUG: Copying first editor');
       const editor2 = editor.copy();
       const element2 = editor2.getElement();
       element2.setHeight(100);
@@ -170,7 +172,7 @@ describe('TextEditor', () => {
         editor.getSelectedBufferRanges()
       );
       expect(editor2.getSelections()[1].isReversed()).toBeTruthy();
-      expect(editor2.getScrollTopRow()).toBe(3);
+      expect(editor2.getScrollTopRow(true)).toBe(3);
       expect(editor2.getScrollLeftColumn()).toBe(4);
       expect(editor2.isFoldedAtBufferRow(4)).toBeTruthy();
       expect(editor2.getAutoWidth()).toBe(false);
@@ -8384,9 +8386,15 @@ describe('TextEditor', () => {
 
       editor.setText('initial stuff');
       await editor.saveAs(temp.openSync('test-file').path);
+      console.log('DEBUG: Editor saved');
 
       editor.setText('other stuff');
+      let promise = new Promise(resolve => editor.onDidConflict(() => {
+        console.log('DEBUG: Conflict!');
+        resolve();
+      }));
       fs.writeFileSync(editor.getPath(), 'new stuff');
+      console.log('DEBUG: File contents changed');
       expect(
         editor.shouldPromptToSave({
           windowCloseRequested: true,
@@ -8394,7 +8402,7 @@ describe('TextEditor', () => {
         })
       ).toBeFalsy();
 
-      await new Promise(resolve => editor.onDidConflict(resolve));
+      await promise;
       expect(
         editor.shouldPromptToSave({
           windowCloseRequested: true,

@@ -3430,12 +3430,15 @@ module.exports = class TextEditorComponent {
     return this.scrollTop;
   }
 
-  setScrollTop(scrollTop) {
+  setScrollTop(scrollTop, debug = false) {
     if (Number.isNaN(scrollTop) || scrollTop == null) return false;
 
     scrollTop = roundToPhysicalPixelBoundary(
       Math.max(0, Math.min(this.getMaxScrollTop(), scrollTop))
     );
+    if (debug) {
+      console.log('DEBUG: scrollTop rounded to', scrollTop, 'existing is', this.scrollTop);
+    }
     if (scrollTop !== this.scrollTop) {
       this.derivedDimensionsCache = {};
       this.scrollTopPending = true;
@@ -3502,23 +3505,31 @@ module.exports = class TextEditorComponent {
     );
   }
 
-  setScrollTopRow(scrollTopRow, scheduleUpdate = true) {
+  setScrollTopRow(scrollTopRow, scheduleUpdate = true, debug = false) {
     if (this.hasInitialMeasurements) {
+      if (debug) {
+        console.log('DEBUG: scrollTopRow hasInitialMeasurements', this.pixelPositionBeforeBlocksForRow(scrollTopRow));
+      }
       const didScroll = this.setScrollTop(
-        this.pixelPositionBeforeBlocksForRow(scrollTopRow)
+        this.pixelPositionBeforeBlocksForRow(scrollTopRow),
+        debug
       );
       if (didScroll && scheduleUpdate) {
         this.scheduleUpdate();
       }
       return didScroll;
     } else {
+      console.log('DEBUG: pending:', scrollTopRow);
       this.pendingScrollTopRow = scrollTopRow;
       return false;
     }
   }
 
-  getScrollTopRow() {
+  getScrollTopRow(debug = false) {
     if (this.hasInitialMeasurements) {
+      if (debug) {
+        console.log('DEBUG: getScrollTopRow scrollTop:', this.getScrollTop(), 'row:', this.rowForPixelPosition(this.getScrollTop()));
+      }
       return this.rowForPixelPosition(this.getScrollTop());
     } else {
       return this.pendingScrollTopRow || 0;

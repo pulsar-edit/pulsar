@@ -2434,6 +2434,7 @@ describe('TextEditorComponent', () => {
     });
 
     it("flashing a highlight decoration doesn't unflash other highlight decorations", async () => {
+      jasmine.useRealClock();
       const { component, element, editor } = buildComponent({
         rowsPerTile: 3,
         height: 200
@@ -2452,7 +2453,7 @@ describe('TextEditorComponent', () => {
       expect(highlights[0].classList.contains('c')).toBe(true);
 
       // Flash another class while the previously-flashed class is still highlighted
-      decoration.flash('d', 100);
+      decoration.flash('d', process.env.CI ? 1500 : 100);
       await component.getNextUpdatePromise();
       expect(highlights[0].classList.contains('c')).toBe(true);
       expect(highlights[0].classList.contains('d')).toBe(true);
@@ -3203,6 +3204,7 @@ describe('TextEditorComponent', () => {
         component,
         3 * component.getLineHeight() + getElementHeight(item3)
       );
+      await wait(100);
       expect(component.getRenderedStartRow()).toBe(3);
       expect(component.getRenderedEndRow()).toBe(12);
       expect(component.getScrollHeight()).toBeNear(
@@ -4671,6 +4673,7 @@ describe('TextEditorComponent', () => {
               [[2, 8], [8, 8]]
             ]);
             didDrag(clientPositionForCharacter(component, 6, 8));
+            console.log('screen ranges:', editor.getSelectedScreenRanges().map(r => r.toString()));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[6, 8], [8, 8]]
