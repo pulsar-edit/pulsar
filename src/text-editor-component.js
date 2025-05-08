@@ -3437,7 +3437,7 @@ module.exports = class TextEditorComponent {
       Math.max(0, Math.min(this.getMaxScrollTop(), scrollTop))
     );
     if (debug) {
-      console.log('DEBUG: scrollTop rounded to', scrollTop, 'existing is', this.scrollTop);
+      console.warn('DEBUG: scrollTop rounded to', scrollTop, 'existing is', this.scrollTop);
     }
     if (scrollTop !== this.scrollTop) {
       this.derivedDimensionsCache = {};
@@ -3508,7 +3508,7 @@ module.exports = class TextEditorComponent {
   setScrollTopRow(scrollTopRow, scheduleUpdate = true, debug = false) {
     if (this.hasInitialMeasurements) {
       if (debug) {
-        console.log('DEBUG: scrollTopRow hasInitialMeasurements', this.pixelPositionBeforeBlocksForRow(scrollTopRow));
+        console.warn('DEBUG: scrollTopRow hasInitialMeasurements', this.pixelPositionBeforeBlocksForRow(scrollTopRow));
       }
       const didScroll = this.setScrollTop(
         this.pixelPositionBeforeBlocksForRow(scrollTopRow),
@@ -3519,7 +3519,7 @@ module.exports = class TextEditorComponent {
       }
       return didScroll;
     } else {
-      console.log('DEBUG: pending:', scrollTopRow);
+      console.warn('DEBUG: pending:', scrollTopRow);
       this.pendingScrollTopRow = scrollTopRow;
       return false;
     }
@@ -3528,7 +3528,7 @@ module.exports = class TextEditorComponent {
   getScrollTopRow(debug = false) {
     if (this.hasInitialMeasurements) {
       if (debug) {
-        console.log('DEBUG: getScrollTopRow scrollTop:', this.getScrollTop(), 'row:', this.rowForPixelPosition(this.getScrollTop()));
+        console.warn('DEBUG: getScrollTopRow scrollTop:', this.getScrollTop(), 'row:', this.rowForPixelPosition(this.getScrollTop()));
       }
       return this.rowForPixelPosition(this.getScrollTop());
     } else {

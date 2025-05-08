@@ -154,7 +154,7 @@ describe('TextEditor', () => {
       editor.update({ showCursorOnSelection: false });
       editor.setSelectedBufferRange([[1, 2], [3, 4]]);
       editor.addSelectionForBufferRange([[5, 6], [7, 8]], { reversed: true });
-      console.log('DEBUG: Setting first editor’s top row to 3');
+      console.warn('DEBUG: Setting first editor’s top row to 3');
       editor.setScrollTopRow(3, true);
       expect(editor.getScrollTopRow(true)).toBe(3);
       editor.setScrollLeftColumn(4);
@@ -162,7 +162,7 @@ describe('TextEditor', () => {
       editor.foldBufferRow(4);
       expect(editor.isFoldedAtBufferRow(4)).toBeTruthy();
 
-      console.log('DEBUG: Copying first editor');
+      console.warn('DEBUG: Copying first editor');
       const editor2 = editor.copy();
       const element2 = editor2.getElement();
       element2.setHeight(100);
