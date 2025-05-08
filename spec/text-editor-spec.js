@@ -141,6 +141,7 @@ describe('TextEditor', () => {
 
   describe('.copy()', () => {
     it('returns a different editor with the same initial state', async () => {
+      console.warn('NOTE: Starting the .copy() test')
       expect(editor.getAutoHeight()).toBeFalsy();
       expect(editor.getAutoWidth()).toBeFalsy();
       expect(editor.getShowCursorOnSelection()).toBeTruthy();
