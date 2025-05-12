@@ -38,7 +38,7 @@ jobs:
     steps:
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools
+      run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
        libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev # <-- Python-related stuff on this line
 
     - name: Restore Compiled Python from Cache - Linux
