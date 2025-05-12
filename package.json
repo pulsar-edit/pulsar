@@ -322,7 +322,7 @@
     "pathwatcher": "https://github.com/savetheclocktower/node-pathwatcher#d2281e60669644a4a8931f0b015d7c3792307327",
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244",
     "@electron/remote": "2.1.2",
-    "**/keyboard-layout": "https://github.com/savetheclocktower/keyboard-layout#5e3a07648c3fc97e2895b199ee5ad3852dbaaaa6",
-    "keyboard-layout": "https://github.com/savetheclocktower/keyboard-layout#5e3a07648c3fc97e2895b199ee5ad3852dbaaaa6"
+    "**/keyboard-layout": "https://github.com/savetheclocktower/keyboard-layout#e3dd9aacba1bdb085de412092f394f949595f805",
+    "keyboard-layout": "https://github.com/savetheclocktower/keyboard-layout#e3dd9aacba1bdb085de412092f394f949595f805"
   }
 }
