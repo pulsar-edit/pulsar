@@ -73,7 +73,7 @@ class I18n {
     }
 
     for (const localeListItem of localeList) {
-      if (I18n.DoLocalesMatch(localeListItem, locale)) {
+      if (I18n.doLocalesMatch(localeListItem, locale)) {
         return true;
       }
     }
@@ -82,7 +82,7 @@ class I18n {
   }
 
   // Takes a wanted locale, and the locale you have, to determine if they match
-  static DoLocalesMatch(want, have) {
+  static doLocalesMatch(want, have) {
     if (want == have) {
       return true;
     }
@@ -197,7 +197,7 @@ class I18n {
     localeFallbackListLoop:
     for (const localeListItem of this.localeFallbackList) {
       for (const possibleLocale in stringLocales) {
-        if (I18n.DoLocalesMatch(localeListItem, possibleLocale)) {
+        if (I18n.doLocalesMatch(localeListItem, possibleLocale)) {
           bestLocale = possibleLocale;
           break localeFallbackListLoop;
         }

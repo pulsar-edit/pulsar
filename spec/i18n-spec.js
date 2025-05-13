@@ -73,19 +73,19 @@ describe("I18n", () => {
     it("Can determine if basic locales match", () => {
       const want = "en-US";
       const have = "en-US";
-      expect(I18n.DoLocalesMatch(want, have)).toEqual(true);
+      expect(I18n.doLocalesMatch(want, have)).toEqual(true);
     });
 
     it("Can determine if wildcard locales match", () => {
       const want = "en-*";
       const have = "en-US";
-      expect(I18n.DoLocalesMatch(want, have)).toEqual(true);
+      expect(I18n.doLocalesMatch(want, have)).toEqual(true);
     });
 
     it("Can determine if locales do not match", () => {
       const want = "en-US";
       const have = "ja-JP";
-      expect(I18n.DoLocalesMatch(want, have)).toEqual(false);
+      expect(I18n.doLocalesMatch(want, have)).toEqual(false);
     });
   });
 
