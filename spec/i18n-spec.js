@@ -18,7 +18,7 @@ describe("I18n", () => {
         "zh-Hant-CN-x-private1-private2",
         "en-US"
       ];
-      const fallbackSet = I18n.LocaleNegotiation(primaryLocale, priorityListLocale);
+      const fallbackSet = I18n.localeNegotiation(primaryLocale, priorityListLocale);
 
       expect(Array.from(fallbackSet)).toEqual([
         "es-MX",
@@ -36,7 +36,7 @@ describe("I18n", () => {
     it("Locale Lookup Filtering Fallback Pattern Array: Excludes duplicates from hardcoded fallback", () => {
       const primaryLocale = "en-US";
       const priorityListLocale = [ "es-MX" ];
-      const fallbackSet = I18n.LocaleNegotiation(primaryLocale, priorityListLocale);
+      const fallbackSet = I18n.localeNegotiation(primaryLocale, priorityListLocale);
 
       expect(Array.from(fallbackSet)).toEqual([
         "en-US",
@@ -155,7 +155,7 @@ describe("I18n", () => {
     beforeEach(() => {
       const primary = "es-MX";
       const priorityListLocale = [ "zh-Hant" ];
-      i18n.localeFallbackList = I18n.LocaleNegotiation(primary, priorityListLocale);
+      i18n.localeFallbackList = I18n.localeNegotiation(primary, priorityListLocale);
     });
 
     it("Returns the proper string based on user setting", () => {
@@ -215,7 +215,7 @@ describe("I18n", () => {
     it("Successfully translates a LocaleLabel", () => {
       const primary = "es-MX";
       const priorityListLocale = [ "zh-Hant" ];
-      i18n.localeFallbackList = I18n.LocaleNegotiation(primary, priorityListLocale);
+      i18n.localeFallbackList = I18n.localeNegotiation(primary, priorityListLocale);
 
       i18n.addStrings({
         example: {
@@ -231,7 +231,7 @@ describe("I18n", () => {
     it("Falls back to the original label if unable to translate", () => {
       const primary = "es-MX";
       const priorityListLocale = [ "zh-Hant" ];
-      i18n.localeFallbackList = I18n.LocaleNegotiation(primary, priorityListLocale);
+      i18n.localeFallbackList = I18n.localeNegotiation(primary, priorityListLocale);
 
       const localeLabel = "%example.stringKey%";
 

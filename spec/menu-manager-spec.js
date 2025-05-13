@@ -107,7 +107,7 @@ describe('MenuManager', function() {
 
     it('translates LocaleLabels', function() {
       const I18n = require("../src/i18n.js");
-      atom.i18n.localeFallbackList = I18n.LocaleNegotiation(
+      atom.i18n.localeFallbackList = I18n.localeNegotiation(
         "es-MX",
         [ "zh-Hant" ]
       );
