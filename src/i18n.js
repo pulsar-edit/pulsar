@@ -180,8 +180,9 @@ class I18n {
     const stringLocales = keyPathHelpers.getValueAtKeyPath(this.strings, keyPath);
 
     if (typeof stringLocales !== "object") {
-      // If the keypath requested doesn't exist, return null
-      return null;
+      // If the keypath requested doesn't exist, return the original keyPath
+      // TODO Should we emit an event? Or append to the string why it coudln't be translated?
+      return keyPath;
     }
 
     let bestLocale;
@@ -205,14 +206,22 @@ class I18n {
     }
 
     if (!stringLocales[bestLocale]) {
-      // If we couldn't find any way to read the string, return null
-      return null;
+      // If we couldn't find any way to read the string, return the original keyPath
+      // TODO Should we emit an event? Or append to the string why it couldn't be translated?
+      return keyPath;
     }
 
-    const msg = new IntlMessageFormat(stringLocales[bestLocale], bestLocale, undefined, { formatters: this.formatters });
+    try {
+      const msg = new IntlMessageFormat(stringLocales[bestLocale], bestLocale, undefined, { formatters: this.formatters });
 
-    const msgFormatted = msg.format(opts);
-    return msgFormatted;
+      const msgFormatted = msg.format(opts);
+      return msgFormatted ?? keyPath;
+    } catch(err) {
+      console.error(err);
+      // We failed to translate the string with IntlMessageFormat, lets return
+      // the original keyPath.
+      return keyPath;
+    }
   }
 
   getT(namespace) {
