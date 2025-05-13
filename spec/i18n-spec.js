@@ -235,7 +235,7 @@ describe("I18n", () => {
 
       const localeLabel = "%example.stringKey%";
 
-      expect(i18n.translateLabel(localeLabel)).toEqual("%example.stringKey%");
+      expect(i18n.translateLabel(localeLabel)).toEqual("example.stringKey");
     });
   });
 });
