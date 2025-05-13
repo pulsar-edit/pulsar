@@ -50,7 +50,7 @@ describe("I18n", () => {
       const primaryLocale = "en-US";
       const priorityListLocale = [ "es-MX" ];
       const questionedLocale = "en";
-      const shouldBeIncluded = I18n.ShouldIncludeLocale(questionedLocale, { primary: primaryLocale, priorityList: priorityListLocale });
+      const shouldBeIncluded = I18n.shouldIncludeLocaleParameterized(questionedLocale, { primary: primaryLocale, priorityList: priorityListLocale });
       expect(shouldBeIncluded).toEqual(true);
     });
 
@@ -58,7 +58,7 @@ describe("I18n", () => {
       const primaryLocale = "zh-Hant";
       const priorityListLocale = [ "es-MX" ];
       const questionedLocale = "ja-JP";
-      const shouldBeIncluded = I18n.ShouldIncludeLocale(questionedLocale, { primary: primaryLocale, priorityList: priorityListLocale });
+      const shouldBeIncluded = I18n.shouldIncludeLocaleParameterized(questionedLocale, { primary: primaryLocale, priorityList: priorityListLocale });
       expect(shouldBeIncluded).toEqual(false);
     });
 
@@ -66,7 +66,7 @@ describe("I18n", () => {
       const primaryLocale = "zh-Hant";
       const priorityListLocale = [ "es-MX" ];
       const questionedLocale = "en";
-      const shouldBeIncluded = I18n.ShouldIncludeLocale(questionedLocale, { primary: primaryLocale, priorityList: priorityListLocale });
+      const shouldBeIncluded = I18n.shouldIncludeLocaleParameterized(questionedLocale, { primary: primaryLocale, priorityList: priorityListLocale });
       expect(shouldBeIncluded).toEqual(true);
     });
 
