@@ -50,19 +50,16 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                The Windows installer no longer removes <code>pulsar</code> and <code>ppm</code> from your path when you update Pulsar to a newer version.
+                Vastly improved support for right-to-left text editing — meaning languages like Arabic, Hebrew, and Farsi.
               </li>
               <li>
-                [spell-check] Removed <code>source comment</code> from the list of automatically checked scopes because of reports of high CPU usage. This means that Pulsar will no longer automatically perform spell-checking for all code comments in all source files. (If you liked the behavior, you can add it back to the list in the <code>spell-check.grammars</code> config setting.)
+                Added support for comments in JSON — both via a new grammar for <code>.jsonc</code> files and via a setting to enable comments in regular <code>.json</code> files.
               </li>
               <li>
-                [language-python] Improved indentation hinting in some unusual scenarios like on one-line blocks and after code comments.
+                Fixed performance issues that can arise when reopening a project with existing editor windows.
               </li>
               <li>
-                [language-css] Updated <code>tree-sitter-css</code> to latest. Selector handling is now much better when typing incomplete selectors in a brand-new CSS file or at the bottom of an existing file.
-              </li>
-              <li>
-                Restored functionality of <a href="https://web.pulsar-edit.dev/packages/project-plus">project-plus</a> via exposing previously removed internal APIs.
+                Updated DOMPurify. This is a security fix.
               </li>
             </ul>
 

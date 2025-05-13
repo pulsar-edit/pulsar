@@ -144,7 +144,7 @@ describe('MenuManager', function() {
       atom.keymaps.add('test', { 'atom-workspace': { 'ctrl-b': 'b' } });
       menu.update();
       advanceClock(1);
-      expect(menu.sendToBrowserProcess.argsForCall[0][1]['b']).toEqual([
+      expect(menu.sendToBrowserProcess.calls.argsFor(0)[1]['b']).toEqual([
         'ctrl-b'
       ]);
     });
@@ -156,7 +156,7 @@ describe('MenuManager', function() {
       atom.keymaps.add('test', { 'atom-workspace': { 'ctrl-b': 'b' } });
       atom.keymaps.add('test', { 'atom-text-editor': { 'ctrl-b': 'unset!' } });
       advanceClock(1);
-      expect(menu.sendToBrowserProcess.argsForCall[0][1]['b']).toBeUndefined();
+      expect(menu.sendToBrowserProcess.calls.argsFor(0)[1]['b']).toBeUndefined();
     });
 
     it('omits key bindings that could conflict with AltGraph characters on macOS', function() {
@@ -181,9 +181,9 @@ describe('MenuManager', function() {
       });
 
       advanceClock(1);
-      expect(menu.sendToBrowserProcess.argsForCall[0][1]['b']).toBeUndefined();
-      expect(menu.sendToBrowserProcess.argsForCall[0][1]['c']).toBeUndefined();
-      expect(menu.sendToBrowserProcess.argsForCall[0][1]['d']).toEqual([
+      expect(menu.sendToBrowserProcess.calls.argsFor(0)[1]['b']).toBeUndefined();
+      expect(menu.sendToBrowserProcess.calls.argsFor(0)[1]['c']).toBeUndefined();
+      expect(menu.sendToBrowserProcess.calls.argsFor(0)[1]['d']).toEqual([
         'alt-cmd-d'
       ]);
     });
@@ -210,9 +210,9 @@ describe('MenuManager', function() {
       });
 
       advanceClock(1);
-      expect(menu.sendToBrowserProcess.argsForCall[0][1]['b']).toBeUndefined();
-      expect(menu.sendToBrowserProcess.argsForCall[0][1]['c']).toBeUndefined();
-      expect(menu.sendToBrowserProcess.argsForCall[0][1]['d']).toEqual([
+      expect(menu.sendToBrowserProcess.calls.argsFor(0)[1]['b']).toBeUndefined();
+      expect(menu.sendToBrowserProcess.calls.argsFor(0)[1]['c']).toBeUndefined();
+      expect(menu.sendToBrowserProcess.calls.argsFor(0)[1]['d']).toEqual([
         'ctrl-alt-cmd-d'
       ]);
     });

@@ -103,7 +103,7 @@
 ; exclude them from the next query.
 (assignment_expression
   left: (member_expression
-    property: (property_identifier) @variable.other.assignment.property.js)
+    property: [(property_identifier) (private_property_identifier)] @variable.other.assignment.property.js)
   right: [(arrow_function) (function_expression)] @_IGNORE_
     (#set! isFunctionProperty true))
 
@@ -117,7 +117,8 @@
 ; The "bar" in `foo.#bar = true`.
 (assignment_expression
   left: (member_expression
-    property: (private_property_identifier) @variable.other.assignment.property.private.js))
+    property: (private_property_identifier) @variable.other.assignment.property.private.js)
+    (#set! capture.final))
 
 ; The "foo" in `foo += 1`.
 (augmented_assignment_expression
@@ -956,6 +957,8 @@
     (#set! prohibitsOptionalChaining true))
 
 ((optional_chain) @invalid.illegal.optional-chain.js
+  ; Ensure this doesn't trigger on zero-content MISSING nodes.
+  (#eq? @invalid.illegal.optional-chain.js "?.")
   (#is? test.descendantOfNodeWithData prohibitsOptionalChaining))
 
 

@@ -6,7 +6,7 @@ const temp = require('temp').track();
 const fs = require('fs-plus');
 const { Disposable } = require('atom');
 const { buildKeydownEvent } = require('../src/keymap-extensions');
-const { mockLocalStorage } = require('./spec-helper');
+const { mockLocalStorage } = require('./helpers/mock-local-storage');
 const ModuleCache = require('../src/module-cache');
 
 describe('PackageManager', () => {
@@ -103,14 +103,14 @@ describe('PackageManager', () => {
     });
 
     it('returns the package if it has an invalid keymap', () => {
-      spyOn(atom, 'inSpecMode').andReturn(false);
+      spyOn(atom, 'inSpecMode').and.returnValue(false);
       const pack = atom.packages.loadPackage('package-with-broken-keymap');
       expect(pack instanceof Package).toBe(true);
       expect(pack.metadata.name).toBe('package-with-broken-keymap');
     });
 
     it('returns the package if it has an invalid stylesheet', () => {
-      spyOn(atom, 'inSpecMode').andReturn(false);
+      spyOn(atom, 'inSpecMode').and.returnValue(false);
       const pack = atom.packages.loadPackage('package-with-invalid-styles');
       expect(pack instanceof Package).toBe(true);
       expect(pack.metadata.name).toBe('package-with-invalid-styles');
@@ -119,27 +119,27 @@ describe('PackageManager', () => {
       const addErrorHandler = jasmine.createSpy();
       atom.notifications.onDidAddNotification(addErrorHandler);
       expect(() => pack.reloadStylesheets()).not.toThrow();
-      expect(addErrorHandler.callCount).toBe(2);
-      expect(addErrorHandler.argsForCall[1][0].message).toContain(
+      expect(addErrorHandler.calls.count()).toBe(2);
+      expect(addErrorHandler.calls.argsFor(1)[0].message).toContain(
         'Failed to reload the package-with-invalid-styles package stylesheets'
       );
-      expect(addErrorHandler.argsForCall[1][0].options.packageName).toEqual(
+      expect(addErrorHandler.calls.argsFor(1)[0].options.packageName).toEqual(
         'package-with-invalid-styles'
       );
     });
 
     it('returns null if the package has an invalid package.json', () => {
-      spyOn(atom, 'inSpecMode').andReturn(false);
+      spyOn(atom, 'inSpecMode').and.returnValue(false);
       const addErrorHandler = jasmine.createSpy();
       atom.notifications.onDidAddNotification(addErrorHandler);
       expect(
         atom.packages.loadPackage('package-with-broken-package-json')
       ).toBeNull();
-      expect(addErrorHandler.callCount).toBe(1);
-      expect(addErrorHandler.argsForCall[0][0].message).toContain(
+      expect(addErrorHandler.calls.count()).toBe(1);
+      expect(addErrorHandler.calls.argsFor(0)[0].message).toContain(
         'Failed to load the package-with-broken-package-json package'
       );
-      expect(addErrorHandler.argsForCall[0][0].options.packageName).toEqual(
+      expect(addErrorHandler.calls.argsFor(0)[0].options.packageName).toEqual(
         'package-with-broken-package-json'
       );
     });
@@ -176,8 +176,8 @@ describe('PackageManager', () => {
       expect(
         atom.packages.loadPackage('this-package-cannot-be-found')
       ).toBeNull();
-      expect(console.warn.callCount).toBe(1);
-      expect(console.warn.argsForCall[0][0]).toContain('Could not resolve');
+      expect(console.warn.calls.count()).toBe(1);
+      expect(console.warn.calls.argsFor(0)[0]).toContain('Could not resolve');
     });
 
     it('invokes ::onDidLoadPackage listeners with the loaded package', () => {
@@ -258,18 +258,18 @@ describe('PackageManager', () => {
       it("registers the view providers when any of the package's deserializers are used", () => {
         atom.packages.loadPackage('package-with-view-providers');
 
-        spyOn(atom.views, 'addViewProvider').andCallThrough();
+        spyOn(atom.views, 'addViewProvider').and.callThrough();
         atom.deserializers.deserialize({
           deserializer: 'DeserializerFromPackageWithViewProviders',
           a: 'b'
         });
-        expect(atom.views.addViewProvider.callCount).toBe(2);
+        expect(atom.views.addViewProvider.calls.count()).toBe(2);
 
         atom.deserializers.deserialize({
           deserializer: 'DeserializerFromPackageWithViewProviders',
           a: 'b'
         });
-        expect(atom.views.addViewProvider.callCount).toBe(2);
+        expect(atom.views.addViewProvider.calls.count()).toBe(2);
 
         const element1 = atom.views.getView(model1);
         expect(element1 instanceof HTMLDivElement).toBe(true);
@@ -597,18 +597,18 @@ describe('PackageManager', () => {
   describe('::activatePackage(id)', () => {
     describe('when called multiple times', () => {
       it('it only calls activate on the package once', async () => {
-        spyOn(Package.prototype, 'activateNow').andCallThrough();
+        spyOn(Package.prototype, 'activateNow').and.callThrough();
         await atom.packages.activatePackage('package-with-index');
         await atom.packages.activatePackage('package-with-index');
         await atom.packages.activatePackage('package-with-index');
 
-        expect(Package.prototype.activateNow.callCount).toBe(1);
+        expect(Package.prototype.activateNow.calls.count()).toBe(1);
       });
     });
 
     describe('when the package has a main module', () => {
       beforeEach(() => {
-        spyOn(Package.prototype, 'requireMainModule').andCallThrough();
+        spyOn(Package.prototype, 'requireMainModule').and.callThrough();
       });
 
       describe('when the metadata specifies a main module path˜', () => {
@@ -665,7 +665,7 @@ describe('PackageManager', () => {
           jasmine.attachToDOM(atom.workspace.getElement());
           mainModule = require('./fixtures/packages/package-with-activation-commands/index');
           mainModule.activationCommandCallCount = 0;
-          spyOn(mainModule, 'activate').andCallThrough();
+          spyOn(mainModule, 'activate').and.callThrough();
 
           workspaceCommandListener = jasmine.createSpy(
             'workspaceCommandListener'
@@ -689,7 +689,7 @@ describe('PackageManager', () => {
         });
 
         it('defers requiring/activating the main module until an activation event bubbles to the root view', async () => {
-          expect(Package.prototype.requireMainModule.callCount).toBe(0);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(0);
 
           atom.workspace
             .getElement()
@@ -698,7 +698,7 @@ describe('PackageManager', () => {
             );
 
           await promise;
-          expect(Package.prototype.requireMainModule.callCount).toBe(1);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(1);
         });
 
         it('triggers the activation event on all handlers registered during activation', async () => {
@@ -717,31 +717,31 @@ describe('PackageManager', () => {
           );
 
           atom.commands.dispatch(editorElement, 'activation-command');
-          expect(mainModule.activate.callCount).toBe(1);
+          expect(mainModule.activate.calls.count()).toBe(1);
           expect(mainModule.activationCommandCallCount).toBe(1);
-          expect(editorCommandListener.callCount).toBe(1);
-          expect(workspaceCommandListener.callCount).toBe(1);
+          expect(editorCommandListener.calls.count()).toBe(1);
+          expect(workspaceCommandListener.calls.count()).toBe(1);
 
           atom.commands.dispatch(editorElement, 'activation-command');
           expect(mainModule.activationCommandCallCount).toBe(2);
-          expect(editorCommandListener.callCount).toBe(2);
-          expect(workspaceCommandListener.callCount).toBe(2);
-          expect(mainModule.activate.callCount).toBe(1);
+          expect(editorCommandListener.calls.count()).toBe(2);
+          expect(workspaceCommandListener.calls.count()).toBe(2);
+          expect(mainModule.activate.calls.count()).toBe(1);
         });
 
         it('activates the package immediately when the events are empty', async () => {
           mainModule = require('./fixtures/packages/package-with-empty-activation-commands/index');
-          spyOn(mainModule, 'activate').andCallThrough();
+          spyOn(mainModule, 'activate').and.callThrough();
 
           atom.packages.activatePackage(
             'package-with-empty-activation-commands'
           );
 
-          expect(mainModule.activate.callCount).toBe(1);
+          expect(mainModule.activate.calls.count()).toBe(1);
         });
 
         it('adds a notification when the activation commands are invalid', () => {
-          spyOn(atom, 'inSpecMode').andReturn(false);
+          spyOn(atom, 'inSpecMode').and.returnValue(false);
           const addErrorHandler = jasmine.createSpy();
           atom.notifications.onDidAddNotification(addErrorHandler);
           expect(() =>
@@ -749,27 +749,27 @@ describe('PackageManager', () => {
               'package-with-invalid-activation-commands'
             )
           ).not.toThrow();
-          expect(addErrorHandler.callCount).toBe(1);
-          expect(addErrorHandler.argsForCall[0][0].message).toContain(
+          expect(addErrorHandler.calls.count()).toBe(1);
+          expect(addErrorHandler.calls.argsFor(0)[0].message).toContain(
             'Failed to activate the package-with-invalid-activation-commands package'
           );
-          expect(addErrorHandler.argsForCall[0][0].options.packageName).toEqual(
+          expect(addErrorHandler.calls.argsFor(0)[0].options.packageName).toEqual(
             'package-with-invalid-activation-commands'
           );
         });
 
         it('adds a notification when the context menu is invalid', () => {
-          spyOn(atom, 'inSpecMode').andReturn(false);
+          spyOn(atom, 'inSpecMode').and.returnValue(false);
           const addErrorHandler = jasmine.createSpy();
           atom.notifications.onDidAddNotification(addErrorHandler);
           expect(() =>
             atom.packages.activatePackage('package-with-invalid-context-menu')
           ).not.toThrow();
-          expect(addErrorHandler.callCount).toBe(1);
-          expect(addErrorHandler.argsForCall[0][0].message).toContain(
+          expect(addErrorHandler.calls.count()).toBe(1);
+          expect(addErrorHandler.calls.argsFor(0)[0].message).toContain(
             'Failed to activate the package-with-invalid-context-menu package'
           );
-          expect(addErrorHandler.argsForCall[0][0].options.packageName).toEqual(
+          expect(addErrorHandler.calls.argsFor(0)[0].options.packageName).toEqual(
             'package-with-invalid-context-menu'
           );
         });
@@ -826,10 +826,10 @@ describe('PackageManager', () => {
 
         beforeEach(() => {
           jasmine.attachToDOM(atom.workspace.getElement());
-          spyOn(atom.packages, 'hasActivatedInitialPackages').andReturn(true);
+          spyOn(atom.packages, 'hasActivatedInitialPackages').and.returnValue(true);
           mainModule = require('./fixtures/packages/package-with-activation-commands-and-deserializers/index');
           mainModule.activationCommandCallCount = 0;
-          spyOn(mainModule, 'activate').andCallThrough();
+          spyOn(mainModule, 'activate').and.callThrough();
           workspaceCommandListener = jasmine.createSpy(
             'workspaceCommandListener'
           );
@@ -852,7 +852,7 @@ describe('PackageManager', () => {
         });
 
         it('activates the package when a deserializer is called', async () => {
-          expect(Package.prototype.requireMainModule.callCount).toBe(0);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(0);
 
           const state1 = { deserializer: 'Deserializer1', a: 'b' };
           expect(atom.deserializers.deserialize(state1, atom)).toEqual({
@@ -861,11 +861,11 @@ describe('PackageManager', () => {
           });
 
           await promise;
-          expect(Package.prototype.requireMainModule.callCount).toBe(1);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(1);
         });
 
         it('defers requiring/activating the main module until an activation event bubbles to the root view', async () => {
-          expect(Package.prototype.requireMainModule.callCount).toBe(0);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(0);
 
           atom.workspace
             .getElement()
@@ -874,9 +874,9 @@ describe('PackageManager', () => {
             );
 
           await promise;
-          expect(mainModule.activate.callCount).toBe(1);
+          expect(mainModule.activate.calls.count()).toBe(1);
           expect(mainModule.activationCommandCallCount).toBe(1);
-          expect(Package.prototype.requireMainModule.callCount).toBe(1);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(1);
         });
       });
 
@@ -885,35 +885,35 @@ describe('PackageManager', () => {
 
         beforeEach(() => {
           mainModule = require('./fixtures/packages/package-with-activation-hooks/index');
-          spyOn(mainModule, 'activate').andCallThrough();
+          spyOn(mainModule, 'activate').and.callThrough();
         });
 
         it('defers requiring/activating the main module until an triggering of an activation hook occurs', async () => {
           promise = atom.packages.activatePackage(
             'package-with-activation-hooks'
           );
-          expect(Package.prototype.requireMainModule.callCount).toBe(0);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(0);
           atom.packages.triggerActivationHook(
             'language-fictitious:grammar-used'
           );
           atom.packages.triggerDeferredActivationHooks();
 
           await promise;
-          expect(Package.prototype.requireMainModule.callCount).toBe(1);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(1);
         });
 
         it('does not double register activation hooks when deactivating and reactivating', async () => {
           promise = atom.packages.activatePackage(
             'package-with-activation-hooks'
           );
-          expect(mainModule.activate.callCount).toBe(0);
+          expect(mainModule.activate.calls.count()).toBe(0);
           atom.packages.triggerActivationHook(
             'language-fictitious:grammar-used'
           );
           atom.packages.triggerDeferredActivationHooks();
 
           await promise;
-          expect(mainModule.activate.callCount).toBe(1);
+          expect(mainModule.activate.calls.count()).toBe(1);
 
           await atom.packages.deactivatePackage(
             'package-with-activation-hooks'
@@ -928,20 +928,20 @@ describe('PackageManager', () => {
           atom.packages.triggerDeferredActivationHooks();
 
           await promise;
-          expect(mainModule.activate.callCount).toBe(2);
+          expect(mainModule.activate.calls.count()).toBe(2);
         });
 
         it('activates the package immediately when activationHooks is empty', async () => {
           mainModule = require('./fixtures/packages/package-with-empty-activation-hooks/index');
-          spyOn(mainModule, 'activate').andCallThrough();
+          spyOn(mainModule, 'activate').and.callThrough();
 
-          expect(Package.prototype.requireMainModule.callCount).toBe(0);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(0);
 
           await atom.packages.activatePackage(
             'package-with-empty-activation-hooks'
           );
-          expect(mainModule.activate.callCount).toBe(1);
-          expect(Package.prototype.requireMainModule.callCount).toBe(1);
+          expect(mainModule.activate.calls.count()).toBe(1);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(1);
         });
 
         it('activates the package immediately if the activation hook had already been triggered', async () => {
@@ -949,11 +949,11 @@ describe('PackageManager', () => {
             'language-fictitious:grammar-used'
           );
           atom.packages.triggerDeferredActivationHooks();
-          expect(Package.prototype.requireMainModule.callCount).toBe(0);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(0);
 
           await atom.packages.activatePackage('package-with-activation-hooks');
-          expect(mainModule.activate.callCount).toBe(1);
-          expect(Package.prototype.requireMainModule.callCount).toBe(1);
+          expect(mainModule.activate.calls.count()).toBe(1);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(1);
         });
       });
 
@@ -962,28 +962,28 @@ describe('PackageManager', () => {
 
         beforeEach(() => {
           mainModule = require('./fixtures/packages/package-with-workspace-openers/index');
-          spyOn(mainModule, 'activate').andCallThrough();
+          spyOn(mainModule, 'activate').and.callThrough();
         });
 
         it('defers requiring/activating the main module until a registered opener is called', async () => {
           promise = atom.packages.activatePackage(
             'package-with-workspace-openers'
           );
-          expect(Package.prototype.requireMainModule.callCount).toBe(0);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(0);
           atom.workspace.open('atom://fictitious');
 
           await promise;
-          expect(Package.prototype.requireMainModule.callCount).toBe(1);
+          expect(Package.prototype.requireMainModule.calls.count()).toBe(1);
           expect(mainModule.openerCount).toBe(1);
         });
 
         it('activates the package immediately when the events are empty', async () => {
           mainModule = require('./fixtures/packages/package-with-empty-workspace-openers/index');
-          spyOn(mainModule, 'activate').andCallThrough();
+          spyOn(mainModule, 'activate').and.callThrough();
 
           atom.packages.activatePackage('package-with-empty-workspace-openers');
 
-          expect(mainModule.activate.callCount).toBe(1);
+          expect(mainModule.activate.calls.count()).toBe(1);
         });
       });
     });
@@ -991,7 +991,7 @@ describe('PackageManager', () => {
     describe('when the package has no main module', () => {
       it('does not throw an exception', () => {
         spyOn(console, 'error');
-        spyOn(console, 'warn').andCallThrough();
+        spyOn(console, 'warn').and.callThrough();
         expect(() =>
           atom.packages.activatePackage('package-without-module')
         ).not.toThrow();
@@ -1017,7 +1017,7 @@ describe('PackageManager', () => {
       atom.packages.serializePackage('package-with-serialization');
       await atom.packages.deactivatePackage('package-with-serialization');
 
-      spyOn(pack.mainModule, 'activate').andCallThrough();
+      spyOn(pack.mainModule, 'activate').and.callThrough();
       await atom.packages.activatePackage('package-with-serialization');
       expect(pack.mainModule.activate).toHaveBeenCalledWith({ someNumber: 77 });
     });
@@ -1034,18 +1034,18 @@ describe('PackageManager', () => {
 
     describe("when the package's main module throws an error on load", () => {
       it('adds a notification instead of throwing an exception', () => {
-        spyOn(atom, 'inSpecMode').andReturn(false);
+        spyOn(atom, 'inSpecMode').and.returnValue(false);
         atom.config.set('core.disabledPackages', []);
         const addErrorHandler = jasmine.createSpy();
         atom.notifications.onDidAddNotification(addErrorHandler);
         expect(() =>
           atom.packages.activatePackage('package-that-throws-an-exception')
         ).not.toThrow();
-        expect(addErrorHandler.callCount).toBe(1);
-        expect(addErrorHandler.argsForCall[0][0].message).toContain(
+        expect(addErrorHandler.calls.count()).toBe(1);
+        expect(addErrorHandler.calls.argsFor(0)[0].message).toContain(
           'Failed to load the package-that-throws-an-exception package'
         );
-        expect(addErrorHandler.argsForCall[0][0].options.packageName).toEqual(
+        expect(addErrorHandler.calls.argsFor(0)[0].options.packageName).toEqual(
           'package-that-throws-an-exception'
         );
       });
@@ -1054,7 +1054,7 @@ describe('PackageManager', () => {
         atom.config.set('core.disabledPackages', []);
         expect(() =>
           atom.packages.activatePackage('package-that-throws-an-exception')
-        ).toThrow('This package throws an exception');
+        ).toThrowError('This package throws an exception');
       });
     });
 
@@ -1067,7 +1067,7 @@ describe('PackageManager', () => {
           await atom.packages.activatePackage('this-doesnt-exist');
           expect('Error to be thrown').toBe('');
         } catch (error) {
-          expect(console.warn.callCount).toBe(1);
+          expect(console.warn.calls.count()).toBe(1);
           expect(error.message).toContain(
             "Failed to load package 'this-doesnt-exist'"
           );
@@ -1234,7 +1234,7 @@ describe('PackageManager', () => {
 
         beforeEach(() => {
           userKeymapPath = path.join(temp.mkdirSync(), 'user-keymaps.cson');
-          spyOn(atom.keymaps, 'getUserKeymapPath').andReturn(userKeymapPath);
+          spyOn(atom.keymaps, 'getUserKeymapPath').and.returnValue(userKeymapPath);
 
           element = createTestElement('test-1');
           jasmine.attachToDOM(element);
@@ -1461,7 +1461,7 @@ describe('PackageManager', () => {
         const uri = 'atom://package-with-uri-handler/some/url?with=args';
         const mod = require('./fixtures/packages/package-with-uri-handler');
         spyOn(mod, 'handleURI');
-        spyOn(atom.packages, 'hasLoadedInitialPackages').andReturn(true);
+        spyOn(atom.packages, 'hasLoadedInitialPackages').and.returnValue(true);
         const activationPromise = atom.packages.activatePackage(
           'package-with-uri-handler'
         );
@@ -1478,17 +1478,17 @@ describe('PackageManager', () => {
         let firstServiceV3Disposed = false;
         let firstServiceV4Disposed = false;
         let secondServiceDisposed = false;
-        spyOn(consumerModule, 'consumeFirstServiceV3').andReturn(
+        spyOn(consumerModule, 'consumeFirstServiceV3').and.returnValue(
           new Disposable(() => {
             firstServiceV3Disposed = true;
           })
         );
-        spyOn(consumerModule, 'consumeFirstServiceV4').andReturn(
+        spyOn(consumerModule, 'consumeFirstServiceV4').and.returnValue(
           new Disposable(() => {
             firstServiceV4Disposed = true;
           })
         );
-        spyOn(consumerModule, 'consumeSecondService').andReturn(
+        spyOn(consumerModule, 'consumeSecondService').and.returnValue(
           new Disposable(() => {
             secondServiceDisposed = true;
           })
@@ -1496,7 +1496,7 @@ describe('PackageManager', () => {
 
         await atom.packages.activatePackage('package-with-consumed-services');
         await atom.packages.activatePackage('package-with-provided-services');
-        expect(consumerModule.consumeFirstServiceV3.callCount).toBe(1);
+        expect(consumerModule.consumeFirstServiceV3.calls.count()).toBe(1);
         expect(consumerModule.consumeFirstServiceV3).toHaveBeenCalledWith(
           'first-service-v3'
         );
@@ -1507,9 +1507,9 @@ describe('PackageManager', () => {
           'second-service'
         );
 
-        consumerModule.consumeFirstServiceV3.reset();
-        consumerModule.consumeFirstServiceV4.reset();
-        consumerModule.consumeSecondService.reset();
+        consumerModule.consumeFirstServiceV3.calls.reset();
+        consumerModule.consumeFirstServiceV4.calls.reset();
+        consumerModule.consumeSecondService.calls.reset();
 
         await atom.packages.deactivatePackage('package-with-provided-services');
         expect(firstServiceV3Disposed).toBe(true);
@@ -1543,20 +1543,20 @@ describe('PackageManager', () => {
             'package-with-missing-provided-services'
           )
         ).toBe(true);
-        expect(addErrorHandler.callCount).toBe(0);
+        expect(addErrorHandler.calls.count()).toBe(0);
       });
     });
   });
 
   describe('::serialize', () => {
     it('does not serialize packages that threw an error during activation', async () => {
-      spyOn(atom, 'inSpecMode').andReturn(false);
+      spyOn(atom, 'inSpecMode').and.returnValue(false);
       spyOn(console, 'warn');
 
       const badPack = await atom.packages.activatePackage(
         'package-that-throws-on-activate'
       );
-      spyOn(badPack.mainModule, 'serialize').andCallThrough();
+      spyOn(badPack.mainModule, 'serialize').and.callThrough();
 
       atom.packages.serialize();
       expect(badPack.mainModule.serialize).not.toHaveBeenCalled();
@@ -1599,7 +1599,7 @@ describe('PackageManager', () => {
     afterEach(() => atom.packages.unloadPackages());
 
     it("calls `deactivate` on the package's main module if activate was successful", async () => {
-      spyOn(atom, 'inSpecMode').andReturn(false);
+      spyOn(atom, 'inSpecMode').and.returnValue(false);
 
       const pack = await atom.packages.activatePackage(
         'package-with-deactivate'
@@ -1607,7 +1607,7 @@ describe('PackageManager', () => {
       expect(
         atom.packages.isPackageActive('package-with-deactivate')
       ).toBeTruthy();
-      spyOn(pack.mainModule, 'deactivate').andCallThrough();
+      spyOn(pack.mainModule, 'deactivate').and.callThrough();
 
       await atom.packages.deactivatePackage('package-with-deactivate');
       expect(pack.mainModule.deactivate).toHaveBeenCalled();
@@ -1620,7 +1620,7 @@ describe('PackageManager', () => {
       expect(
         atom.packages.isPackageActive('package-that-throws-on-activate')
       ).toBeTruthy();
-      spyOn(badPack.mainModule, 'deactivate').andCallThrough();
+      spyOn(badPack.mainModule, 'deactivate').and.callThrough();
 
       await atom.packages.deactivatePackage('package-that-throws-on-activate');
       expect(badPack.mainModule.deactivate).not.toHaveBeenCalled();
@@ -1713,7 +1713,7 @@ describe('PackageManager', () => {
 
   describe('::activate()', () => {
     beforeEach(() => {
-      spyOn(atom, 'inSpecMode').andReturn(false);
+      spyOn(atom, 'inSpecMode').and.returnValue(false);
       jasmine.snapshotDeprecations();
       spyOn(console, 'warn');
       atom.packages.loadPackages();
@@ -1729,7 +1729,7 @@ describe('PackageManager', () => {
     });
 
     it('sets hasActivatedInitialPackages', async () => {
-      spyOn(atom.styles, 'getUserStyleSheetPath').andReturn(null);
+      spyOn(atom.styles, 'getUserStyleSheetPath').and.returnValue(null);
       spyOn(atom.packages, 'activatePackages');
       expect(atom.packages.hasActivatedInitialPackages()).toBe(false);
 
@@ -1746,12 +1746,12 @@ describe('PackageManager', () => {
       expect(packageActivator).toHaveBeenCalled();
       expect(themeActivator).toHaveBeenCalled();
 
-      const packages = packageActivator.mostRecentCall.args[0];
+      const packages = packageActivator.calls.mostRecent().args[0];
       for (let pack of packages) {
         expect(['atom', 'textmate']).toContain(pack.getType());
       }
 
-      const themes = themeActivator.mostRecentCall.args[0];
+      const themes = themeActivator.calls.mostRecent().args[0];
       themes.map(theme => expect(['theme']).toContain(theme.getType()));
     });
 
@@ -1761,7 +1761,7 @@ describe('PackageManager', () => {
       const package3 = atom.packages.loadPackage(
         'package-with-activation-commands'
       );
-      spyOn(atom.packages, 'getLoadedPackages').andReturn([
+      spyOn(atom.packages, 'getLoadedPackages').and.returnValue([
         package1,
         package2,
         package3
@@ -1820,7 +1820,7 @@ describe('PackageManager', () => {
       it('returns null if the package cannot be loaded', () => {
         spyOn(console, 'warn');
         expect(atom.packages.enablePackage('this-doesnt-exist')).toBeNull();
-        expect(console.warn.callCount).toBe(1);
+        expect(console.warn.calls.count()).toBe(1);
       });
 
       it('does not disable an already disabled package', () => {

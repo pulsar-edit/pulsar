@@ -8,4 +8,11 @@
   (compound_statement)
   (switch_block)
   (declaration_list)
+  (array_creation_expression)
 ] @fold
+
+; Fold multiline comments. Should work with both ordinary multiline comments
+; and PHPDoc-style comments.
+((comment) @fold
+  (#set! fold.endAt endPosition)
+  (#set! fold.offsetEnd -2))

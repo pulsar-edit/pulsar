@@ -940,6 +940,8 @@
     (#set! prohibitsOptionalChaining true))
 
 ((optional_chain) @invalid.illegal.optional-chain._LANG_
+  ; Ensure this doesn't trigger on zero-content MISSING nodes.
+  (#eq? @invalid.illegal.optional-chain._LANG_ "?.")
   (#is? test.descendantOfNodeWithData prohibitsOptionalChaining))
 
 (ternary_expression

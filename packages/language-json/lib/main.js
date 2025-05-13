@@ -1,13 +1,15 @@
-exports.activate = () => {
-  const HYPERLINK_PATTERN = /\bhttps?:/
-  
-  atom.grammars.addInjectionPoint('source.json', {
-    type: 'string_content',
-    language: (node) => {
-      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
-    },
-    content: (node) => node,
-    languageScope: null
-  });
+const ROOT_SCOPES = ['source.json', 'source.json.jsonc'];
 
+exports.consumeHyperlinkInjection = (hyperlink) => {
+  for (let rootScope of ROOT_SCOPES) {
+    hyperlink.addInjectionPoint(rootScope, {
+      types: ['comment', 'string_content']
+    });
+  }
+};
+
+exports.consumeTodoInjection = (todo) => {
+  for (let rootScope of ROOT_SCOPES) {
+    todo.addInjectionPoint(rootScope, { types: ['comment'] });
+  }
 };

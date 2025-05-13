@@ -2,13 +2,10 @@
 describe('Python regular expression grammar', () => {
   let grammar = null;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     atom.config.set('core.useTreeSitterParsers', false);
-
-
-    waitsForPromise(() => atom.packages.activatePackage('language-python'));
-
-    runs(() => grammar = atom.grammars.grammarForScopeName('source.regexp.python'));
+    await atom.packages.activatePackage('language-python');
+    grammar = atom.grammars.grammarForScopeName('source.regexp.python');
   });
 
   describe('character classes', () => {

@@ -46,7 +46,7 @@ describe('TreeSitterLanguageMode', () => {
   });
 
   describe('highlighting', () => {
-    it('applies the most specific scope mapping to each node in the syntax tree', async () => {
+    it('applies the most specific scope mapping to each node in the syntax tree', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: {
@@ -75,7 +75,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('provides the grammar with the text of leaf nodes only', async () => {
+    it('provides the grammar with the text of leaf nodes only', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: {
@@ -127,7 +127,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('can start or end multiple scopes at the same position', async () => {
+    it('can start or end multiple scopes at the same position', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: {
@@ -158,7 +158,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('can resume highlighting on a line that starts with whitespace', async () => {
+    it('can resume highlighting on a line that starts with whitespace', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: {
@@ -185,7 +185,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('correctly skips over tokens with zero size', async () => {
+    it('correctly skips over tokens with zero size', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, cGrammarPath, {
         parser: 'tree-sitter-c',
         scopes: {
@@ -232,7 +232,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it("updates lines' highlighting when they are affected by distant changes", async () => {
+    it("updates lines' highlighting when they are affected by distant changes", () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: {
@@ -263,7 +263,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('allows comma-separated selectors as scope mapping keys', async () => {
+    it('allows comma-separated selectors as scope mapping keys', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: {
@@ -292,7 +292,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('handles edits after tokens that end between CR and LF characters (regression)', async () => {
+    it('handles edits after tokens that end between CR and LF characters (regression)', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: {
@@ -332,7 +332,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('handles multi-line nodes with children on different lines (regression)', async () => {
+    it('handles multi-line nodes with children on different lines (regression)', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: {
@@ -365,7 +365,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('handles folds inside of highlighted tokens', async () => {
+    it('handles folds inside of highlighted tokens', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: {
@@ -398,7 +398,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('applies regex match rules when specified', async () => {
+    it('applies regex match rules when specified', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: {
@@ -430,7 +430,7 @@ describe('TreeSitterLanguageMode', () => {
       ]);
     });
 
-    it('handles nodes that start before their first child and end after their last child', async () => {
+    it('handles nodes that start before their first child and end after their last child', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, rubyGrammarPath, {
         parser: 'tree-sitter-ruby',
         scopes: {
@@ -662,7 +662,7 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('highlights the content after injections', async () => {
+      it('highlights the content after injections', () => {
         atom.grammars.addGrammar(jsGrammar);
         atom.grammars.addGrammar(htmlGrammar);
         buffer.setText('<script>\nhello();\n</script>\n<div>\n</div>');
@@ -758,7 +758,7 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('handles injections that intersect', async () => {
+      it('handles injections that intersect', () => {
         const ejsGrammar = new TreeSitterGrammar(
           atom.grammars,
           ejsGrammarPath,
@@ -894,7 +894,7 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('terminates comment token at the end of an injection, so that the next injection is NOT a continuation of the comment', async () => {
+      it('terminates comment token at the end of an injection, so that the next injection is NOT a continuation of the comment', () => {
         const ejsGrammar = new TreeSitterGrammar(
           atom.grammars,
           ejsGrammarPath,
@@ -958,7 +958,7 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('only covers scope boundaries in parent layers if a nested layer has a boundary at the same position', async () => {
+      it('only covers scope boundaries in parent layers if a nested layer has a boundary at the same position', () => {
         const jsdocGrammar = new TreeSitterGrammar(
           atom.grammars,
           jsdocGrammarPath,
@@ -1023,7 +1023,7 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('respects the `includeChildren` property of injection points', async () => {
+      it('respects the `includeChildren` property of injection points', () => {
         const rustGrammar = new TreeSitterGrammar(
           atom.grammars,
           rustGrammarPath,
@@ -1142,12 +1142,12 @@ describe('TreeSitterLanguageMode', () => {
     let originalTimeout;
 
     beforeEach(() => {
-      originalTimeout = jasmine.getEnv().defaultTimeoutInterval;
-      jasmine.getEnv().defaultTimeoutInterval = 60 * 1000;
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
     });
 
     afterEach(() => {
-      jasmine.getEnv().defaultTimeoutInterval = originalTimeout;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     });
 
     it('matches the highlighting of a freshly-opened editor', async () => {
@@ -1223,21 +1223,13 @@ describe('TreeSitterLanguageMode', () => {
           const tokens1 = editor.tokensForScreenRow(j);
           const tokens2 = editor2.tokensForScreenRow(j);
           expect(tokens1).toEqual(tokens2, `Seed: ${seed}, screen line: ${j}`);
-          if (jasmine.getEnv().currentSpec.results().failedCount > 0) {
-            console.log(tokens1);
-            console.log(tokens2);
-            debugger; // eslint-disable-line no-debugger
-            break;
-          }
         }
-
-        if (jasmine.getEnv().currentSpec.results().failedCount > 0) break;
       }
     });
   });
 
   describe('folding', () => {
-    it('can fold nodes that start and end with specified tokens', async () => {
+    it('can fold nodes that start and end with specified tokens', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         folds: [
@@ -1292,7 +1284,7 @@ describe('TreeSitterLanguageMode', () => {
       `);
     });
 
-    it('folds entire buffer rows when necessary to keep words on separate lines', async () => {
+    it('folds entire buffer rows when necessary to keep words on separate lines', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         folds: [
@@ -1340,7 +1332,7 @@ describe('TreeSitterLanguageMode', () => {
       `);
     });
 
-    it('can fold nodes of specified types', async () => {
+    it('can fold nodes of specified types', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         folds: [
@@ -1401,7 +1393,7 @@ describe('TreeSitterLanguageMode', () => {
       `);
     });
 
-    it('can fold entire nodes when no start or end parameters are specified', async () => {
+    it('can fold entire nodes when no start or end parameters are specified', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         folds: [
@@ -1444,7 +1436,7 @@ describe('TreeSitterLanguageMode', () => {
       `);
     });
 
-    it('tries each folding strategy for a given node in the order specified', async () => {
+    it('tries each folding strategy for a given node in the order specified', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, cGrammarPath, {
         parser: 'tree-sitter-c',
         folds: [
@@ -1556,7 +1548,7 @@ describe('TreeSitterLanguageMode', () => {
       `);
     });
 
-    it('does not fold when the start and end parameters match the same child', async () => {
+    it('does not fold when the start and end parameters match the same child', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, htmlGrammarPath, {
         parser: 'tree-sitter-html',
         folds: [
@@ -1589,7 +1581,7 @@ describe('TreeSitterLanguageMode', () => {
       `);
     });
 
-    it('can target named vs anonymous nodes as fold boundaries', async () => {
+    it('can target named vs anonymous nodes as fold boundaries', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, rubyGrammarPath, {
         parser: 'tree-sitter-ruby',
         folds: [
@@ -1696,7 +1688,7 @@ describe('TreeSitterLanguageMode', () => {
     });
 
     describe('when folding a node that ends with a line break', () => {
-      it('ends the fold at the end of the previous line', async () => {
+      it('ends the fold at the end of the previous line', () => {
         const grammar = new TreeSitterGrammar(
           atom.grammars,
           pythonGrammarPath,
@@ -1734,7 +1726,7 @@ describe('TreeSitterLanguageMode', () => {
       });
     });
 
-    it('folds code in injected languages', async () => {
+    it('folds code in injected languages', () => {
       const htmlGrammar = new TreeSitterGrammar(
         atom.grammars,
         htmlGrammarPath,
@@ -1822,7 +1814,7 @@ describe('TreeSitterLanguageMode', () => {
   });
 
   describe('.scopeDescriptorForPosition', () => {
-    it('returns a scope descriptor representing the given position in the syntax tree', async () => {
+    it('returns a scope descriptor representing the given position in the syntax tree', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         scopeName: 'source.js',
         parser: 'tree-sitter-javascript',
@@ -1863,7 +1855,7 @@ describe('TreeSitterLanguageMode', () => {
       ).toEqual(['source.js', 'comment.block']);
     });
 
-    it('includes nodes in injected syntax trees', async () => {
+    it('includes nodes in injected syntax trees', () => {
       const jsGrammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         scopeName: 'source.js',
         parser: 'tree-sitter-javascript',
@@ -1964,7 +1956,7 @@ describe('TreeSitterLanguageMode', () => {
   });
 
   describe('.syntaxTreeScopeDescriptorForPosition', () => {
-    it('returns a scope descriptor representing the given position in the syntax tree', async () => {
+    it('returns a scope descriptor representing the given position in the syntax tree', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         scopeName: 'source.js',
         parser: 'tree-sitter-javascript'
@@ -1998,7 +1990,7 @@ describe('TreeSitterLanguageMode', () => {
       ).toEqual(['source.js', 'program', 'comment']);
     });
 
-    it('includes nodes in injected syntax trees', async () => {
+    it('includes nodes in injected syntax trees', () => {
       const jsGrammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         scopeName: 'source.js',
         parser: 'tree-sitter-javascript',
@@ -2065,7 +2057,7 @@ describe('TreeSitterLanguageMode', () => {
 
   describe('.bufferRangeForScopeAtPosition(selector?, position)', () => {
     describe('when selector = null', () => {
-      it('returns the range of the smallest node at position', async () => {
+      it('returns the range of the smallest node at position', () => {
         const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
           scopeName: 'javascript',
           parser: 'tree-sitter-javascript'
@@ -2084,7 +2076,7 @@ describe('TreeSitterLanguageMode', () => {
         ]);
       });
 
-      it('includes nodes in injected syntax trees', async () => {
+      it('includes nodes in injected syntax trees', () => {
         const jsGrammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
           scopeName: 'javascript',
           parser: 'tree-sitter-javascript',
@@ -2135,7 +2127,7 @@ describe('TreeSitterLanguageMode', () => {
     });
 
     describe('with a selector', () => {
-      it('returns the range of the smallest matching node at position', async () => {
+      it('returns the range of the smallest matching node at position', () => {
         const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
           scopeName: 'javascript',
           parser: 'tree-sitter-javascript',
@@ -2156,7 +2148,7 @@ describe('TreeSitterLanguageMode', () => {
         ).toEqual([[0, 2], [0, 24]]);
       });
 
-      it('includes nodes in injected syntax trees', async () => {
+      it('includes nodes in injected syntax trees', () => {
         const jsGrammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
           scopeName: 'javascript',
           parser: 'tree-sitter-javascript',
@@ -2218,7 +2210,7 @@ describe('TreeSitterLanguageMode', () => {
         ).toEqual(buffer.findSync('<span>\\${person\\.name}</span>'));
       });
 
-      it('accepts node-matching functions as selectors', async () => {
+      it('accepts node-matching functions as selectors', () => {
         const jsGrammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
           scopeName: 'javascript',
           parser: 'tree-sitter-javascript',
@@ -2276,7 +2268,7 @@ describe('TreeSitterLanguageMode', () => {
   });
 
   describe('.getSyntaxNodeAtPosition(position, where?)', () => {
-    it('returns the range of the smallest matching node at position', async () => {
+    it('returns the range of the smallest matching node at position', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         scopeName: 'javascript',
         parser: 'tree-sitter-javascript'
@@ -2391,7 +2383,7 @@ describe('TreeSitterLanguageMode', () => {
   });
 
   describe('TextEditor.selectLargerSyntaxNode and .selectSmallerSyntaxNode', () => {
-    it('expands and contracts the selection based on the syntax tree', async () => {
+    it('expands and contracts the selection based on the syntax tree', () => {
       const grammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         parser: 'tree-sitter-javascript',
         scopes: { program: 'source' }
@@ -2432,7 +2424,7 @@ describe('TreeSitterLanguageMode', () => {
       expect(editor.getSelectedBufferRange()).toEqual([[1, 3], [1, 3]]);
     });
 
-    it('handles injected languages', async () => {
+    it('handles injected languages', () => {
       const jsGrammar = new TreeSitterGrammar(atom.grammars, jsGrammarPath, {
         scopeName: 'javascript',
         parser: 'tree-sitter-javascript',
