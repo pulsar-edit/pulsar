@@ -61,9 +61,9 @@ class I18n {
     return lookupList;
   }
 
-  // Determines if the provided locale should be loaded. Based on the user's
-  // current settings.
-  static ShouldIncludeLocale(locale, opts = {} ) {
+  // Determines if the provided locale should be loaded. Based on manually
+  // provided settings.
+  static shouldIncludeLocaleParameterized(locale, opts = {} ) {
     let localeList;
 
     if (opts.localeList) {
@@ -146,7 +146,7 @@ class I18n {
   }
 
   shouldIncludeLocale(locale) {
-    return I18n.ShouldIncludeLocale(locale, { localeList: this.localeFallbackList });
+    return I18n.shouldIncludeLocaleParameterized(locale, { localeList: this.localeFallbackList });
   }
 
   addStrings(newObj, locale, stringObj = this.strings) {
