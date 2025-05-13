@@ -241,7 +241,9 @@ class I18n {
   translateLabel(label) {
     // Since failing to translate menus could crash Pulsar
     // We must ensure to fallback to the raw label value
-    return this.translate(label.replace(/%/g, "")) ?? label;
+    // But `I18n.translate()` now returns the keyPath on failure
+    // So we don't have to protect against it here.
+    return this.translate(label.replace(/%/g, ""));
   }
 }
 
