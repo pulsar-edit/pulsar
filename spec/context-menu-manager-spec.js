@@ -521,7 +521,7 @@ describe('ContextMenuManager', function() {
 
     it('translates labels when a LocaleLabel is present', function() {
       const I18n = require("../src/i18n.js");
-      atom.i18n.localeFallbackList = I18n.LocaleNegotiation(
+      atom.i18n.localeFallbackList = I18n.localeNegotiation(
         "es-MX",
         [ "zh-Hant" ]
       );

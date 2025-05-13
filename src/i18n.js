@@ -29,9 +29,9 @@ function generateLocaleFallback(list, lang) {
 
 module.exports =
 class I18n {
-  // Provides LocaleNegotiation in accordance to RFC4647 Lookup Filtering Fallback Pattern
+  // Provides localeNegotiation in accordance to RFC4647 Lookup Filtering Fallback Pattern
   // Provided a priorityList, primary language, and default language.
-  static LocaleNegotiation(
+  static localeNegotiation(
     primary,
     priorityList,
     fallback = "en" // Hardcoding to ensure we can always fallback to something
@@ -69,7 +69,7 @@ class I18n {
     if (opts.localeList) {
       localeList = opts.localeList;
     } else {
-      localeList = I18n.LocaleNegotiation(opts.primary, opts.priorityList, opts.fallback);
+      localeList = I18n.localeNegotiation(opts.primary, opts.priorityList, opts.fallback);
     }
 
     for (const localeListItem of localeList) {
@@ -126,7 +126,7 @@ class I18n {
 
   // Helps along with initial setup
   initialize({ resourcePath }) {
-    this.localeFallbackList = I18n.LocaleNegotiation(
+    this.localeFallbackList = I18n.localeNegotiation(
       this.config.get("core.language.primary"),
       this.config.get("core.language.priorityList")
     );
@@ -187,7 +187,7 @@ class I18n {
     let bestLocale;
 
     if (this.localeFallbackList == null) {
-      this.localeFallbackList = I18n.LocaleNegotiation(
+      this.localeFallbackList = I18n.localeNegotiation(
         this.config.get("core.language.primary"),
         this.config.get("core.language.priorityList")
       );
