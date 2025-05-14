@@ -11,7 +11,10 @@ describe('HistoryManager', () => {
     commandRegistry = jasmine.createSpyObj('CommandRegistry', ['add']);
     commandRegistry.add.and.returnValue(commandDisposable);
 
-    stateStore = new StateStore('history-manager-test', 1);
+    stateStore = new StateStore('history-manager-test', 1, {
+      config: atom.config
+    });
+    stateStore.initialize({ configDirPath: atom.getConfigDirPath() });
     await stateStore.save('history-manager', {
       projects: [
         {

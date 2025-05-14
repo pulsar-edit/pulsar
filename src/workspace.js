@@ -202,7 +202,9 @@ module.exports = class Workspace extends Model {
     this.textEditorRegistry = params.textEditorRegistry;
     this.styleManager = params.styleManager;
     this.draggingItem = false;
-    this.itemLocationStore = new StateStore('AtomPreviousItemLocations', 1);
+    this.itemLocationStore = new StateStore('AtomPreviousItemLocations', 1, {
+      config: this.config
+    });
 
     this.emitter = new Emitter();
     this.openers = [];
@@ -373,9 +375,11 @@ module.exports = class Workspace extends Model {
     this.consumeServices(this.packageManager);
   }
 
-  initialize() {
+  initialize({ configDirPath }) {
     // we set originalFontSize to avoid breaking packages that might have relied on it
     this.originalFontSize = this.config.get('defaultFontSize');
+
+    this.itemLocationStore.initialize({ configDirPath });
 
     this.project.onDidChangePaths(this.updateWindowTitle);
     this.subscribeToAddedItems();
@@ -2125,7 +2129,7 @@ module.exports = class Workspace extends Model {
       const onPathsSearchedOption = options.onPathsSearched;
       let totalNumberOfPathsSearched = 0;
       const numberOfPathsSearchedForSearcher = new Map();
-      onPathsSearched = function(searcher, numberOfPathsSearched) {
+      onPathsSearched = function (searcher, numberOfPathsSearched) {
         const oldValue = numberOfPathsSearchedForSearcher.get(searcher);
         if (oldValue) {
           totalNumberOfPathsSearched -= oldValue;
@@ -2135,7 +2139,7 @@ module.exports = class Workspace extends Model {
         return onPathsSearchedOption(totalNumberOfPathsSearched);
       };
     } else {
-      onPathsSearched = function() {};
+      onPathsSearched = function () {};
     }
 
     // Kick off all of the searches and unify them into one Promise.
@@ -2191,7 +2195,7 @@ module.exports = class Workspace extends Model {
     // package relies on this behavior.
     let isCancelled = false;
     const cancellablePromise = new Promise((resolve, reject) => {
-      const onSuccess = function() {
+      const onSuccess = function () {
         if (isCancelled) {
           resolve('cancelled');
         } else {
@@ -2199,7 +2203,7 @@ module.exports = class Workspace extends Model {
         }
       };
 
-      const onFailure = function(error) {
+      const onFailure = function (error) {
         for (let promise of allSearches) {
           promise.cancel();
         }
