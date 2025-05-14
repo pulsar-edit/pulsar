@@ -724,6 +724,7 @@ describe('TextEditorComponent', () => {
     });
 
     it('places the hidden input element at the location of the last cursor if it is visible', async () => {
+      console.warn('TEST START!')
       const { component, editor } = buildComponent({
         height: 60,
         width: 120,
