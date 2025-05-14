@@ -2503,6 +2503,10 @@ module.exports = class TextEditorComponent {
       // don't need to check more than one.
       this.refs.normalWidthCharacterSpan.parentNode.getBoundingClientRect().height
     );
+
+    // TEMP: See if we can get away with snapping to physical pixels here.
+    this.measurements.lineHeight = roundToPhysicalPixelBoundary(this.measurements.lineHeight);
+
     this.measurements.baseCharacterWidth = this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.doubleWidthCharacterWidth = this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.halfWidthCharacterWidth = this.refs.halfWidthCharacterSpan.getBoundingClientRect().width;
