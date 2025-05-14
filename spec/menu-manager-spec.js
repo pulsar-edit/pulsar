@@ -7,7 +7,8 @@ describe('MenuManager', function() {
   beforeEach(function() {
     menu = new MenuManager({
       keymapManager: atom.keymaps,
-      packageManager: atom.packages
+      packageManager: atom.packages,
+      i18n: atom.i18n
     });
     spyOn(menu, 'sendToBrowserProcess'); // Do not modify Atom's actual menus
     menu.initialize({ resourcePath: atom.getLoadSettings().resourcePath });
@@ -102,6 +103,33 @@ describe('MenuManager', function() {
         id: 'A',
         submenu: [{ label: 'B', id: 'B', command: 'b' }]
       });
+    });
+
+    it('translates LocaleLabels', function() {
+      const I18n = require("../src/i18n.js");
+      atom.i18n.localeFallbackList = I18n.localeNegotiation(
+        "es-MX",
+        [ "zh-Hant" ]
+      );
+      atom.i18n.addStrings({
+        example: {
+          stringKey: "Hello Pulsar",
+          otherStringKey: "Goodbye Pulsar"
+        }
+      }, "en");
+
+      const disposable = menu.add([
+        { label: '%example.stringKey%', submenu: [{ label: '%example.otherStringKey%', command: 'b' }] }
+      ]);
+      expect(menu.template).toEqual([
+        {
+          label: 'Hello Pulsar',
+          id: 'Hello Pulsar',
+          submenu: [{ label: 'Goodbye Pulsar', id: 'Goodbye Pulsar', command: 'b' }]
+        }
+      ]);
+      disposable.dispose();
+      expect(menu.template).toEqual([]);
     });
   });
 

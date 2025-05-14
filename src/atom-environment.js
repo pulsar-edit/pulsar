@@ -47,6 +47,7 @@ const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
 const { getReleaseChannel } = require('./get-app-details.js');
 const UI = require('./ui.js');
+const I18n = require("./i18n.js");
 const packagejson = require("../package.json");
 
 const stat = util.promisify(fs.stat);
@@ -128,6 +129,11 @@ class AtomEnvironment {
     /** @type {StyleManager} */
     this.styles = new StyleManager();
 
+    /** @type {I18n} */
+    this.i18n = new I18n({
+      config: this.config
+    });
+
     /** @type {PackageManager} */
     this.packages = new PackageManager({
       config: this.config,
@@ -154,11 +160,12 @@ class AtomEnvironment {
     /** @type {MenuManager} */
     this.menu = new MenuManager({
       keymapManager: this.keymaps,
-      packageManager: this.packages
+      packageManager: this.packages,
+      i18n: this.i18n
     });
 
     /** @type {ContextMenuManager} */
-    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps });
+    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps, i18n: this.i18n });
 
     this.packages.setMenuManager(this.menu);
     this.packages.setContextMenuManager(this.contextMenu);
@@ -280,6 +287,10 @@ class AtomEnvironment {
     if (projectSpecification != null && projectSpecification.config != null) {
       this.project.replace(projectSpecification);
     }
+
+    this.i18n.initialize({
+      resourcePath: resourcePath
+    });
 
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });
