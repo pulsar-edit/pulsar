@@ -2080,9 +2080,12 @@ module.exports = class TextEditorComponent {
     }
 
     this.handleMouseDragUntilMouseUp({
-      didDrag: event => {
+      didDrag: (event, debug = false) => {
         this.autoscrollOnMouseDrag(event);
         const screenPosition = this.screenPositionForMouseEvent(event);
+        if (debug) {
+          console.warn('event:', event, 'translates to screen position:', screenPosition.toString());
+        }
         model.selectToScreenPosition(screenPosition, {
           suppressSelectionMerge: true,
           autoscroll: false
@@ -3349,11 +3352,11 @@ module.exports = class TextEditorComponent {
 
   getRenderedStartRow() {
     if (this.derivedDimensionsCache.renderedStartRow == null) {
-      console.warn('deriving renderedStartRow from getFirstVisibleRow of', this.getFirstVisibleRow());
+      // console.warn('deriving renderedStartRow from getFirstVisibleRow of', this.getFirstVisibleRow());
       this.derivedDimensionsCache.renderedStartRow = this.tileStartRowForRow(
         this.getFirstVisibleRow()
       );
-      console.warn('derived', this.derivedDimensionsCache.renderedStartRow);
+      // console.warn('derived', this.derivedDimensionsCache.renderedStartRow);
     }
 
     return this.derivedDimensionsCache.renderedStartRow;
