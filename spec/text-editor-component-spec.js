@@ -4643,6 +4643,8 @@ describe('TextEditorComponent', () => {
               didDrag,
               didStopDragging
             } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
+            console.warn('clientPositionForCharacter (should be 8, 8)', clientPositionForCharacter(component, 8, 8));
+            console.warn('clientLeftForCharacter (should be 8, 8)', clientLeftForCharacter(component, 8, 8))
             didDrag(clientPositionForCharacter(component, 8, 8));
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [8, 8]]);
             didDrag(clientPositionForCharacter(component, 4, 8));
