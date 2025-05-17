@@ -2819,7 +2819,7 @@ module.exports = class TextEditorComponent {
     }
   }
 
-  screenPositionForPixelPosition({ top, left }, debug = false) {
+  screenPositionForPixelPosition({ top, left }) {
     const { model } = this.props;
     const row = Math.min(
       this.rowForPixelPosition(top),
@@ -2828,9 +2828,6 @@ module.exports = class TextEditorComponent {
 
     let screenLine = this.renderedScreenLineForRow(row);
     if (!screenLine) {
-      if (debug) {
-        console.warn('We don’t have measurements for row', row, 'so we’re asking for them now');
-      }
       this.requestLineToMeasure(row, model.screenLineForScreenRow(row));
       this.updateSyncBeforeMeasuringContent();
       this.measureContentDuringUpdateSync();
@@ -2858,16 +2855,6 @@ module.exports = class TextEditorComponent {
     );
 
     if (inherentRange && textNodes.includes(inherentRange.startContainer)) {
-      if (debug) {
-        console.warn(
-          `Approach 1! Node type: `,
-          inherentRange.startContainer.nodeType,
-          'text content:',
-          inherentRange.startContainer.textContent,
-          'offset:',
-          inherentRange.startOffset
-        )
-      }
       // The range identified a text node on this line. Now we can convert the
       // range start offset to a screen column by adding the lengths of all the
       // previous nodes.
@@ -2876,11 +2863,19 @@ module.exports = class TextEditorComponent {
         inherentRange.startOffset,
         textNodes
       );
-      if (debug) {
-        console.warn(`Returning: (${row}, ${column})`)
-      }
 
-      return Point(row, column);
+      // As a final sanity check, grab this range's bounding DOMRect and ensure
+      // it actually contains the point in question.
+      //
+      // TODO: `caretRangeFromPoint` is incredibly convenient, but this sanity
+      // check is required in order to work around a strange behavior that
+      // produced a test suite failure. If any further quirks emerge, it might
+      // eventually be worth it to skip `caretRangeFromPoint` and go straight
+      // to the fallback approach.
+      let { top, bottom } = inherentRange.getBoundingClientRect();
+      if (targetClientTop >= top && targetClientTop <= bottom) {
+        return Point(row, column);
+      }
     }
 
     // SECOND STRATEGY:
