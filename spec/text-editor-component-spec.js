@@ -4648,11 +4648,14 @@ describe('TextEditorComponent', () => {
             console.warn('clientPositionForCharacter (should be 8, 8)', clientPositionForCharacter(component, 8, 8));
             console.warn('clientLeftForCharacter (should be 8, 8)', clientLeftForCharacter(component, 8, 8))
             didDrag(clientPositionForCharacter(component, 8, 8), true);
+            await wait(100);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [8, 8]]);
             console.warn('now trying 4,8');
             didDrag(clientPositionForCharacter(component, 4, 8), true);
+            await wait(100);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [4, 8]]);
             didStopDragging();
+            await wait(100);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [4, 8]]);
           }
 
@@ -4674,22 +4677,26 @@ describe('TextEditorComponent', () => {
               didStopDragging
             } = component.handleMouseDragUntilMouseUp.calls.argsFor(1)[0];
             didDrag(clientPositionForCharacter(component, 2, 8));
+            await wait(100);
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
             ]);
             didDrag(clientPositionForCharacter(component, 6, 8));
+            await wait(100);
             console.log('screen ranges:', editor.getSelectedScreenRanges().map(r => r.toString()));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[6, 8], [8, 8]]
             ]);
             didDrag(clientPositionForCharacter(component, 2, 8));
+            await wait(100);
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
             ]);
             didStopDragging();
+            await wait(100);
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [8, 8]]
             ]);
