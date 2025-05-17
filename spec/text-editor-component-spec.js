@@ -4638,8 +4638,6 @@ describe('TextEditorComponent', () => {
             )
           );
 
-          // await wait(100);
-
           {
             const {
               didDrag,
@@ -4648,14 +4646,10 @@ describe('TextEditorComponent', () => {
             console.warn('clientPositionForCharacter (should be 8, 8)', clientPositionForCharacter(component, 8, 8, true));
             console.warn('clientLeftForCharacter (should be 8, 8)', clientLeftForCharacter(component, 8, 8))
             didDrag(clientPositionForCharacter(component, 8, 8), true);
-            // await wait(100);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [8, 8]]);
-            console.warn('now trying 4,8');
             didDrag(clientPositionForCharacter(component, 4, 8), true);
-            // await wait(100);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [4, 8]]);
             didStopDragging();
-            // await wait(100);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [4, 8]]);
           }
 
@@ -4683,6 +4677,13 @@ describe('TextEditorComponent', () => {
               [[2, 8], [8, 8]]
             ]);
             console.warn('clientLeftForCharacter (should be 6, 8)', clientLeftForCharacter(component, 6, 8, true))
+            console.warn('clientLeftForCharacter sanity check (should be 6, 4)', clientLeftForCharacter(component, 6, 4, true))
+            console.warn('clientLeftForCharacter sanity check (should be 6, 0)', clientLeftForCharacter(component, 6, 0, true))
+            expect(
+              clientLeftForCharacter(component, 6, 8)
+            ).not.toEqual(
+              clientLeftForCharacter(component, 6, 0)
+            )
             didDrag(clientPositionForCharacter(component, 6, 8), true);
             // await wait(100);
             console.warn('screen ranges:', editor.getSelectedScreenRanges().map(r => r.toString()));
