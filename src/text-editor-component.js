@@ -2845,6 +2845,9 @@ module.exports = class TextEditorComponent {
     );
 
     if (inherentRange && textNodes.includes(inherentRange.startContainer)) {
+      if (debug) {
+        console.warn(`Approach 1! Node:`, inherentRange.textContent, 'offset:', inherentRange.startOffset)
+      }
       // The range identified a text node on this line. Now we can convert the
       // range start offset to a screen column by adding the lengths of all the
       // previous nodes.
@@ -2853,6 +2856,10 @@ module.exports = class TextEditorComponent {
         inherentRange.startOffset,
         textNodes
       );
+      if (debug) {
+        console.warn(`Returning: (${row}, ${column})`)
+      }
+
       return Point(row, column);
     }
 
