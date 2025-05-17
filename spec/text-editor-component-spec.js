@@ -4626,6 +4626,7 @@ describe('TextEditorComponent', () => {
         it('expands the last selection on drag', async () => {
           atom.config.set('editor.multiCursorOnClick', true);
           const { component, editor } = buildComponent();
+          await wait(1000);
           spyOn(component, 'handleMouseDragUntilMouseUp');
 
           component.didMouseDownOnContent(
