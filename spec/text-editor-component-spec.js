@@ -4623,7 +4623,7 @@ describe('TextEditorComponent', () => {
           expect(editor.testAutoscrollRequests).toEqual([]);
         });
 
-        it('expands the last selection on drag', () => {
+        it('expands the last selection on drag', async () => {
           atom.config.set('editor.multiCursorOnClick', true);
           const { component, editor } = buildComponent();
           spyOn(component, 'handleMouseDragUntilMouseUp');
@@ -4638,6 +4638,8 @@ describe('TextEditorComponent', () => {
             )
           );
 
+          await wait(100);
+
           {
             const {
               didDrag,
@@ -4647,7 +4649,7 @@ describe('TextEditorComponent', () => {
             console.warn('clientLeftForCharacter (should be 8, 8)', clientLeftForCharacter(component, 8, 8))
             didDrag(clientPositionForCharacter(component, 8, 8), true);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [8, 8]]);
-            console.log('now trying 4,8');
+            console.warn('now trying 4,8');
             didDrag(clientPositionForCharacter(component, 4, 8), true);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [4, 8]]);
             didStopDragging();
