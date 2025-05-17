@@ -3013,6 +3013,7 @@ describe('TextEditorComponent', () => {
       const { component, element } = buildComponent({ editor, rowsPerTile: 3 });
       element.style.height =
         4 * component.getLineHeight() + horizontalScrollbarHeight + 'px';
+      console.warn('component.getLineHeight():', component.getLineHeight());
       await component.getNextUpdatePromise();
       expect(component.getRenderedStartRow()).toBe(0);
       expect(component.getRenderedEndRow()).toBe(9);
@@ -3167,7 +3168,10 @@ describe('TextEditorComponent', () => {
       expect(element.contains(item6)).toBe(false);
 
       // change the text
+      console.warn('CHANGE THE TEXT');
       editor.getBuffer().setTextInRange([[0, 5], [0, 5]], '\n\n');
+      // TEMP?
+      editor.setScrollTop(0);
       await component.getNextUpdatePromise();
       expect(component.getRenderedStartRow()).toBe(0);
       expect(component.getRenderedEndRow()).toBe(9);
@@ -3179,6 +3183,7 @@ describe('TextEditorComponent', () => {
           getElementHeight(item5) +
           getElementHeight(item6)
       );
+      console.warn('DONE');
       assertTilesAreSizedAndPositionedCorrectly(component, [
         {
           tileStartRow: 0,
