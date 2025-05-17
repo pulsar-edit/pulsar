@@ -4682,7 +4682,7 @@ describe('TextEditorComponent', () => {
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
             ]);
-            console.warn('clientLeftForCharacter (should be 6, 8)', clientLeftForCharacter(component, 6, 8))
+            console.warn('clientLeftForCharacter (should be 6, 8)', clientLeftForCharacter(component, 6, 8, true))
             didDrag(clientPositionForCharacter(component, 6, 8), true);
             // await wait(100);
             console.warn('screen ranges:', editor.getSelectedScreenRanges().map(r => r.toString()));
@@ -4690,7 +4690,7 @@ describe('TextEditorComponent', () => {
               [[1, 4], [4, 8]],
               [[6, 8], [8, 8]]
             ]);
-            console.warn('clientLeftForCharacter (should be 2, 8)', clientLeftForCharacter(component, 2, 8))
+            console.warn('clientLeftForCharacter (should be 2, 8)', clientLeftForCharacter(component, 2, 8, true))
             didDrag(clientPositionForCharacter(component, 2, 8), true);
             // await wait(100);
             expect(editor.getSelectedScreenRanges()).toEqual([
