@@ -2080,9 +2080,12 @@ module.exports = class TextEditorComponent {
     }
 
     this.handleMouseDragUntilMouseUp({
-      didDrag: event => {
+      didDrag: (event, debug = false) => {
         this.autoscrollOnMouseDrag(event);
-        const screenPosition = this.screenPositionForMouseEvent(event);
+        const screenPosition = this.screenPositionForMouseEvent(event, true);
+        if (debug) {
+          console.warn('event:', event.clientX, event.clientY, 'translates to screen position:', screenPosition.toString());
+        }
         model.selectToScreenPosition(screenPosition, {
           suppressSelectionMerge: true,
           autoscroll: false
@@ -2265,14 +2268,34 @@ module.exports = class TextEditorComponent {
     if (scrolled) this.updateSync();
   }
 
-  screenPositionForMouseEvent(event) {
+  screenPositionForMouseEvent(event, debug = false) {
     return this.screenPositionForPixelPosition(
-      this.pixelPositionForMouseEvent(event)
+      this.pixelPositionForMouseEvent(event, debug),
+      debug
     );
   }
 
-  pixelPositionForMouseEvent({ clientX, clientY }) {
+  pixelPositionForMouseEvent({ clientX, clientY }, debug = false) {
+    if (debug) {
+      console.warn('pixelPositionForMouseEvent clientX:', clientX, 'clientY:', clientY);
+    }
     const scrollContainerRect = this.refs.scrollContainer.getBoundingClientRect();
+    if (debug) {
+      console.warn(
+        'scrollContainerRect is left:',
+        scrollContainerRect.left,
+        'right:',
+        scrollContainerRect.right,
+        'top:',
+        scrollContainerRect.top,
+        'bottom:',
+        scrollContainerRect.bottom,
+        'width:',
+        scrollContainerRect.width,
+        'height:',
+        scrollContainerRect.height
+      )
+    }
     clientX = Math.min(
       scrollContainerRect.right,
       Math.max(scrollContainerRect.left, clientX)
@@ -2282,6 +2305,9 @@ module.exports = class TextEditorComponent {
       Math.max(scrollContainerRect.top, clientY)
     );
     const linesRect = this.refs.lineTiles.getBoundingClientRect();
+    if (debug) {
+      console.warn('linesRect top:', linesRect.top, 'left:', linesRect.left, 'clamped clientX:', clientX, 'clamped clientY:', clientY)
+    }
     return {
       top: clientY - linesRect.top,
       left: clientX - linesRect.left
@@ -2503,6 +2529,13 @@ module.exports = class TextEditorComponent {
       // don't need to check more than one.
       this.refs.normalWidthCharacterSpan.parentNode.getBoundingClientRect().height
     );
+
+    // TEMP: See if we can get away with snapping to physical pixels here.
+    //
+    // TEMP: This doesn't work because the rounding should happen at the end so
+    // as not to be compounded from multiple mathematical operations.
+    // this.measurements.lineHeight = roundToPhysicalPixelBoundary(this.measurements.lineHeight);
+
     this.measurements.baseCharacterWidth = this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.doubleWidthCharacterWidth = this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.halfWidthCharacterWidth = this.refs.halfWidthCharacterSpan.getBoundingClientRect().width;
@@ -2773,7 +2806,7 @@ module.exports = class TextEditorComponent {
     }
   }
 
-  screenPositionForPixelPosition({ top, left }) {
+  screenPositionForPixelPosition({ top, left }, debug = false) {
     const { model } = this.props;
     const row = Math.min(
       this.rowForPixelPosition(top),
@@ -2782,6 +2815,9 @@ module.exports = class TextEditorComponent {
 
     let screenLine = this.renderedScreenLineForRow(row);
     if (!screenLine) {
+      if (debug) {
+        console.warn('We don’t have measurements for row', row, 'so we’re asking for them now');
+      }
       this.requestLineToMeasure(row, model.screenLineForScreenRow(row));
       this.updateSyncBeforeMeasuringContent();
       this.measureContentDuringUpdateSync();
@@ -2838,14 +2874,23 @@ module.exports = class TextEditorComponent {
     //
     // Find the text node that contains the position we want.
     {
+      if (debug) {
+        console.warn('Approach 2!');
+      }
       let boundingClientRect = boundingClientRectForTextNodes(textNodes);
       // Weed out cases where the pixel position is outside the left and right
       // bounds of the text nodes’ bounding box. These should be clamped, in
       // effect, to the beginning and end of the line.
       if (targetClientLeft < boundingClientRect.left) {
+        if (debug) {
+          console.warn(`Weedout 1! targetClientLeft:`, targetClientLeft, 'boundingClientRect.left:', boundingClientRect.left);
+        }
         return Point(row, 0);
       }
       if (targetClientLeft > boundingClientRect.right) {
+        if (debug) {
+          console.warn(`Weedout 2! targetClientLeft:`, targetClientLeft, 'boundingClientRect.right:', boundingClientRect.left);
+        }
         return Point(row, rowLength);
       }
 
@@ -2861,6 +2906,12 @@ module.exports = class TextEditorComponent {
 
       // …but we'll handle the failure case just to be safe.
       if (!containingTextNode) {
+        if (debug) {
+          if (debug) {
+            console.warn(`Weedout 3!`);
+          }
+
+        }
         console.error(`Error: could not find a valid cursor position for coordinates: (${left}, ${top}) within the editor.`);
         // Declare defeat and fall back to the 0th column.
         return Point(row, 0);
@@ -3342,9 +3393,11 @@ module.exports = class TextEditorComponent {
 
   getRenderedStartRow() {
     if (this.derivedDimensionsCache.renderedStartRow == null) {
+      // console.warn('deriving renderedStartRow from getFirstVisibleRow of', this.getFirstVisibleRow());
       this.derivedDimensionsCache.renderedStartRow = this.tileStartRowForRow(
         this.getFirstVisibleRow()
       );
+      // console.warn('derived', this.derivedDimensionsCache.renderedStartRow);
     }
 
     return this.derivedDimensionsCache.renderedStartRow;
@@ -3430,12 +3483,15 @@ module.exports = class TextEditorComponent {
     return this.scrollTop;
   }
 
-  setScrollTop(scrollTop) {
+  setScrollTop(scrollTop, debug = false) {
     if (Number.isNaN(scrollTop) || scrollTop == null) return false;
 
     scrollTop = roundToPhysicalPixelBoundary(
       Math.max(0, Math.min(this.getMaxScrollTop(), scrollTop))
     );
+    if (debug) {
+      console.warn('DEBUG: scrollTop rounded to', scrollTop, 'existing is', this.scrollTop);
+    }
     if (scrollTop !== this.scrollTop) {
       this.derivedDimensionsCache = {};
       this.scrollTopPending = true;
@@ -3502,23 +3558,31 @@ module.exports = class TextEditorComponent {
     );
   }
 
-  setScrollTopRow(scrollTopRow, scheduleUpdate = true) {
+  setScrollTopRow(scrollTopRow, scheduleUpdate = true, debug = false) {
     if (this.hasInitialMeasurements) {
+      if (debug) {
+        console.warn('DEBUG: scrollTopRow hasInitialMeasurements', this.pixelPositionBeforeBlocksForRow(scrollTopRow));
+      }
       const didScroll = this.setScrollTop(
-        this.pixelPositionBeforeBlocksForRow(scrollTopRow)
+        this.pixelPositionBeforeBlocksForRow(scrollTopRow),
+        debug
       );
       if (didScroll && scheduleUpdate) {
         this.scheduleUpdate();
       }
       return didScroll;
     } else {
+      console.warn('DEBUG: pending:', scrollTopRow);
       this.pendingScrollTopRow = scrollTopRow;
       return false;
     }
   }
 
-  getScrollTopRow() {
+  getScrollTopRow(debug = false) {
     if (this.hasInitialMeasurements) {
+      if (debug) {
+        console.warn('DEBUG: getScrollTopRow scrollTop:', this.getScrollTop(), 'row:', this.rowForPixelPosition(this.getScrollTop()));
+      }
       return this.rowForPixelPosition(this.getScrollTop());
     } else {
       return this.pendingScrollTopRow || 0;

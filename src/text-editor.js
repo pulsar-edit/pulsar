@@ -5569,12 +5569,12 @@ module.exports = class TextEditor {
     return this.getElement().getMaxScrollTop();
   }
 
-  getScrollTopRow() {
-    return this.getElement().component.getScrollTopRow();
+  getScrollTopRow(debug = false) {
+    return this.getElement().component.getScrollTopRow(debug);
   }
 
-  setScrollTopRow(scrollTopRow) {
-    this.getElement().component.setScrollTopRow(scrollTopRow);
+  setScrollTopRow(scrollTopRow, debug = false) {
+    this.getElement().component.setScrollTopRow(scrollTopRow, undefined, debug);
   }
 
   getScrollLeftColumn() {
