@@ -2082,9 +2082,9 @@ module.exports = class TextEditorComponent {
     this.handleMouseDragUntilMouseUp({
       didDrag: (event, debug = false) => {
         this.autoscrollOnMouseDrag(event);
-        const screenPosition = this.screenPositionForMouseEvent(event);
+        const screenPosition = this.screenPositionForMouseEvent(event, true);
         if (debug) {
-          console.warn('event:', event, 'translates to screen position:', screenPosition.toString());
+          console.warn('event:', event.clientX, event.clientY, 'translates to screen position:', screenPosition.toString());
         }
         model.selectToScreenPosition(screenPosition, {
           suppressSelectionMerge: true,
@@ -2268,13 +2268,16 @@ module.exports = class TextEditorComponent {
     if (scrolled) this.updateSync();
   }
 
-  screenPositionForMouseEvent(event) {
+  screenPositionForMouseEvent(event, debug = false) {
     return this.screenPositionForPixelPosition(
-      this.pixelPositionForMouseEvent(event)
+      this.pixelPositionForMouseEvent(event, debug)
     );
   }
 
-  pixelPositionForMouseEvent({ clientX, clientY }) {
+  pixelPositionForMouseEvent({ clientX, clientY }, debug = false) {
+    if (debug) {
+      console.warn('pixelPositionForMouseEvent clientX:', clientX, 'clientY:', clientY);
+    }
     const scrollContainerRect = this.refs.scrollContainer.getBoundingClientRect();
     clientX = Math.min(
       scrollContainerRect.right,
@@ -2285,6 +2288,9 @@ module.exports = class TextEditorComponent {
       Math.max(scrollContainerRect.top, clientY)
     );
     const linesRect = this.refs.lineTiles.getBoundingClientRect();
+    if (debug) {
+      console.warn('linesRect top:', linesRect.top, 'left:', linesRect.left)
+    }
     return {
       top: clientY - linesRect.top,
       left: clientX - linesRect.left
