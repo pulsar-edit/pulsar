@@ -4623,10 +4623,9 @@ describe('TextEditorComponent', () => {
           expect(editor.testAutoscrollRequests).toEqual([]);
         });
 
-        it('expands the last selection on drag', async () => {
+        it('expands the last selection on drag', () => {
           atom.config.set('editor.multiCursorOnClick', true);
           const { component, editor } = buildComponent({ updatedSynchronously: true });
-          await wait(1000);
           spyOn(component, 'handleMouseDragUntilMouseUp');
 
           component.didMouseDownOnContent(
@@ -4639,24 +4638,24 @@ describe('TextEditorComponent', () => {
             )
           );
 
-          await wait(100);
+          // await wait(100);
 
           {
             const {
               didDrag,
               didStopDragging
             } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
-            console.warn('clientPositionForCharacter (should be 8, 8)', clientPositionForCharacter(component, 8, 8));
+            console.warn('clientPositionForCharacter (should be 8, 8)', clientPositionForCharacter(component, 8, 8, true));
             console.warn('clientLeftForCharacter (should be 8, 8)', clientLeftForCharacter(component, 8, 8))
             didDrag(clientPositionForCharacter(component, 8, 8), true);
-            await wait(100);
+            // await wait(100);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [8, 8]]);
             console.warn('now trying 4,8');
             didDrag(clientPositionForCharacter(component, 4, 8), true);
-            await wait(100);
+            // await wait(100);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [4, 8]]);
             didStopDragging();
-            await wait(100);
+            // await wait(100);
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [4, 8]]);
           }
 
@@ -4678,26 +4677,28 @@ describe('TextEditorComponent', () => {
               didStopDragging
             } = component.handleMouseDragUntilMouseUp.calls.argsFor(1)[0];
             didDrag(clientPositionForCharacter(component, 2, 8));
-            await wait(100);
+            // await wait(100);
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
             ]);
-            didDrag(clientPositionForCharacter(component, 6, 8));
-            await wait(100);
-            console.log('screen ranges:', editor.getSelectedScreenRanges().map(r => r.toString()));
+            console.warn('clientLeftForCharacter (should be 6, 8)', clientLeftForCharacter(component, 6, 8))
+            didDrag(clientPositionForCharacter(component, 6, 8), true);
+            // await wait(100);
+            console.warn('screen ranges:', editor.getSelectedScreenRanges().map(r => r.toString()));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[6, 8], [8, 8]]
             ]);
-            didDrag(clientPositionForCharacter(component, 2, 8));
-            await wait(100);
+            console.warn('clientLeftForCharacter (should be 2, 8)', clientLeftForCharacter(component, 2, 8))
+            didDrag(clientPositionForCharacter(component, 2, 8), true);
+            // await wait(100);
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
             ]);
             didStopDragging();
-            await wait(100);
+            // await wait(100);
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [8, 8]]
             ]);
@@ -6555,12 +6556,19 @@ function clientRectAroundCharacter(component, row, column, index = 0) {
   );
 }
 
-function clientLeftForCharacter(component, row, column) {
+function clientLeftForCharacter(component, row, column, debug = false) {
   const textNodes = textNodesForScreenRow(component, row);
+  if (debug) {
+    console.warn('textNodes:', textNodes.length, textNodes);
+  }
   let textNodeStartColumn = 0;
   for (const textNode of textNodes) {
     const textNodeEndColumn = textNodeStartColumn + textNode.textContent.length;
     if (column < textNodeEndColumn) {
+      if (debug) {
+        console.warn('column is in this text node!', textNode.textContent);
+        console.warn('we need this index into the text node:', column - textNodeStartColumn);
+      }
       const range = document.createRange();
       range.setStart(textNode, column - textNodeStartColumn);
       range.setEnd(textNode, column - textNodeStartColumn);
@@ -6576,9 +6584,9 @@ function clientLeftForCharacter(component, row, column) {
   return range.getBoundingClientRect().right;
 }
 
-function clientPositionForCharacter(component, row, column) {
+function clientPositionForCharacter(component, row, column, debug = false) {
   return {
-    clientX: clientLeftForCharacter(component, row, column),
+    clientX: clientLeftForCharacter(component, row, column, debug),
     clientY: clientTopForLine(component, row)
   };
 }
