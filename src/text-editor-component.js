@@ -2377,6 +2377,7 @@ module.exports = class TextEditorComponent {
   }
 
   autoscrollVertically(screenRange, options) {
+    let debug = !!TextEditor.__DEBUG__;
     const screenRangeTop = this.pixelPositionAfterBlocksForRow(
       screenRange.start.row
     );
@@ -2395,6 +2396,14 @@ module.exports = class TextEditorComponent {
     } else {
       desiredScrollTop = screenRangeTop - verticalScrollMargin;
       desiredScrollBottom = screenRangeBottom + verticalScrollMargin;
+      if (debug) {
+        console.warn(
+          'Autoscrolling vertically to cover screen range:',
+          screenRange.toString(),
+          `which spans pixel heights: ${screenRangeTop}–${screenRangeBottom}`,
+          `resulting in desired scroll range: ${desiredScrollTop}–${desiredScrollBottom}`
+        );
+      }
     }
 
     if (!options || options.reversed !== false) {
@@ -2790,7 +2799,11 @@ module.exports = class TextEditorComponent {
   }
 
   pixelPositionAfterBlocksForRow(row) {
-    return this.lineTopIndex.pixelPositionAfterBlocksForRow(row);
+    let result = this.lineTopIndex.pixelPositionAfterBlocksForRow(row);
+    if (TextEditor.__DEBUG__) {
+      console.warn('pixelPositionAfterBlocksForRow:', row, 'produces position:', result);
+    }
+    return result;
   }
 
   pixelLeftForRowAndColumn(row, column) {
@@ -2846,7 +2859,14 @@ module.exports = class TextEditorComponent {
 
     if (inherentRange && textNodes.includes(inherentRange.startContainer)) {
       if (debug) {
-        console.warn(`Approach 1! Node:`, inherentRange.textContent, 'offset:', inherentRange.startOffset)
+        console.warn(
+          `Approach 1! Node type: `,
+          inherentRange.startContainer.nodeType,
+          'text content:',
+          inherentRange.startContainer.textContent,
+          'offset:',
+          inherentRange.startOffset
+        )
       }
       // The range identified a text node on this line. Now we can convert the
       // range start offset to a screen column by adding the lengths of all the

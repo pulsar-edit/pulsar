@@ -5574,7 +5574,11 @@ module.exports = class TextEditor {
   }
 
   setScrollTopRow(scrollTopRow, debug = false) {
-    this.getElement().component.setScrollTopRow(scrollTopRow, undefined, debug);
+    this.getElement().component.setScrollTopRow(
+      scrollTopRow,
+      undefined,
+      debug
+    );
   }
 
   getScrollLeftColumn() {
