@@ -2279,6 +2279,22 @@ module.exports = class TextEditorComponent {
       console.warn('pixelPositionForMouseEvent clientX:', clientX, 'clientY:', clientY);
     }
     const scrollContainerRect = this.refs.scrollContainer.getBoundingClientRect();
+    if (debug) {
+      console.warn(
+        'scrollContainerRect is left:',
+        scrollContainerRect.left,
+        'right:',
+        scrollContainerRect.right,
+        'top:',
+        scrollContainerRect.top,
+        'bottom:',
+        scrollContainerRect.bottom,
+        'width:',
+        scrollContainerRect.width,
+        'height:',
+        scrollContainerRect.height
+      )
+    }
     clientX = Math.min(
       scrollContainerRect.right,
       Math.max(scrollContainerRect.left, clientX)
@@ -2289,7 +2305,7 @@ module.exports = class TextEditorComponent {
     );
     const linesRect = this.refs.lineTiles.getBoundingClientRect();
     if (debug) {
-      console.warn('linesRect top:', linesRect.top, 'left:', linesRect.left)
+      console.warn('linesRect top:', linesRect.top, 'left:', linesRect.left, 'clamped clientX:', clientX, 'clamped clientY:', clientY)
     }
     return {
       top: clientY - linesRect.top,
