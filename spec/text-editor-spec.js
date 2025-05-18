@@ -151,8 +151,8 @@ describe('TextEditor', () => {
       element.setWidth(100);
       jasmine.attachToDOM(element);
 
-      TextEditor.__DEBUG__ = true;
       editor.update({ showCursorOnSelection: false });
+      TextEditor.__DEBUG__ = true;
       editor.setSelectedBufferRange([[1, 2], [3, 4]]);
       editor.addSelectionForBufferRange([[5, 6], [7, 8]], { reversed: true });
       console.warn('DEBUG: Setting first editor’s top row to 3');

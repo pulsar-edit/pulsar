@@ -2473,6 +2473,9 @@ module.exports = class TextEditorComponent {
       this.props.model.verticalScrollMargin,
       maxMarginInLines
     );
+    if (TextEditor.__DEBUG__) {
+      console.warn('margin in lines:', marginInLines, 'with line height:', this.getLineHeight());
+    }
     return marginInLines * this.getLineHeight();
   }
 

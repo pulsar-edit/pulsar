@@ -2992,6 +2992,7 @@ describe('TextEditorComponent', () => {
 
   describe('block decorations', () => {
     it('renders visible block decorations between the appropriate lines, refreshing and measuring them as needed', async () => {
+      console.log('?!?!?')
       const editor = buildEditor({ autoHeight: false });
       const {
         item: item1,
@@ -3171,7 +3172,7 @@ describe('TextEditorComponent', () => {
       console.warn('CHANGE THE TEXT');
       editor.getBuffer().setTextInRange([[0, 5], [0, 5]], '\n\n');
       // TEMP?
-      editor.setScrollTop(0);
+      // editor.setScrollTop(0);
       await component.getNextUpdatePromise();
       expect(component.getRenderedStartRow()).toBe(0);
       expect(component.getRenderedEndRow()).toBe(9);
