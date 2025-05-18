@@ -3582,6 +3582,11 @@ module.exports = class TextEditorComponent {
       if (didScroll && scheduleUpdate) {
         this.scheduleUpdate();
       }
+      if (debug) {
+        console.warn('DEBUG: After setting scrollTopRow of', scrollTopRow, 'what do we think our scrollTopRow is?');
+        let sanity = this.getScrollTopRow(true);
+        console.warn('DEBUG: The result is', sanity);
+      }
       return didScroll;
     } else {
       console.warn('DEBUG: pending:', scrollTopRow);
