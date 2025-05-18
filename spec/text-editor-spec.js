@@ -147,7 +147,7 @@ describe('TextEditor', () => {
       expect(editor.getShowCursorOnSelection()).toBeTruthy();
 
       const element = editor.getElement();
-      element.setHeight(100);
+      element.setHeight(110);
       element.setWidth(100);
       jasmine.attachToDOM(element);
 
