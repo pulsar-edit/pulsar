@@ -2548,7 +2548,7 @@ module.exports = class TextEditorComponent {
     //
     // TEMP: This doesn't work because the rounding should happen at the end so
     // as not to be compounded from multiple mathematical operations.
-    // this.measurements.lineHeight = roundToPhysicalPixelBoundary(this.measurements.lineHeight);
+    this.measurements.lineHeight = ceilToPhysicalPixelBoundary(this.measurements.lineHeight);
 
     this.measurements.baseCharacterWidth = this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.doubleWidthCharacterWidth = this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;
