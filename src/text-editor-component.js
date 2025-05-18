@@ -2899,23 +2899,14 @@ module.exports = class TextEditorComponent {
     //
     // Find the text node that contains the position we want.
     {
-      if (debug) {
-        console.warn('Approach 2!');
-      }
       let boundingClientRect = boundingClientRectForTextNodes(textNodes);
       // Weed out cases where the pixel position is outside the left and right
       // bounds of the text nodes’ bounding box. These should be clamped, in
       // effect, to the beginning and end of the line.
       if (targetClientLeft < boundingClientRect.left) {
-        if (debug) {
-          console.warn(`Weedout 1! targetClientLeft:`, targetClientLeft, 'boundingClientRect.left:', boundingClientRect.left);
-        }
         return Point(row, 0);
       }
       if (targetClientLeft > boundingClientRect.right) {
-        if (debug) {
-          console.warn(`Weedout 2! targetClientLeft:`, targetClientLeft, 'boundingClientRect.right:', boundingClientRect.left);
-        }
         return Point(row, rowLength);
       }
 
@@ -2931,12 +2922,6 @@ module.exports = class TextEditorComponent {
 
       // …but we'll handle the failure case just to be safe.
       if (!containingTextNode) {
-        if (debug) {
-          if (debug) {
-            console.warn(`Weedout 3!`);
-          }
-
-        }
         console.error(`Error: could not find a valid cursor position for coordinates: (${left}, ${top}) within the editor.`);
         // Declare defeat and fall back to the 0th column.
         return Point(row, 0);
