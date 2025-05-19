@@ -2349,7 +2349,7 @@ at-least-node@^1.0.0:
 "atom-dark-ui@file:packages/atom-dark-ui":
   version "0.53.3"
 
-atom-grammar-test@^0.6.3, atom-grammar-test@^0.6.4:
+atom-grammar-test@^0.6.3:
   version "0.6.4"
   resolved "https://registry.yarnpkg.com/atom-grammar-test/-/atom-grammar-test-0.6.4.tgz#d8a53503d1fe939997f498b74a2ac310044a7d4e"
   integrity sha512-oVd4NmzM95nnb/CSPuyO/YlwbhRN7rpv3UTnc5btj9RSJaI7r6GzJoFYpIjOwBviGnWHuMoZxyupEn2VXbGbZw==
@@ -2376,11 +2376,6 @@ atom-grammar-test@^0.6.3, atom-grammar-test@^0.6.4:
 
 "atom-light-ui@file:packages/atom-light-ui":
   version "0.46.3"
-
-atom-pathspec@^0.0.0:
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/atom-pathspec/-/atom-pathspec-0.0.0.tgz#67aabaf95019b0afd8e3158b2cd7b18d737643f1"
-  integrity sha512-7UMEHdTtBV5sJONT0uMeQ6M8JFdfMQy/14rxuP6OuoFfSiDjxyZHuorIbv8gqhRB3FQMMLPzqONoFJE2cpHiCg==
 
 atom-select-list@^0.7.0, atom-select-list@^0.7.1:
   version "0.7.2"
@@ -3893,10 +3888,10 @@ dompurify@2.0.17:
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.0.17.tgz#505ffa126a580603df4007e034bdc9b6b738668e"
   integrity sha512-nNwwJfW55r8akD8MSFz6k75bzyT2y6JEa1O3JrZFBf+Y5R9JXXU4OsRl0B9hKoPgHTw2b7ER5yJ5Md97MMUJPg==
 
-dompurify@^2.0.17:
-  version "2.5.8"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.5.8.tgz#2809d89d7e528dc7a071dea440d7376df676f824"
-  integrity sha512-o1vSNgrmYMQObbSSvF/1brBYEQPHhV1+gsmrusO7/GXtp1T9rCS8cXFqVxK/9crT1jA6Ccv+5MTSjBNqr7Sovw==
+dompurify@2.5.7:
+  version "2.5.7"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-2.5.7.tgz#6e0d36b9177db5a99f18ade1f28579db5ab839d7"
+  integrity sha512-2q4bEI+coQM8f5ez7kt2xclg1XsecaV9ASJk/54vwlfRRNQfDqJz2pzQ8t0Ix/ToBpXlVjrRIx7pFC/o8itG2Q==
 
 dompurify@^3.0.6:
   version "3.2.4"
@@ -6278,9 +6273,9 @@ key-path-helpers@^0.4.0:
     fs-plus "^3.0.0"
     temp "^0.9.0"
 
-keyboard-layout@2.0.17, "keyboard-layout@https://github.com/savetheclocktower/keyboard-layout#5e3a07648c3fc97e2895b199ee5ad3852dbaaaa6":
+keyboard-layout@2.0.17, "keyboard-layout@https://github.com/savetheclocktower/keyboard-layout#e3dd9aacba1bdb085de412092f394f949595f805":
   version "2.0.17"
-  resolved "https://github.com/savetheclocktower/keyboard-layout#5e3a07648c3fc97e2895b199ee5ad3852dbaaaa6"
+  resolved "https://github.com/savetheclocktower/keyboard-layout#e3dd9aacba1bdb085de412092f394f949595f805"
   dependencies:
     event-kit "^2.0.0"
     node-addon-api "^7.1.1"
@@ -6383,8 +6378,6 @@ ky@0.30.0:
 
 "language-python@file:packages/language-python":
   version "0.53.6"
-  dependencies:
-    atom-grammar-test "^0.6.4"
 
 "language-ruby-on-rails@file:packages/language-ruby-on-rails":
   version "0.25.3"
@@ -6819,7 +6812,7 @@ markdown-it@^14.1.0:
   dependencies:
     cheerio "^1.0.0-rc.3"
     dedent "^1.5.3"
-    dompurify "^2.0.17"
+    dompurify "2.5.7"
     emoji-images "^0.1.1"
     fs-plus "^3.0.0"
     github-markdown-css "^5.5.1"
@@ -8977,7 +8970,6 @@ spdx-license-ids@^3.0.0:
 "spell-check@file:packages/spell-check":
   version "0.77.1"
   dependencies:
-    atom-pathspec "^0.0.0"
     atom-select-list "^0.7.0"
     debug "^4.1.1"
     multi-integer-range "^2.0.0"
@@ -9649,10 +9641,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     typescript "^5.0.3"
 
-typescript@5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.3.tgz#fe976f0c826a88d0a382007681cbb2da44afdedf"
-  integrity sha512-xv8mOEDnigb/tN9PSMTwSEqAnUvkoXMQlicOb0IUVDBSQCgBSaAAROUZYy2IcUy5qU6XajK5jjjO7TMWqBTKZA==
+typescript@^5.0.3, typescript@^5.8.3:
+  version "5.8.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.8.3.tgz#92f8a3e5e3cf497356f4178c34cd65a7f5e8440e"
+  integrity sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==
 
 typical@^2.6.0, typical@^2.6.1:
   version "2.6.1"
