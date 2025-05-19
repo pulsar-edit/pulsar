@@ -8389,15 +8389,15 @@ describe('TextEditor', () => {
 
       editor.setText('initial stuff');
       await editor.saveAs(temp.openSync('test-file').path);
-      console.log('DEBUG: Editor saved');
+      console.warn('DEBUG: Editor saved');
 
       editor.setText('other stuff');
       let promise = new Promise(resolve => editor.onDidConflict(() => {
-        console.log('DEBUG: Conflict!');
+        console.warn('DEBUG: Conflict!');
         resolve();
       }));
       fs.writeFileSync(editor.getPath(), 'new stuff');
-      console.log('DEBUG: File contents changed');
+      console.warn('DEBUG: File contents changed');
       expect(
         editor.shouldPromptToSave({
           windowCloseRequested: true,
