@@ -12,8 +12,6 @@ const defaultOptions = {
 
 let TypeScript = null;
 let typescriptVersionDir = null;
-let compilerHost = null;
-let currentFileName = null;
 
 function shouldCompile() {
   return true;
@@ -44,14 +42,16 @@ function compile(sourceCode, filePath) {
     filePath = 'file:///' + path.resolve(filePath).replace(/\\/g, '/');
   }
 
-  if (!compilerHost) {
-    compilerHost = TypeScript.createCompilerHost(defaultOptions);
-    let originalGetSourceFile = compilerHost.getSourceFile;
-    compilerHost.getSourceFile = function getSourceFile(name, languageVersion) {
-      if (name === currentFileName) return sourceFile;
-      return originalGetSourceFile.call(compilerHost, name, languageVersion);
-    };
-  }
+  // We must take the complicated path at least until we can figure out whether
+  // this transpiled file is syntactically valid.
+  const options = _.defaults({ filename: filePath }, defaultOptions);
+
+  let compilerHost = TypeScript.createCompilerHost(defaultOptions);
+  let originalGetSourceFile = compilerHost.getSourceFile;
+  compilerHost.getSourceFile = function getSourceFile(name, languageVersion) {
+    if (name === filePath) return sourceFile;
+    return originalGetSourceFile.call(compilerHost, name, languageVersion);
+  };
 
   let compilerOptions = TypeScript.parseJsonConfigFileContent(
     { compilerOptions: defaultOptions },
@@ -68,10 +68,8 @@ function compile(sourceCode, filePath) {
     true
   );
 
-  currentFileName = filePath;
   let program = TypeScript.createProgram([filePath], compilerOptions, compilerHost);
   const diagnostics = TypeScript.getPreEmitDiagnostics(program);
-  currentFileName = null;
 
   if (diagnostics.length > 0) {
     let diagnosticErrors = diagnostics.map((d) => {
@@ -84,7 +82,6 @@ function compile(sourceCode, filePath) {
 
   // Once we get this far, we've asserted that transpilation can happen without
   // any fatal errors. We can now use the much simpler `transpileModule` API.
-  const options = _.defaults({ filename: filePath }, defaultOptions);
   let result = TypeScript.transpileModule(sourceCode, { compilerOptions: options });
   return result.outputText;
 }
