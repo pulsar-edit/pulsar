@@ -73,7 +73,7 @@ describe('CompileCache', () => {
     });
 
     describe('when the given file is typescript', () => {
-      fit('compiles the file with typescript and caches it', function () {
+      it('compiles the file with typescript and caches it', function () {
         CompileCache.addPathToCache(path.join(fixtures, 'typescript', 'valid.ts'), atomHome);
         expect(CompileCache.getCacheStats()['.ts']).toEqual({hits: 0, misses: 1});
         expect(TypeScriptTranspiler.compile.calls.count()).toBe(1);
