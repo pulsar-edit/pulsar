@@ -2377,7 +2377,6 @@ module.exports = class TextEditorComponent {
   }
 
   autoscrollVertically(screenRange, options) {
-    let debug = !!TextEditor.__DEBUG__;
     const screenRangeTop = this.pixelPositionAfterBlocksForRow(
       screenRange.start.row
     );
@@ -2396,14 +2395,6 @@ module.exports = class TextEditorComponent {
     } else {
       desiredScrollTop = screenRangeTop - verticalScrollMargin;
       desiredScrollBottom = screenRangeBottom + verticalScrollMargin;
-      if (debug) {
-        console.warn(
-          'Autoscrolling vertically to cover screen range:',
-          screenRange.toString(),
-          `which spans pixel heights: ${screenRangeTop}–${screenRangeBottom}`,
-          `resulting in desired scroll range: ${desiredScrollTop}–${desiredScrollBottom}`
-        );
-      }
     }
 
     if (!options || options.reversed !== false) {
@@ -2473,11 +2464,6 @@ module.exports = class TextEditorComponent {
       this.props.model.verticalScrollMargin,
       maxMarginInLines
     );
-    if (TextEditor.__DEBUG__) {
-      console.warn('scrollContainerClientHeight is', this.getScrollContainerClientHeight(), 'with line height:', this.getLineHeight(), ', hence maxMarginInLines is', maxMarginInLines);
-      console.warn('Do we have a verticalScrollMargin on our model?', this.props.model.verticalScrollMargin);
-      console.warn('margin in lines:', marginInLines);
-    }
     return marginInLines * this.getLineHeight();
   }
 
@@ -2804,11 +2790,7 @@ module.exports = class TextEditorComponent {
   }
 
   pixelPositionAfterBlocksForRow(row) {
-    let result = this.lineTopIndex.pixelPositionAfterBlocksForRow(row);
-    if (TextEditor.__DEBUG__) {
-      console.warn('pixelPositionAfterBlocksForRow:', row, 'produces position:', result);
-    }
-    return result;
+    return this.lineTopIndex.pixelPositionAfterBlocksForRow(row);
   }
 
   pixelLeftForRowAndColumn(row, column) {

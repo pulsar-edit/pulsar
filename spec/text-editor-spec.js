@@ -141,7 +141,6 @@ describe('TextEditor', () => {
 
   describe('.copy()', () => {
     it('returns a different editor with the same initial state', async () => {
-      console.warn('NOTE: Starting the .copy() test')
       expect(editor.getAutoHeight()).toBeFalsy();
       expect(editor.getAutoWidth()).toBeFalsy();
       expect(editor.getShowCursorOnSelection()).toBeTruthy();
@@ -152,19 +151,15 @@ describe('TextEditor', () => {
       jasmine.attachToDOM(element);
 
       editor.update({ showCursorOnSelection: false });
-      TextEditor.__DEBUG__ = true;
       editor.setSelectedBufferRange([[1, 2], [3, 4]]);
       editor.addSelectionForBufferRange([[5, 6], [7, 8]], { reversed: true });
-      console.warn('DEBUG: Setting first editor’s top row to 3');
-      TextEditor.__DEBUG__ = false;
-      editor.setScrollTopRow(3, true);
-      expect(editor.getScrollTopRow(true)).toBe(3);
+      editor.setScrollTopRow(3);
+      expect(editor.getScrollTopRow()).toBe(3);
       editor.setScrollLeftColumn(4);
       expect(editor.getScrollLeftColumn()).toBe(4);
       editor.foldBufferRow(4);
       expect(editor.isFoldedAtBufferRow(4)).toBeTruthy();
 
-      console.warn('DEBUG: Copying first editor');
       const editor2 = editor.copy();
       const element2 = editor2.getElement();
       element2.setHeight(100);
