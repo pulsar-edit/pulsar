@@ -1,3 +1,5 @@
+const { timeoutPromise: wait } = require('./helpers/async-spec-helpers');
+
 const fs = require('fs');
 const path = require('path');
 const temp = require('temp').track();
@@ -8355,6 +8357,9 @@ describe('TextEditor', () => {
 
   describe('.shouldPromptToSave()', () => {
     beforeEach(async () => {
+      jasmine.useRealClock();
+      // Allow for some breathing room to accommodate `pathwatcher`.
+      await wait(50);
       editor = await atom.workspace.open('sample.js');
       jasmine.unspy(editor, 'shouldPromptToSave');
       spyOn(atom.stateStore, 'isConnected').and.returnValue(true);
@@ -8383,8 +8388,9 @@ describe('TextEditor', () => {
       jasmine.useRealClock();
 
       editor.setText('initial stuff');
-      await editor.saveAs(temp.openSync('test-file').path);
-      console.warn('DEBUG: Editor saved');
+      let destination = temp.openSync('test-file').path;
+      await editor.saveAs(destination);
+      expect(fs.readFileSync(destination, 'utf8').toString()).toBe('initial stuff');
 
       editor.setText('other stuff');
       let promise = new Promise(resolve => editor.onDidConflict(() => {
@@ -8392,7 +8398,6 @@ describe('TextEditor', () => {
         resolve();
       }));
       fs.writeFileSync(editor.getPath(), 'new stuff');
-      console.warn('DEBUG: File contents changed');
       expect(
         editor.shouldPromptToSave({
           windowCloseRequested: true,
