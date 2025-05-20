@@ -2253,12 +2253,24 @@ module.exports = class TextEditorComponent {
 
     let scrolled = false;
     if (yDelta != null) {
-      const scaledDelta = scaleMouseDragAutoscrollDelta(yDelta) * yDirection;
+      let scaledDelta = scaleMouseDragAutoscrollDelta(yDelta) * yDirection;
+      // Snap the delta to physical pixels, but do so in the direction of the
+      // scroll. Err on the side of moving more in that direction rather than
+      // less.
+      scaledDelta = yDirection === 1 ?
+        ceilToPhysicalPixelBoundary(scaledDelta) :
+        floorToPhysicalPixelBoundary(scaledDelta);
       scrolled = this.setScrollTop(this.getScrollTop() + scaledDelta);
     }
 
     if (!verticalOnly && xDelta != null) {
-      const scaledDelta = scaleMouseDragAutoscrollDelta(xDelta) * xDirection;
+      let scaledDelta = scaleMouseDragAutoscrollDelta(xDelta) * xDirection;
+      // Snap the delta to physical pixels, but do so in the direction of the
+      // scroll. Err on the side of moving more in that direction rather than
+      // less.
+      scaledDelta = xDirection === 1 ?
+        ceilToPhysicalPixelBoundary(scaledDelta) :
+        floorToPhysicalPixelBoundary(scaledDelta);
       scrolled = this.setScrollLeft(this.getScrollLeft() + scaledDelta);
     }
 
@@ -5653,6 +5665,14 @@ function ceilToPhysicalPixelBoundary(virtualPixelPosition) {
   const virtualPixelsPerPhysicalPixel = 1 / window.devicePixelRatio;
   return (
     Math.ceil(virtualPixelPosition / virtualPixelsPerPhysicalPixel) *
+    virtualPixelsPerPhysicalPixel
+  );
+}
+
+function floorToPhysicalPixelBoundary(virtualPixelPosition) {
+  const virtualPixelsPerPhysicalPixel = 1 / window.devicePixelRatio;
+  return (
+    Math.floor(virtualPixelPosition / virtualPixelsPerPhysicalPixel) *
     virtualPixelsPerPhysicalPixel
   );
 }
