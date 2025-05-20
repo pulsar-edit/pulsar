@@ -1200,7 +1200,7 @@ describe('TextEditorComponent', () => {
         }
       });
 
-      fit('renders the visible rows correctly after randomly mutating the editor', async () => {
+      it('renders the visible rows correctly after randomly mutating the editor', async () => {
         const initialSeed = Date.now();
         for (var i = 0; i < 20; i++) {
           let seed = initialSeed + i;
