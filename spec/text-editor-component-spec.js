@@ -5,6 +5,7 @@ const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
 const TextEditorComponent = require('../src/text-editor-component');
 const TextEditorElement = require('../src/text-editor-element');
 const TextEditor = require('../src/text-editor');
+const ViewRegistry = require('../src/view-registry');
 const TextBuffer = require('text-buffer');
 const { Point } = TextBuffer;
 const fs = require('fs');
@@ -12,6 +13,34 @@ const path = require('path');
 const Grim = require('grim');
 const electron = require('electron');
 const clipboard = electron.clipboard;
+
+// Define a custom scheduler that uses `setTimeout` instead of
+// `requestAnimationFrame` because the latter behaves slowly when the browser
+// does not think the editor is visible.
+class CustomViewRegistry extends ViewRegistry {
+  animationFrameRequest = null;
+
+  clearDocumentRequests() {
+    this.documentReaders = [];
+    this.documentWriters = [];
+    this.nextUpdatePromise = null;
+    this.resolveNextUpdatePromise = null;
+    if (this.animationFrameRequest != null) {
+      clearTimeout(this.animationFrameRequest);
+      this.animationFrameRequest = null;
+    }
+  }
+
+  requestDocumentUpdate() {
+    if (this.animationFrameRequest == null) {
+      this.animationFrameRequest = setTimeout(
+        this.performDocumentUpdate,
+        0
+      );
+    }
+  }
+}
+
 
 const SAMPLE_TEXT = fs.readFileSync(
   path.join(__dirname, 'fixtures', 'sample.js'),
@@ -34,6 +63,12 @@ let verticalScrollbarWidth, horizontalScrollbarHeight;
 
 describe('TextEditorComponent', () => {
   beforeEach(() => {
+    if (process.platform === 'linux') {
+      // For some reason this is only an issue on Linux.
+      let existingScheduler = TextEditorComponent.getScheduler();
+      let scheduler = new CustomViewRegistry(existingScheduler.props);
+      TextEditorComponent.setScheduler(scheduler);
+    }
     if (!window.customElements.get('text-editor-component-test-element')) {
       window.customElements.define(
         'text-editor-component-test-element',
