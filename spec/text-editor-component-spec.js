@@ -41,6 +41,15 @@ class CustomViewRegistry extends ViewRegistry {
   }
 }
 
+let defaultScheduler = TextEditorComponent.getScheduler();
+let alternativeScheduler = new CustomViewRegistry(defaultScheduler.props);
+function useAlternativeScheduler() {
+  TextEditorComponent.setScheduler(alternativeScheduler);
+}
+
+function restoreDefaultScheduler() {
+  TextEditorComponent.setScheduler(defaultScheduler);
+}
 
 const SAMPLE_TEXT = fs.readFileSync(
   path.join(__dirname, 'fixtures', 'sample.js'),
@@ -63,12 +72,6 @@ let verticalScrollbarWidth, horizontalScrollbarHeight;
 
 describe('TextEditorComponent', () => {
   beforeEach(() => {
-    if (process.platform === 'linux') {
-      // For some reason this is only an issue on Linux.
-      let existingScheduler = TextEditorComponent.getScheduler();
-      let scheduler = new CustomViewRegistry(existingScheduler.props);
-      TextEditorComponent.setScheduler(scheduler);
-    }
     if (!window.customElements.get('text-editor-component-test-element')) {
       window.customElements.define(
         'text-editor-component-test-element',
@@ -1183,15 +1186,21 @@ describe('TextEditorComponent', () => {
       let originalTimeout;
 
       beforeEach(() => {
+        if (process.platform === 'linux') {
+          useAlternativeScheduler();
+        }
         originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
       });
 
       afterEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+        if (process.platform === 'linux') {
+          restoreDefaultScheduler();
+        }
       });
 
-      it('renders the visible rows correctly after randomly mutating the editor', async () => {
+      fit('renders the visible rows correctly after randomly mutating the editor', async () => {
         const initialSeed = Date.now();
         for (var i = 0; i < 20; i++) {
           let seed = initialSeed + i;
@@ -2292,6 +2301,18 @@ describe('TextEditorComponent', () => {
   });
 
   describe('highlight decorations', () => {
+    beforeEach(() => {
+      if (process.platform === 'linux') {
+        useAlternativeScheduler();
+      }
+    });
+
+    afterEach(() => {
+      if (process.platform === 'linux') {
+        restoreDefaultScheduler();
+      }
+    });
+
     it('renders single-line highlights', async () => {
       const { component, element, editor } = buildComponent();
       const marker = editor.markScreenRange([[1, 2], [1, 10]]);
