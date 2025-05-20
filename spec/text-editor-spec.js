@@ -8359,7 +8359,7 @@ describe('TextEditor', () => {
     beforeEach(async () => {
       jasmine.useRealClock();
       // Allow for some breathing room to accommodate `pathwatcher`.
-      await wait(50);
+      await wait(process.env.CI ? 500 : 50);
       editor = await atom.workspace.open('sample.js');
       jasmine.unspy(editor, 'shouldPromptToSave');
       spyOn(atom.stateStore, 'isConnected').and.returnValue(true);
