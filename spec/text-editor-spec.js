@@ -8394,9 +8394,9 @@ describe('TextEditor', () => {
 
       editor.setText('other stuff');
       let promise = new Promise(resolve => editor.onDidConflict(() => {
-        console.warn('DEBUG: Conflict!');
         resolve();
       }));
+      await wait(1000);
       fs.writeFileSync(editor.getPath(), 'new stuff');
       expect(
         editor.shouldPromptToSave({
