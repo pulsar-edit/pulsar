@@ -4684,11 +4684,9 @@ describe('TextEditorComponent', () => {
               didDrag,
               didStopDragging
             } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
-            console.warn('clientPositionForCharacter (should be 8, 8)', clientPositionForCharacter(component, 8, 8, true));
-            console.warn('clientLeftForCharacter (should be 8, 8)', clientLeftForCharacter(component, 8, 8))
-            didDrag(clientPositionForCharacter(component, 8, 8), true);
+            didDrag(clientPositionForCharacter(component, 8, 8));
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [8, 8]]);
-            didDrag(clientPositionForCharacter(component, 4, 8), true);
+            didDrag(clientPositionForCharacter(component, 4, 8));
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [4, 8]]);
             didStopDragging();
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [4, 8]]);
@@ -4717,22 +4715,17 @@ describe('TextEditorComponent', () => {
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
             ]);
-            console.warn('clientLeftForCharacter (should be 6, 8)', clientLeftForCharacter(component, 6, 8, true))
-            console.warn('clientLeftForCharacter sanity check (should be 6, 4)', clientLeftForCharacter(component, 6, 4, true))
-            console.warn('clientLeftForCharacter sanity check (should be 6, 0)', clientLeftForCharacter(component, 6, 0, true))
             expect(
               clientLeftForCharacter(component, 6, 8)
             ).not.toEqual(
               clientLeftForCharacter(component, 6, 0)
             )
-            didDrag(clientPositionForCharacter(component, 6, 8), true);
-            console.warn('screen ranges:', editor.getSelectedScreenRanges().map(r => r.toString()));
+            didDrag(clientPositionForCharacter(component, 6, 8));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[6, 8], [8, 8]]
             ]);
-            console.warn('clientLeftForCharacter (should be 2, 8)', clientLeftForCharacter(component, 2, 8, true))
-            didDrag(clientPositionForCharacter(component, 2, 8), true);
+            didDrag(clientPositionForCharacter(component, 2, 8));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]

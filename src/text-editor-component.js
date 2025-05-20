@@ -2080,12 +2080,9 @@ module.exports = class TextEditorComponent {
     }
 
     this.handleMouseDragUntilMouseUp({
-      didDrag: (event, debug = false) => {
+      didDrag: (event) => {
         this.autoscrollOnMouseDrag(event);
-        const screenPosition = this.screenPositionForMouseEvent(event, true);
-        if (debug) {
-          console.warn('event:', event.clientX, event.clientY, 'translates to screen position:', screenPosition.toString());
-        }
+        const screenPosition = this.screenPositionForMouseEvent(event);
         model.selectToScreenPosition(screenPosition, {
           suppressSelectionMerge: true,
           autoscroll: false
@@ -2268,34 +2265,14 @@ module.exports = class TextEditorComponent {
     if (scrolled) this.updateSync();
   }
 
-  screenPositionForMouseEvent(event, debug = false) {
+  screenPositionForMouseEvent(event) {
     return this.screenPositionForPixelPosition(
-      this.pixelPositionForMouseEvent(event, debug),
-      debug
+      this.pixelPositionForMouseEvent(event)
     );
   }
 
-  pixelPositionForMouseEvent({ clientX, clientY }, debug = false) {
-    if (debug) {
-      console.warn('pixelPositionForMouseEvent clientX:', clientX, 'clientY:', clientY);
-    }
+  pixelPositionForMouseEvent({ clientX, clientY }) {
     const scrollContainerRect = this.refs.scrollContainer.getBoundingClientRect();
-    if (debug) {
-      console.warn(
-        'scrollContainerRect is left:',
-        scrollContainerRect.left,
-        'right:',
-        scrollContainerRect.right,
-        'top:',
-        scrollContainerRect.top,
-        'bottom:',
-        scrollContainerRect.bottom,
-        'width:',
-        scrollContainerRect.width,
-        'height:',
-        scrollContainerRect.height
-      )
-    }
     clientX = Math.min(
       scrollContainerRect.right,
       Math.max(scrollContainerRect.left, clientX)
@@ -2305,9 +2282,6 @@ module.exports = class TextEditorComponent {
       Math.max(scrollContainerRect.top, clientY)
     );
     const linesRect = this.refs.lineTiles.getBoundingClientRect();
-    if (debug) {
-      console.warn('linesRect top:', linesRect.top, 'left:', linesRect.left, 'clamped clientX:', clientX, 'clamped clientY:', clientY)
-    }
     return {
       top: clientY - linesRect.top,
       left: clientX - linesRect.left
@@ -3477,15 +3451,12 @@ module.exports = class TextEditorComponent {
     return this.scrollTop;
   }
 
-  setScrollTop(scrollTop, debug = false) {
+  setScrollTop(scrollTop) {
     if (Number.isNaN(scrollTop) || scrollTop == null) return false;
 
     scrollTop = ceilToPhysicalPixelBoundary(
       Math.max(0, Math.min(this.getMaxScrollTop(), scrollTop))
     );
-    if (debug) {
-      console.warn('DEBUG: scrollTop rounded to', scrollTop, 'existing is', this.scrollTop);
-    }
     if (scrollTop !== this.scrollTop) {
       this.derivedDimensionsCache = {};
       this.scrollTopPending = true;
@@ -3552,36 +3523,23 @@ module.exports = class TextEditorComponent {
     );
   }
 
-  setScrollTopRow(scrollTopRow, scheduleUpdate = true, debug = false) {
+  setScrollTopRow(scrollTopRow, scheduleUpdate = true) {
     if (this.hasInitialMeasurements) {
-      if (debug) {
-        console.warn('DEBUG: scrollTopRow hasInitialMeasurements', this.pixelPositionBeforeBlocksForRow(scrollTopRow));
-      }
       const didScroll = this.setScrollTop(
-        this.pixelPositionBeforeBlocksForRow(scrollTopRow),
-        debug
+        this.pixelPositionBeforeBlocksForRow(scrollTopRow)
       );
       if (didScroll && scheduleUpdate) {
         this.scheduleUpdate();
       }
-      if (debug) {
-        console.warn('DEBUG: After setting scrollTopRow of', scrollTopRow, 'what do we think our scrollTopRow is?');
-        let sanity = this.getScrollTopRow(true);
-        console.warn('DEBUG: The result is', sanity);
-      }
       return didScroll;
     } else {
-      console.warn('DEBUG: pending:', scrollTopRow);
       this.pendingScrollTopRow = scrollTopRow;
       return false;
     }
   }
 
-  getScrollTopRow(debug = false) {
+  getScrollTopRow() {
     if (this.hasInitialMeasurements) {
-      if (debug) {
-        console.warn('DEBUG: getScrollTopRow scrollTop:', this.getScrollTop(), 'row:', this.rowForPixelPosition(this.getScrollTop()));
-      }
       return this.rowForPixelPosition(this.getScrollTop());
     } else {
       return this.pendingScrollTopRow || 0;
