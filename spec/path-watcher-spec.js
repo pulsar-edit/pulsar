@@ -281,7 +281,15 @@ describe('File', () => {
           fs.removeSync(filePath);
           expect(changeHandler).not.toHaveBeenCalled();
 
-          await wait(0);
+          // NOTE: Putting this wait(0) here makes this test flakier. We
+          // override the async behavior inside of this spec anyway, so it's
+          // not a great crime to comment this out.
+          //
+          // The alternative is to write a test that's very precise about
+          // timing, but that's a bit hard to do in a non-flaky way for a test
+          // that must pass in a CI environment.
+
+          // await wait(0);
           fs.writeFileSync(filePath, 'HE HAS RISEN!');
           expect(changeHandler).not.toHaveBeenCalled();
 

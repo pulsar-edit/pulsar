@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Install build dependencies
-      run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbfile-dev pkg-config libsecret-1-dev libncursesw5-dev libgdbm-dev libc6-dev libffi-dev
+      run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbfile-dev pkg-config libsecret-1-dev libncursesw5-dev libgdbm-dev libc6-dev libffi-dev libwayland-dev libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
 
     - name: Checkout the latest code
       uses: actions/checkout@v4

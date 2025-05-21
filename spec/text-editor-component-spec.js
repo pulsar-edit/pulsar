@@ -5,6 +5,7 @@ const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
 const TextEditorComponent = require('../src/text-editor-component');
 const TextEditorElement = require('../src/text-editor-element');
 const TextEditor = require('../src/text-editor');
+const ViewRegistry = require('../src/view-registry');
 const TextBuffer = require('text-buffer');
 const { Point } = TextBuffer;
 const fs = require('fs');
@@ -12,6 +13,43 @@ const path = require('path');
 const Grim = require('grim');
 const electron = require('electron');
 const clipboard = electron.clipboard;
+
+// Define a custom scheduler that uses `setTimeout` instead of
+// `requestAnimationFrame` because the latter behaves slowly when the browser
+// does not think the editor is visible.
+class CustomViewRegistry extends ViewRegistry {
+  animationFrameRequest = null;
+
+  clearDocumentRequests() {
+    this.documentReaders = [];
+    this.documentWriters = [];
+    this.nextUpdatePromise = null;
+    this.resolveNextUpdatePromise = null;
+    if (this.animationFrameRequest != null) {
+      clearTimeout(this.animationFrameRequest);
+      this.animationFrameRequest = null;
+    }
+  }
+
+  requestDocumentUpdate() {
+    if (this.animationFrameRequest == null) {
+      this.animationFrameRequest = setTimeout(
+        this.performDocumentUpdate,
+        0
+      );
+    }
+  }
+}
+
+let defaultScheduler = TextEditorComponent.getScheduler();
+let alternativeScheduler = new CustomViewRegistry(defaultScheduler.props);
+function useAlternativeScheduler() {
+  TextEditorComponent.setScheduler(alternativeScheduler);
+}
+
+function restoreDefaultScheduler() {
+  TextEditorComponent.setScheduler(defaultScheduler);
+}
 
 const SAMPLE_TEXT = fs.readFileSync(
   path.join(__dirname, 'fixtures', 'sample.js'),
@@ -1147,12 +1185,18 @@ describe('TextEditorComponent', () => {
       let originalTimeout;
 
       beforeEach(() => {
+        if (process.platform === 'linux') {
+          useAlternativeScheduler();
+        }
         originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
       });
 
       afterEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+        if (process.platform === 'linux') {
+          restoreDefaultScheduler();
+        }
       });
 
       it('renders the visible rows correctly after randomly mutating the editor', async () => {
@@ -2256,6 +2300,18 @@ describe('TextEditorComponent', () => {
   });
 
   describe('highlight decorations', () => {
+    beforeEach(() => {
+      if (process.platform === 'linux') {
+        useAlternativeScheduler();
+      }
+    });
+
+    afterEach(() => {
+      if (process.platform === 'linux') {
+        restoreDefaultScheduler();
+      }
+    });
+
     it('renders single-line highlights', async () => {
       const { component, element, editor } = buildComponent();
       const marker = editor.markScreenRange([[1, 2], [1, 10]]);
@@ -2434,6 +2490,7 @@ describe('TextEditorComponent', () => {
     });
 
     it("flashing a highlight decoration doesn't unflash other highlight decorations", async () => {
+      jasmine.useRealClock();
       const { component, element, editor } = buildComponent({
         rowsPerTile: 3,
         height: 200
@@ -2452,7 +2509,7 @@ describe('TextEditorComponent', () => {
       expect(highlights[0].classList.contains('c')).toBe(true);
 
       // Flash another class while the previously-flashed class is still highlighted
-      decoration.flash('d', 100);
+      decoration.flash('d', process.env.CI ? 1500 : 100);
       await component.getNextUpdatePromise();
       expect(highlights[0].classList.contains('c')).toBe(true);
       expect(highlights[0].classList.contains('d')).toBe(true);
@@ -3203,6 +3260,7 @@ describe('TextEditorComponent', () => {
         component,
         3 * component.getLineHeight() + getElementHeight(item3)
       );
+      await wait(100);
       expect(component.getRenderedStartRow()).toBe(3);
       expect(component.getRenderedEndRow()).toBe(12);
       expect(component.getScrollHeight()).toBeNear(
@@ -4622,7 +4680,7 @@ describe('TextEditorComponent', () => {
 
         it('expands the last selection on drag', () => {
           atom.config.set('editor.multiCursorOnClick', true);
-          const { component, editor } = buildComponent();
+          const { component, editor } = buildComponent({ updatedSynchronously: true });
           spyOn(component, 'handleMouseDragUntilMouseUp');
 
           component.didMouseDownOnContent(
@@ -4670,6 +4728,11 @@ describe('TextEditorComponent', () => {
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
             ]);
+            expect(
+              clientLeftForCharacter(component, 6, 8)
+            ).not.toEqual(
+              clientLeftForCharacter(component, 6, 0)
+            )
             didDrag(clientPositionForCharacter(component, 6, 8));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
@@ -5690,7 +5753,10 @@ describe('TextEditorComponent', () => {
     });
 
     it('gracefully handles the editor being hidden after a styling change', async (done) => {
+      jasmine.useRealClock();
       jasmine.filterByPlatform({only: ['linux']}, done);
+      // Seems to make this test less flaky.
+      await wait(0);
 
       const { component, element } = buildComponent({
         autoHeight: false

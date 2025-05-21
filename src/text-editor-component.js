@@ -2080,7 +2080,7 @@ module.exports = class TextEditorComponent {
     }
 
     this.handleMouseDragUntilMouseUp({
-      didDrag: event => {
+      didDrag: (event) => {
         this.autoscrollOnMouseDrag(event);
         const screenPosition = this.screenPositionForMouseEvent(event);
         model.selectToScreenPosition(screenPosition, {
@@ -2253,12 +2253,24 @@ module.exports = class TextEditorComponent {
 
     let scrolled = false;
     if (yDelta != null) {
-      const scaledDelta = scaleMouseDragAutoscrollDelta(yDelta) * yDirection;
+      let scaledDelta = scaleMouseDragAutoscrollDelta(yDelta) * yDirection;
+      // Snap the delta to physical pixels, but do so in the direction of the
+      // scroll. Err on the side of moving more in that direction rather than
+      // less.
+      scaledDelta = yDirection === 1 ?
+        ceilToPhysicalPixelBoundary(scaledDelta) :
+        floorToPhysicalPixelBoundary(scaledDelta);
       scrolled = this.setScrollTop(this.getScrollTop() + scaledDelta);
     }
 
     if (!verticalOnly && xDelta != null) {
-      const scaledDelta = scaleMouseDragAutoscrollDelta(xDelta) * xDirection;
+      let scaledDelta = scaleMouseDragAutoscrollDelta(xDelta) * xDirection;
+      // Snap the delta to physical pixels, but do so in the direction of the
+      // scroll. Err on the side of moving more in that direction rather than
+      // less.
+      scaledDelta = xDirection === 1 ?
+        ceilToPhysicalPixelBoundary(scaledDelta) :
+        floorToPhysicalPixelBoundary(scaledDelta);
       scrolled = this.setScrollLeft(this.getScrollLeft() + scaledDelta);
     }
 
@@ -2503,6 +2515,7 @@ module.exports = class TextEditorComponent {
       // don't need to check more than one.
       this.refs.normalWidthCharacterSpan.parentNode.getBoundingClientRect().height
     );
+
     this.measurements.baseCharacterWidth = this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.doubleWidthCharacterWidth = this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.halfWidthCharacterWidth = this.refs.halfWidthCharacterSpan.getBoundingClientRect().width;
@@ -2817,7 +2830,19 @@ module.exports = class TextEditorComponent {
         inherentRange.startOffset,
         textNodes
       );
-      return Point(row, column);
+
+      // As a final sanity check, grab this range's bounding DOMRect and ensure
+      // it actually contains the point in question.
+      //
+      // TODO: `caretRangeFromPoint` is incredibly convenient, but this sanity
+      // check is required in order to work around a strange behavior that
+      // produced a test suite failure. If any further quirks emerge, it might
+      // eventually be worth it to skip `caretRangeFromPoint` and go straight
+      // to the fallback approach.
+      let { top, bottom } = inherentRange.getBoundingClientRect();
+      if (targetClientTop >= top && targetClientTop <= bottom) {
+        return Point(row, column);
+      }
     }
 
     // SECOND STRATEGY:
@@ -3433,7 +3458,7 @@ module.exports = class TextEditorComponent {
   setScrollTop(scrollTop) {
     if (Number.isNaN(scrollTop) || scrollTop == null) return false;
 
-    scrollTop = roundToPhysicalPixelBoundary(
+    scrollTop = ceilToPhysicalPixelBoundary(
       Math.max(0, Math.min(this.getMaxScrollTop(), scrollTop))
     );
     if (scrollTop !== this.scrollTop) {
@@ -5632,6 +5657,14 @@ function ceilToPhysicalPixelBoundary(virtualPixelPosition) {
   const virtualPixelsPerPhysicalPixel = 1 / window.devicePixelRatio;
   return (
     Math.ceil(virtualPixelPosition / virtualPixelsPerPhysicalPixel) *
+    virtualPixelsPerPhysicalPixel
+  );
+}
+
+function floorToPhysicalPixelBoundary(virtualPixelPosition) {
+  const virtualPixelsPerPhysicalPixel = 1 / window.devicePixelRatio;
+  return (
+    Math.floor(virtualPixelPosition / virtualPixelsPerPhysicalPixel) *
     virtualPixelsPerPhysicalPixel
   );
 }
