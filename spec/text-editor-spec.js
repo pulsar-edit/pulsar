@@ -148,7 +148,7 @@ describe('TextEditor', () => {
       expect(editor.getShowCursorOnSelection()).toBeTruthy();
 
       const element = editor.getElement();
-      element.setHeight(110);
+      element.setHeight(100);
       element.setWidth(100);
       jasmine.attachToDOM(element);
 
@@ -172,7 +172,7 @@ describe('TextEditor', () => {
         editor.getSelectedBufferRanges()
       );
       expect(editor2.getSelections()[1].isReversed()).toBeTruthy();
-      expect(editor2.getScrollTopRow(true)).toBe(3);
+      expect(editor2.getScrollTopRow()).toBe(3);
       expect(editor2.getScrollLeftColumn()).toBe(4);
       expect(editor2.isFoldedAtBufferRow(4)).toBeTruthy();
       expect(editor2.getAutoWidth()).toBe(false);
@@ -8359,7 +8359,7 @@ describe('TextEditor', () => {
     beforeEach(async () => {
       jasmine.useRealClock();
       // Allow for some breathing room to accommodate `pathwatcher`.
-      await wait(process.env.CI ? 500 : 50);
+      await wait(process.env.CI ? 500 : 0);
       editor = await atom.workspace.open('sample.js');
       jasmine.unspy(editor, 'shouldPromptToSave');
       spyOn(atom.stateStore, 'isConnected').and.returnValue(true);

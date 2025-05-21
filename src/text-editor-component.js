@@ -2516,12 +2516,6 @@ module.exports = class TextEditorComponent {
       this.refs.normalWidthCharacterSpan.parentNode.getBoundingClientRect().height
     );
 
-    // TEMP: See if we can get away with snapping to physical pixels here.
-    //
-    // TEMP: This doesn't work because the rounding should happen at the end so
-    // as not to be compounded from multiple mathematical operations.
-    // this.measurements.lineHeight = ceilToPhysicalPixelBoundary(this.measurements.lineHeight);
-
     this.measurements.baseCharacterWidth = this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.doubleWidthCharacterWidth = this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.halfWidthCharacterWidth = this.refs.halfWidthCharacterSpan.getBoundingClientRect().width;
@@ -3373,11 +3367,9 @@ module.exports = class TextEditorComponent {
 
   getRenderedStartRow() {
     if (this.derivedDimensionsCache.renderedStartRow == null) {
-      // console.warn('deriving renderedStartRow from getFirstVisibleRow of', this.getFirstVisibleRow());
       this.derivedDimensionsCache.renderedStartRow = this.tileStartRowForRow(
         this.getFirstVisibleRow()
       );
-      // console.warn('derived', this.derivedDimensionsCache.renderedStartRow);
     }
 
     return this.derivedDimensionsCache.renderedStartRow;

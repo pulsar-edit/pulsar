@@ -762,7 +762,6 @@ describe('TextEditorComponent', () => {
     });
 
     it('places the hidden input element at the location of the last cursor if it is visible', async () => {
-      console.warn('TEST START!')
       const { component, editor } = buildComponent({
         height: 60,
         width: 120,
@@ -3048,7 +3047,6 @@ describe('TextEditorComponent', () => {
 
   describe('block decorations', () => {
     it('renders visible block decorations between the appropriate lines, refreshing and measuring them as needed', async () => {
-      console.log('?!?!?')
       const editor = buildEditor({ autoHeight: false });
       const {
         item: item1,
@@ -3070,7 +3068,6 @@ describe('TextEditorComponent', () => {
       const { component, element } = buildComponent({ editor, rowsPerTile: 3 });
       element.style.height =
         4 * component.getLineHeight() + horizontalScrollbarHeight + 'px';
-      console.warn('component.getLineHeight():', component.getLineHeight());
       await component.getNextUpdatePromise();
       expect(component.getRenderedStartRow()).toBe(0);
       expect(component.getRenderedEndRow()).toBe(9);
@@ -3225,10 +3222,7 @@ describe('TextEditorComponent', () => {
       expect(element.contains(item6)).toBe(false);
 
       // change the text
-      console.warn('CHANGE THE TEXT');
       editor.getBuffer().setTextInRange([[0, 5], [0, 5]], '\n\n');
-      // TEMP?
-      // editor.setScrollTop(0);
       await component.getNextUpdatePromise();
       expect(component.getRenderedStartRow()).toBe(0);
       expect(component.getRenderedEndRow()).toBe(9);
@@ -3240,7 +3234,6 @@ describe('TextEditorComponent', () => {
           getElementHeight(item5) +
           getElementHeight(item6)
       );
-      console.warn('DONE');
       assertTilesAreSizedAndPositionedCorrectly(component, [
         {
           tileStartRow: 0,
@@ -4731,7 +4724,6 @@ describe('TextEditorComponent', () => {
               didStopDragging
             } = component.handleMouseDragUntilMouseUp.calls.argsFor(1)[0];
             didDrag(clientPositionForCharacter(component, 2, 8));
-            // await wait(100);
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
@@ -5770,7 +5762,7 @@ describe('TextEditorComponent', () => {
         autoHeight: false
       });
       element.style.fontSize =
-      parseInt(getComputedStyle(element).fontSize) + 5 + 'px';
+        parseInt(getComputedStyle(element).fontSize) + 5 + 'px';
       TextEditor.didUpdateStyles();
       element.style.display = 'none';
       await component.getNextUpdatePromise();
@@ -6612,19 +6604,12 @@ function clientRectAroundCharacter(component, row, column, index = 0) {
   );
 }
 
-function clientLeftForCharacter(component, row, column, debug = false) {
+function clientLeftForCharacter(component, row, column) {
   const textNodes = textNodesForScreenRow(component, row);
-  if (debug) {
-    console.warn('textNodes:', textNodes.length, textNodes);
-  }
   let textNodeStartColumn = 0;
   for (const textNode of textNodes) {
     const textNodeEndColumn = textNodeStartColumn + textNode.textContent.length;
     if (column < textNodeEndColumn) {
-      if (debug) {
-        console.warn('column is in this text node!', textNode.textContent);
-        console.warn('we need this index into the text node:', column - textNodeStartColumn);
-      }
       const range = document.createRange();
       range.setStart(textNode, column - textNodeStartColumn);
       range.setEnd(textNode, column - textNodeStartColumn);
@@ -6640,9 +6625,9 @@ function clientLeftForCharacter(component, row, column, debug = false) {
   return range.getBoundingClientRect().right;
 }
 
-function clientPositionForCharacter(component, row, column, debug = false) {
+function clientPositionForCharacter(component, row, column) {
   return {
-    clientX: clientLeftForCharacter(component, row, column, debug),
+    clientX: clientLeftForCharacter(component, row, column),
     clientY: clientTopForLine(component, row)
   };
 }
