@@ -7,6 +7,7 @@ import { promisify } from 'util';
 
 import { CompositeDisposable } from 'event-kit';
 import { watchPath, stopAllWatchers } from '../src/path-watcher';
+const { conditionPromise } = require('./helpers/async-spec-helpers');
 
 temp.track();
 
@@ -14,6 +15,7 @@ const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 const appendFile = promisify(fs.appendFile);
 const realpath = promisify(fs.realpath);
+const symlink = promisify(fs.symlink);
 
 const tempMkdir = promisify(temp.mkdir);
 
@@ -52,13 +54,6 @@ describe('watchPath', function() {
   }
 
   describe('watchPath()', function() {
-    it('resolves the returned promise when the watcher begins listening', async function() {
-      const rootDir = await tempMkdir('atom-fsmanager-test-');
-
-      const watcher = await watchPath(rootDir, {}, () => {});
-      expect(watcher.constructor.name).toBe('PathWatcher');
-    });
-
     it('reuses an existing native watcher and resolves getStartPromise immediately if attached to a running watcher', async function() {
       const rootDir = await tempMkdir('atom-fsmanager-test-');
 
@@ -67,6 +62,129 @@ describe('watchPath', function() {
 
       expect(watcher0.native).toBe(watcher1.native);
     });
+
+    let disposables;
+    beforeEach(() => {
+      disposables = new CompositeDisposable();
+    })
+
+    afterEach(() => {
+      disposables?.dispose();
+    })
+
+    it('resolves the returned promise when the watcher begins listening', async function () {
+      const rootDir = await tempMkdir('atom-fsmanager-test-');
+      const watcher = await watchPath(rootDir, {}, () => {});
+      disposables.add(watcher);
+      expect(watcher.constructor.name).toBe('PathWatcher');
+    });
+
+    it('reuses an existing native watcher and resolves getStartPromise immediately if attached to a running watcher', async function () {
+      const rootDir = await tempMkdir('atom-fsmanager-test-');
+
+      const watcher0 = await watchPath(rootDir, {}, () => {});
+      const watcher1 = await watchPath(rootDir, {}, () => {});
+
+      disposables.add(watcher0, watcher1);
+
+      expect(watcher0.native).toBe(watcher1.native);
+    });
+
+    it("returns paths that appear to descend from the given path, even when symlinks are involved, when `realPaths` is `false`", async () => {
+      jasmine.useRealClock();
+      const rootDir = await tempMkdir('atom-fsmanager-test-');
+      const realRootDir = await realpath(rootDir)
+      const symlinkedPath = temp.path({ suffix: '-symlinked' })
+      await symlink(realRootDir, symlinkedPath)
+
+      let events0 = [];
+      let watcher0 = await watchPath(realRootDir, { realPaths: false }, (events) => {
+        events0.push(...events);
+      });
+      let events1 = [];
+      let watcher1 = await watchPath(symlinkedPath, { realPaths: false }, (events) => {
+        events1.push(...events);
+      });
+
+      disposables.add(watcher0, watcher1);
+
+      await writeFile(path.join(realRootDir, 'foo.txt'), '!')
+      await conditionPromise(() => {
+        return events0.length > 0 && events1.length > 0 && events0.length === events1.length;
+      });
+
+      let [first0] = events0;
+      let [first1] = events1;
+
+      // Even though these two events describe the same filesystem action,
+      // their `path` properties don't match one another; they correspond to
+      // the paths given in their respective calls to `watchPath`.
+      expect(first0.path).not.toBe(first1.path);
+      expect(first0.path.startsWith(realRootDir)).toBe(true);
+      expect(first1.path.startsWith(symlinkedPath)).toBe(true);
+    })
+
+    it("returns real paths for events when `realPaths` is `true`", async () => {
+      jasmine.useRealClock();
+      const rootDir = await tempMkdir('atom-fsmanager-test-');
+      const realRootDir = await realpath(rootDir)
+      const symlinkedPath = temp.path({ suffix: '-symlinked' })
+      await symlink(realRootDir, symlinkedPath)
+      const realSymlinkedPath = await realpath(symlinkedPath)
+
+      let events0 = [];
+      let watcher0 = await watchPath(realRootDir, { realPaths: true }, (events) => {
+        events0.push(...events);
+      });
+      let events1 = [];
+      let watcher1 = await watchPath(symlinkedPath, { realPaths: true }, (events) => {
+        events1.push(...events);
+      });
+
+      disposables.add(watcher0, watcher1);
+
+      await writeFile(path.join(realRootDir, 'foo.txt'), '!')
+      await conditionPromise(() => {
+        return events0.length > 0 && events1.length > 0 &&
+          events0.length === events1.length;
+      });
+
+      let [first0] = events0;
+      let [first1] = events1;
+
+      // Because `realPaths` is `true`, these events will have identical `path`
+      // properties that point to the file's true path on disk.
+      expect(first0.path).toBe(first1.path);
+      expect(first0.path.startsWith(realRootDir)).toBe(true);
+      expect(first1.path.startsWith(symlinkedPath)).toBe(false);
+    })
+
+    it("normalizes a path without resolving symlinks when `realPaths` is `false`", async () => {
+      jasmine.useRealClock();
+      const rootDir = await tempMkdir('atom-fsmanager-test-');
+      const realRootDir = await realpath(rootDir);
+      const symlinkedPath = temp.path({ suffix: '-symlinked' })
+      await symlink(realRootDir, symlinkedPath);
+
+      const relativizedPath = `${symlinkedPath}${path.sep}..${path.sep}${path.basename(symlinkedPath)}`
+
+      let events0 = [];
+      let watcher0 = await watchPath(relativizedPath, { realPaths: false }, (events) => {
+        events0.push(...events);
+      });
+      disposables.add(watcher0);
+
+      await writeFile(path.join(realRootDir, 'foo.txt'), '!')
+      await conditionPromise(() => events0.length > 0);
+
+      let [first0] = events0;
+
+      // We want to ensure that the weird relative path the user gave to
+      // `watchPath` is resolved internally _without_ it pointing to the real
+      // path on disk.
+      expect(first0.path.startsWith(symlinkedPath)).toBe(true);
+      expect(first0.path.startsWith(relativizedPath)).toBe(false);
+    })
 
     it("reuses existing native watchers even while they're still starting", async function() {
       const rootDir = await tempMkdir('atom-fsmanager-test-');
