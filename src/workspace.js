@@ -31,11 +31,15 @@ function filePathMatchesGlob(filePath, matcher) {
   // when we should stop because there's no more upward traversal to be done.
   while (filePath && filePath !== '.') {
     if (matcher.match(filePath)) {
-      return true;
+      // We created these matchers with `flipNegate` because it does the right
+      // thing when faced with this strange glob-matching algorithm. But that
+      // means we need to manually check the `negate` property at the end and
+      // flip the result if it's `true`.
+      return matcher.negate ? false : true;
     }
     filePath = path.dirname(filePath);
   }
-  return false;
+  return matcher.negate ? true : false;
 }
 
 const STOPPED_CHANGING_ACTIVE_PANE_ITEM_DELAY = 100;
@@ -2197,7 +2201,7 @@ module.exports = class Workspace extends Model {
     const searchPromise = Promise.all(allSearches);
 
     let matchers = options.paths ?
-      options.paths.map((inclusion) => new Minimatch(inclusion)) :
+      options.paths.map((inclusion) => new Minimatch(inclusion, { flipNegate: true })) :
       null;
 
     // Let's consider the open buffers.

@@ -2746,7 +2746,7 @@ describe('Workspace', () => {
           expect(matches.length).toBe(1);
         });
 
-        fit('filters open modified buffers from the results against the specified glob pattern', async () => {
+        it('filters open modified buffers from the results against the specified glob pattern', async () => {
           const projectPath = path.join(__dirname, 'fixtures', 'workspace-scan');
           atom.project.setPaths([projectPath]);
 
@@ -2779,6 +2779,28 @@ describe('Workspace', () => {
           expect(paths.includes('b-dir/sample1')).toBe(true);
           expect(paths.includes('b-dir/sample2')).toBe(true);
           expect(paths.includes('a-dir/sample1')).toBe(false);
+
+          paths = [];
+
+          // Now do the same test, but negating the path.
+          await scan(/\bsmapdi\b/, { paths: [`!b-dir`] }, result => {
+            paths.push(atom.project.relativize(result.filePath));
+          });
+
+          // We should get one result:
+          //
+          // - a-dir/sample1 ("smapdi" exists in the modified buffer)
+          //
+          // We should _not_ get:
+          //
+          // - b-dir/sample1 ("smapdi" exists in the modified buffer, but
+          //   should fail our negated glob!)
+          // - b-dir/sample2 ("smapdi" exists on disk, but should fail our
+          //   negated glob!)
+          expect(paths.length).toBe(1);
+          expect(paths.includes('b-dir/sample1')).toBe(false);
+          expect(paths.includes('b-dir/sample2')).toBe(false);
+          expect(paths.includes('a-dir/sample1')).toBe(true);
         })
 
         it("includes files and folders that begin with a '.'", async () => {
