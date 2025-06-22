@@ -2746,6 +2746,41 @@ describe('Workspace', () => {
           expect(matches.length).toBe(1);
         });
 
+        fit('filters open modified buffers from the results against the specified glob pattern', async () => {
+          const projectPath = path.join(__dirname, 'fixtures', 'workspace-scan');
+          atom.project.setPaths([projectPath]);
+
+          // Add the word "smapdi" to each of these buffers, but do not save
+          // either one.
+          let aSample1Editor = await atom.workspace.open(path.join(projectPath, 'a-dir', 'sample1'));
+          let aSample1Text = aSample1Editor.getText();
+          aSample1Editor.setText(`${aSample1Text} smapdi`);
+          let bSample1Editor = await atom.workspace.open(path.join(projectPath, 'b-dir', 'sample1'));
+          let bSample1Text = bSample1Editor.getText();
+          bSample1Editor.setText(`${bSample1Text} smapdi`);
+
+          // We should get two results:
+          //
+          // - b-dir/sample2 ("smapdi" exists on disk)
+          // - b-dir/sample1  ("smapdi" does not exist on disk, but exists in
+          //   the modified buffer)
+          //
+          // We should _not_ get:
+          //
+          // - a-dir/sample1 ("smapdi" exists in the modified buffer, but this
+          //   path doesn't match our glob!)
+          let matches = [], paths = [];
+          await scan(/\bsmapdi\b/, { paths: [`b-dir`] }, result => {
+            paths.push(atom.project.relativize(result.filePath));
+            matches.push(...result.matches);
+          });
+
+          expect(paths.length).toBe(2);
+          expect(paths.includes('b-dir/sample1')).toBe(true);
+          expect(paths.includes('b-dir/sample2')).toBe(true);
+          expect(paths.includes('a-dir/sample1')).toBe(false);
+        })
+
         it("includes files and folders that begin with a '.'", async () => {
           const projectPath = temp.mkdirSync('atom-spec-workspace');
           const filePath = path.join(projectPath, '.text');
