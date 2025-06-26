@@ -78,7 +78,7 @@ module.exports = class Task {
       this.childProcess = ChildProcess.fork(
         require.resolve('./task-bootstrap'),
         [compileCachePath, taskPath],
-        { env, silent: true }
+        { env, silent: true, windowsHide: true }
       );
     }
 

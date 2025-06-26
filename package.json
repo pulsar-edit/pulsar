@@ -30,6 +30,7 @@
     "@babel/core": "7.18.6",
     "@electron/remote": "2.1.2",
     "@formatjs/fast-memoize": "^2.2.6",
+    "@parcel/watcher": "^2.5.1",
     "@pulsar-edit/atom-keymap": "^9.0.2",
     "@pulsar-edit/fuzzy-native": "1.3.0",
     "@pulsar-edit/get-scrollbar-style": "^1.0.1",
