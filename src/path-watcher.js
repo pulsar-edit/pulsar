@@ -1,9 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
 const nsfw = require('nsfw');
 const { NativeWatcherRegistry } = require('./native-watcher-registry');
+const Task = require('./task');
 
 // Private: Associate native watcher action flags with descriptive String
 // equivalents.
@@ -12,6 +14,12 @@ const ACTION_MAP = new Map([
   [nsfw.actions.CREATED,  'created' ],
   [nsfw.actions.DELETED,  'deleted' ],
   [nsfw.actions.RENAMED,  'renamed' ]
+]);
+
+const PARCEL_WATCHER_ACTION_MAP = new Map([
+  ['create', 'created'],
+  ['update', 'updated'],
+  ['delete', 'deleted']
 ]);
 
 // Private: Possible states of a {NativeWatcher}.
@@ -168,6 +176,183 @@ class NativeWatcher {
   }
 }
 
+// A file-watcher implementation that uses `@parcel/watcher`.
+//
+// We briefly experimented with importing it directly into the renderer
+// process, but it caused crashes on window reload for reasons that haven't
+// been fully tracked down. That's fine, though; we can run it in its own
+// long-running task, much like VS Code does.
+class ParcelWatcherNativeWatcher extends NativeWatcher {
+  static task = new Task(require.resolve('./parcel-watcher-worker.js'));
+
+  // Whether the task has been started.
+  static started = false;
+
+  // Whether the task has had its listeners attached.
+  static initialized = false;
+
+  // Job IDs for request/response cycles.
+  static PROMISE_META = new Map();
+
+  // All instances of this watcher organized by unique ID.
+  static INSTANCES = new Map();
+
+  static register(instance) {
+    this.initialize();
+    this.INSTANCES.set(instance.id, instance);
+  }
+
+  static unregister (instance) {
+    this.INSTANCES.delete(instance.id);
+    if (this.INSTANCES.size === 0) {
+      this.task.terminate();
+      this.started = false;
+      this.initialized = false;
+      // Once a task is terminated, it cannot be started again. We have to
+      // replace it with a new instance.
+      this.task = new Task(require.resolve('./parcel-watcher-worker.js'));
+      this.PROMISE_META.clear();
+      this.initialize();
+    }
+  }
+
+  static initialize() {
+    if (this.initialized) return;
+
+    // Emitted when the worker responds to a method call.
+    this.task.on('watcher:reply', ({ id, args, error }) => {
+      let meta = this.PROMISE_META.get(id);
+      if (!meta) return;
+      if (error) {
+        meta.reject(new Error(error));
+      } else {
+        meta.resolve(args);
+      }
+      this.PROMISE_META.delete(id);
+    });
+
+    // Emitted when the worker pushes events.
+    this.task.on('watcher:events', ({ id, events }) => {
+      let instance = this.INSTANCES.get(id);
+      instance?.onEvents(events);
+    });
+
+    // Emitted when the worker pushes a watcher error.
+    this.task.on('watcher:error', ({ id, error }) => {
+      let instance = this.INSTANCES.get(id);
+      instance?.onError(new Error(error));
+    });
+
+    // Emitted when the worker is created and ready to receive method calls.
+    this.task.on('watcher:ready', () => {
+      this.PROMISE_META.get('self:start')?.resolve?.();
+    });
+
+    // Logging from the worker.
+    this.task.on('console:log', (args) => {
+      console.log(...args);
+    });
+
+    this.task.on('console:warn', (args) => {
+      console.warn(...args);
+    });
+
+    this.task.on('console:error', (args) => {
+      console.error(...args);
+    });
+
+    this.initialized = true;
+  }
+
+  static async startTask() {
+    // This is an unusual one-off task, so we'll use a special key for its
+    // promise metadata.
+    let meta = this.PROMISE_META.get('self:start');
+    if (!meta) {
+      meta = {};
+      let promise = new Promise((resolve, reject) => {
+        meta.resolve = resolve;
+        meta.reject = reject;
+        this.task.start();
+      });
+      meta.promise = promise;
+      this.PROMISE_META.set('self:start', meta);
+    }
+    await meta.promise;
+    this.started = true;
+  }
+
+  static async sendEvent(event, args) {
+    let id = this.getID();
+    let bundle = { id, event, args };
+    let meta = {};
+    let promise = new Promise((request, resolve) => {
+      meta.request = request;
+      meta.resolve = resolve;
+    });
+    meta.promise = promise;
+    this.PROMISE_META.set(id, meta);
+    this.task.send(JSON.stringify(bundle));
+    return await promise;
+  }
+
+  // Both instances and jobs have randomly-generated IDs. We use the job IDs
+  // for standard request/response cycles initiated by the renderer. We use
+  // the instance IDs for worker-initiated pushes that are routed directly
+  // to the corresponding watcher instance.
+  static getID() {
+    let id;
+    // Generate an ID that does not collide with any other IDs we're currently
+    // using.
+    do {
+      id = crypto.randomBytes(5).toString('hex');
+    } while (this.INSTANCES.has(id) || this.PROMISE_META.has(id));
+    return id;
+  }
+
+  dispose() {
+    super.dispose();
+    this.constructor.unregister(this);
+  }
+
+  constructor(...args) {
+    super(...args);
+    this.id = this.constructor.getID();
+  }
+
+  async send(event, args) {
+    await this.constructor.sendEvent(event, args);
+  }
+
+  async doStart() {
+    // “Registration” would ordinarily happen earlier in the lifecycle of this
+    // instance. But (a) the purpose of it is to make the constructor know
+    // about our ID so it can funnel events to us, which isn't necessary until
+    // the watcher action starts; (b) if we register just before starting a
+    // watcher and unregister just after ending a watcher, we get to use it as
+    // a sort of reference-counting. That helps us know when the task itself
+    // can be killed.
+    this.constructor.register(this);
+    if (!ParcelWatcherNativeWatcher.started) {
+      await ParcelWatcherNativeWatcher.startTask();
+    }
+
+    return await this.send('watcher:watch', {
+      normalizedPath: this.normalizedPath,
+      instance: this.id
+    });
+  }
+
+  async doStop() {
+    let result = await this.send('watcher:unwatch', {
+      normalizedPath: this.normalizedPath,
+      instance: this.id
+    });
+    this.constructor.unregister(this);
+    return result;
+  }
+}
+
 // Private: Implement a native watcher by translating events from an NSFW
 // watcher.
 class NSFWNativeWatcher extends NativeWatcher {
@@ -198,7 +383,7 @@ class NSFWNativeWatcher extends NativeWatcher {
     };
 
     this.watcher = await nsfw(this.normalizedPath, handler, {
-      debounceMS: 100,
+      debounceMS: 200,
       errorCallback: this.onError
     });
 
@@ -268,13 +453,17 @@ class PathWatcher {
   //   watched filesystem tree.
   // * `options` See {watchPath} for options.
   //
-  constructor(nativeWatcherRegistry, watchedPath, _options) {
+  constructor(nativeWatcherRegistry, watchedPath, options) {
     this.watchedPath = watchedPath;
     this.nativeWatcherRegistry = nativeWatcherRegistry;
+    this.options = { realPaths: true, ...options };
 
     this.normalizedPath = null;
     this.native = null;
     this.changeCallbacks = new Map();
+
+    // Whether the entire `AtomEnvironment` is destroying.
+    this.isDestroying = false;
 
     this.attachedPromise = new Promise(resolve => {
       this.resolveAttachedPromise = resolve;
@@ -417,8 +606,14 @@ class PathWatcher {
 
     this.subs.add(
       native.onShouldDetach(({ replacement, watchedPath }) => {
-        // Don't re-attach if the entire environment is disposing.
-        if (atom.isDestroying) return;
+        // Ordinarily, when a single native watcher detaches, it might prompt
+        // the _creation_ of new watchers, since there might've been some paths
+        // that piggy-backed onto an existing watcher.
+        //
+        // But if the native watcher is detaching because the entire
+        // environment is destroying, then we absolutely should not attach a
+        // replacement watcher.
+        if (this.isDestroying) return;
         if (
           this.native === native &&
           replacement !== native &&
@@ -438,7 +633,44 @@ class PathWatcher {
       })
     );
 
+    this.subs.add(
+      atom.onWillDestroy(() => {
+        this.isDestroying = true;
+        // TODO: Be proactive about stopping file watchers? Or just set the
+        // flag so that they aren't recreated during teardown?
+      })
+    );
+
     this.resolveAttachedPromise();
+  }
+
+  // Private: Given a "real" filesystem path, adjusts it (if necesssary) to
+  // match the path that the user subscribed to.
+  //
+  // This saves the user from having to make their own calls to `fs.realpath`
+  // on their end just to do path equality checks.
+  denormalizePath(filePath) {
+    if (this.options.realPaths) return filePath;
+    if (this.watchedPath === this.normalizedPath) return filePath;
+    if (!filePath.startsWith(this.normalizedPath)) return filePath;
+    let rest = filePath.substring(this.normalizedPath.length);
+    return path.join(this.watchedPath, rest);
+  }
+
+  // Private: Given an event that happened at a "real" filesystem path, adjusts
+  // it (if necessary) to match the path that the user subscribed to.
+  //
+  // This saves the user from having to make their own calls to `fs.realpath`
+  // on their end just to do path equality checks.
+  denormalizeEvent(event) {
+    if (this.options.realPaths) return event;
+    if (this.watchedPath === this.normalizedPath) return event;
+    let result = { ...event };
+    result.path = this.denormalizePath(event.path);
+    if (event.oldPath) {
+      result.oldPath = this.denormalizePath(event.oldPath);
+    }
+    return result;
   }
 
   // Private: Invoked when the attached native watcher creates a batch of
@@ -450,6 +682,12 @@ class PathWatcher {
       eventPath.startsWith(this.normalizedPath);
 
     const filtered = [];
+    let index = {};
+    for (let event of events) {
+      index[event.action] ??= [];
+      index[event.action].push(event);
+    }
+
     for (let i = 0; i < events.length; i++) {
       const event = events[i];
 
@@ -460,21 +698,22 @@ class PathWatcher {
         if (srcWatched && destWatched) {
           filtered.push(event);
         } else if (srcWatched && !destWatched) {
-          filtered.push({
+          filtered.push(this.denormalizeEvent({
             action: 'deleted',
             kind: event.kind,
             path: event.oldPath
-          });
+          }));
         } else if (!srcWatched && destWatched) {
-          filtered.push({
+          filtered.push(this.denormalizeEvent({
             action: 'created',
             kind: event.kind,
-            path: event.path
-          });
+            path: this.denormalizePath(event.path)
+          }));
         }
       } else {
         if (isWatchedPath(event.path)) {
-          filtered.push(event);
+          let denormalizedEvent = this.denormalizeEvent(event);
+          filtered.push(denormalizedEvent);
         }
       }
     }
@@ -558,33 +797,41 @@ class PathWatcherManager {
     this.setting = setting;
     this.live = new Map();
 
-    this.nativeRegistry = new NativeWatcherRegistry(normalizedPath => {
-      const nativeWatcher = new NSFWNativeWatcher(normalizedPath);
+    const initLocal = (NativeConstructor) => {
+      this.nativeRegistry = new NativeWatcherRegistry(normalizedPath => {
+        const nativeWatcher = new NativeConstructor(normalizedPath);
+        this.live.set(normalizedPath, nativeWatcher);
+        const sub = nativeWatcher.onWillStop(() => {
+          this.live.delete(normalizedPath);
+          sub.dispose();
+        });
 
-      this.live.set(normalizedPath, nativeWatcher);
-      const sub = nativeWatcher.onWillStop(() => {
-        this.live.delete(normalizedPath);
-        sub.dispose();
+        return nativeWatcher;
       });
+    }
 
-      return nativeWatcher;
-    });
+    if (setting === 'parcel') {
+      initLocal(ParcelWatcherNativeWatcher)
+    } else {
+      initLocal(NSFWNativeWatcher);
+    }
 
     this.isShuttingDown = false;
   }
 
   // Private: Create a {PathWatcher} tied to this global state. See {watchPath}
   // for detailed arguments.
-  async createWatcher(rootPath, eventCallback) {
+  async createWatcher(rootPath, eventCallback, options) {
     if (this.isShuttingDown) {
       await this.constructor.transitionPromise;
       return PathWatcherManager.active().createWatcher(
         rootPath,
-        eventCallback
+        eventCallback,
+        options
       );
     }
 
-    const w = new PathWatcher(this.nativeRegistry, rootPath);
+    const w = new PathWatcher(this.nativeRegistry, rootPath, options);
     w.onDidChange(eventCallback);
     await w.getStartPromise();
     return w;
@@ -614,7 +861,11 @@ class PathWatcherManager {
 //
 // * `rootPath` {String} specifies the absolute path to the root of the
 //   filesystem content to watch.
-// * `options` Control the watcher's behavior.
+// * `options` Control the watcher's behavior:
+//   * `realPaths` {Boolean} Whether to report real paths on disk for
+//     filesystem events. Default is `true`; a value of `false` will instead
+//     return paths on disk that will always descend from the given path, even
+//     if the real path of the file is different due to symlinks.
 // * `eventCallback` {Function} or other callable to be called each time a
 //   batch of filesystem events is observed.
 //    * `events` {Array} of objects that describe the events that have
@@ -655,7 +906,8 @@ class PathWatcherManager {
 function watchPath(rootPath, options, eventCallback) {
   return PathWatcherManager.active().createWatcher(
     rootPath,
-    eventCallback
+    eventCallback,
+    options
   );
 }
 
@@ -671,5 +923,4 @@ watchPath.printWatchers = function () {
   return PathWatcherManager.active().print();
 };
 
-
-module.exports = { watchPath, stopAllWatchers };
+module.exports = { watchPath, stopAllWatchers};
