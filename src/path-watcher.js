@@ -16,12 +16,6 @@ const ACTION_MAP = new Map([
   [nsfw.actions.RENAMED,  'renamed' ]
 ]);
 
-const PARCEL_WATCHER_ACTION_MAP = new Map([
-  ['create', 'created'],
-  ['update', 'updated'],
-  ['delete', 'deleted']
-]);
-
 // Private: Possible states of a {NativeWatcher}.
 const WATCHER_STATE = {
   STOPPED:  Symbol('stopped'),
@@ -202,7 +196,7 @@ class ParcelWatcherNativeWatcher extends NativeWatcher {
     this.INSTANCES.set(instance.id, instance);
   }
 
-  static unregister (instance) {
+  static unregister(instance) {
     this.INSTANCES.delete(instance.id);
     if (this.INSTANCES.size === 0) {
       this.task.terminate();
@@ -286,9 +280,9 @@ class ParcelWatcherNativeWatcher extends NativeWatcher {
     let id = this.getID();
     let bundle = { id, event, args };
     let meta = {};
-    let promise = new Promise((request, resolve) => {
-      meta.request = request;
+    let promise = new Promise((resolve, reject) => {
       meta.resolve = resolve;
+      meta.reject = reject;
     });
     meta.promise = promise;
     this.PROMISE_META.set(id, meta);
@@ -922,4 +916,4 @@ watchPath.printWatchers = function () {
   return PathWatcherManager.active().print();
 };
 
-module.exports = { watchPath, stopAllWatchers};
+module.exports = { watchPath, stopAllWatchers };
