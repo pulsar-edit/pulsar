@@ -9,6 +9,27 @@ const getAdditionalWordCharacters = require('./get-additional-word-characters')
 const MAX_LEGACY_PREFIX_LENGTH = 80
 const wordCharacterRegexCache = new Map()
 
+const MARKER_LAYERS_FOR_EDITORS = new WeakMap()
+
+function findOrCreateMarkerLayerForEditor(editor) {
+  let layer = MARKER_LAYERS_FOR_EDITORS.get(editor)
+  if (!layer) {
+    layer = editor.addMarkerLayer()
+    MARKER_LAYERS_FOR_EDITORS.set(editor, layer)
+  }
+  return layer
+}
+
+function compareRanges(a, b) {
+  let rangeA = Range.fromObject(a)
+  let rangeB = Range.fromObject(b)
+  return rangeA.compare(rangeB)
+}
+
+function sortTextEdits(textEdits) {
+  return textEdits.sort((a, b) => compareRanges(a.range, b.range))
+}
+
 // Deferred requires
 let minimatch = null
 let grim = null
@@ -86,6 +107,7 @@ class AutocompleteManager {
     this.editor = null
     this.editorView = null
     this.buffer = null
+    this.markerLayer = null
     this.isCurrentFileBlackListedCache = null
 
     if (!this.editorIsValid(currentEditor)) { return }
@@ -96,6 +118,7 @@ class AutocompleteManager {
     this.editorLabels = labels
     this.editorView = atom.views.getView(this.editor)
     this.buffer = this.editor.getBuffer()
+    this.markerLayer = findOrCreateMarkerLayerForEditor(this.editor)
 
     this.editorSubscriptions = new CompositeDisposable()
 
@@ -604,6 +627,13 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     this.hideTimeout = null
   }
 
+  // Private: Applies a `TextEdit` to the given editor.
+  applyTextEdit(textEdit) {
+    if (this.editor === null) return;
+    let range = Range.fromObject(textEdit.range ?? textEdit.oldRange);
+    this.editor.setTextInBufferRange(range, textEdit.newText);
+  }
+
   // Private: Replaces the current prefix with the given match.
   //
   // match - The match to replace the current prefix with
@@ -614,14 +644,52 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     if (cursors == null) { return }
 
     return this.editor.transact(() => {
-      if(suggestion.ranges) {
-        for (let i = 0; i < suggestion.ranges.length; i++) {
-          const range = suggestion.ranges[i]
-          this.editor.setTextInBufferRange(
-            range, suggestion.text != null ? suggestion.text : suggestion.snippet
-          )
+      // Guard against any stray display markers somehow still being on the
+      // layer.
+      this.markerLayer.clear()
+
+      let additionalTextEditMarkers = null
+      if (suggestion.additionalTextEdits) {
+        let textEdits = sortTextEdits(Array.from(suggestion.additionalTextEdits))
+        additionalTextEditMarkers = []
+
+        // We could apply all the `TextEdit`s at once, but we'd have to find a
+        // way to express the default insertion strategy (with consideration of
+        // prefix) as a `TextEdit`, since `additionalTextEdits` is valid no
+        // matter the insertion strategy.
+        //
+        // So we won't do that; we'll apply the main edit first. But that means
+        // we must now guard against their buffer ranges changing after the
+        // edit, so we'll track any change in their buffer ranges with display
+        // markers.
+        for (let textEdit of textEdits) {
+          let range = Range.fromObject(textEdit.range ?? textEdit.oldRange)
+          let marker = this.markerLayer.markBufferRange(range)
+          additionalTextEditMarkers.push([marker, textEdit])
+        }
+      }
+
+      if (suggestion.textEdit) {
+        // Suggestion wants to apply a `TextEdit` in order to insert itself.
+        // This occurs instead of the default text insertion strategy. Sort
+        // them in buffer order, then apply them in reverse order (so that no
+        // buffer position is affected by any other edits).
+        this.applyTextEdit(suggestion.textEdit);
+      } else if (suggestion.ranges) {
+        // Suggestion wants to insert the default text over one or more
+        // specific ranges. This occurs instead of the default text insertion
+        // strategy. The same text is inserted into each range. Sort the ranges
+        // in buffer order, then apply the edits in reverse order (so that
+        // no buffer position is affected by any other edits).
+        let ranges = Array.from(suggestion.ranges).sort(compareRanges)
+        for (let i = ranges.length - 1; i >= 0; i--) {
+          const range = Range.fromObject(ranges[i])
+          this.editor.setTextInBufferRange(range, suggestion.text ?? suggestion.snippet)
         }
       } else {
+        // Default text insertion strategy: insert the text or snippet,
+        // possibly correcting for characters that might already have been
+        // typed.
         for (let i = 0; i < cursors.length; i++) {
           const cursor = cursors[i]
           const endPosition = cursor.getBufferPosition()
@@ -642,6 +710,42 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
             }
           }
         }
+      }
+
+      // Alongside any of these insertion strategies, a suggestion can specify
+      // additional text edits that should be made. These are typically
+      // optional.
+      //
+      // One example might be auto-inserting an import/include statement when a
+      // suggestion from a specific library is inserted (and the library is not
+      // already included into the buffer).
+      //
+      // The buffer positions we originally received might be inaccurate now,
+      // because we've changed the buffer since we received these suggestions.
+      // That's why we marked the buffer ranges before we made this edit.
+      if (additionalTextEditMarkers) {
+        for (let i = additionalTextEditMarkers.length - 1; i >= 0; i--) {
+          let [marker, textEdit] = additionalTextEditMarkers[i]
+
+          // Now that a suggestion can contain any number of arbitrary text
+          // edits, there are some basic sanity rules expected from
+          // autocompletion providers. As the LSP spec says: "Edits must not
+          // overlap (including the same insert position) with the main edit
+          // nor with themselves."
+          //
+          // Hence this could only happen if the provider were behaving
+          // incorrectly, but we'll check for it anyway.
+          if (!marker.isValid()) continue
+
+          let newTextEdit = {
+            newText: textEdit.newText,
+            range: marker.getBufferRange()
+          }
+          this.applyTextEdit(newTextEdit)
+        }
+        // We're done with these markers. We only needed them for a moment so
+        // we could track any content shifts.
+        this.markerLayer.clear()
       }
     })
   }
