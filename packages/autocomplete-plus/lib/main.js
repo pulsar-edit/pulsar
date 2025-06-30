@@ -72,6 +72,12 @@ module.exports = {
     return this.consumeProvider(providers, 5)
   },
 
+  // 5.1.0 API – Further LSP-driven additions. No behavior change, but worth
+  // bumping the version just to signify the additions.
+  consumeProvider_5_1(providers) {
+    return this.consumeProvider(providers, 5)
+  },
+
   consumeProvider (providers, apiVersion = 3) {
     if (!providers) {
       return
