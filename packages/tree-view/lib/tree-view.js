@@ -810,7 +810,10 @@ class TreeView {
         return this.emitter.emit('move-entry-failed', { initialPath, newPath });
       }
     });
-    return dialog.attach();
+    dialog.attach();
+    // This method used to return nothing. We might as well have it return the
+    // instance of `MoveDialog` so that testing is slightly easier.
+    return dialog;
   }
 
   showSelectedEntryInFileManager() {
