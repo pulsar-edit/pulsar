@@ -63,6 +63,7 @@ const getPaneFileName = index => `test-file-${index}.txt`;
 describe("TreeView", function () {
   let findFileContainingText;
   let [treeView, path1, path2, root1, root2, sampleJs, sampleTxt, workspaceElement] = [];
+  let moduleInstance;
 
   function selectEntry(pathToSelect) {
     let dirs = atom.project.getDirectories();
@@ -84,7 +85,7 @@ describe("TreeView", function () {
     waitForPackageActivation();
 
     return runs(function () {
-      const moduleInstance = atom.packages.getActivePackage('tree-view').mainModule.getTreeViewInstance();
+      moduleInstance = atom.packages.getActivePackage('tree-view').mainModule.getTreeViewInstance();
       treeView = atom.workspace.getLeftDock().getActivePaneItem();
       const files = treeView.element.querySelectorAll('.file');
       root1 = treeView.roots[0];
@@ -1572,6 +1573,61 @@ describe("TreeView", function () {
       }));
     });
   });
+
+  describe("moving a file", () => {
+    describe("when the file exists outside of the project", () => {
+      let tempDirOutsideProject, tempFileOutsideProject;
+
+      beforeEach(() => {
+        tempDirOutsideProject = temp.mkdirSync('tree-view-external-path');
+        tempFileOutsideProject = path.resolve(tempDirOutsideProject, 'foo.txt');
+        fs.writeFileSync(tempFileOutsideProject, '');
+        for (let projectPath of atom.project.getPaths()) {
+          let possibleFixtureNeedingRemoval = path.resolve(projectPath, 'bar', 'foo.txt');
+          if (fs.existsSync(possibleFixtureNeedingRemoval)) {
+            fs.unlinkSync(possibleFixtureNeedingRemoval);
+          }
+        }
+      });
+
+      describe("and its destination is within the project", () => {
+        it("accepts a relative path for a destination when it is unambiguous", async () => {
+          let fixturesPath = atom.project.getPaths()[0];
+          // Set a single project root so that a relative path will be
+          // unambiguous.
+          atom.project.setPaths([fixturesPath]);
+
+          await atom.workspace.open(tempFileOutsideProject);
+
+          let moveDialog = moduleInstance.moveSelectedEntry();
+          spyOn(moveDialog, 'onMove').andCallThrough();
+          spyOn(moveDialog, 'showError').andCallThrough();
+          let newRelativePath = `bar${path.sep}foo.txt`;
+          moveDialog.onConfirm(newRelativePath);
+          expect(fs.existsSync(path.resolve(fixturesPath, newRelativePath)))
+          expect(moveDialog.onMove).toHaveBeenCalled();
+          expect(moveDialog.showError).not.toHaveBeenCalled();
+        })
+
+        it("rejects a relative path for a destination when it is ambiguous", async () => {
+          // Keep the two default project roots so that a relative path will be
+          // ambiguous.
+          await atom.workspace.open(tempFileOutsideProject);
+
+          let moveDialog = moduleInstance.moveSelectedEntry();
+          spyOn(moveDialog, 'onMove').andCallThrough();
+          spyOn(moveDialog, 'showError').andCallThrough();
+          let newRelativePath = `bar${path.sep}foo.txt`;
+          moveDialog.onConfirm(newRelativePath);
+          for (let projectPath of atom.project.getPaths()) {
+            expect(!fs.existsSync(path.resolve(projectPath, newRelativePath)));
+          }
+          expect(moveDialog.onMove).not.toHaveBeenCalled();
+          expect(moveDialog.showError).toHaveBeenCalled();
+        })
+      })
+    })
+  })
 
   describe("removing a project folder", function () {
     describe("when the project folder is selected", () => it("removes the folder from the project", function () {
