@@ -248,15 +248,9 @@ module.exports = class ThemeManager {
       // is to determine its real path (without symlinks) before we start the
       // watcher.
       let realStylesheetPath = fs.realpathSync(userStylesheetPath);
-      let realStylesheetDirectory = path.dirname(realStylesheetPath);
 
-      this.userStylesheetSubscription = await watcher.watchPath(realStylesheetDirectory, {}, (events) => {
-        for (const event of events) {
-          if (event.path === realStylesheetPath) {
-            this.reloadStylesheet();
-            break;
-          }
-        }
+      this.userStylesheetSubscription = await watcher.watchPath(realStylesheetPath, {}, () => {
+        this.reloadStylesheet();
       });
     } catch (error) {
       let message = `
