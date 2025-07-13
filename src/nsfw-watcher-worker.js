@@ -121,7 +121,6 @@ async function buildExcludedPaths(normalizedPath, ignoredNames) {
 
   console.log('Generated exclusions in', end - start, 'ms', 'with time spent minimatching:', _totalTimeSpentMinimatching);
   let excludedPaths = results;
-  console.log('Excluded paths:', excludedPaths);
   return excludedPaths;
 }
 
@@ -138,10 +137,13 @@ async function handleMessage(message) {
       console.log('handling watcher:watch with normalizedPath', normalizedPath, 'and ignored', ignored);
       let wrappedHandler = (err, events) => handler(instance, err, events);
       try {
+        let excludedPaths = await buildExcludedPaths(normalizedPath, ignored);
+        console.log('Excluded paths:', instance, excludedPaths);
+
         let watcher = await nsfw(normalizedPath, wrappedHandler, {
           debounceMS: 200,
           errorCallback: (error) => onError(instance, error),
-          excludedPaths: await buildExcludedPaths(normalizedPath, ignored)
+          excludedPaths
         });
         await watcher.start();
         WATCHERS_BY_PATH.set(instance, watcher);
