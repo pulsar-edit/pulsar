@@ -312,10 +312,31 @@ class ParcelWatcherNativeWatcher extends NativeWatcher {
   constructor(...args) {
     super(...args);
     this.id = this.constructor.getID();
+
+    this.subs.add(
+      atom.config.observe('core.ignoredNames', (newValue) => {
+        this.setIgnoredNames(newValue);
+      })
+    );
   }
 
   async send(event, args) {
     await this.constructor.sendEvent(event, args);
+  }
+
+  setIgnoredNames(ignoredNames) {
+    this.ignoredNames = ignoredNames;
+    if (this.state === WATCHER_STATE.RUNNING) {
+      // This watcher can't update ignores after starting, but that's its own
+      // implementation detail to work out. It will respond to this command by
+      // creating a new watcher, waiting for it to start, then stopping the old
+      // one.
+      this.send('watcher:update', {
+        normalizedPath: this.normalizedPath,
+        instance: this.id,
+        ignored: this.ignoredNames
+      });
+    }
   }
 
   async doStart() {
@@ -333,7 +354,8 @@ class ParcelWatcherNativeWatcher extends NativeWatcher {
 
     return await this.send('watcher:watch', {
       normalizedPath: this.normalizedPath,
-      instance: this.id
+      instance: this.id,
+      ignored: this.ignoredNames
     });
   }
 
@@ -347,45 +369,198 @@ class ParcelWatcherNativeWatcher extends NativeWatcher {
   }
 }
 
-// Private: Implement a native watcher by translating events from an NSFW
-// watcher.
+// A file-watcher implementation that uses `nsfw`. Runs in a separate process.
 class NSFWNativeWatcher extends NativeWatcher {
-  async doStart(_rootPath, _eventCallback, _errorCallback) {
-    const handler = events => {
-      this.onEvents(
-        events.map(event => {
-          const action =
-            ACTION_MAP.get(event.action) || `unexpected (${event.action})`;
-          const payload = { action };
+  static task = new Task(require.resolve('./nsfw-watcher-worker.js'));
 
-          if (event.file) {
-            payload.path = path.join(event.directory, event.file);
-          } else {
-            payload.oldPath = path.join(
-              event.directory,
-              typeof event.oldFile === 'undefined' ? '' : event.oldFile
-            );
-            payload.path = path.join(
-              event.directory,
-              typeof event.newFile === 'undefined' ? '' : event.newFile
-            );
-          }
+  // Whether the task has been started.
+  static started = false;
 
-          return payload;
-        })
-      );
-    };
+  // Whether the task has had its listeners attached.
+  static initialized = false;
 
-    this.watcher = await nsfw(this.normalizedPath, handler, {
-      debounceMS: 200,
-      errorCallback: this.onError
-    });
+  // Job IDs for request/response cycles.
+  static PROMISE_META = new Map();
 
-    await this.watcher.start();
+  // All instances of this watcher organized by unique ID.
+  static INSTANCES = new Map();
+
+  static register(instance) {
+    this.initialize();
+    this.INSTANCES.set(instance.id, instance);
   }
 
-  doStop() {
-    return this.watcher.stop();
+  static unregister(instance) {
+    this.INSTANCES.delete(instance.id);
+    if (this.INSTANCES.size === 0) {
+      this.task.terminate();
+      this.started = false;
+      this.initialized = false;
+      // Once a task is terminated, it cannot be started again. We have to
+      // replace it with a new instance.
+      this.task = new Task(require.resolve('./nsfw-watcher-worker.js'));
+      this.PROMISE_META.clear();
+      this.initialize();
+    }
+  }
+
+  static initialize() {
+    if (this.initialized) return;
+
+    // Emitted when the worker responds to a method call.
+    this.task.on('watcher:reply', ({ id, args, error }) => {
+      let meta = this.PROMISE_META.get(id);
+      if (!meta) return;
+      if (error) {
+        meta.reject(new Error(error));
+      } else {
+        meta.resolve(args);
+      }
+      this.PROMISE_META.delete(id);
+    });
+
+    // Emitted when the worker pushes events.
+    this.task.on('watcher:events', ({ id, events }) => {
+      let instance = this.INSTANCES.get(id);
+      instance?.onEvents(events);
+    });
+
+    // Emitted when the worker pushes a watcher error.
+    this.task.on('watcher:error', ({ id, error }) => {
+      let instance = this.INSTANCES.get(id);
+      instance?.onError(new Error(error));
+    });
+
+    // Emitted when the worker is created and ready to receive method calls.
+    this.task.on('watcher:ready', () => {
+      this.PROMISE_META.get('self:start')?.resolve?.();
+    });
+
+    // Logging from the worker.
+    this.task.on('console:log', (args) => {
+      console.log(...args);
+    });
+
+    this.task.on('console:warn', (args) => {
+      console.warn(...args);
+    });
+
+    this.task.on('console:error', (args) => {
+      console.error(...args);
+    });
+
+    this.initialized = true;
+  }
+
+  static async startTask() {
+    // This is an unusual one-off task, so we'll use a special key for its
+    // promise metadata.
+    let meta = this.PROMISE_META.get('self:start');
+    if (!meta) {
+      meta = {};
+      let promise = new Promise((resolve, reject) => {
+        meta.resolve = resolve;
+        meta.reject = reject;
+        this.task.start();
+      });
+      meta.promise = promise;
+      this.PROMISE_META.set('self:start', meta);
+    }
+    await meta.promise;
+    this.started = true;
+  }
+
+  static async sendEvent(event, args) {
+    let id = this.getID();
+    let bundle = { id, event, args };
+    let meta = {};
+    let promise = new Promise((resolve, reject) => {
+      meta.resolve = resolve;
+      meta.reject = reject;
+    });
+    meta.promise = promise;
+    this.PROMISE_META.set(id, meta);
+    this.task.send(JSON.stringify(bundle));
+    let result = await promise;
+    return result;
+  }
+
+  // Both instances and jobs have randomly-generated IDs. We use the job IDs
+  // for standard request/response cycles initiated by the renderer. We use
+  // the instance IDs for worker-initiated pushes that are routed directly
+  // to the corresponding watcher instance.
+  static getID() {
+    let id;
+    // Generate an ID that does not collide with any other IDs we're currently
+    // using.
+    do {
+      id = crypto.randomBytes(5).toString('hex');
+    } while (this.INSTANCES.has(id) || this.PROMISE_META.has(id));
+    return id;
+  }
+
+  dispose() {
+    super.dispose();
+    this.constructor.unregister(this);
+  }
+
+  constructor(...args) {
+    super(...args);
+    this.id = this.constructor.getID();
+
+    this.subs.add(
+      atom.config.observe('core.ignoredNames', (value) => {
+        this.setIgnoredNames(value);
+      })
+    );
+  }
+
+  setIgnoredNames(ignoredNames) {
+    this.ignoredNames = ignoredNames;
+    if (this.state === WATCHER_STATE.RUNNING) {
+      // We can update this watcher without restarting it. We send a special
+      // event name that will look up the watcher, generate new ignores, and
+      // update the excluded paths list.
+      this.send('watcher:update', {
+        normalizedPath: this.normalizedPath,
+        instance: this.id,
+        ignored: this.ignoredNames
+      });
+    }
+  }
+
+  async send(event, args) {
+    await this.constructor.sendEvent(event, args);
+  }
+
+  async doStart() {
+    console.log('nsfw-worker doStart!');
+    // “Registration” would ordinarily happen earlier in the lifecycle of this
+    // instance. But (a) the purpose of it is to make the constructor know
+    // about our ID so it can funnel events to us, which isn't necessary until
+    // the watcher action starts; (b) if we register just before starting a
+    // watcher and unregister just after ending a watcher, we get to use it as
+    // a sort of reference-counting. That helps us know when the task itself
+    // can be killed.
+    this.constructor.register(this);
+    if (!NSFWNativeWatcher.started) {
+      await NSFWNativeWatcher.startTask();
+    }
+
+    return await this.send('watcher:watch', {
+      normalizedPath: this.normalizedPath,
+      instance: this.id,
+      ignored: this.ignoredNames
+    });
+  }
+
+  async doStop() {
+    let result = await this.send('watcher:unwatch', {
+      normalizedPath: this.normalizedPath,
+      instance: this.id
+    });
+    this.constructor.unregister(this);
+    return result;
   }
 }
 
@@ -439,6 +614,15 @@ class NSFWNativeWatcher extends NativeWatcher {
 //   * `oldPath` (for `renamed` events only), a {String} containing the
 //     filesystem entry's former absolute path.
 class PathWatcher {
+
+  static DEFAULT_OPTIONS = {
+    // Whether to normalize filesystem paths to take symlinks into account. The
+    // default, `true`, means that real paths will always be reported; a value
+    // of `false` means that the appropriate path for the watcher will be
+    // reported, even if this means converting a real path to a symlinked path.
+    realPaths: true
+  }
+
   // Private: Instantiate a new PathWatcher. Call {watchPath} instead.
   //
   // * `nativeWatcherRegistry` {NativeWatcherRegistry} used to find and
@@ -450,7 +634,7 @@ class PathWatcher {
   constructor(nativeWatcherRegistry, watchedPath, options) {
     this.watchedPath = watchedPath;
     this.nativeWatcherRegistry = nativeWatcherRegistry;
-    this.options = { realPaths: true, ...options };
+    this.options = { ...PathWatcher.DEFAULT_OPTIONS, ...options };
 
     this.normalizedPath = null;
     this.native = null;
@@ -804,11 +988,10 @@ class PathWatcherManager {
       });
     }
 
-    if (setting === 'parcel') {
-      initLocal(ParcelWatcherNativeWatcher)
-    } else {
-      initLocal(NSFWNativeWatcher);
-    }
+    // Look up the proper watcher implementation based on the current value of
+    // the `core.fileSystemWatcher` setting.
+    let WatcherClass = WATCHERS_BY_VALUE[setting] ?? WATCHERS_BY_VALUE['default'];
+    initLocal(WatcherClass);
 
     this.isShuttingDown = false;
   }
@@ -914,6 +1097,12 @@ function stopAllWatchers() {
 // Private: Show the currently active native watchers in a formatted {String}.
 watchPath.printWatchers = function () {
   return PathWatcherManager.active().print();
+};
+
+const WATCHERS_BY_VALUE = {
+  'default': NSFWNativeWatcher,
+  'nsfw': NSFWNativeWatcher,
+  'parcel': ParcelWatcherNativeWatcher
 };
 
 module.exports = { watchPath, stopAllWatchers };
