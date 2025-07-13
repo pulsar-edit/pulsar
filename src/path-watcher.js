@@ -972,6 +972,7 @@ class PathWatcherManager {
 
   // Private: Initialize global {PathWatcher} state.
   constructor(setting) {
+    PathWatcherManager.transitionPromise ??= Promise.resolve();
     this.setting = setting;
     this.live = new Map();
 
@@ -1032,9 +1033,9 @@ class PathWatcherManager {
 // specified path. If you only need to watch events within the project's root
 // paths, use {Project::onDidChangeFiles} instead.
 //
-// watchPath handles the efficient re-use of operating system resources across
-// living watchers. Watching the same path more than once, or the child of a
-// watched path, will re-use the existing native watcher.
+// `watchPath` handles the efficient re-use of operating system resources
+// across living watchers. Watching the same path more than once, or the child
+// of a watched path, will re-use the existing native watcher.
 //
 // * `rootPath` {String} specifies the absolute path to the root of the
 //   filesystem content to watch.
@@ -1056,6 +1057,25 @@ class PathWatcherManager {
 // Returns a {Promise} that will resolve to a {PathWatcher} once it has
 // started. Note that every {PathWatcher} is a {Disposable}, so they can be
 // managed by a {CompositeDisposable} if desired.
+//
+// The specific library used for file watching may vary over time and may be
+// configurable via the `core.fileSystemWatcher` setting. Some implementations
+// may work better than others on certain platforms, but all will abide by the
+// same contract and should behave in similar fashion to one another.
+//
+// __Important note:__ `watchPath` will _always_ respect the patterns specified
+// by the `core.ignoredNames` setting and will pass those exclusions to the
+// underlying native file watcher implementation. This helps reduce the cost of
+// recursive file-watching on certain platforms.
+//
+// Files that match `core.ignoredNames` may still trigger change handlers, but
+// _directories_ that match `core.ignoredNames` will be excluded from recursive
+// watchers. No filesystem activity that occurs within an excluded directory
+// will ever trigger a change handler for `watchPath`.
+//
+// If you have a legitimate need to watch a path that will or could be listed
+// in `core.ignoredNames`, you must instead use a non-recursive watcher on that
+// path via {Directory::onDidChange}.
 //
 // ```js
 // const {watchPath} = require('atom')
@@ -1095,10 +1115,22 @@ function stopAllWatchers() {
 }
 
 // Private: Show the currently active native watchers in a formatted {String}.
-watchPath.printWatchers = function () {
+watchPath.printWatchers = function printWatchers() {
   return PathWatcherManager.active().print();
 };
 
+// Private: Wait for new watchers to be created after a change to
+// `core.fileSystemWatcher`. This is useful to have in the specs.
+watchPath.waitForTransition = async function waitForTransition() {
+  await PathWatcherManager.transitionPromise;
+};
+
+// Which implementation to use for each possible value of
+// `core.fileSystemWatcher`.
+//
+// The 'default' value — which is, uh, the default — allows us to switch the
+// default at a later date without affecting users that have opted into a
+// specific watcher.
 const WATCHERS_BY_VALUE = {
   'default': NSFWNativeWatcher,
   'nsfw': NSFWNativeWatcher,
