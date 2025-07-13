@@ -29,11 +29,14 @@ function handler(instance, err, events) {
     return payload;
   });
 
+  console.log('Sending events:', events);
+
   emit('watcher:events', {
     id: instance,
     events: normalizedEvents
   });
 }
+
 
 // Organizes watchers by unique ID.
 const WATCHERS_BY_PATH = new Map();
@@ -41,7 +44,7 @@ const WATCHERS_BY_PATH = new Map();
 // A shim over the real `console` methods so that they send log messages back
 // to the renderer process instead of making us dig into their own console.
 const console = {
-  enabled: false,
+  enabled: true,
   log(...args) {
     if (!this.enabled) return;
     emit('console:log', ['parcel-worker', ...args]);
@@ -60,15 +63,34 @@ const console = {
 async function handleMessage(message) {
   let { id, event = null, args } = JSON.parse(message);
   switch (event) {
-    case 'watcher:watch': {
+    case 'watcher:watch': // fallthrough
+    case 'watcher:update': {
       // `instance` is a unique ID for the watcher instance. We use it when we
       // push filesystem events so that they can be routed back to the correct
       // instance.
-      let { normalizedPath, instance } = args;
+      let { normalizedPath, instance, ignored = [] } = args;
+      // If this instance already exists, then the worker will call
+      // `watcher:update` if it wants to change the exclusions. In this worker,
+      // the two commands have the same effect. If there already was a watcher
+      // for this instance, we hold onto the existing watcher until the new one
+      // has started.
+      let existing = WATCHERS_BY_PATH.get(instance);
       let wrappedHandler = (err, events) => handler(instance, err, events);
       try {
-        let handle = await watcher.subscribe(normalizedPath, wrappedHandler);
+        let ignore = ignored.reduce((prev, ignoredName) => {
+          prev.push(`${ignoredName}`, `**/${ignoredName}`);
+          return prev;
+        }, []);
+        console.log('Generated ignore globs:', ignore);
+        let handle = await watcher.subscribe(normalizedPath, wrappedHandler, {
+          ignore
+        });
         WATCHERS_BY_PATH.set(instance, handle);
+        if (existing) {
+          // If there was a pre-existing watcher at this instance, we wait
+          // until the new one is up and running before stopping this one.
+          await existing.unsubscribe();
+        }
         emit('watcher:reply', { id, args: instance });
       } catch (err) {
         console.error('Error trying to watch path:', normalizedPath, err.message);

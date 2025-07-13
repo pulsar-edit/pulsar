@@ -348,13 +348,13 @@ const configSchema = {
       },
       fileSystemWatcher: {
         description:
-          'Choose the underlying implementation used to watch for filesystem changes. Emulating changes will miss any events caused by applications other than Pulsar, but may help prevent crashes or freezes.',
+          'Choose the underlying implementation used to watch for filesystem changes. It’s best to let Pulsar manage this, but you can change this value if you want to opt into a specific watcher that may work better for your platform.',
         type: 'string',
-        default: 'native',
+        default: 'default',
         enum: [
           {
-            value: 'native',
-            description: 'Native operating system APIs'
+            value: 'default',
+            description: 'Default (let Pulsar decide)'
           },
           {
             value: 'nsfw',
