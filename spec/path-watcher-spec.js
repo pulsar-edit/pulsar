@@ -350,11 +350,56 @@ describe('watchPath', function () {
   }
 
   describe('watchPath()', function () {
+    let disposables;
+    beforeEach(() => {
+      disposables = new CompositeDisposable();
+    });
+
+    afterEach(() => {
+      disposables?.dispose();
+    });
+
     it('resolves the returned promise when the watcher begins listening', async function () {
       const rootDir = await tempMkdir('atom-fsmanager-test-');
-
       const watcher = await watchPath(rootDir, {}, () => {});
+      disposables.add(watcher);
       expect(watcher.constructor.name).toBe('PathWatcher');
+    });
+
+    it('respects `core.ignoredNames`', async () => {
+      jasmine.useRealClock();
+
+      let existing = atom.config.get('core.ignoredNames');
+      atom.config.set(
+        'core.ignoredNames',
+        [...existing, 'some-other-dir']
+      );
+
+      const rootDir = await tempMkdir('atom-fsmanager-test-');
+
+      // Create a directory that will be affected by our `core.ignoredNames`
+      // value.
+      let ignoredDir = path.join(rootDir, 'some-other-dir');
+      await mkdir(ignoredDir, { recursive: true });
+
+      let spy = jasmine.createSpy();
+
+      let watcher = await watchPath(rootDir, {}, spy);
+      disposables.add(watcher);
+
+      // Writing a file to a path within an ignored directory should not
+      // trigger the callback…
+      await writeFile(path.join(ignoredDir, 'foo.txt'), 'something');
+      // (file-watchers might have a debounce interval)
+      await wait(1000);
+      expect(spy).not.toHaveBeenCalled();
+
+      // …but writing a file to a path outside of an ignored directory should
+      // trigger the callback.
+      await writeFile(path.join(rootDir, 'foo.txt'), 'something');
+      // (file-watchers might have a debounce interval)
+      await wait(1000);
+      expect(spy).toHaveBeenCalled();
     });
 
     it('reuses an existing native watcher and resolves getStartPromise immediately if attached to a running watcher', async function () {
@@ -362,6 +407,8 @@ describe('watchPath', function () {
 
       const watcher0 = await watchPath(rootDir, {}, () => {});
       const watcher1 = await watchPath(rootDir, {}, () => {});
+
+      disposables.add(watcher0, watcher1);
 
       expect(watcher0.native).toBe(watcher1.native);
     });
