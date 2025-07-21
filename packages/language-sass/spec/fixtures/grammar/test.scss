@@ -1,0 +1,9 @@
+
+div {
+  color: red;
+  // ^ support.type.property-name.scss
+  //     ^ support.constant.color
+  color:red;
+  // ^ support.type.property-name.scss
+  //     ^ support.constant.color
+}
