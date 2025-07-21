@@ -35,6 +35,11 @@ jobs:
       timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
+    - name: Edit sources.list - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+        sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
       run: apt-get update && apt-get install -y git make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools
