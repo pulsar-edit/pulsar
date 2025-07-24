@@ -1,93 +1,99 @@
+let SpellingManager;
+
 class KnownWordsChecker {
-    static initClass() {
-        this.prototype.enableAdd = false;
-        this.prototype.spelling = null;
-        this.prototype.checker = null;
+  enableAdd = false;
+  spelling = null;
+  checker = null;
+
+  static initClass() {
+    this.prototype.enableAdd = false;
+    this.prototype.spelling = null;
+    this.prototype.checker = null;
+  }
+
+  constructor(knownWords) {
+    // Set up the spelling manager we'll be using.
+    SpellingManager ??= require('spelling-manager');
+    this.spelling = new SpellingManager.TokenSpellingManager();
+    this.checker = new SpellingManager.BufferSpellingChecker(this.spelling);
+
+    // Set our known words.
+    this.setKnownWords(knownWords);
+  }
+
+  deactivate() {}
+
+  getId() {
+    return 'spell-check:known-words';
+  }
+  getName() {
+    return 'Known Words';
+  }
+  getPriority() {
+    return 10;
+  }
+  isEnabled() {
+    return this.spelling.sensitive || this.spelling.insensitive;
+  }
+
+  getStatus() {
+    return 'Working correctly.';
+  }
+  providesSpelling(_) {
+    return true;
+  }
+  providesSuggestions(_) {
+    return true;
+  }
+  providesAdding(_) {
+    return this.enableAdd;
+  }
+
+  check(_, text) {
+    const ranges = [];
+    const checked = this.checker.check(text);
+    const id = this.getId();
+    for (let token of checked) {
+      if (token.status === 1) {
+        ranges.push({ start: token.start, end: token.end });
+      }
     }
 
-    constructor(knownWords) {
-        // Set up the spelling manager we'll be using.
-        const spellingManager = require('spelling-manager');
-        this.spelling = new spellingManager.TokenSpellingManager();
-        this.checker = new spellingManager.BufferSpellingChecker(this.spelling);
+    return { id, correct: ranges };
+  }
 
-        // Set our known words.
-        this.setKnownWords(knownWords);
-    }
+  suggest(_, word) {
+    return this.spelling.suggest(word);
+  }
 
-    deactivate() {}
+  getAddingTargets(_) {
+    if (this.enableAdd) {
+      return [{ sensitive: false, label: 'Add to ' + this.getName() }];
+    } else {
+      return [];
+    }
+  }
 
-    getId() {
-        return 'spell-check:known-words';
-    }
-    getName() {
-        return 'Known Words';
-    }
-    getPriority() {
-        return 10;
-    }
-    isEnabled() {
-        return this.spelling.sensitive || this.spelling.insensitive;
-    }
+  add(_, target) {
+    const c = atom.config.get('spell-check.knownWords');
+    c.push(target.word);
+    atom.config.set('spell-check.knownWords', c);
+  }
 
-    getStatus() {
-        return 'Working correctly.';
-    }
-    providesSpelling(args) {
-        return true;
-    }
-    providesSuggestions(args) {
-        return true;
-    }
-    providesAdding(args) {
-        return this.enableAdd;
-    }
+  setAddKnownWords(newValue) {
+    this.enableAdd = newValue;
+  }
 
-    check(args, text) {
-        const ranges = [];
-        const checked = this.checker.check(text);
-        const id = this.getId();
-        for (let token of checked) {
-            if (token.status === 1) {
-                ranges.push({ start: token.start, end: token.end });
-            }
-        }
-        return { id, correct: ranges };
-    }
+  setKnownWords(knownWords) {
+    // Clear out the old list.
+    this.spelling.sensitive = {};
+    this.spelling.insensitive = {};
 
-    suggest(args, word) {
-        return this.spelling.suggest(word);
+    // Add the new ones into the list.
+    if (knownWords) {
+      return knownWords.map((ignore) => this.spelling.add(ignore));
     }
-
-    getAddingTargets(args) {
-        if (this.enableAdd) {
-            return [{ sensitive: false, label: 'Add to ' + this.getName() }];
-        } else {
-            return [];
-        }
-    }
-
-    add(args, target) {
-        const c = atom.config.get('spell-check.knownWords');
-        c.push(target.word);
-        return atom.config.set('spell-check.knownWords', c);
-    }
-
-    setAddKnownWords(newValue) {
-        return (this.enableAdd = newValue);
-    }
-
-    setKnownWords(knownWords) {
-        // Clear out the old list.
-        this.spelling.sensitive = {};
-        this.spelling.insensitive = {};
-
-        // Add the new ones into the list.
-        if (knownWords) {
-            return knownWords.map((ignore) => this.spelling.add(ignore));
-        }
-    }
+  }
 }
-KnownWordsChecker.initClass();
 
 module.exports = KnownWordsChecker;
