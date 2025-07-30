@@ -3,6 +3,7 @@ const url = require('url');
 const path = require('path');
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
 const fs = require('fs-plus');
+const { Minimatch } = require('minimatch');
 const { Directory } = require('pathwatcher');
 const Grim = require('grim');
 const DefaultDirectorySearcher = require('./default-directory-searcher');
@@ -16,6 +17,30 @@ const PanelContainer = require('./panel-container');
 const Task = require('./task');
 const WorkspaceCenter = require('./workspace-center');
 const { createWorkspaceElement } = require('./workspace-element');
+
+// Given a single glob pattern matcher, test it against a relativized path
+// within the project. Even if this path itself doesn't match the glob, it's
+// suitable for inclusion in a search if one of its ancestor folders matches
+// the glob.
+//
+// We could monkey with the glob syntax in order to pull that off, but we'd
+// probably screw it up in some cases. It's easier to just traverse upward
+// until we hit the top of the project.
+function filePathMatchesGlob(filePath, matcher) {
+  // When we call `path.dirname` on a path like `foo`, it'll return `.`. That's
+  // when we should stop because there's no more upward traversal to be done.
+  while (filePath && filePath !== '.') {
+    if (matcher.match(filePath)) {
+      // We created these matchers with `flipNegate` because it does the right
+      // thing when faced with this strange glob-matching algorithm. But that
+      // means we need to manually check the `negate` property at the end and
+      // flip the result if it's `true`.
+      return matcher.negate ? false : true;
+    }
+    filePath = path.dirname(filePath);
+  }
+  return matcher.negate ? true : false;
+}
 
 const STOPPED_CHANGING_ACTIVE_PANE_ITEM_DELAY = 100;
 const ALL_LOCATIONS = ['center', 'left', 'right', 'bottom'];
@@ -2175,17 +2200,30 @@ module.exports = class Workspace extends Model {
     });
     const searchPromise = Promise.all(allSearches);
 
+    let matchers = options.paths ?
+      options.paths.map((inclusion) => new Minimatch(inclusion, { flipNegate: true })) :
+      null;
+
+    // Let's consider the open buffers.
     for (let buffer of this.project.getBuffers()) {
-      if (buffer.isModified()) {
-        const filePath = buffer.getPath();
-        if (!this.project.contains(filePath)) {
-          continue;
-        }
-        var matches = [];
-        buffer.scan(regex, match => matches.push(match));
-        if (matches.length > 0) {
-          iterator({ filePath, matches });
-        }
+      // We only want to search the open buffers that are modified — because
+      // the searchers will only see the files as they exist on disk, and we
+      // want to ensure that even uncommitted changes are reflected in the
+      // search results.
+      if (!buffer.isModified()) continue;
+      const filePath = buffer.getPath();
+      // Filter out paths that aren't part of this project.
+      if (!this.project.contains(filePath)) continue;
+      let relativizedFilePath = atom.project.relativize(filePath);
+      // If the user specified search globs, we want to ensure that we consider
+      // only those modified buffers that would be matched by such globs.
+      if (matchers && !matchers.some(matcher => filePathMatchesGlob(relativizedFilePath, matcher))) {
+        continue;
+      }
+      let matches = [];
+      buffer.scan(regex, match => matches.push(match));
+      if (matches.length > 0) {
+        iterator({ filePath, matches });
       }
     }
 
