@@ -628,10 +628,17 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
   }
 
   // Private: Applies a `TextEdit` to the given editor.
-  applyTextEdit(textEdit) {
-    if (this.editor === null) return;
-    let range = Range.fromObject(textEdit.range ?? textEdit.oldRange);
-    this.editor.setTextInBufferRange(range, textEdit.newText);
+  applyTextEdit(textEdit, isSnippet = false) {
+    if (this.editor === null) return
+    let range = Range.fromObject(textEdit.range ?? textEdit.oldRange)
+    if (isSnippet && this.snippetsManager) {
+      let selection = this.editor.getLastSelection()
+      let cursor = selection.cursor
+      selection.setBufferRange(range)
+      this.snippetsManager.insertSnippet(textEdit.newText, this.editor, cursor)
+    } else {
+      this.editor.setTextInBufferRange(range, textEdit.newText)
+    }
   }
 
   // Private: Replaces the current prefix with the given match.
@@ -674,7 +681,13 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
         // This occurs instead of the default text insertion strategy. Sort
         // them in buffer order, then apply them in reverse order (so that no
         // buffer position is affected by any other edits).
-        this.applyTextEdit(suggestion.textEdit);
+        //
+        // In LSP, the format of the inserted text can be either plain text or
+        // snippet; the format is indicated on the suggestion itself. We
+        // already have a `snippet` property that we can reuse for this purpose
+        // in a way that's rather backward-compatible. If `snippet` is truthy,
+        // we'll assume ourselves to be in snippet mode.
+        this.applyTextEdit(suggestion.textEdit, !!suggestion.snippet)
       } else if (suggestion.ranges) {
         // Suggestion wants to insert the default text over one or more
         // specific ranges. This occurs instead of the default text insertion
@@ -741,7 +754,10 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
             newText: textEdit.newText,
             range: marker.getBufferRange()
           }
-          this.applyTextEdit(newTextEdit)
+          // Unlike the main text inserted by the suggestion, additional text
+          // edits are applied non-interactively. Hence it only makes sense to
+          // apply them as plain text rather than snippets.
+          this.applyTextEdit(newTextEdit, false)
         }
         // We're done with these markers. We only needed them for a moment so
         // we could track any content shifts.
