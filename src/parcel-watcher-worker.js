@@ -4,14 +4,47 @@
 //
 // Manages any number of individual folder watchers in a single process,
 // communicating over IPC.
+//
+// Requests to watch files (rather than directories) are handled via Node's
+// builtin `fs.watch` API.
 
 const watcher = require("@parcel/watcher");
+const fs = require('fs');
 
 const EVENT_MAP = {
   update: 'updated',
   delete: 'deleted',
-  create: 'created'
+  create: 'created',
+  rename: 'renamed',
+  change: 'updated'
 };
+
+// A class designed to imitate the object that is returned by `@parcel/watcher`
+// when it watches directories; this one is for when we watch individual files.
+class FileHandle {
+  constructor(controller) {
+    this.controller = controller;
+  }
+
+  // Async to match `@parcel/watcher`’s API.
+  async unsubscribe() {
+    return this.controller.abort();
+  }
+}
+
+// Reacts to events on individual files and sends batches back to the renderer
+// process.
+function fileHandler(instance, eventType, normalizedPath) {
+  let action = EVENT_MAP[eventType] ?? `unexpected (${eventType})`;
+  let payload = { action, path: normalizedPath };
+
+  console.log('Sending events:', [payload]);
+
+  emit('watcher:events', {
+    id: instance,
+    events: [payload]
+  });
+}
 
 // Reacts to filesystem events and sends batches back to the renderer process.
 function handler(instance, err, events) {
@@ -44,7 +77,7 @@ const WATCHERS_BY_PATH = new Map();
 // A shim over the real `console` methods so that they send log messages back
 // to the renderer process instead of making us dig into their own console.
 const console = {
-  enabled: true,
+  enabled: false,
   log(...args) {
     if (!this.enabled) return;
     emit('console:log', ['parcel-worker', ...args]);
@@ -76,16 +109,24 @@ async function handleMessage(message) {
       // has started.
       let existing = WATCHERS_BY_PATH.get(instance);
       let wrappedHandler = (err, events) => handler(instance, err, events);
+      let wrappedFileHandler = (eventType, _) => fileHandler(instance, eventType, normalizedPath);
       try {
         let ignore = ignored.reduce((prev, ignoredName) => {
           prev.push(`${ignoredName}`, `**/${ignoredName}`);
           return prev;
         }, []);
         console.log('Generated ignore globs:', ignore);
-        let handle = await watcher.subscribe(normalizedPath, wrappedHandler, {
-          ignore
-        });
-        WATCHERS_BY_PATH.set(instance, handle);
+        if (fs.lstatSync(normalizedPath).isDirectory()) {
+          let handle = await watcher.subscribe(normalizedPath, wrappedHandler, {
+            ignore
+          });
+          WATCHERS_BY_PATH.set(instance, handle);
+        } else {
+          console.log('Watching file path:', normalizedPath);
+          let controller = new AbortController();
+          fs.watch(normalizedPath, { signal: controller.signal }, wrappedFileHandler);
+          WATCHERS_BY_PATH.set(instance, new FileHandle(controller));
+        }
         if (existing) {
           // If there was a pre-existing watcher at this instance, we wait
           // until the new one is up and running before stopping this one.
