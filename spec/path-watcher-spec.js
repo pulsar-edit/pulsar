@@ -43,7 +43,7 @@ describe('File', () => {
     file.unsubscribeFromNativeChangeEvents();
     fs.removeSync(filePath);
     closeAllWatchers();
-    await stopAllWatchers();
+    await watchPath.reset();
     await wait(100);
   });
 
@@ -323,7 +323,7 @@ describe('watchPath', function () {
 
   afterEach(async function () {
     subs.dispose();
-    await stopAllWatchers();
+    await watchPath.reset();
   });
 
   function waitForChanges(watcher, ...fileNames) {
