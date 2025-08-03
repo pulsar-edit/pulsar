@@ -534,7 +534,6 @@ class NSFWNativeWatcher extends NativeWatcher {
   }
 
   async doStart() {
-    console.log('nsfw-worker doStart!');
     // “Registration” would ordinarily happen earlier in the lifecycle of this
     // instance. But (a) the purpose of it is to make the constructor know
     // about our ID so it can funnel events to us, which isn't necessary until
