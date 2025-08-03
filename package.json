@@ -76,6 +76,7 @@
     "etch": "0.14.1",
     "event-kit": "^2.5.3",
     "exception-reporting": "file:packages/exception-reporting",
+    "fdir": "6.4.6",
     "find-and-replace": "file:packages/find-and-replace",
     "find-parent-dir": "^0.3.0",
     "focus-trap": "6.3.0",
