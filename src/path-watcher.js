@@ -1125,6 +1125,14 @@ watchPath.waitForTransition = async function waitForTransition() {
   await PathWatcherManager.transitionPromise;
 };
 
+// Private: Stop all watchers and reset `PathWatcherManager` to its initial
+// state.
+watchPath.reset = function reset() {
+  return PathWatcherManager.active().stopAllWatchers().then(() => {
+    PathWatcherManager.activeManager = null;
+  });
+}
+
 // Which implementation to use for each possible value of
 // `core.fileSystemWatcher`.
 //
