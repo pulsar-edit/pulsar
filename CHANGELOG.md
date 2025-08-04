@@ -6,6 +6,51 @@
 
 ## [Unreleased]
 
+## 1.129.0
+
+- Some minor Tree-sitter fixes, including fixing a bug in SCSS highlighting and ensuring proper highlighting support for abstract methods in TypeScript.
+- When viewing a file that exists on disk outside of your project root, you may now use **Tree View: Rename** to “import” it into your project folder by giving it a relative path.
+- Updated various dependencies for security reasons.
+- Updated AppImages to type 2 runtime -- `libfuse` is no-longer required to be installed on the end-user's system to use Pulsar's AppImages!
+
+### Pulsar
+
+- Cirrus: Fetch Buster packages from archive.debian.org [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1315)
+- Update deps June 2025 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1294)
+- Update appimagetool link in ./scripts/fix-linux-appimage.sh [@ Drsheppard01](https://github.com/pulsar-edit/pulsar/pull/1241)
+- Tree-sitter rolling fixes, 1.129 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1300)
+- Fix CI build job in Ubuntu [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1309)
+- [tree-view] Allow `tree-view:rename` to "import" the current file… [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1303)
+- Cirrus: Update Rolling upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1292)
+- Refactor `StateStore` to remove dependency on the `atom` global [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1256)
+
+
+## 1.128.0
+
+- Vastly improved support for right-to-left text editing — meaning languages like Arabic, Hebrew, and Farsi.
+- Added support for comments in JSON — both via a new grammar for `.jsonc` files and via a setting to enable comments in regular `.json` files.
+- Fixed performance issues that can arise when reopening a project with existing editor windows.
+- Updated DOMPurify. This is a security fix.
+
+### Pulsar
+
+- Tree-sitter rolling fixes, 1.128 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1251)
+- Cirrus: Pin macOS builds to using Sonoma images [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1280)
+- Bump Ubuntu in CI to `ubuntu-latest` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1279)
+- Restore ability for packages to focus specs on both Jasmine 1 and Jasmine 2 test runners [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1265)
+- [markdown-preview] Update `dompurify` to 2.5.7 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1271)
+- Create `SECURITY.md` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1253)
+- Improve support for RTL text input [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1249)
+- [find-and-replace] Fix some bugs in the spec suite [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1221)
+
+## 1.127.1
+
+- Hotfix: Reverted a Wayland-related change that Linux users reported issues with on Electron 12.
+
+### Pulsar
+
+- Revert "Wayland pulsar script" [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/1261)
+
 ## 1.127.0
 
 - Added a Jasmine 2-based test runner, migrated core editor tests to use it. Packages bundled into the core editor can migrate their tests to use this as well, over time. The Jasmine 1 test runner remains available.

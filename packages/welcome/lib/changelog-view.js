@@ -50,36 +50,16 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Added a Jasmine 2-based test runner, migrated core editor tests to use it. Packages bundled into the core editor can migrate their tests to use this as well, over time. The Jasmine 1 test runner remains available.
+                Some minor Tree-sitter fixes, including fixing a bug in SCSS highlighting and ensuring proper highlighting support for abstract methods in TypeScript.
               </li>
               <li>
-                Adding <code>--enable-features=UseOzonePlatform</code> and <code>--ozone-platform=wayland</code> as parameters when running under Wayland on Linux (avoids using xwayland, which causes rendering problems on some systems, especially with NVidia)
+                When viewing a file that exists on disk outside of your project root, you may now use <b>Tree View: Rename</b> to “import” it into your project folder by giving it a relative path.
               </li>
               <li>
-                Many Tree-sitter/parser/grammar improvements.
-                <ul>
-                  <li>
-                    Updated to <code>web-tree-sitter</code> version <code>0.25.3</code>.
-                  </li>
-                  <li>
-                    Fixed a bug preventing folds from updating after code changes in some scenarios.
-                  </li>
-                  <li>
-                    Better folding behavior in Python.
-                  </li>
-                  <li>
-                    Better folding and syntax highlighting in Ruby of <code>case</code>/<code>in</code> statements.
-                  </li>
-                  <li>
-                    Better syntax highlighting of private members in JavScript.
-                  </li>
-                  <li>
-                    Better folding of multiline comments in PHP.
-                  </li>
-                </ul>
+                Updated various dependencies for security reasons.
               </li>
               <li>
-                Updated the `read` dependency in ppm
+                Updated AppImages to type 2 runtime -- <code>libfuse</code> is no-longer required to be installed on the end-user's system to use Pulsar's AppImages!
               </li>
             </ul>
 
