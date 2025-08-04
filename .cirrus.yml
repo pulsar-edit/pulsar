@@ -65,6 +65,8 @@ arm_linux_task:
     USE_SYSTEM_FPM: 'true'
     ROLLING_UPLOAD_TOKEN: ENCRYPTED[6806f0b2346b9fc7d98ea3930087c063b8c44492e720223271331c0f317d77532062a2c8d4538f9ddc6f81415706bcf5]
   prepare_script:
+    - sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+    - sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
