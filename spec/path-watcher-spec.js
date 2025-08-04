@@ -400,14 +400,14 @@ describe('watchPath', function () {
         // trigger the callback…
         await writeFile(path.join(ignoredDir, 'foo.txt'), 'something');
         // (file-watchers might have a debounce interval)
-        await wait(1000);
+        await wait(process.env.CI ? 3000 : 1000);
         expect(spy).not.toHaveBeenCalled();
 
         // …but writing a file to a path outside of an ignored directory should
         // trigger the callback.
         await writeFile(path.join(rootDir, 'foo.txt'), 'something');
         // (file-watchers might have a debounce interval)
-        await wait(1000);
+        await wait(process.env.CI ? 3000 : 1000);
         expect(spy).toHaveBeenCalled();
       });
 
