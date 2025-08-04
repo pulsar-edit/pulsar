@@ -6,6 +6,25 @@
 
 ## [Unreleased]
 
+## 1.129.0
+
+- Some minor Tree-sitter fixes, including fixing a bug in SCSS highlighting and ensuring proper highlighting support for abstract methods in TypeScript.
+- When viewing a file that exists on disk outside of your project root, you may now use **Tree View: Rename** to “import” it into your project folder by giving it a relative path.
+- Updated various dependencies for security reasons.
+- Updated AppImages to type 2 runtime -- `libfuse` is no-longer required to be installed on the end-user's system to use Pulsar's AppImages!
+
+### Pulsar
+
+- Cirrus: Fetch Buster packages from archive.debian.org [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1315)
+- Update deps June 2025 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1294)
+- Update appimagetool link in ./scripts/fix-linux-appimage.sh [@ Drsheppard01](https://github.com/pulsar-edit/pulsar/pull/1241)
+- Tree-sitter rolling fixes, 1.129 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1300)
+- Fix CI build job in Ubuntu [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1309)
+- [tree-view] Allow `tree-view:rename` to "import" the current file… [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1303)
+- Cirrus: Update Rolling upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1292)
+- Refactor `StateStore` to remove dependency on the `atom` global [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1256)
+
+
 ## 1.128.0
 
 - Vastly improved support for right-to-left text editing — meaning languages like Arabic, Hebrew, and Farsi.

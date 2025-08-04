@@ -50,16 +50,16 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Vastly improved support for right-to-left text editing — meaning languages like Arabic, Hebrew, and Farsi.
+                Some minor Tree-sitter fixes, including fixing a bug in SCSS highlighting and ensuring proper highlighting support for abstract methods in TypeScript.
               </li>
               <li>
-                Added support for comments in JSON — both via a new grammar for <code>.jsonc</code> files and via a setting to enable comments in regular <code>.json</code> files.
+                When viewing a file that exists on disk outside of your project root, you may now use <b>Tree View: Rename</b> to “import” it into your project folder by giving it a relative path.
               </li>
               <li>
-                Fixed performance issues that can arise when reopening a project with existing editor windows.
+                Updated various dependencies for security reasons.
               </li>
               <li>
-                Updated DOMPurify. This is a security fix.
+                Updated AppImages to type 2 runtime -- <code>libfuse</code> is no-longer required to be installed on the end-user's system to use Pulsar's AppImages!
               </li>
             </ul>
 
