@@ -65,6 +65,8 @@ arm_linux_task:
     USE_SYSTEM_FPM: 'true'
     ROLLING_UPLOAD_TOKEN: ENCRYPTED[693f9eca17f910a1851028ce17637e39adb6393e84f8a18a58a40384ea7cc92bee9196a9671e2fe3031d359a572a4398] # <-- This is the Electron Next Bins token! Careful when resolving merge conflicts to not overrite to/from master. master branch keeps its token, updated-latest-electron branch keeps this one!
   prepare_script:
+    - sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+    - sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
