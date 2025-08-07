@@ -271,6 +271,7 @@ class PathWatcher {
   constructor(nativeWatcherRegistry, watchedPath, _options) {
     this.watchedPath = watchedPath;
     this.nativeWatcherRegistry = nativeWatcherRegistry;
+    this.options = { realPaths: true, ...options };
 
     this.normalizedPath = null;
     this.native = null;
@@ -441,6 +442,35 @@ class PathWatcher {
     this.resolveAttachedPromise();
   }
 
+  // Private: Given a "real" filesystem path, adjusts it (if necesssary) to
+  // match the path that the user subscribed to.
+  //
+  // This saves the user from having to make their own calls to `fs.realpath`
+  // on their end just to do path equality checks.
+  denormalizePath(filePath) {
+    if (this.options.realPaths) return filePath;
+    if (this.watchedPath === this.normalizedPath) return filePath;
+    if (!filePath.startsWith(this.normalizedPath)) return filePath;
+    let rest = filePath.substring(this.normalizedPath.length);
+    return path.join(this.watchedPath, rest);
+  }
+
+  // Private: Given an event that happened at a "real" filesystem path, adjusts
+  // it (if necessary) to match the path that the user subscribed to.
+  //
+  // This saves the user from having to make their own calls to `fs.realpath`
+  // on their end just to do path equality checks.
+  denormalizeEvent(event) {
+    if (this.options.realPaths) return event;
+    if (this.watchedPath === this.normalizedPath) return event;
+    let result = { ...event };
+    result.path = this.denormalizePath(event.path);
+    if (event.oldPath) {
+      result.oldPath = this.denormalizePath(event.oldPath);
+    }
+    return result;
+  }
+
   // Private: Invoked when the attached native watcher creates a batch of
   // native filesystem events. The native watcher's events may include events
   // for paths above this watcher's root path, so filter them to only include
@@ -460,21 +490,21 @@ class PathWatcher {
         if (srcWatched && destWatched) {
           filtered.push(event);
         } else if (srcWatched && !destWatched) {
-          filtered.push({
+          filtered.push(this.denormalizeEvent({
             action: 'deleted',
             kind: event.kind,
             path: event.oldPath
-          });
+          }));
         } else if (!srcWatched && destWatched) {
-          filtered.push({
+          filtered.push(this.denormalizeEvent({
             action: 'created',
             kind: event.kind,
             path: event.path
-          });
+          }));
         }
       } else {
         if (isWatchedPath(event.path)) {
-          filtered.push(event);
+          filtered.push(this.denormalizeEvent(event));
         }
       }
     }
@@ -575,16 +605,17 @@ class PathWatcherManager {
 
   // Private: Create a {PathWatcher} tied to this global state. See {watchPath}
   // for detailed arguments.
-  async createWatcher(rootPath, eventCallback) {
+  async createWatcher(rootPath, eventCallback, options) {
     if (this.isShuttingDown) {
       await this.constructor.transitionPromise;
       return PathWatcherManager.active().createWatcher(
         rootPath,
-        eventCallback
+        eventCallback,
+        options
       );
     }
 
-    const w = new PathWatcher(this.nativeRegistry, rootPath);
+    const w = new PathWatcher(this.nativeRegistry, rootPath, options);
     w.onDidChange(eventCallback);
     await w.getStartPromise();
     return w;
@@ -614,15 +645,18 @@ class PathWatcherManager {
 //
 // * `rootPath` {String} specifies the absolute path to the root of the
 //   filesystem content to watch.
-// * `options` Control the watcher's behavior.
+// * `options` Control the watcher's behavior:
+//   * `realPaths` {Boolean} Whether to report real paths on disk for
+//     filesystem events. Default is `true`; a value of `false` will instead
+//     return paths on disk that will always descend from the given path, even
+//     if the real path of the file is different due to symlinks.
 // * `eventCallback` {Function} or other callable to be called each time a
 //   batch of filesystem events is observed.
-//    * `events` {Array} of objects that describe the events that have
-//      occurred.
+//    * `events` {Array} of objects that describe the events that have occurred.
 //      * `action` {String} describing the filesystem action that occurred. One
 //        of `"created"`, `"modified"`, `"deleted"`, or `"renamed"`.
-//      * `path` {String} containing the absolute path to the filesystem
-//        entry that was acted upon.
+//      * `path` {String} containing the absolute path to the filesystem entry
+//        that was acted upon.
 //      * `oldPath` For rename events, {String} containing the filesystem
 //        entry's former absolute path.
 //
@@ -646,16 +680,17 @@ class PathWatcherManager {
 //   }
 // })
 //
-// // Immediately stop receiving filesystem events. If this is the last
-// // watcher, asynchronously release any OS resources required to subscribe
-// // to these events.
-// disposable.dispose()
+//  // Immediately stop receiving filesystem events. If this is the last
+//  // watcher, asynchronously release any OS resources required to subscribe
+//  // to these events.
+//  disposable.dispose()
 // ```
 //
 function watchPath(rootPath, options, eventCallback) {
   return PathWatcherManager.active().createWatcher(
     rootPath,
-    eventCallback
+    eventCallback,
+    options
   );
 }
 
