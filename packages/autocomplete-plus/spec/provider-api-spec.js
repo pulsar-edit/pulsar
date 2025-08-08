@@ -5,7 +5,8 @@ import {
   waitForAutocomplete,
   triggerAutocompletion,
   conditionPromise,
-  waitForAutocompleteToDisappear} from './spec-helper'
+  waitForAutocompleteToDisappear
+} from './spec-helper'
 import path from 'path'
 
 import { Range } from 'atom'
@@ -342,7 +343,12 @@ describe('Provider API', () => {
         filterSuggestions: true,
         getSuggestions (options) {
           return [
-            {text: 'notmatch/foololohairange', ranges: [[[0, 0], [0, 5]]]},
+            {
+              text: 'notmatch/foololohairange',
+              ranges: [
+                [[0, 0], [0, 5]]
+              ]
+            },
             {text: 'notmatch/foololohaiprefix'},
             {text: 'foololohaiprefix2'}
           ]
