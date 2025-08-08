@@ -2746,6 +2746,67 @@ describe('Workspace', () => {
           expect(matches.length).toBe(1);
         });
 
+        it('filters open modified buffers from the results against the specified glob pattern', async () => {
+          const projectPath = path.join(__dirname, 'fixtures', 'workspace-scan');
+          atom.project.setPaths([projectPath]);
+
+          // Add the word "smapdi" to each of these buffers, but do not save
+          // either one.
+          let aSample1Editor = await atom.workspace.open(path.join(projectPath, 'a-dir', 'sample1.js'));
+          let aSample1Text = aSample1Editor.getText();
+          aSample1Editor.setText(`${aSample1Text} smapdi`);
+          let bSample1Editor = await atom.workspace.open(path.join(projectPath, 'b-dir', 'sample1.js'));
+          let bSample1Text = bSample1Editor.getText();
+          bSample1Editor.setText(`${bSample1Text} smapdi`);
+
+          const positiveGlobs = ['b-dir', 'b-dir/*.js', 'b-dir/**/*.js'];
+          const negativeGlobs = ['!b-dir', '!b-dir/*.js', '!b-dir/**/*.js'];
+
+          for (let glob of positiveGlobs) {
+            let paths = [];
+            await scan(/\bsmapdi\b/, { paths: [glob] }, result => {
+              paths.push(atom.project.relativize(result.filePath));
+            });
+
+            // We should get two results:
+            //
+            // * b-dir/sample2.js ("smapdi" exists on disk)
+            // * b-dir/sample1.js ("smapdi" does not exist on disk, but exists
+            //   in the modified buffer)
+            //
+            // We should _not_ get:
+            //
+            // * a-dir/sample1.js ("smapdi" exists in the modified buffer, but
+            //   this path doesn't match our glob!)
+            expect(paths.length).toBe(2, glob);
+            expect(paths.includes('b-dir/sample1.js')).toBe(true, glob);
+            expect(paths.includes('b-dir/sample2.js')).toBe(true, glob);
+            expect(paths.includes('a-dir/sample1.js')).toBe(false, glob);
+          }
+
+          for (let glob of negativeGlobs) {
+            let paths = [];
+            await scan(/\bsmapdi\b/, { paths: [glob] }, result => {
+              paths.push(atom.project.relativize(result.filePath));
+            });
+
+            // We should get one result:
+            //
+            // * a-dir/sample1.js ("smapdi" exists in the modified buffer)
+            //
+            // We should _not_ get:
+            //
+            // * b-dir/sample1.js ("smapdi" exists in the modified buffer, but
+            //   should fail our negated glob!)
+            // * b-dir/sample2.js ("smapdi" exists on disk, but should fail our
+            //   negated glob!)
+            expect(paths.length).toBe(1, glob);
+            expect(paths.includes('b-dir/sample1.js')).toBe(false, glob);
+            expect(paths.includes('b-dir/sample2.js')).toBe(false, glob);
+            expect(paths.includes('a-dir/sample1.js')).toBe(true, glob);
+          }
+        });
+
         it("includes files and folders that begin with a '.'", async () => {
           const projectPath = temp.mkdirSync('atom-spec-workspace');
           const filePath = path.join(projectPath, '.text');
