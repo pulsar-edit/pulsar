@@ -6,7 +6,7 @@ module.exports = {
   autocompleteManager: new AutocompleteManager(),
 
   // Public: Creates AutocompleteManager instances for all active and future editors (soon, just a single AutocompleteManager)
-  activate () {
+  activate() {
     this.subscriptions = new CompositeDisposable()
     if (!this.autocompleteManager) this.autocompleteManager = new AutocompleteManager()
     this.subscriptions.add(this.autocompleteManager)
@@ -14,7 +14,7 @@ module.exports = {
   },
 
   // Public: Cleans everything up, removes all AutocompleteManager instances
-  deactivate () {
+  deactivate() {
     if (this.subscriptions) {
       this.subscriptions.dispose()
     }
@@ -22,11 +22,11 @@ module.exports = {
     this.autocompleteManager = null
   },
 
-  provideWatchEditor () {
+  provideWatchEditor() {
     return this.autocompleteManager.watchEditor.bind(this.autocompleteManager)
   },
 
-  consumeSnippets (snippetsManager) {
+  consumeSnippets(snippetsManager) {
     this.autocompleteManager.setSnippetsManager(snippetsManager)
   },
 
@@ -36,7 +36,7 @@ module.exports = {
 
   // 1.0.0 API
   // service - {provider: provider1}
-  consumeProvider_1 (service) {
+  consumeProvider_1(service) {
     if (!service || !service.provider) {
       return
     }
@@ -45,7 +45,7 @@ module.exports = {
 
   // 1.1.0 API
   // service - {providers: [provider1, provider2, ...]}
-  consumeProvider_1_1 (service) {
+  consumeProvider_1_1(service) {
     if (!service || !service.providers) {
       return
     }
@@ -53,26 +53,32 @@ module.exports = {
   },
 
   // 2.0.0 API
-  consumeProvider_2 (providers) {
+  consumeProvider_2(providers) {
     return this.consumeProvider(providers, 2)
   },
 
   // 3.0.0 API
-  consumeProvider_3 (providers) {
+  consumeProvider_3(providers) {
     return this.consumeProvider(providers, 3)
   },
 
   // 4.0.0 API – Simplifies prefix computation
-  consumeProvider_4 (providers) {
+  consumeProvider_4(providers) {
     return this.consumeProvider(providers, 4)
   },
 
   // 5.0.0 API – Make autocomplete play nicer with LSP using the same API
-  consumeProvider_5 (providers) {
+  consumeProvider_5(providers) {
     return this.consumeProvider(providers, 5)
   },
 
-  consumeProvider (providers, apiVersion = 3) {
+  // 5.1.0 API – Further LSP-driven additions. No behavior change, but worth
+  // bumping the version just to signify the additions.
+  consumeProvider_5_1(providers) {
+    return this.consumeProvider(providers, 5)
+  },
+
+  consumeProvider(providers, apiVersion = 3) {
     if (!providers) {
       return
     }

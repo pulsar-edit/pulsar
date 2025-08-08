@@ -35,7 +35,8 @@
         "2.0.0": "consumeProvider_2",
         "3.0.0": "consumeProvider_3",
         "4.0.0": "consumeProvider_4",
-        "5.0.0": "consumeProvider_5"
+        "5.0.0": "consumeProvider_5",
+        "5.1.0": "consumeProvider_5_1"
       }
     },
     "snippets": {
