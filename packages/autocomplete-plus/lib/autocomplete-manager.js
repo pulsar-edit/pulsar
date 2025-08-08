@@ -9,13 +9,34 @@ const getAdditionalWordCharacters = require('./get-additional-word-characters')
 const MAX_LEGACY_PREFIX_LENGTH = 80
 const wordCharacterRegexCache = new Map()
 
+const MARKER_LAYERS_FOR_EDITORS = new WeakMap()
+
+function findOrCreateMarkerLayerForEditor(editor) {
+  let layer = MARKER_LAYERS_FOR_EDITORS.get(editor)
+  if (!layer) {
+    layer = editor.addMarkerLayer()
+    MARKER_LAYERS_FOR_EDITORS.set(editor, layer)
+  }
+  return layer
+}
+
+function compareRanges(a, b) {
+  let rangeA = Range.fromObject(a)
+  let rangeB = Range.fromObject(b)
+  return rangeA.compare(rangeB)
+}
+
+function sortTextEdits(textEdits) {
+  return textEdits.sort((a, b) => compareRanges(a.range, b.range))
+}
+
 // Deferred requires
 let minimatch = null
 let grim = null
 
 module.exports =
 class AutocompleteManager {
-  constructor () {
+  constructor() {
     this.autosaveEnabled = false
     this.backspaceTriggersAutocomplete = true
     this.autoConfirmSingleSuggestionEnabled = true
@@ -48,7 +69,7 @@ class AutocompleteManager {
     this.watchedEditors = new WeakSet()
   }
 
-  initialize () {
+  initialize() {
     this.subscriptions = new CompositeDisposable()
 
     this.providerManager.initialize()
@@ -71,11 +92,11 @@ class AutocompleteManager {
     this.ready = true
   }
 
-  setSnippetsManager (snippetsManager) {
+  setSnippetsManager(snippetsManager) {
     this.snippetsManager = snippetsManager
   }
 
-  updateCurrentEditor (currentEditor, labels) {
+  updateCurrentEditor(currentEditor, labels) {
     if (currentEditor === this.editor) { return }
     if (this.editorSubscriptions) {
       this.editorSubscriptions.dispose()
@@ -86,6 +107,7 @@ class AutocompleteManager {
     this.editor = null
     this.editorView = null
     this.buffer = null
+    this.markerLayer = null
     this.isCurrentFileBlackListedCache = null
 
     if (!this.editorIsValid(currentEditor)) { return }
@@ -96,6 +118,7 @@ class AutocompleteManager {
     this.editorLabels = labels
     this.editorView = atom.views.getView(this.editor)
     this.buffer = this.editor.getBuffer()
+    this.markerLayer = findOrCreateMarkerLayerForEditor(this.editor)
 
     this.editorSubscriptions = new CompositeDisposable()
 
@@ -128,7 +151,7 @@ class AutocompleteManager {
     }))
   }
 
-  editorIsValid (editor) {
+  editorIsValid(editor) {
     // TODO: remove conditional when `isTextEditor` is shipped.
     if (typeof atom.workspace.isTextEditor === 'function') {
       return atom.workspace.isTextEditor(editor)
@@ -144,7 +167,7 @@ class AutocompleteManager {
   // providers with the given `labels`.
   //
   // Returns a {Disposable} to stop watching the `editor`.
-  watchEditor (editor, labels) {
+  watchEditor(editor, labels) {
     if (this.watchedEditors.has(editor)) return
 
     let view = atom.views.getView(editor)
@@ -176,7 +199,7 @@ class AutocompleteManager {
     })
   }
 
-  handleEvents () {
+  handleEvents() {
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       const disposable = this.watchEditor(editor, ['workspace-center'])
       editor.onDidDestroy(() => disposable.dispose())
@@ -209,7 +232,7 @@ class AutocompleteManager {
     this.subscriptions.add(this.suggestionList.onDidSelect(suggestion => { this.getDetailsOnSelect(suggestion) }))
   }
 
-  handleCommands () {
+  handleCommands() {
     return this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'autocomplete-plus:activate': (event) => {
         this.shouldDisplaySuggestions = true
@@ -232,7 +255,7 @@ class AutocompleteManager {
 
   // Private: Finds suggestions for the current prefix, sets the list items,
   // positions the overlay and shows it
-  findSuggestions (activatedManually) {
+  findSuggestions(activatedManually) {
     if (this.disposed) { return }
     if ((this.providerManager == null) || (this.editor == null) || (this.buffer == null)) { return }
     if (this.isCurrentFileBlackListed()) { return }
@@ -247,7 +270,7 @@ class AutocompleteManager {
     return this.getSuggestionsFromProviders({editor: this.editor, bufferPosition, scopeDescriptor, prefix, legacyPrefix, activatedManually})
   }
 
-  getSuggestionsFromProviders (options) {
+  getSuggestionsFromProviders(options) {
     let suggestionsPromise
     const providers = this.providerManager.applicableProviders(this.editorLabels, options.scopeDescriptor)
 
@@ -360,7 +383,7 @@ class AutocompleteManager {
     )
   }
 
-  filterSuggestions (suggestions, {prefix}) {
+  filterSuggestions(suggestions, {prefix}) {
     const results = []
     for (let i = 0; i < suggestions.length; i++) {
       // sortScore mostly preserves in the original sorting. The function is
@@ -389,7 +412,7 @@ class AutocompleteManager {
     return results
   }
 
-  reverseSortOnScoreComparator (a, b) {
+  reverseSortOnScoreComparator(a, b) {
     let bscore = b.score
     if (!bscore) {
       bscore = b.sortScore
@@ -402,7 +425,7 @@ class AutocompleteManager {
   }
 
   // providerSuggestions - array of arrays of suggestions provided by all called providers
-  mergeSuggestionsFromProviders (providerSuggestions) {
+  mergeSuggestionsFromProviders(providerSuggestions) {
     return providerSuggestions.reduce((suggestions, providerSuggestions) => {
       if (providerSuggestions && providerSuggestions.length) {
         suggestions = suggestions.concat(providerSuggestions)
@@ -412,7 +435,7 @@ class AutocompleteManager {
     }, [])
   }
 
-  deprecateForSuggestion (provider, suggestion) {
+  deprecateForSuggestion(provider, suggestion) {
     let hasDeprecations = false
     if (suggestion.word != null) {
       hasDeprecations = true
@@ -462,7 +485,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     return hasDeprecations
   }
 
-  displaySuggestions (suggestions, options) {
+  displaySuggestions(suggestions, options) {
     switch (atom.config.get('autocomplete-plus.similarSuggestionRemoval')) {
       case 'textOrSnippet': {
         suggestions = this.getUniqueSuggestions(suggestions, (suggestion) => suggestion.text + suggestion.snippet)
@@ -477,7 +500,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     }
   }
 
-  getUniqueSuggestions (suggestions, uniqueKeyFunction) {
+  getUniqueSuggestions(suggestions, uniqueKeyFunction) {
     const seen = {}
     const result = []
     for (let i = 0; i < suggestions.length; i++) {
@@ -491,7 +514,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     return result
   }
 
-  getPrefix (editor, position, scopeDescriptor) {
+  getPrefix(editor, position, scopeDescriptor) {
     const wordCharacterRegex = this.getWordCharacterRegex(scopeDescriptor)
     const line = editor.getBuffer().getTextInRange([[position.row, 0], position])
 
@@ -507,7 +530,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     return line.slice(startColumn)
   }
 
-  getWordCharacterRegex (scopeDescriptor) {
+  getWordCharacterRegex(scopeDescriptor) {
     const additionalWordChars = getAdditionalWordCharacters(scopeDescriptor)
     let regex = wordCharacterRegexCache.get(additionalWordChars)
 
@@ -518,7 +541,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     return regex
   }
 
-  getLegacyPrefix (editor, bufferPosition) {
+  getLegacyPrefix(editor, bufferPosition) {
     const {row, column} = bufferPosition
     const line = editor.getTextInRange(new Range(
       new Point(row, Math.max(0, column - MAX_LEGACY_PREFIX_LENGTH)),
@@ -532,7 +555,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
   // Private: Gets called when the user successfully confirms a suggestion
   //
   // match - An {Object} representing the confirmed suggestion
-  confirm (suggestion) {
+  confirm(suggestion) {
     if ((this.editor == null) || (suggestion == null) || !!this.disposed) { return }
 
     const apiVersion = this.providerManager.apiVersionForProvider(suggestion.provider)
@@ -567,7 +590,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     }
   }
 
-  getDetailsOnSelect (suggestion) {
+  getDetailsOnSelect(suggestion) {
     if (suggestion != null && suggestion.provider && suggestion.provider.getSuggestionDetailsOnSelect) {
       Promise.resolve(suggestion.provider.getSuggestionDetailsOnSelect(suggestion))
         .then(detailedSuggestion => {
@@ -576,20 +599,20 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     }
   }
 
-  showSuggestionList (suggestions, options) {
+  showSuggestionList(suggestions, options) {
     if (this.disposed) { return }
     this.suggestionList.changeItems(suggestions)
     return this.suggestionList.show(this.editor, options)
   }
 
-  hideSuggestionList () {
+  hideSuggestionList() {
     if (this.disposed) { return }
     this.suggestionList.changeItems(null)
     this.suggestionList.hide()
     this.shouldDisplaySuggestions = false
   }
 
-  requestHideSuggestionList (command) {
+  requestHideSuggestionList(command) {
     if (this.hideTimeout == null) {
       this.hideTimeout = setTimeout(() => {
         this.hideSuggestionList()
@@ -599,29 +622,87 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     this.shouldDisplaySuggestions = false
   }
 
-  cancelHideSuggestionListRequest () {
+  cancelHideSuggestionListRequest() {
     clearTimeout(this.hideTimeout)
     this.hideTimeout = null
+  }
+
+  // Private: Applies a `TextEdit` to the given editor.
+  applyTextEdit(textEdit, isSnippet = false) {
+    if (this.editor === null) return
+    let range = Range.fromObject(textEdit.range ?? textEdit.oldRange)
+    if (isSnippet && this.snippetsManager) {
+      let selection = this.editor.getLastSelection()
+      let cursor = selection.cursor
+      selection.setBufferRange(range)
+      this.snippetsManager.insertSnippet(textEdit.newText, this.editor, cursor)
+    } else {
+      this.editor.setTextInBufferRange(range, textEdit.newText)
+    }
   }
 
   // Private: Replaces the current prefix with the given match.
   //
   // match - The match to replace the current prefix with
-  replaceTextWithMatch (suggestion) {
+  replaceTextWithMatch(suggestion) {
     if (this.editor == null) { return }
 
     const cursors = this.editor.getCursors()
     if (cursors == null) { return }
 
     return this.editor.transact(() => {
-      if(suggestion.ranges) {
-        for (let i = 0; i < suggestion.ranges.length; i++) {
-          const range = suggestion.ranges[i]
-          this.editor.setTextInBufferRange(
-            range, suggestion.text != null ? suggestion.text : suggestion.snippet
-          )
+      // Guard against any stray display markers somehow still being on the
+      // layer.
+      this.markerLayer.clear()
+
+      let additionalTextEditMarkers = null
+      if (suggestion.additionalTextEdits) {
+        let textEdits = sortTextEdits(Array.from(suggestion.additionalTextEdits))
+        additionalTextEditMarkers = []
+
+        // We could apply all the `TextEdit`s at once, but we'd have to find a
+        // way to express the default insertion strategy (with consideration of
+        // prefix) as a `TextEdit`, since `additionalTextEdits` is valid no
+        // matter the insertion strategy.
+        //
+        // So we won't do that; we'll apply the main edit first. But that means
+        // we must now guard against their buffer ranges changing after the
+        // edit, so we'll track any change in their buffer ranges with display
+        // markers.
+        for (let textEdit of textEdits) {
+          let range = Range.fromObject(textEdit.range ?? textEdit.oldRange)
+          let marker = this.markerLayer.markBufferRange(range)
+          additionalTextEditMarkers.push([marker, textEdit])
+        }
+      }
+
+      if (suggestion.textEdit) {
+        // Suggestion wants to apply a `TextEdit` in order to insert itself.
+        // This occurs instead of the default text insertion strategy. Sort
+        // them in buffer order, then apply them in reverse order (so that no
+        // buffer position is affected by any other edits).
+        //
+        // In LSP, the format of the inserted text can be either plain text or
+        // snippet; the format is indicated on the suggestion itself. We
+        // already have a `snippet` property that we can reuse for this purpose
+        // in a way that's rather backward-compatible. If `snippet` is truthy,
+        // we'll assume ourselves to be in snippet mode.
+        this.applyTextEdit(suggestion.textEdit, !!suggestion.snippet)
+      } else if (suggestion.ranges) {
+        // Suggestion wants to insert the default text over one or more
+        // specific ranges. This occurs instead of the default text insertion
+        // strategy. The same text is inserted into each range. Sort the ranges
+        // in buffer order, then apply the edits in reverse order (so that
+        // no buffer position is affected by any other edits).
+        let ranges = Array.from(suggestion.ranges).sort(compareRanges)
+        for (let i = ranges.length - 1; i >= 0; i--) {
+          const range = Range.fromObject(ranges[i])
+          this.editor.setTextInBufferRange(range, suggestion.text ?? suggestion.snippet)
         }
       } else {
+        // Default text insertion strategy: insert the text or snippet,
+        // possibly correcting for characters that might already have been
+        // typed.
         for (let i = 0; i < cursors.length; i++) {
           const cursor = cursors[i]
           const endPosition = cursor.getBufferPosition()
@@ -643,10 +724,49 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
           }
         }
       }
+
+      // Alongside any of these insertion strategies, a suggestion can specify
+      // additional text edits that should be made. These are typically
+      // optional.
+      //
+      // One example might be auto-inserting an import/include statement when a
+      // suggestion from a specific library is inserted (and the library is not
+      // already included into the buffer).
+      //
+      // The buffer positions we originally received might be inaccurate now,
+      // because we've changed the buffer since we received these suggestions.
+      // That's why we marked the buffer ranges before we made this edit.
+      if (additionalTextEditMarkers) {
+        for (let i = additionalTextEditMarkers.length - 1; i >= 0; i--) {
+          let [marker, textEdit] = additionalTextEditMarkers[i]
+
+          // Now that a suggestion can contain any number of arbitrary text
+          // edits, there are some basic sanity rules expected from
+          // autocompletion providers. As the LSP spec says: "Edits must not
+          // overlap (including the same insert position) with the main edit
+          // nor with themselves."
+          //
+          // Hence this could only happen if the provider were behaving
+          // incorrectly, but we'll check for it anyway.
+          if (!marker.isValid()) continue
+
+          let newTextEdit = {
+            newText: textEdit.newText,
+            range: marker.getBufferRange()
+          }
+          // Unlike the main text inserted by the suggestion, additional text
+          // edits are applied non-interactively. Hence it only makes sense to
+          // apply them as plain text rather than snippets.
+          this.applyTextEdit(newTextEdit, false)
+        }
+        // We're done with these markers. We only needed them for a moment so
+        // we could track any content shifts.
+        this.markerLayer.clear()
+      }
     })
   }
 
-  getSuffix (editor, bufferPosition, suggestion) {
+  getSuffix(editor, bufferPosition, suggestion) {
     // This just chews through the suggestion and tries to match the suggestion
     // substring with the lineText starting at the cursor. There is probably a
     // more efficient way to do this.
@@ -664,7 +784,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
   // Private: Checks whether the current file is blacklisted.
   //
   // Returns {Boolean} that defines whether the current file is blacklisted
-  isCurrentFileBlackListed () {
+  isCurrentFileBlackListed() {
     // minimatch is slow. Not necessary to do this computation on every request for suggestions
     let left
     if (this.isCurrentFileBlackListedCache != null) { return this.isCurrentFileBlackListedCache }
@@ -689,7 +809,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
   }
 
   // Private: Gets called when the content has been modified
-  requestNewSuggestions () {
+  requestNewSuggestions() {
     let delay = atom.config.get('autocomplete-plus.autoActivationDelay')
 
     if (this.delayTimeout != null) {
@@ -705,7 +825,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     this.shouldDisplaySuggestions = true
   }
 
-  cancelNewSuggestionsRequest () {
+  cancelNewSuggestionsRequest() {
     if (this.delayTimeout != null) {
       clearTimeout(this.delayTimeout)
     }
@@ -716,7 +836,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
   // the text has not been changed.
   //
   // data - An {Object} containing information on why the cursor has been moved
-  cursorMoved ({textChanged}) {
+  cursorMoved({textChanged}) {
     // The delay is a workaround for the backspace case. The way atom implements
     // backspace is to select left 1 char, then delete. This results in a
     // cursorMoved event with textChanged == false. So we delay, and if the
@@ -728,11 +848,11 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
 
   // Private: Gets called when the user saves the document. Cancels the
   // autocompletion.
-  bufferSaved () {
+  bufferSaved() {
     if (!this.autosaveEnabled) { return this.hideSuggestionList() }
   }
 
-  showOrHideSuggestionListForBufferChanges ({changes}) {
+  showOrHideSuggestionListForBufferChanges({changes}) {
     if (this.disposed) return
 
     const lastCursorPosition = this.editor.getLastCursor().getBufferPosition()
@@ -772,7 +892,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
     }
   }
 
-  shouldSuppressActivationForEditorClasses () {
+  shouldSuppressActivationForEditorClasses() {
     for (let i = 0; i < this.suppressForClasses.length; i++) {
       const classNames = this.suppressForClasses[i]
       let containsCount = 0
@@ -786,7 +906,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
   }
 
   // Public: Clean up, stop listening to events
-  dispose () {
+  dispose() {
     this.hideSuggestionList()
     this.disposed = true
     this.ready = false
