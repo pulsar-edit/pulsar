@@ -1,9 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
 const nsfw = require('nsfw');
 const { NativeWatcherRegistry } = require('./native-watcher-registry');
+const Task = require('./task');
 
 // Private: Associate native watcher action flags with descriptive String
 // equivalents.
@@ -168,45 +170,396 @@ class NativeWatcher {
   }
 }
 
-// Private: Implement a native watcher by translating events from an NSFW
-// watcher.
-class NSFWNativeWatcher extends NativeWatcher {
-  async doStart(_rootPath, _eventCallback, _errorCallback) {
-    const handler = events => {
-      this.onEvents(
-        events.map(event => {
-          const action =
-            ACTION_MAP.get(event.action) || `unexpected (${event.action})`;
-          const payload = { action };
+// A file-watcher implementation that uses `@parcel/watcher`.
+//
+// We briefly experimented with importing it directly into the renderer
+// process, but it caused crashes on window reload for reasons that haven't
+// been fully tracked down. That's fine, though; we can run it in its own
+// long-running task, much like VS Code does.
+class ParcelWatcherNativeWatcher extends NativeWatcher {
+  static task = new Task(require.resolve('./parcel-watcher-worker.js'));
 
-          if (event.file) {
-            payload.path = path.join(event.directory, event.file);
-          } else {
-            payload.oldPath = path.join(
-              event.directory,
-              typeof event.oldFile === 'undefined' ? '' : event.oldFile
-            );
-            payload.path = path.join(
-              event.directory,
-              typeof event.newFile === 'undefined' ? '' : event.newFile
-            );
-          }
+  // Whether the task has been started.
+  static started = false;
 
-          return payload;
-        })
-      );
-    };
+  // Whether the task has had its listeners attached.
+  static initialized = false;
 
-    this.watcher = await nsfw(this.normalizedPath, handler, {
-      debounceMS: 100,
-      errorCallback: this.onError
-    });
+  // Job IDs for request/response cycles.
+  static PROMISE_META = new Map();
 
-    await this.watcher.start();
+  // All instances of this watcher organized by unique ID.
+  static INSTANCES = new Map();
+
+  static register(instance) {
+    this.initialize();
+    this.INSTANCES.set(instance.id, instance);
   }
 
-  doStop() {
-    return this.watcher.stop();
+  static unregister(instance) {
+    this.INSTANCES.delete(instance.id);
+    if (this.INSTANCES.size === 0) {
+      this.task.terminate();
+      this.started = false;
+      this.initialized = false;
+      // Once a task is terminated, it cannot be started again. We have to
+      // replace it with a new instance.
+      this.task = new Task(require.resolve('./parcel-watcher-worker.js'));
+      this.PROMISE_META.clear();
+      this.initialize();
+    }
+  }
+
+  static initialize() {
+    if (this.initialized) return;
+
+    // Emitted when the worker responds to a method call.
+    this.task.on('watcher:reply', ({ id, args, error }) => {
+      let meta = this.PROMISE_META.get(id);
+      if (!meta) return;
+      if (error) {
+        meta.reject(new Error(error));
+      } else {
+        meta.resolve(args);
+      }
+      this.PROMISE_META.delete(id);
+    });
+
+    // Emitted when the worker pushes events.
+    this.task.on('watcher:events', ({ id, events }) => {
+      let instance = this.INSTANCES.get(id);
+      instance?.onEvents(events);
+    });
+
+    // Emitted when the worker pushes a watcher error.
+    this.task.on('watcher:error', ({ id, error }) => {
+      let instance = this.INSTANCES.get(id);
+      instance?.onError(new Error(error));
+    });
+
+    // Emitted when the worker is created and ready to receive method calls.
+    this.task.on('watcher:ready', () => {
+      this.PROMISE_META.get('self:start')?.resolve?.();
+    });
+
+    // Logging from the worker.
+    this.task.on('console:log', (args) => {
+      console.log(...args);
+    });
+
+    this.task.on('console:warn', (args) => {
+      console.warn(...args);
+    });
+
+    this.task.on('console:error', (args) => {
+      console.error(...args);
+    });
+
+    this.initialized = true;
+  }
+
+  static async startTask() {
+    // This is an unusual one-off task, so we'll use a special key for its
+    // promise metadata.
+    let meta = this.PROMISE_META.get('self:start');
+    if (!meta) {
+      meta = {};
+      let promise = new Promise((resolve, reject) => {
+        meta.resolve = resolve;
+        meta.reject = reject;
+        this.task.start();
+      });
+      meta.promise = promise;
+      this.PROMISE_META.set('self:start', meta);
+    }
+    await meta.promise;
+    this.started = true;
+  }
+
+  static async sendEvent(event, args) {
+    let id = this.getID();
+    let bundle = { id, event, args };
+    let meta = {};
+    let promise = new Promise((resolve, reject) => {
+      meta.resolve = resolve;
+      meta.reject = reject;
+    });
+    meta.promise = promise;
+    this.PROMISE_META.set(id, meta);
+    this.task.send(JSON.stringify(bundle));
+    return await promise;
+  }
+
+  // Both instances and jobs have randomly-generated IDs. We use the job IDs
+  // for standard request/response cycles initiated by the renderer. We use
+  // the instance IDs for worker-initiated pushes that are routed directly
+  // to the corresponding watcher instance.
+  static getID() {
+    let id;
+    // Generate an ID that does not collide with any other IDs we're currently
+    // using.
+    do {
+      id = crypto.randomBytes(5).toString('hex');
+    } while (this.INSTANCES.has(id) || this.PROMISE_META.has(id));
+    return id;
+  }
+
+  dispose() {
+    super.dispose();
+    this.constructor.unregister(this);
+  }
+
+  constructor(...args) {
+    super(...args);
+    this.id = this.constructor.getID();
+
+    this.subs.add(
+      atom.config.observe('core.ignoredNames', (newValue) => {
+        this.setIgnoredNames(newValue);
+      })
+    );
+  }
+
+  async send(event, args) {
+    await this.constructor.sendEvent(event, args);
+  }
+
+  setIgnoredNames(ignoredNames) {
+    this.ignoredNames = ignoredNames;
+    if (this.state === WATCHER_STATE.RUNNING) {
+      // This watcher can't update ignores after starting, but that's its own
+      // implementation detail to work out. It will respond to this command by
+      // creating a new watcher, waiting for it to start, then stopping the old
+      // one.
+      this.send('watcher:update', {
+        normalizedPath: this.normalizedPath,
+        instance: this.id,
+        ignored: this.ignoredNames
+      });
+    }
+  }
+
+  async doStart() {
+    // “Registration” would ordinarily happen earlier in the lifecycle of this
+    // instance. But (a) the purpose of it is to make the constructor know
+    // about our ID so it can funnel events to us, which isn't necessary until
+    // the watcher action starts; (b) if we register just before starting a
+    // watcher and unregister just after ending a watcher, we get to use it as
+    // a sort of reference-counting. That helps us know when the task itself
+    // can be killed.
+    this.constructor.register(this);
+    if (!ParcelWatcherNativeWatcher.started) {
+      await ParcelWatcherNativeWatcher.startTask();
+    }
+
+    return await this.send('watcher:watch', {
+      normalizedPath: this.normalizedPath,
+      instance: this.id,
+      ignored: this.ignoredNames
+    });
+  }
+
+  async doStop() {
+    let result = await this.send('watcher:unwatch', {
+      normalizedPath: this.normalizedPath,
+      instance: this.id
+    });
+    this.constructor.unregister(this);
+    return result;
+  }
+}
+
+// A file-watcher implementation that uses `nsfw`. Runs in a separate process.
+class NSFWNativeWatcher extends NativeWatcher {
+  static task = new Task(require.resolve('./nsfw-watcher-worker.js'));
+
+  // Whether the task has been started.
+  static started = false;
+
+  // Whether the task has had its listeners attached.
+  static initialized = false;
+
+  // Job IDs for request/response cycles.
+  static PROMISE_META = new Map();
+
+  // All instances of this watcher organized by unique ID.
+  static INSTANCES = new Map();
+
+  static register(instance) {
+    this.initialize();
+    this.INSTANCES.set(instance.id, instance);
+  }
+
+  static unregister(instance) {
+    this.INSTANCES.delete(instance.id);
+    if (this.INSTANCES.size === 0) {
+      this.task.terminate();
+      this.started = false;
+      this.initialized = false;
+      // Once a task is terminated, it cannot be started again. We have to
+      // replace it with a new instance.
+      this.task = new Task(require.resolve('./nsfw-watcher-worker.js'));
+      this.PROMISE_META.clear();
+      this.initialize();
+    }
+  }
+
+  static initialize() {
+    if (this.initialized) return;
+
+    // Emitted when the worker responds to a method call.
+    this.task.on('watcher:reply', ({ id, args, error }) => {
+      let meta = this.PROMISE_META.get(id);
+      if (!meta) return;
+      if (error) {
+        meta.reject(new Error(error));
+      } else {
+        meta.resolve(args);
+      }
+      this.PROMISE_META.delete(id);
+    });
+
+    // Emitted when the worker pushes events.
+    this.task.on('watcher:events', ({ id, events }) => {
+      let instance = this.INSTANCES.get(id);
+      instance?.onEvents(events);
+    });
+
+    // Emitted when the worker pushes a watcher error.
+    this.task.on('watcher:error', ({ id, error }) => {
+      let instance = this.INSTANCES.get(id);
+      instance?.onError(new Error(error));
+    });
+
+    // Emitted when the worker is created and ready to receive method calls.
+    this.task.on('watcher:ready', () => {
+      this.PROMISE_META.get('self:start')?.resolve?.();
+    });
+
+    // Logging from the worker.
+    this.task.on('console:log', (args) => {
+      console.log(...args);
+    });
+
+    this.task.on('console:warn', (args) => {
+      console.warn(...args);
+    });
+
+    this.task.on('console:error', (args) => {
+      console.error(...args);
+    });
+
+    this.initialized = true;
+  }
+
+  static async startTask() {
+    // This is an unusual one-off task, so we'll use a special key for its
+    // promise metadata.
+    let meta = this.PROMISE_META.get('self:start');
+    if (!meta) {
+      meta = {};
+      let promise = new Promise((resolve, reject) => {
+        meta.resolve = resolve;
+        meta.reject = reject;
+        this.task.start();
+      });
+      meta.promise = promise;
+      this.PROMISE_META.set('self:start', meta);
+    }
+    await meta.promise;
+    this.started = true;
+  }
+
+  static async sendEvent(event, args) {
+    let id = this.getID();
+    let bundle = { id, event, args };
+    let meta = {};
+    let promise = new Promise((resolve, reject) => {
+      meta.resolve = resolve;
+      meta.reject = reject;
+    });
+    meta.promise = promise;
+    this.PROMISE_META.set(id, meta);
+    this.task.send(JSON.stringify(bundle));
+    let result = await promise;
+    return result;
+  }
+
+  // Both instances and jobs have randomly-generated IDs. We use the job IDs
+  // for standard request/response cycles initiated by the renderer. We use
+  // the instance IDs for worker-initiated pushes that are routed directly
+  // to the corresponding watcher instance.
+  static getID() {
+    let id;
+    // Generate an ID that does not collide with any other IDs we're currently
+    // using.
+    do {
+      id = crypto.randomBytes(5).toString('hex');
+    } while (this.INSTANCES.has(id) || this.PROMISE_META.has(id));
+    return id;
+  }
+
+  dispose() {
+    super.dispose();
+    this.constructor.unregister(this);
+  }
+
+  constructor(...args) {
+    super(...args);
+    this.id = this.constructor.getID();
+
+    this.subs.add(
+      atom.config.observe('core.ignoredNames', (value) => {
+        this.setIgnoredNames(value);
+      })
+    );
+  }
+
+  setIgnoredNames(ignoredNames) {
+    this.ignoredNames = ignoredNames;
+    if (this.state === WATCHER_STATE.RUNNING) {
+      // We can update this watcher without restarting it. We send a special
+      // event name that will look up the watcher, generate new ignores, and
+      // update the excluded paths list.
+      this.send('watcher:update', {
+        normalizedPath: this.normalizedPath,
+        instance: this.id,
+        ignored: this.ignoredNames
+      });
+    }
+  }
+
+  async send(event, args) {
+    await this.constructor.sendEvent(event, args);
+  }
+
+  async doStart() {
+    // “Registration” would ordinarily happen earlier in the lifecycle of this
+    // instance. But (a) the purpose of it is to make the constructor know
+    // about our ID so it can funnel events to us, which isn't necessary until
+    // the watcher action starts; (b) if we register just before starting a
+    // watcher and unregister just after ending a watcher, we get to use it as
+    // a sort of reference-counting. That helps us know when the task itself
+    // can be killed.
+    this.constructor.register(this);
+    if (!NSFWNativeWatcher.started) {
+      await NSFWNativeWatcher.startTask();
+    }
+
+    return await this.send('watcher:watch', {
+      normalizedPath: this.normalizedPath,
+      instance: this.id,
+      ignored: this.ignoredNames
+    });
+  }
+
+  async doStop() {
+    let result = await this.send('watcher:unwatch', {
+      normalizedPath: this.normalizedPath,
+      instance: this.id
+    });
+    this.constructor.unregister(this);
+    return result;
   }
 }
 
@@ -260,6 +613,15 @@ class NSFWNativeWatcher extends NativeWatcher {
 //   * `oldPath` (for `renamed` events only), a {String} containing the
 //     filesystem entry's former absolute path.
 class PathWatcher {
+
+  static DEFAULT_OPTIONS = {
+    // Whether to normalize filesystem paths to take symlinks into account. The
+    // default, `true`, means that real paths will always be reported; a value
+    // of `false` means that the appropriate path for the watcher will be
+    // reported, even if this means converting a real path to a symlinked path.
+    realPaths: true
+  }
+
   // Private: Instantiate a new PathWatcher. Call {watchPath} instead.
   //
   // * `nativeWatcherRegistry` {NativeWatcherRegistry} used to find and
@@ -268,13 +630,17 @@ class PathWatcher {
   //   watched filesystem tree.
   // * `options` See {watchPath} for options.
   //
-  constructor(nativeWatcherRegistry, watchedPath, _options) {
+  constructor(nativeWatcherRegistry, watchedPath, options) {
     this.watchedPath = watchedPath;
     this.nativeWatcherRegistry = nativeWatcherRegistry;
+    this.options = { ...PathWatcher.DEFAULT_OPTIONS, ...options };
 
     this.normalizedPath = null;
     this.native = null;
     this.changeCallbacks = new Map();
+
+    // Whether the entire `AtomEnvironment` is destroying.
+    this.isDestroying = false;
 
     this.attachedPromise = new Promise(resolve => {
       this.resolveAttachedPromise = resolve;
@@ -417,8 +783,14 @@ class PathWatcher {
 
     this.subs.add(
       native.onShouldDetach(({ replacement, watchedPath }) => {
-        // Don't re-attach if the entire environment is disposing.
-        if (atom.isDestroying) return;
+        // Ordinarily, when a single native watcher detaches, it might prompt
+        // the _creation_ of new watchers, since there might've been some paths
+        // that piggy-backed onto an existing watcher.
+        //
+        // But if the native watcher is detaching because the entire
+        // environment is destroying, then we absolutely should not attach a
+        // replacement watcher.
+        if (this.isDestroying) return;
         if (
           this.native === native &&
           replacement !== native &&
@@ -438,7 +810,44 @@ class PathWatcher {
       })
     );
 
+    this.subs.add(
+      atom.onWillDestroy(() => {
+        this.isDestroying = true;
+        // TODO: Be proactive about stopping file watchers? Or just set the
+        // flag so that they aren't recreated during teardown?
+      })
+    );
+
     this.resolveAttachedPromise();
+  }
+
+  // Private: Given a "real" filesystem path, adjusts it (if necesssary) to
+  // match the path that the user subscribed to.
+  //
+  // This saves the user from having to make their own calls to `fs.realpath`
+  // on their end just to do path equality checks.
+  denormalizePath(filePath) {
+    if (this.options.realPaths) return filePath;
+    if (this.watchedPath === this.normalizedPath) return filePath;
+    if (!filePath.startsWith(this.normalizedPath)) return filePath;
+    let rest = filePath.substring(this.normalizedPath.length);
+    return path.join(this.watchedPath, rest);
+  }
+
+  // Private: Given an event that happened at a "real" filesystem path, adjusts
+  // it (if necessary) to match the path that the user subscribed to.
+  //
+  // This saves the user from having to make their own calls to `fs.realpath`
+  // on their end just to do path equality checks.
+  denormalizeEvent(event) {
+    if (this.options.realPaths) return event;
+    if (this.watchedPath === this.normalizedPath) return event;
+    let result = { ...event };
+    result.path = this.denormalizePath(event.path);
+    if (event.oldPath) {
+      result.oldPath = this.denormalizePath(event.oldPath);
+    }
+    return result;
   }
 
   // Private: Invoked when the attached native watcher creates a batch of
@@ -450,6 +859,12 @@ class PathWatcher {
       eventPath.startsWith(this.normalizedPath);
 
     const filtered = [];
+    let index = {};
+    for (let event of events) {
+      index[event.action] ??= [];
+      index[event.action].push(event);
+    }
+
     for (let i = 0; i < events.length; i++) {
       const event = events[i];
 
@@ -460,21 +875,22 @@ class PathWatcher {
         if (srcWatched && destWatched) {
           filtered.push(event);
         } else if (srcWatched && !destWatched) {
-          filtered.push({
+          filtered.push(this.denormalizeEvent({
             action: 'deleted',
             kind: event.kind,
             path: event.oldPath
-          });
+          }));
         } else if (!srcWatched && destWatched) {
-          filtered.push({
+          filtered.push(this.denormalizeEvent({
             action: 'created',
             kind: event.kind,
-            path: event.path
-          });
+            path: this.denormalizePath(event.path)
+          }));
         }
       } else {
         if (isWatchedPath(event.path)) {
-          filtered.push(event);
+          let denormalizedEvent = this.denormalizeEvent(event);
+          filtered.push(denormalizedEvent);
         }
       }
     }
@@ -555,36 +971,44 @@ class PathWatcherManager {
 
   // Private: Initialize global {PathWatcher} state.
   constructor(setting) {
+    PathWatcherManager.transitionPromise ??= Promise.resolve();
     this.setting = setting;
     this.live = new Map();
 
-    this.nativeRegistry = new NativeWatcherRegistry(normalizedPath => {
-      const nativeWatcher = new NSFWNativeWatcher(normalizedPath);
+    const initLocal = (NativeConstructor) => {
+      this.nativeRegistry = new NativeWatcherRegistry(normalizedPath => {
+        const nativeWatcher = new NativeConstructor(normalizedPath);
+        this.live.set(normalizedPath, nativeWatcher);
+        const sub = nativeWatcher.onWillStop(() => {
+          this.live.delete(normalizedPath);
+          sub.dispose();
+        });
 
-      this.live.set(normalizedPath, nativeWatcher);
-      const sub = nativeWatcher.onWillStop(() => {
-        this.live.delete(normalizedPath);
-        sub.dispose();
+        return nativeWatcher;
       });
+    }
 
-      return nativeWatcher;
-    });
+    // Look up the proper watcher implementation based on the current value of
+    // the `core.fileSystemWatcher` setting.
+    let WatcherClass = WATCHERS_BY_VALUE[setting] ?? WATCHERS_BY_VALUE['default'];
+    initLocal(WatcherClass);
 
     this.isShuttingDown = false;
   }
 
   // Private: Create a {PathWatcher} tied to this global state. See {watchPath}
   // for detailed arguments.
-  async createWatcher(rootPath, eventCallback) {
+  async createWatcher(rootPath, eventCallback, options) {
     if (this.isShuttingDown) {
       await this.constructor.transitionPromise;
       return PathWatcherManager.active().createWatcher(
         rootPath,
-        eventCallback
+        eventCallback,
+        options
       );
     }
 
-    const w = new PathWatcher(this.nativeRegistry, rootPath);
+    const w = new PathWatcher(this.nativeRegistry, rootPath, options);
     w.onDidChange(eventCallback);
     await w.getStartPromise();
     return w;
@@ -608,13 +1032,17 @@ class PathWatcherManager {
 // specified path. If you only need to watch events within the project's root
 // paths, use {Project::onDidChangeFiles} instead.
 //
-// watchPath handles the efficient re-use of operating system resources across
-// living watchers. Watching the same path more than once, or the child of a
-// watched path, will re-use the existing native watcher.
+// `watchPath` handles the efficient re-use of operating system resources
+// across living watchers. Watching the same path more than once, or the child
+// of a watched path, will re-use the existing native watcher.
 //
 // * `rootPath` {String} specifies the absolute path to the root of the
 //   filesystem content to watch.
-// * `options` Control the watcher's behavior.
+// * `options` Control the watcher's behavior:
+//   * `realPaths` {Boolean} Whether to report real paths on disk for
+//     filesystem events. Default is `true`; a value of `false` will instead
+//     return paths on disk that will always descend from the given path, even
+//     if the real path of the file is different due to symlinks.
 // * `eventCallback` {Function} or other callable to be called each time a
 //   batch of filesystem events is observed.
 //    * `events` {Array} of objects that describe the events that have
@@ -629,6 +1057,25 @@ class PathWatcherManager {
 // Returns a {Promise} that will resolve to a {PathWatcher} once it has
 // started. Note that every {PathWatcher} is a {Disposable}, so they can be
 // managed by a {CompositeDisposable} if desired.
+//
+// The specific library used for file watching may vary over time and may be
+// configurable via the `core.fileSystemWatcher` setting. Some implementations
+// may work better than others on certain platforms, but all will abide by the
+// same contract and should behave in similar fashion to one another.
+//
+// __Important note:__ `watchPath` will _always_ respect the patterns specified
+// by the `core.ignoredNames` setting and will pass those exclusions to the
+// underlying native file watcher implementation. This helps reduce the cost of
+// recursive file-watching on certain platforms.
+//
+// Files that match `core.ignoredNames` may still trigger change handlers, but
+// _directories_ that match `core.ignoredNames` will be excluded from recursive
+// watchers. No filesystem activity that occurs within an excluded directory
+// will ever trigger a change handler for `watchPath`.
+//
+// If you have a legitimate need to watch a path that will or could be listed
+// in `core.ignoredNames`, you must instead use a non-recursive watcher on that
+// path via {Directory::onDidChange}.
 //
 // ```js
 // const {watchPath} = require('atom')
@@ -655,7 +1102,8 @@ class PathWatcherManager {
 function watchPath(rootPath, options, eventCallback) {
   return PathWatcherManager.active().createWatcher(
     rootPath,
-    eventCallback
+    eventCallback,
+    options
   );
 }
 
@@ -667,9 +1115,34 @@ function stopAllWatchers() {
 }
 
 // Private: Show the currently active native watchers in a formatted {String}.
-watchPath.printWatchers = function () {
+watchPath.printWatchers = function printWatchers() {
   return PathWatcherManager.active().print();
 };
 
+// Private: Wait for new watchers to be created after a change to
+// `core.fileSystemWatcher`. This is useful to have in the specs.
+watchPath.waitForTransition = async function waitForTransition() {
+  await PathWatcherManager.transitionPromise;
+};
+
+// Private: Stop all watchers and reset `PathWatcherManager` to its initial
+// state.
+watchPath.reset = function reset() {
+  return PathWatcherManager.active().stopAllWatchers().then(() => {
+    PathWatcherManager.activeManager = null;
+  });
+}
+
+// Which implementation to use for each possible value of
+// `core.fileSystemWatcher`.
+//
+// The 'default' value — which is, uh, the default — allows us to switch the
+// default at a later date without affecting users that have opted into a
+// specific watcher.
+const WATCHERS_BY_VALUE = {
+  'default': NSFWNativeWatcher,
+  'nsfw': NSFWNativeWatcher,
+  'parcel': ParcelWatcherNativeWatcher
+};
 
 module.exports = { watchPath, stopAllWatchers };
