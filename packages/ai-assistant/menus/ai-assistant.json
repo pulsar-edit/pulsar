@@ -1,0 +1,16 @@
+{
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "AI Assistant",
+          "submenu": [
+            { "label": "Toggle Panel", "command": "ai-assistant:toggle" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

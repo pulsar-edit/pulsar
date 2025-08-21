@@ -1,0 +1,43 @@
+{
+  "name": "ai-assistant",
+  "version": "0.1.0",
+  "main": "lib/main.js",
+  "description": "AI assistant panel for Pulsar with Codex, Claude, and Gemini providers.",
+  "keywords": ["ai", "assistant", "codex", "claude", "gemini"],
+  "activationCommands": {
+    "atom-workspace": ["ai-assistant:toggle"]
+  },
+  "configSchema": {
+    "provider": {
+      "type": "string",
+      "default": "codex",
+      "enum": ["codex", "claude", "gemini"],
+      "description": "Default provider to use."
+    },
+    "openaiApiKey": {
+      "type": "string",
+      "default": "",
+      "description": "OpenAI/Codex: leave blank to use Codex CLI; set if calling OpenAI API directly.",
+      "order": 2
+    },
+    "anthropicApiKey": {
+      "type": "string",
+      "default": "",
+      "description": "Anthropic API key for Claude.",
+      "order": 3
+    },
+    "geminiApiKey": {
+      "type": "string",
+      "default": "",
+      "description": "Google Generative AI API key for Gemini.",
+      "order": 4
+    },
+    "defaultModel": {
+      "type": "string",
+      "default": "gpt-5",
+      "description": "Default model name for the chosen provider.",
+      "order": 5
+    }
+  }
+}
+
