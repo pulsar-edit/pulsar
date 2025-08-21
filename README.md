@@ -68,6 +68,28 @@
 [License]: LICENSE.md
 
 
+## AI Assistant (Optional Package)
+
+Pulsar can host an AI Assistant panel with support for multiple providers:
+
+- Codex (via the Codex CLI)
+- Anthropic Claude
+- Google Gemini
+
+Once built with the `packages/ai-assistant` folder present, open the panel via:
+
+- Shortcut: `ctrl-alt-a`
+- Menu: Packages → AI Assistant → Toggle Panel
+
+Provider setup happens in Settings → Packages → ai-assistant. You can configure:
+
+- Default provider and model
+- Anthropic API key
+- Google API key
+
+For Codex, install the Codex CLI (`npm i -g @openai/codex` or `brew install codex`) and ensure `codex` is on PATH.
+
+
 <!---------------------------{ Images }--------------------------->
 
 [Preview]: resources/readme.png 'Preview of the editor.'
