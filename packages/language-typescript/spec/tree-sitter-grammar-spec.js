@@ -6,8 +6,15 @@ describe('WASM Tree-sitter TypeScript grammar', () => {
     await atom.packages.activatePackage('language-typescript');
   });
 
-  it('passes grammar tests', async () => {
-    await runGrammarTests(path.join(__dirname, 'fixtures', 'sample.ts'), /\/\//)
+  describe('regular grammar', () => {
+    it('passes grammar tests', async () => {
+      await runGrammarTests(path.join(__dirname, 'fixtures', 'sample.ts'), /\/\//)
+    });
   });
 
+  describe('TSX grammar', () => {
+    it('passes grammar tests', async () => {
+      await runGrammarTests(path.join(__dirname, 'fixtures', 'sample.tsx'), /\/\//)
+    });
+  });
 });
