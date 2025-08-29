@@ -63,7 +63,7 @@ arm_linux_task:
     memory: 8G
   env:
     USE_SYSTEM_FPM: 'true'
-    ROLLING_UPLOAD_TOKEN: ENCRYPTED[6806f0b2346b9fc7d98ea3930087c063b8c44492e720223271331c0f317d77532062a2c8d4538f9ddc6f81415706bcf5]
+    ROLLING_UPLOAD_TOKEN: ENCRYPTED[0e4157533bb3b8e676cc2725186e5a3afd9d3bbadff034c4dc6123a27cabb7d9a9ec90dc3cd17cdf036a5d0e9cea4809]
   prepare_script:
     - sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
     - sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
@@ -161,7 +161,7 @@ silicon_mac_task:
     APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
     APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
     TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
-    ROLLING_UPLOAD_TOKEN: ENCRYPTED[6806f0b2346b9fc7d98ea3930087c063b8c44492e720223271331c0f317d77532062a2c8d4538f9ddc6f81415706bcf5]
+    ROLLING_UPLOAD_TOKEN: ENCRYPTED[0e4157533bb3b8e676cc2725186e5a3afd9d3bbadff034c4dc6123a27cabb7d9a9ec90dc3cd17cdf036a5d0e9cea4809]
   prepare_script:
     - brew update
     - brew uninstall node@20
