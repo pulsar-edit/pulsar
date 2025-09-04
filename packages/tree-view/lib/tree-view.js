@@ -1,5 +1,6 @@
 const path = require('path');
 const shell = require('electron').shell;
+const remoteShell = require('electron').remote.shell;
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const { CompositeDisposable, Emitter } = require('atom');
@@ -825,7 +826,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return remoteShell.showItemInFolder(filePath);
   }
 
   showCurrentFileInFileManager() {
@@ -837,7 +838,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return remoteShell.showItemInFolder(filePath);
   }
 
   getFileManagerName() {
