@@ -34,10 +34,10 @@ giving it full control over the <code>SelectListView</code> used to show results
 <dl>
 <dt><a href="#etch">etch</a></dt>
 <dd></dd>
-<dt><a href="#css">css</a></dt>
+<dt><a href="#downloadGitRepo">downloadGitRepo</a></dt>
 <dd><p>This file will manage the updating of <code>autocomplete-css</code> <code>completions.json</code>.
   We will mainly utilize <code>@webref/css</code>.listAll() function that returns a full CSS
-  list of all properties seperated by their spec shortname. An example
+  list of all properties separated by their spec shortname. An example
   of this format is defined below for ease of future modifications.</p>
 <p>  Some important notes about the data contained here:
     - Often times the <code>value</code> within the <code>property</code> will be in the following format:
@@ -51,7 +51,7 @@ giving it full control over the <code>SelectListView</code> used to show results
       So this should be handled by the same parser.
     - Additionally an important note is that nowhere in this data do we get any kind
       of description about the data that could lend a hand in being documentation.
-      So the documentation must be gathered seperatly. Likely the best way to collect
+      So the documentation must be gathered separately. Likely the best way to collect
       our documentation data is via <code>mdn/content</code>.
       Within <code>content/files/en-us/web/css</code> is a directory of folders titled
       by the name of properties.</p>
@@ -272,6 +272,7 @@ An instance of this class is always available as the `atom` global.
         * [.commands](#AtomEnvironment+commands) : <code>CommandRegistry</code>
         * [.grammars](#AtomEnvironment+grammars) : <code>GrammarRegistry</code>
         * [.styles](#AtomEnvironment+styles) : <code>StyleManager</code>
+        * [.i18n](#AtomEnvironment+i18n) : <code>I18n</code>
         * [.packages](#AtomEnvironment+packages) : <code>PackageManager</code>
         * [.themes](#AtomEnvironment+themes) : <code>ThemeManager</code>
         * [.menu](#AtomEnvironment+menu) : <code>MenuManager</code>
@@ -325,6 +326,10 @@ An instance of this class is always available as the `atom` global.
 <a name="AtomEnvironment+styles"></a>
 
 ### atomEnvironment.styles : <code>StyleManager</code>
+**Kind**: instance property of [<code>AtomEnvironment</code>](#AtomEnvironment)  
+<a name="AtomEnvironment+i18n"></a>
+
+### atomEnvironment.i18n : <code>I18n</code>
 **Kind**: instance property of [<code>AtomEnvironment</code>](#AtomEnvironment)  
 <a name="AtomEnvironment+packages"></a>
 
@@ -440,12 +445,12 @@ giving it full control over the `SelectListView` used to show results.
 ## etch
 **Kind**: global constant  
 **Jsx**: etch.dom  
-<a name="css"></a>
+<a name="downloadGitRepo"></a>
 
-## css
+## downloadGitRepo
 This file will manage the updating of `autocomplete-css` `completions.json`.
   We will mainly utilize `@webref/css`.listAll() function that returns a full CSS
-  list of all properties seperated by their spec shortname. An example
+  list of all properties separated by their spec shortname. An example
   of this format is defined below for ease of future modifications.
 
   Some important notes about the data contained here:
@@ -460,7 +465,7 @@ This file will manage the updating of `autocomplete-css` `completions.json`.
       So this should be handled by the same parser.
     - Additionally an important note is that nowhere in this data do we get any kind
       of description about the data that could lend a hand in being documentation.
-      So the documentation must be gathered seperatly. Likely the best way to collect
+      So the documentation must be gathered separately. Likely the best way to collect
       our documentation data is via `mdn/content`.
       Within `content/files/en-us/web/css` is a directory of folders titled
       by the name of properties.
