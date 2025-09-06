@@ -200,6 +200,7 @@
 (method_parameters (identifier) @variable.parameter.function.ruby)
 (splat_parameter (identifier) @variable.parameter.function.splat.ruby)
 
+
 ; A keyword-style parameter when defining a method.
 ((keyword_parameter) @constant.other.symbol.hashkey.parameter.ruby
   (#set! adjust.startAt firstChild.startPosition)
@@ -210,6 +211,11 @@
 
 ; This scope should span both the key and the adjacent colon.
 ((pair key: (hash_key_symbol)) @constant.other.symbol.hashkey.ruby
+  (#set! adjust.startAt firstChild.startPosition)
+  (#set! adjust.endAt firstChild.nextSibling.endPosition)
+  (#set! capture.final true))
+
+((keyword_pattern key: (hash_key_symbol)) @constant.other.symbol.hashkey.ruby
   (#set! adjust.startAt firstChild.startPosition)
   (#set! adjust.endAt firstChild.nextSibling.endPosition)
   (#set! capture.final true))
@@ -378,6 +384,8 @@
 
 (nil) @constant.language.nil.ruby
 
+(hash_splat_nil "nil" @constant.language.nil.ruby)
+
 [
   (true)
   (false)
@@ -457,6 +465,9 @@
 (hash_splat_parameter
   "**" @keyword.operator.double-splat.ruby
   (#set! capture.final true))
+(hash_splat_nil
+  "**" @keyword.operator.double-splat.ruby
+  (#set! capture.final true))
 
 (singleton_class
   "<<" @keyword.operator.assigment.ruby)
@@ -492,6 +503,11 @@
 [
   "&"
 ] @keyword.operator.other.ruby
+
+(forward_parameter "..." @keyword.operator.forward.ruby
+  (#set! capture.final))
+(forward_argument "..." @keyword.operator.forward.ruby
+  (#set! capture.final))
 
 ".." @keyword.operator.range.inclusive.ruby
 "..." @keyword.operator.range.exclusive.ruby
@@ -546,6 +562,10 @@
  ")" @punctuation.definition.expression.end.bracket.round.ruby)
 
 (hash
+ "{" @punctuation.definition.hash.begin.bracket.curly.ruby
+ "}" @punctuation.definition.hash.end.bracket.curly.ruby)
+
+(hash_pattern
  "{" @punctuation.definition.hash.begin.bracket.curly.ruby
  "}" @punctuation.definition.hash.end.bracket.curly.ruby)
 

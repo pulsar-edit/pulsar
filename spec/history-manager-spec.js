@@ -6,11 +6,15 @@ describe('HistoryManager', () => {
   let commandDisposable, projectDisposable;
 
   beforeEach(async () => {
+    jasmine.useRealClock();
     commandDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
     commandRegistry = jasmine.createSpyObj('CommandRegistry', ['add']);
-    commandRegistry.add.andReturn(commandDisposable);
+    commandRegistry.add.and.returnValue(commandDisposable);
 
-    stateStore = new StateStore('history-manager-test', 1);
+    stateStore = new StateStore('history-manager-test', 1, {
+      config: atom.config
+    });
+    stateStore.initialize({ configDirPath: atom.getConfigDirPath() });
     await stateStore.save('history-manager', {
       projects: [
         {
@@ -20,10 +24,9 @@ describe('HistoryManager', () => {
         { paths: ['/test'], lastOpened: new Date(2016, 9, 17, 11, 12, 13) }
       ]
     });
-
     projectDisposable = jasmine.createSpyObj('Disposable', ['dispose']);
     project = jasmine.createSpyObj('Project', ['onDidChangePaths']);
-    project.onDidChangePaths.andCallFake(f => {
+    project.onDidChangePaths.and.callFake(f => {
       project.didChangePathsListener = f;
       return projectDisposable;
     });
@@ -43,7 +46,7 @@ describe('HistoryManager', () => {
   describe('constructor', () => {
     it("registers the 'clear-project-history' command function", () => {
       expect(commandRegistry.add).toHaveBeenCalled();
-      const cmdCall = commandRegistry.add.calls[0];
+      const cmdCall = commandRegistry.add.calls.first();
       expect(cmdCall.args.length).toBe(3);
       expect(cmdCall.args[0]).toBe('atom-workspace');
       expect(typeof cmdCall.args[1]['application:clear-project-history']).toBe(
@@ -202,7 +205,7 @@ describe('HistoryManager', () => {
       // so that no data is actually stored to it.
       jasmine.unspy(historyManager, 'saveState');
 
-      spyOn(historyManager.stateStore, 'save').andCallFake((name, history) => {
+      spyOn(historyManager.stateStore, 'save').and.callFake((name, history) => {
         savedHistory = history;
         return Promise.resolve();
       });
@@ -216,7 +219,7 @@ describe('HistoryManager', () => {
         project,
         commands: commandRegistry
       });
-      spyOn(historyManager2.stateStore, 'load').andCallFake(name =>
+      spyOn(historyManager2.stateStore, 'load').and.callFake(name =>
         Promise.resolve(savedHistory)
       );
       await historyManager2.loadState();

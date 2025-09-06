@@ -18,7 +18,7 @@ describe("I18n", () => {
         "zh-Hant-CN-x-private1-private2",
         "en-US"
       ];
-      const fallbackSet = I18n.LocaleNegotiation(primaryLocale, priorityListLocale);
+      const fallbackSet = I18n.localeNegotiation(primaryLocale, priorityListLocale);
 
       expect(Array.from(fallbackSet)).toEqual([
         "es-MX",
@@ -36,7 +36,7 @@ describe("I18n", () => {
     it("Locale Lookup Filtering Fallback Pattern Array: Excludes duplicates from hardcoded fallback", () => {
       const primaryLocale = "en-US";
       const priorityListLocale = [ "es-MX" ];
-      const fallbackSet = I18n.LocaleNegotiation(primaryLocale, priorityListLocale);
+      const fallbackSet = I18n.localeNegotiation(primaryLocale, priorityListLocale);
 
       expect(Array.from(fallbackSet)).toEqual([
         "en-US",
@@ -50,7 +50,7 @@ describe("I18n", () => {
       const primaryLocale = "en-US";
       const priorityListLocale = [ "es-MX" ];
       const questionedLocale = "en";
-      const shouldBeIncluded = I18n.ShouldIncludeLocale(questionedLocale, primaryLocale, priorityListLocale);
+      const shouldBeIncluded = I18n.shouldIncludeLocaleParameterized(questionedLocale, { primary: primaryLocale, priorityList: priorityListLocale });
       expect(shouldBeIncluded).toEqual(true);
     });
 
@@ -58,7 +58,7 @@ describe("I18n", () => {
       const primaryLocale = "zh-Hant";
       const priorityListLocale = [ "es-MX" ];
       const questionedLocale = "ja-JP";
-      const shouldBeIncluded = I18n.ShouldIncludeLocale(questionedLocale, primaryLocale, priorityListLocale);
+      const shouldBeIncluded = I18n.shouldIncludeLocaleParameterized(questionedLocale, { primary: primaryLocale, priorityList: priorityListLocale });
       expect(shouldBeIncluded).toEqual(false);
     });
 
@@ -66,26 +66,26 @@ describe("I18n", () => {
       const primaryLocale = "zh-Hant";
       const priorityListLocale = [ "es-MX" ];
       const questionedLocale = "en";
-      const shouldBeIncluded = I18n.ShouldIncludeLocale(questionedLocale, primaryLocale, priorityListLocale);
+      const shouldBeIncluded = I18n.shouldIncludeLocaleParameterized(questionedLocale, { primary: primaryLocale, priorityList: priorityListLocale });
       expect(shouldBeIncluded).toEqual(true);
     });
 
     it("Can determine if basic locales match", () => {
       const want = "en-US";
       const have = "en-US";
-      expect(I18n.DoLocalesMatch(want, have)).toEqual(true);
+      expect(I18n.doLocalesMatch(want, have)).toEqual(true);
     });
 
     it("Can determine if wildcard locales match", () => {
       const want = "en-*";
       const have = "en-US";
-      expect(I18n.DoLocalesMatch(want, have)).toEqual(true);
+      expect(I18n.doLocalesMatch(want, have)).toEqual(true);
     });
 
     it("Can determine if locales do not match", () => {
       const want = "en-US";
       const have = "ja-JP";
-      expect(I18n.DoLocalesMatch(want, have)).toEqual(false);
+      expect(I18n.doLocalesMatch(want, have)).toEqual(false);
     });
   });
 
@@ -155,7 +155,7 @@ describe("I18n", () => {
     beforeEach(() => {
       const primary = "es-MX";
       const priorityListLocale = [ "zh-Hant" ];
-      i18n.localeFallbackList = I18n.LocaleNegotiation(primary, priorityListLocale);
+      i18n.localeFallbackList = I18n.localeNegotiation(primary, priorityListLocale);
     });
 
     it("Returns the proper string based on user setting", () => {
@@ -215,7 +215,7 @@ describe("I18n", () => {
     it("Successfully translates a LocaleLabel", () => {
       const primary = "es-MX";
       const priorityListLocale = [ "zh-Hant" ];
-      i18n.localeFallbackList = I18n.LocaleNegotiation(primary, priorityListLocale);
+      i18n.localeFallbackList = I18n.localeNegotiation(primary, priorityListLocale);
 
       i18n.addStrings({
         example: {
@@ -231,11 +231,11 @@ describe("I18n", () => {
     it("Falls back to the original label if unable to translate", () => {
       const primary = "es-MX";
       const priorityListLocale = [ "zh-Hant" ];
-      i18n.localeFallbackList = I18n.LocaleNegotiation(primary, priorityListLocale);
+      i18n.localeFallbackList = I18n.localeNegotiation(primary, priorityListLocale);
 
       const localeLabel = "%example.stringKey%";
 
-      expect(i18n.translateLabel(localeLabel)).toEqual("%example.stringKey%");
+      expect(i18n.translateLabel(localeLabel)).toEqual("example.stringKey");
     });
   });
 });

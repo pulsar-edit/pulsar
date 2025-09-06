@@ -45,6 +45,30 @@
 "," @punctuation.separator.comma.json
 ":" @punctuation.separator.key-value.colon.json
 
+; COMMENTS
+; ========
+
+; Comments are envisioned and tolerated by `tree-sitter-json`. They are always
+; allowed in the “JSON with Comments” grammar, but allowed in the ordinary
+; “JSON” grammar only if the user opts into it via settings.
+;
+; If they haven’t been opted into, an earlier query will have pre-empted this
+; one to mark them as illegal.
+
+; Line comments. `//`
+((comment) @comment.line.double-slash.json
+  (#match? @comment.line.double-slash.json "^\/\/"))
+
+((comment) @punctuation.definition.comment.json
+  (#match? @punctuation.definition.comment.json "^\/\/")
+  (#set! adjust.startAndEndAroundFirstMatchOf "^\/\/"))
+
+; Block comments. `/* */`
+((comment) @comment.block.json
+  (#match? @comment.block.json "^/\\*")
+  (#match? @comment.block.json "\\*/$"))
+
+
 ; ERROR HANDLING
 ; ==============
 

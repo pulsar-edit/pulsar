@@ -1,5 +1,6 @@
 const path = require('path');
 const shell = require('electron').shell;
+const remoteShell = require('electron').remote.shell;
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const { CompositeDisposable, Emitter } = require('atom');
@@ -810,7 +811,10 @@ class TreeView {
         return this.emitter.emit('move-entry-failed', { initialPath, newPath });
       }
     });
-    return dialog.attach();
+    dialog.attach();
+    // This method used to return nothing. We might as well have it return the
+    // instance of `MoveDialog` so that testing is slightly easier.
+    return dialog;
   }
 
   showSelectedEntryInFileManager() {
@@ -822,7 +826,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return remoteShell.showItemInFolder(filePath);
   }
 
   showCurrentFileInFileManager() {
@@ -834,7 +838,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return remoteShell.showItemInFolder(filePath);
   }
 
   getFileManagerName() {

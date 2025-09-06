@@ -1,6 +1,6 @@
 const {Disposable, File} = require('atom')
 const getIconServices = require('../lib/get-icon-services')
-const {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} = require('./async-spec-helpers') // eslint-disable-line no-unused-vars
+const {conditionPromise} = require('./async-spec-helpers') // eslint-disable-line no-unused-vars
 
 async function condition (handler) {
   if (jasmine.isSpy(window.setTimeout)) {
@@ -13,21 +13,21 @@ describe('ArchiveEditorView', () => {
   let archiveEditorView, onDidChangeCallback, onDidRenameCallback, onDidDeleteCallback
 
   beforeEach(async () => {
-    spyOn(File.prototype, 'onDidChange').andCallFake(function (callback) {
+    spyOn(File.prototype, 'onDidChange').and.callFake(function (callback) {
       if (/\.tar$/.test(this.getPath())) {
         onDidChangeCallback = callback
       }
       return new Disposable()
     })
 
-    spyOn(File.prototype, 'onDidRename').andCallFake(function (callback) {
+    spyOn(File.prototype, 'onDidRename').and.callFake(function (callback) {
       if (/\.tar$/.test(this.getPath())) {
         onDidRenameCallback = callback
       }
       return new Disposable()
     })
 
-    spyOn(File.prototype, 'onDidDelete').andCallFake(function (callback) {
+    spyOn(File.prototype, 'onDidDelete').and.callFake(function (callback) {
       if (/\.tar$/.test(this.getPath())) {
         onDidDeleteCallback = callback
       }
@@ -150,9 +150,9 @@ describe('ArchiveEditorView', () => {
 
   describe('when the file is renamed', () => {
     it('refreshes the view and updates the title', async () => {
-      spyOn(File.prototype, 'getPath').andReturn('nested-renamed.tar')
+      spyOn(File.prototype, 'getPath').and.returnValue('nested-renamed.tar')
       await condition(() => archiveEditorView.element.querySelectorAll('.entry').length > 0)
-      spyOn(archiveEditorView, 'refresh').andCallThrough()
+      spyOn(archiveEditorView, 'refresh').and.callThrough()
       spyOn(archiveEditorView, 'getTitle')
       onDidRenameCallback()
       expect(archiveEditorView.refresh).toHaveBeenCalled()

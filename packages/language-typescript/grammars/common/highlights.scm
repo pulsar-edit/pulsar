@@ -407,6 +407,7 @@
   "protected"
   "readonly"
   "satisfies"
+  "abstract"
 ] @storage.modifier._TYPE_._LANG_
 
 (index_signature
@@ -718,6 +719,10 @@
   key: (property_identifier) @entity.name.function.method.definition._LANG_
   value: [(function_expression) (arrow_function)])
 
+; Abstract function declaration:
+; The "foo" in `abstract foo(): void`
+(abstract_method_signature name: (_) @entity.name.function.method.definition.abstract._LANG_)
+
 ; Function is `storage.type` because it's a core language construct.
 (function_expression "function" @storage.type.function._LANG_)
 (function_declaration "function" @storage.type.function._LANG_)
@@ -940,6 +945,8 @@
     (#set! prohibitsOptionalChaining true))
 
 ((optional_chain) @invalid.illegal.optional-chain._LANG_
+  ; Ensure this doesn't trigger on zero-content MISSING nodes.
+  (#eq? @invalid.illegal.optional-chain._LANG_ "?.")
   (#is? test.descendantOfNodeWithData prohibitsOptionalChaining))
 
 (ternary_expression

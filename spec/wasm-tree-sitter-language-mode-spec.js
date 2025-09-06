@@ -948,6 +948,86 @@ describe('WASMTreeSitterLanguageMode', () => {
         ]);
       });
 
+      it('updates a buffer’s highlighting when a new injection point is added to its grammar', async () => {
+        const ejsGrammar = new WASMTreeSitterGrammar(
+          atom.grammars,
+          ejsGrammarPath,
+          CSON.readFileSync(ejsGrammarPath)
+        );
+
+        await ejsGrammar.setQueryForTest('highlightsQuery', `
+          ["<%=" "%>"] @directive
+        `);
+
+        ejsGrammar.addInjectionPoint({
+          type: 'template',
+          language: () => 'html',
+          content: (node) => node.descendantsOfType('content')
+        });
+
+        atom.grammars.addGrammar(jsGrammar);
+        atom.grammars.addGrammar(htmlGrammar);
+
+        buffer.setText('<body>\n<script>\nb(<%= c.d %>)\n</script>\n</body>');
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: ejsGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+
+        spyOn(languageMode.rootLanguageLayer, '_populateInjections').and.callThrough();
+
+        ejsGrammar.addInjectionPoint({
+          type: 'template',
+          language: () => 'javascript',
+          content: (node) => node.descendantsOfType('code')
+        });
+
+        expect(
+          languageMode.rootLanguageLayer._populateInjections
+        ).toHaveBeenCalled();
+      });
+
+      it('does not update a specific layer’s injections if a newly added grammar is irrelevant to them', async () => {
+        jasmine.useRealClock();
+        atom.grammars.addGrammar(jsGrammar);
+
+        buffer.setText('node.innerHTML = `\na ${b}<img src="d">\n`;');
+        const languageMode = new WASMTreeSitterLanguageMode({
+          grammar: jsGrammar,
+          buffer,
+          config: atom.config,
+          grammars: atom.grammars
+        });
+        buffer.setLanguageMode(languageMode);
+        await languageMode.ready;
+
+        spyOn(languageMode.rootLanguageLayer, '_populateInjections').and.callThrough();
+
+        const ejsGrammar = new WASMTreeSitterGrammar(
+          atom.grammars,
+          ejsGrammarPath,
+          CSON.readFileSync(ejsGrammarPath)
+        );
+
+        await ejsGrammar.setQueryForTest('highlightsQuery', `
+          ["<%=" "%>"] @directive
+        `);
+
+        atom.grammars.addGrammar(ejsGrammar);
+        await languageMode.nextTransaction;
+        // TODO: Still need a `wait(0)` here and I'm not sure why.
+        await wait(0);
+
+        expect(
+          languageMode.rootLanguageLayer._populateInjections
+        ).not.toHaveBeenCalled();
+      });
+
       it('handles injections that intersect', async () => {
 
         const ejsGrammar = new WASMTreeSitterGrammar(
@@ -1089,7 +1169,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         atom.grammars.addGrammar(htmlGrammar);
         htmlGrammar.highlightsQuery = false;
         // Pretend this grammar doesn't have a highlights query.
-        spyOn(htmlGrammar, 'getQuery').andReturn(Promise.resolve(null));
+        spyOn(htmlGrammar, 'getQuery').and.returnValue(Promise.resolve(null));
         const languageMode = new WASMTreeSitterLanguageMode({
           grammar: jsGrammar,
           buffer,
@@ -1595,12 +1675,12 @@ describe('WASMTreeSitterLanguageMode', () => {
     let originalTimeout;
 
     beforeEach(() => {
-      originalTimeout = jasmine.getEnv().defaultTimeoutInterval;
-      jasmine.getEnv().defaultTimeoutInterval = 60 * 1000;
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
     });
 
     afterEach(() => {
-      jasmine.getEnv().defaultTimeoutInterval = originalTimeout;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
     });
 
     it('matches the highlighting of a freshly-opened editor', async () => {
@@ -1685,15 +1765,7 @@ describe('WASMTreeSitterLanguageMode', () => {
           const tokens1 = editor.tokensForScreenRow(j);
           const tokens2 = editor2.tokensForScreenRow(j);
           expect(tokens1).toEqual(tokens2, `Seed: ${seed}, screen line: ${j}`);
-          if (jasmine.getEnv().currentSpec.results().failedCount > 0) {
-            console.log(tokens1);
-            console.log(tokens2);
-            debugger; // eslint-disable-line no-debugger
-            break;
-          }
         }
-
-        if (jasmine.getEnv().currentSpec.results().failedCount > 0) break;
       }
     });
   });
@@ -3698,8 +3770,8 @@ describe('WASMTreeSitterLanguageMode', () => {
         htmlConfig
       );
 
-      spyOn(jsGrammar, 'getCommentDelimiters').andReturn({ line: undefined, block: undefined });
-      spyOn(htmlGrammar, 'getCommentDelimiters').andReturn({ line: undefined, block: undefined });
+      spyOn(jsGrammar, 'getCommentDelimiters').and.returnValue({ line: undefined, block: undefined });
+      spyOn(htmlGrammar, 'getCommentDelimiters').and.returnValue({ line: undefined, block: undefined });
 
       atom.config.set(
         'editor.commentDelimiters',
@@ -4195,7 +4267,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       spyOn(
         languageMode,
         'suggestedIndentForLineAtBufferRow'
-      ).andReturn(9);
+      ).and.returnValue(9);
 
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
@@ -4425,7 +4497,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       await languageMode.ready;
       await wait(0);
 
-      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+      spyOn(languageMode, 'suggestedIndentForBufferRows').and.callThrough();
 
       editor.setCursorBufferPosition([0, 15]);
       editor.transact(() => {
@@ -4712,7 +4784,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       // Force this test to use async indent in all cases.
       languageMode.transactionReparseBudgetMs = 0;
       languageMode.currentTransactionReparseBudgetMs = 0;
-      spyOn(languageMode, 'suggestedIndentForBufferRows').andCallThrough();
+      spyOn(languageMode, 'suggestedIndentForBufferRows').and.callThrough();
       buffer.setLanguageMode(languageMode);
       await languageMode.ready;
 
@@ -4752,7 +4824,6 @@ describe('WASMTreeSitterLanguageMode', () => {
         function test () {
           return }
       `)
-
     })
 
   });

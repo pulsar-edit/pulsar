@@ -50,19 +50,16 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                The Windows installer no longer removes <code>pulsar</code> and <code>ppm</code> from your path when you update Pulsar to a newer version.
+                Some minor Tree-sitter fixes, including fixing a bug in SCSS highlighting and ensuring proper highlighting support for abstract methods in TypeScript.
               </li>
               <li>
-                [spell-check] Removed <code>source comment</code> from the list of automatically checked scopes because of reports of high CPU usage. This means that Pulsar will no longer automatically perform spell-checking for all code comments in all source files. (If you liked the behavior, you can add it back to the list in the <code>spell-check.grammars</code> config setting.)
+                When viewing a file that exists on disk outside of your project root, you may now use <b>Tree View: Rename</b> to “import” it into your project folder by giving it a relative path.
               </li>
               <li>
-                [language-python] Improved indentation hinting in some unusual scenarios like on one-line blocks and after code comments.
+                Updated various dependencies for security reasons.
               </li>
               <li>
-                [language-css] Updated <code>tree-sitter-css</code> to latest. Selector handling is now much better when typing incomplete selectors in a brand-new CSS file or at the bottom of an existing file.
-              </li>
-              <li>
-                Restored functionality of <a href="https://web.pulsar-edit.dev/packages/project-plus">project-plus</a> via exposing previously removed internal APIs.
+                Updated AppImages to type 2 runtime -- <code>libfuse</code> is no-longer required to be installed on the end-user's system to use Pulsar's AppImages!
               </li>
             </ul>
 

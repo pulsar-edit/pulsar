@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Grim = require('grim');
 const path = require('path');
 const dedent = require('dedent');
 const TextBuffer = require('text-buffer');
@@ -107,6 +108,40 @@ describe('ScopeResolver', () => {
     ScopeResolver.clearConfigCache();
   });
 
+  it('generates deprecation message for old call signature of Query::captures', async () => {
+    // We monkey-patch a method in `web-tree-sitter` whose signature changed so
+    // that it accepts the old signature style and generates a deprecation
+    // message.
+    let query = await grammar.setQueryForTest('highlightsQuery', `
+      (comment) @comment
+      (string) @string
+      "=" @operator
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+    `);
+    await languageMode.ready;
+
+    let tree = languageMode.rootLanguageLayer.tree;
+
+    expect(Grim.getDeprecations()?.length).toBe(0);
+    // We'll use the old method signature and assert that it both (a) returns
+    // results and (b) generates a deprecation message.
+    let captures = query.captures(
+      tree.rootNode,
+      new Point(0, 0),
+      new Point(Infinity, Infinity)
+    );
+    expect(captures.length).toBeGreaterThan(0);
+    let deprecations = Grim.getDeprecations();
+    expect(deprecations.length).toBeGreaterThan(0);
+    Grim.clearDeprecations();
+  });
+
   it('resolves all scopes in absence of any tests or adjustments', async () => {
     await grammar.setQueryForTest('highlightsQuery', `
       (comment) @comment
@@ -178,7 +213,7 @@ describe('ScopeResolver', () => {
     `);
     await languageMode.ready;
 
-    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+    let { captures } = await getAllCaptures(grammar, languageMode);
 
     let names = captures.map(({ name, node }) => {
       return ScopeResolver.interpolateName(name, node)
@@ -189,6 +224,36 @@ describe('ScopeResolver', () => {
       'declaration.const',
       'declaration.let'
     ]);
+  });
+
+  it('does not apply any scopes on an empty capture', async () => {
+    await grammar.setQueryForTest('highlightsQuery', `
+      (lexical_declaration kind: _ @let
+        (#match? @let "let"))
+    `);
+
+    const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+    buffer.setLanguageMode(languageMode);
+    buffer.setText(dedent`
+      // this is a comment
+      const foo = "ahaha";
+      let bar = 'troz'
+    `);
+    await languageMode.ready;
+
+    let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
+
+    // Build a fake capture whose `startPosition` is equal to its `endPosition`.
+    let fakeCapture = { ...captures[0] };
+    fakeCapture.node = {
+      ...fakeCapture.node,
+      endPosition: fakeCapture.node.startPosition
+    };
+
+    let prevBoundaries = scopeResolver.boundaries.size;
+    let result = scopeResolver.store(fakeCapture);
+    expect(result).not.toBe(false);
+    expect(scopeResolver.boundaries.size).toBe(prevBoundaries);
   });
 
   it('does not apply any scopes when @_IGNORE_ is used', async () => {
@@ -347,7 +412,7 @@ describe('ScopeResolver', () => {
       `);
       // Prevent an exception from being thrown before we can even check the
       // scopeResolver.
-      spyOn(languageMode, 'isRowCommented').andReturn(false);
+      spyOn(languageMode, 'isRowCommented').and.returnValue(false);
       await languageMode.ready;
 
       let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);

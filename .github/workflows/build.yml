@@ -35,9 +35,44 @@ jobs:
       timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
+    - name: Edit sources.list - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+        sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools
+      run: apt-get update && apt-get install -y git make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools
+        libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev # <-- Python-related stuff on this line
+
+    - name: Restore Compiled Python from Cache - Linux
+      if: ${{ runner.os == 'Linux' }}
+      id: compiled-python-restore
+      uses: actions/cache/restore@v4
+      with:
+        key: ${{ runner.os }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
+        path: Python-${{ env.PYTHON_VERSION }}.9
+
+    - name: Compile Python - Linux
+      if: ${{ runner.os == 'Linux' && steps.compiled-python-restore.outputs.cache-hit != 'true' }}
+      run: |
+        wget "https://www.python.org/ftp/python/${PYTHON_VERSION}.9/Python-${PYTHON_VERSION}.9.tgz"
+        echo "45313e4c5f0e8acdec9580161d565cf5fea578e3eabf25df7cc6355bf4afa1ee  Python-${PYTHON_VERSION}.9.tgz" | sha256sum --check
+        tar xzf "Python-${PYTHON_VERSION}.9.tgz"
+        cd "Python-${PYTHON_VERSION}.9"
+        ./configure --enable-optimizations
+        make
+
+    - name: Save Compiled Python to Cache - Linux
+      if: ${{ runner.os == 'Linux' && steps.compiled-python-restore.outputs.cache-hit != 'true' }}
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ runner.os }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
+        path: Python-${{ env.PYTHON_VERSION }}.9
+
+    - name: Install Compiled Python - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: cd "Python-${PYTHON_VERSION}.9" && make install
 
     - name: Checkout the latest code
       uses: actions/checkout@v4
@@ -99,6 +134,17 @@ jobs:
       # NodeJS versions above 16 should come with `node-gyp@9.4.0` that has a fix
       # for this issue. At that point this additional step can be removed.
       run: npx node-gyp install ${{ env.NODE_VERSION }}
+
+    - name: Explicitly Specify Python Path (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      # The Windows image somehow gets confused about which Python it should
+      # use. Here we set the `PYTHON` env variable to whatever we get when we
+      # run `python3` in a shell, since that's the copy we used to install
+      # `setuptools` above.
+      run: |
+        Get-Command python3 | Format-Wide -Property Source
+        $pythonPath = (Get-Command python3)[0].Source
+        echo "PYTHON=$pythonPath" >> $env:GITHUB_ENV
 
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e

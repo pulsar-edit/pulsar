@@ -3,6 +3,7 @@ const fs = require("fs-plus");
 const CSON = require("season");
 const keyPathHelpers = require("key-path-helpers");
 const IntlMessageFormat = require("intl-messageformat").default;
+const { memoize } = require("@formatjs/fast-memoize");
 
 // Truncate trailing subtag, as well as single letter or digit subtags
 // which introduce private-use sequences, and extensions, and are not valid
@@ -28,9 +29,9 @@ function generateLocaleFallback(list, lang) {
 
 module.exports =
 class I18n {
-  // Provides LocaleNegotiation in accordance to RFC4647 Lookup Filtering Fallback Pattern
+  // Provides localeNegotiation in accordance to RFC4647 Lookup Filtering Fallback Pattern
   // Provided a priorityList, primary language, and default language.
-  static LocaleNegotiation(
+  static localeNegotiation(
     primary,
     priorityList,
     fallback = "en" // Hardcoding to ensure we can always fallback to something
@@ -60,13 +61,19 @@ class I18n {
     return lookupList;
   }
 
-  // Determines if the provided locale should be loaded. Based on the user's
-  // current settings.
-  static ShouldIncludeLocale(locale, primary, priorityList, fallback) {
-    const localeList = I18n.LocaleNegotiation(primary, priorityList, fallback);
+  // Determines if the provided locale should be loaded. Based on manually
+  // provided settings.
+  static shouldIncludeLocaleParameterized(locale, opts = {} ) {
+    let localeList;
+
+    if (opts.localeList) {
+      localeList = opts.localeList;
+    } else {
+      localeList = I18n.localeNegotiation(opts.primary, opts.priorityList, opts.fallback);
+    }
 
     for (const localeListItem of localeList) {
-      if (I18n.DoLocalesMatch(localeListItem, locale)) {
+      if (I18n.doLocalesMatch(localeListItem, locale)) {
         return true;
       }
     }
@@ -75,7 +82,7 @@ class I18n {
   }
 
   // Takes a wanted locale, and the locale you have, to determine if they match
-  static DoLocalesMatch(want, have) {
+  static doLocalesMatch(want, have) {
     if (want == have) {
       return true;
     }
@@ -102,11 +109,24 @@ class I18n {
     this.config = config;
     this.strings = {};
     this.localeFallbackList = null;
+
+    // Generate our INTL formatters first to speed up later calls to `IntlMessageFormat`
+    this.formatters = {
+      getNumberFormat: memoize(
+        (locale, opts) => new Intl.NumberFormat(locale, opts)
+      ),
+      getDateTimeFormat: memoize(
+        (locale, opts) => new Intl.DateTimeFormat(locale, opts)
+      ),
+      getPluralRules: memoize(
+        (locale, opts) => new Intl.PluralRules(locale, opts)
+      )
+    };
   }
 
   // Helps along with initial setup
   initialize({ resourcePath }) {
-    this.localeFallbackList = I18n.LocaleNegotiation(
+    this.localeFallbackList = I18n.localeNegotiation(
       this.config.get("core.language.primary"),
       this.config.get("core.language.priorityList")
     );
@@ -119,14 +139,14 @@ class I18n {
       const localeFilePath = localePath.split(".");
       // `pulsar.en-US.json` => `en-US`
       const locale = localeFilePath[localeFilePath.length - 2] ?? "";
-      if (I18n.ShouldIncludeLocale(locale)) {
+      if (this.shouldIncludeLocale(locale)) {
         this.addStrings(CSON.readFileSync(localePath) || {}, locale);
       }
     }
   }
 
   shouldIncludeLocale(locale) {
-    return I18n.ShouldIncludeLocale(locale);
+    return I18n.shouldIncludeLocaleParameterized(locale, { localeList: this.localeFallbackList });
   }
 
   addStrings(newObj, locale, stringObj = this.strings) {
@@ -160,14 +180,15 @@ class I18n {
     const stringLocales = keyPathHelpers.getValueAtKeyPath(this.strings, keyPath);
 
     if (typeof stringLocales !== "object") {
-      // If the keypath requested doesn't exist, return null
-      return null;
+      // If the keypath requested doesn't exist, return the original keyPath
+      // TODO Should we emit an event? Or append to the string why it coudln't be translated?
+      return keyPath;
     }
 
     let bestLocale;
 
     if (this.localeFallbackList == null) {
-      this.localeFallbackList = I18n.LocaleNegotiation(
+      this.localeFallbackList = I18n.localeNegotiation(
         this.config.get("core.language.primary"),
         this.config.get("core.language.priorityList")
       );
@@ -177,7 +198,7 @@ class I18n {
     localeFallbackListLoop:
     for (const localeListItem of this.localeFallbackList) {
       for (const possibleLocale in stringLocales) {
-        if (I18n.DoLocalesMatch(localeListItem, possibleLocale)) {
+        if (I18n.doLocalesMatch(localeListItem, possibleLocale)) {
           bestLocale = possibleLocale;
           break localeFallbackListLoop;
         }
@@ -185,13 +206,22 @@ class I18n {
     }
 
     if (!stringLocales[bestLocale]) {
-      // If we couldn't find any way to read the string, return null
-      return null;
+      // If we couldn't find any way to read the string, return the original keyPath
+      // TODO Should we emit an event? Or append to the string why it couldn't be translated?
+      return keyPath;
     }
 
-    const msg = new IntlMessageFormat(stringLocales[bestLocale], bestLocale);
+    try {
+      const msg = new IntlMessageFormat(stringLocales[bestLocale], bestLocale, undefined, { formatters: this.formatters });
 
-    return msg.format(opts);
+      const msgFormatted = msg.format(opts);
+      return msgFormatted ?? keyPath;
+    } catch(err) {
+      console.error(err);
+      // We failed to translate the string with IntlMessageFormat, lets return
+      // the original keyPath.
+      return keyPath;
+    }
   }
 
   getT(namespace) {
@@ -211,7 +241,9 @@ class I18n {
   translateLabel(label) {
     // Since failing to translate menus could crash Pulsar
     // We must ensure to fallback to the raw label value
-    return this.translate(label.replace(/%/g, "")) ?? label;
+    // But `I18n.translate()` now returns the keyPath on failure
+    // So we don't have to protect against it here.
+    return this.translate(label.replace(/%/g, ""));
   }
 }
 

@@ -413,7 +413,7 @@ const configSchema = {
       },
       language: {
         type: "object",
-        description: "Language and Locale options. Requires a restart of Pulsar to take effect.",
+        description: "EXPERIMENTAL: (Minimal effect until stable) Language and locale options. Requires a restart of Pulsar to take effect.",
         properties: {
           primary: {
             type: "string",
