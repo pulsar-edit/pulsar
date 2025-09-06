@@ -1804,12 +1804,12 @@ module.exports = class TextEditorComponent {
     let scrollLeftChanged = false;
     if (!this.scrollTopPending) {
       scrollTopChanged = this.setScrollTop(
-        this.refs.verticalScrollbar.element.scrollTop
+        this.refs.verticalScrollbar ? this.refs.verticalScrollbar.element.scrollTop : 0
       );
     }
     if (!this.scrollLeftPending) {
       scrollLeftChanged = this.setScrollLeft(
-        this.refs.horizontalScrollbar.element.scrollLeft
+        this.refs.horizontalScrollbar ? this.refs.horizontalScrollbar.element.scrollLeft : 0
       );
     }
     if (scrollTopChanged || scrollLeftChanged) this.updateSync();
