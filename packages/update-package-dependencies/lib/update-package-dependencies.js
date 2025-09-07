@@ -47,9 +47,9 @@ module.exports = {
         this.updatePackageDependenciesStatusView.detach();
 
       if (code === 0) {
-        atom.notifications.addSuccess('Package dependencies updated');
+        atom.notifications.addSuccess(atom.i18n.t("update-package-dependencies.src.update-deps:success"));
       } else {
-        atom.notifications.addError('Failed to update package dependencies', {
+        atom.notifications.addError(atom.i18n.t("update-package-dependencies.src.update-deps:failure"), {
           detail: errorOutput,
           dismissable: true
         });
