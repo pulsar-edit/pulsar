@@ -9,3 +9,11 @@
   'select-matching-brackets': 'Select Matching Brackets'
   'selection:label': 'Selection'
 }
+'config': {
+  'autocompleteCharacters:description': 'Autocompleted characters treated as matching pairs, such as `()`, and `{}`.'
+  'pairsWithExtraNewline:description': 'Automatically add a newline between the pair when enter is pressed.'
+  'autocompleteBrackets:description': 'Autocomplete bracket and quote characters, such as `(` and `)`, and `\"`.'
+  'wrapSelectionsInBrackets:description': 'Wrap selected text in brackets or quotes when the editor contains selections and the opening bracket or quote is typed.'
+  'highlightMatchingLineNumber:description': 'Highlight the line number of the matching bracket.'
+  'alwaysSkipClosingPairs:description': 'Always skip closing pairs in front of the cursor.'
+}
