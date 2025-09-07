@@ -1,0 +1,12 @@
+'tips':
+  '1': 'Close panels like find and replace with {body>core:cancel}'
+  '2': 'Everything {brandName} can do is in the Command Palette. See it by using {command-palette:toggle}'
+  '3': 'You can quickly open files with the Fuzzy Finder. Try it by using {fuzzy-finder:toggle-file-finder}'
+  '4': 'You can toggle the Tree View with {tree-view:toggle}'
+  '5': 'You can focus the Tree View with {tree-view:toggle-focus}'
+  '6': 'You can toggle the Git tab with {github:toggle-git-tab}'
+  '7': 'You can toggle the GitHub tab with {github:toggle-github-tab}'
+  '8': 'You can focus the GitHub tab with {github:toggle-github-tab-focus}'
+  '9': 'You can split a pane with {pane:split-right-and-copy-active-item}'
+  '10': 'You can jump to a method in the editor using {symbols-view:toggle-file-symbols}'
+  '11': 'You can install packages and themes from the Settings View {settings-view:open}'
