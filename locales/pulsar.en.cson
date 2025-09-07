@@ -30,9 +30,9 @@
                                     [watches]:https://pulsar-edit.dev/docs/atom-archive/hacking-atom/#typeerror-unable-to-watch-path
                                     '''
                                     # TODO: Update the above to Pulsar docs if we choose to add this
-     'compile-stylesheet-error:message': 'Error compiling Less stylesheet: `{path}`'
-     'compile-stylesheet-error:detail': 'Line number: {line}\\n{message}'
-     'load-stylesheet-error': 'Error loading Less stylesheet: `{path}`'
+      'compile-stylesheet-error:message': 'Error compiling Less stylesheet: `{path}`'
+      'compile-stylesheet-error:detail': 'Line number: {line}\\n{message}'
+      'load-stylesheet-error': 'Error loading Less stylesheet: `{path}`'
     }
     'window-event-handler': {
       'menu-bar-hidden:title': 'Menu bar hidden'
