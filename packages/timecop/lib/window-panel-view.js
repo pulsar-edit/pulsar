@@ -26,27 +26,27 @@ export default class WindowPanelView {
     return (
       <div className='tool-panel padded package-panel'>
         <div className='inset-panel'>
-          <div className='panel-heading'>Startup Time</div>
+          <div className='panel-heading'>{atom.i18n.t("timecop.window-panel-view.startup-time")}</div>
           <div className='panel-body padded'>
             <div className='timing' ref='shellTiming'>
-              <span className='inline-block'>Shell load time</span>
-              <span className='inline-block' ref='shellLoadTime'>Loading…</span>
+              <span className='inline-block'>{atom.i18n.t("timecop.window-panel-view.load-time", { type: "Shell"})}</span>
+              <span className='inline-block' ref='shellLoadTime'>{atom.i18n.t("timecop.common.loading")}</span>
             </div>
 
             <div className='timing' ref='windowTiming'>
-              <span className='inline-block'>Window load time</span>
-              <span className='inline-block' ref='windowLoadTime'>Loading…</span>
+              <span className='inline-block'>{atom.i18n.t("timecop.window-panel-view.load-time", { type: "Window"})}</span>
+              <span className='inline-block' ref='windowLoadTime'>{atom.i18n.t("timecop.common.loading")}</span>
             </div>
 
             <div ref='deserializeTimings'>
               <div className='timing' ref='projectTiming'>
-                <span className='inline-block'>Project load time</span>
-                <span className='inline-block' ref='projectLoadTime'>Loading…</span>
+                <span className='inline-block'>{atom.i18n.t("timecop.window-panel-view.load-time", { type: "Project"})}</span>
+                <span className='inline-block' ref='projectLoadTime'>{atom.i18n.t("timecop.common.loading")}</span>
               </div>
 
               <div className='timing' ref='workspaceTiming'>
-                <span className='inline-block'>Workspace load time</span>
-                <span className='inline-block' ref='workspaceLoadTime'>Loading…</span>
+                <span className='inline-block'>{atom.i18n.t("timecop.window-panel-view.load-time", { type: "Workspace"})}</span>
+                <span className='inline-block' ref='workspaceLoadTime'>{atom.i18n.t("timecop.common.loading")}</span>
               </div>
             </div>
           </div>

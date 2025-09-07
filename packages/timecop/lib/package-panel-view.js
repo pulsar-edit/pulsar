@@ -32,7 +32,7 @@ export default class PackagePanelView {
         <div className='inset-panel'>
           <div className='panel-heading'>{this.title}</div>
           <div className='panel-body padded'>
-            <div className='text-info' ref='summary'>Loading…</div>
+            <div className='text-info' ref='summary'>{atom.i18n.t("timecop.common.loading")}</div>
             <ul className='list-group' ref='list' />
           </div>
         </div>
