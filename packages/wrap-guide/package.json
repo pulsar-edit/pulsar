@@ -15,12 +15,12 @@
       "items": {
         "type": "integer"
       },
-      "description": "Display guides at each of the listed character widths. Leave blank for one guide at your `editor.preferredLineLength`."
+      "description": "%wrap-guide.config.column:description%"
     },
     "modifyPreferredLineLength": {
       "default": true,
       "type": "boolean",
-      "description": "Modify the Editor's Preferred Line Length when changing Wrap Guide's Columns setting."
+      "description": "%wrap-guide.config.modifyPreferredLineLength:description%"
     },
     "enabled": {
       "default": true,
@@ -28,19 +28,19 @@
     },
     "showWrapGuide": {
       "type": "string",
-      "description": "Choose when to show the wrap guide.",
+      "description": "%wrap-guide.config.showWrapGuide%",
       "enum": [
         {
           "value": "always",
-          "description": "Always"
+          "description": "%wrap-guide.config.showWrapGuide:always:description%"
         },
         {
           "value": "wrapping",
-          "description": "When soft wrap is enabled"
+          "description": "%wrap-guide.config.showWrapGuide:wrapping:description%"
         },
         {
           "value": "atPreferredLineLength",
-          "description": "When soft wrap at preferred line length is enabled"
+          "description": "%wrap-guide.config.showWrapGuide:atPreferredLineLength:description%"
         }
       ],
       "default": "always"
