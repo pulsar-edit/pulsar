@@ -1,9 +1,9 @@
 'menu': [
   {
-    'label': '%autoflow.menu.editLabel%'
+    'label': '%autoflow.menu.edit:label%'
     'submenu': [
       {
-        'label': '%autoflow.menu.reflowSelectionLabel%'
+        'label': '%autoflow.menu.reflowSelection:label%'
         'command': 'autoflow:reflow-selection'
       }
     ]

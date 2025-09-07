@@ -1,4 +1,4 @@
 'menu': {
-  'editLabel': 'Edit'
-  'reflowSelectionLabel': 'Reflow Selection'
+  'edit:label': 'Edit'
+  'reflowSelection:label': 'Reflow Selection'
 }
