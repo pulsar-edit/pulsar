@@ -40,8 +40,8 @@
     }
     'workspace': {
       'untitled': 'untitled'
-      'permission-denied': 'Permission denied \'{location}\''
-      'unable-to-open': 'Unable to open \'{location}\''
+      'permission-denied': 'Permission denied \'\'{location}\'\''
+      'unable-to-open': 'Unable to open \'\'{location}\'\''
       'large-file-warning:message': 'Pulsar will be unresponsive during the loading of very large files.'
       'large-file-warning:detail': 'Do you still want to load this file?'
       'confirm-checkout-head-revision:message': 'Confirm Checkout HEAD Revision'
