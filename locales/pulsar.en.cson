@@ -11,6 +11,15 @@
     'core:undo': 'Undo'
   }
   'src': {
+    'atom-environment': {
+      'previous-project-state:message': 'Previous automatically-saved project state detected'
+      'previous-project-state:detail': '''
+                                       There is a previously saved state for the select {nouns}.
+                                       Would you like to add the {nouns} to this window, permanently discard the saved state,
+                                       or open the {nouns} in a new window, restoring the saved state?
+                                       '''
+      'deserialize:error': 'Unable to deserialize project'
+    }
     'theme-manager': {
       'unable-to-watch-path-error': '''
                                     Unable to watch path: `{path}`. Make sure
