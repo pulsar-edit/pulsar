@@ -10,3 +10,6 @@
   'packages:command-palette': 'Command Palette'
   'packages:commnd-palette:toggle': 'Toggle'
 }
+'config': {
+  'preserveLastSearch:description': 'Preserve the last search when reopening the command palette.'
+}
