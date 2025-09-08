@@ -213,7 +213,7 @@ class I18n {
 
     try {
       const msg = new IntlMessageFormat(stringLocales[bestLocale], bestLocale, undefined, { formatters: this.formatters });
-
+      console.log(`I18n: keyPath: '${keyPath}'; string: '${stringLocales[bestLocale]}'; bestLocale: '${bestLocale}'`);
       const msgFormatted = msg.format(opts);
       return msgFormatted ?? keyPath;
     } catch(err) {
