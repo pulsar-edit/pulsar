@@ -93,9 +93,9 @@ module.exports = class Package {
   }
 
   preload() {
+    this.loadLocales();
     this.loadKeymaps();
     this.loadMenus();
-    this.loadLocales();
     this.registerDeserializerMethods();
     this.activateCoreStartupServices();
     this.registerURIHandler();
@@ -129,9 +129,9 @@ module.exports = class Package {
       try {
         ModuleCache.add(this.path, this.metadata);
 
+        this.loadLocales();
         this.loadKeymaps();
         this.loadMenus();
-        this.loadLocales();
         this.loadStylesheets();
         this.registerDeserializerMethods();
         this.activateCoreStartupServices();
@@ -534,10 +534,12 @@ module.exports = class Package {
   }
 
   loadLocales() {
+    console.log(`I18n: package.loadLocales() Loading locales for: '${this.name}'`);
     const localesDirPath = path.join(this.path, "locales");
     const localesPaths = fs.listSync(localesDirPath, ["cson", "json"]);
 
     for (const localePath of localesPaths) {
+      console.log(`I18n: package.loadLocales() Loading Locale File: '${localePath}'`);
       const localeFilePath = localePath.split(".");
       // `package-name.en-US.json` => `en-US`
       const locale = localeFilePath[localeFilePath.length - 2] ?? "";
