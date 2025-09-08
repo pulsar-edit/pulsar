@@ -544,6 +544,7 @@ module.exports = class Package {
       // `package-name.en-US.json` => `en-US`
       const locale = localeFilePath[localeFilePath.length - 2] ?? "";
       if (atom.i18n.shouldIncludeLocale(locale)) {
+        console.log(`I18n: package.loadLocales() Should Include Locale: '${locale}'`);
         const localeFile = CSON.readFileSync(localePath);
         if (localeFile) {
           const localeObj = {};
