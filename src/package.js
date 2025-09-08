@@ -537,6 +537,7 @@ module.exports = class Package {
     console.log(`I18n: package.loadLocales() Loading locales for: '${this.name}'`);
     const localesDirPath = path.join(this.path, "locales");
     const localesPaths = fs.listSync(localesDirPath, ["cson", "json"]);
+    console.log(`I18n: package.loadLocales() Loading locales with path: '${this.path}', found: '${localesPaths}'`);
 
     for (const localePath of localesPaths) {
       console.log(`I18n: package.loadLocales() Loading Locale File: '${localePath}'`);
