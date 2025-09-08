@@ -122,10 +122,12 @@ class I18n {
         (locale, opts) => new Intl.PluralRules(locale, opts)
       )
     };
+    console.log("I18n: Constructor completed.");
   }
 
   // Helps along with initial setup
   initialize({ resourcePath }) {
+    console.log("I18n: initialize started");
     this.localeFallbackList = I18n.localeNegotiation(
       this.config.get("core.language.primary"),
       this.config.get("core.language.priorityList")
@@ -140,9 +142,11 @@ class I18n {
       // `pulsar.en-US.json` => `en-US`
       const locale = localeFilePath[localeFilePath.length - 2] ?? "";
       if (this.shouldIncludeLocale(locale)) {
+        console.log(`I18n: Adding strings for file '${localePath}'`);
         this.addStrings(CSON.readFileSync(localePath) || {}, locale);
       }
     }
+    console.log("I18n: Initialization complete");
   }
 
   shouldIncludeLocale(locale) {
@@ -177,11 +181,14 @@ class I18n {
   }
 
   translate(keyPath, opts = {}) {
+    console.log(`I18n: translate hit: keyPath: '${keyPath}'`);
     const stringLocales = keyPathHelpers.getValueAtKeyPath(this.strings, keyPath);
 
     if (typeof stringLocales !== "object") {
       // If the keypath requested doesn't exist, return the original keyPath
       // TODO Should we emit an event? Or append to the string why it coudln't be translated?
+      console.log(`I18n: '${keyPath}' couldn't find keypath in strings.`);
+      console.log(this.strings);
       return keyPath;
     }
 
@@ -208,6 +215,7 @@ class I18n {
     if (!stringLocales[bestLocale]) {
       // If we couldn't find any way to read the string, return the original keyPath
       // TODO Should we emit an event? Or append to the string why it couldn't be translated?
+      console.log(`I18n: '${keyPath}' couldn't find an appropriate locale for our string.`);
       return keyPath;
     }
 
@@ -217,6 +225,7 @@ class I18n {
       const msgFormatted = msg.format(opts);
       return msgFormatted ?? keyPath;
     } catch(err) {
+      console.log(`I18n: '${keyPath}' error when attempting to format string.`);
       console.error(err);
       // We failed to translate the string with IntlMessageFormat, lets return
       // the original keyPath.
