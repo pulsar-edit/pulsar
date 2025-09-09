@@ -539,7 +539,7 @@ module.exports = class Package {
     const localesPaths = fs.listSync(localesDirPath, ["cson", "json"]);
     console.log(`I18n: package.loadLocales() Loading locales with path: '${this.path}', with resolved path: '${localesDirPath}; found: '${localesPaths}'`);
 
-    if (this.path === "node_modules\timecop") {
+    if (this.name === "timecop") {
       const timecopLocale = CSON.readFileSync(path.join(this.path, "locales", "timecop.en.cson"));
       console.log(`I18n: Timecop explicit read:`);
       console.log(timecopLocale);
