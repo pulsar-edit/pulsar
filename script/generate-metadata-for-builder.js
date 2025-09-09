@@ -66,6 +66,7 @@ function buildBundledPackagesMetadata(packageJSON) {
       metadata: packageMetadata,
       keymaps: {},
       menus: {},
+      locales: {},
       grammarPaths: [],
       settings: {}
     };
@@ -115,6 +116,21 @@ function buildBundledPackagesMetadata(packageJSON) {
         ) {
           packageNewMetadata.menus[packageMenuPath] = CSON.readFileSync(
             packageMenuPath
+          );
+        }
+      }
+    }
+
+    const packageLocalesPath = path.join(packagePath, 'locales');
+    if (fs.existsSync(packageLocalesPath)) {
+      for (let packageLocale of fs.readdirSync(packageLocalesPath)) {
+        const packageLocalePath = path.join(packageLocalesPath, packageLocale);
+        if (
+          packageLocalePath.endsWith('.cson') ||
+          packageLocalePath.endsWith('.json')
+        ) {
+          packageNewMetadata.locales[packageLocalePath] = CSON.readFileSync(
+            packageLocalePath
           );
         }
       }
