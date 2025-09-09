@@ -537,7 +537,7 @@ module.exports = class Package {
     console.log(`I18n: package.loadLocales() Loading locales for: '${this.name}'`);
     if (this.bundledPackage && this.packageManager.packagesCache[this.name]) {
       console.log(`I18n: package.loadLocales() Loading bundled package '${this.name}'`);
-      for (const localePath of this.packageManager.packagesCache[this.name].locales) {
+      for (const localePath in this.packageManager.packagesCache[this.name].locales) {
         console.log(`I18n: package.loadLocales() BUNDLED: loading locales for path: '${localePath}'`);
         const localeFilePathSplit = localePath.split(".");
         const locale = localePathSplit[localeFilePathSplit.length - 2] ?? "";
