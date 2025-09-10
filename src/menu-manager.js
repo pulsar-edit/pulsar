@@ -112,13 +112,20 @@ module.exports = MenuManager = class MenuManager {
       if (this.i18n.isAutoTranslateLabel(item.label)) {
         item.label = this.i18n.translateLabel(item.label);
       }
-      if (Array.isArray(item.submenu)) {
-        for (let y = 0; y < item.submenu.length; y++) {
-          if (this.i18n.isAutoTranslateLabel(item.submenu[y].label)) {
-            item.submenu[y].label = this.i18n.translateLabel(item.submenu[y].label);
+
+      const translateAutoLabelSubmenu = (menuObject) => {
+        if (Array.isArray(menuObject.submenu)) {
+          for (let y = 0; y < menuObject.submenu.length; y++) {
+            if (this.i18n.isAutoTranslateLabel(menuObject.submenu[y].label)) {
+              menuObject.submenu[y].label = this.i18n.translateLabel(menuObject.submenu[y].label);
+            }
+            translateAutoLabelSubmenu(menuObject.submenu[y]);
           }
         }
-      }
+      };
+
+      // Translate submenus recursively
+      translateAutoLabelSubmenu(item);
 
       this.merge(this.template, item);
     }
