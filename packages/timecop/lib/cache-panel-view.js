@@ -6,8 +6,8 @@ import etch from 'etch'
 
 export default class CachePanelView {
   constructor () {
-    etch.initialize(this)
     this.t = atom.i18n.getT("timecop");
+    etch.initialize(this)
   }
 
   update () {}
@@ -20,31 +20,31 @@ export default class CachePanelView {
     return (
       <div className='tool-panel padded package-panel'>
         <div className='inset-panel'>
-          <div className='panel-heading'>{this.t("cache-panel-view.compile-cache")}</div>
+          <div className='panel-heading'>{this.t.t("cache-panel-view.compile-cache")}</div>
           <div className='panel-body padded'>
             <div className='timing'>
-              <span className='inline-block'>{this.t("cache-panel-view.files-compiled", { filetype: "CoffeeScript"})}</span>
-              <span className='inline-block' ref='coffeeCompileCount'>{this.t("common.loading")}</span>
+              <span className='inline-block'>{this.t.t("cache-panel-view.files-compiled", { filetype: "CoffeeScript"})}</span>
+              <span className='inline-block' ref='coffeeCompileCount'>{this.t.t("common.loading")}</span>
             </div>
 
             <div className='timing'>
-              <span className='inline-block'>{this.t("cache-panel-view.files-compiled", { filetype: "Babel"})}</span>
-              <span className='inline-block' ref='babelCompileCount'>{this.t("common.loading")}</span>
+              <span className='inline-block'>{this.t.t("cache-panel-view.files-compiled", { filetype: "Babel"})}</span>
+              <span className='inline-block' ref='babelCompileCount'>{this.t.t("common.loading")}</span>
             </div>
 
             <div className='timing'>
-              <span className='inline-block'>{this.t("cache-panel-view.files-compiled", { filetype: "Typescript"})}</span>
-              <span className='inline-block' ref='typescriptCompileCount'>{this.t("common.loading")}</span>
+              <span className='inline-block'>{this.t.t("cache-panel-view.files-compiled", { filetype: "Typescript"})}</span>
+              <span className='inline-block' ref='typescriptCompileCount'>{this.t.t("common.loading")}</span>
             </div>
 
             <div className='timing'>
-              <span className='inline-block'>{this.t("cache-panel-view.files-compiled", { filetype: "CSON"})}</span>
-              <span className='inline-block' ref='csonCompileCount'>{this.t("common.loading")}</span>
+              <span className='inline-block'>{this.t.t("cache-panel-view.files-compiled", { filetype: "CSON"})}</span>
+              <span className='inline-block' ref='csonCompileCount'>{this.t.t("common.loading")}</span>
             </div>
 
             <div className='timing'>
-              <span className='inline-block'>{this.t("cache-panel-view.files-compiled", { filetype: "Less"})}</span>
-              <span className='inline-block' ref='lessCompileCount'>{this.t("common.loading")}</span>
+              <span className='inline-block'>{this.t.t("cache-panel-view.files-compiled", { filetype: "Less"})}</span>
+              <span className='inline-block' ref='lessCompileCount'>{this.t.t("common.loading")}</span>
             </div>
           </div>
         </div>
