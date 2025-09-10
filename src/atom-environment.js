@@ -1497,7 +1497,7 @@ or use Pane::saveItemAs for programmatic saving.`);
       } catch (error) {
         // We handle the missingProjectPaths case in openLocations().
         if (!error.missingProjectPaths) {
-          this.notifications.addError(this.i18n.t("pulsar.src.atom-environment.deserrialize:error"), {
+          this.notifications.addError(this.i18n.t("pulsar.src.atom-environment.deserialize:error"), {
             description: error.message,
             stack: error.stack
           });
