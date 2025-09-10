@@ -540,7 +540,7 @@ module.exports = class Package {
       for (const localePath in this.packageManager.packagesCache[this.name].locales) {
         console.log(`I18n: package.loadLocales() BUNDLED: loading locales for path: '${localePath}'`);
         const localeFilePathSplit = localePath.split(".");
-        const locale = localePathSplit[localeFilePathSplit.length - 2] ?? "";
+        const locale = localeFilePathSplit[localeFilePathSplit.length - 2] ?? "";
         console.log(`I18n: package.loadLocales() BUNDLED: using locale: '${locale}' from '${localePath}'`);
         if (atom.i18n.shouldIncludeLocale(locale)) {
           console.log(`I18n: package.loadLocales() BUNDLED: adding locale file: '${localePath}'`);
