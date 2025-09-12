@@ -147,7 +147,6 @@ class I18n {
     // As for the initial preload of Pulsar locales before we even have our `resourcePath`
     // We will copy the methodology that `./src/main-process/atom-window.js` uses
     // to determine our 'resourcePath'
-    console.log("I18n: preload started");
     this.localeFallbackList = [ "en" ]; // Hardcode our default fallback value
     // ^^^ For now, we may consider a "*" in the future to load all locales, and prune as needed
     let tempPulsarLocalePath = path.resolve(process.resourcesPath, "app.asar", "locales");
@@ -157,18 +156,16 @@ class I18n {
     if (!fs.existsSync(tempPulsarLocalePath)) {
       tempPulsarLocalePath = path.resolve(__dirname, "..", "..", "resources", "app.asar", "locales");
     }
-    console.log(`I18n: preload: tempPulsarLocalePath: '${tempPulsarLocalePath}'`);
     const localesPaths = fs.listSync(tempPulsarLocalePath, ["cson", "json"]);
 
     for (const localePath of localesPaths) {
       const localeFilePath = localePath.split(".");
       // `pulsar.en-US.json` => `en-US`
       const locale = localeFilePath[localeFilePath.length - 2] ?? "";
-      console.log(`I18n: preload: Adding strings for file '${localePath}'`);
       // During preload we load all available locales, and MUST prune them later
       this.addStrings(CSON.readFileSync(localePath) || {}, locale);
     }
-    console.log("I18n: preload complete");
+    
     this.preloadComplete = true;
   }
 
