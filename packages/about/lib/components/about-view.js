@@ -68,11 +68,11 @@ module.exports = class AboutView extends EtchComponent {
     var showMoreDiv = document.querySelector('.show-more');
     var showMoreText = document.querySelector('.about-more-expand');
     switch (showMoreText.textContent) {
-      case 'Show more':
+      case atom.i18n.t("about.src.show-more"):
         showMoreDiv.classList.toggle('hidden');
         showMoreText.textContent = atom.i18n.t("about.src.hide");
         break;
-      case 'Hide':
+      case atom.i18n.t("about.src.hide"):
         showMoreDiv.classList.toggle('hidden');
         showMoreText.textContent = atom.i18n.t("about.src.show-more");
         break;
