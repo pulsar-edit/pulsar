@@ -4,9 +4,7 @@
   'commaSpace': ', '
 }
 'menu': {
-  'view': 'View'
   'view:command-palette:toggle': 'Toggle Command Palette'
-  'packages': 'Packages'
   'packages:command-palette': 'Command Palette'
   'packages:commnd-palette:toggle': 'Toggle'
 }

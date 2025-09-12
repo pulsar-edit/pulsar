@@ -1,5 +1,4 @@
 'menu': {
-  'packages:label': 'Packages'
   'bracket-matcher:label': 'Bracket Matcher'
   'go-to-matching-bracket': 'Go To Matching Bracket'
   'select-inside-brackets': 'Select Inside Brackets'
@@ -7,7 +6,6 @@
   'close-tag': 'Close Current Tag'
   'remove-matching-brackets': 'Remove Matching Brackets'
   'select-matching-brackets': 'Select Matching Brackets'
-  'selection:label': 'Selection'
 }
 'config': {
   'autocompleteCharacters:description': 'Autocompleted characters treated as matching pairs, such as `()`, and `{}`.'

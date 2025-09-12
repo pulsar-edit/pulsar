@@ -1,6 +1,6 @@
 'menu': [
   {
-    'label': '%bookmarks.menu.edit:label%'
+    'label': '%pulsar.common.menu-labels.edit%'
     'submenu': [
       {
         'label': '%bookmarks.menu.bookmark:label%'

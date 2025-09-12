@@ -1,6 +1,6 @@
 'menu': [
   {
-    'label': '%whitespace.menu.packages:label%'
+    'label': '%pulsar.commons.menu-labels.packages%'
     'submenu': [
       'label': '%whitespace.menu.whitespace:label%'
       'submenu': [

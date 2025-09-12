@@ -1,6 +1,6 @@
 'menu': [
   {
-    'label': '%bracket-matcher.menu.packages:label%'
+    'label': '%pulsar.commons.menu-labels.packages%'
     'submenu': [
       'label': '%bracket-matcher.menu.bracket-matcher:label%'
       'submenu': [
@@ -14,7 +14,7 @@
     ]
   },
   {
-    'label': '%bracket-matcher.menu.selection:label%'
+    'label': '%pulsar.commons.menu-labels.selection%'
     'submenu': [
         { 'label': '%bracket-matcher.menu.select-inside-brackets%', 'command': 'bracket-matcher:select-inside-brackets' }
     ]

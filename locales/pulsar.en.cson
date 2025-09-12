@@ -54,5 +54,14 @@
     'proceed': 'Proceed'
     'ok': 'OK'
     'cancel': 'Cancel'
+    'menu-labels': {
+      'file': 'File'
+      'edit': 'Edit'
+      'view': 'View'
+      'selection': 'Selection'
+      'find': 'Find'
+      'packages': 'Packages'
+      'help': 'Help'
+    }
   }
 }

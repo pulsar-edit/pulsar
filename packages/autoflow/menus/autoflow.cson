@@ -1,6 +1,6 @@
 'menu': [
   {
-    'label': '%autoflow.menu.edit:label%'
+    'label': '%pulsar.commons.menu-labels.edit%'
     'submenu': [
       {
         'label': '%autoflow.menu.reflowSelection:label%'

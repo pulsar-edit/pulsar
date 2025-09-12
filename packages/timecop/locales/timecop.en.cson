@@ -1,5 +1,4 @@
 'menu': {
-  'packages:label': 'Packages'
   'timecop:label': 'Timecop'
   'timecop:view': 'Show'
 }

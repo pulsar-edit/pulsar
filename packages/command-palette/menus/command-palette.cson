@@ -1,6 +1,6 @@
 'menu': [
   {
-    'label': '%command-palette.menu.view%'
+    'label': '%pulsar.commons.menu-labels.view%'
     'submenu': [
       {
         'label': '%command-palette.menu.view:command-palette:toggle%'
@@ -9,7 +9,7 @@
     ]
   }
   {
-    'label': '%command-palette.menu.packages%'
+    'label': '%pulsar.commons.menu-labels.packages%'
     'submenu': [
       {
         'label': '%command-palette.menu.packages:command-palette%',

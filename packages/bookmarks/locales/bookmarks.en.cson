@@ -3,7 +3,6 @@
   'untitled': 'Untitled'
 }
 'menu': {
-  'edit:label': 'Edit'
   'bookmark:label': 'Bookmark'
   'view-all': 'View All'
   'toggle-bookmark': 'Toggle Bookmark'

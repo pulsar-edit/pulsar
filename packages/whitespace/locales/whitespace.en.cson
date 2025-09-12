@@ -1,5 +1,4 @@
 'menu': {
-  'packages:label': 'Packages'
   'whitespace:label': 'Whitespace'
   'whitespace:remove-trailing-whitespace': 'Remove Trailing Whitespace'
   'whitespace:save-with-trailing-whitespace': 'Save With Trailing Whitespace'
