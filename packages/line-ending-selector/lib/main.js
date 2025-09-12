@@ -104,7 +104,7 @@ export function consumeStatusBar(statusBar) {
       }
       tooltipDisposable = atom.tooltips.add(statusBarItem.element, {
         title() {
-          return `File uses ${statusBarItem.description()} line endings`;
+          return atom.i18n.t("line-ending-selector.src.file-uses", { kind: statusBarItem.description() });
         }
       });
       disposables.add(tooltipDisposable);
