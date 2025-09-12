@@ -98,8 +98,7 @@ class GoToLineView {
     if (this.panel.isVisible() || !atom.workspace.getActiveTextEditor()) return;
     this.storeFocusedElement();
     this.panel.show();
-    this.message.textContent =
-      'Enter a <row> or <row>:<column> to go there. Examples: "3" for row 3 or "2:7" for row 2 and column 7';
+    this.message.textContent = atom.i18n.t("go-to-line.src.open-message");
     this.miniEditor.element.focus();
   }
 }
