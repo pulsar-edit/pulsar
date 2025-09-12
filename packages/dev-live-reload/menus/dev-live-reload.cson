@@ -1,9 +1,9 @@
 'menu': [
-  'label': 'Packages'
+  'label': '%pulsar.commons.menu-labels.packages%'
   'submenu': [
-    'label': 'Dev Live Reload'
+    'label': '%dev-live-reload.menu.label%'
     'submenu': [
-      { 'label': 'Reload All Styles', 'command': 'dev-live-reload:reload-all' }
+      { 'label': '%dev-live-reload.dev-live-reload:reload-all:label%', 'command': 'dev-live-reload:reload-all' }
     ]
   ]
 ]
