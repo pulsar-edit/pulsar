@@ -93,9 +93,9 @@ module.exports = class Package {
   }
 
   preload() {
+    this.loadLocales();
     this.loadKeymaps();
     this.loadMenus();
-    this.loadLocales();
     this.registerDeserializerMethods();
     this.activateCoreStartupServices();
     this.registerURIHandler();
@@ -129,9 +129,9 @@ module.exports = class Package {
       try {
         ModuleCache.add(this.path, this.metadata);
 
+        this.loadLocales();
         this.loadKeymaps();
         this.loadMenus();
-        this.loadLocales();
         this.loadStylesheets();
         this.registerDeserializerMethods();
         this.activateCoreStartupServices();
@@ -534,19 +534,32 @@ module.exports = class Package {
   }
 
   loadLocales() {
-    const localesDirPath = path.join(this.path, "locales");
-    const localesPaths = fs.listSync(localesDirPath, ["cson", "json"]);
-
-    for (const localePath of localesPaths) {
-      const localeFilePath = localePath.split(".");
-      // `package-name.en-US.json` => `en-US`
-      const locale = localeFilePath[localeFilePath.length - 2] ?? "";
-      if (atom.i18n.shouldIncludeLocale(locale)) {
-        const localeFile = CSON.readFileSync(localePath);
-        if (localeFile) {
+    if (this.bundledPackage && this.packageManager.packagesCache[this.name]) {
+      for (const localePath in this.packageManager.packagesCache[this.name].locales) {
+        const localeFilePathSplit = localePath.split(".");
+        const locale = localeFilePathSplit[localeFilePathSplit.length - 2] ?? "";
+        if (atom.i18n.shouldIncludeLocale(locale)) {
+          const localeFile = this.packageManager.packagesCache[this.name].locales[localePath];
           const localeObj = {};
           localeObj[this.name] = localeFile;
           atom.i18n.addStrings(localeObj, locale);
+        }
+      }
+    } else {
+      const localesDirPath = path.join(this.path, "locales");
+      const localesPaths = fs.listSync(localesDirPath, ["cson", "json"]);
+
+      for (const localePath of localesPaths) {
+        const localeFilePath = localePath.split(".");
+        // `package-name.en-US.json` => `en-US`
+        const locale = localeFilePath[localeFilePath.length - 2] ?? "";
+        if (atom.i18n.shouldIncludeLocale(locale)) {
+          const localeFile = CSON.readFileSync(localePath);
+          if (localeFile) {
+            const localeObj = {};
+            localeObj[this.name] = localeFile;
+            atom.i18n.addStrings(localeObj, locale);
+          }
         }
       }
     }

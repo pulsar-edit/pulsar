@@ -109,6 +109,12 @@ class AtomEnvironment {
       config: this.config
     });
 
+    /** @type {I18n} */
+    this.i18n = new I18n({
+      config: this.config
+    });
+    this.i18n.preload();
+
     /** @type {KeymapManager} */
     this.keymaps = new KeymapManager({
       notificationManager: this.notifications
@@ -129,11 +135,6 @@ class AtomEnvironment {
 
     /** @type {StyleManager} */
     this.styles = new StyleManager();
-
-    /** @type {I18n} */
-    this.i18n = new I18n({
-      config: this.config
-    });
 
     /** @type {PackageManager} */
     this.packages = new PackageManager({
