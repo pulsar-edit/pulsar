@@ -68,6 +68,7 @@ function buildBundledPackagesMetadata(packageJSON) {
       menus: {},
       locales: {},
       grammarPaths: [],
+      locales: {},
       settings: {}
     };
 
@@ -120,7 +121,6 @@ function buildBundledPackagesMetadata(packageJSON) {
         }
       }
     }
-
     const packageLocalesPath = path.join(packagePath, 'locales');
     if (fs.existsSync(packageLocalesPath)) {
       for (let packageLocale of fs.readdirSync(packageLocalesPath)) {

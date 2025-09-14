@@ -112,7 +112,6 @@ module.exports = MenuManager = class MenuManager {
       if (this.i18n.isAutoTranslateLabel(item.label)) {
         item.label = this.i18n.translateLabel(item.label);
       }
-
       const translateAutoLabelSubmenu = (menuObject) => {
         if (Array.isArray(menuObject.submenu)) {
           for (let y = 0; y < menuObject.submenu.length; y++) {

@@ -267,12 +267,12 @@ An instance of this class is always available as the `atom` global.
         * [.views](#AtomEnvironment+views) : <code>ViewRegistry</code>
         * [.notifications](#AtomEnvironment+notifications) : <code>NotificationManager</code>
         * [.config](#AtomEnvironment+config) : <code>Config</code>
+        * [.i18n](#AtomEnvironment+i18n) : <code>I18n</code>
         * [.keymaps](#AtomEnvironment+keymaps) : <code>KeymapManager</code>
         * [.tooltips](#AtomEnvironment+tooltips) : <code>TooltipManager</code>
         * [.commands](#AtomEnvironment+commands) : <code>CommandRegistry</code>
         * [.grammars](#AtomEnvironment+grammars) : <code>GrammarRegistry</code>
         * [.styles](#AtomEnvironment+styles) : <code>StyleManager</code>
-        * [.i18n](#AtomEnvironment+i18n) : <code>I18n</code>
         * [.packages](#AtomEnvironment+packages) : <code>PackageManager</code>
         * [.themes](#AtomEnvironment+themes) : <code>ThemeManager</code>
         * [.menu](#AtomEnvironment+menu) : <code>MenuManager</code>
@@ -308,6 +308,10 @@ An instance of this class is always available as the `atom` global.
 
 ### atomEnvironment.config : <code>Config</code>
 **Kind**: instance property of [<code>AtomEnvironment</code>](#AtomEnvironment)  
+<a name="AtomEnvironment+i18n"></a>
+
+### atomEnvironment.i18n : <code>I18n</code>
+**Kind**: instance property of [<code>AtomEnvironment</code>](#AtomEnvironment)  
 <a name="AtomEnvironment+keymaps"></a>
 
 ### atomEnvironment.keymaps : <code>KeymapManager</code>
@@ -327,10 +331,6 @@ An instance of this class is always available as the `atom` global.
 <a name="AtomEnvironment+styles"></a>
 
 ### atomEnvironment.styles : <code>StyleManager</code>
-**Kind**: instance property of [<code>AtomEnvironment</code>](#AtomEnvironment)  
-<a name="AtomEnvironment+i18n"></a>
-
-### atomEnvironment.i18n : <code>I18n</code>
 **Kind**: instance property of [<code>AtomEnvironment</code>](#AtomEnvironment)  
 <a name="AtomEnvironment+packages"></a>
 

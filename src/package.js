@@ -534,16 +534,11 @@ module.exports = class Package {
   }
 
   loadLocales() {
-    console.log(`I18n: package.loadLocales() Loading locales for: '${this.name}'`);
     if (this.bundledPackage && this.packageManager.packagesCache[this.name]) {
-      console.log(`I18n: package.loadLocales() Loading bundled package '${this.name}'`);
       for (const localePath in this.packageManager.packagesCache[this.name].locales) {
-        console.log(`I18n: package.loadLocales() BUNDLED: loading locales for path: '${localePath}'`);
         const localeFilePathSplit = localePath.split(".");
         const locale = localeFilePathSplit[localeFilePathSplit.length - 2] ?? "";
-        console.log(`I18n: package.loadLocales() BUNDLED: using locale: '${locale}' from '${localePath}'`);
         if (atom.i18n.shouldIncludeLocale(locale)) {
-          console.log(`I18n: package.loadLocales() BUNDLED: adding locale file: '${localePath}'`);
           const localeFile = this.packageManager.packagesCache[this.name].locales[localePath];
           const localeObj = {};
           localeObj[this.name] = localeFile;
@@ -553,15 +548,12 @@ module.exports = class Package {
     } else {
       const localesDirPath = path.join(this.path, "locales");
       const localesPaths = fs.listSync(localesDirPath, ["cson", "json"]);
-      console.log(`I18n: package.loadLocales() Loading locales with path: '${this.path}', with resolved path: '${localesDirPath}; found: '${localesPaths}'`);
 
       for (const localePath of localesPaths) {
-        console.log(`I18n: package.loadLocales() Loading Locale File: '${localePath}'`);
         const localeFilePath = localePath.split(".");
         // `package-name.en-US.json` => `en-US`
         const locale = localeFilePath[localeFilePath.length - 2] ?? "";
         if (atom.i18n.shouldIncludeLocale(locale)) {
-          console.log(`I18n: package.loadLocales() Should Include Locale: '${locale}'`);
           const localeFile = CSON.readFileSync(localePath);
           if (localeFile) {
             const localeObj = {};
