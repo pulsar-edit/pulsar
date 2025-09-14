@@ -1,0 +1,93 @@
+'src': {
+  'enter-new-path': 'Enter the path for the new {isFile, select, true {file} other {folder}}.'
+  'root-project-path-is-null': 'You must open a directory to create a file with a relative path'
+  'file-already-exists': '\'\'{path}\'\' already exists'
+  'ends-with-directory-separator': 'File names must not end with a \'\'{sep}\'\' character.'
+  'project-is-empty': 'Your project is currently empty'
+  'add-folders': 'Add folders'
+  'reopen-project': 'Reopen a project'
+  'enter-new-path-for-dup': 'Enter the new path for the duplicate.'
+  'error-parsing-ignore-pattern': 'Error parsing ignore patter ({name})'
+  'enter-new-path': {
+    'file': 'Enter the new path for the file.'
+    'dir': 'Enter the new path for the directory.'
+  }
+  'cannot-move-with-multiple-roots': 'Cannot move \'\'{path}\'\' into the project via a relative path because there is more than one project root. Please provide an absolute path.'
+  'unable-to-show-file': 'Unable to show {file} in {manager}'
+  'root-dir-cannot-be-removed': 'The root directory \'\'{dir}\'\' can\'\'t be removed.'
+  'are-you-sure-you-want-to-delete': {
+    'msg': 'Are you sure you want to delete the selected {itemCount, plural, one {item} other {items}}?'
+    'detail': 'You are deleting:\\\n{paths}'
+  }
+  'move-to-trash': 'Move to Trash'
+  'cannot-move-to-trash': 'The following {fileCount, plural, one {file} other {files}} couldn\'\'t be moved to the trash:'
+  'trash-enabled-msg': {
+    'linux': 'Do you have permission to delete, and Trash is enabled on the volume where the files are stored?'
+    'darwin': 'Is Trash enabled on the volume where the files are stored?'
+    'win32': 'Is there a Recycle Bin on the drive where the files are stored?'
+  }
+  'cannot-copy-dir-into-itself': 'Cannot copy a folder into itself'
+  'failed-to-copy': 'Failed to copy entry {initial} to {new}'
+  'cannot-move-dir-into-itself': 'Cannot move a folder into itself'
+  'failed-to-move': 'Failed to move entry {initial} to {new}'
+  'want-to-replace': 'Do you want to replace it?'
+  'replace-file': 'Replace file'
+}
+'menu': {
+  'tree-view:toggle': 'Toggle Tree View'
+  'packages': {
+    'label': 'Tree View'
+    'tree-view:toggle-focus': 'Focus'
+    'tree-view:toggle': 'Toggle'
+    'tree-view:reveal-active-file': 'Reveal Active File'
+    'tree-view:toggle-side': 'Toggle Tree Side'
+  }
+}
+'context-menu': {
+  'new-file': 'New File'
+  'new-folder': 'New Folder'
+  'rename': 'Rename'
+  'duplicate': 'Duplicate'
+  'delete': 'Delete'
+  'copy': 'Copy'
+  'cut': 'Cut'
+  'paste': 'Paste'
+  'add-project-folder': 'Add Project Folder'
+  'remove-project-folder': 'Remove Project Folder'
+  'collapse-all-project-folders': 'Collapse All Project Folders'
+  'copy-full-path': 'Copy Full Path'
+  'copy-project-path': 'Copy Project Path'
+  'open-in-new-window': 'Open in New Window'
+  'reveal-in-finder': 'Reveal in Finder'
+  'reveal-in-explorer': 'Show in Explorer'
+  'reveal-in-file-manager': 'Show in File Manager'
+  'reveal-in-tree-view': 'Reveal in Tree View'
+}
+'config': {
+  'squashDirectoryNames': {
+    'title': 'Collapse directories'
+    'description': 'Collapse directories that only contain a single directory.'
+  }
+  'hideVcsIgnoredFiles': {
+    'title': 'Hide VCS Ignored Files'
+    'description': 'Don\'\'t show files and directories ignored by the current project\'\s VCS system. For example, projects using Git have these paths defined in their `.gitignore` file.'
+  }
+  'hideIgnoredNames': {
+    'description': 'Don\'\'t show items matched by the `Ignored Names` core config setting.'
+  }
+  'sortFoldersBeforeFiles': {
+    'description': 'When listing directory items, list subdirectories before listing files.'
+  }
+  'autoReveal': {
+    'description': 'Reveal tree view entries when they become the active pane item.'
+  }
+  'focusOnReveal': {
+    'description': 'Focus the tree view when revealing entries.'
+  }
+  'alwaysOpenExisting': {
+    'description': 'When opening a file, always focus an already-existing view of the file even if it\'\'s in another pane.'
+  }
+  'hiddenOnStartup': {
+    'description': 'When Pulsar is opened, the view is hidden.'
+  }
+}

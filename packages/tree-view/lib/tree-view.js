@@ -823,7 +823,7 @@ class TreeView {
 
     if (!fs.existsSync(filePath)) {
       return atom.notifications.addWarning(
-        `Unable to show ${filePath} in ${this.getFileManagerName()}`
+        atom.i18n.t("tree-view.src.unable-to-show-file", { file: filePath, manager: this.getFileManagerName() })
       );
     }
     return remoteShell.showItemInFolder(filePath);
@@ -835,7 +835,7 @@ class TreeView {
 
     if (!fs.existsSync(filePath)) {
       return atom.notifications.addWarning(
-        `Unable to show ${filePath} in ${this.getFileManagerName()}`
+        atom.i18n.t("tree-view.src.unable-to-show-file", { file: filePath, manager: this.getFileManagerName() })
       );
     }
     return remoteShell.showItemInFolder(filePath);
@@ -893,17 +893,17 @@ class TreeView {
     for (let root of this.roots) {
       if (selectedPaths.includes(root.getPath())) {
         atom.confirm({
-          message: `The root directory '${root.directory.name} can't be removed.`,
-          buttons: ['OK']
+          message: atom.i18n.t("tree-view.src.root-dir-cannot-be-removed", { dir: root.directory.name }),
+          buttons: [atom.i18n.t("pulsar.commons.ok")]
         }, () => {}); // noop
         return;
       }
     }
 
     return atom.confirm({
-      message: `Are you sure you want to delete the selected ${selectedPaths.length > 1 ? 'items' : 'item'}?`,
-      detailedMessage: `You are deleting:\n${selectedPaths.join('\n')}`,
-      buttons: ['Move to Trash', 'Cancel']
+      message: atom.i18n.t("tree-view.src.are-you-sure-you-want-to-delete.msg", { itemCount: selectedPaths.length }),
+      detailedMessage: atom.i18n.t("tree-view.src.are-you-sure-you-want-to-delete.detail", { paths: selectedPaths.join("\n") }),
+      buttons: [atom.i18n.t("tree-view.src.move-to-trash"), atom.i18n.t("pulsar.commons.cancel")]
     }, (response) => {
       if (response === 0) { // Move to Trash
         let failedDeletions = [];
@@ -951,18 +951,17 @@ class TreeView {
   }
 
   formatTrashFailureMessage(failedDeletions) {
-    let fileText = failedDeletions.length > 1 ? 'files' : 'file';
-    return `The following ${fileText} couldn’t be moved to the trash:`;
+    return atom.i18n.t("tree-view.src.cannot-move-to-trash", { fileCount: failedDeletions.length });
   }
 
   formatTrashEnabledMessage() {
     switch (process.platform) {
       case 'linux':
-        return 'Do you have permission to delete, and Trash is enabled on the volume where the files are stored?';
+        return atom.i18n.t("tree-view.src.trash-enabled-msg.linux");
       case 'darwin':
-        return 'Is Trash enabled on the volume where the files are stored?';
+        return atom.i18n.t("tree-view.src.trash-enabled-msg.darwin");
       case 'win32':
-        return 'Is there a Recycle Bin on the drive where the files are stored?';
+        return atom.i18n.t("tree-view.src.trash-enabled-msg.win32");
     }
   }
 
@@ -1163,7 +1162,7 @@ class TreeView {
 
     if (initialPathIsDirectory && realNewDirectoryPath.startsWith(realInitialPath)) {
       if (!fs.isSymbolicLinkSync(initialPath)) {
-        atom.notifications.addWarning('Cannot copy a folder into itself');
+        atom.notifications.addWarning(atom.i18n.t("tree-view.src.cannot-copy-dir-into-itself"));
         return;
       }
     }
@@ -1205,7 +1204,7 @@ class TreeView {
     } catch (error) {
       this.emitter.emit('copy-entry-failed', { initialPath, newPath });
       atom.notifications.addWarning(
-        `Failed to copy entry ${initialPath} to ${newDirectoryPath}`,
+        atom.i18n.t("tree-view.src.failed-to-copy", { initial: initialPath, new: newDirectoryPath }),
         { detail: error.message }
       );
     }
@@ -1220,13 +1219,13 @@ class TreeView {
       let realInitialPath = fs.realpathSync(initialPath) + path.sep;
       if (fs.isDirectorySync(initialPath) && realNewDirectoryPath.startsWith(realInitialPath)) {
         if (!fs.isSymbolicLinkSync(initialPath)) {
-          atom.notifications.addWarning('Cannot move a folder into itself');
+          atom.notifications.addWarning(atom.i18n.t("tree-view.src.cannot-move-dir-into-itself"));
           return;
         }
       }
     } catch (error) {
       atom.notifications.addWarning(
-        `Failed to move entry ${initialPath} to ${newDirectoryPath}`,
+        atom.i18n.t("tree-view.src.failed-to-move", { initial: initialPath, new: newDirectoryPath }),
         { detail: error.message }
       );
     }
@@ -1246,7 +1245,7 @@ class TreeView {
       } else {
         this.emitter.emit('move-entry-failed', { initialPath, newPath });
         atom.notifications.addWarning(
-          `Failed to move entry ${initialPath} to ${newDirectoryPath}`,
+          atom.i18n.t("tree-view.src.failed-to-move", { initial: initialPath, new: newDirectoryPath }),
           { detail: error.message }
         );
       }
@@ -1259,9 +1258,9 @@ class TreeView {
       if (!fs.isDirectorySync(initialPath)) {
         // Files, symlinks, anything but a directory
         let chosen = atom.confirm({
-          message: `'${path.relative(newDirectoryPath, newPath)}' already exists`,
-          detailedMessage: 'Do you want to replace it?',
-          buttons: ['Replace file', 'Skip', 'Cancel']
+          message: atom.i18n.t("tree-view.src.file-already-exists", { path: path.relative(newDirectoryPath, newPath) }),
+          detailedMessage: atom.i18n.t("tree-view.src.want-to-replace"),
+          buttons: [atom.i18n.t("tree-view.src.replace-file"), atom.i18n.t("pulsar.commons.skip"), atom.i18n.t("pulsar.commons.cancel")]
         });
         switch (chosen) {
           case 0: {// Replace
@@ -1300,7 +1299,7 @@ class TreeView {
     } catch (error) {
       this.emitter.emit('move-entry-failed', { initialPath, newPath });
       atom.notifications.addWarning(
-        `Failed to move entry ${initialPath} to ${newPath}`,
+        atom.i18n.t("tree-view.src.failed-to-move", { initial: initialPath, new: newPath }),
         { detail: error.message }
       );
     }

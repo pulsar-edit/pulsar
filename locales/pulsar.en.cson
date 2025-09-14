@@ -54,6 +54,7 @@
     'proceed': 'Proceed'
     'ok': 'OK'
     'cancel': 'Cancel'
+    'skip': 'Skip'
     'menu-labels': {
       'file': 'File'
       'edit': 'Edit'

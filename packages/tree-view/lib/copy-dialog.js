@@ -7,7 +7,7 @@ module.exports =
 class CopyDialog extends Dialog {
   constructor(initialPath, {onCopy}) {
     super({
-      prompt: 'Enter the new path for the duplicate.',
+      prompt: atom.i18n.t("tree-view.src.enter-new-path-for-dup"),
       initialPath: atom.project.relativize(initialPath),
       select: true,
       iconClass: 'icon-arrow-right'
@@ -31,7 +31,7 @@ class CopyDialog extends Dialog {
     }
 
     if (fs.existsSync(newPath)) {
-      this.showError(`'${newPath}' already exists.`);
+      this.showError(atom.i18n.t("tree-view.src.file-already-exists", { path: newPath }));
       return;
     }
 

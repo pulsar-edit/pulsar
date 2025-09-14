@@ -1,19 +1,19 @@
 'menu': [
   {
-    'label': 'View'
+    'label': '%pulsar.commons.menu-labels.view%'
     'submenu': [
-      {'label': 'Toggle Tree View', 'command': 'tree-view:toggle'}
+      {'label': '%tree-view.menu.tree-view:toggle%', 'command': 'tree-view:toggle'}
     ]
   }
   {
-    'label': 'Packages'
+    'label': '%pulsar.commons.menu-labels.packages%'
     'submenu': [
-      'label': 'Tree View'
+      'label': '%tree-view.menu.packages.label%'
       'submenu': [
-        {'label': 'Focus', 'command': 'tree-view:toggle-focus'}
-        {'label': 'Toggle', 'command': 'tree-view:toggle'}
-        {'label': 'Reveal Active File', 'command': 'tree-view:reveal-active-file'}
-        {'label': 'Toggle Tree Side', 'command': 'tree-view:toggle-side'}
+        {'label': '%tree-view.menu.packages.tree-view:toggle-focus%', 'command': 'tree-view:toggle-focus'}
+        {'label': '%tree-view.menu.packages.tree-view:toggle%', 'command': 'tree-view:toggle'}
+        {'label': '%tree-view.menu.packages.tree-view:reveal-active-file%', 'command': 'tree-view:reveal-active-file'}
+        {'label': '%tree-view.menu.packages.tree-view:toggle-side%', 'command': 'tree-view:toggle-side'}
       ]
     ]
   }
@@ -21,12 +21,12 @@
 
 'context-menu':
   '.tree-view .full-menu': [
-    {'label': 'New File', 'command': 'tree-view:add-file'}
-    {'label': 'New Folder', 'command': 'tree-view:add-folder'}
+    {'label': '%tree-view.context-menu.new-file%', 'command': 'tree-view:add-file'}
+    {'label': '%tree-view.context-menu.new-folder%', 'command': 'tree-view:add-folder'}
     {'type': 'separator'}
 
-    {'label': 'Rename', 'command': 'tree-view:move'}
-    {'label': 'Duplicate', 'command': 'tree-view:duplicate'}
+    {'label': '%tree-view.context-menu.rename%', 'command': 'tree-view:move'}
+    {'label': '%tree-view.context-menu.duplicate%', 'command': 'tree-view:duplicate'}
     {'label': 'Delete', 'command': 'tree-view:remove'}
     {'label': 'Copy', 'command': 'tree-view:copy'}
     {'label': 'Cut', 'command': 'tree-view:cut'}
@@ -50,76 +50,76 @@
   ]
 
   '.tree-view .full-menu .project-root > .header': [
-    {'label': 'New File', 'command': 'tree-view:add-file'}
-    {'label': 'New Folder', 'command': 'tree-view:add-folder'}
+    {'label': '%tree-view.context-menu.new-file%', 'command': 'tree-view:add-file'}
+    {'label': '%tree-view.context-menu.new-folder%', 'command': 'tree-view:add-folder'}
     {'type': 'separator'}
 
-    {'label': 'Rename', 'command': 'tree-view:move'}
-    {'label': 'Duplicate', 'command': 'tree-view:duplicate'}
-    {'label': 'Delete', 'command': 'tree-view:remove'}
-    {'label': 'Copy', 'command': 'tree-view:copy'}
-    {'label': 'Cut', 'command': 'tree-view:cut'}
-    {'label': 'Paste', 'command': 'tree-view:paste'}
+    {'label': '%tree-view.context-menu.rename%', 'command': 'tree-view:move'}
+    {'label': '%tree-view.context-menu.duplicate%', 'command': 'tree-view:duplicate'}
+    {'label': '%tree-view.context-menu.delete%', 'command': 'tree-view:remove'}
+    {'label': '%tree-view.context-menu.copy%', 'command': 'tree-view:copy'}
+    {'label': '%tree-view.context-menu.cut%', 'command': 'tree-view:cut'}
+    {'label': '%tree-view.context-menu.paste%', 'command': 'tree-view:paste'}
     {'type': 'separator'}
 
-    {'label': 'Add Project Folder', 'command': 'application:add-project-folder'}
-    {'label': 'Remove Project Folder', 'command': 'tree-view:remove-project-folder'}
-    {'label': 'Collapse All Project Folders', 'command': 'tree-view:collapse-all'}
+    {'label': '%tree-view.context-menu.add-project-folder%', 'command': 'application:add-project-folder'}
+    {'label': '%tree-view.context-menu.remove-project-folder%', 'command': 'tree-view:remove-project-folder'}
+    {'label': '%tree-view.context-menu.collapse-all-project-folders%', 'command': 'tree-view:collapse-all'}
     {'type': 'separator'}
 
-    {'label': 'Copy Full Path', 'command': 'tree-view:copy-full-path'}
-    {'label': 'Copy Project Path', 'command': 'tree-view:copy-project-path'}
-    {'label': 'Open in New Window', 'command': 'tree-view:open-in-new-window'}
+    {'label': '%tree-view.context-menu.copy-full-path%', 'command': 'tree-view:copy-full-path'}
+    {'label': '%tree-view.context-menu.copy-project-path%', 'command': 'tree-view:copy-project-path'}
+    {'label': '%tree-view.context-menu.open-in-new-window%', 'command': 'tree-view:open-in-new-window'}
   ]
 
   '.platform-darwin .tree-view .full-menu': [
-    {'label': 'Reveal in Finder', 'command': 'tree-view:show-in-file-manager'}
+    {'label': '%tree-view.context-menu.reveal-in-finder%', 'command': 'tree-view:show-in-file-manager'}
   ]
 
   '.platform-win32 .tree-view .full-menu': [
-    {'label': 'Show in Explorer', 'command': 'tree-view:show-in-file-manager'}
+    {'label': '%tree-view.context-menu.reveal-in-explorer%', 'command': 'tree-view:show-in-file-manager'}
   ]
 
   '.platform-linux .tree-view .full-menu': [
-    {'label': 'Show in File Manager', 'command': 'tree-view:show-in-file-manager'}
+    {'label': '%tree-view.context-menu.reveal-in-file-manager%', 'command': 'tree-view:show-in-file-manager'}
   ]
 
   '.tree-view .multi-select': [
-    {'label': 'Delete', 'command': 'tree-view:remove'}
-    {'label': 'Copy', 'command': 'tree-view:copy'}
-    {'label': 'Cut', 'command': 'tree-view:cut'}
-    {'label': 'Paste', 'command': 'tree-view:paste'}
+    {'label': '%tree-view.context-menu.delete%', 'command': 'tree-view:remove'}
+    {'label': '%tree-view.context-menu.copy%', 'command': 'tree-view:copy'}
+    {'label': '%tree-view.context-menu.cut%', 'command': 'tree-view:cut'}
+    {'label': '%tree-view.context-menu.paste%', 'command': 'tree-view:paste'}
   ]
 
   'atom-pane[data-active-item-path] .item-views': [
-    {'label': 'Reveal in Tree View', 'command': 'tree-view:reveal-active-file'}
+    {'label': '%tree-view.context-menu.reveal-in-tree-view%', 'command': 'tree-view:reveal-active-file'}
   ]
 
   'atom-pane[data-active-item-path] .tab.active': [
-    {'label': 'Rename', 'command': 'tree-view:rename'}
-    {'label': 'Reveal in Tree View', 'command': 'tree-view:reveal-active-file'}
+    {'label': '%tree-view.context-menu.rename%', 'command': 'tree-view:rename'}
+    {'label': '%tree-view.context-menu.reveal-in-tree-view%', 'command': 'tree-view:reveal-active-file'}
   ]
 
   '.platform-darwin atom-pane[data-active-item-path] .tab.active': [
-    {'label': 'Reveal In Finder', 'command': 'tree-view:show-current-file-in-file-manager'}
+    {'label': '%tree-view.context-menu.reveal-in-finder%', 'command': 'tree-view:show-current-file-in-file-manager'}
   ]
 
   '.platform-win32 atom-pane[data-active-item-path] .tab.active': [
-    {'label': 'Show In Explorer', 'command': 'tree-view:show-current-file-in-file-manager'}
+    {'label': '%tree-view.context-menu.reveal-in-explorer%', 'command': 'tree-view:show-current-file-in-file-manager'}
   ]
 
   '.platform-linux atom-pane[data-active-item-path] .tab.active': [
-    {'label': 'Show in File Manager', 'command': 'tree-view:show-current-file-in-file-manager'}
+    {'label': '%tree-view.context-menu.reveal-in-file-manager%', 'command': 'tree-view:show-current-file-in-file-manager'}
   ]
 
   '.platform-darwin atom-text-editor:not([mini])': [
-    {'label': 'Reveal In Finder', 'command': 'tree-view:show-current-file-in-file-manager'}
+    {'label': '%tree-view.context-menu.reveal-in-finder%', 'command': 'tree-view:show-current-file-in-file-manager'}
   ]
 
   '.platform-win32 atom-text-editor:not([mini])': [
-    {'label': 'Show In Explorer', 'command': 'tree-view:show-current-file-in-file-manager'}
+    {'label': '%tree-view.context-menu.reveal-in-explorer%', 'command': 'tree-view:show-current-file-in-file-manager'}
   ]
 
   '.platform-linux atom-text-editor:not([mini])': [
-    {'label': 'Show in File Manager', 'command': 'tree-view:show-current-file-in-file-manager'}
+    {'label': '%tree-view.context-menu.reveal-in-file-manager%', 'command': 'tree-view:show-current-file-in-file-manager'}
   ]
