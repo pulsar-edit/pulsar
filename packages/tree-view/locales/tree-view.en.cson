@@ -20,7 +20,7 @@
     'detail': 'You are deleting:\\\n{paths}'
   }
   'move-to-trash': 'Move to Trash'
-  'cannot-move-to-trash': 'The following {fileCount, plural, one {file} other {files}} couldn\'\'t be moved to the trash:'
+  'cannot-move-to-trash': 'The following {fileCount, plural, one {file} other {files}} couldn’t be moved to the trash:'
   'trash-enabled-msg': {
     'linux': 'Do you have permission to delete, and Trash is enabled on the volume where the files are stored?'
     'darwin': 'Is Trash enabled on the volume where the files are stored?'
