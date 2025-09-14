@@ -3,7 +3,7 @@
   'submenu': [
     'label': '%dev-live-reload.menu.label%'
     'submenu': [
-      { 'label': '%dev-live-reload.dev-live-reload:reload-all:label%', 'command': 'dev-live-reload:reload-all' }
+      { 'label': '%dev-live-reload.menu.dev-live-reload:reload-all:label%', 'command': 'dev-live-reload:reload-all' }
     ]
   ]
 ]
