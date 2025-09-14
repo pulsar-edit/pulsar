@@ -1,5 +1,5 @@
 'src': {
-  'file-uses': 'File uses {kind} lin endings'
+  'file-uses': 'File uses {kind} line endings'
 }
 'config': {
   'defaultLineEnding': {
