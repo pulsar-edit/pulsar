@@ -42,7 +42,6 @@ export default class TimecopView {
           </div>
           <div className='panels'>
             <PackagePanelView ref='packageLoadingPanel' title='Package Loading' />
-            <PackagePanelView ref='packageLocaleLoadingPanel' title='Package Locale Loading' />
             <PackagePanelView ref='packageActivationPanel' title='Package Activation' />
             <PackagePanelView ref='themeLoadingPanel' title='Theme Loading' />
             <PackagePanelView ref='themeActivationPanel' title='Theme Activation' />
@@ -54,7 +53,6 @@ export default class TimecopView {
 
   populateLoadingViews () {
     this.showLoadedPackages()
-    this.showLoadedPackagesLocales()
     this.showLoadedThemes()
   }
 
@@ -74,18 +72,6 @@ export default class TimecopView {
       Loaded ${count} packages in ${time}ms.
       ${_.pluralize(packages.length, 'package')} took longer than 5ms to load.
     `
-  }
-
-  showLoadedPackagesLocales() {
-    const {time, count, packages} = this.getSlowPackages(
-      atom.packages.getLoadedPackages().filter(pack => pack.getType() !== 'theme'),
-      'loadTime:locales'
-    )
-    this.refs.packageLocaleLoadingPanel.addPackages(packages, 'loadTime:locales')
-    this.refs.packageLocaleLoadingPanel.refs.summary.textContent = dedent`
-      Loading ${count} packages in ${time}ms.
-      ${_.pluralize(packages.length, 'package')} took longer than 5ms to load.
-    `;
   }
 
   showActivePackages () {
