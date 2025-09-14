@@ -13,6 +13,7 @@ export default class WindowPanelView {
     this.disposables.add(atom.tooltips.add(this.refs.windowTiming, {title: 'The time taken to load this window'}))
     this.disposables.add(atom.tooltips.add(this.refs.projectTiming, {title: 'The time taken to rebuild the previously opened buffers'}))
     this.disposables.add(atom.tooltips.add(this.refs.workspaceTiming, {title: 'The time taken to rebuild the previously opened editors'}))
+    this.disposables.add(atom.tooltips.add(this.refs.localeTiming, {title: 'The time taken to load core locales'}))
   }
 
   update () {}
@@ -49,6 +50,12 @@ export default class WindowPanelView {
                 <span className='inline-block' ref='workspaceLoadTime'>Loading…</span>
               </div>
             </div>
+
+            <div className='timing' ref='localeTiming'>
+              <span className='inline-block'>Locale load time</span>
+              <span className='inline-block' ref='localeLoadTime'>Loading…</span>
+            </div>
+
           </div>
         </div>
       </div>
@@ -77,6 +84,10 @@ export default class WindowPanelView {
     } else {
       this.refs.deserializeTimings.style.display = 'none'
     }
+
+    const localeLoadTime = atom.localeLoadTime;
+    this.refs.localeLoadTime.classList.add(this.getHighlightClass(localeLoadTime))
+    this.refs.localeLoadTime.textContent = `${localeLoadTime}ms`
   }
 
   getHighlightClass (time) {
