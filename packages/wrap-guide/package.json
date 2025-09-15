@@ -15,12 +15,12 @@
       "items": {
         "type": "integer"
       },
-      "description": "%wrap-guide.config.column:description%"
+      "description": "%wrap-guide.config.columns.description%"
     },
     "modifyPreferredLineLength": {
       "default": true,
       "type": "boolean",
-      "description": "%wrap-guide.config.modifyPreferredLineLength:description%"
+      "description": "%wrap-guide.config.modifyPreferredLineLength.description%"
     },
     "enabled": {
       "default": true,
@@ -28,19 +28,19 @@
     },
     "showWrapGuide": {
       "type": "string",
-      "description": "%wrap-guide.config.showWrapGuide%",
+      "description": "%wrap-guide.config.showWrapGuide.description%",
       "enum": [
         {
           "value": "always",
-          "description": "%wrap-guide.config.showWrapGuide:always:description%"
+          "description": "%wrap-guide.config.showWrapGuide.enum.always%"
         },
         {
           "value": "wrapping",
-          "description": "%wrap-guide.config.showWrapGuide:wrapping:description%"
+          "description": "%wrap-guide.config.showWrapGuide.enum.wrapping%"
         },
         {
           "value": "atPreferredLineLength",
-          "description": "%wrap-guide.config.showWrapGuide:atPreferredLineLength:description%"
+          "description": "%wrap-guide.config.showWrapGuide.enum.atPreferredLineLength%"
         }
       ],
       "default": "always"

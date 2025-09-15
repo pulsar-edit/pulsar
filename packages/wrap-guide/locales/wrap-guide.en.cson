@@ -1,8 +1,16 @@
 'config': {
-  'column:description': 'Display guides at each of the listed character widths. Leave blank for one guide at your `editor.preferredLineLength`.'
-  'modifyPreferredLineLength:description': 'Modify the Editor\'s Preferred Line Length when changing Wrap Guide\'s Columns setting.'
-  'showWrapGuide:description': 'Choose when to show the wrap guide.'
-  'showWrapGuide:always:description': 'Always'
-  'showWrapGuide:wrapping:description': 'When soft wrap is enabled'
-  'showWrapGuide:atPreferredLineLength:description': 'When soft wrap at preferred line length is enabled'
+  'columns': {
+    'description': 'Display guides at each of the listed character widths. Leave blank for one guide at your `editor.preferredLineLength`.'
+  }
+  'modifyPreferredLineLength': {
+    'description': 'Modify the Editor\'\'s Preferred Line Length when changing Wrap Guide\'\'s Columns setting.'
+  }
+  'showWrapGuide': {
+    'description': 'Choose when to show the wrap guide.'
+    'enum': {
+      'always': 'Always'
+      'wrapping': 'When soft wrap is enabled'
+      'atPreferredLineLength': 'When soft wrap at preferred line length is enabled'
+    }
+  }
 }
