@@ -33,5 +33,5 @@ menu: [
     {label: '%tabs.context-menu.tabs:keep-pending-tab%', command: 'tabs:keep-pending-tab'}
   ]
   '.tab-bar': [
-    {label: '%tabs.context-menu.tabs:reopen-closed-item%', command: 'pane:reopen-closed-item'}
+    {label: '%tabs.context-menu.pane:reopen-closed-item%', command: 'pane:reopen-closed-item'}
   ]
