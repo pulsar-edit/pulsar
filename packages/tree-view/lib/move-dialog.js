@@ -8,9 +8,9 @@ class MoveDialog extends Dialog {
   constructor(initialPath, {willMove, onMove, onMoveFailed}) {
     let prompt;
     if (fs.isDirectorySync(initialPath)) {
-      prompt = 'Enter the new path for the directory.';
+      prompt = atom.i18n.t("tree-view.src.enter-new-path.dir");
     } else {
-      prompt = 'Enter the new path for the file.';
+      prompt = atom.i18n.t("tree-view.src.enter-new-path.file");
     }
 
     super({
@@ -42,7 +42,7 @@ class MoveDialog extends Dialog {
           // But if there are _multiple_ root paths in this project, we do not
           // have a good way of sensing which root path relative to which this
           // file should be placed.
-          this.showError(`Cannot move '${newPath}' into the project via a relative path because there is more than one project root. Please provide an absolute path.`);
+          this.showError(atom.i18n.t("tree-view.src.cannot-move-with-multiple-roots", { path: newPath }));
           return;
         }
       }
@@ -56,7 +56,7 @@ class MoveDialog extends Dialog {
     }
 
     if (!this.isNewPathValid(newPath)) {
-      this.showError(`'${newPath}' already exists.`);
+      this.showError(atom.i18n.t("tree-view.src.file-already-exists", { path: newPath }));
       return;
     }
 

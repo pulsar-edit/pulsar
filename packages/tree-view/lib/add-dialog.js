@@ -20,7 +20,7 @@ class AddDialog extends Dialog {
     if (relativeDirectoryPath.length > 0) { relativeDirectoryPath += path.sep; }
 
     super({
-      prompt: "Enter the path for the new " + (isCreatingFile ? "file." : "folder."),
+      prompt: atom.i18n.t("tree-view.src.enter-new-path-prompt", { isFile: isCreatingFile }),
       initialPath: relativeDirectoryPath,
       select: false,
       iconClass: isCreatingFile ? 'icon-file-add' : 'icon-file-directory-create'
@@ -43,7 +43,7 @@ class AddDialog extends Dialog {
     const endsWithDirectorySeparator = newPath[newPath.length - 1] === path.sep;
     if (!path.isAbsolute(newPath)) {
       if (this.rootProjectPath == null) {
-        this.showError("You must open a directory to create a file with a relative path");
+        this.showError(atom.i18n.t("tree-view.src.root-project-path-is-null"));
         return;
       }
 
@@ -54,10 +54,10 @@ class AddDialog extends Dialog {
 
     try {
       if (fs.existsSync(newPath)) {
-        return this.showError(`'${newPath}' already exists.`);
+        return this.showError(atom.i18n.t("tree-view.src.file-already-exists", { path: newPath }));
       } else if (this.isCreatingFile) {
         if (endsWithDirectorySeparator) {
-          return this.showError(`File names must not end with a '${path.sep}' character.`);
+          return this.showError(atom.i18n.t("tree-view.src.ends-with-directory-separator", { sep: path.sep }));
         } else {
           fs.writeFileSync(newPath, '');
           repoForPath(newPath)?.getPathStatus(newPath);

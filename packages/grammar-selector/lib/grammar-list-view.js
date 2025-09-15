@@ -45,7 +45,7 @@ module.exports = class GrammarListView {
           if (isModernTreeSitter(grammar)) {
             parser.setAttribute(
               'title',
-              '(Recommended) A faster parser with improved syntax highlighting & code navigation support.'
+              atom.i18n.t("grammar-selector.src.wasm-tree-sitter-parser:title")
             );
           }
           div.appendChild(parser);

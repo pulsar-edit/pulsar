@@ -18,6 +18,7 @@
   },
   "configSchema": {
     "enabled": {
+      "title": "%autosave.config.enabled.title%",
       "type": "boolean",
       "default": false
     }
