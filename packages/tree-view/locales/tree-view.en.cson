@@ -1,5 +1,5 @@
 'src': {
-  'enter-new-path': 'Enter the path for the new {isFile, select, true {file} other {folder}}.'
+  'enter-new-path-prompt': 'Enter the path for the new {isFile, select, true {file} other {folder}}.'
   'root-project-path-is-null': 'You must open a directory to create a file with a relative path'
   'file-already-exists': '\'\'{path}\'\' already exists'
   'ends-with-directory-separator': 'File names must not end with a \'\'{sep}\'\' character.'

@@ -20,7 +20,7 @@ class AddDialog extends Dialog {
     if (relativeDirectoryPath.length > 0) { relativeDirectoryPath += path.sep; }
 
     super({
-      prompt: atom.i18n.t("tree-view.src.enter-new-path", { isFile: isCreatingFile }),
+      prompt: atom.i18n.t("tree-view.src.enter-new-path-prompt", { isFile: isCreatingFile }),
       initialPath: relativeDirectoryPath,
       select: false,
       iconClass: isCreatingFile ? 'icon-file-add' : 'icon-file-directory-create'
