@@ -274,6 +274,8 @@
   "try"
 ] @keyword.control.exception._TYPE_.python
 
+("except*" @keyword.control.exception.group-clause.python)
+
 [
   "global"
   "nonlocal"
@@ -311,6 +313,10 @@
   (dictionary_splat_pattern
     (identifier) @variable.parameter.function.python))
 
+
+; The "foo" in `except TypeError as foo:`.
+(as_pattern_target
+  (identifier) @variable.other.exception.python)
 
 ; `self` and `cls` are just conventions, but they are _strong_ conventions.
 ((identifier) @variable.language.self.python
