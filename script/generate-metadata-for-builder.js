@@ -66,6 +66,7 @@ function buildBundledPackagesMetadata(packageJSON) {
       metadata: packageMetadata,
       keymaps: {},
       menus: {},
+      locales: {},
       grammarPaths: [],
       locales: {},
       settings: {}
@@ -134,7 +135,7 @@ function buildBundledPackagesMetadata(packageJSON) {
         }
       }
     }
-    
+
     const packageGrammarsPath = path.join(packagePath, 'grammars');
     for (let packageGrammarPath of fs.listSync(packageGrammarsPath, [
       'json',

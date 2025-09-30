@@ -37,7 +37,7 @@ export default class ArchiveEditorView {
     return (
       <div className='archive-editor' tabIndex='-1'>
         <div className='archive-container'>
-          <div ref='loadingMessage' className='padded icon icon-hourglass text-info'>{`Loading archive\u2026`}</div>
+          <div ref='loadingMessage' className='padded icon icon-hourglass text-info'>{`${atom.i18n.t("archive-view.archive-editor-view.loadingArchive")}\u2026`}</div>
           <div ref='errorMessage' className='padded icon icon-alert text-error' />
           <div className='inset-panel'>
             <div ref='summary' className='panel-heading' />
@@ -81,7 +81,7 @@ export default class ArchiveEditorView {
   }
 
   getTitle () {
-    return this.path ? this.file.getBaseName() : 'untitled'
+    return this.path ? this.file.getBaseName() : atom.i18n.t("archive-view.archive-editor-view.untitled");
   }
 
   getURI () {
@@ -106,7 +106,7 @@ export default class ArchiveEditorView {
       }
 
       if (error != null) {
-        let message = 'Reading the archive file failed'
+        let message = atom.i18n.t("archive-view.archive-editor-view.readingArchiveFailed");
         if (error.message) {
           message += `: ${error.message}`
         }

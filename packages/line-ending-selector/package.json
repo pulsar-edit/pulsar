@@ -21,8 +21,8 @@
   },
   "configSchema": {
     "defaultLineEnding": {
-      "title": "Default line ending",
-      "description": "Line ending to use for new files",
+      "title": "%line-ending-selector.config.defaultLineEnding.title%",
+      "description": "%line-ending-selector.config.defaultLineEnding.description%",
       "type": "string",
       "default": "OS Default",
       "enum": [

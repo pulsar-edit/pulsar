@@ -1,0 +1,15 @@
+'menu': {
+  'timecop:label': 'Timecop'
+  'timecop:view': 'Show'
+}
+'cache-panel-view': {
+  'compile-cache': 'Compile Cache'
+  'files-compiled': '{filetype} files compiled'
+}
+'window-panel-view': {
+  'startup-time': 'Startup Time'
+  'load-time': '{type} load time'
+}
+'common': {
+  'loading': 'Loading...'
+}

@@ -1,15 +1,15 @@
 'menu': [
   {
-    'label': 'Packages'
+    'label': '%pulsar.commons.menu-labels.packages%'
     'submenu': [
-      'label': 'Whitespace'
+      'label': '%whitespace.menu.whitespace:label%'
       'submenu': [
-        { 'label': 'Remove Trailing Whitespace', 'command': 'whitespace:remove-trailing-whitespace' }
-        { 'label': 'Save With Trailing Whitespace', 'command': 'whitespace:save-with-trailing-whitespace' }
-        { 'label': 'Save Without Trailing Whitespace', 'command': 'whitespace:save-without-trailing-whitespace' }
-        { 'label': 'Convert Tabs To Spaces', 'command': 'whitespace:convert-tabs-to-spaces' }
-        { 'label': 'Convert Spaces To Tabs', 'command': 'whitespace:convert-spaces-to-tabs' }
-        { 'label': 'Convert All Tabs To Spaces', 'command': 'whitespace:convert-all-tabs-to-spaces' }
+        { 'label': '%whitespace.menu.whitespace:remove-trailing-whitespace%', 'command': 'whitespace:remove-trailing-whitespace' }
+        { 'label': '%whitespace.menu.whitespace:save-with-trailing-whitespace%', 'command': 'whitespace:save-with-trailing-whitespace' }
+        { 'label': '%whitespace.menu.whitespace:save-without-trailing-whitespace%', 'command': 'whitespace:save-without-trailing-whitespace' }
+        { 'label': '%whitespace.menu.whitespace:convert-tabs-to-spaces%', 'command': 'whitespace:convert-tabs-to-spaces' }
+        { 'label': '%whitespace.menu.whitespace:convert-spaces-to-tabs%', 'command': 'whitespace:convert-spaces-to-tabs' }
+        { 'label': '%whitespace.menu.whitespace:convert-all-tabs-to-spaces%', 'command': 'whitespace:convert-all-tabs-to-spaces' }
       ]
     ]
   }
