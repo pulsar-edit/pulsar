@@ -109,10 +109,12 @@ class AtomEnvironment {
     });
 
     /** @type {I18n} */
+    const localeLoadStartTime = performance.now();
     this.i18n = new I18n({
       config: this.config
     });
     this.i18n.preload();
+    this.localeLoadTime = Math.round(performance.now() - localeLoadStartTime);
 
     /** @type {KeymapManager} */
     this.keymaps = new KeymapManager({
