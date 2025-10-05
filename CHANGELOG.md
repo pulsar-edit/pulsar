@@ -15,6 +15,7 @@
 - Changed some returns in a backwards compatible way to ensure the community package `emmet` will work again.
 
 ### Pulsar
+
 - [find-and-replace] When a path pattern is provided on a project-wide search, Pulsar won't include any open and modified buffers in the search unless their paths also match the given pattern. [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1298)
 - [autocomplete-plus] Add support for "additional" text edits when a suggestion is accepted [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1301)
 - Cirrus: Update Rolling Release binary upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1331)
