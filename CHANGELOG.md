@@ -9,7 +9,7 @@
 ## 1.130.0
 
 - `autocomplete-plus` can now make other text edits to the buffer when a suggestion is accepted - for instance, adding an `import` for that suggestion.
-- Experimental localization support is now being added into the editor, allowing the editor, packages and even community packages to localize their interface for any language.
+- Experimental localization support is now being added into the editor, allowing the editor, core packages and even community packages to localize their interface for any language.
 - `autocomplete-css` has gotten significantly updated completions.
 - Various documentation and UI links updated after website update.
 - Changed some returns in a backwards compatible way to ensure the community package `emmet` will work again.
