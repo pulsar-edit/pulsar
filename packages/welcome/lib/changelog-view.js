@@ -53,7 +53,7 @@ export default class ChangeLogView {
                 <code>autocomplete-plus</code> can now make other text edits to the buffer when a suggestion is accepted - for instance, adding an <code>import</code> for that suggestion.
               </li>
               <li>
-                Experimental localization support is now being added into the editor, allowing the editor, packages and even community packages to localize their interface for any language.
+                Experimental localization support is now being added into the editor, allowing the editor, core packages and even community packages to localize their interface for any language.
               </li>
               <li>
                 <code>autocomplete-css</code> has gotten significantly updated completions.
