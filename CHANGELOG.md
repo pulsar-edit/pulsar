@@ -27,7 +27,7 @@
 - [autocomplete-css] Update Completions, deps, improve completions data sources [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1191)
 - Resolve Issues in packaged Pulsar Localization [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1337)
 - [meta] remove legacy atom project md files [@wesinator](https://github.com/pulsar-edit/pulsar/pull/1330)
-- Update keymap documentation links [@williamtheanker](https://github.com/pulsar-edit/pulsar/pull/1339)
+- Update keymap documentation links [@williamtheaker](https://github.com/pulsar-edit/pulsar/pull/1339)
 - [core & timecop] Locale loading Statistics [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1338)
 - Ensure `watchPath` "de-normalizes" filesystem event paths if opted into so that users of `watchPath` don't have to do their own realpath resolution [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1286)
 
