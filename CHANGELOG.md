@@ -20,7 +20,7 @@
 - [autocomplete-plus] Add support for "additional" text edits when a suggestion is accepted [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1301)
 - Cirrus: Update Rolling Release binary upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1331)
 - update-manager-spec.js - release notes url spec change [@wesinator](https://github.com/pulsar-edit/pulsar/pull/1329)
-- [snippets] Add getter to fix `emmit` package [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1334)
+- [snippets] Add getter to fix `emmet` package [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1334)
 - Update dependency minimatch to v3 [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/1322)
 - [tree-view] Ensure Explorer opens in focus on Windows [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1167)
 - [core] i18n: Fresh Start [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1074)
