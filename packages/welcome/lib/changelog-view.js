@@ -50,16 +50,19 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Some minor Tree-sitter fixes, including fixing a bug in SCSS highlighting and ensuring proper highlighting support for abstract methods in TypeScript.
+                <code>autocomplete-plus</code> can now make other text edits to the buffer when a suggestion is accepted - for instance, adding an <code>import</code> for that suggestion.
               </li>
               <li>
-                When viewing a file that exists on disk outside of your project root, you may now use <b>Tree View: Rename</b> to “import” it into your project folder by giving it a relative path.
+                Experimental localization support is now being added into the editor, allowing the editor, packages and even community packages to localize their interface for any language.
               </li>
               <li>
-                Updated various dependencies for security reasons.
+                <code>autocomplete-css</code> has gotten significantly updated completions.
               </li>
               <li>
-                Updated AppImages to type 2 runtime -- <code>libfuse</code> is no-longer required to be installed on the end-user's system to use Pulsar's AppImages!
+                Various documentation and UI links updated after website update.
+              </li>
+              <li>
+                Changed some returns in a backwards compatible way to ensure the community package <code>emmet</code> will work again.
               </li>
             </ul>
 
