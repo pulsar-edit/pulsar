@@ -6,6 +6,31 @@
 
 ## [Unreleased]
 
+## 1.130.0
+
+- `autocomplete-plus` can now make other text edits to the buffer when a suggestion is accepted - for instance, adding an `import` for that suggestion.
+- Experimental localization support is now being added into the editor, allowing the editor, core packages and even community packages to localize their interface for any language.
+- `autocomplete-css` has gotten significantly updated completions.
+- Various documentation and UI links updated after website update.
+- Changed some returns in a backwards compatible way to ensure the community package `emmet` will work again.
+
+### Pulsar
+
+- [find-and-replace] When a path pattern is provided on a project-wide search, Pulsar won't include any open and modified buffers in the search unless their paths also match the given pattern. [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1298)
+- [autocomplete-plus] Add support for "additional" text edits when a suggestion is accepted [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1301)
+- Cirrus: Update Rolling Release binary upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1331)
+- update-manager-spec.js - release notes url spec change [@wesinator](https://github.com/pulsar-edit/pulsar/pull/1329)
+- [snippets] Add getter to fix `emmet` package [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1334)
+- Update dependency minimatch to v3 [SECURITY] [@renovate](https://github.com/pulsar-edit/pulsar/pull/1322)
+- [tree-view] Ensure Explorer opens in focus on Windows [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1167)
+- [core] i18n: Fresh Start [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1074)
+- [autocomplete-css] Update Completions, deps, improve completions data sources [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1191)
+- Resolve Issues in packaged Pulsar Localization [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1337)
+- [meta] remove legacy atom project md files [@wesinator](https://github.com/pulsar-edit/pulsar/pull/1330)
+- Update keymap documentation links [@williamtheaker](https://github.com/pulsar-edit/pulsar/pull/1339)
+- [core & timecop] Locale loading Statistics [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1338)
+- Ensure `watchPath` "de-normalizes" filesystem event paths if opted into so that users of `watchPath` don't have to do their own realpath resolution [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1286)
+
 ## 1.129.0
 
 - Some minor Tree-sitter fixes, including fixing a bug in SCSS highlighting and ensuring proper highlighting support for abstract methods in TypeScript.
