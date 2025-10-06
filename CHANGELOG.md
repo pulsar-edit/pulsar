@@ -29,6 +29,7 @@
 - [meta] remove legacy atom project md files [@wesinator](https://github.com/pulsar-edit/pulsar/pull/1330)
 - Update keymap documentation links [@williamtheaker](https://github.com/pulsar-edit/pulsar/pull/1339)
 - [core & timecop] Locale loading Statistics [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1338)
+- Cirrus: Pin fpm gem to ~> 1.16.0 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1347)
 - Ensure `watchPath` "de-normalizes" filesystem event paths if opted into so that users of `watchPath` don't have to do their own realpath resolution [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1286)
 
 ## 1.129.0
