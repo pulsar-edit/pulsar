@@ -3,7 +3,6 @@ name: Build Pulsar Binaries
 on:
   push:
     branches:
-      - 'master'
     tags:
       - '**'
   pull_request:
@@ -19,6 +18,7 @@ env:
   RUN_WINDOWS_VT: false
   RUN_LINUX_VT: true
   RUN_MACOS_VT: true
+  DEBUG: true
 
 jobs:
   build:
