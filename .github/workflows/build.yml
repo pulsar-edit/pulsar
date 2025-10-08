@@ -155,6 +155,10 @@ jobs:
         command: yarn install --ignore-engines
         on_retry_command: rm -R node_modules
 
+    - name: Install PowerShell module to improve Visual Studio Detection Logic
+      if: ${{ runner.os == 'Windows' }}
+      run: Install-Module VSSetup -Scope CurrentUser
+      
     - name: Build Pulsar
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
