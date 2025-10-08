@@ -159,8 +159,7 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       run: |
         cd "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
-        dir
-        vs_installer.exe modify --add Microsoft.VisualStudio.Component.Windows10SDK.19041
+        .\vs_installer.exe modify --add Microsoft.VisualStudio.Component.Windows10SDK.19041
 
     - name: Build Pulsar
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
