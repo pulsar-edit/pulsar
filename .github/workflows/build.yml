@@ -158,6 +158,7 @@ jobs:
     - name: Install Windows 10 SDK in Visual Studio
       if: ${{ runner.os == 'Windows' }}
       run: |
+        cd "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
         vs_installer.exe modify --add Microsoft.VisualStudio.Component.Windows10SDK.19041
 
     - name: Build Pulsar
