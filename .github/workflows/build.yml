@@ -147,6 +147,14 @@ jobs:
         $pythonPath = (Get-Command python3)[0].Source
         echo "PYTHON=$pythonPath" >> $env:GITHUB_ENV
 
+    - name: Install Windows 10 SDK via Visual Studio
+      if: ${{ runner.os == 'Windows' }}
+      working-directory: 'C:\Program Files (x86)\Microsoft Visual Studio\Installer'
+      run: |
+        .\vs_installer.exe modify --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --quiet --norestart --nocache | Out-Host
+      # Slight funk here, the command will act async if we don't wait for it's result. `--wait` isn't supported on `vs_installer.exe`
+      # So we use the pipe to ensure we wait for output, but for the LIFE (#1350) I can't get output here.
+
     - name: Install Pulsar Dependencies
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
