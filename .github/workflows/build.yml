@@ -37,8 +37,8 @@ jobs:
     steps:
     - name: Install Windows 10 SDK in Visual Studio
       if: ${{ runner.os == 'Windows' }}
+      working-directory: 'C:\Program Files (x86)\Microsoft Visual Studio\Installer'
       run: |
-        cd "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
         .\vs_installer.exe modify --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --quiet --norestart --nocache
 
     - name: Edit sources.list - Linux
