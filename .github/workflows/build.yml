@@ -158,7 +158,7 @@ jobs:
     - name: Install Windows 10 SDK in Visual Studio
       if: ${{ runner.os == 'Windows' }}
       run: |
-        & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" modify --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" --quiet --norestart --nocache --add Microsoft.VisualStudio.Component.Windows10SDK.19041
+        vs_installer.exe modify --add Microsoft.VisualStudio.Component.Windows10SDK.19041
 
     - name: Build Pulsar
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
