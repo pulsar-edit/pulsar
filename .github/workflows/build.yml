@@ -161,8 +161,8 @@ jobs:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
-        command: |
-          yarn build
+        command:
+          yarn build && \
           yarn run build:apm
 
     - name: Cache Pulsar dependencies - Linux
