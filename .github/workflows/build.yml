@@ -163,15 +163,21 @@ jobs:
         command: yarn install --ignore-engines
         on_retry_command: rm -R node_modules
 
-    - name: Build Pulsar
+    - name: Rebuild Pulsar Dependencies for Electron
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
-        command: |
-          yarn build
-          yarn run build:apm
+        command: yarn build
+
+    - name: Build ppm
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: yarn build:apm
 
     - name: Cache Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
