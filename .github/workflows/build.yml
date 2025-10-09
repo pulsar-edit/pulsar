@@ -158,11 +158,12 @@ jobs:
     - name: Build Pulsar
       uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
+        shell: bash
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
         command:
-          yarn build && \
+          yarn build &&
           yarn run build:apm
 
     - name: Cache Pulsar dependencies - Linux
