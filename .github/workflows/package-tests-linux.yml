@@ -18,7 +18,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbfile-dev pkg-config libsecret-1-dev libncursesw5-dev libgdbm-dev libc6-dev libffi-dev libwayland-dev libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
 
     - name: Checkout the latest code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: true
 
@@ -168,7 +168,7 @@ jobs:
 
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - name: Setup NodeJS
       uses: actions/setup-node@v4
       with:

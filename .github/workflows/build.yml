@@ -76,7 +76,7 @@ jobs:
       run: cd "Python-${PYTHON_VERSION}.9" && make install
 
     - name: Checkout the latest code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Setup Node
       uses: actions/setup-node@v4
@@ -302,7 +302,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools
 
     - name: Checkout the latest code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Setup Node
       uses: actions/setup-node@v4
