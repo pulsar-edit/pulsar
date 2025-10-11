@@ -142,6 +142,9 @@
       "matchPaths": [ "packages/settings-view/**" ], "groupName": "settings-view package"
     },
     {
+      "matchPaths": [ "packages/snippets/**" ], "groupName": "snippets package"
+    },
+    {
       "matchPaths": [ "packages/spell-check/**" ], "groupName": "spell-check package"
     },
     {
@@ -149,6 +152,12 @@
     },
     {
       "matchPaths": [ "packages/styleguide/**" ], "groupName": "styleguide package"
+    },
+    {
+      "matchPaths": [ "packages/symbol-provider-ctags/**" ], "groupName": "symbol-provider-ctags package"
+    },
+    {
+      "matchPaths": [ "packages/symbol-proivder-tree-sitter/**" ], "groupName": "symbol-provider-tree-sitter package"
     },
     {
       "matchPaths": [ "packages/symbols-view/**" ], "groupName": "symbols-view package"
