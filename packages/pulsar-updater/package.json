@@ -14,8 +14,8 @@
   "repository": "https://github.com/pulsar-edit/pulsar",
   "dependencies": {
     "event-kit": "github:pulsar-edit/event-kit",
-    "shelljs": "^0.8.5",
-    "superagent": "^8.0.9",
+    "shelljs": "^0.10.0",
+    "superagent": "^10.0.0",
     "winreg": "^1.2.4"
   },
   "configSchema": {
