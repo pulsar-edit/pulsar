@@ -1,7 +1,7 @@
 'menu': [
-  'label': 'Edit'
+  'label': '%pulsar.commons.menu-labels.edit%'
   'submenu': [
-    'label': 'Go to Line'
+    'label': '%go-to-line.menu.go-to-line:label%'
     'command': 'go-to-line:toggle'
   ]
 ]

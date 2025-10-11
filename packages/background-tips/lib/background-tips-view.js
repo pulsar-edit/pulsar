@@ -112,7 +112,7 @@ class BackgroundTipsElement {
     if (this.tipsRendered) return
     for (let i = 0; i < Tips.length; i++) {
       const tip = Tips[i]
-      Tips[i] = this.renderTip(tip)
+      Tips[i] = this.renderTip(atom.i18n.t(tip, { brandName: atom.branding.name }))
     }
     this.tipsRendered = true
   }

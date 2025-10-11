@@ -1,0 +1,5 @@
+'src': {
+  'updating-package-deps': 'Updating package dependencies'
+  'update-deps:success': 'Package dependencies updated'
+  'update-deps:failure': 'Failed to update package dependencies'
+}
