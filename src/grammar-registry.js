@@ -9,7 +9,7 @@ const WASMTreeSitterGrammar = require('./wasm-tree-sitter-grammar');
 const ScopeDescriptor = require('./scope-descriptor');
 const Token = require('./token');
 const fs = require('fs-plus');
-const { Point, Range } = require('text-buffer');
+const { Point, Range } = require('@pulsar-edit/text-buffer');
 
 const PATH_SPLIT_REGEX = new RegExp('[/.]');
 

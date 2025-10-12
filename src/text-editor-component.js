@@ -1,5 +1,5 @@
 const etch = require('etch');
-const { Point, Range } = require('text-buffer');
+const { Point, Range } = require('@pulsar-edit/text-buffer');
 const LineTopIndex = require('line-top-index');
 const TextEditor = require('./text-editor');
 const { isPairedCharacter, hasRtlText } = require('./text-utils');

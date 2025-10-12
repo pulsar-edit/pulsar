@@ -1,9 +1,9 @@
 const temp = require('temp').track();
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const Project = require('../src/project');
 const fs = require('fs-plus');
 const path = require('path');
-const { Directory } = require('pathwatcher');
+const { Directory } = require('@pulsar-edit/pathwatcher');
 const { stopAllWatchers } = require('../src/path-watcher');
 const GitRepository = require('../src/git-repository');
 

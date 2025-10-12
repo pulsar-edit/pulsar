@@ -4,7 +4,7 @@ const path = require('path');
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
 const fs = require('fs-plus');
 const { Minimatch } = require('minimatch');
-const { Directory } = require('pathwatcher');
+const { Directory } = require('@pulsar-edit/pathwatcher');
 const Grim = require('grim');
 const DefaultDirectorySearcher = require('./default-directory-searcher');
 const RipgrepDirectorySearcher = require('./ripgrep-directory-searcher');
@@ -1369,7 +1369,7 @@ module.exports = class Workspace extends Model {
   // Open Pulsar's license in the active pane.
   openLicense() {
     const resPath = path.join(process.resourcesPath, 'LICENSE.md')
-    if(fs.existsSync(resPath)) {
+    if (fs.existsSync(resPath)) {
       return this.open(resPath);
     } else {
       return this.open(path.join(__dirname, '..', 'LICENSE.md'))
