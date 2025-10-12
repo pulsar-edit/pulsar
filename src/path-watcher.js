@@ -268,7 +268,7 @@ class PathWatcher {
   //   watched filesystem tree.
   // * `options` See {watchPath} for options.
   //
-  constructor(nativeWatcherRegistry, watchedPath, _options) {
+  constructor(nativeWatcherRegistry, watchedPath, options) {
     this.watchedPath = watchedPath;
     this.nativeWatcherRegistry = nativeWatcherRegistry;
     this.options = { realPaths: true, ...options };
