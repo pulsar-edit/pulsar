@@ -5,9 +5,13 @@ const crypto = require('crypto');
 const path = require('path');
 
 const defaultOptions = {
-  target: 1,
+  target: 'es2023',
   module: 'commonjs',
-  sourceMap: true
+  sourceMap: true,
+  // By default, do not complain if definition files are missing.
+  skipLibCheck: true,
+  types: [],
+  typeRoots: []
 };
 
 let TypeScript = null;
@@ -68,7 +72,7 @@ function compile(sourceCode, filePath) {
     true
   );
 
-  let program = TypeScript.createProgram([filePath], compilerOptions, compilerHost);
+  let program = TypeScript.createProgram([filePath], compilerOptions.options, compilerHost);
   const diagnostics = TypeScript.getPreEmitDiagnostics(program);
 
   if (diagnostics.length > 0) {
