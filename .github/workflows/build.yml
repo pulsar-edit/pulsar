@@ -259,7 +259,7 @@ jobs:
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list || echo "Yeah, tests failed, Windows is like this"
 
     - name: Test Binary - macOS
-      if: runner.os == 'macOS' && env.RUN_MACOS_VT == true
+      if: runner.os == 'macOS' && env.RUN_MACOS_VT == 'true'
       run: |
         export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
         rm -R node_modules/electron; yarn install --check-files
