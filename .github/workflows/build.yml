@@ -267,15 +267,6 @@ jobs:
         export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
 
-    - name: Add binaries to Rolling Release Repo
-      if: ${{ github.event_name == 'push' && runner.os != 'Linux' }}
-      # We only want to upload rolling binaries if they are a commit to master
-      # Otherwise we want to not upload if it's a PR or manually triggered build
-      run: |
-        cd ./script/rolling-release-scripts
-        npm install
-        node ./rolling-release-binary-upload.js
-
     - name: Upload Video Artifacts
       # Run whether this job passed or failed, unless explicitly cancelled.
       if: ${{ !cancelled() && runner.os != 'Linux' }}
