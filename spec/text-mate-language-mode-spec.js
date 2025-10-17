@@ -1,6 +1,6 @@
 const NullGrammar = require('../src/null-grammar');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const { Point } = TextBuffer;
 const _ = require('underscore-plus');
 const dedent = require('dedent');
@@ -889,8 +889,8 @@ describe('TextMateLanguageMode', () => {
       ).toEqual(['syntax--yellow syntax--broken']);
     });
 
-    describe('TextMateHighlightIterator.seek(position)', function() {
-      it('seeks to the leftmost tag boundary greater than or equal to the given position and returns the containing tags', function() {
+    describe('TextMateHighlightIterator.seek(position)', function () {
+      it('seeks to the leftmost tag boundary greater than or equal to the given position and returns the containing tags', function () {
         const languageMode = {
           tokenizedLineForRow(row) {
             if (row === 0) {
@@ -963,7 +963,7 @@ describe('TextMateLanguageMode', () => {
       });
     });
 
-    describe('TextMateHighlightIterator.moveToSuccessor()', function() {
+    describe('TextMateHighlightIterator.moveToSuccessor()', function () {
       it('reports two boundaries at the same position when tags close, open, then close again without a non-negative integer separating them (regression)', () => {
         const languageMode = {
           tokenizedLineForRow() {

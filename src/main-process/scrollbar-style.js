@@ -15,7 +15,7 @@ const { systemPreferences } = require('electron');
 //   try to keep those in the main process absent a compelling reason not to.
 // * The renderer can still imperatively get the scrollbar style; it just has
 //   to go (briefly) async to do it.
-const getScrollbarStyle = require('get-scrollbar-style');
+const getScrollbarStyle = require('@pulsar-edit/get-scrollbar-style');
 
 let subscriptionId;
 const EMITTER = new EventEmitter();

@@ -3,7 +3,7 @@ const fs = require('fs-plus');
 const path = require('path');
 const { promisify } = require('util');
 const { File, Directory } = require('atom');
-const { closeAllWatchers } = require('pathwatcher');
+const { closeAllWatchers } = require('@pulsar-edit/pathwatcher');
 const { sep } = path;
 
 const { CompositeDisposable } = require('event-kit');
