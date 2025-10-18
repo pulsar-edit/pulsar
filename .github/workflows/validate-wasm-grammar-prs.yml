@@ -21,7 +21,7 @@ jobs:
         # Make sure we get all commits, so that we can compare to early commits
 
     - name: Setup Node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: 16
 
