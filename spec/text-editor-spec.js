@@ -1,3 +1,5 @@
+const { timeoutPromise: wait } = require('./helpers/async-spec-helpers');
+
 const fs = require('fs');
 const path = require('path');
 const temp = require('temp').track();
@@ -140,7 +142,7 @@ describe('TextEditor', () => {
   });
 
   describe('.copy()', () => {
-    it('returns a different editor with the same initial state', () => {
+    it('returns a different editor with the same initial state', async () => {
       expect(editor.getAutoHeight()).toBeFalsy();
       expect(editor.getAutoWidth()).toBeFalsy();
       expect(editor.getShowCursorOnSelection()).toBeTruthy();
@@ -7617,10 +7619,17 @@ describe('TextEditor', () => {
       editor.update({ autoHeight: false });
       const element = editor.getElement();
       jasmine.attachToDOM(element);
-      element.style.height = element.component.getLineHeight() * 5 + 'px';
+      // NOTE: When line height is a float, `getRowsPerPage` will round up and
+      // consider there to be an extra row per page. Font metrics are more
+      // complicated than they used to be, but in order to make this test
+      // happy, we'll make the editor height a bit shorter so that we don't try
+      // to make six rows instead of five.
+      element.style.height = Math.floor(element.component.getLineHeight() * 5) + 'px';
       element.measureDimensions();
 
       expect(editor.getCursorBufferPosition().row).toBe(0);
+
+      expect(editor.getRowsPerPage()).toBe(5);
 
       editor.pageDown();
       expect(editor.getCursorBufferPosition().row).toBe(5);
@@ -7641,7 +7650,12 @@ describe('TextEditor', () => {
       editor.update({ autoHeight: false });
       const element = editor.getElement();
       jasmine.attachToDOM(element);
-      element.style.height = element.component.getLineHeight() * 5 + 'px';
+      // NOTE: When line height is a float, `getRowsPerPage` will round up and
+      // consider there to be an extra row per page. Font metrics are more
+      // complicated than they used to be, but in order to make this test
+      // happy, we'll make the editor height a bit shorter so that we don't try
+      // to make six rows instead of five.
+      element.style.height = Math.floor(element.component.getLineHeight() * 5) + 'px';
       element.measureDimensions();
 
       expect(editor.getCursorBufferPosition().row).toBe(0);
@@ -8343,6 +8357,9 @@ describe('TextEditor', () => {
 
   describe('.shouldPromptToSave()', () => {
     beforeEach(async () => {
+      jasmine.useRealClock();
+      // Allow for some breathing room to accommodate `pathwatcher`.
+      await wait(process.env.CI ? 500 : 0);
       editor = await atom.workspace.open('sample.js');
       jasmine.unspy(editor, 'shouldPromptToSave');
       spyOn(atom.stateStore, 'isConnected').and.returnValue(true);
@@ -8371,9 +8388,15 @@ describe('TextEditor', () => {
       jasmine.useRealClock();
 
       editor.setText('initial stuff');
-      await editor.saveAs(temp.openSync('test-file').path);
+      let destination = temp.openSync('test-file').path;
+      await editor.saveAs(destination);
+      expect(fs.readFileSync(destination, 'utf8').toString()).toBe('initial stuff');
 
       editor.setText('other stuff');
+      let promise = new Promise(resolve => editor.onDidConflict(() => {
+        resolve();
+      }));
+      await wait(1000);
       fs.writeFileSync(editor.getPath(), 'new stuff');
       expect(
         editor.shouldPromptToSave({
@@ -8382,7 +8405,7 @@ describe('TextEditor', () => {
         })
       ).toBeFalsy();
 
-      await new Promise(resolve => editor.onDidConflict(resolve));
+      await promise;
       expect(
         editor.shouldPromptToSave({
           windowCloseRequested: true,
