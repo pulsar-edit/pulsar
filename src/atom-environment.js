@@ -257,6 +257,8 @@ class AtomEnvironment {
     // before opening a buffer.
     require('./text-editor-element');
 
+    this.isDestroying = false;
+
     this.window = params.window;
     this.document = params.document;
     this.blobStore = params.blobStore;
@@ -481,6 +483,11 @@ class AtomEnvironment {
 
   destroy() {
     if (!this.project) return;
+
+    // Set this flag and then don't reset it after `destroy` is done, since we
+    // need other disposing objects to be able to check it. We won't need to
+    // reset it because another environment will be created.
+    this.isDestroying = true;
 
     this.disposables.dispose();
     if (this.workspace) this.workspace.destroy();
@@ -787,6 +794,26 @@ class AtomEnvironment {
   // Extended: Toggle the full screen state of the current window.
   toggleFullScreen() {
     return this.setFullScreen(!this.isFullScreen());
+  }
+
+  // A proxy to `shell.trashItem` — which ought to work in the renderer, but
+  // suffers from a bug on Windows. We work around it by delegating to the main
+  // process.
+  //
+  // Undocumented for now, but may eventually be an official part of the API
+  // for when community packages need to delete files.
+  trashItem(filePath) {
+    return this.applicationDelegate.trashItem(filePath);
+  }
+
+  // A proxy to `shell.showItemInFolder` — which ought to work in the renderer,
+  // but seems to suffer from a bug on macOS. We work around it by delegating
+  // to the main process.
+  //
+  // Undocumented for now, but may eventually be an official part of the API
+  // for when community packages need to perform this function.
+  showItemInFolder(filePath) {
+    return this.applicationDelegate.showItemInFolder(filePath);
   }
 
   // Restore the window to its previous dimensions and show it.
