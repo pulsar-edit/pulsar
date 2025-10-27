@@ -132,6 +132,32 @@ module.exports = class ApplicationDelegate {
     return ipcHelpers.on(ipcRenderer, 'did-leave-full-screen', callback);
   }
 
+  trashItem(filePath) {
+    // A simple wrapper around `shell.trashItem`, which currently can only be
+    // called from the main process on Windows.
+    return ipcRenderer.invoke('trashItem', filePath).then(({ outcome, error, result }) => {
+      if (outcome === 'success') {
+        // `result` is undefined, but we might as well guard against an
+        // Electron API change in the future.
+        return result;
+      } else if (outcome === 'failure') {
+        return Promise.reject(error);
+      }
+    });
+  }
+
+  showItemInFolder(filePath) {
+    // A simple wrapper around `shell.trashItem`, which currently can only be
+    // called from the main process.
+    return ipcRenderer.invoke('showItemInFolder', filePath).then(({ outcome, error, result }) => {
+      if (outcome === 'success') {
+        return result;
+      } else if (outcome === 'failure') {
+        return Promise.reject(error);
+      }
+    });
+  }
+
   async openWindowDevTools() {
     // Defer DevTools interaction to the next tick, because using them during
     // event handling causes some wrong input events to be triggered on
