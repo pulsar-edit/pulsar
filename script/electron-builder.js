@@ -1,53 +1,130 @@
-const path = require('path')
-const normalizePackageData = require('normalize-package-data');
-const fs = require("fs/promises");
-const {mkdirSync} = require("fs");
+/* eslint-disable no-process-exit */
+const Path = require('path');
+const dedent = require('dedent');
+const FS = require('fs/promises');
+const { existsSync } = require('fs');
+const yargs = require('yargs');
+const { hideBin } = require('yargs/helpers')
 const generateMetadata = require('./generate-metadata-for-builder')
 const macBundleDocumentTypes = require("./mac-bundle-document-types.js");
 
-// Monkey-patch to not remove things I explicitly didn't say so
+// Ensure the user has initialized and built the `ppm` submodule before they
+// try to build the app.
+if (!existsSync(Path.join('ppm', 'bin'))) {
+  console.error(dedent`
+    \`ppm\` not detected. Please run:
+
+      git submodule update --init
+      yarn run build:apm
+  `);
+  process.exit(2);
+} else if (
+  !existsSync(
+    Path.join(
+      'ppm',
+      'bin',
+      process.platform === 'win32' ? 'node.exe' : 'node'
+    )
+  )
+) {
+  console.error(dedent`
+    \`ppm\` not built. Please run:
+
+    yarn run build:apm
+  `);
+  process.exit(2);
+}
+
+// Monkey-patch to not remove things I explicitly didn't say to remove.
 // See: https://github.com/electron-userland/electron-builder/issues/6957
+
+/* eslint-disable node/no-extraneous-require */
 let transformer = require('app-builder-lib/out/fileTransformer')
 const builder_util_1 = require("builder-util");
+/* eslint-enable node/no-extraneous-require */
 
-transformer.createTransformer = function(srcDir, configuration, extraMetadata, extraTransformer) {
-    const mainPackageJson = path.join(srcDir, "package.json");
-    const isRemovePackageScripts = configuration.removePackageScripts !== false;
-    const isRemovePackageKeywords = configuration.removePackageKeywords !== false;
-    const packageJson = path.sep + "package.json";
-    return file => {
-        if (file === mainPackageJson) {
-            return modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts, isRemovePackageKeywords);
-        }
-        if (extraTransformer != null) {
-            return extraTransformer(file);
-        }
-        else {
-            return null;
-        }
-    };
-}
-async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts, isRemovePackageKeywords) {
-    const mainPackageData = JSON.parse(await fs.readFile(file, "utf-8"));
-    if (extraMetadata != null) {
-        builder_util_1.deepAssign(mainPackageData, extraMetadata);
-        return JSON.stringify(mainPackageData, null, 2);
+transformer.createTransformer = function createTransformer(srcDir, configuration, extraMetadata, extraTransformer) {
+  const mainPackageJson = Path.join(srcDir, "package.json");
+  const isRemovePackageScripts = configuration.removePackageScripts !== false;
+  const isRemovePackageKeywords = configuration.removePackageKeywords !== false;
+  return file => {
+    if (file === mainPackageJson) {
+      return modifyMainPackageJson(
+        file,
+        extraMetadata,
+        isRemovePackageScripts,
+        isRemovePackageKeywords
+      );
     }
-    return null;
+    if (extraTransformer != null) {
+      return extraTransformer(file);
+    }
+    else { return null; }
+  };
 }
-/// END Monkey-Patch
 
-const builder = require("electron-builder")
+async function modifyMainPackageJson(
+  file,
+  extraMetadata,
+  _isRemovePackageScripts,
+  _isRemovePackageKeywords
+) {
+  let mainPackageData = JSON.parse(await FS.readFile(file, 'utf-8'));
+  if (extraMetadata == null) return null;
 
-const pngIcon = 'resources/app-icons/beta.png'
-const icoIcon = 'resources/app-icons/pulsar.ico'
-const svgIcon = 'resources/app-icons/beta.svg'
-const icnsIcon = 'resources/app-icons/beta.icns'
+  builder_util_1.deepAssign(mainPackageData, extraMetadata);
+  return JSON.stringify(mainPackageData, null, 2);
+}
+
+// END Monkey-patch.
+
+// eslint-disable-next-line node/no-unpublished-require
+const builder = require('electron-builder');
+
+const ARGS = yargs(hideBin(process.argv))
+  .command('[platform]', 'build for a given platform', () => {
+    return yargs.positional('platform', {
+      describe: 'One of "mac", "linux", or "win".'
+    })
+  })
+  .option('target', {
+    alias: 't',
+    type: 'string',
+    description: 'Limit to one target of the specified platform; otherwise all targets for that platform are built.'
+  })
+  .option('next', {
+    alias: 'n',
+    type: 'boolean',
+    description: 'Builds a "canary" with a separate bundle identifier and app name so it can run alongside ordinary Pulsar.'
+  })
+  .parse();
+
+
+// The difference in base name matters for the app ID (which helps the OS
+// understand that PulsarNext is not the same as Pulsar), but also for other
+// reasons.
+//
+// The `pulsar-next` executable name is how it knows it's a canary release
+// channel and should use a different home directory from the stable release.
+// Same for `ppm-next`; it's identical to `ppm`, but the name of the script
+// tells it where to install packages.
+const displayName = ARGS.next ? 'PulsarNext' : 'Pulsar';
+const baseName = ARGS.next ? 'pulsar-next' : 'pulsar';
+const ppmBaseName = ARGS.next ? 'ppm-next' : 'ppm';
+const iconName = ARGS.next ? 'beta-next' : 'beta';
+
+const ICONS = {
+  png: `resources/app-icons/${iconName}.png`,
+  ico: `resources/app-icons/${iconName}.ico`,
+  svg: `resources/app-icons/${iconName}.svg`,
+  icns: `resources/app-icons/${iconName}.icns`
+};
+
 
 let options = {
-  "appId": "dev.pulsar-edit.pulsar",
-  "npmRebuild": false,
-  "publish": null,
+  appId: `dev.pulsar-edit.${baseName}`,
+  npmRebuild: false,
+  publish: null,
   files: [
     // --- Inclusions ---
     // Core Repo Inclusions
@@ -58,7 +135,6 @@ let options = {
     "src/**/*",
     "static/**/*",
     "vendor/**/*",
-    "locales/*",
     "node_modules/**/*",
 
     // Core Repo Test Inclusions
@@ -110,10 +186,10 @@ let options = {
     // Other Exclusions
     "!**/._*",
     "!**/node_modules/*.d.ts",
-    "!**/node_modules/**/*.map",
     "!**/node_modules/.bin",
     "!**/node_modules/native-mate",
-    "!node_modules/@pulsar-edit/fuzzy-native/node_modules", // node_modules of the fuzzy-native package are only required for building it
+    // node_modules of the fuzzy-native package are only required for building it
+    "!node_modules/fuzzy-native/node_modules",
     "!**/node_modules/spellchecker/vendor/hunspell/.*",
     "!**/git-utils/deps",
     "!**/oniguruma/deps",
@@ -123,69 +199,92 @@ let options = {
     "!**/jasmine-reporters/ext",
     "!**/deps/libgit2",
     // These are only required in dev-mode, when pegjs grammars aren't precompiled
-      // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
-      // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
-      // "!node_modules/.bin/pegjs", // Note: https://github.com/pulsar-edit/pulsar/pull/206
+    // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
+    // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
+    // "!node_modules/.bin/pegjs", // Note: https://github.com/pulsar-edit/pulsar/pull/206
   ],
-  "extraResources": [
+
+  extraResources: [
+    { from: 'pulsar.sh', to: `${baseName}.sh` },
     {
-      "from": "pulsar.sh",
-      "to": "pulsar.sh"
-    }, {
-      "from": "ppm",
-      "to": "app/ppm"
-    }, {
-      "from": pngIcon,
-      "to": "pulsar.png"
-    }, {
-      "from": "LICENSE.md",
-      "to": "LICENSE.md"
+      // Be selective in what we copy over to PPM’s `bin` directory. On
+      // Windows, the contents of this entire folder will be available on the
+      // `PATH`, so we shouldn’t put stray stuff in here.
+      //
+      // Below we copy over `ppm` itself, but it might have its name changed in
+      // the process depending on the release channel.
+      filter: [
+        // Everything below `ppm`…
+        'ppm/**',
+        // …except for files inside the `bin` directory.
+        '!ppm/bin'
+      ],
+      // This somehow puts it all in the right place with the `ppm` folder
+      // intact.
+      to: 'app'
     },
+    { from: ICONS.png, to: 'pulsar.png' },
+    { from: 'LICENSE.md', to: 'LICENSE.md' }
   ],
-  compression: "normal",
+  compression: 'normal',
   deb: {
-    afterInstall: "script/post-install.sh",
-    afterRemove: "script/post-uninstall.sh",
+    afterInstall: 'script/post-install.sh',
+    afterRemove: 'script/post-uninstall.sh',
+    packageName: baseName
   },
   rpm: {
-    afterInstall: "script/post-install.sh",
-    afterRemove: "script/post-uninstall-rpm.sh",
+    afterInstall: 'script/post-install.sh',
+    afterRemove: 'script/post-uninstall.sh',
     compression: 'xz',
     fpm: ['--rpm-rpmbuild-define=_build_id_links none']
   },
-  "linux": {
+
+  linux: {
+    executableName: baseName,
     // Giving a single PNG icon to electron-builder prevents the correct
     // construction of the icon path, so we have to specify a folder containing
     // multiple icons named each with its size.
-    "icon": "resources/icons",
-    "category": "Development",
-    "synopsis": "A Community-led Hyper-Hackable Text Editor",
-    "target": [
-      { target: "appimage" },
-      { target: "deb" },
-      { target: "rpm" },
-      { target: "tar.gz" }
+    icon: "resources/icons",
+    category: "Development",
+    synopsis: "A community-led hyper-hackable text editor",
+    target: [
+      { target: 'appimage' },
+      { target: 'deb' },
+      { target: 'rpm' },
+      { target: 'tar.gz' }
     ],
-    "extraResources": [
+    extraResources: [
       {
         // Extra SVG icon included in the resources folder to give a chance to
         // Linux packagers to add a scalable desktop icon under
-        // /usr/share/icons/hicolor/scalable
+        // `/usr/share/icons/hicolor/scalable`
         // (used only by desktops to show it on bar/switcher and app menus).
-        "from": svgIcon,
-        "to": "pulsar.svg"
+        "from": ICONS.svg,
+        "to": `${baseName}.svg`
       },
-    ],
-    "executableArgs": ['--no-sandbox'],
+      { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
+      { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
+    ]
   },
-  "mac": {
-    "icon": icnsIcon,
-    "category": "public.app-category.developer-tools",
-    "minimumSystemVersion": "10.8",
-    "hardenedRuntime": true,
-    "extendInfo": {
-      // This contains extra values that will be inserted into the App's plist
-      "CFBundleExecutable": "Pulsar",
+
+  mac: {
+    icon: ICONS.icns,
+    category: "public.app-category.developer-tools",
+    // NOTE: Electron 27-32 use a version of Chromium whose minimum supported
+    // version of macOS is 10.15.
+    //
+    // Electron 33 will drop support for 10.15, at which point the minimum
+    // supported version will be macOS 11.
+    minimumSystemVersion: "10.15",
+    hardenedRuntime: true,
+    // Now that we're on a recent Electron, we no longer have to hide the
+    // `allow-jit` entitlement from Intel Macs in order to work around a
+    // `libuv` bug.
+    entitlements: "resources/mac/entitlements.plist",
+    entitlementsInherit: "resources/mac/entitlements.plist",
+    extendInfo: {
+      // Extra values that will be inserted into the app's plist.
+      "CFBundleExecutable": displayName,
       "NSAppleScriptEnabled": "YES",
       "NSMainNibFile": "MainMenu",
       "NSRequiresAquaSystemAppearance": "NO",
@@ -195,114 +294,150 @@ let options = {
         { "CFBundleURLName": "Atom Shared Session Protocol" }
       ]
     },
+    extraResources: [
+      { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
+      { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
+    ]
   },
-  "dmg": {
-    "sign": false,
-    "writeUpdateInfo": false
-  },
-  "win": {
-    "icon": icoIcon,
-    "extraResources": [
-      {
-        "from": icoIcon,
-        "to": "pulsar.ico"
-      },
-      {
-        "from": "resources/win/pulsar.cmd",
-        "to": "pulsar.cmd"
-      },
-      {
-        "from": "resources/win/pulsar.js",
-        "to": "pulsar.js"
-      }
+
+  dmg: { sign: false },
+
+  // Earliest supported version of Windows is Windows 10. Electron 23 dropped
+  // support for 7/8/8.1.
+  win: {
+    icon: ICONS.ico,
+    extraResources: [
+      { from: ICONS.ico, to: 'pulsar.ico' },
+      { from: 'resources/win/pulsar.cmd', to: `${baseName}.cmd` },
+      { from: 'resources/win/pulsar.js', to: `${baseName}.js` },
+      { from: 'resources/win/modifyWindowsPath.ps1', to: 'modifyWindowsPath.ps1' },
+      // Copy `ppm.cmd` to the `ppm/bin` directory, possibly renaming it
+      // `ppm-next.cmd` depending on release channel.
+      { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
+      { from: 'ppm/bin/node.exe', to: `app/ppm/bin/node.exe` },
     ],
-    "target": [
-      { "target": "nsis" },
-      { target: "zip" },
-    ],
+    target: [
+      { target: 'nsis' },
+      { target: 'zip' }
+    ]
   },
-  // Windows NSIS Configuration
-  "nsis": {
-    "oneClick": false,
-    "allowToChangeInstallationDirectory": true,
-    "uninstallDisplayName": "Pulsar",
-    "runAfterFinish": true,
-    "createDesktopShortcut": true,
-    "createStartMenuShortcut": true,
-    "guid": "0949b555-c22c-56b7-873a-a960bdefa81f",
-    // The GUID is generated from Electron-Builder based on our AppID
-    // Hardcoding it here means it will always be used as generated from
-    // the AppID 'dev.pulsar-edit.pulsar'. If this value ever changes,
-    // A PR to GitHub Desktop must be made with the updated value
-    "include": "resources/win/installer.nsh",
-    "warningsAsErrors": false,
-    "differentialPackage": false
+
+  nsis: {
+    oneClick: false,
+    allowToChangeInstallationDirectory: true,
+    uninstallDisplayName: displayName,
+    runAfterFinish: true,
+    createDesktopShortcut: true,
+    createStartMenuShortcut: true,
+    guid: "0949b555-c22c-56b7-873a-a960bdefa81f", // TODO
+    // The GUID is generated from Electron-Builder based on our AppID.
+    // Hardcoding it here means it will always be used as generated from the
+    // AppID 'dev.pulsar-edit.pulsar'. If this value ever changes, a PR to
+    // GitHub Desktop must be made with the updated value.
+    //
+    // We delete this value when building PulsarNext so that it’s regenerated
+    // based on the app ID. Otherwise the OS might consider it equivalent to
+    // stable Pulsar in some ways.
+    //
+    // TODO: On first look, this installer script seems not to need any
+    // updating for PulsarNext, but we should make sure.
+    include: "resources/win/installer.nsh",
+    warningsAsErrors: false
   },
-  "extraMetadata": {
-  },
-  "afterSign": "script/mac-notarise.js",
-  "asarUnpack": [
+
+  extraMetadata: {},
+
+  afterSign: 'script/mac-notarise.js',
+  asarUnpack: [
     "node_modules/github/bin/*",
-    "node_modules/github/lib/*", // Resolves Error in console
-    "**/node_modules/dugite/git/**", // Include dugite postInstall output (matching glob used for Atom)
+    "node_modules/github/lib/*",       // Resolves error in console
+    "**/node_modules/dugite/git/**",   // Include dugite postInstall output (matching glob used for Atom)
     "**/node_modules/spellchecker/**", // Matching Atom Glob
   ]
+};
 
-}
-
-/**
- The below optional entitlements is needed for the following reasons:
-  - `allow-jit` needs to be applied on silicon builds for WASM to work:
-      https://github.com/pulsar-edit/pulsar/pull/454
-  - But setting `allow-jit` on Intel decreases performance of `fork()` operations
-    e.g. `require('child_process').spanw(...)`
-  - This monkey patch will no longer be needed when we can bump Electron
-    and get `libuv` `v1.42.0` as this issue is fixed upstream there
-  - See: https://github.com/microsoft/vscode/issues/105446
-*/
-if (process.arch === "x64") {
-  options.mac.entitlements = "resources/mac/entitlements.intel.plist";
-  options.mac.entitlementsInherit = "resources/mac/entitlements.intel.plist";
-} else {
-  options.mac.entitlements = "resources/mac/entitlements.silicon.plist";
-  options.mac.entitlementsInherit = "resources/mac/entitlements.silicon.plist";
+if (ARGS.next) {
+  // TODO: Should PulsarNext have its own guid? `electron-builder` docs suggest
+  // it will be generated from the `appId` if omitted, so I think this is fine.
+  delete options.nsis.guid;
 }
 
 function whatToBuild() {
-  const argvStartingWith = process.argv.findIndex(e => e.match('electron-builder.js'))
-  const what = process.argv[argvStartingWith + 1]
-  if(what) {
-    const filter = e => e.target === what
-    options.linux.target = options.linux.target.filter(filter)
-    options.win.target = options.win.target.filter(filter)
-    // options.mac.target = options.mac.target.filter(filter)
-    return options
-  } else {
-    return options
+  if (!ARGS.target) return options;
+  if (!(ARGS.platform in options)) return options;
+  options[ARGS.platform] = options[ARGS.platform].filter(e => e.target === ARGS.target);
+  return options;
+}
+
+function generateVersionNumber(existingVersion, channel = '') {
+  // This matches stable, dev (with or without commit hash) and any other
+  // release channel following the pattern '1.100.0-channel0'
+  const match = existingVersion.match(/(\d+\.\d+\.\d+)(?:-([a-z]+)(\d+|-\w{4,})?)?$/);
+  if (!match || !match[1]) {
+    // We can't parse this. Return it as-is.
+    return existingVersion;
   }
+
+  let tag = channel ? `-${channel}` : ''
+  return `${match[1]}${tag}`
 }
 
 async function main() {
-  const package = await fs.readFile('package.json', "utf-8")
-  let options = whatToBuild()
-  options.extraMetadata = generateMetadata(JSON.parse(package))
-  builder.build({
-    config: options
-  }).then((result) => {
-    console.log("Built binaries")
-    try {
-      mkdirSync('binaries', {recursive: true})
-    } catch (err) {
-      console.warn("Warning: error encountered when making the 'binaries' dir.")
-      console.warn("(HINT: If the 'binaries' folder already exists, then this error message is probably fine to ignore!)")
-      console.warn(err)
+  if (ARGS.next) {
+    console.log('Building PulsarNext!');
+  }
+  let pack = await FS.readFile('package.json', 'utf-8');
+  let options = whatToBuild();
+  let parsedPackageJson = JSON.parse(pack);
+  let rewrotePackageJson = false;
+  options.extraMetadata = generateMetadata(parsedPackageJson);
+  if (ARGS.next) {
+    options.extraMetadata.productName = displayName;
+    if (!process.env.CI && !parsedPackageJson.version.endsWith('-next')) {
+      // We want this local build to have a version number that ends in `-next`
+      // instead of `-dev` or something else. In order to use an arbitrary
+      // version number, we must write it to `package.json` and restore the
+      // original when we're done. This is silly, but it's what
+      // `electron-builder` mandates.
+      //
+      // In CI, we've already changed `package.json` to the version number we
+      // want, so we can skip this step.
+      let newVersionNumber = generateVersionNumber(parsedPackageJson.version, 'next');
+      let newParsedPackageJson = JSON.parse(pack);
+      newParsedPackageJson.version = newVersionNumber;
+      console.log('Temporarily changing package.json to use version:', newVersionNumber);
+      rewrotePackageJson = true;
+      await FS.writeFile(
+        'package.json',
+        JSON.stringify(newParsedPackageJson, null, 2),
+        'utf-8'
+      );
     }
-    Promise.all(result.map(r => fs.copyFile(r, path.join('binaries', path.basename(r)))))
-  }).catch((error) => {
-    console.error("Error building binaries")
-    console.error(error)
-    process.exit(1)
-  })
+  }
+
+  try {
+    let result = await builder.build({ config: options });
+    if (!existsSync('binaries')) {
+      await FS.mkdir('binaries');
+    }
+    let promises = result.map(r => {
+      let destination = Path.join('binaries', Path.basename(r));
+      return FS.copyFile(r, destination);
+    });
+    await Promise.all(promises);
+  } catch (error) {
+    console.error(`Error building Pulsar:`);
+    console.error(error);
+
+    process.exit(1);
+  } finally {
+    // If we rewrote the version number, ensure we restore the original
+    // `package.json` contents.
+    if (rewrotePackageJson) {
+      console.log('Restoring original package.json');
+      await FS.writeFile('package.json', pack, 'utf-8');
+    }
+  }
 }
 
-main()
+main();
