@@ -98,10 +98,102 @@ class WorkspaceElement extends HTMLElement {
   }
 
   updateGlobalTextEditorStyleSheet() {
+    // We multiply `editor.fontSize` by `editor.lineHeight` to determine how
+    // tall our lines will be. We could just pass `editor.lineHeight` into the
+    // CSS as a factor and let CSS do the math, but Chromium tends to make a
+    // mess of it, with the result being occasional tiny gaps between lines.
+    // (See https://github.com/pulsar-edit/pulsar/issues/1181.)
+    //
+    // CSS measurements often involve math that results in unusual values that
+    // will not conform to the pixel grid of the hardware. (For instance:
+    // there's no way to divide 20 hardware pixels evenly into a three-column
+    // grid where the CSS demands that each column be the same width.) Our best
+    // theory is that Chromium used to handle this internally by nudging
+    // measurements to snap to the pixel grid, but that it _stopped_ doing this
+    // at some point, or else moved the snapping behavior to a much later stage
+    // of the rendering process.
+    //
+    // (See also https://johnresig.com/blog/sub-pixel-problems-in-css/, the
+    // venerable post from 2008 on this problem.)
+    //
+    // You may think this isn't a big deal. And, indeed, if the gaps were
+    // _uniform_, you'd probably be right. But it's quite distracting when the
+    // gaps happen consistently on (e.g.) every fifth or sixth line — or
+    // however often the rounding errors accumulate and result in a shift.
+    //
+    // Since it's important to us that rendering be consistent between any
+    // arbitrary pair of consecutive lines, the best way around this seems to
+    // be to assume the task of pixel-grid management ourselves. In this case,
+    // that means we'll compute the line height ourselves while rounding to the
+    // nearest device pixel; then we'll specify the editor `line-height` in CSS
+    // pixels instead of a bare number. `editor.lineHeight` accepts a broad
+    // range of potential values, so we can't do this in 100% of cases, but we
+    // can do it easily in the most common cases.
+    //
+    // This weakens the contract here, since we're adjusting the ratio under
+    // the hood to the closest value that will work without introducing those
+    // tiny gaps. So the user might change their `editor.lineHeight` from `1.5`
+    // to `1.6` and correctly observe that nothing seems to have changed. We
+    // think that's OK — and, in the unlikely event a user thinks this is
+    // wrong, we can advise them on how to avoid this behavior.
+    let fontSize = this.config.get('editor.fontSize');
+    let fontFamily = this.config.get('editor.fontFamily');
+    let lineHeight = this.config.get('editor.lineHeight');
+    let pixelRatio = window.devicePixelRatio;
+    let adjustedLineHeight;
+
+    // The config schema allows `editor.lineHeight` to be either a bare number
+    // or a string; in the latter case, the expectation is that the user can
+    // specify the value using any valid CSS measurement. This makes
+    // interpretation of the value tricky!
+    //
+    // There's one case that should be treated identically to the number case…
+    if (typeof lineHeight === 'string' && Number(lineHeight).toString() === lineHeight) {
+      // …when the user has specified a string with bare number. We'll treat
+      // this as if the setting were _actually_ a number.
+      lineHeight = Number(lineHeight);
+    }
+
+    // There are other string-value cases that we may want to reconcile with
+    // the Chromium rendering issue described above.
+    if (typeof lineHeight === 'string') {
+      if (lineHeight.endsWith('px')) {
+        // The user has specified the `editor.lineHeight` setting with a pixel
+        // value like `"27px"`. We want to make sure this value results in a
+        // line-height that snaps to the hardware pixel grid, so we'll adjust
+        // it if necessary.
+        let lineHeightPixelValue = parseFloat(lineHeight);
+        let computedLineHeight = Math.round(lineHeightPixelValue * pixelRatio) / pixelRatio;
+        adjustedLineHeight = `${computedLineHeight.toFixed(6)}px`;
+      } else {
+        // If it's some other sort of string value, then we'll leave it as-is.
+        // It could be a more exotic CSS measurement — `1.4rem`, `3ch`, etc. —
+        // or it could just be altogether invalid. Either way, we can't easily
+        // convert it into its pixel equivalent, so we won't bother to try to
+        // avoid the Chromium rendering issue.
+        adjustedLineHeight = lineHeight;
+      }
+    } else {
+      // The `editor.lineHeight` setting is a number expressing a ratio based
+      // on the value of `editor.fontSize`. We'll turn that into a pixel value
+      // and adjust it if necessary so that it snaps to the hardware pixel
+      // grid.
+      //
+      // For instance: most screens out there these days have a
+      // `devicePixelRatio` of `2`, meaning that `1px` in CSS will use two
+      // screen pixels. So this would have the effect of snapping the line
+      // height to the nearest half-CSS-pixel.
+      //
+      // On older displays with lower DPI, `devicePixelRatio` would be `1`;
+      // this adjustment would thus snap the value to the nearest whole pixel.
+      let computedLineHeight = Math.round(fontSize * lineHeight * pixelRatio) / pixelRatio;
+      adjustedLineHeight = `${computedLineHeight.toFixed(6)}px`;
+    }
+
     const styleSheetSource = `atom-workspace {
-  --editor-font-size: ${this.config.get('editor.fontSize')}px;
-  --editor-font-family: ${this.config.get('editor.fontFamily')};
-  --editor-line-height: ${this.config.get('editor.lineHeight')};
+  --editor-font-size: ${fontSize}px;
+  --editor-font-family: ${fontFamily};
+  --editor-line-height: ${adjustedLineHeight};
 }`;
     this.styleManager.addStyleSheet(styleSheetSource, {
       sourcePath: 'global-text-editor-styles',
@@ -387,7 +479,7 @@ class WorkspaceElement extends HTMLElement {
   }
 
   nearestVisiblePaneInDirection(direction, pane) {
-    const distance = function(pointA, pointB) {
+    const distance = function (pointA, pointB) {
       const x = pointB.x - pointA.x;
       const y = pointB.y - pointA.y;
       return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));

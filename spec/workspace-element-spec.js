@@ -1,10 +1,9 @@
-/** @babel */
-
 const { ipcRenderer } = require('electron');
 const etch = require('etch');
 const path = require('path');
 const temp = require('temp').track();
-const { Disposable } = require('event-kit');
+
+const { conditionPromise } = require('./helpers/async-spec-helpers');
 
 const getNextUpdatePromise = () => etch.getScheduler().nextUpdatePromise;
 
@@ -61,7 +60,7 @@ describe('WorkspaceElement', () => {
       workspace,
       workspaceElement;
 
-    beforeEach(function() {
+    beforeEach(function () {
       atom.config.set('core.destroyEmptyPanes', false);
       expect(document.hasFocus()).toBe(
         true,
@@ -305,10 +304,10 @@ describe('WorkspaceElement', () => {
     });
   });
 
-  describe('changing focus, copying, and moving items directionally between panes', function() {
+  describe('changing focus, copying, and moving items directionally between panes', function () {
     let workspace, workspaceElement, startingPane;
 
-    beforeEach(function() {
+    beforeEach(function () {
       atom.config.set('core.destroyEmptyPanes', false);
       expect(document.hasFocus()).toBe(
         true,
@@ -330,9 +329,9 @@ describe('WorkspaceElement', () => {
       jasmine.attachToDOM(workspaceElement);
     });
 
-    describe('::focusPaneViewAbove()', function() {
+    describe('::focusPaneViewAbove()', function () {
       describe('when there is a row above the focused pane', () =>
-        it('focuses up to the adjacent row', function() {
+        it('focuses up to the adjacent row', function () {
           const paneAbove = startingPane.splitUp();
           startingPane.activate();
           workspaceElement.focusPaneViewAbove();
@@ -340,16 +339,16 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when there are no rows above the focused pane', () =>
-        it('keeps the current pane focused', function() {
+        it('keeps the current pane focused', function () {
           startingPane.activate();
           workspaceElement.focusPaneViewAbove();
           expect(document.activeElement).toBe(startingPane.getElement());
         }));
     });
 
-    describe('::focusPaneViewBelow()', function() {
+    describe('::focusPaneViewBelow()', function () {
       describe('when there is a row below the focused pane', () =>
-        it('focuses down to the adjacent row', function() {
+        it('focuses down to the adjacent row', function () {
           const paneBelow = startingPane.splitDown();
           startingPane.activate();
           workspaceElement.focusPaneViewBelow();
@@ -357,16 +356,16 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when there are no rows below the focused pane', () =>
-        it('keeps the current pane focused', function() {
+        it('keeps the current pane focused', function () {
           startingPane.activate();
           workspaceElement.focusPaneViewBelow();
           expect(document.activeElement).toBe(startingPane.getElement());
         }));
     });
 
-    describe('::focusPaneViewOnLeft()', function() {
+    describe('::focusPaneViewOnLeft()', function () {
       describe('when there is a column to the left of the focused pane', () =>
-        it('focuses left to the adjacent column', function() {
+        it('focuses left to the adjacent column', function () {
           const paneOnLeft = startingPane.splitLeft();
           startingPane.activate();
           workspaceElement.focusPaneViewOnLeft();
@@ -374,16 +373,16 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when there are no columns to the left of the focused pane', () =>
-        it('keeps the current pane focused', function() {
+        it('keeps the current pane focused', function () {
           startingPane.activate();
           workspaceElement.focusPaneViewOnLeft();
           expect(document.activeElement).toBe(startingPane.getElement());
         }));
     });
 
-    describe('::focusPaneViewOnRight()', function() {
+    describe('::focusPaneViewOnRight()', function () {
       describe('when there is a column to the right of the focused pane', () =>
-        it('focuses right to the adjacent column', function() {
+        it('focuses right to the adjacent column', function () {
           const paneOnRight = startingPane.splitRight();
           startingPane.activate();
           workspaceElement.focusPaneViewOnRight();
@@ -391,16 +390,16 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when there are no columns to the right of the focused pane', () =>
-        it('keeps the current pane focused', function() {
+        it('keeps the current pane focused', function () {
           startingPane.activate();
           workspaceElement.focusPaneViewOnRight();
           expect(document.activeElement).toBe(startingPane.getElement());
         }));
     });
 
-    describe('::moveActiveItemToPaneAbove(keepOriginal)', function() {
+    describe('::moveActiveItemToPaneAbove(keepOriginal)', function () {
       describe('when there is a row above the focused pane', () =>
-        it('moves the active item up to the adjacent row', function() {
+        it('moves the active item up to the adjacent row', function () {
           const item = document.createElement('div');
           const paneAbove = startingPane.splitUp();
           startingPane.activate();
@@ -411,7 +410,7 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when there are no rows above the focused pane', () =>
-        it('keeps the active pane focused', function() {
+        it('keeps the active pane focused', function () {
           const item = document.createElement('div');
           startingPane.activate();
           startingPane.activateItem(item);
@@ -420,7 +419,7 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when `keepOriginal: true` is passed in the params', () =>
-        it('keeps the item and adds a copy of it to the adjacent pane', function() {
+        it('keeps the item and adds a copy of it to the adjacent pane', function () {
           const itemA = document.createElement('div');
           const itemB = document.createElement('div');
           itemA.copy = () => itemB;
@@ -433,9 +432,9 @@ describe('WorkspaceElement', () => {
         }));
     });
 
-    describe('::moveActiveItemToPaneBelow(keepOriginal)', function() {
+    describe('::moveActiveItemToPaneBelow(keepOriginal)', function () {
       describe('when there is a row below the focused pane', () =>
-        it('moves the active item down to the adjacent row', function() {
+        it('moves the active item down to the adjacent row', function () {
           const item = document.createElement('div');
           const paneBelow = startingPane.splitDown();
           startingPane.activate();
@@ -446,7 +445,7 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when there are no rows below the focused pane', () =>
-        it('keeps the active item in the focused pane', function() {
+        it('keeps the active item in the focused pane', function () {
           const item = document.createElement('div');
           startingPane.activate();
           startingPane.activateItem(item);
@@ -455,7 +454,7 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when `keepOriginal: true` is passed in the params', () =>
-        it('keeps the item and adds a copy of it to the adjacent pane', function() {
+        it('keeps the item and adds a copy of it to the adjacent pane', function () {
           const itemA = document.createElement('div');
           const itemB = document.createElement('div');
           itemA.copy = () => itemB;
@@ -468,9 +467,9 @@ describe('WorkspaceElement', () => {
         }));
     });
 
-    describe('::moveActiveItemToPaneOnLeft(keepOriginal)', function() {
+    describe('::moveActiveItemToPaneOnLeft(keepOriginal)', function () {
       describe('when there is a column to the left of the focused pane', () =>
-        it('moves the active item left to the adjacent column', function() {
+        it('moves the active item left to the adjacent column', function () {
           const item = document.createElement('div');
           const paneOnLeft = startingPane.splitLeft();
           startingPane.activate();
@@ -481,7 +480,7 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when there are no columns to the left of the focused pane', () =>
-        it('keeps the active item in the focused pane', function() {
+        it('keeps the active item in the focused pane', function () {
           const item = document.createElement('div');
           startingPane.activate();
           startingPane.activateItem(item);
@@ -490,7 +489,7 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when `keepOriginal: true` is passed in the params', () =>
-        it('keeps the item and adds a copy of it to the adjacent pane', function() {
+        it('keeps the item and adds a copy of it to the adjacent pane', function () {
           const itemA = document.createElement('div');
           const itemB = document.createElement('div');
           itemA.copy = () => itemB;
@@ -503,9 +502,9 @@ describe('WorkspaceElement', () => {
         }));
     });
 
-    describe('::moveActiveItemToPaneOnRight(keepOriginal)', function() {
+    describe('::moveActiveItemToPaneOnRight(keepOriginal)', function () {
       describe('when there is a column to the right of the focused pane', () =>
-        it('moves the active item right to the adjacent column', function() {
+        it('moves the active item right to the adjacent column', function () {
           const item = document.createElement('div');
           const paneOnRight = startingPane.splitRight();
           startingPane.activate();
@@ -516,7 +515,7 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when there are no columns to the right of the focused pane', () =>
-        it('keeps the active item in the focused pane', function() {
+        it('keeps the active item in the focused pane', function () {
           const item = document.createElement('div');
           startingPane.activate();
           startingPane.activateItem(item);
@@ -525,7 +524,7 @@ describe('WorkspaceElement', () => {
         }));
 
       describe('when `keepOriginal: true` is passed in the params', () =>
-        it('keeps the item and adds a copy of it to the adjacent pane', function() {
+        it('keeps the item and adds a copy of it to the adjacent pane', function () {
           const itemA = document.createElement('div');
           const itemB = document.createElement('div');
           itemA.copy = () => itemB;
@@ -540,7 +539,7 @@ describe('WorkspaceElement', () => {
 
     describe('::moveActiveItemToNearestPaneInDirection(direction, params)', () => {
       describe('when the item is not allowed in nearest pane in the given direction', () => {
-        it('does not move or copy the active item', function() {
+        it('does not move or copy the active item', function () {
           const item = {
             element: document.createElement('div'),
             getAllowedLocations: () => ['left', 'right']
@@ -562,7 +561,7 @@ describe('WorkspaceElement', () => {
       });
 
       describe("when the item doesn't implement a `copy` function", () => {
-        it('does not copy the active item', function() {
+        it('does not copy the active item', function () {
           const item = document.createElement('div');
           const paneBelow = startingPane.splitDown();
           expect(paneBelow.getItems().length).toEqual(0);
@@ -894,6 +893,10 @@ describe('WorkspaceElement', () => {
       editorElement = editor.getElement();
     });
 
+    afterEach(() => {
+      window.devicePixelRatio = originalPixelRatio;
+    });
+
     it("updates the font-size based on the 'editor.fontSize' config value", async () => {
       const initialCharWidth = editor.getDefaultCharWidth();
       expect(getComputedStyle(editorElement).fontSize).toBe(
@@ -930,7 +933,9 @@ describe('WorkspaceElement', () => {
       expect(editor.getDefaultCharWidth()).not.toBe(initialCharWidth);
     });
 
-    it("updates the line-height based on the 'editor.lineHeight' config value", async () => {
+    // These next few specs may trigger the behavior that aims to preserve a
+    // `line-height` value that conforms to the hardware pixel grid.
+    it("updates the line-height based on the 'editor.lineHeight' config value (when the value is a pixel measurement string)", async () => {
       const initialLineHeight = editor.getLineHeightInPixels();
 
       await new Promise((resolve) => {
@@ -941,6 +946,81 @@ describe('WorkspaceElement', () => {
       expect(getComputedStyle(editorElement).lineHeight).toBe(
         atom.config.get('editor.lineHeight')
       );
+      expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
+    });
+
+    it("updates the line-height based on the 'editor.lineHeight' config value (when the value is given as a bare number that needs no rounding)", async () => {
+      jasmine.useRealClock();
+      const initialLineHeight = editor.getLineHeightInPixels();
+      atom.config.set('editor.fontSize', 16);
+      atom.config.set('editor.lineHeight', 1.875);
+      let expectedValue = `${atom.config.get('editor.fontSize') * atom.config.get('editor.lineHeight')}px`;
+      await conditionPromise(() => {
+        return getComputedStyle(editorElement).lineHeight === expectedValue;
+      })
+      expect(getComputedStyle(editorElement).lineHeight).toBe(
+        expectedValue
+      );
+      expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
+    });
+
+    it("adjusts the line-height to a value that is appropriate for the display's pixel density (when the value is given in pixels)", async () => {
+      jasmine.useRealClock();
+      const initialLineHeight = editor.getLineHeightInPixels();
+      // It's weird that browsers expose this as a writable getter, but we'll
+      // reset it to its original value when the tests are done.
+      window.devicePixelRatio = 2;
+      atom.config.set('editor.fontSize', 16);
+      atom.config.set('editor.lineHeight', '27.2px');
+      await conditionPromise(() => {
+        return getComputedStyle(editorElement).lineHeight === '27px'
+      });
+      // The user has explicitly asked for a `line-height` of `27.2px`. When
+      // there are two hardware pixels per software pixel, we can tolerate
+      // values of 27px and 27.5px, but not 27.2px. Hence we round to the
+      // nearest acceptable value.
+      expect(getComputedStyle(editorElement).lineHeight).toBe('27px');
+      expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
+    });
+
+    it("adjusts the line-height to a value that is appropriate for the display's pixel density (when the value is given as a bare number and needs rounding)", async () => {
+      jasmine.useRealClock();
+      const initialLineHeight = editor.getLineHeightInPixels();
+      // It's weird that browsers expose this as a writable getter, but we'll
+      // reset it to its original value when the tests are done.
+      window.devicePixelRatio = 2;
+      atom.config.set('editor.fontSize', 16);
+      atom.config.set('editor.lineHeight', 1.7);
+      await conditionPromise(() => {
+        return getComputedStyle(editorElement).lineHeight === '27px'
+      });
+      // The ratio expressed would result in a line height of 27.2px. When
+      // there are two hardware pixels per software pixel, we can tolerate
+      // values of 27px and 27.5px, but not 27.2px. Hence we round to the
+      // nearest acceptable value.
+      expect(getComputedStyle(editorElement).lineHeight).toBe('27px');
+      expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
+    });
+
+    // This last spec covers all cases where we opt out of adjusting the
+    // `line-height` value. Since it can technically be any valid CSS
+    // measurement, there are limits to our ability to adjust it.
+    it("respects the specified 'editor.lineHeight' when the value is more exotic", async () => {
+      jasmine.useRealClock();
+      const initialLineHeight = editor.getLineHeightInPixels();
+      // It's weird that browsers expose this as a writable getter, but we'll
+      // reset it to its original value when the tests are done.
+      window.devicePixelRatio = 2;
+      atom.config.set('editor.fontSize', 16);
+      atom.config.set('editor.lineHeight', '1.7em');
+      await conditionPromise(() => {
+        return getComputedStyle(editorElement).lineHeight === '27.2px'
+      });
+      // The ratio expressed would result in a line height of 27.2px. Since it
+      // was specified in `em`, we don't try to normalize it to pixels, so
+      // we'll allow the value even though it doesn't conform to the hardware
+      // pixel grid.
+      expect(getComputedStyle(editorElement).lineHeight).toBe('27.2px');
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
     });
 
