@@ -1,4 +1,4 @@
-const { Point, Range } = require('text-buffer');
+const { Point, Range } = require('@pulsar-edit/text-buffer');
 const { Emitter } = require('event-kit');
 const _ = require('underscore-plus');
 const Model = require('./model');
