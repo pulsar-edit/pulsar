@@ -5,6 +5,7 @@ const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
 const TextEditorComponent = require('../src/text-editor-component');
 const TextEditorElement = require('../src/text-editor-element');
 const TextEditor = require('../src/text-editor');
+const ViewRegistry = require('../src/view-registry');
 const TextBuffer = require('@pulsar-edit/text-buffer');
 const { Point } = TextBuffer;
 const fs = require('fs');
@@ -12,6 +13,43 @@ const path = require('path');
 const Grim = require('grim');
 const electron = require('electron');
 const clipboard = electron.clipboard;
+
+// Define a custom scheduler that uses `setTimeout` instead of
+// `requestAnimationFrame` because the latter behaves slowly when the browser
+// does not think the editor is visible.
+class CustomViewRegistry extends ViewRegistry {
+  animationFrameRequest = null;
+
+  clearDocumentRequests() {
+    this.documentReaders = [];
+    this.documentWriters = [];
+    this.nextUpdatePromise = null;
+    this.resolveNextUpdatePromise = null;
+    if (this.animationFrameRequest != null) {
+      clearTimeout(this.animationFrameRequest);
+      this.animationFrameRequest = null;
+    }
+  }
+
+  requestDocumentUpdate() {
+    if (this.animationFrameRequest == null) {
+      this.animationFrameRequest = setTimeout(
+        this.performDocumentUpdate,
+        0
+      );
+    }
+  }
+}
+
+let defaultScheduler = TextEditorComponent.getScheduler();
+let alternativeScheduler = new CustomViewRegistry(defaultScheduler.props);
+function useAlternativeScheduler() {
+  TextEditorComponent.setScheduler(alternativeScheduler);
+}
+
+function restoreDefaultScheduler() {
+  TextEditorComponent.setScheduler(defaultScheduler);
+}
 
 const SAMPLE_TEXT = fs.readFileSync(
   path.join(__dirname, 'fixtures', 'sample.js'),
@@ -34,7 +72,7 @@ let verticalScrollbarWidth, horizontalScrollbarHeight;
 
 describe('TextEditorComponent', () => {
   beforeEach(() => {
-    if(!window.customElements.get('text-editor-component-test-element')) {
+    if (!window.customElements.get('text-editor-component-test-element')) {
       window.customElements.define(
         'text-editor-component-test-element',
         DummyElement
@@ -1147,12 +1185,18 @@ describe('TextEditorComponent', () => {
       let originalTimeout;
 
       beforeEach(() => {
+        if (process.platform === 'linux') {
+          useAlternativeScheduler();
+        }
         originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
       });
 
       afterEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+        if (process.platform === 'linux') {
+          restoreDefaultScheduler();
+        }
       });
 
       it('renders the visible rows correctly after randomly mutating the editor', async () => {
@@ -2256,6 +2300,18 @@ describe('TextEditorComponent', () => {
   });
 
   describe('highlight decorations', () => {
+    beforeEach(() => {
+      if (process.platform === 'linux') {
+        useAlternativeScheduler();
+      }
+    });
+
+    afterEach(() => {
+      if (process.platform === 'linux') {
+        restoreDefaultScheduler();
+      }
+    });
+
     it('renders single-line highlights', async () => {
       const { component, element, editor } = buildComponent();
       const marker = editor.markScreenRange([[1, 2], [1, 10]]);
@@ -2434,6 +2490,7 @@ describe('TextEditorComponent', () => {
     });
 
     it("flashing a highlight decoration doesn't unflash other highlight decorations", async () => {
+      jasmine.useRealClock();
       const { component, element, editor } = buildComponent({
         rowsPerTile: 3,
         height: 200
@@ -2452,7 +2509,7 @@ describe('TextEditorComponent', () => {
       expect(highlights[0].classList.contains('c')).toBe(true);
 
       // Flash another class while the previously-flashed class is still highlighted
-      decoration.flash('d', 100);
+      decoration.flash('d', process.env.CI ? 1500 : 100);
       await component.getNextUpdatePromise();
       expect(highlights[0].classList.contains('c')).toBe(true);
       expect(highlights[0].classList.contains('d')).toBe(true);
@@ -3203,6 +3260,7 @@ describe('TextEditorComponent', () => {
         component,
         3 * component.getLineHeight() + getElementHeight(item3)
       );
+      await wait(100);
       expect(component.getRenderedStartRow()).toBe(3);
       expect(component.getRenderedEndRow()).toBe(12);
       expect(component.getScrollHeight()).toBeNear(
@@ -3597,20 +3655,39 @@ describe('TextEditorComponent', () => {
     });
 
     it('does not attempt to render block decorations located outside the visible range', async () => {
-      const { editor, component } = buildComponent({
+      // Build a text editor with only two rows per tile.
+      const { editor, element, component } = buildComponent({
         autoHeight: false,
         rowsPerTile: 2
       });
+
+      // Set `line-height` to an integer to save us headaches later. (We
+      // believe that Chromium used to guarantee fixed increments of line
+      // height, but doesn't anymore — so we must specify it as an integer
+      // value ourselves if we want the math to be simpler.)
+      element.style.lineHeight = '20px';
+      component.measureCharacterDimensions();
+
+      // Make the editor tall enough to fit only two lines at a time.
       await setEditorHeightInLines(component, 2);
+
       expect(component.getRenderedStartRow()).toBe(0);
+
+      // This suggests one extra tile is rendered below the viewport just out
+      // of view. (But why is this `4` rather than `3`, since we're
+      // zero-indexed? This seems like a mistake in `getRenderedEndRow` logic.)
       expect(component.getRenderedEndRow()).toBe(4);
 
+      // Create a marker spanning the fourth and fifth rows…
       const marker1 = editor.markScreenRange([[3, 0], [5, 0]], {
         reversed: false
       });
+
+      // …and decorate it with a DIV.
       const item1 = document.createElement('div');
       editor.decorateMarker(marker1, { type: 'block', item: item1 });
 
+      // Repeat, but with the marker reversed.
       const marker2 = editor.markScreenRange([[3, 0], [5, 0]], {
         reversed: true
       });
@@ -3618,12 +3695,34 @@ describe('TextEditorComponent', () => {
       editor.decorateMarker(marker2, { type: 'block', item: item2 });
 
       await component.getNextUpdatePromise();
+
+      // We do not expect the first block decoration to be rendered; its head
+      // is outside the renderered range.
       expect(item1.parentElement).toBeNull();
+
+      // But we expect the second decoration to be present because its head
+      // _is_ within the rendered range. (Remember that a “reversed” marker has
+      // its head _before_ its tail, but a non-reversed marker starts with its
+      // tail and ends with its head. Read the text-buffer docs for `Marker`
+      // for further understanding.)
+      //
+      // This comment does not imply understanding of the reasoning behind
+      // this — just that this is the relevant difference in behavior between
+      // the two decorations.
       expect(item2.nextSibling).toBe(lineNodeForScreenRow(component, 3));
 
+      // Scroll down so that the fifth line is the first one visible.
       await setScrollTop(component, 4 * component.getLineHeight());
+
+      // Again, lines 4-5-6-7 (zero-indexed) are understood to be visible, but
+      // `getRenderedEndRow` will report an end row of `8`, which is its own
+      // quirk.
       expect(component.getRenderedStartRow()).toBe(4);
       expect(component.getRenderedEndRow()).toBe(8);
+
+      // Now the logic is reversed; the rendered range includes the head of
+      // the first decoration, but not of the second decoration. Hence the
+      // first decoration is renderered and the second isn't.
       expect(item1.nextSibling).toBe(lineNodeForScreenRow(component, 5));
       expect(item2.parentElement).toBeNull();
     });
@@ -4581,7 +4680,7 @@ describe('TextEditorComponent', () => {
 
         it('expands the last selection on drag', () => {
           atom.config.set('editor.multiCursorOnClick', true);
-          const { component, editor } = buildComponent();
+          const { component, editor } = buildComponent({ updatedSynchronously: true });
           spyOn(component, 'handleMouseDragUntilMouseUp');
 
           component.didMouseDownOnContent(
@@ -4629,6 +4728,11 @@ describe('TextEditorComponent', () => {
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
             ]);
+            expect(
+              clientLeftForCharacter(component, 6, 8)
+            ).not.toEqual(
+              clientLeftForCharacter(component, 6, 0)
+            )
             didDrag(clientPositionForCharacter(component, 6, 8));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
@@ -5627,6 +5731,9 @@ describe('TextEditorComponent', () => {
         rowsPerTile: 1,
         autoHeight: false
       });
+      // Set the initial line height to match that of the editor font size.
+      element.style.lineHeight = Math.ceil(parseFloat(getComputedStyle(element).fontSize)) + 'px'
+      component.measureCharacterDimensions();
       await setEditorHeightInLines(component, 3);
       await setEditorWidthInCharacters(component, 20);
       component.setScrollTopRow(4);
@@ -5646,7 +5753,10 @@ describe('TextEditorComponent', () => {
     });
 
     it('gracefully handles the editor being hidden after a styling change', async (done) => {
+      jasmine.useRealClock();
       jasmine.filterByPlatform({only: ['linux']}, done);
+      // Seems to make this test less flaky.
+      await wait(0);
 
       const { component, element } = buildComponent({
         autoHeight: false
@@ -6010,6 +6120,8 @@ describe('TextEditorComponent', () => {
         rowsPerTile: 3,
         autoHeight: false
       });
+      element.style.lineHeight = '20px';
+      component.measureCharacterDimensions();
       element.style.height =
         4 * component.measurements.lineHeight +
         horizontalScrollbarHeight +
