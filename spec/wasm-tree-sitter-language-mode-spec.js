@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const dedent = require('dedent');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const { Point } = TextBuffer;
 const CSON = require('season');
 const TextEditor = require('../src/text-editor');
