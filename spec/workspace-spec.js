@@ -88,16 +88,26 @@ describe('Workspace', () => {
         let pane4 = null;
         let editor;
 
-        (await atom.workspace.open(null)).setText('An untitled editor.')
+        await atom.workspace
+          .open(null)
+          .then(editor => editor.setText('An untitled editor.'));
 
-        pane2.activateItem((await atom.workspace.open('b')).copy());
+        await atom.workspace
+          .open('b')
+          .then(editor => pane2.activateItem(editor.copy()));
 
-        pane3.activateItem(await atom.workspace.open('../sample.js'));
+        await atom.workspace
+          .open('../sample.js')
+          .then(editor => pane3.activateItem(editor));
+
 
         pane3.activeItem.setCursorScreenPosition([2, 4]);
         pane4 = pane2.splitDown();
 
-        pane4.activateItem(await atom.workspace.open('../sample.txt'));
+        await atom.workspace
+          .open('../sample.txt')
+          .then(editor => pane4.activateItem(editor));
+
 
         pane4.getActiveItem().setCursorScreenPosition([0, 2]);
         pane2.activate();
@@ -1710,6 +1720,7 @@ describe('Workspace', () => {
       workspace.onDidChangeActiveTextEditor(editor => observed.push(editor));
       workspace.closeActivePaneItemOrEmptyPaneOrWindow();
       expect(observed).toEqual([undefined]);
+
     });
   });
 
@@ -1782,12 +1793,9 @@ describe('Workspace', () => {
       'source.coffee',
       'source.js', // Tree-sitter grammars also load
       'source.js',
-      'source.js',
-      'source.js.regexp',
       'source.js.regexp',
       'source.js.regexp',
       'source.js.regexp.replacement',
-      'source.jsdoc',
       'source.jsdoc',
       'source.jsdoc',
       'source.litcoffee',
