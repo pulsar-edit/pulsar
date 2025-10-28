@@ -1,6 +1,6 @@
-// This is loaded by atom-environment.coffee. See
-// https://atom.io/docs/api/latest/Config for more information about config TODO: Link to Pulsar API site when documented
-// schemas.
+// This is loaded by atom-environment.js.
+// See https://atom.io/docs/api/latest/Config for more information about config schemas.
+// TODO: Link to Pulsar API site when documented
 const configSchema = {
   core: {
     type: 'object',
@@ -517,6 +517,13 @@ const configSchema = {
         default: true,
         description:
           'Automatically indent pasted text based on the indentation of the previous line.'
+      },
+      convertLineEndingOnCopy: {
+        type: 'string',
+        default: 'system',
+        enum: ['system', 'off', 'LF', 'CRLF'],
+        description:
+          'Changes how newlines are converted when text is copied. When set to "system", newlines are changed to CRLF on Windows and LF on Unix. When set to "off", newlines are copied as-is.'
       },
       nonWordCharacters: {
         type: 'string',
