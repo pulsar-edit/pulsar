@@ -19,6 +19,8 @@ jobs:
 
     - name: Checkout the latest code
       uses: actions/checkout@v5
+      with:
+        submodules: true
 
     - name: Setup node
       uses: actions/setup-node@v4
