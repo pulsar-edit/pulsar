@@ -796,26 +796,6 @@ class AtomEnvironment {
     return this.setFullScreen(!this.isFullScreen());
   }
 
-  // A proxy to `shell.trashItem` — which ought to work in the renderer, but
-  // suffers from a bug on Windows. We work around it by delegating to the main
-  // process.
-  //
-  // Undocumented for now, but may eventually be an official part of the API
-  // for when community packages need to delete files.
-  trashItem(filePath) {
-    return this.applicationDelegate.trashItem(filePath);
-  }
-
-  // A proxy to `shell.showItemInFolder` — which ought to work in the renderer,
-  // but seems to suffer from a bug on macOS. We work around it by delegating
-  // to the main process.
-  //
-  // Undocumented for now, but may eventually be an official part of the API
-  // for when community packages need to perform this function.
-  showItemInFolder(filePath) {
-    return this.applicationDelegate.showItemInFolder(filePath);
-  }
-
   // Restore the window to its previous dimensions and show it.
   //
   // Restores the full screen and maximized state after the window has resized to
