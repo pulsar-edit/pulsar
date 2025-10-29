@@ -9451,6 +9451,12 @@ superagent@^10.0.0:
     mime "2.6.0"
     qs "^6.11.2"
 
+"superstring@github:pulsar-edit/superstring#de97b496663fce40050bf2d66e1466ccfbd00943":
+  version "2.4.4"
+  resolved "https://codeload.github.com/pulsar-edit/superstring/tar.gz/de97b496663fce40050bf2d66e1466ccfbd00943"
+  dependencies:
+    nan "^2.14.2"
+
 supports-color@6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-6.0.0.tgz#76cfe742cf1f41bb9b1c29ad03068c05b4c0e40a"

@@ -1,7 +1,7 @@
 const { Node, Parser } = require('./web-tree-sitter');
 const TokenIterator = require('./token-iterator');
 const { Point, Range, spliceArray } = require('@pulsar-edit/text-buffer');
-const { Patch } = require('@pulsar-edit/superstring');
+const { Patch } = require('superstring');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const ScopeDescriptor = require('./scope-descriptor');
 const ScopeResolver = require('./scope-resolver');
