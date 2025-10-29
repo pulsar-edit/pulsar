@@ -1365,7 +1365,7 @@
     tar "^6.0.5"
     yargs "^17.0.1"
 
-"@electron/remote@2.1.2", "@electron/remote@^2.1.0":
+"@electron/remote@2.1.2":
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@electron/remote/-/remote-2.1.2.tgz#52a97c8faa5b769155b649ef262f2f8c851776e6"
   integrity sha512-EPwNx+nhdrTBxyCqXt/pftoQg/ybtWDW3DUWHafejvnB1ZGGfMpv6e15D8KeempocjXe78T7WreyGGb3mlZxdA==
@@ -1674,22 +1674,6 @@
     minimatch "^2.0.9"
     split "^1.0.0"
     temp "^0.8.3"
-
-"@pulsar-edit/superstring@^3.0.4":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/superstring/-/superstring-3.0.4.tgz#b6fa89cec8ebdb745c7d18c225b2663f1a6c518e"
-  integrity sha512-2gAZOOMCcwjLmFAojiBwyk/4aoj29jezZ80bH+7axjg8/6lFQk63L0Mu3+/lwSjDYMQ1XU6ebZGhBhHHtFSXYA==
-  dependencies:
-    node-addon-api "^8.5.0"
-
-"@pulsar-edit/whats-my-line@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/whats-my-line/-/whats-my-line-0.3.0.tgz#a87d34c0875dc722c2b0344481acb9c155364dfa"
-  integrity sha512-m1aKppObM53jw9DoCCK3UdqbkABFeOAmJ2WYyiXvmoErTJ0uiPMiIdnnv5vCvalia2IEyDYPNXmQrWCH1A5YPA==
-  dependencies:
-    "@pulsar-edit/superstring" "^3.0.4"
-    dugite "2.5.2"
-    what-the-diff "^0.6.0"
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
@@ -5215,9 +5199,9 @@ github-slugger@^1.1.1:
   resolved "https://registry.yarnpkg.com/github-slugger/-/github-slugger-1.5.0.tgz#17891bbc73232051474d68bd867a34625c955f7d"
   integrity sha512-wIh+gKBI9Nshz2o46B0B3f5k/W+WI9ZAv6y5Dn5WJ5SK1t0TnDimB4WE5rmTD05ZAIn8HALCZVmCsvj0w0v0lw==
 
-"github@https://github.com/pulsar-edit/github#v0.37.0-pretranspiled":
-  version "0.37.0"
-  resolved "https://github.com/pulsar-edit/github#285ec77acd8ae6e50dda5289c8744e4049dc5773"
+"github@https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.20-pretranspiled.tar.gz":
+  version "0.36.20"
+  resolved "https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.20-pretranspiled.tar.gz#1f3edb9383940c72037b35cfa6081d59a160f6b8"
   dependencies:
     "@atom/babel-plugin-chai-assert-async" "1.0.0"
     "@atom/babel7-transpiler" "1.0.0-1"
@@ -5227,8 +5211,6 @@ github-slugger@^1.1.1:
     "@babel/plugin-proposal-object-rest-spread" "7.8.0"
     "@babel/preset-env" "7.12.1"
     "@babel/preset-react" "7.8.0"
-    "@electron/remote" "^2.1.0"
-    "@pulsar-edit/whats-my-line" "0.3.0"
     babel-plugin-relay "5.0.0"
     bintrees "1.0.2"
     bytes "3.1.0"
@@ -5257,6 +5239,7 @@ github-slugger@^1.1.1:
     underscore-plus "1.7.0"
     what-the-diff "0.6.0"
     what-the-status "1.0.3"
+    whats-my-line "https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz"
     yubikiri "2.0.0"
 
 glob-parent@^5.1.2, glob-parent@~5.1.2:
@@ -7457,7 +7440,7 @@ node-abi@3.63.0, node-abi@^2.21.0, node-abi@^3.3.0, node-abi@^3.45.0:
   dependencies:
     semver "^7.3.5"
 
-node-addon-api@*, node-addon-api@^8.5.0:
+node-addon-api@*:
   version "8.5.0"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-8.5.0.tgz#c91b2d7682fa457d2e1c388150f0dff9aafb8f3f"
   integrity sha512-/bRZty2mXUIFY/xU5HLvveNHlswNJej+RnxBjOMkidWfwZzgTbPG1E3K5TOxRLOR+5hX7bSofy8yf1hZevMS8A==
@@ -10194,6 +10177,14 @@ what-the-status@1.0.3:
   integrity sha512-6zNdYtQtHTpLVPomSrr+Eyt5Ci4H40ytwScwp7Moi2iqxztV6+juQV9Orj2szAo0ZrV9tphk6WtL+BY3ukCS/Q==
   dependencies:
     split "^1.0.0"
+
+"whats-my-line@https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz":
+  version "0.2.0"
+  resolved "https://github.com/pulsar-edit/whats-my-line/archive/4029ca9567a0bf0f12843890461fb13e758cfcbf.tar.gz#1a504ee809e9ff86d1109de27c2e94fdf23f37d1"
+  dependencies:
+    dugite "2.5.2"
+    superstring "^2.4.4"
+    what-the-diff "^0.6.0"
 
 whatwg-encoding@^3.1.1:
   version "3.1.1"

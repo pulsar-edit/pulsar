@@ -81,7 +81,7 @@
     "fstream": "1.0.12",
     "fuzzy-finder": "file:packages/fuzzy-finder",
     "git-diff": "file:packages/git-diff",
-    "github": "https://github.com/pulsar-edit/github#v0.37.0-pretranspiled",
+    "github": "https://github.com/pulsar-edit/github/archive/refs/tags/v0.36.20-pretranspiled.tar.gz",
     "go-to-line": "file:packages/go-to-line",
     "grammar-selector": "file:packages/grammar-selector",
     "grim": "2.0.3",
