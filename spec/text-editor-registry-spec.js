@@ -1,6 +1,6 @@
 const TextEditorRegistry = require('../src/text-editor-registry');
 const TextEditor = require('../src/text-editor');
-const TextBuffer = require('@pulsar-edit/text-buffer');
+const TextBuffer = require('text-buffer');
 const { Point, Range } = TextBuffer;
 const dedent = require('dedent');
 const NullGrammar = require('../src/null-grammar');

@@ -1,5 +1,5 @@
 const temp = require('temp').track();
-const TextBuffer = require('@pulsar-edit/text-buffer');
+const TextBuffer = require('text-buffer');
 const Project = require('../src/project');
 const fs = require('fs-plus');
 const path = require('path');

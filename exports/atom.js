@@ -1,4 +1,4 @@
-const TextBuffer = require('@pulsar-edit/text-buffer');
+const TextBuffer = require('text-buffer');
 const { Point, Range } = TextBuffer;
 const { File, Directory } = require('@pulsar-edit/pathwatcher');
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');

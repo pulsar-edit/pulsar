@@ -1,6 +1,6 @@
 const NullGrammar = require('../src/null-grammar');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
-const TextBuffer = require('@pulsar-edit/text-buffer');
+const TextBuffer = require('text-buffer');
 const { Point } = TextBuffer;
 const _ = require('underscore-plus');
 const dedent = require('dedent');

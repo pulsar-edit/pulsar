@@ -7,7 +7,7 @@ const dedent = require('dedent');
 const { clipboard } = require('electron');
 const os = require('os');
 const TextEditor = require('../src/text-editor');
-const TextBuffer = require('@pulsar-edit/text-buffer');
+const TextBuffer = require('text-buffer');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
 const WASMTreeSitterLanguageMode = require('../src/wasm-tree-sitter-language-mode');
 
