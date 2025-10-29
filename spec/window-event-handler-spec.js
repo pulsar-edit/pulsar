@@ -1,4 +1,4 @@
-const KeymapManager = require('@pulsar-edit/atom-keymap');
+const KeymapManager = require('atom-keymap');
 const WindowEventHandler = require('../src/window-event-handler');
 const { conditionPromise } = require('./helpers/async-spec-helpers');
 

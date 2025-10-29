@@ -1,6 +1,6 @@
 const fs = require('fs-plus');
 const path = require('path');
-const KeymapManager = require('@pulsar-edit/atom-keymap');
+const KeymapManager = require('atom-keymap');
 const CSON = require('season');
 
 const buildMetadata = require('../package.json');
