@@ -3,7 +3,7 @@ name: Build Pulsar Binaries
 on:
   push:
     branches:
-      - 'master'
+      - '**'
     tags:
       - '**'
   pull_request:
