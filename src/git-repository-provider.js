@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { Directory } = require('@pulsar-edit/pathwatcher');
+const { Directory } = require('pathwatcher');
 const GitRepository = require('./git-repository');
 
 const GIT_FILE_REGEX = RegExp('^gitdir: (.+)');

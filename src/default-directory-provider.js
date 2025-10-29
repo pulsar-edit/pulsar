@@ -1,4 +1,4 @@
-const {Directory} = require('@pulsar-edit/pathwatcher');
+const {Directory} = require('pathwatcher');
 const fs = require('fs-plus');
 const path = require('path');
 const url = require('url');

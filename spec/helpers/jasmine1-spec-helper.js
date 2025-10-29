@@ -15,7 +15,7 @@ const path = require('path');
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const Grim = require('grim');
-const pathwatcher = require('@pulsar-edit/pathwatcher');
+const pathwatcher = require('pathwatcher');
 const FindParentDir = require('find-parent-dir');
 const {CompositeDisposable} = require('event-kit');
 

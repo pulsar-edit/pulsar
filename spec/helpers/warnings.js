@@ -1,4 +1,4 @@
-const pathwatcher = require("@pulsar-edit/pathwatcher");
+const pathwatcher = require("pathwatcher");
 const _ = require("underscore-plus");
 const Grim = require("grim");
 

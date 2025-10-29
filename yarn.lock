@@ -1650,19 +1650,6 @@
     fs-plus "^3.0.0"
     nan "^2.14.2"
 
-"@pulsar-edit/pathwatcher@^9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/pathwatcher/-/pathwatcher-9.0.2.tgz#6c520011910a0e560a0d4bb88ccc03f8a890bdb6"
-  integrity sha512-5FsBUfUsynrS+0W1OlnGNj29wYzHPNgzr06APTScF/zYjnrz02uYj1edYeZOYiErxeBuVWsecrRYue82Zu42zg==
-  dependencies:
-    async "~0.2.10"
-    emissary "^1.3.2"
-    event-kit "^2.1.0"
-    fs-plus "^3.0.0"
-    grim "^2.0.1"
-    iconv-lite "~0.4.4"
-    underscore-plus "~1.x"
-
 "@pulsar-edit/scandal@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@pulsar-edit/scandal/-/scandal-4.0.0.tgz#0a43a5d3be7fcecd87b010fe1f2cac105dc4d807"
@@ -7937,7 +7924,7 @@ pathval@^1.1.1:
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.1.tgz#8534e77a77ce7ac5a2512ea21e0fdb8fcf6c3d8d"
   integrity sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==
 
-pathwatcher@^8.0.0, pathwatcher@^8.1.0:
+pathwatcher@^8.0.0, pathwatcher@^8.1.0, pathwatcher@^8.1.2:
   version "8.1.2"
   resolved "https://registry.yarnpkg.com/pathwatcher/-/pathwatcher-8.1.2.tgz#86eca6a16493dfb29347b88c91627b45720ab5b9"
   integrity sha512-3izRU4DDQ9qVeASauP4Hlp49OhKPcedRYke9iHa0Jh1I+XlC9wYng/NycHh41k5F8wGndA23YYDCtO3KLAFPMg==

@@ -4,7 +4,7 @@ const Grim = require('grim');
 const dedent = require('dedent');
 const { Language, Parser, Query } = require('./web-tree-sitter');
 const { CompositeDisposable, Emitter } = require('event-kit');
-const { File } = require('@pulsar-edit/pathwatcher');
+const { File } = require('pathwatcher');
 const { normalizeDelimiters } = require('./comment-utils.js');
 
 const parserInitPromise = Parser.init();

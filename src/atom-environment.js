@@ -50,7 +50,7 @@ const UI = require('./ui.js');
 const I18n = require("./i18n.js");
 const packagejson = require("../package.json");
 
-const { closeAllWatchers } = require('@pulsar-edit/pathwatcher');
+const { closeAllWatchers } = require('pathwatcher');
 const stat = util.promisify(fs.stat);
 
 let nextId = 0;
