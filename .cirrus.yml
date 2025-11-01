@@ -56,8 +56,8 @@ env:
 
 arm_linux_task:
   alias: linux
-  only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
-  skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
+#   only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
+#   skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
   arm_container:
     image: node:16-slim
     memory: 8G
@@ -136,10 +136,10 @@ arm_linux_task:
     - ./binaries/*AppImage --appimage-extract
     - export BINARY_NAME='squashfs-root/pulsar'
     - Xvfb :99 & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
-  rolling_upload_script:
-    - cd ./script/rolling-release-scripts
-    - npm install
-    - node ./rolling-release-binary-upload.js cirrus
+#   rolling_upload_script:
+#     - cd ./script/rolling-release-scripts
+#     - npm install
+#     - node ./rolling-release-binary-upload.js cirrus
   always:
     videos_artifacts:
       path: ./tests/videos/**
@@ -306,14 +306,14 @@ silicon_mac_task:
 #       type: text/xml
 #       format: junit
 
-silently_mark_skipped_or_no_scheduled_tasks_builds_as_failed_task:
-  skip_notifications: true
-  only_if: $CIRRUS_CRON == "" && $CIRRUS_TAG == ""
-  ### !!! ^ Don't forget to update this appropriately if our `only_if:` or `skip:` logic changes for the other tasks! !!! ###
-  ### !!! ^ We want this task to run [only] if all other tasks would have skipped. !!! ###
-  container:
-    image: alpine:latest
-    cpu: 1
-  clone_script: exit 0 # Shortest possible script that succeeds. Saves time vs actually cloning. Failing here triggers an automatic re-run, so don't do that!
-  mark_task_as_failed_script: exit 1 # Shortest possible script to mark a build as "failed". This protects CIRRUS_LAST_GREEN_CHANGE from being updated by builds that actually just skipped CI.
-  timeout_in: 6s
+# silently_mark_skipped_or_no_scheduled_tasks_builds_as_failed_task:
+#   skip_notifications: true
+#   only_if: $CIRRUS_CRON == "" && $CIRRUS_TAG == ""
+#   ### !!! ^ Don't forget to update this appropriately if our `only_if:` or `skip:` logic changes for the other tasks! !!! ###
+#   ### !!! ^ We want this task to run [only] if all other tasks would have skipped. !!! ###
+#   container:
+#     image: alpine:latest
+#     cpu: 1
+#   clone_script: exit 0 # Shortest possible script that succeeds. Saves time vs actually cloning. Failing here triggers an automatic re-run, so don't do that!
+#   mark_task_as_failed_script: exit 1 # Shortest possible script to mark a build as "failed". This protects CIRRUS_LAST_GREEN_CHANGE from being updated by builds that actually just skipped CI.
+#   timeout_in: 6s
