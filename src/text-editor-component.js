@@ -1809,7 +1809,7 @@ module.exports = class TextEditorComponent {
     }
     if (!this.scrollLeftPending) {
       scrollLeftChanged = this.setScrollLeft(
-        this.refs.horizontalScrollbar ? this.refs.horizontalScrollbar.element.scrollLeft : 0
+        this.refs.horizontalScrollbar?.element.scrollLeft ?? 0
       );
     }
     if (scrollTopChanged || scrollLeftChanged) this.updateSync();
