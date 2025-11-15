@@ -1,4 +1,5 @@
 /** @babel */
+import path from 'path'
 
 // Displays the readme for a package, if it has one
 // TODO Decide to keep this or current button-to-new-tab view
