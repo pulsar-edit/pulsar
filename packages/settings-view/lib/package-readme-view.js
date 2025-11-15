@@ -3,7 +3,7 @@
 // Displays the readme for a package, if it has one
 // TODO Decide to keep this or current button-to-new-tab view
 export default class PackageReadmeView {
-  constructor (readme, readmeSrc, readmeIsLocal) {
+  constructor (readme, readmeDirectory, readmeIsLocal) {
     this.element = document.createElement('section')
     this.element.classList.add('section')
 
@@ -29,9 +29,9 @@ export default class PackageReadmeView {
     };
 
     if (readmeIsLocal) {
-      markdownOpts.filePath = readmeSrc;
+      markdownOpts.filePath = path.join(readmeDirectory, 'README.md');
     } else {
-      markdownOpts.rootDomain = readmeSrc;
+      markdownOpts.rootDomain = readmeDirectory;
     }
 
     try {
