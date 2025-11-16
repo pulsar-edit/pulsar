@@ -440,6 +440,7 @@
 ; Any other type identifiers; the "Bar" in `const foo: Bar`.
 (type_identifier) @support.storage.other.type._LANG_
 
+
 ; SUPPORT
 ; =======
 
@@ -786,7 +787,53 @@
 (template_substitution
   "${" @punctuation.section.embedded.begin._LANG_
   "}" @punctuation.section.embedded.end._LANG_
-) @meta.embedded.line.interpolation._LANG_
+)
+
+; Scope interpolations with `meta.embedded.line` if they start and end on the
+; same line…
+((template_substitution) @meta.embedded.line.interpolation._LANG_
+  (#is? test.startsOnSameRowAs endPosition))
+
+; …or `meta.embedded.block` if they start and end on different lines.
+((template_substitution) @meta.embedded.block.interpolation._LANG_
+  (#is-not? test.startsOnSameRowAs endPosition))
+
+
+; Template literal types allow you to do string manipulation on values. They're
+; basically strings, so let's highlight them that way.
+;
+; Example:
+;
+; type World = "world";
+; type Greeting = `hello ${World}`;
+(template_literal_type) @string.quoted.backtick._LANG_
+(template_literal_type "`" @punctuation.delimiter.string.begin._LANG_
+  (#is? test.first))
+(template_literal_type "`" @punctuation.delimiter.string.end._LANG_
+  (#is? test.last))
+
+; The `template_type` node is used when there's an interpolation within a
+; template literal type.
+(template_literal_type
+  (template_type
+    "${" @punctuation.section.embedded.begin._LANG_
+    "}" @punctuation.section.embedded.end._LANG_
+  )
+)
+
+; Scope interpolations with `meta.embedded.line` if they start and end on the
+; same line…
+(template_literal_type
+  (template_type) @meta.embedded.line.interpolation._LANG_
+  (#is? test.startsOnSameRowAs endPosition)
+)
+
+; …or `meta.embedded.block` if they start and end on different lines.
+(template_literal_type
+  (template_type) @meta.embedded.block.interpolation._LANG_
+  (#is-not? test.startsOnSameRowAs endPosition)
+)
+
 
 (string
   (escape_sequence) @constant.character.escape._LANG_)
