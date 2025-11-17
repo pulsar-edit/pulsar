@@ -194,8 +194,10 @@ module.exports = class GrammarRegistry {
       getGrammarSelectionContent(buffer)
     );
 
-    // Emit an event whenever a grammar is auto-assigned
-    this.emitter.emit("did-auto-assign-grammar", { grammar: result.grammar, buffer: buffer });
+    // Emit an event whenever a grammar is auto-assigned the default, fallback grammar
+    if (result.grammar.scopeName === "text.plain.null-grammar") {
+      this.emitter.emit("did-assign-default-grammar", { grammar: result.grammar, buffer: buffer });
+    }
 
     this.languageOverridesByBufferId.delete(buffer.id);
     this.grammarScoresByBuffer.set(buffer, result.score);
@@ -546,6 +548,18 @@ module.exports = class GrammarRegistry {
       this.emitter.on('did-update-grammar', callback)
     );
     return disposable;
+  }
+
+  // Extended: Invoke `callback` when a file is assigned the default, fallback grammar.
+  //
+  // * `callback` {Function} that is called with file information.
+  //   * `grammar` The {Grammar}
+  //   * `buffer` The {TextBuffer}
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to cancel the
+  // subscription.
+  onDidAssignDefaultGrammar(callback) {
+    return this.emitter.on("did-assign-default-grammar", callback);
   }
 
   // Experimental: Specify a type of syntax node that may embed other languages.
