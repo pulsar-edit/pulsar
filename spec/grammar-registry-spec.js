@@ -184,7 +184,7 @@ describe('GrammarRegistry', () => {
       );
 
       let callbackFired = false;
-      let callbackDisposable = grammarRegistry.onDidAssignDefaultGrammar(({ grammar, buffer, score }) => {
+      let callbackDisposable = grammarRegistry.onDidAssignDefaultGrammar(({ grammar, buffer }) => {
         callbackFired = true;
       });
       grammarRegistry.maintainLanguageMode(buffer);
