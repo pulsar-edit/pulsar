@@ -1,11 +1,69 @@
 const fs = require('fs');
 const path = require('path');
-const Parser = require('./web-tree-sitter');
+const Grim = require('grim');
+const dedent = require('dedent');
+const { Language, Parser, Query } = require('./web-tree-sitter');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const { File } = require('pathwatcher');
+const { normalizeDelimiters } = require('./comment-utils.js');
 
 const parserInitPromise = Parser.init();
 
+function isPosition(obj) {
+  return ('row' in obj && 'column' in obj);
+}
+
+const ZERO_POINT = Object.freeze({ row: 0, column: 0 });
+
+const QUERY_CAPTURES_DEPRECATION_EXPLANATION = dedent`\
+  The \`captures\` method available on Tree-sitter query objects uses a new
+  function signature; the old signature is deprecated. The new signature is
+  \`(node, options)\`. If you want to limit a query to a specific range,
+  specify \`startPosition\` and \`endPosition\` properties within \`options\`.
+`;
+
+// When `web-tree-sitter` harmonized its API with that of `node-tree-sitter`,
+// some function signatures changed. The most impactful one for us is probably
+// `Query#captures`, since two crucial positional arguments were moved into a
+// trailing options argument.
+//
+// We've changed all of our usages, but it's possible some community packages
+// won't have been able to update yet. We should emit a deprecation message in
+// those cases and restructure the arguments on the fly.
+function wrapQueryCaptures(QueryPrototype) {
+  let originalCaptures = QueryPrototype.captures;
+  // We put `node` into its own argument so that this new function’s `length`
+  // property matches that of the old function. (Both are inaccurate, but they
+  // should nonetheless agree.)
+  QueryPrototype.captures = function captures(node, ...args) {
+    // When do we think a consumer is using the old signature?
+    if (
+      // If there are too many arguments and either the second or third
+      // argument looks like a position…
+      args.length >= 2 && (isPosition(args[0]) || isPosition(args[1])) ||
+      // …or if the second argument looks like a position instead of an options
+      // object.
+      isPosition(args[0])
+    ) {
+      Grim.deprecate(QUERY_CAPTURES_DEPRECATION_EXPLANATION);
+      let startPosition = isPosition(args[0]) ? args[0] : ZERO_POINT;
+      let endPosition = isPosition(args[1]) ? args[1] : args[0];
+      let originalOptions = args[2] ?? {};
+      let newOptions = {
+        ...originalOptions,
+        startPosition,
+        endPosition
+      };
+      return originalCaptures.call(this, node, newOptions);
+    } else {
+      return originalCaptures.call(this, node, ...args);
+    }
+  };
+}
+
+wrapQueryCaptures(Query.prototype);
+
+// Extended: This class holds an instance of a Tree-sitter grammar.
 module.exports = class WASMTreeSitterGrammar {
   constructor(registry, grammarPath, params) {
     this.registry = registry;
@@ -73,48 +131,42 @@ module.exports = class WASMTreeSitterGrammar {
     return id;
   }
 
-  // Retrieve the comment delimiters for this grammar.
+  // Extended: Retrieve all known comment delimiters for this grammar.
   //
-  // Traditionally, grammars specified only the delimiters needed for the
-  // “Toggle Line Comments” command — either a line comment (if it existed) or
-  // a block comment. But other features might want to know _all_ of a
-  // language's possible comment delimiters, so we've devised new config values.
+  // Some grammars may have different delimiters for different parts of a file
+  // (such as JSX within JavaScript). In these cases, you might want to call
+  // {TextEditor::getCommentDelimitersForBufferPosition} with a `{Point}` in the
+  // buffer.
+  //
+  // Returns an {Object} with the following properties:
+  //
+  // * `line`: If present, a {String} representing a line comment delimiter.
+  //   (If `undefined`, there is no known line comment delimiter for the given
+  //   buffer position.)
+  // * `block`: If present, a two-item {Array} containing {String}s
+  //   representing the starting and ending block comment delimiters. (If
+  //   `undefined`, there are no known block comment delimiters for the given
+  //   buffer position.)
+  //
   getCommentDelimiters() {
-    let meta = this.commentMetadata;
-    if (!meta) { return null; }
+    // Prefer the config system. It's a better place for this data to live.
+    let commentDelimiters = atom.config.get(
+      'editor.commentDelimiters',
+      { scope: [this.scopeName] }
+    );
+    if (commentDelimiters) return commentDelimiters;
 
-    let result = {};
-
-    // The new convention is to specify a `line` property and start/end
-    // properties.
-    let { line, block } = this.commentMetadata;
-
-    // Failing that, we can deliver at least a partial result by inspecting the
-    // older convention. If `start` exists but not `end`, we know `start` must
-    // be a line comment delimiter.
-    if (!line && meta.start && !meta.end) {
-      line = meta.start;
-    }
-    // Likewise, if both `start` and `end` exist, we know they must be block
-    // comment delimiters.
-    if (!block && meta.start && meta.end) {
-      block = { start: meta.start, end: meta.end };
+    // Failing that, try to extract useful information from this metadata.
+    if (this.commentMetadata) {
+      return normalizeDelimiters(this.commentMetadata);
     }
 
-    // Strip all whitespace from delimiters. Whatever is consuming them can
-    // decide if it wants whitespace.
-    if (line) {
-      line = line.strip();
-      result.line = line;
-    }
+    // If even that doesn't exist, we can fall back onto the older config
+    // settings.
+    let start = atom.config.get('editor.commentStart', { scope: [this.scope] });
+    let end = atom.config.get('editor.commentEnd', { scope: [this.scope] });
 
-    if (block) {
-      block.start = block.start?.strip();
-      block.end = block.end?.strip();
-      result.block = block;
-    }
-
-    return result;
+    return normalizeDelimiters({ start, end });
   }
 
   classNameForScopeId(id) {
@@ -125,21 +177,27 @@ module.exports = class WASMTreeSitterGrammar {
     return this.scopeNamesById.get(id);
   }
 
-  // Returns the Tree-sitter language instance associated with this grammar
-  // _if_ it has already loaded. Call this only when you can be certain that
-  // it's present.
+  // Extended: Retrieves the Tree-sitter `Language` instance associated with
+  // this grammar _if_ it has already been loaded.
+  //
+  // Language instances cannot be retrieved synchrously, so this will return
+  // `undefined` if the instance has not yet been loaded. In that case, going
+  // async will be unavoidable, and you’ll need to call {::getLanguage}.
   getLanguageSync() {
     return this._language;
   }
 
-  // Returns the Tree-sitter language instance associated with this grammar
-  // once it loads. When the {Promise} returned by this method resolves, the
-  // grammar is ready to perform parsing and to execute query captures.
+  // Extended: Retrieves the Tree-sitter language instance associated with this
+  // grammar.
+  //
+  // Returns a {Promise} that will resolve with a Tree-sitter `Language`
+  // instance. Once it resolves, the grammar is ready to perform parsing and to
+  // execute query captures.
   async getLanguage() {
     await parserInitPromise;
     if (!this._language) {
       try {
-        this._language = await Parser.Language.load(this.treeSitterGrammarPath);
+        this._language = await Language.load(this.treeSitterGrammarPath);
       } catch (err) {
         console.error(`Error loading grammar for ${this.scopeName}; original error follows`);
         throw err;
@@ -180,6 +238,7 @@ module.exports = class WASMTreeSitterGrammar {
     }).then(() => {
       this._queryFilesLoaded = true;
       this._loadQueryFilesPromise = null;
+      this.emitter.emit('did-load-query-files', this);
     });
 
     return this._loadQueryFilesPromise;
@@ -238,17 +297,25 @@ module.exports = class WASMTreeSitterGrammar {
     if (!language) { return null; }
     let query = this.queryCache.get(queryType);
     if (!query) {
-      query = language.query(this[queryType]);
+      query = new Query(language, this[queryType]);
       this.queryCache.set(queryType, query);
     }
     return query;
   }
 
-  // Async, but designed so that multiple near-simultaneous calls to `getQuery`
-  // from multiple buffers will not cause multiple calls to `language.query`,
-  // since it's a major bottleneck. Instead they all receive the same unsettled
-  // promise.
+  // Extended: Given a kind of query, retrieves a Tree-sitter `Query` object
+  // in async fashion.
+  //
+  // * `queryType` A {String} describing the query type: typically one of
+  //     `highlightsQuery`, `foldsQuery`, `tagsQuery`, or `indentsQuery`,
+  //     but could be any other custom type.
+  //
+  // Returns a {Promise} that resolves to a Tree-sitter `Query` object.
   getQuery(queryType) {
+    // Async, but designed so that multiple near-simultaneous calls to
+    // `getQuery` from multiple buffers will not cause multiple calls to
+    // `language.query`, since it's a major bottleneck. Instead they all
+    // receive the same unsettled promise.
     // let inDevMode = atom.inDevMode();
     let query = this.queryCache.get(queryType);
     if (query) { return Promise.resolve(query); }
@@ -261,7 +328,7 @@ module.exports = class WASMTreeSitterGrammar {
         // let timeTag = `${this.scopeName} ${queryType} load time`;
         try {
           // if (inDevMode) { console.time(timeTag); }
-          query = language.query(this[queryType]);
+          query = new Query(language, this[queryType]);
 
           // if (inDevMode) { console.timeEnd(timeTag); }
           this.queryCache.set(queryType, query);
@@ -279,23 +346,33 @@ module.exports = class WASMTreeSitterGrammar {
     return promise;
   }
 
-  // Creates an arbitrary query from this grammar. Package authors and end
-  // users can use queries for whatever purposes they like.
+  // Extended: Creates an arbitrary query from this grammar. Package authors
+  // and end users can use queries for whatever purposes they like.
+  //
+  // * `queryContents` A {String} representing the entire contents of a query
+  //     file. Can contain any number of queries.
+  //
+  // Returns a {Promise} that will resolve to a Tree-sitter `Query` object.
   async createQuery(queryContents) {
     let language = await this.getLanguage();
-    return language.query(queryContents);
+    return new Query(language, queryContents);
   }
 
-  // Creates an arbitrary query from this grammar. Package authors and end
-  // users can use queries for whatever purposes they like.
+  // Extended: Creates an arbitrary query from this grammar. Package authors
+  // and end users can use queries for whatever purposes they like.
   //
   // Synchronous; use only when you can be certain that the tree-sitter
   // language has already loaded.
+  //
+  // * `queryContents` A {String} representing the entire contents of a query
+  //     file. Can contain any number of queries.
+  //
+  // Returns a Tree-sitter `Query` object.
   createQuerySync(queryContents) {
     if (!this._language) {
       throw new Error(`Language not loaded!`);
     }
-    return this._language.query(queryContents);
+    return new Query(this._language, queryContents);
   }
 
   // Used by the specs to override a particular query for testing.
@@ -304,7 +381,7 @@ module.exports = class WASMTreeSitterGrammar {
     this.queryCache.delete(queryType);
     this[queryType] = contents;
     let query = await this.getQuery(queryType);
-    this.emitter.emit('did-change-query-file', { filePath: '', queryType });
+    this.emitter.emit('did-change-query', { filePath: '', queryType });
     return query;
   }
 
@@ -330,38 +407,83 @@ module.exports = class WASMTreeSitterGrammar {
             this.queryCache.delete(queryType);
             return;
           }
-          this.emitter.emit('did-change-query-file', { filePath, queryType });
+          this.emitter.emit('did-change-query', { filePath, queryType });
         });
       }));
     }
   }
 
-  // Calls `callback` when any of this grammar's query files change.
+  // Extended: Calls `callback` when any of this grammar's queries change.
   //
-  // The callback is invoked with an object argument with two keys:
+  // A grammar's queries typically will not change after initial load. When
+  // they do, it may mean:
   //
-  // - `filePath`: The path to the query file on disk.
-  // - `queryType`: The type of query file, as denoted by its configuration key
-  //     in the grammar file. One of `highlightsQuery`, `indentsQuery`,
-  //     `foldsQuery`, or `localsQuery`.
-  onDidChangeQueryFile(callback) {
-    return this.emitter.on('did-change-query-file', callback);
+  // - The user is editing query files in dev mode; Pulsar will automatically
+  //   reload queries in dev mode after changes.
+  // - A community package is altering a query file via an API like
+  //   {::setQueryForTest}.
+  //
+  // * `callback` {Function}
+  //   * `data` {Object}
+  //     * `filePath` {String} The path to the query file on disk.
+  //     * `queryType` {String} The type of query file, as denoted by its
+  //         configuration key in the grammar file. Usually one of
+  //         `highlightsQuery`, `indentsQuery`, `foldsQuery`, or `tagsQuery`.
+  onDidChangeQuery(callback) {
+    return this.emitter.on('did-change-query', callback);
   }
 
-  // TODO: Why is this here?
+  // Extended: Calls `callback` when any of this grammar's queries change.
+  //
+  // Alias of {::onDidChangeQuery}.
+  onDidChangeQueryFile(callback) {
+    return this.onDidChangeQuery(callback);
+  }
+
+  // Extended: Calls `callback` when this grammar first loads its query files.
+  //
+  // Since a grammar may not load immedately on startup, this method makes it
+  // easier to hook into the query life cycle in order to modify or augment a
+  // grammar's default queries.
+  //
+  // * callback A function with the following argument:
+  //   * grammar The {WASMTreeSitterGrammar} whose queries have loaded.
+  onDidLoadQueryFiles(callback) {
+    return this.emitter.on('did-load-query-files', callback);
+  }
+
+  // Extended: Calls `callback` when an injection point is added to this
+  // grammar.
+  //
+  // * callback A function with the following argument:
+  //   * injectionPoint The injection point added to the grammar. See
+  //     {WASMTreeSitterGrammar::addInjectionPoint}.
+  onDidAddInjectionPoint(callback) {
+    return this.emitter.on('did-add-injection-point', callback);
+  }
+
+  // Extended: Calls `callback` when an injection point is removed from this
+  // grammar.
+  //
+  // * callback A function with the following argument:
+  //   * injectionPoint The injection point removed from this grammar. See
+  //     {WASMTreeSitterGrammar::addInjectionPoint}.
+  onDidRemoveInjectionPoint(callback) {
+    return this.emitter.on('did-remove-injection-point', callback);
+  }
+
   activate() {
     this.registration = this.registry.addGrammar(this);
   }
 
-  // TODO: Why is this here?
   deactivate() {
     this.registration?.dispose();
     this.subscriptions?.dispose();
     this.queryCache.clear();
   }
 
-  // Define a set of rules for when this grammar should delegate to a different
-  // grammar for certain regions of a buffer. Examples:
+  // Extended: Define a set of rules for when this grammar should delegate to a
+  // different grammar for certain regions of a buffer. Examples:
   //
   // * embedding one language inside another (e.g., JavaScript in HTML)
   // * tokenizing certain structures with greater detail (e.g., regular
@@ -370,56 +492,61 @@ module.exports = class WASMTreeSitterGrammar {
   //   comments in JavaScript)
   //
   // This differs from TextMate-style injections, which operate at the scope
-  // level and are currently incompatible with tree-sitter grammars.
+  // level and are currently incompatible with Tree-sitter grammars.
   //
-  // Expects an object with these keys:
+  // You should typically not call this method directly; instead, call
+  // {GrammarRegistry::addInjectionPoint} and pass a given grammar’s root
+  // language scope as the first argument.
   //
-  // * `type` (string): The type of node to inject into.
-  // * `language` (function): Should return a string describing the language
-  //   that should inject into this area. Grammars that can inject into others
-  //   will define an `injectionRegex` property that will be tested against
-  //   this value; the longest match will win.
-  //   The function receives the node itself as an argument, so you can decide
-  //   the language based on the content of the node, or return `undefined` if
-  //   an injection should not take place.
-  // * `content` (function): Receives the matching node and should return the
-  //   node that will actually be injected into. Usually this will be the same
-  //   node that was given, but could also be a specific child or descendant of
-  //   that node, or potentially any other node in the tree.
+  // NOTE: Packages will call {::addInjectionPoint} with a given scope name,
+  // and that call will be delegated to any Tree-sitter grammars that match
+  // that scope name, whether they're legacy Tree-sitter or modern Tree-sitter.
+  // But modern Tree-sitter grammars cannot be injected into legacy Tree-sitter
+  // grammars, and vice versa.
   //
-  // Understands the following optional keys:
-  //
-  // * `includeChildren` (boolean): Whether the injection range should include
-  //   the ranges of this node's children. Defaults to `false`, meaning that
-  //   the range of each of this node's children will be "subtracted" from the
-  //   injection range, and the remainder will be parsed as if those ranges of
-  //   the buffer do not exist.
-  // * `includeAdjacentWhitespace` (boolean): Whether the injection range
-  //   should include whitespace that occurs between content nodes. Defaults to
-  //   `false`. When `true`, if two injection ranges are separated from one
-  //   another by only whitespace, that whitespace will be added to the
-  //   injection range, and the ranges will be consolidated.
-  // * `newlinesBetween` (boolean): Whether the injection range should include
-  //   any newline characters that may exist in between injection ranges.
-  //   Defaults to `false`. Grammars like ERB and EJS need this so that they do
-  //   not interpret two different embedded code sections on different lines as
-  //   occurring on the same line.
-  // * `coverShallowerScopes` (boolean): Whether the injection should prevent
-  //   the parent grammar (and any of its ancestors) from applying scope
-  //   boundaries within its injection range(s). Defalts to `false`.
-  // * `languageScope` (string | function | null): The base language scope that
-  //   should be used by this injection. Defaults to the grammar's own
-  //   `scopeName` property. Set this to a string to override the default scope
-  //   name, or `null` to omit a base scope name altogether. Set this to a
-  //   function if the scope name to be applied varies based on the grammar;
-  //   the function will be called with a grammar instance as its only
-  //   argument.
-  //
-  // NOTE: Packages will call `atom.grammars.addInjectionPoint` with a given
-  // scope name, and that call will be delegated to any tree-sitter grammars
-  // that match that scope name, whether they're legacy-tree-sitter or
-  // modern-tree-sitter. But modern-tree-sitter grammars cannot be injected
-  // into by legacy-tree-sitter-grammars, and vice versa.
+  // * `options` The options for the injection point:
+  //   * `type` A {String} describing type of node to inject into.
+  //   * `language` A {Function} that should return a string describing the
+  //     language that should inject into this area. The string should be a
+  //     short, unambiguous description of the language; it will be tested
+  //     against other grammars’ `injectionRegex` properties. Receives one
+  //     parameter:
+  //     * `node` A Tree-sitter node.
+  //   * `content` A {Function} that should return the node (or nodes) that
+  //     will actually be injected into. Usually this will be the same node
+  //     that was given, but could also be a specific child or descendant of
+  //     that node.
+  //   * `includeChildren` (optional) {Boolean} controlling whether the
+  //     injection range should include the ranges of the content node’s
+  //     children. Defaults to `false`, meaning that the range of each of this
+  //     node's children will be "subtracted" from the injection range, and the
+  //     remainder will be parsed as if those ranges of the buffer do not
+  //     exist.
+  //   * `includeAdjacentWhitespace` (optional) {Boolean} controlling whether
+  //     the injection range should include whitespace that occurs between
+  //     content nodes. Defaults to `false`. When `true`, if two injection
+  //     ranges are separated from one another by only whitespace, that
+  //     whitespace will be added to the injection range, and the ranges will
+  //     be consolidated.
+  //   * `newlinesBetween` (optional) {Boolean} controlling whether the
+  //     injection range should include any newline characters that may exist
+  //     in between injection ranges. Defaults to `false`. Grammars like ERB
+  //     and EJS need this so that they do not interpret two different
+  //     embedded code sections on different lines as occurring on the same
+  //     line.
+  //   * `coverShallowerScopes` (optional) {Boolean} controlling whether the
+  //     injection should prevent the parent grammar (and any of its
+  //     ancestors) from applying scope boundaries within its injection
+  //     range(s). Defalts to `false`.
+  //   * `languageScope` (optional) A value that determines what scope, if
+  //     any, is added to the injection as its “base” scope name. Can be a
+  //     {String}, {null}, or a {Function} that returns either of these values.
+  //     The base language scope that should be used by this injection.
+  //     Defaults to the grammar's own `scopeName` property. Set this to a
+  //     string to override the default scope name, or `null` to omit a base
+  //     scope name altogether. Set this to a function if the scope name to be
+  //     applied varies based on the grammar; the function will be called with
+  //     a grammar instance as its only argument.
   //
   addInjectionPoint(injectionPoint) {
     let { type } = injectionPoint;
@@ -428,6 +555,7 @@ module.exports = class WASMTreeSitterGrammar {
       injectionPoints = this.injectionPointsByType[type] = [];
     }
     injectionPoints.push(injectionPoint);
+    this.emitter.emit('did-add-injection-point', injectionPoint);
   }
 
   removeInjectionPoint(injectionPoint) {
@@ -439,6 +567,7 @@ module.exports = class WASMTreeSitterGrammar {
         delete this.injectionPointsByType[injectionPoint.type];
       }
     }
+    this.emitter.emit('did-remove-injection-point', injectionPoint);
   }
 
   inspect() {
@@ -449,15 +578,15 @@ module.exports = class WASMTreeSitterGrammar {
   Section - Backward compatibility shims
   */
   /* eslint-disable no-unused-vars */
-  onDidUpdate(callback) {
+  onDidUpdate(_callback) {
     // do nothing
   }
 
-  tokenizeLines(text, compatibilityMode = true) {
+  tokenizeLines(text, _compatibilityMode = true) {
     return text.split('\n').map(line => this.tokenizeLine(line, null, false));
   }
 
-  tokenizeLine(line, ruleStack, firstLine) {
+  tokenizeLine(line, _ruleStack, _firstLine) {
     return {
       value: line,
       scopes: [this.scopeName]

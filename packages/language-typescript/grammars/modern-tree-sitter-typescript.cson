@@ -3,7 +3,7 @@ scopeName: 'source.ts'
 type: 'modern-tree-sitter'
 parser: 'tree-sitter-typescript/typescript'
 
-fileTypes: ['ts']
+fileTypes: ['ts', 'cts', 'mts']
 
 injectionRegex: '^(typescript|TYPESCRIPT|ts|TS)$'
 
@@ -11,6 +11,7 @@ comments:
   start: '// '
 
 treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-typescript#v0.23.0'
   languageSegment: 'ts'
   grammar: 'tree-sitter-typescript/tree-sitter-typescript.wasm'
   highlightsQuery: 'common/highlights.scm'

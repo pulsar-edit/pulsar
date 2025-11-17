@@ -196,6 +196,11 @@ class ScopeResolver {
       ('highlight.invalidateOnChange' in capture.setProperties);
   }
 
+  shouldInvalidateFoldOnChange(capture) {
+    return capture.setProperties &&
+      ('fold.invalidateOnChange' in capture.setProperties);
+  }
+
   // We want to index scope data on buffer position, but each `Point` (or
   // ad-hoc point object) is a different object. We could normalize them to a
   // string and use the string as the map key, but we'd have to convert them
@@ -499,9 +504,25 @@ class ScopeResolver {
       return false;
     }
 
+    // We should not store any boundaries for an empty capture — one whose
+    // starting and ending positions are the same. This would not do the right
+    // thing anyway; at a given position, we close scopes _before_ opening
+    // them, so this would just create a scope that would incorrectly never get
+    // closed.
+    //
+    // But some consumers use this method to test whether a capture is _valid_,
+    // and do not care about its impact on the set of boundaries. We are happy
+    // to return a truthy range to indicate that it's otherwise valid; but they
+    // can discern for themselves that this will not result in any new
+    // boundaries, since the range we return is self-evidently empty.
+    //
+    // Or, for short: empty ranges “pass” this test, but are otherwise silently
+    // ignored.
+    let isEmpty = comparePoints(range.startPosition, range.endPosition) === 0;
+
     let id = this.idForScope(
-        name,
-        node.childCount === 0 ? node.text : undefined,
+      name,
+      node.childCount === 0 ? node.text : undefined,
     );
 
     let {
@@ -509,8 +530,10 @@ class ScopeResolver {
       endPosition: end
     } = range;
 
-    this.setBoundary(start, id, 'open');
-    this.setBoundary(end, id, 'close');
+    if (!isEmpty) {
+      this.setBoundary(start, id, 'open');
+      this.setBoundary(end, id, 'close');
+    }
 
     return range;
   }
@@ -636,7 +659,7 @@ ScopeResolver.TESTS = {
 
   // Passes only if the node contains any descendant ERROR nodes.
   hasError(node) {
-    return node.hasError();
+    return node.hasError;
   },
 
   // Passes when the node's tree belongs to an injection layer, rather than the
@@ -740,6 +763,32 @@ ScopeResolver.TESTS = {
     return false;
   },
 
+  // Passes if this node's parent is of the given type(s).
+  //
+  // Only rarely needed, but may be useful when dealing with ERROR nodes.
+  childOfType(node, type) {
+    if (!node.parent) return false;
+    let multiple = type.includes(' ');
+    let target = multiple ? type.split(/\s+/) : type;
+    return multiple ? target.includes(node.parent.type) : node.parent.type === type;
+  },
+
+  // Takes at least two node types (separated by spaces) and starts traversing
+  // up the node's parent chain. Passes if the first node type is encountered
+  // before any of the rest; fails if any of the rest are reached before the
+  // first.
+  ancestorTypeNearerThan(node, types) {
+    let [target, ...rejected] = types.split(/\s+/);
+    rejected = new Set(rejected)
+    let current = node;
+    while (current.parent) {
+      current = current.parent;
+      if (rejected.has(current.type)) { return false; }
+      if (target === current.type) { return true; }
+    }
+    return false;
+  },
+
   // Passes if this node has at least one descendant of the given type(s).
   ancestorOfType(node, type) {
     let target = type.includes(' ') ? type.split(/\s+/) : type;
@@ -747,9 +796,21 @@ ScopeResolver.TESTS = {
     return descendants.length > 0;
   },
 
+  // Passes if this node has at least one child of the given type(s).
+  //
+  // Only rarely needed, but may be useful when dealing with ERROR nodes.
+  parentOfType(node, type) {
+    if (node.childCount === 0) return false;
+    let multiple = type.includes(' ');
+    let target = multiple ? type.split(/\s+/) : type;
+    return node.children.some(c => {
+      return multiple ? target.includes(c.type) : c.type === target;
+    });
+  },
+
   // Passes if this range (after adjustments) has previously had data stored at
   // the given key.
-  rangeWithData(node, rawValue, existingData) {
+  rangeWithData(_node, rawValue, existingData) {
     if (existingData === undefined) { return false; }
     let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
 
@@ -763,7 +824,7 @@ ScopeResolver.TESTS = {
 
   // Passes if one of this node's ancestors has stored data at the given key
   // for its inherent range (ignoring adjustments).
-  descendantOfNodeWithData(node, rawValue, existingData, instance) {
+  descendantOfNodeWithData(node, rawValue, _existingData, instance) {
     let current = node;
     let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
 
@@ -784,6 +845,7 @@ ScopeResolver.TESTS = {
   // position. Accepts a node position descriptor.
   startsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
+    if (!otherNodePosition) return false
     return otherNodePosition.row === node.startPosition.row;
   },
 
@@ -791,13 +853,14 @@ ScopeResolver.TESTS = {
   // position. Accepts a node position descriptor.
   endsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
+    if (!otherNodePosition) return false
     return otherNodePosition.row === node.endPosition.row;
   },
 
   // Passes only when a given config option is present and truthy. Accepts
   // either (a) a configuration key or (b) a configuration key and value
   // separated by a space.
-  config(node, rawValue, existingData, instance) {
+  config(_node, rawValue, _existingData, instance) {
     let [key, value] = interpretPossibleKeyValuePair(rawValue, true);
 
     // Invalid predicates should be ignored.

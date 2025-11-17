@@ -12,13 +12,16 @@ jobs:
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
+    - name: Install build dependencies
+      run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbfile-dev pkg-config libsecret-1-dev libncursesw5-dev libgdbm-dev libc6-dev libffi-dev
+
     - name: Checkout the latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     - name: Setup node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
         node-version: 16
 
@@ -42,14 +45,14 @@ jobs:
 
     - name: Cache pulsar
       id: cache-pulsar
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: pulsar.deb
         key: pulsar-${{ github.sha }}
 
     - name: Cache dependencies
       id: cache-dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           node_modules
@@ -59,7 +62,7 @@ jobs:
   test:
     name: Package
     needs: setup
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -163,15 +166,15 @@ jobs:
 
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
     - name: Setup NodeJS
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
         node-version: 16
 
     - name: Restore dependencies from Cache
       id: restore-dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           node_modules
@@ -188,17 +191,16 @@ jobs:
 
     - name: Restore pulsar from Cache
       id: restore-pulsar
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: pulsar.deb
         key: pulsar-${{ github.sha }}
 
     - name: Install Pulsar
-      run: sudo dpkg -i pulsar.deb && sudo apt-get -f install -y
+      run: sudo apt-get update && sudo apt-get install ./pulsar.deb
 
     - name: Install xvfb
       run: sudo apt-get install -y xvfb
 
     - name: Run ${{ matrix.package }} Tests
       run: Xvfb :1 & cd node_modules/${{ matrix.package }} && if test -d spec; then DISPLAY=:1 pulsar --test spec; fi
-        # run: node -e "require('./script/run-package-tests')(/${{ matrix.package }}/)"

@@ -37,13 +37,13 @@
 
 (call
   function: (identifier) @support.type.constructor.python
-  (#match? @support.type.constructor.python "^[A-Z][a-z_]+")
+  (#match? @support.type.constructor.python "^[A-Z][A-Za-z_]+")
   (#set! capture.final true))
 
 (call
   function: (attribute
     attribute: (identifier) @support.type.constructor.python)
-    (#match? @support.type.constructor.python "^[A-Z][a-z_]+")
+    (#match? @support.type.constructor.python "^[A-Z][A-Za-z_]+")
     (#set! capture.final true))
 
 (call
@@ -96,7 +96,7 @@
 ; Lambdas
 ; -------
 
-(lambda ":") @punctuation.definition.function.lambda.colon.python
+(lambda ":" @punctuation.definition.function.lambda.colon.python)
 
 
 ; Function calls
@@ -274,6 +274,8 @@
   "try"
 ] @keyword.control.exception._TYPE_.python
 
+("except*" @keyword.control.exception.group-clause.python)
+
 [
   "global"
   "nonlocal"
@@ -307,6 +309,14 @@
   (list_splat_pattern
     (identifier) @variable.parameter.function.python))
 
+(parameters
+  (dictionary_splat_pattern
+    (identifier) @variable.parameter.function.python))
+
+
+; The "foo" in `except TypeError as foo:`.
+(as_pattern_target
+  (identifier) @variable.other.exception.python)
 
 ; `self` and `cls` are just conventions, but they are _strong_ conventions.
 ((identifier) @variable.language.self.python
@@ -337,6 +347,10 @@
   (list_splat_pattern
     (identifier) @variable.parameter.function.lambda.python))
 
+(lambda_parameters
+  (dictionary_splat_pattern
+    (identifier) @variable.parameter.function.lambda.python))
+
 (assignment
   left: (identifier) @variable.other.assignment.python)
 
@@ -349,6 +363,9 @@
 ; =========
 
 (list_splat_pattern "*" @keyword.operator.splat.python
+  (#set! capture.final true))
+
+(dictionary_splat_pattern "**" @keyword.operator.splat.python
   (#set! capture.final true))
 
 "=" @keyword.operator.assignment.python
@@ -432,12 +449,19 @@
 
 (dictionary (pair ":" @puncutation.separator.key-value.python))
 
+(typed_parameter ":" @punctuation.separator.type-annotation.python)
+(typed_default_parameter ":" @punctuation.separator.type-annotation.python)
+
 (parameters
   "(" @punctuation.definition.parameters.begin.bracket.round.python
   ")" @punctuation.definition.parameters.end.bracket.round.python
   (#set! capture.final true))
 
 (parameters
+  "," @punctuation.separator.parameters.comma.python
+  (#set! capture.final true))
+
+(lambda_parameters
   "," @punctuation.separator.parameters.comma.python
   (#set! capture.final true))
 
@@ -469,3 +493,20 @@
 (dictionary
   "," @punctuation.separator.dictionary.comma.python
   (#set! capture.final true))
+
+; MISC
+; ====
+
+(parameters) @meta.function.parameters.python
+
+(
+  (argument_list) @meta.function-call.arguments.python
+  (#set! adjust.offsetStart 1)
+  (#set! adjust.offsetEnd -1)
+)
+
+(lambda) @meta.function.inline.python
+
+(
+  (lambda_parameters) @meta.function.inline.parameters.python
+)

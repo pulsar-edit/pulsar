@@ -29,7 +29,23 @@ class MoveDialog extends Dialog {
   onConfirm(newPath) {
     newPath = newPath.replace(/\s+$/, ''); // Remove trailing whitespace
     if (!path.isAbsolute(newPath)) {
-      const [rootPath] = Array.from(atom.project.relativizePath(this.initialPath));
+      let [rootPath] = Array.from(atom.project.relativizePath(this.initialPath));
+      if (!rootPath) {
+        // This path was never in the project in the first place. But we've
+        // been given a project-relative URL, so we should move it into the
+        // project and its new absolute path should start with the root path of
+        // this project.
+        let projectPaths = atom.project.getPaths();
+        if (projectPaths.length === 1) {
+          rootPath = projectPaths[0];
+        } else {
+          // But if there are _multiple_ root paths in this project, we do not
+          // have a good way of sensing which root path relative to which this
+          // file should be placed.
+          this.showError(`Cannot move '${newPath}' into the project via a relative path because there is more than one project root. Please provide an absolute path.`);
+          return;
+        }
+      }
       newPath = path.join(rootPath, newPath);
       if (!newPath) { return; }
     }
@@ -51,6 +67,7 @@ class MoveDialog extends Dialog {
       if (!fs.existsSync(directoryPath)) { fs.makeTreeSync(directoryPath); }
       fs.moveSync(this.initialPath, newPath);
       this.onMove?.({initialPath: this.initialPath, newPath});
+      // eslint-disable-next-line no-cond-assign
       if (repo = repoForPath(newPath)) {
         repo.getPathStatus(this.initialPath);
         repo.getPathStatus(newPath);

@@ -7,6 +7,9 @@
 </dd>
 <dt><a href="#Clipboard">Clipboard</a></dt>
 <dd></dd>
+<dt><a href="#SomeClass">SomeClass</a> ⇐ <code>AnotherClass</code></dt>
+<dd><p>Does something very important.</p>
+</dd>
 <dt><a href="#Container">Container</a></dt>
 <dd><p>A container capture. When another capture&#39;s node is contained by the
 definition capture&#39;s node, it gets added to this instance.</p>
@@ -31,10 +34,10 @@ giving it full control over the <code>SelectListView</code> used to show results
 <dl>
 <dt><a href="#etch">etch</a></dt>
 <dd></dd>
-<dt><a href="#css">css</a></dt>
+<dt><a href="#downloadGitRepo">downloadGitRepo</a></dt>
 <dd><p>This file will manage the updating of <code>autocomplete-css</code> <code>completions.json</code>.
   We will mainly utilize <code>@webref/css</code>.listAll() function that returns a full CSS
-  list of all properties seperated by their spec shortname. An example
+  list of all properties separated by their spec shortname. An example
   of this format is defined below for ease of future modifications.</p>
 <p>  Some important notes about the data contained here:
     - Often times the <code>value</code> within the <code>property</code> will be in the following format:
@@ -48,7 +51,7 @@ giving it full control over the <code>SelectListView</code> used to show results
       So this should be handled by the same parser.
     - Additionally an important note is that nowhere in this data do we get any kind
       of description about the data that could lend a hand in being documentation.
-      So the documentation must be gathered seperatly. Likely the best way to collect
+      So the documentation must be gathered separately. Likely the best way to collect
       our documentation data is via <code>mdn/content</code>.
       Within <code>content/files/en-us/web/css</code> is a directory of folders titled
       by the name of properties.</p>
@@ -193,7 +196,7 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dt><a href="#renderMarkdown">renderMarkdown(content, givenOpts)</a> ⇒ <code>string</code></dt>
 <dd><p>Takes a Markdown document and renders it as HTML.</p>
 </dd>
-<dt><a href="#beforeEach">beforeEach()</a></dt>
+<dt><a href="#conditionPromise">conditionPromise()</a></dt>
 <dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
@@ -394,6 +397,13 @@ atom.clipboard.write('hello');
 
 console.log(atom.clipboard.read());
 ```
+<a name="SomeClass"></a>
+
+## SomeClass ⇐ <code>AnotherClass</code>
+Does something very important.
+
+**Kind**: global class  
+**Extends**: <code>AnotherClass</code>  
 <a name="Container"></a>
 
 ## Container
@@ -430,12 +440,12 @@ giving it full control over the `SelectListView` used to show results.
 ## etch
 **Kind**: global constant  
 **Jsx**: etch.dom  
-<a name="css"></a>
+<a name="downloadGitRepo"></a>
 
-## css
+## downloadGitRepo
 This file will manage the updating of `autocomplete-css` `completions.json`.
   We will mainly utilize `@webref/css`.listAll() function that returns a full CSS
-  list of all properties seperated by their spec shortname. An example
+  list of all properties separated by their spec shortname. An example
   of this format is defined below for ease of future modifications.
 
   Some important notes about the data contained here:
@@ -450,7 +460,7 @@ This file will manage the updating of `autocomplete-css` `completions.json`.
       So this should be handled by the same parser.
     - Additionally an important note is that nowhere in this data do we get any kind
       of description about the data that could lend a hand in being documentation.
-      So the documentation must be gathered seperatly. Likely the best way to collect
+      So the documentation must be gathered separately. Likely the best way to collect
       our documentation data is via `mdn/content`.
       Within `content/files/en-us/web/css` is a directory of folders titled
       by the name of properties.
@@ -621,9 +631,9 @@ This file aims to run some short simple tests against `update.js`. Focusing
 ## path
 **Kind**: global constant  
 **Babel**:   
-<a name="beforeEach"></a>
+<a name="conditionPromise"></a>
 
-## beforeEach()
+## conditionPromise()
 **Kind**: global function  
 **Babel**:   
 <a name="beforeEach"></a>

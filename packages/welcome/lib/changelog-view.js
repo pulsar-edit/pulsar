@@ -50,25 +50,19 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Enabled Modern Tree-sitter Grammars by default
+                <code>autocomplete-plus</code> can now make other text edits to the buffer when a suggestion is accepted - for instance, adding an <code>import</code> for that suggestion.
               </li>
               <li>
-                Added a modern Tree-sitter grammar for PHP.
+                Experimental localization support is now being added into the editor, allowing the editor, core packages and even community packages to localize their interface for any language.
               </li>
               <li>
-                Fix a measurement issue that was causing visual glitches in the `github` package's diff views.
+                <code>autocomplete-css</code> has gotten significantly updated completions.
               </li>
               <li>
-                Enabled the core `symbols-view` package to accept symbols from a number of sources, including Tree-sitter grammars and IDE packages.
+                Various documentation and UI links updated after website update.
               </li>
               <li>
-                Switch default to false for converting ASCII emoticons to emoji when rendering Markdown.
-              </li>
-              <li>
-                Fix certain find-and-replace scenarios when the "Preserve Case During Replace" setting is enabled.
-              </li>
-              <li>
-                Fix an issue in `symbols-view` when returning from visiting a symbol declaration.
+                Changed some returns in a backwards compatible way to ensure the community package <code>emmet</code> will work again.
               </li>
             </ul>
 

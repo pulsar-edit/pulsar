@@ -3,6 +3,7 @@ const url = require('url');
 const path = require('path');
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
 const fs = require('fs-plus');
+const { Minimatch } = require('minimatch');
 const { Directory } = require('pathwatcher');
 const Grim = require('grim');
 const DefaultDirectorySearcher = require('./default-directory-searcher');
@@ -16,6 +17,30 @@ const PanelContainer = require('./panel-container');
 const Task = require('./task');
 const WorkspaceCenter = require('./workspace-center');
 const { createWorkspaceElement } = require('./workspace-element');
+
+// Given a single glob pattern matcher, test it against a relativized path
+// within the project. Even if this path itself doesn't match the glob, it's
+// suitable for inclusion in a search if one of its ancestor folders matches
+// the glob.
+//
+// We could monkey with the glob syntax in order to pull that off, but we'd
+// probably screw it up in some cases. It's easier to just traverse upward
+// until we hit the top of the project.
+function filePathMatchesGlob(filePath, matcher) {
+  // When we call `path.dirname` on a path like `foo`, it'll return `.`. That's
+  // when we should stop because there's no more upward traversal to be done.
+  while (filePath && filePath !== '.') {
+    if (matcher.match(filePath)) {
+      // We created these matchers with `flipNegate` because it does the right
+      // thing when faced with this strange glob-matching algorithm. But that
+      // means we need to manually check the `negate` property at the end and
+      // flip the result if it's `true`.
+      return matcher.negate ? false : true;
+    }
+    filePath = path.dirname(filePath);
+  }
+  return matcher.negate ? true : false;
+}
 
 const STOPPED_CHANGING_ACTIVE_PANE_ITEM_DELAY = 100;
 const ALL_LOCATIONS = ['center', 'left', 'right', 'bottom'];
@@ -202,7 +227,9 @@ module.exports = class Workspace extends Model {
     this.textEditorRegistry = params.textEditorRegistry;
     this.styleManager = params.styleManager;
     this.draggingItem = false;
-    this.itemLocationStore = new StateStore('AtomPreviousItemLocations', 1);
+    this.itemLocationStore = new StateStore('AtomPreviousItemLocations', 1, {
+      config: this.config
+    });
 
     this.emitter = new Emitter();
     this.openers = [];
@@ -373,9 +400,11 @@ module.exports = class Workspace extends Model {
     this.consumeServices(this.packageManager);
   }
 
-  initialize() {
+  initialize({ configDirPath }) {
     // we set originalFontSize to avoid breaking packages that might have relied on it
     this.originalFontSize = this.config.get('defaultFontSize');
+
+    this.itemLocationStore.initialize({ configDirPath });
 
     this.project.onDidChangePaths(this.updateWindowTitle);
     this.subscribeToAddedItems();
@@ -2125,7 +2154,7 @@ module.exports = class Workspace extends Model {
       const onPathsSearchedOption = options.onPathsSearched;
       let totalNumberOfPathsSearched = 0;
       const numberOfPathsSearchedForSearcher = new Map();
-      onPathsSearched = function(searcher, numberOfPathsSearched) {
+      onPathsSearched = function (searcher, numberOfPathsSearched) {
         const oldValue = numberOfPathsSearchedForSearcher.get(searcher);
         if (oldValue) {
           totalNumberOfPathsSearched -= oldValue;
@@ -2135,7 +2164,7 @@ module.exports = class Workspace extends Model {
         return onPathsSearchedOption(totalNumberOfPathsSearched);
       };
     } else {
-      onPathsSearched = function() {};
+      onPathsSearched = function () {};
     }
 
     // Kick off all of the searches and unify them into one Promise.
@@ -2171,17 +2200,30 @@ module.exports = class Workspace extends Model {
     });
     const searchPromise = Promise.all(allSearches);
 
+    let matchers = options.paths ?
+      options.paths.map((inclusion) => new Minimatch(inclusion, { flipNegate: true })) :
+      null;
+
+    // Let's consider the open buffers.
     for (let buffer of this.project.getBuffers()) {
-      if (buffer.isModified()) {
-        const filePath = buffer.getPath();
-        if (!this.project.contains(filePath)) {
-          continue;
-        }
-        var matches = [];
-        buffer.scan(regex, match => matches.push(match));
-        if (matches.length > 0) {
-          iterator({ filePath, matches });
-        }
+      // We only want to search the open buffers that are modified — because
+      // the searchers will only see the files as they exist on disk, and we
+      // want to ensure that even uncommitted changes are reflected in the
+      // search results.
+      if (!buffer.isModified()) continue;
+      const filePath = buffer.getPath();
+      // Filter out paths that aren't part of this project.
+      if (!this.project.contains(filePath)) continue;
+      let relativizedFilePath = atom.project.relativize(filePath);
+      // If the user specified search globs, we want to ensure that we consider
+      // only those modified buffers that would be matched by such globs.
+      if (matchers && !matchers.some(matcher => filePathMatchesGlob(relativizedFilePath, matcher))) {
+        continue;
+      }
+      let matches = [];
+      buffer.scan(regex, match => matches.push(match));
+      if (matches.length > 0) {
+        iterator({ filePath, matches });
       }
     }
 
@@ -2191,7 +2233,7 @@ module.exports = class Workspace extends Model {
     // package relies on this behavior.
     let isCancelled = false;
     const cancellablePromise = new Promise((resolve, reject) => {
-      const onSuccess = function() {
+      const onSuccess = function () {
         if (isCancelled) {
           resolve('cancelled');
         } else {
@@ -2199,7 +2241,7 @@ module.exports = class Workspace extends Model {
         }
       };
 
-      const onFailure = function(error) {
+      const onFailure = function (error) {
         for (let promise of allSearches) {
           promise.cancel();
         }

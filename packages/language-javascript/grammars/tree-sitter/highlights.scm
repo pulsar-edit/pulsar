@@ -1,3 +1,31 @@
+; MISC
+; ====
+
+; In the JSX construct `<Foo.Bar>`, `Foo.Bar` is treated as a
+; `member_expression`. We don't want the ordinary rules for member expressions
+; to apply, so we block them off.
+;
+; TODO: If we wanted to give these segments individual scopes, we'd do that
+; here — replacing the `@_IGNORE_`s with scope names.
+
+(jsx_opening_element
+  (member_expression
+    (identifier) @_IGNORE_
+    (property_identifier) @_IGNORE_
+      (#set! capture.final)))
+
+(jsx_closing_element
+  (member_expression
+    (identifier) @_IGNORE_
+    (property_identifier) @_IGNORE_
+      (#set! capture.final)))
+
+(jsx_self_closing_element
+  (member_expression
+    (identifier) @_IGNORE_
+    (property_identifier) @_IGNORE_
+      (#set! capture.final)))
+
 
 ; STRINGS
 ; =======
@@ -75,8 +103,8 @@
 ; exclude them from the next query.
 (assignment_expression
   left: (member_expression
-    property: (property_identifier) @variable.other.assignment.property.js)
-  right: [(arrow_function) (function)] @_IGNORE_
+    property: [(property_identifier) (private_property_identifier)] @variable.other.assignment.property.js)
+  right: [(arrow_function) (function_expression)] @_IGNORE_
     (#set! isFunctionProperty true))
 
 ; The "bar" in `foo.bar = true`.
@@ -89,15 +117,31 @@
 ; The "bar" in `foo.#bar = true`.
 (assignment_expression
   left: (member_expression
-    property: (private_property_identifier) @variable.other.assignment.property.private.js))
+    property: (private_property_identifier) @variable.other.assignment.property.private.js)
+    (#set! capture.final))
 
 ; The "foo" in `foo += 1`.
 (augmented_assignment_expression
   left: (identifier) @variable.other.assignment.js)
 
+; The "bar" in `foo.bar += 1`.
+(augmented_assignment_expression
+  left: (member_expression
+    property: (property_identifier) @variable.other.assignment.property.js)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
+
 ; The "foo" in `foo++`.
 (update_expression
   argument: (identifier) @variable.other.assignment.js)
+
+; The "bar" in `foo.bar++`.
+(update_expression
+  argument: (member_expression
+    property: (property_identifier) @variable.other.assignment.property.js)
+    (#is-not? test.rangeWithData isFunctionProperty)
+    (#set! capture.final))
+
 
 ; Public field definition in a class body:
 ; The "foo" in `foo = "bar";`
@@ -119,8 +163,9 @@
 
 ; A variable object destructuring with default value:
 ; The "foo" in `let { foo = true } = something`
-(object_assignment_pattern
+((object_assignment_pattern
   (shorthand_property_identifier_pattern) @variable.other.assignment.destructuring.js)
+  (#is-not? test.descendantOfType "formal_parameters"))
 
 ; A variable object alias destructuring:
 ; The "bar" and "foo" in `let { bar: foo } = something`
@@ -147,24 +192,34 @@
     ; TODO: This arguably isn't an object key.
     key: (_) @entity.other.attribute-name.js
     value: (assignment_pattern
-      left: (identifier) @variable.other.assignment.destructuring.js)))
+      left: (identifier) @_IGNORE_)))
+
+(object_pattern
+  (pair_pattern
+    key: (_) @_IGNORE_
+    value: (assignment_pattern
+      left: (identifier) @variable.other.assignment.destructuring.js))
+      (#is-not? test.descendantOfType "formal_parameters"))
 
 ; A "rest" parameter destructuring:
 ; The "bar" in `let { foo, ...bar } = something`
 (object_pattern
   (rest_pattern
-    (identifier) @variable.other.assignment.destructuring.rest.js))
+    (identifier) @variable.other.assignment.destructuring.rest.js)
+    (#is-not? test.descendantOfType "formal_parameters"))
 
 ; An array-destructured assignment or reassignment, regardless of depth:
 ; The "foo" in `[foo] = bar;` and `[[foo]] = bar;`.
-(array_pattern
+((array_pattern
   (identifier) @variable.other.assignment.destructuring.js)
+  (#is-not? test.descendantOfType "formal_parameters"))
 
 ; An array-destructured assignment or reassignment with a default, regardless of depth:
 ; The "baz" in `let [foo, bar, baz = false] = something;` and `let [[baz = 5]] = something`;
 (array_pattern
   (assignment_pattern
-    (identifier) @variable.other.assignment.destructuring.js))
+    (identifier) @variable.other.assignment.destructuring.js)
+    (#is-not? test.descendantOfType "formal_parameters"))
 
 
 ; A variable declaration in a for…(in|of) loop:
@@ -236,13 +291,28 @@
   (assignment_pattern
     left: (identifier) @variable.parameter.js))
 
+; The "foo" in `function ({ foo = 3 }) {`.
+(object_assignment_pattern
+  (shorthand_property_identifier_pattern) @variable.parameter.destructuring.shorthand.js
+  (#is? test.descendantOfType "formal_parameters")
+  (#set! capture.final))
+
+; The "foo" in `function ({ key: foo = 3 }) {`.
+(pair_pattern
+  key: (property_identifier)
+  value: (assignment_pattern
+    left: (identifier) @variable.parameter.destructuring.value.js
+  )
+  (#is? test.descendantOfType "formal_parameters")
+  (#set! capture.final))
+
 
 ; FUNCTIONS
 ; =========
 
 ; Named function expressions:
 ; the "foo" in `let bar = function foo () {`
-(function
+(function_expression
   name: (identifier) @entity.name.function.definition.js)
 
 ; Function definitions:
@@ -276,27 +346,27 @@
   left: (member_expression
     property: (property_identifier) @entity.name.function.definition.js
     (#set! capture.final true))
-  right: [(arrow_function) (function)])
+  right: [(arrow_function) (function_expression)])
 
 ; Function variable assignment:
 ; The "foo" in `let foo = function () {`
 (variable_declarator
   name: (identifier) @entity.name.function.definition.js
-  value: [(function) (arrow_function)])
+  value: [(function_expression) (arrow_function)])
 
 ; Function variable reassignment:
 ; The "foo" in `foo = function () {`
 (assignment_expression
   left: (identifier) @function
-  right: [(function) (arrow_function)])
+  right: [(function_expression) (arrow_function)])
 
 ; Object key-value pair function:
 ; The "foo" in `{ foo: function () {} }`
 (pair
   key: (property_identifier) @entity.name.function.method.definition.js
-  value: [(function) (arrow_function)])
+  value: [(function_expression) (arrow_function)])
 
-(function "function" @storage.type.function.js)
+(function_expression "function" @storage.type.function.js)
 (function_declaration "function" @storage.type.function.js)
 
 (generator_function "function" @storage.type.function.js)
@@ -573,14 +643,26 @@
 (export_statement
   (identifier) @variable.other.assignment.export.js)
 
-; The "*" in `import * as Foo`
+; The "*" in `import * as Foo from 'bar'`
 (import_clause
   (namespace_import "*" @variable.other.assignment.import.all.js))
 
-; The "Foo" in `import * as Foo`
+; The "Foo" in `import * as Foo from 'bar'`
 (import_clause
   (namespace_import
     (identifier) @variable.other.assignment.import.alias.js))
+
+; The "*" in `export * from 'bar'`
+(export_statement "*" @variable.other.assignment.export.all.js)
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export "*" @variable.other.assignment.export.all.js))
+
+; The "*" in `export * as Foo from 'bar'`
+(export_statement
+  (namespace_export
+    (identifier) @variable.other.assignment.export.alias.js))
 
 ; COMMENTS
 ; ========
@@ -763,20 +845,33 @@
 
 ; The "Foo" in `<Foo />`.
 (jsx_self_closing_element
-  name: (identifier) @entity.name.tag.js
+  name: (_) @entity.name.tag.jsx.js
   ) @meta.tag.jsx.js
 
 ; The "Foo" in `<Foo>`.
 (jsx_opening_element
-  name: (identifier) @entity.name.tag.js)
+  name: (_) @entity.name.tag.jsx.js)
 
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
-  name: (identifier) @entity.name.tag.js)
+  name: (_) @entity.name.tag.jsx.js)
 
 ; The "bar" in `<Foo bar={true} />`.
 (jsx_attribute
-  (property_identifier) @entity.other.attribute-name.js)
+  (property_identifier) @entity.other.attribute-name.jsx.js)
+
+; The "wat:bar" in `<Foo wat:bar={true} />`.
+(jsx_attribute
+  (jsx_namespace_name
+    (identifier)) @entity.other.attribute-name.namespaced.jsx.js)
+
+; The "wat" in `<Foo wat:bar={true} />`. Worth tagging with its own scope name
+; just in case a theme wants to highlight the namespace differently from the
+; rest of the attribute.
+(jsx_attribute
+  (jsx_namespace_name
+    (identifier) @meta.attribute-namespace.jsx.js
+    (#is-not? test.last)))
 
 ; All JSX expressions/interpolations within braces.
 ((jsx_expression) @meta.embedded.block.jsx.js
@@ -862,7 +957,7 @@
 ; use "?." to target it.
 (optional_chain) @keyword.operator.accessor.optional-chaining.js
 
-; Optional chaining is illegal…:
+; Optional chaining is illegal…
 
 ; …on the left-hand side of an assignment.
 (assignment_expression
@@ -875,6 +970,8 @@
     (#set! prohibitsOptionalChaining true))
 
 ((optional_chain) @invalid.illegal.optional-chain.js
+  ; Ensure this doesn't trigger on zero-content MISSING nodes.
+  (#eq? @invalid.illegal.optional-chain.js "?.")
   (#is? test.descendantOfNodeWithData prohibitsOptionalChaining))
 
 
@@ -961,7 +1058,7 @@
   (#set! adjust.endAt lastChild.startPosition)
   (#set! capture.final true))
 
-(function
+(function_expression
   body: (statement_block) @meta.block.function.js
   (#set! adjust.startAt firstChild.endPosition)
   (#set! adjust.endAt lastChild.startPosition)

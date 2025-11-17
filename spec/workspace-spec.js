@@ -5,18 +5,25 @@ const TextBuffer = require('text-buffer');
 const TextEditor = require('../src/text-editor');
 const Workspace = require('../src/workspace');
 const Project = require('../src/project');
-const platform = require('./spec-helper-platform');
+const platform = require('./helpers/platform');
 const _ = require('underscore-plus');
 const fstream = require('fstream');
 const fs = require('fs-plus');
 const AtomEnvironment = require('../src/atom-environment');
-const { conditionPromise } = require('./async-spec-helpers');
+const { conditionPromise, timeoutPromise } = require('./helpers/async-spec-helpers');
 
 describe('Workspace', () => {
   let workspace;
   let setDocumentEdited;
 
-  beforeEach(() => {
+  let fsGetSizeSyncSpy;
+  let fsOpenSyncSpy;
+
+  beforeEach(async () => {
+    jasmine.useRealClock();
+    fsGetSizeSyncSpy ||= spyOn(fs, 'getSizeSync').and.callThrough();
+    fsOpenSyncSpy ||= spyOn(fs, 'openSync').and.callThrough();
+
     workspace = atom.workspace;
     workspace.resetFontSize();
     spyOn(atom.applicationDelegate, 'confirm');
@@ -25,12 +32,14 @@ describe('Workspace', () => {
       'setWindowDocumentEdited'
     );
     atom.project.setPaths([atom.project.getDirectories()[0].resolve('dir')]);
-    waits(1);
 
-    waitsForPromise(() => atom.workspace.itemLocationStore.clear());
+    await atom.workspace.itemLocationStore.clear();
   });
 
   afterEach(() => {
+    fsGetSizeSyncSpy.and.callThrough();
+    fsOpenSyncSpy.and.callThrough();
+
     try {
       temp.cleanupSync();
     } catch (e) {
@@ -38,130 +47,107 @@ describe('Workspace', () => {
     }
   });
 
-  function simulateReload() {
-    waitsForPromise(() => {
-      const workspaceState = workspace.serialize();
-      const projectState = atom.project.serialize({ isUnloading: true });
-      workspace.destroy();
-      atom.project.destroy();
-      atom.project = new Project({
-        notificationManager: atom.notifications,
-        packageManager: atom.packages,
-        confirm: atom.confirm.bind(atom),
-        applicationDelegate: atom.applicationDelegate,
-        grammarRegistry: atom.grammars
-      });
-      return atom.project.deserialize(projectState).then(() => {
-        workspace = atom.workspace = new Workspace({
-          config: atom.config,
-          project: atom.project,
-          packageManager: atom.packages,
-          grammarRegistry: atom.grammars,
-          styleManager: atom.styles,
-          deserializerManager: atom.deserializers,
-          notificationManager: atom.notifications,
-          applicationDelegate: atom.applicationDelegate,
-          viewRegistry: atom.views,
-          assert: atom.assert.bind(atom),
-          textEditorRegistry: atom.textEditors
-        });
-        workspace.deserialize(workspaceState, atom.deserializers);
-      });
+  async function simulateReload() {
+    const workspaceState = workspace.serialize();
+    const projectState = atom.project.serialize({ isUnloading: true });
+    workspace.destroy();
+    atom.project.destroy();
+    atom.project = new Project({
+      notificationManager: atom.notifications,
+      packageManager: atom.packages,
+      confirm: atom.confirm.bind(atom),
+      applicationDelegate: atom.applicationDelegate,
+      grammarRegistry: atom.grammars
     });
+
+    await atom.project.deserialize(projectState)
+
+    workspace = atom.workspace = new Workspace({
+      config: atom.config,
+      project: atom.project,
+      packageManager: atom.packages,
+      grammarRegistry: atom.grammars,
+      styleManager: atom.styles,
+      deserializerManager: atom.deserializers,
+      notificationManager: atom.notifications,
+      applicationDelegate: atom.applicationDelegate,
+      viewRegistry: atom.views,
+      assert: atom.assert.bind(atom),
+      textEditorRegistry: atom.textEditors
+    });
+    workspace.initialize({ configDirPath: atom.getConfigDirPath() });
+    workspace.deserialize(workspaceState, atom.deserializers);
   }
 
   describe('serialization', () => {
     describe('when the workspace contains text editors', () => {
-      it('constructs the view with the same panes', () => {
+      it('constructs the view with the same panes', async () => {
         const pane1 = atom.workspace.getActivePane();
         const pane2 = pane1.splitRight({ copyActiveItem: true });
         const pane3 = pane2.splitRight({ copyActiveItem: true });
         let pane4 = null;
+        let editor;
 
-        waitsForPromise(() =>
-          atom.workspace
-            .open(null)
-            .then(editor => editor.setText('An untitled editor.'))
+        (await atom.workspace.open(null)).setText('An untitled editor.')
+
+        pane2.activateItem((await atom.workspace.open('b')).copy());
+
+        pane3.activateItem(await atom.workspace.open('../sample.js'));
+
+        pane3.activeItem.setCursorScreenPosition([2, 4]);
+        pane4 = pane2.splitDown();
+
+        pane4.activateItem(await atom.workspace.open('../sample.txt'));
+
+        pane4.getActiveItem().setCursorScreenPosition([0, 2]);
+        pane2.activate();
+
+        await simulateReload();
+
+        expect(atom.workspace.getTextEditors().length).toBe(5);
+        const [
+          editor1,
+          editor2,
+          untitledEditor,
+          editor3,
+          editor4
+        ] = atom.workspace.getTextEditors();
+        const firstDirectory = atom.project.getDirectories()[0];
+        expect(firstDirectory).toBeDefined();
+        expect(editor1.getPath()).toBe(firstDirectory.resolve('b'));
+        expect(editor2.getPath()).toBe(
+          firstDirectory.resolve('../sample.txt')
         );
-
-        waitsForPromise(() =>
-          atom.workspace
-            .open('b')
-            .then(editor => pane2.activateItem(editor.copy()))
+        expect(editor2.getCursorScreenPosition()).toEqual([0, 2]);
+        expect(editor3.getPath()).toBe(firstDirectory.resolve('b'));
+        expect(editor4.getPath()).toBe(
+          firstDirectory.resolve('../sample.js')
         );
+        expect(editor4.getCursorScreenPosition()).toEqual([2, 4]);
+        expect(untitledEditor.getPath()).toBeUndefined();
+        expect(untitledEditor.getText()).toBe('An untitled editor.');
 
-        waitsForPromise(() =>
-          atom.workspace
-            .open('../sample.js')
-            .then(editor => pane3.activateItem(editor))
+        expect(atom.workspace.getActiveTextEditor().getPath()).toBe(
+          editor3.getPath()
         );
-
-        runs(() => {
-          pane3.activeItem.setCursorScreenPosition([2, 4]);
-          pane4 = pane2.splitDown();
-        });
-
-        waitsForPromise(() =>
-          atom.workspace
-            .open('../sample.txt')
-            .then(editor => pane4.activateItem(editor))
+        const pathEscaped = fs.tildify(
+          escapeStringRegex(atom.project.getPaths()[0])
         );
-
-        runs(() => {
-          pane4.getActiveItem().setCursorScreenPosition([0, 2]);
-          pane2.activate();
-        });
-
-        simulateReload();
-
-        runs(() => {
-          expect(atom.workspace.getTextEditors().length).toBe(5);
-          const [
-            editor1,
-            editor2,
-            untitledEditor,
-            editor3,
-            editor4
-          ] = atom.workspace.getTextEditors();
-          const firstDirectory = atom.project.getDirectories()[0];
-          expect(firstDirectory).toBeDefined();
-          expect(editor1.getPath()).toBe(firstDirectory.resolve('b'));
-          expect(editor2.getPath()).toBe(
-            firstDirectory.resolve('../sample.txt')
-          );
-          expect(editor2.getCursorScreenPosition()).toEqual([0, 2]);
-          expect(editor3.getPath()).toBe(firstDirectory.resolve('b'));
-          expect(editor4.getPath()).toBe(
-            firstDirectory.resolve('../sample.js')
-          );
-          expect(editor4.getCursorScreenPosition()).toEqual([2, 4]);
-          expect(untitledEditor.getPath()).toBeUndefined();
-          expect(untitledEditor.getText()).toBe('An untitled editor.');
-
-          expect(atom.workspace.getActiveTextEditor().getPath()).toBe(
-            editor3.getPath()
-          );
-          const pathEscaped = fs.tildify(
-            escapeStringRegex(atom.project.getPaths()[0])
-          );
-          expect(document.title).toMatch(
-            new RegExp(
-              `^${path.basename(editor3.getLongTitle())} \\u2014 ${pathEscaped}`
-            )
-          );
-        });
+        expect(document.title).toMatch(
+          new RegExp(
+            `^${path.basename(editor3.getLongTitle())} \\u2014 ${pathEscaped}`
+          )
+        );
       });
     });
 
     describe('where there are no open panes or editors', () => {
-      it('constructs the view with no open editors', () => {
+      it('constructs the view with no open editors', async () => {
         atom.workspace.getActivePane().destroy();
         expect(atom.workspace.getTextEditors().length).toBe(0);
-        simulateReload();
+        await simulateReload();
 
-        runs(() => {
-          expect(atom.workspace.getTextEditors().length).toBe(0);
-        });
+        expect(atom.workspace.getTextEditors().length).toBe(0);
       });
     });
   });
@@ -172,109 +158,87 @@ describe('Workspace', () => {
     beforeEach(() => {
       openEvents = [];
       workspace.onDidOpen(event => openEvents.push(event));
-      spyOn(workspace.getActivePane(), 'activate').andCallThrough();
+      spyOn(workspace.getActivePane(), 'activate').and.callThrough();
     });
 
     describe("when the 'searchAllPanes' option is false (default)", () => {
       describe('when called without a uri or item', () => {
-        it('adds and activates an empty editor on the active pane', () => {
+        it('adds and activates an empty editor on the active pane', async () => {
           let editor1;
           let editor2;
 
-          waitsForPromise(() =>
-            workspace.open().then(editor => {
-              editor1 = editor;
-            })
-          );
+          editor1 = await workspace.open()
 
-          runs(() => {
-            expect(editor1.getPath()).toBeUndefined();
-            expect(workspace.getActivePane().items).toEqual([editor1]);
-            expect(workspace.getActivePaneItem()).toBe(editor1);
-            expect(workspace.getActivePane().activate).toHaveBeenCalled();
-            expect(openEvents).toEqual([
-              {
-                uri: undefined,
-                pane: workspace.getActivePane(),
-                item: editor1,
-                index: 0
-              }
-            ]);
-            openEvents = [];
-          });
+          expect(editor1.getPath()).toBeUndefined();
+          expect(workspace.getActivePane().items).toEqual([editor1]);
+          expect(workspace.getActivePaneItem()).toBe(editor1);
+          expect(workspace.getActivePane().activate).toHaveBeenCalled();
+          expect(openEvents).toEqual([
+            {
+              uri: undefined,
+              pane: workspace.getActivePane(),
+              item: editor1,
+              index: 0
+            }
+          ]);
 
-          waitsForPromise(() =>
-            workspace.open().then(editor => {
-              editor2 = editor;
-            })
-          );
+          openEvents = [];
+          editor2 = await workspace.open();
 
-          runs(() => {
-            expect(editor2.getPath()).toBeUndefined();
-            expect(workspace.getActivePane().items).toEqual([editor1, editor2]);
-            expect(workspace.getActivePaneItem()).toBe(editor2);
-            expect(workspace.getActivePane().activate).toHaveBeenCalled();
-            expect(openEvents).toEqual([
-              {
-                uri: undefined,
-                pane: workspace.getActivePane(),
-                item: editor2,
-                index: 1
-              }
-            ]);
-          });
+          expect(editor2.getPath()).toBeUndefined();
+          expect(workspace.getActivePane().items).toEqual([editor1, editor2]);
+          expect(workspace.getActivePaneItem()).toBe(editor2);
+          expect(workspace.getActivePane().activate).toHaveBeenCalled();
+          expect(openEvents).toEqual([
+            {
+              uri: undefined,
+              pane: workspace.getActivePane(),
+              item: editor2,
+              index: 1
+            }
+          ]);
         });
       });
 
       describe('when called with a uri', () => {
         describe('when the active pane already has an editor for the given uri', () => {
-          it('activates the existing editor on the active pane', () => {
+          it('activates the existing editor on the active pane', async () => {
             let editor = null;
             let editor1 = null;
             let editor2 = null;
 
-            waitsForPromise(() =>
-              workspace.open('a').then(o => {
-                editor1 = o;
-                return workspace.open('b').then(o => {
-                  editor2 = o;
-                  return workspace.open('a').then(o => {
-                    editor = o;
-                  });
-                });
-              })
-            );
+            editor1 = await workspace.open('a');
+            editor2 = await workspace.open('b');
+            editor = await workspace.open('a');
 
-            runs(() => {
-              expect(editor).toBe(editor1);
-              expect(workspace.getActivePaneItem()).toBe(editor);
-              expect(workspace.getActivePane().activate).toHaveBeenCalled();
-              const firstDirectory = atom.project.getDirectories()[0];
-              expect(firstDirectory).toBeDefined();
-              expect(openEvents).toEqual([
-                {
-                  uri: firstDirectory.resolve('a'),
-                  item: editor1,
-                  pane: atom.workspace.getActivePane(),
-                  index: 0
-                },
-                {
-                  uri: firstDirectory.resolve('b'),
-                  item: editor2,
-                  pane: atom.workspace.getActivePane(),
-                  index: 1
-                },
-                {
-                  uri: firstDirectory.resolve('a'),
-                  item: editor1,
-                  pane: atom.workspace.getActivePane(),
-                  index: 0
-                }
-              ]);
-            });
+            expect(editor).toBe(editor1);
+            expect(workspace.getActivePaneItem()).toBe(editor);
+            expect(workspace.getActivePane().activate).toHaveBeenCalled();
+            const firstDirectory = atom.project.getDirectories()[0];
+            expect(firstDirectory).toBeDefined();
+            expect(openEvents).toEqual([
+              {
+                uri: firstDirectory.resolve('a'),
+                item: editor1,
+                pane: atom.workspace.getActivePane(),
+                index: 0
+              },
+              {
+                uri: firstDirectory.resolve('b'),
+                item: editor2,
+                pane: atom.workspace.getActivePane(),
+                index: 1
+              },
+              {
+                uri: firstDirectory.resolve('a'),
+                item: editor1,
+                pane: atom.workspace.getActivePane(),
+                index: 0
+              }
+            ]);
           });
 
-          it('finds items in docks', () => {
+          it('finds items in docks', async () => {
             const dock = atom.workspace.getRightDock();
             const ITEM_URI = 'atom://test';
             const item = {
@@ -284,30 +248,24 @@ describe('Workspace', () => {
             };
             dock.getActivePane().addItem(item);
             expect(dock.getPaneItems()).toHaveLength(1);
-            waitsForPromise(() =>
-              atom.workspace.open(ITEM_URI, { searchAllPanes: true })
-            );
-            runs(() => {
-              expect(atom.workspace.getPaneItems()).toHaveLength(1);
-              expect(dock.getPaneItems()).toHaveLength(1);
-              expect(dock.getPaneItems()[0]).toBe(item);
-            });
+
+            await atom.workspace.open(ITEM_URI, { searchAllPanes: true })
+
+            expect(atom.workspace.getPaneItems()).toHaveLength(1);
+            expect(dock.getPaneItems()).toHaveLength(1);
+            expect(dock.getPaneItems()[0]).toBe(item);
           });
         });
 
         describe("when the 'activateItem' option is false", () => {
-          it('adds the item to the workspace', () => {
+          it('adds the item to the workspace', async () => {
             let editor;
-            waitsForPromise(() => workspace.open('a'));
-            waitsForPromise(() =>
-              workspace.open('b', { activateItem: false }).then(o => {
-                editor = o;
-              })
-            );
-            runs(() => {
-              expect(workspace.getPaneItems()).toContain(editor);
-              expect(workspace.getActivePaneItem()).not.toBe(editor);
-            });
+
+            await workspace.open('a');
+            editor = await workspace.open('b', { activateItem: false });
+
+            expect(workspace.getPaneItems()).toContain(editor);
+            expect(workspace.getActivePaneItem()).not.toBe(editor);
           });
         });
 
@@ -321,66 +279,55 @@ describe('Workspace', () => {
             atom.workspace.enablePersistence = false;
           });
 
-          it('adds and activates a new editor for the given path on the active pane', () => {
-            let editor = null;
-            waitsForPromise(() =>
-              workspace.open('a').then(o => {
-                editor = o;
-              })
-            );
+          it('adds and activates a new editor for the given path on the active pane', async () => {
+            let editor = await workspace.open('a');
 
-            runs(() => {
-              const firstDirectory = atom.project.getDirectories()[0];
-              expect(firstDirectory).toBeDefined();
-              expect(editor.getURI()).toBe(firstDirectory.resolve('a'));
-              expect(workspace.getActivePaneItem()).toBe(editor);
-              expect(workspace.getActivePane().items).toEqual([editor]);
-              expect(workspace.getActivePane().activate).toHaveBeenCalled();
-            });
+            const firstDirectory = atom.project.getDirectories()[0];
+            expect(firstDirectory).toBeDefined();
+            expect(editor.getURI()).toBe(firstDirectory.resolve('a'));
+            expect(workspace.getActivePaneItem()).toBe(editor);
+            expect(workspace.getActivePane().items).toEqual([editor]);
+            expect(workspace.getActivePane().activate).toHaveBeenCalled();
           });
 
-          it('discovers existing editors that are still opening', () => {
+          it('discovers existing editors that are still opening', async () => {
             let editor0 = null;
             let editor1 = null;
 
-            waitsForPromise(() =>
-              Promise.all([
-                workspace.open('spartacus.txt').then(o0 => {
-                  editor0 = o0;
-                }),
-                workspace.open('spartacus.txt').then(o1 => {
-                  editor1 = o1;
-                })
-              ])
-            );
+            await Promise.all([
+              workspace.open('spartacus.txt').then(o0 => {
+                editor0 = o0;
+              }),
+              workspace.open('spartacus.txt').then(o1 => {
+                editor1 = o1;
+              })
+            ]);
 
-            runs(() => {
-              expect(editor0).toEqual(editor1);
-              expect(workspace.getActivePane().items).toEqual([editor0]);
-            });
+            expect(editor0).toEqual(editor1);
+            expect(workspace.getActivePane().items).toEqual([editor0]);
           });
 
-          it("uses the location specified by the model's `getDefaultLocation()` method", () => {
+          it("uses the location specified by the model's `getDefaultLocation()` method", async () => {
             const item = {
-              getDefaultLocation: jasmine.createSpy().andReturn('right'),
+              getDefaultLocation: jasmine.createSpy().and.returnValue('right'),
               getElement: () => document.createElement('div')
             };
-            const opener = jasmine.createSpy().andReturn(item);
+            const opener = jasmine.createSpy().and.returnValue(item);
             const dock = atom.workspace.getRightDock();
-            spyOn(atom.workspace.itemLocationStore, 'load').andReturn(
+            spyOn(atom.workspace.itemLocationStore, 'load').and.returnValue(
               Promise.resolve()
             );
-            spyOn(atom.workspace, 'getOpeners').andReturn([opener]);
+            spyOn(atom.workspace, 'getOpeners').and.returnValue([opener]);
             expect(dock.getPaneItems()).toHaveLength(0);
-            waitsForPromise(() => atom.workspace.open('a'));
-            runs(() => {
-              expect(dock.getPaneItems()).toHaveLength(1);
-              expect(opener).toHaveBeenCalled();
-              expect(item.getDefaultLocation).toHaveBeenCalled();
-            });
+
+            await atom.workspace.open('a');
+
+            expect(dock.getPaneItems()).toHaveLength(1);
+            expect(opener).toHaveBeenCalled();
+            expect(item.getDefaultLocation).toHaveBeenCalled();
           });
 
-          it('prefers the last location the user used for that item', () => {
+          it('prefers the last location the user used for that item', async () => {
             const ITEM_URI = 'atom://test';
             const item = {
               getURI: () => ITEM_URI,
@@ -389,18 +336,18 @@ describe('Workspace', () => {
             };
             const opener = uri => (uri === ITEM_URI ? item : null);
             const dock = atom.workspace.getRightDock();
-            spyOn(atom.workspace.itemLocationStore, 'load').andCallFake(uri =>
+            spyOn(atom.workspace.itemLocationStore, 'load').and.callFake(uri =>
               uri === 'atom://test'
                 ? Promise.resolve('right')
                 : Promise.resolve()
             );
-            spyOn(atom.workspace, 'getOpeners').andReturn([opener]);
+            spyOn(atom.workspace, 'getOpeners').and.returnValue([opener]);
             expect(dock.getPaneItems()).toHaveLength(0);
-            waitsForPromise(() => atom.workspace.open(ITEM_URI));
-            runs(() => {
-              expect(dock.getPaneItems()).toHaveLength(1);
-              expect(dock.getPaneItems()[0]).toBe(item);
-            });
+
+            await atom.workspace.open(ITEM_URI);
+
+            expect(dock.getPaneItems()).toHaveLength(1);
+            expect(dock.getPaneItems()[0]).toBe(item);
           });
         });
       });
@@ -433,37 +380,27 @@ describe('Workspace', () => {
 
     describe("when the 'searchAllPanes' option is true", () => {
       describe('when an editor for the given uri is already open on an inactive pane', () => {
-        it('activates the existing editor on the inactive pane, then activates that pane', () => {
+        it('activates the existing editor on the inactive pane, then activates that pane', async () => {
           let editor1 = null;
           let editor2 = null;
           const pane1 = workspace.getActivePane();
           const pane2 = workspace.getActivePane().splitRight();
 
-          waitsForPromise(() => {
-            pane1.activate();
-            return workspace.open('a').then(o => {
-              editor1 = o;
-            });
-          });
+          pane1.activate();
+          editor1 = await workspace.open('a');
 
-          waitsForPromise(() => {
-            pane2.activate();
-            return workspace.open('b').then(o => {
-              editor2 = o;
-            });
-          });
+          pane2.activate();
+          editor2 = await workspace.open('b');
 
-          runs(() => expect(workspace.getActivePaneItem()).toBe(editor2));
+          expect(workspace.getActivePaneItem()).toBe(editor2);
 
-          waitsForPromise(() => workspace.open('a', { searchAllPanes: true }));
+          await workspace.open('a', { searchAllPanes: true });
 
-          runs(() => {
-            expect(workspace.getActivePane()).toBe(pane1);
-            expect(workspace.getActivePaneItem()).toBe(editor1);
-          });
+          expect(workspace.getActivePane()).toBe(pane1);
+          expect(workspace.getActivePaneItem()).toBe(editor1);
         });
 
-        it('discovers existing editors that are still opening in an inactive pane', () => {
+        it('discovers existing editors that are still opening in an inactive pane', async () => {
           let editor0 = null;
           let editor1 = null;
           const pane0 = workspace.getActivePane();
@@ -482,46 +419,37 @@ describe('Workspace', () => {
               editor1 = o1;
             });
 
-          waitsForPromise(() => Promise.all([promise0, promise1]));
+          await Promise.all([promise0, promise1]);
 
-          runs(() => {
-            expect(editor0).toBeDefined();
-            expect(editor1).toBeDefined();
+          expect(editor0).toBeDefined();
+          expect(editor1).toBeDefined();
 
-            expect(editor0).toEqual(editor1);
-            expect(workspace.getActivePane().items).toEqual([editor0]);
-          });
+          expect(editor0).toEqual(editor1);
+          expect(workspace.getActivePane().items).toEqual([editor0]);
         });
 
-        it('activates the pane in the dock with the matching item', () => {
+        it('activates the pane in the dock with the matching item', async () => {
           const dock = atom.workspace.getRightDock();
           const ITEM_URI = 'atom://test';
           const item = {
             getURI: () => ITEM_URI,
-            getDefaultLocation: jasmine.createSpy().andReturn('left'),
+            getDefaultLocation: jasmine.createSpy().and.returnValue('left'),
             getElement: () => document.createElement('div')
           };
           dock.getActivePane().addItem(item);
           spyOn(dock.paneForItem(item), 'activate');
-          waitsForPromise(() =>
-            atom.workspace.open(ITEM_URI, { searchAllPanes: true })
-          );
-          runs(() =>
-            expect(dock.paneForItem(item).activate).toHaveBeenCalled()
-          );
+
+          await atom.workspace.open(ITEM_URI, { searchAllPanes: true });
+
+          expect(dock.paneForItem(item).activate).toHaveBeenCalled()
         });
       });
 
       describe('when no editor for the given uri is open in any pane', () => {
-        it('opens an editor for the given uri in the active pane', () => {
-          let editor = null;
-          waitsForPromise(() =>
-            workspace.open('a', { searchAllPanes: true }).then(o => {
-              editor = o;
-            })
-          );
+        it('opens an editor for the given uri in the active pane', async () => {
+          let editor = await workspace.open('a', { searchAllPanes: true });
 
-          runs(() => expect(workspace.getActivePaneItem()).toBe(editor));
+          expect(workspace.getActivePaneItem()).toBe(editor);
         });
       });
     });
@@ -585,42 +513,29 @@ describe('Workspace', () => {
 
     describe("when the 'split' option is set", () => {
       describe("when the 'split' option is 'left'", () => {
-        it('opens the editor in the leftmost pane of the current pane axis', () => {
+        it('opens the editor in the leftmost pane of the current pane axis', async () => {
           const pane1 = workspace.getActivePane();
           const pane2 = pane1.splitRight();
           expect(workspace.getActivePane()).toBe(pane2);
 
-          let editor = null;
-          waitsForPromise(() =>
-            workspace.open('a', { split: 'left' }).then(o => {
-              editor = o;
-            })
-          );
+          let editor = await workspace.open('a', { split: 'left' });
 
-          runs(() => {
-            expect(workspace.getActivePane()).toBe(pane1);
-            expect(pane1.items).toEqual([editor]);
-            expect(pane2.items).toEqual([]);
-          });
+          expect(workspace.getActivePane()).toBe(pane1);
+          expect(pane1.items).toEqual([editor]);
+          expect(pane2.items).toEqual([]);
 
           // Focus right pane and reopen the file on the left
-          waitsForPromise(() => {
-            pane2.focus();
-            return workspace.open('a', { split: 'left' }).then(o => {
-              editor = o;
-            });
-          });
+          pane2.focus();
+          editor = await workspace.open('a', { split: 'left' });
 
-          runs(() => {
-            expect(workspace.getActivePane()).toBe(pane1);
-            expect(pane1.items).toEqual([editor]);
-            expect(pane2.items).toEqual([]);
-          });
+          expect(workspace.getActivePane()).toBe(pane1);
+          expect(pane1.items).toEqual([editor]);
+          expect(pane2.items).toEqual([]);
         });
       });
 
       describe('when a pane axis is the leftmost sibling of the current pane', () => {
-        it('opens the new item in the current pane', () => {
+        it('opens the new item in the current pane', async () => {
           let editor = null;
           const pane1 = workspace.getActivePane();
           const pane2 = pane1.splitLeft();
@@ -628,54 +543,37 @@ describe('Workspace', () => {
           pane1.activate();
           expect(workspace.getActivePane()).toBe(pane1);
 
-          waitsForPromise(() =>
-            workspace.open('a', { split: 'left' }).then(o => {
-              editor = o;
-            })
-          );
+          editor = await workspace.open('a', { split: 'left' });
 
-          runs(() => {
-            expect(workspace.getActivePane()).toBe(pane1);
-            expect(pane1.items).toEqual([editor]);
-          });
+          expect(workspace.getActivePane()).toBe(pane1);
+          expect(pane1.items).toEqual([editor]);
         });
       });
 
       describe("when the 'split' option is 'right'", () => {
-        it('opens the editor in the rightmost pane of the current pane axis', () => {
+        it('opens the editor in the rightmost pane of the current pane axis', async () => {
           let editor = null;
           const pane1 = workspace.getActivePane();
           let pane2 = null;
-          waitsForPromise(() =>
-            workspace.open('a', { split: 'right' }).then(o => {
-              editor = o;
-            })
-          );
 
-          runs(() => {
-            pane2 = workspace.getPanes().filter(p => p !== pane1)[0];
-            expect(workspace.getActivePane()).toBe(pane2);
-            expect(pane1.items).toEqual([]);
-            expect(pane2.items).toEqual([editor]);
-          });
+          editor = await workspace.open('a', { split: 'right' });
+
+          pane2 = workspace.getPanes().filter(p => p !== pane1)[0];
+          expect(workspace.getActivePane()).toBe(pane2);
+          expect(pane1.items).toEqual([]);
+          expect(pane2.items).toEqual([editor]);
 
           // Focus right pane and reopen the file on the right
-          waitsForPromise(() => {
-            pane1.focus();
-            return workspace.open('a', { split: 'right' }).then(o => {
-              editor = o;
-            });
-          });
+          pane1.focus();
+          editor = await workspace.open('a', { split: 'right' });
 
-          runs(() => {
-            expect(workspace.getActivePane()).toBe(pane2);
-            expect(pane1.items).toEqual([]);
-            expect(pane2.items).toEqual([editor]);
-          });
+          expect(workspace.getActivePane()).toBe(pane2);
+          expect(pane1.items).toEqual([]);
+          expect(pane2.items).toEqual([editor]);
         });
 
         describe('when a pane axis is the rightmost sibling of the current pane', () => {
-          it('opens the new item in a new pane split to the right of the current pane', () => {
+          it('opens the new item in a new pane split to the right of the current pane', async () => {
             let editor = null;
             const pane1 = workspace.getActivePane();
             const pane2 = pane1.splitRight();
@@ -684,64 +582,45 @@ describe('Workspace', () => {
             expect(workspace.getActivePane()).toBe(pane1);
             let pane4 = null;
 
-            waitsForPromise(() =>
-              workspace.open('a', { split: 'right' }).then(o => {
-                editor = o;
-              })
-            );
+            editor = await workspace.open('a', { split: 'right' });
 
-            runs(() => {
-              pane4 = workspace.getPanes().filter(p => p !== pane1)[0];
-              expect(workspace.getActivePane()).toBe(pane4);
-              expect(pane4.items).toEqual([editor]);
-              expect(workspace.getCenter().paneContainer.root.children[0]).toBe(
-                pane1
-              );
-              expect(workspace.getCenter().paneContainer.root.children[1]).toBe(
-                pane4
-              );
-            });
+            pane4 = workspace.getPanes().filter(p => p !== pane1)[0];
+            expect(workspace.getActivePane()).toBe(pane4);
+            expect(pane4.items).toEqual([editor]);
+            expect(workspace.getCenter().paneContainer.root.children[0]).toBe(
+              pane1
+            );
+            expect(workspace.getCenter().paneContainer.root.children[1]).toBe(
+              pane4
+            );
           });
         });
       });
 
       describe("when the 'split' option is 'up'", () => {
-        it('opens the editor in the topmost pane of the current pane axis', () => {
+        it('opens the editor in the topmost pane of the current pane axis', async () => {
           const pane1 = workspace.getActivePane();
           const pane2 = pane1.splitDown();
           expect(workspace.getActivePane()).toBe(pane2);
 
-          let editor = null;
-          waitsForPromise(() =>
-            workspace.open('a', { split: 'up' }).then(o => {
-              editor = o;
-            })
-          );
+          let editor = await workspace.open('a', { split: 'up' });
 
-          runs(() => {
-            expect(workspace.getActivePane()).toBe(pane1);
-            expect(pane1.items).toEqual([editor]);
-            expect(pane2.items).toEqual([]);
-          });
+          expect(workspace.getActivePane()).toBe(pane1);
+          expect(pane1.items).toEqual([editor]);
+          expect(pane2.items).toEqual([]);
 
           // Focus bottom pane and reopen the file on the top
-          waitsForPromise(() => {
-            pane2.focus();
-            return workspace.open('a', { split: 'up' }).then(o => {
-              editor = o;
-            });
-          });
+          pane2.focus();
+          editor = await workspace.open('a', { split: 'up' });
 
-          runs(() => {
-            expect(workspace.getActivePane()).toBe(pane1);
-            expect(pane1.items).toEqual([editor]);
-            expect(pane2.items).toEqual([]);
-          });
+          expect(workspace.getActivePane()).toBe(pane1);
+          expect(pane1.items).toEqual([editor]);
+          expect(pane2.items).toEqual([]);
         });
       });
 
       describe('when a pane axis is the topmost sibling of the current pane', () => {
-        it('opens the new item in the current pane', () => {
+        it('opens the new item in the current pane', async () => {
           let editor = null;
           const pane1 = workspace.getActivePane();
           const pane2 = pane1.splitUp();
@@ -749,54 +628,37 @@ describe('Workspace', () => {
           pane1.activate();
           expect(workspace.getActivePane()).toBe(pane1);
 
-          waitsForPromise(() =>
-            workspace.open('a', { split: 'up' }).then(o => {
-              editor = o;
-            })
-          );
+          editor = await workspace.open('a', { split: 'up' });
 
-          runs(() => {
-            expect(workspace.getActivePane()).toBe(pane1);
-            expect(pane1.items).toEqual([editor]);
-          });
+          expect(workspace.getActivePane()).toBe(pane1);
+          expect(pane1.items).toEqual([editor]);
         });
       });
 
       describe("when the 'split' option is 'down'", () => {
-        it('opens the editor in the bottommost pane of the current pane axis', () => {
+        it('opens the editor in the bottommost pane of the current pane axis', async () => {
           let editor = null;
           const pane1 = workspace.getActivePane();
           let pane2 = null;
-          waitsForPromise(() =>
-            workspace.open('a', { split: 'down' }).then(o => {
-              editor = o;
-            })
-          );
 
-          runs(() => {
-            pane2 = workspace.getPanes().filter(p => p !== pane1)[0];
-            expect(workspace.getActivePane()).toBe(pane2);
-            expect(pane1.items).toEqual([]);
-            expect(pane2.items).toEqual([editor]);
-          });
+          editor = await workspace.open('a', { split: 'down' });
+
+          pane2 = workspace.getPanes().filter(p => p !== pane1)[0];
+          expect(workspace.getActivePane()).toBe(pane2);
+          expect(pane1.items).toEqual([]);
+          expect(pane2.items).toEqual([editor]);
 
           // Focus bottom pane and reopen the file on the right
-          waitsForPromise(() => {
-            pane1.focus();
-            return workspace.open('a', { split: 'down' }).then(o => {
-              editor = o;
-            });
-          });
+          pane1.focus();
+          editor = await workspace.open('a', { split: 'down' });
 
-          runs(() => {
-            expect(workspace.getActivePane()).toBe(pane2);
-            expect(pane1.items).toEqual([]);
-            expect(pane2.items).toEqual([editor]);
-          });
+          expect(workspace.getActivePane()).toBe(pane2);
+          expect(pane1.items).toEqual([]);
+          expect(pane2.items).toEqual([editor]);
         });
 
         describe('when a pane axis is the bottommost sibling of the current pane', () => {
-          it('opens the new item in a new pane split to the bottom of the current pane', () => {
+          it('opens the new item in a new pane split to the bottom of the current pane', async () => {
             let editor = null;
             const pane1 = workspace.getActivePane();
             const pane2 = pane1.splitDown();
@@ -804,92 +666,62 @@ describe('Workspace', () => {
             expect(workspace.getActivePane()).toBe(pane1);
             let pane4 = null;
 
-            waitsForPromise(() =>
-              workspace.open('a', { split: 'down' }).then(o => {
-                editor = o;
-              })
-            );
+            editor = await workspace.open('a', { split: 'down' });
 
-            runs(() => {
-              pane4 = workspace.getPanes().filter(p => p !== pane1)[0];
-              expect(workspace.getActivePane()).toBe(pane4);
-              expect(pane4.items).toEqual([editor]);
-              expect(workspace.getCenter().paneContainer.root.children[0]).toBe(
-                pane1
-              );
-              expect(workspace.getCenter().paneContainer.root.children[1]).toBe(
-                pane2
-              );
-            });
+            pane4 = workspace.getPanes().filter(p => p !== pane1)[0];
+            expect(workspace.getActivePane()).toBe(pane4);
+            expect(pane4.items).toEqual([editor]);
+            expect(workspace.getCenter().paneContainer.root.children[0]).toBe(
+              pane1
+            );
+            expect(workspace.getCenter().paneContainer.root.children[1]).toBe(
+              pane2
+            );
           });
         });
       });
     });
 
     describe('when an initialLine and initialColumn are specified', () => {
-      it('moves the cursor to the indicated location', () => {
-        waitsForPromise(() =>
-          workspace.open('a', { initialLine: 1, initialColumn: 5 })
-        );
+      it('moves the cursor to the indicated location', async () => {
+        await workspace.open('a', { initialLine: 1, initialColumn: 5 });
 
-        runs(() =>
-          expect(
-            workspace.getActiveTextEditor().getCursorBufferPosition()
-          ).toEqual([1, 5])
-        );
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([1, 5])
 
-        waitsForPromise(() =>
-          workspace.open('a', { initialLine: 2, initialColumn: 4 })
-        );
+        await workspace.open('a', { initialLine: 2, initialColumn: 4 });
 
-        runs(() =>
-          expect(
-            workspace.getActiveTextEditor().getCursorBufferPosition()
-          ).toEqual([2, 4])
-        );
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([2, 4])
 
-        waitsForPromise(() =>
-          workspace.open('a', { initialLine: 0, initialColumn: 0 })
-        );
+        await workspace.open('a', { initialLine: 0, initialColumn: 0 });
 
-        runs(() =>
-          expect(
-            workspace.getActiveTextEditor().getCursorBufferPosition()
-          ).toEqual([0, 0])
-        );
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([0, 0])
 
-        waitsForPromise(() =>
-          workspace.open('a', { initialLine: NaN, initialColumn: 4 })
-        );
+        await workspace.open('a', { initialLine: NaN, initialColumn: 4 });
 
-        runs(() =>
-          expect(
-            workspace.getActiveTextEditor().getCursorBufferPosition()
-          ).toEqual([0, 4])
-        );
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([0, 4])
 
-        waitsForPromise(() =>
-          workspace.open('a', { initialLine: 2, initialColumn: NaN })
-        );
+        await workspace.open('a', { initialLine: 2, initialColumn: NaN });
 
-        runs(() =>
-          expect(
-            workspace.getActiveTextEditor().getCursorBufferPosition()
-          ).toEqual([2, 0])
-        );
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([2, 0])
 
-        waitsForPromise(() =>
-          workspace.open('a', {
-            initialLine: Infinity,
-            initialColumn: Infinity
-          })
-        );
+        await workspace.open('a', {
+          initialLine: Infinity,
+          initialColumn: Infinity
+        });
 
-        runs(() =>
-          expect(
-            workspace.getActiveTextEditor().getCursorBufferPosition()
-          ).toEqual([2, 11])
-        );
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([2, 11])
       });
 
       it('unfolds the fold containing the line', async () => {
@@ -911,10 +743,10 @@ describe('Workspace', () => {
 
     describe('when the file size is over the limit defined in `core.warnOnLargeFileLimit`', () => {
       const shouldPromptForFileOfSize = async (size, shouldPrompt) => {
-        spyOn(fs, 'getSizeSync').andReturn(size * 1048577);
+        fsGetSizeSyncSpy.and.returnValue(size * 1048577);
 
         let selectedButtonIndex = 1; // cancel
-        atom.applicationDelegate.confirm.andCallFake((options, callback) =>
+        atom.applicationDelegate.confirm.and.callFake((options, callback) =>
           callback(selectedButtonIndex)
         );
 
@@ -923,10 +755,10 @@ describe('Workspace', () => {
           expect(editor).toBeUndefined();
           expect(atom.applicationDelegate.confirm).toHaveBeenCalled();
 
-          atom.applicationDelegate.confirm.reset();
+          atom.applicationDelegate.confirm.calls.reset();
           selectedButtonIndex = 0; // open the file
 
-          editor = await workspace.open('sample.js');
+          await workspace.open('sample.js');
 
           expect(atom.applicationDelegate.confirm).toHaveBeenCalled();
         } else {
@@ -951,7 +783,7 @@ describe('Workspace', () => {
     });
 
     describe('when passed a path that matches a custom opener', () => {
-      it('returns the resource returned by the custom opener', () => {
+      it('returns the resource returned by the custom opener', async () => {
         const fooOpener = (pathToOpen, options) => {
           if (pathToOpen != null ? pathToOpen.match(/\.foo/) : undefined) {
             return { foo: pathToOpen, options };
@@ -965,70 +797,50 @@ describe('Workspace', () => {
         workspace.addOpener(fooOpener);
         workspace.addOpener(barOpener);
 
-        waitsForPromise(() => {
-          const pathToOpen = atom.project.getDirectories()[0].resolve('a.foo');
-          return workspace.open(pathToOpen, { hey: 'there' }).then(item =>
-            expect(item).toEqual({
-              foo: pathToOpen,
-              options: { hey: 'there' }
-            })
-          );
-        });
+        const pathToOpen = atom.project.getDirectories()[0].resolve('a.foo');
+        expect(await workspace.open(pathToOpen, { hey: 'there' })).toEqual({
+          foo: pathToOpen,
+          options: { hey: 'there' }
+        })
 
-        waitsForPromise(() =>
-          workspace
-            .open('bar://baz')
-            .then(item => expect(item).toEqual({ bar: 'bar://baz' }))
-        );
+        expect(await workspace.open('bar://baz')).toEqual({ bar: 'bar://baz' })
       });
     });
 
-    it("adds the file to the application's recent documents list", () => {
-      if (process.platform !== 'darwin') {
-        return;
-      } // Feature only supported on macOS
+    it("adds the file to the application's recent documents list", async (done) => {
+      jasmine.filterByPlatform({only: ['darwin']}, done); // Feature only supported on macOS
+
       spyOn(atom.applicationDelegate, 'addRecentDocument');
 
-      waitsForPromise(() => workspace.open());
+      await workspace.open();
 
-      runs(() =>
-        expect(
-          atom.applicationDelegate.addRecentDocument
-        ).not.toHaveBeenCalled()
-      );
+      expect(
+        atom.applicationDelegate.addRecentDocument
+      ).not.toHaveBeenCalled()
 
-      waitsForPromise(() => workspace.open('something://a/url'));
+      await workspace.open('something://a/url');
 
-      runs(() =>
-        expect(
-          atom.applicationDelegate.addRecentDocument
-        ).not.toHaveBeenCalled()
-      );
+      expect(
+        atom.applicationDelegate.addRecentDocument
+      ).not.toHaveBeenCalled()
 
-      waitsForPromise(() => workspace.open(__filename));
+      await workspace.open(__filename);
 
-      runs(() =>
-        expect(atom.applicationDelegate.addRecentDocument).toHaveBeenCalledWith(
-          __filename
-        )
-      );
+      expect(atom.applicationDelegate.addRecentDocument).toHaveBeenCalledWith(
+        __filename
+      )
+
+      done();
     });
 
-    it('notifies ::onDidAddTextEditor observers', () => {
+    it('notifies ::onDidAddTextEditor observers', async () => {
       const absolutePath = require.resolve('./fixtures/dir/a');
       const newEditorHandler = jasmine.createSpy('newEditorHandler');
       workspace.onDidAddTextEditor(newEditorHandler);
 
-      let editor = null;
-      waitsForPromise(() =>
-        workspace.open(absolutePath).then(e => {
-          editor = e;
-        })
-      );
+      let editor = await workspace.open(absolutePath);
 
-      runs(() =>
-        expect(newEditorHandler.argsForCall[0][0].textEditor).toBe(editor)
-      );
+      expect(newEditorHandler.calls.argsFor(0)[0].textEditor).toBe(editor);
     });
 
     describe('when there is an error opening the file', () => {
@@ -1040,187 +852,148 @@ describe('Workspace', () => {
       );
 
       describe('when a file does not exist', () => {
-        it('creates an empty buffer for the specified path', () => {
-          waitsForPromise(() => workspace.open('not-a-file.md'));
+        it('creates an empty buffer for the specified path', async () => {
+          await workspace.open('not-a-file.md');
 
-          runs(() => {
-            const editor = workspace.getActiveTextEditor();
-            expect(notificationSpy).not.toHaveBeenCalled();
-            expect(editor.getPath()).toContain('not-a-file.md');
-          });
+          const editor = workspace.getActiveTextEditor();
+          expect(notificationSpy).not.toHaveBeenCalled();
+          expect(editor.getPath()).toContain('not-a-file.md');
         });
       });
 
       describe('when the user does not have access to the file', () => {
-        beforeEach(() =>
-          spyOn(fs, 'openSync').andCallFake(path => {
+        beforeEach(() => {
+          fsOpenSyncSpy.and.callFake(path => {
             const error = new Error(`EACCES, permission denied '${path}'`);
             error.path = path;
             error.code = 'EACCES';
             throw error;
-          })
-        );
-
-        it('creates a notification', () => {
-          waitsForPromise(() => workspace.open('file1'));
-
-          runs(() => {
-            expect(notificationSpy).toHaveBeenCalled();
-            const notification = notificationSpy.mostRecentCall.args[0];
-            expect(notification.getType()).toBe('warning');
-            expect(notification.getMessage()).toContain('Permission denied');
-            expect(notification.getMessage()).toContain('file1');
           });
+        });
+
+        it('creates a notification', async () => {
+          await workspace.open('file1');
+
+          expect(notificationSpy).toHaveBeenCalled();
+          const notification = notificationSpy.calls.mostRecent().args[0];
+          expect(notification.getType()).toBe('warning');
+          expect(notification.getMessage()).toContain('Permission denied');
+          expect(notification.getMessage()).toContain('file1');
         });
       });
 
       describe('when the the operation is not permitted', () => {
-        beforeEach(() =>
-          spyOn(fs, 'openSync').andCallFake(path => {
+        beforeEach(() => {
+          fsOpenSyncSpy.and.callFake(path => {
             const error = new Error(`EPERM, operation not permitted '${path}'`);
             error.path = path;
             error.code = 'EPERM';
             throw error;
-          })
-        );
-
-        it('creates a notification', () => {
-          waitsForPromise(() => workspace.open('file1'));
-
-          runs(() => {
-            expect(notificationSpy).toHaveBeenCalled();
-            const notification = notificationSpy.mostRecentCall.args[0];
-            expect(notification.getType()).toBe('warning');
-            expect(notification.getMessage()).toContain('Unable to open');
-            expect(notification.getMessage()).toContain('file1');
           });
+        });
+
+        it('creates a notification', async () => {
+          await workspace.open('file1');
+
+          expect(notificationSpy).toHaveBeenCalled();
+          const notification = notificationSpy.calls.mostRecent().args[0];
+          expect(notification.getType()).toBe('warning');
+          expect(notification.getMessage()).toContain('Unable to open');
+          expect(notification.getMessage()).toContain('file1');
         });
       });
 
       describe('when the the file is already open in windows', () => {
-        beforeEach(() =>
-          spyOn(fs, 'openSync').andCallFake(path => {
+        beforeEach(() => {
+          fsOpenSyncSpy.and.callFake(path => {
             const error = new Error(`EBUSY, resource busy or locked '${path}'`);
             error.path = path;
             error.code = 'EBUSY';
             throw error;
           })
-        );
+        });
 
-        it('creates a notification', () => {
-          waitsForPromise(() => workspace.open('file1'));
+        it('creates a notification', async () => {
+          await workspace.open('file1');
 
-          runs(() => {
-            expect(notificationSpy).toHaveBeenCalled();
-            const notification = notificationSpy.mostRecentCall.args[0];
-            expect(notification.getType()).toBe('warning');
-            expect(notification.getMessage()).toContain('Unable to open');
-            expect(notification.getMessage()).toContain('file1');
-          });
+          expect(notificationSpy).toHaveBeenCalled();
+          const notification = notificationSpy.calls.mostRecent().args[0];
+          expect(notification.getType()).toBe('warning');
+          expect(notification.getMessage()).toContain('Unable to open');
+          expect(notification.getMessage()).toContain('file1');
         });
       });
 
       describe('when there is an unhandled error', () => {
-        beforeEach(() =>
-          spyOn(fs, 'openSync').andCallFake(path => {
+        beforeEach(() => {
+          fsOpenSyncSpy.and.callFake(path => {
             throw new Error('I dont even know what is happening right now!!');
-          })
-        );
+          });
+        });
 
-        it('rejects the promise', () => {
-          waitsFor(done => {
-            workspace.open('file1').catch(error => {
-              expect(error.message).toBe(
-                'I dont even know what is happening right now!!'
-              );
-              done();
-            });
+        it('rejects the promise', (done) => {
+          workspace.open('file1').catch(error => {
+            expect(error.message).toBe(
+              'I dont even know what is happening right now!!'
+            );
+            done();
           });
         });
       });
     });
 
     describe('when the file is already open in pending state', () => {
-      it('should terminate the pending state', () => {
+      it('should terminate the pending state', async () => {
         let editor = null;
         let pane = null;
 
-        waitsForPromise(() =>
-          atom.workspace.open('sample.js', { pending: true }).then(o => {
-            editor = o;
-            pane = atom.workspace.getActivePane();
-          })
-        );
+        editor = await atom.workspace.open('sample.js', { pending: true });
+        pane = atom.workspace.getActivePane();
 
-        runs(() => expect(pane.getPendingItem()).toEqual(editor));
+        expect(pane.getPendingItem()).toEqual(editor);
 
-        waitsForPromise(() => atom.workspace.open('sample.js'));
+        await atom.workspace.open('sample.js');
 
-        runs(() => expect(pane.getPendingItem()).toBeNull());
+        expect(pane.getPendingItem()).toBeNull();
       });
     });
 
     describe('when opening will switch from a pending tab to a permanent tab', () => {
-      it('keeps the pending tab open', () => {
+      it('keeps the pending tab open', async () => {
         let editor1 = null;
         let editor2 = null;
 
-        waitsForPromise(() =>
-          atom.workspace.open('sample.txt').then(o => {
-            editor1 = o;
-          })
-        );
+        editor1 = await atom.workspace.open('sample.txt');
+        editor2 = await atom.workspace.open('sample2.txt', { pending: true });
 
-        waitsForPromise(() =>
-          atom.workspace.open('sample2.txt', { pending: true }).then(o => {
-            editor2 = o;
-          })
-        );
-
-        runs(() => {
-          const pane = atom.workspace.getActivePane();
-          pane.activateItem(editor1);
-          expect(pane.getItems().length).toBe(2);
-          expect(pane.getItems()).toEqual([editor1, editor2]);
-        });
+        const pane = atom.workspace.getActivePane();
+        pane.activateItem(editor1);
+        expect(pane.getItems().length).toBe(2);
+        expect(pane.getItems()).toEqual([editor1, editor2]);
       });
     });
 
     describe('when replacing a pending item which is the last item in a second pane', () => {
-      it('does not destroy the pane even if core.destroyEmptyPanes is on', () => {
+      it('does not destroy the pane even if core.destroyEmptyPanes is on', async () => {
         atom.config.set('core.destroyEmptyPanes', true);
         let editor1 = null;
         let editor2 = null;
         const leftPane = atom.workspace.getActivePane();
         let rightPane = null;
 
-        waitsForPromise(() =>
-          atom.workspace
-            .open('sample.js', { pending: true, split: 'right' })
-            .then(o => {
-              editor1 = o;
-              rightPane = atom.workspace.getActivePane();
-              spyOn(rightPane, 'destroy').andCallThrough();
-            })
-        );
+        editor1 = await atom.workspace.open('sample.js', { pending: true, split: 'right' });
+        rightPane = atom.workspace.getActivePane();
+        spyOn(rightPane, 'destroy').and.callThrough();
 
-        runs(() => {
-          expect(leftPane).not.toBe(rightPane);
-          expect(atom.workspace.getActivePane()).toBe(rightPane);
-          expect(atom.workspace.getActivePane().getItems().length).toBe(1);
-          expect(rightPane.getPendingItem()).toBe(editor1);
-        });
+        expect(leftPane).not.toBe(rightPane);
+        expect(atom.workspace.getActivePane()).toBe(rightPane);
+        expect(atom.workspace.getActivePane().getItems().length).toBe(1);
+        expect(rightPane.getPendingItem()).toBe(editor1);
 
-        waitsForPromise(() =>
-          atom.workspace.open('sample.txt', { pending: true }).then(o => {
-            editor2 = o;
-          })
-        );
+        editor2 = await atom.workspace.open('sample.txt', { pending: true });
 
-        runs(() => {
-          expect(rightPane.getPendingItem()).toBe(editor2);
-          expect(rightPane.destroy.callCount).toBe(0);
-        });
+        expect(rightPane.getPendingItem()).toBe(editor2);
+        expect(rightPane.destroy.calls.count()).toBe(0);
       });
     });
 
@@ -1553,7 +1326,7 @@ describe('Workspace', () => {
   });
 
   describe('::onDidStopChangingActivePaneItem()', () => {
-    it('invokes observers when the active item of the active pane stops changing', () => {
+    it('invokes observers when the active item of the active pane stops changing', async () => {
       const pane1 = atom.workspace.getCenter().getActivePane();
       const pane2 = pane1.splitRight({
         items: [document.createElement('div'), document.createElement('div')]
@@ -1573,7 +1346,7 @@ describe('Workspace', () => {
       pane1.activate();
       atom.workspace.getLeftDock().activate();
 
-      advanceClock(100);
+      await timeoutPromise(100);
       expect(emittedItems).toEqual([
         atom.workspace.getLeftDock().getActivePaneItem()
       ]);
@@ -1608,7 +1381,7 @@ describe('Workspace', () => {
         autoIndent: false
       });
       expect(javascriptGrammarUsed).toHaveBeenCalled();
-      expect(observeTextEditorsSpy.callCount).toBe(1);
+      expect(observeTextEditorsSpy.calls.count()).toBe(1);
 
       expect(coffeeScriptGrammarUsed).not.toHaveBeenCalled();
       atom.grammars.assignLanguageMode(editor, 'source.coffee');
@@ -1644,7 +1417,7 @@ describe('Workspace', () => {
         autoIndent: false
       });
       expect(javascriptGrammarUsed).toHaveBeenCalled();
-      expect(observeTextEditorsSpy.callCount).toBe(1);
+      expect(observeTextEditorsSpy.calls.count()).toBe(1);
 
       expect(coffeeScriptGrammarUsed).not.toHaveBeenCalled();
       atom.grammars.assignLanguageMode(editor, 'source.coffee');
@@ -1671,74 +1444,60 @@ describe('Workspace', () => {
   });
 
   describe('::reopenItem()', () => {
-    it("opens the uri associated with the last closed pane that isn't currently open", () => {
+    it("opens the uri associated with the last closed pane that isn't currently open", async () => {
       const pane = workspace.getActivePane();
-      waitsForPromise(() =>
-        workspace
-          .open('a')
-          .then(() =>
-            workspace
-              .open('b')
-              .then(() => workspace.open('file1').then(() => workspace.open()))
-          )
-      );
 
-      runs(() => {
-        // does not reopen items with no uri
-        expect(workspace.getActivePaneItem().getURI()).toBeUndefined();
-        pane.destroyActiveItem();
-      });
+      await workspace.open('a');
+      await workspace.open('b');
+      await workspace.open('file1');
+      await workspace.open();
 
-      waitsForPromise(() => workspace.reopenItem());
+      // does not reopen items with no uri
+      expect(workspace.getActivePaneItem().getURI()).toBeUndefined();
+      pane.destroyActiveItem();
+
+      await workspace.reopenItem();
 
       const firstDirectory = atom.project.getDirectories()[0];
       expect(firstDirectory).toBeDefined();
 
-      runs(() => {
-        expect(workspace.getActivePaneItem().getURI()).not.toBeUndefined();
+      expect(workspace.getActivePaneItem().getURI()).not.toBeUndefined();
 
-        // destroy all items
-        expect(workspace.getActivePaneItem().getURI()).toBe(
-          firstDirectory.resolve('file1')
-        );
-        pane.destroyActiveItem();
-        expect(workspace.getActivePaneItem().getURI()).toBe(
-          firstDirectory.resolve('b')
-        );
-        pane.destroyActiveItem();
-        expect(workspace.getActivePaneItem().getURI()).toBe(
-          firstDirectory.resolve('a')
-        );
-        pane.destroyActiveItem();
-
-        // reopens items with uris
-        expect(workspace.getActivePaneItem()).toBeUndefined();
-      });
-
-      waitsForPromise(() => workspace.reopenItem());
-
-      runs(() =>
-        expect(workspace.getActivePaneItem().getURI()).toBe(
-          firstDirectory.resolve('a')
-        )
+      // destroy all items
+      expect(workspace.getActivePaneItem().getURI()).toBe(
+        firstDirectory.resolve('file1')
       );
+      pane.destroyActiveItem();
+      expect(workspace.getActivePaneItem().getURI()).toBe(
+        firstDirectory.resolve('b')
+      );
+      pane.destroyActiveItem();
+      expect(workspace.getActivePaneItem().getURI()).toBe(
+        firstDirectory.resolve('a')
+      );
+      pane.destroyActiveItem();
+
+      // reopens items with uris
+      expect(workspace.getActivePaneItem()).toBeUndefined();
+
+      await workspace.reopenItem();
+
+      expect(workspace.getActivePaneItem().getURI()).toBe(
+        firstDirectory.resolve('a')
+      )
 
       // does not reopen items that are already open
-      waitsForPromise(() => workspace.open('b'));
+      await workspace.open('b');
 
-      runs(() =>
-        expect(workspace.getActivePaneItem().getURI()).toBe(
-          firstDirectory.resolve('b')
-        )
-      );
+      expect(workspace.getActivePaneItem().getURI()).toBe(
+        firstDirectory.resolve('b')
+      )
 
-      waitsForPromise(() => workspace.reopenItem());
+      await workspace.reopenItem();
 
-      runs(() =>
-        expect(workspace.getActivePaneItem().getURI()).toBe(
-          firstDirectory.resolve('file1')
-        )
-      );
+      expect(workspace.getActivePaneItem().getURI()).toBe(
+        firstDirectory.resolve('file1')
+      )
     });
   });
 
@@ -1801,11 +1560,9 @@ describe('Workspace', () => {
   });
 
   describe('::openLicense()', () => {
-    it('opens the license as plain-text in a buffer', () => {
-      waitsForPromise(() => workspace.openLicense());
-      runs(() =>
-        expect(workspace.getActivePaneItem().getText()).toMatch(/Copyright/)
-      );
+    it('opens the license as plain-text in a buffer', async () => {
+      await workspace.openLicense();
+      expect(workspace.getActivePaneItem().getText()).toMatch(/Copyright/)
     });
   });
 
@@ -1855,16 +1612,16 @@ describe('Workspace', () => {
   });
 
   describe('::observeTextEditors()', () => {
-    it('invokes the observer with current and future text editors', () => {
+    it('invokes the observer with current and future text editors', async () => {
       const observed = [];
 
-      waitsForPromise(() => workspace.open());
-      waitsForPromise(() => workspace.open());
-      waitsForPromise(() => workspace.openLicense());
+      await workspace.open();
+      await workspace.open();
+      await workspace.openLicense();
 
-      runs(() => workspace.observeTextEditors(editor => observed.push(editor)));
+      workspace.observeTextEditors(editor => observed.push(editor));
 
-      waitsForPromise(() => workspace.open());
+      await workspace.open();
 
       expect(observed).toEqual(workspace.getTextEditors());
     });
@@ -1948,13 +1705,11 @@ describe('Workspace', () => {
     it('invokes the observer when closing the one and only text editor after deserialization', async () => {
       pane.activateItem(new TextEditor());
 
-      simulateReload();
+      await simulateReload();
 
-      runs(() => {
-        workspace.onDidChangeActiveTextEditor(editor => observed.push(editor));
-        workspace.closeActivePaneItemOrEmptyPaneOrWindow();
-        expect(observed).toEqual([undefined]);
-      });
+      workspace.onDidChangeActiveTextEditor(editor => observed.push(editor));
+      workspace.closeActivePaneItemOrEmptyPaneOrWindow();
+      expect(observed).toEqual([undefined]);
     });
   });
 
@@ -2027,9 +1782,12 @@ describe('Workspace', () => {
       'source.coffee',
       'source.js', // Tree-sitter grammars also load
       'source.js',
+      'source.js',
+      'source.js.regexp',
       'source.js.regexp',
       'source.js.regexp',
       'source.js.regexp.replacement',
+      'source.jsdoc',
       'source.jsdoc',
       'source.jsdoc',
       'source.litcoffee',
@@ -2055,11 +1813,10 @@ describe('Workspace', () => {
     });
 
     describe("when the active pane item's path is not inside a project path", () => {
-      beforeEach(() =>
-        waitsForPromise(() =>
-          atom.workspace.open('b').then(() => atom.project.setPaths([]))
-        )
-      );
+      beforeEach(async () => {
+        await atom.workspace.open('b');
+        atom.project.setPaths([]);
+      });
 
       it("sets the title to the pane item's title plus the item's path", () => {
         const item = atom.workspace.getActivePaneItem();
@@ -2125,7 +1882,9 @@ describe('Workspace', () => {
     });
 
     describe('when the active pane item is inside a project path', () => {
-      beforeEach(() => waitsForPromise(() => atom.workspace.open('b')));
+      beforeEach(async () => {
+        await atom.workspace.open('b');
+      });
 
       describe('when there is an active pane item', () => {
         it("sets the title to the pane item's title plus the project path", () => {
@@ -2187,9 +1946,11 @@ describe('Workspace', () => {
     });
 
     describe('when the workspace is deserialized', () => {
-      beforeEach(() => waitsForPromise(() => atom.workspace.open('a')));
+      beforeEach(async () => {
+        await atom.workspace.open('a');
+      });
 
-      it("updates the title to contain the project's path", () => {
+      it("updates the title to contain the project's path", async () => {
         document.title = null;
 
         const atom2 = new AtomEnvironment({
@@ -2203,25 +1964,21 @@ describe('Workspace', () => {
           })
         });
 
-        waitsForPromise(() =>
-          atom2.project.deserialize(atom.project.serialize())
+        await atom2.project.deserialize(atom.project.serialize())
+
+        atom2.workspace.deserialize(
+          atom.workspace.serialize(),
+          atom2.deserializers
+        );
+        const item = atom2.workspace.getActivePaneItem();
+        const pathEscaped = fs.tildify(
+          escapeStringRegex(atom.project.getPaths()[0])
+        );
+        expect(document.title).toMatch(
+          new RegExp(`^${item.getLongTitle()} \\u2014 ${pathEscaped}`)
         );
 
-        runs(() => {
-          atom2.workspace.deserialize(
-            atom.workspace.serialize(),
-            atom2.deserializers
-          );
-          const item = atom2.workspace.getActivePaneItem();
-          const pathEscaped = fs.tildify(
-            escapeStringRegex(atom.project.getPaths()[0])
-          );
-          expect(document.title).toMatch(
-            new RegExp(`^${item.getLongTitle()} \\u2014 ${pathEscaped}`)
-          );
-
-          atom2.destroy();
-        });
+        atom2.destroy();
       });
     });
   });
@@ -2230,12 +1987,11 @@ describe('Workspace', () => {
     let item1;
     let item2;
 
-    beforeEach(() => {
-      waitsForPromise(() => atom.workspace.open('a'));
-      waitsForPromise(() => atom.workspace.open('b'));
-      runs(() => {
-        [item1, item2] = atom.workspace.getPaneItems();
-      });
+    beforeEach(async () => {
+      await atom.workspace.open('a');
+      await atom.workspace.open('b');
+
+      [item1, item2] = atom.workspace.getPaneItems();
     });
 
     it('calls setDocumentEdited when the active item changes', () => {
@@ -2247,16 +2003,16 @@ describe('Workspace', () => {
       expect(setDocumentEdited).toHaveBeenCalledWith(true);
     });
 
-    it("calls atom.setDocumentEdited when the active item's modified status changes", () => {
+    it("calls atom.setDocumentEdited when the active item's modified status changes", async () => {
       expect(atom.workspace.getActivePaneItem()).toBe(item2);
       item2.insertText('a');
-      advanceClock(item2.getBuffer().getStoppedChangingDelay());
+      await timeoutPromise(item2.getBuffer().getStoppedChangingDelay());
 
       expect(item2.isModified()).toBe(true);
       expect(setDocumentEdited).toHaveBeenCalledWith(true);
 
       item2.undo();
-      advanceClock(item2.getBuffer().getStoppedChangingDelay());
+      await timeoutPromise(item2.getBuffer().getStoppedChangingDelay());
 
       expect(item2.isModified()).toBe(false);
       expect(setDocumentEdited).toHaveBeenCalledWith(false);
@@ -2266,8 +2022,8 @@ describe('Workspace', () => {
   describe('adding panels', () => {
     class TestItem {}
 
-    // Don't use ES6 classes because then we'll have to call `super()` which we can't do with
-    // HTMLElement
+    // Don't use ES6 classes because then we'll have to call `super()` which we
+    // can't do with HTMLElement
     function TestItemElement() {
       this.constructor = TestItemElement;
     }
@@ -2277,11 +2033,11 @@ describe('Workspace', () => {
     Ctor.prototype = HTMLElement.prototype;
     TestItemElement.prototype = new Ctor();
     TestItemElement.__super__ = HTMLElement.prototype;
-    TestItemElement.prototype.initialize = function(model) {
+    TestItemElement.prototype.initialize = function (model) {
       this.model = model;
       return this;
     };
-    TestItemElement.prototype.getModel = function() {
+    TestItemElement.prototype.getModel = function () {
       return this.model;
     };
 
@@ -2582,7 +2338,7 @@ describe('Workspace', () => {
             });
           });
 
-          describe('newlines on regexps', async () => {
+          describe('newlines on regexps', () => {
             it('returns multiline results from regexps', async () => {
               const results = [];
 
@@ -2722,7 +2478,7 @@ describe('Workspace', () => {
               });
             });
           });
-          describe('pcre2 enabled', async () => {
+          describe('pcre2 enabled', () => {
             it('supports lookbehind searches', async () => {
               const results = [];
 
@@ -2990,6 +2746,67 @@ describe('Workspace', () => {
           expect(matches.length).toBe(1);
         });
 
+        it('filters open modified buffers from the results against the specified glob pattern', async () => {
+          const projectPath = path.join(__dirname, 'fixtures', 'workspace-scan');
+          atom.project.setPaths([projectPath]);
+
+          // Add the word "smapdi" to each of these buffers, but do not save
+          // either one.
+          let aSample1Editor = await atom.workspace.open(path.join(projectPath, 'a-dir', 'sample1.js'));
+          let aSample1Text = aSample1Editor.getText();
+          aSample1Editor.setText(`${aSample1Text} smapdi`);
+          let bSample1Editor = await atom.workspace.open(path.join(projectPath, 'b-dir', 'sample1.js'));
+          let bSample1Text = bSample1Editor.getText();
+          bSample1Editor.setText(`${bSample1Text} smapdi`);
+
+          const positiveGlobs = ['b-dir', 'b-dir/*.js', 'b-dir/**/*.js'];
+          const negativeGlobs = ['!b-dir', '!b-dir/*.js', '!b-dir/**/*.js'];
+
+          for (let glob of positiveGlobs) {
+            let paths = [];
+            await scan(/\bsmapdi\b/, { paths: [glob] }, result => {
+              paths.push(atom.project.relativize(result.filePath));
+            });
+
+            // We should get two results:
+            //
+            // * b-dir/sample2.js ("smapdi" exists on disk)
+            // * b-dir/sample1.js ("smapdi" does not exist on disk, but exists
+            //   in the modified buffer)
+            //
+            // We should _not_ get:
+            //
+            // * a-dir/sample1.js ("smapdi" exists in the modified buffer, but
+            //   this path doesn't match our glob!)
+            expect(paths.length).toBe(2, glob);
+            expect(paths.includes('b-dir/sample1.js')).toBe(true, glob);
+            expect(paths.includes('b-dir/sample2.js')).toBe(true, glob);
+            expect(paths.includes('a-dir/sample1.js')).toBe(false, glob);
+          }
+
+          for (let glob of negativeGlobs) {
+            let paths = [];
+            await scan(/\bsmapdi\b/, { paths: [glob] }, result => {
+              paths.push(atom.project.relativize(result.filePath));
+            });
+
+            // We should get one result:
+            //
+            // * a-dir/sample1.js ("smapdi" exists in the modified buffer)
+            //
+            // We should _not_ get:
+            //
+            // * b-dir/sample1.js ("smapdi" exists in the modified buffer, but
+            //   should fail our negated glob!)
+            // * b-dir/sample2.js ("smapdi" exists on disk, but should fail our
+            //   negated glob!)
+            expect(paths.length).toBe(1, glob);
+            expect(paths.includes('b-dir/sample1.js')).toBe(false, glob);
+            expect(paths.includes('b-dir/sample2.js')).toBe(false, glob);
+            expect(paths.includes('a-dir/sample1.js')).toBe(true, glob);
+          }
+        });
+
         it("includes files and folders that begin with a '.'", async () => {
           const projectPath = temp.mkdirSync('atom-spec-workspace');
           const filePath = path.join(projectPath, '.text');
@@ -3172,8 +2989,6 @@ describe('Workspace', () => {
                   }
                 }
               );
-
-              waitsFor(() => atom.workspace.directorySearchers.length > 0);
             });
 
             it('can override the DefaultDirectorySearcher on a per-directory basis', async () => {
@@ -3212,8 +3027,8 @@ describe('Workspace', () => {
               // onPathsSearched should be called once by each DirectorySearcher. The order is not
               // guaranteed, so we can only verify the total number of paths searched is correct
               // after the second call.
-              expect(onPathsSearched.callCount).toBe(2);
-              expect(onPathsSearched.mostRecentCall.args[0]).toBe(
+              expect(onPathsSearched.calls.count()).toBe(2);
+              expect(onPathsSearched.calls.mostRecent().args[0]).toBe(
                 numPathsToPretendToSearchInCustomDirectorySearcher +
                   numPathsSearchedInDir2
               );
@@ -3223,24 +3038,16 @@ describe('Workspace', () => {
               const thenable = scan(/aaaa/, {}, () => {});
               let resultOfPromiseSearch = null;
 
-              waitsFor('fakeSearch to be defined', () => fakeSearch != null);
+              expect(fakeSearch.cancelled).toBe(undefined);
+              thenable.cancel();
+              expect(fakeSearch.cancelled).toBe(true);
 
-              runs(() => {
-                expect(fakeSearch.cancelled).toBe(undefined);
-                thenable.cancel();
-                expect(fakeSearch.cancelled).toBe(true);
-              });
+              resultOfPromiseSearch = await thenable;
 
-              waitsForPromise(() =>
-                thenable.then(promiseResult => {
-                  resultOfPromiseSearch = promiseResult;
-                })
-              );
-
-              runs(() => expect(resultOfPromiseSearch).toBe('cancelled'));
+              expect(resultOfPromiseSearch).toBe('cancelled');
             });
 
-            it('will have the side-effect of failing the overall search if it fails', () => {
+            it('will have the side-effect of failing the overall search if it fails', async () => {
               // This provider's search should be cancelled when the first provider fails
               let cancelableSearch;
               let fakeSearch2 = null;
@@ -3258,24 +3065,19 @@ describe('Workspace', () => {
                 }
               );
 
-              let didReject = false;
-              const promise = (cancelableSearch = scan(/aaaa/, () => {}));
-              waitsFor('fakeSearch to be defined', () => fakeSearch != null);
+              let cancelableSearchCatchSpy = jasmine.createSpy('cancelableSearch catch spy');
+              cancelableSearch = scan(/aaaa/, () => {});
 
-              runs(() => fakeSearch.hoistedReject());
+              fakeSearch.hoistedReject();
 
-              waitsForPromise(() =>
-                cancelableSearch.catch(() => {
-                  didReject = true;
-                })
-              );
+              await cancelableSearch.catch(cancelableSearchCatchSpy);
 
-              waitsFor(done => promise.then(null, done));
+              await new Promise((resolve) => {
+                cancelableSearch.then(null, resolve);
+              })
 
-              runs(() => {
-                expect(didReject).toBe(true);
-                expect(fakeSearch2.cancelled).toBe(true);
-              });
+              expect(cancelableSearchCatchSpy).toHaveBeenCalled();
+              expect(fakeSearch2.cancelled).toBe(true);
             });
           });
         });
@@ -3392,67 +3194,55 @@ describe('Workspace', () => {
     });
 
     describe("when a file doesn't exist", () => {
-      it('calls back with an error', () => {
+      it('calls back with an error', async () => {
         const errors = [];
         const missingPath = path.resolve('/not-a-file.js');
         expect(fs.existsSync(missingPath)).toBeFalsy();
 
-        waitsForPromise(() =>
-          atom.workspace.replace(
-            /items/gi,
-            'items',
-            [missingPath],
-            (result, error) => errors.push(error)
-          )
+        await atom.workspace.replace(
+          /items/gi,
+          'items',
+          [missingPath],
+          (result, error) => errors.push(error)
         );
 
-        runs(() => {
-          expect(errors).toHaveLength(1);
-          expect(errors[0].path).toBe(missingPath);
-        });
+        expect(errors).toHaveLength(1);
+        expect(errors[0].path).toBe(missingPath);
       });
     });
 
     describe('when called with unopened files', () => {
-      it('replaces properly', () => {
+      it('replaces properly', async () => {
         const filePath = path.join(projectDir, 'sample.js');
         fs.copyFileSync(path.join(fixturesDir, 'sample.js'), filePath);
 
         const results = [];
-        waitsForPromise(() =>
-          atom.workspace.replace(/items/gi, 'items', [filePath], result =>
-            results.push(result)
-          )
-        );
-
-        runs(() => {
-          expect(results).toHaveLength(1);
-          expect(results[0].filePath).toBe(filePath);
-          expect(results[0].replacements).toBe(6);
+        await atom.workspace.replace(/items/gi, 'items', [filePath], (result) => {
+          results.push(result)
         });
+
+        expect(results).toHaveLength(1);
+        expect(results[0].filePath).toBe(filePath);
+        expect(results[0].replacements).toBe(6);
       });
 
-      it('does not discard the multiline flag', () => {
+      it('does not discard the multiline flag', async () => {
         const filePath = path.join(projectDir, 'sample.js');
         fs.copyFileSync(path.join(fixturesDir, 'sample.js'), filePath);
 
         const results = [];
-        waitsForPromise(() =>
-          atom.workspace.replace(/;$/gim, 'items', [filePath], result =>
-            results.push(result)
-          )
-        );
-
-        runs(() => {
-          expect(results).toHaveLength(1);
-          expect(results[0].filePath).toBe(filePath);
-          expect(results[0].replacements).toBe(8);
+        await atom.workspace.replace(/;$/gim, 'items', [filePath], result => {
+          results.push(result)
         });
+
+        expect(results).toHaveLength(1);
+        expect(results[0].filePath).toBe(filePath);
+        expect(results[0].replacements).toBe(8);
       });
     });
 
     describe('when a buffer is already open', () => {
-      it('replaces properly and saves when not modified', () => {
+      it('replaces properly and saves when not modified', async () => {
         const filePath = path.join(projectDir, 'sample.js');
         fs.copyFileSync(
           path.join(fixturesDir, 'sample.js'),
@@ -3462,30 +3252,22 @@ describe('Workspace', () => {
         let editor = null;
         const results = [];
 
-        waitsForPromise(() =>
-          atom.workspace.open('sample.js').then(o => {
-            editor = o;
-          })
-        );
+        editor = await atom.workspace.open('sample.js');
 
-        runs(() => expect(editor.isModified()).toBeFalsy());
+        expect(editor.isModified()).toBeFalsy();
 
-        waitsForPromise(() =>
-          atom.workspace.replace(/items/gi, 'items', [filePath], result =>
-            results.push(result)
-          )
-        );
-
-        runs(() => {
-          expect(results).toHaveLength(1);
-          expect(results[0].filePath).toBe(filePath);
-          expect(results[0].replacements).toBe(6);
-
-          expect(editor.isModified()).toBeFalsy();
+        await atom.workspace.replace(/items/gi, 'items', [filePath], result => {
+          results.push(result)
         });
+
+        expect(results).toHaveLength(1);
+        expect(results[0].filePath).toBe(filePath);
+        expect(results[0].replacements).toBe(6);
+
+        expect(editor.isModified()).toBeFalsy();
       });
 
-      it('does not replace when the path is not specified', () => {
+      it('does not replace when the path is not specified', async () => {
         const filePath = path.join(projectDir, 'sample.js');
         const commentFilePath = path.join(
           projectDir,
@@ -3498,54 +3280,40 @@ describe('Workspace', () => {
         );
         const results = [];
 
-        waitsForPromise(() => atom.workspace.open('sample-with-comments.js'));
+        await atom.workspace.open('sample-with-comments.js');
 
-        waitsForPromise(() =>
-          atom.workspace.replace(
-            /items/gi,
-            'items',
-            [commentFilePath],
-            result => results.push(result)
-          )
+        await atom.workspace.replace(
+          /items/gi,
+          'items',
+          [commentFilePath],
+          result => results.push(result)
         );
 
-        runs(() => {
-          expect(results).toHaveLength(1);
-          expect(results[0].filePath).toBe(commentFilePath);
-        });
+        expect(results).toHaveLength(1);
+        expect(results[0].filePath).toBe(commentFilePath);
       });
 
-      it('does NOT save when modified', () => {
+      it('does NOT save when modified', async () => {
         const filePath = path.join(projectDir, 'sample.js');
         fs.copyFileSync(path.join(fixturesDir, 'sample.js'), filePath);
 
         let editor = null;
         const results = [];
 
-        waitsForPromise(() =>
-          atom.workspace.open('sample.js').then(o => {
-            editor = o;
-          })
-        );
+        editor = await atom.workspace.open('sample.js');
 
-        runs(() => {
-          editor.buffer.setTextInRange([[0, 0], [0, 0]], 'omg');
-          expect(editor.isModified()).toBeTruthy();
+        editor.buffer.setTextInRange([[0, 0], [0, 0]], 'omg');
+        expect(editor.isModified()).toBeTruthy();
+
+        await atom.workspace.replace(/items/gi, 'okthen', [filePath], result => {
+          results.push(result)
         });
 
-        waitsForPromise(() =>
-          atom.workspace.replace(/items/gi, 'okthen', [filePath], result =>
-            results.push(result)
-          )
-        );
+        expect(results).toHaveLength(1);
+        expect(results[0].filePath).toBe(filePath);
+        expect(results[0].replacements).toBe(6);
 
-        runs(() => {
-          expect(results).toHaveLength(1);
-          expect(results[0].filePath).toBe(filePath);
-          expect(results[0].replacements).toBe(6);
-
-          expect(editor.isModified()).toBeTruthy();
-        });
+        expect(editor.isModified()).toBeTruthy();
       });
     });
   });
@@ -3553,56 +3321,48 @@ describe('Workspace', () => {
   describe('::saveActivePaneItem()', () => {
     let editor, notificationSpy;
 
-    beforeEach(() => {
-      waitsForPromise(() =>
-        atom.workspace.open('sample.js').then(o => {
-          editor = o;
-        })
-      );
+    beforeEach(async () => {
+      editor = await atom.workspace.open('sample.js');
 
       notificationSpy = jasmine.createSpy('did-add-notification');
       atom.notifications.onDidAddNotification(notificationSpy);
     });
 
     describe('when there is an error', () => {
-      it('emits a warning notification when the file cannot be saved', () => {
-        spyOn(editor, 'save').andCallFake(() => {
+      it('emits a warning notification when the file cannot be saved', async () => {
+        spyOn(editor, 'save').and.callFake(() => {
           throw new Error("'/some/file' is a directory");
         });
 
-        waitsForPromise(() =>
-          atom.workspace.saveActivePaneItem().then(() => {
-            expect(notificationSpy).toHaveBeenCalled();
-            expect(notificationSpy.mostRecentCall.args[0].getType()).toBe(
-              'warning'
-            );
-            expect(
-              notificationSpy.mostRecentCall.args[0].getMessage()
-            ).toContain('Unable to save');
-          })
+        await atom.workspace.saveActivePaneItem();
+
+        expect(notificationSpy).toHaveBeenCalled();
+        expect(notificationSpy.calls.mostRecent().args[0].getType()).toBe(
+          'warning'
         );
+        expect(
+          notificationSpy.calls.mostRecent().args[0].getMessage()
+        ).toContain('Unable to save');
       });
 
-      it('emits a warning notification when the directory cannot be written to', () => {
-        spyOn(editor, 'save').andCallFake(() => {
+      it('emits a warning notification when the directory cannot be written to', async () => {
+        spyOn(editor, 'save').and.callFake(() => {
           throw new Error("ENOTDIR, not a directory '/Some/dir/and-a-file.js'");
         });
 
-        waitsForPromise(() =>
-          atom.workspace.saveActivePaneItem().then(() => {
-            expect(notificationSpy).toHaveBeenCalled();
-            expect(notificationSpy.mostRecentCall.args[0].getType()).toBe(
-              'warning'
-            );
-            expect(
-              notificationSpy.mostRecentCall.args[0].getMessage()
-            ).toContain('Unable to save');
-          })
+        await atom.workspace.saveActivePaneItem();
+
+        expect(notificationSpy).toHaveBeenCalled();
+        expect(notificationSpy.calls.mostRecent().args[0].getType()).toBe(
+          'warning'
         );
+        expect(
+          notificationSpy.calls.mostRecent().args[0].getMessage()
+        ).toContain('Unable to save');
       });
 
-      it('emits a warning notification when the user does not have permission', () => {
-        spyOn(editor, 'save').andCallFake(() => {
+      it('emits a warning notification when the user does not have permission', async () => {
+        spyOn(editor, 'save').and.callFake(() => {
           const error = new Error(
             "EACCES, permission denied '/Some/dir/and-a-file.js'"
           );
@@ -3611,21 +3371,19 @@ describe('Workspace', () => {
           throw error;
         });
 
-        waitsForPromise(() =>
-          atom.workspace.saveActivePaneItem().then(() => {
-            expect(notificationSpy).toHaveBeenCalled();
-            expect(notificationSpy.mostRecentCall.args[0].getType()).toBe(
-              'warning'
-            );
-            expect(
-              notificationSpy.mostRecentCall.args[0].getMessage()
-            ).toContain('Unable to save');
-          })
+        await atom.workspace.saveActivePaneItem()
+
+        expect(notificationSpy).toHaveBeenCalled();
+        expect(notificationSpy.calls.mostRecent().args[0].getType()).toBe(
+          'warning'
         );
+        expect(
+          notificationSpy.calls.mostRecent().args[0].getMessage()
+        ).toContain('Unable to save');
       });
 
-      it('emits a warning notification when the operation is not permitted', () => {
-        spyOn(editor, 'save').andCallFake(() => {
+      it('emits a warning notification when the operation is not permitted', async () => {
+        spyOn(editor, 'save').and.callFake(() => {
           const error = new Error(
             "EPERM, operation not permitted '/Some/dir/and-a-file.js'"
           );
@@ -3634,21 +3392,19 @@ describe('Workspace', () => {
           throw error;
         });
 
-        waitsForPromise(() =>
-          atom.workspace.saveActivePaneItem().then(() => {
-            expect(notificationSpy).toHaveBeenCalled();
-            expect(notificationSpy.mostRecentCall.args[0].getType()).toBe(
-              'warning'
-            );
-            expect(
-              notificationSpy.mostRecentCall.args[0].getMessage()
-            ).toContain('Unable to save');
-          })
+        await atom.workspace.saveActivePaneItem()
+
+        expect(notificationSpy).toHaveBeenCalled();
+        expect(notificationSpy.calls.mostRecent().args[0].getType()).toBe(
+          'warning'
         );
+        expect(
+          notificationSpy.calls.mostRecent().args[0].getMessage()
+        ).toContain('Unable to save');
       });
 
-      it('emits a warning notification when the file is already open by another app', () => {
-        spyOn(editor, 'save').andCallFake(() => {
+      it('emits a warning notification when the file is already open by another app', async () => {
+        spyOn(editor, 'save').and.callFake(() => {
           const error = new Error(
             "EBUSY, resource busy or locked '/Some/dir/and-a-file.js'"
           );
@@ -3657,21 +3413,19 @@ describe('Workspace', () => {
           throw error;
         });
 
-        waitsForPromise(() =>
-          atom.workspace.saveActivePaneItem().then(() => {
-            expect(notificationSpy).toHaveBeenCalled();
-            expect(notificationSpy.mostRecentCall.args[0].getType()).toBe(
-              'warning'
-            );
-            expect(
-              notificationSpy.mostRecentCall.args[0].getMessage()
-            ).toContain('Unable to save');
-          })
+        await atom.workspace.saveActivePaneItem()
+
+        expect(notificationSpy).toHaveBeenCalled();
+        expect(notificationSpy.calls.mostRecent().args[0].getType()).toBe(
+          'warning'
         );
+        expect(
+          notificationSpy.calls.mostRecent().args[0].getMessage()
+        ).toContain('Unable to save');
       });
 
-      it('emits a warning notification when the file system is read-only', () => {
-        spyOn(editor, 'save').andCallFake(() => {
+      it('emits a warning notification when the file system is read-only', async () => {
+        spyOn(editor, 'save').and.callFake(() => {
           const error = new Error(
             "EROFS, read-only file system '/Some/dir/and-a-file.js'"
           );
@@ -3680,35 +3434,34 @@ describe('Workspace', () => {
           throw error;
         });
 
-        waitsForPromise(() =>
-          atom.workspace.saveActivePaneItem().then(() => {
-            expect(notificationSpy).toHaveBeenCalled();
-            expect(notificationSpy.mostRecentCall.args[0].getType()).toBe(
-              'warning'
-            );
-            expect(
-              notificationSpy.mostRecentCall.args[0].getMessage()
-            ).toContain('Unable to save');
-          })
+        await atom.workspace.saveActivePaneItem()
+
+        expect(notificationSpy).toHaveBeenCalled();
+        expect(notificationSpy.calls.mostRecent().args[0].getType()).toBe(
+          'warning'
         );
+        expect(
+          notificationSpy.calls.mostRecent().args[0].getMessage()
+        ).toContain('Unable to save');
       });
 
-      it('emits a warning notification when the file cannot be saved', () => {
-        spyOn(editor, 'save').andCallFake(() => {
+      it('emits a warning notification when the file cannot be saved', async () => {
+        spyOn(editor, 'save').and.callFake(() => {
           throw new Error('no one knows');
         });
 
-        waitsForPromise({ shouldReject: true }, () =>
-          atom.workspace.saveActivePaneItem()
-        );
+        const catchSpy = jasmine.createSpy();
+        await atom.workspace.saveActivePaneItem().catch(catchSpy)
+
+        expect(catchSpy).toHaveBeenCalled();
       });
     });
   });
 
   describe('::closeActivePaneItemOrEmptyPaneOrWindow', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       spyOn(atom, 'close');
-      waitsForPromise(() => atom.workspace.open());
+      await atom.workspace.open();
     });
 
     it('closes the active center pane item, or the active center pane if it is empty, or the current window if there is only the empty root pane in the center', async () => {
@@ -3885,17 +3638,14 @@ describe('Workspace', () => {
   });
 
   describe('when the core.allowPendingPaneItems option is falsy', () => {
-    it('does not open item with `pending: true` option as pending', () => {
+    it('does not open item with `pending: true` option as pending', async () => {
       let pane = null;
       atom.config.set('core.allowPendingPaneItems', false);
 
-      waitsForPromise(() =>
-        atom.workspace.open('sample.js', { pending: true }).then(() => {
-          pane = atom.workspace.getActivePane();
-        })
-      );
+      await atom.workspace.open('sample.js', {pending: true})
+      pane = atom.workspace.getActivePane();
 
-      runs(() => expect(pane.getPendingItem()).toBeFalsy());
+      expect(pane.getPendingItem()).toBeFalsy();
     });
   });
 
@@ -3965,7 +3715,7 @@ describe('Workspace', () => {
     });
 
     describe("when there's no repository for the editor's file", () => {
-      it("doesn't do anything", async () => {
+      it("doesn't do anything", () => {
         editor = new TextEditor();
         editor.setText('stuff');
         atom.workspace.checkoutHeadRevision(editor);

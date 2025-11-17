@@ -8,16 +8,16 @@ def right_hand_split(
     line: Line, py36: bool = False, omit: Collection[LeafID] = ()
 #   ^^^^ variable.parameter.function
 #       ^ punctuation.separator
-#         ^^^^ storage.type
+#         ^^^^ support.storage.type
 #             ^ punctuation.separator.parameters
 #               ^^^^ variable.parameter.function
 #                   ^ punctuation.separator
-#                     ^^^^ storage.type
+#                     ^^^^ support.storage.type
 #                          ^ keyword.operator.assignment
 #                            ^^^^^ constant
 #                                 ^ punctuation.separator.parameters
 #                                   ^^^^ variable.parameter.function
 #                                       ^ punctuation.separator
 ) -> Iterator[Line]:
-#                  ^ punctuation.definition.function.begin
+#                  ^ punctuation.definition.function.colon
     pass

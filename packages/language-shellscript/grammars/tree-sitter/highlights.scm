@@ -134,7 +134,15 @@
 (binary_expression ["&&" "||"] @keyword.operator.logical.shell)
 
 (pipeline "|" @keyword.operator.pipe.shell)
-(expansion operator: "#" @keyword.operator.expansion.shell)
+
+; Any expansion operator, including all `#`s and `%`s in the following examples:
+;
+; foo="${bar#*.}"
+; foo="${bar##*.}"
+; foo="${bar%*.}"
+; foo="${bar%%*.}"
+; 
+(expansion operator: _ @keyword.operator.expansion.shell)
 
 
 ; "*" @keyword.operator.glob.shell
@@ -169,6 +177,7 @@
   ] @keyword.operator.redirect.shell)
 
 (test_operator) @keyword.operator.test.shell
+(unary_expression "!" @keyword.operator.unary.shell)
 
 ((file_descriptor) @constant.numeric.file-descriptor.shell
   (#match? @constant.numeric.file-descriptor.shell "^[12]$"))

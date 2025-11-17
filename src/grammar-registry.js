@@ -265,8 +265,20 @@ module.exports = class GrammarRegistry {
     return useLegacyTreeSitter ? 'node-tree-sitter' : 'wasm-tree-sitter';
   }
 
-  // Extended: Returns a {Number} representing how well the grammar matches the
-  // `filePath` and `contents`.
+  // Extended: Evaluates a grammar's fitness for use for a certain file.
+  //
+  // By analyzing the file's extension and contents — plus other criteria, like
+  // the user's configuration — Pulsar will assign a score to this grammar that
+  // represents how suitable it is for the given file.
+  //
+  // Ultimately, whichever grammar scores highest for this file will be used
+  // to highlight it.
+  //
+  // * `grammar`: A given {Grammar}.
+  // * `filePath`: A {String} path to the file.
+  // * `contents`: The {String} contents of the file.
+  //
+  // Returns a {Number}.
   getGrammarScore(grammar, filePath, contents) {
     if (contents == null && fs.isFileSync(filePath)) {
       contents = fs.readFileSync(filePath, 'utf8');
@@ -311,8 +323,8 @@ module.exports = class GrammarRegistry {
         }
       }
 
-      // Prefer grammars with matching content regexes. Prefer a grammar with no content regex
-      // over one with a non-matching content regex.
+      // Prefer grammars with matching content regexes. Prefer a grammar with
+      // no content regex over one with a non-matching content regex.
       if (grammar.contentRegex) {
         const contentMatch = isTreeSitter
           ? grammar.contentRegex.test(contents)
@@ -324,7 +336,8 @@ module.exports = class GrammarRegistry {
         }
       }
 
-      // Prefer grammars that the user has manually installed over bundled grammars.
+      // Prefer grammars that the user has manually installed over bundled
+      // grammars.
       if (!grammar.bundledPackage) score += 0.01;
     }
 
@@ -515,6 +528,9 @@ module.exports = class GrammarRegistry {
         }
       }
 
+      // TODO: Still calling this `updateForInjection` for polymorphism, but
+      // we can rename it `updateInjectionsForGrammar` once legacy Tree-sitter
+      // is retired.
       languageMode.updateForInjection(grammar);
     });
   }
@@ -562,7 +578,7 @@ module.exports = class GrammarRegistry {
     return this.emitter.on("did-assign-default-grammar", callback);
   }
 
-  // Experimental: Specify a type of syntax node that may embed other languages.
+  // Public: Specify a type of syntax node that may embed other languages.
   //
   // * `grammarId` The {String} id of the parent language
   // * `injectionPoint` An {Object} with the following keys:
@@ -788,18 +804,16 @@ module.exports = class GrammarRegistry {
     let result = this.textmateRegistry.getGrammars();
     if (!(params && params.includeTreeSitter)) return result;
 
-    let includeLegacyTreeSitterGrammars =
-      atom.config.get('core.useLegacyTreeSitter') === true;
-
     let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById)
       .filter(g => g.scopeName);
     result = result.concat(modernTsGrammars);
 
-    if (includeLegacyTreeSitterGrammars) {
-      const legacyTsGrammars = Object.values(this.treeSitterGrammarsById)
-        .filter(g => g.scopeName);
-      result = result.concat(legacyTsGrammars);
-    }
+    // We must include all legacy Tree-sitter grammars here just in case the
+    // user has opted into `useTreeSitterGrammars` via a scope-specific
+    // setting.
+    const legacyTsGrammars = Object.values(this.treeSitterGrammarsById)
+      .filter(g => g.scopeName);
+    result = result.concat(legacyTsGrammars);
 
     return result;
   }

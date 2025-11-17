@@ -191,14 +191,14 @@ module.exports = class Pane {
   Section: Event Subscription
   */
 
-  // Public: Invoke the given callback when the pane resizes
+  // Public: Invoke the given callback when the pane resizes.
   //
-  // The callback will be invoked when pane's flexScale property changes.
+  // The callback will be invoked when pane's `flexScale` property changes.
   // Use {::getFlexScale} to get the current value.
   //
-  // * `callback` {Function} to be called when the pane is resized
-  //   * `flexScale` {Number} representing the panes `flex-grow`; ability for a
-  //     flex item to grow if necessary.
+  // * `callback` {Function} to be called when the pane is resized.
+  //   * `flexScale` {Number} representing the pane's `flex-grow`; ability for
+  //     a flex item to grow if necessary.
   //
   // Returns a {Disposable} on which '.dispose()' can be called to unsubscribe.
   onDidChangeFlexScale(callback) {
@@ -508,7 +508,7 @@ module.exports = class Pane {
     return this.items[index];
   }
 
-  // Makes the next item in the itemStack active.
+  // Public: Makes the next item in the itemStack active.
   activateNextRecentlyUsedItem() {
     if (this.items.length > 1) {
       if (this.itemStackIndex == null)
@@ -522,7 +522,7 @@ module.exports = class Pane {
     }
   }
 
-  // Makes the previous item in the itemStack active.
+  // Public: Makes the previous item in the itemStack active.
   activatePreviousRecentlyUsedItem() {
     if (this.items.length > 1) {
       if (
@@ -538,7 +538,8 @@ module.exports = class Pane {
     }
   }
 
-  // Moves the active item to the end of the itemStack once the ctrl key is lifted
+  // Public: Moves the active item to the end of the item stack once a modifier
+  // key (typically <kbd>Ctrl</kbd>) is lifted.
   moveActiveItemToTopOfStack() {
     delete this.itemStackIndex;
     this.addItemToStack(this.activeItem);

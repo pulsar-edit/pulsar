@@ -19,11 +19,14 @@ jobs:
         node-version: [16.x]
 
     steps:
+    - name: Install build dependencies
+      run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev
+
     - name: Checkout the Latest Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     - name: Setup NodeJS - ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
 
@@ -43,6 +46,14 @@ jobs:
       run: yarn run private-js-docs
 
     - name: Commit All Changes
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: GH Action Documentation
+      run: |
+        if [ -n "`git status -s | grep "^ M"`" ]; then
+          echo "Uncommitted changes to repo files detected. Committing and pushing now."
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git add -u
+          git commit -m "GH Action Documentation"
+          git push origin HEAD
+        else
+          echo "No changes detected in repo files. Nothing to commit!"
+        fi

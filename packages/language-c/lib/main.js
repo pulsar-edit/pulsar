@@ -8,7 +8,7 @@ exports.activate = function () {
           return language;
         },
         content(node) {
-          return node.lastNamedChild;
+          return node.descendantsOfType('preproc_arg');
         }
       });
     }

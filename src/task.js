@@ -73,9 +73,9 @@ module.exports = class Task {
     const env = Object.assign({}, process.env, {userAgent: navigator.userAgent});
     this.childProcess = ChildProcess.fork(require.resolve('./task-bootstrap'), [compileCachePath, taskPath], { env, silent: true});
 
-    this.on("task:log", () => console.log(...arguments));
-    this.on("task:warn", () => console.warn(...arguments));
-    this.on("task:error", () => console.error(...arguments));
+    this.on("task:log",   (...args) => console.log(...args)  );
+    this.on("task:warn",  (...args) => console.warn(...args) );
+    this.on("task:error", (...args) => console.error(...args));
 
     this.on("task:deprecations", (deprecations) => {
       for (let i = 0; i < deprecations.length; i++) {
@@ -157,7 +157,7 @@ module.exports = class Task {
   }
 
   once(eventName, callback) {
-    var disposable = this.on(eventName, function(...args) {
+    var disposable = this.on(eventName, function (...args) {
       disposable.dispose();
       callback(...args);
     });

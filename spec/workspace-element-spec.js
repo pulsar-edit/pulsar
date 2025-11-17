@@ -864,7 +864,7 @@ describe('WorkspaceElement', () => {
     it('has a class based on the style of the scrollbar', () => {
       let observeCallback;
       const scrollbarStyle = require('scrollbar-style');
-      spyOn(scrollbarStyle, 'observePreferredScrollbarStyle').andCallFake(
+      spyOn(scrollbarStyle, 'observePreferredScrollbarStyle').and.callFake(
         cb => {
           observeCallback = cb;
           return new Disposable(() => {});
@@ -898,11 +898,15 @@ describe('WorkspaceElement', () => {
         atom.config.get('editor.fontSize') + 'px'
       );
 
-      atom.config.set(
-        'editor.fontSize',
-        atom.config.get('editor.fontSize') + 5
-      );
-      await editorElement.component.getNextUpdatePromise();
+      await new Promise((resolve) => {
+        editorElement.component.getNextUpdatePromise().then(() => resolve());
+
+        atom.config.set(
+          'editor.fontSize',
+          atom.config.get('editor.fontSize') + 5
+        );
+      })
+
       expect(getComputedStyle(editorElement).fontSize).toBe(
         atom.config.get('editor.fontSize') + 'px'
       );
@@ -914,17 +918,24 @@ describe('WorkspaceElement', () => {
       let fontFamily = atom.config.get('editor.fontFamily');
       expect(getComputedStyle(editorElement).fontFamily).toBe(fontFamily);
 
-      atom.config.set('editor.fontFamily', 'sans-serif');
+      await new Promise((resolve) => {
+        editorElement.component.getNextUpdatePromise().then(() => resolve());
+        atom.config.set('editor.fontFamily', 'sans-serif');
+      })
+
       fontFamily = atom.config.get('editor.fontFamily');
-      await editorElement.component.getNextUpdatePromise();
       expect(getComputedStyle(editorElement).fontFamily).toBe(fontFamily);
       expect(editor.getDefaultCharWidth()).not.toBe(initialCharWidth);
     });
 
     it("updates the line-height based on the 'editor.lineHeight' config value", async () => {
       const initialLineHeight = editor.getLineHeightInPixels();
-      atom.config.set('editor.lineHeight', '30px');
-      await editorElement.component.getNextUpdatePromise();
+
+      await new Promise((resolve) => {
+        editorElement.component.getNextUpdatePromise().then(() => resolve());
+        atom.config.set('editor.lineHeight', '30px');
+      });
+
       expect(getComputedStyle(editorElement).lineHeight).toBe(
         atom.config.get('editor.lineHeight')
       );
@@ -1098,7 +1109,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[0], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
 
       // Active item doesn't implement ::getPath(). Use first project directory.
       const item = document.createElement('div');
@@ -1109,7 +1120,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[0], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
 
       // Active item has no path. Use first project directory.
       item.getPath = () => null;
@@ -1119,7 +1130,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[0], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
 
       // Active item has path. Use project path for item path.
       item.getPath = () => path.join(projectPaths[1], 'a-file.txt');
@@ -1129,7 +1140,7 @@ describe('WorkspaceElement', () => {
         path.join(projectPaths[1], 'spec'),
         {}
       );
-      ipcRenderer.send.reset();
+      ipcRenderer.send.calls.reset();
     });
 
     it('passes additional options to the spec window', () => {

@@ -24,24 +24,61 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ ubuntu-latest, macos-13, windows-latest ]
         include:
           - os: ubuntu-latest
             image: "debian:10"
       fail-fast: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.image }}
+    outputs:
+      timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
+    - name: Edit sources.list - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+        sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd
+      run: apt-get update && apt-get install -y git make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools
+        libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev # <-- Python-related stuff on this line
+
+    - name: Restore Compiled Python from Cache - Linux
+      if: ${{ runner.os == 'Linux' }}
+      id: compiled-python-restore
+      uses: actions/cache/restore@v4
+      with:
+        key: ${{ runner.os }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
+        path: Python-${{ env.PYTHON_VERSION }}.9
+
+    - name: Compile Python - Linux
+      if: ${{ runner.os == 'Linux' && steps.compiled-python-restore.outputs.cache-hit != 'true' }}
+      run: |
+        wget "https://www.python.org/ftp/python/${PYTHON_VERSION}.9/Python-${PYTHON_VERSION}.9.tgz"
+        echo "45313e4c5f0e8acdec9580161d565cf5fea578e3eabf25df7cc6355bf4afa1ee  Python-${PYTHON_VERSION}.9.tgz" | sha256sum --check
+        tar xzf "Python-${PYTHON_VERSION}.9.tgz"
+        cd "Python-${PYTHON_VERSION}.9"
+        ./configure --enable-optimizations
+        make
+
+    - name: Save Compiled Python to Cache - Linux
+      if: ${{ runner.os == 'Linux' && steps.compiled-python-restore.outputs.cache-hit != 'true' }}
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ runner.os }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
+        path: Python-${{ env.PYTHON_VERSION }}.9
+
+    - name: Install Compiled Python - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: cd "Python-${PYTHON_VERSION}.9" && make install
 
     - name: Checkout the latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     - name: Setup Node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -50,7 +87,7 @@ jobs:
       # which won't work in a Debian 10 Docker image.
       # Get Python from apt repos instead on Linux.
       if: ${{ runner.os != 'Linux' }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
@@ -77,6 +114,13 @@ jobs:
         git submodule init
         git submodule update
 
+    - name: Set Timestamp for Binary Version - Linux
+      id: linux-binary-version
+      if: ${{ runner.os == 'Linux' }}
+      # This output is currently only set for the sake of the Rolling binary upload script.
+      # See the "test-and-upload-Linux" job below.
+      run: echo "timestamp=`date -u +%Y%m%d%H`" >> "$GITHUB_OUTPUT"
+
     - name: Check Pulsar Version
       if: ${{ runner.os != 'Windows' }}
       run: sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
@@ -91,8 +135,27 @@ jobs:
       # for this issue. At that point this additional step can be removed.
       run: npx node-gyp install ${{ env.NODE_VERSION }}
 
+    - name: Explicitly Specify Python Path (Windows)
+      if: ${{ runner.os == 'Windows' }}
+      # The Windows image somehow gets confused about which Python it should
+      # use. Here we set the `PYTHON` env variable to whatever we get when we
+      # run `python3` in a shell, since that's the copy we used to install
+      # `setuptools` above.
+      run: |
+        Get-Command python3 | Format-Wide -Property Source
+        $pythonPath = (Get-Command python3)[0].Source
+        echo "PYTHON=$pythonPath" >> $env:GITHUB_ENV
+
+    - name: Install Windows 10 SDK via Visual Studio
+      if: ${{ runner.os == 'Windows' }}
+      working-directory: 'C:\Program Files (x86)\Microsoft Visual Studio\Installer'
+      run: |
+        .\vs_installer.exe modify --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --quiet --norestart --nocache | Out-Host
+      # Slight funk here, the command will act async if we don't wait for it's result. `--wait` isn't supported on `vs_installer.exe`
+      # So we use the pipe to ensure we wait for output, but for the LIFE (#1350) I can't get output here.
+
     - name: Install Pulsar Dependencies
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -100,19 +163,25 @@ jobs:
         command: yarn install --ignore-engines
         on_retry_command: rm -R node_modules
 
-    - name: Build Pulsar
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+    - name: Rebuild Pulsar Dependencies for Electron
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
-        command: |
-          yarn build
-          yarn run build:apm
+        command: yarn build
+
+    - name: Build ppm
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: yarn build:apm
 
     - name: Cache Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         path: |
           node_modules
@@ -131,25 +200,23 @@ jobs:
         APPLEID: ${{ secrets.APPLEID }}
         APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
         TEAM_ID: ${{ secrets.TEAM_ID }}
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
-        timeout_minutes: 45
-        max_attempts: 3
-        retry_on: error
+        timeout_minutes: 31
+        max_attempts: 7
         command: yarn dist
 
     - name: Build Pulsar Binaries (macOS) (Unsigned)
       if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
-        timeout_minutes: 45
-        max_attempts: 3
-        retry_on: error
+        timeout_minutes: 31
+        max_attempts: 7
         command: yarn dist
 
     - name: Build Pulsar Binaries
       if: ${{ runner.os != 'macOS' }}
-      uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd
+      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -168,15 +235,19 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       run: node ./script/rename.js "Windows"
 
+    - name: Fix AppImage target - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: ./script/fix-linux-appimage.sh x86_64
+
     - name: Cache Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         path: ./binaries
         key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
 
     - name: Upload Binary Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }} Binaries
         path: ./binaries/*
@@ -210,7 +281,7 @@ jobs:
     - name: Upload Video Artifacts
       # Run whether this job passed or failed, unless explicitly cancelled.
       if: ${{ !cancelled() && runner.os != 'Linux' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }} Videos
         path: ./tests/videos/**
@@ -225,24 +296,28 @@ jobs:
     needs: build
 
     steps:
+    - name: Install build dependencies - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools
+
     - name: Checkout the latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     - name: Setup Node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ env.NODE_VERSION }}
 
     - name: Restore Cached Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ./binaries
         key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
 
     - name: Restore Cached Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: |
           node_modules
@@ -258,6 +333,12 @@ jobs:
         mkdir -p ./tests/videos
         Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
+    - name: Check Pulsar Version
+      if: ${{ runner.os != 'Windows' }}
+      run: sed -i -e "s/[0-9]*-dev/${TIMESTAMP}/g" package.json
+      env:
+        TIMESTAMP: ${{needs.build.outputs.timestamp}}
+
     - name: Add binaries to Rolling Release Repo - Linux
       if: ${{ github.event_name == 'push' && runner.os == 'Linux' }}
       # We only want to upload rolling binaries if they are a commit to master
@@ -270,7 +351,7 @@ jobs:
     - name: Upload Video Artifacts - Linux
       # Run whether this job passed or failed, unless explicitly cancelled.
       if: ${{ !cancelled() && runner.os == 'Linux' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }} Videos
         path: ./tests/videos/**

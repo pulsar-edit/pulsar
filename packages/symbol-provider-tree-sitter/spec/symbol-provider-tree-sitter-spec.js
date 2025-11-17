@@ -179,7 +179,7 @@ describe('TreeSitterProvider', () => {
           (variable_declaration
             (variable_declarator
               name: (identifier) @name
-              value: [(arrow_function) (function)]))
+              value: [(arrow_function) (function_expression)]))
         ) @definition.function
         `
       );
@@ -211,7 +211,7 @@ describe('TreeSitterProvider', () => {
           (variable_declaration
             (variable_declarator
               name: (identifier) @name
-              value: [(arrow_function) (function)]))
+              value: [(arrow_function) (function_expression)]))
         ) @definition.function
 
         (
@@ -248,6 +248,166 @@ describe('TreeSitterProvider', () => {
       grammar = editor.getGrammar();
     });
 
+    describe('symbol.context', () => {
+      beforeEach(async () => {
+        await grammar.setQueryForTest('tagsQuery', scm`
+          (
+            (variable_declaration
+              (variable_declarator
+                name: (identifier) @name
+                value: [(arrow_function) (function_expression)]))
+                (#set! symbol.context "something")
+          )
+        `);
+      });
+
+      it('assigns a `context` property on each symbol', async () => {
+        let symbols = await getSymbols(editor, 'file');
+
+        expect(symbols[0].context).toBe('something');
+        expect(symbols[0].position.row).toEqual(0);
+
+        expect(symbols[1].context).toBe('something');
+        expect(symbols[1].position.row).toEqual(1);
+      });
+    });
+
+    describe('symbol.contextNode', () => {
+      beforeEach(async () => {
+        await grammar.setQueryForTest('tagsQuery', scm`
+          (
+            (property_identifier) @name
+            (#eq? @name "push")
+            (#set! symbol.contextNode "parent.firstNamedChild")
+          )
+        `);
+      });
+
+      it('assigns a `context` property on each symbol containing the text of the referenced node', async () => {
+        let symbols = await getSymbols(editor, 'file');
+
+        expect(symbols[0].name).toBe('push');
+        expect(symbols[0].context).toBe('left');
+        expect(symbols[0].position.row).toEqual(6);
+
+        expect(symbols[1].name).toBe('push');
+        expect(symbols[1].context).toBe('right');
+        expect(symbols[1].position.row).toEqual(6);
+      });
+    });
+
+    describe('symbol.icon', () => {
+      it('defines an `icon` property on each symbol', async () => {
+        await grammar.setQueryForTest('tagsQuery', scm`
+          (
+            (variable_declaration
+              (variable_declarator
+                name: (identifier) @name
+                value: [(arrow_function) (function_expression)]))
+                (#set! symbol.icon "book")
+          )
+
+        `);
+
+        let symbols = await getSymbols(editor, 'file');
+        console.log('symbols:', symbols);
+
+        expect(symbols[0].icon).toBe('icon-book');
+        expect(symbols[0].position.row).toEqual(0);
+
+        expect(symbols[1].icon).toBe('icon-book');
+        expect(symbols[1].position.row).toEqual(1);
+      });
+
+      it('supersedes an `icon` property assigned by a tag', async () => {
+        await grammar.setQueryForTest('tagsQuery', scm`
+          (
+            (variable_declaration
+              (variable_declarator
+                name: (identifier) @name
+                value: [(arrow_function) (function_expression)]))
+                (#set! symbol.tag "class")
+                (#set! symbol.icon "book")
+          )
+        `);
+
+        let symbols = await getSymbols(editor, 'file');
+
+        expect(symbols[0].icon).toBe('icon-book');
+        expect(symbols[0].position.row).toEqual(0);
+
+        expect(symbols[1].icon).toBe('icon-book');
+        expect(symbols[1].position.row).toEqual(1);
+      });
+
+      it('supersedes an `icon` property inferred by its container', async () => {
+        await grammar.setQueryForTest('tagsQuery', scm`
+          (
+            (variable_declaration
+              (variable_declarator
+                name: (identifier) @name
+                value: [(arrow_function) (function_expression)]))
+                (#set! symbol.tag "class")
+                (#set! symbol.icon "book")
+          ) @definition.namespace
+        `);
+
+        let symbols = await getSymbols(editor, 'file');
+
+        expect(symbols[0].icon).toBe('icon-book');
+        expect(symbols[0].position.row).toEqual(0);
+
+        expect(symbols[1].icon).toBe('icon-book');
+        expect(symbols[1].position.row).toEqual(1);
+      });
+    });
+
+    describe('symbol.tag', () => {
+      it('defines a `tag` property on each symbol', async () => {
+        await grammar.setQueryForTest('tagsQuery', scm`
+          (
+            (variable_declaration
+              (variable_declarator
+                name: (identifier) @name
+                value: [(arrow_function) (function_expression)]))
+                (#set! symbol.tag "class")
+          )
+        `);
+
+        let symbols = await getSymbols(editor, 'file');
+
+        expect(symbols[0].tag).toBe('class');
+        expect(symbols[0].icon).toBe('icon-puzzle');
+        expect(symbols[0].position.row).toEqual(0);
+
+        expect(symbols[1].tag).toBe('class');
+        expect(symbols[1].icon).toBe('icon-puzzle');
+        expect(symbols[1].position.row).toEqual(1);
+      });
+
+      it('supersedes the `tag` property inferred by its container', async () => {
+        await grammar.setQueryForTest('tagsQuery', scm`
+          (
+            (variable_declaration
+              (variable_declarator
+                name: (identifier) @name
+                value: [(arrow_function) (function_expression)]))
+                (#set! symbol.tag "class")
+          ) @definition.namespace
+        `);
+
+        let symbols = await getSymbols(editor, 'file');
+
+        expect(symbols[0].tag).toBe('class');
+        expect(symbols[0].icon).toBe('icon-puzzle');
+        expect(symbols[0].position.row).toEqual(0);
+
+        expect(symbols[1].tag).toBe('class');
+        expect(symbols[1].icon).toBe('icon-puzzle');
+        expect(symbols[1].position.row).toEqual(1);
+      });
+    });
+
     describe('symbol.strip', () => {
       beforeEach(async () => {
         await grammar.setQueryForTest('tagsQuery', scm`
@@ -255,7 +415,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.strip "ort$")
           )
         `);
@@ -278,7 +438,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.prepend "Foo: ")
           )
         `);
@@ -301,7 +461,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
                 (#set! symbol.append " (foo)")
           )
 
@@ -325,8 +485,8 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
-                (#set! test.onlyIfDescendantOfType function)
+                value: [(arrow_function) (function_expression)]))
+                (#set! test.onlyIfDescendantOfType function_expression)
                 (#set! symbol.prependTextForNode "parent.parent.parent.parent.parent.firstNamedChild")
                 (#set! symbol.joiner ".")
                 (#set! test.final true)
@@ -335,7 +495,7 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
+                value: [(arrow_function) (function_expression)]))
           )
         `);
       });
@@ -358,8 +518,8 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
-                (#set! test.onlyIfNotDescendantOfType function)
+                value: [(arrow_function) (function_expression)]))
+                (#set! test.onlyIfNotDescendantOfType function_expression)
                 (#set! symbol.prepend "ROOT: ")
                 (#set! test.final true)
           )
@@ -368,8 +528,8 @@ describe('TreeSitterProvider', () => {
             (variable_declaration
               (variable_declarator
                 name: (identifier) @name
-                value: [(arrow_function) (function)]))
-                (#set! test.onlyIfDescendantOfType function)
+                value: [(arrow_function) (function_expression)]))
+                (#set! test.onlyIfDescendantOfType function_expression)
                 (#set! symbol.prependSymbolForNode "parent.parent.parent.parent.parent.firstNamedChild")
                 (#set! symbol.joiner ".")
                 (#set! test.final true)

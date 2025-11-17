@@ -1,0 +1,57 @@
+'.source.json':
+  'Atom Snippet':
+    prefix: 'snip'
+    body: """
+      {
+        "${1:.source.js}": {
+          "${2:Snippet Name}": {
+            "prefix": "${3:Snippet Trigger}",
+            "body": "${4:Hello World!}"
+          }
+        }
+      }$5
+    """
+
+  'Atom Snippet With No Selector':
+    prefix: 'snipns'
+    body: """
+      "${1:Snippet Name}": {
+        "prefix": "${2:Snippet Trigger}",
+        "body": "${3:Hello World!}"
+      }$4
+    """
+
+  'Atom Keymap':
+    prefix: 'key'
+    body: """
+      {
+        "${1:body}": {
+          "${2:cmd}-${3:i}": "${4:namespace}:${5:event}"
+        }
+      }$6
+    """
+
+'.source.coffee':
+  'Atom Snippet':
+    prefix: 'snip'
+    body: """
+      '${1:.source.js}':
+        '${2:Snippet Name}':
+          'prefix': '${3:Snippet Trigger}'
+          'body': '${4:Hello World!}'$5
+    """
+
+  'Atom Snippet With No Selector':
+    prefix: 'snipns'
+    body: """
+      '${1:Snippet Name}':
+        'prefix': '${2:Snippet Trigger}'
+        'body': '${3:Hello World!}'$4
+    """
+
+  'Atom Keymap':
+    prefix: 'key'
+    body: """
+      '${1:body}':
+        '${2:cmd}-${3:i}': '${4:namespace}:${5:event}'$6
+    """

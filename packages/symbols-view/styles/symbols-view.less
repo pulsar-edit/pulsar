@@ -43,7 +43,11 @@ atom-panel.modal .symbols-view {
   .primary-line {
     display: flex !important;
     flex-direction: row;
-    align-items: baseline;
+    align-items: center;
+
+    &.icon::before {
+      margin-left: 0;
+    }
 
     .name {
       text-overflow: ellipsis;

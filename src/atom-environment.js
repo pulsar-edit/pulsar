@@ -47,6 +47,7 @@ const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
 const { getReleaseChannel } = require('./get-app-details.js');
 const UI = require('./ui.js');
+const I18n = require("./i18n.js");
 const packagejson = require("../package.json");
 
 const stat = util.promisify(fs.stat);
@@ -87,8 +88,6 @@ class AtomEnvironment {
     /** @type {NotificationManager} */
     this.notifications = new NotificationManager();
 
-    this.stateStore = new StateStore('AtomEnvironments', 1);
-
     /** @type {Config} */
     this.config = new Config({
       saveCallback: settings => {
@@ -104,6 +103,18 @@ class AtomEnvironment {
       type: 'object',
       properties: _.clone(ConfigSchema)
     });
+
+    this.stateStore = new StateStore('AtomEnvironments', 1, {
+      config: this.config
+    });
+
+    /** @type {I18n} */
+    const localeLoadStartTime = performance.now();
+    this.i18n = new I18n({
+      config: this.config
+    });
+    this.i18n.preload();
+    this.localeLoadTime = Math.round(performance.now() - localeLoadStartTime);
 
     /** @type {KeymapManager} */
     this.keymaps = new KeymapManager({
@@ -145,17 +156,19 @@ class AtomEnvironment {
       config: this.config,
       styleManager: this.styles,
       notificationManager: this.notifications,
-      viewRegistry: this.views
+      viewRegistry: this.views,
+      applicationDelegate: this.applicationDelegate
     });
 
     /** @type {MenuManager} */
     this.menu = new MenuManager({
       keymapManager: this.keymaps,
-      packageManager: this.packages
+      packageManager: this.packages,
+      i18n: this.i18n
     });
 
     /** @type {ContextMenuManager} */
-    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps });
+    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps, i18n: this.i18n });
 
     this.packages.setMenuManager(this.menu);
     this.packages.setContextMenuManager(this.contextMenu);
@@ -256,6 +269,10 @@ class AtomEnvironment {
       projectSpecification
     } = this.getLoadSettings();
 
+    this.stateStore.initialize({
+      configDirPath: this.getConfigDirPath()
+    });
+
     ConfigSchema.projectHome = {
       type: 'string',
       default: path.join(fs.getHomeDirectory(), 'github'),
@@ -273,6 +290,10 @@ class AtomEnvironment {
     if (projectSpecification != null && projectSpecification.config != null) {
       this.project.replace(projectSpecification);
     }
+
+    this.i18n.initialize({
+      resourcePath: resourcePath
+    });
 
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });
@@ -322,7 +343,7 @@ class AtomEnvironment {
     this.attachSaveStateListeners();
     this.windowEventHandler.initialize(this.window, this.document);
 
-    this.workspace.initialize();
+    this.workspace.initialize({ configDirPath: this.getConfigDirPath() });
 
     const didChangeStyles = this.didChangeStyles.bind(this);
     this.disposables.add(this.styles.onDidAddStyleElement(didChangeStyles));
@@ -450,7 +471,7 @@ class AtomEnvironment {
     this.workspace.reset(this.packages);
     this.registerDefaultOpeners();
     this.project.reset(this.packages);
-    this.workspace.initialize();
+    this.workspace.initialize({ configDirPath: this.getConfigDirPath() });
     this.grammars.clear();
     this.textEditors.clear();
     this.views.clear();

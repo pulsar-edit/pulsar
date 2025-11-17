@@ -148,14 +148,14 @@ describe('GitRepository', () => {
       const statusHandler = jasmine.createSpy('statusHandler');
       repo.onDidChangeStatus(statusHandler);
       repo.checkoutHead(filePath);
-      expect(statusHandler.callCount).toBe(1);
-      expect(statusHandler.argsForCall[0][0]).toEqual({
+      expect(statusHandler.calls.count()).toBe(1);
+      expect(statusHandler.calls.argsFor(0)[0]).toEqual({
         path: filePath,
         pathStatus: 0
       });
 
       repo.checkoutHead(filePath);
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
     });
   });
 
@@ -177,27 +177,30 @@ describe('GitRepository', () => {
       editor = await atom.workspace.open(filePath);
     });
 
-    it('displays a confirmation dialog by default', () => {
-      // Permissions issues with this test on Windows
-      if (process.platform === 'win32') return;
+    it('displays a confirmation dialog by default', (done) => {
+      jasmine.filterByPlatform({except: ['win32']}, done); // Permissions issues with this test on Windows
 
-      atom.confirm.andCallFake(({ buttons }) => buttons.OK());
+      atom.confirm.and.callFake(({ buttons }) => buttons.OK());
       atom.config.set('editor.confirmCheckoutHeadRevision', true);
 
       repo.checkoutHeadForEditor(editor);
 
       expect(fs.readFileSync(filePath, 'utf8')).toBe('');
+
+      done();
     });
 
-    it('does not display a dialog when confirmation is disabled', () => {
-      // Flakey EPERM opening a.txt on Win32
-      if (process.platform === 'win32') return;
+    it('does not display a dialog when confirmation is disabled', (done) => {
+      jasmine.filterByPlatform({except: ['win32']}, done); // Flakey EPERM opening a.txt on Win32
+
       atom.config.set('editor.confirmCheckoutHeadRevision', false);
 
       repo.checkoutHeadForEditor(editor);
 
       expect(fs.readFileSync(filePath, 'utf8')).toBe('');
       expect(atom.confirm).not.toHaveBeenCalled();
+
+      done();
     });
   });
 
@@ -225,15 +228,15 @@ describe('GitRepository', () => {
       repo.onDidChangeStatus(statusHandler);
       fs.writeFileSync(filePath, '');
       let status = repo.getPathStatus(filePath);
-      expect(statusHandler.callCount).toBe(1);
-      expect(statusHandler.argsForCall[0][0]).toEqual({
+      expect(statusHandler.calls.count()).toBe(1);
+      expect(statusHandler.calls.argsFor(0)[0]).toEqual({
         path: filePath,
         pathStatus: status
       });
 
       fs.writeFileSync(filePath, 'abc');
       status = repo.getPathStatus(filePath);
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
     });
   });
 
@@ -282,7 +285,7 @@ describe('GitRepository', () => {
       fs.writeFileSync(modifiedPath, 'making this path modified');
 
       await repo.refreshStatus();
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
       expect(repo.getCachedPathStatus(cleanPath)).toBeUndefined();
       expect(repo.isStatusNew(repo.getCachedPathStatus(newPath))).toBeTruthy();
       expect(
@@ -349,7 +352,7 @@ describe('GitRepository', () => {
       atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
 
       await editor.save();
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: editor.getPath(),
         pathStatus: 256
@@ -363,14 +366,14 @@ describe('GitRepository', () => {
       atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
 
       await editor.getBuffer().reload();
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: editor.getPath(),
         pathStatus: 256
       });
 
       await editor.getBuffer().reload();
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
     });
 
     it("emits a status-changed event when a buffer's path changes", () => {
@@ -379,13 +382,13 @@ describe('GitRepository', () => {
       const statusHandler = jasmine.createSpy('statusHandler');
       atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
       editor.getBuffer().emitter.emit('did-change-path');
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: editor.getPath(),
         pathStatus: 256
       });
       editor.getBuffer().emitter.emit('did-change-path');
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
     });
 
     it('stops listening to the buffer when the repository is destroyed (regression)', () => {
@@ -424,7 +427,7 @@ describe('GitRepository', () => {
       project2.getRepositories()[0].onDidChangeStatus(statusHandler);
       await buffer.save();
 
-      expect(statusHandler.callCount).toBe(1);
+      expect(statusHandler.calls.count()).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
         path: buffer.getPath(),
         pathStatus: 256

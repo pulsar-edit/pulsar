@@ -1,6 +1,7 @@
 const path = require('path')
 const normalizePackageData = require('normalize-package-data');
 const fs = require("fs/promises");
+const {mkdirSync} = require("fs");
 const generateMetadata = require('./generate-metadata-for-builder')
 const macBundleDocumentTypes = require("./mac-bundle-document-types.js");
 
@@ -39,7 +40,7 @@ async function modifyMainPackageJson(file, extraMetadata, isRemovePackageScripts
 const builder = require("electron-builder")
 
 const pngIcon = 'resources/app-icons/beta.png'
-const icoIcon = 'resources/app-icons/beta.ico'
+const icoIcon = 'resources/app-icons/pulsar.ico'
 const svgIcon = 'resources/app-icons/beta.svg'
 const icnsIcon = 'resources/app-icons/beta.icns'
 
@@ -57,15 +58,13 @@ let options = {
     "src/**/*",
     "static/**/*",
     "vendor/**/*",
+    "locales/*",
     "node_modules/**/*",
 
     // Core Repo Test Inclusions
     "spec/jasmine-test-runner.js",
-    "spec/spec-helper.js",
-    "spec/jasmine-junit-reporter.js",
-    "spec/spec-helper-functions.js",
-    "spec/atom-reporter.js",
-    "spec/jasmine-list-reporter.js",
+    "spec/helpers/**/*",
+    "spec/runners/**/*",
 
     // --- Exclusions ---
     // Core Repo Exclusions
@@ -111,9 +110,10 @@ let options = {
     // Other Exclusions
     "!**/._*",
     "!**/node_modules/*.d.ts",
+    "!**/node_modules/**/*.map",
     "!**/node_modules/.bin",
     "!**/node_modules/native-mate",
-    "!node_modules/fuzzy-native/node_modules", // node_modules of the fuzzy-native package are only required for building it
+    "!node_modules/@pulsar-edit/fuzzy-native/node_modules", // node_modules of the fuzzy-native package are only required for building it
     "!**/node_modules/spellchecker/vendor/hunspell/.*",
     "!**/git-utils/deps",
     "!**/oniguruma/deps",
@@ -149,7 +149,7 @@ let options = {
   },
   rpm: {
     afterInstall: "script/post-install.sh",
-    afterRemove: "script/post-uninstall.sh",
+    afterRemove: "script/post-uninstall-rpm.sh",
     compression: 'xz',
     fpm: ['--rpm-rpmbuild-define=_build_id_links none']
   },
@@ -176,6 +176,7 @@ let options = {
         "to": "pulsar.svg"
       },
     ],
+    "executableArgs": ['--no-sandbox'],
   },
   "mac": {
     "icon": icnsIcon,
@@ -196,7 +197,8 @@ let options = {
     },
   },
   "dmg": {
-    "sign": false
+    "sign": false,
+    "writeUpdateInfo": false
   },
   "win": {
     "icon": icoIcon,
@@ -212,10 +214,6 @@ let options = {
       {
         "from": "resources/win/pulsar.js",
         "to": "pulsar.js"
-      },
-      {
-        "from": "resources/win/modifyWindowsPath.ps1",
-        "to": "modifyWindowsPath.ps1"
       }
     ],
     "target": [
@@ -236,7 +234,9 @@ let options = {
     // Hardcoding it here means it will always be used as generated from
     // the AppID 'dev.pulsar-edit.pulsar'. If this value ever changes,
     // A PR to GitHub Desktop must be made with the updated value
-    "include": "resources/win/installer.nsh"
+    "include": "resources/win/installer.nsh",
+    "warningsAsErrors": false,
+    "differentialPackage": false
   },
   "extraMetadata": {
   },
@@ -290,7 +290,13 @@ async function main() {
     config: options
   }).then((result) => {
     console.log("Built binaries")
-    fs.mkdir('binaries').catch(() => "")
+    try {
+      mkdirSync('binaries', {recursive: true})
+    } catch (err) {
+      console.warn("Warning: error encountered when making the 'binaries' dir.")
+      console.warn("(HINT: If the 'binaries' folder already exists, then this error message is probably fine to ignore!)")
+      console.warn(err)
+    }
     Promise.all(result.map(r => fs.copyFile(r, path.join('binaries', path.basename(r)))))
   }).catch((error) => {
     console.error("Error building binaries")
