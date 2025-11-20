@@ -56,6 +56,18 @@
   ] @fold
 )
 
-((if_statement) @fold
-  ; End at the end of the first (or only) consequence block.
-  (#set! fold.endAt firstNamedChild.nextNamedSibling.endPosition))
+; Folding individual branches of `if` statements is tricky. We want to end at
+; the end of the first/only consequence block, but we can't currently target it
+; by name; we can only identify it via `nextNamedSibling` and its friends.
+;
+; But that doesn't work right because a comment at the top of the consequence
+; block is not considered to be _part of_ that block, so it ends up being
+; folded _instead of_ the block.
+;
+; We can fix this better after the query predicate overhaul by allowing more
+; complex queries that identify fold start/end in one fell swoop. For now,
+; we can do this with a divided fold — but also adjusting the `@fold.end` to
+; identify the _last_ line of the block, not the first.
+(if_statement "if" @fold.start)
+(if_statement consequence: (block) @fold.end
+  (#set! fold.endAt endPosition))
