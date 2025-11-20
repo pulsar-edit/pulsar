@@ -1,0 +1,11 @@
+'src': {
+  'show-more': 'Show more'
+  'hide': 'Hide'
+  'release-notes': 'Release Notes'
+  'updates-have-been-moved': 'Updates have been moved to the package'
+  'how-to-update': 'How to update'
+  'license': 'License'
+  'enable-pulsar-updater': 'Enable `pulsar-updater` to check for updates'
+  'check-now': 'Check Now'
+  'about-title': 'About'
+}

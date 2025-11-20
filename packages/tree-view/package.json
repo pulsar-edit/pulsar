@@ -44,44 +44,44 @@
     "squashDirectoryNames": {
       "type": "boolean",
       "default": false,
-      "title": "Collapse directories",
-      "description": "Collapse directories that only contain a single directory."
+      "title": "%tree-view.config.squashDirectoryNames.title%",
+      "description": "%tree-view.config.squashDirectoryNames.description%"
     },
     "hideVcsIgnoredFiles": {
       "type": "boolean",
       "default": false,
-      "title": "Hide VCS Ignored Files",
-      "description": "Don't show files and directories ignored by the current project's VCS system. For example, projects using Git have these paths defined in their `.gitignore` file."
+      "title": "%tree-view.config.hideVcsIgnoredFiles.title%",
+      "description": "%tree-view.config.hideVcsIgnoredFiles.description%"
     },
     "hideIgnoredNames": {
       "type": "boolean",
       "default": false,
-      "description": "Don't show items matched by the `Ignored Names` core config setting."
+      "description": "%tree-view.config.hideIgnoredNames.description%"
     },
     "sortFoldersBeforeFiles": {
       "type": "boolean",
       "default": true,
-      "description": "When listing directory items, list subdirectories before listing files."
+      "description": "%tree-view.config.sortFoldersBeforeFiles.description%"
     },
     "autoReveal": {
       "type": "boolean",
       "default": false,
-      "description": "Reveal tree view entries when they become the active pane item."
+      "description": "%tree-view.config.autoReveal.description%"
     },
     "focusOnReveal": {
       "type": "boolean",
       "default": true,
-      "description": "Focus the tree view when revealing entries."
+      "description": "%tree-view.config.focusOnReveal.description%"
     },
     "alwaysOpenExisting": {
       "type": "boolean",
       "default": false,
-      "description": "When opening a file, always focus an already-existing view of the file even if it's in another pane."
+      "description": "%tree-view.config.alwaysOpenExisting.description%"
     },
     "hiddenOnStartup": {
       "type": "boolean",
       "default": false,
-      "description": "When Pulsar is opened, the view is hidden."
+      "description": "%tree-view.config.hiddenOnStartup.description%"
     }
   }
 }

@@ -1,0 +1,9 @@
+'src': {
+  'file-uses': 'File uses {kind} line endings'
+}
+'config': {
+  'defaultLineEnding': {
+    'title': 'Default line ending'
+    'description': 'Line ending to use for new files'
+  }
+}

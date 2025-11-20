@@ -17,7 +17,7 @@ class IgnoredNames {
         try {
           this.ignoredPatterns.push(new Minimatch(ignoredName, {matchBase: true, dot: true}));
         } catch (error) {
-          atom.notifications.addWarning(`Error parsing ignore pattern (${ignoredName})`, {detail: error.message});
+          atom.notifications.addWarning(atom.i18n.t("tree-view.src.error-parsing-ignore-pattern", { name: ignoredName }), { detail: error.message });
         }
       }
     }
