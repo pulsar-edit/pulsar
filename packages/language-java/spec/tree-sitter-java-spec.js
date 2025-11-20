@@ -1,18 +1,32 @@
+const path = require('path');
+const { TextEditor } = require('atom');
 
-const {TextEditor} = require('atom');
+describe('WASM Tree-sitter JavaScript grammar', () => {
 
-describe('Tree-sitter based Java grammar', function() {
+  beforeEach(async () => {
+    await atom.packages.activatePackage('language-java');
+  });
+
+  it('passes grammar tests', async () => {
+    await runGrammarTests(path.join(__dirname, 'fixtures', 'sample.java'), /\/\//)
+  });
+
+});
+
+// Skipping this suite because legacy Tree-sitter grammars no longer exist.
+// Keeping it around so that the logic can be adapted later.
+xdescribe('Tree-sitter based Java grammar', function () {
   let grammar = null;
   let editor = null;
   let buffer = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     atom.config.set('core.useTreeSitterParsers', true);
     atom.config.set('core.useLegacyTreeSitter', true);
 
     waitsForPromise(() => atom.packages.activatePackage('language-java'));
 
-    runs(function() {
+    runs(function () {
       editor = new TextEditor();
       grammar = atom.grammars.grammarForScopeName('source.java');
       editor.setGrammar(grammar);
@@ -23,7 +37,7 @@ describe('Tree-sitter based Java grammar', function() {
   // Compatibility functions with TextMate grammar tests
 
   // Returns list of tokens as [{value: ..., scopes: [...]}, ...]
-  const getTokens = function(buffer, row) {
+  const getTokens = function (buffer, row) {
     const line = buffer.lineForRow(row);
     const tokens = [];
 
@@ -61,12 +75,12 @@ describe('Tree-sitter based Java grammar', function() {
     return tokens;
   };
 
-  const tokenizeLine = function(text) {
+  const tokenizeLine = function (text) {
     buffer.setText(text);
     return getTokens(buffer, 0);
   };
 
-  const tokenizeLines = function(text) {
+  const tokenizeLines = function (text) {
     buffer.setText(text);
     const lines = buffer.getLines();
     const tokens = [];
@@ -78,7 +92,7 @@ describe('Tree-sitter based Java grammar', function() {
     return tokens;
   };
 
-  const printTokens = function(tokens) {
+  const printTokens = function (tokens) {
     console.log();
     return (() => {
       const result = [];
@@ -97,12 +111,12 @@ describe('Tree-sitter based Java grammar', function() {
 
   // Unit tests
 
-  it('parses the grammar', function() {
+  it('parses the grammar', function () {
     expect(grammar).toBeTruthy();
     expect(grammar.scopeName).toBe('source.java');
   });
 
-  it('tokenizes punctuation', function() {
+  it('tokenizes punctuation', function () {
     let tokens = tokenizeLine('int a, b, c;');
 
     expect(tokens[2]).toEqual({value: ',', scopes: ['source.java', 'punctuation.separator.delimiter']});
@@ -130,7 +144,7 @@ describe('Tree-sitter based Java grammar', function() {
     expect(tokens[7]).toEqual({value: ',', scopes: ['source.java', 'punctuation.separator.delimiter']});
 });
 
-  it('tokenizes comparison', function() {
+  it('tokenizes comparison', function () {
     const tokens = tokenizeLines(`\
 a > b;
 a < b;
@@ -149,7 +163,7 @@ a != b;\
     expect(tokens[5][1]).toEqual({value: '!=', scopes: ['source.java', 'keyword.operator.comparison']});
 });
 
-  it('tokenizes logical', function() {
+  it('tokenizes logical', function () {
     const tokens = tokenizeLines(`\
 a && b;
 a || b;
@@ -162,7 +176,7 @@ a || b;
     expect(tokens[2][0]).toEqual({value: '!', scopes: ['source.java', 'keyword.operator.logical']});
 });
 
-  it('tokenizes arithmetic', function() {
+  it('tokenizes arithmetic', function () {
     const tokens = tokenizeLines(`\
 a + b;
 a - b;
@@ -193,7 +207,7 @@ a++;
     expect(tokens[11][0]).toEqual({value: '--', scopes: ['source.java', 'keyword.operator.arithmetic']});
 });
 
-  it('tokenizes bitwise', function() {
+  it('tokenizes bitwise', function () {
     const tokens = tokenizeLines(`\
 a & b;
 a | b;
@@ -226,7 +240,7 @@ a >>>= b;
     expect(tokens[12][0]).toEqual({value: '~', scopes: ['source.java', 'keyword.operator.bitwise']});
 });
 
-  it('tokenizes brackets', function() {
+  it('tokenizes brackets', function () {
     const tokens = tokenizeLine('{ (a + b) + c[d] }');
 
     expect(tokens[0]).toEqual({value: '{', scopes: ['source.java', 'punctuation.bracket.curly']});
@@ -237,7 +251,7 @@ a >>>= b;
     expect(tokens[14]).toEqual({value: '}', scopes: ['source.java', 'punctuation.bracket.curly']});
 });
 
-  it('tokenizes literals', function() {
+  it('tokenizes literals', function () {
     const tokens = tokenizeLines(`\
 a = null;
 a = true;
@@ -274,7 +288,7 @@ a = "abc";\
     expect(tokens[14][3]).toEqual({value: '\"abc\"', scopes: ['source.java', 'string.quoted.double']});
 });
 
-  it('tokenizes constants', function() {
+  it('tokenizes constants', function () {
     const tokens = tokenizeLines(`\
 String CONSTANT_STR = "value";
 int CONST0 = 0;
@@ -303,7 +317,7 @@ f = Test.A1_B2_C3;\
     expect(tokens[10][5]).toEqual({value: 'A1_B2_C3', scopes: ['source.java', 'constant.other']});
 });
 
-  it('tokenizes constants in switch statement', function() {
+  it('tokenizes constants in switch statement', function () {
     const tokens = tokenizeLines(`\
 switch (value) {
   case CONST: break;
@@ -325,7 +339,7 @@ switch (value) {
     expect(tokens[6][3]).toEqual({value: 'C$_STR$_DEF$', scopes: ['source.java', 'constant.other']});
 });
 
-  it('tokenizes packages', function() {
+  it('tokenizes packages', function () {
     const tokens = tokenizeLine('package com.test;');
 
     expect(tokens[0]).toEqual({value: 'package', scopes: ['source.java', 'meta.package', 'keyword.other.package']});
@@ -335,20 +349,20 @@ switch (value) {
     expect(tokens[4]).toEqual({value: ';', scopes: ['source.java', 'meta.package', 'punctuation.terminator.statement']});
 });
 
-  it('tokenizes imports', function() {
+  it('tokenizes imports', function () {
     const tokens = tokenizeLine('import com.package;');
 
     expect(tokens[0]).toEqual({value: 'import', scopes: ['source.java', 'meta.import', 'keyword.other.import']});
 });
 
-  it('tokenizes static imports', function() {
+  it('tokenizes static imports', function () {
     const tokens = tokenizeLine('import static com.package;');
 
     expect(tokens[0]).toEqual({value: 'import', scopes: ['source.java', 'meta.import', 'keyword.other.import']});
     expect(tokens[2]).toEqual({value: 'static', scopes: ['source.java', 'meta.import', 'keyword.other.static']});
 });
 
-  it('tokenizes imports with asterisk', function() {
+  it('tokenizes imports with asterisk', function () {
     const tokens = tokenizeLine('import static com.package.*;');
 
     expect(tokens[0]).toEqual({value: 'import', scopes: ['source.java', 'meta.import', 'keyword.other.import']});
@@ -356,7 +370,7 @@ switch (value) {
     expect(tokens[7]).toEqual({value: '*', scopes: ['source.java', 'meta.import', 'variable.language.wildcard']});
 });
 
-  it('tokenizes static initializers', function() {
+  it('tokenizes static initializers', function () {
     const tokens = tokenizeLines(`\
 class A {
   private static int a = 0;
@@ -372,7 +386,7 @@ class A {
     expect(tokens[3][1]).toEqual({value: 'static', scopes: ['source.java', 'meta.class.body', 'storage.modifier']});
 });
 
-  it('tokenizes synchronized blocks', function() {
+  it('tokenizes synchronized blocks', function () {
     const tokens = tokenizeLines(`\
 class A {
   synchronized {
@@ -385,7 +399,7 @@ class A {
     expect(tokens[1][1]).toEqual({value: 'synchronized', scopes: ['source.java', 'meta.class.body', 'storage.modifier']});
 });
 
-  it('tokenizes instanceof', function() {
+  it('tokenizes instanceof', function () {
     const tokens = tokenizeLines(`\
 (a instanceof Tpe);
 (a instanceof tpe);
@@ -409,14 +423,14 @@ if (aaBb instanceof B) { }\
     expect(tokens[5][4]).toEqual({value: 'instanceof', scopes: ['source.java', 'keyword.operator.instanceof']});
 });
 
-  it('tokenizes ternary', function() {
+  it('tokenizes ternary', function () {
     const tokens = tokenizeLine('(a > b) ? a : b;');
 
     expect(tokens[6]).toEqual({value: '?', scopes: ['source.java', 'keyword.control.ternary']});
     expect(tokens[8]).toEqual({value: ':', scopes: ['source.java', 'keyword.control.ternary']});
 });
 
-  it('tokenizes try-catch block with multiple exceptions', function() {
+  it('tokenizes try-catch block with multiple exceptions', function () {
     const tokens = tokenizeLines(`\
 private void method() {
   try {
@@ -440,13 +454,13 @@ private void method() {
     expect(tokens[4][5]).toEqual({value: 'Exception3', scopes: ['source.java', 'storage.type']});
 });
 
-  it('tokenizes lambda expressions', function() {
+  it('tokenizes lambda expressions', function () {
     const tokens = tokenizeLine('(String s1) -> s1.length() - outer.length();');
 
     expect(tokens[5]).toEqual({value: '->', scopes: ['source.java', 'storage.type.function.arrow']});
 });
 
-  it('tokenizes spread parameters', function() {
+  it('tokenizes spread parameters', function () {
     let tokens = tokenizeLine('public void method(String... args);');
 
     expect(tokens[6]).toEqual({value: '...', scopes: ['source.java', 'punctuation.definition.parameters.varargs']});
@@ -457,7 +471,7 @@ private void method() {
     expect(tokens[11]).toEqual({value: '...', scopes: ['source.java', 'punctuation.definition.parameters.varargs']});
 });
 
-  xit('tokenizes identifiers with `$`', function() {
+  xit('tokenizes identifiers with `$`', function () {
     const tokens = tokenizeLines(`\
 class A$B {
   void func$() {
@@ -477,14 +491,14 @@ class A$B {
     expect(tokens[3][1]).toEqual({value: '$hello', scopes: ['source.java', 'meta.class.body', 'meta.method', 'meta.method.body', 'entity.name.function']});
 });
 
-  it('tokenizes this and super', function() {
+  it('tokenizes this and super', function () {
     const tokens = tokenizeLine('this.x + super.x;');
 
     expect(tokens[0]).toEqual({value: 'this', scopes: ['source.java', 'variable.language']});
     expect(tokens[5]).toEqual({value: 'super', scopes: ['source.java', 'variable.language']});
 });
 
-  it('tokenizes this and super in method invocations', function() {
+  it('tokenizes this and super in method invocations', function () {
     const tokens = tokenizeLines(`\
 class A {
   void func() {
@@ -501,7 +515,7 @@ class A {
     expect(tokens[4][3]).toEqual({value: 'super', scopes: ['source.java', 'meta.class.body', 'meta.method', 'meta.method.body', 'variable.language']});
 });
 
-  it('tokenizes comments', function() {
+  it('tokenizes comments', function () {
     const tokens = tokenizeLines(`\
 // comment
 
@@ -517,7 +531,7 @@ class A {
     expect(tokens[4][0]).toEqual({value: ' */', scopes: ['source.java', 'comment.block']});
 });
 
-  it('tokenizes type definitions', function() {
+  it('tokenizes type definitions', function () {
     const tokens = tokenizeLines(`\
 class A {
   void method() { }
@@ -547,7 +561,7 @@ class A {
     expect(tokens[9][7]).toEqual({value: 'T', scopes: ['source.java', 'meta.class.body', 'meta.method', 'storage.type']});
 });
 
-  it('tokenizes type casting', function() {
+  it('tokenizes type casting', function () {
     const tokens = tokenizeLines(`\
 class A {
   A<T> method() {
@@ -566,7 +580,7 @@ class A {
     expect(tokens[2][8]).toEqual({value: ')', scopes: ['source.java', 'meta.class.body', 'meta.method', 'meta.method.body', 'punctuation.bracket.round']});
 });
 
-  it('tokenizes class generic type definitions', function() {
+  it('tokenizes class generic type definitions', function () {
     const tokens = tokenizeLines(`\
 class Test<K, V> {}
 class Test<A extends java.util.List<T>> {}
@@ -671,7 +685,7 @@ class Test<T extends Conv<S>, S extends Conv<T>> {}\
     expect(tokens[7][22]).toEqual({value: '>', scopes: ['source.java', 'punctuation.bracket.angle']});
 });
 
-  it('tokenizes generic type definitions', function() {
+  it('tokenizes generic type definitions', function () {
     const tokens = tokenizeLines(`\
 abstract class Generics {
   HashMap<Integer, String> map = new HashMap<>();
@@ -834,7 +848,7 @@ abstract class Generics {
     expect(tokens[14][16]).toEqual({value: '>', scopes: ['source.java', 'meta.class.body', 'meta.method', 'punctuation.bracket.angle']});
 });
 
-  it('tokenizes generics without mixing with bitwise or comparison operators', function() {
+  it('tokenizes generics without mixing with bitwise or comparison operators', function () {
     const tokens = tokenizeLines(`\
 class A {
   void func1() {
@@ -878,7 +892,7 @@ class A {
     expect(tokens[14][9]).toEqual({value: '<', scopes: ['source.java', 'meta.class.body', 'meta.method', 'meta.method.body', 'keyword.operator.comparison']});
 });
 
-  it('tokenizes types and class names with underscore', function() {
+  it('tokenizes types and class names with underscore', function () {
     const tokens = tokenizeLines(`\
 class _Class {
   static _String var1;
@@ -905,7 +919,7 @@ class _Class {
     expect(tokens[3][10]).toEqual({value: '>', scopes: ['source.java', 'meta.class.body', 'punctuation.bracket.angle']});
 });
 
-  it('tokenizes classes', function() {
+  it('tokenizes classes', function () {
     let tokens = tokenizeLine('public abstract static class A { }');
 
     expect(tokens[0]).toEqual({value: 'public', scopes: ['source.java', 'storage.modifier']});
@@ -927,7 +941,7 @@ class _Class {
     expect(tokens[13]).toEqual({value: 'D', scopes: ['source.java', 'storage.type']});
 });
 
-  it('tokenizes interfaces', function() {
+  it('tokenizes interfaces', function () {
     const tokens = tokenizeLine('public interface A { }');
 
     expect(tokens[0]).toEqual({value: 'public', scopes: ['source.java', 'storage.modifier']});
@@ -937,7 +951,7 @@ class _Class {
     expect(tokens[8]).toEqual({value: '}', scopes: ['source.java', 'meta.interface.body', 'punctuation.bracket.curly']});
 });
 
-  it('tokenizes annotated interfaces', function() {
+  it('tokenizes annotated interfaces', function () {
     const tokens = tokenizeLines(`\
 public @interface A {
   String method() default "abc";
@@ -956,7 +970,7 @@ public @interface A {
     expect(tokens[2][0]).toEqual({value: '}', scopes: ['source.java', 'meta.interface.annotated.body', 'punctuation.bracket.curly']});
 });
 
-  it('tokenizes enums', function() {
+  it('tokenizes enums', function () {
     const tokens = tokenizeLines(`\
 public enum A implements B {
   CONSTANT1,
@@ -980,7 +994,7 @@ public enum A implements B {
     expect(tokens[5][0]).toEqual({value: '}', scopes: ['source.java', 'meta.enum.body', 'punctuation.bracket.curly']});
 });
 
-  it('tokenizes enums with modifiers', function() {
+  it('tokenizes enums with modifiers', function () {
     const tokens = tokenizeLines(`\
 public enum Test { }
 private enum Test { }
@@ -999,7 +1013,7 @@ protected enum Test { }\
     expect(tokens[2][4]).toEqual({value: 'Test', scopes: ['source.java', 'entity.name.type.enum']});
 });
 
-  it('tokenizes annotations', function() {
+  it('tokenizes annotations', function () {
     const tokens = tokenizeLines(`\
 @Annotation1
 @Annotation2()
@@ -1046,7 +1060,7 @@ class A { }\
     expect(tokens[5][5]).toEqual({value: ')', scopes: ['source.java', 'meta.declaration.annotation', 'punctuation.bracket.round']});
 });
 
-  it('tokenizes constructor declarations', function() {
+  it('tokenizes constructor declarations', function () {
     const tokens = tokenizeLines(`\
 class A {
   public A() throws Exception {
@@ -1072,7 +1086,7 @@ class A {
     expect(tokens[4][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.body', 'meta.constructor', 'meta.constructor.body', 'punctuation.bracket.curly']});
 });
 
-  it('tokenizes method declarations', function() {
+  it('tokenizes method declarations', function () {
     const tokens = tokenizeLines(`\
 class A {
   public int[] func(int size) throws Exception {
@@ -1128,7 +1142,7 @@ class A {
     expect(tokens[11][1]).toEqual({value: '}', scopes: ['source.java', 'meta.class.body', 'meta.method', 'meta.method.body', 'punctuation.bracket.curly']});
 });
 
-  it('tokenizes method invocations', function() {
+  it('tokenizes method invocations', function () {
     const tokens = tokenizeLines(`\
 class A {
   void func() {
@@ -1163,7 +1177,7 @@ class A {
     expect(tokens[12][5]).toEqual({value: 'func', scopes: ['source.java', 'meta.class.body', 'meta.method', 'meta.method.body', 'entity.name.function']});
 });
 
-  it('tokenizes method references', function() {
+  it('tokenizes method references', function () {
     const tokens = tokenizeLines(`\
 class A {
   void func() {
@@ -1205,7 +1219,7 @@ class A {
     expect(tokens[7][5]).toEqual({value: 'method', scopes: ['source.java', 'meta.class.body', 'meta.method', 'meta.method.body', 'entity.name.function']});
 });
 
-  it('tokenizes field access', function() {
+  it('tokenizes field access', function () {
     const tokens = tokenizeLines(`\
 class A {
   void func() {
