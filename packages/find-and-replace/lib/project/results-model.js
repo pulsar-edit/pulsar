@@ -3,7 +3,7 @@ const {Emitter, TextEditor, Range} = require('atom')
 const escapeHelper = require('../escape-helper')
 
 class Result {
-  static create (result) {
+  static create(result) {
     if (result && result.matches && result.matches.length) {
       const matches = []
 
@@ -62,13 +62,13 @@ class Result {
     }
   }
 
-  constructor (result) {
+  constructor(result) {
     _.extend(this, result)
   }
 }
 
 module.exports = class ResultsModel {
-  constructor (findOptions) {
+  constructor(findOptions) {
     this.onContentsModified = this.onContentsModified.bind(this)
     this.findOptions = findOptions
     this.emitter = new Emitter()
@@ -82,77 +82,77 @@ module.exports = class ResultsModel {
     this.clear()
   }
 
-  onDidClear (callback) {
+  onDidClear(callback) {
     return this.emitter.on('did-clear', callback)
   }
 
-  onDidClearSearchState (callback) {
+  onDidClearSearchState(callback) {
     return this.emitter.on('did-clear-search-state', callback)
   }
 
-  onDidClearReplacementState (callback) {
+  onDidClearReplacementState(callback) {
     return this.emitter.on('did-clear-replacement-state', callback)
   }
 
-  onDidSearchPaths (callback) {
+  onDidSearchPaths(callback) {
     return this.emitter.on('did-search-paths', callback)
   }
 
-  onDidErrorForPath (callback) {
+  onDidErrorForPath(callback) {
     return this.emitter.on('did-error-for-path', callback)
   }
 
-  onDidNoopSearch (callback) {
+  onDidNoopSearch(callback) {
     return this.emitter.on('did-noop-search', callback)
   }
 
-  onDidStartSearching (callback) {
+  onDidStartSearching(callback) {
     return this.emitter.on('did-start-searching', callback)
   }
 
-  onDidCancelSearching (callback) {
+  onDidCancelSearching(callback) {
     return this.emitter.on('did-cancel-searching', callback)
   }
 
-  onDidFinishSearching (callback) {
+  onDidFinishSearching(callback) {
     return this.emitter.on('did-finish-searching', callback)
   }
 
-  onDidStartReplacing (callback) {
+  onDidStartReplacing(callback) {
     return this.emitter.on('did-start-replacing', callback)
   }
 
-  onDidFinishReplacing (callback) {
+  onDidFinishReplacing(callback) {
     return this.emitter.on('did-finish-replacing', callback)
   }
 
-  onDidSearchPath (callback) {
+  onDidSearchPath(callback) {
     return this.emitter.on('did-search-path', callback)
   }
 
-  onDidReplacePath (callback) {
+  onDidReplacePath(callback) {
     return this.emitter.on('did-replace-path', callback)
   }
 
-  onDidAddResult (callback) {
+  onDidAddResult(callback) {
     return this.emitter.on('did-add-result', callback)
   }
 
-  onDidSetResult (callback) {
+  onDidSetResult(callback) {
     return this.emitter.on('did-set-result', callback)
   }
 
-  onDidRemoveResult (callback) {
+  onDidRemoveResult(callback) {
     return this.emitter.on('did-remove-result', callback)
   }
 
-  clear () {
+  clear() {
     this.clearSearchState()
     this.clearReplacementState()
     this.emitter.emit('did-clear', this.getResultsSummary())
   }
 
-  clearSearchState () {
+  clearSearchState() {
     this.pathCount = 0
     this.matchCount = 0
     this.regex = null
@@ -168,7 +168,7 @@ module.exports = class ResultsModel {
     this.emitter.emit('did-clear-search-state', this.getResultsSummary())
   }
 
-  clearReplacementState () {
+  clearReplacementState() {
     this.replacePattern = null
     this.replacedPathCount = null
     this.replacementCount = null
@@ -176,7 +176,7 @@ module.exports = class ResultsModel {
     this.emitter.emit('did-clear-replacement-state', this.getResultsSummary())
   }
 
-  shouldRerunSearch (findPattern, pathsPattern, options = {}) {
+  shouldRerunSearch(findPattern, pathsPattern, options = {}) {
     return (
       !options.onlyRunIfChanged ||
       findPattern == null ||
@@ -186,7 +186,7 @@ module.exports = class ResultsModel {
     )
   }
 
-  async search (findPattern, pathsPattern, replacePattern, options = {}) {
+  async search(findPattern, pathsPattern, replacePattern, options = {}) {
     if (!this.shouldRerunSearch(findPattern, pathsPattern, options)) {
       this.emitter.emit('did-noop-search')
       return Promise.resolve()
@@ -252,7 +252,7 @@ module.exports = class ResultsModel {
     }
   }
 
-  replace (pathsPattern, replacePattern, replacementPaths) {
+  replace(pathsPattern, replacePattern, replacementPaths) {
     if (!this.findOptions.findPattern || (this.regex == null)) { return }
 
     this.findOptions.set({replacePattern, pathsPattern})
@@ -285,19 +285,19 @@ module.exports = class ResultsModel {
     }).catch(e => console.error(e.stack))
   }
 
-  setActive (isActive) {
+  setActive(isActive) {
     if ((isActive && this.findOptions.findPattern) || !isActive) {
       this.active = isActive
     }
   }
 
-  getActive () { return this.active }
+  getActive() { return this.active }
 
-  getFindOptions () { return this.findOptions }
+  getFindOptions() { return this.findOptions }
 
-  getLastFindPattern () { return this.lastFindPattern }
+  getLastFindPattern() { return this.lastFindPattern }
 
-  getResultsSummary () {
+  getResultsSummary() {
     const findPattern = this.lastFindPattern != null ? this.lastFindPattern : this.findOptions.findPattern
     const { replacePattern } = this.findOptions
     return {
@@ -312,23 +312,23 @@ module.exports = class ResultsModel {
     }
   }
 
-  getPathCount () {
+  getPathCount() {
     return this.pathCount
   }
 
-  getMatchCount () {
+  getMatchCount() {
     return this.matchCount
   }
 
-  getPaths () {
+  getPaths() {
     return Object.keys(this.results)
   }
 
-  getResult (filePath) {
+  getResult(filePath) {
     return this.results[filePath]
   }
 
-  setResult (filePath, result) {
+  setResult(filePath, result) {
     if (result == null) {
       return this.removeResult(filePath)
     }
@@ -342,7 +342,17 @@ module.exports = class ResultsModel {
     this.emitter.emit('did-set-result', {filePath, result})
   }
 
-  addResult (filePath, result) {
+  shouldAddResult(filePath) {
+    // Ensure the given file path is suitable for inclusion in the current
+    // results view by checking it against any path patterns.
+    if (!this.findOptions.pathsPattern) return true;
+    const searchPaths = this.pathsArrayFromPathsPattern(this.findOptions.pathsPattern);
+    return atom.workspace.filePathMatchesPatterns(filePath, searchPaths);
+  }
+
+  addResult(filePath, result) {
+    if (!this.shouldAddResult(filePath, result)) return;
+
     this.pathCount++
     this.matchCount += result.matches.length
 
@@ -350,7 +360,7 @@ module.exports = class ResultsModel {
     this.emitter.emit('did-add-result', {filePath, result})
   }
 
-  removeResult (filePath) {
+  removeResult(filePath) {
     if (!this.results[filePath]) {
       return
     }
@@ -363,7 +373,7 @@ module.exports = class ResultsModel {
     this.emitter.emit('did-remove-result', {filePath, result})
   }
 
-  onContentsModified (editor) {
+  onContentsModified(editor) {
     if (!this.active || !this.regex || !editor.getPath()) { return }
 
     const matches = []
@@ -379,7 +389,7 @@ module.exports = class ResultsModel {
     this.emitter.emit('did-finish-searching', this.getResultsSummary())
   }
 
-  pathsArrayFromPathsPattern (pathsPattern) {
+  pathsArrayFromPathsPattern(pathsPattern) {
     return pathsPattern.trim().split(',').map((inputPath) => inputPath.trim())
   }
 }
