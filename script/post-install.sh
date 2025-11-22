@@ -1,7 +1,7 @@
 #!/bin/sh
 
-FILESOURCE='/opt/Pulsar/resources/pulsar.sh'
-FILEDEST='/usr/bin/pulsar'
+FILESOURCE='/opt/${sanitizedProductName}/resources/${executable}.sh'
+FILEDEST='/usr/bin/${executable}'
 
 if [ -f "$FILEDEST" ]
 then
@@ -9,8 +9,17 @@ then
 fi
 cp "$FILESOURCE" "$FILEDEST"
 
-SYMLINK_TARGET='/opt/Pulsar/resources/app/ppm/bin/apm'
-SYMLINK_PATH='/usr/bin/ppm'
+case $executable in
+  pulsar-next)
+    ppm_executable=ppm-next
+    ;;
+  *)
+    ppm_executable=ppm
+    ;;
+esac
+
+SYMLINK_TARGET='/opt/${sanitizedProductName}/resources/app/ppm/bin/${ppm_executable}'
+SYMLINK_PATH='/usr/bin/${ppm_executable}'
 
 if [ -L "$SYMLINK_PATH" ]
 then

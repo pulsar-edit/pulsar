@@ -1,7 +1,7 @@
 const { Node, Parser } = require('./web-tree-sitter');
 const TokenIterator = require('./token-iterator');
-const { Point, Range, spliceArray } = require('text-buffer');
-const { Patch } = require('superstring');
+const { Point, Range, spliceArray } = require('@pulsar-edit/text-buffer');
+const { Patch } = require('@pulsar-edit/superstring');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const ScopeDescriptor = require('./scope-descriptor');
 const ScopeResolver = require('./scope-resolver');
@@ -273,6 +273,15 @@ class WASMTreeSitterLanguageMode {
     this.injectionsMarkerLayer?.destroy();
     this.rootLanguageLayer = null;
     this.subscriptions?.dispose();
+
+    // Clean up all `Parser` instances created during the lifetime of this
+    // buffer.
+    for (let parsers of this.parsersByLanguage.values()) {
+      for (let parser of parsers) {
+        parser.delete();
+      }
+    }
+    this.parsersByLanguage.clear();
   }
 
   getGrammar() {

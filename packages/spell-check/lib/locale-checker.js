@@ -1,6 +1,8 @@
 const spellchecker = require('spellchecker');
-const pathspec = require('atom-pathspec');
+const pathspec = require('./pathspec');
 const env = require('./checker-env');
+
+let debug;
 
 // The locale checker is a checker that takes a locale string (`en-US`) and
 // optionally a path and then checks it.
@@ -25,7 +27,7 @@ class LocaleChecker {
             debug = require('debug');
             this.log = debug('spell-check:locale-checker').extend(locale);
         } else {
-            this.log = (str) => {};
+            this.log = (_) => {};
         }
         this.log(
             'enabled',

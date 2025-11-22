@@ -9,9 +9,6 @@
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "dependencies": {
-    "tree-sitter-json": "0.20.0"
-  },
   "configSchema": {
     "allowCommentsInJsonFiles": {
       "type": "boolean",

@@ -1,6 +1,7 @@
 const url = require('url');
 
-const {ipcRenderer, remote} = require('electron');
+const {ipcRenderer} = require('electron');
+const remote = require('@electron/remote');
 
 // TODO: Support dragging external folders and using the drag-and-drop indicators for them
 // Currently they're handled in TreeView's drag listeners

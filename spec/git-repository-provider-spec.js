@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs-plus');
 const temp = require('temp').track();
-const { Directory } = require('pathwatcher');
+const { Directory } = require('@pulsar-edit/pathwatcher');
 const GitRepository = require('../src/git-repository');
 const GitRepositoryProvider = require('../src/git-repository-provider');
 

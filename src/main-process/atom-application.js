@@ -1,6 +1,7 @@
 const AtomWindow = require('./atom-window');
 const ApplicationMenu = require('./application-menu');
 const AtomProtocolHandler = require('./atom-protocol-handler');
+const { onDidChangeScrollbarStyle, getScrollbarStyle } = require('./scrollbar-style');
 const StorageFolder = require('../storage-folder');
 const Config = require('../config');
 const ConfigFile = require('../config-file');
@@ -123,6 +124,10 @@ const decryptOptions = (optionsMessage, secret) => {
   return JSON.parse(message);
 };
 
+ipcMain.handle('getScrollbarStyle', () => {
+  return getScrollbarStyle();
+});
+
 ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.isDefaultProtocolClient(protocol, path, args);
 });
@@ -130,6 +135,7 @@ ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
 ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
 });
+
 // The application's singleton class.
 //
 // It's the entry point into the Pulsar application and maintains the global state
@@ -440,12 +446,16 @@ module.exports = class AtomApplication extends EventEmitter {
     if (!window.isSpec) {
       const focusHandler = () => this.windowStack.touch(window);
       const blurHandler = () => this.saveCurrentWindowOptions(false);
+      const scrollbarStyleChangeDisposable = onDidChangeScrollbarStyle((newValue) => {
+        window.browserWindow.webContents.send('did-change-scrollbar-style', newValue);
+      });
       window.browserWindow.on('focus', focusHandler);
       window.browserWindow.on('blur', blurHandler);
       window.browserWindow.once('closed', () => {
         this.windowStack.removeWindow(window);
         window.browserWindow.removeListener('focus', focusHandler);
         window.browserWindow.removeListener('blur', blurHandler);
+        scrollbarStyleChangeDisposable.dispose();
       });
       window.browserWindow.webContents.once('did-finish-load', blurHandler);
       this.saveCurrentWindowOptions(false);
@@ -600,7 +610,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
       this.on('application:open', () => {
         const win = this.focusedWindow();
-        if(win) {
+        if (win) {
           win.sendCommand('application:open')
         } else {
           this.promptForPathToOpen(
@@ -611,7 +621,7 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       this.on('application:open-file', () => {
         const win = this.focusedWindow();
-        if(win) {
+        if (win) {
           win.sendCommand('application:open-file')
         } else {
           this.promptForPathToOpen(
@@ -622,7 +632,7 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       this.on('application:open-folder', () => {
         const win = this.focusedWindow();
-        if(win) {
+        if (win) {
           win.sendCommand('application:open-folder')
         } else {
           this.promptForPathToOpen(
@@ -1763,9 +1773,11 @@ module.exports = class AtomApplication extends EventEmitter {
     let atomTestRunner = packageMetadata.atomTestRunner;
 
     if (!atomTestRunner) {
-      process.stdout.write('atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.');
+      process.stdout.write('atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.\n');
       atomTestRunner = 'runners/jasmine1-test-runner';
     }
+
+    process.stdout.write(`Using test runner: ${atomTestRunner}\n`)
 
     let testRunnerPath;
     Resolve ||= require('resolve');

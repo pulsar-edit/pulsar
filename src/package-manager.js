@@ -177,12 +177,19 @@ module.exports = class PackageManager {
     return this.emitter.on('did-unload-package', callback);
   }
 
+  // Returns the command needed to invoke PPM for the current release channel.
+  static getCommandName() {
+    let releaseChannel = atom.getReleaseChannel();
+    let commandName = releaseChannel === 'next' ? 'ppm-next' : 'ppm';
+    return process.platform === 'win32' ? `${commandName}.cmd` : commandName;
+  }
+
   static possibleApmPaths(configPath) {
     if (process.env.APM_PATH || configPath) {
       return process.env.APM_PATH || configPath;
     }
 
-    const commandName = process.platform === 'win32' ? 'apm.cmd' : 'apm';
+    const commandName = this.getCommandName();
     const bundledPPMRoot = path.join(process.resourcesPath, 'app', 'ppm', 'bin', commandName);
     const unbundledPPMRoot = path.join(__dirname, '..', 'ppm', 'bin', commandName);
 
@@ -208,7 +215,7 @@ module.exports = class PackageManager {
       return configPath || this.apmPath;
     } else {
        this.apmPath = PackageManager.possibleApmPaths();
-       return this.apmPath
+       return this.apmPath;
     }
   }
 

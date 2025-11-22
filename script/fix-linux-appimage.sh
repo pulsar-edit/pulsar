@@ -57,6 +57,11 @@ else
   APPIMAGETOOL_ARCH="arm_aarch64"
 fi
 
+# The second argument can optionally be used if CI is building for a
+# non-standard release channel. If so, the CI job should pass the executable
+# name for Pulsar — e.g., `pulsar-next` for the `next` channel.
+SCRIPT_NAME="${2:pulsar}"
+
 echo "Architecture is: ${APPIMAGE_ARCH}"
 
 cd binaries
@@ -85,7 +90,11 @@ rm -f AppRun
 # Next we'll use `awk` to replace the reference to BIN in `AppRun` so that it
 # points to `pulsar.sh` rather than the `pulsar` executable.
 echo "Making new AppRun…"
-awk '{sub(/BIN=(.*?)/,"BIN=\"$APPDIR/resources/pulsar.sh\""); print}' AppRun.old > AppRun
+if [ $SCRIPT_NAME == "pulsar-next" ]; then
+  awk '{sub(/BIN=(.*?)/,"BIN=\"$APPDIR/resources/pulsar-next.sh\""); print}' AppRun.old > AppRun
+else
+  awk '{sub(/BIN=(.*?)/,"BIN=\"$APPDIR/resources/pulsar.sh\""); print}' AppRun.old > AppRun
+fi
 chmod a+x AppRun
 
 # For sanity's sake, show the new line so we know that this was done properly
