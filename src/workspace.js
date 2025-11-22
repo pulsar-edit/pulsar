@@ -42,6 +42,16 @@ function filePathMatchesGlob(filePath, matcher) {
   return matcher.negate ? true : false;
 }
 
+const CACHED_MINIMATCH_INSTANCES = new Map();
+
+function minimatchInstanceForPattern(pattern) {
+  if (!CACHED_MINIMATCH_INSTANCES.has(pattern)) {
+    let instance = new Minimatch(pattern, { flipNegate: true });
+    CACHED_MINIMATCH_INSTANCES.set(pattern, instance);
+  }
+  return CACHED_MINIMATCH_INSTANCES.get(pattern);
+}
+
 const STOPPED_CHANGING_ACTIVE_PANE_ITEM_DELAY = 100;
 const ALL_LOCATIONS = ['center', 'left', 'right', 'bottom'];
 
@@ -2201,7 +2211,7 @@ module.exports = class Workspace extends Model {
     const searchPromise = Promise.all(allSearches);
 
     let matchers = options.paths ?
-      options.paths.map((inclusion) => new Minimatch(inclusion, { flipNegate: true })) :
+      options.paths.map((inclusion) => minimatchInstanceForPattern(inclusion)) :
       null;
 
     // Let's consider the open buffers.
@@ -2325,6 +2335,40 @@ module.exports = class Workspace extends Model {
 
       inProcessFinished = true;
       checkFinished();
+    });
+  }
+
+  // Experimental: Tests the path of a file in the project against a set of
+  // globs (using the same semantics as {::scan}) and reports whether the file
+  // satisfies the patterns.
+  //
+  // Internally, this method is used to decide if a search result should be
+  // added to a list of project-wide search results.
+  //
+  // * `filePath` {String} representing the absolute path to a file in the
+  //   project. (Any external path will automatically return `false`.)
+  // * `patterns` {Array} of strings that describe glob patterns. Identical to
+  //   (and uses the same glob semantics as) the `options.paths` argument of
+  //   {::scan}.
+  //
+  // Returns a boolean indicating whether the given file path would be included
+  // in a project-wide search if the given path patterns were specified.
+  filePathMatchesPatterns(filePath, patterns) {
+    // If there is no set of patterns to filter against, then the path
+    // automatically matches.
+    if (!patterns || patterns.length === 0) return true;
+    // This catches an array of falsy values, like empty strings.
+    if (patterns.every(p => !p)) return true;
+
+    // Any file path that isn't part of the current project automatically does
+    // not match.
+    if (!this.project.contains(filePath)) return false;
+
+    let matchers = patterns.map(inclusion => minimatchInstanceForPattern(inclusion));
+
+    let relativizedFilePath = atom.project.relativize(filePath);
+    return matchers.some(matcher => {
+      return filePathMatchesGlob(relativizedFilePath, matcher);
     });
   }
 

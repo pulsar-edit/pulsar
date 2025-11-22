@@ -2214,6 +2214,49 @@ describe('Workspace', () => {
     });
   });
 
+  describe('::filePathMatchesPatterns', () => {
+    it('correctly applies scan path glob semantics against individual paths', () => {
+      const projectPath = path.join(__dirname, 'fixtures', 'workspace-scan');
+      atom.project.setPaths([projectPath]);
+
+      let pathA1 = path.join(projectPath, 'a-dir', 'sample1.js');
+      let pathB1 = path.join(projectPath, 'b-dir', 'sample1.js');
+
+      const positiveGlobs = ['b-dir', 'b-dir/*.js', 'b-dir/**/*.js'];
+      const negativeGlobs = ['!b-dir', '!b-dir/*.js', '!b-dir/**/*.js'];
+
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, [])
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, [''])
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, ['', ''])
+      ).toBe(true);
+      
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, ['b-dir/*.js'])
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, ['!b-dir/*.js'])
+      ).toBe(false);
+
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, positiveGlobs)
+      ).toBe(false);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, positiveGlobs)
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, negativeGlobs)
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, negativeGlobs)
+      ).toBe(false);
+    });
+  });
+
   for (const ripgrep of [true, false]) {
     describe(`::scan(regex, options, callback) { ripgrep: ${ripgrep} }`, () => {
       function scan(regex, options, iterator) {
