@@ -1,13 +1,13 @@
 'menu': [
-  'label': 'Edit'
+  'label': '%pulsar.commons.menu-labels.edit%'
   'submenu': [
-    'label': 'Select Grammar'
+    'label': '%grammar-selector.menu.select-grammar:label%'
     'command': 'grammar-selector:show'
   ]
 ]
 
 'context-menu':
   '.overlayer': [
-    'label': 'Change Grammar'
+    'label': '%grammar-selector.context-menu.grammar-selector:show:label%'
     'command': 'grammar-selector:show'
   ]

@@ -1,21 +1,21 @@
 'menu': [
   {
-    'label': 'View'
+    'label': '%pulsar.commons.menu-labels.view%'
     'submenu': [
       {
-        'label': 'Toggle Command Palette'
+        'label': '%command-palette.menu.view:command-palette:toggle%'
         'command': 'command-palette:toggle'
       }
     ]
   }
   {
-    'label': 'Packages'
+    'label': '%pulsar.commons.menu-labels.packages%'
     'submenu': [
       {
-        'label': 'Command Palette',
+        'label': '%command-palette.menu.packages:command-palette%',
         'submenu': [
           {
-            'label': 'Toggle'
+            'label': '%command-palette.menu.packages:commnd-palette:toggle%'
             'command': 'command-palette:toggle'
           }
         ]

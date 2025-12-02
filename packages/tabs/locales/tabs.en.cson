@@ -1,0 +1,47 @@
+'menu': {
+  'tabs:close-all-tabs': 'Close All Tabs'
+}
+'context-menu': {
+  'tabs:close-tab': 'Close Tab'
+  'tabs:close-other-tabs': 'Close Other Tabs'
+  'tabs:close-tabs-to-right': 'Close Tabs to the Right'
+  'tabs:close-tabs-to-left': 'Close Tabs to the Left'
+  'tabs:close-saved-tabs': 'Close Saved Tabs'
+  'tabs:close-all-tabs': 'Close All Tabs'
+  'tabs:split-up': 'Split Up'
+  'tabs:split-down': 'Split Down'
+  'tabs:split-left': 'Split Left'
+  'tabs:split-right': 'Split Right'
+  'tabs:open-in-new-window': 'Open In New Window'
+  'tabs:keep-pending-tab': 'Keep Pending Tab'
+  'pane:reopen-closed-item': 'Reopen Closed Tab'
+}
+'config': {
+  'showIcons': {
+    'description': 'Show icons in tabs for panes which define an icon, such as the Settings and Project Find Results.'
+  }
+  'alwaysShowTabBar': {
+    'description': 'Show the tab bar even when only one tab is open.'
+  }
+  'tabScrolling': {
+    'description': 'Jump to next or previous tab by scrolling on the tab bar.'
+  }
+  'tabScrollingThreshold': {
+    'description': 'Threshold for switching to the next/previous tab when the `Tab Scrolling` config setting is enabled. Higher numbers mean that a longer scroll is needed to jump to the next/previous tab.'
+  }
+  'enableVcsColoring': {
+    'title': 'Enable VCS Coloring'
+    'description': 'Color file names in tabs based on VCS status, similar to how file names are colored in the tree view.'
+  }
+  'addNewTabsAtEnd': {
+    'description': 'Add new tabs at the end of the tab bar, rather than after active tab.'
+  }
+  'enableMruTabSwitching': {
+    'title': 'Enable MRU Tab Switching'
+    'description': 'Enable tab switching in most-recently-used order. This setting has no effect if ctrl-tab or ctrl-shift-tab are already rebound via your keymap or another package.'
+  }
+  'displayMruTabList': {
+    'title': 'Display MRU Tab Switching List'
+    'description': 'When MRU Tab Switching is enabled, display the most-recently-used tab list.'
+  }
+}

@@ -1,0 +1,4 @@
+'menu': {
+  'label': 'Dev Live Reload'
+  'dev-live-reload:reload-all:label': 'Reload All Styles'
+}

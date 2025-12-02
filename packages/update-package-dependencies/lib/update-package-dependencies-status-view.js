@@ -19,7 +19,7 @@ module.exports = class UpdatePackageDependenciesStatusView {
   attach() {
     this.tile = this.statusBar.addRightTile({ item: this.element });
     this.tooltip = atom.tooltips.add(this.element, {
-      title: 'Updating package dependencies\u2026'
+      title: `${atom.i18n.t("update-package-dependencies.src.updating-package-deps")}\u2026`
     });
   }
 

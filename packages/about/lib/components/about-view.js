@@ -68,13 +68,13 @@ module.exports = class AboutView extends EtchComponent {
     var showMoreDiv = document.querySelector('.show-more');
     var showMoreText = document.querySelector('.about-more-expand');
     switch (showMoreText.textContent) {
-      case 'Show more':
+      case atom.i18n.t("about.src.show-more"):
         showMoreDiv.classList.toggle('hidden');
-        showMoreText.textContent = 'Hide';
+        showMoreText.textContent = atom.i18n.t("about.src.hide");
         break;
-      case 'Hide':
+      case atom.i18n.t("about.src.hide"):
         showMoreDiv.classList.toggle('hidden');
-        showMoreText.textContent = 'Show more';
+        showMoreText.textContent = atom.i18n.t("about.src.show-more");
         break;
     }
   }
@@ -108,7 +108,7 @@ module.exports = class AboutView extends EtchComponent {
                 className: 'about-header-release-notes',
                 onclick: this.handleReleaseNotesClick.bind(this)
               },
-              'Release Notes'
+              atom.i18n.t("about.src.release-notes")
             )
           ),
           $.span(
@@ -117,7 +117,7 @@ module.exports = class AboutView extends EtchComponent {
                 'about-version-container show-more-expand',
               onclick: this.handleShowMoreClick.bind(this)
             },
-            $.span({ className: 'about-more-expand' }, 'Show more')
+            $.span({ className: 'about-more-expand' }, atom.i18n.t("about.src.show-more"))
           ),
           $.div(
             { className: 'show-more hidden about-more-info' },
@@ -177,7 +177,7 @@ module.exports = class AboutView extends EtchComponent {
               { className: 'about-updates-item app-unsupported' },
               $.span(
                 { className: 'about-updates-label is-strong' },
-                'Updates have been moved to the package ', $.code({style: {'white-space': 'nowrap'}}, 'pulsar-updater'), '.',
+                `${atom.i18n.t("about.src.updates-have-been-moved")} `, $.code({style: {'white-space': 'nowrap'}}, 'pulsar-updater'), '.',
                 $.br()
               ),
               $.a(
@@ -185,7 +185,7 @@ module.exports = class AboutView extends EtchComponent {
                   className: 'about-updates-instructions',
                   onclick: this.handleHowToUpdateClick.bind(this)
                 },
-                'How to update'
+                atom.i18n.t("about.src.how-to-update")
               )
             )
           ),
@@ -202,7 +202,7 @@ module.exports = class AboutView extends EtchComponent {
               className: 'btn view-license',
               onclick: this.handleLicenseClick.bind(this)
             },
-            'License'
+            atom.i18n.t("about.src.license")
           ),
           //Disabled the below as we don't have this but can reuse if there is the need
           /*$.button(
@@ -233,7 +233,7 @@ module.exports = class AboutView extends EtchComponent {
         { className: 'about-updates-item app-unsupported' },
         $.span(
           { className: 'about-updates-label is-strong' },
-          'Enable `pulsar-updater` to check for updates'
+          atom.i18n.t("about.src.enable-pulsar-updater")
         )
       );
     } else {
@@ -246,7 +246,7 @@ module.exports = class AboutView extends EtchComponent {
             margin: '0 .5em'
           }
         },
-        'Check Now'
+        atom.i18n.t("about.src.check-now")
       );
     }
   }
@@ -267,7 +267,7 @@ module.exports = class AboutView extends EtchComponent {
   }
 
   getTitle() {
-    return 'About';
+    return atom.i18n.t("about.src.about-title");
   }
 
   getIconName() {

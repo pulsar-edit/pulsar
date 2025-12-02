@@ -13,7 +13,7 @@
   },
   "configSchema": {
     "autocompleteCharacters": {
-      "description": "Autocompleted characters treated as matching pairs, such as `()`, and `{}`.",
+      "description": "%bracket-matcher.config.autocompleteCharacters:description%",
       "type": "array",
       "default": [
         "()",
@@ -32,7 +32,7 @@
       }
     },
     "pairsWithExtraNewline": {
-      "description": "Automatically add a newline between the pair when enter is pressed.",
+      "description": "%bracket-matcher.config.pairsWithExtraNewline:description%",
       "type": "array",
       "default": [
         "()",
@@ -46,22 +46,22 @@
     "autocompleteBrackets": {
       "type": "boolean",
       "default": true,
-      "description": "Autocomplete bracket and quote characters, such as `(` and `)`, and `\"`."
+      "description": "%bracket-matcher.config.autocompleteBrackets:description%"
     },
     "wrapSelectionsInBrackets": {
       "type": "boolean",
       "default": true,
-      "description": "Wrap selected text in brackets or quotes when the editor contains selections and the opening bracket or quote is typed."
+      "description": "%bracket-matcher.config.wrapSelectionsInBrackets:description%"
     },
     "highlightMatchingLineNumber": {
       "type": "boolean",
       "default": false,
-      "description": "Highlight the line number of the matching bracket."
+      "description": "%bracket-matcher.config.highlightMatchingLineNumber:description%"
     },
     "alwaysSkipClosingPairs": {
       "type": "boolean",
       "default": false,
-      "description": "Always skip closing pairs in front of the cursor."
+      "description": "%bracket-matcher.config.alwaysSkipClosingPairs:description%"
     }
   }
 }

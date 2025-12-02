@@ -1410,11 +1410,8 @@ class AtomEnvironment {
       const nouns = projectPaths.length === 1 ? 'folder' : 'folders';
       this.confirm(
         {
-          message: 'Previous automatically-saved project state detected',
-          detail:
-            `There is previously saved state for the selected ${nouns}. ` +
-            `Would you like to add the ${nouns} to this window, permanently discarding the saved state, ` +
-            `or open the ${nouns} in a new window, restoring the saved state?`,
+          message: this.i18n.t("pulsar.src.atom-environment.previous-project-state:message"),
+          detail: this.i18n.t("pulsar.src.atom-environment.previous-project-state:detail", { nouns: nouns }),
           buttons: [
             '&Open in new window and recover state',
             '&Add to this window and discard state'
@@ -1502,7 +1499,7 @@ or use Pane::saveItemAs for programmatic saving.`);
       } catch (error) {
         // We handle the missingProjectPaths case in openLocations().
         if (!error.missingProjectPaths) {
-          this.notifications.addError('Unable to deserialize project', {
+          this.notifications.addError(this.i18n.t("pulsar.src.atom-environment.deserialize:error"), {
             description: error.message,
             stack: error.stack
           });

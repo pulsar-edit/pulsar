@@ -124,6 +124,7 @@ class I18n {
         (locale, opts) => new Intl.PluralRules(locale, opts)
       )
     };
+    console.log("I18n: Constructor completed.");
   }
 
   preload() {
@@ -165,7 +166,7 @@ class I18n {
       // During preload we load all available locales, and MUST prune them later
       this.addStrings(CSON.readFileSync(localePath) || {}, locale);
     }
-    
+
     this.preloadComplete = true;
   }
 
@@ -190,6 +191,7 @@ class I18n {
         }
       }
     }
+    console.log("I18n: Initialization complete");
   }
 
   shouldIncludeLocale(locale) {
@@ -224,11 +226,14 @@ class I18n {
   }
 
   translate(keyPath, opts = {}) {
+    console.log(`I18n: translate hit: keyPath: '${keyPath}'`);
     const stringLocales = keyPathHelpers.getValueAtKeyPath(this.strings, keyPath);
 
     if (typeof stringLocales !== "object") {
       // If the keypath requested doesn't exist, return the original keyPath
       // TODO Should we emit an event? Or append to the string why it coudln't be translated?
+      console.log(`I18n: '${keyPath}' couldn't find keypath in strings.`);
+      console.log(this.strings);
       return keyPath;
     }
 
@@ -255,15 +260,17 @@ class I18n {
     if (!stringLocales[bestLocale]) {
       // If we couldn't find any way to read the string, return the original keyPath
       // TODO Should we emit an event? Or append to the string why it couldn't be translated?
+      console.log(`I18n: '${keyPath}' couldn't find an appropriate locale for our string.`);
       return keyPath;
     }
 
     try {
       const msg = new IntlMessageFormat(stringLocales[bestLocale], bestLocale, undefined, { formatters: this.formatters });
-
+      console.log(`I18n: keyPath: '${keyPath}'; string: '${stringLocales[bestLocale]}'; bestLocale: '${bestLocale}'`);
       const msgFormatted = msg.format(opts);
       return msgFormatted ?? keyPath;
     } catch(err) {
+      console.log(`I18n: '${keyPath}' error when attempting to format string.`);
       console.error(err);
       // We failed to translate the string with IntlMessageFormat, lets return
       // the original keyPath.

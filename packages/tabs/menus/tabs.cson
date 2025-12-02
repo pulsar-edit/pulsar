@@ -1,37 +1,37 @@
 menu: [
   {
-    label: 'File'
+    label: '%pulsar.commons.menu-labels.file%'
     submenu: [
-      {label: 'Close All Tabs', command: 'tabs:close-all-tabs'}
+      {label: '%tabs.menu.tabs:close-all-tabs%', command: 'tabs:close-all-tabs'}
     ]
   }
 ]
 
 'context-menu':
   '.tab': [
-    {label: 'Close Tab', command: 'tabs:close-tab'}
-    {label: 'Close Other Tabs', command: 'tabs:close-other-tabs'}
-    {label: 'Close Tabs to the Right', command: 'tabs:close-tabs-to-right'}
-    {label: 'Close Tabs to the Left', command: 'tabs:close-tabs-to-left'}
-    {label: 'Close Saved Tabs', command: 'tabs:close-saved-tabs'}
-    {label: 'Close All Tabs', command: 'tabs:close-all-tabs'}
+    {label: '%tabs.context-menu.tabs:close-tab%', command: 'tabs:close-tab'}
+    {label: '%tabs.context-menu.tabs:close-other-tabs%', command: 'tabs:close-other-tabs'}
+    {label: '%tabs.context-menu.tabs:close-tabs-to-right%', command: 'tabs:close-tabs-to-right'}
+    {label: '%tabs.context-menu.tabs:close-tabs-to-left%', command: 'tabs:close-tabs-to-left'}
+    {label: '%tabs.context-menu.tabs:close-saved-tabs%', command: 'tabs:close-saved-tabs'}
+    {label: '%tabs.context-menu.tabs:close-all-tabs%', command: 'tabs:close-all-tabs'}
 
     {type: 'separator'}
 
-    {label: 'Split Up', command: 'tabs:split-up'}
-    {label: 'Split Down', command: 'tabs:split-down'}
-    {label: 'Split Left', command: 'tabs:split-left'}
-    {label: 'Split Right', command: 'tabs:split-right'}
+    {label: '%tabs.context-menu.tabs:split-up%', command: 'tabs:split-up'}
+    {label: '%tabs.context-menu.tabs:split-down%', command: 'tabs:split-down'}
+    {label: '%tabs.context-menu.tabs:split-left%', command: 'tabs:split-left'}
+    {label: '%tabs.context-menu.tabs:split-right%', command: 'tabs:split-right'}
 
   ]
   '.tab.texteditor': [
     {type: 'separator'}
-    {label: 'Open In New Window', command: 'tabs:open-in-new-window'}
+    {label: '%tabs.context-menu.tabs:open-in-new-window%', command: 'tabs:open-in-new-window'}
     {type: 'separator'}
   ]
   '.tab.pending-tab': [
-    {label: 'Keep Pending Tab', command: 'tabs:keep-pending-tab'}
+    {label: '%tabs.context-menu.tabs:keep-pending-tab%', command: 'tabs:keep-pending-tab'}
   ]
   '.tab-bar': [
-    {label: 'Reopen Closed Tab', command: 'pane:reopen-closed-item'}
+    {label: '%tabs.context-menu.pane:reopen-closed-item%', command: 'pane:reopen-closed-item'}
   ]

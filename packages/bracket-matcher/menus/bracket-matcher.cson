@@ -1,22 +1,22 @@
 'menu': [
   {
-    'label': 'Packages'
+    'label': '%pulsar.commons.menu-labels.packages%'
     'submenu': [
-      'label': 'Bracket Matcher'
+      'label': '%bracket-matcher.menu.bracket-matcher:label%'
       'submenu': [
-        { 'label': 'Go To Matching Bracket', 'command': 'bracket-matcher:go-to-matching-bracket' }
-        { 'label': 'Select Inside Brackets', 'command': 'bracket-matcher:select-inside-brackets' }
-        { 'label': 'Remove Brackets From Selection', 'command': 'bracket-matcher:remove-brackets-from-selection' }
-        { 'label': 'Close Current Tag', 'command': 'bracket-matcher:close-tag' }
-        { 'label': 'Remove Matching Brackets', 'command': 'bracket-matcher:remove-matching-brackets' }
-        { 'label': 'Select Matching Brackets', 'command': 'bracket-matcher:select-matching-brackets' }
+        { 'label': '%bracket-matcher.menu.go-to-matching-bracket%', 'command': 'bracket-matcher:go-to-matching-bracket' }
+        { 'label': '%bracket-matcher.menu.select-inside-brackets%', 'command': 'bracket-matcher:select-inside-brackets' }
+        { 'label': '%bracket-matcher.menu.remove-brackets-from-selection%', 'command': 'bracket-matcher:remove-brackets-from-selection' }
+        { 'label': '%bracket-matcher.menu.close-tag%', 'command': 'bracket-matcher:close-tag' }
+        { 'label': '%bracket-matcher.menu.remove-matching-brackets%', 'command': 'bracket-matcher:remove-matching-brackets' }
+        { 'label': '%bracket-matcher.menu.select-matching-brackets%', 'command': 'bracket-matcher:select-matching-brackets' }
       ]
     ]
   },
   {
-    'label': 'Selection'
+    'label': '%pulsar.commons.menu-labels.selection%'
     'submenu': [
-        { 'label': 'Select Inside Brackets', 'command': 'bracket-matcher:select-inside-brackets' }
+        { 'label': '%bracket-matcher.menu.select-inside-brackets%', 'command': 'bracket-matcher:select-inside-brackets' }
     ]
   }
 ]

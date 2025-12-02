@@ -1,0 +1,5 @@
+'archive-editor-view': {
+  'loadingArchive': 'Loading archive'
+  'untitled': 'untitled'
+  'readingArchiveFailed': 'Reading the archive file failed'
+}

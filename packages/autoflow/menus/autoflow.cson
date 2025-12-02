@@ -1,9 +1,9 @@
 'menu': [
   {
-    'label': 'Edit'
+    'label': '%pulsar.commons.menu-labels.edit%'
     'submenu': [
       {
-        'label': 'Reflow Selection'
+        'label': '%autoflow.menu.reflowSelection:label%'
         'command': 'autoflow:reflow-selection'
       }
     ]

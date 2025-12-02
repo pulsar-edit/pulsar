@@ -7,7 +7,7 @@ class BookmarksView {
   constructor (editorsBookmarks) {
     this.editorsBookmarks = editorsBookmarks
     this.selectList = new SelectListView({
-      emptyMessage: 'No bookmarks found',
+      emptyMessage: atom.i18n.t("bookmarks.bookmarksView.no-bookmarks-found"),
       items: [],
       filterKeyForItem: (bookmark) => bookmark.filterText,
       didConfirmSelection: ({editor, marker}) => {
@@ -22,7 +22,7 @@ class BookmarksView {
       elementForItem: ({marker, editor}) => {
         const bookmarkStartRow = marker.getStartBufferPosition().row
         const bookmarkEndRow = marker.getEndBufferPosition().row
-        const bookmarkPath = editor.getPath() ? path.basename(editor.getPath()) : 'untitled'
+        const bookmarkPath = editor.getPath() ? path.basename(editor.getPath()) : atom.i18n.t("bookmarks.bookmarksView.untitled")
         let bookmarkLocation = `${bookmarkPath}:${bookmarkStartRow + 1}`
         if (bookmarkStartRow !== bookmarkEndRow) {
           bookmarkLocation += `-${bookmarkEndRow + 1}`

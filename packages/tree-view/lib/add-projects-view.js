@@ -10,12 +10,12 @@ class AddProjectView {
 
     this.description = document.createElement('div')
     this.description.classList.add('description')
-    this.description.innerText = 'Your project is currently empty'
+    this.description.innerText = atom.i18n.t("tree-view.src.project-is-empty")
     this.element.appendChild(this.description)
 
     this.addProjectsButton = document.createElement('button')
     this.addProjectsButton.classList.add('btn', 'btn-primary')
-    this.addProjectsButton.innerText = 'Add folders'
+    this.addProjectsButton.innerText = atom.i18n.t("tree-view.src.add-folders")
     this.addProjectsButton.addEventListener('click', () => {
       atom.pickFolder(paths => {
         if (paths) {
@@ -27,7 +27,7 @@ class AddProjectView {
 
     this.reopenProjectButton = document.createElement('button')
     this.reopenProjectButton.classList.add('btn')
-    this.reopenProjectButton.innerText = 'Reopen a project'
+    this.reopenProjectButton.innerText = atom.i18n.t("tree-view.src.reopen-project")
     this.reopenProjectButton.addEventListener('click', () => {
       atom.commands.dispatch(this.element, 'application:reopen-project')
     })

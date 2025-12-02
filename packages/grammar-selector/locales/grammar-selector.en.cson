@@ -1,0 +1,19 @@
+'src': {
+  'wasm-tree-sitter-parser:title': '(Recommended) A faster parsr with improved syntax highlighting & code navigation support.'
+  'file-uses-grammar': 'File uses the {grammar} grammar'
+}
+'menu': {
+  'select-grammar:label': 'Select Grammar'
+}
+'context-menu': {
+  'grammar-selector:show:label': 'Change Grammar'
+}
+'config': {
+  'showOnRightSideOfStatusBar': {
+    'description': 'Show the active pane item’s language on the right side of Pulsar’s status bar, instead of the left.'
+  }
+  'hideDuplicateTextMateGrammars': {
+    'title': 'Hide Duplicate Grammars'
+    'description': 'Hides non-preferred grammars when there is more than one grammar. When checked, whichever grammar is preferred for a given scope name (TextMate or Tree-sitter) will be the only one shown. When unchecked, all grammars will always be shown in the list, regardless of the user’s settings.'
+  }
+}

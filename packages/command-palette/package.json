@@ -28,7 +28,7 @@
     "preserveLastSearch": {
       "type": "boolean",
       "default": false,
-      "description": "Preserve the last search when reopening the command palette."
+      "description": "%command-palette.config.preserveLastSearch:description%"
     }
   }
 }

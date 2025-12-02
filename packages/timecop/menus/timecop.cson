@@ -1,9 +1,9 @@
 'menu': [
-  'label': 'Packages'
+  'label': '%pulsar.commons.menu-labels.packages%'
   'submenu': [
-    'label': 'Timecop'
+    'label': '%timecop.menu.timecop:label%'
     'submenu': [
-      'label': 'Show'
+      'label': '%timecop.menu.timecop:view%'
       'command': 'timecop:view'
     ]
   ]
