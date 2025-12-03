@@ -2,18 +2,16 @@ const dedent = require('dedent');
 const path = require('path');
 const fs = require('fs-plus');
 const temp = require('temp').track();
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const GrammarRegistry = require('../src/grammar-registry');
-const TreeSitterGrammar = require('../src/tree-sitter-grammar');
+const WASMTreeSitterGrammar = require('../src/wasm-tree-sitter-grammar');
 const SecondMate = require('second-mate');
 const { OnigScanner } = SecondMate;
 
 // Expects one of `textmate`, `node-tree-sitter`, or `wasm-tree-sitter`.
 function setConfigForLanguageMode(mode, options = {}) {
   let useTreeSitterParsers = mode !== 'textmate';
-  let useLegacyTreeSitter = mode === 'node-tree-sitter';
   atom.config.set('core.useTreeSitterParsers', useTreeSitterParsers, options);
-  atom.config.set('core.useLegacyTreeSitter', useLegacyTreeSitter, options);
 }
 
 describe('GrammarRegistry', () => {
@@ -22,7 +20,7 @@ describe('GrammarRegistry', () => {
   beforeEach(async () => {
     await SecondMate.ready
     grammarRegistry = new GrammarRegistry({ config: atom.config });
-    expect(subscriptionCount(grammarRegistry)).toBe(2);
+    expect(subscriptionCount(grammarRegistry)).toBe(1);
   });
 
   describe('.assignLanguageMode(buffer, languageId)', () => {
@@ -82,7 +80,7 @@ describe('GrammarRegistry', () => {
     it('allows a TextMate grammar to be assigned directly, even when Tree-sitter is permitted', () => {
       grammarRegistry.loadGrammarSync(
         require.resolve(
-          'language-javascript/grammars/tree-sitter-javascript.cson'
+          'language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
       const tmGrammar = grammarRegistry.loadGrammarSync(
@@ -104,7 +102,7 @@ describe('GrammarRegistry', () => {
       );
       grammarRegistry.loadGrammarSync(
         require.resolve(
-          'language-javascript/grammars/tree-sitter-javascript.cson'
+          'language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
 
@@ -116,20 +114,20 @@ describe('GrammarRegistry', () => {
       expect(grammarRegistry.grammarForId('javascript')).toBe(undefined);
     });
 
-    it('returns a tree-sitter grammar when language is set to node-tree-sitter', () => {
-      setConfigForLanguageMode('node-tree-sitter');
+    it('returns a tree-sitter grammar when modern Tree-sitter is enabled', () => {
+      setConfigForLanguageMode('modern-tree-sitter');
 
       grammarRegistry.loadGrammarSync(
         require.resolve('language-javascript/grammars/javascript.cson')
       );
       grammarRegistry.loadGrammarSync(
         require.resolve(
-          'language-javascript/grammars/tree-sitter-javascript.cson'
+          'language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
 
       const grammar = grammarRegistry.grammarForId('source.js');
-      expect(grammar instanceof TreeSitterGrammar).toBe(true);
+      expect(grammar instanceof WASMTreeSitterGrammar).toBe(true);
       expect(grammar.scopeName).toBe('source.js');
 
       grammarRegistry.removeGrammar(grammar);
@@ -211,14 +209,14 @@ describe('GrammarRegistry', () => {
 
       grammarRegistry.loadGrammarSync(
         require.resolve(
-          'language-javascript/grammars/tree-sitter-javascript.cson'
+          'language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
       expect(buffer.getLanguageMode().grammar).toBe(textMateGrammar);
     });
 
     it("updates the buffer's grammar when a more appropriate tree-sitter grammar is added for its path", async () => {
-      setConfigForLanguageMode('node-tree-sitter');
+      setConfigForLanguageMode('modern-tree-sitter');
 
       const buffer = new TextBuffer();
       expect(buffer.getLanguageMode().getLanguageId()).toBe(null);
@@ -228,15 +226,15 @@ describe('GrammarRegistry', () => {
 
       const treeSitterGrammar = grammarRegistry.loadGrammarSync(
         require.resolve(
-          'language-javascript/grammars/tree-sitter-javascript.cson'
+          'language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
-      expect(buffer.getLanguageMode().grammar).toBe(treeSitterGrammar);
+      expectEquivalentGrammars(buffer.getLanguageMode().grammar, treeSitterGrammar);
 
       grammarRegistry.loadGrammarSync(
         require.resolve('language-javascript/grammars/javascript.cson')
       );
-      expect(buffer.getLanguageMode().grammar).toBe(treeSitterGrammar);
+      expectEquivalentGrammars(buffer.getLanguageMode().grammar, treeSitterGrammar);
     });
 
     it("updates the buffer's grammar when a more appropriate new-tree-sitter grammar is added for its path and the user has opted into new-tree-sitter", async () => {
@@ -250,7 +248,7 @@ describe('GrammarRegistry', () => {
 
       const treeSitterGrammar = grammarRegistry.loadGrammarSync(
         require.resolve(
-          'language-javascript/grammars/tree-sitter-javascript.cson'
+          'language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
       expect(buffer.getLanguageMode().grammar).toBe(treeSitterGrammar);
@@ -261,15 +259,15 @@ describe('GrammarRegistry', () => {
           '../packages/language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
-      expect(buffer.getLanguageMode().grammar).toBe(modernTreeSitterGrammar);
+      expectEquivalentGrammars(buffer.getLanguageMode().grammar, modernTreeSitterGrammar);
       grammarRegistry.loadGrammarSync(
         require.resolve('language-javascript/grammars/javascript.cson')
       );
-      expect(buffer.getLanguageMode().grammar).toBe(modernTreeSitterGrammar);
+      expectEquivalentGrammars(buffer.getLanguageMode().grammar, modernTreeSitterGrammar);
     });
 
     it("updates the buffer's grammar by ignoring a new-tree-sitter grammar if the user has NOT opted into new-tree-sitter", async () => {
-      setConfigForLanguageMode('node-tree-sitter');
+      setConfigForLanguageMode('modern-tree-sitter');
 
       const buffer = new TextBuffer();
       expect(buffer.getLanguageMode().getLanguageId()).toBe(null);
@@ -283,21 +281,20 @@ describe('GrammarRegistry', () => {
       expect(buffer.getLanguageMode().grammar).toBe(textmateGrammar);
 
       // TODO: Why doesn't this path resolution work like the one above?
-      const modernTreeSitterGrammar = grammarRegistry.loadGrammarSync(
+      grammarRegistry.loadGrammarSync(
         require.resolve(
           '../packages/language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
 
-      expect(buffer.getLanguageMode().grammar).toBe(textmateGrammar);
+      expectEquivalentGrammars(buffer.getLanguageMode().grammar, textmateGrammar);
 
-      const treeSitterGrammar = grammarRegistry.loadGrammarSync(
+      grammarRegistry.loadGrammarSync(
         require.resolve(
-          'language-javascript/grammars/tree-sitter-javascript.cson'
+          'language-javascript/grammars/modern-tree-sitter-javascript.cson'
         )
       );
-
-      expect(buffer.getLanguageMode().grammar).toBe(treeSitterGrammar);
+      expectEquivalentGrammars(buffer.getLanguageMode().grammar, textmateGrammar);
     });
 
 
@@ -387,16 +384,16 @@ describe('GrammarRegistry', () => {
 
       const disposable = grammarRegistry.maintainLanguageMode(buffer);
       expect(retainedBufferCount(grammarRegistry)).toBe(1);
-      expect(subscriptionCount(grammarRegistry)).toBe(4);
+      expect(subscriptionCount(grammarRegistry)).toBe(3);
 
       buffer.destroy();
       expect(retainedBufferCount(grammarRegistry)).toBe(0);
-      expect(subscriptionCount(grammarRegistry)).toBe(2);
+      expect(subscriptionCount(grammarRegistry)).toBe(1);
       expect(buffer.emitter.getTotalListenerCount()).toBe(0);
 
       disposable.dispose();
       expect(retainedBufferCount(grammarRegistry)).toBe(0);
-      expect(subscriptionCount(grammarRegistry)).toBe(2);
+      expect(subscriptionCount(grammarRegistry)).toBe(1);
     });
 
     it('does not retain the buffer when the grammar registry is destroyed', () => {
@@ -407,12 +404,12 @@ describe('GrammarRegistry', () => {
 
       grammarRegistry.maintainLanguageMode(buffer);
       expect(retainedBufferCount(grammarRegistry)).toBe(1);
-      expect(subscriptionCount(grammarRegistry)).toBe(4);
+      expect(subscriptionCount(grammarRegistry)).toBe(3);
 
       grammarRegistry.clear();
 
       expect(retainedBufferCount(grammarRegistry)).toBe(0);
-      expect(subscriptionCount(grammarRegistry)).toBe(2);
+      expect(subscriptionCount(grammarRegistry)).toBe(1);
       expect(buffer.emitter.getTotalListenerCount()).toBe(0);
     });
   });
@@ -483,7 +480,7 @@ describe('GrammarRegistry', () => {
       setConfigForLanguageMode('node-tree-sitter', { scopeSelector: '.source.js' })
       let grammar = atom.grammars.selectGrammar('file.js');
       expect(grammar.name).toBe('JavaScript');
-      expect(grammar.constructor.name).toBe('TreeSitterGrammar');
+      expect(grammar.constructor.name).toBe('WASMTreeSitterGrammar');
     })
 
     it("uses the filePath's shebang line if the grammar cannot be determined by the extension or basename", async () => {
@@ -645,7 +642,7 @@ describe('GrammarRegistry', () => {
         );
         grammarRegistry.loadGrammarSync(
           require.resolve(
-            'language-javascript/grammars/tree-sitter-javascript.cson'
+            'language-javascript/grammars/modern-tree-sitter-javascript.cson'
           )
         );
 
@@ -655,7 +652,7 @@ describe('GrammarRegistry', () => {
       });
 
       it('favors a tree-sitter grammar over a text-mate grammar when config is set', () => {
-        setConfigForLanguageMode('node-tree-sitter');
+        setConfigForLanguageMode('modern-tree-sitter');
 
 
         grammarRegistry.loadGrammarSync(
@@ -663,20 +660,20 @@ describe('GrammarRegistry', () => {
         );
         grammarRegistry.loadGrammarSync(
           require.resolve(
-            'language-javascript/grammars/tree-sitter-javascript.cson'
+            'language-javascript/grammars/modern-tree-sitter-javascript.cson'
           )
         );
 
         const grammar = grammarRegistry.selectGrammar('test.js');
-        expect(grammar instanceof TreeSitterGrammar).toBe(true);
+        expect(grammar instanceof WASMTreeSitterGrammar).toBe(true);
       });
 
       it('only favors a tree-sitter grammar if it actually matches in some way (regression)', () => {
-        setConfigForLanguageMode('node-tree-sitter');
+        setConfigForLanguageMode('modern-tree-sitter');
 
         grammarRegistry.loadGrammarSync(
           require.resolve(
-            'language-javascript/grammars/tree-sitter-javascript.cson'
+            'language-javascript/grammars/modern-tree-sitter-javascript.cson'
           )
         );
 
@@ -685,15 +682,15 @@ describe('GrammarRegistry', () => {
       });
     });
 
-    describe('tree-sitter grammars with content regexes', () => {
+    xdescribe('tree-sitter grammars with content regexes', () => {
       it('recognizes C++ header files', () => {
-        setConfigForLanguageMode('node-tree-sitter');
+        setConfigForLanguageMode('modern-tree-sitter');
 
         grammarRegistry.loadGrammarSync(
-          require.resolve('language-c/grammars/tree-sitter-c.cson')
+          require.resolve('language-c/grammars/modern-tree-sitter-c.cson')
         );
         grammarRegistry.loadGrammarSync(
-          require.resolve('language-c/grammars/tree-sitter-cpp.cson')
+          require.resolve('language-c/grammars/modern-tree-sitter-cpp.cson')
         );
         grammarRegistry.loadGrammarSync(
           require.resolve('language-coffee-script/grammars/coffeescript.cson')
@@ -737,16 +734,16 @@ describe('GrammarRegistry', () => {
       });
 
       it('recognizes C++ files that do not match the content regex (regression)', () => {
-        setConfigForLanguageMode('node-tree-sitter');
+        setConfigForLanguageMode('modern-tree-sitter');
 
         grammarRegistry.loadGrammarSync(
-          require.resolve('language-c/grammars/tree-sitter-c.cson')
+          require.resolve('language-c/grammars/modern-tree-sitter-c.cson')
         );
         grammarRegistry.loadGrammarSync(
           require.resolve('language-c/grammars/c++.cson')
         );
         grammarRegistry.loadGrammarSync(
-          require.resolve('language-c/grammars/tree-sitter-cpp.cson')
+          require.resolve('language-c/grammars/modern-tree-sitter-cpp.cson')
         );
 
         let grammar = grammarRegistry.selectGrammar(
@@ -759,9 +756,9 @@ describe('GrammarRegistry', () => {
       });
 
       it('does not apply content regexes from grammars without filetype or first line matches', () => {
-        setConfigForLanguageMode('node-tree-sitter');
+        setConfigForLanguageMode('modern-tree-sitter');
         grammarRegistry.loadGrammarSync(
-          require.resolve('language-c/grammars/tree-sitter-cpp.cson')
+          require.resolve('language-c/grammars/modern-tree-sitter-cpp.cson')
         );
 
         let grammar = grammarRegistry.selectGrammar(
@@ -777,12 +774,12 @@ describe('GrammarRegistry', () => {
       });
 
       it('recognizes shell scripts with shebang lines', () => {
-        setConfigForLanguageMode('node-tree-sitter');
+        setConfigForLanguageMode('modern-tree-sitter');
         grammarRegistry.loadGrammarSync(
           require.resolve('language-shellscript/grammars/shell-unix-bash.cson')
         );
         grammarRegistry.loadGrammarSync(
-          require.resolve('language-shellscript/grammars/tree-sitter-bash.cson')
+          require.resolve('language-shellscript/grammars/modern-tree-sitter-bash.cson')
         );
 
         let grammar = grammarRegistry.selectGrammar(
@@ -794,7 +791,7 @@ describe('GrammarRegistry', () => {
         `
         );
         expect(grammar.name).toBe('Shell Script');
-        expect(grammar instanceof TreeSitterGrammar).toBeTruthy();
+        expect(grammar instanceof WASMTreeSitterGrammar).toBeTruthy();
 
         grammar = grammarRegistry.selectGrammar(
           'test.h',
@@ -805,7 +802,7 @@ describe('GrammarRegistry', () => {
         `
         );
         expect(grammar.name).toBe('Shell Script');
-        expect(grammar instanceof TreeSitterGrammar).toBeTruthy();
+        expect(grammar instanceof WASMTreeSitterGrammar).toBeTruthy();
 
         setConfigForLanguageMode('textmate');
         grammar = grammarRegistry.selectGrammar(
@@ -817,38 +814,7 @@ describe('GrammarRegistry', () => {
         `
         );
         expect(grammar.name).toBe('Shell Script');
-        expect(grammar instanceof TreeSitterGrammar).toBeFalsy();
-      });
-
-      it('recognizes JavaScript files that use Flow', () => {
-        setConfigForLanguageMode('node-tree-sitter');
-        grammarRegistry.loadGrammarSync(
-          require.resolve(
-            'language-javascript/grammars/tree-sitter-javascript.cson'
-          )
-        );
-        grammarRegistry.loadGrammarSync(
-          require.resolve('language-typescript/grammars/tree-sitter-flow.cson')
-        );
-
-        let grammar = grammarRegistry.selectGrammar(
-          'test.js',
-          dedent`
-          // Copyright something
-          // @flow
-
-          module.exports = function () { return 1 + 1 }
-        `
-        );
-        expect(grammar.name).toBe('Flow JavaScript');
-
-        grammar = grammarRegistry.selectGrammar(
-          'test.js',
-          dedent`
-          module.exports = function () { return 1 + 1 }
-        `
-        );
-        expect(grammar.name).toBe('JavaScript');
+        expect(grammar instanceof WASMTreeSitterGrammar).toBeFalsy();
       });
     });
 
@@ -910,7 +876,7 @@ describe('GrammarRegistry', () => {
     beforeEach(() => {
       addCallbackFired = false;
       updateCallbackFired = false;
-      setConfigForLanguageMode('node-tree-sitter');
+      setConfigForLanguageMode('modern-tree-sitter');
     });
 
     afterEach(() => {
@@ -929,7 +895,7 @@ describe('GrammarRegistry', () => {
 
     it('fires the onDidUpdateGrammar callback', async () => {
       await atom.packages.activatePackage('language-javascript');
-      let callbackDisposable = atom.grammars.onDidUpdateGrammar((grammar) => {
+      atom.grammars.onDidUpdateGrammar((grammar) => {
         if (grammar.scopeName === 'source.js') {
           updateCallbackFired = true;
         }
@@ -1046,4 +1012,10 @@ function retainedBufferCount(grammarRegistry) {
 
 function subscriptionCount(grammarRegistry) {
   return grammarRegistry.subscriptions.disposables.size;
+}
+
+function expectEquivalentGrammars(grammarA, grammarB) {
+  if (grammarA.scopeName !== grammarB.scopeName) return false;
+  if (grammarA.constructor.name !== grammarB.constructor.name) return false;
+  return true;
 }

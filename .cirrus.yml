@@ -82,8 +82,14 @@ arm_linux_task:
                 fakeroot
                 libx11-dev
                 libxkbfile-dev
+                libxkbcommon-dev
+                libxkbcommon-x11-dev
+                libxkbcommon0
+                xkb-data
                 libgdk-pixbuf2.0-dev
                 libgtk-3-dev
+                libwayland-dev
+                libwayland-client0
                 libxss-dev
                 libasound2-dev
                 libnss3

@@ -22,11 +22,12 @@ jobs:
     steps:
     - name: Install build dependencies
       if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbfile-dev pkg-config libsecret-1-dev libncursesw5-dev libgdbm-dev libc6-dev libffi-dev
-    
+      run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbfile-dev pkg-config libsecret-1-dev libncursesw5-dev libgdbm-dev libc6-dev libffi-dev libwayland-dev libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
+
     - name: Checkout the latest code
       uses: actions/checkout@v5
-
+      with:
+        submodules: true
     - name: Setup node
       uses: actions/setup-node@v6
       with:
@@ -39,7 +40,7 @@ jobs:
       run: python3 -m pip install setuptools
 
     - name: Install Dependencies
-      run: yarn install
+      run: yarn install --ignore-engines || yarn install --ignore-engines
 
     - name: Build Dependencies
       run: yarn build
