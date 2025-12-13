@@ -11,7 +11,7 @@ module.exports = class StatusBarItem {
   setLineEndings(lineEndings) {
     this.lineEndings = lineEndings;
     this.element.textContent = lineEndingName(lineEndings);
-    this.element.style.display = lineEndingblockStyle(lineEndings);
+    this.element.style.display = lineEndingBlockStyle(lineEndings);
     this.emitter.emit('did-change');
   }
 
