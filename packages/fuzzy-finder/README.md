@@ -12,6 +12,7 @@ When opening a file, you can control the behavior.
   * <kbd>shift-enter</kbd> defaults to switching to another pane if the file is already open there
   * <kbd>cmd-k</kbd> <kbd>right</kbd> *(macOS)* or <kbd>ctrl-k</kbd> <kbd>right</kbd> *(Linux/Windows)* (or any other directional arrow) will open the highlighted file in a new pane on the side indicated by the arrow
   * Adding `:<line number>` to the end of your search will go directly to the line number you specify, or the last line if the number is larger
+  * Beginning your search with `!` will search for VCS ignored files (only if using ripgrep indexing)
 
 Turning on the "Search All Panes" setting reverses the behavior of <kbd>enter</kbd> and <kbd>shift-enter</kbd> so <kbd>enter</kbd> opens the file in any pane and <kbd>shift-enter</kbd> creates a new tab in the current pane.
 
