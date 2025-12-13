@@ -57,7 +57,7 @@ function lineEndingDescription(lineEndings) {
   }
 }
 
-function lineEndingblockStyle(lineEndings) {
+function lineEndingBlockStyle(lineEndings) {
   switch (lineEndingName(lineEndings)) {
     case '':
       return 'none';
