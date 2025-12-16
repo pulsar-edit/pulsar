@@ -8,6 +8,7 @@ const CSON = require('season');
 
 const ServiceHub = require('service-hub');
 const Package = require('./package');
+const { getReleaseChannel } = require('../get-app-details');
 const ThemePackage = require('./theme-package');
 const ModuleCache = require('./module-cache');
 const packageJSON = require('../package.json');
@@ -178,18 +179,20 @@ module.exports = class PackageManager {
   }
 
   // Returns the command needed to invoke PPM for the current release channel.
-  static getCommandName() {
-    let releaseChannel = atom.getReleaseChannel();
+  static getCommandName(version) {
+    let releaseChannel = getReleaseChannel(version);
     let commandName = releaseChannel === 'next' ? 'ppm-next' : 'ppm';
     return process.platform === 'win32' ? `${commandName}.cmd` : commandName;
   }
 
-  static possibleApmPaths(configPath) {
-    if (process.env.APM_PATH || configPath) {
-      return process.env.APM_PATH || configPath;
+  // Returns the path at which the `ppm` binary (formerly `apm`) is believed to
+  // exist.
+  static possibleApmPaths(version) {
+    if (process.env.APM_PATH) {
+      return process.env.APM_PATH;
     }
 
-    const commandName = this.getCommandName();
+    const commandName = this.getCommandName(version);
     const bundledPPMRoot = path.join(process.resourcesPath, 'app', 'ppm', 'bin', commandName);
     const unbundledPPMRoot = path.join(__dirname, '..', 'ppm', 'bin', commandName);
 
@@ -214,8 +217,8 @@ module.exports = class PackageManager {
     if (configPath || this.apmPath) {
       return configPath || this.apmPath;
     } else {
-       this.apmPath = PackageManager.possibleApmPaths();
-       return this.apmPath;
+      this.apmPath = PackageManager.possibleApmPaths();
+      return this.apmPath;
     }
   }
 
@@ -905,7 +908,7 @@ module.exports = class PackageManager {
     return Promise.all([symlinkPromise, dirPromise]).then(values => {
       const [isSymLink, isDir] = values;
       if (!isSymLink && isDir) {
-        return fs.remove(directory, function() {});
+        return fs.remove(directory, function () {});
       }
     });
   }
