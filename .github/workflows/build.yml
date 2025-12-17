@@ -24,7 +24,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-13, windows-latest ]
+        os: [ ubuntu-latest, macos-14, windows-latest ]
         include:
           - os: ubuntu-latest
             image: "debian:10"
@@ -81,6 +81,7 @@ jobs:
       uses: actions/setup-node@v6
       with:
         node-version: ${{ env.NODE_VERSION }}
+        architecture: 'x64'
 
     - name: Setup Python
       # actions/setup-python's copy of Python is compiled for too new glibc,

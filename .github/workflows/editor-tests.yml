@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-20.04, macos-13, windows-2019]
-        os: [ubuntu-latest, macos-13]
+        os: [ubuntu-latest, macos-14]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -37,7 +37,7 @@ jobs:
       # This is needed for Python 3.12+, since many versions of node-gyp
       # are incompatible with Python 3.12+, which no-longer ships 'distutils'
       # out of the box. 'setuptools' package provides 'distutils'.
-      run: python3 -m pip install setuptools
+      run: python3 -m pip install setuptools --break-system-packages
 
     - name: Install Dependencies
       run: yarn install --ignore-engines || yarn install --ignore-engines
