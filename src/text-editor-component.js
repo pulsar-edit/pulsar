@@ -1804,7 +1804,7 @@ module.exports = class TextEditorComponent {
     let scrollLeftChanged = false;
     if (!this.scrollTopPending) {
       scrollTopChanged = this.setScrollTop(
-        this.refs.verticalScrollbar ? this.refs.verticalScrollbar.element.scrollTop : 0
+        this.refs.verticalScrollbar?.element.scrollTop ?? 0
       );
     }
     if (!this.scrollLeftPending) {
