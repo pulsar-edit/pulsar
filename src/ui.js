@@ -105,6 +105,10 @@ function renderMarkdown(content, givenOpts = {}) {
     return typeof opts.rootDomain === "string" && opts.rootDomain.length > 1;
   };
 
+  const validateFilePath = () => {
+    return typeof opts.filePath === "string" && opts.filePath.length > 1;
+  };
+
   const cleanRootDomain = () => {
     // We will also remove any trailing `/` as link resolvers down the line add them in
     return opts.rootDomain.replace(".git", "").replace(/\/$/, "");
@@ -132,62 +136,98 @@ function renderMarkdown(content, givenOpts = {}) {
       divWrap: opts.taskCheckboxDivWrap
     });
   }
-  if (opts.transformImageLinks && validateRootDomain()) {
+  if (opts.transformImageLinks && (validateRootDomain() || validateFilePath())) {
     // Here we will take any links for images provided in the content, and do
     // our best to ensure they can accurately resolve.
     const defaultImageRenderer = md.renderer.rules.image; // We want to keep access to this
 
-    // Determines when we handle links if the item could be a local file or not
-    let couldBeLocalItem;
-    if (typeof opts.filePath != "string" || opts.filePath.length < 1) {
-      couldBeLocalItem = false;
-    } else {
-      couldBeLocalItem = true;
-    }
+    // Determines when we handle links if the item could be a local file or
+    // not.
+    let hasRootDomain = validateRootDomain();
+    let couldBeLocalItem = validateFilePath();
+    let couldBeGitHubRepoItem = hasRootDomain && opts.rootDomain.includes('github.');
 
     md.renderer.rules.image = (tokens, idx, options, env, self) => {
       let token = tokens[idx];
-      let aIndex = token.attrIndex("src");
 
-      // Lets say content contains './my-cool-image.png'
-      // We need to turn it into something like this:
-      // https://github.com/USER/REPO/raw/HEAD/my-cool-image.png
-      if (mdComponents.reg.localLinks.currentDir.test(token.attrGet("src"))) {
-        let rawLink = token.attrGet("src");
-        rawLink = rawLink.replace(mdComponents.reg.localLinks.currentDir, "");
-        // Now we need to handle links for both the web and locally
-        // We can do this by first checking if the link resolves locally
+      // Let's say the image source is './my-cool-image.png'. First we'll try
+      // to resolve it locally; but then we'll try to fall back to a remote URL
+      // of the form https://github.com/USER/REPO/raw/HEAD/my-cool-image.png;
+      // and finally we'll try treating it like an ordinary relative URL to a
+      // remote resource.
+      let rawSrc = token.attrGet("src");
+      if (mdComponents.reg.localLinks.currentDir.test(rawSrc)) {
+        // This URL starts with `./`, so we can try to resolve it from the
+        // current directory, if it's known.
+        rawSrc = rawSrc.replace(mdComponents.reg.localLinks.currentDir, "");
+        let resolved = false;
         if (couldBeLocalItem) {
-          let newSrc = path.resolve(path.dirname(opts.filePath, rawLink));
-          if (!fs.lstatSync(newSrc).isFile()) {
+          let newSrc = path.resolve(path.dirname(opts.filePath), rawSrc);
+          if (fs.lstatSync(newSrc).isFile()) {
             token.attrSet("src", newSrc);
-          } else {
-            token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+            resolved = true;
           }
-        } else {
-          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
         }
-      } else if (mdComponents.reg.localLinks.rootDir.test(token.attrGet("src"))) {
-        let rawLink = token.attrGet("src");
-        rawLink = rawLink.replace(mdComponents.reg.localLinks.rootDir, "");
+        if (!resolved && couldBeGitHubRepoItem) {
+          // Fall back to treating it like a reference to a file in a GitHub
+          // repo.
+          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawSrc}`);
+          resolved = true;
+        }
+        if (!resolved && hasRootDomain) {
+          // Fall back to an approach where we turn the relative path into an
+          // absolute URL.
+          token.attrSet("src", `${cleanRootDomain()}/${rawSrc}`);
+          resolved = true;
+        }
+      } else if (mdComponents.reg.localLinks.rootDir.test(rawSrc)) {
+        // This URL starts with `/`, so it's hard to know how to resolve that
+        // if it's a local item. We'll treat it as being relative from the
+        // project root and see if that leads us to a file.
+        rawSrc = rawSrc.replace(mdComponents.reg.localLinks.rootDir, "");
         // Now to handle the possible web or local link
+        let resolved = false;
         if (couldBeLocalItem) {
-          const [rootDirectory] = atom.project.relativePath(opts.filePath);
-          if (!fs.lstatSync(src).isFile() && rootDirectory) {
-            let newSrc = path.join(rootDirectory, rawLink);
-            token.attrSet("src", newSrc);
+          if (fs.lstatSync(rawSrc).isFile()) {
+            // This already resolves to a file, so we don't need to touch it!
+            resolved = true;
           } else {
-            token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
+            const [rootDirectory] = atom.project.relativizePath(opts.filePath);
+            if (rootDirectory) {
+              let newSrc = path.join(rootDirectory, rawSrc);
+              if (fs.lstatSync(newSrc).isFile()) {
+                token.attrSet("src", newSrc);
+                resolved = true;
+              }
+            }
           }
-        } else {
-          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
         }
-      } else if (!token.attrGet("src").startsWith("http") && !mdComponents.reg.globalLinks.base64.test(token.attrGet("src"))) {
-        // Check for implicit relative urls
-        let rawLink = token.attrGet("src");
-        token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
-      } else if ([".gif", ".png", ".jpg", ".jpeg", ".webp"].find(ext => token.attrGet("src").endsWith(ext)) && token.attrGet("src").startsWith("https://github.com") && token.attrGet("src").includes("blob")) {
-        // Should match any image being distributed from GitHub that's using `blob` instead of `raw` causing images to not load correctly
+        if (!resolved && couldBeGitHubRepoItem) {
+          // Fall back to treating it like a reference to a file in a GitHub
+          // repo.
+          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawSrc}`);
+          resolved = true;
+        }
+        if (!resolved && hasRootDomain) {
+          // Fall back to an approach where we turn the absolute path into an
+          // absolute URL.
+          token.attrSet("src", `${cleanRootDomain()}/${rawSrc}`);
+          resolved = true;
+        }
+      } else if (
+        !rawSrc.startsWith("http") &&
+        !mdComponents.reg.globalLinks.base64.test(rawSrc) &&
+        hasRootDomain
+      ) {
+        // This isn't a base64 URL, but it also doesn't start with `./` or `/`,
+        // and it's not a full URL with scheme, either. Assume it's an implicit
+        // relative URL.
+        token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawSrc}`);
+      } else if (
+        [".gif", ".png", ".jpg", ".jpeg", ".webp"].find(ext => rawSrc.endsWith(ext)) && rawSrc.startsWith("https://github.com") && rawSrc.includes("blob")
+      ) {
+        // Should match any image being distributed from GitHub that's using
+        // `blob` instead of `raw` causing images to not load correctly.
         let rawLink = token.attrGet("src");
         token.attrSet("src", rawLink.replace("blob", "raw"));
       }
@@ -300,7 +340,7 @@ function renderMarkdown(content, givenOpts = {}) {
     });
 
     // Disable Heading
-    md.block.ruler.before("heading", "strip_heading", (state, startLine, endLine) => {
+    md.block.ruler.before("heading", "strip_heading", (state, startLine, _endLine) => {
       let pos = state.bMarks[startLine] + state.tShift[startLine];
 
       if (state.src.charAt(pos) === "#") {
@@ -308,7 +348,7 @@ function renderMarkdown(content, givenOpts = {}) {
 
         const isSpace = () => {
           let code = state.src.charCodeAt(pos);
-          switch(code) {
+          switch (code) {
             case 0x09:
             case 0x20:
               return true;
@@ -338,7 +378,7 @@ function renderMarkdown(content, givenOpts = {}) {
       // until the specified token is reached. Which it will also strip to text,
       // then return
       let idx = initIdx;
-      while(idx < tokens.length) {
+      while (idx < tokens.length) {
         tokens[idx].type = "text";
         tokens[idx].content = "";
 
@@ -411,7 +451,7 @@ function renderMarkdown(content, givenOpts = {}) {
 
       const markdownRows = [
         entries.map(entry => entry[0]),
-        entries.map(entry => '--'),
+        entries.map(_ => '--'),
         entries.map((entry) => {
           if (typeof entry[1] === "object" && !Array.isArray(entry[1])) {
             // Remove all newlines, or they ruin formatting of parent table
@@ -442,7 +482,7 @@ function renderMarkdown(content, givenOpts = {}) {
       ALLOW_SELF_CLOSE_IN_ATTR: opts.sanitizeAllowSelfClose
     };
 
-    rendered = mdComponents.deps.domPurify.sanitize(rendered, opts);
+    rendered = mdComponents.deps.domPurify.sanitize(rendered, domPurifyOpts);
   }
 
   return rendered;
@@ -539,10 +579,11 @@ function applySyntaxHighlighting(content, givenOpts = {}) {
 /**
  * @function convertToDOM
  * @memberof markdown
- * @desc Takes a raw HTML string of data and returns a proper HTMLFragment.
- * This should be done if you need access to APIs available on the DOM itself.
- * @param {string} content - The HTML String.
- * @returns {HTMLFragment}
+ * @desc Takes a raw HTML string of data and returns a proper
+ * `DocumentFragment`. This should be done if you need access to APIs available
+ * on the DOM itself.
+ * @param {string} content - The HTML string.
+ * @returns {DocumentFragment}
  */
 function convertToDOM(content) {
   const template = document.createElement("template");
@@ -572,7 +613,7 @@ function convertToDOM(content) {
   ```
 */
 function setCandidates(matcherOrCandidates, candidates) {
-  if(candidates) {
+  if (candidates) {
     matcherOrCandidates.fuzzyMatcher.setCandidates(
       [...Array(candidates.length).keys()],
       candidates
@@ -669,7 +710,7 @@ const fuzzyMatcher = {
 
   // Same as {setCandidates} passing a single candidate, and returning only
   // the score. It can return `0` if there's no match.
-  score(candidate, query, opts = {}) {
+  score(candidate, query, _opts = {}) {
     return this.match(candidate, query)?.score || 0;
   },
 
