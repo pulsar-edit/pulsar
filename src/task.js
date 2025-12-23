@@ -1,6 +1,6 @@
 const _ = require('underscore-plus');
 const ChildProcess = require('child_process');
-const {Emitter} = require('event-kit');
+const { Emitter } = require('event-kit');
 const Grim = require('grim');
 
 // Extended: Run a node script in a separate process.
@@ -70,11 +70,20 @@ module.exports = class Task {
     this.emitter = new Emitter();
     const compileCachePath = require('./compile-cache').getCacheDirectory();
     taskPath = require.resolve(taskPath);
-    const env = Object.assign({}, process.env, {userAgent: navigator.userAgent});
-    this.childProcess = ChildProcess.fork(require.resolve('./task-bootstrap'), [compileCachePath, taskPath], { env, silent: true});
+    const env = Object.assign({}, process.env, { userAgent: navigator.userAgent });
 
-    this.on("task:log",   (...args) => console.log(...args)  );
-    this.on("task:warn",  (...args) => console.warn(...args) );
+    if (atom.unloading) {
+      this.childProcess = null;
+    } else {
+      this.childProcess = ChildProcess.fork(
+        require.resolve('./task-bootstrap'),
+        [compileCachePath, taskPath],
+        { env, silent: true }
+      );
+    }
+
+    this.on("task:log", (...args) => console.log(...args));
+    this.on("task:warn", (...args) => console.warn(...args));
     this.on("task:error", (...args) => console.error(...args));
 
     this.on("task:deprecations", (deprecations) => {
@@ -92,8 +101,9 @@ module.exports = class Task {
 
   // Routes messages from the child to the appropriate event.
   handleEvents() {
+    if (!this.childProcess) return;
     this.childProcess.removeAllListeners();
-    this.childProcess.on('message', ({event, args}) => {
+    this.childProcess.on('message', ({ event, args }) => {
       if (this.childProcess != null) {
         this.emitter.emit(event, args);
       }
@@ -117,6 +127,8 @@ module.exports = class Task {
   // * `args` The arguments to pass to the function exported by this task's script.
   // * `callback` (optional) A {Function} to call when the task completes.
   start(...args) {
+    // Don't spawn any new tasks during shutdown.
+    if (atom.unloading) return;
     const [callback] = args.splice(-1);
     if (this.childProcess == null) {
       throw new Error('Cannot start terminated process');
@@ -127,7 +139,7 @@ module.exports = class Task {
     } else {
       args.push(callback);
     }
-    this.send({event: 'start', args});
+    this.send({ event: 'start', args });
     return undefined;
   }
 
@@ -164,19 +176,17 @@ module.exports = class Task {
   }
 
   // Public: Forcefully stop the running task.
-
+  //
   // No more events are emitted once this method is called.
+  //
+  // Returns a {Boolean} indicating whether the task was terminated.
   terminate() {
     if (this.childProcess == null) {
       return false;
     }
     this.childProcess.removeAllListeners();
-    if (this.childProcess.stdout != null) {
-      this.childProcess.stdout.removeAllListeners();
-    }
-    if (this.childProcess.stderr != null) {
-      this.childProcess.stderr.removeAllListeners();
-    }
+    this.childProcess.stdout?.removeAllListeners();
+    this.childProcess.stderr?.removeAllListeners();
     this.childProcess.kill();
     this.childProcess = null;
     return true;
