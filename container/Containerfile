@@ -1,0 +1,21 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+RUN mkdir -p /opt/pulsar
+COPY install-build-dependencies.sh /opt/pulsar/
+RUN /opt/pulsar/install-build-dependencies.sh
+
+COPY install-run-dependencies.sh /opt/pulsar/
+RUN /opt/pulsar/install-run-dependencies.sh
+
+# Install the minimal X11 'xeyes' app to be able to debug systems that fail to
+# launch Pulsar due to X11/Wayland issues
+# hadolint ignore=DL3008,DL3059
+RUN apt-get install --yes --quiet --no-install-recommends x11-apps
+
+# Use ENTRYPOINT for the main executable and CMD for default arguments
+COPY pulsar-entrypoint.sh /opt/pulsar/
+ENTRYPOINT ["/opt/pulsar/pulsar-entrypoint.sh"]
+CMD []
