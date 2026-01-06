@@ -1864,7 +1864,10 @@ module.exports = class AtomApplication extends EventEmitter {
     const normalizedPath = path.normalize(
       path.resolve(executedFrom, fs.normalize(result.pathToOpen))
     );
-    if (!url.parse(pathToOpen).protocol) {
+
+    if (!url.parse(result.pathToOpen).protocol) {
+      // If this isn't a URL, it's a file path. File paths need to be resolved
+      // and normalized, whereas we assume URLs are already unambiguous.
       result.pathToOpen = normalizedPath;
     }
 
