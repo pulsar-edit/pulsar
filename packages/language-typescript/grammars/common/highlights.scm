@@ -787,6 +787,7 @@
 (template_substitution
   "${" @punctuation.section.embedded.begin._LANG_
   "}" @punctuation.section.embedded.end._LANG_
+  (#set! capture.final true)
 )
 
 ; Scope interpolations with `meta.embedded.line` if they start and end on the
