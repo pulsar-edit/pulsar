@@ -2,6 +2,8 @@ const LocaleChecker = require('../lib/locale-checker');
 const env = require('../lib/checker-env');
 const { it, fit, ffit } = require('./async-spec-helpers');
 
+let checker;
+
 describe('Locale Checker', function () {
     it('can load en-US without paths', async function () {
         checker = new LocaleChecker('en-US', [], false, false);

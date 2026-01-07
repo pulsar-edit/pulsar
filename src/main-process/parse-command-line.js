@@ -66,6 +66,12 @@ module.exports = function parseCommandLine(processArgs) {
       'Create a profile of the startup execution time.'
     );
   options
+    .boolean('crashdump')
+    .describe(
+      'crashdump',
+      'Generate a crashdump in ~/.pulsar/crashdumps in the event of a crash.'
+    );
+  options
     .alias('r', 'resource-path')
     .string('r')
     .describe(
@@ -183,6 +189,7 @@ module.exports = function parseCommandLine(processArgs) {
   const mainProcess = args['main-process'];
   const timeout = args['timeout'];
   const newWindow = args['new-window'];
+  const useCrashReporter = args['crashdump'];
   let executedFrom = null;
   if (args['executed-from'] && args['executed-from'].toString()) {
     executedFrom = args['executed-from'].toString();
@@ -253,6 +260,7 @@ module.exports = function parseCommandLine(processArgs) {
     clearWindowState,
     addToLastWindow,
     mainProcess,
+    useCrashReporter,
     benchmark,
     benchmarkTest,
     env: process.env

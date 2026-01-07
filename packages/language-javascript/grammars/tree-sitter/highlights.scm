@@ -845,20 +845,33 @@
 
 ; The "Foo" in `<Foo />`.
 (jsx_self_closing_element
-  name: (_) @entity.name.tag.js
+  name: (_) @entity.name.tag.jsx.js
   ) @meta.tag.jsx.js
 
 ; The "Foo" in `<Foo>`.
 (jsx_opening_element
-  name: (_) @entity.name.tag.js)
+  name: (_) @entity.name.tag.jsx.js)
 
 ; The "Foo" in `</Foo>`.
 (jsx_closing_element
-  name: (_) @entity.name.tag.js)
+  name: (_) @entity.name.tag.jsx.js)
 
 ; The "bar" in `<Foo bar={true} />`.
 (jsx_attribute
-  (property_identifier) @entity.other.attribute-name.js)
+  (property_identifier) @entity.other.attribute-name.jsx.js)
+
+; The "wat:bar" in `<Foo wat:bar={true} />`.
+(jsx_attribute
+  (jsx_namespace_name
+    (identifier)) @entity.other.attribute-name.namespaced.jsx.js)
+
+; The "wat" in `<Foo wat:bar={true} />`. Worth tagging with its own scope name
+; just in case a theme wants to highlight the namespace differently from the
+; rest of the attribute.
+(jsx_attribute
+  (jsx_namespace_name
+    (identifier) @meta.attribute-namespace.jsx.js
+    (#is-not? test.last)))
 
 ; All JSX expressions/interpolations within braces.
 ((jsx_expression) @meta.embedded.block.jsx.js

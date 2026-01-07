@@ -32,6 +32,9 @@ describe('SubsequenceProvider', () => {
     // Set the completion delay
     atom.config.set('autocomplete-plus.autoActivationDelay', 100)
 
+    // Disable locality bonus
+    atom.config.set('autocomplete-plus.useLocalityBonus', false)
+
     let workspaceElement = atom.views.getView(atom.workspace)
     jasmine.attachToDOM(workspaceElement)
 

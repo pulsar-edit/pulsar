@@ -24,7 +24,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-13, windows-latest ]
+        os: [ ubuntu-latest, macos-14, windows-latest ]
         include:
           - os: ubuntu-latest
             image: "debian:10"
@@ -42,8 +42,8 @@ jobs:
         sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools
-        libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev # <-- Python-related stuff on this line
+      run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
+       libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev # <-- Python-related stuff on this line
 
     - name: Restore Compiled Python from Cache - Linux
       if: ${{ runner.os == 'Linux' }}
@@ -81,6 +81,7 @@ jobs:
       uses: actions/setup-node@v6
       with:
         node-version: ${{ env.NODE_VERSION }}
+        architecture: 'x64'
 
     - name: Setup Python
       # actions/setup-python's copy of Python is compiled for too new glibc,
@@ -298,7 +299,7 @@ jobs:
     steps:
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools
+      run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
 
     - name: Checkout the latest code
       uses: actions/checkout@v5

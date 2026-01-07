@@ -2,7 +2,7 @@ const path = require('path')
 const crypto = require('crypto')
 const Replacer = require('./replacer')
 const FLAGS = require('./simple-transformations')
-const {remote} = require('electron')
+const remote = require('@electron/remote')
 
 function resolveClipboard () {
   return atom.clipboard.read()

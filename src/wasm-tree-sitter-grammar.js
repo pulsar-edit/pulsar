@@ -4,7 +4,7 @@ const Grim = require('grim');
 const dedent = require('dedent');
 const { Language, Parser, Query } = require('./web-tree-sitter');
 const { CompositeDisposable, Emitter } = require('event-kit');
-const { File } = require('pathwatcher');
+const { File } = require('@pulsar-edit/pathwatcher');
 const { normalizeDelimiters } = require('./comment-utils.js');
 
 const parserInitPromise = Parser.init();
@@ -65,6 +65,32 @@ wrapQueryCaptures(Query.prototype);
 
 // Extended: This class holds an instance of a Tree-sitter grammar.
 module.exports = class WASMTreeSitterGrammar {
+
+  // Cache each `Language` instance at its own path.
+  static LANGUAGE_CACHE = new Map();
+
+  static async loadLanguage(grammarPath) {
+    // We should load each language a maximum of once.
+    //
+    // This cache makes certain trade-offs. Without it, two different grammars
+    // within the same package can point to the same WASM file and each have
+    // its own distinct “copy” of the language. Using the cache avoids this
+    // waste, but makes it unsafe for us to assume we can delete a language
+    // from this cache if its grammar is deactivated.
+    //
+    // So that's the main downside: out of an abundance of caution, we don't
+    // ever prune this cache, even if the grammar that originally loaded a
+    // language is deactivated. But deactivation of a grammar after
+    // instantiation is an uncommon occurrence outside of the test suite, so we
+    // can live with this for now.
+    if (this.LANGUAGE_CACHE.has(grammarPath)) {
+      return this.LANGUAGE_CACHE.get(grammarPath);
+    }
+    let language = await Language.load(grammarPath);
+    this.LANGUAGE_CACHE.set(grammarPath, language);
+    return language;
+  }
+
   constructor(registry, grammarPath, params) {
     this.registry = registry;
     this.name = params.name;
@@ -197,9 +223,10 @@ module.exports = class WASMTreeSitterGrammar {
     await parserInitPromise;
     if (!this._language) {
       try {
-        this._language = await Language.load(this.treeSitterGrammarPath);
+        this._language = await WASMTreeSitterGrammar.loadLanguage(this.treeSitterGrammarPath);
       } catch (err) {
         console.error(`Error loading grammar for ${this.scopeName}; original error follows`);
+        console.error(err);
         throw err;
       }
     }
@@ -479,7 +506,14 @@ module.exports = class WASMTreeSitterGrammar {
   deactivate() {
     this.registration?.dispose();
     this.subscriptions?.dispose();
+    // A new `Query` object gets instantiated for each kind of query every time
+    // a grammar activates. Make sure they're cleaned up upon deactivation;
+    // they're WASM object and will not automatically get GC’d.
+    for (let value of this.queryCache.values()) {
+      value.delete();
+    }
     this.queryCache.clear();
+    this._language = null;
   }
 
   // Extended: Define a set of rules for when this grammar should delegate to a

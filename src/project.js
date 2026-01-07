@@ -3,7 +3,7 @@ const path = require('path');
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const { watchPath } = require('./path-watcher');
 
 const DefaultDirectoryProvider = require('./default-directory-provider');
@@ -162,7 +162,7 @@ module.exports = class Project extends Model {
       deserializer: 'Project',
       paths: this.getPaths(),
       buffers: _.compact(
-        this.buffers.map(function(buffer) {
+        this.buffers.map(function (buffer) {
           if (buffer.isRetained()) {
             const isUnloading = options.isUnloading === true;
             return buffer.serialize({

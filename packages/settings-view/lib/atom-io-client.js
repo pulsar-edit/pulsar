@@ -1,6 +1,6 @@
 const fs = require('fs-plus');
 const path = require('path');
-const {remote} = require('electron');
+const remote = require('@electron/remote');
 const glob = require('glob');
 const request = require('request');
 
