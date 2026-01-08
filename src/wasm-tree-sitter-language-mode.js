@@ -1896,12 +1896,25 @@ class FoldResolver {
   }
 
   resolvePositionForDividedFold(capture) {
-    let { name, node } = capture;
+    let { name, node, setProperties: props } = capture;
     if (name === 'fold.start') {
       return new Point(node.startPosition.row, Infinity);
     } else if (name === 'fold.end') {
+      // `@fold.end` can have adjustments applied to it just like `@fold`.
+      let defaultOptions = { 'fold.endAt': 'startPosition' };
+      let options = { ...defaultOptions, ...props };
       let end = node.startPosition;
-      if (end.column === 0 || this.positionIsNotPrecededByTextOnLine(end)) {
+      let originalEnd = end;
+      for (let key in options) {
+        if (!this.capturePropertyIsFoldAdjustment(key)) { continue; }
+        let value = options[key];
+        end = this.applyFoldAdjustment(key, end, node, value, props, this.layer);
+      }
+      // There's an implicit behavior that we apply for ease of use, but we
+      // should skip it if any `#set!` predicates were used to tweak the end
+      // location.
+      let positionDidMove = originalEnd.row !== end.row || originalEnd.column !== end.column;
+      if (!positionDidMove && (end.column === 0 || this.positionIsNotPrecededByTextOnLine(end))) {
         // If the fold ends at the start of the line, adjust it so that it
         // actually ends at the end of the previous line. This behavior is
         // implied in the existing specs.

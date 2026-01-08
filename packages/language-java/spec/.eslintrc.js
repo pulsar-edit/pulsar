@@ -1,7 +1,9 @@
 module.exports = {
   env: { jasmine: true },
   globals: {
-    waitsForPromise: true
+    waitsForPromise: true,
+    runGrammarTests: true,
+    runFoldsTests: true
   },
   rules: {
     "node/no-unpublished-require": "off",

@@ -11,6 +11,7 @@ comments:
   start: '// '
 
 treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-java#e10607b45ff745f5f876bfa3e94fbcc6b44bdc11'
   grammar: 'tree-sitter-java/tree-sitter-java.wasm'
   highlightsQuery: 'tree-sitter-java/highlights.scm'
   tagsQuery: 'tree-sitter-java/tags.scm'
