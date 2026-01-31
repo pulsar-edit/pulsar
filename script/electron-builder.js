@@ -202,6 +202,61 @@ let options = {
     // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
     // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
     // "!node_modules/.bin/pegjs", // Note: https://github.com/pulsar-edit/pulsar/pull/206
+
+    // Exclusions borrowed from `node-prune`
+    // - Files
+    "!**/{Jenkinsfile}",
+    "!**/{Gulpfile.js}",
+    "!**/{Gruntfile.js}",
+    "!**/{gulpfile.js}",
+    "!**/{.tern-project}",
+    "!**/{.eslintrc.js}",
+    "!**/{.eslintrc.json}",
+    "!**/{.eslintrc.yml}",
+    "!**/{.stylelintrc}",
+    "!**/{stylelint.config.js}",
+    "!**/{stylelintrc.json}",
+    "!**/{stylelintrc.yaml}",
+    "!**/{stylelintrc.yml}",
+    "!**/{stylelintrc.js}",
+    "!**/{.htmllintrc}",
+    "!**/{htmllint.js}",
+    "!**/{.npmrc}",
+    "!**/{.documentup.json}",
+    "!**/{.gitlab-ci.yml}",
+    "!**/{.coveralls.yml}",
+    "!**/{CHANGES}",
+    "!**/{changelog}",
+    "!**/{.yarnclean}",
+    "!**/{_config.yml}",
+    "!**/{.babelrc}",
+    "!**/{.yo-rc.json}",
+    "!**/{jest.config.js}",
+    "!**/{karma.conf.js}",
+    "!**/{wallaby.js}",
+    "!**/{wallaby.conf.js}",
+    "!**/{.prettierrc}",
+    "!**/{.prettierrc.yml}",
+    "!**/{.prettierrc.toml}",
+    "!**/{.prettierrc.js}",
+    "!**/{.prettierrc.json}",
+    "!**/{.prettier.config.js}",
+    "!**/{.appveyor.yml}",
+    "!**/{tsconfig.json}",
+    "!**/{tslint.json}",
+    // - Directories
+    "!**/docs",
+    "!**/doc",
+    "!**/website",
+    "!**/images",
+    "!**/assets",
+    "!**/example",
+    "!**/examples",
+    "!**/coverage",
+    "!**/.circleci",
+    "!**/.github",
+    // - Extensions
+    "!**/*.{markdown,md,mkd,ts,jst,coffee,tgz,swp}"
   ],
 
   extraResources: [
