@@ -256,7 +256,7 @@ let options = {
     "!**/.circleci",
     "!**/.github",
     // - Extensions
-    "!**/*.{markdown,md,mkd,ts,jst,coffee,tgz,swp}"
+    "!**/*.{markdown,md,mkd,ts,jst,tgz,swp}",
   ],
 
   extraResources: [
