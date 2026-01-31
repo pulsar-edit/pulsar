@@ -249,7 +249,6 @@ let options = {
     "!**/doc",
     "!**/website",
     "!**/images",
-    "!**/assets",
     "!**/example",
     "!**/examples",
     "!**/coverage",
