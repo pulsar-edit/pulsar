@@ -238,7 +238,7 @@ class TreeView {
   }
 
   isPermanentDockItem() {
-    return true;
+    return atom.config.get('tree-view.isPermanent');
   }
 
   getPreferredWidth() {

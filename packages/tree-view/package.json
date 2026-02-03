@@ -81,6 +81,11 @@
       "type": "boolean",
       "default": false,
       "description": "When Pulsar is opened, the view is hidden."
+    },
+    "isPermanent": {
+      "type": "boolean",
+      "default": true,
+      "description": "When enabled, the tree view becomes a permanent dock item that cannot be closed."
     }
   }
 }
