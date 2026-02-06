@@ -345,6 +345,13 @@ const configSchema = {
         type: 'number',
         default: 40
       },
+      largeFileThreshold: {
+        description:
+          'Files larger than this size in megabytes will open in large file mode with syntax highlighting disabled. Only applies to TextMate grammars; Tree-sitter grammars handle large files efficiently without this limitation. Set to 0 to always enable syntax highlighting regardless of file size.',
+        type: 'number',
+        default: 2,
+        minimum: 0
+      },
       fileSystemWatcher: {
         description:
           'Choose the underlying implementation used to watch for filesystem changes. Emulating changes will miss any events caused by applications other than Pulsar, but may help prevent crashes or freezes.',
