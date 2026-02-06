@@ -149,5 +149,7 @@ class FileInfoView {
     } else {
       this.currentPath.textContent = '';
     }
+
+    this.element.style.display = this.currentPath.textContent === '' ? 'none' : '';
   }
 }
