@@ -84,6 +84,12 @@ module.exports = {
     }
   },
 
+  consumeBackgroundTips (service) {
+    return service.addTips([
+      'Install packages, themes, and customize your editor in Settings {settings-view:open}'
+    ])
+  },
+
   consumeSnippets (snippets) {
     if (typeof snippets.getUnparsedSnippets === 'function') {
       SnippetsProvider.getSnippets = snippets.getUnparsedSnippets.bind(snippets)

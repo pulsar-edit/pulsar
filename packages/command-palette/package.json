@@ -24,6 +24,13 @@
     "semver": "^5.4.1",
     "sinon": "^3.2.1"
   },
+  "consumedServices": {
+    "background-tips": {
+      "versions": {
+        "1.0.0": "consumeBackgroundTips"
+      }
+    }
+  },
   "configSchema": {
     "preserveLastSearch": {
       "type": "boolean",

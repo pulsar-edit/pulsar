@@ -68,6 +68,11 @@
       "versions": {
         "1.0.0": "consumeSymbolProvider"
       }
+    },
+    "background-tips": {
+      "versions": {
+        "1.0.0": "consumeBackgroundTips"
+      }
     }
   },
   "providedServices": {
