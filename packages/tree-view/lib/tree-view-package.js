@@ -57,6 +57,13 @@ class TreeViewPackage {
     })
   }
 
+  consumeBackgroundTips (service) {
+    return service.addTips([
+      'Show or hide the Tree View with {tree-view:toggle}',
+      'Jump to the Tree View without leaving your keyboard using {tree-view:toggle-focus}'
+    ])
+  }
+
   provideTreeView () {
     return {
       selectedPaths: () => this.getTreeViewInstance().selectedPaths(),

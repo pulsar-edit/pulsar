@@ -115,6 +115,12 @@ module.exports = {
     this.subscriptions = null;
   },
 
+  consumeBackgroundTips (service) {
+    return service.addTips([
+      'Navigate to any function or symbol in the current file with {symbols-view:toggle-file-symbols}'
+    ])
+  },
+
   consumeSymbolProvider(provider) {
     if (Array.isArray(provider)) {
       this.broker.add(...provider);
