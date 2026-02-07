@@ -51,13 +51,13 @@ describe('TextMateLanguageMode', () => {
     });
   });
 
-  describe('core.largeFileThreshold config', () => {
+  describe('editor.largeFileThreshold config', () => {
     afterEach(() => {
-      config.unset('core.largeFileThreshold');
+      config.unset('editor.largeFileThreshold');
     });
 
     it('uses the configured threshold to determine large file mode', () => {
-      config.set('core.largeFileThreshold', 0.001); // 1KB
+      config.set('editor.largeFileThreshold', 0.001); // 1KB
       const line = 'a b c d\n';
       buffer = new TextBuffer(line.repeat(200)); // ~1.6KB
       languageMode = new TextMateLanguageMode({
@@ -69,7 +69,7 @@ describe('TextMateLanguageMode', () => {
     });
 
     it('disables automatic large file mode when threshold is 0', () => {
-      config.set('core.largeFileThreshold', 0);
+      config.set('editor.largeFileThreshold', 0);
       const line = 'a b c d\n';
       buffer = new TextBuffer(line.repeat(256 * 1024)); // 2MB
       languageMode = new TextMateLanguageMode({
@@ -81,7 +81,7 @@ describe('TextMateLanguageMode', () => {
     });
 
     it('respects explicit largeFileMode param over config', () => {
-      config.set('core.largeFileThreshold', 0);
+      config.set('editor.largeFileThreshold', 0);
       buffer = new TextBuffer('small file');
       languageMode = new TextMateLanguageMode({
         buffer,
