@@ -1,19 +1,20 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import path from 'path'
-import electron from 'electron'
-import etch from 'etch'
-import hostedGitInfo from 'hosted-git-info'
+const path = require('path')
+const electron = require('electron')
+const etch = require('etch')
+const hostedGitInfo = require('hosted-git-info')
 
-import {CompositeDisposable, TextEditor} from 'atom'
+const {CompositeDisposable, TextEditor} = require('atom')
 
-import PackageCard from './package-card'
-import ErrorView from './error-view'
+const PackageCard = require('./package-card')
+const ErrorView = require('./error-view')
 
 const PackageNameRegex = /config\/install\/(package|theme):([a-z0-9-_]+)/i
 
-export default class InstallPanel {
+module.exports =
+class InstallPanel {
   constructor (settingsView, packageManager) {
     this.settingsView = settingsView
     this.packageManager = packageManager

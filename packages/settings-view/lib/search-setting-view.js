@@ -1,12 +1,13 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch'
-import { shell } from 'electron'
-import { Disposable, CompositeDisposable } from 'atom'
-import { getSettingTitle } from './rich-title'
+const etch = require('etch')
+const { shell } = require('electron')
+const { Disposable, CompositeDisposable } = require('atom')
+const { getSettingTitle } = require('./rich-title')
 
-export default class SearchSettingView {
+module.exports =
+class SearchSettingView {
   constructor(setting, settingsView) {
     this.settingsView = settingsView
     this.setting = setting

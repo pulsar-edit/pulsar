@@ -2,28 +2,29 @@ let SettingsView = null
 let settingsView = null
 
 let statusView = null
+let statusViewIcon = null
 
 const PackageManager = require('./package-manager')
 let packageManager = null
 
 const SnippetsProvider = {
-  getSnippets () { return atom.config.scopedSettingsStore.propertySets }
+  getSnippets() { return atom.config.scopedSettingsStore.propertySets }
 }
 
 const CONFIG_URI = 'atom://config'
 
 module.exports = {
-  handleURI (parsed) {
+  handleURI(parsed) {
     switch (parsed.pathname) {
       case '/show-package': this.showPackage(parsed.query.package)
     }
   },
 
-  showPackage (packageName) {
+  showPackage(packageName) {
     atom.workspace.open(`atom://config/packages/${packageName}`)
   },
 
-  activate () {
+  activate() {
     atom.workspace.addOpener(uri => {
       if (uri.startsWith(CONFIG_URI)) {
         if (settingsView == null || settingsView.destroyed) {
@@ -39,34 +40,36 @@ module.exports = {
     })
 
     atom.commands.add('atom-workspace', {
-      'settings-view:open' () { atom.workspace.open(CONFIG_URI) },
-      'settings-view:core' () { atom.workspace.open(`${CONFIG_URI}/core`) },
-      'settings-view:editor' () { atom.workspace.open(`${CONFIG_URI}/editor`) },
-      'settings-view:show-keybindings' () { atom.workspace.open(`${CONFIG_URI}/keybindings`) },
-      'settings-view:change-themes' () { atom.workspace.open(`${CONFIG_URI}/themes`) },
-      'settings-view:install-packages-and-themes' () { atom.workspace.open(`${CONFIG_URI}/install`) },
-      'settings-view:view-installed-themes' () { atom.workspace.open(`${CONFIG_URI}/themes`) },
-      'settings-view:uninstall-themes' () { atom.workspace.open(`${CONFIG_URI}/themes`) },
-      'settings-view:view-installed-packages' () { atom.workspace.open(`${CONFIG_URI}/packages`) },
-      'settings-view:uninstall-packages' () { atom.workspace.open(`${CONFIG_URI}/packages`) },
-      'settings-view:check-for-package-updates' () { atom.workspace.open(`${CONFIG_URI}/updates`) }
+      'settings-view:open'() { atom.workspace.open(CONFIG_URI) },
+      'settings-view:core'() { atom.workspace.open(`${CONFIG_URI}/core`) },
+      'settings-view:editor'() { atom.workspace.open(`${CONFIG_URI}/editor`) },
+      'settings-view:show-keybindings'() { atom.workspace.open(`${CONFIG_URI}/keybindings`) },
+      'settings-view:change-themes'() { atom.workspace.open(`${CONFIG_URI}/themes`) },
+      'settings-view:install-packages-and-themes'() { atom.workspace.open(`${CONFIG_URI}/install`) },
+      'settings-view:view-installed-themes'() { atom.workspace.open(`${CONFIG_URI}/themes`) },
+      'settings-view:uninstall-themes'() { atom.workspace.open(`${CONFIG_URI}/themes`) },
+      'settings-view:view-installed-packages'() { atom.workspace.open(`${CONFIG_URI}/packages`) },
+      'settings-view:uninstall-packages'() { atom.workspace.open(`${CONFIG_URI}/packages`) },
+      'settings-view:check-for-package-updates'() { atom.workspace.open(`${CONFIG_URI}/updates`) }
     })
 
     if (process.platform === 'win32' && require('atom').WinShell != null) {
-      atom.commands.add('atom-workspace', {'settings-view:system' () { atom.workspace.open(`${CONFIG_URI}/system`) }})
+      atom.commands.add('atom-workspace', {'settings-view:system'() { atom.workspace.open(`${CONFIG_URI}/system`) }})
     }
   },
 
-  deactivate () {
+  deactivate() {
     if (settingsView) settingsView.destroy()
     if (statusView) statusView.destroy()
+    if (statusViewIcon) statusViewIcon.destroy()
     settingsView = null
     packageManager = null
     statusView = null
+    statusViewIcon = null
     atom.notifications.addWarning("Warning! You have disabled the settings-view package. To enable it again, edit the [`config.cson`](https://pulsar-edit.dev/docs/launch-manual/sections/using-pulsar/#global-configuration-settings) by removing the `settings-view` entry from `core: disabled packages:`");
   },
 
-  consumeStatusBar (statusBar) {
+  consumeStatusBar(statusBar) {
     if (packageManager == null) packageManager = new PackageManager()
     packageManager.getOutdated().then(updates => {
       if (packageManager) {
@@ -84,7 +87,7 @@ module.exports = {
     }
   },
 
-  consumeSnippets (snippets) {
+  consumeSnippets(snippets) {
     if (typeof snippets.getUnparsedSnippets === 'function') {
       SnippetsProvider.getSnippets = snippets.getUnparsedSnippets.bind(snippets)
     }
@@ -93,7 +96,7 @@ module.exports = {
     }
   },
 
-  createSettingsView (params) {
+  createSettingsView(params) {
     if (SettingsView == null) SettingsView = require('./settings-view')
     if (packageManager == null) packageManager = new PackageManager()
     params.packageManager = packageManager

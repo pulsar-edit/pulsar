@@ -1,13 +1,12 @@
-/** @babel */
+const {Disposable} = require('atom')
 
-import {Disposable} from 'atom'
-
-export default class CollapsibleSectionPanel {
-  notHiddenCardsLength (sectionElement) {
+module.exports =
+class CollapsibleSectionPanel {
+  notHiddenCardsLength(sectionElement) {
     return sectionElement.querySelectorAll('.package-card:not(.hidden)').length
   }
 
-  updateSectionCount (headerElement, countElement, packageCount, totalCount) {
+  updateSectionCount(headerElement, countElement, packageCount, totalCount) {
     if (totalCount != null) {
       countElement.textContent = `${packageCount}/${totalCount}`
     } else {
@@ -19,7 +18,7 @@ export default class CollapsibleSectionPanel {
     }
   }
 
-  updateSectionCounts () {
+  updateSectionCounts() {
     this.resetSectionHasItems()
 
     const filterText = this.refs.filterEditor.getText()
@@ -30,7 +29,7 @@ export default class CollapsibleSectionPanel {
     }
   }
 
-  handleEvents () {
+  handleEvents() {
     const handler = (e) => {
       const target = e.target.closest('.sub-section .has-items')
       if (target) {
@@ -41,13 +40,13 @@ export default class CollapsibleSectionPanel {
     return new Disposable(() => this.element.removeEventListener('click', handler))
   }
 
-  resetCollapsibleSections (headerSections) {
+  resetCollapsibleSections(headerSections) {
     for (const headerSection of headerSections) {
       this.resetCollapsibleSection(headerSection)
     }
   }
 
-  resetCollapsibleSection (headerSection) {
+  resetCollapsibleSection(headerSection) {
     headerSection.classList.remove('has-items')
   }
 }

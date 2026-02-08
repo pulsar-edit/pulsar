@@ -1,12 +1,13 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import { TextEditor, CompositeDisposable } from 'atom'
-import etch from 'etch'
-import CollapsibleSectionPanel from './collapsible-section-panel'
-import SearchSettingView from './search-setting-view'
+const { TextEditor, CompositeDisposable } = require('atom')
+const etch = require('etch')
+const CollapsibleSectionPanel = require('./collapsible-section-panel')
+const SearchSettingView = require('./search-setting-view')
 
-export default class SearchSettingsPanel extends CollapsibleSectionPanel {
+module.exports =
+class SearchSettingsPanel extends CollapsibleSectionPanel {
   constructor(settingsView) {
     super()
     etch.initialize(this)

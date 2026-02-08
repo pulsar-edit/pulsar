@@ -1,8 +1,7 @@
-/** @babel */
+const {Disposable, CompositeDisposable} = require('atom')
 
-import {Disposable, CompositeDisposable} from 'atom'
-
-export default class SettingsIconStatusView {
+module.exports =
+class SettingsIconStatusView {
   constructor(statusBar) {
     this.statusBar = statusBar
     this.disposables = new CompositeDisposable()
@@ -22,14 +21,14 @@ export default class SettingsIconStatusView {
 
   }
 
-  attach () {
+  attach() {
     this.tile = this.statusBar.addRightTile({
       item: this,
       priority: -99
     })
   }
 
-  destroy () {
+  destroy() {
     this.disposables.dispose()
     this.element.remove()
     if (this.tile) {

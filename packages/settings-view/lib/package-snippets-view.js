@@ -1,13 +1,14 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import path from 'path'
-import _ from 'underscore-plus'
-import etch from 'etch'
-import {CompositeDisposable, Disposable} from 'atom'
+const path = require('path')
+const _ = require('underscore-plus')
+const etch = require('etch')
+const {CompositeDisposable, Disposable} = require('atom')
 
 // View to display the snippets that a package has registered.
-export default class PackageSnippetsView {
+module.exports =
+class PackageSnippetsView {
   constructor (pack, snippetsProvider) {
     this.pack = pack
     this.namespace = this.pack.name

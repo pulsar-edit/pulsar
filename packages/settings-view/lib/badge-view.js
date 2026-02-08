@@ -1,9 +1,10 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch'
+const etch = require('etch')
 
-export default class BadgeView {
+module.exports =
+class BadgeView {
   constructor(badge) {
     this.badge = badge;
 

@@ -1,10 +1,9 @@
-/** @babel */
+const _ = require('underscore-plus')
+const {CompositeDisposable, Disposable} = require('atom')
 
-import _ from 'underscore-plus'
-import {CompositeDisposable, Disposable} from 'atom'
-
-export default class PackageUpdatesStatusView {
-  initialize (statusBar, packageManager, updates) {
+module.exports =
+class PackageUpdatesStatusView {
+  initialize(statusBar, packageManager, updates) {
     this.statusBar = statusBar
     this.updates = updates
     this.destroyed = true
@@ -37,7 +36,7 @@ export default class PackageUpdatesStatusView {
     this.updateTile()
   }
 
-  destroy () {
+  destroy() {
     this.disposables.dispose()
     this.element.remove()
 
@@ -52,7 +51,7 @@ export default class PackageUpdatesStatusView {
     }
   }
 
-  onPackageUpdateAvailable (pack) {
+  onPackageUpdateAvailable(pack) {
     for (const update of this.updates) {
       if (update.name === pack.name) {
         return
@@ -63,7 +62,7 @@ export default class PackageUpdatesStatusView {
     this.updateTile()
   }
 
-  onPackageUpdating (pack) {
+  onPackageUpdating(pack) {
     // Wipe failed status when an update is retried
     for (let index = 0; index < this.failedUpdates.length; index++) {
       const update = this.failedUpdates[index]
@@ -76,7 +75,7 @@ export default class PackageUpdatesStatusView {
     this.updateTile()
   }
 
-  onPackageUpdated (pack) {
+  onPackageUpdated(pack) {
     for (let index = 0; index < this.updates.length; index++) {
       const update = this.updates[index]
       if (update.name === pack.name) {
@@ -101,7 +100,7 @@ export default class PackageUpdatesStatusView {
     this.updateTile()
   }
 
-  onPackageUpdateFailed (pack) {
+  onPackageUpdateFailed(pack) {
     for (const update of this.failedUpdates) {
       if (update.name === pack.name) {
         return
@@ -119,7 +118,7 @@ export default class PackageUpdatesStatusView {
     this.updateTile()
   }
 
-  updateTile () {
+  updateTile() {
     if (this.updates.length) {
       if (this.tooltip) {
         this.tooltip.dispose()

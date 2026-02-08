@@ -4,7 +4,7 @@ class ListView {
   // * `container` a jQuery element
   // * `createView` a Function that returns a jQuery element / HTMLElement
   //   * `item` the item to create the view for
-  constructor (list, container, createView) {
+  constructor(list, container, createView) {
     this.list = list
     this.container = container
     this.createView = createView
@@ -15,21 +15,21 @@ class ListView {
     this.addViews()
   }
 
-  getViews () {
+  getViews() {
     return this.views
   }
 
-  filterViews (filterFn) {
+  filterViews(filterFn) {
     return this.list.filterItems(filterFn).map((item) => this.viewMap[this.list.keyForItem(item)])
   }
 
-  addViews () {
+  addViews() {
     for (const item of this.list.getItems()) {
       this.addView(item)
     }
   }
 
-  addView (item) {
+  addView(item) {
     const view = this.createView(item)
     this.views.push(view)
     this.viewMap[this.list.keyForItem(item)] = view
@@ -40,7 +40,7 @@ class ListView {
     this.container.insertBefore(row, this.container.children[0])
   }
 
-  removeView (item) {
+  removeView(item) {
     const key = this.list.keyForItem(item)
     const view = this.viewMap[key]
     if (view) {

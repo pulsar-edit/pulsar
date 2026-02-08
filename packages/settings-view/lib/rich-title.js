@@ -1,7 +1,7 @@
 const _ = require("underscore-plus")
 
 module.exports = {
-  getSettingTitle (keyPath, name) {
+  getSettingTitle(keyPath, name) {
     if (name == null) {
       name = ''
     }

@@ -1,23 +1,24 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import path from 'path'
-import etch from 'etch'
-import _ from 'underscore-plus'
-import {CompositeDisposable, Disposable} from 'atom'
+const path = require('path')
+const etch = require('etch')
+const _ = require('underscore-plus')
+const {CompositeDisposable, Disposable} = require('atom')
 
-import GeneralPanel from './general-panel'
-import EditorPanel from './editor-panel'
-import PackageDetailView from './package-detail-view'
-import KeybindingsPanel from './keybindings-panel'
-import InstallPanel from './install-panel'
-import ThemesPanel from './themes-panel'
-import InstalledPackagesPanel from './installed-packages-panel'
-import UpdatesPanel from './updates-panel'
-import UriHandlerPanel from './uri-handler-panel'
-import SearchSettingsPanel from './search-settings-panel'
+const GeneralPanel = require('./general-panel')
+const EditorPanel = require('./editor-panel')
+const PackageDetailView = require('./package-detail-view')
+const KeybindingsPanel = require('./keybindings-panel')
+const InstallPanel = require('./install-panel')
+const ThemesPanel = require('./themes-panel')
+const InstalledPackagesPanel = require('./installed-packages-panel')
+const UpdatesPanel = require('./updates-panel')
+const UriHandlerPanel = require('./uri-handler-panel')
+const SearchSettingsPanel = require('./search-settings-panel')
 
-export default class SettingsView {
+module.exports =
+class SettingsView {
   constructor ({uri, packageManager, snippetsProvider, activePanel} = {}) {
     this.uri = uri
     this.packageManager = packageManager

@@ -1,12 +1,13 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import {CompositeDisposable, TextEditor} from 'atom'
-import etch from 'etch'
-import _ from 'underscore-plus'
-import path from 'path'
+const {CompositeDisposable, TextEditor} = require('atom')
+const etch = require('etch')
+const _ = require('underscore-plus')
+const path = require('path')
 
-export default class KeybindingsPanel {
+module.exports =
+class KeybindingsPanel {
   constructor () {
     etch.initialize(this)
     this.disposables = new CompositeDisposable()

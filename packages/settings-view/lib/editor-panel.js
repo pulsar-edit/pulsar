@@ -1,11 +1,12 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import {CompositeDisposable} from 'atom'
-import etch from 'etch'
-import SettingsPanel from './settings-panel'
+const {CompositeDisposable} = require('atom')
+const etch = require('etch')
+const SettingsPanel = require('./settings-panel')
 
-export default class EditorPanel {
+module.exports =
+class EditorPanel {
   constructor () {
     etch.initialize(this)
     this.subscriptions = new CompositeDisposable()

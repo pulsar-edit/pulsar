@@ -1,14 +1,15 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import path from 'path'
-import _ from 'underscore-plus'
-import {Disposable, CompositeDisposable} from 'atom'
-import etch from 'etch'
-import KeybindingsPanel from './keybindings-panel'
+const path = require('path')
+const _ = require('underscore-plus')
+const {Disposable, CompositeDisposable} = require('atom')
+const etch = require('etch')
+const KeybindingsPanel = require('./keybindings-panel')
 
 // Displays the keybindings for a package namespace
-export default class PackageKeymapView {
+module.exports =
+class PackageKeymapView {
   constructor (pack) {
     this.pack = pack
     this.namespace = this.pack.name

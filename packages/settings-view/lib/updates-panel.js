@@ -1,14 +1,15 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import {CompositeDisposable} from 'atom'
-import asyncQueue from 'async/queue'
-import etch from 'etch'
+const {CompositeDisposable} = require('atom')
+const asyncQueue = require('async/queue')
+const etch = require('etch')
 
-import ErrorView from './error-view'
-import PackageCard from './package-card'
+const ErrorView = require('./error-view')
+const PackageCard = require('./package-card')
 
-export default class UpdatesPanel {
+module.exports =
+class UpdatesPanel {
   constructor (settingsView, packageManager) {
     this.settingsView = settingsView
     this.packageManager = packageManager

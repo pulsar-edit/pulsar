@@ -1,18 +1,19 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import {CompositeDisposable, TextEditor} from 'atom'
-import etch from 'etch'
+const {CompositeDisposable, TextEditor} = require('atom')
+const etch = require('etch')
 
-import CollapsibleSectionPanel from './collapsible-section-panel'
-import PackageCard from './package-card'
-import ErrorView from './error-view'
+const CollapsibleSectionPanel = require('./collapsible-section-panel')
+const PackageCard = require('./package-card')
+const ErrorView = require('./error-view')
 
-import List from './list'
-import ListView from './list-view'
-import {ownerFromRepository, packageComparatorAscending} from './utils'
+const List = require('./list')
+const ListView = require('./list-view')
+const {ownerFromRepository, packageComparatorAscending} = require('./utils')
 
-export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
+module.exports =
+class InstalledPackagesPanel extends CollapsibleSectionPanel {
   static loadPackagesDelay () {
     return 300
   }

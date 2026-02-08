@@ -1,8 +1,8 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import {CompositeDisposable} from 'atom'
-import etch from 'etch'
+const {CompositeDisposable} = require('atom')
+const etch = require('etch')
 
 function isSupported () {
   return ['win32', 'darwin'].includes(process.platform)
@@ -18,7 +18,8 @@ function setAsDefaultProtocolClient () {
   return isSupported() && require('electron').remote.app.setAsDefaultProtocolClient('atom', process.execPath, ['--uri-handler', '--'])
 }
 
-export default class UriHandlerPanel {
+module.exports =
+class UriHandlerPanel {
   constructor () {
     this.handleChange = this.handleChange.bind(this)
     this.handleBecomeProtocolClient = this.handleBecomeProtocolClient.bind(this)

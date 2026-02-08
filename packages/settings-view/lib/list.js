@@ -2,17 +2,17 @@ const {Emitter} = require('atom')
 
 module.exports =
 class List {
-  constructor (key) {
+  constructor(key) {
     this.key = key
     this.items = []
     this.emitter = new Emitter()
   }
 
-  getItems () {
+  getItems() {
     return this.items
   }
 
-  filterItems (filterFn) {
+  filterItems(filterFn) {
     const result = []
     for (const item of this.items) {
       if (filterFn(item)) {
@@ -22,11 +22,11 @@ class List {
     return result
   }
 
-  keyForItem (item) {
+  keyForItem(item) {
     return item[this.key]
   }
 
-  setItems (items) {
+  setItems(items) {
     items = items.slice()
     const setToAdd = difference(items, this.items, this.key)
     const setToRemove = difference(this.items, items, this.key)
@@ -42,11 +42,11 @@ class List {
     }
   }
 
-  onDidAddItem (callback) {
+  onDidAddItem(callback) {
     return this.emitter.on('did-add-item', callback)
   }
 
-  onDidRemoveItem (callback) {
+  onDidRemoveItem(callback) {
     return this.emitter.on('did-remove-item', callback)
   }
 }

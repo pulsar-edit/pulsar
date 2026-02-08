@@ -1,10 +1,8 @@
-/** @babel */
-
-import {CompositeDisposable, Disposable, TextEditor} from 'atom'
-import _ from 'underscore-plus'
-import CollapsibleSectionPanel from './collapsible-section-panel'
-import {getSettingDescription} from './rich-description'
-import {getSettingTitle} from './rich-title'
+const {CompositeDisposable, Disposable, TextEditor} = require('atom')
+const _ = require('underscore-plus')
+const CollapsibleSectionPanel = require('./collapsible-section-panel')
+const {getSettingDescription} = require('./rich-description')
+const {getSettingTitle} = require('./rich-title')
 
 const SCOPED_SETTINGS = [
   'autoIndent',
@@ -23,8 +21,9 @@ const SCOPED_SETTINGS = [
 ]
 
 
-export default class SettingsPanel extends CollapsibleSectionPanel {
-  constructor (options = {}) {
+module.exports =
+class SettingsPanel extends CollapsibleSectionPanel {
+  constructor(options = {}) {
     super()
     let namespace = options.namespace
     this.element = document.createElement('section')
@@ -51,19 +50,19 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     this.disposables.add(this.handleEvents())
   }
 
-  destroy () {
+  destroy() {
     this.disposables.dispose()
     this.element.remove()
   }
 
-  updateOverrideMessage (name) {
+  updateOverrideMessage(name) {
     let hasOverride = settingHasProjectOverride(name)
     let message = this.element.querySelector(`div.setting-override-warning[data-setting-key="${name}"]`)
     if (!message) return
     message.style.display = hasOverride ? 'block' : 'none'
   }
 
-  elementForSettings (namespace, settings) {
+  elementForSettings(namespace, settings) {
     if (_.isEmpty(settings)) {
       return document.createDocumentFragment()
     }
@@ -106,11 +105,11 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     return container
   }
 
-  sortSettings (namespace, settings) {
+  sortSettings(namespace, settings) {
     return sortSettings(namespace, settings)
   }
 
-  bindInputFields () {
+  bindInputFields() {
     const disposables = Array.from(this.element.querySelectorAll('input[id]')).map((input) => {
       let type = input.type
       let name = type === 'radio' ? input.name : input.id
@@ -161,7 +160,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     return new CompositeDisposable(...disposables)
   }
 
-  observe (name, callback) {
+  observe(name, callback) {
     let params = {sources: [atom.config.getUserConfigPath()]}
     if (atom.config.projectFile) {
       params.excludeSources = [atom.config.projectFile]
@@ -185,7 +184,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     this.disposables.add(atom.config.observe(name, params, wrappedCallback))
   }
 
-  isDefault (name) {
+  isDefault(name) {
     let params = {sources: [atom.config.getUserConfigPath()]}
     if (this.options.scopeName != null) {
       params.scope = [this.options.scopeName]
@@ -195,7 +194,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     return (value == null) || (defaultValue === value)
   }
 
-  getDefault (name) {
+  getDefault(name) {
     let params = {excludeSources: [atom.config.getUserConfigPath()]}
     if (this.options.scopeName != null) {
       params.scope = [this.options.scopeName]
@@ -215,7 +214,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     return defaultValue
   }
 
-  set (name, value) {
+  set(name, value) {
     if (this.options.scopeName) {
       if (value === undefined) {
         atom.config.unset(name, {scopeSelector: this.options.scopeName})
@@ -228,7 +227,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     }
   }
 
-  setText (editor, name, type, value) {
+  setText(editor, name, type, value) {
     let stringValue
     if (this.isDefault(name)) {
       stringValue = ''
@@ -244,7 +243,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     editor.moveToEndOfLine()
   }
 
-  bindSelectFields () {
+  bindSelectFields() {
     const disposables = Array.from(this.element.querySelectorAll('select[id]')).map((select) => {
       const name = select.id
       this.observe(name, value => {
@@ -261,7 +260,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     return new CompositeDisposable(...disposables)
   }
 
-  bindEditors () {
+  bindEditors() {
     const disposables = Array.from(this.element.querySelectorAll('atom-text-editor')).map((editorElement) => {
       let editor = editorElement.getModel()
       let name = editorElement.id
@@ -315,7 +314,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     return new CompositeDisposable(...disposables)
   }
 
-  bindTooltips () {
+  bindTooltips() {
     const disposables = Array.from(this.element.querySelectorAll('input[id], select[id], atom-text-editor[id]')).map((element) => {
       const schema = atom.config.getSchema(element.id)
       let defaultValue = this.valueToString(this.getDefault(element.id))
@@ -336,7 +335,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     return new CompositeDisposable(...disposables)
   }
 
-  valueToString (value) {
+  valueToString(value) {
     if (Array.isArray(value)) {
       if (value.length === 0) {
         return null
@@ -349,7 +348,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     }
   }
 
-  parseValue (type, value) {
+  parseValue(type, value) {
     if (value === '') {
       return undefined
     } else if (type === 'number') {
@@ -397,7 +396,7 @@ let isEditableArray = function (array) {
   return true
 }
 
-function sortSettings (namespace, settings) {
+function sortSettings(namespace, settings) {
   return _.chain(settings)
     .keys()
     .sortBy((name) => name)
@@ -408,7 +407,7 @@ function sortSettings (namespace, settings) {
     .value()
 }
 
-function getWithoutProjectOverride (name, options = {}) {
+function getWithoutProjectOverride(name, options = {}) {
   if (atom.config.projectFile) {
     options.excludeSources = [atom.config.projectFile]
   }
@@ -421,11 +420,11 @@ function getWithProjectOverride(name) {
   return _.get(atom.config.projectSettings, name.split('.'))
 }
 
-function settingHasProjectOverride (name) {
+function settingHasProjectOverride(name) {
   return typeof getWithProjectOverride(name) !== 'undefined'
 }
 
-function addOverrideWarning (name, element) {
+function addOverrideWarning(name, element) {
   let div = document.createElement('div')
   div.classList.add('text-warning', 'setting-override-warning')
   div.textContent = `This global setting has been overridden by a project-specific setting. Changing it will affect your global config file, but may not have any effect in this window.`
@@ -435,7 +434,7 @@ function addOverrideWarning (name, element) {
   return div
 }
 
-function elementForSetting (namespace, name, value) {
+function elementForSetting(namespace, name, value) {
   let hasOverride = settingHasProjectOverride(`${namespace}.${name}`)
   if (namespace === 'core') {
     if (name === 'themes') { return document.createDocumentFragment() } // Handled in the Themes panel
@@ -481,7 +480,7 @@ function elementForSetting (namespace, name, value) {
   return controlGroup
 }
 
-function elementForOptions (namespace, name, value, {radio = false}) {
+function elementForOptions(namespace, name, value, {radio = false}) {
   let keyPath = `${namespace}.${name}`
   let schema = atom.config.getSchema(keyPath)
   let options = (schema && schema.enum) ? schema.enum : []
@@ -507,7 +506,7 @@ function elementForOptions (namespace, name, value, {radio = false}) {
   return fragment
 }
 
-function elementForCheckbox (namespace, name, value) {
+function elementForCheckbox(namespace, name, value) {
   let keyPath = `${namespace}.${name}`
 
   const div = document.createElement('div')
@@ -536,7 +535,7 @@ function elementForCheckbox (namespace, name, value) {
   return div
 }
 
-function elementForColor (namespace, name, value) {
+function elementForColor(namespace, name, value) {
   let keyPath = `${namespace}.${name}`
 
   const div = document.createElement('div')
@@ -564,7 +563,7 @@ function elementForColor (namespace, name, value) {
   return div
 }
 
-function elementForEditor (namespace, name, value) {
+function elementForEditor(namespace, name, value) {
   let keyPath = `${namespace}.${name}`
   let type = _.isNumber(value) ? 'number' : 'string'
 
@@ -600,7 +599,7 @@ function elementForEditor (namespace, name, value) {
   return fragment
 }
 
-function elementForArray (namespace, name, value) {
+function elementForArray(namespace, name, value) {
   let keyPath = `${namespace}.${name}`
 
   const fragment = document.createDocumentFragment()
@@ -635,7 +634,7 @@ function elementForArray (namespace, name, value) {
   return fragment
 }
 
-function elementForObject (namespace, name, value) {
+function elementForObject(namespace, name, value) {
   if (_.keys(value).length === 0) {
     return document.createDocumentFragment()
   } else {
@@ -670,7 +669,7 @@ function elementForObject (namespace, name, value) {
   }
 }
 
-function enumOptions (options, {keyPath, radio}) {
+function enumOptions(options, {keyPath, radio}) {
   const containerTag = radio ? 'fieldset' : 'select'
   const container = document.createElement(containerTag)
   container.id = keyPath
@@ -685,7 +684,7 @@ function enumOptions (options, {keyPath, radio}) {
   return container
 }
 
-function optionToRadio (option, keyPath) {
+function optionToRadio(option, keyPath) {
   const button = document.createElement('input')
   const label = document.createElement('label')
   label.classList.add('input-label')
@@ -712,7 +711,7 @@ function optionToRadio (option, keyPath) {
   return label
 }
 
-function optionToSelect (option, keyPath) {
+function optionToSelect(option, keyPath) {
   const optionElement = document.createElement('option')
   if (option.hasOwnProperty('value')) {
     optionElement.value = option.value

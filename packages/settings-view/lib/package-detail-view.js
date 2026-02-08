@@ -1,25 +1,26 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import path from 'path'
-import url from 'url'
+const path = require('path')
+const url = require('url')
 
-import _ from 'underscore-plus'
-import fs from 'fs-plus'
-import {shell} from 'electron'
-import {CompositeDisposable, Disposable} from 'atom'
-import etch from 'etch'
+const _ = require('underscore-plus')
+const fs = require('fs-plus')
+const {shell} = require('electron')
+const {CompositeDisposable, Disposable} = require('atom')
+const etch = require('etch')
 
-import PackageCard from './package-card'
-import PackageGrammarsView from './package-grammars-view'
-import PackageKeymapView from './package-keymap-view'
-import PackageReadmeView from './package-readme-view'
-import PackageSnippetsView from './package-snippets-view'
-import SettingsPanel from './settings-panel'
+const PackageCard = require('./package-card')
+const PackageGrammarsView = require('./package-grammars-view')
+const PackageKeymapView = require('./package-keymap-view')
+const PackageReadmeView = require('./package-readme-view')
+const PackageSnippetsView = require('./package-snippets-view')
+const SettingsPanel = require('./settings-panel')
 
 const NORMALIZE_PACKAGE_DATA_README_ERROR = 'ERROR: No README data found!'
 
-export default class PackageDetailView {
+module.exports =
+class PackageDetailView {
   constructor (pack, settingsView, packageManager, snippetsProvider) {
     this.pack = pack
     if (Array.isArray(pack.badges)) {

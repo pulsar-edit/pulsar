@@ -1,10 +1,11 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import {WinShell, CompositeDisposable} from 'atom'
-import etch from 'etch'
+const {WinShell, CompositeDisposable} = require('atom')
+const etch = require('etch')
 
-export default class SystemPanel {
+module.exports =
+class SystemPanel {
   constructor () {
     etch.initialize(this)
     this.subscriptions = new CompositeDisposable()

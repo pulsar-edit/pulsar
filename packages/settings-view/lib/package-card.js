@@ -1,17 +1,18 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import {CompositeDisposable, Disposable} from 'atom'
-import {shell} from 'electron'
-import etch from 'etch'
-import BadgeView from './badge-view'
-import path from 'path'
+const {CompositeDisposable, Disposable} = require('atom')
+const {shell} = require('electron')
+const etch = require('etch')
+const BadgeView = require('./badge-view')
+const path = require('path')
 
-import {ownerFromRepository, repoUrlFromRepository} from './utils'
+const {ownerFromRepository, repoUrlFromRepository} = require('./utils')
 
 let marked = null
 
-export default class PackageCard {
+module.exports =
+class PackageCard {
   constructor (pack, settingsView, packageManager, options = {}) {
     this.pack = pack
     this.settingsView = settingsView

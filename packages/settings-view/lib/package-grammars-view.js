@@ -1,12 +1,11 @@
-/** @babel */
-
-import path from 'path'
-import {CompositeDisposable} from 'atom'
-import SettingsPanel from './settings-panel'
+const path = require('path')
+const {CompositeDisposable} = require('atom')
+const SettingsPanel = require('./settings-panel')
 
 // View to display the grammars that a package has registered.
-export default class PackageGrammarsView {
-  constructor (packagePath) {
+module.exports =
+class PackageGrammarsView {
+  constructor(packagePath) {
     this.element = document.createElement('section')
     this.element.classList.add('package-grammars')
 
@@ -20,12 +19,12 @@ export default class PackageGrammarsView {
     this.disposables.add(atom.grammars.onDidUpdateGrammar(() => this.addGrammars()))
   }
 
-  destroy () {
+  destroy() {
     this.disposables.dispose()
     this.element.remove()
   }
 
-  getPackageGrammars () {
+  getPackageGrammars() {
     const packageGrammars = []
     const grammars = atom.grammars.grammars != null ? atom.grammars.grammars : []
     for (let grammar of grammars) {
@@ -42,7 +41,7 @@ export default class PackageGrammarsView {
     })
   }
 
-  addGrammarHeading (grammar, panel) {
+  addGrammarHeading(grammar, panel) {
     const container = document.createElement('div')
     container.classList.add('native-key-bindings', 'text')
     container.tabIndex = -1
@@ -76,7 +75,7 @@ export default class PackageGrammarsView {
     sectionBody.parentElement.insertBefore(container, sectionBody)
   }
 
-  addGrammars () {
+  addGrammars() {
     this.grammarSettings.innerHTML = ''
     for (let grammar of this.getPackageGrammars()) {
       let {scopeName, name} = grammar

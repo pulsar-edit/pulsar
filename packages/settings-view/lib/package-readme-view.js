@@ -1,9 +1,8 @@
-/** @babel */
-
 // Displays the readme for a package, if it has one
 // TODO Decide to keep this or current button-to-new-tab view
-export default class PackageReadmeView {
-  constructor (readme, readmeSrc, readmeIsLocal) {
+module.exports =
+class PackageReadmeView {
+  constructor(readme, readmeSrc, readmeIsLocal) {
     this.element = document.createElement('section')
     this.element.classList.add('section')
 
@@ -36,12 +35,12 @@ export default class PackageReadmeView {
 
     try {
       this.packageReadme.innerHTML = atom.ui.markdown.render(readme, markdownOpts);
-    } catch(err) {
+    } catch (err) {
       this.packageReadme.innerHTML = "<h3>Error parsing README</h3>";
     }
   }
 
-  destroy () {
+  destroy() {
     this.element.remove()
   }
 }

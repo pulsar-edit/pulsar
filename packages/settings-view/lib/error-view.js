@@ -1,9 +1,10 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch'
+const etch = require('etch')
 
-export default class ErrorView {
+module.exports =
+class ErrorView {
   constructor (packageManager, {message, stderr, packageInstallError}) {
     etch.initialize(this)
 

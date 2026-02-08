@@ -1,6 +1,6 @@
 
 module.exports = {
-  getSettingDescription (keyPath) {
+  getSettingDescription(keyPath) {
     const schema = atom.config.getSchema(keyPath)
     let description = ''
     if (schema && schema.description) {
