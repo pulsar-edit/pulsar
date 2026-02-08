@@ -9,7 +9,7 @@
     "atom": "^1.0.0"
   },
   "dependencies": {
-    "atom-select-list": "^0.7.0",
+    "pulsar-select-list": "^1.4.0",
     "underscore-plus": "^1.7.0"
   },
   "consumedServices": {
