@@ -9,7 +9,7 @@
     "atom": "*"
   },
   "dependencies": {
-    "atom-select-list": "^0.8.1"
+    "pulsar-select-list": "^1.4.0"
   },
   "devDependencies": {
     "fs-plus": "^3.1.1",

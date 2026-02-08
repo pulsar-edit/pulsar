@@ -1,31 +1,19 @@
-'use babel';
+const SelectListView = require('pulsar-select-list');
+const repositoryForPath = require('./helpers');
 
-import SelectListView from 'atom-select-list';
-import repositoryForPath from './helpers';
-
-export default class DiffListView {
+module.exports =
+class DiffListView {
   constructor() {
-    this.selectListView = new SelectListView({
+    this.selectList = new SelectListView({
+      className: 'diff-list-view',
       emptyMessage: 'No diffs in file',
       items: [],
       filterKeyForItem: diff => diff.lineText,
       elementForItem: diff => {
-        const li = document.createElement('li');
-        li.classList.add('two-lines');
-
-        const primaryLine = document.createElement('div');
-        primaryLine.classList.add('primary-line');
-        primaryLine.textContent = diff.lineText;
-        li.appendChild(primaryLine);
-
-        const secondaryLine = document.createElement('div');
-        secondaryLine.classList.add('secondary-line');
-        secondaryLine.textContent = `-${diff.oldStart},${diff.oldLines} +${
-          diff.newStart
-        },${diff.newLines}`;
-        li.appendChild(secondaryLine);
-
-        return li;
+        return SelectListView.createTwoLineItem({
+          primary: diff.lineText,
+          secondary: `-${diff.oldStart},${diff.oldLines} +${diff.newStart},${diff.newLines}`
+        });
       },
       didConfirmSelection: diff => {
         this.cancel();
@@ -39,37 +27,25 @@ export default class DiffListView {
         this.cancel();
       }
     });
-    this.selectListView.element.classList.add('diff-list-view');
-    this.panel = atom.workspace.addModalPanel({
-      item: this.selectListView,
-      visible: false
-    });
   }
 
   attach() {
-    this.previouslyFocusedElement = document.activeElement;
-    this.selectListView.reset();
-    this.panel.show();
-    this.selectListView.focus();
+    this.selectList.reset();
+    this.selectList.show();
   }
 
   cancel() {
-    this.panel.hide();
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus();
-      this.previouslyFocusedElement = null;
-    }
+    this.selectList.hide();
   }
 
   destroy() {
     this.cancel();
-    this.panel.destroy();
-    return this.selectListView.destroy();
+    return this.selectList.destroy();
   }
 
   async toggle() {
     const editor = atom.workspace.getActiveTextEditor();
-    if (this.panel.isVisible()) {
+    if (this.selectList.isVisible()) {
       this.cancel();
     } else if (editor) {
       this.editor = editor;
@@ -84,7 +60,7 @@ export default class DiffListView {
         diff.lineText = lineText ? lineText.trim() : '';
       }
 
-      await this.selectListView.update({ items: diffs });
+      await this.selectList.update({ items: diffs });
       this.attach();
     }
   }
