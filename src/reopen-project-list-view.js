@@ -1,9 +1,10 @@
-const SelectListView = require('atom-select-list');
+const SelectListView = require('pulsar-select-list');
 
 module.exports = class ReopenProjectListView {
   constructor(callback) {
     this.callback = callback;
-    this.selectListView = new SelectListView({
+    this.selectList = new SelectListView({
+      className: 'reopen-project',
       emptyMessage: 'No projects in history.',
       itemsClassList: ['mark-active'],
       items: [],
@@ -24,41 +25,29 @@ module.exports = class ReopenProjectListView {
         this.cancel();
       }
     });
-    this.selectListView.element.classList.add('reopen-project');
   }
 
   get element() {
-    return this.selectListView.element;
+    return this.selectList.element;
   }
 
   dispose() {
     this.cancel();
-    return this.selectListView.destroy();
+    return this.selectList.destroy();
   }
 
   cancel() {
-    if (this.panel != null) {
-      this.panel.destroy();
-    }
-    this.panel = null;
+    this.selectList.hide();
     this.currentProjectName = null;
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus();
-      this.previouslyFocusedElement = null;
-    }
   }
 
   attach() {
-    this.previouslyFocusedElement = document.activeElement;
-    if (this.panel == null) {
-      this.panel = atom.workspace.addModalPanel({ item: this });
-    }
-    this.selectListView.focus();
-    this.selectListView.reset();
+    this.selectList.reset();
+    this.selectList.show();
   }
 
   async toggle() {
-    if (this.panel != null) {
+    if (this.selectList.isVisible()) {
       this.cancel();
     } else {
       this.currentProjectName =
@@ -66,7 +55,7 @@ module.exports = class ReopenProjectListView {
       const projects = atom.history
         .getProjects()
         .map(p => ({ name: this.makeName(p.paths), value: p.paths }));
-      await this.selectListView.update({ items: projects });
+      await this.selectList.update({ items: projects });
       this.attach();
     }
   }
