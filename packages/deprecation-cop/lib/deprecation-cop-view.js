@@ -1,15 +1,16 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import _ from 'underscore-plus';
-import { CompositeDisposable } from 'atom';
-import etch from 'etch';
-import fs from 'fs-plus';
-import Grim from 'grim';
-import path from 'path';
-import { shell } from 'electron';
+const _ = require('underscore-plus');
+const { CompositeDisposable } = require('atom');
+const etch = require('etch');
+const fs = require('fs-plus');
+const Grim = require('grim');
+const path = require('path');
+const { shell } = require('electron');
 
-export default class DeprecationCopView {
+module.exports =
+class DeprecationCopView {
   constructor({ uri }) {
     this.uri = uri;
     this.subscriptions = new CompositeDisposable();
