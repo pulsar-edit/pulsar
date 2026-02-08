@@ -1,7 +1,6 @@
-'use babel'
-
-export default class SnippetParser {
-  reset () {
+module.exports =
+class SnippetParser {
+  reset() {
     this.inSnippet = false
     this.inSnippetBody = false
     this.snippetStart = -1
@@ -11,7 +10,7 @@ export default class SnippetParser {
     this.escapedBraceIndices = null
   }
 
-  findSnippets (text) {
+  findSnippets(text) {
     if (text.length <= 0 || text.indexOf('$') === -1) { return } // No snippets
     this.reset()
     const snippets = []
@@ -85,7 +84,7 @@ export default class SnippetParser {
     return snippets
   }
 
-  removeBraceEscaping (body, bodyStart, escapedBraceIndices) {
+  removeBraceEscaping(body, bodyStart, escapedBraceIndices) {
     if (escapedBraceIndices != null) {
       for (let i = 0; i < escapedBraceIndices.length; i++) {
         const bodyIndex = escapedBraceIndices[i]

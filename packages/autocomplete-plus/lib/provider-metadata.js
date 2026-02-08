@@ -1,10 +1,9 @@
-'use babel'
+const { Selector } = require('selector-kit')
+const { selectorForScopeChain, selectorsMatchScopeChain } = require('./scope-helpers')
 
-import { Selector } from 'selector-kit'
-import { selectorForScopeChain, selectorsMatchScopeChain } from './scope-helpers'
-
-export default class ProviderMetadata {
-  constructor (provider, apiVersion) {
+module.exports =
+class ProviderMetadata {
+  constructor(provider, apiVersion) {
     this.provider = provider
     this.apiVersion = apiVersion
 
@@ -32,13 +31,13 @@ export default class ProviderMetadata {
     }
   }
 
-  getLabels () {
+  getLabels() {
     // The default label will let the provider be used for
     // the main text editors of the workspace.
     return this.provider.labels || ['workspace-center']
   }
 
-  matchesScopeChain (scopeChain) {
+  matchesScopeChain(scopeChain) {
     if (this.disableForScopeSelectors != null) {
       if (selectorsMatchScopeChain(this.disableForScopeSelectors, scopeChain)) { return false }
     }
@@ -50,7 +49,7 @@ export default class ProviderMetadata {
     }
   }
 
-  shouldDisableDefaultProvider (scopeChain) {
+  shouldDisableDefaultProvider(scopeChain) {
     if (this.disableDefaultProviderSelectors != null) {
       return selectorsMatchScopeChain(this.disableDefaultProviderSelectors, scopeChain)
     } else {
@@ -58,7 +57,7 @@ export default class ProviderMetadata {
     }
   }
 
-  getSpecificity (scopeChain) {
+  getSpecificity(scopeChain) {
     const selector = selectorForScopeChain(this.scopeSelectors, scopeChain)
     if (selector) {
       return selector.getSpecificity()

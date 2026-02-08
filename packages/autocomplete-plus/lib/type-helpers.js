@@ -1,5 +1,3 @@
-'use babel'
-
 const isFunction = value => isType(value, 'function')
 
 const isString = value => isType(value, 'string')
@@ -10,4 +8,4 @@ const isType = (value, typeName) => {
   return t === typeName
 }
 
-export { isFunction, isString }
+module.exports = { isFunction, isString }
