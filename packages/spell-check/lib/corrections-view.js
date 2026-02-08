@@ -1,15 +1,15 @@
-/** @babel */
+const SelectListView = require('pulsar-select-list');
 
-import SelectListView from 'atom-select-list';
-
-export default class CorrectionsView {
+module.exports =
+class CorrectionsView {
     constructor(editor, corrections, marker, updateTarget, updateCallback) {
         this.editor = editor;
         this.corrections = corrections;
         this.marker = marker;
         this.updateTarget = updateTarget;
         this.updateCallback = updateCallback;
-        this.selectListView = new SelectListView({
+        this.selectList = new SelectListView({
+            className: 'spell-check-corrections corrections popover-list',
             emptyMessage: 'No corrections',
             items: this.corrections,
             filterKeyForItem: (item) => item.label,
@@ -68,22 +68,17 @@ export default class CorrectionsView {
                 this.destroy();
             },
         });
-        this.selectListView.element.classList.add(
-            'spell-check-corrections',
-            'corrections',
-            'popover-list'
-        );
     }
 
     attach() {
         this.previouslyFocusedElement = document.activeElement;
         this.overlayDecoration = this.editor.decorateMarker(this.marker, {
             type: 'overlay',
-            item: this.selectListView,
+            item: this.selectList,
         });
         process.nextTick(() => {
             atom.views.readDocument(() => {
-                this.selectListView.focus();
+                this.selectList.focus();
             });
         });
     }
@@ -92,7 +87,7 @@ export default class CorrectionsView {
         if (!this.destroyed) {
             this.destroyed = true;
             this.overlayDecoration.destroy();
-            await this.selectListView.destroy();
+            await this.selectList.destroy();
             if (this.previouslyFocusedElement) {
                 this.previouslyFocusedElement.focus();
                 this.previouslyFocusedElement = null;
