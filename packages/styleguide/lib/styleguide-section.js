@@ -1,9 +1,10 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch'
+const etch = require('etch')
 
-export default class StyleguideSection {
+module.exports =
+class StyleguideSection {
   constructor (props, children) {
     this.collapsed = props.collapsed
     this.title = props.title

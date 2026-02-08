@@ -1,13 +1,14 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch'
-import dedent from 'dedent'
-import CodeBlock from './code-block'
-import StyleguideSection from './styleguide-section'
-import ExampleSelectListView from './example-select-list-view'
+const etch = require('etch')
+const dedent = require('dedent')
+const CodeBlock = require('./code-block')
+const StyleguideSection = require('./styleguide-section')
+const ExampleSelectListView = require('./example-select-list-view')
 
-export default class StyleguideView {
+module.exports =
+class StyleguideView {
   constructor (props) {
     this.uri = props.uri
     this.collapsedSections = props.collapsedSections ? new Set(props.collapsedSections) : new Set()
