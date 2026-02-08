@@ -1,17 +1,16 @@
-/** @babel */
+const {shell} = require('electron')
+const {Range} = require('atom')
+const {parse: parseURL} = require('url')
+const path = require('path')
 
-import {shell} from 'electron'
-import {Range} from 'atom'
-import {parse as parseURL} from 'url'
-import path from 'path'
-
-export default class GitHubFile {
+module.exports =
+class GitHubFile {
   // Public
-  static fromPath (filePath) {
+  static fromPath(filePath) {
     return new GitHubFile(filePath)
   }
 
-  constructor (filePath) {
+  constructor(filePath) {
     this.filePath = filePath
     const [rootDir] = atom.project.relativizePath(this.filePath)
 
@@ -32,21 +31,21 @@ export default class GitHubFile {
   }
 
   // Public
-  open (lineRange) {
+  open(lineRange) {
     if (this.validateRepo()) {
       this.openURLInBrowser(this.blobURL() + this.getLineRangeSuffix(lineRange))
     }
   }
 
   // Public
-  openOnMaster (lineRange) {
+  openOnMaster(lineRange) {
     if (this.validateRepo()) {
       this.openURLInBrowser(this.blobURLForMaster() + this.getLineRangeSuffix(lineRange))
     }
   }
 
   // Public
-  blame (lineRange) {
+  blame(lineRange) {
     if (this.validateRepo()) {
       if (this.type === 'repo') {
         this.openURLInBrowser(this.blameURL() + this.getLineRangeSuffix(lineRange))
@@ -56,19 +55,19 @@ export default class GitHubFile {
     }
   }
 
-  history () {
+  history() {
     if (this.validateRepo()) {
       this.openURLInBrowser(this.historyURL())
     }
   }
 
-  copyURL (lineRange) {
+  copyURL(lineRange) {
     if (this.validateRepo()) {
       atom.clipboard.write(this.shaURL() + this.getLineRangeSuffix(lineRange))
     }
   }
 
-  openBranchCompare () {
+  openBranchCompare() {
     if (this.validateRepo()) {
       if (this.type === 'repo') {
         this.openURLInBrowser(this.branchCompareURL())
@@ -78,7 +77,7 @@ export default class GitHubFile {
     }
   }
 
-  openIssues () {
+  openIssues() {
     if (this.validateRepo()) {
       if (this.type === 'repo') {
         this.openURLInBrowser(this.issuesURL())
@@ -88,7 +87,7 @@ export default class GitHubFile {
     }
   }
 
-  openPullRequests () {
+  openPullRequests() {
     if (this.validateRepo()) {
       if (this.type === 'repo') {
         this.openURLInBrowser(this.pullRequestsURL())
@@ -98,13 +97,13 @@ export default class GitHubFile {
     }
   }
 
-  openRepository () {
+  openRepository() {
     if (this.validateRepo()) {
       this.openURLInBrowser(this.githubRepoURL())
     }
   }
 
-  getLineRangeSuffix (lineRange) {
+  getLineRangeSuffix(lineRange) {
     if (lineRange && this.type !== 'wiki' && atom.config.get('open-on-github.includeLineNumbersInUrls')) {
       lineRange = Range.fromObject(lineRange)
       const startRow = lineRange.start.row + 1
@@ -129,7 +128,7 @@ export default class GitHubFile {
   }
 
   // Internal
-  validateRepo () {
+  validateRepo() {
     if (!this.repo) {
       atom.notifications.addWarning(`No repository found for path: ${this.filePath}.`)
       return false
@@ -144,12 +143,12 @@ export default class GitHubFile {
   }
 
   // Internal
-  openURLInBrowser (url) {
+  openURLInBrowser(url) {
     shell.openExternal(url)
   }
 
   // Internal
-  blobURL () {
+  blobURL() {
     const gitHubRepoURL = this.githubRepoURL()
     const repoRelativePath = this.repoRelativePath()
 
@@ -163,7 +162,7 @@ export default class GitHubFile {
   }
 
   // Internal
-  blobURLForMaster () {
+  blobURLForMaster() {
     const gitHubRepoURL = this.githubRepoURL()
 
     if (this.type === 'repo') {
@@ -174,7 +173,7 @@ export default class GitHubFile {
   }
 
   // Internal
-  shaURL () {
+  shaURL() {
     const gitHubRepoURL = this.githubRepoURL()
     const encodedSHA = this.encodeSegments(this.sha())
     const repoRelativePath = this.repoRelativePath()
@@ -189,12 +188,12 @@ export default class GitHubFile {
   }
 
   // Internal
-  blameURL () {
+  blameURL() {
     return `${this.githubRepoURL()}/blame/${this.remoteBranchName()}/${this.encodeSegments(this.repoRelativePath())}`
   }
 
   // Internal
-  historyURL () {
+  historyURL() {
     const gitHubRepoURL = this.githubRepoURL()
 
     if (this.type === 'wiki') {
@@ -207,31 +206,31 @@ export default class GitHubFile {
   }
 
   // Internal
-  issuesURL () {
+  issuesURL() {
     return `${this.githubRepoURL()}/issues`
   }
 
   // Internal
-  pullRequestsURL () {
+  pullRequestsURL() {
     return `${this.githubRepoURL()}/pulls`
   }
 
   // Internal
-  branchCompareURL () {
+  branchCompareURL() {
     return `${this.githubRepoURL()}/compare/${this.encodeSegments(this.branchName())}`
   }
 
-  encodeSegments (segments = '') {
+  encodeSegments(segments = '') {
     return segments.split('/').map(segment => encodeURIComponent(segment)).join('/')
   }
 
   // Internal
-  extractFileName (relativePath = '') {
+  extractFileName(relativePath = '') {
     return path.parse(relativePath).name
   }
 
   // Internal
-  gitURL () {
+  gitURL() {
     const remoteName = this.remoteName()
     if (remoteName != null) {
       return this.repo.getConfigValue(`remote.${remoteName}.url`, this.filePath)
@@ -241,7 +240,7 @@ export default class GitHubFile {
   }
 
   // Internal
-  githubRepoURL () {
+  githubRepoURL() {
     let url = this.gitURL()
 
     if (url.match(/git@[^:]+:/)) { // git@github.com:user/repo.git
@@ -267,7 +266,7 @@ export default class GitHubFile {
     }
   }
 
-  isGistURL (url) {
+  isGistURL(url) {
     try {
       const {host} = parseURL(url)
 
@@ -277,11 +276,11 @@ export default class GitHubFile {
     }
   }
 
-  isGitHubWikiURL (url) {
+  isGitHubWikiURL(url) {
     return /\/wiki$/.test(url)
   }
 
-  isBitbucketURL (url) {
+  isBitbucketURL(url) {
     if (url.startsWith('git@bitbucket.org')) {
       return true
     }
@@ -296,12 +295,12 @@ export default class GitHubFile {
   }
 
   // Internal
-  repoRelativePath () {
+  repoRelativePath() {
     return this.repo.getRepo(this.filePath).relativize(this.filePath)
   }
 
   // Internal
-  remoteName () {
+  remoteName() {
     const gitConfigRemote = this.repo.getConfigValue('atom.open-on-github.remote', this.filePath)
 
     if (gitConfigRemote) {
@@ -324,12 +323,12 @@ export default class GitHubFile {
   }
 
   // Internal
-  sha () {
+  sha() {
     return this.repo.getReferenceTarget('HEAD', this.filePath)
   }
 
   // Internal
-  branchName () {
+  branchName() {
     const shortBranch = this.repo.getShortHead(this.filePath)
 
     if (!shortBranch) {
@@ -349,7 +348,7 @@ export default class GitHubFile {
   }
 
   // Internal
-  remoteBranchName () {
+  remoteBranchName() {
     const gitConfigBranch = this.repo.getConfigValue('atom.open-on-github.branch', this.filePath)
 
     if (gitConfigBranch) {
