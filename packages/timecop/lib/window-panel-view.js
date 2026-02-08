@@ -1,10 +1,11 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import {CompositeDisposable} from 'atom'
-import etch from 'etch'
+const {CompositeDisposable} = require('atom')
+const etch = require('etch')
 
-export default class WindowPanelView {
+module.exports =
+class WindowPanelView {
   constructor () {
     etch.initialize(this)
 

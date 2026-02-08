@@ -1,10 +1,11 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import path from 'path'
-import etch from 'etch'
+const path = require('path')
+const etch = require('etch')
 
-export default class CachePanelView {
+module.exports =
+class CachePanelView {
   constructor () {
     etch.initialize(this)
   }

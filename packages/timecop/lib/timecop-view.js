@@ -1,14 +1,15 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import _ from 'underscore-plus'
-import dedent from 'dedent'
-import etch from 'etch'
-import CachePanelView from './cache-panel-view'
-import PackagePanelView from './package-panel-view'
-import WindowPanelView from './window-panel-view'
+const _ = require('underscore-plus')
+const dedent = require('dedent')
+const etch = require('etch')
+const CachePanelView = require('./cache-panel-view')
+const PackagePanelView = require('./package-panel-view')
+const WindowPanelView = require('./window-panel-view')
 
-export default class TimecopView {
+module.exports =
+class TimecopView {
   constructor ({uri}) {
     this.uri = uri
     etch.initialize(this)

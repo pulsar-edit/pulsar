@@ -1,10 +1,11 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import {Disposable} from 'atom'
-import etch from 'etch'
+const {Disposable} = require('atom')
+const etch = require('etch')
 
-export default class PackagePanelView {
+module.exports =
+class PackagePanelView {
   constructor ({title}) {
     this.title = title
     etch.initialize(this)
