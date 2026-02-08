@@ -1,15 +1,16 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import SelectListView from 'atom-select-list'
-import etch from 'etch'
-import dedent from 'dedent'
-import CodeBlock from './code-block'
+const SelectListView = require('pulsar-select-list')
+const etch = require('etch')
+const dedent = require('dedent')
+const CodeBlock = require('./code-block')
 
-export default class ExampleSelectListView {
+module.exports =
+class ExampleSelectListView {
   constructor () {
     this.jsExampleCode = dedent`
-    import SelectListView from 'atom-select-list'
+    import SelectListView from 'pulsar-select-list'
 
     const selectListView = new SelectListView({
       items: ['one', 'two', 'three'],
