@@ -1,12 +1,13 @@
 const path = require('path')
 
-const SelectListView = require('atom-select-list')
+const SelectListView = require('pulsar-select-list')
 
 module.exports =
 class BookmarksView {
-  constructor (editorsBookmarks) {
+  constructor(editorsBookmarks) {
     this.editorsBookmarks = editorsBookmarks
     this.selectList = new SelectListView({
+      className: 'bookmarks-view',
       emptyMessage: 'No bookmarks found',
       items: [],
       filterKeyForItem: (bookmark) => bookmark.filterText,
@@ -45,19 +46,13 @@ class BookmarksView {
         return li
       }
     })
-    this.selectList.element.classList.add('bookmarks-view')
   }
 
-  destroy () {
+  destroy() {
     this.selectList.destroy()
-    this.getModalPanel().destroy()
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus()
-      this.previouslyFocusedElement = null
-    }
   }
 
-  async show () {
+  async show() {
     const bookmarks = []
     for (const {editor, markerLayer} of this.editorsBookmarks) {
       for (const marker of markerLayer.getMarkers()) {
@@ -76,25 +71,12 @@ class BookmarksView {
       }
     }
 
-    this.previouslyFocusedElement = document.activeElement
     this.selectList.reset()
     await this.selectList.update({items: bookmarks})
-    this.getModalPanel().show()
-    this.selectList.focus()
+    this.selectList.show()
   }
 
-  hide () {
-    this.getModalPanel().hide()
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus()
-      this.previouslyFocusedElement = null
-    }
-  }
-
-  getModalPanel () {
-    if (!this.modalPanel) {
-      this.modalPanel = atom.workspace.addModalPanel({item: this.selectList})
-    }
-    return this.modalPanel
+  hide() {
+    this.selectList.hide()
   }
 }
