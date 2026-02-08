@@ -1,12 +1,13 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import fs from 'fs-plus'
-import etch from 'etch'
-import {CompositeDisposable} from 'atom'
-import path from 'path'
+const fs = require('fs-plus')
+const etch = require('etch')
+const {CompositeDisposable} = require('atom')
+const path = require('path')
 
-export default class KeyBindingResolverView {
+module.exports =
+class KeyBindingResolverView {
   constructor () {
     this.keystrokes = null
     this.usedKeyBinding = null
