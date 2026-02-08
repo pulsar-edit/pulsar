@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "async": "~0.2.6",
-    "atom-select-list": "^0.7.0",
+    "pulsar-select-list": "^1.4.0",
     "pegjs": "^0.10.0",
     "scoped-property-store": "^0.17.0",
     "season": "^6.0.2",
