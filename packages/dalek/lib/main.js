@@ -1,5 +1,3 @@
-/** @babel */
-
 const dalek = require('./dalek');
 const Grim = require('grim');
 
