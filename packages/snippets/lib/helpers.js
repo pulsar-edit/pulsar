@@ -1,8 +1,6 @@
-/** @babel */
+const path = require('path')
 
-import path from 'path'
-
-export function getPackageRoot() {
+function getPackageRoot () {
   const {resourcePath} = atom.getLoadSettings()
   const currentFileWasRequiredFromSnapshot = !path.isAbsolute(__dirname)
   if (currentFileWasRequiredFromSnapshot) {
@@ -11,3 +9,5 @@ export function getPackageRoot() {
     return path.resolve(__dirname, '..')
   }
 }
+
+module.exports = {getPackageRoot}
