@@ -1,10 +1,8 @@
-'use babel';
-
-import _ from 'underscore-plus';
-import { CompositeDisposable, Disposable } from 'atom';
-import { Selector } from './selector';
-import StatusBarItem from './status-bar-item';
-import helpers from './helpers';
+const _ = require('underscore-plus');
+const { CompositeDisposable, Disposable } = require('atom');
+const { Selector } = require('./selector');
+const StatusBarItem = require('./status-bar-item');
+const helpers = require('./helpers');
 
 const LineEndingRegExp = /\r\n|\n/g;
 
@@ -17,7 +15,7 @@ const CRLFRegExp = /\r\n/g;
 
 let disposables = null;
 
-export function activate() {
+function activate() {
   disposables = new CompositeDisposable();
   let selectorDisposable;
   let selector;
@@ -53,11 +51,11 @@ export function activate() {
   );
 }
 
-export function deactivate() {
+function deactivate() {
   disposables.dispose();
 }
 
-export function consumeStatusBar(statusBar) {
+function consumeStatusBar(statusBar) {
   let statusBarItem = new StatusBarItem();
   let currentBufferDisposable = null;
   let tooltipDisposable = null;
@@ -162,10 +160,12 @@ function getLineEndings(buffer) {
   }
 }
 
-export function setLineEnding(item, lineEnding) {
+function setLineEnding(item, lineEnding) {
   if (item && item.getBuffer) {
     let buffer = item.getBuffer();
     buffer.setPreferredLineEnding(lineEnding);
     buffer.setText(buffer.getText().replace(LineEndingRegExp, lineEnding));
   }
 }
+
+module.exports = { activate, deactivate, consumeStatusBar, setLineEnding };

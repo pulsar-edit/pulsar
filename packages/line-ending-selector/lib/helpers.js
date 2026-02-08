@@ -1,6 +1,4 @@
-'use babel';
-
-export default {
+module.exports = {
   getProcessPlatform() {
     return process.platform;
   }
