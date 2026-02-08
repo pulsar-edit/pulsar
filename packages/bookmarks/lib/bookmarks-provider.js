@@ -1,4 +1,3 @@
-
 class BookmarksProvider {
   constructor(main) {
     this.main = main
