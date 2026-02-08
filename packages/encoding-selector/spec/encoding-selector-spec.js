@@ -1,4 +1,4 @@
-const SelectList = require('atom-select-list')
+const SelectList = require('pulsar-select-list')
 // const {it, fit, ffit, beforeEach, afterEach} = require('./async-spec-helpers') // eslint-disable-line
 const path = require('path');
 

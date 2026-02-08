@@ -1,13 +1,14 @@
 const iconv = require('iconv-lite')
 const jschardet = require('jschardet')
 const fs = require('fs')
-const SelectListView = require('atom-select-list')
+const SelectListView = require('pulsar-select-list')
 
 module.exports =
 class EncodingListView {
-  constructor (encodings) {
+  constructor(encodings) {
     this.encodings = encodings
-    this.selectListView = new SelectListView({
+    this.selectList = new SelectListView({
+      className: 'encoding-selector',
       itemsClassList: ['mark-active'],
       items: [],
       filterKeyForItem: (encoding) => encoding.name,
@@ -32,37 +33,25 @@ class EncodingListView {
         this.cancel()
       }
     })
-    this.selectListView.element.classList.add('encoding-selector')
   }
 
-  destroy () {
+  destroy() {
     this.cancel()
-    return this.selectListView.destroy()
+    return this.selectList.destroy()
   }
 
-  cancel () {
-    if (this.panel != null) {
-      this.panel.destroy()
-    }
-    this.panel = null
+  cancel() {
+    this.selectList.hide()
     this.currentEncoding = null
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus()
-      this.previouslyFocusedElement = null
-    }
   }
 
-  attach () {
-    this.previouslyFocusedElement = document.activeElement
-    if (this.panel == null) {
-      this.panel = atom.workspace.addModalPanel({item: this.selectListView})
-    }
-    this.selectListView.focus()
-    this.selectListView.reset()
+  attach() {
+    this.selectList.reset()
+    this.selectList.show()
   }
 
-  async toggle () {
-    if (this.panel != null) {
+  async toggle() {
+    if (this.selectList.isVisible()) {
       this.cancel()
     } else if (atom.workspace.getActiveTextEditor()) {
       const editor = atom.workspace.getActiveTextEditor()
@@ -77,12 +66,12 @@ class EncodingListView {
         encodingItems.push({id, name: this.encodings[id].list})
       }
 
-      await this.selectListView.update({items: encodingItems})
+      await this.selectList.update({items: encodingItems})
       this.attach()
     }
   }
 
-  detectEncoding () {
+  detectEncoding() {
     const editor = atom.workspace.getActiveTextEditor()
     const filePath = editor.getPath()
     if (fs.existsSync(filePath)) {

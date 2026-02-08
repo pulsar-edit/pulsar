@@ -9,7 +9,7 @@
     "atom": ">=0.141.0"
   },
   "dependencies": {
-    "atom-select-list": "^0.7.0",
+    "pulsar-select-list": "^1.4.0",
     "iconv-lite": "^0.4.4",
     "jschardet": "^1.1.0"
   },
