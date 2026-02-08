@@ -1,21 +1,18 @@
-/** @babel */
+const SelectListView = require('pulsar-select-list')
+const {humanizeKeystroke} = require('underscore-plus')
 
-import SelectListView from 'atom-select-list'
-import {humanizeKeystroke} from 'underscore-plus'
+const { highlightMatches, getMatchIndices } = SelectListView
 
-export default class CommandPaletteView {
-  constructor (initiallyVisibleItemCount = 10) {
+module.exports =
+class CommandPaletteView {
+  constructor() {
     this.keyBindingsForActiveElement = []
-    this.selectListView = new SelectListView({
-      initiallyVisibleItemCount: initiallyVisibleItemCount, // just for being able to disable visible-on-render in spec
+    this.selectList = new SelectListView({
+      className: 'command-palette',
       items: [],
       filter: this.filter,
       emptyMessage: atom.i18n.t("command-palette.commandPaletteView.emptyMessage"),
-      elementForItem: (item, {index, selected, visible}) => {
-        if (!visible) {
-          return document.createElement("li")
-        }
-
+      elementForItem: (item, {selected}) => {
         const li = document.createElement('li')
         li.classList.add('event', 'two-lines')
         li.dataset.eventName = item.name
@@ -39,7 +36,7 @@ export default class CommandPaletteView {
         titleEl.title = item.name
         leftBlock.appendChild(titleEl)
 
-        const query = this.selectListView.getQuery()
+        const query = this.selectList.getQuery()
         this.highlightMatchesInElement(item.displayName, query, titleEl)
 
         if (selected) {
@@ -54,9 +51,9 @@ export default class CommandPaletteView {
           if (Array.isArray(item.tags)) {
             const matchingTags = item.tags
               .map(t => [t, atom.ui.fuzzyMatcher.score(t, query)])
-              .filter(([t, s]) => s > 0)
+              .filter(([, s]) => s > 0)
               .sort((a, b) => a.s - b.s)
-              .map(([t, s]) => t)
+              .map(([t]) => t)
 
             if (matchingTags.length > 0) {
               secondaryEl.appendChild(this.createTags(matchingTags, query))
@@ -78,15 +75,14 @@ export default class CommandPaletteView {
         this.hide()
       }
     })
-    this.selectListView.element.classList.add('command-palette')
   }
 
-  async destroy () {
-    await this.selectListView.destroy()
+  async destroy() {
+    await this.selectList.destroy()
   }
 
-  toggle () {
-    if (this.panel && this.panel.isVisible()) {
+  toggle() {
+    if (this.selectList.isVisible()) {
       this.hide()
       return Promise.resolve()
     } else {
@@ -94,15 +90,9 @@ export default class CommandPaletteView {
     }
   }
 
-  async show (showHiddenCommands = false) {
-    if (!this.panel) {
-      this.panel = atom.workspace.addModalPanel({item: this.selectListView})
-    }
-
+  async show(showHiddenCommands = false) {
     if (!this.preserveLastSearch) {
-      this.selectListView.reset()
-    } else {
-      this.selectListView.refs.queryEditor.selectAll()
+      this.selectList.reset()
     }
 
     this.activeElement = (document.activeElement === document.body) ? atom.views.getView(atom.workspace) : document.activeElement
@@ -111,61 +101,24 @@ export default class CommandPaletteView {
         .findCommands({target: this.activeElement})
         .filter(command => showHiddenCommands === !!command.hiddenInCommandPalette)
     commandsForActiveElement.sort((a, b) => a.displayName.localeCompare(b.displayName))
-    await this.selectListView.update({items: commandsForActiveElement})
+    await this.selectList.update({items: commandsForActiveElement})
 
-    this.previouslyFocusedElement = document.activeElement
-    this.panel.show()
-    this.selectListView.focus()
+    this.selectList.show()
   }
 
-  hide () {
-    this.panel.hide()
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus()
-      this.previouslyFocusedElement = null
-    }
+  hide() {
+    this.selectList.hide()
   }
 
-  async update (props) {
-    if (props.hasOwnProperty('preserveLastSearch')) {
+  async update(props) {
+    if (Object.prototype.hasOwnProperty.call(props, 'preserveLastSearch')) {
       this.preserveLastSearch = props.preserveLastSearch
     }
   }
 
-  highlightMatchesInElement (text, query, el) {
-    const matches = atom.ui.fuzzyMatcher.match(text, query, {recordMatchIndexes: true})
-    let matchedChars = []
-    let lastIndex = 0;
-    const matchIndexes = matches ? (matches.matchIndexes ?? []) : []
-    matchIndexes.forEach(matchIndex => {
-      const unmatched = text.substring(lastIndex, matchIndex)
-      if (unmatched) {
-        if (matchedChars.length > 0) {
-          const matchSpan = document.createElement('span')
-          matchSpan.classList.add('character-match')
-          matchSpan.textContent = matchedChars.join('')
-          el.appendChild(matchSpan)
-          matchedChars = []
-        }
-
-        el.appendChild(document.createTextNode(unmatched))
-      }
-
-      matchedChars.push(text[matchIndex])
-      lastIndex = matchIndex + 1
-    })
-
-    if (matchedChars.length > 0) {
-      const matchSpan = document.createElement('span')
-      matchSpan.classList.add('character-match')
-      matchSpan.textContent = matchedChars.join('')
-      el.appendChild(matchSpan)
-    }
-
-    const unmatched = text.substring(lastIndex)
-    if (unmatched) {
-      el.appendChild(document.createTextNode(unmatched))
-    }
+  highlightMatchesInElement(text, query, el) {
+    const indices = getMatchIndices(text, query)
+    el.appendChild(highlightMatches(text, indices))
   }
 
   filter = (items, query) => {
@@ -194,7 +147,7 @@ export default class CommandPaletteView {
     return scoredItems.map((i) => i.item)
   }
 
-  createDescription (description, query) {
+  createDescription(description, query) {
     const descriptionEl = document.createElement('div')
 
     // in case of overflow, give full contents on long hover
@@ -211,7 +164,7 @@ export default class CommandPaletteView {
     return descriptionEl
   }
 
-  createTag (tagText, query) {
+  createTag(tagText, query) {
     const tagEl = document.createElement('li')
     Object.assign(tagEl.style, {
       borderBottom: 0,
@@ -222,7 +175,7 @@ export default class CommandPaletteView {
     return tagEl
   }
 
-  createTags (matchingTags, query) {
+  createTags(matchingTags, query) {
     const tagsEl = document.createElement('ol')
     Object.assign(tagsEl.style, {
       display: 'inline',

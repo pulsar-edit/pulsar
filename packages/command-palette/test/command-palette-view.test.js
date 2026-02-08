@@ -1,11 +1,9 @@
-/** @babel */
-
-import _ from 'underscore-plus'
-import assert from 'assert'
-import semver from 'semver'
-import sinon from 'sinon'
-import CommandPaletteView from '../lib/command-palette-view'
-import {CompositeDisposable} from 'event-kit'
+const _ = require('underscore-plus')
+const assert = require('assert')
+const semver = require('semver')
+const sinon = require('sinon')
+const CommandPaletteView = require('../lib/command-palette-view')
+const {CompositeDisposable} = require('event-kit')
 
 describe('CommandPaletteView', () => {
   let sandbox
@@ -44,7 +42,7 @@ describe('CommandPaletteView', () => {
           if (description) {
             // just in case it's not the first, need to select the item in order
             // for its description to show
-            await commandPalette.selectListView.selectItem(item)
+            await commandPalette.selectList.selectItem(item)
 
             const descriptionEl = eventLi.querySelector('.secondary-line div')
             assert(descriptionEl)
@@ -92,49 +90,49 @@ describe('CommandPaletteView', () => {
     it('focuses the mini-editor and selects the first command', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
-      assert(commandPalette.selectListView.element.contains(document.activeElement))
-      assert(commandPalette.selectListView.element.querySelectorAll('.event')[0].classList.contains('selected'))
+      assert(commandPalette.selectList.element.contains(document.activeElement))
+      assert(commandPalette.selectList.element.querySelectorAll('.event')[0].classList.contains('selected'))
     })
 
     it('clears the previous mini editor text when `preserveLastSearch` is off', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.update({preserveLastSearch: false})
       await commandPalette.toggle()
-      commandPalette.selectListView.refs.queryEditor.setText('abc')
+      commandPalette.selectList.refs.queryEditor.setText('abc')
       await commandPalette.toggle()
-      assert.equal(commandPalette.selectListView.refs.queryEditor.getText(), 'abc')
+      assert.equal(commandPalette.selectList.refs.queryEditor.getText(), 'abc')
       await commandPalette.toggle()
-      assert.equal(commandPalette.selectListView.refs.queryEditor.getText(), '')
+      assert.equal(commandPalette.selectList.refs.queryEditor.getText(), '')
     })
 
     it('preserves the previous mini editor text when `preserveLastSearch` is on', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.update({preserveLastSearch: true})
       await commandPalette.toggle()
-      commandPalette.selectListView.refs.queryEditor.setText('abc')
+      commandPalette.selectList.refs.queryEditor.setText('abc')
       await commandPalette.toggle()
-      assert.equal(commandPalette.selectListView.refs.queryEditor.getText(), 'abc')
+      assert.equal(commandPalette.selectList.refs.queryEditor.getText(), 'abc')
       await commandPalette.toggle()
-      assert.equal(commandPalette.selectListView.refs.queryEditor.getText(), 'abc')
+      assert.equal(commandPalette.selectList.refs.queryEditor.getText(), 'abc')
     })
 
     it('hides the command palette and focuses the previously active element if the palette was already open', async () => {
       const editor = await atom.workspace.open()
       const commandPalette = new CommandPaletteView()
       assert.equal(document.activeElement.closest('atom-text-editor'), editor.element)
-      assert.equal(commandPalette.selectListView.element.offsetHeight, 0)
+      assert.equal(commandPalette.selectList.element.offsetHeight, 0)
       await commandPalette.toggle()
       assert.notEqual(document.activeElement.closest('atom-text-editor'), editor.element)
-      assert.notEqual(commandPalette.selectListView.element.offsetHeight, 0)
+      assert.notEqual(commandPalette.selectList.element.offsetHeight, 0)
       await commandPalette.toggle()
-      assert.equal(commandPalette.selectListView.element.offsetHeight, 0)
+      assert.equal(commandPalette.selectList.element.offsetHeight, 0)
       assert.equal(document.activeElement.closest('atom-text-editor'), editor.element)
       await commandPalette.toggle()
       assert.notEqual(document.activeElement.closest('atom-text-editor'), editor.element)
-      assert.notEqual(commandPalette.selectListView.element.offsetHeight, 0)
-      commandPalette.selectListView.cancelSelection()
+      assert.notEqual(commandPalette.selectList.element.offsetHeight, 0)
+      commandPalette.selectList.cancelSelection()
       assert.equal(document.activeElement.closest('atom-text-editor'), editor.element)
-      assert.equal(commandPalette.selectListView.element.offsetHeight, 0)
+      assert.equal(commandPalette.selectList.element.offsetHeight, 0)
     })
   })
 
@@ -148,11 +146,11 @@ describe('CommandPaletteView', () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
 
-      assert(!commandPalette.selectListView.props.items.find(item => item.name === 'foo:hidden-in-command-palette'))
+      assert(!commandPalette.selectList.props.items.find(item => item.name === 'foo:hidden-in-command-palette'))
 
       await commandPalette.show(true)
-      assert.equal(commandPalette.selectListView.props.items.length, 1)
-      assert.equal(commandPalette.selectListView.props.items[0].name, 'foo:hidden-in-command-palette')
+      assert.equal(commandPalette.selectList.props.items.length, 1)
+      assert.equal(commandPalette.selectList.props.items[0].name, 'foo:hidden-in-command-palette')
     })
   })
 
@@ -162,19 +160,19 @@ describe('CommandPaletteView', () => {
       editor.element.focus()
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
-      await commandPalette.selectListView.selectNext()
-      await commandPalette.selectListView.selectNext()
-      await commandPalette.selectListView.selectNext()
+      await commandPalette.selectList.selectNext()
+      await commandPalette.selectList.selectNext()
+      await commandPalette.selectList.selectNext()
       let hasDispatchedCommand = false
       atom.commands.add(
         editor.element,
-        commandPalette.selectListView.getSelectedItem().name,
+        commandPalette.selectList.getSelectedItem().name,
         () => { hasDispatchedCommand = true }
       )
-      commandPalette.selectListView.confirmSelection()
+      commandPalette.selectList.confirmSelection()
       assert(hasDispatchedCommand)
       assert.equal(document.activeElement.closest('atom-text-editor'), editor.element)
-      assert.equal(commandPalette.selectListView.element.offsetHeight, 0)
+      assert.equal(commandPalette.selectList.element.offsetHeight, 0)
     })
   })
 
@@ -182,9 +180,9 @@ describe('CommandPaletteView', () => {
     it('highlights exact matches', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
-      commandPalette.selectListView.refs.queryEditor.setText('Application: About')
-      await commandPalette.selectListView.update()
-      const matches = commandPalette.selectListView.element.querySelectorAll('.character-match')
+      commandPalette.selectList.refs.queryEditor.setText('Application: About')
+      await commandPalette.selectList.update()
+      const matches = commandPalette.selectList.element.querySelectorAll('.character-match')
       assert.equal(matches.length, 1)
       assert.equal(matches[0].textContent, 'Application: About')
     })
@@ -192,9 +190,9 @@ describe('CommandPaletteView', () => {
     it('highlights partial matches in the displayName', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
-      commandPalette.selectListView.refs.queryEditor.setText('Application')
-      await commandPalette.selectListView.update()
-      const matches = commandPalette.selectListView.element.querySelectorAll('.character-match')
+      commandPalette.selectList.refs.queryEditor.setText('Application')
+      await commandPalette.selectList.update()
+      const matches = commandPalette.selectList.element.querySelectorAll('.character-match')
       assert(matches.length > 1)
       for (const match of matches) {
         assert.equal(match.textContent, 'Application')
@@ -204,9 +202,9 @@ describe('CommandPaletteView', () => {
     it('highlights multiple matches in the command name', async () => {
       const commandPalette = new CommandPaletteView()
       await commandPalette.toggle()
-      commandPalette.selectListView.refs.queryEditor.setText('ApplicationAbout')
-      await commandPalette.selectListView.update()
-      const matches = commandPalette.selectListView.element.querySelectorAll('.character-match')
+      commandPalette.selectList.refs.queryEditor.setText('ApplicationAbout')
+      await commandPalette.selectList.update()
+      const matches = commandPalette.selectList.element.querySelectorAll('.character-match')
       assert.equal(matches.length, 2)
       assert.equal(matches[0].textContent, 'Application')
       assert.equal(matches[1].textContent, 'About')
@@ -236,9 +234,9 @@ describe('CommandPaletteView', () => {
 
         const commandPalette = new CommandPaletteView()
         await commandPalette.toggle()
-        commandPalette.selectListView.refs.queryEditor.setText('Awesome')
-        await commandPalette.selectListView.update()
-        const {element} = commandPalette.selectListView
+        commandPalette.selectList.refs.queryEditor.setText('Awesome')
+        await commandPalette.selectList.update()
+        const {element} = commandPalette.selectList
 
         const withDescriptionLi = element.querySelector(`[data-event-name='foo:with-description']`)
         const matches = withDescriptionLi.querySelectorAll('.character-match')
@@ -255,9 +253,9 @@ describe('CommandPaletteView', () => {
 
         const commandPalette = new CommandPaletteView()
         await commandPalette.toggle()
-        commandPalette.selectListView.refs.queryEditor.setText('bar')
-        await commandPalette.selectListView.update()
-        const {element} = commandPalette.selectListView
+        commandPalette.selectList.refs.queryEditor.setText('bar')
+        await commandPalette.selectList.update()
+        const {element} = commandPalette.selectList
 
         const withTagsLi = element.querySelector(`[data-event-name='foo:with-tags']`)
         const matches = withTagsLi.querySelectorAll('.character-match')
@@ -270,11 +268,11 @@ describe('CommandPaletteView', () => {
   describe('return placeholder element for invisible item for better performance', () => {
     it('return placeholder element for first 10 items on initial toggle', async () => {
       const commandPalette = new CommandPaletteView()
-      const spy = sinon.spy(commandPalette.selectListView.props, 'elementForItem')
+      const spy = sinon.spy(commandPalette.selectList.props, 'elementForItem')
       await commandPalette.toggle()
 
       const initiallyVisibleItemCount = 10
-      assert.equal(spy.args.length, commandPalette.selectListView.items.length)
+      assert.equal(spy.args.length, commandPalette.selectList.items.length)
       spy.args.forEach((arg, index) => {
         const innerText = spy.returnValues[index].innerText
         if (index < initiallyVisibleItemCount) {
