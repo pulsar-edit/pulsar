@@ -1,5 +1,5 @@
 const path = require('path');
-const SelectListView = require('atom-select-list');
+const SelectListView = require('pulsar-select-list');
 
 function setConfigForLanguageMode(mode) {
   let useTreeSitterParsers = mode !== 'textmate';

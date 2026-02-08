@@ -1,4 +1,4 @@
-const SelectListView = require('atom-select-list');
+const SelectListView = require('pulsar-select-list');
 
 module.exports = class GrammarListView {
   constructor() {
@@ -11,7 +11,8 @@ module.exports = class GrammarListView {
       }
     );
 
-    this.selectListView = new SelectListView({
+    this.selectList = new SelectListView({
+      className: 'grammar-selector',
       itemsClassList: ['mark-active'],
       items: [],
       filterKeyForItem: grammar => grammar.name,
@@ -73,34 +74,21 @@ module.exports = class GrammarListView {
         this.cancel();
       }
     });
-
-    this.selectListView.element.classList.add('grammar-selector');
   }
 
   destroy() {
     this.cancel();
-    return this.selectListView.destroy();
+    return this.selectList.destroy();
   }
 
   cancel() {
-    if (this.panel != null) {
-      this.panel.destroy();
-    }
-    this.panel = null;
+    this.selectList.hide();
     this.currentGrammar = null;
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus();
-      this.previouslyFocusedElement = null;
-    }
   }
 
   attach() {
-    this.previouslyFocusedElement = document.activeElement;
-    if (this.panel == null) {
-      this.panel = atom.workspace.addModalPanel({ item: this.selectListView });
-    }
-    this.selectListView.focus();
-    this.selectListView.reset();
+    this.selectList.reset();
+    this.selectList.show();
   }
 
   getAllDisplayableGrammars() {
@@ -114,7 +102,7 @@ module.exports = class GrammarListView {
   }
 
   async toggle() {
-    if (this.panel != null) {
+    if (this.selectList.isVisible()) {
       this.cancel();
       return;
     }
@@ -154,7 +142,7 @@ module.exports = class GrammarListView {
       }
 
       grammars.unshift(this.autoDetect);
-      await this.selectListView.update({ items: grammars });
+      await this.selectList.update({ items: grammars });
       this.attach();
     }
   }
