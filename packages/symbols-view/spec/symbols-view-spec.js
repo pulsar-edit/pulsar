@@ -128,7 +128,7 @@ describe('SymbolsView', () => {
       await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
       symbolsView = getSymbolsView();
 
-      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
       expect(document.body.contains(symbolsView.element)).toBe(true);
       expect(symbolsView.element.querySelectorAll('li').length).toBe(5);
 
@@ -152,7 +152,7 @@ describe('SymbolsView', () => {
       await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
       symbolsView = getSymbolsView();
 
-      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
       expect(document.body.contains(symbolsView.element)).toBe(true);
       expect(symbolsView.element.querySelectorAll('li').length).toBe(1);
 
@@ -163,7 +163,7 @@ describe('SymbolsView', () => {
       // so that we can assert that the text in the query field is selected.
       // This allows the user to start typing and replace the prefilled
       // selection if they didn't mean to prefill the query.
-      expect(symbolsView.selectListView.refs.queryEditor.getSelectedText()).toBe('Symbol on Row 13');
+      expect(symbolsView.selectList.refs.queryEditor.getSelectedText()).toBe('Symbol on Row 13');
     });
 
     it('does not prefill the query field if `prefillSelectedText` is `false`', async () => {
@@ -174,7 +174,7 @@ describe('SymbolsView', () => {
       await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
       symbolsView = getSymbolsView();
 
-      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
       expect(document.body.contains(symbolsView.element)).toBe(true);
       expect(symbolsView.element.querySelectorAll('li').length).toBe(5);
 
@@ -197,7 +197,7 @@ describe('SymbolsView', () => {
         return count > 0;
       });
 
-      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
       expect(document.body.contains(symbolsView.element)).toBe(true);
       expect(symbolsView.element.querySelectorAll('li').length).toBe(5);
 
@@ -213,14 +213,14 @@ describe('SymbolsView', () => {
       expect(mainModule.broker.providers.length).toBe(1);
       atom.commands.dispatch(getEditorView(), 'symbols-view:toggle-file-symbols');
       symbolsView = getSymbolsView();
-      spyOn(symbolsView.selectListView, 'update').andCallThrough();
+      spyOn(symbolsView.selectList, 'update').andCallThrough();
       await conditionPromise(async () => {
         await getOrScheduleUpdatePromise();
         let count = symbolsView.element.querySelectorAll('li').length;
         return count > 0;
       });
 
-      expect(symbolsView.selectListView.update).toHaveBeenCalledWith(
+      expect(symbolsView.selectList.update).toHaveBeenCalledWith(
         { loadingMessage: 'Loading…' }
       );
     });
@@ -243,7 +243,7 @@ describe('SymbolsView', () => {
       await editor.save();
       await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
 
-      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
       expect(choiceCount(symbolsView)).toBe(5);
       expect(DummyProvider.getSymbols).toHaveBeenCalled();
       editor.destroy();
@@ -274,7 +274,7 @@ describe('SymbolsView', () => {
 
       await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
 
-      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
       expect(choiceCount(symbolsView)).toBe(6);
       expect(DummyProvider.getSymbols).toHaveBeenCalled();
       expect(CacheClearingProvider.getSymbols).toHaveBeenCalled();
@@ -288,18 +288,18 @@ describe('SymbolsView', () => {
       await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
 
       symbolsView = getSymbolsView();
-      symbolsView.selectListView.refs.queryEditor.setText('nothing will match this');
+      symbolsView.selectList.refs.queryEditor.setText('nothing will match this');
 
-      await conditionPromise(() => symbolsView.selectListView.refs.emptyMessage);
+      await conditionPromise(() => symbolsView.selectList.refs.emptyMessage);
       expect(document.body.contains(symbolsView.element)).toBe(true);
       expect(choiceCount(symbolsView)).toBe(0);
 
-      expect(symbolsView.selectListView.refs.emptyMessage.textContent.length).toBeGreaterThan(0);
+      expect(symbolsView.selectList.refs.emptyMessage.textContent.length).toBeGreaterThan(0);
 
-      symbolsView.selectListView.refs.queryEditor.setText('');
+      symbolsView.selectList.refs.queryEditor.setText('');
       await conditionPromise(() => choiceCount(symbolsView) > 0);
       expect( choiceCount(symbolsView) ).toBe(5);
-      expect(symbolsView.selectListView.refs.emptyMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.emptyMessage).toBeUndefined();
     });
 
     it('moves the cursor to the selected function', async () => {
@@ -406,12 +406,12 @@ describe('SymbolsView', () => {
         registerProvider(EmptyProvider);
         await activationPromise;
         atom.commands.dispatch(getEditorView(), 'symbols-view:toggle-file-symbols');
-        await conditionPromise(() => getSymbolsView()?.selectListView.refs.emptyMessage);
+        await conditionPromise(() => getSymbolsView()?.selectList.refs.emptyMessage);
         symbolsView = getSymbolsView();
 
         expect(document.body.contains(symbolsView.element));
         expect(choiceCount(symbolsView)).toBe(0);
-        let refs = symbolsView.selectListView.refs;
+        let refs = symbolsView.selectList.refs;
         expect(refs.emptyMessage).toBeVisible();
         expect(refs.emptyMessage.textContent.length).toBeGreaterThan(0);
         expect(refs.loadingMessage).not.toBeVisible();
@@ -447,7 +447,7 @@ describe('SymbolsView', () => {
         await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
         symbolsView = getSymbolsView();
 
-        expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+        expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
         expect(document.body.contains(symbolsView.element)).toBe(true);
         expect(symbolsView.element.querySelectorAll('li').length).toBe(5);
 
@@ -531,7 +531,7 @@ describe('SymbolsView', () => {
         expect(choiceCount(symbolsView)).toBe(2);
         expect(symbolsView.element).toBeVisible();
         spyOn(SymbolsView.prototype, 'moveToPosition').andCallThrough();
-        symbolsView.selectListView.confirmSelection();
+        symbolsView.selectList.confirmSelection();
 
         await conditionPromise(() => {
           return SymbolsView.prototype.moveToPosition.callCount === 1;
@@ -663,7 +663,7 @@ describe('SymbolsView', () => {
       await dispatchAndWaitForChoices('symbols-view:toggle-project-symbols');
       symbolsView = atom.workspace.getModalPanels()[0].item;
 
-      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
       expect(document.body.contains(symbolsView.element)).toBe(true);
       expect(symbolsView.element.querySelectorAll('li').length).toBe(5);
 
@@ -685,7 +685,7 @@ describe('SymbolsView', () => {
       await dispatchAndWaitForChoices('symbols-view:toggle-project-symbols');
       symbolsView = getSymbolsView();
 
-      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
       expect(document.body.contains(symbolsView.element)).toBe(true);
       expect(symbolsView.element.querySelectorAll('li').length).toBe(1);
 
@@ -704,7 +704,7 @@ describe('SymbolsView', () => {
       await dispatchAndWaitForChoices('symbols-view:toggle-project-symbols');
       symbolsView = atom.workspace.getModalPanels()[0].item;
 
-      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
       expect(document.body.contains(symbolsView.element)).toBe(true);
       expect(symbolsView.element.querySelectorAll('li').length).toBe(10);
 
@@ -726,7 +726,7 @@ describe('SymbolsView', () => {
       await dispatchAndWaitForChoices('symbols-view:toggle-project-symbols');
       symbolsView = atom.workspace.getModalPanels()[0].item;
 
-      expect(symbolsView.selectListView.refs.loadingMessage).toBeUndefined();
+      expect(symbolsView.selectList.refs.loadingMessage).toBeUndefined();
       expect(document.body.contains(symbolsView.element)).toBe(true);
       expect(symbolsView.element.querySelectorAll('li').length).toBe(5);
 
@@ -751,12 +751,12 @@ describe('SymbolsView', () => {
       expect(symbolsView.element.querySelectorAll('li .primary-line').length).toBe(0);
       expect(ProgressiveProjectProvider.getSymbols.callCount).toBe(1);
 
-      expect(symbolsView.selectListView.props.emptyMessage).toBe('Query must be at least 3 characters long.');
+      expect(symbolsView.selectList.props.emptyMessage).toBe('Query must be at least 3 characters long.');
 
       await symbolsView.updateView({ query: 'lor' });
       await wait(2000);
 
-      expect(symbolsView.selectListView.props.emptyMessage).toBeNull();
+      expect(symbolsView.selectList.props.emptyMessage).toBeNull();
 
       expect(symbolsView.element.querySelectorAll('li .primary-line').length).toBe(1);
       expect(symbolsView.element.querySelector('li:first-child .primary-line')).toHaveText('Lorem ipsum');
@@ -797,11 +797,11 @@ describe('SymbolsView', () => {
 
           symbolsView.element.querySelector('li:first-child').click();
 
-          await conditionPromise(() => symbolsView.selectListView.refs.errorMessage);
+          await conditionPromise(() => symbolsView.selectList.refs.errorMessage);
 
           expect(atom.workspace.open).not.toHaveBeenCalled();
           expect(
-            symbolsView.selectListView.refs.errorMessage.textContent.length
+            symbolsView.selectList.refs.errorMessage.textContent.length
           ).toBeGreaterThan(0);
         });
       });
@@ -819,7 +819,7 @@ describe('SymbolsView', () => {
         await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
 
         symbolsView = getSymbolsView();
-        symbolsView.selectListView.refs.queryEditor.setText('quicksort');
+        symbolsView.selectList.refs.queryEditor.setText('quicksort');
         await getOrScheduleUpdatePromise();
         let resultView = symbolsView.element.querySelector('.selected');
         let matches = resultView.querySelectorAll('.character-match');
@@ -832,7 +832,7 @@ describe('SymbolsView', () => {
         await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
         symbolsView = getSymbolsView();
 
-        symbolsView.selectListView.refs.queryEditor.setText('quick');
+        symbolsView.selectList.refs.queryEditor.setText('quick');
         await getOrScheduleUpdatePromise();
 
         let resultView = symbolsView.element.querySelector('.selected');
@@ -846,7 +846,7 @@ describe('SymbolsView', () => {
         await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
         symbolsView = getSymbolsView();
 
-        symbolsView.selectListView.refs.queryEditor.setText('quicort');
+        symbolsView.selectList.refs.queryEditor.setText('quicort');
         await getOrScheduleUpdatePromise();
 
         let resultView = symbolsView.element.querySelector('.selected');
@@ -873,7 +873,7 @@ describe('SymbolsView', () => {
         await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
         symbolsView = getSymbolsView();
 
-        symbolsView.selectListView.selectNext();
+        symbolsView.selectList.selectNext();
 
         expect(editor.getCursorBufferPosition()).toEqual([3, 4]);
       });
@@ -892,7 +892,7 @@ describe('SymbolsView', () => {
         await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
         symbolsView = getSymbolsView();
 
-        symbolsView.selectListView.selectNext();
+        symbolsView.selectList.selectNext();
         expect(editor.getCursorBufferPosition()).toEqual([3, 4]);
 
         await symbolsView.cancel();
@@ -914,7 +914,7 @@ describe('SymbolsView', () => {
 
         await dispatchAndWaitForChoices('symbols-view:toggle-file-symbols');
         symbolsView = getSymbolsView();
-        symbolsView.selectListView.selectNext();
+        symbolsView.selectList.selectNext();
         expect(editor.getCursorBufferPosition()).toEqual([0, 0]);
       });
     });

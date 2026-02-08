@@ -2,24 +2,24 @@ const SymbolsView = require('./symbols-view');
 const { timeout } = require('./util');
 
 module.exports = class GoToView extends SymbolsView {
-  constructor (stack, broker) {
+  constructor(stack, broker) {
     super(stack, broker);
   }
 
-  toggle () {
-    if (this.panel.isVisible()) {
+  toggle() {
+    if (this.selectList.isVisible()) {
       this.cancel();
     } else {
       this.populate();
     }
   }
 
-  detached () {
+  detached() {
     // TODO
     this.abortController?.abort();
   }
 
-  async populate () {
+  async populate() {
     let editor = atom.workspace.getActiveTextEditor();
     if (!editor) return;
 
@@ -40,11 +40,11 @@ module.exports = class GoToView extends SymbolsView {
     this.attach();
   }
 
-  shouldBePending () {
+  shouldBePending() {
     return true;
   }
 
-  async generateSymbols (editor, range = null) {
+  async generateSymbols(editor, range = null) {
     this.abortController?.abort();
     this.abortController = new AbortController();
 

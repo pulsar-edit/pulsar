@@ -21,12 +21,12 @@ module.exports = class ProjectView extends SymbolsView {
   }
 
   toggle(filterTerm = '') {
-    if (this.panel.isVisible()) {
+    if (this.selectList.isVisible()) {
       this.cancel();
     } else {
       this.populate();
       this.attach();
-      this.selectListView.update({ query: filterTerm, selectQuery: true });
+      this.selectList.update({ query: filterTerm, selectQuery: true });
     }
   }
 
@@ -52,7 +52,7 @@ module.exports = class ProjectView extends SymbolsView {
   }
 
   shouldUseCache() {
-    let query = this.selectListView?.getQuery();
+    let query = this.selectList?.getQuery();
     if (query && query.length > 0) return false;
     if (this.shouldReload) return false;
     return !!this.cachedSymbols;
@@ -72,7 +72,7 @@ module.exports = class ProjectView extends SymbolsView {
       return true;
     }
 
-    let query = this.selectListView?.getQuery();
+    let query = this.selectList?.getQuery();
 
     let listViewOptions = {
       loadingMessage: this.cachedSymbols ?

@@ -2,8 +2,8 @@ const Path = require('path');
 const fs = require('fs-plus');
 const Config = require('./config');
 const { CompositeDisposable, Point } = require('atom');
-const SelectListView = require('atom-select-list');
-const { match } = require('fuzzaldrin');
+const SelectListView = require('pulsar-select-list');
+const { highlightMatches } = require('pulsar-select-list');
 
 const el = require('./element-builder');
 const { badge } = require('./util');
@@ -118,46 +118,6 @@ class ListController {
 
 
 class SymbolsView {
-  static highlightMatches(_context, name, matches, offsetIndex = 0) {
-    let lastIndex = 0;
-    let matchedChars = [];
-
-    const fragment = document.createDocumentFragment();
-
-    for (let matchIndex of [...matches]) {
-      matchIndex -= offsetIndex;
-      if (matchIndex < 0) continue;
-
-      let unmatched = name.substring(lastIndex, matchIndex);
-      if (unmatched) {
-        if (matchedChars.length) {
-          let span = document.createElement('span');
-          span.classList.add('character-match');
-          span.textContent = matchedChars.join('');
-          fragment.appendChild(span);
-        }
-        matchedChars = [];
-        fragment.appendChild(document.createTextNode(unmatched));
-      }
-      matchedChars.push(name[matchIndex]);
-      lastIndex = matchIndex + 1;
-    }
-
-    if (matchedChars.length) {
-      const span = document.createElement('span');
-      span.classList.add('character-match');
-      span.textContent = matchedChars.join('');
-      fragment.appendChild(span);
-    }
-
-    // Remaining characters are plain text.
-    fragment.appendChild(
-      document.createTextNode(name.substring(lastIndex))
-    );
-
-    return fragment;
-  }
-
   constructor(stack, broker, options = {}) {
     this.stack = stack;
     this.broker = broker;
@@ -168,8 +128,9 @@ class SymbolsView {
       ...options
     };
 
-    this.selectListView = new SelectListView({
+    this.selectList = new SelectListView({
       ...options,
+      className: 'symbols-view',
       items: [],
       filterKeyForItem: (item) => item.name,
       elementForItem: this.elementForItem.bind(this),
@@ -180,14 +141,11 @@ class SymbolsView {
       didCancelSelection: this.didCancelSelection.bind(this)
     });
 
-    this.selectListViewOptions = options;
+    this.selectListOptions = options;
 
-    this.listController = new ListController(this.selectListView);
+    this.listController = new ListController(this.selectList);
 
-    this.element = this.selectListView.element;
-    this.element.classList.add('symbols-view');
-
-    this.panel = atom.workspace.addModalPanel({ item: this, visible: false });
+    this.element = this.selectList.element;
 
     this.configDisposable = new CompositeDisposable();
 
@@ -208,15 +166,10 @@ class SymbolsView {
   async destroy() {
     await this.cancel();
     this.configDisposable.dispose();
-    this.panel.destroy();
-    return this.selectListView.destroy();
+    return this.selectList.destroy();
   }
 
-  getFilterKey() {
-    return 'name';
-  }
-
-  elementForItem({ position, name, file, icon, tag, context, directory, providerName }) {
+  elementForItem({ position, name, file, icon, tag, context, directory, providerName }, { matchIndices } = {}) {
     name = name.replace(/\n/g, ' ');
 
     if (atom.project.getPaths().length > 1) {
@@ -240,10 +193,9 @@ class SymbolsView {
       }
     }
 
-    let matches = match(name, this.selectListView.getFilterQuery());
     let primary = el(`div.${primaryLineClasses.join('.')}`,
       el('div.name',
-        SymbolsView.highlightMatches(this, name, matches)
+        highlightMatches(name, matchIndices)
       ),
       badges && el('div.badge-container',
         ...badges.map(
@@ -270,17 +222,13 @@ class SymbolsView {
     if (!this.isCanceling) {
       this.isCanceling = true;
       await this.updateView({ items: [] });
-      this.panel.hide();
-      if (this.previouslyFocusedElement) {
-        this.previouslyFocusedElement.focus();
-        this.previouslyFocusedElement = null;
-      }
+      this.selectList.hide();
       this.isCanceling = false;
     }
   }
 
   async updateView(options) {
-    this.selectListView.update(options);
+    this.selectList.update(options);
   }
 
   didChangeQuery() {
@@ -367,10 +315,8 @@ class SymbolsView {
   }
 
   attach() {
-    this.previouslyFocusedElement = document.activeElement;
-    this.panel.show();
-    this.selectListView.reset();
-    this.selectListView.focus();
+    this.selectList.reset();
+    this.selectList.show();
   }
 
   isValidSymbol(symbol) {
