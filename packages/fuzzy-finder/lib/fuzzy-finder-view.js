@@ -181,6 +181,9 @@ module.exports = class FuzzyFinderView {
     if (atom.config.get('fuzzy-finder.prefillFromSelection') === true) {
       this.selectList.setQueryFromSelection()
     }
+    if (!this.selectList.panel) {
+      this.selectList.panel = atom.workspace.addModalPanel({ item: this, visible: false })
+    }
     this.selectList.show()
   }
 

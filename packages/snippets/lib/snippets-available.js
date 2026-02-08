@@ -30,6 +30,8 @@ class SnippetsAvailable {
     })
   }
 
+  get element () { return this.selectList.element }
+
   async toggle (editor) {
     this.editor = editor
     if (this.selectList.isVisible()) {
@@ -37,6 +39,9 @@ class SnippetsAvailable {
     } else {
       this.selectList.reset()
       await this.populate()
+      if (!this.selectList.panel) {
+        this.selectList.panel = atom.workspace.addModalPanel({ item: this, visible: false })
+      }
       this.selectList.show()
     }
   }

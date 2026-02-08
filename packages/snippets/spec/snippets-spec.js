@@ -2020,7 +2020,7 @@ foo\
 
     it("closes the dialog when triggered again", () => {
       atom.commands.dispatch(availableSnippetsView.selectList.refs.queryEditor.element, 'snippets:available');
-      expect(atom.workspace.getModalPanels().length).toBe(0);
+      expect(availableSnippetsView.selectList.isVisible()).toBe(false);
     });
   });
 });

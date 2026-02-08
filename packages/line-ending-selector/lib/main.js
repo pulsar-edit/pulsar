@@ -3,8 +3,7 @@ const { CompositeDisposable, Disposable } = require('atom');
 const { Selector } = require('./selector');
 const StatusBarItem = require('./status-bar-item');
 const helpers = require('./helpers');
-
-const LineEndingRegExp = /\r\n|\n/g;
+const { setLineEnding } = helpers;
 
 // the following regular expression is executed natively via the `substring` package,
 // where `\A` corresponds to the beginning of the string.
@@ -157,14 +156,6 @@ function getLineEndings(buffer) {
       }
       resolve(result);
     });
-  }
-}
-
-function setLineEnding(item, lineEnding) {
-  if (item && item.getBuffer) {
-    let buffer = item.getBuffer();
-    buffer.setPreferredLineEnding(lineEnding);
-    buffer.setText(buffer.getText().replace(LineEndingRegExp, lineEnding));
   }
 }
 

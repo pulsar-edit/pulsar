@@ -1,6 +1,6 @@
 const SelectListView = require('pulsar-select-list');
 const { TextEditor } = require('atom');
-const { setLineEnding } = require('./main');
+const { setLineEnding } = require('./helpers');
 
 class Selector {
 

@@ -316,6 +316,9 @@ class SymbolsView {
 
   attach() {
     this.selectList.reset();
+    if (!this.selectList.panel) {
+      this.selectList.panel = atom.workspace.addModalPanel({ item: this, visible: false });
+    }
     this.selectList.show();
   }
 
