@@ -1,12 +1,11 @@
-'use babel'
-
-import MRUItemView from './mru-item-view'
-import {CompositeDisposable} from 'atom'
+const MRUItemView = require('./mru-item-view')
+const {CompositeDisposable} = require('atom')
 
 const displayListConfigKey = 'tabs.displayMruTabList'
 
-export default class MRUListView {
-  initialize (pane) {
+module.exports =
+class MRUListView {
+  initialize(pane) {
     this.ownerDiv = document.createElement('div')
     this.element = document.createElement('ol')
     this.ownerDiv.appendChild(this.element)
@@ -26,7 +25,7 @@ export default class MRUListView {
     this.preventPropagationClickHandler = this.preventPropagation.bind(this)
   }
 
-  subscribe () {
+  subscribe() {
     this.subscriptions = new CompositeDisposable()
 
     this.subscriptions.add(atom.config.observe(
@@ -60,26 +59,26 @@ export default class MRUListView {
     )
   }
 
-  destroy () {
+  destroy() {
     this.subscriptions.dispose()
     this.panel.destroy()
   }
 
-  choose (selectedItem) {
+  choose(selectedItem) {
     if (this.displayMruList) {
       this.pendingShow = true
       this.show(selectedItem)
     }
   }
 
-  stopChoosing () {
+  stopChoosing() {
     if (this.displayMruList) {
       this.pendingShow = false
       this.hide()
     }
   }
 
-  show (selectedItem) {
+  show(selectedItem) {
     let selectedViewElement
     if (!this.panel.visible) {
       window.setTimeout(() => {
@@ -95,21 +94,21 @@ export default class MRUListView {
     }
   }
 
-  preventPropagation () {
+  preventPropagation() {
     event.stopPropagation()
   }
 
-  addClickHandlers () {
+  addClickHandlers() {
     document.body.addEventListener('click', this.hideClickHandler)
     this.ownerDiv.addEventListener('click', this.preventPropagationClickHandler)
   }
 
-  removeClickHandler () {
+  removeClickHandler() {
     document.body.removeEventListener('click', this.hideClickHandler)
     this.ownerDiv.removeEventListener('click', this.preventPropagationClickHandler)
   }
 
-  hide () {
+  hide() {
     const willClose = this.panel.visible
     if (willClose) {
       this.removeClickHandler()
@@ -118,7 +117,7 @@ export default class MRUListView {
     return willClose
   }
 
-  updateSelectedItem (selectedItem) {
+  updateSelectedItem(selectedItem) {
     let selectedView
     for (let viewElement of this.element.children) {
       if (viewElement.itemViewData.item === selectedItem) {
@@ -129,7 +128,7 @@ export default class MRUListView {
     return selectedView
   }
 
-  scrollToItemView (view) {
+  scrollToItemView(view) {
     const desiredTop = view.offsetTop
     const desiredBottom = desiredTop + view.offsetHeight
 
@@ -140,7 +139,7 @@ export default class MRUListView {
     }
   }
 
-  buildListView (selectedItem) {
+  buildListView(selectedItem) {
     /* Making this more efficient, and not simply building the view for the
     entire stack every time it's shown, has significant complexity cost.
     The pane system completely owns the MRU stack. Adding events and

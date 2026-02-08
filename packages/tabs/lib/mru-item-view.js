@@ -1,10 +1,9 @@
-'use babel'
+const getIconServices = require('./get-icon-services')
+const path = require('path')
 
-import getIconServices from './get-icon-services'
-import path from 'path'
-
-export default class MRUItemView {
-  initialize (listView, item) {
+module.exports =
+class MRUItemView {
+  initialize(listView, item) {
     this.listView = listView
     this.item = item
 
@@ -48,15 +47,15 @@ export default class MRUItemView {
     }
   }
 
-  select () {
+  select() {
     this.element.classList.add('selected')
   }
 
-  unselect () {
+  unselect() {
     this.element.classList.remove('selected')
   }
 
-  static repositoryForPath (filePath) {
+  static repositoryForPath(filePath) {
     if (filePath) {
       const projectPaths = atom.project.getPaths()
       for (let i = 0; i < projectPaths.length; i++) {
