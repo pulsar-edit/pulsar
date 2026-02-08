@@ -1,10 +1,8 @@
-/** @babel */
-
-import {CompositeDisposable} from 'atom'
-import CommandPaletteView from './command-palette-view'
+const {CompositeDisposable} = require('atom')
+const CommandPaletteView = require('./command-palette-view')
 
 class CommandPalettePackage {
-  activate () {
+  activate() {
     this.commandPaletteView = new CommandPaletteView()
     this.disposables = new CompositeDisposable()
     this.disposables.add(atom.commands.add('atom-workspace', {
@@ -21,11 +19,11 @@ class CommandPalettePackage {
     return this.commandPaletteView.show()
   }
 
-  async deactivate () {
+  async deactivate() {
     this.disposables.dispose()
     await this.commandPaletteView.destroy()
   }
 }
 
 const pack = new CommandPalettePackage()
-export default pack
+module.exports = pack
