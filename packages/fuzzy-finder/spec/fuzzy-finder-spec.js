@@ -133,7 +133,7 @@ describe('FuzzyFinder', () => {
         atom.config.set('fuzzy-finder.useRipGrep', useRipGrep)
         sinon.stub(os, 'cpus').returns({length: 1})
 
-        await projectView.selectListView.update({maxResults: null})
+        await projectView.selectList.update({maxResults: null})
       })
 
       afterEach(() => {
@@ -152,8 +152,8 @@ describe('FuzzyFinder', () => {
             await projectView.toggle()
 
             expect(atom.workspace.panelForItem(projectView).isVisible()).toBe(true)
-            expect(projectView.selectListView.refs.queryEditor.element).toHaveFocus()
-            projectView.selectListView.refs.queryEditor.insertText('this should not show up next time we toggle')
+            expect(projectView.selectList.refs.queryEditor.element).toHaveFocus()
+            projectView.selectList.refs.queryEditor.insertText('this should not show up next time we toggle')
 
             await projectView.toggle()
 
@@ -163,7 +163,7 @@ describe('FuzzyFinder', () => {
 
             await projectView.toggle()
 
-            expect(projectView.selectListView.refs.queryEditor.getText()).toBe('')
+            expect(projectView.selectList.refs.queryEditor.getText()).toBe('')
           })
 
           it('shows all files for the current project and selects the first', async () => {
@@ -383,7 +383,7 @@ describe('FuzzyFinder', () => {
             await projectView.toggle()
             await waitForPathsToDisplay(projectView)
 
-            await projectView.selectListView.refs.queryEditor.setText('whatever.js')
+            await projectView.selectList.refs.queryEditor.setText('whatever.js')
             await getOrScheduleUpdatePromise()
 
             // Sort results by path to ensure test is deterministic
@@ -408,7 +408,7 @@ describe('FuzzyFinder', () => {
             await projectView.toggle()
             await waitForPathsToDisplay(projectView)
 
-            await projectView.selectListView.refs.queryEditor.setText('whatever.js')
+            await projectView.selectList.refs.queryEditor.setText('whatever.js')
             await getOrScheduleUpdatePromise()
 
             expect(parseResults(projectView.element)).toEqual([
@@ -444,8 +444,8 @@ describe('FuzzyFinder', () => {
           it('shows an empty message with no files in the list', async () => {
             await projectView.toggle()
 
-            expect(projectView.selectListView.refs.emptyMessage).toBeVisible()
-            expect(projectView.selectListView.refs.emptyMessage.textContent).toBe('Project is empty')
+            expect(projectView.selectList.refs.emptyMessage).toBeVisible()
+            expect(projectView.selectList.refs.emptyMessage.textContent).toBe('Project is empty')
             expect(projectView.element.querySelectorAll('li').length).toBe(0)
           })
         })
@@ -498,13 +498,13 @@ describe('FuzzyFinder', () => {
             expect(projectView.element.parentElement).toBeDefined()
             expect(atom.workspace.getActiveTextEditor().getPath()).toBe(editorPath)
 
-            await conditionPromise(() => projectView.selectListView.refs.errorMessage)
+            await conditionPromise(() => projectView.selectList.refs.errorMessage)
 
             jasmine.useMockClock()
 
             advanceClock(2000)
 
-            await conditionPromise(() => !projectView.selectListView.refs.errorMessage)
+            await conditionPromise(() => !projectView.selectList.refs.errorMessage)
           })
         )
       })
@@ -530,7 +530,7 @@ describe('FuzzyFinder', () => {
 
               expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
               expect(workspaceElement.querySelector('.fuzzy-finder')).toHaveFocus()
-              bufferView.selectListView.refs.queryEditor.insertText('this should not show up next time we toggle')
+              bufferView.selectList.refs.queryEditor.insertText('this should not show up next time we toggle')
 
               await bufferView.toggle()
 
@@ -539,7 +539,7 @@ describe('FuzzyFinder', () => {
 
               await bufferView.toggle()
 
-              expect(bufferView.selectListView.refs.queryEditor.getText()).toBe('')
+              expect(bufferView.selectList.refs.queryEditor.getText()).toBe('')
             })
 
             it('lists the paths of the current items, sorted by most recently opened but with the current item last', async () => {
@@ -720,7 +720,7 @@ describe('FuzzyFinder', () => {
               await projectView.toggle()
 
               expect(projectView.element.parentElement).toBeDefined()
-              expect(projectView.selectListView.refs.queryEditor.element).toHaveFocus()
+              expect(projectView.selectList.refs.queryEditor.element).toHaveFocus()
 
               projectView.cancel()
 
@@ -741,7 +741,7 @@ describe('FuzzyFinder', () => {
               await projectView.toggle()
 
               expect(projectView.element.parentElement).toBeDefined()
-              expect(projectView.selectListView.refs.queryEditor.element).toHaveFocus()
+              expect(projectView.selectList.refs.queryEditor.element).toHaveFocus()
               projectView.cancel()
               expect(atom.workspace.panelForItem(projectView).isVisible()).toBe(false)
               expect(inputView).toHaveFocus()
@@ -862,7 +862,7 @@ describe('FuzzyFinder', () => {
 
           await bufferView.toggle();
 
-          ({filePath} = bufferView.selectListView.getSelectedItem())
+          ({filePath} = bufferView.selectList.getSelectedItem())
           atom.commands.dispatch(bufferView.element, 'pane:split-left')
 
           await conditionPromise(() => atom.workspace.getCenter().getPanes().length === 2)
@@ -880,7 +880,7 @@ describe('FuzzyFinder', () => {
 
           await bufferView.toggle();
 
-          ({filePath} = bufferView.selectListView.getSelectedItem())
+          ({filePath} = bufferView.selectList.getSelectedItem())
           atom.commands.dispatch(bufferView.element, 'pane:split-right')
 
           await conditionPromise(() => atom.workspace.getCenter().getPanes().length === 2)
@@ -898,7 +898,7 @@ describe('FuzzyFinder', () => {
 
           await bufferView.toggle();
 
-          ({filePath} = bufferView.selectListView.getSelectedItem())
+          ({filePath} = bufferView.selectList.getSelectedItem())
           atom.commands.dispatch(bufferView.element, 'pane:split-up')
 
           await conditionPromise(() => atom.workspace.getCenter().getPanes().length === 2)
@@ -916,7 +916,7 @@ describe('FuzzyFinder', () => {
 
           await bufferView.toggle();
 
-          ({filePath} = bufferView.selectListView.getSelectedItem())
+          ({filePath} = bufferView.selectList.getSelectedItem())
           atom.commands.dispatch(bufferView.element, 'pane:split-down')
 
           await conditionPromise(() => atom.workspace.getCenter().getPanes().length === 2)
@@ -951,11 +951,11 @@ describe('FuzzyFinder', () => {
                 await bufferView.toggle()
 
                 expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-                bufferView.selectListView.refs.queryEditor.setText('sample.js:4')
+                bufferView.selectList.refs.queryEditor.setText('sample.js:4')
 
                 await getOrScheduleUpdatePromise()
 
-                const {filePath} = bufferView.selectListView.getSelectedItem()
+                const {filePath} = bufferView.selectList.getSelectedItem()
                 expect(atom.project.getDirectories()[0].resolve(filePath)).toBe(editor1.getPath())
 
                 spyOn(bufferView, 'moveToCaretPosition').andCallThrough()
@@ -979,7 +979,7 @@ describe('FuzzyFinder', () => {
                 await bufferView.toggle()
 
                 expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-                bufferView.selectListView.refs.queryEditor.insertText(':4')
+                bufferView.selectList.refs.queryEditor.insertText(':4')
 
                 await getOrScheduleUpdatePromise()
 
@@ -1004,11 +1004,11 @@ describe('FuzzyFinder', () => {
                   await bufferView.toggle()
 
                   expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-                  bufferView.selectListView.refs.queryEditor.setText('sample.js:4:6')
+                  bufferView.selectList.refs.queryEditor.setText('sample.js:4:6')
 
                   await getOrScheduleUpdatePromise()
 
-                  const {filePath} = bufferView.selectListView.getSelectedItem()
+                  const {filePath} = bufferView.selectList.getSelectedItem()
                   expect(atom.project.getDirectories()[0].resolve(filePath)).toBe(editor1.getPath())
 
                   spyOn(bufferView, 'moveToCaretPosition').andCallThrough()
@@ -1032,11 +1032,11 @@ describe('FuzzyFinder', () => {
                   await bufferView.toggle()
 
                   expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-                  bufferView.selectListView.refs.queryEditor.insertText(':4:6')
+                  bufferView.selectList.refs.queryEditor.insertText(':4:6')
 
                   await getOrScheduleUpdatePromise()
 
-                  expect(bufferView.selectListView.refs.emptyMessage.innerText).toEqual(
+                  expect(bufferView.selectList.refs.emptyMessage.innerText).toEqual(
                     'Jump to line and column in active editor'
                   )
                   expect(bufferView.element.querySelectorAll('li').length).toBe(0)
@@ -1059,11 +1059,11 @@ describe('FuzzyFinder', () => {
                   await bufferView.toggle()
 
                   expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-                  bufferView.selectListView.refs.queryEditor.setText('sample.js:5:a')
+                  bufferView.selectList.refs.queryEditor.setText('sample.js:5:a')
 
                   await getOrScheduleUpdatePromise()
 
-                  const {filePath} = bufferView.selectListView.getSelectedItem()
+                  const {filePath} = bufferView.selectList.getSelectedItem()
                   expect(atom.project.getDirectories()[0].resolve(filePath)).toBe(editor1.getPath())
 
                   spyOn(bufferView, 'moveToCaretPosition').andCallThrough()
@@ -1087,7 +1087,7 @@ describe('FuzzyFinder', () => {
                   await bufferView.toggle()
 
                   expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-                  bufferView.selectListView.refs.queryEditor.setText(':5:a')
+                  bufferView.selectList.refs.queryEditor.setText(':5:a')
 
                   await getOrScheduleUpdatePromise()
 
@@ -1112,11 +1112,11 @@ describe('FuzzyFinder', () => {
               await bufferView.toggle()
 
               expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-              bufferView.selectListView.refs.queryEditor.setText('sample.js:a')
+              bufferView.selectList.refs.queryEditor.setText('sample.js:a')
 
               await getOrScheduleUpdatePromise()
 
-              const {filePath} = bufferView.selectListView.getSelectedItem()
+              const {filePath} = bufferView.selectList.getSelectedItem()
               expect(atom.project.getDirectories()[0].resolve(filePath)).toBe(editor1.getPath())
 
               spyOn(bufferView, 'moveToCaretPosition').andCallThrough()
@@ -1140,11 +1140,11 @@ describe('FuzzyFinder', () => {
               await bufferView.toggle()
 
               expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-              bufferView.selectListView.refs.queryEditor.setText('::')
+              bufferView.selectList.refs.queryEditor.setText('::')
 
               await getOrScheduleUpdatePromise()
 
-              expect(bufferView.selectListView.refs.errorMessage.innerText).toEqual('Invalid line number')
+              expect(bufferView.selectList.refs.errorMessage.innerText).toEqual('Invalid line number')
 
               expect(bufferView.element.querySelectorAll('li').length).toBe(0)
               spyOn(bufferView, 'moveToCaretPosition').andCallThrough()
@@ -1170,20 +1170,20 @@ describe('FuzzyFinder', () => {
 
               expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
 
-              bufferView.selectListView.refs.queryEditor.setText(':42')
+              bufferView.selectList.refs.queryEditor.setText(':42')
               await getOrScheduleUpdatePromise()
-              expect(bufferView.selectListView.refs.emptyMessage.innerText).toEqual(emptyMessage)
-              expect(bufferView.selectListView.refs.errorMessage).toBeUndefined()
+              expect(bufferView.selectList.refs.emptyMessage.innerText).toEqual(emptyMessage)
+              expect(bufferView.selectList.refs.errorMessage).toBeUndefined()
 
-              bufferView.selectListView.refs.queryEditor.setText(':42a')
+              bufferView.selectList.refs.queryEditor.setText(':42a')
               await getOrScheduleUpdatePromise()
-              expect(bufferView.selectListView.refs.emptyMessage).toBeUndefined()
-              expect(bufferView.selectListView.refs.errorMessage.innerText).toEqual(errorMessage)
+              expect(bufferView.selectList.refs.emptyMessage).toBeUndefined()
+              expect(bufferView.selectList.refs.errorMessage.innerText).toEqual(errorMessage)
 
-              bufferView.selectListView.refs.queryEditor.setText(':42')
+              bufferView.selectList.refs.queryEditor.setText(':42')
               await getOrScheduleUpdatePromise()
-              expect(bufferView.selectListView.refs.emptyMessage.innerText).toEqual(emptyMessage)
-              expect(bufferView.selectListView.refs.errorMessage).toBeUndefined()
+              expect(bufferView.selectList.refs.emptyMessage.innerText).toEqual(emptyMessage)
+              expect(bufferView.selectList.refs.errorMessage).toBeUndefined()
             })
 
             it('shows a specific error message when the column is invalid', async () => {
@@ -1198,10 +1198,10 @@ describe('FuzzyFinder', () => {
 
               expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
 
-              bufferView.selectListView.refs.queryEditor.setText(':42:12a')
+              bufferView.selectList.refs.queryEditor.setText(':42:12a')
               await getOrScheduleUpdatePromise()
-              expect(bufferView.selectListView.refs.emptyMessage).toBeUndefined()
-              expect(bufferView.selectListView.refs.errorMessage.innerText).toEqual(errorMessage)
+              expect(bufferView.selectList.refs.emptyMessage).toBeUndefined()
+              expect(bufferView.selectList.refs.errorMessage.innerText).toEqual(errorMessage)
             })
 
             it('shows a more specific message when jumping to line and column', async () => {
@@ -1216,13 +1216,13 @@ describe('FuzzyFinder', () => {
 
               expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
 
-              bufferView.selectListView.refs.queryEditor.setText(':42:')
+              bufferView.selectList.refs.queryEditor.setText(':42:')
               await getOrScheduleUpdatePromise()
-              expect(bufferView.selectListView.refs.emptyMessage.innerText).toEqual(emptyColumnMessage)
+              expect(bufferView.selectList.refs.emptyMessage.innerText).toEqual(emptyColumnMessage)
 
-              bufferView.selectListView.refs.queryEditor.setText(':42:12')
+              bufferView.selectList.refs.queryEditor.setText(':42:12')
               await getOrScheduleUpdatePromise()
-              expect(bufferView.selectListView.refs.emptyMessage.innerText).toEqual(emptyColumnMessage)
+              expect(bufferView.selectList.refs.emptyMessage.innerText).toEqual(emptyColumnMessage)
             })
           })
         })
@@ -1235,7 +1235,7 @@ describe('FuzzyFinder', () => {
         })
 
         it('highlights an exact match', async () => {
-          bufferView.selectListView.refs.queryEditor.setText('sample.js')
+          bufferView.selectList.refs.queryEditor.setText('sample.js')
 
           await getOrScheduleUpdatePromise()
 
@@ -1250,7 +1250,7 @@ describe('FuzzyFinder', () => {
         })
 
         it('highlights a partial match', async () => {
-          bufferView.selectListView.refs.queryEditor.setText('sample')
+          bufferView.selectList.refs.queryEditor.setText('sample')
 
           await getOrScheduleUpdatePromise()
 
@@ -1265,7 +1265,7 @@ describe('FuzzyFinder', () => {
         })
 
         it('highlights multiple matches in the file name', async () => {
-          bufferView.selectListView.refs.queryEditor.setText('samplejs')
+          bufferView.selectList.refs.queryEditor.setText('samplejs')
 
           await getOrScheduleUpdatePromise()
 
@@ -1282,7 +1282,7 @@ describe('FuzzyFinder', () => {
 
         it('highlights matches in the directory and file name', async () => {
           spyOn(bufferView, 'projectRelativePathsForFilePaths').andCallFake((paths) => paths)
-          bufferView.selectListView.refs.queryEditor.setText('root-dirsample')
+          bufferView.selectList.refs.queryEditor.setText('root-dirsample')
 
           await bufferView.setItems([
             {
@@ -1313,7 +1313,7 @@ describe('FuzzyFinder', () => {
             await bufferView.toggle()
 
             expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-            bufferView.selectListView.refs.queryEditor.insertText(':4')
+            bufferView.selectList.refs.queryEditor.insertText(':4')
 
             await getOrScheduleUpdatePromise()
 
@@ -1335,7 +1335,7 @@ describe('FuzzyFinder', () => {
           await projectView.toggle()
 
           expect(atom.workspace.panelForItem(projectView).isVisible()).toBe(true)
-          bufferView.selectListView.refs.queryEditor.insertText('this should not show up next time we open finder')
+          bufferView.selectList.refs.queryEditor.insertText('this should not show up next time we open finder')
 
           await projectView.toggle()
 
@@ -1344,7 +1344,7 @@ describe('FuzzyFinder', () => {
           await projectView.toggle()
 
           expect(atom.workspace.panelForItem(projectView).isVisible()).toBe(true)
-          expect(projectView.selectListView.getQuery()).toBe('')
+          expect(projectView.selectList.getQuery()).toBe('')
         })
 
         it('preserves last search when the config is set', async () => {
@@ -1353,7 +1353,7 @@ describe('FuzzyFinder', () => {
           await projectView.toggle()
 
           expect(atom.workspace.panelForItem(projectView).isVisible()).toBe(true)
-          projectView.selectListView.refs.queryEditor.insertText('this should show up next time we open finder')
+          projectView.selectList.refs.queryEditor.insertText('this should show up next time we open finder')
 
           await projectView.toggle()
 
@@ -1362,8 +1362,8 @@ describe('FuzzyFinder', () => {
           await projectView.toggle()
 
           expect(atom.workspace.panelForItem(projectView).isVisible()).toBe(true)
-          expect(projectView.selectListView.getQuery()).toBe('this should show up next time we open finder')
-          expect(projectView.selectListView.refs.queryEditor.getSelectedText()).toBe('this should show up next time we open finder')
+          expect(projectView.selectList.getQuery()).toBe('this should show up next time we open finder')
+          expect(projectView.selectList.refs.queryEditor.getSelectedText()).toBe('this should show up next time we open finder')
         })
       })
 
@@ -1378,8 +1378,8 @@ describe('FuzzyFinder', () => {
           await projectView.toggle()
 
           expect(atom.workspace.panelForItem(projectView).isVisible()).toBe(true)
-          expect(projectView.selectListView.getQuery()).toBe('')
-          expect(projectView.selectListView.refs.queryEditor.getSelectedText()).toBe('')
+          expect(projectView.selectList.getQuery()).toBe('')
+          expect(projectView.selectList.refs.queryEditor.getSelectedText()).toBe('')
         })
 
         it('takes selection from active editor and prefills query with it', async () => {
@@ -1394,8 +1394,8 @@ describe('FuzzyFinder', () => {
           await projectView.toggle()
 
           expect(atom.workspace.panelForItem(projectView).isVisible()).toBe(true)
-          expect(projectView.selectListView.getQuery()).toBe('sample.txt')
-          expect(projectView.selectListView.refs.queryEditor.getSelectedText()).toBe('sample.txt')
+          expect(projectView.selectList.getQuery()).toBe('sample.txt')
+          expect(projectView.selectList.refs.queryEditor.getSelectedText()).toBe('sample.txt')
         })
       })
 
@@ -1406,7 +1406,7 @@ describe('FuzzyFinder', () => {
           await bufferView.toggle()
 
           expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-          bufferView.selectListView.refs.queryEditor.insertText('js')
+          bufferView.selectList.refs.queryEditor.insertText('js')
 
           await getOrScheduleUpdatePromise()
 
@@ -1420,7 +1420,7 @@ describe('FuzzyFinder', () => {
           await bufferView.toggle()
 
           expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-          bufferView.selectListView.refs.queryEditor.insertText('gif')
+          bufferView.selectList.refs.queryEditor.insertText('gif')
 
           await getOrScheduleUpdatePromise()
 
@@ -1445,7 +1445,7 @@ describe('FuzzyFinder', () => {
             await bufferView.toggle()
 
             expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-            bufferView.selectListView.refs.queryEditor.insertText('js')
+            bufferView.selectList.refs.queryEditor.insertText('js')
 
             await getOrScheduleUpdatePromise()
 
@@ -1477,7 +1477,7 @@ describe('FuzzyFinder', () => {
             await bufferView.toggle()
 
             expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-            bufferView.selectListView.refs.queryEditor.insertText('js')
+            bufferView.selectList.refs.queryEditor.insertText('js')
 
             await getOrScheduleUpdatePromise()
 
@@ -1510,7 +1510,7 @@ describe('FuzzyFinder', () => {
             await bufferView.toggle()
 
             expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)
-            bufferView.selectListView.refs.queryEditor.insertText('js')
+            bufferView.selectList.refs.queryEditor.insertText('js')
 
             await getOrScheduleUpdatePromise()
 
@@ -1775,7 +1775,7 @@ describe('FuzzyFinder', () => {
     projectView = fuzzyFinder.createProjectView()
     jasmine.attachToDOM(workspaceElement)
 
-    await projectView.selectListView.update({maxResults: null})
+    await projectView.selectList.update({maxResults: null})
     await projectView.toggle()
 
     expect(projectView.element.querySelector('.loading')).not.toBeVisible()

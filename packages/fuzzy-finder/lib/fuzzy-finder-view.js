@@ -1,8 +1,9 @@
-const {Point, CompositeDisposable} = require('atom')
+const {Point} = require('atom')
 const fs = require('fs')
 
 const path = require('path')
-const SelectListView = require('atom-select-list')
+const SelectListView = require('pulsar-select-list')
+const { highlightMatches } = SelectListView
 
 const {repositoryForPath} = require('./helpers')
 const getIconServices = require('./get-icon-services')
@@ -10,13 +11,14 @@ const getIconServices = require('./get-icon-services')
 const MAX_RESULTS = 10
 
 module.exports = class FuzzyFinderView {
-  constructor (metricsReporter) {
+  constructor(metricsReporter) {
     this.previousQueryWasLineJump = false
     this.items = []
     this.metricsReporter = metricsReporter
     this.filterFn = this.filterFn.bind(this)
 
-    this.selectListView = new SelectListView({
+    this.selectList = new SelectListView({
+      className: 'fuzzy-finder',
       items: this.items,
       maxResults: MAX_RESULTS,
       emptyMessage: this.getEmptyMessage(),
@@ -48,7 +50,7 @@ module.exports = class FuzzyFinderView {
         const isLineJump = this.isQueryALineJump()
         if (isLineJump) {
           this.previousQueryWasLineJump = true
-          const query = this.selectListView.getQuery()
+          const query = this.selectList.getQuery()
           let emptyMessage = null
           let errorMessage = null
           if (/^:\d+:\d*\D/.test(query)) {
@@ -61,14 +63,14 @@ module.exports = class FuzzyFinderView {
             emptyMessage = 'Jump to line in active editor'
           }
 
-          this.selectListView.update({
+          this.selectList.update({
             items: [],
             emptyMessage: emptyMessage,
             errorMessage: errorMessage
           })
         } else if (this.previousQueryWasLineJump) {
           this.previousQueryWasLineJump = false
-          this.selectListView.update({
+          this.selectList.update({
             items: this.items,
             emptyMessage: this.getEmptyMessage(),
             errorMessage: null
@@ -76,7 +78,7 @@ module.exports = class FuzzyFinderView {
         }
       },
       elementForItem: ({filePath, label, ownerGitHubUsername}) => {
-        const filterQuery = this.selectListView.getFilterQuery()
+        const filterQuery = this.selectList.getFilterQuery()
 
         atom.ui.fuzzyMatcher.setCandidates(
           this.nativeFuzzyForResults, [label]
@@ -98,13 +100,12 @@ module.exports = class FuzzyFinderView {
         }).element
       }
     })
-    this.selectListView.element.classList.add('fuzzy-finder')
 
     const splitLeft = () => { this.splitOpenPath((pane) => pane.splitLeft.bind(pane)) }
     const splitRight = () => { this.splitOpenPath((pane) => pane.splitRight.bind(pane)) }
     const splitUp = () => { this.splitOpenPath((pane) => pane.splitUp.bind(pane)) }
     const splitDown = () => { this.splitOpenPath((pane) => pane.splitDown.bind(pane)) }
-    atom.commands.add(this.selectListView.element, {
+    atom.commands.add(this.selectList.element, {
       'pane:split-left': splitLeft,
       'pane:split-left-and-copy-active-item': splitLeft,
       'pane:split-left-and-move-active-item': splitLeft,
@@ -119,7 +120,7 @@ module.exports = class FuzzyFinderView {
       'pane:split-down-and-move-active-item': splitDown,
       'fuzzy-finder:invert-confirm': () => {
         this.confirm(
-          this.selectListView.getSelectedItem(),
+          this.selectList.getSelectedItem(),
           {searchAllPanes: !atom.config.get('fuzzy-finder.searchAllPanes')}
         )
       }
@@ -134,32 +135,28 @@ module.exports = class FuzzyFinderView {
       // the filtering of items.
       this.nativeFuzzyForResults = atom.ui.fuzzyMatcher.setCandidates([]);
     }
-    this.selectListView.update({ filter: this.filterFn })
+    this.selectList.update({ filter: this.filterFn })
   }
 
-  get element () {
-    return this.selectListView.element
+  get element() {
+    return this.selectList.element
   }
 
-  destroy () {
-    if (this.panel) {
-      this.panel.destroy()
-    }
-
-    return this.selectListView.destroy()
+  destroy() {
+    return this.selectList.destroy()
   }
 
-  cancel () {
+  cancel() {
     if (atom.config.get('fuzzy-finder.preserveLastSearch')) {
-      this.selectListView.refs.queryEditor.selectAll()
+      this.selectList.refs.queryEditor.selectAll()
     } else {
-      this.selectListView.reset()
+      this.selectList.reset()
     }
 
     this.hide()
   }
 
-  confirm ({uri} = {}, openOptions) {
+  confirm({uri} = {}, openOptions) {
     if (atom.workspace.getActiveTextEditor() && this.isQueryALineJump()) {
       const caretPosition = this.getCaretPosition()
       this.cancel()
@@ -169,69 +166,36 @@ module.exports = class FuzzyFinderView {
     } else {
       try {
         if (fs.lstatSync(uri).isDirectory()) {
-          this.selectListView.update({errorMessage: 'Selected path is a directory'})
-          setTimeout(() => { this.selectListView.update({errorMessage: null}) }, 2000)
+          this.selectList.update({errorMessage: 'Selected path is a directory'})
+          setTimeout(() => { this.selectList.update({errorMessage: null}) }, 2000)
           return
         }
-      } catch (e) {}
+      } catch (e) { /* file may not exist yet */ }
       const caretPosition = this.getCaretPosition()
       this.cancel()
       this.openURI(uri, caretPosition, openOptions)
     }
   }
 
-  getEditorSelection () {
-    const editor = atom.workspace.getActiveTextEditor()
-    if (!editor) {
-      return
-    }
-    const selectedText = editor.getSelectedText()
-    if (/\n/m.test(selectedText)) {
-      return
-    }
-    return selectedText
-  }
-
-  prefillQueryFromSelection () {
-    const selectedText = this.getEditorSelection()
-    if (selectedText) {
-      this.selectListView.refs.queryEditor.setText(selectedText)
-      const textLength = selectedText.length
-      this.selectListView.refs.queryEditor.setSelectedBufferRange([[0, 0], [0, textLength]])
-    }
-  }
-
-  show () {
-    this.previouslyFocusedElement = document.activeElement
-    if (!this.panel) {
-      this.panel = atom.workspace.addModalPanel({item: this})
-    }
-    this.panel.show()
+  show() {
     if (atom.config.get('fuzzy-finder.prefillFromSelection') === true) {
-      this.prefillQueryFromSelection()
+      this.selectList.setQueryFromSelection()
     }
-    this.selectListView.focus()
+    this.selectList.show()
   }
 
-  hide () {
-    if (this.panel) {
-      this.panel.hide()
-    }
-
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus()
-      this.previouslyFocusedElement = null
-    }
+  hide() {
+    this.selectList.hide()
   }
 
-  async openURI (uri, caretPosition, openOptions) {
+  async openURI(uri, caretPosition, openOptions) {
     if (uri) {
       await atom.workspace.open(uri, openOptions)
       this.moveToCaretPosition(caretPosition)
     }
   }
 
-  moveToCaretPosition (caretPosition) {
+  moveToCaretPosition(caretPosition) {
     const editor = atom.workspace.getActiveTextEditor()
     if (editor && caretPosition.row >= 0) {
       editor.unfoldBufferRow(caretPosition.row)
@@ -244,37 +208,34 @@ module.exports = class FuzzyFinderView {
     }
   }
 
-  splitOpenPath (splitFn) {
-    const {uri} = this.selectListView.getSelectedItem() || {}
+  splitOpenPath(splitFn) {
+    const {uri} = this.selectList.getSelectedItem() || {}
     const caretPosition = this.getCaretPosition()
     const editor = atom.workspace.getActiveTextEditor()
     const activePane = atom.workspace.getActivePane()
 
     if (this.isQueryALineJump() && editor) {
-      this.previouslyFocusedElement = null
       splitFn(activePane)({copyActiveItem: true})
       this.moveToCaretPosition(caretPosition)
     } else if (!uri) {
       return // eslint-disable-line no-useless-return
     } else if (activePane) {
-      this.previouslyFocusedElement = null
       splitFn(activePane)()
       this.openURI(uri, caretPosition)
     } else {
-      this.previouslyFocusedElement = null
       this.openURI(uri, caretPosition)
     }
   }
 
-  isQueryALineJump () {
+  isQueryALineJump() {
     return (
-      this.selectListView.getFilterQuery().trim() === '' &&
-      this.selectListView.getQuery().includes(':')
+      this.selectList.getFilterQuery().trim() === '' &&
+      this.selectList.getQuery().includes(':')
     )
   }
 
-  getCaretPosition () {
-    const query = this.selectListView.getQuery()
+  getCaretPosition() {
+    const query = this.selectList.getQuery()
     const firstColon = query.indexOf(':')
     const secondColon = query.indexOf(':', firstColon + 1)
     let position = new Point(-1, -1)
@@ -292,7 +253,7 @@ module.exports = class FuzzyFinderView {
     return position
   }
 
-  setItems (items) {
+  setItems(items) {
     this.items = items
     atom.ui.fuzzyMatcher.setCandidates(
       this.nativeFuzzy,
@@ -300,14 +261,14 @@ module.exports = class FuzzyFinderView {
     );
 
     if (this.isQueryALineJump()) {
-      this.selectListView.update({
+      this.selectList.update({
         items: [],
         infoMessage: null,
         loadingMessage: null,
         loadingBadge: null
       })
     } else {
-      this.selectListView.update({
+      this.selectList.update({
         items: this.items,
         infoMessage: null,
         loadingMessage: null,
@@ -316,7 +277,7 @@ module.exports = class FuzzyFinderView {
     }
   }
 
-  projectRelativePathsForFilePaths (filePaths) {
+  projectRelativePathsForFilePaths(filePaths) {
     // Don't regenerate project relative paths unless the file paths have changed
     if (filePaths !== this.filePaths) {
       this.filePaths = filePaths
@@ -328,7 +289,7 @@ module.exports = class FuzzyFinderView {
     return this.projectRelativePaths
   }
 
-  convertPathToSelectViewObject (filePath) {
+  convertPathToSelectViewObject(filePath) {
     const projectHasMultipleDirectories = atom.project.getDirectories().length > 1
 
     const [rootPath, projectRelativePath] = atom.project.relativizePath(filePath)
@@ -347,47 +308,13 @@ module.exports = class FuzzyFinderView {
   }
 }
 
-function highlight (path, matches, offsetIndex) {
-  let lastIndex = 0
-  let matchedChars = []
-  const fragment = document.createDocumentFragment()
-  for (let matchIndex of matches) {
-    matchIndex -= offsetIndex
-    // If marking up the basename, omit path matches
-    if (matchIndex < 0) {
-      continue
-    }
-    const unmatched = path.substring(lastIndex, matchIndex)
-    if (unmatched) {
-      if (matchedChars.length > 0) {
-        const span = document.createElement('span')
-        span.classList.add('character-match')
-        span.textContent = matchedChars.join('')
-        fragment.appendChild(span)
-        matchedChars = []
-      }
-
-      fragment.appendChild(document.createTextNode(unmatched))
-    }
-
-    matchedChars.push(path[matchIndex])
-    lastIndex = matchIndex + 1
-  }
-
-  if (matchedChars.length > 0) {
-    const span = document.createElement('span')
-    span.classList.add('character-match')
-    span.textContent = matchedChars.join('')
-    fragment.appendChild(span)
-  }
-
-  // Remaining characters are plain text
-  fragment.appendChild(document.createTextNode(path.substring(lastIndex)))
-  return fragment
+function highlight(text, matches, offsetIndex) {
+  const adjusted = matches.map(i => i - offsetIndex).filter(i => i >= 0 && i < text.length)
+  return highlightMatches(text, adjusted)
 }
 
 class FuzzyFinderItem {
-  constructor ({filePath, label, ownerGitHubUsername, filterQuery, matches, repository}) {
+  constructor({filePath, label, ownerGitHubUsername, matches, repository}) {
     this.filePath = filePath
     this.label = label
     this.element = document.createElement('li')

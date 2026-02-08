@@ -6,7 +6,7 @@ const PathLoader = require('./path-loader')
 
 module.exports =
 class ProjectView extends FuzzyFinderView {
-  constructor (paths, metricsReporter) {
+  constructor(paths, metricsReporter) {
     super(metricsReporter)
     this.disposables = new CompositeDisposable()
     this.paths = paths
@@ -39,7 +39,7 @@ class ProjectView extends FuzzyFinderView {
     }
   }
 
-  destroy () {
+  destroy() {
     if (this.loadPathsTask) {
       this.loadPathsTask.terminate()
     }
@@ -48,12 +48,12 @@ class ProjectView extends FuzzyFinderView {
     return super.destroy()
   }
 
-  setTeletypeService (teletypeService) {
+  setTeletypeService(teletypeService) {
     this.teletypeService = teletypeService
   }
 
-  async toggle () {
-    if (this.panel && this.panel.isVisible()) {
+  async toggle() {
+    if (this.selectList.isVisible()) {
       this.cancel()
     } else {
       this.show()
@@ -61,7 +61,7 @@ class ProjectView extends FuzzyFinderView {
     }
   }
 
-  async populate () {
+  async populate() {
     const remoteEditors = (this.teletypeService && await this.teletypeService.getRemoteEditors()) || []
 
     const remoteItems = remoteEditors.map((remoteEditor) => {
@@ -77,7 +77,7 @@ class ProjectView extends FuzzyFinderView {
     await this.setItems(remoteItems.concat(localItems))
   }
 
-  async reloadPathsIfNeeded () {
+  async reloadPathsIfNeeded() {
     if (this.reloadPaths) {
       this.reloadPaths = false
       let task = null
@@ -108,25 +108,25 @@ class ProjectView extends FuzzyFinderView {
       }
 
       if (this.paths) {
-        await this.selectListView.update({loadingMessage: 'Reindexing project\u2026', infoMessage: null})
+        await this.selectList.update({loadingMessage: 'Reindexing project\u2026', infoMessage: null})
       } else {
-        await this.selectListView.update({loadingMessage: 'Indexing project\u2026', infoMessage: null, loadingBadge: '0'})
+        await this.selectList.update({loadingMessage: 'Indexing project\u2026', infoMessage: null, loadingBadge: '0'})
         if (task) {
           let pathsFound = 0
           task.on('load-paths:paths-found', (paths) => {
             pathsFound += paths.length
-            this.selectListView.update({loadingMessage: 'Indexing project\u2026', infoMessage: null, loadingBadge: humanize.intComma(pathsFound)})
+            this.selectList.update({loadingMessage: 'Indexing project\u2026', infoMessage: null, loadingBadge: humanize.intComma(pathsFound)})
           })
         }
       }
     }
   }
 
-  getEmptyMessage () {
+  getEmptyMessage() {
     return 'Project is empty'
   }
 
-  projectRelativePathsForFilePaths (filePaths) {
+  projectRelativePathsForFilePaths(filePaths) {
     const projectRelativePaths = super.projectRelativePathsForFilePaths(filePaths)
     const lastOpenedPath = this.getLastOpenedPath()
     if (lastOpenedPath) {
@@ -143,7 +143,7 @@ class ProjectView extends FuzzyFinderView {
     return projectRelativePaths
   }
 
-  getLastOpenedPath () {
+  getLastOpenedPath() {
     let activePath = null
     const activePaneItem = atom.workspace.getActivePaneItem()
     if (activePaneItem && activePaneItem.getPath) {
@@ -173,7 +173,7 @@ class ProjectView extends FuzzyFinderView {
     return lastOpenedEditor ? lastOpenedEditor.getPath() : null
   }
 
-  runLoadPathsTask (fn) {
+  runLoadPathsTask(fn) {
     if (this.loadPathsTask) {
       this.loadPathsTask.terminate()
     }

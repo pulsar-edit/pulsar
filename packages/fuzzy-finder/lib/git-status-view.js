@@ -5,8 +5,8 @@ const FuzzyFinderView = require('./fuzzy-finder-view')
 
 module.exports =
 class GitStatusView extends FuzzyFinderView {
-  async toggle () {
-    if (this.panel && this.panel.isVisible()) {
+  async toggle() {
+    if (this.selectList.isVisible()) {
       this.cancel()
     } else if (atom.project.getRepositories().some((repo) => repo)) {
       const paths = []
@@ -26,7 +26,7 @@ class GitStatusView extends FuzzyFinderView {
     }
   }
 
-  getEmptyMessage () {
+  getEmptyMessage() {
     return 'Nothing to commit, working directory clean'
   }
 }

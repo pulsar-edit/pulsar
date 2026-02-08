@@ -3,16 +3,16 @@ const path = require('path')
 
 module.exports =
 class BufferView extends FuzzyFinderView {
-  setTeletypeService (teletypeService) {
+  setTeletypeService(teletypeService) {
     this.teletypeService = teletypeService
   }
 
-  getEmptyMessage () {
+  getEmptyMessage() {
     return 'No open editors'
   }
 
-  async toggle () {
-    if (this.panel && this.panel.isVisible()) {
+  async toggle() {
+    if (this.selectList.isVisible()) {
       this.cancel()
     } else {
       const items = this.sortItems(await this.buildItems())
@@ -23,7 +23,7 @@ class BufferView extends FuzzyFinderView {
     }
   }
 
-  async buildItems () {
+  async buildItems() {
     const itemsByURI = new Map()
 
     const remoteEditorsByURI = await this.getRemoteEditorsByURI()
@@ -62,7 +62,7 @@ class BufferView extends FuzzyFinderView {
     return Array.from(itemsByURI.values())
   }
 
-  sortItems (items) {
+  sortItems(items) {
     const activeEditor = atom.workspace.getActiveTextEditor()
     const activeEditorURI = activeEditor ? activeEditor.getURI() : null
     items.sort((a, b) => {
@@ -77,7 +77,7 @@ class BufferView extends FuzzyFinderView {
     return items
   }
 
-  async getRemoteEditorsByURI () {
+  async getRemoteEditorsByURI() {
     const remoteEditorsByURI = new Map()
     const remoteEditors = this.teletypeService ? await this.teletypeService.getRemoteEditors() : []
     for (var i = 0; i < remoteEditors.length; i++) {
