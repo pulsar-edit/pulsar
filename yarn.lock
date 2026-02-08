@@ -2535,22 +2535,6 @@ atom-grammar-test@^0.6.3:
 "atom-light-ui@file:packages/atom-light-ui":
   version "0.46.3"
 
-atom-select-list@^0.7.0, atom-select-list@^0.7.1:
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/atom-select-list/-/atom-select-list-0.7.2.tgz#84a2db86af91d57b8acfc4ded34af771448fced7"
-  integrity sha512-a707OB1DhLGjzqtFrtMQKH7BBxFuCh8UBoUWxgFOrLrSwVh3g+/TlVPVDOz12+U0mDu3mIrnYLqQyhywQOTxhw==
-  dependencies:
-    etch "^0.12.6"
-    fuzzaldrin "^2.1.0"
-
-atom-select-list@^0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/atom-select-list/-/atom-select-list-0.8.1.tgz#af65a3164fe893c0603cda3bfaad59894dc0c8a2"
-  integrity sha512-MpwlZmmI81odx7rY+HpJrRmDW9aXlkFDFDNt70JxrPibxEh8h9HCZZj22woa4CKFKVXC8sEiLMcNtuDeE10jog==
-  dependencies:
-    etch "^0.14.0"
-    fuzzaldrin "^2.1.0"
-
 atom-slick@^2, atom-slick@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/atom-slick/-/atom-slick-2.0.0.tgz#ff0dbe15be2c4eda268b9d30d76e2517e0b7d3ca"
@@ -2814,7 +2798,7 @@ bluebird@^3.5.0, bluebird@^3.5.5, bluebird@^3.7.2:
 "bookmarks@file:packages/bookmarks":
   version "0.46.0"
   dependencies:
-    atom-select-list "^0.7.0"
+    pulsar-select-list "^1.3.0"
 
 boolbase@^1.0.0:
   version "1.0.0"
@@ -3441,7 +3425,7 @@ command-line-usage@^4.1.0:
 "command-palette@file:packages/command-palette":
   version "0.43.5"
   dependencies:
-    atom-select-list "^0.7.1"
+    pulsar-select-list "^1.3.0"
     underscore-plus "^1.0.0"
 
 commander@2.9.0:
@@ -3949,6 +3933,11 @@ dezalgo@^1.0.4:
     asap "^2.0.0"
     wrappy "1"
 
+diacritic@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/diacritic/-/diacritic-0.0.2.tgz#fc2a887b5a5bc0a0a854fb614c7c2f209061ee04"
+  integrity sha512-iQCeDkSPwkfwWPr+HZZ49WRrM2FSI9097Q9w7agyRCdLcF9Eh2Ek0sHKcmMWx2oZVBjRBE/sziGFjZu0uf1Jbg==
+
 diff@3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/diff/-/diff-3.5.0.tgz#800c0dd1e0a8bfbc95835c202ad220fe317e5a12"
@@ -4225,9 +4214,9 @@ emoji-regex@^8.0.0:
 "encoding-selector@file:packages/encoding-selector":
   version "0.23.9"
   dependencies:
-    atom-select-list "^0.7.0"
     iconv-lite "^0.4.4"
     jschardet "^1.1.0"
+    pulsar-select-list "^1.3.0"
 
 encoding-sniffer@^0.2.1:
   version "0.2.1"
@@ -5090,17 +5079,12 @@ functions-have-names@^1.2.3:
   resolved "https://registry.yarnpkg.com/functions-have-names/-/functions-have-names-1.2.3.tgz#0404fe4ee2ba2f607f0e0ec3c80bae994133b834"
   integrity sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==
 
-fuzzaldrin@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz#90204c3e2fdaa6941bb28d16645d418063a90e9b"
-  integrity sha512-zgllBYwfHR5P3CncJiGbGVPpa3iFYW1yuPaIv8DiTVRrcg5/6uETNL5zvIoKflG1aifXVUZTlIroDehw4WygGA==
-
 "fuzzy-finder@file:packages/fuzzy-finder":
   version "1.14.3"
   dependencies:
-    atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
     minimatch "~3.0.3"
+    pulsar-select-list "^1.3.0"
     underscore-plus "^1.7.0"
     vscode-ripgrep "^1.2.5"
     wrench "^1.5"
@@ -5228,7 +5212,7 @@ getpass@^0.1.1:
 "git-diff@file:packages/git-diff":
   version "1.3.9"
   dependencies:
-    atom-select-list "^0.8.1"
+    pulsar-select-list "^1.3.0"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -5446,7 +5430,7 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0, 
 "grammar-selector@file:packages/grammar-selector":
   version "0.50.1"
   dependencies:
-    atom-select-list "^0.7.0"
+    pulsar-select-list "^1.3.0"
 
 grapheme-splitter@^1.0.2:
   version "1.0.4"
@@ -6670,7 +6654,7 @@ lighthouse-logger@^1.0.0:
 "line-ending-selector@file:packages/line-ending-selector":
   version "0.7.7"
   dependencies:
-    atom-select-list "^0.7.0"
+    pulsar-select-list "^1.3.0"
     underscore-plus "^1.7.0"
 
 line-top-index@0.3.1:
@@ -8177,6 +8161,14 @@ psl@^1.1.28:
   dependencies:
     punycode "^2.3.1"
 
+pulsar-select-list@^1.3.0, pulsar-select-list@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/pulsar-select-list/-/pulsar-select-list-1.4.0.tgz#d1f4f83786552ff6ca3ac6e2303c8d4b42dabbbf"
+  integrity sha512-+Cxj+EFVb5Ryaq4PA8pct5VGXMREy8SDbbFNMVEry8E99rurkY+wYRa5VQNOj5Tr6hnZg7ulkp4yuO9sW7qGAQ==
+  dependencies:
+    diacritic "^0.0.2"
+    etch "^0.14.0"
+
 "pulsar-updater@file:packages/pulsar-updater":
   version "1.0.0"
   dependencies:
@@ -9031,8 +9023,8 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   version "1.8.0"
   dependencies:
     async "~0.2.6"
-    atom-select-list "^0.7.0"
     pegjs "^0.10.0"
+    pulsar-select-list "^1.3.0"
     scoped-property-store "^0.17.0"
     season "^6.0.2"
     temp "~0.8.0"
@@ -9135,10 +9127,10 @@ spdx-license-ids@^3.0.0:
 "spell-check@file:packages/spell-check":
   version "0.77.1"
   dependencies:
-    atom-select-list "^0.7.0"
     debug "^4.1.1"
     multi-integer-range "^2.0.0"
     natural "^0.4.0"
+    pulsar-select-list "^1.3.0"
     spellchecker "https://github.com/pulsar-edit/node-spellchecker.git#da32e897e74691b7f43b70ddc0d171bad2d38208"
     spelling-manager "^1.1.0"
     underscore-plus "^1"
@@ -9396,9 +9388,9 @@ strip-json-comments@^3.1.0, strip-json-comments@^3.1.1:
 "styleguide@file:./packages/styleguide":
   version "0.49.12"
   dependencies:
-    atom-select-list "^0.7.0"
     dedent "^0.7.0"
     etch "0.9.0"
+    pulsar-select-list "^1.3.0"
 
 sumchecker@^3.0.1:
   version "3.0.1"
@@ -9471,10 +9463,9 @@ sylvester@^0.0.12:
 "symbols-view@file:./packages/symbols-view":
   version "1.0.0"
   dependencies:
-    atom-select-list "^0.8.1"
     fs-plus "^3.1.1"
-    fuzzaldrin "^2.1.0"
     murmurhash-js "^1.0.0"
+    pulsar-select-list "^1.3.0"
 
 tabbable@^5.1.5:
   version "5.3.3"
