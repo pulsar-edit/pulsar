@@ -472,5 +472,17 @@ describe('SubsequenceProvider', () => {
 
       atom.config.set('autocomplete-plus.includeCompletionsFromAllBuffers', false)
     })
+
+    it('handles bufferToSubsequenceMatches gracefully for an untracked buffer', async () => {
+      const nonWorkspaceEditor = new TextEditor()
+      nonWorkspaceEditor.setText('function anotherTestWord() {}')
+
+      // Directly call the internal method with an untracked buffer
+      const matches = await provider.bufferToSubsequenceMatches('another', '', nonWorkspaceEditor.getBuffer())
+
+      // Should return empty array instead of throwing
+      expect(Array.isArray(matches)).toBe(true)
+      expect(matches.length).toBe(0)
+    })
   })
 })
