@@ -80,7 +80,6 @@
     "focus-trap": "6.3.0",
     "fs-admin": "0.19.0",
     "fs-plus": "^3.1.1",
-    "fstream": "1.0.12",
     "fuzzy-finder": "file:packages/fuzzy-finder",
     "git-diff": "file:packages/git-diff",
     "github": "https://github.com/pulsar-edit/github#v0.37.0-pretranspiled",
