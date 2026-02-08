@@ -1,15 +1,13 @@
-'use babel';
-
-import { CompositeDisposable } from 'atom';
-import GitDiffView from './git-diff-view';
-import DiffListView from './diff-list-view';
+const { CompositeDisposable } = require('atom');
+const GitDiffView = require('./git-diff-view');
+const DiffListView = require('./diff-list-view');
 
 let diffListView = null;
 let diffViews = new Set();
 let subscriptions = null;
 
-export default {
-  activate(state) {
+module.exports = {
+  activate() {
     subscriptions = new CompositeDisposable();
 
     subscriptions.add(

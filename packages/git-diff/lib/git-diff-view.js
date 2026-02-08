@@ -1,7 +1,5 @@
-'use babel';
-
-import { CompositeDisposable } from 'atom';
-import repositoryForPath from './helpers';
+const { CompositeDisposable } = require('atom');
+const repositoryForPath = require('./helpers');
 
 const MAX_BUFFER_LENGTH_TO_DIFF = 2 * 1024 * 1024;
 
@@ -9,7 +7,8 @@ const MAX_BUFFER_LENGTH_TO_DIFF = 2 * 1024 * 1024;
  * @describe Handles per-editor event and repository subscriptions.
  * @param editor {Atom.TextEditor} - The editor this view will manage.
  */
-export default class GitDiffView {
+module.exports =
+class GitDiffView {
   constructor(editor, editorElement) {
     // These are the only members guaranteed to exist.
     this.subscriptions = new CompositeDisposable();

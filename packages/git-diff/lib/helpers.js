@@ -1,7 +1,6 @@
-'use babel';
-import { Directory } from 'atom';
+const { Directory } = require('atom');
 
-export default async function(goalPath) {
+module.exports = async function (goalPath) {
   if (goalPath) {
     return atom.project.repositoryForDirectory(new Directory(goalPath));
   }
