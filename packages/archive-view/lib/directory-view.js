@@ -1,12 +1,10 @@
-/** @babel */
+const {CompositeDisposable, Disposable} = require('atom')
+const FileView = require('./file-view')
+const getIconServices = require('./get-icon-services')
 
-import {CompositeDisposable, Disposable} from 'atom'
-
-import FileView from './file-view'
-import getIconServices from './get-icon-services'
-
-export default class DirectoryView {
-  constructor (parentView, indexInParentView, archivePath, entry) {
+module.exports =
+class DirectoryView {
+  constructor(parentView, indexInParentView, archivePath, entry) {
     this.disposables = new CompositeDisposable()
     this.entries = []
     this.parentView = parentView
@@ -53,7 +51,7 @@ export default class DirectoryView {
     this.element.appendChild(this.entriesTree)
   }
 
-  destroy () {
+  destroy() {
     if (this.iconDisposable) {
       this.iconDisposable.dispose()
       this.iconDisposable = null
@@ -67,7 +65,7 @@ export default class DirectoryView {
     this.element.remove()
   }
 
-  selectFileBeforeIndex (index) {
+  selectFileBeforeIndex(index) {
     for (let i = index - 1; i >= 0; i--) {
       const previousEntry = this.entries[i]
       if (previousEntry instanceof FileView) {
@@ -83,7 +81,7 @@ export default class DirectoryView {
     this.parentView.selectFileBeforeIndex(this.indexInParentView)
   }
 
-  selectFileAfterIndex (index) {
+  selectFileAfterIndex(index) {
     for (let i = index + 1; i < this.entries.length; i++) {
       const nextEntry = this.entries[i]
       if (nextEntry instanceof FileView) {
@@ -99,7 +97,7 @@ export default class DirectoryView {
     this.parentView.selectFileAfterIndex(this.indexInParentView)
   }
 
-  selectFirstFile () {
+  selectFirstFile() {
     for (const entry of this.entries) {
       if (entry instanceof FileView) {
         entry.select()
@@ -114,7 +112,7 @@ export default class DirectoryView {
     return false
   }
 
-  selectLastFile () {
+  selectLastFile() {
     for (var i = this.entries.length - 1; i >= 0; i--) {
       const entry = this.entries[i]
       if (entry instanceof FileView) {

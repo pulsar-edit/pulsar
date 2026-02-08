@@ -1,15 +1,13 @@
-/** @babel */
+const {CompositeDisposable, Disposable} = require('atom')
+const path = require('path')
+const fs = require('fs')
+const temp = require('temp')
+const archive = require('ls-archive')
+const getIconServices = require('./get-icon-services')
 
-import {CompositeDisposable, Disposable} from 'atom'
-import path from 'path'
-import fs from 'fs'
-import temp from 'temp'
-import archive from 'ls-archive'
-
-import getIconServices from './get-icon-services'
-
-export default class FileView {
-  constructor (parentView, indexInParentView, archivePath, entry) {
+module.exports =
+class FileView {
+  constructor(parentView, indexInParentView, archivePath, entry) {
     this.disposables = new CompositeDisposable()
     this.parentView = parentView
     this.indexInParentView = indexInParentView
@@ -53,20 +51,20 @@ export default class FileView {
     }))
   }
 
-  destroy () {
+  destroy() {
     this.disposables.dispose()
     this.element.remove()
   }
 
-  isSelected () {
+  isSelected() {
     return this.element.classList.contains('selected')
   }
 
-  logError (message, error) {
+  logError(message, error) {
     console.error(message, error.stack != null ? error.stack : error)
   }
 
-  openFile () {
+  openFile() {
     archive.readFile(this.archivePath, this.entry.getPath(), (error, contents) => {
       if (error != null) {
         this.logError(`Error reading: ${this.entry.getPath()} from ${this.archivePath}`, error)
@@ -96,7 +94,7 @@ export default class FileView {
     })
   }
 
-  select () {
+  select() {
     this.element.focus()
 
     const archiveEditorElement = this.element.closest('.archive-editor')

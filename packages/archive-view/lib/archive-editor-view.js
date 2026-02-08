@@ -1,16 +1,17 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import fs from 'fs'
-import humanize from 'humanize-plus'
-import archive from 'ls-archive'
-import {CompositeDisposable, Disposable, Emitter, File} from 'atom'
-import etch from 'etch'
+const fs = require('fs')
+const humanize = require('humanize-plus')
+const archive = require('ls-archive')
+const {CompositeDisposable, Disposable, Emitter, File} = require('atom')
+const etch = require('etch')
 
-import FileView from './file-view'
-import DirectoryView from './directory-view'
+const FileView = require('./file-view')
+const DirectoryView = require('./directory-view')
 
-export default class ArchiveEditorView {
+module.exports =
+class ArchiveEditorView {
   constructor (archivePath) {
     this.disposables = new CompositeDisposable()
     this.emitter = new Emitter()
