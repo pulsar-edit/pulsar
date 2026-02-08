@@ -1,14 +1,12 @@
-/** @babel */
-
-import os from 'os';
-import stackTrace from 'stack-trace';
-import path from 'path';
+const os = require('os');
+const stackTrace = require('stack-trace');
+const path = require('path');
 
 const API_KEY = '7ddca14cb60cbd1cd12d1b252473b076';
 const LIB_VERSION = require('../package.json')['version'];
 const StackTraceCache = new WeakMap();
 
-export default class Reporter {
+class Reporter {
   constructor(params = {}) {
     this.request = params.request || window.fetch;
     this.alwaysReport = params.hasOwnProperty('alwaysReport')
@@ -299,3 +297,4 @@ export default class Reporter {
 
 Reporter.API_KEY = API_KEY;
 Reporter.LIB_VERSION = LIB_VERSION;
+module.exports = Reporter;

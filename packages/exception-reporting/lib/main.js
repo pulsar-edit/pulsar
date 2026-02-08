@@ -1,6 +1,4 @@
-/** @babel */
-
-import { CompositeDisposable } from 'atom';
+const { CompositeDisposable } = require('atom');
 
 let reporter;
 
@@ -12,7 +10,7 @@ function getReporter() {
   return reporter;
 }
 
-export default {
+module.exports = {
   activate() {
     this.subscriptions = new CompositeDisposable();
 
