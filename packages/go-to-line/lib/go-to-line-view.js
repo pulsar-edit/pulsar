@@ -1,6 +1,4 @@
-'use babel';
-
-import { Point, TextEditor } from 'atom';
+const { Point, TextEditor } = require('atom');
 
 class GoToLineView {
   constructor() {
@@ -104,7 +102,7 @@ class GoToLineView {
   }
 }
 
-export default {
+module.exports = {
   activate() {
     return new GoToLineView();
   }
