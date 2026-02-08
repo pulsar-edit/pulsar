@@ -8,7 +8,7 @@ const CSON = require('season');
 
 const ServiceHub = require('service-hub');
 const Package = require('./package');
-const { getReleaseChannel } = require('../get-app-details.js');
+const { getReleaseChannel } = require('./get-app-details.js');
 const ThemePackage = require('./theme-package');
 const ModuleCache = require('./module-cache');
 const packageJSON = require('../package.json');
