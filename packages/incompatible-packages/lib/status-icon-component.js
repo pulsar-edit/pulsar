@@ -1,9 +1,10 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch';
+const etch = require('etch');
 
-export default class StatusIconComponent {
+module.exports =
+class StatusIconComponent {
   constructor({ count }) {
     this.count = count;
     etch.initialize(this);

@@ -1,14 +1,15 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch';
+const etch = require('etch');
 
-import VIEW_URI from './view-uri';
+const VIEW_URI = require('./view-uri');
 const REBUILDING = 'rebuilding';
 const REBUILD_FAILED = 'rebuild-failed';
 const REBUILD_SUCCEEDED = 'rebuild-succeeded';
 
-export default class IncompatiblePackagesComponent {
+module.exports =
+class IncompatiblePackagesComponent {
   constructor(packageManager) {
     this.rebuildStatuses = new Map();
     this.rebuildFailureOutputs = new Map();
