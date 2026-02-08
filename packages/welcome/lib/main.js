@@ -1,5 +1,3 @@
-/** @babel */
+const WelcomePackage = require('./welcome-package');
 
-import WelcomePackage from './welcome-package';
-
-export default new WelcomePackage();
+module.exports = new WelcomePackage();

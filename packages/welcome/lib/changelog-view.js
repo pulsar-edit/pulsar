@@ -1,9 +1,10 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch';
+const etch = require('etch');
 
-export default class ChangeLogView {
+module.exports =
+class ChangeLogView {
   constructor(props) {
     this.props = props;
     etch.initialize(this);

@@ -1,10 +1,11 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch';
-import path from 'path';
+const etch = require('etch');
+const path = require('path');
 
-export default class WelcomeView {
+module.exports =
+class WelcomeView {
   constructor(props) {
     this.props = props;
     this.brand = atom.branding.name;

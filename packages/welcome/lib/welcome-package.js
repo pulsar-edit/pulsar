@@ -1,6 +1,4 @@
-/** @babel */
-
-import { CompositeDisposable } from 'atom';
+const { CompositeDisposable } = require('atom');
 
 let WelcomeView, GuideView, ChangeLogView;
 
@@ -8,7 +6,8 @@ const WELCOME_URI = 'atom://welcome/welcome';
 const GUIDE_URI = 'atom://welcome/guide';
 const CHANGELOG_URI = 'atom://welcome/changelog';
 
-export default class WelcomePackage {
+module.exports =
+class WelcomePackage {
   async activate() {
     this.subscriptions = new CompositeDisposable();
 

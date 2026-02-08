@@ -1,9 +1,10 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch';
+const etch = require('etch');
 
-export default class GuideView {
+module.exports =
+class GuideView {
   constructor(props) {
     this.props = props;
     this.brand = atom.branding.name;
