@@ -1310,6 +1310,7 @@ describe('FuzzyFinder', () => {
 
             expect(atom.workspace.getActiveTextEditor()).toBe(editor1)
 
+            bufferView.cancel()
             await bufferView.toggle()
 
             expect(atom.workspace.panelForItem(bufferView).isVisible()).toBe(true)

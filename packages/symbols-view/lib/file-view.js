@@ -139,14 +139,18 @@ class FileView extends SymbolsView {
     if (quickJump && item) this.openTag(item);
   }
 
-  async didCancelSelection() {
-    this.abortController?.abort();
-    await this.cancel();
+  async cancel() {
+    await super.cancel();
     let editor = this.getEditor();
     if (editor && this.initialState) {
       this.deserializeEditorState(editor, this.initialState);
     }
     this.initialState = null;
+  }
+
+  async didCancelSelection() {
+    this.abortController?.abort();
+    await this.cancel();
   }
 
   didConfirmEmptySelection() {
