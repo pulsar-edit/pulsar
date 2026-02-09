@@ -465,6 +465,35 @@ describe('Provider API', () => {
       expect(editor.getText()).toEqual("kb${1:yyy}ye, world\n")
     })
 
+    it('applies the textEdit if it is present', async () => {
+      testProvider = {
+        scopeSelector: '.source.js',
+        filterSuggestions: true,
+        getSuggestions () {
+          return [
+            {
+              text: 'ohai',
+              textEdit: {
+                range: [[2, 0], [2, 5]],
+                // Our new text will insert a newline, thereby changing the
+                // buffer range of one of our `additionalTextEdits`.
+                newText: 'kbye\n'
+              }
+            },
+            { text: 'ca.ts' },
+            { text: '::dogs'}
+          ]
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
+      editor.insertText('\nlorem\nhello, world\ndolor\n')
+
+      await triggerAutocompletion()
+      await confirmChoice(0)
+
+      expect(editor.getText()).toEqual("\nlorem\nkbye\n, world\ndolor\n")
+    })
+
     it('applies additional text edits if they are specified on the suggestion, even if their original buffer ranges are invalidated', async () => {
       testProvider = {
         scopeSelector: '.source.js',
@@ -489,7 +518,7 @@ describe('Provider API', () => {
           ]
         }
       }
-      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.0.0', testProvider)
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
       editor.insertText('\nlorem\nhello, world\ndolor\n')
 
       await triggerAutocompletion()
