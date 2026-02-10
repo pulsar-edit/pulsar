@@ -401,7 +401,8 @@ class AutocompleteManager {
         results.push(suggestion)
       } else {
         const keepMatching = suggestion.ranges || suggestionPrefix[0].toLowerCase() === text[0].toLowerCase()
-        if (keepMatching && (score = atom.ui.fuzzyMatcher.score(text, suggestionPrefix)) > 0) {
+        let score = atom.ui.fuzzyMatcher.score(text, suggestionPrefix)
+        if (!!suggestion.textEdit || (keepMatching && score > 0)) {
           suggestion.score = score * suggestion.sortScore
           results.push(suggestion)
         }
