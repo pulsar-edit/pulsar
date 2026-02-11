@@ -1,6 +1,15 @@
 const fs = require('fs');
 const path = require('path');
-const { ipcRenderer } = require('electron');
+
+// Lazy-loaded: electron is not available when this module is loaded in a Task
+// child process (plain Node.js with ELECTRON_RUN_AS_NODE=1).
+let ipcRenderer = null;
+function getIpcRenderer() {
+  if (!ipcRenderer) {
+    ipcRenderer = require('electron').ipcRenderer;
+  }
+  return ipcRenderer;
+}
 
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
 const { NativeWatcherRegistry } = require('./native-watcher-registry');
@@ -205,7 +214,7 @@ class ParcelNativeWatcher extends NativeWatcher {
   // Re-subscribe with updated ignore patterns via IPC.
   async resubscribe() {
     const ignore = buildIgnoreGlobs(this.ignoredNames);
-    await ipcRenderer.invoke('watcher:update', {
+    await getIpcRenderer().invoke('watcher:update', {
       id: this.watcherId,
       options: { ignore }
     });
@@ -222,17 +231,17 @@ class ParcelNativeWatcher extends NativeWatcher {
         this.onError(new Error(error));
       }
     };
-    ipcRenderer.on('watcher:events', this._ipcHandler);
-    ipcRenderer.on('watcher:error', this._ipcErrorHandler);
+    getIpcRenderer().on('watcher:events', this._ipcHandler);
+    getIpcRenderer().on('watcher:error', this._ipcErrorHandler);
   }
 
   _removeIpcListeners() {
     if (this._ipcHandler) {
-      ipcRenderer.removeListener('watcher:events', this._ipcHandler);
+      getIpcRenderer().removeListener('watcher:events', this._ipcHandler);
       this._ipcHandler = null;
     }
     if (this._ipcErrorHandler) {
-      ipcRenderer.removeListener('watcher:error', this._ipcErrorHandler);
+      getIpcRenderer().removeListener('watcher:error', this._ipcErrorHandler);
       this._ipcErrorHandler = null;
     }
   }
@@ -241,7 +250,7 @@ class ParcelNativeWatcher extends NativeWatcher {
     const ignore = buildIgnoreGlobs(this.ignoredNames);
     this._setupIpcListeners();
     try {
-      await ipcRenderer.invoke('watcher:subscribe', {
+      await getIpcRenderer().invoke('watcher:subscribe', {
         id: this.watcherId,
         path: this.normalizedPath,
         options: { ignore }
@@ -255,7 +264,7 @@ class ParcelNativeWatcher extends NativeWatcher {
   async doStop() {
     this._removeIpcListeners();
     try {
-      await ipcRenderer.invoke('watcher:unsubscribe', {
+      await getIpcRenderer().invoke('watcher:unsubscribe', {
         id: this.watcherId
       });
     } catch (err) {
