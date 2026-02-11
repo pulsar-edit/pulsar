@@ -1,18 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const parcelWatcher = require('@parcel/watcher');
 
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const nsfw = require('nsfw');
 const { NativeWatcherRegistry } = require('./native-watcher-registry');
-
-// Private: Associate native watcher action flags with descriptive String
-// equivalents.
-const ACTION_MAP = new Map([
-  [nsfw.actions.MODIFIED, 'modified'],
-  [nsfw.actions.CREATED,  'created' ],
-  [nsfw.actions.DELETED,  'deleted' ],
-  [nsfw.actions.RENAMED,  'renamed' ]
-]);
 
 // Private: Possible states of a {NativeWatcher}.
 const WATCHER_STATE = {
@@ -168,45 +159,112 @@ class NativeWatcher {
   }
 }
 
-// Private: Implement a native watcher by translating events from an NSFW
-// watcher.
-class NSFWNativeWatcher extends NativeWatcher {
-  async doStart(_rootPath, _eventCallback, _errorCallback) {
-    const handler = events => {
-      this.onEvents(
-        events.map(event => {
-          const action =
-            ACTION_MAP.get(event.action) || `unexpected (${event.action})`;
-          const payload = { action };
+// Map @parcel/watcher event types to Pulsar's expected action names.
+const EVENT_MAP = {
+  create: 'created',
+  update: 'modified',
+  delete: 'deleted'
+};
 
-          if (event.file) {
-            payload.path = path.join(event.directory, event.file);
-          } else {
-            payload.oldPath = path.join(
-              event.directory,
-              typeof event.oldFile === 'undefined' ? '' : event.oldFile
-            );
-            payload.path = path.join(
-              event.directory,
-              typeof event.newFile === 'undefined' ? '' : event.newFile
-            );
-          }
+// Build ignore globs from the `core.ignoredNames` setting.
+function buildIgnoreGlobs(ignoredNames) {
+  if (!ignoredNames || !ignoredNames.length) return [];
+  let globs = [];
+  for (let name of ignoredNames) {
+    globs.push(name, `**/${name}`);
+  }
+  return globs;
+}
 
-          return payload;
-        })
-      );
-    };
+// Private: Implement a native watcher backed by `@parcel/watcher`, loaded
+// directly in-process. Uses the same async native APIs that VS Code relies on,
+// with no child process or worker thread needed.
+class ParcelNativeWatcher extends NativeWatcher {
+  constructor(...args) {
+    super(...args);
+    this.subscription = null;
 
-    this.watcher = await nsfw(this.normalizedPath, handler, {
-      debounceMS: 100,
-      errorCallback: this.onError
-    });
-
-    await this.watcher.start();
+    this.subs.add(
+      atom.config.observe('core.ignoredNames', (newValue) => {
+        this.setIgnoredNames(newValue);
+      })
+    );
   }
 
-  doStop() {
-    return this.watcher.stop();
+  dispose() {
+    super.dispose();
+    this.subs.dispose();
+  }
+
+  setIgnoredNames(ignoredNames) {
+    this.ignoredNames = ignoredNames;
+    if (this.state === WATCHER_STATE.RUNNING) {
+      this.resubscribe();
+    }
+  }
+
+  // Re-subscribe with updated ignore patterns.
+  async resubscribe() {
+    if (this.subscription) {
+      await this.subscription.unsubscribe();
+    }
+    let ignore = buildIgnoreGlobs(this.ignoredNames);
+    this.subscription = await parcelWatcher.subscribe(
+      this.normalizedPath,
+      (err, events) => this.handleEvents(err, events),
+      { ignore }
+    );
+  }
+
+  handleEvents(err, events) {
+    if (err) {
+      this.onError(err);
+      return;
+    }
+    let normalizedEvents = events.map(event => ({
+      action: EVENT_MAP[event.type] || `unexpected (${event.type})`,
+      path: event.path
+    }));
+    this.onEvents(normalizedEvents);
+  }
+
+  async doStart() {
+    let ignore = buildIgnoreGlobs(this.ignoredNames);
+
+    let isDir;
+    try {
+      isDir = fs.lstatSync(this.normalizedPath).isDirectory();
+    } catch (e) {
+      throw new Error(`Cannot watch path: ${this.normalizedPath} (${e.message})`);
+    }
+
+    if (isDir) {
+      this.subscription = await parcelWatcher.subscribe(
+        this.normalizedPath,
+        (err, events) => this.handleEvents(err, events),
+        { ignore }
+      );
+    } else {
+      // @parcel/watcher only watches directories. For individual files,
+      // fall back to Node's built-in fs.watch.
+      let controller = new AbortController();
+      fs.watch(
+        this.normalizedPath,
+        { signal: controller.signal },
+        (eventType) => {
+          let action = eventType === 'rename' ? 'deleted' : 'modified';
+          this.onEvents([{ action, path: this.normalizedPath }]);
+        }
+      );
+      this.subscription = { unsubscribe: () => controller.abort() };
+    }
+  }
+
+  async doStop() {
+    if (this.subscription) {
+      await this.subscription.unsubscribe();
+      this.subscription = null;
+    }
   }
 }
 
@@ -589,7 +647,7 @@ class PathWatcherManager {
     this.live = new Map();
 
     this.nativeRegistry = new NativeWatcherRegistry(normalizedPath => {
-      const nativeWatcher = new NSFWNativeWatcher(normalizedPath);
+      const nativeWatcher = new ParcelNativeWatcher(normalizedPath);
 
       this.live.set(normalizedPath, nativeWatcher);
       const sub = nativeWatcher.onWillStop(() => {

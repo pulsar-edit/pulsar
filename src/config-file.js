@@ -6,10 +6,7 @@ const CSON = require('season');
 const Path = require('path');
 const asyncQueue = require('async/queue');
 
-// TODO: if we ever decide to change path watchers on the future, this is kinda
-// duplicated because of https://github.com/pulsar-edit/pulsar/issues/76
-const nsfw = require('nsfw');
-const EVENT_TYPES = new Set([nsfw.actions.CREATED, nsfw.actions.MODIFIED, nsfw.actions.RENAMED]);
+const nodeFs = require('fs');
 
 module.exports = class ConfigFile {
   static at(path) {
@@ -74,15 +71,14 @@ module.exports = class ConfigFile {
     await this.reload();
 
     try {
-      const watcher = await nsfw(this.path, events => {
-        if (events.some(event => EVENT_TYPES.has(event.action))) {
+      const controller = new AbortController();
+      nodeFs.watch(this.path, { signal: controller.signal }, (eventType) => {
+        if (eventType === 'change' || eventType === 'rename') {
           this.requestLoad();
         }
-      })
-      await watcher.start();
-      return { dispose: () => watcher.stop() };
+      });
+      return new Disposable(() => controller.abort());
     } catch (error) {
-      //TODO_PULSAR: Find out why the atom global variable isn't available at this point
       this.emitter.emit(
         'did-error',
         dedent`
@@ -93,7 +89,7 @@ module.exports = class ConfigFile {
         See [this document][watches] for more info.
 
         [watches]:https://pulsar-edit.dev/docs/atom-archive/hacking-atom/#typeerror-unable-to-watch-path
-      `//TODO: Update the above to the pulsar docs if we choose to add this
+      `
       );
       return new Disposable();
     }

@@ -590,5 +590,83 @@ describe('watchPath', function () {
         parentWatcherChanges
       ]);
     });
+
+    // Regression tests for https://github.com/pulsar-edit/pulsar/issues/1402
+    // Cyclic symlinks (e.g. `ln -s . a`) caused NSFW's inotify-based watcher
+    // to recurse infinitely, consuming 100% CPU. With @parcel/watcher, these
+    // should be handled gracefully.
+    describe('with cyclic symlinks', function () {
+      const symlinkType = process.platform === 'win32' ? 'junction' : 'dir';
+
+      it('starts a watcher on a directory with one cyclic symlink without hanging', async function () {
+        const rootDir = await tempMkdir('atom-cyclic-test-').then(realpath);
+
+        // Create a symlink that points back to the root: rootDir/cycle -> rootDir
+        await symlink(rootDir, path.join(rootDir, 'cycle'), symlinkType);
+
+        const TIMEOUT = 10000;
+        const watcher = await Promise.race([
+          watchPath(rootDir, {}, () => {}),
+          wait(TIMEOUT).then(() => {
+            throw new Error(`watchPath did not resolve within ${TIMEOUT}ms — likely hung on cyclic symlink`);
+          })
+        ]);
+        disposables.add(watcher);
+        expect(watcher.constructor.name).toBe('PathWatcher');
+      });
+
+      it('starts a watcher on a directory with multiple cyclic symlinks without hanging', async function () {
+        const rootDir = await tempMkdir('atom-cyclic-test-').then(realpath);
+
+        // Create two symlinks that both point back to the root.
+        // This is the exact scenario from issue #1402: with NSFW this caused
+        // O(2^N) recursive scanning because the inode cycle detection was
+        // broken for 2+ symlinks.
+        await symlink(rootDir, path.join(rootDir, 'cycle-a'), symlinkType);
+        await symlink(rootDir, path.join(rootDir, 'cycle-b'), symlinkType);
+
+        const TIMEOUT = 10000;
+        const watcher = await Promise.race([
+          watchPath(rootDir, {}, () => {}),
+          wait(TIMEOUT).then(() => {
+            throw new Error(`watchPath did not resolve within ${TIMEOUT}ms — likely hung on cyclic symlinks`);
+          })
+        ]);
+        disposables.add(watcher);
+        expect(watcher.constructor.name).toBe('PathWatcher');
+      });
+
+      it('still detects file changes in a directory containing cyclic symlinks', async function () {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-cyclic-test-').then(realpath);
+        const testFile = path.join(rootDir, 'test.txt');
+
+        // Create cyclic symlinks.
+        await symlink(rootDir, path.join(rootDir, 'cycle-a'), symlinkType);
+        await symlink(rootDir, path.join(rootDir, 'cycle-b'), symlinkType);
+
+        const TIMEOUT = 10000;
+        const watcher = await Promise.race([
+          watchPath(rootDir, {}, () => {}),
+          wait(TIMEOUT).then(() => {
+            throw new Error(`watchPath did not resolve within ${TIMEOUT}ms`);
+          })
+        ]);
+        disposables.add(watcher);
+
+        // Verify that file events are still detected despite the cycles.
+        const changes = waitForChanges(watcher, testFile);
+        await writeFile(testFile, 'hello\n', { encoding: 'utf8' });
+        const events = await Promise.race([
+          changes,
+          wait(TIMEOUT).then(() => {
+            throw new Error(`Did not receive file change event within ${TIMEOUT}ms`);
+          })
+        ]);
+
+        expect(events.length).toBeGreaterThan(0);
+        expect(events[0].path).toBe(testFile);
+      });
+    });
   });
 });
