@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const parcelWatcher = require('@parcel/watcher');
+const { ipcRenderer } = require('electron');
 
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
 const { NativeWatcherRegistry } = require('./native-watcher-registry');
@@ -159,13 +159,6 @@ class NativeWatcher {
   }
 }
 
-// Map @parcel/watcher event types to Pulsar's expected action names.
-const EVENT_MAP = {
-  create: 'created',
-  update: 'modified',
-  delete: 'deleted'
-};
-
 // Build ignore globs from the `core.ignoredNames` setting.
 function buildIgnoreGlobs(ignoredNames) {
   if (!ignoredNames || !ignoredNames.length) return [];
@@ -176,13 +169,18 @@ function buildIgnoreGlobs(ignoredNames) {
   return globs;
 }
 
-// Private: Implement a native watcher backed by `@parcel/watcher`, loaded
-// directly in-process. Uses the same async native APIs that VS Code relies on,
-// with no child process or worker thread needed.
+let nextWatcherId = 0;
+
+// Private: Implement a native watcher that delegates to @parcel/watcher running
+// in the main process. Communication happens via Electron IPC, which provides
+// crash isolation and avoids macOS kqueue issues entirely (the main process
+// watches directories via @parcel/watcher which uses FSEvents on macOS).
 class ParcelNativeWatcher extends NativeWatcher {
   constructor(...args) {
     super(...args);
-    this.subscription = null;
+    this.watcherId = `w-${process.pid}-${Date.now()}-${nextWatcherId++}`;
+    this._ipcHandler = null;
+    this._ipcErrorHandler = null;
 
     this.subs.add(
       atom.config.observe('core.ignoredNames', (newValue) => {
@@ -192,6 +190,7 @@ class ParcelNativeWatcher extends NativeWatcher {
   }
 
   dispose() {
+    this._removeIpcListeners();
     super.dispose();
     this.subs.dispose();
   }
@@ -203,67 +202,64 @@ class ParcelNativeWatcher extends NativeWatcher {
     }
   }
 
-  // Re-subscribe with updated ignore patterns.
+  // Re-subscribe with updated ignore patterns via IPC.
   async resubscribe() {
-    if (this.subscription) {
-      await this.subscription.unsubscribe();
-    }
-    let ignore = buildIgnoreGlobs(this.ignoredNames);
-    this.subscription = await parcelWatcher.subscribe(
-      this.normalizedPath,
-      (err, events) => this.handleEvents(err, events),
-      { ignore }
-    );
+    const ignore = buildIgnoreGlobs(this.ignoredNames);
+    await ipcRenderer.invoke('watcher:update', {
+      id: this.watcherId,
+      options: { ignore }
+    });
   }
 
-  handleEvents(err, events) {
-    if (err) {
-      this.onError(err);
-      return;
+  _setupIpcListeners() {
+    this._ipcHandler = (_event, { id, events }) => {
+      if (id === this.watcherId) {
+        this.onEvents(events);
+      }
+    };
+    this._ipcErrorHandler = (_event, { id, error }) => {
+      if (id === this.watcherId) {
+        this.onError(new Error(error));
+      }
+    };
+    ipcRenderer.on('watcher:events', this._ipcHandler);
+    ipcRenderer.on('watcher:error', this._ipcErrorHandler);
+  }
+
+  _removeIpcListeners() {
+    if (this._ipcHandler) {
+      ipcRenderer.removeListener('watcher:events', this._ipcHandler);
+      this._ipcHandler = null;
     }
-    let normalizedEvents = events.map(event => ({
-      action: EVENT_MAP[event.type] || `unexpected (${event.type})`,
-      path: event.path
-    }));
-    this.onEvents(normalizedEvents);
+    if (this._ipcErrorHandler) {
+      ipcRenderer.removeListener('watcher:error', this._ipcErrorHandler);
+      this._ipcErrorHandler = null;
+    }
   }
 
   async doStart() {
-    let ignore = buildIgnoreGlobs(this.ignoredNames);
-
-    let isDir;
+    const ignore = buildIgnoreGlobs(this.ignoredNames);
+    this._setupIpcListeners();
     try {
-      isDir = fs.lstatSync(this.normalizedPath).isDirectory();
-    } catch (e) {
-      throw new Error(`Cannot watch path: ${this.normalizedPath} (${e.message})`);
-    }
-
-    if (isDir) {
-      this.subscription = await parcelWatcher.subscribe(
-        this.normalizedPath,
-        (err, events) => this.handleEvents(err, events),
-        { ignore }
-      );
-    } else {
-      // @parcel/watcher only watches directories. For individual files,
-      // fall back to Node's built-in fs.watch.
-      let controller = new AbortController();
-      fs.watch(
-        this.normalizedPath,
-        { signal: controller.signal },
-        (eventType) => {
-          let action = eventType === 'rename' ? 'deleted' : 'modified';
-          this.onEvents([{ action, path: this.normalizedPath }]);
-        }
-      );
-      this.subscription = { unsubscribe: () => controller.abort() };
+      await ipcRenderer.invoke('watcher:subscribe', {
+        id: this.watcherId,
+        path: this.normalizedPath,
+        options: { ignore }
+      });
+    } catch (err) {
+      this._removeIpcListeners();
+      throw err;
     }
   }
 
   async doStop() {
-    if (this.subscription) {
-      await this.subscription.unsubscribe();
-      this.subscription = null;
+    this._removeIpcListeners();
+    try {
+      await ipcRenderer.invoke('watcher:unsubscribe', {
+        id: this.watcherId
+      });
+    } catch (err) {
+      // Best effort — main process may have already cleaned up.
     }
   }
 }

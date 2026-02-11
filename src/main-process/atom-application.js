@@ -235,6 +235,9 @@ module.exports = class AtomApplication extends EventEmitter {
     );
     this.storageFolder = new StorageFolder(process.env.ATOM_HOME);
 
+    const WatcherService = require('./watcher-service');
+    this.watcherService = new WatcherService();
+
     this.disposable = new CompositeDisposable();
     this.handleEvents();
 
@@ -249,6 +252,8 @@ module.exports = class AtomApplication extends EventEmitter {
     StartupTime.addMarker('main-process:atom-application:initialize:start');
 
     global.atomApplication = this;
+
+    this.watcherService.initialize();
 
     this.applicationMenu = new ApplicationMenu(
       this.version
@@ -281,6 +286,7 @@ module.exports = class AtomApplication extends EventEmitter {
       return window.closedPromise;
     });
     await Promise.all(windowsClosePromises);
+    await this.watcherService.dispose();
     this.disposable.dispose();
   }
 
@@ -451,11 +457,21 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       window.browserWindow.on('focus', focusHandler);
       window.browserWindow.on('blur', blurHandler);
+      const webContentsId = window.browserWindow.webContents.id;
       window.browserWindow.once('closed', () => {
         this.windowStack.removeWindow(window);
         window.browserWindow.removeListener('focus', focusHandler);
         window.browserWindow.removeListener('blur', blurHandler);
         scrollbarStyleChangeDisposable.dispose();
+        this.watcherService.cleanupForWebContents(webContentsId);
+      });
+      // Clean up stale watcher subscriptions when the renderer navigates
+      // (e.g. window reload). This must fire BEFORE the new page's JS runs,
+      // otherwise the cleanup would race with newly created subscriptions.
+      // did-start-navigation fires at the start of navigation, before the old
+      // page is unloaded and before the new page's Node.js modules execute.
+      window.browserWindow.webContents.on('did-start-navigation', () => {
+        this.watcherService.cleanupForWebContents(webContentsId);
       });
       window.browserWindow.webContents.once('did-finish-load', blurHandler);
       this.saveCurrentWindowOptions(false);

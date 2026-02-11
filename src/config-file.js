@@ -72,8 +72,13 @@ module.exports = class ConfigFile {
 
     try {
       const controller = new AbortController();
-      nodeFs.watch(this.path, { signal: controller.signal }, (eventType) => {
-        if (eventType === 'change' || eventType === 'rename') {
+      const dir = Path.dirname(this.path);
+      const base = Path.basename(this.path);
+      // Watch the parent directory instead of the file directly. On macOS,
+      // fs.watch on a file uses kqueue which is unreliable; watching a
+      // directory uses FSEvents which is robust.
+      nodeFs.watch(dir, { signal: controller.signal }, (eventType, filename) => {
+        if (filename === base && (eventType === 'change' || eventType === 'rename')) {
           this.requestLoad();
         }
       });
