@@ -208,4 +208,6 @@ process.on('uncaughtException', (error) => {
 
 process.title = `Pulsar file watcher worker (NSFW) [PID: ${process.pid}]`;
 
+process.on('disconnect', () => process.exit(0));
+
 module.exports = run;

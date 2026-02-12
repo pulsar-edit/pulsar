@@ -66,20 +66,13 @@ module.exports = class Task {
   //
   // * `taskPath` The {String} path to the CoffeeScript/JavaScript file that
   //   exports a single {Function} to execute.
-  constructor(taskPath) {
+  constructor(taskPath, { autoStart = true } = {}) {
     this.emitter = new Emitter();
-    const compileCachePath = require('./compile-cache').getCacheDirectory();
-    taskPath = require.resolve(taskPath);
-    const env = Object.assign({}, process.env, { userAgent: navigator.userAgent });
+    this.autoStart = autoStart;
+    this.taskPath = require.resolve(taskPath);
 
-    if (atom.unloading) {
-      this.childProcess = null;
-    } else {
-      this.childProcess = ChildProcess.fork(
-        require.resolve('./task-bootstrap'),
-        [compileCachePath, taskPath],
-        { env, silent: true, windowsHide: true }
-      );
+    if (autoStart) {
+      this.createChildProcess();
     }
 
     this.on("task:log", (...args) => console.log(...args));
@@ -96,6 +89,20 @@ module.exports = class Task {
         this.callback(...args)
       }
     });
+  }
+
+  createChildProcess () {
+    const compileCachePath = require('./compile-cache').getCacheDirectory();
+    const env = Object.assign({}, process.env, { userAgent: navigator.userAgent });
+    if (window.atom?.unloading) {
+      this.childProcess = null;
+    } else {
+      this.childProcess = ChildProcess.fork(
+        require.resolve('./task-bootstrap'),
+        [compileCachePath, this.taskPath],
+        { env, silent: true, windowsHide: true }
+      );
+    }
     this.handleEvents();
   }
 
@@ -130,10 +137,13 @@ module.exports = class Task {
     // Don't spawn any new tasks during shutdown.
     if (atom.unloading) return;
     const [callback] = args.splice(-1);
-    if (this.childProcess == null) {
-      throw new Error('Cannot start terminated process');
+    if (this.autoStart && !this.childProcess) {
+      if (this.childProcess == null) {
+        throw new Error('Cannot start terminated process');
+      }
+    } else if (!this.autoStart && !this.childProcess) {
+      this.createChildProcess();
     }
-    this.handleEvents();
     if (_.isFunction(callback)) {
       this.callback = callback;
     } else {

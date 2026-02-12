@@ -177,7 +177,7 @@ class NativeWatcher {
 // been fully tracked down. That's fine, though; we can run it in its own
 // long-running task, much like VS Code does.
 class ParcelWatcherNativeWatcher extends NativeWatcher {
-  static task = new Task(require.resolve('./parcel-watcher-worker.js'));
+  static task = new Task(require.resolve('./parcel-watcher-worker.js'), { autoStart: false });
 
   // Whether the task has been started.
   static started = false;
@@ -204,7 +204,7 @@ class ParcelWatcherNativeWatcher extends NativeWatcher {
       this.initialized = false;
       // Once a task is terminated, it cannot be started again. We have to
       // replace it with a new instance.
-      this.task = new Task(require.resolve('./parcel-watcher-worker.js'));
+      this.task = new Task(require.resolve('./parcel-watcher-worker.js'), { autoStart: false });
       this.PROMISE_META.clear();
       this.initialize();
     }
@@ -272,8 +272,8 @@ class ParcelWatcherNativeWatcher extends NativeWatcher {
       meta.promise = promise;
       this.PROMISE_META.set('self:start', meta);
     }
-    await meta.promise;
     this.started = true;
+    await meta.promise;
   }
 
   static async sendEvent(event, args) {
@@ -371,7 +371,7 @@ class ParcelWatcherNativeWatcher extends NativeWatcher {
 
 // A file-watcher implementation that uses `nsfw`. Runs in a separate process.
 class NSFWNativeWatcher extends NativeWatcher {
-  static task = new Task(require.resolve('./nsfw-watcher-worker.js'));
+  static task = new Task(require.resolve('./nsfw-watcher-worker.js'), { autoStart: false });
 
   // Whether the task has been started.
   static started = false;
@@ -398,7 +398,7 @@ class NSFWNativeWatcher extends NativeWatcher {
       this.initialized = false;
       // Once a task is terminated, it cannot be started again. We have to
       // replace it with a new instance.
-      this.task = new Task(require.resolve('./nsfw-watcher-worker.js'));
+      this.task = new Task(require.resolve('./nsfw-watcher-worker.js'), { autoStart: false });
       this.PROMISE_META.clear();
       this.initialize();
     }
@@ -466,8 +466,8 @@ class NSFWNativeWatcher extends NativeWatcher {
       meta.promise = promise;
       this.PROMISE_META.set('self:start', meta);
     }
-    await meta.promise;
     this.started = true;
+    await meta.promise;
   }
 
   static async sendEvent(event, args) {
