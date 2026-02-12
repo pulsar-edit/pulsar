@@ -129,6 +129,22 @@ describe('Python folding (modern Tree-sitter)', () => {
       except NameError:…
       except: # Foo…
     `);
+
+    await setTextAndWaitForUpdate(dedent`
+      if(True):
+        # This comment should disappear
+        pass # And this one
+        # And even this one
+      elif(False):
+        pass
+    `);
+
+    editor.foldBufferRow(0);
+    expect(getDisplayText(editor)).toEqual(dedent`
+      if(True):…
+      elif(False):
+        pass
+    `);
   });
 
 });
