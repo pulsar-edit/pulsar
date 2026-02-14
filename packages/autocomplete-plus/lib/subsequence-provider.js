@@ -133,7 +133,12 @@ class SubsequenceProvider {
   }
 
   bufferToSubsequenceMatches (prefix, additionalWordCharacters, buffer) {
-    const position = this.watchedBuffers.get(buffer).getCursorBufferPosition()
+    const editor = this.watchedBuffers.get(buffer)
+    // Guard against buffers that aren't in watchedBuffers (e.g., non-workspace editors)
+    if (!editor) {
+      return Promise.resolve([])
+    }
+    const position = editor.getCursorBufferPosition()
     const searchRange = this.clampedRange(
       this.maxSearchRowDelta,
       position.row,
@@ -160,9 +165,13 @@ class SubsequenceProvider {
       return
     }
 
-    const buffers = this.includeCompletionsFromAllBuffers
+    // Get buffers to search for completions
+    // Filter to only include buffers that are in watchedBuffers to avoid errors
+    // with non-workspace editors (like watch pane editors)
+    const requestedBuffers = this.includeCompletionsFromAllBuffers
       ? Array.from(this.watchedBuffers.keys())
       : [editor.getBuffer()]
+    const buffers = requestedBuffers.filter(buffer => this.watchedBuffers.has(buffer))
 
     const currentEditorBuffer = editor.getBuffer()
 
@@ -181,6 +190,7 @@ class SubsequenceProvider {
 
     const subsequenceMatchToType = (match) => {
       const editor = this.watchedBuffers.get(match.buffer)
+      if (!editor) return null
       const scopeDescriptor = editor.scopeDescriptorForBufferPosition(match.positions[0])
       return this.providerConfig.scopeDescriptorToType(scopeDescriptor)
     }
