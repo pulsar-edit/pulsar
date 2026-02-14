@@ -290,7 +290,7 @@ module.exports = class CommandRegistry {
   //
   // * `target` The DOM node at which to start bubbling the command event.
   // * `commandName` {String} indicating the name of the command to dispatch.
-  // * `detail` {any} Any value that will be assigned to the event's `.detail` property. Pass an object with multiple properties if you need multiple command arguments.
+  // * `detail` Any value that will be assigned to the event's `.detail` property. Pass an object with multiple properties if you need multiple command arguments.
   dispatch(target, commandName, detail) {
     const event = new CustomEvent(commandName, { bubbles: true, detail });
     Object.defineProperty(event, 'target', { value: target });
