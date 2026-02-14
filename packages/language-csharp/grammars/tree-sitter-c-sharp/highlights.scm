@@ -168,6 +168,10 @@
 (enum_member_declaration
 	(identifier) @variable.other.property.cs)
 
+; The "X" in `ptr->X`.
+(member_access_expression
+	name: (identifier) @variable.other.property.cs)
+
 ; KEYWORDS
 
 [
@@ -201,12 +205,13 @@
 	"when"
 	"out"
 	"ref"
-	; "from"
 	"where"
 	"select"
 	"record"
 	"init"
+	"unsafe"
 	"with"
+	"stackalloc"
 ] @keyword.control._TYPE_.cs
 
 (
@@ -219,8 +224,30 @@
 "=" @keyword.operator.assignment.cs
 
 "." @keyword.operator.accessor.cs
+"->" @keyword.operator.accessor.member.cs
+
+; TODO: `tree-sitter-csharp` doesn't seem to handle this properly; the `?` and
+; `.` are divided into separate tokens.
+;
+; In the meantime, both `?` and `.` will probably be highlighted as individual
+; characters identically to how they'd be highlighted as a unit, so we can live
+; with this for now.
+; "?." @keyword.operator.optional-chain.cs
 
 "?" @keyword.operator.optional.cs
+".." @keyword.operator.range.cs
+
+(prefix_unary_expression
+	["&" "^" "+" "-"] @keyword.operator.unary.cs)
+
+(prefix_unary_expression
+	["++" "--"] @keyword.operator.unary.increment.cs)
+
+(prefix_unary_expression
+	["~"] @keyword.operator.unary.bitwise.cs)
+
+(postfix_unary_expression
+	["!" @keyword.operator.null-forgiving.cs])
 
 [
 	"sizeof"
@@ -237,6 +264,24 @@
 	"%"
 ] @keyword.operator.arithmetic.cs
 
+["++" "--"] @keyword.operator.increment.cs
+
+["&&" "||" "??"] @keyword.operator.logical.cs
+
+("!" @keyword.operator.unary.logical.cs
+	(#set! capture.shy))
+
+([
+	"&"
+	"|"
+	"^"
+	"~"
+	"<<"
+	">>"
+	">>>"
+] @keyword.operator.bitwise.cs
+	(#set! capture.shy))
+
 [
 	"+="
 	"-="
@@ -244,6 +289,15 @@
 	"/="
 	"%="
 ] @keyword.operator.arithmetic.compound.cs
+
+[
+	"&="
+	"|="
+	"^="
+	"<<="
+	">>="
+	">>>="
+] @keyword.operator.bitwise.compound.cs
 
 (destructor_declaration "~" @keyword.operator.destructor.cs)
 
@@ -255,13 +309,27 @@
 
 "=>" @punctuation.other.arrow.cs
 
-("(" @punctuation.definition.begin.bracket.round.cs
+("[" @punctuation.definition.begin.bracket.square.cs
+	(#set! capture.shy))
+("]" @punctuation.definition.end.bracket.square.cs
 	(#set! capture.shy))
 
+("{" @punctuation.definition.begin.bracket.curly.cs
+	(#set! capture.shy))
+("}" @punctuation.definition.end.bracket.curly.cs
+	(#set! capture.shy))
+
+("(" @punctuation.definition.begin.bracket.round.cs
+	(#set! capture.shy))
 (")" @punctuation.definition.end.bracket.round.cs
 	(#set! capture.shy))
 
 (type_parameter_list
+	"<" @punctuation.definition.parameters.begin.bracket.angle.cs
+	">" @punctuation.definition.parameters.end.bracket.angle.cs
+)
+
+(type_argument_list
 	"<" @punctuation.definition.parameters.begin.bracket.angle.cs
 	">" @punctuation.definition.parameters.end.bracket.angle.cs
 )
