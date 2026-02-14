@@ -280,8 +280,8 @@ module.exports = class CommandRegistry {
   // Public: Simulate the dispatch of a command on a DOM node.
   //
   // This is useful for passing arguments to a command, as keymaps currently do not
-  // support arguments; for example add a new argless command that calls a another
-  // with arguments, and map the new command to a key binding.
+  // support arguments; for example, add a new command with no arguments that
+  // dispatches another command with arguments, and map the new command to a key binding.
   //
   // This can be useful for testing when you want to simulate the invocation of a
   // command on a detached DOM node. Otherwise, the DOM node in question needs to
