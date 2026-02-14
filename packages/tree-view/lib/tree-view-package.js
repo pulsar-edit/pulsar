@@ -23,6 +23,7 @@ class TreeViewPackage {
     const treeView = this.getTreeViewInstance()
     const showOnAttach = !atom.workspace.getActivePaneItem()
     this.treeViewOpenPromise = atom.workspace.open(treeView, {
+      searchAllPanes: true,
       activatePane: showOnAttach,
       activateItem: showOnAttach
     })
