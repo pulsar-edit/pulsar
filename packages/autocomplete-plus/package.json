@@ -125,6 +125,13 @@
       "default": false,
       "order": 9
     },
+    "firstCharacterMustMatch": {
+      "title": "Enforce First-Character Match",
+      "description": "When this is enabled, the first character of the suggestion option must match the first character the user types, even when using fuzzy searching.",
+      "type": "boolean",
+      "default": false,
+      "order": 9.5
+    },
     "minimumWordLength": {
       "description": "Only autocomplete when you've typed at least this many characters. Note: May not affect external providers.",
       "type": "integer",

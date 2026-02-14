@@ -251,7 +251,7 @@ describe('Provider API', () => {
             return [
               {text: 'ohai'},
               {text: 'hai'},
-              {text: 'okwow', replacementPrefix: 'k'},
+              {text: 'okwow', replacementPrefix: 'z'},
               {text: 'ok', replacementPrefix: 'nope'},
               {text: '::cats', replacementPrefix: '::c'},
               {text: 'something', replacementPrefix: 'sm'}
@@ -266,7 +266,8 @@ describe('Provider API', () => {
         expect(getSuggestions()).toEqual([
           {text: '::cats'},
           {text: 'hai'},
-          {text: 'something'}
+          {text: 'something'},
+          {text: 'ohai'}
         ])
       })
 
@@ -337,14 +338,51 @@ describe('Provider API', () => {
       expect(editor.getText()).toEqual("ohai, ohai\n")
     })
 
-    it('ignores `prefix` if `range` is present', async () => {
+    describe('when `firstCharacterMustMatch` is `true`', () => {
+      beforeEach(() => {
+        atom.config.set('autocomplete-plus.firstCharacterMustMatch', true);
+      });
+
+      it('ignores `prefix` if `ranges` is present', async () => {
+        testProvider = {
+          scopeSelector: '.source.js',
+          filterSuggestions: true,
+          getSuggestions (options) {
+            return [
+              {
+                text: 'notmatch/foololohairange',
+                ranges: [
+                  [[0, 0], [0, 5]]
+                ]
+              },
+              {text: 'notmatch/foololohaiprefix'},
+              {text: 'foololohaiprefix2'}
+            ]
+          }
+        }
+        registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.0.0', testProvider)
+        editor.insertText('foololohai')
+        await triggerAutocompletion()
+
+        // Because we're pruning results whose first characters do not match
+        // the first character of the prefix, both `notmatch/` options would
+        // ordinarily be removed — except one of them has `ranges` defined, so
+        // it's wrong to prune it because it is operating on an arbitrary
+        // buffer range.
+        expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/notmatch\/foololohairange/)
+        expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/foololohaiprefix2/)
+        expect(document.querySelector('autocomplete-suggestion-list').innerText).toNotMatch(/notmatch\/foololohaiprefix/)
+      })
+    });
+
+    it('does not remove a non-matching suggestion if `ranges` is present', async () => {
       testProvider = {
         scopeSelector: '.source.js',
         filterSuggestions: true,
         getSuggestions (options) {
           return [
             {
-              text: 'notmatch/foololohairange',
+              text: 'notmatch/anything',
               ranges: [
                 [[0, 0], [0, 5]]
               ]
@@ -357,9 +395,16 @@ describe('Provider API', () => {
       registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.0.0', testProvider)
       editor.insertText('foololohai')
       await triggerAutocompletion()
-      expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/notmatch\/foololohairange/)
+
+      // Because we are applying true fuzzy search to all suggestions, only
+      // those that score 0 will be removed. Hence `notmatch/foololohaiprefix`
+      // remains even though the matching prefix does not start the string.
+      //
+      // `notmatch/anything` also remains because it specifies `ranges`,
+      // meaning that it operates on an arbitrary buffer range.
+      expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/notmatch\/anything/)
       expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/foololohaiprefix2/)
-      expect(document.querySelector('autocomplete-suggestion-list').innerText).toNotMatch(/notmatch\/foololohaiprefix/)
+      expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/notmatch\/foololohaiprefix/)
     })
   })
 
