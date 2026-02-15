@@ -7,7 +7,6 @@ const Workspace = require('../src/workspace');
 const Project = require('../src/project');
 const platform = require('./helpers/platform');
 const _ = require('underscore-plus');
-const fstream = require('fstream');
 const fs = require('fs-plus');
 const AtomEnvironment = require('../src/atom-environment');
 const { conditionPromise, timeoutPromise } = require('./helpers/async-spec-helpers');
@@ -2614,13 +2613,7 @@ describe('Workspace', () => {
             );
             projectPath = path.join(temp.mkdirSync('atom'));
 
-            const writerStream = fstream.Writer(projectPath);
-            fstream.Reader(sourceProjectPath).pipe(writerStream);
-
-            await new Promise(resolve => {
-              writerStream.on('close', resolve);
-              writerStream.on('error', resolve);
-            });
+            fs.cpSync(sourceProjectPath, projectPath, { recursive: true });
 
             fs.renameSync(
               path.join(projectPath, 'git.git'),
@@ -2689,13 +2682,7 @@ describe('Workspace', () => {
             );
             projectPath = path.join(temp.mkdirSync('atom'));
 
-            const writerStream = fstream.Writer(projectPath);
-            fstream.Reader(sourceProjectPath).pipe(writerStream);
-
-            await new Promise(resolve => {
-              writerStream.on('close', resolve);
-              writerStream.on('error', resolve);
-            });
+            fs.cpSync(sourceProjectPath, projectPath, { recursive: true });
 
             fs.symlinkSync(
               path.join(__dirname, 'fixtures', 'dir', 'b'),
@@ -2744,13 +2731,7 @@ describe('Workspace', () => {
             );
             projectPath = path.join(temp.mkdirSync('atom'));
 
-            const writerStream = fstream.Writer(projectPath);
-            fstream.Reader(sourceProjectPath).pipe(writerStream);
-
-            await new Promise(resolve => {
-              writerStream.on('close', resolve);
-              writerStream.on('error', resolve);
-            });
+            fs.cpSync(sourceProjectPath, projectPath, { recursive: true });
 
             // Note: This won't create a hidden file on Windows, in order to more
             // accurately test this behaviour there, we should either use a package
