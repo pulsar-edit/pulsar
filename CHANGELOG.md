@@ -45,7 +45,7 @@ For more information, read [Pulsar on Electron 30: what it means for you](https:
 - Bump CI runners to `macos-14` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1389)
 - Fix text-editor-component annoying bug [@Psychosynthesis](https://github.com/pulsar-edit/pulsar/pull/1336)
 - Migrate to python3 style super for new class snippets in language-python [@bridgetjs](https://github.com/pulsar-edit/pulsar/pull/1385)
-- Update to Electron 30 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1367)
+- Update to Electron 30 [@mauricioszabo and @savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1367)
 - Cirrus: Update Rolling upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1382)
 - [find-and-replace] Prevent addition of project results from editors whose paths are not matched by the current path inclusions [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1380)
 - Tree-sitter rolling fixes, 1.130.0 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1320)
