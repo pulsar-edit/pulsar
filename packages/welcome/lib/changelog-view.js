@@ -50,19 +50,47 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                <code>autocomplete-plus</code> can now make other text edits to the buffer when a suggestion is accepted - for instance, adding an <code>import</code> for that suggestion.
+                Update Electron to version 30!
+                <ul>
+                  <li>Node is now version 20.11.1!</li>
+                  <li>Chromium is now version 124!</li>
+                  <li>This means better performance, better Node library compatibility, and ability for community packages to use newer features of Chromium.</li>
+                  <li>It should also vastly improve the Pulsar experience for Linux users in Wayland environments.</li>
+                  <li>Because this is such a big upgrade, some of your community packages might be affected! Read <a href="https://blog.pulsar-edit.dev/posts/20251202-savetheclocktower-pulsar-on-electron-30/">Pulsar on Electron 30: what it means for you</a> for more information.</li>
+                </ul>
               </li>
               <li>
-                Experimental localization support is now being added into the editor, allowing the editor, core packages and even community packages to localize their interface for any language.
+                Bump <code>ppm</code> to use Node 20.11.1
+                <ul>
+                  <li>For the first time in a long time, both <code>ppm</code> and Pulsar are using the same version of Node; this should avoid some rare bugs encountered when installing certain packages.</li>
+                </ul>
               </li>
               <li>
-                <code>autocomplete-css</code> has gotten significantly updated completions.
+                Fix handling when opening files to certain line numbers via CLI - e.g. <code>pulsar foo.txt:30</code>
               </li>
               <li>
-                Various documentation and UI links updated after website update.
+                Prevent packages from spawning new background tasks if the environment is unloading.
               </li>
               <li>
-                Changed some returns in a backwards compatible way to ensure the community package <code>emmet</code> will work again.
+                <code>find-and-replace</code> Fix an issue where certain files would show results in a project-wide search even when they would be excluded by the file/directory pattern.
+              </li>
+              <li>
+                <code>markdown-preview</code> Fix situations where "Save as HTML" and "Copy as HTML" silently failed with certain kinds of content.
+              </li>
+              <li>
+                <code>autocomplete-plus</code> Prevent certain kinds of suggestions from being incorrectly filtered out of the result set.
+              </li>
+              <li>
+                <code>language-java</code> Update to the latest <code>tree-sitter-java</code> parser, adding support for multiline strings, amount other things.
+              </li>
+              <li>
+                <code>language-python</code> Better highlighting of <code>except</code> clauses; fixed folding of certain <code>if</code> blocks.
+              </li>
+              <li>
+                <code>language-typescript</code> Better highlighting of template literals; adding folding of <code>interface</code> and <code>enum</code> blocks.
+              </li>
+              <li>
+                <code>language-javascript</code> Proper highlighting of JSX with namespaced attributes.
               </li>
             </ul>
 
