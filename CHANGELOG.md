@@ -103,6 +103,14 @@ For more information, read [Pulsar on Electron 30: what it means for you](https:
 - Update ppm to commit 07faba10096ee4239ce671218d9953fb2e40ecbf
 - Remove unnecessary `Promise.all`
 
+### ppm
+
+- Fix CI [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/154)
+- Fix misnamed variable in `rebuild` command [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/155)
+- Upgrade Node to version 20.11.1 [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/156)
+- Add TypeScript template [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/152)
+- Revert setting of `--force-process-config` now that we’re on Electron 30 [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/162)
+
 ## 1.130.1
 
 Hotfix: Restore Windows app to working condition, after it was mis-built in v1.130.0.
