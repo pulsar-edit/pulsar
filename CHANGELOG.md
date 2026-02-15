@@ -6,6 +6,112 @@
 
 ## [Unreleased]
 
+## 1.131.0
+
+Because this is such a huge upgrade to Pulsar, some of your community packages may be affected!
+If you handle distributions for Pulsar as a community maintainer make sure to read this changelog carefully to make things compatible!
+For more information, read [Pulsar on Electron 30: what it means for you](https://blog.pulsar-edit.dev/posts/20251202-savetheclocktower-pulsar-on-electron-30/).
+
+* Update Electron to version 30!
+  * Node is now version 20.11.1
+  * Chromium is now version 124
+  * This means better performance, better Node library compatibility, and ability for community packages to use newer features of Chromium.
+  * It should also vastly improve the Pulsar experience for Linux users in Wayland environments.
+  * Because this is such a big upgrade, some of your community packages might be affected!
+* Bump `ppm` to use Node 20.11.1
+  * For the first time in a long time, both `ppm` and Pulsar are using the same version of Node; this should avoid some rare bugs encountered when installing certain packages.
+* Fix handling when opening files to certain line numbers via CLI - e.g. `pulsar foo.txt:30`.
+* Prevent packages from spawning new background tasks if the environment is unloading (as would happen during a window reload or while quitting Pulsar).
+* [find-and-replace] Fix an issue where certain files would show results in a project-wide search even when they would be excluded by the file/directory pattern.
+* [markdown-preview] Fix situations where "Save as HTML" and "Copy as HTML" silently failed with certain kinds of content.
+* [autocomplete-plus] Prevent certain kinds of suggestions from being incorrectly filtered out of the result set.
+* [language-java] Update to the latest `tree-sitter-java` parser, adding support for multiline strings, among other things.
+* [language-python] Better highlighting of `except` clauses; fixed folding of certain `if` blocks.
+* [language-typescript] Better highlighting of template literals; adding folding of `interface` and `enum` blocks.
+* [language-javascript] Proper highlighting of JSX with namespaced attributes.
+
+### Pulsar
+
+- Enhance documentation for `atom.commands.dispatch()` method [@trusktr](https://github.com/pulsar-edit/pulsar/pull/1411)
+- Fix autocomplete-plus crash with non-workspace editors [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1381)
+- Fix tree-view crash when dock pane is split [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1409)
+- Tree-sitter rolling fixes, 1.131.0 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1377)
+- Always show suggestions with `textEdit`s instead of filtering them out [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1422)
+- Fix incorrect interpretation of a line-number spec on the command line [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1400)
+- Prevent task spawning during unload [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1387)
+- [markdown-preview] Fix failure to serialize to HTML when the document contains certain kinds of code blocks [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1374)
+- Bump to latest `ppm` after fixing the `force-process-config` issue in ppm#162 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1396)
+- Remove reliance on `title` key of a setting to avoid using locale labels [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1391)
+- Bump CI runners to `macos-14` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1389)
+- Fix text-editor-component annoying bug [@Psychosynthesis](https://github.com/pulsar-edit/pulsar/pull/1336)
+- Migrate to python3 style super for new class snippets in language-python [@bridgetjs](https://github.com/pulsar-edit/pulsar/pull/1385)
+- Update to Electron 30 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1367)
+- Cirrus: Update Rolling upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1382)
+- [find-and-replace] Prevent addition of project results from editors whose paths are not matched by the current path inclusions [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1380)
+- Tree-sitter rolling fixes, 1.130.0 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1320)
+- Update actions/setup-python action to v6 [@renovate](https://github.com/pulsar-edit/pulsar/pull/1365)
+- Update actions/setup-node action to v6 [@renovate](https://github.com/pulsar-edit/pulsar/pull/1364)
+- [meta] Add new and missing packages to our renovate config [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1359)
+- Update pulsar-updater package [@renovate](https://github.com/pulsar-edit/pulsar/pull/1356)
+- Update actions/checkout action to v5 [@renovate](https://github.com/pulsar-edit/pulsar/pull/1357)
+- Add "Regular Release Checklist" issue template [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1346)
+
+#### Changes for Electron 30
+> Internals of 'Update to Electron 30' PR
+
+- Remove all support for legacy Tree-sitter
+- Prefer `@electron/remote`, deprecate direct usage of `electron.remote` and switch all internal usages to `@electron/remote`.
+- Decaffeinate `tree-view`
+- Fix a failing `autocomplete-plus` spec
+- Get `dev-live-reload` specs passing
+- Get `image-view` specs passing
+- [language-ruby] Add a basic grammar test spec
+- [markdown-preview] Get specs passing
+- [settings-view] Get specs passing
+- Point to Electron `30.0.9` and point our dependencies to the NPM-published versions under the `@pulsar-edit` namespace that are compatible with Electron 30.0.9.
+- Fix some `TextEditorComponent` issues related to changes in Chromium sometime between Electron 12 and Electron 30.
+- Eliminate reliance on `typescript-simple` in favor of a custom solution that uses the `typescript` package directly.
+- Consume `get-scrollbar-style` to replace the deprecated `scrollbar-style` module
+- Additional changes related to device pixel ratio that probably should have gone in the earlier commit.
+- Add the ability to report crashes via Electron's standard `crashReporter` interface.
+- Delete deprecated "app.allowRendererProcessReuse = false"
+- Enable `@electron-remote` for the given window during startup and disable a Blink experimental feature that was causing trouble with package compatibility (because it added an `on` method to all DOM nodes!).
+- Be more paranoid about release channels in a handful of places in case we want to maintain a `next` (or `nightly` or `preview`) release channel on an ongoing basis.
+- Cache `Language` instances in `web-tree-sitter` so that the specs don't run out of memory.
+- Preserve an `ATOM_CHANNEL` environment variable if it exists and other changes related to release-channel agnosticism.
+- [snippets] Get specs passing
+- [spell-check] Get specs passing and abandon `atom-pathspec` in favor of an internal implementation.
+- [tabs] Fix an exception that can happen in unusual scenarios when the browser can't give us an element under a given X/Y coordinate.
+- [update-package-dependencies] Get specs passing
+- [symbol-provider-tree-sitter] Unmock clock in the standard way
+- Remove outdated Tree-sitter documentation
+- Update GitHub Actions CI jobs to include Wayland-related keyboard dependencies.
+- Update CirrusCI build job to include Wayland-related keyboard dependencies.
+- Revert to a single `entitlements.plist` now that we're no longer affected by the awful `libuv` bug that was present in Electron 12.
+- Update `script/electron-builder.js` to support a couple of command-line switches and to build correctly for Electron 30.
+- Fix `ThemeManager` specs
+- Define two methods on the `atom` global to work around `tree-view` issues related to trashing and revealing items in `electron.shell`.
+- Comment reformatting
+- Some integration test fixes
+- Fix `PackageManager` specs
+- Use `yarn.lock` from `updated-latest-electron` branch
+- Swallow exceptions raised by pending tests
+- Disallow `if(` and the like in `.eslitrc`
+- Add `submodules: true` back into certain workflows
+- Remove `atom.trashItem` and `atom.showItemInFolder` since they weren't even being used. The equivalent functions from the `shell` module of `@electron/remote` have been performing the same task in PulsarNext for a while now.
+- Update ppm to commit d288b0978b35f7c0ffb3dc5c1e50c
+- Update ppm to commit 07faba10096ee4239ce671218d9953fb2e40ecbf
+- Remove unnecessary `Promise.all`
+
+## 1.130.1
+
+Hotfix: Restore Windows app to working condition, after it was mis-built in v1.130.0.
+
+### Pulsar
+
+- CI: Split 'yarn build' and 'yarn build:apm' into separate steps [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1353)
+- [ci] Fix Windows Builds by manually installing the Win10 SDK [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1351)
+
 ## 1.130.0
 
 - `autocomplete-plus` can now make other text edits to the buffer when a suggestion is accepted - for instance, adding an `import` for that suggestion.
