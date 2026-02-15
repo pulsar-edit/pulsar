@@ -40,7 +40,7 @@
     "@pulsar-edit/text-buffer": "^14.0.3",
     "about": "file:packages/about",
     "archive-view": "file:packages/archive-view",
-    "async": "3.2.4",
+    "async": "3.2.6",
     "atom-dark-syntax": "file:packages/atom-dark-syntax",
     "atom-dark-ui": "file:packages/atom-dark-ui",
     "atom-light-syntax": "file:packages/atom-light-syntax",
