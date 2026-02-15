@@ -14,10 +14,6 @@ jobs:
     permissions:
       contents: write
 
-    strategy:
-      matrix:
-        node-version: [16.x]
-
     steps:
     - name: Install build dependencies
       run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
@@ -25,10 +21,10 @@ jobs:
     - name: Checkout the Latest Code
       uses: actions/checkout@v5
 
-    - name: Setup NodeJS - ${{ matrix.node-version }}
+    - name: Setup NodeJS
       uses: actions/setup-node@v6
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version-file: '.nvmrc'
 
     - name: Install Python setuptools
       # This is needed for Python 3.12+, since many versions of node-gyp
