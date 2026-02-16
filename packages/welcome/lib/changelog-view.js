@@ -92,6 +92,15 @@ export default class ChangeLogView {
               <li>
                 <code>language-javascript</code> Proper highlighting of JSX with namespaced attributes.
               </li>
+              <li>
+                Fix an issue in <code>superstring</code> that occasionally caused crashes while editing text.
+              </li>
+              <li>
+                Add support for additional image formats in Pulsar's Markdown renderer.
+              </li>
+              <li>
+                Reduce binary size through various means.
+              </li>
             </ul>
 
             <section className="welcome-panel">
