@@ -6,6 +6,24 @@
 
 ## [Unreleased]
 
+## 1.131.1
+
+* Fix an issue in `superstring` that occasionally caused crashes while editing text.
+* Add support for additional image formats in Pulsar's Markdown renderer.
+* Minor reduction of binary size through various means.
+
+### Pulsar
+
+- Bump `@pulsar-edit/superstring` to `3.0.5` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1441)
+- [core] Add support for `data:image/svg+xml` in `ui.renderMarkdown` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1439)
+- Remove abandoned fstream dependency [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1418)
+- Bump `async` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1406)
+- Add exclusions borrowed from `node-prune` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1405)
+
+### superstring
+
+- Fix a crash caused by improper management of async workers [@savetheclocktower](https://github.com/pulsar-edit/superstring/pull/21)
+
 ## 1.131.0
 
 Because this is such a huge upgrade to Pulsar, some of your community packages may be affected!
