@@ -93,7 +93,11 @@ module.exports = class Task {
 
   createChildProcess () {
     const compileCachePath = require('./compile-cache').getCacheDirectory();
-    const env = Object.assign({}, process.env, { userAgent: navigator.userAgent });
+    const env = Object.assign({}, process.env, {
+      userAgent: navigator.userAgent,
+      ELECTRON_RUN_AS_NODE: '1',
+      ELECTRON_NO_ATTACH_CONSOLE: '1'
+    });
     if (window.atom?.unloading) {
       this.childProcess = null;
     } else {
