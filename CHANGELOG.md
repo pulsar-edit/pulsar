@@ -6,6 +6,21 @@
 
 ## [Unreleased]
 
+## 1.131.1
+
+Hotfix: TODO Text about multi-OS crashing that's been fixed. Maybe notes about the other changes?
+
+### Pulsar
+
+- [core] Add support for `data:image/svg+xml` in `ui.renderMarkdown` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1439)
+- Remove abandoned fstream dependency [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1418)
+- Bump `async` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1406)
+- Add exclusions borrowed from `node-prune` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1405)
+
+### superstring
+
+- Fix a crash caused by improper management of async workers [@savetheclocktower](https://github.com/pulsar-edit/superstring/pull/21)
+
 ## 1.131.0
 
 Because this is such a huge upgrade to Pulsar, some of your community packages may be affected!
