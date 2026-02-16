@@ -8,10 +8,13 @@
 
 ## 1.131.1
 
-Hotfix: TODO Text about multi-OS crashing that's been fixed. Maybe notes about the other changes?
+* Fix an issue in `superstring` that occasionally caused crashes while editing text.
+* Add support for additional image formats in Pulsar's Markdown renderer.
+* Reduce binary size through various means.
 
 ### Pulsar
 
+- Bump `@pulsar-edit/superstring` to `3.0.5` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1441)
 - [core] Add support for `data:image/svg+xml` in `ui.renderMarkdown` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1439)
 - Remove abandoned fstream dependency [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1418)
 - Bump `async` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1406)
