@@ -1732,10 +1732,10 @@
     split "^1.0.0"
     temp "^0.8.3"
 
-"@pulsar-edit/superstring@^3.0.4":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/superstring/-/superstring-3.0.4.tgz#b6fa89cec8ebdb745c7d18c225b2663f1a6c518e"
-  integrity sha512-2gAZOOMCcwjLmFAojiBwyk/4aoj29jezZ80bH+7axjg8/6lFQk63L0Mu3+/lwSjDYMQ1XU6ebZGhBhHHtFSXYA==
+"@pulsar-edit/superstring@3.0.5", "@pulsar-edit/superstring@^3.0.4", "@pulsar-edit/superstring@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/superstring/-/superstring-3.0.5.tgz#20e547a06a0692741f38f67e6522e2c68ed6d776"
+  integrity sha512-J92AD7eq7INlwpU6arJj5QBfbTBdW/c81hrmrG36hiubKkx+43NDT9y4+YR4n9SgAyMGuzLU/I9OX3n57njRog==
   dependencies:
     node-addon-api "^8.5.0"
 

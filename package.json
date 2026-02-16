@@ -36,7 +36,7 @@
     "@pulsar-edit/git-utils": "^7.0.1",
     "@pulsar-edit/pathwatcher": "^9.0.2",
     "@pulsar-edit/scandal": "^4.0.0",
-    "@pulsar-edit/superstring": "^3.0.4",
+    "@pulsar-edit/superstring": "^3.0.5",
     "@pulsar-edit/text-buffer": "^14.0.3",
     "about": "file:packages/about",
     "archive-view": "file:packages/archive-view",
@@ -318,6 +318,7 @@
     "nan": "2.19.0",
     "ctags": "https://github.com/pulsar-edit/node-ctags.git#c32ca6017dd3f4ea314d53b044225505820abbe3",
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244",
-    "@electron/remote": "2.1.2"
+    "@electron/remote": "2.1.2",
+    "@pulsar-edit/superstring": "3.0.5"
   }
 }
