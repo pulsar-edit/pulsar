@@ -99,7 +99,7 @@ export default class ChangeLogView {
                 Add support for additional image formats in Pulsar's Markdown renderer.
               </li>
               <li>
-                Reduce binary size through various means.
+                Minor reduction of binary size through various means.
               </li>
             </ul>
 

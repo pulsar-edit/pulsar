@@ -10,7 +10,7 @@
 
 * Fix an issue in `superstring` that occasionally caused crashes while editing text.
 * Add support for additional image formats in Pulsar's Markdown renderer.
-* Reduce binary size through various means.
+* Minor reduction of binary size through various means.
 
 ### Pulsar
 
