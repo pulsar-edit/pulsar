@@ -117,6 +117,20 @@ function renderMarkdown(content, givenOpts = {}) {
 
   let md = new MarkdownIt(markdownItOpts);
 
+  // Support more image/link formats by default
+  const defaultValidateLink = md.validateLink;
+  md.validateLink = (url) => {
+    if (defaultValidateLink(url)) {
+      return true;
+    }
+
+    if (/^data:image\/svg\+xml;/.test(url)) {
+      return true;
+    }
+
+    return false;
+  };
+
   if (opts.useDefaultEmoji) {
     mdComponents.deps.markdownItEmoji ??= require("markdown-it-emoji");
     md.use(mdComponents.deps.markdownItEmoji, {});
