@@ -354,7 +354,10 @@ let options = {
     ]
   },
 
-  dmg: { sign: false },
+  dmg: {
+    sign: false,
+    writeUpdateInfo: false
+  },
 
   // Earliest supported version of Windows is Windows 10. Electron 23 dropped
   // support for 7/8/8.1.
@@ -396,7 +399,8 @@ let options = {
     // TODO: On first look, this installer script seems not to need any
     // updating for PulsarNext, but we should make sure.
     include: "resources/win/installer.nsh",
-    warningsAsErrors: false
+    warningsAsErrors: false,
+    differentialPackage: false
   },
 
   extraMetadata: {},
