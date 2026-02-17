@@ -391,6 +391,10 @@ let options = {
     // Hardcoding it here means it will always be used as generated from the
     // AppID 'dev.pulsar-edit.pulsar'. If this value ever changes, a PR to
     // GitHub Desktop must be made with the updated value.
+    //
+    // We delete this value when building PulsarNext so that it’s regenerated
+    // based on the app ID. Otherwise the OS might consider it equivalent to
+    // stable Pulsar in some ways.
     include: "resources/win/installer.nsh",
     warningsAsErrors: false,
     differentialPackage: false
