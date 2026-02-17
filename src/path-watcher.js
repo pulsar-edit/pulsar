@@ -3,18 +3,9 @@ const path = require('path');
 const crypto = require('crypto');
 
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const nsfw = require('nsfw');
 const { NativeWatcherRegistry } = require('./native-watcher-registry');
 const Task = require('./task');
-
-// Private: Associate native watcher action flags with descriptive String
-// equivalents.
-const ACTION_MAP = new Map([
-  [nsfw.actions.MODIFIED, 'modified'],
-  [nsfw.actions.CREATED,  'created' ],
-  [nsfw.actions.DELETED,  'deleted' ],
-  [nsfw.actions.RENAMED,  'renamed' ]
-]);
+const WatcherTask = require('./watcher-task');
 
 // Private: Possible states of a {NativeWatcher}.
 const WATCHER_STATE = {
@@ -27,7 +18,6 @@ const WATCHER_STATE = {
 // Private: Interface with and normalize events from a filesystem watcher
 // implementation.
 class NativeWatcher {
-
   // Private: Initialize a native watcher on a path.
   //
   // Events will not be produced until {start()} is called.
@@ -170,114 +160,124 @@ class NativeWatcher {
   }
 }
 
-// A file-watcher implementation that uses `@parcel/watcher`.
-//
-// We briefly experimented with importing it directly into the renderer
-// process, but it caused crashes on window reload for reasons that haven't
-// been fully tracked down. That's fine, though; we can run it in its own
-// long-running task, much like VS Code does.
-class ParcelWatcherNativeWatcher extends NativeWatcher {
-  static task = new Task(require.resolve('./parcel-watcher-worker.js'), { autoStart: false });
+// A `NativeWatcher` that delegates file-watching to a worker process.
+class WorkerProcessWatcher extends NativeWatcher {
+  // The path to the worker script.
+  static taskPath = undefined;
+  // An instance of `WatcherTask`.
+  static task = undefined;
 
-  // Whether the task has been started.
-  static started = false;
-
-  // Whether the task has had its listeners attached.
+  // Whether the watcher task has been created and had its events bound.
   static initialized = false;
 
-  // Job IDs for request/response cycles.
-  static PROMISE_META = new Map();
+  // Whether the watcher task is currently running in its own process.
+  static started = false;
 
-  // All instances of this watcher organized by unique ID.
+  // Keeps track of instances of `WorkerProcessWatch` indexed by ID.
   static INSTANCES = new Map();
 
-  static register(instance) {
+  // Keeps track of pending method calls indexed by ID.
+  static PROMISE_META = new Map();
+
+  static createWatcherTask () {
+    this.started = false;
+    this.initialized = false;
+    this.task = new WatcherTask(this.taskPath);
+  }
+
+  static register (instance) {
     this.initialize();
     this.INSTANCES.set(instance.id, instance);
   }
 
-  static unregister(instance) {
+  static unregister (instance) {
     this.INSTANCES.delete(instance.id);
     if (this.INSTANCES.size === 0) {
       this.task.terminate();
-      this.started = false;
       this.initialized = false;
-      // Once a task is terminated, it cannot be started again. We have to
-      // replace it with a new instance.
-      this.task = new Task(require.resolve('./parcel-watcher-worker.js'), { autoStart: false });
+      this.started = false;
+
       this.PROMISE_META.clear();
-      this.initialize();
     }
   }
 
-  static initialize() {
+  static initialize () {
     if (this.initialized) return;
+    if (!this.task) this.createWatcherTask();
 
-    // Emitted when the worker responds to a method call.
+    // Create new copies of these maps so that we don't accidentally share
+    // state with any other subclasses of `WorkerProcessWatcher`.
+    this.PROMISE_META = new Map();
+    this.INSTANCES = new Map();
+
+    // Response to a method call. Look up the promise and its resolvers in the
+    // table and call the appropriate one.
     this.task.on('watcher:reply', ({ id, args, error }) => {
-      let meta = this.PROMISE_META.get(id);
-      if (!meta) return;
-      if (error) {
-        meta.reject(new Error(error));
-      } else {
-        meta.resolve(args);
-      }
-      this.PROMISE_META.delete(id);
-    });
+			let meta = this.PROMISE_META.get(id);
+			if (!meta) return;
+			if (error) {
+				meta.reject(new Error(error));
+			} else {
+				meta.resolve(args);
+			}
+			this.PROMISE_META.delete(id);
+		});
 
-    // Emitted when the worker pushes events.
-    this.task.on('watcher:events', ({ id, events }) => {
-      let instance = this.INSTANCES.get(id);
-      instance?.onEvents(events);
-    });
+    // Filesystem events reported by the watcher.
+		this.task.on('watcher:events', ({ id, events }) => {
+			let instance = this.INSTANCES.get(id);
+			instance?.onEvents(events);
+		});
 
-    // Emitted when the worker pushes a watcher error.
-    this.task.on('watcher:error', ({ id, error }) => {
-      let instance = this.INSTANCES.get(id);
-      instance?.onError(new Error(error));
-    });
+    // Errors reported by the watcher.
+		this.task.on('watcher:error', ({ id, error }) => {
+			let instance = this.INSTANCES.get(id);
+			instance?.onError(new Error(error));
+		});
 
-    // Emitted when the worker is created and ready to receive method calls.
-    this.task.on('watcher:ready', () => {
-      this.PROMISE_META.get('self:start')?.resolve?.();
-    });
+    // The watcher signaling that it's ready to start listening to files.
+		this.task.on('watcher:ready', () => {
+			this.PROMISE_META.get('self:start')?.resolve?.();
+		});
 
-    // Logging from the worker.
-    this.task.on('console:log', (args) => {
-      console.log(...args);
-    });
+    // Forward logging messages to the renderer's console.
+		this.task.on('console:log', (args) => console.log(...args));
+		this.task.on('console:warn', (args) => console.warn(...args));
+		this.task.on('console:error', (args) => console.error(...args));
 
-    this.task.on('console:warn', (args) => {
-      console.warn(...args);
-    });
-
-    this.task.on('console:error', (args) => {
-      console.error(...args);
-    });
-
-    this.initialized = true;
+		this.initialized = true;
   }
 
-  static async startTask() {
-    // This is an unusual one-off task, so we'll use a special key for its
-    // promise metadata.
+  // Tell the worker to set up file-watching.
+  static async startTask () {
     let meta = this.PROMISE_META.get('self:start');
-    if (!meta) {
-      meta = {};
-      let promise = new Promise((resolve, reject) => {
-        meta.resolve = resolve;
-        meta.reject = reject;
-        this.task.start();
-      });
-      meta.promise = promise;
-      this.PROMISE_META.set('self:start', meta);
+		if (!meta) {
+			meta = {};
+			let promise = new Promise((resolve, reject) => {
+				meta.resolve = resolve;
+				meta.reject = reject;
+				this.task.start();
+			});
+			meta.promise = promise;
+			this.PROMISE_META.set('self:start', meta);
     }
-    this.started = true;
+		this.started = true;
     await meta.promise;
   }
 
-  static async sendEvent(event, args) {
-    let id = this.getID();
+  // Generate a unique ID to identify a watcher or a method call.
+  static generateID () {
+    let id;
+    // The ID must not clash with any IDs we're already using.
+		do {
+			id = crypto.randomBytes(5).toString('hex');
+		} while (this.INSTANCES.has(id) || this.PROMISE_META.has(id));
+		return id;
+  }
+
+  // Send an event to the worker and wait for its response.
+  static async sendEvent (event, args) {
+    let id = this.generateID();
     let bundle = { id, event, args };
     let meta = {};
     let promise = new Promise((resolve, reject) => {
@@ -290,278 +290,99 @@ class ParcelWatcherNativeWatcher extends NativeWatcher {
     return await promise;
   }
 
-  // Both instances and jobs have randomly-generated IDs. We use the job IDs
-  // for standard request/response cycles initiated by the renderer. We use
-  // the instance IDs for worker-initiated pushes that are routed directly
-  // to the corresponding watcher instance.
-  static getID() {
-    let id;
-    // Generate an ID that does not collide with any other IDs we're currently
-    // using.
-    do {
-      id = crypto.randomBytes(5).toString('hex');
-    } while (this.INSTANCES.has(id) || this.PROMISE_META.has(id));
-    return id;
-  }
+  constructor (...args) {
+		super(...args);
+		this.id = this.constructor.generateID();
 
-  dispose() {
-    super.dispose();
-    this.constructor.unregister(this);
-  }
+    // TODO: Optional handling of ignored names.
+    //
+    // It is a good idea to improve worker performance and cut down on
+    // wastefulness by having recursive watchers respect the editor's and
+    // project's settings for ignored names. This is how VS Code handles
+    // recursive watchers; anything that wants to watch below an ignored path
+    // must set up its own non-recursive watcher.
+    //
+    // However, this is hard for us to do, both because of backward
+    // compatibility (some of our own watchers rely on the behavior we're
+    // trying to prohibit!) and because we try to share/reuse watchers.
+    //
+    // One way around this would be to allow watchers to opt into ignored-name
+    // behavior, then have two "pools," each of which could share with other
+    // watchers in the same pool.
+	}
 
-  constructor(...args) {
-    super(...args);
-    this.id = this.constructor.getID();
+  dispose () {
+		super.dispose();
+		this.constructor.unregister(this);
+	}
 
-    this.subs.add(
-      atom.config.observe('core.ignoredNames', (newValue) => {
-        this.setIgnoredNames(newValue);
-      })
-    );
-  }
 
-  async send(event, args) {
-    await this.constructor.sendEvent(event, args);
-  }
+	async send (event, args) {
+		await this.constructor.sendEvent(event, args);
+	}
 
-  setIgnoredNames(ignoredNames) {
-    this.ignoredNames = ignoredNames;
-    if (this.state === WATCHER_STATE.RUNNING) {
-      // This watcher can't update ignores after starting, but that's its own
-      // implementation detail to work out. It will respond to this command by
-      // creating a new watcher, waiting for it to start, then stopping the old
-      // one.
-      this.send('watcher:update', {
-        normalizedPath: this.normalizedPath,
-        instance: this.id,
-        ignored: this.ignoredNames
-      });
-    }
-  }
+	setIgnoredNames (ignoredNames) {
+		this.ignoredNames = ignoredNames;
+		if (this.state === WATCHER_STATE.RUNNING) {
+			this.send('watcher:update', {
+				normalizedPath: this.normalizedPath,
+				instance: this.id,
+				ignored: this.ignoredNames
+			});
+		}
+	}
 
-  async doStart() {
-    // “Registration” would ordinarily happen earlier in the lifecycle of this
+  async doStart () {
+		// “Registration” would ordinarily happen earlier in the lifecycle of this
     // instance. But (a) the purpose of it is to make the constructor know
     // about our ID so it can funnel events to us, which isn't necessary until
     // the watcher action starts; (b) if we register just before starting a
     // watcher and unregister just after ending a watcher, we get to use it as
     // a sort of reference-counting. That helps us know when the task itself
     // can be killed.
-    this.constructor.register(this);
-    if (!ParcelWatcherNativeWatcher.started) {
-      await ParcelWatcherNativeWatcher.startTask();
-    }
+		this.constructor.register(this);
+		if (!this.constructor.started) {
+			await this.constructor.startTask();
+		}
 
-    return await this.send('watcher:watch', {
-      normalizedPath: this.normalizedPath,
+		return await this.send('watcher:watch', {
+			normalizedPath: this.normalizedPath,
       instance: this.id,
       ignored: this.ignoredNames
-    });
-  }
+		});
+	}
 
-  async doStop() {
-    let result = await this.send('watcher:unwatch', {
-      normalizedPath: this.normalizedPath,
-      instance: this.id
-    });
-    this.constructor.unregister(this);
-    return result;
-  }
+	async doStop () {
+		let result = await this.send('watcher:unwatch', {
+			normalizedPath: this.normalizedPath,
+			instance: this.id
+		});
+		this.constructor.unregister(this);
+		return result;
+	}
 }
 
-// A file-watcher implementation that uses `nsfw`. Runs in a separate process.
-class NSFWNativeWatcher extends NativeWatcher {
-  static task = new Task(require.resolve('./nsfw-watcher-worker.js'), { autoStart: false });
-
-  // Whether the task has been started.
-  static started = false;
-
-  // Whether the task has had its listeners attached.
-  static initialized = false;
-
-  // Job IDs for request/response cycles.
-  static PROMISE_META = new Map();
-
-  // All instances of this watcher organized by unique ID.
-  static INSTANCES = new Map();
-
-  static register(instance) {
-    this.initialize();
-    this.INSTANCES.set(instance.id, instance);
-  }
-
-  static unregister(instance) {
-    this.INSTANCES.delete(instance.id);
-    if (this.INSTANCES.size === 0) {
-      this.task.terminate();
-      this.started = false;
-      this.initialized = false;
-      // Once a task is terminated, it cannot be started again. We have to
-      // replace it with a new instance.
-      this.task = new Task(require.resolve('./nsfw-watcher-worker.js'), { autoStart: false });
-      this.PROMISE_META.clear();
-      this.initialize();
-    }
-  }
-
-  static initialize() {
-    if (this.initialized) return;
-
-    // Emitted when the worker responds to a method call.
-    this.task.on('watcher:reply', ({ id, args, error }) => {
-      let meta = this.PROMISE_META.get(id);
-      if (!meta) return;
-      if (error) {
-        meta.reject(new Error(error));
-      } else {
-        meta.resolve(args);
-      }
-      this.PROMISE_META.delete(id);
-    });
-
-    // Emitted when the worker pushes events.
-    this.task.on('watcher:events', ({ id, events }) => {
-      let instance = this.INSTANCES.get(id);
-      instance?.onEvents(events);
-    });
-
-    // Emitted when the worker pushes a watcher error.
-    this.task.on('watcher:error', ({ id, error }) => {
-      let instance = this.INSTANCES.get(id);
-      instance?.onError(new Error(error));
-    });
-
-    // Emitted when the worker is created and ready to receive method calls.
-    this.task.on('watcher:ready', () => {
-      this.PROMISE_META.get('self:start')?.resolve?.();
-    });
-
-    // Logging from the worker.
-    this.task.on('console:log', (args) => {
-      console.log(...args);
-    });
-
-    this.task.on('console:warn', (args) => {
-      console.warn(...args);
-    });
-
-    this.task.on('console:error', (args) => {
-      console.error(...args);
-    });
-
-    this.initialized = true;
-  }
-
-  static async startTask() {
-    // This is an unusual one-off task, so we'll use a special key for its
-    // promise metadata.
-    let meta = this.PROMISE_META.get('self:start');
-    if (!meta) {
-      meta = {};
-      let promise = new Promise((resolve, reject) => {
-        meta.resolve = resolve;
-        meta.reject = reject;
-        this.task.start();
-      });
-      meta.promise = promise;
-      this.PROMISE_META.set('self:start', meta);
-    }
-    this.started = true;
-    await meta.promise;
-  }
-
-  static async sendEvent(event, args) {
-    let id = this.getID();
-    let bundle = { id, event, args };
-    let meta = {};
-    let promise = new Promise((resolve, reject) => {
-      meta.resolve = resolve;
-      meta.reject = reject;
-    });
-    meta.promise = promise;
-    this.PROMISE_META.set(id, meta);
-    this.task.send(JSON.stringify(bundle));
-    let result = await promise;
-    return result;
-  }
-
-  // Both instances and jobs have randomly-generated IDs. We use the job IDs
-  // for standard request/response cycles initiated by the renderer. We use
-  // the instance IDs for worker-initiated pushes that are routed directly
-  // to the corresponding watcher instance.
-  static getID() {
-    let id;
-    // Generate an ID that does not collide with any other IDs we're currently
-    // using.
-    do {
-      id = crypto.randomBytes(5).toString('hex');
-    } while (this.INSTANCES.has(id) || this.PROMISE_META.has(id));
-    return id;
-  }
-
-  dispose() {
-    super.dispose();
-    this.constructor.unregister(this);
-  }
-
-  constructor(...args) {
-    super(...args);
-    this.id = this.constructor.getID();
-
-    this.subs.add(
-      atom.config.observe('core.ignoredNames', (value) => {
-        this.setIgnoredNames(value);
-      })
-    );
-  }
-
-  setIgnoredNames(ignoredNames) {
-    this.ignoredNames = ignoredNames;
-    if (this.state === WATCHER_STATE.RUNNING) {
-      // We can update this watcher without restarting it. We send a special
-      // event name that will look up the watcher, generate new ignores, and
-      // update the excluded paths list.
-      this.send('watcher:update', {
-        normalizedPath: this.normalizedPath,
-        instance: this.id,
-        ignored: this.ignoredNames
-      });
-    }
-  }
-
-  async send(event, args) {
-    await this.constructor.sendEvent(event, args);
-  }
-
-  async doStart() {
-    // “Registration” would ordinarily happen earlier in the lifecycle of this
-    // instance. But (a) the purpose of it is to make the constructor know
-    // about our ID so it can funnel events to us, which isn't necessary until
-    // the watcher action starts; (b) if we register just before starting a
-    // watcher and unregister just after ending a watcher, we get to use it as
-    // a sort of reference-counting. That helps us know when the task itself
-    // can be killed.
-    this.constructor.register(this);
-    if (!NSFWNativeWatcher.started) {
-      await NSFWNativeWatcher.startTask();
-    }
-
-    return await this.send('watcher:watch', {
-      normalizedPath: this.normalizedPath,
-      instance: this.id,
-      ignored: this.ignoredNames
-    });
-  }
-
-  async doStop() {
-    let result = await this.send('watcher:unwatch', {
-      normalizedPath: this.normalizedPath,
-      instance: this.id
-    });
-    this.constructor.unregister(this);
-    return result;
-  }
+// A file-watcher implementation that uses `@parcel/watcher`.
+//
+// We briefly experimented with importing it directly into the renderer
+// process, but it caused crashes on window reload for reasons that haven't
+// been fully tracked down. That's fine, though; we can run it in its own
+// long-running task, much like VS Code does.
+class ParcelWatcher extends WorkerProcessWatcher {
+	static taskPath = require.resolve('./parcel-watcher-worker.js');
 }
+
+// A file-watcher implementation that uses `nsfw`.
+//
+// This has been the main file-watcher for most of Pulsar's existence, but we
+// are moving away from it for a number of reasons. It remains an option,
+// however. It used to run in the renderer process, but we've moved it to a
+// worker to match the other options, and because it makes it more feasible to
+// implement ignored paths.
+class NSFWWatcher extends WorkerProcessWatcher {
+	static taskPath = require.resolve('./nsfw-watcher-worker.js');
+}
+
 
 // Extended: Manage a subscription to filesystem events that occur beneath a
 // root directory. Construct these by calling `watchPath`. To watch for events
@@ -1139,9 +960,9 @@ watchPath.reset = function reset() {
 // default at a later date without affecting users that have opted into a
 // specific watcher.
 const WATCHERS_BY_VALUE = {
-  'default': NSFWNativeWatcher,
-  'nsfw': NSFWNativeWatcher,
-  'parcel': ParcelWatcherNativeWatcher
+  'default': NSFWWatcher,
+  'nsfw': NSFWWatcher,
+  'parcel': ParcelWatcher
 };
 
 module.exports = { watchPath, stopAllWatchers };

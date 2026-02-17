@@ -1,6 +1,7 @@
 /* global emit */
 
-// A worker script for `@parcel/watcher`. Runs as a `Task` (see src/task.js).
+// A worker script for `@parcel/watcher`. Runs as a `WatcherTask` (see
+// src/worker-task.js).
 //
 // Manages any number of individual folder watchers in a single process,
 // communicating over IPC.
@@ -8,7 +9,7 @@
 // Requests to watch files (rather than directories) are handled via Node's
 // builtin `fs.watch` API.
 
-const watcher = require("@parcel/watcher");
+const watcher = require('@parcel/watcher');
 const fs = require('fs');
 
 const EVENT_MAP = {

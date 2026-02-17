@@ -1,5 +1,15 @@
 /* global emit */
 
+// A worker script for `nsfw`. Runs as a `WatcherTask` (see
+// src/worker-task.js).
+//
+// Manages any number of individual folder watchers in a single process,
+// communicating over IPC.
+//
+// Since `nsfw` doesn't accept glob exclusions (making you specify every single
+// path you want to ignore), `fdir` and `minimatch` are used to turn a glob
+// into a set of excluded paths.
+
 const nsfw = require('nsfw');
 const minimatch = require('minimatch');
 const { fdir } = require('fdir');
@@ -12,7 +22,7 @@ const ACTION_MAP = new Map([
   [nsfw.actions.RENAMED, 'renamed']
 ]);
 
-// Organizes watchers by unique ID.
+// Organize watchers by unique ID.
 const WATCHERS_BY_PATH = new Map();
 
 function onError(instance, err) {
@@ -77,11 +87,7 @@ const console = {
 //
 // But `nsfw` doesn't take globs; it takes explicit absolute paths. So we have
 // to do the filesystem crawling ourselves.
-//
-// If we were running this watcher on the renderer process, we'd have to worry
-// about scheduling this work so as not to lock up the process. But we can more
-// easily afford to go synchronous here because we're on a worker process.
-async function buildExcludedPaths(normalizedPath, ignoredNames) {
+async function buildExcludedPaths(normalizedPath, ignoredNames = []) {
   let results = [];
   let _totalTimeSpentMinimatching = 0;
   let start = new Date().valueOf();
@@ -127,19 +133,15 @@ async function buildExcludedPaths(normalizedPath, ignoredNames) {
 // Reacts to messages sent by the renderer.
 async function handleMessage(message) {
   let { id, event = null, args } = JSON.parse(message);
-  console.log('handleMessage:', id, event, args);
   switch (event) {
     case 'watcher:watch': {
       // `instance` is a unique ID for the watcher instance. We use it when we
       // push filesystem events so that they can be routed back to the correct
       // instance.
       let { normalizedPath, instance, ignored } = args;
-      console.log('handling watcher:watch with normalizedPath', normalizedPath, 'and ignored', ignored);
       let wrappedHandler = (err, events) => handler(instance, err, events);
       try {
         let excludedPaths = await buildExcludedPaths(normalizedPath, ignored);
-        console.log('Excluded paths:', instance, excludedPaths);
-
         let watcher = await nsfw(normalizedPath, wrappedHandler, {
           debounceMS: 200,
           errorCallback: (error) => onError(instance, error),
@@ -156,8 +158,12 @@ async function handleMessage(message) {
     }
     case 'watcher:update': {
       let { normalizedPath, instance, ignored } = args;
-      /** @type {nsfw.NSFW} */
       let watcher = WATCHERS_BY_PATH.get(instance);
+      if (!watcher) {
+        console.error('Error trying to update watcher for instance:', instance);
+        emit('watcher:reply', { id, error: 'No such watcher' });
+        break;
+      }
       let excludedPaths = await buildExcludedPaths(normalizedPath, ignored);
       await watcher.updateExcludedPaths(excludedPaths);
       emit('watcher:reply', { id, args: instance });
@@ -182,7 +188,6 @@ function run() {
   // Run a no-op on an interval just to keep the task alive.
   setInterval(() => {}, 10000);
   process.on('message', handleMessage);
-  console.log('nsfw worker starting');
   emit('watcher:ready');
 }
 
