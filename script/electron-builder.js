@@ -386,18 +386,11 @@ let options = {
     runAfterFinish: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
-    guid: "0949b555-c22c-56b7-873a-a960bdefa81f", // TODO
+    guid: "0949b555-c22c-56b7-873a-a960bdefa81f",
     // The GUID is generated from Electron-Builder based on our AppID.
     // Hardcoding it here means it will always be used as generated from the
     // AppID 'dev.pulsar-edit.pulsar'. If this value ever changes, a PR to
     // GitHub Desktop must be made with the updated value.
-    //
-    // We delete this value when building PulsarNext so that it’s regenerated
-    // based on the app ID. Otherwise the OS might consider it equivalent to
-    // stable Pulsar in some ways.
-    //
-    // TODO: On first look, this installer script seems not to need any
-    // updating for PulsarNext, but we should make sure.
     include: "resources/win/installer.nsh",
     warningsAsErrors: false,
     differentialPackage: false
