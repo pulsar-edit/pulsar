@@ -1,10 +1,15 @@
 {
-  "extends": [ "config:recommended", ":dependencyDashboardApproval"],
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboardApproval"
+  ],
   "constraints": {
     "node": "< 16"
   },
-  "labels": ["dependencies"],
-  "separateMajorMinor": "false",
+  "labels": [
+    "dependencies"
+  ],
+  "separateMajorMinor": false,
   "ignorePaths": [
     "packages/autocomplete-atom-api/spec/fixtures/",
     "packages/dev-live-reload/spec/fixtures/",
@@ -15,173 +20,327 @@
   "packageRules": [
     {
       "description": "Group all DevDependencies for the Core Editor",
-      "matchDepTypes": ["devDependencies"],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
       "groupName": "Core DevDependencies",
-      "matchPaths": ["package.json"]
+      "matchFileNames": [
+        "package.json"
+      ]
     },
     {
       "description": "Group all Dependencies for the Core Editor",
-      "matchDepTypes": ["dependencies"],
+      "matchDepTypes": [
+        "dependencies"
+      ],
       "groupName": "Core Dependencies",
-      "matchPaths": ["package.json"]
+      "matchFileNames": [
+        "package.json"
+      ]
     },
     {
       "description": "Group all of our Syntax Themes and UI Themes",
       "groupName": "Core Syntax & UI Themes",
-      "matchPaths": [
-        "packages/*-syntax/**", "packages/*-ui/**", "packages/*-theme/**"
+      "matchFileNames": [
+        "packages/*-syntax/**",
+        "packages/*-ui/**",
+        "packages/*-theme/**"
       ]
     },
     {
       "description": "Group all of our Languages",
       "groupName": "Core Languages",
-      "matchPaths": [
+      "matchFileNames": [
         "packages/language-*/**"
       ]
     },
     {
-      "matchPaths": [ "packages/about/**" ], "groupName": "about package"
+      "matchFileNames": [
+        "packages/about/**"
+      ],
+      "groupName": "about package"
     },
     {
-      "matchPaths": [ "packages/archive-view/**" ], "groupName": "archive-view package"
+      "matchFileNames": [
+        "packages/archive-view/**"
+      ],
+      "groupName": "archive-view package"
     },
     {
-      "matchPaths": [ "packages/autocomplete-atom-api/**" ], "groupName": "autocomplete-atom-api"
+      "matchFileNames": [
+        "packages/autocomplete-atom-api/**"
+      ],
+      "groupName": "autocomplete-atom-api"
     },
     {
-      "matchPaths": [ "packages/autocomplete-css/**" ], "groupName": "autocomplete-css package"
+      "matchFileNames": [
+        "packages/autocomplete-css/**"
+      ],
+      "groupName": "autocomplete-css package"
     },
     {
-      "matchPaths": [ "packages/autocomplete-html/**" ], "groupName": "autocomplete-html package"
+      "matchFileNames": [
+        "packages/autocomplete-html/**"
+      ],
+      "groupName": "autocomplete-html package"
     },
     {
-      "matchPaths": [ "packages/autocomplete-plus/**" ], "groupName": "autocomplete-plus package"
+      "matchFileNames": [
+        "packages/autocomplete-plus/**"
+      ],
+      "groupName": "autocomplete-plus package"
     },
     {
-      "matchPaths": [ "packages/autocomplete-snippets/**" ], "groupName": "autocomplete-snippets package"
+      "matchFileNames": [
+        "packages/autocomplete-snippets/**"
+      ],
+      "groupName": "autocomplete-snippets package"
     },
     {
-      "matchPaths": [ "packages/autoflow/**" ], "groupName": "autoflow package"
+      "matchFileNames": [
+        "packages/autoflow/**"
+      ],
+      "groupName": "autoflow package"
     },
     {
-      "matchPaths": [ "packages/autosave/**" ], "groupName": "autosave package"
+      "matchFileNames": [
+        "packages/autosave/**"
+      ],
+      "groupName": "autosave package"
     },
     {
-      "matchPaths": [ "packages/background-tips/**" ], "groupName": "background-tips package"
+      "matchFileNames": [
+        "packages/background-tips/**"
+      ],
+      "groupName": "background-tips package"
     },
     {
-      "matchPaths": [ "packages/bookmarks/**" ], "groupName": "bookmarks package"
+      "matchFileNames": [
+        "packages/bookmarks/**"
+      ],
+      "groupName": "bookmarks package"
     },
     {
-      "matchPaths": [ "packages/bracket-matcher/**" ], "groupName": "bracket-matcher package"
+      "matchFileNames": [
+        "packages/bracket-matcher/**"
+      ],
+      "groupName": "bracket-matcher package"
     },
     {
-      "matchPaths": [ "packages/command-palette/**" ], "groupName": "command-palette package"
+      "matchFileNames": [
+        "packages/command-palette/**"
+      ],
+      "groupName": "command-palette package"
     },
     {
-      "matchPaths": [ "packages/dalek/**" ], "groupName": "dalek package"
+      "matchFileNames": [
+        "packages/dalek/**"
+      ],
+      "groupName": "dalek package"
     },
     {
-      "matchPaths": [ "packages/deprecation-cop/**" ], "groupName": "deprecation-cop package"
+      "matchFileNames": [
+        "packages/deprecation-cop/**"
+      ],
+      "groupName": "deprecation-cop package"
     },
     {
-      "matchPaths": [ "packages/dev-live-reload/**" ], "groupName": "dev-live-reload package"
+      "matchFileNames": [
+        "packages/dev-live-reload/**"
+      ],
+      "groupName": "dev-live-reload package"
     },
     {
-      "matchPaths": [ "packages/encoding-selector/**" ], "groupName": "encoding-selector package"
+      "matchFileNames": [
+        "packages/encoding-selector/**"
+      ],
+      "groupName": "encoding-selector package"
     },
     {
-      "matchPaths": [ "packages/exception-reporting/**" ], "groupName": "exception-reporting package"
+      "matchFileNames": [
+        "packages/exception-reporting/**"
+      ],
+      "groupName": "exception-reporting package"
     },
     {
-      "matchPaths": [ "packages/find-and-replace/**" ], "groupName": "find-and-replace package"
+      "matchFileNames": [
+        "packages/find-and-replace/**"
+      ],
+      "groupName": "find-and-replace package"
     },
     {
-      "matchPaths": [ "packages/fuzzy-finder/**" ], "groupName": "fuzzy-finder package"
+      "matchFileNames": [
+        "packages/fuzzy-finder/**"
+      ],
+      "groupName": "fuzzy-finder package"
     },
     {
-      "matchPaths": [ "packages/git-diff/**" ], "groupName": "git-diff package"
+      "matchFileNames": [
+        "packages/git-diff/**"
+      ],
+      "groupName": "git-diff package"
     },
     {
-      "matchPaths": [ "packages/go-to-line/**" ], "groupName": "go-to-line package"
+      "matchFileNames": [
+        "packages/go-to-line/**"
+      ],
+      "groupName": "go-to-line package"
     },
     {
-      "matchPaths": [ "packages/grammar-selector/**" ], "groupName": "grammar-selector package"
+      "matchFileNames": [
+        "packages/grammar-selector/**"
+      ],
+      "groupName": "grammar-selector package"
     },
     {
-      "matchPaths": [ "packages/image-view/**" ], "groupName": "image-view package"
+      "matchFileNames": [
+        "packages/image-view/**"
+      ],
+      "groupName": "image-view package"
     },
     {
-      "matchPaths": [ "packages/incompatible-packages/**" ], "groupName": "incompatible-packages package"
+      "matchFileNames": [
+        "packages/incompatible-packages/**"
+      ],
+      "groupName": "incompatible-packages package"
     },
     {
-      "matchPaths": [ "packages/keybinding-resolver/**" ], "groupName": "keybinding-resolver package"
+      "matchFileNames": [
+        "packages/keybinding-resolver/**"
+      ],
+      "groupName": "keybinding-resolver package"
     },
     {
-      "matchPaths": [ "packages/line-ending-selector/**" ], "groupName": "line-ending-selector package"
+      "matchFileNames": [
+        "packages/line-ending-selector/**"
+      ],
+      "groupName": "line-ending-selector package"
     },
     {
-      "matchPaths": [ "packages/link/**" ], "groupName": "link package"
+      "matchFileNames": [
+        "packages/link/**"
+      ],
+      "groupName": "link package"
     },
     {
-      "matchPaths": [ "packages/markdown-preview/**" ], "groupName": "markdown-preview package"
+      "matchFileNames": [
+        "packages/markdown-preview/**"
+      ],
+      "groupName": "markdown-preview package"
     },
     {
-      "matchPaths": [ "packages/notifications/**" ], "groupName": "notifications package"
+      "matchFileNames": [
+        "packages/notifications/**"
+      ],
+      "groupName": "notifications package"
     },
     {
-      "matchPaths": [ "packages/open-on-github/**" ], "groupName": "open-on-github package"
+      "matchFileNames": [
+        "packages/open-on-github/**"
+      ],
+      "groupName": "open-on-github package"
     },
     {
-      "matchPaths": [ "packages/package-generator/**" ], "groupName": "package-generator package"
+      "matchFileNames": [
+        "packages/package-generator/**"
+      ],
+      "groupName": "package-generator package"
     },
     {
-      "matchPaths": [ "packages/pulsar-updater/**" ], "groupName": "pulsar-updater package"
+      "matchFileNames": [
+        "packages/pulsar-updater/**"
+      ],
+      "groupName": "pulsar-updater package"
     },
     {
-      "matchPaths": [ "packages/settings-view/**" ], "groupName": "settings-view package"
+      "matchFileNames": [
+        "packages/settings-view/**"
+      ],
+      "groupName": "settings-view package"
     },
     {
-      "matchPaths": [ "packages/snippets/**" ], "groupName": "snippets package"
+      "matchFileNames": [
+        "packages/snippets/**"
+      ],
+      "groupName": "snippets package"
     },
     {
-      "matchPaths": [ "packages/spell-check/**" ], "groupName": "spell-check package"
+      "matchFileNames": [
+        "packages/spell-check/**"
+      ],
+      "groupName": "spell-check package"
     },
     {
-      "matchPaths": [ "packages/status-bar/**" ], "groupName": "status-bar package"
+      "matchFileNames": [
+        "packages/status-bar/**"
+      ],
+      "groupName": "status-bar package"
     },
     {
-      "matchPaths": [ "packages/styleguide/**" ], "groupName": "styleguide package"
+      "matchFileNames": [
+        "packages/styleguide/**"
+      ],
+      "groupName": "styleguide package"
     },
     {
-      "matchPaths": [ "packages/symbol-provider-ctags/**" ], "groupName": "symbol-provider-ctags package"
+      "matchFileNames": [
+        "packages/symbol-provider-ctags/**"
+      ],
+      "groupName": "symbol-provider-ctags package"
     },
     {
-      "matchPaths": [ "packages/symbol-proivder-tree-sitter/**" ], "groupName": "symbol-provider-tree-sitter package"
+      "matchFileNames": [
+        "packages/symbol-proivder-tree-sitter/**"
+      ],
+      "groupName": "symbol-provider-tree-sitter package"
     },
     {
-      "matchPaths": [ "packages/symbols-view/**" ], "groupName": "symbols-view package"
+      "matchFileNames": [
+        "packages/symbols-view/**"
+      ],
+      "groupName": "symbols-view package"
     },
     {
-      "matchPaths": [ "packages/tabs/**" ], "groupName": "tabs package"
+      "matchFileNames": [
+        "packages/tabs/**"
+      ],
+      "groupName": "tabs package"
     },
     {
-      "matchPaths": [ "packages/timecop/**" ], "groupName": "timecop package"
+      "matchFileNames": [
+        "packages/timecop/**"
+      ],
+      "groupName": "timecop package"
     },
     {
-      "matchPaths": [ "packages/tree-view/**" ], "groupName": "tree-view package"
+      "matchFileNames": [
+        "packages/tree-view/**"
+      ],
+      "groupName": "tree-view package"
     },
     {
-      "matchPaths": [ "packages/update-package-dependencies/**" ], "groupName": "update-package-dependencies package"
+      "matchFileNames": [
+        "packages/update-package-dependencies/**"
+      ],
+      "groupName": "update-package-dependencies package"
     },
     {
-      "matchPaths": [ "packages/welcome/**" ], "groupName": "welcome package"
+      "matchFileNames": [
+        "packages/welcome/**"
+      ],
+      "groupName": "welcome package"
     },
     {
-      "matchPaths": [ "packages/whitespace/**" ], "groupName": "whitespace package"
+      "matchFileNames": [
+        "packages/whitespace/**"
+      ],
+      "groupName": "whitespace package"
     },
     {
-      "matchPaths": [ "packages/wrap-guide/**" ], "groupName": "wrap-guide package"
+      "matchFileNames": [
+        "packages/wrap-guide/**"
+      ],
+      "groupName": "wrap-guide package"
     }
   ]
 }
