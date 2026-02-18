@@ -1,4 +1,4 @@
-const {Point, CompositeDisposable} = require('atom')
+const {Point} = require('atom')
 const fs = require('fs')
 
 const path = require('path')
@@ -10,10 +10,11 @@ const getIconServices = require('./get-icon-services')
 const MAX_RESULTS = 10
 
 module.exports = class FuzzyFinderView {
-  constructor (metricsReporter) {
+  constructor () {
     this.previousQueryWasLineJump = false
+    this.previousQueryOverrodeIgnore = false
     this.items = []
-    this.metricsReporter = metricsReporter
+    this.ignoredItems = []
     this.filterFn = this.filterFn.bind(this)
 
     this.selectListView = new SelectListView({
@@ -26,6 +27,11 @@ module.exports = class FuzzyFinderView {
         if (colon !== -1) {
           query = query.slice(0, colon)
         }
+
+        if (query.indexOf('!') === 0 ) {
+            query = query.slice(1)
+        }
+
         // Normalize to backslashes on Windows
         if (process.platform === 'win32') {
           query = query.replace(/\//g, '\\')
@@ -46,7 +52,11 @@ module.exports = class FuzzyFinderView {
           this.iconDisposables = null
         }
         const isLineJump = this.isQueryALineJump()
+        const overridesIgnore = this.queryOverridesIgnore()
+
+        // if last query was not line jump and this one is, clear the list of items
         if (isLineJump) {
+
           this.previousQueryWasLineJump = true
           const query = this.selectListView.getQuery()
           let emptyMessage = null
@@ -66,8 +76,24 @@ module.exports = class FuzzyFinderView {
             emptyMessage: emptyMessage,
             errorMessage: errorMessage
           })
-        } else if (this.previousQueryWasLineJump) {
+
+        // if last query did not override ignored paths and this one does,
+        // set the filter items to the ignored paths
+        } else if (!this.previousQueryOverrodeIgnore && overridesIgnore) {
+          this.previousQueryOverrodeIgnore = true
+          this.selectListView.update({
+            items: this.ignoredItems,
+            emptyMessage: this.getEmptyMessage(),
+            errorMessage: null
+          })
+
+        // if last query was line jump and this one is not,
+        // OR if last query overrode ignored paths and this one doesn't
+        // reset the filter items to the regular items
+        } else if ((this.previousQueryWasLineJump && !isLineJump) ||
+                   (this.previousQueryOverrodeIgnore && !overridesIgnore)) {
           this.previousQueryWasLineJump = false
+          this.previousQueryOverrodeIgnore = false
           this.selectListView.update({
             items: this.items,
             emptyMessage: this.getEmptyMessage(),
@@ -125,10 +151,13 @@ module.exports = class FuzzyFinderView {
       }
     })
 
-    if (!this.nativeFuzzy) {
-      this.nativeFuzzy = atom.ui.fuzzyMatcher.setCandidates(
+    if (!this.nativeFuzzyTracked) {
+      this.nativeFuzzyTracked = atom.ui.fuzzyMatcher.setCandidates(
         this.items.map(el => el.label)
       );
+      this.nativeFuzzyIgnored = atom.ui.fuzzyMatcher.setCandidates(
+        this.ignoredItems.map(el => el.label)
+      )
       // We need a separate instance of the fuzzy finder to calculate the
       // matched paths only for the returned results. This speeds up considerably
       // the filtering of items.
@@ -273,6 +302,10 @@ module.exports = class FuzzyFinderView {
     )
   }
 
+  queryOverridesIgnore () {
+    return this.selectListView.getQuery().indexOf('!') === 0
+  }
+
   getCaretPosition () {
     const query = this.selectListView.getQuery()
     const firstColon = query.indexOf(':')
@@ -292,11 +325,17 @@ module.exports = class FuzzyFinderView {
     return position
   }
 
-  setItems (items) {
+  setItems (items, ignoredItems = []) {
     this.items = items
+    this.ignoredItems = ignoredItems
+
     atom.ui.fuzzyMatcher.setCandidates(
-      this.nativeFuzzy,
+      this.nativeFuzzyTracked,
       this.items.map(item => item.label)
+    );
+    atom.ui.fuzzyMatcher.setCandidates(
+      this.nativeFuzzyIgnored,
+      this.ignoredItems.map(item => item.label)
     );
 
     if (this.isQueryALineJump()) {
@@ -308,7 +347,9 @@ module.exports = class FuzzyFinderView {
       })
     } else {
       this.selectListView.update({
-        items: this.items,
+        items: this.queryOverridesIgnore()
+          ? this.ignoredItems
+          : this.items,
         infoMessage: null,
         loadingMessage: null,
         loadingBadge: null
@@ -342,7 +383,15 @@ module.exports = class FuzzyFinderView {
 
   filterFn(items, query) {
     if (!query) return items
-    return this.nativeFuzzy.match(query, {maxResults: MAX_RESULTS, algorithm: 'command-t'})
+
+    if (this.queryOverridesIgnore()) {
+        return this.nativeFuzzyIgnored
+          .match(query, {maxResults: MAX_RESULTS, algorithm: 'command-t'})
+          .map(({id}) => this.ignoredItems[id])
+    }
+
+    return this.nativeFuzzyTracked
+      .match(query, {maxResults: MAX_RESULTS, algorithm: 'command-t'})
       .map(({id}) => this.items[id])
   }
 }
@@ -387,7 +436,7 @@ function highlight (path, matches, offsetIndex) {
 }
 
 class FuzzyFinderItem {
-  constructor ({filePath, label, ownerGitHubUsername, filterQuery, matches, repository}) {
+  constructor ({filePath, label, ownerGitHubUsername, matches, repository}) {
     this.filePath = filePath
     this.label = label
     this.element = document.createElement('li')
