@@ -375,7 +375,10 @@ describe('watchPath', function () {
         expect(watcher.constructor.name).toBe('PathWatcher');
       });
 
-      it('respects `core.ignoredNames`', async () => {
+      // TODO: File-watchers cannot respect `core.ignoredNames` by default
+      // without breaking backward-compatibility. Keeping this spec around for a
+      // future where we might use this new behavior on an opt-in basis.
+      xit('respects `core.ignoredNames`', async () => {
         jasmine.useRealClock();
 
         let existing = atom.config.get('core.ignoredNames');
@@ -536,44 +539,6 @@ describe('watchPath', function () {
     disposables?.dispose();
   })
 
-  // TODO: File-watchers cannot respect `core.ignoredNames` by default
-  // without breaking backward-compatibility. Keeping this spec around for a
-  // future where we might use this new behavior on an opt-in basis.
-  xit('respects `core.ignoredNames`', async () => {
-    jasmine.useRealClock();
-
-    let existing = atom.config.get('core.ignoredNames');
-    atom.config.set(
-      'core.ignoredNames',
-      [...existing, 'some-other-dir']
-    );
-
-    const rootDir = await tempMkdir('atom-fsmanager-test-');
-
-    // Create a directory that will be affected by our `core.ignoredNames`
-    // value.
-    let ignoredDir = path.join(rootDir, 'some-other-dir');
-    await mkdir(ignoredDir, { recursive: true });
-
-    let spy = jasmine.createSpy();
-
-    let watcher = await watchPath(rootDir, {}, spy);
-    disposables.add(watcher);
-
-    // Writing a file to a path within an ignored directory should not
-    // trigger the callback…
-    await writeFile(path.join(ignoredDir, 'foo.txt'), 'something');
-    // (file-watchers might have a debounce interval)
-    await wait(1000);
-    expect(spy).not.toHaveBeenCalled();
-
-    // …but writing a file to a path outside of an ignored directory should
-    // trigger the callback.
-    await writeFile(path.join(rootDir, 'foo.txt'), 'something');
-    // (file-watchers might have a debounce interval)
-    await wait(1000);
-    expect(spy).toHaveBeenCalled();
-  });
 
   it('reuses an existing native watcher and resolves getStartPromise immediately if attached to a running watcher', async function () {
     const rootDir = await tempMkdir('atom-fsmanager-test-');
