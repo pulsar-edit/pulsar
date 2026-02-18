@@ -1,6 +1,7 @@
 const path = require('path');
 const { CompositeDisposable } = require('event-kit');
 
+// The HTMLElement corresponding to a {Pane}.
 class PaneElement extends HTMLElement {
   constructor() {
     super();
@@ -72,6 +73,16 @@ class PaneElement extends HTMLElement {
     this.addEventListener('drop', handleDrop);
   }
 
+  // Sets up callbacks when PaneElement initializes
+  //
+  // Only called in {Pane::getElement} as of February 2025.
+  //
+  // * `model` The container {Pane}.
+  // * An {Object} with the following keys:
+  //   * `views` A {ViewRegistry} used to hide and show pane items.
+  //   * `applicationDelegate` An {ApplicationDelegate} used to open file paths.
+  //
+  // Returns this {PaneElement}.
   initialize(model, { views, applicationDelegate }) {
     this.model = model;
     this.views = views;

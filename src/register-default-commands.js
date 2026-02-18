@@ -449,6 +449,11 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
     'core:paste': function() {
       return this.pasteText();
     },
+    'editor:paste-without-reindenting': function() {
+      return this.pasteText({
+        autoIndent: false
+      });
+    },
     'editor:paste-without-reformatting': function() {
       return this.pasteText({
         normalizeLineEndings: false,
