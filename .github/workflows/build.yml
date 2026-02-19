@@ -13,7 +13,7 @@ env:
   # Variables needed for build information
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PYTHON_VERSION: '3.12'
-  NODE_VERSION: 16
+  NODE_VERSION: 24
   ROLLING_UPLOAD_TOKEN: ${{ secrets.ROLLING_RELEASE_UPLOAD_TOKEN }}
   # Below variables allow us to quickly control visual tests for each platform
   RUN_WINDOWS_VT: false
