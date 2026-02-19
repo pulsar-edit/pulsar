@@ -271,8 +271,12 @@ class Directory {
         this.realPath,
         { signal: this.watcherAbortController.signal },
         (eventType, filename) => {
+          // Modifying files does not require reloading the tree view.
+          if (eventType === 'change') {
+            return;
+          }
           // Deletions are represented as `rename` events — so if this
-          // directory itself is “renamed,” that means it's probably been
+          // directory itself is "renamed," that means it's probably been
           // deleted.
           if ((filename === this.path || filename === this.realPath) && eventType === 'rename') {
             if (!fs.existsSync(this.path)) {
