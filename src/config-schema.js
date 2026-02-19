@@ -1,6 +1,7 @@
 // This is loaded by atom-environment.coffee. See
-// https://atom.io/docs/api/latest/Config for more information about config TODO: Link to Pulsar API site when documented
-// schemas.
+// https://atom.io/docs/api/latest/Config for more information about config
+//
+// TODO: Link to Pulsar API site when documented schemas.
 const configSchema = {
   core: {
     type: 'object',
@@ -347,13 +348,21 @@ const configSchema = {
       },
       fileSystemWatcher: {
         description:
-          'Choose the underlying implementation used to watch for filesystem changes. Emulating changes will miss any events caused by applications other than Pulsar, but may help prevent crashes or freezes.',
+          'Choose the underlying implementation used to watch for filesystem changes. It’s best to let Pulsar manage this, but you can change this value if you want to opt into a specific watcher that may work better for your platform.',
         type: 'string',
-        default: 'native',
+        default: 'default',
         enum: [
           {
-            value: 'native',
-            description: 'Native operating system APIs'
+            value: 'default',
+            description: 'Default (let Pulsar decide)'
+          },
+          {
+            value: 'nsfw',
+            description: 'Node Sentinel File Watcher'
+          },
+          {
+            value: 'parcel',
+            description: '@parcel/watcher'
           }
         ]
       },
