@@ -174,6 +174,92 @@ describe('GrammarRegistry', () => {
     });
   });
 
+  describe('.onDidAssignDefaultGrammar(callback)', () => {
+    it('fires when no best grammar can be found and the default grammar is used', () => {
+      const buffer = new TextBuffer();
+      grammarRegistry.loadGrammarSync(
+        require.resolve('language-javascript/grammars/javascript.cson')
+      );
+
+      let callbackFired = false;
+      let callbackDisposable = grammarRegistry.onDidAssignDefaultGrammar(({ grammar, buffer }) => {
+        callbackFired = true;
+      });
+      grammarRegistry.maintainLanguageMode(buffer);
+      buffer.setPath('foo.some-strange-language');
+
+      expect(buffer.getLanguageMode().getLanguageId()).toBe(
+        'text.plain.null-grammar'
+      );
+      expect(callbackFired).toBe(true);
+      callbackDisposable.dispose();
+    });
+
+    it('does not fire when a grammar can be found', () => {
+      const buffer = new TextBuffer();
+      grammarRegistry.loadGrammarSync(
+        require.resolve('language-javascript/grammars/javascript.cson')
+      );
+
+      let callbackFired = false;
+      let callbackDisposable = grammarRegistry.onDidAssignDefaultGrammar(({ grammar, buffer }) => {
+        callbackFired = true;
+      });
+      buffer.setPath('foo.js');
+      grammarRegistry.maintainLanguageMode(buffer);
+
+      expect(buffer.getLanguageMode().getLanguageId()).toBe(
+        'source.js'
+      );
+      expect(callbackFired).toBe(false);
+    });
+
+    it('does not fire when a grammar is manually assigned', () => {
+      const buffer = new TextBuffer();
+      grammarRegistry.loadGrammarSync(
+        require.resolve('language-javascript/grammars/javascript.cson')
+      );
+      grammarRegistry.loadGrammarSync(
+        require.resolve('language-css/grammars/css.cson')
+      );
+
+      let callbackFired = false;
+      let callbackDisposable = grammarRegistry.onDidAssignDefaultGrammar(({ grammar, buffer }) => {
+        callbackFired = true;
+      });
+      buffer.setPath('foo.js');
+      grammarRegistry.maintainLanguageMode(buffer);
+
+      expect(buffer.getLanguageMode().getLanguageId()).toBe(
+        'source.js'
+      );
+      expect(grammarRegistry.assignLanguageMode(buffer, 'source.css')).toBe(
+        true
+      );
+      expect(buffer.getLanguageMode().getLanguageId()).toBe('source.css');
+      expect(callbackFired).toBe(false);
+    });
+
+    it('does not fire if the grammar assigned is regular text', () => {
+      const buffer = new TextBuffer();
+      grammarRegistry.loadGrammarSync(
+        require.resolve('language-text/grammars/plain text.cson')
+      );
+
+      let callbackFired = false;
+      let callbackDisposable = grammarRegistry.onDidAssignDefaultGrammar(({ grammar, buffer }) => {
+        callbackFired = true;
+      });
+      buffer.setPath('foo.txt');
+      grammarRegistry.maintainLanguageMode(buffer);
+
+      expect(buffer.getLanguageMode().getLanguageId()).toBe(
+        'text.plain'
+      );
+      expect(callbackFired).toBe(false);
+    });
+  });
+
   describe('.maintainLanguageMode(buffer)', () => {
     it('assigns a grammar to the buffer based on its path', async () => {
       const buffer = new TextBuffer();
