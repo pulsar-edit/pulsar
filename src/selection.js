@@ -308,27 +308,49 @@ module.exports = class Selection {
   }
 
   // Public: Selects all the text from the current cursor position to the
-  // beginning of the line.
+  // beginning of the buffer line.
+  //
+  // Deprecated; prefer {::selectToBeginningOfBufferLine}.
   selectToBeginningOfLine() {
-    this.modifySelection(() => this.cursor.moveToBeginningOfLine());
+    this.selectToBeginningOfBufferLine();
+  }
+
+  // Public: Selects all the text from the current cursor position to the
+  // beginning of the screen line.
+  selectToBeginningOfScreenLine() {
+    this.modifiySelection(() => this.cursor.moveToBeginningOfScreenLine());
+  }
+
+  // Public: Selects all the text from the current cursor position to the
+  // beginning of the buffer line.
+  selectToBeginningOfBufferLine() {
+    this.modifySelection(() => this.cursor.moveToBeginningOfBufferLine());
   }
 
   // Public: Selects all the text from the current cursor position to the first
-  // character of the line.
+  // non-whitespace character of the screen line.
   selectToFirstCharacterOfLine() {
     this.modifySelection(() => this.cursor.moveToFirstCharacterOfLine());
   }
 
+  // Public: Selects all the text from the current cursor position to the end
+  // of the screen line.
+  //
+  // Deprecated; prefer {::selectToEndOfScreenLine}.
+  selectToEndOfLine() {
+    this.selectToEndOfScreenLine();
+  }
+
   // Public: Selects all the text from the current cursor position to the end of
   // the screen line.
-  selectToEndOfLine() {
+  selectToEndOfScreenLine() {
     this.modifySelection(() => this.cursor.moveToEndOfScreenLine());
   }
 
   // Public: Selects all the text from the current cursor position to the end of
   // the buffer line.
   selectToEndOfBufferLine() {
-    this.modifySelection(() => this.cursor.moveToEndOfLine());
+    this.modifySelection(() => this.cursor.moveToEndOfBufferLine());
   }
 
   // Public: Selects all the text from the current cursor position to the
@@ -632,14 +654,42 @@ module.exports = class Selection {
     this.deleteSelectedText(options);
   }
 
-  // Public: Removes from the beginning of the line which the selection begins on
-  // all the way through to the end of the selection.
+  // Public: Removes from the beginning of the buffer line which the selection
+  // begins on all the way through to the end of the selection.
+  //
+  // Deprecated; prefer {::deleteToBeginningOfBufferLine}.
+  deleteToBeginningOfLine(options = {}) {
+    if (!this.ensureWritable('deleteToBeginningOfLine', options)) return;
+    return this.deleteToBeginningOfBufferLine(options);
+  }
+
+  // Public: Removes all text from the beginning of the buffer line which the
+  // selection begins on all the way through to the end of the selection. When
+  // the cursor is on the first column of the buffer line and the selection is
+  // empty, deletes the preceding newline character.
   //
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
-  deleteToBeginningOfLine(options = {}) {
-    if (!this.ensureWritable('deleteToBeginningOfLine', options)) return;
+  deleteToBeginningOfBufferLine(options = {}) {
+    if (!this.ensureWritable('deleteToBeginningOfBufferLine', options)) return;
     if (this.isEmpty() && this.cursor.isAtBeginningOfLine()) {
+      this.selectLeft();
+    } else {
+      this.selectToBeginningOfLine();
+    }
+    this.deleteSelectedText(options);
+  }
+
+  // Public: Removes all text from the beginning of the screen line which the
+  // selection begins on all the way through to the end of the selection. When
+  // the cursor is on the first column of the buffer line and the selection is
+  // empty, deletes the preceding newline character.
+  //
+  // * `options` (optional) {Object}
+  //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
+  deleteToBeginningOfScreenLine(options = {}) {
+    if (!this.ensureWritable('deleteToBeginningOfBufferLine', options)) return;
+    if (this.isEmpty()) {
       this.selectLeft();
     } else {
       this.selectToBeginningOfLine();
@@ -659,20 +709,49 @@ module.exports = class Selection {
   }
 
   // Public: If the selection is empty, removes all text from the cursor to the
-  // end of the line. If the cursor is already at the end of the line, it
-  // removes the following newline. If the selection isn't empty, only deletes
-  // the contents of the selection.
+  // end of the screen line. If the cursor is already at the end of the screen
+  // line, deletes the following newline. If the selection isn't empty, only
+  // deletes the contents of the selection.
+  //
+  // Deprecated; prefer {::deleteToEndOfScreenLine}.
+  deleteToEndOfLine(options = {}) {
+    return this.deleteToEndOfScreenLine(options);
+  }
+
+  // Public: If the selection is empty, removes all text from the cursor to the
+  // end of the screen line. If the cursor is already at the end of the screen
+  // line, deletes the following newline. If the selection isn't empty, only
+  // deletes the contents of the selection.
   //
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
-  deleteToEndOfLine(options = {}) {
-    if (!this.ensureWritable('deleteToEndOfLine', options)) return;
+  deleteToEndOfScreenLine(options = {}) {
+    if (!this.ensureWritable('deleteToEndOfScreenLine', options)) return;
     if (this.isEmpty()) {
       if (this.cursor.isAtEndOfLine()) {
         this.delete(options);
         return;
       }
-      this.selectToEndOfLine();
+      this.selectToEndOfScreenLine();
+    }
+    this.deleteSelectedText(options);
+  }
+
+  // Public: If the selection is empty, removes all text from the cursor to the
+  // end of the buffer line. If the cursor is already at the end of the buffer
+  // line, deletes the following newline. If the selection isn't empty, only
+  // deletes the contents of the selection.
+  //
+  // * `options` (optional) {Object}
+  //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
+  deleteToEndOfBufferLine(options = {}) {
+    if (!this.ensureWritable('deleteToEndOfBufferLine', options)) return;
+    if (this.isEmpty()) {
+      if (this.cursor.isAtEndOfLine()) {
+        this.delete(options);
+        return;
+      }
+      this.selectToEndOfBufferLine();
     }
     this.deleteSelectedText(options);
   }
@@ -861,10 +940,17 @@ module.exports = class Selection {
 
   // Public: Cuts the selection until the end of the screen line.
   //
+  // Deprecated; prefer {::cutToEndOfScreenLine}.
+  cutToEndOfLine(maintainClipboard, options = {}) {
+    return this.cutToEndOfScreenLine(maintainClipboard, options);
+  }
+
+  // Public: Cuts the selection until the end of the screen line.
+  //
   // * `maintainClipboard` {Boolean}
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
-  cutToEndOfLine(maintainClipboard, options = {}) {
+  cutToEndOfScreenLine(maintainClipboard, options = {}) {
     if (!this.ensureWritable('cutToEndOfLine', options)) return;
     if (this.isEmpty()) this.selectToEndOfLine();
     return this.cut(maintainClipboard, false, options.bypassReadOnly);
