@@ -42,6 +42,64 @@ function filePathMatchesGlob(filePath, matcher) {
   return matcher.negate ? true : false;
 }
 
+// Given a path pattern like `foo/bar/baz` and a list of the current root path
+// basenames, reinterprets the path pattern and decides which root(s) it refers
+// to.
+//
+// We need to do this when there are multiple project roots, since the first
+// segment may tell us which root is being targeted.
+//
+// Returns a two-item array. The first item is the root basename to which the
+// pattern applies, or `null` if it applies to all roots. The second item is
+// the normalized path exclusion to pass along to the searcher when applicable.
+//
+// Exclusions can be interpreted in the same manner and will be correctly
+// normalized.
+//
+// Examples:
+//
+// If `foo` is in `rootBasenames`, pattern `foo/bar` will be reinterpreted to
+// `bar`; `['foo', 'bar']` will be returned.
+//
+// If `foo` is in `rootBasenames`, pattern `!foo/bar` will be reinterpreted to
+// `!bar`; `['foo', '!bar']` will be returned.
+//
+// If `foo` _is not_ in `rootBasenames`, pattern `foo/bar` will remain as-is;
+// `[null, 'foo/bar']` will be returned.
+//
+// If `foo` _is not_ in `rootBasenames`, pattern `!foo/bar` will remain as-is;
+// `[null, '!foo/bar']` will be returned.
+//
+function extractProjectRootsFromPathPattern (pathPattern, rootBasenames) {
+  let negated = pathPattern.startsWith('!');
+  if (negated) {
+    pathPattern = pathPattern.substring(1);
+  }
+  let prefix = negated ? '!' : '';
+  let normalized = path.normalize(pathPattern);
+  let originalPathPattern = pathPattern;
+  if (pathPattern === "") return [null, ""];
+  let rootBasename;
+  if (!pathPattern.includes(path.sep)) {
+    rootBasename = pathPattern;
+    pathPattern = "";
+  } else {
+    let index = normalized.indexOf(path.sep);
+    rootBasename = normalized.substring(0, index);
+    pathPattern = normalized.slice(index + 1);
+  }
+
+  if (rootBasenames.includes(rootBasename)) {
+    return [rootBasename, `${prefix}${pathPattern}`];
+  }
+  return [null, `${prefix}${originalPathPattern}`];
+}
+
+function getBasenamesFromProjectRoots () {
+  let roots = atom.project.getPaths();
+  return roots.map(r => path.basename(r));
+}
+
 const CACHED_MINIMATCH_INSTANCES = new Map();
 
 function minimatchInstanceForPattern(pattern) {
@@ -2118,7 +2176,7 @@ module.exports = class Workspace extends Model {
   //
   // * `regex` {RegExp} to search with.
   // * `options` (optional) {Object}
-  //   * `paths` An {Array} of glob patterns to search within.
+  //   * `paths` An {Array} of glob patterns to search within. (See note below for multi-root projects.)
   //   * `onPathsSearched` (optional) {Function} to be periodically called
   //     with number of paths searched.
   //   * `leadingContextLineCount` {Number} default `0`; The number of lines
@@ -2126,19 +2184,164 @@ module.exports = class Workspace extends Model {
   //   * `trailingContextLineCount` {Number} default `0`; The number of lines
   //      after the matched line to include in the results object.
   // * `iterator` {Function} callback on each file found.
-  //
+  //   //
   // Returns a {Promise} with a `cancel()` method that will cancel all
   // of the underlying searches that were started as part of this scan.
+  //
+  // #### Caveats
+  //
+  // When a project has multiple roots, the patterns in `options.paths` may opt
+  // into or out of specific roots.
+  //
+  // For instance: when only one root is present, `'foo/bar.js'` is construed
+  // as a glob meant to match `<root>/foo/bar.js`; when multiple roots are
+  // present and at least one project root has a base directory name of `foo`,
+  // then `foo/bar.js` is construed as a glob meant only for root `foo` and
+  // meant to match `bar.js`.
   scan(regex, options = {}, iterator) {
     if (_.isFunction(options)) {
       iterator = options;
       options = {};
     }
 
-    // Find a searcher for every Directory in the project. Each searcher that is matched
-    // will be associated with an Array of Directory objects in the Map.
+    const hasMultipleProjectRoots = atom.project.getPaths().length > 1;
+    let pathsWithProjectRoots = options.paths?.map(p => [null, p]) ?? undefined;
+    if (hasMultipleProjectRoots) {
+      let rootBasenames = getBasenamesFromProjectRoots();
+      pathsWithProjectRoots = options.paths ?
+        options.paths.map(p => extractProjectRootsFromPathPattern(p, rootBasenames)) :
+        options.paths;
+    } else if (pathsWithProjectRoots) {
+      pathsWithProjectRoots = options.paths?.map(p => [null, p]) ?? undefined;
+    }
+
+    // Find a searcher for every Directory in the project. Each searcher that
+    // is matched will be associated with an Array of Directory objects in the
+    // Map.
     const directoriesForSearcher = new Map();
+    const customInclusionsForDirectory = new Map();
+
+    // We set this variable's initial value to what we need it to be in order
+    // for a single project root to pass the check below — because if there's
+    // only one project root, it can never be skipped altogether.
+    let hasOnlyExclusions = true;
+
+    let skippedProjectRoots = new Set();
     for (const directory of this.project.getDirectories()) {
+      let isExplicitlyExcluded = false;
+      let filteredPaths = options.paths;
+      if (hasMultipleProjectRoots && options.paths) {
+        // When there are multiple project roots, we must interpret each path
+        // inclusion as though it _could_ start with a segment that references
+        // the basename of the project root. That's how users can refine path
+        // inclusions/exclusions in a multi-project environment.
+        //
+        // But we don't want to _mandate_ that path exclusions work this way,
+        // since that would make it more tedious to specify globs like (e.g.)
+        // `**/src/*.js`. We should only interpret the first segment to refer
+        // to a project root if the basename matches that of one of our actual
+        // project roots.
+        //
+        // Given a project with two root folders whose basenames are `foo` and
+        // `bar`, here's how various path values are reinterpreted:
+        //
+        // * `foo/src` is interpreted to mean "search root `foo` with inclusion
+        //   `src` and ignore other roots."
+        // * `!foo/src` is interpreted to mean "search root `foo` and exclude
+        //   results from `src`; also, search root `bar` with no path
+        //   inclusions or exclusions."
+        // * `foo` is interpreted to mean "search only root `foo` with no path
+        //   inclusions or exclusions."
+        // * `!foo` is interpreted to mean "search all roots except for `foo`
+        //   with no path inclusions or exclusions."
+        // * `src/*.js` cannot refer to a project root (since there is no root
+        //   with basename of `src`), so it is not reinterpreted; each root
+        //   will be searched with a path inclusion of `src/*.js`.
+        //
+        // Based on these rules, each project root gets its own custom `paths`
+        // value; some values may be modified, and some entries in the list may
+        // be filtered out entirely.
+        //
+        // Note that we allow any number of arbitrary paths to be added to a
+        // project; the basename of the path is not guaranteed to be unique.
+        // But if the user (for instance) adds two different roots with the
+        // basename `foo`, we can fairly conclude that they are not concerned
+        // with the ability to search only one root and not the other via path
+        // exclusions.
+        //
+        // TODO: It would be good if more of this code were shared with
+        // `::filePathMatchesPatterns`. That method is needed because any
+        // active project-wide search term is incrementally tested against
+        // modified buffers on every edit, just in case they suddenly match and
+        // need to get added to the result set.
+        //
+        // As things currently are, if we rewrote the code below to use
+        // `::filePathMatchesPatterns` instead, we would reduce code
+        // duplication at the cost of far more redundant work being done. So we
+        // can live with the duplication until it can be removed in a way that
+        // offers no downside. Until then, we should be careful to ensure that
+        // the path interpretation logic behaves identically in both places.
+        let basename = path.basename(directory.getPath());
+        filteredPaths = [];
+        for (let [intendedRoot, singlePath] of pathsWithProjectRoots) {
+          let isExclusion = singlePath.startsWith('!');
+          if (!isExclusion) {
+            hasOnlyExclusions = false;
+          }
+          if (intendedRoot === null) {
+            // This path pattern was specifically meant for this root, or else
+            // was meant to apply to all roots.
+            filteredPaths.push(singlePath);
+          } else if (intendedRoot === basename) {
+            // This path pattern was specifically meant for this root.
+            if (singlePath === '!') {
+              // This path pattern is specifically excluding this project root
+              // altogether! Thus we should skip searching in it entirely, even
+              // if other path patterns would have matched.
+              isExplicitlyExcluded = true;
+              break;
+            }
+            // Otherwise it counts as an inclusion.
+            filteredPaths.push(singlePath);
+          } else {
+            // This path pattern is referring to a specific pattern in another
+            // root. Do nothing.
+          }
+        }
+        customInclusionsForDirectory.set(directory, filteredPaths);
+      }
+
+      // Ordinarily, when `paths` is undefined or empty, we interpret that as
+      // meaning that we should search the entire root.
+      //
+      // But when there are multiple project roots, it's harder to discern.
+      // Here are the rules we're trying to follow:
+      //
+      // * If `paths` explicitly excludes the current root entirely, we'll skip
+      //   it, no matter what. (For example, `!foo` will exclude root `foo`, no
+      //   matter what other values may be present in `paths`.)
+      // * Otherwise, if `paths` includes at least one value that applies to
+      //   the current root — either because its basename is mentioned
+      //   explicitly or because it is a pattern whose first segment does not
+      //   match up with a root basename — then we will include it in the
+      //   search.
+      // * If neither of the first two rules applies, that means no `paths`
+      //   target to the current root, but it is still presumed to be included
+      //   unless it is _implicitly excluded_ by the given paths. For instance:
+      //   if there are roots `foo` and `bar`, and `paths` contains only
+      //   `bar/src`, then the fact the user opted into `bar` by name is
+      //   interpreted as implicitly excluding `foo`.
+      // * On the other hand, if `paths` contained only `!bar/src` in the
+      //   example above, then no other roots were explicitly included; thus
+      //   `foo` would be included in the search.
+      //
+      if (isExplicitlyExcluded || ((filteredPaths ?? []).length === 0 && !hasOnlyExclusions)) {
+        // This directory is either explicitly or implicitly excluded in its
+        // entirety based on the normalized value of `paths`.
+        skippedProjectRoots.add(directory.getPath());
+        continue;
+      }
+
       let searcher = options.ripgrep
         ? this.ripgrepDirectorySearcher
         : this.scandalDirectorySearcher;
@@ -2201,18 +2404,34 @@ module.exports = class Workspace extends Model {
           return onPathsSearched(searcher, count);
         }
       };
-      const directorySearcher = searcher.search(
-        directories,
-        regex,
-        searchOptions
-      );
-      allSearches.push(directorySearcher);
+      // When there are multiple roots, we build separate `inclusions` for each
+      // root. If those were set earlier, we should use them now.
+      //
+      // Even though several of these roots can theoretically share a searcher,
+      // we must pass different inclusions to each one — meaning we must create
+      // a different instance of the searcher for each directory.
+      let directorySearchers = directories.map(dir => {
+        let customInclusions = customInclusionsForDirectory.get(dir);
+        let customSearchOptions = { ...searchOptions };
+        if (customInclusions) {
+          customSearchOptions.inclusions = customInclusions;
+        }
+        return searcher.search([dir], regex, customSearchOptions)
+      });
+      allSearches.push(...directorySearchers);
     });
+
     const searchPromise = Promise.all(allSearches);
 
-    let matchers = options.paths ?
+    let defaultMatchers = options.paths ?
       options.paths.map((inclusion) => minimatchInstanceForPattern(inclusion)) :
       null;
+
+    const customMatchers = new Map();
+    for (let [dir, inclusions] of customInclusionsForDirectory) {
+      let matchers = inclusions?.map(i => minimatchInstanceForPattern(i)) ?? null;
+      customMatchers.set(dir.getPath(), matchers);
+    }
 
     // Let's consider the open buffers.
     for (let buffer of this.project.getBuffers()) {
@@ -2224,10 +2443,16 @@ module.exports = class Workspace extends Model {
       const filePath = buffer.getPath();
       // Filter out paths that aren't part of this project.
       if (!this.project.contains(filePath)) continue;
-      let relativizedFilePath = atom.project.relativize(filePath);
+      let [rootPath, relativizedFilePath] = atom.project.relativizePath(filePath);
+      let matchers = customMatchers.get(rootPath) ?? defaultMatchers;
       // If the user specified search globs, we want to ensure that we consider
       // only those modified buffers that would be matched by such globs.
-      if (matchers && !matchers.some(matcher => filePathMatchesGlob(relativizedFilePath, matcher))) {
+      if (skippedProjectRoots.has(rootPath)) {
+        // We skipped this root altogether in the main search path, so we
+        // should exclude this buffer for that reason alone.
+        continue;
+      }
+      if (matchers && matchers.length > 0  && !matchers.some(matcher => filePathMatchesGlob(relativizedFilePath, matcher))) {
         continue;
       }
       let matches = [];
@@ -2353,10 +2578,59 @@ module.exports = class Workspace extends Model {
   //
   // Returns a boolean indicating whether the given file path would be included
   // in a project-wide search if the given path patterns were specified.
-  filePathMatchesPatterns(filePath, patterns) {
+  filePathMatchesPatterns(filePath, rawPatterns) {
+    let patterns = rawPatterns;
+    let rootBasenames = getBasenamesFromProjectRoots();
+    if (rootBasenames.length > 0) {
+      // When there is more than one project root, some of these raw patterns
+      // may reference specific project roots. We will apply the same
+      // interpretation to these patterns that we apply in {::scan}:
+      //
+      // * filter out any patterns that refer to roots other than the one that
+      //   `filePath` belongs to;
+      // * normalize any patterns that explicitly refer to our own root;
+      // * return `false` if any pattern explicitly excludes our own root
+      //   altogether;
+      // * return `false` if, after considering all patterns, we decide that
+      //   this root was implicitly excluded. (A root is implicitly excluded if
+      //   (a) no path patterns match it, and (b) the user did explicitly
+      //   include a path in a different root.)
+      //
+      let [rootPath] = atom.project.relativizePath(filePath);
+      let basename = path.basename(rootPath);
+      let basenameAndPatternPairs = patterns.map((pattern) => {
+        return extractProjectRootsFromPathPattern(pattern, rootBasenames);
+      });
+      let filteredPatterns = [];
+      let hasOnlyExclusions = true;
+      for (let [intendedRoot, pattern] of basenameAndPatternPairs) {
+        let isExclusion = pattern.startsWith('!');
+        if (!isExclusion) hasOnlyExclusions = false;
+        if (intendedRoot === null) {
+          filteredPatterns.push(pattern);
+        } else if (intendedRoot === basename) {
+          if (pattern === '!') {
+            // This root has explicitly been excluded in its entirety! We must
+            // return `false` no matter what other patterns are present.
+            return false;
+          }
+          filteredPatterns.push(pattern);
+        } else {
+          // This path pattern is referring to another root; it does not apply
+          // to us. Do nothing.
+        }
+      }
+      if (filteredPatterns.length === 0 && !hasOnlyExclusions) {
+        // These patterns implicitly exclude our root altogether.
+        return false;
+      }
+      patterns = filteredPatterns;
+    }
+
     // If there is no set of patterns to filter against, then the path
     // automatically matches.
     if (!patterns || patterns.length === 0) return true;
+
     // This catches an array of falsy values, like empty strings.
     if (patterns.every(p => !p)) return true;
 
@@ -2370,6 +2644,7 @@ module.exports = class Workspace extends Model {
     return matchers.some(matcher => {
       return filePathMatchesGlob(relativizedFilePath, matcher);
     });
+
   }
 
   checkoutHeadRevision(editor) {

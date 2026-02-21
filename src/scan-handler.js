@@ -20,12 +20,15 @@ module.exports = function (rootPaths, regexSource, options, searchOptions = {}) 
   }
   var regex = new RegExp(regexSource, flags);
   return async.each(rootPaths, function (rootPath, next) {
+    console.log('Considering root path:', rootPath);
     const options2 = Object.assign({}, options, {
       inclusions: processPaths(rootPath, options.inclusions),
       globalExclusions: processPaths(rootPath, options.globalExclusions)
     });
+    console.log('options2:', options2);
     const scanner = new PathScanner(rootPath, options2);
-    scanner.on('path-found', function () {
+    scanner.on('path-found', function (x) {
+      console.log('Path found:', x);
       pathsSearched++;
       if (pathsSearched % PATHS_COUNTER_SEARCHED_CHUNK === 0) {
         emit('scan:paths-searched', pathsSearched);
@@ -39,6 +42,7 @@ module.exports = function (rootPaths, regexSource, options, searchOptions = {}) 
 };
 
 var processPaths = function (rootPath, paths) {
+  console.log('PROCESS PATHS:', rootPath, paths)
   if (paths == null || paths.length == 0) {
     return paths;
   }
@@ -56,5 +60,6 @@ var processPaths = function (rootPath, paths) {
       }
     }
   }
+  console.log('RESULTS:', results);
   return results;
 };

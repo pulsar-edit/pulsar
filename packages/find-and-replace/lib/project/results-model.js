@@ -1,6 +1,47 @@
 const _ = require('underscore-plus')
 const {Emitter, TextEditor, Range} = require('atom')
 const escapeHelper = require('../escape-helper')
+const path = require('path');
+
+// Given a path pattern like `foo/bar/baz`, splits into [`foo`, `bar/baz`].
+// We need to do this when there are multiple project roots, since the first
+// segment tells us which root is being targeted.
+// function extractProjectRootFromPathPattern (pathPattern, basenames) {
+//   let normalized = path.normalize(pathPattern)
+//   if (pathPattern === "") return ["", ""]
+//   if (!pathPattern.includes(path.sep)) {
+//     return [pathPattern, ""]
+//   }
+//   let index = normalized.indexOf(path.sep)
+//   return [
+//     normalized.substring(0, index),
+//     normalized.slice(index + 1)
+//   ];
+// }
+
+// Given a path pattern like `foo/bar/baz`, splits into [`foo`, `bar/baz`].
+// We need to do this when there are multiple project roots, since the first
+// segment tells us which root is being targeted.
+function extractProjectRootFromPathPattern (pathPattern, rootBasenames) {
+  let normalized = path.normalize(pathPattern);
+  let originalPathPattern = pathPattern;
+  if (pathPattern === "") return [null, ""];
+  let rootBasename;
+  if (!pathPattern.includes(path.sep)) {
+    rootBasename = pathPattern;
+    pathPattern = "";
+  } else {
+    let index = normalized.indexOf(path.sep);
+    rootBasename = normalized.substring(0, index);
+    pathPattern = normalized.slice(index + 1);
+  }
+
+  if (rootBasenames.includes(rootBasename)) {
+    return [rootBasename, pathPattern];
+  }
+  return [null, originalPathPattern];
+}
+
 
 class Result {
   static create(result) {
@@ -206,6 +247,7 @@ module.exports = class ResultsModel {
 
     this.active = true
     const searchPaths = this.pathsArrayFromPathsPattern(pathsPattern)
+    console.log('SEARCHING PATHS??', searchPaths);
 
     const onPathsSearched = numberOfPathsSearched => {
       this.emitter.emit('did-search-paths', numberOfPathsSearched)
@@ -217,6 +259,8 @@ module.exports = class ResultsModel {
     const startTime = Date.now()
     const useRipgrep = atom.config.get('find-and-replace.useRipgrep')
     const enablePCRE2 = atom.config.get('find-and-replace.enablePCRE2')
+
+    console.log('@@@', { useRipgrep, enablePCRE2 });
 
     this.inProgressSearchPromise = atom.workspace.scan(
       this.regex,
@@ -230,6 +274,7 @@ module.exports = class ResultsModel {
       },
       (result, error) => {
         if (result) {
+          console.log('Setting result:', result);
           this.setResult(result.filePath, Result.create(result))
         } else {
           if (this.searchErrors == null) { this.searchErrors = [] }
@@ -342,16 +387,56 @@ module.exports = class ResultsModel {
     this.emitter.emit('did-set-result', {filePath, result})
   }
 
+  // Ensure the given file path is suitable for inclusion in the current
+  // results view by checking it against any path patterns.
+  //
+  // Ordinary project-wide search should already produce results that match our
+  // paths pattern; but we also search all modified buffers in the workspace in
+  // manual fashion, so we need this check to to be able to filter those
+  // buffers properly.
   shouldAddResult(filePath) {
-    // Ensure the given file path is suitable for inclusion in the current
-    // results view by checking it against any path patterns.
-    if (!this.findOptions.pathsPattern) return true;
-    const searchPaths = this.pathsArrayFromPathsPattern(this.findOptions.pathsPattern);
-    return atom.workspace.filePathMatchesPatterns(filePath, searchPaths);
+    // return true;
+    let { pathsPattern } = this.findOptions
+    console.warn('shouldAddResult', filePath, pathsPattern);
+    if (!pathsPattern) return true
+
+    if (atom.project.getPaths().length > 1) {
+      let operativeBasename = path.basename(atom.project.relativizePath(filePath)?.[0] ?? '')
+      let basenames = atom.project.getPaths().map(p => path.basename(p))
+      let pathPatternSegments = pathsPattern.split(/,\s*/)
+      // When there is more than one project root, we disambiguate by adding
+      // the basename of the specific project root folder to the beginning of
+      // the pattern.
+      //
+      // So we must first ensure that the basename matches what we expect for
+      // this file path; and, if so, we must strip that basename from the
+      // pattern before we build a paths array below.
+      let [filePathBase] = atom.project.relativizePath(filePath)
+      let normalizedPathPatternSegments = []
+      for (let segment of pathPatternSegments) {
+        let [patternBase, patternRest] = extractProjectRootFromPathPattern(segment, basenames)
+        if (patternBase === null || operativeBasename === patternBase) {
+          // This segment applies to this project root.
+          normalizedPathPatternSegments.push(patternRest);
+        }
+      }
+      // if (path.basename(filePathBase) !== patternBase) {
+      //   return false
+      // }
+      pathsPattern = normalizedPathPatternSegments.join(',')
+    }
+    const searchPaths = this.pathsArrayFromPathsPattern(pathsPattern)
+    console.log('[???] Search paths array from normalized path pattern segments:', searchPaths);
+    return atom.workspace.filePathMatchesPatterns(filePath, searchPaths)
   }
 
   addResult(filePath, result) {
-    if (!this.shouldAddResult(filePath, result)) return;
+    console.log('!!! addResult');
+    if (!this.shouldAddResult(filePath, result)) {
+      console.log('[???] Will not add', filePath);
+      return
+    }
+    console.log('[???] WILL add', filePath);
 
     this.pathCount++
     this.matchCount += result.matches.length
