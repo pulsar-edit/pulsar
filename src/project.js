@@ -484,6 +484,21 @@ module.exports = class Project extends Model {
     }
   }
 
+  // Public: Add multiple paths to the project's list of root paths,
+  // emitting a single `did-change-paths` event after all paths are added.
+  //
+  // * `projectPaths` An {Array} of {String} paths to add.
+  // * `options` An optional {Object} passed to {::addPath} for each path.
+  addPaths(projectPaths, options = {}) {
+    const pathsBefore = this.getPaths().length;
+    for (const projectPath of projectPaths) {
+      this.addPath(projectPath, { ...options, emitEvent: false });
+    }
+    if (this.getPaths().length !== pathsBefore) {
+      this.emitter.emit('did-change-paths', this.getPaths());
+    }
+  }
+
   getProvidedDirectoryForProjectPath(projectPath) {
     for (let provider of this.directoryProviders) {
       if (typeof provider.directoryForURISync === 'function') {

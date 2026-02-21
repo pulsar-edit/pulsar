@@ -1385,7 +1385,7 @@ class AtomEnvironment {
     if (state && this.project.getPaths().length === 0) {
       this.attemptRestoreProjectStateForPaths(state, projectPaths);
     } else {
-      projectPaths.map(folder => this.project.addPath(folder));
+      this.project.addPaths(projectPaths);
     }
   }
 
@@ -1439,9 +1439,7 @@ class AtomEnvironment {
             });
             resolveDiscardStatePromise(Promise.resolve(null));
           } else if (response === 1) {
-            for (let selectedPath of projectPaths) {
-              this.project.addPath(selectedPath);
-            }
+            this.project.addPaths(projectPaths);
             resolveDiscardStatePromise(
               Promise.all(filesToOpen.map(file => this.workspace.open(file)))
             );
@@ -1721,9 +1719,7 @@ or use Pane::saveItemAs for programmatic saving.`);
         );
         restoredState = true;
       } else {
-        for (let folder of foldersToAddToProject) {
-          this.project.addPath(folder);
-        }
+        this.project.addPaths(foldersToAddToProject);
       }
     }
 
