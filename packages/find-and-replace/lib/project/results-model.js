@@ -411,7 +411,6 @@ module.exports = class ResultsModel {
       // So we must first ensure that the basename matches what we expect for
       // this file path; and, if so, we must strip that basename from the
       // pattern before we build a paths array below.
-      let [filePathBase] = atom.project.relativizePath(filePath)
       let normalizedPathPatternSegments = []
       for (let segment of pathPatternSegments) {
         let [patternBase, patternRest] = extractProjectRootFromPathPattern(segment, basenames)
@@ -420,23 +419,16 @@ module.exports = class ResultsModel {
           normalizedPathPatternSegments.push(patternRest);
         }
       }
-      // if (path.basename(filePathBase) !== patternBase) {
-      //   return false
-      // }
       pathsPattern = normalizedPathPatternSegments.join(',')
     }
     const searchPaths = this.pathsArrayFromPathsPattern(pathsPattern)
-    console.log('[???] Search paths array from normalized path pattern segments:', searchPaths);
     return atom.workspace.filePathMatchesPatterns(filePath, searchPaths)
   }
 
   addResult(filePath, result) {
-    console.log('!!! addResult');
     if (!this.shouldAddResult(filePath, result)) {
-      console.log('[???] Will not add', filePath);
       return
     }
-    console.log('[???] WILL add', filePath);
 
     this.pathCount++
     this.matchCount += result.matches.length
