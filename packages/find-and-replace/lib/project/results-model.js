@@ -397,30 +397,8 @@ module.exports = class ResultsModel {
   shouldAddResult(filePath) {
     // return true;
     let { pathsPattern } = this.findOptions
-    console.warn('shouldAddResult', filePath, pathsPattern);
     if (!pathsPattern) return true
 
-    if (atom.project.getPaths().length > 1) {
-      let operativeBasename = path.basename(atom.project.relativizePath(filePath)?.[0] ?? '')
-      let basenames = atom.project.getPaths().map(p => path.basename(p))
-      let pathPatternSegments = pathsPattern.split(/,\s*/)
-      // When there is more than one project root, we disambiguate by adding
-      // the basename of the specific project root folder to the beginning of
-      // the pattern.
-      //
-      // So we must first ensure that the basename matches what we expect for
-      // this file path; and, if so, we must strip that basename from the
-      // pattern before we build a paths array below.
-      let normalizedPathPatternSegments = []
-      for (let segment of pathPatternSegments) {
-        let [patternBase, patternRest] = extractProjectRootFromPathPattern(segment, basenames)
-        if (patternBase === null || operativeBasename === patternBase) {
-          // This segment applies to this project root.
-          normalizedPathPatternSegments.push(patternRest);
-        }
-      }
-      pathsPattern = normalizedPathPatternSegments.join(',')
-    }
     const searchPaths = this.pathsArrayFromPathsPattern(pathsPattern)
     return atom.workspace.filePathMatchesPatterns(filePath, searchPaths)
   }

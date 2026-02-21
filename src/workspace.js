@@ -2628,7 +2628,8 @@ module.exports = class Workspace extends Model {
     }
 
     // If there is no set of patterns to filter against, then the path
-    // automatically matches.
+    // automatically matches. (Not always true in multi-root projects, but we
+    // handled that case above.)
     if (!patterns || patterns.length === 0) return true;
 
     // This catches an array of falsy values, like empty strings.
