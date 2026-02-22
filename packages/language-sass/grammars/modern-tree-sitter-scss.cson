@@ -15,7 +15,7 @@ fileTypes: [
 injectionRegex: '^(scss|SCSS)$'
 
 treeSitter:
-  parserSource: 'github:savetheclocktower/tree-sitter-scss#f5dfc3b4609d01fb11af8c97f3948fffeff25e92'
+  parserSource: 'github:simeonoff/tree-sitter-scss#e4c61ee6ffd939b8700ab3645c586cf6da960080'
   grammar: 'tree-sitter/tree-sitter-scss.wasm'
   highlightsQuery: 'tree-sitter/highlights.scm'
   foldsQuery: 'tree-sitter/folds.scm'

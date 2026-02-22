@@ -243,6 +243,10 @@
 "@namespace" @keyword.control.at-rule.namespace.css.scss
 "@supports" @keyword.control.at-rule.supports.css.scss
 "@keyframes" @keyword.control.at-rule.keyframes.css.scss
+"@container" @keyword.control.at-rule.container.css.scss
+"@property" @keyword.control.at-rule.property.css.scss
+"@layer" @keyword.control.at-rule.layer.css.scss
+"@scope" @keyword.control.at-rule.scope.css.scss
 
 "@include" @keyword.control.at-rule.include.scss
 "@mixin" @keyword.control.at-rule.mixin.scss
@@ -273,12 +277,33 @@
 (keyword_query) @support.constant.css.scss
 (feature_name) @support.constant.css.scss
 
+(style_query
+  "style" @support.function.style.css.scss)
+(scroll_state_query
+  "scroll-state" @support.function.scroll-state.css.scss)
+(scroll_state_condition
+  (state_name) @support.type.property-name.state-name.css.scss)
+
 [
   "as"
   "from"
   "through"
+  "to"
 ] @keyword.control._TYPE_.scss
 
+; CSS `if` function. For visibility and consistency, it's highlighted as a
+; keyword rather than as a function name.
+((function_name) @keyword.control.if.scss
+  (#match? @keyword.control.if.scss "if")
+  (#set! capture.final))
+
+; Highlight `else` like a keyword to match `if`.
+((if_else_condition) @keyword.control.else.scss
+  (#match? @keyword.control.else.scss "else")
+  (#set! capture.final))
+
+(style_condition
+  (property_name) @variable.scss.scss)
 
 (id_selector
   "#" @punctuation.definition.entity.id.scss) @entity.other.attribute-name.id.scss
@@ -294,6 +319,8 @@
 
 (function_statement (name) @entity.name.function.scss)
 
+(if_style_condition
+  "style" @support.function.style.css.scss)
 
 ; OPERATORS
 ; =========
@@ -330,7 +357,22 @@
 (keyframes_statement
   name: (keyframes_name) @entity.name.keyframes.css.scss)
 
+(container_statement
+  (container_name) @entity.name.container.css.scss)
+
 (nesting_value) @entity.other.tag.reference.scss
+
+; Tailwind's `@utility` extension.
+"@utility" @keyword.control.at-rule.utility.css.scss
+(utility_statement
+  (name) @entity.name.utility.css.scss)
+
+(property_statement
+  (property_name) @entity.name.property.scss)
+
+(layer_statement
+  (name) @entity.name.layer.scss)
+
 
 ; PUNCTUATION
 ; ===========
