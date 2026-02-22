@@ -8386,6 +8386,7 @@ describe('TextEditor', () => {
 
     it('returns true when the window is closing if the file has changed on disk', async () => {
       jasmine.useRealClock();
+      await wait(1000);
 
       editor.setText('initial stuff');
       let destination = temp.openSync('test-file').path;
@@ -8398,6 +8399,7 @@ describe('TextEditor', () => {
       }));
       await wait(1000);
       fs.writeFileSync(editor.getPath(), 'new stuff');
+      await wait(1000);
       expect(
         editor.shouldPromptToSave({
           windowCloseRequested: true,
