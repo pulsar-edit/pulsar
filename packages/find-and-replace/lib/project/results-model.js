@@ -247,7 +247,6 @@ module.exports = class ResultsModel {
 
     this.active = true
     const searchPaths = this.pathsArrayFromPathsPattern(pathsPattern)
-    console.log('SEARCHING PATHS??', searchPaths);
 
     const onPathsSearched = numberOfPathsSearched => {
       this.emitter.emit('did-search-paths', numberOfPathsSearched)
@@ -259,8 +258,6 @@ module.exports = class ResultsModel {
     const startTime = Date.now()
     const useRipgrep = atom.config.get('find-and-replace.useRipgrep')
     const enablePCRE2 = atom.config.get('find-and-replace.enablePCRE2')
-
-    console.log('@@@', { useRipgrep, enablePCRE2 });
 
     this.inProgressSearchPromise = atom.workspace.scan(
       this.regex,
@@ -274,7 +271,6 @@ module.exports = class ResultsModel {
       },
       (result, error) => {
         if (result) {
-          console.log('Setting result:', result);
           this.setResult(result.filePath, Result.create(result))
         } else {
           if (this.searchErrors == null) { this.searchErrors = [] }

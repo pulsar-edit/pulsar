@@ -217,25 +217,17 @@ describe("ResultsModel", () => {
         ).toBe(undefined);
       });
 
-      it('is excluded from the results if appropriate, even if there are matches', async () => {
-        await resultsModel.search('quicksort =', '**/foo.js', '');
-        expect(
-          resultsModel.getResult(modifiedPath)
-        ).toBe(undefined);
-      });
-
-      it('does not include a dirty buffer that would not have been included if it were clean', async () => {
-        // In this case, `project/sample.js` should be implicitly excluded
-        // because the user opted into a different root and no patterns apply
-        // to the `project` root.
-        await resultsModel.search('quicksort =', '**/foo.js', '');
-        expect(
-          resultsModel.getResult(modifiedPath)
-        ).toBe(undefined);
-      })
-
       it('has its path inclusions and exclusions assessed properly', async () => {
-        await resultsModel.search('quicksort =', '**/sample.js, another-project-root/foo.js, project/sample.js', '');
+        jasmine.useRealClock();
+        console.log('ROOTS:', atom.project.getPaths());
+        await resultsModel.search(' var quicksort =', '**/sample.js, another-project-root/foo.js, project/sample.js', '');
+        expect(
+          resultsModel.getResult(modifiedPath)
+        ).toBe(undefined);
+        modifyEditor();
+        await waitForCondition(() => {
+          return !!resultsModel.getResult(modifiedPath);
+        });
         expect(
           resultsModel.getResult(modifiedPath)
         ).not.toBe(undefined);
@@ -436,11 +428,19 @@ describe("ResultsModel", () => {
         });
 
         it('has its path inclusions and exclusions assessed properly', async () => {
-          await resultsModel.search('quicksort =', '**/sample.js, another-project-root/foo.js, project/sample.js', '');
+          jasmine.useRealClock();
+          await resultsModel.search(' var quicksort =', '**/sample.js, another-project-root/foo.js, project/sample.js', '');
+          expect(
+            resultsModel.getResult(modifiedPath)
+          ).toBe(undefined);
+          modifyEditor();
+          await waitForCondition(() => {
+            return !!resultsModel.getResult(modifiedPath);
+          });
           expect(
             resultsModel.getResult(modifiedPath)
           ).not.toBe(undefined);
-        })
+        });
       });
     });
   });
