@@ -8401,9 +8401,9 @@ describe('TextEditor', () => {
       fs.writeFileSync(editor.getPath(), 'new stuff');
       await wait(1000);
       try {
-        console.log('IS IN CONFLICT?', editor.buffer.isInConflict());
-        console.log('Is modified?', this.isModified(), 'Has multiple editors?', this.buffer.hasMultipleEditors());
-        console.log('State store is connected?', atom.stateStore.isConnected());
+        console.warn('IS IN CONFLICT?', editor.buffer.isInConflict());
+        console.warn('Is modified?', this.isModified(), 'Has multiple editors?', this.buffer.hasMultipleEditors());
+        console.warn('State store is connected?', atom.stateStore.isConnected());
       } catch (err) {
         console.error('Debugging error:');
         console.error(err);
