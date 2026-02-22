@@ -8402,7 +8402,7 @@ describe('TextEditor', () => {
       await wait(1000);
       try {
         console.warn('IS IN CONFLICT?', editor.buffer.isInConflict());
-        console.warn('Is modified?', this.isModified(), 'Has multiple editors?', this.buffer.hasMultipleEditors());
+        console.warn('Is modified?', editor.isModified(), 'Has multiple editors?', editor.buffer.hasMultipleEditors());
         console.warn('State store is connected?', atom.stateStore.isConnected());
       } catch (err) {
         console.error('Debugging error:');
