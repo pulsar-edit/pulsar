@@ -8394,17 +8394,22 @@ describe('TextEditor', () => {
       // watching a new file. It's possible that this happens too quickly in CI
       // for the subscription to detect the writing of new contents.
       await editor.saveAs(destination);
+      expect(
+        fs.readFileSync(destination, 'utf8').toString()
+      ).toBe('initial stuff');
       await wait(1000);
-      expect(fs.readFileSync(destination, 'utf8').toString()).toBe('initial stuff');
-      await wait(500);
       try {
         console.warn('Is it ALREADY in conflict?', editor.buffer.isInConflict());
       } catch (err) {
         console.error('Debugging error:');
         console.error(err);
       }
+
       editor.setText('other stuff');
-      await wait(500);
+      let promise = new Promise(resolve => editor.onDidConflict(() => {
+        console.warn('On did conflict!');
+        resolve();
+      }));
       fs.writeFileSync(editor.getPath(), 'new stuff');
       try {
         console.warn('IS IN CONFLICT?', editor.buffer.isInConflict());
