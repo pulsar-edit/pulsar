@@ -368,11 +368,19 @@
   (name) @entity.name.utility.css.scss)
 
 (property_statement
-  (property_name) @entity.name.property.scss)
+  (property_name) @entity.name.property.css.scss)
 
+; Layer declarations with blocks:
+; `@layer utilities {`
 (layer_statement
-  (name) @entity.name.layer.scss)
+  (layer_name) @entity.name.layer.css.scss
+  (block)
+  (#set! capture.final))
 
+; Lists of layers:
+; `@layer foo, bar, baz;`
+(layer_statement
+  (layer_name) @support.constant.layer-name.css.scss)
 
 ; PUNCTUATION
 ; ===========
