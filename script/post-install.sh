@@ -53,21 +53,24 @@ fi
 # Unfortunately, at the moment AppArmor doesn't have a good story for backwards compatibility.
 # https://askubuntu.com/questions/1517272/writing-a-backwards-compatible-apparmor-profile
 if apparmor_status --enabled > /dev/null 2>&1; then
-  APPARMOR_PROFILE_SOURCE='/opt/${sanitizedProductName}/resources/apparmor-profile'
   APPARMOR_PROFILE_TARGET='/etc/apparmor.d/${executable}'
-  if apparmor_parser --skip-kernel-load --debug "$APPARMOR_PROFILE_SOURCE" > /dev/null 2>&1; then
-    cp -f "$APPARMOR_PROFILE_SOURCE" "$APPARMOR_PROFILE_TARGET"
+  APPARMOR_PROFILE_CONTENT="abi <abi/4.0>,
+include <tunables/global>
 
-    # Updating the current AppArmor profile is not possible and probably not meaningful in a chroot'ed environment.
-    # Use cases are for example environments where images for clients are maintained.
-    # There, AppArmor might correctly be installed, but live updating makes no sense.
+profile \"${executable}\" \"/opt/${sanitizedProductName}/${executable}\" flags=(unconfined) {
+  userns,
+
+  # Site-specific additions and overrides. See local/README for details.
+  include if exists <local/${executable}>
+}"
+
+  if echo "$APPARMOR_PROFILE_CONTENT" | apparmor_parser --skip-kernel-load --debug > /dev/null 2>&1; then
+    echo "$APPARMOR_PROFILE_CONTENT" > "$APPARMOR_PROFILE_TARGET"
+
     if ! { [ -x '/usr/bin/ischroot' ] && /usr/bin/ischroot; } && hash apparmor_parser 2>/dev/null; then
-      # Extra flags taken from dh_apparmor:
-      # > By using '-W -T' we ensure that any abstraction updates are also pulled in.
-      # https://wiki.debian.org/AppArmor/Contribute/FirstTimeProfileImport
       apparmor_parser --replace --write-cache --skip-read-cache "$APPARMOR_PROFILE_TARGET"
     fi
   else
-    echo "Skipping the installation of the AppArmor profile as this version of AppArmor does not seem to support the bundled profile"
+    echo "Skipping AppArmor profile installation: profile not supported on this version of AppArmor"
   fi
 fi
