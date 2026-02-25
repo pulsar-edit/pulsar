@@ -1264,15 +1264,12 @@ module.exports = class Workspace extends Model {
         pane.activate();
       }
 
-      let initialColumn = 0;
-      let initialLine = 0;
-      if (!Number.isNaN(options.initialLine)) {
-        initialLine = options.initialLine;
-      }
-      if (!Number.isNaN(options.initialColumn)) {
-        initialColumn = options.initialColumn;
-      }
-      if (initialLine >= 0 || initialColumn >= 0) {
+      const hasInitialLine = typeof options.initialLine === 'number' && !Number.isNaN(options.initialLine) && options.initialLine >= 0;
+      const hasInitialColumn = typeof options.initialColumn === 'number' && !Number.isNaN(options.initialColumn) && options.initialColumn >= 0;
+      const initialLine = hasInitialLine ? options.initialLine : 0;
+      const initialColumn = hasInitialColumn ? options.initialColumn : 0;
+
+      if (hasInitialLine || hasInitialColumn) {
         if (typeof item.setCursorBufferPosition === 'function') {
           item.setCursorBufferPosition([initialLine, initialColumn]);
         }
