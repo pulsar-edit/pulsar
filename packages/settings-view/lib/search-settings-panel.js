@@ -56,14 +56,7 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
             <div className='section-heading icon icon-search-save'>
               Search Pulsar's Settings
             </div>
-            <div className='alert alert-warning icon icon-info'>
-              This feature is experimental.<br />
-              If you have feedback/suggestions, or you encounter any issues, feel free to report them here:&nbsp;
-              <a href="https://github.com/orgs/pulsar-edit/discussions/150" style="text-decoration: underline;">
-                https://github.com/orgs/pulsar-edit/discussions/150
-              </a>
-            </div>
-            <div className='editor-container'>
+<div className='editor-container'>
               <TextEditor ref='searchEditor' mini placeholderText='Start Searching for Settings' />
             </div>
 
@@ -141,7 +134,7 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
 
           let schema = this.settingsSchema[setting].properties[item];
 
-          schema.rank = this.generateRanks(text, schema.title, schema.description, setting, item)
+          schema.rank = this.generateRanks(searchTerm, schema.title, schema.description, setting, item)
 
           schema.path = `${setting}.${item}`
 
@@ -159,40 +152,19 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
   }
 
   generateRanks (searchText, title, description, settingName, settingItem) {
-    // In charge of generating each setting entry's rank
-    let rankedTitle = this.getScore(this.handleSettingsString(searchText), this.handleSettingsString(title))
-    let rankedDescription = this.getScore(this.handleSettingsString(searchText), this.handleSettingsString(description))
-    let rankedSettingName = this.getScore(this.handleSettingsString(searchText), this.handleSettingsString(settingName))
-    let rankedSettingItem = this.getScore(this.handleSettingsString(searchText), this.handleSettingsString(settingItem))
+    let candidate = [settingName, settingItem, title]
+      .filter(Boolean).join(' ');
 
-    let rank = {
-      title: rankedTitle,
-      description: rankedDescription,
-      settingName: rankedSettingName,
-      settingItem: rankedSettingItem
-    };
+    let result = this.getScore(candidate, searchText);
 
-    // Now to calculate the total score of the search resutls.
-    // The total score will be a sume of all individual scores,
-    // with weighted bonus' for higher matches depending on where the match was
-    let titleBonus = (rank.title.score > 0.8) ? 0.2 : 0;
-    let perfectTitleBonus = (rank.title.score === 1) ? 0.2 : 0;
-    let descriptionBonus = (rank.description.score > 0.5) ? 0.1 : 0;
-    let perfectDescriptionBonus = (rank.title.score === 1) ? 0.1 : 0;
-    let settingNameBonus = (rank.settingName.score > 0.8) ? 0.2 : 0;
-    let perfectSettingNameBonus = (rank.settingName.score === 1) ? 0.3 : 0;
-    let settingItemBonus = (rank.settingItem.score > 0.8) ? 0.2 : 0;
-    let perfectSettingItemBonus = (rank.settingItem.score === 1) ? 0.1 : 0;
+    // Only use description as a tiebreaker when primary fields already match
+    let descBonus = 0;
+    if (result.score > 0 && description) {
+      let descResult = this.getScore(description, searchText);
+      descBonus = descResult.score * 0.01;
+    }
 
-    let totalScore =
-      rank.title.score + titleBonus + perfectTitleBonus
-      + rank.description.score + descriptionBonus + perfectDescriptionBonus
-      + rank.settingName.score + settingNameBonus + perfectSettingNameBonus
-      + rank.settingItem.score + settingItemBonus + perfectSettingItemBonus;
-
-    rank.totalScore = totalScore;
-
-    return rank;
+    return { totalScore: result.score + descBonus, matchIndexes: result.matchIndexes };
   }
 
   processRanks (ranks) {
@@ -223,51 +195,15 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
 
   }
 
-  getScore (s1, s2) {
-    // s1 is the text we are calculating the score against
-    // s2 is the text the user typed
-    // Below is an exact implmentation of Longest Common Subsequence
-
-    let height = s1.length + 1;
-    let width = s2.length + 1;
-    let matrix = Array(height)
-      .fill(0)
-      .map(() => Array(width).fill(0));
-
-    for (let row = 1; row < height; row++) {
-      for (let col = 1; col < width; col++) {
-        if (s1[row - 1] == s2[col - 1]) {
-          matrix[row][col] = matrix[row - 1][col - 1] + 1;
-        } else {
-          matrix[row][col] = Math.max(matrix[row][col - 1], matrix[row - 1][col]);
-        }
-      }
+  getScore (candidate, query) {
+    if (!candidate || !query) {
+      return { score: 0, matchIndexes: [] };
     }
-
-    let longest = this.lcsTraceback(matrix, s1, s2, height, width);
-    // Now longest is a literal string of the longest common subsequence.
-    // We will now assign a score to help ranking, but will still return the
-    // text sequence, in case we want to use that for display purposes
-    return {
-      score: longest.length / s1.length,
-      sequence: longest
-    };
-  }
-
-  lcsTraceback (matrix, s1, s2, height, width) {
-    if (height === 0 || width === 0) {
-      return "";
+    const result = atom.ui.fuzzyMatcher.match(candidate, query, { recordMatchIndexes: true });
+    if (result) {
+      return { score: result.score, matchIndexes: result.matchIndexes };
     }
-    if (s1[height - 1] == s2[width - 1]) {
-      return (
-        this.lcsTraceback(matrix, s1, s2, height - 1, width - 1) +
-          (s1[height - 1] ? s1[height - 1] : "")
-      );
-    }
-    if (matrix[height][width - 1] > matrix[height - 1][width]) {
-      return this.lcsTraceback(matrix, s1, s2, height, width - 1);
-    }
-    return this.lcsTraceback(matrix, s1, s2, height - 1, width);
+    return { score: 0, matchIndexes: [] };
   }
 
   // Boiler Plate Functions
