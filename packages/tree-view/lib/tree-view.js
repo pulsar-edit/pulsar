@@ -504,12 +504,12 @@ class TreeView {
       }
 
       for (let projectPath of projectPaths) {
-        let stats = fs.lstatSyncNoException(projectPath);
-        if (!stats) continue;
+        const fs_stats = fs.lstatSyncNoException(projectPath);
+        if (!fs_stats) continue;
 
-        stats = _.pick(stats, ..._.keys(stats));
-        for (let key of ['atime', 'birthtime', 'ctime', 'mtime']) {
-          stats[key] = stats[key].getTime();
+        let stats = {}
+        for (const key of ['atime', 'birthtime', 'ctime', 'mtime']) {
+          stats[key] = fs_stats[key].getTime();
         }
 
         let directory = new Directory({

@@ -13,7 +13,7 @@ env:
   # Variables needed for build information
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PYTHON_VERSION: '3.12'
-  NODE_VERSION: 16
+  NODE_VERSION: 24
   ROLLING_UPLOAD_TOKEN: ${{ secrets.ROLLING_RELEASE_UPLOAD_TOKEN }}
   # Below variables allow us to quickly control visual tests for each platform
   RUN_WINDOWS_VT: false
@@ -27,7 +27,7 @@ jobs:
         os: [ ubuntu-latest, macos-14, windows-latest ]
         include:
           - os: ubuntu-latest
-            image: "debian:10"
+            image: "debian:13"
       fail-fast: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.image }}
@@ -35,11 +35,6 @@ jobs:
       timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
-    - name: Edit sources.list - Linux
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
-        sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
       run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
