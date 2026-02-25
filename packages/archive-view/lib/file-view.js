@@ -4,7 +4,7 @@ import {CompositeDisposable, Disposable} from 'atom'
 import path from 'path'
 import fs from 'fs'
 import temp from 'temp'
-import archive from 'ls-archive'
+import archive from '@pulsar-edit/ls-archive'
 
 import getIconServices from './get-icon-services'
 
