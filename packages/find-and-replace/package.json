@@ -55,6 +55,11 @@
       "versions": {
         "1.0.0": "consumeElementIcons"
       }
+    },
+    "background-tips": {
+      "versions": {
+        "1.0.0": "consumeBackgroundTips"
+      }
     }
   },
   "providedServices": {

@@ -9,6 +9,14 @@
   "engines": {
     "atom": ">0.42.0"
   },
+  "providedServices": {
+    "background-tips": {
+      "description": "Allows packages to register tips shown when no editors are open",
+      "versions": {
+        "1.0.0": "provideBackgroundTips"
+      }
+    }
+  },
   "dependencies": {
     "underscore-plus": "1.x"
   }

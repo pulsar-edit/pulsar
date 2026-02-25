@@ -77,6 +77,12 @@ module.exports = {
     return new Disposable(() => metricsReporter.unsetReporter())
   },
 
+  consumeBackgroundTips (service) {
+    return service.addTips([
+      'Quickly open any file in your project with the Fuzzy Finder using {fuzzy-finder:toggle-file-finder}'
+    ])
+  },
+
   serialize () {
     const paths = {}
     for (let editor of atom.workspace.getTextEditors()) {

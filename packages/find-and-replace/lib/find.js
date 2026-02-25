@@ -202,6 +202,12 @@ module.exports = {
     }
   },
 
+  consumeBackgroundTips(service) {
+    return service.addTips([
+      'Dismiss panels like Find and Replace with {body>core:cancel}'
+    ]);
+  },
+
   consumeAutocompleteWatchEditor(watchEditor) {
     this.autocompleteWatchEditor = watchEditor;
     atom.config.observe(
