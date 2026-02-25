@@ -10,7 +10,7 @@ then
 fi
 cp "$FILESOURCE" "$FILEDEST"
 
-# Find the right binary name for `ppm`, then install it to `/usr/bin/ppm`
+# Find the right binary name for `ppm`, then install it to `/usr/bin/ppm`.
 case $executable in
   pulsar-next)
     ppm_executable=ppm-next
