@@ -1,0 +1,169 @@
+{
+  "menu": {
+    "pulsar": {
+      "about": "",
+      "view-license": "",
+      "version": "",
+      "restart-and-install-update": "",
+      "check-for-update": "",
+      "checking-for-update": "",
+      "downloading-update": "",
+      "preferences": "",
+      "config": "",
+      "init-script": "",
+      "keymap": "",
+      "snippets": "",
+      "stylesheet": "",
+      "install-shell-commands": "",
+      "quit": ""
+    },
+    "macos": {
+      "services": "",
+      "hide-self": "",
+      "hide-others": "",
+      "show-all": ""
+    },
+    "file": {
+      "self": "",
+      "new-window": "",
+      "new-file": "",
+      "open": "",
+      "open-file": "",
+      "open-folder": "",
+      "add-project-folder": "",
+      "project-history": {
+        "reopen-project": "",
+        "clear": ""
+      },
+      "reopen-last-item": "",
+      "save": "",
+      "save-as": "",
+      "save-all": "",
+      "close-tab": "",
+      "close-pane": "",
+      "close-window": ""
+    },
+    "edit": {
+      "self": "",
+      "undo": "",
+      "redo": "",
+      "cut": "",
+      "copy": "",
+      "copy-path": "",
+      "paste": "",
+      "paste-without-reformatting": "",
+      "select-all": "",
+      "toggle-comments": "",
+      "lines": {
+        "self": "",
+        "indent": "",
+        "outdent": "",
+        "auto-indent": "",
+        "move-up": "",
+        "move-down": "",
+        "duplicate": "",
+        "delete": "",
+        "join": ""
+      },
+      "columns": {
+        "self": "",
+        "move-selection-left": "",
+        "move-selection-right": ""
+      },
+      "text": {
+        "self": "",
+        "upper-case": "",
+        "lower-case": "",
+        "delete-to-end-of-word": "",
+        "delete-to-previous-word-boundary": "",
+        "delete-to-next-word-boundary": "",
+        "delete-line": "",
+        "transpose": ""
+      },
+      "folding": {
+        "self": "",
+        "fold": "",
+        "unfold": "",
+        "fold-all": "",
+        "unfold-all": "",
+        "fold-level-1": "",
+        "fold-level-2": "",
+        "fold-level-3": "",
+        "fold-level-4": "",
+        "fold-level-5": "",
+        "fold-level-6": "",
+        "fold-level-7": "",
+        "fold-level-8": "",
+        "fold-level-9": ""
+      }
+    },
+    "view": {
+      "self": "",
+      "toggle-full-screen": "",
+      "toggle-menu-bar": "",
+      "panes": {
+        "self": "",
+        "split-up": "",
+        "split-down": "",
+        "split-left": "",
+        "split-right": "",
+        "focus-next": "",
+        "focus-previous": "",
+        "focus-above": "",
+        "focus-below": "",
+        "focus-on-left": "",
+        "focus-on-right": "",
+        "close": ""
+      },
+      "developer": {
+        "self": "",
+        "open-in-dev-mode": "",
+        "reload-window": "",
+        "run-package-specs": "",
+        "toggle-dev-tools": ""
+      },
+      "increase-font-size": "",
+      "decrease-font-size": "",
+      "reset-font-size": "",
+      "toggle-soft-wrap": ""
+    },
+    "selection": {
+      "self": "",
+      "add-above": "",
+      "add-below": "",
+      "single": "",
+      "split-into-lines": "",
+      "to-top": "",
+      "to-bottom": "",
+      "line": "",
+      "word": "",
+      "to-beginning-of-word": "",
+      "to-beginning-of-line": "",
+      "to-first-char-of-line": "",
+      "to-end-of-word": "",
+      "to-end-of-line": ""
+    },
+    "find": {
+      "self": ""
+    },
+    "packages": {
+      "self": "",
+      "open-package-manager": ""
+    },
+    "window": {
+      "self": "",
+      "minimise": "",
+      "zoom": "",
+      "bring-all-to-front": ""
+    },
+    "help": {
+      "self": "",
+      "terms-of-use": "",
+      "docs": "",
+      "faq": "",
+      "community-discussions": "",
+      "report-issue": "",
+      "search-issues": ""
+    }
+  }
+}
