@@ -1,6 +1,47 @@
 const _ = require('underscore-plus')
 const {Emitter, TextEditor, Range} = require('atom')
 const escapeHelper = require('../escape-helper')
+const path = require('path');
+
+// Given a path pattern like `foo/bar/baz`, splits into [`foo`, `bar/baz`].
+// We need to do this when there are multiple project roots, since the first
+// segment tells us which root is being targeted.
+// function extractProjectRootFromPathPattern (pathPattern, basenames) {
+//   let normalized = path.normalize(pathPattern)
+//   if (pathPattern === "") return ["", ""]
+//   if (!pathPattern.includes(path.sep)) {
+//     return [pathPattern, ""]
+//   }
+//   let index = normalized.indexOf(path.sep)
+//   return [
+//     normalized.substring(0, index),
+//     normalized.slice(index + 1)
+//   ];
+// }
+
+// Given a path pattern like `foo/bar/baz`, splits into [`foo`, `bar/baz`].
+// We need to do this when there are multiple project roots, since the first
+// segment tells us which root is being targeted.
+function extractProjectRootFromPathPattern (pathPattern, rootBasenames) {
+  let normalized = path.normalize(pathPattern);
+  let originalPathPattern = pathPattern;
+  if (pathPattern === "") return [null, ""];
+  let rootBasename;
+  if (!pathPattern.includes(path.sep)) {
+    rootBasename = pathPattern;
+    pathPattern = "";
+  } else {
+    let index = normalized.indexOf(path.sep);
+    rootBasename = normalized.substring(0, index);
+    pathPattern = normalized.slice(index + 1);
+  }
+
+  if (rootBasenames.includes(rootBasename)) {
+    return [rootBasename, pathPattern];
+  }
+  return [null, originalPathPattern];
+}
+
 
 class Result {
   static create(result) {
@@ -342,16 +383,26 @@ module.exports = class ResultsModel {
     this.emitter.emit('did-set-result', {filePath, result})
   }
 
+  // Ensure the given file path is suitable for inclusion in the current
+  // results view by checking it against any path patterns.
+  //
+  // Ordinary project-wide search should already produce results that match our
+  // paths pattern; but we also search all modified buffers in the workspace in
+  // manual fashion, so we need this check to to be able to filter those
+  // buffers properly.
   shouldAddResult(filePath) {
-    // Ensure the given file path is suitable for inclusion in the current
-    // results view by checking it against any path patterns.
-    if (!this.findOptions.pathsPattern) return true;
-    const searchPaths = this.pathsArrayFromPathsPattern(this.findOptions.pathsPattern);
-    return atom.workspace.filePathMatchesPatterns(filePath, searchPaths);
+    // return true;
+    let { pathsPattern } = this.findOptions
+    if (!pathsPattern) return true
+
+    const searchPaths = this.pathsArrayFromPathsPattern(pathsPattern)
+    return atom.workspace.filePathMatchesPatterns(filePath, searchPaths)
   }
 
   addResult(filePath, result) {
-    if (!this.shouldAddResult(filePath, result)) return;
+    if (!this.shouldAddResult(filePath, result)) {
+      return
+    }
 
     this.pathCount++
     this.matchCount += result.matches.length
