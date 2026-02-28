@@ -2,7 +2,6 @@ name: Editor tests
 on:
   pull_request:
   push:
-    branches: ['master']
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ATOM_JASMINE_REPORTER: list
