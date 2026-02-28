@@ -81,6 +81,56 @@ async function modifyMainPackageJson(
 // eslint-disable-next-line node/no-unpublished-require
 const builder = require('electron-builder');
 
+
+const LINUX_TARGETS = {
+  appimage: 'appimage',
+  deb: 'deb',
+  rpm: 'rpm',
+  targz: 'tar.gz'
+};
+
+// Allows a user to run (e.g.) `yarn dist targz` to build just one of the
+// output targets rather than all four.
+function inferLinuxTargetsFromArgs () {
+  let output = [];
+  let anyMatched = false;
+  for (let [key, value] of Object.entries(LINUX_TARGETS)) {
+    if (process.argv.includes(key)) {
+      anyMatched = true;
+      output.push({ target: value });
+    }
+  }
+  if (!anyMatched) {
+    return Object.values(LINUX_TARGETS).map(t => ({ target: t }));
+  }
+  if (process.platform === 'linux') {
+    console.log(`Targets specified; building only the following: ${output.map(o => o.target).join(', ')} `);
+  }
+  return output;
+}
+
+const WIN_TARGETS = ['nsis', 'zip'];
+
+// Allows a user to run (e.g.) `yarn dist nsis` to build just one of the two
+// output targets.
+function inferWindowsTargetsFromArgs () {
+  let output = [];
+  let anyMatched = false;
+  for (let value of WIN_TARGETS) {
+    if (process.argv.includes(value)) {
+      anyMatched = true;
+      output.push({ target: value });
+    }
+  }
+  if (!anyMatched) {
+    return WIN_TARGETS.map(t => ({ target: t }));
+  }
+  if (process.platform === 'win32') {
+    console.log(`Targets specified; building only the following: ${output.map(o => o.target).join(', ')} `);
+  }
+  return output;
+}
+
 const ARGS = yargs(hideBin(process.argv))
   .command('[platform]', 'build for a given platform', () => {
     return yargs.positional('platform', {
@@ -119,7 +169,6 @@ const ICONS = {
   svg: `resources/app-icons/${iconName}.svg`,
   icns: `resources/app-icons/${iconName}.icns`
 };
-
 
 let options = {
   appId: `dev.pulsar-edit.${baseName}`,
@@ -301,12 +350,7 @@ let options = {
     icon: "resources/icons",
     category: "Development",
     synopsis: "A community-led hyper-hackable text editor",
-    target: [
-      { target: 'appimage' },
-      { target: 'deb' },
-      { target: 'rpm' },
-      { target: 'tar.gz' }
-    ],
+    target: inferLinuxTargetsFromArgs(),
     extraResources: [
       {
         // Extra SVG icon included in the resources folder to give a chance to
@@ -373,10 +417,7 @@ let options = {
       { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
       { from: 'ppm/bin/node.exe', to: `app/ppm/bin/node.exe` },
     ],
-    target: [
-      { target: 'nsis' },
-      { target: 'zip' }
-    ]
+    target: inferWindowsTargetsFromArgs()
   },
 
   nsis: {
