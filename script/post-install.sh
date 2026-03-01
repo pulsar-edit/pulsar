@@ -20,8 +20,8 @@ case $executable in
     ;;
 esac
 
-SYMLINK_TARGET='/opt/${sanitizedProductName}/resources/app/ppm/bin/${ppm_executable}'
-SYMLINK_PATH='/usr/bin/${ppm_executable}'
+SYMLINK_TARGET="/opt/${sanitizedProductName}/resources/app/ppm/bin/${ppm_executable}"
+SYMLINK_PATH="/usr/bin/${ppm_executable}"
 
 if [ -L "$SYMLINK_PATH" ]
 then
