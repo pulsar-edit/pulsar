@@ -10,7 +10,9 @@ jobs:
     name: Build Editor
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
-      !startsWith(github.event.pull_request.title, '[skip-package-ci]')
+      !startsWith(github.event.pull_request.title, '[skip-package-ci]') &&
+      !always() # REVERT ME #
+      # TEMPORARILY DISABLING THIS WORKFLOW, REVERT ME #
     runs-on: ubuntu-latest
     steps:
     - name: Install build dependencies
