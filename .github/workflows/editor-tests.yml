@@ -44,6 +44,17 @@ jobs:
     - name: Build Dependencies
       run: yarn build
 
+    - name: Fix Chrome Sandbox Permissions (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        # Check if user namespaces are supported by the kernel and working with a quick test:
+        if ! { [[ -L /proc/self/ns/user ]] && unshare --user true; }; then
+          # Use SUID chrome-sandbox only on systems without user namespaces:
+          chmod 4755 'node_modules/electron/dist/chrome-sandbox' || true
+        else
+          chmod 0755 'node_modules/electron/dist/chrome-sandbox' || true
+        fi
+
     - name: Run Tests
       if: runner.os != 'Linux'
       run: yarn start --test spec

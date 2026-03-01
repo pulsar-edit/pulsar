@@ -325,11 +325,25 @@ jobs:
           packages
         key: Linux-dependencies-${{ github.sha }}-${{ github.workflow }}
 
-    - name: Test Binary - Linux
+    - name: Extract Binary - Linux
       if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
       run: |
         rm -R node_modules/electron; yarn install --check-files
         ./binaries/*AppImage --appimage-extract
+
+    - name: Fix Chrome Sandbox Permissions
+      run: |
+        # Check if user namespaces are supported by the kernel and working with a quick test:
+        if ! { [[ -L /proc/self/ns/user ]] && unshare --user true; }; then
+          # Use SUID chrome-sandbox only on systems without user namespaces:
+          chmod 4755 './binaries/squashfs-root/chrome-sandbox' || true
+        else
+          chmod 0755 './binaries/squashfs-root/chrome-sandbox' || true
+        fi
+
+    - name: Test Binary - Linux
+      if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
+      run: |
         export BINARY_NAME='squashfs-root/pulsar'
         mkdir -p ./tests/videos
         Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
