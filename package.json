@@ -319,6 +319,7 @@
     "ctags": "https://github.com/pulsar-edit/node-ctags.git#c32ca6017dd3f4ea314d53b044225505820abbe3",
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244",
     "@electron/remote": "2.1.2",
-    "@pulsar-edit/superstring": "3.0.5"
+    "@pulsar-edit/superstring": "3.0.5",
+    "@pulsar-edit/pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher#c1e13d69b93ea93afd29217307185167f9414f03"
   }
 }
