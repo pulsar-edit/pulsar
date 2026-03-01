@@ -16,6 +16,16 @@ XPStyle on
     ; install steps, ultimately removing Pulsar from the PATH
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources"
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources\app\ppm\bin"
+    ; Remove any shell/contextmenu entries created for Pulsar so they don't
+    ; stay after you uninstall.
+    DeleteRegKey HKCR "*\\shell\\Pulsar"
+    DeleteRegKey HKCR "Directory\\shell\\Pulsar"
+    DeleteRegKey HKCR "Folder\\shell\\Pulsar"
+    DeleteRegKey HKCR "Drive\\shell\\Pulsar"
+    DeleteRegKey HKCU "Software\\Classes\\*\\shell\\Pulsar"
+    DeleteRegKey HKCU "Software\\Classes\\Directory\\shell\\Pulsar"
+    DeleteRegKey HKCU "Software\\Classes\\Folder\\shell\\Pulsar"
+    DeleteRegKey HKCU "Software\\Classes\\Drive\\shell\\Pulsar"
   ${endIf}
 !macroend
 
