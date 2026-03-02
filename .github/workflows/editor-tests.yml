@@ -77,4 +77,4 @@ jobs:
 
     - name: Run Tests with xvfb-run (Linux)
       if: runner.os == 'Linux'
-      run: xvfb-run --auto-servernum yarn start --test spec
+      run: xvfb-run --auto-servernum ./node_modules/electron/dist/electron --enable-logging . -f --test spec
