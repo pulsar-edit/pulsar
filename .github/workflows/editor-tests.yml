@@ -49,7 +49,8 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         # Check if user namespaces are supported by the kernel and working with a quick test:
-        if ! { [[ -L /proc/self/ns/user ]] && unshare --user true; }; then
+        # if ! { [[ -L /proc/self/ns/user ]] && unshare --user true; }; then
+        if true; then
           # Use SUID chrome-sandbox only on systems without user namespaces:
           echo "Before, ls -l"
           ls -l node_modules/electron/dist/chrome-sandbox
