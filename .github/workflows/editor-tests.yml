@@ -56,6 +56,8 @@ jobs:
           ls -l node_modules/electron/dist/chrome-sandbox
           echo "setting perms to 4755!!"
           chmod 4755 'node_modules/electron/dist/chrome-sandbox'
+          echo "Setting owner to root!"
+          sudo chown root 'node_modules/electron/dist/chrome-sandbox'
           echo "After, ls -l"
           ls -l node_modules/electron/dist/chrome-sandbox
         else
@@ -63,6 +65,8 @@ jobs:
           ls -l node_modules/electron/dist/chrome-sandbox
           echo "setting perms to 0755!!"
           chmod 0755 'node_modules/electron/dist/chrome-sandbox'
+          echo "Setting owner to root!"
+          sudo chown root 'node_modules/electron/dist/chrome-sandbox'
           echo "After, ls -l"
           ls -l node_modules/electron/dist/chrome-sandbox
         fi
