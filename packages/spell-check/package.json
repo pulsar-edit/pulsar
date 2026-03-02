@@ -8,7 +8,7 @@
     "debug": "^4.1.1",
     "multi-integer-range": "^2.0.0",
     "natural": "^0.4.0",
-    "spellchecker": "https://github.com/pulsar-edit/node-spellchecker.git#da32e897e74691b7f43b70ddc0d171bad2d38208",
+    "spellchecker": "https://github.com/pulsar-edit/node-spellchecker.git#electron-40",
     "spelling-manager": "^1.1.0",
     "underscore-plus": "^1"
   },
