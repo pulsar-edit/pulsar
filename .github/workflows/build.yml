@@ -241,12 +241,12 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       run: ./script/fix-linux-appimage.sh x86_64
 
-    - name: Cache Pulsar Binaries - Linux
+    - name: Cache Pulsar AppImage - Linux
       if: ${{ runner.os == 'Linux' }}
       uses: actions/cache/save@v4
       with:
-        path: ./binaries
-        key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
+        path: ./binaries/*AppImage
+        key: pulsar-Linux-AppImage-${{ github.sha }}-${{ github.workflow }}
 
     - name: Upload Binary Artifacts
       uses: actions/upload-artifact@v4
@@ -310,12 +310,12 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    - name: Restore Cached Pulsar Binaries - Linux
+    - name: Restore Cached Pulsar AppImage - Linux
       if: ${{ runner.os == 'Linux' }}
       uses: actions/cache/restore@v4
       with:
-        path: ./binaries
-        key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
+        path: ./binaries/*AppImage
+        key: pulsar-Linux-AppImage-${{ github.sha }}-${{ github.workflow }}
 
     - name: Restore Cached Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
