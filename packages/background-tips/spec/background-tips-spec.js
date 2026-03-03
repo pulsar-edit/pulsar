@@ -121,10 +121,10 @@ describe("BackgroundTips", () => {
       );
       const service = mainModule.provideBackgroundTips();
 
-      expect(typeof service.addTips).toBe("function");
+      expect(typeof service.registerTips).toBe("function");
 
       const originalCount = mainModule.getTips().length;
-      const disposable = service.addTips(["Custom tip 1", "Custom tip 2"]);
+      const disposable = service.registerTips(["Custom tip 1", "Custom tip 2"]);
       expect(mainModule.getTips().length).toBe(originalCount + 2);
       expect(mainModule.getTips()).toContain("Custom tip 1");
       expect(mainModule.getTips()).toContain("Custom tip 2");
@@ -139,7 +139,7 @@ describe("BackgroundTips", () => {
       const { mainModule } = atom.packages.getActivePackage("background-tips");
 
       const service = mainModule.provideBackgroundTips();
-      service.addTips(["Unique test tip for spec"]);
+      service.registerTips(["Unique test tip for spec"]);
 
       advanceClock(backgroundTipsView.startDelay);
       advanceClock(backgroundTipsView.fadeDuration);
