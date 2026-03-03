@@ -78,9 +78,11 @@ module.exports = {
   },
 
   consumeBackgroundTips (service) {
-    return service.addTips([
+    const disposable = service.registerTips([
       'Quickly open any file in your project with the Fuzzy Finder using {fuzzy-finder:toggle-file-finder}'
     ])
+    this.disposables.add(disposable)
+    return disposable
   },
 
   serialize () {

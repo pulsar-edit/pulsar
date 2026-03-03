@@ -23,7 +23,7 @@ module.exports = {
 
   provideBackgroundTips() {
     return {
-      addTips: (tips) => {
+      registerTips: (tips) => {
         this.addedTips.add(tips);
         this.backgroundTipsView.tipsChanged();
         return new Disposable(() => {

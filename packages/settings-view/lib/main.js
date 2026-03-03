@@ -58,6 +58,7 @@ module.exports = {
   },
 
   deactivate () {
+    this.backgroundTipsDisposable?.dispose()
     if (settingsView) settingsView.destroy()
     if (statusView) statusView.destroy()
     settingsView = null
@@ -85,9 +86,11 @@ module.exports = {
   },
 
   consumeBackgroundTips (service) {
-    return service.addTips([
+    const disposable = service.registerTips([
       'Install packages, themes, and customize your editor in Settings {settings-view:open}'
     ])
+    this.backgroundTipsDisposable = disposable
+    return disposable
   },
 
   consumeSnippets (snippets) {
