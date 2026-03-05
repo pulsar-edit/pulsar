@@ -88,12 +88,13 @@ mv AppRun AppRun.old
 rm -f AppRun
 
 # Next we'll use `awk` to replace the reference to BIN in `AppRun` so that it
-# points to `pulsar.sh` rather than the `pulsar` executable.
+# points to `pulsar.sh` rather than the `pulsar` executable. We'll also enforce
+# that `--no-sandbox` is used upon launch.
 echo "Making new AppRun…"
 if [ $SCRIPT_NAME == "pulsar-next" ]; then
-  awk '{sub(/BIN=(.*?)/,"BIN=\"$APPDIR/resources/pulsar-next.sh\""); print}' AppRun.old > AppRun
+  awk '{sub(/BIN=(.*?)/, "BIN=\"$APPDIR/resources/pulsar-next.sh\""); sub(/exec "\$BIN"/, "exec \"$BIN\" --no-sandbox")} 1' AppRun.old > AppRun
 else
-  awk '{sub(/BIN=(.*?)/,"BIN=\"$APPDIR/resources/pulsar.sh\""); print}' AppRun.old > AppRun
+  awk '{sub(/BIN=(.*?)/, "BIN=\"$APPDIR/resources/pulsar.sh\""); sub(/exec "\$BIN"/, "exec \"$BIN\" --no-sandbox")} 1' AppRun.old > AppRun
 fi
 chmod a+x AppRun
 
