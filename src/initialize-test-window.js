@@ -88,7 +88,7 @@ module.exports = async function({ blobStore }) {
     window.addEventListener('keydown', handleKeydown, { capture: true });
 
     // Add application-specific exports to module search path.
-    const exportsPath = path.join(resourcePath, 'exports');
+    const exportsPath = path.join(getWindowLoadSettings().resourcePath, 'exports');
 
     const Module = require('module');
     // `Module.globalPaths` is no longer a thing. Wrapping this function ensures
