@@ -31,10 +31,26 @@ module.exports = function({ blobStore }) {
   const { ipcRenderer } = require('electron');
   const { resourcePath, devMode } = getWindowLoadSettings();
   require('./electron-shims');
+  const Module = require('module');
 
   // Add application-specific exports to module search path.
   const exportsPath = path.join(resourcePath, 'exports');
-  require('module').globalPaths.push(exportsPath);
+
+  // `Module.globalPaths` is no longer a thing. Wrapping this function ensures
+  // that the `exports` folder is treated as a search path of last resort for
+  // global modules; this allows `require('clipboard')` and the like to keep
+  // working even though Electron has deprecated them.
+  const _originalResolveLookupPaths = Module._resolveLookupPaths;
+  Module._resolveLookupPaths = function (request, parent) {
+    const original = _originalResolveLookupPaths(request, parent);
+    const firstChar = request.charAt(0);
+    const isRelativeOrAbsolute = firstChar === '.' || firstChar === '/';
+    if (isRelativeOrAbsolute || original === null) {
+      return original;
+    }
+    return original.concat(exportsPath);
+  };
+
   process.env.NODE_PATH = exportsPath;
 
   // Make React faster
