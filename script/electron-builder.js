@@ -1,4 +1,33 @@
 /* eslint-disable no-process-exit */
+
+/**
+ * This script is a wrapper around electron-builder that must be used instead of
+ * calling electron-builder directly. The wrapper is necessary for several reasons:
+ *
+ * 1. PPM (Pulsar Package Manager) integration:
+ *    - Validates that the `ppm` submodule is initialized and built before building
+ *    - Copies the built `ppm` binary into the application's resources so it's
+ *      available to users for installing packages
+ *    - Handles renaming `ppm` to `ppm-next` for canary builds
+ *
+ * 2. Build configuration:
+ *    - Generates metadata for the build (e.g., git commit hash, branch name)
+ *    - Handles the `--next` flag for canary builds (PulsarNext), which changes
+ *      the app ID, product name, and executable name
+ *    - Manages version number modifications for local builds
+ *
+ * 3. File transformation:
+ *    - Monkey-patches electron-builder's file transformer to properly handle
+ *      package.json modifications with extra metadata
+ *
+ * 4. Post-build operations:
+ *    - Copies built binaries to a `binaries/` directory for easy access
+ *    - Restores the original package.json if it was temporarily modified
+ *
+ * Calling electron-builder directly would result in a build without PPM and
+ * without proper metadata, making the package manager unavailable to users.
+ */
+
 const Path = require('path');
 const dedent = require('dedent');
 const FS = require('fs/promises');
@@ -82,15 +111,16 @@ async function modifyMainPackageJson(
 const builder = require('electron-builder');
 
 const ARGS = yargs(hideBin(process.argv))
-  .command('[platform]', 'build for a given platform', () => {
+  .command('$0 [platform]', 'Build Pulsar', (yargs) => {
     return yargs.positional('platform', {
-      describe: 'One of "mac", "linux", or "win".'
-    })
+      describe: 'One of "mac", "linux", or "win".',
+      type: 'string'
+    });
   })
   .option('target', {
     alias: 't',
     type: 'string',
-    description: 'Limit to one target of the specified platform; otherwise all targets for that platform are built.'
+    description: 'Limit to one target of the specified platform; otherwise all targets for that platform are built. Use "dir" to build only the unpacked directory without creating distribution packages.'
   })
   .option('next', {
     alias: 'n',
@@ -417,9 +447,51 @@ if (ARGS.next) {
   delete options.nsis.guid;
 }
 
+/**
+ * Determines which platforms and targets to build based on command-line arguments.
+ *
+ * The build configuration supports three modes:
+ *
+ * 1. No arguments (default):
+ *    Builds for all platforms with all configured targets. For Linux:
+ *    AppImage, deb, rpm, and tar.gz. For Windows: nsis and zip. For Mac:
+ *    dmg and zip.
+ *
+ * 2. Platform specified:
+ *    Builds only for the specified platform with all configured targets.
+ *    Platform options: "mac", "linux", or "win".
+ *    Example: `node script/electron-builder.js linux` builds all Linux targets.
+ *
+ * 3. Target flag specified (--target):
+ *    Builds only the specified target for the platform. Target options depend
+ *    on the platform: "appimage", "deb", "rpm", "tar.gz" for Linux; "nsis",
+ *    "zip" for Windows; "dmg", "zip" for Mac. Use "dir" to build only the
+ *    unpacked directory without creating distribution packages.
+ *    Example: `node script/electron-builder.js linux --target appimage` builds
+ *    only the AppImage.
+ *
+ * @returns {Object} The modified electron-builder configuration object.
+ */
 function whatToBuild() {
-  if (!ARGS.target) return options;
-  if (!(ARGS.platform in options)) return options;
+  // Default mode: no specific target requested, build all configured targets
+  if (!ARGS.target) {
+    return options;
+  }
+
+  // Single-target mode: build only the requested target
+  if (!(ARGS.platform in options)) {
+    return options;
+  }
+
+  // Special case: 'dir' bypasses packaging entirely and outputs only the
+  // unpacked application directory. This is fundamentally different from
+  // distribution targets like appimage, deb, rpm, etc.
+  if (ARGS.target === 'dir') {
+    options[ARGS.platform].target = 'dir';
+    return options;
+  }
+
+  // Filter the platform's target array to include only the requested target
   options[ARGS.platform] = options[ARGS.platform].filter(e => e.target === ARGS.target);
   return options;
 }
