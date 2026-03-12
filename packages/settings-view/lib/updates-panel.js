@@ -186,7 +186,7 @@ export default class UpdatesPanel {
     await queue.drain()
 
     if (successfulUpdatesCount > 0) {
-      const message = `Restart Atom to complete the update of ${successfulUpdatesCount} ${pluralize('package', successfulUpdatesCount)}:`
+      const message = `Restart Pulsar to complete the update of ${successfulUpdatesCount} ${pluralize('package', successfulUpdatesCount)}:`
       let detail = ''
       this.packageCards.forEach((card) => {
         let oldVersion = ''
