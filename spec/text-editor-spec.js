@@ -8386,18 +8386,41 @@ describe('TextEditor', () => {
 
     it('returns true when the window is closing if the file has changed on disk', async () => {
       jasmine.useRealClock();
+      await wait(1000);
 
       editor.setText('initial stuff');
       let destination = temp.openSync('test-file').path;
+      // Saving to a different file path creates a new `File` class and starts
+      // watching a new file. It's possible that this happens too quickly in CI
+      // for the subscription to detect the writing of new contents.
       await editor.saveAs(destination);
-      expect(fs.readFileSync(destination, 'utf8').toString()).toBe('initial stuff');
+      expect(
+        fs.readFileSync(destination, 'utf8').toString()
+      ).toBe('initial stuff');
+      await wait(1000);
+      try {
+        console.warn('Is it ALREADY in conflict?', editor.buffer.isInConflict());
+      } catch (err) {
+        console.error('Debugging error:');
+        console.error(err);
+      }
 
       editor.setText('other stuff');
       let promise = new Promise(resolve => editor.onDidConflict(() => {
+        console.warn('On did conflict!');
         resolve();
       }));
-      await wait(1000);
       fs.writeFileSync(editor.getPath(), 'new stuff');
+      try {
+        console.warn('IS IN CONFLICT?', editor.buffer.isInConflict());
+        console.warn('Is modified?', editor.isModified(), 'Has multiple editors?', editor.buffer.hasMultipleEditors());
+        console.warn('State store is connected?', atom.stateStore.isConnected());
+      } catch (err) {
+        console.error('Debugging error:');
+        console.error(err);
+      }
+      // If we check it right away, `editor.buffer.isInConflict()` will return
+      // `false`, since `onDidConflict` has not yet fired.
       expect(
         editor.shouldPromptToSave({
           windowCloseRequested: true,
@@ -8405,6 +8428,7 @@ describe('TextEditor', () => {
         })
       ).toBeFalsy();
 
+      // It should fire soon enough, though.
       await promise;
       expect(
         editor.shouldPromptToSave({
