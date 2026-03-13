@@ -1227,15 +1227,24 @@ module.exports = class TextEditorComponent {
     let decorationToMeasure = this.decorationsToMeasure.cursors.get(marker);
     if (!decorationToMeasure) {
       const isLastCursor = model.getLastCursor().getMarker() === marker;
-      const screenPosition = reversed ? screenRange.start : screenRange.end;
-      const { row, column } = screenPosition;
+      const rawScreenPosition = reversed ? screenRange.start : screenRange.end;
+      const { row } = rawScreenPosition;
+      let { column } = rawScreenPosition;
 
       if (row < this.getRenderedStartRow() || row >= this.getRenderedEndRow())
         return;
 
+      // Clamp column to line length to prevent cursor rendering at invalid
+      // positions due to intermittent timing issues with display layer updates
+      const lineLength = model.lineLengthForScreenRow(row);
+      if (column > lineLength) {
+        column = lineLength;
+      }
+
+      const screenPosition = { row, column };
       this.requestHorizontalMeasurement(row, column);
       let columnWidth = 0;
-      if (model.lineLengthForScreenRow(row) > column) {
+      if (lineLength > column) {
         columnWidth = 1;
         this.requestHorizontalMeasurement(row, column + 1);
       }
