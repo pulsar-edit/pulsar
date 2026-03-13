@@ -3,46 +3,6 @@ const {Emitter, TextEditor, Range} = require('atom')
 const escapeHelper = require('../escape-helper')
 const path = require('path');
 
-// Given a path pattern like `foo/bar/baz`, splits into [`foo`, `bar/baz`].
-// We need to do this when there are multiple project roots, since the first
-// segment tells us which root is being targeted.
-// function extractProjectRootFromPathPattern (pathPattern, basenames) {
-//   let normalized = path.normalize(pathPattern)
-//   if (pathPattern === "") return ["", ""]
-//   if (!pathPattern.includes(path.sep)) {
-//     return [pathPattern, ""]
-//   }
-//   let index = normalized.indexOf(path.sep)
-//   return [
-//     normalized.substring(0, index),
-//     normalized.slice(index + 1)
-//   ];
-// }
-
-// Given a path pattern like `foo/bar/baz`, splits into [`foo`, `bar/baz`].
-// We need to do this when there are multiple project roots, since the first
-// segment tells us which root is being targeted.
-function extractProjectRootFromPathPattern (pathPattern, rootBasenames) {
-  let normalized = path.normalize(pathPattern);
-  let originalPathPattern = pathPattern;
-  if (pathPattern === "") return [null, ""];
-  let rootBasename;
-  if (!pathPattern.includes(path.sep)) {
-    rootBasename = pathPattern;
-    pathPattern = "";
-  } else {
-    let index = normalized.indexOf(path.sep);
-    rootBasename = normalized.substring(0, index);
-    pathPattern = normalized.slice(index + 1);
-  }
-
-  if (rootBasenames.includes(rootBasename)) {
-    return [rootBasename, pathPattern];
-  }
-  return [null, originalPathPattern];
-}
-
-
 class Result {
   static create(result) {
     if (result && result.matches && result.matches.length) {

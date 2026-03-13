@@ -2184,7 +2184,7 @@ module.exports = class Workspace extends Model {
   //   * `trailingContextLineCount` {Number} default `0`; The number of lines
   //      after the matched line to include in the results object.
   // * `iterator` {Function} callback on each file found.
-  //   //
+  //
   // Returns a {Promise} with a `cancel()` method that will cancel all
   // of the underlying searches that were started as part of this scan.
   //
@@ -2326,14 +2326,14 @@ module.exports = class Workspace extends Model {
       //   match up with a root basename — then we will include it in the
       //   search.
       // * If neither of the first two rules applies, that means no `paths`
-      //   target to the current root, but it is still presumed to be included
+      //   target the current root, but it is still presumed to be included
       //   unless it is _implicitly excluded_ by the given paths. For instance:
       //   if there are roots `foo` and `bar`, and `paths` contains only
       //   `bar/src`, then the fact the user opted into `bar` by name is
       //   interpreted as implicitly excluding `foo`.
       // * On the other hand, if `paths` contained only `!bar/src` in the
-      //   example above, then no other roots were explicitly included; thus
-      //   `foo` would be included in the search.
+      //   example above, then no other roots were explicitly included or
+      //   implicitly excluded; thus `foo` would be included in the search.
       //
       if (isExplicitlyExcluded || ((filteredPaths ?? []).length === 0 && !hasOnlyExclusions)) {
         // This directory is either explicitly or implicitly excluded in its
@@ -2462,10 +2462,10 @@ module.exports = class Workspace extends Model {
       }
     }
 
-    // Make sure the Promise that is returned to the client is cancelable. To be consistent
-    // with the existing behavior, instead of cancel() rejecting the promise, it should
-    // resolve it with the special value 'cancelled'. At least the built-in find-and-replace
-    // package relies on this behavior.
+    // Make sure the Promise that is returned to the client is cancelable. To
+    // be consistent with the existing behavior, instead of cancel() rejecting
+    // the promise, it should resolve it with the special value 'cancelled'. At
+    // least the built-in find-and-replace package relies on this behavior.
     let isCancelled = false;
     const cancellablePromise = new Promise((resolve, reject) => {
       const onSuccess = function () {
