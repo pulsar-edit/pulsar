@@ -788,7 +788,11 @@ class AtomEnvironment {
 
   // Extended: Set the full screen state of the current window.
   setFullScreen(fullScreen = false) {
-    return this.applicationDelegate.setWindowFullScreen(fullScreen);
+    let result = this.applicationDelegate.setWindowFullScreen(fullScreen);
+    // On Linux, setting full screen (no matter the value) hides the menu bar.
+    // Hence we must re-assert this setting.
+    this.setAutoHideMenuBar(this.config.get('core.autoHideMenuBar'));
+    return result;
   }
 
   // Extended: Toggle the full screen state of the current window.
