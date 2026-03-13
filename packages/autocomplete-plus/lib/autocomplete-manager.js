@@ -385,10 +385,25 @@ class AutocompleteManager {
 
   filterSuggestions(suggestions, {prefix}) {
     const results = []
+
+    // Legacy behavior: filtering used to include a "sanity check" that ensured
+    // the first character of the suggestion matched the first character of the
+    // input.
+    //
+    // The original intent of this decision is not known, but it aged poorly,
+    // especially as autocompletion suggestions got more sophisticated and grew
+    // the ability to trigger arbitrary text edits instead of just adding
+    // characters to what had been typed.
+    //
+    // We envision this will eventually go away altogether, but as an
+    // intermediate step, we've turned it into an option that is `false` by
+    // default.
+    let firstCharacterMustMatch = atom.config.get('autocomplete-plus.firstCharacterMustMatch')
+
     for (let i = 0; i < suggestions.length; i++) {
-      // sortScore mostly preserves in the original sorting. The function is
-      // chosen such that suggestions with a very high match score can break out.
-      let score
+      // `sortScore` mostly preserves in the original sorting. The function is
+      // chosen such that suggestions with a very high match score can break
+      // out.
       const suggestion = suggestions[i]
       suggestion.sortScore = Math.max((-i / 10) + 3, 0) + 1
       suggestion.score = null
@@ -400,9 +415,22 @@ class AutocompleteManager {
       if (prefixIsEmpty) {
         results.push(suggestion)
       } else {
-        const keepMatching = suggestion.ranges || suggestionPrefix[0].toLowerCase() === text[0].toLowerCase()
+        const keepMatching = firstCharacterMustMatch ?
+          suggestionPrefix[0].toLowerCase() === text[0].toLowerCase() :
+          true
         let score = atom.ui.fuzzyMatcher.score(text, suggestionPrefix)
-        if (!!suggestion.textEdit || (keepMatching && score > 0)) {
+
+        // Suggestions are removed from the list if their fuzzy-matching score
+        // is `0` — unless they have `ranges` or `textEdit`. Both of these
+        // properties imply that the suggestion operates on an arbitrary buffer
+        // range, meaning that traditional filter heuristics are unlikely to be
+        // accurate.
+        //
+        // In situations where such suggestions fail fuzzy matching, they will
+        // have their scores reduced to `0`. This may deprioritize them
+        // relative to other options. Hence, though they remain in the result
+        // set, they may be deprioritized relative to other suggestions.
+        if ((!!suggestion.ranges || !!suggestion.textEdit) || (keepMatching && score > 0)) {
           suggestion.score = score * suggestion.sortScore
           results.push(suggestion)
         }
