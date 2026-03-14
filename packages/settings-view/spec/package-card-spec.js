@@ -79,19 +79,17 @@ describe("PackageCard", function() {
 
   it("shows a badge", function () {
     const pack = {
-      badge: {
+      badges: [{
         link: 'https://example.com',
         title: 'Archived',
         text: 'Source code has been archived',
         type: 'warn'
-      }
-    };
-    card = new PackageCard({
+      }],
       name: 'something',
       version: '1.0.0',
-      latestVersion: '1.0.0',
-      pack
-    }, new SettingsView(), packageManager);
+      latestVersion: '1.0.0'
+    };
+    card = new PackageCard(pack, new SettingsView(), packageManager);
 
     spyOn(shell, 'openExternal');
     jasmine.attachToDOM(card.element);
