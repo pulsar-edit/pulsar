@@ -1,11 +1,13 @@
-const { timeoutPromise: wait } = require('./helpers/async-spec-helpers');
+const { timeoutPromise: wait, conditionPromise } = require('./helpers/async-spec-helpers');
 
+const { CompositeDisposable } = require('atom');
 const fs = require('fs');
 const path = require('path');
 const temp = require('temp').track();
 const dedent = require('dedent');
 const { clipboard } = require('electron');
 const os = require('os');
+const Pane = require('../src/pane');
 const TextEditor = require('../src/text-editor');
 const TextBuffer = require('@pulsar-edit/text-buffer');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
@@ -8353,6 +8355,127 @@ describe('TextEditor', () => {
         'property_identifier'
       ]);
     });
+  });
+
+  describe('when the file on disk is changed while we have pending modifications', () => {
+    let destination;
+    let disposables;
+    let promptOnConflictOutcome;
+    beforeEach(async () => {
+      jasmine.useRealClock();
+      let projectPath = temp.mkdirSync('project-with-file-modification');
+      destination = path.resolve(projectPath, 'sample.js');
+      fs.copyFileSync(
+        path.resolve(__dirname, 'fixtures', 'sample.js'),
+        destination
+      );
+      disposables?.dispose();
+      disposables = new CompositeDisposable();
+      atom.project.setPaths([projectPath]);
+      editor = await atom.workspace.open(destination);
+      buffer = editor.buffer;
+      editor.update({ autoIndent: false });
+
+      // Mock `Pane::promptOnConflict` in order to skip the presentation of the
+      // dialog. Instead, we can choose the outcome of the prompt on a per-call
+      // basis.
+      promptOnConflictOutcome = Promise.resolve();
+      if (!Pane.prototype.promptOnConflict.calls) {
+        spyOn(Pane.prototype, 'promptOnConflict').and.callFake(() => {
+          return promptOnConflictOutcome;
+        });
+      }
+
+      await atom.packages.activatePackage('language-javascript');
+      languageMode = buffer.getLanguageMode();
+      if ('useAsyncParsing' in languageMode) {
+        languageMode.useAsyncParsing = false;
+        languageMode.useAsyncIndent = false;
+      }
+      if (languageMode.ready) {
+        await languageMode.ready;
+      }
+      let contents = fs.readFileSync(destination, 'utf8').toString();
+
+      // Modify the buffer (replacing `var` with `let`) so that the buffer is
+      // dirty…
+      editor.setTextInBufferRange(
+        [[0, 0], [0, 3]],
+        'let'
+      );
+      expect(editor.isModified()).toBe(true);
+
+      // …then change the file on disk so that our modifications are orphaned.
+      fs.writeFileSync(destination, `${contents}\n\n// changed`);
+
+      // TEMP: The infrastructure is present to make this a more rigorous
+      // end-to-end test (temp directories, etc.) but `pathwatcher` seems to
+      // have trouble keeping up.
+      //
+      // Since the effect of conflict detection is to flip a particular flag on
+      // the `TextBuffer`, we'll flip it manually here. The purpose of these
+      // specs is to verify that the correct things happen _after_ a certain
+      // condition is met; it's the job of `TextBuffer`’s specs to prove that
+      // file-watching produces that condition.
+      editor.buffer.fileHasChangedSinceLastLoad = true;
+      expect(editor.isInConflict()).toBe(true);
+    });
+
+    afterEach(() => disposables?.dispose());
+
+    it('is considered to be in conflicted state, but will overwrite with user confirmation', async () => {
+      expect(editor.isInConflict()).toBe(true);
+
+      let uncommittedContents = editor.getText();
+
+      // We've got to save this editor via the `Pane::saveItem` interface to
+      // trigger this conflict warning.
+      let activePane = atom.workspace.getActivePane();
+      activePane.saveItem(editor);
+
+      // User should be shown the dialog…
+      await conditionPromise(() => {
+        return Pane.prototype.promptOnConflict.calls.count() > 0
+      });
+
+      await conditionPromise(() => !editor.isModified());
+
+      // …and whatever was in the buffer when we chose to overwrite should
+      // match what's now present on disk.
+      expect(
+        fs.readFileSync(destination, 'utf8').toString()
+      ).toBe(uncommittedContents);
+
+      // Now that we've written to disk, there's no longer a conflict.
+      expect(editor.isInConflict()).toBe(false);
+
+      // Saving the file to disk should flip this internal flag.
+      expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
+    });
+
+    it('is considered to be in conflicted state and will not overwrite if user declines', async () => {
+      let contentsOnDisk = fs.readFileSync(destination, 'utf8').toString();
+      expect(editor.isInConflict()).toBe(true);
+
+      promptOnConflictOutcome = Promise.reject({ path: destination });
+      let uncommittedContents = editor.getText();
+
+      let activePane = atom.workspace.getActivePane();
+      activePane.saveItem(editor);
+      await conditionPromise(() => {
+        return Pane.prototype.promptOnConflict.calls.count() > 0
+      });
+
+      expect(
+        fs.readFileSync(destination, 'utf8').toString()
+      ).toBe(contentsOnDisk);
+
+      expect(editor.getText()).toBe(uncommittedContents);
+
+      // Since we cancelled the write, the conflict state should still be
+      // present and unresolved.
+      expect(editor.isInConflict()).toBe(true);
+    })
   });
 
   describe('.shouldPromptToSave()', () => {
