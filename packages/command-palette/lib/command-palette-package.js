@@ -21,14 +21,6 @@ class CommandPalettePackage {
     return this.commandPaletteView.show()
   }
 
-  consumeBackgroundTips (service) {
-    const disposable = service.registerTips([
-      `The Command Palette lets you access all of ${atom.branding.name}'s commands. Open it with {command-palette:toggle}`
-    ])
-    this.disposables.add(disposable)
-    return disposable
-  }
-
   async deactivate () {
     this.disposables.dispose()
     await this.commandPaletteView.destroy()
