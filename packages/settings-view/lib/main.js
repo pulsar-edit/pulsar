@@ -58,6 +58,7 @@ module.exports = {
   },
 
   deactivate () {
+    this.backgroundTipsDisposable?.dispose()
     if (settingsView) settingsView.destroy()
     if (statusView) statusView.destroy()
     settingsView = null
@@ -82,6 +83,14 @@ module.exports = {
       statusViewIcon = new SettingsIconStatusView(statusBar)
       statusViewIcon.attach()
     }
+  },
+
+  consumeBackgroundTips (service) {
+    const disposable = service.registerTips([
+      'Install packages, themes, and customize your editor in Settings {settings-view:open}'
+    ])
+    this.backgroundTipsDisposable = disposable
+    return disposable
   },
 
   consumeSnippets (snippets) {
