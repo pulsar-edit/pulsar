@@ -182,8 +182,6 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dd></dd>
 <dt><a href="#path">path</a></dt>
 <dd></dd>
-<dt><a href="#path">path</a></dt>
-<dd></dd>
 <dt><a href="#_">_</a></dt>
 <dd></dd>
 <dt><a href="#path">path</a></dt>
@@ -605,11 +603,6 @@ This file aims to run some short simple tests against `update.js`. Focusing
 <a name="assert"></a>
 
 ## assert
-**Kind**: global constant  
-**Babel**:   
-<a name="path"></a>
-
-## path
 **Kind**: global constant  
 **Babel**:   
 <a name="path"></a>
