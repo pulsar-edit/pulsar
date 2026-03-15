@@ -13,7 +13,6 @@ env:
   # Variables needed for build information
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PYTHON_VERSION: '3.12'
-  NODE_VERSION: 16
   ROLLING_UPLOAD_TOKEN: ${{ secrets.ROLLING_RELEASE_UPLOAD_TOKEN }}
   # Below variables allow us to quickly control visual tests for each platform
   RUN_WINDOWS_VT: false
@@ -80,7 +79,7 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v6
       with:
-        node-version: ${{ env.NODE_VERSION }}
+        node-version-file: '.nvmrc'
         architecture: 'x64'
 
     - name: Setup Python
