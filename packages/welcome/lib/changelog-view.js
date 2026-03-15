@@ -60,46 +60,34 @@ export default class ChangeLogView {
                 </ul>
               </li>
               <li>
-                Bump <code>ppm</code> to use Node 20.11.1
-                <ul>
-                  <li>For the first time in a long time, both <code>ppm</code> and Pulsar are using the same version of Node; this should avoid some rare bugs encountered when installing certain packages.</li>
-                </ul>
+                [settings-view] Fixed issue that closed project windows when the user clicked on a badge in a package card.
               </li>
               <li>
-                Fix handling when opening files to certain line numbers via CLI - e.g. <code>pulsar foo.txt:30</code>
+                [find-and-replace] Fixed issue that prevented searches with patterns from working properly in projects with multiple roots.
               </li>
               <li>
-                Prevent packages from spawning new background tasks if the environment is unloading.
+                Fixed issue affecting keybinding interpretation on non-QWERTY keyboards in Linux/X11 environments.
               </li>
               <li>
-                <code>find-and-replace</code> Fix an issue where certain files would show results in a project-wide search even when they would be excluded by the file/directory pattern.
+                Fixed Linux issue causing the menu bar to hide immediately after a project window opens.
               </li>
               <li>
-                <code>markdown-preview</code> Fix situations where "Save as HTML" and "Copy as HTML" silently failed with certain kinds of content.
+                Fixed macOS issue causing buffer contents to fail to update for some users when modified by another program.
               </li>
               <li>
-                <code>autocomplete-plus</code> Prevent certain kinds of suggestions from being incorrectly filtered out of the result set.
+                Fixed issue causing the <code>.deb</code> installation to refuse to launch because of improper permissions.
               </li>
               <li>
-                <code>language-java</code> Update to the latest <code>tree-sitter-java</code> parser, adding support for multiline strings, amount other things.
+                Fixed issue causing the <code>.rpm</code> installation to run the wrong script when upgrading.
               </li>
               <li>
-                <code>language-python</code> Better highlighting of <code>except</code> clauses; fixed folding of certain <code>if</code> blocks.
+                Fixed issue causing the <code>--package</code> switch not to work correctly when invoked directly on the Pulsar binary, rather than on <code>pulsar.sh</code>/<code>pulsar.cmd</code>.
               </li>
               <li>
-                <code>language-typescript</code> Better highlighting of template literals; adding folding of <code>interface</code> and <code>enum</code> blocks.
+                Fixed issue that prevented <code>ppm</code> from being symlinked or un-symlinked correctly in Linux install/uninstall scripts.
               </li>
               <li>
-                <code>language-javascript</code> Proper highlighting of JSX with namespaced attributes.
-              </li>
-              <li>
-                Fix an issue in <code>superstring</code> that occasionally caused crashes while editing text.
-              </li>
-              <li>
-                Add support for additional image formats in Pulsar's Markdown renderer.
-              </li>
-              <li>
-                Minor reduction of binary size through various means.
+                Added <code>atom.project.addPaths</code> method for adding multiple project roots at once.
               </li>
             </ul>
 
