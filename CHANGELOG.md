@@ -44,7 +44,7 @@
 
 - Introduce an alternative macOS implementation that uses `kqueue` to better match this library's pre-v9 behavior [@savetheclocktower](https://github.com/pulsar-edit/node-pathwatcher/pull/4)
 
-### atom-keymap
+### @pulsar-edit/atom-keymap
 
 - Bump @pulsar-edit/keyboard-layout to 3.0.5 [@savetheclocktower](https://github.com/pulsar-edit/atom-keymap/commit/37a68fe1cf4d66174b8dd16f75ebf017e55a6d83)
 
