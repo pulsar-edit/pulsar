@@ -60,34 +60,34 @@ export default class ChangeLogView {
                 </ul>
               </li>
               <li>
-                [settings-view] Fixed issue that closed project windows when the user clicked on a badge in a package card.
+                [settings-view] Fix issue that closes project windows when the user clicked on a badge in a package card.
               </li>
               <li>
-                [find-and-replace] Fixed issue that prevented searches with patterns from working properly in projects with multiple roots.
+                [find-and-replace] Fix issue that prevents searches with patterns from working properly in projects with multiple roots.
               </li>
               <li>
-                Fixed issue affecting keybinding interpretation on non-QWERTY keyboards in Linux/X11 environments.
+                Fix issue affecting keybinding interpretation on non-QWERTY keyboards in Linux/X11 environments.
               </li>
               <li>
-                Fixed Linux issue causing the menu bar to hide immediately after a project window opens.
+                Fix Linux issue causing the menu bar to hide immediately after a project window opens.
               </li>
               <li>
-                Fixed macOS issue causing buffer contents to fail to update for some users when modified by another program.
+                Fix macOS issue causing buffer contents to fail to update for some users when modified by another program.
               </li>
               <li>
-                Fixed issue causing the <code>.deb</code> installation to refuse to launch because of improper permissions.
+                Fix issue causing the <code>.deb</code> installation to refuse to launch because of improper permissions.
               </li>
               <li>
-                Fixed issue causing the <code>.rpm</code> installation to run the wrong script when upgrading.
+                Fix issue causing the <code>.rpm</code> installation to run the wrong script when upgrading.
               </li>
               <li>
-                Fixed issue causing the <code>--package</code> switch not to work correctly when invoked directly on the Pulsar binary, rather than on <code>pulsar.sh</code>/<code>pulsar.cmd</code>.
+                Fix issue causing the <code>--package</code> switch not to work correctly when invoked directly on the Pulsar binary, rather than on <code>pulsar.sh</code>/<code>pulsar.cmd</code>.
               </li>
               <li>
-                Fixed issue that prevented <code>ppm</code> from being symlinked or un-symlinked correctly in Linux install/uninstall scripts.
+                Fix issue that prevents <code>ppm</code> from being symlinked or un-symlinked correctly in Linux install/uninstall scripts.
               </li>
               <li>
-                Added <code>atom.project.addPaths</code> method for adding multiple project roots at once.
+                Add <code>atom.project.addPaths</code> method for adding multiple project roots at once.
               </li>
             </ul>
 
