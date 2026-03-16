@@ -158,12 +158,6 @@
     },
     {
       "matchFileNames": [
-        "packages/exception-reporting/**"
-      ],
-      "groupName": "exception-reporting package"
-    },
-    {
-      "matchFileNames": [
         "packages/find-and-replace/**"
       ],
       "groupName": "find-and-replace package"

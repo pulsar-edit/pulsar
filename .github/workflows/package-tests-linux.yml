@@ -99,7 +99,6 @@ jobs:
           - package: "deprecation-cop"
           - package: "dev-live-reload"
           - package: "encoding-selector"
-          - package: "exception-reporting"
           - package: "find-and-replace"
           - package: "fuzzy-finder"
           - package: "github"
