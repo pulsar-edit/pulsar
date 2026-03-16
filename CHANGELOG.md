@@ -26,7 +26,7 @@
 - [settings-view] Prevent weird half-crash when clicking on a badge such as an "Archived" badge next to a package card [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1481)
 - [find-and-replace] Fix project search path pattern interpretation when the project has more than one root directory [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1455)
 - Update to a version of `pathwatcher` that uses `kqueue` on macOS instead of `FSEvents` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1471)
-- Fix inability to use `require('clipboard')` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1474)
+- Fix inability to use `require('clipboard')` and its other deprecated siblings [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1474)
 - Re-assert `core.setAutoHideMenuBar` after a call to `setFullScreen` so that the menu bar isn't automatically hidden on Linux [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1472)
 - settings-view: rebrand README and Restart notification [@catb0t](https://github.com/pulsar-edit/pulsar/pull/1476)
 - Bump `atom-keymap` to v9.0.3 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1475)
