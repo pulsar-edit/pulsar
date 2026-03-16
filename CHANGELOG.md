@@ -8,13 +8,13 @@
 
 ## 1.131.2
 
-* [settings-view] Fix issue that closes project windows when the user clicked on a badge in a package card.
+* [settings-view] Fix issue that closes project windows when the user clicks on a badge in a package card.
 * [find-and-replace] Fix issue that prevents searches with patterns from working properly in projects with multiple roots.
 * Fix issue affecting keybinding interpretation on non-QWERTY keyboards in Linux/X11 environments.
 * Fix Linux issue causing the menu bar to hide immediately after a project window opens.
 * Fix macOS issue causing buffer contents to fail to update for some users when modified by another program.
-* Fix issue causing the `.deb` installation to refuse to launch because of improper permissions.
-* Fix issue causing the `.rpm` installation to run the wrong script when upgrading.
+* Fix issue causing the `.deb` installation to refuse to launch because of improper permissions/AppArmor profile.
+* Fix issue causing the `.rpm` installation to run the wrong script when upgrading (restore pulsar and ppm to PATH).
 * Fix issue causing the `--package` switch not to work correctly when invoked directly on the Pulsar binary, rather than on `pulsar.sh`/`pulsar.cmd`.
 * Fix issue that prevents `ppm` from being symlinked or un-symlinked correctly in Linux install/uninstall scripts.
 * Add `atom.project.addPaths` method for adding multiple project roots at once.
