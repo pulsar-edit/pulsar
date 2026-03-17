@@ -3,7 +3,7 @@
 !include nsDialogs.nsh
 XPStyle on
 
-!macro preInit ; Macro called by electron-builder; inserted at start of .OnInit callback
+!macro customInit ; Macro called by electron-builder; inserted at start of .OnInit callback
   ; Check the current windows version
   ${GetWindowsVersion} $R0
 
