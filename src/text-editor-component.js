@@ -2626,17 +2626,21 @@ module.exports = class TextEditorComponent {
       columnsToMeasure.sort((a, b) => a - b);
 
       const screenLine = this.renderedScreenLineForRow(row);
-      const lineComponent = this.lineComponentsByScreenLineId.get(
-        screenLine.id
-      );
 
-      // Skip rows whose line component is not currently rendered rather than
-      // throwing. Measurements can be queued for non-rendered rows by calls to
-      // pixelPositionForScreenPosition or pendingAutoscroll when block
+      // Skip rows whose screen line or line component is not currently
+      // rendered. Measurements can be queued for non-rendered rows by calls
+      // to pixelPositionForScreenPosition or pendingAutoscroll when block
       // decorations shift lines outside the rendered range. Because clear()
       // runs after the forEach, throwing here prevents it from ever being
       // reached, poisoning horizontalPositionsToMeasure permanently and
       // causing an infinite error loop on every subsequent animation frame.
+      if (!screenLine) {
+        return;
+      }
+
+      const lineComponent = this.lineComponentsByScreenLineId.get(
+        screenLine.id
+      );
       if (!lineComponent) {
         return;
       }
