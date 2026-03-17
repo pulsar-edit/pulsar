@@ -1669,13 +1669,13 @@
     "@types/node" "*"
     playwright-core "1.22.2"
 
-"@pulsar-edit/atom-keymap@^9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/atom-keymap/-/atom-keymap-9.0.2.tgz#2e65f87f6e4d1c501e74a61575308d616ae0c8c0"
-  integrity sha512-2rXUV8hGhxVNb3wexN8LMBEwx1eAlUE5BJ7F0ZXbW8i8CZ0lAolLZOnI6PNQWSubj6iabtASHnO3rCb63qr7TQ==
+"@pulsar-edit/atom-keymap@^9.0.3":
+  version "9.0.3"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/atom-keymap/-/atom-keymap-9.0.3.tgz#5df0dec0d710e74639bfdfbd1b790a927035aeaf"
+  integrity sha512-Qh/PFAXA6xNBV6gZTYs7fQf7EwyHNf8Keh0U155XO+0JdRws68YlH07Doq0tqQVvURwU8RIZGNilK0BKkJpRUg==
   dependencies:
     "@electron/rebuild" "^3.2.11"
-    "@pulsar-edit/keyboard-layout" "^3.0.4"
+    "@pulsar-edit/keyboard-layout" "^3.0.5"
     "@pulsar-edit/pathwatcher" "^9.0.2"
     clear-cut "^2"
     event-kit "^1.0.0"
@@ -1706,14 +1706,14 @@
     fs-plus "^3.0.0"
     nan "^2.14.2"
 
-"@pulsar-edit/keyboard-layout@^3.0.4":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/keyboard-layout/-/keyboard-layout-3.0.4.tgz#8474b2658c37b7c17324baf89639189b1273dfb5"
-  integrity sha512-qpyaN5lEOruWXYTPfK4mh82o+1V6B2apMCMTKo+qxX29lRJXCsxZVu2xrOADU3ORfTsQAYIE2w+l5zlgBh48hA==
+"@pulsar-edit/keyboard-layout@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/keyboard-layout/-/keyboard-layout-3.0.5.tgz#efe5c73a5619e40cc1569030e28947176f013a6b"
+  integrity sha512-+Fr3is/HY7E1in7ZgRvCDjkUDDfO8mZdFC1YqaGabUSfMzRAg/jMBR7VEvm57avr1mqpFNOjh+QRzxZciml3YA==
   dependencies:
     event-kit "^2.0.0"
     node-addon-api "^7.1.1"
-
+    
 "@pulsar-edit/ls-archive@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@pulsar-edit/ls-archive/-/ls-archive-2.0.0.tgz#21fdcdc1d0b6fa8a1e6198ee5e9fa46ec3da5ec0"
@@ -1726,10 +1726,10 @@
     unbzip2-stream "^1.4.3"
     yauzl "^3.2.0"
 
-"@pulsar-edit/pathwatcher@^9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/pathwatcher/-/pathwatcher-9.0.2.tgz#6c520011910a0e560a0d4bb88ccc03f8a890bdb6"
-  integrity sha512-5FsBUfUsynrS+0W1OlnGNj29wYzHPNgzr06APTScF/zYjnrz02uYj1edYeZOYiErxeBuVWsecrRYue82Zu42zg==
+"@pulsar-edit/pathwatcher@9.0.3", "@pulsar-edit/pathwatcher@^9.0.2":
+  version "9.0.3"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/pathwatcher/-/pathwatcher-9.0.3.tgz#13dcbdbf4115904bfdf76509580612cf09e8043c"
+  integrity sha512-S8QwhsUf/x617g6FEuPixdu1c3Mt4kzZsGaTrbogkaCJuY1mMAEkqkp6zEp4MM+UfWFruRszAOkdZYbI5gWW9Q==
   dependencies:
     async "~0.2.10"
     emissary "^1.3.2"

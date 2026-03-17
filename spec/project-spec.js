@@ -810,6 +810,48 @@ describe('Project', () => {
     });
   });
 
+  describe('.addPaths(projectPaths, options)', () => {
+    it('adds multiple paths and emits a single did-change-paths event', () => {
+      const onDidChangePathsSpy = jasmine.createSpy('onDidChangePaths spy');
+      atom.project.onDidChangePaths(onDidChangePathsSpy);
+
+      const [oldPath] = atom.project.getPaths();
+      const newPath1 = temp.mkdirSync('dir1');
+      const newPath2 = temp.mkdirSync('dir2');
+      atom.project.addPaths([newPath1, newPath2]);
+
+      expect(atom.project.getPaths()).toEqual([oldPath, newPath1, newPath2]);
+      expect(onDidChangePathsSpy.calls.count()).toBe(1);
+      expect(onDidChangePathsSpy.calls.mostRecent().args[0]).toEqual([
+        oldPath,
+        newPath1,
+        newPath2
+      ]);
+    });
+
+    it('does not fire an event if all paths are already project paths', () => {
+      const onDidChangePathsSpy = jasmine.createSpy('onDidChangePaths spy');
+      atom.project.onDidChangePaths(onDidChangePathsSpy);
+
+      const [oldPath] = atom.project.getPaths();
+      atom.project.addPaths([oldPath]);
+
+      expect(onDidChangePathsSpy).not.toHaveBeenCalled();
+    });
+
+    it('fires an event if only some paths are already project paths', () => {
+      const onDidChangePathsSpy = jasmine.createSpy('onDidChangePaths spy');
+      atom.project.onDidChangePaths(onDidChangePathsSpy);
+
+      const [oldPath] = atom.project.getPaths();
+      const newPath = temp.mkdirSync('dir');
+      atom.project.addPaths([oldPath, newPath]);
+
+      expect(atom.project.getPaths()).toEqual([oldPath, newPath]);
+      expect(onDidChangePathsSpy.calls.count()).toBe(1);
+    });
+  });
+
   describe('.removePath(path)', () => {
     let onDidChangePathsSpy = null;
 

@@ -788,7 +788,11 @@ class AtomEnvironment {
 
   // Extended: Set the full screen state of the current window.
   setFullScreen(fullScreen = false) {
-    return this.applicationDelegate.setWindowFullScreen(fullScreen);
+    let result = this.applicationDelegate.setWindowFullScreen(fullScreen);
+    // On Linux, setting full screen (no matter the value) hides the menu bar.
+    // Hence we must re-assert this setting.
+    this.setAutoHideMenuBar(this.config.get('core.autoHideMenuBar'));
+    return result;
   }
 
   // Extended: Toggle the full screen state of the current window.
@@ -1385,7 +1389,7 @@ class AtomEnvironment {
     if (state && this.project.getPaths().length === 0) {
       this.attemptRestoreProjectStateForPaths(state, projectPaths);
     } else {
-      projectPaths.map(folder => this.project.addPath(folder));
+      this.project.addPaths(projectPaths);
     }
   }
 
@@ -1439,9 +1443,7 @@ class AtomEnvironment {
             });
             resolveDiscardStatePromise(Promise.resolve(null));
           } else if (response === 1) {
-            for (let selectedPath of projectPaths) {
-              this.project.addPath(selectedPath);
-            }
+            this.project.addPaths(projectPaths);
             resolveDiscardStatePromise(
               Promise.all(filesToOpen.map(file => this.workspace.open(file)))
             );
@@ -1721,9 +1723,7 @@ or use Pane::saveItemAs for programmatic saving.`);
         );
         restoredState = true;
       } else {
-        for (let folder of foldersToAddToProject) {
-          this.project.addPath(folder);
-        }
+        this.project.addPaths(foldersToAddToProject);
       }
     }
 

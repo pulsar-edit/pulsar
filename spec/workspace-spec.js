@@ -2241,7 +2241,7 @@ describe('Workspace', () => {
       expect(
         atom.workspace.filePathMatchesPatterns(pathA1, ['', ''])
       ).toBe(true);
-      
+
       expect(
         atom.workspace.filePathMatchesPatterns(pathB1, ['b-dir/*.js'])
       ).toBe(true);
@@ -2901,6 +2901,7 @@ describe('Workspace', () => {
           let dir2;
           let file1;
           let file2;
+          let extraRootBasename;
 
           beforeEach(() => {
             dir1 = atom.project.getPaths()[0];
@@ -2913,6 +2914,7 @@ describe('Workspace', () => {
             fs.writeFileSync(file2, 'ccc aaaa');
 
             atom.project.addPath(dir2);
+            extraRootBasename = path.basename(dir2);
           });
 
           it("searches matching files in all of the project's root directories", async () => {
@@ -2976,6 +2978,44 @@ describe('Workspace', () => {
               expect(resultPaths).toEqual([file2]);
             });
           });
+
+          describe('when an exclusion path starts with the basename of a root directory', () => {
+            it('interprets the exclusion as applying only to that root', async () => {
+              let resultPaths = [];
+              await scan(/aaaa/, { paths: [`!${extraRootBasename}`] }, ({ filePath }) => {
+                if (!resultPaths.includes(filePath)) {
+                  resultPaths.push(filePath);
+                }
+              });
+
+              expect(resultPaths).toEqual([file1]);
+            });
+          });
+
+          describe('when inclusion paths mix inclusions and exclusions', () => {
+            it('filters out a wholesale exclusion of another root', async () => {
+              let resultPaths = [];
+              await scan(/aaaa/, { paths: ['dir', `!${extraRootBasename}`] }, ({ filePath }) => {
+                if (!resultPaths.includes(filePath)) {
+                  resultPaths.push(filePath);
+                }
+              });
+
+              expect(resultPaths).toEqual([file1]);
+            });
+
+            it('does not apply an exclusion that targets a different root', async () => {
+              let resultPaths = [];
+              await scan(/aaaa/, { paths: ['dir', `!${extraRootBasename}/**/*`] }, ({ filePath }) => {
+                if (!resultPaths.includes(filePath)) {
+                  resultPaths.push(filePath);
+                }
+              });
+
+              expect(resultPaths).toEqual([file1]);
+            });
+          });
+
 
           describe('when a custom directory searcher is registered', () => {
             let fakeSearch = null;
@@ -3211,6 +3251,62 @@ describe('Workspace', () => {
               result.slice(0, 3)
             )
           });
+        });
+      });
+
+      describe('with multiple project roots', () => {
+        let projectDir1, projectDir2;
+        let projectRoot1, projectRoot2;
+
+        beforeEach(() => {
+          projectDir1 = temp.mkdirSync('atom');
+          projectDir2 = temp.mkdirSync('atom');
+
+          // Within each of these two directories, create another directory so
+          // we can control the exact basename.
+          projectRoot1 = path.resolve(projectDir1, 'alpha');
+          projectRoot2 = path.resolve(projectDir2, 'beta');
+          fs.mkdirSync(projectRoot1);
+          fs.mkdirSync(projectRoot2);
+
+          let fixturesDirA = path.resolve(
+            __dirname,
+            'fixtures',
+            'workspace-scan',
+            'a-dir'
+          );
+          let fixturesDirB = path.resolve(
+            __dirname,
+            'fixtures',
+            'workspace-scan',
+            'b-dir'
+          );
+
+          fs.cpSync(fixturesDirA, projectRoot1, { recursive: true });
+          fs.cpSync(fixturesDirB, projectRoot2, { recursive: true });
+
+          atom.project.setPaths([projectRoot1, projectRoot2]);
+        });
+
+        it('should search both roots when no paths are given', async () => {
+          let results = [];
+          await scan(
+            /ipsum/,
+            {
+              leadingContextLineCount: 1,
+              trailingContextLineCount: 1
+            },
+            result => results.push(result.filePath)
+          );
+
+          results.sort((a, b) => a.localeCompare(b));
+
+          let sortedExpectedFilePaths = [
+            path.join(projectRoot1, 'sample1.js'),
+            path.join(projectRoot2, 'sample1.js')
+          ].sort()
+
+          expect(results).toEqual(sortedExpectedFilePaths);
         });
       });
     }); // Cancels other ongoing searches

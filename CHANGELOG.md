@@ -6,6 +6,52 @@
 
 ## [Unreleased]
 
+## 1.131.2
+
+* [settings-view] Fix issue that closes project windows when the user clicks on a badge in a package card.
+* [find-and-replace] Fix issue that prevents searches with patterns from working properly in projects with multiple roots.
+* Fix issue affecting keybinding interpretation on non-QWERTY keyboards in Linux/X11 environments.
+* Fix Linux issue causing the menu bar to hide immediately after a project window opens.
+* Fix macOS issue causing buffer contents to fail to update for some users when modified by another program.
+* Fix issue causing the `.deb` installation to refuse to launch because of improper permissions/AppArmor profile.
+* Fix issue causing the `.rpm` installation to run the wrong script when upgrading (restore pulsar and ppm to PATH).
+* Fix issue causing the `--package` switch not to work correctly when invoked directly on the Pulsar binary, rather than on `pulsar.sh`/`pulsar.cmd`.
+* Fix issue that prevents `ppm` from being symlinked or un-symlinked correctly in Linux install/uninstall scripts.
+* Add `atom.project.addPaths` method for adding multiple project roots at once.
+
+### Pulsar
+
+- script: Fix pulsar and ppm removal from PATH during upgrade with .rpms [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1482)
+- Fix `pulsar --package` usage when `APM_PATH` is not set [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1388)
+- [settings-view] Prevent weird half-crash when clicking on a badge such as an "Archived" badge next to a package card [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1481)
+- [find-and-replace] Fix project search path pattern interpretation when the project has more than one root directory [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1455)
+- Update to a version of `pathwatcher` that uses `kqueue` on macOS instead of `FSEvents` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1471)
+- Fix inability to use `require('clipboard')` and its other deprecated siblings [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1474)
+- Re-assert `core.setAutoHideMenuBar` after a call to `setFullScreen` so that the menu bar isn't automatically hidden on Linux [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1472)
+- settings-view: rebrand README and Restart notification [@catb0t](https://github.com/pulsar-edit/pulsar/pull/1476)
+- Bump `atom-keymap` to v9.0.3 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1475)
+- Update the `post-install.sh` script to set permissions properly after `.deb` and `.rpm` installations [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1466)
+- Cirrus: Update Rolling release token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1470)
+- script: Fix ppm symlinking issues in Linux install/uninstall scripts [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1464)
+- Cirrus: Update `brew uninstall node@20` to `brew uninstall node@24` [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1465)
+- Fix deprecated electron.remote usage in reopen-project-menu-manager [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1424)
+- Add Project.addPaths to batch multiple root folders with a single event [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1454)
+- [meta] Exclude blockmaps again [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1443)
+- Migrate Renovate config [@renovate](https://github.com/pulsar-edit/pulsar/pull/1444)
+- Update whitespace package [@renovate](https://github.com/pulsar-edit/pulsar/pull/1445)
+
+### @pulsar-edit/pathwatcher
+
+- Introduce an alternative macOS implementation that uses `kqueue` to better match this library's pre-v9 behavior [@savetheclocktower](https://github.com/pulsar-edit/node-pathwatcher/pull/4)
+
+### @pulsar-edit/atom-keymap
+
+- Bump @pulsar-edit/keyboard-layout to 3.0.5 [@savetheclocktower](https://github.com/pulsar-edit/atom-keymap/commit/37a68fe1cf4d66174b8dd16f75ebf017e55a6d83)
+
+### @pulsar-edit/keyboard-layout
+
+- Stop considering `XInputContext` in X11 when translating keys to characters [@savetheclocktower](https://github.com/pulsar-edit/keyboard-layout/pull/5)
+
 ## 1.131.1
 
 * Fix an issue in `superstring` that occasionally caused crashes while editing text.
