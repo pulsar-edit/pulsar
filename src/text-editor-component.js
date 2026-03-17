@@ -2634,16 +2634,19 @@ module.exports = class TextEditorComponent {
       // runs after the forEach, throwing here prevents it from ever being
       // reached, poisoning horizontalPositionsToMeasure permanently and
       // causing an infinite error loop on every subsequent animation frame.
-      if (!screenLine) {
+      if (!screenLine || !this.lineComponentsByScreenLineId.get(screenLine.id)) {
+        if (atom.inDevMode()) {
+          console.warn(
+            'measureHorizontalPositions: skipped non-rendered row',
+            row
+          );
+        }
         return;
       }
 
       const lineComponent = this.lineComponentsByScreenLineId.get(
         screenLine.id
       );
-      if (!lineComponent) {
-        return;
-      }
 
       const lineNode = lineComponent.element;
       const textNodes = lineComponent.textNodes;
