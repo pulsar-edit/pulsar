@@ -3922,6 +3922,22 @@ describe('TextEditorComponent', () => {
       );
     });
 
+    it('does not throw when a block decoration is destroyed during an update cycle', async () => {
+      const editor = buildEditor({ autoHeight: false });
+      const { decoration, marker } = createBlockDecorationAtScreenRow(editor, 2, {
+        height: 20,
+        position: 'after'
+      });
+      const { component } = buildComponent({ editor, rowsPerTile: 3 });
+      await component.getNextUpdatePromise();
+
+      decoration.destroy();
+      marker.destroy();
+      expect(() => {
+        component.updateSync();
+      }).not.toThrow();
+    });
+
     function createBlockDecorationAtScreenRow(
       editor,
       screenRow,
@@ -5994,6 +6010,33 @@ describe('TextEditorComponent', () => {
       );
       expect(previouslyMeasuredLineElement.style.display).toBe('');
       expect(previouslyMeasuredLineElement.style.visibility).toBe('');
+    });
+
+    it('does not throw when called with a row far beyond the rendered range', async () => {
+      const { component } = buildComponent({
+        rowsPerTile: 2,
+        autoHeight: false
+      });
+      await setEditorHeightInLines(component, 3);
+
+      const outOfRangeRow = component.getRenderedEndRow() + 1000;
+      expect(() => {
+        component.pixelPositionForScreenPosition({ row: outOfRangeRow, column: 0 });
+      }).not.toThrow();
+    });
+
+    it('does not throw when requestHorizontalMeasurement targets a non-rendered row', async () => {
+      const { component } = buildComponent({
+        rowsPerTile: 2,
+        autoHeight: false
+      });
+      await setEditorHeightInLines(component, 3);
+
+      const outOfRangeRow = component.getRenderedEndRow() + 1000;
+      component.requestHorizontalMeasurement(outOfRangeRow, 0);
+      expect(() => {
+        component.measureHorizontalPositions();
+      }).not.toThrow();
     });
   });
 
