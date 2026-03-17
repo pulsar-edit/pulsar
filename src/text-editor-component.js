@@ -2630,25 +2630,15 @@ module.exports = class TextEditorComponent {
         screenLine.id
       );
 
+      // Skip rows whose line component is not currently rendered rather than
+      // throwing. Measurements can be queued for non-rendered rows by calls to
+      // pixelPositionForScreenPosition or pendingAutoscroll when block
+      // decorations shift lines outside the rendered range. Because clear()
+      // runs after the forEach, throwing here prevents it from ever being
+      // reached, poisoning horizontalPositionsToMeasure permanently and
+      // causing an infinite error loop on every subsequent animation frame.
       if (!lineComponent) {
-        const error = new Error(
-          'Requested measurement of a line component that is not currently rendered'
-        );
-        error.metadata = {
-          row,
-          columnsToMeasure,
-          renderedScreenLineIds: this.renderedScreenLines.map(line => line.id),
-          extraRenderedScreenLineIds: Array.from(
-            this.extraRenderedScreenLines.keys()
-          ),
-          lineComponentScreenLineIds: Array.from(
-            this.lineComponentsByScreenLineId.keys()
-          ),
-          renderedStartRow: this.getRenderedStartRow(),
-          renderedEndRow: this.getRenderedEndRow(),
-          requestedScreenLineId: screenLine.id
-        };
-        throw error;
+        return;
       }
 
       const lineNode = lineComponent.element;
@@ -4740,7 +4730,12 @@ class LinesTileComponent {
         const oldDecorations = oldProps.blockDecorations
           ? oldProps.blockDecorations.get(screenLineId)
           : null;
-        const lineNode = lineComponentsByScreenLineId.get(screenLineId).element;
+        const lineComponent = lineComponentsByScreenLineId.get(screenLineId);
+        // Skip block decorations whose screen line is not in this tile.
+        // This can happen when decorations are destroyed or moved between
+        // tiles during the same update cycle.
+        if (!lineComponent) return;
+        const lineNode = lineComponent.element;
         let lastAfter = lineNode;
 
         for (let i = 0; i < newDecorations.length; i++) {
