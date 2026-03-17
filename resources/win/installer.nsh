@@ -12,7 +12,7 @@ XPStyle on
     ${Case} '' ; Support Windows versions unknown to GetWindowsVersion v4.1.1 (Win11)
       ${Break} ; Do nothing if supported version.
     ${Default}
-      MessageBox MB_OK "Pulsar >=v1.130.0 is only supported on Windows 10 or 11."
+      MessageBox MB_OK "Pulsar >=v1.131.0 is only supported on Windows 10 or 11."
       Quit
       ${Break}
   ${EndSwitch}
