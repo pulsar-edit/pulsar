@@ -984,9 +984,10 @@ module.exports = class AtomApplication extends EventEmitter {
         // application frontmost on its own. We must bring the app to the
         // foreground.
         window.show();
-        if (window.preserveFocus) {
-          window.preserveFocus = false;
-          return;
+        let atomWindow = this.atomWindowForBrowserWindow(window);
+        if (atomWindow?.preserveFocus) {
+          atomWindow.preserveFocus = false;
+          return
         }
         app.focus({ steal: true });
       })
