@@ -3924,11 +3924,11 @@ describe('TextEditorComponent', () => {
 
     it('does not throw when a block decoration is destroyed during an update cycle', async () => {
       const editor = buildEditor({ autoHeight: false });
+      const { component } = buildComponent({ editor, rowsPerTile: 3 });
       const { decoration, marker } = createBlockDecorationAtScreenRow(editor, 2, {
         height: 20,
         position: 'after'
       });
-      const { component } = buildComponent({ editor, rowsPerTile: 3 });
       await component.getNextUpdatePromise();
 
       decoration.destroy();
