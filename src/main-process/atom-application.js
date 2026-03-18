@@ -359,10 +359,6 @@ module.exports = class AtomApplication extends EventEmitter {
       env
     } = options;
 
-    if (!preserveFocus) {
-      app.focus();
-    }
-
     if (test) {
       return this.runTests({
         headless: true,
@@ -398,6 +394,7 @@ module.exports = class AtomApplication extends EventEmitter {
         profileStartup,
         clearWindowState,
         addToLastWindow,
+        preserveFocus,
         env
       });
     } else if (urlsToOpen && urlsToOpen.length > 0) {
@@ -417,6 +414,7 @@ module.exports = class AtomApplication extends EventEmitter {
         profileStartup,
         clearWindowState,
         addToLastWindow,
+        preserveFocus,
         env
       });
     }
@@ -981,7 +979,17 @@ module.exports = class AtomApplication extends EventEmitter {
       ipcHelpers.respondTo('focus-window', window => window.focus())
     );
     this.disposable.add(
-      ipcHelpers.respondTo('show-window', window => window.show())
+      ipcHelpers.respondTo('show-window', window => {
+        // On macOS, opening a project from the terminal won't make this
+        // application frontmost on its own. We must bring the app to the
+        // foreground.
+        window.show();
+        if (window.preserveFocus) {
+          window.preserveFocus = false;
+          return;
+        }
+        app.focus({ steal: true });
+      })
     );
     this.disposable.add(
       ipcHelpers.respondTo('hide-window', window => window.hide())
@@ -1264,6 +1272,7 @@ module.exports = class AtomApplication extends EventEmitter {
     window,
     clearWindowState,
     addToLastWindow,
+    preserveFocus,
     env
   } = {}) {
     if (!env) env = process.env;
@@ -1362,6 +1371,9 @@ module.exports = class AtomApplication extends EventEmitter {
       } else {
         openedWindow.focus();
       }
+      if (!preserveFocus) {
+        app.focus({ steal: true });
+      }
       openedWindow.replaceEnvironment(env);
     } else {
       let resourcePath, windowInitializationScript;
@@ -1399,6 +1411,7 @@ module.exports = class AtomApplication extends EventEmitter {
         clearWindowState,
         env
       });
+      openedWindow.preserveFocus = preserveFocus;
       this.addWindow(openedWindow);
       openedWindow.focus();
     }
