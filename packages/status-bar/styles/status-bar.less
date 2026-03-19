@@ -99,7 +99,12 @@ status-bar {
   .hide,
   .current-path:empty,
   .cursor-position:empty,
-  .selection-count:empty {
+  .selection-count:empty,
+  status-bar-launch-mode:empty,
+  status-bar-file:has(.current-path:empty),
+  status-bar-cursor:empty,
+  status-bar-selection:empty,
+  status-bar-git:empty {
     display: none;
   }
 
