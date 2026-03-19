@@ -12,9 +12,82 @@ The status bar package accepts the following configuration values:
 
 * `status-bar.selectionCountFormat` &mdash; A string that describes the format to use for the selection count status bar tile. It defaults to `(%L, %C)`. In the format string, `%L` represents the 1-based line count and `%C` represents the 1-based character count.
 
+### Tile Priorities
+
+Each built-in tile has a configurable priority. The sign determines which side of the status bar the tile appears on, and the absolute value determines its position. Set to `0` to hide a tile.
+
+* `status-bar.launchModePriority` &mdash; Default: `-1`
+* `status-bar.fileInfoPriority` &mdash; Default: `-11`
+* `status-bar.cursorPositionPriority` &mdash; Default: `-12`
+* `status-bar.selectionCountPriority` &mdash; Default: `-13`
+* `status-bar.gitInfoPriority` &mdash; Default: `10`
+
+Priority layout:
+
+```
+LEFT EDGE ←  -1 -2 -10 -100  [0=hidden]  100 10 5 2 1  → RIGHT EDGE
+```
+
+Negative values place tiles on the left, positive on the right. Smaller absolute values are closer to the edge, larger values are closer to the center.
+
 ## API
 
-This package provides a service that you can use in other Pulsar packages. To use it, include `status-bar` in the `consumedServices` section of your `package.json`:
+This package provides a service that you can use in other Pulsar packages.
+
+### v2 API (recommended)
+
+The v2 API uses a single `addTile` method where the priority sign determines the side.
+
+```json
+{
+  "name": "my-package",
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^2.0.0": "consumeStatusBar"
+      }
+    }
+  }
+}
+```
+
+```js
+module.exports = {
+  activate() { /* ... */ },
+
+  consumeStatusBar(statusBar) {
+    // Negative priority = left side, positive = right side, 0 = hidden
+    this.tile = statusBar.addTile({ item: myElement, priority: -50 });
+
+    // Or bind to a config key for reactive priority changes:
+    this.tile = statusBar.addTile({ item: myElement, priorityConfig: 'my-package.tilePriority' });
+  },
+
+  deactivate() {
+    this.tile?.destroy();
+    this.tile = null;
+  }
+};
+```
+
+The v2 `status-bar` API has two methods:
+
+  * `addTile({ item, priority })` &mdash; Add a tile to the status bar. Negative priority places it on the left, positive on the right. Priority `0` hides the tile. Optionally pass `priorityConfig` instead of `priority` to bind the tile's priority to a config key (the tile will automatically update when the config changes).
+  * `getTiles()` &mdash; Retrieve all tiles in visual order (left to right).
+
+The `item` parameter can be a DOM element or a model object for which a view provider has been registered in the view registry.
+
+`addTile` returns a `Tile` object with the following methods:
+
+  * `getPriority()` &mdash; Retrieve the tile's current priority. If using `priorityConfig`, reads the current value from config.
+  * `getItem()` &mdash; Retrieve the tile's item.
+  * `isVisible()` &mdash; Returns `true` if the tile is visible (priority is not `0`).
+  * `setPriority(newPriority)` &mdash; Change the tile's priority. The tile will be repositioned (or hidden if `0`). Can move tiles between left and right sides by changing the sign.
+  * `destroy()` &mdash; Remove the tile from the status bar and clean up any config observers.
+
+### v1 API (legacy)
+
+The v1 API uses separate methods for left and right tiles. Priority `0` is a valid position in v1.
 
 ```json
 {
@@ -29,33 +102,22 @@ This package provides a service that you can use in other Pulsar packages. To us
 }
 ```
 
-Then, in your package's main module, call methods on the service:
+```js
+module.exports = {
+  activate() { /* ... */ },
 
-```coffee
-module.exports =
-  activate: -> # ...
+  consumeStatusBar(statusBar) {
+    this.tile = statusBar.addLeftTile({ item: myElement, priority: 100 });
+  },
 
-  consumeStatusBar: (statusBar) ->
-    @statusBarTile = statusBar.addLeftTile(item: myElement, priority: 100)
-
-  deactivate: ->
-    # ...
-    @statusBarTile?.destroy()
-    @statusBarTile = null
+  deactivate() {
+    this.tile?.destroy();
+    this.tile = null;
+  }
+};
 ```
 
-The `status-bar` API has four methods:
-
-  * `addLeftTile({ item, priority })` - Add a tile to the left side of the status bar. Lower priority tiles are placed further to the left.
-  * `addRightTile({ item, priority })` - Add a tile to the right side of the status bar. Lower priority tiles are placed further to the right.
-
-The `item` parameter to these methods can be a DOM element, a [jQuery object](http://jquery.com), or a model object for which a view provider has been registered in the [the view registry](https://atom.io/docs/api/latest/ViewRegistry).
-
-  * `getLeftTiles()` - Retrieve all of the tiles on the left side of the status bar.
-  * `getRightTiles()` - Retrieve all of the tiles on the right side of the status bar
-
-All of these methods return `Tile` objects, which have the following methods:
-
-  * `getPriority()` - Retrieve the priority that was assigned to the `Tile` when it was created.
-  * `getItem()` - Retrieve the `Tile`'s item.
-  * `destroy()` - Remove the `Tile` from the status bar.
+  * `addLeftTile({ item, priority })` &mdash; Add a tile to the left side. Lower priority tiles are placed further to the left.
+  * `addRightTile({ item, priority })` &mdash; Add a tile to the right side. Lower priority tiles are placed further to the right.
+  * `getLeftTiles()` &mdash; Retrieve all tiles on the left side.
+  * `getRightTiles()` &mdash; Retrieve all tiles on the right side.
