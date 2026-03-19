@@ -1,5 +1,4 @@
 const { Disposable } = require('atom');
-const url = require('url');
 const fs = require('fs-plus');
 
 module.exports =
@@ -9,7 +8,7 @@ class FileInfoView {
     this.element.classList.add('file-info', 'inline-block');
 
     this.currentPath = document.createElement('a');
-    this.currentPath.classList.add('current-path');
+    this.currentPath.classList.add('current-path', 'inline-block');
     this.element.appendChild(this.currentPath);
     this.element.currentPath = this.currentPath;
 
@@ -77,9 +76,7 @@ class FileInfoView {
 
     // An item path could be a url, we only want to copy the `path` part
     if (path?.indexOf('://') > 0) {
-      ({
-        path
-      } = url.parse(path));
+      path = new URL(path).pathname;
     }
     return path;
   }
