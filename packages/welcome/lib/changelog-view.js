@@ -60,34 +60,10 @@ export default class ChangeLogView {
                 </ul>
               </li>
               <li>
-                [settings-view] Fix issue that closes project windows when the user clicks on a badge in a package card.
+                [settings-view] Fix regression with rendering badges on package search results.
               </li>
               <li>
-                [find-and-replace] Fix issue that prevents searches with patterns from working properly in projects with multiple roots.
-              </li>
-              <li>
-                Fix issue affecting keybinding interpretation on non-QWERTY keyboards in Linux/X11 environments.
-              </li>
-              <li>
-                Fix Linux issue causing the menu bar to hide immediately after a project window opens.
-              </li>
-              <li>
-                Fix macOS issue causing buffer contents to fail to update for some users when modified by another program.
-              </li>
-              <li>
-                Fix issue causing the <code>.deb</code> installation to refuse to launch because of improper permissions/AppArmor profile.
-              </li>
-              <li>
-                Fix issue causing the <code>.rpm</code> installation to run the wrong script when upgrading (restore pulsar and ppm to PATH).
-              </li>
-              <li>
-                Fix issue causing the <code>--package</code> switch not to work correctly when invoked directly on the Pulsar binary, rather than on <code>pulsar.sh</code>/<code>pulsar.cmd</code>.
-              </li>
-              <li>
-                Fix issue that prevents <code>ppm</code> from being symlinked or un-symlinked correctly in Linux install/uninstall scripts.
-              </li>
-              <li>
-                Add <code>atom.project.addPaths</code> method for adding multiple project roots at once.
+                Fix failure to include localization files in the built application.
               </li>
             </ul>
 
