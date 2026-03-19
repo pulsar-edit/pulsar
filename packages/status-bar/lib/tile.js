@@ -18,6 +18,8 @@ class Tile {
       this.priority = priority;
     }
 
+    this.hidden = false;
+
     if (this.hideOnZero && this.priority === 0) {
       atom.views.getView(this.item).style.display = 'none';
     }
@@ -35,8 +37,20 @@ class Tile {
   }
 
   isVisible() {
-    if (!this.hideOnZero) return true;
-    return this.priority !== 0;
+    if (this.hidden) return false;
+    if (this.hideOnZero && this.priority === 0) return false;
+    return true;
+  }
+
+  show() {
+    this.hidden = false;
+    if (this.hideOnZero && this.priority === 0) return;
+    atom.views.getView(this.item).style.display = '';
+  }
+
+  hide() {
+    this.hidden = true;
+    atom.views.getView(this.item).style.display = 'none';
   }
 
   setPriority(newPriority) {
@@ -51,7 +65,7 @@ class Tile {
 
     this.priority = newPriority;
 
-    if (this.hideOnZero && newPriority === 0) {
+    if (this.hidden || (this.hideOnZero && newPriority === 0)) {
       element.style.display = 'none';
     } else {
       element.style.display = '';
