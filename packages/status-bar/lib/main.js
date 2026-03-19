@@ -37,38 +37,66 @@ module.exports = {
 
     const { safeMode, devMode } = atom.getLoadSettings();
     if (safeMode || devMode) {
-      const launchModeView = new LaunchModeView({safeMode, devMode});
-      this.statusBar.addLeftTile({item: launchModeView.element, priority: -1});
+      this.launchModeView = new LaunchModeView({safeMode, devMode});
+      this.launchModeTile = this.statusBar.addTile({
+        item: this.launchModeView.element,
+        priorityConfig: 'status-bar.launchModePriority'
+      });
     }
 
     this.fileInfo = new FileInfoView();
-    this.statusBar.addLeftTile({item: this.fileInfo.element, priority: 0});
+    this.fileInfoTile = this.statusBar.addTile({
+      item: this.fileInfo.element,
+      priorityConfig: 'status-bar.fileInfoPriority'
+    });
 
     this.cursorPosition = new CursorPositionView();
-    this.statusBar.addLeftTile({item: this.cursorPosition.element, priority: 1});
+    this.cursorPositionTile = this.statusBar.addTile({
+      item: this.cursorPosition.element,
+      priorityConfig: 'status-bar.cursorPositionPriority'
+    });
 
     this.selectionCount = new SelectionCountView();
-    this.statusBar.addLeftTile({item: this.selectionCount.element, priority: 2});
+    this.selectionCountTile = this.statusBar.addTile({
+      item: this.selectionCount.element,
+      priorityConfig: 'status-bar.selectionCountPriority'
+    });
 
     this.gitInfo = new GitView();
-    this.gitInfoTile = this.statusBar.addRightTile({item: this.gitInfo.element, priority: 0});
+    this.gitInfoTile = this.statusBar.addTile({
+      item: this.gitInfo.element,
+      priorityConfig: 'status-bar.gitInfoPriority'
+    });
   },
 
   deactivate() {
     this.statusBarVisibilitySubscription?.dispose();
     this.statusBarVisibilitySubscription = null;
 
+    this.gitInfoTile?.destroy();
+    this.gitInfoTile = null;
     this.gitInfo?.destroy();
     this.gitInfo = null;
 
+    this.fileInfoTile?.destroy();
+    this.fileInfoTile = null;
     this.fileInfo?.destroy();
     this.fileInfo = null;
 
+    this.cursorPositionTile?.destroy();
+    this.cursorPositionTile = null;
     this.cursorPosition?.destroy();
     this.cursorPosition = null;
 
+    this.selectionCountTile?.destroy();
+    this.selectionCountTile = null;
     this.selectionCount?.destroy();
     this.selectionCount = null;
+
+    this.launchModeTile?.destroy();
+    this.launchModeTile = null;
+    this.launchModeView?.destroy?.();
+    this.launchModeView = null;
 
     this.statusBarPanel?.destroy();
     this.statusBarPanel = null;
@@ -93,13 +121,20 @@ module.exports = {
     }
   },
 
+  provideStatusBarV2() {
+    return {
+      addTile: this.statusBar.addTile.bind(this.statusBar),
+      getTiles: this.statusBar.getTiles.bind(this.statusBar)
+    };
+  },
+
   provideStatusBar() {
     return {
       addLeftTile: this.statusBar.addLeftTile.bind(this.statusBar),
       addRightTile: this.statusBar.addRightTile.bind(this.statusBar),
       getLeftTiles: this.statusBar.getLeftTiles.bind(this.statusBar),
       getRightTiles: this.statusBar.getRightTiles.bind(this.statusBar),
-      disableGitInfoTile: this.gitInfoTile.destroy.bind(this.gitInfoTile)
+      disableGitInfoTile: () => this.gitInfoTile?.destroy()
     };
   },
 
