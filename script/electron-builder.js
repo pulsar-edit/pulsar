@@ -367,6 +367,7 @@ let options = {
       { from: ICONS.ico, to: 'pulsar.ico' },
       { from: 'resources/win/pulsar.cmd', to: `${baseName}.cmd` },
       { from: 'resources/win/pulsar.js', to: `${baseName}.js` },
+      { from: 'resources/win/NSIS_Licenses.txt', to: 'NSIS_Licenses.txt' },
       // Copy `ppm.cmd` to the `ppm/bin` directory, possibly renaming it
       // `ppm-next.cmd` depending on release channel.
       { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
