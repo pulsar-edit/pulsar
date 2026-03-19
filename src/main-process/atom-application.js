@@ -987,9 +987,11 @@ module.exports = class AtomApplication extends EventEmitter {
         let atomWindow = this.atomWindowForBrowserWindow(window);
         if (atomWindow?.preserveFocus) {
           atomWindow.preserveFocus = false;
-          return
+          return;
         }
-        app.focus({ steal: true });
+        if (process.platform === 'darwin') {
+          app.focus({ steal: true });
+        }
       })
     );
     this.disposable.add(
@@ -1367,13 +1369,15 @@ module.exports = class AtomApplication extends EventEmitter {
       openedWindow = existingWindow;
       StartupTime.addMarker('main-process:atom-application:open-in-existing');
       openedWindow.openLocations(locationsToOpen);
-      if (openedWindow.isMinimized()) {
-        openedWindow.restore();
-      } else {
-        openedWindow.focus();
-      }
       if (!preserveFocus) {
-        app.focus({ steal: true });
+        if (openedWindow.isMinimized()) {
+          openedWindow.restore();
+        } else {
+          openedWindow.focus();
+        }
+        if (process.platform === 'darwin') {
+          app.focus({ steal: true });
+        }
       }
       openedWindow.replaceEnvironment(env);
     } else {
