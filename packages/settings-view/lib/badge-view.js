@@ -21,10 +21,12 @@ export default class BadgeView {
       shell.openExternal(anchor.href)
     }
 
-    this.refs.badgeLink.addEventListener('click', clickHandler)
-    this.disposables.add(new Disposable(() => {
-      this.refs.badgeLink.removeEventListener('click', clickHandler)
-    }))
+    if (this.hasLink()) {
+      this.refs.badgeLink.addEventListener('click', clickHandler)
+      this.disposables.add(new Disposable(() => {
+        this.refs.badgeLink.removeEventListener('click', clickHandler)
+      }))
+    }
   }
 
   destroy () {
