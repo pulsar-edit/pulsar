@@ -6,6 +6,16 @@
 
 ## [Unreleased]
 
+## 1.131.3
+
+* [settings-view] Fix regression with rendering badges on package search results.
+* Fix failure to include localization files in the built application.
+
+### Pulsar
+
+- [build] Ensure `locales` dir is included when building Pulsar [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1488)
+- [settings-view] Don't try to attach a listener if the ref doesn't exist [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1493)
+
 ## 1.131.2
 
 * [settings-view] Fix issue that closes project windows when the user clicks on a badge in a package card.
