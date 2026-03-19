@@ -1,3 +1,4 @@
+; From: https://nsis.sourceforge.io/Get_Windows_version, which states "Content is available under [zlib/libpng license](https://nsis.sourceforge.io/License) unless otherwise noted."
 ; GetWindowsVersion 4.1.1 (2015-06-22)
 ;
 ; Based on Yazno's function, http://yazno.tripod.com/powerpimpit/
