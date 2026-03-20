@@ -105,6 +105,10 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   // NB: This prevents Win10 from showing dupe items in the taskbar.
   app.setAppUserModelId(appUserModelId);
+  if (process.platform === 'win32') {
+    app.requestSingleInstanceLock();
+    app.on('second-instance', () => {});
+  }
 
   function addPathToOpen(event, pathToOpen) {
     event.preventDefault();
