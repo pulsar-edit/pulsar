@@ -980,15 +980,18 @@ module.exports = class AtomApplication extends EventEmitter {
     );
     this.disposable.add(
       ipcHelpers.respondTo('show-window', window => {
-        // On macOS, opening a project from the terminal won't make this
-        // application frontmost on its own. We must bring the app to the
-        // foreground.
         window.show();
         let atomWindow = this.atomWindowForBrowserWindow(window);
         if (atomWindow?.preserveFocus) {
           atomWindow.preserveFocus = false;
           return;
         }
+        // On Linux, `window.show()` is enough to make the new window
+        // frontmost, at least on X11. (TODO: Investigate Wayland behavior.)
+        //
+        // On both Windows and macOS (despite their varying window management
+        // models!) we must also call `app.focus()` to ensure the frontmost
+        // Pulsar window is brought above windows from other applications.
         if (process.platform !== 'linux') {
           app.focus({ steal: true });
         }
@@ -1375,6 +1378,12 @@ module.exports = class AtomApplication extends EventEmitter {
         } else {
           openedWindow.focus();
         }
+        // On Linux, `window.show()` is enough to make the existing window
+        // frontmost, at least on X11. (TODO: Investigate Wayland behavior.)
+        //
+        // On both Windows and macOS (despite their varying window management
+        // models!) we must also call `app.focus()` to ensure the frontmost
+        // Pulsar window is brought above windows from other applications.
         if (process.platform !== 'linux') {
           app.focus({ steal: true });
         }

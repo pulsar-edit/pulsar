@@ -105,8 +105,28 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   // NB: This prevents Win10 from showing dupe items in the taskbar.
   app.setAppUserModelId(appUserModelId);
+
+  // Pulsar uses a custom mechanism for ensuring a single instance, so we don't
+  // need `app.requestSingleInstanceLock()`. But we call this method on Windows
+  // anyway in order to benefit from a side effect.
+  //
+  // Windows doesn't like it when applications try to move themselves to the
+  // front unilaterally. There are certain escape hatches, though; one process
+  // can give another process specific permission for the latter process to
+  // foreground itself while the former process is active.
+  //
+  // This happens automatically as part of the `requestSingleInstanceLock`
+  // machinery. Hence we ask for a single-instance lock on startup so that the
+  // _second_ instance, when the request is denied, will trigger the side
+  // effect that allows the original instance to foreground itself.
+  //
+  // The effects are not seen here, but rather in `atom-application.js`, where
+  // calls to `app.focus` will actually work instead of having no effect.
   if (process.platform === 'win32') {
     app.requestSingleInstanceLock();
+    // Add an explicit no-op listener here to ensure that this channel isn't
+    // used for communication — we already have a way for the second instance
+    // to communicate with the first.
     app.on('second-instance', () => {});
   }
 
