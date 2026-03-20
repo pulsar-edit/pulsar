@@ -989,7 +989,7 @@ module.exports = class AtomApplication extends EventEmitter {
           atomWindow.preserveFocus = false;
           return;
         }
-        if (process.platform === 'darwin') {
+        if (process.platform !== 'linux') {
           app.focus({ steal: true });
         }
       })
@@ -1375,7 +1375,7 @@ module.exports = class AtomApplication extends EventEmitter {
         } else {
           openedWindow.focus();
         }
-        if (process.platform === 'darwin') {
+        if (process.platform !== 'linux') {
           app.focus({ steal: true });
         }
       }
