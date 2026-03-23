@@ -359,10 +359,6 @@ module.exports = class AtomApplication extends EventEmitter {
       env
     } = options;
 
-    if (!preserveFocus) {
-      app.focus();
-    }
-
     if (test) {
       return this.runTests({
         headless: true,
@@ -398,6 +394,7 @@ module.exports = class AtomApplication extends EventEmitter {
         profileStartup,
         clearWindowState,
         addToLastWindow,
+        preserveFocus,
         env
       });
     } else if (urlsToOpen && urlsToOpen.length > 0) {
@@ -417,6 +414,7 @@ module.exports = class AtomApplication extends EventEmitter {
         profileStartup,
         clearWindowState,
         addToLastWindow,
+        preserveFocus,
         env
       });
     }
@@ -981,7 +979,23 @@ module.exports = class AtomApplication extends EventEmitter {
       ipcHelpers.respondTo('focus-window', window => window.focus())
     );
     this.disposable.add(
-      ipcHelpers.respondTo('show-window', window => window.show())
+      ipcHelpers.respondTo('show-window', window => {
+        window.show();
+        let atomWindow = this.atomWindowForBrowserWindow(window);
+        if (atomWindow?.preserveFocus) {
+          atomWindow.preserveFocus = false;
+          return;
+        }
+        // On Linux, `window.show()` is enough to make the new window
+        // frontmost, at least on X11. (TODO: Investigate Wayland behavior.)
+        //
+        // On both Windows and macOS (despite their varying window management
+        // models!) we must also call `app.focus()` to ensure the frontmost
+        // Pulsar window is brought above windows from other applications.
+        if (process.platform !== 'linux') {
+          app.focus({ steal: true });
+        }
+      })
     );
     this.disposable.add(
       ipcHelpers.respondTo('hide-window', window => window.hide())
@@ -1264,6 +1278,7 @@ module.exports = class AtomApplication extends EventEmitter {
     window,
     clearWindowState,
     addToLastWindow,
+    preserveFocus,
     env
   } = {}) {
     if (!env) env = process.env;
@@ -1357,10 +1372,21 @@ module.exports = class AtomApplication extends EventEmitter {
       openedWindow = existingWindow;
       StartupTime.addMarker('main-process:atom-application:open-in-existing');
       openedWindow.openLocations(locationsToOpen);
-      if (openedWindow.isMinimized()) {
-        openedWindow.restore();
-      } else {
-        openedWindow.focus();
+      if (!preserveFocus) {
+        if (openedWindow.isMinimized()) {
+          openedWindow.restore();
+        } else {
+          openedWindow.focus();
+        }
+        // On Linux, `window.show()` is enough to make the existing window
+        // frontmost, at least on X11. (TODO: Investigate Wayland behavior.)
+        //
+        // On both Windows and macOS (despite their varying window management
+        // models!) we must also call `app.focus()` to ensure the frontmost
+        // Pulsar window is brought above windows from other applications.
+        if (process.platform !== 'linux') {
+          app.focus({ steal: true });
+        }
       }
       openedWindow.replaceEnvironment(env);
     } else {
@@ -1399,6 +1425,7 @@ module.exports = class AtomApplication extends EventEmitter {
         clearWindowState,
         env
       });
+      openedWindow.preserveFocus = preserveFocus;
       this.addWindow(openedWindow);
       openedWindow.focus();
     }
