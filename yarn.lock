@@ -1713,7 +1713,7 @@
   dependencies:
     event-kit "^2.0.0"
     node-addon-api "^7.1.1"
-    
+
 "@pulsar-edit/ls-archive@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@pulsar-edit/ls-archive/-/ls-archive-2.0.0.tgz#21fdcdc1d0b6fa8a1e6198ee5e9fa46ec3da5ec0"
@@ -4200,10 +4200,10 @@ electron-to-chromium@^1.5.227:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.237.tgz#eacf61cef3f6345d0069ab427585c5a04d7084f0"
   integrity sha512-icUt1NvfhGLar5lSWH3tHNzablaA5js3HVHacQimfP8ViEBOQv+L7DKEuHdbTZ0SKCO1ogTJTIL1Gwk9S6Qvcg==
 
-electron@30.0.9:
-  version "30.0.9"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-30.0.9.tgz#b11400e4642a4b635e79244ba365f1d401ee60b5"
-  integrity sha512-ArxgdGHVu3o5uaP+Tqj8cJDvU03R6vrGrOqiMs7JXLnvQHMqXJIIxmFKQAIdJW8VoT3ac3hD21tA7cPO10RLow==
+electron@30.5.1:
+  version "30.5.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-30.5.1.tgz#9f6060ce5b869c3803cbf8064305e9c3056c0744"
+  integrity sha512-AhL7+mZ8Lg14iaNfoYTkXQ2qee8mmsQyllKdqxlpv/zrKgfxz6jNVtcRRbQtLxtF8yzcImWdfTQROpYiPumdbw==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^20.9.0"
