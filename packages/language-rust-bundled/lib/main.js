@@ -1,4 +1,4 @@
-exports.activate = function() {
+exports.activate = function () {
   for (const nodeType of ['macro_invocation', 'macro_rule']) {
     atom.grammars.addInjectionPoint('source.rust', {
       type: nodeType,
@@ -13,4 +13,21 @@ exports.activate = function() {
       coverShallowerScopes: true
     });
   }
+};
+
+exports.consumeHyperlinkInjection = (hyperlink) => {
+  hyperlink.addInjectionPoint('source.rust', {
+    types: [
+      'line_comment',
+      'block_comment',
+      'string_literal',
+      'raw_string_literal'
+    ]
+  });
+};
+
+exports.consumeTodoInjection = (todo) => {
+  todo.addInjectionPoint('source.rust', {
+    types: ['line_comment', 'block_comment']
+  });
 };

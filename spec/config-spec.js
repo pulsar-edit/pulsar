@@ -150,6 +150,41 @@ describe('Config', () => {
         ).toBe(4);
       });
 
+      it("merges project-specific settings with other settings when the keypath is an object", () => {
+        atom.config.set('x.y', 1);
+        atom.config.set('x.z', "fibrinolysis");
+
+        atom.project.replace({
+          originPath: 'TEST',
+          paths: atom.project.getPaths(),
+          config: {
+            "*": {
+              "x": {
+                "y": 4
+              }
+            }
+          }
+        });
+
+        // Project-specific settings work fine, as the spec below shows, when
+        // the value being retrieved is a primitive. But until recently, Pulsar
+        // didn't know what to do if the value being retrieved was an object.
+        //
+        // Imagine asking for _all_ config settings. The non-project-specific
+        // lookup returns everything. The project-specific lookup returns only
+        // a few overrides. Pulsar needs to _blend_ these two objects, but was
+        // previously choosing the project-specific lookup just because it
+        // wasn't undefined.
+
+        // Here we demonstrate that it now retrieves an object for the given
+        // key path at the normal location and applies a project-specific
+        // “patch…”
+        expect(atom.config.get('x')).toEqual({ y: 4, z: "fibrinolysis" })
+
+        // …without any general settings leaking into the project config.
+        expect(atom.config.projectSettings.x.z).toBeUndefined();
+      });
+
       it("ignores the project-specific source when 'excludeSources' tells it to", () => {
         atom.config.set('x.y', 1);
 
@@ -721,16 +756,16 @@ describe('Config', () => {
           newValue: 'value 2',
           oldValue: 'value 1'
         });
-        observeHandler.reset();
-        observeHandler.andCallFake(() => {
+        observeHandler.calls.reset();
+        observeHandler.and.callFake(() => {
           throw new Error('oops');
         });
-        expect(() => atom.config.set('foo.bar.baz', 'value 1')).toThrow('oops');
+        expect(() => atom.config.set('foo.bar.baz', 'value 1')).toThrowError('oops');
         expect(observeHandler).toHaveBeenCalledWith({
           newValue: 'value 1',
           oldValue: 'value 2'
         });
-        observeHandler.reset();
+        observeHandler.calls.reset();
 
         // Regression: exception in earlier handler shouldn't put observer
         // into a bad state.
@@ -750,33 +785,33 @@ describe('Config', () => {
         expect(observeHandler).not.toHaveBeenCalled());
 
       it('fires the callback every time any value changes', () => {
-        observeHandler.reset(); // clear the initial call
+        observeHandler.calls.reset(); // clear the initial call
         atom.config.set('foo.bar.baz', 'value 2');
         expect(observeHandler).toHaveBeenCalled();
-        expect(observeHandler.mostRecentCall.args[0].newValue.foo.bar.baz).toBe(
+        expect(observeHandler.calls.mostRecent().args[0].newValue.foo.bar.baz).toBe(
           'value 2'
         );
-        expect(observeHandler.mostRecentCall.args[0].oldValue.foo.bar.baz).toBe(
+        expect(observeHandler.calls.mostRecent().args[0].oldValue.foo.bar.baz).toBe(
           'value 1'
         );
 
-        observeHandler.reset();
+        observeHandler.calls.reset();
         atom.config.set('foo.bar.baz', 'value 1');
         expect(observeHandler).toHaveBeenCalled();
-        expect(observeHandler.mostRecentCall.args[0].newValue.foo.bar.baz).toBe(
+        expect(observeHandler.calls.mostRecent().args[0].newValue.foo.bar.baz).toBe(
           'value 1'
         );
-        expect(observeHandler.mostRecentCall.args[0].oldValue.foo.bar.baz).toBe(
+        expect(observeHandler.calls.mostRecent().args[0].oldValue.foo.bar.baz).toBe(
           'value 2'
         );
 
-        observeHandler.reset();
+        observeHandler.calls.reset();
         atom.config.set('foo.bar.int', 1);
         expect(observeHandler).toHaveBeenCalled();
-        expect(observeHandler.mostRecentCall.args[0].newValue.foo.bar.int).toBe(
+        expect(observeHandler.calls.mostRecent().args[0].newValue.foo.bar.int).toBe(
           1
         );
-        expect(observeHandler.mostRecentCall.args[0].oldValue.foo.bar.int).toBe(
+        expect(observeHandler.calls.mostRecent().args[0].oldValue.foo.bar.int).toBe(
           undefined
         );
       });
@@ -796,42 +831,42 @@ describe('Config', () => {
           oldValue: undefined,
           newValue: 12
         });
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.set('foo.bar.baz', 22, {
           scopeSelector: '.source .string.quoted.double',
           source: 'a'
         });
         expect(changeSpy).toHaveBeenCalledWith({ oldValue: 12, newValue: 22 });
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.set('foo.bar.baz', 42, {
           scopeSelector: '.source.coffee .string.quoted.double.coffee',
           source: 'b'
         });
         expect(changeSpy).toHaveBeenCalledWith({ oldValue: 22, newValue: 42 });
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.unset(null, {
           scopeSelector: '.source.coffee .string.quoted.double.coffee',
           source: 'b'
         });
         expect(changeSpy).toHaveBeenCalledWith({ oldValue: 42, newValue: 22 });
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.unset(null, {
           scopeSelector: '.source .string.quoted.double',
           source: 'a'
         });
         expect(changeSpy).toHaveBeenCalledWith({ oldValue: 22, newValue: 12 });
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.set('foo.bar.baz', undefined);
         expect(changeSpy).toHaveBeenCalledWith({
           oldValue: 12,
           newValue: undefined
         });
-        changeSpy.reset();
+        changeSpy.calls.reset();
       }));
   });
 
@@ -848,38 +883,38 @@ describe('Config', () => {
       expect(observeHandler).toHaveBeenCalledWith('value 1'));
 
     it('fires the callback every time the observed value changes', () => {
-      observeHandler.reset(); // clear the initial call
+      observeHandler.calls.reset(); // clear the initial call
       atom.config.set('foo.bar.baz', 'value 2');
       expect(observeHandler).toHaveBeenCalledWith('value 2');
 
-      observeHandler.reset();
+      observeHandler.calls.reset();
       atom.config.set('foo.bar.baz', 'value 1');
       expect(observeHandler).toHaveBeenCalledWith('value 1');
       advanceClock(100); // complete pending save that was requested in ::set
 
-      observeHandler.reset();
+      observeHandler.calls.reset();
       atom.config.resetUserSettings({ foo: {} });
       expect(observeHandler).toHaveBeenCalledWith(undefined);
     });
 
     it('fires the callback when the observed value is deleted', () => {
-      observeHandler.reset(); // clear the initial call
+      observeHandler.calls.reset(); // clear the initial call
       atom.config.set('foo.bar.baz', undefined);
       expect(observeHandler).toHaveBeenCalledWith(undefined);
     });
 
     it('fires the callback when the full key path goes into and out of existence', () => {
-      observeHandler.reset(); // clear the initial call
+      observeHandler.calls.reset(); // clear the initial call
       atom.config.set('foo.bar', undefined);
       expect(observeHandler).toHaveBeenCalledWith(undefined);
 
-      observeHandler.reset();
+      observeHandler.calls.reset();
       atom.config.set('foo.bar.baz', "i'm back");
       expect(observeHandler).toHaveBeenCalledWith("i'm back");
     });
 
     it('does not fire the callback once the subscription is disposed', () => {
-      observeHandler.reset(); // clear the initial call
+      observeHandler.calls.reset(); // clear the initial call
       observeSubscription.dispose();
       atom.config.set('foo.bar.baz', 'value 2');
       expect(observeHandler).not.toHaveBeenCalled();
@@ -892,7 +927,7 @@ describe('Config', () => {
         bazCatHandler
       );
 
-      bazCatHandler.reset();
+      bazCatHandler.calls.reset();
       atom.config.set('foo.bar.baz', 'value 10');
       expect(bazCatHandler).not.toHaveBeenCalled();
     });
@@ -930,43 +965,43 @@ describe('Config', () => {
           changeSpy
         );
         expect(changeSpy).toHaveBeenCalledWith('value 1');
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.set('foo.bar.baz', 12);
         expect(changeSpy).toHaveBeenCalledWith(12);
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.set('foo.bar.baz', 22, {
           scopeSelector: '.source .string.quoted.double',
           source: 'a'
         });
         expect(changeSpy).toHaveBeenCalledWith(22);
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.set('foo.bar.baz', 42, {
           scopeSelector: '.source.coffee .string.quoted.double.coffee',
           source: 'b'
         });
         expect(changeSpy).toHaveBeenCalledWith(42);
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.unset(null, {
           scopeSelector: '.source.coffee .string.quoted.double.coffee',
           source: 'b'
         });
         expect(changeSpy).toHaveBeenCalledWith(22);
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.unset(null, {
           scopeSelector: '.source .string.quoted.double',
           source: 'a'
         });
         expect(changeSpy).toHaveBeenCalledWith(12);
-        changeSpy.reset();
+        changeSpy.calls.reset();
 
         atom.config.set('foo.bar.baz', undefined);
         expect(changeSpy).toHaveBeenCalledWith(undefined);
-        changeSpy.reset();
+        changeSpy.calls.reset();
       });
     });
   });
@@ -986,8 +1021,8 @@ describe('Config', () => {
         atom.config.set('foo.bar.baz', 3);
       });
 
-      expect(changeSpy.callCount).toBe(1);
-      expect(changeSpy.argsForCall[0][0]).toEqual({
+      expect(changeSpy.calls.count()).toBe(1);
+      expect(changeSpy.calls.argsFor(0)[0]).toEqual({
         newValue: 3,
         oldValue: undefined
       });
@@ -1007,7 +1042,7 @@ describe('Config', () => {
       atom.config.onDidChange('foo.bar.baz', changeSpy);
     });
 
-    it('allows only one change event for the duration of the given promise if it gets resolved', () => {
+    it('allows only one change event for the duration of the given promise if it gets resolved', async () => {
       let promiseResult = null;
       const transactionPromise = atom.config.transactAsync(() => {
         atom.config.set('foo.bar.baz', 1);
@@ -1016,23 +1051,17 @@ describe('Config', () => {
         return Promise.resolve('a result');
       });
 
-      waitsForPromise(() =>
-        transactionPromise.then(result => {
-          promiseResult = result;
-        })
-      );
+      promiseResult = await transactionPromise;
 
-      runs(() => {
-        expect(promiseResult).toBe('a result');
-        expect(changeSpy.callCount).toBe(1);
-        expect(changeSpy.argsForCall[0][0]).toEqual({
-          newValue: 3,
-          oldValue: undefined
-        });
+      expect(promiseResult).toBe('a result');
+      expect(changeSpy.calls.count()).toBe(1);
+      expect(changeSpy.calls.argsFor(0)[0]).toEqual({
+        newValue: 3,
+        oldValue: undefined
       });
     });
 
-    it('allows only one change event for the duration of the given promise if it gets rejected', () => {
+    it('allows only one change event for the duration of the given promise if it gets rejected', async () => {
       let promiseError = null;
       const transactionPromise = atom.config.transactAsync(() => {
         atom.config.set('foo.bar.baz', 1);
@@ -1041,23 +1070,19 @@ describe('Config', () => {
         return Promise.reject(new Error('an error'));
       });
 
-      waitsForPromise(() =>
-        transactionPromise.catch(error => {
-          promiseError = error;
-        })
-      );
+      await transactionPromise.catch(error => {
+        promiseError = error;
+      });
 
-      runs(() => {
-        expect(promiseError.message).toBe('an error');
-        expect(changeSpy.callCount).toBe(1);
-        expect(changeSpy.argsForCall[0][0]).toEqual({
-          newValue: 3,
-          oldValue: undefined
-        });
+      expect(promiseError.message).toBe('an error');
+      expect(changeSpy.calls.count()).toBe(1);
+      expect(changeSpy.calls.argsFor(0)[0]).toEqual({
+        newValue: 3,
+        oldValue: undefined
       });
     });
 
-    it('allows only one change event even when the given callback throws', () => {
+    it('allows only one change event even when the given callback throws', async () => {
       const error = new Error('Oops!');
       let promiseError = null;
       const transactionPromise = atom.config.transactAsync(() => {
@@ -1067,19 +1092,15 @@ describe('Config', () => {
         throw error;
       });
 
-      waitsForPromise(() =>
-        transactionPromise.catch(e => {
-          promiseError = e;
-        })
-      );
+      await transactionPromise.catch(e => {
+        promiseError = e;
+      });
 
-      runs(() => {
-        expect(promiseError).toBe(error);
-        expect(changeSpy.callCount).toBe(1);
-        expect(changeSpy.argsForCall[0][0]).toEqual({
-          newValue: 3,
-          oldValue: undefined
-        });
+      expect(promiseError).toBe(error);
+      expect(changeSpy.calls.count()).toBe(1);
+      expect(changeSpy.calls.argsFor(0)[0]).toEqual({
+        newValue: 3,
+        oldValue: undefined
       });
     });
   });
@@ -1154,7 +1175,7 @@ describe('Config', () => {
         atom.config.save();
 
         const writtenConfig = savedSettings[0];
-        expect(writtenConfig).toEqualJson({
+        expect(writtenConfig).toEqual({
           '*': atom.config.settings,
           '.ruby.source': {
             foo: {
@@ -1261,7 +1282,7 @@ describe('Config', () => {
         expect(atom.config.get('foo.bar')).toBe('baz');
         expect(atom.config.get('foo.int')).toBe(12);
         expect(console.warn).toHaveBeenCalled();
-        expect(console.warn.mostRecentCall.args[0]).toContain('foo.int');
+        expect(console.warn.calls.mostRecent().args[0]).toContain('foo.int');
       });
     });
 
@@ -1352,7 +1373,7 @@ describe('Config', () => {
       atom.config.set('foo.bar.baz', ['a']);
       const observeHandler = jasmine.createSpy('observeHandler');
       atom.config.observe('foo.bar.baz', observeHandler);
-      observeHandler.reset();
+      observeHandler.calls.reset();
 
       expect(atom.config.pushAtKeyPath('foo.bar.baz', 'b')).toBe(2);
       expect(atom.config.get('foo.bar.baz')).toEqual(['a', 'b']);
@@ -1367,7 +1388,7 @@ describe('Config', () => {
       atom.config.set('foo.bar.baz', ['b']);
       const observeHandler = jasmine.createSpy('observeHandler');
       atom.config.observe('foo.bar.baz', observeHandler);
-      observeHandler.reset();
+      observeHandler.calls.reset();
 
       expect(atom.config.unshiftAtKeyPath('foo.bar.baz', 'a')).toBe(2);
       expect(atom.config.get('foo.bar.baz')).toEqual(['a', 'b']);
@@ -1382,7 +1403,7 @@ describe('Config', () => {
       atom.config.set('foo.bar.baz', ['a', 'b', 'c']);
       const observeHandler = jasmine.createSpy('observeHandler');
       atom.config.observe('foo.bar.baz', observeHandler);
-      observeHandler.reset();
+      observeHandler.calls.reset();
 
       expect(atom.config.removeAtKeyPath('foo.bar.baz', 'b')).toEqual([
         'a',
@@ -1411,9 +1432,9 @@ describe('Config', () => {
     it('emits an updated event', () => {
       const updatedCallback = jasmine.createSpy('updated');
       atom.config.onDidChange('foo.bar.baz.a', updatedCallback);
-      expect(updatedCallback.callCount).toBe(0);
+      expect(updatedCallback.calls.count()).toBe(0);
       atom.config.setDefaults('foo.bar.baz', { a: 2 });
-      expect(updatedCallback.callCount).toBe(1);
+      expect(updatedCallback.calls.count()).toBe(1);
     });
   });
 

@@ -1,33 +1,44 @@
 
 // GitHub.com styles
 
-// These are the GitHub Flavored Markdown styles also found on github.com.
-// They can be anabled in the markdown-preview settings by turning on "Use GitHub.com styles".
+// These are the GitHub Flavored Markdown styles also found on github.com. They
+// can be enabled in the `markdown-preview` settings by turning on "Use
+// GitHub.com Styles."
+//
+// We define styles for both dark mode and light mode. A specific mode can be
+// opted into via the “GitHub.com Style Mode” setting… or else the user can
+// leave the setting on “System Default” to use whatever mode the OS has
+// decided to use.
 
 
-@import (reference) "../assets/primer-markdown";
+// The GitHub styles are imported from the `github-markdown-css` package, then
+// customized via the `generate-github-markdown-css` task and written to the
+// `assets` directory. The task applies some simple transformations to the CSS
+// and handles the light-mode/dark-mode logic.
+//
+// We import these files as `less` files (even though they're ordinary CSS)
+// because that forces Less to process them instead of leaving them for the
+// standard `@import` directive in CSS. Less can resolve these relative paths,
+// but CSS can't.
+@import (less) "../assets/github-markdown-auto.css";
+@import (less) "../assets/github-markdown-light.css";
+@import (less) "../assets/github-markdown-dark.css";
 
-.markdown-preview[data-use-github-style] {
+// After we import these rules, we define some overrides; these are needed
+// because some UI theme style rules could bleed into Markdown preview areas in
+// situations where GitHub relies on browser defaults or fails to envision the
+// presence of other possible style rules. Since we don't know what rules the
+// user's UI theme has defined, we need to be a bit more paranoid.
 
-  // Includes GitHub.com styles from `../assets/primer-markdown.less`.
-  // Source: https://github.com/primer/primer/tree/master/modules/primer-markdown
-  .markdown-body();
-
-
-  // The styles below override/complement the GitHub.com styles
-  // It's needed because some markup or global styles are different
+// Overrides for all themes.
+.markdown-preview-additions() {
   padding: 30px;
   font-size: 16px;
-  color: #333;
-  background-color: #fff;
   overflow: scroll;
-
-  a {
-    color: #337ab7;
-  }
 
   code {
     color: inherit;
+    border: inherit;
   }
 
   atom-text-editor {
@@ -36,5 +47,46 @@
     font-size: .85em;
     border-radius: 4px;
     overflow: auto;
+  }
+
+}
+
+// Overrides for dark mode.
+.markdown-preview-additions-dark() {
+  .markdown-preview-additions();
+  color: rgb(230, 237, 243);
+  background-color: rgb(13, 17, 23);
+  a {
+    color: rgb(69, 147, 248);
+  }
+}
+
+// Overrides for light mode.
+.markdown-preview-additions-light() {
+  .markdown-preview-additions();
+  color: rgb(31, 35, 40);
+  background-color: rgb(255, 255, 255);
+  a {
+    color: rgb(11, 105, 218);
+  }
+}
+
+.markdown-preview[data-use-github-style="light"] {
+  .markdown-preview-additions-light();
+}
+
+@media (prefers-color-scheme: light) {
+  .markdown-preview[data-use-github-style="auto"] {
+    .markdown-preview-additions-light();
+  }
+}
+
+.markdown-preview[data-use-github-style="dark"] {
+  .markdown-preview-additions-dark();
+}
+
+@media (prefers-color-scheme: dark) {
+  .markdown-preview[data-use-github-style="auto"] {
+    .markdown-preview-additions-dark();
   }
 }

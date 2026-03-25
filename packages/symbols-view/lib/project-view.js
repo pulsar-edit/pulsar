@@ -4,7 +4,7 @@ const SymbolsView = require('./symbols-view');
 const { isIterable, timeout } = require('./util');
 
 module.exports = class ProjectView extends SymbolsView {
-  constructor (stack, broker) {
+  constructor(stack, broker) {
     // TODO: Do these defaults make sense? Should we allow a provider to
     // override them?
     super(stack, broker, {
@@ -16,30 +16,31 @@ module.exports = class ProjectView extends SymbolsView {
     this.shouldReload = true;
   }
 
-  destroy () {
+  destroy() {
     return super.destroy();
   }
 
-  toggle () {
+  toggle(filterTerm = '') {
     if (this.panel.isVisible()) {
       this.cancel();
     } else {
       this.populate();
       this.attach();
+      this.selectListView.update({ query: filterTerm, selectQuery: true });
     }
   }
 
-  didCancelSelection () {
+  didCancelSelection() {
     this.abortController?.abort();
     super.didCancelSelection();
   }
 
-  didConfirmEmptySelection () {
+  didConfirmEmptySelection() {
     this.abortController?.abort();
     super.didConfirmEmptySelection();
   }
 
-  isValidSymbol (symbol) {
+  isValidSymbol(symbol) {
     if (!super.isValidSymbol(symbol)) return false;
     if (
       !(typeof symbol.file === 'string' && typeof symbol.directory === 'string') &&
@@ -50,22 +51,22 @@ module.exports = class ProjectView extends SymbolsView {
     return true;
   }
 
-  shouldUseCache () {
+  shouldUseCache() {
     let query = this.selectListView?.getQuery();
     if (query && query.length > 0) return false;
     if (this.shouldReload) return false;
     return !!this.cachedSymbols;
   }
 
-  didChangeQuery () {
+  didChangeQuery() {
     this.populate({ retain: true });
   }
 
-  clear () {
+  clear() {
 
   }
 
-  async populate ({ retain = false } = {}) {
+  async populate({ retain = false } = {}) {
     if (this.shouldUseCache()) {
       await this.updateView({ items: this.cachedSymbols });
       return true;
@@ -131,7 +132,7 @@ module.exports = class ProjectView extends SymbolsView {
     return true;
   }
 
-  async generateSymbols (editor, query = '', callback) {
+  async generateSymbols(editor, query = '', callback) {
     this.abortController?.abort();
     this.abortController = new AbortController();
 
@@ -142,7 +143,11 @@ module.exports = class ProjectView extends SymbolsView {
     // longer need the symbols we asked for.
     let signal = this.abortController.signal;
 
-    let providers = await this.broker.select(meta);
+    // A user would probably expect this search to return symbols from all
+    // files in the project, regardless of their language. Instead of picking a
+    // “winning” provider as we usually do, we should instead consult _all_
+    // providers that consider themselves up to the task.
+    let providers = await this.broker.select(meta, { enforceExclusivity: false });
     if (providers?.length === 0) {
       console.warn('No providers found!');
       return null;

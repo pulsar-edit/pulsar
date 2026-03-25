@@ -13,12 +13,12 @@ function getUserLanguageIds() {
     let pairs = usersLanguageIDs.split(",");
 
     for (let i = 0; i < pairs.length; i++) {
-     let split = pairs[i].split(":");
-    obj[split[0].trim()] = split[1].trim();
+      let split = pairs[i].split(":");
+      obj[split[0].trim()] = split[1].trim();
     }
 
     return obj;
-
+    
   } catch(err) {
     atom.notifications.addError(`Unable to load Markdown Preview Custom Syntax Highlighting Language Identifiers\n${err.toString()}`);
     return {};
@@ -61,7 +61,7 @@ function getLanguageIds() {
 }
 
 module.exports = {
-  scopeForFenceName (fenceName) {
+  scopeForFenceName(fenceName) {
     fenceName = fenceName.toLowerCase()
 
     let scopesByFenceName = getLanguageIds();

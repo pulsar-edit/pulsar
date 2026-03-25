@@ -1,6 +1,6 @@
 const _ = require('underscore-plus');
 const { CompositeDisposable, Emitter } = require('event-kit');
-const { Point, Range } = require('text-buffer');
+const { Point, Range } = require('@pulsar-edit/text-buffer');
 const TokenizedLine = require('./tokenized-line');
 const TokenIterator = require('./token-iterator');
 const ScopeDescriptor = require('./scope-descriptor');
@@ -11,6 +11,7 @@ const {
   fromFirstMateScopeId
 } = require('./first-mate-helpers');
 const { selectorMatchesAnyScope } = require('./selectors');
+const { normalizeDelimiters, commentStringsFromDelimiters } = require('./comment-utils.js');
 
 const NON_WHITESPACE_REGEX = /\S/;
 
@@ -29,7 +30,7 @@ class TextMateLanguageMode {
     this.id = params.id != null ? params.id : nextId++;
     this.buffer = params.buffer;
     this.largeFileMode = params.largeFileMode;
-    this.config = params.config;
+    this.config = params.config ?? atom.config;
     this.largeFileMode =
       params.largeFileMode != null
         ? params.largeFileMode
@@ -236,10 +237,19 @@ class TextMateLanguageMode {
     const commentEndEntry = commentEndEntries.find(entry => {
       return entry.scopeSelector === commentStartEntry.scopeSelector;
     });
-    return {
-      commentStartString: commentStartEntry && commentStartEntry.value,
-      commentEndString: commentEndEntry && commentEndEntry.value
-    };
+    // If a `commentDelimiters` setting exists, return it in its entirety. This
+    // can contain more comprehensive delimiter metadata for snippets and other
+    // purposes.
+    const commentDelimiters = this.config.get('editor.commentDelimiters', { scope });
+    if (commentStartEntry) {
+      return {
+        commentStartString: commentStartEntry && commentStartEntry.value,
+        commentEndString: commentEndEntry && commentEndEntry.value,
+        commentDelimiters: commentDelimiters && normalizeDelimiters(commentDelimiters)
+      };
+    } else if (commentDelimiters) {
+      return commentStringsFromDelimiters(commentDelimiters);
+    }
   }
 
   /*

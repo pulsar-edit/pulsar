@@ -7,6 +7,7 @@
  * never forgotten about.
  */
 
+
 const cp = require("node:child_process");
 const path = require("node:path");
 const fs = require("node:fs");
@@ -62,7 +63,15 @@ if (wasmFilesChanged.length === 0) {
 // are also accompanied by a change in the `parserSource` key
 
 for (const wasmFile of wasmFilesChanged) {
+  // Ignore files that have been deleted or moved.
+  if (!fs.existsSync(wasmFile)) {
+    console.log(`Skipping file that no longer exists: ${wasmFile}`);
+    continue;
+  }
   const wasmPath = path.dirname(wasmFile);
+
+  // Don't check the base `tree-sitter.wasm` file.
+  if (wasmFile.includes('vendor/web-tree-sitter')) continue;
 
   const files = fs.readdirSync(path.join(wasmPath, ".."));
   console.log(`Detected changes to: ${wasmFile}`);
@@ -76,6 +85,9 @@ for (const wasmFile of wasmFilesChanged) {
   }
 
   for (const file of files) {
+    // Only check `cson` files.
+    if (!file.endsWith('.cson')) continue;
+
     const filePath = path.join(wasmPath, "..", file);
     console.log(`Checking: ${filePath}`);
 

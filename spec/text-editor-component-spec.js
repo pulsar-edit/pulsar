@@ -1,11 +1,12 @@
-const { conditionPromise } = require('./async-spec-helpers');
+const { conditionPromise, timeoutPromise: wait } = require('./helpers/async-spec-helpers');
 
 const Random = require('random-seed');
 const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
 const TextEditorComponent = require('../src/text-editor-component');
 const TextEditorElement = require('../src/text-editor-element');
 const TextEditor = require('../src/text-editor');
-const TextBuffer = require('text-buffer');
+const ViewRegistry = require('../src/view-registry');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const { Point } = TextBuffer;
 const fs = require('fs');
 const path = require('path');
@@ -13,8 +14,50 @@ const Grim = require('grim');
 const electron = require('electron');
 const clipboard = electron.clipboard;
 
+// Define a custom scheduler that uses `setTimeout` instead of
+// `requestAnimationFrame` because the latter behaves slowly when the browser
+// does not think the editor is visible.
+class CustomViewRegistry extends ViewRegistry {
+  animationFrameRequest = null;
+
+  clearDocumentRequests() {
+    this.documentReaders = [];
+    this.documentWriters = [];
+    this.nextUpdatePromise = null;
+    this.resolveNextUpdatePromise = null;
+    if (this.animationFrameRequest != null) {
+      clearTimeout(this.animationFrameRequest);
+      this.animationFrameRequest = null;
+    }
+  }
+
+  requestDocumentUpdate() {
+    if (this.animationFrameRequest == null) {
+      this.animationFrameRequest = setTimeout(
+        this.performDocumentUpdate,
+        0
+      );
+    }
+  }
+}
+
+let defaultScheduler = TextEditorComponent.getScheduler();
+let alternativeScheduler = new CustomViewRegistry(defaultScheduler.props);
+function useAlternativeScheduler() {
+  TextEditorComponent.setScheduler(alternativeScheduler);
+}
+
+function restoreDefaultScheduler() {
+  TextEditorComponent.setScheduler(defaultScheduler);
+}
+
 const SAMPLE_TEXT = fs.readFileSync(
   path.join(__dirname, 'fixtures', 'sample.js'),
+  'utf8'
+);
+
+const SAMPLE_WITH_RTL_TEXT = fs.readFileSync(
+  path.join(__dirname, 'fixtures', 'sample-with-rtl-text.js'),
   'utf8'
 );
 
@@ -24,17 +67,19 @@ class DummyElement extends HTMLElement {
   }
 }
 
-window.customElements.define(
-  'text-editor-component-test-element',
-  DummyElement
-);
-
-document.createElement('text-editor-component-test-element');
-
 const editors = [];
 let verticalScrollbarWidth, horizontalScrollbarHeight;
 
 describe('TextEditorComponent', () => {
+  beforeEach(() => {
+    if (!window.customElements.get('text-editor-component-test-element')) {
+      window.customElements.define(
+        'text-editor-component-test-element',
+        DummyElement
+      );
+    }
+  })
+
   beforeEach(() => {
     jasmine.useRealClock();
 
@@ -1072,9 +1117,11 @@ describe('TextEditorComponent', () => {
       expect(element.className).toBe('editor a b');
       element.focus();
       await component.getNextUpdatePromise();
+      await wait(0);
       expect(element.className).toBe('editor a b is-focused');
       document.body.focus();
       await component.getNextUpdatePromise();
+      await wait(0);
       expect(element.className).toBe('editor a b');
     });
 
@@ -1138,12 +1185,18 @@ describe('TextEditorComponent', () => {
       let originalTimeout;
 
       beforeEach(() => {
-        originalTimeout = jasmine.getEnv().defaultTimeoutInterval;
-        jasmine.getEnv().defaultTimeoutInterval = 60 * 1000;
+        if (process.platform === 'linux') {
+          useAlternativeScheduler();
+        }
+        originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
       });
 
       afterEach(() => {
-        jasmine.getEnv().defaultTimeoutInterval = originalTimeout;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+        if (process.platform === 'linux') {
+          restoreDefaultScheduler();
+        }
       });
 
       it('renders the visible rows correctly after randomly mutating the editor', async () => {
@@ -1177,8 +1230,8 @@ describe('TextEditorComponent', () => {
             if (k < 10) {
               editor.setSoftWrapped(!editor.isSoftWrapped());
             } else if (k < 15) {
-              if (random(2)) setEditorWidthInCharacters(component, random(20));
-              if (random(2)) setEditorHeightInLines(component, random(10));
+              if (random(2)) await setEditorWidthInCharacters(component, random(20));
+              if (random(2)) await setEditorHeightInLines(component, random(10));
             } else if (k < 40) {
               editor.setSelectedBufferRange(range);
               editor.backspace();
@@ -1694,7 +1747,7 @@ describe('TextEditorComponent', () => {
         scrollSensitivity
       });
       // stub in place for Event.preventDefault()
-      const eventPreventDefaultStub = function() {};
+      const eventPreventDefaultStub = function () {};
 
       {
         const expectedScrollTop = 20 * (scrollSensitivity / 100);
@@ -1767,7 +1820,7 @@ describe('TextEditorComponent', () => {
         scrollSensitivity
       });
       // stub in place for Event.preventDefault()
-      const eventPreventDefaultStub = function() {};
+      const eventPreventDefaultStub = function () {};
 
       component.props.platform = 'linux';
       {
@@ -2247,6 +2300,18 @@ describe('TextEditorComponent', () => {
   });
 
   describe('highlight decorations', () => {
+    beforeEach(() => {
+      if (process.platform === 'linux') {
+        useAlternativeScheduler();
+      }
+    });
+
+    afterEach(() => {
+      if (process.platform === 'linux') {
+        restoreDefaultScheduler();
+      }
+    });
+
     it('renders single-line highlights', async () => {
       const { component, element, editor } = buildComponent();
       const marker = editor.markScreenRange([[1, 2], [1, 10]]);
@@ -2425,6 +2490,7 @@ describe('TextEditorComponent', () => {
     });
 
     it("flashing a highlight decoration doesn't unflash other highlight decorations", async () => {
+      jasmine.useRealClock();
       const { component, element, editor } = buildComponent({
         rowsPerTile: 3,
         height: 200
@@ -2443,7 +2509,7 @@ describe('TextEditorComponent', () => {
       expect(highlights[0].classList.contains('c')).toBe(true);
 
       // Flash another class while the previously-flashed class is still highlighted
-      decoration.flash('d', 100);
+      decoration.flash('d', process.env.CI ? 1500 : 100);
       await component.getNextUpdatePromise();
       expect(highlights[0].classList.contains('c')).toBe(true);
       expect(highlights[0].classList.contains('d')).toBe(true);
@@ -2569,10 +2635,10 @@ describe('TextEditorComponent', () => {
       fakeWindow.style.backgroundColor = 'blue';
       fakeWindow.appendChild(component.element);
       jasmine.attachToDOM(fakeWindow);
-      spyOn(component, 'getWindowInnerWidth').andCallFake(
+      spyOn(component, 'getWindowInnerWidth').and.callFake(
         () => fakeWindow.getBoundingClientRect().width
       );
-      spyOn(component, 'getWindowInnerHeight').andCallFake(
+      spyOn(component, 'getWindowInnerHeight').and.callFake(
         () => fakeWindow.getBoundingClientRect().height
       );
       return fakeWindow;
@@ -3194,6 +3260,7 @@ describe('TextEditorComponent', () => {
         component,
         3 * component.getLineHeight() + getElementHeight(item3)
       );
+      await wait(100);
       expect(component.getRenderedStartRow()).toBe(3);
       expect(component.getRenderedEndRow()).toBe(12);
       expect(component.getScrollHeight()).toBeNear(
@@ -3588,20 +3655,39 @@ describe('TextEditorComponent', () => {
     });
 
     it('does not attempt to render block decorations located outside the visible range', async () => {
-      const { editor, component } = buildComponent({
+      // Build a text editor with only two rows per tile.
+      const { editor, element, component } = buildComponent({
         autoHeight: false,
         rowsPerTile: 2
       });
+
+      // Set `line-height` to an integer to save us headaches later. (We
+      // believe that Chromium used to guarantee fixed increments of line
+      // height, but doesn't anymore — so we must specify it as an integer
+      // value ourselves if we want the math to be simpler.)
+      element.style.lineHeight = '20px';
+      component.measureCharacterDimensions();
+
+      // Make the editor tall enough to fit only two lines at a time.
       await setEditorHeightInLines(component, 2);
+
       expect(component.getRenderedStartRow()).toBe(0);
+
+      // This suggests one extra tile is rendered below the viewport just out
+      // of view. (But why is this `4` rather than `3`, since we're
+      // zero-indexed? This seems like a mistake in `getRenderedEndRow` logic.)
       expect(component.getRenderedEndRow()).toBe(4);
 
+      // Create a marker spanning the fourth and fifth rows…
       const marker1 = editor.markScreenRange([[3, 0], [5, 0]], {
         reversed: false
       });
+
+      // …and decorate it with a DIV.
       const item1 = document.createElement('div');
       editor.decorateMarker(marker1, { type: 'block', item: item1 });
 
+      // Repeat, but with the marker reversed.
       const marker2 = editor.markScreenRange([[3, 0], [5, 0]], {
         reversed: true
       });
@@ -3609,12 +3695,34 @@ describe('TextEditorComponent', () => {
       editor.decorateMarker(marker2, { type: 'block', item: item2 });
 
       await component.getNextUpdatePromise();
+
+      // We do not expect the first block decoration to be rendered; its head
+      // is outside the renderered range.
       expect(item1.parentElement).toBeNull();
+
+      // But we expect the second decoration to be present because its head
+      // _is_ within the rendered range. (Remember that a “reversed” marker has
+      // its head _before_ its tail, but a non-reversed marker starts with its
+      // tail and ends with its head. Read the text-buffer docs for `Marker`
+      // for further understanding.)
+      //
+      // This comment does not imply understanding of the reasoning behind
+      // this — just that this is the relevant difference in behavior between
+      // the two decorations.
       expect(item2.nextSibling).toBe(lineNodeForScreenRow(component, 3));
 
+      // Scroll down so that the fifth line is the first one visible.
       await setScrollTop(component, 4 * component.getLineHeight());
+
+      // Again, lines 4-5-6-7 (zero-indexed) are understood to be visible, but
+      // `getRenderedEndRow` will report an end row of `8`, which is its own
+      // quirk.
       expect(component.getRenderedStartRow()).toBe(4);
       expect(component.getRenderedEndRow()).toBe(8);
+
+      // Now the logic is reversed; the rendered range includes the head of
+      // the first decoration, but not of the second decoration. Hence the
+      // first decoration is renderered and the second isn't.
       expect(item1.nextSibling).toBe(lineNodeForScreenRow(component, 5));
       expect(item2.parentElement).toBeNull();
     });
@@ -3812,6 +3920,22 @@ describe('TextEditorComponent', () => {
       expect(beforeItems[5].nextSibling).toBe(
         lineNodeForScreenRow(component, 2)
       );
+    });
+
+    it('does not throw when a block decoration is destroyed during an update cycle', async () => {
+      const editor = buildEditor({ autoHeight: false });
+      const { component } = buildComponent({ editor, rowsPerTile: 3 });
+      const { decoration, marker } = createBlockDecorationAtScreenRow(editor, 2, {
+        height: 20,
+        position: 'after'
+      });
+      await component.getNextUpdatePromise();
+
+      decoration.destroy();
+      marker.destroy();
+      expect(() => {
+        component.updateSync();
+      }).not.toThrow();
     });
 
     function createBlockDecorationAtScreenRow(
@@ -4572,7 +4696,7 @@ describe('TextEditorComponent', () => {
 
         it('expands the last selection on drag', () => {
           atom.config.set('editor.multiCursorOnClick', true);
-          const { component, editor } = buildComponent();
+          const { component, editor } = buildComponent({ updatedSynchronously: true });
           spyOn(component, 'handleMouseDragUntilMouseUp');
 
           component.didMouseDownOnContent(
@@ -4589,7 +4713,7 @@ describe('TextEditorComponent', () => {
             const {
               didDrag,
               didStopDragging
-            } = component.handleMouseDragUntilMouseUp.argsForCall[0][0];
+            } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
             didDrag(clientPositionForCharacter(component, 8, 8));
             expect(editor.getSelectedScreenRange()).toEqual([[1, 4], [8, 8]]);
             didDrag(clientPositionForCharacter(component, 4, 8));
@@ -4614,12 +4738,17 @@ describe('TextEditorComponent', () => {
             const {
               didDrag,
               didStopDragging
-            } = component.handleMouseDragUntilMouseUp.argsForCall[1][0];
+            } = component.handleMouseDragUntilMouseUp.calls.argsFor(1)[0];
             didDrag(clientPositionForCharacter(component, 2, 8));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
             ]);
+            expect(
+              clientLeftForCharacter(component, 6, 8)
+            ).not.toEqual(
+              clientLeftForCharacter(component, 6, 0)
+            )
             didDrag(clientPositionForCharacter(component, 6, 8));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
@@ -4662,7 +4791,7 @@ describe('TextEditorComponent', () => {
 
           const {
             didDrag
-          } = component.handleMouseDragUntilMouseUp.argsForCall[1][0];
+          } = component.handleMouseDragUntilMouseUp.calls.argsFor(1)[0];
           didDrag(clientPositionForCharacter(component, 0, 8));
           expect(editor.getSelectedScreenRange()).toEqual([[0, 4], [1, 5]]);
           didDrag(clientPositionForCharacter(component, 2, 10));
@@ -4690,7 +4819,7 @@ describe('TextEditorComponent', () => {
 
           const {
             didDrag
-          } = component.handleMouseDragUntilMouseUp.argsForCall[2][0];
+          } = component.handleMouseDragUntilMouseUp.calls.argsFor(2)[0];
           didDrag(clientPositionForCharacter(component, 1, 8));
           expect(editor.getSelectedScreenRange()).toEqual([[1, 0], [3, 0]]);
           didDrag(clientPositionForCharacter(component, 4, 10));
@@ -4752,7 +4881,7 @@ describe('TextEditorComponent', () => {
           });
           const {
             didDrag
-          } = component.handleMouseDragUntilMouseUp.argsForCall[0][0];
+          } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
 
           didDrag({ clientX: 199, clientY: 199 });
           assertScrolledDownAndRight();
@@ -4800,7 +4929,7 @@ describe('TextEditorComponent', () => {
       });
 
       it('pastes the previously selected text when clicking the middle mouse button on Linux', async () => {
-        spyOn(electron.ipcRenderer, 'send').andCallFake(function(
+        spyOn(electron.ipcRenderer, 'send').and.callFake(function (
           eventName,
           selectedText
         ) {
@@ -4854,7 +4983,7 @@ describe('TextEditorComponent', () => {
       });
 
       it('does not paste into a read only editor when clicking the middle mouse button on Linux', async () => {
-        spyOn(electron.ipcRenderer, 'send').andCallFake(function(
+        spyOn(electron.ipcRenderer, 'send').and.callFake(function (
           eventName,
           selectedText
         ) {
@@ -4899,6 +5028,7 @@ describe('TextEditorComponent', () => {
         // Selects entire buffer line when clicked screen line is soft-wrapped
         component.didMouseDownOnLineNumberGutter({
           button: 0,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 3)
         });
         expect(editor.getSelectedScreenRange()).toEqual([[3, 0], [5, 0]]);
@@ -4908,6 +5038,7 @@ describe('TextEditorComponent', () => {
         // span multiple buffer lines
         component.didMouseDownOnLineNumberGutter({
           button: 0,
+          clientX: clientLeftForCharacter(component, 5, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
         expect(editor.getSelectedScreenRange()).toEqual([[5, 0], [6, 0]]);
@@ -4927,6 +5058,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           metaKey: true,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 3)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -4943,6 +5075,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           metaKey: true,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -4972,6 +5105,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           shiftKey: true,
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
 
@@ -4984,8 +5118,9 @@ describe('TextEditorComponent', () => {
         const {
           didDrag,
           didStopDragging
-        } = component.handleMouseDragUntilMouseUp.argsForCall[0][0];
+        } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
         didDrag({
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         expect(editor.getSelectedBufferRanges()).toEqual([
@@ -4994,6 +5129,7 @@ describe('TextEditorComponent', () => {
         ]);
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 5, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
 
@@ -5016,15 +5152,17 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           button: 0,
           metaKey: true,
+          clientX: clientLeftForCharacter(component, 2, 0) - 15,
           clientY: clientTopForLine(component, 2)
         });
 
         const {
           didDrag,
           didStopDragging
-        } = component.handleMouseDragUntilMouseUp.argsForCall[0][0];
+        } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -5033,6 +5171,7 @@ describe('TextEditorComponent', () => {
         ]);
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 5, 0) - 15,
           clientY: clientTopForLine(component, 5)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -5042,6 +5181,7 @@ describe('TextEditorComponent', () => {
         expect(editor.isFoldedAtBufferRow(4)).toBe(true);
 
         didDrag({
+          clientX: clientLeftForCharacter(component, 3, 0) - 15,
           clientY: clientTopForLine(component, 3)
         });
         expect(editor.getSelectedScreenRanges()).toEqual([
@@ -5063,6 +5203,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           target,
           button: 0,
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         expect(editor.isFoldedAtScreenRow(1)).toBe(true);
@@ -5071,6 +5212,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           target,
           button: 0,
+          clientX: clientLeftForCharacter(component, 1, 0) - 15,
           clientY: clientTopForLine(component, 1)
         });
         await component.getNextUpdatePromise();
@@ -5086,6 +5228,7 @@ describe('TextEditorComponent', () => {
         component.didMouseDownOnLineNumberGutter({
           target,
           button: 0,
+          clientX: clientLeftForCharacter(component, 4, 0) - 15,
           clientY: clientTopForLine(component, 4)
         });
         expect(editor.isFoldedAtScreenRow(4)).toBe(false);
@@ -5122,7 +5265,7 @@ describe('TextEditorComponent', () => {
         });
         const {
           didDrag
-        } = component.handleMouseDragUntilMouseUp.argsForCall[0][0];
+        } = component.handleMouseDragUntilMouseUp.calls.argsFor(0)[0];
         didDrag({ clientX: 199, clientY: 199 });
         assertScrolledDown();
         didDrag({ clientX: 199, clientY: 199 });
@@ -5604,6 +5747,9 @@ describe('TextEditorComponent', () => {
         rowsPerTile: 1,
         autoHeight: false
       });
+      // Set the initial line height to match that of the editor font size.
+      element.style.lineHeight = Math.ceil(parseFloat(getComputedStyle(element).fontSize)) + 'px'
+      component.measureCharacterDimensions();
       await setEditorHeightInLines(component, 3);
       await setEditorWidthInCharacters(component, 20);
       component.setScrollTopRow(4);
@@ -5622,7 +5768,12 @@ describe('TextEditorComponent', () => {
       expect(component.getScrollTopRow()).toBe(4);
     });
 
-    it('gracefully handles the editor being hidden after a styling change', async () => {
+    it('gracefully handles the editor being hidden after a styling change', async (done) => {
+      jasmine.useRealClock();
+      jasmine.filterByPlatform({only: ['linux']}, done);
+      // Seems to make this test less flaky.
+      await wait(0);
+
       const { component, element } = buildComponent({
         autoHeight: false
       });
@@ -5631,6 +5782,8 @@ describe('TextEditorComponent', () => {
       TextEditor.didUpdateStyles();
       element.style.display = 'none';
       await component.getNextUpdatePromise();
+
+      done();
     });
 
     it('does not throw an exception when the editor is soft-wrapped and changing the font size changes also the longest screen line', async () => {
@@ -5716,7 +5869,7 @@ describe('TextEditorComponent', () => {
         updatedSynchronously: true
       });
       editor.setSoftWrapped(true);
-      spyOn(window, 'onerror').andCallThrough();
+      spyOn(window, 'onerror').and.callThrough();
       jasmine.attachToDOM(element); // should not throw an exception
       expect(window.onerror).not.toHaveBeenCalled();
     });
@@ -5858,6 +6011,33 @@ describe('TextEditorComponent', () => {
       expect(previouslyMeasuredLineElement.style.display).toBe('');
       expect(previouslyMeasuredLineElement.style.visibility).toBe('');
     });
+
+    it('does not throw when called with a row far beyond the rendered range', async () => {
+      const { component } = buildComponent({
+        rowsPerTile: 2,
+        autoHeight: false
+      });
+      await setEditorHeightInLines(component, 3);
+
+      const outOfRangeRow = component.getRenderedEndRow() + 1000;
+      expect(() => {
+        component.pixelPositionForScreenPosition({ row: outOfRangeRow, column: 0 });
+      }).not.toThrow();
+    });
+
+    it('does not throw when requestHorizontalMeasurement targets a non-rendered row', async () => {
+      const { component } = buildComponent({
+        rowsPerTile: 2,
+        autoHeight: false
+      });
+      await setEditorHeightInLines(component, 3);
+
+      const outOfRangeRow = component.getRenderedEndRow() + 1000;
+      component.requestHorizontalMeasurement(outOfRangeRow, 0);
+      expect(() => {
+        component.measureHorizontalPositions();
+      }).not.toThrow();
+    });
   });
 
   describe('screenPositionForPixelPosition', () => {
@@ -5937,24 +6117,24 @@ describe('TextEditorComponent', () => {
       });
       spyOn(Grim, 'deprecate');
       expect(editor.getHeight()).toBe(component.getScrollContainerHeight());
-      expect(Grim.deprecate.callCount).toBe(1);
+      expect(Grim.deprecate.calls.count()).toBe(1);
 
       editor.setHeight(100);
       await component.getNextUpdatePromise();
       expect(component.getScrollContainerHeight()).toBe(100);
-      expect(Grim.deprecate.callCount).toBe(2);
+      expect(Grim.deprecate.calls.count()).toBe(2);
     });
 
     it('delegates setWidth and getWidth to the component', async () => {
       const { component, editor } = buildComponent();
       spyOn(Grim, 'deprecate');
       expect(editor.getWidth()).toBe(component.getScrollContainerWidth());
-      expect(Grim.deprecate.callCount).toBe(1);
+      expect(Grim.deprecate.calls.count()).toBe(1);
 
       editor.setWidth(100);
       await component.getNextUpdatePromise();
       expect(component.getScrollContainerWidth()).toBe(100);
-      expect(Grim.deprecate.callCount).toBe(2);
+      expect(Grim.deprecate.calls.count()).toBe(2);
     });
 
     it('delegates getFirstVisibleScreenRow, getLastVisibleScreenRow, and getVisibleRowRange to the component', async () => {
@@ -5983,6 +6163,8 @@ describe('TextEditorComponent', () => {
         rowsPerTile: 3,
         autoHeight: false
       });
+      element.style.lineHeight = '20px';
+      component.measureCharacterDimensions();
       element.style.height =
         4 * component.measurements.lineHeight +
         horizontalScrollbarHeight +
@@ -6147,6 +6329,204 @@ describe('TextEditorComponent', () => {
       return new Promise(resolve => requestAnimationFrame(resolve));
     }
   });
+
+  describe('RTL text handling', () => {
+
+    it('renders multiple decorations for a contiguous selection if line contains bidirectional text', async () => {
+      const { component, element, editor } = buildComponent({ text: SAMPLE_WITH_RTL_TEXT });
+      editor.setSoftWrapped(true);
+      await component.getNextUpdatePromise();
+      await setEditorWidthInCharacters(component, 60);
+
+      const marker = editor.markScreenRange([[1, 15], [1, 39]]);
+      editor.decorateMarker(marker, { type: 'highlight', class: 'a' });
+      await component.getNextUpdatePromise();
+
+      // Selection begins in an LTR text region and ends in an RTL text region;
+      // therefore there will be two non-contiguous highlights on the line.
+      {
+        let regions = Array.from(
+          element.querySelectorAll('.highlight.a .region.a')
+        );
+        expect(regions.length).toBe(2);
+        const regionRects = regions.map(r => r.getBoundingClientRect());
+        expect(regionRects[0].top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        expect(regionRects[1].top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        expect(Math.round(regionRects[0].left)).toBeNear(
+          clientLeftForCharacter(component, 1, 15)
+        );
+        expect(Math.round(regionRects[1].left)).toBeNear(
+          clientLeftForCharacter(component, 1, 39)
+        )
+      }
+
+      marker.setScreenRange([[1, 36], [1, 39]]);
+      await component.getNextUpdatePromise();
+
+      // Selection begins and ends in an RTL text region; therefore there will
+      // be one contiguous highlight on the line.
+
+      {
+        let regions = element.querySelectorAll('.highlight.a .region.a');
+        expect(regions.length).toBe(1);
+        const regionRect = regions[0].getBoundingClientRect();
+        expect(regionRect.top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        expect(regionRect.bottom).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().bottom
+        );
+        // The text rendering is “backwards,” so the left side of the selection
+        // will match the _later_ column index.
+        expect(Math.round(regionRect.left)).toBeNear(
+          clientLeftForCharacter(component, 1, 39)
+        );
+        expect(Math.round(regionRect.right)).toBeNear(
+          clientRectAroundCharacter(component, 1, 36).right
+        );
+      }
+
+      marker.setScreenRange([[1, 23], [1, 59]]);
+      await component.getNextUpdatePromise();
+
+      // Selection starts in LTR, passes through RTL, then ends in LTR. DOM
+      // methods on the actual text would report that it was drawn with three
+      // different `DOMRects`, but since they touch one another, we consolidate
+      // them into a single region.
+      {
+        let regions = element.querySelectorAll('.highlight.a .region.a');
+        expect(regions.length).toBe(1);
+        const regionRect = regions[0].getBoundingClientRect();
+        expect(regionRect.top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        expect(regionRect.bottom).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().bottom
+        );
+
+        expect(Math.round(regionRect.left)).toBeNear(
+          clientLeftForCharacter(component, 1, 23)
+        );
+        expect(Math.round(regionRect.right)).toBeNear(
+          clientRectAroundRange(component, 1, 58, 59).right
+        );
+      }
+    });
+
+    it('handles multi-line selections', async () => {
+      const { component, element, editor } = buildComponent({ text: SAMPLE_WITH_RTL_TEXT });
+      editor.setSoftWrapped(true);
+      await component.getNextUpdatePromise();
+      await setEditorWidthInCharacters(component, 60);
+
+      const marker = editor.markScreenRange([[1, 39], [2, 24]]);
+      editor.decorateMarker(marker, { type: 'highlight', class: 'a' });
+      await component.getNextUpdatePromise();
+
+      // Selection starts in RTL text and goes to the end of the line, passing
+      // through LTR text along the way. It ends at the end of a line that
+      // holds only LTR text.
+      //
+      // Thus the selection should have two regions on its initial line, the
+      // rightmost of which should extend all the way to the edge of the
+      // editor.
+      {
+        let regions = element.querySelectorAll('.highlight.a .region.a');
+        expect(regions.length).toBe(3);
+        let regionRects = Array.from(regions).map(r => r.getBoundingClientRect());
+        // At least one of the first two regions should have a CSS `right` of
+        // `0px` to signify that it goes all the way to the right edge of the
+        // editor.
+        expect(
+          [regions[0], regions[1]].some(
+            rect => rect.style.right === '0px'
+          )
+        ).toBe(true);
+        // First two `DOMRect`s should align with line 1…
+        expect(regionRects[0].top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        expect(regionRects[1].top).toBe(
+          lineNodeForScreenRow(component, 1).getBoundingClientRect().top
+        );
+        // …and the third should align with line 2.
+        expect(regionRects[2].top).toBe(
+          lineNodeForScreenRow(component, 2).getBoundingClientRect().top
+        );
+      }
+
+      marker.setScreenRange([[11, 27], [14, 33]]);
+
+      await component.getNextUpdatePromise();
+
+      // Starts on an LTR line and ends on a line that contains RTL text. The
+      // ending line should have two highlighted regions. Starting and ending
+      // lines are nonconsecutive, so there'll be an extra selection
+      // representing the middle rows.
+      {
+        let regions = element.querySelectorAll('.highlight.a .region.a');
+        expect(regions.length).toBe(4);
+        let regionRects = Array.from(regions).map(r => r.getBoundingClientRect());
+        expect(regionRects[0].top).toBe(
+          lineNodeForScreenRow(component, 11).getBoundingClientRect().top
+        );
+        // Second `DOMRect` should represent the middle rows.
+        expect(regionRects[1].top).toBe(
+          lineNodeForScreenRow(component, 12).getBoundingClientRect().top
+        );
+        expect(regionRects[1].bottom).toBe(
+          lineNodeForScreenRow(component, 14).getBoundingClientRect().top
+        );
+        // Last two should represent the discontiguous selections on the last
+        // row.
+        expect(regionRects[2].top).toBe(
+          lineNodeForScreenRow(component, 14).getBoundingClientRect().top
+        );
+        expect(regionRects[3].top).toBe(
+          lineNodeForScreenRow(component, 14).getBoundingClientRect().top
+        );
+      }
+    });
+
+    it('measures each column of a bidirectional-text line at a different X-axis position', async () => {
+      const { component, editor } = buildComponent({ text: SAMPLE_WITH_RTL_TEXT });
+      editor.setSoftWrapped(true);
+      await component.getNextUpdatePromise();
+      await setEditorWidthInCharacters(component, 60);
+
+      let width = editor.lineLengthForScreenRow(14);
+      let positions = new Set();
+      // Schedule measurement of each position on the line.
+      for (let i = 0; i < width; i++) {
+        component.requestHorizontalMeasurement(14, i);
+      }
+      await component.getNextUpdatePromise();
+      for (let i = 0; i < width; i++) {
+        positions.add(
+          component.pixelLeftForRowAndColumn(14, i)
+        );
+      }
+      // Previous faulty logic for determining the pixel positions of RTL
+      // characters meant that multiple RTL characters incorrectly shared an
+      // X-axis pixel measurement. Here we're asserting that we get 46 distinct
+      // values for 46 columns.
+      expect(positions.size).toBe(width);
+
+      let original = [...positions];
+      let sorted = [...original].sort((a, b) => a - b);
+
+      // Here we're asserting that the pixel positions _do not_ monotonically
+      // increase as we'd expect on a line with only LTR text. Sorting the list
+      // by ascending pixel value should produce a different ordering than what
+      // we already have.
+      expect(original).not.toEqual(sorted);
+    });
+
+  });
 });
 
 function buildEditor(params = {}) {
@@ -6227,6 +6607,44 @@ function verifyCursorPosition(component, cursorNode, row, column) {
 
 function clientTopForLine(component, row) {
   return lineNodeForScreenRow(component, row).getBoundingClientRect().top;
+}
+
+function clientRectAroundRange(component, row, startColumn, endColumn, index = 0) {
+  const textNodes = textNodesForScreenRow(component, row);
+  let textNodeStartColumn = 0;
+  const range = document.createRange();
+  let didSetStart = false;
+  let didSetEnd = false;
+  for (const textNode of textNodes) {
+    const textNodeEndColumn = textNodeStartColumn + textNode.textContent.length;
+    if (startColumn < textNodeEndColumn && !didSetStart) {
+      range.setStart(textNode, startColumn - textNodeStartColumn);
+      didSetStart = true;
+    }
+    if (endColumn <= textNodeEndColumn && !didSetEnd) {
+      range.setEnd(textNode, endColumn - textNodeStartColumn);
+      didSetEnd = true;
+    }
+
+    if (didSetStart && didSetEnd) {
+      let rects = range.getClientRects();
+      return rects[index];
+    }
+    textNodeStartColumn = textNodeEndColumn;
+  }
+  throw new Error(`Invalid screen range: (${row}, ${startColumn}) — (${row}, ${endColumn})`);
+}
+
+// Given a row and column, attempts to extract a `ClientRect` for a single
+// character.
+function clientRectAroundCharacter(component, row, column, index = 0) {
+  return clientRectAroundRange(
+    component,
+    row,
+    column,
+    column + 1,
+    index
+  );
 }
 
 function clientLeftForCharacter(component, row, column) {

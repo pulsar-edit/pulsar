@@ -11,6 +11,7 @@ comments:
   start: '// '
 
 treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-go#ff86c7f1734873c8c4874ca4dd95603695686d7a'
   grammar: 'tree-sitter-go/tree-sitter-go.wasm'
   highlightsQuery: 'tree-sitter-go/highlights.scm'
   foldsQuery: 'tree-sitter-go/folds.scm'

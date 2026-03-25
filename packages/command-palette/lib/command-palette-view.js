@@ -10,7 +10,7 @@ export default class CommandPaletteView {
       initiallyVisibleItemCount: initiallyVisibleItemCount, // just for being able to disable visible-on-render in spec
       items: [],
       filter: this.filter,
-      emptyMessage: 'No matches found',
+      emptyMessage: atom.i18n.t("command-palette.commandPaletteView.emptyMessage"),
       elementForItem: (item, {index, selected, visible}) => {
         if (!visible) {
           return document.createElement("li")
@@ -135,8 +135,9 @@ export default class CommandPaletteView {
   highlightMatchesInElement (text, query, el) {
     const matches = atom.ui.fuzzyMatcher.match(text, query, {recordMatchIndexes: true})
     let matchedChars = []
-    let lastIndex = 0
-    matches.matchIndexes.forEach(matchIndex => {
+    let lastIndex = 0;
+    const matchIndexes = matches ? (matches.matchIndexes ?? []) : []
+    matchIndexes.forEach(matchIndex => {
       const unmatched = text.substring(lastIndex, matchIndex)
       if (unmatched) {
         if (matchedChars.length > 0) {
@@ -231,7 +232,7 @@ export default class CommandPaletteView {
     })
 
     const introEl = document.createElement('strong')
-    introEl.textContent = 'matching tags: '
+    introEl.textContent = atom.i18n.t("command-palette.commandPaletteView.matchingTags");
 
     tagsEl.appendChild(introEl)
     matchingTags.map(t => this.createTag(t, query)).forEach((tagEl, i) => {

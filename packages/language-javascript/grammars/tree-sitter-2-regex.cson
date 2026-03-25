@@ -1,9 +1,0 @@
-name: 'JavaScript RegExp'
-scopeName: 'source.js.regexp'
-type: 'modern-tree-sitter'
-parser: 'tree-sitter-regex'
-
-injectionRegex: '^(js-regex)$'
-treeSitter:
-  grammar: 'ts/regex/tree-sitter-regex.wasm'
-  highlightsQuery: 'ts/regex/highlights.scm'

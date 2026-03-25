@@ -4,12 +4,11 @@
   "main": "./lib/main",
   "description": "Highlights misspelled words and shows possible corrections.",
   "dependencies": {
-    "atom-pathspec": "^0.0.0",
     "atom-select-list": "^0.7.0",
     "debug": "^4.1.1",
     "multi-integer-range": "^2.0.0",
     "natural": "^0.4.0",
-    "spellchecker": "^3.7.1",
+    "spellchecker": "https://github.com/pulsar-edit/node-spellchecker.git#da32e897e74691b7f43b70ddc0d171bad2d38208",
     "spelling-manager": "^1.1.0",
     "underscore-plus": "^1"
   },
@@ -20,7 +19,8 @@
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
   "engines": {
-    "atom": "*"
+    "atom": "*",
+    "node": ">=14"
   },
   "scripts": {
     "format": "prettier --write \"spec/*.js\" \"lib/**/*.js\" \"script/*.js\" --loglevel warn"
@@ -37,7 +37,7 @@
         "source.rst",
         "text.restructuredtext"
       ],
-      "description": "List of scopes for languages which will be checked for misspellings. See [the README](https://github.com/pulsar-edit/pulsar/blob/master/packages/spell-check/README.md) for more information on finding the correct scope for a specific language.",
+      "description": "List of scopes for languages which will be checked for misspellings. See [the README](https://github.com/pulsar-edit/pulsar/blob/master/packages/spell-check/README.md) for more information on finding the correct scope for a specific language. If you want to spell-check only parts of some languages, you may specify a more detailed scope selector (like `source.js comment.block` or `source string`); but the first part of the selector must match the language scope.",
       "order": 1
     },
     "excludedScopes": {

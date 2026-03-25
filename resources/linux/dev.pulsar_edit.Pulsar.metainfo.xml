@@ -3,22 +3,43 @@
   <id>dev.pulsar_edit.Pulsar</id>
   <name>Pulsar</name>
   <developer_name>Pulsar Edit</developer_name>
-  <summary>A Community-led Hyper-Hackable Text Editor</summary>
+  <developer id="dev.pulsar_edit">
+    <name translatable="no">Pulsar Edit</name>
+  </developer>
+  <summary>Community-led hyper-hackable editor</summary>
+  <launchable type="desktop-id">dev.pulsar_edit.Pulsar.desktop</launchable>
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
   <url type="homepage">https://pulsar-edit.dev</url>
   <url type="bugtracker">https://github.com/pulsar-edit/pulsar/issues/</url>
+  <url type="faq">https://pulsar-edit.dev/docs/launch-manual/sections/faq/</url>
+  <url type="vcs-browser">https://github.com/pulsar-edit/pulsar</url>
+  <url type="donation">https://pulsar-edit.dev/donate.html</url>
+  <branding>
+  <color type="primary" scheme_preference="light">#c061cb</color>
+  <color type="primary" scheme_preference="dark">#613583</color>
+  </branding>
   <update_contact>admin@pulsar-edit.dev</update_contact>
   <description>
     <p>Pulsar aims to not only reach feature parity with the original Atom, but to bring Pulsar into the 21st century by updating the underlying architecture, and supporting modern features.</p>
   </description>
   <screenshots>
+    <screenshot type="default">
+      <image type="source">https://raw.githubusercontent.com/pulsar-edit/pulsar/master/resources/linux/linux-screenshot.png</image>
+      <caption>Pulsar welcome window in the middle, an open file on the right, and project on the left</caption>
+    </screenshot>
     <screenshot>
       <image type="source">https://raw.githubusercontent.com/pulsar-edit/pulsar/master/resources/readme.png</image>
+      <caption>Pulsar welcome window with an open project</caption>
     </screenshot>
   </screenshots>
+  <keywords>
+    <keyword>atom</keyword>
+  </keywords>
+  <releases>
+  </releases>
   <kudos>
     <kudo>HiDpiIcon</kudo>
   </kudos>
-  <content_rating type="oars-1.1" />
+  <content_rating type="oars-1.1"/>
 </component>

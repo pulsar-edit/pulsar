@@ -3,7 +3,10 @@ describe('PHP grammar', function() {
   let grammar = null;
 
   beforeEach(function() {
-    waitsForPromise(() => atom.packages.activatePackage('language-php'));
+    atom.config.set('core.useTreeSitterParsers', false);
+
+    waitsForPromise(() =>
+       atom.packages.activatePackage('language-php'));
 
     runs(function() {
       grammar = atom.grammars.grammarForScopeName('source.php');

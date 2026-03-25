@@ -3,7 +3,7 @@ const SymbolsView = require('./symbols-view');
 
 // TODO: Does this really need to extend SymbolsView?
 module.exports = class GoBackView extends SymbolsView {
-  toggle () {
+  toggle() {
     let previous = this.stack.pop();
     if (!previous) return;
 
@@ -23,7 +23,7 @@ module.exports = class GoBackView extends SymbolsView {
       // The editor is not there anymore; e.g., a package like `zentabs` might
       // have automatically closed it when a new editor view was opened. So we
       // should restore it if we can.
-      atom.workspace.open(previous).then(restorePosition);
+      atom.workspace.open(previous.file).then(restorePosition);
     }
   }
 }

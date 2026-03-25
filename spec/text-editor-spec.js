@@ -1,3 +1,5 @@
+const { timeoutPromise: wait } = require('./helpers/async-spec-helpers');
+
 const fs = require('fs');
 const path = require('path');
 const temp = require('temp').track();
@@ -5,11 +7,11 @@ const dedent = require('dedent');
 const { clipboard } = require('electron');
 const os = require('os');
 const TextEditor = require('../src/text-editor');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
 const WASMTreeSitterLanguageMode = require('../src/wasm-tree-sitter-language-mode');
 
-async function languageModeReady (editor) {
+async function languageModeReady(editor) {
   let languageMode = editor.getBuffer().getLanguageMode();
   if (languageMode.ready) {
     await languageMode.ready;
@@ -49,7 +51,7 @@ describe('TextEditor', () => {
 
     // The id generator should skip the id used up by the deserialized one:
     const fresh = new TextEditor();
-    expect(fresh.id).toNotEqual(deserialized.id);
+    expect(fresh.id).not.toEqual(deserialized.id);
   });
 
   describe('when the editor is deserialized', () => {
@@ -140,7 +142,7 @@ describe('TextEditor', () => {
   });
 
   describe('.copy()', () => {
-    it('returns a different editor with the same initial state', () => {
+    it('returns a different editor with the same initial state', async () => {
       expect(editor.getAutoHeight()).toBeFalsy();
       expect(editor.getAutoWidth()).toBeFalsy();
       expect(editor.getShowCursorOnSelection()).toBeTruthy();
@@ -211,7 +213,7 @@ describe('TextEditor', () => {
       });
 
       expect(returnedPromise).toBe(element.component.getNextUpdatePromise());
-      expect(changeSpy.callCount).toBe(1);
+      expect(changeSpy.calls.count()).toBe(1);
       expect(editor.getTabLength()).toBe(6);
       expect(editor.getSoftTabs()).toBe(false);
       expect(editor.isSoftWrapped()).toBe(true);
@@ -366,8 +368,8 @@ describe('TextEditor', () => {
 
         expect(editorCallback).toHaveBeenCalled();
         expect(cursorCallback).toHaveBeenCalled();
-        const eventObject = editorCallback.mostRecentCall.args[0];
-        expect(cursorCallback.mostRecentCall.args[0]).toEqual(eventObject);
+        const eventObject = editorCallback.calls.mostRecent().args[0];
+        expect(cursorCallback.calls.mostRecent().args[0]).toEqual(eventObject);
 
         expect(eventObject.oldBufferPosition).toEqual([0, 0]);
         expect(eventObject.oldScreenPosition).toEqual([0, 0]);
@@ -1586,7 +1588,7 @@ describe('TextEditor', () => {
       it("doesn't get stuck in a infinite loop when called from ::onDidAddCursor after the last selection has been destroyed (regression)", () => {
         let callCount = 0;
         editor.getLastSelection().destroy();
-        editor.onDidAddCursor(function(cursor) {
+        editor.onDidAddCursor(function (cursor) {
           callCount++;
           editor.getLastSelection();
         });
@@ -1619,7 +1621,7 @@ describe('TextEditor', () => {
         editor.selectToBufferPosition([6, 2]);
 
         expect(rangeChangedHandler).toHaveBeenCalled();
-        const eventObject = rangeChangedHandler.mostRecentCall.args[0];
+        const eventObject = rangeChangedHandler.calls.mostRecent().args[0];
 
         expect(eventObject.oldBufferRange).toEqual([[3, 0], [4, 5]]);
         expect(eventObject.oldScreenRange).toEqual([[3, 0], [4, 5]]);
@@ -2250,7 +2252,7 @@ describe('TextEditor', () => {
         spyOn(
           editor.getBuffer().getLanguageMode(),
           'getNonWordCharacters'
-        ).andCallFake(function(position) {
+        ).and.callFake(function (position) {
           const result = '/()"\':,.;<>~!@#$%^&*|+=[]{}`?';
           const scopes = this.scopeDescriptorForPosition(
             position
@@ -4002,7 +4004,7 @@ describe('TextEditor', () => {
         it('notifies the observers when inserting text', () => {
           const willInsertSpy = jasmine
             .createSpy()
-            .andCallFake(() =>
+            .and.callFake(() =>
               expect(buffer.lineForRow(1)).toBe(
                 '  var sort = function(items) {'
               )
@@ -4010,7 +4012,7 @@ describe('TextEditor', () => {
 
           const didInsertSpy = jasmine
             .createSpy()
-            .andCallFake(() =>
+            .and.callFake(() =>
               expect(buffer.lineForRow(1)).toBe(
                 'xxxvar sort = function(items) {'
               )
@@ -4025,18 +4027,18 @@ describe('TextEditor', () => {
           expect(willInsertSpy).toHaveBeenCalled();
           expect(didInsertSpy).toHaveBeenCalled();
 
-          let options = willInsertSpy.mostRecentCall.args[0];
+          let options = willInsertSpy.calls.mostRecent().args[0];
           expect(options.text).toBe('xxx');
           expect(options.cancel).toBeDefined();
 
-          options = didInsertSpy.mostRecentCall.args[0];
+          options = didInsertSpy.calls.mostRecent().args[0];
           expect(options.text).toBe('xxx');
         });
 
         it('cancels text insertion when an ::onWillInsertText observer calls cancel on an event', () => {
           const willInsertSpy = jasmine
             .createSpy()
-            .andCallFake(({ cancel }) => cancel());
+            .and.callFake(({ cancel }) => cancel());
 
           const didInsertSpy = jasmine.createSpy();
 
@@ -5313,7 +5315,7 @@ describe('TextEditor', () => {
 
         it('notifies ::onWillInsertText observers', () => {
           const insertedStrings = [];
-          editor.onWillInsertText(function({ text, cancel }) {
+          editor.onWillInsertText(function ({ text, cancel }) {
             insertedStrings.push(text);
             cancel();
           });
@@ -7617,10 +7619,17 @@ describe('TextEditor', () => {
       editor.update({ autoHeight: false });
       const element = editor.getElement();
       jasmine.attachToDOM(element);
-      element.style.height = element.component.getLineHeight() * 5 + 'px';
+      // NOTE: When line height is a float, `getRowsPerPage` will round up and
+      // consider there to be an extra row per page. Font metrics are more
+      // complicated than they used to be, but in order to make this test
+      // happy, we'll make the editor height a bit shorter so that we don't try
+      // to make six rows instead of five.
+      element.style.height = Math.floor(element.component.getLineHeight() * 5) + 'px';
       element.measureDimensions();
 
       expect(editor.getCursorBufferPosition().row).toBe(0);
+
+      expect(editor.getRowsPerPage()).toBe(5);
 
       editor.pageDown();
       expect(editor.getCursorBufferPosition().row).toBe(5);
@@ -7641,7 +7650,12 @@ describe('TextEditor', () => {
       editor.update({ autoHeight: false });
       const element = editor.getElement();
       jasmine.attachToDOM(element);
-      element.style.height = element.component.getLineHeight() * 5 + 'px';
+      // NOTE: When line height is a float, `getRowsPerPage` will round up and
+      // consider there to be an extra row per page. Font metrics are more
+      // complicated than they used to be, but in order to make this test
+      // happy, we'll make the editor height a bit shorter so that we don't try
+      // to make six rows instead of five.
+      element.style.height = Math.floor(element.component.getLineHeight() * 5) + 'px';
       element.measureDimensions();
 
       expect(editor.getCursorBufferPosition().row).toBe(0);
@@ -8211,6 +8225,64 @@ describe('TextEditor', () => {
     });
   });
 
+  describe('.getCommentDelimitersForBufferPosition', () => {
+    it('returns comment delimiters on a TextMate grammar', async () => {
+      atom.config.set('core.useTreeSitterParsers', false);
+
+      editor = await atom.workspace.open('sample.js', { autoIndent: false });
+      await atom.packages.activatePackage('language-javascript');
+
+      let buffer = editor.getBuffer();
+
+      let languageMode = new TextMateLanguageMode({
+        buffer,
+        grammar: atom.grammars.grammarForScopeName('source.js')
+      });
+
+      buffer.setLanguageMode(languageMode);
+
+      languageMode.startTokenizing();
+      while (languageMode.firstInvalidRow() != null) {
+        advanceClock();
+      }
+
+      let delimiters = editor.getCommentDelimitersForBufferPosition([8, 0]);
+      expect(delimiters).toEqual({
+        line: '//',
+        block: ['/*', '*/']
+      })
+    })
+
+    it('returns comment delimiters on a modern Tree-sitter grammar', async () => {
+      jasmine.useRealClock();
+      atom.config.set('core.useTreeSitterParsers', true);
+
+      editor = await atom.workspace.open('sample.js', { autoIndent: false });
+      await atom.packages.activatePackage('language-javascript');
+
+      let buffer = editor.getBuffer();
+
+      let languageMode = new WASMTreeSitterLanguageMode({
+        buffer,
+        grammar: atom.grammars.grammarForScopeName('source.js'),
+        grammars: atom.grammars
+      });
+
+      languageMode.useAsyncParsing = false;
+      languageMode.useAsyncIndent = false;
+
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+
+      let delimiters = editor.getCommentDelimitersForBufferPosition([8, 0]);
+      expect(delimiters).toEqual({
+        line: '//',
+        block: ['/*', '*/']
+      })
+    })
+  })
+
   describe('.syntaxTreeScopeDescriptorForBufferPosition(position)', () => {
     it('returns the result of scopeDescriptorForBufferPosition() when textmate language mode is used', async () => {
       atom.config.set('core.useTreeSitterParsers', false);
@@ -8268,11 +8340,11 @@ describe('TextEditor', () => {
         'program',
         'variable_declaration',
         'variable_declarator',
-        'function',
+        'function_expression',
         'statement_block',
         'variable_declaration',
         'variable_declarator',
-        'function',
+        'function_expression',
         'statement_block',
         'while_statement',
         'parenthesized_expression',
@@ -8285,9 +8357,12 @@ describe('TextEditor', () => {
 
   describe('.shouldPromptToSave()', () => {
     beforeEach(async () => {
+      jasmine.useRealClock();
+      // Allow for some breathing room to accommodate `pathwatcher`.
+      await wait(process.env.CI ? 500 : 0);
       editor = await atom.workspace.open('sample.js');
       jasmine.unspy(editor, 'shouldPromptToSave');
-      spyOn(atom.stateStore, 'isConnected').andReturn(true);
+      spyOn(atom.stateStore, 'isConnected').and.returnValue(true);
     });
 
     it('returns true when buffer has unsaved changes', () => {
@@ -8313,9 +8388,15 @@ describe('TextEditor', () => {
       jasmine.useRealClock();
 
       editor.setText('initial stuff');
-      await editor.saveAs(temp.openSync('test-file').path);
+      let destination = temp.openSync('test-file').path;
+      await editor.saveAs(destination);
+      expect(fs.readFileSync(destination, 'utf8').toString()).toBe('initial stuff');
 
       editor.setText('other stuff');
+      let promise = new Promise(resolve => editor.onDidConflict(() => {
+        resolve();
+      }));
+      await wait(1000);
       fs.writeFileSync(editor.getPath(), 'new stuff');
       expect(
         editor.shouldPromptToSave({
@@ -8324,7 +8405,7 @@ describe('TextEditor', () => {
         })
       ).toBeFalsy();
 
-      await new Promise(resolve => editor.onDidConflict(resolve));
+      await promise;
       expect(
         editor.shouldPromptToSave({
           windowCloseRequested: true,

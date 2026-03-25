@@ -1,6 +1,7 @@
 const AtomWindow = require('./atom-window');
 const ApplicationMenu = require('./application-menu');
 const AtomProtocolHandler = require('./atom-protocol-handler');
+const { onDidChangeScrollbarStyle, getScrollbarStyle } = require('./scrollbar-style');
 const StorageFolder = require('../storage-folder');
 const Config = require('../config');
 const ConfigFile = require('../config-file');
@@ -16,7 +17,8 @@ const {
   dialog,
   ipcMain,
   shell,
-  screen
+  screen,
+  nativeTheme
 } = require('electron');
 const signalBroker = require('./signal-broker');
 const { CompositeDisposable, Disposable } = require('event-kit');
@@ -123,6 +125,10 @@ const decryptOptions = (optionsMessage, secret) => {
   return JSON.parse(message);
 };
 
+ipcMain.handle('getScrollbarStyle', () => {
+  return getScrollbarStyle();
+});
+
 ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.isDefaultProtocolClient(protocol, path, args);
 });
@@ -130,6 +136,7 @@ ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
 ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
 });
+
 // The application's singleton class.
 //
 // It's the entry point into the Pulsar application and maintains the global state
@@ -289,6 +296,9 @@ module.exports = class AtomApplication extends EventEmitter {
         this.config.onDidChange('core.colorProfile', () =>
           this.promptForRestart()
         );
+        this.config.onDidChange('core.allowWindowTransparency', () =>
+          this.promptForRestart()
+        );
       });
       await this.configFilePromise;
     }
@@ -353,10 +363,6 @@ module.exports = class AtomApplication extends EventEmitter {
       env
     } = options;
 
-    if (!preserveFocus) {
-      app.focus();
-    }
-
     if (test) {
       return this.runTests({
         headless: true,
@@ -392,6 +398,7 @@ module.exports = class AtomApplication extends EventEmitter {
         profileStartup,
         clearWindowState,
         addToLastWindow,
+        preserveFocus,
         env
       });
     } else if (urlsToOpen && urlsToOpen.length > 0) {
@@ -411,6 +418,7 @@ module.exports = class AtomApplication extends EventEmitter {
         profileStartup,
         clearWindowState,
         addToLastWindow,
+        preserveFocus,
         env
       });
     }
@@ -440,12 +448,16 @@ module.exports = class AtomApplication extends EventEmitter {
     if (!window.isSpec) {
       const focusHandler = () => this.windowStack.touch(window);
       const blurHandler = () => this.saveCurrentWindowOptions(false);
+      const scrollbarStyleChangeDisposable = onDidChangeScrollbarStyle((newValue) => {
+        window.browserWindow.webContents.send('did-change-scrollbar-style', newValue);
+      });
       window.browserWindow.on('focus', focusHandler);
       window.browserWindow.on('blur', blurHandler);
       window.browserWindow.once('closed', () => {
         this.windowStack.removeWindow(window);
         window.browserWindow.removeListener('focus', focusHandler);
         window.browserWindow.removeListener('blur', blurHandler);
+        scrollbarStyleChangeDisposable.dispose();
       });
       window.browserWindow.webContents.once('did-finish-load', blurHandler);
       this.saveCurrentWindowOptions(false);
@@ -600,7 +612,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
       this.on('application:open', () => {
         const win = this.focusedWindow();
-        if(win) {
+        if (win) {
           win.sendCommand('application:open')
         } else {
           this.promptForPathToOpen(
@@ -611,7 +623,7 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       this.on('application:open-file', () => {
         const win = this.focusedWindow();
-        if(win) {
+        if (win) {
           win.sendCommand('application:open-file')
         } else {
           this.promptForPathToOpen(
@@ -622,7 +634,7 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       this.on('application:open-folder', () => {
         const win = this.focusedWindow();
-        if(win) {
+        if (win) {
           win.sendCommand('application:open-folder')
         } else {
           this.promptForPathToOpen(
@@ -807,6 +819,14 @@ module.exports = class AtomApplication extends EventEmitter {
       })
     );
 
+    this.disposable.add(
+      ipcHelpers.on(ipcMain, 'setWindowTheme', (event, options) => {
+        if (options && typeof options === 'string') {
+          nativeTheme.themeSource = options;
+        }
+      })
+    );
+
     // A request from the associated render process to open a set of paths using the standard window location logic.
     // Used for application:reopen-project.
     this.disposable.add(
@@ -963,7 +983,23 @@ module.exports = class AtomApplication extends EventEmitter {
       ipcHelpers.respondTo('focus-window', window => window.focus())
     );
     this.disposable.add(
-      ipcHelpers.respondTo('show-window', window => window.show())
+      ipcHelpers.respondTo('show-window', window => {
+        window.show();
+        let atomWindow = this.atomWindowForBrowserWindow(window);
+        if (atomWindow?.preserveFocus) {
+          atomWindow.preserveFocus = false;
+          return;
+        }
+        // On Linux, `window.show()` is enough to make the new window
+        // frontmost, at least on X11. (TODO: Investigate Wayland behavior.)
+        //
+        // On both Windows and macOS (despite their varying window management
+        // models!) we must also call `app.focus()` to ensure the frontmost
+        // Pulsar window is brought above windows from other applications.
+        if (process.platform !== 'linux') {
+          app.focus({ steal: true });
+        }
+      })
     );
     this.disposable.add(
       ipcHelpers.respondTo('hide-window', window => window.hide())
@@ -1246,6 +1282,7 @@ module.exports = class AtomApplication extends EventEmitter {
     window,
     clearWindowState,
     addToLastWindow,
+    preserveFocus,
     env
   } = {}) {
     if (!env) env = process.env;
@@ -1339,10 +1376,21 @@ module.exports = class AtomApplication extends EventEmitter {
       openedWindow = existingWindow;
       StartupTime.addMarker('main-process:atom-application:open-in-existing');
       openedWindow.openLocations(locationsToOpen);
-      if (openedWindow.isMinimized()) {
-        openedWindow.restore();
-      } else {
-        openedWindow.focus();
+      if (!preserveFocus) {
+        if (openedWindow.isMinimized()) {
+          openedWindow.restore();
+        } else {
+          openedWindow.focus();
+        }
+        // On Linux, `window.show()` is enough to make the existing window
+        // frontmost, at least on X11. (TODO: Investigate Wayland behavior.)
+        //
+        // On both Windows and macOS (despite their varying window management
+        // models!) we must also call `app.focus()` to ensure the frontmost
+        // Pulsar window is brought above windows from other applications.
+        if (process.platform !== 'linux') {
+          app.focus({ steal: true });
+        }
       }
       openedWindow.replaceEnvironment(env);
     } else {
@@ -1381,6 +1429,7 @@ module.exports = class AtomApplication extends EventEmitter {
         clearWindowState,
         env
       });
+      openedWindow.preserveFocus = preserveFocus;
       this.addWindow(openedWindow);
       openedWindow.focus();
     }
@@ -1742,37 +1791,63 @@ module.exports = class AtomApplication extends EventEmitter {
   }
 
   resolveTestRunnerPath(testPath) {
-    let packageRoot;
-    if (FindParentDir == null) {
-      FindParentDir = require('find-parent-dir');
+    FindParentDir ||= require('find-parent-dir');
+
+    let packageRoot = FindParentDir.sync(testPath, 'package.json');
+
+    if (!packageRoot) {
+      process.stderr.write('Error: Could not find root directory');
+      process.exit(1);
     }
 
-    if ((packageRoot = FindParentDir.sync(testPath, 'package.json'))) {
-      const packageMetadata = require(path.join(packageRoot, 'package.json'));
-      if (packageMetadata.atomTestRunner) {
-        let testRunnerPath;
-        if (Resolve == null) {
-          Resolve = require('resolve');
-        }
-        if (
-          (testRunnerPath = Resolve.sync(packageMetadata.atomTestRunner, {
-            basedir: packageRoot,
-            extensions: Object.keys(require.extensions)
-          }))
-        ) {
-          return testRunnerPath;
-        } else {
-          process.stderr.write(
-            `Error: Could not resolve test runner path '${
-              packageMetadata.atomTestRunner
-            }'`
-          );
-          process.exit(1);
-        }
+    const packageMetadata = require(path.join(packageRoot, 'package.json'));
+    let atomTestRunner = packageMetadata.atomTestRunner;
+
+    if (!atomTestRunner) {
+      process.stdout.write('atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.\n');
+      atomTestRunner = 'runners/jasmine1-test-runner';
+    }
+
+    process.stdout.write(`Using test runner: ${atomTestRunner}\n`)
+
+    let testRunnerPath;
+    Resolve ||= require('resolve');
+
+    // First try to run with local runners (e.g: `./test/runner.js`) or
+    // packages (e.g.: `atom-mocha-test-runner`)
+    try {
+      testRunnerPath = Resolve.sync(atomTestRunner, {
+        basedir: packageRoot,
+        extensions: Object.keys(require.extensions)
+      });
+
+      if (testRunnerPath) {
+        return testRunnerPath;
       }
+    } catch (err) {
+      // Nothing to do, try the next strategy
     }
 
-    return this.resolveLegacyTestRunnerPath();
+    // Then try to use one of the runners defined in Pulsar
+    try {
+      testRunnerPath = Resolve.sync(`./spec/${atomTestRunner}`, {
+        basedir: this.devResourcePath,
+        extensions: Object.keys(require.extensions)
+      });
+
+      if (testRunnerPath) {
+        return testRunnerPath;
+      }
+    } catch (err) {
+      // Nothing to do, try the next strategy
+    }
+
+    process.stderr.write(
+      `Error: Could not resolve test runner path '${
+        packageMetadata.atomTestRunner
+      }'`
+    );
+    process.exit(1);
   }
 
   resolveLegacyTestRunnerPath() {
@@ -1820,7 +1895,10 @@ module.exports = class AtomApplication extends EventEmitter {
     const normalizedPath = path.normalize(
       path.resolve(executedFrom, fs.normalize(result.pathToOpen))
     );
-    if (!url.parse(pathToOpen).protocol) {
+
+    if (!url.parse(result.pathToOpen).protocol) {
+      // If this isn't a URL, it's a file path. File paths need to be resolved
+      // and normalized, whereas we assume URLs are already unambiguous.
       result.pathToOpen = normalizedPath;
     }
 

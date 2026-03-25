@@ -1,3 +1,6 @@
+const electronRemote = require('@electron/remote/main')
+electronRemote.initialize()
+
 const {
   BrowserWindow,
   app,
@@ -57,14 +60,11 @@ module.exports = class AtomWindow extends EventEmitter {
         // Disable the `auxclick` feature so that `click` events are triggered in
         // response to a middle-click.
         // (Ref: https://github.com/atom/atom/pull/12696#issuecomment-290496960)
-        disableBlinkFeatures: 'Auxclick',
+        disableBlinkFeatures: 'Auxclick,ObservableAPI',
         nodeIntegration: true,
         contextIsolation: false,
-        enableRemoteModule: true,
         webviewTag: true,
 
-        // TodoElectronIssue: remote module is deprecated https://www.electronjs.org/docs/breaking-changes#default-changed-enableremotemodule-defaults-to-false
-        enableRemoteModule: true,
         // node support in threads
         nodeIntegrationInWorker: true
       },
@@ -80,9 +80,20 @@ module.exports = class AtomWindow extends EventEmitter {
       options.titleBarStyle = 'hiddenInset';
     if (this.shouldHideTitleBar()) options.frame = false;
 
+    // Enabling window transparency creates several downstream issues relating
+    // to management of window size and maximixed state.
+    //
+    // Hence this option was removed from the config schema because it's a
+    // footgun, but we've left it in for those users who really know what
+    // they're doing.
+    if (this.atomApplication.config.get('core.allowWindowTransparency')){
+      options.transparent = true;
+    }
+
     const BrowserWindowConstructor =
       settings.browserWindowConstructor || BrowserWindow;
     this.browserWindow = new BrowserWindowConstructor(options);
+    electronRemote.enable(this.browserWindow.webContents)
 
     Object.defineProperty(this.browserWindow, 'loadSettingsJSON', {
       get: () =>
@@ -339,6 +350,7 @@ module.exports = class AtomWindow extends EventEmitter {
       NODE_ENV,
       NODE_PATH,
       ATOM_HOME,
+      ATOM_CHANNEL,
       ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT
     } = env;
 
@@ -346,6 +358,7 @@ module.exports = class AtomWindow extends EventEmitter {
       NODE_ENV,
       NODE_PATH,
       ATOM_HOME,
+      ATOM_CHANNEL,
       ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT
     });
   }

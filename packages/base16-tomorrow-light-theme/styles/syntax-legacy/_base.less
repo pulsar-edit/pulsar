@@ -267,6 +267,12 @@
   &.syntax--raw {
     color: @green;
   }
+
+  // Horizontal rules in GFM used to be scoped as `comment.hr`. For continuity,
+  // we assign the color of a comment to this new scope.
+  &.syntax--horizontal-rule {
+    color: @gray;
+  }
 }
 
 .syntax--source.syntax--gfm {

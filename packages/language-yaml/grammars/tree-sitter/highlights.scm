@@ -33,7 +33,7 @@
 ; STRINGS
 ; =======
 
-((string_scalar) @string.quoted.yaml)
+((string_scalar) @string.unquoted.yaml)
 
 (single_quote_scalar) @string.quoted.single.yaml
 

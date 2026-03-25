@@ -1,4 +1,4 @@
-exports.activate = function() {
+exports.activate = function () {
   atom.grammars.addInjectionPoint('text.html.basic', {
     type: 'script_element',
     language() {
@@ -18,38 +18,6 @@ exports.activate = function() {
       return node.child(1);
     }
   });
-
-  const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
-  const HYPERLINK_PATTERN = /\bhttps?:/
-
-  atom.grammars.addInjectionPoint('text.html.basic', {
-    type: 'comment',
-    language: (node) => {
-      return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
-    },
-    content: (node) => node,
-    languageScope: null
-  });
-
-  atom.grammars.addInjectionPoint('text.html.basic', {
-    type: 'comment',
-    language: (node) => {
-      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
-    },
-    content: (node) => node,
-    languageScope: null
-  });
-
-  atom.grammars.addInjectionPoint('text.html.basic', {
-    type: 'attribute_value',
-    language: (node) => {
-      return HYPERLINK_PATTERN.test(node.text) ? 'hyperlink' : undefined;
-    },
-    content: (node) => node,
-    languageScope: null
-  });
-
-  // TODO: Inject hyperlink grammar into plain text?
 
   // EMBEDDED
 
@@ -94,4 +62,15 @@ exports.activate = function() {
       return node.descendantsOfType('content');
     }
   });
+};
+
+exports.consumeHyperlinkInjection = (hyperlink) => {
+  // TODO: Inject hyperlink grammar into plain text?
+  hyperlink.addInjectionPoint('text.html.basic', {
+    types: ['comment', 'attribute_value']
+  });
+};
+
+exports.consumeTodoInjection = (todo) => {
+  todo.addInjectionPoint('text.html.basic', { types: ['comment'] });
 };

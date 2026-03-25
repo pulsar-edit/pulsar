@@ -11,7 +11,7 @@ The following is a set of guidelines for contributing to Pulsar and its packages
 [I don't want to read this whole thing, I just have a question!!!](#i-dont-want-to-read-this-whole-thing-i-just-have-a-question)
 
 [What should I know before I get started?](#what-should-i-know-before-i-get-started)
-  * [Pulsar and Packages](#atom-and-packages)
+  * [Pulsar and Packages](#pulsar-and-packages)
   * [Pulsar Design Decisions](#design-decisions)
 
 [How Can I Contribute?](#how-can-i-contribute)

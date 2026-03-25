@@ -1,4 +1,5 @@
-const { ipcRenderer, remote, shell } = require('electron');
+const { ipcRenderer, shell } = require('electron');
+const remote = require('@electron/remote');
 const ipcHelpers = require('./ipc-helpers');
 const { Emitter, Disposable } = require('event-kit');
 const getWindowLoadSettings = require('./get-window-load-settings');
@@ -27,9 +28,13 @@ module.exports = class ApplicationDelegate {
     return ipcRenderer.send('open', params);
   }
 
+  setWindowTheme(params) {
+    return ipcRenderer.send('setWindowTheme', params);
+  }
+
   pickFolder(callback) {
     const responseChannel = 'atom-pick-folder-response';
-    ipcRenderer.on(responseChannel, function(event, path) {
+    ipcRenderer.on(responseChannel, function (event, path) {
       ipcRenderer.removeAllListeners(responseChannel);
       return callback(path);
     });

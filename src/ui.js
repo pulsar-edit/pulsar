@@ -117,6 +117,20 @@ function renderMarkdown(content, givenOpts = {}) {
 
   let md = new MarkdownIt(markdownItOpts);
 
+  // Support more image/link formats by default
+  const defaultValidateLink = md.validateLink;
+  md.validateLink = (url) => {
+    if (defaultValidateLink(url)) {
+      return true;
+    }
+
+    if (/^data:image\/svg\+xml;/.test(url)) {
+      return true;
+    }
+
+    return false;
+  };
+
   if (opts.useDefaultEmoji) {
     mdComponents.deps.markdownItEmoji ??= require("markdown-it-emoji");
     md.use(mdComponents.deps.markdownItEmoji, {});
@@ -249,8 +263,8 @@ function renderMarkdown(content, givenOpts = {}) {
 
   // Here we can add some simple additions that make code highlighting possible later on,
   // but doesn't actually preform any code highlighting.
-  md.options.highlight = function(str, lang) {
-    return `<pre><code class="language-${lang}">${str}</code></pre>`;
+  md.options.highlight = function (str, lang) {
+    return `<pre><code class="language-${lang}">${md.utils.escapeHtml(str)}</code></pre>`;
   };
 
   // Process disables
@@ -292,8 +306,8 @@ function renderMarkdown(content, givenOpts = {}) {
         if (match) {
           // We define breakline as a custom Token Type
           let token = state.push("html_inline", "breakline", 0);
-          token.content = "<br/>";
-          state.pos += "<br/>".length;
+          token.content = "<br>";
+          state.pos += match[0].length;
           return true;
         }
       }

@@ -2,6 +2,8 @@
 'fileTypes': [
   'boot'
   'clj'
+  'clje'
+  'cljr'
   'clj.hl'
   'cljc'
   'cljs'
@@ -9,7 +11,6 @@
   'cljx'
   'clojure'
   'edn'
-  'org'
   'joke'
   'joker'
 ]

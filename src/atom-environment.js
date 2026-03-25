@@ -43,13 +43,15 @@ const PaneAxis = require('./pane-axis');
 const Pane = require('./pane');
 const Dock = require('./dock');
 const TextEditor = require('./text-editor');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
 const { getReleaseChannel } = require('./get-app-details.js');
 const UI = require('./ui.js');
+const I18n = require("./i18n.js");
 const packagejson = require("../package.json");
 
+const { closeAllWatchers } = require('@pulsar-edit/pathwatcher');
 const stat = util.promisify(fs.stat);
 
 let nextId = 0;
@@ -88,8 +90,6 @@ class AtomEnvironment {
     /** @type {NotificationManager} */
     this.notifications = new NotificationManager();
 
-    this.stateStore = new StateStore('AtomEnvironments', 1);
-
     /** @type {Config} */
     this.config = new Config({
       saveCallback: settings => {
@@ -108,6 +108,19 @@ class AtomEnvironment {
 
     /** @type {SignalManager} */
     this.signal = new SignalManager();
+
+    /** @type {StateStore} */
+    this.stateStore = new StateStore('AtomEnvironments', 1, {
+      config: this.config
+    });
+
+    /** @type {I18n} */
+    const localeLoadStartTime = performance.now();
+    this.i18n = new I18n({
+      config: this.config
+    });
+    this.i18n.preload();
+    this.localeLoadTime = Math.round(performance.now() - localeLoadStartTime);
 
     /** @type {KeymapManager} */
     this.keymaps = new KeymapManager({
@@ -149,17 +162,19 @@ class AtomEnvironment {
       config: this.config,
       styleManager: this.styles,
       notificationManager: this.notifications,
-      viewRegistry: this.views
+      viewRegistry: this.views,
+      applicationDelegate: this.applicationDelegate
     });
 
     /** @type {MenuManager} */
     this.menu = new MenuManager({
       keymapManager: this.keymaps,
-      packageManager: this.packages
+      packageManager: this.packages,
+      i18n: this.i18n
     });
 
     /** @type {ContextMenuManager} */
-    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps });
+    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps, i18n: this.i18n });
 
     this.packages.setMenuManager(this.menu);
     this.packages.setContextMenuManager(this.contextMenu);
@@ -247,6 +262,8 @@ class AtomEnvironment {
     // before opening a buffer.
     require('./text-editor-element');
 
+    this.isDestroying = false;
+
     this.window = params.window;
     this.document = params.document;
     this.blobStore = params.blobStore;
@@ -259,6 +276,10 @@ class AtomEnvironment {
       userSettings,
       projectSpecification
     } = this.getLoadSettings();
+
+    this.stateStore.initialize({
+      configDirPath: this.getConfigDirPath()
+    });
 
     ConfigSchema.projectHome = {
       type: 'string',
@@ -277,6 +298,10 @@ class AtomEnvironment {
     if (projectSpecification != null && projectSpecification.config != null) {
       this.project.replace(projectSpecification);
     }
+
+    this.i18n.initialize({
+      resourcePath: resourcePath
+    });
 
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });
@@ -326,7 +351,7 @@ class AtomEnvironment {
     this.attachSaveStateListeners();
     this.windowEventHandler.initialize(this.window, this.document);
 
-    this.workspace.initialize();
+    this.workspace.initialize({ configDirPath: this.getConfigDirPath() });
 
     const didChangeStyles = this.didChangeStyles.bind(this);
     this.disposables.add(this.styles.onDidAddStyleElement(didChangeStyles));
@@ -454,7 +479,7 @@ class AtomEnvironment {
     this.workspace.reset(this.packages);
     this.registerDefaultOpeners();
     this.project.reset(this.packages);
-    this.workspace.initialize();
+    this.workspace.initialize({ configDirPath: this.getConfigDirPath() });
     this.grammars.clear();
     this.textEditors.clear();
     this.views.clear();
@@ -463,6 +488,11 @@ class AtomEnvironment {
 
   destroy() {
     if (!this.project) return;
+
+    // Set this flag and then don't reset it after `destroy` is done, since we
+    // need other disposing objects to be able to check it. We won't need to
+    // reset it because another environment will be created.
+    this.isDestroying = true;
 
     this.disposables.dispose();
     if (this.workspace) this.workspace.destroy();
@@ -763,7 +793,11 @@ class AtomEnvironment {
 
   // Extended: Set the full screen state of the current window.
   setFullScreen(fullScreen = false) {
-    return this.applicationDelegate.setWindowFullScreen(fullScreen);
+    let result = this.applicationDelegate.setWindowFullScreen(fullScreen);
+    // On Linux, setting full screen (no matter the value) hides the menu bar.
+    // Hence we must re-assert this setting.
+    this.setAutoHideMenuBar(this.config.get('core.autoHideMenuBar'));
+    return result;
   }
 
   // Extended: Toggle the full screen state of the current window.
@@ -1118,6 +1152,7 @@ class AtomEnvironment {
   }
 
   unloadEditorWindow() {
+    closeAllWatchers();
     if (!this.project) return;
 
     this.storeWindowBackground();
@@ -1359,7 +1394,7 @@ class AtomEnvironment {
     if (state && this.project.getPaths().length === 0) {
       this.attemptRestoreProjectStateForPaths(state, projectPaths);
     } else {
-      projectPaths.map(folder => this.project.addPath(folder));
+      this.project.addPaths(projectPaths);
     }
   }
 
@@ -1413,9 +1448,7 @@ class AtomEnvironment {
             });
             resolveDiscardStatePromise(Promise.resolve(null));
           } else if (response === 1) {
-            for (let selectedPath of projectPaths) {
-              this.project.addPath(selectedPath);
-            }
+            this.project.addPaths(projectPaths);
             resolveDiscardStatePromise(
               Promise.all(filesToOpen.map(file => this.workspace.open(file)))
             );
@@ -1695,9 +1728,7 @@ or use Pane::saveItemAs for programmatic saving.`);
         );
         restoredState = true;
       } else {
-        for (let folder of foldersToAddToProject) {
-          this.project.addPath(folder);
-        }
+        this.project.addPaths(foldersToAddToProject);
       }
     }
 
@@ -1743,7 +1774,30 @@ or use Pane::saveItemAs for programmatic saving.`);
           '` do not exist.';
       }
 
-      this.notifications.addWarning(message, { description });
+      let notification;
+
+      let removeMissingPaths = async () => {
+        this.applicationDelegate.setProjectRoots(this.project.getPaths());
+
+        if (notification) {
+          notification.dismiss();
+        }
+      };
+
+      let skipRemove = () => {
+        if (notification) {
+          notification.dismiss();
+        }
+      }
+
+      notification = this.notifications.addWarning(message, {
+        description,
+        dismissable: true,
+        buttons: [
+          { text: 'Remove all', onDidClick: removeMissingPaths },
+          { text: 'Skip for now', onDidClick: skipRemove }
+        ]
+      });
     }
 
     ipcRenderer.send('window-command', 'window:locations-opened');

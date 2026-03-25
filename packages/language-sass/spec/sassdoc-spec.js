@@ -1,15 +1,19 @@
 
-describe('SassDoc grammar', function() {
+describe('SassDoc grammar', function () {
   let grammar = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
+    // There isn't a Tree-sitter grammar for SassDoc that I'm aware of. Users
+    // who expect thorough highlighting of SassDoc can add a scope-specific
+    // override to prefer the TextMate-style SCSS grammar.
+    atom.config.set('core.useTreeSitterParsers', false)
     waitsForPromise(() => atom.packages.activatePackage('language-sass'));
 
     runs(() => grammar = atom.grammars.grammarForScopeName('source.css.scss'));
   });
 
-  describe('block tags', function() {
-    it('tokenises simple tags', function() {
+  describe('block tags', function () {
+    it('tokenises simple tags', function () {
       const {tokens} = grammar.tokenizeLine('/// @deprecated');
       expect(tokens[0]).toEqual({value: '///', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'punctuation.definition.comment.scss']});
       expect(tokens[1]).toEqual({value: ' ', scopes: ['source.css.scss', 'comment.block.documentation.scss']});
@@ -17,7 +21,7 @@ describe('SassDoc grammar', function() {
       expect(tokens[3]).toEqual({value: 'deprecated', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'storage.type.class.sassdoc']});
   });
 
-    it('tokenises @param tags with a description', function() {
+    it('tokenises @param tags with a description', function () {
       const {tokens} = grammar.tokenizeLine('/// @param {type} $name - Description');
       expect(tokens[0]).toEqual({value: '///', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'punctuation.definition.comment.scss']});
       expect(tokens[2]).toEqual({value: '@', scopes: ['source.css.scss', 'comment.block.documentation.scss', 'storage.type.class.sassdoc', 'punctuation.definition.block.tag.sassdoc']});
@@ -30,7 +34,7 @@ describe('SassDoc grammar', function() {
   });
 });
 
-  describe('highlighted examples', () => it('highlights SCSS after an @example tag', function() {
+  describe('highlighted examples', () => it('highlights SCSS after an @example tag', function () {
     const lines = grammar.tokenizeLines(`\
 ///
 /// @example scss - Description

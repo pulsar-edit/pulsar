@@ -66,6 +66,12 @@ module.exports = function parseCommandLine(processArgs) {
       'Create a profile of the startup execution time.'
     );
   options
+    .boolean('crashdump')
+    .describe(
+      'crashdump',
+      'Generate a crashdump in ~/.pulsar/crashdumps in the event of a crash.'
+    );
+  options
     .alias('r', 'resource-path')
     .string('r')
     .describe(
@@ -148,14 +154,17 @@ module.exports = function parseCommandLine(processArgs) {
   if (args['package']) {
     const PackageManager = require('../package-manager');
     const cp = require('child_process');
-    const ppmPath = PackageManager.possibleApmPaths();
+    const ppmPath = PackageManager.possibleApmPaths(version);
 
     let ppmArgs = [...processArgs]
-    while(true) {
-      const arg = ppmArgs.shift()
-      if(arg === '-p' || arg === '--package' || ppmArgs.length === 0) break;
+    while (true) {
+      // Silently discard all arguments up to (and including) `--package`/`-p`.
+      const arg = ppmArgs.shift();
+      if (arg === '-p' || arg === '--package' || ppmArgs.length === 0) {
+        break;
+      }
     }
-    const exitCode = cp.spawnSync(ppmPath, ppmArgs, {stdio: 'inherit'}).status;
+    const exitCode = cp.spawnSync(ppmPath, ppmArgs, { stdio: 'inherit' }).status;
     process.exit(exitCode);
     return;
   }
@@ -183,6 +192,7 @@ module.exports = function parseCommandLine(processArgs) {
   const mainProcess = args['main-process'];
   const timeout = args['timeout'];
   const newWindow = args['new-window'];
+  const useCrashReporter = args['crashdump'];
   let executedFrom = null;
   if (args['executed-from'] && args['executed-from'].toString()) {
     executedFrom = args['executed-from'].toString();
@@ -253,6 +263,7 @@ module.exports = function parseCommandLine(processArgs) {
     clearWindowState,
     addToLastWindow,
     mainProcess,
+    useCrashReporter,
     benchmark,
     benchmarkTest,
     env: process.env

@@ -27,28 +27,66 @@ const PatternCache = {
   },
 };
 
+
+// Assign a default icon type for each tag — or what LSP calls “kind.” This
+// list is copied directly from the LSP spec's exhaustive list of potential
+// symbol kinds:
+//
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#symbolKind
 function iconForTag(tag) {
   switch (tag) {
-    case 'function':
-      return 'icon-gear';
-    case 'method':
-      return 'icon-gear';
-    case 'namespace':
-      return 'icon-tag';
-    case 'variable':
-      return 'icon-code';
-    case 'class':
-      return 'icon-package';
-    case 'constant':
-      return 'icon-primitive-square';
-    case 'property':
-      return 'icon-primitive-dot';
-    case 'interface':
-      return 'icon-key';
-    case 'constructor':
-      return 'icon-tools';
+    case 'file':
+      return 'icon-file';
     case 'module':
       return 'icon-database';
+    case 'namespace':
+      return 'icon-tag';
+    case 'package':
+      return 'icon-package';
+    case 'class':
+      return 'icon-puzzle';
+    case 'method':
+      return 'icon-gear';
+    case 'property':
+      return 'icon-primitive-dot';
+    case 'field':
+      return 'icon-primitive-dot';
+    case 'constructor':
+      return 'icon-tools';
+    case 'enum':
+      return 'icon-list-unordered';
+    case 'interface':
+      return 'icon-key';
+    case 'function':
+      return 'icon-gear';
+    case 'variable':
+      return 'icon-code';
+    case 'constant':
+      return 'icon-primitive-square';
+    case 'string':
+      return 'icon-quote';
+    case 'number':
+      return 'icon-plus';
+    case 'boolean':
+      return 'icon-question';
+    case 'array':
+      return 'icon-list-ordered';
+    case 'object':
+      return 'icon-file-code';
+    case 'key':
+      return 'icon-key';
+    case 'null':
+      return null;
+    case 'enum-member':
+      return 'icon-primitive-dot';
+    case 'struct':
+      return 'icon-book';
+    case 'event':
+      return 'icon-calendar';
+    case 'operator':
+      return 'icon-plus';
+    case 'type-parameter':
+      return null;
     default:
       return null;
   }
@@ -66,9 +104,10 @@ class Container {
     this.capture = capture;
     this.node = capture.node;
     this.organizer = organizer;
+    this.props = capture.setProperties || {};
 
     this.tag = capture.name.substring(capture.name.indexOf('.') + 1);
-    this.icon = iconForTag(this.tag);
+    this.icon = this.resolveIcon();
     this.position = capture.node.range.start;
   }
 
@@ -108,6 +147,13 @@ class Container {
     );
   }
 
+  resolveIcon() {
+    let icon = this.props['symbol.icon'] ?? iconForTag(this.tag);
+    if (icon && !icon.startsWith('icon-'))
+      icon = `icon-${icon}`;
+    return icon;
+  }
+
   toSymbol() {
     if (!this.nameCapture) return null;
     let nameSymbol = this.nameCapture.toSymbol();
@@ -115,7 +161,7 @@ class Container {
       name: nameSymbol.name,
       shortName: nameSymbol.shortName,
       tag: nameSymbol.tag ?? this.tag,
-      icon: nameSymbol.icon ?? iconForTag(nameSymbol.tag) ?? iconForTag(this.tag),
+      icon: nameSymbol.icon ?? this.icon,
       position: this.position
     };
 
@@ -246,11 +292,11 @@ class Name {
   }
 
   toSymbol() {
-    let { name, shortName, position, context, tag } = this;
-    let symbol = { name, shortName, position };
+    let { name, shortName, position, context, tag, icon } = this;
+    let symbol = { name, shortName, position, icon };
     if (tag) {
       symbol.tag = tag;
-      symbol.icon = iconForTag(tag);
+      symbol.icon ??= iconForTag(tag);
     }
     if (context) symbol.context = context;
 

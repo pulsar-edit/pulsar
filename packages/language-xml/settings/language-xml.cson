@@ -2,6 +2,8 @@
   'editor':
     'commentStart': '<!-- '
     'commentEnd': ' -->'
+    'commentDelimiters':
+      'block': ['<!--', '-->']
     'foldEndPattern': '^\\s*(</[^>]+>|[/%]>|-->)\\s*$'
     'increaseIndentPattern': '^\\s*<(([^!/?]|%)(?!.+?([/%]>|</.+?>))|[%!]--\\s*$)'
     'decreaseIndentPattern': '^\\s*(</[^>]+>|-->|--%>)'

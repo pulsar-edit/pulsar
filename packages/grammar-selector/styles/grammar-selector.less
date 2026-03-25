@@ -1,5 +1,13 @@
 @import "ui-variables";
 
+.grammar-item {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
 .grammar-status a,
 .grammar-status a:hover {
   color: @text-color;

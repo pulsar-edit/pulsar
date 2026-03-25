@@ -8,6 +8,13 @@
     }
   }
 
+  // Color JSON keys differently from other strings.
+  .syntax--meta.syntax--structure.syntax--key {
+    .syntax--string.syntax--quoted.syntax--double {
+      color: @red;
+    }
+  }
+
   .syntax--meta.syntax--structure.syntax--dictionary.syntax--json, .syntax--meta.syntax--structure.syntax--array.syntax--json {
     & > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json,
     & > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json > .syntax--punctuation {

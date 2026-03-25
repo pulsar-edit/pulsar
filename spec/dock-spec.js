@@ -37,7 +37,7 @@ describe('Dock', () => {
 
       dock.activate();
       expect(document.activeElement).toBe(dock.getActivePane().getElement());
-      expect(didChangeVisibleSpy.mostRecentCall.args[0]).toBe(true);
+      expect(didChangeVisibleSpy.calls.mostRecent().args[0]).toBe(true);
 
       dock.hide();
       expect(document.activeElement).toBe(
@@ -46,11 +46,11 @@ describe('Dock', () => {
           .getActivePane()
           .getElement()
       );
-      expect(didChangeVisibleSpy.mostRecentCall.args[0]).toBe(false);
+      expect(didChangeVisibleSpy.calls.mostRecent().args[0]).toBe(false);
 
       dock.activate();
       expect(document.activeElement).toBe(dock.getActivePane().getElement());
-      expect(didChangeVisibleSpy.mostRecentCall.args[0]).toBe(true);
+      expect(didChangeVisibleSpy.calls.mostRecent().args[0]).toBe(true);
 
       dock.toggle();
       expect(document.activeElement).toBe(
@@ -59,7 +59,7 @@ describe('Dock', () => {
           .getActivePane()
           .getElement()
       );
-      expect(didChangeVisibleSpy.mostRecentCall.args[0]).toBe(false);
+      expect(didChangeVisibleSpy.calls.mostRecent().args[0]).toBe(false);
 
       // Don't change focus if the dock was not focused in the first place
       const modalElement = document.createElement('div');
@@ -70,11 +70,11 @@ describe('Dock', () => {
 
       dock.show();
       expect(document.activeElement).toBe(modalElement);
-      expect(didChangeVisibleSpy.mostRecentCall.args[0]).toBe(true);
+      expect(didChangeVisibleSpy.calls.mostRecent().args[0]).toBe(true);
 
       dock.hide();
       expect(document.activeElement).toBe(modalElement);
-      expect(didChangeVisibleSpy.mostRecentCall.args[0]).toBe(false);
+      expect(didChangeVisibleSpy.calls.mostRecent().args[0]).toBe(false);
     });
   });
 
@@ -422,7 +422,7 @@ describe('Dock', () => {
       spyOn(Grim, 'deprecate');
 
       atom.workspace.getLeftDock().getActiveTextEditor();
-      expect(Grim.deprecate.callCount).toBe(1);
+      expect(Grim.deprecate.calls.count()).toBe(1);
     });
   });
 });

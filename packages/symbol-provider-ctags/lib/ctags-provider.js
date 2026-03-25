@@ -62,11 +62,11 @@ class CtagsProvider {
     const {resourcePath} = atom.getLoadSettings();
     const currentFileWasRequiredFromSnapshot = !fs.isAbsolute(__dirname);
     const packageRoot = currentFileWasRequiredFromSnapshot
-      ? path.join(resourcePath, 'node_modules', 'symbols-view')
+      ? path.join(resourcePath, 'node_modules', 'symbol-provider-ctags')
       : path.resolve(__dirname, '..');
 
     if (path.extname(resourcePath) === '.asar' && packageRoot.indexOf(resourcePath) === 0) {
-      return path.join(`${resourcePath}.unpacked`, 'node_modules', 'symbols-view');
+      return path.join(`${resourcePath}.unpacked`, 'node_modules', 'symbol-provider-ctags');
     } else {
       return packageRoot;
     }

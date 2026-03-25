@@ -2,6 +2,11 @@ const os = require('os');
 const path = require('path');
 const updatePackageDependencies = require('../lib/update-package-dependencies');
 
+let baseExecutableName = 'ppm';
+if (process.env.ATOM_BASE_NAME === 'pulsar-next') {
+  baseExecutableName = 'ppm-next';
+}
+
 describe('Update Package Dependencies', () => {
   let projectPath = null;
 
@@ -30,9 +35,9 @@ describe('Update Package Dependencies', () => {
 
       expect(updatePackageDependencies.runBufferedProcess).toHaveBeenCalled();
       if (process.platform !== 'win32') {
-        expect(command.endsWith('/apm')).toBe(true);
+        expect(command.endsWith(`/${baseExecutableName}`)).toBe(true);
       } else {
-        expect(command.endsWith('\\apm.cmd')).toBe(true);
+        expect(command.endsWith(`\\${baseExecutableName}.cmd`)).toBe(true);
       }
       expect(args).toEqual(['install', '--no-color']);
       expect(options.cwd).toEqual(projectPath);

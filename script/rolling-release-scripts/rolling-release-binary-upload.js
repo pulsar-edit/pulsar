@@ -9,8 +9,9 @@ const packageJson = require("../../package.json");
 // Since cirrus always triggers this script, we must check if the version is a rolling
 // release version
 const verSegments = packageJson.version.split(".");
+const lastVerSegment = verSegments[verSegments.length - 1];
 
-if (verSegments[verSegments.length - 1].length < 4) {
+if (lastVerSegment.length < 4 || lastVerSegment.includes('-dev')) {
   console.log(`According to our version: ${packageJson.version} this is not a rolling release...`);
   console.log("Exiting without changes...");
   process.exit(0);

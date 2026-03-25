@@ -1,6 +1,6 @@
 const NullGrammar = require('../src/null-grammar');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const { Point } = TextBuffer;
 const _ = require('underscore-plus');
 const dedent = require('dedent');
@@ -456,7 +456,7 @@ describe('TextMateLanguageMode', () => {
         const tokenizedHandler = jasmine.createSpy('tokenized handler');
         editor.languageMode.onDidTokenize(tokenizedHandler);
         fullyTokenize(editor.getBuffer().getLanguageMode());
-        expect(tokenizedHandler.callCount).toBe(1);
+        expect(tokenizedHandler.calls.count()).toBe(1);
       });
 
       it("doesn't re-emit the `tokenized` event when it is re-tokenized", async () => {
@@ -471,7 +471,7 @@ describe('TextMateLanguageMode', () => {
       });
     });
 
-    describe('when the grammar is updated because a grammar it includes is activated', async () => {
+    describe('when the grammar is updated because a grammar it includes is activated', () => {
       it('re-emits the `tokenized` event', async () => {
         let tokenizationCount = 0;
 
@@ -520,7 +520,7 @@ describe('TextMateLanguageMode', () => {
 
     describe('when the buffer is configured with the null grammar', () => {
       it('does not actually tokenize using the grammar', () => {
-        spyOn(NullGrammar, 'tokenizeLine').andCallThrough();
+        spyOn(NullGrammar, 'tokenizeLine').and.callThrough();
         buffer = atom.project.bufferForPathSync(
           'sample.will-use-the-null-grammar'
         );
@@ -532,14 +532,14 @@ describe('TextMateLanguageMode', () => {
         expect(languageMode.tokenizedLines[0]).toBeUndefined();
         expect(languageMode.tokenizedLines[1]).toBeUndefined();
         expect(languageMode.tokenizedLines[2]).toBeUndefined();
-        expect(tokenizeCallback.callCount).toBe(0);
+        expect(tokenizeCallback.calls.count()).toBe(0);
         expect(NullGrammar.tokenizeLine).not.toHaveBeenCalled();
 
         fullyTokenize(languageMode);
         expect(languageMode.tokenizedLines[0]).toBeUndefined();
         expect(languageMode.tokenizedLines[1]).toBeUndefined();
         expect(languageMode.tokenizedLines[2]).toBeUndefined();
-        expect(tokenizeCallback.callCount).toBe(0);
+        expect(tokenizeCallback.calls.count()).toBe(0);
         expect(NullGrammar.tokenizeLine).not.toHaveBeenCalled();
       });
     });
@@ -889,8 +889,8 @@ describe('TextMateLanguageMode', () => {
       ).toEqual(['syntax--yellow syntax--broken']);
     });
 
-    describe('TextMateHighlightIterator.seek(position)', function() {
-      it('seeks to the leftmost tag boundary greater than or equal to the given position and returns the containing tags', function() {
+    describe('TextMateHighlightIterator.seek(position)', function () {
+      it('seeks to the leftmost tag boundary greater than or equal to the given position and returns the containing tags', function () {
         const languageMode = {
           tokenizedLineForRow(row) {
             if (row === 0) {
@@ -963,7 +963,7 @@ describe('TextMateLanguageMode', () => {
       });
     });
 
-    describe('TextMateHighlightIterator.moveToSuccessor()', function() {
+    describe('TextMateHighlightIterator.moveToSuccessor()', function () {
       it('reports two boundaries at the same position when tags close, open, then close again without a non-negative integer separating them (regression)', () => {
         const languageMode = {
           tokenizedLineForRow() {

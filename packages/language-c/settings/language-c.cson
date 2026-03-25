@@ -1,6 +1,11 @@
 '.source.c, .source.cpp, .source.objc, .source.objcpp':
   'editor':
     'commentStart': '// '
+    # Technically, line comments aren't universally valid in C, but all modern
+    # C compilers support them.
+    'commentDelimiters':
+      'block': ['/*', '*/']
+      'line': '//'
     'increaseIndentPattern': '(?x)
        ^ .* \\{ [^}"\']* $
       |^ .* \\( [^\\)"\']* $

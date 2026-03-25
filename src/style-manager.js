@@ -144,50 +144,54 @@ module.exports = class StyleManager {
       }
     }
 
-    if (params.skipDeprecatedSelectorsTransformation) {
-      styleElement.textContent = source;
-    } else {
-      const transformed = this.upgradeDeprecatedSelectorsForStyleSheet(
-        source,
-        params.context
+    let textContent = source
+    let deprecationMessages = [];
+
+    if (!params.skipDeprecatedSelectorsTransformation) {
+      const transformed = this.upgradeStyleSheet(
+        textContent,
+        params.context,
+        transformDeprecatedShadowDOMSelectors
       );
-      styleElement.textContent = transformed.source;
-      if (transformed.deprecationMessage) {
-        this.deprecationsBySourcePath[params.sourcePath] = {
-          message: transformed.deprecationMessage
-        };
-        this.emitter.emit('did-update-deprecations');
-      }
+
+      textContent = transformed.source;
+      deprecationMessages.push(transformed.deprecationMessage);
     }
 
     if (!params.skipDeprecatedMathUsageTransformation) {
-      const transformed = this.upgradeDeprecatedMathUsageForStyleSheet(
-        styleElement.textContent,
-        params.context
+      const transformed = this.upgradeStyleSheet(
+        textContent,
+        params.context,
+        transformDeprecatedMathUsage
       );
-      styleElement.textContent = transformed.source;
-      if (transformed.deprecationMessage) {
-        // Now we may already have a deprecation message from upgrading deprecated
-        // selectors, so we want to check if the message already exists for this
-        // source path, and add to it, otherwise we can create a new one
-        if (typeof this.deprecationsBySourcePath[params.sourcePath]?.message === "string") {
-          this.deprecationsBySourcePath[params.sourcePath].message += `\n${transformed.deprecationMessage}`;
-          this.emitter.emit('did-update-deprecations');
-        } else {
-          // lets create a new deprecation
-          this.deprecationsBySourcePath[params.sourcePath] = {
-            message: transformed.deprecationMessage
-          };
-          this.emitter.emit('did-update-deprecations');
-        }
-      }
+
+      textContent = transformed.source;
+      deprecationMessages.push(transformed.deprecationMessage);
+    }
+
+    // Once done with any and all transformations we can apply our new textContent
+    styleElement.textContent = textContent;
+
+    // Reduce the deprecation messages array to remove any null, undefined, or empty text values
+    // Anything not 'truthy'
+    deprecationMessages = deprecationMessages.filter((ele) => ele);
+
+    if (deprecationMessages.length > 0) {
+      // we do in fact have deprecations
+      let deprecationMsg = deprecationMessages.join("\n");
+
+      this.deprecationsBySourcePath[params.sourcePath] = {
+        message: deprecationMsg
+      };
+      this.emitter.emit("did-update-deprecations");
     }
 
     if (updated) {
-      this.emitter.emit('did-update-style-element', styleElement);
+      this.emitter.emit("did-update-style-element", styleElement);
     } else {
       this.addStyleElement(styleElement);
     }
+
     return new Disposable(() => {
       this.removeStyleElement(styleElement);
     });
@@ -226,46 +230,36 @@ module.exports = class StyleManager {
     }
   }
 
-  upgradeDeprecatedSelectorsForStyleSheet(styleSheet, context) {
-    if (this.cacheDirPath != null) {
-      const hash = crypto.createHash('sha1');
-      if (context != null) {
-        hash.update(context);
-      }
-      hash.update(styleSheet);
-      const cacheFilePath = path.join(this.cacheDirPath, hash.digest('hex'));
-      try {
-        return JSON.parse(fs.readFileSync(cacheFilePath));
-      } catch (e) {
-        const transformed = transformDeprecatedShadowDOMSelectors(
-          styleSheet,
-          context
-        );
-        fs.writeFileSync(cacheFilePath, JSON.stringify(transformed));
-        return transformed;
-      }
-    } else {
-      return transformDeprecatedShadowDOMSelectors(styleSheet, context);
-    }
-  }
+  // Wrapper function useful for applying any upgrades due to deprecations
+  upgradeStyleSheet(styleSheet, context, upgradeName) {
+    let cb;
 
-  upgradeDeprecatedMathUsageForStyleSheet(styleSheet, context) {
+    // Allows us to utilize a direct callback, or if calling from outside
+    // StyleManager we can define a string that works
+    if (upgradeName === "math") {
+      cb = transformDeprecatedMathUsage;
+    } else if (upgradeName === "selector") {
+      cb = transformDeprecatedShadowDOMSelectors;
+    } else if (typeof upgradeName === "function") {
+      cb = upgradeName;
+    }
+
     if (this.cacheDirPath != null) {
-      const hash = crypto.createHash('sha1');
+      const hash = crypto.createHash("sha1");
       if (context != null) {
         hash.update(context);
       }
       hash.update(styleSheet);
-      const cacheFilePath = path.join(this.cacheDirPath, hash.digest('hex'));
+      const cacheFilePath = path.join(this.cacheDirPath, hash.digest("hex"));
       try {
         return JSON.parse(fs.readFileSync(cacheFilePath));
       } catch(e) {
-        const transformed = transformDeprecatedMathUsage(styleSheet, context);
+        const transformed = cb(styleSheet, context);
         fs.writeFileSync(cacheFilePath, JSON.stringify(transformed));
         return transformed;
       }
     } else {
-      return transformDeprecatedMathUsage(styleSheet, context);
+      return cb(styleSheet, context);
     }
   }
 

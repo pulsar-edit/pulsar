@@ -37,13 +37,13 @@
 
 (call
   function: (identifier) @support.type.constructor.python
-  (#match? @support.type.constructor.python "^[A-Z][a-z_]+")
+  (#match? @support.type.constructor.python "^[A-Z][A-Za-z_]+")
   (#set! capture.final true))
 
 (call
   function: (attribute
     attribute: (identifier) @support.type.constructor.python)
-    (#match? @support.type.constructor.python "^[A-Z][a-z_]+")
+    (#match? @support.type.constructor.python "^[A-Z][A-Za-z_]+")
     (#set! capture.final true))
 
 (call
@@ -96,7 +96,7 @@
 ; Lambdas
 ; -------
 
-(lambda ":") @punctuation.definition.function.lambda.colon.python
+(lambda ":" @punctuation.definition.function.lambda.colon.python)
 
 
 ; Function calls
@@ -187,23 +187,26 @@
 ; similarly here. No need to account for the rawness of a string in the scope
 ; name unless someone requests that feature.
 
+((string) @string.quoted.triple.block.format.python
+  (#match? @string.quoted.triple.block.format.python "^[fFrR]+\"\"\"")
+  (#set! capture.final))
+
 ((string) @string.quoted.triple.block.python
   (#match? @string.quoted.triple.block.python "^[bBrRuU]*\"\"\""))
 
-((string) @string.quoted.triple.block.format.python
-  (#match? @string.quoted.triple.block.format.python "^[fFrR]*\"\"\""))
+((string) @string.quoted.double.single-line.format.python
+  (#match? @string.quoted.double.single-line.format.python "^[fFrR]+\"")
+  (#set! capture.final))
 
 ((string) @string.quoted.double.single-line.python
   (#match? @string.quoted.double.single-line.python "^[bBrRuU]*\"(?!\")"))
 
-((string) @string.quoted.double.single-line.format.python
-  (#match? @string.quoted.double.single-line.format.python "^[fFrR]*\""))
+((string) @string.quoted.single.single-line.format.python
+  (#match? @string.quoted.single.single-line.format.python "^[fFrR]+?\'")
+  (#set! capture.final))
 
 ((string) @string.quoted.single.single-line.python
   (#match? @string.quoted.single.single-line.python "^[bBrRuU]*\'"))
-
-((string) @string.quoted.single.single-line.format.python
-  (#match? @string.quoted.single.single-line.format.python "^[fFrR]*?\'"))
 
 (string_content (escape_sequence) @constant.character.escape.python)
 
@@ -219,7 +222,7 @@
   _ @punctuation.definition.string.end.python
   (#is? test.last true))
 
-(string prefix: _ @storage.type.string.python
+(string (string_start) @storage.type.string.python
   (#match? @storage.type.string.python "^[bBfFrRuU]+")
   (#set! adjust.endAfterFirstMatchOf "^[bBfFrRuU]+"))
 
@@ -255,6 +258,7 @@
 ] @keyword.control.statement._TYPE_.python
 
 [
+  "break"
   "continue"
   "for"
   "while"
@@ -269,6 +273,8 @@
   "finally"
   "try"
 ] @keyword.control.exception._TYPE_.python
+
+("except*" @keyword.control.exception.group-clause.python)
 
 [
   "global"
@@ -303,6 +309,14 @@
   (list_splat_pattern
     (identifier) @variable.parameter.function.python))
 
+(parameters
+  (dictionary_splat_pattern
+    (identifier) @variable.parameter.function.python))
+
+
+; The "foo" in `except TypeError as foo:`.
+(as_pattern_target
+  (identifier) @variable.other.exception.python)
 
 ; `self` and `cls` are just conventions, but they are _strong_ conventions.
 ((identifier) @variable.language.self.python
@@ -333,6 +347,10 @@
   (list_splat_pattern
     (identifier) @variable.parameter.function.lambda.python))
 
+(lambda_parameters
+  (dictionary_splat_pattern
+    (identifier) @variable.parameter.function.lambda.python))
+
 (assignment
   left: (identifier) @variable.other.assignment.python)
 
@@ -345,6 +363,9 @@
 ; =========
 
 (list_splat_pattern "*" @keyword.operator.splat.python
+  (#set! capture.final true))
+
+(dictionary_splat_pattern "**" @keyword.operator.splat.python
   (#set! capture.final true))
 
 "=" @keyword.operator.assignment.python
@@ -393,6 +414,9 @@
   "or"
 ] @keyword.operator.logical._TYPE_.python
 
+; The 'not' and 'in' are each scoped separately, each one being an anonymous
+; node incorrectly named "not in".
+"not in" @keyword.operator.logical.not-in.python
 "is not" @keyword.operator.logical.is-not.python
 
 (call
@@ -425,12 +449,19 @@
 
 (dictionary (pair ":" @puncutation.separator.key-value.python))
 
+(typed_parameter ":" @punctuation.separator.type-annotation.python)
+(typed_default_parameter ":" @punctuation.separator.type-annotation.python)
+
 (parameters
   "(" @punctuation.definition.parameters.begin.bracket.round.python
   ")" @punctuation.definition.parameters.end.bracket.round.python
   (#set! capture.final true))
 
 (parameters
+  "," @punctuation.separator.parameters.comma.python
+  (#set! capture.final true))
+
+(lambda_parameters
   "," @punctuation.separator.parameters.comma.python
   (#set! capture.final true))
 
@@ -462,3 +493,20 @@
 (dictionary
   "," @punctuation.separator.dictionary.comma.python
   (#set! capture.final true))
+
+; MISC
+; ====
+
+(parameters) @meta.function.parameters.python
+
+(
+  (argument_list) @meta.function-call.arguments.python
+  (#set! adjust.offsetStart 1)
+  (#set! adjust.offsetEnd -1)
+)
+
+(lambda) @meta.function.inline.python
+
+(
+  (lambda_parameters) @meta.function.inline.parameters.python
+)

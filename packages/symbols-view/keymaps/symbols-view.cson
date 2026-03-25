@@ -5,13 +5,13 @@
 
 '.platform-win32 atom-text-editor:not([mini])':
   'ctrl-r': 'symbols-view:toggle-file-symbols'
-  'ctrl-alt-down': 'symbols-view:go-to-declaration'
-  'ctrl-alt-up': 'symbols-view:return-from-declaration'
+  'ctrl-alt-shift-down': 'symbols-view:go-to-declaration'
+  'ctrl-alt-shift-up': 'symbols-view:return-from-declaration'
 
 '.platform-linux atom-text-editor:not([mini])':
   'ctrl-r': 'symbols-view:toggle-file-symbols'
-  'ctrl-alt-down': 'symbols-view:go-to-declaration'
-  'ctrl-alt-up': 'symbols-view:return-from-declaration'
+  'ctrl-alt-shift-down': 'symbols-view:go-to-declaration'
+  'ctrl-alt-shift-up': 'symbols-view:return-from-declaration'
 
 '.platform-darwin':
   'cmd-shift-r': 'symbols-view:toggle-project-symbols'

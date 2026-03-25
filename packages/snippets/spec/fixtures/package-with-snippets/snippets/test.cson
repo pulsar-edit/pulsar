@@ -1,0 +1,31 @@
+".test":
+  "Test Snippet":
+    prefix: "test"
+    body: "testing 123"
+  "Test Snippet With Description":
+    prefix: "testd"
+    body: "testing 456"
+    description: "a description"
+    descriptionMoreURL: "http://google.com"
+  "Test Snippet With A Label On The Left":
+    prefix: "testlabelleft"
+    body: "testing 456"
+    leftLabel: "a label"
+  "Test Snippet With HTML Labels":
+    prefix: "testhtmllabels"
+    body: "testing 456"
+    leftLabelHTML: "<span style=\"color:red\">Label</span>"
+    rightLabelHTML: "<span style=\"color:white\">Label</span>"
+
+".package-with-snippets-unique-scope":
+  "Test Snippet":
+    prefix: "test"
+    body: "testing 123"
+
+".source.js":
+  "Overrides a core package's snippet":
+    prefix: "log"
+    body: "from-a-community-package"
+  "Maps to a command":
+    body: 'lorem ipsum $0 dolor sit amet'
+    command: 'test-command-name'

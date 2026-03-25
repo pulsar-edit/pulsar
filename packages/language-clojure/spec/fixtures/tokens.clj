@@ -18,10 +18,41 @@
   ;  ^ !entity.name.function
   ;      ^ constant.numeric
 
+(deftest abc (+ a b))
+;  ^ keyword.control
+;        ^ entity.global
+
+(defmacro abc [a b])
+;  ^ keyword.control
+;         ^ entity.global
+
+(defonce a "A STRING")
+  ; <- keyword.control
+  ;      ^ entity.global
+
+(defaults a)
+;  ^ !keyword.control
+;         ^ !entity.global
+
+(s/defn foobar [a b])
+;  ^ keyword.control
+;       ^ entity.global
+
+(defprotocol FooBar
+  ;  ^ keyword.control
+  ;          ^ entity.global
+  (-eq [this other]))
+
+(defrecord Lol [a b])
+  ;  ^ keyword.control
+  ;        ^ entity.global
+
 (def a "A STRING")
   ; <- keyword.control
   ;  ^ entity.global
+  ;    ^ punctuation.definition.string.begin
   ;      ^ string.quoted.double
+  ;             ^ punctuation.definition.string.end
 
 #{'foo}
 ; <- punctuation.section.set.begin
@@ -72,12 +103,19 @@ error/
 ;               ^ meta.symbol
 ;               ^ !entity.name.function
 
-`(call param ~(call))
+`(call param param# ~(call something param#))
 ;  ^ meta.symbol
-;  ^ !entity.name.function
-;       ^ meta.symbol
-;       ^ !entity.name.function
-;               ^ entity.name.function
+;  ^ entity.name.function
+;       ^ meta.symbol.syntax-quoted
+;            ^ meta.symbol.generated
+;            ^ !meta.symbol.syntax-quoted
+;                     ^ entity.name.function
+;                          ^ !meta.syntax-quoted
+;                          ^ !meta.symbol.syntax-quoted
+;                                    ^ !meta.symbol.generated
+(call param param#)
+;       ^ !meta.symbol.syntax-quoted
+;            ^ !meta.symbol.generated
 
 ;; Comments
 ;   ^ comment.line.semicolon
@@ -109,3 +147,57 @@ error/
 (ns other.namespace
   (:use [foo.bar]))
 ;   ^ invalid.deprecated
+
+^{:some :meta} (def foo 10)
+;  ^ meta.metadata.clojure
+
+#_
+(+ '1 `(+ ba))
+;   ^ comment.block
+;   ^ !constant.numeric
+;      ^ !punctuation
+;       ^ comment.block
+;       ^ !constant.keyword
+
+;; Special forms (core language features)
+(do :foo)
+; ^ storage.control
+#_
+(do :foo)
+; ^ !storage.control
+(if true 10)
+; ^ keyword.control.conditional.if
+#_
+(if true 10)
+; ^ !keyword.control.conditional.if
+(when true 10)
+; ^ keyword.control.conditional.when
+#_
+(when true 10)
+; ^ !keyword.control.conditional.when
+(cond true 10)
+; ^ keyword.control.conditional.cond
+#_
+(cond true 10)
+; ^ !keyword.control.conditional.cond
+(condp true 10)
+; ^ keyword.control.conditional.cond
+#_
+(condp true 10)
+; ^ !keyword.control.conditional.cond
+(cond-> true 10)
+; ^ keyword.control.conditional.cond
+#_
+(cond-> true 10)
+; ^ !keyword.control.conditional.cond
+
+;; Specific stuff
+[js* "console.log('abc');", "'foo'"]
+; ^ !keyword.control.js.clojure
+;      ^ !support.class.builtin.console.js
+
+(js* "console.log('abc');", "'foo'")
+; ^ keyword.control.js.clojure
+;      ^ support.class.builtin.console.js
+;                   ^ string.quoted.single.js
+;                            ^ !string.quoted.single.js

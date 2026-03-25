@@ -1,0 +1,5 @@
+
+/* Ensure that a file that ends in a bare tag name scopes the tag name properly. */
+
+div
+/* <- entity.name.tag.css */

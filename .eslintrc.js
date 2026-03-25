@@ -14,11 +14,27 @@ module.exports = {
     ecmaVersion: "latest"
   },
   rules: {
+    // One leading and trailing space around each keyword.
+    "keyword-spacing": "error",
     "space-before-function-paren": ["error", {
       anonymous: "always",
       asyncArrow: "always",
       named: "never"
     }],
+    "no-constant-condition": "off",
+    "no-unused-vars": [
+      "warn",
+      {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_'
+      }
+    ],
+    "node/no-missing-require": [
+      "error",
+      {
+        allowModules: ["atom"]
+      }
+    ],
     "node/no-unpublished-require": [
       "error",
       {

@@ -3,7 +3,7 @@ const { Emitter } = require('event-kit');
 let idCounter = 0;
 const nextId = () => idCounter++;
 
-const normalizeDecorationProperties = function(decoration, decorationParams) {
+const normalizeDecorationProperties = function (decoration, decorationParams) {
   decorationParams.id = decoration.id;
 
   if (
@@ -117,7 +117,7 @@ module.exports = class Decoration {
   Section: Event Subscription
   */
 
-  // Essential: When the {Decoration} is updated via {Decoration::update}.
+  // Essential: When the {Decoration} is updated via {Decoration::setProperties}.
   //
   // * `callback` {Function}
   //   * `event` {Object}

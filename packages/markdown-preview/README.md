@@ -8,44 +8,43 @@ It is currently enabled for `.markdown`, `.md`, `.mdown`, `.mkd`, `.mkdown`, `.r
 
 ## Customize
 
-By default Markdown Preview uses the colors of the active syntax theme. Enable `Use GitHub.com style` in the __package settings__ to make it look closer to how markdown files get rendered on github.com.
+By default Markdown Preview uses the colors of the active syntax theme. Enable **Use GitHub.com Style** in the __package settings__ to make it look closer to how markdown files get rendered on github.com.
 
 ![markdown-preview GitHub style](https://cloud.githubusercontent.com/assets/378023/10013087/24ccc7ec-6149-11e5-97ea-53a842a715ea.png)
 
-To customize even further, the styling can be overridden in your `styles.less` file. For example:
+When **Use GitHub.com Style** is selected, you can further customize the theme of the Markdown preview with the **GitHub.com Style Mode** setting. Since the GitHub website has a light theme and a dark theme, `markdown-preview` allows you to choose which theme to use when previewing your files. By default, it will use whatever mode is preferred by your system, but you can opt into “Light” or “Dark” to force it to use a particular theme.
+
+No matter which theme you use, you can apply further customizations in your `styles.less` file. For example:
 
 ```css
-.markdown-preview.markdown-preview {
+.markdown-preview pre {
   background-color: #444;
 }
 ```
 
-## Syntax Highlighting Language Identifier
+## Language identifiers in fenced code blocks
 
-While a verbose specification of Markdown, mostly, ensures the content of Markdown will look the same everywhere it's shipped, the same isn't true of code block language identifiers.
+A detailed Markdown specification helps to ensure that Markdown is displayed consistently across multiple parsers. Sadly, the same isn’t true of code block language identifiers — the strings you use to tell the renderer what sort of code is inside a code block.
 
-A "code block language identifier" is the string you use to tell the Markdown renderer what code is inside a code block of your Markdown document.
+The CommonMark specification [explicitly avoids standardizing these identifiers](https://spec.commonmark.org/0.31.2/#info-string):
 
-Nearly every Markdown rendering system supports different strings to specify your language than each other. `Markdown-Preview` has implemented several valid Language Identifier systems to help ensure that your Markdown will look the same no matter where you publish it!
+> The first word of the info string is typically used to specify the language of the code sample, and rendered in the class attribute of the code tag. However, this spec does not mandate any particular treatment of the info string.
 
-In the settings, you can select from a list of different popular Language Identification systems that can then be used in your code blocks. This means that they will still be valid when shipping them to whatever platform of your choice.
+There are several valid ways to infer specific languages from language identifiers such as `js`, `less`, `coffee`,  and `c`. This package supports the following systems, configured via the **Syntax Highlighting Language Identifiers** setting:
 
-Currently, `Markdown-Preview` supports the following:
+  * [Linguist](https://github.com/github-linguist/linguist): Used by GitHub (previously the default and only language identification system).
+  * [Chroma](https://github.com/alecthomas/chroma): Used by CodeBerg/Gitea/Hugo/Goldmark.
+  * [Rouge](https://github.com/rouge-ruby/rouge): Used by GitLab/Jekyll.
+  * [HighlightJS](https://highlightjs.org/): Used in a number of places, but most relevantly on the [Pulsar Package Registry](https://web.pulsar-edit.dev/) website.
 
-  * Linguist: Used by GitHub (Previously the default and only language identification system)
-  * Chroma: Used by CodeBerg/Gitea/Hugo/Goldmark
-  * Rouge: Used by GitLab/Jekyll
-  * HighlightJS: Used by Markdown-IT/Pulsar Package Website
+If none of these systems meets your needs, you may specify custom language identifiers. This may not be as portable as the systems described above, but it will at least produce the desired outcome on your own system.
 
+The setting **Custom Syntax Highlighting Language Identifiers** lets you define a list of custom language identifiers that match up to languages available within your Pulsar installation.
 
-Of course, not all Markdown content is destined to be shared, `Markdown-Preview` even lets you specify custom Language Identifiers to be used within your Markdown code blocks.
-
-The setting `Custom Syntax Highlighting Language Identifiers` lets you define a list of custom language identifiers that match up to languages available within your Pulsar installation
-
-For example, if you wanted to highlight your code like JavaScript by just using `j` as your Code Block language Identifier and `p` to use Python Syntax Highlighting, you could add the following to this setting:
+For example, if you wanted to map `j` to JavaScript and `p` to Python, you’d add the following text to the **Custom Syntax Highlighting Language Identifiers** field:
 
 ```
 j: source.js, p: source.python
 ```
 
-And that's it, now anytime you use that language identifier it will be highlighted exactly the way you want. Of course your preference of language identification system will still be used, in addition to your custom list.
+Now `markdown-preview` will understand what to do with fenced code blocks that begin with <code>\`\`\`j</code> or <code>\`\`\`p</code>. These custom identifiers will work alongside whatever system you’ve chosen with **Syntax Highlighting Language Identifiers**, but will supersede that system in the event of conflict.

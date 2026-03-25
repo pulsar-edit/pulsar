@@ -32,7 +32,7 @@
 ; -----------
 
 ; Wrap the "foo" and "!" of `foo!()`.
-((macro_invocation) @support.other.function.rust
+((macro_invocation (identifier)) @support.other.function.rust
   (#set! adjust.endAt firstChild.nextSibling.endPosition))
 
 (call_expression
@@ -210,6 +210,8 @@
   "<<="
   ">>="
 ] @keyword.operator.assignment.compound.rust
+
+(reference_expression "&" @keyword.operator.reference.rust)
 
 (binary_expression
   ["&" "|" "^" ">>" "<<"] @keyword.operator.bitwise.rust)

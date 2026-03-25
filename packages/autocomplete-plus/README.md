@@ -14,7 +14,7 @@ Displays possible autocomplete suggestions on keystroke (or manually by typing `
 
 `autocomplete+` has a powerful autocomplete provider API, allowing provider authors to add language-specific behavior to this package.
 
-You should *definitely* install additional providers (the default provider bundled with this package is somewhat crude): https://github.com/atom/autocomplete-plus/wiki/Autocomplete-Providers
+You should *definitely* install additional providers (the default provider bundled with this package is somewhat crude): here’s [a list of all Pulsar packages (built-in or community) that provide `autocomplete.provider`](https://web.pulsar-edit.dev/packages?serviceType=provided&service=autocomplete.provider).
 
 ## Usage
 
@@ -77,7 +77,7 @@ Then add these to your keymap file:
 
 Great autocomplete depends on having great autocomplete providers. If there is not already a great provider for the language / grammar that you are working in, please consider creating a provider.
 
-[Read the `Provider API` documentation](https://github.com/atom/autocomplete-plus/wiki/Provider-API) to learn how to create a new autocomplete provider.
+[Read the `Provider API` documentation](./docs/provider-api.md) to learn how to create a new autocomplete provider.
 
 ## `SymbolProvider` Configuration
 

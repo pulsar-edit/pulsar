@@ -1,7 +1,9 @@
 let instance;
 const spellchecker = require('spellchecker');
-const pathspec = require('atom-pathspec');
+const pathspec = require('./pathspec');
 const env = require('./checker-env');
+
+let debug;
 
 // Initialize the global spell checker which can take some time. We also force
 // the use of the system or operating system library instead of Hunspell.
@@ -27,7 +29,7 @@ class SystemChecker {
             debug = require('debug');
             this.log = debug('spell-check:system-checker');
         } else {
-            this.log = (str) => {};
+            this.log = (_) => {};
         }
         this.log('enabled', this.isEnabled(), this.getStatus());
     }

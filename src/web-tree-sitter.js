@@ -1,4 +1,3 @@
-
 // Any Tree-sitter parser can write an external C scanner, and that scanner can
 // use any functions in the C/C++ stdlib.
 //
@@ -37,11 +36,11 @@
 //
 const USE_CUSTOM_WEB_TREE_SITTER = true;
 
-let Parser;
+let bundle;
 if (USE_CUSTOM_WEB_TREE_SITTER) {
-  Parser = require('../vendor/web-tree-sitter/tree-sitter');
+  bundle = require('../vendor/web-tree-sitter/web-tree-sitter');
 } else {
-  Parser = require('web-tree-sitter');
+  bundle = require('web-tree-sitter');
 }
 
-module.exports = Parser;
+module.exports = bundle;

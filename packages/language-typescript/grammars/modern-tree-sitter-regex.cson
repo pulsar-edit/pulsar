@@ -1,0 +1,10 @@
+scopeName: 'source.ts.regexp'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-regex'
+
+injectionRegex: '^(ts-regex)$'
+
+treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-regex#2354482d7e2e8f8ff33c1ef6c8aa5690410fbc96'
+  grammar: 'tree-sitter-regex/tree-sitter-regex.wasm'
+  highlightsQuery: 'tree-sitter-regex/highlights.scm'

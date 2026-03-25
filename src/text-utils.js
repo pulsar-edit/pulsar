@@ -58,6 +58,10 @@ const isPairedCharacter = (string, index = 0) => {
   );
 };
 
+const RE_RTL_TEXT = /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/;
+
+const hasRtlText = text => RE_RTL_TEXT.test(text);
+
 const IsJapaneseKanaCharacter = charCode =>
   charCode >= 0x3000 && charCode <= 0x30ff;
 
@@ -134,6 +138,7 @@ const hasPairedCharacter = string => {
 module.exports = {
   isPairedCharacter,
   hasPairedCharacter,
+  hasRtlText,
   isDoubleWidthCharacter,
   isHalfWidthCharacter,
   isKoreanCharacter,

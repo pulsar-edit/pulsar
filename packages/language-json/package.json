@@ -1,5 +1,6 @@
 {
   "name": "language-json",
+  "main": "lib/main",
   "version": "1.0.5",
   "description": "JSON language support in Atom",
   "engines": {
@@ -8,7 +9,24 @@
   },
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "dependencies": {
-    "tree-sitter-json": "0.20.0"
+  "configSchema": {
+    "allowCommentsInJsonFiles": {
+      "type": "boolean",
+      "title": "Allow Comments in .json files",
+      "description": "When checked, will allow comments in `.json` files even though they’re not valid according to the official JSON specification. When unchecked, comments in `.json` files will be marked as invalid, and only files with the `.jsonc` extension will mark comments as valid and allowed. (It’s recommended to reload your window or restart Pulsar after changing this setting.)",
+      "default": false
+    }
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
   }
 }

@@ -4,6 +4,8 @@
     'increaseIndentPattern': '^.*\\{\\}?\\s*$'
     'decreaseIndentPattern': '^\\s*\\}'
     'commentStart': '# '
+    'commentDelimiters':
+      'line': '#'
     'nonWordCharacters': '/\\()"\':,.;<>~!#^&*|+=[]{}`?-'
 '.source.perl6':
   'editor':
@@ -11,4 +13,6 @@
     'increaseIndentPattern': '^.*\\{\\}?\\s*$'
     'decreaseIndentPattern': '^\\s*\\}'
     'commentStart': '# '
+    'commentDelimiters':
+      'line': '#'
     'nonWordCharacters': '/\\()"\':,.;<>~!#^&*|+=[]{}`?-'

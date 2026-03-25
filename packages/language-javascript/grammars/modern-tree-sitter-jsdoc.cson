@@ -1,0 +1,13 @@
+name: 'JSDoc'
+scopeName: 'source.jsdoc'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-jsdoc'
+
+injectionRegex: '^jsdoc$'
+
+treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-jsdoc#a5e363a98676136d9f5884cb558086e5f1fc32b6'
+  grammar: 'tree-sitter/jsdoc/tree-sitter-jsdoc.wasm'
+  highlightsQuery: 'tree-sitter/jsdoc/highlights.scm'
+  foldsQuery: 'tree-sitter/jsdoc/folds.scm'
+  indentsQuery: 'tree-sitter/jsdoc/indents.scm'

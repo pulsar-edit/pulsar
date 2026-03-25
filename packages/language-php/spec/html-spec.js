@@ -3,6 +3,7 @@ describe('PHP in HTML', () => {
   let grammar = null;
 
   beforeEach(() => {
+    atom.config.set('core.useTreeSitterParsers', false);
     waitsForPromise(() => atom.packages.activatePackage('language-php'));
 
     waitsForPromise(() => // While not used explicitly in any tests, we still activate language-html

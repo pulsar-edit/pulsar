@@ -1,141 +1,72 @@
 'use strict';
+const IndexedDB = require('./state-store/indexed-db');
+const SQL = require('./state-store/sql');
 
 module.exports = class StateStore {
-  constructor(databaseName, version) {
-    this.connected = false;
+  constructor(databaseName, version, { config }) {
     this.databaseName = databaseName;
     this.version = version;
+    this.config = config;
   }
 
-  get dbPromise() {
-    if (!this._dbPromise) {
-      this._dbPromise = new Promise(resolve => {
-        const dbOpenRequest = indexedDB.open(this.databaseName, this.version);
-        dbOpenRequest.onupgradeneeded = event => {
-          let db = event.target.result;
-          db.onerror = error => {
-            atom.notifications.addFatalError('Error loading database', {
-              stack: new Error('Error loading database').stack,
-              dismissable: true
-            });
-            console.error('Error loading database', error);
-          };
-          db.createObjectStore('states');
-        };
-        dbOpenRequest.onsuccess = () => {
-          this.connected = true;
-          resolve(dbOpenRequest.result);
-        };
-        dbOpenRequest.onerror = error => {
-          atom.notifications.addFatalError('Could not connect to indexedDB', {
-            stack: new Error('Could not connect to indexedDB').stack,
-            dismissable: true
-          });
-          console.error('Could not connect to indexedDB', error);
-          this.connected = false;
-          resolve(null);
-        };
-      });
-    }
-
-    return this._dbPromise;
+  initialize({ configDirPath }) {
+    this.configDirPath = configDirPath;
   }
 
   isConnected() {
-    return this.connected;
+    let impl = this._getImplementation();
+    return impl?.isConnected() ?? false;
   }
 
   connect() {
-    return this.dbPromise.then(db => !!db);
+    return this._getOrCreateImplementation().connect();
   }
 
   save(key, value) {
-    return new Promise((resolve, reject) => {
-      this.dbPromise.then(db => {
-        if (db == null) return resolve();
-
-        const request = db
-          .transaction(['states'], 'readwrite')
-          .objectStore('states')
-          .put({ value: value, storedAt: new Date().toString() }, key);
-
-        request.onsuccess = resolve;
-        request.onerror = reject;
-      });
-    });
+    return this._getOrCreateImplementation().save(key, value);
   }
 
   load(key) {
-    return this.dbPromise.then(db => {
-      if (!db) return;
-
-      return new Promise((resolve, reject) => {
-        const request = db
-          .transaction(['states'])
-          .objectStore('states')
-          .get(key);
-
-        request.onsuccess = event => {
-          let result = event.target.result;
-          if (result && !result.isJSON) {
-            resolve(result.value);
-          } else {
-            resolve(null);
-          }
-        };
-
-        request.onerror = event => reject(event);
-      });
-    });
+    return this._getOrCreateImplementation().load(key);
   }
 
   delete(key) {
-    return new Promise((resolve, reject) => {
-      this.dbPromise.then(db => {
-        if (db == null) return resolve();
-
-        const request = db
-          .transaction(['states'], 'readwrite')
-          .objectStore('states')
-          .delete(key);
-
-        request.onsuccess = resolve;
-        request.onerror = reject;
-      });
-    });
+    return this._getOrCreateImplementation().delete(key);
   }
 
   clear() {
-    return this.dbPromise.then(db => {
-      if (!db) return;
-
-      return new Promise((resolve, reject) => {
-        const request = db
-          .transaction(['states'], 'readwrite')
-          .objectStore('states')
-          .clear();
-
-        request.onsuccess = resolve;
-        request.onerror = reject;
-      });
-    });
+    return this._getOrCreateImplementation().clear();
   }
 
   count() {
-    return this.dbPromise.then(db => {
-      if (!db) return;
+    return this._getOrCreateImplementation().count();
+  }
 
-      return new Promise((resolve, reject) => {
-        const request = db
-          .transaction(['states'])
-          .objectStore('states')
-          .count();
+  get dbPromise() {
+    // Exposed due to usage in [`project-plus`](https://web.pulsar-edit.dev/packages/project-plus)
+    return this._getOrCreateImplementation().dbPromise;
+  }
 
-        request.onsuccess = () => {
-          resolve(request.result);
-        };
-        request.onerror = reject;
+  _getImplementation() {
+    if (this.config.get('core.useLegacySessionStore')) {
+      return this.indexed;
+    } else {
+      return this.sql;
+    }
+  }
+
+  _getOrCreateImplementation() {
+    if (this.config.get('core.useLegacySessionStore')) {
+      this.indexed ??= new IndexedDB(this.databaseName, this.version);
+      return this.indexed;
+    } else {
+      if (!this.configDirPath) {
+        throw new Error(`state-store: Must initialize with configDirPath`);
+      }
+      this.sql ??= new SQL(this.databaseName, this.version, {
+        storagePath: this.configDirPath
       });
-    });
+      return this.sql;
+    }
   }
 };

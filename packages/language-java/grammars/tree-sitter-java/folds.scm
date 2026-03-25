@@ -1,4 +1,4 @@
-((comment) @fold
+((block_comment) @fold
   (#set! fold.endAt endPosition)
   (#set! fold.adjustToEndOfPreviousRow true))
 

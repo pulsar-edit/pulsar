@@ -11,9 +11,8 @@
 (interface_declaration
   name: (identifier) @name) @definition.interface
 
-; TODO: Update parser
-; (type_list
-;   (type_identifier) @name) @reference.implementation
+(type_list
+  (type_identifier) @name) @reference.implementation
 
 (object_creation_expression
   type: (type_identifier) @name) @reference.class

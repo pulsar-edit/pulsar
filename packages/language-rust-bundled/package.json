@@ -10,11 +10,20 @@
   "main": "lib/main.js",
   "repository": "https://github.com/pulsar-edit/pulsar",
   "license": "MIT",
-  "dependencies": {
-    "tree-sitter-rust": "0.20.1"
-  },
   "engines": {
     "atom": ">=1.0.0 <2.0.0",
     "node": ">=12"
+  },
+  "consumedServices": {
+    "hyperlink.injection": {
+      "versions": {
+        "0.1.0": "consumeHyperlinkInjection"
+      }
+    },
+    "todo.injection": {
+      "versions": {
+        "0.1.0": "consumeTodoInjection"
+      }
+    }
   }
 }

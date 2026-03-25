@@ -23,6 +23,70 @@ function validateListControllerProps(props) {
   ));
 }
 
+// Assign a default icon type for each tag — or what LSP calls “kind.” This
+// list is copied directly from the LSP spec's exhaustive list of potential
+// symbol kinds:
+//
+// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#symbolKind
+function iconForTag(tag) {
+  switch (tag) {
+    case 'file':
+      return 'icon-file';
+    case 'module':
+      return 'icon-database';
+    case 'namespace':
+      return 'icon-tag';
+    case 'package':
+      return 'icon-package';
+    case 'class':
+      return 'icon-puzzle';
+    case 'method':
+      return 'icon-gear';
+    case 'property':
+      return 'icon-primitive-dot';
+    case 'field':
+      return 'icon-primitive-dot';
+    case 'constructor':
+      return 'icon-tools';
+    case 'enum':
+      return 'icon-list-unordered';
+    case 'interface':
+      return 'icon-key';
+    case 'function':
+      return 'icon-gear';
+    case 'variable':
+      return 'icon-code';
+    case 'constant':
+      return 'icon-primitive-square';
+    case 'string':
+      return 'icon-quote';
+    case 'number':
+      return 'icon-plus';
+    case 'boolean':
+      return 'icon-question';
+    case 'array':
+      return 'icon-list-ordered';
+    case 'object':
+      return 'icon-file-code';
+    case 'key':
+      return 'icon-key';
+    case 'null':
+      return null;
+    case 'enum-member':
+      return 'icon-primitive-dot';
+    case 'struct':
+      return 'icon-book';
+    case 'event':
+      return 'icon-calendar';
+    case 'operator':
+      return 'icon-plus';
+    case 'type-parameter':
+      return null;
+    default:
+      return null;
+  }
+}
+
 /**
  * A class for setting various UI properties on a symbol list palette. This is a
  * privilege given to the “main” (or _exclusive_) provider for a given task.
@@ -318,24 +382,33 @@ class SymbolsView {
     return true;
   }
 
+  normalizeSymbol(symbol, provider) {
+    // We enforce these so that (a) we can show a human-readable name of the
+    // provider for each symbol (if the user opts into it), and (b) we can
+    // selectively clear cached results for certain providers without
+    // affecting others.
+    symbol.providerName ??= provider.name;
+    symbol.providerId ??= provider.packageName;
+    if (symbol.path) {
+      let parts = Path.parse(symbol.path);
+      symbol.directory = `${parts.dir}${Path.sep}`;
+      symbol.file = parts.base;
+    }
+    symbol.name = symbol.name.replace(/[\n\r\t]/, ' ');
+
+    if (symbol.tag && !symbol.icon) {
+      symbol.icon = iconForTag(symbol.tag);
+    }
+  }
+
   addSymbols(allSymbols, newSymbols, provider) {
     for (let symbol of newSymbols) {
       if (!this.isValidSymbol(symbol)) {
         console.warn('Invalid symbol:', symbol);
         continue;
       }
-      // We enforce these so that (a) we can show a human-readable name of the
-      // provider for each symbol (if the user opts into it), and (b) we can
-      // selectively clear cached results for certain providers without
-      // affecting others.
-      symbol.providerName ??= provider.name;
-      symbol.providerId ??= provider.packageName;
-      if (symbol.path) {
-        let parts = Path.parse(symbol.path);
-        symbol.directory = `${parts.dir}${Path.sep}`;
-        symbol.file = parts.base;
-      }
-      symbol.name = symbol.name.replace(/[\n\r\t]/, ' ');
+
+      this.normalizeSymbol(symbol, provider);
       allSymbols.push(symbol);
     }
   }

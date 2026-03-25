@@ -107,7 +107,7 @@ This allows us to incorporate any transformations that were applied to the other
 
 ##### Adding the `context` field
 
-The `context` field of a symbol is a short piece of text meant to give context. For instance, a symbol that represents a class method could have a `context` field that contains the name of the owning class. The `context` field is not filtered on.
+The `context` field of a symbol is a short piece of text meant to give context. For instance, a symbol that represents a class method could have a `context` field that contains the name of the class it belongs to. The `context` field is not filtered on.
 
 ###### symbol.contextNode
 
@@ -135,7 +135,11 @@ The point of `context` is to provide information to help you tell symbols apart,
 
 ##### Adding a tag
 
-The `tag` field is a string (ideally a short string) that indicates a symbol’s kind or type. A `tag` for a class method’s symbol might say `method`, whereas the symbol for the class itself might have a `tag` of `class`. These tags will be indicated in the UI with a badge or an icon.
+The `tag` field is a string that indicates a symbol’s kind or type. It should be a single word wherever possible. A `tag` for a class method’s symbol would typically be `method`, whereas the symbol for the class itself would typically have a `tag` of `class`. These tags will be indicated in the UI with a badge, an icon, or both.
+
+If you’re not sure what to call something, consult [this list from the Language Server Protocol spec](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#symbolKind). But some symbols may not fit any of those, so ultimately it’s up to the author. (For example, headings in Markdown files are assigned a kind of `heading`.)
+
+For consistency, tags should be all lowercase. The interface will apply its own casing effect through CSS (`text-transform: capitalize` by default, but customizable in UI themes).
 
 The preferred method of adding a tag is to leverage the `@definition.` captures that are typically present in a tags file. For instance, in this excerpt from the JavaScript grammar’s `tags.scm` file…
 
@@ -154,18 +158,7 @@ The preferred method of adding a tag is to leverage the `@definition.` captures 
 
 In cases where this is impractical, you can provide the tag explicitly with a predicate.
 
-###### symbol.icon
-
-```scm
-(class_body (method_definition
-  name: (property_identifier) @name
-  (#set! symbol.icon "package")
-))
-```
-
-The icon to be shown alongside the symbol in a list. Will only be shown if the user has enabled the “Show Icons in Symbols View” option in the `symbols-view` settings. You can see the full list of available icons by invoking the **Styleguide: Show** command and browsing the “Icons” section. The value can include the preceding `icon-` or can omit it; e.g., `icon-package` and `package` are both valid values.
-
-If this value is omitted, this provider will still attempt to match certain common tag values to icons. If `tag` is not present on the symbol, or is an uncommon value, there will be a blank space instead of an icon.
+Nearly all the tags on [the aforementioned list](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#symbolKind) will also apply an appropriate `icon` to their symbol when assigned. If you choose a tag name not on that list, or want to override the default, you can use the `symbol.icon` predicate described below.
 
 ###### symbol.tag
 
@@ -179,3 +172,18 @@ If this value is omitted, this provider will still attempt to match certain comm
 The `symbol.tag` predicate will set the value of a symbol’s `tag` property to a fixed string.
 
 The `tag` property is used to supply a word that represents the symbol in some way. For conventional symbols, this will often be something like `class` or `function`.
+
+This provider will attempt to match certain common tag values to icons. This can be overridden by specifying an explicit `symbol.icon` value.
+
+###### symbol.icon
+
+```scm
+(class_body (method_definition
+  name: (property_identifier) @name
+  (#set! symbol.icon "package")
+))
+```
+
+The icon to be shown alongside the symbol in a list. Will only be shown if the user has enabled the “Show Icons in Symbols View” option in the `symbols-view` settings. You can see the full list of available icons by invoking the **Styleguide: Show** command and browsing the “Icons” section. The value can include the preceding `icon-` or can omit it; e.g., `icon-package` and `package` are both valid values.
+
+If this value is omitted, this provider will still attempt to match certain common tag values to icons. If `tag` is not present on the symbol, or is an uncommon value, there will be a blank space instead of an icon.

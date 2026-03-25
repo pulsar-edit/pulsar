@@ -23,7 +23,7 @@ const languages = [
   // {language: "mustache", code: '10', checks: {numeric: '10'}},
   {language: "Objective C", code: '10', checks: {numeric: '10'}},
   {language: "Perl", code: '10', checks: {numeric: '10'}},
-  {language: "PHP", code: '<? 10 %>', checks: {numeric: '10'}},
+  {language: "PHP", code: '<? $foo ?>', checks: {variable: '$foo'}},
   // {language: "property-list", code: '10', checks: {numeric: '10'}},
   {language: "Python", code: '10', checks: {numeric: '10'}},
   {language: "Ruby on Rails", code: '10', checks: {numeric: '10'}},
@@ -104,9 +104,9 @@ test.describe('Opening Atom for the first time', () => {
         await modalInput.press('Enter')
 
         await Promise.all(
-          Object.keys(checks).map(k =>
-            expect(syntaxElement(k, checks[k])).toHaveText(checks[k])
-          )
+          Object.keys(checks).map(k => {
+            return expect(syntaxElement(k, checks[k])).toContainText(checks[k])
+          })
         )
       })
     })
@@ -115,7 +115,6 @@ test.describe('Opening Atom for the first time', () => {
 
 function syntaxElement(kind, text) {
   return editor.page.locator(
-    `atom-text-editor.is-focused .syntax--${kind}`,
-    { hasText: text }
+    `atom-text-editor.is-focused .syntax--${kind}:text('${text}')`
  )
 }

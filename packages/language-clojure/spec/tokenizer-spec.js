@@ -7,8 +7,9 @@ function setConfigForLanguageMode(mode) {
 }
 
 describe('Clojure grammars', () => {
-
   beforeEach(async () => {
+    await atom.packages.activatePackage('language-c');
+    await atom.packages.activatePackage('language-javascript');
     await atom.packages.activatePackage('language-clojure');
   });
 
@@ -23,6 +24,12 @@ describe('Clojure grammars', () => {
     atom.config.set('language-clojure.commentTag', false);
     atom.config.set('language-clojure.markDeprecations', true);
     await runGrammarTests(path.join(__dirname, 'fixtures', 'tokens.clj'), /;/)
+  });
+
+  it('tokenizes EDN using modern tree-sitter parser', async () => {
+    setConfigForLanguageMode('modern-tree-sitter');
+    atom.config.set('language-clojure.dismissTag', true);
+    await runGrammarTests(path.join(__dirname, 'fixtures', 'tokens.edn'), /;/)
   });
 
   it('tokenizes the editor using modern tree-sitter, but with all default configs toggled', async () => {

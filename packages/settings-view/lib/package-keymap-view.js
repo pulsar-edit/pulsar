@@ -11,7 +11,6 @@ import KeybindingsPanel from './keybindings-panel'
 export default class PackageKeymapView {
   constructor (pack) {
     this.pack = pack
-    this.otherPlatformPattern = new RegExp(`\\.platform-(?!${_.escapeRegExp(process.platform)}\\b)`)
     this.namespace = this.pack.name
     this.disposables = new CompositeDisposable()
     etch.initialize(this)
@@ -128,8 +127,8 @@ export default class PackageKeymapView {
         continue
       }
 
-      if (this.otherPlatformPattern.test(selector)) {
-        continue
+      if (!this.selectorIsCompatibleWithPlatform(selector)) {
+        continue;
       }
 
       const keyBindingRow = document.createElement('tr')
@@ -182,5 +181,12 @@ export default class PackageKeymapView {
     }
 
     atom.clipboard.write(content)
+  }
+
+  selectorIsCompatibleWithPlatform(selector, platform = process.platform) {
+    const otherPlatformPattern = new RegExp(`\\.platform-(?!${_.escapeRegExp(platform)}\\b)`);
+    const currentPlatformPattern = new RegExp(`\\.platform-(${_.escapeRegExp(platform)}\\b)`);
+
+    return !(otherPlatformPattern.test(selector) && !currentPlatformPattern.test(selector));
   }
 }
