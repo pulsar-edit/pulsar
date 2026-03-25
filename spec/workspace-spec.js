@@ -1,13 +1,12 @@
 const path = require('path');
 const temp = require('temp').track();
 const dedent = require('dedent');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const TextEditor = require('../src/text-editor');
 const Workspace = require('../src/workspace');
 const Project = require('../src/project');
 const platform = require('./helpers/platform');
 const _ = require('underscore-plus');
-const fstream = require('fstream');
 const fs = require('fs-plus');
 const AtomEnvironment = require('../src/atom-environment');
 const { conditionPromise, timeoutPromise } = require('./helpers/async-spec-helpers');
@@ -88,16 +87,26 @@ describe('Workspace', () => {
         let pane4 = null;
         let editor;
 
-        (await atom.workspace.open(null)).setText('An untitled editor.')
+        await atom.workspace
+          .open(null)
+          .then(editor => editor.setText('An untitled editor.'));
 
-        pane2.activateItem((await atom.workspace.open('b')).copy());
+        await atom.workspace
+          .open('b')
+          .then(editor => pane2.activateItem(editor.copy()));
 
-        pane3.activateItem(await atom.workspace.open('../sample.js'));
+        await atom.workspace
+          .open('../sample.js')
+          .then(editor => pane3.activateItem(editor));
+
 
         pane3.activeItem.setCursorScreenPosition([2, 4]);
         pane4 = pane2.splitDown();
 
-        pane4.activateItem(await atom.workspace.open('../sample.txt'));
+        await atom.workspace
+          .open('../sample.txt')
+          .then(editor => pane4.activateItem(editor));
+
 
         pane4.getActiveItem().setCursorScreenPosition([0, 2]);
         pane2.activate();
@@ -1710,6 +1719,7 @@ describe('Workspace', () => {
       workspace.onDidChangeActiveTextEditor(editor => observed.push(editor));
       workspace.closeActivePaneItemOrEmptyPaneOrWindow();
       expect(observed).toEqual([undefined]);
+
     });
   });
 
@@ -1782,12 +1792,9 @@ describe('Workspace', () => {
       'source.coffee',
       'source.js', // Tree-sitter grammars also load
       'source.js',
-      'source.js',
-      'source.js.regexp',
       'source.js.regexp',
       'source.js.regexp',
       'source.js.regexp.replacement',
-      'source.jsdoc',
       'source.jsdoc',
       'source.jsdoc',
       'source.litcoffee',
@@ -2214,6 +2221,49 @@ describe('Workspace', () => {
     });
   });
 
+  describe('::filePathMatchesPatterns', () => {
+    it('correctly applies scan path glob semantics against individual paths', () => {
+      const projectPath = path.join(__dirname, 'fixtures', 'workspace-scan');
+      atom.project.setPaths([projectPath]);
+
+      let pathA1 = path.join(projectPath, 'a-dir', 'sample1.js');
+      let pathB1 = path.join(projectPath, 'b-dir', 'sample1.js');
+
+      const positiveGlobs = ['b-dir', 'b-dir/*.js', 'b-dir/**/*.js'];
+      const negativeGlobs = ['!b-dir', '!b-dir/*.js', '!b-dir/**/*.js'];
+
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, [])
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, [''])
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, ['', ''])
+      ).toBe(true);
+
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, ['b-dir/*.js'])
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, ['!b-dir/*.js'])
+      ).toBe(false);
+
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, positiveGlobs)
+      ).toBe(false);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, positiveGlobs)
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, negativeGlobs)
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, negativeGlobs)
+      ).toBe(false);
+    });
+  });
+
   for (const ripgrep of [true, false]) {
     describe(`::scan(regex, options, callback) { ripgrep: ${ripgrep} }`, () => {
       function scan(regex, options, iterator) {
@@ -2563,13 +2613,7 @@ describe('Workspace', () => {
             );
             projectPath = path.join(temp.mkdirSync('atom'));
 
-            const writerStream = fstream.Writer(projectPath);
-            fstream.Reader(sourceProjectPath).pipe(writerStream);
-
-            await new Promise(resolve => {
-              writerStream.on('close', resolve);
-              writerStream.on('error', resolve);
-            });
+            fs.cpSync(sourceProjectPath, projectPath, { recursive: true });
 
             fs.renameSync(
               path.join(projectPath, 'git.git'),
@@ -2638,13 +2682,7 @@ describe('Workspace', () => {
             );
             projectPath = path.join(temp.mkdirSync('atom'));
 
-            const writerStream = fstream.Writer(projectPath);
-            fstream.Reader(sourceProjectPath).pipe(writerStream);
-
-            await new Promise(resolve => {
-              writerStream.on('close', resolve);
-              writerStream.on('error', resolve);
-            });
+            fs.cpSync(sourceProjectPath, projectPath, { recursive: true });
 
             fs.symlinkSync(
               path.join(__dirname, 'fixtures', 'dir', 'b'),
@@ -2693,13 +2731,7 @@ describe('Workspace', () => {
             );
             projectPath = path.join(temp.mkdirSync('atom'));
 
-            const writerStream = fstream.Writer(projectPath);
-            fstream.Reader(sourceProjectPath).pipe(writerStream);
-
-            await new Promise(resolve => {
-              writerStream.on('close', resolve);
-              writerStream.on('error', resolve);
-            });
+            fs.cpSync(sourceProjectPath, projectPath, { recursive: true });
 
             // Note: This won't create a hidden file on Windows, in order to more
             // accurately test this behaviour there, we should either use a package
@@ -2869,6 +2901,7 @@ describe('Workspace', () => {
           let dir2;
           let file1;
           let file2;
+          let extraRootBasename;
 
           beforeEach(() => {
             dir1 = atom.project.getPaths()[0];
@@ -2881,6 +2914,7 @@ describe('Workspace', () => {
             fs.writeFileSync(file2, 'ccc aaaa');
 
             atom.project.addPath(dir2);
+            extraRootBasename = path.basename(dir2);
           });
 
           it("searches matching files in all of the project's root directories", async () => {
@@ -2944,6 +2978,44 @@ describe('Workspace', () => {
               expect(resultPaths).toEqual([file2]);
             });
           });
+
+          describe('when an exclusion path starts with the basename of a root directory', () => {
+            it('interprets the exclusion as applying only to that root', async () => {
+              let resultPaths = [];
+              await scan(/aaaa/, { paths: [`!${extraRootBasename}`] }, ({ filePath }) => {
+                if (!resultPaths.includes(filePath)) {
+                  resultPaths.push(filePath);
+                }
+              });
+
+              expect(resultPaths).toEqual([file1]);
+            });
+          });
+
+          describe('when inclusion paths mix inclusions and exclusions', () => {
+            it('filters out a wholesale exclusion of another root', async () => {
+              let resultPaths = [];
+              await scan(/aaaa/, { paths: ['dir', `!${extraRootBasename}`] }, ({ filePath }) => {
+                if (!resultPaths.includes(filePath)) {
+                  resultPaths.push(filePath);
+                }
+              });
+
+              expect(resultPaths).toEqual([file1]);
+            });
+
+            it('does not apply an exclusion that targets a different root', async () => {
+              let resultPaths = [];
+              await scan(/aaaa/, { paths: ['dir', `!${extraRootBasename}/**/*`] }, ({ filePath }) => {
+                if (!resultPaths.includes(filePath)) {
+                  resultPaths.push(filePath);
+                }
+              });
+
+              expect(resultPaths).toEqual([file1]);
+            });
+          });
+
 
           describe('when a custom directory searcher is registered', () => {
             let fakeSearch = null;
@@ -3179,6 +3251,62 @@ describe('Workspace', () => {
               result.slice(0, 3)
             )
           });
+        });
+      });
+
+      describe('with multiple project roots', () => {
+        let projectDir1, projectDir2;
+        let projectRoot1, projectRoot2;
+
+        beforeEach(() => {
+          projectDir1 = temp.mkdirSync('atom');
+          projectDir2 = temp.mkdirSync('atom');
+
+          // Within each of these two directories, create another directory so
+          // we can control the exact basename.
+          projectRoot1 = path.resolve(projectDir1, 'alpha');
+          projectRoot2 = path.resolve(projectDir2, 'beta');
+          fs.mkdirSync(projectRoot1);
+          fs.mkdirSync(projectRoot2);
+
+          let fixturesDirA = path.resolve(
+            __dirname,
+            'fixtures',
+            'workspace-scan',
+            'a-dir'
+          );
+          let fixturesDirB = path.resolve(
+            __dirname,
+            'fixtures',
+            'workspace-scan',
+            'b-dir'
+          );
+
+          fs.cpSync(fixturesDirA, projectRoot1, { recursive: true });
+          fs.cpSync(fixturesDirB, projectRoot2, { recursive: true });
+
+          atom.project.setPaths([projectRoot1, projectRoot2]);
+        });
+
+        it('should search both roots when no paths are given', async () => {
+          let results = [];
+          await scan(
+            /ipsum/,
+            {
+              leadingContextLineCount: 1,
+              trailingContextLineCount: 1
+            },
+            result => results.push(result.filePath)
+          );
+
+          results.sort((a, b) => a.localeCompare(b));
+
+          let sortedExpectedFilePaths = [
+            path.join(projectRoot1, 'sample1.js'),
+            path.join(projectRoot2, 'sample1.js')
+          ].sort()
+
+          expect(results).toEqual(sortedExpectedFilePaths);
         });
       });
     }); // Cancels other ongoing searches

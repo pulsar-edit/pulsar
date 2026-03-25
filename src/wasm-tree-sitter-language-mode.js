@@ -1,7 +1,7 @@
 const { Node, Parser } = require('./web-tree-sitter');
 const TokenIterator = require('./token-iterator');
-const { Point, Range, spliceArray } = require('text-buffer');
-const { Patch } = require('superstring');
+const { Point, Range, spliceArray } = require('@pulsar-edit/text-buffer');
+const { Patch } = require('@pulsar-edit/superstring');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const ScopeDescriptor = require('./scope-descriptor');
 const ScopeResolver = require('./scope-resolver');
@@ -273,6 +273,15 @@ class WASMTreeSitterLanguageMode {
     this.injectionsMarkerLayer?.destroy();
     this.rootLanguageLayer = null;
     this.subscriptions?.dispose();
+
+    // Clean up all `Parser` instances created during the lifetime of this
+    // buffer.
+    for (let parsers of this.parsersByLanguage.values()) {
+      for (let parser of parsers) {
+        parser.delete();
+      }
+    }
+    this.parsersByLanguage.clear();
   }
 
   getGrammar() {
@@ -1887,12 +1896,25 @@ class FoldResolver {
   }
 
   resolvePositionForDividedFold(capture) {
-    let { name, node } = capture;
+    let { name, node, setProperties: props } = capture;
     if (name === 'fold.start') {
       return new Point(node.startPosition.row, Infinity);
     } else if (name === 'fold.end') {
+      // `@fold.end` can have adjustments applied to it just like `@fold`.
+      let defaultOptions = { 'fold.endAt': 'startPosition' };
+      let options = { ...defaultOptions, ...props };
       let end = node.startPosition;
-      if (end.column === 0 || this.positionIsNotPrecededByTextOnLine(end)) {
+      let originalEnd = end;
+      for (let key in options) {
+        if (!this.capturePropertyIsFoldAdjustment(key)) { continue; }
+        let value = options[key];
+        end = this.applyFoldAdjustment(key, end, node, value, props, this.layer);
+      }
+      // There's an implicit behavior that we apply for ease of use, but we
+      // should skip it if any `#set!` predicates were used to tweak the end
+      // location.
+      let positionDidMove = originalEnd.row !== end.row || originalEnd.column !== end.column;
+      if (!positionDidMove && (end.column === 0 || this.positionIsNotPrecededByTextOnLine(end))) {
         // If the fold ends at the start of the line, adjust it so that it
         // actually ends at the end of the previous line. This behavior is
         // implied in the existing specs.
@@ -5256,9 +5278,26 @@ class IndentResolver {
     //
     // Use the position of the first text on the line as the reference point.
     let rowStartingColumn = Math.max(line.search(/\S/), 0);
+    let rowStartingPoint = new Point(row, rowStartingColumn)
     let controllingLayer = languageMode.controllingLayerAtPoint(
-      new Point(row, rowStartingColumn),
-      (layer) => !!layer.queries.indentsQuery
+      rowStartingPoint,
+      (layer) => {
+        if (!layer.queries.indentsQuery) return false;
+        // We're using the same logic here that we used in the dedent phase of
+        // `suggestedIndentForBufferRow`: allow layers that _begin_ at the
+        // cursor, but exclude layers that _end_ at the cursor.
+        //
+        // So first we test for containment exclusive of endpoints…
+        if (layer.containsPoint(rowStartingPoint, true)) {
+          return true;
+        }
+
+        // …but we'll still accept layers that have a content range which
+        // _starts_ at the cursor position.
+        return layer.getCurrentRanges()?.some(r => {
+          return r.start.compare(rowStartingPoint) === 0;
+        });
+      }
     );
 
     if (!controllingLayer) { return undefined; }

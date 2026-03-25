@@ -1,0 +1,25 @@
+name: 'C#'
+scopeName: "source.cs"
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-c-sharp'
+
+injectionRegex: '^(csharp|CSHARP|cs|CS)$'
+
+treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-c-sharp#f05a2ca99d329de2e6c32f26a21c6169b2bfcbb7'
+  grammar: 'tree-sitter-c-sharp/tree-sitter-c-sharp.wasm'
+  highlightsQuery: [
+    'tree-sitter-c-sharp/highlights.scm'
+  ]
+  tagsQuery: 'tree-sitter-c-sharp/tags.scm'
+  foldsQuery: 'tree-sitter-c-sharp/folds.scm'
+  indentsQuery: 'tree-sitter-c-sharp/indents.scm'
+
+fileTypes: [
+  "cs"
+]
+
+comments:
+  start: '// '
+  line: '//'
+  block: ['/*', '*/']

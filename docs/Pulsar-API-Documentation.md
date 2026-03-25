@@ -182,8 +182,6 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dd></dd>
 <dt><a href="#path">path</a></dt>
 <dd></dd>
-<dt><a href="#path">path</a></dt>
-<dd></dd>
 <dt><a href="#_">_</a></dt>
 <dd></dd>
 <dt><a href="#path">path</a></dt>
@@ -199,8 +197,6 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dt><a href="#conditionPromise">conditionPromise()</a></dt>
 <dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
-<dd></dd>
-<dt><a href="#conditionPromise">conditionPromise()</a></dt>
 <dd></dd>
 <dt><a href="#conditionPromise">conditionPromise()</a></dt>
 <dd></dd>
@@ -220,6 +216,9 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
+<dt><a href="#getPath">getPath(spec)</a> ⇒ <code>string</code></dt>
+<dd><p>Returns an absolute path from the given spec.</p>
+</dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
 <dt><a href="#isIterable">isIterable(obj)</a> ⇒ <code>Boolean</code></dt>
@@ -616,11 +615,6 @@ This file aims to run some short simple tests against `update.js`. Focusing
 ## path
 **Kind**: global constant  
 **Babel**:   
-<a name="path"></a>
-
-## path
-**Kind**: global constant  
-**Babel**:   
 <a name="_"></a>
 
 ## \_
@@ -639,11 +633,6 @@ This file aims to run some short simple tests against `update.js`. Focusing
 <a name="beforeEach"></a>
 
 ## beforeEach()
-**Kind**: global function  
-**Babel**:   
-<a name="conditionPromise"></a>
-
-## conditionPromise()
 **Kind**: global function  
 **Babel**:   
 <a name="conditionPromise"></a>
@@ -703,6 +692,18 @@ This file aims to run some short simple tests against `update.js`. Focusing
 ## beforeEach()
 **Kind**: global function  
 **Babel**:   
+<a name="getPath"></a>
+
+## getPath(spec) ⇒ <code>string</code>
+Returns an absolute path from the given spec.
+
+**Kind**: global function  
+**Returns**: <code>string</code> - An absolute path of the given spec.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| spec | <code>string</code> | A path specifier which may be an absolute,    pseudo-drive, or relative path. |
+
 <a name="beforeEach"></a>
 
 ## beforeEach()

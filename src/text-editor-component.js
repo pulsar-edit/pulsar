@@ -1,5 +1,5 @@
 const etch = require('etch');
-const { Point, Range } = require('text-buffer');
+const { Point, Range } = require('@pulsar-edit/text-buffer');
 const LineTopIndex = require('line-top-index');
 const TextEditor = require('./text-editor');
 const { isPairedCharacter, hasRtlText } = require('./text-utils');
@@ -762,10 +762,25 @@ module.exports = class TextEditorComponent {
         className: 'line dummy',
         style: { position: 'absolute', visibility: 'hidden' }
       },
-      $.span({ ref: 'normalWidthCharacterSpan' }, NORMAL_WIDTH_CHARACTER),
-      $.span({ ref: 'doubleWidthCharacterSpan' }, DOUBLE_WIDTH_CHARACTER),
-      $.span({ ref: 'halfWidthCharacterSpan' }, HALF_WIDTH_CHARACTER),
-      $.span({ ref: 'koreanCharacterSpan' }, KOREAN_CHARACTER)
+      // We used to put each of these characters inside the same block-level
+      // element, but that resulted in different, less-accurate measurements
+      // than when they each exist in isolation.
+      $.div(
+        {},
+        $.span({ ref: 'normalWidthCharacterSpan' }, NORMAL_WIDTH_CHARACTER)
+      ),
+      $.div(
+        {},
+        $.span({ ref: 'doubleWidthCharacterSpan' }, DOUBLE_WIDTH_CHARACTER)
+      ),
+      $.div(
+        {},
+        $.span({ ref: 'halfWidthCharacterSpan' }, HALF_WIDTH_CHARACTER)
+      ),
+      $.div(
+        {},
+        $.span({ ref: 'koreanCharacterSpan' }, KOREAN_CHARACTER)
+      )
     );
   }
 
@@ -1804,12 +1819,12 @@ module.exports = class TextEditorComponent {
     let scrollLeftChanged = false;
     if (!this.scrollTopPending) {
       scrollTopChanged = this.setScrollTop(
-        this.refs.verticalScrollbar.element.scrollTop
+        this.refs.verticalScrollbar?.element.scrollTop ?? 0
       );
     }
     if (!this.scrollLeftPending) {
       scrollLeftChanged = this.setScrollLeft(
-        this.refs.horizontalScrollbar.element.scrollLeft
+        this.refs.horizontalScrollbar?.element.scrollLeft ?? 0
       );
     }
     if (scrollTopChanged || scrollLeftChanged) this.updateSync();
@@ -2065,7 +2080,7 @@ module.exports = class TextEditorComponent {
     }
 
     this.handleMouseDragUntilMouseUp({
-      didDrag: event => {
+      didDrag: (event) => {
         this.autoscrollOnMouseDrag(event);
         const screenPosition = this.screenPositionForMouseEvent(event);
         model.selectToScreenPosition(screenPosition, {
@@ -2238,12 +2253,24 @@ module.exports = class TextEditorComponent {
 
     let scrolled = false;
     if (yDelta != null) {
-      const scaledDelta = scaleMouseDragAutoscrollDelta(yDelta) * yDirection;
+      let scaledDelta = scaleMouseDragAutoscrollDelta(yDelta) * yDirection;
+      // Snap the delta to physical pixels, but do so in the direction of the
+      // scroll. Err on the side of moving more in that direction rather than
+      // less.
+      scaledDelta = yDirection === 1 ?
+        ceilToPhysicalPixelBoundary(scaledDelta) :
+        floorToPhysicalPixelBoundary(scaledDelta);
       scrolled = this.setScrollTop(this.getScrollTop() + scaledDelta);
     }
 
     if (!verticalOnly && xDelta != null) {
-      const scaledDelta = scaleMouseDragAutoscrollDelta(xDelta) * xDirection;
+      let scaledDelta = scaleMouseDragAutoscrollDelta(xDelta) * xDirection;
+      // Snap the delta to physical pixels, but do so in the direction of the
+      // scroll. Err on the side of moving more in that direction rather than
+      // less.
+      scaledDelta = xDirection === 1 ?
+        ceilToPhysicalPixelBoundary(scaledDelta) :
+        floorToPhysicalPixelBoundary(scaledDelta);
       scrolled = this.setScrollLeft(this.getScrollLeft() + scaledDelta);
     }
 
@@ -2483,8 +2510,12 @@ module.exports = class TextEditorComponent {
   measureCharacterDimensions() {
     this.measurements.lineHeight = Math.max(
       1,
-      this.refs.characterMeasurementLine.getBoundingClientRect().height
+      // Each of the four characters below exists inside its own block-level
+      // element, but each of those containers should have the same height. We
+      // don't need to check more than one.
+      this.refs.normalWidthCharacterSpan.parentNode.getBoundingClientRect().height
     );
+
     this.measurements.baseCharacterWidth = this.refs.normalWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.doubleWidthCharacterWidth = this.refs.doubleWidthCharacterSpan.getBoundingClientRect().width;
     this.measurements.halfWidthCharacterWidth = this.refs.halfWidthCharacterSpan.getBoundingClientRect().width;
@@ -2595,30 +2626,27 @@ module.exports = class TextEditorComponent {
       columnsToMeasure.sort((a, b) => a - b);
 
       const screenLine = this.renderedScreenLineForRow(row);
+
+      // Skip rows whose screen line or line component is not currently
+      // rendered. Measurements can be queued for non-rendered rows by calls
+      // to pixelPositionForScreenPosition or pendingAutoscroll when block
+      // decorations shift lines outside the rendered range. Because clear()
+      // runs after the forEach, throwing here prevents it from ever being
+      // reached, poisoning horizontalPositionsToMeasure permanently and
+      // causing an infinite error loop on every subsequent animation frame.
+      if (!screenLine || !this.lineComponentsByScreenLineId.get(screenLine.id)) {
+        if (atom.inDevMode()) {
+          console.warn(
+            'measureHorizontalPositions: skipped non-rendered row',
+            row
+          );
+        }
+        return;
+      }
+
       const lineComponent = this.lineComponentsByScreenLineId.get(
         screenLine.id
       );
-
-      if (!lineComponent) {
-        const error = new Error(
-          'Requested measurement of a line component that is not currently rendered'
-        );
-        error.metadata = {
-          row,
-          columnsToMeasure,
-          renderedScreenLineIds: this.renderedScreenLines.map(line => line.id),
-          extraRenderedScreenLineIds: Array.from(
-            this.extraRenderedScreenLines.keys()
-          ),
-          lineComponentScreenLineIds: Array.from(
-            this.lineComponentsByScreenLineId.keys()
-          ),
-          renderedStartRow: this.getRenderedStartRow(),
-          renderedEndRow: this.getRenderedEndRow(),
-          requestedScreenLineId: screenLine.id
-        };
-        throw error;
-      }
 
       const lineNode = lineComponent.element;
       const textNodes = lineComponent.textNodes;
@@ -2799,7 +2827,19 @@ module.exports = class TextEditorComponent {
         inherentRange.startOffset,
         textNodes
       );
-      return Point(row, column);
+
+      // As a final sanity check, grab this range's bounding DOMRect and ensure
+      // it actually contains the point in question.
+      //
+      // TODO: `caretRangeFromPoint` is incredibly convenient, but this sanity
+      // check is required in order to work around a strange behavior that
+      // produced a test suite failure. If any further quirks emerge, it might
+      // eventually be worth it to skip `caretRangeFromPoint` and go straight
+      // to the fallback approach.
+      let { top, bottom } = inherentRange.getBoundingClientRect();
+      if (targetClientTop >= top && targetClientTop <= bottom) {
+        return Point(row, column);
+      }
     }
 
     // SECOND STRATEGY:
@@ -3415,7 +3455,7 @@ module.exports = class TextEditorComponent {
   setScrollTop(scrollTop) {
     if (Number.isNaN(scrollTop) || scrollTop == null) return false;
 
-    scrollTop = roundToPhysicalPixelBoundary(
+    scrollTop = ceilToPhysicalPixelBoundary(
       Math.max(0, Math.min(this.getMaxScrollTop(), scrollTop))
     );
     if (scrollTop !== this.scrollTop) {
@@ -4697,7 +4737,12 @@ class LinesTileComponent {
         const oldDecorations = oldProps.blockDecorations
           ? oldProps.blockDecorations.get(screenLineId)
           : null;
-        const lineNode = lineComponentsByScreenLineId.get(screenLineId).element;
+        const lineComponent = lineComponentsByScreenLineId.get(screenLineId);
+        // Skip block decorations whose screen line is not in this tile.
+        // This can happen when decorations are destroyed or moved between
+        // tiles during the same update cycle.
+        if (!lineComponent) return;
+        const lineNode = lineComponent.element;
         let lastAfter = lineNode;
 
         for (let i = 0; i < newDecorations.length; i++) {
@@ -5614,6 +5659,14 @@ function ceilToPhysicalPixelBoundary(virtualPixelPosition) {
   const virtualPixelsPerPhysicalPixel = 1 / window.devicePixelRatio;
   return (
     Math.ceil(virtualPixelPosition / virtualPixelsPerPhysicalPixel) *
+    virtualPixelsPerPhysicalPixel
+  );
+}
+
+function floorToPhysicalPixelBoundary(virtualPixelPosition) {
+  const virtualPixelsPerPhysicalPixel = 1 / window.devicePixelRatio;
+  return (
+    Math.floor(virtualPixelPosition / virtualPixelsPerPhysicalPixel) *
     virtualPixelsPerPhysicalPixel
   );
 }

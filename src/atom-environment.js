@@ -42,7 +42,7 @@ const PaneAxis = require('./pane-axis');
 const Pane = require('./pane');
 const Dock = require('./dock');
 const TextEditor = require('./text-editor');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
 const { getReleaseChannel } = require('./get-app-details.js');
@@ -50,6 +50,7 @@ const UI = require('./ui.js');
 const I18n = require("./i18n.js");
 const packagejson = require("../package.json");
 
+const { closeAllWatchers } = require('@pulsar-edit/pathwatcher');
 const stat = util.promisify(fs.stat);
 
 let nextId = 0;
@@ -255,6 +256,8 @@ class AtomEnvironment {
     // using `document.createElement('atom-text-editor')` works if it's called
     // before opening a buffer.
     require('./text-editor-element');
+
+    this.isDestroying = false;
 
     this.window = params.window;
     this.document = params.document;
@@ -480,6 +483,11 @@ class AtomEnvironment {
 
   destroy() {
     if (!this.project) return;
+
+    // Set this flag and then don't reset it after `destroy` is done, since we
+    // need other disposing objects to be able to check it. We won't need to
+    // reset it because another environment will be created.
+    this.isDestroying = true;
 
     this.disposables.dispose();
     if (this.workspace) this.workspace.destroy();
@@ -780,7 +788,11 @@ class AtomEnvironment {
 
   // Extended: Set the full screen state of the current window.
   setFullScreen(fullScreen = false) {
-    return this.applicationDelegate.setWindowFullScreen(fullScreen);
+    let result = this.applicationDelegate.setWindowFullScreen(fullScreen);
+    // On Linux, setting full screen (no matter the value) hides the menu bar.
+    // Hence we must re-assert this setting.
+    this.setAutoHideMenuBar(this.config.get('core.autoHideMenuBar'));
+    return result;
   }
 
   // Extended: Toggle the full screen state of the current window.
@@ -1135,6 +1147,7 @@ class AtomEnvironment {
   }
 
   unloadEditorWindow() {
+    closeAllWatchers();
     if (!this.project) return;
 
     this.storeWindowBackground();
@@ -1376,7 +1389,7 @@ class AtomEnvironment {
     if (state && this.project.getPaths().length === 0) {
       this.attemptRestoreProjectStateForPaths(state, projectPaths);
     } else {
-      projectPaths.map(folder => this.project.addPath(folder));
+      this.project.addPaths(projectPaths);
     }
   }
 
@@ -1430,9 +1443,7 @@ class AtomEnvironment {
             });
             resolveDiscardStatePromise(Promise.resolve(null));
           } else if (response === 1) {
-            for (let selectedPath of projectPaths) {
-              this.project.addPath(selectedPath);
-            }
+            this.project.addPaths(projectPaths);
             resolveDiscardStatePromise(
               Promise.all(filesToOpen.map(file => this.workspace.open(file)))
             );
@@ -1712,9 +1723,7 @@ or use Pane::saveItemAs for programmatic saving.`);
         );
         restoredState = true;
       } else {
-        for (let folder of foldersToAddToProject) {
-          this.project.addPath(folder);
-        }
+        this.project.addPaths(foldersToAddToProject);
       }
     }
 

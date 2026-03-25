@@ -50,19 +50,44 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                <code>autocomplete-plus</code> can now make other text edits to the buffer when a suggestion is accepted - for instance, adding an <code>import</code> for that suggestion.
+                Update Electron to version 30!
+                <ul>
+                  <li>Node is now version 20.11.1!</li>
+                  <li>Chromium is now version 124!</li>
+                  <li>This means better performance, better Node library compatibility, and ability for community packages to use newer features of Chromium.</li>
+                  <li>It should also vastly improve the Pulsar experience for Linux users in Wayland environments.</li>
+                  <li>Because this is such a big upgrade, some of your community packages might be affected! Read <a href="https://blog.pulsar-edit.dev/posts/20251202-savetheclocktower-pulsar-on-electron-30/">Pulsar on Electron 30: what it means for you</a> for more information.</li>
+                </ul>
               </li>
               <li>
-                Experimental localization support is now being added into the editor, allowing the editor, core packages and even community packages to localize their interface for any language.
+                [settings-view] Fix issue that closes project windows when the user clicks on a badge in a package card.
               </li>
               <li>
-                <code>autocomplete-css</code> has gotten significantly updated completions.
+                [find-and-replace] Fix issue that prevents searches with patterns from working properly in projects with multiple roots.
               </li>
               <li>
-                Various documentation and UI links updated after website update.
+                Fix issue affecting keybinding interpretation on non-QWERTY keyboards in Linux/X11 environments.
               </li>
               <li>
-                Changed some returns in a backwards compatible way to ensure the community package <code>emmet</code> will work again.
+                Fix Linux issue causing the menu bar to hide immediately after a project window opens.
+              </li>
+              <li>
+                Fix macOS issue causing buffer contents to fail to update for some users when modified by another program.
+              </li>
+              <li>
+                Fix issue causing the <code>.deb</code> installation to refuse to launch because of improper permissions/AppArmor profile.
+              </li>
+              <li>
+                Fix issue causing the <code>.rpm</code> installation to run the wrong script when upgrading (restore pulsar and ppm to PATH).
+              </li>
+              <li>
+                Fix issue causing the <code>--package</code> switch not to work correctly when invoked directly on the Pulsar binary, rather than on <code>pulsar.sh</code>/<code>pulsar.cmd</code>.
+              </li>
+              <li>
+                Fix issue that prevents <code>ppm</code> from being symlinked or un-symlinked correctly in Linux install/uninstall scripts.
+              </li>
+              <li>
+                Add <code>atom.project.addPaths</code> method for adding multiple project roots at once.
               </li>
             </ul>
 
