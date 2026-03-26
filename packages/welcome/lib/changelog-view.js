@@ -2,26 +2,65 @@
 /** @jsx etch.dom */
 
 import etch from 'etch';
+import { CompositeDisposable, Emitter } from 'atom';
 
 export default class ChangeLogView {
   constructor(props) {
     this.props = props;
+    this.emitter = new Emitter();
+    this.subscriptions = new CompositeDisposable();
+
+    this.didDismissForCurrentVersion = false;
+
+    // Extract a version string so we can use it for comparison purposes.
+    this.version = atom.getVersion().split(' ')[0];
+
+    this._dismissVersion = this.dismissVersion.bind(this);
+
     etch.initialize(this);
+
+    this.subscriptions.add(
+      // Listen for signals from other windows that signal the closure of a
+      // change log; if it closes in any window, it should close in all
+      // windows.
+      atom.signal.onMessage('welcome:changelog-close', () => this.destroy()),
+      // Listen for changes to this setting and keep this checkbox
+      // synchronized.
+      atom.config.onDidChange('welcome.lastViewedChangeLog', ({ newValue }) => {
+        this.refs.skipChangeLog.checked = atom.versionSatisfies(newValue);
+      })
+    );
   }
 
   didChangeShowChangeLog() {
     atom.config.set('welcome.showChangeLog', this.checked);
   }
 
-  dismissVersion() {
-    atom.config.set('welcome.lastViewedChangeLog', atom.getVersion().split(" ")[0]);
+  dismissVersion(event) {
+    let isChecked = event.currentTarget.checked;
+    if (isChecked) {
+      atom.config.set('welcome.lastViewedChangeLog', this.version);
+      atom.signal.send('welcome-changelog-dismiss', true);
+    } else {
+      atom.config.unset('welcome.lastViewedChangeLog');
+    }
   }
 
   wasVersionDismissed() {
-    // Use the new `.versionSatisfies()` API to check if our last dismissed version
-    // is the same as the current version. `.versionSatisfies()` compares equality
-    // by default, so no comparator is needed
+    // Use the new `.versionSatisfies()` API to check if our last dismissed
+    // version is the same as the current version. `.versionSatisfies()`
+    // compares equality by default, so no comparator is needed.
     return atom.versionSatisfies(atom.config.get('welcome.lastViewedChangeLog'));
+  }
+
+  destroy () {
+    atom.signal.send('welcome-changelog-close', true);
+    this.subscriptions.dispose();
+    this.emitter.emit('did-destroy');
+  }
+
+  onDidDestroy (callback) {
+    return this.emitter.on('did-destroy', callback);
   }
 
   update() {}
@@ -98,17 +137,18 @@ export default class ChangeLogView {
                   checked={atom.config.get('welcome.showChangeLog')}
                   onchange={this.didChangeShowChangeLog}
                 />
-                Show the Change Log after an update.
+                Show the Change Log after an update
               </label>
             </section>
             <section className="welcome-panel">
               <label>
                 <input className="input-checkbox"
                   type="checkbox"
+                  ref="skipChangeLog"
                   checked={this.wasVersionDismissed()}
-                  onchange={this.dismissVersion}
+                  onchange={this._dismissVersion}
                 />
-                Dismiss this Change Log
+                Don’t show a Change Log again for version {this.version}
               </label>
             </section>
           </div>
