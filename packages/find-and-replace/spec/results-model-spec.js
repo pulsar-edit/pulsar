@@ -156,6 +156,33 @@ describe("ResultsModel", () => {
 
     })
 
+    describe("when a file is modified before the search starts", () => {
+      let editor, modifiedPath;
+      beforeEach(async () => {
+        atom.project.setPaths([
+          path.join(__dirname, "fixtures/project"),
+        ]);
+        resultsModel = new ResultsModel(new FindOptions({}));
+        modifiedPath = path.resolve(__dirname, "fixtures", "project", "sample.js");
+        editor = await atom.workspace.open(modifiedPath);
+        editor.setCursorBufferPosition([0, 0]);
+        editor.insertText(' ');
+        expect(editor.isModified()).toBe(true);
+      })
+
+      afterEach(() => {
+        if (editor.isModified()) editor.undo();
+      })
+
+      it('still appears in search results', async () => {
+        jasmine.useRealClock();
+        await resultsModel.search('var quicksort =', '', '');
+        expect(
+          resultsModel.getResult(modifiedPath)
+        ).not.toBe(undefined);
+      })
+    })
+
     describe("when a file is modified after the search finishes", () => {
       let editor, modifiedPath;
       let modifyEditor = () => {};
