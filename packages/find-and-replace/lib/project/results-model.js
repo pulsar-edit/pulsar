@@ -351,7 +351,6 @@ module.exports = class ResultsModel {
   // manual fashion, so we need this check to to be able to filter those
   // buffers properly.
   shouldAddResult(filePath) {
-    // return true;
     let { pathsPattern } = this.findOptions
     if (!pathsPattern) return true
 
