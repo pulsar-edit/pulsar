@@ -20,11 +20,11 @@
     "url": "https://github.com/pulsar-edit/pulsar/issues"
   },
   "engines": {
-    "node": ">=20.16.0"
+    "node": ">=16.17.1"
   },
   "atomTestRunner": "runners/jasmine2-test-runner",
   "license": "MIT",
-  "electronVersion": "30.5.1",
+  "electronVersion": "22.3.27",
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
     "@babel/core": "7.18.6",
@@ -301,7 +301,7 @@
     "@electron/notarize": "^1.2.3",
     "@electron/rebuild": "3.6.0",
     "@playwright/test": "1.22.2",
-    "electron": "30.5.1",
+    "electron": "22.3.27",
     "electron-builder": "23.3.1",
     "eslint": "^8.33.0",
     "eslint-plugin-jsdoc": "^39.7.4",
