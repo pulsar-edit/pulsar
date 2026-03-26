@@ -1,22 +1,6 @@
 !include "${BUILD_RESOURCES_DIR}\..\resources\win\EnvVarUpdate.nsh" ; Relative to 'build\'
-!include "${BUILD_RESOURCES_DIR}\..\resources\win\GetWindowsVersion.nsh"
 !include nsDialogs.nsh
 XPStyle on
-
-!macro customInit ; Macro called by electron-builder; inserted at start of .OnInit callback
-  ; Check the current windows version
-  ${GetWindowsVersion} $R0
-
-  ${Switch} $R0
-    ${Case} '10.0' ; Support Windows 10
-    ${Case} '' ; Support Windows versions unknown to GetWindowsVersion v4.1.1 (Win11)
-      ${Break} ; Do nothing if supported version.
-    ${Default}
-      MessageBox MB_OK "Pulsar >=v1.131.0 is only supported on Windows 10 or 11."
-      Quit
-      ${Break}
-  ${EndSwitch}
-!macroend
 
 !macro customInstall ; Macro called by electron-builder
   ; Set the 'InstallLocation' Registry Key for GitHub Desktop
