@@ -20,7 +20,6 @@ const {
   screen,
   nativeTheme
 } = require('electron');
-const signalBroker = require('./signal-broker');
 const { CompositeDisposable, Disposable } = require('event-kit');
 const crypto = require('crypto');
 const fs = require('fs-plus');
@@ -270,9 +269,6 @@ module.exports = class AtomApplication extends EventEmitter {
     this.setupDockMenu();
 
     const result = await this.launch(options);
-
-    signalBroker.start();
-    this.disposable.add(() => signalBroker.stop());
 
     StartupTime.addMarker('main-process:atom-application:initialize:end');
 
