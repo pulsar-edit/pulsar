@@ -401,7 +401,11 @@ module.exports = class ResultsModel {
   }
 
   pathsArrayFromPathsPattern(pathsPattern) {
-    return pathsPattern.trim().split(',').map((inputPath) => inputPath.trim())
+    return pathsPattern
+      .trim()
+      .split(',')
+      .filter(p => !!p)
+      .map((inputPath) => inputPath.trim())
   }
 }
 

@@ -2423,9 +2423,12 @@ module.exports = class Workspace extends Model {
 
     const searchPromise = Promise.all(allSearches);
 
-    let defaultMatchers = options.paths ?
-      options.paths.map((inclusion) => minimatchInstanceForPattern(inclusion)) :
-      null;
+    let defaultMatchers = null;
+    if (options.paths) {
+      defaultMatchers = options.paths
+        .filter(p => !!p)
+        .map(inclusion => minimatchInstanceForPattern(inclusion));
+    }
 
     const customMatchers = new Map();
     for (let [dir, inclusions] of customInclusionsForDirectory) {
