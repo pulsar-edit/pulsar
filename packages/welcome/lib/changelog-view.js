@@ -40,7 +40,6 @@ export default class ChangeLogView {
     let isChecked = event.currentTarget.checked;
     if (isChecked) {
       atom.config.set('welcome.lastViewedChangeLog', this.version);
-      atom.signal.send('welcome-changelog-dismiss', true);
     } else {
       atom.config.unset('welcome.lastViewedChangeLog');
     }
@@ -54,7 +53,7 @@ export default class ChangeLogView {
   }
 
   destroy () {
-    atom.signal.send('welcome-changelog-close', true);
+    atom.signal.send('welcome:changelog-close', true);
     this.subscriptions.dispose();
     this.emitter.emit('did-destroy');
   }
