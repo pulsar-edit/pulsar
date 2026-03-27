@@ -122,6 +122,22 @@ describe("ResultsModel", () => {
         expect(result).not.toBeUndefined();
       });
 
+      it('should correctly show results when the path pattern points to a directory', async () => {
+        await resultsModel.search('quicksort =', 'sub', '')
+        let result = resultsModel.getResult(
+          path.resolve(__dirname, 'fixtures', 'another-project-root', 'sub', 'sample.js')
+        );
+        expect(result).not.toBeUndefined();
+      })
+
+      it('should correctly show results when the path pattern points to a directory (with trailing slash)', async () => {
+        await resultsModel.search('quicksort =', 'sub/', '')
+        let result = resultsModel.getResult(
+          path.resolve(__dirname, 'fixtures', 'another-project-root', 'sub', 'sample.js')
+        );
+        expect(result).not.toBeUndefined();
+      })
+
       it("should correctly show results when the path pattern points to a file", async () => {
         await resultsModel.search('quicksort =', 'sub/sample.js', '')
         let result = resultsModel.getResult(
