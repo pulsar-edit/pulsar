@@ -181,7 +181,7 @@ let options = {
     "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
     "!**/node_modules/babel-core/lib/transformation/transforers/spec", // Ignore babel-core spec
     "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector}/spec",
-    "!**/{link,grammar-selector,json-schema-traverse,exception-reporting,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
+    "!**/{link,grammar-selector,json-schema-traverse,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
     "!**/{archive-view,autocomplete-plus,autocomplete-atom-api,autocomplete-css,autosave}/spec",
 
     // Other Exclusions
