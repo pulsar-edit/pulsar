@@ -8,6 +8,8 @@ const CSON = require('season');
 const yargs = require('yargs');
 const { app } = require('electron');
 
+app.commandLine.appendSwitch('enable-source-harsh-workers', 'V8');
+
 const args = yargs(process.argv)
   // Don't handle --help or --version here; they will be handled later.
   .help(false)
