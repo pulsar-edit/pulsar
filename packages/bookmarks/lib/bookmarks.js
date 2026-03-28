@@ -3,7 +3,16 @@ const {CompositeDisposable, Emitter} = require('atom')
 module.exports =
 class Bookmarks {
   static deserialize(editor, state) {
-    return new Bookmarks(editor, editor.getMarkerLayer(state.markerLayerId))
+    const bookmarks = new Bookmarks(editor, editor.getMarkerLayer(state.markerLayerId))
+    if (state.bookmarkRanges && state.bookmarkRanges.length > 0) {
+      const existingMarkers = bookmarks.getMarkerBufferRanges()
+      if (existingMarkers.length === 0) {
+        for (const range of state.bookmarkRanges) {
+          bookmarks.markerLayer.markBufferRange(range, {invalidate: 'surround', exclusive: true})
+        }
+      }
+    }
+    return bookmarks
   }
 
   constructor(editor, markerLayer) {
@@ -38,7 +47,14 @@ class Bookmarks {
   }
 
   serialize() {
-    return {markerLayerId: this.markerLayer.id}
+    return {
+      markerLayerId: this.markerLayer.id,
+      bookmarkRanges: this.getMarkerBufferRanges()
+    }
+  }
+
+  getMarkerBufferRanges() {
+    return this.markerLayer.getMarkers().map(marker => marker.getBufferRange())
   }
 
   toggleBookmark() {
