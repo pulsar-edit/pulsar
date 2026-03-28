@@ -16,16 +16,49 @@ XPStyle on
     ; install steps, ultimately removing Pulsar from the PATH
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources"
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources\app\ppm\bin"
-    ; Remove any shell/contextmenu entries created for Pulsar so they don't
-    ; stay after you uninstall.
-    DeleteRegKey HKCR "*\\shell\\Pulsar"
-    DeleteRegKey HKCR "Directory\\shell\\Pulsar"
-    DeleteRegKey HKCR "Folder\\shell\\Pulsar"
-    DeleteRegKey HKCR "Drive\\shell\\Pulsar"
-    DeleteRegKey HKCU "Software\\Classes\\*\\shell\\Pulsar"
-    DeleteRegKey HKCU "Software\\Classes\\Directory\\shell\\Pulsar"
-    DeleteRegKey HKCU "Software\\Classes\\Folder\\shell\\Pulsar"
-    DeleteRegKey HKCU "Software\\Classes\\Drive\\shell\\Pulsar"
+    
+    ; Remove context menu entries
+    ClearErrors
+
+    ; File Context Menu
+    Var FileContextMenuRK
+    StrCpy $FileContextMenuRK "Software\Classes\*\shell\Pulsar\"
+
+    ReadRegStr $0 HKCU $FileContextMenuRK ""
+    ${ifNot} ${Errors}
+      DeleteRegKey HKCU $FileContextMenuRK
+    ${endIf}
+    ClearErrors
+
+    ; Folder Context Menu
+    Var FolderContextMenuRK
+    StrCpy $FolderContextMenuRK "Software\Classes\Directory\shell\Pulsar\"
+
+    ReadRegStr $0 HKCU $FolderContextMenuRK ""
+    ${ifNot} ${Errors}
+      DeleteRegKey HKCU $FolderContextMenuRK
+    ${endIf}
+    ClearErrors
+
+    ; Folder Background Context Menu
+    Var FolderBgContextMenuRK
+    StrCpy $FolderBgContextMenuRK "Software\Classes\Directory\background\shell\Pulsar\"
+
+    ReadRegStr $0 HKCU $FolderBgContextMenuRK ""
+    ${ifNot} ${Errors}
+      DeleteRegKey HKCU $FolderBgContextMenuRK
+    ${endIf}
+    ClearErrors
+    
+    ; File Handler Entry
+    Var FileHandlerRK
+    StrCpy $FileHandlerRK "Software\Classes\Applications\Pulsar.exe\"
+
+    ReadRegStr $0 HKCU $FileHandlerRK ""
+    ${ifNot} ${Errors}
+      DeleteRegKey HKCU $FileHandlerRK
+    ${endIf}
+    ClearErrors
   ${endIf}
 !macroend
 
