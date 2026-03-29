@@ -22,7 +22,7 @@
 const crypto = require('crypto');
 
 const USED_KEYS = new Set();
-const STATE_KEYS_BY_WINDOW = new WeakMap();
+let STATE_KEYS_BY_WINDOW = new WeakMap();
 
 // Compute the state key used when
 function getIdealStateKey (projectPaths) {
@@ -91,4 +91,9 @@ function releaseStateKey (win) {
   USED_KEYS.delete(stateKey);
 }
 
-module.exports = { getStateKey, releaseStateKey, reserveStateKey };
+function resetStateKeys () {
+  USED_KEYS.clear();
+  STATE_KEYS_BY_WINDOW = new WeakMap();
+}
+
+module.exports = { getStateKey, releaseStateKey, reserveStateKey, resetStateKeys };
