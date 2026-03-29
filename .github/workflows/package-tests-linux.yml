@@ -176,7 +176,7 @@ jobs:
     - name: Setup NodeJS
       uses: actions/setup-node@v6
       with:
-        node-version: 16
+        node-version-file: '.nvmrc'
 
     - name: Restore dependencies from Cache
       id: restore-dependencies
@@ -209,9 +209,9 @@ jobs:
       run: sudo apt-get install -y xvfb
 
     - name: Install build dependencies
-      # Since we run `install` for some packages, we need to build dependencies
-      # that they rely on (e.g. `github`)
-      run: sudo apt-get install -y libsecret-1-dev
+      if: ${{ matrix.package == 'github' }}
+      # Install build tools needed for github & it's dependency keytar
+      run: sudo apt-get install -y libsecret-1-dev python3 python3-pip
 
     - name: Optionally install package's `devDependencies`
       # Running install for Pulsar ignores our installed package's dependencies.
