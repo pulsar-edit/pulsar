@@ -21,7 +21,7 @@ XPStyle on
     ClearErrors
 
     ; File Context Menu
-    Var FileContextMenuRK
+    Var /GLOBAL FileContextMenuRK
     StrCpy $FileContextMenuRK "Software\Classes\*\shell\Pulsar\"
 
     ReadRegStr $0 HKCU $FileContextMenuRK ""
@@ -31,7 +31,7 @@ XPStyle on
     ClearErrors
 
     ; Folder Context Menu
-    Var FolderContextMenuRK
+    Var /GLOBAL FolderContextMenuRK
     StrCpy $FolderContextMenuRK "Software\Classes\Directory\shell\Pulsar\"
 
     ReadRegStr $0 HKCU $FolderContextMenuRK ""
@@ -41,7 +41,7 @@ XPStyle on
     ClearErrors
 
     ; Folder Background Context Menu
-    Var FolderBgContextMenuRK
+    Var /GLOBAL FolderBgContextMenuRK
     StrCpy $FolderBgContextMenuRK "Software\Classes\Directory\background\shell\Pulsar\"
 
     ReadRegStr $0 HKCU $FolderBgContextMenuRK ""
@@ -51,7 +51,7 @@ XPStyle on
     ClearErrors
     
     ; File Handler Entry
-    Var FileHandlerRK
+    Var /GLOBAL FileHandlerRK
     StrCpy $FileHandlerRK "Software\Classes\Applications\Pulsar.exe\"
 
     ReadRegStr $0 HKCU $FileHandlerRK ""
