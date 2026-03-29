@@ -222,7 +222,7 @@ jobs:
       # here if that's the case. Somewhat hacky, and may be worth refactoring in
       # the future.
       if: matrix.dir
-      run: cd node_modules/${{ matrix.package }} && yarn install
+      run: cd node_modules/${{ matrix.package }} && ppm install
 
     - name: Run ${{ matrix.package }} Tests
       run: Xvfb :1 & cd node_modules/${{ matrix.package }} && DISPLAY=:1 pulsar --test ${{ matrix.dir || 'spec'}}
