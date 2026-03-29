@@ -207,5 +207,16 @@ jobs:
     - name: Install xvfb
       run: sudo apt-get install -y xvfb
 
+    - name: Optionally install package's `devDependencies`
+      # Running install for Pulsar ignores our installed package's dependencies.
+      # While we could define each package as a workspace, it seems simpler to detect
+      # if this particular package has a special `dir` defined. Most often, if we
+      # do, that means the package is using a custom `atomTestRunner` and requires
+      # it's `devDependencies` to be installed. So we run an additional install
+      # here if that's the case. Somewhat hacky, and may be worth refactoring in
+      # the future.
+      if: matrix.dir
+      run: cd node_modules/${{ matrix.package }} && yarn install
+
     - name: Run ${{ matrix.package }} Tests
       run: Xvfb :1 & cd node_modules/${{ matrix.package }} && DISPLAY=:1 pulsar --test ${{ matrix.dir || 'spec'}}
