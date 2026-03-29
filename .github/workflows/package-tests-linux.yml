@@ -211,7 +211,7 @@ jobs:
     - name: Install build dependencies
       # Since we run `install` for some packages, we need to build dependencies
       # that they rely on (e.g. `github`)
-      run: apt-get update && apt-get install -y libsecret-1-dev
+      run: sudo apt-get install -y libsecret-1-dev
 
     - name: Optionally install package's `devDependencies`
       # Running install for Pulsar ignores our installed package's dependencies.
