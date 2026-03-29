@@ -105,6 +105,7 @@ jobs:
           - package: "find-and-replace"
           - package: "fuzzy-finder"
           - package: "github"
+            dir: test
           - package: "git-diff"
           - package: "go-to-line"
           - package: "grammar-selector"
