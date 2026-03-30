@@ -57,6 +57,8 @@ function getStateKey (win, projectPaths, { pathsOnly = false } = {}) {
   let idealKey = getIdealStateKey(projectPaths);
 
   let actualKey = idealKey;
+  if (actualKey === null) return null;
+
   if (USED_KEYS.has(idealKey)) {
     actualKey = getRandomStateKey();
   }

@@ -1014,7 +1014,10 @@ module.exports = class AtomApplication extends EventEmitter {
     this.disposable.add(
       ipcHelpers.respondTo(
         'get-state-key',
-        (win, projectPaths, options) => getStateKey(win, projectPaths, options)
+        (browserWindow, projectPaths, options) => {
+          const win = this.atomWindowForBrowserWindow(browserWindow);
+          return getStateKey(win, projectPaths, options);
+        }
       )
     );
 
