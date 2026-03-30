@@ -47,7 +47,7 @@ jobs:
     - name: Restore Compiled Python from Cache - Linux
       if: ${{ runner.os == 'Linux' }}
       id: compiled-python-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         key: ${{ runner.os }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
         path: Python-${{ env.PYTHON_VERSION }}.9
@@ -64,7 +64,7 @@ jobs:
 
     - name: Save Compiled Python to Cache - Linux
       if: ${{ runner.os == 'Linux' && steps.compiled-python-restore.outputs.cache-hit != 'true' }}
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         key: ${{ runner.os }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
         path: Python-${{ env.PYTHON_VERSION }}.9
@@ -181,7 +181,7 @@ jobs:
 
     - name: Cache Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           node_modules
@@ -241,7 +241,7 @@ jobs:
 
     - name: Cache Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: ./binaries
         key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
@@ -310,14 +310,14 @@ jobs:
 
     - name: Restore Cached Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: ./binaries
         key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
 
     - name: Restore Cached Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           node_modules
