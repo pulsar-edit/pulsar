@@ -47,14 +47,14 @@ jobs:
 
     - name: Cache pulsar
       id: cache-pulsar
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: pulsar.deb
         key: pulsar-${{ github.sha }}
 
     - name: Cache dependencies
       id: cache-dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           node_modules
@@ -175,7 +175,7 @@ jobs:
 
     - name: Restore dependencies from Cache
       id: restore-dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           node_modules
@@ -192,7 +192,7 @@ jobs:
 
     - name: Restore pulsar from Cache
       id: restore-pulsar
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: pulsar.deb
         key: pulsar-${{ github.sha }}
