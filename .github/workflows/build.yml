@@ -247,7 +247,7 @@ jobs:
         key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
 
     - name: Upload Binary Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.os }} Binaries
         path: ./binaries/*
@@ -281,7 +281,7 @@ jobs:
     - name: Upload Video Artifacts
       # Run whether this job passed or failed, unless explicitly cancelled.
       if: ${{ !cancelled() && runner.os != 'Linux' }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.os }} Videos
         path: ./tests/videos/**
@@ -351,7 +351,7 @@ jobs:
     - name: Upload Video Artifacts - Linux
       # Run whether this job passed or failed, unless explicitly cancelled.
       if: ${{ !cancelled() && runner.os == 'Linux' }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.os }} Videos
         path: ./tests/videos/**
