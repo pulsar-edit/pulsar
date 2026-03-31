@@ -132,9 +132,16 @@ module.exports = class TooltipManager {
       });
       const keystroke = getKeystroke(bindings);
       if (options.title != null && keystroke != null) {
-        options.title += ` ${getKeystroke(bindings)}`;
+        if (typeof options.title === 'function') {
+          const originalTitle = options.title;
+          options.title = function() {
+            return originalTitle.call(this) + ` ${keystroke}`;
+          };
+        } else {
+          options.title += ` ${keystroke}`;
+        }
       } else if (keystroke != null) {
-        options.title = getKeystroke(bindings);
+        options.title = keystroke;
       }
     }
 

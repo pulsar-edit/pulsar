@@ -214,6 +214,36 @@ describe('TooltipManager', () => {
           });
         }));
 
+      describe('when the title is a function', () => {
+        it('calls the function and appends the key binding to the result', () => {
+          atom.keymaps.add('test', {
+            '.foo': { 'ctrl-x ctrl-y': 'test-command' }
+          });
+
+          manager.add(element, {
+            title: () => 'Title',
+            keyBindingCommand: 'test-command'
+          });
+
+          hover(element, function() {
+            const tooltipElement = document.body.querySelector('.tooltip');
+            expect(tooltipElement).toHaveText(`Title ${ctrlX} ${ctrlY}`);
+          });
+        });
+
+        it('calls the function without appending anything when no key binding is found', () => {
+          manager.add(element, {
+            title: () => 'Title',
+            keyBindingCommand: 'test-command'
+          });
+
+          hover(element, function() {
+            const tooltipElement = document.body.querySelector('.tooltip');
+            expect(tooltipElement.textContent).toBe('Title');
+          });
+        });
+      });
+
       describe('when a keyBindingTarget is specified', () => {
         it('looks up the key binding relative to the target', () => {
           atom.keymaps.add('test', {
