@@ -1385,7 +1385,10 @@ class AtomEnvironment {
   }
 
   async addToProject(projectPaths) {
-    const state = await this.loadState(this.getStateKey(projectPaths));
+    let stateKeyForNewProjectPaths = await this.getStateKey(projectPaths, { pathsOnly: true });
+    const state = await this.loadState(stateKeyForNewProjectPaths);
+    // When this is an “empty” project, adding one or more paths could lead the
+    // window to offer to “adopt” any state that existed for those paths.
     if (state && this.project.getPaths().length === 0) {
       this.attemptRestoreProjectStateForPaths(state, projectPaths);
     } else {
@@ -1474,7 +1477,7 @@ or use Pane::saveItemAs for programmatic saving.`);
     if (this.enablePersistence && this.project) {
       const state = this.serialize(options);
       if (!storageKey)
-        storageKey = this.getStateKey(this.project && this.project.getPaths());
+        storageKey = await this.getStateKey(this.project && this.project.getPaths());
       if (storageKey) {
         await this.stateStore.save(storageKey, state);
       } else {
@@ -1483,17 +1486,17 @@ or use Pane::saveItemAs for programmatic saving.`);
     }
   }
 
-  loadState(stateKey) {
+  async loadState(stateKey) {
     if (this.enablePersistence) {
       if (!stateKey)
-        stateKey = this.getStateKey(this.getLoadSettings().initialProjectRoots);
+        stateKey = await this.getStateKey(this.getLoadSettings().initialProjectRoots);
       if (stateKey) {
-        return this.stateStore.load(stateKey);
+        return await this.stateStore.load(stateKey);
       } else {
-        return this.applicationDelegate.getTemporaryWindowState();
+        return await this.applicationDelegate.getTemporaryWindowState();
       }
     } else {
-      return Promise.resolve(null);
+      return null;
     }
   }
 
@@ -1560,21 +1563,8 @@ or use Pane::saveItemAs for programmatic saving.`);
     }
   }
 
-  getStateKey(paths) {
-    if (paths && paths.length > 0) {
-      const sha1 = crypto
-        .createHash('sha1')
-        .update(
-          paths
-            .slice()
-            .sort()
-            .join('\n')
-        )
-        .digest('hex');
-      return `editor-${sha1}`;
-    } else {
-      return null;
-    }
+  async getStateKey (paths, options = {}) {
+    return this.applicationDelegate.getStateKey(paths, options);
   }
 
   getConfigDirPath() {
@@ -1710,7 +1700,7 @@ or use Pane::saveItemAs for programmatic saving.`);
         missingFolders.map(location => location.pathToOpen)
       );
       const state = await this.loadState(
-        this.getStateKey(Array.from(foldersForStateKey))
+        await this.getStateKey(Array.from(foldersForStateKey), { pathsOnly: true })
       );
 
       // only restore state if this is the first path added to the project
