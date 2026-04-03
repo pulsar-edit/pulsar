@@ -42,6 +42,17 @@ function filePathMatchesGlob(filePath, matcher) {
   return matcher.negate ? true : false;
 }
 
+// Trim trailing path separators from the ends of patterns. This makes it so
+// that `foo/` and `foo` are treated identically.
+function normalizePattern (rawPath) {
+  // The path separator is `\` on Windows, but we also allow usage of `/`;
+  // hence we check for both here.
+  if (rawPath.endsWith(path.sep) || rawPath.endsWith('/')) {
+    return rawPath.substring(0, rawPath.length - 1);
+  }
+  return rawPath;
+}
+
 // Given a path pattern like `foo/bar/baz` and a list of the current root path
 // basenames, reinterprets the path pattern and decides which root(s) it refers
 // to.
@@ -102,7 +113,8 @@ function getBasenamesFromProjectRoots () {
 
 const CACHED_MINIMATCH_INSTANCES = new Map();
 
-function minimatchInstanceForPattern(pattern) {
+function minimatchInstanceForPattern(rawPattern) {
+  let pattern = normalizePattern(rawPattern);
   if (!CACHED_MINIMATCH_INSTANCES.has(pattern)) {
     let instance = new Minimatch(pattern, { flipNegate: true });
     CACHED_MINIMATCH_INSTANCES.set(pattern, instance);
@@ -2423,9 +2435,12 @@ module.exports = class Workspace extends Model {
 
     const searchPromise = Promise.all(allSearches);
 
-    let defaultMatchers = options.paths ?
-      options.paths.map((inclusion) => minimatchInstanceForPattern(inclusion)) :
-      null;
+    let defaultMatchers = null;
+    if (options.paths) {
+      defaultMatchers = options.paths
+        .filter(p => !!p)
+        .map(inclusion => minimatchInstanceForPattern(inclusion));
+    }
 
     const customMatchers = new Map();
     for (let [dir, inclusions] of customInclusionsForDirectory) {
