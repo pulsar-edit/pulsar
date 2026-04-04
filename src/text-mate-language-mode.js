@@ -29,17 +29,16 @@ class TextMateLanguageMode {
     this.tokenizationStarted = false;
     this.id = params.id != null ? params.id : nextId++;
     this.buffer = params.buffer;
-    this.largeFileMode = params.largeFileMode;
     this.config = params.config ?? atom.config;
-    this.largeFileMode =
-      params.largeFileMode != null
-        ? params.largeFileMode
-        : this.buffer.buffer.getLength() >= 2 * 1024 * 1024;
-
     this.grammar = params.grammar || NullGrammar;
     this.rootScopeDescriptor = new ScopeDescriptor({
       scopes: [this.grammar.scopeName]
     });
+    const largeFileThreshold = this.config.get('editor.largeFileThreshold', { scope: this.rootScopeDescriptor }) ?? 2;
+    this.largeFileMode =
+      params.largeFileMode != null
+        ? params.largeFileMode
+        : largeFileThreshold > 0 && this.buffer.buffer.getLength() >= largeFileThreshold * 1024 * 1024;
     this.disposables.add(
       this.grammar.onDidUpdate(() => this.retokenizeLines())
     );
