@@ -111,8 +111,19 @@ module.exports = {
     this.broker?.destroy();
     this.broker = null;
 
+    this.backgroundTipsDisposable?.dispose();
+    this.backgroundTipsDisposable = null;
+
     this.subscriptions?.dispose();
     this.subscriptions = null;
+  },
+
+  consumeBackgroundTips (service) {
+    const disposable = service.registerTips([
+      'Navigate to any function or symbol in the current file with {symbols-view:toggle-file-symbols}'
+    ])
+    this.backgroundTipsDisposable = disposable
+    return disposable
   },
 
   consumeSymbolProvider(provider) {
