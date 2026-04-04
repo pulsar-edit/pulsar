@@ -1046,10 +1046,15 @@ module.exports = class Pane {
         // If the item is conflicted, we'll show a dialog in order to decide
         // how to proceed. The user may choose to overwrite (force the save) or
         // cancel.
-        let preface = conflicted ? this.promptOnConflict(item) : Promise.resolve();
+        let preface = () => promisify(() => item.save());
+        if (conflicted) {
+          preface = () => {
+            return this.promptOnConflict(item)
+              .then(() => item.save());
+          };
+        }
 
-        return preface
-          .then(() => item.save())
+        return preface()
           .then(() => {
             if (nextAction) nextAction();
           }).catch(error => {
