@@ -8363,6 +8363,7 @@ describe('TextEditor', () => {
     let promptOnConflictOutcome;
     beforeEach(async () => {
       jasmine.useRealClock();
+      atom.config.set('core.promptOnConflict', true);
       let projectPath = temp.mkdirSync('project-with-file-modification');
       destination = path.resolve(projectPath, 'sample.js');
       fs.copyFileSync(
@@ -8423,7 +8424,7 @@ describe('TextEditor', () => {
 
     afterEach(() => disposables?.dispose());
 
-    it('is considered to be in conflicted state, but will overwrite with user confirmation', async () => {
+    it('is considered to be in a conflicted state, but will overwrite with user confirmation', async () => {
       expect(editor.isInConflict()).toBe(true);
 
       let uncommittedContents = editor.getText();
@@ -8480,7 +8481,47 @@ describe('TextEditor', () => {
       // Since we cancelled the write, the conflict state should still be
       // present and unresolved.
       expect(editor.isInConflict()).toBe(true);
-    })
+    });
+
+    describe('but core.promptOnConflict is false', () => {
+      beforeEach(() => {
+        atom.config.set('core.promptOnConflict', false);
+      });
+
+      it('is considered to be in a conflicted state, but will not prompt the user', async () => {
+        expect(editor.isInConflict()).toBe(true);
+        expect(atom.config.get('core.promptOnConflict')).toBe(false);
+
+        let uncommittedContents = editor.getText();
+
+        // We've got to save this editor via the `Pane::saveItem` interface to
+        // trigger this conflict warning.
+        let activePane = atom.workspace.getActivePane();
+        activePane.saveItem(editor);
+
+        await conditionPromise(() => !editor.isModified());
+
+        // User should not have been shown the dialog…
+        expect(Pane.prototype.promptOnConflict).not.toHaveBeenCalled();
+
+        // …yet whatever was in the buffer when we chose to overwrite should
+        // match what's now present on disk.
+        expect(
+          fs.readFileSync(destination, 'utf8').toString()
+        ).toBe(uncommittedContents);
+
+        // Now that we've written to disk, there's no longer a conflict.
+        expect(editor.isInConflict()).toBe(false);
+
+        // Saving the file to disk should flip this internal flag.
+        expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
+
+        await wait(2000);
+        // The flag should stay this way even if the save triggered the buffer's
+        // `onDidChange` handler.
+        expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
+      });
+    });
   });
 
   describe('.shouldPromptToSave()', () => {
