@@ -1,4 +1,3 @@
-const { Disposable } = require('atom');
 const Tile = require('./tile');
 
 module.exports =
@@ -48,45 +47,63 @@ class StatusBarView {
     this.element.remove();
   }
 
-  addLeftTile(options) {
-    let index;
-    const newItem = options.item;
-    const newPriority = options?.priority != null ? options?.priority : this.leftTiles[this.leftTiles.length - 1].priority + 1;
-    let nextItem = null;
-    for (index = 0; index < this.leftTiles.length; index++) {
-      const {priority, item} = this.leftTiles[index];
-      if (priority > newPriority) {
-        nextItem = item;
-        break;
-      }
-    }
-
-    const newTile = new Tile(newItem, newPriority, this.leftTiles);
-    this.leftTiles.splice(index, 0, newTile);
-    const newElement = atom.views.getView(newItem);
-    const nextElement = atom.views.getView(nextItem);
+  insertLeftTile(tile) {
+    let index = this.leftTiles.findIndex(t => t.priority < tile.priority);
+    if (index === -1) index = this.leftTiles.length;
+    this.leftTiles.splice(index, 0, tile);
+    const newElement = atom.views.getView(tile.item);
+    const nextElement = this.leftPanel.children[index];
     this.leftPanel.insertBefore(newElement, nextElement);
+  }
+
+  insertRightTile(tile) {
+    let index = this.rightTiles.findIndex(t => t.priority < tile.priority);
+    if (index === -1) index = this.rightTiles.length;
+    this.rightTiles.splice(index, 0, tile);
+    const newElement = atom.views.getView(tile.item);
+    const nextElement = this.rightPanel.children[index];
+    this.rightPanel.insertBefore(newElement, nextElement);
+  }
+
+  addLeftTile(options) {
+    const newItem = options.item;
+    const newPriority = options?.priority != null ? -options.priority : this.leftTiles[this.leftTiles.length - 1].priority - 1;
+    const newTile = new Tile(newItem, newPriority, this.leftTiles);
+    this.insertLeftTile(newTile);
     return newTile;
   }
 
   addRightTile(options) {
-    let index;
     const newItem = options.item;
     const newPriority = options?.priority != null ? options?.priority : this.rightTiles[0].priority + 1;
-    let nextItem = null;
-    for (index = 0; index < this.rightTiles.length; index++) {
-      const {priority, item} = this.rightTiles[index];
-      if (priority < newPriority) {
-        nextItem = item;
-        break;
-      }
-    }
-
     const newTile = new Tile(newItem, newPriority, this.rightTiles);
-    this.rightTiles.splice(index, 0, newTile);
-    const newElement = atom.views.getView(newItem);
-    const nextElement = atom.views.getView(nextItem);
-    this.rightPanel.insertBefore(newElement, nextElement);
+    this.insertRightTile(newTile);
+    return newTile;
+  }
+
+  insertTileV2(tile) {
+    if (tile.priority === 0) return;
+
+    const isLeft = tile.priority < 0;
+    const tiles = isLeft ? this.leftTiles : this.rightTiles;
+    const panel = isLeft ? this.leftPanel : this.rightPanel;
+
+    tile.collection = tiles;
+
+    let index = tiles.findIndex(t => t.priority < tile.priority);
+    if (index === -1) index = tiles.length;
+    tiles.splice(index, 0, tile);
+    panel.insertBefore(atom.views.getView(tile.item), panel.children[index]);
+  }
+
+  addTile(options) {
+    const reinsert = (tile) => this.insertTileV2(tile);
+    const newTile = new Tile(options.item, options?.priority ?? 0, this.leftTiles, {
+      hideOnZero: true,
+      reinsertFn: reinsert,
+      priorityConfig: options?.priorityConfig
+    });
+    this.insertTileV2(newTile);
     return newTile;
   }
 
@@ -96,6 +113,10 @@ class StatusBarView {
 
   getRightTiles() {
     return this.rightTiles;
+  }
+
+  getTiles() {
+    return [...this.leftTiles, ...this.rightTiles];
   }
 
   getActiveBuffer() {

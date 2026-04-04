@@ -1,5 +1,5 @@
 const _ = require("underscore-plus");
-const { CompositeDisposable, GitRepositoryAsync } = require("atom");
+const { CompositeDisposable } = require("atom");
 
 module.exports =
 class GitView {
@@ -80,7 +80,7 @@ class GitView {
     for (let repo of atom.project.getRepositories()) {
       if (repo != null) {
         this.repositorySubscriptions.add(
-          repo.onDidChangeStatus(({ path, status }) => {
+          repo.onDidChangeStatus(({ path }) => {
             if (path === this.getActiveItemPath()) {
               this.update();
             }

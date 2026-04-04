@@ -17,6 +17,7 @@
     "status-bar": {
       "description": "A container for indicators at the bottom of the workspace",
       "versions": {
+        "2.0.0": "provideStatusBarV2",
         "1.1.0": "provideStatusBar",
         "0.58.0": "legacyProvideStatusBar"
       }
@@ -46,6 +47,36 @@
       "type": "string",
       "default": "(%L, %C)",
       "description": "Format for the selection count status bar element, where %L is the line count and %C is the character count"
+    },
+    "launchModePriority": {
+      "order": 10,
+      "type": "integer",
+      "default": -1,
+      "description": "Priority of the launch mode tile. Negative = left, positive = right, 0 = hidden."
+    },
+    "fileInfoPriority": {
+      "order": 11,
+      "type": "integer",
+      "default": -11,
+      "description": "Priority of the file info tile. Negative = left, positive = right, 0 = hidden."
+    },
+    "cursorPositionPriority": {
+      "order": 12,
+      "type": "integer",
+      "default": -12,
+      "description": "Priority of the cursor position tile. Negative = left, positive = right, 0 = hidden."
+    },
+    "selectionCountPriority": {
+      "order": 13,
+      "type": "integer",
+      "default": -13,
+      "description": "Priority of the selection count tile. Negative = left, positive = right, 0 = hidden."
+    },
+    "gitInfoPriority": {
+      "order": 14,
+      "type": "integer",
+      "default": 10,
+      "description": "Priority of the git info tile. Negative = left, positive = right, 0 = hidden."
     }
   }
 }
