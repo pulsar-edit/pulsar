@@ -185,8 +185,9 @@ describe('CommandPaletteView', () => {
       commandPalette.selectListView.refs.queryEditor.setText('Application: About')
       await commandPalette.selectListView.update()
       const matches = commandPalette.selectListView.element.querySelectorAll('.character-match')
-      assert.equal(matches.length, 1)
-      assert.equal(matches[0].textContent, 'Application: About')
+      assert.equal(matches.length, 2)
+      assert.equal(matches[0].textContent, 'Application:')
+      assert.equal(matches[1].textContent, 'About')
     })
 
     it('highlights partial matches in the displayName', async () => {
