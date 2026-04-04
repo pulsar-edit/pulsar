@@ -1058,8 +1058,12 @@ module.exports = class Pane {
             } else {
               this.handleSaveError(error, item);
             }
-            // Re-propagate the error.
-            return Promise.reject(error);
+            // Re-propagate cancellation errors so callers know the save was
+            // aborted. Other errors are already handled by
+            // handleSaveError/nextAction above.
+            if (error instanceof SaveCancelledError || error instanceof SaveConflictedError) {
+              return Promise.reject(error);
+            }
           });
       } else if (nextAction) {
         // Don't check if this item is in conflict; if it can't be saved,
