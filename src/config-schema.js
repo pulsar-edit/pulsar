@@ -133,6 +133,12 @@ const configSchema = {
         description:
           "When a window with no open tabs or panes is given the 'Close Tab' command, close that window."
       },
+      promptOnConflict: {
+        type: 'boolean',
+        title: 'Experimental: Prompt on Conflict',
+        default: false,
+        description: "Prompt before saving a file in a conflicted state, as happens when a file’s contents on disk are changed by another program while edits are pending."
+      },
       fileEncoding: {
         description:
           'Default character set encoding to use when reading and writing files.',
