@@ -1,9 +1,5 @@
 const fs = require('fs')
-const {it, fit, ffit, beforeEach, waitForCondition, wait} = require('./async-spec-helpers') // eslint-disable-line
-
-async function waitForSave (saveFn) {
-  return waitForCondition(() => saveFn.callCount > 0)
-}
+const {it, fit, ffit, beforeEach} = require('./async-spec-helpers') // eslint-disable-line
 
 describe('Autosave', () => {
   let workspaceElement, initialActiveItem, otherItem1, otherItem2
@@ -54,16 +50,13 @@ describe('Autosave', () => {
     })
 
     describe('when a pane loses focus', () => {
-      beforeEach(() => jasmine.useRealClock())
-
-      it('saves the item if autosave is enabled and the item has a uri', async () => {
+      it('saves the item if autosave is enabled and the item has a uri', () => {
         document.body.focus()
         expect(initialActiveItem.save).not.toHaveBeenCalled()
 
         workspaceElement.focus()
         atom.config.set('autosave.enabled', true)
         document.body.focus()
-        await waitForSave(initialActiveItem.save)
         expect(initialActiveItem.save).toHaveBeenCalled()
       })
 
@@ -97,7 +90,7 @@ describe('Autosave', () => {
     })
 
     describe('when a new pane is created', () => {
-      it('saves the item if autosave is enabled and the item has a uri', async () => {
+      it('saves the item if autosave is enabled and the item has a uri', () => {
         const leftPane = atom.workspace.getActivePane()
         const rightPane = leftPane.splitRight()
         expect(initialActiveItem.save).not.toHaveBeenCalled()
@@ -107,7 +100,6 @@ describe('Autosave', () => {
 
         atom.config.set('autosave.enabled', true)
         leftPane.splitRight()
-        await waitForSave(initialActiveItem.save)
         expect(initialActiveItem.save).toHaveBeenCalled()
       })
     })
@@ -132,7 +124,7 @@ describe('Autosave', () => {
       })
 
       describe('when the item is NOT the active item', () => {
-        it('does not save the item if autosave is enabled and the item has a uri', async () => {
+        it('does not save the item if autosave is enabled and the item has a uri', () => {
           let leftPane = atom.workspace.getActivePane()
           const rightPane = leftPane.splitRight({items: [otherItem1]})
           expect(initialActiveItem).not.toBe(atom.workspace.getActivePaneItem())
@@ -145,7 +137,6 @@ describe('Autosave', () => {
           rightPane.focus()
           expect(otherItem2).not.toBe(atom.workspace.getActivePaneItem())
           leftPane.destroyItem(otherItem2)
-          await waitForSave(otherItem2.save)
           expect(otherItem2.save).toHaveBeenCalled()
         })
       })
@@ -168,7 +159,7 @@ describe('Autosave', () => {
   })
 
   describe('when the window is blurred', () => {
-    it('saves all items', async () => {
+    it('saves all items', () => {
       atom.config.set('autosave.enabled', true)
 
       const leftPane = atom.workspace.getActivePane()
@@ -179,10 +170,6 @@ describe('Autosave', () => {
 
       window.dispatchEvent(new FocusEvent('blur'))
 
-      await Promise.all([
-        waitForSave(initialActiveItem.save),
-        waitForSave(otherItem1.save)
-      ])
       expect(initialActiveItem.save).toHaveBeenCalled()
       expect(otherItem1.save).toHaveBeenCalled()
     })
@@ -257,14 +244,12 @@ describe('Autosave', () => {
     atom.config.set('autosave.enabled', true)
 
     await atom.workspace.destroyActivePaneItem()
-    await waitForSave(initialActiveItem.save)
     expect(initialActiveItem.save).toHaveBeenCalled()
     expect(atom.notifications.addWarning.callCount > 0 || errorCallback.callCount > 0).toBe(true)
   })
 
   describe('dontSaveIf service', () => {
     it("doesn't save a paneItem if a predicate function registered via the dontSaveIf service returns true", async () => {
-      jasmine.useRealClock()
       atom.workspace.getActivePane().addItem(otherItem1)
       atom.config.set('autosave.enabled', true)
       const service = atom.packages.getActivePackage('autosave').mainModule.provideService()
@@ -274,10 +259,7 @@ describe('Autosave', () => {
       otherItem1.setText('bar')
 
       window.dispatchEvent(new FocusEvent('blur'))
-      await Promise.all([
-        waitForSave(otherItem1.save),
-        wait(200)
-      ])
+
       expect(initialActiveItem.save).not.toHaveBeenCalled()
       expect(otherItem1.save).toHaveBeenCalled()
     })

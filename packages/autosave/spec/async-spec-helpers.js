@@ -32,26 +32,6 @@ exports.afterEach = function afterEach (fn) {
   }
 })
 
-exports.waitForCondition = function waitForCondition(fn) {
-  return new Promise((resolve, reject) => {
-    const interval = setInterval(() => {
-      if (fn()) {
-        resolve()
-        clearInterval(interval)
-        clearTimeout(timeout)
-      }
-    }, 100)
-    let timeout = setTimeout(() => {
-      reject(new Error(`Timeout waiting for condition`))
-      clearInterval(interval)
-    }, 4000)
-  })
-}
-
-exports.wait = function wait(ms) {
-  return new Promise(r => setTimeout(r, ms))
-}
-
 function waitsForPromise (fn) {
   const promise = fn()
   global.waitsFor('spec promise to resolve', function (done) {
