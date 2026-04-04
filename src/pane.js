@@ -899,8 +899,14 @@ module.exports = class Pane {
   // Prompt the user about an item's conflicted state during an attempt to
   // save. The user must decide whether to cancel the attempted save… or force
   // it and overwrite what's on disk.
+  //
+  // Resolves with boolean `true` when a save can proceed… or rejects with an
+  // error when the save is aborted.
   promptOnConflict(item) {
     return new Promise((resolve, reject) => {
+      // Don't prompt if the user hasn't opted into it.
+      if (!atom.config.get('core.promptOnConflict')) return resolve(true);
+
       // Ensure the item implements an `isInConflict` method, and that it
       // returns `true`.
       if (!item.isInConflict?.()) {
@@ -1062,7 +1068,8 @@ module.exports = class Pane {
         return Promise.resolve();
       }
     } else {
-      // The file has not been committed to disk, so there's conflict hazard.
+      // The file has not been committed to disk, so there's no conflict
+      // hazard.
       return this.saveItemAs(item, nextAction);
     }
   }
