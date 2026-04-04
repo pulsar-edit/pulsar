@@ -111,7 +111,7 @@ describe('Autosave', () => {
         spyOn(initialActiveItem, 'isInConflict').andReturn(true)
       })
 
-      it('does not try save the item', async () => {
+      it('does not try to save the item', async () => {
         expect(initialActiveItem.isInConflict()).toBe(true)
         const newItem = await atom.workspace.createItemForURI('notyet.js')
         spyOn(newItem, 'isModified').andReturn(true)
@@ -133,6 +133,37 @@ describe('Autosave', () => {
           atom.config.set('autosave.enabled', true)
           document.body.focus()
           expect(initialActiveItem.save).not.toHaveBeenCalled()
+        })
+      })
+
+      describe('but core.promptOnConflict is false', () => {
+        beforeEach(() => {
+          atom.config.set('core.promptOnConflict', false)
+        })
+
+        it('does try to save the item', async () => {
+          expect(initialActiveItem.isInConflict()).toBe(true)
+          const newItem = await atom.workspace.createItemForURI('notyet.js')
+          spyOn(newItem, 'isModified').andReturn(true)
+          spyOn(newItem, 'isInConflict').andReturn(true)
+
+          atom.config.set('autosave.enabled', true)
+          spyOn(atom.workspace.getActivePane(), 'saveItem').andCallFake(() => Promise.resolve())
+          atom.workspace.getActivePane().addItem(newItem)
+
+          expect(atom.workspace.getActivePane().saveItem).toHaveBeenCalledWith(newItem)
+        })
+
+        describe('and a pane loses focus', () => {
+          it('saves the conflicted item if autosave is enabled', () => {
+            document.body.focus()
+            expect(initialActiveItem.save).not.toHaveBeenCalled()
+
+            workspaceElement.focus()
+            atom.config.set('autosave.enabled', true)
+            document.body.focus()
+            expect(initialActiveItem.save).toHaveBeenCalled()
+          })
         })
       })
     })

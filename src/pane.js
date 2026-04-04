@@ -1047,7 +1047,7 @@ module.exports = class Pane {
         // how to proceed. The user may choose to overwrite (force the save) or
         // cancel.
         let preface = () => promisify(() => item.save());
-        if (conflicted) {
+        if (conflicted && atom.config.get('core.promptOnConflict')) {
           preface = () => {
             return this.promptOnConflict(item)
               .then(() => item.save());
