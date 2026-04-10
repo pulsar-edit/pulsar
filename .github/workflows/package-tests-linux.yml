@@ -65,7 +65,6 @@ jobs:
     name: Package
     needs: setup
     runs-on: ubuntu-latest
-    if: ${{ ! matrix.skip || true }}
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -173,6 +172,7 @@ jobs:
           - package: "language-xml"
           - package: "language-yaml"
 
+    if: ${{ ! matrix.skip || true }}
     steps:
     - name: Checkout the latest code
       uses: actions/checkout@v5
