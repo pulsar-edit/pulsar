@@ -97,7 +97,7 @@ jobs:
           - package: "bracket-matcher"
           - package: "command-palette"
             dir: test
-            skip: true # TODO
+            should-run: false # TODO
           - package: "dalek"
             dir: test
           - package: "deprecation-cop"
@@ -107,7 +107,7 @@ jobs:
           - package: "fuzzy-finder"
           - package: "github"
             dir: test
-            skip: true # TODO
+            should-run: false # TODO
           - package: "git-diff"
           - package: "go-to-line"
           - package: "grammar-selector"
@@ -172,7 +172,7 @@ jobs:
           - package: "language-xml"
           - package: "language-yaml"
 
-    if: ${{ ! matrix.skip || true }}
+    if: ${{ matrix.should-run || true }}
     steps:
     - name: Checkout the latest code
       uses: actions/checkout@v5
