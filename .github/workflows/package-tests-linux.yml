@@ -70,18 +70,19 @@ jobs:
       max-parallel: 8
       matrix:
         include:
-          - package: "atom-dark-syntax"
-          - package: "atom-dark-ui"
-          - package: "atom-light-syntax"
-          - package: "atom-light-ui"
-          - package: "base16-tomorrow-dark-theme"
-          - package: "base16-tomorrow-light-theme"
+          # Package's that are commented out are core packages, but do not contain any tests
+          #- package: "atom-dark-syntax"
+          #- package: "atom-dark-ui"
+          #- package: "atom-light-syntax"
+          #- package: "atom-light-ui"
+          #- package: "base16-tomorrow-dark-theme"
+          #- package: "base16-tomorrow-light-theme"
           - package: "one-dark-ui"
           - package: "one-light-ui"
-          - package: "one-dark-syntax"
-          - package: "one-light-syntax"
-          - package: "solarized-dark-syntax"
-          - package: "solarized-light-syntax"
+          #- package: "one-dark-syntax"
+          #- package: "one-light-syntax"
+          #- package: "solarized-dark-syntax"
+          #- package: "solarized-light-syntax"
           - package: "about"
           - package: "archive-view"
           - package: "autocomplete-atom-api"
@@ -95,13 +96,18 @@ jobs:
           - package: "bookmarks"
           - package: "bracket-matcher"
           - package: "command-palette"
+            dir: test
+            allow-failure: true # TODO
           - package: "dalek"
+            dir: test
           - package: "deprecation-cop"
           - package: "dev-live-reload"
           - package: "encoding-selector"
           - package: "find-and-replace"
           - package: "fuzzy-finder"
           - package: "github"
+            dir: test
+            allow-failure: true # TODO
           - package: "git-diff"
           - package: "go-to-line"
           - package: "grammar-selector"
@@ -128,6 +134,7 @@ jobs:
           - package: "tree-view"
           - package: "update-package-dependencies"
           - package: "welcome"
+            dir: test
           - package: "whitespace"
           - package: "wrap-guide"
           - package: "language-c"
@@ -149,14 +156,14 @@ jobs:
           - package: "language-objective-c"
           - package: "language-perl"
           - package: "language-php"
-          - package: "language-property-list"
+          #- package: "language-property-list" #TODO we should probably add tests for this package
           - package: "language-python"
           - package: "language-ruby"
           - package: "language-ruby-on-rails"
-          - package: "language-rust-bundled"
+          #- package: "language-rust-bundled" #TODO we should probably add tests for this package
           - package: "language-sass"
           - package: "language-shellscript"
-          - package: "language-source"
+          #- package: "language-source" #TODO we should probably add tests for this package
           - package: "language-sql"
           - package: "language-text"
           - package: "language-todo"
@@ -171,7 +178,7 @@ jobs:
     - name: Setup NodeJS
       uses: actions/setup-node@v6
       with:
-        node-version: 16
+        node-version-file: '.nvmrc'
 
     - name: Restore dependencies from Cache
       id: restore-dependencies
@@ -203,5 +210,23 @@ jobs:
     - name: Install xvfb
       run: sudo apt-get install -y xvfb
 
+    - name: Install build dependencies
+      if: ${{ matrix.package == 'github' }}
+      # Install build tools needed for github & it's dependency keytar
+      run: sudo apt-get install -y libsecret-1-dev python3 python3-pip
+
+    - name: Optionally install package's `devDependencies`
+      # Running install for Pulsar ignores our installed package's dependencies.
+      # While we could define each package as a workspace, it seems simpler to detect
+      # if this particular package has a special `dir` defined. Most often, if we
+      # do, that means the package is using a custom `atomTestRunner` and requires
+      # it's `devDependencies` to be installed. So we run an additional install
+      # here if that's the case. Somewhat hacky, and may be worth refactoring in
+      # the future.
+      if: matrix.dir
+      continue-on-error: ${{ matrix.allow-failure || false }}
+      run: cd node_modules/${{ matrix.package }} && ppm install
+
     - name: Run ${{ matrix.package }} Tests
-      run: Xvfb :1 & cd node_modules/${{ matrix.package }} && if test -d spec; then DISPLAY=:1 pulsar --test spec; fi
+      continue-on-error: ${{ matrix.allow-failure || false }}
+      run: Xvfb :1 & cd node_modules/${{ matrix.package }} && DISPLAY=:1 pulsar --test ${{ matrix.dir || 'spec'}}
