@@ -2,6 +2,7 @@ const AtomWindow = require('./atom-window');
 const ApplicationMenu = require('./application-menu');
 const AtomProtocolHandler = require('./atom-protocol-handler');
 const { onDidChangeScrollbarStyle, getScrollbarStyle } = require('./scrollbar-style');
+const { getStateKey, releaseStateKey, reserveStateKey } = require('./state-keys');
 const StorageFolder = require('../storage-folder');
 const Config = require('../config');
 const ConfigFile = require('../config-file');
@@ -340,6 +341,7 @@ module.exports = class AtomApplication extends EventEmitter {
   openWithOptions(options) {
     const {
       pathsToOpen,
+      stateKey,
       executedFrom,
       foldersToOpen,
       urlsToOpen,
@@ -363,6 +365,7 @@ module.exports = class AtomApplication extends EventEmitter {
       return this.runTests({
         headless: true,
         devMode,
+        stateKey,
         resourcePath: this.resourcePath,
         executedFrom,
         pathsToOpen,
@@ -395,6 +398,7 @@ module.exports = class AtomApplication extends EventEmitter {
         clearWindowState,
         addToLastWindow,
         preserveFocus,
+        stateKey,
         env
       });
     } else if (urlsToOpen && urlsToOpen.length > 0) {
@@ -427,6 +431,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
   // Public: Removes the {AtomWindow} from the global window list.
   removeWindow(window) {
+    releaseStateKey(window);
     this.windowStack.removeWindow(window);
     if (this.getAllWindows().length === 0 && process.platform !== 'darwin') {
       app.quit();
@@ -1006,6 +1011,15 @@ module.exports = class AtomApplication extends EventEmitter {
         window => window.temporaryState
       )
     );
+    this.disposable.add(
+      ipcHelpers.respondTo(
+        'get-state-key',
+        (browserWindow, projectPaths, options) => {
+          const win = this.atomWindowForBrowserWindow(browserWindow);
+          return getStateKey(win, projectPaths, options);
+        }
+      )
+    );
 
     this.disposable.add(
       ipcHelpers.respondTo('set-temporary-window-state', (win, state) => {
@@ -1268,6 +1282,7 @@ module.exports = class AtomApplication extends EventEmitter {
   async openPaths({
     pathsToOpen,
     foldersToOpen,
+    stateKey,
     executedFrom,
     pidToKillWhenClosed,
     newWindow,
@@ -1427,6 +1442,9 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       openedWindow.preserveFocus = preserveFocus;
       this.addWindow(openedWindow);
+      if (stateKey) {
+        reserveStateKey(openedWindow, stateKey);
+      }
       openedWindow.focus();
     }
 
@@ -1505,7 +1523,10 @@ module.exports = class AtomApplication extends EventEmitter {
       version: APPLICATION_STATE_VERSION,
       windows: windows
         .filter(window => !window.isSpec)
-        .map(window => ({ projectRoots: window.projectRoots }))
+        .map(window => ({
+          projectRoots: window.projectRoots,
+          stateKey: getStateKey(window, window.projectRoots)
+        }))
     };
     state.windows.reverse();
 
@@ -1526,6 +1547,7 @@ module.exports = class AtomApplication extends EventEmitter {
       // Schema: {version: '1', windows: [{projectRoots: ['<root-dir>', ...]}, ...]}
       return state.windows.map(each => ({
         foldersToOpen: each.projectRoots,
+        stateKey: each.stateKey,
         devMode: this.devMode,
         safeMode: this.safeMode,
         newWindow: true
