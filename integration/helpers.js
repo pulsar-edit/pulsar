@@ -9,14 +9,13 @@ async function openAtom(profilePath, videoName) {
   env.ATOM_HOME = path.join("tmp", profilePath)
 
   const config = {
-    args: ["--no-sandbox", "."],
+    args: ["."],
     cwd: ".",
     env: env,
     timeout: 50000
   }
   if(env.BINARY_NAME) {
     config.executablePath = env.BINARY_NAME
-    config.args = ["--no-sandbox"]
   }
 
   if(process.env.CI) {
