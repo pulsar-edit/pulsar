@@ -41,6 +41,11 @@
       "versions": {
         "^1.1.0": "consumeMetricsReporter"
       }
+    },
+    "background-tips": {
+      "versions": {
+        "1.0.0": "consumeBackgroundTips"
+      }
     }
   },
   "configSchema": {

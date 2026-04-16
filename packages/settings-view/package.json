@@ -65,6 +65,11 @@
       "versions": {
         "0.1.0": "consumeSnippets"
       }
+    },
+    "background-tips": {
+      "versions": {
+        "1.0.0": "consumeBackgroundTips"
+      }
     }
   },
   "deserializers": {
