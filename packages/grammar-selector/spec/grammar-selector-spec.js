@@ -116,8 +116,8 @@ describe('GrammarSelector', () => {
 
     beforeEach(async () => {
       statusBar = document.querySelector('status-bar');
-      [grammarTile] = statusBar.getLeftTiles().slice(-1);
-      grammarStatus = grammarTile.getItem();
+      grammarTile = statusBar.getLeftTiles().find(t => t.getItem().tagName === 'GRAMMAR-SELECTOR-STATUS');
+      grammarStatus = grammarTile?.getItem();
 
       // Wait for status bar service hook to fire
       while (!grammarStatus || !grammarStatus.textContent) {

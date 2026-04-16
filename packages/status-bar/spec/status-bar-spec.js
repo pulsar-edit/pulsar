@@ -91,7 +91,7 @@ describe("Status Bar package", function() {
     });
   });
 
-  describe("the 'status-bar' service", function() {
+  describe("the 'status-bar' v1 service", function() {
     it("allows tiles to be added, removed, and retrieved", function() {
       let dummyView = document.createElement("div");
       let tile = statusBarService.addLeftTile({item: dummyView});
@@ -111,11 +111,72 @@ describe("Status Bar package", function() {
     });
 
     it("allows the git info tile to be disabled", function() {
-      const getGitInfoTile = () => statusBar.getRightTiles().find(tile => tile.item.matches('.git-view'));
+      const getGitInfoTile = () => statusBar.getRightTiles().find(tile => tile.item.matches?.('.git-view'));
 
       expect(getGitInfoTile()).not.toBeUndefined();
       statusBarService.disableGitInfoTile();
       expect(getGitInfoTile()).toBeUndefined();
+    });
+  });
+
+  describe("the 'status-bar' v2 service", function() {
+    let statusBarV2Service = null;
+
+    beforeEach(function() {
+      statusBarV2Service = mainModule.provideStatusBarV2();
+    });
+
+    it("allows tiles to be added, removed, and retrieved", function() {
+      const dummyView = document.createElement("div");
+      const tile = statusBarV2Service.addTile({item: dummyView, priority: -10});
+      expect(statusBar).toContain(dummyView);
+      expect(statusBarV2Service.getTiles()).toContain(tile);
+      tile.destroy();
+      expect(statusBar).not.toContain(dummyView);
+      expect(statusBarV2Service.getTiles()).not.toContain(tile);
+    });
+
+    it("places tiles on the left for negative priority and right for positive", function() {
+      const leftView = document.createElement("div");
+      const rightView = document.createElement("div");
+
+      const leftTile = statusBarV2Service.addTile({item: leftView, priority: -10});
+      const rightTile = statusBarV2Service.addTile({item: rightView, priority: 10});
+
+      expect(statusBar.leftPanel).toContain(leftView);
+      expect(statusBar.rightPanel).toContain(rightView);
+    });
+
+    it("hides tiles with priority 0", function() {
+      const dummyView = document.createElement("div");
+      const tile = statusBarV2Service.addTile({item: dummyView, priority: 0});
+
+      expect(tile.isVisible()).toBe(false);
+      expect(dummyView.style.display).toBe('none');
+    });
+
+    it("supports setPriority to reposition tiles", function() {
+      const dummyView = document.createElement("div");
+      const tile = statusBarV2Service.addTile({item: dummyView, priority: -10});
+
+      expect(statusBar.leftPanel).toContain(dummyView);
+      tile.setPriority(10);
+      expect(statusBar.rightPanel).toContain(dummyView);
+      expect(tile.getPriority()).toBe(10);
+    });
+
+    it("supports setPriority to hide and show tiles", function() {
+      const dummyView = document.createElement("div");
+      const tile = statusBarV2Service.addTile({item: dummyView, priority: -10});
+
+      expect(tile.isVisible()).toBe(true);
+      tile.setPriority(0);
+      expect(tile.isVisible()).toBe(false);
+      expect(dummyView.style.display).toBe('none');
+
+      tile.setPriority(10);
+      expect(tile.isVisible()).toBe(true);
+      expect(dummyView.style.display).toBe('');
     });
   });
 });
