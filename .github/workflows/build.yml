@@ -155,7 +155,7 @@ jobs:
       # So we use the pipe to ensure we wait for output, but for the LIFE (#1350) I can't get output here.
 
     - name: Install Pulsar Dependencies
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -164,7 +164,7 @@ jobs:
         on_retry_command: rm -R node_modules
 
     - name: Rebuild Pulsar Dependencies for Electron
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -172,7 +172,7 @@ jobs:
         command: yarn build
 
     - name: Build ppm
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -200,7 +200,7 @@ jobs:
         APPLEID: ${{ secrets.APPLEID }}
         APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
         TEAM_ID: ${{ secrets.TEAM_ID }}
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 31
         max_attempts: 7
@@ -208,7 +208,7 @@ jobs:
 
     - name: Build Pulsar Binaries (macOS) (Unsigned)
       if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 31
         max_attempts: 7
@@ -216,7 +216,7 @@ jobs:
 
     - name: Build Pulsar Binaries
       if: ${{ runner.os != 'macOS' }}
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 30
         max_attempts: 3
