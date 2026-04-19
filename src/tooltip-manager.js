@@ -133,10 +133,7 @@ module.exports = class TooltipManager {
       const keystroke = getKeystroke(bindings);
       if (options.title != null && keystroke != null) {
         if (typeof options.title === 'function') {
-          const originalTitle = options.title;
-          options.title = function() {
-            return originalTitle.call(this) + ` ${keystroke}`;
-          };
+          options.title = options.title() + ` ${keystroke}`;
         } else {
           options.title += ` ${keystroke}`;
         }
