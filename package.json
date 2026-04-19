@@ -37,7 +37,7 @@
     "@pulsar-edit/pathwatcher": "^9.0.2",
     "@pulsar-edit/scandal": "^4.0.0",
     "@pulsar-edit/superstring": "^3.0.5",
-    "@pulsar-edit/text-buffer": "^14.0.3",
+    "@pulsar-edit/text-buffer": "^14.0.4",
     "about": "file:packages/about",
     "archive-view": "file:packages/archive-view",
     "async": "3.2.6",
