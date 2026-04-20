@@ -2438,6 +2438,7 @@ module.exports = class Workspace extends Model {
     let defaultMatchers = null;
     if (options.paths) {
       defaultMatchers = options.paths
+        // Filter out "empty string" ("") path segments that somehow make it here
         .filter(p => !!p)
         .map(inclusion => minimatchInstanceForPattern(inclusion));
     }
