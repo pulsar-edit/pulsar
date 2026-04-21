@@ -1249,6 +1249,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitLeft(params) {
@@ -1260,6 +1261,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitRight(params) {
@@ -1271,6 +1273,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitUp(params) {
@@ -1282,6 +1285,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitDown(params) {
@@ -1335,7 +1339,9 @@ module.exports = class Pane {
     if (params && params.moveActiveItem && this.activeItem)
       this.moveItemToPane(this.activeItem, newPane);
 
-    newPane.activate();
+    if (!params || params.activate !== false) {
+      newPane.activate();
+    }
     return newPane;
   }
 
@@ -1371,10 +1377,10 @@ module.exports = class Pane {
 
   // If the parent is a horizontal axis, returns its last child if it is a pane;
   // otherwise returns a new pane created by splitting this pane rightward.
-  findOrCreateRightmostSibling() {
+  findOrCreateRightmostSibling(params) {
     const rightmostSibling = this.findRightmostSibling();
     if (rightmostSibling === this) {
-      return this.splitRight();
+      return this.splitRight(params);
     } else {
       return rightmostSibling;
     }
@@ -1412,10 +1418,10 @@ module.exports = class Pane {
 
   // If the parent is a vertical axis, returns its last child if it is a pane;
   // otherwise returns a new pane created by splitting this pane bottomward.
-  findOrCreateBottommostSibling() {
+  findOrCreateBottommostSibling(params) {
     const bottommostSibling = this.findBottommostSibling();
     if (bottommostSibling === this) {
-      return this.splitDown();
+      return this.splitDown(params);
     } else {
       return bottommostSibling;
     }

@@ -1236,6 +1236,15 @@ describe('Pane', () => {
         });
       });
 
+      describe('when `activate: false` is passed in the params', () => {
+        it('creates the new pane without activating it', () => {
+          pane1.activate();
+          const pane2 = pane1.splitRight({ activate: false });
+          expect(container.root.children).toContain(pane2);
+          expect(container.getActivePane()).toBe(pane1);
+        });
+      });
+
       describe('when the parent is a column', () => {
         it('replaces itself with a row and inserts a new pane to the right of itself', () => {
           pane1.splitDown();
