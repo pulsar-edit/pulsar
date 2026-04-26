@@ -126,23 +126,17 @@ module.exports = class TooltipManager {
     const { keyBindingCommand, keyBindingTarget } = options;
 
     if (keyBindingCommand != null) {
-      const bindings = this.keymapManager.findKeyBindings({
-        command: keyBindingCommand,
-        target: keyBindingTarget
-      });
-      const keystroke = getKeystroke(bindings);
-      if (options.title != null && keystroke != null) {
-        if (typeof options.title === 'function') {
-          const originalTitle = options.title;
-          options.title = function() {
-            return originalTitle.call(this) + ` ${keystroke}`;
-          };
-        } else {
-          options.title += ` ${keystroke}`;
-        }
-      } else if (keystroke != null) {
-        options.title = keystroke;
-      }
+      const keymapManager = this.keymapManager;
+      const baseTitle = options.title;
+      options.title = function() {
+        const bindings = keymapManager.findKeyBindings({
+          command: keyBindingCommand,
+          target: keyBindingTarget
+        });
+        const keystroke = getKeystroke(bindings);
+        const base = typeof baseTitle === 'function' ? baseTitle.call(this) : baseTitle;
+        return [base, keystroke].filter(Boolean).join(' ');
+      };
     }
 
     delete options.selector;
