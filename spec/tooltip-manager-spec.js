@@ -244,6 +244,68 @@ describe('TooltipManager', () => {
         });
       });
 
+      describe('when the keymap changes after the tooltip is registered', () => {
+        it('shows the updated key binding when a string title is specified', () => {
+          const initialKeymap = atom.keymaps.add('initial', {
+            '.foo': { 'ctrl-x ctrl-z': 'test-command' }
+          });
+
+          manager.add(element, {
+            title: 'Title',
+            keyBindingCommand: 'test-command'
+          });
+
+          initialKeymap.dispose();
+          atom.keymaps.add('test', {
+            '.foo': { 'ctrl-x ctrl-y': 'test-command' }
+          });
+
+          hover(element, function() {
+            const tooltipElement = document.body.querySelector('.tooltip');
+            expect(tooltipElement).toHaveText(`Title ${ctrlX} ${ctrlY}`);
+          });
+        });
+
+        it('shows the updated key binding when no title is specified', () => {
+          const initialKeymap = atom.keymaps.add('initial', {
+            '.foo': { 'ctrl-x ctrl-z': 'test-command' }
+          });
+
+          manager.add(element, { keyBindingCommand: 'test-command' });
+
+          initialKeymap.dispose();
+          atom.keymaps.add('test', {
+            '.foo': { 'ctrl-x ctrl-y': 'test-command' }
+          });
+
+          hover(element, function() {
+            const tooltipElement = document.body.querySelector('.tooltip');
+            expect(tooltipElement).toHaveText(`${ctrlX} ${ctrlY}`);
+          });
+        });
+
+        it('shows the updated key binding when the title is a function', () => {
+          const initialKeymap = atom.keymaps.add('initial', {
+            '.foo': { 'ctrl-x ctrl-z': 'test-command' }
+          });
+
+          manager.add(element, {
+            title: () => 'Title',
+            keyBindingCommand: 'test-command'
+          });
+
+          initialKeymap.dispose();
+          atom.keymaps.add('test', {
+            '.foo': { 'ctrl-x ctrl-y': 'test-command' }
+          });
+
+          hover(element, function() {
+            const tooltipElement = document.body.querySelector('.tooltip');
+            expect(tooltipElement).toHaveText(`Title ${ctrlX} ${ctrlY}`);
+          });
+        });
+      });
+
       describe('when a keyBindingTarget is specified', () => {
         it('looks up the key binding relative to the target', () => {
           atom.keymaps.add('test', {
