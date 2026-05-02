@@ -9680,9 +9680,9 @@ temp@^0.8.1, temp@^0.8.3, temp@~0.8.0, temp@~0.8.1:
   dependencies:
     rimraf "~2.6.2"
 
-"terminal@https://github.com/pulsar-edit/terminal#v0.3.1":
-  version "0.3.1"
-  resolved "https://github.com/pulsar-edit/terminal#8a4c0142331e5479e56f5c409887d8edf2148b4a"
+"terminal@https://github.com/pulsar-edit/terminal#v0.3.2":
+  version "0.3.2"
+  resolved "https://github.com/pulsar-edit/terminal#558dc4c23230cbf0db314cdd1d426df00cb73448"
   dependencies:
     "@electron/remote" "^2.1.2"
     "@xterm/addon-fit" "^0.11.0"
