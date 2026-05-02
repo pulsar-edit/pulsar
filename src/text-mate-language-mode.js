@@ -36,9 +36,7 @@ class TextMateLanguageMode {
     });
     const largeFileThreshold = this.config.get('editor.largeFileThreshold', { scope: this.rootScopeDescriptor }) ?? 2;
     this.largeFileMode =
-      params.largeFileMode != null
-        ? params.largeFileMode
-        : largeFileThreshold > 0 && this.buffer.buffer.getLength() >= largeFileThreshold * 1024 * 1024;
+      params.largeFileMode ?? (largeFileThreshold > 0 && this.buffer.buffer.getLength() >= largeFileThreshold * 1024 * 1024);
     this.disposables.add(
       this.grammar.onDidUpdate(() => this.retokenizeLines())
     );
