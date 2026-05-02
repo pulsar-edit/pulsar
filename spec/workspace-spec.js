@@ -747,16 +747,12 @@ describe('Workspace', () => {
       });
 
       it('does not throw when opened without position options', async () => {
-        await expectAsync(workspace.open('a', {})).toBeResolved();
-        await expectAsync(
-          workspace.open('a', { initialLine: null, initialColumn: null })
-        ).toBeResolved();
-        await expectAsync(
-          workspace.open('a', {
-            initialLine: undefined,
-            initialColumn: undefined
-          })
-        ).toBeResolved();
+        await workspace.open('a', {});
+        await workspace.open('a', { initialLine: null, initialColumn: null });
+        await workspace.open('a', {
+          initialLine: undefined,
+          initialColumn: undefined
+        });
       });
 
       it('does not throw when opening a file outside the project with null position options', async () => {
@@ -766,9 +762,7 @@ describe('Workspace', () => {
         const filePath = path.join(dir, 'outside.txt');
         fs.writeFileSync(filePath, 'content outside project\n');
 
-        await expectAsync(
-          workspace.open(filePath, { initialLine: null, initialColumn: null })
-        ).toBeResolved();
+        await workspace.open(filePath, { initialLine: null, initialColumn: null });
 
         expect(
           workspace.getActiveTextEditor().getCursorBufferPosition()
