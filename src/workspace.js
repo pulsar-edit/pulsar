@@ -2659,7 +2659,6 @@ module.exports = class Workspace extends Model {
         // These patterns implicitly exclude our root altogether.
         return false;
       }
-      console.log('Filtered patterns:', filteredPatterns);
       patterns = filteredPatterns;
     }
 
