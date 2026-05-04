@@ -50,7 +50,16 @@ function normalizePattern (rawPath) {
   if (rawPath.endsWith(path.sep) || rawPath.endsWith('/')) {
     return rawPath.substring(0, rawPath.length - 1);
   }
-  return rawPath;
+  // If a user searches for (e.g.) `*.js`, we want to search all `.js` files
+  // anywhere in the project, not just in the root. That means we should treat
+  // patterns as implicitly prepending `**/` if they contain no path separators.
+  //
+  // NOTE: This is stricter than VS Code's approach, which is to prepend `**/`
+  // to _all_ patterns unless the user specifically opts out by starting a
+  // path with `/`. This would make plenty of sense for us, but would be a
+  // change in behavior, so for now we're going with this as a compromise.
+  if (rawPath.includes(`${path.sep}`)) return rawPath;
+  return `**${path.sep}${rawPath}`;
 }
 
 // Given a path pattern like `foo/bar/baz` and a list of the current root path

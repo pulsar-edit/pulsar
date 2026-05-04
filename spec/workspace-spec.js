@@ -2280,6 +2280,13 @@ describe('Workspace', () => {
       ).toBe(false);
 
       expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, ['*.js'])
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, ['*.js'])
+      ).toBe(true);
+
+      expect(
         atom.workspace.filePathMatchesPatterns(pathA1, positiveGlobs)
       ).toBe(false);
       expect(
