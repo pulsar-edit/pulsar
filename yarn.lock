@@ -1669,10 +1669,10 @@
     "@types/node" "*"
     playwright-core "1.22.2"
 
-"@pulsar-edit/atom-keymap@^9.0.3":
-  version "9.0.3"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/atom-keymap/-/atom-keymap-9.0.3.tgz#5df0dec0d710e74639bfdfbd1b790a927035aeaf"
-  integrity sha512-Qh/PFAXA6xNBV6gZTYs7fQf7EwyHNf8Keh0U155XO+0JdRws68YlH07Doq0tqQVvURwU8RIZGNilK0BKkJpRUg==
+"@pulsar-edit/atom-keymap@^9.1.0":
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/atom-keymap/-/atom-keymap-9.1.0.tgz#574bd035d1d4b59b2445cc4ea1925513e6c992cf"
+  integrity sha512-BW7WvkyeXzcr6v2G97gIkxEnUIi/EoIUDHOLAyNqsRvMJcPxPajBDwM54rgCSPw1oeKSaaiHk56O46mlAyxcxg==
   dependencies:
     "@electron/rebuild" "^3.2.11"
     "@pulsar-edit/keyboard-layout" "^3.0.5"
@@ -9974,17 +9974,22 @@ unbzip2-stream@1.4.3, unbzip2-stream@^1.4.3:
     buffer "^5.2.1"
     through "^2.3.8"
 
-underscore-plus@1.7.0, underscore-plus@1.x, underscore-plus@^1, underscore-plus@^1.0.0, underscore-plus@^1.0.6, underscore-plus@^1.6.3, underscore-plus@^1.7.0, underscore-plus@~1.x:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/underscore-plus/-/underscore-plus-1.7.0.tgz#107f1900c520ac1fefe4edec6580a7ff08a99d0f"
-  integrity sha512-A3BEzkeicFLnr+U/Q3EyWwJAQPbA19mtZZ4h+lLq3ttm9kn8WC4R3YpuJZEXmWdLjYP47Zc8aLZm9kwdv+zzvA==
+underscore-plus@1.7.0, underscore-plus@1.x, underscore-plus@^1, underscore-plus@^1.0.0, underscore-plus@^1.0.6, underscore-plus@^1.6.3, underscore-plus@^1.7.0, "underscore-plus@npm:@pulsar-edit/underscore-plus@1.8.3", underscore-plus@~1.x:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/underscore-plus/-/underscore-plus-1.8.3.tgz#588ac69f214f3082684ace9f18352362bc490cd6"
+  integrity sha512-s4cbK1imHEvUJcPKdaoMz2fg49XWjlhqq0Qd0cvVREeswLKyKsMRH/GvvE9sxGfv1qIZaGRAWn/6y+8kViVP2Q==
   dependencies:
-    underscore "^1.9.1"
+    underscore "^1.10.2"
 
 "underscore@>= 1.3.1", underscore@>=1.3.1, underscore@^1.3.1, underscore@^1.9.1, underscore@~1.13.2:
   version "1.13.7"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.13.7.tgz#970e33963af9a7dda228f17ebe8399e5fbe63a10"
   integrity sha512-GMXzWtsc57XAtguZgaQViUOzs0KTkk8ojr3/xAxXLITqf/3EMwxC0inyETfDFjH/Krbhuep0HNbbjI9i/q3F3g==
+
+underscore@^1.10.2:
+  version "1.13.8"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.13.8.tgz#a93a21186c049dbf0e847496dba72b7bd8c1e92b"
+  integrity sha512-DXtD3ZtEQzc7M8m4cXotyHR+FAS18C64asBYY5vqZexfYryNNnDc02W4hKg3rdQuqOYas1jkseX0+nZXjTXnvQ==
 
 undici-types@~5.26.4:
   version "5.26.5"
