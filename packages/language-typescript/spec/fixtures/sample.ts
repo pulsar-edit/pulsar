@@ -1,6 +1,9 @@
 // @ts-nocheck
 /* eslint-disable */
 
+import json from './test.json' with { type: 'json' };
+//                             ^^^^ keyword.control.with.ts
+
 type World = "world";
 // <- storage.type.ts
 //   ^^^^^ support.storage.other.type.ts

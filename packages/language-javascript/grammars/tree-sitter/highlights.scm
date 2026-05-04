@@ -749,6 +749,9 @@
   "while"
 ] @keyword.control.loop._TYPE_.js
 
+((import_attribute "with" @keyword.control.with.js)
+  (#set! capture.final))
+
 "with" @keyword.control.with.js @invalid.deprecated.with.js
 
 ["async" "static"] @storage.modifier._TYPE_.js
