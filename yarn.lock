@@ -9974,10 +9974,10 @@ unbzip2-stream@1.4.3, unbzip2-stream@^1.4.3:
     buffer "^5.2.1"
     through "^2.3.8"
 
-underscore-plus@1.7.0, underscore-plus@1.x, underscore-plus@^1, underscore-plus@^1.0.0, underscore-plus@^1.0.6, underscore-plus@^1.6.3, underscore-plus@^1.7.0, "underscore-plus@npm:@pulsar-edit/underscore-plus@1.8.1", underscore-plus@~1.x:
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/underscore-plus/-/underscore-plus-1.8.1.tgz#4819c2a0d89ad1095894385a7f44e3cef7ae92c3"
-  integrity sha512-XY4L5Tqz5YDv+h2VFM7y87QLZnyK5S01aT7tdVrsomwqMHQLchzOW6TQt2syfx69mcWVBJKn00jE/Y0Zlm/pmw==
+underscore-plus@1.7.0, underscore-plus@1.x, underscore-plus@^1, underscore-plus@^1.0.0, underscore-plus@^1.0.6, underscore-plus@^1.6.3, underscore-plus@^1.7.0, "underscore-plus@npm:@pulsar-edit/underscore-plus@1.8.2", underscore-plus@~1.x:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/underscore-plus/-/underscore-plus-1.8.2.tgz#8b86f1bf0590dec11b05ac6b9b5859c2a858c8ed"
+  integrity sha512-0vIq92Gp3QGc5G7J7X7noSsvfxgwkmZHhXkGUDKoU7bo69TaGshX3XIHSEl13Klvd1jyHKJJuaOEWA2XTeTXng==
   dependencies:
     underscore "^1.10.2"
 
