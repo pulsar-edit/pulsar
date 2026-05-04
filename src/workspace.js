@@ -42,7 +42,7 @@ function filePathMatchesGlob(filePath, matcher) {
   return matcher.negate ? true : false;
 }
 
-// Transform it prior to handing it off to `minimatch`.
+// Transform a pattern prior to handing it off to `minimatch`.
 function normalizePattern (rawPath) {
   // Strip any trailing path separator.
   // The path separator is `\` on Windows, but we also allow usage of `/`;
