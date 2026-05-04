@@ -321,6 +321,6 @@
     "@electron/remote": "2.1.2",
     "@pulsar-edit/superstring": "3.0.5",
     "@pulsar-edit/pathwatcher": "9.0.3",
-    "**/underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.2"
+    "**/underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   }
 }
