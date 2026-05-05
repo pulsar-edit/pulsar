@@ -42,15 +42,33 @@ function filePathMatchesGlob(filePath, matcher) {
   return matcher.negate ? true : false;
 }
 
-// Trim trailing path separators from the ends of patterns. This makes it so
-// that `foo/` and `foo` are treated identically.
+// Transform a pattern prior to handing it off to `minimatch`.
 function normalizePattern (rawPath) {
+  // Strip any trailing path separator.
   // The path separator is `\` on Windows, but we also allow usage of `/`;
   // hence we check for both here.
   if (rawPath.endsWith(path.sep) || rawPath.endsWith('/')) {
-    return rawPath.substring(0, rawPath.length - 1);
+    rawPath = rawPath.substring(0, rawPath.length - 1);
   }
-  return rawPath;
+
+  // Keep any path negation separate from the rest, since it needs to stay at
+  // the beginning no matter what.
+  let negation = '';
+  if (rawPath.startsWith('!')) {
+    rawPath = rawPath.slice(1);
+    negation = '!';
+  }
+
+  // If a user searches for (e.g.) `*.js`, we want to search all `.js` files
+  // anywhere in the project, not just in the root. That means we should treat
+  // patterns as implicitly prepending `**/` if they contain no path separators.
+  //
+  // NOTE: This is stricter than VS Code's approach, which is to prepend `**/`
+  // to _all_ patterns unless the user specifically opts out by starting a
+  // path with `/`. This would make plenty of sense for us, but would be a
+  // change in behavior, so for now we're going with this as a compromise.
+  let prefix = (rawPath.includes(path.sep) || rawPath.includes('/')) ? '' : `**${path.sep}`;
+  return `${negation}${prefix}${rawPath}`;
 }
 
 // Given a path pattern like `foo/bar/baz` and a list of the current root path
