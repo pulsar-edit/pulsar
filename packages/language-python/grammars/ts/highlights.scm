@@ -64,7 +64,7 @@
   (#set! capture.final true))
 
 
-; CLASSES
+; CONSTANTS
 ; =======
 
 ((identifier) @constant.other.python
@@ -87,6 +87,11 @@
   superclasses: (argument_list
     (identifier) @entity.other.inherited-class.python))
 
+; TYPES
+; =====
+
+(generic_type (identifier) @support.storage.type.generic.python)
+(type (identifier) @support.storage.type.python)
 
 ; FUNCTIONS
 ; =========
@@ -440,6 +445,9 @@
   "[" @punctuation.definition.list.begin.bracket.square.python
   "]" @punctuation.definition.list.end.bracket.square.python)
 
+(type_parameter
+  "[" @punctuation.definition.list.begin.bracket.square.python
+  "]" @punctuation.definition.list.end.bracket.square.python)
 
 (slice ":" @punctuation.separator.slice.colon.python)
 

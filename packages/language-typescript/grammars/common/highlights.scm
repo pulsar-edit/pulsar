@@ -894,6 +894,11 @@
   "debugger"
 ] @keyword.control._TYPE_._LANG_
 
+((import_attribute "with" @keyword.control.with._LANG_)
+  (#set! capture.final))
+
+"with" @keyword.control.with._LANG_ @invalid.deprecated.with._LANG_
+
 
 ; REGEX
 ; =====
