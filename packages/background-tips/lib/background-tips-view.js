@@ -109,7 +109,6 @@ module.exports = class BackgroundTipsElement {
   }
 
   addPackageTips(pkg) {
-    if (atom.packages.isPackageDisabled(pkg.name)) return;
     const raw = pkg.metadata.backgroundTips;
     if (!Array.isArray(raw) || raw.length === 0) return;
     for (const tip of raw) {
