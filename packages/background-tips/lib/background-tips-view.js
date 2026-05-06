@@ -15,6 +15,7 @@ module.exports = class BackgroundTipsElement {
     this.fadeDuration = 300;
     this.tips = [];
     this.tipSources = [];
+    this.started = false;
     this.disposables = new CompositeDisposable();
     const visibilityCallback = () => this.updateVisibility();
     this.disposables.add(
@@ -25,7 +26,7 @@ module.exports = class BackgroundTipsElement {
         this.displayDuration = value * 1000;
       }),
     );
-    this.startTimeout = setTimeout(() => this.start(), this.startDelay);
+    this.startTimeout = setTimeout(() => { this.started = true; this.start(); }, this.startDelay);
   }
 
   destroy() {
@@ -116,7 +117,7 @@ module.exports = class BackgroundTipsElement {
       this.tipSources.push(pkg.name);
     }
     this.log(`Package "${pkg.name}" added ${raw.length} tip(s), total: ${this.tips.length}`);
-    if (this.interval == null) this.start();
+    if (this.started && this.interval == null) this.start();
   }
 
   removePackageTips(pkg) {
