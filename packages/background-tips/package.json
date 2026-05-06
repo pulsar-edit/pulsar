@@ -9,12 +9,25 @@
   "engines": {
     "atom": ">0.42.0"
   },
-  "providedServices": {
-    "background-tips": {
-      "description": "Allows packages to register tips shown when no editors are open",
-      "versions": {
-        "1.0.0": "provideBackgroundTips"
-      }
+  "backgroundTips": [
+    "You can split your editor into multiple panes with {pane:split-right-and-copy-active-item}",
+    "You can move a line of text up with {atom-text-editor>editor:move-line-up}",
+    "You can move a line of text down with {atom-text-editor>editor:move-line-down}",
+    "You can toggle line comments with {atom-text-editor>editor:toggle-line-comments}"
+  ],
+  "configSchema": {
+    "displayDuration": {
+      "type": "integer",
+      "default": 10,
+      "minimum": 1,
+      "description": "How long each tip is displayed, in seconds.",
+      "order": 1
+    },
+    "debug": {
+      "type": "boolean",
+      "default": false,
+      "description": "Log debug information about tip collection and display to the console.",
+      "order": 2
     }
   },
   "dependencies": {

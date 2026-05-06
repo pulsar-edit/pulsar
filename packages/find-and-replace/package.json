@@ -40,6 +40,9 @@
   "devDependencies": {
     "dedent": "^0.6.0"
   },
+  "backgroundTips": [
+    "Dismiss panels like Find and Replace with {body>core:cancel}"
+  ],
   "consumedServices": {
     "atom.file-icons": {
       "versions": {

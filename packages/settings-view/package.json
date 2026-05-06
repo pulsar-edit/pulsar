@@ -65,13 +65,11 @@
       "versions": {
         "0.1.0": "consumeSnippets"
       }
-    },
-    "background-tips": {
-      "versions": {
-        "1.0.0": "consumeBackgroundTips"
-      }
     }
   },
+  "backgroundTips": [
+    "You can install packages, themes, and customize your editor in Settings with {atom-workspace>settings-view:open}"
+  ],
   "deserializers": {
     "SettingsView": "createSettingsView"
   }

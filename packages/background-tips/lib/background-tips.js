@@ -1,36 +1,25 @@
-const { Disposable } = require("atom");
+const { CompositeDisposable } = require("atom");
 const BackgroundTipsView = require("./background-tips-view");
 
 module.exports = {
   activate() {
-    this.defaultTips = require("./tips");
-    this.addedTips = new Set();
-    this.backgroundTipsView = new BackgroundTipsView(this);
+    this.backgroundTipsView = new BackgroundTipsView();
+    this.disposables = new CompositeDisposable();
+    for (let pkg of atom.packages.getLoadedPackages()) {
+      this.backgroundTipsView.addPackageTips(pkg);
+    }
+    this.disposables.add(
+      atom.packages.onDidLoadPackage((pkg) => {
+        this.backgroundTipsView.addPackageTips(pkg);
+      }),
+      atom.packages.onDidUnloadPackage((pkg) => {
+        this.backgroundTipsView.removePackageTips(pkg);
+      }),
+    )
   },
 
   deactivate() {
+    this.disposables.dispose();
     this.backgroundTipsView.destroy();
-    this.addedTips.clear();
-  },
-
-  getTips() {
-    let all = [...this.defaultTips];
-    for (const tips of this.addedTips) {
-      all = all.concat(tips);
-    }
-    return all;
-  },
-
-  provideBackgroundTips() {
-    return {
-      registerTips: (tips) => {
-        this.addedTips.add(tips);
-        this.backgroundTipsView.tipsChanged();
-        return new Disposable(() => {
-          this.addedTips.delete(tips);
-          this.backgroundTipsView.tipsChanged();
-        });
-      },
-    };
   },
 };

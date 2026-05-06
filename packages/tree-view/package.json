@@ -29,13 +29,12 @@
       "versions": {
         "1.0.0": "consumeElementIcons"
       }
-    },
-    "background-tips": {
-      "versions": {
-        "1.0.0": "consumeBackgroundTips"
-      }
     }
   },
+  "backgroundTips": [
+    "You can toggle the Tree View with {atom-workspace>tree-view:toggle}",
+    "You can focus the Tree View with {atom-workspace>tree-view:toggle-focus}"
+  ],
   "providedServices": {
     "tree-view": {
       "description": "A tree-like view of directories and files",
