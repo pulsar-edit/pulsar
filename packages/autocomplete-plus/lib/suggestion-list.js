@@ -334,6 +334,9 @@ class SuggestionList {
         // shouldn't remove this class name anymore.
         if (this.lastActiveAt > timestamp) return
         editorElement.classList.remove('autocomplete-active')
+        // If the user clicked on the suggestion, focus moved onto the overlay
+        // before it was destroyed, so we'll move it back onto the editor.
+        editorElement.focus()
       })
     }
     this.suggestionMarker = undefined
