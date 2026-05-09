@@ -2350,7 +2350,7 @@ defm`
       expect(items[0].innerText.trim()).toEqual('center')
     })
 
-    it('stops providing autocompletions when disposed.', async () => {
+    it('stops providing autocompletions when disposed', async () => {
       autocompleteDisposable.dispose()
       bottomEditorView.focus()
       triggerAutocompletion(bottomEditor)
