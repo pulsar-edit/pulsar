@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+* Fix an issue where opening up git worktree doesn't show any git info on the editor
+
 ## 1.131.3
 
 * [settings-view] Fix regression with rendering badges on package search results.
