@@ -33,9 +33,19 @@ export default class ChangeLogView {
     };
   }
 
+  openUri (event) {
+    let anchor = event.target.closest('[href]');
+    if (!anchor) return;
+
+    let uri = anchor.getAttribute('href');
+    if (!uri?.startsWith('atom://')) return;
+
+    atom.workspace.open(uri);
+  }
+
   render() {
     return (
-      <div className="welcome">
+      <div className="welcome" on={{ click: this.openUri }}>
         <div className="welcome-container">
           <div className="header">
             <a title="Full Change Log" href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">
