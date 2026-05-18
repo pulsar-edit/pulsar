@@ -86,7 +86,7 @@
 ### terminal
 
 - New package by @savetheclocktower; "Uses XTerm and node-pty." "Based heavily on atomic-terminal, x-terminal-reloaded, and all their predecessors."
-  - See https://github.com/pulsar-edit/terminal#terminal for details
+  - See [package README](https://github.com/pulsar-edit/terminal#terminal) for details
 - Fixes terminal:set-selection-as-find-pattern keybind [@Daeraxa](https://github.com/pulsar-edit/terminal/pull/14)
 - Fix context menu commands [@Daeraxa](https://github.com/pulsar-edit/terminal/pull/16)
 - Fix: update keymap selector to work correctly on linux [@Daeraxa](https://github.com/pulsar-edit/terminal/pull/5)
