@@ -40,14 +40,14 @@
 - chore(deps): update dependency temp to ^0.9.0 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1518)
 - chore(deps): update dependency temp to ^0.9.0 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1515)
 - chore(deps): update actions/upload-artifact action to v7 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1514)
-- chore(deps): update actions/checkout action to v6 [renovate (bot)]https://github.com/pulsar-edit/pulsar/pull/1513
+- chore(deps): update actions/checkout action to v6 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1513)
 - chore(deps): update actions/cache action to v5 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1510)
 - fix(deps): update dependency minimatch to v3.1.4 [security] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1500)
-- chore(deps): update dependency dompurify to v3.3.2 [security] [renovate (bot)]https://github.com/pulsar-edit/pulsar/pull/1503
+- chore(deps): update dependency dompurify to v3.3.2 [security] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1503)
 - [exception-reporting] Remove core package [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1486)
 - Improve "Project does not exist" popup [@kiskoza](https://github.com/pulsar-edit/pulsar/pull/954)
 - Bump Electron version to v30.5.1 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1452)
-- Change timing of window focus when a new project is opened [@savetheclocktower]https://github.com/pulsar-edit/pulsar/pull/1492
+- Change timing of window focus when a new project is opened [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1492)
 - Ensure NodeJS version matches what we actually use [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1436)
 - [build] Check Windows version during install [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1489)
 - Fix crashes in measureHorizontalPositions and updateBlockDecorations for non-rendered rows [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1490)
@@ -86,7 +86,7 @@
 ### terminal
 
 - New package by @savetheclocktower; "Uses XTerm and node-pty." "Based heavily on atomic-terminal, x-terminal-reloaded, and all their predecessors."
-  - See https://github.com/pulsar-edit/terminal#terminal for details
+  - See [package README](https://github.com/pulsar-edit/terminal#terminal) for details
 - Fixes terminal:set-selection-as-find-pattern keybind [@Daeraxa](https://github.com/pulsar-edit/terminal/pull/14)
 - Fix context menu commands [@Daeraxa](https://github.com/pulsar-edit/terminal/pull/16)
 - Fix: update keymap selector to work correctly on linux [@Daeraxa](https://github.com/pulsar-edit/terminal/pull/5)
@@ -95,11 +95,11 @@
 
 - PRs from before Pulsar's fork:
   - Only decaffeinate [@aminya](https://github.com/atom/underscore-plus/pull/22)
-  - Migrate to Github actions [@darangi]https://github.com/atom/underscore-plus/pull/23
+  - Migrate to Github actions [@darangi](https://github.com/atom/underscore-plus/pull/23)
 - PRs since Pulsar's fork began:
   - Add cmdorctrl to modifier key maps [@asiloisad](https://github.com/pulsar-edit/underscore-plus/pull/1)
   - Update all GHA [@confused-Techie](https://github.com/pulsar-edit/underscore-plus/pull/2)
-  - Manually define a default export in order to play better with transpiled code in the Pulsar codebase. [@savetheclocktower]https://github.com/pulsar-edit/underscore-plus/pull/5
+  - Manually define a default export in order to play better with transpiled code in the Pulsar codebase. [@savetheclocktower](https://github.com/pulsar-edit/underscore-plus/pull/5)
   - Opt into "loose" mode for transpiling to CommonJS so that the exports can be mocked in specs. [@savetheclocktower](https://github.com/pulsar-edit/underscore-plus/commit/79eb75a068ee98d65ec233acfb90fa2dd72fc159)
 
 ### ppm
