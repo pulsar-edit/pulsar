@@ -95,7 +95,7 @@
 
 - PRs from before Pulsar's fork:
   - Only decaffeinate [@aminya](https://github.com/atom/underscore-plus/pull/22)
-  - Migrate to Github actions [@darangi]https://github.com/atom/underscore-plus/pull/23
+  - Migrate to Github actions [@darangi](https://github.com/atom/underscore-plus/pull/23)
 - PRs since Pulsar's fork began:
   - Add cmdorctrl to modifier key maps [@asiloisad](https://github.com/pulsar-edit/underscore-plus/pull/1)
   - Update all GHA [@confused-Techie](https://github.com/pulsar-edit/underscore-plus/pull/2)
