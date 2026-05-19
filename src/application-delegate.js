@@ -413,8 +413,8 @@ module.exports = class ApplicationDelegate {
   }
 
   showItemInFolder(filePath) {
-    // A simple wrapper around `shell.trashItem`, which currently can only be
-    // called from the main process.
+    // A simple wrapper around `shell.showItemInFolder`, which currently can
+    // only be called from the main process.
     return ipcRenderer.invoke('showItemInFolder', filePath).then(({ outcome, error, result }) => {
       if (outcome === 'success') {
         return result;
