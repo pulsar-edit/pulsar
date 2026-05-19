@@ -371,4 +371,49 @@ module.exports = class ApplicationDelegate {
       ipcRenderer.removeListener('did-resolve-proxy', outerCallback)
     );
   }
+  openExternal(url) {
+    return ipcRenderer.invoke('openExternal', url).then(({ outcome, error, result }) => {
+      if (outcome === 'success') {
+        return result;
+      } else if (outcome === 'failure') {
+        return Promise.reject(error);
+      }
+    });
+  }
+
+  openPath (filePath) {
+    return ipcRenderer.invoke('openPath', filePath).then(({ outcome, error, result }) => {
+      if (outcome === 'success') {
+        return result;
+      } else if (outcome === 'failure') {
+        return Promise.reject(error);
+      }
+    });
+  }
+  
+  trashItem(filePath) {
+    // A simple wrapper around `shell.trashItem`, since the main process is the
+    // most reliable place from which to call this method.
+    return ipcRenderer.invoke('trashItem', filePath).then(({ outcome, error, result }) => {
+      if (outcome === 'success') {
+        // `result` is undefined, but we might as well guard against an
+        // Electron API change in the future.
+        return result;
+      } else if (outcome === 'failure') {
+        return Promise.reject(error);
+      }
+    });
+  }
+
+  showItemInFolder(filePath) {
+    // A simple wrapper around `shell.trashItem`, which currently can only be
+    // called from the main process.
+    return ipcRenderer.invoke('showItemInFolder', filePath).then(({ outcome, error, result }) => {
+      if (outcome === 'success') {
+        return result;
+      } else if (outcome === 'failure') {
+        return Promise.reject(error);
+      }
+    });
+  }
 };
