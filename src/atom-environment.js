@@ -841,7 +841,7 @@ class AtomEnvironment {
   // Returns a {Promise} that resolves when the operation has completed or
   // rejects in the event of failure.
   openExternal (url) {
-    return this.applicationDelegate.openExternal(url);
+    return this.applicationDelegate.openExternalDirect(url);
   }
 
   // Restore the window to its previous dimensions and show it.

@@ -363,7 +363,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidResolveProxy(callback) {
-    const outerCallback = (event, requestId, proxy) =>
+    const outerCallback = (_event, requestId, proxy) =>
       callback(requestId, proxy);
 
     ipcRenderer.on('did-resolve-proxy', outerCallback);
@@ -371,7 +371,14 @@ module.exports = class ApplicationDelegate {
       ipcRenderer.removeListener('did-resolve-proxy', outerCallback)
     );
   }
-  openExternal(url) {
+
+  // We already have an `openExternal` method that calls `shell.openExternal`
+  // directly from the renderer. This version proxies to the main process to
+  // call the same method.
+  //
+  // We'll leave `openExternal` in place above because some existing specs
+  // rely on being able to mock it.
+  openExternalDirect(url) {
     return ipcRenderer.invoke('openExternal', url).then(({ outcome, error, result }) => {
       if (outcome === 'success') {
         return result;
@@ -390,7 +397,7 @@ module.exports = class ApplicationDelegate {
       }
     });
   }
-  
+
   trashItem(filePath) {
     // A simple wrapper around `shell.trashItem`, since the main process is the
     // most reliable place from which to call this method.
