@@ -8,7 +8,11 @@
 
 ## 1.132.1
 
-* Fix an issue where missing theme variables prevented the project window from initializing. [@Daeraxa]
+* Fix an issue where missing theme variables prevented the project window from initializing.
+
+### Pulsar
+
+- Fix: Add UI scrollbar variable fallbacks [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/1566)
 
 ## 1.132.0
 
