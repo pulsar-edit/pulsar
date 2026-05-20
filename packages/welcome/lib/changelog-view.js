@@ -60,7 +60,7 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                Fix an issue where a missing theme variable prevented the project window from initializing.
+                Fix an issue where missing theme variables prevented the project window from initializing.
               </li>
               <li>
                 New <code>terminal</code> package! For more information, consult the package’s <a href="atom://config/packages/terminal">settings and README</a>, or read <a href="https://blog.pulsar-edit.dev/posts/20260510-savetheclocktower-terminal-package/">the introductory blog post</a>.
