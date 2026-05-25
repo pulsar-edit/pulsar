@@ -663,6 +663,20 @@ const configSchema = {
         default: true,
         description:
           'Add multiple cursors when pressing the Ctrl key (Command key on macOS) and clicking the editor.'
+      },
+      // This setting relates to the behavior of `text-buffer` specifically
+      // (not treating a buffer as modified if its backing file is deleted and
+      // the file was not already considered to be modified at time of
+      // deletion).
+      //
+      // For other types of pane item, nothing else has changed;
+      // `shouldPromptToSave` is the source of truth. That's why this setting
+      // exists in the `editor` namespace rather than the `core` namespace.
+      promptWhenAbandoningDeletedFile: {
+        type: 'boolean',
+        title: 'Experimental: Prompt When Abandoning Deleted File',
+        default: true,
+        description: "Prompt before closing a buffer whose file on disk has been deleted. If disabled, you will still be prompted to save a deleted file on closing if the file had uncommitted changes in the buffer at time of deletion."
       }
     }
   }
