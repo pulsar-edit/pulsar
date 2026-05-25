@@ -10,6 +10,8 @@
 	"params"
 	"partial"
 	"static"
+	"async"
+	"readonly"
 	"unchecked"
 	"unmanaged"
 ] @storage.modifier._TYPE_.cs
@@ -63,10 +65,37 @@
 (raw_string_literal) @string.quoted.triple.cs
 (verbatim_string_literal) @string.quoted.double.verbatim.cs
 
+; Double-quoted interpolated string expressions. We want to match `$""` and
+; `$"x"` but not `$"""`. Also, `$`/`$@`/`@$` are all valid sigils!
+((interpolated_string_expression) @string.quoted.double.interpolated.cs
+	(#match? @string.quoted.double.interpolated.cs "^(\\$|\\$@|@\\$)\"[^\"]"))
+((interpolated_string_expression) @string.quoted.double.interpolated.cs
+	(#eq? @string.quoted.double.interpolated.cs "$\"\""))
+
+; Triple-quoted interpolation strings.
+(interpolated_string_expression (interpolation_quote)) @string.quoted.triple.interpolated.cs
+
+; Delimiters for triple-quoted interpolation strings.
+(interpolated_string_expression
+	(interpolation_quote) @punctuation.definition.string.begin.cs
+	(#is? test.firstOfType))
+(interpolated_string_expression
+	(interpolation_quote) @punctuation.definition.string.end.cs
+	(#is? test.lastOfType))
+
+; The sigil in an interpolation string.
+(interpolation_start) @punctuation.definition.string.begin.cs
+
 (escape_sequence) @constant.character.escape.cs
 
-; TODO: Interpolations.
+; Interpolations within strings.
+(interpolated_string_expression
+	(interpolation) @meta.embedded.block.cs
+	(#match? @meta.embedded.block.cs "\\n")
+	(#set! capture.final))
 
+(interpolated_string_expression
+	(interpolation) @meta.embedded.line.cs)
 
 ; COMMENTS
 
@@ -112,6 +141,8 @@
 (local_function_statement
 	name: (identifier) @entity.name.function.cs)
 
+(attribute name: (identifier) @entity.other.attribute-name.cs)
+
 ; SUPPORT
 
 (invocation_expression
@@ -119,24 +150,37 @@
 
 ; TYPES
 
+; Builtin types like `string`.
 (predefined_type) @support.storage.type.builtin.cs
 
+; The `Foo` in "List<Foo>".
 (type_argument_list
 	(identifier) @support.storage.type.cs)
 
-(generic_name (identifier) @support.storage.type.cs)
+; The inner `List` in "List<List<Foo>>".
+(type_argument_list
+	(generic_name
+		(identifier) @support.storage.type.cs))
 
+; The first `List` in "static List<int> x = new List<int>();".
+(variable_declaration
+	type: (generic_name (identifier) @support.storage.type.cs))
+
+; Type coercion.
 (as_expression
 	right: (identifier) @support.storage.type.cs)
 
+; Type checking/binding.
 (is_expression
 	right: (identifier) @support.storage.type.cs)
 
+; Generally, anything with a `type:` field should be highlighted like a type.
 (_ type: (identifier) @support.storage.type.cs)
 
 ; TODO: This might be overbroad.
 (base_list (identifier) @support.storage.type.cs)
 
+; Generally, anything with a `returns:` field should be highlighted like a type.
 (_
 	returns: (identifier) @support.storage.type.cs
 	(#set! capture.shy))
@@ -168,9 +212,21 @@
 (enum_member_declaration
 	(identifier) @variable.other.property.cs)
 
+; The `EndsWith` in 'someString.EndsWith("foo")'.
+(invocation_expression
+	(member_access_expression
+		name: (identifier) @support.other.function.method.cs))
+
+; The `Sort` in "Array.Sort<Foo>".
+(invocation_expression
+	(member_access_expression
+		name: (generic_name (identifier) @support.other.function.method.cs))
+	(#set! capture.final))
+
 ; The "X" in `ptr->X`.
 (member_access_expression
-	name: (identifier) @variable.other.property.cs)
+	name: (identifier) @variable.other.property.cs
+	(#is-not? test.descendantOfType "invocation_expression"))
 
 ; KEYWORDS
 
@@ -237,6 +293,8 @@
 "?" @keyword.operator.optional.cs
 ".." @keyword.operator.range.cs
 
+["new"] @keyword.operator._TYPE_.cs
+
 (prefix_unary_expression
 	["&" "^" "+" "-"] @keyword.operator.unary.cs)
 
@@ -299,6 +357,25 @@
 	">>>="
 ] @keyword.operator.bitwise.compound.cs
 
+((type_parameter_list
+	"<" @punctuation.definition.parameters.begin.bracket.angle.cs
+	">" @punctuation.definition.parameters.end.bracket.angle.cs)
+	(#set! capture.final))
+
+((type_argument_list
+	"<" @punctuation.definition.parameters.begin.bracket.angle.cs
+	">" @punctuation.definition.parameters.end.bracket.angle.cs)
+	(#set! capture.final))
+
+[
+	"=="
+	"!="
+	">="
+	"<="
+	">"
+	"<"
+] @keyword.operator.comparison.cs
+
 (destructor_declaration "~" @keyword.operator.destructor.cs)
 
 ; PUNCTUATION
@@ -323,13 +400,3 @@
 	(#set! capture.shy))
 (")" @punctuation.definition.end.bracket.round.cs
 	(#set! capture.shy))
-
-(type_parameter_list
-	"<" @punctuation.definition.parameters.begin.bracket.angle.cs
-	">" @punctuation.definition.parameters.end.bracket.angle.cs
-)
-
-(type_argument_list
-	"<" @punctuation.definition.parameters.begin.bracket.angle.cs
-	">" @punctuation.definition.parameters.end.bracket.angle.cs
-)
