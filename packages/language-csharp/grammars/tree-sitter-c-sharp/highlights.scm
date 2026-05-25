@@ -97,6 +97,14 @@
 (interpolated_string_expression
 	(interpolation) @meta.embedded.line.cs)
 
+(interpolation
+	(interpolation_brace) @punctuation.section.embedded.begin.cs
+	(#is? test.firstOfType))
+
+(interpolation
+	(interpolation_brace) @punctuation.section.embedded.end.cs
+	(#is? test.lastOfType))
+
 ; COMMENTS
 
 ((comment) @comment.line.cs
