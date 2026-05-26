@@ -3973,9 +3973,9 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-"document-register-element@https://github.com/pulsar-edit/document-register-element.git#1f5868f":
+"document-register-element@https://github.com/pulsar-edit/document-register-element.git#3915545":
   version "1.14.10"
-  resolved "https://github.com/pulsar-edit/document-register-element.git#1f5868fba7b6c3a337c777a0396c43a080e1fad3"
+  resolved "https://github.com/pulsar-edit/document-register-element.git#3915545b3ffecf305b6258680257d2682b0dc91e"
 
 dom-serializer@^2.0.0:
   version "2.0.0"
