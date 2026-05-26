@@ -50,7 +50,7 @@ jobs:
       id: compiled-python-restore
       uses: actions/cache/restore@v5
       with:
-        key: ${{ runner.os }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
+        key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
         path: Python-${{ env.PYTHON_VERSION }}.9
 
     - name: Compile Python - Linux
@@ -67,7 +67,7 @@ jobs:
       if: ${{ runner.os == 'Linux' && steps.compiled-python-restore.outputs.cache-hit != 'true' }}
       uses: actions/cache/save@v5
       with:
-        key: ${{ runner.os }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
+        key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
         path: Python-${{ env.PYTHON_VERSION }}.9
 
     - name: Install Compiled Python - Linux
