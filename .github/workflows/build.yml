@@ -80,7 +80,7 @@ jobs:
       uses: actions/setup-node@v6
       with:
         node-version-file: '.nvmrc'
-        architecture: 'x64'
+        # architecture: 'x64'
 
     - name: Setup Python
       # actions/setup-python's copy of Python is compiled for too new glibc,
