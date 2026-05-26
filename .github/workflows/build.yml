@@ -188,26 +188,27 @@ jobs:
           packages
         key: Linux-dependencies-${{ github.sha }}-${{ github.workflow }}
 
-    # macOS Signing Stuff
-    - name: Build Pulsar Binaries (macOS) (Signed)
-      if: ${{ runner.os == 'macOS' && github.event_name == 'push' }}
-      # Note: PRs generated from forks cannot access GitHub Secrets.
-      # So if the PR is from a fork, we can still build, but cannot sign.
-      # Note: We aren't attempting to sign for *any* PRs anymore, though.
-      env:
-        CSC_LINK: ${{ secrets.CSC_LINK }}
-        CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-        APPLEID: ${{ secrets.APPLEID }}
-        APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
-        TEAM_ID: ${{ secrets.TEAM_ID }}
-      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
-      with:
-        timeout_minutes: 31
-        max_attempts: 7
-        command: yarn dist
+    # # macOS Signing Stuff
+    # - name: Build Pulsar Binaries (macOS) (Signed)
+    #   if: ${{ runner.os == 'macOS' && github.event_name == 'push' }}
+    #   # Note: PRs generated from forks cannot access GitHub Secrets.
+    #   # So if the PR is from a fork, we can still build, but cannot sign.
+    #   # Note: We aren't attempting to sign for *any* PRs anymore, though.
+    #   env:
+    #     CSC_LINK: ${{ secrets.CSC_LINK }}
+    #     CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+    #     APPLEID: ${{ secrets.APPLEID }}
+    #     APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
+    #     TEAM_ID: ${{ secrets.TEAM_ID }}
+    #   uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
+    #   with:
+    #     timeout_minutes: 31
+    #     max_attempts: 7
+    #     command: yarn dist
 
     - name: Build Pulsar Binaries (macOS) (Unsigned)
-      if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
+      # if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
+      if: ${{ runner.os == 'macOS' }}
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 31
@@ -269,14 +270,14 @@ jobs:
         export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
         PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
 
-    - name: Add binaries to Rolling Release Repo
-      if: ${{ github.event_name == 'push' && runner.os != 'Linux' }}
-      # We only want to upload rolling binaries if they are a commit to master
-      # Otherwise we want to not upload if it's a PR or manually triggered build
-      run: |
-        cd ./script/rolling-release-scripts
-        npm install
-        node ./rolling-release-binary-upload.js
+    # - name: Add binaries to Rolling Release Repo
+    #   if: ${{ github.event_name == 'push' && runner.os != 'Linux' }}
+    #   # We only want to upload rolling binaries if they are a commit to master
+    #   # Otherwise we want to not upload if it's a PR or manually triggered build
+    #   run: |
+    #     cd ./script/rolling-release-scripts
+    #     npm install
+    #     node ./rolling-release-binary-upload.js
 
     - name: Upload Video Artifacts
       # Run whether this job passed or failed, unless explicitly cancelled.
