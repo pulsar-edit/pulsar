@@ -187,7 +187,7 @@ jobs:
         path: |
           node_modules
           packages
-        key: Linux-dependencies-${{ github.sha }}-${{ github.workflow }}
+        key: Linux-dependencies-${{ runner.arch }}-${{ github.sha }}-${{ github.workflow }}
 
     # # macOS Signing Stuff
     # - name: Build Pulsar Binaries (macOS) (Signed)
@@ -250,7 +250,7 @@ jobs:
       uses: actions/cache/save@v5
       with:
         path: ./binaries
-        key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
+        key: pulsar-Linux-Binaries-${{ runner.arch }}-${{ github.sha }}-${{ github.workflow }}
 
     - name: Upload Binary Artifacts
       uses: actions/upload-artifact@v7
@@ -320,7 +320,7 @@ jobs:
       uses: actions/cache/restore@v5
       with:
         path: ./binaries
-        key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
+        key: pulsar-Linux-Binaries-${{ runner.arch }}-${{ github.sha }}-${{ github.workflow }}
 
     - name: Restore Cached Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
@@ -329,7 +329,7 @@ jobs:
         path: |
           node_modules
           packages
-        key: Linux-dependencies-${{ github.sha }}-${{ github.workflow }}
+        key: Linux-dependencies-${{ runner.arch }}-${{ github.sha }}-${{ github.workflow }}
 
     - name: Test Binary - Linux
       if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
