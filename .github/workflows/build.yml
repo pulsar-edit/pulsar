@@ -302,8 +302,11 @@ jobs:
     # Debian Docker environment. If anyone can make it work, feel free to
     # re-combine visual testing on Linux back into the main build job above!
     # - DeeDeeG
-    # runs-on: ubuntu-latest
-    runs-on: ubuntu-24.04-arm
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, ubuntu-24.04-arm ]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
     needs: build
 
     steps:
