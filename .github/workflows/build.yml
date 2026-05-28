@@ -23,14 +23,15 @@ jobs:
   build:
     strategy:
       matrix:
-        # os: [ ubuntu-latest, macos-14, windows-latest ]
-        os: [ macos-14 ]
+        os: [ ubuntu-latest, macos-14, windows-latest, ubuntu-24.04-arm ]
         node-architecture: [ '' ]
         include:
-          # - os: ubuntu-24.04-arm
-          #   image: "debian:10"
           - os: macos-14
             node-architecture: x64
+          - os: ubuntu-24.04-arm
+            image: "debian:10"
+          - os: ubuntu-latest
+            image: "debian:10"
       fail-fast: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.image }}
