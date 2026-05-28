@@ -24,7 +24,10 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-24.04-arm, ubuntu-latest, macos-14, windows-latest ]
+        node-architecture: [ '' ]
         include:
+          - os: macos-14
+            node-architecture: x64
           - os: ubuntu-24.04-arm
             image: "debian:10"
           - os: ubuntu-latest
@@ -82,7 +85,7 @@ jobs:
       uses: actions/setup-node@v6
       with:
         node-version-file: '.nvmrc'
-        # architecture: 'x64'
+        architecture: ${{ matrix.node-architecture }}
 
     - name: Setup Python
       # actions/setup-python's copy of Python is compiled for too new glibc,
