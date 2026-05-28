@@ -259,7 +259,7 @@ jobs:
     - name: Upload Binary Artifacts
       uses: actions/upload-artifact@v7
       with:
-        name: ${{ matrix.os }} Binaries
+        name: ${{ matrix.os }} ${{ matrix.node-architecture }} Binaries
         path: ./binaries/*
 
     - name: Test Binary - Windows
