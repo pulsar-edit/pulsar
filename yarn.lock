@@ -1726,7 +1726,7 @@
     unbzip2-stream "^1.4.3"
     yauzl "^3.2.0"
 
-"@pulsar-edit/pathwatcher@9.0.3", "@pulsar-edit/pathwatcher@^9.0.2":
+"@pulsar-edit/pathwatcher@9.0.3", "@pulsar-edit/pathwatcher@^9.0.2", "@pulsar-edit/pathwatcher@^9.0.3":
   version "9.0.3"
   resolved "https://registry.yarnpkg.com/@pulsar-edit/pathwatcher/-/pathwatcher-9.0.3.tgz#13dcbdbf4115904bfdf76509580612cf09e8043c"
   integrity sha512-S8QwhsUf/x617g6FEuPixdu1c3Mt4kzZsGaTrbogkaCJuY1mMAEkqkp6zEp4MM+UfWFruRszAOkdZYbI5gWW9Q==
@@ -1758,22 +1758,20 @@
   dependencies:
     node-addon-api "^8.5.0"
 
-"@pulsar-edit/text-buffer@^14.0.4":
-  version "14.0.4"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/text-buffer/-/text-buffer-14.0.4.tgz#9bf03445ab8da000c9c986255654acf04433e6bb"
-  integrity sha512-KiC/uA7zdnoI2pI3AyoYYXAdL5h6LyHURHl/URxkViQPjGeFXr3vRr6cb9OxsS1NRM4fVFtEdHFG8T7aafDdUQ==
+"@pulsar-edit/text-buffer@^15.0.0":
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/text-buffer/-/text-buffer-15.0.0.tgz#5c72fde1caa8d9aee71a4f98252550b32934401d"
+  integrity sha512-Ut7VbD+8NIUMlf79NFjUzhTBV5e/Ty2jLGWlxtOYM0RRuey4zFv3RedIFjbgWY+qQoRBbmigLmyvzewIMVrONA==
   dependencies:
-    "@pulsar-edit/pathwatcher" "^9.0.2"
+    "@pulsar-edit/pathwatcher" "^9.0.3"
     "@pulsar-edit/superstring" "^3.0.4"
     delegato "^1.0.0"
     diff "^2.2.1"
-    emissary "^1.0.0"
     event-kit "^2.4.0"
     fs-admin "^0.19.0"
     fs-plus "^3.0.0"
     grim "^2.0.2"
     mkdirp "^0.5.1"
-    serializable "^1.0.3"
     underscore-plus "^1.0.0"
     winattr "^3.0.0"
 
@@ -4242,7 +4240,7 @@ electron@30.5.1:
     "@types/node" "^20.9.0"
     extract-zip "^2.0.1"
 
-emissary@^1.0.0, emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
+emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/emissary/-/emissary-1.3.3.tgz#a618d92d682b232d31111dc3625a5df661799606"
   integrity sha512-pD6FWNBSlEOzSJDCTcSGVLgNnGw5fnCvvGMdQ/TN43efeXZ/QTq8+hZoK3OOEXPRNjMmSJmeOnEJh+bWT5O8rQ==
@@ -5230,11 +5228,6 @@ get-intrinsic@^1.2.4, get-intrinsic@^1.2.5, get-intrinsic@^1.2.6, get-intrinsic@
     has-symbols "^1.1.0"
     hasown "^2.0.2"
     math-intrinsics "^1.1.0"
-
-get-parameter-names@~0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/get-parameter-names/-/get-parameter-names-0.2.0.tgz#a2163ad092e350d94bee2958974fcece1bc53c99"
-  integrity sha512-QgxVvmXNqxCDYMwK8zwM5B0AMoLUGQ9MBw202kELskDTDEIveOwP6zR38F3XLA3v+rsuv6+DtCXjW0AEPE9+4Q==
 
 get-proto@^1.0.1:
   version "1.0.1"
@@ -8899,15 +8892,6 @@ semver@^7.0.0, semver@^7.3.2, semver@^7.3.4, semver@^7.3.5, semver@^7.3.7, semve
   version "7.7.3"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.3.tgz#4b5f4143d007633a8dc671cd0a6ef9147b8bb946"
   integrity sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==
-
-serializable@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/serializable/-/serializable-1.0.3.tgz#0a5a8b6b7777cb24544df11a6f889a6d2b3e1189"
-  integrity sha512-x4C87GbC+fSbj1NlmZrKW4tDN+sZodzTZNxELEH4iwXzg4xirHBQOIOpPatmksXkes07ZebIRpo6+UVS0rvwsw==
-  dependencies:
-    get-parameter-names "~0.2.0"
-    mixto "1.x"
-    underscore-plus "1.x"
 
 serialize-error@^7.0.1:
   version "7.0.1"
