@@ -80,7 +80,9 @@ class TabView {
         } else {
           this.unsetVcsStatus();
         }
-      })
+      }),
+
+      atom.config.observe('tabs.enableItemStatusColoring', this.setBufferStatusColoring.bind(this))
     );
 
     const titleChangedHandler = () => this.updateTitle();
@@ -194,6 +196,18 @@ class TabView {
         }
       });
       this.addItemDisposable(onDidSaveDisposable, 'onDidSave');
+    }
+  }
+
+  setBufferStatusColoring (isEnabled) {
+    console.log('Setting buffer status coloring to', isEnabled);
+    this.useBufferStatusColoring = isEnabled;
+    if (!isEnabled) {
+      this.toggleTabClass('conflicted', false);
+      this.toggleTabClass('deleted', false);
+    } else {
+      this.toggleTabClass('conflicted', this.isConflicted);
+      this.toggleTabClass('deleted', this.isDeleted);
     }
   }
 
@@ -348,20 +362,21 @@ class TabView {
 
   updateConflictedStatus () {
     this.isConflicted = this.item.isInConflict?.() ?? false;
-    this.toggleTabClass('conflicted', this.isConflicted);
+    this.toggleTabClass('conflicted', this.useBufferStatusColoring && this.isConflicted);
     return this.isConflicted;
+  }
+
+  updateDeletedStatus () {
+    this.isDeleted = this.item.isDeleted?.() ?? false;
+    console.log('using buffer status coloring?', this.useBufferStatusColoring);
+    this.toggleTabClass('deleted', this.useBufferStatusColoring && this.isDeleted);
+    return this.isDeleted;
   }
 
   updateModifiedStatus() {
     this.isModified = this.item.isModified?.() ?? false;
     this.toggleTabClass('modified', this.isModified);
     return this.isModified;
-  }
-
-  updateDeletedStatus () {
-    this.isDeleted = this.item.isDeleted?.() ?? false;
-    this.toggleTabClass('deleted', this.isDeleted);
-    return this.isDeleted;
   }
 
   setupVcsStatus() {
