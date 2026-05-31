@@ -200,7 +200,6 @@ class TabView {
   }
 
   setBufferStatusColoring (isEnabled) {
-    console.log('Setting buffer status coloring to', isEnabled);
     this.useBufferStatusColoring = isEnabled;
     if (!isEnabled) {
       this.toggleTabClass('conflicted', false);
@@ -368,7 +367,6 @@ class TabView {
 
   updateDeletedStatus () {
     this.isDeleted = this.item.isDeleted?.() ?? false;
-    console.log('using buffer status coloring?', this.useBufferStatusColoring);
     this.toggleTabClass('deleted', this.useBufferStatusColoring && this.isDeleted);
     return this.isDeleted;
   }
