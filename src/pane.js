@@ -664,7 +664,7 @@ module.exports = class Pane {
       );
     }
 
-    if (item.isDestroyed?.()) {
+    if (this.paneItemIsDestroyed(item)) {
       throw new Error(
         `Adding a pane item with URI '${typeof item.getURI === 'function' &&
           item.getURI()}' that has already been destroyed`
@@ -702,6 +702,15 @@ module.exports = class Pane {
     if (replacingPendingItem) this.destroyItem(lastPendingItem);
     if (!this.getActiveItem()) this.setActiveItem(item);
     return item;
+  }
+
+  paneItemIsDestroyed (item) {
+    if (typeof item.isDestroyed === 'boolean') {
+      return item.isDestroyed;
+    } else if (typeof item.isDestroyed === 'function') {
+      return item.isDestroyed();
+    }
+    return false;
   }
 
   setPendingItem(item) {
