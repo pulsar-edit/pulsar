@@ -986,13 +986,13 @@ module.exports = class Pane {
         return resolve(true);
       }
 
-      // A pane item must have a URI so that we have a "title of last resort"
-      // to show in the dialog.
-      let uri = item.getURI?.() ?? item.getUri?.() ?? null;
-      if (!uri) {
+      // If the item has no way of providing us a URI, then it probably wasn't
+      // designed to represent a resource that can be saved.
+      if (typeof item.getURI !== 'function' && typeof item.getUri !== 'function') {
         return resolve(true);
       }
 
+      let uri = item.getURI?.() ?? item.getUri?.();
       let title = item.getTitle?.() || uri;
 
       const saveDialog = (saveButtonText, saveFn, message) => {
