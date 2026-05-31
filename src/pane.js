@@ -16,7 +16,27 @@ class SaveConflictedError extends Error {
   name = 'SaveConflictedError';
 }
 
-
+// Handles values that could be booleans, functions, or undefined.
+//
+// Pane items implement several `isX` methods — `isDestroyed`, `isDeleted`,
+// `isModified`, et cetera. But all of these are optional. We could just do
+// `item.isDestroyed?.()` — except that, in at least one high-profile case, a
+// package has implemented defined `isDestroyed` _incorrectly_ as a boolean
+// instead of a function! And calling `item.isDestroyed?.()` on a boolean
+// throws an error.
+//
+// So this is our way of handling such scenarios without re-introducing lots of
+// boilerplate. We use this for some `isX` methods, but not all. (Newer methods
+// don't get this treatment because of almost zero chance of misimplementation
+// in the wild.)
+function interpret(booleanOrFunction) {
+  if (typeof booleanOrFunction === 'boolean') {
+    return booleanOrFunction;
+  } else if (typeof booleanOrFunction === 'function') {
+    return booleanOrFunction();
+  }
+  return false;
+}
 
 // Extended: A container for presenting content in the center of the workspace.
 // Panes can contain multiple items, one of which is *active* at a given time.
@@ -664,7 +684,7 @@ module.exports = class Pane {
       );
     }
 
-    if (this.paneItemIsDestroyed(item)) {
+    if (interpret(item.isDestroyed)) {
       throw new Error(
         `Adding a pane item with URI '${typeof item.getURI === 'function' &&
           item.getURI()}' that has already been destroyed`
@@ -702,15 +722,6 @@ module.exports = class Pane {
     if (replacingPendingItem) this.destroyItem(lastPendingItem);
     if (!this.getActiveItem()) this.setActiveItem(item);
     return item;
-  }
-
-  paneItemIsDestroyed (item) {
-    if (typeof item.isDestroyed === 'boolean') {
-      return item.isDestroyed;
-    } else if (typeof item.isDestroyed === 'function') {
-      return item.isDestroyed();
-    }
-    return false;
   }
 
   setPendingItem(item) {
@@ -851,15 +862,15 @@ module.exports = class Pane {
     // Don't allow deletion of permanent dock items unless `force` is `true`.
     if (
       !force &&
-      item.isPermanentDockItem?.() &&
+      interpret(item.isPermanentDockItem) &&
       (!this.container || this.container.getLocation() !== 'center')
     ) {
       return false;
     }
 
     // In the case where there are no `onWillDestroyPaneItem` listeners,
-    // preserve the old behavior where `Pane.destroyItem` and callers such as
-    // `Pane.close` take effect synchronously.
+    // preserve the old behavior where `Pane::destroyItem` and callers such as
+    // `Pane::close` take effect synchronously.
     if (this.emitter.listenerCountForEventName('will-destroy-item') > 0) {
       await this.emitter.emitAsync('will-destroy-item', { item, index });
     }
@@ -927,8 +938,9 @@ module.exports = class Pane {
       const title = item.getTitle?.() || uri;
 
       let message, detail;
-      let firstButton = item.isDeleted() ? 'Save' : 'Overwrite';
-      if (item.isDeleted()) {
+      let isDeleted = interpret(item.isDeleted);
+      let firstButton = isDeleted ? 'Save' : 'Overwrite';
+      if (isDeleted) {
         // The message is a bit different when the file no longer exists on
         // disk.
         message = `'${title}' was deleted on disk. Do you still want to save this file?`;
@@ -1163,7 +1175,7 @@ module.exports = class Pane {
   // Public: Save all items.
   saveItems() {
     for (let item of this.getItems()) {
-      if (item.isModified?.()) {
+      if (interpret(item.isModified)) {
         this.saveItem(item);
       }
     }
