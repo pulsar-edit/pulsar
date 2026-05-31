@@ -1031,14 +1031,20 @@ module.exports = class TextEditor {
     return this.getBuffer().onDidChangeModified(callback);
   }
 
-  // Extended: Calls your `callback` when the buffer's underlying file changes on
-  // disk at a moment when the result of {::isModified} is true.
+  // Extended: Calls your `callback` when the buffer's underlying file changes
+  // on disk at a moment when the result of {::isModified} is true.
   //
   // * `callback` {Function}
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidConflict(callback) {
     return this.getBuffer().onDidConflict(callback);
+  }
+
+  // Extended: Calls your `callback` when the buffer's underlying file is
+  // deleted on disk.
+  onDidDelete(callback) {
+    return this.getBuffer().onDidDelete(callback);
   }
 
   // Extended: Calls your `callback` before text has been inserted.
@@ -1433,23 +1439,28 @@ module.exports = class TextEditor {
     }
   }
 
-  // Essential: Returns the {String} path of this editor's text buffer.
+  // Essential: Returns the {String} path of this editor's text buffer, or
+  // `undefined` if the buffer is not associated with a file on disk.
   getPath() {
     return this.buffer.getPath();
   }
 
+  // Extended: Returns the file name of this editor's text buffer, or
+  // `undefined` if the buffer is not associated with a file on disk.
   getFileName() {
     const fullPath = this.getPath();
     if (fullPath) return path.basename(fullPath);
   }
 
+  // Extended: Returns the parent directory of this editor's text buffer, or
+  // `undefined` if the buffer is not associated with a file on disk.
   getDirectoryPath() {
     const fullPath = this.getPath();
     if (fullPath) return path.dirname(fullPath);
   }
 
-  // Extended: Returns the {String} character set encoding of this editor's text
-  // buffer.
+  // Extended: Returns the {String} character set encoding of this editor's
+  // text buffer.
   getEncoding() {
     return this.buffer.getEncoding();
   }
@@ -1457,13 +1468,22 @@ module.exports = class TextEditor {
   // Extended: Set the character set encoding to use in this editor's text
   // buffer.
   //
-  // * `encoding` The {String} character set encoding name such as 'utf8'
+  // * `encoding` The {String} character set encoding name, such as `utf8`.
   setEncoding(encoding) {
     this.buffer.setEncoding(encoding);
   }
 
   // Essential: Returns {Boolean} `true` if this editor has been modified.
   isModified() {
+    let promptWhenAbandoningDeletedFile = atom.config.get('editor.promptWhenAbandoningDeletedFile', {
+      scope: this.getRootScopeDescriptor()
+    });
+    // When `promptWhenAbandoningDeletedFile` is `true` (as is the default),
+    // replicate the legacy `isModified` behavior where buffers with no backing
+    // file _always_ return `true`.
+    if (promptWhenAbandoningDeletedFile && this.isDeleted()) {
+      return true;
+    }
     return this.buffer.isModified();
   }
 
@@ -1475,8 +1495,18 @@ module.exports = class TextEditor {
   // edit it in Pulsar, but before you're able to save those changes. It can
   // also happen if you switch branches in version control while a certain
   // buffer has uncommitted changes.
-  isInConflict () {
+  isInConflict() {
     return this.buffer.isInConflict();
+  }
+
+  // Essential: Returns {Boolean} `true` if this editor's backing file was
+  // deleted.
+  //
+  // Will return `false` if the editor's buffer _never_ was associated with a
+  // file on disk, or if the buffer was re-saved to the same location or a
+  // different one.
+  isDeleted() {
+    return this.buffer.isDeleted();
   }
 
   // Essential: Returns {Boolean} `true` if this editor has no content.
@@ -1514,6 +1544,10 @@ module.exports = class TextEditor {
     ) {
       return this.buffer.isInConflict();
     } else {
+      // Don't prompt when the user closes an editor if there are other editors
+      // in the window that belong to that buffer. In theory, this ensures
+      // we'll prompt only once for a given file when closing a window, but may
+      // need investigation in practice to be sure.
       return this.isModified() && !this.buffer.hasMultipleEditors();
     }
   }

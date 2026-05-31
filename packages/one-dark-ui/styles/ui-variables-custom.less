@@ -105,10 +105,12 @@
 
 @tab-text-color:                    @text-color-subtle;
 @tab-text-color-active:             @text-color-highlight;
-@tab-text-color-editor:             contrast(@ui-syntax-color, darken(@ui-syntax-color, 50%), @text-color-highlight );
+@tab-text-color-editor:             contrast(@ui-syntax-color, darken(@ui-syntax-color, 50%), @text-color-highlight);
+@tab-text-color-editor-deleted:     @syntax-color-removed;
 @tab-background-color-editor:       @ui-syntax-color;
 @tab-inactive-status-added:         fade(@text-color-success, 55%);
 @tab-inactive-status-modified:      fade(@text-color-warning, 55%);
+@tab-inactive-status-deleted:       fade(@text-color-error, 55%);
 
 
 @tooltip-background-color:          @accent-bg-color;

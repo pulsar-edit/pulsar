@@ -5,6 +5,10 @@ const getIconServices = require('./get-icon-services');
 const layout = require('./layout');
 
 class TabView {
+  isModified = false;
+  isDeleted = false;
+  isConflicted = false;
+
   constructor({item, pane, didClickCloseIcon, tabs, location}) {
     this.item = item;
     this.pane = pane;
@@ -55,66 +59,80 @@ class TabView {
   }
 
   handleEvents() {
-    const titleChangedHandler = () => {
-      return this.updateTitle();
-    };
+    this.subscriptions.add(
+      // Destroy a tab when its pane item is destroyed.
+      this.pane.onDidDestroy(() => this.destroy()),
+      // Take a tab out of "pending" state when the same happens for the pane
+      // item.
+      this.pane.onItemDidTerminatePendingState(item => {
+        if (item === this.item) this.clearPending();
+      }),
+      // Update whether icons are shown when the user changes the associated
+      // setting.
+      atom.config.observe('tabs.showIcons', () => {
+        this.updateIconVisibility();
+      }),
+      // Update whether VCS status colors are used when the user changes the
+      // associated setting.
+      atom.config.observe('tabs.enableVcsColoring', isEnabled => {
+        if (isEnabled && (this.path != null)) {
+          this.setupVcsStatus();
+        } else {
+          this.unsetVcsStatus();
+        }
+      }),
 
-    this.subscriptions.add(this.pane.onDidDestroy(() => this.destroy()));
-    this.subscriptions.add(this.pane.onItemDidTerminatePendingState(item => {
-      if (item === this.item) { return this.clearPending(); }
-    })
+      atom.config.observe('tabs.enableItemStatusColoring', this.setBufferStatusColoring.bind(this))
     );
 
+    const titleChangedHandler = () => this.updateTitle();
+
+    // Subscribe to title changes on this pane item.
     if (typeof this.item.onDidChangeTitle === 'function') {
       const onDidChangeTitleDisposable = this.item.onDidChangeTitle(titleChangedHandler);
-      if (Disposable.isDisposable(onDidChangeTitleDisposable)) {
-        this.subscriptions.add(onDidChangeTitleDisposable);
-      } else {
-        console.warn("::onDidChangeTitle does not return a valid Disposable!", this.item);
-      }
+      this.addItemDisposable(onDidChangeTitleDisposable, 'onDidChangeTitle');
     } else if (typeof this.item.on === 'function') {
-      //TODO Remove once old events are no longer supported
+      // TODO: Remove once old events are no longer supported.
       this.item.on('title-changed', titleChangedHandler);
-      this.subscriptions.add({dispose: () => {
-        return (typeof this.item.off === 'function' ? this.item.off('title-changed', titleChangedHandler) : undefined);
-      }
-      });
+      this.subscriptions.add(
+        new Disposable(() => {
+          this.item.off?.('title-changed', titleChangedHandler)
+        })
+      );
     }
 
-    const pathChangedHandler = path1 => {
-      this.path = path1;
+    const pathChangedHandler = newPath => {
+      this.path = newPath;
       this.updateDataAttributes();
       this.updateTitle();
       this.updateTooltip();
-      return this.updateIcon();
+      this.updateIcon();
     };
 
+    // Subscribe to path changes on this pane item.
     if (typeof this.item.onDidChangePath === 'function') {
       const onDidChangePathDisposable = this.item.onDidChangePath(pathChangedHandler);
-      if (Disposable.isDisposable(onDidChangePathDisposable)) {
-        this.subscriptions.add(onDidChangePathDisposable);
-      } else {
-        console.warn("::onDidChangePath does not return a valid Disposable!", this.item);
-      }
+      this.addItemDisposable(onDidChangePathDisposable, 'onDidChangePath');
     } else if (typeof this.item.on === 'function') {
-      //TODO Remove once old events are no longer supported
+      // TODO: Remove once old events are no longer supported.
       this.item.on('path-changed', pathChangedHandler);
-      this.subscriptions.add({dispose: () => {
-        return (typeof this.item.off === 'function' ? this.item.off('path-changed', pathChangedHandler) : undefined);
-      }
-      });
+      this.subscriptions.add(
+        new Disposable(() => {
+          this.item.off?.('path-changed', pathChangedHandler);
+        })
+      );
     }
 
-    const iconChangedHandler = () => {
-      return this.updateIcon();
-    };
+    const iconChangedHandler = () => this.updateIcon();
+    this.subscriptions.add(
+      getIconServices().onDidChange(iconChangedHandler)
+    );
 
-    this.subscriptions.add(getIconServices().onDidChange(() => this.updateIcon()));
-
+    // Subscribe to icon changes on this pane item.
     if (typeof this.item.onDidChangeIcon === 'function') {
-      const onDidChangeIconDisposable = typeof this.item.onDidChangeIcon === 'function' ? this.item.onDidChangeIcon(() => {
+      const onDidChangeIconDisposable = this.item.onDidChangeIcon(() => {
         return this.updateIcon();
-      }) : undefined;
+      });
       if (Disposable.isDisposable(onDidChangeIconDisposable)) {
         this.subscriptions.add(onDidChangeIconDisposable);
       } else {
@@ -123,68 +141,81 @@ class TabView {
     } else if (typeof this.item.on === 'function') {
       //TODO Remove once old events are no longer supported
       this.item.on('icon-changed', iconChangedHandler);
-      this.subscriptions.add({dispose: () => {
-        return (typeof this.item.off === 'function' ? this.item.off('icon-changed', iconChangedHandler) : undefined);
-      }
-      });
+      this.subscriptions.add(
+        new Disposable(() => {
+          this.item.off?.('icon-changed', iconChangedHandler);
+        })
+      );
     }
 
-    const modifiedHandler = () => {
-      return this.updateModifiedStatus();
-    };
+    const modifiedHandler = () => this.updateModifiedStatus();
 
+    // Subscribe to changes in "modified" status on this pane item.
     if (typeof this.item.onDidChangeModified === 'function') {
       const onDidChangeModifiedDisposable = this.item.onDidChangeModified(modifiedHandler);
-      if (Disposable.isDisposable(onDidChangeModifiedDisposable)) {
-        this.subscriptions.add(onDidChangeModifiedDisposable);
-      } else {
-        console.warn("::onDidChangeModified does not return a valid Disposable!", this.item);
-      }
+      this.addItemDisposable(onDidChangeModifiedDisposable, 'onDidChangeModified');
     } else if (typeof this.item.on === 'function') {
-      //TODO Remove once old events are no longer supported
+      // TODO: Remove once old events are no longer supported.
       this.item.on('modified-status-changed', modifiedHandler);
-      this.subscriptions.add({dispose: () => {
-        return (typeof this.item.off === 'function' ? this.item.off('modified-status-changed', modifiedHandler) : undefined);
-      }
-      });
+      this.subscriptions.add(
+        new Disposable(() => {
+          this.item.off?.('modified-status-changed', modifiedHandler)
+        })
+      );
     }
 
+    // Subscribe to changes in "conflicted" status on this pane item.
     if (typeof this.item.onDidConflict === 'function') {
       const onDidConflictDisposable = this.item.onDidConflict(() => {
         this.updateConflictedStatus();
       });
-      if (Disposable.isDisposable(onDidConflictDisposable)) {
-        this.subscriptions.add(onDidConflictDisposable);
-      } else {
-        console.warn("::onDidConflict does not return a valid Disposable!", this.item);
-      }
+      this.addItemDisposable(onDidConflictDisposable, 'onDidConflict');
     }
 
+    // Subscribe to changes in "deleted" status on this pane item.
+    if (typeof this.item.onDidDelete === 'function') {
+      let onDidDeleteDisposable = this.item.onDidDelete(() => {
+        this.terminatePendingState();
+        this.updateDeletedStatus();
+      });
+      this.addItemDisposable(onDidDeleteDisposable, 'onDidDelete');
+    }
+
+    // Subscribe to "save" events on this pane item, since those correlate with
+    // changes in several pane item states.
     if (typeof this.item.onDidSave === 'function') {
       const onDidSaveDisposable = this.item.onDidSave(event => {
         this.terminatePendingState();
         this.updateConflictedStatus();
+        this.updateDeletedStatus();
         if (event.path !== this.path) {
           this.path = event.path;
-          if (atom.config.get('tabs.enableVcsColoring')) { return this.setupVcsStatus(); }
+          if (atom.config.get('tabs.enableVcsColoring')) {
+            this.setupVcsStatus();
+          }
         }
       });
-
-      if (Disposable.isDisposable(onDidSaveDisposable)) {
-        this.subscriptions.add(onDidSaveDisposable);
-      } else {
-        console.warn("::onDidSave does not return a valid Disposable!", this.item);
-      }
+      this.addItemDisposable(onDidSaveDisposable, 'onDidSave');
     }
-    this.subscriptions.add(atom.config.observe('tabs.showIcons', () => {
-      return this.updateIconVisibility();
-    })
-    );
+  }
 
-    return this.subscriptions.add(atom.config.observe('tabs.enableVcsColoring', isEnabled => {
-      if (isEnabled && (this.path != null)) { return this.setupVcsStatus(); } else { return this.unsetVcsStatus(); }
-    })
-    );
+  setBufferStatusColoring (isEnabled) {
+    this.useBufferStatusColoring = isEnabled;
+    if (!isEnabled) {
+      this.toggleTabClass('conflicted', false);
+      this.toggleTabClass('deleted', false);
+    } else {
+      this.toggleTabClass('conflicted', this.isConflicted);
+      this.toggleTabClass('deleted', this.isDeleted);
+    }
+  }
+
+  addItemDisposable (disposable, methodName) {
+    if (!Disposable.isDisposable(disposable)) {
+      console.warn(`::${methodName} does not return a valid Disposable!`, this.item);
+      return;
+    }
+    this.subscriptions.add(disposable);
   }
 
   setupTooltip() {
@@ -198,11 +229,12 @@ class TabView {
       return this.element.dispatchEvent(new CustomEvent('mouseenter', {bubbles: true}));
     };
 
-    this.mouseEnterSubscription = { dispose: () => {
-      this.element.removeEventListener('mouseenter', onMouseEnter);
-      return this.mouseEnterSubscription = null;
-    }
-  };
+    this.mouseEnterSubscription = {
+      dispose: () => {
+        this.element.removeEventListener('mouseenter', onMouseEnter);
+        return this.mouseEnterSubscription = null;
+      }
+    };
 
     return this.element.addEventListener('mouseenter', onMouseEnter);
   }
@@ -328,72 +360,78 @@ class TabView {
   }
 
   updateConflictedStatus () {
-    if (this.item.isInConflict?.()) {
-      this.element.classList.add('conflicted');
-      this.isConflicted = true;
-    } else {
-      if (this.isConflicted) {
-        this.element.classList.remove('conflicted');
-      }
-      this.isConflicted = false;
-    }
+    this.isConflicted = this.item.isInConflict?.() ?? false;
+    this.toggleTabClass('conflicted', this.useBufferStatusColoring && this.isConflicted);
     return this.isConflicted;
   }
 
+  updateDeletedStatus () {
+    this.isDeleted = this.item.isDeleted?.() ?? false;
+    this.toggleTabClass('deleted', this.useBufferStatusColoring && this.isDeleted);
+    return this.isDeleted;
+  }
+
   updateModifiedStatus() {
-    if (typeof this.item.isModified === 'function' ? this.item.isModified() : undefined) {
-      if (!this.isModified) { this.element.classList.add('modified'); }
-      return this.isModified = true;
-    } else {
-      if (this.isModified) { this.element.classList.remove('modified'); }
-      return this.isModified = false;
-    }
+    this.isModified = this.item.isModified?.() ?? false;
+    this.toggleTabClass('modified', this.isModified);
+    return this.isModified;
   }
 
   setupVcsStatus() {
     if (this.path == null) { return; }
     return this.repoForPath(this.path).then(repo => {
       this.subscribeToRepo(repo);
-      return this.updateVcsStatus(repo);
+      this.updateVcsStatus(repo);
     });
+  }
+
+  toggleTabClass (className, condition) {
+    if (condition) {
+      this.element.classList.add(className);
+    } else {
+      this.element.classList.remove(className);
+    }
   }
 
   // Subscribe to the project's repo for changes to the VCS status of the file.
   subscribeToRepo(repo) {
-    if (repo == null) { return; }
+    if (repo == null) return;
 
     // Remove previous repo subscriptions.
-    if (this.repoSubscriptions != null) {
-      this.repoSubscriptions.dispose();
-    }
+    this.repoSubscriptions?.dispose();
     this.repoSubscriptions = new CompositeDisposable();
 
-    this.repoSubscriptions.add(repo.onDidChangeStatus(event => {
-      if (event.path === this.path) { return this.updateVcsStatus(repo, event.pathStatus); }
-    })
-    );
-    return this.repoSubscriptions.add(repo.onDidChangeStatuses(() => {
-      return this.updateVcsStatus(repo);
-    })
+    this.repoSubscriptions.add(
+      repo.onDidChangeStatus(event => {
+        if (event.path === this.path) {
+          return this.updateVcsStatus(repo, event.pathStatus);
+        }
+      }),
+
+      repo.onDidChangeStatuses(() => {
+        return this.updateVcsStatus(repo);
+      })
     );
   }
 
   repoForPath() {
     for (let dir of atom.project.getDirectories()) {
-      if (dir.contains(this.path)) { return atom.project.repositoryForDirectory(dir); }
+      if (dir.contains(this.path)) {
+        return atom.project.repositoryForDirectory(dir);
+      }
     }
     return Promise.resolve(null);
   }
 
   // Update the VCS status property of this tab using the repo.
   updateVcsStatus(repo, status) {
-    if (repo == null) { return; }
+    if (repo == null) return;
 
     let newStatus = null;
     if (repo.isPathIgnored(this.path)) {
       newStatus = 'ignored';
     } else {
-      if (status == null) { status = repo.getCachedPathStatus(this.path); }
+      status ??= repo.getCachedPathStatus(this.path);
       if (repo.isStatusModified(status)) {
         newStatus = 'modified';
       } else if (repo.isStatusNew(status)) {
@@ -410,7 +448,7 @@ class TabView {
   updateVcsColoring() {
     this.itemTitle.classList.remove('status-ignored', 'status-modified',  'status-added');
     if (this.status && atom.config.get('tabs.enableVcsColoring')) {
-      return this.itemTitle.classList.add(`status-${this.status}`);
+      this.itemTitle.classList.add(`status-${this.status}`);
     }
   }
 
@@ -419,7 +457,7 @@ class TabView {
       this.repoSubscriptions.dispose();
     }
     delete this.status;
-    return this.updateVcsColoring();
+    this.updateVcsColoring();
   }
 }
 

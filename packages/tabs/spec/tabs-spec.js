@@ -1,10 +1,95 @@
 const _ = require('underscore-plus');
+const { Emitter } = require('atom');
 const path = require('path');
 const temp = require('temp');
 const TabBarView = require('../lib/tab-bar-view');
 const layout = require('../lib/layout');
 const main = require('../lib/main');
 let {triggerMouseEvent, triggerClickEvent, buildDragEvents, buildDragEnterLeaveEvents, buildWheelEvent, buildWheelPlusShiftEvent} = require("./event-helpers.js");
+
+class SamplePaneItem {
+  _isModified = false;
+  _isConflicted = false;
+  _isDeleted = false;
+  constructor(slug) {
+    this._slug = slug;
+    this.element = document.createElement('div');
+    this.emitter = new Emitter();
+  }
+  getTitle() { return "Anything"; }
+  getPath() { return `foo://${this._slug ?? 'bar'}`; }
+  onDidChangeTitle(cb) {
+    return this.emitter.on('did-change-title', cb);
+  }
+  onDidChangeIcon(cb) {
+    return this.emitter.on('did-change-icon', cb);
+  }
+  onDidChangeModified(cb) {
+    return this.emitter.on('did-change-modified', cb);
+  }
+  onDidSave(cb) {
+    return this.emitter.on('did-save', cb);
+  }
+  onDidChangePath(cb) {
+    return this.emitter.on('did-change-path', cb);
+  }
+  onDidDelete (cb) {
+    return this.emitter.on('did-change-deleted', cb);
+  }
+  onDidConflict (cb) {
+    return this.emitter.on('did-conflict', cb);
+  }
+
+  save() {
+    // Mimic what saving would do for a typical pane item -- clear any
+    // "deleted" state and then trigger a save event.
+    this._isDeleted = false;
+    this._isConflicted = false;
+    this._trigger('did-save', { path: this.getPath() });
+  }
+
+  isModified () {
+    return this._isModified;
+  }
+
+  isInConflict () {
+    return this._isConflicted;
+  }
+
+  isDeleted() {
+    return this._isDeleted;
+  }
+
+  _setIsModified (isModified) {
+    let wasModified = this._isModified;
+    this._isModified = isModified;
+    if (isModified !== wasModified) {
+      this._trigger('did-change-modified', isModified);
+    }
+  }
+
+  _setIsConflicted (isConflicted) {
+    let wasConflicted = this._isConflicted;
+    this._isConflicted = isConflicted;
+    if (isConflicted && !wasConflicted) {
+      this._trigger('did-conflict', isConflicted);
+    }
+  }
+
+  _setIsDeleted (isDeleted) {
+    let wasDeleted = this._isDeleted;
+    this._isDeleted = isDeleted;
+    if (isDeleted && !wasDeleted) {
+      console.log('Triggering deletion change!');
+      this._trigger('did-change-deleted', isDeleted);
+    }
+  }
+
+  _trigger (eventName, ...args) {
+    this.emitter.emit(eventName, ...args);
+  }
+}
+
 
 describe("Tabs package main", () => {
   let centerElement = null;
@@ -96,6 +181,7 @@ describe("TabBarView", () => {
   }
 
   beforeEach(() => {
+    atom.config.set('tabs.enableItemStatusColoring', true);
     deserializerDisposable = atom.deserializers.add(TestView);
     item1 = new TestView('Item 1', undefined, "squirrel", "sample.js");
     item2 = new TestView('Item 2');
@@ -219,6 +305,7 @@ describe("TabBarView", () => {
   describe("when a new item is added to the pane", () => {
     it("adds the 'modified' class to the new tab if the item is initially modified", () => {
       let editor2 = null;
+      let paneItem = null;
 
       waitsForPromise(() => {
         if (atom.workspace.createItemForURI != null) {
@@ -232,7 +319,77 @@ describe("TabBarView", () => {
         editor2.insertText('x');
         pane.activateItem(editor2);
         expect(tabBar.tabForItem(editor2).element).toHaveClass('modified');
+        if (paneItem) {
+          pane.removeItem(paneItem);
+        }
       });
+    });
+
+    it("adds a 'deleted' class if the item signals that it is entering the 'deleted' state", () => {
+      paneItem = new SamplePaneItem('test-1');
+      console.log('Adding to pane:', pane);
+      pane.addItem(paneItem);
+
+      let tabBar = new TabBarView(pane, 'center');
+
+      let tab = tabBar.tabs.find(t => t.item === paneItem);
+      expect(!!tab).toBe(true);
+
+      expect(tab.element).not.toHaveClass('deleted');
+
+      paneItem._setIsDeleted(true);
+
+      expect(tab.element).toHaveClass('deleted');
+
+      // Toggling this setting should immediately remove/restore the
+      // associated class name.
+      atom.config.set('tabs.enableItemStatusColoring', false);
+      expect(tab.element).not.toHaveClass('deleted');
+
+      atom.config.set('tabs.enableItemStatusColoring', true);
+      expect(tab.element).toHaveClass('deleted');
+
+      paneItem.save();
+      expect(tab.element).not.toHaveClass('deleted');
+
+      // When this setting is `false`, no status-related class names should be
+      // added to the tab.
+      atom.config.set('tabs.enableItemStatusColoring', false);
+      paneItem._setIsDeleted(true);
+      expect(tab.element).not.toHaveClass('deleted');
+    });
+
+    it("adds a 'conflicted' class if the item signals that it is entering the 'conflicted' state", () => {
+      paneItem = new SamplePaneItem('test-1');
+      pane.addItem(paneItem);
+
+      let tabBar = new TabBarView(pane, 'center');
+
+      let tab = tabBar.tabs.find(t => t.item === paneItem);
+      expect(!!tab).toBe(true);
+
+      expect(tab.element).not.toHaveClass('conflicted');
+
+      paneItem._setIsConflicted(true);
+
+      expect(tab.element).toHaveClass('conflicted');
+
+      // Toggling this setting should immediately remove/restore the
+      // associated class name.
+      atom.config.set('tabs.enableItemStatusColoring', false);
+      expect(tab.element).not.toHaveClass('conflicted');
+
+      atom.config.set('tabs.enableItemStatusColoring', true);
+      expect(tab.element).toHaveClass('conflicted');
+
+      paneItem.save();
+      expect(tab.element).not.toHaveClass('conflicted');
+
+      // When this setting is `false`, no status-related class names should be
+      // added to the tab.
+      atom.config.set('tabs.enableItemStatusColoring', false);
+      paneItem._setIsConflicted(true);
+      expect(tab.element).not.toHaveClass('conflicted');
     });
 
     describe("when addNewTabsAtEnd is set to true in package settings", () => {
