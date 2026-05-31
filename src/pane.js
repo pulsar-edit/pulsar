@@ -31,9 +31,7 @@ class SaveConflictedError extends Error {
 // in the wild.)
 function interpret(obj, booleanOrFunctionName) {
   let booleanOrFunction = obj[booleanOrFunctionName];
-  if (typeof booleanOrFunction === 'boolean') {
-    return booleanOrFunction;
-  } else if (typeof booleanOrFunction === 'function') {
+  if (typeof booleanOrFunction === 'function') {
     return obj[booleanOrFunctionName]();
   }
   return false;
