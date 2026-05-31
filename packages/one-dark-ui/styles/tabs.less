@@ -27,6 +27,7 @@
   // Tab ----------------------
 
   .tab {
+    --tab-color: @tab-text-color;
     position: relative;
     top: 0;
     padding: 0;
@@ -34,12 +35,12 @@
     height: inherit;
     font-size: inherit;
     line-height: @ui-tab-height;
-    color: @tab-text-color;
+    color: var(--tab-color);
     background-color: @tab-background-color;
     box-shadow: inherit;
     border-left: @tab-border;
     &.active {
-      color: @tab-text-color-active;
+      --tab-color: @tab-text-color-active;
       background-color: @tab-background-color-active;
       box-shadow: none;
     }
@@ -60,11 +61,16 @@
     .title {
       text-align: center;
       margin: 0 @title-padding;
+      color: var(--tab-color);
     }
 
     // VCS coloring ----------------------
-    &:not(.active) .status-added    { color: @tab-inactive-status-added; }
-    &:not(.active) .status-modified { color: @tab-inactive-status-modified; }
+    &:not(.active):has(.status-added) {
+      --tab-color: @tab-inactive-status-added;
+    }
+    &:not(.active):has(.status-modified) {
+      --tab-color: @tab-inactive-status-modified;
+    }
 
 
     // Icons ----------------------
@@ -115,6 +121,19 @@
       transition-duration: .16s;
     }
   }
+
+  // Deleted state ----------------------
+
+  .tab.deleted {
+    --tab-color: @text-color-error;
+    text-decoration: line-through;
+    text-decoration-color: var(--tab-color);
+
+    &:not(.active) {
+      --tab-color: @tab-inactive-status-deleted;
+    }
+  }
+
 
   // Modified icon ----------------------
 
@@ -249,7 +268,8 @@ atom-dock .tab-bar .tab::before {
   &[data-type$="TimecopView"],
   &[data-type$="StyleguideView"],
   &[data-type="MarkdownPreviewView"] {
-    color: @tab-text-color-editor;
+    --tab-color: @tab-text-color-editor;
+    color: var(--tab-color);
     background-color: @tab-background-color-editor; // Match syntax background color
   }
 }
