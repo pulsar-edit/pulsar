@@ -29,11 +29,12 @@ class SaveConflictedError extends Error {
 // boilerplate. We use this for some `isX` methods, but not all. (Newer methods
 // don't get this treatment because of almost zero chance of misimplementation
 // in the wild.)
-function interpret(booleanOrFunction) {
+function interpret(obj, booleanOrFunctionName) {
+  let booleanOrFunction = obj[booleanOrFunctionName];
   if (typeof booleanOrFunction === 'boolean') {
     return booleanOrFunction;
   } else if (typeof booleanOrFunction === 'function') {
-    return booleanOrFunction();
+    return obj[booleanOrFunctionName]();
   }
   return false;
 }
@@ -684,7 +685,7 @@ module.exports = class Pane {
       );
     }
 
-    if (interpret(item.isDestroyed)) {
+    if (interpret(item, 'isDestroyed')) {
       throw new Error(
         `Adding a pane item with URI '${typeof item.getURI === 'function' &&
           item.getURI()}' that has already been destroyed`
@@ -862,7 +863,7 @@ module.exports = class Pane {
     // Don't allow deletion of permanent dock items unless `force` is `true`.
     if (
       !force &&
-      interpret(item.isPermanentDockItem) &&
+      interpret(item, 'isPermanentDockItem') &&
       (!this.container || this.container.getLocation() !== 'center')
     ) {
       return false;
@@ -938,7 +939,7 @@ module.exports = class Pane {
       const title = item.getTitle?.() || uri;
 
       let message, detail;
-      let isDeleted = interpret(item.isDeleted);
+      let isDeleted = interpret(item, 'isDeleted');
       let firstButton = isDeleted ? 'Save' : 'Overwrite';
       if (isDeleted) {
         // The message is a bit different when the file no longer exists on
@@ -1175,7 +1176,7 @@ module.exports = class Pane {
   // Public: Save all items.
   saveItems() {
     for (let item of this.getItems()) {
-      if (interpret(item.isModified)) {
+      if (interpret(item, 'isModified')) {
         this.saveItem(item);
       }
     }
