@@ -23,8 +23,10 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-14, windows-latest ]
+        os: [ ubuntu-24.04-arm, ubuntu-latest, macos-14, windows-latest ]
         include:
+          - os: ubuntu-24.04-arm
+            image: "debian:10"
           - os: ubuntu-latest
             image: "debian:10"
       fail-fast: false
@@ -296,7 +298,11 @@ jobs:
     # Debian Docker environment. If anyone can make it work, feel free to
     # re-combine visual testing on Linux back into the main build job above!
     # - DeeDeeG
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-24.04-arm, ubuntu-latest ]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
     needs: build
 
     steps:
