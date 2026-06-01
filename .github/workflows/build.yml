@@ -228,12 +228,20 @@ jobs:
         retry_on: error
         command: yarn dist
 
-    - name: Rename Pulsar Binaries for Regular release (Linux)
-      if: ${{ runner.os == 'Linux' }}
+    - name: Rename Pulsar Binaries for Regular release (ARM64 Linux)
+      if: ${{ runner.os == 'Linux' && runner.arch == 'ARM64' }}
+      run: node ./script/rename.js "ARM.Linux"
+
+    - name: Rename Pulsar Binaries for Regular release (x64 Linux)
+      if: ${{ runner.os == 'Linux' && runner.arch == 'X64' }}
       run: node ./script/rename.js "Linux"
 
-    - name: Rename Pulsar Binaries for Regular release (macOS)
-      if: ${{ runner.os == 'macOS' }}
+    - name: Rename Pulsar Binaries for Regular release (ARM64 macOS)
+      if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && matrix.node-architecture != 'x64' }}
+      run: node ./script/rename.js "Silicon.Mac"
+
+    - name: Rename Pulsar Binaries for Regular release (x64 macOS)
+      if: ${{ runner.os == 'macOS' && ( runner.arch == 'X64' || matrix.node-architecture == 'x64' ) }}
       run: node ./script/rename.js "Intel.Mac"
 
     - name: Rename Pulsar Binaries for Regular release (Windows)
