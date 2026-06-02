@@ -425,14 +425,12 @@ function whatToBuild() {
   if (!platform) {
     throw new Error(`Unrecognized platform: ${platform}`);
   }
-  let filteredOptions = { [platform]: options[platform] };
-  if (!ARGS.target) {
-    return filteredOptions;
+  if (ARGS.target) {
+    options[platform].target = options[platform].target.filter(
+      e => e.target === ARGS.target
+    );
   }
-  filteredOptions[platform].target = filteredOptions[platform].target.filter(
-    e => e.target === ARGS.target
-  );
-  return filteredOptions;
+  return options;
 }
 
 function generateVersionNumber(existingVersion, channel = '') {
