@@ -78,15 +78,9 @@ async function modifyMainPackageJson(
 
 // END Monkey-patch.
 
-// eslint-disable-next-line node/no-unpublished-require
 const builder = require('electron-builder');
 
 const ARGS = yargs(hideBin(process.argv))
-  .command('[platform]', 'build for a given platform', () => {
-    return yargs.positional('platform', {
-      describe: 'One of "mac", "linux", or "win".'
-    })
-  })
   .option('target', {
     alias: 't',
     type: 'string',
@@ -98,7 +92,6 @@ const ARGS = yargs(hideBin(process.argv))
     description: 'Builds a "canary" with a separate bundle identifier and app name so it can run alongside ordinary Pulsar.'
   })
   .parse();
-
 
 // The difference in base name matters for the app ID (which helps the OS
 // understand that PulsarNext is not the same as Pulsar), but also for other
@@ -119,7 +112,6 @@ const ICONS = {
   svg: `resources/app-icons/${iconName}.svg`,
   icns: `resources/app-icons/${iconName}.icns`
 };
-
 
 let options = {
   appId: `dev.pulsar-edit.${baseName}`,
@@ -352,7 +344,11 @@ let options = {
     extraResources: [
       { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
       { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
-    ]
+    ],
+    target: [
+      { target: 'dmg' },
+      { target: 'zip' }
+    ],
   },
 
   dmg: {
@@ -418,11 +414,25 @@ if (ARGS.next) {
   delete options.nsis.guid;
 }
 
+const PLATFORMS = {
+  darwin: 'mac',
+  win32: 'win',
+  linux: 'linux'
+};
+
 function whatToBuild() {
-  if (!ARGS.target) return options;
-  if (!(ARGS.platform in options)) return options;
-  options[ARGS.platform] = options[ARGS.platform].filter(e => e.target === ARGS.target);
-  return options;
+  let platform = PLATFORMS[process.platform];
+  if (!platform) {
+    throw new Error(`Unrecognized platform: ${platform}`);
+  }
+  let filteredOptions = { [platform]: options[platform] };
+  if (!ARGS.target) {
+    return filteredOptions;
+  }
+  filteredOptions[platform].target = filteredOptions[platform].target.filter(
+    e => e.target === ARGS.target
+  );
+  return filteredOptions;
 }
 
 function generateVersionNumber(existingVersion, channel = '') {
