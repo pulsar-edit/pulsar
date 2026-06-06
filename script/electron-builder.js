@@ -426,9 +426,12 @@ function whatToBuild() {
     throw new Error(`Unrecognized platform: ${platform}`);
   }
   if (ARGS.target) {
-    options[platform].target = options[platform].target.filter(
-      e => e.target === ARGS.target
-    );
+    let targets = ARGS.target.split(',');
+    // Replace the `target` array with the targets provided by the user. It's
+    // up to the user to ensure these are valid targets for the given platform.
+    options[platform].target = targets.map(t => {
+      return { target: t }
+    });
   }
   return options;
 }
