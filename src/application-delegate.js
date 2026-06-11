@@ -13,7 +13,7 @@ module.exports = class ApplicationDelegate {
   ipcMessageEmitter() {
     if (!this._ipcMessageEmitter) {
       this._ipcMessageEmitter = new Emitter();
-      ipcRenderer.on('message', (event, message, detail) => {
+      ipcRenderer.on('message', (_event, message, detail) => {
         this._ipcMessageEmitter.emit(message, detail);
       });
     }
@@ -34,7 +34,7 @@ module.exports = class ApplicationDelegate {
 
   pickFolder(callback) {
     const responseChannel = 'atom-pick-folder-response';
-    ipcRenderer.on(responseChannel, function (event, path) {
+    ipcRenderer.on(responseChannel, function (_event, path) {
       ipcRenderer.removeAllListeners(responseChannel);
       return callback(path);
     });
@@ -271,7 +271,7 @@ module.exports = class ApplicationDelegate {
     }
   }
 
-  showMessageDialog(params) {}
+  showMessageDialog(_params) {}
 
   showSaveDialog(options, callback) {
     if (typeof callback === 'function') {
@@ -287,6 +287,7 @@ module.exports = class ApplicationDelegate {
   }
 
   playBeepSound() {
+    // TODO: Delegate to main.
     return shell.beep();
   }
 
@@ -295,7 +296,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onApplicationMenuCommand(handler) {
-    const outerCallback = (event, ...args) => handler(...args);
+    const outerCallback = (_event, ...args) => handler(...args);
 
     ipcRenderer.on('command', outerCallback);
     return new Disposable(() =>
@@ -304,7 +305,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onContextMenuCommand(handler) {
-    const outerCallback = (event, ...args) => handler(...args);
+    const outerCallback = (_event, ...args) => handler(...args);
 
     ipcRenderer.on('context-command', outerCallback);
     return new Disposable(() =>
@@ -313,7 +314,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onURIMessage(handler) {
-    const outerCallback = (event, ...args) => handler(...args);
+    const outerCallback = (_event, ...args) => handler(...args);
 
     ipcRenderer.on('uri-message', outerCallback);
     return new Disposable(() =>
@@ -322,7 +323,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidRequestUnload(callback) {
-    const outerCallback = async (event, message) => {
+    const outerCallback = async (event, _message) => {
       const shouldUnload = await callback(event);
       ipcRenderer.send('did-prepare-to-unload', shouldUnload);
     };
@@ -334,7 +335,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidChangeHistoryManager(callback) {
-    const outerCallback = (event, message) => callback(event);
+    const outerCallback = (event, _message) => callback(event);
 
     ipcRenderer.on('did-change-history-manager', outerCallback);
     return new Disposable(() =>
@@ -347,7 +348,7 @@ module.exports = class ApplicationDelegate {
   }
 
   openExternal(url) {
-    return shell.openExternal(url);
+    return this.openExternalDirect(url);
   }
 
   emitWillSavePath(path) {

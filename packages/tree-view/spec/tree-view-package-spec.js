@@ -6,7 +6,6 @@ const path = require('path');
 const temp = require('temp').track();
 const os = require('os');
 const remote = require('@electron/remote');
-const {shell} = remote;
 const Directory = require('../lib/directory');
 const eventHelpers = require("./event-helpers");
 const { setDebug } = require('../lib/helpers');
@@ -3227,7 +3226,7 @@ describe("TreeView", function () {
         fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
         treeView.focus();
 
-        spyOn(shell, 'trashItem').andCallFake(() => {
+        spyOn(atom, 'trashItem').andCallFake(() => {
           return Promise.reject(false);
         });
 
@@ -4410,17 +4409,17 @@ describe("TreeView", function () {
   });
 
   describe("showSelectedEntryInFileManager()", function () {
-    beforeEach(() => spyOn(shell, 'showItemInFolder').andReturn(false));
+    beforeEach(() => spyOn(atom, 'showItemInFolder').andReturn(false));
 
     it("does nothing if no entry is selected", function () {
       treeView.deselect();
       treeView.showSelectedEntryInFileManager();
-      expect(shell.showItemInFolder).not.toHaveBeenCalled();
+      expect(atom.showItemInFolder).not.toHaveBeenCalled();
     });
 
     it("shows the selected entry in the OS's file manager", function () {
       treeView.showSelectedEntryInFileManager();
-      expect(shell.showItemInFolder).toHaveBeenCalled();
+      expect(atom.showItemInFolder).toHaveBeenCalled();
     });
 
     it("displays a notification if showing the file fails", function () {
@@ -4432,13 +4431,13 @@ describe("TreeView", function () {
   });
 
   describe("showCurrentFileInFileManager()", function () {
-    beforeEach(() => spyOn(shell, 'showItemInFolder').andReturn(false));
+    beforeEach(() => spyOn(atom, 'showItemInFolder').andReturn(false));
 
     it("does nothing when no file is opened", function () {
       expect(atom.workspace.getCenter().getPaneItems().length).toBe(0);
 
       treeView.showCurrentFileInFileManager();
-      expect(shell.showItemInFolder).not.toHaveBeenCalled();
+      expect(atom.showItemInFolder).not.toHaveBeenCalled();
     });
 
     it("does nothing when only an untitled tab is opened", function () {
@@ -4447,7 +4446,7 @@ describe("TreeView", function () {
       return runs(function () {
         workspaceElement.focus();
         treeView.showCurrentFileInFileManager();
-        expect(shell.showItemInFolder).not.toHaveBeenCalled();
+        expect(atom.showItemInFolder).not.toHaveBeenCalled();
       });
     });
 
@@ -4458,7 +4457,7 @@ describe("TreeView", function () {
 
       return runs(function () {
         treeView.showCurrentFileInFileManager();
-        expect(shell.showItemInFolder).toHaveBeenCalled();
+        expect(atom.showItemInFolder).toHaveBeenCalled();
       });
     });
 
