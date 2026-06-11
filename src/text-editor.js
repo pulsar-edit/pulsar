@@ -3822,6 +3822,11 @@ module.exports = class TextEditor {
     return this.expandSelectionsForward(selection => selection.selectWord());
   }
 
+  // Extended: Select the subword surrounding each cursor.
+  selectSubwordsContainingCursors() {
+    return this.expandSelectionsForward(selection => selection.selectSubword());
+  }
+
   // Selection Extended
 
   // Extended: For each selection, move its cursor to the preceding word boundary
