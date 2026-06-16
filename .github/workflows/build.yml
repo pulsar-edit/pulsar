@@ -23,7 +23,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ macos-14, ubuntu-24.04-arm, ubuntu-latest, windows-latest ]
+        os: [ macos-14, ubuntu-24.04-arm, ubuntu-latest, windows-2022 ]
         node-architecture: [ '' ]
         include:
           - os: macos-14
