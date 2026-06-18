@@ -59,6 +59,8 @@ jobs:
         fi
         curl -Ls "https://micro.mamba.pm/api/micromamba/${MAMBA_ARCH}/latest" | tar -xvj -C /usr/local bin/micromamba
         /usr/local/bin/micromamba create -y -p /opt/gcc-toolchain -c conda-forge gcc=12 gxx=12
+        echo "PULSAR_CC=/opt/gcc-toolchain/bin/${CONDA_TARGET}-gcc" >> "$GITHUB_ENV"
+        echo "PULSAR_CXX=/opt/gcc-toolchain/bin/${CONDA_TARGET}-g++" >> "$GITHUB_ENV"
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
       run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
@@ -196,8 +198,8 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       env:
-        CC: /opt/gcc-toolchain/bin/x86_64-conda-linux-gnu-gcc
-        CXX: /opt/gcc-toolchain/bin/x86_64-conda-linux-gnu-g++
+        CC: ${{ env.PULSAR_CC }}
+        CXX: ${{ env.PULSAR_CXX }}
         CFLAGS: -I/usr/include -I/usr/include/x86_64-linux-gnu
         CXXFLAGS: -I/usr/include -I/usr/include/x86_64-linux-gnu
         LDFLAGS: -L/usr/lib/x86_64-linux-gnu -L/usr/lib
@@ -353,7 +355,7 @@ jobs:
     steps:
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
+      run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ file libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
 
     - name: Checkout the latest code
       uses: actions/checkout@v6
