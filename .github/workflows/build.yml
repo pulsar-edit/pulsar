@@ -45,6 +45,7 @@ jobs:
         sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
         sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
         sed -i '/security/d' /etc/apt/sources.list
+        sed -i '/-updates/d' /etc/apt/sources.list
     - name: Install Modern GCC Toolchain - Linux
       if: ${{ runner.os == 'Linux' }}
       run: |
@@ -58,10 +59,8 @@ jobs:
         fi
         curl -Ls "https://micro.mamba.pm/api/micromamba/${MAMBA_ARCH}/latest" | tar -xvj -C /usr/local bin/micromamba
         /usr/local/bin/micromamba create -y -p /opt/gcc-toolchain -c conda-forge gcc=12 gxx=12
-        echo "LIST:"
-        ls -l /opt/gcc-toolchain/bin/
-        echo "CC=/opt/gcc-toolchain/bin/${CONDA_TARGET}-gcc" >> "$GITHUB_ENV"
-        echo "CXX=/opt/gcc-toolchain/bin/${CONDA_TARGET}-g++" >> "$GITHUB_ENV"
+        echo "CC=/opt/gcc-toolchain/bin/gcc" >> "$GITHUB_ENV"
+        echo "CXX=/opt/gcc-toolchain/bin/g++" >> "$GITHUB_ENV"
         echo "/opt/gcc-toolchain/bin" >> "$GITHUB_PATH"
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
