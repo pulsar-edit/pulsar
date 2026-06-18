@@ -39,13 +39,13 @@ jobs:
       timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
-    - name: Edit sources.list - Linux
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
-        sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
-        sed -i '/security/d' /etc/apt/sources.list
-        sed -i '/-updates/d' /etc/apt/sources.list
+    # - name: Edit sources.list - Linux
+    #   if: ${{ runner.os == 'Linux' }}
+    #   run: |
+    #     sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+    #     sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
+    #     sed -i '/security/d' /etc/apt/sources.list
+    #     sed -i '/-updates/d' /etc/apt/sources.list
     - name: Install Modern GCC Toolchain - Linux
       if: ${{ runner.os == 'Linux' }}
       run: |
