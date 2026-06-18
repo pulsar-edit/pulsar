@@ -200,11 +200,15 @@ jobs:
         CXX: /opt/gcc-toolchain/bin/x86_64-conda-linux-gnu-g++
         CFLAGS: -I/usr/include -I/usr/include/x86_64-linux-gnu
         CXXFLAGS: -I/usr/include -I/usr/include/x86_64-linux-gnu
+        LDFLAGS: -L/usr/lib/x86_64-linux-gnu -L/usr/lib
       with:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
-        command: yarn build
+        command: |
+          echo "libx11.so lives at:"
+          dpkg -L libx11-6 | grep '\.so'
+          yarn build
 
     - name: Build ppm
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
