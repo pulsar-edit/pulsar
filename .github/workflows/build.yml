@@ -53,14 +53,19 @@ jobs:
         if [ "${{ runner.arch }}" = "ARM64" ]; then
           MAMBA_ARCH=linux-aarch64
           CONDA_TARGET=aarch64-conda-linux-gnu
+          MULTIARCH=aarch64-linux-gnu
         else
           MAMBA_ARCH=linux-64
           CONDA_TARGET=x86_64-conda-linux-gnu
+          MULTIARCH=x86_64-linux-gnu
         fi
         curl -Ls "https://micro.mamba.pm/api/micromamba/${MAMBA_ARCH}/latest" | tar -xvj -C /usr/local bin/micromamba
         /usr/local/bin/micromamba create -y -p /opt/gcc-toolchain -c conda-forge gcc=12 gxx=12
         echo "PULSAR_CC=/opt/gcc-toolchain/bin/${CONDA_TARGET}-gcc" >> "$GITHUB_ENV"
         echo "PULSAR_CXX=/opt/gcc-toolchain/bin/${CONDA_TARGET}-g++" >> "$GITHUB_ENV"
+        echo "PULSAR_CFLAGS=-I/usr/include -I/usr/include/${MULTIARCH}" >> "$GITHUB_ENV"
+        echo "PULSAR_CXXFLAGS=-I/usr/include -I/usr/include/${MULTIARCH}" >> "$GITHUB_ENV"
+        echo "PULSAR_LDFLAGS=-L/usr/lib/${MULTIARCH} -L/usr/lib" >> "$GITHUB_ENV"
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
       run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
@@ -200,9 +205,9 @@ jobs:
       env:
         CC: ${{ env.PULSAR_CC }}
         CXX: ${{ env.PULSAR_CXX }}
-        CFLAGS: -I/usr/include -I/usr/include/x86_64-linux-gnu
-        CXXFLAGS: -I/usr/include -I/usr/include/x86_64-linux-gnu
-        LDFLAGS: -L/usr/lib/x86_64-linux-gnu -L/usr/lib
+        CFLAGS: ${{ env.PULSAR_CFLAGS }}
+        CXXFLAGS: ${{ env.PULSAR_CXXFLAGS }}
+        LDFLAGS: ${{ env.PULSAR_LDFLAGS }}
       with:
         timeout_minutes: 30
         max_attempts: 3
