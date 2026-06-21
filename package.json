@@ -20,7 +20,7 @@
     "url": "https://github.com/pulsar-edit/pulsar/issues"
   },
   "engines": {
-    "node": ">=20.16.0"
+    "node": ">=20.18.1"
   },
   "atomTestRunner": "runners/jasmine2-test-runner",
   "license": "MIT",
