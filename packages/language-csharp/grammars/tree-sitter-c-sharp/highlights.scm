@@ -204,6 +204,10 @@
 	returns: (_) @_IGNORE_
 	(#set! type_annotation true))
 
+(class_declaration
+	(base_list) @_IGNORE_
+	(#set! type_annotation true))
+
 ; Scope all identifiers as types when they match those marked nodes…
 ((identifier)
 	@support.storage.type.cs
