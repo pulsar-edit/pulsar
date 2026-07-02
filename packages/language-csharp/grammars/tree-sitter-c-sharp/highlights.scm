@@ -149,53 +149,81 @@
 (local_function_statement
 	name: (identifier) @entity.name.function.cs)
 
-(attribute name: (identifier) @entity.other.attribute-name.cs)
+(attribute name: _ @entity.other.attribute-name.cs)
+
+(property_declaration name: _ @entity.name.property.cs)
 
 ; SUPPORT
 
 (invocation_expression
 	function: (identifier) @support.other.function.cs)
 
+; All kinds of Foo in `new Foo()`, `new Foo<int>`, new `Foo.Foo()`, etc.
+(object_creation_expression
+	type: (identifier) @support.class.instance.cs
+	(#set! capture.final))
+
+; Mark `type:` fields within an object creation…
+(object_creation_expression
+	type: _ @_IGNORE_
+	(#set! type_instantiation true)
+	(#set! capture.final))
+
+; …then scope all identifiers within (except generic type arguments).
+((identifier) @support.class.instance.cs
+	(#is-not? test.descendantOfType "type_argument_list")
+	(#is? test.descendantOfNodeWithData "type_instantiation"))
+
 ; TYPES
 
 ; Builtin types like `string`.
 (predefined_type) @support.storage.type.builtin.cs
 
-; The `Foo` in "List<Foo>".
-(type_argument_list
-	(identifier) @support.storage.type.cs)
-
-; The inner `List` in "List<List<Foo>>".
-(type_argument_list
-	(generic_name
-		(identifier) @support.storage.type.cs))
-
-; The first `List` in "static List<int> x = new List<int>();".
-(variable_declaration
-	type: (generic_name (identifier) @support.storage.type.cs))
+; Catch and mark all `type:` fields on things that aren't object creation
+; expressions.
+(_ type: (_) @_IGNORE_
+	(#set! type_annotation true))
 
 ; Type coercion.
 (as_expression
-	right: (identifier) @support.storage.type.cs)
+	right: (_) @_IGNORE_
+	(#set! type_annotation true))
 
 ; Type checking/binding.
 (is_expression
-	right: (identifier) @support.storage.type.cs)
+	right: (_) @_IGNORE_
+	(#set! type_annotation true))
 
-; Generally, anything with a `type:` field should be highlighted like a type.
-(_ type: (identifier) @support.storage.type.cs)
+; e.g., `value is Foo.Bar`.
+(is_pattern_expression
+	pattern: _ @_IGNORE_
+	(#set! type_annotation true))
+
+; Generally, anything with a `returns:` field should be highlighted like a type.
+(_
+	returns: (_) @_IGNORE_
+	(#set! type_annotation true))
+
+; Scope all identifiers as types when they match those marked nodes…
+((identifier)
+	@support.storage.type.cs
+	(#is? test.rangeWithData "type_annotation")
+	(#set! capture.final))
+
+; or when they descend from those marked nodes.
+((identifier)
+	@support.storage.type.cs
+	(#is? test.descendantOfNodeWithData "type_annotation")
+	(#set! capture.final))
 
 ; TODO: This might be overbroad.
-(base_list (identifier) @support.storage.type.cs)
+; (base_list (identifier) @support.storage.type.cs)
 
 ; Generally, anything with a `returns:` field should be highlighted like a type.
 (_
 	returns: (identifier) @support.storage.type.cs
 	(#set! capture.shy))
 
-(_
-	returns: (qualified_name
-		name: (identifier) @support.storage.type.cs))
 
 ; VARIABLES
 
@@ -209,6 +237,8 @@
 
 (assignment_expression
 	left: (identifier) @variable.other.assignment.cs)
+
+(declaration_pattern name: (identifier) @variable.other.assignment.cs)
 
 (type_parameter_list
 	(type_parameter
@@ -224,6 +254,11 @@
 (invocation_expression
 	(member_access_expression
 		name: (identifier) @support.other.function.method.cs))
+		(#set! capture.final)
+
+(invocation_expression
+	(generic_name
+		(identifier) @support.other.function.cs))
 
 ; The `Sort` in "Array.Sort<Foo>".
 (invocation_expression
@@ -234,7 +269,10 @@
 ; The "X" in `ptr->X`.
 (member_access_expression
 	name: (identifier) @variable.other.property.cs
-	(#is-not? test.descendantOfType "invocation_expression"))
+	; This way it won't apply if we've already scoped it as a method call.
+	(#set! capture.shy))
+
+(catch_declaration name: _ @variable.other.assignment.cs)
 
 ; KEYWORDS
 
@@ -276,6 +314,8 @@
 	"unsafe"
 	"with"
 	"stackalloc"
+	"try"
+	"switch"
 ] @keyword.control._TYPE_.cs
 
 (
