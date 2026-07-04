@@ -138,7 +138,7 @@ jobs:
       # Overwrite bad headers that get downloaded.
       # NodeJS versions above 16 should come with `node-gyp@9.4.0` that has a fix
       # for this issue. At that point this additional step can be removed.
-      run: npx node-gyp install ${{ env.NODE_VERSION }}
+      run: npx node-gyp@12.4.0 install ${{ env.NODE_VERSION }}
 
     - name: Explicitly Specify Python Path (Windows)
       if: ${{ runner.os == 'Windows' }}
