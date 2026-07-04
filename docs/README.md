@@ -1,7 +1,6 @@
 # Pulsar Docs
 
-<img src="../resources/pulsar.png" alt="Pulsar" width="200">
-
+<img src="../resources/pulsar.png" alt="Pulsar" width="100">
 
 Most of the Pulsar/Atom user and developer documentation is contained on the [Pulsar Website](https://docs.pulsar-edit.dev/).
 
