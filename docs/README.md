@@ -7,7 +7,7 @@ Most of the Pulsar/Atom user and developer documentation is contained on the [Pu
 
 The Pulsar API documentation is available on the website at [docs.pulsar-edit.dev/api](https://docs.pulsar-edit.dev/api/).
 
-There is also general guidance on the internal [stucture and behavior](./architecture/README.md) of Pulsar available.
+There is also general guidance on the internal [structure and behavior](./architecture/README.md) of Pulsar available.
 
 ## Build documentation
 

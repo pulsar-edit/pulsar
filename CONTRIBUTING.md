@@ -122,10 +122,10 @@ Explain the problem and include additional details to help maintainers reproduce
 * **Provide specific examples to demonstrate the steps**. Include links to files or GitHub projects, or copy/pasteable snippets, which you use in those examples. If you're providing snippets in the issue, use [Markdown code blocks](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github).
 * **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
 * **Explain which behavior you expected to see instead and why.**
-* **Include screenshots and animated GIFs** which show you following the described steps and clearly demonstrate the problem. If you use the keyboard while following the steps, **record the GIF with the [Keybinding Resolver](https://github.com/pulsar-edit/pulsar/tree/master/packages/keybinding-resolver) shown**. You can use [this tool](https://www.cockos.com/licecap/) to record GIFs on macOS and Windows, and [this tool](https://github.com/colinkeenan/silentcast) on Linux.
-* **If you're reporting that Pulsar crashed**, include a crash report with a stack trace from the operating system. On macOS, the crash report will be available in `Console.app` under "Diagnostic and usage information" > "User diagnostic reports". Include the crash report in the issue in a [code block](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github), a [file attachment](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files), or put it in a [gist](https://gist.github.com/discover) and provide link to that gist.
+* **Include screenshots and/or screencasts** which show you following the described steps and clearly demonstrate the problem. If you use the keyboard while following the steps, **record the screencast with the [Keybinding Resolver](https://github.com/pulsar-edit/pulsar/tree/master/packages/keybinding-resolver) shown**.  The exact program used to record one's screen will vary from platform to platform. If you like, you can use `ffmpeg` to convert your screencast to MP4 for broadest compatibility: e.g., `ffmpeg -i screencast.mov screencast.mp4`.
+* **If you're reporting that Pulsar crashed**, include a crash report with a stack trace from the operating system. On macOS, the crash report will be available in `Console.app` under "Diagnostic and usage information" > "User diagnostic reports". On Windows and Linux, you should be able to find a new crashdump in the `crashdumps` folder within `ATOM_HOME` — e.g., `~/.pulsar/crashdumps` on Linux. Include the crash report in the issue in a [code block](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github), a [file attachment](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files), or put it in a [gist](https://gist.github.com/discover) and provide link to that gist.
 * **If the problem is related to performance or memory**, include a [CPU profile capture](https://docs.pulsar-edit.dev/troubleshooting-pulsar/diagnosing-runtime-performance/) with your report.
-* **If Chrome's developer tools pane is shown without you triggering it**, that normally means that you have a syntax error in one of your themes or in your `styles.less`. Try running in [Safe Mode](https://docs.pulsar-edit.dev/troubleshooting-pulsar/using-safe-mode/) and using a different theme or comment out the contents of your `styles.less` to see if that fixes the problem.
+* **If Chrome's developer tools pane is shown without you triggering it**, that typically means that an installed package is throwing an error, or else that there is a syntax error in your `styles.less`. In the former case, running in [Safe Mode](https://docs.pulsar-edit.dev/troubleshooting-pulsar/using-safe-mode/) will disable non-core packages so you can compare the behavior; in the latter case, you can try using a different theme or commenting out the contents of your `styles.less` to see if that fixes the problem.
 * **If the problem wasn't triggered by a specific action**, describe what you were doing before the problem happened and share more information using the guidelines below.
 
 Provide more context by answering these questions:
@@ -178,7 +178,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://docs.github.com/e
 Unsure where to begin contributing to Pulsar? You can start by looking through these `beginner` and `help-wanted` issues:
 
 * [Beginner issues][beginner] - issues which should only require a few lines of code, and a test or two.
-* [Help wanted issues][help-wanted] - issues which should be a bit more involved than `beginner` issues.
+* [Help wanted issues][help-wanted] - issues which should be a bit more involved than `beginner` issues. These could be issues that require subject matter expertise that we don't have. They could also be issues that aren't on our roadmap — for which we'd accept a well-written pull request, but which otherwise don't have a high chance of being addressed by the core maintainers in the near future.
 
 Both issue lists are sorted by total number of comments. While not perfect, number of comments is a reasonable proxy for impact a given change will have.
 
@@ -216,7 +216,6 @@ While the prerequisites above must be satisfied prior to having your pull reques
 * Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
 * Limit the first line to 72 characters or less
 * Reference issues and pull requests liberally after the first line
-* When only changing documentation, include `[ci skip]` in the commit title
 * Consider starting the commit message with an applicable emoji:
     * 🎨 `:art:` when improving the format/structure of the code
     * 🐎 `:racehorse:` when improving performance
@@ -253,13 +252,14 @@ All JavaScript code is linted with [Prettier](https://prettier.io/).
   export default ClassName
   ```
 * Place requires in the following order:
-    * Built in Node Modules (such as `path`)
-    * Built in Pulsar and Electron Modules (such as `atom`, `remote`)
+    * Built-in Node Modules (such as `path`)
+    * Built-in Pulsar and Electron Modules (such as `atom`, `remote`)
     * Local Modules (using relative paths)
 * Place class properties in the following order:
     * Class methods and properties (methods starting with `static`)
     * Instance methods and properties
 * Avoid platform-dependent code
+  * If you must resort to a platform-dependent fix, you should still ensure that the affected code path works as expected on each of our three supported platforms — and that we prove it with specs to the greatest possible extent
 
 ### CoffeeScript Styleguide
 
@@ -311,7 +311,7 @@ describe 'a dog', ->
 
 ### Documentation Styleguide
 
-* Use AtomDoc.
+* Use [AtomDoc](https://github.com/pulsar-edit/atomdoc).
 * Use [Markdown](https://daringfireball.net/projects/markdown/).
 * Reference methods and classes in markdown with the custom `{}` notation:
     * Reference classes with `{ClassName}`
