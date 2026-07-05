@@ -1,13 +1,37 @@
 /** @babel */
 /** @jsx etch.dom */
 
+import {CompositeDisposable, Disposable} from 'atom'
 import etch from 'etch'
+import {shell} from 'electron'
 
 export default class BadgeView {
   constructor(badge) {
     this.badge = badge;
+    this.disposables = new CompositeDisposable()
 
     etch.initialize(this)
+
+    // Intercept the click request and manually open this URL in a web browser.
+    let clickHandler = (event) => {
+      let anchor = event.target.closest('a')
+      if (!anchor) return
+      event.stopPropagation()
+      event.preventDefault()
+      shell.openExternal(anchor.href)
+    }
+
+    if (this.hasLink()) {
+      this.refs.badgeLink.addEventListener('click', clickHandler)
+      this.disposables.add(new Disposable(() => {
+        this.refs.badgeLink.removeEventListener('click', clickHandler)
+      }))
+    }
+  }
+
+  destroy () {
+    this.disposables.dispose()
+    return etch.destroy(this)
   }
 
   render () {
@@ -20,7 +44,7 @@ export default class BadgeView {
         // Link and Text
 
         return (
-          <a href={badge.link}>
+          <a href={badge.link} ref="badgeLink">
             <span class={classes}>
               <i class={icons}></i>
               {badge.title}: <span class="badge-expandable">...</span><span class="badge-text"> {badge.text}</span>
@@ -60,7 +84,7 @@ export default class BadgeView {
         );
       }
     }
-    
+
   }
 
   hasLink () {
@@ -112,7 +136,5 @@ export default class BadgeView {
   }
 
   update () {}
-
-  destroy () {}
 
 }

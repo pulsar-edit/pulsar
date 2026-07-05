@@ -1,5 +1,5 @@
 const { CompositeDisposable } = require('event-kit');
-const { Point } = require('text-buffer');
+const { Point } = require('@pulsar-edit/text-buffer');
 const ScopeDescriptor = require('./scope-descriptor');
 
 // TODO: These utility functions are duplicated between this file and

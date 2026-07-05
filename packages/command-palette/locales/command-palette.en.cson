@@ -1,0 +1,4 @@
+'commandPaletteView': {
+  'emptyMessage': 'No matches found'
+  'matchingTags': 'matching tags: '
+}

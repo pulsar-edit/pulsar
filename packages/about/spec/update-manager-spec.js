@@ -13,12 +13,16 @@ describe('UpdateManager', () => {
         'pulsar-edit/pulsar/blob/master/CHANGELOG.md#11000-dev'
       );
     });
-    it('returns the page for the release when not a dev version', () => {
+
+    it('returns the page for the release when a rolling ("nightly") release version', () => {
       expect(updateManager.getReleaseNotesURLForVersion('1.108.2023090322')).toContain(
         'pulsar-edit/pulsar/blob/master/CHANGELOG.md#11082023090322'
       );
-      expect(updateManager.getReleaseNotesURLForVersion('1.100.0')).toContain(
-        'pulsar-edit/pulsar/blob/master/CHANGELOG.md#11000'
+    });
+
+    it('returns the page for the release when not a dev version', () => {
+      expect(updateManager.getReleaseNotesURLForVersion('1.129.0')).toContain(
+        'pulsar-edit/pulsar/blob/master/CHANGELOG.md#11290'
       );
       expect(updateManager.getReleaseNotesURLForVersion('v1.100.0')).toContain(
         'pulsar-edit/pulsar/blob/master/CHANGELOG.md#11000'

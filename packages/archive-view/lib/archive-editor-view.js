@@ -3,7 +3,7 @@
 
 import fs from 'fs'
 import humanize from 'humanize-plus'
-import archive from 'ls-archive'
+import archive from '@pulsar-edit/ls-archive'
 import {CompositeDisposable, Disposable, Emitter, File} from 'atom'
 import etch from 'etch'
 

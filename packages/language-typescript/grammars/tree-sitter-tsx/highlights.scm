@@ -59,6 +59,19 @@
 (jsx_attribute
   (property_identifier) @entity.other.attribute-name.ts.tsx)
 
+; The "wat:bar" in `<Foo wat:bar={true} />`.
+(jsx_attribute
+  (jsx_namespace_name
+    (identifier)) @entity.other.attribute-name.namespaced.ts.tsx)
+
+; The "wat" in `<Foo wat:bar={true} />`. Worth tagging with its own scope name
+; just in case a theme wants to highlight the namespace differently from the
+; rest of the attribute.
+(jsx_attribute
+  (jsx_namespace_name
+    (identifier) @meta.attribute-namespace.ts.tsx
+    (#is-not? test.last)))
+
 ; All JSX expressions/interpolations within braces.
 ((jsx_expression) @meta.embedded.block.ts.tsx
   (#match? @meta.embedded.block.ts.tsx "\\n")

@@ -79,7 +79,7 @@ module.exports = {
     if (selector == null) {
       selector = '*'
     }
-    return document.elementFromPoint(clientX, clientY).closest(selector)
+    return document.elementFromPoint(clientX, clientY)?.closest(selector)
   },
 
   getItemViewAt (coords) {

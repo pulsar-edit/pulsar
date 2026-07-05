@@ -309,12 +309,13 @@ exports.register = function({ resourcePath, devMode } = {}) {
   if (cache.registered) return;
 
   const originalResolveFilename = Module._resolveFilename;
-  Module._resolveFilename = function(relativePath, parentModule) {
+  Module._resolveFilename = function(...args) {
+    let [relativePath, parentModule] = args;
     let resolvedPath = resolveModulePath(relativePath, parentModule);
     if (!resolvedPath) {
       resolvedPath = resolveFilePath(relativePath, parentModule);
     }
-    return resolvedPath || originalResolveFilename(relativePath, parentModule);
+    return resolvedPath || originalResolveFilename(...args);
   };
 
   cache.registered = true;

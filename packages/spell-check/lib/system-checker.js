@@ -1,6 +1,6 @@
 let instance;
 const spellchecker = require('spellchecker');
-// const pathspec = require('atom-pathspec');
+const pathspec = require('./pathspec');
 const env = require('./checker-env');
 
 let debug;
@@ -34,20 +34,26 @@ class SystemChecker {
     this.log('enabled', this.isEnabled(), this.getStatus());
   }
 
-  deactivate() {}
+  deactivate() {
+    // no-op
+  }
 
   getId() {
     return 'spell-check:system';
   }
+
   getName() {
     return 'System Checker';
   }
+
   getPriority() {
     return 110;
   }
+
   isEnabled() {
     return instance;
   }
+
   getStatus() {
     if (instance) {
       return 'working correctly';
@@ -59,25 +65,26 @@ class SystemChecker {
   providesSpelling(_) {
     return this.isEnabled();
   }
+
   providesSuggestions(_) {
     return this.isEnabled();
   }
+
   providesAdding(_) {
     return false;
   } // Users can't add yet.
 
-  check(_, text) {
+  async check(_, text) {
     const id = this.getId();
 
     if (this.isEnabled()) {
       // We use the default checker here and not the locale-specific one so it
       // will check all languages at the same time.
-      return instance.checkSpellingAsync(text).then((incorrect) => {
-        if (this.log.enabled) {
-          this.log('check', incorrect);
-        }
-        return { id, invertIncorrectAsCorrect: true, incorrect };
-      });
+      let incorrect = await instance.checkSpellingAsync(text);
+      if (this.log.enabled) {
+        this.log('check', incorrect);
+      }
+      return { id, invertIncorrectAsCorrect: true, incorrect };
     } else {
       return { id, status: this.getStatus() };
     }

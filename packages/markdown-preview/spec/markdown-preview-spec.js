@@ -692,7 +692,7 @@ world\
 
       runs(() =>
         expect(preview.element.innerHTML).toBe(`\
-<p><img alt="rel path" src="/foo.png"></p>\
+<p><img src="/foo.png" alt="rel path"></p>\
 `)
       )
     })

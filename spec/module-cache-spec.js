@@ -2,6 +2,7 @@ const path = require('path');
 const Module = require('module');
 const fs = require('fs-plus');
 const temp = require('temp').track();
+const crypto = require('crypto');
 const ModuleCache = require('../src/module-cache');
 
 describe('ModuleCache', function() {
@@ -24,6 +25,20 @@ describe('ModuleCache', function() {
     }
 
     expect(Module._findPath.calls.count()).toBe(0);
+  });
+
+  it('supports resolution of legacy Electron require paths', function() {
+    // This demonstrates that attempting to resolve a nonexistent module still
+    // throws; it's not just coincidence that the specific paths below succeed.
+    expect(() => require.resolve(crypto.randomUUID())).toThrow();
+
+    expect(() => {
+      require.resolve('ipc');
+      require.resolve('clipboard');
+      require.resolve('remote');
+      require.resolve('shell');
+      require.resolve('web-frame');
+    }).not.toThrow();
   });
 
   it('resolves relative core paths without hitting the filesystem', function() {

@@ -14,6 +14,8 @@ module.exports = {
     ecmaVersion: "latest"
   },
   rules: {
+    // One leading and trailing space around each keyword.
+    "keyword-spacing": "error",
     "space-before-function-paren": ["error", {
       anonymous: "always",
       asyncArrow: "always",

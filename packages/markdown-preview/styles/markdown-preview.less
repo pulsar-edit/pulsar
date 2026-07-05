@@ -6,7 +6,10 @@
 
   // Hide a `pre` that comes directly after an `atom-text-editor` because the
   // `atom-text-editor` is the syntax-highlighted representation.
-  atom-text-editor + pre {
+  //
+  // When we generate HTML via “Copy HTML” or “Save as HTML,” we add an
+  // attribute to the PRE so that this style rule is neutralized.
+  atom-text-editor + pre:not([data-serialized]) {
     display: none;
   }
 

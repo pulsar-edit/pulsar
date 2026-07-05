@@ -1,5 +1,5 @@
 const spellchecker = require('spellchecker');
-const pathspec = require('atom-pathspec');
+const pathspec = require('./pathspec');
 const env = require('./checker-env');
 
 let debug;
@@ -37,7 +37,9 @@ class LocaleChecker {
     );
   }
 
-  deactivate() {}
+  deactivate() {
+    // noop
+  }
 
   getId() {
     let localeToken = this.locale.toLowerCase().replace('_', '-');

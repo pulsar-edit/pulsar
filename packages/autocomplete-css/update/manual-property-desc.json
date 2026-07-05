@@ -894,5 +894,65 @@
   "copy-into": {
     "desc": "The copy-into property contains one or more pairs, each consisting of a custom identifier followed by a content-level keyword describing how to construct the value of the named content fragment.",
     "spec": "https://drafts.csswg.org/css-gcpm-4/#copy-into-heading"
+  },
+  "text-box-edge": {
+    "desc": "This property specifies the metrics to use for 'text-box-trim' effects.",
+    "spec": "https://drafts.csswg.org/css-inline-3/#propdef-text-box-edge"
+  },
+  "text-box-trim": {
+    "desc": "On inline boxes, specifies whether to trim the content box to match the specified 'text-box-edge' metric. On block containers, as well as on each column of a multi-column container, specifies whether to trim half-leading at the start/end of the box's content to better match its content edge to its text content.",
+    "spec": "https://drafts.csswg.org/css-inline-3/#propdef-text-box-trim"
+  },
+  "view-transition-class": {
+    "desc": "The 'view-transition-class' can be used to apply the same style rule to multiple named view transition pseudo-elements.",
+    "spec": "https://drafts.csswg.org/css-view-transitions-2/#propdef-view-transition-class"
+  },
+  "anchor-scope": {
+    "desc": "This property scopes the specified anchor names, and lookups for these anchor names, to this element's subtree.",
+    "spec": "https://drafts.csswg.org/css-anchor-position-1/#propdef-anchor-scope"
+  },
+  "text-box": {
+    "desc": "This property is a shorthand for setting the 'text-box-trim' and 'text-box-edge' properties in a single declaration.",
+    "spec": "https://drafts.csswg.org/css-inline-3/#propdef-text-box"
+  },
+  "text-autospace": {
+    "desc": "Controls spacing between adjacent characters on the same line within the same inline formatting context.",
+    "spec": "https://drafts.csswg.org/css-text-4/#propdef-text-autospace"
+  },
+  "dynamic-range-limit": {
+    "desc": "Controls highest luminance color.",
+    "spec": "https://drafts.csswg.org/css-color-hdr-1/#propdef-dynamic-range-limit"
+  },
+  "view-transition-group": {
+    "desc": "The 'view-transition-group' property can be used in conjuction with 'view-transition-name' to generate a hierarchy of named view transition pseudo-element.",
+    "spec": "https://drafts.csswg.org/css-view-transitions-2/#propdef-view-transition-group"
+  },
+  "caret-animation": {
+    "desc": "On most platforms and in most UAs, the text insertion caret blinks. This property allows the author to take control over the way the caret is animated.",
+    "spec": "https://drafts.csswg.org/css-ui-4/#propdef-caret-animation"
+  },
+  "masonry-track-end": {
+    "desc": "Controls item placement in the grid axis of a masonry container.",
+    "spec": "https://drafts.csswg.org/css-grid-3/#propdef-masonry-track-end"
+  },
+  "masonry": {
+    "desc": "This value causes an element to generate a masonry container box that is block-level when placed in flow layout.",
+    "spec": "https://drafts.csswg.org/css-grid-3/#valdef-display-masonry"
+  },
+  "row-rule": {
+    "desc": "Sets the corresponding width, style, and color properties as a set.",
+    "spec": "https://drafts.csswg.org/css-gaps-1/#propdef-row-rule"
+  },
+  "gap-rule": {
+    "desc": "Shorthand to set corresponding column and row properties.",
+    "spec": "https://drafts.csswg.org/css-gaps-1/#propdef-gap-rule"
+  },
+  "font-width": {
+    "desc": "The 'font-width' property selects a normal, condensed, or expanded face from a font family.",
+    "spec": "https://drafts.csswg.org/css-fonts-4/#propdef-font-width"
+  },
+  "reading-flow": {
+    "desc": "Controls the order in which elements in a flex or grid layout are rendered to speech or are navigated to when using (linear) sequential navigation methods.",
+    "spec": "https://drafts.csswg.org/css-display-4/#propdef-reading-flow"
   }
 }

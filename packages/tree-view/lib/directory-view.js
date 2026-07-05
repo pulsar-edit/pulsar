@@ -145,7 +145,7 @@ class DirectoryView {
     }
   }
 
-  expand (isRecursive) {
+  async expand(isRecursive) {
     if (isRecursive == null) {
       isRecursive = false
     }
@@ -155,19 +155,19 @@ class DirectoryView {
       this.element.isExpanded = this.isExpanded
       this.element.classList.add('expanded')
       this.element.classList.remove('collapsed')
-      this.directory.expand()
+      await this.directory.expand()
     }
 
     if (isRecursive) {
       for (let entry of this.entries.children) {
         if (entry.classList.contains('directory')) {
-          entry.expand(true)
+          await entry.expand(true)
         }
       }
     }
   }
 
-  collapse (isRecursive) {
+  collapse(isRecursive) {
     if (isRecursive == null) isRecursive = false
     this.isExpanded = false
     this.element.isExpanded = false

@@ -1,4 +1,10 @@
+// @ts-nocheck
 /* eslint-disable */
+
+import json from './test.json' with { type: 'json' };
+//                             ^^^^ keyword.control.with.js
+
+
 function diff(obj1, obj2, pathConverter) {
 // ^ storage.type.function
       // ^ entity.name.function.definition
@@ -234,3 +240,12 @@ module.exports = diff;
                   // ^ punctuation.terminator.statement
 
 /* eslint-enable */
+
+function SomeComponent () {
+  return <Button icon="code" on:click={props.openFile} />;
+//       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.tag.jsx.js
+//        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.jsx.inside-tag.js
+//        ^^^^^^ entity.name.tag.jsx.js
+//                           ^^ meta.attribute-namespace.jsx.js
+//                           ^^^^^^^^ entity.other.attribute-name.namespaced.jsx.js
+}

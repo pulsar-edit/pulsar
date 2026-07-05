@@ -6,7 +6,7 @@ env:
 # linux_task:
 #   alias: linux
 #   container:
-#     image: node:16-slim
+#     image: node:20-buster-slim
 #     memory: 8G
 #   prepare_script:
 #     - apt-get update
@@ -59,12 +59,14 @@ arm_linux_task:
   only_if: $CIRRUS_CRON != "" || $CIRRUS_TAG != ""
   skip: $CIRRUS_CHANGE_IN_REPO == $CIRRUS_LAST_GREEN_CHANGE
   arm_container:
-    image: node:16-slim
+    image: node:20-buster-slim
     memory: 8G
   env:
     USE_SYSTEM_FPM: 'true'
-    ROLLING_UPLOAD_TOKEN: ENCRYPTED[6806f0b2346b9fc7d98ea3930087c063b8c44492e720223271331c0f317d77532062a2c8d4538f9ddc6f81415706bcf5]
+    ROLLING_UPLOAD_TOKEN: ENCRYPTED[e674e6495da6833f79c58bf74800d2163ca640335b09260885d79e607698808f15dea022a55dffae4aa23826fa79d224]
   prepare_script:
+    - sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+    - sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
     - apt-get update
     - export DEBIAN_FRONTEND="noninteractive"
     - apt-get install -y
@@ -80,8 +82,14 @@ arm_linux_task:
                 fakeroot
                 libx11-dev
                 libxkbfile-dev
+                libxkbcommon-dev
+                libxkbcommon-x11-dev
+                libxkbcommon0
+                xkb-data
                 libgdk-pixbuf2.0-dev
                 libgtk-3-dev
+                libwayland-dev
+                libwayland-client0
                 libxss-dev
                 libasound2-dev
                 libnss3
@@ -97,7 +105,7 @@ arm_linux_task:
                 libffi-dev
                 zlib1g-dev
     - gem install dotenv -v '~>  2.8'
-    - gem install fpm
+    - gem install fpm -v '~> 1.16.0'
     - git submodule init
     - git submodule update
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json
@@ -159,10 +167,10 @@ silicon_mac_task:
     APPLEID: ENCRYPTED[549ce052bd5666dba5245f4180bf93b74ed206fe5e6e7c8f67a8596d3767c1f682b84e347b326ac318c62a07c8844a57]
     APPLEID_PASSWORD: ENCRYPTED[774c3307fd3b62660ecf5beb8537a24498c76e8d90d7f28e5bc816742fd8954a34ffed13f9aa2d1faf66ce08b4496e6f]
     TEAM_ID: ENCRYPTED[11f3fedfbaf4aff1859bf6c105f0437ace23d84f5420a2c1cea884fbfa43b115b7834a463516d50cb276d4c4d9128b49]
-    ROLLING_UPLOAD_TOKEN: ENCRYPTED[6806f0b2346b9fc7d98ea3930087c063b8c44492e720223271331c0f317d77532062a2c8d4538f9ddc6f81415706bcf5]
+    ROLLING_UPLOAD_TOKEN: ENCRYPTED[e674e6495da6833f79c58bf74800d2163ca640335b09260885d79e607698808f15dea022a55dffae4aa23826fa79d224]
   prepare_script:
     - brew update
-    - brew uninstall node@20
+    - brew uninstall node@24
     - brew install git python@$PYTHON_VERSION python-setuptools
     - git submodule init
     - git submodule update
@@ -171,7 +179,7 @@ silicon_mac_task:
     - mkdir tj_n && cd tj_n
     - curl -L https://github.com/tj/n/archive/0ce85771fdff8f4b3e09ade700461b4f58a64444.tar.gz -O
     - tar xf 0ce85771fdff8f4b3e09ade700461b4f58a64444.tar.gz
-    - sudo bash ./n-0ce85771fdff8f4b3e09ade700461b4f58a64444/bin/n 16
+    - sudo bash ./n-0ce85771fdff8f4b3e09ade700461b4f58a64444/bin/n 20
     - cd ..
     - sudo npm install -g yarn
     - sed -i -e "s/[0-9]*-dev/`date -u +%Y%m%d%H`/g" package.json

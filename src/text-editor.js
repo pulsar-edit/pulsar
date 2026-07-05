@@ -4,7 +4,7 @@ const fs = require('fs-plus');
 const Grim = require('grim');
 const dedent = require('dedent');
 const { CompositeDisposable, Disposable, Emitter } = require('event-kit');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const { Point, Range } = TextBuffer;
 const DecorationManager = require('./decoration-manager');
 const Cursor = require('./cursor');
@@ -1465,6 +1465,18 @@ module.exports = class TextEditor {
   // Essential: Returns {Boolean} `true` if this editor has been modified.
   isModified() {
     return this.buffer.isModified();
+  }
+
+  // Essential: Returns {Boolean} `true` if this editor's buffer is in conflict
+  // — that is, if the buffer is modified and those changes are based on buffer
+  // contents that do not match what is currently written to disk.
+  //
+  // This can happen if another process writes to a file after you start to
+  // edit it in Pulsar, but before you're able to save those changes. It can
+  // also happen if you switch branches in version control while a certain
+  // buffer has uncommitted changes.
+  isInConflict () {
+    return this.buffer.isInConflict();
   }
 
   // Essential: Returns {Boolean} `true` if this editor has no content.
@@ -3808,6 +3820,11 @@ module.exports = class TextEditor {
   // Essential: Select the word surrounding each cursor.
   selectWordsContainingCursors() {
     return this.expandSelectionsForward(selection => selection.selectWord());
+  }
+
+  // Extended: Select the subword surrounding each cursor.
+  selectSubwordsContainingCursors() {
+    return this.expandSelectionsForward(selection => selection.selectSubword());
   }
 
   // Selection Extended

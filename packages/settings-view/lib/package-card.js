@@ -9,8 +9,6 @@ import path from 'path'
 
 import {ownerFromRepository, repoUrlFromRepository} from './utils'
 
-let marked = null
-
 export default class PackageCard {
   constructor (pack, settingsView, packageManager, options = {}) {
     this.pack = pack

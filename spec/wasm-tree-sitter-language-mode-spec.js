@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const dedent = require('dedent');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const { Point } = TextBuffer;
 const CSON = require('season');
 const TextEditor = require('../src/text-editor');
@@ -2345,6 +2345,69 @@ describe('WASMTreeSitterLanguageMode', () => {
         #ifdef _WIN32…
         #elif defined MACOS…
         #else…
+        #endif
+
+        #endif
+      `);
+    });
+
+    it('allows fold adjustments to be applied to @fold.end markers', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, cGrammarPath, cConfig);
+
+      // In addition to nudging the fold ending position forward one character,
+      // it also precludes the automatic “adjust to end of previous line”
+      // behavior. So the fold will expand by one row and one column.
+      await grammar.setQueryForTest('foldsQuery', `
+      ["#ifndef" "#ifdef" "#elif" "#else"] @fold.start
+      (["#elif" "#else" "#endif"] @fold.end
+       (#set! fold.offsetEnd 1))
+      `);
+
+      buffer.setText(dedent`
+        #ifndef FOO_H_
+        #define FOO_H_
+
+        #ifdef _WIN32
+
+        #include <windows.h>
+        const char *path_separator = "\\";
+
+        #elif defined MACOS
+
+        #include <carbon.h>
+        const char *path_separator = "/";
+
+        #else
+
+        #include <dirent.h>
+        const char *path_separator = "/";
+
+        #endif
+
+        #endif
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      expect(editor.isFoldableAtBufferRow(0)).toBe(true);
+
+      editor.foldBufferRow(3);
+      expect(getDisplayText(editor)).toBe(dedent`
+        #ifndef FOO_H_
+        #define FOO_H_
+
+        #ifdef _WIN32…elif defined MACOS
+
+        #include <carbon.h>
+        const char *path_separator = "/";
+
+        #else
+
+        #include <dirent.h>
+        const char *path_separator = "/";
+
         #endif
 
         #endif

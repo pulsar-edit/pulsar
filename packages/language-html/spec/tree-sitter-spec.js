@@ -1,6 +1,8 @@
 const dedent = require('dedent');
 
-describe('Tree-sitter HTML grammar', () => {
+// Skipping this suite because legacy Tree-sitter grammars no longer exist.
+// Keeping it around so that the logic can be adapted later.
+xdescribe('Tree-sitter HTML grammar', () => {
   beforeEach(async () => {
     atom.config.set('core.useTreeSitterParsers', true);
     atom.config.set('core.useLegacyTreeSitter', true);

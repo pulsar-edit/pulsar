@@ -13,7 +13,7 @@ const {getPackageRoot} = require('./helpers')
 
 // TODO: Not sure about validity of numbers in here, but might as well be
 // permissive.
-const COMMAND_NAME_PATTERN = /^[a-z\d][a-z\d\-]*[a-z\d]$/
+const COMMAND_NAME_PATTERN = /^[a-z\d][a-z\d-]*[a-z\d]$/
 function isValidCommandName (commandName) {
   return COMMAND_NAME_PATTERN.test(commandName)
 }
@@ -263,7 +263,7 @@ module.exports = {
 
   watchUserSnippets (callback) {
     const userSnippetsPath = this.getUserSnippetsPath()
-    fs.stat(userSnippetsPath, (error, stat) => {
+    fs.stat(userSnippetsPath, (_error, stat) => {
       if (stat != null && stat.isFile()) {
         const userSnippetsFileDisposable = new CompositeDisposable()
         const userSnippetsFile = new File(userSnippetsPath)
@@ -389,6 +389,13 @@ module.exports = {
       }
 
       callback(_.extend({}, ...enabledPackages))
+    })
+  },
+
+  waitForSnippetsLoaded () {
+    if (this.loaded) return Promise.resolve()
+    return new Promise((resolve) => {
+      this.getEmitter().once('did-load-snippets', resolve)
     })
   },
 

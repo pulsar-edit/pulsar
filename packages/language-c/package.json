@@ -12,10 +12,6 @@
     "atom": "*",
     "node": ">=12"
   },
-  "dependencies": {
-    "tree-sitter-c": "0.20.2",
-    "tree-sitter-cpp": "0.20.0"
-  },
   "consumedServices": {
     "hyperlink.injection": {
       "versions": {

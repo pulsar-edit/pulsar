@@ -1,4 +1,4 @@
-const { app } = require('electron');
+const { app, crashReporter } = require('electron');
 const path = require('path');
 const temp = require('temp');
 const parseCommandLine = require('./parse-command-line');
@@ -15,7 +15,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   global.shellStartTime = startTime;
   StartupTime.addMarker('main-process:start');
 
-  process.on('uncaughtException', function(error = {}) {
+  process.on('uncaughtException', function (error = {}) {
     if (error.message != null) {
       console.log(error.message);
     }
@@ -25,7 +25,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     }
   });
 
-  process.on('unhandledRejection', function(error = {}) {
+  process.on('unhandledRejection', function (error = {}) {
     if (error.message != null) {
       console.log(error.message);
     }
@@ -34,9 +34,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
       console.log(error.stack);
     }
   });
-
-  // TodoElectronIssue this should be set to true before Electron 12 - https://github.com/electron/electron/issues/18397
-  app.allowRendererProcessReuse = false;
 
   app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 
@@ -45,8 +42,37 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
+  const releaseChannel = getReleaseChannel(app.getVersion());
+  process.env.ATOM_CHANNEL ??= releaseChannel;
   atomPaths.setAtomHome(app.getPath('home'));
   atomPaths.setUserData(app);
+
+  // Now that we can be sure `ATOM_HOME` is set, we can set our custom crash
+  // dump path.
+  app.setPath('crashDumps', path.resolve(process.env.ATOM_HOME, 'crashdumps'))
+
+  // By default, we're using the crash reporter on Windows and Linux, but not
+  // macOS. That's because:
+  //
+  // * macOS already generates great crash reports with stacktraces
+  //   (Console.app -> Crash Reports);
+  // * if we enable crash reporting, thse crash reports stop being generated,
+  //   even when `ignoreSystemCrashHandler` is `false`.
+  //
+  // Still, it's nice to have a way to opt into the crash reporter even on
+  // macOS. Hence the `--crashdump` command-line switch.
+  let shouldStartCrashReporter = args.useCrashReporter || process.platform !== 'darwin';
+  if (shouldStartCrashReporter) {
+    console.log("Starting crash reporter; crash reports will be saved to", app.getPath('crashDumps'))
+    crashReporter.start({
+      productName: 'Pulsar',
+      companyName: 'Pulsar-Edit',
+      submitURL: '',
+      uploadToServer: false,
+      ignoreSystemCrashHandler: false,
+      compress: false
+    });
+  }
 
   const config = getConfig();
   const colorProfile = config.get('core.colorProfile');
@@ -59,7 +85,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
       'userData',
       temp.mkdirSync('atom-user-data-dir-for-main-process-tests')
     );
-    app.on('ready', function() {
+    app.on('ready', function () {
       const testRunner = require(path.join(
         args.resourcePath,
         'spec/main-process/mocha-test-runner'
@@ -69,7 +95,6 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     return;
   }
 
-  const releaseChannel = getReleaseChannel(app.getVersion());
   let appUserModelId = 'dev.pulsar-edit.pulsar.' + process.arch;
 
   // If the release channel is not stable, we append it to the app user model id.
@@ -80,6 +105,30 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   // NB: This prevents Win10 from showing dupe items in the taskbar.
   app.setAppUserModelId(appUserModelId);
+
+  // Pulsar uses a custom mechanism for ensuring a single instance, so we don't
+  // need `app.requestSingleInstanceLock()`. But we call this method on Windows
+  // anyway in order to benefit from a side effect.
+  //
+  // Windows doesn't like it when applications try to move themselves to the
+  // front unilaterally. There are certain escape hatches, though; one process
+  // can give another process specific permission for the latter process to
+  // foreground itself while the former process is active.
+  //
+  // This happens automatically as part of the `requestSingleInstanceLock`
+  // machinery. Hence we ask for a single-instance lock on startup so that the
+  // _second_ instance, when the request is denied, will trigger the side
+  // effect that allows the original instance to foreground itself.
+  //
+  // The effects are not seen here, but rather in `atom-application.js`, where
+  // calls to `app.focus` will actually work instead of having no effect.
+  if (process.platform === 'win32') {
+    app.requestSingleInstanceLock();
+    // Add an explicit no-op listener here to ensure that this channel isn't
+    // used for communication — we already have a way for the second instance
+    // to communicate with the first.
+    app.on('second-instance', () => {});
+  }
 
   function addPathToOpen(event, pathToOpen) {
     event.preventDefault();
@@ -101,7 +150,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   }
 
   StartupTime.addMarker('main-process:electron-onready:start');
-  app.on('ready', function() {
+  app.on('ready', function () {
     StartupTime.addMarker('main-process:electron-onready:end');
     app.removeListener('open-file', addPathToOpen);
     app.removeListener('open-url', addUrlToOpen);

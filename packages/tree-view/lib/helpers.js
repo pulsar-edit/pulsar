@@ -1,5 +1,7 @@
 const path = require("path");
 
+let DEBUG = false;
+
 module.exports = {
   repoForPath(goalPath) {
     const iterable = atom.project.getPaths();
@@ -27,5 +29,13 @@ module.exports = {
     const basename = path.basename(filePath);
     const position = basename.indexOf('.');
     if (position > 0) { return basename.slice(position); } else { return ''; }
-  }
+  },
+
+  isDebug() {
+    return DEBUG;
+  },
+
+  setDebug(newValue) {
+    DEBUG = newValue;
+  },
 };

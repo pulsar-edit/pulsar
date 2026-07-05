@@ -1,5 +1,5 @@
 ; The closing brace of a switch statement's body should match the indentation of the line where the switch statement starts.
-(switch_statement
+(switch_expression
   body: (switch_block "}" @match
     (#is? test.last true))
   (#set! indent.matchIndentOf parent.parent.startPosition))

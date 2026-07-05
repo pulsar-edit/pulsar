@@ -8,7 +8,7 @@
   "dependencies": {
     "atom-select-list": "^0.7.0",
     "fs-plus": "^3.0.0",
-    "minimatch": "~3.0.3",
+    "minimatch": "~3.1.0",
     "underscore-plus": "^1.7.0",
     "vscode-ripgrep": "^1.2.5",
     "wrench": "^1.5"

@@ -1729,6 +1729,7 @@ describe('PackageManager', () => {
     });
 
     it('sets hasActivatedInitialPackages', async () => {
+      jasmine.useRealClock();
       spyOn(atom.styles, 'getUserStyleSheetPath').and.returnValue(null);
       spyOn(atom.packages, 'activatePackages');
       expect(atom.packages.hasActivatedInitialPackages()).toBe(false);
@@ -1756,6 +1757,7 @@ describe('PackageManager', () => {
     });
 
     it('calls callbacks registered with ::onDidActivateInitialPackages', async () => {
+      jasmine.useRealClock();
       const package1 = atom.packages.loadPackage('package-with-main');
       const package2 = atom.packages.loadPackage('package-with-index');
       const package3 = atom.packages.loadPackage(
@@ -1768,10 +1770,7 @@ describe('PackageManager', () => {
       ]);
       spyOn(atom.themes, 'activatePackages');
 
-      atom.packages.activate();
-      await new Promise(resolve =>
-        atom.packages.onDidActivateInitialPackages(resolve)
-      );
+      await atom.packages.activate();
 
       jasmine.unspy(atom.packages, 'getLoadedPackages');
       expect(atom.packages.getActivePackages().includes(package1)).toBe(true);
@@ -1838,10 +1837,17 @@ describe('PackageManager', () => {
     });
 
     describe('with themes', () => {
-      beforeEach(() => atom.themes.activateThemes());
-      afterEach(() => atom.themes.deactivateThemes());
+      beforeEach(async () => {
+        jasmine.useRealClock();
+        await atom.themes.activateThemes();
+      });
+      afterEach(async () => {
+        jasmine.useRealClock();
+        await atom.themes.deactivateThemes()
+      });
 
       it('enables and disables a theme', async () => {
+        jasmine.useRealClock();
         const packageName = 'theme-with-package-file';
         expect(atom.config.get('core.themes')).not.toContain(packageName);
         expect(atom.config.get('core.disabledPackages')).not.toContain(
@@ -1849,10 +1855,13 @@ describe('PackageManager', () => {
         );
 
         // enabling of theme
-        const pack = atom.packages.enablePackage(packageName);
-        await new Promise(resolve =>
-          atom.packages.onDidActivatePackage(resolve)
+        let promise = new Promise(resolve =>
+          atom.packages.onDidActivatePackage(() => {
+            resolve();
+          })
         );
+        const pack = atom.packages.enablePackage(packageName);
+        await promise;
         expect(atom.packages.isPackageActive(packageName)).toBe(true);
         expect(atom.config.get('core.themes')).toContain(packageName);
         expect(atom.config.get('core.disabledPackages')).not.toContain(

@@ -1,6 +1,6 @@
 const NullGrammar = require('../src/null-grammar');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const { Point } = TextBuffer;
 const _ = require('underscore-plus');
 const dedent = require('dedent');
@@ -48,6 +48,48 @@ describe('TextMateLanguageMode', () => {
       iterator.seek({ row: 0, column: 0 });
       iterator.moveToSuccessor();
       expect(iterator.getPosition()).toEqual({ row: 0, column: 11 });
+    });
+  });
+
+  describe('editor.largeFileThreshold config', () => {
+    afterEach(() => {
+      config.unset('editor.largeFileThreshold');
+    });
+
+    it('uses the configured threshold to determine large file mode', () => {
+      config.set('editor.largeFileThreshold', 0.001); // 1KB
+      const line = 'a b c d\n';
+      buffer = new TextBuffer(line.repeat(200)); // ~1.6KB
+      languageMode = new TextMateLanguageMode({
+        buffer,
+        config,
+        grammar: atom.grammars.grammarForScopeName('source.js')
+      });
+      expect(languageMode.largeFileMode).toBe(true);
+    });
+
+    it('disables automatic large file mode when threshold is 0', () => {
+      config.set('editor.largeFileThreshold', 0);
+      const line = 'a b c d\n';
+      buffer = new TextBuffer(line.repeat(256 * 1024)); // 2MB
+      languageMode = new TextMateLanguageMode({
+        buffer,
+        config,
+        grammar: atom.grammars.grammarForScopeName('source.js')
+      });
+      expect(languageMode.largeFileMode).toBe(false);
+    });
+
+    it('respects explicit largeFileMode param over config', () => {
+      config.set('editor.largeFileThreshold', 0);
+      buffer = new TextBuffer('small file');
+      languageMode = new TextMateLanguageMode({
+        buffer,
+        config,
+        grammar: atom.grammars.grammarForScopeName('source.js'),
+        largeFileMode: true
+      });
+      expect(languageMode.largeFileMode).toBe(true);
     });
   });
 
@@ -889,8 +931,8 @@ describe('TextMateLanguageMode', () => {
       ).toEqual(['syntax--yellow syntax--broken']);
     });
 
-    describe('TextMateHighlightIterator.seek(position)', function() {
-      it('seeks to the leftmost tag boundary greater than or equal to the given position and returns the containing tags', function() {
+    describe('TextMateHighlightIterator.seek(position)', function () {
+      it('seeks to the leftmost tag boundary greater than or equal to the given position and returns the containing tags', function () {
         const languageMode = {
           tokenizedLineForRow(row) {
             if (row === 0) {
@@ -963,7 +1005,7 @@ describe('TextMateLanguageMode', () => {
       });
     });
 
-    describe('TextMateHighlightIterator.moveToSuccessor()', function() {
+    describe('TextMateHighlightIterator.moveToSuccessor()', function () {
       it('reports two boundaries at the same position when tags close, open, then close again without a non-negative integer separating them (regression)', () => {
         const languageMode = {
           tokenizedLineForRow() {

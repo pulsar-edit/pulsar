@@ -631,7 +631,7 @@ class TabBarView {
   browserWindowForId(id) {
     if (BrowserWindow == null) { ({
       BrowserWindow
-    } = require('electron').remote); }
+    } = require('@electron/remote')); }
 
     return BrowserWindow.fromId(id);
   }

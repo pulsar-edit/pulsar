@@ -1,6 +1,6 @@
-const {PathReplacer} = require('scandal');
+const {PathReplacer} = require('@pulsar-edit/scandal');
 
-module.exports = function(filePaths, regexSource, regexFlags, replacementText) {
+module.exports = function (filePaths, regexSource, regexFlags, replacementText) {
   const callback = this.async();
   const replacer = new PathReplacer();
   const regex = new RegExp(regexSource, regexFlags);

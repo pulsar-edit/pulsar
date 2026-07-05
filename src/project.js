@@ -3,7 +3,7 @@ const path = require('path');
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const { watchPath } = require('./path-watcher');
 
 const DefaultDirectoryProvider = require('./default-directory-provider');
@@ -162,7 +162,7 @@ module.exports = class Project extends Model {
       deserializer: 'Project',
       paths: this.getPaths(),
       buffers: _.compact(
-        this.buffers.map(function(buffer) {
+        this.buffers.map(function (buffer) {
           if (buffer.isRetained()) {
             const isUnloading = options.isUnloading === true;
             return buffer.serialize({
@@ -480,6 +480,21 @@ module.exports = class Project extends Model {
     }
 
     if (options.emitEvent !== false) {
+      this.emitter.emit('did-change-paths', this.getPaths());
+    }
+  }
+
+  // Public: Add multiple paths to the project's list of root paths,
+  // emitting a single `did-change-paths` event after all paths are added.
+  //
+  // * `projectPaths` An {Array} of {String} paths to add.
+  // * `options` An optional {Object} passed to {::addPath} for each path.
+  addPaths(projectPaths, options = {}) {
+    const pathsBefore = this.getPaths().length;
+    for (const projectPath of projectPaths) {
+      this.addPath(projectPath, { ...options, emitEvent: false });
+    }
+    if (this.getPaths().length !== pathsBefore) {
       this.emitter.emit('did-change-paths', this.getPaths());
     }
   }

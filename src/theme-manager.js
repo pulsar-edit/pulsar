@@ -2,11 +2,18 @@
 
 const path = require('path');
 const _ = require('underscore-plus');
-const { Emitter, CompositeDisposable } = require('event-kit');
-const { File } = require('pathwatcher');
+const { Emitter } = require('event-kit');
 const fs = require('fs-plus');
 const LessCompileCache = require('./less-compile-cache');
 const Color = require('./color');
+
+// Keeping a reference to the entire object so that it can be mocked more
+// easily in the specs.
+const watcher = require('./path-watcher');
+
+async function wait(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
 
 // Extended: Handles loading and activating available themes.
 //
@@ -36,6 +43,10 @@ module.exports = class ThemeManager {
         this.packageManager.reloadActivePackageStyleSheets()
       );
     });
+
+    this.reloadStylesheet = _.debounce(() => {
+      this.loadUserStylesheet();
+    }, 20);
   }
 
   initialize({ resourcePath, configDirPath, safeMode, devMode }) {
@@ -211,18 +222,19 @@ module.exports = class ThemeManager {
     }
   }
 
-  unwatchUserStylesheet() {
-    if (this.userStylesheetSubscriptions != null)
-      this.userStylesheetSubscriptions.dispose();
-    this.userStylesheetSubscriptions = null;
-    this.userStylesheetFile = null;
-    if (this.userStyleSheetDisposable != null)
-      this.userStyleSheetDisposable.dispose();
+  async unwatchUserStylesheet() {
+    this.userStylesheetSubscription?.dispose();
+    this.userStylesheetSubscription = null;
+
+    this.userStyleSheetDisposable?.dispose();
     this.userStyleSheetDisposable = null;
+
+    // Pause a moment for file-watcher cleanup.
+    await wait(10);
   }
 
-  loadUserStylesheet() {
-    this.unwatchUserStylesheet();
+  async loadUserStylesheet() {
+    await this.unwatchUserStylesheet();
 
     const userStylesheetPath = this.styleManager.getUserStyleSheetPath();
     if (!fs.isFileSync(userStylesheetPath)) {
@@ -230,27 +242,28 @@ module.exports = class ThemeManager {
     }
 
     try {
-      this.userStylesheetFile = new File(userStylesheetPath);
-      this.userStylesheetSubscriptions = new CompositeDisposable();
-      const reloadStylesheet = () => this.loadUserStylesheet();
-      this.userStylesheetSubscriptions.add(
-        this.userStylesheetFile.onDidChange(reloadStylesheet)
-      );
-      this.userStylesheetSubscriptions.add(
-        this.userStylesheetFile.onDidRename(reloadStylesheet)
-      );
-      this.userStylesheetSubscriptions.add(
-        this.userStylesheetFile.onDidDelete(reloadStylesheet)
-      );
+      // `watchPath` is recursive, even though we don't need it to be. So the
+      // easiest way to be sure our stylesheet is the one that was modified
+      // (rather than some other file called `styles.less` deeper in the tree)
+      // is to determine its real path (without symlinks) before we start the
+      // watcher.
+      let realStylesheetPath = fs.realpathSync(userStylesheetPath);
+
+      this.userStylesheetSubscription = await watcher.watchPath(realStylesheetPath, {}, () => {
+        this.reloadStylesheet();
+      });
     } catch (error) {
-      const message = `\
+      let message = `
 Unable to watch path: \`${path.basename(userStylesheetPath)}\`. Make sure
 you have permissions to \`${userStylesheetPath}\`.
+`;
+      if (process.platform === 'linux') {
+        message = `${message}
 
-On linux there are currently problems with watch sizes. See
-[this document][watches] for more info.
+On Linux there are currently problems with watch sizes. See [this document][watches] for more info.
 [watches]:https://pulsar-edit.dev/docs/atom-archive/hacking-atom/#typeerror-unable-to-watch-path
-`; //TODO: Update the above to Pulsar docs if we choose to add this
+`
+      }
       this.notificationManager.addError(message, { dismissable: true });
     }
 
@@ -408,10 +421,10 @@ On linux there are currently problems with watch sizes. See
             }
           }
 
-          return Promise.all(promises).then(() => {
+          return Promise.all(promises).then(async () => {
             this.addActiveThemeClasses();
             this.refreshLessCache(); // Update cache again now that @getActiveThemes() is populated
-            this.loadUserStylesheet();
+            await this.loadUserStylesheet();
             this.reloadBaseStylesheets();
             if (this.config.get("editor.syncWindowThemeWithPulsarTheme")) {
               this.refreshWindowTheme();

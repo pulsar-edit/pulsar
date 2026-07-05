@@ -149,9 +149,21 @@ class TabView {
       });
     }
 
+    if (typeof this.item.onDidConflict === 'function') {
+      const onDidConflictDisposable = this.item.onDidConflict(() => {
+        this.updateConflictedStatus();
+      });
+      if (Disposable.isDisposable(onDidConflictDisposable)) {
+        this.subscriptions.add(onDidConflictDisposable);
+      } else {
+        console.warn("::onDidConflict does not return a valid Disposable!", this.item);
+      }
+    }
+
     if (typeof this.item.onDidSave === 'function') {
       const onDidSaveDisposable = this.item.onDidSave(event => {
         this.terminatePendingState();
+        this.updateConflictedStatus();
         if (event.path !== this.path) {
           this.path = event.path;
           if (atom.config.get('tabs.enableVcsColoring')) { return this.setupVcsStatus(); }
@@ -313,6 +325,19 @@ class TabView {
     } else {
       return this.itemTitle.classList.add('hide-icon');
     }
+  }
+
+  updateConflictedStatus () {
+    if (this.item.isInConflict?.()) {
+      this.element.classList.add('conflicted');
+      this.isConflicted = true;
+    } else {
+      if (this.isConflicted) {
+        this.element.classList.remove('conflicted');
+      }
+      this.isConflicted = false;
+    }
+    return this.isConflicted;
   }
 
   updateModifiedStatus() {

@@ -55,4 +55,21 @@ describe("Renders Markdown", () => {
     });
   });
 
+  describe("transforms images correctly", () => {
+    it("properly handles a standard PNG image", () => {
+      expect(atom.ui.markdown.render(
+        "![Alt Text](/image-link.png)",
+        { rootDomain: "https://github.com/pulsar-edit/pulsar" }
+      )).toBe('<p><img src="https://github.com/pulsar-edit/pulsar/raw/HEAD/image-link.png" alt="Alt Text"></p>\n');
+    });
+
+    it("handles 'data:image/svg+xml' images", () => {
+      expect(atom.ui.markdown.render(
+        "![Baseline icon](data:image/svg+xml;base64,SoMeBaSe64cArAcTerS+)"
+      )).toBe(
+        '<p><img src="data:image/svg+xml;base64,SoMeBaSe64cArAcTerS+" alt="Baseline icon"></p>\n'
+      );
+    });
+  });
+
 });
