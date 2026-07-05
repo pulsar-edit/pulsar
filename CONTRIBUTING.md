@@ -264,7 +264,7 @@ describe 'a dog', ->
 ### Documentation Styleguide
 
 * Use [AtomDoc](https://github.com/pulsar-edit/atomdoc).
-* Use [Markdown](https://daringfireball.net/projects/markdown/).
+* Use [Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github).
 * Reference methods and classes in markdown with the custom `{}` notation:
     * Reference classes with `{ClassName}`
     * Reference instance methods with `{ClassName::methodName}`
