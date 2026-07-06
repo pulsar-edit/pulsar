@@ -40,7 +40,11 @@ module.exports = class ThemePackage extends Package {
         this.rejectActivationPromise = reject;
         this.measure('activateTime', () => {
           try {
-            if (this.metadata.theme) {
+            // Multi-theme packages (declaring a `themes` array) do not load
+            // stylesheets on activation; the theme manager applies only the
+            // active variant's stylesheets. Every other theme, including a bare
+            // directory of stylesheets with no `package.json`, loads its own.
+            if (!Array.isArray(this.metadata.themes)) {
               this.loadStylesheets();
             }
             this.activateNow();
