@@ -47,6 +47,23 @@ describe("ThemesPanel", function () {
     expect(panel.refs.syntaxMenu.value).toBe('atom-dark-syntax');
   });
 
+  it("lists theme variants in the theme menus", function () {
+    atom.packages.loadPackage('theme-with-variants');
+    panel.updateActiveThemes();
+
+    const uiThemeValues = Array.from(panel.refs.uiMenu.children).map(
+      child => child.value
+    );
+    const syntaxThemeValues = Array.from(panel.refs.syntaxMenu.children).map(
+      child => child.value
+    );
+
+    expect(uiThemeValues).toContain('theme-variant-day-ui');
+    expect(uiThemeValues).toContain('theme-variant-night-ui');
+    expect(syntaxThemeValues).toContain('theme-variant-day-syntax');
+    expect(syntaxThemeValues).toContain('theme-variant-night-syntax');
+  });
+
   describe("when a UI theme is selected", () => it("updates the 'core.themes' config key with the selected UI theme", function () {
     for (let child of Array.from(panel.refs.uiMenu.children)) {
       child.selected = child.value === 'atom-light-ui';
@@ -64,6 +81,21 @@ describe("ThemesPanel", function () {
     waitsFor(() => reloadedHandler.callCount === 2);
     runs(() => expect(atom.config.get('core.themes')).toEqual(['atom-dark-ui', 'atom-light-syntax']));
 }));
+
+  describe("when a UI theme variant is selected", () => it("updates the 'core.themes' config key with the selected UI variant", function () {
+    atom.packages.loadPackage('theme-with-variants');
+    panel.updateActiveThemes();
+
+    for (let child of Array.from(panel.refs.uiMenu.children)) {
+      child.selected = child.value === 'theme-variant-night-ui';
+      child.dispatchEvent(new Event('change', {bubbles: true}));
+    }
+    waitsFor(() => reloadedHandler.callCount === 2);
+    runs(() => expect(atom.config.get('core.themes')).toEqual([
+      'theme-variant-night-ui',
+      'atom-dark-syntax'
+    ]));
+  }));
 
   describe("when the 'core.config' key changes", () => it("refreshes the theme menus", function () {
     reloadedHandler.reset();

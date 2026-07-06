@@ -40,7 +40,9 @@ module.exports = class ThemePackage extends Package {
         this.rejectActivationPromise = reject;
         this.measure('activateTime', () => {
           try {
-            this.loadStylesheets();
+            if (this.metadata.theme) {
+              this.loadStylesheets();
+            }
             this.activateNow();
           } catch (error) {
             this.handleError(
