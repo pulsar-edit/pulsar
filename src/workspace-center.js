@@ -288,7 +288,7 @@ module.exports = class WorkspaceCenter {
 
   // Save all pane items.
   saveAll() {
-    this.paneContainer.saveAll();
+    return this.paneContainer.saveAll();
   }
 
   confirmClose(options) {

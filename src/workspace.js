@@ -1663,9 +1663,7 @@ module.exports = class Workspace extends Model {
 
   // Save all pane items.
   saveAll() {
-    this.getPaneContainers().forEach((container) => {
-      container.saveAll();
-    });
+    return Promise.all(this.getPaneContainers().map((container) => container.saveAll()));
   }
 
   confirmClose(options) {

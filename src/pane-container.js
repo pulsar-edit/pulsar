@@ -209,9 +209,7 @@ module.exports = class PaneContainer {
   }
 
   saveAll() {
-    for (let pane of this.getPanes()) {
-      pane.saveItems();
-    }
+    return Promise.all(this.getPanes().map((pane) => pane.saveItems()));
   }
 
   confirmClose(options) {

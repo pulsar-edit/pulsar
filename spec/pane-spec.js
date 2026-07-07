@@ -1,9 +1,16 @@
 const { extend } = require("underscore-plus");
 const { Emitter } = require("event-kit");
 const Grim = require("grim");
+const fs = require("fs");
+const path = require("path");
+const temp = require("temp").track();
 const Pane = require("../src/pane");
 const PaneContainer = require("../src/pane-container");
 const { conditionPromise, timeoutPromise } = require("./helpers/async-spec-helpers");
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 describe("Pane", () => {
   let confirm, showSaveDialog, deserializerDisposable;
@@ -1655,6 +1662,50 @@ describe("Pane", () => {
 
       const newPane = Pane.deserialize(pane.serialize(), atom);
       expect(newPane.itemStack).toEqual([item2, item1, item3]);
+    });
+  });
+
+  describe("::saveItems", () => {
+    let editor1, editor2, bufferSubscription, pane;
+
+    beforeEach(async () => {
+      const tempDir = temp.mkdirSync({ prefix: "atom-test-pane-" });
+      const fixturePath = path.join(__dirname, "fixtures", "sample.js");
+      const filePath1 = path.join(tempDir, "sample1.js");
+      const filePath2 = path.join(tempDir, "sample2.js");
+      fs.copyFileSync(fixturePath, filePath1);
+      fs.copyFileSync(fixturePath, filePath2);
+
+      editor1 = await atom.workspace.open(filePath1);
+      editor2 = await atom.workspace.open(filePath2);
+
+      pane = atom.workspace.paneForItem(editor1);
+      expect(atom.workspace.paneForItem(editor2)).toBe(pane);
+
+      bufferSubscription = editor2.getBuffer().onWillSave(async () => {
+        await wait(300);
+      });
+    });
+
+    afterEach(() => {
+      editor1?.destroy();
+      editor2?.destroy();
+      bufferSubscription?.dispose();
+    });
+
+    it("waits for all items to save before resolving", async () => {
+      jasmine.useRealClock();
+      for (const editor of [editor1, editor2]) {
+        editor.setCursorBufferPosition([Infinity, Infinity]);
+        editor.insertText("\n");
+      }
+
+      const saveItemsPromise = pane.saveItems();
+      expect(saveItemsPromise instanceof Promise).toBe(true);
+      expect(editor2.getBuffer().isModified()).toBe(true);
+
+      await saveItemsPromise;
+      expect(editor2.getBuffer().isModified()).toBe(false);
     });
   });
 });

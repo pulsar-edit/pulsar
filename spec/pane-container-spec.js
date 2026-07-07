@@ -428,7 +428,7 @@ describe("PaneContainer", () => {
     });
   });
 
-  describe("::saveAll()", () =>
+  describe("::saveAll()", () => {
     it("saves all modified pane items", async () => {
       const container = new PaneContainer(params);
       const pane1 = container.getRoot();
@@ -475,12 +475,64 @@ describe("PaneContainer", () => {
       pane1.addItem(item2);
       pane1.addItem(item3);
 
-      container.saveAll();
+      await container.saveAll();
 
       expect(item1.saved).toBe(true);
       expect(item2.saved).toBe(false);
       expect(item3.saved).toBe(true);
-    }));
+    });
+
+    it("returns a promise that waits for every pane to save", async () => {
+      jasmine.useRealClock();
+
+      const container = new PaneContainer(params);
+      const pane1 = container.getRoot();
+      const pane2 = pane1.splitRight();
+
+      const item1 = {
+        saved: false,
+        getURI() {
+          return "";
+        },
+        isModified() {
+          return true;
+        },
+        save() {
+          this.saved = true;
+        },
+      };
+      const item2 = {
+        saved: false,
+        getURI() {
+          return "";
+        },
+        isModified() {
+          return true;
+        },
+        save() {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              this.saved = true;
+              resolve();
+            }, 50);
+          });
+        },
+      };
+
+      pane1.addItem(item1);
+      pane2.addItem(item2);
+
+      const saveAllPromise = container.saveAll();
+
+      expect(saveAllPromise instanceof Promise).toBe(true);
+      expect(item1.saved).toBe(true);
+      expect(item2.saved).toBe(false);
+
+      await saveAllPromise;
+
+      expect(item2.saved).toBe(true);
+    });
+  });
 
   describe("::moveActiveItemToPane(destPane) and ::copyActiveItemToPane(destPane)", () => {
     let container, pane1, pane2, item1;
