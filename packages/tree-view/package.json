@@ -1,0 +1,192 @@
+{
+  "name": "tree-view",
+  "version": "0.9.3",
+  "main": "./lib/main",
+  "description": "Enhanced tree view for exploring and opening project files",
+  "repository": "https://github.com/asiloisad/pulsar-tree-view",
+  "bugs": {
+    "url": "https://github.com/asiloisad/pulsar-tree-view/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.132.0 <2.0.0"
+  },
+  "dependencies": {
+    "minimatch": "^10.1.2",
+    "natural-compare-lite": "^1.4.0"
+  },
+  "backgroundTips": [
+    "You can toggle the Tree View with {atom-workspace>tree-view:toggle}",
+    "You can focus the Tree View with {atom-workspace>tree-view:toggle-focus}"
+  ],
+  "deserializers": {
+    "TreeView": "getTreeViewInstance"
+  },
+  "consumedServices": {
+    "atom.file-icons": {
+      "versions": {
+        "1.0.0": "consumeFileIcons"
+      }
+    },
+    "file-icons.element-icons": {
+      "versions": {
+        "1.0.0": "consumeElementIcons"
+      }
+    },
+    "open-external": {
+      "versions": {
+        "1.0.0": "consumeOpenExternal"
+      }
+    },
+    "project-list": {
+      "versions": {
+        "1.0.0": "consumeProjectList"
+      }
+    },
+    "recent-list": {
+      "versions": {
+        "1.0.0": "consumeRecentList"
+      }
+    }
+  },
+  "providedServices": {
+    "tree-view": {
+      "description": "A tree-like view of directories and files",
+      "versions": {
+        "1.0.0": "provideTreeView"
+      }
+    },
+    "tree-view": {
+      "description": "Extended tree view API with reveal and navigation support",
+      "versions": {
+        "1.0.0": "provideTreeViewPlus"
+      }
+    },
+    "tree-view-roots": {
+      "description": "Register virtual root sections in the tree view",
+      "versions": {
+        "1.0.0": "provideRoots"
+      }
+    }
+  },
+  "configSchema": {
+    "sortMethod": {
+      "order": 1,
+      "type": "string",
+      "default": "default",
+      "enum": [
+        {
+          "value": "default",
+          "description": "Default (locale-aware, numeric)"
+        },
+        {
+          "value": "natural",
+          "description": "Natural sort (alphabetical and numbers)"
+        }
+      ],
+      "description": "Method used to sort files and directories in the tree view."
+    },
+    "sortFoldersBeforeFiles": {
+      "order": 2,
+      "type": "boolean",
+      "default": true,
+      "description": "When listing directory items, list subdirectories before listing files."
+    },
+    "sortByBase": {
+      "order": 3,
+      "type": "boolean",
+      "default": true,
+      "description": "Sort by filename base and extension independently. Files with the same base name are grouped together."
+    },
+    "duplicateCopyNameStyle": {
+      "order": 4,
+      "type": "string",
+      "default": "system",
+      "enum": [
+        {
+          "value": "system",
+          "description": "System default (Windows, macOS, or Linux style)"
+        },
+        {
+          "value": "legacy",
+          "description": "Legacy tree-view style: file0.txt, file1.txt"
+        },
+        {
+          "value": "windows",
+          "description": "Windows style: file - Copy.txt, file - Copy (2).txt"
+        },
+        {
+          "value": "macos",
+          "description": "macOS style: file copy.txt, file copy 2.txt"
+        },
+        {
+          "value": "linux",
+          "description": "Linux/GNOME style: file (copy).txt, file (another copy).txt"
+        }
+      ],
+      "description": "Naming style used when copy-pasting an entry where an item with the same name already exists."
+    },
+    "showOnRightSide": {
+      "order": 5,
+      "type": "boolean",
+      "default": false,
+      "description": "Show the tree view on the right side of the workspace."
+    },
+    "squashDirectoryNames": {
+      "order": 6,
+      "type": "boolean",
+      "default": false,
+      "title": "Collapse directories",
+      "description": "Collapse directories that only contain a single directory."
+    },
+    "hideVcsIgnoredFiles": {
+      "order": 7,
+      "type": "boolean",
+      "default": false,
+      "title": "Hide VCS Ignored Files",
+      "description": "Don't show files and directories ignored by the current project's VCS system. For example, projects using Git have these paths defined in their `.gitignore` file."
+    },
+    "hideIgnoredNames": {
+      "order": 8,
+      "type": "boolean",
+      "default": false,
+      "description": "Don't show items matched by the `Ignored Names` core config setting."
+    },
+    "autoReveal": {
+      "order": 9,
+      "type": "boolean",
+      "default": false,
+      "description": "Reveal tree view entries when they become the active pane item."
+    },
+    "focusOnReveal": {
+      "order": 10,
+      "type": "boolean",
+      "default": true,
+      "description": "Focus the tree view when revealing entries."
+    },
+    "alwaysOpenExisting": {
+      "order": 11,
+      "type": "boolean",
+      "default": false,
+      "description": "When opening a file, always focus an already-existing view of the file even if it's in another pane."
+    },
+    "hiddenOnStartup": {
+      "order": 12,
+      "type": "boolean",
+      "default": false,
+      "description": "When Pulsar is opened, the view is hidden."
+    },
+    "fileDoubleClick": {
+      "order": 13,
+      "type": "boolean",
+      "default": false,
+      "description": "Require double click to open files. When enabled, single click only selects the entry."
+    },
+    "dirDoubleClick": {
+      "order": 14,
+      "type": "boolean",
+      "default": false,
+      "description": "Require double click to expand/collapse folders. When enabled, single click only selects the entry. The arrow icon always responds to a single click."
+    }
+  }
+}

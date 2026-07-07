@@ -6230,7 +6230,7 @@ minimatch@3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimatch@^10.0.3, minimatch@^10.1.2, minimatch@^10.2.2, minimatch@^10.2.4:
+minimatch@^10.0.3, minimatch@^10.1.2, minimatch@^10.2.2, minimatch@^10.2.4, minimatch@^10.2.5:
   version "10.2.5"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-10.2.5.tgz#bd48687a0be38ed2961399105600f832095861d1"
   integrity sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==
@@ -8547,9 +8547,8 @@ tough-cookie@~2.5.0:
     psl "^1.1.28"
     punycode "^2.1.1"
 
-"tree-view@https://github.com/lumine-code/tree-view.git#master":
+"tree-view@file:./packages/tree-view":
   version "0.9.3"
-  resolved "https://github.com/lumine-code/tree-view.git#1597e4f1a49b16a7b76f0fdb106d7836abf72e19"
   dependencies:
     minimatch "^10.1.2"
     natural-compare-lite "^1.4.0"
