@@ -457,6 +457,7 @@ class AtomEnvironment {
     // need other disposing objects to be able to check it. We won't need to
     // reset it because another environment will be created.
     this.isDestroying = true;
+    this.emitter.emit("will-destroy");
 
     this.disposables.dispose();
     if (this.workspace) this.workspace.destroy();
@@ -469,6 +470,16 @@ class AtomEnvironment {
     this.uriHandlerRegistry.destroy();
 
     this.uninstallWindowEventHandler();
+  }
+
+  // Extended: Invoke the given callback when the environment is destroying, as
+  // happens during window close or reload.
+  //
+  // * `callback` {Function} to be called when the environment starts destroying
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onWillDestroy(callback) {
+    return this.emitter.on("will-destroy", callback);
   }
 
   /**

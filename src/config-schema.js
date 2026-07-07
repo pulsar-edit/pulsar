@@ -335,13 +335,21 @@ const configSchema = {
       },
       fileSystemWatcher: {
         description:
-          "Choose the underlying implementation used to watch for filesystem changes. Emulating changes will miss any events caused by applications other than Lumine, but may help prevent crashes or freezes.",
+          "Choose the underlying implementation used to watch for filesystem changes. It’s usually best to let Lumine handle this, but if you have issues with filesystem events, you can opt into a specific watcher that may work better for your platform.",
         type: "string",
-        default: "native",
+        default: "default",
         enum: [
           {
-            value: "native",
-            description: "Native operating system APIs",
+            value: "default",
+            description: "Default (let Lumine decide)",
+          },
+          {
+            value: "nsfw",
+            description: "Node Sentinel File Watcher",
+          },
+          {
+            value: "parcel",
+            description: "@parcel/watcher",
           },
         ],
       },
