@@ -11,10 +11,10 @@ const macBundleDocumentTypes = require("./mac-bundle-document-types.js");
 // Monkey-patch to not remove things I explicitly didn't say to remove.
 // See: https://github.com/electron-userland/electron-builder/issues/6957
 
-/* eslint-disable node/no-extraneous-require */
+/* eslint-disable n/no-extraneous-require */
 let transformer = require('app-builder-lib/out/fileTransformer')
 const builder_util_1 = require("builder-util");
-/* eslint-enable node/no-extraneous-require */
+/* eslint-enable n/no-extraneous-require */
 
 transformer.createTransformer = function createTransformer(srcDir, configuration, extraMetadata, extraTransformer) {
   const mainPackageJson = Path.join(srcDir, "package.json");
@@ -51,7 +51,7 @@ async function modifyMainPackageJson(
 
 // END Monkey-patch.
 
-// eslint-disable-next-line node/no-unpublished-require
+// eslint-disable-next-line n/no-unpublished-require
 const builder = require('electron-builder');
 
 const ARGS = yargs(hideBin(process.argv))
@@ -172,6 +172,7 @@ let options = {
     "!**/{.eslintrc.js}",
     "!**/{.eslintrc.json}",
     "!**/{.eslintrc.yml}",
+    "!**/{eslint.config.js,eslint.config.mjs,eslint.config.cjs}",
     "!**/{.stylelintrc}",
     "!**/{stylelint.config.js}",
     "!**/{stylelintrc.json}",
@@ -218,7 +219,7 @@ let options = {
   ],
 
   extraResources: [
-    { from: 'lumine.sh', to: `${baseName}.sh` },
+    { from: 'lumine.sh', to: `${baseName}.sh` },
     { from: ICONS.png, to: 'lumine.png' },
     { from: 'LICENSE.md', to: 'LICENSE.md' }
   ],
