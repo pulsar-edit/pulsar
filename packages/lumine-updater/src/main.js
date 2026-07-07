@@ -45,7 +45,12 @@ class LumineUpdater {
     }
 
     // We get the results ordered by newest tag first, so we can just check the
-    // first item.
+    // first item. If the repo has no releases yet, the body is an empty array,
+    // so fall back to the "never update" sentinel.
+    if (!Array.isArray(res.body) || res.body.length === 0) {
+      return "0.0.0";
+    }
+
     return res.body[0].tag_name;
   }
 
