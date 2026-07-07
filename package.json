@@ -288,6 +288,8 @@
     "dist": "node script/electron-builder.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
     "test:editor": "yarn test:only spec",
     "test:only": "yarn start --test"
   },
@@ -299,6 +301,7 @@
     "electron": "43.0.0",
     "electron-builder": "26.0.20",
     "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsdoc": "^63.0.12",
     "eslint-plugin-n": "^18.2.1",
     "globals": "^17.7.0",
@@ -307,6 +310,7 @@
     "postinstall-postinstall": "2.1.0",
     "playwright": "1.22.2",
     "playwright-core": "1.22.2",
+    "prettier": "^3.9.4",
     "random-seed": "0.3.0"
   },
   "resolutions": {

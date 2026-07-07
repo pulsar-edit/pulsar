@@ -1,0 +1,10 @@
+# Build output
+dist/
+binaries/
+
+# Vendored / third-party (not our source)
+vendor/
+
+# Generated / lockfiles / minified
+yarn.lock
+*.min.js
