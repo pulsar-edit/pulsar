@@ -1,4 +1,5 @@
 const path = require("path");
+const { webUtils } = require("electron");
 const { CompositeDisposable } = require("event-kit");
 
 class PaneElement extends HTMLElement {
@@ -55,7 +56,9 @@ class PaneElement extends HTMLElement {
       event.preventDefault();
       event.stopPropagation();
       this.getModel().activate();
-      const pathsToOpen = [...event.dataTransfer.files].map((file) => file.path);
+      const pathsToOpen = [...event.dataTransfer.files]
+        .map((file) => getPathForDroppedFile(file))
+        .filter(Boolean);
       if (pathsToOpen.length > 0) {
         this.applicationDelegate.open({ pathsToOpen, here: true });
       }
@@ -198,6 +201,19 @@ function createPaneElement() {
 }
 
 window.customElements.define("atom-pane", PaneElement);
+
+function getPathForDroppedFile(file) {
+  if (typeof webUtils?.getPathForFile === "function") {
+    try {
+      const filePath = webUtils.getPathForFile(file);
+      if (filePath) return filePath;
+    } catch {
+      // Spec fakes and older call sites may still provide a path property instead.
+    }
+  }
+
+  return file.path;
+}
 
 module.exports = {
   createPaneElement,

@@ -309,6 +309,13 @@ describe("PaneElement", function () {
         paneElement.dispatchEvent(event);
         expect(atom.applicationDelegate.open).not.toHaveBeenCalled();
       }));
+
+    describe("when a dropped file has no resolved path", () =>
+      it("does nothing", function () {
+        const event = buildDragEvent("drop", [{}]);
+        paneElement.dispatchEvent(event);
+        expect(atom.applicationDelegate.open).not.toHaveBeenCalled();
+      }));
   });
 
   describe("resize", () =>
