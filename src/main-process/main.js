@@ -31,7 +31,7 @@ function isAtomRepoPath(repoPath) {
   if (fs.statSyncNoException(packageJsonPath)) {
     try {
       let packageJson = CSON.readFileSync(packageJsonPath);
-      return packageJson.name === "atom";
+      return packageJson.name === "lumine";
     } catch {
       return false;
     }
@@ -55,8 +55,8 @@ if (args.resourcePath) {
     "lumine",
   );
 
-  if (process.env.ATOM_DEV_RESOURCE_PATH) {
-    devResourcePath = process.env.ATOM_DEV_RESOURCE_PATH;
+  if (process.env.LUMINE_RESOURCE_PATH) {
+    devResourcePath = process.env.LUMINE_RESOURCE_PATH;
   } else if (isAtomRepoPath(process.cwd())) {
     devResourcePath = process.cwd();
   } else if (fs.statSyncNoException(defaultRepositoryPath)) {
