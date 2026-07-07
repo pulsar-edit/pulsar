@@ -297,7 +297,6 @@
     "@electron/notarize": "^1.2.3",
     "@electron/rebuild": "4.1.0",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "1.22.2",
     "electron": "43.0.0",
     "electron-builder": "26.0.20",
     "eslint": "^10.6.0",
@@ -307,8 +306,6 @@
     "globals": "^17.7.0",
     "jsdoc-to-markdown": "^8.0.0",
     "patch-package": "8.0.1",
-    "playwright": "1.22.2",
-    "playwright-core": "1.22.2",
     "postinstall-postinstall": "2.1.0",
     "prettier": "^3.9.4",
     "random-seed": "0.3.0"
