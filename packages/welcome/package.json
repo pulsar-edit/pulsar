@@ -3,7 +3,6 @@
   "version": "0.36.9",
   "description": "Welcome users to Lumine with useful information",
   "main": "./lib/main",
-  "atomTestRunner": "atom-mocha-test-runner",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
@@ -36,8 +35,5 @@
   },
   "dependencies": {
     "etch": "0.9.0"
-  },
-  "devDependencies": {
-    "atom-mocha-test-runner": "^1.0.0"
   }
 }

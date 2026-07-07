@@ -5,7 +5,6 @@
   "description": "EXTERMINATEs built-in packages installed in ~/.lumine/packages",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
-  "atomTestRunner": "./test/runner",
   "engines": {
     "atom": ">=1.12.7 <2.0.0"
   },
@@ -13,7 +12,6 @@
     "grim": "^2.0.3"
   },
   "devDependencies": {
-    "atom-mocha-test-runner": "^1.0.0",
     "sinon": "^15.2.0"
   }
 }

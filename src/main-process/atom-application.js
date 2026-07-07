@@ -1638,9 +1638,9 @@ module.exports = class AtomApplication extends EventEmitter {
 
     if (!atomTestRunner) {
       process.stdout.write(
-        "atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.\n",
+        "atomTestRunner was not defined, using runners/jasmine-test-runner.\n",
       );
-      atomTestRunner = "runners/jasmine1-test-runner";
+      atomTestRunner = "runners/jasmine-test-runner";
     }
 
     process.stdout.write(`Using test runner: ${atomTestRunner}\n`);

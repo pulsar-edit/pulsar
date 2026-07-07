@@ -3,10 +3,10 @@
 
 import fs from "fs";
 import humanize from "humanize-plus";
-import archive from "@pulsar-edit/ls-archive";
 import { CompositeDisposable, Disposable, Emitter, File } from "atom";
 import etch from "etch";
 
+import archive from "./archive";
 import FileView from "./file-view";
 import DirectoryView from "./directory-view";
 
@@ -168,7 +168,9 @@ export default class ArchiveEditorView {
     let fileSize;
     try {
       fileSize = fs.statSync(this.path)?.size;
-    } catch (e) {}
+    } catch {
+      // The summary can still render when the archive path is unavailable.
+    }
     if (fileSize == null) fileSize = -1;
     this.refs.summary.textContent = `${humanize.fileSize(fileSize)} with ${fileLabel} and ${directoryLabel}`;
   }

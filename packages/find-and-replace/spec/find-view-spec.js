@@ -24,8 +24,7 @@ describe("FindView", () => {
   }
 
   beforeEach(async () => {
-    jasmine.unspy(global, "setTimeout");
-    jasmine.unspy(Date, "now");
+    jasmine.useRealClock();
     spyOn(atom, "beep");
     workspaceElement = atom.views.getView(atom.workspace);
     workspaceElement.style.height = "800px";

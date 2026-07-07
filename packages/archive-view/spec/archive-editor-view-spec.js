@@ -183,6 +183,9 @@ describe("ArchiveEditorView", () => {
   });
 
   describe("FileIcons", () => {
+    beforeEach(() => getIconServices().resetFileIcons());
+    afterEach(() => getIconServices().resetFileIcons());
+
     async function openFile() {
       await atom.workspace.open("file-icons.zip");
       archiveEditorView = atom.workspace.getActivePaneItem();
@@ -236,14 +239,14 @@ describe("ArchiveEditorView", () => {
         await openFile();
         await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
         expect(
-          findEntryContainingText("adobe.pdf").querySelector(".file.icon.icon-file-pdf").length,
-        ).not.toBe(0);
+          findEntryContainingText("adobe.pdf").querySelector(".file.icon.icon-file-pdf"),
+        ).toExist();
         expect(
-          findEntryContainingText("spacer.gif").querySelector(".file.icon.icon-file-media").length,
-        ).not.toBe(0);
+          findEntryContainingText("spacer.gif").querySelector(".file.icon.icon-file-media"),
+        ).toExist();
         expect(
-          findEntryContainingText("sunn.o").querySelector(".file.icon.icon-file-binary").length,
-        ).not.toBe(0);
+          findEntryContainingText("sunn.o").querySelector(".file.icon.icon-file-binary"),
+        ).toExist();
       });
 
       it("allows multiple classes to be passed", async () => {

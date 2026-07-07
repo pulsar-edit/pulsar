@@ -7,6 +7,20 @@
 const { getLeftPosition, getLeftPositions } = require("./helpers");
 const { uniqueAscending } = require("../lib/main");
 
+async function waitForCondition(condition, description) {
+  const startTime = performance.now();
+
+  while (true) {
+    if (condition()) return;
+
+    if (performance.now() - startTime > 4500) {
+      throw new Error(`Timed out waiting for ${description}`);
+    }
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  }
+}
+
 describe("WrapGuideElement", function () {
   let [editor, editorElement, wrapGuide, workspaceElement] = [];
 
@@ -143,24 +157,22 @@ describe("WrapGuideElement", function () {
         });
       });
 
-      it("updates the wrap guide position for hidden editors when they become visible", function () {
+      it("updates the wrap guide position for hidden editors when they become visible", async function () {
         const initial = getLeftPosition(wrapGuide.firstChild);
         expect(initial).toBeGreaterThan(0);
 
-        waitsForPromise(() => atom.workspace.open());
+        await atom.workspace.open();
 
-        runs(function () {
-          const fontSize = atom.config.get("editor.fontSize");
-          atom.config.set("editor.fontSize", fontSize + 10);
-          atom.workspace.getActivePane().activatePreviousItem();
+        const fontSize = atom.config.get("editor.fontSize");
+        atom.config.set("editor.fontSize", fontSize + 10);
+        atom.workspace.getActivePane().activatePreviousItem();
 
-          waitsForPromise(() => editorElement.getComponent().getNextUpdatePromise());
+        await waitForCondition(
+          () => getLeftPosition(wrapGuide.firstChild) > initial,
+          "wrap guide position to update",
+        );
 
-          runs(function () {
-            expect(getLeftPosition(wrapGuide.firstChild)).toBeGreaterThan(initial);
-            expect(wrapGuide.firstChild).toBeVisible();
-          });
-        });
+        expect(wrapGuide.firstChild).toBeVisible();
       });
     });
 
@@ -175,28 +187,24 @@ describe("WrapGuideElement", function () {
       }));
 
     describe("when the preferredLineLength changes", () =>
-      it("updates the wrap guide positions", function () {
+      it("updates the wrap guide positions", async function () {
         const initial = [10, 15, 20, 30];
         atom.config.set("wrap-guide.columns", initial, {
           scopeSelector: `.${editor.getGrammar().scopeName}`,
         });
-        waitsForPromise(() => editorElement.getComponent().getNextUpdatePromise());
 
-        runs(function () {
-          atom.config.set("editor.preferredLineLength", 15, {
-            scopeSelector: `.${editor.getGrammar().scopeName}`,
-          });
-          waitsForPromise(() => editorElement.getComponent().getNextUpdatePromise());
+        await waitForCondition(() => wrapGuide.children.length === initial.length, "wrap guides");
 
-          runs(function () {
-            const columns = atom.config.get("wrap-guide.columns", {
-              scope: editor.getRootScopeDescriptor(),
-            });
-            expect(columns.length).toBe(2);
-            expect(columns[0]).toBe(10);
-            expect(columns[1]).toBe(15);
-          });
+        atom.config.set("editor.preferredLineLength", 15, {
+          scopeSelector: `.${editor.getGrammar().scopeName}`,
         });
+
+        await waitForCondition(() => {
+          const columns = atom.config.get("wrap-guide.columns", {
+            scope: editor.getRootScopeDescriptor(),
+          });
+          return columns != null && columns.length === 2 && columns[0] === 10 && columns[1] === 15;
+        }, "wrap guide columns to follow preferredLineLength");
       }));
 
     describe("when the columns config changes", function () {

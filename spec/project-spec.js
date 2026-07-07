@@ -125,8 +125,8 @@ describe("Project", () => {
       expect(deserializedProject.getBuffers().length).toBe(0);
     });
 
-    it("does not deserialize buffers when their path is inaccessible", async (done) => {
-      jasmine.filterByPlatform({ except: ["win32"] }, done); // chmod not supported on win32
+    it("does not deserialize buffers when their path is inaccessible", async () => {
+      jasmine.filterByPlatform({ except: ["win32"] }); // chmod not supported on win32
 
       const pathToOpen = path.join(temp.mkdirSync("atom-spec-project"), "file.txt");
       fs.writeFileSync(pathToOpen, "");
@@ -145,8 +145,6 @@ describe("Project", () => {
       await deserializedProject.deserialize(atom.project.serialize({ isUnloading: false }));
 
       expect(deserializedProject.getBuffers().length).toBe(0);
-
-      done();
     });
 
     it("does not deserialize buffers with their path is no longer present", async () => {

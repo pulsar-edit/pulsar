@@ -37,8 +37,7 @@ for (const ripgrep of [false, true]) {
 
     beforeEach(() => {
       jasmine.getEnv().defaultTimeoutInterval = 30000;
-      jasmine.unspy(global, "setTimeout");
-      jasmine.unspy(Date, "now");
+      jasmine.useRealClock();
       atom.config.set("find-and-replace.useRipgrep", ripgrep);
       workspaceElement = atom.views.getView(atom.workspace);
       atom.config.set("core.excludeVcsIgnoredPaths", false);

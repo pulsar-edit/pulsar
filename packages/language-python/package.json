@@ -12,7 +12,6 @@
   ],
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
-  "atomTestRunner": "runners/jasmine2-test-runner",
   "dependencies": {},
   "consumedServices": {
     "hyperlink.injection": {

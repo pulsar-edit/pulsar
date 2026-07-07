@@ -80,6 +80,13 @@ module.exports = class WrapGuideElement {
     this.subscriptions.add(this.editorElement.onDidChangeScrollLeft(updateGuideCallback));
     this.subscriptions.add(this.editor.onDidChangePath(updateGuideCallback));
     this.subscriptions.add(
+      atom.workspace.onDidChangeActiveTextEditor((activeEditor) => {
+        if (activeEditor === this.editor) {
+          requestAnimationFrame(updateGuideCallback);
+        }
+      }),
+    );
+    this.subscriptions.add(
       this.editor.onDidChangeGrammar(async () => {
         this.configSubscriptions.dispose();
         this.handleConfigEvents();

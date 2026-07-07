@@ -301,13 +301,18 @@ describe("PackageCard", function () {
     it("can be updated", function () {
       const pack = atom.packages.getLoadedPackage("package-with-config");
       pack.latestVersion = "1.1.0";
+      pack.latestSha = "abcdef1234567890";
+      pack.apmInstallSource = {
+        type: "git",
+        source: "example/package-with-config",
+        sha: pack.latestSha,
+      };
       let packageUpdated = false;
 
       packageManager.on("package-updated", () => (packageUpdated = true));
-      packageManager.runCommand.andCallFake(function (args, callback) {
-        callback(0, "", "");
-        return { onWillThrowError() {} };
-      });
+      spyOn(packageManager, "installGitHubPackage").andReturn(
+        Promise.resolve({ name: "package-with-config" }),
+      );
 
       const originalLoadPackage = atom.packages.loadPackage;
       spyOn(atom.packages, "loadPackage").andCallFake(() =>
@@ -321,7 +326,7 @@ describe("PackageCard", function () {
       jasmine.attachToDOM(card.element);
       expect(card.refs.updateButton).toBeVisible();
 
-      card.update();
+      card.update().catch(() => {});
 
       waitsFor(() => packageUpdated);
 
@@ -331,13 +336,16 @@ describe("PackageCard", function () {
     it("keeps the update button visible if the update failed", function () {
       const pack = atom.packages.getLoadedPackage("package-with-config");
       pack.latestVersion = "1.1.0";
+      pack.latestSha = "abcdef1234567890";
+      pack.apmInstallSource = {
+        type: "git",
+        source: "example/package-with-config",
+        sha: pack.latestSha,
+      };
       let updateFailed = false;
 
       packageManager.on("package-update-failed", () => (updateFailed = true));
-      packageManager.runCommand.andCallFake(function (args, callback) {
-        callback(1, "", "");
-        return { onWillThrowError() {} };
-      });
+      spyOn(packageManager, "installGitHubPackage").andReturn(Promise.reject(new Error("boom")));
 
       const originalLoadPackage = atom.packages.loadPackage;
       spyOn(atom.packages, "loadPackage").andCallFake(() =>
@@ -385,13 +393,18 @@ describe("PackageCard", function () {
     it("will stay disabled after an update", function () {
       const pack = atom.packages.getLoadedPackage("package-with-config");
       pack.latestVersion = "1.1.0";
+      pack.latestSha = "abcdef1234567890";
+      pack.apmInstallSource = {
+        type: "git",
+        source: "example/package-with-config",
+        sha: pack.latestSha,
+      };
       let packageUpdated = false;
 
       packageManager.on("package-updated", () => (packageUpdated = true));
-      packageManager.runCommand.andCallFake(function (args, callback) {
-        callback(0, "", "");
-        return { onWillThrowError() {} };
-      });
+      spyOn(packageManager, "installGitHubPackage").andReturn(
+        Promise.resolve({ name: "package-with-config" }),
+      );
 
       const originalLoadPackage = atom.packages.loadPackage;
       spyOn(atom.packages, "loadPackage").andCallFake(() =>
@@ -415,15 +428,16 @@ describe("PackageCard", function () {
       setPackageStatusSpies({ installed: true, disabled: false });
 
       let [uninstallCallback] = [];
-      packageManager.runCommand.andCallFake(function (args, callback) {
-        if (args[0] === "uninstall") {
-          uninstallCallback = callback;
-        }
-        return { onWillThrowError() {} };
-      });
-
       spyOn(packageManager, "install").andCallThrough();
-      spyOn(packageManager, "uninstall").andCallThrough();
+      spyOn(packageManager, "uninstall").andCallFake(function (pack, callback) {
+        packageManager.emitPackageEvent("uninstalling", pack);
+        uninstallCallback = function () {
+          if (typeof callback === "function") {
+            callback();
+          }
+          packageManager.emitPackageEvent("uninstalled", pack);
+        };
+      });
 
       const pack = atom.packages.getLoadedPackage("package-with-config");
       card = new PackageCard(pack, new SettingsView(), packageManager);

@@ -25,16 +25,23 @@ module.exports = {
 
   scanProjectDirectories() {
     this.packageDirectories = [];
-    atom.project.getDirectories().forEach((directory) => {
-      if (directory == null) {
-        return;
-      }
-      this.readMetadata(directory, (error, metadata) => {
-        if (this.isAtomPackage(metadata) || this.isAtomCore(metadata)) {
-          this.packageDirectories.push(directory);
-        }
-      });
-    });
+    return Promise.all(
+      atom.project.getDirectories().map(
+        (directory) =>
+          new Promise((resolve) => {
+            if (directory == null) {
+              resolve();
+              return;
+            }
+            this.readMetadata(directory, (error, metadata) => {
+              if (this.isAtomPackage(metadata) || this.isAtomCore(metadata)) {
+                this.packageDirectories.push(directory);
+              }
+              resolve();
+            });
+          }),
+      ),
+    );
   },
 
   readMetadata(directory, callback) {

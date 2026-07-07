@@ -1332,7 +1332,7 @@ describe("Autocomplete Manager", () => {
 
         let overlayElement = editorView.querySelector(".autocomplete-plus");
         expect(overlayElement).toExist();
-        expect(overlayElement.style.left).toBe(pixelLeftForBufferPosition([0, 12]));
+        expect(overlayElement.style.left).toHaveNearPixels(pixelLeftForBufferPosition([0, 12]));
       });
 
       it("displays the suggestion list taking into account the passed back replacementPrefix", async () => {

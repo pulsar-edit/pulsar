@@ -777,8 +777,8 @@ describe("Workspace", () => {
       });
     });
 
-    it("adds the file to the application's recent documents list", async (done) => {
-      jasmine.filterByPlatform({ only: ["darwin"] }, done); // Feature only supported on macOS
+    it("adds the file to the application's recent documents list", async () => {
+      jasmine.filterByPlatform({ only: ["darwin"] }); // Feature only supported on macOS
 
       spyOn(atom.applicationDelegate, "addRecentDocument");
 
@@ -793,8 +793,6 @@ describe("Workspace", () => {
       await workspace.open(__filename);
 
       expect(atom.applicationDelegate.addRecentDocument).toHaveBeenCalledWith(__filename);
-
-      done();
     });
 
     it("notifies ::onDidAddTextEditor observers", async () => {
@@ -2602,7 +2600,9 @@ describe("Workspace", () => {
           for (let glob of positiveGlobs) {
             let paths = [];
             await scan(/\bsmapdi\b/, { paths: [glob] }, (result) => {
-              paths.push(atom.project.relativize(result.filePath));
+              // Normalize separators so the forward-slash glob assertions
+              // below also hold on Windows.
+              paths.push(atom.project.relativize(result.filePath).replace(/\\/g, "/"));
             });
 
             // We should get two results:
@@ -2624,7 +2624,9 @@ describe("Workspace", () => {
           for (let glob of negativeGlobs) {
             let paths = [];
             await scan(/\bsmapdi\b/, { paths: [glob] }, (result) => {
-              paths.push(atom.project.relativize(result.filePath));
+              // Normalize separators so the forward-slash glob assertions
+              // below also hold on Windows.
+              paths.push(atom.project.relativize(result.filePath).replace(/\\/g, "/"));
             });
 
             // We should get one result:

@@ -80,8 +80,7 @@ describe("ResultsView", () => {
 
   beforeEach(async () => {
     jasmine.getEnv().defaultTimeoutInterval = 30000;
-    jasmine.unspy(global, "setTimeout");
-    jasmine.unspy(Date, "now");
+    jasmine.useRealClock();
     workspaceElement = atom.views.getView(atom.workspace);
     workspaceElement.style.height = "1000px";
     jasmine.attachToDOM(workspaceElement);
@@ -358,7 +357,9 @@ describe("ResultsView", () => {
       expect(listView.element.scrollTop).not.toBe(0);
 
       resultsView.moveToTop();
-      await waitForCondition(() => listView.element.querySelector(".selected"));
+      await waitForCondition(() =>
+        listView.element.querySelector(".path-row")?.parentElement?.classList.contains("selected"),
+      );
       expect(listView.element.querySelector(".path-row").parentElement).toHaveClass("selected");
       expect(listView.element.scrollTop).toBe(0);
     });
@@ -754,7 +755,8 @@ describe("ResultsView", () => {
         await resultsView.expandAllResults();
         await waitForCondition(() => {
           const classes =
-            resultsView?.refs?.listView?.element?.querySelector(".path-row")?.classList;
+            resultsView?.refs?.listView?.element?.querySelector(".path-row")?.parentElement
+              ?.classList;
           if (classes) {
             return !classes.contains("collapsed");
           }

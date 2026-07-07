@@ -49,7 +49,7 @@ function formatStackTrace(spec, message = "", stackTrace) {
         // at it (path:1:2) -> at path:1:2
         .replace(/^at f*it \(([^)]+)\)/, "at $1")
         // at spec/file-test.js -> at file-test.js
-        .replace(spec.specDirectory + path.sep, "");
+        .replace(getSpecDirectory(spec) + path.sep, "");
     }
 
     return line;
@@ -61,6 +61,10 @@ function formatStackTrace(spec, message = "", stackTrace) {
 // Spec objects in the reporter lifecycle don't have all the metadata we need.
 // We'll store the full objects in this map, then look them up as needed by ID.
 const REGISTRY = new Map();
+
+function getSpecDirectory(spec) {
+  return spec.specDirectory ?? spec.properties?.specDirectory ?? path.dirname(spec.filename ?? "");
+}
 
 class AtomReporter {
   constructor() {
@@ -147,7 +151,7 @@ class AtomReporter {
     while (suite.parentSuite) {
       suites.unshift({
         id: suite.id,
-        description: suite.result.description,
+        description: suite.result?.description ?? suite.description,
       });
       suite = suite.parentSuite;
     }

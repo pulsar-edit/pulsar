@@ -27,6 +27,9 @@ const { createWorkspaceElement } = require("./workspace-element");
 // probably screw it up in some cases. It's easier to just traverse upward
 // until we hit the top of the project.
 function filePathMatchesGlob(filePath, matcher) {
+  // Minimatch globs use `/` as the separator, but on Windows the relativized
+  // path arrives with `\`, so normalize before matching.
+  filePath = filePath.split(path.sep).join("/");
   // When we call `path.dirname` on a path like `foo`, it'll return `.`. That's
   // when we should stop because there's no more upward traversal to be done.
   while (filePath && filePath !== ".") {

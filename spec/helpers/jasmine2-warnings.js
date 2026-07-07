@@ -5,17 +5,17 @@ const {
 } = require("./warnings");
 
 exports.register = (jasmineEnv) => {
-  jasmineEnv.afterEach(async (done) => {
+  jasmineEnv.afterEach((done) => {
     ensureNoDeprecatedFunctionCalls();
     ensureNoDeprecatedStylesheets();
 
-    await atom.reset();
+    atom.reset().then(() => {
+      if (!window.debugContent) {
+        document.getElementById("jasmine-content").innerHTML = "";
+      }
+      warnIfLeakingPathSubscriptions();
 
-    if (!window.debugContent) {
-      document.getElementById("jasmine-content").innerHTML = "";
-    }
-    warnIfLeakingPathSubscriptions();
-
-    done();
+      done();
+    }, done.fail);
   });
 };

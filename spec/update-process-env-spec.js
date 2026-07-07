@@ -247,8 +247,8 @@ describe("updateProcessEnv(launchEnv)", function () {
 
   describe("when the launch environment does not come from a shell", function () {
     describe("on macOS", function () {
-      it("updates process.env to match the environment in the user's login shell", async function (done) {
-        jasmine.filterByPlatform({ only: ["darwin"] }, done); // TestsThatFailOnWin32
+      it("updates process.env to match the environment in the user's login shell", async function () {
+        jasmine.filterByPlatform({ only: ["darwin"] }); // TestsThatFailOnWin32
 
         process.env.SHELL = "/my/custom/bash";
         spawn.setDefault(
@@ -273,14 +273,12 @@ describe("updateProcessEnv(launchEnv)", function () {
 
         // Doesn't error
         await updateProcessEnv(null);
-
-        done();
       });
     });
 
     describe("on linux", function () {
-      it("updates process.env to match the environment in the user's login shell", async function (done) {
-        jasmine.filterByPlatform({ only: ["linux"] }, done); // TestsThatFailOnWin32
+      it("updates process.env to match the environment in the user's login shell", async function () {
+        jasmine.filterByPlatform({ only: ["linux"] }); // TestsThatFailOnWin32
 
         process.env.SHELL = "/my/custom/bash";
         spawn.setDefault(
@@ -305,8 +303,6 @@ describe("updateProcessEnv(launchEnv)", function () {
 
         // Doesn't error
         await updateProcessEnv(null);
-
-        done();
       });
     });
 

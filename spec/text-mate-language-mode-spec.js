@@ -483,10 +483,6 @@ describe("TextMateLanguageMode", () => {
         languageMode.destroy();
         buffer.release();
       });
-
-      describe("when the buffer is fully tokenized", () => {
-        beforeEach(() => fullyTokenize(languageMode));
-      });
     });
 
     describe("when tokenization completes", () => {

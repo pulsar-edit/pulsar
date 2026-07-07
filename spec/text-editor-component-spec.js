@@ -5649,9 +5649,9 @@ describe("TextEditorComponent", () => {
       expect(component.getScrollTopRow()).toBe(4);
     });
 
-    it("gracefully handles the editor being hidden after a styling change", async (done) => {
+    it("gracefully handles the editor being hidden after a styling change", async () => {
       jasmine.useRealClock();
-      jasmine.filterByPlatform({ only: ["linux"] }, done);
+      jasmine.filterByPlatform({ only: ["linux"] });
       // Seems to make this test less flaky.
       await wait(0);
 
@@ -5662,8 +5662,6 @@ describe("TextEditorComponent", () => {
       TextEditor.didUpdateStyles();
       element.style.display = "none";
       await component.getNextUpdatePromise();
-
-      done();
     });
 
     it("does not throw an exception when the editor is soft-wrapped and changing the font size changes also the longest screen line", async () => {

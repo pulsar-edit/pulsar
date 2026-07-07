@@ -51,7 +51,7 @@ describe("WindowEventHandler", () => {
   });
 
   describe("resize event", () =>
-    it("calls storeWindowDimensions", async (done) => {
+    it("calls storeWindowDimensions", (done) => {
       jasmine.useRealClock();
 
       spyOn(atom, "storeWindowDimensions").and.callFake(() => {

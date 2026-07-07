@@ -2,6 +2,18 @@ const temp = require("temp");
 
 describe("Atom API autocompletions", () => {
   let [editor, provider] = [];
+  const conditionPromise = async (condition, description = "condition") => {
+    const startedAt = Date.now();
+    while (true) {
+      if (condition()) {
+        return;
+      }
+      if (Date.now() - startedAt > 5000) {
+        throw new Error(`Timed out waiting for ${description}`);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  };
 
   const getCompletions = function () {
     const cursor = editor.getLastCursor();
@@ -17,27 +29,21 @@ describe("Atom API autocompletions", () => {
     return provider.getSuggestions(request);
   };
 
-  beforeEach(() => {
-    waitsForPromise(() => atom.packages.activatePackage("autocomplete-atom-api"));
-    runs(
-      () =>
-        (provider = atom.packages
-          .getActivePackage("autocomplete-atom-api")
-          .mainModule.getProvider()),
-    );
-    waitsFor(() => Object.keys(provider.completions).length > 0);
-    waitsFor(() => provider.packageDirectories?.length > 0);
-    waitsForPromise(() => atom.workspace.open("test.js"));
-    runs(() => (editor = atom.workspace.getActiveTextEditor()));
+  beforeEach(async () => {
+    jasmine.useRealClock();
+    await atom.packages.activatePackage("autocomplete-atom-api");
+    provider = atom.packages.getActivePackage("autocomplete-atom-api").mainModule.getProvider();
+    await conditionPromise(() => Object.keys(provider.completions).length > 0, "completions");
+    await conditionPromise(() => provider.packageDirectories?.length > 0, "package directories");
+    await atom.workspace.open("test.js");
+    editor = atom.workspace.getActiveTextEditor();
   });
 
   it("only includes completions in files that are in an Atom package or Atom core", () => {
     const emptyProjectPath = temp.mkdirSync("atom-project-");
     atom.project.setPaths([emptyProjectPath]);
 
-    waitsForPromise(() => atom.workspace.open("empty.js"));
-
-    runs(() => {
+    return atom.workspace.open("empty.js").then(() => {
       expect(provider.packageDirectories.length).toBe(0);
       editor = atom.workspace.getActiveTextEditor();
       editor.setText("atom.");
@@ -51,9 +57,7 @@ describe("Atom API autocompletions", () => {
     const emptyProjectPath = temp.mkdirSync("some-guy");
     atom.project.setPaths([emptyProjectPath]);
 
-    waitsForPromise(() => atom.workspace.open(".atom/init.coffee"));
-
-    runs(() => {
+    return atom.workspace.open(".atom/init.coffee").then(() => {
       expect(provider.packageDirectories.length).toBe(0);
       editor = atom.workspace.getActiveTextEditor();
       editor.setText("atom.");
@@ -67,9 +71,7 @@ describe("Atom API autocompletions", () => {
     const emptyProjectPath = temp.mkdirSync("some-guy");
     atom.project.setPaths([emptyProjectPath]);
 
-    waitsForPromise(() => atom.workspace.open());
-
-    runs(() => {
+    return atom.workspace.open().then(() => {
       expect(provider.packageDirectories.length).toBe(0);
       editor = atom.workspace.getActiveTextEditor();
       editor.setText("atom.");
