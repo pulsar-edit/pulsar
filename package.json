@@ -286,6 +286,7 @@
     "postinstall": "patch-package",
     "start": "electron --no-sandbox --enable-logging . -f",
     "dist": "node script/electron-builder.js",
+    "full": "yarn install && yarn build && yarn dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
