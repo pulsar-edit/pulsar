@@ -33839,7 +33839,7 @@ module.exports = [
   'pulpwood',
   'pulpy',
   'pulque',
-  'pulsar',
+  'lumine',
   'pulsate',
   'pulsatile',
   'pulsation',

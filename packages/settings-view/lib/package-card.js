@@ -145,7 +145,7 @@ export default class PackageCard {
         if (packageVersion !== this.pack.version) {
           this.refs.versionValue.classList.add('text-warning')
           this.refs.packageMessage.classList.add('text-warning')
-          this.refs.packageMessage.textContent = `Version ${packageVersion} is not the latest version available for this package, but it's the latest that is compatible with your version of Pulsar.`
+          this.refs.packageMessage.textContent = `Version ${packageVersion} is not the latest version available for this package, but it's the latest that is compatible with your version of Lumine.`
         }
 
         this.installablePack = pack
@@ -156,9 +156,9 @@ export default class PackageCard {
         this.refs.packageMessage.classList.add('text-error')
         this.refs.packageMessage.insertAdjacentText(
           'beforeend',
-          `There's no version of this package that is compatible with your Pulsar version. The version must satisfy ${this.pack.engines.atom}.`
+          `There's no version of this package that is compatible with your Lumine version. The version must satisfy ${this.pack.engines.atom}.`
         )
-        console.error(`No available version compatible with the installed Pulsar version: ${atom.getVersion()}`)
+        console.error(`No available version compatible with the installed Lumine version: ${atom.getVersion()}`)
       }
 
       callback()
@@ -214,7 +214,7 @@ export default class PackageCard {
           detail = `${oldVersion} -> ${newVersion}`
         }
 
-        const notification = atom.notifications.addSuccess(`Restart Pulsar to complete the update of \`${this.pack.name}\`.`, {
+        const notification = atom.notifications.addSuccess(`Restart Lumine to complete the update of \`${this.pack.name}\`.`, {
           dismissable: true,
           buttons: [{
             text: 'Restart now',
@@ -281,7 +281,7 @@ export default class PackageCard {
   loadCachedMetadata () {
     if (repoUrlFromRepository(this.pack.repository) === atom.branding.urlCoreRepo) {
       // Don't hit the web for our bundled packages. Just use the local image.
-      this.refs.avatar.src = `file://${path.join(process.resourcesPath, "pulsar.png")}`;
+      this.refs.avatar.src = `file://${path.join(process.resourcesPath, "lumine.png")}`;
     } else {
       this.client.avatar(ownerFromRepository(this.pack.repository), (err, avatarPath) => {
         if (!err && avatarPath) {

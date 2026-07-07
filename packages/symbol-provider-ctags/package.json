@@ -3,7 +3,7 @@
   "main": "./lib/main",
   "version": "1.0.0",
   "description": "Provides symbols to symbols-view via ctags",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0",
@@ -21,7 +21,7 @@
     "useEditorGrammarAsCtagsLanguage": {
       "default": true,
       "type": "boolean",
-      "description": "Force `ctags` to use the name of the current file's language in Pulsar when generating tags. By default, `ctags` automatically selects the language of a source file, ignoring those files whose language cannot be determined. This option forces the specified language to be used instead of automatically selecting the language based upon its extension."
+      "description": "Force `ctags` to use the name of the current file's language in Lumine when generating tags. By default, `ctags` automatically selects the language of a source file, ignoring those files whose language cannot be determined. This option forces the specified language to be used instead of automatically selecting the language based upon its extension."
     }
   },
   "dependencies": {

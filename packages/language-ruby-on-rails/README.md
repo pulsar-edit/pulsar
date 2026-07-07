@@ -1,6 +1,6 @@
-# Ruby on Rails language support in Pulsar
+# Ruby on Rails language support in Lumine
 
-Adds syntax highlighting and snippets to Rails files in Pulsar.
+Adds syntax highlighting and snippets to Rails files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Ruby on Rails TextMate bundle](https://github.com/drnic/ruby-on-rails-tmbundle).
 

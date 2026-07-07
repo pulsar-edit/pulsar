@@ -1,4 +1,4 @@
-'pulsar': {
+'lumine': {
   'config': {
     'excludeVcsIgnoredPaths': {
       'title': 'Exclude VCS Ignored Paths'

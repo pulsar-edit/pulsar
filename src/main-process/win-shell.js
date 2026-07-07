@@ -9,7 +9,7 @@ const fileIconPath = `"${Path.join(
   process.execPath,
   '..',
   'resources',
-  'pulsar.ico'
+  'lumine.ico'
 )}"`;
 
 class ShellOption {

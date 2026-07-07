@@ -7,7 +7,7 @@ const Path = require('path');
 const asyncQueue = require('async/queue');
 
 // TODO: if we ever decide to change path watchers on the future, this is kinda
-// duplicated because of https://github.com/pulsar-edit/pulsar/issues/76
+// duplicated because of https://github.com/lumine-editor/lumine/issues/76
 const nsfw = require('nsfw');
 const EVENT_TYPES = new Set([nsfw.actions.CREATED, nsfw.actions.MODIFIED, nsfw.actions.RENAMED]);
 
@@ -82,7 +82,7 @@ module.exports = class ConfigFile {
       await watcher.start();
       return { dispose: () => watcher.stop() };
     } catch (error) {
-      //TODO_PULSAR: Find out why the atom global variable isn't available at this point
+      //TODO_LUMINE: Find out why the atom global variable isn't available at this point
       this.emitter.emit(
         'did-error',
         dedent`
@@ -93,7 +93,7 @@ module.exports = class ConfigFile {
         See [this document][watches] for more info.
 
         [watches]:https://pulsar-edit.dev/docs/atom-archive/hacking-atom/#typeerror-unable-to-watch-path
-      `//TODO: Update the above to the pulsar docs if we choose to add this
+      `//TODO: Update the above to the lumine docs if we choose to add this
       );
       return new Disposable();
     }

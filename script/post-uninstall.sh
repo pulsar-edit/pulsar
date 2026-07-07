@@ -1,10 +1,10 @@
 #!/bin/sh
 
-PULSAR_SCRIPT_PATH='/usr/bin/${executable}'
+LUMINE_SCRIPT_PATH='/usr/bin/${executable}'
 
-if [ -f "$PULSAR_SCRIPT_PATH" ]
+if [ -f "$LUMINE_SCRIPT_PATH" ]
 then
-  rm "$PULSAR_SCRIPT_PATH"
+  rm "$LUMINE_SCRIPT_PATH"
 fi
 
 ppm_executable=ppm

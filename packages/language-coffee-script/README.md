@@ -1,6 +1,6 @@
-# CoffeeScript language support in Pulsar
+# CoffeeScript language support in Lumine
 
-Adds syntax highlighting and snippets to CoffeeScript files in Pulsar.
+Adds syntax highlighting and snippets to CoffeeScript files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [CoffeeScript TextMate bundle](https://github.com/jashkenas/coffee-script-tmbundle).
 

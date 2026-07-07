@@ -48,7 +48,7 @@ export default class ChangeLogView {
       <div className="welcome" on={{ click: this.openUri }}>
         <div className="welcome-container">
           <div className="header">
-            <a title="Full Change Log" href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">
+            <a title="Full Change Log" href="https://github.com/lumine-editor/lumine/blob/master/CHANGELOG.md">
               {/* LOGO GOES HERE */}
               <h1 className="welcome-title">
                 Change Log
@@ -57,7 +57,7 @@ export default class ChangeLogView {
           </div>
           <div className="welcome-panel">
             <p>Take a look at some of the awesome things {atom.branding.name} has changed:</p>
-            <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
+            <p>Feel free to read our <a href="https://github.com/lumine-editor/lumine/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
                 Fix an issue where missing theme variables prevented the project window from initializing.
@@ -69,7 +69,7 @@ export default class ChangeLogView {
                 New <code>editor.largeFileThreshold</code> setting that allows the user to configure the file-size threshold of the “large file mode” present in TextMate-style grammars.
               </li>
               <li>
-                New experimental setting: <code>core.promptOnConflict</code>. When enabled, Pulsar will ask for confirmation if you try to save an item while it’s in a “conflicted” state. You may decide whether to cancel or proceed with overwriting the file on disk. (For an editor, the “conflicted” state occurs if you open a file and make changes, but another program writes different contents to the file on disk before you can save your changes in Pulsar.) Since this setting is experimental, it is disabled by default… but we encourage users to enable it and help us test it!
+                New experimental setting: <code>core.promptOnConflict</code>. When enabled, Lumine will ask for confirmation if you try to save an item while it’s in a “conflicted” state. You may decide whether to cancel or proceed with overwriting the file on disk. (For an editor, the “conflicted” state occurs if you open a file and make changes, but another program writes different contents to the file on disk before you can save your changes in Lumine.) Since this setting is experimental, it is disabled by default… but we encourage users to enable it and help us test it!
               </li>
               <li>
                 Minor Electron version increase to v30.5.1.

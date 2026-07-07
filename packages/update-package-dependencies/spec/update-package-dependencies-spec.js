@@ -3,7 +3,7 @@ const path = require('path');
 const updatePackageDependencies = require('../lib/update-package-dependencies');
 
 let baseExecutableName = 'ppm';
-if (process.env.ATOM_BASE_NAME === 'pulsar-next') {
+if (process.env.ATOM_BASE_NAME === 'lumine-next') {
   baseExecutableName = 'ppm-next';
 }
 

@@ -1,6 +1,6 @@
-# Ruby language support in Pulsar
+# Ruby language support in Lumine
 
-Adds syntax highlighting and snippets to Ruby files in Pulsar.
+Adds syntax highlighting and snippets to Ruby files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Ruby TextMate bundle](https://github.com/textmate/ruby.tmbundle).
 

@@ -6,8 +6,8 @@ const fs = require('fs');
 
 const prefix = process.argv[2];
 
-const pulsarVersion = require('../package.json').version;
-const versionSegments = pulsarVersion.split('.');
+const lumineVersion = require('../package.json').version;
+const versionSegments = lumineVersion.split('.');
 const lastSegment = versionSegments[versionSegments.length - 1];
 
 // Detecting Rolling release version strings
@@ -15,7 +15,7 @@ if (lastSegment.length > 4) {
 	// For example, '1-dev' is longer than 4 characters,
 	// and the format like '2023081600' from CI is longer than 4 characters.
 	// Either of those would indicate Rolling, not Regular.
-	console.log(`Based on the version string in package.json (${pulsarVersion}),`);
+	console.log(`Based on the version string in package.json (${lumineVersion}),`);
 	console.log('we are *not* preparing a Regular release, so *not* renaming any binaries.');
 	console.log('Exiting the binary renaming script.');
 	process.exit(0);
@@ -32,7 +32,7 @@ if (typeof prefix !== "string" || prefix.length === 0) {
 	process.exit(0);
 }
 
-console.log(`Based on the version string in package.json (${pulsarVersion}),`);
+console.log(`Based on the version string in package.json (${lumineVersion}),`);
 console.log('we *are* preparing a Regular release, so *renaming all binaries with prefixes*.');
 
 console.log(`Prefix is: ${prefix}`);

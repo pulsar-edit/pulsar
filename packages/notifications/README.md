@@ -4,5 +4,5 @@
 
 ### Docs
 
-Notifications are available for use in your Pulsar packages via the `atom.notifications` `NotificationManager` object. See
+Notifications are available for use in your Lumine packages via the `atom.notifications` `NotificationManager` object. See
 https://atom.io/docs/api/latest/NotificationManager and https://atom.io/docs/api/latest/Notification for documentation.

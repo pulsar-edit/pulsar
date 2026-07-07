@@ -12,7 +12,7 @@ The original symbol provider, `ctags`, now lives in its own provider package cal
 
 ### Community package providers
 
-Any package can act as a symbol provider. [These are the packages on the Pulsar Package Repository that provide the `symbol.provider` service.](https://web.pulsar-edit.dev/packages?service=symbol.provider&serviceType=provided)
+Any package can act as a symbol provider. [These are the packages on the Lumine Package Repository that provide the `symbol.provider` service.](https://web.pulsar-edit.dev/packages?service=symbol.provider&serviceType=provided)
 
 ## Commands
 

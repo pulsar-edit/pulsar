@@ -42,7 +42,7 @@ if (args.resourcePath) {
     // Setting the path for the app
     app.getPath('home'),
     'github',
-    'pulsar'
+    'lumine'
   );
 
   if (process.env.ATOM_DEV_RESOURCE_PATH) {

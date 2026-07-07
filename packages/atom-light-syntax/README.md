@@ -1,8 +1,8 @@
-# Pulsar Light Syntax theme
+# Lumine Light Syntax theme
 
-A light syntax theme for Pulsar.
+A light syntax theme for Lumine.
 
-This theme is installed by default with Pulsar and can be activated by going to
+This theme is installed by default with Lumine and can be activated by going to
 the _Themes_ section in the Settings view (`cmd-,`) and selecting it from the
 _Syntax Themes_ dropdown menu.
 

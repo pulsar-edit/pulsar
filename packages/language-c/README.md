@@ -1,6 +1,6 @@
-# C/C++ language support in Pulsar
+# C/C++ language support in Lumine
 
-Adds syntax highlighting and snippets to C/C++ files in Pulsar.
+Adds syntax highlighting and snippets to C/C++ files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
 from the [C TextMate bundle](https://github.com/textmate/c.tmbundle).

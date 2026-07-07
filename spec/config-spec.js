@@ -167,12 +167,12 @@ describe('Config', () => {
         });
 
         // Project-specific settings work fine, as the spec below shows, when
-        // the value being retrieved is a primitive. But until recently, Pulsar
+        // the value being retrieved is a primitive. But until recently, Lumine
         // didn't know what to do if the value being retrieved was an object.
         //
         // Imagine asking for _all_ config settings. The non-project-specific
         // lookup returns everything. The project-specific lookup returns only
-        // a few overrides. Pulsar needs to _blend_ these two objects, but was
+        // a few overrides. Lumine needs to _blend_ these two objects, but was
         // previously choosing the project-specific lookup just because it
         // wasn't undefined.
 

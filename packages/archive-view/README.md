@@ -1,6 +1,6 @@
 # Archive view package
 
-Adds support for browsing archive files in Pulsar with the following extensions:
+Adds support for browsing archive files in Lumine with the following extensions:
 
 * `.egg`
 * `.epub`

@@ -1,6 +1,6 @@
-# Plain text support in Pulsar
+# Plain text support in Lumine
 
-Grammar and snippets for plain text files in Pulsar.
+Grammar and snippets for plain text files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
 from the [Text TextMate bundle](https://github.com/textmate/text.tmbundle).

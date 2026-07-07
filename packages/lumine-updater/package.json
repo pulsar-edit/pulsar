@@ -1,17 +1,17 @@
 {
-  "name": "pulsar-updater",
+  "name": "lumine-updater",
   "version": "1.0.0",
-  "description": "Detect Pulsar updates on Launch.",
+  "description": "Detect Lumine updates on launch.",
   "main": "./src/main.js",
   "scripts": {
-    "test": "pulsar --test spec"
+    "test": "lumine --test spec"
   },
   "engines": {
     "atom": ">=1.106.0 <2.0.0"
   },
   "author": "confused-Techie",
   "license": "MIT",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "dependencies": {
     "event-kit": "github:pulsar-edit/event-kit",
     "shelljs": "^0.10.0",
@@ -22,7 +22,7 @@
     "checkForUpdatesOnLaunch": {
       "type": "boolean",
       "default": true,
-      "description": "If Pulsar Updater should check for an update to Pulsar as soon as Pulsar launches."
+      "description": "If Lumine Updater should check for an update to Lumine as soon as Lumine launches."
     }
   }
 }

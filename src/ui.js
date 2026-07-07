@@ -89,7 +89,7 @@ function renderMarkdown(content, givenOpts = {}) {
     taskCheckboxDisabled: true, // `markdown-it-task-checkbox`: Disable checkbox interactivity
     taskCheckboxDivWrap: false, // `markdown-it-task-checkbox`: Wrap div arround checkboc
     transformImageLinks: true, // Attempt to resolve image urls
-    transformAtomLinks: true, // Attempt to rewrite links to Atom pages, changing them to Pulsar
+    transformAtomLinks: true, // Attempt to rewrite links to Atom pages, changing them to Lumine
     transformNonFqdnLinks: true, // Attempt to resolve non-FQDN links
     rootDomain: "", // The root URL that should be used for the above 'transform' options
     filePath: "", // The path to the file where this markdown is generated from,
@@ -466,7 +466,7 @@ function renderMarkdown(content, givenOpts = {}) {
  * @function applySyntaxHighlighting
  * @memberof markdown
  * @async
- * @desc Uses Pulsar's built-in Syntax Highlighting system to apply the same syntax
+ * @desc Uses Lumine's built-in Syntax Highlighting system to apply the same syntax
  * highlighting to code blocks within markdown. Modifies the existing object passed.
  * @param {HTMLFragment} content - The HTML Node/Fragment to apply syntax highlighting on.
  * Will modifyn the original object.
@@ -482,7 +482,7 @@ function renderMarkdown(content, givenOpts = {}) {
 function applySyntaxHighlighting(content, givenOpts = {}) {
   const defaultOpts = {
     syntaxScopeNameFunc: null, // Function used to resolve codeblock fences language id
-    // to a Pulsar Grammar source. Should be a function that takes the declared scope and returns a source,
+    // to a Lumine Grammar source. Should be a function that takes the declared scope and returns a source,
     grammar: null,
     renderMode: "full", // Just like in `renderMarkdown` this can be full or fragment
   };

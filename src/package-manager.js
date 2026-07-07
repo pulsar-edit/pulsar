@@ -13,7 +13,7 @@ const ThemePackage = require('./theme-package');
 const ModuleCache = require('./module-cache');
 const packageJSON = require('../package.json');
 
-// Extended: Package manager for coordinating the lifecycle of Pulsar packages.
+// Extended: Package manager for coordinating the lifecycle of Lumine packages.
 //
 // An instance of this class is always available as the `atom.packages` global.
 //
@@ -255,7 +255,7 @@ module.exports = class PackageManager {
     return null;
   }
 
-  // Public: Is the package with the given name bundled with Pulsar?
+  // Public: Is the package with the given name bundled with Lumine?
   //
   // * `name` - The {String} package name.
   //

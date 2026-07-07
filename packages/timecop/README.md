@@ -1,6 +1,6 @@
 # Timecop package
 
-Displays information about where time is spent while Pulsar loads.
+Displays information about where time is spent while Lumine loads.
 
   * Startup time
   * Compile cache

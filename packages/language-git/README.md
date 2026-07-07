@@ -1,11 +1,11 @@
-# Git editing support in Pulsar
+# Git editing support in Lumine
 
-Adds syntax highlighting to Git commit, merge, and rebase messages edited in Pulsar.
+Adds syntax highlighting to Git commit, merge, and rebase messages edited in Lumine.
 
-You can configure Pulsar to be your Git editor with the following command:
+You can configure Lumine to be your Git editor with the following command:
 
 ```sh
-git config --global core.editor "pulsar --wait"
+git config --global core.editor "lumine --wait"
 ```
 
 ## Commit message highlighting

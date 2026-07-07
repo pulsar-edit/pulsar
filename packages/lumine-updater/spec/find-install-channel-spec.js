@@ -1,7 +1,7 @@
 const findInstallChannel = require("../src/find-install-channel.js");
 const shell = require("shelljs");
 
-describe("pulsar-updater findInstallChannel", () => {
+describe("lumine-updater findInstallChannel", () => {
   describe("windows choco install", () => {
     it("fails if 'choco' isn't found", () => {
       spyOn(shell, "which").andReturn(false);
@@ -9,9 +9,9 @@ describe("pulsar-updater findInstallChannel", () => {
       let installCheck = findInstallChannel.windows_chocoInstalled();
       expect(installCheck).toBe(false);
     });
-    it("fails if pulsar isn't included in stdout", () => {
+    it("fails if lumine isn't included in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not -pu-l-sar" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-lumine" });
 
       let installCheck = findInstallChannel.windows_chocoInstalled();
       expect(installCheck).toBe(false);
@@ -23,9 +23,9 @@ describe("pulsar-updater findInstallChannel", () => {
       let installCheck = findInstallChannel.windows_chocoInstalled();
       expect(installCheck).toBe(false);
     });
-    it("succeeds if pulsar is included in stdout", () => {
+    it("succeeds if lumine is included in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "pulsar" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "lumine" });
 
       let installCheck = findInstallChannel.windows_chocoInstalled();
       expect(installCheck).toBe(true);
@@ -39,9 +39,9 @@ describe("pulsar-updater findInstallChannel", () => {
       let installCheck = findInstallChannel.windows_wingetInstalled();
       expect(installCheck).toBe(false);
     });
-    it("fails if pulsar isn't found in stdout", () => {
+    it("fails if lumine isn't found in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not -pu-l-sar" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-lumine" });
 
       let installCheck = findInstallChannel.windows_wingetInstalled();
       expect(installCheck).toBe(false);
@@ -53,9 +53,9 @@ describe("pulsar-updater findInstallChannel", () => {
       let installCheck = findInstallChannel.windows_wingetInstalled();
       expect(installCheck).toBe(false);
     });
-    it("succeeds if pulsar is included in stdout", () => {
+    it("succeeds if Lumine is included in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "Pulsar" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "Lumine" });
 
       let installCheck = findInstallChannel.windows_wingetInstalled();
       expect(installCheck).toBe(true);
@@ -69,9 +69,9 @@ describe("pulsar-updater findInstallChannel", () => {
       let installCheck = findInstallChannel.linux_macos_homebrewInstalled();
       expect(installCheck).toBe(false);
     });
-    it("fails if pulsar isn't found in stdout", () => {
+    it("fails if lumine isn't found in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not -pu-l-sar" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-lumine" });
 
       let installCheck = findInstallChannel.linux_macos_homebrewInstalled();
       expect(installCheck).toBe(false);
@@ -83,9 +83,9 @@ describe("pulsar-updater findInstallChannel", () => {
       let installCheck = findInstallChannel.linux_macos_homebrewInstalled();
       expect(installCheck).toBe(false);
     });
-    it("succeeds if pulsar is included in stdout", () => {
+    it("succeeds if lumine is included in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "pulsar" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "lumine" });
 
       let installCheck = findInstallChannel.linux_macos_homebrewInstalled();
       expect(installCheck).toBe(true);
@@ -99,9 +99,9 @@ describe("pulsar-updater findInstallChannel", () => {
       let installCheck = findInstallChannel.linux_debGetInstalled();
       expect(installCheck).toBe(false);
     });
-    it("fails if pulsar isn't found in stdout", () => {
+    it("fails if lumine isn't found in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not -pu-l-sar" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-lumine" });
 
       let installCheck = findInstallChannel.linux_debGetInstalled();
       expect(installCheck).toBe(false);
@@ -113,9 +113,9 @@ describe("pulsar-updater findInstallChannel", () => {
       let installCheck = findInstallChannel.linux_debGetInstalled();
       expect(installCheck).toBe(false);
     });
-    it("succeeds if pulsar is included in stdout", () => {
+    it("succeeds if lumine is included in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "pulsar" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "lumine" });
 
       let installCheck = findInstallChannel.linux_debGetInstalled();
       expect(installCheck).toBe(true);
@@ -123,13 +123,13 @@ describe("pulsar-updater findInstallChannel", () => {
   });
 
   describe("linux flatpak install", () => {
-    it("fails if flatpak_id is not pulsar", () => {
-      process.env.FLATPAK_ID = "not-pulsar";
+    it("fails if flatpak_id is not lumine", () => {
+      process.env.FLATPAK_ID = "not-lumine";
       let installCheck = findInstallChannel.linux_flatpakInstalled();
       expect(installCheck).toBe(false);
     });
-    it("succeeds if flatpak_id is pulsar", () => {
-      process.env.FLATPAK_ID = "dev.pulsar_edit.Pulsar";
+    it("succeeds if flatpak_id is lumine", () => {
+      process.env.FLATPAK_ID = "io.github.lumine-editor.lumine";
       let installCheck = findInstallChannel.linux_flatpakInstalled();
       expect(installCheck).toBe(true);
     });

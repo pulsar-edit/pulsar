@@ -527,8 +527,8 @@ describe('ContextMenuManager', function() {
       );
       atom.i18n.addStrings({
         example: {
-          stringKey: "Hello Pulsar",
-          otherStringKey: "Goodbye Pulsar"
+          stringKey: "Hello Lumine",
+          otherStringKey: "Goodbye Lumine"
         }
       }, "en");
 
@@ -553,12 +553,12 @@ describe('ContextMenuManager', function() {
       const dispatchedEvent = { target: parent };
       expect(contextMenu.templateForEvent(dispatchedEvent)).toEqual([
         {
-          label: 'Hello Pulsar',
-          id: 'Hello Pulsar',
+          label: 'Hello Lumine',
+          id: 'Hello Lumine',
           submenu: [
             {
-              label: 'Goodbye Pulsar',
-              id: 'Goodbye Pulsar',
+              label: 'Goodbye Lumine',
+              id: 'Goodbye Lumine',
               command: 'test:my-other-command'
             },
             {

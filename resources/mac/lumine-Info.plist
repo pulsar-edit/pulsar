@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>Pulsar</string>
+	<string>Lumine</string>
 	<key>CFBundleIconFile</key>
-	<string>pulsar.icns</string>
+	<string>lumine.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>dev.pulsar-edit.pulsar</string>
+	<string>io.github.lumine-editor.lumine</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Pulsar</string>
+	<string>Lumine</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleDevelopmentRegion</key>
@@ -43,10 +43,10 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>pulsar</string>
+				<string>lumine</string>
 			</array>
 			<key>CFBundleURLName</key>
-			<string>Pulsar Shared Session Protocol</string>
+			<string>Lumine Shared Session Protocol</string>
 		</dict>
 	</array>
 	<key>CFBundleDocumentTypes</key>

@@ -3,7 +3,7 @@
   "main": "./lib/main",
   "version": "1.0.0",
   "description": "Provides symbols to symbols-view based on tree-sitter queries",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0",

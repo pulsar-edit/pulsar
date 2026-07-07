@@ -189,7 +189,7 @@ let options = {
     // These are only required in dev-mode, when pegjs grammars aren't precompiled
     // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
     // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
-    // "!node_modules/.bin/pegjs", // Note: https://github.com/pulsar-edit/pulsar/pull/206
+    // "!node_modules/.bin/pegjs", // Note: https://github.com/lumine-editor/lumine/pull/206
 
     // Exclusions borrowed from `node-prune`
     // - Files
@@ -247,7 +247,7 @@ let options = {
   ],
 
   extraResources: [
-    { from: 'pulsar.sh', to: `${baseName}.sh` },
+    { from: 'lumine.sh', to: `${baseName}.sh` },
     {
       // Be selective in what we copy over to PPM’s `bin` directory. On
       // Windows, the contents of this entire folder will be available on the
@@ -265,7 +265,7 @@ let options = {
       // intact.
       to: 'app'
     },
-    { from: ICONS.png, to: 'pulsar.png' },
+    { from: ICONS.png, to: 'lumine.png' },
     { from: 'LICENSE.md', to: 'LICENSE.md' }
   ],
   compression: 'normal',
@@ -352,9 +352,9 @@ let options = {
   win: {
     icon: ICONS.ico,
     extraResources: [
-      { from: ICONS.ico, to: 'pulsar.ico' },
-      { from: 'resources/win/pulsar.cmd', to: `${baseName}.cmd` },
-      { from: 'resources/win/pulsar.js', to: `${baseName}.js` },
+      { from: ICONS.ico, to: 'lumine.ico' },
+      { from: 'resources/win/lumine.cmd', to: `${baseName}.cmd` },
+      { from: 'resources/win/lumine.js', to: `${baseName}.js` },
       { from: 'resources/win/NSIS_Licenses.txt', to: 'NSIS_Licenses.txt' },
       // Copy `ppm.cmd` to the `ppm/bin` directory.
       { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },

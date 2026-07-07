@@ -15,7 +15,7 @@
 //   specific position in the buffer.
 // * {Cursor::getScopeDescriptor} to get a cursor's descriptor based on position.
 //
-// See the [scopes and scope descriptor guide](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar#scoped-settings-scopes-and-scope-descriptors)
+// See the [scopes and scope descriptor guide](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine#scoped-settings-scopes-and-scope-descriptors)
 // for more information.
 module.exports = class ScopeDescriptor {
   static fromObject(scopes) {

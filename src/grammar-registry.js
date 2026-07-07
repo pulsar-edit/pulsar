@@ -254,7 +254,7 @@ module.exports = class GrammarRegistry {
   // Extended: Evaluates a grammar's fitness for use for a certain file.
   //
   // By analyzing the file's extension and contents — plus other criteria, like
-  // the user's configuration — Pulsar will assign a score to this grammar that
+  // the user's configuration — Lumine will assign a score to this grammar that
   // represents how suitable it is for the given file.
   //
   // Ultimately, whichever grammar scores highest for this file will be used

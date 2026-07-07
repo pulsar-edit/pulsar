@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { clipboard } = require('electron');
 
-// Extended: Represents the clipboard used for copying and pasting in Pulsar.
+// Extended: Represents the clipboard used for copying and pasting in Lumine.
 //
 // An instance of this class is always available as the `atom.clipboard` global.
 //
@@ -14,7 +14,7 @@ const { clipboard } = require('electron');
 // ```
 /**
  * @class Clipboard
- * @desc Represents the clipboard used for copying and pasting in Pulsar.
+ * @desc Represents the clipboard used for copying and pasting in Lumine.
  *
  * An instance of this class is always available as the `atom.clipboard` global.
  * @example

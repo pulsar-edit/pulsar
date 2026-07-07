@@ -57,7 +57,7 @@ let nextId = 0;
 
 /**
  * @class AtomEnvironment
- * @classdesc Pulsar global for dealing with packages, themes, menus, and the window.
+ * @classdesc Lumine global for dealing with packages, themes, menus, and the window.
  *
  * An instance of this class is always available as the `atom` global.
  */
@@ -417,15 +417,15 @@ class AtomEnvironment {
   registerDefaultOpeners() {
     this.workspace.addOpener(uri => {
       switch (uri) {
-        case 'atom://.pulsar/stylesheet':
+        case 'atom://.lumine/stylesheet':
           return this.workspace.openTextFile(
             this.styles.getUserStyleSheetPath()
           );
-        case 'atom://.pulsar/keymap':
+        case 'atom://.lumine/keymap':
           return this.workspace.openTextFile(this.keymaps.getUserKeymapPath());
-        case 'atom://.pulsar/config':
+        case 'atom://.lumine/config':
           return this.workspace.openTextFile(this.config.getUserConfigPath());
-        case 'atom://.pulsar/init-script':
+        case 'atom://.lumine/init-script':
           return this.workspace.openTextFile(this.getUserInitScriptPath());
       }
     });
@@ -568,7 +568,7 @@ class AtomEnvironment {
   }
 
   /*
-  Section: Pulsar Details
+  Section: Lumine Details
   */
 
   // Public: Returns a {Boolean} that is `true` if the current window is in development mode.
@@ -597,7 +597,7 @@ class AtomEnvironment {
     return this.firstLoad;
   }
 
-  // Public: Get the full name of this Pulsar release (e.g. "Pulsar", "Pulsar Beta")
+  // Public: Get the full name of this Lumine release (e.g. "Lumine", "Lumine Beta")
   //
   // Returns the app name {String}.
   getAppName() {
@@ -605,7 +605,7 @@ class AtomEnvironment {
     return this.appName;
   }
 
-  // Public: Get the version of the Pulsar application.
+  // Public: Get the version of the Lumine application.
   //
   // Returns the version text {String}.
   getVersion() {
@@ -616,7 +616,7 @@ class AtomEnvironment {
 
   /**
    * @memberof AtomEnvironment
-   * Compares the current Pulsar version against any valid semver range.
+   * Compares the current Lumine version against any valid semver range.
    * @param {string} value - Any valid semver range.
    * @returns {boolean} True if the current version satisfies the range provided,
    * false otherwise.
@@ -626,10 +626,10 @@ class AtomEnvironment {
     return semver.satisfies(this.getVersion(), value);
   }
 
-  // Public: Gets the release channel of the Pulsar application.
+  // Public: Gets the release channel of the Lumine application.
   //
   // Returns the release channel as a {String}. Will return a specific release channel
-  // name like 'beta' or 'nightly' if one is found in the Pulsar version or 'stable'
+  // name like 'beta' or 'nightly' if one is found in the Lumine version or 'stable'
   // otherwise.
   getReleaseChannel() {
     return getReleaseChannel(this.getVersion());
@@ -671,10 +671,10 @@ class AtomEnvironment {
   }
 
   /*
-  Section: Managing The Pulsar Window
+  Section: Managing The Lumine Window
   */
 
-  // Essential: Open a new Pulsar window using the given options.
+  // Essential: Open a new Lumine window using the given options.
   //
   // Calling this method without an options parameter will open a prompt to pick
   // a file/folder to open in the new window.
@@ -684,10 +684,10 @@ class AtomEnvironment {
   //   * `newWindow` A {Boolean}, true to always open a new window instead of
   //     reusing existing windows depending on the paths to open.
   //   * `devMode` A {Boolean}, true to open the window in development mode.
-  //     Development mode loads the Pulsar source from the locally cloned
-  //     repository and also loads all the packages in ~/.pulsar/dev/packages
+  //     Development mode loads the Lumine source from the locally cloned
+  //     repository and also loads all the packages in ~/.lumine/dev/packages
   //   * `safeMode` A {Boolean}, true to open the window in safe mode. Safe
-  //     mode prevents all packages installed to ~/.pulsar/packages from loading.
+  //     mode prevents all packages installed to ~/.lumine/packages from loading.
   open(params) {
     return this.applicationDelegate.open(params);
   }
@@ -1823,7 +1823,7 @@ module.exports = AtomEnvironment;
 
 // Preserve this deprecation until 2.0. Sorry. Should have removed Q sooner.
 Promise.prototype.done = function (callback) {
-  deprecate('Pulsar now uses ES6 Promises instead of Q. Call promise.then instead of promise.done')
+  deprecate('Lumine now uses ES6 Promises instead of Q. Call promise.then instead of promise.done')
   return this.then(callback)
 }
 

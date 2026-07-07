@@ -445,7 +445,7 @@ module.exports = class WASMTreeSitterGrammar {
   // A grammar's queries typically will not change after initial load. When
   // they do, it may mean:
   //
-  // - The user is editing query files in dev mode; Pulsar will automatically
+  // - The user is editing query files in dev mode; Lumine will automatically
   //   reload queries in dev mode after changes.
   // - A community package is altering a query file via an API like
   //   {::setQueryForTest}.

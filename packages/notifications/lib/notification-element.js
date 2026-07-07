@@ -192,7 +192,7 @@ module.exports =
         issueButton.remove();
         fatalNotification.textContent = `The error was thrown from the ${packageName} package. `;
       } else {
-        fatalNotification.textContent = "This is likely a bug in Pulsar. ";
+        fatalNotification.textContent = "This is likely a bug in Lumine. ";
       }
 
       // We only show the create issue button if it's clearly in atom core or in a package with a repo url
@@ -200,12 +200,12 @@ module.exports =
         if ((packageName != null) && (repoUrl != null)) {
           issueButton.textContent = `Create issue on the ${packageName} package`;
         } else {
-          issueButton.textContent = "Create issue on pulsar-edit/pulsar";
+          issueButton.textContent = "Create issue on lumine-editor/lumine";
         }
 
         const promises = [];
         promises.push(this.issue.findSimilarIssues());
-        promises.push(UserUtilities.checkPulsarUpToDate());
+        promises.push(UserUtilities.checkLumineUpToDate());
         if (packageName != null) {
           promises.push(UserUtilities.checkPackageUpToDate(packageName));
         }
@@ -238,8 +238,8 @@ Upgrading to the latest version may fix this issue.\
 
             fatalNotification.innerHTML += `\
 <br><br>
-Locally installed core Pulsar package <code>${packageName}</code> is out of date: ${packageCheck.installedVersion} installed locally;
-${packageCheck.versionShippedWithPulsar} included with the version of Pulsar you're running.
+Locally installed core Lumine package <code>${packageName}</code> is out of date: ${packageCheck.installedVersion} installed locally;
+${packageCheck.versionShippedWithLumine} included with the version of Lumine you're running.
 Removing the locally installed version may fix this issue.\
 `;
 
@@ -254,9 +254,9 @@ Use: <code>apm unlink ${packagePath}</code>\
             issueButton.remove();
 
             fatalNotification.innerHTML += `\
-Pulsar is out of date: ${atomCheck.installedVersion} installed;
+Lumine is out of date: ${atomCheck.installedVersion} installed;
 ${atomCheck.latestVersion} latest.
-Upgrading to the <a href='https://github.com/pulsar-edit/pulsar/releases/tag/v${atomCheck.latestVersion}'>latest version</a> may fix this issue.\
+Upgrading to the <a href='https://github.com/lumine-editor/lumine/releases/tag/v${atomCheck.latestVersion}'>latest version</a> may fix this issue.\
 `;
           } else {
             fatalNotification.innerHTML += " You can help by creating an issue. Please explain what actions triggered this error.";

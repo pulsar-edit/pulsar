@@ -15,9 +15,9 @@ const url = require('url');
 const { EventEmitter } = require('events');
 const StartupTime = require('../startup-time');
 
-let ICON_PATH = path.resolve(process.resourcesPath, 'pulsar.png');
+let ICON_PATH = path.resolve(process.resourcesPath, 'lumine.png');
 if(!fs.existsSync(ICON_PATH)) {
-  ICON_PATH = path.resolve(__dirname, '..', '..', 'resources', 'pulsar.png');
+  ICON_PATH = path.resolve(__dirname, '..', '..', 'resources', 'lumine.png');
 }
 
 let includeShellLoadTime = true;
@@ -267,7 +267,7 @@ module.exports = class AtomWindow extends EventEmitter {
         buttons: ['Close Window', 'Reload', 'Keep It Open'],
         cancelId: 2, // Canceling should be the least destructive action
         message: 'The editor has crashed',
-        detail: 'Please report this issue to https://github.com/pulsar-edit/pulsar'
+        detail: 'Please report this issue to https://github.com/lumine-editor/lumine'
       });
 
       switch (result.response) {

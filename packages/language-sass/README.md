@@ -1,6 +1,6 @@
-# Sass/SCSS language support in Pulsar
+# Sass/SCSS language support in Lumine
 
-Adds syntax highlighting and snippets to Sass/SCSS files in Pulsar.
+Adds syntax highlighting and snippets to Sass/SCSS files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Sass TextMate bundle](https://github.com/alexsancho/SASS.tmbundle).
 

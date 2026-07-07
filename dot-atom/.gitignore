@@ -5,4 +5,4 @@ storage
 .apm
 .node-gyp
 .npm
-.pulsar-socket-secret-*
+.lumine-socket-secret-*

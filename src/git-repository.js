@@ -6,7 +6,7 @@ const GitUtils = require('@pulsar-edit/git-utils');
 
 let nextId = 0;
 
-// Extended: Represents the underlying git operations performed by Pulsar.
+// Extended: Represents the underlying git operations performed by Lumine.
 //
 // This class shouldn't be instantiated directly but instead by accessing the
 // `atom.project` global and calling `getRepositories()`. Note that this will

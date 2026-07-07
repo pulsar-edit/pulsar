@@ -66,9 +66,9 @@ export default class IncompatiblePackagesComponent {
         return (
           <div className={'alert icon ' + alertClass}>
             {this.rebuiltPackageCount} of {this.incompatiblePackages.length}{' '}
-            packages were rebuilt successfully. Reload Pulsar to activate them.
+            packages were rebuilt successfully. Reload Lumine to activate them.
             <button ref="reloadButton" className="btn pull-right">
-              Reload Pulsar
+              Reload Lumine
             </button>
           </div>
         );
@@ -76,7 +76,7 @@ export default class IncompatiblePackagesComponent {
         return (
           <div className="alert alert-danger icon icon-bug">
             Some installed packages could not be loaded because they contain
-            native modules that were compiled for an earlier version of Pulsar.
+            native modules that were compiled for an earlier version of Lumine.
             <button
               ref="rebuildButton"
               className="btn pull-right"

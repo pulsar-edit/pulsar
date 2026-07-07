@@ -1,6 +1,6 @@
-# YAML language support in Pulsar
+# YAML language support in Lumine
 
-Adds syntax highlighting to YAML files in Pulsar.
+Adds syntax highlighting to YAML files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [YAML TextMate bundle](https://github.com/textmate/yaml.tmbundle).
 

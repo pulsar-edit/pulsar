@@ -34,7 +34,7 @@ describe('AtomPaths', () => {
 
       /**
       * TODO: FAILING TEST - This test fails with the following output:
-      * Expected '/home/runner/.pulsar' to equal '/home/runner/work/pulsar/pulsar/node_modules/electron/.atom'
+      * Expected '/home/runner/.lumine' to equal '/home/runner/work/lumine/lumine/node_modules/electron/.atom'
       */
       xit('sets ATOM_HOME to the portable .atom folder if it has permission', () => {
         atomPaths.setAtomHome(app.getPath('home'));
@@ -73,7 +73,7 @@ describe('AtomPaths', () => {
 
       /**
       * TODO: FAILING TEST - This test fails with the following output:
-      * Expected '/home/runner/.pulsar' to equal '/home/runner/work/pulsar/pulsar/node_modules/electron/.atom'
+      * Expected '/home/runner/.lumine' to equal '/home/runner/work/lumine/lumine/node_modules/electron/.atom'
       */
       xit('sets ATOM_HOME to a default location if not yet set', () => {
         const expectedPath = path.join(app.getPath('home'), '.atom');

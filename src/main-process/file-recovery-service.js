@@ -78,7 +78,7 @@ module.exports = class FileRecoveryService {
               `Error ${error.code}. There was a crash while saving "${
                 recoveryFile.originalPath
               }", so this file might be blank or corrupted.\n` +
-              `Pulsar couldn't recover it automatically, but a recovery file has been saved at: "${
+              `Lumine couldn't recover it automatically, but a recovery file has been saved at: "${
                 recoveryFile.recoveryPath
               }".`;
             console.log(detail);

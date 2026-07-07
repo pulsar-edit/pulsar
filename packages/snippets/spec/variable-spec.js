@@ -14,7 +14,7 @@ describe('Variable', () => {
 
   let fakeEditor = {
     getTitle () { return 'foo.rb'; },
-    getPath () { return '/Users/pulsar/code/foo.rb'; },
+    getPath () { return '/Users/lumine/code/foo.rb'; },
     getTextInBufferRange (x) {
       return x === true ? 'word' : 'this text is selected';
     },
@@ -33,7 +33,7 @@ describe('Variable', () => {
       'TM_CURRENT_WORD': 'word',
       'TM_LINE_INDEX': '9',
       'TM_LINE_NUMBER': '10',
-      'TM_DIRECTORY': '/Users/pulsar/code',
+      'TM_DIRECTORY': '/Users/lumine/code',
       'TM_SELECTED_TEXT': 'this text is selected'
     };
 

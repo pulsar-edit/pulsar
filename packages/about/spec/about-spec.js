@@ -16,7 +16,7 @@ describe('About', () => {
   });
 
   describe('when the about:about-atom command is triggered', () => {
-    it('shows the About Pulsar view', async () => {
+    it('shows the About Lumine view', async () => {
       // Attaching the workspaceElement to the DOM is required to allow the
       // `toBeVisible()` matchers to work. Anything testing visibility or focus
       // requires that the workspaceElement is on the DOM. Tests that attach the
@@ -31,7 +31,7 @@ describe('About', () => {
     });
   });
 
-  describe('when the Pulsar version number is clicked', () => {
+  describe('when the Lumine version number is clicked', () => {
     it('copies the version number to the clipboard', async () => {
       await atom.workspace.open('atom://about');
       jasmine.attachToDOM(workspaceElement);
@@ -93,8 +93,8 @@ describe('About', () => {
   });
 
   describe('check for update appears', () => {
-    it('when "pulsar-updater" is enabled', async () => {
-      atom.packages.activatePackage('pulsar-updater');
+    it('when "lumine-updater" is enabled', async () => {
+      atom.packages.activatePackage('lumine-updater');
       await atom.workspace.open('atom://about');
       jasmine.attachToDOM(workspaceElement);
 

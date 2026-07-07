@@ -248,7 +248,7 @@ type ServiceProvider = {
     bufferPosition: Point,
     /**
      * The scope descriptor at the given buffer position.
-     * @see https://docs.pulsar-edit.dev/api/pulsar/latest/ScopeDescriptor/
+     * @see https://docs.pulsar-edit.dev/api/lumine/latest/ScopeDescriptor/
      */
     scopeDescriptor: ScopeDescriptor,
     /**

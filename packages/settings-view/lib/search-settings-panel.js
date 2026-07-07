@@ -54,7 +54,7 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
         <section className='section'>
           <div className='section-container'>
             <div className='section-heading icon icon-search-save'>
-              Search Pulsar's Settings
+              Search Lumine's Settings
             </div>
             <div className='editor-container'>
               <TextEditor ref='searchEditor' mini placeholderText='Start Searching for Settings' />

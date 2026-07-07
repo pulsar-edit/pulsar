@@ -1,6 +1,6 @@
-# PHP language support in Pulsar
+# PHP language support in Lumine
 
-Adds syntax highlighting and snippets to PHP files in Pulsar.
+Adds syntax highlighting and snippets to PHP files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [PHP TextMate bundle](https://github.com/textmate/php.tmbundle).
 

@@ -1,6 +1,6 @@
-# Go language support in Pulsar
+# Go language support in Lumine
 
-Adds syntax highlighting and snippets to Go files in Pulsar.
+Adds syntax highlighting and snippets to Go files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Go TextMate bundle](https://github.com/rsms/Go.tmbundle).
 

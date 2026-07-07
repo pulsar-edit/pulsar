@@ -8,7 +8,7 @@ This provider does not currently support project-wide symbol search, but possibl
 
 ## Tags queries
 
-This provider expects for a grammar to have specified a tags query in its grammar definition file. All the built-in Tree-sitter grammars will have such a file. If you’re using a third-party Tree-sitter grammar that hasn’t defined one, file an issue on Pulsar and we’ll see what we can do.
+This provider expects for a grammar to have specified a tags query in its grammar definition file. All the built-in Tree-sitter grammars will have such a file. If you’re using a third-party Tree-sitter grammar that hasn’t defined one, file an issue on Lumine and we’ll see what we can do.
 
 If you’re writing your own grammar, or contributing a `tags.scm` to a grammar without one, keep reading.
 

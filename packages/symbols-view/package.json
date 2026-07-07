@@ -4,7 +4,7 @@
   "main": "./lib/main",
   "types": "./lib/main.d.ts",
   "description": "Jump to a function/method in the current editor or in the project.",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "engines": {
     "atom": "*",
     "node": ">=14"

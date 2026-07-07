@@ -96,7 +96,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
             <div className='section-heading icon icon-paintcan'>Choose a Theme</div>
 
             <div className='text native-key-bindings' tabIndex='-1'>
-              <span className='icon icon-question'>You can also style Pulsar by editing </span>
+              <span className='icon icon-question'>You can also style Lumine by editing </span>
               <a className='link' onclick={this.didClickOpenUserStyleSheet}>your stylesheet</a>
             </div>
 

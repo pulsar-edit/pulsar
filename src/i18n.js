@@ -127,40 +127,40 @@ class I18n {
   }
 
   preload() {
-    // Needed because the built Pulsar version attempts to preload packages, and
-    // quickly bootstrap the Pulsar window. Meaning it all happens before our
+    // Needed because the built Lumine version attempts to preload packages, and
+    // quickly bootstrap the Lumine window. Meaning it all happens before our
     // initial `this.initialize()` method is called. And before our config file
     // has actually been read.
-    // So we need to attempt to load locales for Pulsar without knowing what
+    // So we need to attempt to load locales for Lumine without knowing what
     // languages we should actually support. And we need to ensure bundled/cached
     // packages that are preloaded in a second will succeed in finding the locales
     // they actually should be loading, since otherwise the preload process will
     // ask if they should include a locale from a `null` `this.localeFallbackList`
     // So they won't ever actually load any locales.
-    // The best bet here may be to load all locales, and if Pulsar's locales are
+    // The best bet here may be to load all locales, and if Lumine's locales are
     // loaded when initialize is actually called, we attempt a prune task to remove
-    // unused strings and lower memory usage of Pulsar.
+    // unused strings and lower memory usage of Lumine.
     // But in the meantime until pruning is implemented, we should instead at least
     // ensure our fallback locale is included. But in the future maybe we should
     // consider setting this value to "*" to match any locale? Will have to check
     // if that even works.
-    // As for the initial preload of Pulsar locales before we even have our `resourcePath`
+    // As for the initial preload of Lumine locales before we even have our `resourcePath`
     // We will copy the methodology that `./src/main-process/atom-window.js` uses
     // to determine our 'resourcePath'
     this.localeFallbackList = [ "en" ]; // Hardcode our default fallback value
     // ^^^ For now, we may consider a "*" in the future to load all locales, and prune as needed
-    let tempPulsarLocalePath = path.resolve(process.resourcesPath, "app.asar", "locales");
-    if (!fs.existsSync(tempPulsarLocalePath)) {
-      tempPulsarLocalePath = path.resolve(__dirname, "..", "locales"); // `yarn start` CLI run
+    let tempLumineLocalePath = path.resolve(process.resourcesPath, "app.asar", "locales");
+    if (!fs.existsSync(tempLumineLocalePath)) {
+      tempLumineLocalePath = path.resolve(__dirname, "..", "locales"); // `yarn start` CLI run
     }
-    if (!fs.existsSync(tempPulsarLocalePath)) {
-      tempPulsarLocalePath = path.resolve(__dirname, "..", "..", "resources", "app.asar", "locales");
+    if (!fs.existsSync(tempLumineLocalePath)) {
+      tempLumineLocalePath = path.resolve(__dirname, "..", "..", "resources", "app.asar", "locales");
     }
-    const localesPaths = fs.listSync(tempPulsarLocalePath, ["cson", "json"]);
+    const localesPaths = fs.listSync(tempLumineLocalePath, ["cson", "json"]);
 
     for (const localePath of localesPaths) {
       const localeFilePath = localePath.split(".");
-      // `pulsar.en-US.json` => `en-US`
+      // `lumine.en-US.json` => `en-US`
       const locale = localeFilePath[localeFilePath.length - 2] ?? "";
       // During preload we load all available locales, and MUST prune them later
       this.addStrings(CSON.readFileSync(localePath) || {}, locale);
@@ -177,13 +177,13 @@ class I18n {
     );
 
     if (this.preloadComplete === false) {
-      // Load Pulsar Core Locales
+      // Load Lumine Core Locales
       const localesPath = path.join(resourcePath, "locales");
       const localesPaths = fs.listSync(localesPath, ["cson", "json"]);
 
       for (const localePath of localesPaths) {
         const localeFilePath = localePath.split(".");
-        // `pulsar.en-US.json` => `en-US`
+        // `lumine.en-US.json` => `en-US`
         const locale = localeFilePath[localeFilePath.length - 2] ?? "";
         if (this.shouldIncludeLocale(locale)) {
           this.addStrings(CSON.readFileSync(localePath) || {}, locale);
@@ -286,7 +286,7 @@ class I18n {
 
   // Used in the menu and context-menu when auto-translating labels
   translateLabel(label) {
-    // Since failing to translate menus could crash Pulsar
+    // Since failing to translate menus could crash Lumine
     // We must ensure to fallback to the raw label value
     // But `I18n.translate()` now returns the keyPath on failure
     // So we don't have to protect against it here.

@@ -36,7 +36,7 @@ So from here we import that module, and shim it.
 A word of caution, we are specifically using the older version of `ts-import`
 because this was the version that was used before the developer upgraded the Node
 version supported. Which beyond this they use `node:fs` to import the FS Module,
-which isn't supported on the version of Pulsar we are currently using.
+which isn't supported on the version of Lumine we are currently using.
 
 So once we upgrade our version of NodeJS we will also be able to upgrade `ts-import`
 to it's latest version. That will also mean we have to rewrite `chromium-elements-shim.mjs`

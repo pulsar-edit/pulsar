@@ -484,7 +484,7 @@ class WASMTreeSitterLanguageMode {
   // * How many atomic changes have been made since the last clean tree.
   // * The range that represents the extent of the changes made since the last
   //   clean tree.
-  // * How many times Pulsar requested auto-indent actions that this language
+  // * How many times Lumine requested auto-indent actions that this language
   //   mode couldn't fulfill (see `suggestedIndentForLineAtBufferRow`).
   //
   async atTransactionEnd() {
@@ -1630,11 +1630,11 @@ class WASMTreeSitterLanguageMode {
 //   `@fold.end` that it encounters in the document.
 //
 //   When determining the end of a fold that is marked with `@fold.start`,
-//   Pulsar will search the buffer for the next “balanced” occurrence of
+//   Lumine will search the buffer for the next “balanced” occurrence of
 //   `@fold.end`. For instance, when trying to find a match for a `@fold.start`
-//   on row 9, Pulsar might encounter another `@fold.start` on row 10,
+//   on row 9, Lumine might encounter another `@fold.start` on row 10,
 //   and would then understand that the next `@fold.end` it sees will end
-//   _that_ fold and not the one we're looking for. If Pulsar _does not_ find a
+//   _that_ fold and not the one we're looking for. If Lumine _does not_ find a
 //   matching `@fold.end`, the given line will not be considered to be
 //   foldable.
 //

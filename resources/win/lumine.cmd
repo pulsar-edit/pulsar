@@ -54,7 +54,7 @@ IF "%ATOM_ADD%"=="YES" (
 )
 if "%PACKAGE_MODE%"=="YES" (
   REM In package mode, we should shell out directly to `ppm` instead of
-  REM invoking `Pulsar.exe` at all. But first we need to assemble a list of
+  REM invoking `Lumine.exe` at all. But first we need to assemble a list of
   REM arguments that `ppm.cmd` will understand.
 
   REM Since batch files don't have `while` loops, we've got to fake them with

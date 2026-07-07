@@ -1,9 +1,9 @@
 # Core Packages
 
-This folder contains core packages that are bundled with Pulsar releases. Not all core packages are kept here; please
+This folder contains core packages that are bundled with Lumine releases. Not all core packages are kept here; please
 see the table below for the location of every core package.
 
-> **NOTE:** There is an ongoing effort to migrate more Pulsar packages from their individual repositories to this folder.
+> **NOTE:** There is an ongoing effort to migrate more Lumine packages from their individual repositories to this folder.
 See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate-core-packages.md) for more details.
 
 | Package | Where to find it | Migration issue |
@@ -84,7 +84,7 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **open-on-github** | [`./open-on-github`](./open-on-github) | |
 | **settings-view** | [`./settings-view`](./settings-view) |  |
 | **package-generator** | [`./package-generator`](./package-generator) | |
-| **pulsar-updater** | [`./pulsar-updater`](./pulsar-updater) | |
+| **lumine-updater** | [`./lumine-updater`](./lumine-updater) | |
 | **snippets** | [`./snippets`](./snippets) |  |
 | **solarized-dark-syntax** | [`./solarized-dark-syntax`](./solarized-dark-syntax) | |
 | **solarized-light-syntax** | [`./solarized-light-syntax`](./solarized-light-syntax) | |

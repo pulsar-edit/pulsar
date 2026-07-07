@@ -503,7 +503,7 @@ module.exports = class Selection {
   //   * `autoDecreaseIndent` If `true`, decreases indent level appropriately
   //     (for example, when a closing bracket is inserted).
   //   * `preserveTrailingLineIndentation` By default, when pasting multiple
-  //   lines, Pulsar attempts to preserve the relative indent level between the
+  //   lines, Lumine attempts to preserve the relative indent level between the
   //   first line and trailing lines, even if the indent level of the first
   //   line has changed from the copied text. If this option is `true`, this
   //   behavior is suppressed.

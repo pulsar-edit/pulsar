@@ -1,12 +1,12 @@
 # Snippets package
 
-Expand snippets matching the current prefix with <kbd>tab</kbd> in Pulsar.
+Expand snippets matching the current prefix with <kbd>tab</kbd> in Lumine.
 
-To add your own snippets, select the _Pulsar > Snippets..._ menu option if you're using macOS, or the _File > Snippets..._ menu option if you're using Windows, or the _Edit > Snippets..._ menu option if you are using Linux.
+To add your own snippets, select the _Lumine > Snippets..._ menu option if you're using macOS, or the _File > Snippets..._ menu option if you're using Windows, or the _Edit > Snippets..._ menu option if you are using Linux.
 
 ## Snippet Format
 
-Snippets files are stored in a package's `snippets/` folder and also loaded from `~/.pulsar/snippets.cson`. They can be either `.json` or `.cson` file types.
+Snippets files are stored in a package's `snippets/` folder and also loaded from `~/.lumine/snippets.cson`. They can be either `.json` or `.cson` file types.
 
 ```coffee
 '.source.js':
@@ -95,15 +95,15 @@ This package supports a subset of the features of TextMate snippets, [documented
 
 The following features from TextMate snippets are not yet supported:
 
-* Interpolated shell code can’t reliably be supported cross-platform, and is probably a bad idea anyway. No other editors that support snippets have adopted this feature, and Pulsar won’t either.
+* Interpolated shell code can’t reliably be supported cross-platform, and is probably a bad idea anyway. No other editors that support snippets have adopted this feature, and Lumine won’t either.
 
 The following features from VSCode snippets are not yet supported:
 
-* “Choice” syntax like `${1|one,two,three|}` requires that the autocomplete engine pop up a menu to offer the user a choice between the available placeholder options. This may be supported in the future, but right now Pulsar effectively converts this to `${1:one}`, treating the first choice as a conventional placeholder.
+* “Choice” syntax like `${1|one,two,three|}` requires that the autocomplete engine pop up a menu to offer the user a choice between the available placeholder options. This may be supported in the future, but right now Lumine effectively converts this to `${1:one}`, treating the first choice as a conventional placeholder.
 
 ### Variables
 
-Pulsar snippets support all of the variables mentioned in the [LSP specification][lsp], plus many of the variables [supported by VSCode][vscode].
+Lumine snippets support all of the variables mentioned in the [LSP specification][lsp], plus many of the variables [supported by VSCode][vscode].
 
 Variables can be referenced with `$`, either without braces (`$CLIPBOARD`) or with braces (`${CLIPBOARD}`). Variables can also have fallback values (`${CLIPBOARD:http://example.com}`), simple flag-based transformations (`${CLIPBOARD:/upcase}`), or `sed`-style transformations (`${CLIPBOARD/ /_/g}`).
 
@@ -124,7 +124,7 @@ Any variable that has no value — for instance, `TM_FILENAME` on an untitled d
 
 #### Variable transformation flags
 
-Pulsar supports the three flags defined in the [LSP snippets specification][lsp] and two other flags that are [implemented in VSCode][vscode]:
+Lumine supports the three flags defined in the [LSP snippets specification][lsp] and two other flags that are [implemented in VSCode][vscode]:
 
 * `/upcase` (`foo` → `FOO`)
 * `/downcase` (`BAR` → `bar`)
@@ -152,14 +152,14 @@ These transformation flags can also be applied on backreferences in `sed`-style 
 
 #### Variable caveats
 
-* `WORKSPACE_NAME`, `WORKSPACE_FOLDER`, and `RELATIVE_PATH` all rely on the presence of a root project folder, but a Pulsar project can technically have multiple root folders. While this is rare, it is handled by `snippets` as follows: whichever project path is an ancestor of the currently active file is treated as the project root — or the first one found if multiple roots are ancestors.
-* `WORKSPACE_NAME` in VSCode refers to “the name of the opened workspace or folder.” In the former case, this appears to mean bundled projects with a `.code-workspace` file extension — which have no Pulsar equivalent. Instead, `WORKSPACE_NAME` will always refer to the last path component of your project’s root directory as defined above.
+* `WORKSPACE_NAME`, `WORKSPACE_FOLDER`, and `RELATIVE_PATH` all rely on the presence of a root project folder, but a Lumine project can technically have multiple root folders. While this is rare, it is handled by `snippets` as follows: whichever project path is an ancestor of the currently active file is treated as the project root — or the first one found if multiple roots are ancestors.
+* `WORKSPACE_NAME` in VSCode refers to “the name of the opened workspace or folder.” In the former case, this appears to mean bundled projects with a `.code-workspace` file extension — which have no Lumine equivalent. Instead, `WORKSPACE_NAME` will always refer to the last path component of your project’s root directory as defined above.
 
 #### Variables that are not yet supported
 
-Of the variables supported by VSCode, Pulsar does not yet support:
+Of the variables supported by VSCode, Lumine does not yet support:
 
-* `UUID` (Will automatically be supported when Pulsar uses a version of Electron that has native `crypto.randomUUID`.)
+* `UUID` (Will automatically be supported when Lumine uses a version of Electron that has native `crypto.randomUUID`.)
 
 ## Multi-line Snippet Body
 
@@ -201,7 +201,7 @@ Likewise, if your snippet includes literal references to `$` or `{`, you may hav
 
 ## Multiple snippets for the same scope
 
-Snippets for the same scope must be placed within the same key. See [this section of the Pulsar documentation](https://docs.pulsar-edit.dev/customizing-pulsar/configuring-with-cson/) for more information.
+Snippets for the same scope must be placed within the same key. See [this section of the Lumine documentation](https://docs.pulsar-edit.dev/customizing-lumine/configuring-with-cson/) for more information.
 
 
 [lsp]: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#variables

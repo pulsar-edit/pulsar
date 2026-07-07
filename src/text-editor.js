@@ -36,7 +36,7 @@ const DEFAULT_NON_WORD_CHARACTERS = '/\\()"\':,.;<>~!@#$%^&*|+=[]{}`?-…';
 // If you're manipulating the state of an editor, use this class.
 //
 // A single {TextBuffer} can belong to multiple editors. For example, if the
-// same file is open in two different panes, Pulsar creates a separate editor for
+// same file is open in two different panes, Lumine creates a separate editor for
 // each pane. If the buffer is manipulated the changes are reflected in both
 // editors, but each maintains its own cursor position, folded lines, etc.
 //
@@ -325,7 +325,7 @@ module.exports = class TextEditor {
       \`TextEditor.prototype.editorElement\` has always been private, but now
       it is gone. Reading the \`editorElement\` property still returns a
       reference to the editor element but this field will be removed in a
-      later version of Pulsar, so we recommend using the \`element\` property instead.\
+      later version of Lumine, so we recommend using the \`element\` property instead.\
     `);
 
     return this.getElement();
@@ -1472,7 +1472,7 @@ module.exports = class TextEditor {
   // contents that do not match what is currently written to disk.
   //
   // This can happen if another process writes to a file after you start to
-  // edit it in Pulsar, but before you're able to save those changes. It can
+  // edit it in Lumine, but before you're able to save those changes. It can
   // also happen if you switch branches in version control while a certain
   // buffer has uncommitted changes.
   isInConflict () {
@@ -5945,7 +5945,7 @@ module.exports = class TextEditor {
   // Public: Return information about the appropriate comment delimiters to use
   // at a given point in the buffer.
   //
-  // Pulsar allows language bundles to define comment delimiters in several
+  // Lumine allows language bundles to define comment delimiters in several
   // places. For instance, a grammar author can place delimiter metadata in the
   // grammar definition file, or as scope-specific settings in the ordinary
   // config system — or a combination of the two.

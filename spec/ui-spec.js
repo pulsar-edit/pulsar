@@ -33,7 +33,7 @@ describe("Renders Markdown", () => {
       expect(atom.ui.markdown.render("[Hello World](https://github.com)"))
         .toBe('<p><a href="https://github.com">Hello World</a></p>\n');
     });
-    it("resolves package links to pulsar", () => {
+    it("resolves package links to lumine", () => {
       expect(atom.ui.markdown.render("[Hello](https://atom.io/packages/hey-pane)"))
         .toBe('<p><a href="https://web.pulsar-edit.dev/packages/hey-pane">Hello</a></p>\n');
     });
@@ -44,14 +44,14 @@ describe("Renders Markdown", () => {
     it("resolves incomplete local links", () => {
       expect(atom.ui.markdown.render(
         "[Hello](./readme.md)",
-        { rootDomain: "https://github.com/pulsar-edit/pulsar" }
-      )).toBe('<p><a href="https://github.com/pulsar-edit/pulsar/blob/HEAD/readme.md">Hello</a></p>\n');
+        { rootDomain: "https://github.com/lumine-editor/lumine" }
+      )).toBe('<p><a href="https://github.com/lumine-editor/lumine/blob/HEAD/readme.md">Hello</a></p>\n');
     });
     it("resolves incomplete root links", () => {
       expect(atom.ui.markdown.render(
         "[Hello](/readme.md)",
-        { rootDomain: "https://github.com/pulsar-edit/pulsar" }
-      )).toBe('<p><a href="https://github.com/pulsar-edit/pulsar/blob/HEAD/readme.md">Hello</a></p>\n');
+        { rootDomain: "https://github.com/lumine-editor/lumine" }
+      )).toBe('<p><a href="https://github.com/lumine-editor/lumine/blob/HEAD/readme.md">Hello</a></p>\n');
     });
   });
 
@@ -59,8 +59,8 @@ describe("Renders Markdown", () => {
     it("properly handles a standard PNG image", () => {
       expect(atom.ui.markdown.render(
         "![Alt Text](/image-link.png)",
-        { rootDomain: "https://github.com/pulsar-edit/pulsar" }
-      )).toBe('<p><img src="https://github.com/pulsar-edit/pulsar/raw/HEAD/image-link.png" alt="Alt Text"></p>\n');
+        { rootDomain: "https://github.com/lumine-editor/lumine" }
+      )).toBe('<p><img src="https://github.com/lumine-editor/lumine/raw/HEAD/image-link.png" alt="Alt Text"></p>\n');
     });
 
     it("handles 'data:image/svg+xml' images", () => {

@@ -653,7 +653,7 @@ describe('TextEditorComponent', () => {
     /**
     * TODO: FAILING TEST - This test fails with the following output:
     * Error: Timed out waiting on anonymous condition at
-    * conditionPromise (/home/runner/work/pulsar/pulsar/spec/async-spec-helpers.js:20:13)
+    * conditionPromise (/home/runner/work/lumine/lumine/spec/async-spec-helpers.js:20:13)
     */
     xit('blinks cursors when the editor is focused and the cursors are not moving', async () => {
       assertDocumentFocused();

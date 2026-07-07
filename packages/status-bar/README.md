@@ -14,7 +14,7 @@ The status bar package accepts the following configuration values:
 
 ## API
 
-This package provides a service that you can use in other Pulsar packages. To use it, include `status-bar` in the `consumedServices` section of your `package.json`:
+This package provides a service that you can use in other Lumine packages. To use it, include `status-bar` in the `consumedServices` section of your `package.json`:
 
 ```json
 {

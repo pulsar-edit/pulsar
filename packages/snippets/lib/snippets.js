@@ -142,7 +142,7 @@ module.exports = {
 
     this.subscriptions = new CompositeDisposable
     this.subscriptions.add(atom.workspace.addOpener(uri => {
-      if (uri === 'atom://.pulsar/snippets') {
+      if (uri === 'atom://.lumine/snippets') {
         return atom.workspace.openTextFile(this.getUserSnippetsPath())
       }
     }))
@@ -274,7 +274,7 @@ module.exports = {
         } catch (e) {
           const message = `\
           Unable to watch path: \`snippets.cson\`. Make sure you have permissions
-          to the \`~/.pulsar\` directory and \`${userSnippetsPath}\`.
+          to the \`~/.lumine\` directory and \`${userSnippetsPath}\`.
 
           On linux there are currently problems with watch sizes. See
           [this document][watches] for more info.

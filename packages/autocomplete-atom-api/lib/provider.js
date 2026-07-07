@@ -61,7 +61,7 @@ module.exports = {
     if (editorPath != null) {
       const parsedPath = path.parse(editorPath);
       const basename = path.basename(parsedPath.dir);
-      if ((basename === '.atom') || (basename === '.pulsar')) {
+      if ((basename === '.atom') || (basename === '.lumine')) {
         if ((parsedPath.base === 'init.coffee') || (parsedPath.base === 'init.js')) {
           return true;
         }

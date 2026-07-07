@@ -113,16 +113,16 @@ if [ $OS == 'Mac' ]; then
   fi
   ATOM_APP="$(dirname "$(dirname "$(dirname "$SCRIPT")")")"
 
-  # If this is a `pulsar.sh` from a built version of Pulsar, then `$ATOM_APP`
-  # should now be the path to the user's instance of Pulsar.app.
+  # If this is a `lumine.sh` from a built version of Lumine, then `$ATOM_APP`
+  # should now be the path to the user's instance of Lumine.app.
   if [[ "$ATOM_APP" == . || "$ATOM_APP" != *".app" ]]; then
-    # This is a `pulsar.sh` that's in the source code of Pulsar or has been
+    # This is a `lumine.sh` that's in the source code of Lumine or has been
     # copied to a location outside of the app (instead of symlinked). We'll try
     # another tactic.
     unset ATOM_APP
   else
-    # We found the location of the Pulsar.app that this script lives in.
-    PULSAR_PATH="$(dirname "$ATOM_APP")"
+    # We found the location of the Lumine.app that this script lives in.
+    LUMINE_PATH="$(dirname "$ATOM_APP")"
     ATOM_APP_NAME="$(basename "$ATOM_APP")"
   fi
 
@@ -134,42 +134,42 @@ if [ $OS == 'Mac' ]; then
     ATOM_APP_NAME="${ATOM_EXECUTABLE_NAME}.app"
   fi
 
-  if [ -z "${PULSAR_PATH}" ]; then
-    # If PULSAR_PATH isn't set, check /Applications and then ~/Applications for
-    # Pulsar.app.
+  if [ -z "${LUMINE_PATH}" ]; then
+    # If LUMINE_PATH isn't set, check /Applications and then ~/Applications for
+    # Lumine.app.
     if [ -x "/Applications/${ATOM_APP_NAME}" ]; then
-      PULSAR_PATH="/Applications"
+      LUMINE_PATH="/Applications"
     elif [ -x "$HOME/Applications/${ATOM_APP_NAME}" ]; then
-      PULSAR_PATH="$HOME/Applications"
+      LUMINE_PATH="$HOME/Applications"
     else
       # We still haven't found it. Let's try searching for it via
       # Spotlight.
-      PULSAR_APP_SEARCH_RESULT="$(mdfind "kMDItemCFBundleIdentifier == 'io.github.lumine-editor.${BASENAME}'" | grep -v ShipIt | head -1)"
-      if [ ! -z "$PULSAR_APP_SEARCH_RESULT" ]; then
-        PULSAR_PATH="$(dirname "$PULSAR_APP_SEARCH_RESULT")"
-        ATOM_APP_NAME="$(basename "$PULSAR_APP_SEARCH_RESULT")"
+      LUMINE_APP_SEARCH_RESULT="$(mdfind "kMDItemCFBundleIdentifier == 'io.github.lumine-editor.${ATOM_BASE_NAME}'" | grep -v ShipIt | head -1)"
+      if [ ! -z "$LUMINE_APP_SEARCH_RESULT" ]; then
+        LUMINE_PATH="$(dirname "$LUMINE_APP_SEARCH_RESULT")"
+        ATOM_APP_NAME="$(basename "$LUMINE_APP_SEARCH_RESULT")"
       fi
     fi
   fi
 
-  PULSAR_EXECUTABLE="$PULSAR_PATH/$ATOM_APP_NAME/Contents/MacOS/$ATOM_EXECUTABLE_NAME"
-  PPM_EXECUTABLE="$PULSAR_PATH/$ATOM_APP_NAME/Contents/Resources/app/ppm/bin/ppm"
+  LUMINE_EXECUTABLE="$LUMINE_PATH/$ATOM_APP_NAME/Contents/MacOS/$ATOM_EXECUTABLE_NAME"
+  PPM_EXECUTABLE="$LUMINE_PATH/$ATOM_APP_NAME/Contents/Resources/app/ppm/bin/ppm"
 
-  # Exit if Pulsar can't be found.
-  if [ ! -x "${PULSAR_EXECUTABLE}" ]; then
-    echoerr "Cannot locate ${ATOM_APP_NAME}; it is usually located in /Applications. Set the PULSAR_PATH environment variable to the directory containing ${ATOM_APP_NAME}."
+  # Exit if Lumine can't be found.
+  if [ ! -x "${LUMINE_EXECUTABLE}" ]; then
+    echoerr "Cannot locate ${ATOM_APP_NAME}; it is usually located in /Applications. Set the LUMINE_PATH environment variable to the directory containing ${ATOM_APP_NAME}."
     exit 1
   fi
 
   # If `-p` or `--package` was specified, call `ppm` with all the arguments
-  # that followed it instead of calling the Pulsar executable directly.
+  # that followed it instead of calling the Lumine executable directly.
   if [ $PACKAGE_MODE ]; then
     "$PPM_EXECUTABLE" "$@"
     exit $?
   fi
 
   if [ $EXPECT_OUTPUT ]; then
-    "$PULSAR_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@"
+    "$LUMINE_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@"
     ATOM_EXIT=$?
     if [ ${ATOM_EXIT} -eq 0 ] && [ -n "${EXIT_CODE_OVERRIDE}" ]; then
       exit "${EXIT_CODE_OVERRIDE}"
@@ -177,7 +177,7 @@ if [ $OS == 'Mac' ]; then
       exit ${ATOM_EXIT}
     fi
   else
-    open -a "$PULSAR_PATH/$ATOM_APP_NAME" -n -g --args --executed-from="$(pwd)" --pid=$$ --path-environment="$PATH" "$@"
+    open -a "$LUMINE_PATH/$ATOM_APP_NAME" -n -g --args --executed-from="$(pwd)" --pid=$$ --path-environment="$PATH" "$@"
   fi
 elif [ $OS == 'Linux' ]; then
 
@@ -193,61 +193,61 @@ elif [ $OS == 'Linux' ]; then
   ATOM_EXECUTABLE_NAME=$ATOM_BASE_NAME
   ATOM_APP_NAME="Lumine"
 
-  # If `PULSAR_PATH` is set by the user, we'll assume they know what they're
+  # If `LUMINE_PATH` is set by the user, we'll assume they know what they're
   # doing. Otherwise we should try to find it ourselves.
-  if [ -z "${PULSAR_PATH}" ]; then
-    # Attempt to infer the installation directory of Pulsar from the location
+  if [ -z "${LUMINE_PATH}" ]; then
+    # Attempt to infer the installation directory of Lumine from the location
     # of this script. When symlinked to a common location like
     # `/usr/local/bin`, this approach should find the true location of the
-    # Pulsar installation.
+    # Lumine installation.
     if [ -L "$0" ]; then
       SCRIPT="$(readlink -f "$0")"
     else
       SCRIPT="$0"
     fi
 
-    # The `pulsar.sh` file lives one directory deeper than the root directory
-    # that contains the `pulsar` binary.
+    # The `lumine.sh` file lives one directory deeper than the root directory
+    # that contains the `lumine` binary.
     ATOM_APP="$(dirname "$(dirname "$SCRIPT")")"
-    PULSAR_PATH="$(realpath "$ATOM_APP")"
+    LUMINE_PATH="$(realpath "$ATOM_APP")"
 
-    if [ ! -f "$PULSAR_PATH/${ATOM_EXECUTABLE_NAME}" ]; then
-      # If that path doesn't contain a `pulsar` executable, then it's not a
+    if [ ! -f "$LUMINE_PATH/${ATOM_EXECUTABLE_NAME}" ]; then
+      # If that path doesn't contain a `lumine` executable, then it's not a
       # valid path. We'll try something else.
       unset ATOM_APP
-      unset PULSAR_PATH
+      unset LUMINE_PATH
     fi
 
-    if [ -z "${PULSAR_PATH}" ]; then
+    if [ -z "${LUMINE_PATH}" ]; then
       if [ -f "/opt/${ATOM_APP_NAME}/${ATOM_EXECUTABLE_NAME}" ]; then
         # Check the default installation directory for RPM and DEB
         # distributions.
-        PULSAR_PATH="/opt/${ATOM_APP_NAME}"
-      elif [ -f "$TMPDIR/pulsar-build/${ATOM_APP_NAME}/${ATOM_EXECUTABLE_NAME}" ]; then
-        # This is where Pulsar can be found during some CI build tasks.
-        PULSAR_PATH="$TMPDIR/pulsar-build/${ATOM_APP_NAME}"
+        LUMINE_PATH="/opt/${ATOM_APP_NAME}"
+      elif [ -f "$TMPDIR/lumine-build/${ATOM_APP_NAME}/${ATOM_EXECUTABLE_NAME}" ]; then
+        # This is where Lumine can be found during some CI build tasks.
+        LUMINE_PATH="$TMPDIR/lumine-build/${ATOM_APP_NAME}"
       else
-        echoerr "Cannot locate ${ATOM_APP_NAME}. Set the PULSAR_PATH environment variable to the directory containing the \`${ATOM_BASE_NAME}\` executable."
+        echoerr "Cannot locate ${ATOM_APP_NAME}. Set the LUMINE_PATH environment variable to the directory containing the \`${ATOM_BASE_NAME}\` executable."
         exit 1
       fi
     fi
   fi
 
-  PULSAR_EXECUTABLE="$PULSAR_PATH/$ATOM_EXECUTABLE_NAME"
+  LUMINE_EXECUTABLE="$LUMINE_PATH/$ATOM_EXECUTABLE_NAME"
 
   PPM_EXECUTABLE_NAME="ppm"
 
-  PPM_EXECUTABLE="$PULSAR_PATH/resources/app/ppm/bin/$PPM_EXECUTABLE_NAME"
+  PPM_EXECUTABLE="$LUMINE_PATH/resources/app/ppm/bin/$PPM_EXECUTABLE_NAME"
 
   # If `-p` or `--package` was specified, call `ppm` with all the arguments
-  # that followed it instead of calling the Pulsar executable directly.
+  # that followed it instead of calling the Lumine executable directly.
   if [ $PACKAGE_MODE ]; then
     "$PPM_EXECUTABLE" "$@"
     exit $?
   fi
 
   if [ $EXPECT_OUTPUT ]; then
-    "$PULSAR_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox
+    "$LUMINE_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox
     ATOM_EXIT=$?
     if [ ${ATOM_EXIT} -eq 0 ] && [ -n "${EXIT_CODE_OVERRIDE}" ]; then
       exit "${EXIT_CODE_OVERRIDE}"
@@ -256,7 +256,7 @@ elif [ $OS == 'Linux' ]; then
     fi
   else
     (
-    nohup "$PULSAR_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox > "$ATOM_HOME/nohup.out" 2>&1
+    nohup "$LUMINE_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox > "$ATOM_HOME/nohup.out" 2>&1
     if [ $? -ne 0 ]; then
       cat "$ATOM_HOME/nohup.out"
       exit $?
@@ -265,13 +265,13 @@ elif [ $OS == 'Linux' ]; then
   fi
 fi
 
-# Exits this process when Pulsar is used as $EDITOR
+# Exits this process when Lumine is used as $EDITOR
 on_die() {
   exit 0
 }
 trap 'on_die' SIGQUIT SIGTERM
 
-# If the wait flag is set, don't exit this process until Pulsar kills it.
+# If the wait flag is set, don't exit this process until Lumine kills it.
 if [ $WAIT ]; then
   WAIT_FIFO="$ATOM_HOME/.wait_fifo"
 

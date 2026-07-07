@@ -1,14 +1,14 @@
 {
   "name": "language-rust-bundled",
   "version": "0.1.1",
-  "description": "Rust support for Pulsar",
+  "description": "Rust support for Lumine",
   "keywords": [
     "language",
     "grammar",
     "rust"
   ],
   "main": "lib/main.js",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0",

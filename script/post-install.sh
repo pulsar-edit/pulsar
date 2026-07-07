@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install `resources/pulsar.sh` to `/usr/bin/pulsar`.
+# Install `resources/lumine.sh` to `/usr/bin/lumine`.
 FILESOURCE='/opt/${sanitizedProductName}/resources/${executable}.sh'
 FILEDEST='/usr/bin/${executable}'
 

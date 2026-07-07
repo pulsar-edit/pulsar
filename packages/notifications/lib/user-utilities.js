@@ -137,7 +137,7 @@ module.exports = {
     });
   },
 
-  checkPulsarUpToDate() {
+  checkLumineUpToDate() {
     const installedVersion = atom.getVersion().replace(/-.*$/, '');
     return {
       upToDate: true,
@@ -151,7 +151,7 @@ module.exports = {
     return (pack != null ? pack.metadata.version : undefined);
   },
 
-  getPackageVersionShippedWithPulsar(packageName) {
+  getPackageVersionShippedWithLumine(packageName) {
     return require(path.join(atom.getLoadSettings().resourcePath, 'package.json')).packageDependencies[packageName];
   },
 
@@ -177,17 +177,17 @@ module.exports = {
       const installedVersion = this.getPackageVersion(packageName);
       let upToDate = (installedVersion != null) && semver.gte(installedVersion, latestPackageData?.releases?.latest);
       const latestVersion = latestPackageData?.releases?.latest;
-      const versionShippedWithPulsar = this.getPackageVersionShippedWithPulsar(packageName);
+      const versionShippedWithLumine = this.getPackageVersionShippedWithLumine(packageName);
 
-      if (isCore = (versionShippedWithPulsar != null)) {
+      if (isCore = (versionShippedWithLumine != null)) {
         // A core package is out of date if the version which is being used
         // is lower than the version which normally ships with the version
-        // of Pulsar which is running. This will happen when there's a locally
-        // installed version of the package with a lower version than Pulsar's.
-        upToDate = (installedVersion != null) && semver.gte(installedVersion, versionShippedWithPulsar);
+        // of Lumine which is running. This will happen when there's a locally
+        // installed version of the package with a lower version than Lumine's.
+        upToDate = (installedVersion != null) && semver.gte(installedVersion, versionShippedWithLumine);
       }
 
-      return {isCore, upToDate, latestVersion, installedVersion, versionShippedWithPulsar};
+      return {isCore, upToDate, latestVersion, installedVersion, versionShippedWithLumine};
   });
   }
 };

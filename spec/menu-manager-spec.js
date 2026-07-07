@@ -113,8 +113,8 @@ describe('MenuManager', function() {
       );
       atom.i18n.addStrings({
         example: {
-          stringKey: "Hello Pulsar",
-          otherStringKey: "Goodbye Pulsar"
+          stringKey: "Hello Lumine",
+          otherStringKey: "Goodbye Lumine"
         }
       }, "en");
 
@@ -123,9 +123,9 @@ describe('MenuManager', function() {
       ]);
       expect(menu.template).toEqual([
         {
-          label: 'Hello Pulsar',
-          id: 'Hello Pulsar',
-          submenu: [{ label: 'Goodbye Pulsar', id: 'Goodbye Pulsar', command: 'b' }]
+          label: 'Hello Lumine',
+          id: 'Hello Lumine',
+          submenu: [{ label: 'Goodbye Lumine', id: 'Goodbye Lumine', command: 'b' }]
         }
       ]);
       disposable.dispose();

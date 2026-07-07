@@ -1,6 +1,6 @@
 'use strict';
 
-// Pulsar's compile-cache when installing or updating packages, called by apm's Node-js
+// Lumine's compile-cache when installing or updating packages, called by apm's Node-js
 
 const path = require('path');
 const fs = require('fs-plus');

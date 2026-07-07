@@ -1,13 +1,13 @@
 const cache = require("../src/cache.js");
 
-describe("pulsar-updater cache", () => {
+describe("lumine-updater cache", () => {
   beforeEach(() => {
     jasmine.useRealClock();
   });
 
   it("returns key for path", () => {
     let key = cache.cacheKeyForPath("test");
-    expect(key).toBe("pulsar-updater:test");
+    expect(key).toBe("lumine-updater:test");
   });
 
   it("returns not expired properly according to date", () => {

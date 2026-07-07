@@ -3,27 +3,27 @@ function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms, true));
 }
 
-describe('PulsarUpdater', () => {
+describe('LumineUpdater', () => {
 
   let pack, workspaceElement;
   beforeEach(async () => {
-    atom.config.set("pulsar-updater.checkForUpdatesOnLaunch", false);
+    atom.config.set("lumine-updater.checkForUpdatesOnLaunch", false);
     workspaceElement = atom.views.getView(atom.workspace);
-    pack = await atom.packages.activatePackage('pulsar-updater');
+    pack = await atom.packages.activatePackage('lumine-updater');
     pack.mainModule.cache?.empty("last-update-check");
   });
 
   afterEach(async () => {
     pack.mainModule.cache?.empty("last-update-check");
-    await atom.packages.deactivatePackage('pulsar-updater');
+    await atom.packages.deactivatePackage('lumine-updater');
   });
 
-  describe('when pulsar-updater:check-for-updates is triggered', () => {
+  describe('when lumine-updater:check-for-updates is triggered', () => {
     beforeEach(async () => {
       spyOn(pack.mainModule, 'checkForUpdates');
     })
     it('triggers an update check', () => {
-      atom.commands.dispatch(workspaceElement, 'pulsar-updater:check-for-update');
+      atom.commands.dispatch(workspaceElement, 'lumine-updater:check-for-update');
       expect(pack.mainModule.checkForUpdates).toHaveBeenCalled();
     });
   });
@@ -45,7 +45,7 @@ describe('PulsarUpdater', () => {
 
     it("signals that the user should update", async () => {
       jasmine.useRealClock();
-      atom.commands.dispatch(workspaceElement, 'pulsar-updater:check-for-update');
+      atom.commands.dispatch(workspaceElement, 'lumine-updater:check-for-update');
       await wait(200);
       expect(pack.mainModule.notifyAboutUpdate).toHaveBeenCalledWith("2.0.0");
       expect(pack.mainModule.notifyAboutCurrent).not.toHaveBeenCalled();
@@ -64,7 +64,7 @@ describe('PulsarUpdater', () => {
 
     it("takes no action", async () => {
       jasmine.useRealClock();
-      atom.commands.dispatch(workspaceElement, 'pulsar-updater:check-for-update');
+      atom.commands.dispatch(workspaceElement, 'lumine-updater:check-for-update');
       await wait(200);
       expect(pack.mainModule.notifyAboutUpdate).not.toHaveBeenCalled();
       expect(pack.mainModule.notifyAboutCurrent).toHaveBeenCalledWith("1.0.5", true);
@@ -84,7 +84,7 @@ describe('PulsarUpdater', () => {
 
     it("subsequent checks do not result in notifications", async () => {
       jasmine.useRealClock();
-      atom.commands.dispatch(workspaceElement, 'pulsar-updater:check-for-update');
+      atom.commands.dispatch(workspaceElement, 'lumine-updater:check-for-update');
       await wait(200);
 
       expect(pack.mainModule.notifyAboutUpdate).toHaveBeenCalledWith("1.0.6");

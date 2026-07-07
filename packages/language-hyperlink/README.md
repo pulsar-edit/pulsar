@@ -1,7 +1,7 @@
-# Hyperlink colorization in Pulsar
+# Hyperlink colorization in Lumine
 
 Adds syntax highlighting to hyperlinks embedded in strings, comments, and plain
-text in Pulsar.
+text in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
 from the [Hyperlink Helper TextMate bundle](https://github.com/textmate/hyperlink-helper.tmbundle).

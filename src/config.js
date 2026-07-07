@@ -13,7 +13,7 @@ const ScopeDescriptor = require('./scope-descriptor');
 
 const schemaEnforcers = {};
 
-// Essential: Used to access all of Pulsar's configuration details.
+// Essential: Used to access all of Lumine's configuration details.
 //
 // An instance of this class is always available as the `atom.config` global.
 //
@@ -487,7 +487,7 @@ class Config {
   //   * `scope` (optional) {ScopeDescriptor} describing a path from
   //     the root of the syntax tree to a token. Get one by calling
   //     {editor.getLastCursor().getScopeDescriptor()}. See {::get} for examples.
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine#scoped-settings-scopes-and-scope-descriptors)
   //     for more information.
   // * `callback` {Function} to call when the value of the key changes.
   //   * `value` the new value of the key
@@ -531,7 +531,7 @@ class Config {
   //   * `scope` (optional) {ScopeDescriptor} describing a path from
   //     the root of the syntax tree to a token. Get one by calling
   //     {editor.getLastCursor().getScopeDescriptor()}. See {::get} for examples.
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine#scoped-settings-scopes-and-scope-descriptors)
   //     for more information.
   // * `callback` {Function} to call when the value of the key changes.
   //   * `event` {Object}
@@ -613,10 +613,10 @@ class Config {
   //   * `scope` (optional) {ScopeDescriptor} describing a path from
   //     the root of the syntax tree to a token. Get one by calling
   //     {editor.getLastCursor().getScopeDescriptor()}
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine#scoped-settings-scopes-and-scope-descriptors)
   //     for more information.
   //
-  // Returns the value from Pulsar's default settings, the user's configuration
+  // Returns the value from Lumine's default settings, the user's configuration
   // file in the type specified by the configuration schema.
   get(...args) {
     let keyPath, options, scope;
@@ -688,7 +688,7 @@ class Config {
 
   // Essential: Sets the value for a configuration setting.
   //
-  // This value is stored in Pulsar's internal configuration file.
+  // This value is stored in Lumine's internal configuration file.
   //
   // ### Examples
   //
@@ -720,7 +720,7 @@ class Config {
   //   setting to the default value.
   // * `options` (optional) {Object}
   //   * `scopeSelector` (optional) {String}. eg. '.source.ruby'
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine#scoped-settings-scopes-and-scope-descriptors)
   //     for more information.
   //   * `source` (optional) {String} The name of a file with which the setting
   //     is associated. Defaults to the user's config file.

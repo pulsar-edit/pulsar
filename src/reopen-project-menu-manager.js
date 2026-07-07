@@ -69,7 +69,7 @@ module.exports = class ReopenProjectMenuManager {
     }
   }
 
-  // Windows users can right-click Pulsar taskbar and remove project from the jump list.
+  // Windows users can right-click Lumine taskbar and remove project from the jump list.
   // We have to honor that or the group stops working. As we only get a partial list
   // each time we remove them from history entirely.
   async applyWindowsJumpListRemovals() {

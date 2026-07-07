@@ -86,7 +86,7 @@ const CommandInstaller = require('../src/command-installer');
 //     });
 //   });
 //
-//   describe('when installing command line tools for Pulsar', () => {
+//   describe('when installing command line tools for Lumine', () => {
 //     beforeEach(() => {
 //       installer = new CommandInstaller();
 //       installer.initialize('2.0.2');
@@ -96,8 +96,8 @@ const CommandInstaller = require('../src/command-installer');
 //     * TODO: FAILING TEST - This test fails with the following output: (macos only)
 //     * timeout: timed out after 120000 msec waiting for condition
 //     */
-//     it("symlinks the atom command as 'pulsar'", () => {
-//       const installedAtomPath = path.join(installationPath, 'pulsar');
+//     it("symlinks the atom command as 'lumine'", () => {
+//       const installedAtomPath = path.join(installationPath, 'lumine');
 //       expect(fs.isFileSync(installedAtomPath)).toBeFalsy();
 //
 //       waitsFor(done => {
@@ -107,7 +107,7 @@ const CommandInstaller = require('../src/command-installer');
 //             fs.realpathSync(atomBinPath)
 //           );
 //           expect(fs.isExecutableSync(installedAtomPath)).toBe(true);
-//           expect(fs.isFileSync(path.join(installationPath, 'pulsar'))).toBe(
+//           expect(fs.isFileSync(path.join(installationPath, 'lumine'))).toBe(
 //             false
 //           );
 //           done();

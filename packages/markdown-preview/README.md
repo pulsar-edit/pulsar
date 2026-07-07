@@ -35,11 +35,11 @@ There are several valid ways to infer specific languages from language identifie
   * [Linguist](https://github.com/github-linguist/linguist): Used by GitHub (previously the default and only language identification system).
   * [Chroma](https://github.com/alecthomas/chroma): Used by CodeBerg/Gitea/Hugo/Goldmark.
   * [Rouge](https://github.com/rouge-ruby/rouge): Used by GitLab/Jekyll.
-  * [HighlightJS](https://highlightjs.org/): Used in a number of places, but most relevantly on the [Pulsar Package Registry](https://web.pulsar-edit.dev/) website.
+  * [HighlightJS](https://highlightjs.org/): Used in a number of places, but most relevantly on the [Lumine Package Registry](https://web.pulsar-edit.dev/) website.
 
 If none of these systems meets your needs, you may specify custom language identifiers. This may not be as portable as the systems described above, but it will at least produce the desired outcome on your own system.
 
-The setting **Custom Syntax Highlighting Language Identifiers** lets you define a list of custom language identifiers that match up to languages available within your Pulsar installation.
+The setting **Custom Syntax Highlighting Language Identifiers** lets you define a list of custom language identifiers that match up to languages available within your Lumine installation.
 
 For example, if you wanted to map `j` to JavaScript and `p` to Python, you’d add the following text to the **Custom Syntax Highlighting Language Identifiers** field:
 

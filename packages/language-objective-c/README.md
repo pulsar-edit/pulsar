@@ -1,6 +1,6 @@
-# Objective-C language support in Pulsar
+# Objective-C language support in Lumine
 
-Adds syntax highlighting and snippets to Objective-C files in Pulsar.
+Adds syntax highlighting and snippets to Objective-C files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Objective-C TextMate bundle](https://github.com/textmate/objective-c.tmbundle).
 

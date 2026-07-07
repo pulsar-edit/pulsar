@@ -1,6 +1,6 @@
-# HTML language support in Pulsar
+# HTML language support in Lumine
 
-Adds syntax highlighting and snippets to HTML files in Pulsar.
+Adds syntax highlighting and snippets to HTML files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
 from the [HTML TextMate bundle](https://github.com/textmate/html.tmbundle).

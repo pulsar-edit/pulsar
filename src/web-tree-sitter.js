@@ -6,13 +6,13 @@
 // the grammar itself to fill that gap.
 //
 // If a tree-sitter parser is known to fail in a browser when running
-// `tree-sitter playground`, it'll fail in Pulsar — _unless_ we build our own
+// `tree-sitter playground`, it'll fail in Lumine — _unless_ we build our own
 // copy of `web-tree-sitter`.
 //
 // For now, that's what we're doing, along with an `exports.json` file that
 // includes references to any C/C++ stdlib functions that are needed to make a
 // tree-sitter parser work. This includes, but is not limited to, the parsers
-// in the built-in language packages that ship with Pulsar. If a user wants to
+// in the built-in language packages that ship with Lumine. If a user wants to
 // write a third-party package with a tree-sitter parser, and it won't work on
 // vanilla `web-tree-sitter`, it (temporarily) falls on us to bridge that gap.
 //

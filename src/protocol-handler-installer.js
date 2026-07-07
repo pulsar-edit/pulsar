@@ -87,7 +87,7 @@ module.exports = class ProtocolHandlerInstaller {
         dismissable: true,
         icon: 'link',
         description:
-          'Pulsar is not currently set as the default handler for atom:// URIs. Would you like Pulsar to handle ' +
+          'Lumine is not currently set as the default handler for atom:// URIs. Would you like Lumine to handle ' +
           'atom:// URIs?',
         buttons: [
           {

@@ -1,6 +1,6 @@
 # HTML Autocomplete package
 
-HTML tag and attribute autocompletions in Pulsar.
+HTML tag and attribute autocompletions in Lumine.
 
 Tag and attribute autocompletions are powered by the list of HTML tags [here](https://github.com/adobe/brackets/blob/master/src/extensions/default/HTMLCodeHints/HtmlTags.json) and HTML attributes [here](https://github.com/adobe/brackets/blob/master/src/extensions/default/HTMLCodeHints/HtmlAttributes.json).
 Descriptions are powered by [MDN](https://developer.mozilla.org).

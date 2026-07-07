@@ -1,6 +1,6 @@
 # Image View package
 
-Open images in an editor in Pulsar. Support zooming via <kbd>cmd-+</kbd>, <kbd>cmd--</kbd>, and <kbd>cmd-0</kbd>.
+Open images in an editor in Lumine. Support zooming via <kbd>cmd-+</kbd>, <kbd>cmd--</kbd>, and <kbd>cmd-0</kbd>.
 
 
 Currently supports the following file extensions:

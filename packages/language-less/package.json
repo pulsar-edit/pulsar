@@ -7,7 +7,7 @@
     "atom": "*",
     "node": "*"
   },
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "devDependencies": {
     "bluebird": "^2.9.25",
     "season": "^6.0.2",

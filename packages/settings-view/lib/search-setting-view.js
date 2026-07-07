@@ -83,7 +83,7 @@ export default class SearchSettingView {
           if (settingName === 'uriHandlerRegistration') {
             // the URI handler doesn't have any registered uri to actually reach it
             // funnily enough. So we will prompt a notification to go there
-            atom.notifications.addInfo("Sorry, Pulsar is unable to link to this setting. Please select 'URI Handling' on the sidebar.")
+            atom.notifications.addInfo("Sorry, Lumine is unable to link to this setting. Please select 'URI Handling' on the sidebar.")
           } else {
             atom.workspace.open("atom://config/core")
           }

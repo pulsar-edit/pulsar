@@ -529,7 +529,7 @@ class PathWatcher {
 }
 
 // Private: Globally tracked state used to de-duplicate related
-// [PathWatchers]{PathWatcher} backed by emulated Pulsar events or NSFW.
+// [PathWatchers]{PathWatcher} backed by emulated Lumine events or NSFW.
 class PathWatcherManager {
   // Private: Access the currently active manager instance, creating one if
   // necessary.

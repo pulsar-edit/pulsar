@@ -3,7 +3,7 @@
   "version": "1.8.17",
   "main": "./lib/main",
   "description": "Display information about the current editor such as cursor position, file path, grammar, current branch, ahead/behind commits counts, and line diff count.",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "license": "MIT",
   "engines": {
     "atom": "*"

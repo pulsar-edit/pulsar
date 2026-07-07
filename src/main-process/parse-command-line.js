@@ -5,7 +5,7 @@ const yargs = require('yargs');
 const { app } = require('electron');
 
 module.exports = function parseCommandLine(processArgs) {
-  // macOS Gatekeeper adds a flag ("-psn_0_[six or seven digits here]") when it intercepts Pulsar launches.
+  // macOS Gatekeeper adds a flag ("-psn_0_[six or seven digits here]") when it intercepts Lumine launches.
   // (This happens for fresh downloads, new installs, or first launches after upgrading).
   // We don't need this flag, and yargs interprets it as many short flags. So, we filter it out.
   const filteredArgs = processArgs.filter(arg => !arg.startsWith('-psn_'));
@@ -206,7 +206,7 @@ module.exports = function parseCommandLine(processArgs) {
     );
 
     // Exiting the main process with a nonzero exit code on macOS causes the app open to fail with the mysterious
-    // message "LSOpenURLsWithRole() failed for the application /Applications/Pulsar Dev.app with error -10810."
+    // message "LSOpenURLsWithRole() failed for the application /Applications/Lumine Dev.app with error -10810."
     process.exit(0);
   }
 

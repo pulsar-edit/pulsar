@@ -1,6 +1,6 @@
 # Styleguide package
 
-Styleguide will show you all the UI components used in Pulsar. It is useful as a reference when developing themes and packages.
+Styleguide will show you all the UI components used in Lumine. It is useful as a reference when developing themes and packages.
 
 * <kbd>cmd-ctrl-shift-g</kbd> (macOS) and <kbd>ctrl-shift-g</kbd> (Windows and Linux) opens it in a new tab
 * You can click on the section headings to expand/collapse them

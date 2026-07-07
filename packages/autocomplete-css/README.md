@@ -1,6 +1,6 @@
 # CSS Autocomplete package
 
-CSS property name and value autocompletions in Pulsar. Uses the
+CSS property name and value autocompletions in Lumine. Uses the
 [autocomplete-plus](https://github.com/pulsar-edit/autocomplete-plus) package.
 
 This is powered by the list of CSS property and values [here](https://github.com/adobe/brackets/blob/master/src/extensions/default/CSSCodeHints/CSSProperties.json).

@@ -53,7 +53,7 @@ function windows_chocoInstalled() {
     return false;
   }
   
-  return chocoCheck.stdout.includes("pulsar");
+  return chocoCheck.stdout.includes("lumine");
 }
 
 function windows_wingetInstalled() {
@@ -61,13 +61,13 @@ function windows_wingetInstalled() {
     return false;
   }
 
-  let wingetCheck = shell.exec("winget show Pulsar");
+  let wingetCheck = shell.exec("winget show Lumine");
 
   if (wingetCheck.code !== 0) {
     return false;
   }
 
-  return wingetCheck.stdout.includes("Pulsar");
+  return wingetCheck.stdout.includes("Lumine");
 }
 
 function linux_macos_homebrewInstalled() {
@@ -75,13 +75,13 @@ function linux_macos_homebrewInstalled() {
     return false;
   }
 
-  let homebrewCheck = shell.exec("brew list 'pulsar'");
+  let homebrewCheck = shell.exec("brew list 'lumine'");
 
   if (homebrewCheck.code !== 0) {
     return false;
   }
 
-  return homebrewCheck.stdout.includes("pulsar");
+  return homebrewCheck.stdout.includes("lumine");
 }
 
 function linux_nixInstalled() {
@@ -96,13 +96,13 @@ function linux_nixInstalled() {
 
   shell.cd("/nix/store");
 
-  let nixCheck = shell.exec('find -maxdepth 1 -name "*pulsar.nemo_action"');
+  let nixCheck = shell.exec('find -maxdepth 1 -name "*lumine.nemo_action"');
 
   if (nixCheck.code !== 0) {
     return false;
   }
 
-  return nixCheck.stdout.includes("pulsar.nemo_action");
+  return nixCheck.stdout.includes("lumine.nemo_action");
 }
 
 function linux_debGetInstalled() {
@@ -116,11 +116,11 @@ function linux_debGetInstalled() {
     return false;
   }
 
-  return debGetCheck.stdout.includes("pulsar");
+  return debGetCheck.stdout.includes("lumine");
 }
 
 function linux_flatpakInstalled() {
-  return process.env.FLATPAK_ID === "dev.pulsar_edit.Pulsar";
+  return process.env.FLATPAK_ID === "io.github.lumine-editor.lumine";
 }
 
 module.exports = {

@@ -140,7 +140,7 @@ describe("Snippet Loading", () => {
       ]);
     });
 
-    // NOTE: This spec will fail if you're hacking on the Pulsar source code
+    // NOTE: This spec will fail if you're hacking on the Lumine source code
     // with `ATOM_DEV_RESOURCE_PATH`. Just make sure it passes in CI and you'll
     // be fine.
     it("allows other packages to override core packages' snippets", () => {

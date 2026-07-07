@@ -7568,7 +7568,7 @@ psl@^1.1.28:
   dependencies:
     punycode "^2.3.1"
 
-"pulsar-updater@file:packages/pulsar-updater":
+"lumine-updater@file:packages/lumine-updater":
   version "1.0.0"
   dependencies:
     event-kit "github:pulsar-edit/event-kit"

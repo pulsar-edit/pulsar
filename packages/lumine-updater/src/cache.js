@@ -53,7 +53,7 @@ function online() {
 }
 
 function cacheKeyForPath(path) {
-  return `pulsar-updater:${path}`;
+  return `lumine-updater:${path}`;
 }
 
 function expiry() {

@@ -1,9 +1,9 @@
 [Nemo Action]
 Active=true
-Name=Open in Pulsar
-Comment=Open in Pulsar
+Name=Open in Lumine
+Comment=Open in Lumine
 #%U is the current selected file, this will also work on current directory
-Exec=pulsar -n %U
-Icon-Name=pulsar
+Exec=lumine -n %U
+Icon-Name=lumine
 Selection=any
 Extensions=any

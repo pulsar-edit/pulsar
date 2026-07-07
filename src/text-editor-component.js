@@ -1854,10 +1854,10 @@ module.exports = class TextEditorComponent {
 
   didPaste(event) {
     // On Linux, Chromium translates a middle-button mouse click into a
-    // mousedown event *and* a paste event. Since Pulsar supports the middle mouse
+    // mousedown event *and* a paste event. Since Lumine supports the middle mouse
     // click as a way of closing a tab, we only want the mousedown event, not
     // the paste event. And since we don't use the `paste` event for any
-    // behavior in Pulsar, we can no-op the event to eliminate this issue.
+    // behavior in Lumine, we can no-op the event to eliminate this issue.
     // See https://github.com/atom/atom/pull/15183#issue-248432413.
     if (this.getPlatform() === 'linux') event.preventDefault();
   }

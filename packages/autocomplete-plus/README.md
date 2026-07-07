@@ -4,17 +4,17 @@ Displays possible autocomplete suggestions on keystroke (or manually by typing `
 
 ![autocomplete+](https://cloud.githubusercontent.com/assets/744740/7656861/9fb8bcc4-faea-11e4-9814-9dca218ded93.png)
 
-[Changelog](https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md)
+[Changelog](https://github.com/lumine-editor/lumine/blob/master/CHANGELOG.md)
 
 ## Installation
 
-`autocomplete+` is bundled with Pulsar. You don't have to do anything to install it.
+`autocomplete+` is bundled with Lumine. You don't have to do anything to install it.
 
 ## Providers
 
 `autocomplete+` has a powerful autocomplete provider API, allowing provider authors to add language-specific behavior to this package.
 
-You should *definitely* install additional providers (the default provider bundled with this package is somewhat crude): here’s [a list of all Pulsar packages (built-in or community) that provide `autocomplete.provider`](https://web.pulsar-edit.dev/packages?serviceType=provided&service=autocomplete.provider).
+You should *definitely* install additional providers (the default provider bundled with this package is somewhat crude): here’s [a list of all Lumine packages (built-in or community) that provide `autocomplete.provider`](https://web.pulsar-edit.dev/packages?serviceType=provided&service=autocomplete.provider).
 
 ## Usage
 
@@ -85,7 +85,7 @@ If the default `SymbolProvider` is missing useful information for the language /
 
 ## The `watchEditor` API
 
-The `watchEditor` method on the `AutocompleteManager` object is exposed as a [provided service](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar/#interacting-with-other-packages-via-services), named `autocomplete.watchEditor`. The method allows external editors to register for autocompletions from providers with a given set of labels. Disposing the returned object will undo this request. External packages can access this service with the following code.
+The `watchEditor` method on the `AutocompleteManager` object is exposed as a [provided service](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine/#interacting-with-other-packages-via-services), named `autocomplete.watchEditor`. The method allows external editors to register for autocompletions from providers with a given set of labels. Disposing the returned object will undo this request. External packages can access this service with the following code.
 
 In `package.json`:
 ```

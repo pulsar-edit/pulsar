@@ -1,6 +1,6 @@
-# CSS language support in Pulsar
+# CSS language support in Lumine
 
-Adds syntax highlighting, completions, and snippets to CSS files in Pulsar.
+Adds syntax highlighting, completions, and snippets to CSS files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
 from the [CSS TextMate bundle](https://github.com/textmate/css.tmbundle).

@@ -25,7 +25,7 @@ const configSchema = {
       excludeVcsIgnoredPaths: {
         type: 'boolean',
         default: true,
-        title: '%pulsar.config.excludeVcsIgnoredPaths.title%',
+        title: '%lumine.config.excludeVcsIgnoredPaths.title%',
         description:
           "Files and directories ignored by the current project's VCS will be ignored by some packages, such as the fuzzy finder and find and replace. For example, projects using Git have these paths defined in the .gitignore file. Individual packages might have additional config settings for ignoring VCS ignored files and folders."
       },
@@ -318,7 +318,7 @@ const configSchema = {
         enum: ['no', 'yes', 'always'],
         default: 'yes',
         description:
-          "When selected 'no', a blank environment is loaded. When selected 'yes' and Lumine is started from the icon or `pulsar` by itself from the command line, restores the last state of all Lumine windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Lumine windows always, no matter how Lumine is started."
+          "When selected 'no', a blank environment is loaded. When selected 'yes' and Lumine is started from the icon or `lumine` by itself from the command line, restores the last state of all Lumine windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Lumine windows always, no matter how Lumine is started."
       },
       reopenProjectMenuCount: {
         description:
@@ -328,14 +328,14 @@ const configSchema = {
       },
       automaticallyUpdate: {
         description:
-          'Automatically update Lumine when a new release is available. **Note**: Currently not functional, please download new releases from [pulsar-edit.dev](https://pulsar-edit.dev/download.html)',
+          'Automatically update Lumine when a new release is available. **Note**: Currently not functional, please download new releases from [Lumine releases](https://github.com/lumine-editor/lumine/releases)',
         type: 'boolean',
         default: false
       },
       useProxySettingsWhenCallingApm: {
         title: 'Use Proxy Settings When Calling PPM',
         description:
-          'Use detected proxy settings when calling the `pulsar -p` or `ppm` command-line tool.',
+          'Use detected proxy settings when calling the `lumine -p` or `ppm` command-line tool.',
         type: 'boolean',
         default: true
       },
@@ -412,7 +412,7 @@ const configSchema = {
         type: 'boolean',
         default: true
       },
-      syncWindowThemeWithPulsarTheme: {
+      syncWindowThemeWithLumineTheme: {
         description: 'When changing the theme within Lumine also change the theme of the window on the operating system.',
         type: 'boolean',
         default: false

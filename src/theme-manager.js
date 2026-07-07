@@ -426,7 +426,7 @@ On Linux there are currently problems with watch sizes. See [this document][watc
             this.refreshLessCache(); // Update cache again now that @getActiveThemes() is populated
             await this.loadUserStylesheet();
             this.reloadBaseStylesheets();
-            if (this.config.get("editor.syncWindowThemeWithPulsarTheme")) {
+            if (this.config.get("editor.syncWindowThemeWithLumineTheme")) {
               this.refreshWindowTheme();
             }
             this.initialLoadComplete = true;

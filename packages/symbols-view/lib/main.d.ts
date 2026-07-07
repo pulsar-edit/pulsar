@@ -206,7 +206,7 @@ export interface SymbolProvider {
   //
   // If your provider may have its cache invalidated for reasons not in this
   // list, you should implement `onShouldClearCache` and invoke any callback
-  // that registers for it. The `EventEmitter` pattern found throughout Pulsar
+  // that registers for it. The `EventEmitter` pattern found throughout Lumine
   // is probably how you want to pull this off.
   onShouldClearCache?(callback: () => TextEditor): void,
 

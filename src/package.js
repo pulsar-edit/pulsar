@@ -609,7 +609,7 @@ module.exports = class Package {
             if (atomEnvironment.packages.hasActivatedInitialPackages()) {
               // Only explicitly activate the package if initial packages
               // have finished activating. This is because deserialization
-              // generally occurs at Pulsar startup, which happens before the
+              // generally occurs at Lumine startup, which happens before the
               // workspace element is added to the DOM and is inconsistent with
               // with when initial package activation occurs. Triggering activation
               // immediately may cause problems with packages that expect to
@@ -940,7 +940,7 @@ module.exports = class Package {
         Failed to require the main module of '${
           this.name
         }' because it requires one or more incompatible native modules (${nativeModuleNames}).
-        Run \`pulsar -p rebuild\` in the package directory and restart Pulsar to resolve.\
+        Run \`lumine -p rebuild\` in the package directory and restart Lumine to resolve.\
       `);
     } else {
       const mainModulePath = this.getMainModulePath();
@@ -1248,7 +1248,7 @@ module.exports = class Package {
   */
 
   // Extended: Are all native modules depended on by this package correctly
-  // compiled against the current version of Pulsar?
+  // compiled against the current version of Lumine?
   //
   // Incompatible packages cannot be activated.
   //
@@ -1268,11 +1268,11 @@ module.exports = class Package {
   }
 
   // Extended: Rebuild native modules in this package's dependencies for the
-  // current version of Pulsar.
+  // current version of Lumine.
   //
   // Returns a {Promise} that resolves with an object containing `code`,
   // `stdout`, and `stderr` properties based on the results of running
-  // `pulsar -p rebuild` on the package.
+  // `lumine -p rebuild` on the package.
   rebuild() {
     return new Promise(resolve =>
       this.runRebuildProcess(result => {

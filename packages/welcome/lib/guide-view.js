@@ -344,7 +344,7 @@ export default class GuideView {
 
   getApplicationMenuName() {
     if (process.platform === 'darwin') {
-      return 'Pulsar';
+      return 'Lumine';
     } else if (process.platform === 'linux') {
       return 'Edit';
     } else {
@@ -408,14 +408,14 @@ export default class GuideView {
   }
 
   didClickStylingButton() {
-    atom.workspace.open('atom://.pulsar/stylesheet', { split: 'left' });
+    atom.workspace.open('atom://.lumine/stylesheet', { split: 'left' });
   }
 
   didClickInitScriptButton() {
-    atom.workspace.open('atom://.pulsar/init-script', { split: 'left' });
+    atom.workspace.open('atom://.lumine/init-script', { split: 'left' });
   }
 
   didClickSnippetsButton() {
-    atom.workspace.open('atom://.pulsar/snippets', { split: 'left' });
+    atom.workspace.open('atom://.lumine/snippets', { split: 'left' });
   }
 }

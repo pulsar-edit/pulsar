@@ -71,7 +71,7 @@ class CompileToolsErrorView {
         </div>
         <div className='compile-tools-message'>
           <span>Run </span>
-          <code className='alert-danger'>pulsar -p install --check</code>
+          <code className='alert-danger'>lumine -p install --check</code>
           <span> after installing to test compiling a native module.</span>
         </div>
       </div>

@@ -48,8 +48,8 @@ describe('AtomEnvironment', () => {
 
   describe('.versionSatisfies()', () => {
     it('returns appropriately for provided range', () => {
-      let testPulsarVersion = '0.1.0';
-      spyOn(atom, 'getVersion').and.callFake(() => testPulsarVersion);
+      let testLumineVersion = '0.1.0';
+      spyOn(atom, 'getVersion').and.callFake(() => testLumineVersion);
       expect(atom.versionSatisfies('>0.2.0')).toBe(false);
       expect(atom.versionSatisfies('>=0.x.x <=2.x.x')).toBe(true);
       expect(atom.versionSatisfies('^0.1.x')).toBe(true);

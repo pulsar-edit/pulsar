@@ -51,7 +51,7 @@ module.exports = class AboutView extends EtchComponent {
   handleHowToUpdateClick(e) {
     e.preventDefault();
     shell.openExternal(
-            'https://github.com/pulsar-edit/pulsar/tree/master/packages/pulsar-updater#readme'
+            'https://github.com/lumine-editor/lumine/tree/master/packages/lumine-updater#readme'
     );
   }
 
@@ -59,7 +59,7 @@ module.exports = class AboutView extends EtchComponent {
     e.preventDefault();
     atom.commands.dispatch(
       atom.views.getView(atom.workspace),
-      'pulsar-updater:check-for-update'
+      'lumine-updater:check-for-update'
     );
   }
 
@@ -177,7 +177,7 @@ module.exports = class AboutView extends EtchComponent {
               { className: 'about-updates-item app-unsupported' },
               $.span(
                 { className: 'about-updates-label is-strong' },
-                'Updates have been moved to the package ', $.code({style: {'white-space': 'nowrap'}}, 'pulsar-updater'), '.',
+                'Updates have been moved to the package ', $.code({style: {'white-space': 'nowrap'}}, 'lumine-updater'), '.',
                 $.br()
               ),
               $.a(
@@ -221,19 +221,19 @@ module.exports = class AboutView extends EtchComponent {
         $.span({ className: 'inline' }, ' with '),
         $.a({ className: 'icon icon-heart', href: `${atom.branding.urlWeb}` + "community" }),
         $.span({ className: 'inline' }, ' by '),
-        //$.a({ className: 'icon icon-logo-github', href: `${atom.branding.urlWeb}` }) Replace icon with Pulsar word logo and delete following line
-        $.a({ className: 'inline', href: `${atom.branding.urlWeb}` }, 'Pulsar Team')
+        //$.a({ className: 'icon icon-logo-github', href: `${atom.branding.urlWeb}` }) Replace icon with Lumine word logo and delete following line
+        $.a({ className: 'inline', href: `${atom.branding.urlWeb}` }, 'Lumine Team')
       ),
     );
   }
 
   renderUpdateChecker() {
-    if (atom.packages.isPackageDisabled("pulsar-updater")) {
+    if (atom.packages.isPackageDisabled("lumine-updater")) {
       return $.div(
         { className: 'about-updates-item app-unsupported' },
         $.span(
           { className: 'about-updates-label is-strong' },
-          'Enable `pulsar-updater` to check for updates'
+          'Enable `lumine-updater` to check for updates'
         )
       );
     } else {

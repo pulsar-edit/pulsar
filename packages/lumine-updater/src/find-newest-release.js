@@ -5,9 +5,9 @@ async function findNewestRelease() {
   superagent ??= require("superagent");
 
   let res = await superagent
-    .get("https://api.github.com/repos/pulsar-edit/pulsar/releases")
+    .get("https://api.github.com/repos/lumine-editor/lumine/releases")
     .set("Accept", "application/vnd.github+json")
-    .set("User-Agent", "Pulsar.Pulsar-Updater");
+    .set("User-Agent", "Lumine.Lumine-Updater");
 
   if (res.status !== 200) {
     // Lie and say it's something that will never update

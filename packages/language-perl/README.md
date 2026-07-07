@@ -1,6 +1,6 @@
-# Perl language support in Pulsar
+# Perl language support in Lumine
 
-Adds syntax highlighting and snippets to Perl files in Pulsar.
+Adds syntax highlighting and snippets to Perl files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Perl TextMate bundle](https://github.com/textmate/perl.tmbundle).
 

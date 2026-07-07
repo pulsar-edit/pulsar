@@ -1,10 +1,10 @@
 {
   "name": "autocomplete-atom-api",
   "version": "0.10.7",
-  "description": "Pulsar API autocompletions",
+  "description": "Lumine API autocompletions",
   "main": "./lib/main",
   "license": "MIT",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "engines": {
     "atom": ">=0.174.0 <2.0.0"
   },

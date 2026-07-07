@@ -36,7 +36,7 @@ export default class SystemPanel {
           <div className='settings-panel'>
             <div className='section-container'>
               <div className='block section-heading icon icon-device-desktop'>System Settings</div>
-              <div className='text icon icon-question'>These settings determine how Pulsar integrates with your operating system.</div>
+              <div className='text icon icon-question'>These settings determine how Lumine integrates with your operating system.</div>
               <div className='section-body'>
                 <div className='control-group'>
                   <div className='controls'>
@@ -120,9 +120,9 @@ export default class SystemPanel {
         <div className='controls'>
           <div className='checkbox'>
             <label for='system.windows.add-to-path'>
-              <div className='setting-title'>Add Pulsar to PATH</div>
+              <div className='setting-title'>Add Lumine to PATH</div>
               <div className='setting-description'>
-                Settings for adding Pulsar to the PATH have now been exclusively moved to the Pulsar windows installer.
+                Settings for adding Lumine to the PATH have now been exclusively moved to the Lumine windows installer.
                 If you'd like to change your PATH addition options please rerun your original, or a new installer.
               </div>
             </label>

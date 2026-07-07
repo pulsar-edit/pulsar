@@ -45,7 +45,7 @@ const getSocketSecretPath = applicationVersion => {
   const { username } = os.userInfo();
   const atomHome = path.resolve(process.env.ATOM_HOME);
 
-  return path.join(atomHome, `.pulsar-socket-secret-${username}-${applicationVersion}`);
+  return path.join(atomHome, `.lumine-socket-secret-${username}-${applicationVersion}`);
 };
 
 const getSocketPath = socketSecret => {
@@ -61,9 +61,9 @@ const getSocketPath = socketSecret => {
     .substr(0, 12);
 
   if (process.platform === 'win32') {
-    return `\\\\.\\pipe\\pulsar-${socketName}-sock`;
+    return `\\\\.\\pipe\\lumine-${socketName}-sock`;
   } else {
-    return path.join(os.tmpdir(), `pulsar-${socketName}.sock`);
+    return path.join(os.tmpdir(), `lumine-${socketName}.sock`);
   }
 };
 
@@ -138,11 +138,11 @@ ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
 
 // The application's singleton class.
 //
-// It's the entry point into the Pulsar application and maintains the global state
+// It's the entry point into the Lumine application and maintains the global state
 // of the application.
 //
 module.exports = class AtomApplication extends EventEmitter {
-  // Public: The entry point into the Pulsar application.
+  // Public: The entry point into the Lumine application.
   static open(options) {
     StartupTime.addMarker('main-process:atom-application:open');
 
@@ -404,7 +404,7 @@ module.exports = class AtomApplication extends EventEmitter {
         )
       );
     } else {
-      // Always open an editor window if this is the first instance of Pulsar.
+      // Always open an editor window if this is the first instance of Lumine.
       return this.openPath({
         pathToOpen: null,
         pidToKillWhenClosed,
@@ -575,24 +575,24 @@ module.exports = class AtomApplication extends EventEmitter {
     });
 
     this.on('application:open-documentation', () =>
-      shell.openExternal('https://pulsar-edit.dev/docs/')
+      shell.openExternal('https://github.com/lumine-editor/lumine')
     );
     this.on('application:open-discussions', () =>
-      shell.openExternal('https://github.com/orgs/pulsar-edit/discussions')
+      shell.openExternal('https://github.com/orgs/lumine-editor/discussions')
     );
     this.on('application:open-faq', () =>
-      shell.openExternal('https://pulsar-edit.dev/docs/launch-manual/sections/faq/')
+      shell.openExternal('https://github.com/lumine-editor/lumine/discussions')
     );
     this.on('application:open-terms-of-use', () =>
       shell.openExternal('https://atom.io/terms') //TODO: This needs to be updated for when we have our own published on the site
     );
     this.on('application:report-issue', () =>
       shell.openExternal(
-        'https://github.com/pulsar-edit/pulsar/issues/new/choose'
+        'https://github.com/lumine-editor/lumine/issues/new/choose'
       )
     );
     this.on('application:search-issues', () =>
-      shell.openExternal('https://github.com/pulsar-edit/pulsar/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc')
+      shell.openExternal('https://github.com/lumine-editor/lumine/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc')
     );
 
     if (process.platform === 'darwin') {
@@ -671,19 +671,19 @@ module.exports = class AtomApplication extends EventEmitter {
 
     this.openPathOnEvent('application:about', 'atom://about');
     this.openPathOnEvent('application:show-settings', 'atom://config');
-    this.openPathOnEvent('application:open-your-config', 'atom://.pulsar/config');
+    this.openPathOnEvent('application:open-your-config', 'atom://.lumine/config');
     this.openPathOnEvent(
       'application:open-your-init-script',
-      'atom://.pulsar/init-script'
+      'atom://.lumine/init-script'
     );
-    this.openPathOnEvent('application:open-your-keymap', 'atom://.pulsar/keymap');
+    this.openPathOnEvent('application:open-your-keymap', 'atom://.lumine/keymap');
     this.openPathOnEvent(
       'application:open-your-snippets',
-      'atom://.pulsar/snippets'
+      'atom://.lumine/snippets'
     );
     this.openPathOnEvent(
       'application:open-your-stylesheet',
-      'atom://.pulsar/stylesheet'
+      'atom://.lumine/stylesheet'
     );
     this.openPathOnEvent(
       'application:open-license',
@@ -764,7 +764,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
     // Triggered by the 'open-file' event from Electron:
     // https://electronjs.org/docs/api/app#event-open-file-macos
-    // For example, this is fired when a file is dragged and dropped onto the Pulsar application icon in the dock.
+    // For example, this is fired when a file is dragged and dropped onto the Lumine application icon in the dock.
     this.disposable.add(
       ipcHelpers.on(app, 'open-file', (event, pathToOpen) => {
         event.preventDefault();
@@ -991,7 +991,7 @@ module.exports = class AtomApplication extends EventEmitter {
         //
         // On both Windows and macOS (despite their varying window management
         // models!) we must also call `app.focus()` to ensure the frontmost
-        // Pulsar window is brought above windows from other applications.
+        // Lumine window is brought above windows from other applications.
         if (process.platform !== 'linux') {
           app.focus({ steal: true });
         }
@@ -1383,7 +1383,7 @@ module.exports = class AtomApplication extends EventEmitter {
         //
         // On both Windows and macOS (despite their varying window management
         // models!) we must also call `app.focus()` to ensure the frontmost
-        // Pulsar window is brought above windows from other applications.
+        // Lumine window is brought above windows from other applications.
         if (process.platform !== 'linux') {
           app.focus({ steal: true });
         }
@@ -1522,7 +1522,7 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     if (state.version === APPLICATION_STATE_VERSION) {
-      // Pulsar >=1.36.1
+      // Lumine >=1.36.1
       // Schema: {version: '1', windows: [{projectRoots: ['<root-dir>', ...]}, ...]}
       return state.windows.map(each => ({
         foldersToOpen: each.projectRoots,
@@ -1531,7 +1531,7 @@ module.exports = class AtomApplication extends EventEmitter {
         newWindow: true
       }));
     } else if (state.version === undefined) {
-      // Pulsar <= 1.36.0
+      // Lumine <= 1.36.0
       // Schema: [{initialPaths: ['<root-dir>', ...]}, ...]
       return Promise.all(
         state.map(async windowState => {
@@ -1559,7 +1559,7 @@ module.exports = class AtomApplication extends EventEmitter {
         })
       );
     } else {
-      // Unrecognized version (from a newer Pulsar?)
+      // Unrecognized version (from a newer Lumine?)
       return [];
     }
   }
@@ -1711,8 +1711,8 @@ module.exports = class AtomApplication extends EventEmitter {
   //                   completion.
   //   :resourcePath - The path to include specs from.
   //   :specPath - The directory to load specs from.
-  //   :safeMode - A Boolean that, if true, won't run specs from ~/.pulsar/packages
-  //               and ~/.pulsar/dev/packages, defaults to false.
+  //   :safeMode - A Boolean that, if true, won't run specs from ~/.lumine/packages
+  //               and ~/.lumine/dev/packages, defaults to false.
   runTests({
     headless,
     resourcePath,
@@ -1824,7 +1824,7 @@ module.exports = class AtomApplication extends EventEmitter {
       // Nothing to do, try the next strategy
     }
 
-    // Then try to use one of the runners defined in Pulsar
+    // Then try to use one of the runners defined in Lumine
     try {
       testRunnerPath = Resolve.sync(`./spec/${atomTestRunner}`, {
         basedir: this.devResourcePath,

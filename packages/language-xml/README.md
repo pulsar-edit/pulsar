@@ -1,6 +1,6 @@
-# XML language support in Pulsar
+# XML language support in Lumine
 
-Adds syntax highlighting and snippets to XML files in Pulsar.
+Adds syntax highlighting and snippets to XML files in Lumine.
 
 Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [XML TextMate bundle](https://github.com/textmate/xml.tmbundle).
 

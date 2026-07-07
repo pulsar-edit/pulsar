@@ -183,7 +183,7 @@ const RESOLVERS = {
   //
 }
 
-// $UUID will be easy to implement once Pulsar runs a newer version of Node, so
+// $UUID will be easy to implement once Lumine runs a newer version of Node, so
 // there's no reason not to be proactive and sniff for the function we need.
 if (('randomUUID' in crypto) && (typeof crypto.randomUUID === 'function')) {
   RESOLVERS['UUID'] = () => {

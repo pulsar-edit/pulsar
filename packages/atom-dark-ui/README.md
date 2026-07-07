@@ -1,8 +1,8 @@
-# Pulsar Dark UI theme
+# Lumine Dark UI theme
 
-A dark UI theme for Pulsar.
+A dark UI theme for Lumine.
 
-This theme is installed by default with Pulsar and can be activated by going to
+This theme is installed by default with Lumine and can be activated by going to
 the _Themes_ section in the Settings view (`cmd-,`) and selecting it from the
 _UI Themes_ drop-down menu.
 

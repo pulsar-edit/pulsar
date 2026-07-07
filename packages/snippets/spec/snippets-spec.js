@@ -1561,13 +1561,13 @@ foo\
     });
   });
 
-  describe("when atom://.pulsar/snippets is opened", () => {
-    it("opens ~/.pulsar/snippets.cson", () => {
+  describe("when atom://.lumine/snippets is opened", () => {
+    it("opens ~/.lumine/snippets.cson", () => {
       jasmine.unspy(Snippets, 'getUserSnippetsPath');
       atom.workspace.destroyActivePaneItem();
       const configDirPath = temp.mkdirSync('atom-config-dir-');
       spyOn(atom, 'getConfigDirPath').andReturn(configDirPath);
-      atom.workspace.open('atom://.pulsar/snippets');
+      atom.workspace.open('atom://.lumine/snippets');
 
       waitsFor(() => atom.workspace.getActiveTextEditor() != null);
 

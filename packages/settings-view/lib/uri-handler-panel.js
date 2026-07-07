@@ -59,7 +59,7 @@ export default class UriHandlerPanel {
           <div className='settings-panel'>
             <div className='section-container'>
               <div className='block section-heading icon icon-device-desktop'>URI Handling</div>
-              <div className='text icon icon-question'>These settings determine how Pulsar handles atom:// URIs.</div>
+              <div className='text icon icon-question'>These settings determine how Lumine handles atom:// URIs.</div>
               <div className='section-body'>
                 <div className='control-group'>
                   <div className='controls'>
@@ -154,9 +154,9 @@ export default class UriHandlerPanel {
 
   renderRegistrationDescription () {
     if (this.isDefaultProtocolClient) {
-      return 'Pulsar is already the default handler for atom:// URIs.'
+      return 'Lumine is already the default handler for atom:// URIs.'
     } else if (isSupported()) {
-      return 'Register Pulsar as the default handler for atom:// URIs.'
+      return 'Register Lumine as the default handler for atom:// URIs.'
     } else {
       return 'Registration as the default handler for atom:// URIs is only supported on Windows and macOS.'
     }

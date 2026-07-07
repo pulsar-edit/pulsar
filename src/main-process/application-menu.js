@@ -114,7 +114,7 @@ module.exports = class ApplicationMenu {
     return [
       {
         label: 'Lumine',
-        id: 'Pulsar',
+        id: 'Lumine',
         submenu: [
           {
             label: 'Reload',

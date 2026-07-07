@@ -3,7 +3,7 @@
   "version": "0.160.2",
   "main": "./lib/main",
   "description": "Open a rendered version of the Markdown in the current editor with `ctrl-shift-m`.",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "license": "MIT",
   "engines": {
     "atom": "*",
@@ -99,7 +99,7 @@
     "syntaxHighlightingLanguageIdentifier": {
       "order": 7,
       "title": "Syntax Highlighting Language Identifiers",
-      "description": "Syntax Highlighting System to use for code block language identification. See [the README](https://github.com/pulsar-edit/pulsar/tree/master/packages/markdown-preview#readme) for details.",
+      "description": "Syntax Highlighting System to use for code block language identification. See [the README](https://github.com/lumine-editor/lumine/tree/master/packages/markdown-preview#readme) for details.",
       "type": "string",
       "default": "linguist",
       "enum": [
@@ -122,12 +122,12 @@
       ]
     },
     "customSyntaxHighlightingLanguageIdentifiers": {
-      "description": "Comma-separated list of syntax language identifiers to map to any language. See [the README](https://github.com/pulsar-edit/pulsar/tree/master/packages/markdown-preview#readme) for usage.",
+      "description": "Comma-separated list of syntax language identifiers to map to any language. See [the README](https://github.com/lumine-editor/lumine/tree/master/packages/markdown-preview#readme) for usage.",
       "type": "string",
       "default": ""
     },
     "useOriginalParser": {
-      "description": "When checked, will use the original Markdown parser for `markdown-preview` (`marked`). When unchecked, will use the new Markdown parser built into Pulsar (`markdown-it`).",
+      "description": "When checked, will use the original Markdown parser for `markdown-preview` (`marked`). When unchecked, will use the new Markdown parser built into Lumine (`markdown-it`).",
       "type": "boolean",
       "default": true
     }

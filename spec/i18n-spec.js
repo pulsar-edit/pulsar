@@ -119,33 +119,33 @@ describe("I18n", () => {
     it("Adds new locales to existing objects", () => {
       i18n.addStrings({
         example: {
-          stringKey: "Hello Pulsar"
+          stringKey: "Hello Lumine"
         }
       }, "en-US");
       i18n.addStrings({
         example: {
-          stringKey: "Hola Pulsar"
+          stringKey: "Hola Lumine"
         }
       }, "es-MX");
 
       expect(i18n.strings.example.stringKey).toEqual({
-        "en-US": "Hello Pulsar",
-        "es-MX": "Hola Pulsar"
+        "en-US": "Hello Lumine",
+        "es-MX": "Hola Lumine"
       });
     });
 
     it("Adds new locale to object", () => {
       i18n.addStrings({
         example: {
-          stringKey: "Hello Pulsar"
+          stringKey: "Hello Lumine"
         }
       }, "en-US");
 
-      i18n.addString("example.stringKey", "Hola Pulsar", "es-MX");
+      i18n.addString("example.stringKey", "Hola Lumine", "es-MX");
 
       expect(i18n.strings.example.stringKey).toEqual({
-        "en-US": "Hello Pulsar",
-        "es-MX": "Hola Pulsar"
+        "en-US": "Hello Lumine",
+        "es-MX": "Hola Lumine"
       });
     });
   });
@@ -161,17 +161,17 @@ describe("I18n", () => {
     it("Returns the proper string based on user setting", () => {
       i18n.addStrings({
         example: {
-          stringKey: "Hello Pulsar"
+          stringKey: "Hello Lumine"
         }
       }, "en");
 
       i18n.addStrings({
         example: {
-          stringKey: "Hola Pulsar"
+          stringKey: "Hola Lumine"
         }
       }, "es-MX");
 
-      expect(i18n.t("example.stringKey")).toEqual("Hola Pulsar");
+      expect(i18n.t("example.stringKey")).toEqual("Hola Lumine");
     });
 
     it("Handles ICU MessageFormat Replacements", () => {
@@ -189,13 +189,13 @@ describe("I18n", () => {
     it("Handles namespace translations", () => {
       i18n.addStrings({
         example: {
-          stringKey: "Hello Pulsar"
+          stringKey: "Hello Lumine"
         }
       }, "en");
 
       const t = i18n.getT("example");
 
-      expect(t.t("stringKey")).toEqual("Hello Pulsar");
+      expect(t.t("stringKey")).toEqual("Hello Lumine");
     });
   });
 
@@ -219,13 +219,13 @@ describe("I18n", () => {
 
       i18n.addStrings({
         example: {
-          stringKey: "Hello Pulsar"
+          stringKey: "Hello Lumine"
         }
       }, "en");
 
       const localeLabel = "%example.stringKey%";
 
-      expect(i18n.translateLabel(localeLabel)).toEqual("Hello Pulsar");
+      expect(i18n.translateLabel(localeLabel)).toEqual("Hello Lumine");
     });
 
     it("Falls back to the original label if unable to translate", () => {

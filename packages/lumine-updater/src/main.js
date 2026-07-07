@@ -4,24 +4,24 @@ let shell;
 let superagent;
 let findInstallMethod;
 
-class PulsarUpdater {
+class LumineUpdater {
   activate() {
     this.disposables = new CompositeDisposable();
     this.cache = require("./cache.js");
 
     this.disposables.add(
       atom.commands.add("atom-workspace", {
-        "pulsar-updater:check-for-update": () => {
+        "lumine-updater:check-for-update": () => {
           this.checkForUpdates({ manual: true });
         },
-        "pulsar-updater:clear-cache": () => {
+        "lumine-updater:clear-cache": () => {
           this.cache.empty("last-update-check");
           this.cache.empty(`installMethod.${atom.getVersion()}`);
         },
       })
     );
 
-    if (atom.config.get("pulsar-updater.checkForUpdatesOnLaunch")) {
+    if (atom.config.get("lumine-updater.checkForUpdatesOnLaunch")) {
       this.checkForUpdates();
     }
   }
@@ -35,9 +35,9 @@ class PulsarUpdater {
     superagent ??= require("superagent");
 
     let res = await superagent
-      .get("https://api.github.com/repos/pulsar-edit/pulsar/releases")
+      .get("https://api.github.com/repos/lumine-editor/lumine/releases")
       .set("Accept", "application/vnd.github+json")
-      .set("User-Agent", "Pulsar.Pulsar-Updater");
+      .set("User-Agent", "Lumine.Lumine-Updater");
 
     if (res.status !== 200) {
       // Lie and say it's something that will never update
@@ -80,7 +80,7 @@ class PulsarUpdater {
   notifyAboutCurrent(latestVersion, manual) {
     if (!manual) return;
     atom.notifications.addInfo(
-      "Pulsar is already up to date.",
+      "Lumine is already up to date.",
       { dismissable: true }
     );
   }
@@ -112,7 +112,7 @@ class PulsarUpdater {
     }
 
     const notification = atom.notifications.addInfo(
-      "An update for Pulsar is available.",
+      "An update for Lumine is available.",
       {
         description: notificationDetailText,
         dismissable: true,
@@ -132,7 +132,7 @@ class PulsarUpdater {
             },
           },
           // Below we optionally add a button for the install method. That may
-          // open to a pulsar download URL, if available for installation method
+          // open to a Lumine download URL, if available for installation method
           typeof objButtonForInstallMethod === "object" &&
             objButtonForInstallMethod
         ],
@@ -153,12 +153,12 @@ class PulsarUpdater {
   }
 
   getNotificationText(installMethod, latestVersion) {
-    let returnText = `Pulsar ${latestVersion} is available.\n`;
+    let returnText = `Lumine ${latestVersion} is available.\n`;
 
     switch (installMethod.installMethod) {
       case "Developer Mode":
         returnText +=
-          "Since you're in developer mode, Pulsy trusts you know how to update. :)";
+          "Since you're in developer mode, Lumine trusts you know how to update.";
         break;
       case "Safe Mode":
         return null;
@@ -171,7 +171,7 @@ class PulsarUpdater {
         break;
       case "Deb-Get Installation":
         returnText +=
-          "Install the latest version by running `deb-get update && deb-get install pulsar`.";
+          "Install the latest version by running `deb-get update && deb-get install lumine`.";
         break;
       case "Nix Installation":
         // TODO find nix update command
@@ -179,15 +179,15 @@ class PulsarUpdater {
         break;
       case "Homebrew Installation":
         returnText +=
-          "Install the latest version by running `brew upgrade pulsar`.";
+          "Install the latest version by running `brew upgrade lumine`.";
         break;
       case "winget Installation":
         returnText +=
-          "Install the latest version by running `winget upgrade pulsar`.";
+          "Install the latest version by running `winget upgrade lumine`.";
         break;
       case "Chocolatey Installation":
         returnText +=
-          "Install the latest version by running `choco upgrade pulsar`.";
+          "Install the latest version by running `choco upgrade lumine`.";
         break;
       case "User Installation":
       case "Machine Installation":
@@ -195,7 +195,7 @@ class PulsarUpdater {
       case "Manual Installation":
       default:
         returnText +=
-          "Download the latest version from the Pulsar Website or GitHub.";
+          "Download the latest version from the Lumine website or GitHub.";
         break;
     }
 
@@ -210,7 +210,7 @@ class PulsarUpdater {
       shell ??= shell || require("electron").shell;
       let latestVersion = this.cache.getCacheItem("last-update-check")?.latestVersion;
       let tagSegment = latestVersion ? `tag/${latestVersion}` : "";
-      shell.openExternal(`https://github.com/pulsar-edit/pulsar/releases/${tagSegment}`);
+      shell.openExternal(`https://github.com/lumine-editor/lumine/releases/${tagSegment}`);
     };
 
     switch (installMethod.installMethod) {
@@ -228,4 +228,4 @@ class PulsarUpdater {
   }
 }
 
-module.exports = new PulsarUpdater();
+module.exports = new LumineUpdater();

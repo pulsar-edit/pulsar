@@ -26,7 +26,7 @@ module.exports = class NotificationIssue {
 
   findSimilarIssues() {
     let repoUrl = this.getRepoUrl();
-    if (repoUrl == null) { repoUrl = 'pulsar-edit/pulsar'; }
+    if (repoUrl == null) { repoUrl = 'lumine-editor/lumine'; }
     const repo = repoUrl.replace(/http(s)?:\/\/(\d+\.)?github.com\//gi, '');
     const issueTitle = this.getIssueTitle();
     const query = `${issueTitle} repo:${repo}`;
@@ -69,7 +69,7 @@ module.exports = class NotificationIssue {
     return this.getIssueBody().then(issueBody => {
       let repoUrl = this.getRepoUrl();
       if (repoUrl == null) {
-        repoUrl = 'https://github.com/pulsar-edit/pulsar'; 
+        repoUrl = 'https://github.com/lumine-editor/lumine';
       }
       return `${repoUrl}/issues/new?title=${this.encodeURI(this.getIssueTitle())}&body=${this.encodeURI(issueBody)}`;
     });
@@ -125,14 +125,14 @@ module.exports = class NotificationIssue {
         } else if (packageName != null) {
           packageMessage = `'${packageName}' package v${packageVersion}`;
         } else {
-          packageMessage = 'Pulsar Core';
+          packageMessage = 'Lumine Core';
         }
 
         this.issueBody = `\
 <!--
-Have you read Pulsar's Code of Conduct? By filing an Issue, you are expected to comply with it, including treating everyone with respect: https://github.com/atom/.github/blob/master/CODE_OF_CONDUCT.md
+Have you read Lumine's Code of Conduct? By filing an Issue, you are expected to comply with it, including treating everyone with respect: https://github.com/atom/.github/blob/master/CODE_OF_CONDUCT.md
 
-Do you want to ask a question? Are you looking for support? The Pulsar message board is the best place for getting support: https://discuss.atom.io
+Do you want to ask a question? Are you looking for support? The Lumine message board is the best place for getting support: https://discuss.atom.io
 -->
 
 ### Prerequisites
@@ -142,7 +142,7 @@ Do you want to ask a question? Are you looking for support? The Pulsar message b
     * Followed all applicable steps in the debugging guide: <https://flight-manual.atom.io/hacking-atom/sections/debugging/>
     * Checked the FAQs on the message board for common solutions: <https://discuss.atom.io/c/faq>
     * Checked that your issue isn't already filed: <https://github.com/issues?q=is%3Aissue+user%3Aatom>
-    * Checked that there is not already an Pulsar package that provides the described functionality: <https://atom.io/packages>
+    * Checked that there is not already an Lumine package that provides the described functionality: <https://atom.io/packages>
 
 ### Description
 
@@ -164,7 +164,7 @@ Do you want to ask a question? Are you looking for support? The Pulsar message b
 
 ### Versions
 
-**Pulsar**: ${atom.getVersion()} ${process.arch}
+**Lumine**: ${atom.getVersion()} ${process.arch}
 **Electron**: ${process.versions.electron}
 **OS**: ${systemName}
 **Thrown From**: ${packageMessage}

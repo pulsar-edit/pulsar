@@ -4,7 +4,7 @@ Provides commands to quickly view the current file on GitHub.com (The Website).
 
 ## Usage
 
-When editing a file in Pulsar, use the command palette or keyboard shortcuts to:
+When editing a file in Lumine, use the command palette or keyboard shortcuts to:
 
 - Open the file on github.com <kbd>alt-g, o</kbd>
 - Open the blame view for the file on github.com <kbd>alt-g, b</kbd>

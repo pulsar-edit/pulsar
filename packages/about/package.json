@@ -3,8 +3,8 @@
   "author": "Machisté N. Quintana <mnquintana@users.noreply.github.com>",
   "main": "./lib/main",
   "version": "1.9.1",
-  "description": "View useful information about your Pulsar installation.",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "description": "View useful information about your Lumine installation.",
+  "repository": "https://github.com/lumine-editor/lumine",
   "license": "MIT",
   "engines": {
     "atom": ">=1.7 <2.0.0"

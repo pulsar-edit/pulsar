@@ -106,7 +106,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   // NB: This prevents Win10 from showing dupe items in the taskbar.
   app.setAppUserModelId(appUserModelId);
 
-  // Pulsar uses a custom mechanism for ensuring a single instance, so we don't
+  // Lumine uses a custom mechanism for ensuring a single instance, so we don't
   // need `app.requestSingleInstanceLock()`. But we call this method on Windows
   // anyway in order to benefit from a side effect.
   //

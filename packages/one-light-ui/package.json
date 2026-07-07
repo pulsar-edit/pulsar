@@ -2,14 +2,14 @@
   "name": "one-light-ui",
   "theme": "ui",
   "version": "1.12.5",
-  "description": "One light UI theme developed for Atom, repurposed for Pulsar",
+  "description": "One light UI theme developed for Atom, repurposed for Lumine",
   "keywords": [
     "light",
     "adaptive",
     "ui"
   ],
   "license": "MIT",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "main": "lib/main",
   "engines": {
     "atom": ">0.40.0"

@@ -12,7 +12,7 @@ XPStyle on
     ${Case} '' ; Support Windows versions unknown to GetWindowsVersion v4.1.1 (Win11)
       ${Break} ; Do nothing if supported version.
     ${Default}
-      MessageBox MB_OK "Pulsar >=v1.131.0 is only supported on Windows 10 or 11."
+      MessageBox MB_OK "Lumine >=v1.131.0 is only supported on Windows 10 or 11."
       Quit
       ${Break}
   ${EndSwitch}
@@ -29,7 +29,7 @@ XPStyle on
   ${ifNot} ${isUpdated}
     ; Only run uninstall steps if truly uninstalling. Prevents this step from
     ; running during an upgrade, where it technically runs after the upgrade's
-    ; install steps, ultimately removing Pulsar from the PATH
+    ; install steps, ultimately removing Lumine from the PATH
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources"
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources\app\ppm\bin"
   ${endIf}
@@ -39,13 +39,13 @@ XPStyle on
 
   ; Define our variables
   Var Dialog
-  Var PulsarPathCheckbox_Label
-  Var PulsarPathCheckbox
-  Var PulsarPathCheckbox_State
+  Var LuminePathCheckbox_Label
+  Var LuminePathCheckbox
+  Var LuminePathCheckbox_State
   Var PpmPathCheckbox
   Var PpmPathCheckbox_State
 
-  Var PulsarPathAdd_Status
+  Var LuminePathAdd_Status
   Var PpmPathAdd_Status
 
   Page custom AddToPathPage AddToPathFunction ; Call our page with creator_function leave_function
@@ -62,23 +62,23 @@ XPStyle on
     ${EndIf}
 
     ; Enter our custom dialog controls
-    ${NSD_CreateLabel} 0 0 100% 24u "You can choose to add the 'pulsar' and 'ppm' commands to your PATH. This allows you to easily invoke Pulsar and PPM (Pulsar Package Manager) from the shell."
-    Pop $PulsarPathCheckbox_Label
+    ${NSD_CreateLabel} 0 0 100% 24u "You can choose to add the 'lumine' and 'ppm' commands to your PATH. This allows you to easily invoke Lumine and PPM (Lumine Package Manager) from the shell."
+    Pop $LuminePathCheckbox_Label
 
-    ${NSD_CreateCheckbox} 0 30u 100% 10u "&Add Pulsar to the User PATH"
-    Pop $PulsarPathCheckbox
+    ${NSD_CreateCheckbox} 0 30u 100% 10u "&Add Lumine to the User PATH"
+    Pop $LuminePathCheckbox
 
     ${NSD_CreateCheckbox} 0 45u 100% 10u "&Add PPM to the User PATH"
     Pop $PpmPathCheckbox
 
     ; Check the boxes by default
-    ${NSD_Check} $PulsarPathCheckbox
+    ${NSD_Check} $LuminePathCheckbox
     ${NSD_Check} $PpmPathCheckbox
 
     ; The below 'If's add memory to the selection. Meaning if the user clicks
     ; forward then returns, their selection will be remembered.
-    ${If} $PulsarPathCheckbox_State == ${BST_UNCHECKED}
-      ${NSD_Uncheck} $PulsarPathCheckbox
+    ${If} $LuminePathCheckbox_State == ${BST_UNCHECKED}
+      ${NSD_Uncheck} $LuminePathCheckbox
     ${EndIf}
 
     ${If} $PpmPathCheckbox_State == ${BST_UNCHECKED}
@@ -91,12 +91,12 @@ XPStyle on
 
   Function AddToPathFunction
     ; Here we set the memory of the users selection after leaving the page.
-    ${NSD_GetState} $PulsarPathCheckbox $PulsarPathCheckbox_State
+    ${NSD_GetState} $LuminePathCheckbox $LuminePathCheckbox_State
     ${NSD_GetState} $PpmPathCheckbox $PpmPathCheckbox_State
 
     ; Now to add this data to the User PATH
-    ${If} $PulsarPathCheckbox_State == ${BST_CHECKED}
-      ${EnvVarUpdate} $PulsarPathAdd_Status "PATH" "A" "HKCU" "$INSTDIR\resources"
+    ${If} $LuminePathCheckbox_State == ${BST_CHECKED}
+      ${EnvVarUpdate} $LuminePathAdd_Status "PATH" "A" "HKCU" "$INSTDIR\resources"
     ${EndIf}
 
     ${If} $PpmPathCheckbox_State == ${BST_CHECKED}

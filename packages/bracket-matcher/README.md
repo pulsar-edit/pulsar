@@ -36,7 +36,7 @@ fn main() {
 ```
 
 #### Scoped settings
-In addition to the global settings, you are also able to add scope-specific modifications to Pulsar in your `config.cson`. This is especially useful for editor rule changes specific to each language. Scope-specific settings override package defaults _and_ global settings.
+In addition to the global settings, you are also able to add scope-specific modifications to Lumine in your `config.cson`. This is especially useful for editor rule changes specific to each language. Scope-specific settings override package defaults _and_ global settings.
 Example:
 ```cson
 ".rust.source":

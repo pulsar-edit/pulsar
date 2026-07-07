@@ -2,9 +2,9 @@
   "name": "atom-dark-ui",
   "theme": "ui",
   "version": "0.53.3",
-  "description": "A dark UI theme for Pulsar",
+  "description": "A dark UI theme for Lumine",
   "license": "MIT",
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "engines": {
     "atom": ">0.40.0"
   }

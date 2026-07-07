@@ -300,7 +300,7 @@ module.exports = class StyleManager {
   Section: Paths
   */
 
-  // Extended: Get the path of the user style sheet in `~/.pulsar`.
+  // Extended: Get the path of the user style sheet in `~/.lumine`.
   //
   // Returns a {String}.
   getUserStyleSheetPath() {
@@ -388,7 +388,7 @@ function transformDeprecatedShadowDOMSelectors(css, context) {
     let deprecationMessage;
     if (transformedSelectors.length > 0) {
       deprecationMessage =
-        'Starting from Pulsar v1.13.0, the contents of `atom-text-editor` elements ';
+        'Starting from Lumine v1.13.0, the contents of `atom-text-editor` elements ';
       deprecationMessage +=
         'are no longer encapsulated within a shadow DOM boundary. ';
       deprecationMessage +=
@@ -396,7 +396,7 @@ function transformDeprecatedShadowDOMSelectors(css, context) {
       deprecationMessage +=
         'pseudo-selectors, and prepend all your syntax selectors with `syntax--`. ';
       deprecationMessage +=
-        'To prevent breakage with existing style sheets, Pulsar will automatically ';
+        'To prevent breakage with existing style sheets, Lumine will automatically ';
       deprecationMessage += 'upgrade the following selectors:\n\n';
       deprecationMessage +=
         transformedSelectors
@@ -476,13 +476,13 @@ function transformDeprecatedMathUsage(css, context) {
     let deprecationMessage;
     if (transformedProperties.length > 0) {
       deprecationMessage =
-        'Starting from Pulsar v1.107.0, less v4.1.3 is used to transpile less style sheets. ';
+        'Starting from Lumine v1.107.0, less v4.1.3 is used to transpile less style sheets. ';
       deprecationMessage +=
         'This means that Parens-division is now the default math setting, and all ';
       deprecationMessage +=
         'less style sheets must wrap division within parenthesis. ';
       deprecationMessage +=
-        'To prevent breakage with existing style sheets, Pulsar will automatically ';
+        'To prevent breakage with existing style sheets, Lumine will automatically ';
       deprecationMessage +=
         'wrap any mathematical expressions found unparsed by Less with `calc()`. ';
       deprecationMessage +=

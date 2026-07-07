@@ -52,8 +52,8 @@ describe('PackageManager', () => {
   describe('::getApmPath()', () => {
     /**
     * TODO: FAILING TEST - This test fails with the following output:
-    * Expected '/home/runner/work/pulsar/pulsar/apm/node_modules/ppm/bin/apm' to be
-    * '/home/runner/work/pulsar/pulsar/node_modules/electron/dist/resources/app/apm/bin/apm'
+    * Expected '/home/runner/work/lumine/lumine/apm/node_modules/ppm/bin/apm' to be
+    * '/home/runner/work/lumine/lumine/node_modules/electron/dist/resources/app/apm/bin/apm'
     */
     xit('returns the path to the apm command', () => {
       let apmPath = path.join(

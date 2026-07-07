@@ -8,9 +8,9 @@ const path = require('path');
 // custom resource loader for 'atom://' URLs.
 //
 // The following directories are searched in order:
-//   * ~/.pulsar/assets
-//   * ~/.pulsar/dev/packages (unless in safe mode)
-//   * ~/.pulsar/packages
+//   * ~/.lumine/assets
+//   * ~/.lumine/dev/packages (unless in safe mode)
+//   * ~/.lumine/packages
 //   * RESOURCE_PATH/node_modules
 //
 module.exports = class AtomProtocolHandler {

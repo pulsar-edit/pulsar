@@ -58,9 +58,9 @@ const INSTALL_CHANNELS = {
 };
 
 // This module will do whatever it can to determine the installation method.
-// This doesn't just mean to determine what platform Pulsar is installed on
+// This doesn't just mean to determine what platform Lumine is installed on
 // this also means to determine what program installed it, and what variant
-// of the Pulsar binary is in use.
+// of the Lumine binary is in use.
 
 async function main() {
   let returnValue = "";
@@ -83,7 +83,7 @@ async function main() {
     // * `yarn start` was used by a developer,
     // * someone built a local binary without removing `-dev` from the version,
     //   or
-    // * someone was using a preview build of PulsarNext.
+    // * someone was using a preview build of LumineNext.
     returnValue = 'Custom Release Channel';
   }
 
@@ -136,7 +136,7 @@ async function determineChannel(channels, fallback) {
     }
   }
 
-  // Since we know that Pulsar hasn't been installed via an above method,
+  // Since we know that Lumine hasn't been installed via an above method,
   // we should assume the fallback method
   return fallback;
 }

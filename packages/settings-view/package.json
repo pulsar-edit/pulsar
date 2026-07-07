@@ -37,7 +37,7 @@
     },
     "showSettingsIconInStatusBar": {
       "title": "Show Settings Icon in Status Bar",
-      "description": "Whether or not to show a settings icon in the Pulsar Status Bar.",
+      "description": "Whether or not to show a settings icon in the Lumine Status Bar.",
       "type": "boolean",
       "default": true
     }
@@ -53,7 +53,7 @@
     "semver": "^5.3.0",
     "underscore-plus": "^1.0.6"
   },
-  "repository": "https://github.com/pulsar-edit/pulsar",
+  "repository": "https://github.com/lumine-editor/lumine",
   "engines": {
     "atom": "*"
   },
