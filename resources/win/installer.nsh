@@ -31,8 +31,60 @@ XPStyle on
     ; running during an upgrade, where it technically runs after the upgrade's
     ; install steps, ultimately removing Lumine from the PATH
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources"
+
+    ; Remove the Explorer context menu and shell entries that Lumine registers
+    ; at runtime (see src/main-process/win-shell.js). Those verbs are keyed on
+    ; the app name, which for non-stable channels gets a suffix (e.g. "Lumine
+    ; Dev", "Lumine Beta") via getAppName(). So we can't just delete "Lumine" —
+    ; we enumerate each container and remove every verb named "Lumine" or
+    ; "Lumine <Channel>".
+    Push "Software\Classes\*\shell"
+    Call un.RemoveLumineShellVerbs
+    Push "Software\Classes\Directory\shell"
+    Call un.RemoveLumineShellVerbs
+    Push "Software\Classes\Directory\background\shell"
+    Call un.RemoveLumineShellVerbs
+
+    ; File handler entry. The executable name has no channel suffix (it follows
+    ; productName), so a single key covers it. DeleteRegKey is a no-op when the
+    ; key is absent.
+    DeleteRegKey HKCU "Software\Classes\Applications\Lumine.exe"
   ${endIf}
 !macroend
+
+; Deletes every subkey of the given HKCU container whose name is "Lumine" or
+; begins with "Lumine " (covering channel-suffixed names). Takes the container
+; path (relative to HKCU) on the stack.
+Function un.RemoveLumineShellVerbs
+  Exch $R0 ; container key path
+  Push $R1 ; enumeration index
+  Push $R2 ; current subkey name
+  Push $R3 ; name prefix scratch
+
+  StrCpy $R1 0
+  loop:
+    EnumRegKey $R2 HKCU "$R0" $R1
+    StrCmp $R2 "" done
+    ; Exact "Lumine"?
+    StrCmp $R2 "Lumine" delete
+    ; Channel-suffixed "Lumine <...>"?
+    StrCpy $R3 $R2 7
+    StrCmp $R3 "Lumine " delete
+    ; No match: advance to the next subkey.
+    IntOp $R1 $R1 + 1
+    Goto loop
+  delete:
+    ; Deleting shifts the remaining subkeys down into this index, so re-read
+    ; the same index rather than incrementing.
+    DeleteRegKey HKCU "$R0\$R2"
+    Goto loop
+  done:
+
+  Pop $R3
+  Pop $R2
+  Pop $R1
+  Pop $R0
+FunctionEnd
 
 !macro MUI_PAGE_ADD_TO_PATH ; Define our custom macro
 
