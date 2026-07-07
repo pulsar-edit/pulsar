@@ -1,5 +1,5 @@
 // This is loaded by atom-environment.coffee. See
-// https://atom.io/docs/api/latest/Config for more information about config TODO: Link to Pulsar API site when documented
+// https://atom.io/docs/api/latest/Config for more information about config TODO: Link to Lumine API site when documented
 // schemas.
 const configSchema = {
   core: {
@@ -51,7 +51,7 @@ const configSchema = {
         default: 'native',
         enum: ['native', 'hidden'],
         description:
-          'Experimental:  The title bar can  be completely `hidden`.<br>This setting will require a relaunch of Pulsar to take effect.'
+          'Experimental:  The title bar can  be completely `hidden`.<br>This setting will require a relaunch of Lumine to take effect.'
       },
       versionPinnedPackages: {
         type: 'array',
@@ -80,12 +80,12 @@ const configSchema = {
         type: 'string',
         default: 'prompt',
         description:
-          'When should Pulsar register itself as the default handler for atom:// URIs',
+          'When should Lumine register itself as the default handler for atom:// URIs',
         enum: [
           {
             value: 'prompt',
             description:
-              'Prompt to register Pulsar as the default atom:// URI handler'
+              'Prompt to register Lumine as the default atom:// URI handler'
           },
           {
             value: 'always',
@@ -105,7 +105,7 @@ const configSchema = {
           type: 'string'
         },
         description:
-          'Names of UI and syntax themes which will be used when Pulsar starts.'
+          'Names of UI and syntax themes which will be used when Lumine starts.'
       },
       audioBeep: {
         type: 'boolean',
@@ -118,7 +118,7 @@ const configSchema = {
         default: false,
         title: 'Close Deleted File Tabs',
         description:
-          'Close corresponding editors when a file is deleted outside Pulsar.'
+          'Close corresponding editors when a file is deleted outside Lumine.'
       },
       destroyEmptyPanes: {
         type: 'boolean',
@@ -318,7 +318,7 @@ const configSchema = {
         enum: ['no', 'yes', 'always'],
         default: 'yes',
         description:
-          "When selected 'no', a blank environment is loaded. When selected 'yes' and Pulsar is started from the icon or `pulsar` by itself from the command line, restores the last state of all Pulsar windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Pulsar windows always, no matter how Pulsar is started."
+          "When selected 'no', a blank environment is loaded. When selected 'yes' and Lumine is started from the icon or `pulsar` by itself from the command line, restores the last state of all Lumine windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Lumine windows always, no matter how Lumine is started."
       },
       reopenProjectMenuCount: {
         description:
@@ -328,7 +328,7 @@ const configSchema = {
       },
       automaticallyUpdate: {
         description:
-          'Automatically update Pulsar when a new release is available. **Note**: Currently not functional, please download new releases from [pulsar-edit.dev](https://pulsar-edit.dev/download.html)',
+          'Automatically update Lumine when a new release is available. **Note**: Currently not functional, please download new releases from [pulsar-edit.dev](https://pulsar-edit.dev/download.html)',
         type: 'boolean',
         default: false
       },
@@ -353,7 +353,7 @@ const configSchema = {
       },
       fileSystemWatcher: {
         description:
-          'Choose the underlying implementation used to watch for filesystem changes. Emulating changes will miss any events caused by applications other than Pulsar, but may help prevent crashes or freezes.',
+          'Choose the underlying implementation used to watch for filesystem changes. Emulating changes will miss any events caused by applications other than Lumine, but may help prevent crashes or freezes.',
         type: 'string',
         default: 'native',
         enum: [
@@ -383,7 +383,7 @@ const configSchema = {
       },
       colorProfile: {
         description:
-          "Specify whether Pulsar should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Pulsar to take effect.",
+          "Specify whether Lumine should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Lumine to take effect.",
         type: 'string',
         default: 'default',
         enum: [
@@ -398,28 +398,28 @@ const configSchema = {
         ]
       },
       transformDeprecatedStyleSheetSelectors: {
-        description: 'Whether Pulsar should transform deprecated DOM Selectors in community package style sheets. Increases compatibility, as well as startup time.',
+        description: 'Whether Lumine should transform deprecated DOM Selectors in community package style sheets. Increases compatibility, as well as startup time.',
         type: 'boolean',
         default: true
       },
       transformDeprecatedStyleSheetMathExpressions: {
-        description: 'Whether Pulsar should transform deprecated Mathematical Expressions in community package style sheets. Increases compatibility, as well as startup time.',
+        description: 'Whether Lumine should transform deprecated Mathematical Expressions in community package style sheets. Increases compatibility, as well as startup time.',
         type: 'boolean',
         default: true
       },
       addCurrentTabToWindowTitle: {
-        description: 'Add the current tab title to the Pulsar Window title.',
+        description: 'Add the current tab title to the Lumine Window title.',
         type: 'boolean',
         default: true
       },
       syncWindowThemeWithPulsarTheme: {
-        description: 'When changing the theme within Pulsar also change the theme of the window on the operating system.',
+        description: 'When changing the theme within Lumine also change the theme of the window on the operating system.',
         type: 'boolean',
         default: false
       },
       language: {
         type: "object",
-        description: "EXPERIMENTAL: (Minimal effect until stable) Language and locale options. Requires a restart of Pulsar to take effect.",
+        description: "EXPERIMENTAL: (Minimal effect until stable) Language and locale options. Requires a restart of Lumine to take effect.",
         properties: {
           primary: {
             type: "string",
@@ -620,7 +620,7 @@ const configSchema = {
       invisibles: {
         type: 'object',
         description:
-          'A hash of characters Pulsar will use to render whitespace characters. Keys are whitespace character types, values are rendered characters (use value false to turn off individual whitespace character types).',
+          'A hash of characters Lumine will use to render whitespace characters. Keys are whitespace character types, values are rendered characters (use value false to turn off individual whitespace character types).',
         properties: {
           eol: {
             type: ['boolean', 'string'],
@@ -683,13 +683,13 @@ if (process.platform === 'darwin') {
     default: 'native',
     enum: ['native', 'custom', 'custom-inset', 'hidden'],
     description:
-      'Experimental: A `custom` title bar adapts to theme colors. Choosing `custom-inset` adds a bit more padding. The title bar can also be completely `hidden`.<br>Note: Switching to a custom or hidden title bar will compromise some functionality.<br>This setting will require a relaunch of Pulsar to take effect.'
+      'Experimental: A `custom` title bar adapts to theme colors. Choosing `custom-inset` adds a bit more padding. The title bar can also be completely `hidden`.<br>Note: Switching to a custom or hidden title bar will compromise some functionality.<br>This setting will require a relaunch of Lumine to take effect.'
   };
   configSchema.core.properties.simpleFullScreenWindows = {
     type: 'boolean',
     default: false,
     description:
-      'Use pre-Lion fullscreen on macOS. This does not create a new desktop space for Pulsar on fullscreen mode.'
+      'Use pre-Lion fullscreen on macOS. This does not create a new desktop space for Lumine on fullscreen mode.'
   };
 }
 

@@ -10,15 +10,8 @@ then
 fi
 cp "$FILESOURCE" "$FILEDEST"
 
-# Find the right binary name for `ppm`, then install it to `/usr/bin/ppm`.
-case $executable in
-  pulsar-next)
-    ppm_executable=ppm-next
-    ;;
-  *)
-    ppm_executable=ppm
-    ;;
-esac
+# Install `ppm` to `/usr/bin/ppm`.
+ppm_executable=ppm
 
 SYMLINK_TARGET="/opt/${sanitizedProductName}/resources/app/ppm/bin/${ppm_executable}"
 SYMLINK_PATH="/usr/bin/${ppm_executable}"

@@ -92,26 +92,13 @@ const ARGS = yargs(hideBin(process.argv))
     type: 'string',
     description: 'Limit to one target of the specified platform; otherwise all targets for that platform are built.'
   })
-  .option('next', {
-    alias: 'n',
-    type: 'boolean',
-    description: 'Builds a "canary" with a separate bundle identifier and app name so it can run alongside ordinary Pulsar.'
-  })
   .parse();
 
 
-// The difference in base name matters for the app ID (which helps the OS
-// understand that PulsarNext is not the same as Pulsar), but also for other
-// reasons.
-//
-// The `pulsar-next` executable name is how it knows it's a canary release
-// channel and should use a different home directory from the stable release.
-// Same for `ppm-next`; it's identical to `ppm`, but the name of the script
-// tells it where to install packages.
-const displayName = ARGS.next ? 'PulsarNext' : 'Pulsar';
-const baseName = ARGS.next ? 'pulsar-next' : 'pulsar';
-const ppmBaseName = ARGS.next ? 'ppm-next' : 'ppm';
-const iconName = ARGS.next ? 'beta-next' : 'beta';
+const displayName = 'Lumine';
+const baseName = 'lumine';
+const ppmBaseName = 'ppm';
+const iconName = 'beta';
 
 const ICONS = {
   png: `resources/app-icons/${iconName}.png`,
@@ -122,7 +109,7 @@ const ICONS = {
 
 
 let options = {
-  appId: `dev.pulsar-edit.${baseName}`,
+  appId: `io.github.lumine-editor.${baseName}`,
   npmRebuild: false,
   publish: null,
   files: [
@@ -369,8 +356,7 @@ let options = {
       { from: 'resources/win/pulsar.cmd', to: `${baseName}.cmd` },
       { from: 'resources/win/pulsar.js', to: `${baseName}.js` },
       { from: 'resources/win/NSIS_Licenses.txt', to: 'NSIS_Licenses.txt' },
-      // Copy `ppm.cmd` to the `ppm/bin` directory, possibly renaming it
-      // `ppm-next.cmd` depending on release channel.
+      // Copy `ppm.cmd` to the `ppm/bin` directory.
       { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
       { from: 'ppm/bin/node.exe', to: `app/ppm/bin/node.exe` },
     ],
@@ -387,15 +373,7 @@ let options = {
     runAfterFinish: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
-    guid: "0949b555-c22c-56b7-873a-a960bdefa81f",
-    // The GUID is generated from Electron-Builder based on our AppID.
-    // Hardcoding it here means it will always be used as generated from the
-    // AppID 'dev.pulsar-edit.pulsar'. If this value ever changes, a PR to
-    // GitHub Desktop must be made with the updated value.
-    //
-    // We delete this value when building PulsarNext so that it’s regenerated
-    // based on the app ID. Otherwise the OS might consider it equivalent to
-    // stable Pulsar in some ways.
+    // GUID is omitted so electron-builder derives it from the appId.
     include: "resources/win/installer.nsh",
     warningsAsErrors: false,
     differentialPackage: false
@@ -412,12 +390,6 @@ let options = {
   ]
 };
 
-if (ARGS.next) {
-  // TODO: Should PulsarNext have its own guid? `electron-builder` docs suggest
-  // it will be generated from the `appId` if omitted, so I think this is fine.
-  delete options.nsis.guid;
-}
-
 function whatToBuild() {
   if (!ARGS.target) return options;
   if (!(ARGS.platform in options)) return options;
@@ -425,51 +397,11 @@ function whatToBuild() {
   return options;
 }
 
-function generateVersionNumber(existingVersion, channel = '') {
-  // This matches stable, dev (with or without commit hash) and any other
-  // release channel following the pattern '1.100.0-channel0'
-  const match = existingVersion.match(/(\d+\.\d+\.\d+)(?:-([a-z]+)(\d+|-\w{4,})?)?$/);
-  if (!match || !match[1]) {
-    // We can't parse this. Return it as-is.
-    return existingVersion;
-  }
-
-  let tag = channel ? `-${channel}` : ''
-  return `${match[1]}${tag}`
-}
-
 async function main() {
-  if (ARGS.next) {
-    console.log('Building PulsarNext!');
-  }
   let pack = await FS.readFile('package.json', 'utf-8');
   let options = whatToBuild();
   let parsedPackageJson = JSON.parse(pack);
-  let rewrotePackageJson = false;
   options.extraMetadata = generateMetadata(parsedPackageJson);
-  if (ARGS.next) {
-    options.extraMetadata.productName = displayName;
-    if (!process.env.CI && !parsedPackageJson.version.endsWith('-next')) {
-      // We want this local build to have a version number that ends in `-next`
-      // instead of `-dev` or something else. In order to use an arbitrary
-      // version number, we must write it to `package.json` and restore the
-      // original when we're done. This is silly, but it's what
-      // `electron-builder` mandates.
-      //
-      // In CI, we've already changed `package.json` to the version number we
-      // want, so we can skip this step.
-      let newVersionNumber = generateVersionNumber(parsedPackageJson.version, 'next');
-      let newParsedPackageJson = JSON.parse(pack);
-      newParsedPackageJson.version = newVersionNumber;
-      console.log('Temporarily changing package.json to use version:', newVersionNumber);
-      rewrotePackageJson = true;
-      await FS.writeFile(
-        'package.json',
-        JSON.stringify(newParsedPackageJson, null, 2),
-        'utf-8'
-      );
-    }
-  }
 
   try {
     let result = await builder.build({ config: options });
@@ -482,17 +414,10 @@ async function main() {
     });
     await Promise.all(promises);
   } catch (error) {
-    console.error(`Error building Pulsar:`);
+    console.error(`Error building Lumine:`);
     console.error(error);
 
     process.exit(1);
-  } finally {
-    // If we rewrote the version number, ensure we restore the original
-    // `package.json` contents.
-    if (rewrotePackageJson) {
-      console.log('Restoring original package.json');
-      await FS.writeFile('package.json', pack, 'utf-8');
-    }
   }
 }
 

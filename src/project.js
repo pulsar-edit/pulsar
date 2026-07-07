@@ -354,7 +354,7 @@ module.exports = class Project extends Model {
       return this.rootDirectories.map(rootDirectory => rootDirectory.getPath());
     } catch (e) {
       atom.notifications.addError(
-        "Please clear Pulsar's window state with: pulsar --clear-window-state"
+        "Please clear Lumine's window state with: lumine --clear-window-state"
       );
     }
   }

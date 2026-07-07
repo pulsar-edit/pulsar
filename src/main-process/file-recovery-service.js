@@ -73,7 +73,7 @@ module.exports = class FileRecoveryService {
         recoveryFile
           .recover()
           .catch(error => {
-            const message = 'A file that Pulsar was saving could be corrupted';
+            const message = 'A file that Lumine was saving could be corrupted';
             const detail =
               `Error ${error.code}. There was a crash while saving "${
                 recoveryFile.originalPath

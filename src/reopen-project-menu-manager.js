@@ -128,7 +128,7 @@ module.exports = class ReopenProjectMenuManager {
             title: 'New Window',
             program: process.execPath,
             args: '--new-window',
-            description: 'Opens a new Pulsar window'
+            description: 'Opens a new Lumine window'
           }
         ]
       }

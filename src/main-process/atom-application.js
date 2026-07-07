@@ -2021,8 +2021,8 @@ module.exports = class AtomApplication extends EventEmitter {
         type: 'warning',
         title: 'Restart required',
         message:
-          'You will need to restart Pulsar for this change to take effect.',
-        buttons: ['Restart Pulsar', 'Cancel']
+          'You will need to restart Lumine for this change to take effect.',
+        buttons: ['Restart Lumine', 'Cancel']
       }
     );
     if (result.response === 0) this.restart();

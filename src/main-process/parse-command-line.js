@@ -13,30 +13,30 @@ module.exports = function parseCommandLine(processArgs) {
   const options = yargs(filteredArgs).wrap(yargs.terminalWidth());
   const version = app.getVersion();
   options.usage(
-    dedent`Pulsar Editor v${version}
+    dedent`Lumine Editor v${version}
 
     Usage:
-      pulsar
-      pulsar [options] [path ...]
-      pulsar file[:line[:column]]
+      lumine
+      lumine [options] [path ...]
+      lumine file[:line[:column]]
 
     One or more paths to files or folders may be specified. If there is an
-    existing Pulsar window that contains all of the given folders, the paths
+    existing Lumine window that contains all of the given folders, the paths
     will be opened in that window. Otherwise, they will be opened in a new
     window.
 
     A file may be opened at the desired line (and optionally column) by
-    appending the numbers right after the file name, e.g. \`pulsar file:5:8\`.
+    appending the numbers right after the file name, e.g. \`lumine file:5:8\`.
 
     Paths that start with \`atom://\` will be interpreted as URLs.
 
     Environment Variables:
 
-      ATOM_DEV_RESOURCE_PATH  The path from which Pulsar loads source code in dev mode.
+      ATOM_DEV_RESOURCE_PATH  The path from which Lumine loads source code in dev mode.
                               Defaults to \`~/github/atom\`.
 
       ATOM_HOME               The root path for all configuration files and folders.
-                              Defaults to \`~/.pulsar\`.`
+                              Defaults to \`~/.lumine\`.`
   );
   options
     .alias('d', 'dev')
@@ -69,20 +69,20 @@ module.exports = function parseCommandLine(processArgs) {
     .boolean('crashdump')
     .describe(
       'crashdump',
-      'Generate a crashdump in ~/.pulsar/crashdumps in the event of a crash.'
+      'Generate a crashdump in ~/.lumine/crashdumps in the event of a crash.'
     );
   options
     .alias('r', 'resource-path')
     .string('r')
     .describe(
       'r',
-      'Set the path to the Pulsar source directory and enable dev-mode.'
+      'Set the path to the Lumine source directory and enable dev-mode.'
     );
   options
     .boolean('safe')
     .describe(
       'safe',
-      'Do not load packages from ~/.pulsar/packages or ~/.pulsar/dev/packages.'
+      'Do not load packages from ~/.lumine/packages or ~/.lumine/dev/packages.'
     );
   options
     .boolean('benchmark')
@@ -124,7 +124,7 @@ module.exports = function parseCommandLine(processArgs) {
   options.string('user-data-dir');
   options
     .boolean('clear-window-state')
-    .describe('clear-window-state', 'Delete all Pulsar environment state.');
+    .describe('clear-window-state', 'Delete all Lumine environment state.');
   options
     .boolean('enable-electron-logging')
     .describe(
@@ -136,12 +136,12 @@ module.exports = function parseCommandLine(processArgs) {
     .boolean('p')
     .describe(
       'package',
-      'Delegate all commands to Pulsar\'s package management. Run with --package for more details'
+      'Delegate all commands to Lumine\'s package management. Run with --package for more details'
     );
   options.boolean('uri-handler');
   options
     .version(
-      dedent`Pulsar  : ${version}
+      dedent`Lumine  : ${version}
              Electron: ${process.versions.electron}
              Chrome  : ${process.versions.chrome}
              Node    : ${process.versions.node}`

@@ -20,7 +20,7 @@ exports.default = async function notarizing(ctx) {
 
 	/** @type {Parameters<typeof notarize>[0]} */
 	let notarise_args = {
-		appBundleId: "dev.pulsar-edit.pulsar",
+		appBundleId: "io.github.lumine-editor.lumine",
 		appPath: `${ctx.appOutDir}/${appname}.app`,
 		appleId,
 		appleIdPassword

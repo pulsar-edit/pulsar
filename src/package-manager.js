@@ -178,10 +178,9 @@ module.exports = class PackageManager {
     return this.emitter.on('did-unload-package', callback);
   }
 
-  // Returns the command needed to invoke PPM for the current release channel.
+  // Returns the command needed to invoke PPM.
   static getCommandName(version) {
-    let releaseChannel = getReleaseChannel(version);
-    let commandName = releaseChannel === 'next' ? 'ppm-next' : 'ppm';
+    let commandName = 'ppm';
     return process.platform === 'win32' ? `${commandName}.cmd` : commandName;
   }
 

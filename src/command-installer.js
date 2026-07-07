@@ -32,10 +32,8 @@ module.exports = class CommandInstaller {
       return process.env.ATOM_BASE_NAME;
     }
 
-    // Otherwise we can make an educated guess from the name of the release
-    // channel.
-    let releaseChannel = this.getReleaseChannel();
-    this.scriptBaseName = releaseChannel === 'next' ? 'pulsar-next' : 'pulsar';
+    // Otherwise fall back to the default executable name.
+    this.scriptBaseName = 'lumine';
 
     return this.scriptBaseName;
   }
@@ -91,8 +89,7 @@ module.exports = class CommandInstaller {
   }
 
   installApmCommand(askForPrivilege, callback) {
-    let isNextReleaseChannel = this.getScriptBaseName().endsWith('-next');
-    let ppmName = isNextReleaseChannel ? 'ppm-next' : 'ppm';
+    let ppmName = 'ppm';
     this.installCommand(
       path.join(
         this.getResourcesDirectory(),

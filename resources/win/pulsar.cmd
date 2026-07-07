@@ -42,20 +42,10 @@ set EXE_NAME=
 set ATOM_CHANNEL=
 set PPM_NAME=
 
-REM Use the name of the executable to infer a release channel.
 set ATOM_BASE_NAME=%~n0
-
-if "%ATOM_BASE_NAME%"=="pulsar-next" (
-  set ATOM_CHANNEL=next
-  set EXE_NAME=PulsarNext
-  set PPM_NAME=ppm-next
-)
-
-if "%ATOM_BASE_NAME%"=="pulsar" (
-  set ATOM_CHANNEL=stable
-  set EXE_NAME=Pulsar
-  set PPM_NAME=ppm
-)
+set ATOM_CHANNEL=stable
+set EXE_NAME=Lumine
+set PPM_NAME=ppm
 
 IF "%ATOM_ADD%"=="YES" (
   IF "%ATOM_NEW_WINDOW%"=="YES" (

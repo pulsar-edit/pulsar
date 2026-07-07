@@ -1,23 +1,23 @@
 {
-  "name": "pulsar",
-  "author": "Pulsar-Edit <admin@pulsar-edit.dev>",
-  "productName": "Pulsar",
+  "name": "lumine",
+  "author": "lumine-editor",
+  "productName": "Lumine",
   "version": "1.132.1-dev",
   "description": "A Community-led Hyper-Hackable Text Editor",
   "branding": {
-    "id": "pulsar",
-    "name": "Pulsar",
-    "urlWeb": "https://pulsar-edit.dev/",
-    "urlGH": "https://github.com/pulsar-edit",
-    "urlForum": "https://github.com/orgs/pulsar-edit/discussions"
+    "id": "lumine",
+    "name": "Lumine",
+    "urlWeb": "https://github.com/lumine-editor",
+    "urlGH": "https://github.com/lumine-editor",
+    "urlForum": "https://github.com/orgs/lumine-editor/discussions"
   },
   "main": "./src/main-process/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pulsar-edit/pulsar"
+    "url": "https://github.com/lumine-editor/lumine"
   },
   "bugs": {
-    "url": "https://github.com/pulsar-edit/pulsar/issues"
+    "url": "https://github.com/lumine-editor/lumine/issues"
   },
   "engines": {
     "node": ">=22.0.0"

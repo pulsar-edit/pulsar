@@ -13,14 +13,7 @@ fi
 
 ATOM_BASE_NAME=$(basename $0)
 ATOM_BASE_NAME=${ATOM_BASE_NAME%.*}
-case $ATOM_BASE_NAME in
-  pulsar-next)
-    CHANNEL=next
-    ;;
-  *)
-    CHANNEL=stable
-    ;;
-esac
+CHANNEL=stable
 # Capture the name of this script so that we can use it at runtime.
 export ATOM_BASE_NAME
 export ATOM_CHANNEL=$CHANNEL
@@ -137,12 +130,7 @@ if [ $OS == 'Mac' ]; then
     # If ATOM_APP_NAME is known, use it as the executable name
     ATOM_EXECUTABLE_NAME="${ATOM_APP_NAME%.*}"
   else
-    # Else choose it from the inferred channel name
-    if [ "$CHANNEL" == 'next' ]; then
-      ATOM_EXECUTABLE_NAME="PulsarNext"
-    else
-      ATOM_EXECUTABLE_NAME="Pulsar"
-    fi
+    ATOM_EXECUTABLE_NAME="Lumine"
     ATOM_APP_NAME="${ATOM_EXECUTABLE_NAME}.app"
   fi
 
@@ -156,7 +144,7 @@ if [ $OS == 'Mac' ]; then
     else
       # We still haven't found it. Let's try searching for it via
       # Spotlight.
-      PULSAR_APP_SEARCH_RESULT="$(mdfind "kMDItemCFBundleIdentifier == 'dev.pulsar-edit.${BASENAME}'" | grep -v ShipIt | head -1)"
+      PULSAR_APP_SEARCH_RESULT="$(mdfind "kMDItemCFBundleIdentifier == 'io.github.lumine-editor.${BASENAME}'" | grep -v ShipIt | head -1)"
       if [ ! -z "$PULSAR_APP_SEARCH_RESULT" ]; then
         PULSAR_PATH="$(dirname "$PULSAR_APP_SEARCH_RESULT")"
         ATOM_APP_NAME="$(basename "$PULSAR_APP_SEARCH_RESULT")"
@@ -198,17 +186,12 @@ elif [ $OS == 'Linux' ]; then
 
   # We think that
   #
-  # * `ATOM_APP_NAME` will refer to the human-readable app name (“Pulsar” or
-  #   “PulsarNext”)
+  # * `ATOM_APP_NAME` will refer to the human-readable app name (“Lumine”)
   # * `ATOM_EXECUTABLE_NAME` will refer to the executable we must run to launch
-  #   it (`pulsar` or `pulsar-next`)
+  #   it (`lumine`)
 
   ATOM_EXECUTABLE_NAME=$ATOM_BASE_NAME
-  if [ "$CHANNEL" == 'next' ]; then
-    ATOM_APP_NAME="PulsarNext"
-  else
-    ATOM_APP_NAME="Pulsar"
-  fi
+  ATOM_APP_NAME="Lumine"
 
   # If `PULSAR_PATH` is set by the user, we'll assume they know what they're
   # doing. Otherwise we should try to find it ourselves.
@@ -252,17 +235,7 @@ elif [ $OS == 'Linux' ]; then
 
   PULSAR_EXECUTABLE="$PULSAR_PATH/$ATOM_EXECUTABLE_NAME"
 
-  # The name of the `ppm` binary we should run will be named according to the
-  # same convention as this script; that's how PPM itself knows which release
-  # channel it's using.
-  case $ATOM_BASE_NAME in
-    pulsar-next)
-      PPM_EXECUTABLE_NAME="ppm-next"
-      ;;
-    *)
-      PPM_EXECUTABLE_NAME="ppm"
-      ;;
-  esac
+  PPM_EXECUTABLE_NAME="ppm"
 
   PPM_EXECUTABLE="$PULSAR_PATH/resources/app/ppm/bin/$PPM_EXECUTABLE_NAME"
 

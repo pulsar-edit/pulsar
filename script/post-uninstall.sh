@@ -7,14 +7,7 @@ then
   rm "$PULSAR_SCRIPT_PATH"
 fi
 
-case $executable in
-  pulsar-next)
-    ppm_executable=ppm-next
-    ;;
-  *)
-    ppm_executable=ppm
-    ;;
-esac
+ppm_executable=ppm
 
 PPM_SYMLINK_PATH="/usr/bin/${ppm_executable}"
 

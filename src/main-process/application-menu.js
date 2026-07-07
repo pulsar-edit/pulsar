@@ -113,7 +113,7 @@ module.exports = class ApplicationMenu {
   getDefaultTemplate() {
     return [
       {
-        label: 'Pulsar',
+        label: 'Lumine',
         id: 'Pulsar',
         submenu: [
           {

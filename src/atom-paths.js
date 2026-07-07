@@ -27,17 +27,17 @@ const getAppDirectory = () => {
 
 module.exports = {
   setAtomHome: homePath => {
-    // When a read-writeable `.pulsar` folder exists above the app directory,
+    // When a read-writeable `.lumine` folder exists above the app directory,
     // use that. The portability means that we don't have to use a different
     // name to distinguish the release channel.
-    const portableHomePath = path.join(getAppDirectory(), '..', '.pulsar');
+    const portableHomePath = path.join(getAppDirectory(), '..', '.lumine');
     if (fs.existsSync(portableHomePath)) {
       if (hasWriteAccess(portableHomePath)) {
         process.env.ATOM_HOME = portableHomePath;
       } else {
         // A path exists so it was intended to be used but we didn't have rights, so warn.
         console.log(
-          `Insufficient permission to portable Pulsar home "${portableHomePath}".`
+          `Insufficient permission to portable Lumine home "${portableHomePath}".`
         );
       }
     }
@@ -47,25 +47,14 @@ module.exports = {
       return;
     }
 
-    // We fall back to a `.pulsar` folder in the user's home folder — or a
-    // different folder name if we're not on the stable release channel.
+    // We fall back to a `.lumine` folder in the user's home folder.
     //
-    // On macOS and Linux, `ATOM_HOME` gets set in `pulsar(-next).sh`, so we'd
-    // only get this far if the user launched via a non-shell method.
+    // On macOS and Linux, `ATOM_HOME` gets set in `lumine.sh`, so we'd only get
+    // this far if the user launched via a non-shell method. On Windows, we
+    // don’t try to set `ATOM_HOME` in `lumine.cmd`, so we'll always get this
+    // far.
     //
-    // On Windows, we don’t try to set `ATOM_HOME` in `pulsar.cmd`, so we'll
-    // always get this far.
-    //
-    // In these cases, we rely on `ATOM_CHANNEL`, which is defined either by
-    // the launcher script or by the main process shortly after launch
-    // (inferred via the version number).
-    //
-    let folderName = '.pulsar';
-    if (process.env.ATOM_CHANNEL === 'next') {
-      folderName = '.pulsar-next';
-    }
-
-    process.env.ATOM_HOME = path.join(homePath, folderName);
+    process.env.ATOM_HOME = path.join(homePath, '.lumine');
   },
 
   setUserData: app => {
