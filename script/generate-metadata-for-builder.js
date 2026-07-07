@@ -67,7 +67,6 @@ function buildBundledPackagesMetadata(packageJSON) {
       keymaps: {},
       menus: {},
       grammarPaths: [],
-      locales: {},
       settings: {}
     };
 
@@ -120,21 +119,6 @@ function buildBundledPackagesMetadata(packageJSON) {
         }
       }
     }
-    const packageLocalesPath = path.join(packagePath, 'locales');
-    if (fs.existsSync(packageLocalesPath)) {
-      for (let packageLocale of fs.readdirSync(packageLocalesPath)) {
-        const packageLocalePath = path.join(packageLocalesPath, packageLocale);
-        if (
-          packageLocalePath.endsWith('.cson') ||
-          packageLocalePath.endsWith('.json')
-        ) {
-          packageNewMetadata.locales[packageLocalePath] = CSON.readFileSync(
-            packageLocalePath
-          );
-        }
-      }
-    }
-    
     const packageGrammarsPath = path.join(packagePath, 'grammars');
     for (let packageGrammarPath of fs.listSync(packageGrammarsPath, [
       'json',

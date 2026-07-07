@@ -47,7 +47,6 @@ const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
 const { getReleaseChannel } = require('./get-app-details.js');
 const UI = require('./ui.js');
-const I18n = require("./i18n.js");
 const packagejson = require("../package.json");
 
 const { closeAllWatchers } = require('@pulsar-edit/pathwatcher');
@@ -109,14 +108,6 @@ class AtomEnvironment {
       config: this.config
     });
 
-    /** @type {I18n} */
-    const localeLoadStartTime = performance.now();
-    this.i18n = new I18n({
-      config: this.config
-    });
-    this.i18n.preload();
-    this.localeLoadTime = Math.round(performance.now() - localeLoadStartTime);
-
     /** @type {KeymapManager} */
     this.keymaps = new KeymapManager({
       notificationManager: this.notifications
@@ -164,12 +155,11 @@ class AtomEnvironment {
     /** @type {MenuManager} */
     this.menu = new MenuManager({
       keymapManager: this.keymaps,
-      packageManager: this.packages,
-      i18n: this.i18n
+      packageManager: this.packages
     });
 
     /** @type {ContextMenuManager} */
-    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps, i18n: this.i18n });
+    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps });
 
     this.packages.setMenuManager(this.menu);
     this.packages.setContextMenuManager(this.contextMenu);
@@ -293,10 +283,6 @@ class AtomEnvironment {
     if (projectSpecification != null && projectSpecification.config != null) {
       this.project.replace(projectSpecification);
     }
-
-    this.i18n.initialize({
-      resourcePath: resourcePath
-    });
 
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });

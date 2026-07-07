@@ -6,11 +6,6 @@ module.exports = {
     if (schema && schema.description) {
       description = schema.description
     }
-
-    // Localize
-    if (atom.i18n.isAutoTranslateLabel(description)) {
-      description = atom.i18n.translateLabel(description);
-    }
     
     return atom.ui.markdown.render(
       description,

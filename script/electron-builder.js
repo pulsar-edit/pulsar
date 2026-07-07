@@ -94,7 +94,6 @@ let options = {
     "src/**/*",
     "static/**/*",
     "vendor/**/*",
-    "locales/*",
     "node_modules/**/*",
 
     // Core Repo Test Inclusions

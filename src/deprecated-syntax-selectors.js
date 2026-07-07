@@ -2268,7 +2268,6 @@ module.exports = new Set([
   'hyphenation-char',
   'i',
   'i-beam',
-  'i18n',
   'iRev',
   'ice',
   'icinga2',

@@ -10,7 +10,7 @@ export default class CommandPaletteView {
       initiallyVisibleItemCount: initiallyVisibleItemCount, // just for being able to disable visible-on-render in spec
       items: [],
       filter: this.filter,
-      emptyMessage: atom.i18n.t("command-palette.commandPaletteView.emptyMessage"),
+      emptyMessage: 'No matches found',
       elementForItem: (item, {index, selected, visible}) => {
         if (!visible) {
           return document.createElement("li")
@@ -232,7 +232,7 @@ export default class CommandPaletteView {
     })
 
     const introEl = document.createElement('strong')
-    introEl.textContent = atom.i18n.t("command-palette.commandPaletteView.matchingTags");
+    introEl.textContent = 'matching tags: '
 
     tagsEl.appendChild(introEl)
     matchingTags.map(t => this.createTag(t, query)).forEach((tagEl, i) => {
