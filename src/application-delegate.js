@@ -252,7 +252,7 @@ module.exports = class ApplicationDelegate {
     }
   }
 
-  showMessageDialog(params) {}
+  showMessageDialog(_params) {}
 
   showSaveDialog(options, callback) {
     if (typeof callback === "function") {
@@ -297,7 +297,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidRequestUnload(callback) {
-    const outerCallback = async (event, message) => {
+    const outerCallback = async (event, _message) => {
       const shouldUnload = await callback(event);
       ipcRenderer.send("did-prepare-to-unload", shouldUnload);
     };
@@ -307,7 +307,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidChangeHistoryManager(callback) {
-    const outerCallback = (event, message) => callback(event);
+    const outerCallback = (event, _message) => callback(event);
 
     ipcRenderer.on("did-change-history-manager", outerCallback);
     return new Disposable(() =>

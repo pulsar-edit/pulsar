@@ -905,7 +905,7 @@ module.exports = class Pane {
   }
 
   promptToSaveItem(item, options = {}) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       if (typeof item.shouldPromptToSave !== "function" || !item.shouldPromptToSave(options)) {
         return resolve(true);
       }

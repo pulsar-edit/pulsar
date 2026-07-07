@@ -1,5 +1,6 @@
 // Copied from NPM package functional-red-black-tree
 // but changed to not insert duplicates (!!!)
+/* eslint-disable no-redeclare, no-unreachable, getter-return, no-unused-vars -- vendored third-party code, kept close to upstream */
 "use strict";
 
 module.exports = createRBTree;

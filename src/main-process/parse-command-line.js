@@ -145,7 +145,7 @@ module.exports = function parseCommandLine(processArgs) {
   const timeout = args["timeout"];
   const newWindow = args["new-window"];
   const useCrashReporter = args["crashdump"];
-  let executedFrom = null;
+  let executedFrom;
   if (args["executed-from"] && args["executed-from"].toString()) {
     executedFrom = args["executed-from"].toString();
   } else {

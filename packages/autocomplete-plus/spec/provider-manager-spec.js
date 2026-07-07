@@ -1,5 +1,4 @@
 "use babel";
-/* eslint-env jasmine */
 
 import ProviderManager from "../lib/provider-manager";
 

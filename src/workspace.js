@@ -1174,6 +1174,7 @@ module.exports = class Workspace extends Model {
 
       // Avoid adding URLs as recent documents to work-around this Spotlight crash:
       // https://github.com/atom/atom/issues/10071
+      // eslint-disable-next-line n/no-deprecated-api -- url.parse tolerates loose/relative input and exposes slashes/auth; URL migration needs review
       if (uri && (!url.parse(uri).protocol || process.platform === "win32")) {
         this.applicationDelegate.addRecentDocument(uri);
       }
@@ -2439,7 +2440,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Promise}.
   replace(regex, replacementText, filePaths, iterator) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       let buffer;
       const openPaths = this.project.getBuffers().map((buffer) => buffer.getPath());
       const outOfProcessPaths = _.difference(filePaths, openPaths);

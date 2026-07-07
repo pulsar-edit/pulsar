@@ -1667,7 +1667,7 @@ or use Pane::saveItemAs for programmatic saving.`);
   }
 
   resolveProxy(url) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       const requestId = this.nextProxyRequestId++;
       const disposable = this.applicationDelegate.onDidResolveProxy((id, proxy) => {
         if (id === requestId) {
@@ -1685,12 +1685,8 @@ AtomEnvironment.version = 1;
 AtomEnvironment.prototype.saveStateDebounceInterval = 1000;
 module.exports = AtomEnvironment;
 
-/* eslint-disable */
-
 // Preserve this deprecation until 2.0. Sorry. Should have removed Q sooner.
 Promise.prototype.done = function (callback) {
   deprecate("Lumine now uses ES6 Promises instead of Q. Call promise.then instead of promise.done");
   return this.then(callback);
 };
-
-/* eslint-enable */

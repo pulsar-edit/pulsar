@@ -127,13 +127,13 @@ module.exports = async function ({ blobStore }) {
     const buildDefaultApplicationDelegate = () => new ApplicationDelegate();
     const buildAtomEnvironment = function (params) {
       params = cloneObject(params);
-      if (!params.hasOwnProperty("clipboard")) {
+      if (!Object.hasOwn(params, "clipboard")) {
         params.clipboard = clipboard;
       }
-      if (!params.hasOwnProperty("blobStore")) {
+      if (!Object.hasOwn(params, "blobStore")) {
         params.blobStore = blobStore;
       }
-      if (!params.hasOwnProperty("onlyLoadBaseStyleSheets")) {
+      if (!Object.hasOwn(params, "onlyLoadBaseStyleSheets")) {
         params.onlyLoadBaseStyleSheets = true;
       }
       const atomEnvironment = new AtomEnvironment(params);

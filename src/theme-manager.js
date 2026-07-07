@@ -244,7 +244,7 @@ module.exports = class ThemeManager {
       this.userStylesheetSubscription = await watcher.watchPath(realStylesheetPath, {}, () => {
         this.reloadStylesheet();
       });
-    } catch (error) {
+    } catch {
       let message = `
 Unable to watch path: \`${path.basename(userStylesheetPath)}\`. Make sure
 you have permissions to \`${userStylesheetPath}\`.
@@ -262,7 +262,7 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     let userStylesheetContents;
     try {
       userStylesheetContents = this.loadStylesheet(userStylesheetPath, true);
-    } catch (error) {
+    } catch {
       return;
     }
 

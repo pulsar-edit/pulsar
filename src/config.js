@@ -735,7 +735,7 @@ class Config {
     if (value !== undefined) {
       try {
         value = this.makeValueConformToSchema(keyPath, value);
-      } catch (e) {
+      } catch {
         return false;
       }
     }
@@ -862,7 +862,7 @@ class Config {
     }
   }
 
-  getLegacyScopeDescriptorForNewScopeDescriptor(scopeDescriptor) {
+  getLegacyScopeDescriptorForNewScopeDescriptor(_scopeDescriptor) {
     return null;
   }
 
@@ -1154,7 +1154,7 @@ class Config {
         const result = [];
         for (let key in defaults) {
           const childValue = defaults[key];
-          if (!defaults.hasOwnProperty(key)) {
+          if (!Object.hasOwn(defaults, key)) {
             continue;
           }
           result.push(this.setDefaults(keys.concat([key]).join("."), childValue));
@@ -1165,7 +1165,7 @@ class Config {
       try {
         defaults = this.makeValueConformToSchema(keyPath, defaults);
         this.setRawDefault(keyPath, defaults);
-      } catch (e) {
+      } catch {
         console.warn(
           `'${keyPath}' could not set the default. Attempted default: ${JSON.stringify(
             defaults,
@@ -1219,7 +1219,7 @@ class Config {
       const scopedDefaults = {};
       for (let scope in schema.scopes) {
         const scopeSchema = schema.scopes[scope];
-        if (!scopeSchema.hasOwnProperty("default")) {
+        if (!Object.hasOwn(scopeSchema, "default")) {
           continue;
         }
         scopedDefaults[scope] = {};
@@ -1232,7 +1232,7 @@ class Config {
       const keys = splitKeyPath(keyPath);
       for (let key in schema.properties) {
         const childValue = schema.properties[key];
-        if (!schema.properties.hasOwnProperty(key)) {
+        if (!Object.hasOwn(schema.properties, key)) {
           continue;
         }
         this.setScopedDefaultsFromSchema(keys.concat([key]).join("."), childValue);
@@ -1262,7 +1262,7 @@ class Config {
     if (options != null ? options.suppressException : undefined) {
       try {
         return this.makeValueConformToSchema(keyPath, value);
-      } catch (e) {
+      } catch {
         return undefined;
       }
     } else {
@@ -1341,7 +1341,7 @@ class Config {
     return this.emitChangeEvent();
   }
 
-  setRawScopedValue(keyPath, value, source, selector, options) {
+  setRawScopedValue(keyPath, value, source, selector, _options) {
     if (keyPath != null) {
       const newValue = {};
       setValueAtKeyPath(newValue, keyPath, value);
@@ -1405,13 +1405,13 @@ class Config {
 // specification.
 Config.addSchemaEnforcers({
   any: {
-    coerce(keyPath, value, schema) {
+    coerce(keyPath, value, _schema) {
       return value;
     },
   },
 
   integer: {
-    coerce(keyPath, value, schema) {
+    coerce(keyPath, value, _schema) {
       value = parseInt(value);
       if (isNaN(value) || !isFinite(value)) {
         throw new Error(
@@ -1423,7 +1423,7 @@ Config.addSchemaEnforcers({
   },
 
   number: {
-    coerce(keyPath, value, schema) {
+    coerce(keyPath, value, _schema) {
       value = parseFloat(value);
       if (isNaN(value) || !isFinite(value)) {
         throw new Error(
@@ -1437,7 +1437,7 @@ Config.addSchemaEnforcers({
   },
 
   boolean: {
-    coerce(keyPath, value, schema) {
+    coerce(keyPath, value, _schema) {
       switch (typeof value) {
         case "string":
           if (value.toLowerCase() === "true") {
@@ -1464,7 +1464,7 @@ Config.addSchemaEnforcers({
   },
 
   string: {
-    validate(keyPath, value, schema) {
+    validate(keyPath, value, _schema) {
       if (typeof value !== "string") {
         throw new Error(
           `Validation failed at ${keyPath}, ${JSON.stringify(value)} must be a string`,
@@ -1484,7 +1484,7 @@ Config.addSchemaEnforcers({
 
   null: {
     // null sort of isnt supported. It will just unset in this case
-    coerce(keyPath, value, schema) {
+    coerce(keyPath, value, _schema) {
       if (![undefined, null].includes(value)) {
         throw new Error(`Validation failed at ${keyPath}, ${JSON.stringify(value)} must be null`);
       }
@@ -1564,7 +1564,7 @@ Config.addSchemaEnforcers({
   },
 
   color: {
-    coerce(keyPath, value, schema) {
+    coerce(keyPath, value, _schema) {
       const color = Color.parse(value);
       if (color == null) {
         throw new Error(
@@ -1596,7 +1596,7 @@ Config.addSchemaEnforcers({
 
       if (Array.isArray(possibleValues)) {
         possibleValues = possibleValues.map((value) => {
-          if (value.hasOwnProperty("value")) {
+          if (Object.hasOwn(value, "value")) {
             return value.value;
           } else {
             return value;

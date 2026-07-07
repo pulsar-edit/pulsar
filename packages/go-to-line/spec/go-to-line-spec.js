@@ -1,6 +1,5 @@
 "use babel";
 
-/* eslint-env jasmine */
 
 import GoToLineView from "../lib/go-to-line-view";
 const path = require("path");

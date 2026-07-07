@@ -1,6 +1,4 @@
-/* eslint-disable no-process-exit */
 const Path = require("path");
-const dedent = require("dedent");
 const FS = require("fs/promises");
 const { existsSync } = require("fs");
 const yargs = require("yargs");
@@ -57,7 +55,6 @@ async function modifyMainPackageJson(
 
 // END Monkey-patch.
 
-// eslint-disable-next-line n/no-unpublished-require
 const builder = require("electron-builder");
 
 const ARGS = yargs(hideBin(process.argv))

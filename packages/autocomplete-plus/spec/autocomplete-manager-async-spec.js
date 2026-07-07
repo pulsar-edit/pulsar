@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 const { waitForAutocomplete, timeoutPromise, conditionPromise } = require("./spec-helper");
 const path = require("path");

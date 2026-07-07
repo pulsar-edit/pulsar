@@ -190,7 +190,7 @@ describe("TextEditorComponent", () => {
         expect(actualWidth).toBe(expectedWidth + "px");
       }
 
-      // eslint-disable-next-line no-lone-blocks
+       
       {
         // Make sure we do not throw an error if a synchronous update is
         // triggered before measuring the longest line from a

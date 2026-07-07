@@ -161,7 +161,6 @@ function renderMarkdown(content, givenOpts = {}) {
 
     md.renderer.rules.image = (tokens, idx, options, env, self) => {
       let token = tokens[idx];
-      let aIndex = token.attrIndex("src");
 
       // Lets say content contains './my-cool-image.png'
       // We need to turn it into something like this:
@@ -187,8 +186,8 @@ function renderMarkdown(content, givenOpts = {}) {
         // Now to handle the possible web or local link
         if (couldBeLocalItem) {
           const [rootDirectory] = atom.project.relativePath(opts.filePath);
-          if (!fs.lstatSync(src).isFile() && rootDirectory) {
-            let newSrc = path.join(rootDirectory, rawLink);
+          let newSrc = path.join(rootDirectory, rawLink);
+          if (!fs.lstatSync(newSrc).isFile() && rootDirectory) {
             token.attrSet("src", newSrc);
           } else {
             token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
@@ -331,7 +330,7 @@ function renderMarkdown(content, givenOpts = {}) {
     });
 
     // Disable Heading
-    md.block.ruler.before("heading", "strip_heading", (state, startLine, endLine) => {
+    md.block.ruler.before("heading", "strip_heading", (state, startLine, _endLine) => {
       let pos = state.bMarks[startLine] + state.tShift[startLine];
 
       if (state.src.charAt(pos) === "#") {
@@ -441,7 +440,7 @@ function renderMarkdown(content, givenOpts = {}) {
 
       const markdownRows = [
         entries.map((entry) => entry[0]),
-        entries.map((entry) => "--"),
+        entries.map((_entry) => "--"),
         entries.map((entry) => {
           if (typeof entry[1] === "object" && !Array.isArray(entry[1])) {
             // Remove all newlines, or they ruin formatting of parent table
@@ -464,11 +463,6 @@ function renderMarkdown(content, givenOpts = {}) {
 
   if (opts.sanitize) {
     mdComponents.deps.domPurify ??= require("dompurify");
-
-    let domPurifyOpts = {
-      ALLOW_UNKNOWN_PROTOCOLS: opts.sanitizeAllowUnknownProtocols,
-      ALLOW_SELF_CLOSE_IN_ATTR: opts.sanitizeAllowSelfClose,
-    };
 
     rendered = mdComponents.deps.domPurify.sanitize(rendered, opts);
   }
@@ -693,7 +687,7 @@ const fuzzyMatcher = {
 
   // Same as {setCandidates} passing a single candidate, and returning only
   // the score. It can return `0` if there's no match.
-  score(candidate, query, opts = {}) {
+  score(candidate, query, _opts = {}) {
     return this.match(candidate, query)?.score || 0;
   },
 

@@ -81,7 +81,7 @@ module.exports = class ConfigFile {
       });
       await watcher.start();
       return { dispose: () => watcher.stop() };
-    } catch (error) {
+    } catch {
       //TODO_LUMINE: Find out why the atom global variable isn't available at this point
       this.emitter.emit(
         "did-error",

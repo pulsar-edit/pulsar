@@ -1,5 +1,4 @@
 "use babel";
-/* eslint-env jasmine */
 
 import { conditionPromise, waitForAutocomplete } from "./spec-helper";
 import path from "path";

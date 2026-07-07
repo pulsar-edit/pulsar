@@ -59,7 +59,7 @@ if (buildMetadata) {
 // ```
 //
 // See {::add} for more info about adding menu's directly.
-module.exports = MenuManager = class MenuManager {
+module.exports = class MenuManager {
   constructor({ resourcePath, keymapManager, packageManager }) {
     this.resourcePath = resourcePath;
     this.keymapManager = keymapManager;
@@ -137,7 +137,7 @@ module.exports = MenuManager = class MenuManager {
       if (document.body.webkitMatchesSelector(selector)) {
         return true;
       }
-    } catch (error) {
+    } catch {
       // Selector isn't valid
       return false;
     }
@@ -234,7 +234,6 @@ module.exports = MenuManager = class MenuManager {
 
   // Get an {Array} of {String} classes for the given element.
   classesForElement(element) {
-    var classList;
     if (element && element.classList) {
       return Array.prototype.slice.apply(element.classList);
     } else {

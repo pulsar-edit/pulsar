@@ -14,6 +14,7 @@ module.exports = class DefaultDirectoryProvider {
   // * `null` if the given URI is not compatible with this provider.
   directoryForURISync(uri) {
     const normalizedPath = this.normalizePath(uri);
+    // eslint-disable-next-line n/no-deprecated-api -- url.parse tolerates loose/relative input and exposes slashes/auth; URL migration needs review
     const { host } = url.parse(uri);
     let directoryPath;
     if (host) {

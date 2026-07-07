@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 beforeEach(() => {
   spyOn(atom.views, "readDocument").andCallFake((fn) => fn());

@@ -67,7 +67,7 @@ module.exports = class PaneContainer {
     return !this.isAlive();
   }
 
-  serialize(params) {
+  serialize(_params) {
     return {
       deserializer: "PaneContainer",
       version: SERIALIZATION_VERSION,

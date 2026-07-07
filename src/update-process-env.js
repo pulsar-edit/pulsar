@@ -94,7 +94,7 @@ async function getEnvFromShell(env) {
     child.stdout.on("data", (data) => {
       buffers.push(data);
     });
-    child.on("close", (code, signal) => {
+    child.on("close", (_code, _signal) => {
       done = true;
       process.removeListener("exit", cleanup);
       if (buffers.length) {

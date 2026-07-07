@@ -190,7 +190,7 @@ module.exports = class Package {
   activate() {
     if (!this.grammarsPromise) this.grammarsPromise = this.loadGrammars();
     if (!this.activationPromise) {
-      this.activationPromise = new Promise((resolve, reject) => {
+      this.activationPromise = new Promise((resolve, _reject) => {
         this.resolveActivationPromise = resolve;
         this.measure("activateTime", () => {
           try {
@@ -1048,7 +1048,7 @@ module.exports = class Package {
   isNativeModule(modulePath) {
     try {
       return this.getModulePathNodeFiles(modulePath).length > 0;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -1058,7 +1058,7 @@ module.exports = class Package {
     try {
       const modulePathNodeFiles = fs.listSync(path.join(modulePath, "build", "Release"), [".node"]);
       return modulePathNodeFiles;
-    } catch (error) {
+    } catch {
       return [];
     }
   }
@@ -1100,7 +1100,9 @@ module.exports = class Package {
           }
           traversePath(path.join(modulePath, "node_modules"));
         }
-      } catch (error) {}
+      } catch {
+        /* ignore */
+      }
     };
 
     traversePath(path.join(this.path, "node_modules"));
@@ -1210,7 +1212,9 @@ module.exports = class Package {
         let version;
         try {
           ({ version } = require(`${nativeModulePath}/package.json`));
-        } catch (error2) {}
+        } catch {
+          /* ignore */
+        }
         incompatibleNativeModules.push({
           path: nativeModulePath,
           name: path.basename(nativeModulePath),

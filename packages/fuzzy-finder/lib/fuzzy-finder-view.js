@@ -266,7 +266,7 @@ module.exports = class FuzzyFinderView {
       splitFn(activePane)({ copyActiveItem: true });
       this.moveToCaretPosition(caretPosition);
     } else if (!uri) {
-      return; // eslint-disable-line no-useless-return
+      return;  
     } else if (activePane) {
       this.previouslyFocusedElement = null;
       splitFn(activePane)();

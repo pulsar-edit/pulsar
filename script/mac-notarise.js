@@ -44,6 +44,7 @@ exports.default = async function notarizing(ctx) {
     };
   }
 
+  // eslint-disable-next-line n/no-extraneous-require -- build-only transitive dep
   require("debug").enable("electron-notarize");
 
   return await notarize(notarise_args);

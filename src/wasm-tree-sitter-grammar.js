@@ -625,7 +625,7 @@ module.exports = class WASMTreeSitterGrammar {
   /*
   Section - Backward compatibility shims
   */
-  /* eslint-disable no-unused-vars */
+
   onDidUpdate(_callback) {
     // do nothing
   }
@@ -640,7 +640,6 @@ module.exports = class WASMTreeSitterGrammar {
       scopes: [this.scopeName],
     };
   }
-  /* eslint-enable no-unused-vars */
 };
 
 function buildRegex(value) {

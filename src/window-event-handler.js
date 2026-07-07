@@ -84,7 +84,7 @@ module.exports = class WindowEventHandler {
         this.atomEnvironment.commands.add(
           ".native-key-bindings",
           command,
-          (event) => this.applicationDelegate.getCurrentWindow().webContents[action](),
+          (_event) => this.applicationDelegate.getCurrentWindow().webContents[action](),
           false,
         ),
       );
@@ -227,7 +227,7 @@ module.exports = class WindowEventHandler {
     this.document.body.classList.remove("fullscreen");
   }
 
-  handleWindowBeforeunload(event) {
+  handleWindowBeforeunload(_event) {
     if (
       !this.reloadRequested &&
       !this.atomEnvironment.inSpecMode() &&

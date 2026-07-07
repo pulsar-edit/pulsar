@@ -5,7 +5,6 @@ var idCounter = 1;
 
 const TokenizedLine = class TokenizedLine {
   constructor(properties) {
-    var tokens;
     this.id = idCounter++;
     if (properties == null) {
       return;

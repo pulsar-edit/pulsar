@@ -346,7 +346,7 @@ module.exports = class Project extends Model {
   getPaths() {
     try {
       return this.rootDirectories.map((rootDirectory) => rootDirectory.getPath());
-    } catch (e) {
+    } catch {
       atom.notifications.addError(
         "Please clear Lumine's window state with: lumine --clear-window-state",
       );
@@ -799,7 +799,7 @@ module.exports = class Project extends Model {
     return buffer;
   }
 
-  addBuffer(buffer, options = {}) {
+  addBuffer(buffer, _options = {}) {
     this.buffers.push(buffer);
     this.subscriptions.add(this.grammarRegistry.maintainLanguageMode(buffer));
     this.subscribeToBuffer(buffer);
@@ -817,7 +817,7 @@ module.exports = class Project extends Model {
     }
   }
 
-  removeBufferAtIndex(index, options = {}) {
+  removeBufferAtIndex(index, _options = {}) {
     const [buffer] = this.buffers.splice(index, 1);
     return buffer != null ? buffer.destroy() : undefined;
   }

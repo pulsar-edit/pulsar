@@ -472,7 +472,7 @@ module.exports = class AtomApplication extends EventEmitter {
         try {
           const options = decryptOptions(data, this.socketSecret);
           this.openWithOptions(options);
-        } catch (e) {
+        } catch {
           // Error while parsing/decrypting the options passed by the client.
           // We cannot trust the client, aborting.
         }
@@ -837,7 +837,7 @@ module.exports = class AtomApplication extends EventEmitter {
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, "run-benchmarks", (event, benchmarksPath) => {
+      ipcHelpers.on(ipcMain, "run-benchmarks", (_event, _benchmarksPath) => {
         // Printing a message saying benchmarks are removed will help avoid
         // confusion about the benchmarking feature not working.
         console.log("The benchmarking feature has been removed.");
@@ -1280,7 +1280,9 @@ module.exports = class AtomApplication extends EventEmitter {
             path.join(this.devResourcePath, "src", "initialize-application-window"),
           );
           resourcePath = this.devResourcePath;
-        } catch (error) {}
+        } catch {
+          /* ignore */
+        }
       }
 
       if (!windowInitializationScript) {
@@ -1445,6 +1447,7 @@ module.exports = class AtomApplication extends EventEmitter {
   //   :devMode - Boolean to control the opened window's dev mode.
   //   :safeMode - Boolean to control the opened window's safe mode.
   openUrl({ urlToOpen, devMode, safeMode, env }) {
+    // eslint-disable-next-line n/no-deprecated-api -- url.parse tolerates loose/relative input and exposes slashes/auth; URL migration needs review
     const parsedUrl = url.parse(urlToOpen, true);
     if (parsedUrl.protocol !== "atom:") return;
 
@@ -1486,7 +1489,9 @@ module.exports = class AtomApplication extends EventEmitter {
             path.join(this.devResourcePath, "src", "initialize-application-window"),
           );
           resourcePath = this.devResourcePath;
-        } catch (error) {}
+        } catch {
+          /* ignore */
+        }
       }
 
       if (!windowInitializationScript) {
@@ -1575,7 +1580,7 @@ module.exports = class AtomApplication extends EventEmitter {
       windowInitializationScript = require.resolve(
         path.resolve(this.devResourcePath, "src", "initialize-test-window"),
       );
-    } catch (error) {
+    } catch {
       windowInitializationScript = require.resolve(
         path.resolve(__dirname, "..", "..", "src", "initialize-test-window"),
       );
@@ -1648,13 +1653,14 @@ module.exports = class AtomApplication extends EventEmitter {
     try {
       testRunnerPath = Resolve.sync(atomTestRunner, {
         basedir: packageRoot,
+        // eslint-disable-next-line n/no-deprecated-api -- Atom module system relies on require.extensions
         extensions: Object.keys(require.extensions),
       });
 
       if (testRunnerPath) {
         return testRunnerPath;
       }
-    } catch (err) {
+    } catch {
       // Nothing to do, try the next strategy
     }
 
@@ -1662,13 +1668,14 @@ module.exports = class AtomApplication extends EventEmitter {
     try {
       testRunnerPath = Resolve.sync(`./spec/${atomTestRunner}`, {
         basedir: this.devResourcePath,
+        // eslint-disable-next-line n/no-deprecated-api -- Atom module system relies on require.extensions
         extensions: Object.keys(require.extensions),
       });
 
       if (testRunnerPath) {
         return testRunnerPath;
       }
-    } catch (err) {
+    } catch {
       // Nothing to do, try the next strategy
     }
 
@@ -1681,7 +1688,7 @@ module.exports = class AtomApplication extends EventEmitter {
   resolveLegacyTestRunnerPath() {
     try {
       return require.resolve(path.resolve(this.devResourcePath, "spec", "jasmine-test-runner.js"));
-    } catch (error) {
+    } catch {
       return require.resolve(path.resolve(__dirname, "..", "..", "spec", "jasmine-test-runner.js"));
     }
   }
@@ -1720,6 +1727,7 @@ module.exports = class AtomApplication extends EventEmitter {
       path.resolve(executedFrom, fs.normalize(result.pathToOpen)),
     );
 
+    // eslint-disable-next-line n/no-deprecated-api -- url.parse tolerates loose/relative input and exposes slashes/auth; URL migration needs review
     if (!url.parse(result.pathToOpen).protocol) {
       // If this isn't a URL, it's a file path. File paths need to be resolved
       // and normalized, whereas we assume URLs are already unambiguous.
@@ -1906,7 +1914,7 @@ class WindowStack {
 
   getLastFocusedWindow(predicate) {
     if (predicate == null) {
-      predicate = (win) => true;
+      predicate = (_win) => true;
     }
     return this.windows.find(predicate);
   }

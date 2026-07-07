@@ -35,7 +35,7 @@ module.exports = class FileSystemBlobStore {
     try {
       this.storedBlob = fs.readFileSync(this.blobFilename);
       this.storedBlobMap = JSON.parse(fs.readFileSync(this.blobMapFilename));
-    } catch (e) {
+    } catch {
       this.reset();
     }
   }
@@ -65,7 +65,7 @@ module.exports = class FileSystemBlobStore {
   }
 
   has(key) {
-    return this.inMemoryBlobs.has(key) || this.storedBlobMap.hasOwnProperty(key);
+    return this.inMemoryBlobs.has(key) || Object.hasOwn(this.storedBlobMap, key);
   }
 
   get(key) {

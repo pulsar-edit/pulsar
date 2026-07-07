@@ -89,6 +89,7 @@ module.exports = class URIHandlerRegistry {
   }
 
   async handleURI(uri) {
+    // eslint-disable-next-line n/no-deprecated-api -- url.parse tolerates loose/relative input and exposes slashes/auth; URL migration needs review
     const parsed = url.parse(uri, true);
     const { protocol, slashes, auth, port, host } = parsed;
     if (protocol !== "atom:" || slashes !== true || auth || port) {

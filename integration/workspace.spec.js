@@ -1,5 +1,5 @@
 const os = require("os");
-const { openAtom, runCommand, typeInEditor } = require("./helpers");
+const { openAtom, runCommand } = require("./helpers");
 const { test, expect } = require("@playwright/test");
 
 const languages = [

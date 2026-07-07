@@ -34,7 +34,7 @@ module.exports = class SyntaxScopeMap {
               }
               break;
 
-            case "string":
+            case "string": {
               if (!currentTable) currentTable = this.anonymousScopeTable;
               const value = termNode.value.slice(1, -1).replace(/\\"/g, '"');
               if (!currentTable[value]) currentTable[value] = {};
@@ -47,6 +47,7 @@ module.exports = class SyntaxScopeMap {
                 currentIndexValue = null;
               }
               break;
+            }
 
             case "universal":
               if (currentTable) {

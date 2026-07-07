@@ -1,4 +1,4 @@
-/* eslint-disable no-template-curly-in-string */
+ 
 
 const fs = require("fs");
 const path = require("path");

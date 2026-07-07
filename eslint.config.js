@@ -12,9 +12,15 @@ module.exports = [
   n.configs["flat/recommended-script"],
   {
     plugins: { jsdoc },
+    settings: {
+      // This is an Electron app bundling its own Node 24 runtime, so lint
+      // syntax/builtins support against that — not each package's stale engines.
+      n: { version: ">=24.0.0" },
+    },
     languageOptions: {
       ecmaVersion: "latest",
-      sourceType: "commonjs",
+      sourceType: "module",
+      parserOptions: { ecmaFeatures: { jsx: true } },
       globals: {
         ...globals.browser,
         ...globals.node,
@@ -30,9 +36,28 @@ module.exports = [
           argsIgnorePattern: "^_",
         },
       ],
-      "n/no-missing-require": ["error", { allowModules: ["atom"] }],
-      "n/no-unpublished-require": ["error", { allowModules: ["electron"] }],
+      // `atom` and `electron` are provided by the Lumine/Electron runtime,
+      // not resolvable via npm — allow them across all resolution rules.
+      "n/no-missing-require": ["error", { allowModules: ["atom", "electron"] }],
+      "n/no-missing-import": ["error", { allowModules: ["atom", "electron"] }],
+      "n/no-unpublished-require": ["error", { allowModules: ["atom", "electron"] }],
+      "n/no-unpublished-import": ["error", { allowModules: ["atom", "electron"] }],
+      "n/no-extraneous-require": ["error", { allowModules: ["atom", "electron"] }],
+      "n/no-extraneous-import": ["error", { allowModules: ["atom", "electron"] }],
+      // `localStorage`/`navigator` here are Chromium (renderer) globals, not
+      // Node's newer experimental builtins of the same name.
+      "n/no-unsupported-features/node-builtins": [
+        "error",
+        { ignores: ["localStorage", "navigator"] },
+      ],
     },
+  },
+  {
+    // process.exit() is legitimate in build scripts and the Electron main
+    // process (CLI flag handling, forced quit) — not the anti-pattern this
+    // rule targets in long-running library code.
+    files: ["script/**", "src/main-process/**"],
+    rules: { "n/no-process-exit": "off" },
   },
   {
     // Jasmine specs (Atom test runner) — test globals + Atom's async helpers.

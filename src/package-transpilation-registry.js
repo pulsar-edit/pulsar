@@ -175,6 +175,7 @@ class PackageTranspilationRegistry {
     Resolve = Resolve || require("resolve");
     return Resolve.sync(spec.transpiler, {
       basedir: spec._config.path,
+      // eslint-disable-next-line n/no-deprecated-api -- Atom module system relies on require.extensions
       extensions: Object.keys(require.extensions),
     });
   }

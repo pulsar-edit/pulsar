@@ -6,9 +6,7 @@
   const electron = require("electron");
   const remote = require("@electron/remote");
   const path = require("path");
-  const Module = require("module");
   const getWindowLoadSettings = require("../src/get-window-load-settings");
-  const { getReleaseChannel } = require("../src/get-app-details.js");
   const StartupTime = require("../src/startup-time");
   const entryPointDirPath = __dirname;
   let blobStore = null;
@@ -34,9 +32,6 @@
       process.resourcesPath = path.normalize(process.resourcesPath);
 
       setupAtomHome();
-      const devMode =
-        getWindowLoadSettings().devMode ||
-        !getWindowLoadSettings().resourcePath.startsWith(process.resourcesPath + path.sep);
 
       const FileSystemBlobStore = require("../src/file-system-blob-store");
       blobStore = FileSystemBlobStore.load(path.join(process.env.ATOM_HOME, "blob-store"));
@@ -96,8 +91,6 @@
 
       return documentRegisterElement(type, options);
     };
-
-    const { userSettings, appVersion } = getWindowLoadSettings();
 
     const CSON = require("season");
     CSON.setCacheDir(path.join(CompileCache.getCacheDirectory(), "cson"));

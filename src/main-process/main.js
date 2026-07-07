@@ -22,7 +22,7 @@ function isAtomRepoPath(repoPath) {
     try {
       let packageJson = CSON.readFileSync(packageJsonPath);
       return packageJson.name === "atom";
-    } catch (e) {
+    } catch {
       return false;
     }
   }

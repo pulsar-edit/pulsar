@@ -1,5 +1,4 @@
 "use babel";
-/* eslint-env jasmine */
 
 let temp = require("temp").track();
 import path from "path";

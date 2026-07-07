@@ -1,5 +1,7 @@
 "use strict";
 
+/* global snapshotResult */ // defined when running from a V8 snapshot
+
 // Lumine's compile-cache when installing or updating packages, called by apm's Node-js
 
 const path = require("path");
@@ -109,7 +111,9 @@ function readCachedJavaScript(relativeCachePath) {
   if (fs.isFileSync(cachePath)) {
     try {
       return fs.readFileSync(cachePath, "utf8");
-    } catch (error) {}
+    } catch {
+      /* ignore */
+    }
   }
   return null;
 }
@@ -224,11 +228,10 @@ exports.install = function (resourcesPath, nodeRequire) {
     },
   });
 
-  // eslint-disable-next-line no-extend-native
   Error.prototype.getRawStack = function () {
     // Access this.stack to ensure prepareStackTrace has been run on this error
     // because it assigns this.rawStack as a side-effect
-    this.stack; // eslint-disable-line no-unused-expressions
+    this.stack;
     return this.rawStack;
   };
 

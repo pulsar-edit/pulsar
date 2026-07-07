@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 const { TextEditor } = require("atom");
 const { conditionPromise } = require("./spec-helper");

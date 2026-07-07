@@ -171,7 +171,7 @@ module.exports = class BufferedProcess {
 
     try {
       wmicProcess = ChildProcess.spawn(cmd, args);
-    } catch (spawnError) {
+    } catch {
       this.killProcess();
       return;
     }
@@ -191,7 +191,9 @@ module.exports = class BufferedProcess {
 
         try {
           process.kill(pid);
-        } catch (error) {}
+        } catch {
+          /* ignore */
+        }
       }
 
       this.killProcess();

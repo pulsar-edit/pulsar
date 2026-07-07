@@ -8,9 +8,7 @@ const CSON = require("season");
 
 const ServiceHub = require("service-hub");
 const Package = require("./package");
-const { getReleaseChannel } = require("./get-app-details.js");
 const ThemePackage = require("./theme-package");
-const ModuleCache = require("./module-cache");
 const packageJSON = require("../package.json");
 
 // Extended: Package manager for coordinating the lifecycle of Lumine packages.
@@ -171,7 +169,7 @@ module.exports = class PackageManager {
   }
 
   // Returns the command needed to invoke PPM.
-  static getCommandName(version) {
+  static getCommandName(_version) {
     let commandName = "ppm";
     return process.platform === "win32" ? `${commandName}.cmd` : commandName;
   }
@@ -253,7 +251,7 @@ module.exports = class PackageManager {
   //
   // Returns a {Boolean}.
   isBundledPackage(name) {
-    return this.getPackageDependencies().hasOwnProperty(name);
+    return Object.hasOwn(this.getPackageDependencies(), name);
   }
 
   /*
@@ -944,10 +942,4 @@ module.exports = class PackageManager {
       normalizePackageData(metadata);
     }
   }
-};
-
-const NullVersionRange = {
-  test() {
-    return false;
-  },
 };

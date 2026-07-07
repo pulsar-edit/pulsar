@@ -11,7 +11,7 @@ function parse(selector) {
   return typeof selector === "string" ? selector.replace(/^\./, "").split(".") : selector;
 }
 
-const always = (scope) => true;
+const always = (_scope) => true;
 
 // Essential: Return a matcher function for a selector.
 //

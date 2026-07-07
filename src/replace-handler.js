@@ -1,3 +1,4 @@
+/* global emit */ // injected by Atom's task runner
 const { PathReplacer } = require("@pulsar-edit/scandal");
 
 module.exports = function (filePaths, regexSource, regexFlags, replacementText) {

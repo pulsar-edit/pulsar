@@ -130,7 +130,7 @@ module.exports = class GrammarRegistry {
   assignLanguageMode(buffer, languageId) {
     if (buffer.getBuffer) buffer = buffer.getBuffer();
 
-    let grammar = null;
+    let grammar;
     if (languageId != null) {
       grammar = this.grammarForId(languageId);
       if (!grammar || !grammar.scopeName) return false;

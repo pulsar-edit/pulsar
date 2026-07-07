@@ -1798,7 +1798,7 @@ module.exports = class TextEditorComponent {
     this.lastKeydown = event;
   }
 
-  didKeypress(event) {
+  didKeypress(_event) {
     this.lastKeydownBeforeKeypress = this.lastKeydown;
 
     // This cancels the accented character behavior if we type a key normally
@@ -2469,11 +2469,10 @@ module.exports = class TextEditorComponent {
     let textNodesIndex = 0;
     let lastTextNodeRight = null;
 
-    // eslint-disable-next-line no-labels
     columnLoop: for (let columnsIndex = 0; columnsIndex < columnsToMeasure.length; columnsIndex++) {
       const nextColumnToMeasure = columnsToMeasure[columnsIndex];
       while (textNodesIndex < textNodes.length) {
-        if (positions.has(nextColumnToMeasure)) continue columnLoop; // eslint-disable-line no-labels
+        if (positions.has(nextColumnToMeasure)) continue columnLoop;
         const textNode = textNodes[textNodesIndex];
         const textNodeEndColumn = textNodeStartColumn + textNode.textContent.length;
 
@@ -2496,7 +2495,7 @@ module.exports = class TextEditorComponent {
           }
 
           positions.set(nextColumnToMeasure, Math.round(clientPixelPosition - lineNodeClientLeft));
-          continue columnLoop; // eslint-disable-line no-labels
+          continue columnLoop;
         } else {
           textNodesIndex++;
           textNodeStartColumn = textNodeEndColumn;
@@ -2657,7 +2656,7 @@ module.exports = class TextEditorComponent {
       }
 
       let containingTextNodeIndex = textNodes.indexOf(containingTextNode);
-      let characterIndex = 0;
+      let characterIndex;
 
       // The space we will search will be either a full text node or some
       // subset of it. We will ensure that this range of the text node has
@@ -4953,17 +4952,6 @@ function clientRectsForTextNodes(textNodes, startColumn, endColumn) {
   rangeForMeasurement.setStart(startTextNode, startOffset);
   rangeForMeasurement.setEnd(endTextNode, endOffset);
   return consolidateClientRects(rangeForMeasurement.getClientRects());
-}
-
-// Detects whether the given set of text nodes contains at least one instance
-// of LTR- and RTL-mixed text.
-function hasMultipleTextDirections(textNodes) {
-  rangeForMeasurement ??= document.createRange();
-  if (textNodes.length === 0) return false;
-  rangeForMeasurement.setStartBefore(textNodes[0]);
-  rangeForMeasurement.setEndAfter(textNodes[textNodes.length - 1]);
-  let rects = rangeForMeasurement.getClientRects();
-  return rects.length > textNodes.length;
 }
 
 // Returns whether two `DOMRect`s overlap.

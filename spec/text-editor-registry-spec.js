@@ -310,13 +310,13 @@ describe("TextEditorRegistry", function () {
         let disposable = registry.maintainConfig(editor);
         expect(editor.getSoftTabs()).toBe(true);
 
-        /* eslint-disable no-tabs */
+         
         editor.setText(dedent`
           {
           	hello;
           }
         `);
-        /* eslint-enable no-tabs */
+         
         disposable.dispose();
         disposable = registry.maintainConfig(editor);
         expect(editor.getSoftTabs()).toBe(false);
@@ -333,7 +333,7 @@ describe("TextEditorRegistry", function () {
         disposable = registry.maintainConfig(editor);
         expect(editor.getSoftTabs()).toBe(false);
 
-        /* eslint-disable no-tabs */
+         
         editor.setText(dedent`
           /*
            * Comment with a leading space.
@@ -343,7 +343,7 @@ describe("TextEditorRegistry", function () {
           	hello;
           }
         `);
-        /* eslint-enable no-tabs */
+         
         disposable.dispose();
         disposable = registry.maintainConfig(editor);
         expect(editor.getSoftTabs()).toBe(false);

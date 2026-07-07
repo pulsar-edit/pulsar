@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 /* global waitsForPromise */
 
 const path = require("path");

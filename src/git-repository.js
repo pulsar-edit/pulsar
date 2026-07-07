@@ -67,7 +67,7 @@ module.exports = class GitRepository {
     }
     try {
       return new GitRepository(path, options);
-    } catch (error) {
+    } catch {
       return null;
     }
   }

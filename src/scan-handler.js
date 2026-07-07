@@ -1,3 +1,4 @@
+/* global emit */ // injected by Atom's task runner
 const path = require("path");
 const async = require("async");
 

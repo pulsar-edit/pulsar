@@ -78,7 +78,7 @@ class NativeCompileCache {
       let wrapper = Module.wrap(content);
 
       let cacheKey = computeHash(wrapper + self.v8Version);
-      let compiledWrapper = null;
+      let compiledWrapper;
       if (self.cacheStore.has(cacheKey)) {
         let buffer = self.cacheStore.get(cacheKey);
         let compilationResult = self.runInThisContextCached(wrapper, filename, buffer);

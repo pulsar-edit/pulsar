@@ -5,7 +5,7 @@ const {
   afterEach,
   beforeEach,
   emitterEventPromise,
-} = require("./async-spec-helpers"); // eslint-disable-line no-unused-vars
+} = require("./async-spec-helpers");  
 
 describe("BackgroundTips", () => {
   let workspaceElement;

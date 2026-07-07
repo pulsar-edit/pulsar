@@ -58,7 +58,7 @@ function loadDependencies(modulePath, rootPath, rootMetadata, moduleCache) {
     if (
       rootPath === modulePath &&
       rootMetadata.packageDependencies &&
-      rootMetadata.packageDependencies.hasOwnProperty(path.basename(childPath))
+      Object.hasOwn(rootMetadata.packageDependencies, path.basename(childPath))
     ) {
       continue;
     }
@@ -71,7 +71,7 @@ function loadDependencies(modulePath, rootPath, rootMetadata, moduleCache) {
       let mainPath;
       try {
         mainPath = require.resolve(childPath);
-      } catch (error) {
+      } catch {
         mainPath = null;
       }
 
@@ -126,7 +126,7 @@ function loadFolderCompatibility(modulePath, rootPath, rootMetadata, moduleCache
     if (
       rootPath === modulePath &&
       rootMetadata.packageDependencies &&
-      rootMetadata.packageDependencies.hasOwnProperty(path.basename(childPath))
+      Object.hasOwn(rootMetadata.packageDependencies, path.basename(childPath))
     ) {
       continue;
     }
@@ -170,7 +170,7 @@ function loadExtensions(modulePath, rootPath, rootMetadata, moduleCache) {
         const packageName = path.basename(childPath);
         if (
           rootMetadata.packageDependencies &&
-          rootMetadata.packageDependencies.hasOwnProperty(packageName)
+          Object.hasOwn(rootMetadata.packageDependencies, packageName)
         )
           return false;
       }
@@ -218,8 +218,9 @@ function resolveModulePath(relativePath, parentModule) {
   if (!relativePath) return;
   if (!(parentModule && parentModule.filename)) return;
 
+  // eslint-disable-next-line n/no-deprecated-api -- low-level native-module listing
   if (!nativeModules) nativeModules = process.binding("natives");
-  if (nativeModules.hasOwnProperty(relativePath)) return;
+  if (Object.hasOwn(nativeModules, relativePath)) return;
   if (relativePath[0] === ".") return;
   if (isAbsolute(relativePath)) return;
 
@@ -307,7 +308,7 @@ exports.add = function (directoryPath, metadata) {
   if (metadata == null) {
     try {
       metadata = require(`${directoryPath}${path.sep}package.json`);
-    } catch (error) {
+    } catch {
       return;
     }
   }

@@ -30,7 +30,7 @@ module.exports = class Color {
 
     try {
       var parsedColor = ParsedColor(value);
-    } catch (error) {
+    } catch {
       return null;
     }
 

@@ -823,7 +823,7 @@ class WASMTreeSitterLanguageMode {
     };
 
     let tree;
-    // eslint-disable-next-line no-unused-vars
+
     let batchCount = 0;
 
     const cleanup = () => {
@@ -1595,7 +1595,6 @@ class WASMTreeSitterLanguageMode {
 
     const scopes = iterator.seek(start, row) || [];
 
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       const end = { ...iterator.getPosition() };
       if (end.row > row) {

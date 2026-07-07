@@ -46,7 +46,7 @@ module.exports = class DefaultDirectorySearcher {
   // * `directory` {Directory} whose search needs might be supported by this object.
   //
   // Returns a `boolean` indicating whether this object can search this `Directory`.
-  canSearchDirectory(directory) {
+  canSearchDirectory(_directory) {
     return true;
   }
 
@@ -92,7 +92,7 @@ module.exports = class DefaultDirectorySearcher {
         if (isCancelled) {
           resolve();
         } else {
-          reject(); // eslint-disable-line prefer-promise-reject-errors
+          reject();
         }
       });
     });

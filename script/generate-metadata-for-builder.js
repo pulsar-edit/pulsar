@@ -4,7 +4,6 @@ const CSON = require("season");
 const fs = require("fs-plus");
 const normalizePackageData = require("normalize-package-data");
 const path = require("path");
-const semver = require("semver");
 
 module.exports = function (packageJSON) {
   return {
@@ -102,7 +101,7 @@ function buildBundledPackagesMetadata(packageJSON) {
     }
 
     const packageStyleSheetsPath = path.join(packagePath, "styles");
-    let styleSheets = null;
+    let styleSheets;
     if (packageMetadata.mainStyleSheet) {
       styleSheets = [fs.resolve(packagePath, packageMetadata.mainStyleSheet)];
     } else if (packageMetadata.styleSheets) {
@@ -135,7 +134,7 @@ function buildBundledPackagesMetadata(packageJSON) {
   return packages;
 }
 
-function buildPlatformMenuMetadata(packageJSON) {
+function buildPlatformMenuMetadata(_packageJSON) {
   const menuPath = path.join("menus", `${process.platform}.cson`);
   if (fs.existsSync(menuPath)) {
     return CSON.readFileSync(menuPath);
@@ -144,7 +143,7 @@ function buildPlatformMenuMetadata(packageJSON) {
   }
 }
 
-function buildPlatformKeymapsMetadata(packageJSON) {
+function buildPlatformKeymapsMetadata(_packageJSON) {
   const invalidPlatforms = ["darwin", "freebsd", "linux", "sunos", "win32"].filter(
     (p) => p !== process.platform,
   );

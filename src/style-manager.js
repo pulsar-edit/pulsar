@@ -246,7 +246,7 @@ module.exports = class StyleManager {
       const cacheFilePath = path.join(this.cacheDirPath, hash.digest("hex"));
       try {
         return JSON.parse(fs.readFileSync(cacheFilePath));
-      } catch (e) {
+      } catch {
         const transformed = cb(styleSheet, context);
         fs.writeFileSync(cacheFilePath, JSON.stringify(transformed));
         return transformed;
@@ -315,7 +315,7 @@ function transformDeprecatedShadowDOMSelectors(css, context) {
   let transformedSource;
   try {
     transformedSource = postcss.parse(css);
-  } catch (e) {
+  } catch {
     transformedSource = null;
   }
 
@@ -398,7 +398,7 @@ function transformDeprecatedShadowDOMSelectors(css, context) {
   }
 }
 
-function transformDeprecatedMathUsage(css, context) {
+function transformDeprecatedMathUsage(css, _context) {
   const transformedProperties = [];
   let transformedSource;
 
@@ -415,11 +415,11 @@ function transformDeprecatedMathUsage(css, context) {
   const cssValueIgnoreList = /hsl|abs|acos|asin|atan|atan2|cos|mod|rem|sign|sin|tan|url/g;
 
   const mathExpressionRegex =
-    /(-*(\d(\.\d)?)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?|@?[\w-]+)(\s*([\/\+\*]|(\-\s+))\s*((\d(\.\d)*)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?|@?[\w-]+))+/g;
+    /(-*(\d(\.\d)?)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?|@?[\w-]+)(\s*([/+*]|(-\s+))\s*((\d(\.\d)*)+(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|rlh|vw|vh|vmin|vmax|vb|vi|svw|svh|lvw|lvh|dvw|dvh|%)?|@?[\w-]+))+/g;
 
   try {
     transformedSource = postcss.parse(css);
-  } catch (e) {
+  } catch {
     transformedSource = null;
   }
 

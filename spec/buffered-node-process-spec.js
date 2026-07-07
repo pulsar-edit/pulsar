@@ -1,4 +1,4 @@
-/* eslint-disable no-new */
+ 
 const path = require("path");
 const BufferedNodeProcess = require("../src/buffered-node-process");
 
