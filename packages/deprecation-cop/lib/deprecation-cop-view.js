@@ -7,7 +7,6 @@ import etch from "etch";
 import fs from "fs-plus";
 import Grim from "grim";
 import path from "path";
-import { shell } from "electron";
 
 export default class DeprecationCopView {
   constructor({ uri }) {
@@ -321,12 +320,12 @@ export default class DeprecationCopView {
   async openIssueURL(repoURL, issueURL, issueTitle) {
     const issue = await this.findSimilarIssue(repoURL, issueTitle);
     if (issue) {
-      shell.openExternal(issue.html_url);
+      atom.openExternal(issue.html_url);
     } else if (process.platform === "win32") {
       // Windows will not launch URLs greater than ~2000 bytes so we need to shrink it
-      shell.openExternal((await this.shortenURL(issueURL)) || issueURL);
+      atom.openExternal((await this.shortenURL(issueURL)) || issueURL);
     } else {
-      shell.openExternal(issueURL);
+      atom.openExternal(issueURL);
     }
   }
 

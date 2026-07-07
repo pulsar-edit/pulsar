@@ -1,5 +1,4 @@
 const url = require("url");
-const { shell } = require("electron");
 const _ = require("underscore-plus");
 
 const LINK_SCOPE_REGEX = /markup\.underline\.link/;
@@ -28,7 +27,7 @@ module.exports = {
 
     const { protocol } = url.parse(link);
     if (protocol === "http:" || protocol === "https:" || protocol === "atom:") {
-      shell.openExternal(link);
+      atom.openExternal(link);
     }
   },
 

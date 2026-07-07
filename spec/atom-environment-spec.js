@@ -878,4 +878,43 @@ describe("AtomEnvironment", () => {
       expect(atom.getReleaseChannel()).toBe("dev");
     });
   });
+
+  describe("::trashItem()", () => {
+    let fileToBeTrashed, tempDir;
+
+    beforeEach(() => {
+      tempDir = temp.mkdirSync("trash-item-");
+      fileToBeTrashed = path.join(tempDir, "file-1.txt");
+      fs.writeFileSync(fileToBeTrashed, "test file");
+
+      spyOn(atom.applicationDelegate, "trashItem").and.callFake((filePath) => {
+        if (!fs.existsSync(filePath)) return Promise.reject(new Error("File does not exist"));
+        fs.unlinkSync(filePath);
+        return Promise.resolve();
+      });
+    });
+
+    it("trashes the file", async () => {
+      expect(fs.existsSync(fileToBeTrashed)).toBe(true);
+      await atom.trashItem(fileToBeTrashed);
+      expect(atom.applicationDelegate.trashItem).toHaveBeenCalledWith(fileToBeTrashed);
+      expect(fs.existsSync(fileToBeTrashed)).toBe(false);
+    });
+
+    it("rejects when asked to trash a nonexistent file", async () => {
+      const nonexistentFile = path.join(tempDir, "zzyzx.txt");
+      expect(fs.existsSync(nonexistentFile)).toBe(false);
+      let outcome;
+
+      try {
+        await atom.trashItem(nonexistentFile);
+        outcome = "success";
+      } catch {
+        outcome = "failure";
+      } finally {
+        expect(atom.applicationDelegate.trashItem).toHaveBeenCalledWith(nonexistentFile);
+        expect(outcome).toBe("failure");
+      }
+    });
+  });
 });

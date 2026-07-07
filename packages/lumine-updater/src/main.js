@@ -1,6 +1,5 @@
 const { CompositeDisposable } = require("atom");
 
-let shell;
 let superagent;
 let findInstallMethod;
 
@@ -193,10 +192,9 @@ class LumineUpdater {
 
     const openWebGitHub = (e) => {
       e.preventDefault();
-      shell ??= shell || require("electron").shell;
       let latestVersion = this.cache.getCacheItem("last-update-check")?.latestVersion;
       let tagSegment = latestVersion ? `tag/${latestVersion}` : "";
-      shell.openExternal(`https://github.com/lumine-code/lumine/releases/${tagSegment}`);
+      atom.openExternal(`https://github.com/lumine-code/lumine/releases/${tagSegment}`);
     };
 
     switch (installMethod.installMethod) {

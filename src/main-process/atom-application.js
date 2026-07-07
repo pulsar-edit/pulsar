@@ -132,6 +132,46 @@ ipcMain.handle("setAsDefaultProtocolClient", (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
 });
 
+// Handle file deletion requests.
+//
+// Works around https://github.com/electron/electron/issues/29598, which seems
+// to be the cause of failed deletion attempts on Windows.
+ipcMain.handle("trashItem", async (_, filePath) => {
+  try {
+    const result = await shell.trashItem(filePath);
+    return { outcome: "success", result };
+  } catch (error) {
+    return { outcome: "failure", error };
+  }
+});
+
+ipcMain.handle("showItemInFolder", async (_, filePath) => {
+  try {
+    const result = shell.showItemInFolder(filePath);
+    return { outcome: "success", result };
+  } catch (error) {
+    return { outcome: "failure", error };
+  }
+});
+
+ipcMain.handle("openPath", async (_, filePath) => {
+  try {
+    const result = await shell.openPath(filePath);
+    return { outcome: "success", result };
+  } catch (error) {
+    return { outcome: "failure", error };
+  }
+});
+
+ipcMain.handle("openExternal", async (_, url) => {
+  try {
+    const result = await shell.openExternal(url);
+    return { outcome: "success", result };
+  } catch (error) {
+    return { outcome: "failure", error };
+  }
+});
+
 // The application's singleton class.
 //
 // It's the entry point into the Lumine application and maintains the global state

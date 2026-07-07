@@ -2,7 +2,6 @@ const path = require("path");
 const PackageCard = require("../lib/package-card");
 const PackageManager = require("../lib/package-manager");
 const SettingsView = require("../lib/settings-view");
-const { shell } = require("electron");
 
 describe("PackageCard", function () {
   const setPackageStatusSpies = function (opts) {
@@ -114,12 +113,12 @@ describe("PackageCard", function () {
     };
     card = new PackageCard(pack, new SettingsView(), packageManager);
 
-    spyOn(shell, "openExternal");
+    spyOn(atom, "openExternal");
     jasmine.attachToDOM(card.element);
     let badge = card.element.querySelector(".badge");
     expect(badge).toExist();
     badge?.click();
-    expect(shell.openExternal).toHaveBeenCalled();
+    expect(atom.openExternal).toHaveBeenCalled();
   });
 
   it("shows the author details", function () {

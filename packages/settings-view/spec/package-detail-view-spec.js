@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const { shell } = require("electron");
 
 const PackageDetailView = require("../lib/package-detail-view");
 const PackageManager = require("../lib/package-manager");
@@ -173,32 +172,32 @@ describe("PackageDetailView", function () {
 
   it("triggers a report issue button click and checks that the fallback repository issue tracker URL was opened", function () {
     loadCustomPackageFromRemote("package-without-bugs-property");
-    spyOn(shell, "openExternal");
+    spyOn(atom, "openExternal");
     view.refs.issueButton.click();
-    expect(shell.openExternal).toHaveBeenCalledWith(
+    expect(atom.openExternal).toHaveBeenCalledWith(
       "https://github.com/example/package-without-bugs-property/issues/new",
     );
   });
 
   it("triggers a report issue button click and checks that the bugs URL string was opened", function () {
     loadCustomPackageFromRemote("package-with-bugs-property-url-string");
-    spyOn(shell, "openExternal");
+    spyOn(atom, "openExternal");
     view.refs.issueButton.click();
-    expect(shell.openExternal).toHaveBeenCalledWith("https://example.com/custom-issue-tracker/new");
+    expect(atom.openExternal).toHaveBeenCalledWith("https://example.com/custom-issue-tracker/new");
   });
 
   it("triggers a report issue button click and checks that the bugs URL was opened", function () {
     loadCustomPackageFromRemote("package-with-bugs-property-url");
-    spyOn(shell, "openExternal");
+    spyOn(atom, "openExternal");
     view.refs.issueButton.click();
-    expect(shell.openExternal).toHaveBeenCalledWith("https://example.com/custom-issue-tracker/new");
+    expect(atom.openExternal).toHaveBeenCalledWith("https://example.com/custom-issue-tracker/new");
   });
 
   it("triggers a report issue button click and checks that the bugs email link was opened", function () {
     loadCustomPackageFromRemote("package-with-bugs-property-email");
-    spyOn(shell, "openExternal");
+    spyOn(atom, "openExternal");
     view.refs.issueButton.click();
-    expect(shell.openExternal).toHaveBeenCalledWith("mailto:issues@example.com");
+    expect(atom.openExternal).toHaveBeenCalledWith("mailto:issues@example.com");
   });
 
   it("should show 'Install' as the first breadcrumb by default", function () {
@@ -208,18 +207,18 @@ describe("PackageDetailView", function () {
 
   it("should open repository url", function () {
     loadPackageFromRemote("package-with-readme");
-    spyOn(shell, "openExternal");
+    spyOn(atom, "openExternal");
     view.refs.packageRepo.click();
-    expect(shell.openExternal).toHaveBeenCalledWith(
+    expect(atom.openExternal).toHaveBeenCalledWith(
       "https://github.com/example/package-with-readme",
     );
   });
 
   it("should open internal package repository url", function () {
     loadPackageFromRemote("package-internal");
-    spyOn(shell, "openExternal");
+    spyOn(atom, "openExternal");
     view.refs.packageRepo.click();
-    expect(shell.openExternal).toHaveBeenCalledWith(
+    expect(atom.openExternal).toHaveBeenCalledWith(
       "https://github.com/lumine-code/lumine/tree/master/packages/package-internal",
     );
   });

@@ -2,7 +2,6 @@
 /** @jsx etch.dom */
 
 import { CompositeDisposable, Disposable } from "atom";
-import { shell } from "electron";
 import etch from "etch";
 import BadgeView from "./badge-view";
 import path from "path";
@@ -309,7 +308,7 @@ export default class PackageCard {
 
     const packageNameClickHandler = (event) => {
       event.stopPropagation();
-      shell.openExternal(`https://web.pulsar-edit.dev/packages/${this.pack.name}`);
+      atom.openExternal(`https://web.pulsar-edit.dev/packages/${this.pack.name}`);
     };
     this.refs.packageName.addEventListener("click", packageNameClickHandler);
     this.disposables.add(
@@ -320,7 +319,7 @@ export default class PackageCard {
 
     const packageAuthorClickHandler = (event) => {
       event.stopPropagation();
-      shell.openExternal(
+      atom.openExternal(
         `https://web.pulsar-edit.dev/users/${ownerFromRepository(this.pack.repository)}`,
       ); //TODO: Fix - This does not current exist but this will at least be more accurate
     };

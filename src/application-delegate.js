@@ -320,7 +320,7 @@ module.exports = class ApplicationDelegate {
   }
 
   openExternal(url) {
-    return shell.openExternal(url);
+    return this.openExternalDirect(url);
   }
 
   emitWillSavePath(path) {
@@ -340,5 +340,31 @@ module.exports = class ApplicationDelegate {
 
     ipcRenderer.on("did-resolve-proxy", outerCallback);
     return new Disposable(() => ipcRenderer.removeListener("did-resolve-proxy", outerCallback));
+  }
+
+  openExternalDirect(url) {
+    return this.invokeShellMethod("openExternal", url);
+  }
+
+  openPath(filePath) {
+    return this.invokeShellMethod("openPath", filePath);
+  }
+
+  trashItem(filePath) {
+    return this.invokeShellMethod("trashItem", filePath);
+  }
+
+  showItemInFolder(filePath) {
+    return this.invokeShellMethod("showItemInFolder", filePath);
+  }
+
+  invokeShellMethod(channel, ...args) {
+    return ipcRenderer.invoke(channel, ...args).then(({ outcome, error, result }) => {
+      if (outcome === "success") {
+        return result;
+      } else if (outcome === "failure") {
+        return Promise.reject(error);
+      }
+    });
   }
 };

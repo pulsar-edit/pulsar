@@ -2,7 +2,6 @@
 /** @jsx etch.dom */
 
 import etch from "etch";
-import { shell } from "electron";
 import { Disposable, CompositeDisposable } from "atom";
 import { getSettingTitle } from "./rich-title";
 

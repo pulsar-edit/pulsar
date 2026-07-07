@@ -9,8 +9,6 @@
  */
 let NotificationElement;
 const fs = require("fs-plus");
-const path = require("path");
-const { shell } = require("electron");
 
 const NotificationIssue = require("./notification-issue");
 const TemplateHelper = require("./template-helper");
@@ -286,7 +284,7 @@ Upgrading to the <a href='https://github.com/lumine-code/lumine/releases/tag/v${
               e.preventDefault();
               issueButton.classList.add("opening");
               return this.issue.getIssueUrlForSystem().then(function (issueUrl) {
-                shell.openExternal(issueUrl);
+                atom.openExternal(issueUrl);
                 return issueButton.classList.remove("opening");
               });
             });

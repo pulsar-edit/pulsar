@@ -324,7 +324,7 @@ module.exports = class AutocompleteManager {
             let descriptionMoreLink = descriptionContainer.querySelector(
               ".suggestion-description-more-link",
             );
-            require("electron").shell.openExternal(descriptionMoreLink.href);
+            atom.openExternal(descriptionMoreLink.href);
           }
         },
       }),

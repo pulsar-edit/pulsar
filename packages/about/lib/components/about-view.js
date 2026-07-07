@@ -1,6 +1,5 @@
 const { Disposable } = require("atom");
 const etch = require("etch");
-const { shell } = require("electron");
 const AtomLogo = require("./atom-logo");
 const EtchComponent = require("../etch-component");
 
@@ -29,7 +28,7 @@ module.exports = class AboutView extends EtchComponent {
 
   handleReleaseNotesClick(e) {
     e.preventDefault();
-    shell.openExternal(this.props.updateManager.getReleaseNotesURLForCurrentVersion());
+    atom.openExternal(this.props.updateManager.getReleaseNotesURLForCurrentVersion());
   }
 
   handleLicenseClick(e) {
@@ -39,13 +38,13 @@ module.exports = class AboutView extends EtchComponent {
 
   handleTermsOfUseClick(e) {
     e.preventDefault();
-    shell.openExternal("https://atom.io/terms"); //If we use this then this URL will need updating but button disabled (L#182)
+    atom.openExternal("https://atom.io/terms"); //If we use this then this URL will need updating but button disabled (L#182)
     // TODO Update to Privacy Policy once `pulsar-edit.github.io` #161 is resolved
   }
 
   handleHowToUpdateClick(e) {
     e.preventDefault();
-    shell.openExternal(
+    atom.openExternal(
       "https://github.com/lumine-code/lumine/tree/master/packages/lumine-updater#readme",
     );
   }

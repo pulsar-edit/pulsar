@@ -2,7 +2,6 @@
 /** @jsx etch.dom */
 
 import path from "path";
-import electron from "electron";
 import etch from "etch";
 import hostedGitInfo from "hosted-git-info";
 
@@ -28,7 +27,7 @@ export default class InstallPanel {
     this.refs.searchEditor.setPlaceholderText("GitHub repository");
     this.searchType = "packages";
     this.disposables.add(
-      this.packageManager.on("package-install-failed", ({ pack, error }) => {
+      this.packageManager.on("package-install-failed", ({ error }) => {
         this.refs.searchErrors.appendChild(new ErrorView(this.packageManager, error).element);
       }),
     );
@@ -301,7 +300,7 @@ export default class InstallPanel {
 
   didClickOpenAtomIo(event) {
     event.preventDefault();
-    electron.shell.openExternal(this.atomIoURL);
+    atom.openExternal(this.atomIoURL);
   }
 
   didClickSearchPackagesButton() {

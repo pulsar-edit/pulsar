@@ -1,9 +1,6 @@
 const { CompositeDisposable, Emitter } = require("atom");
 const AboutView = require("./components/about-view");
 
-// Deferred requires
-let shell;
-
 module.exports = class About {
   constructor(initialState) {
     this.subscriptions = new CompositeDisposable();
@@ -24,8 +21,7 @@ module.exports = class About {
 
     this.subscriptions.add(
       atom.commands.add("atom-workspace", "about:view-release-notes", () => {
-        shell = shell || require("electron").shell;
-        shell.openExternal(this.state.updateManager.getReleaseNotesURLForCurrentVersion());
+        atom.openExternal(this.state.updateManager.getReleaseNotesURLForCurrentVersion());
       }),
     );
   }

@@ -767,6 +767,50 @@ class AtomEnvironment {
     return this.setFullScreen(!this.isFullScreen());
   }
 
+  // Extended: Moves an item to the trash.
+  //
+  // Returns a {Promise} that resolves when the operation has completed or
+  // rejects in the event of failure.
+  trashItem(filePath) {
+    return this.applicationDelegate.trashItem(filePath);
+  }
+
+  // Extended: Reveals the given path in the system's file browser, selecting
+  // it if possible.
+  //
+  // Returns a {Promise} that resolves when the operation has completed or
+  // rejects in the event of failure.
+  showItemInFolder(filePath) {
+    return this.applicationDelegate.showItemInFolder(filePath);
+  }
+
+  // Extended: Opens the given path in the default manner for the operating
+  // system.
+  //
+  // For instance: if you pass the path to a directory, will likely open that
+  // directory in a file browser. If you pass the path to an image file, will
+  // likely open that image file in a web browser or an image editing
+  // application.
+  //
+  // Returns a {Promise} that resolves when the operation has completed or
+  // rejects in the event of failure.
+  openPath(filePath) {
+    return this.applicationDelegate.openPath(filePath);
+  }
+
+  // Extended: Opens the given URL in the default manner for the operating
+  // system.
+  //
+  // For instance: passing an `https:` URI will open it in the default web
+  // browser, and passing a `mailto:` link will open it in the default mail
+  // client.
+  //
+  // Returns a {Promise} that resolves when the operation has completed or
+  // rejects in the event of failure.
+  openExternal(url) {
+    return this.applicationDelegate.openExternalDirect(url);
+  }
+
   // Restore the window to its previous dimensions and show it.
   //
   // Restores the full screen and maximized state after the window has resized to
