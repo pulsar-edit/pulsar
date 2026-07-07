@@ -33,13 +33,14 @@
 
       setupAtomHome();
 
+      // Persist V8 bytecode of compiled modules across launches to speed up
+      // startup (supported replacement for the removed native-compile-cache).
+      require("module").enableCompileCache?.(
+        path.join(process.env.ATOM_HOME, "compile-cache", "v8"),
+      );
+
       const FileSystemBlobStore = require("../src/file-system-blob-store");
       blobStore = FileSystemBlobStore.load(path.join(process.env.ATOM_HOME, "blob-store"));
-
-      const NativeCompileCache = require("../src/native-compile-cache");
-      NativeCompileCache.setCacheStore(blobStore);
-      NativeCompileCache.setV8Version(process.versions.v8);
-      NativeCompileCache.install();
 
       if (getWindowLoadSettings().profileStartup) {
         profileStartup(Date.now() - startTime);

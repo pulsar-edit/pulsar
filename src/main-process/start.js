@@ -46,6 +46,11 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   atomPaths.setAtomHome(app.getPath("home"));
   atomPaths.setUserData(app);
 
+  // Persist V8 bytecode of compiled modules across launches to speed up startup.
+  require("module").enableCompileCache?.(
+    path.resolve(process.env.ATOM_HOME, "compile-cache", "v8"),
+  );
+
   // Now that we can be sure `ATOM_HOME` is set, we can set our custom crash
   // dump path.
   app.setPath("crashDumps", path.resolve(process.env.ATOM_HOME, "crashdumps"));

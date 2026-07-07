@@ -5,7 +5,6 @@ const TextEditor = require("./text-editor");
 
 require("./text-editor-component");
 require("./file-system-blob-store");
-require("./native-compile-cache");
 require("./compile-cache");
 require("./module-cache");
 
