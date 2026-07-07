@@ -7,6 +7,7 @@ const { EventEmitter } = require('events');
 const temp = require('temp').track();
 const sandbox = require('sinon').createSandbox();
 const dedent = require('dedent');
+const { BrowserWindow, webContents } = require('electron');
 
 const AtomWindow = require('../../src/main-process/atom-window');
 const { emitterEventPromise } = require('../helpers/async-spec-helpers');
@@ -249,6 +250,57 @@ describe('AtomWindow', function() {
       });
 
       assert.isTrue(w.browserWindow.behavior.focusOnWebView);
+    });
+  });
+
+  describe('isWebViewFocused', function() {
+    it('returns false when no web contents are focused', function() {
+      sinon.stub(webContents, 'getFocusedWebContents').returns(null);
+
+      const w = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow
+      });
+
+      assert.isFalse(w.isWebViewFocused());
+    });
+
+    it("returns true when this window's web contents are focused", function() {
+      const w = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow
+      });
+      sinon
+        .stub(webContents, 'getFocusedWebContents')
+        .returns(w.browserWindow.webContents);
+
+      assert.isTrue(w.isWebViewFocused());
+    });
+
+    it('returns true when a webview owned by this window is focused', function() {
+      const w = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow
+      });
+      const focusedWebContents = {
+        hostWebContents: w.browserWindow.webContents
+      };
+      sinon
+        .stub(webContents, 'getFocusedWebContents')
+        .returns(focusedWebContents);
+
+      assert.isTrue(w.isWebViewFocused());
+    });
+
+    it('returns false when another window owns the focused web contents', function() {
+      const w = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow
+      });
+      const otherWindow = new StubBrowserWindow({});
+      const focusedWebContents = otherWindow.webContents;
+      sinon
+        .stub(webContents, 'getFocusedWebContents')
+        .returns(focusedWebContents);
+      sinon.stub(BrowserWindow, 'fromWebContents').returns(otherWindow);
+
+      assert.isFalse(w.isWebViewFocused());
     });
   });
 

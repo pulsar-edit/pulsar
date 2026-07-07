@@ -6,7 +6,8 @@ const {
   app,
   dialog,
   ipcMain,
-  nativeImage
+  nativeImage,
+  webContents
 } = require('electron');
 const { getAppName } = require('../get-app-details.js');
 const path = require('path');
@@ -478,7 +479,14 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   isWebViewFocused() {
-    return this.browserWindow.isWebViewFocused();
+    const focusedWebContents = webContents.getFocusedWebContents();
+    if (focusedWebContents == null) return false;
+
+    return (
+      focusedWebContents === this.browserWindow.webContents ||
+      focusedWebContents.hostWebContents === this.browserWindow.webContents ||
+      BrowserWindow.fromWebContents(focusedWebContents) === this.browserWindow
+    );
   }
 
   isSpecWindow() {
