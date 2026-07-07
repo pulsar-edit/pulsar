@@ -6,7 +6,17 @@ const path = require("path");
 const fs = require("fs-plus");
 const CSON = require("season");
 const yargs = require("yargs");
-const { app } = require("electron");
+const { app, protocol } = require("electron");
+
+// Declare the `atom://` scheme privileged before the app is ready, so packages
+// can load fonts and use fetch/XHR against atom:// URLs from the file://
+// renderer (otherwise Chromium blocks them as cross-origin/CORS violations).
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "atom",
+    privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true },
+  },
+]);
 
 const args = yargs(process.argv)
   // Don't handle --help or --version here; they will be handled later.
