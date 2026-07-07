@@ -5,6 +5,8 @@ parser: 'tree-sitter-html'
 
 injectionRegex: '(HTML|html|Html)$'
 
+firstLineRegex: "<(?:!DOCTYPE\\s*)?html|-\\*-(?:\\s*(?=[^:;\\s]+\\s*-\\*-)|(?:.*?[;\\s]|(?<=-\\*-))mode\\s*:\\s*)html(?=[\\s;]|(?<![-*])-\\*-).*?-\\*-|(?:(?:\\s|^)vi(?:m[<=>]?\\d+|m)?|\\sex)(?=:(?=\\s*set?\\s[^\\n:]+:)|:(?!\\s*set?\\s))(?:(?:\\s|\\s*:\\s*)\\w*(?:\\s*=(?:[^\\n\\\\\\s]|\\\\.)*)?)*[\\s:](?:filetype|ft|syntax)\\s*=x?html(?=\\s|:|$)"
+
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-html#v0.23.0'
   grammar: 'tree-sitter-html/tree-sitter-html.wasm'
