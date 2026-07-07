@@ -8,7 +8,7 @@
     "rust"
   ],
   "main": "lib/main.js",
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0",

@@ -26,7 +26,7 @@ module.exports = class NotificationIssue {
 
   findSimilarIssues() {
     let repoUrl = this.getRepoUrl();
-    if (repoUrl == null) { repoUrl = 'lumine-editor/lumine'; }
+    if (repoUrl == null) { repoUrl = 'lumine-code/lumine'; }
     const repo = repoUrl.replace(/http(s)?:\/\/(\d+\.)?github.com\//gi, '');
     const issueTitle = this.getIssueTitle();
     const query = `${issueTitle} repo:${repo}`;
@@ -69,7 +69,7 @@ module.exports = class NotificationIssue {
     return this.getIssueBody().then(issueBody => {
       let repoUrl = this.getRepoUrl();
       if (repoUrl == null) {
-        repoUrl = 'https://github.com/lumine-editor/lumine';
+        repoUrl = 'https://github.com/lumine-code/lumine';
       }
       return `${repoUrl}/issues/new?title=${this.encodeURI(this.getIssueTitle())}&body=${this.encodeURI(issueBody)}`;
     });

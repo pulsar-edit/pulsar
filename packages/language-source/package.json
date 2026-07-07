@@ -6,6 +6,6 @@
     "node": "*"
   },
   "description": "Source code support in Atom",
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT"
 }

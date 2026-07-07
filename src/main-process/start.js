@@ -66,7 +66,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     console.log("Starting crash reporter; crash reports will be saved to", app.getPath('crashDumps'))
     crashReporter.start({
       productName: 'Lumine',
-      companyName: 'lumine-editor',
+      companyName: 'lumine-code',
       submitURL: '',
       uploadToServer: false,
       ignoreSystemCrashHandler: false,
@@ -95,7 +95,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     return;
   }
 
-  let appUserModelId = 'io.github.lumine-editor.lumine.' + process.arch;
+  let appUserModelId = 'io.github.lumine-code.lumine.' + process.arch;
 
   // If the release channel is not stable, we append it to the app user model id.
   // This allows having the different release channels as separate items in the taskbar.

@@ -328,7 +328,7 @@ const configSchema = {
       },
       automaticallyUpdate: {
         description:
-          'Automatically update Lumine when a new release is available. **Note**: Currently not functional, please download new releases from [Lumine releases](https://github.com/lumine-editor/lumine/releases)',
+          'Automatically update Lumine when a new release is available. **Note**: Currently not functional, please download new releases from [Lumine releases](https://github.com/lumine-code/lumine/releases)',
         type: 'boolean',
         default: false
       },

@@ -200,7 +200,7 @@ module.exports =
         if ((packageName != null) && (repoUrl != null)) {
           issueButton.textContent = `Create issue on the ${packageName} package`;
         } else {
-          issueButton.textContent = "Create issue on lumine-editor/lumine";
+          issueButton.textContent = "Create issue on lumine-code/lumine";
         }
 
         const promises = [];
@@ -256,7 +256,7 @@ Use: <code>apm unlink ${packagePath}</code>\
             fatalNotification.innerHTML += `\
 Lumine is out of date: ${atomCheck.installedVersion} installed;
 ${atomCheck.latestVersion} latest.
-Upgrading to the <a href='https://github.com/lumine-editor/lumine/releases/tag/v${atomCheck.latestVersion}'>latest version</a> may fix this issue.\
+Upgrading to the <a href='https://github.com/lumine-code/lumine/releases/tag/v${atomCheck.latestVersion}'>latest version</a> may fix this issue.\
 `;
           } else {
             fatalNotification.innerHTML += " You can help by creating an issue. Please explain what actions triggered this error.";

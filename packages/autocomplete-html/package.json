@@ -4,7 +4,7 @@
   "description": "HTML element and attribute autocompletions",
   "main": "./lib/main",
   "license": "MIT",
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "engines": {
     "atom": ">=0.174.0 <2.0.0"
   },

@@ -7,7 +7,7 @@
 	<key>CFBundleIconFile</key>
 	<string>lumine.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>io.github.lumine-editor.lumine</string>
+	<string>io.github.lumine-code.lumine</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

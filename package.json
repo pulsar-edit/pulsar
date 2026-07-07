@@ -1,23 +1,23 @@
 {
   "name": "lumine",
-  "author": "lumine-editor",
+  "author": "lumine-code",
   "productName": "Lumine",
   "version": "1.132.1-dev",
   "description": "A Community-led Hyper-Hackable Text Editor",
   "branding": {
     "id": "lumine",
     "name": "Lumine",
-    "urlWeb": "https://github.com/lumine-editor",
-    "urlGH": "https://github.com/lumine-editor",
-    "urlForum": "https://github.com/orgs/lumine-editor/discussions"
+    "urlWeb": "https://github.com/lumine-code",
+    "urlGH": "https://github.com/lumine-code",
+    "urlForum": "https://github.com/orgs/lumine-code/discussions"
   },
   "main": "./src/main-process/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lumine-editor/lumine"
+    "url": "https://github.com/lumine-code/lumine"
   },
   "bugs": {
-    "url": "https://github.com/lumine-editor/lumine/issues"
+    "url": "https://github.com/lumine-code/lumine/issues"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -30,7 +30,7 @@
     "@babel/core": "7.18.6",
     "@electron/remote": "2.1.3",
     "@pulsar-edit/atom-keymap": "^9.1.0",
-    "@pulsar-edit/fuzzy-native": "https://github.com/lumine-editor/fuzzy-native.git#eae88f7",
+    "@pulsar-edit/fuzzy-native": "https://github.com/lumine-code/fuzzy-native.git#eae88f7",
     "@pulsar-edit/get-scrollbar-style": "^1.0.1",
     "@pulsar-edit/git-utils": "^7.0.1",
     "@pulsar-edit/pathwatcher": "^9.0.2",
@@ -172,7 +172,7 @@
     "temp": "0.9.4",
     "terminal": "https://github.com/pulsar-edit/terminal#v0.3.2",
     "timecop": "file:./packages/timecop",
-    "tree-view": "https://github.com/lumine-editor/tree-view.git#master",
+    "tree-view": "https://github.com/lumine-code/tree-view.git#master",
     "typescript": "^5.8.3",
     "underscore-plus": "^1.7.0",
     "update-package-dependencies": "file:./packages/update-package-dependencies",

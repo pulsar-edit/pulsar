@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.lumine-editor.lumine</id>
+  <id>io.github.lumine-code.lumine</id>
   <name>Lumine</name>
   <developer_name>Lumine Editor</developer_name>
-  <developer id="io.github.lumine-editor">
+  <developer id="io.github.lumine-code">
     <name translatable="no">Lumine Editor</name>
   </developer>
   <summary>Community-led hyper-hackable editor</summary>
-  <launchable type="desktop-id">io.github.lumine-editor.lumine.desktop</launchable>
+  <launchable type="desktop-id">io.github.lumine-code.lumine.desktop</launchable>
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
-  <url type="homepage">https://github.com/lumine-editor</url>
-  <url type="bugtracker">https://github.com/lumine-editor/lumine/issues/</url>
-  <url type="vcs-browser">https://github.com/lumine-editor/lumine</url>
+  <url type="homepage">https://github.com/lumine-code</url>
+  <url type="bugtracker">https://github.com/lumine-code/lumine/issues/</url>
+  <url type="vcs-browser">https://github.com/lumine-code/lumine</url>
   <branding>
   <color type="primary" scheme_preference="light">#c061cb</color>
   <color type="primary" scheme_preference="dark">#613583</color>
   </branding>
-  <update_contact>admin@lumine-editor.dev</update_contact>
+  <update_contact>admin@lumine-code.dev</update_contact>
   <description>
     <p>Lumine aims to carry forward the hackable editor experience with updated architecture and support for modern features.</p>
   </description>
   <screenshots>
     <screenshot type="default">
-      <image type="source">https://raw.githubusercontent.com/lumine-editor/lumine/master/resources/linux/linux-screenshot.png</image>
+      <image type="source">https://raw.githubusercontent.com/lumine-code/lumine/master/resources/linux/linux-screenshot.png</image>
       <caption>Lumine welcome window in the middle, an open file on the right, and project on the left</caption>
     </screenshot>
     <screenshot>
-      <image type="source">https://raw.githubusercontent.com/lumine-editor/lumine/master/resources/readme.png</image>
+      <image type="source">https://raw.githubusercontent.com/lumine-code/lumine/master/resources/readme.png</image>
       <caption>Lumine welcome window with an open project</caption>
     </screenshot>
   </screenshots>

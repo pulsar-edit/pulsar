@@ -10,22 +10,22 @@ describe('UpdateManager', () => {
   describe('::getReleaseNotesURLForVersion', () => {
     it('returns the page for the release even when a dev version', () => {
       expect(updateManager.getReleaseNotesURLForVersion('1.100.0-dev')).toContain(
-        'lumine-editor/lumine/blob/master/CHANGELOG.md#11000-dev'
+        'lumine-code/lumine/blob/master/CHANGELOG.md#11000-dev'
       );
     });
 
     it('returns the page for the release when a rolling ("nightly") release version', () => {
       expect(updateManager.getReleaseNotesURLForVersion('1.108.2023090322')).toContain(
-        'lumine-editor/lumine/blob/master/CHANGELOG.md#11082023090322'
+        'lumine-code/lumine/blob/master/CHANGELOG.md#11082023090322'
       );
     });
 
     it('returns the page for the release when not a dev version', () => {
       expect(updateManager.getReleaseNotesURLForVersion('1.129.0')).toContain(
-        'lumine-editor/lumine/blob/master/CHANGELOG.md#11290'
+        'lumine-code/lumine/blob/master/CHANGELOG.md#11290'
       );
       expect(updateManager.getReleaseNotesURLForVersion('v1.100.0')).toContain(
-        'lumine-editor/lumine/blob/master/CHANGELOG.md#11000'
+        'lumine-code/lumine/blob/master/CHANGELOG.md#11000'
       );
     });
   });

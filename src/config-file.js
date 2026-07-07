@@ -7,7 +7,7 @@ const Path = require('path');
 const asyncQueue = require('async/queue');
 
 // TODO: if we ever decide to change path watchers on the future, this is kinda
-// duplicated because of https://github.com/lumine-editor/lumine/issues/76
+// duplicated because of https://github.com/lumine-code/lumine/issues/76
 const nsfw = require('nsfw');
 const EVENT_TYPES = new Set([nsfw.actions.CREATED, nsfw.actions.MODIFIED, nsfw.actions.RENAMED]);
 

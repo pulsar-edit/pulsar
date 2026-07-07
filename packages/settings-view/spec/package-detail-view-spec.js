@@ -171,6 +171,6 @@ describe("PackageDetailView", function() {
     loadPackageFromRemote('package-internal');
     spyOn(shell, 'openExternal');
     view.refs.packageRepo.click();
-    expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/lumine-editor/lumine/tree/master/packages/package-internal');
+    expect(shell.openExternal).toHaveBeenCalledWith('https://github.com/lumine-code/lumine/tree/master/packages/package-internal');
   });
 });

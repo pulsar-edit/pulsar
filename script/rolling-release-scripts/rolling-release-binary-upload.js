@@ -55,7 +55,7 @@ if (cirrusFlag === "cirrus") {
   // - GITHUB_TOKEN as fallback
   publish({
     token: process.env.ROLLING_UPLOAD_TOKEN || process.env.GITHUB_TOKEN,
-    owner: "lumine-editor",
+    owner: "lumine-code",
     repo: "lumine-rolling-releases",
     name: packageJson.version,
     notes: `Rolling Release: ${packageJson.version}`,

@@ -52,8 +52,8 @@ const whenEditorReady = function (editor) {
 // these locations will now check for more than the last good value.
 // This of course assumes that the web won't start removing matching items faster
 // than adding. But locations of this behavior will be marked accordingly with:
-// * #398: https://github.com/lumine-editor/lumine/pull/398
-// * #1191: https://github.com/lumine-editor/lumine/pull/1191
+// * #398: https://github.com/lumine-code/lumine/pull/398
+// * #1191: https://github.com/lumine-code/lumine/pull/1191
 
 Object.keys(packagesToTest).forEach(packageLabel => {
   if (!atom.packages.getAvailablePackageNames().includes(packagesToTest[packageLabel].name)) {

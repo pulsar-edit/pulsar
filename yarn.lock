@@ -1493,9 +1493,9 @@
     property-accessors "^1"
     season "^6.0.2"
 
-"@pulsar-edit/fuzzy-native@https://github.com/lumine-editor/fuzzy-native.git#eae88f7":
+"@pulsar-edit/fuzzy-native@https://github.com/lumine-code/fuzzy-native.git#eae88f7":
   version "1.3.2"
-  resolved "https://github.com/lumine-editor/fuzzy-native.git#eae88f7c8728da88e6b89f779325c272068f35e0"
+  resolved "https://github.com/lumine-code/fuzzy-native.git#eae88f7c8728da88e6b89f779325c272068f35e0"
   dependencies:
     nan "^2.18.0"
 
@@ -8854,9 +8854,9 @@ tr46@~0.0.3:
   resolved "https://registry.yarnpkg.com/tr46/-/tr46-0.0.3.tgz#8184fd347dac9cdc185992f3a6622e14b9d9ab6a"
   integrity sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==
 
-"tree-view@https://github.com/lumine-editor/tree-view.git#master":
+"tree-view@https://github.com/lumine-code/tree-view.git#master":
   version "0.9.3"
-  resolved "https://github.com/lumine-editor/tree-view.git#6a5686b9f8bfcf61c00ff8a27381d1320f69e375"
+  resolved "https://github.com/lumine-code/tree-view.git#6a5686b9f8bfcf61c00ff8a27381d1320f69e375"
   dependencies:
     minimatch "^10.1.2"
     natural-compare-lite "^1.4.0"

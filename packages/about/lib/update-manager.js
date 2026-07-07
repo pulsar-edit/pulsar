@@ -13,7 +13,7 @@ let UpdateManager = class UpdateManager {
       appVersion = appVersion.replace("v", "");
     }
 
-    return `https://github.com/lumine-editor/lumine/blob/master/CHANGELOG.md#${appVersion.replace(/\./g, "")}`;
+    return `https://github.com/lumine-code/lumine/blob/master/CHANGELOG.md#${appVersion.replace(/\./g, "")}`;
   }
 };
 

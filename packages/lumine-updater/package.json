@@ -11,7 +11,7 @@
   },
   "author": "confused-Techie",
   "license": "MIT",
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "dependencies": {
     "event-kit": "github:pulsar-edit/event-kit",
     "shelljs": "^0.10.0",

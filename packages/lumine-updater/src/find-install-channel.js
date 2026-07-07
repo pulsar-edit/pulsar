@@ -120,7 +120,7 @@ function linux_debGetInstalled() {
 }
 
 function linux_flatpakInstalled() {
-  return process.env.FLATPAK_ID === "io.github.lumine-editor.lumine";
+  return process.env.FLATPAK_ID === "io.github.lumine-code.lumine";
 }
 
 module.exports = {

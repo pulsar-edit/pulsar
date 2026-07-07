@@ -8,7 +8,7 @@ const update = require("./update.js");
 describe("Parses Descriptions Properly from Markdown", () => {
 
   test("Extracts Markdown Links text", () => {
-    const text = "Here is my very important [link](https://github.com/lumine-editor/lumine)!";
+    const text = "Here is my very important [link](https://github.com/lumine-code/lumine)!";
 
     const out = update.sanitizeDescription(text);
 

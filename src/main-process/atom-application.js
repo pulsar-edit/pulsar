@@ -575,24 +575,24 @@ module.exports = class AtomApplication extends EventEmitter {
     });
 
     this.on('application:open-documentation', () =>
-      shell.openExternal('https://github.com/lumine-editor/lumine')
+      shell.openExternal('https://github.com/lumine-code/lumine')
     );
     this.on('application:open-discussions', () =>
-      shell.openExternal('https://github.com/orgs/lumine-editor/discussions')
+      shell.openExternal('https://github.com/orgs/lumine-code/discussions')
     );
     this.on('application:open-faq', () =>
-      shell.openExternal('https://github.com/lumine-editor/lumine/discussions')
+      shell.openExternal('https://github.com/lumine-code/lumine/discussions')
     );
     this.on('application:open-terms-of-use', () =>
       shell.openExternal('https://atom.io/terms') //TODO: This needs to be updated for when we have our own published on the site
     );
     this.on('application:report-issue', () =>
       shell.openExternal(
-        'https://github.com/lumine-editor/lumine/issues/new/choose'
+        'https://github.com/lumine-code/lumine/issues/new/choose'
       )
     );
     this.on('application:search-issues', () =>
-      shell.openExternal('https://github.com/lumine-editor/lumine/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc')
+      shell.openExternal('https://github.com/lumine-code/lumine/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc')
     );
 
     if (process.platform === 'darwin') {

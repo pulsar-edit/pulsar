@@ -81,7 +81,7 @@ const ICONS = {
 
 
 let options = {
-  appId: `io.github.lumine-editor.${baseName}`,
+  appId: `io.github.lumine-code.${baseName}`,
   npmRebuild: false,
   publish: null,
   files: [
@@ -160,7 +160,7 @@ let options = {
     // These are only required in dev-mode, when pegjs grammars aren't precompiled
     // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
     // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
-    // "!node_modules/.bin/pegjs", // Note: https://github.com/lumine-editor/lumine/pull/206
+    // "!node_modules/.bin/pegjs", // Note: https://github.com/lumine-code/lumine/pull/206
 
     // Exclusions borrowed from `node-prune`
     // - Files

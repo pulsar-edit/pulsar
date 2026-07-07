@@ -48,7 +48,7 @@ export default class ChangeLogView {
       <div className="welcome" on={{ click: this.openUri }}>
         <div className="welcome-container">
           <div className="header">
-            <a title="Full Change Log" href="https://github.com/lumine-editor/lumine/blob/master/CHANGELOG.md">
+            <a title="Full Change Log" href="https://github.com/lumine-code/lumine/blob/master/CHANGELOG.md">
               {/* LOGO GOES HERE */}
               <h1 className="welcome-title">
                 Change Log
@@ -57,7 +57,7 @@ export default class ChangeLogView {
           </div>
           <div className="welcome-panel">
             <p>Take a look at some of the awesome things {atom.branding.name} has changed:</p>
-            <p>Feel free to read our <a href="https://github.com/lumine-editor/lumine/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
+            <p>Feel free to read our <a href="https://github.com/lumine-code/lumine/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
                 Fix an issue where missing theme variables prevented the project window from initializing.

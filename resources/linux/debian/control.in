@@ -7,6 +7,6 @@ Section: devel
 Priority: optional
 Architecture: <%= arch %>
 Installed-Size: <%= installedSize %>
-Maintainer: lumine-editor <admin@lumine-editor.dev>
+Maintainer: lumine-code <admin@lumine-code.dev>
 Description: <%= description %>
  Lumine is a free and open source text editor that is modern, approachable, and hackable to the core.

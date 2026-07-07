@@ -509,7 +509,7 @@ module.exports = class SnippetExpansion {
   // `length` is the only thing `emmet` cares about, so this is an acceptable
   // workaround that requires no code changes on the `emmet` side.
   //
-  // See https://github.com/lumine-editor/lumine/issues/1132.
+  // See https://github.com/lumine-code/lumine/issues/1132.
   get tabStopMarkers () {
     return this.insertionsByIndex
   }

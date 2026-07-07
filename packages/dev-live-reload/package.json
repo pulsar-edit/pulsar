@@ -3,7 +3,7 @@
   "main": "./lib/main",
   "version": "0.48.1",
   "description": "Live reload Lumine themes and packages.",
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "dependencies": {
     "fs-plus": "^3.0.0"

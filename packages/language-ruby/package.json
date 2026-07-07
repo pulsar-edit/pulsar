@@ -11,7 +11,7 @@
   },
   "main": "lib/main",
   "license": "MIT",
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "devDependencies": {
     "dedent": "^0.7.0"
   },

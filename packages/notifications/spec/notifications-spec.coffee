@@ -392,7 +392,7 @@ describe "Notifications", ->
             expect(notificationContainer.childNodes.length).toBe 1
             expect(fatalError).toHaveClass 'has-close'
             expect(fatalError.innerHTML).toContain 'ReferenceError: a is not defined'
-            expect(fatalError.innerHTML).toContain "<a href=\"https://github.com/lumine-editor/lumine\">notifications package</a>"
+            expect(fatalError.innerHTML).toContain "<a href=\"https://github.com/lumine-code/lumine\">notifications package</a>"
             expect(fatalError.issue.getPackageName()).toBe 'notifications'
 
             button = fatalError.querySelector('.btn')
@@ -403,7 +403,7 @@ describe "Notifications", ->
             expect(issueBody).toMatch /Lumine\*\*: [0-9].[0-9]+.[0-9]+/ig
             expect(issueBody).not.toMatch /Unknown/ig
             expect(issueBody).toContain 'ReferenceError: a is not defined'
-            expect(issueBody).toContain 'Thrown From**: [notifications](https://github.com/lumine-editor/lumine) package '
+            expect(issueBody).toContain 'Thrown From**: [notifications](https://github.com/lumine-code/lumine) package '
             expect(issueBody).toContain '### Non-Core Packages'
 
             # FIXME: this doesnt work on the test server. `apm ls` is not working for some reason.
@@ -695,7 +695,7 @@ describe "Notifications", ->
           expect(fatalError.issue.getPackageName()).toBeUndefined()
 
           button = fatalError.querySelector('.btn')
-          expect(button.textContent).toContain 'Create issue on lumine-editor/lumine'
+          expect(button.textContent).toContain 'Create issue on lumine-code/lumine'
 
           expect(issueBody).toContain 'ReferenceError: a is not defined'
           expect(issueBody).toContain '**Thrown From**: Lumine Core'
@@ -878,7 +878,7 @@ describe "Notifications", ->
       #
       #   it "provides a link to the latest released version", ->
       #     fatalNotification = fatalError.querySelector('.fatal-notification')
-      #     expect(fatalNotification.innerHTML).toContain '<a href="https://github.com/lumine-editor/lumine/releases/tag/v0.180.0">latest version</a>'
+      #     expect(fatalNotification.innerHTML).toContain '<a href="https://github.com/lumine-code/lumine/releases/tag/v0.180.0">latest version</a>'
 
       describe "when the error has been reported", ->
         beforeEach ->

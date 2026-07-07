@@ -3,7 +3,7 @@
   "main": "./lib/main",
   "version": "0.2.2",
   "description": "EXTERMINATEs built-in packages installed in ~/.lumine/packages",
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "atomTestRunner": "./test/runner",
   "engines": {

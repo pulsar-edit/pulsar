@@ -8,7 +8,7 @@
       "command-palette:toggle"
     ]
   },
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
     "atom": "*"

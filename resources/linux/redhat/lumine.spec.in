@@ -3,7 +3,7 @@ Version:        <%= version %>
 Release:        0.1%{?dist}
 Summary:        <%= description %>
 License:        MIT
-URL:            https://github.com/lumine-editor/lumine
+URL:            https://github.com/lumine-code/lumine
 AutoReqProv:    no # Avoid libchromiumcontent.so missing dependency
 Prefix:         <%= installDir %>
 

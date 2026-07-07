@@ -102,7 +102,7 @@ class WorkspaceElement extends HTMLElement {
     // tall our lines will be. We could just pass `editor.lineHeight` into the
     // CSS as a factor and let CSS do the math, but Chromium tends to make a
     // mess of it, with the result being occasional tiny gaps between lines.
-    // (See https://github.com/lumine-editor/lumine/issues/1181.)
+    // (See https://github.com/lumine-code/lumine/issues/1181.)
     //
     // CSS measurements often involve math that results in unusual values that
     // will not conform to the pixel grid of the hardware. (For instance:

@@ -4,7 +4,7 @@ Displays possible autocomplete suggestions on keystroke (or manually by typing `
 
 ![autocomplete+](https://cloud.githubusercontent.com/assets/744740/7656861/9fb8bcc4-faea-11e4-9814-9dca218ded93.png)
 
-[Changelog](https://github.com/lumine-editor/lumine/blob/master/CHANGELOG.md)
+[Changelog](https://github.com/lumine-code/lumine/blob/master/CHANGELOG.md)
 
 ## Installation
 

@@ -5,7 +5,7 @@ async function findNewestRelease() {
   superagent ??= require("superagent");
 
   let res = await superagent
-    .get("https://api.github.com/repos/lumine-editor/lumine/releases")
+    .get("https://api.github.com/repos/lumine-code/lumine/releases")
     .set("Accept", "application/vnd.github+json")
     .set("User-Agent", "Lumine.Lumine-Updater");
 

@@ -129,7 +129,7 @@ describe("lumine-updater findInstallChannel", () => {
       expect(installCheck).toBe(false);
     });
     it("succeeds if flatpak_id is lumine", () => {
-      process.env.FLATPAK_ID = "io.github.lumine-editor.lumine";
+      process.env.FLATPAK_ID = "io.github.lumine-code.lumine";
       let installCheck = findInstallChannel.linux_flatpakInstalled();
       expect(installCheck).toBe(true);
     });

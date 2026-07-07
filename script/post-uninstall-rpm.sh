@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# https://github.com/lumine-editor/lumine/issues/544
+# https://github.com/lumine-code/lumine/issues/544
 # This check works only for RPMs
 if [ $1 -ge 1 ]; then
     # Package upgrade, do not uninstall

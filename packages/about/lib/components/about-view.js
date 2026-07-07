@@ -51,7 +51,7 @@ module.exports = class AboutView extends EtchComponent {
   handleHowToUpdateClick(e) {
     e.preventDefault();
     shell.openExternal(
-            'https://github.com/lumine-editor/lumine/tree/master/packages/lumine-updater#readme'
+            'https://github.com/lumine-code/lumine/tree/master/packages/lumine-updater#readme'
     );
   }
 

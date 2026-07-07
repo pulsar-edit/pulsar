@@ -144,7 +144,7 @@ if [ $OS == 'Mac' ]; then
     else
       # We still haven't found it. Let's try searching for it via
       # Spotlight.
-      LUMINE_APP_SEARCH_RESULT="$(mdfind "kMDItemCFBundleIdentifier == 'io.github.lumine-editor.${ATOM_BASE_NAME}'" | grep -v ShipIt | head -1)"
+      LUMINE_APP_SEARCH_RESULT="$(mdfind "kMDItemCFBundleIdentifier == 'io.github.lumine-code.${ATOM_BASE_NAME}'" | grep -v ShipIt | head -1)"
       if [ ! -z "$LUMINE_APP_SEARCH_RESULT" ]; then
         LUMINE_PATH="$(dirname "$LUMINE_APP_SEARCH_RESULT")"
         ATOM_APP_NAME="$(basename "$LUMINE_APP_SEARCH_RESULT")"

@@ -3,7 +3,7 @@
   "version": "0.90.8",
   "main": "lib/main",
   "description": "Syntax highlighting and snippets for GitHub Flavored Markdown (GFM).",
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
     "atom": "*"

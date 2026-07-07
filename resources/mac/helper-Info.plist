@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Lumine Helper</string>
 	<key>CFBundleIdentifier</key>
-	<string>io.github.lumine-editor.lumine.helper</string>
+	<string>io.github.lumine-code.lumine.helper</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

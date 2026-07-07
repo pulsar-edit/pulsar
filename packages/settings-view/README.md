@@ -51,7 +51,7 @@ The Settings View package uses the `ui-variables` to match a theme's color schem
 Use the [developer tools](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#developer-tools) to find more selectors.
 
 ## Contributing
-Always feel free to help out!  Whether it's [filing bugs and feature requests](https://github.com/lumine-editor/lumine/issues/new) or working on some of the [open issues](https://github.com/lumine-editor/lumine/issues), Lumine's [contributing guide](https://github.com/pulsar-edit/.github/blob/main/CONTRIBUTING.md) will help get you started while the [guide for contributing to packages](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#contributing-to-official-lumine-packages) has some extra information.
+Always feel free to help out!  Whether it's [filing bugs and feature requests](https://github.com/lumine-code/lumine/issues/new) or working on some of the [open issues](https://github.com/lumine-code/lumine/issues), Lumine's [contributing guide](https://github.com/pulsar-edit/.github/blob/main/CONTRIBUTING.md) will help get you started while the [guide for contributing to packages](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#contributing-to-official-lumine-packages) has some extra information.
 
 ## License
-MIT License.  See [the license](https://github.com/lumine-editor/lumine/blob/master/LICENSE.md) for more details.
+MIT License.  See [the license](https://github.com/lumine-code/lumine/blob/master/LICENSE.md) for more details.

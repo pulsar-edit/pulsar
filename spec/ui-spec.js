@@ -44,14 +44,14 @@ describe("Renders Markdown", () => {
     it("resolves incomplete local links", () => {
       expect(atom.ui.markdown.render(
         "[Hello](./readme.md)",
-        { rootDomain: "https://github.com/lumine-editor/lumine" }
-      )).toBe('<p><a href="https://github.com/lumine-editor/lumine/blob/HEAD/readme.md">Hello</a></p>\n');
+        { rootDomain: "https://github.com/lumine-code/lumine" }
+      )).toBe('<p><a href="https://github.com/lumine-code/lumine/blob/HEAD/readme.md">Hello</a></p>\n');
     });
     it("resolves incomplete root links", () => {
       expect(atom.ui.markdown.render(
         "[Hello](/readme.md)",
-        { rootDomain: "https://github.com/lumine-editor/lumine" }
-      )).toBe('<p><a href="https://github.com/lumine-editor/lumine/blob/HEAD/readme.md">Hello</a></p>\n');
+        { rootDomain: "https://github.com/lumine-code/lumine" }
+      )).toBe('<p><a href="https://github.com/lumine-code/lumine/blob/HEAD/readme.md">Hello</a></p>\n');
     });
   });
 
@@ -59,8 +59,8 @@ describe("Renders Markdown", () => {
     it("properly handles a standard PNG image", () => {
       expect(atom.ui.markdown.render(
         "![Alt Text](/image-link.png)",
-        { rootDomain: "https://github.com/lumine-editor/lumine" }
-      )).toBe('<p><img src="https://github.com/lumine-editor/lumine/raw/HEAD/image-link.png" alt="Alt Text"></p>\n');
+        { rootDomain: "https://github.com/lumine-code/lumine" }
+      )).toBe('<p><img src="https://github.com/lumine-code/lumine/raw/HEAD/image-link.png" alt="Alt Text"></p>\n');
     });
 
     it("handles 'data:image/svg+xml' images", () => {

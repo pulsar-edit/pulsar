@@ -4,7 +4,7 @@
   "description": "Welcome users to Lumine with useful information",
   "main": "./lib/main",
   "atomTestRunner": "atom-mocha-test-runner",
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"

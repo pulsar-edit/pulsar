@@ -35,7 +35,7 @@ class LumineUpdater {
     superagent ??= require("superagent");
 
     let res = await superagent
-      .get("https://api.github.com/repos/lumine-editor/lumine/releases")
+      .get("https://api.github.com/repos/lumine-code/lumine/releases")
       .set("Accept", "application/vnd.github+json")
       .set("User-Agent", "Lumine.Lumine-Updater");
 
@@ -210,7 +210,7 @@ class LumineUpdater {
       shell ??= shell || require("electron").shell;
       let latestVersion = this.cache.getCacheItem("last-update-check")?.latestVersion;
       let tagSegment = latestVersion ? `tag/${latestVersion}` : "";
-      shell.openExternal(`https://github.com/lumine-editor/lumine/releases/${tagSegment}`);
+      shell.openExternal(`https://github.com/lumine-code/lumine/releases/${tagSegment}`);
     };
 
     switch (installMethod.installMethod) {

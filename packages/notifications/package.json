@@ -2,7 +2,7 @@
   "name": "notifications",
   "main": "./lib/main",
   "version": "0.73.0",
-  "repository": "https://github.com/lumine-editor/lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "description": "A tidy way to display Lumine notifications.",
   "license": "MIT",
   "engines": {

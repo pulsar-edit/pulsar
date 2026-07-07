@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2022-2026 lumine-editor
+Copyright (c) 2022-2026 lumine-code
 Original work copyright (c) 2011-2022 GitHub Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

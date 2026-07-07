@@ -19,7 +19,7 @@ const provider = {
       // We avoid creating any actual error messages, as this is intended to fix
       // the case when providing completions for EJS that multiple continious
       // errors are created rapidly.
-      // https://github.com/lumine-editor/lumine/issues/649
+      // https://github.com/lumine-code/lumine/issues/649
       console.error(err);
       return [];
     }
