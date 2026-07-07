@@ -16,6 +16,12 @@ const path = require("path");
 
 let NodeTypeText = 3;
 
+function simulateClick(element) {
+  element.dispatchEvent(new PointerEvent("mousedown", { bubbles: true, cancelable: true }));
+  element.dispatchEvent(new PointerEvent("mouseup", { bubbles: true, cancelable: true }));
+  element.dispatchEvent(new PointerEvent("click", { bubbles: true, cancelable: true }));
+}
+
 describe("Autocomplete Manager", () => {
   let autocompleteManager, editor, editorView, gutterWidth, mainModule, workspaceElement;
 
@@ -1459,6 +1465,32 @@ describe("Autocomplete Manager", () => {
         atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
 
         expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      });
+
+      it("hides the suggestions list when a suggestion is clicked on", async () => {
+        triggerAutocompletion(editor, false, "a");
+        await waitForAutocomplete(editor);
+
+        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+
+        // Accept suggestion
+        let suggestionListView = editorView.querySelector(
+          ".autocomplete-plus autocomplete-suggestion-list",
+        );
+        let firstOption = suggestionListView.querySelector("li");
+
+        // Manually blurring the editor here matches our observation that, when
+        // an actual human clicks on a suggestion, it blurs the editor and ends
+        // up focusing the BODY indirectly.
+        document.activeElement.blur();
+        simulateClick(firstOption);
+
+        // Ensure the menu is closed…
+        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        // …and our editor still has focus.
+        await conditionPromise(() => {
+          return document.activeElement.closest("atom-text-editor") === editorView;
+        });
       });
 
       describe("when the replacementPrefix is empty", () => {
