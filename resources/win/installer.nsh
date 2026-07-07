@@ -31,7 +31,6 @@ XPStyle on
     ; running during an upgrade, where it technically runs after the upgrade's
     ; install steps, ultimately removing Lumine from the PATH
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources"
-    ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources\app\ppm\bin"
   ${endIf}
 !macroend
 
@@ -42,11 +41,8 @@ XPStyle on
   Var LuminePathCheckbox_Label
   Var LuminePathCheckbox
   Var LuminePathCheckbox_State
-  Var PpmPathCheckbox
-  Var PpmPathCheckbox_State
 
   Var LuminePathAdd_Status
-  Var PpmPathAdd_Status
 
   Page custom AddToPathPage AddToPathFunction ; Call our page with creator_function leave_function
 
@@ -62,27 +58,19 @@ XPStyle on
     ${EndIf}
 
     ; Enter our custom dialog controls
-    ${NSD_CreateLabel} 0 0 100% 24u "You can choose to add the 'lumine' and 'ppm' commands to your PATH. This allows you to easily invoke Lumine and PPM (Lumine Package Manager) from the shell."
+    ${NSD_CreateLabel} 0 0 100% 24u "You can choose to add the 'lumine' command to your PATH. This allows you to easily invoke Lumine from the shell."
     Pop $LuminePathCheckbox_Label
 
     ${NSD_CreateCheckbox} 0 30u 100% 10u "&Add Lumine to the User PATH"
     Pop $LuminePathCheckbox
 
-    ${NSD_CreateCheckbox} 0 45u 100% 10u "&Add PPM to the User PATH"
-    Pop $PpmPathCheckbox
-
     ; Check the boxes by default
     ${NSD_Check} $LuminePathCheckbox
-    ${NSD_Check} $PpmPathCheckbox
 
     ; The below 'If's add memory to the selection. Meaning if the user clicks
     ; forward then returns, their selection will be remembered.
     ${If} $LuminePathCheckbox_State == ${BST_UNCHECKED}
       ${NSD_Uncheck} $LuminePathCheckbox
-    ${EndIf}
-
-    ${If} $PpmPathCheckbox_State == ${BST_UNCHECKED}
-      ${NSD_Uncheck} $PpmPathCheckbox
     ${EndIf}
 
     nsDialogs::Show ; Show custom dialog
@@ -92,15 +80,10 @@ XPStyle on
   Function AddToPathFunction
     ; Here we set the memory of the users selection after leaving the page.
     ${NSD_GetState} $LuminePathCheckbox $LuminePathCheckbox_State
-    ${NSD_GetState} $PpmPathCheckbox $PpmPathCheckbox_State
 
     ; Now to add this data to the User PATH
     ${If} $LuminePathCheckbox_State == ${BST_CHECKED}
       ${EnvVarUpdate} $LuminePathAdd_Status "PATH" "A" "HKCU" "$INSTDIR\resources"
-    ${EndIf}
-
-    ${If} $PpmPathCheckbox_State == ${BST_CHECKED}
-      ${EnvVarUpdate} $PpmPathAdd_Status "PATH" "A" "HKCU" "$INSTDIR\resources\app\ppm\bin"
     ${EndIf}
 
   FunctionEnd

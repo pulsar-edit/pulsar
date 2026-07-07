@@ -8,33 +8,6 @@ const { hideBin } = require('yargs/helpers')
 const generateMetadata = require('./generate-metadata-for-builder')
 const macBundleDocumentTypes = require("./mac-bundle-document-types.js");
 
-// Ensure the user has initialized and built the `ppm` submodule before they
-// try to build the app.
-if (!existsSync(Path.join('ppm', 'bin'))) {
-  console.error(dedent`
-    \`ppm\` not detected. Please run:
-
-      git submodule update --init
-      yarn run build:apm
-  `);
-  process.exit(2);
-} else if (
-  !existsSync(
-    Path.join(
-      'ppm',
-      'bin',
-      process.platform === 'win32' ? 'node.exe' : 'node'
-    )
-  )
-) {
-  console.error(dedent`
-    \`ppm\` not built. Please run:
-
-    yarn run build:apm
-  `);
-  process.exit(2);
-}
-
 // Monkey-patch to not remove things I explicitly didn't say to remove.
 // See: https://github.com/electron-userland/electron-builder/issues/6957
 
@@ -97,7 +70,6 @@ const ARGS = yargs(hideBin(process.argv))
 
 const displayName = 'Lumine';
 const baseName = 'lumine';
-const ppmBaseName = 'ppm';
 const iconName = 'beta';
 
 const ICONS = {
@@ -247,24 +219,7 @@ let options = {
   ],
 
   extraResources: [
-    { from: 'lumine.sh', to: `${baseName}.sh` },
-    {
-      // Be selective in what we copy over to PPM’s `bin` directory. On
-      // Windows, the contents of this entire folder will be available on the
-      // `PATH`, so we shouldn’t put stray stuff in here.
-      //
-      // Below we copy over `ppm` itself, but it might have its name changed in
-      // the process depending on the release channel.
-      filter: [
-        // Everything below `ppm`…
-        'ppm/**',
-        // …except for files inside the `bin` directory.
-        '!ppm/bin'
-      ],
-      // This somehow puts it all in the right place with the `ppm` folder
-      // intact.
-      to: 'app'
-    },
+    { from: 'lumine.sh', to: `${baseName}.sh` },
     { from: ICONS.png, to: 'lumine.png' },
     { from: 'LICENSE.md', to: 'LICENSE.md' }
   ],
@@ -303,9 +258,7 @@ let options = {
         // (used only by desktops to show it on bar/switcher and app menus).
         "from": ICONS.svg,
         "to": `${baseName}.svg`
-      },
-      { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
-      { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
+      }
     ]
   },
 
@@ -336,10 +289,7 @@ let options = {
         { "CFBundleURLName": "Atom Shared Session Protocol" }
       ]
     },
-    extraResources: [
-      { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
-      { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
-    ]
+    extraResources: []
   },
 
   dmg: {
@@ -356,9 +306,6 @@ let options = {
       { from: 'resources/win/lumine.cmd', to: `${baseName}.cmd` },
       { from: 'resources/win/lumine.js', to: `${baseName}.js` },
       { from: 'resources/win/NSIS_Licenses.txt', to: 'NSIS_Licenses.txt' },
-      // Copy `ppm.cmd` to the `ppm/bin` directory.
-      { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
-      { from: 'ppm/bin/node.exe', to: `app/ppm/bin/node.exe` },
     ],
     target: [
       { target: 'nsis' },

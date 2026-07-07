@@ -10,18 +10,6 @@ then
 fi
 cp "$FILESOURCE" "$FILEDEST"
 
-# Install `ppm` to `/usr/bin/ppm`.
-ppm_executable=ppm
-
-SYMLINK_TARGET="/opt/${sanitizedProductName}/resources/app/ppm/bin/${ppm_executable}"
-SYMLINK_PATH="/usr/bin/${ppm_executable}"
-
-if [ -L "$SYMLINK_PATH" ]
-then
-  rm "$SYMLINK_PATH"
-fi
-ln -s "$SYMLINK_TARGET" "$SYMLINK_PATH"
-
 # Set correct permissions on `chrome-sandbox`; this should help avoid the need
 # for `--no-sandbox` and the like.
 

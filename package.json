@@ -285,7 +285,6 @@
   "private": true,
   "scripts": {
     "build": "electron-rebuild",
-    "build:apm": "cd ppm && yarn install",
     "postinstall": "patch-package",
     "start": "electron --no-sandbox --enable-logging . -f",
     "dist": "node script/electron-builder.js",

@@ -25,7 +25,7 @@ export default class InstallPanel {
 
     this.refs.searchMessage.style.display = 'none'
 
-    this.refs.searchEditor.setPlaceholderText('Search packages')
+    this.refs.searchEditor.setPlaceholderText('GitHub repository')
     this.searchType = 'packages'
     this.disposables.add(
       this.packageManager.on('package-install-failed', ({pack, error}) => {
@@ -91,8 +91,8 @@ export default class InstallPanel {
 
             <div className='text native-key-bindings' tabIndex='-1'>
               <span className='icon icon-question' />
-              <span ref='publishedToText'>Packages are published to </span>
-              <a className='link' onclick={this.didClickOpenAtomIo.bind(this)}>web.pulsar-edit.dev</a>
+              <span ref='publishedToText'>Packages are installed from </span>
+              <a className='link' onclick={this.didClickOpenAtomIo.bind(this)}>GitHub</a>
               <span> and are installed to {path.join(process.env.ATOM_HOME, 'packages')}</span>
             </div>
 
@@ -129,17 +129,17 @@ export default class InstallPanel {
       this.searchType = 'themes'
       this.refs.searchThemesButton.classList.add('selected')
       this.refs.searchPackagesButton.classList.remove('selected')
-      this.refs.searchEditor.setPlaceholderText('Search themes')
-      this.refs.publishedToText.textContent = 'Themes are published to '
-      this.atomIoURL = 'https://pulsar-edit.dev/themes'
+      this.refs.searchEditor.setPlaceholderText('GitHub repository')
+      this.refs.publishedToText.textContent = 'Themes are installed from '
+      this.atomIoURL = 'https://github.com'
       this.loadFeaturedPackages(true)
     } else if (searchType === 'package') {
       this.searchType = 'packages'
       this.refs.searchPackagesButton.classList.add('selected')
       this.refs.searchThemesButton.classList.remove('selected')
-      this.refs.searchEditor.setPlaceholderText('Search packages')
-      this.refs.publishedToText.textContent = 'Packages are published to '
-      this.atomIoURL = 'https://web.pulsar-edit.dev/packages'
+      this.refs.searchEditor.setPlaceholderText('GitHub repository')
+      this.refs.publishedToText.textContent = 'Packages are installed from '
+      this.atomIoURL = 'https://github.com'
       this.loadFeaturedPackages()
     }
   }
@@ -175,14 +175,25 @@ export default class InstallPanel {
 
   performSearchForQuery (query) {
     const gitUrlInfo = hostedGitInfo.fromUrl(query)
-    if (gitUrlInfo) {
+    if (gitUrlInfo && gitUrlInfo.type === 'github') {
       const type = gitUrlInfo.default
       if (type === 'sshurl' || type === 'https' || type === 'shortcut') {
         this.showGitInstallPackageCard({name: query, gitUrlInfo})
       }
     } else {
-      this.search(query)
+      this.showGitHubOnlyMessage(query)
     }
+  }
+
+  showGitHubOnlyMessage (query) {
+    if (this.currentGitPackageCard) {
+      this.currentGitPackageCard.destroy()
+      this.currentGitPackageCard = null
+    }
+
+    this.refs.resultsContainer.innerHTML = ''
+    this.refs.searchMessage.textContent = `Enter a GitHub repository such as owner/repo or https://github.com/owner/repo`
+    this.refs.searchMessage.style.display = ''
   }
 
   showGitInstallPackageCard (pack) {
@@ -211,26 +222,8 @@ export default class InstallPanel {
 
   async search (query) {
     this.refs.resultsContainer.innerHTML = ''
-    this.refs.searchMessage.textContent = `Searching ${this.searchType} for \u201C${query}\u201D\u2026`
+    this.refs.searchMessage.textContent = `Enter a GitHub repository such as owner/repo or https://github.com/owner/repo`
     this.refs.searchMessage.style.display = ''
-
-    const options = {}
-    options[this.searchType] = true
-
-    try {
-      const packages = (await this.client.search(query, options)) || []
-      this.refs.resultsContainer.innerHTML = ''
-      this.refs.searchMessage.style.display = 'none'
-      if (packages.length === 0) {
-        this.refs.searchMessage.textContent = `No ${this.searchType.replace(/s$/, '')} results for \u201C${query}\u201D`
-        this.refs.searchMessage.style.display = ''
-      }
-
-      this.addPackageViews(this.refs.resultsContainer, packages)
-    } catch (error) {
-      this.refs.searchMessage.style.display = 'none'
-      this.refs.searchErrors.appendChild(new ErrorView(this.packageManager, error).element)
-    }
   }
 
   addPackageViews (container, packages) {
@@ -263,42 +256,15 @@ export default class InstallPanel {
 
     if (loadThemes) {
       this.refs.installHeading.textContent = 'Install Themes'
-      this.refs.featuredHeading.textContent = 'Featured Themes'
-      this.refs.loadingMessage.textContent = 'Loading featured themes\u2026'
+      this.refs.featuredHeading.textContent = 'GitHub Themes'
+      this.refs.loadingMessage.textContent = 'Enter a GitHub repository above.'
     } else {
       this.refs.installHeading.textContent = 'Install Packages'
-      this.refs.featuredHeading.textContent = 'Featured Packages'
-      this.refs.loadingMessage.textContent = 'Loading featured packages\u2026'
+      this.refs.featuredHeading.textContent = 'GitHub Packages'
+      this.refs.loadingMessage.textContent = 'Enter a GitHub repository above.'
     }
 
     this.refs.loadingMessage.style.display = ''
-
-    const handle = error => {
-      this.refs.loadingMessage.style.display = 'none'
-      this.refs.featuredErrors.appendChild(new ErrorView(this.packageManager, error).element)
-    }
-
-    if (loadThemes) {
-      this.client.featuredThemes((error, themes) => {
-        if (error) {
-          handle(error)
-        } else {
-          this.refs.loadingMessage.style.display = 'none'
-          this.refs.featuredHeading.textContent = 'Featured Themes'
-          this.addPackageViews(this.refs.featuredContainer, themes)
-        }
-      })
-    } else {
-      this.client.featuredPackages((error, packages) => {
-        if (error) {
-          handle(error)
-        } else {
-          this.refs.loadingMessage.style.display = 'none'
-          this.refs.featuredHeading.textContent = 'Featured Packages'
-          this.addPackageViews(this.refs.featuredContainer, packages)
-        }
-      })
-    }
   }
 
   didClickOpenAtomIo (event) {

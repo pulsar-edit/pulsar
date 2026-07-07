@@ -136,7 +136,7 @@ module.exports = function parseCommandLine(processArgs) {
     .boolean('p')
     .describe(
       'package',
-      'Delegate all commands to Lumine\'s package management. Run with --package for more details'
+      'This option is no longer supported.'
     );
   options.boolean('uri-handler');
   options
@@ -152,20 +152,8 @@ module.exports = function parseCommandLine(processArgs) {
   let args = options.argv;
 
   if (args['package']) {
-    const PackageManager = require('../package-manager');
-    const cp = require('child_process');
-    const ppmPath = PackageManager.possibleApmPaths(version);
-
-    let ppmArgs = [...processArgs]
-    while (true) {
-      // Silently discard all arguments up to (and including) `--package`/`-p`.
-      const arg = ppmArgs.shift();
-      if (arg === '-p' || arg === '--package' || ppmArgs.length === 0) {
-        break;
-      }
-    }
-    const exitCode = cp.spawnSync(ppmPath, ppmArgs, { stdio: 'inherit' }).status;
-    process.exit(exitCode);
+    process.stderr.write('The external Lumine package manager command has been removed. Install packages from Settings using a GitHub repository URL.\n');
+    process.exit(1);
     return;
   }
 

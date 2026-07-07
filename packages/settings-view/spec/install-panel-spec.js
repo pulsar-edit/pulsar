@@ -16,75 +16,70 @@ describe('InstallPanel', function() {
 
   describe("when the packages button is clicked", function() {
     beforeEach(function() {
-      spyOn(panel, 'search');
+      spyOn(panel, 'showGitHubOnlyMessage');
       panel.refs.searchEditor.setText('something');
     });
 
-    it("performs a search for the contents of the input", function() {
+    it("shows the GitHub-only message for non-repository input", function() {
       panel.refs.searchPackagesButton.click();
       expect(panel.searchType).toBe('packages');
-      expect(panel.search).toHaveBeenCalledWith('something');
-      expect(panel.search.callCount).toBe(1);
+      expect(panel.showGitHubOnlyMessage).toHaveBeenCalledWith('something');
+      expect(panel.showGitHubOnlyMessage.callCount).toBe(1);
 
       panel.refs.searchPackagesButton.click();
       expect(panel.searchType).toBe('packages');
-      expect(panel.search).toHaveBeenCalledWith('something');
-      expect(panel.search.callCount).toBe(2);
+      expect(panel.showGitHubOnlyMessage).toHaveBeenCalledWith('something');
+      expect(panel.showGitHubOnlyMessage.callCount).toBe(2);
     });
   });
 
   describe("when the themes button is clicked", function() {
     beforeEach(function() {
-      spyOn(panel, 'search');
+      spyOn(panel, 'showGitHubOnlyMessage');
       panel.refs.searchEditor.setText('something');
     });
 
-    it("performs a search for the contents of the input", function() {
+    it("shows the GitHub-only message for non-repository input", function() {
       panel.refs.searchThemesButton.click();
       expect(panel.searchType).toBe('themes');
-      expect(panel.search.callCount).toBe(1);
-      expect(panel.search).toHaveBeenCalledWith('something');
+      expect(panel.showGitHubOnlyMessage.callCount).toBe(1);
+      expect(panel.showGitHubOnlyMessage).toHaveBeenCalledWith('something');
 
       panel.refs.searchThemesButton.click();
       expect(panel.searchType).toBe('themes');
-      expect(panel.search.callCount).toBe(2);
+      expect(panel.showGitHubOnlyMessage.callCount).toBe(2);
     });
   });
 
   describe("when the buttons are toggled", function() {
     beforeEach(function() {
-      spyOn(panel, 'search');
+      spyOn(panel, 'showGitHubOnlyMessage');
       panel.refs.searchEditor.setText('something');
     });
 
-    it("performs a search for the contents of the input", function() {
+    it("shows the GitHub-only message for non-repository input", function() {
       panel.refs.searchThemesButton.click();
       expect(panel.searchType).toBe('themes');
-      expect(panel.search.callCount).toBe(1);
-      expect(panel.search).toHaveBeenCalledWith('something');
+      expect(panel.showGitHubOnlyMessage.callCount).toBe(1);
+      expect(panel.showGitHubOnlyMessage).toHaveBeenCalledWith('something');
 
       panel.refs.searchPackagesButton.click();
       expect(panel.searchType).toBe('packages');
-      expect(panel.search.callCount).toBe(2);
+      expect(panel.showGitHubOnlyMessage.callCount).toBe(2);
 
       panel.refs.searchThemesButton.click();
       expect(panel.searchType).toBe('themes');
-      expect(panel.search.callCount).toBe(3);
+      expect(panel.showGitHubOnlyMessage.callCount).toBe(3);
     });
   });
 
-  describe("searching packages", () => it("displays the packages in the order returned", function() {
-    spyOn(panel.client, 'search').andCallFake(() => Promise.resolve([{name: 'not-first'}, {name: 'first'}]));
-    spyOn(panel, 'getPackageCardView').andCallThrough();
+  describe("searching packages", () => it("does not query the package registry", function() {
+    spyOn(panel.client, 'search').andCallThrough();
 
-    waitsForPromise(() => {
-      return panel.search('first');
-    });
+    panel.search('first');
 
-    return runs(function() {
-      expect(panel.getPackageCardView.argsForCall[0][0].name).toEqual('not-first');
-      expect(panel.getPackageCardView.argsForCall[1][0].name).toEqual('first');
-    });
+    expect(panel.client.search).not.toHaveBeenCalled();
+    expect(panel.refs.searchMessage.textContent).toContain('GitHub repository');
   }));
 
   describe("searching git packages", function() {
@@ -120,6 +115,7 @@ describe('InstallPanel', function() {
       const query = 'this-package-is-so-normal';
       panel.performSearchForQuery(query);
       expect(panel.showGitInstallPackageCard).not.toHaveBeenCalled();
+      expect(panel.refs.searchMessage.textContent).toContain('GitHub repository');
     });
 
     describe("when a package with the same gitUrlInfo property is installed", function() {

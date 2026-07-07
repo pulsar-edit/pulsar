@@ -956,9 +956,6 @@ class AtomEnvironment {
       this.commandInstaller.installAtomCommand(false, error => {
         if (error) console.warn(error.message);
       });
-      this.commandInstaller.installApmCommand(false, error => {
-        if (error) console.warn(error.message);
-      });
 
       this.disposables.add(
         this.applicationDelegate.onDidChangeUserSettings(settings =>

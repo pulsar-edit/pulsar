@@ -51,16 +51,13 @@ module.exports = class CommandInstaller {
 
     this.installAtomCommand(true, (error, atomCommandName) => {
       if (error) return showErrorDialog(error);
-      this.installApmCommand(true, (error, apmCommandName) => {
-        if (error) return showErrorDialog(error);
-        this.applicationDelegate.confirm(
-          {
-            message: 'Commands installed.',
-            detail: `The shell commands \`${atomCommandName}\` and \`${apmCommandName}\` are installed.`
-          },
-          () => {}
-        );
-      });
+      this.applicationDelegate.confirm(
+        {
+          message: 'Command installed.',
+          detail: `The shell command \`${atomCommandName}\` is installed.`
+        },
+        () => {}
+      );
     });
   }
 
@@ -83,22 +80,6 @@ module.exports = class CommandInstaller {
     this.installCommand(
       path.join(this.getResourcesDirectory(), `${scriptName}.sh`),
       scriptName,
-      askForPrivilege,
-      callback
-    );
-  }
-
-  installApmCommand(askForPrivilege, callback) {
-    let ppmName = 'ppm';
-    this.installCommand(
-      path.join(
-        this.getResourcesDirectory(),
-        'app',
-        'ppm',
-        'bin',
-        ppmName
-      ),
-      ppmName,
       askForPrivilege,
       callback
     );

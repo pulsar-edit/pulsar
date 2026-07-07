@@ -75,20 +75,11 @@ describe('InstalledPackagesPanel', function() {
     });
 
     it('adds newly installed packages to the list', function() {
-      let [installCallback] = [];
-      spyOn(this.packageManager, 'runCommand').andCallFake(function(args, callback) {
-        installCallback = callback;
-        return {onWillThrowError() {}};
-      });
-      spyOn(atom.packages, 'activatePackage').andCallFake(name => {
-        return this.installed.user.push({name});
-    });
-
       expect(this.panel.refs.communityCount.textContent.trim()).toBe('1');
       expect(this.panel.refs.communityPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(1);
 
-      this.packageManager.install({name: 'another-user-package'});
-      installCallback(0, '', '');
+      this.installed.user.push({name: 'another-user-package'});
+      this.packageManager.emitter.emit('package-installed', {pack: {name: 'another-user-package'}});
 
       advanceClock(InstalledPackagesPanel.loadPackagesDelay());
       waits(1);
@@ -99,20 +90,11 @@ describe('InstalledPackagesPanel', function() {
     });
 
     it('removes uninstalled packages from the list', function() {
-      let [uninstallCallback] = [];
-      spyOn(this.packageManager, 'runCommand').andCallFake(function(args, callback) {
-        uninstallCallback = callback;
-        return {onWillThrowError() {}};
-      });
-      spyOn(this.packageManager, 'unload').andCallFake(name => {
-        return this.installed.user = [];
-    });
-
       expect(this.panel.refs.communityCount.textContent.trim()).toBe('1');
       expect(this.panel.refs.communityPackages.querySelectorAll('.package-card:not(.hidden)').length).toBe(1);
 
-      this.packageManager.uninstall({name: 'user-package'});
-      uninstallCallback(0, '', '');
+      this.installed.user = [];
+      this.packageManager.emitter.emit('package-uninstalled', {pack: {name: 'user-package'}});
 
       advanceClock(InstalledPackagesPanel.loadPackagesDelay());
       waits(1);

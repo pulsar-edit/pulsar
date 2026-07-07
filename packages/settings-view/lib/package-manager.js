@@ -1,5 +1,10 @@
 const _ = require('underscore-plus');
 const {BufferedProcess, CompositeDisposable, Emitter} = require('atom');
+const CSON = require('season');
+const fs = require('fs-plus');
+const hostedGitInfo = require('hosted-git-info');
+const os = require('os');
+const path = require('path');
 const semver = require('semver');
 
 const Client = require('./atom-io-client');
@@ -100,28 +105,11 @@ module.exports = class PackageManager {
   }
 
   loadInstalled(callback) {
-    const args = ['ls', '--json'];
-    const errorMessage = 'Fetching local packages failed.';
-    const apmProcess = this.runCommand(args, function(code, stdout, stderr) {
-      let error;
-      if (code === 0) {
-        let packages;
-        try {
-          packages = (JSON.parse(stdout) != null) ? JSON.parse(stdout) : [];
-        } catch (parseError) {
-          error = createJsonParseError(errorMessage, parseError, stdout);
-          return callback(error);
-        }
-        return callback(null, packages);
-      } else {
-        error = new Error(errorMessage);
-        error.stdout = stdout;
-        error.stderr = stderr;
-        return callback(error);
-      }
-    });
-
-    return handleProcessErrors(apmProcess, errorMessage, callback);
+    try {
+      return callback(null, this.getLocalPackages());
+    } catch (error) {
+      return callback(error);
+    }
   }
 
   loadFeatured(loadThemes, callback) {
@@ -130,34 +118,7 @@ module.exports = class PackageManager {
       loadThemes = false;
     }
 
-    const args = ['featured', '--json'];
-    const version = atom.getVersion();
-    if (loadThemes) { args.push('--themes'); }
-    if (semver.valid(version)) { args.push('--compatible', version); }
-    const errorMessage = 'Fetching featured packages failed.';
-
-    const apmProcess = this.runCommand(args, function(code, stdout, stderr) {
-      let error;
-      if (code === 0) {
-        let packages;
-        try {
-          let left;
-          packages = (left = JSON.parse(stdout)) != null ? left : [];
-        } catch (parseError) {
-          error = createJsonParseError(errorMessage, parseError, stdout);
-          return callback(error);
-        }
-
-        return callback(null, packages);
-      } else {
-        error = new Error(errorMessage);
-        error.stdout = stdout;
-        error.stderr = stderr;
-        return callback(error);
-      }
-    });
-
-    return handleProcessErrors(apmProcess, errorMessage, callback);
+    return callback(null, []);
   }
 
   loadOutdated(clearCache, callback) {
@@ -168,53 +129,18 @@ module.exports = class PackageManager {
       return callback(null, this.apmCache.loadOutdated.value);
     }
 
-    const args = ['outdated', '--json'];
-    const version = atom.getVersion();
-    if (semver.valid(version)) { args.push('--compatible', version); }
-    const errorMessage = 'Fetching outdated packages and themes failed.';
-
-    const apmProcess = this.runCommand(args, (code, stdout, stderr) => {
-      let error;
-      let pack;
-      if (code === 0) {
-        let packages;
-        try {
-          let left;
-          packages = (left = JSON.parse(stdout)) != null ? left : [];
-        } catch (parseError) {
-          error = createJsonParseError(errorMessage, parseError, stdout);
-          return callback(error);
-        }
-
-        const updatablePackages = ((() => {
-          const result = [];
-          for (pack of Array.from(packages)) {
-            if (!this.getVersionPinnedPackages().includes(pack != null ? pack.name : undefined)) {
-              result.push(pack);
-            }
-          }
-          return result;
-        })());
-
+    this.getGitPackageUpdates().then(updatablePackages => {
         this.apmCache.loadOutdated = {
           value: updatablePackages,
           expiry: Date.now() + this.CACHE_EXPIRY
         };
 
-        for (pack of Array.from(updatablePackages)) {
+        for (const pack of Array.from(updatablePackages)) {
           this.emitPackageEvent('update-available', pack);
         }
 
         return callback(null, updatablePackages);
-      } else {
-        error = new Error(errorMessage);
-        error.stdout = stdout;
-        error.stderr = stderr;
-        return callback(error);
-      }
-    });
-
-    return handleProcessErrors(apmProcess, errorMessage, callback);
+    }, callback);
   }
 
   getVersionPinnedPackages() {
@@ -230,59 +156,16 @@ module.exports = class PackageManager {
   }
 
   loadPackage(packageName, callback) {
-    const args = ['view', packageName, '--json'];
-    const errorMessage = `Fetching package '${packageName}' failed.`;
-
-    const apmProcess = this.runCommand(args, function(code, stdout, stderr) {
-      let error;
-      if (code === 0) {
-        let packages;
-        try {
-          let left;
-          packages = (left = JSON.parse(stdout)) != null ? left : [];
-        } catch (parseError) {
-          error = createJsonParseError(errorMessage, parseError, stdout);
-          return callback(error);
-        }
-
-        return callback(null, packages);
-      } else {
-        error = new Error(errorMessage);
-        error.stdout = stdout;
-        error.stderr = stderr;
-        return callback(error);
-      }
-    });
-
-    return handleProcessErrors(apmProcess, errorMessage, callback);
+    const pack = this.getAllLocalPackages().find(pack => pack.name === packageName);
+    if (pack) {
+      return callback(null, pack);
+    } else {
+      return callback(new Error(`Package '${packageName}' is not installed.`));
+    }
   }
 
   loadCompatiblePackageVersion(packageName, callback) {
-    const args = ['view', packageName, '--json', '--compatible', this.normalizeVersion(atom.getVersion())];
-    const errorMessage = `Fetching package '${packageName}' failed.`;
-
-    const apmProcess = this.runCommand(args, function(code, stdout, stderr) {
-      let error;
-      if (code === 0) {
-        let packages;
-        try {
-          let left;
-          packages = (left = JSON.parse(stdout)) != null ? left : [];
-        } catch (parseError) {
-          error = createJsonParseError(errorMessage, parseError, stdout);
-          return callback(error);
-        }
-
-        return callback(null, packages);
-      } else {
-        error = new Error(errorMessage);
-        error.stdout = stdout;
-        error.stderr = stderr;
-        return callback(error);
-      }
-    });
-
-    return handleProcessErrors(apmProcess, errorMessage, callback);
+    return this.loadPackage(packageName, (error, pack) => callback(null, error ? {} : pack));
   }
 
   getInstalled() {
@@ -348,7 +231,6 @@ module.exports = class PackageManager {
   }
 
   update(pack, newVersion, callback) {
-    let args;
     const {name, theme, apmInstallSource} = pack;
 
     const errorMessage = newVersion ?
@@ -361,30 +243,23 @@ module.exports = class PackageManager {
       return (typeof callback === 'function' ? callback(error) : undefined);
     };
 
-    if ((apmInstallSource != null ? apmInstallSource.type : undefined) === 'git') {
-      args = ['install', apmInstallSource.source];
-    } else {
-      args = ['install', `${name}@${newVersion}`];
+    if ((apmInstallSource != null ? apmInstallSource.type : undefined) !== 'git') {
+      const error = new Error('Only GitHub package updates are supported.');
+      error.packageInstallError = !theme;
+      return onError(error);
     }
 
-    const exit = (code, stdout, stderr) => {
-      if (code === 0) {
+    this.emitPackageEvent('updating', pack);
+    this.installGitHubPackage(_.extend({}, pack, {name: apmInstallSource.source})).then(updatedPack => {
         this.clearOutdatedCache();
         if (typeof callback === 'function') {
           callback();
         }
-        return this.emitPackageEvent('updated', pack);
-      } else {
-        const error = new Error(errorMessage);
-        error.stdout = stdout;
-        error.stderr = stderr;
-        return onError(error);
-      }
-    };
-
-    this.emitPackageEvent('updating', pack);
-    const apmProcess = this.runCommand(args, exit);
-    return handleProcessErrors(apmProcess, errorMessage, onError);
+        return this.emitPackageEvent('updated', updatedPack);
+    }, error => {
+      error.message = error.message || errorMessage;
+      return onError(error);
+    });
   }
 
   unload(name) {
@@ -396,12 +271,9 @@ module.exports = class PackageManager {
 
   install(pack, callback) {
     let {name, version, theme} = pack;
-    const activateOnSuccess = !theme && !atom.packages.isPackageDisabled(name);
+    const activateOnSuccess = !theme;
     const activateOnFailure = atom.packages.isPackageActive(name);
     const nameWithVersion = (version != null) ? `${name}@${version}` : name;
-
-    this.unload(name);
-    const args = ['install', nameWithVersion, '--json'];
 
     const errorMessage = `Installing \u201C${nameWithVersion}\u201D failed.`;
     const onError = error => {
@@ -410,19 +282,12 @@ module.exports = class PackageManager {
       return (typeof callback === 'function' ? callback(error) : undefined);
     };
 
-    const exit = (code, stdout, stderr) => {
-      if (code === 0) {
-        // get real package name from package.json
-        try {
-          const packageInfo = JSON.parse(stdout)[0];
-          pack = _.extend({}, pack, packageInfo.metadata);
-          ({
-            name
-          } = pack);
-        } catch (err) {}
-          // using old apm without --json support
+    this.emitPackageEvent('installing', pack);
+    this.installGitHubPackage(pack).then(installedPack => {
+        pack = _.extend({}, pack, installedPack);
+        ({name} = pack);
         this.clearOutdatedCache();
-        if (activateOnSuccess) {
+        if (activateOnSuccess && !atom.packages.isPackageDisabled(name)) {
           atom.packages.activatePackage(name);
         } else {
           atom.packages.loadPackage(name);
@@ -432,18 +297,11 @@ module.exports = class PackageManager {
           callback();
         }
         return this.emitPackageEvent('installed', pack);
-      } else {
+    }, error => {
         if (activateOnFailure) { atom.packages.activatePackage(name); }
-        const error = new Error(errorMessage);
-        error.stdout = stdout;
-        error.stderr = stderr;
+        error.message = error.message || errorMessage;
         return onError(error);
-      }
-    };
-
-    this.emitPackageEvent('installing', pack);
-    const apmProcess = this.runCommand(args, exit);
-    return handleProcessErrors(apmProcess, errorMessage, onError);
+    });
   }
 
   uninstall(pack, callback) {
@@ -457,25 +315,22 @@ module.exports = class PackageManager {
       return (typeof callback === 'function' ? callback(error) : undefined);
     };
 
-    this.emitPackageEvent('uninstalling', pack);
-    const apmProcess = this.runCommand(['uninstall', '--hard', name], (code, stdout, stderr) => {
-      if (code === 0) {
+    try {
+      this.emitPackageEvent('uninstalling', pack);
+      const packagePath = atom.packages.resolvePackagePath(name) || path.join(this.getAtomPackagesDirectory(), name);
+      if (atom.packages.isPackageActive(name)) { atom.packages.deactivatePackage(name); }
+      if (atom.packages.isPackageLoaded(name)) { atom.packages.unloadPackage(name); }
+      if (fs.isDirectorySync(packagePath)) { fs.removeSync(packagePath); }
         this.clearOutdatedCache();
-        this.unload(name);
         this.removePackageNameFromDisabledPackages(name);
         if (typeof callback === 'function') {
           callback();
         }
         return this.emitPackageEvent('uninstalled', pack);
-      } else {
-        const error = new Error(errorMessage);
-        error.stdout = stdout;
-        error.stderr = stderr;
-        return onError(error);
-      }
-    });
-
-    return handleProcessErrors(apmProcess, errorMessage, onError);
+    } catch (error) {
+      error.message = error.message || errorMessage;
+      return onError(error);
+    }
   }
 
   canUpgrade(installedPackage, availableVersion) {
@@ -519,20 +374,173 @@ module.exports = class PackageManager {
   }
 
   checkNativeBuildTools() {
+    return Promise.all([
+      this.runProcess(this.getGitCommand(), ['--version']),
+      this.runProcess(this.getNpmCommand(), ['--version'])
+    ]);
+  }
+
+  getAtomPackagesDirectory() {
+    return path.join(process.env.ATOM_HOME, 'packages');
+  }
+
+  getGitCommand() {
+    return 'git';
+  }
+
+  getNpmCommand() {
+    return process.platform === 'win32' ? 'npm.cmd' : 'npm';
+  }
+
+  runProcess(command, args, options = {}) {
     return new Promise((resolve, reject) => {
-      const apmProcess = this.runCommand(['install', '--check'], function(code, stdout, stderr) {
-        if (code === 0) {
-          resolve();
-        } else {
-          reject(new Error());
+      let stdout = '';
+      let stderr = '';
+      const process = new BufferedProcess({
+        command,
+        args,
+        options,
+        stdout(output) { stdout += output; },
+        stderr(output) { stderr += output; },
+        exit(code) {
+          if (code === 0) {
+            resolve({code, stdout, stderr});
+          } else {
+            const error = new Error(stderr || stdout || `${command} failed with exit code ${code}`);
+            error.stdout = stdout;
+            error.stderr = stderr;
+            reject(error);
+          }
         }
       });
 
-      apmProcess.onWillThrowError(function({error, handle}) {
+      process.onWillThrowError(({error, handle}) => {
         handle();
+        error.stdout = stdout;
+        error.stderr = stderr || error.message;
         reject(error);
       });
     });
+  }
+
+  getGitHubInfo(source) {
+    const gitUrlInfo = hostedGitInfo.fromUrl(source);
+    return gitUrlInfo && gitUrlInfo.type === 'github' ? gitUrlInfo : null;
+  }
+
+  getCloneUrl(source) {
+    const gitUrlInfo = this.getGitHubInfo(source);
+    if (!gitUrlInfo) {
+      throw new Error('Enter a GitHub repository such as owner/repo or https://github.com/owner/repo.');
+    }
+
+    if (gitUrlInfo.default === 'sshurl') {
+      return gitUrlInfo.toString();
+    } else {
+      return gitUrlInfo.https().replace(/^git\+https:/, 'https:');
+    }
+  }
+
+  async installGitHubPackage(pack) {
+    const source = pack.name;
+    const cloneUrl = this.getCloneUrl(source);
+    const cloneDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'lumine-package-')));
+
+    await this.runProcess(this.getGitCommand(), ['clone', '--depth', '1', cloneUrl, cloneDir]);
+    const {stdout: shaOutput} = await this.runProcess(this.getGitCommand(), ['rev-parse', 'HEAD'], {cwd: cloneDir});
+    await this.runProcess(this.getNpmCommand(), ['install', '--production'], {cwd: cloneDir});
+
+    const metadataFilePath = CSON.resolve(path.join(cloneDir, 'package'));
+    if (!metadataFilePath) {
+      throw new Error('The GitHub repository does not contain a package.json or package.cson file.');
+    }
+
+    const metadata = CSON.readFileSync(metadataFilePath);
+    const sha = shaOutput.trim();
+    metadata.apmInstallSource = {
+      type: 'git',
+      source,
+      sha
+    };
+    this.writePackageMetadata(metadataFilePath, metadata);
+
+    const packageName = metadata.name || path.basename(source);
+    this.unload(packageName);
+    const targetDir = path.join(this.getAtomPackagesDirectory(), packageName);
+    fs.removeSync(targetDir);
+    fs.copySync(cloneDir, targetDir);
+    fs.removeSync(path.join(targetDir, '.git'));
+    fs.removeSync(cloneDir);
+
+    return _.extend({}, pack, metadata, {
+      name: packageName,
+      installPath: targetDir,
+      gitUrlInfo: pack.gitUrlInfo,
+      apmInstallSource: metadata.apmInstallSource
+    });
+  }
+
+  writePackageMetadata(metadataFilePath, metadata) {
+    if (path.extname(metadataFilePath) === '.json') {
+      fs.writeFileSync(metadataFilePath, `${JSON.stringify(metadata, null, 2)}\n`);
+    } else {
+      CSON.writeFileSync(metadataFilePath, metadata);
+    }
+  }
+
+  getLocalPackages() {
+    const packages = {dev: [], user: [], core: [], git: []};
+    const configDirPath = atom.getConfigDirPath ? atom.getConfigDirPath() : process.env.ATOM_HOME;
+    const devPackagesPath = path.join(configDirPath, 'dev', 'packages');
+
+    for (const pack of atom.packages.getAvailablePackages()) {
+      const metadata = atom.packages.loadPackageMetadata(pack, true) || {};
+      const packageInfo = _.extend({}, metadata, {
+        name: metadata.name || pack.name,
+        path: pack.path
+      });
+
+      if (packageInfo.apmInstallSource && packageInfo.apmInstallSource.type === 'git') {
+        packages.git.push(packageInfo);
+      } else if (pack.isBundled) {
+        packages.core.push(packageInfo);
+      } else if (pack.path && pack.path.startsWith(devPackagesPath)) {
+        packages.dev.push(packageInfo);
+      } else {
+        packages.user.push(packageInfo);
+      }
+    }
+
+    return packages;
+  }
+
+  getAllLocalPackages() {
+    const packages = this.getLocalPackages();
+    return [].concat(packages.dev, packages.user, packages.core, packages.git);
+  }
+
+  async getGitPackageUpdates() {
+    const updates = [];
+    const pinnedPackages = this.getVersionPinnedPackages();
+    const gitPackages = this.getLocalPackages().git;
+
+    for (const pack of gitPackages) {
+      if (pinnedPackages.includes(pack.name)) { continue; }
+      const source = pack.apmInstallSource && pack.apmInstallSource.source;
+      const currentSha = pack.apmInstallSource && pack.apmInstallSource.sha;
+      if (!source || !currentSha) { continue; }
+
+      try {
+        const cloneUrl = this.getCloneUrl(source);
+        const {stdout} = await this.runProcess(this.getGitCommand(), ['ls-remote', cloneUrl, 'HEAD']);
+        const latestSha = stdout.trim().split(/\s+/)[0];
+        if (latestSha && latestSha !== currentSha) {
+          updates.push(_.extend({}, pack, {latestSha}));
+        }
+      } catch (error) {}
+    }
+
+    return updates;
   }
 
   removePackageNameFromDisabledPackages(packageName) {
