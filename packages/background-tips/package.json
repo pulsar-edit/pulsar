@@ -9,6 +9,12 @@
   "engines": {
     "atom": ">0.42.0"
   },
+  "backgroundTips": [
+    "You can split your editor into multiple panes with {pane:split-right-and-copy-active-item}",
+    "You can move a line of text up with {atom-text-editor>editor:move-line-up}",
+    "You can move a line of text down with {atom-text-editor>editor:move-line-down}",
+    "You can toggle line comments with {atom-text-editor>editor:toggle-line-comments}"
+  ],
   "dependencies": {
     "underscore-plus": "1.x"
   }

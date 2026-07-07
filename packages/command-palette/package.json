@@ -22,6 +22,9 @@
     "semver": "^5.4.1",
     "sinon": "^3.2.1"
   },
+  "backgroundTips": [
+    "Everything Lumine can do is in the Command Palette. See it by using {atom-workspace>command-palette:toggle}"
+  ],
   "configSchema": {
     "preserveLastSearch": {
       "type": "boolean",
