@@ -2,7 +2,6 @@
 /** @jsx etch.dom */
 
 import {CompositeDisposable, Disposable} from 'atom'
-import {shell} from 'electron'
 import etch from 'etch'
 import BadgeView from './badge-view'
 import path from 'path'
@@ -233,14 +232,14 @@ export default class PackageCard {
 
     const packageNameClickHandler = (event) => {
       event.stopPropagation()
-      shell.openExternal(`https://web.pulsar-edit.dev/packages/${this.pack.name}`)
+      atom.openExternal(`https://web.pulsar-edit.dev/packages/${this.pack.name}`)
     }
     this.refs.packageName.addEventListener('click', packageNameClickHandler)
     this.disposables.add(new Disposable(() => { this.refs.packageName.removeEventListener('click', packageNameClickHandler) }))
 
     const packageAuthorClickHandler = (event) => {
       event.stopPropagation()
-      shell.openExternal(`https://web.pulsar-edit.dev/users/${ownerFromRepository(this.pack.repository)}`) //TODO: Fix - This does not current exist but this will at least be more accurate
+      atom.openExternal(`https://web.pulsar-edit.dev/users/${ownerFromRepository(this.pack.repository)}`) //TODO: Fix - This does not current exist but this will at least be more accurate
     }
     this.refs.loginLink.addEventListener('click', packageAuthorClickHandler)
     this.disposables.add(new Disposable(() => { this.refs.loginLink.removeEventListener('click', packageAuthorClickHandler) }))
