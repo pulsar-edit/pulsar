@@ -1,13 +1,13 @@
-'use strict';
+"use strict";
 // This file is required by compile-cache, which is required directly from
 // apm, so it can only use the subset of newer JavaScript features that apm's
 // version of Node supports. Strict mode is required for block scoped declarations.
 
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
+const crypto = require("crypto");
+const fs = require("fs");
+const path = require("path");
 
-const minimatch = require('minimatch');
+const minimatch = require("minimatch");
 
 let Resolve = null;
 
@@ -23,7 +23,7 @@ class PackageTranspilationRegistry {
       name: packageName,
       meta: packageMeta,
       path: packagePath,
-      specs: config.map(spec => Object.assign({}, spec))
+      specs: config.map((spec) => Object.assign({}, spec)),
     };
   }
 
@@ -32,7 +32,7 @@ class PackageTranspilationRegistry {
     const packagePathWithSep = packagePath.endsWith(path.sep)
       ? path.join(packagePath)
       : path.join(packagePath) + path.sep;
-    Object.keys(this.specByFilePath).forEach(filePath => {
+    Object.keys(this.specByFilePath).forEach((filePath) => {
       if (path.join(filePath).startsWith(packagePathWithSep)) {
         delete this.specByFilePath[filePath];
       }
@@ -56,11 +56,7 @@ class PackageTranspilationRegistry {
       compile: (sourceCode, filePath) => {
         const spec = this.getPackageTranspilerSpecForFilePath(filePath);
         if (spec) {
-          return this.transpileWithPackageTranspiler(
-            sourceCode,
-            filePath,
-            spec
-          );
+          return this.transpileWithPackageTranspiler(sourceCode, filePath, spec);
         }
 
         return transpiler.compile(sourceCode, filePath);
@@ -76,13 +72,12 @@ class PackageTranspilationRegistry {
         }
 
         return transpiler.shouldCompile(sourceCode, filePath);
-      }
+      },
     };
   }
 
   getPackageTranspilerSpecForFilePath(filePath) {
-    if (this.specByFilePath[filePath] !== undefined)
-      return this.specByFilePath[filePath];
+    if (this.specByFilePath[filePath] !== undefined) return this.specByFilePath[filePath];
 
     let thisPath = filePath;
     let lastPath = null;
@@ -112,7 +107,7 @@ class PackageTranspilationRegistry {
       }
 
       lastPath = thisPath;
-      thisPath = path.join(thisPath, '..');
+      thisPath = path.join(thisPath, "..");
     }
 
     this.specByFilePath[filePath] = null;
@@ -121,16 +116,15 @@ class PackageTranspilationRegistry {
 
   getCachePath(sourceCode, filePath, spec) {
     const transpilerPath = this.getTranspilerPath(spec);
-    const transpilerSource =
-      spec._transpilerSource || fs.readFileSync(transpilerPath, 'utf8');
+    const transpilerSource = spec._transpilerSource || fs.readFileSync(transpilerPath, "utf8");
     spec._transpilerSource = transpilerSource;
     const transpiler = this.getTranspiler(spec);
 
     let hash = crypto
-      .createHash('sha1')
+      .createHash("sha1")
       .update(JSON.stringify(spec.options || {}))
-      .update(transpilerSource, 'utf8')
-      .update(sourceCode, 'utf8');
+      .update(transpilerSource, "utf8")
+      .update(sourceCode, "utf8");
 
     if (transpiler && transpiler.getCacheKeyData) {
       const meta = this.getMetadata(spec);
@@ -138,16 +132,12 @@ class PackageTranspilationRegistry {
         sourceCode,
         filePath,
         spec.options || {},
-        meta
+        meta,
       );
-      hash.update(additionalCacheData, 'utf8');
+      hash.update(additionalCacheData, "utf8");
     }
 
-    return path.join(
-      'package-transpile',
-      spec._config.name,
-      hash.digest('hex')
-    );
+    return path.join("package-transpile", spec._config.name, hash.digest("hex"));
   }
 
   transpileWithPackageTranspiler(sourceCode, filePath, spec) {
@@ -155,29 +145,19 @@ class PackageTranspilationRegistry {
 
     if (transpiler) {
       const meta = this.getMetadata(spec);
-      const result = transpiler.transpile(
-        sourceCode,
-        filePath,
-        spec.options || {},
-        meta
-      );
+      const result = transpiler.transpile(sourceCode, filePath, spec.options || {}, meta);
       if (result === undefined || (result && result.code === undefined)) {
         return sourceCode;
       } else if (result.code) {
         return result.code.toString();
       } else {
         throw new Error(
-          'Could not find a property `.code` on the transpilation results of ' +
-            filePath
+          "Could not find a property `.code` on the transpilation results of " + filePath,
         );
       }
     } else {
       const err = new Error(
-        "Could not resolve transpiler '" +
-          spec.transpiler +
-          "' from '" +
-          spec._config.path +
-          "'"
+        "Could not resolve transpiler '" + spec.transpiler + "' from '" + spec._config.path + "'",
       );
       throw err;
     }
@@ -187,15 +167,15 @@ class PackageTranspilationRegistry {
     return {
       name: spec._config.name,
       path: spec._config.path,
-      meta: spec._config.meta
+      meta: spec._config.meta,
     };
   }
 
   getTranspilerPath(spec) {
-    Resolve = Resolve || require('resolve');
+    Resolve = Resolve || require("resolve");
     return Resolve.sync(spec.transpiler, {
       basedir: spec._config.path,
-      extensions: Object.keys(require.extensions)
+      extensions: Object.keys(require.extensions),
     });
   }
 

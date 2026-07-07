@@ -4,39 +4,37 @@ module.exports = {
     commonjs: true,
     es2021: true,
   },
-  extends: [
-    "eslint:recommended",
-    "plugin:node/recommended",
-  ],
+  extends: ["eslint:recommended", "plugin:node/recommended"],
   overrides: [],
   parserOptions: {
-    ecmaVersion: "latest"
+    ecmaVersion: "latest",
   },
   rules: {
     "no-fallthrough": "off",
     "no-case-declarations": "off",
-    "space-before-function-paren": ["error", {
-      anonymous: "always",
-      asyncArrow: "always",
-      named: "never"
-    }],
+    "space-before-function-paren": [
+      "error",
+      {
+        anonymous: "always",
+        asyncArrow: "always",
+        named: "never",
+      },
+    ],
     "node/no-unpublished-require": [
       "error",
       {
-        allowModules: ["electron"]
-      }
+        allowModules: ["electron"],
+      },
     ],
     "node/no-missing-require": [
       "error",
       {
-        allowModules: ["atom"]
-      }
-    ]
+        allowModules: ["atom"],
+      },
+    ],
   },
-  plugins: [
-    "jsdoc"
-  ],
+  plugins: ["jsdoc"],
   globals: {
-    atom: "writeable"
-  }
+    atom: "writeable",
+  },
 };

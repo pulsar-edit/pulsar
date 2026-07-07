@@ -1,4 +1,4 @@
-const Task = require('./task');
+const Task = require("./task");
 
 // Searches local files for lines matching a specified regex. Implements `.then()`
 // so that it can be used with `Promise.all()`.
@@ -10,28 +10,22 @@ class DirectorySearch {
       includeHidden: options.includeHidden,
       excludeVcsIgnores: options.excludeVcsIgnores,
       globalExclusions: options.exclusions,
-      follow: options.follow
+      follow: options.follow,
     };
     const searchOptions = {
       leadingContextLineCount: options.leadingContextLineCount,
-      trailingContextLineCount: options.trailingContextLineCount
+      trailingContextLineCount: options.trailingContextLineCount,
     };
-    this.task = new Task(require.resolve('./scan-handler'));
-    this.task.on('scan:result-found', options.didMatch);
-    this.task.on('scan:file-error', options.didError);
-    this.task.on('scan:paths-searched', options.didSearchPaths);
+    this.task = new Task(require.resolve("./scan-handler"));
+    this.task.on("scan:result-found", options.didMatch);
+    this.task.on("scan:file-error", options.didError);
+    this.task.on("scan:paths-searched", options.didSearchPaths);
     this.promise = new Promise((resolve, reject) => {
-      this.task.on('task:cancelled', reject);
-      this.task.start(
-        rootPaths,
-        regex.source,
-        scanHandlerOptions,
-        searchOptions,
-        () => {
-          this.task.terminate();
-          resolve();
-        }
-      );
+      this.task.on("task:cancelled", reject);
+      this.task.start(rootPaths, regex.source, scanHandlerOptions, searchOptions, () => {
+        this.task.terminate();
+        resolve();
+      });
     });
   }
 
@@ -90,11 +84,11 @@ module.exports = class DefaultDirectorySearcher {
   // Returns a *thenable* `DirectorySearch` that includes a `cancel()` method. If `cancel()` is
   // invoked before the `DirectorySearch` is determined, it will resolve the `DirectorySearch`.
   search(directories, regex, options) {
-    const rootPaths = directories.map(directory => directory.getPath());
+    const rootPaths = directories.map((directory) => directory.getPath());
     let isCancelled = false;
     const directorySearch = new DirectorySearch(rootPaths, regex, options);
-    const promise = new Promise(function(resolve, reject) {
-      directorySearch.then(resolve, function() {
+    const promise = new Promise(function (resolve, reject) {
+      directorySearch.then(resolve, function () {
         if (isCancelled) {
           resolve();
         } else {
@@ -108,7 +102,7 @@ module.exports = class DefaultDirectorySearcher {
       cancel() {
         isCancelled = true;
         directorySearch.cancel();
-      }
+      },
     };
   }
 };

@@ -20,7 +20,7 @@ class CSSParser {
       "+": "Plus Sign Multiplier",
       "?": "Question Mark Multiplier",
       "#": "Hash Mark Multiplier",
-      "!": "Exclamation Point Multiplier"
+      "!": "Exclamation Point Multiplier",
     };
 
     this.separators = {
@@ -30,7 +30,7 @@ class CSSParser {
       "[": "Open Bracket Combinator",
       "]": "Close Bracket Combinator",
       " ": "Juxtaposition Combinator",
-      "/": "Undocumented Seperator?"
+      "/": "Undocumented Seperator?",
     };
 
     this.startFold = "<"; // A foldable item would mean to stop parsing within.
@@ -51,7 +51,7 @@ class CSSParser {
     if (this.isStartDiscardable()) {
       // We don't care about what's in here, until we hit the end of our discardable
       this.offLoadBuffer();
-      while(!this.isEndDiscardable()) {
+      while (!this.isEndDiscardable()) {
         this.next();
       }
       this.next();
@@ -74,7 +74,7 @@ class CSSParser {
 
     if (this.isStartFold()) {
       let tmpValue = "";
-      while(!this.isEndFold()) {
+      while (!this.isEndFold()) {
         tmpValue += this.cur();
         this.next();
       }
@@ -84,12 +84,18 @@ class CSSParser {
       return this.parse();
     }
 
-    if (!this.isStartDiscardable() && !this.isEndDiscardable() && !this.isKeyword().status && !this.isSeparators().status && !this.isStartFold() && !this.isEndFold()) {
+    if (
+      !this.isStartDiscardable() &&
+      !this.isEndDiscardable() &&
+      !this.isKeyword().status &&
+      !this.isSeparators().status &&
+      !this.isStartFold() &&
+      !this.isEndFold()
+    ) {
       this.buffer += this.cur();
       this.next();
       return this.parse();
     }
-
   }
 
   offLoadBuffer() {
@@ -101,7 +107,10 @@ class CSSParser {
 
   isKeyword() {
     for (const name in this.keywords) {
-      if (this.keywords.hasOwnProperty(name) && this.value.substr(this.index, name.length) === name) {
+      if (
+        this.keywords.hasOwnProperty(name) &&
+        this.value.substr(this.index, name.length) === name
+      ) {
         return { status: true, who: name };
       }
     }
@@ -110,7 +119,10 @@ class CSSParser {
 
   isSeparators() {
     for (const name in this.separators) {
-      if (this.separators.hasOwnProperty(name) && this.value.substr(this.index, name.length) === name) {
+      if (
+        this.separators.hasOwnProperty(name) &&
+        this.value.substr(this.index, name.length) === name
+      ) {
         return { status: true, who: name };
       }
     }

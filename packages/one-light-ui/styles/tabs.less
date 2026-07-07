@@ -1,10 +1,9 @@
-
 // Tabs
 
 @tab-border: 1px solid @tab-border-color;
-@title-padding: .66em;
-@icon-padding-top: .5em; // 2.5 (total) - 1.5 (text) / 2
-@icon-padding-right: .5em;
+@title-padding: 0.66em;
+@icon-padding-top: 0.5em; // 2.5 (total) - 1.5 (text) / 2
+@icon-padding-right: 0.5em;
 
 .tab-bar {
   position: relative;
@@ -22,7 +21,6 @@
   &:empty {
     display: none;
   }
-
 
   // Tab ----------------------
 
@@ -48,12 +46,13 @@
     }
     &:last-of-type {
       // use box-shadow to not take up any space
-      box-shadow: inset 0 -1px 0 @tab-border-color, 1px 0 0 @base-border-color;
+      box-shadow:
+        inset 0 -1px 0 @tab-border-color,
+        1px 0 0 @base-border-color;
     }
     &.active:last-of-type {
       box-shadow: 1px 0 0 @base-border-color;
     }
-
 
     // Title ----------------------
 
@@ -63,19 +62,22 @@
     }
 
     // VCS coloring ----------------------
-    &:not(.active) .status-added    { color: @tab-inactive-status-added; }
-    &:not(.active) .status-modified { color: @tab-inactive-status-modified; }
-
+    &:not(.active) .status-added {
+      color: @tab-inactive-status-added;
+    }
+    &:not(.active) .status-modified {
+      color: @tab-inactive-status-modified;
+    }
 
     // Icons ----------------------
 
     .title.title:before {
-      margin-right: .3em;
+      margin-right: 0.3em;
       width: auto;
       height: auto;
       line-height: 1;
       font-size: 1.125em;
-      vertical-align: -.0625em; // Adjust center for the 0.1em font-size increase
+      vertical-align: -0.0625em; // Adjust center for the 0.1em font-size increase
     }
 
     // Close icon ----------------------
@@ -93,7 +95,7 @@
       background-color: inherit;
       overflow: hidden;
       transform: scale(0);
-      transition: transform .08s;
+      transition: transform 0.08s;
       &:hover {
         color: @accent-text-color;
         background-color: @accent-color;
@@ -104,7 +106,7 @@
       &::before {
         z-index: 1;
         font-size: 1.1em;
-        vertical-align: -.05em; // Adjust center for the 0.1em font-size increase
+        vertical-align: -0.05em; // Adjust center for the 0.1em font-size increase
         width: auto;
         height: auto;
         pointer-events: none;
@@ -112,7 +114,7 @@
     }
     &:hover .close-icon {
       transform: scale(1);
-      transition-duration: .16s;
+      transition-duration: 0.16s;
     }
   }
 
@@ -142,7 +144,6 @@
     }
   }
 
-
   // Tabs in the docks ----------------------
 
   atom-dock & {
@@ -151,11 +152,10 @@
     }
   }
 
-
   // Dragging ----------------------
 
   .tab.is-dragging {
-    opacity: .5;
+    opacity: 0.5;
 
     .close-icon,
     &:before {
@@ -179,7 +179,7 @@
     // arrow
     &:after {
       z-index: 0;
-      top: (@ui-tab-height/2);
+      top: (@ui-tab-height / 2);
       margin: -4px 0 0 -3px;
       border-radius: 0;
       border: 4px solid @accent-color;
@@ -199,7 +199,6 @@
     }
   }
 
-
   // Overrides ----------------------
 
   // keep tabs same size when active
@@ -211,7 +210,6 @@
     }
   }
 }
-
 
 // Active/focused pane marker --------------
 
@@ -239,7 +237,6 @@ atom-pane-container > atom-pane.pane {
 atom-dock .tab-bar .tab::before {
   display: none;
 }
-
 
 // Custom tabs --------------
 

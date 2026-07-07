@@ -1,9 +1,9 @@
-const path = require('path');
-const Package = require('../src/package');
-const ThemePackage = require('../src/theme-package');
-const { mockLocalStorage } = require('./helpers/mock-local-storage');
+const path = require("path");
+const Package = require("../src/package");
+const ThemePackage = require("../src/theme-package");
+const { mockLocalStorage } = require("./helpers/mock-local-storage");
 
-describe('Package', function () {
+describe("Package", function () {
   const build = (constructor, packagePath) =>
     new constructor({
       path: packagePath,
@@ -18,14 +18,14 @@ describe('Package', function () {
       menuManager: atom.menu,
       contextMenuManager: atom.contextMenu,
       deserializerManager: atom.deserializers,
-      viewRegistry: atom.views
+      viewRegistry: atom.views,
     });
 
-  const buildPackage = packagePath => build(Package, packagePath);
+  const buildPackage = (packagePath) => build(Package, packagePath);
 
-  const buildThemePackage = themePath => build(ThemePackage, themePath);
+  const buildThemePackage = (themePath) => build(ThemePackage, themePath);
 
-  describe('when the package contains incompatible native modules', function () {
+  describe("when the package contains incompatible native modules", function () {
     beforeEach(function () {
       atom.packages.devMode = false;
       mockLocalStorage();
@@ -33,65 +33,65 @@ describe('Package', function () {
 
     afterEach(() => (atom.packages.devMode = true));
 
-    it('does not activate it', function () {
+    it("does not activate it", function () {
       const packagePath = atom.project
         .getDirectories()[0]
-        .resolve('packages/package-with-incompatible-native-module');
+        .resolve("packages/package-with-incompatible-native-module");
       const pack = buildPackage(packagePath);
       expect(pack.isCompatible()).toBe(false);
-      expect(pack.incompatibleModules[0].name).toBe('native-module');
+      expect(pack.incompatibleModules[0].name).toBe("native-module");
       expect(pack.incompatibleModules[0].path).toBe(
-        path.join(packagePath, 'node_modules', 'native-module')
+        path.join(packagePath, "node_modules", "native-module"),
       );
     });
 
-    it('detects the package as incompatible even if .node file is loaded conditionally', function () {
+    it("detects the package as incompatible even if .node file is loaded conditionally", function () {
       const packagePath = atom.project
         .getDirectories()[0]
-        .resolve(
-          'packages/package-with-incompatible-native-module-loaded-conditionally'
-        );
+        .resolve("packages/package-with-incompatible-native-module-loaded-conditionally");
       const pack = buildPackage(packagePath);
       expect(pack.isCompatible()).toBe(false);
-      expect(pack.incompatibleModules[0].name).toBe('native-module');
+      expect(pack.incompatibleModules[0].name).toBe("native-module");
       expect(pack.incompatibleModules[0].path).toBe(
-        path.join(packagePath, 'node_modules', 'native-module')
+        path.join(packagePath, "node_modules", "native-module"),
       );
     });
 
     it("utilizes _atomModuleCache if present to determine the package's native dependencies", function () {
       let packagePath = atom.project
         .getDirectories()[0]
-        .resolve('packages/package-with-ignored-incompatible-native-module');
+        .resolve("packages/package-with-ignored-incompatible-native-module");
       let pack = buildPackage(packagePath);
       expect(pack.getNativeModuleDependencyPaths().length).toBe(1); // doesn't see the incompatible module
       expect(pack.isCompatible()).toBe(true);
 
-      packagePath = atom.project.getDirectories()?.[0]?.resolve('packages/package-with-cached-incompatible-native-module')
+      packagePath = atom.project
+        .getDirectories()?.[0]
+        ?.resolve("packages/package-with-cached-incompatible-native-module");
 
       pack = buildPackage(packagePath);
       expect(pack.isCompatible()).toBe(false);
     });
 
-    it('logs an error to the console describing the problem', function () {
+    it("logs an error to the console describing the problem", function () {
       const packagePath = atom.project
         .getDirectories()[0]
-        .resolve('packages/package-with-incompatible-native-module');
+        .resolve("packages/package-with-incompatible-native-module");
 
-      spyOn(console, 'warn');
-      spyOn(atom.notifications, 'addFatalError');
+      spyOn(console, "warn");
+      spyOn(atom.notifications, "addFatalError");
 
       buildPackage(packagePath).activateNow();
 
       expect(atom.notifications.addFatalError).not.toHaveBeenCalled();
       expect(console.warn.calls.count()).toBe(1);
       expect(console.warn.calls.mostRecent().args[0]).toContain(
-        'it requires one or more incompatible native modules (native-module)'
+        "it requires one or more incompatible native modules (native-module)",
       );
     });
   });
 
-  describe('::rebuild()', function () {
+  describe("::rebuild()", function () {
     beforeEach(function () {
       atom.packages.devMode = false;
       mockLocalStorage();
@@ -99,66 +99,66 @@ describe('Package', function () {
 
     afterEach(() => (atom.packages.devMode = true));
 
-    it('returns a promise resolving to the results of `apm rebuild`', async () => {
-      const packagePath = atom.project.getDirectories()?.[0]?.resolve('packages/package-with-index')
+    it("returns a promise resolving to the results of `apm rebuild`", async () => {
+      const packagePath = atom.project
+        .getDirectories()?.[0]
+        ?.resolve("packages/package-with-index");
 
       const pack = buildPackage(packagePath);
       const rebuildCallbacks = [];
-      spyOn(pack, 'runRebuildProcess').and.callFake(callback =>
-        rebuildCallbacks.push(callback)
-      );
+      spyOn(pack, "runRebuildProcess").and.callFake((callback) => rebuildCallbacks.push(callback));
 
       const promise = pack.rebuild();
       rebuildCallbacks[0]({
         code: 0,
-        stdout: 'stdout output',
-        stderr: 'stderr output'
+        stdout: "stdout output",
+        stderr: "stderr output",
       });
 
       expect(await promise).toEqual({
         code: 0,
-        stdout: 'stdout output',
-        stderr: 'stderr output'
+        stdout: "stdout output",
+        stderr: "stderr output",
       });
     });
 
-    it('persists build failures in local storage', function () {
-      const packagePath = atom.project.getDirectories()?.[0]?.resolve('packages/package-with-index')
+    it("persists build failures in local storage", function () {
+      const packagePath = atom.project
+        .getDirectories()?.[0]
+        ?.resolve("packages/package-with-index");
       const pack = buildPackage(packagePath);
 
       expect(pack.isCompatible()).toBe(true);
       expect(pack.getBuildFailureOutput()).toBeNull();
 
       const rebuildCallbacks = [];
-      spyOn(pack, 'runRebuildProcess').and.callFake(callback =>
-        rebuildCallbacks.push(callback)
-      );
+      spyOn(pack, "runRebuildProcess").and.callFake((callback) => rebuildCallbacks.push(callback));
 
       pack.rebuild();
-      rebuildCallbacks[0]({ code: 13, stderr: 'It is broken' });
+      rebuildCallbacks[0]({ code: 13, stderr: "It is broken" });
 
-      expect(pack.getBuildFailureOutput()).toBe('It is broken');
+      expect(pack.getBuildFailureOutput()).toBe("It is broken");
       expect(pack.getIncompatibleNativeModules()).toEqual([]);
       expect(pack.isCompatible()).toBe(false);
 
       // A different package instance has the same failure output (simulates reload)
       const pack2 = buildPackage(packagePath);
-      expect(pack2.getBuildFailureOutput()).toBe('It is broken');
+      expect(pack2.getBuildFailureOutput()).toBe("It is broken");
 
       // Clears the build failure after a successful build
       pack.rebuild();
-      rebuildCallbacks[1]({ code: 0, stdout: 'It worked' });
+      rebuildCallbacks[1]({ code: 0, stdout: "It worked" });
 
       expect(pack.getBuildFailureOutput()).toBeNull();
       expect(pack2.getBuildFailureOutput()).toBeNull();
     });
   });
 
-  describe('theme', function () {
+  describe("theme", function () {
     let editorElement, theme;
 
     beforeEach(function () {
-      editorElement = document.createElement('atom-text-editor');
+      editorElement = document.createElement("atom-text-editor");
       jasmine.attachToDOM(editorElement);
     });
 
@@ -168,78 +168,86 @@ describe('Package', function () {
       }
     });
 
-    describe('when the theme contains a single style file', function () {
-      it('loads and applies css', function () {
-        expect(getComputedStyle(editorElement).paddingBottom).not.toBe(
-          '1234px'
-        );
-        const themePath = atom.project.getDirectories()[0]?.resolve('packages/theme-with-index-css')
+    describe("when the theme contains a single style file", function () {
+      it("loads and applies css", function () {
+        expect(getComputedStyle(editorElement).paddingBottom).not.toBe("1234px");
+        const themePath = atom.project
+          .getDirectories()[0]
+          ?.resolve("packages/theme-with-index-css");
         theme = buildThemePackage(themePath);
         theme.activate();
-        expect(getComputedStyle(editorElement).paddingTop).toBe('1234px');
+        expect(getComputedStyle(editorElement).paddingTop).toBe("1234px");
       });
 
-      it('parses, loads and applies less', function () {
-        expect(getComputedStyle(editorElement).paddingBottom).not.toBe(
-          '1234px'
-        );
-        const themePath = atom.project.getDirectories()[0]?.resolve('packages/theme-with-index-less')
+      it("parses, loads and applies less", function () {
+        expect(getComputedStyle(editorElement).paddingBottom).not.toBe("1234px");
+        const themePath = atom.project
+          .getDirectories()[0]
+          ?.resolve("packages/theme-with-index-less");
         theme = buildThemePackage(themePath);
         theme.activate();
-        expect(getComputedStyle(editorElement).paddingTop).toBe('4321px');
+        expect(getComputedStyle(editorElement).paddingTop).toBe("4321px");
       });
     });
 
-    describe('when the theme contains a package.json file', () =>
-      it('loads and applies stylesheets from package.json in the correct order', function () {
-        expect(getComputedStyle(editorElement).paddingTop).not.toBe('101px');
-        expect(getComputedStyle(editorElement).paddingRight).not.toBe('102px');
-        expect(getComputedStyle(editorElement).paddingBottom).not.toBe('103px');
+    describe("when the theme contains a package.json file", () =>
+      it("loads and applies stylesheets from package.json in the correct order", function () {
+        expect(getComputedStyle(editorElement).paddingTop).not.toBe("101px");
+        expect(getComputedStyle(editorElement).paddingRight).not.toBe("102px");
+        expect(getComputedStyle(editorElement).paddingBottom).not.toBe("103px");
 
-        const themePath = atom.project.getDirectories()[0]?.resolve('packages/theme-with-package-file')
+        const themePath = atom.project
+          .getDirectories()[0]
+          ?.resolve("packages/theme-with-package-file");
         theme = buildThemePackage(themePath);
         theme.activate();
-        expect(getComputedStyle(editorElement).paddingTop).toBe('101px');
-        expect(getComputedStyle(editorElement).paddingRight).toBe('102px');
-        expect(getComputedStyle(editorElement).paddingBottom).toBe('103px');
+        expect(getComputedStyle(editorElement).paddingTop).toBe("101px");
+        expect(getComputedStyle(editorElement).paddingRight).toBe("102px");
+        expect(getComputedStyle(editorElement).paddingBottom).toBe("103px");
       }));
 
-    describe('when the theme does not contain a package.json file and is a directory', () =>
-      it('loads all stylesheet files in the directory', function () {
-        expect(getComputedStyle(editorElement).paddingTop).not.toBe('10px');
-        expect(getComputedStyle(editorElement).paddingRight).not.toBe('20px');
-        expect(getComputedStyle(editorElement).paddingBottom).not.toBe('30px');
+    describe("when the theme does not contain a package.json file and is a directory", () =>
+      it("loads all stylesheet files in the directory", function () {
+        expect(getComputedStyle(editorElement).paddingTop).not.toBe("10px");
+        expect(getComputedStyle(editorElement).paddingRight).not.toBe("20px");
+        expect(getComputedStyle(editorElement).paddingBottom).not.toBe("30px");
 
-        const themePath = atom.project.getDirectories()[0]?.resolve('packages/theme-without-package-file')
+        const themePath = atom.project
+          .getDirectories()[0]
+          ?.resolve("packages/theme-without-package-file");
         theme = buildThemePackage(themePath);
         theme.activate();
-        expect(getComputedStyle(editorElement).paddingTop).toBe('10px');
-        expect(getComputedStyle(editorElement).paddingRight).toBe('20px');
-        expect(getComputedStyle(editorElement).paddingBottom).toBe('30px');
+        expect(getComputedStyle(editorElement).paddingTop).toBe("10px");
+        expect(getComputedStyle(editorElement).paddingRight).toBe("20px");
+        expect(getComputedStyle(editorElement).paddingBottom).toBe("30px");
       }));
 
-    describe('reloading a theme', function () {
+    describe("reloading a theme", function () {
       beforeEach(function () {
-        const themePath = atom.project.getDirectories()[0]?.resolve('packages/theme-with-package-file')
+        const themePath = atom.project
+          .getDirectories()[0]
+          ?.resolve("packages/theme-with-package-file");
         theme = buildThemePackage(themePath);
         theme.activate();
       });
 
-      it('reloads without readding to the stylesheets list', function () {
+      it("reloads without readding to the stylesheets list", function () {
         expect(theme.getStylesheetPaths().length).toBe(3);
         theme.reloadStylesheets();
         expect(theme.getStylesheetPaths().length).toBe(3);
       });
     });
 
-    describe('events', function () {
+    describe("events", function () {
       beforeEach(function () {
-        const themePath = atom.project.getDirectories()[0]?.resolve('packages/theme-with-package-file')
+        const themePath = atom.project
+          .getDirectories()[0]
+          ?.resolve("packages/theme-with-package-file");
         theme = buildThemePackage(themePath);
         theme.activate();
       });
 
-      it('deactivated event fires on .deactivate()', async function () {
+      it("deactivated event fires on .deactivate()", async function () {
         let spy = jasmine.createSpy();
         theme.onDidDeactivate(spy);
         await theme.deactivate();
@@ -248,44 +256,46 @@ describe('Package', function () {
     });
   });
 
-  describe('.loadMetadata()', function () {
+  describe(".loadMetadata()", function () {
     let [packagePath, metadata] = [];
 
     beforeEach(function () {
-      packagePath = atom.project.getDirectories()[0]?.resolve('packages/package-with-different-directory-name')
+      packagePath = atom.project
+        .getDirectories()[0]
+        ?.resolve("packages/package-with-different-directory-name");
       metadata = atom.packages.loadPackageMetadata(packagePath, true);
     });
 
-    it('uses the package name defined in package.json', () =>
-      expect(metadata.name).toBe('package-with-a-totally-different-name'));
+    it("uses the package name defined in package.json", () =>
+      expect(metadata.name).toBe("package-with-a-totally-different-name"));
   });
 
-  describe('the initialize() hook', function () {
-    it('gets called when the package is activated', function () {
+  describe("the initialize() hook", function () {
+    it("gets called when the package is activated", function () {
       const packagePath = atom.project
         .getDirectories()[0]
-        .resolve('packages/package-with-deserializers');
+        .resolve("packages/package-with-deserializers");
       const pack = buildPackage(packagePath);
       pack.requireMainModule();
       const { mainModule } = pack;
-      spyOn(mainModule, 'initialize');
+      spyOn(mainModule, "initialize");
       expect(mainModule.initialize).not.toHaveBeenCalled();
       pack.activate();
       expect(mainModule.initialize).toHaveBeenCalled();
       expect(mainModule.initialize.calls.count()).toBe(1);
     });
 
-    it('gets called when a deserializer is used', function () {
+    it("gets called when a deserializer is used", function () {
       const packagePath = atom.project
         .getDirectories()[0]
-        .resolve('packages/package-with-deserializers');
+        .resolve("packages/package-with-deserializers");
       const pack = buildPackage(packagePath);
       pack.requireMainModule();
       const { mainModule } = pack;
-      spyOn(mainModule, 'initialize');
+      spyOn(mainModule, "initialize");
       pack.load();
       expect(mainModule.initialize).not.toHaveBeenCalled();
-      atom.deserializers.deserialize({ deserializer: 'Deserializer1', a: 'b' });
+      atom.deserializers.deserialize({ deserializer: "Deserializer1", a: "b" });
       expect(mainModule.initialize).toHaveBeenCalled();
     });
   });

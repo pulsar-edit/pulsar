@@ -1,17 +1,18 @@
-const _ = require('underscore-plus');
+const _ = require("underscore-plus");
 
-module.exports =
-class SelectionCountView {
+module.exports = class SelectionCountView {
   constructor() {
-    this.element = document.createElement('status-bar-selection');
-    this.element.classList.add('selection-count', 'inline-block');
+    this.element = document.createElement("status-bar-selection");
+    this.element.classList.add("selection-count", "inline-block");
 
-    this.tooltipElement = document.createElement('div');
-    this.tooltipDisposable = atom.tooltips.add(this.element, {item: this.tooltipElement});
+    this.tooltipElement = document.createElement("div");
+    this.tooltipDisposable = atom.tooltips.add(this.element, { item: this.tooltipElement });
 
-    this.formatString = atom.config.get('status-bar.selectionCountFormat') ?? '(%L, %C)';
+    this.formatString = atom.config.get("status-bar.selectionCountFormat") ?? "(%L, %C)";
 
-    this.activeItemSubscription = atom.workspace.onDidChangeActiveTextEditor(() => this.subscribeToActiveTextEditor());
+    this.activeItemSubscription = atom.workspace.onDidChangeActiveTextEditor(() =>
+      this.subscribeToActiveTextEditor(),
+    );
 
     this.subscribeToConfig();
     this.subscribeToActiveTextEditor();
@@ -26,8 +27,8 @@ class SelectionCountView {
 
   subscribeToConfig() {
     this.configSubscription?.dispose();
-    this.configSubscription = atom.config.observe('status-bar.selectionCountFormat', value => {
-      this.formatString = value ?? '(%L, %C)';
+    this.configSubscription = atom.config.observe("status-bar.selectionCountFormat", (value) => {
+      this.formatString = value ?? "(%L, %C)";
       this.scheduleUpdateCount();
     });
   }
@@ -36,7 +37,9 @@ class SelectionCountView {
     this.selectionSubscription?.dispose();
     const activeEditor = this.getActiveTextEditor();
     const selectionsMarkerLayer = activeEditor?.selectionsMarkerLayer;
-    this.selectionSubscription = selectionsMarkerLayer?.onDidUpdate(this.scheduleUpdateCount.bind(this));
+    this.selectionSubscription = selectionsMarkerLayer?.onDidUpdate(
+      this.scheduleUpdateCount.bind(this),
+    );
     this.scheduleUpdateCount();
   }
 
@@ -58,13 +61,15 @@ class SelectionCountView {
     const count = this.getActiveTextEditor()?.getSelectedText().length;
     const range = this.getActiveTextEditor()?.getSelectedBufferRange();
     let lineCount = range?.getRowCount();
-    if (range?.end.column === 0) { lineCount -= 1; }
+    if (range?.end.column === 0) {
+      lineCount -= 1;
+    }
     if (count > 0) {
-      this.element.textContent = this.formatString.replace('%L', lineCount).replace('%C', count);
-      this.tooltipElement.textContent = `${_.pluralize(lineCount, 'line')}, ${_.pluralize(count, 'character')} selected`;
+      this.element.textContent = this.formatString.replace("%L", lineCount).replace("%C", count);
+      this.tooltipElement.textContent = `${_.pluralize(lineCount, "line")}, ${_.pluralize(count, "character")} selected`;
     } else {
-      this.element.textContent = '';
-      this.tooltipElement.textContent = '';
+      this.element.textContent = "";
+      this.tooltipElement.textContent = "";
     }
   }
-}
+};

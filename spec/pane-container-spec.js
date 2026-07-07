@@ -1,22 +1,22 @@
-const PaneContainer = require('../src/pane-container');
+const PaneContainer = require("../src/pane-container");
 
-describe('PaneContainer', () => {
+describe("PaneContainer", () => {
   let confirm, params;
 
   beforeEach(() => {
-    confirm = spyOn(atom.applicationDelegate, 'confirm').and.callFake(
-      (options, callback) => callback(0)
+    confirm = spyOn(atom.applicationDelegate, "confirm").and.callFake((options, callback) =>
+      callback(0),
     );
     params = {
-      location: 'center',
+      location: "center",
       config: atom.config,
       deserializerManager: atom.deserializers,
       applicationDelegate: atom.applicationDelegate,
-      viewRegistry: atom.views
+      viewRegistry: atom.views,
     };
   });
 
-  describe('serialization', () => {
+  describe("serialization", () => {
     let containerA, pane1A, pane2A, pane3A;
 
     beforeEach(() => {
@@ -26,7 +26,7 @@ describe('PaneContainer', () => {
           return new this();
         }
         serialize() {
-          return { deserializer: 'Item' };
+          return { deserializer: "Item" };
         }
       }
       atom.deserializers.add(Item);
@@ -39,7 +39,7 @@ describe('PaneContainer', () => {
       pane3A.focus();
     });
 
-    it('preserves the focused pane across serialization', () => {
+    it("preserves the focused pane across serialization", () => {
       expect(pane3A.focused).toBe(true);
 
       const containerB = new PaneContainer(params);
@@ -48,7 +48,7 @@ describe('PaneContainer', () => {
       expect(pane3B.focused).toBe(true);
     });
 
-    it('preserves the active pane across serialization, independent of focus', () => {
+    it("preserves the active pane across serialization, independent of focus", () => {
       pane3A.activate();
       expect(containerA.getActivePane()).toBe(pane3A);
 
@@ -58,7 +58,7 @@ describe('PaneContainer', () => {
       expect(containerB.getActivePane()).toBe(pane3B);
     });
 
-    it('makes the first pane active if no pane exists for the activePaneId', () => {
+    it("makes the first pane active if no pane exists for the activePaneId", () => {
       pane3A.activate();
       const state = containerA.serialize();
       state.activePaneId = -22;
@@ -67,13 +67,13 @@ describe('PaneContainer', () => {
       expect(containerB.getActivePane()).toBe(containerB.getPanes()[0]);
     });
 
-    describe('if there are empty panes after deserialization', () => {
+    describe("if there are empty panes after deserialization", () => {
       beforeEach(() => {
-        pane3A.getItems()[0].serialize = () => ({ deserializer: 'Bogus' });
+        pane3A.getItems()[0].serialize = () => ({ deserializer: "Bogus" });
       });
 
       describe("if the 'core.destroyEmptyPanes' config option is false (the default)", () =>
-        it('leaves the empty panes intact', () => {
+        it("leaves the empty panes intact", () => {
           const state = containerA.serialize();
           const containerB = new PaneContainer(params);
           containerB.deserialize(state, atom.deserializers);
@@ -86,8 +86,8 @@ describe('PaneContainer', () => {
         }));
 
       describe("if the 'core.destroyEmptyPanes' config option is true", () =>
-        it('removes empty panes on deserialization', () => {
-          atom.config.set('core.destroyEmptyPanes', true);
+        it("removes empty panes on deserialization", () => {
+          atom.config.set("core.destroyEmptyPanes", true);
 
           const state = containerA.serialize();
           const containerB = new PaneContainer(params);
@@ -100,14 +100,14 @@ describe('PaneContainer', () => {
     });
   });
 
-  it('does not allow the root pane to be destroyed', () => {
+  it("does not allow the root pane to be destroyed", () => {
     const container = new PaneContainer(params);
     container.getRoot().destroy();
     expect(container.getRoot()).toBeDefined();
     expect(container.getRoot().isDestroyed()).toBe(false);
   });
 
-  describe('::getActivePane()', () => {
+  describe("::getActivePane()", () => {
     let container, pane1, pane2;
 
     beforeEach(() => {
@@ -115,12 +115,12 @@ describe('PaneContainer', () => {
       pane1 = container.getRoot();
     });
 
-    it('returns the first pane if no pane has been made active', () => {
+    it("returns the first pane if no pane has been made active", () => {
       expect(container.getActivePane()).toBe(pane1);
       expect(pane1.isActive()).toBe(true);
     });
 
-    it('returns the most pane on which ::activate() was most recently called', () => {
+    it("returns the most pane on which ::activate() was most recently called", () => {
       pane2 = pane1.splitRight();
       pane2.activate();
       expect(container.getActivePane()).toBe(pane2);
@@ -132,7 +132,7 @@ describe('PaneContainer', () => {
       expect(pane2.isActive()).toBe(false);
     });
 
-    it('returns the next pane if the current active pane is destroyed', () => {
+    it("returns the next pane if the current active pane is destroyed", () => {
       pane2 = pane1.splitRight();
       pane2.activate();
       pane2.destroy();
@@ -141,7 +141,7 @@ describe('PaneContainer', () => {
     });
   });
 
-  describe('::onDidChangeActivePane()', () => {
+  describe("::onDidChangeActivePane()", () => {
     let container, pane1, pane2, observed;
 
     beforeEach(() => {
@@ -151,17 +151,17 @@ describe('PaneContainer', () => {
       [pane1, pane2] = container.getPanes();
 
       observed = [];
-      container.onDidChangeActivePane(pane => observed.push(pane));
+      container.onDidChangeActivePane((pane) => observed.push(pane));
     });
 
-    it('invokes observers when the active pane changes', () => {
+    it("invokes observers when the active pane changes", () => {
       pane1.activate();
       pane2.activate();
       expect(observed).toEqual([pane1, pane2]);
     });
   });
 
-  describe('::onDidChangeActivePaneItem()', () => {
+  describe("::onDidChangeActivePaneItem()", () => {
     let container, pane1, pane2, observed;
 
     beforeEach(() => {
@@ -171,23 +171,23 @@ describe('PaneContainer', () => {
       [pane1, pane2] = container.getPanes();
 
       observed = [];
-      container.onDidChangeActivePaneItem(item => observed.push(item));
+      container.onDidChangeActivePaneItem((item) => observed.push(item));
     });
 
-    it('invokes observers when the active item of the active pane changes', () => {
+    it("invokes observers when the active item of the active pane changes", () => {
       pane2.activateNextItem();
       pane2.activateNextItem();
       expect(observed).toEqual([pane2.itemAtIndex(1), pane2.itemAtIndex(0)]);
     });
 
-    it('invokes observers when the active pane changes', () => {
+    it("invokes observers when the active pane changes", () => {
       pane1.activate();
       pane2.activate();
       expect(observed).toEqual([pane1.itemAtIndex(0), pane2.itemAtIndex(0)]);
     });
   });
 
-  describe('::onDidStopChangingActivePaneItem()', () => {
+  describe("::onDidStopChangingActivePaneItem()", () => {
     let container, pane1, pane2, observed;
 
     beforeEach(() => {
@@ -197,10 +197,10 @@ describe('PaneContainer', () => {
       [pane1, pane2] = container.getPanes();
 
       observed = [];
-      container.onDidStopChangingActivePaneItem(item => observed.push(item));
+      container.onDidStopChangingActivePaneItem((item) => observed.push(item));
     });
 
-    it('invokes observers once when the active item of the active pane changes', () => {
+    it("invokes observers once when the active item of the active pane changes", () => {
       pane2.activateNextItem();
       pane2.activateNextItem();
       expect(observed).toEqual([]);
@@ -208,7 +208,7 @@ describe('PaneContainer', () => {
       expect(observed).toEqual([pane2.itemAtIndex(0)]);
     });
 
-    it('invokes observers once when the active pane changes', () => {
+    it("invokes observers once when the active pane changes", () => {
       pane1.activate();
       pane2.activate();
       expect(observed).toEqual([]);
@@ -217,14 +217,14 @@ describe('PaneContainer', () => {
     });
   });
 
-  describe('::onDidActivatePane', () => {
-    it('invokes observers when a pane is activated (even if it was already active)', () => {
+  describe("::onDidActivatePane", () => {
+    it("invokes observers when a pane is activated (even if it was already active)", () => {
       const container = new PaneContainer(params);
       container.getRoot().splitRight();
       const [pane1, pane2] = container.getPanes();
 
       const activatedPanes = [];
-      container.onDidActivatePane(pane => activatedPanes.push(pane));
+      container.onDidActivatePane((pane) => activatedPanes.push(pane));
 
       pane1.activate();
       pane1.activate();
@@ -234,14 +234,14 @@ describe('PaneContainer', () => {
     });
   });
 
-  describe('::observePanes()', () => {
-    it('invokes observers with all current and future panes', () => {
+  describe("::observePanes()", () => {
+    it("invokes observers with all current and future panes", () => {
       const container = new PaneContainer(params);
       container.getRoot().splitRight();
       const [pane1, pane2] = container.getPanes();
 
       const observed = [];
-      container.observePanes(pane => observed.push(pane));
+      container.observePanes((pane) => observed.push(pane));
 
       const pane3 = pane2.splitDown();
       const pane4 = pane2.splitRight();
@@ -250,14 +250,14 @@ describe('PaneContainer', () => {
     });
   });
 
-  describe('::observePaneItems()', () =>
-    it('invokes observers with all current and future pane items', () => {
+  describe("::observePaneItems()", () =>
+    it("invokes observers with all current and future pane items", () => {
       const container = new PaneContainer(params);
       container.getRoot().addItems([{}, {}]);
       container.getRoot().splitRight({ items: [{}] });
       const pane2 = container.getPanes()[1];
       const observed = [];
-      container.observePaneItems(pane => observed.push(pane));
+      container.observePaneItems((pane) => observed.push(pane));
 
       const pane3 = pane2.splitDown({ items: [{}] });
       pane3.addItems([{}, {}]);
@@ -265,7 +265,7 @@ describe('PaneContainer', () => {
       expect(observed).toEqual(container.getPaneItems());
     }));
 
-  describe('::confirmClose()', () => {
+  describe("::confirmClose()", () => {
     let container, pane1, pane2;
 
     beforeEach(() => {
@@ -274,7 +274,7 @@ describe('PaneContainer', () => {
           return true;
         }
         getURI() {
-          return 'test';
+          return "test";
         }
       }
 
@@ -285,14 +285,14 @@ describe('PaneContainer', () => {
       pane2.addItem(new TestItem());
     });
 
-    it('returns true if the user saves all modified files when prompted', async () => {
+    it("returns true if the user saves all modified files when prompted", async () => {
       confirm.and.callFake((options, callback) => callback(0));
       const saved = await container.confirmClose();
       expect(confirm).toHaveBeenCalled();
       expect(saved).toBeTruthy();
     });
 
-    it('returns false if the user cancels saving any modified file', async () => {
+    it("returns false if the user cancels saving any modified file", async () => {
       confirm.and.callFake((options, callback) => callback(1));
       const saved = await container.confirmClose();
       expect(confirm).toHaveBeenCalled();
@@ -300,11 +300,11 @@ describe('PaneContainer', () => {
     });
   });
 
-  describe('::onDidAddPane(callback)', () => {
-    it('invokes the given callback when panes are added', () => {
+  describe("::onDidAddPane(callback)", () => {
+    it("invokes the given callback when panes are added", () => {
       const container = new PaneContainer(params);
       const events = [];
-      container.onDidAddPane(event => {
+      container.onDidAddPane((event) => {
         expect(container.getPanes().includes(event.pane)).toBe(true);
         events.push(event);
       });
@@ -317,8 +317,8 @@ describe('PaneContainer', () => {
     });
   });
 
-  describe('::onWillDestroyPane(callback)', () => {
-    it('invokes the given callback before panes or their items are destroyed', () => {
+  describe("::onWillDestroyPane(callback)", () => {
+    it("invokes the given callback before panes or their items are destroyed", () => {
       class TestItem {
         constructor() {
           this._isDestroyed = false;
@@ -333,10 +333,8 @@ describe('PaneContainer', () => {
 
       const container = new PaneContainer(params);
       const events = [];
-      container.onWillDestroyPane(event => {
-        const itemsDestroyed = event.pane
-          .getItems()
-          .map(item => item.isDestroyed());
+      container.onWillDestroyPane((event) => {
+        const itemsDestroyed = event.pane.getItems().map((item) => item.isDestroyed());
         events.push([event, { itemsDestroyed }]);
       });
 
@@ -350,11 +348,11 @@ describe('PaneContainer', () => {
     });
   });
 
-  describe('::onDidDestroyPane(callback)', () => {
-    it('invokes the given callback when panes are destroyed', () => {
+  describe("::onDidDestroyPane(callback)", () => {
+    it("invokes the given callback when panes are destroyed", () => {
       const container = new PaneContainer(params);
       const events = [];
-      container.onDidDestroyPane(event => {
+      container.onDidDestroyPane((event) => {
         expect(container.getPanes().includes(event.pane)).toBe(false);
         events.push(event);
       });
@@ -369,10 +367,10 @@ describe('PaneContainer', () => {
       expect(events).toEqual([{ pane: pane2 }, { pane: pane3 }]);
     });
 
-    it('invokes the given callback when the container is destroyed', () => {
+    it("invokes the given callback when the container is destroyed", () => {
       const container = new PaneContainer(params);
       const events = [];
-      container.onDidDestroyPane(event => {
+      container.onDidDestroyPane((event) => {
         expect(container.getPanes().includes(event.pane)).toBe(false);
         events.push(event);
       });
@@ -383,16 +381,12 @@ describe('PaneContainer', () => {
 
       container.destroy();
 
-      expect(events).toEqual([
-        { pane: pane1 },
-        { pane: pane2 },
-        { pane: pane3 }
-      ]);
+      expect(events).toEqual([{ pane: pane1 }, { pane: pane2 }, { pane: pane3 }]);
     });
   });
 
-  describe('::onWillDestroyPaneItem() and ::onDidDestroyPaneItem()', () => {
-    it('invokes the given callbacks when an item will be destroyed on any pane', async () => {
+  describe("::onWillDestroyPaneItem() and ::onDidDestroyPaneItem()", () => {
+    it("invokes the given callbacks when an item will be destroyed on any pane", async () => {
       const container = new PaneContainer(params);
       const pane1 = container.getRoot();
       const item1 = {};
@@ -401,8 +395,8 @@ describe('PaneContainer', () => {
 
       pane1.addItem(item1);
       const events = [];
-      container.onWillDestroyPaneItem(event => events.push(['will', event]));
-      container.onDidDestroyPaneItem(event => events.push(['did', event]));
+      container.onWillDestroyPaneItem((event) => events.push(["will", event]));
+      container.onDidDestroyPaneItem((event) => events.push(["did", event]));
       const pane2 = pane1.splitRight({ items: [item2, item3] });
 
       await pane1.destroyItem(item1);
@@ -410,41 +404,32 @@ describe('PaneContainer', () => {
       await pane2.destroyItem(item2);
 
       expect(events.length).toBe(6);
-      expect(events[1]).toEqual([
-        'did',
-        { item: item1, pane: pane1, index: 0 }
-      ]);
-      expect(events[3]).toEqual([
-        'did',
-        { item: item3, pane: pane2, index: 1 }
-      ]);
-      expect(events[5]).toEqual([
-        'did',
-        { item: item2, pane: pane2, index: 0 }
-      ]);
+      expect(events[1]).toEqual(["did", { item: item1, pane: pane1, index: 0 }]);
+      expect(events[3]).toEqual(["did", { item: item3, pane: pane2, index: 1 }]);
+      expect(events[5]).toEqual(["did", { item: item2, pane: pane2, index: 0 }]);
 
-      expect(events[0][0]).toEqual('will');
+      expect(events[0][0]).toEqual("will");
       expect(events[0][1].item).toEqual(item1);
       expect(events[0][1].pane).toEqual(pane1);
       expect(events[0][1].index).toEqual(0);
-      expect(typeof events[0][1].prevent).toEqual('function');
+      expect(typeof events[0][1].prevent).toEqual("function");
 
-      expect(events[2][0]).toEqual('will');
+      expect(events[2][0]).toEqual("will");
       expect(events[2][1].item).toEqual(item3);
       expect(events[2][1].pane).toEqual(pane2);
       expect(events[2][1].index).toEqual(1);
-      expect(typeof events[2][1].prevent).toEqual('function');
+      expect(typeof events[2][1].prevent).toEqual("function");
 
-      expect(events[4][0]).toEqual('will');
+      expect(events[4][0]).toEqual("will");
       expect(events[4][1].item).toEqual(item2);
       expect(events[4][1].pane).toEqual(pane2);
       expect(events[4][1].index).toEqual(0);
-      expect(typeof events[4][1].prevent).toEqual('function');
+      expect(typeof events[4][1].prevent).toEqual("function");
     });
   });
 
-  describe('::saveAll()', () =>
-    it('saves all modified pane items', async () => {
+  describe("::saveAll()", () =>
+    it("saves all modified pane items", async () => {
       const container = new PaneContainer(params);
       const pane1 = container.getRoot();
       pane1.splitRight();
@@ -452,38 +437,38 @@ describe('PaneContainer', () => {
       const item1 = {
         saved: false,
         getURI() {
-          return '';
+          return "";
         },
         isModified() {
           return true;
         },
         save() {
           this.saved = true;
-        }
+        },
       };
       const item2 = {
         saved: false,
         getURI() {
-          return '';
+          return "";
         },
         isModified() {
           return false;
         },
         save() {
           this.saved = true;
-        }
+        },
       };
       const item3 = {
         saved: false,
         getURI() {
-          return '';
+          return "";
         },
         isModified() {
           return true;
         },
         save() {
           this.saved = true;
-        }
+        },
       };
 
       pane1.addItem(item1);
@@ -497,7 +482,7 @@ describe('PaneContainer', () => {
       expect(item3.saved).toBe(true);
     }));
 
-  describe('::moveActiveItemToPane(destPane) and ::copyActiveItemToPane(destPane)', () => {
+  describe("::moveActiveItemToPane(destPane) and ::copyActiveItemToPane(destPane)", () => {
     let container, pane1, pane2, item1;
 
     beforeEach(() => {
@@ -512,18 +497,18 @@ describe('PaneContainer', () => {
 
       container = new PaneContainer(params);
       pane1 = container.getRoot();
-      item1 = new TestItem('1');
+      item1 = new TestItem("1");
       pane2 = pane1.splitRight({ items: [item1] });
     });
 
-    describe('::::moveActiveItemToPane(destPane)', () =>
-      it('moves active item to given pane and focuses it', () => {
+    describe("::::moveActiveItemToPane(destPane)", () =>
+      it("moves active item to given pane and focuses it", () => {
         container.moveActiveItemToPane(pane1);
         expect(pane1.getActiveItem()).toBe(item1);
       }));
 
-    describe('::::copyActiveItemToPane(destPane)', () =>
-      it('copies active item to given pane and focuses it', () => {
+    describe("::::copyActiveItemToPane(destPane)", () =>
+      it("copies active item to given pane and focuses it", () => {
         container.copyActiveItemToPane(pane1);
         expect(container.paneForItem(item1)).toBe(pane2);
         expect(pane1.getActiveItem().id).toBe(item1.id);

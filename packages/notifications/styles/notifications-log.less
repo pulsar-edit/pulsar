@@ -21,7 +21,7 @@
       margin: 1px;
       padding: 0;
       color: @text-color-subtle;
-      opacity: .5;
+      opacity: 0.5;
       background: @base-background-color;
     }
 
@@ -30,7 +30,7 @@
     }
   }
 
-  .notifications-log-items  {
+  .notifications-log-items {
     flex: auto;
     list-style: none;
     padding: 0;
@@ -58,14 +58,14 @@
           bottom: 0;
           width: @icon-size;
           height: 100%;
-          padding-top: (@component-padding/2);
+          padding-top: (@component-padding / 2);
           text-align: center;
         }
 
         .message {
           flex: 0 1 auto;
           word-wrap: break-word;
-          padding: (@component-padding/2) @component-padding;
+          padding: (@component-padding / 2) @component-padding;
           border-left: 1px solid @base-border-color;
         }
 
@@ -81,7 +81,7 @@
 
           .btn-copy-report {
             vertical-align: middle;
-            margin-left: (@component-padding/2);
+            margin-left: (@component-padding / 2);
 
             &::before {
               margin: 0;
@@ -99,13 +99,11 @@
       }
     }
   }
-
 }
 
 // Types -------------------------------
 
 .notifications-log {
-
   // fatal
   .notification-type.fatal {
     .type(@text-color-error; @background-color-error);
@@ -170,7 +168,6 @@
   .notifications-log-notification.success {
     .log(@text-color-success; @background-color-success);
   }
-
 }
 
 // Type Mixin

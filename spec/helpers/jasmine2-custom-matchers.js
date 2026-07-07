@@ -33,7 +33,7 @@ exports.register = (jasmineEnv) => {
               };
             }
           },
-        }
+        };
       },
 
       toExistOnDisk: function (util, customEqualityTesters) {
@@ -44,14 +44,16 @@ exports.register = (jasmineEnv) => {
               message: `Expected path '${actual}' to exist.`,
             };
           },
-        }
+        };
       },
 
       toHaveFocus: function (util, customEqualityTesters) {
         return {
           compare: function (actual) {
             if (!document.hasFocus()) {
-              console.error("Specs will fail because the Dev Tools have focus. To fix this close the Dev Tools or click the spec runner.");
+              console.error(
+                "Specs will fail because the Dev Tools have focus. To fix this close the Dev Tools or click the spec runner.",
+              );
             }
 
             let element = actual;
@@ -60,11 +62,11 @@ exports.register = (jasmineEnv) => {
             }
 
             return {
-              pass: (element === document.activeElement) || element.contains(document.activeElement),
+              pass: element === document.activeElement || element.contains(document.activeElement),
               message: `Expected element '${actual}' or its descendants to have focus.`,
             };
           },
-        }
+        };
       },
 
       toShow: function (util, customEqualityTesters) {
@@ -77,11 +79,14 @@ exports.register = (jasmineEnv) => {
             const computedStyle = getComputedStyle(element);
 
             return {
-              pass: (computedStyle.display !== 'none') && (computedStyle.visibility === 'visible') && !element.hidden,
+              pass:
+                computedStyle.display !== "none" &&
+                computedStyle.visibility === "visible" &&
+                !element.hidden,
               message: `Expected element '${element}' or its descendants to show.`,
             };
           },
-        }
+        };
       },
 
       toEqualPath: function (util, customEqualityTesters) {
@@ -95,7 +100,7 @@ exports.register = (jasmineEnv) => {
               message: `Expected path '${actualPath}' to be equal to '${expectedPath}'.`,
             };
           },
-        }
+        };
       },
 
       toBeNear: function (util, customEqualityTesters) {
@@ -104,11 +109,11 @@ exports.register = (jasmineEnv) => {
             let acceptedError = 1;
 
             return {
-              pass: ((expected - acceptedError) <= actual) && (actual <= (expected + acceptedError)),
+              pass: expected - acceptedError <= actual && actual <= expected + acceptedError,
               message: `Expected '${actual}' to be near to '${expected}'.`,
             };
           },
-        }
+        };
       },
 
       toHaveNearPixels: function (util, customEqualityTesters) {
@@ -120,11 +125,15 @@ exports.register = (jasmineEnv) => {
             const actualNumber = parseFloat(actual);
 
             return {
-              pass: (expected.indexOf('px') >= 1) && (actual.indexOf('px') >= 1) && ((expectedNumber - acceptedError) <= actualNumber) && (actualNumber <= (expectedNumber + acceptedError)),
+              pass:
+                expected.indexOf("px") >= 1 &&
+                actual.indexOf("px") >= 1 &&
+                expectedNumber - acceptedError <= actualNumber &&
+                actualNumber <= expectedNumber + acceptedError,
               message: `Expected '${actual}' to have near pixels to '${expected}'.`,
-            }
-          }
-        }
+            };
+          },
+        };
       },
 
       toHaveClass: function (util, customEqualityTesters) {
@@ -132,10 +141,10 @@ exports.register = (jasmineEnv) => {
           compare: function (actual, expected) {
             return {
               pass: actual instanceof HTMLElement && actual.classList.contains(expected),
-              message: `Expected '${actual}' to have '${expected}' class`
-            }
-          }
-        }
+              message: `Expected '${actual}' to have '${expected}' class`,
+            };
+          },
+        };
       },
 
       toHaveText: function (util, customEqualityTesters) {
@@ -143,25 +152,25 @@ exports.register = (jasmineEnv) => {
           compare: function (actual, expected) {
             return {
               pass: actual instanceof HTMLElement && actual.textContent == expected,
-              message: `Expected '${actual}' to have text: '${expected}'`
-            }
-          }
-        }
+              message: `Expected '${actual}' to have text: '${expected}'`,
+            };
+          },
+        };
       },
 
       toExist: function (util, customEqualityTesters) {
         return {
           compare: function (actual) {
             if (actual instanceof HTMLElement) {
-              return {pass: true}
+              return { pass: true };
             } else if (actual) {
-              return {pass: actual.size() > 0}
+              return { pass: actual.size() > 0 };
             } else {
-              return {pass: false}
+              return { pass: false };
             }
-          }
-        }
-      }
+          },
+        };
+      },
     });
   });
-}
+};

@@ -1,12 +1,12 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch';
+import etch from "etch";
 
-import VIEW_URI from './view-uri';
-const REBUILDING = 'rebuilding';
-const REBUILD_FAILED = 'rebuild-failed';
-const REBUILD_SUCCEEDED = 'rebuild-succeeded';
+import VIEW_URI from "./view-uri";
+const REBUILDING = "rebuilding";
+const REBUILD_FAILED = "rebuild-failed";
+const REBUILD_SUCCEEDED = "rebuild-succeeded";
 
 export default class IncompatiblePackagesComponent {
   constructor(packageManager) {
@@ -24,15 +24,13 @@ export default class IncompatiblePackagesComponent {
       global.setImmediate(this.populateIncompatiblePackages.bind(this));
     }
 
-    this.element.addEventListener('click', event => {
+    this.element.addEventListener("click", (event) => {
       if (event.target === this.refs.rebuildButton) {
         this.rebuildIncompatiblePackages();
       } else if (event.target === this.refs.reloadButton) {
         atom.reload();
-      } else if (event.target.classList.contains('view-settings')) {
-        atom.workspace.open(
-          `atom://config/packages/${event.target.package.name}`
-        );
+      } else if (event.target.classList.contains("view-settings")) {
+        atom.workspace.open(`atom://config/packages/${event.target.package.name}`);
       }
     });
   }
@@ -45,10 +43,7 @@ export default class IncompatiblePackagesComponent {
     }
 
     return (
-      <div
-        className="incompatible-packages padded native-key-bindings"
-        tabIndex="-1"
-      >
+      <div className="incompatible-packages padded native-key-bindings" tabIndex="-1">
         {this.renderHeading()}
         {this.renderIncompatiblePackageList()}
       </div>
@@ -60,13 +55,13 @@ export default class IncompatiblePackagesComponent {
       if (this.rebuiltPackageCount > 0) {
         let alertClass =
           this.rebuiltPackageCount === this.incompatiblePackages.length
-            ? 'alert-success icon-check'
-            : 'alert-warning icon-bug';
+            ? "alert-success icon-check"
+            : "alert-warning icon-bug";
 
         return (
-          <div className={'alert icon ' + alertClass}>
-            {this.rebuiltPackageCount} of {this.incompatiblePackages.length}{' '}
-            packages were rebuilt successfully. Reload Lumine to activate them.
+          <div className={"alert icon " + alertClass}>
+            {this.rebuiltPackageCount} of {this.incompatiblePackages.length} packages were rebuilt
+            successfully. Reload Lumine to activate them.
             <button ref="reloadButton" className="btn pull-right">
               Reload Lumine
             </button>
@@ -75,8 +70,8 @@ export default class IncompatiblePackagesComponent {
       } else {
         return (
           <div className="alert alert-danger icon icon-bug">
-            Some installed packages could not be loaded because they contain
-            native modules that were compiled for an earlier version of Lumine.
+            Some installed packages could not be loaded because they contain native modules that
+            were compiled for an earlier version of Lumine.
             <button
               ref="rebuildButton"
               className="btn pull-right"
@@ -97,58 +92,37 @@ export default class IncompatiblePackagesComponent {
   }
 
   renderIncompatiblePackageList() {
-    return (
-      <div>
-        {this.incompatiblePackages.map(
-          this.renderIncompatiblePackage.bind(this)
-        )}
-      </div>
-    );
+    return <div>{this.incompatiblePackages.map(this.renderIncompatiblePackage.bind(this))}</div>;
   }
 
   renderIncompatiblePackage(pack) {
     let rebuildStatus = this.rebuildStatuses.get(pack);
 
     return (
-      <div className={'incompatible-package'}>
+      <div className={"incompatible-package"}>
         {this.renderRebuildStatusIndicator(rebuildStatus)}
-        <button
-          className="btn view-settings icon icon-gear pull-right"
-          package={pack}
-        >
+        <button className="btn view-settings icon icon-gear pull-right" package={pack}>
           Package Settings
         </button>
         <h4 className="heading">
           {pack.name} {pack.metadata.version}
         </h4>
-        {rebuildStatus
-          ? this.renderRebuildOutput(pack)
-          : this.renderIncompatibleModules(pack)}
+        {rebuildStatus ? this.renderRebuildOutput(pack) : this.renderIncompatibleModules(pack)}
       </div>
     );
   }
 
   renderRebuildStatusIndicator(rebuildStatus) {
     if (rebuildStatus === REBUILDING) {
-      return (
-        <div className="badge badge-info pull-right icon icon-gear">
-          Rebuilding
-        </div>
-      );
+      return <div className="badge badge-info pull-right icon icon-gear">Rebuilding</div>;
     } else if (rebuildStatus === REBUILD_SUCCEEDED) {
       return (
-        <div className="badge badge-success pull-right icon icon-check">
-          Rebuild Succeeded
-        </div>
+        <div className="badge badge-success pull-right icon icon-check">Rebuild Succeeded</div>
       );
     } else if (rebuildStatus === REBUILD_FAILED) {
-      return (
-        <div className="badge badge-error pull-right icon icon-x">
-          Rebuild Failed
-        </div>
-      );
+      return <div className="badge badge-error pull-right icon icon-x">Rebuild Failed</div>;
     } else {
-      return '';
+      return "";
     }
   }
 
@@ -156,17 +130,17 @@ export default class IncompatiblePackagesComponent {
     if (this.rebuildStatuses.get(pack) === REBUILD_FAILED) {
       return <pre>{this.rebuildFailureOutputs.get(pack)}</pre>;
     } else {
-      return '';
+      return "";
     }
   }
 
   renderIncompatibleModules(pack) {
     return (
       <ul>
-        {pack.incompatibleModules.map(nativeModule => (
+        {pack.incompatibleModules.map((nativeModule) => (
           <li>
             <div className="icon icon-file-binary">
-              {nativeModule.name}@{nativeModule.version || 'unknown'} –{' '}
+              {nativeModule.name}@{nativeModule.version || "unknown"} –{" "}
               <span className="text-warning">{nativeModule.error}</span>
             </div>
           </li>
@@ -178,7 +152,7 @@ export default class IncompatiblePackagesComponent {
   populateIncompatiblePackages() {
     this.incompatiblePackages = this.packageManager
       .getLoadedPackages()
-      .filter(pack => !pack.isCompatible());
+      .filter((pack) => !pack.isCompatible());
 
     for (let pack of this.incompatiblePackages) {
       let buildFailureOutput = pack.getBuildFailureOutput();
@@ -222,7 +196,7 @@ export default class IncompatiblePackagesComponent {
   }
 
   getTitle() {
-    return 'Incompatible Packages';
+    return "Incompatible Packages";
   }
 
   getURI() {
@@ -230,10 +204,10 @@ export default class IncompatiblePackagesComponent {
   }
 
   getIconName() {
-    return 'package';
+    return "package";
   }
 
   serialize() {
-    return { deserializer: 'IncompatiblePackagesComponent' };
+    return { deserializer: "IncompatiblePackagesComponent" };
   }
 }

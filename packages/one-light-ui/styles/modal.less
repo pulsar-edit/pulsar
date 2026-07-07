@@ -1,10 +1,11 @@
-
-@modal-padding: (@ui-padding/2) (@ui-padding/1.5);
+@modal-padding: (@ui-padding / 2) (@ui-padding / 1.5);
 @modal-width: (@ui-size * 50);
 
 atom-panel-container.modal {
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 atom-panel.modal {
@@ -15,14 +16,14 @@ atom-panel.modal {
   left: initial;
   color: @text-color;
   background-color: transparent;
-  padding: (@ui-padding/2);
+  padding: (@ui-padding / 2);
 
   &.from-top {
     top: (@component-padding * 5);
   }
 
   atom-text-editor[mini] {
-    margin-bottom: (@ui-padding/2);
+    margin-bottom: (@ui-padding / 2);
   }
 
   .select-list ol.list-group,
@@ -63,13 +64,12 @@ atom-panel.modal {
         }
       }
     }
-
   }
 
   .select-list .key-binding {
     margin-top: -1px;
-    margin-left: (@ui-padding/2);
-    margin-right: calc( (-@ui-padding/3) ~"+" 1px);
+    margin-left: (@ui-padding / 2);
+    margin-right: calc((-@ui-padding / 3) ~"+" 1px);
   }
 
   .select-list .primary-line {
@@ -85,7 +85,6 @@ atom-panel.modal {
     background-color: @overlay-background-color;
   }
 
-
   // Container
   &:before {
     content: "";
@@ -97,7 +96,7 @@ atom-panel.modal {
     z-index: 0;
     background-color: @overlay-background-color;
     border-radius: (@component-border-radius*2);
-    box-shadow: 0 6px 12px -2px hsla(0,0%,0%,.4);
+    box-shadow: 0 6px 12px -2px hsla(0, 0%, 0%, 0.4);
   }
 
   // Backdrop
@@ -114,12 +113,15 @@ atom-panel.modal {
     background: @overlay-backdrop-color;
     opacity: @overlay-backdrop-opacity;
     backface-visibility: hidden; // fixes scrollbar on retina screens
-    -webkit-animation: overlay-fade .24s cubic-bezier(0.215, 0.61, 0.355, 1);
+    -webkit-animation: overlay-fade 0.24s cubic-bezier(0.215, 0.61, 0.355, 1);
   }
 
   @-webkit-keyframes overlay-fade {
-    0% { opacity: 0; }
-    100% { opacity: @overlay-backdrop-opacity; }
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: @overlay-backdrop-opacity;
+    }
   }
-
 }

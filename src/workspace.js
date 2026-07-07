@@ -1,22 +1,22 @@
-const _ = require('underscore-plus');
-const url = require('url');
-const path = require('path');
-const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const fs = require('fs-plus');
-const { Minimatch } = require('minimatch');
-const { Directory } = require('@pulsar-edit/pathwatcher');
-const Grim = require('grim');
-const DefaultDirectorySearcher = require('./default-directory-searcher');
-const RipgrepDirectorySearcher = require('./ripgrep-directory-searcher');
-const Dock = require('./dock');
-const Model = require('./model');
-const StateStore = require('./state-store');
-const TextEditor = require('./text-editor');
-const Panel = require('./panel');
-const PanelContainer = require('./panel-container');
-const Task = require('./task');
-const WorkspaceCenter = require('./workspace-center');
-const { createWorkspaceElement } = require('./workspace-element');
+const _ = require("underscore-plus");
+const url = require("url");
+const path = require("path");
+const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
+const fs = require("fs-plus");
+const { Minimatch } = require("minimatch");
+const { Directory } = require("@pulsar-edit/pathwatcher");
+const Grim = require("grim");
+const DefaultDirectorySearcher = require("./default-directory-searcher");
+const RipgrepDirectorySearcher = require("./ripgrep-directory-searcher");
+const Dock = require("./dock");
+const Model = require("./model");
+const StateStore = require("./state-store");
+const TextEditor = require("./text-editor");
+const Panel = require("./panel");
+const PanelContainer = require("./panel-container");
+const Task = require("./task");
+const WorkspaceCenter = require("./workspace-center");
+const { createWorkspaceElement } = require("./workspace-element");
 
 // Given a single glob pattern matcher, test it against a relativized path
 // within the project. Even if this path itself doesn't match the glob, it's
@@ -29,7 +29,7 @@ const { createWorkspaceElement } = require('./workspace-element');
 function filePathMatchesGlob(filePath, matcher) {
   // When we call `path.dirname` on a path like `foo`, it'll return `.`. That's
   // when we should stop because there's no more upward traversal to be done.
-  while (filePath && filePath !== '.') {
+  while (filePath && filePath !== ".") {
     if (matcher.match(filePath)) {
       // We created these matchers with `flipNegate` because it does the right
       // thing when faced with this strange glob-matching algorithm. But that
@@ -43,20 +43,20 @@ function filePathMatchesGlob(filePath, matcher) {
 }
 
 // Transform a pattern prior to handing it off to `minimatch`.
-function normalizePattern (rawPath) {
+function normalizePattern(rawPath) {
   // Strip any trailing path separator.
   // The path separator is `\` on Windows, but we also allow usage of `/`;
   // hence we check for both here.
-  if (rawPath.endsWith(path.sep) || rawPath.endsWith('/')) {
+  if (rawPath.endsWith(path.sep) || rawPath.endsWith("/")) {
     rawPath = rawPath.substring(0, rawPath.length - 1);
   }
 
   // Keep any path negation separate from the rest, since it needs to stay at
   // the beginning no matter what.
-  let negation = '';
-  if (rawPath.startsWith('!')) {
+  let negation = "";
+  if (rawPath.startsWith("!")) {
     rawPath = rawPath.slice(1);
-    negation = '!';
+    negation = "!";
   }
 
   // If a user searches for (e.g.) `*.js`, we want to search all `.js` files
@@ -67,7 +67,7 @@ function normalizePattern (rawPath) {
   // to _all_ patterns unless the user specifically opts out by starting a
   // path with `/`. This would make plenty of sense for us, but would be a
   // change in behavior, so for now we're going with this as a compromise.
-  let prefix = (rawPath.includes(path.sep) || rawPath.includes('/')) ? '' : `**${path.sep}`;
+  let prefix = rawPath.includes(path.sep) || rawPath.includes("/") ? "" : `**${path.sep}`;
   return `${negation}${prefix}${rawPath}`;
 }
 
@@ -99,12 +99,12 @@ function normalizePattern (rawPath) {
 // If `foo` _is not_ in `rootBasenames`, pattern `!foo/bar` will remain as-is;
 // `[null, '!foo/bar']` will be returned.
 //
-function extractProjectRootsFromPathPattern (pathPattern, rootBasenames) {
-  let negated = pathPattern.startsWith('!');
+function extractProjectRootsFromPathPattern(pathPattern, rootBasenames) {
+  let negated = pathPattern.startsWith("!");
   if (negated) {
     pathPattern = pathPattern.substring(1);
   }
-  let prefix = negated ? '!' : '';
+  let prefix = negated ? "!" : "";
   let normalized = path.normalize(pathPattern);
   let originalPathPattern = pathPattern;
   if (pathPattern === "") return [null, ""];
@@ -124,9 +124,9 @@ function extractProjectRootsFromPathPattern (pathPattern, rootBasenames) {
   return [null, `${prefix}${originalPathPattern}`];
 }
 
-function getBasenamesFromProjectRoots () {
+function getBasenamesFromProjectRoots() {
   let roots = atom.project.getPaths();
-  return roots.map(r => path.basename(r));
+  return roots.map((r) => path.basename(r));
 }
 
 const CACHED_MINIMATCH_INSTANCES = new Map();
@@ -141,7 +141,7 @@ function minimatchInstanceForPattern(rawPattern) {
 }
 
 const STOPPED_CHANGING_ACTIVE_PANE_ITEM_DELAY = 100;
-const ALL_LOCATIONS = ['center', 'left', 'right', 'bottom'];
+const ALL_LOCATIONS = ["center", "left", "right", "bottom"];
 
 // Essential: Represents the state of the user interface for the entire window.
 // An instance of this class is available via the `atom.workspace` global.
@@ -304,12 +304,9 @@ module.exports = class Workspace extends Model {
     this.updateWindowTitle = this.updateWindowTitle.bind(this);
     this.updateDocumentEdited = this.updateDocumentEdited.bind(this);
     this.didDestroyPaneItem = this.didDestroyPaneItem.bind(this);
-    this.didChangeActivePaneOnPaneContainer = this.didChangeActivePaneOnPaneContainer.bind(
-      this
-    );
-    this.didChangeActivePaneItemOnPaneContainer = this.didChangeActivePaneItemOnPaneContainer.bind(
-      this
-    );
+    this.didChangeActivePaneOnPaneContainer = this.didChangeActivePaneOnPaneContainer.bind(this);
+    this.didChangeActivePaneItemOnPaneContainer =
+      this.didChangeActivePaneItemOnPaneContainer.bind(this);
     this.didActivatePaneContainer = this.didActivatePaneContainer.bind(this);
 
     this.enablePersistence = params.enablePersistence;
@@ -325,8 +322,8 @@ module.exports = class Workspace extends Model {
     this.textEditorRegistry = params.textEditorRegistry;
     this.styleManager = params.styleManager;
     this.draggingItem = false;
-    this.itemLocationStore = new StateStore('AtomPreviousItemLocations', 1, {
-      config: this.config
+    this.itemLocationStore = new StateStore("AtomPreviousItemLocations", 1, {
+      config: this.config,
     });
 
     this.emitter = new Emitter();
@@ -340,9 +337,9 @@ module.exports = class Workspace extends Model {
 
     this.paneContainers = {
       center: this.createCenter(),
-      left: this.createDock('left'),
-      right: this.createDock('right'),
-      bottom: this.createDock('bottom')
+      left: this.createDock("left"),
+      right: this.createDock("right"),
+      bottom: this.createDock("bottom"),
     };
     this.activePaneContainer = this.paneContainers.center;
     this.hasActiveTextEditor = false;
@@ -350,35 +347,35 @@ module.exports = class Workspace extends Model {
     this.panelContainers = {
       top: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'top'
+        location: "top",
       }),
       left: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'left',
-        dock: this.paneContainers.left
+        location: "left",
+        dock: this.paneContainers.left,
       }),
       right: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'right',
-        dock: this.paneContainers.right
+        location: "right",
+        dock: this.paneContainers.right,
       }),
       bottom: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'bottom',
-        dock: this.paneContainers.bottom
+        location: "bottom",
+        dock: this.paneContainers.bottom,
       }),
       header: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'header'
+        location: "header",
       }),
       footer: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'footer'
+        location: "footer",
       }),
       modal: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'modal'
-      })
+        location: "modal",
+      }),
     };
 
     this.incoming = new Map();
@@ -386,7 +383,7 @@ module.exports = class Workspace extends Model {
 
   get paneContainer() {
     Grim.deprecate(
-      '`atom.workspace.paneContainer` has always been private, but it is now gone. Please use `atom.workspace.getCenter()` instead and consult the workspace API docs for public methods.'
+      "`atom.workspace.paneContainer` has always been private, but it is now gone. Please use `atom.workspace.getCenter()` instead and consult the workspace API docs for public methods.",
     );
     return this.paneContainers.center.paneContainer;
   }
@@ -397,7 +394,7 @@ module.exports = class Workspace extends Model {
         config: this.config,
         project: this.project,
         viewRegistry: this.viewRegistry,
-        styleManager: this.styleManager
+        styleManager: this.styleManager,
       });
     }
     return this.element;
@@ -413,7 +410,7 @@ module.exports = class Workspace extends Model {
       didActivate: this.didActivatePaneContainer,
       didChangeActivePane: this.didChangeActivePaneOnPaneContainer,
       didChangeActivePaneItem: this.didChangeActivePaneItemOnPaneContainer,
-      didDestroyPaneItem: this.didDestroyPaneItem
+      didDestroyPaneItem: this.didDestroyPaneItem,
     });
   }
 
@@ -428,7 +425,7 @@ module.exports = class Workspace extends Model {
       didActivate: this.didActivatePaneContainer,
       didChangeActivePane: this.didChangeActivePaneOnPaneContainer,
       didChangeActivePaneItem: this.didChangeActivePaneItemOnPaneContainer,
-      didDestroyPaneItem: this.didDestroyPaneItem
+      didDestroyPaneItem: this.didDestroyPaneItem,
     });
   }
 
@@ -442,15 +439,15 @@ module.exports = class Workspace extends Model {
     this.paneContainers.right.destroy();
     this.paneContainers.bottom.destroy();
 
-    _.values(this.panelContainers).forEach(panelContainer => {
+    _.values(this.panelContainers).forEach((panelContainer) => {
       panelContainer.destroy();
     });
 
     this.paneContainers = {
       center: this.createCenter(),
-      left: this.createDock('left'),
-      right: this.createDock('right'),
-      bottom: this.createDock('bottom')
+      left: this.createDock("left"),
+      right: this.createDock("right"),
+      bottom: this.createDock("bottom"),
     };
     this.activePaneContainer = this.paneContainers.center;
     this.hasActiveTextEditor = false;
@@ -458,35 +455,35 @@ module.exports = class Workspace extends Model {
     this.panelContainers = {
       top: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'top'
+        location: "top",
       }),
       left: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'left',
-        dock: this.paneContainers.left
+        location: "left",
+        dock: this.paneContainers.left,
       }),
       right: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'right',
-        dock: this.paneContainers.right
+        location: "right",
+        dock: this.paneContainers.right,
       }),
       bottom: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'bottom',
-        dock: this.paneContainers.bottom
+        location: "bottom",
+        dock: this.paneContainers.bottom,
       }),
       header: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'header'
+        location: "header",
       }),
       footer: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'footer'
+        location: "footer",
       }),
       modal: new PanelContainer({
         viewRegistry: this.viewRegistry,
-        location: 'modal'
-      })
+        location: "modal",
+      }),
     };
 
     this.openers = [];
@@ -500,7 +497,7 @@ module.exports = class Workspace extends Model {
 
   initialize({ configDirPath }) {
     // we set originalFontSize to avoid breaking packages that might have relied on it
-    this.originalFontSize = this.config.get('defaultFontSize');
+    this.originalFontSize = this.config.get("defaultFontSize");
 
     this.itemLocationStore.initialize({ configDirPath });
 
@@ -510,23 +507,23 @@ module.exports = class Workspace extends Model {
     this.subscribeToDockToggling();
 
     this.disposables.add(
-      this.config.onDidChange('core.addCurrentTabToWindowTitle', () => {
+      this.config.onDidChange("core.addCurrentTabToWindowTitle", () => {
         this.updateWindowTitle();
-      })
+      }),
     );
   }
 
   consumeServices({ serviceHub }) {
     this.directorySearchers = [];
-    serviceHub.consume('atom.directory-searcher', '^0.1.0', provider =>
-      this.directorySearchers.unshift(provider)
+    serviceHub.consume("atom.directory-searcher", "^0.1.0", (provider) =>
+      this.directorySearchers.unshift(provider),
     );
   }
 
   // Called by the Serializable mixin during serialization.
   serialize() {
     return {
-      deserializer: 'Workspace',
+      deserializer: "Workspace",
       packagesWithActiveGrammars: this.getPackageNamesWithActiveGrammars(),
       destroyedItemURIs: this.destroyedItemURIs.slice(),
       // Ensure deserializing 1.17 state with pre 1.17 Lumine does not error
@@ -536,16 +533,14 @@ module.exports = class Workspace extends Model {
         center: this.paneContainers.center.serialize(),
         left: this.paneContainers.left.serialize(),
         right: this.paneContainers.right.serialize(),
-        bottom: this.paneContainers.bottom.serialize()
-      }
+        bottom: this.paneContainers.bottom.serialize(),
+      },
     };
   }
 
   deserialize(state, deserializerManager) {
     const packagesWithActiveGrammars =
-      state.packagesWithActiveGrammars != null
-        ? state.packagesWithActiveGrammars
-        : [];
+      state.packagesWithActiveGrammars != null ? state.packagesWithActiveGrammars : [];
     for (let packageName of packagesWithActiveGrammars) {
       const pkg = this.packageManager.getLoadedPackage(packageName);
       if (pkg != null) {
@@ -557,28 +552,13 @@ module.exports = class Workspace extends Model {
     }
 
     if (state.paneContainers) {
-      this.paneContainers.center.deserialize(
-        state.paneContainers.center,
-        deserializerManager
-      );
-      this.paneContainers.left.deserialize(
-        state.paneContainers.left,
-        deserializerManager
-      );
-      this.paneContainers.right.deserialize(
-        state.paneContainers.right,
-        deserializerManager
-      );
-      this.paneContainers.bottom.deserialize(
-        state.paneContainers.bottom,
-        deserializerManager
-      );
+      this.paneContainers.center.deserialize(state.paneContainers.center, deserializerManager);
+      this.paneContainers.left.deserialize(state.paneContainers.left, deserializerManager);
+      this.paneContainers.right.deserialize(state.paneContainers.right, deserializerManager);
+      this.paneContainers.bottom.deserialize(state.paneContainers.bottom, deserializerManager);
     } else if (state.paneContainer) {
       // TODO: Remove this fallback once a lot of time has passed since 1.17 was released
-      this.paneContainers.center.deserialize(
-        state.paneContainer,
-        deserializerManager
-      );
+      this.paneContainers.center.deserialize(state.paneContainer, deserializerManager);
     }
 
     this.hasActiveTextEditor = this.getActiveTextEditor() != null;
@@ -598,9 +578,7 @@ module.exports = class Workspace extends Model {
       }
 
       packageNames.push(packageName);
-      for (let scopeName of includedGrammarScopes != null
-        ? includedGrammarScopes
-        : []) {
+      for (let scopeName of includedGrammarScopes != null ? includedGrammarScopes : []) {
         addGrammar(this.grammarRegistry.grammarForScopeName(scopeName));
       }
     };
@@ -624,34 +602,26 @@ module.exports = class Workspace extends Model {
   didActivatePaneContainer(paneContainer) {
     if (paneContainer !== this.getActivePaneContainer()) {
       this.activePaneContainer = paneContainer;
-      this.didChangeActivePaneItem(
-        this.activePaneContainer.getActivePaneItem()
-      );
+      this.didChangeActivePaneItem(this.activePaneContainer.getActivePaneItem());
+      this.emitter.emit("did-change-active-pane-container", this.activePaneContainer);
+      this.emitter.emit("did-change-active-pane", this.activePaneContainer.getActivePane());
       this.emitter.emit(
-        'did-change-active-pane-container',
-        this.activePaneContainer
-      );
-      this.emitter.emit(
-        'did-change-active-pane',
-        this.activePaneContainer.getActivePane()
-      );
-      this.emitter.emit(
-        'did-change-active-pane-item',
-        this.activePaneContainer.getActivePaneItem()
+        "did-change-active-pane-item",
+        this.activePaneContainer.getActivePaneItem(),
       );
     }
   }
 
   didChangeActivePaneOnPaneContainer(paneContainer, pane) {
     if (paneContainer === this.getActivePaneContainer()) {
-      this.emitter.emit('did-change-active-pane', pane);
+      this.emitter.emit("did-change-active-pane", pane);
     }
   }
 
   didChangeActivePaneItemOnPaneContainer(paneContainer, item) {
     if (paneContainer === this.getActivePaneContainer()) {
       this.didChangeActivePaneItem(item);
-      this.emitter.emit('did-change-active-pane-item', item);
+      this.emitter.emit("did-change-active-pane-item", item);
     }
 
     if (paneContainer === this.getCenter()) {
@@ -660,7 +630,7 @@ module.exports = class Workspace extends Model {
 
       if (this.hasActiveTextEditor || hadActiveTextEditor) {
         const itemValue = this.hasActiveTextEditor ? item : undefined;
-        this.emitter.emit('did-change-active-text-editor', itemValue);
+        this.emitter.emit("did-change-active-text-editor", itemValue);
       }
     }
   }
@@ -673,35 +643,24 @@ module.exports = class Workspace extends Model {
 
     let modifiedSubscription, titleSubscription;
 
-    if (item != null && typeof item.onDidChangeTitle === 'function') {
+    if (item != null && typeof item.onDidChangeTitle === "function") {
       titleSubscription = item.onDidChangeTitle(this.updateWindowTitle);
-    } else if (item != null && typeof item.on === 'function') {
-      titleSubscription = item.on('title-changed', this.updateWindowTitle);
-      if (
-        titleSubscription == null ||
-        typeof titleSubscription.dispose !== 'function'
-      ) {
+    } else if (item != null && typeof item.on === "function") {
+      titleSubscription = item.on("title-changed", this.updateWindowTitle);
+      if (titleSubscription == null || typeof titleSubscription.dispose !== "function") {
         titleSubscription = new Disposable(() => {
-          item.off('title-changed', this.updateWindowTitle);
+          item.off("title-changed", this.updateWindowTitle);
         });
       }
     }
 
-    if (item != null && typeof item.onDidChangeModified === 'function') {
-      modifiedSubscription = item.onDidChangeModified(
-        this.updateDocumentEdited
-      );
-    } else if (item != null && typeof item.on === 'function') {
-      modifiedSubscription = item.on(
-        'modified-status-changed',
-        this.updateDocumentEdited
-      );
-      if (
-        modifiedSubscription == null ||
-        typeof modifiedSubscription.dispose !== 'function'
-      ) {
+    if (item != null && typeof item.onDidChangeModified === "function") {
+      modifiedSubscription = item.onDidChangeModified(this.updateDocumentEdited);
+    } else if (item != null && typeof item.on === "function") {
+      modifiedSubscription = item.on("modified-status-changed", this.updateDocumentEdited);
+      if (modifiedSubscription == null || typeof modifiedSubscription.dispose !== "function") {
         modifiedSubscription = new Disposable(() => {
-          item.off('modified-status-changed', this.updateDocumentEdited);
+          item.off("modified-status-changed", this.updateDocumentEdited);
         });
       }
     }
@@ -716,7 +675,7 @@ module.exports = class Workspace extends Model {
     this.cancelStoppedChangingActivePaneItemTimeout();
     this.stoppedChangingActivePaneItemTimeout = setTimeout(() => {
       this.stoppedChangingActivePaneItemTimeout = null;
-      this.emitter.emit('did-stop-changing-active-pane-item', item);
+      this.emitter.emit("did-stop-changing-active-pane-item", item);
     }, STOPPED_CHANGING_ACTIVE_PANE_ITEM_DELAY);
   }
 
@@ -727,7 +686,7 @@ module.exports = class Workspace extends Model {
   }
 
   setDraggingItem(draggingItem) {
-    _.values(this.paneContainers).forEach(dock => {
+    _.values(this.paneContainers).forEach((dock) => {
       dock.setDraggingItem(draggingItem);
     });
   }
@@ -737,7 +696,7 @@ module.exports = class Workspace extends Model {
       if (item instanceof TextEditor) {
         const subscriptions = new CompositeDisposable(
           this.textEditorRegistry.add(item),
-          this.textEditorRegistry.maintainConfig(item)
+          this.textEditorRegistry.maintainConfig(item),
         );
         if (!this.project.findBufferForId(item.buffer.id)) {
           this.project.addBuffer(item.buffer);
@@ -745,39 +704,30 @@ module.exports = class Workspace extends Model {
         item.onDidDestroy(() => {
           subscriptions.dispose();
         });
-        this.emitter.emit('did-add-text-editor', {
+        this.emitter.emit("did-add-text-editor", {
           textEditor: item,
           pane,
-          index
+          index,
         });
         // It's important to call handleGrammarUsed after emitting the did-add event:
         // if we activate a package between adding the editor to the registry and emitting
         // the package may receive the editor twice from `observeTextEditors`.
         // (Note that the item can be destroyed by an `observeTextEditors` handler.)
         if (!item.isDestroyed()) {
-          subscriptions.add(
-            item.observeGrammar(this.handleGrammarUsed.bind(this))
-          );
+          subscriptions.add(item.observeGrammar(this.handleGrammarUsed.bind(this)));
         }
       }
     });
   }
 
   subscribeToDockToggling() {
-    const docks = [
-      this.getLeftDock(),
-      this.getRightDock(),
-      this.getBottomDock()
-    ];
-    docks.forEach(dock => {
-      dock.onDidChangeVisible(visible => {
+    const docks = [this.getLeftDock(), this.getRightDock(), this.getBottomDock()];
+    docks.forEach((dock) => {
+      dock.onDidChangeVisible((visible) => {
         if (visible) return;
         const { activeElement } = document;
         const dockElement = dock.getElement();
-        if (
-          dockElement === activeElement ||
-          dockElement.contains(activeElement)
-        ) {
+        if (dockElement === activeElement || dockElement.contains(activeElement)) {
           this.getCenter().activate();
         }
       });
@@ -786,17 +736,17 @@ module.exports = class Workspace extends Model {
 
   subscribeToMovedItems() {
     for (const paneContainer of this.getPaneContainers()) {
-      paneContainer.observePanes(pane => {
+      paneContainer.observePanes((pane) => {
         pane.onDidAddItem(({ item }) => {
-          if (typeof item.getURI === 'function' && this.enablePersistence) {
+          if (typeof item.getURI === "function" && this.enablePersistence) {
             const uri = item.getURI();
             if (uri) {
               const location = paneContainer.getLocation();
               let defaultLocation;
-              if (typeof item.getDefaultLocation === 'function') {
+              if (typeof item.getDefaultLocation === "function") {
                 defaultLocation = item.getDefaultLocation();
               }
-              defaultLocation = defaultLocation || 'center';
+              defaultLocation = defaultLocation || "center";
               if (location === defaultLocation) {
                 this.itemLocationStore.delete(item.getURI());
               } else {
@@ -818,29 +768,23 @@ module.exports = class Workspace extends Model {
     const projectPaths = left != null ? left : [];
     const item = this.getActivePaneItem();
     if (item) {
-      itemPath =
-        typeof item.getPath === 'function' ? item.getPath() : undefined;
-      const longTitle =
-        typeof item.getLongTitle === 'function'
-          ? item.getLongTitle()
-          : undefined;
+      itemPath = typeof item.getPath === "function" ? item.getPath() : undefined;
+      const longTitle = typeof item.getLongTitle === "function" ? item.getLongTitle() : undefined;
       itemTitle =
         longTitle == null
-          ? typeof item.getTitle === 'function'
+          ? typeof item.getTitle === "function"
             ? item.getTitle()
             : undefined
           : longTitle;
       projectPath = _.find(
         projectPaths,
-        projectPath =>
+        (projectPath) =>
           itemPath === projectPath ||
-          (itemPath != null
-            ? itemPath.startsWith(projectPath + path.sep)
-            : undefined)
+          (itemPath != null ? itemPath.startsWith(projectPath + path.sep) : undefined),
       );
     }
     if (itemTitle == null) {
-      itemTitle = 'untitled';
+      itemTitle = "untitled";
     }
     if (projectPath == null) {
       projectPath = itemPath ? path.dirname(itemPath) : projectPaths[0];
@@ -850,10 +794,14 @@ module.exports = class Workspace extends Model {
     }
 
     const titleParts = [];
-    if (item != null && projectPath != null && this.config.get('core.addCurrentTabToWindowTitle')) {
+    if (item != null && projectPath != null && this.config.get("core.addCurrentTabToWindowTitle")) {
       titleParts.push(itemTitle, projectPath);
       representedPath = itemPath != null ? itemPath : projectPath;
-    } else if (item != null && projectPath != null && !this.config.get('core.addCurrentTabToWindowTitle')) {
+    } else if (
+      item != null &&
+      projectPath != null &&
+      !this.config.get("core.addCurrentTabToWindowTitle")
+    ) {
       titleParts.push(projectPath);
       representedPath = itemPath != null ? itemPath : projectPath;
     } else if (projectPath != null) {
@@ -861,16 +809,16 @@ module.exports = class Workspace extends Model {
       representedPath = projectPath;
     } else {
       titleParts.push(itemTitle);
-      representedPath = '';
+      representedPath = "";
     }
 
-    if (process.platform !== 'darwin') {
+    if (process.platform !== "darwin") {
       titleParts.push(appName);
     }
 
-    document.title = titleParts.join(' \u2014 ');
+    document.title = titleParts.join(" \u2014 ");
     this.applicationDelegate.setRepresentedFilename(representedPath);
-    this.emitter.emit('did-change-window-title');
+    this.emitter.emit("did-change-window-title");
   }
 
   // On macOS, fades the application window's proxy icon when the current file
@@ -878,7 +826,7 @@ module.exports = class Workspace extends Model {
   updateDocumentEdited() {
     const activePaneItem = this.getActivePaneItem();
     const modified =
-      activePaneItem != null && typeof activePaneItem.isModified === 'function'
+      activePaneItem != null && typeof activePaneItem.isModified === "function"
         ? activePaneItem.isModified() || false
         : false;
     this.applicationDelegate.setWindowDocumentEdited(modified);
@@ -889,7 +837,7 @@ module.exports = class Workspace extends Model {
   */
 
   onDidChangeActivePaneContainer(callback) {
-    return this.emitter.on('did-change-active-pane-container', callback);
+    return this.emitter.on("did-change-active-pane-container", callback);
   }
 
   // Essential: Invoke the given callback with all current and future text
@@ -917,9 +865,7 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   observePaneItems(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.observePaneItems(callback)
-      )
+      ...this.getPaneContainers().map((container) => container.observePaneItems(callback)),
     );
   }
 
@@ -935,7 +881,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeActivePaneItem(callback) {
-    return this.emitter.on('did-change-active-pane-item', callback);
+    return this.emitter.on("did-change-active-pane-item", callback);
   }
 
   // Essential: Invoke the given callback when the active pane item stops
@@ -953,7 +899,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidStopChangingActivePaneItem(callback) {
-    return this.emitter.on('did-stop-changing-active-pane-item', callback);
+    return this.emitter.on("did-stop-changing-active-pane-item", callback);
   }
 
   // Essential: Invoke the given callback when a text editor becomes the active
@@ -965,7 +911,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeActiveTextEditor(callback) {
-    return this.emitter.on('did-change-active-text-editor', callback);
+    return this.emitter.on("did-change-active-text-editor", callback);
   }
 
   // Essential: Invoke the given callback with the current active pane item and
@@ -1008,7 +954,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidOpen(callback) {
-    return this.emitter.on('did-open', callback);
+    return this.emitter.on("did-open", callback);
   }
 
   // Extended: Invoke the given callback when a pane is added to the workspace.
@@ -1020,9 +966,7 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddPane(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onDidAddPane(callback)
-      )
+      ...this.getPaneContainers().map((container) => container.onDidAddPane(callback)),
     );
   }
 
@@ -1036,9 +980,7 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onWillDestroyPane(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onWillDestroyPane(callback)
-      )
+      ...this.getPaneContainers().map((container) => container.onWillDestroyPane(callback)),
     );
   }
 
@@ -1052,9 +994,7 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroyPane(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onDidDestroyPane(callback)
-      )
+      ...this.getPaneContainers().map((container) => container.onDidDestroyPane(callback)),
     );
   }
 
@@ -1068,9 +1008,7 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   observePanes(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.observePanes(callback)
-      )
+      ...this.getPaneContainers().map((container) => container.observePanes(callback)),
     );
   }
 
@@ -1081,7 +1019,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeActivePane(callback) {
-    return this.emitter.on('did-change-active-pane', callback);
+    return this.emitter.on("did-change-active-pane", callback);
   }
 
   // Extended: Invoke the given callback with the current active pane and when
@@ -1109,9 +1047,7 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddPaneItem(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onDidAddPaneItem(callback)
-      )
+      ...this.getPaneContainers().map((container) => container.onDidAddPaneItem(callback)),
     );
   }
 
@@ -1129,9 +1065,7 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose` can be called to unsubscribe.
   onWillDestroyPaneItem(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onWillDestroyPaneItem(callback)
-      )
+      ...this.getPaneContainers().map((container) => container.onWillDestroyPaneItem(callback)),
     );
   }
 
@@ -1147,9 +1081,7 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose` can be called to unsubscribe.
   onDidDestroyPaneItem(callback) {
     return new CompositeDisposable(
-      ...this.getPaneContainers().map(container =>
-        container.onDidDestroyPaneItem(callback)
-      )
+      ...this.getPaneContainers().map((container) => container.onDidDestroyPaneItem(callback)),
     );
   }
 
@@ -1165,11 +1097,11 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddTextEditor(callback) {
-    return this.emitter.on('did-add-text-editor', callback);
+    return this.emitter.on("did-add-text-editor", callback);
   }
 
   onDidChangeWindowTitle(callback) {
-    return this.emitter.on('did-change-window-title', callback);
+    return this.emitter.on("did-change-window-title", callback);
   }
 
   /*
@@ -1213,11 +1145,11 @@ module.exports = class Workspace extends Model {
   // Returns a {Promise} that resolves to the {TextEditor} for the file URI.
   async open(itemOrURI, options = {}) {
     let uri, item;
-    if (typeof itemOrURI === 'string') {
+    if (typeof itemOrURI === "string") {
       uri = this.project.resolvePath(itemOrURI);
     } else if (itemOrURI) {
       item = itemOrURI;
-      if (typeof item.getURI === 'function') uri = item.getURI();
+      if (typeof item.getURI === "function") uri = item.getURI();
     }
 
     let resolveItem = () => {};
@@ -1226,9 +1158,9 @@ module.exports = class Workspace extends Model {
       if (!incomingItem) {
         this.incoming.set(
           uri,
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolveItem = resolve;
-          })
+          }),
         );
       } else {
         await incomingItem;
@@ -1236,13 +1168,13 @@ module.exports = class Workspace extends Model {
     }
 
     try {
-      if (!atom.config.get('core.allowPendingPaneItems')) {
+      if (!atom.config.get("core.allowPendingPaneItems")) {
         options.pending = false;
       }
 
       // Avoid adding URLs as recent documents to work-around this Spotlight crash:
       // https://github.com/atom/atom/issues/10071
-      if (uri && (!url.parse(uri).protocol || process.platform === 'win32')) {
+      if (uri && (!url.parse(uri).protocol || process.platform === "win32")) {
         this.applicationDelegate.addRecentDocument(uri);
       }
 
@@ -1264,16 +1196,16 @@ module.exports = class Workspace extends Model {
           // The `split` option affects where we search for the item.
           pane = container.getActivePane();
           switch (options.split) {
-            case 'left':
+            case "left":
               pane = pane.findLeftmostSibling();
               break;
-            case 'right':
+            case "right":
               pane = pane.findRightmostSibling();
               break;
-            case 'up':
+            case "up":
               pane = pane.findTopmostSibling();
               break;
-            case 'down':
+            case "down":
               pane = pane.findBottommostSibling();
               break;
           }
@@ -1305,32 +1237,30 @@ module.exports = class Workspace extends Model {
           if (!location && !options.split && uri && this.enablePersistence) {
             location = await this.itemLocationStore.load(uri);
           }
-          if (!location && typeof item.getDefaultLocation === 'function') {
+          if (!location && typeof item.getDefaultLocation === "function") {
             location = item.getDefaultLocation();
           }
 
           const allowedLocations =
-            typeof item.getAllowedLocations === 'function'
+            typeof item.getAllowedLocations === "function"
               ? item.getAllowedLocations()
               : ALL_LOCATIONS;
-          location = allowedLocations.includes(location)
-            ? location
-            : allowedLocations[0];
+          location = allowedLocations.includes(location) ? location : allowedLocations[0];
 
           const container = this.paneContainers[location] || this.getCenter();
           pane = container.getActivePane();
           const splitParams = { activate: options.activatePane !== false };
           switch (options.split) {
-            case 'left':
+            case "left":
               pane = pane.findLeftmostSibling();
               break;
-            case 'right':
+            case "right":
               pane = pane.findOrCreateRightmostSibling(splitParams);
               break;
-            case 'up':
+            case "up":
               pane = pane.findTopmostSibling();
               break;
-            case 'down':
+            case "down":
               pane = pane.findOrCreateBottommostSibling(splitParams);
               break;
           }
@@ -1362,21 +1292,21 @@ module.exports = class Workspace extends Model {
         initialColumn = options.initialColumn;
       }
       if (initialLine >= 0 || initialColumn >= 0) {
-        if (typeof item.setCursorBufferPosition === 'function') {
+        if (typeof item.setCursorBufferPosition === "function") {
           item.setCursorBufferPosition([initialLine, initialColumn]);
         }
-        if (typeof item.unfoldBufferRow === 'function') {
+        if (typeof item.unfoldBufferRow === "function") {
           item.unfoldBufferRow(initialLine);
         }
-        if (typeof item.scrollToBufferPosition === 'function') {
+        if (typeof item.scrollToBufferPosition === "function") {
           item.scrollToBufferPosition([initialLine, initialColumn], {
-            center: true
+            center: true,
           });
         }
       }
 
       const index = pane.getActiveItemIndex();
-      this.emitter.emit('did-open', { uri, pane, item, index });
+      this.emitter.emit("did-open", { uri, pane, item, index });
       if (uri) {
         this.incoming.delete(uri);
       }
@@ -1403,11 +1333,8 @@ module.exports = class Workspace extends Model {
       }
 
       if (activationHookText?.length > 1 && activationHookItem?.length > 1) {
-        this.packageManager.triggerActivationHook(
-          `${activationHookItem}:${activationHookText}`
-        );
+        this.packageManager.triggerActivationHook(`${activationHookItem}:${activationHookText}`);
       }
-
     } finally {
       resolveItem();
     }
@@ -1432,8 +1359,7 @@ module.exports = class Workspace extends Model {
           const foundItem =
             activeItem != null &&
             (activeItem === itemOrURI ||
-              (typeof activeItem.getURI === 'function' &&
-                activeItem.getURI() === itemOrURI));
+              (typeof activeItem.getURI === "function" && activeItem.getURI() === itemOrURI));
           if (foundItem) {
             foundItems = true;
             // We can't really hide the center so we just destroy the item.
@@ -1467,11 +1393,11 @@ module.exports = class Workspace extends Model {
 
   // Open Lumine's license in the active pane.
   openLicense() {
-    const resPath = path.join(process.resourcesPath, 'LICENSE.md')
+    const resPath = path.join(process.resourcesPath, "LICENSE.md");
     if (fs.existsSync(resPath)) {
       return this.open(resPath);
     } else {
-      return this.open(path.join(__dirname, '..', 'LICENSE.md'))
+      return this.open(path.join(__dirname, "..", "LICENSE.md"));
     }
   }
 
@@ -1489,12 +1415,10 @@ module.exports = class Workspace extends Model {
   //     the containing pane. Defaults to `true`.
   //   * `activateItem` A {Boolean} indicating whether to call {Pane::activateItem}
   //     on containing pane. Defaults to `true`.
-  openSync(uri_ = '', options = {}) {
+  openSync(uri_ = "", options = {}) {
     const { initialLine, initialColumn } = options;
-    const activatePane =
-      options.activatePane != null ? options.activatePane : true;
-    const activateItem =
-      options.activateItem != null ? options.activateItem : true;
+    const activatePane = options.activatePane != null ? options.activatePane : true;
+    const activateItem = options.activateItem != null ? options.activateItem : true;
 
     const uri = this.project.resolvePath(uri_);
     let item = this.getActivePane().itemForURI(uri);
@@ -1543,27 +1467,25 @@ module.exports = class Workspace extends Model {
       return item;
     } catch (error) {
       switch (error.code) {
-        case 'CANCELLED':
+        case "CANCELLED":
           return Promise.resolve();
-        case 'EACCES':
-          this.notificationManager.addWarning(
-            `Permission denied '${error.path}'`
-          );
+        case "EACCES":
+          this.notificationManager.addWarning(`Permission denied '${error.path}'`);
           return Promise.resolve();
-        case 'EPERM':
-        case 'EBUSY':
-        case 'ENXIO':
-        case 'EIO':
-        case 'ENOTCONN':
-        case 'UNKNOWN':
-        case 'ECONNRESET':
-        case 'EINVAL':
-        case 'EMFILE':
-        case 'ENOTDIR':
-        case 'EAGAIN':
+        case "EPERM":
+        case "EBUSY":
+        case "ENXIO":
+        case "EIO":
+        case "ENOTCONN":
+        case "UNKNOWN":
+        case "ECONNRESET":
+        case "EINVAL":
+        case "EMFILE":
+        case "ENOTDIR":
+        case "EAGAIN":
           this.notificationManager.addWarning(
             `Unable to open '${error.path != null ? error.path : uri}'`,
-            { detail: error.message }
+            { detail: error.message },
           );
           return Promise.resolve();
         default:
@@ -1577,10 +1499,10 @@ module.exports = class Workspace extends Model {
 
     if (filePath != null) {
       try {
-        fs.closeSync(fs.openSync(filePath, 'r'));
+        fs.closeSync(fs.openSync(filePath, "r"));
       } catch (error) {
         // allow ENOENT errors to create an editor for paths that dont exist
-        if (error.code !== 'ENOENT') {
+        if (error.code !== "ENOENT") {
           throw error;
         }
       }
@@ -1588,45 +1510,38 @@ module.exports = class Workspace extends Model {
 
     const fileSize = fs.getSizeSync(filePath);
 
-    if (fileSize >= this.config.get('core.warnOnLargeFileLimit') * 1048576) {
+    if (fileSize >= this.config.get("core.warnOnLargeFileLimit") * 1048576) {
       // 40MB by default
       await new Promise((resolve, reject) => {
         this.applicationDelegate.confirm(
           {
-            message:
-              'Lumine will be unresponsive during the loading of very large files.',
-            detail: 'Do you still want to load this file?',
-            buttons: ['Proceed', 'Cancel']
+            message: "Lumine will be unresponsive during the loading of very large files.",
+            detail: "Do you still want to load this file?",
+            buttons: ["Proceed", "Cancel"],
           },
-          response => {
+          (response) => {
             if (response === 1) {
               const error = new Error();
-              error.code = 'CANCELLED';
+              error.code = "CANCELLED";
               reject(error);
             } else {
               resolve();
             }
-          }
+          },
         );
       });
     }
 
     const buffer = await this.project.bufferForPath(filePath, options);
-    return this.textEditorRegistry.build(
-      Object.assign({ buffer, autoHeight: false }, options)
-    );
+    return this.textEditorRegistry.build(Object.assign({ buffer, autoHeight: false }, options));
   }
 
   handleGrammarUsed(grammar) {
     if (grammar == null) {
       return;
     }
-    this.packageManager.triggerActivationHook(
-      `${grammar.scopeName}:root-scope-used`
-    );
-    this.packageManager.triggerActivationHook(
-      `${grammar.packageName}:grammar-used`
-    );
+    this.packageManager.triggerActivationHook(`${grammar.scopeName}:root-scope-used`);
+    this.packageManager.triggerActivationHook(`${grammar.packageName}:grammar-used`);
   }
 
   // Public: Returns a {Boolean} that is `true` if `object` is a `TextEditor`.
@@ -1711,9 +1626,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns an {Array} of items.
   getPaneItems() {
-    return _.flatten(
-      this.getPaneContainers().map(container => container.getPaneItems())
-    );
+    return _.flatten(this.getPaneContainers().map((container) => container.getPaneItems()));
   }
 
   // Essential: Get the active {Pane}'s active item.
@@ -1727,7 +1640,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns an {Array} of {TextEditor}s.
   getTextEditors() {
-    return this.getPaneItems().filter(item => item instanceof TextEditor);
+    return this.getPaneItems().filter((item) => item instanceof TextEditor);
   }
 
   // Essential: Get the workspace center's active item if it is a {TextEditor}.
@@ -1743,15 +1656,15 @@ module.exports = class Workspace extends Model {
 
   // Save all pane items.
   saveAll() {
-    this.getPaneContainers().forEach(container => {
+    this.getPaneContainers().forEach((container) => {
       container.saveAll();
     });
   }
 
   confirmClose(options) {
     return Promise.all(
-      this.getPaneContainers().map(container => container.confirmClose(options))
-    ).then(results => !results.includes(false));
+      this.getPaneContainers().map((container) => container.confirmClose(options)),
+    ).then((results) => !results.includes(false));
   }
 
   // Save the active pane item.
@@ -1761,9 +1674,7 @@ module.exports = class Workspace extends Model {
   // {::saveActivePaneItemAs} # will be called instead. This method does nothing
   // if the active item does not implement a `.save` method.
   saveActivePaneItem() {
-    return this.getCenter()
-      .getActivePane()
-      .saveActiveItem();
+    return this.getCenter().getActivePane().saveActiveItem();
   }
 
   // Prompt the user for a path and save the active pane item to it.
@@ -1772,9 +1683,7 @@ module.exports = class Workspace extends Model {
   // `.saveAs` on the item with the selected path. This method does nothing if
   // the active item does not implement a `.saveAs` method.
   saveActivePaneItemAs() {
-    this.getCenter()
-      .getActivePane()
-      .saveActiveItemAs();
+    this.getCenter().getActivePane().saveActiveItemAs();
   }
 
   // Destroy (close) the active pane item.
@@ -1800,15 +1709,11 @@ module.exports = class Workspace extends Model {
   //
   // Returns an {Array} of {Pane}s.
   getPanes() {
-    return _.flatten(
-      this.getPaneContainers().map(container => container.getPanes())
-    );
+    return _.flatten(this.getPaneContainers().map((container) => container.getPanes()));
   }
 
   getVisiblePanes() {
-    return _.flatten(
-      this.getVisiblePaneContainers().map(container => container.getPanes())
-    );
+    return _.flatten(this.getVisiblePaneContainers().map((container) => container.getPanes()));
   }
 
   // Extended: Get the active {Pane}.
@@ -1836,9 +1741,7 @@ module.exports = class Workspace extends Model {
   // Returns a {Dock}, the {WorkspaceCenter}, or `undefined` if no item exists
   // with the given URI.
   paneContainerForURI(uri) {
-    return this.getPaneContainers().find(container =>
-      container.paneForURI(uri)
-    );
+    return this.getPaneContainers().find((container) => container.paneForURI(uri));
   }
 
   // Extended: Get the first pane container that contains the given item.
@@ -1848,9 +1751,7 @@ module.exports = class Workspace extends Model {
   // Returns a {Dock}, the {WorkspaceCenter}, or `undefined` if no item exists
   // with the given URI.
   paneContainerForItem(uri) {
-    return this.getPaneContainers().find(container =>
-      container.paneForItem(uri)
-    );
+    return this.getPaneContainers().find((container) => container.paneForItem(uri));
   }
 
   // Extended: Get the first {Pane} that contains an item with the given URI.
@@ -1893,43 +1794,38 @@ module.exports = class Workspace extends Model {
   // empty, or the current window if there is only the empty root pane.
   closeActivePaneItemOrEmptyPaneOrWindow() {
     if (this.getCenter().getActivePaneItem() != null) {
-      this.getCenter()
-        .getActivePane()
-        .destroyActiveItem();
+      this.getCenter().getActivePane().destroyActiveItem();
     } else if (this.getCenter().getPanes().length > 1) {
       this.getCenter().destroyActivePane();
-    } else if (this.config.get('core.closeEmptyWindows')) {
+    } else if (this.config.get("core.closeEmptyWindows")) {
       atom.close();
     }
   }
 
   // Increase the editor font size by 1px.
   increaseFontSize() {
-    this.config.set('editor.fontSize', this.config.get('editor.fontSize') + 1);
+    this.config.set("editor.fontSize", this.config.get("editor.fontSize") + 1);
   }
 
   // Decrease the editor font size by 1px.
   decreaseFontSize() {
-    const fontSize = this.config.get('editor.fontSize');
+    const fontSize = this.config.get("editor.fontSize");
     if (fontSize > 1) {
-      this.config.set('editor.fontSize', fontSize - 1);
+      this.config.set("editor.fontSize", fontSize - 1);
     }
   }
 
   // Restore to the window's default editor font size.
   resetFontSize() {
-    this.config.set(
-      'editor.fontSize',
-      this.config.get('editor.defaultFontSize')
-    );
+    this.config.set("editor.fontSize", this.config.get("editor.defaultFontSize"));
   }
 
   // Removes the item's uri from the list of potential items to reopen.
   itemOpened(item) {
     let uri;
-    if (typeof item.getURI === 'function') {
+    if (typeof item.getURI === "function") {
       uri = item.getURI();
-    } else if (typeof item.getUri === 'function') {
+    } else if (typeof item.getUri === "function") {
       uri = item.getUri();
     }
 
@@ -1941,9 +1837,9 @@ module.exports = class Workspace extends Model {
   // Adds the destroyed item's uri to the list of items to reopen.
   didDestroyPaneItem({ item }) {
     let uri;
-    if (typeof item.getURI === 'function') {
+    if (typeof item.getURI === "function") {
       uri = item.getURI();
-    } else if (typeof item.getUri === 'function') {
+    } else if (typeof item.getUri === "function") {
       uri = item.getUri();
     }
 
@@ -1994,7 +1890,7 @@ module.exports = class Workspace extends Model {
       this.paneContainers.center,
       this.paneContainers.left,
       this.paneContainers.right,
-      this.paneContainers.bottom
+      this.paneContainers.bottom,
     ];
   }
 
@@ -2002,7 +1898,7 @@ module.exports = class Workspace extends Model {
     const center = this.getCenter();
     return atom.workspace
       .getPaneContainers()
-      .filter(container => container === center || container.isVisible());
+      .filter((container) => container === center || container.isVisible());
   }
 
   /*
@@ -2021,7 +1917,7 @@ module.exports = class Workspace extends Model {
 
   // Essential: Get an {Array} of all the panel items at the bottom of the editor window.
   getBottomPanels() {
-    return this.getPanels('bottom');
+    return this.getPanels("bottom");
   }
 
   // Essential: Adds a panel item to the bottom of the editor window.
@@ -2037,12 +1933,12 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Panel}
   addBottomPanel(options) {
-    return this.addPanel('bottom', options);
+    return this.addPanel("bottom", options);
   }
 
   // Essential: Get an {Array} of all the panel items to the left of the editor window.
   getLeftPanels() {
-    return this.getPanels('left');
+    return this.getPanels("left");
   }
 
   // Essential: Adds a panel item to the left of the editor window.
@@ -2058,12 +1954,12 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Panel}
   addLeftPanel(options) {
-    return this.addPanel('left', options);
+    return this.addPanel("left", options);
   }
 
   // Essential: Get an {Array} of all the panel items to the right of the editor window.
   getRightPanels() {
-    return this.getPanels('right');
+    return this.getPanels("right");
   }
 
   // Essential: Adds a panel item to the right of the editor window.
@@ -2079,12 +1975,12 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Panel}
   addRightPanel(options) {
-    return this.addPanel('right', options);
+    return this.addPanel("right", options);
   }
 
   // Essential: Get an {Array} of all the panel items at the top of the editor window.
   getTopPanels() {
-    return this.getPanels('top');
+    return this.getPanels("top");
   }
 
   // Essential: Adds a panel item to the top of the editor window above the tabs.
@@ -2100,12 +1996,12 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Panel}
   addTopPanel(options) {
-    return this.addPanel('top', options);
+    return this.addPanel("top", options);
   }
 
   // Essential: Get an {Array} of all the panel items in the header.
   getHeaderPanels() {
-    return this.getPanels('header');
+    return this.getPanels("header");
   }
 
   // Essential: Adds a panel item to the header.
@@ -2121,12 +2017,12 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Panel}
   addHeaderPanel(options) {
-    return this.addPanel('header', options);
+    return this.addPanel("header", options);
   }
 
   // Essential: Get an {Array} of all the panel items in the footer.
   getFooterPanels() {
-    return this.getPanels('footer');
+    return this.getPanels("footer");
   }
 
   // Essential: Adds a panel item to the footer.
@@ -2142,12 +2038,12 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Panel}
   addFooterPanel(options) {
-    return this.addPanel('footer', options);
+    return this.addPanel("footer", options);
   }
 
   // Essential: Get an {Array} of all the modal panel items
   getModalPanels() {
-    return this.getPanels('modal');
+    return this.getPanels("modal");
   }
 
   // Essential: Adds a panel item as a modal dialog.
@@ -2168,7 +2064,7 @@ module.exports = class Workspace extends Model {
   //
   // Returns a {Panel}
   addModalPanel(options = {}) {
-    return this.addPanel('modal', options);
+    return this.addPanel("modal", options);
   }
 
   // Essential: Returns the {Panel} associated with the given item. Returns
@@ -2194,9 +2090,7 @@ module.exports = class Workspace extends Model {
     if (options == null) {
       options = {};
     }
-    return this.panelContainers[location].addPanel(
-      new Panel(options, this.viewRegistry)
-    );
+    return this.panelContainers[location].addPanel(new Panel(options, this.viewRegistry));
   }
 
   /*
@@ -2236,14 +2130,14 @@ module.exports = class Workspace extends Model {
     }
 
     const hasMultipleProjectRoots = atom.project.getPaths().length > 1;
-    let pathsWithProjectRoots = options.paths?.map(p => [null, p]) ?? undefined;
+    let pathsWithProjectRoots = options.paths?.map((p) => [null, p]) ?? undefined;
     if (hasMultipleProjectRoots) {
       let rootBasenames = getBasenamesFromProjectRoots();
-      pathsWithProjectRoots = options.paths ?
-        options.paths.map(p => extractProjectRootsFromPathPattern(p, rootBasenames)) :
-        options.paths;
+      pathsWithProjectRoots = options.paths
+        ? options.paths.map((p) => extractProjectRootsFromPathPattern(p, rootBasenames))
+        : options.paths;
     } else if (pathsWithProjectRoots) {
-      pathsWithProjectRoots = options.paths?.map(p => [null, p]) ?? undefined;
+      pathsWithProjectRoots = options.paths?.map((p) => [null, p]) ?? undefined;
     }
 
     // Find a searcher for every Directory in the project. Each searcher that
@@ -2315,7 +2209,7 @@ module.exports = class Workspace extends Model {
         let basename = path.basename(directory.getPath());
         filteredPaths = [];
         for (let [intendedRoot, singlePath] of pathsWithProjectRoots) {
-          let isExclusion = singlePath.startsWith('!');
+          let isExclusion = singlePath.startsWith("!");
           if (!isExclusion) {
             hasOnlyExclusions = false;
           }
@@ -2325,7 +2219,7 @@ module.exports = class Workspace extends Model {
             filteredPaths.push(singlePath);
           } else if (intendedRoot === basename) {
             // This path pattern was specifically meant for this root.
-            if (singlePath === '!') {
+            if (singlePath === "!") {
               // This path pattern is specifically excluding this project root
               // altogether! Thus we should skip searching in it entirely, even
               // if other path patterns would have matched.
@@ -2417,13 +2311,13 @@ module.exports = class Workspace extends Model {
       const searchOptions = {
         inclusions: options.paths || [],
         includeHidden: true,
-        excludeVcsIgnores: this.config.get('core.excludeVcsIgnoredPaths'),
-        exclusions: this.config.get('core.ignoredNames'),
-        follow: this.config.get('core.followSymlinks'),
+        excludeVcsIgnores: this.config.get("core.excludeVcsIgnoredPaths"),
+        exclusions: this.config.get("core.ignoredNames"),
+        follow: this.config.get("core.followSymlinks"),
         leadingContextLineCount: options.leadingContextLineCount || 0,
         trailingContextLineCount: options.trailingContextLineCount || 0,
         PCRE2: options.PCRE2,
-        didMatch: result => {
+        didMatch: (result) => {
           if (!this.project.isPathModified(result.filePath)) {
             return iterator(result);
           }
@@ -2433,7 +2327,7 @@ module.exports = class Workspace extends Model {
         },
         didSearchPaths(count) {
           return onPathsSearched(searcher, count);
-        }
+        },
       };
       // When there are multiple roots, we build separate `inclusions` for each
       // root. If those were set earlier, we should use them now.
@@ -2441,13 +2335,13 @@ module.exports = class Workspace extends Model {
       // Even though several of these roots can theoretically share a searcher,
       // we must pass different inclusions to each one — meaning we must create
       // a different instance of the searcher for each directory.
-      let directorySearchers = directories.map(dir => {
+      let directorySearchers = directories.map((dir) => {
         let customInclusions = customInclusionsForDirectory.get(dir);
         let customSearchOptions = { ...searchOptions };
         if (customInclusions) {
           customSearchOptions.inclusions = customInclusions;
         }
-        return searcher.search([dir], regex, customSearchOptions)
+        return searcher.search([dir], regex, customSearchOptions);
       });
       allSearches.push(...directorySearchers);
     });
@@ -2458,13 +2352,13 @@ module.exports = class Workspace extends Model {
     if (options.paths) {
       defaultMatchers = options.paths
         // Filter out "empty string" ("") path segments that somehow make it here
-        .filter(p => !!p)
-        .map(inclusion => minimatchInstanceForPattern(inclusion));
+        .filter((p) => !!p)
+        .map((inclusion) => minimatchInstanceForPattern(inclusion));
     }
 
     const customMatchers = new Map();
     for (let [dir, inclusions] of customInclusionsForDirectory) {
-      let matchers = inclusions?.map(i => minimatchInstanceForPattern(i)) ?? null;
+      let matchers = inclusions?.map((i) => minimatchInstanceForPattern(i)) ?? null;
       customMatchers.set(dir.getPath(), matchers);
     }
 
@@ -2487,11 +2381,15 @@ module.exports = class Workspace extends Model {
         // should exclude this buffer for that reason alone.
         continue;
       }
-      if (matchers && matchers.length > 0  && !matchers.some(matcher => filePathMatchesGlob(relativizedFilePath, matcher))) {
+      if (
+        matchers &&
+        matchers.length > 0 &&
+        !matchers.some((matcher) => filePathMatchesGlob(relativizedFilePath, matcher))
+      ) {
         continue;
       }
       let matches = [];
-      buffer.scan(regex, match => matches.push(match));
+      buffer.scan(regex, (match) => matches.push(match));
       if (matches.length > 0) {
         iterator({ filePath, matches });
       }
@@ -2505,7 +2403,7 @@ module.exports = class Workspace extends Model {
     const cancellablePromise = new Promise((resolve, reject) => {
       const onSuccess = function () {
         if (isCancelled) {
-          resolve('cancelled');
+          resolve("cancelled");
         } else {
           resolve(null);
         }
@@ -2525,7 +2423,7 @@ module.exports = class Workspace extends Model {
       // Note that cancelling all of the members of allSearches will cause all of the searches
       // to resolve, which causes searchPromise to resolve, which is ultimately what causes
       // cancellablePromise to resolve.
-      allSearches.map(promise => promise.cancel());
+      allSearches.map((promise) => promise.cancel());
     };
 
     return cancellablePromise;
@@ -2543,9 +2441,7 @@ module.exports = class Workspace extends Model {
   replace(regex, replacementText, filePaths, iterator) {
     return new Promise((resolve, reject) => {
       let buffer;
-      const openPaths = this.project
-        .getBuffers()
-        .map(buffer => buffer.getPath());
+      const openPaths = this.project.getBuffers().map((buffer) => buffer.getPath());
       const outOfProcessPaths = _.difference(filePaths, openPaths);
 
       let inProcessFinished = !openPaths.length;
@@ -2557,16 +2453,16 @@ module.exports = class Workspace extends Model {
       };
 
       if (!outOfProcessFinished.length) {
-        let flags = 'g';
+        let flags = "g";
         if (regex.multiline) {
-          flags += 'm';
+          flags += "m";
         }
         if (regex.ignoreCase) {
-          flags += 'i';
+          flags += "i";
         }
 
         const task = Task.once(
-          require.resolve('./replace-handler'),
+          require.resolve("./replace-handler"),
           outOfProcessPaths,
           regex.source,
           flags,
@@ -2574,11 +2470,11 @@ module.exports = class Workspace extends Model {
           () => {
             outOfProcessFinished = true;
             checkFinished();
-          }
+          },
         );
 
-        task.on('replace:path-replaced', iterator);
-        task.on('replace:file-error', error => {
+        task.on("replace:path-replaced", iterator);
+        task.on("replace:file-error", (error) => {
           iterator(null, error);
         });
       }
@@ -2639,12 +2535,12 @@ module.exports = class Workspace extends Model {
       let filteredPatterns = [];
       let hasOnlyExclusions = true;
       for (let [intendedRoot, pattern] of basenameAndPatternPairs) {
-        let isExclusion = pattern.startsWith('!');
+        let isExclusion = pattern.startsWith("!");
         if (!isExclusion) hasOnlyExclusions = false;
         if (intendedRoot === null) {
           filteredPatterns.push(pattern);
         } else if (intendedRoot === basename) {
-          if (pattern === '!') {
+          if (pattern === "!") {
             // This root has explicitly been excluded in its entirety! We must
             // return `false` no matter what other patterns are present.
             return false;
@@ -2668,40 +2564,39 @@ module.exports = class Workspace extends Model {
     if (!patterns || patterns.length === 0) return true;
 
     // This catches an array of falsy values, like empty strings.
-    if (patterns.every(p => !p)) return true;
+    if (patterns.every((p) => !p)) return true;
 
     // Any file path that isn't part of the current project automatically does
     // not match.
     if (!this.project.contains(filePath)) return false;
 
-    let matchers = patterns.map(inclusion => minimatchInstanceForPattern(inclusion));
+    let matchers = patterns.map((inclusion) => minimatchInstanceForPattern(inclusion));
 
     let relativizedFilePath = atom.project.relativize(filePath);
-    return matchers.some(matcher => {
+    return matchers.some((matcher) => {
       return filePathMatchesGlob(relativizedFilePath, matcher);
     });
-
   }
 
   checkoutHeadRevision(editor) {
     if (editor.getPath()) {
       const checkoutHead = async () => {
         const repository = await this.project.repositoryForDirectory(
-          new Directory(editor.getDirectoryPath())
+          new Directory(editor.getDirectoryPath()),
         );
         if (repository) repository.checkoutHeadForEditor(editor);
       };
 
-      if (this.config.get('editor.confirmCheckoutHeadRevision')) {
+      if (this.config.get("editor.confirmCheckoutHeadRevision")) {
         this.applicationDelegate.confirm(
           {
-            message: 'Confirm Checkout HEAD Revision',
+            message: "Confirm Checkout HEAD Revision",
             detail: `Are you sure you want to discard all changes to "${editor.getFileName()}" since the last Git commit?`,
-            buttons: ['OK', 'Cancel']
+            buttons: ["OK", "Cancel"],
           },
-          response => {
+          (response) => {
             if (response === 0) checkoutHead();
-          }
+          },
         );
       } else {
         checkoutHead();

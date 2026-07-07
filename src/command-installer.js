@@ -1,6 +1,6 @@
-const path = require('path');
-const fs = require('fs-plus');
-const { getReleaseChannel } = require('./get-app-details.js');
+const path = require("path");
+const fs = require("fs-plus");
+const { getReleaseChannel } = require("./get-app-details.js");
 
 module.exports = class CommandInstaller {
   constructor(applicationDelegate) {
@@ -12,7 +12,7 @@ module.exports = class CommandInstaller {
   }
 
   getInstallDirectory() {
-    return '/usr/local/bin';
+    return "/usr/local/bin";
   }
 
   getResourcesDirectory() {
@@ -33,19 +33,19 @@ module.exports = class CommandInstaller {
     }
 
     // Otherwise fall back to the default executable name.
-    this.scriptBaseName = 'lumine';
+    this.scriptBaseName = "lumine";
 
     return this.scriptBaseName;
   }
 
   async installShellCommandsInteractively() {
-    const showErrorDialog = error => {
+    const showErrorDialog = (error) => {
       this.applicationDelegate.confirm(
         {
-          message: 'Failed to install shell commands',
-          detail: error.message
+          message: "Failed to install shell commands",
+          detail: error.message,
         },
-        () => {}
+        () => {},
       );
     };
 
@@ -53,22 +53,22 @@ module.exports = class CommandInstaller {
       if (error) return showErrorDialog(error);
       this.applicationDelegate.confirm(
         {
-          message: 'Command installed.',
-          detail: `The shell command \`${atomCommandName}\` is installed.`
+          message: "Command installed.",
+          detail: `The shell command \`${atomCommandName}\` is installed.`,
         },
-        () => {}
+        () => {},
       );
     });
   }
 
   getCommandNameForChannel(commandName) {
     let channelMatch = this.appVersion.match(/beta|nightly/);
-    let channel = channelMatch ? channelMatch[0] : '';
+    let channel = channelMatch ? channelMatch[0] : "";
 
     switch (channel) {
-      case 'beta':
+      case "beta":
         return `${commandName}-beta`;
-      case 'nightly':
+      case "nightly":
         return `${commandName}-nightly`;
       default:
         return commandName;
@@ -81,22 +81,22 @@ module.exports = class CommandInstaller {
       path.join(this.getResourcesDirectory(), `${scriptName}.sh`),
       scriptName,
       askForPrivilege,
-      callback
+      callback,
     );
   }
 
   installCommand(commandPath, commandName, askForPrivilege, callback) {
-    if (process.platform !== 'darwin') return callback();
+    if (process.platform !== "darwin") return callback();
 
     const destinationPath = path.join(this.getInstallDirectory(), commandName);
 
     fs.readlink(destinationPath, (error, realpath) => {
-      if (error && error.code !== 'ENOENT') return callback(error);
+      if (error && error.code !== "ENOENT") return callback(error);
       if (realpath === commandPath) return callback(null, commandName);
-      this.createSymlink(fs, commandPath, destinationPath, error => {
-        if (error && error.code === 'EACCES' && askForPrivilege) {
-          const fsAdmin = require('fs-admin');
-          this.createSymlink(fsAdmin, commandPath, destinationPath, error => {
+      this.createSymlink(fs, commandPath, destinationPath, (error) => {
+        if (error && error.code === "EACCES" && askForPrivilege) {
+          const fsAdmin = require("fs-admin");
+          this.createSymlink(fsAdmin, commandPath, destinationPath, (error) => {
             callback(error, commandName);
           });
         } else {
@@ -107,9 +107,9 @@ module.exports = class CommandInstaller {
   }
 
   createSymlink(fs, sourcePath, destinationPath, callback) {
-    fs.unlink(destinationPath, error => {
-      if (error && error.code !== 'ENOENT') return callback(error);
-      fs.makeTree(path.dirname(destinationPath), error => {
+    fs.unlink(destinationPath, (error) => {
+      if (error && error.code !== "ENOENT") return callback(error);
+      fs.makeTree(path.dirname(destinationPath), (error) => {
         if (error) return callback(error);
         fs.symlink(sourcePath, destinationPath, callback);
       });

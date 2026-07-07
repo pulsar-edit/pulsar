@@ -1,109 +1,109 @@
-function beforeEach (fn) {
+function beforeEach(fn) {
   global.beforeEach(() => {
-    const result = fn()
+    const result = fn();
     if (result instanceof Promise) {
-      waitsForPromise(() => result)
+      waitsForPromise(() => result);
     }
-  })
+  });
 }
 
-function afterEach (fn) {
+function afterEach(fn) {
   global.afterEach(() => {
-    const result = fn()
+    const result = fn();
     if (result instanceof Promise) {
-      waitsForPromise(() => result)
+      waitsForPromise(() => result);
     }
-  })
+  });
 }
 
-;['it', 'fit', 'ffit', 'fffit'].forEach(name => {
+["it", "fit", "ffit", "fffit"].forEach((name) => {
   exports[name] = (description, fn) => {
     if (fn === undefined) {
-      global[name](description)
-      return
+      global[name](description);
+      return;
     }
 
     global[name](description, () => {
-      const result = fn()
+      const result = fn();
       if (result instanceof Promise) {
-        waitsForPromise(() => result)
+        waitsForPromise(() => result);
       }
-    })
-  }
-})
+    });
+  };
+});
 
-async function conditionPromise (condition, description = 'anonymous condition') {
-  const startTime = Date.now()
+async function conditionPromise(condition, description = "anonymous condition") {
+  const startTime = Date.now();
 
   while (true) {
-    await timeoutPromise(100)
+    await timeoutPromise(100);
 
     if (await condition()) {
-      return
+      return;
     }
 
     if (Date.now() - startTime > 5000) {
-      throw new Error('Timed out waiting on ' + description)
+      throw new Error("Timed out waiting on " + description);
     }
   }
 }
 
-function timeoutPromise (timeout) {
-  return new Promise(resolve => {
-    global.setTimeout(resolve, timeout)
-  })
+function timeoutPromise(timeout) {
+  return new Promise((resolve) => {
+    global.setTimeout(resolve, timeout);
+  });
 }
 
-function waitsForPromise (fn) {
-  const promise = fn()
-  global.waitsFor('spec promise to resolve', done => {
-    promise.then(done, error => {
-      jasmine.getEnv().currentSpec.fail(error)
-      done()
-    })
-  })
+function waitsForPromise(fn) {
+  const promise = fn();
+  global.waitsFor("spec promise to resolve", (done) => {
+    promise.then(done, (error) => {
+      jasmine.getEnv().currentSpec.fail(error);
+      done();
+    });
+  });
 }
 
-function emitterEventPromise (emitter, event, timeout = 15000) {
+function emitterEventPromise(emitter, event, timeout = 15000) {
   return new Promise((resolve, reject) => {
     const timeoutHandle = setTimeout(() => {
-      reject(new Error(`Timed out waiting for '${event}' event`))
-    }, timeout)
+      reject(new Error(`Timed out waiting for '${event}' event`));
+    }, timeout);
     emitter.once(event, () => {
-      clearTimeout(timeoutHandle)
-      resolve()
-    })
-  })
+      clearTimeout(timeoutHandle);
+      resolve();
+    });
+  });
 }
 
-function promisify (original) {
+function promisify(original) {
   return function (...args) {
     return new Promise((resolve, reject) => {
       args.push((err, ...results) => {
         if (err) {
-          reject(err)
+          reject(err);
         } else {
-          resolve(...results)
+          resolve(...results);
         }
-      })
+      });
 
-      return original(...args)
-    })
-  }
+      return original(...args);
+    });
+  };
 }
 
-function promisifySome (obj, fnNames) {
-  const result = {}
+function promisifySome(obj, fnNames) {
+  const result = {};
   for (const fnName of fnNames) {
-    result[fnName] = promisify(obj[fnName])
+    result[fnName] = promisify(obj[fnName]);
   }
-  return result
+  return result;
 }
 
-exports.afterEach = afterEach
-exports.beforeEach = beforeEach
-exports.conditionPromise = conditionPromise
-exports.emitterEventPromise = emitterEventPromise
-exports.promisify = promisify
-exports.promisifySome = promisifySome
-exports.timeoutPromise = timeoutPromise
+exports.afterEach = afterEach;
+exports.beforeEach = beforeEach;
+exports.conditionPromise = conditionPromise;
+exports.emitterEventPromise = emitterEventPromise;
+exports.promisify = promisify;
+exports.promisifySome = promisifySome;
+exports.timeoutPromise = timeoutPromise;

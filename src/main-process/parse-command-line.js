@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
-const dedent = require('dedent');
-const yargs = require('yargs');
-const { app } = require('electron');
+const dedent = require("dedent");
+const yargs = require("yargs");
+const { app } = require("electron");
 
 module.exports = function parseCommandLine(processArgs) {
   // macOS Gatekeeper adds a flag ("-psn_0_[six or seven digits here]") when it intercepts Lumine launches.
   // (This happens for fresh downloads, new installs, or first launches after upgrading).
   // We don't need this flag, and yargs interprets it as many short flags. So, we filter it out.
-  const filteredArgs = processArgs.filter(arg => !arg.startsWith('-psn_'));
+  const filteredArgs = processArgs.filter((arg) => !arg.startsWith("-psn_"));
 
   const options = yargs(filteredArgs).wrap(yargs.terminalWidth());
   const version = app.getVersion();
@@ -36,128 +36,92 @@ module.exports = function parseCommandLine(processArgs) {
                               Defaults to \`~/github/atom\`.
 
       ATOM_HOME               The root path for all configuration files and folders.
-                              Defaults to \`~/.lumine\`.`
+                              Defaults to \`~/.lumine\`.`,
   );
+  options.alias("d", "dev").boolean("d").describe("d", "Run in development mode.");
   options
-    .alias('d', 'dev')
-    .boolean('d')
-    .describe('d', 'Run in development mode.');
+    .alias("f", "foreground")
+    .boolean("f")
+    .describe("f", "Keep the main process in the foreground.");
+  options.help(false);
+  options.alias("h", "help").boolean("h").describe("h", "Print this usage message.");
   options
-    .alias('f', 'foreground')
-    .boolean('f')
-    .describe('f', 'Keep the main process in the foreground.');
-  options.help(false)
+    .alias("l", "log-file")
+    .string("l")
+    .describe("l", "Log all output to file when running tests.");
+  options.alias("n", "new-window").boolean("n").describe("n", "Open a new window.");
   options
-    .alias('h', 'help')
-    .boolean('h')
-    .describe('h', 'Print this usage message.')
+    .boolean("profile-startup")
+    .describe("profile-startup", "Create a profile of the startup execution time.");
   options
-    .alias('l', 'log-file')
-    .string('l')
-    .describe('l', 'Log all output to file when running tests.');
+    .boolean("crashdump")
+    .describe("crashdump", "Generate a crashdump in ~/.lumine/crashdumps in the event of a crash.");
   options
-    .alias('n', 'new-window')
-    .boolean('n')
-    .describe('n', 'Open a new window.');
+    .alias("r", "resource-path")
+    .string("r")
+    .describe("r", "Set the path to the Lumine source directory and enable dev-mode.");
   options
-    .boolean('profile-startup')
+    .boolean("safe")
+    .describe("safe", "Do not load packages from ~/.lumine/packages or ~/.lumine/dev/packages.");
+  options.boolean("benchmark").describe("benchmark", "This option is no longer supported.");
+  options
+    .boolean("benchmark-test")
+    .describe("benchmark-test", "This option is no longer supported.");
+  options
+    .alias("t", "test")
+    .boolean("t")
+    .describe("t", "Run the specified specs and exit with error code on failures.");
+  options
+    .alias("m", "main-process")
+    .boolean("m")
+    .describe("m", "Run the specified specs in the main process.");
+  options
+    .string("timeout")
     .describe(
-      'profile-startup',
-      'Create a profile of the startup execution time.'
+      "timeout",
+      "When in test mode, waits until the specified time (in minutes) and kills the process (exit code: 130).",
     );
   options
-    .boolean('crashdump')
-    .describe(
-      'crashdump',
-      'Generate a crashdump in ~/.lumine/crashdumps in the event of a crash.'
-    );
+    .alias("w", "wait")
+    .boolean("w")
+    .describe("w", "Wait for window to be closed before returning.");
   options
-    .alias('r', 'resource-path')
-    .string('r')
-    .describe(
-      'r',
-      'Set the path to the Lumine source directory and enable dev-mode.'
-    );
+    .alias("a", "add")
+    .boolean("a")
+    .describe("add", "Open path as a new project in last used window.");
+  options.string("user-data-dir");
   options
-    .boolean('safe')
-    .describe(
-      'safe',
-      'Do not load packages from ~/.lumine/packages or ~/.lumine/dev/packages.'
-    );
+    .boolean("clear-window-state")
+    .describe("clear-window-state", "Delete all Lumine environment state.");
   options
-    .boolean('benchmark')
-    .describe(
-      'benchmark',
-      'This option is no longer supported.'
-    );
+    .boolean("enable-electron-logging")
+    .describe("enable-electron-logging", "Enable low-level logging messages from Electron.");
   options
-    .boolean('benchmark-test')
-    .describe(
-      'benchmark-test',
-      'This option is no longer supported.'
-    );
-  options
-    .alias('t', 'test')
-    .boolean('t')
-    .describe(
-      't',
-      'Run the specified specs and exit with error code on failures.'
-    );
-  options
-    .alias('m', 'main-process')
-    .boolean('m')
-    .describe('m', 'Run the specified specs in the main process.');
-  options
-    .string('timeout')
-    .describe(
-      'timeout',
-      'When in test mode, waits until the specified time (in minutes) and kills the process (exit code: 130).'
-    );
-  options
-    .alias('w', 'wait')
-    .boolean('w')
-    .describe('w', 'Wait for window to be closed before returning.');
-  options
-    .alias('a', 'add')
-    .boolean('a')
-    .describe('add', 'Open path as a new project in last used window.');
-  options.string('user-data-dir');
-  options
-    .boolean('clear-window-state')
-    .describe('clear-window-state', 'Delete all Lumine environment state.');
-  options
-    .boolean('enable-electron-logging')
-    .describe(
-      'enable-electron-logging',
-      'Enable low-level logging messages from Electron.'
-    );
-  options
-    .alias('p', 'package')
-    .boolean('p')
-    .describe(
-      'package',
-      'This option is no longer supported.'
-    );
-  options.boolean('uri-handler');
+    .alias("p", "package")
+    .boolean("p")
+    .describe("package", "This option is no longer supported.");
+  options.boolean("uri-handler");
   options
     .version(
       dedent`Lumine  : ${version}
              Electron: ${process.versions.electron}
              Chrome  : ${process.versions.chrome}
-             Node    : ${process.versions.node}`
+             Node    : ${process.versions.node}`,
     )
-    .alias('v', 'version');
+    .alias("v", "version");
 
   // NB: if --help or --version are given, this also displays the relevant message and exits
   let args = options.argv;
 
-  if (args['package']) {
-    process.stderr.write('The external Lumine package manager command has been removed. Install packages from Settings using a GitHub repository URL.\n');
+  if (args["package"]) {
+    process.stderr.write(
+      "The external Lumine package manager command has been removed. Install packages from Settings using a GitHub repository URL.\n",
+    );
     process.exit(1);
     return;
   }
 
-  if (args['help']) {
+  if (args["help"]) {
     options.showHelp();
     process.exit(0);
     return;
@@ -167,30 +131,30 @@ module.exports = function parseCommandLine(processArgs) {
   if (args.uriHandler) {
     args = {
       uriHandler: true,
-      'uri-handler': true,
-      _: args._.filter(str => str.startsWith('atom://')).slice(0, 1)
+      "uri-handler": true,
+      _: args._.filter((str) => str.startsWith("atom://")).slice(0, 1),
     };
   }
 
-  const addToLastWindow = args['add'];
-  const safeMode = args['safe'];
-  const benchmark = args['benchmark'];
-  const benchmarkTest = args['benchmark-test'];
-  const test = args['test'];
-  const mainProcess = args['main-process'];
-  const timeout = args['timeout'];
-  const newWindow = args['new-window'];
-  const useCrashReporter = args['crashdump'];
+  const addToLastWindow = args["add"];
+  const safeMode = args["safe"];
+  const benchmark = args["benchmark"];
+  const benchmarkTest = args["benchmark-test"];
+  const test = args["test"];
+  const mainProcess = args["main-process"];
+  const timeout = args["timeout"];
+  const newWindow = args["new-window"];
+  const useCrashReporter = args["crashdump"];
   let executedFrom = null;
-  if (args['executed-from'] && args['executed-from'].toString()) {
-    executedFrom = args['executed-from'].toString();
+  if (args["executed-from"] && args["executed-from"].toString()) {
+    executedFrom = args["executed-from"].toString();
   } else {
     executedFrom = process.cwd();
   }
 
   if (newWindow && addToLastWindow) {
     process.stderr.write(
-      `Only one of the --add and --new-window options may be specified at the same time.\n\n${options.help()}`
+      `Only one of the --add and --new-window options may be specified at the same time.\n\n${options.help()}`,
     );
 
     // Exiting the main process with a nonzero exit code on macOS causes the app open to fail with the mysterious
@@ -199,25 +163,25 @@ module.exports = function parseCommandLine(processArgs) {
   }
 
   let pidToKillWhenClosed = null;
-  if (args['wait']) {
-    pidToKillWhenClosed = args['pid'];
+  if (args["wait"]) {
+    pidToKillWhenClosed = args["pid"];
   }
 
-  const logFile = args['log-file'];
-  const userDataDir = args['user-data-dir'];
-  const profileStartup = args['profile-startup'];
-  const clearWindowState = args['clear-window-state'];
+  const logFile = args["log-file"];
+  const userDataDir = args["user-data-dir"];
+  const profileStartup = args["profile-startup"];
+  const clearWindowState = args["clear-window-state"];
   let pathsToOpen = [];
   let urlsToOpen = [];
-  let devMode = args['dev'];
+  let devMode = args["dev"];
 
   for (const path of args._) {
-    if (typeof path !== 'string') {
+    if (typeof path !== "string") {
       // Sometimes non-strings (such as numbers or boolean true) get into args._
       // In the next block, .startsWith() only works on strings. So, skip non-string arguments.
       continue;
     }
-    if (path.startsWith('atom://')) {
+    if (path.startsWith("atom://")) {
       urlsToOpen.push(path);
     } else {
       pathsToOpen.push(path);
@@ -228,10 +192,10 @@ module.exports = function parseCommandLine(processArgs) {
     devMode = true;
   }
 
-  if (args['path-environment']) {
+  if (args["path-environment"]) {
     // On Yosemite the $PATH is not inherited by the "open" command, so we have to
     // explicitly pass it by command line, see http://git.io/YC8_Ew.
-    process.env.PATH = args['path-environment'];
+    process.env.PATH = args["path-environment"];
   }
 
   return {
@@ -254,6 +218,6 @@ module.exports = function parseCommandLine(processArgs) {
     useCrashReporter,
     benchmark,
     benchmarkTest,
-    env: process.env
+    env: process.env,
   };
 };

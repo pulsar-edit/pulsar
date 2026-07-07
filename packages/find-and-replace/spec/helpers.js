@@ -15,7 +15,7 @@ function waitForCondition(fn) {
 }
 
 async function wait(ms) {
-  return new Promise(r => setTimeout(r, ms));
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 module.exports = { waitForCondition, wait };

@@ -1,11 +1,10 @@
-const fs = require('fs-plus');
+const fs = require("fs-plus");
 
-const Watcher = require('./watcher');
+const Watcher = require("./watcher");
 
 module.exports = class PackageWatcher extends Watcher {
   static supportsPackage(pack, type) {
-    if (pack.getType() === type && pack.getStylesheetPaths().length)
-      return true;
+    if (pack.getType() === type && pack.getStylesheetPaths().length) return true;
     return false;
   }
 
@@ -17,7 +16,7 @@ module.exports = class PackageWatcher extends Watcher {
 
   watch() {
     const watchedPaths = [];
-    const watchPath = stylesheet => {
+    const watchPath = (stylesheet) => {
       if (!watchedPaths.includes(stylesheet)) this.watchFile(stylesheet);
       watchedPaths.push(stylesheet);
     };
@@ -29,7 +28,7 @@ module.exports = class PackageWatcher extends Watcher {
     }
 
     const stylesheetPaths = new Set(this.pack.getStylesheetPaths());
-    const onFile = stylesheetPath => stylesheetPaths.add(stylesheetPath);
+    const onFile = (stylesheetPath) => stylesheetPaths.add(stylesheetPath);
     const onFolder = () => true;
     fs.traverseTreeSync(stylesheetsPath, onFile, onFolder);
 
@@ -39,12 +38,12 @@ module.exports = class PackageWatcher extends Watcher {
   }
 
   loadStylesheet(pathName) {
-    if (pathName.includes('variables')) this.emitGlobalsChanged();
+    if (pathName.includes("variables")) this.emitGlobalsChanged();
     this.loadAllStylesheets();
   }
 
   loadAllStylesheets() {
-    console.log('Reloading package', this.pack.name);
+    console.log("Reloading package", this.pack.name);
     this.pack.reloadStylesheets();
   }
 };

@@ -7,23 +7,28 @@
   }
 }
 
-atom-panel, .tool-panel {
+atom-panel,
+.tool-panel {
   .text(normal);
   position: relative;
 
   background-color: @tool-panel-background-color;
 
-  &.bottom, &.panel-bottom,
-  &.footer, &.panel-footer {
+  &.bottom,
+  &.panel-bottom,
+  &.footer,
+  &.panel-footer {
     border-top: 1px solid @tool-panel-border-color;
     box-shadow: inset 0 1px 0 @background-color-highlight;
   }
 
-  &.left, &.panel-left {
+  &.left,
+  &.panel-left {
     border-right: 1px solid @tool-panel-border-color;
   }
 
-  &.right, &.panel-right {
+  &.right,
+  &.panel-right {
     border-left: 1px solid @tool-panel-border-color;
   }
 }
@@ -46,7 +51,10 @@ atom-panel, .tool-panel {
   border-top: 1px solid fadein(@background-color-highlight, 10%);
 
   background-color: transparent;
-  background-image: -webkit-linear-gradient(@panel-heading-background-color, darken(@panel-heading-background-color, 10%));
+  background-image: -webkit-linear-gradient(
+    @panel-heading-background-color,
+    darken(@panel-heading-background-color, 10%)
+  );
 
   .btn {
     padding-left: 8px;

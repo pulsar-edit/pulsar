@@ -1,8 +1,8 @@
-const path = require('path');
-const fs = require('fs-plus');
-const _ = require('underscore-plus');
-const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const GitUtils = require('@pulsar-edit/git-utils');
+const path = require("path");
+const fs = require("fs-plus");
+const _ = require("underscore-plus");
+const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
+const GitUtils = require("@pulsar-edit/git-utils");
 
 let nextId = 0;
 
@@ -98,18 +98,16 @@ module.exports = class GitRepository {
         this.refreshStatus();
       };
 
-      window.addEventListener('focus', onWindowFocus);
+      window.addEventListener("focus", onWindowFocus);
       this.subscriptions.add(
-        new Disposable(() => window.removeEventListener('focus', onWindowFocus))
+        new Disposable(() => window.removeEventListener("focus", onWindowFocus)),
       );
     }
 
     if (this.project != null) {
-      this.project
-        .getBuffers()
-        .forEach(buffer => this.subscribeToBuffer(buffer));
+      this.project.getBuffers().forEach((buffer) => this.subscribeToBuffer(buffer));
       this.subscriptions.add(
-        this.project.onDidAddBuffer(buffer => this.subscribeToBuffer(buffer))
+        this.project.onDidAddBuffer((buffer) => this.subscribeToBuffer(buffer)),
       );
     }
   }
@@ -122,7 +120,7 @@ module.exports = class GitRepository {
     this.repo = null;
 
     if (this.emitter) {
-      this.emitter.emit('did-destroy');
+      this.emitter.emit("did-destroy");
       this.emitter.dispose();
       this.emitter = null;
     }
@@ -145,7 +143,7 @@ module.exports = class GitRepository {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy(callback) {
-    return this.emitter.once('did-destroy', callback);
+    return this.emitter.once("did-destroy", callback);
   }
 
   /*
@@ -164,7 +162,7 @@ module.exports = class GitRepository {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeStatus(callback) {
-    return this.emitter.on('did-change-status', callback);
+    return this.emitter.on("did-change-status", callback);
   }
 
   // Public: Invoke the given callback when a multiple files' statuses have
@@ -176,7 +174,7 @@ module.exports = class GitRepository {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeStatuses(callback) {
-    return this.emitter.on('did-change-statuses', callback);
+    return this.emitter.on("did-change-statuses", callback);
   }
 
   /*
@@ -188,7 +186,7 @@ module.exports = class GitRepository {
   //
   // Returns `"git"`.
   getType() {
-    return 'git';
+    return "git";
   }
 
   // Public: Returns the {String} path of the repository.
@@ -209,8 +207,7 @@ module.exports = class GitRepository {
   isProjectAtRoot() {
     if (this.projectAtRoot == null) {
       this.projectAtRoot =
-        this.project &&
-        this.project.relativize(this.getWorkingDirectory()) === '';
+        this.project && this.project.relativize(this.getWorkingDirectory()) === "";
     }
     return this.projectAtRoot;
   }
@@ -252,10 +249,7 @@ module.exports = class GitRepository {
       return true;
     } else {
       // Check if the filePath is a working directory in a repo that isn't the root.
-      return (
-        repo !== this.getRepo() &&
-        repo.relativize(path.join(filePath, 'dir')) === 'dir'
-      );
+      return repo !== this.getRepo() && repo.relativize(path.join(filePath, "dir")) === "dir";
     }
   }
 
@@ -296,7 +290,7 @@ module.exports = class GitRepository {
   // * `path` (optional) {String} path in the repository to get this information
   //   for, only needed if the repository has submodules.
   getOriginURL(path) {
-    return this.getConfigValue('remote.origin.url', path);
+    return this.getConfigValue("remote.origin.url", path);
   }
 
   // Public: Returns the upstream branch for the current HEAD, or null if there
@@ -397,7 +391,7 @@ module.exports = class GitRepository {
       delete this.statuses[relativePath];
     }
     if (currentPathStatus !== pathStatus) {
-      this.emitter.emit('did-change-status', { path, pathStatus });
+      this.emitter.emit("did-change-status", { path, pathStatus });
     }
 
     return pathStatus;
@@ -463,7 +457,7 @@ module.exports = class GitRepository {
   getLineDiffs(path, text) {
     // Ignore eol of line differences on windows so that files checked in as
     // LF don't report every line modified when the text contains CRLF endings.
-    const options = { ignoreEolWhitespace: process.platform === 'win32' };
+    const options = { ignoreEolWhitespace: process.platform === "win32" };
     const repo = this.getRepo(path);
     return repo.getLineDiffs(repo.relativize(path), text, options);
   }
@@ -523,7 +517,7 @@ module.exports = class GitRepository {
       buffer.onDidDestroy(() => {
         bufferSubscriptions.dispose();
         return this.subscriptions.remove(bufferSubscriptions);
-      })
+      }),
     );
     this.subscriptions.add(bufferSubscriptions);
   }
@@ -543,7 +537,7 @@ module.exports = class GitRepository {
     if (this.repo) {
       return this.repo.submoduleForPath(path) || this.repo;
     } else {
-      throw new Error('Repository has been destroyed');
+      throw new Error("Repository has been destroyed");
     }
   }
 
@@ -563,10 +557,8 @@ module.exports = class GitRepository {
       this.project &&
       this.project
         .getPaths()
-        .map(projectPath => this.relativize(projectPath))
-        .filter(
-          projectPath => projectPath.length > 0 && !path.isAbsolute(projectPath)
-        );
+        .map((projectPath) => this.relativize(projectPath))
+        .filter((projectPath) => projectPath.length > 0 && !path.isAbsolute(projectPath));
 
     const branch = await repo.getHeadAsync();
     const upstream = await repo.getAheadBehindCountAsync();
@@ -585,7 +577,7 @@ module.exports = class GitRepository {
       const submoduleRepo = repo.submodules[submodulePath];
       submodules[submodulePath] = {
         branch: await submoduleRepo.getHeadAsync(),
-        upstream: await submoduleRepo.getAheadBehindCountAsync()
+        upstream: await submoduleRepo.getAheadBehindCountAsync(),
       };
 
       const workingDirectoryPath = submoduleRepo.getWorkingDirectory();
@@ -597,8 +589,7 @@ module.exports = class GitRepository {
       }
     }
 
-    if (this.statusRefreshCount !== statusRefreshCount || this.isDestroyed())
-      return;
+    if (this.statusRefreshCount !== statusRefreshCount || this.isDestroyed()) return;
 
     const statusesUnchanged =
       _.isEqual(branch, this.branch) &&
@@ -612,10 +603,9 @@ module.exports = class GitRepository {
     this.submodules = submodules;
 
     for (let submodulePath in repo.submodules) {
-      repo.submodules[submodulePath].upstream =
-        submodules[submodulePath].upstream;
+      repo.submodules[submodulePath].upstream = submodules[submodulePath].upstream;
     }
 
-    if (!statusesUnchanged) this.emitter.emit('did-change-statuses');
+    if (!statusesUnchanged) this.emitter.emit("did-change-statuses");
   }
 };

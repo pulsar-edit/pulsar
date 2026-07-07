@@ -14,13 +14,13 @@ export async function conditionPromise(condition) {
     }
 
     if (now() - startTime > 5000) {
-      throw new Error('Timed out waiting on condition');
+      throw new Error("Timed out waiting on condition");
     }
   }
 }
 
 export function timeoutPromise(timeout) {
-  return new Promise(function(resolve) {
+  return new Promise(function (resolve) {
     setTimeout(resolve, timeout);
   });
 }

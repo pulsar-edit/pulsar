@@ -5,9 +5,11 @@
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
     margin: 0;
-    color: #1F2328;
+    color: #1f2328;
     background-color: #ffffff;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif,
+      "Apple Color Emoji", "Segoe UI Emoji";
     font-size: 16px;
     line-height: 1.5;
     word-wrap: break-word;
@@ -27,7 +29,7 @@
   .markdown-preview[data-use-github-style="auto"] h6:hover .anchor .octicon-link:before {
     width: 16px;
     height: 16px;
-    content: ' ';
+    content: " ";
     display: inline-block;
     background-color: currentColor;
     -webkit-mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' version='1.1' aria-hidden='true'><path fill-rule='evenodd' d='M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z'></path></svg>");
@@ -70,16 +72,16 @@
   }
 
   .markdown-preview[data-use-github-style="auto"] h1 {
-    margin: .67em 0;
+    margin: 0.67em 0;
     font-weight: 600;
-    padding-bottom: .3em;
+    padding-bottom: 0.3em;
     font-size: 2em;
-    border-bottom: 1px solid hsla(210,18%,87%,1);
+    border-bottom: 1px solid hsla(210, 18%, 87%, 1);
   }
 
   .markdown-preview[data-use-github-style="auto"] mark {
     background-color: #fff8c5;
-    color: #1F2328;
+    color: #1f2328;
   }
 
   .markdown-preview[data-use-github-style="auto"] small {
@@ -125,8 +127,8 @@
     box-sizing: content-box;
     overflow: hidden;
     background: transparent;
-    border-bottom: 1px solid hsla(210,18%,87%,1);
-    height: .25em;
+    border-bottom: 1px solid hsla(210, 18%, 87%, 1);
+    height: 0.25em;
     padding: 0;
     margin: 24px 0;
     background-color: #d0d7de;
@@ -142,33 +144,33 @@
     line-height: inherit;
   }
 
-  .markdown-preview[data-use-github-style="auto"] [type=button],
-  .markdown-preview[data-use-github-style="auto"] [type=reset],
-  .markdown-preview[data-use-github-style="auto"] [type=submit] {
+  .markdown-preview[data-use-github-style="auto"] [type="button"],
+  .markdown-preview[data-use-github-style="auto"] [type="reset"],
+  .markdown-preview[data-use-github-style="auto"] [type="submit"] {
     -webkit-appearance: button;
     appearance: button;
   }
 
-  .markdown-preview[data-use-github-style="auto"] [type=checkbox],
-  .markdown-preview[data-use-github-style="auto"] [type=radio] {
+  .markdown-preview[data-use-github-style="auto"] [type="checkbox"],
+  .markdown-preview[data-use-github-style="auto"] [type="radio"] {
     box-sizing: border-box;
     padding: 0;
   }
 
-  .markdown-preview[data-use-github-style="auto"] [type=number]::-webkit-inner-spin-button,
-  .markdown-preview[data-use-github-style="auto"] [type=number]::-webkit-outer-spin-button {
+  .markdown-preview[data-use-github-style="auto"] [type="number"]::-webkit-inner-spin-button,
+  .markdown-preview[data-use-github-style="auto"] [type="number"]::-webkit-outer-spin-button {
     height: auto;
   }
 
-  .markdown-preview[data-use-github-style="auto"] [type=search]::-webkit-search-cancel-button,
-  .markdown-preview[data-use-github-style="auto"] [type=search]::-webkit-search-decoration {
+  .markdown-preview[data-use-github-style="auto"] [type="search"]::-webkit-search-cancel-button,
+  .markdown-preview[data-use-github-style="auto"] [type="search"]::-webkit-search-decoration {
     -webkit-appearance: none;
     appearance: none;
   }
 
   .markdown-preview[data-use-github-style="auto"] ::-webkit-input-placeholder {
     color: inherit;
-    opacity: .54;
+    opacity: 0.54;
   }
 
   .markdown-preview[data-use-github-style="auto"] ::-webkit-file-upload-button {
@@ -215,30 +217,30 @@
     cursor: pointer;
   }
 
-  .markdown-preview[data-use-github-style="auto"] details:not([open])>*:not(summary) {
+  .markdown-preview[data-use-github-style="auto"] details:not([open]) > *:not(summary) {
     display: none !important;
   }
 
   .markdown-preview[data-use-github-style="auto"] a:focus,
-  .markdown-preview[data-use-github-style="auto"] [role=button]:focus,
-  .markdown-preview[data-use-github-style="auto"] input[type=radio]:focus,
-  .markdown-preview[data-use-github-style="auto"] input[type=checkbox]:focus {
+  .markdown-preview[data-use-github-style="auto"] [role="button"]:focus,
+  .markdown-preview[data-use-github-style="auto"] input[type="radio"]:focus,
+  .markdown-preview[data-use-github-style="auto"] input[type="checkbox"]:focus {
     outline: 2px solid #0969da;
     outline-offset: -2px;
     box-shadow: none;
   }
 
   .markdown-preview[data-use-github-style="auto"] a:focus:not(:focus-visible),
-  .markdown-preview[data-use-github-style="auto"] [role=button]:focus:not(:focus-visible),
-  .markdown-preview[data-use-github-style="auto"] input[type=radio]:focus:not(:focus-visible),
-  .markdown-preview[data-use-github-style="auto"] input[type=checkbox]:focus:not(:focus-visible) {
+  .markdown-preview[data-use-github-style="auto"] [role="button"]:focus:not(:focus-visible),
+  .markdown-preview[data-use-github-style="auto"] input[type="radio"]:focus:not(:focus-visible),
+  .markdown-preview[data-use-github-style="auto"] input[type="checkbox"]:focus:not(:focus-visible) {
     outline: solid 1px transparent;
   }
 
   .markdown-preview[data-use-github-style="auto"] a:focus-visible,
-  .markdown-preview[data-use-github-style="auto"] [role=button]:focus-visible,
-  .markdown-preview[data-use-github-style="auto"] input[type=radio]:focus-visible,
-  .markdown-preview[data-use-github-style="auto"] input[type=checkbox]:focus-visible {
+  .markdown-preview[data-use-github-style="auto"] [role="button"]:focus-visible,
+  .markdown-preview[data-use-github-style="auto"] input[type="radio"]:focus-visible,
+  .markdown-preview[data-use-github-style="auto"] input[type="checkbox"]:focus-visible {
     outline: 2px solid #0969da;
     outline-offset: -2px;
     box-shadow: none;
@@ -246,25 +248,32 @@
 
   .markdown-preview[data-use-github-style="auto"] a:not([class]):focus,
   .markdown-preview[data-use-github-style="auto"] a:not([class]):focus-visible,
-  .markdown-preview[data-use-github-style="auto"] input[type=radio]:focus,
-  .markdown-preview[data-use-github-style="auto"] input[type=radio]:focus-visible,
-  .markdown-preview[data-use-github-style="auto"] input[type=checkbox]:focus,
-  .markdown-preview[data-use-github-style="auto"] input[type=checkbox]:focus-visible {
+  .markdown-preview[data-use-github-style="auto"] input[type="radio"]:focus,
+  .markdown-preview[data-use-github-style="auto"] input[type="radio"]:focus-visible,
+  .markdown-preview[data-use-github-style="auto"] input[type="checkbox"]:focus,
+  .markdown-preview[data-use-github-style="auto"] input[type="checkbox"]:focus-visible {
     outline-offset: 0;
   }
 
   .markdown-preview[data-use-github-style="auto"] kbd {
     display: inline-block;
     padding: 3px 5px;
-    font: 11px ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+    font:
+      11px ui-monospace,
+      SFMono-Regular,
+      SF Mono,
+      Menlo,
+      Consolas,
+      Liberation Mono,
+      monospace;
     line-height: 10px;
-    color: #1F2328;
+    color: #1f2328;
     vertical-align: middle;
     background-color: #f6f8fa;
-    border: solid 1px rgba(175,184,193,0.2);
-    border-bottom-color: rgba(175,184,193,0.2);
+    border: solid 1px rgba(175, 184, 193, 0.2);
+    border-bottom-color: rgba(175, 184, 193, 0.2);
     border-radius: 6px;
-    box-shadow: inset 0 -1px 0 rgba(175,184,193,0.2);
+    box-shadow: inset 0 -1px 0 rgba(175, 184, 193, 0.2);
   }
 
   .markdown-preview[data-use-github-style="auto"] h1,
@@ -281,9 +290,9 @@
 
   .markdown-preview[data-use-github-style="auto"] h2 {
     font-weight: 600;
-    padding-bottom: .3em;
+    padding-bottom: 0.3em;
     font-size: 1.5em;
-    border-bottom: 1px solid hsla(210,18%,87%,1);
+    border-bottom: 1px solid hsla(210, 18%, 87%, 1);
   }
 
   .markdown-preview[data-use-github-style="auto"] h3 {
@@ -298,12 +307,12 @@
 
   .markdown-preview[data-use-github-style="auto"] h5 {
     font-weight: 600;
-    font-size: .875em;
+    font-size: 0.875em;
   }
 
   .markdown-preview[data-use-github-style="auto"] h6 {
     font-weight: 600;
-    font-size: .85em;
+    font-size: 0.85em;
     color: #656d76;
   }
 
@@ -316,7 +325,7 @@
     margin: 0;
     padding: 0 1em;
     color: #656d76;
-    border-left: .25em solid #d0d7de;
+    border-left: 0.25em solid #d0d7de;
   }
 
   .markdown-preview[data-use-github-style="auto"] ul,
@@ -345,14 +354,28 @@
   .markdown-preview[data-use-github-style="auto"] tt,
   .markdown-preview[data-use-github-style="auto"] code,
   .markdown-preview[data-use-github-style="auto"] samp {
-    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      SF Mono,
+      Menlo,
+      Consolas,
+      Liberation Mono,
+      monospace;
     font-size: 12px;
   }
 
   .markdown-preview[data-use-github-style="auto"] pre {
     margin-top: 0;
     margin-bottom: 0;
-    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      SF Mono,
+      Menlo,
+      Consolas,
+      Liberation Mono,
+      monospace;
     font-size: 12px;
     word-wrap: normal;
   }
@@ -386,11 +409,11 @@
     content: "";
   }
 
-  .markdown-preview[data-use-github-style="auto"]>*:first-child {
+  .markdown-preview[data-use-github-style="auto"] > *:first-child {
     margin-top: 0 !important;
   }
 
-  .markdown-preview[data-use-github-style="auto"]>*:last-child {
+  .markdown-preview[data-use-github-style="auto"] > *:last-child {
     margin-bottom: 0 !important;
   }
 
@@ -426,11 +449,11 @@
     margin-bottom: 16px;
   }
 
-  .markdown-preview[data-use-github-style="auto"] blockquote>:first-child {
+  .markdown-preview[data-use-github-style="auto"] blockquote > :first-child {
     margin-top: 0;
   }
 
-  .markdown-preview[data-use-github-style="auto"] blockquote>:last-child {
+  .markdown-preview[data-use-github-style="auto"] blockquote > :last-child {
     margin-bottom: 0;
   }
 
@@ -440,7 +463,7 @@
   .markdown-preview[data-use-github-style="auto"] h4 .octicon-link,
   .markdown-preview[data-use-github-style="auto"] h5 .octicon-link,
   .markdown-preview[data-use-github-style="auto"] h6 .octicon-link {
-    color: #1F2328;
+    color: #1f2328;
     vertical-align: middle;
     visibility: hidden;
   }
@@ -475,7 +498,7 @@
   .markdown-preview[data-use-github-style="auto"] h5 code,
   .markdown-preview[data-use-github-style="auto"] h6 tt,
   .markdown-preview[data-use-github-style="auto"] h6 code {
-    padding: 0 .2em;
+    padding: 0 0.2em;
     font-size: inherit;
   }
 
@@ -529,7 +552,7 @@
     list-style-type: decimal;
   }
 
-  .markdown-preview[data-use-github-style="auto"] div>ol:not([type]) {
+  .markdown-preview[data-use-github-style="auto"] div > ol:not([type]) {
     list-style-type: decimal;
   }
 
@@ -541,12 +564,12 @@
     margin-bottom: 0;
   }
 
-  .markdown-preview[data-use-github-style="auto"] li>p {
+  .markdown-preview[data-use-github-style="auto"] li > p {
     margin-top: 16px;
   }
 
-  .markdown-preview[data-use-github-style="auto"] li+li {
-    margin-top: .25em;
+  .markdown-preview[data-use-github-style="auto"] li + li {
+    margin-top: 0.25em;
   }
 
   .markdown-preview[data-use-github-style="auto"] dl {
@@ -576,13 +599,13 @@
     border: 1px solid #d0d7de;
   }
 
-  .markdown-preview[data-use-github-style="auto"] table td>:last-child {
+  .markdown-preview[data-use-github-style="auto"] table td > :last-child {
     margin-bottom: 0;
   }
 
   .markdown-preview[data-use-github-style="auto"] table tr {
     background-color: #ffffff;
-    border-top: 1px solid hsla(210,18%,87%,1);
+    border-top: 1px solid hsla(210, 18%, 87%, 1);
   }
 
   .markdown-preview[data-use-github-style="auto"] table tr:nth-child(2n) {
@@ -593,11 +616,11 @@
     background-color: transparent;
   }
 
-  .markdown-preview[data-use-github-style="auto"] img[align=right] {
+  .markdown-preview[data-use-github-style="auto"] img[align="right"] {
     padding-left: 20px;
   }
 
-  .markdown-preview[data-use-github-style="auto"] img[align=left] {
+  .markdown-preview[data-use-github-style="auto"] img[align="left"] {
     padding-right: 20px;
   }
 
@@ -612,7 +635,7 @@
     overflow: hidden;
   }
 
-  .markdown-preview[data-use-github-style="auto"] span.frame>span {
+  .markdown-preview[data-use-github-style="auto"] span.frame > span {
     display: block;
     float: left;
     width: auto;
@@ -631,7 +654,7 @@
     display: block;
     padding: 5px 0 0;
     clear: both;
-    color: #1F2328;
+    color: #1f2328;
   }
 
   .markdown-preview[data-use-github-style="auto"] span.align-center {
@@ -640,7 +663,7 @@
     clear: both;
   }
 
-  .markdown-preview[data-use-github-style="auto"] span.align-center>span {
+  .markdown-preview[data-use-github-style="auto"] span.align-center > span {
     display: block;
     margin: 13px auto 0;
     overflow: hidden;
@@ -658,7 +681,7 @@
     clear: both;
   }
 
-  .markdown-preview[data-use-github-style="auto"] span.align-right>span {
+  .markdown-preview[data-use-github-style="auto"] span.align-right > span {
     display: block;
     margin: 13px 0 0;
     overflow: hidden;
@@ -688,7 +711,7 @@
     overflow: hidden;
   }
 
-  .markdown-preview[data-use-github-style="auto"] span.float-right>span {
+  .markdown-preview[data-use-github-style="auto"] span.float-right > span {
     display: block;
     margin: 13px auto 0;
     overflow: hidden;
@@ -697,11 +720,11 @@
 
   .markdown-preview[data-use-github-style="auto"] code,
   .markdown-preview[data-use-github-style="auto"] tt {
-    padding: .2em .4em;
+    padding: 0.2em 0.4em;
     margin: 0;
     font-size: 85%;
     white-space: break-spaces;
-    background-color: rgba(175,184,193,0.2);
+    background-color: rgba(175, 184, 193, 0.2);
     border-radius: 6px;
   }
 
@@ -722,7 +745,7 @@
     font-size: 100%;
   }
 
-  .markdown-preview[data-use-github-style="auto"] pre>code {
+  .markdown-preview[data-use-github-style="auto"] pre > code {
     padding: 0;
     margin: 0;
     word-break: normal;
@@ -746,7 +769,7 @@
     overflow: auto;
     font-size: 85%;
     line-height: 1.45;
-    color: #1F2328;
+    color: #1f2328;
     background-color: #f6f8fa;
     border-radius: 6px;
   }
@@ -832,7 +855,7 @@
   }
 
   .markdown-preview[data-use-github-style="auto"] .footnotes li:target {
-    color: #1F2328;
+    color: #1f2328;
   }
 
   .markdown-preview[data-use-github-style="auto"] .footnotes .data-footnote-backref g-emoji {
@@ -962,7 +985,7 @@
   .markdown-preview[data-use-github-style="auto"] g-emoji {
     display: inline-block;
     min-width: 1ch;
-    font-family: "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-size: 1em;
     font-style: normal !important;
     font-weight: 400;
@@ -987,7 +1010,7 @@
     cursor: pointer;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .task-list-item+.task-list-item {
+  .markdown-preview[data-use-github-style="auto"] .task-list-item + .task-list-item {
     margin-top: 4px;
   }
 
@@ -996,20 +1019,26 @@
   }
 
   .markdown-preview[data-use-github-style="auto"] .task-list-item-checkbox {
-    margin: 0 .2em .25em -1.4em;
+    margin: 0 0.2em 0.25em -1.4em;
     vertical-align: middle;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .contains-task-list:dir(rtl) .task-list-item-checkbox {
-    margin: 0 -1.6em .25em .2em;
+  .markdown-preview[data-use-github-style="auto"]
+    .contains-task-list:dir(rtl)
+    .task-list-item-checkbox {
+    margin: 0 -1.6em 0.25em 0.2em;
   }
 
   .markdown-preview[data-use-github-style="auto"] .contains-task-list {
     position: relative;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .contains-task-list:hover .task-list-item-convert-container,
-  .markdown-preview[data-use-github-style="auto"] .contains-task-list:focus-within .task-list-item-convert-container {
+  .markdown-preview[data-use-github-style="auto"]
+    .contains-task-list:hover
+    .task-list-item-convert-container,
+  .markdown-preview[data-use-github-style="auto"]
+    .contains-task-list:focus-within
+    .task-list-item-convert-container {
     display: block;
     width: auto;
     height: 24px;
@@ -1025,14 +1054,14 @@
     padding: 8px 16px;
     margin-bottom: 16px;
     color: inherit;
-    border-left: .25em solid #d0d7de;
+    border-left: 0.25em solid #d0d7de;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert>:first-child {
+  .markdown-preview[data-use-github-style="auto"] .markdown-alert > :first-child {
     margin-top: 0;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert>:last-child {
+  .markdown-preview[data-use-github-style="auto"] .markdown-alert > :last-child {
     margin-bottom: 0;
   }
 
@@ -1047,7 +1076,9 @@
     border-left-color: #0969da;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-note .markdown-alert-title {
+  .markdown-preview[data-use-github-style="auto"]
+    .markdown-alert.markdown-alert-note
+    .markdown-alert-title {
     color: #0969da;
   }
 
@@ -1055,7 +1086,9 @@
     border-left-color: #8250df;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-important .markdown-alert-title {
+  .markdown-preview[data-use-github-style="auto"]
+    .markdown-alert.markdown-alert-important
+    .markdown-alert-title {
     color: #8250df;
   }
 
@@ -1063,7 +1096,9 @@
     border-left-color: #9a6700;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-warning .markdown-alert-title {
+  .markdown-preview[data-use-github-style="auto"]
+    .markdown-alert.markdown-alert-warning
+    .markdown-alert-title {
     color: #9a6700;
   }
 
@@ -1071,7 +1106,9 @@
     border-left-color: #1f883d;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-tip .markdown-alert-title {
+  .markdown-preview[data-use-github-style="auto"]
+    .markdown-alert.markdown-alert-tip
+    .markdown-alert-title {
     color: #1a7f37;
   }
 
@@ -1079,10 +1116,11 @@
     border-left-color: #cf222e;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-caution .markdown-alert-title {
+  .markdown-preview[data-use-github-style="auto"]
+    .markdown-alert.markdown-alert-caution
+    .markdown-alert-title {
     color: #d1242f;
   }
-
 }
 @media (prefers-color-scheme: dark) {
   /*dark*/
@@ -1094,7 +1132,9 @@
     margin: 0;
     color: #e6edf3;
     background-color: #0d1117;
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif,
+      "Apple Color Emoji", "Segoe UI Emoji";
     font-size: 16px;
     line-height: 1.5;
     word-wrap: break-word;
@@ -1114,7 +1154,7 @@
   .markdown-preview[data-use-github-style="auto"] h6:hover .anchor .octicon-link:before {
     width: 16px;
     height: 16px;
-    content: ' ';
+    content: " ";
     display: inline-block;
     background-color: currentColor;
     -webkit-mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' version='1.1' aria-hidden='true'><path fill-rule='evenodd' d='M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z'></path></svg>");
@@ -1157,15 +1197,15 @@
   }
 
   .markdown-preview[data-use-github-style="auto"] h1 {
-    margin: .67em 0;
+    margin: 0.67em 0;
     font-weight: 600;
-    padding-bottom: .3em;
+    padding-bottom: 0.3em;
     font-size: 2em;
     border-bottom: 1px solid #21262d;
   }
 
   .markdown-preview[data-use-github-style="auto"] mark {
-    background-color: rgba(187,128,9,0.15);
+    background-color: rgba(187, 128, 9, 0.15);
     color: #e6edf3;
   }
 
@@ -1213,7 +1253,7 @@
     overflow: hidden;
     background: transparent;
     border-bottom: 1px solid #21262d;
-    height: .25em;
+    height: 0.25em;
     padding: 0;
     margin: 24px 0;
     background-color: #30363d;
@@ -1229,33 +1269,33 @@
     line-height: inherit;
   }
 
-  .markdown-preview[data-use-github-style="auto"] [type=button],
-  .markdown-preview[data-use-github-style="auto"] [type=reset],
-  .markdown-preview[data-use-github-style="auto"] [type=submit] {
+  .markdown-preview[data-use-github-style="auto"] [type="button"],
+  .markdown-preview[data-use-github-style="auto"] [type="reset"],
+  .markdown-preview[data-use-github-style="auto"] [type="submit"] {
     -webkit-appearance: button;
     appearance: button;
   }
 
-  .markdown-preview[data-use-github-style="auto"] [type=checkbox],
-  .markdown-preview[data-use-github-style="auto"] [type=radio] {
+  .markdown-preview[data-use-github-style="auto"] [type="checkbox"],
+  .markdown-preview[data-use-github-style="auto"] [type="radio"] {
     box-sizing: border-box;
     padding: 0;
   }
 
-  .markdown-preview[data-use-github-style="auto"] [type=number]::-webkit-inner-spin-button,
-  .markdown-preview[data-use-github-style="auto"] [type=number]::-webkit-outer-spin-button {
+  .markdown-preview[data-use-github-style="auto"] [type="number"]::-webkit-inner-spin-button,
+  .markdown-preview[data-use-github-style="auto"] [type="number"]::-webkit-outer-spin-button {
     height: auto;
   }
 
-  .markdown-preview[data-use-github-style="auto"] [type=search]::-webkit-search-cancel-button,
-  .markdown-preview[data-use-github-style="auto"] [type=search]::-webkit-search-decoration {
+  .markdown-preview[data-use-github-style="auto"] [type="search"]::-webkit-search-cancel-button,
+  .markdown-preview[data-use-github-style="auto"] [type="search"]::-webkit-search-decoration {
     -webkit-appearance: none;
     appearance: none;
   }
 
   .markdown-preview[data-use-github-style="auto"] ::-webkit-input-placeholder {
     color: inherit;
-    opacity: .54;
+    opacity: 0.54;
   }
 
   .markdown-preview[data-use-github-style="auto"] ::-webkit-file-upload-button {
@@ -1302,30 +1342,30 @@
     cursor: pointer;
   }
 
-  .markdown-preview[data-use-github-style="auto"] details:not([open])>*:not(summary) {
+  .markdown-preview[data-use-github-style="auto"] details:not([open]) > *:not(summary) {
     display: none !important;
   }
 
   .markdown-preview[data-use-github-style="auto"] a:focus,
-  .markdown-preview[data-use-github-style="auto"] [role=button]:focus,
-  .markdown-preview[data-use-github-style="auto"] input[type=radio]:focus,
-  .markdown-preview[data-use-github-style="auto"] input[type=checkbox]:focus {
+  .markdown-preview[data-use-github-style="auto"] [role="button"]:focus,
+  .markdown-preview[data-use-github-style="auto"] input[type="radio"]:focus,
+  .markdown-preview[data-use-github-style="auto"] input[type="checkbox"]:focus {
     outline: 2px solid #2f81f7;
     outline-offset: -2px;
     box-shadow: none;
   }
 
   .markdown-preview[data-use-github-style="auto"] a:focus:not(:focus-visible),
-  .markdown-preview[data-use-github-style="auto"] [role=button]:focus:not(:focus-visible),
-  .markdown-preview[data-use-github-style="auto"] input[type=radio]:focus:not(:focus-visible),
-  .markdown-preview[data-use-github-style="auto"] input[type=checkbox]:focus:not(:focus-visible) {
+  .markdown-preview[data-use-github-style="auto"] [role="button"]:focus:not(:focus-visible),
+  .markdown-preview[data-use-github-style="auto"] input[type="radio"]:focus:not(:focus-visible),
+  .markdown-preview[data-use-github-style="auto"] input[type="checkbox"]:focus:not(:focus-visible) {
     outline: solid 1px transparent;
   }
 
   .markdown-preview[data-use-github-style="auto"] a:focus-visible,
-  .markdown-preview[data-use-github-style="auto"] [role=button]:focus-visible,
-  .markdown-preview[data-use-github-style="auto"] input[type=radio]:focus-visible,
-  .markdown-preview[data-use-github-style="auto"] input[type=checkbox]:focus-visible {
+  .markdown-preview[data-use-github-style="auto"] [role="button"]:focus-visible,
+  .markdown-preview[data-use-github-style="auto"] input[type="radio"]:focus-visible,
+  .markdown-preview[data-use-github-style="auto"] input[type="checkbox"]:focus-visible {
     outline: 2px solid #2f81f7;
     outline-offset: -2px;
     box-shadow: none;
@@ -1333,25 +1373,32 @@
 
   .markdown-preview[data-use-github-style="auto"] a:not([class]):focus,
   .markdown-preview[data-use-github-style="auto"] a:not([class]):focus-visible,
-  .markdown-preview[data-use-github-style="auto"] input[type=radio]:focus,
-  .markdown-preview[data-use-github-style="auto"] input[type=radio]:focus-visible,
-  .markdown-preview[data-use-github-style="auto"] input[type=checkbox]:focus,
-  .markdown-preview[data-use-github-style="auto"] input[type=checkbox]:focus-visible {
+  .markdown-preview[data-use-github-style="auto"] input[type="radio"]:focus,
+  .markdown-preview[data-use-github-style="auto"] input[type="radio"]:focus-visible,
+  .markdown-preview[data-use-github-style="auto"] input[type="checkbox"]:focus,
+  .markdown-preview[data-use-github-style="auto"] input[type="checkbox"]:focus-visible {
     outline-offset: 0;
   }
 
   .markdown-preview[data-use-github-style="auto"] kbd {
     display: inline-block;
     padding: 3px 5px;
-    font: 11px ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+    font:
+      11px ui-monospace,
+      SFMono-Regular,
+      SF Mono,
+      Menlo,
+      Consolas,
+      Liberation Mono,
+      monospace;
     line-height: 10px;
     color: #e6edf3;
     vertical-align: middle;
     background-color: #161b22;
-    border: solid 1px rgba(110,118,129,0.4);
-    border-bottom-color: rgba(110,118,129,0.4);
+    border: solid 1px rgba(110, 118, 129, 0.4);
+    border-bottom-color: rgba(110, 118, 129, 0.4);
     border-radius: 6px;
-    box-shadow: inset 0 -1px 0 rgba(110,118,129,0.4);
+    box-shadow: inset 0 -1px 0 rgba(110, 118, 129, 0.4);
   }
 
   .markdown-preview[data-use-github-style="auto"] h1,
@@ -1368,7 +1415,7 @@
 
   .markdown-preview[data-use-github-style="auto"] h2 {
     font-weight: 600;
-    padding-bottom: .3em;
+    padding-bottom: 0.3em;
     font-size: 1.5em;
     border-bottom: 1px solid #21262d;
   }
@@ -1385,12 +1432,12 @@
 
   .markdown-preview[data-use-github-style="auto"] h5 {
     font-weight: 600;
-    font-size: .875em;
+    font-size: 0.875em;
   }
 
   .markdown-preview[data-use-github-style="auto"] h6 {
     font-weight: 600;
-    font-size: .85em;
+    font-size: 0.85em;
     color: #848d97;
   }
 
@@ -1403,7 +1450,7 @@
     margin: 0;
     padding: 0 1em;
     color: #848d97;
-    border-left: .25em solid #30363d;
+    border-left: 0.25em solid #30363d;
   }
 
   .markdown-preview[data-use-github-style="auto"] ul,
@@ -1432,14 +1479,28 @@
   .markdown-preview[data-use-github-style="auto"] tt,
   .markdown-preview[data-use-github-style="auto"] code,
   .markdown-preview[data-use-github-style="auto"] samp {
-    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      SF Mono,
+      Menlo,
+      Consolas,
+      Liberation Mono,
+      monospace;
     font-size: 12px;
   }
 
   .markdown-preview[data-use-github-style="auto"] pre {
     margin-top: 0;
     margin-bottom: 0;
-    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      SF Mono,
+      Menlo,
+      Consolas,
+      Liberation Mono,
+      monospace;
     font-size: 12px;
     word-wrap: normal;
   }
@@ -1473,11 +1534,11 @@
     content: "";
   }
 
-  .markdown-preview[data-use-github-style="auto"]>*:first-child {
+  .markdown-preview[data-use-github-style="auto"] > *:first-child {
     margin-top: 0 !important;
   }
 
-  .markdown-preview[data-use-github-style="auto"]>*:last-child {
+  .markdown-preview[data-use-github-style="auto"] > *:last-child {
     margin-bottom: 0 !important;
   }
 
@@ -1513,11 +1574,11 @@
     margin-bottom: 16px;
   }
 
-  .markdown-preview[data-use-github-style="auto"] blockquote>:first-child {
+  .markdown-preview[data-use-github-style="auto"] blockquote > :first-child {
     margin-top: 0;
   }
 
-  .markdown-preview[data-use-github-style="auto"] blockquote>:last-child {
+  .markdown-preview[data-use-github-style="auto"] blockquote > :last-child {
     margin-bottom: 0;
   }
 
@@ -1562,7 +1623,7 @@
   .markdown-preview[data-use-github-style="auto"] h5 code,
   .markdown-preview[data-use-github-style="auto"] h6 tt,
   .markdown-preview[data-use-github-style="auto"] h6 code {
-    padding: 0 .2em;
+    padding: 0 0.2em;
     font-size: inherit;
   }
 
@@ -1616,7 +1677,7 @@
     list-style-type: decimal;
   }
 
-  .markdown-preview[data-use-github-style="auto"] div>ol:not([type]) {
+  .markdown-preview[data-use-github-style="auto"] div > ol:not([type]) {
     list-style-type: decimal;
   }
 
@@ -1628,12 +1689,12 @@
     margin-bottom: 0;
   }
 
-  .markdown-preview[data-use-github-style="auto"] li>p {
+  .markdown-preview[data-use-github-style="auto"] li > p {
     margin-top: 16px;
   }
 
-  .markdown-preview[data-use-github-style="auto"] li+li {
-    margin-top: .25em;
+  .markdown-preview[data-use-github-style="auto"] li + li {
+    margin-top: 0.25em;
   }
 
   .markdown-preview[data-use-github-style="auto"] dl {
@@ -1663,7 +1724,7 @@
     border: 1px solid #30363d;
   }
 
-  .markdown-preview[data-use-github-style="auto"] table td>:last-child {
+  .markdown-preview[data-use-github-style="auto"] table td > :last-child {
     margin-bottom: 0;
   }
 
@@ -1680,11 +1741,11 @@
     background-color: transparent;
   }
 
-  .markdown-preview[data-use-github-style="auto"] img[align=right] {
+  .markdown-preview[data-use-github-style="auto"] img[align="right"] {
     padding-left: 20px;
   }
 
-  .markdown-preview[data-use-github-style="auto"] img[align=left] {
+  .markdown-preview[data-use-github-style="auto"] img[align="left"] {
     padding-right: 20px;
   }
 
@@ -1699,7 +1760,7 @@
     overflow: hidden;
   }
 
-  .markdown-preview[data-use-github-style="auto"] span.frame>span {
+  .markdown-preview[data-use-github-style="auto"] span.frame > span {
     display: block;
     float: left;
     width: auto;
@@ -1727,7 +1788,7 @@
     clear: both;
   }
 
-  .markdown-preview[data-use-github-style="auto"] span.align-center>span {
+  .markdown-preview[data-use-github-style="auto"] span.align-center > span {
     display: block;
     margin: 13px auto 0;
     overflow: hidden;
@@ -1745,7 +1806,7 @@
     clear: both;
   }
 
-  .markdown-preview[data-use-github-style="auto"] span.align-right>span {
+  .markdown-preview[data-use-github-style="auto"] span.align-right > span {
     display: block;
     margin: 13px 0 0;
     overflow: hidden;
@@ -1775,7 +1836,7 @@
     overflow: hidden;
   }
 
-  .markdown-preview[data-use-github-style="auto"] span.float-right>span {
+  .markdown-preview[data-use-github-style="auto"] span.float-right > span {
     display: block;
     margin: 13px auto 0;
     overflow: hidden;
@@ -1784,11 +1845,11 @@
 
   .markdown-preview[data-use-github-style="auto"] code,
   .markdown-preview[data-use-github-style="auto"] tt {
-    padding: .2em .4em;
+    padding: 0.2em 0.4em;
     margin: 0;
     font-size: 85%;
     white-space: break-spaces;
-    background-color: rgba(110,118,129,0.4);
+    background-color: rgba(110, 118, 129, 0.4);
     border-radius: 6px;
   }
 
@@ -1809,7 +1870,7 @@
     font-size: 100%;
   }
 
-  .markdown-preview[data-use-github-style="auto"] pre>code {
+  .markdown-preview[data-use-github-style="auto"] pre > code {
     padding: 0;
     margin: 0;
     word-break: normal;
@@ -2049,7 +2110,7 @@
   .markdown-preview[data-use-github-style="auto"] g-emoji {
     display: inline-block;
     min-width: 1ch;
-    font-family: "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-size: 1em;
     font-style: normal !important;
     font-weight: 400;
@@ -2074,7 +2135,7 @@
     cursor: pointer;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .task-list-item+.task-list-item {
+  .markdown-preview[data-use-github-style="auto"] .task-list-item + .task-list-item {
     margin-top: 4px;
   }
 
@@ -2083,20 +2144,26 @@
   }
 
   .markdown-preview[data-use-github-style="auto"] .task-list-item-checkbox {
-    margin: 0 .2em .25em -1.4em;
+    margin: 0 0.2em 0.25em -1.4em;
     vertical-align: middle;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .contains-task-list:dir(rtl) .task-list-item-checkbox {
-    margin: 0 -1.6em .25em .2em;
+  .markdown-preview[data-use-github-style="auto"]
+    .contains-task-list:dir(rtl)
+    .task-list-item-checkbox {
+    margin: 0 -1.6em 0.25em 0.2em;
   }
 
   .markdown-preview[data-use-github-style="auto"] .contains-task-list {
     position: relative;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .contains-task-list:hover .task-list-item-convert-container,
-  .markdown-preview[data-use-github-style="auto"] .contains-task-list:focus-within .task-list-item-convert-container {
+  .markdown-preview[data-use-github-style="auto"]
+    .contains-task-list:hover
+    .task-list-item-convert-container,
+  .markdown-preview[data-use-github-style="auto"]
+    .contains-task-list:focus-within
+    .task-list-item-convert-container {
     display: block;
     width: auto;
     height: 24px;
@@ -2112,14 +2179,14 @@
     padding: 8px 16px;
     margin-bottom: 16px;
     color: inherit;
-    border-left: .25em solid #30363d;
+    border-left: 0.25em solid #30363d;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert>:first-child {
+  .markdown-preview[data-use-github-style="auto"] .markdown-alert > :first-child {
     margin-top: 0;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert>:last-child {
+  .markdown-preview[data-use-github-style="auto"] .markdown-alert > :last-child {
     margin-bottom: 0;
   }
 
@@ -2134,7 +2201,9 @@
     border-left-color: #1f6feb;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-note .markdown-alert-title {
+  .markdown-preview[data-use-github-style="auto"]
+    .markdown-alert.markdown-alert-note
+    .markdown-alert-title {
     color: #2f81f7;
   }
 
@@ -2142,7 +2211,9 @@
     border-left-color: #8957e5;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-important .markdown-alert-title {
+  .markdown-preview[data-use-github-style="auto"]
+    .markdown-alert.markdown-alert-important
+    .markdown-alert-title {
     color: #a371f7;
   }
 
@@ -2150,15 +2221,19 @@
     border-left-color: #9e6a03;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-warning .markdown-alert-title {
+  .markdown-preview[data-use-github-style="auto"]
+    .markdown-alert.markdown-alert-warning
+    .markdown-alert-title {
     color: #d29922;
   }
-  
+
   .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-tip {
     border-left-color: #238636;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-tip .markdown-alert-title {
+  .markdown-preview[data-use-github-style="auto"]
+    .markdown-alert.markdown-alert-tip
+    .markdown-alert-title {
     color: #3fb950;
   }
 
@@ -2166,8 +2241,9 @@
     border-left-color: #da3633;
   }
 
-  .markdown-preview[data-use-github-style="auto"] .markdown-alert.markdown-alert-caution .markdown-alert-title {
+  .markdown-preview[data-use-github-style="auto"]
+    .markdown-alert.markdown-alert-caution
+    .markdown-alert-title {
     color: #f85149;
   }
-
 }

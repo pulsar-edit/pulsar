@@ -1,8 +1,8 @@
-const { ipcRenderer, shell } = require('electron');
-const remote = require('@electron/remote');
-const ipcHelpers = require('./ipc-helpers');
-const { Emitter, Disposable } = require('event-kit');
-const getWindowLoadSettings = require('./get-window-load-settings');
+const { ipcRenderer, shell } = require("electron");
+const remote = require("@electron/remote");
+const ipcHelpers = require("./ipc-helpers");
+const { Emitter, Disposable } = require("event-kit");
+const getWindowLoadSettings = require("./get-window-load-settings");
 
 module.exports = class ApplicationDelegate {
   constructor() {
@@ -13,7 +13,7 @@ module.exports = class ApplicationDelegate {
   ipcMessageEmitter() {
     if (!this._ipcMessageEmitter) {
       this._ipcMessageEmitter = new Emitter();
-      ipcRenderer.on('message', (event, message, detail) => {
+      ipcRenderer.on("message", (event, message, detail) => {
         this._ipcMessageEmitter.emit(message, detail);
       });
     }
@@ -25,20 +25,20 @@ module.exports = class ApplicationDelegate {
   }
 
   open(params) {
-    return ipcRenderer.send('open', params);
+    return ipcRenderer.send("open", params);
   }
 
   setWindowTheme(params) {
-    return ipcRenderer.send('setWindowTheme', params);
+    return ipcRenderer.send("setWindowTheme", params);
   }
 
   pickFolder(callback) {
-    const responseChannel = 'atom-pick-folder-response';
+    const responseChannel = "atom-pick-folder-response";
     ipcRenderer.on(responseChannel, function (event, path) {
       ipcRenderer.removeAllListeners(responseChannel);
       return callback(path);
     });
-    return ipcRenderer.send('pick-folder', responseChannel);
+    return ipcRenderer.send("pick-folder", responseChannel);
   }
 
   getCurrentWindow() {
@@ -46,16 +46,16 @@ module.exports = class ApplicationDelegate {
   }
 
   closeWindow() {
-    return ipcHelpers.call('window-method', 'close');
+    return ipcHelpers.call("window-method", "close");
   }
 
   async getTemporaryWindowState() {
-    const stateJSON = await ipcHelpers.call('get-temporary-window-state');
+    const stateJSON = await ipcHelpers.call("get-temporary-window-state");
     return stateJSON && JSON.parse(stateJSON);
   }
 
   setTemporaryWindowState(state) {
-    return ipcHelpers.call('set-temporary-window-state', JSON.stringify(state));
+    return ipcHelpers.call("set-temporary-window-state", JSON.stringify(state));
   }
 
   getWindowSize() {
@@ -64,7 +64,7 @@ module.exports = class ApplicationDelegate {
   }
 
   setWindowSize(width, height) {
-    return ipcHelpers.call('set-window-size', width, height);
+    return ipcHelpers.call("set-window-size", width, height);
   }
 
   getWindowPosition() {
@@ -73,35 +73,35 @@ module.exports = class ApplicationDelegate {
   }
 
   setWindowPosition(x, y) {
-    return ipcHelpers.call('set-window-position', x, y);
+    return ipcHelpers.call("set-window-position", x, y);
   }
 
   centerWindow() {
-    return ipcHelpers.call('center-window');
+    return ipcHelpers.call("center-window");
   }
 
   focusWindow() {
-    return ipcHelpers.call('focus-window');
+    return ipcHelpers.call("focus-window");
   }
 
   showWindow() {
-    return ipcHelpers.call('show-window');
+    return ipcHelpers.call("show-window");
   }
 
   hideWindow() {
-    return ipcHelpers.call('hide-window');
+    return ipcHelpers.call("hide-window");
   }
 
   reloadWindow() {
-    return ipcHelpers.call('window-method', 'reload');
+    return ipcHelpers.call("window-method", "reload");
   }
 
   restartApplication() {
-    return ipcRenderer.send('restart-application');
+    return ipcRenderer.send("restart-application");
   }
 
   minimizeWindow() {
-    return ipcHelpers.call('window-method', 'minimize');
+    return ipcHelpers.call("window-method", "minimize");
   }
 
   isWindowMaximized() {
@@ -109,11 +109,11 @@ module.exports = class ApplicationDelegate {
   }
 
   maximizeWindow() {
-    return ipcHelpers.call('window-method', 'maximize');
+    return ipcHelpers.call("window-method", "maximize");
   }
 
   unmaximizeWindow() {
-    return ipcHelpers.call('window-method', 'unmaximize');
+    return ipcHelpers.call("window-method", "unmaximize");
   }
 
   isWindowFullScreen() {
@@ -121,15 +121,15 @@ module.exports = class ApplicationDelegate {
   }
 
   setWindowFullScreen(fullScreen = false) {
-    return ipcHelpers.call('window-method', 'setFullScreen', fullScreen);
+    return ipcHelpers.call("window-method", "setFullScreen", fullScreen);
   }
 
   onDidEnterFullScreen(callback) {
-    return ipcHelpers.on(ipcRenderer, 'did-enter-full-screen', callback);
+    return ipcHelpers.on(ipcRenderer, "did-enter-full-screen", callback);
   }
 
   onDidLeaveFullScreen(callback) {
-    return ipcHelpers.on(ipcRenderer, 'did-leave-full-screen', callback);
+    return ipcHelpers.on(ipcRenderer, "did-leave-full-screen", callback);
   }
 
   async openWindowDevTools() {
@@ -137,7 +137,7 @@ module.exports = class ApplicationDelegate {
     // event handling causes some wrong input events to be triggered on
     // `TextEditorComponent` (Ref.: https://github.com/atom/atom/issues/9697).
     await new Promise(process.nextTick);
-    return ipcHelpers.call('window-method', 'openDevTools');
+    return ipcHelpers.call("window-method", "openDevTools");
   }
 
   async closeWindowDevTools() {
@@ -145,7 +145,7 @@ module.exports = class ApplicationDelegate {
     // event handling causes some wrong input events to be triggered on
     // `TextEditorComponent` (Ref.: https://github.com/atom/atom/issues/9697).
     await new Promise(process.nextTick);
-    return ipcHelpers.call('window-method', 'closeDevTools');
+    return ipcHelpers.call("window-method", "closeDevTools");
   }
 
   async toggleWindowDevTools() {
@@ -153,39 +153,35 @@ module.exports = class ApplicationDelegate {
     // event handling causes some wrong input events to be triggered on
     // `TextEditorComponent` (Ref.: https://github.com/atom/atom/issues/9697).
     await new Promise(process.nextTick);
-    return ipcHelpers.call('window-method', 'toggleDevTools');
+    return ipcHelpers.call("window-method", "toggleDevTools");
   }
 
   executeJavaScriptInWindowDevTools(code) {
-    return ipcRenderer.send('execute-javascript-in-dev-tools', code);
+    return ipcRenderer.send("execute-javascript-in-dev-tools", code);
   }
 
   didClosePathWithWaitSession(path) {
-    return ipcHelpers.call(
-      'window-method',
-      'didClosePathWithWaitSession',
-      path
-    );
+    return ipcHelpers.call("window-method", "didClosePathWithWaitSession", path);
   }
 
   setWindowDocumentEdited(edited) {
-    return ipcHelpers.call('window-method', 'setDocumentEdited', edited);
+    return ipcHelpers.call("window-method", "setDocumentEdited", edited);
   }
 
   setRepresentedFilename(filename) {
-    return ipcHelpers.call('window-method', 'setRepresentedFilename', filename);
+    return ipcHelpers.call("window-method", "setRepresentedFilename", filename);
   }
 
   addRecentDocument(filename) {
-    return ipcRenderer.send('add-recent-document', filename);
+    return ipcRenderer.send("add-recent-document", filename);
   }
 
   setProjectRoots(paths) {
-    return ipcHelpers.call('window-method', 'setProjectRoots', paths);
+    return ipcHelpers.call("window-method", "setProjectRoots", paths);
   }
 
   setAutoHideWindowMenuBar(autoHide) {
-    return ipcHelpers.call('window-method', 'setAutoHideMenuBar', autoHide);
+    return ipcHelpers.call("window-method", "setAutoHideMenuBar", autoHide);
   }
 
   setWindowMenuBarVisibility(visible) {
@@ -203,41 +199,29 @@ module.exports = class ApplicationDelegate {
   async setUserSettings(config, configFilePath) {
     this.pendingSettingsUpdateCount++;
     try {
-      await ipcHelpers.call(
-        'set-user-settings',
-        JSON.stringify(config),
-        configFilePath
-      );
+      await ipcHelpers.call("set-user-settings", JSON.stringify(config), configFilePath);
     } finally {
       this.pendingSettingsUpdateCount--;
     }
   }
 
   onDidChangeUserSettings(callback) {
-    return this.ipcMessageEmitter().on('did-change-user-settings', detail => {
+    return this.ipcMessageEmitter().on("did-change-user-settings", (detail) => {
       if (this.pendingSettingsUpdateCount === 0) callback(detail);
     });
   }
 
   onDidFailToReadUserSettings(callback) {
-    return this.ipcMessageEmitter().on(
-      'did-fail-to-read-user-setting',
-      callback
-    );
+    return this.ipcMessageEmitter().on("did-fail-to-read-user-setting", callback);
   }
 
   confirm(options, callback) {
-    if (typeof callback === 'function') {
+    if (typeof callback === "function") {
       // Async version: pass options directly to Electron but set sane defaults
-      options = Object.assign(
-        { type: 'info', normalizeAccessKeys: true },
-        options
-      );
-      remote.dialog
-        .showMessageBox(remote.getCurrentWindow(), options)
-        .then(result => {
-          callback(result.response, result.checkboxChecked);
-        });
+      options = Object.assign({ type: "info", normalizeAccessKeys: true }, options);
+      remote.dialog.showMessageBox(remote.getCurrentWindow(), options).then((result) => {
+        callback(result.response, result.checkboxChecked);
+      });
     } else {
       // Legacy sync version: options can only have `message`,
       // `detailedMessage` (optional), and buttons array or object (optional)
@@ -251,22 +235,19 @@ module.exports = class ApplicationDelegate {
         buttonLabels = Object.keys(buttons);
       }
 
-      const chosen = remote.dialog.showMessageBoxSync(
-        remote.getCurrentWindow(),
-        {
-          type: 'info',
-          message,
-          detail: detailedMessage,
-          buttons: buttonLabels,
-          normalizeAccessKeys: true
-        }
-      );
+      const chosen = remote.dialog.showMessageBoxSync(remote.getCurrentWindow(), {
+        type: "info",
+        message,
+        detail: detailedMessage,
+        buttons: buttonLabels,
+        normalizeAccessKeys: true,
+      });
 
       if (Array.isArray(buttons)) {
         return chosen;
       } else {
         const callback = buttons[buttonLabels[chosen]];
-        if (typeof callback === 'function') return callback();
+        if (typeof callback === "function") return callback();
       }
     }
   }
@@ -274,12 +255,12 @@ module.exports = class ApplicationDelegate {
   showMessageDialog(params) {}
 
   showSaveDialog(options, callback) {
-    if (typeof callback === 'function') {
+    if (typeof callback === "function") {
       // Async
       this.getCurrentWindow().showSaveDialog(options, callback);
     } else {
       // Sync
-      if (typeof options === 'string') {
+      if (typeof options === "string") {
         options = { defaultPath: options };
       }
       return this.getCurrentWindow().showSaveDialog(options);
@@ -291,59 +272,51 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidOpenLocations(callback) {
-    return this.ipcMessageEmitter().on('open-locations', callback);
+    return this.ipcMessageEmitter().on("open-locations", callback);
   }
 
   onApplicationMenuCommand(handler) {
     const outerCallback = (event, ...args) => handler(...args);
 
-    ipcRenderer.on('command', outerCallback);
-    return new Disposable(() =>
-      ipcRenderer.removeListener('command', outerCallback)
-    );
+    ipcRenderer.on("command", outerCallback);
+    return new Disposable(() => ipcRenderer.removeListener("command", outerCallback));
   }
 
   onContextMenuCommand(handler) {
     const outerCallback = (event, ...args) => handler(...args);
 
-    ipcRenderer.on('context-command', outerCallback);
-    return new Disposable(() =>
-      ipcRenderer.removeListener('context-command', outerCallback)
-    );
+    ipcRenderer.on("context-command", outerCallback);
+    return new Disposable(() => ipcRenderer.removeListener("context-command", outerCallback));
   }
 
   onURIMessage(handler) {
     const outerCallback = (event, ...args) => handler(...args);
 
-    ipcRenderer.on('uri-message', outerCallback);
-    return new Disposable(() =>
-      ipcRenderer.removeListener('uri-message', outerCallback)
-    );
+    ipcRenderer.on("uri-message", outerCallback);
+    return new Disposable(() => ipcRenderer.removeListener("uri-message", outerCallback));
   }
 
   onDidRequestUnload(callback) {
     const outerCallback = async (event, message) => {
       const shouldUnload = await callback(event);
-      ipcRenderer.send('did-prepare-to-unload', shouldUnload);
+      ipcRenderer.send("did-prepare-to-unload", shouldUnload);
     };
 
-    ipcRenderer.on('prepare-to-unload', outerCallback);
-    return new Disposable(() =>
-      ipcRenderer.removeListener('prepare-to-unload', outerCallback)
-    );
+    ipcRenderer.on("prepare-to-unload", outerCallback);
+    return new Disposable(() => ipcRenderer.removeListener("prepare-to-unload", outerCallback));
   }
 
   onDidChangeHistoryManager(callback) {
     const outerCallback = (event, message) => callback(event);
 
-    ipcRenderer.on('did-change-history-manager', outerCallback);
+    ipcRenderer.on("did-change-history-manager", outerCallback);
     return new Disposable(() =>
-      ipcRenderer.removeListener('did-change-history-manager', outerCallback)
+      ipcRenderer.removeListener("did-change-history-manager", outerCallback),
     );
   }
 
   didChangeHistoryManager() {
-    return ipcRenderer.send('did-change-history-manager');
+    return ipcRenderer.send("did-change-history-manager");
   }
 
   openExternal(url) {
@@ -351,24 +324,21 @@ module.exports = class ApplicationDelegate {
   }
 
   emitWillSavePath(path) {
-    return ipcHelpers.call('will-save-path', path);
+    return ipcHelpers.call("will-save-path", path);
   }
 
   emitDidSavePath(path) {
-    return ipcHelpers.call('did-save-path', path);
+    return ipcHelpers.call("did-save-path", path);
   }
 
   resolveProxy(requestId, url) {
-    return ipcRenderer.send('resolve-proxy', requestId, url);
+    return ipcRenderer.send("resolve-proxy", requestId, url);
   }
 
   onDidResolveProxy(callback) {
-    const outerCallback = (event, requestId, proxy) =>
-      callback(requestId, proxy);
+    const outerCallback = (event, requestId, proxy) => callback(requestId, proxy);
 
-    ipcRenderer.on('did-resolve-proxy', outerCallback);
-    return new Disposable(() =>
-      ipcRenderer.removeListener('did-resolve-proxy', outerCallback)
-    );
+    ipcRenderer.on("did-resolve-proxy", outerCallback);
+    return new Disposable(() => ipcRenderer.removeListener("did-resolve-proxy", outerCallback));
   }
 };

@@ -81,11 +81,13 @@
 @terminal-color-bright-cyan: lighten(@terminal-color-cyan, 10%);
 @terminal-color-bright-white: lighten(@terminal-color-white, 10%);
 
-
 // Custom variables
 // Warning: Don't use in packages
 
 @syntax-comment-color: @base01;
 @syntax-subtle-color: @base00;
 @syntax-emphasized-color: @base1;
-@syntax-cursor-line: fade(lighten(@syntax-background-color, 30%), 8%); // needs to be semi-transparent
+@syntax-cursor-line: fade(
+  lighten(@syntax-background-color, 30%),
+  8%
+); // needs to be semi-transparent

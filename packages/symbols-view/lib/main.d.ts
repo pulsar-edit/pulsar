@@ -1,4 +1,4 @@
-import type { TextEditor, Point, Range as AtomRange } from 'atom';
+import type { TextEditor, Point, Range as AtomRange } from "atom";
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -13,10 +13,10 @@ type MaybePromise<T> = T | Promise<T>;
 // could set an `emptyMessage` of “Query must be at least X characters long” to
 // explain why no results are present at first.
 type ListControllerParams = Partial<{
-  errorMessage: string,
-  emptyMessage: string,
-  loadingMessage: string,
-  laodingBadge: string
+  errorMessage: string;
+  emptyMessage: string;
+  loadingMessage: string;
+  laodingBadge: string;
 }>;
 
 type ListControllerParamName = keyof ListControllerParams;
@@ -25,10 +25,10 @@ type ListControllerParamName = keyof ListControllerParams;
 // provider can use this to control certain aspects of the symbol list's UI.
 type ListController = {
   // Set props on the `SelectList` instance.
-  set (params: ListControllerParams): void,
+  set(params: ListControllerParams): void;
 
   // Clear any number of props on the `SelectList` instance.
-  clear(...propNames: ListControllerParamName[]): void
+  clear(...propNames: ListControllerParamName[]): void;
 };
 
 export type SymbolPosition = {
@@ -43,20 +43,20 @@ export type SymbolRange = {
   // be used to highlight the token when selected by the user, though that
   // depends on the user's settings. At least one of `position` and `range`
   // must exist.
-  range: AtomRange
+  range: AtomRange;
 };
 
 export type SymbolDirectoryAndFile = {
   // The name of the file that contains the symbol. Will be shown in the UI.
-  file: string,
+  file: string;
   // The path of to the directory of the file that contains the symbol. Should
   // not contain the file name.
-  directory: string
+  directory: string;
 };
 
 export type SymbolPath = {
   // The full path to the file that contains the symbol.
-  path: string
+  path: string;
 };
 
 // The only required fields in a file symbol are (a) the `name` of the symbol,
@@ -65,20 +65,20 @@ export type SymbolPath = {
 export type FileSymbol = (SymbolPosition | SymbolRange) & {
   // The name of the symbol. This value will be shown in the UI and will be
   // filtered against if the user types in the text box. Required.
-  name: string,
+  name: string;
 
   // A word representing the symbol in some way. Typically this would describe
   // the symbol — function, constant, et cetera — but can be used however the
   // provider sees fit. If present, will be included in the symbol list as a
   // badge.
-  tag?: string
+  tag?: string;
 
   // A _short_ string of explanatory text. Optional. Can be used for text that
   // is contexually significant to the symbol; for instance, a method or field
   // might describe the class that owns it. Symbol consumers will expect this
   // field to be short, and will not devote much space to it in the interface,
   // so this field _should not_ contain unbounded text.
-  context?: string
+  context?: string;
 
   // POSSIBLE ENHANCEMENTS (UNIMPLEMENTED!):
   //
@@ -91,14 +91,14 @@ export type FileSymbol = (SymbolPosition | SymbolRange) & {
   // types.
   //
   // This field would receive its own line in a symbol list.
-  signature?: string
+  signature?: string;
 
   // The literal line of code containing the symbol. A symbol consumer could
   // try to retrieve this information itself, but some symbol providers would
   // be able to supply it much more simply.
   //
   // This field would receive its own line in a symbol list.
-  source?: string
+  source?: string;
 };
 
 // A project symbol has the additional requirement of specifying the file in
@@ -116,10 +116,10 @@ export type SymbolMeta = {
   // * `project-find`: A project-wide attempt to resolve a reference based on
   //    (a) the position of the cursor, (b) the value of the editor's current
   //    text selection, or (c) whatever word was clicked on in the IDE.
-  type: 'file' | 'project' | 'project-find',
+  type: "file" | "project" | "project-find";
 
   // The current text editor.
-  editor: TextEditor,
+  editor: TextEditor;
 
   // The relevant search term, if any.
   //
@@ -132,13 +132,13 @@ export type SymbolMeta = {
   // When `type` is `file`, this field will be absent, because file symbols are
   // queried only initially, before the user has typed anything; all winnowing
   // is done on the frontend as the user types.
-  query?: string,
+  query?: string;
 
   // The relevant range in the buffer.
   //
   // This may be present when `type` is `project-find` and the consumer wants
   // to resolve an arbitrary buffer range instead of the word under the cursor.
-  range?: Range,
+  range?: Range;
 
   // An `AbortSignal` that represents whether the task has been cancelled. This
   // will happen if the user cancels out of the symbol UI while waiting for
@@ -151,7 +151,7 @@ export type SymbolMeta = {
   // resuming. If the signal has aborted, then there is no point in continuing.
   // The provider should immediately return/resolve with `null` and avoid doing
   // unnecessary further work.
-  signal: AbortSignal,
+  signal: AbortSignal;
 
   // The amount of time, in milliseconds, the provider has before it must
   // return results. This value is configurable by the user. If the provider
@@ -167,20 +167,20 @@ export type SymbolMeta = {
   // amount of time. If the UI is already present — for instance, when
   // winnowing results in a project-wide symbol search — `timeoutMs` will be
   // omitted, and the provider can take as much time as it deems appropriate.
-  timeoutMs?: number
+  timeoutMs?: number;
 };
 
-type FileSymbolMeta = SymbolMeta & { type: 'file' };
-type ProjectSymbolMeta = SymbolMeta & { type: 'project' | 'project-find' };
+type FileSymbolMeta = SymbolMeta & { type: "file" };
+type ProjectSymbolMeta = SymbolMeta & { type: "project" | "project-find" };
 
 // Symbol metadata that will be passed to the `canProvideSymbols` method.
-export type PreliminarySymbolMeta = Omit<SymbolMeta, 'signal'>;
+export type PreliminarySymbolMeta = Omit<SymbolMeta, "signal">;
 
 export interface SymbolProvider {
   // A human-readable name for your provider. This name may be displayed to the
   // user, and it's how they can configure `symbols-view` to prefer
   // certain providers over others.
-  name: string,
+  name: string;
 
   // The name of your package. This is present so that the user can find out
   // where a given provider comes from. In the settings for preferring certain
@@ -188,11 +188,11 @@ export interface SymbolProvider {
   // specific provider name — either because that's the value the user
   // remembers, or because the package contains several providers and the user
   // wishes to express a preference for all those providers at once.
-  packageName: string,
+  packageName: string;
 
   // If present, will be called on window teardown, or if `symbols-view`
   // or the provider's own package is disabled.
-  destroy?(): void,
+  destroy?(): void;
 
   // An optional method. If it exists, the main package will use it to register
   // a callback so that it can clear the cache of this provider's symbols.
@@ -208,7 +208,7 @@ export interface SymbolProvider {
   // list, you should implement `onShouldClearCache` and invoke any callback
   // that registers for it. The `EventEmitter` pattern found throughout Lumine
   // is probably how you want to pull this off.
-  onShouldClearCache?(callback: () => TextEditor): void,
+  onShouldClearCache?(callback: () => TextEditor): void;
 
   // Whether this provider aims to be the main symbol provider for a given
   // file. The “exclusive” provider competes with the other workhorse providers
@@ -220,7 +220,7 @@ export interface SymbolProvider {
   // of symbols. These providers generally do not compete with exclusive
   // providers, or with each other, and can add symbols to any exclusive
   // provider’s results.
-  isExclusive?: boolean,
+  isExclusive?: boolean;
 
   // Indicates whether the provider can provide symbols for a given task. Can
   // return either a boolean or a number; boolean `true` is equivalent to a
@@ -255,7 +255,7 @@ export interface SymbolProvider {
   // To avoid a number war, any numeric value greater than `1` returned from
   // `canProvideSymbols` will be clamped to `1`. The user can break ties by
   // choosing their preferred providers in the package settings.
-  canProvideSymbols(meta: PreliminarySymbolMeta): MaybePromise<boolean | number>,
+  canProvideSymbols(meta: PreliminarySymbolMeta): MaybePromise<boolean | number>;
 
   // Returns a list of symbols.
   //
@@ -297,13 +297,19 @@ export interface SymbolProvider {
   //   treat this similarly to a project-wide symbol search and return more
   //   than one result.
   //
-  getSymbols(meta: FileSymbolMeta, listController?: ListController): MaybePromise<FileSymbol[] | null>
-  getSymbols(meta: ProjectSymbolMeta, listController?: ListController): MaybePromise<ProjectSymbol[] | null>
+  getSymbols(
+    meta: FileSymbolMeta,
+    listController?: ListController,
+  ): MaybePromise<FileSymbol[] | null>;
+  getSymbols(
+    meta: ProjectSymbolMeta,
+    listController?: ListController,
+  ): MaybePromise<ProjectSymbol[] | null>;
 }
 
 export type SymbolProviderMainModule = {
-  activate(): void,
-  deactivate(): void,
+  activate(): void;
+  deactivate(): void;
 
   // No business logic should go in here. If a package wants to provide symbols
   // only under certain circumstances, it should decide those circumstances on
@@ -329,5 +335,5 @@ export type SymbolProviderMainModule = {
   //
   // A single package can supply multiple providers if need be.
   //
-  provideSymbols(): SymbolProvider | SymbolProvider[],
+  provideSymbols(): SymbolProvider | SymbolProvider[];
 };

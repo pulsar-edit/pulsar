@@ -1,11 +1,10 @@
-
 describe("Perl 6 grammar", () => {
   let grammar = null;
 
   beforeEach(() => {
     waitsForPromise(() => atom.packages.activatePackage("language-perl"));
 
-    runs(() => grammar = atom.grammars.grammarForScopeName("source.perl6"));
+    runs(() => (grammar = atom.grammars.grammarForScopeName("source.perl6")));
   });
 
   it("parses the grammar", () => {
@@ -15,166 +14,160 @@ describe("Perl 6 grammar", () => {
 
   describe("identifiers", () => {
     it("should match simple scalar identifiers", () => {
-      const {tokens} = grammar.tokenizeLine('$a');
-      expect(tokens[0]).toEqual({value: '$a', scopes: [
-        'source.perl6',
-        'variable.other.identifier.perl6'
-      ]});
-  });
+      const { tokens } = grammar.tokenizeLine("$a");
+      expect(tokens[0]).toEqual({
+        value: "$a",
+        scopes: ["source.perl6", "variable.other.identifier.perl6"],
+      });
+    });
 
     it("should match simple array identifiers", () => {
-      const {tokens} = grammar.tokenizeLine('@a');
-      expect(tokens[0]).toEqual({value: '@a', scopes: [
-        'source.perl6',
-        'variable.other.identifier.perl6'
-      ]});
-  });
+      const { tokens } = grammar.tokenizeLine("@a");
+      expect(tokens[0]).toEqual({
+        value: "@a",
+        scopes: ["source.perl6", "variable.other.identifier.perl6"],
+      });
+    });
 
     it("should match simple hash identifiers", () => {
-      const {tokens} = grammar.tokenizeLine('%a');
-      expect(tokens[0]).toEqual({value: '%a', scopes: [
-        'source.perl6',
-        'variable.other.identifier.perl6'
-      ]});
-  });
+      const { tokens } = grammar.tokenizeLine("%a");
+      expect(tokens[0]).toEqual({
+        value: "%a",
+        scopes: ["source.perl6", "variable.other.identifier.perl6"],
+      });
+    });
 
     it("should match simple hash identifiers", () => {
-      const {tokens} = grammar.tokenizeLine('&a');
-      expect(tokens[0]).toEqual({value: '&a', scopes: [
-        'source.perl6',
-        'variable.other.identifier.perl6'
-      ]});
-  });
+      const { tokens } = grammar.tokenizeLine("&a");
+      expect(tokens[0]).toEqual({
+        value: "&a",
+        scopes: ["source.perl6", "variable.other.identifier.perl6"],
+      });
+    });
 
     it("should match unicode identifiers", () => {
-      const {tokens} = grammar.tokenizeLine('$cööl-páttérn');
-      expect(tokens[0]).toEqual({value: '$cööl-páttérn', scopes: [
-        'source.perl6',
-        'variable.other.identifier.perl6'
-      ]});
-  });
+      const { tokens } = grammar.tokenizeLine("$cööl-páttérn");
+      expect(tokens[0]).toEqual({
+        value: "$cööl-páttérn",
+        scopes: ["source.perl6", "variable.other.identifier.perl6"],
+      });
+    });
 
     it("should match identifiers with multiple dashes which can contain other keywords", () => {
-      const {tokens} = grammar.tokenizeLine('start-from-here');
+      const { tokens } = grammar.tokenizeLine("start-from-here");
       expect(tokens.length).toEqual(1);
-      expect(tokens[0]).toEqual({value: 'start-from-here', scopes: [
-        'source.perl6',
-        'routine.name.perl6'
-      ]});
-  });
+      expect(tokens[0]).toEqual({
+        value: "start-from-here",
+        scopes: ["source.perl6", "routine.name.perl6"],
+      });
+    });
 
     it("should match identifiers with dash which can contain other keywords", () => {
-      const {tokens} = grammar.tokenizeLine('start-here');
+      const { tokens } = grammar.tokenizeLine("start-here");
       expect(tokens.length).toEqual(1);
-      expect(tokens[0]).toEqual({value: 'start-here', scopes: [
-        'source.perl6',
-        'routine.name.perl6'
-      ]});
-  });
+      expect(tokens[0]).toEqual({
+        value: "start-here",
+        scopes: ["source.perl6", "routine.name.perl6"],
+      });
+    });
 
     it("should match identifiers with dash which can contain other keywords", () => {
-      const {tokens} = grammar.tokenizeLine('is-required');
+      const { tokens } = grammar.tokenizeLine("is-required");
       expect(tokens.length).toEqual(1);
-      expect(tokens[0]).toEqual({value: 'is-required', scopes: [
-        'source.perl6',
-        'routine.name.perl6'
-      ]});
-  });
+      expect(tokens[0]).toEqual({
+        value: "is-required",
+        scopes: ["source.perl6", "routine.name.perl6"],
+      });
+    });
 
     it("should match identifiers with dash which can contain other keywords", () => {
-      const {tokens} = grammar.tokenizeLine('is-utf8');
+      const { tokens } = grammar.tokenizeLine("is-utf8");
       expect(tokens.length).toEqual(1);
-      expect(tokens[0]).toEqual({value: 'is-utf8', scopes: [
-        'source.perl6',
-        'routine.name.perl6'
-      ]});
-  });
+      expect(tokens[0]).toEqual({
+        value: "is-utf8",
+        scopes: ["source.perl6", "routine.name.perl6"],
+      });
+    });
 
     it("should match identifiers with a dangling match", () => {
-      const {tokens} = grammar.tokenizeLine('is-');
+      const { tokens } = grammar.tokenizeLine("is-");
       expect(tokens.length).toEqual(2);
-      expect(tokens[0]).toEqual({value: 'is', scopes: [
-        'source.perl6',
-        'routine.name.perl6'
-      ]});
-      expect(tokens[1]).toEqual({value: '-', scopes: [
-        'source.perl6'
-      ]});
-  });
+      expect(tokens[0]).toEqual({ value: "is", scopes: ["source.perl6", "routine.name.perl6"] });
+      expect(tokens[1]).toEqual({ value: "-", scopes: ["source.perl6"] });
+    });
 
     it("should not match scalar identifiers with a dash followed by a number", () => {
-      const {tokens} = grammar.tokenizeLine('$foo-1');
+      const { tokens } = grammar.tokenizeLine("$foo-1");
       expect(tokens.length).toEqual(2);
-      expect(tokens[0]).toEqual({value: '$foo', scopes: [
-        'source.perl6',
-        'variable.other.identifier.perl6'
-      ]});
-      expect(tokens[1]).toEqual({value: '-1', scopes: [
-        'source.perl6'
-      ]});
+      expect(tokens[0]).toEqual({
+        value: "$foo",
+        scopes: ["source.perl6", "variable.other.identifier.perl6"],
+      });
+      expect(tokens[1]).toEqual({ value: "-1", scopes: ["source.perl6"] });
+    });
   });
-});
 
-  describe("strings", () => it("should tokenize simple strings", () => {
-    const {tokens} = grammar.tokenizeLine('"abc"');
-    expect(tokens.length).toEqual(3);
-    expect(tokens[0]).toEqual({value: '"', scopes: [
-      'source.perl6',
-      'string.quoted.double.perl6',
-      'punctuation.definition.string.begin.perl6'
-    ]});
-    expect(tokens[1]).toEqual({value: 'abc', scopes: [
-      'source.perl6',
-      'string.quoted.double.perl6'
-    ]});
-    expect(tokens[2]).toEqual({value: '"', scopes: [
-      'source.perl6',
-      'string.quoted.double.perl6',
-      'punctuation.definition.string.end.perl6'
-    ]});
-}));
+  describe("strings", () =>
+    it("should tokenize simple strings", () => {
+      const { tokens } = grammar.tokenizeLine('"abc"');
+      expect(tokens.length).toEqual(3);
+      expect(tokens[0]).toEqual({
+        value: '"',
+        scopes: [
+          "source.perl6",
+          "string.quoted.double.perl6",
+          "punctuation.definition.string.begin.perl6",
+        ],
+      });
+      expect(tokens[1]).toEqual({
+        value: "abc",
+        scopes: ["source.perl6", "string.quoted.double.perl6"],
+      });
+      expect(tokens[2]).toEqual({
+        value: '"',
+        scopes: [
+          "source.perl6",
+          "string.quoted.double.perl6",
+          "punctuation.definition.string.end.perl6",
+        ],
+      });
+    }));
 
-  describe("modules", () => it("should parse package declarations", () => {
-    const {tokens} = grammar.tokenizeLine("class Johnny's::Super-Cool::cööl-páttérn::Module");
-    expect(tokens.length).toEqual(3);
-    expect(tokens[0]).toEqual({value: 'class', scopes: [
-      'source.perl6',
-      'meta.class.perl6',
-      'storage.type.class.perl6'
-    ]});
-    expect(tokens[1]).toEqual({
-      value: ' ',
-      scopes: [
-        'source.perl6',
-        'meta.class.perl6'
-      ]});
-    expect(tokens[2]).toEqual({
-      value: 'Johnny\'s::Super-Cool::cööl-páttérn::Module',
-      scopes: [
-        'source.perl6',
-        'meta.class.perl6',
-        'entity.name.type.class.perl6'
-      ]});
-}));
+  describe("modules", () =>
+    it("should parse package declarations", () => {
+      const { tokens } = grammar.tokenizeLine("class Johnny's::Super-Cool::cööl-páttérn::Module");
+      expect(tokens.length).toEqual(3);
+      expect(tokens[0]).toEqual({
+        value: "class",
+        scopes: ["source.perl6", "meta.class.perl6", "storage.type.class.perl6"],
+      });
+      expect(tokens[1]).toEqual({
+        value: " ",
+        scopes: ["source.perl6", "meta.class.perl6"],
+      });
+      expect(tokens[2]).toEqual({
+        value: "Johnny's::Super-Cool::cööl-páttérn::Module",
+        scopes: ["source.perl6", "meta.class.perl6", "entity.name.type.class.perl6"],
+      });
+    }));
 
-  describe("comments", () => it("should parse comments", () => {
-    const {tokens} = grammar.tokenizeLine("# this is the comment");
-    expect(tokens.length).toEqual(3);
-    expect(tokens[0]).toEqual({
-      value: '#',
-      scopes: [
-        'source.perl6',
-        'comment.line.number-sign.perl6',
-        'punctuation.definition.comment.perl6'
-      ]});
-    expect(tokens[1]).toEqual({
-      value: ' this is the comment',
-      scopes: [
-        'source.perl6',
-        'comment.line.number-sign.perl6'
-      ]});
-}));
-
+  describe("comments", () =>
+    it("should parse comments", () => {
+      const { tokens } = grammar.tokenizeLine("# this is the comment");
+      expect(tokens.length).toEqual(3);
+      expect(tokens[0]).toEqual({
+        value: "#",
+        scopes: [
+          "source.perl6",
+          "comment.line.number-sign.perl6",
+          "punctuation.definition.comment.perl6",
+        ],
+      });
+      expect(tokens[1]).toEqual({
+        value: " this is the comment",
+        scopes: ["source.perl6", "comment.line.number-sign.perl6"],
+      });
+    }));
 
   describe("firstLineMatch", () => {
     it("recognises interpreter directives", () => {

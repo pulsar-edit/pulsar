@@ -1,7 +1,7 @@
-'use babel';
+"use babel";
 
-import { CompositeDisposable } from 'atom';
-import repositoryForPath from './helpers';
+import { CompositeDisposable } from "atom";
+import repositoryForPath from "./helpers";
 
 const MAX_BUFFER_LENGTH_TO_DIFF = 2 * 1024 * 1024;
 
@@ -30,9 +30,7 @@ export default class GitDiffView {
 
     subscribeToRepository();
 
-    this.subscriptions.add(
-      atom.project.onDidChangePaths(subscribeToRepository)
-    );
+    this.subscriptions.add(atom.project.onDidChangePaths(subscribeToRepository));
   }
 
   /**
@@ -58,8 +56,7 @@ export default class GitDiffView {
   destroyChildren() {
     if (this._animationId) cancelAnimationFrame(this._animationId);
 
-    if (this.diffs)
-      for (const diff of this.diffs) this.markers.get(diff).destroy();
+    if (this.diffs) for (const diff of this.diffs) this.markers.get(diff).destroy();
   }
 
   /**
@@ -99,7 +96,7 @@ export default class GitDiffView {
       this._repoSubs = new CompositeDisposable(
         this.repository.onDidDestroy(subscribeToRepository),
         this.repository.onDidChangeStatuses(scheduleUpdate),
-        this.repository.onDidChangeStatus(changedPath => {
+        this.repository.onDidChangeStatus((changedPath) => {
           if (changedPath === this.editorPath) scheduleUpdate();
         }),
         this.editor.onDidStopChanging(scheduleUpdate),
@@ -110,20 +107,17 @@ export default class GitDiffView {
         }),
         atom.commands.add(
           this.editorElement,
-          'git-diff:move-to-next-diff',
-          this.moveToNextDiff.bind(this)
+          "git-diff:move-to-next-diff",
+          this.moveToNextDiff.bind(this),
         ),
         atom.commands.add(
           this.editorElement,
-          'git-diff:move-to-previous-diff',
-          this.moveToPreviousDiff.bind(this)
+          "git-diff:move-to-previous-diff",
+          this.moveToPreviousDiff.bind(this),
         ),
-        atom.config.onDidChange(
-          'git-diff.showIconsInEditorGutter',
-          updateIconDecoration
-        ),
-        atom.config.onDidChange('editor.showLineNumbers', updateIconDecoration),
-        this.editorElement.onDidAttach(updateIconDecoration)
+        atom.config.onDidChange("git-diff.showIconsInEditorGutter", updateIconDecoration),
+        atom.config.onDidChange("editor.showLineNumbers", updateIconDecoration),
+        this.editorElement.onDidAttach(updateIconDecoration),
       );
 
       // Every time the repo is changed, the editor needs to be reinitialized.
@@ -155,10 +149,7 @@ export default class GitDiffView {
     }
 
     // Wrap around to the first diff in the file
-    if (
-      atom.config.get('git-diff.wrapAroundOnMoveToDiff') &&
-      nextDiffLineNumber == null
-    ) {
+    if (atom.config.get("git-diff.wrapAroundOnMoveToDiff") && nextDiffLineNumber == null) {
       nextDiffLineNumber = firstDiffLineNumber;
     }
 
@@ -177,10 +168,7 @@ export default class GitDiffView {
     }
 
     // Wrap around to the last diff in the file
-    if (
-      atom.config.get('git-diff.wrapAroundOnMoveToDiff') &&
-      previousDiffLineNumber === null
-    ) {
+    if (atom.config.get("git-diff.wrapAroundOnMoveToDiff") && previousDiffLineNumber === null) {
       previousDiffLineNumber = lastDiffLineNumber;
     }
 
@@ -188,15 +176,15 @@ export default class GitDiffView {
   }
 
   updateIconDecoration() {
-    const gutter = this.editorElement.querySelector('.gutter');
+    const gutter = this.editorElement.querySelector(".gutter");
     if (gutter) {
       if (
-        atom.config.get('editor.showLineNumbers') &&
-        atom.config.get('git-diff.showIconsInEditorGutter')
+        atom.config.get("editor.showLineNumbers") &&
+        atom.config.get("git-diff.showIconsInEditorGutter")
       ) {
-        gutter.classList.add('git-diff-icon');
+        gutter.classList.add("git-diff-icon");
       } else {
-        gutter.classList.remove('git-diff-icon');
+        gutter.classList.remove("git-diff-icon");
       }
     }
   }
@@ -224,8 +212,7 @@ export default class GitDiffView {
   updateDiffs() {
     if (this.buffer.getLength() < MAX_BUFFER_LENGTH_TO_DIFF) {
       // Before we redraw the diffs, tear down the old markers.
-      if (this.diffs)
-        for (const diff of this.diffs) this.markers.get(diff)?.destroy();
+      if (this.diffs) for (const diff of this.diffs) this.markers.get(diff)?.destroy();
 
       this.markers.clear();
 
@@ -241,15 +228,15 @@ export default class GitDiffView {
         let mark;
 
         if (oldLines === 0 && newLines > 0) {
-          mark = this.markRange(startRow, endRow, 'git-line-added');
+          mark = this.markRange(startRow, endRow, "git-line-added");
         } else if (newLines === 0 && oldLines > 0) {
           if (startRow < 0) {
-            mark = this.markRange(0, 0, 'git-previous-line-removed');
+            mark = this.markRange(0, 0, "git-previous-line-removed");
           } else {
-            mark = this.markRange(startRow, startRow, 'git-line-removed');
+            mark = this.markRange(startRow, startRow, "git-line-removed");
           }
         } else {
-          mark = this.markRange(startRow, endRow, 'git-line-modified');
+          mark = this.markRange(startRow, endRow, "git-line-modified");
         }
 
         this.markers.set(diff, mark);
@@ -258,13 +245,18 @@ export default class GitDiffView {
   }
 
   markRange(startRow, endRow, klass) {
-    if (this.editor.getBuffer().isDestroyed())
-      return;
+    if (this.editor.getBuffer().isDestroyed()) return;
 
-    const marker = this.editor.markBufferRange([[startRow, 0], [endRow, 0]], {
-      invalidate: 'never'
-    });
-    this.editor.decorateMarker(marker, { type: 'line-number', class: klass });
+    const marker = this.editor.markBufferRange(
+      [
+        [startRow, 0],
+        [endRow, 0],
+      ],
+      {
+        invalidate: "never",
+      },
+    );
+    this.editor.decorateMarker(marker, { type: "line-number", class: klass });
     return marker;
   }
 }

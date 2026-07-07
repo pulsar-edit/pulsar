@@ -1,14 +1,11 @@
-async function conditionPromise(
-  condition,
-  description = 'anonymous condition'
-) {
+async function conditionPromise(condition, description = "anonymous condition") {
   const startTime = Date.now();
 
   while (true) {
     await timeoutPromise(100);
 
     // if condition is sync
-    if (condition.constructor.name !== 'AsyncFunction' && condition()) {
+    if (condition.constructor.name !== "AsyncFunction" && condition()) {
       return;
     }
     // if condition is async
@@ -17,13 +14,13 @@ async function conditionPromise(
     }
 
     if (Date.now() - startTime > 5000) {
-      throw new Error('Timed out waiting on ' + description);
+      throw new Error("Timed out waiting on " + description);
     }
   }
 }
 
 function timeoutPromise(timeout) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     global.setTimeout(resolve, timeout);
   });
 }

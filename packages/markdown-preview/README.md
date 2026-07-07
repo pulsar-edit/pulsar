@@ -8,7 +8,7 @@ It is currently enabled for `.markdown`, `.md`, `.mdown`, `.mkd`, `.mkdown`, `.r
 
 ## Customize
 
-By default Markdown Preview uses the colors of the active syntax theme. Enable **Use GitHub.com Style** in the __package settings__ to make it look closer to how markdown files get rendered on github.com.
+By default Markdown Preview uses the colors of the active syntax theme. Enable **Use GitHub.com Style** in the **package settings** to make it look closer to how markdown files get rendered on github.com.
 
 ![markdown-preview GitHub style](https://cloud.githubusercontent.com/assets/378023/10013087/24ccc7ec-6149-11e5-97ea-53a842a715ea.png)
 
@@ -30,12 +30,12 @@ The CommonMark specification [explicitly avoids standardizing these identifiers]
 
 > The first word of the info string is typically used to specify the language of the code sample, and rendered in the class attribute of the code tag. However, this spec does not mandate any particular treatment of the info string.
 
-There are several valid ways to infer specific languages from language identifiers such as `js`, `less`, `coffee`,  and `c`. This package supports the following systems, configured via the **Syntax Highlighting Language Identifiers** setting:
+There are several valid ways to infer specific languages from language identifiers such as `js`, `less`, `coffee`, and `c`. This package supports the following systems, configured via the **Syntax Highlighting Language Identifiers** setting:
 
-  * [Linguist](https://github.com/github-linguist/linguist): Used by GitHub (previously the default and only language identification system).
-  * [Chroma](https://github.com/alecthomas/chroma): Used by CodeBerg/Gitea/Hugo/Goldmark.
-  * [Rouge](https://github.com/rouge-ruby/rouge): Used by GitLab/Jekyll.
-  * [HighlightJS](https://highlightjs.org/): Used in a number of places, but most relevantly on the [Lumine Package Registry](https://web.pulsar-edit.dev/) website.
+- [Linguist](https://github.com/github-linguist/linguist): Used by GitHub (previously the default and only language identification system).
+- [Chroma](https://github.com/alecthomas/chroma): Used by CodeBerg/Gitea/Hugo/Goldmark.
+- [Rouge](https://github.com/rouge-ruby/rouge): Used by GitLab/Jekyll.
+- [HighlightJS](https://highlightjs.org/): Used in a number of places, but most relevantly on the [Lumine Package Registry](https://web.pulsar-edit.dev/) website.
 
 If none of these systems meets your needs, you may specify custom language identifiers. This may not be as portable as the systems described above, but it will at least produce the desired outcome on your own system.
 

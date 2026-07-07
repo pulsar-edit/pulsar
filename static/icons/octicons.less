@@ -4,17 +4,24 @@
 // Add icon font
 // --------------------------------------------------
 
-@font-face { .octicon-font-legacy(); } // keep for backwards compatibility
-@font-face { .octicon-font(); }
-@font-face { .atomicon-font(); } // Private
-
+@font-face {
+  .octicon-font-legacy();
+} // keep for backwards compatibility
+@font-face {
+  .octicon-font();
+}
+@font-face {
+  .atomicon-font();
+} // Private
 
 //
 // Create icons
 // --------------------------------------------------
 
 .make-icon(@name) {
-  .icon-@{name} { .octicon(@name); }
+  .icon-@{name} {
+    .octicon(@name);
+  }
 }
 
 // There seems to be no way to make an array, or grab all the local vars in
@@ -22,7 +29,6 @@
 // replace.
 // Find: @([a-z-]+): "[^"]+";
 // Replace: .make-icon(\1);
-
 
 // Atomicons (private)
 
@@ -44,7 +50,6 @@
 .make-icon(type-property);
 .make-icon(type-string);
 .make-icon(type-variable);
-
 
 // Octicons
 

@@ -1,22 +1,22 @@
-const { Disposable, CompositeDisposable } = require('atom');
-const DeprecationCopView = require('./deprecation-cop-view');
-const DeprecationCopStatusBarView = require('./deprecation-cop-status-bar-view');
-const ViewURI = 'atom://deprecation-cop';
+const { Disposable, CompositeDisposable } = require("atom");
+const DeprecationCopView = require("./deprecation-cop-view");
+const DeprecationCopStatusBarView = require("./deprecation-cop-status-bar-view");
+const ViewURI = "atom://deprecation-cop";
 
 class DeprecationCopPackage {
   activate() {
     this.disposables = new CompositeDisposable();
     this.disposables.add(
-      atom.workspace.addOpener(uri => {
+      atom.workspace.addOpener((uri) => {
         if (uri === ViewURI) {
           return this.deserializeDeprecationCopView({ uri });
         }
-      })
+      }),
     );
     this.disposables.add(
-      atom.commands.add('atom-workspace', 'deprecation-cop:view', () => {
+      atom.commands.add("atom-workspace", "deprecation-cop:view", () => {
         atom.workspace.open(ViewURI);
-      })
+      }),
     );
   }
 
@@ -36,17 +36,17 @@ class DeprecationCopPackage {
     const statusBarView = new DeprecationCopStatusBarView();
     const statusBarTile = statusBar.addRightTile({
       item: statusBarView,
-      priority: 150
+      priority: 150,
     });
     this.disposables.add(
       new Disposable(() => {
         statusBarView.destroy();
-      })
+      }),
     );
     this.disposables.add(
       new Disposable(() => {
         statusBarTile.destroy();
-      })
+      }),
     );
   }
 }

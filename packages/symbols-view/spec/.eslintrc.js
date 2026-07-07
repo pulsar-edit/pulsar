@@ -5,6 +5,6 @@ module.exports = {
     "node/no-extraneous-require": "off",
     "no-unused-vars": "off",
     "no-empty": "off",
-    "no-constant-condition": "off"
-  }
+    "no-constant-condition": "off",
+  },
 };

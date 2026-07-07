@@ -1,7 +1,4 @@
-async function conditionPromise(
-  condition,
-  description = 'anonymous condition'
-) {
+async function conditionPromise(condition, description = "anonymous condition") {
   const startTime = Date.now();
 
   while (true) {
@@ -12,7 +9,7 @@ async function conditionPromise(
     }
 
     if (Date.now() - startTime > 5000) {
-      throw new Error('Timed out waiting on ' + description);
+      throw new Error("Timed out waiting on " + description);
     }
   }
 }

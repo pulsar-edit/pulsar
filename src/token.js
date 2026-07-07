@@ -1,9 +1,8 @@
-const _ = require('underscore-plus');
+const _ = require("underscore-plus");
 const StartDotRegex = /^\.?/;
 
 // Represents a single unit of text as selected by a grammar.
 module.exports = class Token {
-
   constructor(properties) {
     this.value = properties.value;
     this.scopes = properties.scopes;
@@ -19,11 +18,10 @@ module.exports = class Token {
   }
 
   matchesScopeSelector(selector) {
-    let targetClasses = selector.replace(StartDotRegex, '').split('.');
+    let targetClasses = selector.replace(StartDotRegex, "").split(".");
     return _.any(this.scopes, (scope) => {
-      let scopeClasses = scope.split('.');
+      let scopeClasses = scope.split(".");
       return _.isSubset(targetClasses, scopeClasses);
     });
   }
-
 };

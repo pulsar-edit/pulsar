@@ -4,12 +4,12 @@ const Grim = require("grim");
 let grimDeprecationsSnapshot = null;
 let stylesDeprecationsSnapshot = null;
 
-jasmine.snapshotDeprecations = function() {
+jasmine.snapshotDeprecations = function () {
   grimDeprecationsSnapshot = _.clone(Grim.deprecations);
-  return stylesDeprecationsSnapshot = _.clone(atom.styles.deprecationsBySourcePath);
+  return (stylesDeprecationsSnapshot = _.clone(atom.styles.deprecationsBySourcePath));
 };
 
-jasmine.restoreDeprecationsSnapshot = function() {
+jasmine.restoreDeprecationsSnapshot = function () {
   Grim.deprecations = grimDeprecationsSnapshot;
-  return atom.styles.deprecationsBySourcePath = stylesDeprecationsSnapshot;
+  return (atom.styles.deprecationsBySourcePath = stylesDeprecationsSnapshot);
 };

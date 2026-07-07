@@ -7,20 +7,22 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
-const Grim = require('grim');
-const fs = require('fs-plus');
-const temp = require('temp');
-const path = require('path');
-const {ipcRenderer} = require('electron');
+const Grim = require("grim");
+const fs = require("fs-plus");
+const temp = require("temp");
+const path = require("path");
+const { ipcRenderer } = require("electron");
 
 temp.track();
 
 module.exports = function ({ logFile, headless, testPaths, buildAtomEnvironment }) {
-  require('../helpers/jasmine-singleton');
-  require('jasmine-focused');
+  require("../helpers/jasmine-singleton");
+  require("jasmine-focused");
 
-  const normalizeComments = require('../helpers/normalize-comments');
-  for (let key in normalizeComments) { window[key] = normalizeComments[key]; }
+  const normalizeComments = require("../helpers/normalize-comments");
+  for (let key in normalizeComments) {
+    window[key] = normalizeComments[key];
+  }
 
   // Rewrite global jasmine functions to have support for async tests.
   // This way packages can create async specs without having to import these from the
@@ -34,62 +36,71 @@ module.exports = function ({ logFile, headless, testPaths, buildAtomEnvironment 
 
   // Allow document.title to be assigned in specs without screwing up spec window title
   let documentTitle = null;
-  Object.defineProperty(document, 'title', {
-    get() { return documentTitle; },
-    set(title) { return documentTitle = title; }
-  }
-  );
+  Object.defineProperty(document, "title", {
+    get() {
+      return documentTitle;
+    },
+    set(title) {
+      return (documentTitle = title);
+    },
+  });
 
-  const userHome = process.env.ATOM_HOME || path.join(fs.getHomeDirectory(), '.atom');
-  const atomHome = temp.mkdirSync({prefix: 'atom-test-home-'});
+  const userHome = process.env.ATOM_HOME || path.join(fs.getHomeDirectory(), ".atom");
+  const atomHome = temp.mkdirSync({ prefix: "atom-test-home-" });
   if (process.env.APM_TEST_PACKAGES) {
     const testPackages = process.env.APM_TEST_PACKAGES.split(/\s+/);
-    fs.makeTreeSync(path.join(atomHome, 'packages'));
+    fs.makeTreeSync(path.join(atomHome, "packages"));
     for (let packName of Array.from(testPackages)) {
-      const userPack = path.join(userHome, 'packages', packName);
-      const loadablePack = path.join(atomHome, 'packages', packName);
+      const userPack = path.join(userHome, "packages", packName);
+      const loadablePack = path.join(atomHome, "packages", packName);
 
       try {
-        fs.symlinkSync(userPack, loadablePack, 'dir');
+        fs.symlinkSync(userPack, loadablePack, "dir");
       } catch (error) {
         fs.copySync(userPack, loadablePack);
       }
     }
   }
 
-  const ApplicationDelegate = require('../../src/application-delegate');
+  const ApplicationDelegate = require("../../src/application-delegate");
   const applicationDelegate = new ApplicationDelegate();
   applicationDelegate.setRepresentedFilename = function () {};
   applicationDelegate.setWindowDocumentEdited = function () {};
   window.atom = buildAtomEnvironment({
-    applicationDelegate, window, document,
+    applicationDelegate,
+    window,
+    document,
     configDirPath: atomHome,
-    enablePersistence: false
+    enablePersistence: false,
   });
 
-  require('../helpers/jasmine1-spec-helper');
-  if (process.env.JANKY_SHA1 || process.env.CI) { disableFocusMethods(); }
-  for (let testPath of Array.from(testPaths)) { requireSpecs(testPath); }
+  require("../helpers/jasmine1-spec-helper");
+  if (process.env.JANKY_SHA1 || process.env.CI) {
+    disableFocusMethods();
+  }
+  for (let testPath of Array.from(testPaths)) {
+    requireSpecs(testPath);
+  }
 
-  setSpecType('user');
+  setSpecType("user");
 
   let resolveWithExitCode = null;
-  const promise = new Promise((resolve, reject) => resolveWithExitCode = resolve);
+  const promise = new Promise((resolve, reject) => (resolveWithExitCode = resolve));
   const jasmineEnv = jasmine.getEnv();
-  jasmineEnv.addReporter(buildReporter({logFile, headless, resolveWithExitCode}));
+  jasmineEnv.addReporter(buildReporter({ logFile, headless, resolveWithExitCode }));
 
-  if(process.env.SPEC_FILTER) {
-    const {getFullDescription} = require('../helpers/jasmine-list-reporter');
-    const regex = new RegExp(process.env.SPEC_FILTER)
-    jasmineEnv.specFilter = (spec) => getFullDescription(spec, false).match(regex)
+  if (process.env.SPEC_FILTER) {
+    const { getFullDescription } = require("../helpers/jasmine-list-reporter");
+    const regex = new RegExp(process.env.SPEC_FILTER);
+    jasmineEnv.specFilter = (spec) => getFullDescription(spec, false).match(regex);
   }
 
   if (jasmineEnv.setIncludedTags) {
     jasmineEnv.setIncludedTags([process.platform]);
   }
 
-  const jasmineContent = document.createElement('div');
-  jasmineContent.setAttribute('id', 'jasmine-content');
+  const jasmineContent = document.createElement("div");
+  jasmineContent.setAttribute("id", "jasmine-content");
 
   document.body.appendChild(jasmineContent);
 
@@ -97,37 +108,43 @@ module.exports = function ({ logFile, headless, testPaths, buildAtomEnvironment 
   return promise;
 };
 
-var asyncifyJasmineFn = (fn, callbackPosition) => (function (...args) {
-  if (typeof args[callbackPosition] === 'function') {
-    const callback = args[callbackPosition];
+var asyncifyJasmineFn = (fn, callbackPosition) =>
+  function (...args) {
+    if (typeof args[callbackPosition] === "function") {
+      const callback = args[callbackPosition];
 
-    args[callbackPosition] = function (...args) {
-      const result = callback.apply(this, args);
-      if (result instanceof Promise) {
-        return waitsForPromise(() => result);
-      }
-    };
-  }
+      args[callbackPosition] = function (...args) {
+        const result = callback.apply(this, args);
+        if (result instanceof Promise) {
+          return waitsForPromise(() => result);
+        }
+      };
+    }
 
-  return fn.apply(this, args);
-});
+    return fn.apply(this, args);
+  };
 
 var waitsForPromise = function (fn) {
   const promise = fn();
 
-  return global.waitsFor('spec promise to resolve', done => promise.then(done, function (error) {
-    jasmine.getEnv().currentSpec.fail(error);
-    return done();
-  }));
+  return global.waitsFor("spec promise to resolve", (done) =>
+    promise.then(done, function (error) {
+      jasmine.getEnv().currentSpec.fail(error);
+      return done();
+    }),
+  );
 };
 
-var disableFocusMethods = () => ['fdescribe', 'ffdescribe', 'fffdescribe', 'fit', 'ffit', 'fffit'].forEach(function (methodName) {
-  const focusMethod = window[methodName];
-  return window[methodName] = function (description) {
-    const error = new Error('Focused spec is running on CI');
-    return focusMethod(description, function () { throw error; });
-  };
-});
+var disableFocusMethods = () =>
+  ["fdescribe", "ffdescribe", "fffdescribe", "fit", "ffit", "fffit"].forEach(function (methodName) {
+    const focusMethod = window[methodName];
+    return (window[methodName] = function (description) {
+      const error = new Error("Focused spec is running on CI");
+      return focusMethod(description, function () {
+        throw error;
+      });
+    });
+  });
 
 var requireSpecs = function (testPath, specType) {
   if (fs.isDirectorySync(testPath)) {
@@ -150,39 +167,49 @@ var requireSpecs = function (testPath, specType) {
 
 const setSpecField = function (name, value) {
   const specs = jasmine.getEnv().currentRunner().specs();
-  if (specs.length === 0) { return; }
+  if (specs.length === 0) {
+    return;
+  }
   return (() => {
     const result = [];
-    for (let start = specs.length-1, index = start, asc = start <= 0; asc ? index <= 0 : index >= 0; asc ? index++ : index--) {
-      if (specs[index][name] != null) { break; }
-      result.push(specs[index][name] = value);
+    for (
+      let start = specs.length - 1, index = start, asc = start <= 0;
+      asc ? index <= 0 : index >= 0;
+      asc ? index++ : index--
+    ) {
+      if (specs[index][name] != null) {
+        break;
+      }
+      result.push((specs[index][name] = value));
     }
     return result;
   })();
 };
 
-var setSpecType = specType => setSpecField('specType', specType);
+var setSpecType = (specType) => setSpecField("specType", specType);
 
-var setSpecDirectory = specDirectory => setSpecField('specDirectory', specDirectory);
+var setSpecDirectory = (specDirectory) => setSpecField("specDirectory", specDirectory);
 
-var buildReporter = function ({logFile, headless, resolveWithExitCode}) {
+var buildReporter = function ({ logFile, headless, resolveWithExitCode }) {
   if (headless) {
     return buildTerminalReporter(logFile, resolveWithExitCode);
   } else {
     let reporter;
-    const AtomReporter = require('../helpers/jasmine1-atom-reporter.js');
-    return reporter = new AtomReporter();
+    const AtomReporter = require("../helpers/jasmine1-atom-reporter.js");
+    return (reporter = new AtomReporter());
   }
 };
 
 var buildTerminalReporter = function (logFile, resolveWithExitCode) {
   let logStream;
-  if (logFile != null) { logStream = fs.openSync(logFile, 'w'); }
+  if (logFile != null) {
+    logStream = fs.openSync(logFile, "w");
+  }
   const log = function (str) {
     if (logStream != null) {
       return fs.writeSync(logStream, str);
     } else {
-      return ipcRenderer.send('write-to-stderr', str);
+      return ipcRenderer.send("write-to-stderr", str);
     }
   };
 
@@ -191,7 +218,9 @@ var buildTerminalReporter = function (logFile, resolveWithExitCode) {
       return log(str);
     },
     onComplete(runner) {
-      if (logStream != null) { fs.closeSync(logStream); }
+      if (logStream != null) {
+        fs.closeSync(logStream);
+      }
       if (Grim.getDeprecationsLength() > 0) {
         Grim.logDeprecations();
         resolveWithExitCode(1);
@@ -203,14 +232,14 @@ var buildTerminalReporter = function (logFile, resolveWithExitCode) {
       } else {
         return resolveWithExitCode(0);
       }
-    }
+    },
   };
 
-  if (process.env.ATOM_JASMINE_REPORTER === 'list') {
-    const {JasmineListReporter} = require('../helpers/jasmine-list-reporter');
+  if (process.env.ATOM_JASMINE_REPORTER === "list") {
+    const { JasmineListReporter } = require("../helpers/jasmine-list-reporter");
     return new JasmineListReporter(options);
   } else {
-    const {TerminalReporter} = require('jasmine-tagged');
+    const { TerminalReporter } = require("jasmine-tagged");
     return new TerminalReporter(options);
   }
 };

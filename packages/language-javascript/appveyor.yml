@@ -3,4 +3,4 @@ build: off
 
 branches:
   only:
-  - non-existing
+    - non-existing

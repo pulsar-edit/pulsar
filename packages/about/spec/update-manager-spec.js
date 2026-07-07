@@ -1,31 +1,31 @@
-const UpdateManager = require('../lib/update-manager');
+const UpdateManager = require("../lib/update-manager");
 
-describe('UpdateManager', () => {
+describe("UpdateManager", () => {
   let updateManager;
 
   beforeEach(() => {
     updateManager = new UpdateManager();
   });
 
-  describe('::getReleaseNotesURLForVersion', () => {
-    it('returns the page for the release even when a dev version', () => {
-      expect(updateManager.getReleaseNotesURLForVersion('1.100.0-dev')).toContain(
-        'lumine-code/lumine/blob/master/CHANGELOG.md#11000-dev'
+  describe("::getReleaseNotesURLForVersion", () => {
+    it("returns the page for the release even when a dev version", () => {
+      expect(updateManager.getReleaseNotesURLForVersion("1.100.0-dev")).toContain(
+        "lumine-code/lumine/blob/master/CHANGELOG.md#11000-dev",
       );
     });
 
     it('returns the page for the release when a rolling ("nightly") release version', () => {
-      expect(updateManager.getReleaseNotesURLForVersion('1.108.2023090322')).toContain(
-        'lumine-code/lumine/blob/master/CHANGELOG.md#11082023090322'
+      expect(updateManager.getReleaseNotesURLForVersion("1.108.2023090322")).toContain(
+        "lumine-code/lumine/blob/master/CHANGELOG.md#11082023090322",
       );
     });
 
-    it('returns the page for the release when not a dev version', () => {
-      expect(updateManager.getReleaseNotesURLForVersion('1.129.0')).toContain(
-        'lumine-code/lumine/blob/master/CHANGELOG.md#11290'
+    it("returns the page for the release when not a dev version", () => {
+      expect(updateManager.getReleaseNotesURLForVersion("1.129.0")).toContain(
+        "lumine-code/lumine/blob/master/CHANGELOG.md#11290",
       );
-      expect(updateManager.getReleaseNotesURLForVersion('v1.100.0')).toContain(
-        'lumine-code/lumine/blob/master/CHANGELOG.md#11000'
+      expect(updateManager.getReleaseNotesURLForVersion("v1.100.0")).toContain(
+        "lumine-code/lumine/blob/master/CHANGELOG.md#11000",
       );
     });
   });

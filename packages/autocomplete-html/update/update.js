@@ -77,7 +77,10 @@ async function update() {
 
   const fullArrayHtmlElements = buildHtmlElementsArray(htmlElementsRaw);
 
-  const tagsWithAttrs = matchElementInterface(fullArrayHtmlElements, chromiumElements.DOMPinnedProperties);
+  const tagsWithAttrs = matchElementInterface(
+    fullArrayHtmlElements,
+    chromiumElements.DOMPinnedProperties,
+  );
   // tagsWithAttrs gives us an already built object for tags. Including their description.
 
   // Like mentioned in the docs above, instead of manually curate and organize
@@ -88,7 +91,7 @@ async function update() {
 
   const completion = {
     tags: tagsWithAttrs,
-    attributes: curatedAttributes
+    attributes: curatedAttributes,
   };
 
   // Now to write our file
@@ -99,7 +102,9 @@ async function update() {
 
   if (missingGlobals.length > 0) {
     console.log(missingGlobals);
-    console.log("Above are the globals found during updating that do not exist in Curated Attributes.");
+    console.log(
+      "Above are the globals found during updating that do not exist in Curated Attributes.",
+    );
     console.log(`Total Missing Global Attributes: ${missingGlobals.length}`);
   }
 
@@ -147,7 +152,6 @@ function matchElementInterface(elements, domProperties) {
 
     let desc = getElementDescription(ele.name);
     outElements[ele.name].description = desc;
-
   }
 
   return outElements;
@@ -205,7 +209,7 @@ function getElementDescription(element) {
   // name. So we will manually intervein in those cases.
 
   if (element.match(/^h[1-6]$/)) {
-    element = 'heading_elements';
+    element = "heading_elements";
   }
 
   let file;
@@ -213,9 +217,9 @@ function getElementDescription(element) {
   // First lets find the file, but when not initially found, we will continue
   // to search valid locations. Since MDN has content of valid tags seperated
   // by essentially the spec they exist in.
-  const filePath = [ "html", "svg", "mathml" ].map(path =>
-    `./node_modules/content/files/en-us/web/${path}/element/${element}/index.md`
-  ).find(f => fs.existsSync(f));
+  const filePath = ["html", "svg", "mathml"]
+    .map((path) => `./node_modules/content/files/en-us/web/${path}/element/${element}/index.md`)
+    .find((f) => fs.existsSync(f));
 
   if (filePath) {
     file = fs.readFileSync(filePath, { encoding: "utf8" });
@@ -229,10 +233,11 @@ function getElementDescription(element) {
     let breaks = file.split("---");
 
     // The first two breaks should be the yaml metadata block
-    let data = breaks[2].replace(/\{\{\S+\}\}\{\{\S+\}\}/gm, "")
-                        .replace(/\{\{HTMLSidebar\}\}/gm, "") // Used when within `web/html`
-                        .replace(/\{\{SVGRef\}\}/gm, "") // used when within `web/svg`
-                        .replace(/\{\{MathMLRef\}\}/gm, ""); // used when within `web/mathml`
+    let data = breaks[2]
+      .replace(/\{\{\S+\}\}\{\{\S+\}\}/gm, "")
+      .replace(/\{\{HTMLSidebar\}\}/gm, "") // Used when within `web/html`
+      .replace(/\{\{SVGRef\}\}/gm, "") // used when within `web/svg`
+      .replace(/\{\{MathMLRef\}\}/gm, ""); // used when within `web/mathml`
 
     let summaryRaw = data.split("\n");
     // In case the first few lines is an empty line break
@@ -245,19 +250,20 @@ function getElementDescription(element) {
     // No proper file was ever found. Return an empty description
     return "";
   }
-
 }
 
 function sanitizeDescription(input) {
-  return input
-          .replace(/\{\{\S+\("(\S+)"\)\}\}/g, '$1')
-            // ^ Parses special MDN Markdown Links.
-            // eg. {{htmlattrxref("title")}} => title
-            // Where we still want to keep the text within
-          .replace(/[\*\`\{\}\"]/g, "") // Removes special Markdown based characters
-          .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, '$1');
-          // ^ Parses Markdown links, extracting only the linked text
-          // eg. [HTML](/en-US/docs/Web/HTML) => HTML
+  return (
+    input
+      .replace(/\{\{\S+\("(\S+)"\)\}\}/g, "$1")
+      // ^ Parses special MDN Markdown Links.
+      // eg. {{htmlattrxref("title")}} => title
+      // Where we still want to keep the text within
+      .replace(/[\*\`\{\}\"]/g, "") // Removes special Markdown based characters
+      .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, "$1")
+  );
+  // ^ Parses Markdown links, extracting only the linked text
+  // eg. [HTML](/en-US/docs/Web/HTML) => HTML
 }
 
 update();

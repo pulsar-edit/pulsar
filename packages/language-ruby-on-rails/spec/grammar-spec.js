@@ -1,4 +1,3 @@
-
 describe("Ruby on Rails package", () => {
   beforeEach(() => waitsForPromise(() => atom.packages.activatePackage("language-ruby-on-rails")));
 

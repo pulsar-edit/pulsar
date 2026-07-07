@@ -5,37 +5,37 @@ const TextEditorElement = require("../../src/text-editor-element");
 const pathwatcher = require("@pulsar-edit/pathwatcher");
 const TextEditor = require("../../src/text-editor");
 const TextMateLanguageMode = require("../../src/text-mate-language-mode");
-const {CompositeDisposable} = require("event-kit");
-const {clipboard} = require("electron");
+const { CompositeDisposable } = require("event-kit");
+const { clipboard } = require("electron");
 
-const {testPaths} = atom.getLoadSettings();
-let specPackagePath = FindParentDir.sync(testPaths[0], 'package.json')
+const { testPaths } = atom.getLoadSettings();
+let specPackagePath = FindParentDir.sync(testPaths[0], "package.json");
 
 let specPackageName;
 if (specPackagePath) {
-  const packageMetadata = require(path.join(specPackagePath, 'package.json'));
+  const packageMetadata = require(path.join(specPackagePath, "package.json"));
   specPackageName = packageMetadata.name;
 }
 
-let specDirectory = FindParentDir.sync(testPaths[0], 'fixtures');
+let specDirectory = FindParentDir.sync(testPaths[0], "fixtures");
 let specProjectPath;
 if (specDirectory) {
-  specProjectPath = path.join(specDirectory, 'fixtures');
+  specProjectPath = path.join(specDirectory, "fixtures");
 } else {
-  specProjectPath = require('os').tmpdir();
+  specProjectPath = require("os").tmpdir();
 }
 
 exports.register = (jasmineEnv) => {
   jasmineEnv.beforeEach(function () {
     // Do not clobber recent project history
-    spyOn(Object.getPrototypeOf(atom.history), 'saveState').and.returnValue(Promise.resolve());
+    spyOn(Object.getPrototypeOf(atom.history), "saveState").and.returnValue(Promise.resolve());
 
     atom.project.setPaths([specProjectPath]);
 
     atom.packages._originalResolvePackagePath = atom.packages.resolvePackagePath;
-    const spy = spyOn(atom.packages, 'resolvePackagePath')
+    const spy = spyOn(atom.packages, "resolvePackagePath");
     spy.and.callFake(function (packageName) {
-      if (specPackageName && (packageName === specPackageName)) {
+      if (specPackageName && packageName === specPackageName) {
         return atom.packages._originalResolvePackagePath(specPackagePath);
       } else {
         return atom.packages._originalResolvePackagePath(packageName);
@@ -43,21 +43,18 @@ exports.register = (jasmineEnv) => {
     });
 
     // prevent specs from modifying Atom's menus
-    spyOn(atom.menu, 'sendToBrowserProcess');
+    spyOn(atom.menu, "sendToBrowserProcess");
 
     // reset config before each spec
     atom.config.set("core.destroyEmptyPanes", false);
     atom.config.set("editor.fontFamily", "Courier");
     atom.config.set("editor.fontSize", 16);
     atom.config.set("editor.autoIndent", false);
-    atom.config.set(
-      "core.disabledPackages",
-      [
-        "package-that-throws-an-exception",
-        "package-with-broken-package-json",
-        "package-with-broken-keymap"
-      ]
-    );
+    atom.config.set("core.disabledPackages", [
+      "package-that-throws-an-exception",
+      "package-with-broken-package-json",
+      "package-with-broken-keymap",
+    ]);
 
     // advanceClock(1000);
     // window.setTimeout.calls.reset();
@@ -85,18 +82,22 @@ exports.register = (jasmineEnv) => {
         this.emitter.on("did-tokenize", callback),
         this.onDidChangeGrammar(() => {
           const languageMode = this.buffer.getLanguageMode();
-          if (languageMode.tokenizeInBackground != null ? languageMode.tokenizeInBackground.originalValue : undefined) {
+          if (
+            languageMode.tokenizeInBackground != null
+              ? languageMode.tokenizeInBackground.originalValue
+              : undefined
+          ) {
             return callback();
           }
-        })
+        }),
       );
     });
 
-    let clipboardContent = 'initial clipboard content';
-    spyOn(clipboard, 'writeText').and.callFake(text => clipboardContent = text);
-    spyOn(clipboard, 'readText').and.callFake(() => clipboardContent);
+    let clipboardContent = "initial clipboard content";
+    spyOn(clipboard, "writeText").and.callFake((text) => (clipboardContent = text));
+    spyOn(clipboard, "readText").and.callFake(() => clipboardContent);
   });
-}
+};
 
 jasmine.unspy = function (object, methodName) {
   object[methodName].and.callThrough();

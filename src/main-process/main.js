@@ -1,27 +1,27 @@
 const startTime = Date.now();
-const StartupTime = require('../startup-time');
+const StartupTime = require("../startup-time");
 StartupTime.setStartTime();
 
-const path = require('path');
-const fs = require('fs-plus');
-const CSON = require('season');
-const yargs = require('yargs');
-const { app } = require('electron');
+const path = require("path");
+const fs = require("fs-plus");
+const CSON = require("season");
+const yargs = require("yargs");
+const { app } = require("electron");
 
 const args = yargs(process.argv)
   // Don't handle --help or --version here; they will be handled later.
   .help(false)
   .version(false)
-  .alias('d', 'dev')
-  .alias('t', 'test')
-  .alias('r', 'resource-path').argv;
+  .alias("d", "dev")
+  .alias("t", "test")
+  .alias("r", "resource-path").argv;
 
 function isAtomRepoPath(repoPath) {
-  let packageJsonPath = path.join(repoPath, 'package.json');
+  let packageJsonPath = path.join(repoPath, "package.json");
   if (fs.statSyncNoException(packageJsonPath)) {
     try {
       let packageJson = CSON.readFileSync(packageJsonPath);
-      return packageJson.name === 'atom';
+      return packageJson.name === "atom";
     } catch (e) {
       return false;
     }
@@ -40,9 +40,9 @@ if (args.resourcePath) {
   const stableResourcePath = path.dirname(path.dirname(__dirname));
   const defaultRepositoryPath = path.join(
     // Setting the path for the app
-    app.getPath('home'),
-    'github',
-    'lumine'
+    app.getPath("home"),
+    "github",
+    "lumine",
   );
 
   if (process.env.ATOM_DEV_RESOURCE_PATH) {
@@ -62,5 +62,5 @@ if (args.resourcePath) {
   }
 }
 
-const start = require(path.join(resourcePath, 'src', 'main-process', 'start'));
+const start = require(path.join(resourcePath, "src", "main-process", "start"));
 start(resourcePath, devResourcePath, startTime);

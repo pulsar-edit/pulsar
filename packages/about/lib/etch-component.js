@@ -1,4 +1,4 @@
-const etch = require('etch');
+const etch = require("etch");
 
 /*
   Public: Abstract class for handling the initialization
@@ -51,6 +51,6 @@ module.exports = class EtchComponent {
   }
 
   render() {
-    throw new Error('Etch components must implement a `render` method');
+    throw new Error("Etch components must implement a `render` method");
   }
 };

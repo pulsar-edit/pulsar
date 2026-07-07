@@ -1,17 +1,21 @@
-const path = require('path');
-const CSON = require('season');
-const fs = require('fs-plus');
-const {calculateSpecificity, validateSelector} = require('clear-cut');
-const {Disposable} = require('event-kit');
-const remote = require('@electron/remote');
-const MenuHelpers = require('./menu-helpers');
-const {sortMenuItems} = require('./menu-sort-helpers');
-const _ = require('underscore-plus');
+const path = require("path");
+const CSON = require("season");
+const fs = require("fs-plus");
+const { calculateSpecificity, validateSelector } = require("clear-cut");
+const { Disposable } = require("event-kit");
+const remote = require("@electron/remote");
+const MenuHelpers = require("./menu-helpers");
+const { sortMenuItems } = require("./menu-sort-helpers");
+const _ = require("underscore-plus");
 
-const buildMetadata = require('../package.json');
+const buildMetadata = require("../package.json");
 var platformContextMenu;
-if (buildMetadata != null && buildMetadata._atomMenu != null && buildMetadata._atomMenu['context-menu']) {
-  platformContextMenu = buildMetadata._atomMenu['context-menu'];
+if (
+  buildMetadata != null &&
+  buildMetadata._atomMenu != null &&
+  buildMetadata._atomMenu["context-menu"]
+) {
+  platformContextMenu = buildMetadata._atomMenu["context-menu"];
 }
 
 // Extended: Provides a registry for commands that you'd like to appear in the
@@ -45,16 +49,16 @@ if (buildMetadata != null && buildMetadata._atomMenu != null && buildMetadata._a
 // The format for use in {::add} is the same minus the `context-menu` key. See
 // {::add} for more information.
 module.exports = class ContextMenuManager {
-  constructor({keymapManager}) {
+  constructor({ keymapManager }) {
     this.keymapManager = keymapManager;
     this.definitions = {
-      '.overlayer': [] // TODO: Remove once color picker package stops touching private data
+      ".overlayer": [], // TODO: Remove once color picker package stops touching private data
     };
     this.clear();
     this.keymapManager.onDidLoadBundledKeymaps(() => this.loadPlatformItems());
   }
 
-  initialize({resourcePath, devMode}) {
+  initialize({ resourcePath, devMode }) {
     this.resourcePath = resourcePath;
     this.devMode = devMode;
   }
@@ -63,10 +67,10 @@ module.exports = class ContextMenuManager {
     if (platformContextMenu != null) {
       return this.add(platformContextMenu, this.devMode || false);
     } else {
-      const menusDirPath = path.join(this.resourcePath, 'menus');
-      const platformMenuPath = fs.resolve(menusDirPath, process.platform, ['cson', 'json']);
+      const menusDirPath = path.join(this.resourcePath, "menus");
+      const platformMenuPath = fs.resolve(menusDirPath, process.platform, ["cson", "json"]);
       const map = CSON.readFileSync(platformMenuPath);
-      return this.add(map['context-menu']);
+      return this.add(map["context-menu"]);
     }
   }
 
@@ -142,7 +146,7 @@ module.exports = class ContextMenuManager {
   }
 
   templateForElement(target) {
-    return this.templateForEvent({target});
+    return this.templateForEvent({ target });
   }
 
   templateForEvent(event) {
@@ -150,7 +154,9 @@ module.exports = class ContextMenuManager {
     let currentTarget = event.target;
     while (currentTarget != null) {
       const currentTargetItems = [];
-      const matchingItemSets = this.itemSets.filter((itemSet) => currentTarget.webkitMatchesSelector(itemSet.selector));
+      const matchingItemSets = this.itemSets.filter((itemSet) =>
+        currentTarget.webkitMatchesSelector(itemSet.selector),
+      );
       for (let itemSet of matchingItemSets) {
         for (let item of itemSet.items) {
           const itemForEvent = this.cloneItemForEvent(item, event);
@@ -175,13 +181,16 @@ module.exports = class ContextMenuManager {
     for (let id in template) {
       const item = template[id];
       if (item.command) {
-        const keymaps = this.keymapManager.findKeyBindings({command: item.command, target: document.activeElement});
-        const keystrokes = (keymaps && keymaps[0]) ? keymaps[0].keystrokes : undefined;
+        const keymaps = this.keymapManager.findKeyBindings({
+          command: item.command,
+          target: document.activeElement,
+        });
+        const keystrokes = keymaps && keymaps[0] ? keymaps[0].keystrokes : undefined;
         if (keystrokes) {
           // Electron does not support multi-keystroke accelerators. Therefore,
           // when the command maps to a multi-stroke key binding, show the
           // keystrokes next to the item's label.
-          if (keystrokes.includes(' ')) {
+          if (keystrokes.includes(" ")) {
             item.label += ` [${_.humanizeKeystroke(keystrokes)}]`;
           } else {
             item.accelerator = MenuHelpers.acceleratorForKeystroke(keystrokes);
@@ -198,7 +207,7 @@ module.exports = class ContextMenuManager {
     let keepNextItemIfSeparator = false;
     let index = 0;
     while (index < menu.length) {
-      if (menu[index].type === 'separator') {
+      if (menu[index].type === "separator") {
         if (!keepNextItemIfSeparator || index === menu.length - 1) {
           menu.splice(index, 1);
         } else {
@@ -228,7 +237,7 @@ module.exports = class ContextMenuManager {
       return null;
     }
     item = Object.create(item);
-    if (typeof item.shouldDisplay === 'function' && !item.shouldDisplay(event)) {
+    if (typeof item.shouldDisplay === "function" && !item.shouldDisplay(event)) {
       return null;
     }
     if (typeof item.created === "function") {
@@ -248,28 +257,27 @@ module.exports = class ContextMenuManager {
     if (!(menuTemplate && menuTemplate.length > 0)) {
       return;
     }
-    remote.getCurrentWindow().emit('context-menu', menuTemplate);
+    remote.getCurrentWindow().emit("context-menu", menuTemplate);
   }
 
   clear() {
     this.activeElement = null;
     this.itemSets = [];
     const inspectElement = {
-      'atom-workspace': [
+      "atom-workspace": [
         {
-          label: 'Inspect Element',
-          command: 'application:inspect',
+          label: "Inspect Element",
+          command: "application:inspect",
           devMode: true,
-          created: function(event) {
-            const {pageX, pageY} = event;
-            this.commandDetail = {x: pageX, y: pageY};
-          }
-        }
-      ]
+          created: function (event) {
+            const { pageX, pageY } = event;
+            this.commandDetail = { x: pageX, y: pageY };
+          },
+        },
+      ],
     };
     this.add(inspectElement, false);
   }
-
 };
 
 var ContextMenuItemSet = class ContextMenuItemSet {
@@ -278,5 +286,4 @@ var ContextMenuItemSet = class ContextMenuItemSet {
     this.items = items1;
     this.specificity = calculateSpecificity(this.selector);
   }
-
 };

@@ -52,7 +52,7 @@ function windows_chocoInstalled() {
   if (chocoCheck.code !== 0) {
     return false;
   }
-  
+
   return chocoCheck.stdout.includes("lumine");
 }
 

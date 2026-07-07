@@ -1,31 +1,32 @@
-
-describe("CoffeeScript (Literate) grammar", function() {
+describe("CoffeeScript (Literate) grammar", function () {
   let grammar = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     waitsForPromise(() => atom.packages.activatePackage("language-coffee-script"));
 
-    runs(() => grammar = atom.grammars.grammarForScopeName("source.litcoffee"));
+    runs(() => (grammar = atom.grammars.grammarForScopeName("source.litcoffee")));
   });
 
-  it("parses the grammar", function() {
+  it("parses the grammar", function () {
     expect(grammar).toBeTruthy();
     expect(grammar.scopeName).toBe("source.litcoffee");
   });
 
-  it("recognizes a code block after a list", function() {
+  it("recognizes a code block after a list", function () {
     const tokens = grammar.tokenizeLines(`\
 1. Example
 2. List
 
     1 + 2\
-`
-    );
-    expect(tokens[3][1]).toEqual({value: "1", scopes: ["source.litcoffee", "markup.raw.block.markdown", "constant.numeric.decimal.coffee"]});
-});
+`);
+    expect(tokens[3][1]).toEqual({
+      value: "1",
+      scopes: ["source.litcoffee", "markup.raw.block.markdown", "constant.numeric.decimal.coffee"],
+    });
+  });
 
-  describe("firstLineMatch", function() {
-    it("recognises interpreter directives", function() {
+  describe("firstLineMatch", function () {
+    it("recognises interpreter directives", function () {
       let line;
       const valid = `\
 #!/usr/local/bin/coffee --no-header --literate -w
@@ -50,7 +51,7 @@ describe("CoffeeScript (Literate) grammar", function() {
       })();
     });
 
-    it("recognises Emacs modelines", function() {
+    it("recognises Emacs modelines", function () {
       let line;
       const valid = `\
 #-*- litcoffee -*-
@@ -95,7 +96,7 @@ describe("CoffeeScript (Literate) grammar", function() {
       })();
     });
 
-    it("recognises Vim modelines", function() {
+    it("recognises Vim modelines", function () {
       let line;
       const valid = `\
 vim: se filetype=litcoffee:

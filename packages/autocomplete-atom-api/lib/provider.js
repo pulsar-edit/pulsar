@@ -1,17 +1,18 @@
+const fs = require("fs");
+const path = require("path");
 
-const fs = require('fs');
-const path = require('path');
-
-const CLASSES = require('../completions.json');
+const CLASSES = require("../completions.json");
 
 const propertyPrefixPattern = /(?:^|\[|\(|,|=|:|\s)\s*(atom\.(?:[a-zA-Z]+\.?){0,2})$/;
 
 module.exports = {
-  selector: '.source.coffee, .source.js',
+  selector: ".source.coffee, .source.js",
   filterSuggestions: true,
 
-  getSuggestions({bufferPosition, editor}) {
-    if (!this.isEditingAnAtomPackageFile(editor)) { return; }
+  getSuggestions({ bufferPosition, editor }) {
+    if (!this.isEditingAnAtomPackageFile(editor)) {
+      return;
+    }
     const line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]);
     return this.getCompletions(line);
   },
@@ -24,8 +25,10 @@ module.exports = {
 
   scanProjectDirectories() {
     this.packageDirectories = [];
-    atom.project.getDirectories().forEach(directory => {
-      if (directory == null) { return; }
+    atom.project.getDirectories().forEach((directory) => {
+      if (directory == null) {
+        return;
+      }
       this.readMetadata(directory, (error, metadata) => {
         if (this.isAtomPackage(metadata) || this.isAtomCore(metadata)) {
           this.packageDirectories.push(directory);
@@ -35,7 +38,7 @@ module.exports = {
   },
 
   readMetadata(directory, callback) {
-    fs.readFile(path.join(directory.getPath(), 'package.json'), function(error, contents) {
+    fs.readFile(path.join(directory.getPath(), "package.json"), function (error, contents) {
       let metadata;
       if (error == null) {
         try {
@@ -53,7 +56,7 @@ module.exports = {
   },
 
   isAtomCore(metadata) {
-    return metadata?.name === 'atom';
+    return metadata?.name === "atom";
   },
 
   isEditingAnAtomPackageFile(editor) {
@@ -61,33 +64,42 @@ module.exports = {
     if (editorPath != null) {
       const parsedPath = path.parse(editorPath);
       const basename = path.basename(parsedPath.dir);
-      if ((basename === '.atom') || (basename === '.lumine')) {
-        if ((parsedPath.base === 'init.coffee') || (parsedPath.base === 'init.js')) {
+      if (basename === ".atom" || basename === ".lumine") {
+        if (parsedPath.base === "init.coffee" || parsedPath.base === "init.js") {
           return true;
         }
       }
     }
-    for (let directory of (this.packageDirectories != null ? this.packageDirectories : [])) {
-      if (directory.contains(editorPath)) { return true; }
+    for (let directory of this.packageDirectories != null ? this.packageDirectories : []) {
+      if (directory.contains(editorPath)) {
+        return true;
+      }
     }
     return false;
   },
 
   loadCompletions() {
-    if (this.completions == null) { this.completions = {}; }
-    return this.loadProperty('atom', 'AtomEnvironment', CLASSES);
+    if (this.completions == null) {
+      this.completions = {};
+    }
+    return this.loadProperty("atom", "AtomEnvironment", CLASSES);
   },
 
   getCompletions(line) {
     const completions = [];
-    const match =  propertyPrefixPattern.exec(line)?.[1];
-    if (!match) { return completions; }
+    const match = propertyPrefixPattern.exec(line)?.[1];
+    if (!match) {
+      return completions;
+    }
 
-    let segments = match.split('.');
-    const prefix = segments.pop() ?? '';
-    segments = segments.filter(segment => segment);
+    let segments = match.split(".");
+    const prefix = segments.pop() ?? "";
+    segments = segments.filter((segment) => segment);
     const property = segments[segments.length - 1];
-    const propertyCompletions = this.completions[property]?.completions != null ? this.completions[property]?.completions : [];
+    const propertyCompletions =
+      this.completions[property]?.completions != null
+        ? this.completions[property]?.completions
+        : [];
     for (let completion of propertyCompletions) {
       if (!prefix || firstCharsEqual(completion.name, prefix)) {
         completions.push(clone(completion));
@@ -102,23 +114,28 @@ module.exports = {
 
   loadProperty(propertyName, className, classes, parent) {
     const classCompletions = classes[className];
-    if (classCompletions == null) { return; }
+    if (classCompletions == null) {
+      return;
+    }
 
-    this.completions[propertyName] = {completions: []};
+    this.completions[propertyName] = { completions: [] };
 
     for (let completion of classCompletions) {
       this.completions[propertyName].completions.push(completion);
-      if (completion.type === 'property') {
+      if (completion.type === "property") {
         const propertyClass = this.getPropertyClass(completion.name);
         this.loadProperty(completion.name, propertyClass, classes);
       }
     }
-  }
+  },
 };
 
-const clone = function(obj) {
+const clone = function (obj) {
   const newObj = {};
-  for (let k in obj) { const v = obj[k]; newObj[k] = v; }
+  for (let k in obj) {
+    const v = obj[k];
+    newObj[k] = v;
+  }
   return newObj;
 };
 

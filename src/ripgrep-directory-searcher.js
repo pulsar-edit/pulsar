@@ -1,5 +1,5 @@
-const { spawn } = require('child_process');
-const path = require('path');
+const { spawn } = require("child_process");
+const path = require("path");
 
 // `ripgrep` and `scandal` have a different way of handling the trailing and leading
 // context lines:
@@ -45,7 +45,7 @@ const path = require('path');
 // haven't been fulfilled in this Set, and mutate them adding new lines until they are fulfilled.
 
 function updateLeadingContext(message, pendingLeadingContext, options) {
-  if (message.type !== 'match' && message.type !== 'context') {
+  if (message.type !== "match" && message.type !== "context") {
     return;
   }
 
@@ -59,7 +59,7 @@ function updateLeadingContext(message, pendingLeadingContext, options) {
 }
 
 function updateTrailingContexts(message, pendingTrailingContexts, options) {
-  if (message.type !== 'match' && message.type !== 'context') {
+  if (message.type !== "match" && message.type !== "context") {
     return;
   }
 
@@ -77,9 +77,7 @@ function updateTrailingContexts(message, pendingTrailingContexts, options) {
 function cleanResultLine(resultLine) {
   resultLine = getText(resultLine);
 
-  return resultLine[resultLine.length - 1] === '\n'
-    ? resultLine.slice(0, -1)
-    : resultLine;
+  return resultLine[resultLine.length - 1] === "\n" ? resultLine.slice(0, -1) : resultLine;
 }
 
 function getPositionFromColumn(lines, column) {
@@ -132,7 +130,7 @@ function processUnicodeMatch(match) {
 // will have different start and end rows and we need to calculate these
 // based on the lines that ripgrep returns.
 function processSubmatch(submatch, lineText, offsetRow) {
-  const lineParts = lineText.split('\n');
+  const lineParts = lineText.split("\n");
 
   const start = getPositionFromColumn(lineParts, submatch.start);
   const end = getPositionFromColumn(lineParts, submatch.end);
@@ -152,14 +150,12 @@ function processSubmatch(submatch, lineText, offsetRow) {
 
   return {
     range: [start, end],
-    lineText: cleanResultLine({ text: lineParts.join('\n') })
+    lineText: cleanResultLine({ text: lineParts.join("\n") }),
   };
 }
 
 function getText(input) {
-  return 'text' in input
-    ? input.text
-    : Buffer.from(input.bytes, 'base64').toString();
+  return "text" in input ? input.text : Buffer.from(input.bytes, "base64").toString();
 }
 
 module.exports = class RipgrepDirectorySearcher {
@@ -203,8 +199,8 @@ module.exports = class RipgrepDirectorySearcher {
   search(directories, regexp, options) {
     const numPathsFound = { num: 0 };
 
-    const allPromises = directories.map(directory =>
-      this.searchInDirectory(directory, regexp, options, numPathsFound)
+    const allPromises = directories.map((directory) =>
+      this.searchInDirectory(directory, regexp, options, numPathsFound),
     );
 
     const promise = Promise.all(allPromises);
@@ -221,76 +217,67 @@ module.exports = class RipgrepDirectorySearcher {
   searchInDirectory(directory, regexp, options, numPathsFound) {
     // Delay the require of vscode-ripgrep to not mess with the snapshot creation.
     if (!this.rgPath) {
-      this.rgPath = require('vscode-ripgrep').rgPath.replace(
-        /\bapp\.asar\b/,
-        'app.asar.unpacked'
-      );
+      this.rgPath = require("vscode-ripgrep").rgPath.replace(/\bapp\.asar\b/, "app.asar.unpacked");
     }
 
     const directoryPath = directory.getPath();
     const regexpStr = this.prepareRegexp(regexp.source);
 
-    const args = ['--json', '--regexp', regexpStr];
+    const args = ["--json", "--regexp", regexpStr];
     if (options.leadingContextLineCount) {
-      args.push('--before-context', options.leadingContextLineCount);
+      args.push("--before-context", options.leadingContextLineCount);
     }
     if (options.trailingContextLineCount) {
-      args.push('--after-context', options.trailingContextLineCount);
+      args.push("--after-context", options.trailingContextLineCount);
     }
     if (regexp.ignoreCase) {
-      args.push('--ignore-case');
+      args.push("--ignore-case");
     }
-    for (const inclusion of this.prepareGlobs(
-      options.inclusions,
-      directoryPath
-    )) {
-      args.push('--glob', inclusion);
+    for (const inclusion of this.prepareGlobs(options.inclusions, directoryPath)) {
+      args.push("--glob", inclusion);
     }
-    for (const exclusion of this.prepareGlobs(
-      options.exclusions,
-      directoryPath
-    )) {
-      args.push('--glob', '!' + exclusion);
+    for (const exclusion of this.prepareGlobs(options.exclusions, directoryPath)) {
+      args.push("--glob", "!" + exclusion);
     }
 
     if (this.isMultilineRegexp(regexpStr)) {
-      args.push('--multiline');
+      args.push("--multiline");
     }
 
     if (options.includeHidden) {
-      args.push('--hidden');
+      args.push("--hidden");
     }
 
     if (options.follow) {
-      args.push('--follow');
+      args.push("--follow");
     }
 
     if (!options.excludeVcsIgnores) {
-      args.push('--no-ignore-vcs');
+      args.push("--no-ignore-vcs");
     }
 
     if (options.PCRE2) {
-      args.push('--pcre2');
+      args.push("--pcre2");
     }
 
-    args.push('.');
+    args.push(".");
 
     const child = spawn(this.rgPath, args, {
       cwd: directoryPath,
-      stdio: ['pipe', 'pipe', 'pipe']
+      stdio: ["pipe", "pipe", "pipe"],
     });
 
     const didMatch = options.didMatch || (() => {});
     let cancelled = false;
 
     const returnedPromise = new Promise((resolve, reject) => {
-      let buffer = '';
-      let bufferError = '';
+      let buffer = "";
+      let bufferError = "";
       let pendingEvent;
       let pendingLeadingContext;
       let pendingTrailingContexts;
 
-      child.on('close', (code, signal) => {
+      child.on("close", (code, signal) => {
         // code 1 is used when no results are found.
         if (code !== null && code > 1) {
           reject(new Error(bufferError));
@@ -299,30 +286,30 @@ module.exports = class RipgrepDirectorySearcher {
         }
       });
 
-      child.stderr.on('data', chunk => {
+      child.stderr.on("data", (chunk) => {
         bufferError += chunk;
       });
 
-      child.stdout.on('data', chunk => {
+      child.stdout.on("data", (chunk) => {
         if (cancelled) {
           return;
         }
 
         buffer += chunk;
-        const lines = buffer.split('\n');
+        const lines = buffer.split("\n");
         buffer = lines.pop();
         for (const line of lines) {
           const message = JSON.parse(line);
           updateTrailingContexts(message, pendingTrailingContexts, options);
 
-          if (message.type === 'begin') {
+          if (message.type === "begin") {
             pendingEvent = {
               filePath: path.join(directoryPath, getText(message.data.path)),
-              matches: []
+              matches: [],
             };
             pendingLeadingContext = [];
             pendingTrailingContexts = new Set();
-          } else if (message.type === 'match') {
+          } else if (message.type === "match") {
             const trailingContextLines = [];
             pendingTrailingContexts.add(trailingContextLines);
 
@@ -332,7 +319,7 @@ module.exports = class RipgrepDirectorySearcher {
               const { lineText, range } = processSubmatch(
                 submatch,
                 getText(message.data.lines),
-                message.data.line_number - 1
+                message.data.line_number - 1,
               );
 
               pendingEvent.matches.push({
@@ -341,10 +328,10 @@ module.exports = class RipgrepDirectorySearcher {
                 lineTextOffset: 0,
                 range,
                 leadingContextLines: [...pendingLeadingContext],
-                trailingContextLines
+                trailingContextLines,
               });
             }
-          } else if (message.type === 'end') {
+          } else if (message.type === "end") {
             options.didSearchPaths(++numPathsFound.num);
             didMatch(pendingEvent);
             pendingEvent = null;
@@ -372,7 +359,7 @@ module.exports = class RipgrepDirectorySearcher {
     for (let pattern of globs) {
       // we need to replace path separators by slashes since globs should
       // always use always slashes as path separators.
-      pattern = pattern.replace(new RegExp(`\\${path.sep}`, 'g'), '/');
+      pattern = pattern.replace(new RegExp(`\\${path.sep}`, "g"), "/");
 
       if (pattern.length === 0) {
         continue;
@@ -383,20 +370,20 @@ module.exports = class RipgrepDirectorySearcher {
       // The user can just search inside one of the opened projects. When we detect
       // this scenario we just consider the glob to include every file.
       if (pattern === projectName) {
-        output.push('**/*');
+        output.push("**/*");
         continue;
       }
 
-      if (pattern.startsWith(projectName + '/')) {
+      if (pattern.startsWith(projectName + "/")) {
         pattern = pattern.slice(projectName.length + 1);
       }
 
-      if (pattern.endsWith('/')) {
+      if (pattern.endsWith("/")) {
         pattern = pattern.slice(0, -1);
       }
 
       output.push(pattern);
-      output.push(pattern.endsWith('/**') ? pattern : `${pattern}/**`);
+      output.push(pattern.endsWith("/**") ? pattern : `${pattern}/**`);
     }
 
     return output;
@@ -405,19 +392,19 @@ module.exports = class RipgrepDirectorySearcher {
   prepareRegexp(regexpStr) {
     // ripgrep handles `--` as the arguments separator, so we need to escape it if the
     // user searches for that exact same string.
-    if (regexpStr === '--') {
-      return '\\-\\-';
+    if (regexpStr === "--") {
+      return "\\-\\-";
     }
 
     // ripgrep is quite picky about unnecessarily escaped sequences, so we need to unescape
     // them: https://github.com/BurntSushi/ripgrep/issues/434.
-    regexpStr = regexpStr.replace(/\\\//g, '/');
+    regexpStr = regexpStr.replace(/\\\//g, "/");
 
     return regexpStr;
   }
 
   isMultilineRegexp(regexpStr) {
-    if (regexpStr.includes('\\n')) {
+    if (regexpStr.includes("\\n")) {
       return true;
     }
 

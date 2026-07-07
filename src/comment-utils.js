@@ -1,4 +1,3 @@
-
 // Accept a comment metadata block and make it more consistent and predictable.
 //
 // The `comments` key in a grammar definition file has historically contained
@@ -12,7 +11,9 @@
 function normalizeDelimiters(meta = {}) {
   // Adapt the style used in `TreeSitterGrammar`.
   if (
-    ('commentStartString' in meta && 'commentEndString' in meta) && !('line' in meta || 'block' in meta)
+    "commentStartString" in meta &&
+    "commentEndString" in meta &&
+    !("line" in meta || "block" in meta)
   ) {
     let { commentStartString: start, commentEndString: end } = meta;
     meta = { start, end };
@@ -20,7 +21,7 @@ function normalizeDelimiters(meta = {}) {
   let { line, block } = meta;
   // Normalize the `{ start: string, end: string }` version to `[string,
   // string].`
-  if (block && (!Array.isArray(block))) {
+  if (block && !Array.isArray(block)) {
     let { start, end } = block;
     block = [start, end];
   }
@@ -49,7 +50,7 @@ function commentStringsFromDelimiters(meta) {
   let commentEndString;
   let commentDelimiters = { line, block };
   let blockIsValid = block != null && Array.isArray(block);
-  let lineIsValid = typeof line === 'string';
+  let lineIsValid = typeof line === "string";
   if (lineIsValid || blockIsValid) {
     commentDelimiters = { line, block };
     if (lineIsValid) {
@@ -64,22 +65,20 @@ function commentStringsFromDelimiters(meta) {
   return result;
 }
 
-
-
 // Given a scope, return a single object of `editor.commentDelimiters` data.
 // Needed because an ordinary config lookup will “blend” objects from cascading
 // scopes — which is usually the behavior we want! Just not this time.
 function getDelimitersForScope(scope) {
   let reversed = [...scope.scopes].reverse();
-  let mapped = reversed.map(scope => {
-    return atom.config.get('editor.commentDelimiters', { scope: [scope] })
-  })
-  let result = mapped.find(setting => !!setting)
-  return result ? normalizeDelimiters(result) : result
+  let mapped = reversed.map((scope) => {
+    return atom.config.get("editor.commentDelimiters", { scope: [scope] });
+  });
+  let result = mapped.find((setting) => !!setting);
+  return result ? normalizeDelimiters(result) : result;
 }
 
 module.exports = {
   normalizeDelimiters,
   commentStringsFromDelimiters,
-  getDelimitersForScope
+  getDelimitersForScope,
 };

@@ -1,20 +1,18 @@
-const { CompositeDisposable } = require('event-kit');
-require('./pane-resize-handle-element');
+const { CompositeDisposable } = require("event-kit");
+require("./pane-resize-handle-element");
 
 class PaneAxisElement extends HTMLElement {
   connectedCallback() {
     if (this.subscriptions == null) {
       this.subscriptions = this.subscribeToModel();
     }
-    this.model
-      .getChildren()
-      .map((child, index) => this.childAdded({ child, index }));
+    this.model.getChildren().map((child, index) => this.childAdded({ child, index }));
   }
 
   disconnectedCallback() {
     this.subscriptions.dispose();
     this.subscriptions = null;
-    this.model.getChildren().map(child => this.childRemoved({ child }));
+    this.model.getChildren().map((child) => this.childRemoved({ child }));
   }
 
   initialize(model, viewRegistry) {
@@ -30,11 +28,11 @@ class PaneAxisElement extends HTMLElement {
     }
 
     switch (this.model.getOrientation()) {
-      case 'horizontal':
-        this.classList.add('horizontal', 'pane-row');
+      case "horizontal":
+        this.classList.add("horizontal", "pane-row");
         break;
-      case 'vertical':
-        this.classList.add('vertical', 'pane-column');
+      case "vertical":
+        this.classList.add("vertical", "pane-column");
         break;
     }
     return this;
@@ -43,22 +41,15 @@ class PaneAxisElement extends HTMLElement {
   subscribeToModel() {
     const subscriptions = new CompositeDisposable();
     subscriptions.add(this.model.onDidAddChild(this.childAdded.bind(this)));
-    subscriptions.add(
-      this.model.onDidRemoveChild(this.childRemoved.bind(this))
-    );
-    subscriptions.add(
-      this.model.onDidReplaceChild(this.childReplaced.bind(this))
-    );
-    subscriptions.add(
-      this.model.observeFlexScale(this.flexScaleChanged.bind(this))
-    );
+    subscriptions.add(this.model.onDidRemoveChild(this.childRemoved.bind(this)));
+    subscriptions.add(this.model.onDidReplaceChild(this.childReplaced.bind(this)));
+    subscriptions.add(this.model.observeFlexScale(this.flexScaleChanged.bind(this)));
     return subscriptions;
   }
 
   isPaneResizeHandleElement(element) {
     return (
-      (element != null ? element.nodeName.toLowerCase() : undefined) ===
-      'atom-pane-resize-handle'
+      (element != null ? element.nodeName.toLowerCase() : undefined) === "atom-pane-resize-handle"
     );
   }
 
@@ -70,14 +61,14 @@ class PaneAxisElement extends HTMLElement {
     const prevElement = view.previousSibling;
     // if previous element is not pane resize element, then insert new resize element
     if (prevElement != null && !this.isPaneResizeHandleElement(prevElement)) {
-      resizeHandle = document.createElement('atom-pane-resize-handle');
+      resizeHandle = document.createElement("atom-pane-resize-handle");
       this.insertBefore(resizeHandle, view);
     }
 
     const nextElement = view.nextSibling;
     // if next element isnot resize element, then insert new resize element
     if (nextElement != null && !this.isPaneResizeHandleElement(nextElement)) {
-      resizeHandle = document.createElement('atom-pane-resize-handle');
+      resizeHandle = document.createElement("atom-pane-resize-handle");
       return this.insertBefore(resizeHandle, nextElement);
     }
   }
@@ -109,18 +100,16 @@ class PaneAxisElement extends HTMLElement {
   }
 
   hasFocus() {
-    return (
-      this === document.activeElement || this.contains(document.activeElement)
-    );
+    return this === document.activeElement || this.contains(document.activeElement);
   }
 }
 
-window.customElements.define('atom-pane-axis', PaneAxisElement);
+window.customElements.define("atom-pane-axis", PaneAxisElement);
 
 function createPaneAxisElement() {
-  return document.createElement('atom-pane-axis');
+  return document.createElement("atom-pane-axis");
 }
 
 module.exports = {
-  createPaneAxisElement
+  createPaneAxisElement,
 };

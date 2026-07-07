@@ -46,21 +46,21 @@ module.exports = class ScopeDescriptor {
   getScopeChain() {
     // For backward compatibility, prefix TextMate-style scope names with
     // leading dots (e.g. 'source.js' -> '.source.js').
-    if (this.scopes[0] != null && this.scopes[0].includes('.')) {
-      let result = '';
+    if (this.scopes[0] != null && this.scopes[0].includes(".")) {
+      let result = "";
       for (let i = 0; i < this.scopes.length; i++) {
         const scope = this.scopes[i];
         if (i > 0) {
-          result += ' ';
+          result += " ";
         }
-        if (scope[0] !== '.') {
-          result += '.';
+        if (scope[0] !== ".") {
+          result += ".";
         }
         result += scope;
       }
       return result;
     } else {
-      return this.scopes.join(' ');
+      return this.scopes.join(" ");
     }
   }
 

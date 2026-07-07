@@ -29,8 +29,8 @@
   }
 
   .input-checkbox {
-    margin-top: -.2em;
-    margin-right: .5em;
+    margin-top: -0.2em;
+    margin-right: 0.5em;
   }
 
   // Components ----------------------
@@ -83,7 +83,7 @@
       color: lighten(@text-color, 4%);
     }
     &::-webkit-details-marker {
-      display: none
+      display: none;
     }
     &:before {
       width: 20px;
@@ -108,8 +108,8 @@
       margin-bottom: 0;
     }
     .btn {
-      margin-top: (@component-padding/3);
-      margin-bottom: (@component-padding/3);
+      margin-top: (@component-padding / 3);
+      margin-bottom: (@component-padding / 3);
     }
   }
 
@@ -131,11 +131,11 @@
       margin: 1em -1em;
 
       button {
-        width: 100%
+        width: 100%;
       }
 
       div {
-        margin: .5em 1em;
+        margin: 0.5em 1em;
         flex: 1;
       }
 
@@ -147,18 +147,20 @@
 
   &-key {
     display: inline-block;
-    padding: .3em .4em;
-    font-size: .8em;
+    padding: 0.3em 0.4em;
+    font-size: 0.8em;
     line-height: 1;
     border-radius: 3px;
     color: @text-color-highlight;
     border: 1px solid @text-color-subtle;
-    background: hsla(0,0%,0%,.1);
+    background: hsla(0, 0%, 0%, 0.1);
   }
 
   &-love {
     color: @text-color-subtle;
-    a { color: @text-color-subtle; }
+    a {
+      color: @text-color-subtle;
+    }
 
     .icon::before {
       // Make these octicons look good inlined with text
@@ -177,7 +179,7 @@
   }
 
   &-note {
-    font-size: .86em;
+    font-size: 0.86em;
     color: @text-color-subtle;
 
     .icon {

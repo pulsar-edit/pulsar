@@ -6,7 +6,6 @@
 // Buttons
 // --------------------------------------------------
 
-
 // Base styles
 // --------------------------------------------------
 
@@ -49,7 +48,7 @@
   &.active {
     outline: 0;
     background-image: none;
-    box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
   }
 
   &.selected,
@@ -64,7 +63,7 @@
   &[disabled],
   fieldset[disabled] & {
     cursor: @cursor-disabled;
-    opacity: .65;
+    opacity: 0.65;
     box-shadow: none;
   }
 
@@ -75,7 +74,6 @@
     }
   }
 }
-
 
 // Button variants
 // --------------------------------------------------
@@ -148,13 +146,12 @@
   .button-variant(@btn-error-color; @btn-error-bg;);
 }
 
-
 // Button Sizes
 // --------------------------------------------------
 
 .btn-xs,
 .btn-group-xs > .btn {
-  padding: (@component-padding/4) (@component-padding/2);
+  padding: (@component-padding / 4) (@component-padding / 2);
   font-size: (@font-size - 2px);
   height: auto;
   line-height: 1.3em;
@@ -164,7 +161,7 @@
 }
 .btn-sm,
 .btn-group-sm > .btn {
-  padding: (@component-padding/4) (@component-padding/2);
+  padding: (@component-padding / 4) (@component-padding / 2);
   height: auto;
   line-height: 1.3em;
   &.icon:before {
@@ -174,14 +171,13 @@
 .btn-lg,
 .btn-group-lg > .btn {
   font-size: @font-size + 2px;
-  padding: (@component-padding - 2px)  (@component-padding + 2px);
+  padding: (@component-padding - 2px) (@component-padding + 2px);
   height: auto;
   line-height: 1.3em;
   &.icon:before {
     font-size: (@font-size + 6px);
   }
 }
-
 
 // Link button
 // -------------------------
@@ -215,7 +211,6 @@
   }
 }
 
-
 // Block button
 // --------------------------------------------------
 
@@ -238,7 +233,6 @@ input[type="button"] {
   }
 }
 
-
 // Icon buttons
 // --------------------------------------------------
 
@@ -246,13 +240,12 @@ input[type="button"] {
   &:before {
     width: initial;
     height: initial;
-    margin-right: .3125em;
+    margin-right: 0.3125em;
   }
   &:empty:before {
     margin-right: 0;
   }
 }
-
 
 // Button Toolbar
 // --------------------------------------------------

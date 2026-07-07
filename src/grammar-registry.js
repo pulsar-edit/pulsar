@@ -1,17 +1,17 @@
-const _ = require('underscore-plus');
-const Grim = require('grim');
-const CSON = require('season');
-const SecondMate = require('second-mate');
-const { Disposable, CompositeDisposable, Emitter } = require('event-kit');
-const TextMateLanguageMode = require('./text-mate-language-mode');
-const WASMTreeSitterLanguageMode = require('./wasm-tree-sitter-language-mode');
-const WASMTreeSitterGrammar = require('./wasm-tree-sitter-grammar');
-const ScopeDescriptor = require('./scope-descriptor');
-const Token = require('./token');
-const fs = require('fs-plus');
-const { Point, Range } = require('@pulsar-edit/text-buffer');
+const _ = require("underscore-plus");
+const Grim = require("grim");
+const CSON = require("season");
+const SecondMate = require("second-mate");
+const { Disposable, CompositeDisposable, Emitter } = require("event-kit");
+const TextMateLanguageMode = require("./text-mate-language-mode");
+const WASMTreeSitterLanguageMode = require("./wasm-tree-sitter-language-mode");
+const WASMTreeSitterGrammar = require("./wasm-tree-sitter-grammar");
+const ScopeDescriptor = require("./scope-descriptor");
+const Token = require("./token");
+const fs = require("fs-plus");
+const { Point, Range } = require("@pulsar-edit/text-buffer");
 
-const PATH_SPLIT_REGEX = new RegExp('[/.]');
+const PATH_SPLIT_REGEX = new RegExp("[/.]");
 
 // Extended: This class holds the grammars used for tokenizing.
 //
@@ -22,7 +22,7 @@ module.exports = class GrammarRegistry {
     this.subscriptions = new CompositeDisposable();
     this.textmateRegistry = new SecondMate.GrammarRegistry({
       maxTokensPerLine: 100,
-      maxLineLength: 1000
+      maxLineLength: 1000,
     });
     this.emitter = new Emitter();
     this.clear();
@@ -53,7 +53,7 @@ module.exports = class GrammarRegistry {
     };
 
     this.subscriptions.add(
-      this.config.onDidChange('core.useTreeSitterParsers', onLanguageModeChange)
+      this.config.onDidChange("core.useTreeSitterParsers", onLanguageModeChange),
     );
   }
 
@@ -67,10 +67,7 @@ module.exports = class GrammarRegistry {
 
   deserialize(params) {
     for (const bufferId in params.languageOverridesByBufferId || {}) {
-      this.languageOverridesByBufferId.set(
-        bufferId,
-        params.languageOverridesByBufferId[bufferId]
-      );
+      this.languageOverridesByBufferId.set(bufferId, params.languageOverridesByBufferId[bufferId]);
     }
   }
 
@@ -145,9 +142,7 @@ module.exports = class GrammarRegistry {
 
     this.grammarScoresByBuffer.set(buffer, null);
     if (grammar !== buffer.getLanguageMode().grammar) {
-      buffer.setLanguageMode(
-        this.languageModeForGrammarAndBuffer(grammar, buffer)
-      );
+      buffer.setLanguageMode(this.languageModeForGrammarAndBuffer(grammar, buffer));
     }
 
     return true;
@@ -166,9 +161,7 @@ module.exports = class GrammarRegistry {
     this.languageOverridesByBufferId.set(buffer.id, grammar.scopeName || null);
     this.grammarScoresByBuffer.set(buffer, null);
     if (grammar !== buffer.getLanguageMode().grammar) {
-      buffer.setLanguageMode(
-        this.languageModeForGrammarAndBuffer(grammar, buffer)
-      );
+      buffer.setLanguageMode(this.languageModeForGrammarAndBuffer(grammar, buffer));
     }
     return true;
   }
@@ -189,14 +182,12 @@ module.exports = class GrammarRegistry {
   autoAssignLanguageMode(buffer) {
     const result = this.selectGrammarWithScore(
       buffer.getPath(),
-      getGrammarSelectionContent(buffer)
+      getGrammarSelectionContent(buffer),
     );
     this.languageOverridesByBufferId.delete(buffer.id);
     this.grammarScoresByBuffer.set(buffer, result.score);
     if (result.grammar !== buffer.getLanguageMode().grammar) {
-      buffer.setLanguageMode(
-        this.languageModeForGrammarAndBuffer(result.grammar, buffer)
-      );
+      buffer.setLanguageMode(this.languageModeForGrammarAndBuffer(result.grammar, buffer));
     }
   }
 
@@ -206,7 +197,7 @@ module.exports = class GrammarRegistry {
         grammar,
         buffer,
         config: this.config,
-        grammars: this
+        grammars: this,
       });
     } else {
       return new TextMateLanguageMode({ grammar, buffer, config: this.config });
@@ -229,7 +220,7 @@ module.exports = class GrammarRegistry {
   selectGrammarWithScore(filePath, fileContents) {
     let bestMatch = null;
     let highestScore = -Infinity;
-    this.forEachGrammar(grammar => {
+    this.forEachGrammar((grammar) => {
       const score = this.getGrammarScore(grammar, filePath, fileContents);
       if (score > highestScore || bestMatch == null) {
         bestMatch = grammar;
@@ -243,12 +234,12 @@ module.exports = class GrammarRegistry {
   // users to opt into or out of Tree-sitter parsers on a language-by-language
   // basis.
   getLanguageParserForScope(scope) {
-    if (typeof scope === 'string') {
+    if (typeof scope === "string") {
       scope = new ScopeDescriptor({ scopes: [scope] });
     }
 
-    let useTreeSitterParsers = this.config.get('core.useTreeSitterParsers', { scope });
-    return useTreeSitterParsers ? 'wasm-tree-sitter' : 'textmate';
+    let useTreeSitterParsers = this.config.get("core.useTreeSitterParsers", { scope });
+    return useTreeSitterParsers ? "wasm-tree-sitter" : "textmate";
   }
 
   // Extended: Evaluates a grammar's fitness for use for a certain file.
@@ -267,7 +258,7 @@ module.exports = class GrammarRegistry {
   // Returns a {Number}.
   getGrammarScore(grammar, filePath, contents) {
     if (contents == null && fs.isFileSync(filePath)) {
-      contents = fs.readFileSync(filePath, 'utf8');
+      contents = fs.readFileSync(filePath, "utf8");
     }
 
     // Initially identify matching grammars based on the filename and the first
@@ -288,9 +279,9 @@ module.exports = class GrammarRegistry {
       // from legacy tree-sitter grammars; it can be vastly simplified once the
       // transition is complete.
       if (isTreeSitter) {
-        if (parserConfig === 'wasm-tree-sitter') {
+        if (parserConfig === "wasm-tree-sitter") {
           score += 0.1;
-        } else if (parserConfig === 'textmate') {
+        } else if (parserConfig === "textmate") {
           score = -1;
         }
       }
@@ -318,18 +309,16 @@ module.exports = class GrammarRegistry {
 
   getGrammarPathScore(grammar, filePath) {
     if (!filePath) return -1;
-    if (process.platform === 'win32') {
-      filePath = filePath.replace(/\\/g, '/');
+    if (process.platform === "win32") {
+      filePath = filePath.replace(/\\/g, "/");
     }
 
     const pathComponents = filePath.toLowerCase().split(PATH_SPLIT_REGEX);
     let pathScore = 0;
 
     let customFileTypes;
-    if (this.config.get('core.customFileTypes')) {
-      customFileTypes = this.config.get('core.customFileTypes')[
-        grammar.scopeName
-      ];
+    if (this.config.get("core.customFileTypes")) {
+      customFileTypes = this.config.get("core.customFileTypes")[grammar.scopeName];
     }
 
     let { fileTypes } = grammar;
@@ -358,10 +347,10 @@ module.exports = class GrammarRegistry {
       let numberOfNewlinesInRegex = 0;
       for (let character of grammar.firstLineRegex.source) {
         switch (character) {
-          case '\\':
+          case "\\":
             escaped = !escaped;
             break;
-          case 'n':
+          case "n":
             if (escaped) {
               numberOfNewlinesInRegex++;
             }
@@ -373,9 +362,9 @@ module.exports = class GrammarRegistry {
       }
 
       const prefix = contents
-        .split('\n')
+        .split("\n")
         .slice(0, numberOfNewlinesInRegex + 1)
-        .join('\n');
+        .join("\n");
       if (grammar.firstLineRegex.findNextMatchSync) {
         return grammar.firstLineRegex.findNextMatchSync(prefix);
       } else {
@@ -392,9 +381,7 @@ module.exports = class GrammarRegistry {
 
   grammarForId(languageId) {
     if (!languageId) return null;
-    const config = this.getLanguageParserForScope(
-      new ScopeDescriptor({ scopes: [languageId] })
-    );
+    const config = this.getLanguageParserForScope(new ScopeDescriptor({ scopes: [languageId] }));
 
     let getTreeSitterGrammar = (table, languageId) => {
       let grammar = table[languageId];
@@ -404,12 +391,9 @@ module.exports = class GrammarRegistry {
       return null;
     };
 
-    if (config === 'wasm-tree-sitter') {
+    if (config === "wasm-tree-sitter") {
       return (
-        getTreeSitterGrammar(
-          this.wasmTreeSitterGrammarsById,
-          languageId
-        ) ||
+        getTreeSitterGrammar(this.wasmTreeSitterGrammarsById, languageId) ||
         this.textmateRegistry.grammarForScopeName(languageId)
       );
     } else {
@@ -426,7 +410,7 @@ module.exports = class GrammarRegistry {
   //
   // Returns a {String} such as `"source.js"`.
   grammarOverrideForPath(filePath) {
-    Grim.deprecate('Use buffer.getLanguageMode().getLanguageId() instead');
+    Grim.deprecate("Use buffer.getLanguageMode().getLanguageId() instead");
     const buffer = atom.project.findBufferForPath(filePath);
     if (buffer) return this.getAssignedLanguageId(buffer);
   }
@@ -438,14 +422,11 @@ module.exports = class GrammarRegistry {
   //
   // Returns undefined.
   setGrammarOverrideForPath(filePath, languageId) {
-    Grim.deprecate(
-      'Use atom.grammars.assignLanguageMode(buffer, languageId) instead'
-    );
+    Grim.deprecate("Use atom.grammars.assignLanguageMode(buffer, languageId) instead");
     const buffer = atom.project.findBufferForPath(filePath);
     if (buffer) {
       const grammar = this.grammarForScopeName(languageId);
-      if (grammar)
-        this.languageOverridesByBufferId.set(buffer.id, grammar.name);
+      if (grammar) this.languageOverridesByBufferId.set(buffer.id, grammar.name);
     }
   }
 
@@ -455,7 +436,7 @@ module.exports = class GrammarRegistry {
   //
   // Returns undefined.
   clearGrammarOverrideForPath(filePath) {
-    Grim.deprecate('Use atom.grammars.autoAssignLanguageMode(buffer) instead');
+    Grim.deprecate("Use atom.grammars.autoAssignLanguageMode(buffer) instead");
     const buffer = atom.project.findBufferForPath(filePath);
     if (buffer) this.languageOverridesByBufferId.delete(buffer.id);
   }
@@ -471,21 +452,17 @@ module.exports = class GrammarRegistry {
         grammar === buffer.getLanguageMode().grammar ||
         grammar === this.grammarForId(languageOverride)
       ) {
-        buffer.setLanguageMode(
-          this.languageModeForGrammarAndBuffer(grammar, buffer)
-        );
+        buffer.setLanguageMode(this.languageModeForGrammarAndBuffer(grammar, buffer));
         return;
       } else if (!languageOverride) {
         const score = this.getGrammarScore(
           grammar,
           buffer.getPath(),
-          getGrammarSelectionContent(buffer)
+          getGrammarSelectionContent(buffer),
         );
         const currentScore = this.grammarScoresByBuffer.get(buffer);
         if (currentScore == null || score > currentScore) {
-          buffer.setLanguageMode(
-            this.languageModeForGrammarAndBuffer(grammar, buffer)
-          );
+          buffer.setLanguageMode(this.languageModeForGrammarAndBuffer(grammar, buffer));
           this.grammarScoresByBuffer.set(buffer, score);
           return;
         }
@@ -508,7 +485,7 @@ module.exports = class GrammarRegistry {
     let disposable = new CompositeDisposable();
     disposable.add(
       this.textmateRegistry.onDidAddGrammar(callback),
-      this.emitter.on('did-add-grammar', callback)
+      this.emitter.on("did-add-grammar", callback),
     );
     return disposable;
   }
@@ -524,7 +501,7 @@ module.exports = class GrammarRegistry {
     let disposable = new CompositeDisposable();
     disposable.add(
       this.textmateRegistry.onDidUpdateGrammar(callback),
-      this.emitter.on('did-update-grammar', callback)
+      this.emitter.on("did-update-grammar", callback),
     );
     return disposable;
   }
@@ -574,14 +551,13 @@ module.exports = class GrammarRegistry {
           // This is a grammar that's already loaded — not just a stub. Editors
           // that already use this grammar will want to know that we added an
           // injection.
-          this.emitter.emit('did-update-grammar', grammar);
+          this.emitter.emit("did-update-grammar", grammar);
         } else {
           grammar.injectionPoints.push(injectionPoint);
         }
         grammarsToDispose.push(grammar);
-
       } else {
-        table[grammarId] = { injectionPoints: [injectionPoint] }
+        table[grammarId] = { injectionPoints: [injectionPoint] };
       }
     };
 
@@ -603,10 +579,7 @@ module.exports = class GrammarRegistry {
   }
 
   decodeTokens() {
-    return this.textmateRegistry.decodeTokens.apply(
-      this.textmateRegistry,
-      arguments
-    );
+    return this.textmateRegistry.decodeTokens.apply(this.textmateRegistry, arguments);
   }
 
   grammarForScopeName(scopeName) {
@@ -615,17 +588,15 @@ module.exports = class GrammarRegistry {
 
   addGrammar(grammar) {
     if (grammar instanceof WASMTreeSitterGrammar) {
-      const existingParams =
-        this.wasmTreeSitterGrammarsById[grammar.scopeName] || {};
-      if (grammar.scopeName)
-        this.wasmTreeSitterGrammarsById[grammar.scopeName] = grammar;
+      const existingParams = this.wasmTreeSitterGrammarsById[grammar.scopeName] || {};
+      if (grammar.scopeName) this.wasmTreeSitterGrammarsById[grammar.scopeName] = grammar;
       if (existingParams.injectionPoints) {
         for (const injectionPoint of existingParams.injectionPoints) {
           grammar.addInjectionPoint(injectionPoint);
         }
       }
       this.grammarAddedOrUpdated(grammar);
-      this.emitter.emit('did-add-grammar', grammar);
+      this.emitter.emit("did-add-grammar", grammar);
       return new Disposable(() => this.removeGrammar(grammar));
     } else {
       return this.textmateRegistry.addGrammar(grammar);
@@ -695,23 +666,15 @@ module.exports = class GrammarRegistry {
   //
   // Returns a {Grammar}.
   readGrammarSync(grammarPath) {
-    return this.createGrammar(
-      grammarPath,
-      CSON.readFileSync(grammarPath) || {}
-    );
+    return this.createGrammar(grammarPath, CSON.readFileSync(grammarPath) || {});
   }
 
   createGrammar(grammarPath, params) {
-    if (params.type === 'modern-tree-sitter') {
-      return new WASMTreeSitterGrammar(this, grammarPath, params)
+    if (params.type === "modern-tree-sitter") {
+      return new WASMTreeSitterGrammar(this, grammarPath, params);
     } else {
-      if (
-        typeof params.scopeName !== 'string' ||
-        params.scopeName.length === 0
-      ) {
-        throw new Error(
-          `Grammar missing required scopeName property: ${grammarPath}`
-        );
+      if (typeof params.scopeName !== "string" || params.scopeName.length === 0) {
+        throw new Error(`Grammar missing required scopeName property: ${grammarPath}`);
       }
       return this.textmateRegistry.createGrammar(grammarPath, params);
     }
@@ -728,8 +691,9 @@ module.exports = class GrammarRegistry {
     let result = this.textmateRegistry.getGrammars();
     if (!(params && params.includeTreeSitter)) return result;
 
-    let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById)
-      .filter(g => g.scopeName);
+    let modernTsGrammars = Object.values(this.wasmTreeSitterGrammarsById).filter(
+      (g) => g.scopeName,
+    );
     result = result.concat(modernTsGrammars);
     return result;
   }
@@ -761,7 +725,5 @@ module.exports = class GrammarRegistry {
 };
 
 function getGrammarSelectionContent(buffer) {
-  return buffer.getTextInRange(
-    Range(Point(0, 0), buffer.positionForCharacterIndex(1024))
-  );
+  return buffer.getTextInRange(Range(Point(0, 0), buffer.positionForCharacterIndex(1024)));
 }

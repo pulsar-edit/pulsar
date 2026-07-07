@@ -11,21 +11,21 @@ const mdComponents = {
     yamlFrontMatter: null,
     markdownItEmoji: null,
     markdownItGitHubHeadings: null,
-    markdownItTaskCheckbox: null
+    markdownItTaskCheckbox: null,
   },
   // Regex Declarations
   reg: {
     localLinks: {
       currentDir: new RegExp(/^\.\//),
-      rootDir: new RegExp(/^\//)
+      rootDir: new RegExp(/^\//),
     },
     globalLinks: {
-      base64: new RegExp(/^data:image\/.*;base64/, "i")
+      base64: new RegExp(/^data:image\/.*;base64/, "i"),
     },
     atomLinks: {
       package: new RegExp(/^https:\/\/atom\.io\/packages\/(.*)$/),
-      flightManual: new RegExp(/^https:\/\/flight-manual\.atom\.io\//)
-    }
+      flightManual: new RegExp(/^https:\/\/flight-manual\.atom\.io\//),
+    },
   },
 };
 
@@ -112,7 +112,7 @@ function renderMarkdown(content, givenOpts = {}) {
 
   const markdownItOpts = {
     html: opts.html,
-    breaks: opts.breaks
+    breaks: opts.breaks,
   };
 
   let md = new MarkdownIt(markdownItOpts);
@@ -143,7 +143,7 @@ function renderMarkdown(content, givenOpts = {}) {
     mdComponents.deps.markdownItTaskCheckbox ??= require("markdown-it-task-checkbox");
     md.use(mdComponents.deps.markdownItTaskCheckbox, {
       disabled: opts.taskCheckboxDisabled,
-      divWrap: opts.taskCheckboxDivWrap
+      divWrap: opts.taskCheckboxDivWrap,
     });
   }
   if (opts.transformImageLinks && validateRootDomain()) {
@@ -196,11 +196,20 @@ function renderMarkdown(content, givenOpts = {}) {
         } else {
           token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
         }
-      } else if (!token.attrGet("src").startsWith("http") && !mdComponents.reg.globalLinks.base64.test(token.attrGet("src"))) {
+      } else if (
+        !token.attrGet("src").startsWith("http") &&
+        !mdComponents.reg.globalLinks.base64.test(token.attrGet("src"))
+      ) {
         // Check for implicit relative urls
         let rawLink = token.attrGet("src");
         token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
-      } else if ([".gif", ".png", ".jpg", ".jpeg", ".webp"].find(ext => token.attrGet("src").endsWith(ext)) && token.attrGet("src").startsWith("https://github.com") && token.attrGet("src").includes("blob")) {
+      } else if (
+        [".gif", ".png", ".jpg", ".jpeg", ".webp"].find((ext) =>
+          token.attrGet("src").endsWith(ext),
+        ) &&
+        token.attrGet("src").startsWith("https://github.com") &&
+        token.attrGet("src").includes("blob")
+      ) {
         // Should match any image being distributed from GitHub that's using `blob` instead of `raw` causing images to not load correctly
         let rawLink = token.attrGet("src");
         token.attrSet("src", rawLink.replace("blob", "raw"));
@@ -220,9 +229,15 @@ function renderMarkdown(content, givenOpts = {}) {
                 if (attr[0] === "href") {
                   let link = attr[1];
 
-                  if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.currentDir.test(link)) {
+                  if (
+                    opts.transformNonFqdnLinks &&
+                    mdComponents.reg.localLinks.currentDir.test(link)
+                  ) {
                     attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(mdComponents.reg.localLinks.currentDir, "")}`;
-                  } else if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.rootDir.test(link)) {
+                  } else if (
+                    opts.transformNonFqdnLinks &&
+                    mdComponents.reg.localLinks.rootDir.test(link)
+                  ) {
                     attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(mdComponents.reg.localLinks.rootDir, "")}`;
                   } else if (opts.transformNonFqdnLinks && !link.startsWith("http")) {
                     attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(".git", "")}`;
@@ -250,7 +265,10 @@ function renderMarkdown(content, givenOpts = {}) {
                     attr[1] = `https://web.pulsar-edit.dev/packages/${link.match(mdComponents.reg.atomLinks.package)[1]}`;
                   } else if (mdComponents.reg.atomLinks.flightManual.test(link)) {
                     // Resolve any links to the flight manual to web archive
-                    attr[1] = link.replace(mdComponents.reg.atomLinks.flightManual, "https://web.archive.org/web/20221215003438/https://flight-manual.atom.io/");
+                    attr[1] = link.replace(
+                      mdComponents.reg.atomLinks.flightManual,
+                      "https://web.archive.org/web/20221215003438/https://flight-manual.atom.io/",
+                    );
                   }
                 }
               });
@@ -269,7 +287,6 @@ function renderMarkdown(content, givenOpts = {}) {
 
   // Process disables
   if (opts.disableMode === "strict") {
-
     // Easy Disable
     md.disable("lheading");
 
@@ -322,7 +339,7 @@ function renderMarkdown(content, givenOpts = {}) {
 
         const isSpace = () => {
           let code = state.src.charCodeAt(pos);
-          switch(code) {
+          switch (code) {
             case 0x09:
             case 0x20:
               return true;
@@ -338,7 +355,9 @@ function renderMarkdown(content, givenOpts = {}) {
           ch = state.src.charAt(++pos);
         }
 
-        if (level > 6 || (pos < max && !isSpace())) { return false; }
+        if (level > 6 || (pos < max && !isSpace())) {
+          return false;
+        }
         // Now that we are confident we are within a heading, lets strip it
         state.pos += level;
         state.line = startLine + 1;
@@ -352,7 +371,7 @@ function renderMarkdown(content, givenOpts = {}) {
       // until the specified token is reached. Which it will also strip to text,
       // then return
       let idx = initIdx;
-      while(idx < tokens.length) {
+      while (idx < tokens.length) {
         tokens[idx].type = "text";
         tokens[idx].content = "";
 
@@ -387,13 +406,11 @@ function renderMarkdown(content, givenOpts = {}) {
     md.renderer.rules.html_inline = (tokens, idx, _options, _env, _self) => {
       if (tokens[idx].type === "html_inline") {
         // Here we can build an allow list of inline HTML elements to keep.
-        if (
-          tokens[idx].tag !== "breakline"
-          ) {
-            return "";
-          } else {
-            return tokens[idx].content;
-          }
+        if (tokens[idx].tag !== "breakline") {
+          return "";
+        } else {
+          return tokens[idx].content;
+        }
       }
     };
 
@@ -403,7 +420,6 @@ function renderMarkdown(content, givenOpts = {}) {
         return "";
       }
     };
-
   }
 
   let textContent;
@@ -424,8 +440,8 @@ function renderMarkdown(content, givenOpts = {}) {
       }
 
       const markdownRows = [
-        entries.map(entry => entry[0]),
-        entries.map(entry => '--'),
+        entries.map((entry) => entry[0]),
+        entries.map((entry) => "--"),
         entries.map((entry) => {
           if (typeof entry[1] === "object" && !Array.isArray(entry[1])) {
             // Remove all newlines, or they ruin formatting of parent table
@@ -433,12 +449,10 @@ function renderMarkdown(content, givenOpts = {}) {
           } else {
             return entry[1];
           }
-        })
+        }),
       ];
 
-      return (
-        markdownRows.map(row => "| " + row.join(" | ") + " |").join("\n") + "\n"
-      );
+      return markdownRows.map((row) => "| " + row.join(" | ") + " |").join("\n") + "\n";
     };
 
     textContent = renderYamlTable(vars) + __content;
@@ -453,7 +467,7 @@ function renderMarkdown(content, givenOpts = {}) {
 
     let domPurifyOpts = {
       ALLOW_UNKNOWN_PROTOCOLS: opts.sanitizeAllowUnknownProtocols,
-      ALLOW_SELF_CLOSE_IN_ATTR: opts.sanitizeAllowSelfClose
+      ALLOW_SELF_CLOSE_IN_ATTR: opts.sanitizeAllowSelfClose,
     };
 
     rendered = mdComponents.deps.domPurify.sanitize(rendered, opts);
@@ -528,12 +542,11 @@ function applySyntaxHighlighting(content, givenOpts = {}) {
   for (const preElement of content.querySelectorAll("pre")) {
     const codeBlock = preElement.firstElementChild ?? preElement;
     const className = codeBlock.getAttribute("class");
-    const fenceName =
-      className != null ? className.replace(/^language-/, "") : defaultLanguage;
+    const fenceName = className != null ? className.replace(/^language-/, "") : defaultLanguage;
 
     const editor = new TextEditor({
       readonly: true,
-      keyboardInputEnabled: false
+      keyboardInputEnabled: false,
     });
     const editorElement = editor.getElement();
 
@@ -586,18 +599,15 @@ function convertToDOM(content) {
   ```
 */
 function setCandidates(matcherOrCandidates, candidates) {
-  if(candidates) {
+  if (candidates) {
     matcherOrCandidates.fuzzyMatcher.setCandidates(
       [...Array(candidates.length).keys()],
-      candidates
+      candidates,
     );
     return matcherOrCandidates;
   } else {
     return new Matcher(
-      new fuzzyNative.Matcher(
-        [...Array(matcherOrCandidates.length).keys()],
-        matcherOrCandidates
-      )
+      new fuzzyNative.Matcher([...Array(matcherOrCandidates.length).keys()], matcherOrCandidates),
     );
   }
 }
@@ -611,8 +621,8 @@ function setCandidates(matcherOrCandidates, candidates) {
 class Matcher {
   constructor(fuzzyMatcher) {
     // Some heuristics to get the default number of CPUs to make the filter
-    this.numCpus = Math.max(1, Math.round(4 * 0.8))
-    this.fuzzyMatcher = fuzzyMatcher
+    this.numCpus = Math.max(1, Math.round(4 * 0.8));
+    this.fuzzyMatcher = fuzzyMatcher;
   }
 
   /*
@@ -649,10 +659,10 @@ class Matcher {
       `value` for each character in `query`. This can be expensive to calculate.
   */
   match(query, options = {}) {
-    let {numThreads, algorithm} = options;
+    let { numThreads, algorithm } = options;
     numThreads ||= this.numCpus;
-    algorithm ||= 'fuzzaldrin';
-    return this.fuzzyMatcher.match(query, {...options, numThreads, algorithm});
+    algorithm ||= "fuzzaldrin";
+    return this.fuzzyMatcher.match(query, { ...options, numThreads, algorithm });
   }
 
   /*
@@ -692,8 +702,8 @@ const fuzzyMatcher = {
   match(candidate, query, opts = {}) {
     const matcher = setCandidates([candidate]);
     return matcher.match(query, opts)[0];
-  }
-}
+  },
+};
 
 function makeAtomEditorNonInteractive(editorElement, preElement) {
   preElement.remove();
@@ -711,9 +721,7 @@ function convertAtomEditorToStandardElement(editorElement, preElement) {
     const editor = editorElement.getModel();
     const done = () =>
       editor.component.getNextUpdatePromise().then(function () {
-        for (const line of editorElement.querySelectorAll(
-          ".line:not(.dummy)"
-        )) {
+        for (const line of editorElement.querySelectorAll(".line:not(.dummy)")) {
           const line2 = document.createElement("div");
           line2.className = "line";
           line2.innerHTML = line.firstChild.innerHTML;
@@ -721,7 +729,7 @@ function convertAtomEditorToStandardElement(editorElement, preElement) {
         }
         editorElement.remove();
         resolve();
-      })
+      });
     const languageMode = editor.getBuffer().getLanguageMode();
     if (languageMode.fullyTokenized || languageMode.tree) {
       done();
@@ -741,10 +749,10 @@ function convertAtomEditorToStandardElement(editorElement, preElement) {
 const markdown = {
   render: renderMarkdown,
   applySyntaxHighlighting: applySyntaxHighlighting,
-  convertToDOM: convertToDOM
+  convertToDOM: convertToDOM,
 };
 
 module.exports = {
   markdown,
-  fuzzyMatcher
+  fuzzyMatcher,
 };

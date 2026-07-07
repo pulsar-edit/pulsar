@@ -1,18 +1,18 @@
-const etch = require('etch');
-const _ = require('underscore-plus');
-const { CompositeDisposable, Emitter } = require('event-kit');
-const PaneContainer = require('./pane-container');
-const TextEditor = require('./text-editor');
-const Grim = require('grim');
+const etch = require("etch");
+const _ = require("underscore-plus");
+const { CompositeDisposable, Emitter } = require("event-kit");
+const PaneContainer = require("./pane-container");
+const TextEditor = require("./text-editor");
+const Grim = require("grim");
 
 const $ = etch.dom;
 const MINIMUM_SIZE = 100;
 const DEFAULT_INITIAL_SIZE = 300;
-const SHOULD_ANIMATE_CLASS = 'atom-dock-should-animate';
-const VISIBLE_CLASS = 'atom-dock-open';
-const RESIZE_HANDLE_RESIZABLE_CLASS = 'atom-dock-resize-handle-resizable';
-const TOGGLE_BUTTON_VISIBLE_CLASS = 'atom-dock-toggle-button-visible';
-const CURSOR_OVERLAY_VISIBLE_CLASS = 'atom-dock-cursor-overlay-visible';
+const SHOULD_ANIMATE_CLASS = "atom-dock-should-animate";
+const VISIBLE_CLASS = "atom-dock-open";
+const RESIZE_HANDLE_RESIZABLE_CLASS = "atom-dock-resize-handle-resizable";
+const TOGGLE_BUTTON_VISIBLE_CLASS = "atom-dock-toggle-button-visible";
+const CURSOR_OVERLAY_VISIBLE_CLASS = "atom-dock-cursor-overlay-visible";
 
 // Extended: A container at the edges of the editor window capable of holding items.
 // You should not create a Dock directly. Instead, access one of the three docks of the workspace
@@ -20,17 +20,13 @@ const CURSOR_OVERLAY_VISIBLE_CLASS = 'atom-dock-cursor-overlay-visible';
 // or add an item to a dock via {Workspace::open}.
 module.exports = class Dock {
   constructor(params) {
-    this.handleResizeHandleDragStart = this.handleResizeHandleDragStart.bind(
-      this
-    );
+    this.handleResizeHandleDragStart = this.handleResizeHandleDragStart.bind(this);
     this.handleResizeToFit = this.handleResizeToFit.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleDrag = _.throttle(this.handleDrag.bind(this), 30);
     this.handleDragEnd = this.handleDragEnd.bind(this);
-    this.handleToggleButtonDragEnter = this.handleToggleButtonDragEnter.bind(
-      this
-    );
+    this.handleToggleButtonDragEnter = this.handleToggleButtonDragEnter.bind(this);
     this.toggle = this.toggle.bind(this);
 
     this.location = params.location;
@@ -50,13 +46,13 @@ module.exports = class Dock {
       applicationDelegate: this.applicationDelegate,
       deserializerManager: this.deserializerManager,
       notificationManager: this.notificationManager,
-      viewRegistry: this.viewRegistry
+      viewRegistry: this.viewRegistry,
     });
 
     this.state = {
       size: null,
       visible: false,
-      shouldAnimate: false
+      shouldAnimate: false,
     };
 
     this.subscriptions = new CompositeDisposable(
@@ -65,19 +61,15 @@ module.exports = class Dock {
         this.show();
         this.didActivate(this);
       }),
-      this.paneContainer.observePanes(pane => {
+      this.paneContainer.observePanes((pane) => {
         pane.onDidAddItem(this.handleDidAddPaneItem.bind(this));
         pane.onDidRemoveItem(this.handleDidRemovePaneItem.bind(this));
       }),
-      this.paneContainer.onDidChangeActivePane(item =>
-        params.didChangeActivePane(this, item)
+      this.paneContainer.onDidChangeActivePane((item) => params.didChangeActivePane(this, item)),
+      this.paneContainer.onDidChangeActivePaneItem((item) =>
+        params.didChangeActivePaneItem(this, item),
       ),
-      this.paneContainer.onDidChangeActivePaneItem(item =>
-        params.didChangeActivePaneItem(this, item)
-      ),
-      this.paneContainer.onDidDestroyPaneItem(item =>
-        params.didDestroyPaneItem(item)
-      )
+      this.paneContainer.onDidDestroyPaneItem((item) => params.didDestroyPaneItem(item)),
     );
   }
 
@@ -104,10 +96,10 @@ module.exports = class Dock {
   destroy() {
     this.subscriptions.dispose();
     this.paneContainer.destroy();
-    window.removeEventListener('mousemove', this.handleMouseMove);
-    window.removeEventListener('mouseup', this.handleMouseUp);
-    window.removeEventListener('drag', this.handleDrag);
-    window.removeEventListener('dragend', this.handleDragEnd);
+    window.removeEventListener("mousemove", this.handleMouseMove);
+    window.removeEventListener("mouseup", this.handleMouseUp);
+    window.removeEventListener("drag", this.handleDrag);
+    window.removeEventListener("dragend", this.handleDragEnd);
   }
 
   setHovered(hovered) {
@@ -162,11 +154,7 @@ module.exports = class Dock {
     if (nextState.visible !== prevState.visible) {
       // Never animate toggling visibility...
       nextState.shouldAnimate = false;
-    } else if (
-      !nextState.visible &&
-      nextState.draggingItem &&
-      !prevState.draggingItem
-    ) {
+    } else if (!nextState.visible && nextState.draggingItem && !prevState.draggingItem) {
       // ...but do animate if you start dragging while the panel is hidden.
       nextState.shouldAnimate = true;
     }
@@ -184,88 +172,79 @@ module.exports = class Dock {
     }
 
     if (hovered !== prevState.hovered) {
-      this.emitter.emit('did-change-hovered', hovered);
+      this.emitter.emit("did-change-hovered", hovered);
     }
     if (visible !== prevState.visible) {
-      this.emitter.emit('did-change-visible', visible);
+      this.emitter.emit("did-change-visible", visible);
     }
   }
 
   render() {
-    const innerElementClassList = ['atom-dock-inner', this.location];
+    const innerElementClassList = ["atom-dock-inner", this.location];
     if (this.state.visible) innerElementClassList.push(VISIBLE_CLASS);
 
-    const maskElementClassList = ['atom-dock-mask'];
-    if (this.state.shouldAnimate)
-      maskElementClassList.push(SHOULD_ANIMATE_CLASS);
+    const maskElementClassList = ["atom-dock-mask"];
+    if (this.state.shouldAnimate) maskElementClassList.push(SHOULD_ANIMATE_CLASS);
 
-    const cursorOverlayElementClassList = [
-      'atom-dock-cursor-overlay',
-      this.location
-    ];
-    if (this.state.resizing)
-      cursorOverlayElementClassList.push(CURSOR_OVERLAY_VISIBLE_CLASS);
+    const cursorOverlayElementClassList = ["atom-dock-cursor-overlay", this.location];
+    if (this.state.resizing) cursorOverlayElementClassList.push(CURSOR_OVERLAY_VISIBLE_CLASS);
 
     const shouldBeVisible = this.state.visible || this.state.showDropTarget;
     const size = Math.max(
       MINIMUM_SIZE,
       this.state.size ||
-        (this.state.draggingItem &&
-          getPreferredSize(this.state.draggingItem, this.location)) ||
-        DEFAULT_INITIAL_SIZE
+        (this.state.draggingItem && getPreferredSize(this.state.draggingItem, this.location)) ||
+        DEFAULT_INITIAL_SIZE,
     );
 
     // We need to change the size of the mask...
     const maskStyle = {
-      [this.widthOrHeight]: `${shouldBeVisible ? size : 0}px`
+      [this.widthOrHeight]: `${shouldBeVisible ? size : 0}px`,
     };
     // ...but the content needs to maintain a constant size.
     const wrapperStyle = { [this.widthOrHeight]: `${size}px` };
 
     return $(
-      'atom-dock',
+      "atom-dock",
       { className: this.location },
       $.div(
-        { ref: 'innerElement', className: innerElementClassList.join(' ') },
+        { ref: "innerElement", className: innerElementClassList.join(" ") },
         $.div(
           {
-            className: maskElementClassList.join(' '),
-            style: maskStyle
+            className: maskElementClassList.join(" "),
+            style: maskStyle,
           },
           $.div(
             {
-              ref: 'wrapperElement',
+              ref: "wrapperElement",
               className: `atom-dock-content-wrapper ${this.location}`,
-              style: wrapperStyle
+              style: wrapperStyle,
             },
             $(DockResizeHandle, {
               location: this.location,
               onResizeStart: this.handleResizeHandleDragStart,
               onResizeToFit: this.handleResizeToFit,
-              dockIsVisible: this.state.visible
+              dockIsVisible: this.state.visible,
             }),
             $(ElementComponent, { element: this.paneContainer.getElement() }),
-            $.div({ className: cursorOverlayElementClassList.join(' ') })
-          )
+            $.div({ className: cursorOverlayElementClassList.join(" ") }),
+          ),
         ),
         $(DockToggleButton, {
-          ref: 'toggleButton',
-          onDragEnter: this.state.draggingItem
-            ? this.handleToggleButtonDragEnter
-            : null,
+          ref: "toggleButton",
+          onDragEnter: this.state.draggingItem ? this.handleToggleButtonDragEnter : null,
           location: this.location,
           toggle: this.toggle,
           dockIsVisible: shouldBeVisible,
           visible:
             // Don't show the toggle button if the dock is closed and empty...
-            (this.state.hovered &&
-              (this.state.visible || this.getPaneItems().length > 0)) ||
+            (this.state.hovered && (this.state.visible || this.getPaneItems().length > 0)) ||
             // ...or if the item can't be dropped in that dock.
             (!shouldBeVisible &&
               this.state.draggingItem &&
-              isItemAllowed(this.state.draggingItem, this.location))
-        })
-      )
+              isItemAllowed(this.state.draggingItem, this.location)),
+        }),
+      ),
     );
   }
 
@@ -288,8 +267,8 @@ module.exports = class Dock {
   }
 
   handleResizeHandleDragStart() {
-    window.addEventListener('mousemove', this.handleMouseMove);
-    window.addEventListener('mouseup', this.handleMouseUp);
+    window.addEventListener("mousemove", this.handleMouseMove);
+    window.addEventListener("mouseup", this.handleMouseUp);
     this.setState({ resizing: true });
   }
 
@@ -310,13 +289,13 @@ module.exports = class Dock {
 
     let size = 0;
     switch (this.location) {
-      case 'left':
+      case "left":
         size = event.pageX - this.element.getBoundingClientRect().left;
         break;
-      case 'bottom':
+      case "bottom":
         size = this.element.getBoundingClientRect().bottom - event.pageY;
         break;
-      case 'right':
+      case "right":
         size = this.element.getBoundingClientRect().right - event.pageX;
         break;
     }
@@ -324,15 +303,15 @@ module.exports = class Dock {
   }
 
   handleMouseUp(event) {
-    window.removeEventListener('mousemove', this.handleMouseMove);
-    window.removeEventListener('mouseup', this.handleMouseUp);
+    window.removeEventListener("mousemove", this.handleMouseMove);
+    window.removeEventListener("mouseup", this.handleMouseUp);
     this.setState({ resizing: false });
   }
 
   handleToggleButtonDragEnter() {
     this.setState({ showDropTarget: true });
-    window.addEventListener('drag', this.handleDrag);
-    window.addEventListener('dragend', this.handleDragEnd);
+    window.addEventListener("drag", this.handleDrag);
+    window.addEventListener("dragend", this.handleDragEnd);
   }
 
   handleDrag(event) {
@@ -347,8 +326,8 @@ module.exports = class Dock {
 
   draggedOut() {
     this.setState({ showDropTarget: false });
-    window.removeEventListener('drag', this.handleDrag);
-    window.removeEventListener('dragend', this.handleDragEnd);
+    window.removeEventListener("drag", this.handleDrag);
+    window.removeEventListener("dragend", this.handleDragEnd);
   }
 
   // Determine whether the cursor is within the dock hover area. This isn't as simple as just using
@@ -365,31 +344,31 @@ module.exports = class Dock {
       top: dockBounds.top,
       right: dockBounds.right,
       bottom: dockBounds.bottom,
-      left: dockBounds.left
+      left: dockBounds.left,
     };
 
     // To provide a minimum target, expand the area toward the center a bit.
     switch (this.location) {
-      case 'right':
+      case "right":
         bounds.left = Math.min(bounds.left, bounds.right - 2);
         break;
-      case 'bottom':
+      case "bottom":
         bounds.top = Math.min(bounds.top, bounds.bottom - 1);
         break;
-      case 'left':
+      case "left":
         bounds.right = Math.max(bounds.right, bounds.left + 2);
         break;
     }
 
     // Further expand the area to include all panels that are closer to the edge than the dock.
     switch (this.location) {
-      case 'right':
+      case "right":
         bounds.right = Number.POSITIVE_INFINITY;
         break;
-      case 'bottom':
+      case "bottom":
         bounds.bottom = Number.POSITIVE_INFINITY;
         break;
-      case 'left':
+      case "left":
         bounds.left = Number.NEGATIVE_INFINITY;
         break;
     }
@@ -415,17 +394,14 @@ module.exports = class Dock {
     if (detectingExit) {
       const hoverMargin = 20;
       switch (this.location) {
-        case 'right':
-          bounds.left =
-            Math.min(bounds.left, toggleButtonBounds.left) - hoverMargin;
+        case "right":
+          bounds.left = Math.min(bounds.left, toggleButtonBounds.left) - hoverMargin;
           break;
-        case 'bottom':
-          bounds.top =
-            Math.min(bounds.top, toggleButtonBounds.top) - hoverMargin;
+        case "bottom":
+          bounds.top = Math.min(bounds.top, toggleButtonBounds.top) - hoverMargin;
           break;
-        case 'left':
-          bounds.right =
-            Math.max(bounds.right, toggleButtonBounds.right) + hoverMargin;
+        case "left":
+          bounds.right = Math.max(bounds.right, toggleButtonBounds.right) + hoverMargin;
           break;
       }
       if (rectContainsPoint(bounds, point)) return true;
@@ -437,8 +413,7 @@ module.exports = class Dock {
   getInitialSize() {
     // The item may not have been activated yet. If that's the case, just use the first item.
     const activePaneItem =
-      this.paneContainer.getActivePaneItem() ||
-      this.paneContainer.getPaneItems()[0];
+      this.paneContainer.getActivePaneItem() || this.paneContainer.getPaneItems()[0];
     // If there are items, we should have an explicit width; if not, we shouldn't.
     return activePaneItem
       ? getPreferredSize(activePaneItem, this.location) || DEFAULT_INITIAL_SIZE
@@ -447,23 +422,19 @@ module.exports = class Dock {
 
   serialize() {
     return {
-      deserializer: 'Dock',
+      deserializer: "Dock",
       size: this.state.size,
       paneContainer: this.paneContainer.serialize(),
-      visible: this.state.visible
+      visible: this.state.visible,
     };
   }
 
   deserialize(serialized, deserializerManager) {
-    this.paneContainer.deserialize(
-      serialized.paneContainer,
-      deserializerManager
-    );
+    this.paneContainer.deserialize(serialized.paneContainer, deserializerManager);
     this.setState({
       size: serialized.size || this.getInitialSize(),
       // If no items could be deserialized, we don't want to show the dock (even if it was visible last time)
-      visible:
-        serialized.visible && this.paneContainer.getPaneItems().length > 0
+      visible: serialized.visible && this.paneContainer.getPaneItems().length > 0,
     });
   }
 
@@ -478,7 +449,7 @@ module.exports = class Dock {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeVisible(callback) {
-    return this.emitter.on('did-change-visible', callback);
+    return this.emitter.on("did-change-visible", callback);
   }
 
   // Essential: Invoke the given callback with the current and all future visibilities of the dock.
@@ -665,7 +636,7 @@ module.exports = class Dock {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeHovered(callback) {
-    return this.emitter.on('did-change-hovered', callback);
+    return this.emitter.on("did-change-hovered", callback);
   }
 
   /*
@@ -692,7 +663,7 @@ module.exports = class Dock {
   // {TextEditor}.
   getActiveTextEditor() {
     Grim.deprecate(
-      'Text editors are not allowed in docks. Use atom.workspace.getActiveTextEditor() instead.'
+      "Text editors are not allowed in docks. Use atom.workspace.getActiveTextEditor() instead.",
     );
 
     const activeItem = this.getActivePaneItem();
@@ -762,12 +733,12 @@ class DockResizeHandle {
   }
 
   render() {
-    const classList = ['atom-dock-resize-handle', this.props.location];
+    const classList = ["atom-dock-resize-handle", this.props.location];
     if (this.props.dockIsVisible) classList.push(RESIZE_HANDLE_RESIZABLE_CLASS);
 
     return $.div({
-      className: classList.join(' '),
-      on: { mousedown: this.handleMouseDown }
+      className: classList.join(" "),
+      on: { mousedown: this.handleMouseDown },
     });
   }
 
@@ -777,9 +748,7 @@ class DockResizeHandle {
 
   getSize() {
     if (!this.size) {
-      this.size = this.element.getBoundingClientRect()[
-        getWidthOrHeight(this.props.location)
-      ];
+      this.size = this.element.getBoundingClientRect()[getWidthOrHeight(this.props.location)];
     }
     return this.size;
   }
@@ -805,28 +774,25 @@ class DockToggleButton {
   }
 
   render() {
-    const classList = ['atom-dock-toggle-button', this.props.location];
+    const classList = ["atom-dock-toggle-button", this.props.location];
     if (this.props.visible) classList.push(TOGGLE_BUTTON_VISIBLE_CLASS);
 
     return $.div(
-      { className: classList.join(' ') },
+      { className: classList.join(" ") },
       $.div(
         {
-          ref: 'innerElement',
+          ref: "innerElement",
           className: `atom-dock-toggle-button-inner ${this.props.location}`,
           on: {
             click: this.handleClick,
-            dragenter: this.props.onDragEnter
-          }
+            dragenter: this.props.onDragEnter,
+          },
         },
         $.span({
-          ref: 'iconElement',
-          className: `icon ${getIconName(
-            this.props.location,
-            this.props.dockIsVisible
-          )}`
-        })
-      )
+          ref: "iconElement",
+          className: `icon ${getIconName(this.props.location, this.props.dockIsVisible)}`,
+        }),
+      ),
     );
   }
 
@@ -861,31 +827,27 @@ class ElementComponent {
 }
 
 function getWidthOrHeight(location) {
-  return location === 'left' || location === 'right' ? 'width' : 'height';
+  return location === "left" || location === "right" ? "width" : "height";
 }
 
 function getPreferredSize(item, location) {
   switch (location) {
-    case 'left':
-    case 'right':
-      return typeof item.getPreferredWidth === 'function'
-        ? item.getPreferredWidth()
-        : null;
+    case "left":
+    case "right":
+      return typeof item.getPreferredWidth === "function" ? item.getPreferredWidth() : null;
     default:
-      return typeof item.getPreferredHeight === 'function'
-        ? item.getPreferredHeight()
-        : null;
+      return typeof item.getPreferredHeight === "function" ? item.getPreferredHeight() : null;
   }
 }
 
 function getIconName(location, visible) {
   switch (location) {
-    case 'right':
-      return visible ? 'icon-chevron-right' : 'icon-chevron-left';
-    case 'bottom':
-      return visible ? 'icon-chevron-down' : 'icon-chevron-up';
-    case 'left':
-      return visible ? 'icon-chevron-left' : 'icon-chevron-right';
+    case "right":
+      return visible ? "icon-chevron-right" : "icon-chevron-left";
+    case "bottom":
+      return visible ? "icon-chevron-down" : "icon-chevron-up";
+    case "left":
+      return visible ? "icon-chevron-left" : "icon-chevron-right";
     default:
       throw new Error(`Invalid location: ${location}`);
   }
@@ -893,15 +855,12 @@ function getIconName(location, visible) {
 
 function rectContainsPoint(rect, point) {
   return (
-    point.x >= rect.left &&
-    point.y >= rect.top &&
-    point.x <= rect.right &&
-    point.y <= rect.bottom
+    point.x >= rect.left && point.y >= rect.top && point.x <= rect.right && point.y <= rect.bottom
   );
 }
 
 // Is the item allowed in the given location?
 function isItemAllowed(item, location) {
-  if (typeof item.getAllowedLocations !== 'function') return true;
+  if (typeof item.getAllowedLocations !== "function") return true;
   return item.getAllowedLocations().includes(location);
 }

@@ -1,7 +1,7 @@
-const {Directory} = require('@pulsar-edit/pathwatcher');
-const fs = require('fs-plus');
-const path = require('path');
-const url = require('url');
+const { Directory } = require("@pulsar-edit/pathwatcher");
+const fs = require("fs-plus");
+const path = require("path");
+const url = require("url");
 
 module.exports = class DefaultDirectoryProvider {
   // Public: Create a Directory that corresponds to the specified URI.
@@ -14,15 +14,16 @@ module.exports = class DefaultDirectoryProvider {
   // * `null` if the given URI is not compatible with this provider.
   directoryForURISync(uri) {
     const normalizedPath = this.normalizePath(uri);
-    const {host} = url.parse(uri);
+    const { host } = url.parse(uri);
     let directoryPath;
     if (host) {
-       directoryPath = uri;
-    }
-    else if (!fs.isDirectorySync(normalizedPath) && fs.isDirectorySync(path.dirname(normalizedPath))) {
+      directoryPath = uri;
+    } else if (
+      !fs.isDirectorySync(normalizedPath) &&
+      fs.isDirectorySync(path.dirname(normalizedPath))
+    ) {
       directoryPath = path.dirname(normalizedPath);
-    }
-    else {
+    } else {
       directoryPath = normalizedPath;
     }
     // TODO: Stop normalizing the path in pathwatcher's Directory.
@@ -57,10 +58,9 @@ module.exports = class DefaultDirectoryProvider {
     let matchData, pathWithNormalizedDiskDriveLetter;
     // Normalize disk drive letter on Windows to avoid opening two buffers for the same file
     pathWithNormalizedDiskDriveLetter = uri;
-    if (process.platform === 'win32' && (matchData = uri.match(/^([a-z]):/))) {
+    if (process.platform === "win32" && (matchData = uri.match(/^([a-z]):/))) {
       pathWithNormalizedDiskDriveLetter = `${matchData[1].toUpperCase()}${uri.slice(1)}`;
     }
     return path.normalize(pathWithNormalizedDiskDriveLetter);
   }
-
 };

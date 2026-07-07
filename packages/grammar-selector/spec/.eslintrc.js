@@ -3,6 +3,6 @@ module.exports = {
   rules: {
     "node/no-unpublished-require": "off",
     "no-unused-vars": "off",
-    "no-empty": "off"
-  }
+    "no-empty": "off",
+  },
 };

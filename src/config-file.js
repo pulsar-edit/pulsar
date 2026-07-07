@@ -1,14 +1,14 @@
-const _ = require('underscore-plus');
-const fs = require('fs-plus');
-const dedent = require('dedent');
-const { Disposable, Emitter } = require('event-kit');
-const CSON = require('season');
-const Path = require('path');
-const asyncQueue = require('async/queue');
+const _ = require("underscore-plus");
+const fs = require("fs-plus");
+const dedent = require("dedent");
+const { Disposable, Emitter } = require("event-kit");
+const CSON = require("season");
+const Path = require("path");
+const asyncQueue = require("async/queue");
 
 // TODO: if we ever decide to change path watchers on the future, this is kinda
 // duplicated because of https://github.com/lumine-code/lumine/issues/76
-const nsfw = require('nsfw');
+const nsfw = require("nsfw");
 const EVENT_TYPES = new Set([nsfw.actions.CREATED, nsfw.actions.MODIFIED, nsfw.actions.RENAMED]);
 
 module.exports = class ConfigFile {
@@ -35,23 +35,23 @@ module.exports = class ConfigFile {
 
     // Use a queue to prevent multiple concurrent write to the same file.
     const writeQueue = asyncQueue((data, callback) =>
-      CSON.writeFile(this.path, data, error => {
+      CSON.writeFile(this.path, data, (error) => {
         if (error) {
           this.emitter.emit(
-            'did-error',
+            "did-error",
             dedent`
               Failed to write \`${Path.basename(this.path)}\`.
 
               ${error.message}
-            `
+            `,
           );
         }
         callback();
-      })
+      }),
     );
 
     this.requestLoad = _.debounce(() => this.reload(), 200);
-    this.requestSave = _.debounce(data => writeQueue.push(data), 200);
+    this.requestSave = _.debounce((data) => writeQueue.push(data), 200);
   }
 
   get() {
@@ -59,7 +59,7 @@ module.exports = class ConfigFile {
   }
 
   update(value) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       this.requestSave(value);
       this.reloadCallbacks.push(resolve);
     });
@@ -68,23 +68,23 @@ module.exports = class ConfigFile {
   async watch() {
     if (!fs.existsSync(this.path)) {
       fs.makeTreeSync(Path.dirname(this.path));
-      CSON.writeFileSync(this.path, {}, { flag: 'wx' });
+      CSON.writeFileSync(this.path, {}, { flag: "wx" });
     }
 
     await this.reload();
 
     try {
-      const watcher = await nsfw(this.path, events => {
-        if (events.some(event => EVENT_TYPES.has(event.action))) {
+      const watcher = await nsfw(this.path, (events) => {
+        if (events.some((event) => EVENT_TYPES.has(event.action))) {
           this.requestLoad();
         }
-      })
+      });
       await watcher.start();
       return { dispose: () => watcher.stop() };
     } catch (error) {
       //TODO_LUMINE: Find out why the atom global variable isn't available at this point
       this.emitter.emit(
-        'did-error',
+        "did-error",
         dedent`
         Unable to watch path: \`${Path.basename(this.path)}\`.
 
@@ -93,31 +93,31 @@ module.exports = class ConfigFile {
         See [this document][watches] for more info.
 
         [watches]:https://pulsar-edit.dev/docs/atom-archive/hacking-atom/#typeerror-unable-to-watch-path
-      `//TODO: Update the above to the lumine docs if we choose to add this
+      `, //TODO: Update the above to the lumine docs if we choose to add this
       );
       return new Disposable();
     }
   }
 
   onDidChange(callback) {
-    return this.emitter.on('did-change', callback);
+    return this.emitter.on("did-change", callback);
   }
 
   onDidError(callback) {
-    return this.emitter.on('did-error', callback);
+    return this.emitter.on("did-error", callback);
   }
 
   reload() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       CSON.readFile(this.path, (error, data) => {
         if (error) {
           this.emitter.emit(
-            'did-error',
-            `Failed to load \`${Path.basename(this.path)}\` - ${error.message}`
+            "did-error",
+            `Failed to load \`${Path.basename(this.path)}\` - ${error.message}`,
           );
         } else {
           this.value = data || {};
-          this.emitter.emit('did-change', this.value);
+          this.emitter.emit("did-change", this.value);
 
           for (const callback of this.reloadCallbacks) callback();
           this.reloadCallbacks.length = 0;

@@ -1,4 +1,4 @@
-const parser = require('postcss-selector-parser');
+const parser = require("postcss-selector-parser");
 
 module.exports = class SyntaxScopeMap {
   constructor(resultsBySelector) {
@@ -12,7 +12,7 @@ module.exports = class SyntaxScopeMap {
   }
 
   addSelector(selector, result) {
-    parser(parseResult => {
+    parser((parseResult) => {
       for (let selectorNode of parseResult.nodes) {
         let currentTable = null;
         let currentIndexValue = null;
@@ -21,10 +21,9 @@ module.exports = class SyntaxScopeMap {
           const termNode = selectorNode.nodes[i];
 
           switch (termNode.type) {
-            case 'tag':
+            case "tag":
               if (!currentTable) currentTable = this.namedScopeTable;
-              if (!currentTable[termNode.value])
-                currentTable[termNode.value] = {};
+              if (!currentTable[termNode.value]) currentTable[termNode.value] = {};
               currentTable = currentTable[termNode.value];
               if (currentIndexValue != null) {
                 if (!currentTable.indices) currentTable.indices = {};
@@ -35,7 +34,7 @@ module.exports = class SyntaxScopeMap {
               }
               break;
 
-            case 'string':
+            case "string":
               if (!currentTable) currentTable = this.anonymousScopeTable;
               const value = termNode.value.slice(1, -1).replace(/\\"/g, '"');
               if (!currentTable[value]) currentTable[value] = {};
@@ -49,17 +48,15 @@ module.exports = class SyntaxScopeMap {
               }
               break;
 
-            case 'universal':
+            case "universal":
               if (currentTable) {
-                if (!currentTable['*']) currentTable['*'] = {};
-                currentTable = currentTable['*'];
+                if (!currentTable["*"]) currentTable["*"] = {};
+                currentTable = currentTable["*"];
               } else {
-                if (!this.namedScopeTable['*']) {
-                  this.namedScopeTable['*'] = this.anonymousScopeTable[
-                    '*'
-                  ] = {};
+                if (!this.namedScopeTable["*"]) {
+                  this.namedScopeTable["*"] = this.anonymousScopeTable["*"] = {};
                 }
-                currentTable = this.namedScopeTable['*'];
+                currentTable = this.namedScopeTable["*"];
               }
               if (currentIndexValue != null) {
                 if (!currentTable.indices) currentTable.indices = {};
@@ -70,12 +67,12 @@ module.exports = class SyntaxScopeMap {
               }
               break;
 
-            case 'combinator':
+            case "combinator":
               if (currentIndexValue != null) {
                 rejectSelector(selector);
               }
 
-              if (termNode.value === '>') {
+              if (termNode.value === ">") {
                 if (!currentTable.parents) currentTable.parents = {};
                 currentTable = currentTable.parents;
               } else {
@@ -83,8 +80,8 @@ module.exports = class SyntaxScopeMap {
               }
               break;
 
-            case 'pseudo':
-              if (termNode.value === ':nth-child') {
+            case "pseudo":
+              if (termNode.value === ":nth-child") {
                 currentIndexValue = termNode.nodes[0].nodes[0].value;
               } else {
                 rejectSelector(selector);
@@ -108,7 +105,7 @@ module.exports = class SyntaxScopeMap {
       ? this.namedScopeTable[nodeTypes[i]]
       : this.anonymousScopeTable[nodeTypes[i]];
 
-    if (!currentTable) currentTable = this.namedScopeTable['*'];
+    if (!currentTable) currentTable = this.namedScopeTable["*"];
 
     while (currentTable) {
       if (currentTable.indices && currentTable.indices[childIndices[i]]) {
@@ -122,8 +119,7 @@ module.exports = class SyntaxScopeMap {
       if (i === 0) break;
       i--;
       currentTable =
-        currentTable.parents &&
-        (currentTable.parents[nodeTypes[i]] || currentTable.parents['*']);
+        currentTable.parents && (currentTable.parents[nodeTypes[i]] || currentTable.parents["*"]);
     }
 
     return result;
@@ -131,7 +127,7 @@ module.exports = class SyntaxScopeMap {
 };
 
 function setTableDefaults(table, allowWildcardSelector) {
-  const defaultTypeTable = allowWildcardSelector ? table['*'] : null;
+  const defaultTypeTable = allowWildcardSelector ? table["*"] : null;
 
   for (let type in table) {
     let typeTable = table[type];

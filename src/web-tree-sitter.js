@@ -38,9 +38,9 @@ const USE_CUSTOM_WEB_TREE_SITTER = true;
 
 let bundle;
 if (USE_CUSTOM_WEB_TREE_SITTER) {
-  bundle = require('../vendor/web-tree-sitter/web-tree-sitter');
+  bundle = require("../vendor/web-tree-sitter/web-tree-sitter");
 } else {
-  bundle = require('web-tree-sitter');
+  bundle = require("web-tree-sitter");
 }
 
 module.exports = bundle;

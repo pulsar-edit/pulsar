@@ -1,27 +1,27 @@
-const _ = require('underscore-plus');
-const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const TextEditor = require('./text-editor');
-const ScopeDescriptor = require('./scope-descriptor');
+const _ = require("underscore-plus");
+const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
+const TextEditor = require("./text-editor");
+const ScopeDescriptor = require("./scope-descriptor");
 
 const EDITOR_PARAMS_BY_SETTING_KEY = [
-  ['core.fileEncoding', 'encoding'],
-  ['editor.atomicSoftTabs', 'atomicSoftTabs'],
-  ['editor.showInvisibles', 'showInvisibles'],
-  ['editor.tabLength', 'tabLength'],
-  ['editor.invisibles', 'invisibles'],
-  ['editor.showCursorOnSelection', 'showCursorOnSelection'],
-  ['editor.showIndentGuide', 'showIndentGuide'],
-  ['editor.showLineNumbers', 'showLineNumbers'],
-  ['editor.softWrap', 'softWrapped'],
-  ['editor.softWrapHangingIndent', 'softWrapHangingIndentLength'],
-  ['editor.softWrapAtPreferredLineLength', 'softWrapAtPreferredLineLength'],
-  ['editor.preferredLineLength', 'preferredLineLength'],
-  ['editor.maxScreenLineLength', 'maxScreenLineLength'],
-  ['editor.autoIndent', 'autoIndent'],
-  ['editor.autoIndentOnPaste', 'autoIndentOnPaste'],
-  ['editor.scrollPastEnd', 'scrollPastEnd'],
-  ['editor.undoGroupingInterval', 'undoGroupingInterval'],
-  ['editor.scrollSensitivity', 'scrollSensitivity']
+  ["core.fileEncoding", "encoding"],
+  ["editor.atomicSoftTabs", "atomicSoftTabs"],
+  ["editor.showInvisibles", "showInvisibles"],
+  ["editor.tabLength", "tabLength"],
+  ["editor.invisibles", "invisibles"],
+  ["editor.showCursorOnSelection", "showCursorOnSelection"],
+  ["editor.showIndentGuide", "showIndentGuide"],
+  ["editor.showLineNumbers", "showLineNumbers"],
+  ["editor.softWrap", "softWrapped"],
+  ["editor.softWrapHangingIndent", "softWrapHangingIndentLength"],
+  ["editor.softWrapAtPreferredLineLength", "softWrapAtPreferredLineLength"],
+  ["editor.preferredLineLength", "preferredLineLength"],
+  ["editor.maxScreenLineLength", "maxScreenLineLength"],
+  ["editor.autoIndent", "autoIndent"],
+  ["editor.autoIndentOnPaste", "autoIndentOnPaste"],
+  ["editor.scrollPastEnd", "scrollPastEnd"],
+  ["editor.undoGroupingInterval", "undoGroupingInterval"],
+  ["editor.scrollSensitivity", "scrollSensitivity"],
 ];
 
 // Experimental: This global registry tracks registered `TextEditors`.
@@ -49,7 +49,7 @@ module.exports = class TextEditorRegistry {
 
   serialize() {
     return {
-      editorGrammarOverrides: Object.assign({}, this.editorGrammarOverrides)
+      editorGrammarOverrides: Object.assign({}, this.editorGrammarOverrides),
     };
   }
 
@@ -83,7 +83,7 @@ module.exports = class TextEditorRegistry {
   add(editor) {
     this.editors.add(editor);
     editor.registered = true;
-    this.emitter.emit('did-add-editor', editor);
+    this.emitter.emit("did-add-editor", editor);
 
     return new Disposable(() => this.remove(editor));
   }
@@ -145,7 +145,7 @@ module.exports = class TextEditorRegistry {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   observe(callback) {
     this.editors.forEach(callback);
-    return this.emitter.on('did-add-editor', callback);
+    return this.emitter.on("did-add-editor", callback);
   }
 
   // Keep a {TextEditor}'s configuration in sync with Atom's settings.
@@ -164,7 +164,7 @@ module.exports = class TextEditorRegistry {
     const languageChangeSubscription = editor.buffer.onDidChangeLanguageMode(
       (newLanguageMode, oldLanguageMode) => {
         this.updateAndMonitorEditorSettings(editor, oldLanguageMode);
-      }
+      },
     );
     this.subscriptions.add(languageChangeSubscription);
 
@@ -173,9 +173,9 @@ module.exports = class TextEditorRegistry {
       editor.setSoftTabs(
         shouldEditorUseSoftTabs(
           editor,
-          this.config.get('editor.tabType', configOptions),
-          this.config.get('editor.softTabs', configOptions)
-        )
+          this.config.get("editor.tabType", configOptions),
+          this.config.get("editor.softTabs", configOptions),
+        ),
       );
     };
 
@@ -241,12 +241,8 @@ module.exports = class TextEditorRegistry {
     const newLanguageMode = editor.buffer.getLanguageMode();
 
     if (oldLanguageMode) {
-      const newSettings = this.textEditorParamsForScope(
-        newLanguageMode.rootScopeDescriptor
-      );
-      const oldSettings = this.textEditorParamsForScope(
-        oldLanguageMode.rootScopeDescriptor
-      );
+      const newSettings = this.textEditorParamsForScope(newLanguageMode.rootScopeDescriptor);
+      const oldSettings = this.textEditorParamsForScope(oldLanguageMode.rootScopeDescriptor);
 
       const updatedSettings = {};
       for (const [, paramName] of EDITOR_PARAMS_BY_SETTING_KEY) {
@@ -262,9 +258,7 @@ module.exports = class TextEditorRegistry {
         editor.update(updatedSettings);
       }
     } else {
-      editor.update(
-        this.textEditorParamsForScope(newLanguageMode.rootScopeDescriptor)
-      );
+      editor.update(this.textEditorParamsForScope(newLanguageMode.rootScopeDescriptor));
     }
   }
 
@@ -281,38 +275,28 @@ module.exports = class TextEditorRegistry {
       for (const [settingKey, paramName] of EDITOR_PARAMS_BY_SETTING_KEY) {
         this.subscriptions.add(
           this.config.onDidChange(settingKey, configOptions, ({ newValue }) => {
-            this.editorsWithMaintainedConfig.forEach(editor => {
+            this.editorsWithMaintainedConfig.forEach((editor) => {
               if (editor.getRootScopeDescriptor().isEqual(scopeDescriptor)) {
                 editor.update({ [paramName]: newValue });
               }
             });
-          })
+          }),
         );
       }
 
       const updateTabTypes = () => {
-        const tabType = this.config.get('editor.tabType', configOptions);
-        const softTabs = this.config.get('editor.softTabs', configOptions);
-        this.editorsWithMaintainedConfig.forEach(editor => {
+        const tabType = this.config.get("editor.tabType", configOptions);
+        const softTabs = this.config.get("editor.softTabs", configOptions);
+        this.editorsWithMaintainedConfig.forEach((editor) => {
           if (editor.getRootScopeDescriptor().isEqual(scopeDescriptor)) {
-            editor.setSoftTabs(
-              shouldEditorUseSoftTabs(editor, tabType, softTabs)
-            );
+            editor.setSoftTabs(shouldEditorUseSoftTabs(editor, tabType, softTabs));
           }
         });
       };
 
       this.subscriptions.add(
-        this.config.onDidChange(
-          'editor.tabType',
-          configOptions,
-          updateTabTypes
-        ),
-        this.config.onDidChange(
-          'editor.softTabs',
-          configOptions,
-          updateTabTypes
-        )
+        this.config.onDidChange("editor.tabType", configOptions, updateTabTypes),
+        this.config.onDidChange("editor.softTabs", configOptions, updateTabTypes),
       );
     }
   }
@@ -329,11 +313,11 @@ module.exports = class TextEditorRegistry {
 
 function shouldEditorUseSoftTabs(editor, tabType, softTabs) {
   switch (tabType) {
-    case 'hard':
+    case "hard":
       return false;
-    case 'soft':
+    case "soft":
       return true;
-    case 'auto':
+    case "auto":
       switch (editor.usesSoftTabs()) {
         case true:
           return true;

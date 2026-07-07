@@ -1,98 +1,114 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import { TextEditor, CompositeDisposable } from 'atom'
-import etch from 'etch'
-import CollapsibleSectionPanel from './collapsible-section-panel'
-import SearchSettingView from './search-setting-view'
+import { TextEditor, CompositeDisposable } from "atom";
+import etch from "etch";
+import CollapsibleSectionPanel from "./collapsible-section-panel";
+import SearchSettingView from "./search-setting-view";
 
 export default class SearchSettingsPanel extends CollapsibleSectionPanel {
   constructor(settingsView) {
-    super()
-    etch.initialize(this)
-    this.settingsView = settingsView
-    this.searchResults = []
+    super();
+    etch.initialize(this);
+    this.settingsView = settingsView;
+    this.searchResults = [];
     // Get all available settings
     this.settingsSchema = atom.config.schema.properties;
 
-    this.subscriptions = new CompositeDisposable()
-    this.subscriptions.add(this.handleEvents())
-    this.subscriptions.add(atom.commands.add(this.element, {
-      'core:move-up': () => { this.scrollUp() },
-      'core:move-down': () => { this.scrollDown() },
-      'core:page-up': () => { this.pageUp() },
-      'core:page-down': () => { this.pageDown() },
-      'core:move-to-top': () => { this.scrollToTop() },
-      'core:move-to-bottom': () => { this.scrollToBottom() }
-    }))
+    this.subscriptions = new CompositeDisposable();
+    this.subscriptions.add(this.handleEvents());
+    this.subscriptions.add(
+      atom.commands.add(this.element, {
+        "core:move-up": () => {
+          this.scrollUp();
+        },
+        "core:move-down": () => {
+          this.scrollDown();
+        },
+        "core:page-up": () => {
+          this.pageUp();
+        },
+        "core:page-down": () => {
+          this.pageDown();
+        },
+        "core:move-to-top": () => {
+          this.scrollToTop();
+        },
+        "core:move-to-bottom": () => {
+          this.scrollToBottom();
+        },
+      }),
+    );
 
     this.subscriptions.add(
-      this.refs.searchEditor.onDidStopChanging(() => { this.matchSettings() })
-    )
+      this.refs.searchEditor.onDidStopChanging(() => {
+        this.matchSettings();
+      }),
+    );
   }
 
-  focus () {
-    this.refs.searchEditor.element.focus()
+  focus() {
+    this.refs.searchEditor.element.focus();
   }
 
-  show () {
-    this.element.style.display = ''
+  show() {
+    this.element.style.display = "";
     // Don't show the loading for search results as soon as page appears
-    this.refs.loadingArea.style.display = 'none'
+    this.refs.loadingArea.style.display = "none";
   }
 
-  destroy () {
-    this.subscriptions.dispose()
-    return etch.destroy(this)
+  destroy() {
+    this.subscriptions.dispose();
+    return etch.destroy(this);
   }
 
-  update () {}
+  update() {}
 
-  render () {
+  render() {
     return (
-      <div className='panels-item' tabIndex='-1'>
-        <section className='section'>
-          <div className='section-container'>
-            <div className='section-heading icon icon-search-save'>
-              Search Lumine's Settings
-            </div>
-            <div className='editor-container'>
-              <TextEditor ref='searchEditor' mini placeholderText='Start Searching for Settings' />
+      <div className="panels-item" tabIndex="-1">
+        <section className="section">
+          <div className="section-container">
+            <div className="section-heading icon icon-search-save">Search Lumine's Settings</div>
+            <div className="editor-container">
+              <TextEditor ref="searchEditor" mini placeholderText="Start Searching for Settings" />
             </div>
 
-            <section className='sub-section search-results'>
-              <h3 ref='searchHeader' className='sub-section-heading icon icon-package'>
+            <section className="sub-section search-results">
+              <h3 ref="searchHeader" className="sub-section-heading icon icon-package">
                 Search Results
               </h3>
-              <div ref='searchResults' className='container package-container'>
-                <div ref='loadingArea' className='alert alert-info loading-area icon icon-hourglass'>
+              <div ref="searchResults" className="container package-container">
+                <div
+                  ref="loadingArea"
+                  className="alert alert-info loading-area icon icon-hourglass"
+                >
                   Loading Results...
                 </div>
               </div>
             </section>
-
           </div>
         </section>
       </div>
-    )
+    );
   }
 
-  matchSettings () {
+  matchSettings() {
     // this is called after the user types.
     // So lets show our loading message after removing any previous results
-    this.clearSearchResults()
-    this.refs.loadingArea.style.display = ''
-    this.filterSettings(this.refs.searchEditor.getText())
+    this.clearSearchResults();
+    this.refs.loadingArea.style.display = "";
+    this.filterSettings(this.refs.searchEditor.getText());
   }
 
-  clearSearchResults () {
+  clearSearchResults() {
     for (let i = 0; i < this.searchResults.length; i++) {
-      this.searchResults[i].destroy()
+      this.searchResults[i].destroy();
     }
-    this.searchResults = []
+    this.searchResults = [];
   }
 
-  filterSettings (text) {
+  filterSettings(text) {
     let rankedResults = [];
 
     let searchTerm = text;
@@ -117,7 +133,6 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
       // The top level item should always be an object, but just in case we will check.
       // If the top level item returned is not an object it will NOT be listed
       if (useFilter) {
-
         if (namedFilter !== setting) {
           continue;
           // We use this so that we can break out of our current loop iteration
@@ -131,29 +146,32 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
 
       if (this.settingsSchema[setting].type === "object") {
         for (const item in this.settingsSchema[setting].properties) {
-
           let schema = this.settingsSchema[setting].properties[item];
 
-          schema.rank = this.generateRanks(searchTerm, schema.title, schema.description, setting, item)
+          schema.rank = this.generateRanks(
+            searchTerm,
+            schema.title,
+            schema.description,
+            setting,
+            item,
+          );
 
-          schema.path = `${setting}.${item}`
+          schema.path = `${setting}.${item}`;
 
-          rankedResults.push(schema)
+          rankedResults.push(schema);
         }
       }
-
     }
 
-    this.processRanks(rankedResults)
+    this.processRanks(rankedResults);
   }
 
-  handleSettingsString (string) {
+  handleSettingsString(string) {
     return string?.toLowerCase() ?? "";
   }
 
-  generateRanks (searchText, title, description, settingName, settingItem) {
-    let candidate = [settingName, settingItem, title]
-      .filter(Boolean).join(' ');
+  generateRanks(searchText, title, description, settingName, settingItem) {
+    let candidate = [settingName, settingItem, title].filter(Boolean).join(" ");
 
     let result = this.getScore(candidate, searchText);
 
@@ -167,11 +185,13 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
     return { totalScore: result.score + descBonus, matchIndexes: result.matchIndexes };
   }
 
-  processRanks (ranks) {
+  processRanks(ranks) {
     // Gets an array of schemas with ranks included
 
     // Removes any scores below a specific limit
-    let filteredRanks = ranks.filter(item => item.rank.totalScore > atom.config.get("settings-view.searchSettingsMinimumScore"));
+    let filteredRanks = ranks.filter(
+      (item) => item.rank.totalScore > atom.config.get("settings-view.searchSettingsMinimumScore"),
+    );
 
     // Sorts the array from highest score to lowest score
     filteredRanks.sort((a, b) => {
@@ -185,17 +205,16 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
     });
 
     // Remove our loading symbol
-    this.refs.loadingArea.style.display = 'none'
+    this.refs.loadingArea.style.display = "none";
 
     for (const setting of filteredRanks) {
-      let searchView = new SearchSettingView(setting, this.settingsView)
-      this.refs.searchResults.appendChild(searchView.element)
-      this.searchResults.push(searchView)
+      let searchView = new SearchSettingView(setting, this.settingsView);
+      this.refs.searchResults.appendChild(searchView.element);
+      this.searchResults.push(searchView);
     }
-
   }
 
-  getScore (candidate, query) {
+  getScore(candidate, query) {
     if (!candidate || !query) {
       return { score: 0, matchIndexes: [] };
     }
@@ -207,27 +226,27 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
   }
 
   // Boiler Plate Functions
-  scrollUp () {
-    this.element.scrollTop -= document.body.offsetHeight / 20
+  scrollUp() {
+    this.element.scrollTop -= document.body.offsetHeight / 20;
   }
 
-  scrollDown () {
-    this.element.scrollTop += document.body.offsetHeight / 20
+  scrollDown() {
+    this.element.scrollTop += document.body.offsetHeight / 20;
   }
 
-  pageUp () {
-    this.element.scrollTop -= this.element.offsetHeight
+  pageUp() {
+    this.element.scrollTop -= this.element.offsetHeight;
   }
 
-  pageDown () {
-    this.element.scrollTop += this.element.offsetHeight
+  pageDown() {
+    this.element.scrollTop += this.element.offsetHeight;
   }
 
-  scrollToTop () {
-    this.element.scrollTop = 0
+  scrollToTop() {
+    this.element.scrollTop = 0;
   }
 
-  scrollToBottom () {
-    this.element.scrollTop = this.element.scrollHeight
+  scrollToBottom() {
+    this.element.scrollTop = this.element.scrollHeight;
   }
 }

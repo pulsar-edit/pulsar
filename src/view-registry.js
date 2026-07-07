@@ -1,7 +1,7 @@
-const Grim = require('grim');
-const { Disposable } = require('event-kit');
+const Grim = require("grim");
+const { Disposable } = require("event-kit");
 
-const AnyConstructor = Symbol('any-constructor');
+const AnyConstructor = Symbol("any-constructor");
 
 // Essential: `ViewRegistry` handles the association between model and view
 // types in Lumine. We call this association a View Provider. As in, for a given
@@ -69,20 +69,20 @@ module.exports = class ViewRegistry {
     let provider;
     if (arguments.length === 1) {
       switch (typeof modelConstructor) {
-        case 'function':
+        case "function":
           provider = {
             createView: modelConstructor,
-            modelConstructor: AnyConstructor
+            modelConstructor: AnyConstructor,
           };
           break;
-        case 'object':
+        case "object":
           Grim.deprecate(
-            'atom.views.addViewProvider now takes 2 arguments: a model constructor and a createView function. See docs for details.'
+            "atom.views.addViewProvider now takes 2 arguments: a model constructor and a createView function. See docs for details.",
           );
           provider = modelConstructor;
           break;
         default:
-          throw new TypeError('Arguments to addViewProvider must be functions');
+          throw new TypeError("Arguments to addViewProvider must be functions");
       }
     } else {
       provider = { modelConstructor, createView };
@@ -90,7 +90,7 @@ module.exports = class ViewRegistry {
 
     this.providers.push(provider);
     return new Disposable(() => {
-      this.providers = this.providers.filter(p => p !== provider);
+      this.providers = this.providers.filter((p) => p !== provider);
     });
   }
 
@@ -142,7 +142,7 @@ module.exports = class ViewRegistry {
     }
 
     let element;
-    if (object && typeof object.getElement === 'function') {
+    if (object && typeof object.getElement === "function") {
       element = object.getElement();
       if (element instanceof HTMLElement) {
         return element;
@@ -167,9 +167,7 @@ module.exports = class ViewRegistry {
       }
 
       if (object instanceof provider.modelConstructor) {
-        element =
-          provider.createView &&
-          provider.createView(object, this.atomEnvironment);
+        element = provider.createView && provider.createView(object, this.atomEnvironment);
         if (element) {
           return element;
         }
@@ -198,7 +196,7 @@ module.exports = class ViewRegistry {
     throw new Error(
       `Can't create a view for ${
         object.constructor.name
-      } instance. Please register a view provider.`
+      } instance. Please register a view provider.`,
     );
   }
 
@@ -208,9 +206,7 @@ module.exports = class ViewRegistry {
       this.requestDocumentUpdate();
     }
     return new Disposable(() => {
-      this.documentWriters = this.documentWriters.filter(
-        writer => writer !== fn
-      );
+      this.documentWriters = this.documentWriters.filter((writer) => writer !== fn);
     });
   }
 
@@ -218,15 +214,13 @@ module.exports = class ViewRegistry {
     this.documentReaders.push(fn);
     this.requestDocumentUpdate();
     return new Disposable(() => {
-      this.documentReaders = this.documentReaders.filter(
-        reader => reader !== fn
-      );
+      this.documentReaders = this.documentReaders.filter((reader) => reader !== fn);
     });
   }
 
   getNextUpdatePromise() {
     if (this.nextUpdatePromise == null) {
-      this.nextUpdatePromise = new Promise(resolve => {
+      this.nextUpdatePromise = new Promise((resolve) => {
         this.resolveNextUpdatePromise = resolve;
       });
     }
@@ -247,9 +241,7 @@ module.exports = class ViewRegistry {
 
   requestDocumentUpdate() {
     if (this.animationFrameRequest == null) {
-      this.animationFrameRequest = requestAnimationFrame(
-        this.performDocumentUpdate
-      );
+      this.animationFrameRequest = requestAnimationFrame(this.performDocumentUpdate);
     }
   }
 

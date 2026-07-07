@@ -1,5 +1,4 @@
-
-const HYPERLINK_PATTERN = /\bhttps?:/
+const HYPERLINK_PATTERN = /\bhttps?:/;
 
 module.exports = {
   provideHyperlinkInjection() {
@@ -43,17 +42,16 @@ module.exports = {
                 let result = options.language(node);
                 if (result !== undefined) return result;
               }
-              return HYPERLINK_PATTERN.test(node.text) ?
-                'hyperlink' : undefined;
+              return HYPERLINK_PATTERN.test(node.text) ? "hyperlink" : undefined;
             },
             content(node) {
               return options.content ? options.content(node) : node;
             },
             languageScope: options.languageScope ?? null,
-            includeChildren: options.includeChildren ?? false
+            includeChildren: options.includeChildren ?? false,
           });
         }
       },
-    }
-  }
+    };
+  },
 };

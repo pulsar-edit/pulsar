@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const { calculateSpecificity, validateSelector } = require('clear-cut');
-const _ = require('underscore-plus');
+const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
+const { calculateSpecificity, validateSelector } = require("clear-cut");
+const _ = require("underscore-plus");
 
 let SequenceCount = 0;
 
@@ -71,11 +71,7 @@ module.exports = class CommandRegistry {
 
   destroy() {
     for (const commandName in this.registeredCommands) {
-      this.rootNode.removeEventListener(
-        commandName,
-        this.handleCommandEvent,
-        true
-      );
+      this.rootNode.removeEventListener(commandName, this.handleCommandEvent, true);
     }
   }
 
@@ -128,21 +124,19 @@ module.exports = class CommandRegistry {
   // Returns a {Disposable} on which `.dispose()` can be called to remove the
   // added command handler(s).
   add(target, commandName, listener, throwOnInvalidSelector = true) {
-    if (typeof commandName === 'object') {
+    if (typeof commandName === "object") {
       const commands = commandName;
       throwOnInvalidSelector = listener;
       const disposable = new CompositeDisposable();
       for (commandName in commands) {
         listener = commands[commandName];
-        disposable.add(
-          this.add(target, commandName, listener, throwOnInvalidSelector)
-        );
+        disposable.add(this.add(target, commandName, listener, throwOnInvalidSelector));
       }
       return disposable;
     }
 
     if (listener == null) {
-      throw new Error('Cannot register a command with a null listener.');
+      throw new Error("Cannot register a command with a null listener.");
     }
 
     // type Listener = ((e: CustomEvent) => void) | {
@@ -150,16 +144,13 @@ module.exports = class CommandRegistry {
     //   description?: string,
     //   didDispatch(e: CustomEvent): void,
     // }
-    if (
-      typeof listener !== 'function' &&
-      typeof listener.didDispatch !== 'function'
-    ) {
+    if (typeof listener !== "function" && typeof listener.didDispatch !== "function") {
       throw new Error(
-        'Listener must be a callback function or an object with a didDispatch method.'
+        "Listener must be a callback function or an object with a didDispatch method.",
       );
     }
 
-    if (typeof target === 'string') {
+    if (typeof target === "string") {
       if (throwOnInvalidSelector) {
         validateSelector(target);
       }
@@ -173,23 +164,14 @@ module.exports = class CommandRegistry {
     if (this.selectorBasedListenersByCommandName[commandName] == null) {
       this.selectorBasedListenersByCommandName[commandName] = [];
     }
-    const listenersForCommand = this.selectorBasedListenersByCommandName[
-      commandName
-    ];
-    const selectorListener = new SelectorBasedListener(
-      selector,
-      commandName,
-      listener
-    );
+    const listenersForCommand = this.selectorBasedListenersByCommandName[commandName];
+    const selectorListener = new SelectorBasedListener(selector, commandName, listener);
     listenersForCommand.push(selectorListener);
 
     this.commandRegistered(commandName);
 
     return new Disposable(() => {
-      listenersForCommand.splice(
-        listenersForCommand.indexOf(selectorListener),
-        1
-      );
+      listenersForCommand.splice(listenersForCommand.indexOf(selectorListener), 1);
       if (listenersForCommand.length === 0) {
         delete this.selectorBasedListenersByCommandName[commandName];
       }
@@ -213,10 +195,7 @@ module.exports = class CommandRegistry {
     this.commandRegistered(commandName);
 
     return new Disposable(() => {
-      listenersForElement.splice(
-        listenersForElement.indexOf(inlineListener),
-        1
-      );
+      listenersForElement.splice(listenersForElement.indexOf(inlineListener), 1);
       if (listenersForElement.length === 0) {
         listenersForCommand.delete(element);
       }
@@ -250,9 +229,7 @@ module.exports = class CommandRegistry {
         if (listeners.has(currentTarget) && !commandNames.has(name)) {
           commandNames.add(name);
           const targetListeners = listeners.get(currentTarget);
-          commands.push(
-            ...targetListeners.map(listener => listener.descriptor)
-          );
+          commands.push(...targetListeners.map((listener) => listener.descriptor));
         }
       }
 
@@ -293,7 +270,7 @@ module.exports = class CommandRegistry {
   // * `detail` Any value that will be assigned to the event's `.detail` property. Pass an object with multiple properties if you need multiple command arguments.
   dispatch(target, commandName, detail) {
     const event = new CustomEvent(commandName, { bubbles: true, detail });
-    Object.defineProperty(event, 'target', { value: target });
+    Object.defineProperty(event, "target", { value: target });
     return this.handleCommandEvent(event);
   }
 
@@ -302,7 +279,7 @@ module.exports = class CommandRegistry {
   // * `callback` {Function} to be called before dispatching each command
   //   * `event` The Event that will be dispatched
   onWillDispatch(callback) {
-    return this.emitter.on('will-dispatch', callback);
+    return this.emitter.on("will-dispatch", callback);
   }
 
   // Public: Invoke the given callback after dispatching a command event.
@@ -310,7 +287,7 @@ module.exports = class CommandRegistry {
   // * `callback` {Function} to be called after dispatching each command
   //   * `event` The Event that was dispatched
   onDidDispatch(callback) {
-    return this.emitter.on('did-dispatch', callback);
+    return this.emitter.on("did-dispatch", callback);
   }
 
   getSnapshot() {
@@ -338,41 +315,41 @@ module.exports = class CommandRegistry {
 
     const dispatchedEvent = new CustomEvent(event.type, {
       bubbles: true,
-      detail: event.detail
+      detail: event.detail,
     });
-    Object.defineProperty(dispatchedEvent, 'eventPhase', {
-      value: Event.BUBBLING_PHASE
+    Object.defineProperty(dispatchedEvent, "eventPhase", {
+      value: Event.BUBBLING_PHASE,
     });
-    Object.defineProperty(dispatchedEvent, 'currentTarget', {
+    Object.defineProperty(dispatchedEvent, "currentTarget", {
       get() {
         return currentTarget;
-      }
+      },
     });
-    Object.defineProperty(dispatchedEvent, 'target', { value: currentTarget });
-    Object.defineProperty(dispatchedEvent, 'preventDefault', {
+    Object.defineProperty(dispatchedEvent, "target", { value: currentTarget });
+    Object.defineProperty(dispatchedEvent, "preventDefault", {
       value() {
         return event.preventDefault();
-      }
+      },
     });
-    Object.defineProperty(dispatchedEvent, 'stopPropagation', {
+    Object.defineProperty(dispatchedEvent, "stopPropagation", {
       value() {
         event.stopPropagation();
         propagationStopped = true;
-      }
+      },
     });
-    Object.defineProperty(dispatchedEvent, 'stopImmediatePropagation', {
+    Object.defineProperty(dispatchedEvent, "stopImmediatePropagation", {
       value() {
         event.stopImmediatePropagation();
         propagationStopped = true;
         immediatePropagationStopped = true;
-      }
+      },
     });
-    Object.defineProperty(dispatchedEvent, 'abortKeyBinding', {
+    Object.defineProperty(dispatchedEvent, "abortKeyBinding", {
       value() {
-        if (typeof event.abortKeyBinding === 'function') {
+        if (typeof event.abortKeyBinding === "function") {
           event.abortKeyBinding();
         }
-      }
+      },
     });
 
     for (const key of Object.keys(event)) {
@@ -381,20 +358,16 @@ module.exports = class CommandRegistry {
       }
     }
 
-    this.emitter.emit('will-dispatch', dispatchedEvent);
+    this.emitter.emit("will-dispatch", dispatchedEvent);
 
     while (true) {
-      const commandInlineListeners = this.inlineListenersByCommandName[
-        event.type
-      ]
+      const commandInlineListeners = this.inlineListenersByCommandName[event.type]
         ? this.inlineListenersByCommandName[event.type].get(currentTarget)
         : null;
       let listeners = commandInlineListeners || [];
       if (currentTarget.webkitMatchesSelector != null) {
-        const selectorBasedListeners = (
-          this.selectorBasedListenersByCommandName[event.type] || []
-        )
-          .filter(listener => listener.matchesTarget(currentTarget))
+        const selectorBasedListeners = (this.selectorBasedListenersByCommandName[event.type] || [])
+          .filter((listener) => listener.matchesTarget(currentTarget))
           .sort((a, b) => a.compare(b));
         listeners = selectorBasedListeners.concat(listeners);
       }
@@ -419,7 +392,7 @@ module.exports = class CommandRegistry {
       currentTarget = currentTarget.parentNode || window;
     }
 
-    this.emitter.emit('did-dispatch', dispatchedEvent);
+    this.emitter.emit("did-dispatch", dispatchedEvent);
 
     return matched.length > 0 ? Promise.all(matched) : null;
   }
@@ -427,7 +400,7 @@ module.exports = class CommandRegistry {
   commandRegistered(commandName) {
     if (this.rootNode != null && !this.registeredCommands[commandName]) {
       this.rootNode.addEventListener(commandName, this.handleCommandEvent, {
-        capture: true
+        capture: true,
       });
       return (this.registeredCommands[commandName] = true);
     }
@@ -448,17 +421,11 @@ class SelectorBasedListener {
   }
 
   compare(other) {
-    return (
-      this.specificity - other.specificity ||
-      this.sequenceNumber - other.sequenceNumber
-    );
+    return this.specificity - other.specificity || this.sequenceNumber - other.sequenceNumber;
   }
 
   matchesTarget(target) {
-    return (
-      target.webkitMatchesSelector &&
-      target.webkitMatchesSelector(this.selector)
-    );
+    return target.webkitMatchesSelector && target.webkitMatchesSelector(this.selector);
   }
 }
 
@@ -474,14 +441,12 @@ class InlineListener {
 //   displayName: string,
 // };
 function extractDescriptor(name, listener) {
-  return Object.assign(_.omit(listener, 'didDispatch'), {
+  return Object.assign(_.omit(listener, "didDispatch"), {
     name,
-    displayName: listener.displayName
-      ? listener.displayName
-      : _.humanizeEventName(name)
+    displayName: listener.displayName ? listener.displayName : _.humanizeEventName(name),
   });
 }
 
 function extractDidDispatch(listener) {
-  return typeof listener === 'function' ? listener : listener.didDispatch;
+  return typeof listener === "function" ? listener : listener.didDispatch;
 }

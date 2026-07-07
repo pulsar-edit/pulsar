@@ -1,7 +1,8 @@
-import * as tsImport from 'ts-import';
+import * as tsImport from "ts-import";
 
 export const bootstrap = async () => {
-  const filePath = "./node_modules/chrome-devtools-frontend/front_end/models/javascript_metadata/DOMPinnedProperties.ts";
+  const filePath =
+    "./node_modules/chrome-devtools-frontend/front_end/models/javascript_metadata/DOMPinnedProperties.ts";
   const compiled = await tsImport.default.tsImport.compile(filePath);
 
   return compiled;

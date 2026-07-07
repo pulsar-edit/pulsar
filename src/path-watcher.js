@@ -1,31 +1,30 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const nsfw = require('nsfw');
-const { NativeWatcherRegistry } = require('./native-watcher-registry');
+const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
+const nsfw = require("nsfw");
+const { NativeWatcherRegistry } = require("./native-watcher-registry");
 
 // Private: Associate native watcher action flags with descriptive String
 // equivalents.
 const ACTION_MAP = new Map([
-  [nsfw.actions.MODIFIED, 'modified'],
-  [nsfw.actions.CREATED,  'created' ],
-  [nsfw.actions.DELETED,  'deleted' ],
-  [nsfw.actions.RENAMED,  'renamed' ]
+  [nsfw.actions.MODIFIED, "modified"],
+  [nsfw.actions.CREATED, "created"],
+  [nsfw.actions.DELETED, "deleted"],
+  [nsfw.actions.RENAMED, "renamed"],
 ]);
 
 // Private: Possible states of a {NativeWatcher}.
 const WATCHER_STATE = {
-  STOPPED:  Symbol('stopped'),
-  STARTING: Symbol('starting'),
-  RUNNING:  Symbol('running'),
-  STOPPING: Symbol('stopping')
+  STOPPED: Symbol("stopped"),
+  STARTING: Symbol("starting"),
+  RUNNING: Symbol("running"),
+  STOPPING: Symbol("stopping"),
 };
 
 // Private: Interface with and normalize events from a filesystem watcher
 // implementation.
 class NativeWatcher {
-
   // Private: Initialize a native watcher on a path.
   //
   // Events will not be produced until {start()} is called.
@@ -52,11 +51,11 @@ class NativeWatcher {
     await this.doStart();
 
     this.state = WATCHER_STATE.RUNNING;
-    this.emitter.emit('did-start');
+    this.emitter.emit("did-start");
   }
 
   doStart() {
-    return Promise.reject(new Error('doStart() not overridden'));
+    return Promise.reject(new Error("doStart() not overridden"));
   }
 
   // Private: Return true if the underlying watcher is actively listening for filesystem events.
@@ -68,7 +67,7 @@ class NativeWatcher {
   //
   // Returns: A {Disposable} to revoke the subscription.
   onDidStart(callback) {
-    return this.emitter.on('did-start', callback);
+    return this.emitter.on("did-start", callback);
   }
 
   // Private: Register a callback to be invoked with normalized filesystem events as they arrive. Starts the watcher
@@ -79,10 +78,10 @@ class NativeWatcher {
   onDidChange(callback) {
     this.start();
 
-    const sub = this.emitter.on('did-change', callback);
+    const sub = this.emitter.on("did-change", callback);
     return new Disposable(() => {
       sub.dispose();
-      if (this.emitter.listenerCountForEventName('did-change') === 0) {
+      if (this.emitter.listenerCountForEventName("did-change") === 0) {
         this.stop();
       }
     });
@@ -92,28 +91,28 @@ class NativeWatcher {
   //
   // Returns: A {Disposable} to revoke the subscription.
   onShouldDetach(callback) {
-    return this.emitter.on('should-detach', callback);
+    return this.emitter.on("should-detach", callback);
   }
 
   // Private: Register a callback to be invoked when a {NativeWatcher} is about to be stopped.
   //
   // Returns: A {Disposable} to revoke the subscription.
   onWillStop(callback) {
-    return this.emitter.on('will-stop', callback);
+    return this.emitter.on("will-stop", callback);
   }
 
   // Private: Register a callback to be invoked when the filesystem watcher has been stopped.
   //
   // Returns: A {Disposable} to revoke the subscription.
   onDidStop(callback) {
-    return this.emitter.on('did-stop', callback);
+    return this.emitter.on("did-stop", callback);
   }
 
   // Private: Register a callback to be invoked with any errors reported from the watcher.
   //
   // Returns: A {Disposable} to revoke the subscription.
   onDidError(callback) {
-    return this.emitter.on('did-error', callback);
+    return this.emitter.on("did-error", callback);
   }
 
   // Private: Broadcast an `onShouldDetach` event to prompt any {Watcher} instances bound here to attach to a new
@@ -122,7 +121,7 @@ class NativeWatcher {
   // * `replacement` the new {NativeWatcher} instance that a live {Watcher} instance should reattach to instead.
   // * `watchedPath` absolute path watched by the new {NativeWatcher}.
   reattachTo(replacement, watchedPath, options) {
-    this.emitter.emit('should-detach', { replacement, watchedPath, options });
+    this.emitter.emit("should-detach", { replacement, watchedPath, options });
   }
 
   // Private: Stop the native watcher and release any operating system resources associated with it.
@@ -133,12 +132,12 @@ class NativeWatcher {
       return;
     }
     this.state = WATCHER_STATE.STOPPING;
-    this.emitter.emit('will-stop');
+    this.emitter.emit("will-stop");
 
     await this.doStop();
 
     this.state = WATCHER_STATE.STOPPED;
-    this.emitter.emit('did-stop');
+    this.emitter.emit("did-stop");
   }
 
   doStop() {
@@ -156,7 +155,7 @@ class NativeWatcher {
   //
   // * `events` An Array of filesystem events.
   onEvents(events) {
-    this.emitter.emit('did-change', events);
+    this.emitter.emit("did-change", events);
   }
 
   // Private: Callback function invoked by the native watcher when an error
@@ -164,7 +163,7 @@ class NativeWatcher {
   //
   // * `err` The native filesystem error.
   onError(err) {
-    this.emitter.emit('did-error', err);
+    this.emitter.emit("did-error", err);
   }
 }
 
@@ -172,11 +171,10 @@ class NativeWatcher {
 // watcher.
 class NSFWNativeWatcher extends NativeWatcher {
   async doStart(_rootPath, _eventCallback, _errorCallback) {
-    const handler = events => {
+    const handler = (events) => {
       this.onEvents(
-        events.map(event => {
-          const action =
-            ACTION_MAP.get(event.action) || `unexpected (${event.action})`;
+        events.map((event) => {
+          const action = ACTION_MAP.get(event.action) || `unexpected (${event.action})`;
           const payload = { action };
 
           if (event.file) {
@@ -184,22 +182,22 @@ class NSFWNativeWatcher extends NativeWatcher {
           } else {
             payload.oldPath = path.join(
               event.directory,
-              typeof event.oldFile === 'undefined' ? '' : event.oldFile
+              typeof event.oldFile === "undefined" ? "" : event.oldFile,
             );
             payload.path = path.join(
               event.directory,
-              typeof event.newFile === 'undefined' ? '' : event.newFile
+              typeof event.newFile === "undefined" ? "" : event.newFile,
             );
           }
 
           return payload;
-        })
+        }),
       );
     };
 
     this.watcher = await nsfw(this.normalizedPath, handler, {
       debounceMS: 100,
-      errorCallback: this.onError
+      errorCallback: this.onError,
     });
 
     await this.watcher.start();
@@ -277,7 +275,7 @@ class PathWatcher {
     this.native = null;
     this.changeCallbacks = new Map();
 
-    this.attachedPromise = new Promise(resolve => {
+    this.attachedPromise = new Promise((resolve) => {
       this.resolveAttachedPromise = resolve;
     });
 
@@ -297,7 +295,7 @@ class PathWatcher {
         resolve(real);
       });
     });
-    this.normalizedPathPromise.catch(err => this.rejectStartPromise(err));
+    this.normalizedPathPromise.catch((err) => this.rejectStartPromise(err));
 
     this.emitter = new Emitter();
     this.subs = new CompositeDisposable();
@@ -354,9 +352,7 @@ class PathWatcher {
   // callbacks mapped to it have been disposed.
   onDidChange(callback) {
     if (this.native) {
-      const sub = this.native.onDidChange(events =>
-        this.onNativeEvents(events, callback)
-      );
+      const sub = this.native.onDidChange((events) => this.onNativeEvents(events, callback));
       this.changeCallbacks.set(callback, sub);
 
       this.native.start();
@@ -382,7 +378,7 @@ class PathWatcher {
   //
   // Returns a {Disposable}.
   onDidError(callback) {
-    return this.emitter.on('did-error', callback);
+    return this.emitter.on("did-error", callback);
   }
 
   // Private: Wire this watcher to an operating system-level native watcher
@@ -397,23 +393,21 @@ class PathWatcher {
       this.subs.add(
         native.onDidStart(() => {
           this.resolveStartPromise();
-        })
+        }),
       );
     }
 
     // Transfer any native event subscriptions to the new NativeWatcher.
     for (const [callback, formerSub] of this.changeCallbacks) {
-      const newSub = native.onDidChange(events =>
-        this.onNativeEvents(events, callback)
-      );
+      const newSub = native.onDidChange((events) => this.onNativeEvents(events, callback));
       this.changeCallbacks.set(callback, newSub);
       formerSub.dispose();
     }
 
     this.subs.add(
-      native.onDidError(err => {
-        this.emitter.emit('did-error', err);
-      })
+      native.onDidError((err) => {
+        this.emitter.emit("did-error", err);
+      }),
     );
 
     this.subs.add(
@@ -427,7 +421,7 @@ class PathWatcher {
         ) {
           this.attachToNative(replacement);
         }
-      })
+      }),
     );
 
     this.subs.add(
@@ -436,7 +430,7 @@ class PathWatcher {
           this.subs.dispose();
           this.native = null;
         }
-      })
+      }),
     );
 
     this.resolveAttachedPromise();
@@ -476,31 +470,34 @@ class PathWatcher {
   // for paths above this watcher's root path, so filter them to only include
   // the relevant ones, then re-broadcast them to our subscribers.
   onNativeEvents(events, callback) {
-    const isWatchedPath = eventPath =>
-      eventPath.startsWith(this.normalizedPath);
+    const isWatchedPath = (eventPath) => eventPath.startsWith(this.normalizedPath);
 
     const filtered = [];
     for (let i = 0; i < events.length; i++) {
       const event = events[i];
 
-      if (event.action === 'renamed') {
+      if (event.action === "renamed") {
         const srcWatched = isWatchedPath(event.oldPath);
         const destWatched = isWatchedPath(event.path);
 
         if (srcWatched && destWatched) {
           filtered.push(event);
         } else if (srcWatched && !destWatched) {
-          filtered.push(this.denormalizeEvent({
-            action: 'deleted',
-            kind: event.kind,
-            path: event.oldPath
-          }));
+          filtered.push(
+            this.denormalizeEvent({
+              action: "deleted",
+              kind: event.kind,
+              path: event.oldPath,
+            }),
+          );
         } else if (!srcWatched && destWatched) {
-          filtered.push(this.denormalizeEvent({
-            action: 'created',
-            kind: event.kind,
-            path: event.path
-          }));
+          filtered.push(
+            this.denormalizeEvent({
+              action: "created",
+              kind: event.kind,
+              path: event.path,
+            }),
+          );
         }
       } else {
         if (isWatchedPath(event.path)) {
@@ -535,15 +532,10 @@ class PathWatcherManager {
   // necessary.
   static active() {
     if (!this.activeManager) {
-      this.activeManager = new PathWatcherManager(
-        atom.config.get('core.fileSystemWatcher')
-      );
-      this.sub = atom.config.onDidChange(
-        'core.fileSystemWatcher',
-        ({ newValue }) => {
-          this.transitionTo(newValue);
-        }
-      );
+      this.activeManager = new PathWatcherManager(atom.config.get("core.fileSystemWatcher"));
+      this.sub = atom.config.onDidChange("core.fileSystemWatcher", ({ newValue }) => {
+        this.transitionTo(newValue);
+      });
     }
     return this.activeManager;
   }
@@ -563,7 +555,7 @@ class PathWatcherManager {
     current.isShuttingDown = true;
 
     let resolveTransitionPromise = () => {};
-    this.transitionPromise = new Promise(resolve => {
+    this.transitionPromise = new Promise((resolve) => {
       resolveTransitionPromise = resolve;
     });
 
@@ -574,7 +566,7 @@ class PathWatcherManager {
       Array.from(current.live, async ([root, native]) => {
         const w = await replacement.createWatcher(root, () => {});
         native.reattachTo(w.native, root, w.native.options || {});
-      })
+      }),
     );
 
     current.stopAllWatchers();
@@ -588,7 +580,7 @@ class PathWatcherManager {
     this.setting = setting;
     this.live = new Map();
 
-    this.nativeRegistry = new NativeWatcherRegistry(normalizedPath => {
+    this.nativeRegistry = new NativeWatcherRegistry((normalizedPath) => {
       const nativeWatcher = new NSFWNativeWatcher(normalizedPath);
 
       this.live.set(normalizedPath, nativeWatcher);
@@ -608,11 +600,7 @@ class PathWatcherManager {
   async createWatcher(rootPath, eventCallback, options) {
     if (this.isShuttingDown) {
       await this.constructor.transitionPromise;
-      return PathWatcherManager.active().createWatcher(
-        rootPath,
-        eventCallback,
-        options
-      );
+      return PathWatcherManager.active().createWatcher(rootPath, eventCallback, options);
     }
 
     const w = new PathWatcher(this.nativeRegistry, rootPath, options);
@@ -687,11 +675,7 @@ class PathWatcherManager {
 // ```
 //
 function watchPath(rootPath, options, eventCallback) {
-  return PathWatcherManager.active().createWatcher(
-    rootPath,
-    eventCallback,
-    options
-  );
+  return PathWatcherManager.active().createWatcher(rootPath, eventCallback, options);
 }
 
 // Private: Return a Promise that resolves when all {NativeWatcher} instances
@@ -705,6 +689,5 @@ function stopAllWatchers() {
 watchPath.printWatchers = function () {
   return PathWatcherManager.active().print();
 };
-
 
 module.exports = { watchPath, stopAllWatchers };

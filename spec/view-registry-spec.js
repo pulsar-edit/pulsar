@@ -4,9 +4,9 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const ViewRegistry = require('../src/view-registry');
+const ViewRegistry = require("../src/view-registry");
 
-describe('ViewRegistry', () => {
+describe("ViewRegistry", () => {
   let registry = null;
 
   beforeEach(() => {
@@ -17,18 +17,18 @@ describe('ViewRegistry', () => {
     registry.clearDocumentRequests();
   });
 
-  describe('::getView(object)', () => {
-    describe('when passed a DOM node', () =>
-      it('returns the given DOM node', () => {
-        const node = document.createElement('div');
+  describe("::getView(object)", () => {
+    describe("when passed a DOM node", () =>
+      it("returns the given DOM node", () => {
+        const node = document.createElement("div");
         expect(registry.getView(node)).toBe(node);
       }));
 
-    describe('when passed an object with an element property', () =>
+    describe("when passed an object with an element property", () =>
       it("returns the element property if it's an instance of HTMLElement", () => {
         class TestComponent {
           constructor() {
-            this.element = document.createElement('div');
+            this.element = document.createElement("div");
           }
         }
 
@@ -36,12 +36,12 @@ describe('ViewRegistry', () => {
         expect(registry.getView(component)).toBe(component.element);
       }));
 
-    describe('when passed an object with a getElement function', () =>
+    describe("when passed an object with a getElement function", () =>
       it("returns the return value of getElement if it's an instance of HTMLElement", () => {
         class TestComponent {
           getElement() {
             if (this.myElement == null) {
-              this.myElement = document.createElement('div');
+              this.myElement = document.createElement("div");
             }
             return this.myElement;
           }
@@ -51,9 +51,9 @@ describe('ViewRegistry', () => {
         expect(registry.getView(component)).toBe(component.myElement);
       }));
 
-    describe('when passed a model object', () => {
+    describe("when passed a model object", () => {
       describe("when a view provider is registered matching the object's constructor", () =>
-        it('constructs a view element and assigns the model on it', () => {
+        it("constructs a view element and assigns the model on it", () => {
           class TestModel {}
 
           class TestModelSubclass extends TestModel {}
@@ -67,9 +67,7 @@ describe('ViewRegistry', () => {
 
           const model = new TestModel();
 
-          registry.addViewProvider(TestModel, model =>
-            new TestView().initialize(model)
-          );
+          registry.addViewProvider(TestModel, (model) => new TestView().initialize(model));
 
           const view = registry.getView(model);
           expect(view instanceof TestView).toBe(true);
@@ -81,31 +79,31 @@ describe('ViewRegistry', () => {
           expect(view2.model).toBe(subclassModel);
         }));
 
-      describe('when a view provider is registered generically, and works with the object', () =>
-        it('constructs a view element and assigns the model on it', () => {
-          registry.addViewProvider(model => {
-            if (model.a === 'b') {
-              const element = document.createElement('div');
-              element.className = 'test-element';
+      describe("when a view provider is registered generically, and works with the object", () =>
+        it("constructs a view element and assigns the model on it", () => {
+          registry.addViewProvider((model) => {
+            if (model.a === "b") {
+              const element = document.createElement("div");
+              element.className = "test-element";
               return element;
             }
           });
 
-          const view = registry.getView({ a: 'b' });
-          expect(view.className).toBe('test-element');
+          const view = registry.getView({ a: "b" });
+          expect(view.className).toBe("test-element");
 
-          expect(() => registry.getView({ a: 'c' })).toThrow();
+          expect(() => registry.getView({ a: "c" })).toThrow();
         }));
 
       describe("when no view provider is registered for the object's constructor", () =>
-        it('throws an exception', () => {
+        it("throws an exception", () => {
           expect(() => registry.getView({})).toThrow();
         }));
     });
   });
 
-  describe('::addViewProvider(providerSpec)', () =>
-    it('returns a disposable that can be used to remove the provider', () => {
+  describe("::addViewProvider(providerSpec)", () =>
+    it("returns a disposable that can be used to remove the provider", () => {
       class TestModel {}
       class TestView {
         initialize(model) {
@@ -114,8 +112,8 @@ describe('ViewRegistry', () => {
         }
       }
 
-      const disposable = registry.addViewProvider(TestModel, model =>
-        new TestView().initialize(model)
+      const disposable = registry.addViewProvider(TestModel, (model) =>
+        new TestView().initialize(model),
       );
 
       expect(registry.getView(new TestModel()) instanceof TestView).toBe(true);
@@ -123,81 +121,79 @@ describe('ViewRegistry', () => {
       expect(() => registry.getView(new TestModel())).toThrow();
     }));
 
-  describe('::updateDocument(fn) and ::readDocument(fn)', () => {
+  describe("::updateDocument(fn) and ::readDocument(fn)", () => {
     let frameRequests = null;
 
     beforeEach(() => {
       frameRequests = [];
-      spyOn(window, 'requestAnimationFrame').and.callFake(fn =>
-        frameRequests.push(fn)
-      );
+      spyOn(window, "requestAnimationFrame").and.callFake((fn) => frameRequests.push(fn));
     });
 
-    it('performs all pending writes before all pending reads on the next animation frame', () => {
+    it("performs all pending writes before all pending reads on the next animation frame", () => {
       let events = [];
 
-      registry.updateDocument(() => events.push('write 1'));
-      registry.readDocument(() => events.push('read 1'));
-      registry.readDocument(() => events.push('read 2'));
-      registry.updateDocument(() => events.push('write 2'));
+      registry.updateDocument(() => events.push("write 1"));
+      registry.readDocument(() => events.push("read 1"));
+      registry.readDocument(() => events.push("read 2"));
+      registry.updateDocument(() => events.push("write 2"));
 
       expect(events).toEqual([]);
 
       expect(frameRequests.length).toBe(1);
       frameRequests[0]();
-      expect(events).toEqual(['write 1', 'write 2', 'read 1', 'read 2']);
+      expect(events).toEqual(["write 1", "write 2", "read 1", "read 2"]);
 
       frameRequests = [];
       events = [];
-      const disposable = registry.updateDocument(() => events.push('write 3'));
-      registry.updateDocument(() => events.push('write 4'));
-      registry.readDocument(() => events.push('read 3'));
+      const disposable = registry.updateDocument(() => events.push("write 3"));
+      registry.updateDocument(() => events.push("write 4"));
+      registry.readDocument(() => events.push("read 3"));
 
       disposable.dispose();
 
       expect(frameRequests.length).toBe(1);
       frameRequests[0]();
-      expect(events).toEqual(['write 4', 'read 3']);
+      expect(events).toEqual(["write 4", "read 3"]);
     });
 
-    it('performs writes requested from read callbacks in the same animation frame', () => {
+    it("performs writes requested from read callbacks in the same animation frame", () => {
       const events = [];
 
-      registry.updateDocument(() => events.push('write 1'));
+      registry.updateDocument(() => events.push("write 1"));
       registry.readDocument(() => {
-        registry.updateDocument(() => events.push('write from read 1'));
-        events.push('read 1');
+        registry.updateDocument(() => events.push("write from read 1"));
+        events.push("read 1");
       });
       registry.readDocument(() => {
-        registry.updateDocument(() => events.push('write from read 2'));
-        events.push('read 2');
+        registry.updateDocument(() => events.push("write from read 2"));
+        events.push("read 2");
       });
-      registry.updateDocument(() => events.push('write 2'));
+      registry.updateDocument(() => events.push("write 2"));
 
       expect(frameRequests.length).toBe(1);
       frameRequests[0]();
       expect(frameRequests.length).toBe(1);
 
       expect(events).toEqual([
-        'write 1',
-        'write 2',
-        'read 1',
-        'read 2',
-        'write from read 1',
-        'write from read 2'
+        "write 1",
+        "write 2",
+        "read 1",
+        "read 2",
+        "write from read 1",
+        "write from read 2",
       ]);
     });
   });
 
-  describe('::getNextUpdatePromise()', () =>
-    it('returns a promise that resolves at the end of the next update cycle', async () => {
-      let updateDocumentSpy = jasmine.createSpy('update document');
-      let readDocumentSpy = jasmine.createSpy('read document');
+  describe("::getNextUpdatePromise()", () =>
+    it("returns a promise that resolves at the end of the next update cycle", async () => {
+      let updateDocumentSpy = jasmine.createSpy("update document");
+      let readDocumentSpy = jasmine.createSpy("read document");
 
       registry.updateDocument(updateDocumentSpy);
       registry.readDocument(readDocumentSpy);
 
-      await registry.getNextUpdatePromise()
+      await registry.getNextUpdatePromise();
 
       expect(updateDocumentSpy).toHaveBeenCalled();
       expect(readDocumentSpy).toHaveBeenCalled();

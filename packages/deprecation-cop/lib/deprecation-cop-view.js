@@ -1,53 +1,53 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import _ from 'underscore-plus';
-import { CompositeDisposable } from 'atom';
-import etch from 'etch';
-import fs from 'fs-plus';
-import Grim from 'grim';
-import path from 'path';
-import { shell } from 'electron';
+import _ from "underscore-plus";
+import { CompositeDisposable } from "atom";
+import etch from "etch";
+import fs from "fs-plus";
+import Grim from "grim";
+import path from "path";
+import { shell } from "electron";
 
 export default class DeprecationCopView {
   constructor({ uri }) {
     this.uri = uri;
     this.subscriptions = new CompositeDisposable();
     this.subscriptions.add(
-      Grim.on('updated', () => {
+      Grim.on("updated", () => {
         etch.update(this);
-      })
+      }),
     );
     // TODO: Remove conditional when the new StyleManager deprecation APIs reach stable.
     if (atom.styles.onDidUpdateDeprecations) {
       this.subscriptions.add(
         atom.styles.onDidUpdateDeprecations(() => {
           etch.update(this);
-        })
+        }),
       );
     }
     etch.initialize(this);
     this.subscriptions.add(
       atom.commands.add(this.element, {
-        'core:move-up': () => {
+        "core:move-up": () => {
           this.scrollUp();
         },
-        'core:move-down': () => {
+        "core:move-down": () => {
           this.scrollDown();
         },
-        'core:page-up': () => {
+        "core:page-up": () => {
           this.pageUp();
         },
-        'core:page-down': () => {
+        "core:page-down": () => {
           this.pageDown();
         },
-        'core:move-to-top': () => {
+        "core:move-to-top": () => {
           this.scrollToTop();
         },
-        'core:move-to-bottom': () => {
+        "core:move-to-bottom": () => {
           this.scrollToBottom();
-        }
-      })
+        },
+      }),
     );
   }
 
@@ -55,7 +55,7 @@ export default class DeprecationCopView {
     return {
       deserializer: this.constructor.name,
       uri: this.getURI(),
-      version: 1
+      version: 1,
     };
   }
 
@@ -70,16 +70,13 @@ export default class DeprecationCopView {
 
   render() {
     return (
-      <div
-        className="deprecation-cop pane-item native-key-bindings"
-        tabIndex="-1"
-      >
+      <div className="deprecation-cop pane-item native-key-bindings" tabIndex="-1">
         <div className="panel">
           <div className="padded deprecation-overview">
             <div className="pull-right btn-group">
               <button
                 className="btn btn-primary check-for-update"
-                onclick={event => {
+                onclick={(event) => {
                   event.preventDefault();
                   this.checkForUpdates();
                 }}
@@ -92,9 +89,7 @@ export default class DeprecationCopView {
           <div className="panel-heading">
             <span>Deprecated calls</span>
           </div>
-          <ul className="list-tree has-collapsable-children">
-            {this.renderDeprecatedCalls()}
-          </ul>
+          <ul className="list-tree has-collapsable-children">{this.renderDeprecatedCalls()}</ul>
 
           <div className="panel-heading">
             <span>Deprecated selectors</span>
@@ -114,57 +109,53 @@ export default class DeprecationCopView {
       return <li className="list-item">No deprecated calls</li>;
     } else {
       //TODO_LUMINE: Validate 'atom core'
-      return packageNames.sort().map(packageName => (
+      return packageNames.sort().map((packageName) => (
         <li className="deprecation list-nested-item collapsed">
           <div
             className="deprecation-info list-item"
-            onclick={event =>
-              event.target.parentElement.classList.toggle('collapsed')
-            }
+            onclick={(event) => event.target.parentElement.classList.toggle("collapsed")}
           >
-            <span className="text-highlight">{packageName || 'atom core'}</span>
+            <span className="text-highlight">{packageName || "atom core"}</span>
             <span>{` (${_.pluralize(
               deprecationsByPackageName[packageName].length,
-              'deprecation'
+              "deprecation",
             )})`}</span>
           </div>
 
           <ul className="list">
             {this.renderPackageActionsIfNeeded(packageName)}
-            {deprecationsByPackageName[packageName].map(
-              ({ deprecation, stack }) => (
-                <li className="list-item deprecation-detail">
-                  <span className="text-warning icon icon-alert" />
-                  <div
-                    className="list-item deprecation-message"
-                    innerHTML={atom.ui.markdown.render(deprecation.getMessage())}
-                  />
-                  {this.renderIssueURLIfNeeded(
-                    packageName,
-                    deprecation,
-                    this.buildIssueURL(packageName, deprecation, stack)
-                  )}
-                  <div className="stack-trace">
-                    {stack.map(({ functionName, location }) => (
-                      <div className="stack-line">
-                        <span>{functionName}</span>
-                        <span> - </span>
-                        <a
-                          className="stack-line-location"
-                          href={location}
-                          onclick={event => {
-                            event.preventDefault();
-                            this.openLocation(location);
-                          }}
-                        >
-                          {location}
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                </li>
-              )
-            )}
+            {deprecationsByPackageName[packageName].map(({ deprecation, stack }) => (
+              <li className="list-item deprecation-detail">
+                <span className="text-warning icon icon-alert" />
+                <div
+                  className="list-item deprecation-message"
+                  innerHTML={atom.ui.markdown.render(deprecation.getMessage())}
+                />
+                {this.renderIssueURLIfNeeded(
+                  packageName,
+                  deprecation,
+                  this.buildIssueURL(packageName, deprecation, stack),
+                )}
+                <div className="stack-trace">
+                  {stack.map(({ functionName, location }) => (
+                    <div className="stack-line">
+                      <span>{functionName}</span>
+                      <span> - </span>
+                      <a
+                        className="stack-line-location"
+                        href={location}
+                        onclick={(event) => {
+                          event.preventDefault();
+                          this.openLocation(location);
+                        }}
+                      >
+                        {location}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </li>
+            ))}
           </ul>
         </li>
       ));
@@ -177,13 +168,11 @@ export default class DeprecationCopView {
     if (packageNames.length === 0) {
       return <li className="list-item">No deprecated selectors</li>;
     } else {
-      return packageNames.map(packageName => (
+      return packageNames.map((packageName) => (
         <li className="deprecation list-nested-item collapsed">
           <div
             className="deprecation-info list-item"
-            onclick={event =>
-              event.target.parentElement.classList.toggle('collapsed')
-            }
+            onclick={(event) => event.target.parentElement.classList.toggle("collapsed")}
           >
             <span className="text-highlight">{packageName}</span>
           </div>
@@ -192,20 +181,15 @@ export default class DeprecationCopView {
             {this.renderPackageActionsIfNeeded(packageName)}
             {deprecationsByPackageName[packageName].map(
               ({ packagePath, sourcePath, deprecation }) => {
-                const relativeSourcePath = path.relative(
-                  packagePath,
-                  sourcePath
-                );
+                const relativeSourcePath = path.relative(packagePath, sourcePath);
                 const issueTitle = `Deprecated selector in \`${relativeSourcePath}\``;
-                const issueBody = `In \`${relativeSourcePath}\`: \n\n${
-                  deprecation.message
-                }`;
+                const issueBody = `In \`${relativeSourcePath}\`: \n\n${deprecation.message}`;
                 return (
                   <li className="list-item source-file">
                     <a
                       className="source-url"
                       href={sourcePath}
-                      onclick={event => {
+                      onclick={(event) => {
                         event.preventDefault();
                         this.openLocation(sourcePath);
                       }}
@@ -219,16 +203,12 @@ export default class DeprecationCopView {
                           className="list-item deprecation-message"
                           innerHTML={atom.ui.markdown.render(deprecation.message)}
                         />
-                        {this.renderSelectorIssueURLIfNeeded(
-                          packageName,
-                          issueTitle,
-                          issueBody
-                        )}
+                        {this.renderSelectorIssueURLIfNeeded(packageName, issueTitle, issueBody)}
                       </li>
                     </ul>
                   </li>
                 );
-              }
+              },
             )}
           </ul>
         </li>
@@ -243,7 +223,7 @@ export default class DeprecationCopView {
           <div className="btn-group">
             <button
               className="btn check-for-update"
-              onclick={event => {
+              onclick={(event) => {
                 event.preventDefault();
                 this.checkForUpdates();
               }}
@@ -253,7 +233,7 @@ export default class DeprecationCopView {
             <button
               className="btn disable-package"
               data-package-name={packageName}
-              onclick={event => {
+              onclick={(event) => {
                 event.preventDefault();
                 this.disablePackage(packageName);
               }}
@@ -264,22 +244,19 @@ export default class DeprecationCopView {
         </div>
       );
     } else {
-      return '';
+      return "";
     }
   }
 
   encodeURI(str) {
-    return encodeURI(str)
-      .replace(/#/g, '%23')
-      .replace(/;/g, '%3B')
-      .replace(/%20/g, '+');
+    return encodeURI(str).replace(/#/g, "%23").replace(/;/g, "%3B").replace(/%20/g, "+");
   }
 
   renderSelectorIssueURLIfNeeded(packageName, issueTitle, issueBody) {
     const repoURL = this.getRepoURL(packageName);
     if (repoURL) {
       const issueURL = `${repoURL}/issues/new?title=${this.encodeURI(
-        issueTitle
+        issueTitle,
       )}&body=${this.encodeURI(issueBody)}`;
       return (
         <div className="btn-toolbar">
@@ -288,7 +265,7 @@ export default class DeprecationCopView {
             data-issue-title={issueTitle}
             data-repo-url={repoURL}
             data-issue-url={issueURL}
-            onclick={event => {
+            onclick={(event) => {
               event.preventDefault();
               this.openIssueURL(repoURL, issueURL, issueTitle);
             }}
@@ -298,7 +275,7 @@ export default class DeprecationCopView {
         </div>
       );
     } else {
-      return '';
+      return "";
     }
   }
 
@@ -313,7 +290,7 @@ export default class DeprecationCopView {
             data-issue-title={issueTitle}
             data-repo-url={repoURL}
             data-issue-url={issueURL}
-            onclick={event => {
+            onclick={(event) => {
               event.preventDefault();
               this.openIssueURL(repoURL, issueURL, issueTitle);
             }}
@@ -323,7 +300,7 @@ export default class DeprecationCopView {
         </div>
       );
     } else {
-      return '';
+      return "";
     }
   }
 
@@ -333,11 +310,9 @@ export default class DeprecationCopView {
       const title = `${deprecation.getOriginName()} is deprecated.`;
       const stacktrace = stack
         .map(({ functionName, location }) => `${functionName} (${location})`)
-        .join('\n');
+        .join("\n");
       const body = `${deprecation.getMessage()}\n\`\`\`\n${stacktrace}\n\`\`\``;
-      return `${repoURL}/issues/new?title=${encodeURI(title)}&body=${encodeURI(
-        body
-      )}`;
+      return `${repoURL}/issues/new?title=${encodeURI(title)}&body=${encodeURI(body)}`;
     } else {
       return null;
     }
@@ -347,7 +322,7 @@ export default class DeprecationCopView {
     const issue = await this.findSimilarIssue(repoURL, issueTitle);
     if (issue) {
       shell.openExternal(issue.html_url);
-    } else if (process.platform === 'win32') {
+    } else if (process.platform === "win32") {
       // Windows will not launch URLs greater than ~2000 bytes so we need to shrink it
       shell.openExternal((await this.shortenURL(issueURL)) || issueURL);
     } else {
@@ -356,19 +331,16 @@ export default class DeprecationCopView {
   }
 
   async findSimilarIssue(repoURL, issueTitle) {
-    const url = 'https://api.github.com/search/issues';
-    const repo = repoURL.replace(/http(s)?:\/\/(\d+\.)?github.com\//gi, '');
+    const url = "https://api.github.com/search/issues";
+    const repo = repoURL.replace(/http(s)?:\/\/(\d+\.)?github.com\//gi, "");
     const query = `${issueTitle} repo:${repo}`;
-    const response = await window.fetch(
-      `${url}?q=${encodeURI(query)}&sort=created`,
-      {
-        method: 'GET',
-        headers: {
-          Accept: 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const response = await window.fetch(`${url}?q=${encodeURI(query)}&sort=created`, {
+      method: "GET",
+      headers: {
+        Accept: "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+      },
+    });
 
     if (response.ok) {
       const data = await response.json();
@@ -387,19 +359,16 @@ export default class DeprecationCopView {
 
   async shortenURL(url) {
     let encodedUrl = encodeURIComponent(url).substr(0, 5000); // is.gd has 5000 char limit
-    let incompletePercentEncoding = encodedUrl.indexOf(
-      '%',
-      encodedUrl.length - 2
-    );
+    let incompletePercentEncoding = encodedUrl.indexOf("%", encodedUrl.length - 2);
     if (incompletePercentEncoding >= 0) {
       // Handle an incomplete % encoding cut-off
       encodedUrl = encodedUrl.substr(0, incompletePercentEncoding);
     }
 
-    let result = await fetch('https://is.gd/create.php?format=simple', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `url=${encodedUrl}`
+    let result = await fetch("https://is.gd/create.php?format=simple", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `url=${encodedUrl}`,
     });
 
     return result.text();
@@ -407,15 +376,9 @@ export default class DeprecationCopView {
 
   getRepoURL(packageName) {
     const loadedPackage = atom.packages.getLoadedPackage(packageName);
-    if (
-      loadedPackage &&
-      loadedPackage.metadata &&
-      loadedPackage.metadata.repository
-    ) {
-      const url =
-        loadedPackage.metadata.repository.url ||
-        loadedPackage.metadata.repository;
-      return url.replace(/\.git$/, '');
+    if (loadedPackage && loadedPackage.metadata && loadedPackage.metadata.repository) {
+      const url = loadedPackage.metadata.repository.url || loadedPackage.metadata.repository;
+      return url.replace(/\.git$/, "");
     } else {
       return null;
     }
@@ -433,11 +396,10 @@ export default class DeprecationCopView {
         if (stack.metadata && stack.metadata.packageName) {
           packageName = stack.metadata.packageName;
         } else {
-          packageName = (this.getPackageName(stack) || '').toLowerCase();
+          packageName = (this.getPackageName(stack) || "").toLowerCase();
         }
 
-        deprecatedCallsByPackageName[packageName] =
-          deprecatedCallsByPackageName[packageName] || [];
+        deprecatedCallsByPackageName[packageName] = deprecatedCallsByPackageName[packageName] || [];
         deprecatedCallsByPackageName[packageName].push({ deprecation, stack });
       }
     }
@@ -451,17 +413,15 @@ export default class DeprecationCopView {
       for (const sourcePath of Object.keys(deprecatedSelectorsBySourcePath)) {
         const deprecation = deprecatedSelectorsBySourcePath[sourcePath];
         const components = sourcePath.split(path.sep);
-        const packagesComponentIndex = components.indexOf('packages');
+        const packagesComponentIndex = components.indexOf("packages");
         let packageName = null;
         let packagePath = null;
         if (packagesComponentIndex === -1) {
-          packageName = 'Other'; // could be Atom Core or the personal style sheet
-          packagePath = '';
+          packageName = "Other"; // could be Atom Core or the personal style sheet
+          packagePath = "";
         } else {
           packageName = components[packagesComponentIndex + 1];
-          packagePath = components
-            .slice(0, packagesComponentIndex + 1)
-            .join(path.sep);
+          packagePath = components.slice(0, packagesComponentIndex + 1).join(path.sep);
         }
 
         deprecatedSelectorsByPackageName[packageName] =
@@ -469,7 +429,7 @@ export default class DeprecationCopView {
         deprecatedSelectorsByPackageName[packageName].push({
           packagePath,
           sourcePath,
-          deprecation
+          deprecation,
         });
       }
     }
@@ -481,8 +441,8 @@ export default class DeprecationCopView {
     const packagePaths = this.getPackagePathsByPackageName();
     for (const [packageName, packagePath] of packagePaths) {
       if (
-        packagePath.includes('.lumine/dev/packages') ||
-        packagePath.includes('.lumine/packages')
+        packagePath.includes(".lumine/dev/packages") ||
+        packagePath.includes(".lumine/packages")
       ) {
         packagePaths.set(packageName, fs.absolute(packagePath));
       }
@@ -529,7 +489,7 @@ export default class DeprecationCopView {
   }
 
   checkForUpdates() {
-    atom.workspace.open('atom://config/updates');
+    atom.workspace.open("atom://config/updates");
   }
 
   disablePackage(packageName) {
@@ -539,9 +499,9 @@ export default class DeprecationCopView {
   }
 
   openLocation(location) {
-    let pathToOpen = location.replace('file://', '');
-    if (process.platform === 'win32') {
-      pathToOpen = pathToOpen.replace(/^\//, '');
+    let pathToOpen = location.replace("file://", "");
+    if (process.platform === "win32") {
+      pathToOpen = pathToOpen.replace(/^\//, "");
     }
     atom.open({ pathsToOpen: [pathToOpen] });
   }
@@ -551,11 +511,11 @@ export default class DeprecationCopView {
   }
 
   getTitle() {
-    return 'Deprecation Cop';
+    return "Deprecation Cop";
   }
 
   getIconName() {
-    return 'alert';
+    return "alert";
   }
 
   scrollUp() {

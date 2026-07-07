@@ -1,43 +1,37 @@
-const path = require('path');
-const fs = require('fs-plus');
-const temp = require('temp').track();
+const path = require("path");
+const fs = require("fs-plus");
+const temp = require("temp").track();
 
-describe('GitDiff when targeting nested repository', () => {
+describe("GitDiff when targeting nested repository", () => {
   let editor, editorElement, projectPath, screenUpdates;
 
   beforeEach(() => {
     screenUpdates = 0;
-    spyOn(window, 'requestAnimationFrame').andCallFake(fn => {
+    spyOn(window, "requestAnimationFrame").andCallFake((fn) => {
       fn();
       screenUpdates++;
     });
-    spyOn(window, 'cancelAnimationFrame').andCallFake(i => null);
+    spyOn(window, "cancelAnimationFrame").andCallFake((i) => null);
 
-    projectPath = temp.mkdirSync('git-diff-spec-');
+    projectPath = temp.mkdirSync("git-diff-spec-");
 
-    fs.copySync(path.join(__dirname, 'fixtures', 'working-dir'), projectPath);
-    fs.moveSync(
-      path.join(projectPath, 'git.git'),
-      path.join(projectPath, '.git')
-    );
+    fs.copySync(path.join(__dirname, "fixtures", "working-dir"), projectPath);
+    fs.moveSync(path.join(projectPath, "git.git"), path.join(projectPath, ".git"));
 
     // The nested repo doesn't need to be managed by the temp module because
     // it's a part of our test environment.
-    const nestedPath = path.join(projectPath, 'nested-repository');
+    const nestedPath = path.join(projectPath, "nested-repository");
     // Initialize the repository contents.
-    fs.copySync(path.join(__dirname, 'fixtures', 'working-dir'), nestedPath);
-    fs.moveSync(
-      path.join(nestedPath, 'git.git'),
-      path.join(nestedPath, '.git')
-    );
+    fs.copySync(path.join(__dirname, "fixtures", "working-dir"), nestedPath);
+    fs.moveSync(path.join(nestedPath, "git.git"), path.join(nestedPath, ".git"));
 
     atom.project.setPaths([projectPath]);
 
     jasmine.attachToDOM(atom.workspace.getElement());
 
     waitsForPromise(async () => {
-      await atom.workspace.open(path.join(nestedPath, 'sample.js'));
-      await atom.packages.activatePackage('git-diff');
+      await atom.workspace.open(path.join(nestedPath, "sample.js"));
+      await atom.packages.activatePackage("git-diff");
     });
 
     runs(() => {
@@ -50,7 +44,7 @@ describe('GitDiff when targeting nested repository', () => {
     temp.cleanup();
   });
 
-  describe('When git-diff targets a file in a nested git-repository', () => {
+  describe("When git-diff targets a file in a nested git-repository", () => {
     /***
      * Non-hack regression prevention for nested repositories. If we know
      * that our project path contains two repositories, we can ensure that
@@ -62,13 +56,11 @@ describe('GitDiff when targeting nested repository', () => {
      * markers exist and we know we're targeting the proper repository,
      * If no markers exist, we're targeting an ancestor repo.
      */
-    it('uses the innermost repository', () => {
-      editor.insertText('a');
+    it("uses the innermost repository", () => {
+      editor.insertText("a");
       waitsFor(() => screenUpdates > 0);
       runs(() => {
-        expect(
-          editorElement.querySelectorAll('.git-line-modified').length
-        ).toBe(1);
+        expect(editorElement.querySelectorAll(".git-line-modified").length).toBe(1);
       });
     });
   });

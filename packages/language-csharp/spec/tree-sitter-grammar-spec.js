@@ -1,13 +1,11 @@
-const path = require('path');
+const path = require("path");
 
-describe('WASM Tree-sitter JavaScript grammar', () => {
-
+describe("WASM Tree-sitter JavaScript grammar", () => {
   beforeEach(async () => {
-		await atom.packages.activatePackage('language-csharp');
+    await atom.packages.activatePackage("language-csharp");
   });
 
-  it('passes grammar tests', async () => {
-    await runGrammarTests(path.join(__dirname, 'fixtures', 'sample.cs'), /\/\//)
+  it("passes grammar tests", async () => {
+    await runGrammarTests(path.join(__dirname, "fixtures", "sample.cs"), /\/\//);
   });
-
 });

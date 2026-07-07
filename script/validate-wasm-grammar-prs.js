@@ -7,7 +7,6 @@
  * never forgotten about.
  */
 
-
 const cp = require("node:child_process");
 const path = require("node:path");
 const fs = require("node:fs");
@@ -18,7 +17,7 @@ let verbose = true;
 
 // Lets first find our common ancestor commit
 // This lets us determine the commit where the branch or fork departed from
-const commonAncestorCmd = cp.spawnSync("git", [ "merge-base", "origin/master", "HEAD^" ]);
+const commonAncestorCmd = cp.spawnSync("git", ["merge-base", "origin/master", "HEAD^"]);
 
 if (commonAncestorCmd.status !== 0 || commonAncestorCmd.stderr.toString().length > 0) {
   console.error("Git Command has failed!");
@@ -33,7 +32,7 @@ if (verbose) {
   console.log(`Common Ancestor Commit: '${commit}'`);
 }
 
-const cmd = cp.spawnSync("git", [ "diff", "--name-only", "-r", "HEAD", commit])
+const cmd = cp.spawnSync("git", ["diff", "--name-only", "-r", "HEAD", commit]);
 
 if (cmd.status !== 0 || cmd.stderr.toString().length > 0) {
   console.error("Git Command has failed!");
@@ -51,7 +50,7 @@ if (verbose) {
   console.log(changedFiles);
 }
 
-const wasmFilesChanged = changedFiles.filter(element => element.endsWith(".wasm"));
+const wasmFilesChanged = changedFiles.filter((element) => element.endsWith(".wasm"));
 
 if (wasmFilesChanged.length === 0) {
   // No WASM files have been modified. Return success
@@ -71,7 +70,7 @@ for (const wasmFile of wasmFilesChanged) {
   const wasmPath = path.dirname(wasmFile);
 
   // Don't check the base `tree-sitter.wasm` file.
-  if (wasmFile.includes('vendor/web-tree-sitter')) continue;
+  if (wasmFile.includes("vendor/web-tree-sitter")) continue;
 
   const files = fs.readdirSync(path.join(wasmPath, ".."));
   console.log(`Detected changes to: ${wasmFile}`);
@@ -86,7 +85,7 @@ for (const wasmFile of wasmFilesChanged) {
 
   for (const file of files) {
     // Only check `cson` files.
-    if (!file.endsWith('.cson')) continue;
+    if (!file.endsWith(".cson")) continue;
 
     const filePath = path.join(wasmPath, "..", file);
     console.log(`Checking: ${filePath}`);
@@ -107,7 +106,7 @@ for (const wasmFile of wasmFilesChanged) {
         // will be relative from the file itself
 
         // In order to check the previous state of what the key is, we first must retreive the file prior to this PR
-        const getPrevFile = cp.spawnSync("git", [ "show", `${commit}:./${filePath}` ]);
+        const getPrevFile = cp.spawnSync("git", ["show", `${commit}:./${filePath}`]);
 
         if (getPrevFile.status !== 0 || getPrevFile.stderr.toString().length > 0) {
           // This can fail for two major reasons
@@ -152,7 +151,9 @@ for (const wasmFile of wasmFilesChanged) {
         console.log(`Validated \`parserSource\` has been updated within '${filePath}' properly.`);
       } else {
         if (verbose) {
-          console.log("This grammar file doesn't use a WASM file that's changed (On the current iteration)");
+          console.log(
+            "This grammar file doesn't use a WASM file that's changed (On the current iteration)",
+          );
         }
       }
     }

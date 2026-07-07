@@ -1,5 +1,5 @@
-const { CompositeDisposable, File, Directory, Emitter } = require('atom');
-const path = require('path');
+const { CompositeDisposable, File, Directory, Emitter } = require("atom");
+const path = require("path");
 
 module.exports = class Watcher {
   constructor() {
@@ -10,17 +10,17 @@ module.exports = class Watcher {
   }
 
   onDidDestroy(callback) {
-    this.emitter.on('did-destroy', callback);
+    this.emitter.on("did-destroy", callback);
   }
 
   onDidChangeGlobals(callback) {
-    this.emitter.on('did-change-globals', callback);
+    this.emitter.on("did-change-globals", callback);
   }
 
   destroy() {
     this.disposables.dispose();
     this.entities = null;
-    this.emitter.emit('did-destroy');
+    this.emitter.emit("did-destroy");
     this.emitter.dispose();
   }
 
@@ -37,7 +37,7 @@ module.exports = class Watcher {
   }
 
   emitGlobalsChanged() {
-    this.emitter.emit('did-change-globals');
+    this.emitter.emit("did-change-globals");
   }
 
   watchDirectory(directoryPath) {
@@ -67,8 +67,7 @@ module.exports = class Watcher {
   isInAsarArchive(pathToCheck) {
     const { resourcePath } = atom.getLoadSettings();
     return (
-      pathToCheck.startsWith(`${resourcePath}${path.sep}`) &&
-      path.extname(resourcePath) === '.asar'
+      pathToCheck.startsWith(`${resourcePath}${path.sep}`) && path.extname(resourcePath) === ".asar"
     );
   }
 };

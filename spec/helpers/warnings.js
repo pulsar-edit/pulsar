@@ -21,7 +21,7 @@ exports.ensureNoDeprecatedFunctionCalls = function () {
         output.push(`${deprecation.originName} is deprecated. ${deprecation.message}`);
         output.push(_.multiplyString("-", output[output.length - 1].length));
         for (stack of Array.from(deprecation.getStacks())) {
-          for (let {functionName, location} of Array.from(stack)) {
+          for (let { functionName, location } of Array.from(stack)) {
             output.push(`${functionName} -- ${location}`);
           }
         }
@@ -30,7 +30,9 @@ exports.ensureNoDeprecatedFunctionCalls = function () {
       return output.join("\n");
     };
 
-    const error = new Error(`Deprecated function(s) ${deprecations.map(({originName}) => originName).join(', ')}) were called.`);
+    const error = new Error(
+      `Deprecated function(s) ${deprecations.map(({ originName }) => originName).join(", ")}) were called.`,
+    );
     error.stack;
     Error.prepareStackTrace = originalPrepareStackTrace;
     throw error;
@@ -45,10 +47,9 @@ exports.ensureNoDeprecatedStylesheets = function () {
     for (let sourcePath in deprecations) {
       const deprecation = deprecations[sourcePath];
       const title =
-        sourcePath !== 'undefined' ?
-          `Deprecated stylesheet at '${sourcePath}':`
-          :
-          "Deprecated stylesheet:";
+        sourcePath !== "undefined"
+          ? `Deprecated stylesheet at '${sourcePath}':`
+          : "Deprecated stylesheet:";
       throw new Error(`${title}\n${deprecation.message}`);
     }
     return result;

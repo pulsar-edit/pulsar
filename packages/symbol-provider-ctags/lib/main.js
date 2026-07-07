@@ -1,5 +1,4 @@
-
-const CtagsProvider = require('./ctags-provider');
+const CtagsProvider = require("./ctags-provider");
 
 module.exports = {
   activate() {
@@ -12,5 +11,5 @@ module.exports = {
 
   provideSymbols() {
     return this.provider;
-  }
+  },
 };

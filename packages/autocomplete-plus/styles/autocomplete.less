@@ -1,15 +1,18 @@
 // TODO: remove this fallback when 193 is out for a while
-.attr-syntax-color() { @syntax-color-attribute: #888; } .attr-syntax-color();
+.attr-syntax-color() {
+  @syntax-color-attribute: #888;
+}
+.attr-syntax-color();
 
 @import "ui-variables";
 @import "syntax-variables";
 
-@font-size-small: .9em;
+@font-size-small: 0.9em;
 @type-icon-font-size: 1em;
 @type-letter-icon-font-size: @font-size-small;
 @row-line-height: 2em;
-@item-padding: .75em;
-@item-side-padding: .6em;
+@item-padding: 0.75em;
+@item-side-padding: 0.6em;
 
 atom-overlay.autocomplete-plus {
   z-index: 12; // higher than docks
@@ -58,7 +61,7 @@ autocomplete-suggestion-list.select-list.popover-list {
 
   input {
     position: absolute;
-    opacity: 0.00;
+    opacity: 0;
   }
 
   ol.list-group {
@@ -80,7 +83,7 @@ autocomplete-suggestion-list.select-list.popover-list {
       &:after {
         clear: both;
         display: block;
-        content: ' ';
+        content: " ";
       }
 
       &.selected {
@@ -90,7 +93,9 @@ autocomplete-suggestion-list.select-list.popover-list {
         .character-match {
           color: @text-color-selected;
         }
-        .left-label, .right-label, .snippet-completion {
+        .left-label,
+        .right-label,
+        .snippet-completion {
           color: fadeout(@text-color-selected, 50%);
         }
       }
@@ -120,7 +125,9 @@ autocomplete-suggestion-list {
     color: @text-color-subtle;
     background: fadeout(@text-color, 90%);
 
-    &:empty { display: none; }
+    &:empty {
+      display: none;
+    }
     > *::before {
       font-size: @type-icon-font-size;
       width: @type-icon-font-size;
@@ -130,7 +137,7 @@ autocomplete-suggestion-list {
     .icon-letter {
       // I'm failing to vert center these letters. So shift them up...
       position: relative;
-      top: -.1em;
+      top: -0.1em;
       font-size: @type-letter-icon-font-size;
       line-height: @type-letter-icon-font-size;
     }
@@ -187,7 +194,9 @@ autocomplete-suggestion-list {
     max-width: 25vw;
   }
 
-  .word, .left-label, .right-label {
+  .word,
+  .left-label,
+  .right-label {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -218,14 +227,20 @@ autocomplete-suggestion-list {
 .make-type-icon(@type, @color) {
   .icon.@{type} {
     color: @color;
-    background: fadeout(@color, 80%)
+    background: fadeout(@color, 80%);
   }
 }
 .make-type-icon(@type, @color)
-  when (hsvvalue(@color) - hsvvalue(@overlay-background-color) > -20)
-  and (hsvvalue(@color) - hsvvalue(@overlay-background-color) < 20) {
+  when
+  (hsvvalue(@color) - hsvvalue(@overlay-background-color) > -20)
+  and
+  (hsvvalue(@color) - hsvvalue(@overlay-background-color) < 20) {
   .icon.@{type} {
-    @corrected-color: contrast(@overlay-background-color, darken(@color, 30%), lighten(@color, 30%));
+    @corrected-color: contrast(
+      @overlay-background-color,
+      darken(@color, 30%),
+      lighten(@color, 30%)
+    );
     color: @corrected-color;
     background: fadeout(@corrected-color, 80%);
   }

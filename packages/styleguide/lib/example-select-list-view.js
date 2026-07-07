@@ -1,13 +1,13 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import SelectListView from 'atom-select-list'
-import etch from 'etch'
-import dedent from 'dedent'
-import CodeBlock from './code-block'
+import SelectListView from "atom-select-list";
+import etch from "etch";
+import dedent from "dedent";
+import CodeBlock from "./code-block";
 
 export default class ExampleSelectListView {
-  constructor () {
+  constructor() {
     this.jsExampleCode = dedent`
     import SelectListView from 'atom-select-list'
 
@@ -25,44 +25,47 @@ export default class ExampleSelectListView {
         console.log('cancelled')
       }
     })
-    `
-    etch.initialize(this)
+    `;
+    etch.initialize(this);
   }
 
-  elementForItem (item) {
-    const li = document.createElement('li')
-    li.textContent = item
-    return li
+  elementForItem(item) {
+    const li = document.createElement("li");
+    li.textContent = item;
+    return li;
   }
 
-  didConfirmSelection (item) {
-    console.log('confirmed', item)
+  didConfirmSelection(item) {
+    console.log("confirmed", item);
   }
 
-  didCancelSelection () {
-    console.log('cancelled')
+  didCancelSelection() {
+    console.log("cancelled");
   }
 
-  render () {
+  render() {
     return (
-      <div className='example'>
-        <div className='example-rendered'>
-          <atom-panel className='modal'>
+      <div className="example">
+        <div className="example-rendered">
+          <atom-panel className="modal">
             <SelectListView
-              items={['one', 'two', 'three']}
+              items={["one", "two", "three"]}
               elementForItem={this.elementForItem.bind(this)}
               onDidConfirmSelection={this.didConfirmSelection.bind(this)}
-              onDidCancelSelection={this.didCancelSelection.bind(this)} />
+              onDidCancelSelection={this.didCancelSelection.bind(this)}
+            />
           </atom-panel>
         </div>
-        <div className='example-code show-example-space-pen'>
-          <CodeBlock cssClass='example-space-pen' grammarScopeName='source.js' code={this.jsExampleCode} />
+        <div className="example-code show-example-space-pen">
+          <CodeBlock
+            cssClass="example-space-pen"
+            grammarScopeName="source.js"
+            code={this.jsExampleCode}
+          />
         </div>
       </div>
-    )
+    );
   }
 
-  update () {
-
-  }
+  update() {}
 }

@@ -4,14 +4,13 @@
 // Tooltips
 // --------------------------------------------------
 
-@tooltip-max-width:           200px; //** Tooltip max width
-@tooltip-color:               #fff; //** Tooltip text color
-@tooltip-bg:                  @background-color-info; //** Tooltip background color
-@tooltip-opacity:             .9;
-@tooltip-arrow-width:         5px; //** Tooltip arrow width
-@tooltip-arrow-color:         @tooltip-bg; //** Tooltip arrow color
-@tooltip-zindex:              1070;
-
+@tooltip-max-width: 200px; //** Tooltip max width
+@tooltip-color: #fff; //** Tooltip text color
+@tooltip-bg: @background-color-info; //** Tooltip background color
+@tooltip-opacity: 0.9;
+@tooltip-arrow-width: 5px; //** Tooltip arrow width
+@tooltip-arrow-color: @tooltip-bg; //** Tooltip arrow color
+@tooltip-zindex: 1070;
 
 // Base class
 .tooltip {
@@ -26,11 +25,25 @@
   font-size: @font-size;
   opacity: 0;
 
-  &.in     { opacity: @tooltip-opacity; }
-  &.top    { margin-top:  -3px; padding: @tooltip-arrow-width 0; }
-  &.right  { margin-left:  3px; padding: 0 @tooltip-arrow-width; }
-  &.bottom { margin-top:   3px; padding: @tooltip-arrow-width 0; }
-  &.left   { margin-left: -3px; padding: 0 @tooltip-arrow-width; }
+  &.in {
+    opacity: @tooltip-opacity;
+  }
+  &.top {
+    margin-top: -3px;
+    padding: @tooltip-arrow-width 0;
+  }
+  &.right {
+    margin-left: 3px;
+    padding: 0 @tooltip-arrow-width;
+  }
+  &.bottom {
+    margin-top: 3px;
+    padding: @tooltip-arrow-width 0;
+  }
+  &.left {
+    margin-left: -3px;
+    padding: 0 @tooltip-arrow-width;
+  }
 }
 
 // Wrapper for the tooltip content

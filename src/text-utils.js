@@ -1,11 +1,10 @@
-const isHighSurrogate = charCode => charCode >= 0xd800 && charCode <= 0xdbff;
+const isHighSurrogate = (charCode) => charCode >= 0xd800 && charCode <= 0xdbff;
 
-const isLowSurrogate = charCode => charCode >= 0xdc00 && charCode <= 0xdfff;
+const isLowSurrogate = (charCode) => charCode >= 0xdc00 && charCode <= 0xdfff;
 
-const isVariationSelector = charCode =>
-  charCode >= 0xfe00 && charCode <= 0xfe0f;
+const isVariationSelector = (charCode) => charCode >= 0xfe00 && charCode <= 0xfe0f;
 
-const isCombiningCharacter = charCode =>
+const isCombiningCharacter = (charCode) =>
   (charCode >= 0x0300 && charCode <= 0x036f) ||
   (charCode >= 0x1ab0 && charCode <= 0x1aff) ||
   (charCode >= 0x1dc0 && charCode <= 0x1dff) ||
@@ -60,19 +59,16 @@ const isPairedCharacter = (string, index = 0) => {
 
 const RE_RTL_TEXT = /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/;
 
-const hasRtlText = text => RE_RTL_TEXT.test(text);
+const hasRtlText = (text) => RE_RTL_TEXT.test(text);
 
-const IsJapaneseKanaCharacter = charCode =>
-  charCode >= 0x3000 && charCode <= 0x30ff;
+const IsJapaneseKanaCharacter = (charCode) => charCode >= 0x3000 && charCode <= 0x30ff;
 
-const isCJKUnifiedIdeograph = charCode =>
-  charCode >= 0x4e00 && charCode <= 0x9fff;
+const isCJKUnifiedIdeograph = (charCode) => charCode >= 0x4e00 && charCode <= 0x9fff;
 
-const isFullWidthForm = charCode =>
-  (charCode >= 0xff01 && charCode <= 0xff5e) ||
-  (charCode >= 0xffe0 && charCode <= 0xffe6);
+const isFullWidthForm = (charCode) =>
+  (charCode >= 0xff01 && charCode <= 0xff5e) || (charCode >= 0xffe0 && charCode <= 0xffe6);
 
-const isDoubleWidthCharacter = character => {
+const isDoubleWidthCharacter = (character) => {
   const charCode = character.charCodeAt(0);
 
   return (
@@ -82,16 +78,13 @@ const isDoubleWidthCharacter = character => {
   );
 };
 
-const isHalfWidthCharacter = character => {
+const isHalfWidthCharacter = (character) => {
   const charCode = character.charCodeAt(0);
 
-  return (
-    (charCode >= 0xff65 && charCode <= 0xffdc) ||
-    (charCode >= 0xffe8 && charCode <= 0xffee)
-  );
+  return (charCode >= 0xff65 && charCode <= 0xffdc) || (charCode >= 0xffe8 && charCode <= 0xffee);
 };
 
-const isKoreanCharacter = character => {
+const isKoreanCharacter = (character) => {
   const charCode = character.charCodeAt(0);
 
   return (
@@ -103,17 +96,18 @@ const isKoreanCharacter = character => {
   );
 };
 
-const isCJKCharacter = character =>
+const isCJKCharacter = (character) =>
   isDoubleWidthCharacter(character) ||
   isHalfWidthCharacter(character) ||
   isKoreanCharacter(character);
 
 const isWordStart = (previousCharacter, character) =>
-  (previousCharacter === ' ' ||
-    previousCharacter === '\t' ||
-    previousCharacter === '-' ||
-    previousCharacter === '/') &&
-  (character !== ' ' && character !== '\t');
+  (previousCharacter === " " ||
+    previousCharacter === "\t" ||
+    previousCharacter === "-" ||
+    previousCharacter === "/") &&
+  character !== " " &&
+  character !== "\t";
 
 const isWrapBoundary = (previousCharacter, character) =>
   isWordStart(previousCharacter, character) || isCJKCharacter(character);
@@ -124,7 +118,7 @@ const isWrapBoundary = (previousCharacter, character) =>
 // * `string` The {String} to check for the presence of paired characters.
 //
 // Returns a {Boolean}.
-const hasPairedCharacter = string => {
+const hasPairedCharacter = (string) => {
   let index = 0;
   while (index < string.length) {
     if (isPairedCharacter(string, index)) {
@@ -142,5 +136,5 @@ module.exports = {
   isDoubleWidthCharacter,
   isHalfWidthCharacter,
   isKoreanCharacter,
-  isWrapBoundary
+  isWrapBoundary,
 };

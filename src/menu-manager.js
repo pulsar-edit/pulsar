@@ -1,15 +1,15 @@
-const path = require('path');
-const _ = require('underscore-plus');
-const {ipcRenderer} = require('electron');
-const CSON = require('season');
-const fs = require('fs-plus');
-const {Disposable} = require('event-kit');
-const MenuHelpers = require('./menu-helpers');
+const path = require("path");
+const _ = require("underscore-plus");
+const { ipcRenderer } = require("electron");
+const CSON = require("season");
+const fs = require("fs-plus");
+const { Disposable } = require("event-kit");
+const MenuHelpers = require("./menu-helpers");
 
-const buildMetadata = require('../package.json');
+const buildMetadata = require("../package.json");
 var platformMenu;
 if (buildMetadata) {
-  platformMenu = (buildMetadata._atomMenu && buildMetadata._atomMenu.menu);
+  platformMenu = buildMetadata._atomMenu && buildMetadata._atomMenu.menu;
 }
 
 // Extended: Provides a registry for menu items that you'd like to appear in the
@@ -60,7 +60,7 @@ if (buildMetadata) {
 //
 // See {::add} for more info about adding menu's directly.
 module.exports = MenuManager = class MenuManager {
-  constructor({resourcePath, keymapManager, packageManager}) {
+  constructor({ resourcePath, keymapManager, packageManager }) {
     this.resourcePath = resourcePath;
     this.keymapManager = keymapManager;
     this.packageManager = packageManager;
@@ -71,7 +71,7 @@ module.exports = MenuManager = class MenuManager {
     this.packageManager.onDidActivateInitialPackages(() => this.sortPackagesMenu());
   }
 
-  initialize({resourcePath}) {
+  initialize({ resourcePath }) {
     this.resourcePath = resourcePath;
     this.keymapManager.onDidReloadKeymap(() => this.update());
     this.update();
@@ -145,18 +145,18 @@ module.exports = MenuManager = class MenuManager {
     // to a body element that has the same classes as the current body element.
     if (this.testEditor == null) {
       // Use new document so that custom elements don't actually get created
-      const testDocument = document.implementation.createDocument(document.namespaceURI, 'html');
-      const testBody = testDocument.createElement('body');
+      const testDocument = document.implementation.createDocument(document.namespaceURI, "html");
+      const testBody = testDocument.createElement("body");
       testBody.classList.add(...this.classesForElement(document.body));
-      const testWorkspace = testDocument.createElement('atom-workspace');
-      let workspaceClasses = this.classesForElement(document.body.querySelector('atom-workspace'));
+      const testWorkspace = testDocument.createElement("atom-workspace");
+      let workspaceClasses = this.classesForElement(document.body.querySelector("atom-workspace"));
       if (workspaceClasses.length === 0) {
-        workspaceClasses = ['workspace'];
+        workspaceClasses = ["workspace"];
       }
       testWorkspace.classList.add(...workspaceClasses);
       testBody.appendChild(testWorkspace);
-      this.testEditor = testDocument.createElement('atom-text-editor');
-      this.testEditor.classList.add('editor');
+      this.testEditor = testDocument.createElement("atom-text-editor");
+      this.testEditor.classList.add("editor");
       testWorkspace.appendChild(this.testEditor);
     }
     let element = this.testEditor;
@@ -180,7 +180,7 @@ module.exports = MenuManager = class MenuManager {
     this.pendingUpdateOperation = setTimeout(() => {
       const unsetKeystrokes = new Set();
       for (let binding of this.keymapManager.getKeyBindings()) {
-        if (binding.command === 'unset!') {
+        if (binding.command === "unset!") {
           unsetKeystrokes.add(binding.keystrokes);
         }
       }
@@ -192,10 +192,10 @@ module.exports = MenuManager = class MenuManager {
         if (unsetKeystrokes.has(binding.keystrokes)) {
           continue;
         }
-        if (process.platform === 'darwin' && /^alt-(shift-)?.$/.test(binding.keystrokes)) {
+        if (process.platform === "darwin" && /^alt-(shift-)?.$/.test(binding.keystrokes)) {
           continue;
         }
-        if (process.platform === 'win32' && /^ctrl-alt-(shift-)?.$/.test(binding.keystrokes)) {
+        if (process.platform === "win32" && /^ctrl-alt-(shift-)?.$/.test(binding.keystrokes)) {
           continue;
         }
         if (keystrokesByCommand[binding.command] == null) {
@@ -211,9 +211,9 @@ module.exports = MenuManager = class MenuManager {
     if (platformMenu != null) {
       return this.add(platformMenu);
     } else {
-      const menusDirPath = path.join(this.resourcePath, 'menus');
-      const platformMenuPath = fs.resolve(menusDirPath, process.platform, ['cson', 'json']);
-      const {menu} = CSON.readFileSync(platformMenuPath);
+      const menusDirPath = path.join(this.resourcePath, "menus");
+      const platformMenuPath = fs.resolve(menusDirPath, process.platform, ["cson", "json"]);
+      const { menu } = CSON.readFileSync(platformMenuPath);
       return this.add(menu);
     }
   }
@@ -229,7 +229,7 @@ module.exports = MenuManager = class MenuManager {
   }
 
   sendToBrowserProcess(template, keystrokesByCommand) {
-    ipcRenderer.send('update-application-menu', template, keystrokesByCommand);
+    ipcRenderer.send("update-application-menu", template, keystrokesByCommand);
   }
 
   // Get an {Array} of {String} classes for the given element.
@@ -243,18 +243,22 @@ module.exports = MenuManager = class MenuManager {
   }
 
   sortPackagesMenu() {
-    const packagesMenu = _.find(this.template, ({id}) => MenuHelpers.normalizeLabel(id) === 'Packages');
+    const packagesMenu = _.find(
+      this.template,
+      ({ id }) => MenuHelpers.normalizeLabel(id) === "Packages",
+    );
     if (!(packagesMenu && packagesMenu.submenu != null)) {
       return;
     }
     packagesMenu.submenu.sort((item1, item2) => {
       if (item1.label && item2.label) {
-        return MenuHelpers.normalizeLabel(item1.label).localeCompare(MenuHelpers.normalizeLabel(item2.label));
+        return MenuHelpers.normalizeLabel(item1.label).localeCompare(
+          MenuHelpers.normalizeLabel(item2.label),
+        );
       } else {
         return 0;
       }
     });
     return this.update();
   }
-
 };

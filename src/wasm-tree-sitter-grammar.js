@@ -1,16 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-const Grim = require('grim');
-const dedent = require('dedent');
-const { Language, Parser, Query } = require('./web-tree-sitter');
-const { CompositeDisposable, Emitter } = require('event-kit');
-const { File } = require('@pulsar-edit/pathwatcher');
-const { normalizeDelimiters } = require('./comment-utils.js');
+const fs = require("fs");
+const path = require("path");
+const Grim = require("grim");
+const dedent = require("dedent");
+const { Language, Parser, Query } = require("./web-tree-sitter");
+const { CompositeDisposable, Emitter } = require("event-kit");
+const { File } = require("@pulsar-edit/pathwatcher");
+const { normalizeDelimiters } = require("./comment-utils.js");
 
 const parserInitPromise = Parser.init();
 
 function isPosition(obj) {
-  return ('row' in obj && 'column' in obj);
+  return "row" in obj && "column" in obj;
 }
 
 const ZERO_POINT = Object.freeze({ row: 0, column: 0 });
@@ -40,7 +40,7 @@ function wrapQueryCaptures(QueryPrototype) {
     if (
       // If there are too many arguments and either the second or third
       // argument looks like a position…
-      args.length >= 2 && (isPosition(args[0]) || isPosition(args[1])) ||
+      (args.length >= 2 && (isPosition(args[0]) || isPosition(args[1]))) ||
       // …or if the second argument looks like a position instead of an options
       // object.
       isPosition(args[0])
@@ -52,7 +52,7 @@ function wrapQueryCaptures(QueryPrototype) {
       let newOptions = {
         ...originalOptions,
         startPosition,
-        endPosition
+        endPosition,
       };
       return originalCaptures.call(this, node, newOptions);
     } else {
@@ -65,7 +65,6 @@ wrapQueryCaptures(Query.prototype);
 
 // Extended: This class holds an instance of a Tree-sitter grammar.
 module.exports = class WASMTreeSitterGrammar {
-
   // Cache each `Language` instance at its own path.
   static LANGUAGE_CACHE = new Map();
 
@@ -94,14 +93,12 @@ module.exports = class WASMTreeSitterGrammar {
   constructor(registry, grammarPath, params) {
     this.registry = registry;
     this.name = params.name;
-    this.type = 'modern-tree-sitter';
+    this.type = "modern-tree-sitter";
     this.scopeName = params.scopeName;
 
     this.contentRegex = buildRegex(params.contentRegex);
     this.firstLineRegex = buildRegex(params.firstLineRegex);
-    this.injectionRegex = buildRegex(
-      params.injectionRegex || params.injectionRegExp
-    );
+    this.injectionRegex = buildRegex(params.injectionRegex || params.injectionRegExp);
     this.injectionPointsByType = {};
 
     this.grammarFilePath = grammarPath;
@@ -109,8 +106,8 @@ module.exports = class WASMTreeSitterGrammar {
     this.languageSegment = params.treeSitter?.languageSegment ?? null;
     const dirName = path.dirname(grammarPath);
 
-    this.emitter = new Emitter;
-    this.subscriptions = new CompositeDisposable;
+    this.emitter = new Emitter();
+    this.subscriptions = new CompositeDisposable();
 
     this.queryCache = new Map();
     this.promisesForQueryFiles = new Map();
@@ -126,7 +123,7 @@ module.exports = class WASMTreeSitterGrammar {
 
     this.commentStrings = {
       commentStartString: params.comments && params.comments.start,
-      commentEndString: params.comments && params.comments.end
+      commentEndString: params.comments && params.comments.end,
     };
 
     this.commentMetadata = params.comments;
@@ -142,14 +139,16 @@ module.exports = class WASMTreeSitterGrammar {
   // Though _text is unused here, some packages (eg semanticolor) use it to
   // customize scopes on the fly.
   idForScope(scopeName, _text) {
-    if (!scopeName) { return undefined; }
+    if (!scopeName) {
+      return undefined;
+    }
     let id = this.idsByScope[scopeName];
     if (!id) {
       id = this.nextScopeId += 2;
       const className = scopeName
-        .split('.')
-        .map(s => `syntax--${s}`)
-        .join(' ');
+        .split(".")
+        .map((s) => `syntax--${s}`)
+        .join(" ");
       this.idsByScope[scopeName] = id;
       this.classNamesById.set(id, className);
       this.scopeNamesById.set(id, scopeName);
@@ -176,10 +175,9 @@ module.exports = class WASMTreeSitterGrammar {
   //
   getCommentDelimiters() {
     // Prefer the config system. It's a better place for this data to live.
-    let commentDelimiters = atom.config.get(
-      'editor.commentDelimiters',
-      { scope: [this.scopeName] }
-    );
+    let commentDelimiters = atom.config.get("editor.commentDelimiters", {
+      scope: [this.scopeName],
+    });
     if (commentDelimiters) return commentDelimiters;
 
     // Failing that, try to extract useful information from this metadata.
@@ -189,8 +187,8 @@ module.exports = class WASMTreeSitterGrammar {
 
     // If even that doesn't exist, we can fall back onto the older config
     // settings.
-    let start = atom.config.get('editor.commentStart', { scope: [this.scope] });
-    let end = atom.config.get('editor.commentEnd', { scope: [this.scope] });
+    let start = atom.config.get("editor.commentStart", { scope: [this.scope] });
+    let end = atom.config.get("editor.commentEnd", { scope: [this.scope] });
 
     return normalizeDelimiters({ start, end });
   }
@@ -247,13 +245,15 @@ module.exports = class WASMTreeSitterGrammar {
       let dirName = path.dirname(grammarPath);
 
       for (let [key, name] of Object.entries(queryPaths)) {
-        if (!key.endsWith('Query')) { continue; }
+        if (!key.endsWith("Query")) {
+          continue;
+        }
 
         // Every `fooQuery` path can contain either a single file name or an
         // array of file names. If the latter, each is concatenated together in
         // order.
         let paths = Array.isArray(name) ? name : [name];
-        let filePaths = paths.map(p => path.join(dirName, p));
+        let filePaths = paths.map((p) => path.join(dirName, p));
 
         promises.push(this.loadQueryFile(filePaths, key));
 
@@ -265,55 +265,61 @@ module.exports = class WASMTreeSitterGrammar {
     }).then(() => {
       this._queryFilesLoaded = true;
       this._loadQueryFilesPromise = null;
-      this.emitter.emit('did-load-query-files', this);
+      this.emitter.emit("did-load-query-files", this);
     });
 
     return this._loadQueryFilesPromise;
   }
 
   loadQueryFile(paths, queryType) {
-    let key = `${paths.join(',')}/${queryType}`;
+    let key = `${paths.join(",")}/${queryType}`;
 
     let existingPromise = this.promisesForQueryFiles.get(key);
-    if (existingPromise) { return existingPromise; }
+    if (existingPromise) {
+      return existingPromise;
+    }
 
-    let readFilePromises = paths.map(path => {
-      return fs.promises.readFile(path, 'utf-8').then((contents) => {
+    let readFilePromises = paths.map((path) => {
+      return fs.promises.readFile(path, "utf-8").then((contents) => {
         return { contents, path };
       });
     });
 
-    let promise = Promise.all(readFilePromises).then((allResults) => {
-      let output = "";
-      for (let result of allResults) {
-        let { contents, path } = result;
-        if (contents === "") {
-          // An empty file should still count as “present” when assessing whether
-          // a grammar has a particular query. So we'll set the contents to a
-          // comment instead.
-          contents = '; (empty)';
-        }
-        if (contents.includes('._LANG_')) {
-          // The `_LANG_` token indicates places where the last segment of a
-          // scope name will vary based on which grammar includes it. It
-          // assumes that the grammar author will define a segment (like
-          // `ts.tsx`) under the `treeSitter.languageSegment` setting in the
-          // grammar file.
-          if (this.languageSegment) {
-            contents = contents.replace(/\._LANG_/g, `.${this.languageSegment}`);
-          } else {
-            console.warn(`Warning: query file at ${path} includes _LANG_ tokens, but grammar does not specify a "treeSitter.languageSegment" setting.`);
+    let promise = Promise.all(readFilePromises)
+      .then((allResults) => {
+        let output = "";
+        for (let result of allResults) {
+          let { contents, path } = result;
+          if (contents === "") {
+            // An empty file should still count as “present” when assessing whether
+            // a grammar has a particular query. So we'll set the contents to a
+            // comment instead.
+            contents = "; (empty)";
           }
+          if (contents.includes("._LANG_")) {
+            // The `_LANG_` token indicates places where the last segment of a
+            // scope name will vary based on which grammar includes it. It
+            // assumes that the grammar author will define a segment (like
+            // `ts.tsx`) under the `treeSitter.languageSegment` setting in the
+            // grammar file.
+            if (this.languageSegment) {
+              contents = contents.replace(/\._LANG_/g, `.${this.languageSegment}`);
+            } else {
+              console.warn(
+                `Warning: query file at ${path} includes _LANG_ tokens, but grammar does not specify a "treeSitter.languageSegment" setting.`,
+              );
+            }
+          }
+          output += `\n${contents}`;
         }
-        output += `\n${contents}`;
-      }
-      if (this[queryType] !== output) {
-        this[queryType] = output;
-        this.queryCache.delete(queryType);
-      }
-    }).finally(() => {
-      this.promisesForQueryFiles.delete(key);
-    });
+        if (this[queryType] !== output) {
+          this[queryType] = output;
+          this.queryCache.delete(queryType);
+        }
+      })
+      .finally(() => {
+        this.promisesForQueryFiles.delete(key);
+      });
 
     this.promisesForQueryFiles.set(key, promise);
     return promise;
@@ -321,7 +327,9 @@ module.exports = class WASMTreeSitterGrammar {
 
   getQuerySync(queryType) {
     let language = this.getLanguageSync();
-    if (!language) { return null; }
+    if (!language) {
+      return null;
+    }
     let query = this.queryCache.get(queryType);
     if (!query) {
       query = new Query(language, this[queryType]);
@@ -345,10 +353,14 @@ module.exports = class WASMTreeSitterGrammar {
     // receive the same unsettled promise.
     // let inDevMode = atom.inDevMode();
     let query = this.queryCache.get(queryType);
-    if (query) { return Promise.resolve(query); }
+    if (query) {
+      return Promise.resolve(query);
+    }
 
     let promise = this.promisesForQueries.get(queryType);
-    if (promise) { return promise; }
+    if (promise) {
+      return promise;
+    }
 
     promise = new Promise((resolve, reject) => {
       this.getLanguage().then((language) => {
@@ -408,7 +420,7 @@ module.exports = class WASMTreeSitterGrammar {
     this.queryCache.delete(queryType);
     this[queryType] = contents;
     let query = await this.getQuery(queryType);
-    this.emitter.emit('did-change-query', { filePath: '', queryType });
+    this.emitter.emit("did-change-query", { filePath: "", queryType });
     return query;
   }
 
@@ -417,26 +429,28 @@ module.exports = class WASMTreeSitterGrammar {
   observeQueryFile(filePaths, queryType) {
     for (let filePath of filePaths) {
       let watcher = new File(filePath);
-      this.subscriptions.add(watcher.onDidChange(() => {
-        let existingQuery = this[queryType];
-        // When any one of the file paths changes, we have to re-concatenate
-        // the whole set.
-        this.loadQueryFile(filePaths, queryType).then(async () => {
-          // Sanity-check the language for errors before we let the buffers know
-          // about this change.
-          try {
-            await this.getQuery(queryType);
-          } catch (error) {
-            atom.beep();
-            console.error(`Error parsing query file: ${queryType}`);
-            console.error(error);
-            this[queryType] = existingQuery;
-            this.queryCache.delete(queryType);
-            return;
-          }
-          this.emitter.emit('did-change-query', { filePath, queryType });
-        });
-      }));
+      this.subscriptions.add(
+        watcher.onDidChange(() => {
+          let existingQuery = this[queryType];
+          // When any one of the file paths changes, we have to re-concatenate
+          // the whole set.
+          this.loadQueryFile(filePaths, queryType).then(async () => {
+            // Sanity-check the language for errors before we let the buffers know
+            // about this change.
+            try {
+              await this.getQuery(queryType);
+            } catch (error) {
+              atom.beep();
+              console.error(`Error parsing query file: ${queryType}`);
+              console.error(error);
+              this[queryType] = existingQuery;
+              this.queryCache.delete(queryType);
+              return;
+            }
+            this.emitter.emit("did-change-query", { filePath, queryType });
+          });
+        }),
+      );
     }
   }
 
@@ -457,7 +471,7 @@ module.exports = class WASMTreeSitterGrammar {
   //         configuration key in the grammar file. Usually one of
   //         `highlightsQuery`, `indentsQuery`, `foldsQuery`, or `tagsQuery`.
   onDidChangeQuery(callback) {
-    return this.emitter.on('did-change-query', callback);
+    return this.emitter.on("did-change-query", callback);
   }
 
   // Extended: Calls `callback` when any of this grammar's queries change.
@@ -476,7 +490,7 @@ module.exports = class WASMTreeSitterGrammar {
   // * callback A function with the following argument:
   //   * grammar The {WASMTreeSitterGrammar} whose queries have loaded.
   onDidLoadQueryFiles(callback) {
-    return this.emitter.on('did-load-query-files', callback);
+    return this.emitter.on("did-load-query-files", callback);
   }
 
   // Extended: Calls `callback` when an injection point is added to this
@@ -486,7 +500,7 @@ module.exports = class WASMTreeSitterGrammar {
   //   * injectionPoint The injection point added to the grammar. See
   //     {WASMTreeSitterGrammar::addInjectionPoint}.
   onDidAddInjectionPoint(callback) {
-    return this.emitter.on('did-add-injection-point', callback);
+    return this.emitter.on("did-add-injection-point", callback);
   }
 
   // Extended: Calls `callback` when an injection point is removed from this
@@ -496,7 +510,7 @@ module.exports = class WASMTreeSitterGrammar {
   //   * injectionPoint The injection point removed from this grammar. See
   //     {WASMTreeSitterGrammar::addInjectionPoint}.
   onDidRemoveInjectionPoint(callback) {
-    return this.emitter.on('did-remove-injection-point', callback);
+    return this.emitter.on("did-remove-injection-point", callback);
   }
 
   activate() {
@@ -589,7 +603,7 @@ module.exports = class WASMTreeSitterGrammar {
       injectionPoints = this.injectionPointsByType[type] = [];
     }
     injectionPoints.push(injectionPoint);
-    this.emitter.emit('did-add-injection-point', injectionPoint);
+    this.emitter.emit("did-add-injection-point", injectionPoint);
   }
 
   removeInjectionPoint(injectionPoint) {
@@ -601,7 +615,7 @@ module.exports = class WASMTreeSitterGrammar {
         delete this.injectionPointsByType[injectionPoint.type];
       }
     }
-    this.emitter.emit('did-remove-injection-point', injectionPoint);
+    this.emitter.emit("did-remove-injection-point", injectionPoint);
   }
 
   inspect() {
@@ -617,22 +631,22 @@ module.exports = class WASMTreeSitterGrammar {
   }
 
   tokenizeLines(text, _compatibilityMode = true) {
-    return text.split('\n').map(line => this.tokenizeLine(line, null, false));
+    return text.split("\n").map((line) => this.tokenizeLine(line, null, false));
   }
 
   tokenizeLine(line, _ruleStack, _firstLine) {
     return {
       value: line,
-      scopes: [this.scopeName]
+      scopes: [this.scopeName],
     };
   }
   /* eslint-enable no-unused-vars */
-}
+};
 
 function buildRegex(value) {
   // Allow multiple alternatives to be specified via an array, for
   // readability of the grammar file
-  if (Array.isArray(value)) value = value.map(_ => `(${_})`).join('|');
-  if (typeof value === 'string') return new RegExp(value);
+  if (Array.isArray(value)) value = value.map((_) => `(${_})`).join("|");
+  if (typeof value === "string") return new RegExp(value);
   return null;
 }

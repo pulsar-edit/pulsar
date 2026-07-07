@@ -1,14 +1,14 @@
-const path = require('path');
+const path = require("path");
 
-const _ = require('underscore-plus');
-const fs = require('fs-plus');
-const { Emitter, Disposable, CompositeDisposable } = require('event-kit');
-const TextBuffer = require('@pulsar-edit/text-buffer');
-const { watchPath } = require('./path-watcher');
+const _ = require("underscore-plus");
+const fs = require("fs-plus");
+const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
+const TextBuffer = require("@pulsar-edit/text-buffer");
+const { watchPath } = require("./path-watcher");
 
-const DefaultDirectoryProvider = require('./default-directory-provider');
-const Model = require('./model');
-const GitRepositoryProvider = require('./git-repository-provider');
+const DefaultDirectoryProvider = require("./default-directory-provider");
+const Model = require("./model");
+const GitRepositoryProvider = require("./git-repository-provider");
 
 // Extended: Represents a project that's opened in Lumine.
 //
@@ -23,7 +23,7 @@ module.exports = class Project extends Model {
     packageManager,
     config,
     applicationDelegate,
-    grammarRegistry
+    grammarRegistry,
   }) {
     super();
     this.notificationManager = notificationManager;
@@ -54,7 +54,7 @@ module.exports = class Project extends Model {
       if (repository != null) repository.destroy();
     }
     for (let path in this.watcherPromisesByPath) {
-      this.watcherPromisesByPath[path].then(watcher => {
+      this.watcherPromisesByPath[path].then((watcher) => {
         watcher.dispose();
       });
     }
@@ -99,21 +99,19 @@ module.exports = class Project extends Model {
 
       // If no path is specified, set to directory of originPath.
       if (!Array.isArray(projectSpecification.paths)) {
-        projectSpecification.paths = [
-          path.dirname(projectSpecification.originPath)
-        ];
+        projectSpecification.paths = [path.dirname(projectSpecification.originPath)];
       }
       atom.config.resetProjectSettings(
         projectSpecification.config,
-        projectSpecification.originPath
+        projectSpecification.originPath,
       );
       this.setPaths(projectSpecification.paths);
     }
-    this.emitter.emit('did-replace', projectSpecification);
+    this.emitter.emit("did-replace", projectSpecification);
   }
 
   onDidReplace(callback) {
-    return this.emitter.on('did-replace', callback);
+    return this.emitter.on("did-replace", callback);
   }
 
   /*
@@ -124,10 +122,9 @@ module.exports = class Project extends Model {
     this.retiredBufferIDs = new Set();
     this.retiredBufferPaths = new Set();
 
-    const handleBufferState = bufferState => {
+    const handleBufferState = (bufferState) => {
       if (bufferState.shouldDestroyOnFileDelete == null) {
-        bufferState.shouldDestroyOnFileDelete = () =>
-          atom.config.get('core.closeDeletedFileTabs');
+        bufferState.shouldDestroyOnFileDelete = () => atom.config.get("core.closeDeletedFileTabs");
       }
 
       // Use a little guilty knowledge of the way TextBuffers are serialized.
@@ -135,7 +132,7 @@ module.exports = class Project extends Model {
       // TextBuffers backed by files that have been deleted from being saved.
       bufferState.mustExist = bufferState.digestWhenLastPersisted !== false;
 
-      return TextBuffer.deserialize(bufferState).catch(_ => {
+      return TextBuffer.deserialize(bufferState).catch((_) => {
         this.retiredBufferIDs.add(bufferState.id);
         this.retiredBufferPaths.add(bufferState.filePath);
         return null;
@@ -147,7 +144,7 @@ module.exports = class Project extends Model {
       bufferPromises.push(handleBufferState(bufferState));
     }
 
-    return Promise.all(bufferPromises).then(buffers => {
+    return Promise.all(bufferPromises).then((buffers) => {
       this.buffers = buffers.filter(Boolean);
       for (let buffer of this.buffers) {
         this.grammarRegistry.maintainLanguageMode(buffer);
@@ -159,7 +156,7 @@ module.exports = class Project extends Model {
 
   serialize(options = {}) {
     return {
-      deserializer: 'Project',
+      deserializer: "Project",
       paths: this.getPaths(),
       buffers: _.compact(
         this.buffers.map(function (buffer) {
@@ -167,11 +164,11 @@ module.exports = class Project extends Model {
             const isUnloading = options.isUnloading === true;
             return buffer.serialize({
               markerLayers: isUnloading,
-              history: isUnloading
+              history: isUnloading,
             });
           }
-        })
-      )
+        }),
+      ),
     };
   }
 
@@ -186,7 +183,7 @@ module.exports = class Project extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangePaths(callback) {
-    return this.emitter.on('did-change-paths', callback);
+    return this.emitter.on("did-change-paths", callback);
   }
 
   // Public: Invoke the given callback when a text buffer is added to the
@@ -197,7 +194,7 @@ module.exports = class Project extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddBuffer(callback) {
-    return this.emitter.on('did-add-buffer', callback);
+    return this.emitter.on("did-add-buffer", callback);
   }
 
   // Public: Invoke the given callback with all current and future text
@@ -253,7 +250,7 @@ module.exports = class Project extends Model {
   //
   // Returns a {Disposable} to manage this event subscription.
   onDidChangeFiles(callback) {
-    return this.emitter.on('did-change-files', callback);
+    return this.emitter.on("did-change-files", callback);
   }
 
   // Public: Invoke the given callback with all current and future
@@ -285,7 +282,7 @@ module.exports = class Project extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to
   // unsubscribe.
   onDidAddRepository(callback) {
-    return this.emitter.on('did-add-repository', callback);
+    return this.emitter.on("did-add-repository", callback);
   }
 
   /*
@@ -317,23 +314,20 @@ module.exports = class Project extends Model {
     const pathForDirectory = directory.getRealPathSync();
     let promise = this.repositoryPromisesByPath.get(pathForDirectory);
     if (!promise) {
-      const promises = this.repositoryProviders.map(provider =>
-        provider.repositoryForDirectory(directory)
+      const promises = this.repositoryProviders.map((provider) =>
+        provider.repositoryForDirectory(directory),
       );
-      promise = Promise.all(promises).then(repositories => {
-        const repo = repositories.find(repo => repo != null) || null;
+      promise = Promise.all(promises).then((repositories) => {
+        const repo = repositories.find((repo) => repo != null) || null;
 
         // If no repository is found, remove the entry for the directory in
         // @repositoryPromisesByPath in case some other RepositoryProvider is
         // registered in the future that could supply a Repository for the
         // directory.
-        if (repo == null)
-          this.repositoryPromisesByPath.delete(pathForDirectory);
+        if (repo == null) this.repositoryPromisesByPath.delete(pathForDirectory);
 
         if (repo && repo.onDidDestroy) {
-          repo.onDidDestroy(() =>
-            this.repositoryPromisesByPath.delete(pathForDirectory)
-          );
+          repo.onDidDestroy(() => this.repositoryPromisesByPath.delete(pathForDirectory));
         }
 
         return repo;
@@ -351,10 +345,10 @@ module.exports = class Project extends Model {
   // directories.
   getPaths() {
     try {
-      return this.rootDirectories.map(rootDirectory => rootDirectory.getPath());
+      return this.rootDirectories.map((rootDirectory) => rootDirectory.getPath());
     } catch (e) {
       atom.notifications.addError(
-        "Please clear Lumine's window state with: lumine --clear-window-state"
+        "Please clear Lumine's window state with: lumine --clear-window-state",
       );
     }
   }
@@ -375,7 +369,7 @@ module.exports = class Project extends Model {
     this.repositories = [];
 
     for (let path in this.watcherPromisesByPath) {
-      this.watcherPromisesByPath[path].then(watcher => {
+      this.watcherPromisesByPath[path].then((watcher) => {
         watcher.dispose();
       });
     }
@@ -387,7 +381,7 @@ module.exports = class Project extends Model {
         this.addPath(projectPath, {
           emitEvent: false,
           mustExist: true,
-          exact: options.exact === true
+          exact: options.exact === true,
         });
       } catch (e) {
         if (e.missingProjectPaths != null) {
@@ -398,10 +392,10 @@ module.exports = class Project extends Model {
       }
     }
 
-    this.emitter.emit('did-change-paths', projectPaths);
+    this.emitter.emit("did-change-paths", projectPaths);
 
     if (options.mustExist === true && missingProjectPaths.length > 0) {
-      const err = new Error('One or more project directories do not exist');
+      const err = new Error("One or more project directories do not exist");
       err.missingProjectPaths = missingProjectPaths;
       throw err;
     }
@@ -441,11 +435,11 @@ module.exports = class Project extends Model {
 
     this.rootDirectories.push(directory);
 
-    const didChangeCallback = events => {
+    const didChangeCallback = (events) => {
       // Stop event delivery immediately on removal of a rootDirectory, even if its watcher
       // promise has yet to resolve at the time of removal
       if (this.rootDirectories.includes(directory)) {
-        this.emitter.emit('did-change-files', events);
+        this.emitter.emit("did-change-files", events);
       }
     };
 
@@ -458,8 +452,8 @@ module.exports = class Project extends Model {
         : watchPath(directory.getPath(), {}, didChangeCallback);
 
     for (let watchedPath in this.watcherPromisesByPath) {
-      if (!this.rootDirectories.find(dir => dir.getPath() === watchedPath)) {
-        this.watcherPromisesByPath[watchedPath].then(watcher => {
+      if (!this.rootDirectories.find((dir) => dir.getPath() === watchedPath)) {
+        this.watcherPromisesByPath[watchedPath].then((watcher) => {
           watcher.dispose();
         });
       }
@@ -476,11 +470,11 @@ module.exports = class Project extends Model {
     }
     this.repositories.push(repo != null ? repo : null);
     if (repo != null) {
-      this.emitter.emit('did-add-repository', repo);
+      this.emitter.emit("did-add-repository", repo);
     }
 
     if (options.emitEvent !== false) {
-      this.emitter.emit('did-change-paths', this.getPaths());
+      this.emitter.emit("did-change-paths", this.getPaths());
     }
   }
 
@@ -495,13 +489,13 @@ module.exports = class Project extends Model {
       this.addPath(projectPath, { ...options, emitEvent: false });
     }
     if (this.getPaths().length !== pathsBefore) {
-      this.emitter.emit('did-change-paths', this.getPaths());
+      this.emitter.emit("did-change-paths", this.getPaths());
     }
   }
 
   getProvidedDirectoryForProjectPath(projectPath) {
     for (let provider of this.directoryProviders) {
-      if (typeof provider.directoryForURISync === 'function') {
+      if (typeof provider.directoryForURISync === "function") {
         const directory = provider.directoryForURISync(projectPath);
         if (directory) {
           return directory;
@@ -514,9 +508,7 @@ module.exports = class Project extends Model {
   getDirectoryForProjectPath(projectPath) {
     let directory = this.getProvidedDirectoryForProjectPath(projectPath);
     if (directory == null) {
-      directory = this.defaultDirectoryProvider.directoryForURISync(
-        projectPath
-      );
+      directory = this.defaultDirectoryProvider.directoryForURISync(projectPath);
     }
     return directory;
   }
@@ -564,10 +556,10 @@ module.exports = class Project extends Model {
         if (removedRepository) removedRepository.destroy();
       }
       if (this.watcherPromisesByPath[projectPath] != null) {
-        this.watcherPromisesByPath[projectPath].then(w => w.dispose());
+        this.watcherPromisesByPath[projectPath].then((w) => w.dispose());
       }
       delete this.watcherPromisesByPath[projectPath];
-      this.emitter.emit('did-change-paths', this.getPaths());
+      this.emitter.emit("did-change-paths", this.getPaths());
       return true;
     } else {
       return false;
@@ -594,7 +586,7 @@ module.exports = class Project extends Model {
         // TODO: what should we do here when there are multiple directories?
       } else if ((projectPath = this.getPaths()[0])) {
         return this.defaultDirectoryProvider.normalizePath(
-          fs.resolveHome(path.join(projectPath, uri))
+          fs.resolveHome(path.join(projectPath, uri)),
         );
       } else {
         return undefined;
@@ -657,7 +649,7 @@ module.exports = class Project extends Model {
   //
   // Returns whether the path is inside the project's root directory.
   contains(pathToCheck) {
-    return this.rootDirectories.some(dir => dir.contains(pathToCheck));
+    return this.rootDirectories.some((dir) => dir.contains(pathToCheck));
   }
 
   /*
@@ -665,32 +657,22 @@ module.exports = class Project extends Model {
   */
 
   consumeServices({ serviceHub }) {
-    serviceHub.consume('atom.directory-provider', '^0.1.0', provider => {
+    serviceHub.consume("atom.directory-provider", "^0.1.0", (provider) => {
       this.directoryProviders.unshift(provider);
       return new Disposable(() => {
-        return this.directoryProviders.splice(
-          this.directoryProviders.indexOf(provider),
-          1
-        );
+        return this.directoryProviders.splice(this.directoryProviders.indexOf(provider), 1);
       });
     });
 
-    return serviceHub.consume(
-      'atom.repository-provider',
-      '^0.1.0',
-      provider => {
-        this.repositoryProviders.unshift(provider);
-        if (this.repositories.includes(null)) {
-          this.setPaths(this.getPaths());
-        }
-        return new Disposable(() => {
-          return this.repositoryProviders.splice(
-            this.repositoryProviders.indexOf(provider),
-            1
-          );
-        });
+    return serviceHub.consume("atom.repository-provider", "^0.1.0", (provider) => {
+      this.repositoryProviders.unshift(provider);
+      if (this.repositories.includes(null)) {
+        this.setPaths(this.getPaths());
       }
-    );
+      return new Disposable(() => {
+        return this.repositoryProviders.splice(this.repositoryProviders.indexOf(provider), 1);
+      });
+    });
   }
 
   // Retrieves all the {TextBuffer}s in the project; that is, the
@@ -708,11 +690,11 @@ module.exports = class Project extends Model {
   }
 
   findBufferForPath(filePath) {
-    return _.find(this.buffers, buffer => buffer.getPath() === filePath);
+    return _.find(this.buffers, (buffer) => buffer.getPath() === filePath);
   }
 
   findBufferForId(id) {
-    return _.find(this.buffers, buffer => buffer.getId() === id);
+    return _.find(this.buffers, (buffer) => buffer.getId() === id);
   }
 
   // Only to be used in specs
@@ -726,9 +708,7 @@ module.exports = class Project extends Model {
     if (filePath) {
       existingBuffer = this.findBufferForPath(absoluteFilePath);
     }
-    return existingBuffer != null
-      ? existingBuffer
-      : this.buildBufferSync(absoluteFilePath);
+    return existingBuffer != null ? existingBuffer : this.buildBufferSync(absoluteFilePath);
   }
 
   // Only to be used when deserializing
@@ -765,13 +745,13 @@ module.exports = class Project extends Model {
   }
 
   shouldDestroyBufferOnFileDelete() {
-    return atom.config.get('core.closeDeletedFileTabs');
+    return atom.config.get("core.closeDeletedFileTabs");
   }
 
   // Still needed when deserializing a tokenized buffer
   buildBufferSync(absoluteFilePath) {
     const params = {
-      shouldDestroyOnFileDelete: this.shouldDestroyBufferOnFileDelete
+      shouldDestroyOnFileDelete: this.shouldDestroyBufferOnFileDelete,
     };
 
     let buffer;
@@ -792,21 +772,18 @@ module.exports = class Project extends Model {
   // Returns a {Promise} that resolves to the {TextBuffer}.
   async buildBuffer(absoluteFilePath) {
     const params = {
-      shouldDestroyOnFileDelete: this.shouldDestroyBufferOnFileDelete
+      shouldDestroyOnFileDelete: this.shouldDestroyBufferOnFileDelete,
     };
 
     let buffer;
     if (absoluteFilePath != null) {
       if (this.loadPromisesByPath[absoluteFilePath] == null) {
-        this.loadPromisesByPath[absoluteFilePath] = TextBuffer.load(
-          absoluteFilePath,
-          params
-        )
-          .then(result => {
+        this.loadPromisesByPath[absoluteFilePath] = TextBuffer.load(absoluteFilePath, params)
+          .then((result) => {
             delete this.loadPromisesByPath[absoluteFilePath];
             return result;
           })
-          .catch(error => {
+          .catch((error) => {
             delete this.loadPromisesByPath[absoluteFilePath];
             throw error;
           });
@@ -826,7 +803,7 @@ module.exports = class Project extends Model {
     this.buffers.push(buffer);
     this.subscriptions.add(this.grammarRegistry.maintainLanguageMode(buffer));
     this.subscribeToBuffer(buffer);
-    this.emitter.emit('did-add-buffer', buffer);
+    this.emitter.emit("did-add-buffer", buffer);
     return buffer;
   }
 
@@ -856,21 +833,15 @@ module.exports = class Project extends Model {
       callback(buffer);
     }
     if (subscriber) {
-      return subscriber.subscribe(this, 'buffer-created', buffer =>
-        callback(buffer)
-      );
+      return subscriber.subscribe(this, "buffer-created", (buffer) => callback(buffer));
     } else {
-      return this.on('buffer-created', buffer => callback(buffer));
+      return this.on("buffer-created", (buffer) => callback(buffer));
     }
   }
 
   subscribeToBuffer(buffer) {
-    buffer.onWillSave(async ({ path }) =>
-      this.applicationDelegate.emitWillSavePath(path)
-    );
-    buffer.onDidSave(({ path }) =>
-      this.applicationDelegate.emitDidSavePath(path)
-    );
+    buffer.onWillSave(async ({ path }) => this.applicationDelegate.emitWillSavePath(path));
+    buffer.onDidSave(({ path }) => this.applicationDelegate.emitDidSavePath(path));
     buffer.onDidDestroy(() => this.removeBuffer(buffer));
     buffer.onDidChangePath(() => {
       if (!(this.getPaths().length > 0)) {
@@ -884,7 +855,7 @@ module.exports = class Project extends Model {
         `Make sure you have permission to access \`${buffer.getPath()}\`.`;
       this.notificationManager.addWarning(message, {
         detail: error.message,
-        dismissable: true
+        dismissable: true,
       });
     });
   }

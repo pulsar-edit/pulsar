@@ -5,9 +5,7 @@ module.exports = class ItemRegistry {
 
   addItem(item) {
     if (this.hasItem(item)) {
-      throw new Error(
-        `The workspace can only contain one instance of item ${item}`
-      );
+      throw new Error(`The workspace can only contain one instance of item ${item}`);
     }
     return this.items.add(item);
   }

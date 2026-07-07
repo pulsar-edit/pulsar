@@ -1,4 +1,3 @@
-
 // Settings
 
 // Modular Scale (1.125): http://www.modularscale.com/?1&em&1.125&web&table
@@ -10,132 +9,121 @@
 @ms-1: (@ui-size * 1.125);
 @ms-0: (@ui-size * 1);
 @ms_1: (@ui-size * 0.889);
-@ms_2: (@ui-size * 0.790);
-
-
+@ms_2: (@ui-size * 0.79);
 
 .settings-view {
+  // Menu ------------------------------
 
-	// Menu ------------------------------
+  .config-menu {
+    position: relative;
+    min-width: (@ui-size * 15);
+    max-width: (@ui-size * 20);
+    border-width: 0 1px 0 0;
+    border-image: linear-gradient(@level-2-color 10px, @base-border-color 200px) 0 1 0 0 stretch;
+    background: @level-2-color;
 
-	.config-menu {
-		position: relative;
-		min-width: (@ui-size * 15);
-		max-width: (@ui-size * 20);
-		border-width: 0 1px 0 0;
-		border-image: linear-gradient(@level-2-color 10px, @base-border-color 200px) 0 1 0 0 stretch;
-		background: @level-2-color;
+    .btn {
+      white-space: initial;
+      font-size: @ms_1;
+      line-height: 1;
+      padding: (@ui-padding / 3) (@ui-padding / 2);
+      &::before {
+        vertical-align: middle;
+      }
+    }
+  }
+  .nav {
+    & > li > a {
+      padding: (@ui-padding / 2) @ui-padding;
+      line-height: @ui-line-height;
+    }
+  }
 
-		.btn {
-			white-space: initial;
-			font-size: @ms_1;
-			line-height: 1;
-			padding: (@ui-padding/3) (@ui-padding/2);
-			&::before {
-				vertical-align: middle;
-			}
-		}
+  // Sections ------------------------------
 
+  & > .panels {
+    background-color: @level-2-color;
+  }
 
-	}
-	.nav {
-		& > li > a {
-			padding: (@ui-padding/2) @ui-padding;
-			line-height: @ui-line-height;
-		}
-	}
+  .section-container {
+    max-width: (@ui-size*60);
+  }
 
+  .section,
+  .section:first-child,
+  .section:last-child {
+    padding: (@ui-padding*3);
+  }
 
-	// Sections ------------------------------
+  .themes-panel .control-group {
+    margin-top: (@ui-padding*2);
+  }
 
-	& > .panels {
-		background-color: @level-2-color;
-	}
+  // Titles ------------------------------
 
-	.section-container {
-		max-width: (@ui-size*60);
-	}
+  .section .section-heading {
+    margin-bottom: (@ui-padding / 1.5);
+  }
 
-	.section,
-	.section:first-child,
-	.section:last-child {
-		padding: (@ui-padding*3);
-	}
+  .sub-section-heading.icon:before,
+  .section-heading.icon:before {
+    margin-right: @ui-padding-icon;
+  }
 
-	.themes-panel .control-group {
-		margin-top: (@ui-padding*2);
-	}
+  // Cards ------------------------------
 
+  .sub-section:not(.collapsed) .package-container {
+    padding-bottom: (@component-padding*3);
+  }
 
-	// Titles ------------------------------
+  .package-card {
+    padding: @ui-padding;
+    .meta-controls .status-indicator {
+      width: (@ui-padding / 4);
+      &:before {
+        content: "\00a0"; // fixes 0 height
+      }
+    }
+  }
 
-	.section .section-heading {
-		margin-bottom: (@ui-padding/1.5);
-	}
+  // Components ------------------------------
 
-	.sub-section-heading.icon:before,
-	.section-heading.icon:before {
-		margin-right: @ui-padding-icon;
-	}
+  .icon::before {
+    color: @text-color-subtle;
+  }
 
+  .editor-container {
+    margin: @ui-padding 0;
+  }
 
+  .form-control {
+    font-size: (@ui-size*1.25);
+    height: @ui-line-height;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
 
-	// Cards ------------------------------
+  .update-all-button {
+    font-size: 0.75em;
+  }
 
-	.sub-section:not(.collapsed) .package-container {
-		padding-bottom: (@component-padding*3);
-	}
+  .install-button {
+    .btn-variant(@accent-bg-color);
+  }
 
-	.package-card {
-		padding: @ui-padding;
-		.meta-controls .status-indicator {
-			width: (@ui-padding/4);
-			&:before {
-				content: "\00a0"; // fixes 0 height
-			}
-		}
-	}
+  input[type="checkbox"] {
+    background-color: @background-color-selected;
+    &:active,
+    &:checked {
+      background-color: @accent-color;
+    }
+    &:before,
+    &:after {
+      background-color: @accent-text-color;
+    }
+  }
 
-
-	// Components ------------------------------
-
-	.icon::before {
-		color: @text-color-subtle;
-	}
-
-	.editor-container {
-		margin: @ui-padding 0;
-	}
-
-	.form-control {
-		font-size: (@ui-size*1.25);
-		height: @ui-line-height;
-		padding-top: 0;
-		padding-bottom: 0;
-	}
-
-	.update-all-button {
-		font-size: .75em;
-	}
-
-	.install-button {
-		.btn-variant(@accent-bg-color);
-	}
-
-	input[type="checkbox"] {
-		background-color: @background-color-selected;
-		&:active,
-		&:checked {
-			background-color: @accent-color;
-		}
-		&:before,
-		&:after {
-			background-color: @accent-text-color;
-		}
-	}
-
-	.search-container .btn {
-		font-size: @ui-input-size;
-	}
-
+  .search-container .btn {
+    font-size: @ui-input-size;
+  }
 }

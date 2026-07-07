@@ -1,6 +1,6 @@
 // An active workspace item that doesn't contain a TextEditor.
 
-const etch = require('etch');
+const etch = require("etch");
 const $ = etch.dom;
 
 class UnrecognizedItem {
@@ -17,14 +17,12 @@ class UnrecognizedItem {
   }
 
   render() {
-    return (
-      $.div({className: 'wrapper'}, 'Some text')
-    )
+    return $.div({ className: "wrapper" }, "Some text");
   }
 
   update() {}
 }
 
-UnrecognizedItem.uri = 'atom://find-and-replace/spec/unrecognized'
+UnrecognizedItem.uri = "atom://find-and-replace/spec/unrecognized";
 
-module.exports = UnrecognizedItem
+module.exports = UnrecognizedItem;

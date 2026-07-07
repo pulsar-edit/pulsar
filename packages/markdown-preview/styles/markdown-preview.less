@@ -1,4 +1,3 @@
-
 // Global Markdown Preview styles
 
 .markdown-preview {
@@ -31,9 +30,9 @@
   }
 
   // move task list checkboxes
-  .task-list-item input[type=checkbox] {
+  .task-list-item input[type="checkbox"] {
     position: absolute;
-    margin: .25em 0 0 -1.4em;
+    margin: 0.25em 0 0 -1.4em;
   }
 
   .task-list-item {
@@ -51,7 +50,7 @@
     // only shows up when preview content takes a while to render.
     &:before {
       display: block;
-      content: 'Loading Markdown…';
+      content: "Loading Markdown…";
       margin: auto;
       background-image: url(images/octocat-spinner-128.gif);
       background-repeat: no-repeat;
@@ -71,6 +70,10 @@
 // Not an actual animation; we just use an animation so that it can appear
 // after a short delay.
 @keyframes appear-after-short-delay {
-  0% { opacity: 1; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
 }

@@ -1,7 +1,7 @@
-const { dialog } = require('electron');
-const crypto = require('crypto');
-const Path = require('path');
-const fs = require('fs-plus');
+const { dialog } = require("electron");
+const crypto = require("crypto");
+const Path = require("path");
+const fs = require("fs-plus");
 
 module.exports = class FileRecoveryService {
   constructor(recoveryDirectory) {
@@ -15,21 +15,15 @@ module.exports = class FileRecoveryService {
     const stats = await tryStatFile(path);
     if (!stats) return;
 
-    const recoveryPath = Path.join(
-      this.recoveryDirectory,
-      RecoveryFile.fileNameForPath(path)
-    );
+    const recoveryPath = Path.join(this.recoveryDirectory, RecoveryFile.fileNameForPath(path));
     const recoveryFile =
-      this.recoveryFilesByFilePath.get(path) ||
-      new RecoveryFile(path, stats.mode, recoveryPath);
+      this.recoveryFilesByFilePath.get(path) || new RecoveryFile(path, stats.mode, recoveryPath);
 
     try {
       await recoveryFile.retain();
     } catch (err) {
       console.log(
-        `Couldn't retain ${recoveryFile.recoveryPath}. Code: ${
-          err.code
-        }. Message: ${err.message}`
+        `Couldn't retain ${recoveryFile.recoveryPath}. Code: ${err.code}. Message: ${err.message}`,
       );
       return;
     }
@@ -55,7 +49,7 @@ module.exports = class FileRecoveryService {
         console.log(
           `Couldn't release ${recoveryFile.recoveryPath}. Code: ${
             err.code
-          }. Message: ${err.message}`
+          }. Message: ${err.message}`,
         );
       }
       if (recoveryFile.isReleased()) this.recoveryFilesByFilePath.delete(path);
@@ -72,8 +66,8 @@ module.exports = class FileRecoveryService {
       promises.push(
         recoveryFile
           .recover()
-          .catch(error => {
-            const message = 'A file that Lumine was saving could be corrupted';
+          .catch((error) => {
+            const message = "A file that Lumine was saving could be corrupted";
             const detail =
               `Error ${error.code}. There was a crash while saving "${
                 recoveryFile.originalPath
@@ -83,10 +77,10 @@ module.exports = class FileRecoveryService {
               }".`;
             console.log(detail);
             dialog.showMessageBox(window, {
-              type: 'info',
-              buttons: ['OK'],
+              type: "info",
+              buttons: ["OK"],
               message,
-              detail
+              detail,
             });
           })
           .then(() => {
@@ -95,7 +89,7 @@ module.exports = class FileRecoveryService {
             }
             this.windowsByRecoveryFile.delete(recoveryFile);
             this.recoveryFilesByFilePath.delete(recoveryFile.originalPath);
-          })
+          }),
       );
     }
 
@@ -116,7 +110,7 @@ class RecoveryFile {
   static fileNameForPath(path) {
     const extension = Path.extname(path);
     const basename = Path.basename(path, extension).substring(0, 34);
-    const randomSuffix = crypto.randomBytes(3).toString('hex');
+    const randomSuffix = crypto.randomBytes(3).toString("hex");
     return `${basename}-${randomSuffix}${extension}`;
   }
 
@@ -138,9 +132,9 @@ class RecoveryFile {
 
   async remove() {
     return new Promise((resolve, reject) =>
-      fs.unlink(this.recoveryPath, error =>
-        error && error.code !== 'ENOENT' ? reject(error) : resolve()
-      )
+      fs.unlink(this.recoveryPath, (error) =>
+        error && error.code !== "ENOENT" ? reject(error) : resolve(),
+      ),
     );
   }
 
@@ -161,21 +155,21 @@ class RecoveryFile {
 
 async function tryStatFile(path) {
   return new Promise((resolve, reject) =>
-    fs.stat(path, (error, result) => resolve(error == null && result))
+    fs.stat(path, (error, result) => resolve(error == null && result)),
   );
 }
 
 async function copyFile(source, destination, mode) {
   return new Promise((resolve, reject) => {
-    fs.mkdir(Path.dirname(destination), {recursive:true}, error => {
+    fs.mkdir(Path.dirname(destination), { recursive: true }, (error) => {
       if (error) return reject(error);
       const readStream = fs.createReadStream(source);
-      readStream.on('error', reject).once('open', () => {
+      readStream.on("error", reject).once("open", () => {
         const writeStream = fs.createWriteStream(destination, { mode });
         writeStream
-          .on('error', reject)
-          .on('open', () => readStream.pipe(writeStream))
-          .once('close', () => resolve());
+          .on("error", reject)
+          .on("open", () => readStream.pipe(writeStream))
+          .once("close", () => resolve());
       });
     });
   });

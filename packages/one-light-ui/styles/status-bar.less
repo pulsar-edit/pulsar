@@ -1,4 +1,3 @@
-
 @status-bar-height: @ui-tab-height; // same as tabs
 @status-bar-padding: @ui-padding;
 
@@ -21,7 +20,7 @@
 
   .inline-block {
     margin: 0; // override default
-    padding: 0 (@status-bar-padding/2);
+    padding: 0 (@status-bar-padding / 2);
     vertical-align: top;
 
     &:hover {
@@ -49,19 +48,17 @@
   }
   .icon::before {
     font-size: 1.33333em; // should be 16px with a default of 12px
-  	width: auto; // use natural width
+    width: auto; // use natural width
     line-height: 1;
     height: 1em; // same as line-height
-    margin-right: .25em;
+    margin-right: 0.25em;
     top: auto;
   }
 }
 
-
 // Package overrides -------------------------------
 
 .status-bar.status-bar {
-
   // Read-only -> Remove hover effect
   .is-read-only, // <- use this class in packages
   status-bar-launch-mode,
@@ -91,7 +88,8 @@
   .icon.is-icon-only::before {
     margin-right: 0;
   }
-  .github-PushPull-label.is-push:empty { // GitHub package when nothing to push
-    margin-right: -.25em;
+  .github-PushPull-label.is-push:empty {
+    // GitHub package when nothing to push
+    margin-right: -0.25em;
   }
 }

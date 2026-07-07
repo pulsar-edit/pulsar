@@ -56,15 +56,16 @@ Snippet command names must be unique. They can’t conflict with each other, nor
 
 These parameters are meant to provide extra information about your snippet to [autocomplete-plus](https://github.com/atom/autocomplete-plus/wiki/Provider-API).
 
-* `leftLabel` will add text to the left part of the autocomplete results box.
-* `leftLabelHTML` will overwrite what's in `leftLabel` and allow you to use a bit of CSS such as `color`.
-* `rightLabelHTML`. By default, in the right part of the results box you will see the name of the snippet. When using `rightLabelHTML` the name of the snippet will no longer be displayed, and you will be able to use a bit of CSS.
-* `description` will add text to a description box under the autocomplete results list.
-* `descriptionMoreURL` URL to the documentation of the snippet.
+- `leftLabel` will add text to the left part of the autocomplete results box.
+- `leftLabelHTML` will overwrite what's in `leftLabel` and allow you to use a bit of CSS such as `color`.
+- `rightLabelHTML`. By default, in the right part of the results box you will see the name of the snippet. When using `rightLabelHTML` the name of the snippet will no longer be displayed, and you will be able to use a bit of CSS.
+- `description` will add text to a description box under the autocomplete results list.
+- `descriptionMoreURL` URL to the documentation of the snippet.
 
 ![autocomplete-description](http://i.imgur.com/cvI2lOq.png)
 
 Example:
+
 ```coffee
 '.source.js':
   'console.log':
@@ -76,7 +77,7 @@ Example:
 
 ### Determining the correct scope for a snippet
 
-The outmost key of a snippet is the “scope” that you want the descendent snippets to be available in. The key should be prefixed with a period (`text.html.basic` → `.text.html.basic`). You can find out the correct scope by opening the Settings (<kbd>cmd-,</kbd> on macOS) and selecting the corresponding *Language [xxx]* package. For example, here’s the settings page for `language-html`:
+The outmost key of a snippet is the “scope” that you want the descendent snippets to be available in. The key should be prefixed with a period (`text.html.basic` → `.text.html.basic`). You can find out the correct scope by opening the Settings (<kbd>cmd-,</kbd> on macOS) and selecting the corresponding _Language [xxx]_ package. For example, here’s the settings page for `language-html`:
 
 ![Screenshot of Language Html settings](https://cloud.githubusercontent.com/assets/1038121/5137632/126beb66-70f2-11e4-839b-bc7e84103f67.png)
 
@@ -84,7 +85,7 @@ If it's difficult to determine the package handling the file type in question (f
 
 1. Put your cursor in a file in which you want the snippet to be available.
 2. Open the [Command Palette](https://github.com/pulsar-edit/command-palette)
-(<kbd>cmd-shift-p</kbd> or <kbd>ctrl-shift-p</kbd>).
+   (<kbd>cmd-shift-p</kbd> or <kbd>ctrl-shift-p</kbd>).
 3. Run the `Editor: Log Cursor Scope` command.
 
 This will trigger a notification which will contain a list of scopes. The first scope that's listed is the scope for that language. Here are some examples: `source.coffee`, `text.plain`, `text.html.basic`.
@@ -95,11 +96,11 @@ This package supports a subset of the features of TextMate snippets, [documented
 
 The following features from TextMate snippets are not yet supported:
 
-* Interpolated shell code can’t reliably be supported cross-platform, and is probably a bad idea anyway. No other editors that support snippets have adopted this feature, and Lumine won’t either.
+- Interpolated shell code can’t reliably be supported cross-platform, and is probably a bad idea anyway. No other editors that support snippets have adopted this feature, and Lumine won’t either.
 
 The following features from VSCode snippets are not yet supported:
 
-* “Choice” syntax like `${1|one,two,three|}` requires that the autocomplete engine pop up a menu to offer the user a choice between the available placeholder options. This may be supported in the future, but right now Lumine effectively converts this to `${1:one}`, treating the first choice as a conventional placeholder.
+- “Choice” syntax like `${1|one,two,three|}` requires that the autocomplete engine pop up a menu to offer the user a choice between the available placeholder options. This may be supported in the future, but right now Lumine effectively converts this to `${1:one}`, treating the first choice as a conventional placeholder.
 
 ### Variables
 
@@ -111,14 +112,14 @@ One of the most useful is `TM_SELECTED_TEXT`, which represents whatever text was
 
 Others that can be useful:
 
-* `TM_FILENAME`: The name of the current file (`foo.rb`).
-* `TM_FILENAME_BASE`: The name of the current file, but without its extension (`foo`).
-* `TM_FILEPATH`: The entire path on disk to the current file.
-* `TM_CURRENT_LINE`: The entire current line that the cursor is sitting on.
-* `TM_CURRENT_WORD`: The entire word that the cursor is within or adjacent to, as interpreted by `cursor.getCurrentWordBufferRange`.
-* `CLIPBOARD`: The current contents of the clipboard.
-* `CURRENT_YEAR`, `CURRENT_MONTH`, et cetera: referneces to the current date and time in various formats.
-* `LINE_COMMENT`, `BLOCK_COMMENT_START`, `BLOCK_COMMENT_END`: uses the correct comment delimiters for whatever language you’re in.
+- `TM_FILENAME`: The name of the current file (`foo.rb`).
+- `TM_FILENAME_BASE`: The name of the current file, but without its extension (`foo`).
+- `TM_FILEPATH`: The entire path on disk to the current file.
+- `TM_CURRENT_LINE`: The entire current line that the cursor is sitting on.
+- `TM_CURRENT_WORD`: The entire word that the cursor is within or adjacent to, as interpreted by `cursor.getCurrentWordBufferRange`.
+- `CLIPBOARD`: The current contents of the clipboard.
+- `CURRENT_YEAR`, `CURRENT_MONTH`, et cetera: referneces to the current date and time in various formats.
+- `LINE_COMMENT`, `BLOCK_COMMENT_START`, `BLOCK_COMMENT_END`: uses the correct comment delimiters for whatever language you’re in.
 
 Any variable that has no value — for instance, `TM_FILENAME` on an untitled document, or `LINE_COMMENT` in a CSS file — will resolve to an empty string.
 
@@ -126,16 +127,16 @@ Any variable that has no value — for instance, `TM_FILENAME` on an untitled d
 
 Lumine supports the three flags defined in the [LSP snippets specification][lsp] and two other flags that are [implemented in VSCode][vscode]:
 
-* `/upcase` (`foo` → `FOO`)
-* `/downcase` (`BAR` → `bar`)
-* `/capitalize` (`lorem ipsum dolor` → `Lorem ipsum dolor`) *(first letter uppercased; rest of input left intact)*
-* `/camelcase` (`foo bar` → `fooBar`, `lorem-ipsum.dolor` → `loremIpsumDolor`)
-* `/pascalcase` (`foo bar` → `FooBar`, `lorem-ipsum.dolor` → `LoremIpsumDolor`)
+- `/upcase` (`foo` → `FOO`)
+- `/downcase` (`BAR` → `bar`)
+- `/capitalize` (`lorem ipsum dolor` → `Lorem ipsum dolor`) _(first letter uppercased; rest of input left intact)_
+- `/camelcase` (`foo bar` → `fooBar`, `lorem-ipsum.dolor` → `loremIpsumDolor`)
+- `/pascalcase` (`foo bar` → `FooBar`, `lorem-ipsum.dolor` → `LoremIpsumDolor`)
 
 It also supports two other common transformations:
 
-* `/snakecase` (`foo bar` → `foo_bar`, `lorem-ipsum.dolor` → `lorem_ipsum_dolor`)
-* `/kebabcase` (`foo bar` → `foo-bar`, `lorem-ipsum.dolor` → `lorem-ipsum-dolor`)
+- `/snakecase` (`foo bar` → `foo_bar`, `lorem-ipsum.dolor` → `lorem_ipsum_dolor`)
+- `/kebabcase` (`foo bar` → `foo-bar`, `lorem-ipsum.dolor` → `lorem-ipsum-dolor`)
 
 These transformation flags can also be applied on backreferences in `sed`-style replacements for transformed tab stops. Given the following example snippet body…
 
@@ -149,17 +150,16 @@ These transformation flags can also be applied on backreferences in `sed`-style 
 [Lorem ipsum dolor] becomes [LOREM IPSUM DOLOR]
 ```
 
-
 #### Variable caveats
 
-* `WORKSPACE_NAME`, `WORKSPACE_FOLDER`, and `RELATIVE_PATH` all rely on the presence of a root project folder, but a Lumine project can technically have multiple root folders. While this is rare, it is handled by `snippets` as follows: whichever project path is an ancestor of the currently active file is treated as the project root — or the first one found if multiple roots are ancestors.
-* `WORKSPACE_NAME` in VSCode refers to “the name of the opened workspace or folder.” In the former case, this appears to mean bundled projects with a `.code-workspace` file extension — which have no Lumine equivalent. Instead, `WORKSPACE_NAME` will always refer to the last path component of your project’s root directory as defined above.
+- `WORKSPACE_NAME`, `WORKSPACE_FOLDER`, and `RELATIVE_PATH` all rely on the presence of a root project folder, but a Lumine project can technically have multiple root folders. While this is rare, it is handled by `snippets` as follows: whichever project path is an ancestor of the currently active file is treated as the project root — or the first one found if multiple roots are ancestors.
+- `WORKSPACE_NAME` in VSCode refers to “the name of the opened workspace or folder.” In the former case, this appears to mean bundled projects with a `.code-workspace` file extension — which have no Lumine equivalent. Instead, `WORKSPACE_NAME` will always refer to the last path component of your project’s root directory as defined above.
 
 #### Variables that are not yet supported
 
 Of the variables supported by VSCode, Lumine does not yet support:
 
-* `UUID` (Will automatically be supported when Lumine uses a version of Electron that has native `crypto.randomUUID`.)
+- `UUID` (Will automatically be supported when Lumine uses a version of Electron that has native `crypto.randomUUID`.)
 
 ## Multi-line Snippet Body
 
@@ -202,7 +202,6 @@ Likewise, if your snippet includes literal references to `$` or `{`, you may hav
 ## Multiple snippets for the same scope
 
 Snippets for the same scope must be placed within the same key. See [this section of the Lumine documentation](https://docs.pulsar-edit.dev/customizing-lumine/configuring-with-cson/) for more information.
-
 
 [lsp]: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#variables
 [vscode]: https://code.visualstudio.com/docs/editor/userdefinedsnippets#_variables

@@ -1,5 +1,5 @@
-require = require("esm")(module)
-module.exports = require("./chromium-elements-shim.mjs")
+require = require("esm")(module);
+module.exports = require("./chromium-elements-shim.mjs");
 
 /**
 Used to aid in the automatic updating of our `completions.json`

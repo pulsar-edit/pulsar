@@ -1,4 +1,5 @@
-atom-panel.modal, .overlay {
+atom-panel.modal,
+.overlay {
   color: @text-color;
   background-color: @overlay-background-color;
   padding: @component-padding;
@@ -12,7 +13,6 @@ atom-panel.modal, .overlay {
 
   .select-list ol.list-group,
   &.select-list ol.list-group {
-
     background-color: @inset-panel-background-color;
 
     li {
@@ -20,9 +20,13 @@ atom-panel.modal, .overlay {
       border-top: 1px solid @inset-panel-border-color;
       border-left: 1px solid @inset-panel-border-color;
       border-right: 1px solid @inset-panel-border-color;
-      &:last-child { border-bottom: 1px solid @inset-panel-border-color; }
+      &:last-child {
+        border-bottom: 1px solid @inset-panel-border-color;
+      }
 
-      &.two-lines { padding: (@component-padding/2) @component-padding; }
+      &.two-lines {
+        padding: (@component-padding / 2) @component-padding;
+      }
       &.selected {
         color: @text-color;
         background-color: @background-color-highlight;
@@ -36,6 +40,5 @@ atom-panel.modal, .overlay {
         }
       }
     }
-
   }
 }

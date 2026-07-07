@@ -2,12 +2,12 @@
 
 Displays information about where time is spent while Lumine loads.
 
-  * Startup time
-  * Compile cache
-  * Package loading time
-  * Package activation time
-  * Theme loading time
-  * Theme activation time
+- Startup time
+- Compile cache
+- Package loading time
+- Package activation time
+- Theme loading time
+- Theme activation time
 
 ![](https://cloud.githubusercontent.com/assets/378023/20422582/9e5907f8-adae-11e6-8267-faa3514de896.png)
 

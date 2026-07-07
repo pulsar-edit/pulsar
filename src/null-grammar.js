@@ -1,8 +1,8 @@
-const { Disposable } = require('event-kit');
+const { Disposable } = require("event-kit");
 
 module.exports = {
-  name: 'Null Grammar',
-  scopeName: 'text.plain.null-grammar',
+  name: "Null Grammar",
+  scopeName: "text.plain.null-grammar",
   scopeForId(id) {
     if (id === -1 || id === -2) {
       return this.scopeName;
@@ -26,17 +26,13 @@ module.exports = {
   },
   tokenizeLine(text) {
     return {
-      tags: [
-        this.startIdForScope(this.scopeName),
-        text.length,
-        this.endIdForScope(this.scopeName)
-      ],
-      ruleStack: null
+      tags: [this.startIdForScope(this.scopeName), text.length, this.endIdForScope(this.scopeName)],
+      ruleStack: null,
     };
   },
   onDidUpdate(callback) {
     return new Disposable(noop);
-  }
+  },
 };
 
 function noop() {}

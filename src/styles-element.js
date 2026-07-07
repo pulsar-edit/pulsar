@@ -1,4 +1,4 @@
-const { Emitter, CompositeDisposable } = require('event-kit');
+const { Emitter, CompositeDisposable } = require("event-kit");
 
 class StylesElement extends HTMLElement {
   constructor() {
@@ -10,21 +10,20 @@ class StylesElement extends HTMLElement {
   }
 
   onDidAddStyleElement(callback) {
-    this.emitter.on('did-add-style-element', callback);
+    this.emitter.on("did-add-style-element", callback);
   }
 
   onDidRemoveStyleElement(callback) {
-    this.emitter.on('did-remove-style-element', callback);
+    this.emitter.on("did-remove-style-element", callback);
   }
 
   onDidUpdateStyleElement(callback) {
-    this.emitter.on('did-update-style-element', callback);
+    this.emitter.on("did-update-style-element", callback);
   }
 
   connectedCallback() {
     let left;
-    this.context =
-      (left = this.getAttribute('context')) != null ? left : undefined;
+    this.context = (left = this.getAttribute("context")) != null ? left : undefined;
   }
 
   disconnectedCallback() {
@@ -33,11 +32,11 @@ class StylesElement extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['context'];
+    return ["context"];
   }
 
   attributeChangedCallback(attrName) {
-    if (attrName === 'context') {
+    if (attrName === "context") {
       return this.contextChanged();
     }
   }
@@ -45,23 +44,17 @@ class StylesElement extends HTMLElement {
   initialize(styleManager) {
     this.styleManager = styleManager;
     if (this.styleManager == null) {
-      throw new Error(
-        'Must pass a styleManager parameter when initializing a StylesElement'
-      );
+      throw new Error("Must pass a styleManager parameter when initializing a StylesElement");
     }
 
     this.subscriptions.add(
-      this.styleManager.observeStyleElements(this.styleElementAdded.bind(this))
+      this.styleManager.observeStyleElements(this.styleElementAdded.bind(this)),
     );
     this.subscriptions.add(
-      this.styleManager.onDidRemoveStyleElement(
-        this.styleElementRemoved.bind(this)
-      )
+      this.styleManager.onDidRemoveStyleElement(this.styleElementRemoved.bind(this)),
     );
     this.subscriptions.add(
-      this.styleManager.onDidUpdateStyleElement(
-        this.styleElementUpdated.bind(this)
-      )
+      this.styleManager.onDidUpdateStyleElement(this.styleElementUpdated.bind(this)),
     );
   }
 
@@ -73,7 +66,7 @@ class StylesElement extends HTMLElement {
     for (let child of Array.from(Array.prototype.slice.call(this.children))) {
       this.styleElementRemoved(child);
     }
-    this.context = this.getAttribute('context');
+    this.context = this.getAttribute("context");
     for (let styleElement of Array.from(this.styleManager.getStyleElements())) {
       this.styleElementAdded(styleElement);
     }
@@ -89,10 +82,7 @@ class StylesElement extends HTMLElement {
     styleElementClone.sourcePath = styleElement.sourcePath;
     styleElementClone.context = styleElement.context;
     styleElementClone.priority = styleElement.priority;
-    this.styleElementClonesByOriginalElement.set(
-      styleElement,
-      styleElementClone
-    );
+    this.styleElementClonesByOriginalElement.set(styleElement, styleElementClone);
 
     const { priority } = styleElement;
     if (priority != null) {
@@ -105,7 +95,7 @@ class StylesElement extends HTMLElement {
     }
 
     this.insertBefore(styleElementClone, insertBefore);
-    this.emitter.emit('did-add-style-element', styleElementClone);
+    this.emitter.emit("did-add-style-element", styleElementClone);
   }
 
   styleElementRemoved(styleElement) {
@@ -115,12 +105,11 @@ class StylesElement extends HTMLElement {
     }
 
     const styleElementClone =
-      (left = this.styleElementClonesByOriginalElement.get(styleElement)) !=
-      null
+      (left = this.styleElementClonesByOriginalElement.get(styleElement)) != null
         ? left
         : styleElement;
     styleElementClone.remove();
-    this.emitter.emit('did-remove-style-element', styleElementClone);
+    this.emitter.emit("did-remove-style-element", styleElementClone);
   }
 
   styleElementUpdated(styleElement) {
@@ -128,11 +117,9 @@ class StylesElement extends HTMLElement {
       return;
     }
 
-    const styleElementClone = this.styleElementClonesByOriginalElement.get(
-      styleElement
-    );
+    const styleElementClone = this.styleElementClonesByOriginalElement.get(styleElement);
     styleElementClone.textContent = styleElement.textContent;
-    this.emitter.emit('did-update-style-element', styleElementClone);
+    this.emitter.emit("did-update-style-element", styleElementClone);
   }
 
   styleElementMatchesContext(styleElement) {
@@ -140,12 +127,12 @@ class StylesElement extends HTMLElement {
   }
 }
 
-window.customElements.define('atom-styles', StylesElement);
+window.customElements.define("atom-styles", StylesElement);
 
 function createStylesElement() {
-  return document.createElement('atom-styles');
+  return document.createElement("atom-styles");
 }
 
 module.exports = {
-  createStylesElement
+  createStylesElement,
 };

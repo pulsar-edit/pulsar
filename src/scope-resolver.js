@@ -1,6 +1,6 @@
-const { CompositeDisposable } = require('event-kit');
-const { Point } = require('@pulsar-edit/text-buffer');
-const ScopeDescriptor = require('./scope-descriptor');
+const { CompositeDisposable } = require("event-kit");
+const { Point } = require("@pulsar-edit/text-buffer");
+const ScopeDescriptor = require("./scope-descriptor");
 
 // TODO: These utility functions are duplicated between this file and
 // `wasm-tree-sitter-language-mode.js`. Eventually they might need to be moved
@@ -23,39 +23,50 @@ function rangeSpecToString(range) {
 }
 
 function resolveNodeDescriptor(node, descriptor) {
-  let parts = descriptor.split('.');
+  let parts = descriptor.split(".");
   let result = node;
   while (result !== null && parts.length > 0) {
     let part = parts.shift();
-    if (!result[part]) { return null; }
+    if (!result[part]) {
+      return null;
+    }
     result = result[part];
   }
   return result;
 }
 
 function resolveNodePosition(node, descriptor) {
-  let parts = descriptor.split('.');
+  let parts = descriptor.split(".");
   let lastPart = parts.pop();
-  let result = parts.length === 0 ?
-    node :
-    resolveNodeDescriptor(node, parts.join('.'));
-  if (!result) { return null; }
+  let result = parts.length === 0 ? node : resolveNodeDescriptor(node, parts.join("."));
+  if (!result) {
+    return null;
+  }
   return result[lastPart];
 }
 
 function interpretPredicateValue(value) {
-  if (value === "true") { return true; }
-  if (value === "false") { return false; }
-  if (/^\d+$/.test(value)) { return Number(value); }
+  if (value === "true") {
+    return true;
+  }
+  if (value === "false") {
+    return false;
+  }
+  if (/^\d+$/.test(value)) {
+    return Number(value);
+  }
   return value;
 }
 
 function interpretPossibleKeyValuePair(rawValue, coerceValue = false) {
-  if (!rawValue.includes(' ')) { return [rawValue, null]; }
+  if (!rawValue.includes(" ")) {
+    return [rawValue, null];
+  }
 
   // Split on the first space. Everything after the first space is the value.
-  let parts = rawValue.split(' ');
-  let key = parts.shift(), value = parts.join(' ');
+  let parts = rawValue.split(" ");
+  let key = parts.shift(),
+    value = parts.join(" ");
 
   // We only want to interpret the value if we're comparing it to a config
   // value; otherwise we want to compare strings to strings.
@@ -77,7 +88,7 @@ class ConfigCache {
     this.subscriptions.add(
       this.config.onDidChange(() => this.clearAll()),
       atom.grammars.onDidAddGrammar(() => this.clearAll()),
-      atom.grammars.onDidUpdateGrammar(() => this.clearAll())
+      atom.grammars.onDidUpdateGrammar(() => this.clearAll()),
     );
   }
 
@@ -128,7 +139,6 @@ ConfigCache.clear = () => {
   ConfigCache.CACHES_FOR_CONFIG_OBJECTS.clear();
 };
 
-
 // A data structure for storing scope information while processing capture
 // data. The data is reset in between each task.
 //
@@ -147,13 +157,12 @@ class ScopeResolver {
     this.buffer = languageLayer.buffer;
     this.config = languageLayer?.languageMode?.config ?? atom.config;
     this.grammar = languageLayer.grammar;
-    this.idForScope = idForScope ?? (x => x);
-    this.boundaries = new Map;
-    this.rangeData = new Map;
-    this.pointKeyCache = new Map;
-    this.patternCache = new Map;
-    this.configCache = ConfigCache.forConfig(this.config)
-      .getCacheForGrammar(this.grammar);
+    this.idForScope = idForScope ?? ((x) => x);
+    this.boundaries = new Map();
+    this.rangeData = new Map();
+    this.pointKeyCache = new Map();
+    this.patternCache = new Map();
+    this.configCache = ConfigCache.forConfig(this.config).getCacheForGrammar(this.grammar);
   }
 
   getOrCompilePattern(pattern) {
@@ -170,7 +179,7 @@ class ScopeResolver {
       return this.configCache.get(key);
     }
     let value = this.config.get(key, {
-      scope: new ScopeDescriptor({ scopes: [this.grammar.scopeName] })
+      scope: new ScopeDescriptor({ scopes: [this.grammar.scopeName] }),
     });
     this.configCache.set(key, value);
     return value;
@@ -180,7 +189,7 @@ class ScopeResolver {
     return this.buffer.positionForCharacterIndex(index);
   }
 
-  positionToIndex(position)  {
+  positionToIndex(position) {
     return this.buffer.characterIndexForPosition(position);
   }
 
@@ -192,13 +201,11 @@ class ScopeResolver {
   }
 
   shouldInvalidateOnChange(capture) {
-    return capture.setProperties &&
-      ('highlight.invalidateOnChange' in capture.setProperties);
+    return capture.setProperties && "highlight.invalidateOnChange" in capture.setProperties;
   }
 
   shouldInvalidateFoldOnChange(capture) {
-    return capture.setProperties &&
-      ('fold.invalidateOnChange' in capture.setProperties);
+    return capture.setProperties && "fold.invalidateOnChange" in capture.setProperties;
   }
 
   // We want to index scope data on buffer position, but each `Point` (or
@@ -229,7 +236,7 @@ class ScopeResolver {
     let normalizedProps = { ...props };
     // TEMP: No longer needed when we remove support for (#set! test.final
     // true).
-    for (let prop of ['final', 'shy']) {
+    for (let prop of ["final", "shy"]) {
       if (`test.${prop}` in normalizedProps) {
         normalizedProps[`capture.${prop}`] = normalizedProps[`test.${prop}`];
       }
@@ -245,13 +252,19 @@ class ScopeResolver {
   isValidRange(range) {
     let { startPosition, startIndex, endPosition, endIndex } = range;
     if (!(
-      typeof startIndex === 'number' &&
-      typeof endIndex === 'number' &&
-      typeof startPosition === 'object' &&
-      typeof endPosition === 'object'
-    )) { return false; }
-    if (startIndex > endIndex) { return false; }
-    if (comparePoints(startPosition, endPosition) >= 0) { return false; }
+      typeof startIndex === "number" &&
+      typeof endIndex === "number" &&
+      typeof startPosition === "object" &&
+      typeof endPosition === "object"
+    )) {
+      return false;
+    }
+    if (startIndex > endIndex) {
+      return false;
+    }
+    if (comparePoints(startPosition, endPosition) >= 0) {
+      return false;
+    }
     return true;
   }
 
@@ -259,18 +272,19 @@ class ScopeResolver {
   adjustsCaptureRange(capture) {
     let { setProperties: props = {} } = capture;
     let keys = Object.keys(props);
-    if (keys.length === 0) { return false; }
-    return keys.some(k => this.capturePropertyIsAdjustment(k));
+    if (keys.length === 0) {
+      return false;
+    }
+    return keys.some((k) => this.capturePropertyIsAdjustment(k));
   }
 
   rangeExceedsBoundsOfCapture(range, capture) {
-    return range.startIndex < capture.node.startIndex ||
-      range.endIndex > capture.node.endIndex;
+    return range.startIndex < capture.node.startIndex || range.endIndex > capture.node.endIndex;
   }
 
   normalizeAdjustmentProperty(prop) {
-    if (prop.startsWith('adjust.')) {
-      prop = prop.replace(/^adjust\./, '');
+    if (prop.startsWith("adjust.")) {
+      prop = prop.replace(/^adjust\./, "");
     }
     return prop;
   }
@@ -286,26 +300,26 @@ class ScopeResolver {
   }
 
   normalizeTestProperty(prop) {
-    if (prop.startsWith('test.')) {
+    if (prop.startsWith("test.")) {
       prop = prop.substring(5);
     }
 
     // TEMP: Normalize `onlyIfNotFoo` and `onlyIfFoo` to `foo`.
-    if (prop.startsWith('onlyIfNot')) {
+    if (prop.startsWith("onlyIfNot")) {
       prop = prop.charAt(9).toLowerCase() + prop.substring(10);
     }
-    if (prop.startsWith('onlyIf')) {
+    if (prop.startsWith("onlyIf")) {
       prop = prop.charAt(6).toLowerCase() + prop.substring(7);
     }
     return prop;
   }
 
   normalizeCaptureSettingProperty(prop) {
-    if (prop.startsWith('capture.')) {
+    if (prop.startsWith("capture.")) {
       prop = prop.substring(8);
     }
     // TEMP: Normalize `test.final` and `test.shy` to `final` and `shy`.
-    if (prop === 'test.final' || prop === 'test.shy') {
+    if (prop === "test.final" || prop === "test.shy") {
       prop = prop.substring(5);
     }
     return prop;
@@ -318,10 +332,10 @@ class ScopeResolver {
 
   capturePropertyIsCaptureSetting(prop) {
     // TEMP: Support `test.final` and `test.shy` temporarily.
-    if (prop === 'test.final' || prop === 'test.shy') {
+    if (prop === "test.final" || prop === "test.shy") {
       return true;
     }
-    if (prop.includes('.') && !prop.startsWith('capture.')) {
+    if (prop.includes(".") && !prop.startsWith("capture.")) {
       return false;
     }
     prop = this.normalizeCaptureSettingProperty(prop);
@@ -329,7 +343,7 @@ class ScopeResolver {
   }
 
   applyTest(prop, ...args) {
-    let isLegacyNegation = prop.includes('onlyIfNot');
+    let isLegacyNegation = prop.includes("onlyIfNot");
     prop = this.normalizeTestProperty(prop);
     let result = ScopeResolver.TESTS[prop](...args);
     return isLegacyNegation ? !result : result;
@@ -341,17 +355,17 @@ class ScopeResolver {
   }
 
   warnAboutExceededRange(range, capture) {
-    let msg = ['Cannot extend past original range of capture!'];
+    let msg = ["Cannot extend past original range of capture!"];
 
     msg.push(`Scope name: ${capture.name}`);
     msg.push(`Original range: ${rangeSpecToString(capture.node)}`);
     msg.push(`Adjusted range: ${rangeSpecToString(range)}`);
 
     if (atom.inDevMode()) {
-      throw new Error(msg.join('\n'));
+      throw new Error(msg.join("\n"));
     }
 
-    console.warn(msg.join('\n'));
+    console.warn(msg.join("\n"));
   }
 
   // Given a capture and possible predicate data, determines the buffer range
@@ -362,13 +376,15 @@ class ScopeResolver {
     // `startIndex`, and `endIndex`. Any single node can thus fulfill this
     // contract, but so can a plain object of our own construction.
     let { setProperties: props = {} } = capture;
-    if (!this.adjustsCaptureRange(capture)) { return capture.node; }
+    if (!this.adjustsCaptureRange(capture)) {
+      return capture.node;
+    }
 
     let range = {
       startPosition: capture.node.startPosition,
       startIndex: capture.node.startIndex,
       endPosition: capture.node.endPosition,
-      endIndex: capture.node.endIndex
+      endIndex: capture.node.endIndex,
     };
 
     for (let key in props) {
@@ -382,7 +398,9 @@ class ScopeResolver {
 
         // If any single adjustment returns `null`, we shouldn't store this
         // capture.
-        if (range === null) { return null; }
+        if (range === null) {
+          return null;
+        }
       }
     }
 
@@ -392,13 +410,14 @@ class ScopeResolver {
 
     // Any invalidity in the returned range means we shouldn't store this
     // capture.
-    if (!this.isValidRange(range)) { return null; }
+    if (!this.isValidRange(range)) {
+      return null;
+    }
     return range;
   }
 
   isFinal(existingData = {}) {
-    return ('capture.final' in existingData) ||
-      ('final' in existingData);
+    return "capture.final" in existingData || "final" in existingData;
   }
 
   // Given a syntax capture, test whether we should include its scope in the
@@ -408,7 +427,7 @@ class ScopeResolver {
       node,
       setProperties: props = {},
       assertedProperties: asserted = {},
-      refutedProperties: refuted = {}
+      refutedProperties: refuted = {},
     } = capture;
 
     if (this.isFinal(existingData)) {
@@ -424,7 +443,9 @@ class ScopeResolver {
     for (let key in props) {
       let isCaptureSettingProperty = this.capturePropertyIsCaptureSetting(key);
       let isTest = this.capturePropertyIsTest(key);
-      if (!(isCaptureSettingProperty || isTest)) { continue; }
+      if (!(isCaptureSettingProperty || isTest)) {
+        continue;
+      }
       let value = props[key] ?? true;
       if (isCaptureSettingProperty) {
         if (!this.applyCaptureSettingProperty(key, node, existingData, this)) {
@@ -441,7 +462,9 @@ class ScopeResolver {
 
     // Apply tests of the form `(#is? foo)`.
     for (let key in asserted) {
-      if (!this.capturePropertyIsTest(key)) { continue; }
+      if (!this.capturePropertyIsTest(key)) {
+        continue;
+      }
       let value = asserted[key] ?? true;
       let result = this.applyTest(key, node, value, existingData, this);
       if (!result) return false;
@@ -449,7 +472,9 @@ class ScopeResolver {
 
     // Apply tests of the form `(#is-not? foo)`.
     for (let key in refuted) {
-      if (!this.capturePropertyIsTest(key)) { continue; }
+      if (!this.capturePropertyIsTest(key)) {
+        continue;
+      }
       let value = refuted[key] ?? true;
       let result = this.applyTest(key, node, value, existingData, this);
       if (result) return false;
@@ -466,11 +491,7 @@ class ScopeResolver {
   // Will return `false` if the scope should not be added for the given range;
   // otherwise will return the computed range.
   store(capture) {
-    let {
-      node,
-      name,
-      setProperties: props = {}
-    } = capture;
+    let { node, name, setProperties: props = {} } = capture;
 
     name = ScopeResolver.interpolateName(name, node);
 
@@ -492,7 +513,7 @@ class ScopeResolver {
       this.setDataForRange(range, props);
     }
 
-    if (name === '_IGNORE_' || name.startsWith('_IGNORE_.')) {
+    if (name === "_IGNORE_" || name.startsWith("_IGNORE_.")) {
       // "@_IGNORE_" is a magical variable in an SCM file that will not be
       // applied in the grammar, but which allows us to prevent other kinds of
       // scopes from matching. We purposefully allowed this syntax node to set
@@ -520,19 +541,13 @@ class ScopeResolver {
     // ignored.
     let isEmpty = comparePoints(range.startPosition, range.endPosition) === 0;
 
-    let id = this.idForScope(
-      name,
-      node.childCount === 0 ? node.text : undefined,
-    );
+    let id = this.idForScope(name, node.childCount === 0 ? node.text : undefined);
 
-    let {
-      startPosition: start,
-      endPosition: end
-    } = range;
+    let { startPosition: start, endPosition: end } = range;
 
     if (!isEmpty) {
-      this.setBoundary(start, id, 'open');
-      this.setBoundary(end, id, 'close');
+      this.setBoundary(start, id, "open");
+      this.setBoundary(end, id, "close");
     }
 
     return range;
@@ -541,8 +556,8 @@ class ScopeResolver {
   setBoundary(point, id, which, { root = false } = {}) {
     let key = this._keyForPoint(point);
 
-      if (!this.boundaries.has(key)) {
-      this.boundaries.set(key, { open: [], close: [] })
+    if (!this.boundaries.has(key)) {
+      this.boundaries.set(key, { open: [], close: [] });
     }
 
     let bundle = this.boundaries.get(key);
@@ -553,16 +568,22 @@ class ScopeResolver {
     // `root` is a way of opting out of this behavior and asserting that a
     // scope added later is more important. We use this to add the language's
     // root scope if needed.
-    if (which === 'open') {
+    if (which === "open") {
       // If an earlier token has already opened at this point, we want to open
       // after it.
-      if (root) { idBundle.unshift(id); }
-      else { idBundle.push(id); }
+      if (root) {
+        idBundle.unshift(id);
+      } else {
+        idBundle.push(id);
+      }
     } else {
       // If an earlier token has already closed at this point, we want to close
       // before it.
-      if (root) { idBundle.push(id); }
-      else { idBundle.unshift(id); }
+      if (root) {
+        idBundle.push(id);
+      } else {
+        idBundle.unshift(id);
+      }
     }
   }
 
@@ -588,22 +609,19 @@ class ScopeResolver {
   }
 }
 
-
 // Scope names can mark themselves with `TEXT` to interpolate the node's text
 // into the capture, or `TYPE` to interpolate the anonymous node's type.
 ScopeResolver.interpolateName = (name, node) => {
   // Only interpolate `_TEXT_` if we know the text has no spaces. Spaces are
   // not valid in scope names.
-  if (name.includes('_TEXT_') &&
-   !node.text.includes(' ')) {
-    name = name.replace('_TEXT_', node.text);
+  if (name.includes("_TEXT_") && !node.text.includes(" ")) {
+    name = name.replace("_TEXT_", node.text);
   }
-  if (name.includes('_TYPE_')) {
-    name = name.replace('_TYPE_', node.type);
+  if (name.includes("_TYPE_")) {
+    name = name.replace("_TYPE_", node.type);
   }
   return name;
 };
-
 
 // Special `#set!` predicates that work on “claimed” and “unclaimed” ranges.
 ScopeResolver.CAPTURE_SETTINGS = {
@@ -613,15 +631,14 @@ ScopeResolver.CAPTURE_SETTINGS = {
   // define `final` or not.
   final(_node, existingData) {
     if (!existingData) return true;
-    return !('capture.final' in existingData) && !('final' in existingData);
+    return !("capture.final" in existingData) && !("final" in existingData);
   },
 
   // Passes only if no earlier capture has occurred for the exact same range.
   shy(_node, existingData) {
     return existingData === undefined;
-  }
+  },
 };
-
 
 // These tests are used to define criteria under which the scope should be
 // applied. Set them in a query file like so:
@@ -648,13 +665,14 @@ ScopeResolver.CAPTURE_SETTINGS = {
 //
 
 ScopeResolver.TESTS = {
-
   // Passes only if the node is of the given type. Can accept multiple
   // space-separated types.
   type(node, nodeType) {
-    if (!nodeType.includes(' ')) { return node.type === nodeType }
+    if (!nodeType.includes(" ")) {
+      return node.type === nodeType;
+    }
     let nodeTypes = nodeType.split(/\s+/);
-    return nodeTypes.some(t => t === node.type);
+    return nodeTypes.some((t) => t === node.type);
   },
 
   // Passes only if the node contains any descendant ERROR nodes.
@@ -678,7 +696,9 @@ ScopeResolver.TESTS = {
   // Is not guaranteed to pass if descended from an ERROR node.
   first(node) {
     // Root nodes are always first.
-    if (!node.parent) { return true; }
+    if (!node.parent) {
+      return true;
+    }
 
     // We're really paranoid on these because if the parse tree is in an error
     // state, weird things can happen, like a node's parent not having a
@@ -691,7 +711,9 @@ ScopeResolver.TESTS = {
   // Is not guaranteed to pass if descended from an ERROR node.
   last(node) {
     // Root nodes are always last.
-    if (!node.parent) { return true; }
+    if (!node.parent) {
+      return true;
+    }
     return node?.parent?.lastChild?.id === node.id;
   },
 
@@ -699,17 +721,26 @@ ScopeResolver.TESTS = {
   //
   // Is not guaranteed to pass if descended from an ERROR node.
   firstOfType(node) {
-    if (!node.parent) { return true; }
+    if (!node.parent) {
+      return true;
+    }
     let type = node.type;
     let parent = node.parent;
     // Lots of optional chaining here to guard against weird states inside
     // ERROR nodes.
-    if ((parent?.childCount ?? 0) === 0) { return false; }
+    if ((parent?.childCount ?? 0) === 0) {
+      return false;
+    }
     for (let i = 0; i < parent.childCount; i++) {
       let child = parent?.child(i);
-      if (!child) { continue; }
-      if (child?.id === node.id) { return true; }
-      else if (child?.type === type) { return false; }
+      if (!child) {
+        continue;
+      }
+      if (child?.id === node.id) {
+        return true;
+      } else if (child?.type === type) {
+        return false;
+      }
     }
     return false;
   },
@@ -718,15 +749,24 @@ ScopeResolver.TESTS = {
   //
   // Is not guaranteed to pass if descended from an ERROR node.
   lastOfType(node) {
-    if (!node.parent) { return true; }
+    if (!node.parent) {
+      return true;
+    }
     let type = node.type;
     let parent = node.parent;
-    if ((parent?.childCount ?? 0) === 0) { return false; }
+    if ((parent?.childCount ?? 0) === 0) {
+      return false;
+    }
     for (let i = parent.childCount - 1; i >= 0; i--) {
       let child = parent?.child(i);
-      if (!child) { continue; }
-      if (child?.id === node.id) { return true; }
-      else if (child?.type === type) { return false; }
+      if (!child) {
+        continue;
+      }
+      if (child?.id === node.id) {
+        return true;
+      } else if (child?.type === type) {
+        return false;
+      }
     }
     return false;
   },
@@ -752,13 +792,16 @@ ScopeResolver.TESTS = {
   // Passes if this node has any node of the given type(s) in its ancestor
   // chain.
   descendantOfType(node, type) {
-    let multiple = type.includes(' ');
+    let multiple = type.includes(" ");
     let target = multiple ? type.split(/\s+/) : type;
     let current = node;
     while (current.parent) {
       current = current.parent;
-      if (multiple && target.includes(current.type)) { return true; }
-      else if (!multiple && target === current.type) { return true; }
+      if (multiple && target.includes(current.type)) {
+        return true;
+      } else if (!multiple && target === current.type) {
+        return true;
+      }
     }
     return false;
   },
@@ -768,7 +811,7 @@ ScopeResolver.TESTS = {
   // Only rarely needed, but may be useful when dealing with ERROR nodes.
   childOfType(node, type) {
     if (!node.parent) return false;
-    let multiple = type.includes(' ');
+    let multiple = type.includes(" ");
     let target = multiple ? type.split(/\s+/) : type;
     return multiple ? target.includes(node.parent.type) : node.parent.type === type;
   },
@@ -779,19 +822,23 @@ ScopeResolver.TESTS = {
   // first.
   ancestorTypeNearerThan(node, types) {
     let [target, ...rejected] = types.split(/\s+/);
-    rejected = new Set(rejected)
+    rejected = new Set(rejected);
     let current = node;
     while (current.parent) {
       current = current.parent;
-      if (rejected.has(current.type)) { return false; }
-      if (target === current.type) { return true; }
+      if (rejected.has(current.type)) {
+        return false;
+      }
+      if (target === current.type) {
+        return true;
+      }
     }
     return false;
   },
 
   // Passes if this node has at least one descendant of the given type(s).
   ancestorOfType(node, type) {
-    let target = type.includes(' ') ? type.split(/\s+/) : type;
+    let target = type.includes(" ") ? type.split(/\s+/) : type;
     let descendants = node.descendantsOfType(target);
     return descendants.length > 0;
   },
@@ -801,9 +848,9 @@ ScopeResolver.TESTS = {
   // Only rarely needed, but may be useful when dealing with ERROR nodes.
   parentOfType(node, type) {
     if (node.childCount === 0) return false;
-    let multiple = type.includes(' ');
+    let multiple = type.includes(" ");
     let target = multiple ? type.split(/\s+/) : type;
-    return node.children.some(c => {
+    return node.children.some((c) => {
       return multiple ? target.includes(c.type) : c.type === target;
     });
   },
@@ -811,15 +858,17 @@ ScopeResolver.TESTS = {
   // Passes if this range (after adjustments) has previously had data stored at
   // the given key.
   rangeWithData(_node, rawValue, existingData) {
-    if (existingData === undefined) { return false; }
+    if (existingData === undefined) {
+      return false;
+    }
     let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
 
     // Invalid predicates should be ignored.
-    if (!key) { return true; }
+    if (!key) {
+      return true;
+    }
 
-    return (value !== null) ?
-      existingData[key] === value :
-      (key in existingData);
+    return value !== null ? existingData[key] === value : key in existingData;
   },
 
   // Passes if one of this node's ancestors has stored data at the given key
@@ -829,14 +878,20 @@ ScopeResolver.TESTS = {
     let [key, value] = interpretPossibleKeyValuePair(rawValue, false);
 
     // Invalid predicates should be ignored.
-    if (!key) { return true; }
+    if (!key) {
+      return true;
+    }
 
     while (current.parent) {
       current = current.parent;
       let data = instance.getDataForRange(current);
-      if (data === undefined) { continue; }
-      let passes = (value !== null) ? data[key] === value : (key in data);
-      if (passes) { return true; }
+      if (data === undefined) {
+        continue;
+      }
+      let passes = value !== null ? data[key] === value : key in data;
+      if (passes) {
+        return true;
+      }
     }
     return false;
   },
@@ -845,7 +900,7 @@ ScopeResolver.TESTS = {
   // position. Accepts a node position descriptor.
   startsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
-    if (!otherNodePosition) return false
+    if (!otherNodePosition) return false;
     return otherNodePosition.row === node.startPosition.row;
   },
 
@@ -853,7 +908,7 @@ ScopeResolver.TESTS = {
   // position. Accepts a node position descriptor.
   endsOnSameRowAs(node, descriptor) {
     let otherNodePosition = resolveNodePosition(node, descriptor);
-    if (!otherNodePosition) return false
+    if (!otherNodePosition) return false;
     return otherNodePosition.row === node.endPosition.row;
   },
 
@@ -864,11 +919,13 @@ ScopeResolver.TESTS = {
     let [key, value] = interpretPossibleKeyValuePair(rawValue, true);
 
     // Invalid predicates should be ignored.
-    if (!key) { return true; }
+    if (!key) {
+      return true;
+    }
 
     let configValue = instance.getConfig(key) ?? false;
     return value === null ? !!configValue : configValue === value;
-  }
+  },
 };
 
 // Usually, we want to map a scope to the exact range of a node in the tree,
@@ -886,7 +943,9 @@ ScopeResolver.ADJUSTMENTS = {
   // Alter the given range to start at the start or end of a different node.
   startAt(node, value, range, resolver) {
     let start = resolveNodePosition(node, value);
-    if (!start) { return null; }
+    if (!start) {
+      return null;
+    }
 
     range.startPosition = start;
     range.startIndex = resolver.positionToIndex(range.startPosition);
@@ -896,7 +955,9 @@ ScopeResolver.ADJUSTMENTS = {
   // Alter the given range to end at the start or end of a different node.
   endAt(node, value, range, resolver) {
     let end = resolveNodePosition(node, value);
-    if (!end) { return null; }
+    if (!end) {
+      return null;
+    }
 
     range.endPosition = end;
     range.endIndex = resolver.positionToIndex(range.endPosition);
@@ -907,7 +968,9 @@ ScopeResolver.ADJUSTMENTS = {
   // direction. Can act after other range alterations.
   offsetStart(node, value, range, resolver) {
     let offset = Number(value);
-    if (isNaN(offset)) { return null; }
+    if (isNaN(offset)) {
+      return null;
+    }
     let { startPosition } = range;
 
     let offsetPosition = resolver.adjustPositionByOffset(startPosition, offset);
@@ -923,7 +986,9 @@ ScopeResolver.ADJUSTMENTS = {
   // direction. Can act after other range alterations.
   offsetEnd(node, value, range, resolver) {
     let offset = Number(value);
-    if (isNaN(offset)) { return null; }
+    if (isNaN(offset)) {
+      return null;
+    }
     let { endPosition } = range;
 
     let offsetPosition = resolver.adjustPositionByOffset(endPosition, offset);
@@ -941,15 +1006,15 @@ ScopeResolver.ADJUSTMENTS = {
   startAndEndAroundFirstMatchOf(node, value, position, resolver) {
     let regex = resolver.getOrCompilePattern(value);
     let match = node.text.match(regex);
-    if (!match) { return null; }
+    if (!match) {
+      return null;
+    }
     let oldStartPosition = { ...node.startPosition };
     let startOffset = match.index;
     let endOffset = match.index + match[0].length;
 
-    position.startPosition = resolver.adjustPositionByOffset(
-      oldStartPosition, startOffset);
-    position.endPosition = resolver.adjustPositionByOffset(
-      oldStartPosition, endOffset);
+    position.startPosition = resolver.adjustPositionByOffset(oldStartPosition, startOffset);
+    position.endPosition = resolver.adjustPositionByOffset(oldStartPosition, endOffset);
 
     position.startIndex = resolver.positionToIndex(position.startPosition);
     position.endIndex = resolver.positionToIndex(position.endPosition);
@@ -964,13 +1029,14 @@ ScopeResolver.ADJUSTMENTS = {
     let regex = resolver.getOrCompilePattern(value);
     let match = node.text.match(regex);
 
-    if (!match) { return null; }
+    if (!match) {
+      return null;
+    }
     let oldStartPosition = { ...node.startPosition };
 
     let startOffset = match.index;
 
-    position.startPosition = resolver.adjustPositionByOffset(
-      oldStartPosition, startOffset);
+    position.startPosition = resolver.adjustPositionByOffset(oldStartPosition, startOffset);
     position.startIndex = resolver.positionToIndex(position.startPosition);
 
     return position;
@@ -983,13 +1049,14 @@ ScopeResolver.ADJUSTMENTS = {
     let regex = resolver.getOrCompilePattern(value);
     let match = node.text.match(regex);
 
-    if (!match) { return null; }
+    if (!match) {
+      return null;
+    }
     let oldStartPosition = { ...node.startPosition };
 
     let startOffset = match.index + match[0].length;
 
-    position.startPosition = resolver.adjustPositionByOffset(
-      oldStartPosition, startOffset);
+    position.startPosition = resolver.adjustPositionByOffset(oldStartPosition, startOffset);
     position.startIndex = resolver.positionToIndex(position.startPosition);
 
     return position;
@@ -1002,12 +1069,13 @@ ScopeResolver.ADJUSTMENTS = {
     let regex = resolver.getOrCompilePattern(value);
     let match = node.text.match(regex);
 
-    if (!match) { return null; }
+    if (!match) {
+      return null;
+    }
     let oldStartPosition = { ...node.startPosition };
     let endOffset = match.index;
 
-    position.endPosition = resolver.adjustPositionByOffset(
-      oldStartPosition, endOffset);
+    position.endPosition = resolver.adjustPositionByOffset(oldStartPosition, endOffset);
     position.endIndex = resolver.positionToIndex(position.endPosition);
 
     return position;
@@ -1020,21 +1088,21 @@ ScopeResolver.ADJUSTMENTS = {
     let regex = resolver.getOrCompilePattern(value);
     let match = node.text.match(regex);
 
-    if (!match) { return null; }
+    if (!match) {
+      return null;
+    }
     let oldStartPosition = { ...node.startPosition };
     let endOffset = match.index + match[0].length;
 
-    position.endPosition = resolver.adjustPositionByOffset(
-      oldStartPosition, endOffset);
+    position.endPosition = resolver.adjustPositionByOffset(oldStartPosition, endOffset);
     position.endIndex = resolver.positionToIndex(position.endPosition);
 
     return position;
-  }
+  },
 };
 
 ScopeResolver.clearConfigCache = () => {
   ConfigCache.clear();
 };
-
 
 module.exports = ScopeResolver;

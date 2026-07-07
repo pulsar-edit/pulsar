@@ -1,6 +1,7 @@
 @import "octicon-mixins.less"; // https://github.com/atom/atom/blob/master/static/variables/octicon-mixins.less
 
-.list-group, .list-tree {
+.list-group,
+.list-tree {
   li:not(.list-nested-item),
   li.list-nested-item > .list-item {
     .text(normal);
@@ -46,7 +47,9 @@
 .select-list ol.list-group,
 &.select-list ol.list-group {
   li.two-lines {
-    .secondary-line { color: @text-color-subtle; }
+    .secondary-line {
+      color: @text-color-subtle;
+    }
     &.selected .secondary-line {
       color: @text-color;
       text-shadow: none;
@@ -57,21 +60,24 @@
   // know their size.
   li.selected {
     background-color: @background-color-selected;
-    &:before{ display: none; }
+    &:before {
+      display: none;
+    }
   }
 
-  &.mark-active{
+  &.mark-active {
     @active-icon-size: 14px;
 
     // pad in front of the text where the icon would be We'll pad the non-
     // active items with a 'fake' icon so other classes can pad the item
     // without worrying about the icon padding.
     li:before {
-      content: '';
+      content: "";
       background-color: transparent;
       position: static;
       display: inline-block;
-      left: auto; right: auto;
+      left: auto;
+      right: auto;
       height: @active-icon-size;
       width: @active-icon-size;
     }
@@ -91,16 +97,16 @@
 .select-list.popover-list {
   background-color: @overlay-background-color;
   box-shadow: 0 0 10px @base-border-color;
-  padding: (@component-padding/2);
+  padding: (@component-padding / 2);
   border-radius: @component-border-radius;
   border: 1px solid @overlay-border-color;
 
   atom-text-editor {
-    margin-bottom: (@component-padding/2);
+    margin-bottom: (@component-padding / 2);
   }
 
   .list-group li {
-    padding-left: (@component-padding/2);
+    padding-left: (@component-padding / 2);
   }
 }
 
@@ -116,7 +122,8 @@
   }
 }
 
-li.ui-draggable-dragging, li.ui-sortable-helper {
+li.ui-draggable-dragging,
+li.ui-sortable-helper {
   line-height: @component-line-height;
   height: @component-line-height;
   border: 0;

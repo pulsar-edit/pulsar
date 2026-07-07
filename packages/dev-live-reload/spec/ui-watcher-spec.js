@@ -1,35 +1,31 @@
-const path = require('path');
+const path = require("path");
 
-const UIWatcher = require('../lib/ui-watcher');
+const UIWatcher = require("../lib/ui-watcher");
 
-const { conditionPromise, timeoutPromise: wait } = require('./async-spec-helpers');
+const { conditionPromise, timeoutPromise: wait } = require("./async-spec-helpers");
 
-describe('UIWatcher', () => {
+describe("UIWatcher", () => {
   let uiWatcher = null;
 
-  beforeEach(() =>
-    atom.packages.packageDirPaths.push(path.join(__dirname, 'fixtures'))
-  );
+  beforeEach(() => atom.packages.packageDirPaths.push(path.join(__dirname, "fixtures")));
 
   afterEach(() => uiWatcher && uiWatcher.destroy());
 
   describe("when a base theme's file changes", () => {
     beforeEach(() => {
-      spyOn(atom.themes, 'resolveStylesheet').andReturn(
-        path.join(__dirname, 'fixtures', 'static', 'atom.less')
+      spyOn(atom.themes, "resolveStylesheet").andReturn(
+        path.join(__dirname, "fixtures", "static", "atom.less"),
       );
       uiWatcher = new UIWatcher();
     });
 
-    it('reloads all the base styles', async () => {
+    it("reloads all the base styles", async () => {
       jasmine.useRealClock();
-      spyOn(atom.themes, 'reloadBaseStylesheets');
+      spyOn(atom.themes, "reloadBaseStylesheets");
 
-      expect(uiWatcher.baseTheme.entities[0].getPath()).toContain(
-        `${path.sep}static${path.sep}`
-      );
+      expect(uiWatcher.baseTheme.entities[0].getPath()).toContain(`${path.sep}static${path.sep}`);
 
-      uiWatcher.baseTheme.entities[0].emitter.emit('did-change');
+      uiWatcher.baseTheme.entities[0].emitter.emit("did-change");
       await conditionPromise(() => {
         return atom.themes.reloadBaseStylesheets.callCount > 0;
       });
@@ -37,11 +33,7 @@ describe('UIWatcher', () => {
   });
 
   it("watches all the style sheets in the theme's styles folder", async () => {
-    const packagePath = path.join(
-      __dirname,
-      'fixtures',
-      'package-with-styles-folder'
-    );
+    const packagePath = path.join(__dirname, "fixtures", "package-with-styles-folder");
 
     await atom.packages.activatePackage(packagePath);
     uiWatcher = new UIWatcher();
@@ -49,81 +41,74 @@ describe('UIWatcher', () => {
     const lastWatcher = uiWatcher.watchers[uiWatcher.watchers.length - 1];
 
     expect(lastWatcher.entities.length).toBe(4);
-    expect(lastWatcher.entities[0].getPath()).toBe(
-      path.join(packagePath, 'styles')
-    );
-    expect(lastWatcher.entities[1].getPath()).toBe(
-      path.join(packagePath, 'styles', '3.css')
-    );
+    expect(lastWatcher.entities[0].getPath()).toBe(path.join(packagePath, "styles"));
+    expect(lastWatcher.entities[1].getPath()).toBe(path.join(packagePath, "styles", "3.css"));
     expect(lastWatcher.entities[2].getPath()).toBe(
-      path.join(packagePath, 'styles', 'sub', '1.css')
+      path.join(packagePath, "styles", "sub", "1.css"),
     );
     expect(lastWatcher.entities[3].getPath()).toBe(
-      path.join(packagePath, 'styles', 'sub', '2.less')
+      path.join(packagePath, "styles", "sub", "2.less"),
     );
   });
 
-  describe('when a package stylesheet file changes', async () => {
+  describe("when a package stylesheet file changes", async () => {
     beforeEach(async () => {
       await atom.packages.activatePackage(
-        path.join(__dirname, 'fixtures', 'package-with-styles-manifest')
+        path.join(__dirname, "fixtures", "package-with-styles-manifest"),
       );
       uiWatcher = new UIWatcher();
     });
 
-    it('reloads all package styles', async () => {
+    it("reloads all package styles", async () => {
       jasmine.useRealClock();
       const pack = atom.packages.getActivePackages()[0];
-      spyOn(pack, 'reloadStylesheets');
+      spyOn(pack, "reloadStylesheets");
 
-      uiWatcher.watchers[
-        uiWatcher.watchers.length - 1
-      ].entities[1].emitter.emit('did-change');
+      uiWatcher.watchers[uiWatcher.watchers.length - 1].entities[1].emitter.emit("did-change");
       await conditionPromise(() => pack.reloadStylesheets.callCount > 0);
 
       expect(pack.reloadStylesheets).toHaveBeenCalled();
     });
   });
 
-  describe('when a package does not have a stylesheet', () => {
+  describe("when a package does not have a stylesheet", () => {
     beforeEach(async () => {
-      await atom.packages.activatePackage('package-with-index');
+      await atom.packages.activatePackage("package-with-index");
       uiWatcher = new UIWatcher();
     });
 
-    it('does not create a PackageWatcher', () => {
-      expect(uiWatcher.watchedPackages['package-with-index']).toBeUndefined();
+    it("does not create a PackageWatcher", () => {
+      expect(uiWatcher.watchedPackages["package-with-index"]).toBeUndefined();
     });
   });
 
-  describe('when a package global file changes', () => {
+  describe("when a package global file changes", () => {
     beforeEach(async () => {
       jasmine.useRealClock();
-      atom.config.set('core.themes', [
-        'theme-with-ui-variables',
-        'theme-with-multiple-imported-files'
+      atom.config.set("core.themes", [
+        "theme-with-ui-variables",
+        "theme-with-multiple-imported-files",
       ]);
 
-      console.log('awaiting…');
+      console.log("awaiting…");
       await atom.themes.activateThemes();
-      console.log('…awaited.');
+      console.log("…awaited.");
       uiWatcher = new UIWatcher();
     });
 
     afterEach(() => atom.themes.deactivateThemes());
 
-    it('reloads every package when the variables file changes', async () => {
+    it("reloads every package when the variables file changes", async () => {
       let varEntity;
       for (const theme of atom.themes.getActiveThemes()) {
-        spyOn(theme, 'reloadStylesheets');
+        spyOn(theme, "reloadStylesheets");
       }
 
-      for (const entity of uiWatcher.watchedThemes.get(
-        'theme-with-multiple-imported-files'
-      ).entities) {
-        if (entity.getPath().indexOf('variables') > -1) varEntity = entity;
+      for (const entity of uiWatcher.watchedThemes.get("theme-with-multiple-imported-files")
+        .entities) {
+        if (entity.getPath().indexOf("variables") > -1) varEntity = entity;
       }
-      varEntity.emitter.emit('did-change');
+      varEntity.emitter.emit("did-change");
       await conditionPromise(() => {
         return atom.themes.getActiveThemes().every((t) => {
           return t.reloadStylesheets.callCount > 0;
@@ -132,59 +117,50 @@ describe('UIWatcher', () => {
     });
   });
 
-  describe('watcher lifecycle', () => {
-    it('starts watching a package if it is activated after initial startup', async () => {
+  describe("watcher lifecycle", () => {
+    it("starts watching a package if it is activated after initial startup", async () => {
       uiWatcher = new UIWatcher();
       expect(uiWatcher.watchedPackages.size).toBe(0);
 
       await atom.packages.activatePackage(
-        path.join(__dirname, 'fixtures', 'package-with-styles-folder')
+        path.join(__dirname, "fixtures", "package-with-styles-folder"),
       );
-      expect(
-        uiWatcher.watchedPackages.get('package-with-styles-folder')
-      ).not.toBeUndefined();
+      expect(uiWatcher.watchedPackages.get("package-with-styles-folder")).not.toBeUndefined();
     });
 
-    it('unwatches a package after it is deactivated', async () => {
+    it("unwatches a package after it is deactivated", async () => {
       await atom.packages.activatePackage(
-        path.join(__dirname, 'fixtures', 'package-with-styles-folder')
+        path.join(__dirname, "fixtures", "package-with-styles-folder"),
       );
       uiWatcher = new UIWatcher();
-      const watcher = uiWatcher.watchedPackages.get(
-        'package-with-styles-folder'
-      );
+      const watcher = uiWatcher.watchedPackages.get("package-with-styles-folder");
       expect(watcher).not.toBeUndefined();
 
-      const watcherDestructionSpy = jasmine.createSpy('watcher-on-did-destroy');
+      const watcherDestructionSpy = jasmine.createSpy("watcher-on-did-destroy");
       watcher.onDidDestroy(watcherDestructionSpy);
 
-      await atom.packages.deactivatePackage('package-with-styles-folder');
-      expect(
-        uiWatcher.watchedPackages.get('package-with-styles-folder')
-      ).toBeUndefined();
+      await atom.packages.deactivatePackage("package-with-styles-folder");
+      expect(uiWatcher.watchedPackages.get("package-with-styles-folder")).toBeUndefined();
       expect(uiWatcher.watchedPackages.size).toBe(0);
       expect(watcherDestructionSpy).toHaveBeenCalled();
     });
 
-    it('does not watch activated packages after the UI watcher has been destroyed', async () => {
+    it("does not watch activated packages after the UI watcher has been destroyed", async () => {
       uiWatcher = new UIWatcher();
       uiWatcher.destroy();
 
       await atom.packages.activatePackage(
-        path.join(__dirname, 'fixtures', 'package-with-styles-folder')
+        path.join(__dirname, "fixtures", "package-with-styles-folder"),
       );
       expect(uiWatcher.watchedPackages.size).toBe(0);
     });
   });
 
-  describe('minimal theme packages', () => {
+  describe("minimal theme packages", () => {
     let pack = null;
     beforeEach(async () => {
       jasmine.useRealClock();
-      atom.config.set('core.themes', [
-        'theme-with-syntax-variables',
-        'theme-with-index-less'
-      ]);
+      atom.config.set("core.themes", ["theme-with-syntax-variables", "theme-with-index-less"]);
       await atom.themes.activateThemes();
       uiWatcher = new UIWatcher();
       pack = atom.themes.getActiveThemes()[0];
@@ -196,27 +172,27 @@ describe('UIWatcher', () => {
       await wait(50);
     });
 
-    it('watches themes without a styles directory', async () => {
-      spyOn(pack, 'reloadStylesheets');
-      spyOn(atom.themes, 'reloadBaseStylesheets');
+    it("watches themes without a styles directory", async () => {
+      spyOn(pack, "reloadStylesheets");
+      spyOn(atom.themes, "reloadBaseStylesheets");
 
-      const watcher = uiWatcher.watchedThemes.get('theme-with-index-less');
+      const watcher = uiWatcher.watchedThemes.get("theme-with-index-less");
 
       expect(watcher.entities.length).toBe(1);
 
-      watcher.entities[0].emitter.emit('did-change');
+      watcher.entities[0].emitter.emit("did-change");
       await conditionPromise(() => pack.reloadStylesheets.callCount > 0);
       expect(atom.themes.reloadBaseStylesheets).not.toHaveBeenCalled();
     });
   });
 
-  describe('theme packages', () => {
+  describe("theme packages", () => {
     let pack = null;
     beforeEach(async () => {
       jasmine.useRealClock();
-      atom.config.set('core.themes', [
-        'theme-with-syntax-variables',
-        'theme-with-multiple-imported-files'
+      atom.config.set("core.themes", [
+        "theme-with-syntax-variables",
+        "theme-with-multiple-imported-files",
       ]);
 
       await atom.themes.activateThemes();
@@ -226,52 +202,43 @@ describe('UIWatcher', () => {
 
     afterEach(() => atom.themes.deactivateThemes());
 
-    it('reloads the theme when anything within the theme changes', async () => {
-      spyOn(pack, 'reloadStylesheets');
-      spyOn(atom.themes, 'reloadBaseStylesheets');
+    it("reloads the theme when anything within the theme changes", async () => {
+      spyOn(pack, "reloadStylesheets");
+      spyOn(atom.themes, "reloadBaseStylesheets");
 
-      const watcher = uiWatcher.watchedThemes.get(
-        'theme-with-multiple-imported-files'
-      );
+      const watcher = uiWatcher.watchedThemes.get("theme-with-multiple-imported-files");
 
       expect(watcher.entities.length).toBe(6);
 
-      watcher.entities[2].emitter.emit('did-change');
+      watcher.entities[2].emitter.emit("did-change");
       await wait(20);
       expect(pack.reloadStylesheets).toHaveBeenCalled();
       expect(atom.themes.reloadBaseStylesheets).not.toHaveBeenCalled();
 
-      watcher.entities[watcher.entities.length - 1].emitter.emit('did-change');
+      watcher.entities[watcher.entities.length - 1].emitter.emit("did-change");
       await conditionPromise(() => atom.themes.reloadBaseStylesheets.callCount > 0);
     });
 
-    it('unwatches when a theme is deactivated', async () => {
+    it("unwatches when a theme is deactivated", async () => {
       jasmine.useRealClock();
 
-      atom.config.set('core.themes', []);
-      await conditionPromise(
-        () => !uiWatcher.watchedThemes['theme-with-multiple-imported-files']
-      );
+      atom.config.set("core.themes", []);
+      await conditionPromise(() => !uiWatcher.watchedThemes["theme-with-multiple-imported-files"]);
     });
 
-    it('watches a new theme when it is deactivated', async () => {
+    it("watches a new theme when it is deactivated", async () => {
       jasmine.useRealClock();
 
-      atom.config.set('core.themes', [
-        'theme-with-syntax-variables',
-        'theme-with-package-file'
-      ]);
-      await conditionPromise(() =>
-        uiWatcher.watchedThemes.get('theme-with-package-file')
-      );
+      atom.config.set("core.themes", ["theme-with-syntax-variables", "theme-with-package-file"]);
+      await conditionPromise(() => uiWatcher.watchedThemes.get("theme-with-package-file"));
 
       pack = atom.themes.getActiveThemes()[0];
-      spyOn(pack, 'reloadStylesheets');
+      spyOn(pack, "reloadStylesheets");
 
-      expect(pack.name).toBe('theme-with-package-file');
+      expect(pack.name).toBe("theme-with-package-file");
 
-      const watcher = uiWatcher.watchedThemes.get('theme-with-package-file');
-      watcher.entities[2].emitter.emit('did-change');
+      const watcher = uiWatcher.watchedThemes.get("theme-with-package-file");
+      watcher.entities[2].emitter.emit("did-change");
       await conditionPromise(() => pack.reloadStylesheets.callCount > 0);
     });
   });

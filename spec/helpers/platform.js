@@ -1,5 +1,5 @@
-const path = require('path');
-const fs = require('fs-plus');
+const path = require("path");
+const fs = require("fs-plus");
 
 // # Platform specific helpers
 module.exports = {
@@ -14,32 +14,28 @@ module.exports = {
   // Returns nothing.
   generateEvilFiles() {
     let filenames;
-    const evilFilesPath = path.join(__dirname, '..', 'fixtures', 'evil-files');
+    const evilFilesPath = path.join(__dirname, "..", "fixtures", "evil-files");
     if (fs.existsSync(evilFilesPath)) {
       fs.removeSync(evilFilesPath);
     }
     fs.mkdirSync(evilFilesPath);
 
     if (this.isWindows()) {
-      filenames = [
-        'a_file_with_utf8.txt',
-        'file with spaces.txt',
-        'utfa\u0306.md'
-      ];
+      filenames = ["a_file_with_utf8.txt", "file with spaces.txt", "utfa\u0306.md"];
     } else {
       filenames = [
-        'a_file_with_utf8.txt',
-        'file with spaces.txt',
-        'goddam\nnewlines',
+        "a_file_with_utf8.txt",
+        "file with spaces.txt",
+        "goddam\nnewlines",
         'quote".txt',
-        'utfa\u0306.md'
+        "utfa\u0306.md",
       ];
     }
 
-    filenames.map(filename =>
-      fs.writeFileSync(path.join(evilFilesPath, filename), 'evil file!', {
-        flag: 'w'
-      })
+    filenames.map((filename) =>
+      fs.writeFileSync(path.join(evilFilesPath, filename), "evil file!", {
+        flag: "w",
+      }),
     );
-  }
+  },
 };

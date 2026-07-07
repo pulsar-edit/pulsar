@@ -1,7 +1,7 @@
 /** @babel */
 
-const dalek = require('./dalek');
-const Grim = require('grim');
+const dalek = require("./dalek");
+const Grim = require("grim");
 
 module.exports = {
   activate() {
@@ -11,9 +11,9 @@ module.exports = {
         const duplicate = duplicates[i];
         Grim.deprecate(
           `You have the core package "${duplicate}" installed as a community package. See https://github.com/lumine-code/lumine/blob/master/packages/dalek/README.md for how this causes problems and instructions on how to correct the situation.`,
-          { packageName: duplicate }
+          { packageName: duplicate },
         );
       }
     });
-  }
+  },
 };

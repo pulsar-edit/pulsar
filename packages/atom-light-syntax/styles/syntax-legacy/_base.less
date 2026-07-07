@@ -4,28 +4,28 @@
 }
 
 .syntax--string {
-  color: #D14;
+  color: #d14;
 }
 
 // String interpolation in Ruby, CoffeeScript, and others
 .syntax--string {
   .syntax--source,
   .syntax--meta.syntax--embedded.syntax--line {
-    color: #5A5A5A;
+    color: #5a5a5a;
   }
 
   .syntax--punctuation.syntax--section.syntax--embedded {
-    color: #920B2D;
+    color: #920b2d;
 
     .syntax--source {
-      color: #920B2D;  // Required for the end of embedded strings in Ruby #716
+      color: #920b2d; // Required for the end of embedded strings in Ruby #716
     }
   }
 }
 
 .syntax--constant {
   &.syntax--numeric {
-    color: #D14;
+    color: #d14;
   }
 
   &.syntax--language {
@@ -64,7 +64,7 @@
   }
 
   &.syntax--special-method {
-    color: #0086B3;
+    color: #0086b3;
   }
 }
 
@@ -101,7 +101,7 @@
   }
 
   &.syntax--name.syntax--filename.syntax--find-in-files {
-    color: #E6DB74;
+    color: #e6db74;
   }
 }
 
@@ -118,29 +118,32 @@
 }
 
 .syntax--invalid {
-  color: #F8F8F0;
-  background-color: #00A8C6;
+  color: #f8f8f0;
+  background-color: #00a8c6;
 
   &.syntax--deprecated {
-    color: #F8F8F0;
-    background-color: #8FBE00;
+    color: #f8f8f0;
+    background-color: #8fbe00;
   }
 }
 
-
 .syntax--meta {
-  &.syntax--structure.syntax--dictionary.syntax--json > .syntax--string.syntax--quoted.syntax--double.syntax--json,
-  &.syntax--structure.syntax--dictionary.syntax--json > .syntax--string.syntax--quoted.syntax--double.syntax--json .syntax--punctuation.syntax--string {
+  &.syntax--structure.syntax--dictionary.syntax--json
+    > .syntax--string.syntax--quoted.syntax--double.syntax--json,
+  &.syntax--structure.syntax--dictionary.syntax--json
+    > .syntax--string.syntax--quoted.syntax--double.syntax--json
+    .syntax--punctuation.syntax--string {
     color: #000080;
   }
 
-  &.syntax--structure.syntax--dictionary.syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--double.syntax--json {
+  &.syntax--structure.syntax--dictionary.syntax--value.syntax--json
+    > .syntax--string.syntax--quoted.syntax--double.syntax--json {
     color: #d14;
   }
 
   &.syntax--diff,
   &.syntax--diff.syntax--header {
-    color: #75715E;
+    color: #75715e;
   }
 }
 

@@ -1,6 +1,6 @@
 module.exports = { selectorMatchesAnyScope, matcherForSelector };
 
-const { isSubset } = require('underscore-plus');
+const { isSubset } = require("underscore-plus");
 
 // Private: Parse a selector into parts.
 //          If already parsed, returns the selector unmodified.
@@ -8,12 +8,10 @@ const { isSubset } = require('underscore-plus');
 // * `selector` a {String|Array<String>} specifying what to match
 // Returns selector parts, an {Array<String>}.
 function parse(selector) {
-  return typeof selector === 'string'
-    ? selector.replace(/^\./, '').split('.')
-    : selector;
+  return typeof selector === "string" ? selector.replace(/^\./, "").split(".") : selector;
 }
 
-const always = scope => true;
+const always = (scope) => true;
 
 // Essential: Return a matcher function for a selector.
 //
@@ -22,8 +20,8 @@ const always = scope => true;
 // true iff the scope matches the selector.
 function matcherForSelector(selector) {
   const parts = parse(selector);
-  if (typeof parts === 'function') return parts;
-  return selector ? scope => isSubset(parts, parse(scope)) : always;
+  if (typeof parts === "function") return parts;
+  return selector ? (scope) => isSubset(parts, parse(scope)) : always;
 }
 
 // Essential: Return true iff the selector matches any provided scope.

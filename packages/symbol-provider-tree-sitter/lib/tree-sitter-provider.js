@@ -1,5 +1,5 @@
-const CaptureOrganizer = require('./capture-organizer');
-const { Emitter } = require('atom');
+const CaptureOrganizer = require("./capture-organizer");
+const { Emitter } = require("atom");
 
 function layerHasTagsQuery(layer) {
   return layer.queries?.tagsQuery ?? layer.tagsQuery;
@@ -7,15 +7,15 @@ function layerHasTagsQuery(layer) {
 
 class TreeSitterProvider {
   constructor() {
-    this.packageName = 'symbol-provider-tree-sitter';
-    this.name = 'Tree-sitter';
+    this.packageName = "symbol-provider-tree-sitter";
+    this.name = "Tree-sitter";
     this.isExclusive = true;
     this.captureOrganizer = new CaptureOrganizer();
     this.emitter = new Emitter();
-    this.disposable = atom.config.onDidChange('symbol-provider-tree-sitter', () => {
+    this.disposable = atom.config.onDidChange("symbol-provider-tree-sitter", () => {
       // Signal the consumer to clear its cache whenever we change the package
       // config.
-      this.emitter.emit('should-clear-cache', { provider: this });
+      this.emitter.emit("should-clear-cache", { provider: this });
     });
   }
 
@@ -25,14 +25,14 @@ class TreeSitterProvider {
   }
 
   onShouldClearCache(callback) {
-    return this.emitter.on('should-clear-cache', callback);
+    return this.emitter.on("should-clear-cache", callback);
   }
 
   canProvideSymbols(meta) {
     let { editor, type } = meta;
 
     // This provider can't crawl the whole project.
-    if (type === 'project' || type === 'project-find') return false;
+    if (type === "project" || type === "project-find") return false;
 
     // This provider works only for editors with Tree-sitter grammars.
     let languageMode = editor?.getBuffer()?.getLanguageMode();
@@ -75,14 +75,12 @@ class TreeSitterProvider {
       let extent = layer.getExtent();
 
       let tagsQuery = layer.queries?.tagsQuery ?? layer.tagsQuery;
-      let captures = tagsQuery.captures(
-        layer.tree.rootNode,
-        { startPosition: extent.start, endPosition: extent.end }
-      );
+      let captures = tagsQuery.captures(layer.tree.rootNode, {
+        startPosition: extent.start,
+        endPosition: extent.end,
+      });
 
-      results.push(
-        ...this.captureOrganizer.process(captures, scopeResolver)
-      );
+      results.push(...this.captureOrganizer.process(captures, scopeResolver));
     }
     results.sort((a, b) => a.position.compare(b.position));
     return results;

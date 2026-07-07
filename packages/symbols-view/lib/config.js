@@ -1,4 +1,4 @@
-const { CompositeDisposable, Emitter } = require('atom');
+const { CompositeDisposable, Emitter } = require("atom");
 
 const Config = {
   activate() {
@@ -7,9 +7,9 @@ const Config = {
     this.subscriptions = new CompositeDisposable();
 
     this.subscriptions.add(
-      atom.config.onDidChange('symbols-view', config => {
-        this.emitter.emit('did-change-config', config);
-      })
+      atom.config.onDidChange("symbols-view", (config) => {
+        this.emitter.emit("did-change-config", config);
+      }),
     );
     this.activated = true;
   },
@@ -37,8 +37,8 @@ const Config = {
   },
 
   onDidChange(callback) {
-    return this.emitter.on('did-change-config', callback);
-  }
+    return this.emitter.on("did-change-config", callback);
+  },
 };
 
 module.exports = Config;

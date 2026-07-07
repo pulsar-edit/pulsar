@@ -1,13 +1,11 @@
-const { Emitter, CompositeDisposable } = require('event-kit');
-const { flatten } = require('underscore-plus');
-const Model = require('./model');
-const { createPaneAxisElement } = require('./pane-axis-element');
+const { Emitter, CompositeDisposable } = require("event-kit");
+const { flatten } = require("underscore-plus");
+const Model = require("./model");
+const { createPaneAxisElement } = require("./pane-axis-element");
 
 class PaneAxis extends Model {
   static deserialize(state, { deserializers, views }) {
-    state.children = state.children.map(childState =>
-      deserializers.deserialize(childState)
-    );
+    state.children = state.children.map((childState) => deserializers.deserialize(childState));
     return new PaneAxis(state, views);
   }
 
@@ -31,19 +29,16 @@ class PaneAxis extends Model {
 
   serialize() {
     return {
-      deserializer: 'PaneAxis',
-      children: this.children.map(child => child.serialize()),
+      deserializer: "PaneAxis",
+      children: this.children.map((child) => child.serialize()),
       orientation: this.orientation,
-      flexScale: this.flexScale
+      flexScale: this.flexScale,
     };
   }
 
   getElement() {
     if (!this.element) {
-      this.element = createPaneAxisElement().initialize(
-        this,
-        this.viewRegistry
-      );
+      this.element = createPaneAxisElement().initialize(this, this.viewRegistry);
     }
     return this.element;
   }
@@ -54,7 +49,7 @@ class PaneAxis extends Model {
 
   setFlexScale(flexScale) {
     this.flexScale = flexScale;
-    this.emitter.emit('did-change-flex-scale', this.flexScale);
+    this.emitter.emit("did-change-flex-scale", this.flexScale);
     return this.flexScale;
   }
 
@@ -74,7 +69,7 @@ class PaneAxis extends Model {
   setContainer(container) {
     if (container && container !== this.container) {
       this.container = container;
-      this.children.forEach(child => child.setContainer(container));
+      this.children.forEach((child) => child.setContainer(container));
     }
   }
 
@@ -87,31 +82,31 @@ class PaneAxis extends Model {
   }
 
   getPanes() {
-    return flatten(this.children.map(child => child.getPanes()));
+    return flatten(this.children.map((child) => child.getPanes()));
   }
 
   getItems() {
-    return flatten(this.children.map(child => child.getItems()));
+    return flatten(this.children.map((child) => child.getItems()));
   }
 
   onDidAddChild(fn) {
-    return this.emitter.on('did-add-child', fn);
+    return this.emitter.on("did-add-child", fn);
   }
 
   onDidRemoveChild(fn) {
-    return this.emitter.on('did-remove-child', fn);
+    return this.emitter.on("did-remove-child", fn);
   }
 
   onDidReplaceChild(fn) {
-    return this.emitter.on('did-replace-child', fn);
+    return this.emitter.on("did-replace-child", fn);
   }
 
   onDidDestroy(fn) {
-    return this.emitter.once('did-destroy', fn);
+    return this.emitter.once("did-destroy", fn);
   }
 
   onDidChangeFlexScale(fn) {
-    return this.emitter.on('did-change-flex-scale', fn);
+    return this.emitter.on("did-change-flex-scale", fn);
   }
 
   observeFlexScale(fn) {
@@ -124,7 +119,7 @@ class PaneAxis extends Model {
     child.setParent(this);
     child.setContainer(this.container);
     this.subscribeToChild(child);
-    return this.emitter.emit('did-add-child', { child, index });
+    return this.emitter.emit("did-add-child", { child, index });
   }
 
   adjustFlexScale() {
@@ -144,14 +139,14 @@ class PaneAxis extends Model {
   removeChild(child, replacing = false) {
     const index = this.children.indexOf(child);
     if (index === -1) {
-      throw new Error('Removing non-existent child');
+      throw new Error("Removing non-existent child");
     }
 
     this.unsubscribeFromChild(child);
 
     this.children.splice(index, 1);
     this.adjustFlexScale();
-    this.emitter.emit('did-remove-child', { child, index });
+    this.emitter.emit("did-remove-child", { child, index });
     if (!replacing && this.children.length < 2) {
       this.reparentLastChild();
     }
@@ -166,7 +161,7 @@ class PaneAxis extends Model {
 
     const index = this.children.indexOf(oldChild);
     this.children.splice(index, 1, newChild);
-    this.emitter.emit('did-replace-child', { oldChild, newChild, index });
+    this.emitter.emit("did-replace-child", { oldChild, newChild, index });
   }
 
   insertChildBefore(currentChild, newChild) {
@@ -200,7 +195,7 @@ class PaneAxis extends Model {
 
   destroyed() {
     this.subscriptions.dispose();
-    this.emitter.emit('did-destroy');
+    this.emitter.emit("did-destroy");
     this.emitter.dispose();
   }
 }

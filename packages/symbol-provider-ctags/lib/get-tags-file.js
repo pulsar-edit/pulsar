@@ -1,13 +1,13 @@
-const fs = require('fs-plus');
-const path = require('path');
+const fs = require("fs-plus");
+const path = require("path");
 
 const FILES = [
-  'TAGS',
-  'tags',
-  '.TAGS',
-  '.tags',
-  path.join('.git', 'tags'),
-  path.join('.git', 'TAGS')
+  "TAGS",
+  "tags",
+  ".TAGS",
+  ".tags",
+  path.join(".git", "tags"),
+  path.join(".git", "TAGS"),
 ];
 
 function getTagsFile(directoryPath) {

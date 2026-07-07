@@ -1,18 +1,18 @@
 /* global snapshotAuxiliaryData */
 
-const path = require('path');
-const _ = require('underscore-plus');
-const { Emitter } = require('event-kit');
-const fs = require('fs-plus');
-const LessCompileCache = require('./less-compile-cache');
-const Color = require('./color');
+const path = require("path");
+const _ = require("underscore-plus");
+const { Emitter } = require("event-kit");
+const fs = require("fs-plus");
+const LessCompileCache = require("./less-compile-cache");
+const Color = require("./color");
 
 // Keeping a reference to the entire object so that it can be mocked more
 // easily in the specs.
-const watcher = require('./path-watcher');
+const watcher = require("./path-watcher");
 
 async function wait(ms) {
-  return new Promise(r => setTimeout(r, ms));
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 // Extended: Handles loading and activating available themes.
@@ -25,7 +25,7 @@ module.exports = class ThemeManager {
     styleManager,
     notificationManager,
     viewRegistry,
-    applicationDelegate
+    applicationDelegate,
   }) {
     this.applicationDelegate = applicationDelegate;
     this.packageManager = packageManager;
@@ -37,11 +37,9 @@ module.exports = class ThemeManager {
     this.styleSheetDisposablesBySourcePath = {};
     this.lessCache = null;
     this.initialLoadComplete = false;
-    this.packageManager.registerPackageActivator(this, ['theme']);
+    this.packageManager.registerPackageActivator(this, ["theme"]);
     this.packageManager.onDidActivateInitialPackages(() => {
-      this.onDidChangeActiveThemes(() =>
-        this.packageManager.reloadActivePackageStyleSheets()
-      );
+      this.onDidChangeActiveThemes(() => this.packageManager.reloadActivePackageStyleSheets());
     });
 
     this.reloadStylesheet = _.debounce(() => {
@@ -54,12 +52,11 @@ module.exports = class ThemeManager {
     this.configDirPath = configDirPath;
     this.safeMode = safeMode;
     this.lessSourcesByRelativeFilePath = null;
-    if (devMode || typeof snapshotAuxiliaryData === 'undefined') {
+    if (devMode || typeof snapshotAuxiliaryData === "undefined") {
       this.lessSourcesByRelativeFilePath = {};
       this.importedFilePathsByRelativeImportPath = {};
     } else {
-      this.lessSourcesByRelativeFilePath =
-        snapshotAuxiliaryData.lessSourcesByRelativeFilePath;
+      this.lessSourcesByRelativeFilePath = snapshotAuxiliaryData.lessSourcesByRelativeFilePath;
       this.importedFilePathsByRelativeImportPath =
         snapshotAuxiliaryData.importedFilePathsByRelativeImportPath;
     }
@@ -76,7 +73,7 @@ module.exports = class ThemeManager {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeActiveThemes(callback) {
-    return this.emitter.on('did-change-active-themes', callback);
+    return this.emitter.on("did-change-active-themes", callback);
   }
 
   /*
@@ -94,14 +91,12 @@ module.exports = class ThemeManager {
 
   // Public: Returns an {Array} of {String}s of all the loaded theme names.
   getLoadedThemeNames() {
-    return this.getLoadedThemes().map(theme => theme.name);
+    return this.getLoadedThemes().map((theme) => theme.name);
   }
 
   // Public: Returns an {Array} of all the loaded themes.
   getLoadedThemes() {
-    return this.packageManager
-      .getLoadedPackages()
-      .filter(pack => pack.isTheme());
+    return this.packageManager.getLoadedPackages().filter((pack) => pack.isTheme());
   }
 
   /*
@@ -110,14 +105,12 @@ module.exports = class ThemeManager {
 
   // Public: Returns an {Array} of {String}s of all the active theme names.
   getActiveThemeNames() {
-    return this.getActiveThemes().map(theme => theme.name);
+    return this.getActiveThemes().map((theme) => theme.name);
   }
 
   // Public: Returns an {Array} of all the active themes.
   getActiveThemes() {
-    return this.packageManager
-      .getActivePackages()
-      .filter(pack => pack.isTheme());
+    return this.packageManager.getActivePackages().filter((pack) => pack.isTheme());
   }
 
   activatePackages() {
@@ -129,14 +122,14 @@ module.exports = class ThemeManager {
   */
 
   warnForNonExistentThemes() {
-    let themeNames = this.config.get('core.themes') || [];
+    let themeNames = this.config.get("core.themes") || [];
     if (!Array.isArray(themeNames)) {
       themeNames = [themeNames];
     }
     for (let themeName of themeNames) {
       if (
         !themeName ||
-        typeof themeName !== 'string' ||
+        typeof themeName !== "string" ||
         !this.packageManager.resolvePackagePath(themeName)
       ) {
         console.warn(`Enabled theme '${themeName}' is not installed.`);
@@ -148,37 +141,36 @@ module.exports = class ThemeManager {
   //
   // Returns an array of theme names in the order that they should be activated.
   getEnabledThemeNames() {
-    let themeNames = this.config.get('core.themes') || [];
+    let themeNames = this.config.get("core.themes") || [];
     if (!Array.isArray(themeNames)) {
       themeNames = [themeNames];
     }
     themeNames = themeNames.filter(
-      themeName =>
-        typeof themeName === 'string' &&
-        this.packageManager.resolvePackagePath(themeName)
+      (themeName) =>
+        typeof themeName === "string" && this.packageManager.resolvePackagePath(themeName),
     );
 
     // Use a built-in syntax and UI theme any time the configured themes are not
     // available.
     if (themeNames.length < 2) {
       const builtInThemeNames = [
-        'atom-dark-syntax',
-        'atom-dark-ui',
-        'atom-light-syntax',
-        'atom-light-ui',
-        'base16-tomorrow-dark-theme',
-        'base16-tomorrow-light-theme',
-        'solarized-dark-syntax',
-        'solarized-light-syntax'
+        "atom-dark-syntax",
+        "atom-dark-ui",
+        "atom-light-syntax",
+        "atom-light-ui",
+        "base16-tomorrow-dark-theme",
+        "base16-tomorrow-light-theme",
+        "solarized-dark-syntax",
+        "solarized-light-syntax",
       ];
       themeNames = _.intersection(themeNames, builtInThemeNames);
       if (themeNames.length === 0) {
-        themeNames = ['one-dark-syntax', 'one-dark-ui'];
+        themeNames = ["one-dark-syntax", "one-dark-ui"];
       } else if (themeNames.length === 1) {
-        if (themeNames[0].endsWith('-ui')) {
-          themeNames.unshift('one-dark-syntax');
+        if (themeNames[0].endsWith("-ui")) {
+          themeNames.unshift("one-dark-syntax");
         } else {
-          themeNames.push('one-dark-ui');
+          themeNames.push("one-dark-ui");
         }
       }
     }
@@ -205,7 +197,7 @@ module.exports = class ThemeManager {
     stylesheetPath,
     priority,
     skipDeprecatedSelectorsTransformation,
-    skipDeprecatedMathUsageTransformation
+    skipDeprecatedMathUsageTransformation,
   ) {
     let fullPath = this.resolveStylesheet(stylesheetPath);
     if (fullPath) {
@@ -215,7 +207,7 @@ module.exports = class ThemeManager {
         content,
         priority,
         skipDeprecatedSelectorsTransformation,
-        skipDeprecatedMathUsageTransformation
+        skipDeprecatedMathUsageTransformation,
       );
     } else {
       throw new Error(`Could not find a file at path '${stylesheetPath}'`);
@@ -257,12 +249,12 @@ module.exports = class ThemeManager {
 Unable to watch path: \`${path.basename(userStylesheetPath)}\`. Make sure
 you have permissions to \`${userStylesheetPath}\`.
 `;
-      if (process.platform === 'linux') {
+      if (process.platform === "linux") {
         message = `${message}
 
 On Linux there are currently problems with watch sizes. See [this document][watches] for more info.
 [watches]:https://pulsar-edit.dev/docs/atom-archive/hacking-atom/#typeerror-unable-to-watch-path
-`
+`;
       }
       this.notificationManager.addError(message, { dismissable: true });
     }
@@ -274,10 +266,10 @@ On Linux there are currently problems with watch sizes. See [this document][watc
       return;
     }
 
-    this.userStyleSheetDisposable = this.styleManager.addStyleSheet(
-      userStylesheetContents,
-      { sourcePath: userStylesheetPath, priority: 2 }
-    );
+    this.userStyleSheetDisposable = this.styleManager.addStyleSheet(userStylesheetContents, {
+      sourcePath: userStylesheetPath,
+      priority: 2,
+    });
   }
 
   loadBaseStylesheets() {
@@ -285,29 +277,27 @@ On Linux there are currently problems with watch sizes. See [this document][watc
   }
 
   reloadBaseStylesheets() {
-    this.requireStylesheet('../static/atom', -2, true);
+    this.requireStylesheet("../static/atom", -2, true);
   }
 
   stylesheetElementForId(id) {
-    const escapedId = id.replace(/\\/g, '\\\\');
-    return document.head.querySelector(
-      `atom-styles style[source-path="${escapedId}"]`
-    );
+    const escapedId = id.replace(/\\/g, "\\\\");
+    return document.head.querySelector(`atom-styles style[source-path="${escapedId}"]`);
   }
 
   resolveStylesheet(stylesheetPath) {
     if (path.extname(stylesheetPath).length > 0) {
       return fs.resolveOnLoadPath(stylesheetPath);
     } else {
-      return fs.resolveOnLoadPath(stylesheetPath, ['css', 'less']);
+      return fs.resolveOnLoadPath(stylesheetPath, ["css", "less"]);
     }
   }
 
   loadStylesheet(stylesheetPath, importFallbackVariables) {
-    if (path.extname(stylesheetPath) === '.less') {
+    if (path.extname(stylesheetPath) === ".less") {
       return this.loadLessStylesheet(stylesheetPath, importFallbackVariables);
     } else {
-      return fs.readFileSync(stylesheetPath, 'utf8');
+      return fs.readFileSync(stylesheetPath, "utf8");
     }
   }
 
@@ -316,9 +306,8 @@ On Linux there are currently problems with watch sizes. See [this document][watc
       this.lessCache = new LessCompileCache({
         resourcePath: this.resourcePath,
         lessSourcesByRelativeFilePath: this.lessSourcesByRelativeFilePath,
-        importedFilePathsByRelativeImportPath: this
-          .importedFilePathsByRelativeImportPath,
-        importPaths: this.getImportPaths()
+        importedFilePathsByRelativeImportPath: this.importedFilePathsByRelativeImportPath,
+        importPaths: this.getImportPaths(),
       });
     }
 
@@ -328,10 +317,7 @@ On Linux there are currently problems with watch sizes. See [this document][watc
 @import "variables/ui-variables";
 @import "variables/syntax-variables";\
 `;
-        const relativeFilePath = path.relative(
-          this.resourcePath,
-          lessStylesheetPath
-        );
+        const relativeFilePath = path.relative(this.resourcePath, lessStylesheetPath);
         const lessSource = this.lessSourcesByRelativeFilePath[relativeFilePath];
 
         let content, digest;
@@ -339,8 +325,7 @@ On Linux there are currently problems with watch sizes. See [this document][watc
           ({ content } = lessSource);
           ({ digest } = lessSource);
         } else {
-          content =
-            baseVarImports + '\n' + fs.readFileSync(lessStylesheetPath, 'utf8');
+          content = baseVarImports + "\n" + fs.readFileSync(lessStylesheetPath, "utf8");
           digest = null;
         }
 
@@ -375,14 +360,18 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     }
   }
 
-  applyStylesheet(path, text, priority, skipDeprecatedSelectorsTransformation, skipDeprecatedMathUsageTransformation) {
-    this.styleSheetDisposablesBySourcePath[
-      path
-    ] = this.styleManager.addStyleSheet(text, {
+  applyStylesheet(
+    path,
+    text,
+    priority,
+    skipDeprecatedSelectorsTransformation,
+    skipDeprecatedMathUsageTransformation,
+  ) {
+    this.styleSheetDisposablesBySourcePath[path] = this.styleManager.addStyleSheet(text, {
       priority,
       skipDeprecatedSelectorsTransformation,
       skipDeprecatedMathUsageTransformation,
-      sourcePath: path
+      sourcePath: path,
     });
 
     return this.styleSheetDisposablesBySourcePath[path];
@@ -403,9 +392,9 @@ On Linux there are currently problems with watch sizes. See [this document][watc
   }
 
   activateThemes() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       // @config.observe runs the callback once, then on subsequent changes.
-      this.config.observe('core.themes', () => {
+      this.config.observe("core.themes", () => {
         this.deactivateThemes().then(() => {
           this.warnForNonExistentThemes();
           this.refreshLessCache(); // Update cache for packages in core.themes config
@@ -415,9 +404,7 @@ On Linux there are currently problems with watch sizes. See [this document][watc
             if (this.packageManager.resolvePackagePath(themeName)) {
               promises.push(this.packageManager.activatePackage(themeName));
             } else {
-              console.warn(
-                `Failed to activate theme '${themeName}' because it isn't installed.`
-              );
+              console.warn(`Failed to activate theme '${themeName}' because it isn't installed.`);
             }
           }
 
@@ -430,7 +417,7 @@ On Linux there are currently problems with watch sizes. See [this document][watc
               this.refreshWindowTheme();
             }
             this.initialLoadComplete = true;
-            this.emitter.emit('did-change-active-themes');
+            this.emitter.emit("did-change-active-themes");
             resolve();
           });
         });
@@ -441,12 +428,10 @@ On Linux there are currently problems with watch sizes. See [this document][watc
   deactivateThemes() {
     this.removeActiveThemeClasses();
     this.unwatchUserStylesheet();
-    const results = this.getActiveThemes().map(pack =>
-      this.packageManager.deactivatePackage(pack.name)
+    const results = this.getActiveThemes().map((pack) =>
+      this.packageManager.deactivatePackage(pack.name),
     );
-    return Promise.all(
-      results.filter(r => r != null && typeof r.then === 'function')
-    );
+    return Promise.all(results.filter((r) => r != null && typeof r.then === "function"));
   }
 
   isInitialLoadComplete() {
@@ -477,24 +462,22 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     let themePaths;
     const activeThemes = this.getActiveThemes();
     if (activeThemes.length > 0) {
-      themePaths = activeThemes
-        .filter(theme => theme)
-        .map(theme => theme.getStylesheetsPath());
+      themePaths = activeThemes.filter((theme) => theme).map((theme) => theme.getStylesheetsPath());
     } else {
       themePaths = [];
       for (const themeName of this.getEnabledThemeNames()) {
         const themePath = this.packageManager.resolvePackagePath(themeName);
         if (themePath) {
-          const deprecatedPath = path.join(themePath, 'stylesheets');
+          const deprecatedPath = path.join(themePath, "stylesheets");
           if (fs.isDirectorySync(deprecatedPath)) {
             themePaths.push(deprecatedPath);
           } else {
-            themePaths.push(path.join(themePath, 'styles'));
+            themePaths.push(path.join(themePath, "styles"));
           }
         }
       }
     }
 
-    return themePaths.filter(themePath => fs.isDirectorySync(themePath));
+    return themePaths.filter((themePath) => fs.isDirectorySync(themePath));
   }
 };

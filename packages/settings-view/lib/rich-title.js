@@ -1,12 +1,12 @@
-const _ = require("underscore-plus")
+const _ = require("underscore-plus");
 
 module.exports = {
-  getSettingTitle (keyPath, name) {
+  getSettingTitle(keyPath, name) {
     if (name == null) {
-      name = ''
+      name = "";
     }
-    const schema = atom.config.getSchema(keyPath)
-    let title = schema != null ? schema.title : null
-    return title || _.uncamelcase(name).split('.').map(_.capitalize).join(' ')
-  }
-}
+    const schema = atom.config.getSchema(keyPath);
+    let title = schema != null ? schema.title : null;
+    return title || _.uncamelcase(name).split(".").map(_.capitalize).join(" ");
+  },
+};

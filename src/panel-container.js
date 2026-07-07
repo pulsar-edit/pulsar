@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-const { Emitter, CompositeDisposable } = require('event-kit');
-const { createPanelContainerElement } = require('./panel-container-element');
+const { Emitter, CompositeDisposable } = require("event-kit");
+const { createPanelContainerElement } = require("./panel-container-element");
 
 module.exports = class PanelContainer {
   constructor({ location, dock, viewRegistry } = {}) {
@@ -18,16 +18,13 @@ module.exports = class PanelContainer {
       panel.destroy();
     }
     this.subscriptions.dispose();
-    this.emitter.emit('did-destroy', this);
+    this.emitter.emit("did-destroy", this);
     this.emitter.dispose();
   }
 
   getElement() {
     if (!this.element) {
-      this.element = createPanelContainerElement().initialize(
-        this,
-        this.viewRegistry
-      );
+      this.element = createPanelContainerElement().initialize(this, this.viewRegistry);
     }
     return this.element;
   }
@@ -37,15 +34,15 @@ module.exports = class PanelContainer {
   */
 
   onDidAddPanel(callback) {
-    return this.emitter.on('did-add-panel', callback);
+    return this.emitter.on("did-add-panel", callback);
   }
 
   onDidRemovePanel(callback) {
-    return this.emitter.on('did-remove-panel', callback);
+    return this.emitter.on("did-remove-panel", callback);
   }
 
   onDidDestroy(callback) {
-    return this.emitter.once('did-destroy', callback);
+    return this.emitter.once("did-destroy", callback);
   }
 
   /*
@@ -57,7 +54,7 @@ module.exports = class PanelContainer {
   }
 
   isModal() {
-    return this.location === 'modal';
+    return this.location === "modal";
   }
 
   getPanels() {
@@ -74,7 +71,7 @@ module.exports = class PanelContainer {
       this.panels.splice(index, 0, panel);
     }
 
-    this.emitter.emit('did-add-panel', { panel, index });
+    this.emitter.emit("did-add-panel", { panel, index });
     return panel;
   }
 
@@ -91,13 +88,13 @@ module.exports = class PanelContainer {
     const index = this.panels.indexOf(panel);
     if (index > -1) {
       this.panels.splice(index, 1);
-      this.emitter.emit('did-remove-panel', { panel, index });
+      this.emitter.emit("did-remove-panel", { panel, index });
     }
   }
 
   getPanelIndex(panel) {
     const priority = panel.getPriority();
-    if (['bottom', 'right'].includes(this.location)) {
+    if (["bottom", "right"].includes(this.location)) {
       for (let i = this.panels.length - 1; i >= 0; i--) {
         const p = this.panels[i];
         if (priority < p.getPriority()) {

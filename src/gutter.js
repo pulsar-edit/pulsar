@@ -1,4 +1,4 @@
-const { Emitter } = require('event-kit');
+const { Emitter } = require("event-kit");
 
 const DefaultPriority = -100;
 
@@ -9,10 +9,9 @@ module.exports = class Gutter {
   constructor(gutterContainer, options) {
     this.gutterContainer = gutterContainer;
     this.name = options && options.name;
-    this.priority =
-      options && options.priority != null ? options.priority : DefaultPriority;
+    this.priority = options && options.priority != null ? options.priority : DefaultPriority;
     this.visible = options && options.visible != null ? options.visible : true;
-    this.type = options && options.type != null ? options.type : 'decorated';
+    this.type = options && options.type != null ? options.type : "decorated";
     this.labelFn = options && options.labelFn;
     this.className = options && options.class;
 
@@ -28,11 +27,11 @@ module.exports = class Gutter {
 
   // Essential: Destroys the gutter.
   destroy() {
-    if (this.name === 'line-number') {
-      throw new Error('The line-number gutter cannot be destroyed.');
+    if (this.name === "line-number") {
+      throw new Error("The line-number gutter cannot be destroyed.");
     } else {
       this.gutterContainer.removeGutter(this);
-      this.emitter.emit('did-destroy');
+      this.emitter.emit("did-destroy");
       this.emitter.dispose();
     }
   }
@@ -48,7 +47,7 @@ module.exports = class Gutter {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeVisible(callback) {
-    return this.emitter.on('did-change-visible', callback);
+    return this.emitter.on("did-change-visible", callback);
   }
 
   // Essential: Calls your `callback` when the gutter is destroyed.
@@ -57,7 +56,7 @@ module.exports = class Gutter {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy(callback) {
-    return this.emitter.once('did-destroy', callback);
+    return this.emitter.once("did-destroy", callback);
   }
 
   /*
@@ -69,7 +68,7 @@ module.exports = class Gutter {
     if (this.visible) {
       this.visible = false;
       this.gutterContainer.scheduleComponentUpdate();
-      this.emitter.emit('did-change-visible', this);
+      this.emitter.emit("did-change-visible", this);
     }
   }
 
@@ -78,7 +77,7 @@ module.exports = class Gutter {
     if (!this.visible) {
       this.visible = true;
       this.gutterContainer.scheduleComponentUpdate();
-      this.emitter.emit('did-change-visible', this);
+      this.emitter.emit("did-change-visible", this);
     }
   }
 
@@ -108,7 +107,7 @@ module.exports = class Gutter {
   }
 
   getElement() {
-    if (this.element == null) this.element = document.createElement('div');
+    if (this.element == null) this.element = document.createElement("div");
     return this.element;
   }
 };

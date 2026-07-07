@@ -1,74 +1,78 @@
-'use babel'
+"use babel";
 
-import slick from 'atom-slick'
+import slick from "atom-slick";
 
-const EscapeCharacterRegex = /[-!"#$%&'*+,/:;=?@|^~()<>{}[\]]/g
+const EscapeCharacterRegex = /[-!"#$%&'*+,/:;=?@|^~()<>{}[\]]/g;
 
-const cachedMatchesBySelector = {}
+const cachedMatchesBySelector = {};
 
 const getCachedMatch = (selector, scopeChain) => {
-  const cachedMatchesByScopeChain = cachedMatchesBySelector[selector]
+  const cachedMatchesByScopeChain = cachedMatchesBySelector[selector];
   if (cachedMatchesByScopeChain) {
-    return cachedMatchesByScopeChain[scopeChain]
+    return cachedMatchesByScopeChain[scopeChain];
   }
-}
+};
 
 const setCachedMatch = (selector, scopeChain, match) => {
-  let cachedMatchesByScopeChain = cachedMatchesBySelector[selector]
+  let cachedMatchesByScopeChain = cachedMatchesBySelector[selector];
   if (!cachedMatchesByScopeChain) {
-    cachedMatchesByScopeChain = {}
-    cachedMatchesBySelector[selector] = cachedMatchesByScopeChain
+    cachedMatchesByScopeChain = {};
+    cachedMatchesBySelector[selector] = cachedMatchesByScopeChain;
   }
-  cachedMatchesByScopeChain[scopeChain] = match
-  cachedMatchesByScopeChain[scopeChain]
-}
+  cachedMatchesByScopeChain[scopeChain] = match;
+  cachedMatchesByScopeChain[scopeChain];
+};
 
 const parseScopeChain = (scopeChain) => {
   scopeChain = scopeChain.replace(EscapeCharacterRegex, (match) => {
-    return '\\' + match[0]
-  })
+    return "\\" + match[0];
+  });
 
-  const parsed = slick.parse(scopeChain)[0]
+  const parsed = slick.parse(scopeChain)[0];
   if (!parsed || parsed.length === 0) {
-    return []
+    return [];
   }
 
-  const result = []
+  const result = [];
   for (let i = 0; i < parsed.length; i++) {
-    result.push(parsed[i])
+    result.push(parsed[i]);
   }
 
-  return result
-}
+  return result;
+};
 
 const selectorForScopeChain = (selectors, scopeChain) => {
   for (let i = 0; i < selectors.length; i++) {
-    const selector = selectors[i]
-    const cachedMatch = getCachedMatch(selector, scopeChain)
+    const selector = selectors[i];
+    const cachedMatch = getCachedMatch(selector, scopeChain);
     if (cachedMatch != null) {
       if (cachedMatch) {
-        return selector
+        return selector;
       } else {
-        continue
+        continue;
       }
     } else {
-      const scopes = parseScopeChain(scopeChain)
+      const scopes = parseScopeChain(scopeChain);
       while (scopes.length > 0) {
         if (selector.matches(scopes)) {
-          setCachedMatch(selector, scopeChain, true)
-          return selector
+          setCachedMatch(selector, scopeChain, true);
+          return selector;
         }
-        scopes.pop()
+        scopes.pop();
       }
-      setCachedMatch(selector, scopeChain, false)
+      setCachedMatch(selector, scopeChain, false);
     }
   }
 
-  return null
-}
+  return null;
+};
 
-const selectorsMatchScopeChain = (selectors, scopeChain) => { return selectorForScopeChain(selectors, scopeChain) != null }
+const selectorsMatchScopeChain = (selectors, scopeChain) => {
+  return selectorForScopeChain(selectors, scopeChain) != null;
+};
 
-const buildScopeChainString = (scopes) => { return `.${scopes.join(' .')}` }
+const buildScopeChainString = (scopes) => {
+  return `.${scopes.join(" .")}`;
+};
 
-export { selectorsMatchScopeChain, selectorForScopeChain, buildScopeChainString }
+export { selectorsMatchScopeChain, selectorForScopeChain, buildScopeChainString };

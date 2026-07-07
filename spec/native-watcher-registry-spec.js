@@ -1,14 +1,14 @@
 /** @babel */
 
-import path from 'path';
-import { Emitter } from 'event-kit';
+import path from "path";
+import { Emitter } from "event-kit";
 
-import { NativeWatcherRegistry } from '../src/native-watcher-registry';
+import { NativeWatcherRegistry } from "../src/native-watcher-registry";
 
 function findRootDirectory() {
   let current = process.cwd();
   while (true) {
-    let next = path.resolve(current, '..');
+    let next = path.resolve(current, "..");
     if (next === current) {
       return next;
     } else {
@@ -24,7 +24,7 @@ function absolute(...parts) {
 }
 
 function parts(fullPath) {
-  return fullPath.split(path.sep).filter(part => part.length > 0);
+  return fullPath.split(path.sep).filter((part) => part.length > 0);
 }
 
 class MockWatcher {
@@ -40,9 +40,7 @@ class MockWatcher {
   attachToNative(native, nativePath) {
     if (this.normalizedPath.startsWith(nativePath)) {
       if (this.native) {
-        this.native.attached = this.native.attached.filter(
-          each => each !== this
-        );
+        this.native.attached = this.native.attached.filter((each) => each !== this);
       }
       this.native = native;
       this.native.attached.push(this);
@@ -67,7 +65,7 @@ class MockNative {
   }
 
   onWillStop(callback) {
-    return this.emitter.on('will-stop', callback);
+    return this.emitter.on("will-stop", callback);
   }
 
   dispose() {
@@ -76,22 +74,20 @@ class MockNative {
 
   stop() {
     this.stopped = true;
-    this.emitter.emit('will-stop');
+    this.emitter.emit("will-stop");
   }
 }
 
-describe('NativeWatcherRegistry', function() {
+describe("NativeWatcherRegistry", function () {
   let createNative, registry;
 
-  beforeEach(function() {
-    registry = new NativeWatcherRegistry(normalizedPath =>
-      createNative(normalizedPath)
-    );
+  beforeEach(function () {
+    registry = new NativeWatcherRegistry((normalizedPath) => createNative(normalizedPath));
   });
 
-  it('attaches a Watcher to a newly created NativeWatcher for a new directory', async function() {
-    const watcher = new MockWatcher(absolute('some', 'path'));
-    const NATIVE = new MockNative('created');
+  it("attaches a Watcher to a newly created NativeWatcher for a new directory", async function () {
+    const watcher = new MockWatcher(absolute("some", "path"));
+    const NATIVE = new MockNative("created");
     createNative = () => NATIVE;
 
     await registry.attach(watcher);
@@ -99,11 +95,11 @@ describe('NativeWatcherRegistry', function() {
     expect(watcher.native).toBe(NATIVE);
   });
 
-  it('reuses an existing NativeWatcher on the same directory', async function() {
+  it("reuses an existing NativeWatcher on the same directory", async function () {
     // this.RETRY_FLAKY_TEST_AND_SLOW_DOWN_THE_BUILD();
 
-    const EXISTING = new MockNative('existing');
-    const existingPath = absolute('existing', 'path');
+    const EXISTING = new MockNative("existing");
+    const existingPath = absolute("existing", "path");
     let firstTime = true;
     createNative = () => {
       if (firstTime) {
@@ -111,7 +107,7 @@ describe('NativeWatcherRegistry', function() {
         return EXISTING;
       }
 
-      return new MockNative('nope');
+      return new MockNative("nope");
     };
     await registry.attach(new MockWatcher(existingPath));
 
@@ -121,10 +117,10 @@ describe('NativeWatcherRegistry', function() {
     expect(watcher.native).toBe(EXISTING);
   });
 
-  it('attaches to an existing NativeWatcher on a parent directory', async function() {
-    const EXISTING = new MockNative('existing');
-    const parentDir = absolute('existing', 'path');
-    const subDir = path.join(parentDir, 'sub', 'directory');
+  it("attaches to an existing NativeWatcher on a parent directory", async function () {
+    const EXISTING = new MockNative("existing");
+    const parentDir = absolute("existing", "path");
+    const subDir = path.join(parentDir, "sub", "directory");
     let firstTime = true;
     createNative = () => {
       if (firstTime) {
@@ -132,7 +128,7 @@ describe('NativeWatcherRegistry', function() {
         return EXISTING;
       }
 
-      return new MockNative('nope');
+      return new MockNative("nope");
     };
     await registry.attach(new MockWatcher(parentDir));
 
@@ -142,18 +138,18 @@ describe('NativeWatcherRegistry', function() {
     expect(watcher.native).toBe(EXISTING);
   });
 
-  it('adopts Watchers from NativeWatchers on child directories', async function() {
-    const parentDir = absolute('existing', 'path');
-    const childDir0 = path.join(parentDir, 'child', 'directory', 'zero');
-    const childDir1 = path.join(parentDir, 'child', 'directory', 'one');
-    const otherDir = absolute('another', 'path');
+  it("adopts Watchers from NativeWatchers on child directories", async function () {
+    const parentDir = absolute("existing", "path");
+    const childDir0 = path.join(parentDir, "child", "directory", "zero");
+    const childDir1 = path.join(parentDir, "child", "directory", "one");
+    const otherDir = absolute("another", "path");
 
-    const CHILD0 = new MockNative('existing0');
-    const CHILD1 = new MockNative('existing1');
-    const OTHER = new MockNative('existing2');
-    const PARENT = new MockNative('parent');
+    const CHILD0 = new MockNative("existing0");
+    const CHILD1 = new MockNative("existing1");
+    const OTHER = new MockNative("existing2");
+    const PARENT = new MockNative("parent");
 
-    createNative = dir => {
+    createNative = (dir) => {
       if (dir === childDir0) {
         return CHILD0;
       } else if (dir === childDir1) {
@@ -199,28 +195,17 @@ describe('NativeWatcherRegistry', function() {
     expect(OTHER.disposed).toBe(false);
   });
 
-  describe('removing NativeWatchers', function() {
-    it('happens when they stop', async function() {
-      const STOPPED = new MockNative('stopped');
-      const RUNNING = new MockNative('running');
+  describe("removing NativeWatchers", function () {
+    it("happens when they stop", async function () {
+      const STOPPED = new MockNative("stopped");
+      const RUNNING = new MockNative("running");
 
-      const stoppedPath = absolute('watcher', 'that', 'will', 'be', 'stopped');
-      const stoppedPathParts = stoppedPath
-        .split(path.sep)
-        .filter(part => part.length > 0);
-      const runningPath = absolute(
-        'watcher',
-        'that',
-        'will',
-        'continue',
-        'to',
-        'exist'
-      );
-      const runningPathParts = runningPath
-        .split(path.sep)
-        .filter(part => part.length > 0);
+      const stoppedPath = absolute("watcher", "that", "will", "be", "stopped");
+      const stoppedPathParts = stoppedPath.split(path.sep).filter((part) => part.length > 0);
+      const runningPath = absolute("watcher", "that", "will", "continue", "to", "exist");
+      const runningPathParts = runningPath.split(path.sep).filter((part) => part.length > 0);
 
-      createNative = dir => {
+      createNative = (dir) => {
         if (dir === stoppedPath) {
           return STOPPED;
         } else if (dir === runningPath) {
@@ -239,9 +224,9 @@ describe('NativeWatcherRegistry', function() {
       STOPPED.stop();
 
       const runningNode = registry.tree.root.lookup(runningPathParts).when({
-        parent: node => node,
+        parent: (node) => node,
         missing: () => false,
-        children: () => false
+        children: () => false,
       });
       expect(runningNode).toBeTruthy();
       expect(runningNode.getNativeWatcher()).toBe(RUNNING);
@@ -249,21 +234,21 @@ describe('NativeWatcherRegistry', function() {
       const stoppedNode = registry.tree.root.lookup(stoppedPathParts).when({
         parent: () => false,
         missing: () => true,
-        children: () => false
+        children: () => false,
       });
       expect(stoppedNode).toBe(true);
     });
 
-    it('reassigns new child watchers when a parent watcher is stopped', async function() {
-      const CHILD0 = new MockNative('child0');
-      const CHILD1 = new MockNative('child1');
-      const PARENT = new MockNative('parent');
+    it("reassigns new child watchers when a parent watcher is stopped", async function () {
+      const CHILD0 = new MockNative("child0");
+      const CHILD1 = new MockNative("child1");
+      const PARENT = new MockNative("parent");
 
-      const parentDir = absolute('parent');
-      const childDir0 = path.join(parentDir, 'child0');
-      const childDir1 = path.join(parentDir, 'child1');
+      const parentDir = absolute("parent");
+      const childDir0 = path.join(parentDir, "child0");
+      const childDir1 = path.join(parentDir, "child1");
 
-      createNative = dir => {
+      createNative = (dir) => {
         if (dir === parentDir) {
           return PARENT;
         } else if (dir === childDir0) {
@@ -280,10 +265,7 @@ describe('NativeWatcherRegistry', function() {
       const childWatcher1 = new MockWatcher(childDir1);
 
       await registry.attach(parentWatcher);
-      await Promise.all([
-        registry.attach(childWatcher0),
-        registry.attach(childWatcher1)
-      ]);
+      await Promise.all([registry.attach(childWatcher0), registry.attach(childWatcher1)]);
 
       // All three watchers should share the parent watcher's native watcher.
       expect(parentWatcher.native).toBe(PARENT);
@@ -300,36 +282,36 @@ describe('NativeWatcherRegistry', function() {
         registry.tree.root.lookup(parts(parentDir)).when({
           parent: () => false,
           missing: () => false,
-          children: () => true
-        })
+          children: () => true,
+        }),
       ).toBe(true);
 
       expect(
         registry.tree.root.lookup(parts(childDir0)).when({
           parent: () => true,
           missing: () => false,
-          children: () => false
-        })
+          children: () => false,
+        }),
       ).toBe(true);
 
       expect(
         registry.tree.root.lookup(parts(childDir1)).when({
           parent: () => true,
           missing: () => false,
-          children: () => false
-        })
+          children: () => false,
+        }),
       ).toBe(true);
     });
 
-    it('consolidates children when splitting a parent watcher', async function() {
-      const CHILD0 = new MockNative('child0');
-      const PARENT = new MockNative('parent');
+    it("consolidates children when splitting a parent watcher", async function () {
+      const CHILD0 = new MockNative("child0");
+      const PARENT = new MockNative("parent");
 
-      const parentDir = absolute('parent');
-      const childDir0 = path.join(parentDir, 'child0');
-      const childDir1 = path.join(parentDir, 'child0', 'child1');
+      const parentDir = absolute("parent");
+      const childDir0 = path.join(parentDir, "child0");
+      const childDir1 = path.join(parentDir, "child0", "child1");
 
-      createNative = dir => {
+      createNative = (dir) => {
         if (dir === parentDir) {
           return PARENT;
         } else if (dir === childDir0) {
@@ -344,10 +326,7 @@ describe('NativeWatcherRegistry', function() {
       const childWatcher1 = new MockWatcher(childDir1);
 
       await registry.attach(parentWatcher);
-      await Promise.all([
-        registry.attach(childWatcher0),
-        registry.attach(childWatcher1)
-      ]);
+      await Promise.all([registry.attach(childWatcher0), registry.attach(childWatcher1)]);
 
       // All three watchers should share the parent watcher's native watcher.
       expect(parentWatcher.native).toBe(PARENT);
@@ -365,24 +344,24 @@ describe('NativeWatcherRegistry', function() {
         registry.tree.root.lookup(parts(parentDir)).when({
           parent: () => false,
           missing: () => false,
-          children: () => true
-        })
+          children: () => true,
+        }),
       ).toBe(true);
 
       expect(
         registry.tree.root.lookup(parts(childDir0)).when({
           parent: () => true,
           missing: () => false,
-          children: () => false
-        })
+          children: () => false,
+        }),
       ).toBe(true);
 
       expect(
         registry.tree.root.lookup(parts(childDir1)).when({
           parent: () => true,
           missing: () => false,
-          children: () => false
-        })
+          children: () => false,
+        }),
       ).toBe(true);
     });
   });

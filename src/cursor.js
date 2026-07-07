@@ -1,7 +1,7 @@
-const { Point, Range } = require('@pulsar-edit/text-buffer');
-const { Emitter } = require('event-kit');
-const _ = require('underscore-plus');
-const Model = require('./model');
+const { Point, Range } = require("@pulsar-edit/text-buffer");
+const { Emitter } = require("event-kit");
+const _ = require("underscore-plus");
+const Model = require("./model");
 
 const EmptyLineRegExp = /(\r\n[\t ]*\r\n)|(\n[\t ]*\n)/g;
 
@@ -40,7 +40,7 @@ module.exports = class Cursor extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangePosition(callback) {
-    return this.emitter.on('did-change-position', callback);
+    return this.emitter.on("did-change-position", callback);
   }
 
   // Public: Calls your `callback` when the cursor is destroyed
@@ -49,7 +49,7 @@ module.exports = class Cursor extends Model {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy(callback) {
-    return this.emitter.once('did-destroy', callback);
+    return this.emitter.once("did-destroy", callback);
   }
 
   /*
@@ -124,9 +124,7 @@ module.exports = class Cursor extends Model {
 
   // Public: Returns whether the cursor is on the line return character.
   isAtEndOfLine() {
-    return this.getBufferPosition().isEqual(
-      this.getCurrentLineBufferRange().end
-    );
+    return this.getBufferPosition().isEqual(this.getCurrentLineBufferRange().end);
   }
 
   /*
@@ -147,7 +145,10 @@ module.exports = class Cursor extends Model {
   // Returns a {Boolean}.
   isSurroundedByWhitespace() {
     const { row, column } = this.getBufferPosition();
-    const range = [[row, column - 1], [row, column + 1]];
+    const range = [
+      [row, column - 1],
+      [row, column + 1],
+    ];
     return /^\s+$/.test(this.editor.getTextInBufferRange(range));
   }
 
@@ -163,15 +164,15 @@ module.exports = class Cursor extends Model {
     if (this.isAtBeginningOfLine() || this.isAtEndOfLine()) return false;
 
     const { row, column } = this.getBufferPosition();
-    const range = [[row, column - 1], [row, column + 1]];
+    const range = [
+      [row, column - 1],
+      [row, column + 1],
+    ];
     const text = this.editor.getTextInBufferRange(range);
     if (/\s/.test(text[0]) || /\s/.test(text[1])) return false;
 
     const nonWordCharacters = this.getNonWordCharacters();
-    return (
-      nonWordCharacters.includes(text[0]) !==
-      nonWordCharacters.includes(text[1])
-    );
+    return nonWordCharacters.includes(text[0]) !== nonWordCharacters.includes(text[1]);
   }
 
   // Public: Returns whether this cursor is between a word's start and end.
@@ -183,11 +184,12 @@ module.exports = class Cursor extends Model {
   // Returns a {Boolean}
   isInsideWord(options) {
     const { row, column } = this.getBufferPosition();
-    const range = [[row, column], [row, Infinity]];
+    const range = [
+      [row, column],
+      [row, Infinity],
+    ];
     const text = this.editor.getTextInBufferRange(range);
-    return (
-      text.search((options && options.wordRegex) || this.wordRegExp()) === 0
-    );
+    return text.search((options && options.wordRegex) || this.wordRegExp()) === 0;
   }
 
   // Public: Returns the indentation level of the current line.
@@ -203,18 +205,14 @@ module.exports = class Cursor extends Model {
   //
   // Returns a {ScopeDescriptor}
   getScopeDescriptor() {
-    return this.editor.scopeDescriptorForBufferPosition(
-      this.getBufferPosition()
-    );
+    return this.editor.scopeDescriptorForBufferPosition(this.getBufferPosition());
   }
 
   // Public: Retrieves the syntax tree scope descriptor for the cursor's current position.
   //
   // Returns a {ScopeDescriptor}
   getSyntaxTreeScopeDescriptor() {
-    return this.editor.syntaxTreeScopeDescriptorForBufferPosition(
-      this.getBufferPosition()
-    );
+    return this.editor.syntaxTreeScopeDescriptorForBufferPosition(this.getBufferPosition());
   }
 
   // Public: Returns true if this cursor has no non-whitespace characters before
@@ -260,10 +258,7 @@ module.exports = class Cursor extends Model {
     }
 
     if (this.goalColumn != null) column = this.goalColumn;
-    this.setScreenPosition(
-      { row: row - rowCount, column },
-      { skipSoftWrapIndentation: true }
-    );
+    this.setScreenPosition({ row: row - rowCount, column }, { skipSoftWrapIndentation: true });
     this.goalColumn = column;
   }
 
@@ -283,10 +278,7 @@ module.exports = class Cursor extends Model {
     }
 
     if (this.goalColumn != null) column = this.goalColumn;
-    this.setScreenPosition(
-      { row: row + rowCount, column },
-      { skipSoftWrapIndentation: true }
-    );
+    this.setScreenPosition({ row: row + rowCount, column }, { skipSoftWrapIndentation: true });
     this.goalColumn = column;
   }
 
@@ -310,7 +302,7 @@ module.exports = class Cursor extends Model {
       }
 
       column = column - columnCount;
-      this.setScreenPosition({ row, column }, { clipDirection: 'backward' });
+      this.setScreenPosition({ row, column }, { clipDirection: "backward" });
     }
   }
 
@@ -340,7 +332,7 @@ module.exports = class Cursor extends Model {
       }
 
       column = column + columnCount;
-      this.setScreenPosition({ row, column }, { clipDirection: 'forward' });
+      this.setScreenPosition({ row, column }, { clipDirection: "forward" });
     }
   }
 
@@ -372,37 +364,27 @@ module.exports = class Cursor extends Model {
     let targetBufferColumn;
     const screenRow = this.getScreenRow();
     const screenLineStart = this.editor.clipScreenPosition([screenRow, 0], {
-      skipSoftWrapIndentation: true
+      skipSoftWrapIndentation: true,
     });
     const screenLineEnd = [screenRow, Infinity];
     const screenLineBufferRange = this.editor.bufferRangeForScreenRange([
       screenLineStart,
-      screenLineEnd
+      screenLineEnd,
     ]);
 
     let firstCharacterColumn = null;
-    this.editor.scanInBufferRange(
-      /\S/,
-      screenLineBufferRange,
-      ({ range, stop }) => {
-        firstCharacterColumn = range.start.column;
-        stop();
-      }
-    );
+    this.editor.scanInBufferRange(/\S/, screenLineBufferRange, ({ range, stop }) => {
+      firstCharacterColumn = range.start.column;
+      stop();
+    });
 
-    if (
-      firstCharacterColumn != null &&
-      firstCharacterColumn !== this.getBufferColumn()
-    ) {
+    if (firstCharacterColumn != null && firstCharacterColumn !== this.getBufferColumn()) {
       targetBufferColumn = firstCharacterColumn;
     } else {
       targetBufferColumn = screenLineBufferRange.start.column;
     }
 
-    this.setBufferPosition([
-      screenLineBufferRange.start.row,
-      targetBufferColumn
-    ]);
+    this.setBufferPosition([screenLineBufferRange.start.row, targetBufferColumn]);
   }
 
   // Public: Moves the cursor to the end of the line.
@@ -496,25 +478,17 @@ module.exports = class Cursor extends Model {
   //      (default: {::wordRegExp})
   getPreviousWordBoundaryBufferPosition(options = {}) {
     const currentBufferPosition = this.getBufferPosition();
-    const previousNonBlankRow = this.editor.buffer.previousNonBlankRow(
-      currentBufferPosition.row
-    );
-    const scanRange = Range(
-      Point(previousNonBlankRow || 0, 0),
-      currentBufferPosition
-    );
+    const previousNonBlankRow = this.editor.buffer.previousNonBlankRow(currentBufferPosition.row);
+    const scanRange = Range(Point(previousNonBlankRow || 0, 0), currentBufferPosition);
 
     const ranges = this.editor.buffer.findAllInRangeSync(
       options.wordRegex || this.wordRegExp(),
-      scanRange
+      scanRange,
     );
 
     const range = ranges[ranges.length - 1];
     if (range) {
-      if (
-        range.start.row < currentBufferPosition.row &&
-        currentBufferPosition.column > 0
-      ) {
+      if (range.start.row < currentBufferPosition.row && currentBufferPosition.column > 0) {
         return Point(currentBufferPosition.row, 0);
       } else if (currentBufferPosition.isGreaterThan(range.end)) {
         return Point.fromObject(range.end);
@@ -534,14 +508,11 @@ module.exports = class Cursor extends Model {
   //      (default: {::wordRegExp})
   getNextWordBoundaryBufferPosition(options = {}) {
     const currentBufferPosition = this.getBufferPosition();
-    const scanRange = Range(
-      currentBufferPosition,
-      this.editor.getEofBufferPosition()
-    );
+    const scanRange = Range(currentBufferPosition, this.editor.getEofBufferPosition());
 
     const range = this.editor.buffer.findInRangeSync(
       options.wordRegex || this.wordRegExp(),
-      scanRange
+      scanRange,
     );
 
     if (range) {
@@ -579,7 +550,7 @@ module.exports = class Cursor extends Model {
 
     const ranges = this.editor.buffer.findAllInRangeSync(
       options.wordRegex || this.wordRegExp(options),
-      scanRange
+      scanRange,
     );
 
     let result;
@@ -612,7 +583,7 @@ module.exports = class Cursor extends Model {
 
     const ranges = this.editor.buffer.findAllInRangeSync(
       options.wordRegex || this.wordRegExp(options),
-      scanRange
+      scanRange,
     );
 
     for (let range of ranges) {
@@ -644,7 +615,7 @@ module.exports = class Cursor extends Model {
       ({ range, stop }) => {
         beginningOfNextWordPosition = range.start;
         stop();
-      }
+      },
     );
 
     return beginningOfNextWordPosition || currentBufferPosition;
@@ -659,12 +630,10 @@ module.exports = class Cursor extends Model {
     const position = this.getBufferPosition();
     const ranges = this.editor.buffer.findAllInRangeSync(
       options.wordRegex || this.wordRegExp(options),
-      new Range(new Point(position.row, 0), new Point(position.row, Infinity))
+      new Range(new Point(position.row, 0), new Point(position.row, Infinity)),
     );
     const range = ranges.find(
-      range =>
-        range.end.column >= position.column &&
-        range.start.column <= position.column
+      (range) => range.end.column >= position.column && range.start.column <= position.column,
     );
     return range ? Range.fromObject(range) : new Range(position, position);
   }
@@ -691,7 +660,7 @@ module.exports = class Cursor extends Model {
   getCurrentWordPrefix() {
     return this.editor.getTextInBufferRange([
       this.getBeginningOfCurrentWordBufferPosition(),
-      this.getBufferPosition()
+      this.getBufferPosition(),
     ]);
   }
 
@@ -734,7 +703,7 @@ module.exports = class Cursor extends Model {
     if (!options || options.includeNonWordCharacters !== false) {
       source += `|${`[${nonWordCharacters}]+`}`;
     }
-    return new RegExp(source, 'g');
+    return new RegExp(source, "g");
   }
 
   // Public: Get the RegExp used by the cursor to determine what a "subword" is.
@@ -746,14 +715,14 @@ module.exports = class Cursor extends Model {
   // Returns a {RegExp}.
   subwordRegExp(options = {}) {
     const nonWordCharacters = this.getNonWordCharacters();
-    const lowercaseLetters = 'a-z\\u00DF-\\u00F6\\u00F8-\\u00FF';
-    const uppercaseLetters = 'A-Z\\u00C0-\\u00D6\\u00D8-\\u00DE';
+    const lowercaseLetters = "a-z\\u00DF-\\u00F6\\u00F8-\\u00FF";
+    const uppercaseLetters = "A-Z\\u00C0-\\u00D6\\u00D8-\\u00DE";
     const snakeCamelSegment = `[${uppercaseLetters}]?[${lowercaseLetters}]+`;
     const segments = [
-      '^[\t ]+',
-      '[\t ]+$',
+      "^[\t ]+",
+      "[\t ]+$",
       `[${uppercaseLetters}]+(?![${lowercaseLetters}])`,
-      '\\d+'
+      "\\d+",
     ];
     if (options.backwards) {
       segments.push(`${snakeCamelSegment}_*`);
@@ -762,8 +731,8 @@ module.exports = class Cursor extends Model {
       segments.push(`_*${snakeCamelSegment}`);
       segments.push(`\\s*[${_.escapeRegExp(nonWordCharacters)}]+`);
     }
-    segments.push('_+');
-    return new RegExp(segments.join('|'), 'g');
+    segments.push("_+");
+    return new RegExp(segments.join("|"), "g");
   }
 
   /*
@@ -779,9 +748,7 @@ module.exports = class Cursor extends Model {
     fn();
     this.goalColumn = null;
     const autoscroll =
-      options && options.autoscroll != null
-        ? options.autoscroll
-        : this.isLastCursor();
+      options && options.autoscroll != null ? options.autoscroll : this.isLastCursor();
     if (autoscroll) this.autoscroll();
   }
 
@@ -803,14 +770,10 @@ module.exports = class Cursor extends Model {
     const { row, column } = eof;
     let position = new Point(row, column - 1);
 
-    this.editor.scanInBufferRange(
-      EmptyLineRegExp,
-      scanRange,
-      ({ range, stop }) => {
-        position = range.start.traverse(Point(1, 0));
-        if (!position.isEqual(start)) stop();
-      }
-    );
+    this.editor.scanInBufferRange(EmptyLineRegExp, scanRange, ({ range, stop }) => {
+      position = range.start.traverse(Point(1, 0));
+      if (!position.isEqual(start)) stop();
+    });
     return position;
   }
 
@@ -818,16 +781,15 @@ module.exports = class Cursor extends Model {
     const start = this.getBufferPosition();
 
     const { row, column } = start;
-    const scanRange = [[row - 1, column], [0, 0]];
+    const scanRange = [
+      [row - 1, column],
+      [0, 0],
+    ];
     let position = new Point(0, 0);
-    this.editor.backwardsScanInBufferRange(
-      EmptyLineRegExp,
-      scanRange,
-      ({ range, stop }) => {
-        position = range.start.traverse(Point(1, 0));
-        if (!position.isEqual(start)) stop();
-      }
-    );
+    this.editor.backwardsScanInBufferRange(EmptyLineRegExp, scanRange, ({ range, stop }) => {
+      position = range.start.traverse(Point(1, 0));
+      if (!position.isEqual(start)) stop();
+    });
     return position;
   }
 };

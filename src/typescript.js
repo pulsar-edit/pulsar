@@ -1,17 +1,17 @@
-'use strict';
+"use strict";
 
-const _ = require('underscore-plus');
-const crypto = require('crypto');
-const path = require('path');
+const _ = require("underscore-plus");
+const crypto = require("crypto");
+const path = require("path");
 
 const defaultOptions = {
-  target: 'es2023',
-  module: 'commonjs',
+  target: "es2023",
+  module: "commonjs",
   sourceMap: true,
   // By default, do not complain if definition files are missing.
   skipLibCheck: true,
   types: [],
-  typeRoots: []
+  typeRoots: [],
 };
 
 let TypeScript = null;
@@ -23,27 +23,21 @@ function shouldCompile() {
 
 function getCachePath(sourceCode) {
   if (typescriptVersionDir == null) {
-    const version = require('typescript/package.json').version;
-    typescriptVersionDir = path.join(
-      'ts',
-      createVersionAndOptionsDigest(version, defaultOptions)
-    );
+    const version = require("typescript/package.json").version;
+    typescriptVersionDir = path.join("ts", createVersionAndOptionsDigest(version, defaultOptions));
   }
 
   return path.join(
     typescriptVersionDir,
-    crypto
-      .createHash('sha1')
-      .update(sourceCode, 'utf8')
-      .digest('hex') + '.js'
+    crypto.createHash("sha1").update(sourceCode, "utf8").digest("hex") + ".js",
   );
 }
 
 function compile(sourceCode, filePath) {
-  TypeScript ??= require('typescript');
+  TypeScript ??= require("typescript");
 
-  if (process.platform === 'win32') {
-    filePath = 'file:///' + path.resolve(filePath).replace(/\\/g, '/');
+  if (process.platform === "win32") {
+    filePath = "file:///" + path.resolve(filePath).replace(/\\/g, "/");
   }
 
   // We must take the complicated path at least until we can figure out whether
@@ -62,14 +56,14 @@ function compile(sourceCode, filePath) {
     TypeScript.sys,
     path.dirname(filePath),
     {},
-    `tsconfig.json`
+    `tsconfig.json`,
   );
 
   let sourceFile = TypeScript.createSourceFile(
     filePath,
     sourceCode,
     TypeScript.ScriptTarget.Latest,
-    true
+    true,
   );
 
   let program = TypeScript.createProgram([filePath], compilerOptions.options, compilerHost);
@@ -92,18 +86,17 @@ function compile(sourceCode, filePath) {
 
 function createVersionAndOptionsDigest(version, options) {
   return crypto
-    .createHash('sha1')
-    .update('typescript', 'utf8')
-    .update('\0', 'utf8')
-    .update(version, 'utf8')
-    .update('\0', 'utf8')
-    .update(JSON.stringify(options), 'utf8')
-    .digest('hex');
+    .createHash("sha1")
+    .update("typescript", "utf8")
+    .update("\0", "utf8")
+    .update(version, "utf8")
+    .update("\0", "utf8")
+    .update(JSON.stringify(options), "utf8")
+    .digest("hex");
 }
-
 
 module.exports = {
   shouldCompile,
   getCachePath,
-  compile
+  compile,
 };

@@ -1,24 +1,17 @@
-const electronRemote = require('@electron/remote/main')
-electronRemote.initialize()
+const electronRemote = require("@electron/remote/main");
+electronRemote.initialize();
 
-const {
-  BrowserWindow,
-  app,
-  dialog,
-  ipcMain,
-  nativeImage,
-  webContents
-} = require('electron');
-const { getAppName } = require('../get-app-details.js');
-const path = require('path');
-const fs = require('fs');
-const url = require('url');
-const { EventEmitter } = require('events');
-const StartupTime = require('../startup-time');
+const { BrowserWindow, app, dialog, ipcMain, nativeImage, webContents } = require("electron");
+const { getAppName } = require("../get-app-details.js");
+const path = require("path");
+const fs = require("fs");
+const url = require("url");
+const { EventEmitter } = require("events");
+const StartupTime = require("../startup-time");
 
-let ICON_PATH = path.resolve(process.resourcesPath, 'lumine.png');
-if(!fs.existsSync(ICON_PATH)) {
-  ICON_PATH = path.resolve(__dirname, '..', '..', 'resources', 'lumine.png');
+let ICON_PATH = path.resolve(process.resourcesPath, "lumine.png");
+if (!fs.existsSync(ICON_PATH)) {
+  ICON_PATH = path.resolve(__dirname, "..", "..", "resources", "lumine.png");
 }
 
 let includeShellLoadTime = true;
@@ -26,7 +19,7 @@ let nextId = 0;
 
 module.exports = class AtomWindow extends EventEmitter {
   constructor(atomApplication, fileRecoveryService, settings = {}) {
-    StartupTime.addMarker('main-process:atom-window:start');
+    StartupTime.addMarker("main-process:atom-window:start");
 
     super();
 
@@ -41,17 +34,17 @@ module.exports = class AtomWindow extends EventEmitter {
 
     const locationsToOpen = settings.locationsToOpen || [];
 
-    this.loadedPromise = new Promise(resolve => {
+    this.loadedPromise = new Promise((resolve) => {
       this.resolveLoadedPromise = resolve;
     });
-    this.closedPromise = new Promise(resolve => {
+    this.closedPromise = new Promise((resolve) => {
       this.resolveClosedPromise = resolve;
     });
 
     const options = {
       show: false,
       title: getAppName(),
-      tabbingIdentifier: 'atom',
+      tabbingIdentifier: "atom",
       webPreferences: {
         // Prevent specs from throttling when the window is in the background:
         // this should result in faster CI builds, and an improvement in the
@@ -61,24 +54,22 @@ module.exports = class AtomWindow extends EventEmitter {
         // Disable the `auxclick` feature so that `click` events are triggered in
         // response to a middle-click.
         // (Ref: https://github.com/atom/atom/pull/12696#issuecomment-290496960)
-        disableBlinkFeatures: 'Auxclick,ObservableAPI',
+        disableBlinkFeatures: "Auxclick,ObservableAPI",
         nodeIntegration: true,
         contextIsolation: false,
         webviewTag: true,
 
         // node support in threads
-        nodeIntegrationInWorker: true
+        nodeIntegrationInWorker: true,
       },
-      simpleFullscreen: this.getSimpleFullscreen()
+      simpleFullscreen: this.getSimpleFullscreen(),
     };
 
     // Don't set icon on Windows so the exe's ico will be used as window and
     // taskbar's icon. See https://github.com/atom/atom/issues/4811 for more.
-    if (process.platform === 'linux')
-      options.icon = nativeImage.createFromPath(ICON_PATH);
-    if (this.shouldAddCustomTitleBar()) options.titleBarStyle = 'hidden';
-    if (this.shouldAddCustomInsetTitleBar())
-      options.titleBarStyle = 'hiddenInset';
+    if (process.platform === "linux") options.icon = nativeImage.createFromPath(ICON_PATH);
+    if (this.shouldAddCustomTitleBar()) options.titleBarStyle = "hidden";
+    if (this.shouldAddCustomInsetTitleBar()) options.titleBarStyle = "hiddenInset";
     if (this.shouldHideTitleBar()) options.frame = false;
 
     // Enabling window transparency creates several downstream issues relating
@@ -87,27 +78,24 @@ module.exports = class AtomWindow extends EventEmitter {
     // Hence this option was removed from the config schema because it's a
     // footgun, but we've left it in for those users who really know what
     // they're doing.
-    if (this.atomApplication.config.get('core.allowWindowTransparency')){
+    if (this.atomApplication.config.get("core.allowWindowTransparency")) {
       options.transparent = true;
     }
 
-    const BrowserWindowConstructor =
-      settings.browserWindowConstructor || BrowserWindow;
+    const BrowserWindowConstructor = settings.browserWindowConstructor || BrowserWindow;
     this.browserWindow = new BrowserWindowConstructor(options);
-    electronRemote.enable(this.browserWindow.webContents)
+    electronRemote.enable(this.browserWindow.webContents);
 
-    Object.defineProperty(this.browserWindow, 'loadSettingsJSON', {
+    Object.defineProperty(this.browserWindow, "loadSettingsJSON", {
       get: () =>
         JSON.stringify(
           Object.assign(
             {
-              userSettings: !this.isSpec
-                ? this.atomApplication.configFile.get()
-                : null
+              userSettings: !this.isSpec ? this.atomApplication.configFile.get() : null,
             },
-            this.loadSettings
-          )
-        )
+            this.loadSettings,
+          ),
+        ),
     });
 
     this.handleEvents();
@@ -119,21 +107,20 @@ module.exports = class AtomWindow extends EventEmitter {
     this.loadSettings.atomHome = process.env.ATOM_HOME;
     if (this.loadSettings.devMode == null) this.loadSettings.devMode = false;
     if (this.loadSettings.safeMode == null) this.loadSettings.safeMode = false;
-    if (this.loadSettings.clearWindowState == null)
-      this.loadSettings.clearWindowState = false;
+    if (this.loadSettings.clearWindowState == null) this.loadSettings.clearWindowState = false;
 
     this.addLocationsToOpen(locationsToOpen);
 
     this.loadSettings.hasOpenFiles = locationsToOpen.some(
-      location => location.pathToOpen && !location.isDirectory
+      (location) => location.pathToOpen && !location.isDirectory,
     );
     this.loadSettings.initialProjectRoots = this.projectRoots;
 
-    StartupTime.addMarker('main-process:atom-window:end');
+    StartupTime.addMarker("main-process:atom-window:end");
 
     // Expose the startup markers to the renderer process, so we can have unified
     // measures about startup time between the main process and the renderer process.
-    Object.defineProperty(this.browserWindow, 'startupMarkers', {
+    Object.defineProperty(this.browserWindow, "startupMarkers", {
       get: () => {
         // We only want to make the main process startup data available once,
         // so if the window is refreshed or a new window is opened, the
@@ -142,7 +129,7 @@ module.exports = class AtomWindow extends EventEmitter {
         StartupTime.deleteData();
 
         return timingData;
-      }
+      },
     });
 
     // Only send to the first non-spec window created
@@ -155,41 +142,38 @@ module.exports = class AtomWindow extends EventEmitter {
 
     if (!this.loadSettings.env) this.env = this.loadSettings.env;
 
-    this.browserWindow.on('window:loaded', () => {
+    this.browserWindow.on("window:loaded", () => {
       this.disableZoom();
-      this.emit('window:loaded');
+      this.emit("window:loaded");
       this.resolveLoadedPromise();
     });
 
-    this.browserWindow.on('window:locations-opened', () => {
-      this.emit('window:locations-opened');
+    this.browserWindow.on("window:locations-opened", () => {
+      this.emit("window:locations-opened");
     });
 
-    this.browserWindow.on('enter-full-screen', () => {
-      this.browserWindow.webContents.send('did-enter-full-screen');
+    this.browserWindow.on("enter-full-screen", () => {
+      this.browserWindow.webContents.send("did-enter-full-screen");
     });
 
-    this.browserWindow.on('leave-full-screen', () => {
-      this.browserWindow.webContents.send('did-leave-full-screen');
+    this.browserWindow.on("leave-full-screen", () => {
+      this.browserWindow.webContents.send("did-leave-full-screen");
     });
 
     this.browserWindow.loadURL(
       url.format({
-        protocol: 'file',
+        protocol: "file",
         pathname: `${this.resourcePath}/static/index.html`,
-        slashes: true
-      })
+        slashes: true,
+      }),
     );
 
     this.browserWindow.showSaveDialog = this.showSaveDialog.bind(this);
 
     if (this.isSpec) this.browserWindow.focusOnWebView();
 
-    const hasPathToOpen = !(
-      locationsToOpen.length === 1 && locationsToOpen[0].pathToOpen == null
-    );
-    if (hasPathToOpen && !this.isSpecWindow())
-      this.openLocations(locationsToOpen);
+    const hasPathToOpen = !(locationsToOpen.length === 1 && locationsToOpen[0].pathToOpen == null);
+    if (hasPathToOpen && !this.isSpecWindow()) this.openLocations(locationsToOpen);
   }
 
   hasProjectPaths() {
@@ -197,21 +181,21 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   setupContextMenu() {
-    const ContextMenu = require('./context-menu');
+    const ContextMenu = require("./context-menu");
 
-    this.browserWindow.on('context-menu', menuTemplate => {
+    this.browserWindow.on("context-menu", (menuTemplate) => {
       return new ContextMenu(menuTemplate, this);
     });
   }
 
   containsLocations(locations) {
-    return locations.every(location => this.containsLocation(location));
+    return locations.every((location) => this.containsLocation(location));
   }
 
   containsLocation(location) {
     if (!location.pathToOpen) return false;
 
-    return this.projectRoots.some(projectPath => {
+    return this.projectRoots.some((projectPath) => {
       if (location.pathToOpen === projectPath) return true;
       if (location.pathToOpen.startsWith(path.join(projectPath, path.sep))) {
         if (!location.exists) return true;
@@ -222,10 +206,9 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   handleEvents() {
-    this.browserWindow.on('close', async event => {
+    this.browserWindow.on("close", async (event) => {
       if (
-        (!this.atomApplication.quitting ||
-          this.atomApplication.quittingForUpdate) &&
+        (!this.atomApplication.quitting || this.atomApplication.quittingForUpdate) &&
         !this.unloading
       ) {
         event.preventDefault();
@@ -235,28 +218,28 @@ module.exports = class AtomWindow extends EventEmitter {
       }
     });
 
-    this.browserWindow.on('closed', () => {
+    this.browserWindow.on("closed", () => {
       this.fileRecoveryService.didCloseWindow(this);
       this.atomApplication.removeWindow(this);
       this.resolveClosedPromise();
     });
 
-    this.browserWindow.on('unresponsive', async () => {
+    this.browserWindow.on("unresponsive", async () => {
       if (this.isSpec) return;
       const result = await dialog.showMessageBox(this.browserWindow, {
-        type: 'warning',
-        buttons: ['Force Close', 'Keep Waiting'],
+        type: "warning",
+        buttons: ["Force Close", "Keep Waiting"],
         cancelId: 1, // Canceling should be the least destructive action
-        message: 'Editor is not responding',
+        message: "Editor is not responding",
         detail:
-          'The editor is not responding. Would you like to force close it or just keep waiting?'
+          "The editor is not responding. Would you like to force close it or just keep waiting?",
       });
       if (result.response === 0) this.browserWindow.destroy();
     });
 
-    this.browserWindow.webContents.on('render-process-gone', async () => {
+    this.browserWindow.webContents.on("render-process-gone", async () => {
       if (this.headless) {
-        console.log('Renderer process crashed, exiting');
+        console.log("Renderer process crashed, exiting");
         this.atomApplication.exit(100);
         return;
       }
@@ -264,11 +247,11 @@ module.exports = class AtomWindow extends EventEmitter {
       await this.fileRecoveryService.didCrashWindow(this);
 
       const result = await dialog.showMessageBox(this.browserWindow, {
-        type: 'warning',
-        buttons: ['Close Window', 'Reload', 'Keep It Open'],
+        type: "warning",
+        buttons: ["Close Window", "Reload", "Keep It Open"],
         cancelId: 2, // Canceling should be the least destructive action
-        message: 'The editor has crashed',
-        detail: 'Please report this issue to https://github.com/lumine-code/lumine'
+        message: "The editor has crashed",
+        detail: "Please report this issue to https://github.com/lumine-code/lumine",
       });
 
       switch (result.response) {
@@ -281,27 +264,23 @@ module.exports = class AtomWindow extends EventEmitter {
       }
     });
 
-    this.browserWindow.webContents.on('will-navigate', (event, url) => {
-      if (url !== this.browserWindow.webContents.getURL())
-        event.preventDefault();
+    this.browserWindow.webContents.on("will-navigate", (event, url) => {
+      if (url !== this.browserWindow.webContents.getURL()) event.preventDefault();
     });
 
     this.setupContextMenu();
 
     // Spec window's web view should always have focus
-    if (this.isSpec)
-      this.browserWindow.on('blur', () => this.browserWindow.focusOnWebView());
+    if (this.isSpec) this.browserWindow.on("blur", () => this.browserWindow.focusOnWebView());
   }
 
   async prepareToUnload() {
     if (this.isSpecWindow()) return true;
 
-    this.lastPrepareToUnloadPromise = new Promise(resolve => {
+    this.lastPrepareToUnloadPromise = new Promise((resolve) => {
       const callback = (event, result) => {
-        if (
-          BrowserWindow.fromWebContents(event.sender) === this.browserWindow
-        ) {
-          ipcMain.removeListener('did-prepare-to-unload', callback);
+        if (BrowserWindow.fromWebContents(event.sender) === this.browserWindow) {
+          ipcMain.removeListener("did-prepare-to-unload", callback);
           if (!result) {
             this.unloading = false;
             this.atomApplication.quitting = false;
@@ -309,8 +288,8 @@ module.exports = class AtomWindow extends EventEmitter {
           resolve(result);
         }
       };
-      ipcMain.on('did-prepare-to-unload', callback);
-      this.browserWindow.webContents.send('prepare-to-unload');
+      ipcMain.on("did-prepare-to-unload", callback);
+      this.browserWindow.webContents.send("prepare-to-unload");
     });
 
     return this.lastPrepareToUnloadPromise;
@@ -323,15 +302,15 @@ module.exports = class AtomWindow extends EventEmitter {
   async openLocations(locationsToOpen) {
     this.addLocationsToOpen(locationsToOpen);
     await this.loadedPromise;
-    this.sendMessage('open-locations', locationsToOpen);
+    this.sendMessage("open-locations", locationsToOpen);
   }
 
   didChangeUserSettings(settings) {
-    this.sendMessage('did-change-user-settings', settings);
+    this.sendMessage("did-change-user-settings", settings);
   }
 
   didFailToReadUserSettings(message) {
-    this.sendMessage('did-fail-to-read-user-settings', message);
+    this.sendMessage("did-fail-to-read-user-settings", message);
   }
 
   addLocationsToOpen(locationsToOpen) {
@@ -352,31 +331,31 @@ module.exports = class AtomWindow extends EventEmitter {
       NODE_PATH,
       ATOM_HOME,
       ATOM_CHANNEL,
-      ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT
+      ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT,
     } = env;
 
-    this.browserWindow.webContents.send('environment', {
+    this.browserWindow.webContents.send("environment", {
       NODE_ENV,
       NODE_PATH,
       ATOM_HOME,
       ATOM_CHANNEL,
-      ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT
+      ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT,
     });
   }
 
   sendMessage(message, detail) {
-    this.browserWindow.webContents.send('message', message, detail);
+    this.browserWindow.webContents.send("message", message, detail);
   }
 
   sendCommand(command, ...args) {
     if (this.isSpecWindow()) {
       if (!this.atomApplication.sendCommandToFirstResponder(command)) {
         switch (command) {
-          case 'window:reload':
+          case "window:reload":
             return this.reload();
-          case 'window:toggle-dev-tools':
+          case "window:toggle-dev-tools":
             return this.toggleDevTools();
-          case 'window:close':
+          case "window:close":
             return this.close();
         }
       }
@@ -388,12 +367,11 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   sendURIMessage(uri) {
-    this.browserWindow.webContents.send('uri-message', uri);
+    this.browserWindow.webContents.send("uri-message", uri);
   }
 
   sendCommandToBrowserWindow(command, ...args) {
-    const action =
-      args[0] && args[0].contextCommand ? 'context-command' : 'command';
+    const action = args[0] && args[0].contextCommand ? "context-command" : "command";
     this.browserWindow.webContents.send(action, command, ...args);
   }
 
@@ -404,30 +382,27 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   getSimpleFullscreen() {
-    return this.atomApplication.config.get('core.simpleFullScreenWindows');
+    return this.atomApplication.config.get("core.simpleFullScreenWindows");
   }
 
   shouldAddCustomTitleBar() {
     return (
       !this.isSpec &&
-      process.platform === 'darwin' &&
-      this.atomApplication.config.get('core.titleBar') === 'custom'
+      process.platform === "darwin" &&
+      this.atomApplication.config.get("core.titleBar") === "custom"
     );
   }
 
   shouldAddCustomInsetTitleBar() {
     return (
       !this.isSpec &&
-      process.platform === 'darwin' &&
-      this.atomApplication.config.get('core.titleBar') === 'custom-inset'
+      process.platform === "darwin" &&
+      this.atomApplication.config.get("core.titleBar") === "custom-inset"
     );
   }
 
   shouldHideTitleBar() {
-    return (
-      !this.isSpec &&
-      this.atomApplication.config.get('core.titleBar') === 'hidden'
-    );
+    return !this.isSpec && this.atomApplication.config.get("core.titleBar") === "hidden";
   }
 
   close() {
@@ -494,10 +469,10 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   reload() {
-    this.loadedPromise = new Promise(resolve => {
+    this.loadedPromise = new Promise((resolve) => {
       this.resolveLoadedPromise = resolve;
     });
-    this.prepareToUnload().then(canUnload => {
+    this.prepareToUnload().then((canUnload) => {
       if (canUnload) this.browserWindow.reload();
     });
     return this.loadedPromise;
@@ -506,14 +481,14 @@ module.exports = class AtomWindow extends EventEmitter {
   showSaveDialog(options, callback) {
     options = Object.assign(
       {
-        title: 'Save File',
-        defaultPath: this.projectRoots[0]
+        title: "Save File",
+        defaultPath: this.projectRoots[0],
       },
-      options
+      options,
     );
 
     let promise = dialog.showSaveDialog(this.browserWindow, options);
-    if (typeof callback === 'function') {
+    if (typeof callback === "function") {
       promise = promise.then(({ filePath, bookmark }) => {
         callback(filePath, bookmark);
       });

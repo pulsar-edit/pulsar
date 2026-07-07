@@ -6,10 +6,10 @@ module.exports = class TreeIndenter {
     this.languageMode = languageMode;
     this.scopes =
       scopes ||
-      languageMode.config.get('editor.scopes', {
-        scope: this.languageMode.rootScopeDescriptor
+      languageMode.config.get("editor.scopes", {
+        scope: this.languageMode.rootScopeDescriptor,
       });
-    log('[TreeIndenter] constructor', this.scopes);
+    log("[TreeIndenter] constructor", this.scopes);
   }
 
   /** tree indenter is configured for this language */
@@ -34,8 +34,7 @@ module.exports = class TreeIndenter {
         syntaxNode.parent &&
         syntaxNode.parent.startPosition.row === syntaxNode.startPosition.row &&
         syntaxNode.parent.endPosition.row === syntaxNode.startPosition.row &&
-        syntaxNode.parent.startPosition.column ===
-          syntaxNode.startPosition.column
+        syntaxNode.parent.startPosition.column === syntaxNode.startPosition.column
       ) {
         syntaxNode = syntaxNode.parent;
       }
@@ -58,8 +57,7 @@ module.exports = class TreeIndenter {
     } else {
       let increment = 0;
 
-      const notFirstOrLastSibling =
-        node.previousSibling != null && node.nextSibling != null;
+      const notFirstOrLastSibling = node.previousSibling != null && node.nextSibling != null;
 
       const isScope = this.scopes.indent[node.parent.type];
       notFirstOrLastSibling && isScope && increment++;
@@ -89,10 +87,9 @@ module.exports = class TreeIndenter {
           node.parent.endIndex <= lastScope.node.endIndex + 1) ||
           // or this is a special scope (like if, while) and it's ends coincide
           (isScope3 &&
-            (lastScope.node.endIndex === node.endIndex ||
-              node.parent.endIndex === node.endIndex)))
+            (lastScope.node.endIndex === node.endIndex || node.parent.endIndex === node.endIndex)))
       ) {
-        log('ignoring repeat', node.parent.type, lastScope);
+        log("ignoring repeat", node.parent.type, lastScope);
         increment = 0;
       } else {
         lastScope &&
@@ -102,18 +99,17 @@ module.exports = class TreeIndenter {
             node.parent.endIndex,
             lastScope.node.endIndex,
             isScope3,
-            node.endIndex
+            node.endIndex,
           );
       }
 
-      log('treewalk', {
+      log("treewalk", {
         node,
         notFirstOrLastSibling,
         type: node.parent.type,
-        increment
+        increment,
       });
-      const newLastScope =
-        isScope || isScope2 ? { node: node.parent } : lastScope;
+      const newLastScope = isScope || isScope2 ? { node: node.parent } : lastScope;
       return this._treeWalk(node.parent, newLastScope) + increment;
     }
   }
@@ -121,17 +117,14 @@ module.exports = class TreeIndenter {
   suggestedIndentForBufferRow(row, tabLength, options) {
     // get current indentation for row
     const line = this.languageMode.buffer.lineForRow(row);
-    const currentIndentation = this.languageMode.indentLevelForLine(
-      line,
-      tabLength
-    );
+    const currentIndentation = this.languageMode.indentLevelForLine(line, tabLength);
 
     const syntaxNode = this._getHighestSyntaxNodeAtPosition(row);
     if (!syntaxNode) {
       const previousRow = Math.max(row - 1, 0);
       const previousIndentation = this.languageMode.indentLevelForLine(
         this.languageMode.indentLevelForLine(previousRow),
-        tabLength
+        tabLength,
       );
       return previousIndentation;
     }
@@ -139,7 +132,7 @@ module.exports = class TreeIndenter {
 
     // Special case for comments
     if (
-      (syntaxNode.type === 'comment' || syntaxNode.type === 'description') &&
+      (syntaxNode.type === "comment" || syntaxNode.type === "description") &&
       syntaxNode.startPosition.row < row &&
       syntaxNode.endPosition.row > row
     ) {

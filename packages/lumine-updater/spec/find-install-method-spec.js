@@ -1,7 +1,6 @@
 const findInstallMethod = require("../src/find-install-method.js");
 
 describe("find-install-method main", async () => {
-
   const platform = process.platform;
   const arch = process.arch;
 

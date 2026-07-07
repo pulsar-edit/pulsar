@@ -1,15 +1,14 @@
-const { Disposable } = require('atom');
-const url = require('url');
-const fs = require('fs-plus');
+const { Disposable } = require("atom");
+const url = require("url");
+const fs = require("fs-plus");
 
-module.exports =
-class FileInfoView {
+module.exports = class FileInfoView {
   constructor() {
-    this.element = document.createElement('status-bar-file');
-    this.element.classList.add('file-info', 'inline-block');
+    this.element = document.createElement("status-bar-file");
+    this.element.classList.add("file-info", "inline-block");
 
-    this.currentPath = document.createElement('a');
-    this.currentPath.classList.add('current-path');
+    this.currentPath = document.createElement("a");
+    this.currentPath.classList.add("current-path");
     this.element.appendChild(this.currentPath);
     this.element.currentPath = this.currentPath;
 
@@ -21,26 +20,28 @@ class FileInfoView {
     this.subscribeToActiveItem();
 
     this.registerTooltip();
-    const clickHandler = event => {
+    const clickHandler = (event) => {
       const isShiftClick = event.shiftKey;
       this.showCopiedTooltip(isShiftClick);
       const text = this.getActiveItemCopyText(isShiftClick);
       atom.clipboard.write(text);
       return setTimeout(() => {
         return this.clearCopiedTooltip();
-      }
-      , 2000);
+      }, 2000);
     };
 
-    this.element.addEventListener('click', clickHandler);
-    this.clickSubscription = new Disposable(() => this.element.removeEventListener('click', clickHandler));
+    this.element.addEventListener("click", clickHandler);
+    this.clickSubscription = new Disposable(() =>
+      this.element.removeEventListener("click", clickHandler),
+    );
   }
 
   registerTooltip() {
-    this.tooltip = atom.tooltips.add(this.element, { title() {
-      return "Click to copy absolute file path (Shift + Click to copy relative path)";
-    }
-  });
+    this.tooltip = atom.tooltips.add(this.element, {
+      title() {
+        return "Click to copy absolute file path (Shift + Click to copy relative path)";
+      },
+    });
   }
 
   clearCopiedTooltip() {
@@ -54,18 +55,19 @@ class FileInfoView {
     const text = this.getActiveItemCopyText(copyRelativePath);
     this.copiedTooltip = atom.tooltips.add(this.element, {
       title: `Copied: ${text}`,
-      trigger: 'manual',
+      trigger: "manual",
       delay: {
-        show: 0
-      }
-    }
-    );
+        show: 0,
+      },
+    });
   }
 
   getActiveItemCopyText(copyRelativePath) {
     const activeItem = this.getActiveItem();
     let path = activeItem?.getPath?.();
-    if ((path == null)) { return activeItem?.getTitle?.() || ''; }
+    if (path == null) {
+      return activeItem?.getTitle?.() || "";
+    }
 
     // Make sure we try to relativize before parsing URLs.
     if (copyRelativePath) {
@@ -76,10 +78,8 @@ class FileInfoView {
     }
 
     // An item path could be a url, we only want to copy the `path` part
-    if (path?.indexOf('://') > 0) {
-      ({
-        path
-      } = url.parse(path));
+    if (path?.indexOf("://") > 0) {
+      ({ path } = url.parse(path));
     }
     return path;
   }
@@ -90,17 +90,20 @@ class FileInfoView {
     const activeItem = this.getActiveItem();
 
     if (activeItem) {
-      if (this.updateCallback == null) { this.updateCallback = () => this.update(); }
+      if (this.updateCallback == null) {
+        this.updateCallback = () => this.update();
+      }
 
-      if (typeof activeItem.onDidChangeTitle === 'function') {
+      if (typeof activeItem.onDidChangeTitle === "function") {
         this.titleSubscription = activeItem.onDidChangeTitle(this.updateCallback);
-      } else if (typeof activeItem.on === 'function') {
+      } else if (typeof activeItem.on === "function") {
         //TODO Remove once title-changed event support is removed
-        activeItem.on('title-changed', this.updateCallback);
-        this.titleSubscription = { dispose: () => {
-          return activeItem.off?.('title-changed', this.updateCallback);
-        }
-      };
+        activeItem.on("title-changed", this.updateCallback);
+        this.titleSubscription = {
+          dispose: () => {
+            return activeItem.off?.("title-changed", this.updateCallback);
+          },
+        };
       }
 
       this.modifiedSubscription = activeItem.onDidChangeModified?.(this.updateCallback);
@@ -129,10 +132,10 @@ class FileInfoView {
 
   updateBufferHasModifiedText(isModified) {
     if (isModified) {
-      this.element.classList.add('buffer-modified');
+      this.element.classList.add("buffer-modified");
       this.isModified = true;
     } else {
-      this.element.classList.remove('buffer-modified');
+      this.element.classList.remove("buffer-modified");
       this.isModified = false;
     }
   }
@@ -143,13 +146,13 @@ class FileInfoView {
 
     if (path) {
       const relativized = atom.project.relativize(path);
-      this.currentPath.textContent = (relativized != null) ? fs.tildify(relativized) : path;
+      this.currentPath.textContent = relativized != null ? fs.tildify(relativized) : path;
     } else if (title) {
       this.currentPath.textContent = title;
     } else {
-      this.currentPath.textContent = '';
+      this.currentPath.textContent = "";
     }
 
-    this.element.style.display = this.currentPath.textContent === '' ? 'none' : '';
+    this.element.style.display = this.currentPath.textContent === "" ? "none" : "";
   }
-}
+};

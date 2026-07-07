@@ -1,6 +1,4 @@
-
-module.exports =
-class Tile {
+module.exports = class Tile {
   constructor(item, priority, collection) {
     this.item = item;
     this.priority = priority;
@@ -19,4 +17,4 @@ class Tile {
     this.collection.splice(this.collection.indexOf(this), 1);
     atom.views.getView(this.item).remove();
   }
-}
+};

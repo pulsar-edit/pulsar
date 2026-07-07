@@ -1,12 +1,12 @@
-const dedent = require('dedent');
+const dedent = require("dedent");
 
-describe('Python indentation (modern Tree-sitter)', () => {
+describe("Python indentation (modern Tree-sitter)", () => {
   let editor;
   let languageMode;
   let grammar;
 
   async function insertNewline() {
-    editor.getLastSelection().insertText('\n', { autoIndent: true, autoIndentNewline: true })
+    editor.getLastSelection().insertText("\n", { autoIndent: true, autoIndentNewline: true });
     await languageMode.atTransactionEnd();
   }
 
@@ -17,61 +17,64 @@ describe('Python indentation (modern Tree-sitter)', () => {
     let currentRow = editor.getLastCursor().getBufferPosition().row;
     insertNewline();
     if (assert) {
-      expect(editor.lineTextForBufferRow(currentRow + 1)).toEqual('    ');
+      expect(editor.lineTextForBufferRow(currentRow + 1)).toEqual("    ");
     } else {
-      expect(editor.lineTextForBufferRow(currentRow + 1)).toEqual('');
+      expect(editor.lineTextForBufferRow(currentRow + 1)).toEqual("");
     }
   }
 
   beforeEach(async () => {
-    atom.config.set('core.useTreeSitterParsers', true);
+    atom.config.set("core.useTreeSitterParsers", true);
 
     editor = await atom.workspace.open();
-    await atom.packages.activatePackage('language-python');
-    grammar = atom.grammars.grammarForScopeName('source.python');
+    await atom.packages.activatePackage("language-python");
+    grammar = atom.grammars.grammarForScopeName("source.python");
     editor.setGrammar(grammar);
     languageMode = editor.languageMode;
     await languageMode.ready;
   });
 
-  it('indents blocks properly', async () => {
-    await expectToAutoIndentAfter(`if 1 > 2:`)
-    await expectToAutoIndentAfter(`if 1 > 2: # test`)
-    await expectToAutoIndentAfter(`if 1 > 2: pass`, false)
+  it("indents blocks properly", async () => {
+    await expectToAutoIndentAfter(`if 1 > 2:`);
+    await expectToAutoIndentAfter(`if 1 > 2: # test`);
+    await expectToAutoIndentAfter(`if 1 > 2: pass`, false);
 
-    await expectToAutoIndentAfter(`def f(x):`)
-    await expectToAutoIndentAfter(`def f(x): # test`)
-    await expectToAutoIndentAfter(`def f(x): pass`, false)
+    await expectToAutoIndentAfter(`def f(x):`);
+    await expectToAutoIndentAfter(`def f(x): # test`);
+    await expectToAutoIndentAfter(`def f(x): pass`, false);
 
-    await expectToAutoIndentAfter(`class Fx(object):`)
-    await expectToAutoIndentAfter(`class Fx(object): # test`)
-    await expectToAutoIndentAfter(`class Fx(object): pass`, false)
+    await expectToAutoIndentAfter(`class Fx(object):`);
+    await expectToAutoIndentAfter(`class Fx(object): # test`);
+    await expectToAutoIndentAfter(`class Fx(object): pass`, false);
 
-    await expectToAutoIndentAfter(`while True:`)
-    await expectToAutoIndentAfter(`while True: # test`)
-    await expectToAutoIndentAfter(`while True: pass`, false)
+    await expectToAutoIndentAfter(`while True:`);
+    await expectToAutoIndentAfter(`while True: # test`);
+    await expectToAutoIndentAfter(`while True: pass`, false);
 
-    await expectToAutoIndentAfter(`for _ in iter(x):`)
-    await expectToAutoIndentAfter(`for _ in iter(x): # test`)
-    await expectToAutoIndentAfter(`for _ in iter(x): pass`, false)
+    await expectToAutoIndentAfter(`for _ in iter(x):`);
+    await expectToAutoIndentAfter(`for _ in iter(x): # test`);
+    await expectToAutoIndentAfter(`for _ in iter(x): pass`, false);
 
     await expectToAutoIndentAfter(dedent`
       if 1 > 2:
         pass
       elif 2 > 3:
-    `)
+    `);
 
     await expectToAutoIndentAfter(dedent`
       if 1 > 2:
         pass
       elif 2 > 3: # test
-    `)
+    `);
 
-    await expectToAutoIndentAfter(dedent`
+    await expectToAutoIndentAfter(
+      dedent`
       if 1 > 2:
         pass
       elif 2 > 3: pass
-    `, false)
+    `,
+      false,
+    );
 
     await expectToAutoIndentAfter(dedent`
       if 1 > 2:
@@ -79,7 +82,7 @@ describe('Python indentation (modern Tree-sitter)', () => {
       elif 2 > 3:
           pass
       else:
-    `)
+    `);
 
     await expectToAutoIndentAfter(dedent`
       if 1 > 2:
@@ -87,17 +90,20 @@ describe('Python indentation (modern Tree-sitter)', () => {
       elif 2 > 3:
           pass
       else: # test
-    `)
+    `);
 
-    await expectToAutoIndentAfter(dedent`
+    await expectToAutoIndentAfter(
+      dedent`
       if 1 > 2:
           pass
       elif 2 > 3:
           pass
       else: pass
-    `, false)
+    `,
+      false,
+    );
 
-    await expectToAutoIndentAfter(`try:`)
+    await expectToAutoIndentAfter(`try:`);
 
     // The assertions below don't work because `tree-sitter-python` doesn't
     // parse them correctly unless they occur within an already intact
@@ -109,20 +115,23 @@ describe('Python indentation (modern Tree-sitter)', () => {
       try:
           do_something()
       except:
-    `)
+    `);
     await expectToAutoIndentAfter(dedent`
       try:
           do_something()
       except: # test
-    `)
-    await expectToAutoIndentAfter(dedent`
+    `);
+    await expectToAutoIndentAfter(
+      dedent`
       try:
           do_something()
       except: pass
-    `, false)
+    `,
+      false,
+    );
   });
 
-  it('indents blocks properly (complex cases)', async () => {
+  it("indents blocks properly (complex cases)", async () => {
     editor.setText(dedent`
       try: pass
       except: pass
@@ -130,50 +139,50 @@ describe('Python indentation (modern Tree-sitter)', () => {
     await languageMode.atTransactionEnd();
     editor.setCursorBufferPosition([0, Infinity]);
     await insertNewline();
-    expect(editor.lineTextForBufferRow(1)).toBe('')
+    expect(editor.lineTextForBufferRow(1)).toBe("");
 
     editor.setText(dedent`
       try: #foo
       except: pass
-    `)
+    `);
     await languageMode.atTransactionEnd();
     editor.setCursorBufferPosition([0, Infinity]);
     await insertNewline();
-    expect(editor.lineTextForBufferRow(1)).toBe('    ')
-  })
-
-  it(`does not indent for other usages of colons`, async () => {
-    await expectToAutoIndentAfter(`x = lambda a : a + 10`, false)
-    await expectToAutoIndentAfter(`x = list[:2]`, false)
-    await expectToAutoIndentAfter(`x = { foo: 2 }`, false)
+    expect(editor.lineTextForBufferRow(1)).toBe("    ");
   });
 
-  it('indents braces properly', async () => {
+  it(`does not indent for other usages of colons`, async () => {
+    await expectToAutoIndentAfter(`x = lambda a : a + 10`, false);
+    await expectToAutoIndentAfter(`x = list[:2]`, false);
+    await expectToAutoIndentAfter(`x = { foo: 2 }`, false);
+  });
+
+  it("indents braces properly", async () => {
     let pairs = [
-      ['[', ']'],
-      ['{', '}'],
-      ['(', ')']
+      ["[", "]"],
+      ["{", "}"],
+      ["(", ")"],
     ];
     for (let [a, b] of pairs) {
       editor.setText(`x = ${a}
 
-      ${b}`)
+      ${b}`);
       await languageMode.atTransactionEnd();
       editor.setCursorBufferPosition([0, Infinity]);
       await insertNewline();
-      expect(editor.lineTextForBufferRow(1)).toBe('    ')
+      expect(editor.lineTextForBufferRow(1)).toBe("    ");
     }
 
     editor.setText(`x = <
 
-    >`)
+    >`);
     await languageMode.atTransactionEnd();
     editor.setCursorBufferPosition([0, Infinity]);
     await insertNewline();
-    expect(editor.lineTextForBufferRow(1)).toBe('')
+    expect(editor.lineTextForBufferRow(1)).toBe("");
   });
 
-  it('dedents properly', async () => {
+  it("dedents properly", async () => {
     editor.setText(dedent`
       if 1 > 2:
         pass
@@ -181,12 +190,12 @@ describe('Python indentation (modern Tree-sitter)', () => {
     `);
     editor.setCursorBufferPosition([Infinity, Infinity]);
     await languageMode.atTransactionEnd();
-    editor.getLastSelection().insertText('f', {
+    editor.getLastSelection().insertText("f", {
       autoIndent: true,
-      autoDecreaseIndent: true
+      autoDecreaseIndent: true,
     });
     await languageMode.atTransactionEnd();
-    expect(editor.lineTextForBufferRow(2)).toBe('elif');
+    expect(editor.lineTextForBufferRow(2)).toBe("elif");
 
     editor.setText(dedent`
       if 1 > 2:
@@ -195,13 +204,12 @@ describe('Python indentation (modern Tree-sitter)', () => {
     `);
     editor.setCursorBufferPosition([Infinity, Infinity]);
     await languageMode.atTransactionEnd();
-    editor.getLastSelection().insertText('e', {
+    editor.getLastSelection().insertText("e", {
       autoIndent: true,
-      autoDecreaseIndent: true
+      autoDecreaseIndent: true,
     });
     await languageMode.atTransactionEnd();
-    expect(editor.lineTextForBufferRow(2)).toBe('else');
-
+    expect(editor.lineTextForBufferRow(2)).toBe("else");
 
     editor.setText(dedent`
       match x:
@@ -211,12 +219,11 @@ describe('Python indentation (modern Tree-sitter)', () => {
     `);
     editor.setCursorBufferPosition([Infinity, Infinity]);
     await languageMode.atTransactionEnd();
-    editor.getLastSelection().insertText('e', {
+    editor.getLastSelection().insertText("e", {
       autoIndent: true,
-      autoDecreaseIndent: true
+      autoDecreaseIndent: true,
     });
     await languageMode.atTransactionEnd();
-    expect(editor.lineTextForBufferRow(3)).toBe('    case');
+    expect(editor.lineTextForBufferRow(3)).toBe("    case");
   });
-
 });

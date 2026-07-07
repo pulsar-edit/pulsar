@@ -1,12 +1,19 @@
-const path = require('path');
-const LessCache = require('less-cache');
+const path = require("path");
+const LessCache = require("less-cache");
 
 // {LessCache} wrapper used by {ThemeManager} to read stylesheets.
 module.exports = class LessCompileCache {
-
-  constructor({resourcePath, importPaths, lessSourcesByRelativeFilePath, importedFilePathsByRelativeImportPath}) {
-    const cacheDir = path.join(process.env.ATOM_HOME, 'compile-cache', 'less');
-    this.lessSearchPaths = [path.join(resourcePath, 'static', 'variables'), path.join(resourcePath, 'static')];
+  constructor({
+    resourcePath,
+    importPaths,
+    lessSourcesByRelativeFilePath,
+    importedFilePathsByRelativeImportPath,
+  }) {
+    const cacheDir = path.join(process.env.ATOM_HOME, "compile-cache", "less");
+    this.lessSearchPaths = [
+      path.join(resourcePath, "static", "variables"),
+      path.join(resourcePath, "static"),
+    ];
     if (importPaths != null) {
       importPaths = importPaths.concat(this.lessSearchPaths);
     } else {
@@ -18,7 +25,7 @@ module.exports = class LessCompileCache {
       lessSourcesByRelativeFilePath,
       importedFilePathsByRelativeImportPath,
       cacheDir,
-      fallbackDir: path.join(resourcePath, 'less-compile-cache')
+      fallbackDir: path.join(resourcePath, "less-compile-cache"),
     });
   }
 
@@ -33,5 +40,4 @@ module.exports = class LessCompileCache {
   cssForFile(stylesheetPath, lessContent, digest) {
     return this.cache.cssForFile(stylesheetPath, lessContent, digest);
   }
-
 };

@@ -1,5 +1,4 @@
-
-const SymbolsView = require('./symbols-view');
+const SymbolsView = require("./symbols-view");
 
 // TODO: Does this really need to extend SymbolsView?
 module.exports = class GoBackView extends SymbolsView {
@@ -13,7 +12,7 @@ module.exports = class GoBackView extends SymbolsView {
     };
 
     let allEditors = atom.workspace.getTextEditors();
-    let previousEditor = allEditors.find(e => e.id === previous.editorId);
+    let previousEditor = allEditors.find((e) => e.id === previous.editorId);
 
     if (previousEditor) {
       let pane = atom.workspace.paneForItem(previousEditor);
@@ -26,4 +25,4 @@ module.exports = class GoBackView extends SymbolsView {
       atom.workspace.open(previous.file).then(restorePosition);
     }
   }
-}
+};

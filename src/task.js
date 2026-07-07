@@ -1,7 +1,7 @@
-const _ = require('underscore-plus');
-const ChildProcess = require('child_process');
-const { Emitter } = require('event-kit');
-const Grim = require('grim');
+const _ = require("underscore-plus");
+const ChildProcess = require("child_process");
+const { Emitter } = require("event-kit");
+const Grim = require("grim");
 
 // Extended: Run a node script in a separate process.
 //
@@ -49,7 +49,7 @@ module.exports = class Task {
   // Returns the created {Task}.
   static once(taskPath, ...args) {
     const task = new Task(taskPath);
-    task.once('task:completed', () => task.terminate());
+    task.once("task:completed", () => task.terminate());
     task.start(...args);
     return task;
   }
@@ -68,7 +68,7 @@ module.exports = class Task {
   //   exports a single {Function} to execute.
   constructor(taskPath) {
     this.emitter = new Emitter();
-    const compileCachePath = require('./compile-cache').getCacheDirectory();
+    const compileCachePath = require("./compile-cache").getCacheDirectory();
     taskPath = require.resolve(taskPath);
     const env = Object.assign({}, process.env, { userAgent: navigator.userAgent });
 
@@ -76,9 +76,9 @@ module.exports = class Task {
       this.childProcess = null;
     } else {
       this.childProcess = ChildProcess.fork(
-        require.resolve('./task-bootstrap'),
+        require.resolve("./task-bootstrap"),
         [compileCachePath, taskPath],
-        { env, silent: true }
+        { env, silent: true },
       );
     }
 
@@ -93,7 +93,7 @@ module.exports = class Task {
     });
     this.on("task:completed", (...args) => {
       if (typeof this.callback === "function") {
-        this.callback(...args)
+        this.callback(...args);
       }
     });
     this.handleEvents();
@@ -103,7 +103,7 @@ module.exports = class Task {
   handleEvents() {
     if (!this.childProcess) return;
     this.childProcess.removeAllListeners();
-    this.childProcess.on('message', ({ event, args }) => {
+    this.childProcess.on("message", ({ event, args }) => {
       if (this.childProcess != null) {
         this.emitter.emit(event, args);
       }
@@ -111,11 +111,11 @@ module.exports = class Task {
     // Catch the errors that happened before task-bootstrap.
     if (this.childProcess.stdout != null) {
       this.childProcess.stdout.removeAllListeners();
-      this.childProcess.stdout.on('data', (data) => console.log(data.toString()));
+      this.childProcess.stdout.on("data", (data) => console.log(data.toString()));
     }
     if (this.childProcess.stderr != null) {
       this.childProcess.stderr.removeAllListeners();
-      this.childProcess.stderr.on('data', (data) => console.error(data.toString()));
+      this.childProcess.stderr.on("data", (data) => console.error(data.toString()));
     }
   }
 
@@ -131,7 +131,7 @@ module.exports = class Task {
     if (atom.unloading) return;
     const [callback] = args.splice(-1);
     if (this.childProcess == null) {
-      throw new Error('Cannot start terminated process');
+      throw new Error("Cannot start terminated process");
     }
     this.handleEvents();
     if (_.isFunction(callback)) {
@@ -139,7 +139,7 @@ module.exports = class Task {
     } else {
       args.push(callback);
     }
-    this.send({ event: 'start', args });
+    this.send({ event: "start", args });
     return undefined;
   }
 
@@ -153,7 +153,7 @@ module.exports = class Task {
     if (this.childProcess != null) {
       this.childProcess.send(message);
     } else {
-      throw new Error('Cannot send message to terminated process');
+      throw new Error("Cannot send message to terminated process");
     }
     return undefined;
   }
@@ -198,9 +198,8 @@ module.exports = class Task {
   cancel() {
     const didForcefullyTerminate = this.terminate();
     if (didForcefullyTerminate) {
-      this.emitter.emit('task:cancelled');
+      this.emitter.emit("task:cancelled");
     }
     return didForcefullyTerminate;
   }
-
 };

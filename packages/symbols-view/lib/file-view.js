@@ -1,10 +1,10 @@
-const { CompositeDisposable, Point } = require('atom');
-const { match } = require('fuzzaldrin');
+const { CompositeDisposable, Point } = require("atom");
+const { match } = require("fuzzaldrin");
 
-const Config = require('./config');
-const SymbolsView = require('./symbols-view');
-const el = require('./element-builder');
-const { badge, isIterable, timeout } = require('./util');
+const Config = require("./config");
+const SymbolsView = require("./symbols-view");
+const el = require("./element-builder");
+const { badge, isIterable, timeout } = require("./util");
 
 class FileView extends SymbolsView {
   constructor(stack, broker) {
@@ -17,7 +17,7 @@ class FileView extends SymbolsView {
     this.providersWithInvalidatedCaches = new Map();
     this.watchedEditors = new WeakSet();
 
-    this.editorsSubscription = atom.workspace.observeTextEditors(editor => {
+    this.editorsSubscription = atom.workspace.observeTextEditors((editor) => {
       if (this.watchedEditors.has(editor)) return;
 
       const removeFromCache = (provider = null) => {
@@ -28,7 +28,7 @@ class FileView extends SymbolsView {
         }
         let results = this.cachedResults.get(editor);
         if (!results || results.length === 0) return;
-        results = results.filter(sym => {
+        results = results.filter((sym) => {
           return sym.providerId !== provider.packageName;
         });
         if (results.length === 0) {
@@ -73,14 +73,14 @@ class FileView extends SymbolsView {
           let { provider = null, editor: someEditor = null } = bundle;
           if (someEditor && editor.id !== someEditor.id) return;
           removeFromCache(provider);
-        })
+        }),
       );
 
       editorSubscriptions.add(
         editor.onDidDestroy(() => {
           this.watchedEditors.delete(editor);
           editorSubscriptions.dispose();
-        })
+        }),
       );
 
       this.watchedEditors.add(editor);
@@ -104,41 +104,40 @@ class FileView extends SymbolsView {
       badges.push(tag);
     }
 
-    let primaryLineClasses = ['primary-line'];
+    let primaryLineClasses = ["primary-line"];
     if (this.showIconsInSymbolsView) {
       if (icon) {
-        primaryLineClasses.push('icon', icon);
+        primaryLineClasses.push("icon", icon);
       } else {
-        primaryLineClasses.push('no-icon');
+        primaryLineClasses.push("no-icon");
       }
     }
 
     // The “primary” results line shows the symbol's name and its tag, if any.
-    let primary = el(`div.${primaryLineClasses.join('.')}`,
-      el('div.name',
-        SymbolsView.highlightMatches(this, name, matches)
-      ),
-      badges && el('div.badge-container',
-        ...badges.map(b => badge(b, { variant: this.useBadgeColors }))
-      )
+    let primary = el(
+      `div.${primaryLineClasses.join(".")}`,
+      el("div.name", SymbolsView.highlightMatches(this, name, matches)),
+      badges &&
+        el("div.badge-container", ...badges.map((b) => badge(b, { variant: this.useBadgeColors }))),
     );
 
     // The “secondary” results line shows the symbol’s row number and its
     // context, if any.
-    let secondaryLineClasses = ['secondary-line'];
+    let secondaryLineClasses = ["secondary-line"];
     if (this.showIconsInSymbolsView) {
-      secondaryLineClasses.push('no-icon');
+      secondaryLineClasses.push("no-icon");
     }
-    let secondary = el(`div.${secondaryLineClasses.join('.')}`,
-      el('span.location', `Line ${position.row + 1}`),
-      context && el('span.context', context)
+    let secondary = el(
+      `div.${secondaryLineClasses.join(".")}`,
+      el("span.location", `Line ${position.row + 1}`),
+      context && el("span.context", context),
     );
 
-    return el('li.two-lines', primary, secondary);
+    return el("li.two-lines", primary, secondary);
   }
 
   didChangeSelection(item) {
-    let quickJump = Config.get('quickJumpToFileSymbol');
+    let quickJump = Config.get("quickJumpToFileSymbol");
     if (quickJump && item) this.openTag(item);
   }
 
@@ -157,12 +156,12 @@ class FileView extends SymbolsView {
     super.didConfirmEmptySelection();
   }
 
-  async toggle(filterTerm = '') {
+  async toggle(filterTerm = "") {
     if (this.panel.isVisible()) await this.cancel();
     let editor = this.getEditor();
     // Remember exactly where the editor is so that we can restore that state
     // if the user cancels.
-    let quickJump = Config.get('quickJumpToFileSymbol');
+    let quickJump = Config.get("quickJumpToFileSymbol");
     if (quickJump && editor) {
       this.initialState = this.serializeEditorState(editor);
     }
@@ -179,7 +178,7 @@ class FileView extends SymbolsView {
 
     return {
       bufferRanges: editor.getSelectedBufferRanges(),
-      scrollTop
+      scrollTop,
     };
   }
 
@@ -204,7 +203,7 @@ class FileView extends SymbolsView {
 
   isValidSymbol(symbol) {
     if (!symbol.position || !(symbol.position instanceof Point)) return false;
-    if (typeof symbol.name !== 'string') return false;
+    if (typeof symbol.name !== "string") return false;
     return true;
   }
 
@@ -214,13 +213,13 @@ class FileView extends SymbolsView {
     if (result && !providersToQuery?.size) {
       let symbols = result;
       await this.updateView({
-        items: symbols
+        items: symbols,
       });
       return true;
     } else {
       await this.updateView({
         items: [],
-        loadingMessage: 'Generating symbols\u2026'
+        loadingMessage: "Generating symbols\u2026",
       });
       result = this.generateSymbols(editor, result, providersToQuery);
       if (result?.then) result = await result;
@@ -233,7 +232,7 @@ class FileView extends SymbolsView {
       result.sort((a, b) => a.position.compare(b.position));
       await this.updateView({
         items: result,
-        loadingMessage: null
+        loadingMessage: null,
       });
       return true;
     }
@@ -243,7 +242,7 @@ class FileView extends SymbolsView {
     this.abortController?.abort();
     this.abortController = new AbortController();
 
-    let meta = { type: 'file', editor, timeout: this.timeoutMs };
+    let meta = { type: "file", editor, timeout: this.timeoutMs };
 
     // The signal is how a provider can stop doing work if it's going async,
     // since it'll be able to tell if we've cancelled this command and no
@@ -260,7 +259,7 @@ class FileView extends SymbolsView {
     // should act similarly in the event of partial invalidation, and ignore
     // any providers _except_ the ones whose caches were invalidated.
     if (onlyProviders) {
-      providers = providers.filter(p => onlyProviders.has(p));
+      providers = providers.filter((p) => onlyProviders.has(p));
     }
 
     if (providers?.length === 0) {
@@ -283,7 +282,7 @@ class FileView extends SymbolsView {
 
     let error = (err, provider) => {
       if (signal.aborted) return;
-      let message = typeof err === 'string' ? err : err.message;
+      let message = typeof err === "string" ? err : err.message;
       console.error(`Error in retrieving symbols from provider ${provider.name}: ${message}`);
     };
 
@@ -298,7 +297,7 @@ class FileView extends SymbolsView {
           // need to wait for.
           let task = symbols
             .then((result) => done(result, provider))
-            .catch(err => error(err, provider));
+            .catch((err) => error(err, provider));
           tasks.push(task);
         } else if (isIterable(symbols)) {
           // This is a valid list of symbols, so the provider acted

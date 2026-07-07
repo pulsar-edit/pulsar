@@ -11,7 +11,8 @@ This is a package for [Lumine](https://pulsar-edit.dev), a community-led hyper-h
 This package provides a cross-platform "About Lumine" view that displays information about your Lumine installation, which currently includes the current version, the license, and the Terms of Use.
 
 ## Contributing
-Always feel free to help out!  Whether it's filing bugs and feature requests
+
+Always feel free to help out! Whether it's filing bugs and feature requests
 or working on some of the open issues, Lumine's [contributing guide](https://github.com/pulsar-edit/.github/blob/main/CONTRIBUTING.md)
 will help get you started while the [guide for contributing to packages](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#contributing-to-packages)
 has some extra information.

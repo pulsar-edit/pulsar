@@ -8,3 +8,6 @@ vendor/
 # Generated / lockfiles / minified
 yarn.lock
 *.min.js
+
+# Test fixtures — exact content is asserted by specs; must not be reformatted
+**/fixtures/

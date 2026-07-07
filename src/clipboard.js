@@ -1,5 +1,5 @@
-const crypto = require('crypto');
-const { clipboard } = require('electron');
+const crypto = require("crypto");
+const { clipboard } = require("electron");
 
 // Extended: Represents the clipboard used for copying and pasting in Lumine.
 //
@@ -39,10 +39,7 @@ module.exports = class Clipboard {
   //
   // Returns a hashed {String}.
   md5(text) {
-    return crypto
-      .createHash('md5')
-      .update(text, 'utf8')
-      .digest('hex');
+    return crypto.createHash("md5").update(text, "utf8").digest("hex");
   }
 
   // Public: Write the given text to the clipboard.
@@ -53,7 +50,7 @@ module.exports = class Clipboard {
   // * `text` The {String} to store.
   // * `metadata` (optional) The additional info to associate with the text.
   write(text, metadata) {
-    text = text.replace(/\r?\n/g, process.platform === 'win32' ? '\r\n' : '\n');
+    text = text.replace(/\r?\n/g, process.platform === "win32" ? "\r\n" : "\n");
 
     this.signatureForMetadata = this.md5(text);
     this.metadata = metadata;

@@ -11,7 +11,6 @@
   "dependencies": {
     "atom-select-list": "^0.7.0"
   },
-
   "providedServices": {
     "bookmarks": {
       "description": "Provides a list of bookmarks to any package that wants to know about them.",

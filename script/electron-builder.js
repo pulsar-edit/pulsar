@@ -1,48 +1,54 @@
 /* eslint-disable no-process-exit */
-const Path = require('path');
-const dedent = require('dedent');
-const FS = require('fs/promises');
-const { existsSync } = require('fs');
-const yargs = require('yargs');
-const { hideBin } = require('yargs/helpers')
-const generateMetadata = require('./generate-metadata-for-builder')
+const Path = require("path");
+const dedent = require("dedent");
+const FS = require("fs/promises");
+const { existsSync } = require("fs");
+const yargs = require("yargs");
+const { hideBin } = require("yargs/helpers");
+const generateMetadata = require("./generate-metadata-for-builder");
 const macBundleDocumentTypes = require("./mac-bundle-document-types.js");
 
 // Monkey-patch to not remove things I explicitly didn't say to remove.
 // See: https://github.com/electron-userland/electron-builder/issues/6957
 
 /* eslint-disable n/no-extraneous-require */
-let transformer = require('app-builder-lib/out/fileTransformer')
+let transformer = require("app-builder-lib/out/fileTransformer");
 const builder_util_1 = require("builder-util");
 /* eslint-enable n/no-extraneous-require */
 
-transformer.createTransformer = function createTransformer(srcDir, configuration, extraMetadata, extraTransformer) {
+transformer.createTransformer = function createTransformer(
+  srcDir,
+  configuration,
+  extraMetadata,
+  extraTransformer,
+) {
   const mainPackageJson = Path.join(srcDir, "package.json");
   const isRemovePackageScripts = configuration.removePackageScripts !== false;
   const isRemovePackageKeywords = configuration.removePackageKeywords !== false;
-  return file => {
+  return (file) => {
     if (file === mainPackageJson) {
       return modifyMainPackageJson(
         file,
         extraMetadata,
         isRemovePackageScripts,
-        isRemovePackageKeywords
+        isRemovePackageKeywords,
       );
     }
     if (extraTransformer != null) {
       return extraTransformer(file);
+    } else {
+      return null;
     }
-    else { return null; }
   };
-}
+};
 
 async function modifyMainPackageJson(
   file,
   extraMetadata,
   _isRemovePackageScripts,
-  _isRemovePackageKeywords
+  _isRemovePackageKeywords,
 ) {
-  let mainPackageData = JSON.parse(await FS.readFile(file, 'utf-8'));
+  let mainPackageData = JSON.parse(await FS.readFile(file, "utf-8"));
   if (extraMetadata == null) return null;
 
   builder_util_1.deepAssign(mainPackageData, extraMetadata);
@@ -52,33 +58,32 @@ async function modifyMainPackageJson(
 // END Monkey-patch.
 
 // eslint-disable-next-line n/no-unpublished-require
-const builder = require('electron-builder');
+const builder = require("electron-builder");
 
 const ARGS = yargs(hideBin(process.argv))
-  .command('[platform]', 'build for a given platform', () => {
-    return yargs.positional('platform', {
-      describe: 'One of "mac", "linux", or "win".'
-    })
+  .command("[platform]", "build for a given platform", () => {
+    return yargs.positional("platform", {
+      describe: 'One of "mac", "linux", or "win".',
+    });
   })
-  .option('target', {
-    alias: 't',
-    type: 'string',
-    description: 'Limit to one target of the specified platform; otherwise all targets for that platform are built.'
+  .option("target", {
+    alias: "t",
+    type: "string",
+    description:
+      "Limit to one target of the specified platform; otherwise all targets for that platform are built.",
   })
   .parse();
 
-
-const displayName = 'Lumine';
-const baseName = 'lumine';
-const iconName = 'beta';
+const displayName = "Lumine";
+const baseName = "lumine";
+const iconName = "beta";
 
 const ICONS = {
   png: `resources/app-icons/${iconName}.png`,
   ico: `resources/app-icons/${iconName}.ico`,
   svg: `resources/app-icons/${iconName}.svg`,
-  icns: `resources/app-icons/${iconName}.icns`
+  icns: `resources/app-icons/${iconName}.icns`,
 };
-
 
 let options = {
   appId: `io.github.lumine-code.${baseName}`,
@@ -219,21 +224,21 @@ let options = {
   ],
 
   extraResources: [
-    { from: 'lumine.sh', to: `${baseName}.sh` },
-    { from: ICONS.png, to: 'lumine.png' },
-    { from: 'LICENSE.md', to: 'LICENSE.md' }
+    { from: "lumine.sh", to: `${baseName}.sh` },
+    { from: ICONS.png, to: "lumine.png" },
+    { from: "LICENSE.md", to: "LICENSE.md" },
   ],
-  compression: 'normal',
+  compression: "normal",
   deb: {
-    afterInstall: 'script/post-install.sh',
-    afterRemove: 'script/post-uninstall.sh',
-    packageName: baseName
+    afterInstall: "script/post-install.sh",
+    afterRemove: "script/post-uninstall.sh",
+    packageName: baseName,
   },
   rpm: {
-    afterInstall: 'script/post-install.sh',
-    afterRemove: 'script/post-uninstall-rpm.sh',
-    compression: 'xz',
-    fpm: ['--rpm-digest', 'sha256', '--rpm-rpmbuild-define=_build_id_links none']
+    afterInstall: "script/post-install.sh",
+    afterRemove: "script/post-uninstall-rpm.sh",
+    compression: "xz",
+    fpm: ["--rpm-digest", "sha256", "--rpm-rpmbuild-define=_build_id_links none"],
   },
 
   linux: {
@@ -244,22 +249,17 @@ let options = {
     icon: "resources/icons",
     category: "Development",
     synopsis: "A community-led hyper-hackable text editor",
-    target: [
-      { target: 'appimage' },
-      { target: 'deb' },
-      { target: 'rpm' },
-      { target: 'tar.gz' }
-    ],
+    target: [{ target: "appimage" }, { target: "deb" }, { target: "rpm" }, { target: "tar.gz" }],
     extraResources: [
       {
         // Extra SVG icon included in the resources folder to give a chance to
         // Linux packagers to add a scalable desktop icon under
         // `/usr/share/icons/hicolor/scalable`
         // (used only by desktops to show it on bar/switcher and app menus).
-        "from": ICONS.svg,
-        "to": `${baseName}.svg`
-      }
-    ]
+        from: ICONS.svg,
+        to: `${baseName}.svg`,
+      },
+    ],
   },
 
   mac: {
@@ -279,22 +279,22 @@ let options = {
     entitlementsInherit: "resources/mac/entitlements.plist",
     extendInfo: {
       // Extra values that will be inserted into the app's plist.
-      "CFBundleExecutable": displayName,
-      "NSAppleScriptEnabled": "YES",
-      "NSMainNibFile": "MainMenu",
-      "NSRequiresAquaSystemAppearance": "NO",
-      "CFBundleDocumentTypes": macBundleDocumentTypes.create(),
-      "CFBundleURLTypes": [
-        { "CFBundleURLSchemes": [ "atom" ] },
-        { "CFBundleURLName": "Atom Shared Session Protocol" }
-      ]
+      CFBundleExecutable: displayName,
+      NSAppleScriptEnabled: "YES",
+      NSMainNibFile: "MainMenu",
+      NSRequiresAquaSystemAppearance: "NO",
+      CFBundleDocumentTypes: macBundleDocumentTypes.create(),
+      CFBundleURLTypes: [
+        { CFBundleURLSchemes: ["atom"] },
+        { CFBundleURLName: "Atom Shared Session Protocol" },
+      ],
     },
-    extraResources: []
+    extraResources: [],
   },
 
   dmg: {
     sign: false,
-    writeUpdateInfo: false
+    writeUpdateInfo: false,
   },
 
   // Earliest supported version of Windows is Windows 10. Electron 23 dropped
@@ -302,15 +302,12 @@ let options = {
   win: {
     icon: ICONS.ico,
     extraResources: [
-      { from: ICONS.ico, to: 'lumine.ico' },
-      { from: 'resources/win/lumine.cmd', to: `${baseName}.cmd` },
-      { from: 'resources/win/lumine.js', to: `${baseName}.js` },
-      { from: 'resources/win/NSIS_Licenses.txt', to: 'NSIS_Licenses.txt' },
+      { from: ICONS.ico, to: "lumine.ico" },
+      { from: "resources/win/lumine.cmd", to: `${baseName}.cmd` },
+      { from: "resources/win/lumine.js", to: `${baseName}.js` },
+      { from: "resources/win/NSIS_Licenses.txt", to: "NSIS_Licenses.txt" },
     ],
-    target: [
-      { target: 'nsis' },
-      { target: 'zip' }
-    ]
+    target: [{ target: "nsis" }, { target: "zip" }],
   },
 
   nsis: {
@@ -323,40 +320,40 @@ let options = {
     // GUID is omitted so electron-builder derives it from the appId.
     include: "resources/win/installer.nsh",
     warningsAsErrors: false,
-    differentialPackage: false
+    differentialPackage: false,
   },
 
   extraMetadata: {},
 
-  afterSign: 'script/mac-notarise.js',
+  afterSign: "script/mac-notarise.js",
   asarUnpack: [
     "node_modules/github/bin/*",
-    "node_modules/github/lib/*",       // Resolves error in console
-    "**/node_modules/dugite/git/**",   // Include dugite postInstall output (matching glob used for Atom)
+    "node_modules/github/lib/*", // Resolves error in console
+    "**/node_modules/dugite/git/**", // Include dugite postInstall output (matching glob used for Atom)
     "**/node_modules/spellchecker/**", // Matching Atom Glob
-  ]
+  ],
 };
 
 function whatToBuild() {
   if (!ARGS.target) return options;
   if (!(ARGS.platform in options)) return options;
-  options[ARGS.platform] = options[ARGS.platform].filter(e => e.target === ARGS.target);
+  options[ARGS.platform] = options[ARGS.platform].filter((e) => e.target === ARGS.target);
   return options;
 }
 
 async function main() {
-  let pack = await FS.readFile('package.json', 'utf-8');
+  let pack = await FS.readFile("package.json", "utf-8");
   let options = whatToBuild();
   let parsedPackageJson = JSON.parse(pack);
   options.extraMetadata = generateMetadata(parsedPackageJson);
 
   try {
     let result = await builder.build({ config: options });
-    if (!existsSync('binaries')) {
-      await FS.mkdir('binaries');
+    if (!existsSync("binaries")) {
+      await FS.mkdir("binaries");
     }
-    let promises = result.map(r => {
-      let destination = Path.join('binaries', Path.basename(r));
+    let promises = result.map((r) => {
+      let destination = Path.join("binaries", Path.basename(r));
       return FS.copyFile(r, destination);
     });
     await Promise.all(promises);

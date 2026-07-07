@@ -7,7 +7,9 @@
   margin: 0;
   color: #e6edf3;
   background-color: #0d1117;
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
   font-size: 16px;
   line-height: 1.5;
   word-wrap: break-word;
@@ -27,7 +29,7 @@
 .markdown-preview[data-use-github-style="dark"] h6:hover .anchor .octicon-link:before {
   width: 16px;
   height: 16px;
-  content: ' ';
+  content: " ";
   display: inline-block;
   background-color: currentColor;
   -webkit-mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' version='1.1' aria-hidden='true'><path fill-rule='evenodd' d='M7.775 3.275a.75.75 0 001.06 1.06l1.25-1.25a2 2 0 112.83 2.83l-2.5 2.5a2 2 0 01-2.83 0 .75.75 0 00-1.06 1.06 3.5 3.5 0 004.95 0l2.5-2.5a3.5 3.5 0 00-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 010-2.83l2.5-2.5a2 2 0 012.83 0 .75.75 0 001.06-1.06 3.5 3.5 0 00-4.95 0l-2.5 2.5a3.5 3.5 0 004.95 4.95l1.25-1.25a.75.75 0 00-1.06-1.06l-1.25 1.25a2 2 0 01-2.83 0z'></path></svg>");
@@ -70,15 +72,15 @@
 }
 
 .markdown-preview[data-use-github-style="dark"] h1 {
-  margin: .67em 0;
+  margin: 0.67em 0;
   font-weight: 600;
-  padding-bottom: .3em;
+  padding-bottom: 0.3em;
   font-size: 2em;
   border-bottom: 1px solid #21262d;
 }
 
 .markdown-preview[data-use-github-style="dark"] mark {
-  background-color: rgba(187,128,9,0.15);
+  background-color: rgba(187, 128, 9, 0.15);
   color: #e6edf3;
 }
 
@@ -126,7 +128,7 @@
   overflow: hidden;
   background: transparent;
   border-bottom: 1px solid #21262d;
-  height: .25em;
+  height: 0.25em;
   padding: 0;
   margin: 24px 0;
   background-color: #30363d;
@@ -142,33 +144,33 @@
   line-height: inherit;
 }
 
-.markdown-preview[data-use-github-style="dark"] [type=button],
-.markdown-preview[data-use-github-style="dark"] [type=reset],
-.markdown-preview[data-use-github-style="dark"] [type=submit] {
+.markdown-preview[data-use-github-style="dark"] [type="button"],
+.markdown-preview[data-use-github-style="dark"] [type="reset"],
+.markdown-preview[data-use-github-style="dark"] [type="submit"] {
   -webkit-appearance: button;
   appearance: button;
 }
 
-.markdown-preview[data-use-github-style="dark"] [type=checkbox],
-.markdown-preview[data-use-github-style="dark"] [type=radio] {
+.markdown-preview[data-use-github-style="dark"] [type="checkbox"],
+.markdown-preview[data-use-github-style="dark"] [type="radio"] {
   box-sizing: border-box;
   padding: 0;
 }
 
-.markdown-preview[data-use-github-style="dark"] [type=number]::-webkit-inner-spin-button,
-.markdown-preview[data-use-github-style="dark"] [type=number]::-webkit-outer-spin-button {
+.markdown-preview[data-use-github-style="dark"] [type="number"]::-webkit-inner-spin-button,
+.markdown-preview[data-use-github-style="dark"] [type="number"]::-webkit-outer-spin-button {
   height: auto;
 }
 
-.markdown-preview[data-use-github-style="dark"] [type=search]::-webkit-search-cancel-button,
-.markdown-preview[data-use-github-style="dark"] [type=search]::-webkit-search-decoration {
+.markdown-preview[data-use-github-style="dark"] [type="search"]::-webkit-search-cancel-button,
+.markdown-preview[data-use-github-style="dark"] [type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
   appearance: none;
 }
 
 .markdown-preview[data-use-github-style="dark"] ::-webkit-input-placeholder {
   color: inherit;
-  opacity: .54;
+  opacity: 0.54;
 }
 
 .markdown-preview[data-use-github-style="dark"] ::-webkit-file-upload-button {
@@ -215,30 +217,30 @@
   cursor: pointer;
 }
 
-.markdown-preview[data-use-github-style="dark"] details:not([open])>*:not(summary) {
+.markdown-preview[data-use-github-style="dark"] details:not([open]) > *:not(summary) {
   display: none !important;
 }
 
 .markdown-preview[data-use-github-style="dark"] a:focus,
-.markdown-preview[data-use-github-style="dark"] [role=button]:focus,
-.markdown-preview[data-use-github-style="dark"] input[type=radio]:focus,
-.markdown-preview[data-use-github-style="dark"] input[type=checkbox]:focus {
+.markdown-preview[data-use-github-style="dark"] [role="button"]:focus,
+.markdown-preview[data-use-github-style="dark"] input[type="radio"]:focus,
+.markdown-preview[data-use-github-style="dark"] input[type="checkbox"]:focus {
   outline: 2px solid #2f81f7;
   outline-offset: -2px;
   box-shadow: none;
 }
 
 .markdown-preview[data-use-github-style="dark"] a:focus:not(:focus-visible),
-.markdown-preview[data-use-github-style="dark"] [role=button]:focus:not(:focus-visible),
-.markdown-preview[data-use-github-style="dark"] input[type=radio]:focus:not(:focus-visible),
-.markdown-preview[data-use-github-style="dark"] input[type=checkbox]:focus:not(:focus-visible) {
+.markdown-preview[data-use-github-style="dark"] [role="button"]:focus:not(:focus-visible),
+.markdown-preview[data-use-github-style="dark"] input[type="radio"]:focus:not(:focus-visible),
+.markdown-preview[data-use-github-style="dark"] input[type="checkbox"]:focus:not(:focus-visible) {
   outline: solid 1px transparent;
 }
 
 .markdown-preview[data-use-github-style="dark"] a:focus-visible,
-.markdown-preview[data-use-github-style="dark"] [role=button]:focus-visible,
-.markdown-preview[data-use-github-style="dark"] input[type=radio]:focus-visible,
-.markdown-preview[data-use-github-style="dark"] input[type=checkbox]:focus-visible {
+.markdown-preview[data-use-github-style="dark"] [role="button"]:focus-visible,
+.markdown-preview[data-use-github-style="dark"] input[type="radio"]:focus-visible,
+.markdown-preview[data-use-github-style="dark"] input[type="checkbox"]:focus-visible {
   outline: 2px solid #2f81f7;
   outline-offset: -2px;
   box-shadow: none;
@@ -246,25 +248,32 @@
 
 .markdown-preview[data-use-github-style="dark"] a:not([class]):focus,
 .markdown-preview[data-use-github-style="dark"] a:not([class]):focus-visible,
-.markdown-preview[data-use-github-style="dark"] input[type=radio]:focus,
-.markdown-preview[data-use-github-style="dark"] input[type=radio]:focus-visible,
-.markdown-preview[data-use-github-style="dark"] input[type=checkbox]:focus,
-.markdown-preview[data-use-github-style="dark"] input[type=checkbox]:focus-visible {
+.markdown-preview[data-use-github-style="dark"] input[type="radio"]:focus,
+.markdown-preview[data-use-github-style="dark"] input[type="radio"]:focus-visible,
+.markdown-preview[data-use-github-style="dark"] input[type="checkbox"]:focus,
+.markdown-preview[data-use-github-style="dark"] input[type="checkbox"]:focus-visible {
   outline-offset: 0;
 }
 
 .markdown-preview[data-use-github-style="dark"] kbd {
   display: inline-block;
   padding: 3px 5px;
-  font: 11px ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+  font:
+    11px ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    Liberation Mono,
+    monospace;
   line-height: 10px;
   color: #e6edf3;
   vertical-align: middle;
   background-color: #161b22;
-  border: solid 1px rgba(110,118,129,0.4);
-  border-bottom-color: rgba(110,118,129,0.4);
+  border: solid 1px rgba(110, 118, 129, 0.4);
+  border-bottom-color: rgba(110, 118, 129, 0.4);
   border-radius: 6px;
-  box-shadow: inset 0 -1px 0 rgba(110,118,129,0.4);
+  box-shadow: inset 0 -1px 0 rgba(110, 118, 129, 0.4);
 }
 
 .markdown-preview[data-use-github-style="dark"] h1,
@@ -281,7 +290,7 @@
 
 .markdown-preview[data-use-github-style="dark"] h2 {
   font-weight: 600;
-  padding-bottom: .3em;
+  padding-bottom: 0.3em;
   font-size: 1.5em;
   border-bottom: 1px solid #21262d;
 }
@@ -298,12 +307,12 @@
 
 .markdown-preview[data-use-github-style="dark"] h5 {
   font-weight: 600;
-  font-size: .875em;
+  font-size: 0.875em;
 }
 
 .markdown-preview[data-use-github-style="dark"] h6 {
   font-weight: 600;
-  font-size: .85em;
+  font-size: 0.85em;
   color: #848d97;
 }
 
@@ -316,7 +325,7 @@
   margin: 0;
   padding: 0 1em;
   color: #848d97;
-  border-left: .25em solid #30363d;
+  border-left: 0.25em solid #30363d;
 }
 
 .markdown-preview[data-use-github-style="dark"] ul,
@@ -345,14 +354,28 @@
 .markdown-preview[data-use-github-style="dark"] tt,
 .markdown-preview[data-use-github-style="dark"] code,
 .markdown-preview[data-use-github-style="dark"] samp {
-  font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    Liberation Mono,
+    monospace;
   font-size: 12px;
 }
 
 .markdown-preview[data-use-github-style="dark"] pre {
   margin-top: 0;
   margin-bottom: 0;
-  font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    Liberation Mono,
+    monospace;
   font-size: 12px;
   word-wrap: normal;
 }
@@ -386,11 +409,11 @@
   content: "";
 }
 
-.markdown-preview[data-use-github-style="dark"]>*:first-child {
+.markdown-preview[data-use-github-style="dark"] > *:first-child {
   margin-top: 0 !important;
 }
 
-.markdown-preview[data-use-github-style="dark"]>*:last-child {
+.markdown-preview[data-use-github-style="dark"] > *:last-child {
   margin-bottom: 0 !important;
 }
 
@@ -426,11 +449,11 @@
   margin-bottom: 16px;
 }
 
-.markdown-preview[data-use-github-style="dark"] blockquote>:first-child {
+.markdown-preview[data-use-github-style="dark"] blockquote > :first-child {
   margin-top: 0;
 }
 
-.markdown-preview[data-use-github-style="dark"] blockquote>:last-child {
+.markdown-preview[data-use-github-style="dark"] blockquote > :last-child {
   margin-bottom: 0;
 }
 
@@ -475,7 +498,7 @@
 .markdown-preview[data-use-github-style="dark"] h5 code,
 .markdown-preview[data-use-github-style="dark"] h6 tt,
 .markdown-preview[data-use-github-style="dark"] h6 code {
-  padding: 0 .2em;
+  padding: 0 0.2em;
   font-size: inherit;
 }
 
@@ -529,7 +552,7 @@
   list-style-type: decimal;
 }
 
-.markdown-preview[data-use-github-style="dark"] div>ol:not([type]) {
+.markdown-preview[data-use-github-style="dark"] div > ol:not([type]) {
   list-style-type: decimal;
 }
 
@@ -541,12 +564,12 @@
   margin-bottom: 0;
 }
 
-.markdown-preview[data-use-github-style="dark"] li>p {
+.markdown-preview[data-use-github-style="dark"] li > p {
   margin-top: 16px;
 }
 
-.markdown-preview[data-use-github-style="dark"] li+li {
-  margin-top: .25em;
+.markdown-preview[data-use-github-style="dark"] li + li {
+  margin-top: 0.25em;
 }
 
 .markdown-preview[data-use-github-style="dark"] dl {
@@ -576,7 +599,7 @@
   border: 1px solid #30363d;
 }
 
-.markdown-preview[data-use-github-style="dark"] table td>:last-child {
+.markdown-preview[data-use-github-style="dark"] table td > :last-child {
   margin-bottom: 0;
 }
 
@@ -593,11 +616,11 @@
   background-color: transparent;
 }
 
-.markdown-preview[data-use-github-style="dark"] img[align=right] {
+.markdown-preview[data-use-github-style="dark"] img[align="right"] {
   padding-left: 20px;
 }
 
-.markdown-preview[data-use-github-style="dark"] img[align=left] {
+.markdown-preview[data-use-github-style="dark"] img[align="left"] {
   padding-right: 20px;
 }
 
@@ -612,7 +635,7 @@
   overflow: hidden;
 }
 
-.markdown-preview[data-use-github-style="dark"] span.frame>span {
+.markdown-preview[data-use-github-style="dark"] span.frame > span {
   display: block;
   float: left;
   width: auto;
@@ -640,7 +663,7 @@
   clear: both;
 }
 
-.markdown-preview[data-use-github-style="dark"] span.align-center>span {
+.markdown-preview[data-use-github-style="dark"] span.align-center > span {
   display: block;
   margin: 13px auto 0;
   overflow: hidden;
@@ -658,7 +681,7 @@
   clear: both;
 }
 
-.markdown-preview[data-use-github-style="dark"] span.align-right>span {
+.markdown-preview[data-use-github-style="dark"] span.align-right > span {
   display: block;
   margin: 13px 0 0;
   overflow: hidden;
@@ -688,7 +711,7 @@
   overflow: hidden;
 }
 
-.markdown-preview[data-use-github-style="dark"] span.float-right>span {
+.markdown-preview[data-use-github-style="dark"] span.float-right > span {
   display: block;
   margin: 13px auto 0;
   overflow: hidden;
@@ -697,11 +720,11 @@
 
 .markdown-preview[data-use-github-style="dark"] code,
 .markdown-preview[data-use-github-style="dark"] tt {
-  padding: .2em .4em;
+  padding: 0.2em 0.4em;
   margin: 0;
   font-size: 85%;
   white-space: break-spaces;
-  background-color: rgba(110,118,129,0.4);
+  background-color: rgba(110, 118, 129, 0.4);
   border-radius: 6px;
 }
 
@@ -722,7 +745,7 @@
   font-size: 100%;
 }
 
-.markdown-preview[data-use-github-style="dark"] pre>code {
+.markdown-preview[data-use-github-style="dark"] pre > code {
   padding: 0;
   margin: 0;
   word-break: normal;
@@ -962,7 +985,7 @@
 .markdown-preview[data-use-github-style="dark"] g-emoji {
   display: inline-block;
   min-width: 1ch;
-  font-family: "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-size: 1em;
   font-style: normal !important;
   font-weight: 400;
@@ -987,7 +1010,7 @@
   cursor: pointer;
 }
 
-.markdown-preview[data-use-github-style="dark"] .task-list-item+.task-list-item {
+.markdown-preview[data-use-github-style="dark"] .task-list-item + .task-list-item {
   margin-top: 4px;
 }
 
@@ -996,20 +1019,26 @@
 }
 
 .markdown-preview[data-use-github-style="dark"] .task-list-item-checkbox {
-  margin: 0 .2em .25em -1.4em;
+  margin: 0 0.2em 0.25em -1.4em;
   vertical-align: middle;
 }
 
-.markdown-preview[data-use-github-style="dark"] .contains-task-list:dir(rtl) .task-list-item-checkbox {
-  margin: 0 -1.6em .25em .2em;
+.markdown-preview[data-use-github-style="dark"]
+  .contains-task-list:dir(rtl)
+  .task-list-item-checkbox {
+  margin: 0 -1.6em 0.25em 0.2em;
 }
 
 .markdown-preview[data-use-github-style="dark"] .contains-task-list {
   position: relative;
 }
 
-.markdown-preview[data-use-github-style="dark"] .contains-task-list:hover .task-list-item-convert-container,
-.markdown-preview[data-use-github-style="dark"] .contains-task-list:focus-within .task-list-item-convert-container {
+.markdown-preview[data-use-github-style="dark"]
+  .contains-task-list:hover
+  .task-list-item-convert-container,
+.markdown-preview[data-use-github-style="dark"]
+  .contains-task-list:focus-within
+  .task-list-item-convert-container {
   display: block;
   width: auto;
   height: 24px;
@@ -1025,14 +1054,14 @@
   padding: 8px 16px;
   margin-bottom: 16px;
   color: inherit;
-  border-left: .25em solid #30363d;
+  border-left: 0.25em solid #30363d;
 }
 
-.markdown-preview[data-use-github-style="dark"] .markdown-alert>:first-child {
+.markdown-preview[data-use-github-style="dark"] .markdown-alert > :first-child {
   margin-top: 0;
 }
 
-.markdown-preview[data-use-github-style="dark"] .markdown-alert>:last-child {
+.markdown-preview[data-use-github-style="dark"] .markdown-alert > :last-child {
   margin-bottom: 0;
 }
 
@@ -1047,7 +1076,9 @@
   border-left-color: #1f6feb;
 }
 
-.markdown-preview[data-use-github-style="dark"] .markdown-alert.markdown-alert-note .markdown-alert-title {
+.markdown-preview[data-use-github-style="dark"]
+  .markdown-alert.markdown-alert-note
+  .markdown-alert-title {
   color: #2f81f7;
 }
 
@@ -1055,7 +1086,9 @@
   border-left-color: #8957e5;
 }
 
-.markdown-preview[data-use-github-style="dark"] .markdown-alert.markdown-alert-important .markdown-alert-title {
+.markdown-preview[data-use-github-style="dark"]
+  .markdown-alert.markdown-alert-important
+  .markdown-alert-title {
   color: #a371f7;
 }
 
@@ -1063,7 +1096,9 @@
   border-left-color: #9e6a03;
 }
 
-.markdown-preview[data-use-github-style="dark"] .markdown-alert.markdown-alert-warning .markdown-alert-title {
+.markdown-preview[data-use-github-style="dark"]
+  .markdown-alert.markdown-alert-warning
+  .markdown-alert-title {
   color: #d29922;
 }
 
@@ -1071,7 +1106,9 @@
   border-left-color: #238636;
 }
 
-.markdown-preview[data-use-github-style="dark"] .markdown-alert.markdown-alert-tip .markdown-alert-title {
+.markdown-preview[data-use-github-style="dark"]
+  .markdown-alert.markdown-alert-tip
+  .markdown-alert-title {
   color: #3fb950;
 }
 
@@ -1079,6 +1116,8 @@
   border-left-color: #da3633;
 }
 
-.markdown-preview[data-use-github-style="dark"] .markdown-alert.markdown-alert-caution .markdown-alert-title {
+.markdown-preview[data-use-github-style="dark"]
+  .markdown-alert.markdown-alert-caution
+  .markdown-alert-title {
   color: #f85149;
 }

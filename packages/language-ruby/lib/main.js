@@ -1,20 +1,20 @@
 exports.activate = function () {
   if (!atom.grammars.addInjectionPoint) return;
 
-  atom.grammars.addInjectionPoint('source.ruby', {
-    type: 'heredoc_body',
+  atom.grammars.addInjectionPoint("source.ruby", {
+    type: "heredoc_body",
     language(node) {
       return node.lastChild.text;
     },
     content(node) {
-      return node.descendantsOfType('heredoc_content')
+      return node.descendantsOfType("heredoc_content");
     },
   });
 
-  atom.grammars.addInjectionPoint('source.ruby', {
-    type: 'regex',
+  atom.grammars.addInjectionPoint("source.ruby", {
+    type: "regex",
     language() {
-      return 'rb-regex';
+      return "rb-regex";
     },
     content(node) {
       return node;
@@ -23,15 +23,14 @@ exports.activate = function () {
     includeChildren: true,
     // coverShallowerScopes: false
   });
-
 };
 
 exports.consumeHyperlinkInjection = (hyperlink) => {
-  hyperlink.addInjectionPoint('source.ruby', {
-    types: ['comment', 'string_content']
+  hyperlink.addInjectionPoint("source.ruby", {
+    types: ["comment", "string_content"],
   });
 };
 
 exports.consumeTodoInjection = (todo) => {
-  todo.addInjectionPoint('source.ruby', { types: ['comment'] });
+  todo.addInjectionPoint("source.ruby", { types: ["comment"] });
 };

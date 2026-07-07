@@ -6,36 +6,40 @@
 // Forms
 // --------------------------------------------------
 
-
-@input-bg:                       #fff; //** `<input>` background color
-@input-bg-disabled:              @gray-lighter; //** `<input disabled>` background color
-@input-color:                    @gray; //** Text color for `<input>`s
-@input-border:                   #ccc; //** `<input>` border color
+@input-bg: #fff; //** `<input>` background color
+@input-bg-disabled: @gray-lighter; //** `<input disabled>` background color
+@input-color: @gray; //** Text color for `<input>`s
+@input-border: #ccc; //** `<input>` border color
 
 // TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
 //** Default `.form-control` border radius
 // This has no effect on `<select>`s in some browsers, due to the limited stylability of `<select>`s in CSS.
-@input-border-radius:            @border-radius-base; //** Large `.form-control` border radius
-@input-border-radius-large:      @border-radius-large; //** Small `.form-control` border radius
-@input-border-radius-small:      @border-radius-small;
-@input-border-focus:             #66afe9; //** Border color for inputs on focus
-@input-color-placeholder:        #999; //** Placeholder text color
-@input-height-base:              (@line-height-computed + (@padding-base-vertical * 2) + 2); //** Default `.form-control` height
-@input-height-large:             (ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 2); //** Large `.form-control` height
-@input-height-small:             (floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 2); //** Small `.form-control` height
+@input-border-radius: @border-radius-base; //** Large `.form-control` border radius
+@input-border-radius-large: @border-radius-large; //** Small `.form-control` border radius
+@input-border-radius-small: @border-radius-small;
+@input-border-focus: #66afe9; //** Border color for inputs on focus
+@input-color-placeholder: #999; //** Placeholder text color
+@input-height-base: (
+  @line-height-computed + (@padding-base-vertical * 2) + 2
+); //** Default `.form-control` height
+@input-height-large: (
+  ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 2
+); //** Large `.form-control` height
+@input-height-small: (
+  floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 2
+); //** Small `.form-control` height
 
-@form-group-margin-bottom:       15px; //** `.form-group` margin
+@form-group-margin-bottom: 15px; //** `.form-group` margin
 
-@legend-color:                   @gray-dark;
-@legend-border-color:            #e5e5e5;
+@legend-color: @gray-dark;
+@legend-border-color: #e5e5e5;
 
-@input-group-addon-bg:           @gray-lighter; //** Background color for textual input addons
+@input-group-addon-bg: @gray-lighter; //** Background color for textual input addons
 @input-group-addon-border-color: @input-border; //** Border color for textual input addons
 
-@cursor-disabled:                not-allowed; //** Disabled cursor for form controls and buttons.
+@cursor-disabled: not-allowed; //** Disabled cursor for form controls and buttons.
 
-@grid-gutter-width:         30px; //** Padding between columns. Gets divided in half for the left and right.
-
+@grid-gutter-width: 30px; //** Padding between columns. Gets divided in half for the left and right.
 
 // Form validation states
 //
@@ -53,16 +57,18 @@
   &.radio label,
   &.checkbox label,
   &.radio-inline label,
-  &.checkbox-inline label  {
+  &.checkbox-inline label {
     color: @text-color;
   }
   // Set the border and box shadow on specific inputs to match
   .form-control {
     border-color: @border-color;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075); // Redeclare so transitions work
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); // Redeclare so transitions work
     &:focus {
       border-color: darken(@border-color, 10%);
-      box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px lighten(@border-color, 20%);
+      box-shadow:
+        inset 0 1px 1px rgba(0, 0, 0, 0.075),
+        0 0 6px lighten(@border-color, 20%);
     }
   }
   // Set validation states also for addons
@@ -77,7 +83,6 @@
   }
 }
 
-
 // Form control focus state
 //
 // Generate a customized focus state and for any input with the specified color,
@@ -91,11 +96,13 @@
 // Example usage: change the default blue border and shadow to white for better
 // contrast against a dark gray background.
 .form-control-focus(@color: @input-border-focus) {
-  @color-rgba: rgba(red(@color), green(@color), blue(@color), .6);
+  @color-rgba: rgba(red(@color), green(@color), blue(@color), 0.6);
   &:focus {
     border-color: @color;
     outline: 0;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px @color-rgba;
+    box-shadow:
+      inset 0 1px 1px rgba(0, 0, 0, 0.075),
+      0 0 8px @color-rgba;
   }
 }
 
@@ -124,19 +131,19 @@
 
 // Placeholder text
 .placeholder(@color: @input-color-placeholder) {
-  &::-webkit-input-placeholder  { color: @color; } // Safari and Chrome
+  &::-webkit-input-placeholder {
+    color: @color;
+  } // Safari and Chrome
 }
 
 // Creates a wrapper for a series of columns
 .make-row(@gutter: @grid-gutter-width) {
-  margin-left:  ceil((@gutter / -2));
+  margin-left: ceil((@gutter / -2));
   margin-right: floor((@gutter / -2));
   &:extend(.clearfix all);
 }
 
-
 // -----------------------------------------------------
-
 
 // Normalize non-controls
 //
@@ -170,7 +177,6 @@ label {
   margin-bottom: 5px;
   font-weight: bold;
 }
-
 
 // Normalize form controls
 //
@@ -223,7 +229,6 @@ output {
   color: @input-color;
 }
 
-
 // Common form controls
 //
 // Shared size and type resets for form controls. Apply `.form-control` to any
@@ -258,8 +263,10 @@ output {
   background-image: none; // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
   border: 1px solid @input-border;
   border-radius: @input-border-radius; // Note: This has no effect on <select>s in some browsers, due to the limited stylability of <select>s in CSS.
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  transition:
+    border-color ease-in-out 0.15s,
+    box-shadow ease-in-out 0.15s;
 
   // Customize the `:focus` state to imitate native WebKit styles.
   .form-control-focus();
@@ -296,7 +303,6 @@ output {
   }
 }
 
-
 // Form groups
 //
 // Designed to help with the organization and spacing of vertical forms. For
@@ -305,7 +311,6 @@ output {
 .form-group {
   margin-bottom: @form-group-margin-bottom;
 }
-
 
 // Checkboxes and radios
 //
@@ -388,7 +393,6 @@ input[type="checkbox"] {
   }
 }
 
-
 // Static form control text
 //
 // Apply class to a `p` element to make any string of text align with labels in
@@ -408,7 +412,6 @@ input[type="checkbox"] {
     padding-right: 0;
   }
 }
-
 
 // Form control sizing
 //
@@ -474,7 +477,6 @@ input[type="checkbox"] {
   }
 }
 
-
 // Form control feedback states
 //
 // Apply contextual and semantic states to individual form controls.
@@ -529,7 +531,6 @@ input[type="checkbox"] {
 
 // Reposition feedback icon if input has visible label above
 .has-feedback label {
-
   & ~ .form-control-feedback {
     top: (@line-height-computed + 5); // Height of the `label` and its margin
   }
@@ -537,7 +538,6 @@ input[type="checkbox"] {
     top: 0;
   }
 }
-
 
 // Help text
 //
@@ -551,7 +551,6 @@ input[type="checkbox"] {
   color: lighten(@text-color, 25%); // lighten the text some for contrast
 }
 
-
 // Inline forms
 //
 // Make forms appear inline(-block) by adding the `.form-inline` class. Inline
@@ -564,7 +563,6 @@ input[type="checkbox"] {
 // Heads up! This is mixin-ed into `.navbar-form` in navbars.less.
 
 .form-inline {
-
   // Kick in the inline
   @media (min-width: @screen-sm-min) {
     // Inline-block all the things for "inline"
@@ -633,14 +631,12 @@ input[type="checkbox"] {
   }
 }
 
-
 // Horizontal forms
 //
 // Horizontal forms are built on grid classes and allow you to create forms with
 // labels on the left and inputs on the right.
 
 .form-horizontal {
-
   // Consistent vertical alignment of radios and checkboxes
   //
   // Labels also get some reset styles, but that is scoped to a media query below.

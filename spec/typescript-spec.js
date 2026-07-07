@@ -1,25 +1,24 @@
-const expectedError = new Error('Success!');
+const expectedError = new Error("Success!");
 
-describe('TypeScript transpiler support', function () {
-
-  describe('when there is a .ts file', () =>
-    it('transpiles it using typescript', function () {
-      const transpiled = require('./fixtures/typescript/valid.ts');
+describe("TypeScript transpiler support", function () {
+  describe("when there is a .ts file", () =>
+    it("transpiles it using typescript", function () {
+      const transpiled = require("./fixtures/typescript/valid.ts");
       expect(transpiled(3)).toBe(4);
     }));
 
-  describe('when the .ts file is invalid', () => {
-    it('does not transpile', () => {
+  describe("when the .ts file is invalid", () => {
+    it("does not transpile", () => {
       expect(() => {
         try {
-          require('./fixtures/typescript/invalid.ts')
+          require("./fixtures/typescript/invalid.ts");
         } catch (error) {
-          if (error.message.includes('Could not compile TypeScript')) {
+          if (error.message.includes("Could not compile TypeScript")) {
             throw expectedError;
           }
           throw error;
         }
       }).toThrow(expectedError);
-    })
+    });
   });
 });

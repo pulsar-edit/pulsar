@@ -1,5 +1,5 @@
-const _ = require('underscore-plus');
-const { Disposable, CompositeDisposable } = require('event-kit');
+const _ = require("underscore-plus");
+const { Disposable, CompositeDisposable } = require("event-kit");
 let Tooltip = null;
 
 // Essential: Associates tooltips with HTML elements.
@@ -47,15 +47,15 @@ let Tooltip = null;
 module.exports = class TooltipManager {
   constructor({ keymapManager, viewRegistry }) {
     this.defaults = {
-      trigger: 'hover',
-      container: 'body',
+      trigger: "hover",
+      container: "body",
       html: true,
-      placement: 'auto top',
-      viewportPadding: 2
+      placement: "auto top",
+      viewportPadding: 2,
     };
 
     this.hoverDefaults = {
-      delay: { show: 1000, hide: 100 }
+      delay: { show: 1000, hide: 100 },
     };
 
     this.keymapManager = keymapManager;
@@ -120,7 +120,7 @@ module.exports = class TooltipManager {
     }
 
     if (Tooltip == null) {
-      Tooltip = require('./tooltip');
+      Tooltip = require("./tooltip");
     }
 
     const { keyBindingCommand, keyBindingTarget } = options;
@@ -128,20 +128,20 @@ module.exports = class TooltipManager {
     if (keyBindingCommand != null) {
       const keymapManager = this.keymapManager;
       const baseTitle = options.title;
-      options.title = function() {
+      options.title = function () {
         const bindings = keymapManager.findKeyBindings({
           command: keyBindingCommand,
-          target: keyBindingTarget
+          target: keyBindingTarget,
         });
         const keystroke = getKeystroke(bindings);
-        const base = typeof baseTitle === 'function' ? baseTitle.call(this) : baseTitle;
-        return [base, keystroke].filter(Boolean).join(' ');
+        const base = typeof baseTitle === "function" ? baseTitle.call(this) : baseTitle;
+        return [base, keystroke].filter(Boolean).join(" ");
       };
     }
 
     delete options.selector;
     options = _.defaults(options, this.defaults);
-    if (options.trigger === 'hover') {
+    if (options.trigger === "hover") {
       options = _.defaults(options, this.hoverDefaults);
     }
 
@@ -152,16 +152,16 @@ module.exports = class TooltipManager {
     }
     this.tooltips.get(target).push(tooltip);
 
-    const hideTooltip = function() {
+    const hideTooltip = function () {
       tooltip.leave({ currentTarget: target });
       tooltip.hide();
     };
 
     // note: adding a listener here adds a new listener for every tooltip element that's registered.  Adding unnecessary listeners is bad for performance.  It would be better to add/remove listeners when tooltips are actually created in the dom.
-    window.addEventListener('resize', hideTooltip);
+    window.addEventListener("resize", hideTooltip);
 
     const disposable = new Disposable(() => {
-      window.removeEventListener('resize', hideTooltip);
+      window.removeEventListener("resize", hideTooltip);
 
       hideTooltip();
       tooltip.destroy();
@@ -196,15 +196,13 @@ module.exports = class TooltipManager {
 };
 
 function humanizeKeystrokes(keystroke) {
-  let keystrokes = keystroke.split(' ');
-  keystrokes = keystrokes.map(stroke => _.humanizeKeystroke(stroke));
-  return keystrokes.join(' ');
+  let keystrokes = keystroke.split(" ");
+  keystrokes = keystrokes.map((stroke) => _.humanizeKeystroke(stroke));
+  return keystrokes.join(" ");
 }
 
 function getKeystroke(bindings) {
   if (bindings && bindings.length) {
-    return `<span class="keystroke">${humanizeKeystrokes(
-      bindings[0].keystrokes
-    )}</span>`;
+    return `<span class="keystroke">${humanizeKeystrokes(bindings[0].keystrokes)}</span>`;
   }
 }

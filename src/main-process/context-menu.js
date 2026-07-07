@@ -1,4 +1,4 @@
-const { Menu } = require('electron');
+const { Menu } = require("electron");
 
 module.exports = class ContextMenu {
   constructor(template, atomWindow) {
@@ -12,7 +12,7 @@ module.exports = class ContextMenu {
   // closures are dragged across processes and failed to be garbage collected
   // appropriately.
   createClickHandlers(template) {
-    template.forEach(item => {
+    template.forEach((item) => {
       if (item.command) {
         if (!item.commandDetail) item.commandDetail = {};
         item.commandDetail.contextCommand = true;
@@ -20,7 +20,7 @@ module.exports = class ContextMenu {
           global.atomApplication.sendCommandToWindow(
             item.command,
             this.atomWindow,
-            item.commandDetail
+            item.commandDetail,
           );
         };
       } else if (item.submenu) {

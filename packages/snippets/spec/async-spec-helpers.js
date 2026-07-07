@@ -1,5 +1,4 @@
-
-function beforeEach (fn) {
+function beforeEach(fn) {
   global.beforeEach(function () {
     const result = fn();
     if (result instanceof Promise) {
@@ -8,7 +7,7 @@ function beforeEach (fn) {
   });
 }
 
-function afterEach (fn) {
+function afterEach(fn) {
   global.afterEach(function () {
     const result = fn();
     if (result instanceof Promise) {
@@ -17,7 +16,7 @@ function afterEach (fn) {
   });
 }
 
-['it', 'fit', 'ffit', 'fffit'].forEach(function (name) {
+["it", "fit", "ffit", "fffit"].forEach(function (name) {
   module.exports[name] = function (description, fn) {
     if (fn === undefined) {
       global[name](description);
@@ -33,7 +32,7 @@ function afterEach (fn) {
   };
 });
 
-async function conditionPromise (condition, description = 'anonymous condition') {
+async function conditionPromise(condition, description = "anonymous condition") {
   const startTime = Date.now();
 
   while (true) {
@@ -44,20 +43,20 @@ async function conditionPromise (condition, description = 'anonymous condition')
     }
 
     if (Date.now() - startTime > 5000) {
-      throw new Error('Timed out waiting on ' + description);
+      throw new Error("Timed out waiting on " + description);
     }
   }
 }
 
-function timeoutPromise (timeout) {
+function timeoutPromise(timeout) {
   return new Promise(function (resolve) {
     global.setTimeout(resolve, timeout);
   });
 }
 
-function waitsForPromise (fn) {
+function waitsForPromise(fn) {
   const promise = fn();
-  global.waitsFor('spec promise to resolve', function (done) {
+  global.waitsFor("spec promise to resolve", function (done) {
     promise.then(done, function (error) {
       jasmine.getEnv().currentSpec.fail(error);
       done();
@@ -65,7 +64,7 @@ function waitsForPromise (fn) {
   });
 }
 
-function emitterEventPromise (emitter, event, timeout = 15000) {
+function emitterEventPromise(emitter, event, timeout = 15000) {
   return new Promise((resolve, reject) => {
     const timeoutHandle = setTimeout(() => {
       reject(new Error(`Timed out waiting for '${event}' event`));
@@ -77,7 +76,7 @@ function emitterEventPromise (emitter, event, timeout = 15000) {
   });
 }
 
-function promisify (original) {
+function promisify(original) {
   return function (...args) {
     return new Promise((resolve, reject) => {
       args.push((err, ...results) => {
@@ -93,7 +92,7 @@ function promisify (original) {
   };
 }
 
-function promisifySome (obj, fnNames) {
+function promisifySome(obj, fnNames) {
   const result = {};
   for (const fnName of fnNames) {
     result[fnName] = promisify(obj[fnName]);
@@ -108,5 +107,5 @@ module.exports = {
   conditionPromise,
   timeoutPromise,
   beforeEach,
-  afterEach
+  afterEach,
 };

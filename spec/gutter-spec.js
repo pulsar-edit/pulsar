@@ -1,20 +1,20 @@
-const Gutter = require('../src/gutter');
+const Gutter = require("../src/gutter");
 
-describe('Gutter', () => {
+describe("Gutter", () => {
   const fakeGutterContainer = {
-    scheduleComponentUpdate() {}
+    scheduleComponentUpdate() {},
   };
-  const name = 'name';
+  const name = "name";
 
-  describe('::hide', () =>
-    it('hides the gutter if it is visible.', () => {
+  describe("::hide", () =>
+    it("hides the gutter if it is visible.", () => {
       const options = {
         name,
-        visible: true
+        visible: true,
       };
       const gutter = new Gutter(fakeGutterContainer, options);
       const events = [];
-      gutter.onDidChangeVisible(gutter => events.push(gutter.isVisible()));
+      gutter.onDidChangeVisible((gutter) => events.push(gutter.isVisible()));
 
       expect(gutter.isVisible()).toBe(true);
       gutter.hide();
@@ -26,15 +26,15 @@ describe('Gutter', () => {
       expect(events.length).toBe(1);
     }));
 
-  describe('::show', () =>
-    it('shows the gutter if it is hidden.', () => {
+  describe("::show", () =>
+    it("shows the gutter if it is hidden.", () => {
       const options = {
         name,
-        visible: false
+        visible: false,
       };
       const gutter = new Gutter(fakeGutterContainer, options);
       const events = [];
-      gutter.onDidChangeVisible(gutter => events.push(gutter.isVisible()));
+      gutter.onDidChangeVisible((gutter) => events.push(gutter.isVisible()));
 
       expect(gutter.isVisible()).toBe(false);
       gutter.show();
@@ -46,7 +46,7 @@ describe('Gutter', () => {
       expect(events.length).toBe(1);
     }));
 
-  describe('::destroy', () => {
+  describe("::destroy", () => {
     let mockGutterContainer, mockGutterContainerRemovedGutters;
 
     beforeEach(() => {
@@ -54,17 +54,17 @@ describe('Gutter', () => {
       mockGutterContainer = {
         removeGutter(destroyedGutter) {
           mockGutterContainerRemovedGutters.push(destroyedGutter);
-        }
+        },
       };
     });
 
-    it('removes the gutter from its container.', () => {
+    it("removes the gutter from its container.", () => {
       const gutter = new Gutter(mockGutterContainer, { name });
       gutter.destroy();
       expect(mockGutterContainerRemovedGutters).toEqual([gutter]);
     });
 
-    it('calls all callbacks registered on ::onDidDestroy.', () => {
+    it("calls all callbacks registered on ::onDidDestroy.", () => {
       const gutter = new Gutter(mockGutterContainer, { name });
       let didDestroy = false;
       gutter.onDidDestroy(() => {
@@ -74,8 +74,8 @@ describe('Gutter', () => {
       expect(didDestroy).toBe(true);
     });
 
-    it('does not allow destroying the line-number gutter', () => {
-      const gutter = new Gutter(mockGutterContainer, { name: 'line-number' });
+    it("does not allow destroying the line-number gutter", () => {
+      const gutter = new Gutter(mockGutterContainer, { name: "line-number" });
       expect(gutter.destroy).toThrow();
     });
   });

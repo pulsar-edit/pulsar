@@ -14,12 +14,12 @@
 // string matching.
 let CommandLogger;
 const ignoredCommands = {
-  'show.bs.tooltip': true,
-  'shown.bs.tooltip': true,
-  'hide.bs.tooltip': true,
-  'hidden.bs.tooltip': true,
-  'editor:display-updated': true,
-  'mousewheel': true
+  "show.bs.tooltip": true,
+  "shown.bs.tooltip": true,
+  "hide.bs.tooltip": true,
+  "hidden.bs.tooltip": true,
+  "editor:display-updated": true,
+  mousewheel: true,
 };
 
 // Ten minutes in milliseconds.
@@ -28,16 +28,14 @@ const tenMinutes = 10 * 60 * 1000;
 // Public: Handles logging all of the Lumine commands for the automatic repro steps feature.
 //
 // It uses an array as a circular data structure to log only the most recent commands.
-module.exports =
-(CommandLogger = (function() {
+module.exports = CommandLogger = (function () {
   CommandLogger = class CommandLogger {
     static initClass() {
-  
       // Public: Maximum size of the log.
       this.prototype.logSize = 16;
     }
     static instance() {
-      return this._instance != null ? this._instance : (this._instance = new CommandLogger);
+      return this._instance != null ? this._instance : (this._instance = new CommandLogger());
     }
 
     static start() {
@@ -50,7 +48,7 @@ module.exports =
     }
 
     start() {
-      return atom.commands.onWillDispatch(event => {
+      return atom.commands.onWillDispatch((event) => {
         return this.logCommand(event);
       });
     }
@@ -64,9 +62,13 @@ module.exports =
       const lines = [];
       const lastTime = Date.now();
 
-      this.eachEvent(event => {
-        if (event.time > lastTime) { return; }
-        if (!event.name || ((lastTime - event.time) >= tenMinutes)) { return; }
+      this.eachEvent((event) => {
+        if (event.time > lastTime) {
+          return;
+        }
+        if (!event.name || lastTime - event.time >= tenMinutes) {
+          return;
+        }
         return lines.push(this.formatEvent(event, lastTime));
       });
 
@@ -74,8 +76,8 @@ module.exports =
         lines.push(`     ${this.formatTime(0)} ${externalData.title}`);
       }
 
-      lines.unshift('```');
-      lines.push('```');
+      lines.unshift("```");
+      lines.push("```");
       return lines.join("\n");
     }
 
@@ -92,9 +94,13 @@ module.exports =
     //   * `type` Name {String} of the command
     //   * `target` {String} describing where the command was triggered
     logCommand(command) {
-      const {type: name, target, time} = command;
-      if (command.detail != null ? command.detail.jQueryTrigger : undefined) { return; }
-      if (name in ignoredCommands) { return; }
+      const { type: name, target, time } = command;
+      if (command.detail != null ? command.detail.jQueryTrigger : undefined) {
+        return;
+      }
+      if (name in ignoredCommands) {
+        return;
+      }
 
       let event = this.latestEvent();
 
@@ -108,7 +114,7 @@ module.exports =
         event.targetClassName = target.className;
         event.targetId = target.id;
         event.count = 1;
-        return event.time = time != null ? time : Date.now();
+        return (event.time = time != null ? time : Date.now());
       }
     }
 
@@ -118,10 +124,12 @@ module.exports =
     //
     // Returns the {Date} of the last event that should be reported.
     calculateLastEventTime(data) {
-      if (data) { return data.time; }
+      if (data) {
+        return data.time;
+      }
 
       let lastTime = null;
-      this.eachEvent(event => lastTime = event.time);
+      this.eachEvent((event) => (lastTime = event.time));
       return lastTime;
     }
 
@@ -142,7 +150,11 @@ module.exports =
     //   console.log event.name
     // ```
     eachEvent(fn) {
-      for (let offset = 1, end = this.logSize, asc = 1 <= end; asc ? offset <= end : offset >= end; asc ? offset++ : offset--) {
+      for (
+        let offset = 1, end = this.logSize, asc = 1 <= end;
+        asc ? offset <= end : offset >= end;
+        asc ? offset++ : offset--
+      ) {
         fn(this.eventLog[(this.logIndex + offset) % this.logSize]);
       }
     }
@@ -152,9 +164,12 @@ module.exports =
     // Returns the {String} format of the command count.
     formatCount(count) {
       switch (false) {
-        case !(count < 2): return '    ';
-        case !(count < 10): return `  ${count}x`;
-        case !(count < 100): return ` ${count}x`;
+        case !(count < 2):
+          return "    ";
+        case !(count < 10):
+          return `  ${count}x`;
+        case !(count < 100):
+          return ` ${count}x`;
       }
     }
 
@@ -165,11 +180,15 @@ module.exports =
     //
     // Returns the {String} format of the command event.
     formatEvent(event, lastTime) {
-      const {count, time, name, targetNodeName, targetClassName, targetId} = event;
+      const { count, time, name, targetNodeName, targetClassName, targetId } = event;
       const nodeText = targetNodeName.toLowerCase();
-      const idText = targetId ? `#${targetId}` : '';
-      let classText = '';
-      if (targetClassName != null) { for (var klass of Array.from(targetClassName.split(" "))) { classText += `.${klass}`; } }
+      const idText = targetId ? `#${targetId}` : "";
+      let classText = "";
+      if (targetClassName != null) {
+        for (var klass of Array.from(targetClassName.split(" "))) {
+          classText += `.${klass}`;
+        }
+      }
       return `${this.formatCount(count)} ${this.formatTime(lastTime - time)} ${name} (${nodeText}${idText}${classText})`;
     }
 
@@ -181,27 +200,31 @@ module.exports =
     formatTime(time) {
       const minutes = Math.floor(time / 60000);
       let seconds = Math.floor(((time % 60000) / 1000) * 10) / 10;
-      if (seconds < 10) { seconds = `0${seconds}`; }
-      if (Math.floor(seconds) !== seconds) { seconds = `${seconds}.0`; }
+      if (seconds < 10) {
+        seconds = `0${seconds}`;
+      }
+      if (Math.floor(seconds) !== seconds) {
+        seconds = `${seconds}.0`;
+      }
       return `-${minutes}:${seconds}`;
     }
 
     // Private: Initializes the log structure for speed.
     initLog() {
       this.logIndex = 0;
-      return this.eventLog = __range__(0, this.logSize, false).map((i) => ({
+      return (this.eventLog = __range__(0, this.logSize, false).map((i) => ({
         name: null,
         count: 0,
         targetNodeName: null,
         targetClassName: null,
         targetId: null,
-        time: null
-      }));
+        time: null,
+      })));
     }
   };
   CommandLogger.initClass();
   return CommandLogger;
-})());
+})();
 
 function __range__(left, right, inclusive) {
   let range = [];

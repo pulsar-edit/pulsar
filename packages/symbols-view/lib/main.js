@@ -1,9 +1,9 @@
-const { Disposable, TextEditor } = require('atom');
-const Config = require('./config');
-const ProviderBroker = require('./provider-broker');
-const Path = require('path');
-const { shell } = require('electron');
-const { migrateOldConfigIfNeeded } = require('./util');
+const { Disposable, TextEditor } = require("atom");
+const Config = require("./config");
+const ProviderBroker = require("./provider-broker");
+const Path = require("path");
+const { shell } = require("electron");
+const { migrateOldConfigIfNeeded } = require("./util");
 
 const NO_PROVIDERS_MESSAGE = `You don’t have any symbol providers installed.`;
 const NO_PROVIDERS_DESCRIPTION = `The button below will show all packages that can provide symbols.
@@ -16,11 +16,13 @@ At minimum, we recommend you install the following packages to get an experience
 
 const NO_PROVIDERS_BUTTONS = [
   {
-    text: 'Find providers',
+    text: "Find providers",
     onDidClick: () => {
-      shell.openExternal(`https://web.pulsar-edit.dev/packages?service=symbol.provider&serviceType=provided`);
-    }
-  }
+      shell.openExternal(
+        `https://web.pulsar-edit.dev/packages?service=symbol.provider&serviceType=provided`,
+      );
+    },
+  },
 ];
 
 module.exports = {
@@ -29,64 +31,57 @@ module.exports = {
     this.stack = [];
     this.broker = new ProviderBroker();
 
-    this.workspaceSubscription = atom.commands.add(
-      'atom-workspace',
-      {
-        'symbols-view:toggle-project-symbols': (event) => {
-          if (!this.ensureProvidersExist()) {
-            event.abortKeyBinding();
-            return;
-          }
-          let text = this.getSelectedTextIfEnabled(event);
-          this.createProjectView().toggle(text);
-        },
-        'symbols-view:show-active-providers': () => {
-          this.showActiveProviders();
+    this.workspaceSubscription = atom.commands.add("atom-workspace", {
+      "symbols-view:toggle-project-symbols": (event) => {
+        if (!this.ensureProvidersExist()) {
+          event.abortKeyBinding();
+          return;
         }
-      }
-    );
+        let text = this.getSelectedTextIfEnabled(event);
+        this.createProjectView().toggle(text);
+      },
+      "symbols-view:show-active-providers": () => {
+        this.showActiveProviders();
+      },
+    });
 
-    this.editorSubscription = atom.commands.add(
-      'atom-text-editor:not([mini])',
-      {
-        'symbols-view:toggle-file-symbols': (event) => {
-          if (!this.ensureProvidersExist()) {
-            event.abortKeyBinding();
-            return;
-          }
-          let text = this.getSelectedTextIfEnabled(event);
-          this.createFileView().toggle(text);
-        },
-        'symbols-view:go-to-declaration': () => {
-          if (!this.ensureProvidersExist()) return;
-          this.createGoToView().toggle();
-        },
-        'symbols-view:return-from-declaration': () => {
-          if (!this.ensureProvidersExist()) return;
-          this.createGoBackView().toggle();
+    this.editorSubscription = atom.commands.add("atom-text-editor:not([mini])", {
+      "symbols-view:toggle-file-symbols": (event) => {
+        if (!this.ensureProvidersExist()) {
+          event.abortKeyBinding();
+          return;
         }
-      }
-    );
+        let text = this.getSelectedTextIfEnabled(event);
+        this.createFileView().toggle(text);
+      },
+      "symbols-view:go-to-declaration": () => {
+        if (!this.ensureProvidersExist()) return;
+        this.createGoToView().toggle();
+      },
+      "symbols-view:return-from-declaration": () => {
+        if (!this.ensureProvidersExist()) return;
+        this.createGoBackView().toggle();
+      },
+    });
 
     migrateOldConfigIfNeeded();
   },
 
   getSelectedTextIfEnabled(event) {
-    let editorView = event.target.closest('atom-text-editor');
-    if (!editorView) return '';
+    let editorView = event.target.closest("atom-text-editor");
+    if (!editorView) return "";
     let editor = editorView.getModel();
     let selection = editor.getLastSelection();
 
     // Don't use the selection if it spans more than one buffer line.
     let range = selection.getBufferRange();
-    if (range.start.row !== range.end.row) return '';
+    if (range.start.row !== range.end.row) return "";
 
     // Don't use the selection unless the associated config option is enabled.
-    let prefill = atom.config.get(
-      'symbols-view.prefillSelectedText',
-      { scope: [editor.getGrammar()?.scopeName] }
-    );
-    return prefill ? editor.getSelectedText() : '';
+    let prefill = atom.config.get("symbols-view.prefillSelectedText", {
+      scope: [editor.getGrammar()?.scopeName],
+    });
+    return prefill ? editor.getSelectedText() : "";
   },
 
   deactivate() {
@@ -134,7 +129,7 @@ module.exports = {
   createFileView() {
     if (this.fileView) return this.fileView;
 
-    const FileView = require('./file-view');
+    const FileView = require("./file-view");
     this.fileView = new FileView(this.stack, this.broker);
     return this.fileView;
   },
@@ -142,7 +137,7 @@ module.exports = {
   createProjectView() {
     if (this.projectView) return this.projectView;
 
-    const ProjectView = require('./project-view');
+    const ProjectView = require("./project-view");
     this.projectView = new ProjectView(this.stack, this.broker);
     return this.projectView;
   },
@@ -150,7 +145,7 @@ module.exports = {
   createGoToView() {
     if (this.goToView) return this.goToView;
 
-    const GoToView = require('./go-to-view');
+    const GoToView = require("./go-to-view");
     this.goToView = new GoToView(this.stack, this.broker);
     return this.goToView;
   },
@@ -158,7 +153,7 @@ module.exports = {
   createGoBackView() {
     if (this.goBackView) return this.goBackView;
 
-    const GoBackView = require('./go-back-view');
+    const GoBackView = require("./go-back-view");
     this.goBackView = new GoBackView(this.stack, this.broker);
     return this.goBackView;
   },
@@ -168,42 +163,36 @@ module.exports = {
     for (let provider of this.broker.providers) {
       providerList.push({
         name: provider.name,
-        packageName: provider.packageName
+        packageName: provider.packageName,
       });
     }
 
-    let message = providerList.map(
-      p => `* **${p.name}** provided by \`${p.packageName}\``
-    ).join('\n');
+    let message = providerList
+      .map((p) => `* **${p.name}** provided by \`${p.packageName}\``)
+      .join("\n");
 
-    atom.notifications.addInfo(
-      'Symbols View Redux providers',
-      {
-        description: message,
-        dismissable: true,
-        buttons: [
-          {
-            text: 'Copy',
-            onDidClick() {
-              atom.clipboard.write(message);
-            }
-          }
-        ]
-      }
-    );
+    atom.notifications.addInfo("Symbols View Redux providers", {
+      description: message,
+      dismissable: true,
+      buttons: [
+        {
+          text: "Copy",
+          onDidClick() {
+            atom.clipboard.write(message);
+          },
+        },
+      ],
+    });
   },
 
   ensureProvidersExist() {
     if (this.broker.providers.length > 0) return true;
 
-    atom.notifications.addWarning(
-      NO_PROVIDERS_MESSAGE,
-      {
-        description: NO_PROVIDERS_DESCRIPTION,
-        buttons: NO_PROVIDERS_BUTTONS,
-        dismissable: true
-      }
-    );
+    atom.notifications.addWarning(NO_PROVIDERS_MESSAGE, {
+      description: NO_PROVIDERS_DESCRIPTION,
+      buttons: NO_PROVIDERS_BUTTONS,
+      dismissable: true,
+    });
 
     return false;
   },
@@ -228,7 +217,7 @@ module.exports = {
         // whose position is identical to the position we asked about. Filter
         // it out. In that situation, we don't want a hyperclick affordance at
         // all.
-        symbols = symbols.filter(sym => {
+        symbols = symbols.filter((sym) => {
           let { path, directory, file } = sym;
           if (!path) {
             path = Path.join(directory, file);
@@ -242,9 +231,9 @@ module.exports = {
           callback: () => {
             editor.setSelectedBufferRange(range);
             goto.toggle();
-          }
+          },
         };
-      }
+      },
     };
-  }
+  },
 };

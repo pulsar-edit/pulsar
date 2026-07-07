@@ -1,21 +1,21 @@
-const { app, crashReporter } = require('electron');
-const path = require('path');
-const temp = require('temp');
-const parseCommandLine = require('./parse-command-line');
-const { getReleaseChannel, getConfigFilePath } = require('../get-app-details.js');
-const atomPaths = require('../atom-paths');
-const fs = require('fs');
-const CSON = require('season');
-const Config = require('../config');
-const StartupTime = require('../startup-time');
+const { app, crashReporter } = require("electron");
+const path = require("path");
+const temp = require("temp");
+const parseCommandLine = require("./parse-command-line");
+const { getReleaseChannel, getConfigFilePath } = require("../get-app-details.js");
+const atomPaths = require("../atom-paths");
+const fs = require("fs");
+const CSON = require("season");
+const Config = require("../config");
+const StartupTime = require("../startup-time");
 
 StartupTime.setStartTime();
 
 module.exports = function start(resourcePath, devResourcePath, startTime) {
   global.shellStartTime = startTime;
-  StartupTime.addMarker('main-process:start');
+  StartupTime.addMarker("main-process:start");
 
-  process.on('uncaughtException', function (error = {}) {
+  process.on("uncaughtException", function (error = {}) {
     if (error.message != null) {
       console.log(error.message);
     }
@@ -25,7 +25,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     }
   });
 
-  process.on('unhandledRejection', function (error = {}) {
+  process.on("unhandledRejection", function (error = {}) {
     if (error.message != null) {
       console.log(error.message);
     }
@@ -35,7 +35,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     }
   });
 
-  app.commandLine.appendSwitch('enable-experimental-web-platform-features');
+  app.commandLine.appendSwitch("enable-experimental-web-platform-features");
 
   const args = parseCommandLine(process.argv.slice(1));
 
@@ -44,12 +44,12 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   const releaseChannel = getReleaseChannel(app.getVersion());
   process.env.ATOM_CHANNEL ??= releaseChannel;
-  atomPaths.setAtomHome(app.getPath('home'));
+  atomPaths.setAtomHome(app.getPath("home"));
   atomPaths.setUserData(app);
 
   // Now that we can be sure `ATOM_HOME` is set, we can set our custom crash
   // dump path.
-  app.setPath('crashDumps', path.resolve(process.env.ATOM_HOME, 'crashdumps'))
+  app.setPath("crashDumps", path.resolve(process.env.ATOM_HOME, "crashdumps"));
 
   // By default, we're using the crash reporter on Windows and Linux, but not
   // macOS. That's because:
@@ -61,45 +61,44 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   //
   // Still, it's nice to have a way to opt into the crash reporter even on
   // macOS. Hence the `--crashdump` command-line switch.
-  let shouldStartCrashReporter = args.useCrashReporter || process.platform !== 'darwin';
+  let shouldStartCrashReporter = args.useCrashReporter || process.platform !== "darwin";
   if (shouldStartCrashReporter) {
-    console.log("Starting crash reporter; crash reports will be saved to", app.getPath('crashDumps'))
+    console.log(
+      "Starting crash reporter; crash reports will be saved to",
+      app.getPath("crashDumps"),
+    );
     crashReporter.start({
-      productName: 'Lumine',
-      companyName: 'lumine-code',
-      submitURL: '',
+      productName: "Lumine",
+      companyName: "lumine-code",
+      submitURL: "",
       uploadToServer: false,
       ignoreSystemCrashHandler: false,
-      compress: false
+      compress: false,
     });
   }
 
   const config = getConfig();
-  const colorProfile = config.get('core.colorProfile');
-  if (colorProfile && colorProfile !== 'default') {
-    app.commandLine.appendSwitch('force-color-profile', colorProfile);
+  const colorProfile = config.get("core.colorProfile");
+  if (colorProfile && colorProfile !== "default") {
+    app.commandLine.appendSwitch("force-color-profile", colorProfile);
   }
 
   if (args.test && args.mainProcess) {
-    app.setPath(
-      'userData',
-      temp.mkdirSync('atom-user-data-dir-for-main-process-tests')
-    );
-    app.on('ready', function () {
-      const testRunner = require(path.join(
-        args.resourcePath,
-        'spec/main-process/mocha-test-runner'
-      ));
+    app.setPath("userData", temp.mkdirSync("atom-user-data-dir-for-main-process-tests"));
+    app.on("ready", function () {
+      const testRunner = require(
+        path.join(args.resourcePath, "spec/main-process/mocha-test-runner"),
+      );
       testRunner(args.pathsToOpen);
     });
     return;
   }
 
-  let appUserModelId = 'io.github.lumine-code.lumine.' + process.arch;
+  let appUserModelId = "io.github.lumine-code.lumine." + process.arch;
 
   // If the release channel is not stable, we append it to the app user model id.
   // This allows having the different release channels as separate items in the taskbar.
-  if (releaseChannel !== 'stable') {
+  if (releaseChannel !== "stable") {
     appUserModelId += `-${releaseChannel}`;
   }
 
@@ -122,12 +121,12 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   //
   // The effects are not seen here, but rather in `atom-application.js`, where
   // calls to `app.focus` will actually work instead of having no effect.
-  if (process.platform === 'win32') {
+  if (process.platform === "win32") {
     app.requestSingleInstanceLock();
     // Add an explicit no-op listener here to ensure that this channel isn't
     // used for communication — we already have a way for the second instance
     // to communicate with the first.
-    app.on('second-instance', () => {});
+    app.on("second-instance", () => {});
   }
 
   function addPathToOpen(event, pathToOpen) {
@@ -140,26 +139,23 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     args.urlsToOpen.push(urlToOpen);
   }
 
-  app.on('open-file', addPathToOpen);
-  app.on('open-url', addUrlToOpen);
+  app.on("open-file", addPathToOpen);
+  app.on("open-url", addUrlToOpen);
 
   if (args.userDataDir != null) {
-    app.setPath('userData', args.userDataDir);
+    app.setPath("userData", args.userDataDir);
   } else if (args.test) {
-    app.setPath('userData', temp.mkdirSync('atom-test-data'));
+    app.setPath("userData", temp.mkdirSync("atom-test-data"));
   }
 
-  StartupTime.addMarker('main-process:electron-onready:start');
-  app.on('ready', function () {
-    StartupTime.addMarker('main-process:electron-onready:end');
-    app.removeListener('open-file', addPathToOpen);
-    app.removeListener('open-url', addUrlToOpen);
-    const AtomApplication = require(path.join(
-      args.resourcePath,
-      'src',
-      'main-process',
-      'atom-application'
-    ));
+  StartupTime.addMarker("main-process:electron-onready:start");
+  app.on("ready", function () {
+    StartupTime.addMarker("main-process:electron-onready:end");
+    app.removeListener("open-file", addPathToOpen);
+    app.removeListener("open-url", addUrlToOpen);
+    const AtomApplication = require(
+      path.join(args.resourcePath, "src", "main-process", "atom-application"),
+    );
     AtomApplication.open(args);
   });
 };
@@ -184,11 +180,8 @@ function getConfig() {
 }
 
 function normalizeDriveLetterName(filePath) {
-  if (process.platform === 'win32' && filePath) {
-    return filePath.replace(
-      /^([a-z]):/,
-      ([driveLetter]) => driveLetter.toUpperCase() + ':'
-    );
+  if (process.platform === "win32" && filePath) {
+    return filePath.replace(/^([a-z]):/, ([driveLetter]) => driveLetter.toUpperCase() + ":");
   } else {
     return filePath;
   }

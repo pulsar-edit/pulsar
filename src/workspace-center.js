@@ -1,24 +1,22 @@
-'use strict';
+"use strict";
 
-const TextEditor = require('./text-editor');
-const PaneContainer = require('./pane-container');
+const TextEditor = require("./text-editor");
+const PaneContainer = require("./pane-container");
 
 // Essential: Represents the workspace at the center of the entire window.
 module.exports = class WorkspaceCenter {
   constructor(params) {
-    params.location = 'center';
+    params.location = "center";
     this.paneContainer = new PaneContainer(params);
     this.didActivate = params.didActivate;
     this.paneContainer.onDidActivatePane(() => this.didActivate(this));
-    this.paneContainer.onDidChangeActivePane(pane => {
+    this.paneContainer.onDidChangeActivePane((pane) => {
       params.didChangeActivePane(this, pane);
     });
-    this.paneContainer.onDidChangeActivePaneItem(item => {
+    this.paneContainer.onDidChangeActivePaneItem((item) => {
       params.didChangeActivePaneItem(this, item);
     });
-    this.paneContainer.onDidDestroyPaneItem(item =>
-      params.didDestroyPaneItem(item)
-    );
+    this.paneContainer.onDidDestroyPaneItem((item) => params.didDestroyPaneItem(item));
   }
 
   destroy() {
@@ -38,7 +36,7 @@ module.exports = class WorkspaceCenter {
   }
 
   getLocation() {
-    return 'center';
+    return "center";
   }
 
   setDraggingItem() {
@@ -274,7 +272,7 @@ module.exports = class WorkspaceCenter {
   //
   // Returns an {Array} of {TextEditor}s.
   getTextEditors() {
-    return this.getPaneItems().filter(item => item instanceof TextEditor);
+    return this.getPaneItems().filter((item) => item instanceof TextEditor);
   }
 
   // Essential: Get the active item if it is an {TextEditor}.

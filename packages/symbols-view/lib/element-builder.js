@@ -1,18 +1,17 @@
-
-function parseTagName (selector) {
-  if (!selector.includes('.')) {
+function parseTagName(selector) {
+  if (!selector.includes(".")) {
     return [selector, null];
   }
-  let tagName = selector.substring(0, selector.indexOf('.'));
-  let classes = selector.substring(selector.indexOf('.') + 1);
-  let classList = classes.split('.');
-  return [tagName ?? 'div', classList];
+  let tagName = selector.substring(0, selector.indexOf("."));
+  let classes = selector.substring(selector.indexOf(".") + 1);
+  let classList = classes.split(".");
+  return [tagName ?? "div", classList];
 }
 
-function el (selector, ...args) {
+function el(selector, ...args) {
   let attributes = null;
 
-  if (typeof args[0] === 'object' && !args[0].nodeType) {
+  if (typeof args[0] === "object" && !args[0].nodeType) {
     attributes = args.shift();
   }
 
@@ -30,7 +29,7 @@ function el (selector, ...args) {
   // Any further arguments are children of the element.
   for (let item of args) {
     if (!item) continue;
-    if (typeof item === 'string') {
+    if (typeof item === "string") {
       item = document.createTextNode(item);
     } else if (Array.isArray(item)) {
       // This is an array; append its children, but do not append it.

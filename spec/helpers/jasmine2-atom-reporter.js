@@ -1,51 +1,61 @@
-const path = require('path');
-const process = require('process');
-const listen = require('../../src/delegated-listener');
-const ipcHelpers = require('../../src/ipc-helpers');
+const path = require("path");
+const process = require("process");
+const listen = require("../../src/delegated-listener");
+const ipcHelpers = require("../../src/ipc-helpers");
 
-function formatStackTrace(spec, message = '', stackTrace) {
-  if (!stackTrace) { return stackTrace; }
+function formatStackTrace(spec, message = "", stackTrace) {
+  if (!stackTrace) {
+    return stackTrace;
+  }
 
   // at ... (.../jasmine.js:1:2)
   const jasminePattern = /^\s*at\s+.*\(?.*[/\\]jasmine(-[^/\\]*)?\.js:\d+:\d+\)?\s*$/;
   // at jasmine.Something... (.../jasmine.js:1:2)
-  const firstJasmineLinePattern = /^\s*at\s+jasmine\.[A-Z][^\s]*\s+\(?.*[/\\]jasmine(-[^/\\]*)?\.js:\d+:\d+\)?\s*$/;
+  const firstJasmineLinePattern =
+    /^\s*at\s+jasmine\.[A-Z][^\s]*\s+\(?.*[/\\]jasmine(-[^/\\]*)?\.js:\d+:\d+\)?\s*$/;
   let lines = [];
-  for (let line of stackTrace.split('\n')) {
-    if (firstJasmineLinePattern.test(line)) { break; }
-    if (!jasminePattern.test(line)) { lines.push(line); }
+  for (let line of stackTrace.split("\n")) {
+    if (firstJasmineLinePattern.test(line)) {
+      break;
+    }
+    if (!jasminePattern.test(line)) {
+      lines.push(line);
+    }
   }
 
   // Remove first line of stack when it is the same as the error message
   const errorMatch = lines[0]?.match(/^Error: (.*)/);
-  if (message.trim() === errorMatch?.[1]?.trim()) { lines.shift(); }
+  if (message.trim() === errorMatch?.[1]?.trim()) {
+    lines.shift();
+  }
 
   lines = lines.map(function (line) {
     // Only format actual stacktrace lines
     if (/^\s*at\s/.test(line)) {
       // Needs to occur before path relativization
-      if ((process.platform === 'win32') && /file:\/\/\//.test(line)) {
+      if (process.platform === "win32" && /file:\/\/\//.test(line)) {
         // file:///C:/some/file -> C:\some\file
         line = line
-          .replace('file:///', '')
-          .replace(new RegExp(`${path.posix.sep}`, 'g'), path.win32.sep);
+          .replace("file:///", "")
+          .replace(new RegExp(`${path.posix.sep}`, "g"), path.win32.sep);
       }
 
-      line = line.trim()
+      line = line
+        .trim()
         // at jasmine.Spec.<anonymous> (path:1:2) -> at path:1:2
-        .replace(/^at jasmine\.Spec\.<anonymous> \(([^)]+)\)/, 'at $1')
+        .replace(/^at jasmine\.Spec\.<anonymous> \(([^)]+)\)/, "at $1")
         // at jasmine.Spec.it (path:1:2) -> at path:1:2
-        .replace(/^at jasmine\.Spec\.f*it \(([^)]+)\)/, 'at $1')
+        .replace(/^at jasmine\.Spec\.f*it \(([^)]+)\)/, "at $1")
         // at it (path:1:2) -> at path:1:2
-        .replace(/^at f*it \(([^)]+)\)/, 'at $1')
+        .replace(/^at f*it \(([^)]+)\)/, "at $1")
         // at spec/file-test.js -> at file-test.js
-        .replace(spec.specDirectory + path.sep, '');
+        .replace(spec.specDirectory + path.sep, "");
     }
 
     return line;
   });
 
-  return lines.join('\n').trim();
+  return lines.join("\n").trim();
 }
 
 // Spec objects in the reporter lifecycle don't have all the metadata we need.
@@ -63,8 +73,8 @@ class AtomReporter {
     this.totalSpecCount = 0;
     this.deprecationCount = 0;
     this.timeoutId = 0;
-    this.element = document.createElement('div');
-    this.element.classList.add('spec-reporter-container');
+    this.element = document.createElement("div");
+    this.element.classList.add("spec-reporter-container");
     this.element.innerHTML = `\
 <div class="spec-reporter">
 <div class="padded pull-right">
@@ -88,8 +98,8 @@ class AtomReporter {
 </div>\
 `;
 
-    for (let element of Array.from(this.element.querySelectorAll('[outlet]'))) {
-      this[element.getAttribute('outlet')] = element;
+    for (let element of Array.from(this.element.querySelectorAll("[outlet]"))) {
+      this[element.getAttribute("outlet")] = element;
     }
   }
 
@@ -104,9 +114,9 @@ class AtomReporter {
 
     // Create summary dots for each test.
     for (let spec of Object.values(this.specs)) {
-      const symbol = document.createElement('li');
-      symbol.setAttribute('id', `spec-summary-${spec.id}`);
-      symbol.setAttribute('title', this.specTitle(spec));
+      const symbol = document.createElement("li");
+      symbol.setAttribute("id", `spec-summary-${spec.id}`);
+      symbol.setAttribute("title", this.specTitle(spec));
       symbol.className = "spec-summary pending";
       this.userSummary.appendChild(symbol);
     }
@@ -137,7 +147,7 @@ class AtomReporter {
     while (suite.parentSuite) {
       suites.unshift({
         id: suite.id,
-        description: suite.result.description
+        description: suite.result.description,
       });
       suite = suite.parentSuite;
     }
@@ -153,8 +163,8 @@ class AtomReporter {
   jasmineDone() {
     this.updateSpecCounts();
     if (this.failedCount === 0) {
-      this.status.classList.add('alert-success');
-      this.status.classList.remove('alert-info');
+      this.status.classList.add("alert-success");
+      this.status.classList.remove("alert-info");
     }
 
     if (this.failedCount === 1) {
@@ -165,37 +175,39 @@ class AtomReporter {
   }
 
   handleEvents() {
-    listen(document, 'click', '.spec-toggle', function (event) {
-      const specFailures = event.currentTarget.parentElement.querySelector('.spec-failures');
+    listen(document, "click", ".spec-toggle", function (event) {
+      const specFailures = event.currentTarget.parentElement.querySelector(".spec-failures");
 
-      if (specFailures.style.display === 'none') {
-        specFailures.style.display = '';
-        event.currentTarget.classList.remove('folded');
+      if (specFailures.style.display === "none") {
+        specFailures.style.display = "";
+        event.currentTarget.classList.remove("folded");
       } else {
-        specFailures.style.display = 'none';
-        event.currentTarget.classList.add('folded');
+        specFailures.style.display = "none";
+        event.currentTarget.classList.add("folded");
       }
 
       event.preventDefault();
     });
 
-    listen(document, 'click', '.deprecation-list', function (event) {
-      const deprecationList = event.currentTarget.parentElement.querySelector('.deprecation-list');
+    listen(document, "click", ".deprecation-list", function (event) {
+      const deprecationList = event.currentTarget.parentElement.querySelector(".deprecation-list");
 
-      if (deprecationList.style.display === 'none') {
-        deprecationList.style.display = '';
-        event.currentTarget.classList.remove('folded');
+      if (deprecationList.style.display === "none") {
+        deprecationList.style.display = "";
+        event.currentTarget.classList.remove("folded");
       } else {
-        deprecationList.style.display = 'none';
-        event.currentTarget.classList.add('folded');
+        deprecationList.style.display = "none";
+        event.currentTarget.classList.add("folded");
       }
 
       event.preventDefault();
     });
 
-    listen(document, 'click', '.stack-trace', event => event.currentTarget.classList.toggle('expanded'));
+    listen(document, "click", ".stack-trace", (event) =>
+      event.currentTarget.classList.toggle("expanded"),
+    );
 
-    this.reloadButton.addEventListener('click', () => ipcHelpers.call('window-method', 'reload'));
+    this.reloadButton.addEventListener("click", () => ipcHelpers.call("window-method", "reload"));
   }
 
   updateSpecCounts() {
@@ -210,8 +222,8 @@ class AtomReporter {
 
   updateStatusView(spec) {
     if (this.failedCount > 0) {
-      this.status.classList.add('alert-danger');
-      this.status.classList.remove('alert-info');
+      this.status.classList.add("alert-danger");
+      this.status.classList.remove("alert-info");
     }
     let fullSpec = REGISTRY.get(spec.id);
 
@@ -225,7 +237,9 @@ class AtomReporter {
     this.message.textContent = rootSuite.description;
 
     let time = `${Math.round((spec.endedAt - this.startedAt) / 10)}`;
-    if (time.length < 3) { time = `0${time}`; }
+    if (time.length < 3) {
+      time = `0${time}`;
+    }
     this.time.textContent = `${time.slice(0, -2)}.${time.slice(-2)}s`;
   }
 
@@ -255,21 +269,21 @@ class AtomReporter {
       console.warn(`Does not exist:`, spec.id);
       return;
     }
-    specSummaryElement.classList.remove('pending');
+    specSummaryElement.classList.remove("pending");
     switch (spec.status) {
-      case 'disabled':
-        specSummaryElement.classList.add('skipped');
+      case "disabled":
+        specSummaryElement.classList.add("skipped");
         this.skippedCount++;
         break;
-      case 'failed': {
-        specSummaryElement.classList.add('failed');
+      case "failed": {
+        specSummaryElement.classList.add("failed");
         const specView = new SpecResultView(spec);
         specView.attach();
         this.failedCount++;
         break;
       }
-      case 'passed':
-        specSummaryElement.classList.add('passed');
+      case "passed":
+        specSummaryElement.classList.add("passed");
         this.passedCount++;
         break;
       default:
@@ -278,7 +292,7 @@ class AtomReporter {
 
     this.completeSpecCount++;
     spec.endedAt = Date.now();
-    if (spec.status !== 'disabled') {
+    if (spec.status !== "disabled") {
       this.updateStatusView(spec);
     }
   }
@@ -289,22 +303,24 @@ module.exports = AtomReporter;
 class SuiteResultView {
   constructor(suite) {
     this.suite = suite;
-    this.element = document.createElement('div');
-    this.element.className = 'suite';
-    this.element.setAttribute('id', `suite-view-${this.suite.id}`);
-    this.description = document.createElement('div');
-    this.description.className = 'description';
+    this.element = document.createElement("div");
+    this.element.className = "suite";
+    this.element.setAttribute("id", `suite-view-${this.suite.id}`);
+    this.description = document.createElement("div");
+    this.description.className = "description";
     this.description.textContent = this.suite.description;
     this.element.appendChild(this.description);
   }
 
   attach() {
-    (this.parentSuiteView() || document.querySelector('.results')).appendChild(this.element);
+    (this.parentSuiteView() || document.querySelector(".results")).appendChild(this.element);
   }
 
   parentSuiteView() {
     let suiteViewElement;
-    if (!this.suite.parentSuite || this.suite.parentSuite._isTopSuite) { return; }
+    if (!this.suite.parentSuite || this.suite.parentSuite._isTopSuite) {
+      return;
+    }
 
     if (!(suiteViewElement = document.querySelector(`#suite-view-${this.suite.parentSuite.id}`))) {
       const suiteView = new SuiteResultView(this.suite.parentSuite);
@@ -319,8 +335,8 @@ class SuiteResultView {
 class SpecResultView {
   constructor(spec) {
     this.spec = spec;
-    this.element = document.createElement('div');
-    this.element.className = 'spec';
+    this.element = document.createElement("div");
+    this.element.className = "spec";
     this.element.innerHTML = `\
 <div class='spec-toggle'></div>
 <div outlet='description' class='description'></div>
@@ -331,22 +347,22 @@ class SpecResultView {
 
     this.element.classList.add(`spec-view-${this.spec.id}`);
 
-    let {
-      description
-    } = this.spec;
-    if (description.indexOf('it ') !== 0) { description = `it ${description}`; }
+    let { description } = this.spec;
+    if (description.indexOf("it ") !== 0) {
+      description = `it ${description}`;
+    }
     this.description.textContent = description;
 
     for (let result of this.spec.failedExpectations) {
       let stackTrace = formatStackTrace(this.spec, result.message, result.stack);
-      const resultElement = document.createElement('div');
-      resultElement.className = 'result-message fail';
+      const resultElement = document.createElement("div");
+      resultElement.className = "result-message fail";
       resultElement.textContent = result.message;
       this.specFailures.appendChild(resultElement);
 
       if (stackTrace) {
-        const traceElement = document.createElement('pre');
-        traceElement.className = 'stack-trace padded';
+        const traceElement = document.createElement("pre");
+        traceElement.className = "stack-trace padded";
         traceElement.textContent = stackTrace;
         this.specFailures.appendChild(traceElement);
       }
@@ -359,7 +375,7 @@ class SpecResultView {
 
   parentSuiteView() {
     let suiteViewElement;
-    let fullSpec = REGISTRY.get(this.spec.id)
+    let fullSpec = REGISTRY.get(this.spec.id);
     if (!(suiteViewElement = document.querySelector(`#suite-view-${fullSpec.suite.id}`))) {
       const suiteView = new SuiteResultView(fullSpec.suite);
       suiteView.attach();

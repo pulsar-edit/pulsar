@@ -1,76 +1,76 @@
 exports.activate = function () {
-  atom.grammars.addInjectionPoint('text.html.basic', {
-    type: 'script_element',
+  atom.grammars.addInjectionPoint("text.html.basic", {
+    type: "script_element",
     language() {
-      return 'javascript';
+      return "javascript";
     },
     content(node) {
       return node.child(1);
-    }
+    },
   });
 
-  atom.grammars.addInjectionPoint('text.html.basic', {
-    type: 'style_element',
+  atom.grammars.addInjectionPoint("text.html.basic", {
+    type: "style_element",
     language() {
-      return 'css';
+      return "css";
     },
     content(node) {
       return node.child(1);
-    }
+    },
   });
 
   // EMBEDDED
 
-  atom.grammars.addInjectionPoint('text.html.ejs', {
-    type: 'template',
+  atom.grammars.addInjectionPoint("text.html.ejs", {
+    type: "template",
     language() {
-      return 'javascript';
+      return "javascript";
     },
     content(node) {
-      return node.descendantsOfType('code');
+      return node.descendantsOfType("code");
     },
-    newlinesBetween: true
+    newlinesBetween: true,
   });
 
-  atom.grammars.addInjectionPoint('text.html.ejs', {
-    type: 'template',
+  atom.grammars.addInjectionPoint("text.html.ejs", {
+    type: "template",
     language() {
-      return 'html';
+      return "html";
     },
     content(node) {
-      return node.descendantsOfType('content');
-    }
+      return node.descendantsOfType("content");
+    },
   });
 
-  atom.grammars.addInjectionPoint('text.html.erb', {
-    type: 'template',
+  atom.grammars.addInjectionPoint("text.html.erb", {
+    type: "template",
     language() {
-      return 'ruby';
+      return "ruby";
     },
     content(node) {
-      return node.descendantsOfType('code');
+      return node.descendantsOfType("code");
     },
-    newlinesBetween: true
+    newlinesBetween: true,
   });
 
-  atom.grammars.addInjectionPoint('text.html.erb', {
-    type: 'template',
+  atom.grammars.addInjectionPoint("text.html.erb", {
+    type: "template",
     language() {
-      return 'html';
+      return "html";
     },
     content(node) {
-      return node.descendantsOfType('content');
-    }
+      return node.descendantsOfType("content");
+    },
   });
 };
 
 exports.consumeHyperlinkInjection = (hyperlink) => {
   // TODO: Inject hyperlink grammar into plain text?
-  hyperlink.addInjectionPoint('text.html.basic', {
-    types: ['comment', 'attribute_value']
+  hyperlink.addInjectionPoint("text.html.basic", {
+    types: ["comment", "attribute_value"],
   });
 };
 
 exports.consumeTodoInjection = (todo) => {
-  todo.addInjectionPoint('text.html.basic', { types: ['comment'] });
+  todo.addInjectionPoint("text.html.basic", { types: ["comment"] });
 };

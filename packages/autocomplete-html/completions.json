@@ -13229,28 +13229,17 @@
       "description": "The id of a menu to use as the contextual menu for this element."
     },
     "dir": {
-      "attribOption": [
-        "ltr",
-        "rtl"
-      ],
+      "attribOption": ["ltr", "rtl"],
       "global": "true",
       "description": "An enumerated attribute indicates the directionality of the element's text."
     },
     "draggable": {
-      "attribOption": [
-        "auto",
-        "false",
-        "true"
-      ],
+      "attribOption": ["auto", "false", "true"],
       "global": "true",
       "description": "An enumerated attribute that indicates whether the element can be dragged, using the HTML Drag and Drop API."
     },
     "dropzone": {
-      "attribOption": [
-        "copy",
-        "move",
-        "link"
-      ],
+      "attribOption": ["copy", "move", "link"],
       "global": "true",
       "description": "An enumerated attribute indicating what types of content can be dropped on an element, using the Drag and Drop API."
     },
@@ -13749,21 +13738,13 @@
       "global": "true"
     },
     "aria-autocomplete": {
-      "attribOption": [
-        "inline",
-        "list",
-        "both",
-        "none"
-      ]
+      "attribOption": ["inline", "list", "both", "none"]
     },
     "aria-activedescendant": {
       "global": "true"
     },
     "aria-atomic": {
-      "attribOption": [
-        "true",
-        "false"
-      ],
+      "attribOption": ["true", "false"],
       "global": "true",
       "type": "boolean"
     },
@@ -13772,12 +13753,7 @@
       "type": "boolean"
     },
     "aria-checked": {
-      "attribOption": [
-        "true",
-        "false",
-        "mixed",
-        "undefined"
-      ]
+      "attribOption": ["true", "false", "mixed", "undefined"]
     },
     "aria-controls": {
       "global": "true"
@@ -13786,64 +13762,35 @@
       "global": "true"
     },
     "aria-disabled": {
-      "attribOption": [
-        "true",
-        "false"
-      ],
+      "attribOption": ["true", "false"],
       "global": "true"
     },
     "aria-dropeffect": {
-      "attribOption": [
-        "copy",
-        "move",
-        "link",
-        "execute",
-        "popup",
-        "none"
-      ],
+      "attribOption": ["copy", "move", "link", "execute", "popup", "none"],
       "global": "true"
     },
     "aria-expanded": {
-      "attribOption": [
-        "true",
-        "false",
-        "undefined"
-      ]
+      "attribOption": ["true", "false", "undefined"]
     },
     "aria-flowto": {
       "global": "true"
     },
     "aria-grabbed": {
-      "attribOption": [
-        "true",
-        "false",
-        "undefined"
-      ],
+      "attribOption": ["true", "false", "undefined"],
       "global": "true"
     },
     "aria-haspopup": {
-      "attribOption": [
-        "true",
-        "false"
-      ],
+      "attribOption": ["true", "false"],
       "global": "true",
       "type": "boolean"
     },
     "aria-hidden": {
-      "attribOption": [
-        "true",
-        "false"
-      ],
+      "attribOption": ["true", "false"],
       "global": "true",
       "type": "boolean"
     },
     "aria-invalid": {
-      "attribOption": [
-        "grammar",
-        "false",
-        "spelling",
-        "true"
-      ],
+      "attribOption": ["grammar", "false", "spelling", "true"],
       "global": "true"
     },
     "aria-label": {
@@ -13854,83 +13801,44 @@
     },
     "aria-level": {},
     "aria-live": {
-      "attribOption": [
-        "off",
-        "polite",
-        "assertive"
-      ],
+      "attribOption": ["off", "polite", "assertive"],
       "global": "true"
     },
     "aria-multiline": {
-      "attribOption": [
-        "true",
-        "false"
-      ],
+      "attribOption": ["true", "false"],
       "type": "boolean"
     },
     "aria-multiselectable": {
-      "attribOption": [
-        "true",
-        "false"
-      ],
+      "attribOption": ["true", "false"],
       "type": "boolean"
     },
     "aria-orientation": {
-      "attribOption": [
-        "vertical",
-        "horizontal"
-      ]
+      "attribOption": ["vertical", "horizontal"]
     },
     "aria-owns": {
       "global": "true"
     },
     "aria-posinset": {},
     "aria-pressed": {
-      "attribOption": [
-        "true",
-        "false",
-        "mixed",
-        "undefined"
-      ]
+      "attribOption": ["true", "false", "mixed", "undefined"]
     },
     "aria-readonly": {
-      "attribOption": [
-        "true",
-        "false"
-      ]
+      "attribOption": ["true", "false"]
     },
     "aria-relevant": {
-      "attribOption": [
-        "additions",
-        "removals",
-        "text",
-        "all",
-        "additions text"
-      ],
+      "attribOption": ["additions", "removals", "text", "all", "additions text"],
       "global": "true"
     },
     "aria-required": {
-      "attribOption": [
-        "true",
-        "false"
-      ],
+      "attribOption": ["true", "false"],
       "type": "boolean"
     },
     "aria-selected": {
-      "attribOption": [
-        "true",
-        "false",
-        "undefined"
-      ]
+      "attribOption": ["true", "false", "undefined"]
     },
     "aria-setsize": {},
     "aria-sort": {
-      "attribOption": [
-        "ascending",
-        "descending",
-        "none",
-        "other"
-      ]
+      "attribOption": ["ascending", "descending", "none", "other"]
     },
     "aria-valuemax": {},
     "aria-valuemin": {},
@@ -13975,14 +13883,7 @@
       "type": "flag"
     },
     "autocapitalize": {
-      "attribOption": [
-        "off",
-        "none",
-        "on",
-        "sentences",
-        "words",
-        "characters"
-      ],
+      "attribOption": ["off", "none", "on", "sentences", "words", "characters"],
       "global": "true",
       "description": "Controls whether and how text input is automatically capitalized."
     },
@@ -14059,11 +13960,7 @@
       "type": "flag"
     },
     "behavior": {
-      "attribOption": [
-        "scroll",
-        "slide",
-        "alternate"
-      ]
+      "attribOption": ["scroll", "slide", "alternate"]
     },
     "bgcolor": {
       "type": "color"
@@ -14142,50 +14039,29 @@
       "type": "flag"
     },
     "direction": {
-      "attribOption": [
-        "left",
-        "right",
-        "up",
-        "down"
-      ]
+      "attribOption": ["left", "right", "up", "down"]
     },
     "dirname": {},
     "disabled": {
       "type": "flag"
     },
     "enctype": {
-      "attribOption": [
-        "application/x-www-form-urlencoded",
-        "multipart/form-data",
-        "text/plain"
-      ]
+      "attribOption": ["application/x-www-form-urlencoded", "multipart/form-data", "text/plain"]
     },
     "for": {},
     "form": {},
     "formaction": {},
     "formenctype": {
-      "attribOption": [
-        "application/x-www-form-urlencoded",
-        "multipart/form-data",
-        "text/plain"
-      ]
+      "attribOption": ["application/x-www-form-urlencoded", "multipart/form-data", "text/plain"]
     },
     "formmethod": {
-      "attribOption": [
-        "get",
-        "post"
-      ]
+      "attribOption": ["get", "post"]
     },
     "formnovalidate": {
       "type": "flag"
     },
     "formtarget": {
-      "attribOption": [
-        "_blank",
-        "_parent",
-        "_self",
-        "_top"
-      ]
+      "attribOption": ["_blank", "_parent", "_self", "_top"]
     },
     "headers": {},
     "height": {},
@@ -14194,31 +14070,17 @@
     "hreflang": {},
     "hspace": {},
     "http-equiv": {
-      "attribOption": [
-        "content-type",
-        "default-style",
-        "refresh"
-      ]
+      "attribOption": ["content-type", "default-style", "refresh"]
     },
     "icon": {},
     "ismap": {
       "type": "flag"
     },
     "keytype": {
-      "attribOption": [
-        "dsa",
-        "ec",
-        "rsa"
-      ]
+      "attribOption": ["dsa", "ec", "rsa"]
     },
     "kind": {
-      "attribOption": [
-        "captions",
-        "chapters",
-        "descriptions",
-        "metadata",
-        "subtitles"
-      ]
+      "attribOption": ["captions", "chapters", "descriptions", "metadata", "subtitles"]
     },
     "label": {},
     "list": {},
@@ -14281,10 +14143,7 @@
     },
     "mediagroup": {},
     "method": {
-      "attribOption": [
-        "get",
-        "post"
-      ]
+      "attribOption": ["get", "post"]
     },
     "min": {},
     "multiple": {
@@ -14295,13 +14154,7 @@
     },
     "name": {},
     "meta/name": {
-      "attribOption": [
-        "application-name",
-        "author",
-        "description",
-        "generator",
-        "keywords"
-      ]
+      "attribOption": ["application-name", "author", "description", "generator", "keywords"]
     },
     "novalidate": {
       "type": "flag"
@@ -14314,11 +14167,7 @@
     "placeholder": {},
     "poster": {},
     "preload": {
-      "attribOption": [
-        "auto",
-        "metadata",
-        "none"
-      ]
+      "attribOption": ["auto", "metadata", "none"]
     },
     "pubdate": {},
     "radiogroup": {},
@@ -14369,12 +14218,7 @@
     "rows": {},
     "rowspan": {},
     "sandbox": {
-      "attribOption": [
-        "allow-forms",
-        "allow-same-origin",
-        "allow-scripts",
-        "allow-top-navigation"
-      ]
+      "attribOption": ["allow-forms", "allow-same-origin", "allow-scripts", "allow-top-navigation"]
     },
     "seamless": {
       "type": "flag"
@@ -14383,12 +14227,7 @@
       "type": "flag"
     },
     "scope": {
-      "attribOption": [
-        "col",
-        "colgroup",
-        "row",
-        "rowgroup"
-      ]
+      "attribOption": ["col", "colgroup", "row", "rowgroup"]
     },
     "scoped": {
       "type": "boolean"
@@ -14396,18 +14235,11 @@
     "scrollamount": {},
     "scrolldelay": {},
     "shape": {
-      "attribOption": [
-        "circle",
-        "default",
-        "poly",
-        "rect"
-      ]
+      "attribOption": ["circle", "default", "poly", "rect"]
     },
     "size": {},
     "sizes": {
-      "attribOption": [
-        "any"
-      ]
+      "attribOption": ["any"]
     },
     "span": {},
     "src": {},
@@ -14417,18 +14249,10 @@
     "start": {},
     "step": {},
     "target": {
-      "attribOption": [
-        "_blank",
-        "_parent",
-        "_self",
-        "_top"
-      ]
+      "attribOption": ["_blank", "_parent", "_self", "_top"]
     },
     "translate": {
-      "attribOption": [
-        "no",
-        "yes"
-      ],
+      "attribOption": ["no", "yes"],
       "global": "true",
       "description": "Used to specify whether an element's translatable attribute values and its text node children should be translated."
     },
@@ -14437,39 +14261,19 @@
     },
     "type": {},
     "button/type": {
-      "attribOption": [
-        "button",
-        "reset",
-        "submit"
-      ]
+      "attribOption": ["button", "reset", "submit"]
     },
     "command/type": {
-      "attribOption": [
-        "command",
-        "checkbox",
-        "radio"
-      ]
+      "attribOption": ["command", "checkbox", "radio"]
     },
     "link/type": {
-      "attribOption": [
-        "text/css"
-      ]
+      "attribOption": ["text/css"]
     },
     "menu/type": {
-      "attribOption": [
-        "context",
-        "list",
-        "toolbar"
-      ]
+      "attribOption": ["context", "list", "toolbar"]
     },
     "ol/type": {
-      "attribOption": [
-        "1",
-        "a",
-        "A",
-        "i",
-        "I"
-      ]
+      "attribOption": ["1", "a", "A", "i", "I"]
     },
     "script/type": {
       "attribOption": [
@@ -14489,9 +14293,7 @@
       ]
     },
     "style/type": {
-      "attribOption": [
-        "text/css"
-      ]
+      "attribOption": ["text/css"]
     },
     "input/type": {
       "attribOption": [
@@ -14525,10 +14327,7 @@
     "vspace": {},
     "width": {},
     "wrap": {
-      "attribOption": [
-        "hard",
-        "soft"
-      ]
+      "attribOption": ["hard", "soft"]
     },
     "nonce": {
       "global": "true",

@@ -1,4 +1,4 @@
-jasmine.filterByPlatform = ({only, except}, done) => {
+jasmine.filterByPlatform = ({ only, except }, done) => {
   if (only && !only.includes(process.platform)) {
     done();
     pending();
@@ -8,4 +8,4 @@ jasmine.filterByPlatform = ({only, except}, done) => {
     done();
     pending();
   }
-}
+};

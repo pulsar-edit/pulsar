@@ -1,83 +1,95 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import etch from 'etch'
-import dedent from 'dedent'
-import CodeBlock from './code-block'
-import StyleguideSection from './styleguide-section'
-import ExampleSelectListView from './example-select-list-view'
+import etch from "etch";
+import dedent from "dedent";
+import CodeBlock from "./code-block";
+import StyleguideSection from "./styleguide-section";
+import ExampleSelectListView from "./example-select-list-view";
 
 export default class StyleguideView {
-  constructor (props) {
-    this.uri = props.uri
-    this.collapsedSections = props.collapsedSections ? new Set(props.collapsedSections) : new Set()
-    this.sections = []
-    etch.initialize(this)
+  constructor(props) {
+    this.uri = props.uri;
+    this.collapsedSections = props.collapsedSections ? new Set(props.collapsedSections) : new Set();
+    this.sections = [];
+    etch.initialize(this);
     for (const section of this.sections) {
       if (this.collapsedSections.has(section.name)) {
-        section.collapse()
+        section.collapse();
       } else {
-        section.expand()
+        section.expand();
       }
     }
   }
 
-  destroy () {
-    this.sections = null
+  destroy() {
+    this.sections = null;
   }
 
-  serialize () {
+  serialize() {
     return {
       deserializer: this.constructor.name,
       collapsedSections: this.sections.filter((s) => s.collapsed).map((s) => s.name),
-      uri: this.uri
-    }
+      uri: this.uri,
+    };
   }
 
-  update () {
+  update() {
     // intentionally empty.
   }
 
-  getURI () {
-    return this.uri
+  getURI() {
+    return this.uri;
   }
 
-  getTitle () {
-    return 'Styleguide'
+  getTitle() {
+    return "Styleguide";
   }
 
-  getIconName () {
-    return 'paintcan'
+  getIconName() {
+    return "paintcan";
   }
 
-  expandAll () {
+  expandAll() {
     for (const section of this.sections) {
-      section.expand()
+      section.expand();
     }
   }
 
-  collapseAll () {
+  collapseAll() {
     for (const section of this.sections) {
-      section.collapse()
+      section.collapse();
     }
   }
 
-  render () {
+  render() {
     return (
-      <div className='styleguide pane-item native-key-bindings' tabIndex='-1'>
-        <header className='styleguide-header'>
+      <div className="styleguide pane-item native-key-bindings" tabIndex="-1">
+        <header className="styleguide-header">
           <h1>Styleguide</h1>
           <p>This exercises all UI components and acts as a styleguide.</p>
 
-          <div className='styleguide-controls btn-group'>
-            <button className='btn' onclick={() => this.collapseAll()}>Collapse All</button>
-            <button className='btn' onclick={() => this.expandAll()}>Expand All</button>
+          <div className="styleguide-controls btn-group">
+            <button className="btn" onclick={() => this.collapseAll()}>
+              Collapse All
+            </button>
+            <button className="btn" onclick={() => this.expandAll()}>
+              Expand All
+            </button>
           </div>
         </header>
 
-        <main className='styleguide-sections'>
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='variables' title='Variables'>
-            <p>Use these UI variables in your package's stylesheets. They are set by UI themes and therefore your package will match the overall look. Make sure to @import 'ui-variables' in your stylesheets to use these variables.</p>
+        <main className="styleguide-sections">
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="variables"
+            title="Variables"
+          >
+            <p>
+              Use these UI variables in your package's stylesheets. They are set by UI themes and
+              therefore your package will match the overall look. Make sure to @import
+              'ui-variables' in your stylesheets to use these variables.
+            </p>
             <h2>Text colors</h2>
             {this.renderExampleHTML(dedent`
               <div class="is-color text-color">@text-color</div>
@@ -168,9 +180,23 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='icons' title='Icons'>
-            <p>Atom comes bundled with the Octicons. It lets you easily add icons to your packages.</p>
-            <p>Currently version <code>4.4.0</code> is available. In addition some older icons from version <code>2.1.2</code> are still kept for backwards compatibility. Make sure to use the <code>icon icon-</code> prefix in front of an icon name. See the <a href='http://flight-manual.atom.io/hacking-atom/sections/iconography/'>documentation</a> for more details.</p>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="icons"
+            title="Icons"
+          >
+            <p>
+              Atom comes bundled with the Octicons. It lets you easily add icons to your packages.
+            </p>
+            <p>
+              Currently version <code>4.4.0</code> is available. In addition some older icons from
+              version <code>2.1.2</code> are still kept for backwards compatibility. Make sure to
+              use the <code>icon icon-</code> prefix in front of an icon name. See the{" "}
+              <a href="http://flight-manual.atom.io/hacking-atom/sections/iconography/">
+                documentation
+              </a>{" "}
+              for more details.
+            </p>
 
             <h2>Octicons</h2>
             {this.renderExampleHTML(dedent`
@@ -401,7 +427,11 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='inputs' title='Inputs'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="inputs"
+            title="Inputs"
+          >
             <p>Various inputs and controls.</p>
 
             <h2>Text Inputs</h2>
@@ -428,7 +458,11 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='text' title='Text'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="text"
+            title="Text"
+          >
             <p>There are a number of text classes.</p>
 
             <h2>text-* classes</h2>
@@ -454,7 +488,11 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='layout' title='Layout'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="layout"
+            title="Layout"
+          >
             <p>A few things that might be useful for general layout.</p>
 
             <h2>.block</h2>
@@ -494,7 +532,11 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='git' title='Git Status'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="git"
+            title="Git Status"
+          >
             <p>Often we need git related classes to specify status.</p>
 
             <h2>status-* classes</h2>
@@ -516,13 +558,17 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='site-highlight' title='Site colors'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="site-highlight"
+            title="Site colors"
+          >
             <p>Site colors are used for collaboration. A site is another collaborator.</p>
 
             <h2>ui-site-* classes</h2>
             <p>
-              These classes only set the background color, no other styles.
-              You can also use LESS variables <code>@ui-site-#</code> in your plugins where
+              These classes only set the background color, no other styles. You can also use LESS
+              variables <code>@ui-site-#</code> in your plugins where
               <code>#</code> is a number between 1 and 5.
             </p>
             <p>Site colors will always be in the color progression you see here.</p>
@@ -535,7 +581,11 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='badges' title='Badges'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="badges"
+            title="Badges"
+          >
             <p>Badges are typically used to show numbers.</p>
 
             <h2>Standalone badges</h2>
@@ -560,14 +610,21 @@ export default class StyleguideView {
             `)}
 
             <h2>Badge sizes</h2>
-            <p>By default the <code>@font-size</code> variable from themes is used. Additionally there are also 3 predefined sizes.</p>
+            <p>
+              By default the <code>@font-size</code> variable from themes is used. Additionally
+              there are also 3 predefined sizes.
+            </p>
             {this.renderExampleHTML(dedent`
               <div class='block'>Large <span class='badge badge-large'>8</span></div>
               <div class='block'>Medium <span class='badge badge-medium'>2</span></div>
               <div class='block'>Small <span class='badge badge-small'>7</span></div>
             `)}
 
-            <p>If you like the size change depending on the parent, use the <code>badge-flexible</code> class. Note: Best used for larger sizes. For smaller sizes it could cause the number to be mis-aligned by a pixel.</p>
+            <p>
+              If you like the size change depending on the parent, use the{" "}
+              <code>badge-flexible</code> class. Note: Best used for larger sizes. For smaller sizes
+              it could cause the number to be mis-aligned by a pixel.
+            </p>
             {this.renderExampleHTML(dedent`
               <h1 class='block'>Heading <span class='badge badge-flexible'>1</span></h1>
               <h2 class='block'>Heading <span class='badge badge-flexible'>2</span></h2>
@@ -585,7 +642,11 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='buttons' title='Buttons'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="buttons"
+            title="Buttons"
+          >
             <p>Buttons are similar to bootstrap buttons</p>
 
             <h2>Standalone buttons</h2>
@@ -633,7 +694,9 @@ export default class StyleguideView {
             `)}
 
             <h2>Icon buttons</h2>
-            <p>Overview of all <a href='https://octicons.github.com/'>Octicons</a>.</p>
+            <p>
+              Overview of all <a href="https://octicons.github.com/">Octicons</a>.
+            </p>
             {this.renderExampleHTML(dedent`
               <div class='block'>
                 <button class='btn icon icon-gear inline-block-tight'>Settings</button>
@@ -701,7 +764,10 @@ export default class StyleguideView {
             `)}
 
             <h2>Selected buttons</h2>
-            <p>Buttons can be marked selected by adding a <code>.selected</code> class. Useful for toggle groups.</p>
+            <p>
+              Buttons can be marked selected by adding a <code>.selected</code> class. Useful for
+              toggle groups.
+            </p>
             {this.renderExampleHTML(dedent`
               <div class='block'>
                 <div class='btn-group'>
@@ -737,7 +803,11 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='panel' title='Panels'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="panel"
+            title="Panels"
+          >
             <p>A container attached to some side of the Atom UI.</p>
             {this.renderExampleHTML(dedent`
               <atom-panel>
@@ -764,7 +834,11 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='list-group' title='List Group'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="list-group"
+            title="List Group"
+          >
             <p>Use for anything that requires a list.</p>
             {this.renderExampleHTML(dedent`
               <ul class='list-group'>
@@ -813,8 +887,14 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='list-tree' title='List Tree'>
-            <p>A <code>.list-tree</code> is a special case of <code>.list-group</code>.</p>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="list-tree"
+            title="List Tree"
+          >
+            <p>
+              A <code>.list-tree</code> is a special case of <code>.list-group</code>.
+            </p>
             {this.renderExampleHTML(dedent`
               <ul class='list-tree'>
                 <li class='list-nested-item'>
@@ -867,7 +947,10 @@ export default class StyleguideView {
             `)}
 
             <h2>With disclosure arrows</h2>
-            <p>Add the class <code>.has-collapsable-children</code> to give the children with nested items disclosure arrows.</p>
+            <p>
+              Add the class <code>.has-collapsable-children</code> to give the children with nested
+              items disclosure arrows.
+            </p>
             {this.renderExampleHTML(dedent`
               <ul class='list-tree has-collapsable-children'>
                 <li class='list-nested-item'>
@@ -921,7 +1004,10 @@ export default class StyleguideView {
             `)}
 
             <h2>With disclosure arrows at only one level.</h2>
-            <p>Add the class <code>.has-flat-children</code> to sub-<code>.list-tree</code>s to indicate that the children will not be collapsable.</p>
+            <p>
+              Add the class <code>.has-flat-children</code> to sub-<code>.list-tree</code>s to
+              indicate that the children will not be collapsable.
+            </p>
             {this.renderExampleHTML(dedent`
               <ul class='list-tree has-collapsable-children '>
                 <li class='list-nested-item'>
@@ -949,11 +1035,19 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='select-list' title='Select List'>
-            <p>This is how you will typically specify a <code>.select-list</code>.</p>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="select-list"
+            title="Select List"
+          >
+            <p>
+              This is how you will typically specify a <code>.select-list</code>.
+            </p>
             <ExampleSelectListView />
 
-            <p>The list items have many options you can use, and shows you how they will display.</p>
+            <p>
+              The list items have many options you can use, and shows you how they will display.
+            </p>
 
             <h2>Basic example with one item selected</h2>
             {this.renderExampleHTML(dedent`
@@ -1110,10 +1204,14 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='popover-list' title='Popover List'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="popover-list"
+            title="Popover List"
+          >
             <p>
-              A <code>.popover-list</code> is a <code>.select-list</code> that
-              is meant to popover the code for something like autocomplete.
+              A <code>.popover-list</code> is a <code>.select-list</code> that is meant to popover
+              the code for something like autocomplete.
             </p>
 
             <h2>Basic example with one item selected</h2>
@@ -1129,7 +1227,11 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='modal-panel' title='Modals'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="modal-panel"
+            title="Modals"
+          >
             <p>Modals are like dialog boxes.</p>
             {this.renderExampleHTML(dedent`
               <atom-panel class='modal'>
@@ -1138,12 +1240,17 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='tooltips' title='Tooltips'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="tooltips"
+            title="Tooltips"
+          >
             <p>
               You do not create the markup directly. You call
-              <code>{`element.setTooltip(title, {command, commandElement}={})`}</code>.
-              Passing in a <code>command</code> (like <code>find-and-replace:show-find</code>) and
-              <code>commandElement</code> (context for the command) will yield a tip with a keystroke.
+              <code>{`element.setTooltip(title, {command, commandElement}={})`}</code>. Passing in a{" "}
+              <code>command</code> (like <code>find-and-replace:show-find</code>) and
+              <code>commandElement</code> (context for the command) will yield a tip with a
+              keystroke.
             </p>
 
             {this.renderExampleHTML(dedent`
@@ -1161,9 +1268,14 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='error-messages' title='Messages'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="error-messages"
+            title="Messages"
+          >
             <p>
-              Use to convey info to the user when something happens. See <code>find-and-replace</code>
+              Use to convey info to the user when something happens. See{" "}
+              <code>find-and-replace</code>
               for an example.
             </p>
 
@@ -1184,9 +1296,7 @@ export default class StyleguideView {
             `)}
 
             <h2>Background Messages</h2>
-            <p>
-              Subtle background messages for panes. Use for cases when there are no results.
-            </p>
+            <p>Subtle background messages for panes. Use for cases when there are no results.</p>
 
             {this.renderExampleHTML(dedent`
               <ul class='background-message'>
@@ -1195,8 +1305,8 @@ export default class StyleguideView {
             `)}
 
             <p>
-              Centered background messages will center horizontally and vertically.
-              Your container for this element must have <code>position</code> set with <code>relative</code> or
+              Centered background messages will center horizontally and vertically. Your container
+              for this element must have <code>position</code> set with <code>relative</code> or
               <code>absolute</code>.
             </p>
 
@@ -1207,7 +1317,11 @@ export default class StyleguideView {
             `)}
           </StyleguideSection>
 
-          <StyleguideSection onDidInitialize={this.didInitializeSection.bind(this)} name='progress' title='Loading/Progress'>
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="progress"
+            title="Loading/Progress"
+          >
             <h2>Progress Bars</h2>
             {this.renderExampleHTML(dedent`
               <div class='block'>
@@ -1246,21 +1360,21 @@ export default class StyleguideView {
           </StyleguideSection>
         </main>
       </div>
-    )
+    );
   }
 
-  renderExampleHTML (html) {
+  renderExampleHTML(html) {
     return (
-      <div className='example'>
-        <div className='example-rendered' innerHTML={html} />
-        <div className='example-code show-example-html'>
-          <CodeBlock cssClass='example-html' grammarScopeName='text.html.basic' code={html} />
+      <div className="example">
+        <div className="example-rendered" innerHTML={html} />
+        <div className="example-code show-example-html">
+          <CodeBlock cssClass="example-html" grammarScopeName="text.html.basic" code={html} />
         </div>
       </div>
-    )
+    );
   }
 
-  didInitializeSection (section) {
-    this.sections.push(section)
+  didInitializeSection(section) {
+    this.sections.push(section);
   }
 }

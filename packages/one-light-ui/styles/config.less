@@ -1,12 +1,10 @@
-
 // Theme config
 // This gets changed from the theme settings
 
-@theme-tabsizing: ~'theme-@{ui-theme-name}-tabsizing';
-@theme-dockButtons: ~'theme-@{ui-theme-name}-dock-buttons';
-@theme-stickyHeaders: ~'theme-@{ui-theme-name}-sticky-headers';
-@theme-closeButton: ~'theme-@{ui-theme-name}-tab-close-button';
-
+@theme-tabsizing: ~"theme-@{ui-theme-name}-tabsizing";
+@theme-dockButtons: ~"theme-@{ui-theme-name}-dock-buttons";
+@theme-stickyHeaders: ~"theme-@{ui-theme-name}-sticky-headers";
+@theme-closeButton: ~"theme-@{ui-theme-name}-tab-close-button";
 
 // Tabs ----------------------------------------------
 
@@ -35,7 +33,6 @@
   // }
 }
 
-
 // Maximum (full width)
 
 [@{theme-tabsizing}="maximum"] .tab-bar {
@@ -44,7 +41,6 @@
     max-width: none;
   }
 }
-
 
 // Minimum (show long paths)
 
@@ -63,25 +59,20 @@
   }
 }
 
-
 // Tabs: close button position  ------------------------------
 
 [@{theme-closeButton}="left"] {
-
   .tab-bar .tab {
     .close-icon {
       right: auto;
       left: @icon-padding-right;
     }
   }
-
 }
-
 
 // Hide docks toggle buttons ------------------------------
 
 [@{theme-dockButtons}="hidden"] {
-
   // Hide docks when not open
   .atom-dock-inner:not(.atom-dock-open) {
     display: none;
@@ -91,14 +82,11 @@
   .atom-dock-toggle-button {
     display: none;
   }
-
 }
-
 
 // Sticky Projects ------------------------------
 
 [@{theme-stickyHeaders}="sticky"] {
-
   .tree-view {
     .project-root-header {
       position: sticky;
@@ -123,7 +111,7 @@
         background-color: @background-color-selected;
       }
     }
-    &:focus .selected .project-root-header.project-root-header  {
+    &:focus .selected .project-root-header.project-root-header {
       background: @button-background-color-selected;
     }
   }

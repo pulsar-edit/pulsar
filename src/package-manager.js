@@ -1,17 +1,17 @@
-const path = require('path');
+const path = require("path");
 let normalizePackageData = null;
 
-const _ = require('underscore-plus');
-const { Emitter } = require('event-kit');
-const fs = require('fs-plus');
-const CSON = require('season');
+const _ = require("underscore-plus");
+const { Emitter } = require("event-kit");
+const fs = require("fs-plus");
+const CSON = require("season");
 
-const ServiceHub = require('service-hub');
-const Package = require('./package');
-const { getReleaseChannel } = require('./get-app-details.js');
-const ThemePackage = require('./theme-package');
-const ModuleCache = require('./module-cache');
-const packageJSON = require('../package.json');
+const ServiceHub = require("service-hub");
+const Package = require("./package");
+const { getReleaseChannel } = require("./get-app-details.js");
+const ThemePackage = require("./theme-package");
+const ModuleCache = require("./module-cache");
+const packageJSON = require("../package.json");
 
 // Extended: Package manager for coordinating the lifecycle of Lumine packages.
 //
@@ -39,7 +39,7 @@ module.exports = class PackageManager {
       grammarRegistry: this.grammarRegistry,
       deserializerManager: this.deserializerManager,
       viewRegistry: this.viewRegistry,
-      uriHandlerRegistry: this.uriHandlerRegistry
+      uriHandlerRegistry: this.uriHandlerRegistry,
     } = params);
 
     this.emitter = new Emitter();
@@ -47,12 +47,9 @@ module.exports = class PackageManager {
     this.packageDirPaths = [];
     this.deferredActivationHooks = [];
     this.triggeredActivationHooks = new Set();
-    this.packagesCache =
-      packageJSON._atomPackages != null ? packageJSON._atomPackages : {};
+    this.packagesCache = packageJSON._atomPackages != null ? packageJSON._atomPackages : {};
     this.packageDependencies =
-      packageJSON.packageDependencies != null
-        ? packageJSON.packageDependencies
-        : {};
+      packageJSON.packageDependencies != null ? packageJSON.packageDependencies : {};
     this.initialPackagesLoaded = false;
     this.initialPackagesActivated = false;
     this.preloadedPackages = {};
@@ -63,7 +60,7 @@ module.exports = class PackageManager {
     this.serviceHub = new ServiceHub();
 
     this.packageActivators = [];
-    this.registerPackageActivator(this, ['atom', 'textmate']);
+    this.registerPackageActivator(this, ["atom", "textmate"]);
   }
 
   initialize(params) {
@@ -71,12 +68,10 @@ module.exports = class PackageManager {
     this.resourcePath = params.resourcePath;
     if (params.configDirPath != null && !params.safeMode) {
       if (this.devMode) {
-        this.packageDirPaths.push(
-          path.join(params.configDirPath, 'dev', 'packages')
-        );
-        this.packageDirPaths.push(path.join(this.resourcePath, 'packages'));
+        this.packageDirPaths.push(path.join(params.configDirPath, "dev", "packages"));
+        this.packageDirPaths.push(path.join(this.resourcePath, "packages"));
       }
-      this.packageDirPaths.push(path.join(params.configDirPath, 'packages'));
+      this.packageDirPaths.push(path.join(params.configDirPath, "packages"));
     }
   }
 
@@ -98,12 +93,9 @@ module.exports = class PackageManager {
     this.loadedPackages = {};
     this.preloadedPackages = {};
     this.packageStates = {};
-    this.packagesCache =
-      packageJSON._atomPackages != null ? packageJSON._atomPackages : {};
+    this.packagesCache = packageJSON._atomPackages != null ? packageJSON._atomPackages : {};
     this.packageDependencies =
-      packageJSON.packageDependencies != null
-        ? packageJSON.packageDependencies
-        : {};
+      packageJSON.packageDependencies != null ? packageJSON.packageDependencies : {};
     this.triggeredActivationHooks.clear();
     this.activatePromise = null;
   }
@@ -118,7 +110,7 @@ module.exports = class PackageManager {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidLoadInitialPackages(callback) {
-    return this.emitter.on('did-load-initial-packages', callback);
+    return this.emitter.on("did-load-initial-packages", callback);
   }
 
   // Public: Invoke the given callback when all packages have been activated.
@@ -127,7 +119,7 @@ module.exports = class PackageManager {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidActivateInitialPackages(callback) {
-    return this.emitter.on('did-activate-initial-packages', callback);
+    return this.emitter.on("did-activate-initial-packages", callback);
   }
 
   getActivatePromise() {
@@ -145,7 +137,7 @@ module.exports = class PackageManager {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidActivatePackage(callback) {
-    return this.emitter.on('did-activate-package', callback);
+    return this.emitter.on("did-activate-package", callback);
   }
 
   // Public: Invoke the given callback when a package is deactivated.
@@ -155,7 +147,7 @@ module.exports = class PackageManager {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDeactivatePackage(callback) {
-    return this.emitter.on('did-deactivate-package', callback);
+    return this.emitter.on("did-deactivate-package", callback);
   }
 
   // Public: Invoke the given callback when a package is loaded.
@@ -165,7 +157,7 @@ module.exports = class PackageManager {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidLoadPackage(callback) {
-    return this.emitter.on('did-load-package', callback);
+    return this.emitter.on("did-load-package", callback);
   }
 
   // Public: Invoke the given callback when a package is unloaded.
@@ -175,13 +167,13 @@ module.exports = class PackageManager {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidUnloadPackage(callback) {
-    return this.emitter.on('did-unload-package', callback);
+    return this.emitter.on("did-unload-package", callback);
   }
 
   // Returns the command needed to invoke PPM.
   static getCommandName(version) {
-    let commandName = 'ppm';
-    return process.platform === 'win32' ? `${commandName}.cmd` : commandName;
+    let commandName = "ppm";
+    return process.platform === "win32" ? `${commandName}.cmd` : commandName;
   }
 
   // Returns the path at which the `ppm` binary (formerly `apm`) is believed to
@@ -192,8 +184,8 @@ module.exports = class PackageManager {
     }
 
     const commandName = this.getCommandName(version);
-    const bundledPPMRoot = path.join(process.resourcesPath, 'app', 'ppm', 'bin', commandName);
-    const unbundledPPMRoot = path.join(__dirname, '..', 'ppm', 'bin', commandName);
+    const bundledPPMRoot = path.join(process.resourcesPath, "app", "ppm", "bin", commandName);
+    const unbundledPPMRoot = path.join(__dirname, "..", "ppm", "bin", commandName);
 
     if (fs.isFileSync(bundledPPMRoot)) {
       return bundledPPMRoot;
@@ -212,7 +204,7 @@ module.exports = class PackageManager {
   //
   // Return a {String} file path to apm.
   getApmPath() {
-    const configPath = atom.config.get('core.apmPath');
+    const configPath = atom.config.get("core.apmPath");
     if (configPath || this.apmPath) {
       return configPath || this.apmPath;
     } else {
@@ -247,7 +239,7 @@ module.exports = class PackageManager {
       return packagePath;
     }
 
-    packagePath = path.join(this.resourcePath, 'node_modules', name);
+    packagePath = path.join(this.resourcePath, "node_modules", name);
     if (this.hasAtomEngine(packagePath)) {
       return packagePath;
     }
@@ -300,7 +292,7 @@ module.exports = class PackageManager {
   //
   // Returns a {Boolean}.
   isPackageDisabled(name) {
-    return _.include(this.config.get('core.disabledPackages') || [], name);
+    return _.include(this.config.get("core.disabledPackages") || [], name);
   }
 
   /*
@@ -348,7 +340,7 @@ module.exports = class PackageManager {
   //
   // * `types` an {Array} of {String}s like ['atom', 'textmate'].
   getLoadedPackagesForTypes(types) {
-    return this.getLoadedPackages().filter(p => types.includes(p.getType()));
+    return this.getLoadedPackages().filter((p) => types.includes(p.getType()));
   }
 
   // Public: Get the loaded {Package} with the given name.
@@ -380,12 +372,12 @@ module.exports = class PackageManager {
 
   // Public: Returns an {Array} of {String}s of all the available package paths.
   getAvailablePackagePaths() {
-    return this.getAvailablePackages().map(a => a.path);
+    return this.getAvailablePackages().map((a) => a.path);
   }
 
   // Public: Returns an {Array} of {String}s of all the available package names.
   getAvailablePackageNames() {
-    return this.getAvailablePackages().map(a => a.name);
+    return this.getAvailablePackages().map((a) => a.name);
   }
 
   // Public: Returns an {Array} of {String}s of all the available package metadata.
@@ -394,9 +386,7 @@ module.exports = class PackageManager {
     for (const pack of this.getAvailablePackages()) {
       const loadedPackage = this.getLoadedPackage(pack.name);
       const metadata =
-        loadedPackage != null
-          ? loadedPackage.metadata
-          : this.loadPackageMetadata(pack, true);
+        loadedPackage != null ? loadedPackage.metadata : this.loadPackageMetadata(pack, true);
       packages.push(metadata);
     }
     return packages;
@@ -413,23 +403,20 @@ module.exports = class PackageManager {
         const packageNames = fs
           .readdirSync(packageDirPath, { withFileTypes: true })
           .filter(
-            dirent =>
+            (dirent) =>
               dirent.isDirectory() ||
               (dirent.isSymbolicLink() &&
-                fs.isDirectorySync(path.join(packageDirPath, dirent.name)))
+                fs.isDirectorySync(path.join(packageDirPath, dirent.name))),
           )
-          .map(dirent => dirent.name);
+          .map((dirent) => dirent.name);
 
         for (const packageName of packageNames) {
-          if (
-            !packageName.startsWith('.') &&
-            !packagesByName.has(packageName)
-          ) {
+          if (!packageName.startsWith(".") && !packagesByName.has(packageName)) {
             const packagePath = path.join(packageDirPath, packageName);
             packages.push({
               name: packageName,
               path: packagePath,
-              isBundled: false
+              isBundled: false,
             });
             packagesByName.add(packageName);
           }
@@ -441,8 +428,8 @@ module.exports = class PackageManager {
       if (!packagesByName.has(packageName)) {
         packages.push({
           name: packageName,
-          path: path.join(this.resourcePath, 'node_modules', packageName),
-          isBundled: true
+          path: path.join(this.resourcePath, "node_modules", packageName),
+          isBundled: true,
         });
       }
     }
@@ -468,11 +455,7 @@ module.exports = class PackageManager {
 
   hasAtomEngine(packagePath) {
     const metadata = this.loadPackageMetadata(packagePath, true);
-    return (
-      metadata != null &&
-      metadata.engines != null &&
-      metadata.engines.atom != null
-    );
+    return metadata != null && metadata.engines != null && metadata.engines.atom != null;
   }
 
   unobserveDisabledPackages() {
@@ -488,16 +471,16 @@ module.exports = class PackageManager {
     }
 
     this.disabledPackagesSubscription = this.config.onDidChange(
-      'core.disabledPackages',
+      "core.disabledPackages",
       ({ newValue, oldValue }) => {
         const packagesToEnable = _.difference(oldValue, newValue);
         const packagesToDisable = _.difference(newValue, oldValue);
-        packagesToDisable.forEach(name => {
+        packagesToDisable.forEach((name) => {
           if (this.getActivePackage(name)) this.deactivatePackage(name);
         });
-        packagesToEnable.forEach(name => this.activatePackage(name));
+        packagesToEnable.forEach((name) => this.activatePackage(name));
         return null;
-      }
+      },
     );
   }
 
@@ -513,11 +496,7 @@ module.exports = class PackageManager {
       return;
     }
 
-    const performOnLoadedActivePackages = (
-      packageNames,
-      disabledPackageNames,
-      action
-    ) => {
+    const performOnLoadedActivePackages = (packageNames, disabledPackageNames, action) => {
       for (const packageName of packageNames) {
         if (!disabledPackageNames.has(packageName)) {
           const pack = this.getLoadedPackage(packageName);
@@ -529,54 +508,43 @@ module.exports = class PackageManager {
     };
 
     this.packagesWithKeymapsDisabledSubscription = this.config.onDidChange(
-      'core.packagesWithKeymapsDisabled',
+      "core.packagesWithKeymapsDisabled",
       ({ newValue, oldValue }) => {
         const keymapsToEnable = _.difference(oldValue, newValue);
         const keymapsToDisable = _.difference(newValue, oldValue);
 
-        const disabledPackageNames = new Set(
-          this.config.get('core.disabledPackages')
+        const disabledPackageNames = new Set(this.config.get("core.disabledPackages"));
+        performOnLoadedActivePackages(keymapsToDisable, disabledPackageNames, (p) =>
+          p.deactivateKeymaps(),
         );
-        performOnLoadedActivePackages(
-          keymapsToDisable,
-          disabledPackageNames,
-          p => p.deactivateKeymaps()
-        );
-        performOnLoadedActivePackages(
-          keymapsToEnable,
-          disabledPackageNames,
-          p => p.activateKeymaps()
+        performOnLoadedActivePackages(keymapsToEnable, disabledPackageNames, (p) =>
+          p.activateKeymaps(),
         );
         return null;
-      }
+      },
     );
   }
 
   preloadPackages() {
     const result = [];
     for (const packageName in this.packagesCache) {
-      result.push(
-        this.preloadPackage(packageName, this.packagesCache[packageName])
-      );
+      result.push(this.preloadPackage(packageName, this.packagesCache[packageName]));
     }
     return result;
   }
 
   preloadPackage(packageName, pack) {
     const metadata = pack.metadata || {};
-    if (typeof metadata.name !== 'string' || metadata.name.length < 1) {
+    if (typeof metadata.name !== "string" || metadata.name.length < 1) {
       metadata.name = packageName;
     }
 
     if (
       metadata.repository != null &&
-      metadata.repository.type === 'git' &&
-      typeof metadata.repository.url === 'string'
+      metadata.repository.type === "git" &&
+      typeof metadata.repository.url === "string"
     ) {
-      metadata.repository.url = metadata.repository.url.replace(
-        /(^git\+)|(\.git$)/g,
-        ''
-      );
+      metadata.repository.url = metadata.repository.url.replace(/(^git\+)|(\.git$)/g, "");
     }
 
     const options = {
@@ -596,7 +564,7 @@ module.exports = class PackageManager {
       menuManager: this.menuManager,
       contextMenuManager: this.contextMenuManager,
       deserializerManager: this.deserializerManager,
-      viewRegistry: this.viewRegistry
+      viewRegistry: this.viewRegistry,
     };
 
     pack = metadata.theme ? new ThemePackage(options) : new Package(options);
@@ -608,18 +576,16 @@ module.exports = class PackageManager {
   loadPackages() {
     // Ensure atom exports is already in the require cache so the load time
     // of the first package isn't skewed by being the first to require atom
-    require('../exports/atom');
+    require("../exports/atom");
 
-    const disabledPackageNames = new Set(
-      this.config.get('core.disabledPackages')
-    );
+    const disabledPackageNames = new Set(this.config.get("core.disabledPackages"));
     this.config.transact(() => {
       for (const pack of this.getAvailablePackages()) {
         this.loadAvailablePackage(pack, disabledPackageNames);
       }
     });
     this.initialPackagesLoaded = true;
-    this.emitter.emit('did-load-initial-packages');
+    this.emitter.emit("did-load-initial-packages");
   }
 
   loadPackage(nameOrPath) {
@@ -639,7 +605,7 @@ module.exports = class PackageManager {
       return this.loadAvailablePackage({
         name,
         path: packagePath,
-        isBundled: this.isBundledPackagePath(packagePath)
+        isBundled: this.isBundledPackagePath(packagePath),
       });
     }
 
@@ -650,10 +616,7 @@ module.exports = class PackageManager {
   loadAvailablePackage(availablePackage, disabledPackageNames) {
     const preloadedPackage = this.preloadedPackages[availablePackage.name];
 
-    if (
-      disabledPackageNames != null &&
-      disabledPackageNames.has(availablePackage.name)
-    ) {
+    if (disabledPackageNames != null && disabledPackageNames.has(availablePackage.name)) {
       if (preloadedPackage != null) {
         preloadedPackage.deactivate();
         delete preloadedPackage[availablePackage.name];
@@ -701,20 +664,18 @@ module.exports = class PackageManager {
       menuManager: this.menuManager,
       contextMenuManager: this.contextMenuManager,
       deserializerManager: this.deserializerManager,
-      viewRegistry: this.viewRegistry
+      viewRegistry: this.viewRegistry,
     };
 
-    const pack = metadata.theme
-      ? new ThemePackage(options)
-      : new Package(options);
+    const pack = metadata.theme ? new ThemePackage(options) : new Package(options);
     pack.load();
     this.loadedPackages[pack.name] = pack;
-    this.emitter.emit('did-load-package', pack);
+    this.emitter.emit("did-load-package", pack);
     return pack;
   }
 
   unloadPackages() {
-    _.keys(this.loadedPackages).forEach(name => this.unloadPackage(name));
+    _.keys(this.loadedPackages).forEach((name) => this.unloadPackage(name));
   }
 
   unloadPackage(name) {
@@ -725,7 +686,7 @@ module.exports = class PackageManager {
     const pack = this.getLoadedPackage(name);
     if (pack) {
       delete this.loadedPackages[pack.name];
-      this.emitter.emit('did-unload-package', pack);
+      this.emitter.emit("did-unload-package", pack);
     } else {
       throw new Error(`No loaded package for name '${name}'`);
     }
@@ -741,7 +702,7 @@ module.exports = class PackageManager {
     this.activatePromise = Promise.all(promises).then(() => {
       this.triggerDeferredActivationHooks();
       this.initialPackagesActivated = true;
-      this.emitter.emit('did-activate-initial-packages');
+      this.emitter.emit("did-activate-initial-packages");
       this.activatePromise = null;
     });
     return this.activatePromise;
@@ -790,15 +751,13 @@ module.exports = class PackageManager {
       if (this.activatingPackages[pack.name] != null) {
         delete this.activatingPackages[pack.name];
         this.activePackages[pack.name] = pack;
-        this.emitter.emit('did-activate-package', pack);
+        this.emitter.emit("did-activate-package", pack);
       }
       return pack;
     });
 
     if (this.deferredActivationHooks == null) {
-      this.triggeredActivationHooks.forEach(hook =>
-        this.activationHookEmitter.emit(hook)
-      );
+      this.triggeredActivationHooks.forEach((hook) => this.activationHookEmitter.emit(hook));
     }
 
     return activationPromise;
@@ -818,7 +777,7 @@ module.exports = class PackageManager {
 
   triggerActivationHook(hook) {
     if (hook == null || !_.isString(hook) || hook.length <= 0) {
-      return new Error('Cannot trigger an empty activation hook');
+      return new Error("Cannot trigger an empty activation hook");
     }
 
     this.triggeredActivationHooks.add(hook);
@@ -844,7 +803,7 @@ module.exports = class PackageManager {
   }
 
   serializePackage(pack) {
-    if (typeof pack.serialize === 'function') {
+    if (typeof pack.serialize === "function") {
       this.setPackageState(pack.name, pack.serialize());
     }
   }
@@ -852,11 +811,7 @@ module.exports = class PackageManager {
   // Deactivate all packages
   async deactivatePackages() {
     await this.config.transactAsync(() =>
-      Promise.all(
-        this.getLoadedPackages().map(pack =>
-          this.deactivatePackage(pack.name, true)
-        )
-      )
+      Promise.all(this.getLoadedPackages().map((pack) => this.deactivatePackage(pack.name, true))),
     );
     this.unobserveDisabledPackages();
     this.unobservePackagesWithKeymapsDisabled();
@@ -874,17 +829,17 @@ module.exports = class PackageManager {
     }
 
     const deactivationResult = pack.deactivate();
-    if (deactivationResult && typeof deactivationResult.then === 'function') {
+    if (deactivationResult && typeof deactivationResult.then === "function") {
       await deactivationResult;
     }
 
     delete this.activePackages[pack.name];
     delete this.activatingPackages[pack.name];
-    this.emitter.emit('did-deactivate-package', pack);
+    this.emitter.emit("did-deactivate-package", pack);
   }
 
   handleMetadataError(error, packagePath) {
-    const metadataPath = path.join(packagePath, 'package.json');
+    const metadataPath = path.join(packagePath, "package.json");
     const detail = `${error.message} in ${metadataPath}`;
     const stack = `${error.stack}\n  at ${metadataPath}:1:1`;
     const message = `Failed to load the ${path.basename(packagePath)} package`;
@@ -892,19 +847,19 @@ module.exports = class PackageManager {
       stack,
       detail,
       packageName: path.basename(packagePath),
-      dismissable: true
+      dismissable: true,
     });
   }
 
   uninstallDirectory(directory) {
-    const symlinkPromise = new Promise(resolve =>
-      fs.isSymbolicLink(directory, isSymLink => resolve(isSymLink))
+    const symlinkPromise = new Promise((resolve) =>
+      fs.isSymbolicLink(directory, (isSymLink) => resolve(isSymLink)),
     );
-    const dirPromise = new Promise(resolve =>
-      fs.isDirectory(directory, isDir => resolve(isDir))
+    const dirPromise = new Promise((resolve) =>
+      fs.isDirectory(directory, (isDir) => resolve(isDir)),
     );
 
-    return Promise.all([symlinkPromise, dirPromise]).then(values => {
+    return Promise.all([symlinkPromise, dirPromise]).then((values) => {
       const [isSymLink, isDir] = values;
       if (!isSymLink && isDir) {
         return fs.remove(directory, function () {});
@@ -914,20 +869,14 @@ module.exports = class PackageManager {
 
   reloadActivePackageStyleSheets() {
     for (const pack of this.getActivePackages()) {
-      if (
-        pack.getType() !== 'theme' &&
-        typeof pack.reloadStylesheets === 'function'
-      ) {
+      if (pack.getType() !== "theme" && typeof pack.reloadStylesheets === "function") {
         pack.reloadStylesheets();
       }
     }
   }
 
   isBundledPackagePath(packagePath) {
-    if (
-      this.devMode &&
-      !this.resourcePath.startsWith(`${process.resourcesPath}${path.sep}`)
-    ) {
+    if (this.devMode && !this.resourcePath.startsWith(`${process.resourcesPath}${path.sep}`)) {
       return false;
     }
 
@@ -935,15 +884,12 @@ module.exports = class PackageManager {
       this.resourcePathWithTrailingSlash = `${this.resourcePath}${path.sep}`;
     }
 
-    return (
-      packagePath != null &&
-      packagePath.startsWith(this.resourcePathWithTrailingSlash)
-    );
+    return packagePath != null && packagePath.startsWith(this.resourcePathWithTrailingSlash);
   }
 
   loadPackageMetadata(packagePathOrAvailablePackage, ignoreErrors = false) {
     let isBundled, packageName, packagePath;
-    if (typeof packagePathOrAvailablePackage === 'object') {
+    if (typeof packagePathOrAvailablePackage === "object") {
       const availablePackage = packagePathOrAvailablePackage;
       packageName = availablePackage.name;
       packagePath = availablePackage.path;
@@ -960,7 +906,7 @@ module.exports = class PackageManager {
     }
 
     if (metadata == null) {
-      const metadataPath = CSON.resolve(path.join(packagePath, 'package'));
+      const metadataPath = CSON.resolve(path.join(packagePath, "package"));
       if (metadataPath) {
         try {
           metadata = CSON.readFileSync(metadataPath);
@@ -977,19 +923,16 @@ module.exports = class PackageManager {
       metadata = {};
     }
 
-    if (typeof metadata.name !== 'string' || metadata.name.length <= 0) {
+    if (typeof metadata.name !== "string" || metadata.name.length <= 0) {
       metadata.name = packageName;
     }
 
     if (
       metadata.repository &&
-      metadata.repository.type === 'git' &&
-      typeof metadata.repository.url === 'string'
+      metadata.repository.type === "git" &&
+      typeof metadata.repository.url === "string"
     ) {
-      metadata.repository.url = metadata.repository.url.replace(
-        /(^git\+)|(\.git$)/g,
-        ''
-      );
+      metadata.repository.url = metadata.repository.url.replace(/(^git\+)|(\.git$)/g, "");
     }
 
     return metadata;
@@ -997,8 +940,7 @@ module.exports = class PackageManager {
 
   normalizePackageMetadata(metadata) {
     if (metadata != null) {
-      normalizePackageData =
-        normalizePackageData || require('normalize-package-data');
+      normalizePackageData = normalizePackageData || require("normalize-package-data");
       normalizePackageData(metadata);
     }
   }
@@ -1007,5 +949,5 @@ module.exports = class PackageManager {
 const NullVersionRange = {
   test() {
     return false;
-  }
+  },
 };

@@ -1,14 +1,14 @@
-const AtomWindow = require('./atom-window');
-const ApplicationMenu = require('./application-menu');
-const AtomProtocolHandler = require('./atom-protocol-handler');
-const { onDidChangeScrollbarStyle, getScrollbarStyle } = require('./scrollbar-style');
-const StorageFolder = require('../storage-folder');
-const Config = require('../config');
-const ConfigFile = require('../config-file');
-const FileRecoveryService = require('./file-recovery-service');
-const StartupTime = require('../startup-time');
-const ipcHelpers = require('../ipc-helpers');
-const { getConfigFilePath } = require('../get-app-details.js');
+const AtomWindow = require("./atom-window");
+const ApplicationMenu = require("./application-menu");
+const AtomProtocolHandler = require("./atom-protocol-handler");
+const { onDidChangeScrollbarStyle, getScrollbarStyle } = require("./scrollbar-style");
+const StorageFolder = require("../storage-folder");
+const Config = require("../config");
+const ConfigFile = require("../config-file");
+const FileRecoveryService = require("./file-recovery-service");
+const StartupTime = require("../startup-time");
+const ipcHelpers = require("../ipc-helpers");
+const { getConfigFilePath } = require("../get-app-details.js");
 const {
   BrowserWindow,
   Menu,
@@ -18,74 +18,74 @@ const {
   ipcMain,
   shell,
   screen,
-  nativeTheme
-} = require('electron');
-const { CompositeDisposable, Disposable } = require('event-kit');
-const crypto = require('crypto');
-const fs = require('fs-plus');
-const path = require('path');
-const os = require('os');
-const net = require('net');
-const url = require('url');
-const { promisify } = require('util');
-const { EventEmitter } = require('events');
-const _ = require('underscore-plus');
+  nativeTheme,
+} = require("electron");
+const { CompositeDisposable, Disposable } = require("event-kit");
+const crypto = require("crypto");
+const fs = require("fs-plus");
+const path = require("path");
+const os = require("os");
+const net = require("net");
+const url = require("url");
+const { promisify } = require("util");
+const { EventEmitter } = require("events");
+const _ = require("underscore-plus");
 let FindParentDir = null;
 let Resolve = null;
-const ConfigSchema = require('../config-schema');
+const ConfigSchema = require("../config-schema");
 
 const LocationSuffixRegExp = /(:\d+)(:\d+)?$/;
 
 // Increment this when changing the serialization format of `${ATOM_HOME}/storage/application.json` used by
 // AtomApplication::saveCurrentWindowOptions() and AtomApplication::loadPreviousWindowOptions() in a backward-
 // incompatible way.
-const APPLICATION_STATE_VERSION = '1';
+const APPLICATION_STATE_VERSION = "1";
 
-const getSocketSecretPath = applicationVersion => {
+const getSocketSecretPath = (applicationVersion) => {
   const { username } = os.userInfo();
   const atomHome = path.resolve(process.env.ATOM_HOME);
 
   return path.join(atomHome, `.lumine-socket-secret-${username}-${applicationVersion}`);
 };
 
-const getSocketPath = socketSecret => {
+const getSocketPath = (socketSecret) => {
   if (!socketSecret) {
     return null;
   }
 
   // Hash the secret to create the socket name to not expose it.
   const socketName = crypto
-    .createHmac('sha256', socketSecret)
-    .update('socketName')
-    .digest('hex')
+    .createHmac("sha256", socketSecret)
+    .update("socketName")
+    .digest("hex")
     .substr(0, 12);
 
-  if (process.platform === 'win32') {
+  if (process.platform === "win32") {
     return `\\\\.\\pipe\\lumine-${socketName}-sock`;
   } else {
     return path.join(os.tmpdir(), `lumine-${socketName}.sock`);
   }
 };
 
-const getExistingSocketSecret = applicationVersion => {
+const getExistingSocketSecret = (applicationVersion) => {
   const socketSecretPath = getSocketSecretPath(applicationVersion);
 
   if (!fs.existsSync(socketSecretPath)) {
     return null;
   }
 
-  return fs.readFileSync(socketSecretPath, 'utf8');
+  return fs.readFileSync(socketSecretPath, "utf8");
 };
 
 const getRandomBytes = promisify(crypto.randomBytes);
 const writeFile = promisify(fs.writeFile);
 
-const createSocketSecret = async applicationVersion => {
-  const socketSecret = (await getRandomBytes(16)).toString('hex');
+const createSocketSecret = async (applicationVersion) => {
+  const socketSecret = (await getRandomBytes(16)).toString("hex");
 
   await writeFile(getSocketSecretPath(applicationVersion), socketSecret, {
-    encoding: 'utf8',
-    mode: 0o600
+    encoding: "utf8",
+    mode: 0o600,
   });
 
   return socketSecret;
@@ -94,45 +94,41 @@ const createSocketSecret = async applicationVersion => {
 const encryptOptions = (options, secret) => {
   const message = JSON.stringify(options);
   const initVector = crypto.randomBytes(16); // AES uses 16 bytes for iV
-  const cipher = crypto.createCipheriv('aes-256-gcm', secret, initVector);
+  const cipher = crypto.createCipheriv("aes-256-gcm", secret, initVector);
 
-  let content = cipher.update(message, 'utf8', 'hex');
-  content += cipher.final('hex');
+  let content = cipher.update(message, "utf8", "hex");
+  content += cipher.final("hex");
 
-  const authTag = cipher.getAuthTag().toString('hex');
+  const authTag = cipher.getAuthTag().toString("hex");
 
   return JSON.stringify({
     authTag,
     content,
-    initVector: initVector.toString('hex')
+    initVector: initVector.toString("hex"),
   });
 };
 
 const decryptOptions = (optionsMessage, secret) => {
   const { authTag, content, initVector } = JSON.parse(optionsMessage);
 
-  const decipher = crypto.createDecipheriv(
-    'aes-256-gcm',
-    secret,
-    Buffer.from(initVector, 'hex')
-  );
-  decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+  const decipher = crypto.createDecipheriv("aes-256-gcm", secret, Buffer.from(initVector, "hex"));
+  decipher.setAuthTag(Buffer.from(authTag, "hex"));
 
-  let message = decipher.update(content, 'hex', 'utf8');
-  message += decipher.final('utf8');
+  let message = decipher.update(content, "hex", "utf8");
+  message += decipher.final("utf8");
 
   return JSON.parse(message);
 };
 
-ipcMain.handle('getScrollbarStyle', () => {
+ipcMain.handle("getScrollbarStyle", () => {
   return getScrollbarStyle();
 });
 
-ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
+ipcMain.handle("isDefaultProtocolClient", (_, { protocol, path, args }) => {
   return app.isDefaultProtocolClient(protocol, path, args);
 });
 
-ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
+ipcMain.handle("setAsDefaultProtocolClient", (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
 });
 
@@ -144,7 +140,7 @@ ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
 module.exports = class AtomApplication extends EventEmitter {
   // Public: The entry point into the Lumine application.
   static open(options) {
-    StartupTime.addMarker('main-process:atom-application:open');
+    StartupTime.addMarker("main-process:atom-application:open");
 
     const socketSecret = getExistingSocketSecret(options.version);
     const socketPath = getSocketPath(socketSecret);
@@ -163,7 +159,7 @@ module.exports = class AtomApplication extends EventEmitter {
     if (
       !socketPath ||
       options.test ||
-      (process.platform !== 'win32' && !fs.existsSync(socketPath))
+      (process.platform !== "win32" && !fs.existsSync(socketPath))
     ) {
       return createApplication(options);
     }
@@ -174,10 +170,10 @@ module.exports = class AtomApplication extends EventEmitter {
       // and have it show in the same terminal where the second instance of the
       // editor is being launched. The Promise below hands things off
       // to the existing, older editor main process that is already running.
-      console.log('The benchmarking feature has been removed.');
+      console.log("The benchmarking feature has been removed.");
     }
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const client = net.connect({ path: socketPath }, () => {
         client.write(encryptOptions(options, socketSecret), () => {
           client.end();
@@ -186,7 +182,7 @@ module.exports = class AtomApplication extends EventEmitter {
         });
       });
 
-      client.on('error', () => resolve(createApplication(options)));
+      client.on("error", () => resolve(createApplication(options)));
     });
   }
 
@@ -195,7 +191,7 @@ module.exports = class AtomApplication extends EventEmitter {
   }
 
   constructor(options) {
-    StartupTime.addMarker('main-process:atom-application:constructor:start');
+    StartupTime.addMarker("main-process:atom-application:constructor:start");
 
     super();
     this.quitting = false;
@@ -219,26 +215,26 @@ module.exports = class AtomApplication extends EventEmitter {
 
     this.configFile = ConfigFile.at(configFilePath);
     this.config = new Config({
-      saveCallback: settings => {
+      saveCallback: (settings) => {
         if (!this.quitting) {
           return this.configFile.update(settings);
         }
-      }
+      },
     });
     this.config.setSchema(null, {
-      type: 'object',
-      properties: _.clone(ConfigSchema)
+      type: "object",
+      properties: _.clone(ConfigSchema),
     });
 
     this.fileRecoveryService = new FileRecoveryService(
-      path.join(process.env.ATOM_HOME, 'recovery')
+      path.join(process.env.ATOM_HOME, "recovery"),
     );
     this.storageFolder = new StorageFolder(process.env.ATOM_HOME);
 
     this.disposable = new CompositeDisposable();
     this.handleEvents();
 
-    StartupTime.addMarker('main-process:atom-application:constructor:end');
+    StartupTime.addMarker("main-process:atom-application:constructor:end");
   }
 
   // This stuff was previously done in the constructor, but we want to be able to construct this object
@@ -246,17 +242,12 @@ module.exports = class AtomApplication extends EventEmitter {
   // of these various sub-objects into the constructor, but you'll need to remove the side-effects they
   // perform during their construction, adding an initialize method that you call here.
   async initialize(options) {
-    StartupTime.addMarker('main-process:atom-application:initialize:start');
+    StartupTime.addMarker("main-process:atom-application:initialize:start");
 
     global.atomApplication = this;
 
-    this.applicationMenu = new ApplicationMenu(
-      this.version
-    );
-    this.atomProtocolHandler = new AtomProtocolHandler(
-      this.resourcePath,
-      this.safeMode
-    );
+    this.applicationMenu = new ApplicationMenu(this.version);
+    this.atomProtocolHandler = new AtomProtocolHandler(this.resourcePath, this.safeMode);
 
     let socketServerPromise;
     if (options.test) {
@@ -270,13 +261,13 @@ module.exports = class AtomApplication extends EventEmitter {
 
     const result = await this.launch(options);
 
-    StartupTime.addMarker('main-process:atom-application:initialize:end');
+    StartupTime.addMarker("main-process:atom-application:initialize:end");
 
     return result;
   }
 
   async destroy() {
-    const windowsClosePromises = this.getAllWindows().map(window => {
+    const windowsClosePromises = this.getAllWindows().map((window) => {
       window.close();
       return window.closedPromise;
     });
@@ -286,15 +277,11 @@ module.exports = class AtomApplication extends EventEmitter {
 
   async launch(options) {
     if (!this.configFilePromise) {
-      this.configFilePromise = this.configFile.watch().then(disposable => {
+      this.configFilePromise = this.configFile.watch().then((disposable) => {
         this.disposable.add(disposable);
-        this.config.onDidChange('core.titleBar', () => this.promptForRestart());
-        this.config.onDidChange('core.colorProfile', () =>
-          this.promptForRestart()
-        );
-        this.config.onDidChange('core.allowWindowTransparency', () =>
-          this.promptForRestart()
-        );
+        this.config.onDidChange("core.titleBar", () => this.promptForRestart());
+        this.config.onDidChange("core.colorProfile", () => this.promptForRestart());
+        this.config.onDidChange("core.allowWindowTransparency", () => this.promptForRestart());
       });
       await this.configFilePromise;
     }
@@ -312,16 +299,15 @@ module.exports = class AtomApplication extends EventEmitter {
     ) {
       optionsForWindowsToOpen.push(options);
       shouldReopenPreviousWindows =
-        this.config.get('core.restorePreviousWindowsOnStart') === 'always';
+        this.config.get("core.restorePreviousWindowsOnStart") === "always";
     } else {
-      shouldReopenPreviousWindows =
-        this.config.get('core.restorePreviousWindowsOnStart') !== 'no';
+      shouldReopenPreviousWindows = this.config.get("core.restorePreviousWindowsOnStart") !== "no";
     }
 
     if (shouldReopenPreviousWindows) {
       optionsForWindowsToOpen = [
         ...(await this.loadPreviousWindowOptions()),
-        ...optionsForWindowsToOpen
+        ...optionsForWindowsToOpen,
       ];
     }
 
@@ -356,7 +342,7 @@ module.exports = class AtomApplication extends EventEmitter {
       clearWindowState,
       addToLastWindow,
       preserveFocus,
-      env
+      env,
     } = options;
 
     if (test) {
@@ -368,7 +354,7 @@ module.exports = class AtomApplication extends EventEmitter {
         pathsToOpen,
         logFile,
         timeout,
-        env
+        env,
       });
     } else if (benchmark || benchmarkTest) {
       // We are keeping these startup options so we can print a removal message.
@@ -395,13 +381,11 @@ module.exports = class AtomApplication extends EventEmitter {
         clearWindowState,
         addToLastWindow,
         preserveFocus,
-        env
+        env,
       });
     } else if (urlsToOpen && urlsToOpen.length > 0) {
       return Promise.all(
-        urlsToOpen.map(urlToOpen =>
-          this.openUrl({ urlToOpen, devMode, safeMode, env })
-        )
+        urlsToOpen.map((urlToOpen) => this.openUrl({ urlToOpen, devMode, safeMode, env })),
       );
     } else {
       // Always open an editor window if this is the first instance of Lumine.
@@ -415,7 +399,7 @@ module.exports = class AtomApplication extends EventEmitter {
         clearWindowState,
         addToLastWindow,
         preserveFocus,
-        env
+        env,
       });
     }
   }
@@ -428,7 +412,7 @@ module.exports = class AtomApplication extends EventEmitter {
   // Public: Removes the {AtomWindow} from the global window list.
   removeWindow(window) {
     this.windowStack.removeWindow(window);
-    if (this.getAllWindows().length === 0 && process.platform !== 'darwin') {
+    if (this.getAllWindows().length === 0 && process.platform !== "darwin") {
       app.quit();
       return;
     }
@@ -438,24 +422,23 @@ module.exports = class AtomApplication extends EventEmitter {
   // Public: Adds the {AtomWindow} to the global window list.
   addWindow(window) {
     this.windowStack.addWindow(window);
-    if (this.applicationMenu)
-      this.applicationMenu.addWindow(window.browserWindow);
+    if (this.applicationMenu) this.applicationMenu.addWindow(window.browserWindow);
 
     if (!window.isSpec) {
       const focusHandler = () => this.windowStack.touch(window);
       const blurHandler = () => this.saveCurrentWindowOptions(false);
       const scrollbarStyleChangeDisposable = onDidChangeScrollbarStyle((newValue) => {
-        window.browserWindow.webContents.send('did-change-scrollbar-style', newValue);
+        window.browserWindow.webContents.send("did-change-scrollbar-style", newValue);
       });
-      window.browserWindow.on('focus', focusHandler);
-      window.browserWindow.on('blur', blurHandler);
-      window.browserWindow.once('closed', () => {
+      window.browserWindow.on("focus", focusHandler);
+      window.browserWindow.on("blur", blurHandler);
+      window.browserWindow.once("closed", () => {
         this.windowStack.removeWindow(window);
-        window.browserWindow.removeListener('focus', focusHandler);
-        window.browserWindow.removeListener('blur', blurHandler);
+        window.browserWindow.removeListener("focus", focusHandler);
+        window.browserWindow.removeListener("blur", blurHandler);
         scrollbarStyleChangeDisposable.dispose();
       });
-      window.browserWindow.webContents.once('did-finish-load', blurHandler);
+      window.browserWindow.webContents.once("did-finish-load", blurHandler);
       this.saveCurrentWindowOptions(false);
     }
   }
@@ -480,12 +463,12 @@ module.exports = class AtomApplication extends EventEmitter {
 
     await this.deleteSocketFile();
 
-    const server = net.createServer(connection => {
-      let data = '';
-      connection.on('data', chunk => {
+    const server = net.createServer((connection) => {
+      let data = "";
+      connection.on("data", (chunk) => {
         data += chunk;
       });
-      connection.on('end', () => {
+      connection.on("end", () => {
         try {
           const options = decryptOptions(data, this.socketSecret);
           this.openWithOptions(options);
@@ -496,16 +479,14 @@ module.exports = class AtomApplication extends EventEmitter {
       });
     });
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       server.listen(this.socketPath, resolve);
-      server.on('error', error =>
-        console.error('Application server failed', error)
-      );
+      server.on("error", (error) => console.error("Application server failed", error));
     });
   }
 
   async deleteSocketFile() {
-    if (process.platform === 'win32') return;
+    if (process.platform === "win32") return;
 
     if (!this.socketSecretPromise) {
       return;
@@ -519,7 +500,7 @@ module.exports = class AtomApplication extends EventEmitter {
         // Ignore ENOENT errors in case the file was deleted between the exists
         // check and the call to unlink sync. This occurred occasionally on CI
         // which is why this check is here.
-        if (error.code !== 'ENOENT') throw error;
+        if (error.code !== "ENOENT") throw error;
       }
     }
   }
@@ -538,7 +519,7 @@ module.exports = class AtomApplication extends EventEmitter {
       } catch (error) {
         // Ignore ENOENT errors in case the file was deleted between the exists
         // check and the call to unlink sync.
-        if (error.code !== 'ENOENT') throw error;
+        if (error.code !== "ENOENT") throw error;
       }
     }
   }
@@ -546,57 +527,48 @@ module.exports = class AtomApplication extends EventEmitter {
   // Registers basic application commands, non-idempotent.
   handleEvents() {
     const createOpenSettings = ({ event, sameWindow }) => {
-      const targetWindow = event
-        ? this.atomWindowForEvent(event)
-        : this.focusedWindow();
+      const targetWindow = event ? this.atomWindowForEvent(event) : this.focusedWindow();
       return {
         devMode: targetWindow ? targetWindow.devMode : false,
         safeMode: targetWindow ? targetWindow.safeMode : false,
-        window: sameWindow && targetWindow ? targetWindow : null
+        window: sameWindow && targetWindow ? targetWindow : null,
       };
     };
 
-    this.on('application:quit', () => app.quit());
-    this.on('application:new-window', () =>
-      this.openPath(createOpenSettings({}))
-    );
-    this.on('application:new-file', () =>
-      (this.focusedWindow() || this).openPath()
-    );
-    this.on('application:open-dev', () =>
-      this.promptForPathToOpen('all', { devMode: true })
-    );
-    this.on('application:open-safe', () =>
-      this.promptForPathToOpen('all', { safeMode: true })
-    );
-    this.on('application:inspect', ({ x, y, atomWindow }) => {
+    this.on("application:quit", () => app.quit());
+    this.on("application:new-window", () => this.openPath(createOpenSettings({})));
+    this.on("application:new-file", () => (this.focusedWindow() || this).openPath());
+    this.on("application:open-dev", () => this.promptForPathToOpen("all", { devMode: true }));
+    this.on("application:open-safe", () => this.promptForPathToOpen("all", { safeMode: true }));
+    this.on("application:inspect", ({ x, y, atomWindow }) => {
       if (!atomWindow) atomWindow = this.focusedWindow();
       if (atomWindow) atomWindow.browserWindow.inspectElement(x, y);
     });
 
-    this.on('application:open-documentation', () =>
-      shell.openExternal('https://github.com/lumine-code/lumine')
+    this.on("application:open-documentation", () =>
+      shell.openExternal("https://github.com/lumine-code/lumine"),
     );
-    this.on('application:open-discussions', () =>
-      shell.openExternal('https://github.com/orgs/lumine-code/discussions')
+    this.on("application:open-discussions", () =>
+      shell.openExternal("https://github.com/orgs/lumine-code/discussions"),
     );
-    this.on('application:open-faq', () =>
-      shell.openExternal('https://github.com/lumine-code/lumine/discussions')
+    this.on("application:open-faq", () =>
+      shell.openExternal("https://github.com/lumine-code/lumine/discussions"),
     );
-    this.on('application:open-terms-of-use', () =>
-      shell.openExternal('https://atom.io/terms') //TODO: This needs to be updated for when we have our own published on the site
+    this.on(
+      "application:open-terms-of-use",
+      () => shell.openExternal("https://atom.io/terms"), //TODO: This needs to be updated for when we have our own published on the site
     );
-    this.on('application:report-issue', () =>
+    this.on("application:report-issue", () =>
+      shell.openExternal("https://github.com/lumine-code/lumine/issues/new/choose"),
+    );
+    this.on("application:search-issues", () =>
       shell.openExternal(
-        'https://github.com/lumine-code/lumine/issues/new/choose'
-      )
-    );
-    this.on('application:search-issues', () =>
-      shell.openExternal('https://github.com/lumine-code/lumine/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc')
+        "https://github.com/lumine-code/lumine/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc",
+      ),
     );
 
-    if (process.platform === 'darwin') {
-      this.on('application:reopen-project', ({ paths }) => {
+    if (process.platform === "darwin") {
+      this.on("application:reopen-project", ({ paths }) => {
         const focusedWindow = this.focusedWindow();
         if (focusedWindow) {
           const { safeMode, devMode } = focusedWindow;
@@ -606,98 +578,74 @@ module.exports = class AtomApplication extends EventEmitter {
         this.openPaths({ pathsToOpen: paths });
       });
 
-      this.on('application:open', () => {
+      this.on("application:open", () => {
         const win = this.focusedWindow();
         if (win) {
-          win.sendCommand('application:open')
+          win.sendCommand("application:open");
         } else {
-          this.promptForPathToOpen(
-            'all',
-            createOpenSettings({ sameWindow: true })
-          );
+          this.promptForPathToOpen("all", createOpenSettings({ sameWindow: true }));
         }
       });
-      this.on('application:open-file', () => {
+      this.on("application:open-file", () => {
         const win = this.focusedWindow();
         if (win) {
-          win.sendCommand('application:open-file')
+          win.sendCommand("application:open-file");
         } else {
-          this.promptForPathToOpen(
-            'file',
-            createOpenSettings({ sameWindow: true })
-          );
+          this.promptForPathToOpen("file", createOpenSettings({ sameWindow: true }));
         }
       });
-      this.on('application:open-folder', () => {
+      this.on("application:open-folder", () => {
         const win = this.focusedWindow();
         if (win) {
-          win.sendCommand('application:open-folder')
+          win.sendCommand("application:open-folder");
         } else {
-          this.promptForPathToOpen(
-            'folder',
-            createOpenSettings({ sameWindow: true })
-          );
+          this.promptForPathToOpen("folder", createOpenSettings({ sameWindow: true }));
         }
       });
 
-      this.on('application:bring-all-windows-to-front', () =>
-        Menu.sendActionToFirstResponder('arrangeInFront:')
+      this.on("application:bring-all-windows-to-front", () =>
+        Menu.sendActionToFirstResponder("arrangeInFront:"),
       );
-      this.on('application:hide', () =>
-        Menu.sendActionToFirstResponder('hide:')
+      this.on("application:hide", () => Menu.sendActionToFirstResponder("hide:"));
+      this.on("application:hide-other-applications", () =>
+        Menu.sendActionToFirstResponder("hideOtherApplications:"),
       );
-      this.on('application:hide-other-applications', () =>
-        Menu.sendActionToFirstResponder('hideOtherApplications:')
+      this.on("application:minimize", () => Menu.sendActionToFirstResponder("performMiniaturize:"));
+      this.on("application:unhide-all-applications", () =>
+        Menu.sendActionToFirstResponder("unhideAllApplications:"),
       );
-      this.on('application:minimize', () =>
-        Menu.sendActionToFirstResponder('performMiniaturize:')
-      );
-      this.on('application:unhide-all-applications', () =>
-        Menu.sendActionToFirstResponder('unhideAllApplications:')
-      );
-      this.on('application:zoom', () =>
-        Menu.sendActionToFirstResponder('zoom:')
-      );
+      this.on("application:zoom", () => Menu.sendActionToFirstResponder("zoom:"));
     } else {
-      this.on('application:minimize', () => {
+      this.on("application:minimize", () => {
         const window = this.focusedWindow();
         if (window) window.minimize();
       });
-      this.on('application:zoom', function () {
+      this.on("application:zoom", function () {
         const window = this.focusedWindow();
         if (window) window.maximize();
       });
     }
 
-    this.openPathOnEvent('application:about', 'atom://about');
-    this.openPathOnEvent('application:show-settings', 'atom://config');
-    this.openPathOnEvent('application:open-your-config', 'atom://.lumine/config');
+    this.openPathOnEvent("application:about", "atom://about");
+    this.openPathOnEvent("application:show-settings", "atom://config");
+    this.openPathOnEvent("application:open-your-config", "atom://.lumine/config");
+    this.openPathOnEvent("application:open-your-init-script", "atom://.lumine/init-script");
+    this.openPathOnEvent("application:open-your-keymap", "atom://.lumine/keymap");
+    this.openPathOnEvent("application:open-your-snippets", "atom://.lumine/snippets");
+    this.openPathOnEvent("application:open-your-stylesheet", "atom://.lumine/stylesheet");
     this.openPathOnEvent(
-      'application:open-your-init-script',
-      'atom://.lumine/init-script'
-    );
-    this.openPathOnEvent('application:open-your-keymap', 'atom://.lumine/keymap');
-    this.openPathOnEvent(
-      'application:open-your-snippets',
-      'atom://.lumine/snippets'
-    );
-    this.openPathOnEvent(
-      'application:open-your-stylesheet',
-      'atom://.lumine/stylesheet'
-    );
-    this.openPathOnEvent(
-      'application:open-license',
-      path.join(process.resourcesPath, 'LICENSE.md')
+      "application:open-license",
+      path.join(process.resourcesPath, "LICENSE.md"),
     );
 
-    this.configFile.onDidChange(settings => {
+    this.configFile.onDidChange((settings) => {
       for (let window of this.getAllWindows()) {
         window.didChangeUserSettings(settings);
       }
       this.config.resetUserSettings(settings);
     });
 
-    this.configFile.onDidError(message => {
+    this.configFile.onDidError((message) => {
       const window = this.focusedWindow() || this.getLastFocusedWindow();
       if (window) {
         window.didFailToReadUserSettings(message);
@@ -707,25 +655,23 @@ module.exports = class AtomApplication extends EventEmitter {
     });
 
     this.disposable.add(
-      ipcHelpers.on(app, 'before-quit', async event => {
+      ipcHelpers.on(app, "before-quit", async (event) => {
         let resolveBeforeQuitPromise;
-        this.lastBeforeQuitPromise = new Promise(resolve => {
+        this.lastBeforeQuitPromise = new Promise((resolve) => {
           resolveBeforeQuitPromise = resolve;
         });
 
         if (!this.quitting) {
           this.quitting = true;
           event.preventDefault();
-          const windowUnloadPromises = this.getAllWindows().map(
-            async window => {
-              const unloaded = await window.prepareToUnload();
-              if (unloaded) {
-                window.close();
-                await window.closedPromise;
-              }
-              return unloaded;
+          const windowUnloadPromises = this.getAllWindows().map(async (window) => {
+            const unloaded = await window.prepareToUnload();
+            if (unloaded) {
+              window.close();
+              await window.closedPromise;
             }
-          );
+            return unloaded;
+          });
           const windowUnloadedResults = await Promise.all(windowUnloadPromises);
           if (windowUnloadedResults.every(Boolean)) {
             app.quit();
@@ -735,100 +681,95 @@ module.exports = class AtomApplication extends EventEmitter {
         }
 
         resolveBeforeQuitPromise();
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(app, 'will-quit', () => {
+      ipcHelpers.on(app, "will-quit", () => {
         this.killAllProcesses();
 
-        return Promise.all([
-          this.deleteSocketFile(),
-          this.deleteSocketSecretFile()
-        ]);
-      })
+        return Promise.all([this.deleteSocketFile(), this.deleteSocketSecretFile()]);
+      }),
     );
 
     // See: https://www.electronjs.org/docs/api/app#event-window-all-closed
     this.disposable.add(
-      ipcHelpers.on(app, 'window-all-closed', () => {
+      ipcHelpers.on(app, "window-all-closed", () => {
         if (this.applicationMenu != null) {
           this.applicationMenu.enableWindowSpecificItems(false);
         }
         // Don't quit when the last window is closed on macOS.
-        if (process.platform !== 'darwin') {
+        if (process.platform !== "darwin") {
           app.quit();
         }
-      })
+      }),
     );
 
     // Triggered by the 'open-file' event from Electron:
     // https://electronjs.org/docs/api/app#event-open-file-macos
     // For example, this is fired when a file is dragged and dropped onto the Lumine application icon in the dock.
     this.disposable.add(
-      ipcHelpers.on(app, 'open-file', (event, pathToOpen) => {
+      ipcHelpers.on(app, "open-file", (event, pathToOpen) => {
         event.preventDefault();
         this.openPath({ pathToOpen });
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(app, 'open-url', (event, urlToOpen) => {
+      ipcHelpers.on(app, "open-url", (event, urlToOpen) => {
         event.preventDefault();
         this.openUrl({
           urlToOpen,
           devMode: this.devMode,
-          safeMode: this.safeMode
+          safeMode: this.safeMode,
         });
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(app, 'activate', (event, hasVisibleWindows) => {
+      ipcHelpers.on(app, "activate", (event, hasVisibleWindows) => {
         if (hasVisibleWindows) return;
         if (event) event.preventDefault();
-        this.emit('application:new-window');
-      })
+        this.emit("application:new-window");
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'restart-application', () => {
+      ipcHelpers.on(ipcMain, "restart-application", () => {
         this.restart();
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'resolve-proxy', async (event, requestId, url) => {
+      ipcHelpers.on(ipcMain, "resolve-proxy", async (event, requestId, url) => {
         const proxy = await event.sender.session.resolveProxy(url);
-        if (!event.sender.isDestroyed())
-          event.sender.send('did-resolve-proxy', requestId, proxy);
-      })
+        if (!event.sender.isDestroyed()) event.sender.send("did-resolve-proxy", requestId, proxy);
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'did-change-history-manager', event => {
+      ipcHelpers.on(ipcMain, "did-change-history-manager", (event) => {
         for (let atomWindow of this.getAllWindows()) {
           const { webContents } = atomWindow.browserWindow;
-          if (webContents !== event.sender)
-            webContents.send('did-change-history-manager');
+          if (webContents !== event.sender) webContents.send("did-change-history-manager");
         }
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'setWindowTheme', (event, options) => {
-        if (options && typeof options === 'string') {
+      ipcHelpers.on(ipcMain, "setWindowTheme", (event, options) => {
+        if (options && typeof options === "string") {
           nativeTheme.themeSource = options;
         }
-      })
+      }),
     );
 
     // A request from the associated render process to open a set of paths using the standard window location logic.
     // Used for application:reopen-project.
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'open', (event, options) => {
+      ipcHelpers.on(ipcMain, "open", (event, options) => {
         if (options) {
-          if (typeof options.pathsToOpen === 'string') {
+          if (typeof options.pathsToOpen === "string") {
             options.pathsToOpen = [options.pathsToOpen];
           }
 
@@ -842,144 +783,117 @@ module.exports = class AtomApplication extends EventEmitter {
             this.addWindow(this.createWindow(options));
           }
         } else {
-          this.promptForPathToOpen('all', {});
+          this.promptForPathToOpen("all", {});
         }
-      })
+      }),
     );
 
     // Prompt for a file, folder, or either, then open the chosen paths. Files will be opened in the originating
     // window; folders will be opened in a new window unless an existing window exactly contains all of them.
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'open-chosen-any', (event, defaultPath) => {
+      ipcHelpers.on(ipcMain, "open-chosen-any", (event, defaultPath) => {
         this.promptForPathToOpen(
-          'all',
+          "all",
           createOpenSettings({ event, sameWindow: true }),
-          defaultPath
+          defaultPath,
         );
-      })
+      }),
     );
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'open-chosen-file', (event, defaultPath) => {
+      ipcHelpers.on(ipcMain, "open-chosen-file", (event, defaultPath) => {
         this.promptForPathToOpen(
-          'file',
+          "file",
           createOpenSettings({ event, sameWindow: true }),
-          defaultPath
+          defaultPath,
         );
-      })
+      }),
     );
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'open-chosen-folder', (event, defaultPath) => {
-        this.promptForPathToOpen(
-          'folder',
-          createOpenSettings({ event }),
-          defaultPath
+      ipcHelpers.on(ipcMain, "open-chosen-folder", (event, defaultPath) => {
+        this.promptForPathToOpen("folder", createOpenSettings({ event }), defaultPath);
+      }),
+    );
+
+    this.disposable.add(
+      ipcHelpers.on(ipcMain, "update-application-menu", (event, template, menu) => {
+        const window = BrowserWindow.fromWebContents(event.sender);
+        if (this.applicationMenu) this.applicationMenu.update(window, template, menu);
+      }),
+    );
+
+    this.disposable.add(
+      ipcHelpers.on(ipcMain, "run-package-specs", (event, packageSpecPath, options = {}) => {
+        this.runTests(
+          Object.assign(
+            {
+              resourcePath: this.devResourcePath,
+              pathsToOpen: [packageSpecPath],
+              headless: false,
+            },
+            options,
+          ),
         );
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(
-        ipcMain,
-        'update-application-menu',
-        (event, template, menu) => {
-          const window = BrowserWindow.fromWebContents(event.sender);
-          if (this.applicationMenu)
-            this.applicationMenu.update(window, template, menu);
-        }
-      )
-    );
-
-    this.disposable.add(
-      ipcHelpers.on(
-        ipcMain,
-        'run-package-specs',
-        (event, packageSpecPath, options = {}) => {
-          this.runTests(
-            Object.assign(
-              {
-                resourcePath: this.devResourcePath,
-                pathsToOpen: [packageSpecPath],
-                headless: false
-              },
-              options
-            )
-          );
-        }
-      )
-    );
-
-    this.disposable.add(
-      ipcHelpers.on(ipcMain, 'run-benchmarks', (event, benchmarksPath) => {
+      ipcHelpers.on(ipcMain, "run-benchmarks", (event, benchmarksPath) => {
         // Printing a message saying benchmarks are removed will help avoid
         // confusion about the benchmarking feature not working.
         console.log("The benchmarking feature has been removed.");
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'command', (event, command) => {
+      ipcHelpers.on(ipcMain, "command", (event, command) => {
         this.emit(command);
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'window-command', (event, command, ...args) => {
+      ipcHelpers.on(ipcMain, "window-command", (event, command, ...args) => {
         const window = BrowserWindow.fromWebContents(event.sender);
         return window && window.emit(command, ...args);
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.respondTo(
-        'window-method',
-        (browserWindow, method, ...args) => {
-          const window = this.atomWindowForBrowserWindow(browserWindow);
-          if (window) window[method](...args);
-        }
-      )
+      ipcHelpers.respondTo("window-method", (browserWindow, method, ...args) => {
+        const window = this.atomWindowForBrowserWindow(browserWindow);
+        if (window) window[method](...args);
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.on(ipcMain, 'pick-folder', (event, responseChannel) => {
-        this.promptForPath('folder', paths =>
-          event.sender.send(responseChannel, paths)
-        );
-      })
+      ipcHelpers.on(ipcMain, "pick-folder", (event, responseChannel) => {
+        this.promptForPath("folder", (paths) => event.sender.send(responseChannel, paths));
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.respondTo('set-window-size', (window, width, height) => {
+      ipcHelpers.respondTo("set-window-size", (window, width, height) => {
         window.setSize(width, height);
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.respondTo('set-window-position', (window, x, y) => {
+      ipcHelpers.respondTo("set-window-position", (window, x, y) => {
         window.setPosition(x, y);
-      })
+      }),
     );
 
     this.disposable.add(
-      ipcHelpers.respondTo(
-        'set-user-settings',
-        (window, settings, filePath) => {
-          if (!this.quitting) {
-            return ConfigFile.at(filePath || this.configFilePath).update(
-              JSON.parse(settings)
-            );
-          }
+      ipcHelpers.respondTo("set-user-settings", (window, settings, filePath) => {
+        if (!this.quitting) {
+          return ConfigFile.at(filePath || this.configFilePath).update(JSON.parse(settings));
         }
-      )
+      }),
     );
 
+    this.disposable.add(ipcHelpers.respondTo("center-window", (window) => window.center()));
+    this.disposable.add(ipcHelpers.respondTo("focus-window", (window) => window.focus()));
     this.disposable.add(
-      ipcHelpers.respondTo('center-window', window => window.center())
-    );
-    this.disposable.add(
-      ipcHelpers.respondTo('focus-window', window => window.focus())
-    );
-    this.disposable.add(
-      ipcHelpers.respondTo('show-window', window => {
+      ipcHelpers.respondTo("show-window", (window) => {
         window.show();
         let atomWindow = this.atomWindowForBrowserWindow(window);
         if (atomWindow?.preserveFocus) {
@@ -992,94 +906,83 @@ module.exports = class AtomApplication extends EventEmitter {
         // On both Windows and macOS (despite their varying window management
         // models!) we must also call `app.focus()` to ensure the frontmost
         // Lumine window is brought above windows from other applications.
-        if (process.platform !== 'linux') {
+        if (process.platform !== "linux") {
           app.focus({ steal: true });
         }
-      })
+      }),
     );
+    this.disposable.add(ipcHelpers.respondTo("hide-window", (window) => window.hide()));
     this.disposable.add(
-      ipcHelpers.respondTo('hide-window', window => window.hide())
-    );
-    this.disposable.add(
-      ipcHelpers.respondTo(
-        'get-temporary-window-state',
-        window => window.temporaryState
-      )
+      ipcHelpers.respondTo("get-temporary-window-state", (window) => window.temporaryState),
     );
 
     this.disposable.add(
-      ipcHelpers.respondTo('set-temporary-window-state', (win, state) => {
+      ipcHelpers.respondTo("set-temporary-window-state", (win, state) => {
         win.temporaryState = state;
-      })
+      }),
+    );
+
+    this.disposable.add(
+      ipcHelpers.on(ipcMain, "write-text-to-selection-clipboard", (event, text) =>
+        clipboard.writeText(text, "selection"),
+      ),
+    );
+
+    this.disposable.add(
+      ipcHelpers.on(ipcMain, "write-to-stdout", (event, output) => process.stdout.write(output)),
+    );
+
+    this.disposable.add(
+      ipcHelpers.on(ipcMain, "write-to-stderr", (event, output) => process.stderr.write(output)),
+    );
+
+    this.disposable.add(
+      ipcHelpers.on(ipcMain, "add-recent-document", (event, filename) =>
+        app.addRecentDocument(filename),
+      ),
     );
 
     this.disposable.add(
       ipcHelpers.on(
         ipcMain,
-        'write-text-to-selection-clipboard',
-        (event, text) => clipboard.writeText(text, 'selection')
-      )
-    );
-
-    this.disposable.add(
-      ipcHelpers.on(ipcMain, 'write-to-stdout', (event, output) =>
-        process.stdout.write(output)
-      )
-    );
-
-    this.disposable.add(
-      ipcHelpers.on(ipcMain, 'write-to-stderr', (event, output) =>
-        process.stderr.write(output)
-      )
-    );
-
-    this.disposable.add(
-      ipcHelpers.on(ipcMain, 'add-recent-document', (event, filename) =>
-        app.addRecentDocument(filename)
-      )
-    );
-
-    this.disposable.add(
-      ipcHelpers.on(
-        ipcMain,
-        'execute-javascript-in-dev-tools',
+        "execute-javascript-in-dev-tools",
         (event, code) =>
           event.sender.devToolsWebContents &&
-          event.sender.devToolsWebContents.executeJavaScript(code)
-      )
+          event.sender.devToolsWebContents.executeJavaScript(code),
+      ),
     );
 
     this.disposable.add(
-      ipcHelpers.respondTo('will-save-path', (window, path) =>
-        this.fileRecoveryService.willSavePath(window, path)
-      )
+      ipcHelpers.respondTo("will-save-path", (window, path) =>
+        this.fileRecoveryService.willSavePath(window, path),
+      ),
     );
 
     this.disposable.add(
-      ipcHelpers.respondTo('did-save-path', (window, path) =>
-        this.fileRecoveryService.didSavePath(window, path)
-      )
+      ipcHelpers.respondTo("did-save-path", (window, path) =>
+        this.fileRecoveryService.didSavePath(window, path),
+      ),
     );
 
     this.disposable.add(this.disableZoomOnDisplayChange());
   }
 
   setupDockMenu() {
-    if (process.platform === 'darwin') {
+    if (process.platform === "darwin") {
       return app.dock.setMenu(
         Menu.buildFromTemplate([
           {
-            label: 'New Window',
-            click: () => this.emit('application:new-window')
-          }
-        ])
+            label: "New Window",
+            click: () => this.emit("application:new-window"),
+          },
+        ]),
       );
     }
   }
 
   initializeAtomHome(configDirPath) {
     if (!fs.existsSync(configDirPath)) {
-      const templateConfigDirPath = fs.resolve(this.resourcePath, 'dot-atom');
+      const templateConfigDirPath = fs.resolve(this.resourcePath, "dot-atom");
       fs.copySync(templateConfigDirPath, configDirPath);
     }
   }
@@ -1119,26 +1022,26 @@ module.exports = class AtomApplication extends EventEmitter {
   // Translates the command into macOS action and sends it to application's first
   // responder.
   sendCommandToFirstResponder(command) {
-    if (process.platform !== 'darwin') return false;
+    if (process.platform !== "darwin") return false;
 
     switch (command) {
-      case 'core:undo':
-        Menu.sendActionToFirstResponder('undo:');
+      case "core:undo":
+        Menu.sendActionToFirstResponder("undo:");
         break;
-      case 'core:redo':
-        Menu.sendActionToFirstResponder('redo:');
+      case "core:redo":
+        Menu.sendActionToFirstResponder("redo:");
         break;
-      case 'core:copy':
-        Menu.sendActionToFirstResponder('copy:');
+      case "core:copy":
+        Menu.sendActionToFirstResponder("copy:");
         break;
-      case 'core:cut':
-        Menu.sendActionToFirstResponder('cut:');
+      case "core:cut":
+        Menu.sendActionToFirstResponder("cut:");
         break;
-      case 'core:paste':
-        Menu.sendActionToFirstResponder('paste:');
+      case "core:paste":
+        Menu.sendActionToFirstResponder("paste:");
         break;
-      case 'core:select-all':
-        Menu.sendActionToFirstResponder('selectAll:');
+      case "core:select-all":
+        Menu.sendActionToFirstResponder("selectAll:");
         break;
       default:
         return false;
@@ -1167,37 +1070,33 @@ module.exports = class AtomApplication extends EventEmitter {
   // Returns the {AtomWindow} for the given locations.
   windowForLocations(locationsToOpen, devMode, safeMode) {
     return this.getLastFocusedWindow(
-      window =>
+      (window) =>
         !window.isSpec &&
         window.devMode === devMode &&
         window.safeMode === safeMode &&
-        window.containsLocations(locationsToOpen)
+        window.containsLocations(locationsToOpen),
     );
   }
 
   // Returns the {AtomWindow} for the given ipcMain event.
   atomWindowForEvent({ sender }) {
-    return this.atomWindowForBrowserWindow(
-      BrowserWindow.fromWebContents(sender)
-    );
+    return this.atomWindowForBrowserWindow(BrowserWindow.fromWebContents(sender));
   }
 
   atomWindowForBrowserWindow(browserWindow) {
-    return this.getAllWindows().find(
-      atomWindow => atomWindow.browserWindow === browserWindow
-    );
+    return this.getAllWindows().find((atomWindow) => atomWindow.browserWindow === browserWindow);
   }
 
   // Public: Returns the currently focused {AtomWindow} or undefined if none.
   focusedWindow() {
-    return this.getAllWindows().find(window => window.isFocused());
+    return this.getAllWindows().find((window) => window.isFocused());
   }
 
   // Get the platform-specific window offset for new windows.
   getWindowOffsetForCurrentPlatform() {
     const offsetByPlatform = {
       darwin: 22,
-      win32: 26
+      win32: 26,
     };
     return offsetByPlatform[process.platform] || 0;
   }
@@ -1237,7 +1136,7 @@ module.exports = class AtomApplication extends EventEmitter {
     window,
     clearWindowState,
     addToLastWindow,
-    env
+    env,
   } = {}) {
     return this.openPaths({
       pathsToOpen: [pathToOpen],
@@ -1249,7 +1148,7 @@ module.exports = class AtomApplication extends EventEmitter {
       window,
       clearWindowState,
       addToLastWindow,
-      env
+      env,
     });
   }
 
@@ -1279,7 +1178,7 @@ module.exports = class AtomApplication extends EventEmitter {
     clearWindowState,
     addToLastWindow,
     preserveFocus,
-    env
+    env,
   } = {}) {
     if (!env) env = process.env;
     if (!pathsToOpen) pathsToOpen = [];
@@ -1290,11 +1189,11 @@ module.exports = class AtomApplication extends EventEmitter {
     clearWindowState = Boolean(clearWindowState);
 
     const locationsToOpen = await Promise.all(
-      pathsToOpen.map(pathToOpen =>
+      pathsToOpen.map((pathToOpen) =>
         this.parsePathToOpen(pathToOpen, executedFrom, {
-          hasWaitSession: pidToKillWhenClosed != null
-        })
-      )
+          hasWaitSession: pidToKillWhenClosed != null,
+        }),
+      ),
     );
 
     for (const folderToOpen of foldersToOpen) {
@@ -1304,7 +1203,7 @@ module.exports = class AtomApplication extends EventEmitter {
         initialColumn: null,
         exists: true,
         isDirectory: true,
-        hasWaitSession: pidToKillWhenClosed != null
+        hasWaitSession: pidToKillWhenClosed != null,
       });
     }
 
@@ -1312,9 +1211,7 @@ module.exports = class AtomApplication extends EventEmitter {
       return;
     }
 
-    const hasNonEmptyPath = locationsToOpen.some(
-      location => location.pathToOpen
-    );
+    const hasNonEmptyPath = locationsToOpen.some((location) => location.pathToOpen);
     const createNewWindow = newWindow || !hasNonEmptyPath;
 
     let existingWindow;
@@ -1326,42 +1223,28 @@ module.exports = class AtomApplication extends EventEmitter {
       // If no window is specified and at least one path is provided, locate an existing window that contains all
       // provided paths.
       if (!existingWindow && hasNonEmptyPath) {
-        existingWindow = this.windowForLocations(
-          locationsToOpen,
-          devMode,
-          safeMode
-        );
+        existingWindow = this.windowForLocations(locationsToOpen, devMode, safeMode);
       }
 
       // No window specified, no existing window found, and addition to the last window requested. Find the last
       // focused window that matches the requested dev and safe modes.
       if (!existingWindow && addToLastWindow) {
-        existingWindow = this.getLastFocusedWindow(win => {
-          return (
-            !win.isSpec && win.devMode === devMode && win.safeMode === safeMode
-          );
+        existingWindow = this.getLastFocusedWindow((win) => {
+          return !win.isSpec && win.devMode === devMode && win.safeMode === safeMode;
         });
       }
 
       // Fall back to the last focused window that has no project roots.
       if (!existingWindow) {
-        existingWindow = this.getLastFocusedWindow(
-          win => !win.isSpec && !win.hasProjectPaths()
-        );
+        existingWindow = this.getLastFocusedWindow((win) => !win.isSpec && !win.hasProjectPaths());
       }
 
       // One last case: if *no* paths are directories, add to the last focused window.
       if (!existingWindow) {
-        const noDirectories = locationsToOpen.every(
-          location => !location.isDirectory
-        );
+        const noDirectories = locationsToOpen.every((location) => !location.isDirectory);
         if (noDirectories) {
-          existingWindow = this.getLastFocusedWindow(win => {
-            return (
-              !win.isSpec &&
-              win.devMode === devMode &&
-              win.safeMode === safeMode
-            );
+          existingWindow = this.getLastFocusedWindow((win) => {
+            return !win.isSpec && win.devMode === devMode && win.safeMode === safeMode;
           });
         }
       }
@@ -1370,7 +1253,7 @@ module.exports = class AtomApplication extends EventEmitter {
     let openedWindow;
     if (existingWindow) {
       openedWindow = existingWindow;
-      StartupTime.addMarker('main-process:atom-application:open-in-existing');
+      StartupTime.addMarker("main-process:atom-application:open-in-existing");
       openedWindow.openLocations(locationsToOpen);
       if (!preserveFocus) {
         if (openedWindow.isMinimized()) {
@@ -1384,7 +1267,7 @@ module.exports = class AtomApplication extends EventEmitter {
         // On both Windows and macOS (despite their varying window management
         // models!) we must also call `app.focus()` to ensure the frontmost
         // Lumine window is brought above windows from other applications.
-        if (process.platform !== 'linux') {
+        if (process.platform !== "linux") {
           app.focus({ steal: true });
         }
       }
@@ -1394,26 +1277,19 @@ module.exports = class AtomApplication extends EventEmitter {
       if (devMode) {
         try {
           windowInitializationScript = require.resolve(
-            path.join(
-              this.devResourcePath,
-              'src',
-              'initialize-application-window'
-            )
+            path.join(this.devResourcePath, "src", "initialize-application-window"),
           );
           resourcePath = this.devResourcePath;
         } catch (error) {}
       }
 
       if (!windowInitializationScript) {
-        windowInitializationScript = require.resolve(
-          '../initialize-application-window'
-        );
+        windowInitializationScript = require.resolve("../initialize-application-window");
       }
       if (!resourcePath) resourcePath = this.resourcePath;
-      if (!windowDimensions)
-        windowDimensions = this.getDimensionsForNewWindow();
+      if (!windowDimensions) windowDimensions = this.getDimensionsForNewWindow();
 
-      StartupTime.addMarker('main-process:atom-application:create-window');
+      StartupTime.addMarker("main-process:atom-application:create-window");
       openedWindow = this.createWindow({
         locationsToOpen,
         windowInitializationScript,
@@ -1423,7 +1299,7 @@ module.exports = class AtomApplication extends EventEmitter {
         windowDimensions,
         profileStartup,
         clearWindowState,
-        env
+        env,
       });
       openedWindow.preserveFocus = preserveFocus;
       this.addWindow(openedWindow);
@@ -1437,14 +1313,12 @@ module.exports = class AtomApplication extends EventEmitter {
       this.waitSessionsByWindow.get(openedWindow).push({
         pid: pidToKillWhenClosed,
         remainingPaths: new Set(
-          locationsToOpen.map(location => location.pathToOpen).filter(Boolean)
-        )
+          locationsToOpen.map((location) => location.pathToOpen).filter(Boolean),
+        ),
       });
     }
 
-    openedWindow.browserWindow.once('closed', () =>
-      this.killProcessesForWindow(openedWindow)
-    );
+    openedWindow.browserWindow.once("closed", () => this.killProcessesForWindow(openedWindow));
     return openedWindow;
   }
 
@@ -1483,11 +1357,9 @@ module.exports = class AtomApplication extends EventEmitter {
       const parsedPid = parseInt(pid);
       if (isFinite(parsedPid)) this._killProcess(parsedPid);
     } catch (error) {
-      if (error.code !== 'ESRCH') {
+      if (error.code !== "ESRCH") {
         console.log(
-          `Killing process ${pid} failed: ${
-            error.code != null ? error.code : error.message
-          }`
+          `Killing process ${pid} failed: ${error.code != null ? error.code : error.message}`,
         );
       }
     }
@@ -1497,26 +1369,26 @@ module.exports = class AtomApplication extends EventEmitter {
     if (this.quitting) return;
 
     const windows = this.getAllWindows();
-    const hasASpecWindow = windows.some(window => window.isSpec);
+    const hasASpecWindow = windows.some((window) => window.isSpec);
 
     if (windows.length === 1 && hasASpecWindow) return;
 
     const state = {
       version: APPLICATION_STATE_VERSION,
       windows: windows
-        .filter(window => !window.isSpec)
-        .map(window => ({ projectRoots: window.projectRoots }))
+        .filter((window) => !window.isSpec)
+        .map((window) => ({ projectRoots: window.projectRoots })),
     };
     state.windows.reverse();
 
     if (state.windows.length > 0 || allowEmpty) {
-      await this.storageFolder.store('application.json', state);
-      this.emit('application:did-save-state');
+      await this.storageFolder.store("application.json", state);
+      this.emit("application:did-save-state");
     }
   }
 
   async loadPreviousWindowOptions() {
-    const state = await this.storageFolder.load('application.json');
+    const state = await this.storageFolder.load("application.json");
     if (!state) {
       return [];
     }
@@ -1524,27 +1396,25 @@ module.exports = class AtomApplication extends EventEmitter {
     if (state.version === APPLICATION_STATE_VERSION) {
       // Lumine >=1.36.1
       // Schema: {version: '1', windows: [{projectRoots: ['<root-dir>', ...]}, ...]}
-      return state.windows.map(each => ({
+      return state.windows.map((each) => ({
         foldersToOpen: each.projectRoots,
         devMode: this.devMode,
         safeMode: this.safeMode,
-        newWindow: true
+        newWindow: true,
       }));
     } else if (state.version === undefined) {
       // Lumine <= 1.36.0
       // Schema: [{initialPaths: ['<root-dir>', ...]}, ...]
       return Promise.all(
-        state.map(async windowState => {
+        state.map(async (windowState) => {
           // Classify each window's initialPaths as directories or non-directories
           const classifiedPaths = await Promise.all(
             windowState.initialPaths.map(
-              initialPath =>
-                new Promise(resolve => {
-                  fs.isDirectory(initialPath, isDir =>
-                    resolve({ initialPath, isDir })
-                  );
-                })
-            )
+              (initialPath) =>
+                new Promise((resolve) => {
+                  fs.isDirectory(initialPath, (isDir) => resolve({ initialPath, isDir }));
+                }),
+            ),
           );
 
           // Only accept initialPaths that are existing directories
@@ -1554,9 +1424,9 @@ module.exports = class AtomApplication extends EventEmitter {
               .map(({ initialPath }) => initialPath),
             devMode: this.devMode,
             safeMode: this.safeMode,
-            newWindow: true
+            newWindow: true,
           };
-        })
+        }),
       );
     } else {
       // Unrecognized version (from a newer Lumine?)
@@ -1576,7 +1446,7 @@ module.exports = class AtomApplication extends EventEmitter {
   //   :safeMode - Boolean to control the opened window's safe mode.
   openUrl({ urlToOpen, devMode, safeMode, env }) {
     const parsedUrl = url.parse(urlToOpen, true);
-    if (parsedUrl.protocol !== 'atom:') return;
+    if (parsedUrl.protocol !== "atom:") return;
 
     const pack = this.findPackageWithName(parsedUrl.host, devMode);
     if (pack && pack.urlMain) {
@@ -1586,33 +1456,22 @@ module.exports = class AtomApplication extends EventEmitter {
         urlToOpen,
         devMode,
         safeMode,
-        env
+        env,
       );
     } else {
-      return this.openPackageUriHandler(
-        urlToOpen,
-        parsedUrl,
-        devMode,
-        safeMode,
-        env
-      );
+      return this.openPackageUriHandler(urlToOpen, parsedUrl, devMode, safeMode, env);
     }
   }
 
   openPackageUriHandler(url, parsedUrl, devMode, safeMode, env) {
     let bestWindow;
 
-    if (parsedUrl.host === 'core') {
-      const predicate = require('../core-uri-handlers').windowPredicate(
-        parsedUrl
-      );
-      bestWindow = this.getLastFocusedWindow(
-        win => !win.isSpecWindow() && predicate(win)
-      );
+    if (parsedUrl.host === "core") {
+      const predicate = require("../core-uri-handlers").windowPredicate(parsedUrl);
+      bestWindow = this.getLastFocusedWindow((win) => !win.isSpecWindow() && predicate(win));
     }
 
-    if (!bestWindow)
-      bestWindow = this.getLastFocusedWindow(win => !win.isSpecWindow());
+    if (!bestWindow) bestWindow = this.getLastFocusedWindow((win) => !win.isSpecWindow());
 
     if (bestWindow) {
       bestWindow.sendURIMessage(url);
@@ -1624,20 +1483,14 @@ module.exports = class AtomApplication extends EventEmitter {
       if (devMode) {
         try {
           windowInitializationScript = require.resolve(
-            path.join(
-              this.devResourcePath,
-              'src',
-              'initialize-application-window'
-            )
+            path.join(this.devResourcePath, "src", "initialize-application-window"),
           );
           resourcePath = this.devResourcePath;
         } catch (error) {}
       }
 
       if (!windowInitializationScript) {
-        windowInitializationScript = require.resolve(
-          '../initialize-application-window'
-        );
+        windowInitializationScript = require.resolve("../initialize-application-window");
       }
 
       const windowDimensions = this.getDimensionsForNewWindow();
@@ -1647,10 +1500,10 @@ module.exports = class AtomApplication extends EventEmitter {
         devMode,
         safeMode,
         windowDimensions,
-        env
+        env,
       });
       this.addWindow(window);
-      window.on('window:loaded', () => window.sendURIMessage(url));
+      window.on("window:loaded", () => window.sendURIMessage(url));
       return window;
     }
   }
@@ -1661,21 +1514,9 @@ module.exports = class AtomApplication extends EventEmitter {
       .find(({ name }) => name === packageName);
   }
 
-  openPackageUrlMain(
-    packageName,
-    packageUrlMain,
-    urlToOpen,
-    devMode,
-    safeMode,
-    env
-  ) {
-    const packagePath = this.getPackageManager(devMode).resolvePackagePath(
-      packageName
-    );
-    const windowInitializationScript = path.resolve(
-      packagePath,
-      packageUrlMain
-    );
+  openPackageUrlMain(packageName, packageUrlMain, urlToOpen, devMode, safeMode, env) {
+    const packagePath = this.getPackageManager(devMode).resolvePackagePath(packageName);
+    const windowInitializationScript = path.resolve(packagePath, packageUrlMain);
     const windowDimensions = this.getDimensionsForNewWindow();
     const window = this.createWindow({
       windowInitializationScript,
@@ -1684,7 +1525,7 @@ module.exports = class AtomApplication extends EventEmitter {
       safeMode,
       urlToOpen,
       windowDimensions,
-      env
+      env,
     });
     this.addWindow(window);
     return window;
@@ -1692,12 +1533,12 @@ module.exports = class AtomApplication extends EventEmitter {
 
   getPackageManager(devMode) {
     if (this.packages == null) {
-      const PackageManager = require('../package-manager');
+      const PackageManager = require("../package-manager");
       this.packages = new PackageManager({});
       this.packages.initialize({
         configDirPath: process.env.ATOM_HOME,
         devMode,
-        resourcePath: this.resourcePath
+        resourcePath: this.resourcePath,
       });
     }
 
@@ -1713,16 +1554,7 @@ module.exports = class AtomApplication extends EventEmitter {
   //   :specPath - The directory to load specs from.
   //   :safeMode - A Boolean that, if true, won't run specs from ~/.lumine/packages
   //               and ~/.lumine/dev/packages, defaults to false.
-  runTests({
-    headless,
-    resourcePath,
-    executedFrom,
-    pathsToOpen,
-    logFile,
-    safeMode,
-    timeout,
-    env
-  }) {
+  runTests({ headless, resourcePath, executedFrom, pathsToOpen, logFile, safeMode, timeout, env }) {
     let windowInitializationScript;
     if (resourcePath !== this.resourcePath && !fs.existsSync(resourcePath)) {
       ({ resourcePath } = this);
@@ -1732,7 +1564,7 @@ module.exports = class AtomApplication extends EventEmitter {
     if (!Number.isNaN(timeoutInSeconds)) {
       const timeoutHandler = function () {
         console.log(
-          `The test suite has timed out because it has been running for more than ${timeoutInSeconds} seconds.`
+          `The test suite has timed out because it has been running for more than ${timeoutInSeconds} seconds.`,
         );
         return process.exit(124); // Use the same exit code as the UNIX timeout util.
       };
@@ -1741,11 +1573,11 @@ module.exports = class AtomApplication extends EventEmitter {
 
     try {
       windowInitializationScript = require.resolve(
-        path.resolve(this.devResourcePath, 'src', 'initialize-test-window')
+        path.resolve(this.devResourcePath, "src", "initialize-test-window"),
       );
     } catch (error) {
       windowInitializationScript = require.resolve(
-        path.resolve(__dirname, '..', '..', 'src', 'initialize-test-window')
+        path.resolve(__dirname, "..", "..", "src", "initialize-test-window"),
       );
     }
 
@@ -1757,7 +1589,7 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     if (testPaths.length === 0) {
-      process.stderr.write('Error: Specify at least one test path\n\n');
+      process.stderr.write("Error: Specify at least one test path\n\n");
       process.exit(1);
     }
 
@@ -1779,7 +1611,7 @@ module.exports = class AtomApplication extends EventEmitter {
       testPaths,
       logFile,
       safeMode,
-      env
+      env,
     });
     this.addWindow(window);
     if (env) window.replaceEnvironment(env);
@@ -1787,34 +1619,36 @@ module.exports = class AtomApplication extends EventEmitter {
   }
 
   resolveTestRunnerPath(testPath) {
-    FindParentDir ||= require('find-parent-dir');
+    FindParentDir ||= require("find-parent-dir");
 
-    let packageRoot = FindParentDir.sync(testPath, 'package.json');
+    let packageRoot = FindParentDir.sync(testPath, "package.json");
 
     if (!packageRoot) {
-      process.stderr.write('Error: Could not find root directory');
+      process.stderr.write("Error: Could not find root directory");
       process.exit(1);
     }
 
-    const packageMetadata = require(path.join(packageRoot, 'package.json'));
+    const packageMetadata = require(path.join(packageRoot, "package.json"));
     let atomTestRunner = packageMetadata.atomTestRunner;
 
     if (!atomTestRunner) {
-      process.stdout.write('atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.\n');
-      atomTestRunner = 'runners/jasmine1-test-runner';
+      process.stdout.write(
+        "atomTestRunner was not defined, using the deprecated runners/jasmine1-test-runner.\n",
+      );
+      atomTestRunner = "runners/jasmine1-test-runner";
     }
 
-    process.stdout.write(`Using test runner: ${atomTestRunner}\n`)
+    process.stdout.write(`Using test runner: ${atomTestRunner}\n`);
 
     let testRunnerPath;
-    Resolve ||= require('resolve');
+    Resolve ||= require("resolve");
 
     // First try to run with local runners (e.g: `./test/runner.js`) or
     // packages (e.g.: `atom-mocha-test-runner`)
     try {
       testRunnerPath = Resolve.sync(atomTestRunner, {
         basedir: packageRoot,
-        extensions: Object.keys(require.extensions)
+        extensions: Object.keys(require.extensions),
       });
 
       if (testRunnerPath) {
@@ -1828,7 +1662,7 @@ module.exports = class AtomApplication extends EventEmitter {
     try {
       testRunnerPath = Resolve.sync(`./spec/${atomTestRunner}`, {
         basedir: this.devResourcePath,
-        extensions: Object.keys(require.extensions)
+        extensions: Object.keys(require.extensions),
       });
 
       if (testRunnerPath) {
@@ -1839,22 +1673,16 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     process.stderr.write(
-      `Error: Could not resolve test runner path '${
-        packageMetadata.atomTestRunner
-      }'`
+      `Error: Could not resolve test runner path '${packageMetadata.atomTestRunner}'`,
     );
     process.exit(1);
   }
 
   resolveLegacyTestRunnerPath() {
     try {
-      return require.resolve(
-        path.resolve(this.devResourcePath, 'spec', 'jasmine-test-runner.js')
-      );
+      return require.resolve(path.resolve(this.devResourcePath, "spec", "jasmine-test-runner.js"));
     } catch (error) {
-      return require.resolve(
-        path.resolve(__dirname, '..', '..', 'spec', 'jasmine-test-runner.js')
-      );
+      return require.resolve(path.resolve(__dirname, "..", "..", "spec", "jasmine-test-runner.js"));
     }
   }
 
@@ -1866,16 +1694,16 @@ module.exports = class AtomApplication extends EventEmitter {
         initialLine: null,
         exists: false,
         isDirectory: false,
-        isFile: false
+        isFile: false,
       },
-      extra
+      extra,
     );
 
     if (!pathToOpen) {
       return result;
     }
 
-    result.pathToOpen = result.pathToOpen.replace(/[:\s]+$/, '');
+    result.pathToOpen = result.pathToOpen.replace(/[:\s]+$/, "");
     const match = result.pathToOpen.match(LocationSuffixRegExp);
 
     if (match != null) {
@@ -1889,7 +1717,7 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     const normalizedPath = path.normalize(
-      path.resolve(executedFrom, fs.normalize(result.pathToOpen))
+      path.resolve(executedFrom, fs.normalize(result.pathToOpen)),
     );
 
     if (!url.parse(result.pathToOpen).protocol) {
@@ -1901,7 +1729,7 @@ module.exports = class AtomApplication extends EventEmitter {
     await new Promise((resolve, reject) => {
       fs.stat(result.pathToOpen, (err, st) => {
         if (err) {
-          if (err.code === 'ENOENT' || err.code === 'EACCES') {
+          if (err.code === "ENOENT" || err.code === "EACCES") {
             result.exists = false;
             resolve();
           } else {
@@ -1938,21 +1766,20 @@ module.exports = class AtomApplication extends EventEmitter {
   promptForPathToOpen(type, { devMode, safeMode, window }, path = null) {
     return this.promptForPath(
       type,
-      async pathsToOpen => {
+      async (pathsToOpen) => {
         let targetWindow;
 
         // Open in :window as long as no chosen paths are folders. If any chosen path is a folder, open in a
         // new window instead.
-        if (type === 'folder') {
+        if (type === "folder") {
           targetWindow = null;
-        } else if (type === 'file') {
+        } else if (type === "file") {
           targetWindow = window;
-        } else if (type === 'all') {
+        } else if (type === "all") {
           const areDirectories = await Promise.all(
             pathsToOpen.map(
-              pathToOpen =>
-                new Promise(resolve => fs.isDirectory(pathToOpen, resolve))
-            )
+              (pathToOpen) => new Promise((resolve) => fs.isDirectory(pathToOpen, resolve)),
+            ),
           );
           if (!areDirectories.some(Boolean)) {
             targetWindow = window;
@@ -1963,22 +1790,22 @@ module.exports = class AtomApplication extends EventEmitter {
           pathsToOpen,
           devMode,
           safeMode,
-          window: targetWindow
+          window: targetWindow,
         });
       },
-      path
+      path,
     );
   }
 
   promptForPath(type, callback, path) {
     const properties = (() => {
       switch (type) {
-        case 'file':
-          return ['openFile'];
-        case 'folder':
-          return ['openDirectory'];
-        case 'all':
-          return ['openFile', 'openDirectory'];
+        case "file":
+          return ["openFile"];
+        case "folder":
+          return ["openDirectory"];
+        case "all":
+          return ["openFile", "openDirectory"];
         default:
           throw new Error(`${type} is an invalid type for promptForPath`);
       }
@@ -1986,56 +1813,48 @@ module.exports = class AtomApplication extends EventEmitter {
 
     // Show the open dialog as child window on Windows and Linux, and as an independent dialog on macOS. This matches
     // most native apps.
-    const parentWindow =
-      process.platform === 'darwin' ? null : BrowserWindow.getFocusedWindow();
+    const parentWindow = process.platform === "darwin" ? null : BrowserWindow.getFocusedWindow();
 
     const openOptions = {
-      properties: properties.concat(['multiSelections', 'createDirectory']),
+      properties: properties.concat(["multiSelections", "createDirectory"]),
       title: (() => {
         switch (type) {
-          case 'file':
-            return 'Open File';
-          case 'folder':
-            return 'Open Folder';
+          case "file":
+            return "Open File";
+          case "folder":
+            return "Open Folder";
           default:
-            return 'Open';
+            return "Open";
         }
-      })()
+      })(),
     };
 
     // File dialog defaults to project directory of currently active editor
     if (path) openOptions.defaultPath = path;
-    dialog
-      .showOpenDialog(parentWindow, openOptions)
-      .then(({ filePaths, bookmarks }) => {
-        if (typeof callback === 'function') {
-          callback(filePaths, bookmarks);
-        }
-      });
+    dialog.showOpenDialog(parentWindow, openOptions).then(({ filePaths, bookmarks }) => {
+      if (typeof callback === "function") {
+        callback(filePaths, bookmarks);
+      }
+    });
   }
 
   async promptForRestart() {
-    const result = await dialog.showMessageBox(
-      BrowserWindow.getFocusedWindow(),
-      {
-        type: 'warning',
-        title: 'Restart required',
-        message:
-          'You will need to restart Lumine for this change to take effect.',
-        buttons: ['Restart Lumine', 'Cancel']
-      }
-    );
+    const result = await dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
+      type: "warning",
+      title: "Restart required",
+      message: "You will need to restart Lumine for this change to take effect.",
+      buttons: ["Restart Lumine", "Cancel"],
+    });
     if (result.response === 0) this.restart();
   }
 
   restart() {
     const args = [];
-    if (this.safeMode) args.push('--safe');
+    if (this.safeMode) args.push("--safe");
     if (this.logFile != null) args.push(`--log-file=${this.logFile}`);
-    if (this.userDataDir != null)
-      args.push(`--user-data-dir=${this.userDataDir}`);
+    if (this.userDataDir != null) args.push(`--user-data-dir=${this.userDataDir}`);
     if (this.devMode) {
-      args.push('--dev');
+      args.push("--dev");
       args.push(`--resource-path=${this.resourcePath}`);
     }
     app.relaunch({ args });
@@ -2044,17 +1863,17 @@ module.exports = class AtomApplication extends EventEmitter {
 
   disableZoomOnDisplayChange() {
     const callback = () => {
-      this.getAllWindows().map(window => window.disableZoom());
+      this.getAllWindows().map((window) => window.disableZoom());
     };
 
     // Set the limits every time a display is added or removed, otherwise the
     // configuration gets reset to the default, which allows zooming the
     // webframe.
-    screen.on('display-added', callback);
-    screen.on('display-removed', callback);
+    screen.on("display-added", callback);
+    screen.on("display-removed", callback);
     return new Disposable(() => {
-      screen.removeListener('display-added', callback);
-      screen.removeListener('display-removed', callback);
+      screen.removeListener("display-added", callback);
+      screen.removeListener("display-removed", callback);
     });
   }
 };
@@ -2087,7 +1906,7 @@ class WindowStack {
 
   getLastFocusedWindow(predicate) {
     if (predicate == null) {
-      predicate = win => true;
+      predicate = (win) => true;
     }
     return this.windows.find(predicate);
   }

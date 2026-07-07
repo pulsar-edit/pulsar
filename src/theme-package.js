@@ -1,9 +1,9 @@
-const path = require('path');
-const Package = require('./package');
+const path = require("path");
+const Package = require("./package");
 
 module.exports = class ThemePackage extends Package {
   getType() {
-    return 'theme';
+    return "theme";
   }
 
   getStyleSheetPriority() {
@@ -11,11 +11,11 @@ module.exports = class ThemePackage extends Package {
   }
 
   enable() {
-    this.config.unshiftAtKeyPath('core.themes', this.name);
+    this.config.unshiftAtKeyPath("core.themes", this.name);
   }
 
   disable() {
-    this.config.removeAtKeyPath('core.themes', this.name);
+    this.config.removeAtKeyPath("core.themes", this.name);
   }
 
   preload() {
@@ -38,15 +38,12 @@ module.exports = class ThemePackage extends Package {
       this.activationPromise = new Promise((resolve, reject) => {
         this.resolveActivationPromise = resolve;
         this.rejectActivationPromise = reject;
-        this.measure('activateTime', () => {
+        this.measure("activateTime", () => {
           try {
             this.loadStylesheets();
             this.activateNow();
           } catch (error) {
-            this.handleError(
-              `Failed to activate the ${this.name} theme`,
-              error
-            );
+            this.handleError(`Failed to activate the ${this.name} theme`, error);
           }
         });
       });

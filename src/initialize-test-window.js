@@ -1,5 +1,5 @@
-const ipcHelpers = require('./ipc-helpers');
-const { requireModule } = require('./module-utils');
+const ipcHelpers = require("./ipc-helpers");
+const { requireModule } = require("./module-utils");
 
 function cloneObject(object) {
   const clone = {};
@@ -9,74 +9,66 @@ function cloneObject(object) {
   return clone;
 }
 
-module.exports = async function({ blobStore }) {
-  const remote = require('@electron/remote');
-  const getWindowLoadSettings = require('./get-window-load-settings');
+module.exports = async function ({ blobStore }) {
+  const remote = require("@electron/remote");
+  const getWindowLoadSettings = require("./get-window-load-settings");
 
-  const exitWithStatusCode = function(status) {
-    remote.app.emit('will-quit');
+  const exitWithStatusCode = function (status) {
+    remote.app.emit("will-quit");
     remote.process.exit(status);
   };
 
   try {
-    const path = require('path');
-    const { ipcRenderer } = require('electron');
-    const CompileCache = require('./compile-cache');
-    const AtomEnvironment = require('../src/atom-environment');
-    const ApplicationDelegate = require('../src/application-delegate');
-    const Clipboard = require('../src/clipboard');
-    const TextEditor = require('../src/text-editor');
-    const { updateProcessEnv } = require('./update-process-env');
-    require('./electron-shims');
+    const path = require("path");
+    const { ipcRenderer } = require("electron");
+    const CompileCache = require("./compile-cache");
+    const AtomEnvironment = require("../src/atom-environment");
+    const ApplicationDelegate = require("../src/application-delegate");
+    const Clipboard = require("../src/clipboard");
+    const TextEditor = require("../src/text-editor");
+    const { updateProcessEnv } = require("./update-process-env");
+    require("./electron-shims");
 
-    ipcRenderer.on('environment', (event, env) => updateProcessEnv(env));
+    ipcRenderer.on("environment", (event, env) => updateProcessEnv(env));
 
-    const {
-      testRunnerPath,
-      legacyTestRunnerPath,
-      headless,
-      logFile,
-      testPaths,
-      env
-    } = getWindowLoadSettings();
+    const { testRunnerPath, legacyTestRunnerPath, headless, logFile, testPaths, env } =
+      getWindowLoadSettings();
 
     if (headless) {
       // Install console functions that output to stdout and stderr.
-      const util = require('util');
+      const util = require("util");
 
       Object.defineProperties(process, {
         stdout: { value: remote.process.stdout },
-        stderr: { value: remote.process.stderr }
+        stderr: { value: remote.process.stderr },
       });
 
-      console.log = (...args) =>
-        process.stdout.write(`${util.format(...args)}\n`);
-      console.error = (...args) =>
-        process.stderr.write(`${util.format(...args)}\n`);
+      console.log = (...args) => process.stdout.write(`${util.format(...args)}\n`);
+      console.error = (...args) => process.stderr.write(`${util.format(...args)}\n`);
     } else {
       // Show window synchronously so a focusout doesn't fire on input elements
       // that are focused in the very first spec run.
       remote.getCurrentWindow().show();
     }
 
-    const handleKeydown = function(event) {
+    const handleKeydown = function (event) {
       // Reload: cmd-r / ctrl-r
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 82) {
-        ipcHelpers.call('window-method', 'reload');
+        ipcHelpers.call("window-method", "reload");
       }
 
       // Toggle Dev Tools: cmd-alt-i (Mac) / ctrl-shift-i (Linux/Windows)
       if (
         event.keyCode === 73 &&
-        ((process.platform === 'darwin' && event.metaKey && event.altKey) ||
-          (process.platform !== 'darwin' && event.ctrlKey && event.shiftKey))
+        ((process.platform === "darwin" && event.metaKey && event.altKey) ||
+          (process.platform !== "darwin" && event.ctrlKey && event.shiftKey))
       ) {
-        ipcHelpers.call('window-method', 'toggleDevTools');
+        ipcHelpers.call("window-method", "toggleDevTools");
       }
 
       // Close: cmd-w / ctrl-w
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 87) {
-        ipcHelpers.call('window-method', 'close');
+        ipcHelpers.call("window-method", "close");
       }
 
       // Copy: cmd-c / ctrl-c
@@ -85,12 +77,12 @@ module.exports = async function({ blobStore }) {
       }
     };
 
-    window.addEventListener('keydown', handleKeydown, { capture: true });
+    window.addEventListener("keydown", handleKeydown, { capture: true });
 
     // Add application-specific exports to module search path.
-    const exportsPath = path.join(getWindowLoadSettings().resourcePath, 'exports');
+    const exportsPath = path.join(getWindowLoadSettings().resourcePath, "exports");
 
-    const Module = require('module');
+    const Module = require("module");
     // `Module.globalPaths` is no longer a thing. Wrapping this function ensures
     // that the `exports` folder is treated as a search path of last resort for
     // global modules; this allows `require('clipboard')` and the like to keep
@@ -99,7 +91,7 @@ module.exports = async function({ blobStore }) {
     Module._resolveLookupPaths = function (request, parent) {
       const original = _originalResolveLookupPaths(request, parent);
       const firstChar = request.charAt(0);
-      const isRelativeOrAbsolute = firstChar === '.' || firstChar === '/';
+      const isRelativeOrAbsolute = firstChar === "." || firstChar === "/";
       if (isRelativeOrAbsolute || original === null) {
         return original;
       }
@@ -110,38 +102,38 @@ module.exports = async function({ blobStore }) {
     updateProcessEnv(env);
 
     // Set up optional transpilation for packages under test if any
-    const FindParentDir = require('find-parent-dir');
-    const packageRoot = FindParentDir.sync(testPaths[0], 'package.json');
+    const FindParentDir = require("find-parent-dir");
+    const packageRoot = FindParentDir.sync(testPaths[0], "package.json");
     if (packageRoot) {
-      const packageMetadata = require(path.join(packageRoot, 'package.json'));
+      const packageMetadata = require(path.join(packageRoot, "package.json"));
       if (packageMetadata.atomTranspilers) {
         CompileCache.addTranspilerConfigForPath(
           packageRoot,
           packageMetadata.name,
           packageMetadata,
-          packageMetadata.atomTranspilers
+          packageMetadata.atomTranspilers,
         );
       }
     }
 
-    document.title = 'Spec Suite';
+    document.title = "Spec Suite";
 
     const clipboard = new Clipboard();
     TextEditor.setClipboard(clipboard);
-    TextEditor.viewForItem = item => atom.views.getView(item);
+    TextEditor.viewForItem = (item) => atom.views.getView(item);
 
     const testRunner = requireModule(testRunnerPath);
     const legacyTestRunner = require(legacyTestRunnerPath);
     const buildDefaultApplicationDelegate = () => new ApplicationDelegate();
-    const buildAtomEnvironment = function(params) {
+    const buildAtomEnvironment = function (params) {
       params = cloneObject(params);
-      if (!params.hasOwnProperty('clipboard')) {
+      if (!params.hasOwnProperty("clipboard")) {
         params.clipboard = clipboard;
       }
-      if (!params.hasOwnProperty('blobStore')) {
+      if (!params.hasOwnProperty("blobStore")) {
         params.blobStore = blobStore;
       }
-      if (!params.hasOwnProperty('onlyLoadBaseStyleSheets')) {
+      if (!params.hasOwnProperty("onlyLoadBaseStyleSheets")) {
         params.onlyLoadBaseStyleSheets = true;
       }
       const atomEnvironment = new AtomEnvironment(params);
@@ -156,7 +148,7 @@ module.exports = async function({ blobStore }) {
       testPaths,
       buildAtomEnvironment,
       buildDefaultApplicationDelegate,
-      legacyTestRunner
+      legacyTestRunner,
     });
 
     if (getWindowLoadSettings().headless) {

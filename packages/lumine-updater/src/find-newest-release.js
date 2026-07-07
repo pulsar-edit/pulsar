@@ -1,7 +1,6 @@
 let superagent;
 
-module.exports =
-async function findNewestRelease() {
+module.exports = async function findNewestRelease() {
   superagent ??= require("superagent");
 
   let res = await superagent
@@ -17,4 +16,4 @@ async function findNewestRelease() {
   // We can be fast and simply check if the top of the array is newer than our
   // current version. Since the return is ordered.
   return res.body[0].tag_name;
-}
+};

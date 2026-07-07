@@ -1,29 +1,27 @@
-
 function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms, true));
+  return new Promise((resolve) => setTimeout(resolve, ms, true));
 }
 
-describe('LumineUpdater', () => {
-
+describe("LumineUpdater", () => {
   let pack, workspaceElement;
   beforeEach(async () => {
     atom.config.set("lumine-updater.checkForUpdatesOnLaunch", false);
     workspaceElement = atom.views.getView(atom.workspace);
-    pack = await atom.packages.activatePackage('lumine-updater');
+    pack = await atom.packages.activatePackage("lumine-updater");
     pack.mainModule.cache?.empty("last-update-check");
   });
 
   afterEach(async () => {
     pack.mainModule.cache?.empty("last-update-check");
-    await atom.packages.deactivatePackage('lumine-updater');
+    await atom.packages.deactivatePackage("lumine-updater");
   });
 
-  describe('when lumine-updater:check-for-updates is triggered', () => {
+  describe("when lumine-updater:check-for-updates is triggered", () => {
     beforeEach(async () => {
-      spyOn(pack.mainModule, 'checkForUpdates');
-    })
-    it('triggers an update check', () => {
-      atom.commands.dispatch(workspaceElement, 'lumine-updater:check-for-update');
+      spyOn(pack.mainModule, "checkForUpdates");
+    });
+    it("triggers an update check", () => {
+      atom.commands.dispatch(workspaceElement, "lumine-updater:check-for-update");
       expect(pack.mainModule.checkForUpdates).toHaveBeenCalled();
     });
   });
@@ -31,21 +29,21 @@ describe('LumineUpdater', () => {
   describe("when the remote version is greater than ours", () => {
     beforeEach(() => {
       spyOn(atom, "getVersion").andReturn("1.0.0");
-      spyOn(pack.mainModule, 'findNewestRelease').andCallFake(() => {
+      spyOn(pack.mainModule, "findNewestRelease").andCallFake(() => {
         return "2.0.0";
-      })
-      spyOn(pack.mainModule, 'notifyAboutUpdate').andCallThrough();
-      spyOn(pack.mainModule, 'notifyAboutCurrent').andCallThrough();
+      });
+      spyOn(pack.mainModule, "notifyAboutUpdate").andCallThrough();
+      spyOn(pack.mainModule, "notifyAboutCurrent").andCallThrough();
     });
 
     afterEach(() => {
       pack.mainModule.notifyAboutUpdate.reset();
       pack.mainModule.notifyAboutCurrent.reset();
-    })
+    });
 
     it("signals that the user should update", async () => {
       jasmine.useRealClock();
-      atom.commands.dispatch(workspaceElement, 'lumine-updater:check-for-update');
+      atom.commands.dispatch(workspaceElement, "lumine-updater:check-for-update");
       await wait(200);
       expect(pack.mainModule.notifyAboutUpdate).toHaveBeenCalledWith("2.0.0");
       expect(pack.mainModule.notifyAboutCurrent).not.toHaveBeenCalled();
@@ -55,16 +53,16 @@ describe('LumineUpdater', () => {
   describe("when the remote version is equal to ours", () => {
     beforeEach(() => {
       spyOn(atom, "getVersion").andReturn("1.0.5");
-      spyOn(pack.mainModule, 'findNewestRelease').andCallFake(() => {
+      spyOn(pack.mainModule, "findNewestRelease").andCallFake(() => {
         return "1.0.5";
-      })
-      spyOn(pack.mainModule, 'notifyAboutUpdate');
-      spyOn(pack.mainModule, 'notifyAboutCurrent');
+      });
+      spyOn(pack.mainModule, "notifyAboutUpdate");
+      spyOn(pack.mainModule, "notifyAboutCurrent");
     });
 
     it("takes no action", async () => {
       jasmine.useRealClock();
-      atom.commands.dispatch(workspaceElement, 'lumine-updater:check-for-update');
+      atom.commands.dispatch(workspaceElement, "lumine-updater:check-for-update");
       await wait(200);
       expect(pack.mainModule.notifyAboutUpdate).not.toHaveBeenCalled();
       expect(pack.mainModule.notifyAboutCurrent).toHaveBeenCalledWith("1.0.5", true);
@@ -75,16 +73,16 @@ describe('LumineUpdater', () => {
     let latestVersion = "1.0.6";
     beforeEach(() => {
       spyOn(atom, "getVersion").andReturn("1.0.5");
-      spyOn(pack.mainModule, 'findNewestRelease').andCallFake(() => {
+      spyOn(pack.mainModule, "findNewestRelease").andCallFake(() => {
         return latestVersion;
       });
-      spyOn(pack.mainModule, 'notifyAboutUpdate').andCallThrough();
-      spyOn(pack.mainModule, 'notifyAboutCurrent').andCallThrough();
+      spyOn(pack.mainModule, "notifyAboutUpdate").andCallThrough();
+      spyOn(pack.mainModule, "notifyAboutCurrent").andCallThrough();
     });
 
     it("subsequent checks do not result in notifications", async () => {
       jasmine.useRealClock();
-      atom.commands.dispatch(workspaceElement, 'lumine-updater:check-for-update');
+      atom.commands.dispatch(workspaceElement, "lumine-updater:check-for-update");
       await wait(200);
 
       expect(pack.mainModule.notifyAboutUpdate).toHaveBeenCalledWith("1.0.6");
@@ -107,5 +105,4 @@ describe('LumineUpdater', () => {
       expect(pack.mainModule.notifyAboutCurrent).not.toHaveBeenCalled();
     });
   });
-
 });

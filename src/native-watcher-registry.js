@@ -1,11 +1,9 @@
-const path = require('path');
+const path = require("path");
 
 // Private: re-join the segments split from an absolute path to form another absolute path.
 function absolute(...parts) {
   const candidate = path.join(...parts);
-  return path.isAbsolute(candidate)
-    ? candidate
-    : path.join(path.sep, candidate);
+  return path.isAbsolute(candidate) ? candidate : path.join(path.sep, candidate);
 }
 
 // Private: Map userland filesystem watcher subscriptions efficiently to
@@ -46,20 +44,14 @@ class RegistryTree {
     const absolutePathSegments = this.basePathSegments.concat(pathSegments);
     const absolutePath = absolute(...absolutePathSegments);
 
-    const attachToNew = childPaths => {
+    const attachToNew = (childPaths) => {
       const native = this.createNative(absolutePath);
-      const leaf = new RegistryWatcherNode(
-        native,
-        absolutePathSegments,
-        childPaths
-      );
+      const leaf = new RegistryWatcherNode(native, absolutePathSegments, childPaths);
       this.root = this.root.insert(pathSegments, leaf);
 
       const sub = native.onWillStop(() => {
         sub.dispose();
-        this.root =
-          this.root.remove(pathSegments, this.createNative) ||
-          new RegistryNode();
+        this.root = this.root.remove(pathSegments, this.createNative) || new RegistryNode();
       });
 
       attachToNative(native, absolutePath);
@@ -74,10 +66,10 @@ class RegistryTree {
         parent.addChildPath(remaining);
         attachToNative(native, absolute(...parent.getAbsolutePathSegments()));
       },
-      children: children => {
+      children: (children) => {
         // One or more NativeWatchers exist on child directories of the requested path. Create a new native watcher
         // on the parent directory, note the subscribed child paths, and cleanly stop the child native watchers.
-        const newNative = attachToNew(children.map(child => child.path));
+        const newNative = attachToNew(children.map((child) => child.path));
 
         for (let i = 0; i < children.length; i++) {
           const childNode = children[i].node;
@@ -87,7 +79,7 @@ class RegistryTree {
           childNative.stop();
         }
       },
-      missing: () => attachToNew([])
+      missing: () => attachToNew([]),
     });
   }
 
@@ -203,12 +195,12 @@ class RegistryNode {
 
   // Private: Return a {String} representation of this subtree for diagnostics and testing.
   print(indent = 0) {
-    let spaces = '';
+    let spaces = "";
     for (let i = 0; i < indent; i++) {
-      spaces += ' ';
+      spaces += " ";
     }
 
-    let result = '';
+    let result = "";
     for (const p of Object.keys(this.children)) {
       result += `${spaces}${p}\n${this.children[p].print(indent + 2)}`;
     }
@@ -290,10 +282,7 @@ class RegistryWatcherNode {
     if (pathSegments.length !== 0) {
       return this;
     } else if (this.childPaths.size > 0) {
-      let newSubTree = new RegistryTree(
-        this.absolutePathSegments,
-        createSplitNative
-      );
+      let newSubTree = new RegistryTree(this.absolutePathSegments, createSplitNative);
 
       for (const childPath of this.childPaths) {
         const childPathSegments = childPath.split(path.sep);
@@ -320,15 +309,15 @@ class RegistryWatcherNode {
   // Private: Return a {String} representation of this watcher for diagnostics and testing. Indicates the number of
   // child paths that this node's {NativeWatcher} is responsible for.
   print(indent = 0) {
-    let result = '';
+    let result = "";
     for (let i = 0; i < indent; i++) {
-      result += ' ';
+      result += " ";
     }
-    result += '[watcher';
+    result += "[watcher";
     if (this.childPaths.size > 0) {
       result += ` +${this.childPaths.size}`;
     }
-    result += ']\n';
+    result += "]\n";
 
     return result;
   }
@@ -434,7 +423,7 @@ class NativeWatcherRegistry {
     const normalizedDirectory = await watcher.getNormalizedPathPromise();
     const pathSegments = normalizedDirectory
       .split(path.sep)
-      .filter(segment => segment.length > 0);
+      .filter((segment) => segment.length > 0);
 
     this.tree.add(pathSegments, (native, nativePath) => {
       watcher.attachToNative(native, nativePath);

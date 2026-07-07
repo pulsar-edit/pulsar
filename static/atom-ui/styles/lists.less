@@ -26,7 +26,6 @@
   }
 }
 
-
 //
 // List groups
 // --------------------------------------------------
@@ -62,8 +61,6 @@
   }
 }
 
-
-
 // Individual list items
 //
 // Use on `li`s or `div`s within the `.list-group` parent.
@@ -86,7 +83,6 @@
     .border-bottom-radius(@list-group-border-radius);
   }
 }
-
 
 // Interactive list items
 //
@@ -154,7 +150,6 @@ button.list-group-item {
   }
 }
 
-
 // Contextual variants
 //
 // Add modifier classes to change text and background color on individual items.
@@ -164,7 +159,6 @@ button.list-group-item {
 .list-group-item-variant(info; @state-info-bg; @state-info-text);
 .list-group-item-variant(warning; @state-warning-bg; @state-warning-text);
 .list-group-item-variant(danger; @state-danger-bg; @state-danger-text);
-
 
 // Custom content options
 //
@@ -178,8 +172,6 @@ button.list-group-item {
   margin-bottom: 0;
   line-height: 1.3;
 }
-
-
 
 // This is a bootstrap override
 // ---------------------------------------------
@@ -211,7 +203,7 @@ button.list-group-item {
   // it can span the entire width of the parent container rather than the size
   // of the list item.
   .selected::before {
-    content: '';
+    content: "";
     background-color: @background-color-selected;
     position: absolute;
     left: 0;
@@ -233,8 +225,6 @@ button.list-group-item {
     padding-left: @component-icon-padding + @component-icon-size;
   }
 }
-
-
 
 //
 // List Tree
@@ -262,7 +252,7 @@ button.list-group-item {
     // Nested items always get disclosure arrows
     .list-nested-item > .list-item {
       .octicon(chevron-down, @disclosure-arrow-size);
-      &::before{
+      &::before {
         position: relative;
         top: -1px;
         margin-right: @component-icon-padding;
@@ -270,7 +260,7 @@ button.list-group-item {
     }
     .list-nested-item.collapsed > .list-item {
       .octicon(chevron-right, @disclosure-arrow-size);
-      &::before{
+      &::before {
         left: 1px;
       }
     }

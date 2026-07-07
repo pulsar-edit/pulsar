@@ -1,4 +1,4 @@
-const { CompositeDisposable } = require('event-kit');
+const { CompositeDisposable } = require("event-kit");
 
 class PaneContainerElement extends HTMLElement {
   constructor() {
@@ -10,16 +10,14 @@ class PaneContainerElement extends HTMLElement {
     this.model = model;
     this.views = views;
     if (this.views == null) {
-      throw new Error(
-        'Must pass a views parameter when initializing PaneContainerElements'
-      );
+      throw new Error("Must pass a views parameter when initializing PaneContainerElements");
     }
     this.subscriptions.add(this.model.observeRoot(this.rootChanged.bind(this)));
     return this;
   }
 
   connectedCallback() {
-    this.classList.add('panes');
+    this.classList.add("panes");
   }
 
   rootChanged(root) {
@@ -37,18 +35,16 @@ class PaneContainerElement extends HTMLElement {
   }
 
   hasFocus() {
-    return (
-      this === document.activeElement || this.contains(document.activeElement)
-    );
+    return this === document.activeElement || this.contains(document.activeElement);
   }
 }
 
-window.customElements.define('atom-pane-container', PaneContainerElement);
+window.customElements.define("atom-pane-container", PaneContainerElement);
 
 function createPaneContainerElement() {
-  return document.createElement('atom-pane-container');
+  return document.createElement("atom-pane-container");
 }
 
 module.exports = {
-  createPaneContainerElement
+  createPaneContainerElement,
 };

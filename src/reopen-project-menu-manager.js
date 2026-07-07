@@ -1,5 +1,5 @@
-const { CompositeDisposable } = require('event-kit');
-const path = require('path');
+const { CompositeDisposable } = require("event-kit");
+const path = require("path");
 
 const TASK_DESCRIPTION_MAX_LENGTH = 260;
 
@@ -14,15 +14,12 @@ module.exports = class ReopenProjectMenuManager {
     this.subscriptions = new CompositeDisposable();
     this.subscriptions.add(
       history.onDidChangeProjects(this.update.bind(this)),
-      config.onDidChange(
-        'core.reopenProjectMenuCount',
-        ({ oldValue, newValue }) => {
-          this.update();
-        }
-      ),
-      commands.add('atom-workspace', {
-        'application:reopen-project': this.reopenProjectCommand.bind(this)
-      })
+      config.onDidChange("core.reopenProjectMenuCount", ({ oldValue, newValue }) => {
+        this.update();
+      }),
+      commands.add("atom-workspace", {
+        "application:reopen-project": this.reopenProjectCommand.bind(this),
+      }),
     );
 
     this.applyWindowsJumpListRemovals();
@@ -38,8 +35,8 @@ module.exports = class ReopenProjectMenuManager {
 
   createReopenProjectListView() {
     if (this.reopenProjectListView == null) {
-      const ReopenProjectListView = require('./reopen-project-list-view');
-      this.reopenProjectListView = new ReopenProjectListView(paths => {
+      const ReopenProjectListView = require("./reopen-project-list-view");
+      this.reopenProjectListView = new ReopenProjectListView((paths) => {
         if (paths != null) {
           this.open(paths);
         }
@@ -52,7 +49,7 @@ module.exports = class ReopenProjectMenuManager {
     this.disposeProjectMenu();
     this.projects = this.historyManager
       .getProjects()
-      .slice(0, this.config.get('core.reopenProjectMenuCount'));
+      .slice(0, this.config.get("core.reopenProjectMenuCount"));
     const newMenu = ReopenProjectMenuManager.createProjectsMenu(this.projects);
     this.lastProjectMenu = this.menuManager.add([newMenu]);
     this.updateWindowsJumpList();
@@ -60,10 +57,10 @@ module.exports = class ReopenProjectMenuManager {
 
   static taskDescription(paths) {
     const description = paths
-      .map(path => `${ReopenProjectMenuManager.betterBaseName(path)} (${path})`)
-      .join(' ');
+      .map((path) => `${ReopenProjectMenuManager.betterBaseName(path)} (${path})`)
+      .join(" ");
     if (description.length > TASK_DESCRIPTION_MAX_LENGTH) {
-      return description.substring(0, TASK_DESCRIPTION_MAX_LENGTH - 3) + "..."
+      return description.substring(0, TASK_DESCRIPTION_MAX_LENGTH - 3) + "...";
     } else {
       return description;
     }
@@ -73,65 +70,52 @@ module.exports = class ReopenProjectMenuManager {
   // We have to honor that or the group stops working. As we only get a partial list
   // each time we remove them from history entirely.
   async applyWindowsJumpListRemovals() {
-    if (process.platform !== 'win32') return;
+    if (process.platform !== "win32") return;
     if (this.app === undefined) {
-      this.app = require('@electron/remote').app;
+      this.app = require("@electron/remote").app;
     }
 
-    const removed = this.app
-      .getJumpListSettings()
-      .removedItems.map(i => i.description);
+    const removed = this.app.getJumpListSettings().removedItems.map((i) => i.description);
     if (removed.length === 0) return;
     for (let project of this.historyManager.getProjects()) {
-      if (
-        removed.includes(
-          ReopenProjectMenuManager.taskDescription(project.paths)
-        )
-      ) {
+      if (removed.includes(ReopenProjectMenuManager.taskDescription(project.paths))) {
         await this.historyManager.removeProject(project.paths);
       }
     }
   }
 
   updateWindowsJumpList() {
-    if (process.platform !== 'win32') return;
+    if (process.platform !== "win32") return;
     if (this.app === undefined) {
-      this.app = require('@electron/remote').app;
+      this.app = require("@electron/remote").app;
     }
 
     this.app.setJumpList([
       {
-        type: 'custom',
-        name: 'Recent Projects',
-        items: this.projects.map(project => ({
-          type: 'task',
-          title: project.paths
-            .map(ReopenProjectMenuManager.betterBaseName)
-            .join(', '),
+        type: "custom",
+        name: "Recent Projects",
+        items: this.projects.map((project) => ({
+          type: "task",
+          title: project.paths.map(ReopenProjectMenuManager.betterBaseName).join(", "),
           description: ReopenProjectMenuManager.taskDescription(project.paths),
           program: process.execPath,
-          args: project.paths.map(path => `"${path}"`).join(' '),
-          iconPath: path.join(
-            path.dirname(process.execPath),
-            'resources',
-            'cli',
-            'folder.ico'
-          ),
-          iconIndex: 0
-        }))
+          args: project.paths.map((path) => `"${path}"`).join(" "),
+          iconPath: path.join(path.dirname(process.execPath), "resources", "cli", "folder.ico"),
+          iconIndex: 0,
+        })),
       },
-      { type: 'recent' },
+      { type: "recent" },
       {
         items: [
           {
-            type: 'task',
-            title: 'New Window',
+            type: "task",
+            title: "New Window",
             program: process.execPath,
-            args: '--new-window',
-            description: 'Opens a new Lumine window'
-          }
-        ]
-      }
+            args: "--new-window",
+            description: "Opens a new Lumine window",
+          },
+        ],
+      },
     ]);
   }
 
@@ -152,31 +136,31 @@ module.exports = class ReopenProjectMenuManager {
 
   static createProjectsMenu(projects) {
     return {
-      label: 'File',
-      id: 'File',
+      label: "File",
+      id: "File",
       submenu: [
         {
-          label: 'Reopen Project',
-          id: 'Reopen Project',
+          label: "Reopen Project",
+          id: "Reopen Project",
           submenu: projects.map((project, index) => ({
             label: this.createLabel(project),
-            command: 'application:reopen-project',
-            commandDetail: { index: index, paths: project.paths }
-          }))
-        }
-      ]
+            command: "application:reopen-project",
+            commandDetail: { index: index, paths: project.paths },
+          })),
+        },
+      ],
     };
   }
 
   static createLabel(project) {
     return project.paths.length === 1
       ? project.paths[0]
-      : project.paths.map(this.betterBaseName).join(', ');
+      : project.paths.map(this.betterBaseName).join(", ");
   }
 
   static betterBaseName(directory) {
     // Handles Windows roots better than path.basename which returns '' for 'd:' and 'd:\'
     const match = directory.match(/^([a-z]:)[\\]?$/i);
-    return match ? match[1] + '\\' : path.basename(directory);
+    return match ? match[1] + "\\" : path.basename(directory);
   }
 };

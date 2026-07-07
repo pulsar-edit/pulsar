@@ -4,14 +4,14 @@ module.exports = class TitleBar {
     this.workspace = workspace;
     this.themes = themes;
     this.applicationDelegate = applicationDelegate;
-    this.element = document.createElement('div');
-    this.element.classList.add('title-bar');
+    this.element = document.createElement("div");
+    this.element.classList.add("title-bar");
 
-    this.titleElement = document.createElement('div');
-    this.titleElement.classList.add('title');
+    this.titleElement = document.createElement("div");
+    this.titleElement.classList.add("title");
     this.element.appendChild(this.titleElement);
 
-    this.element.addEventListener('dblclick', this.dblclickHandler);
+    this.element.addEventListener("dblclick", this.dblclickHandler);
 
     this.workspace.onDidChangeWindowTitle(() => this.updateTitle());
     this.themes.onDidChangeActiveThemes(() => this.updateWindowSheetOffset());
@@ -22,16 +22,11 @@ module.exports = class TitleBar {
 
   dblclickHandler() {
     // User preference deciding which action to take on a title bar double-click
-    switch (
-      this.applicationDelegate.getUserDefault(
-        'AppleActionOnDoubleClick',
-        'string'
-      )
-    ) {
-      case 'Minimize':
+    switch (this.applicationDelegate.getUserDefault("AppleActionOnDoubleClick", "string")) {
+      case "Minimize":
         this.applicationDelegate.minimizeWindow();
         break;
-      case 'Maximize':
+      case "Maximize":
         if (this.applicationDelegate.isWindowMaximized()) {
           this.applicationDelegate.unmaximizeWindow();
         } else {
@@ -46,8 +41,6 @@ module.exports = class TitleBar {
   }
 
   updateWindowSheetOffset() {
-    this.applicationDelegate
-      .getCurrentWindow()
-      .setSheetOffset(this.element.offsetHeight);
+    this.applicationDelegate.getCurrentWindow().setSheetOffset(this.element.offsetHeight);
   }
 };

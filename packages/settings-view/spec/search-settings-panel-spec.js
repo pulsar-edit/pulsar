@@ -1,7 +1,6 @@
-const SearchSettingsPanel = require('../lib/search-settings-panel');
+const SearchSettingsPanel = require("../lib/search-settings-panel");
 
 describe("SearchSettingsPanel", () => {
-
   describe("handleSettingsString", () => {
     let searchSettingsPanel = null;
 
@@ -23,7 +22,6 @@ describe("SearchSettingsPanel", () => {
       let string = searchSettingsPanel.handleSettingsString("hello world");
       expect(string).toBe("hello world");
     });
-
   });
 
   describe("getScore", () => {
@@ -58,7 +56,6 @@ describe("SearchSettingsPanel", () => {
       obj = searchSettingsPanel.getScore("hello", null);
       expect(obj.score).toBe(0);
     });
-
   });
 
   describe("generateRanks", () => {
@@ -74,7 +71,7 @@ describe("SearchSettingsPanel", () => {
         "Tab Setting",
         "Just a friendly tab setting",
         "tabs",
-        "tabSetting"
+        "tabSetting",
       );
 
       expect(typeof obj.totalScore === "number").toBe(true);
@@ -83,5 +80,4 @@ describe("SearchSettingsPanel", () => {
       expect(obj.matchIndexes.length).toBeGreaterThan(0);
     });
   });
-
 });

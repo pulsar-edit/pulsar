@@ -1,20 +1,20 @@
-const path = require('path');
-const Module = require('module');
-const fs = require('fs-plus');
-const temp = require('temp').track();
-const crypto = require('crypto');
-const ModuleCache = require('../src/module-cache');
+const path = require("path");
+const Module = require("module");
+const fs = require("fs-plus");
+const temp = require("temp").track();
+const crypto = require("crypto");
+const ModuleCache = require("../src/module-cache");
 
-describe('ModuleCache', function() {
-  beforeEach(() => spyOn(Module, '_findPath').and.callThrough());
+describe("ModuleCache", function () {
+  beforeEach(() => spyOn(Module, "_findPath").and.callThrough());
 
-  afterEach(function() {
+  afterEach(function () {
     try {
       temp.cleanupSync();
     } catch (error) {}
   });
 
-  it('resolves Electron module paths without hitting the filesystem', function() {
+  it("resolves Electron module paths without hitting the filesystem", function () {
     const { builtins } = ModuleCache.cache;
     expect(Object.keys(builtins).length).toBeGreaterThan(0);
 
@@ -27,69 +27,64 @@ describe('ModuleCache', function() {
     expect(Module._findPath.calls.count()).toBe(0);
   });
 
-  it('supports resolution of legacy Electron require paths', function() {
+  it("supports resolution of legacy Electron require paths", function () {
     // This demonstrates that attempting to resolve a nonexistent module still
     // throws; it's not just coincidence that the specific paths below succeed.
     expect(() => require.resolve(crypto.randomUUID())).toThrow();
 
     expect(() => {
-      require.resolve('ipc');
-      require.resolve('clipboard');
-      require.resolve('remote');
-      require.resolve('shell');
-      require.resolve('web-frame');
+      require.resolve("ipc");
+      require.resolve("clipboard");
+      require.resolve("remote");
+      require.resolve("shell");
+      require.resolve("web-frame");
     }).not.toThrow();
   });
 
-  it('resolves relative core paths without hitting the filesystem', function() {
+  it("resolves relative core paths without hitting the filesystem", function () {
     ModuleCache.add(atom.getLoadSettings().resourcePath, {
       _atomModuleCache: {
         extensions: {
-          '.json': [path.join('spec', 'fixtures', 'module-cache', 'file.json')]
-        }
-      }
+          ".json": [path.join("spec", "fixtures", "module-cache", "file.json")],
+        },
+      },
     });
-    expect(require('./fixtures/module-cache/file.json').foo).toBe('bar');
+    expect(require("./fixtures/module-cache/file.json").foo).toBe("bar");
     expect(Module._findPath.calls.count()).toBe(0);
   });
 
-  it('resolves module paths when a compatible version is provided by core', function() {
-    const packagePath = fs.realpathSync(temp.mkdirSync('atom-package'));
+  it("resolves module paths when a compatible version is provided by core", function () {
+    const packagePath = fs.realpathSync(temp.mkdirSync("atom-package"));
     ModuleCache.add(packagePath, {
       _atomModuleCache: {
         folders: [
           {
-            paths: [''],
+            paths: [""],
             dependencies: {
-              'underscore-plus': '*'
-            }
-          }
-        ]
-      }
+              "underscore-plus": "*",
+            },
+          },
+        ],
+      },
     });
     ModuleCache.add(atom.getLoadSettings().resourcePath, {
       _atomModuleCache: {
         dependencies: [
           {
-            name: 'underscore-plus',
-            version: require('underscore-plus/package.json').version,
-            path: path.join(
-              'node_modules',
-              'underscore-plus',
-              'lib',
-              'underscore-plus.js'
-            )
-          }
-        ]
-      }
+            name: "underscore-plus",
+            version: require("underscore-plus/package.json").version,
+            path: path.join("node_modules", "underscore-plus", "lib", "underscore-plus.js"),
+          },
+        ],
+      },
     });
 
-    const indexPath = path.join(packagePath, 'index.js');
+    const indexPath = path.join(packagePath, "index.js");
     fs.writeFileSync(
       indexPath,
       `\
 exports.load = function() { require('underscore-plus'); };\
-`
+`,
     );
 
     const packageMain = require(indexPath);
@@ -98,46 +93,41 @@ exports.load = function() { require('underscore-plus'); };\
     expect(Module._findPath.calls.count()).toBe(0);
   });
 
-  it('does not resolve module paths when no compatible version is provided by core', function() {
-    const packagePath = fs.realpathSync(temp.mkdirSync('atom-package'));
+  it("does not resolve module paths when no compatible version is provided by core", function () {
+    const packagePath = fs.realpathSync(temp.mkdirSync("atom-package"));
     ModuleCache.add(packagePath, {
       _atomModuleCache: {
         folders: [
           {
-            paths: [''],
+            paths: [""],
             dependencies: {
-              'underscore-plus': '0.0.1'
-            }
-          }
-        ]
-      }
+              "underscore-plus": "0.0.1",
+            },
+          },
+        ],
+      },
     });
     ModuleCache.add(atom.getLoadSettings().resourcePath, {
       _atomModuleCache: {
         dependencies: [
           {
-            name: 'underscore-plus',
-            version: require('underscore-plus/package.json').version,
-            path: path.join(
-              'node_modules',
-              'underscore-plus',
-              'lib',
-              'underscore-plus.js'
-            )
-          }
-        ]
-      }
+            name: "underscore-plus",
+            version: require("underscore-plus/package.json").version,
+            path: path.join("node_modules", "underscore-plus", "lib", "underscore-plus.js"),
+          },
+        ],
+      },
     });
 
-    const indexPath = path.join(packagePath, 'index.js');
+    const indexPath = path.join(packagePath, "index.js");
     fs.writeFileSync(
       indexPath,
       `\
 exports.load = function() { require('underscore-plus'); };\
-`
+`,
     );
 
-    spyOn(process, 'cwd').and.returnValue('/'); // Required when running this test from CLI
+    spyOn(process, "cwd").and.returnValue("/"); // Required when running this test from CLI
     const packageMain = require(indexPath);
     Module._findPath.calls.reset();
     expect(() => packageMain.load()).toThrow();

@@ -1,5 +1,5 @@
-const url = require('url');
-const { Emitter, Disposable } = require('event-kit');
+const url = require("url");
+const { Emitter, Disposable } = require("event-kit");
 
 // Private: Associates listener functions with URIs from outside the application.
 //
@@ -73,16 +73,12 @@ module.exports = class URIHandlerRegistry {
   }
 
   registerHostHandler(host, callback) {
-    if (typeof callback !== 'function') {
-      throw new Error(
-        'Cannot register a URI host handler with a non-function callback'
-      );
+    if (typeof callback !== "function") {
+      throw new Error("Cannot register a URI host handler with a non-function callback");
     }
 
     if (this.registrations.has(host)) {
-      throw new Error(
-        `There is already a URI host handler for the host ${host}`
-      );
+      throw new Error(`There is already a URI host handler for the host ${host}`);
     } else {
       this.registrations.set(host, callback);
     }
@@ -95,10 +91,8 @@ module.exports = class URIHandlerRegistry {
   async handleURI(uri) {
     const parsed = url.parse(uri, true);
     const { protocol, slashes, auth, port, host } = parsed;
-    if (protocol !== 'atom:' || slashes !== true || auth || port) {
-      throw new Error(
-        `URIHandlerRegistry#handleURI asked to handle an invalid URI: ${uri}`
-      );
+    if (protocol !== "atom:" || slashes !== true || auth || port) {
+      throw new Error(`URIHandlerRegistry#handleURI asked to handle an invalid URI: ${uri}`);
     }
 
     const registration = this.registrations.get(host);
@@ -113,7 +107,7 @@ module.exports = class URIHandlerRegistry {
       if (this.history.length > this.maxHistoryLength) {
         this.history.length = this.maxHistoryLength;
       }
-      this.emitter.emit('history-change');
+      this.emitter.emit("history-change");
     }
   }
 
@@ -122,7 +116,7 @@ module.exports = class URIHandlerRegistry {
   }
 
   onHistoryChange(cb) {
-    return this.emitter.on('history-change', cb);
+    return this.emitter.on("history-change", cb);
   }
 
   destroy() {

@@ -1,8 +1,8 @@
 const {
   ensureNoDeprecatedFunctionCalls,
   ensureNoDeprecatedStylesheets,
-  warnIfLeakingPathSubscriptions
-} = require('./warnings')
+  warnIfLeakingPathSubscriptions,
+} = require("./warnings");
 
 exports.register = (jasmineEnv) => {
   jasmineEnv.afterEach(async (done) => {
@@ -12,10 +12,10 @@ exports.register = (jasmineEnv) => {
     await atom.reset();
 
     if (!window.debugContent) {
-      document.getElementById('jasmine-content').innerHTML = '';
+      document.getElementById("jasmine-content").innerHTML = "";
     }
     warnIfLeakingPathSubscriptions();
 
     done();
   });
-}
+};

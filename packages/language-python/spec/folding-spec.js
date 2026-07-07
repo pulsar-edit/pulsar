@@ -1,10 +1,10 @@
-const dedent = require('dedent');
+const dedent = require("dedent");
 
 function getDisplayText(editor) {
   return editor.displayLayer.getText();
 }
 
-describe('Python folding (modern Tree-sitter)', () => {
+describe("Python folding (modern Tree-sitter)", () => {
   let editor;
   let languageMode;
   let grammar;
@@ -21,20 +21,19 @@ describe('Python folding (modern Tree-sitter)', () => {
     expect(getDisplayText(editor)).toBe(foldedText);
   }
 
-
   beforeEach(async () => {
-    atom.config.set('core.useTreeSitterParsers', true);
+    atom.config.set("core.useTreeSitterParsers", true);
 
     editor = await atom.workspace.open();
-    editor.displayLayer.reset({ foldCharacter: '…' });
-    await atom.packages.activatePackage('language-python');
-    grammar = atom.grammars.grammarForScopeName('source.python');
+    editor.displayLayer.reset({ foldCharacter: "…" });
+    await atom.packages.activatePackage("language-python");
+    grammar = atom.grammars.grammarForScopeName("source.python");
     editor.setGrammar(grammar);
     languageMode = editor.languageMode;
     await languageMode.ready;
   });
 
-  it('folds blocks properly', async () => {
+  it("folds blocks properly", async () => {
     await expectToFoldInto(
       dedent`
         def foo(arg):
@@ -42,7 +41,7 @@ describe('Python folding (modern Tree-sitter)', () => {
       `,
       dedent`
         def foo(arg):…
-      `
+      `,
     );
 
     await expectToFoldInto(
@@ -55,7 +54,7 @@ describe('Python folding (modern Tree-sitter)', () => {
       `,
       dedent`
         foo(…)
-      `
+      `,
     );
 
     await setTextAndWaitForUpdate(dedent`
@@ -146,5 +145,4 @@ describe('Python folding (modern Tree-sitter)', () => {
         pass
     `);
   });
-
 });

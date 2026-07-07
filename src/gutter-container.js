@@ -1,5 +1,5 @@
-const { Emitter } = require('event-kit');
-const Gutter = require('./gutter');
+const { Emitter } = require("event-kit");
+const Gutter = require("./gutter");
 
 module.exports = class GutterContainer {
   constructor(textEditor) {
@@ -17,7 +17,7 @@ module.exports = class GutterContainer {
     // GutterContainer's @gutters.
     const guttersToDestroy = this.gutters.slice(0);
     for (let gutter of guttersToDestroy) {
-      if (gutter.name !== 'line-number') {
+      if (gutter.name !== "line-number") {
         gutter.destroy();
       }
     }
@@ -29,12 +29,10 @@ module.exports = class GutterContainer {
     options = options || {};
     const gutterName = options.name;
     if (gutterName === null) {
-      throw new Error('A name is required to create a gutter.');
+      throw new Error("A name is required to create a gutter.");
     }
     if (this.gutterWithName(gutterName)) {
-      throw new Error(
-        'Tried to create a gutter with a name that is already in use.'
-      );
+      throw new Error("Tried to create a gutter with a name that is already in use.");
     }
     const newGutter = new Gutter(this, options);
 
@@ -52,7 +50,7 @@ module.exports = class GutterContainer {
       this.gutters.push(newGutter);
     }
     this.scheduleComponentUpdate();
-    this.emitter.emit('did-add-gutter', newGutter);
+    this.emitter.emit("did-add-gutter", newGutter);
     return newGutter;
   }
 
@@ -77,11 +75,11 @@ module.exports = class GutterContainer {
   }
 
   onDidAddGutter(callback) {
-    return this.emitter.on('did-add-gutter', callback);
+    return this.emitter.on("did-add-gutter", callback);
   }
 
   onDidRemoveGutter(callback) {
-    return this.emitter.on('did-remove-gutter', callback);
+    return this.emitter.on("did-remove-gutter", callback);
   }
 
   /*
@@ -95,21 +93,20 @@ module.exports = class GutterContainer {
     if (index > -1) {
       this.gutters.splice(index, 1);
       this.scheduleComponentUpdate();
-      this.emitter.emit('did-remove-gutter', gutter.name);
+      this.emitter.emit("did-remove-gutter", gutter.name);
     } else {
       throw new Error(
-        'The given gutter cannot be removed because it is not ' +
-          'within this GutterContainer.'
+        "The given gutter cannot be removed because it is not " + "within this GutterContainer.",
       );
     }
   }
 
   // The public interface is Gutter::decorateMarker or TextEditor::decorateMarker.
   addGutterDecoration(gutter, marker, options) {
-    if (gutter.type === 'line-number') {
-      options.type = 'line-number';
+    if (gutter.type === "line-number") {
+      options.type = "line-number";
     } else {
-      options.type = 'gutter';
+      options.type = "gutter";
     }
     options.gutterName = gutter.name;
     return this.textEditor.decorateMarker(marker, options);

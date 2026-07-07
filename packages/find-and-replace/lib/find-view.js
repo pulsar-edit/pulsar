@@ -1,12 +1,11 @@
-const _ = require('underscore-plus');
-const {TextBuffer, TextEditor, CompositeDisposable} = require('atom');
-const Util = require('./project/util');
-const etch = require('etch');
+const _ = require("underscore-plus");
+const { TextBuffer, TextEditor, CompositeDisposable } = require("atom");
+const Util = require("./project/util");
+const etch = require("etch");
 const $ = etch.dom;
 
-module.exports =
-class FindView {
-  constructor(model, {findBuffer, replaceBuffer, findHistoryCycler, replaceHistoryCycler} = {}) {
+module.exports = class FindView {
+  constructor(model, { findBuffer, replaceBuffer, findHistoryCycler, replaceHistoryCycler } = {}) {
     this.model = model;
     this.findBuffer = findBuffer;
     this.replaceBuffer = replaceBuffer;
@@ -14,7 +13,7 @@ class FindView {
     this.replaceHistoryCycler = replaceHistoryCycler;
     this.subscriptions = new CompositeDisposable();
 
-    etch.initialize(this)
+    etch.initialize(this);
 
     this.findHistoryCycler.addEditorElement(this.findEditor.getElement());
     this.replaceHistoryCycler.addEditorElement(this.replaceEditor.getElement());
@@ -30,87 +29,115 @@ class FindView {
   update(props) {}
 
   render() {
-    return (
-      $.div({tabIndex: -1, className: 'find-and-replace'},
-        $.header({className: 'header'},
-          $.span({ref: 'closeButton', className: 'header-item close-button pull-right'},
-            $.i({className: "icon icon-x clickable"})
-          ),
-
-          $.span({ref: 'descriptionLabel', className: 'header-item description'},
-            'Find in Current Buffer'
-          ),
-
-          $.span({className: 'header-item options-label pull-right'},
-            $.span({}, 'Finding with Options: '),
-            $.span({ref: 'optionsLabel', className: 'options'}),
-            $.span({className: 'btn-group btn-toggle btn-group-options'},
-              $.button({ref: 'regexOptionButton', className: 'btn'},
-                $.svg({className: "icon", innerHTML: '<use href="#find-and-replace-icon-regex" />'})
-              ),
-
-              $.button({ref: 'caseOptionButton', className: 'btn'},
-                $.svg({className: "icon", innerHTML: '<use href="#find-and-replace-icon-case" />'})
-              ),
-
-              $.button({ref: 'selectionOptionButton', className: 'btn option-selection'},
-                $.svg({className: "icon", innerHTML: '<use href="#find-and-replace-icon-selection" />'})
-              ),
-
-              $.button({ref: 'wholeWordOptionButton', className: 'btn option-whole-word'},
-                $.svg({className: "icon", innerHTML: '<use href="#find-and-replace-icon-word" />'})
-              )
-            )
-          )
+    return $.div(
+      { tabIndex: -1, className: "find-and-replace" },
+      $.header(
+        { className: "header" },
+        $.span(
+          { ref: "closeButton", className: "header-item close-button pull-right" },
+          $.i({ className: "icon icon-x clickable" }),
         ),
 
-        $.section({className: 'input-block find-container'},
-          $.div({className: 'input-block-item input-block-item--flex editor-container'},
-            $(TextEditor, {
-              ref: 'findEditor',
-              mini: true,
-              placeholderText: 'Find in current buffer',
-              buffer: this.findBuffer
-            }),
+        $.span(
+          { ref: "descriptionLabel", className: "header-item description" },
+          "Find in Current Buffer",
+        ),
 
-            $.div({className: 'find-meta-container'},
-              $.span({ref: 'resultCounter', className: 'text-subtle result-counter'})
-            )
-          ),
-
-          $.div({className: 'input-block-item'},
-            $.div({className: 'btn-group btn-group-find'},
-              $.button({ref: 'nextButton', className: 'btn btn-next'}, 'Find')
+        $.span(
+          { className: "header-item options-label pull-right" },
+          $.span({}, "Finding with Options: "),
+          $.span({ ref: "optionsLabel", className: "options" }),
+          $.span(
+            { className: "btn-group btn-toggle btn-group-options" },
+            $.button(
+              { ref: "regexOptionButton", className: "btn" },
+              $.svg({
+                className: "icon",
+                innerHTML: '<use href="#find-and-replace-icon-regex" />',
+              }),
             ),
 
-            $.div({className: 'btn-group btn-group-find-all'},
-              $.button({ref: 'findAllButton', className: 'btn btn-all'}, 'Find All')
-            )
-          )
-        ),
-
-        $.section({className: 'input-block replace-container'},
-          $.div({className: 'input-block-item input-block-item--flex editor-container'},
-            $(TextEditor, {
-              ref: 'replaceEditor',
-              mini: true,
-              placeholderText: 'Replace in current buffer',
-              buffer: this.replaceBuffer
-            })
-          ),
-
-          $.div({className: 'input-block-item'},
-            $.div({className: 'btn-group btn-group-replace'},
-              $.button({ref: 'replaceNextButton', className: 'btn btn-next'}, 'Replace')
+            $.button(
+              { ref: "caseOptionButton", className: "btn" },
+              $.svg({ className: "icon", innerHTML: '<use href="#find-and-replace-icon-case" />' }),
             ),
 
-            $.div({className: 'btn-group btn-group-replace-all'},
-              $.button({ref: 'replaceAllButton', className: 'btn btn-all'}, 'Replace All')
-            )
-          )
+            $.button(
+              { ref: "selectionOptionButton", className: "btn option-selection" },
+              $.svg({
+                className: "icon",
+                innerHTML: '<use href="#find-and-replace-icon-selection" />',
+              }),
+            ),
+
+            $.button(
+              { ref: "wholeWordOptionButton", className: "btn option-whole-word" },
+              $.svg({ className: "icon", innerHTML: '<use href="#find-and-replace-icon-word" />' }),
+            ),
+          ),
+        ),
+      ),
+
+      $.section(
+        { className: "input-block find-container" },
+        $.div(
+          { className: "input-block-item input-block-item--flex editor-container" },
+          $(TextEditor, {
+            ref: "findEditor",
+            mini: true,
+            placeholderText: "Find in current buffer",
+            buffer: this.findBuffer,
+          }),
+
+          $.div(
+            { className: "find-meta-container" },
+            $.span({ ref: "resultCounter", className: "text-subtle result-counter" }),
+          ),
         ),
 
-        $.svg({style: {display: 'none'}, innerHTML: `
+        $.div(
+          { className: "input-block-item" },
+          $.div(
+            { className: "btn-group btn-group-find" },
+            $.button({ ref: "nextButton", className: "btn btn-next" }, "Find"),
+          ),
+
+          $.div(
+            { className: "btn-group btn-group-find-all" },
+            $.button({ ref: "findAllButton", className: "btn btn-all" }, "Find All"),
+          ),
+        ),
+      ),
+
+      $.section(
+        { className: "input-block replace-container" },
+        $.div(
+          { className: "input-block-item input-block-item--flex editor-container" },
+          $(TextEditor, {
+            ref: "replaceEditor",
+            mini: true,
+            placeholderText: "Replace in current buffer",
+            buffer: this.replaceBuffer,
+          }),
+        ),
+
+        $.div(
+          { className: "input-block-item" },
+          $.div(
+            { className: "btn-group btn-group-replace" },
+            $.button({ ref: "replaceNextButton", className: "btn btn-next" }, "Replace"),
+          ),
+
+          $.div(
+            { className: "btn-group btn-group-replace-all" },
+            $.button({ ref: "replaceAllButton", className: "btn btn-all" }, "Replace All"),
+          ),
+        ),
+      ),
+
+      $.svg({
+        style: { display: "none" },
+        innerHTML: `
           <symbol id="find-and-replace-icon-regex" viewBox="0 0 20 16" stroke="none" fill-rule="evenodd">
             <rect x="3" y="10" width="3" height="3" rx="1"></rect>
             <rect x="12" y="3" width="2" height="9" rx="1"></rect>
@@ -152,14 +179,18 @@ class FindView {
             <rect x="2" y="7" width="10" height="2"></rect>
             <rect opacity="0.6" x="2" y="3" width="16" height="2"></rect>
           </symbol>
-        `})
-      )
+        `,
+      }),
     );
   }
 
-  get findEditor() { return this.refs.findEditor; }
+  get findEditor() {
+    return this.refs.findEditor;
+  }
 
-  get replaceEditor() { return this.refs.replaceEditor; }
+  get replaceEditor() {
+    return this.refs.replaceEditor;
+  }
 
   destroy() {
     if (this.subscriptions) this.subscriptions.dispose();
@@ -168,44 +199,46 @@ class FindView {
 
   setPanel(panel) {
     this.panel = panel;
-    this.subscriptions.add(this.panel.onDidChangeVisible(visible => {
-      if (visible) {
-        this.didShow();
-      } else {
-        this.didHide();
-      }
-    }));
+    this.subscriptions.add(
+      this.panel.onDidChangeVisible((visible) => {
+        if (visible) {
+          this.didShow();
+        } else {
+          this.didHide();
+        }
+      }),
+    );
   }
 
   didShow() {
-    atom.views.getView(atom.workspace).classList.add('find-visible');
+    atom.views.getView(atom.workspace).classList.add("find-visible");
     if (this.tooltipSubscriptions) return;
 
     this.tooltipSubscriptions = new CompositeDisposable(
       atom.tooltips.add(this.refs.closeButton, {
         title: 'Close Panel <span class="keystroke">Esc</span>',
-        html: true
+        html: true,
       }),
       atom.tooltips.add(this.refs.regexOptionButton, {
         title: "Use Regex",
-        keyBindingCommand: 'find-and-replace:toggle-regex-option',
-        keyBindingTarget: this.findEditor.element
+        keyBindingCommand: "find-and-replace:toggle-regex-option",
+        keyBindingTarget: this.findEditor.element,
       }),
       atom.tooltips.add(this.refs.caseOptionButton, {
         title: "Match Case",
-        keyBindingCommand: 'find-and-replace:toggle-case-option',
-        keyBindingTarget: this.findEditor.element
+        keyBindingCommand: "find-and-replace:toggle-case-option",
+        keyBindingTarget: this.findEditor.element,
       }),
       atom.tooltips.add(this.refs.selectionOptionButton, {
         title: "Only In Selection",
-        keyBindingCommand: 'find-and-replace:toggle-selection-option',
-        keyBindingTarget: this.findEditor.element
+        keyBindingCommand: "find-and-replace:toggle-selection-option",
+        keyBindingTarget: this.findEditor.element,
       }),
       atom.tooltips.add(this.refs.wholeWordOptionButton, {
         title: "Whole Word",
-        keyBindingCommand: 'find-and-replace:toggle-whole-word-option',
-        keyBindingTarget: this.findEditor.element
-      })
+        keyBindingCommand: "find-and-replace:toggle-whole-word-option",
+        keyBindingTarget: this.findEditor.element,
+      }),
     );
   }
 
@@ -213,7 +246,7 @@ class FindView {
     this.hideAllTooltips();
     let workspaceElement = atom.views.getView(atom.workspace);
     workspaceElement.focus();
-    workspaceElement.classList.remove('find-visible');
+    workspaceElement.classList.remove("find-visible");
   }
 
   hideAllTooltips() {
@@ -223,62 +256,91 @@ class FindView {
 
   handleEvents() {
     this.findEditor.onDidStopChanging(() => this.liveSearch());
-    this.refs.nextButton.addEventListener('click', e => e.shiftKey ? this.findPrevious({focusEditorAfter: true}) : this.findNext({focusEditorAfter: true}));
-    this.refs.findAllButton.addEventListener('click', this.findAll.bind(this));
-    this.subscriptions.add(atom.commands.add('atom-workspace', {
-      'find-and-replace:find-next': () => this.findNext({focusEditorAfter: true}),
-      'find-and-replace:find-previous': () => this.findPrevious({focusEditorAfter: true}),
-      'find-and-replace:find-all': () => this.findAll({focusEditorAfter: true}),
-      'find-and-replace:find-next-selected': this.findNextSelected.bind(this),
-      'find-and-replace:find-previous-selected': this.findPreviousSelected.bind(this),
-      'find-and-replace:use-selection-as-find-pattern': this.setSelectionAsFindPattern.bind(this),
-      'find-and-replace:use-selection-as-replace-pattern': this.setSelectionAsReplacePattern.bind(this)
-    }));
+    this.refs.nextButton.addEventListener("click", (e) =>
+      e.shiftKey
+        ? this.findPrevious({ focusEditorAfter: true })
+        : this.findNext({ focusEditorAfter: true }),
+    );
+    this.refs.findAllButton.addEventListener("click", this.findAll.bind(this));
+    this.subscriptions.add(
+      atom.commands.add("atom-workspace", {
+        "find-and-replace:find-next": () => this.findNext({ focusEditorAfter: true }),
+        "find-and-replace:find-previous": () => this.findPrevious({ focusEditorAfter: true }),
+        "find-and-replace:find-all": () => this.findAll({ focusEditorAfter: true }),
+        "find-and-replace:find-next-selected": this.findNextSelected.bind(this),
+        "find-and-replace:find-previous-selected": this.findPreviousSelected.bind(this),
+        "find-and-replace:use-selection-as-find-pattern": this.setSelectionAsFindPattern.bind(this),
+        "find-and-replace:use-selection-as-replace-pattern":
+          this.setSelectionAsReplacePattern.bind(this),
+      }),
+    );
 
-    this.refs.replaceNextButton.addEventListener('click', e => e.shiftKey ? this.replacePrevious() : this.replaceNext());
-    this.refs.replaceAllButton.addEventListener('click', this.replaceAll.bind(this));
-    this.subscriptions.add(atom.commands.add('atom-workspace', {
-      'find-and-replace:replace-previous': this.replacePrevious.bind(this),
-      'find-and-replace:replace-next': this.replaceNext.bind(this),
-      'find-and-replace:replace-all': this.replaceAll.bind(this),
-    }));
+    this.refs.replaceNextButton.addEventListener("click", (e) =>
+      e.shiftKey ? this.replacePrevious() : this.replaceNext(),
+    );
+    this.refs.replaceAllButton.addEventListener("click", this.replaceAll.bind(this));
+    this.subscriptions.add(
+      atom.commands.add("atom-workspace", {
+        "find-and-replace:replace-previous": this.replacePrevious.bind(this),
+        "find-and-replace:replace-next": this.replaceNext.bind(this),
+        "find-and-replace:replace-all": this.replaceAll.bind(this),
+      }),
+    );
 
-    this.subscriptions.add(atom.commands.add(this.findEditor.element, {
-      'core:confirm': () => this.confirm(),
-      'find-and-replace:confirm': () => this.confirm(),
-      'find-and-replace:show-previous': () => this.showPrevious()
-    }));
+    this.subscriptions.add(
+      atom.commands.add(this.findEditor.element, {
+        "core:confirm": () => this.confirm(),
+        "find-and-replace:confirm": () => this.confirm(),
+        "find-and-replace:show-previous": () => this.showPrevious(),
+      }),
+    );
 
-    this.subscriptions.add(atom.commands.add(this.replaceEditor.element, {
-      'core:confirm': () => this.replaceNext()
-    }));
+    this.subscriptions.add(
+      atom.commands.add(this.replaceEditor.element, {
+        "core:confirm": () => this.replaceNext(),
+      }),
+    );
 
-    this.subscriptions.add(atom.commands.add(this.element, {
-      'core:close': () => this.panel && this.panel.hide(),
-      'core:cancel': () => this.panel && this.panel.hide(),
-      'find-and-replace:focus-next': this.toggleFocus.bind(this),
-      'find-and-replace:focus-previous': this.toggleFocus.bind(this),
-      'find-and-replace:toggle-regex-option': this.toggleRegexOption.bind(this),
-      'find-and-replace:toggle-case-option': this.toggleCaseOption.bind(this),
-      'find-and-replace:toggle-selection-option': this.toggleSelectionOption.bind(this),
-      'find-and-replace:toggle-whole-word-option': this.toggleWholeWordOption.bind(this)
-    }));
+    this.subscriptions.add(
+      atom.commands.add(this.element, {
+        "core:close": () => this.panel && this.panel.hide(),
+        "core:cancel": () => this.panel && this.panel.hide(),
+        "find-and-replace:focus-next": this.toggleFocus.bind(this),
+        "find-and-replace:focus-previous": this.toggleFocus.bind(this),
+        "find-and-replace:toggle-regex-option": this.toggleRegexOption.bind(this),
+        "find-and-replace:toggle-case-option": this.toggleCaseOption.bind(this),
+        "find-and-replace:toggle-selection-option": this.toggleSelectionOption.bind(this),
+        "find-and-replace:toggle-whole-word-option": this.toggleWholeWordOption.bind(this),
+      }),
+    );
 
     this.subscriptions.add(this.model.onDidUpdate(this.markersUpdated.bind(this)));
     this.subscriptions.add(this.model.onDidError(this.findError.bind(this)));
-    this.subscriptions.add(this.model.onDidChangeCurrentResult(this.updateResultCounter.bind(this)));
-    this.subscriptions.add(this.model.getFindOptions().onDidChange(this.updateOptionViews.bind(this)));
-    this.subscriptions.add(this.model.getFindOptions().onDidChangeUseRegex(this.updateSyntaxHighlighting.bind(this)));
+    this.subscriptions.add(
+      this.model.onDidChangeCurrentResult(this.updateResultCounter.bind(this)),
+    );
+    this.subscriptions.add(
+      this.model.getFindOptions().onDidChange(this.updateOptionViews.bind(this)),
+    );
+    this.subscriptions.add(
+      this.model.getFindOptions().onDidChangeUseRegex(this.updateSyntaxHighlighting.bind(this)),
+    );
 
-    this.refs.closeButton.addEventListener('click', () => this.panel && this.panel.hide());
-    this.refs.regexOptionButton.addEventListener('click', this.toggleRegexOption.bind(this));
-    this.refs.caseOptionButton.addEventListener('click', this.toggleCaseOption.bind(this));
-    this.refs.selectionOptionButton.addEventListener('click', this.toggleSelectionOption.bind(this));
-    this.refs.wholeWordOptionButton.addEventListener('click', this.toggleWholeWordOption.bind(this));
+    this.refs.closeButton.addEventListener("click", () => this.panel && this.panel.hide());
+    this.refs.regexOptionButton.addEventListener("click", this.toggleRegexOption.bind(this));
+    this.refs.caseOptionButton.addEventListener("click", this.toggleCaseOption.bind(this));
+    this.refs.selectionOptionButton.addEventListener(
+      "click",
+      this.toggleSelectionOption.bind(this),
+    );
+    this.refs.wholeWordOptionButton.addEventListener(
+      "click",
+      this.toggleWholeWordOption.bind(this),
+    );
 
-    this.element.addEventListener('focus', () => this.findEditor.element.focus());
-    this.element.addEventListener('click', (e) => {
-      if (e.target.tagName === 'button') {
+    this.element.addEventListener("focus", () => this.findEditor.element.focus());
+    this.element.addEventListener("click", (e) => {
+      if (e.target.tagName === "button") {
         let workspaceElement = atom.views.getView(atom.workspace);
         workspaceElement.focus();
       }
@@ -286,9 +348,9 @@ class FindView {
   }
 
   focusFindEditor() {
-    const activeEditor = atom.workspace.getCenter().getActiveTextEditor()
-    let selectedText = activeEditor && activeEditor.getSelectedText()
-    if (selectedText && selectedText.indexOf('\n') < 0) {
+    const activeEditor = atom.workspace.getCenter().getActiveTextEditor();
+    let selectedText = activeEditor && activeEditor.getSelectedText();
+    if (selectedText && selectedText.indexOf("\n") < 0) {
       if (this.model.getFindOptions().useRegex) {
         selectedText = Util.escapeRegex(selectedText);
       }
@@ -299,9 +361,9 @@ class FindView {
   }
 
   focusReplaceEditor() {
-    const activeEditor = atom.workspace.getCenter().getActiveTextEditor()
-    const selectedText = activeEditor && activeEditor.getSelectedText()
-    if (selectedText && selectedText.indexOf('\n') < 0) {
+    const activeEditor = atom.workspace.getCenter().getActiveTextEditor();
+    const selectedText = activeEditor && activeEditor.getSelectedText();
+    if (selectedText && selectedText.indexOf("\n") < 0) {
       this.replaceEditor.setText(selectedText);
     }
     this.replaceEditor.getElement().focus();
@@ -317,42 +379,50 @@ class FindView {
   }
 
   confirm() {
-    this.findNext({focusEditorAfter: atom.config.get('find-and-replace.focusEditorAfterSearch')});
+    this.findNext({ focusEditorAfter: atom.config.get("find-and-replace.focusEditorAfterSearch") });
   }
 
   showPrevious() {
-    this.findPrevious({focusEditorAfter: atom.config.get('find-and-replace.focusEditorAfterSearch')});
+    this.findPrevious({
+      focusEditorAfter: atom.config.get("find-and-replace.focusEditorAfterSearch"),
+    });
   }
 
   liveSearch() {
     let findPattern = this.findEditor.getText();
-    if (findPattern.length === 0 || (findPattern.length >= atom.config.get('find-and-replace.liveSearchMinimumCharacters') && !this.model.patternMatchesEmptyString(findPattern))) {
+    if (
+      findPattern.length === 0 ||
+      (findPattern.length >= atom.config.get("find-and-replace.liveSearchMinimumCharacters") &&
+        !this.model.patternMatchesEmptyString(findPattern))
+    ) {
       return this.model.search(findPattern);
     }
   }
 
   search(findPattern, options) {
-    if (arguments.length === 1 && typeof findPattern === 'object') {
+    if (arguments.length === 1 && typeof findPattern === "object") {
       options = findPattern;
       findPattern = null;
     }
-    if (findPattern == null) { findPattern = this.findEditor.getText(); }
+    if (findPattern == null) {
+      findPattern = this.findEditor.getText();
+    }
     this.model.search(findPattern, options);
   }
 
-  findAll(options = {focusEditorAfter: true}) {
+  findAll(options = { focusEditorAfter: true }) {
     this.findAndSelectResult(this.selectAllMarkers, options);
   }
 
-  findNext(options = {focusEditorAfter: false}) {
+  findNext(options = { focusEditorAfter: false }) {
     this.findAndSelectResult(this.selectFirstMarkerAfterCursor, options);
   }
 
-  findPrevious(options = {focusEditorAfter: false}) {
+  findPrevious(options = { focusEditorAfter: false }) {
     this.findAndSelectResult(this.selectFirstMarkerBeforeCursor, options);
   }
 
-  findAndSelectResult(selectFunction, {focusEditorAfter, fieldToFocus}) {
+  findAndSelectResult(selectFunction, { focusEditorAfter, fieldToFocus }) {
     this.search();
     this.findHistoryCycler.store();
 
@@ -372,11 +442,11 @@ class FindView {
   }
 
   replaceNext() {
-    this.replace('findNext', 'firstMarkerIndexStartingFromCursor');
+    this.replace("findNext", "firstMarkerIndexStartingFromCursor");
   }
 
   replacePrevious() {
-    this.replace('findPrevious', 'firstMarkerIndexBeforeCursor');
+    this.replace("findPrevious", "firstMarkerIndexBeforeCursor");
   }
 
   replace(nextOrPreviousFn, nextIndexFn) {
@@ -394,7 +464,7 @@ class FindView {
       }
 
       this.model.replace([currentMarker], this.replaceEditor.getText());
-      this[nextOrPreviousFn]({fieldToFocus: this.replaceEditor});
+      this[nextOrPreviousFn]({ fieldToFocus: this.replaceEditor });
     } else {
       atom.beep();
     }
@@ -420,12 +490,18 @@ class FindView {
 
     if (this.model.getFindOptions().findPattern) {
       let results = this.markers.length;
-      let resultsStr = results ? _.pluralize(results, 'result') : 'No results';
-      this.element.classList.remove('has-results', 'has-no-results');
-      this.element.classList.add(results ? 'has-results' : 'has-no-results');
+      let resultsStr = results ? _.pluralize(results, "result") : "No results";
+      this.element.classList.remove("has-results", "has-no-results");
+      this.element.classList.add(results ? "has-results" : "has-no-results");
       this.setInfoMessage(`${resultsStr} found for '${this.model.getFindOptions().findPattern}'`);
-      if (this.findEditor.getElement().hasFocus() && results > 0 && atom.config.get('find-and-replace.scrollToResultOnLiveSearch')) {
-        this.findAndSelectResult(this.selectFirstMarkerStartingFromCursor, {focusEditorAfter: false});
+      if (
+        this.findEditor.getElement().hasFocus() &&
+        results > 0 &&
+        atom.config.get("find-and-replace.scrollToResultOnLiveSearch")
+      ) {
+        this.findAndSelectResult(this.selectFirstMarkerStartingFromCursor, {
+          focusEditorAfter: false,
+        });
       }
     } else {
       this.clearMessage();
@@ -441,7 +517,7 @@ class FindView {
 
     const index = this.markers && this.markers.indexOf(this.model.currentResultMarker);
     if (index != null && index > -1) {
-      text = `${ index + 1} of ${this.markers.length}`;
+      text = `${index + 1} of ${this.markers.length}`;
     } else {
       if (this.markers == null || this.markers.length === 0) {
         text = "no results";
@@ -457,38 +533,44 @@ class FindView {
 
   setInfoMessage(infoMessage) {
     this.refs.descriptionLabel.textContent = infoMessage;
-    this.refs.descriptionLabel.classList.remove('text-error');
+    this.refs.descriptionLabel.classList.remove("text-error");
   }
 
   setErrorMessage(errorMessage) {
     this.refs.descriptionLabel.textContent = errorMessage;
-    this.refs.descriptionLabel.classList.add('text-error');
+    this.refs.descriptionLabel.classList.add("text-error");
   }
 
   clearMessage() {
-    this.element.classList.remove('has-results', 'has-no-results');
-    this.refs.descriptionLabel.innerHTML = 'Find in Current Buffer'
-    this.refs.descriptionLabel.classList.remove('text-error');
+    this.element.classList.remove("has-results", "has-no-results");
+    this.refs.descriptionLabel.innerHTML = "Find in Current Buffer";
+    this.refs.descriptionLabel.classList.remove("text-error");
   }
 
   selectFirstMarkerAfterCursor() {
     let marker = this.firstMarkerIndexAfterCursor();
-    if (!marker) { return; }
-    let {index, wrapped} = marker;
+    if (!marker) {
+      return;
+    }
+    let { index, wrapped } = marker;
     this.selectMarkerAtIndex(index, wrapped);
   }
 
   selectFirstMarkerStartingFromCursor() {
     let marker = this.firstMarkerIndexAfterCursor(true);
-    if (!marker) { return; }
-    let {index, wrapped} = marker;
+    if (!marker) {
+      return;
+    }
+    let { index, wrapped } = marker;
     this.selectMarkerAtIndex(index, wrapped);
   }
 
   selectFirstMarkerBeforeCursor() {
     let marker = this.firstMarkerIndexBeforeCursor();
-    if (!marker) { return; }
-    let {index, wrapped} = marker;
+    if (!marker) {
+      return;
+    }
+    let { index, wrapped } = marker;
     this.selectMarkerAtIndex(index, wrapped);
   }
 
@@ -501,7 +583,7 @@ class FindView {
     if (!editor || !this.markers) return null;
 
     const selection = editor.getLastSelection();
-    let {start, end} = selection.getBufferRange();
+    let { start, end } = selection.getBufferRange();
     if (selection.isReversed()) start = end;
 
     for (let index = 0, length = this.markers.length; index < length; index++) {
@@ -514,10 +596,10 @@ class FindView {
           if (!indexIncluded) continue;
           break;
       }
-      return {index, wrapped: null};
+      return { index, wrapped: null };
     }
 
-    return {index: 0, wrapped: 'up'};
+    return { index: 0, wrapped: "up" };
   }
 
   firstMarkerIndexBeforeCursor() {
@@ -525,37 +607,37 @@ class FindView {
     if (!editor) return null;
 
     const selection = this.model.getEditor().getLastSelection();
-    let {start, end} = selection.getBufferRange();
+    let { start, end } = selection.getBufferRange();
     if (selection.isReversed()) start = end;
 
     for (let index = this.markers.length - 1; index >= 0; index--) {
       const marker = this.markers[index];
       const markerEndPosition = marker.bufferMarker.getEndPosition();
       if (markerEndPosition.isLessThan(start)) {
-        return {index, wrapped: null};
+        return { index, wrapped: null };
       }
     }
 
-    return {index: this.markers.length - 1, wrapped: 'down'};
+    return { index: this.markers.length - 1, wrapped: "down" };
   }
 
   selectAllMarkers() {
     if (!this.markers || this.markers.length === 0) return;
-    let ranges = (Array.from(this.markers).map((marker) => marker.getBufferRange()));
+    let ranges = Array.from(this.markers).map((marker) => marker.getBufferRange());
     let scrollMarker = this.markers[this.firstMarkerIndexAfterCursor().index];
     let editor = this.model.getEditor();
-    for(let range of ranges) {
+    for (let range of ranges) {
       editor.unfoldBufferRow(range.start.row);
     }
-    editor.setSelectedBufferRanges(ranges, {flash: true});
-    editor.scrollToBufferPosition(scrollMarker.getStartBufferPosition(), {center: true});
+    editor.setSelectedBufferRanges(ranges, { flash: true });
+    editor.scrollToBufferPosition(scrollMarker.getStartBufferPosition(), { center: true });
   }
 
   selectMarkerAtIndex(markerIndex, wrapped) {
     let marker;
     if (!this.markers || this.markers.length === 0) return;
 
-    if (marker = this.markers[markerIndex]) {
+    if ((marker = this.markers[markerIndex])) {
       let editor = this.model.getEditor();
       let bufferRange = marker.getBufferRange();
       let screenRange = marker.getScreenRange();
@@ -565,18 +647,18 @@ class FindView {
         screenRange.end.row > editor.getLastVisibleScreenRow()
       ) {
         switch (wrapped) {
-          case 'up':
-            this.showWrapIcon('icon-move-up');
+          case "up":
+            this.showWrapIcon("icon-move-up");
             break;
-          case 'down':
-            this.showWrapIcon('icon-move-down');
+          case "down":
+            this.showWrapIcon("icon-move-down");
             break;
         }
       }
 
       editor.unfoldBufferRow(bufferRange.start.row);
-      editor.setSelectedBufferRange(bufferRange, {flash: true});
-      editor.scrollToCursorPosition({center: true});
+      editor.setSelectedBufferRange(bufferRange, { flash: true });
+      editor.scrollToCursorPosition({ center: true });
     }
   }
 
@@ -615,12 +697,12 @@ class FindView {
 
   findNextSelected() {
     this.setSelectionAsFindPattern();
-    this.findNext({focusEditorAfter: true});
+    this.findNext({ focusEditorAfter: true });
   }
 
   findPreviousSelected() {
     this.setSelectionAsFindPattern();
-    this.findPrevious({focusEditorAfter: true});
+    this.findPrevious({ focusEditorAfter: true });
   }
 
   updateOptionViews() {
@@ -630,8 +712,10 @@ class FindView {
 
   updateSyntaxHighlighting() {
     if (this.model.getFindOptions().useRegex) {
-      this.findEditor.setGrammar(atom.grammars.grammarForScopeName('source.js.regexp'));
-      this.replaceEditor.setGrammar(atom.grammars.grammarForScopeName('source.js.regexp.replacement'));
+      this.findEditor.setGrammar(atom.grammars.grammarForScopeName("source.js.regexp"));
+      this.replaceEditor.setGrammar(
+        atom.grammars.grammarForScopeName("source.js.regexp.replacement"),
+      );
     } else {
       this.findEditor.setGrammar(atom.grammars.nullGrammar);
       this.replaceEditor.setGrammar(atom.grammars.nullGrammar);
@@ -642,75 +726,84 @@ class FindView {
     const label = [];
 
     if (this.model.getFindOptions().useRegex) {
-      label.push('Regex');
+      label.push("Regex");
     }
 
     if (this.model.getFindOptions().caseSensitive) {
-      label.push('Case Sensitive');
+      label.push("Case Sensitive");
     } else {
-      label.push('Case Insensitive');
+      label.push("Case Insensitive");
     }
 
     if (this.model.getFindOptions().inCurrentSelection) {
-      label.push('Within Current Selection');
+      label.push("Within Current Selection");
     }
 
     if (this.model.getFindOptions().wholeWord) {
-      label.push('Whole Word');
+      label.push("Whole Word");
     }
 
-    this.refs.optionsLabel.textContent = label.join(', ');
+    this.refs.optionsLabel.textContent = label.join(", ");
   }
 
   updateOptionButtons() {
     this.setOptionButtonState(this.refs.regexOptionButton, this.model.getFindOptions().useRegex);
-    this.setOptionButtonState(this.refs.caseOptionButton, this.model.getFindOptions().caseSensitive);
-    this.setOptionButtonState(this.refs.selectionOptionButton, this.model.getFindOptions().inCurrentSelection);
-    this.setOptionButtonState(this.refs.wholeWordOptionButton, this.model.getFindOptions().wholeWord);
+    this.setOptionButtonState(
+      this.refs.caseOptionButton,
+      this.model.getFindOptions().caseSensitive,
+    );
+    this.setOptionButtonState(
+      this.refs.selectionOptionButton,
+      this.model.getFindOptions().inCurrentSelection,
+    );
+    this.setOptionButtonState(
+      this.refs.wholeWordOptionButton,
+      this.model.getFindOptions().wholeWord,
+    );
   }
 
   setOptionButtonState(optionButton, selected) {
     if (selected) {
-      optionButton.classList.add('selected');
+      optionButton.classList.add("selected");
     } else {
-      optionButton.classList.remove('selected');
+      optionButton.classList.remove("selected");
     }
   }
 
   anyMarkersAreSelected() {
     let editor = this.model.getEditor();
     if (editor) {
-      return editor.getSelectedBufferRanges().some(selectedRange => {
+      return editor.getSelectedBufferRanges().some((selectedRange) => {
         return this.model.findMarker(selectedRange);
       });
     }
   }
 
   toggleRegexOption() {
-    this.search({useRegex: !this.model.getFindOptions().useRegex});
+    this.search({ useRegex: !this.model.getFindOptions().useRegex });
     if (!this.anyMarkersAreSelected()) {
       this.selectFirstMarkerAfterCursor();
     }
   }
 
   toggleCaseOption() {
-    this.search({caseSensitive: !this.model.getFindOptions().caseSensitive});
+    this.search({ caseSensitive: !this.model.getFindOptions().caseSensitive });
     if (!this.anyMarkersAreSelected()) {
       this.selectFirstMarkerAfterCursor();
     }
   }
 
   toggleSelectionOption() {
-    this.search({inCurrentSelection: !this.model.getFindOptions().inCurrentSelection});
+    this.search({ inCurrentSelection: !this.model.getFindOptions().inCurrentSelection });
 
     let editor = this.model.getEditor();
-    if (editor && editor.getSelectedBufferRanges().every(range => range.isEmpty())) {
+    if (editor && editor.getSelectedBufferRanges().every((range) => range.isEmpty())) {
       this.selectFirstMarkerAfterCursor();
     }
   }
 
   toggleWholeWordOption() {
-    this.search(this.findEditor.getText(), {wholeWord: !this.model.getFindOptions().wholeWord});
+    this.search(this.findEditor.getText(), { wholeWord: !this.model.getFindOptions().wholeWord });
     if (!this.anyMarkersAreSelected()) {
       this.selectFirstMarkerAfterCursor();
     }
@@ -718,79 +811,95 @@ class FindView {
 
   updateFindEnablement() {
     let editor = this.model.getEditor();
-    let isDisabled = this.refs.findAllButton.classList.contains('disabled');
+    let isDisabled = this.refs.findAllButton.classList.contains("disabled");
     let hadFindTooltip = !!this.findTooltipSubscriptions;
 
     if (hadFindTooltip) this.findTooltipSubscriptions.dispose();
-    this.findTooltipSubscriptions = new CompositeDisposable;
+    this.findTooltipSubscriptions = new CompositeDisposable();
 
     if (editor && (!hadFindTooltip || isDisabled)) {
-      this.refs.findAllButton.classList.remove('disabled');
-      this.refs.nextButton.classList.remove('disabled');
+      this.refs.findAllButton.classList.remove("disabled");
+      this.refs.nextButton.classList.remove("disabled");
 
-      this.findTooltipSubscriptions.add(atom.tooltips.add(this.refs.nextButton, {
-        title: "Find Next",
-        keyBindingCommand: 'find-and-replace:find-next',
-        keyBindingTarget: this.findEditor.element
-      }));
-      this.findTooltipSubscriptions.add(atom.tooltips.add(this.refs.findAllButton, {
-        title: "Find All",
-        keyBindingCommand: 'find-and-replace:find-all',
-        keyBindingTarget: this.findEditor.element
-      }));
+      this.findTooltipSubscriptions.add(
+        atom.tooltips.add(this.refs.nextButton, {
+          title: "Find Next",
+          keyBindingCommand: "find-and-replace:find-next",
+          keyBindingTarget: this.findEditor.element,
+        }),
+      );
+      this.findTooltipSubscriptions.add(
+        atom.tooltips.add(this.refs.findAllButton, {
+          title: "Find All",
+          keyBindingCommand: "find-and-replace:find-all",
+          keyBindingTarget: this.findEditor.element,
+        }),
+      );
     } else if (!editor && (!hadFindTooltip || !isDisabled)) {
-      this.refs.findAllButton.classList.add('disabled');
-      this.refs.nextButton.classList.add('disabled');
+      this.refs.findAllButton.classList.add("disabled");
+      this.refs.nextButton.classList.add("disabled");
 
-      this.findTooltipSubscriptions.add(atom.tooltips.add(this.refs.nextButton, {
-        title: "Find Next [when in a text document]"
-      }));
-      this.findTooltipSubscriptions.add(atom.tooltips.add(this.refs.findAllButton, {
-        title: "Find All [when in a text document]"
-      }));
+      this.findTooltipSubscriptions.add(
+        atom.tooltips.add(this.refs.nextButton, {
+          title: "Find Next [when in a text document]",
+        }),
+      );
+      this.findTooltipSubscriptions.add(
+        atom.tooltips.add(this.refs.findAllButton, {
+          title: "Find All [when in a text document]",
+        }),
+      );
     }
   }
 
   updateReplaceEnablement() {
     let canReplace = this.markers && this.markers.length > 0;
-    if (canReplace && !this.refs.replaceAllButton.classList.contains('disabled')) return;
+    if (canReplace && !this.refs.replaceAllButton.classList.contains("disabled")) return;
 
     if (this.replaceTooltipSubscriptions) this.replaceTooltipSubscriptions.dispose();
-    this.replaceTooltipSubscriptions = new CompositeDisposable;
+    this.replaceTooltipSubscriptions = new CompositeDisposable();
 
     if (canReplace) {
-      this.refs.replaceAllButton.classList.remove('disabled');
-      this.refs.replaceNextButton.classList.remove('disabled');
+      this.refs.replaceAllButton.classList.remove("disabled");
+      this.refs.replaceNextButton.classList.remove("disabled");
 
-      this.replaceTooltipSubscriptions.add(atom.tooltips.add(this.refs.replaceNextButton, {
-        title: "Replace Next",
-        keyBindingCommand: 'find-and-replace:replace-next',
-        keyBindingTarget: this.replaceEditor.element
-      }));
-      this.replaceTooltipSubscriptions.add(atom.tooltips.add(this.refs.replaceAllButton, {
-        title: "Replace All",
-        keyBindingCommand: 'find-and-replace:replace-all',
-        keyBindingTarget: this.replaceEditor.element
-      }));
+      this.replaceTooltipSubscriptions.add(
+        atom.tooltips.add(this.refs.replaceNextButton, {
+          title: "Replace Next",
+          keyBindingCommand: "find-and-replace:replace-next",
+          keyBindingTarget: this.replaceEditor.element,
+        }),
+      );
+      this.replaceTooltipSubscriptions.add(
+        atom.tooltips.add(this.refs.replaceAllButton, {
+          title: "Replace All",
+          keyBindingCommand: "find-and-replace:replace-all",
+          keyBindingTarget: this.replaceEditor.element,
+        }),
+      );
     } else {
-      this.refs.replaceAllButton.classList.add('disabled');
-      this.refs.replaceNextButton.classList.add('disabled');
+      this.refs.replaceAllButton.classList.add("disabled");
+      this.refs.replaceNextButton.classList.add("disabled");
 
-      this.replaceTooltipSubscriptions.add(atom.tooltips.add(this.refs.replaceNextButton, {
-        title: "Replace Next [when there are results]"
-      }));
-      this.replaceTooltipSubscriptions.add(atom.tooltips.add(this.refs.replaceAllButton, {
-        title: "Replace All [when there are results]"
-      }));
+      this.replaceTooltipSubscriptions.add(
+        atom.tooltips.add(this.refs.replaceNextButton, {
+          title: "Replace Next [when there are results]",
+        }),
+      );
+      this.replaceTooltipSubscriptions.add(
+        atom.tooltips.add(this.refs.replaceAllButton, {
+          title: "Replace All [when there are results]",
+        }),
+      );
     }
   }
 
   createWrapIcon() {
-    this.wrapIcon = document.createElement('div');
+    this.wrapIcon = document.createElement("div");
   }
 
   showWrapIcon(icon) {
-    if (!atom.config.get('find-and-replace.showSearchWrapIcon')) return;
+    if (!atom.config.get("find-and-replace.showSearchWrapIcon")) return;
     let editor = this.model.getEditor();
     if (!editor) return;
 
@@ -800,6 +909,6 @@ class FindView {
 
     this.wrapIcon.className = `find-wrap-icon ${icon} visible`;
     clearTimeout(this.wrapTimeout);
-    this.wrapTimeout = setTimeout((() => this.wrapIcon.classList.remove('visible')), 500);
+    this.wrapTimeout = setTimeout(() => this.wrapIcon.classList.remove("visible"), 500);
   }
 };

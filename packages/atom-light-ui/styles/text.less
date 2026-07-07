@@ -2,11 +2,17 @@ h1,
 h2,
 h3 {
   line-height: 1em;
-  margin-bottom: 15px
+  margin-bottom: 15px;
 }
-h1 { font-size: 2em; }
-h2 { font-size: 1.5em; }
-h3 { font-size: 1.2em; }
+h1 {
+  font-size: 2em;
+}
+h2 {
+  font-size: 1.5em;
+}
+h3 {
+  font-size: 1.2em;
+}
 
 p {
   line-height: 1.6;
@@ -32,25 +38,41 @@ code {
   border-radius: @component-border-radius;
 }
 
-.selected { .text(highlight); }
+.selected {
+  .text(highlight);
+}
 
-.text-smaller { font-size: 0.9em; }
+.text-smaller {
+  font-size: 0.9em;
+}
 
-.text-subtle { .text(subtle); }
-.text-highlight { .text(highlight); }
+.text-subtle {
+  .text(subtle);
+}
+.text-highlight {
+  .text(highlight);
+}
 
-.text-error { .text(error); }
+.text-error {
+  .text(error);
+}
 .text-info {
   .text(info);
-  &:hover { color: @text-color-info; }
+  &:hover {
+    color: @text-color-info;
+  }
 }
 .text-warning {
   .text(warning);
-  &:hover { color: @text-color-warning; }
+  &:hover {
+    color: @text-color-warning;
+  }
 }
 .text-success {
   .text(success);
-  &:hover { color: @text-color-success; }
+  &:hover {
+    color: @text-color-success;
+  }
 }
 
 .highlight {

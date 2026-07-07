@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-const { createFocusTrap } = require('focus-trap');
-const { CompositeDisposable } = require('event-kit');
+const { createFocusTrap } = require("focus-trap");
+const { CompositeDisposable } = require("event-kit");
 
 class PanelContainerElement extends HTMLElement {
   constructor() {
@@ -19,9 +19,7 @@ class PanelContainerElement extends HTMLElement {
     this.model = model;
     this.viewRegistry = viewRegistry;
 
-    this.subscriptions.add(
-      this.model.onDidAddPanel(this.panelAdded.bind(this))
-    );
+    this.subscriptions.add(this.model.onDidAddPanel(this.panelAdded.bind(this)));
     this.subscriptions.add(this.model.onDidDestroy(this.destroyed.bind(this)));
     this.classList.add(this.model.getLocation());
 
@@ -41,12 +39,9 @@ class PanelContainerElement extends HTMLElement {
     const panelElement = panel.getElement();
     panelElement.classList.add(this.model.getLocation());
     if (this.model.isModal()) {
-      panelElement.classList.add('overlay', 'from-top');
+      panelElement.classList.add("overlay", "from-top");
     } else {
-      panelElement.classList.add(
-        'tool-panel',
-        `panel-${this.model.getLocation()}`
-      );
+      panelElement.classList.add("tool-panel", `panel-${this.model.getLocation()}`);
     }
 
     if (index >= this.childNodes.length) {
@@ -59,11 +54,11 @@ class PanelContainerElement extends HTMLElement {
     if (this.model.isModal()) {
       this.hideAllPanelsExcept(panel);
       this.subscriptions.add(
-        panel.onDidChangeVisible(visible => {
+        panel.onDidChangeVisible((visible) => {
           if (visible) {
             this.hideAllPanelsExcept(panel);
           }
-        })
+        }),
       );
 
       if (panel.autoFocus) {
@@ -75,7 +70,7 @@ class PanelContainerElement extends HTMLElement {
           // closing is handled by core Lumine commands and this already deactivates
           // on visibility changes
           escapeDeactivates: false,
-          delayInitialFocus: false
+          delayInitialFocus: false,
         };
 
         if (panel.autoFocus !== true) {
@@ -84,13 +79,13 @@ class PanelContainerElement extends HTMLElement {
         const modalFocusTrap = createFocusTrap(panelElement, focusOptions);
 
         this.subscriptions.add(
-          panel.onDidChangeVisible(visible => {
+          panel.onDidChangeVisible((visible) => {
             if (visible) {
               modalFocusTrap.activate();
             } else {
               modalFocusTrap.deactivate();
             }
-          })
+          }),
         );
       }
     }
@@ -112,12 +107,12 @@ class PanelContainerElement extends HTMLElement {
   }
 }
 
-window.customElements.define('atom-panel-container', PanelContainerElement);
+window.customElements.define("atom-panel-container", PanelContainerElement);
 
 function createPanelContainerElement() {
-  return document.createElement('atom-panel-container');
+  return document.createElement("atom-panel-container");
 }
 
 module.exports = {
-  createPanelContainerElement
+  createPanelContainerElement,
 };

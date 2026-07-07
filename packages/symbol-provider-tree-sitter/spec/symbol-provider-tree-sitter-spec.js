@@ -1,12 +1,11 @@
-
-const path = require('path');
-const fs = require('fs-plus');
-const temp = require('temp');
-const TreeSitterProvider = require('../lib/tree-sitter-provider');
+const path = require("path");
+const fs = require("fs-plus");
+const temp = require("temp");
+const TreeSitterProvider = require("../lib/tree-sitter-provider");
 
 // Just for syntax highlighting.
 function scm(strings) {
-  return strings.join('');
+  return strings.join("");
 }
 
 function getEditor() {
@@ -14,93 +13,84 @@ function getEditor() {
 }
 
 async function wait(ms) {
-  return new Promise(r => setTimeout(r, ms));
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 let provider;
 
-async function getSymbols(editor, type = 'file') {
+async function getSymbols(editor, type = "file") {
   let controller = new AbortController();
   let symbols = await provider.getSymbols({
     type,
     editor,
-    signal: controller.signal
+    signal: controller.signal,
   });
 
   return symbols;
 }
 
-describe('TreeSitterProvider', () => {
+describe("TreeSitterProvider", () => {
   let directory, editor;
 
   beforeEach(async () => {
     jasmine.useRealClock();
 
-    atom.config.set('core.useTreeSitterParsers', true);
-    atom.config.set('core.useExperimentalModernTreeSitter', true);
-    await atom.packages.activatePackage('language-javascript');
+    atom.config.set("core.useTreeSitterParsers", true);
+    atom.config.set("core.useExperimentalModernTreeSitter", true);
+    await atom.packages.activatePackage("language-javascript");
 
-    atom.config.set('symbol-provider-tree-sitter.includeReferences', false);
+    atom.config.set("symbol-provider-tree-sitter.includeReferences", false);
 
     provider = new TreeSitterProvider();
 
-    atom.project.setPaths([
-      temp.mkdirSync('other-dir-'),
-      temp.mkdirSync('atom-symbols-view-')
-    ]);
+    atom.project.setPaths([temp.mkdirSync("other-dir-"), temp.mkdirSync("atom-symbols-view-")]);
 
     directory = atom.project.getDirectories()[1];
-    fs.copySync(
-      path.join(__dirname, 'fixtures', 'js'),
-      atom.project.getPaths()[1]
-    );
+    fs.copySync(path.join(__dirname, "fixtures", "js"), atom.project.getPaths()[1]);
 
-    fs.copySync(
-      path.join(__dirname, 'fixtures', 'ruby'),
-      atom.project.getPaths()[1]
-    );
+    fs.copySync(path.join(__dirname, "fixtures", "ruby"), atom.project.getPaths()[1]);
   });
 
-  describe('when a tree-sitter grammar is used for a file', () => {
+  describe("when a tree-sitter grammar is used for a file", () => {
     beforeEach(async () => {
-      await atom.workspace.open(directory.resolve('sample.js'));
+      await atom.workspace.open(directory.resolve("sample.js"));
       editor = getEditor();
       let languageMode = editor.getBuffer().getLanguageMode();
       await languageMode.ready;
     });
 
-    it('is willing to provide symbols for the current file', () => {
-      let meta = { type: 'file', editor };
+    it("is willing to provide symbols for the current file", () => {
+      let meta = { type: "file", editor };
       expect(provider.canProvideSymbols(meta)).toBe(0.999);
     });
 
-    it('is not willing to provide symbols for an entire project', () => {
-      let meta = { type: 'project', editor };
+    it("is not willing to provide symbols for an entire project", () => {
+      let meta = { type: "project", editor };
       expect(provider.canProvideSymbols(meta)).toBe(false);
     });
 
-    it('provides all JavaScript functions', async () => {
-      let symbols = await getSymbols(editor, 'file');
+    it("provides all JavaScript functions", async () => {
+      let symbols = await getSymbols(editor, "file");
 
-      expect(symbols[0].name).toBe('quicksort');
+      expect(symbols[0].name).toBe("quicksort");
       expect(symbols[0].position.row).toEqual(0);
 
-      expect(symbols[1].name).toBe('sort');
+      expect(symbols[1].name).toBe("sort");
       expect(symbols[1].position.row).toEqual(1);
     });
   });
 
-  describe('when a non-tree-sitter grammar is used for a file', () => {
+  describe("when a non-tree-sitter grammar is used for a file", () => {
     beforeEach(async () => {
-      atom.config.set('core.useTreeSitterParsers', false);
-      atom.config.set('core.useExperimentalModernTreeSitter', false);
-      await atom.workspace.open(directory.resolve('sample.js'));
+      atom.config.set("core.useTreeSitterParsers", false);
+      atom.config.set("core.useExperimentalModernTreeSitter", false);
+      await atom.workspace.open(directory.resolve("sample.js"));
       editor = getEditor();
     });
 
-    it('is not willing to provide symbols for the current file', () => {
+    it("is not willing to provide symbols for the current file", () => {
       expect(editor.getGrammar().rootLanguageLayer).toBe(undefined);
-      let meta = { type: 'file', editor };
+      let meta = { type: "file", editor };
       expect(provider.canProvideSymbols(meta)).toBe(false);
     });
   });
@@ -108,71 +98,69 @@ describe('TreeSitterProvider', () => {
   // TODO: Test that `canProvideSymbols` returns `false` when no layer has a
   // tags query.
 
-  describe('when the buffer is new and unsaved', () => {
+  describe("when the buffer is new and unsaved", () => {
     let grammar;
     beforeEach(async () => {
       await atom.workspace.open();
       editor = getEditor();
-      grammar = atom.grammars.grammarForId('source.js');
+      grammar = atom.grammars.grammarForId("source.js");
       editor.setGrammar(grammar);
       await editor.getBuffer().getLanguageMode().ready;
     });
 
-    it('is willing to provide symbols', () => {
-      let meta = { type: 'file', editor };
+    it("is willing to provide symbols", () => {
+      let meta = { type: "file", editor };
       expect(provider.canProvideSymbols(meta)).toBe(0.999);
     });
 
-    describe('and has content', () => {
+    describe("and has content", () => {
       beforeEach(async () => {
-        let text = fs.readFileSync(
-          path.join(__dirname, 'fixtures', 'js', 'sample.js')
-        ).toString();
+        let text = fs.readFileSync(path.join(__dirname, "fixtures", "js", "sample.js")).toString();
         editor.setText(text);
         await editor.getBuffer().getLanguageMode().atTransactionEnd();
       });
 
-      it('provides symbols just as if the file were saved on disk', async () => {
-        let symbols = await getSymbols(editor, 'file');
+      it("provides symbols just as if the file were saved on disk", async () => {
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].name).toBe('quicksort');
+        expect(symbols[0].name).toBe("quicksort");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].name).toBe('sort');
+        expect(symbols[1].name).toBe("sort");
         expect(symbols[1].position.row).toEqual(1);
       });
     });
   });
 
-  describe('when the file has multiple language layers', () => {
+  describe("when the file has multiple language layers", () => {
     beforeEach(async () => {
-      await atom.packages.activatePackage('language-ruby');
-      await atom.workspace.open(directory.resolve('embed.rb'));
+      await atom.packages.activatePackage("language-ruby");
+      await atom.workspace.open(directory.resolve("embed.rb"));
       editor = getEditor();
       await editor.getBuffer().getLanguageMode().ready;
     });
 
-    it('detects symbols across several layers', async () => {
-      let symbols = await getSymbols(editor, 'file');
+    it("detects symbols across several layers", async () => {
+      let symbols = await getSymbols(editor, "file");
 
-      expect(symbols[0].name).toBe('foo');
+      expect(symbols[0].name).toBe("foo");
       expect(symbols[0].position.row).toEqual(1);
 
-      expect(symbols[1].name).toBe('bar');
+      expect(symbols[1].name).toBe("bar");
       expect(symbols[1].position.row).toEqual(4);
     });
   });
 
-  describe('when the tags query contains @definition captures', () => {
+  describe("when the tags query contains @definition captures", () => {
     let grammar;
     beforeEach(async () => {
-      await atom.workspace.open(directory.resolve('sample.js'));
+      await atom.workspace.open(directory.resolve("sample.js"));
       editor = getEditor();
       let languageMode = editor.getBuffer().getLanguageMode();
       await languageMode.ready;
       grammar = editor.getGrammar();
       await grammar.setQueryForTest(
-        'tagsQuery',
+        "tagsQuery",
         scm`
         (
           (variable_declaration
@@ -180,31 +168,31 @@ describe('TreeSitterProvider', () => {
               name: (identifier) @name
               value: [(arrow_function) (function_expression)]))
         ) @definition.function
-        `
+        `,
       );
     });
 
-    it('can infer tag names from those captures', async () => {
-      let symbols = await getSymbols(editor, 'file');
+    it("can infer tag names from those captures", async () => {
+      let symbols = await getSymbols(editor, "file");
 
-      expect(symbols[0].name).toBe('quicksort');
-      expect(symbols[0].tag).toBe('function');
+      expect(symbols[0].name).toBe("quicksort");
+      expect(symbols[0].tag).toBe("function");
 
-      expect(symbols[1].name).toBe('sort');
-      expect(symbols[1].tag).toBe('function');
+      expect(symbols[1].name).toBe("sort");
+      expect(symbols[1].tag).toBe("function");
     });
   });
 
-  describe('when the tags query contains @reference captures', () => {
+  describe("when the tags query contains @reference captures", () => {
     let grammar;
     beforeEach(async () => {
-      await atom.workspace.open(directory.resolve('sample.js'));
+      await atom.workspace.open(directory.resolve("sample.js"));
       editor = getEditor();
       let languageMode = editor.getBuffer().getLanguageMode();
       await languageMode.ready;
       grammar = editor.getGrammar();
       await grammar.setQueryForTest(
-        'tagsQuery',
+        "tagsQuery",
         scm`
         (
           (variable_declaration
@@ -217,39 +205,38 @@ describe('TreeSitterProvider', () => {
           (call_expression
             function: (identifier) @name) @reference.call
             (#not-match? @name "^(require)$"))
-        `
+        `,
       );
     });
 
-    it('skips references when they are disabled in settings', async () => {
-      let symbols = await getSymbols(editor, 'file');
+    it("skips references when they are disabled in settings", async () => {
+      let symbols = await getSymbols(editor, "file");
       expect(symbols.length).toBe(2);
     });
 
-    it('includes references when they are enabled in settings', async () => {
-      atom.config.set('symbol-provider-tree-sitter.includeReferences', true);
-      let symbols = await getSymbols(editor, 'file');
+    it("includes references when they are enabled in settings", async () => {
+      atom.config.set("symbol-provider-tree-sitter.includeReferences", true);
+      let symbols = await getSymbols(editor, "file");
       expect(symbols.length).toBe(5);
-      expect(symbols.map(s => s.tag)).toEqual(
-        ['function', 'function', 'call', 'call', 'call']
-      );
+      expect(symbols.map((s) => s.tag)).toEqual(["function", "function", "call", "call", "call"]);
     });
-
   });
 
-  describe('when the tags query uses the predicate', () => {
+  describe("when the tags query uses the predicate", () => {
     let grammar;
     beforeEach(async () => {
-      await atom.workspace.open(directory.resolve('sample.js'));
+      await atom.workspace.open(directory.resolve("sample.js"));
       editor = getEditor();
       let languageMode = editor.getBuffer().getLanguageMode();
       await languageMode.ready;
       grammar = editor.getGrammar();
     });
 
-    describe('symbol.context', () => {
+    describe("symbol.context", () => {
       beforeEach(async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (variable_declaration
               (variable_declarator
@@ -257,47 +244,53 @@ describe('TreeSitterProvider', () => {
                 value: [(arrow_function) (function_expression)]))
                 (#set! symbol.context "something")
           )
-        `);
+        `,
+        );
       });
 
-      it('assigns a `context` property on each symbol', async () => {
-        let symbols = await getSymbols(editor, 'file');
+      it("assigns a `context` property on each symbol", async () => {
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].context).toBe('something');
+        expect(symbols[0].context).toBe("something");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].context).toBe('something');
+        expect(symbols[1].context).toBe("something");
         expect(symbols[1].position.row).toEqual(1);
       });
     });
 
-    describe('symbol.contextNode', () => {
+    describe("symbol.contextNode", () => {
       beforeEach(async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (property_identifier) @name
             (#eq? @name "push")
             (#set! symbol.contextNode "parent.firstNamedChild")
           )
-        `);
+        `,
+        );
       });
 
-      it('assigns a `context` property on each symbol containing the text of the referenced node', async () => {
-        let symbols = await getSymbols(editor, 'file');
+      it("assigns a `context` property on each symbol containing the text of the referenced node", async () => {
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].name).toBe('push');
-        expect(symbols[0].context).toBe('left');
+        expect(symbols[0].name).toBe("push");
+        expect(symbols[0].context).toBe("left");
         expect(symbols[0].position.row).toEqual(6);
 
-        expect(symbols[1].name).toBe('push');
-        expect(symbols[1].context).toBe('right');
+        expect(symbols[1].name).toBe("push");
+        expect(symbols[1].context).toBe("right");
         expect(symbols[1].position.row).toEqual(6);
       });
     });
 
-    describe('symbol.icon', () => {
-      it('defines an `icon` property on each symbol', async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+    describe("symbol.icon", () => {
+      it("defines an `icon` property on each symbol", async () => {
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (variable_declaration
               (variable_declarator
@@ -306,20 +299,23 @@ describe('TreeSitterProvider', () => {
                 (#set! symbol.icon "book")
           )
 
-        `);
+        `,
+        );
 
-        let symbols = await getSymbols(editor, 'file');
-        console.log('symbols:', symbols);
+        let symbols = await getSymbols(editor, "file");
+        console.log("symbols:", symbols);
 
-        expect(symbols[0].icon).toBe('icon-book');
+        expect(symbols[0].icon).toBe("icon-book");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].icon).toBe('icon-book');
+        expect(symbols[1].icon).toBe("icon-book");
         expect(symbols[1].position.row).toEqual(1);
       });
 
-      it('supersedes an `icon` property assigned by a tag', async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+      it("supersedes an `icon` property assigned by a tag", async () => {
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (variable_declaration
               (variable_declarator
@@ -328,19 +324,22 @@ describe('TreeSitterProvider', () => {
                 (#set! symbol.tag "class")
                 (#set! symbol.icon "book")
           )
-        `);
+        `,
+        );
 
-        let symbols = await getSymbols(editor, 'file');
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].icon).toBe('icon-book');
+        expect(symbols[0].icon).toBe("icon-book");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].icon).toBe('icon-book');
+        expect(symbols[1].icon).toBe("icon-book");
         expect(symbols[1].position.row).toEqual(1);
       });
 
-      it('supersedes an `icon` property inferred by its container', async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+      it("supersedes an `icon` property inferred by its container", async () => {
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (variable_declaration
               (variable_declarator
@@ -349,21 +348,24 @@ describe('TreeSitterProvider', () => {
                 (#set! symbol.tag "class")
                 (#set! symbol.icon "book")
           ) @definition.namespace
-        `);
+        `,
+        );
 
-        let symbols = await getSymbols(editor, 'file');
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].icon).toBe('icon-book');
+        expect(symbols[0].icon).toBe("icon-book");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].icon).toBe('icon-book');
+        expect(symbols[1].icon).toBe("icon-book");
         expect(symbols[1].position.row).toEqual(1);
       });
     });
 
-    describe('symbol.tag', () => {
-      it('defines a `tag` property on each symbol', async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+    describe("symbol.tag", () => {
+      it("defines a `tag` property on each symbol", async () => {
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (variable_declaration
               (variable_declarator
@@ -371,21 +373,24 @@ describe('TreeSitterProvider', () => {
                 value: [(arrow_function) (function_expression)]))
                 (#set! symbol.tag "class")
           )
-        `);
+        `,
+        );
 
-        let symbols = await getSymbols(editor, 'file');
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].tag).toBe('class');
-        expect(symbols[0].icon).toBe('icon-puzzle');
+        expect(symbols[0].tag).toBe("class");
+        expect(symbols[0].icon).toBe("icon-puzzle");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].tag).toBe('class');
-        expect(symbols[1].icon).toBe('icon-puzzle');
+        expect(symbols[1].tag).toBe("class");
+        expect(symbols[1].icon).toBe("icon-puzzle");
         expect(symbols[1].position.row).toEqual(1);
       });
 
-      it('supersedes the `tag` property inferred by its container', async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+      it("supersedes the `tag` property inferred by its container", async () => {
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (variable_declaration
               (variable_declarator
@@ -393,23 +398,26 @@ describe('TreeSitterProvider', () => {
                 value: [(arrow_function) (function_expression)]))
                 (#set! symbol.tag "class")
           ) @definition.namespace
-        `);
+        `,
+        );
 
-        let symbols = await getSymbols(editor, 'file');
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].tag).toBe('class');
-        expect(symbols[0].icon).toBe('icon-puzzle');
+        expect(symbols[0].tag).toBe("class");
+        expect(symbols[0].icon).toBe("icon-puzzle");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].tag).toBe('class');
-        expect(symbols[1].icon).toBe('icon-puzzle');
+        expect(symbols[1].tag).toBe("class");
+        expect(symbols[1].icon).toBe("icon-puzzle");
         expect(symbols[1].position.row).toEqual(1);
       });
     });
 
-    describe('symbol.strip', () => {
+    describe("symbol.strip", () => {
       beforeEach(async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (variable_declaration
               (variable_declarator
@@ -417,22 +425,25 @@ describe('TreeSitterProvider', () => {
                 value: [(arrow_function) (function_expression)]))
                 (#set! symbol.strip "ort$")
           )
-        `);
+        `,
+        );
       });
-      it('strips the given text from each symbol', async () => {
-        let symbols = await getSymbols(editor, 'file');
+      it("strips the given text from each symbol", async () => {
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].name).toBe('quicks');
+        expect(symbols[0].name).toBe("quicks");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].name).toBe('s');
+        expect(symbols[1].name).toBe("s");
         expect(symbols[1].position.row).toEqual(1);
       });
     });
 
-    describe('symbol.prepend', () => {
+    describe("symbol.prepend", () => {
       beforeEach(async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (variable_declaration
               (variable_declarator
@@ -440,22 +451,25 @@ describe('TreeSitterProvider', () => {
                 value: [(arrow_function) (function_expression)]))
                 (#set! symbol.prepend "Foo: ")
           )
-        `);
+        `,
+        );
       });
-      it('prepends the given text to each symbol', async () => {
-        let symbols = await getSymbols(editor, 'file');
+      it("prepends the given text to each symbol", async () => {
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].name).toBe('Foo: quicksort');
+        expect(symbols[0].name).toBe("Foo: quicksort");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].name).toBe('Foo: sort');
+        expect(symbols[1].name).toBe("Foo: sort");
         expect(symbols[1].position.row).toEqual(1);
       });
     });
 
-    describe('symbol.append', () => {
+    describe("symbol.append", () => {
       beforeEach(async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (variable_declaration
               (variable_declarator
@@ -464,22 +478,25 @@ describe('TreeSitterProvider', () => {
                 (#set! symbol.append " (foo)")
           )
 
-        `);
+        `,
+        );
       });
-      it('appends the given text to each symbol', async () => {
-        let symbols = await getSymbols(editor, 'file');
+      it("appends the given text to each symbol", async () => {
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].name).toBe('quicksort (foo)');
+        expect(symbols[0].name).toBe("quicksort (foo)");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].name).toBe('sort (foo)');
+        expect(symbols[1].name).toBe("sort (foo)");
         expect(symbols[1].position.row).toEqual(1);
       });
     });
 
-    describe('symbol.prependTextForNode', () => {
+    describe("symbol.prependTextForNode", () => {
       beforeEach(async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           (
             (variable_declaration
               (variable_declarator
@@ -496,22 +513,25 @@ describe('TreeSitterProvider', () => {
                 name: (identifier) @name
                 value: [(arrow_function) (function_expression)]))
           )
-        `);
+        `,
+        );
       });
       it(`prepends the associated node's text to each symbol`, async () => {
-        let symbols = await getSymbols(editor, 'file');
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].name).toBe('quicksort');
+        expect(symbols[0].name).toBe("quicksort");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].name).toBe('quicksort.sort');
+        expect(symbols[1].name).toBe("quicksort.sort");
         expect(symbols[1].position.row).toEqual(1);
       });
     });
 
-    describe('symbol.prependSymbolForNode', () => {
+    describe("symbol.prependSymbolForNode", () => {
       beforeEach(async () => {
-        await grammar.setQueryForTest('tagsQuery', scm`
+        await grammar.setQueryForTest(
+          "tagsQuery",
+          scm`
           ; Outer function has prepended text...
           (
             (variable_declaration
@@ -533,18 +553,18 @@ describe('TreeSitterProvider', () => {
                 (#set! symbol.joiner ".")
                 (#set! test.final true)
           )
-        `);
+        `,
+        );
       });
       it(`prepends the associated node's symbol name to each symbol`, async () => {
-        let symbols = await getSymbols(editor, 'file');
+        let symbols = await getSymbols(editor, "file");
 
-        expect(symbols[0].name).toBe('ROOT: quicksort');
+        expect(symbols[0].name).toBe("ROOT: quicksort");
         expect(symbols[0].position.row).toEqual(0);
 
-        expect(symbols[1].name).toBe('ROOT: quicksort.sort');
+        expect(symbols[1].name).toBe("ROOT: quicksort.sort");
         expect(symbols[1].position.row).toEqual(1);
       });
     });
-
   });
 });

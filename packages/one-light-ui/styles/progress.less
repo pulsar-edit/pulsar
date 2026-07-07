@@ -1,4 +1,3 @@
-
 // Spinner ----------------------
 
 @spinner-duration: 1.2s;
@@ -9,7 +8,7 @@
   width: 1em;
   height: 1em;
   font-size: @size;
-  background: radial-gradient(@accent-color .1em, transparent .11em);
+  background: radial-gradient(@accent-color 0.1em, transparent 0.11em);
 
   &::before,
   &::after {
@@ -31,7 +30,7 @@
   }
   &::after {
     border-color: transparent lighten(@accent-color, 15%) transparent transparent;
-    -webkit-animation-delay: (@spinner-duration/2);
+    -webkit-animation-delay: (@spinner-duration / 2);
   }
 
   &.inline-block {
@@ -40,19 +39,36 @@
 }
 
 @-webkit-keyframes spinner-animation {
-    0% { transform: rotateZ(  0deg); -webkit-animation-timing-function: cubic-bezier(0, 0, .8, .2); }
-   50% { transform: rotateZ(180deg); -webkit-animation-timing-function: cubic-bezier(.2, .8, 1, 1); }
-  100% { transform: rotateZ(360deg); }
+  0% {
+    transform: rotateZ(0deg);
+    -webkit-animation-timing-function: cubic-bezier(0, 0, 0.8, 0.2);
+  }
+  50% {
+    transform: rotateZ(180deg);
+    -webkit-animation-timing-function: cubic-bezier(0.2, 0.8, 1, 1);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
 }
 
 // Spinner sizes
-.loading-spinner-tiny   { .loading-spinner(16px); &::before, &::after { border-width: 1px; } }
-.loading-spinner-small  { .loading-spinner(32px); }
-.loading-spinner-medium { .loading-spinner(48px); }
-.loading-spinner-large  { .loading-spinner(64px); }
-
-
-
+.loading-spinner-tiny {
+  .loading-spinner(16px);
+  &::before,
+  &::after {
+    border-width: 1px;
+  }
+}
+.loading-spinner-small {
+  .loading-spinner(32px);
+}
+.loading-spinner-medium {
+  .loading-spinner(48px);
+}
+.loading-spinner-large {
+  .loading-spinner(64px);
+}
 
 // Progress Bar ----------------------
 
@@ -77,18 +93,28 @@ progress {
 
   // Is buffering (when no value is set)
   &:indeterminate {
-    background-image:
-       linear-gradient(-45deg, transparent 33%, @progress-buffer-color 33%,
-                               @progress-buffer-color 66%, transparent 66%);
-    background-size: 25px @progress-height, 100% 100%, 100% 100%;
+    background-image: linear-gradient(
+      -45deg,
+      transparent 33%,
+      @progress-buffer-color 33%,
+      @progress-buffer-color 66%,
+      transparent 66%
+    );
+    background-size:
+      25px @progress-height,
+      100% 100%,
+      100% 100%;
 
     // Plays animation for 1min (12runs) at normal speed,
     // then slows down frame-rate for 9mins (108runs) to limit CPU usage
-    -webkit-animation: progress-buffering 5s linear 12,
-                       progress-buffering 5s 60s steps(10) 108;
+    -webkit-animation:
+      progress-buffering 5s linear 12,
+      progress-buffering 5s 60s steps(10) 108;
   }
 }
 
 @-webkit-keyframes progress-buffering {
-   100% { background-position: -100px 0px; }
+  100% {
+    background-position: -100px 0px;
+  }
 }

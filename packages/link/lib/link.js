@@ -1,15 +1,13 @@
-const url = require('url');
-const { shell } = require('electron');
-const _ = require('underscore-plus');
+const url = require("url");
+const { shell } = require("electron");
+const _ = require("underscore-plus");
 
 const LINK_SCOPE_REGEX = /markup\.underline\.link/;
 
 module.exports = {
   activate() {
-    this.commandDisposable = atom.commands.add(
-      'atom-text-editor',
-      'link:open',
-      () => this.openLink()
+    this.commandDisposable = atom.commands.add("atom-text-editor", "link:open", () =>
+      this.openLink(),
     );
   },
 
@@ -24,12 +22,12 @@ module.exports = {
     let link = this.linkUnderCursor(editor);
     if (link == null) return;
 
-    if (editor.getGrammar().scopeName === 'source.gfm') {
+    if (editor.getGrammar().scopeName === "source.gfm") {
       link = this.linkForName(editor, link);
     }
 
     const { protocol } = url.parse(link);
-    if (protocol === 'http:' || protocol === 'https:' || protocol === 'atom:') {
+    if (protocol === "http:" || protocol === "https:" || protocol === "atom:") {
       shell.openExternal(link);
     }
   },
@@ -53,11 +51,7 @@ module.exports = {
   // Returns a {String} link or undefined if no link found.
   linkAtPosition(editor, bufferPosition) {
     const token = editor.tokenForBufferPosition(bufferPosition);
-    if (
-      token &&
-      token.value &&
-      token.scopes.some(scope => LINK_SCOPE_REGEX.test(scope))
-    ) {
+    if (token && token.value && token.scopes.some((scope) => LINK_SCOPE_REGEX.test(scope))) {
       return token.value;
     }
   },
@@ -75,18 +69,18 @@ module.exports = {
   // Returns a {String} link
   linkForName(editor, linkName) {
     let link = linkName;
-    const regex = new RegExp(
-      `^\\s*\\[${_.escapeRegExp(linkName)}\\]\\s*:\\s*(.+)$`,
-      'g'
-    );
+    const regex = new RegExp(`^\\s*\\[${_.escapeRegExp(linkName)}\\]\\s*:\\s*(.+)$`, "g");
     editor.backwardsScanInBufferRange(
       regex,
-      [[0, 0], [Infinity, Infinity]],
+      [
+        [0, 0],
+        [Infinity, Infinity],
+      ],
       ({ match, stop }) => {
         link = match[1];
         stop();
-      }
+      },
     );
     return link;
-  }
+  },
 };

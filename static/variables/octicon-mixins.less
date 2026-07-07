@@ -7,7 +7,7 @@
 }
 
 .icon(@size, @display: inline-block) {
-  font-family: 'Octicons Regular';
+  font-family: "Octicons Regular";
   font-weight: normal;
   font-style: normal;
   display: @display;
@@ -21,35 +21,35 @@
 .octicon(@name, @size: 16px) {
   &::before {
     .icon(@size);
-    content: @@name
+    content: @@name;
   }
 }
 
 .mega-octicon(@name, @size: 32px) {
   &::before {
     .icon(@size);
-    content: @@name
+    content: @@name;
   }
 }
 
 // keep for backwards compatibility
 .octicon-font-legacy() {
-  font-family: 'Octicons Regular';
+  font-family: "Octicons Regular";
   src: url("icons/octicons-2.1.2.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }
 
 .octicon-font() {
-  font-family: 'Octicons Regular';
+  font-family: "Octicons Regular";
   src: url("icons/octicons.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }
 
 .atomicon-font() {
-  font-family: 'Octicons Regular';
-  src: url('icons/atomicons.woff') format('woff');
+  font-family: "Octicons Regular";
+  src: url("icons/atomicons.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }

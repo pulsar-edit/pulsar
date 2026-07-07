@@ -13,12 +13,13 @@ status-bar {
   white-space: nowrap;
   min-width: -webkit-min-content;
 
-  a, a:hover {
+  a,
+  a:hover {
     color: @text-color;
   }
 
   .flexbox-repaint-hack {
-    padding: 0 (@component-line-height/2);
+    padding: 0 (@component-line-height / 2);
     position: absolute;
     top: 0;
     right: 0;
@@ -78,7 +79,7 @@ status-bar {
   }
 
   .file-info.buffer-modified::after {
-    content: '*';
+    content: "*";
   }
 
   // All icons are smaller than normal (normal is 16px)

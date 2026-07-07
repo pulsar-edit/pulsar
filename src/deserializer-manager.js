@@ -1,4 +1,4 @@
-const { Disposable } = require('event-kit');
+const { Disposable } = require("event-kit");
 
 // Extended: Manages the deserializers used for serialized state
 //
@@ -62,19 +62,14 @@ module.exports = class DeserializerManager {
 
     const deserializer = this.get(state);
     if (deserializer) {
-      let stateVersion =
-        (typeof state.get === 'function' && state.get('version')) ||
-        state.version;
+      let stateVersion = (typeof state.get === "function" && state.get("version")) || state.version;
 
-      if (
-        deserializer.version != null &&
-        deserializer.version !== stateVersion
-      ) {
+      if (deserializer.version != null && deserializer.version !== stateVersion) {
         return;
       }
       return deserializer.deserialize(state, this.atomEnvironment);
     } else {
-      return console.warn('No deserializer found for', state);
+      return console.warn("No deserializer found for", state);
     }
   }
 
@@ -87,8 +82,7 @@ module.exports = class DeserializerManager {
     }
 
     let stateDeserializer =
-      (typeof state.get === 'function' && state.get('deserializer')) ||
-      state.deserializer;
+      (typeof state.get === "function" && state.get("deserializer")) || state.deserializer;
 
     return this.deserializers[stateDeserializer];
   }

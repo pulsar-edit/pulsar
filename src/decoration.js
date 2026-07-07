@@ -1,4 +1,4 @@
-const { Emitter } = require('event-kit');
+const { Emitter } = require("event-kit");
 
 let idCounter = 0;
 const nextId = () => idCounter++;
@@ -6,11 +6,8 @@ const nextId = () => idCounter++;
 const normalizeDecorationProperties = function (decoration, decorationParams) {
   decorationParams.id = decoration.id;
 
-  if (
-    decorationParams.type === 'line-number' &&
-    decorationParams.gutterName == null
-  ) {
-    decorationParams.gutterName = 'line-number';
+  if (decorationParams.type === "line-number" && decorationParams.gutterName == null) {
+    decorationParams.gutterName = "line-number";
   }
 
   if (decorationParams.order == null) {
@@ -60,17 +57,14 @@ module.exports = class Decoration {
         return true;
       }
 
-      if (
-        type === 'gutter' &&
-        decorationProperties.type.includes('line-number')
-      ) {
+      if (type === "gutter" && decorationProperties.type.includes("line-number")) {
         return true;
       }
 
       return false;
     } else {
-      if (type === 'gutter') {
-        return ['gutter', 'line-number'].includes(decorationProperties.type);
+      if (type === "gutter") {
+        return ["gutter", "line-number"].includes(decorationProperties.type);
       } else {
         return type === decorationProperties.type;
       }
@@ -88,9 +82,7 @@ module.exports = class Decoration {
     this.id = nextId();
     this.setProperties(properties);
     this.destroyed = false;
-    this.markerDestroyDisposable = this.marker.onDidDestroy(() =>
-      this.destroy()
-    );
+    this.markerDestroyDisposable = this.marker.onDidDestroy(() => this.destroy());
   }
 
   // Essential: Destroy this marker decoration.
@@ -105,7 +97,7 @@ module.exports = class Decoration {
     this.markerDestroyDisposable = null;
     this.destroyed = true;
     this.decorationManager.didDestroyMarkerDecoration(this);
-    this.emitter.emit('did-destroy');
+    this.emitter.emit("did-destroy");
     return this.emitter.dispose();
   }
 
@@ -126,7 +118,7 @@ module.exports = class Decoration {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeProperties(callback) {
-    return this.emitter.on('did-change-properties', callback);
+    return this.emitter.on("did-change-properties", callback);
   }
 
   // Essential: Invoke the given callback when the {Decoration} is destroyed
@@ -135,7 +127,7 @@ module.exports = class Decoration {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy(callback) {
-    return this.emitter.once('did-destroy', callback);
+    return this.emitter.once("did-destroy", callback);
   }
 
   /*
@@ -191,9 +183,9 @@ module.exports = class Decoration {
       this.decorationManager.decorationDidChangeType(this);
     }
     this.decorationManager.emitDidUpdateDecorations();
-    return this.emitter.emit('did-change-properties', {
+    return this.emitter.emit("did-change-properties", {
       oldProperties,
-      newProperties
+      newProperties,
     });
   }
 
@@ -230,6 +222,6 @@ module.exports = class Decoration {
     this.properties.flashClass = klass;
     this.properties.flashDuration = duration;
     this.decorationManager.emitDidUpdateDecorations();
-    return this.emitter.emit('did-flash');
+    return this.emitter.emit("did-flash");
   }
 };

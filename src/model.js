@@ -1,7 +1,6 @@
 var nextInstanceId = 1;
 
 module.exports = class Model {
-
   static resetNextInstanceId() {
     nextInstanceId = 1;
   }
@@ -37,5 +36,4 @@ module.exports = class Model {
   isDestroyed() {
     return !this.isAlive();
   }
-
 };

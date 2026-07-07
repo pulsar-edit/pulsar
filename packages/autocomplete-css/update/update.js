@@ -103,7 +103,7 @@ async function update(params) {
   const completions = {
     tags: tags,
     properties: properties,
-    pseudoSelectors: pseudoSelectors
+    pseudoSelectors: pseudoSelectors,
   };
 
   completions.properties = sortByLength(completions.properties);
@@ -128,7 +128,7 @@ async function update(params) {
       if (showEmpty) {
         console.log(prop);
       }
-      count ++;
+      count++;
     }
   }
 
@@ -137,7 +137,7 @@ async function update(params) {
   if (count !== 0) {
     console.log("It is not required to fix the above empty completions issue.");
     console.log("Use `node update.js --show-empty` to show the empty property names.");
-  };
+  }
 }
 
 function sortByLength(obj) {
@@ -192,8 +192,7 @@ async function sortByPopularity(obj) {
     }
 
     return newObj;
-
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     process.exit(1);
   }
@@ -207,19 +206,17 @@ async function buildProperties(css) {
   let propertyObj = {};
 
   for (const spec in css) {
-
     // For now we will only retain `properties` in these files. At a later time
     // we can revist and looking at adding `atrules`
     if (Array.isArray(css[spec].properties)) {
       for (const prop of css[spec].properties) {
-
         const propDescription = await getDescriptionOfProp(prop.name);
         const propValues = getValuesOfProp(prop.value, css);
 
         if (typeof propertyObj[prop.name] !== "object") {
           propertyObj[prop.name] = {
             values: dedupPropValues(propValues),
-            description: propDescription
+            description: propDescription,
           };
         } else {
           // So seems this happens way more often than assumed.
@@ -229,7 +226,7 @@ async function buildProperties(css) {
           if (propertyObj[prop.name].values.length < propValues.length) {
             propertyObj[prop.name] = {
               values: dedupPropValues(propValues),
-              description: propDescription
+              description: propDescription,
             };
           }
         }
@@ -237,7 +234,6 @@ async function buildProperties(css) {
         // inaccurate. As there are duplicate `display` definitions.
         // The first containing all the data we want, and the later containing nothing.
         // This protects against overriding previously defined definitions.
-
       }
     } // else continue our loop
   }
@@ -253,9 +249,9 @@ async function getDescriptionOfProp(name) {
   // While this seems strange, it's because some selectors are part of other
   // specs and may not be worth mentioning standalone.
   let file;
-  let filePath = [ "css", "svg/attribute", "svg/element" ].map(path =>
-    `./content/files/en-us/web/${path}/${name}/index.md`
-  ).find(f => fs.existsSync(f));
+  let filePath = ["css", "svg/attribute", "svg/element"]
+    .map((path) => `./content/files/en-us/web/${path}/${name}/index.md`)
+    .find((f) => fs.existsSync(f));
 
   if (filePath) {
     file = fs.readFileSync(filePath, { encoding: "utf8" });
@@ -266,24 +262,29 @@ async function getDescriptionOfProp(name) {
     let breaks = file.split("---");
 
     // The first two breaks should be the yaml metadata block
-    let data = breaks[2].replace(/\{\{\S+\}\}\{\{\S+\}\}/gm, "")
-                        .replace(/\{\{CSSRef\}\}/gm, "")
-                        .replace(/\{\{SVGRef\}\}/gm, "");
+    let data = breaks[2]
+      .replace(/\{\{\S+\}\}\{\{\S+\}\}/gm, "")
+      .replace(/\{\{CSSRef\}\}/gm, "")
+      .replace(/\{\{SVGRef\}\}/gm, "");
     let summaryRaw = data.split("\n");
     // In case the first few lines is an empty line break
     for (let i = 0; i < summaryRaw.length; i++) {
       // Filtering the starting character protects against collecting accidental
       // warnings or other notices within the MDN site.
-      if (summaryRaw[i].length > 1 && !summaryRaw[i].startsWith("> ") && !summaryRaw[i].startsWith("« ")) {
+      if (
+        summaryRaw[i].length > 1 &&
+        !summaryRaw[i].startsWith("> ") &&
+        !summaryRaw[i].startsWith("« ")
+      ) {
         return summaryRaw[i]
-          .replace(/\{\{\S+\("(\S+)"\)\}\}/g, '$1')
+          .replace(/\{\{\S+\("(\S+)"\)\}\}/g, "$1")
           .replace(/\*/g, "")
           .replace(/\`/g, "")
           .replace(/\{/g, "")
           .replace(/\}/g, "")
           .replace(/\"/g, "")
           .replace(/\_/g, "")
-          .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, '$1');
+          .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, "$1");
       }
     }
 
@@ -291,7 +292,9 @@ async function getDescriptionOfProp(name) {
     // description, lets check if we have a manual entry for this item. So we
     // can warn of that and allow that manual entry to be deleted.
     if (manualPropertyDesc[name]) {
-      console.log(`A manual property description has become outdated and should be removed: '${name}'`);
+      console.log(
+        `A manual property description has become outdated and should be removed: '${name}'`,
+      );
     }
   } else {
     // A document doesn't yet exist, let's ensure it's not in our manual list first
@@ -304,14 +307,14 @@ async function getDescriptionOfProp(name) {
   }
 }
 
-function getValuesOfProp(value, allValues, appendImplicitValues=true) {
+function getValuesOfProp(value, allValues, appendImplicitValues = true) {
   // value holds the value string of the values we expect
   // allValues holds all of the values that apply to the spec
   // Like mentioned above `value` = "value1 | value2 | <valueGroupName>"
   // https://developer.mozilla.org/en-US/docs/Web/CSS/Value_definition_syntax
 
   // We will at least supply the implicitly defined keywords that apply to all CSS properties
-  let implicitValues = [ "inherit", "initial", "unset" ];
+  let implicitValues = ["inherit", "initial", "unset"];
 
   if (!value) {
     if (appendImplicitValues === true) {
@@ -319,7 +322,7 @@ function getValuesOfProp(value, allValues, appendImplicitValues=true) {
     }
 
     return [];
-  };
+  }
 
   let values = [];
   let parser = new CSSParser(value);
@@ -342,10 +345,9 @@ function getValuesOfProp(value, allValues, appendImplicitValues=true) {
   if (appendImplicitValues === true) {
     // Add the implicit values to the end...
     values = values.concat(implicitValues);
-  };
+  }
 
   return values;
-
 }
 
 function parseValueGroup(valueGroupName, allValues) {
@@ -383,7 +385,11 @@ function parseValueGroup(valueGroupName, allValues) {
     }
   }
 
-  return getValuesOfProp(resolvedValueGroupString, allValues=null, appendImplicitValues=false);
+  return getValuesOfProp(
+    resolvedValueGroupString,
+    (allValues = null),
+    (appendImplicitValues = false),
+  );
 }
 
 async function getTagsHTML() {
@@ -411,7 +417,9 @@ async function getPseudoSelectors() {
   // collect it manually.
 
   try {
-    const res = await superagent.get("https://github.com/w3c/webref/raw/main/ed/css/selectors.json");
+    const res = await superagent.get(
+      "https://github.com/w3c/webref/raw/main/ed/css/selectors.json",
+    );
     if (res.status !== 200) {
       console.error(res);
       process.exit(1);
@@ -425,7 +433,9 @@ async function getPseudoSelectors() {
       newObj[item.name] = { description: item.prose ?? "" };
     }
 
-    const res2 = await superagent.get("https://github.com/w3c/webref/raw/main/ed/css/css-pseudo.json");
+    const res2 = await superagent.get(
+      "https://github.com/w3c/webref/raw/main/ed/css/css-pseudo.json",
+    );
     if (res2.status !== 200) {
       console.error(res2);
       process.exit(1);
@@ -438,7 +448,7 @@ async function getPseudoSelectors() {
     }
 
     return newObj;
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     process.exit(1);
   }

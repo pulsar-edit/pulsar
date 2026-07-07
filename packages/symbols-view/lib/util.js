@@ -1,6 +1,6 @@
-const el = require('./element-builder');
+const el = require("./element-builder");
 
-const murmur = require('murmurhash-js');
+const murmur = require("murmurhash-js");
 const BADGE_TEXT_HASH_MAP = new Map();
 
 /**
@@ -16,7 +16,7 @@ const BADGE_TEXT_HASH_MAP = new Map();
  */
 function isIterable(obj) {
   if (obj === null || obj === undefined) return false;
-  return typeof obj[Symbol.iterator] === 'function';
+  return typeof obj[Symbol.iterator] === "function";
 }
 
 /**
@@ -49,7 +49,7 @@ function getBadgeTextVariant(text) {
   if (BADGE_TEXT_HASH_MAP.has(text)) {
     return BADGE_TEXT_HASH_MAP.get(text);
   }
-  let hash = murmur.murmur3(text, 'symbols-view').toString(16);
+  let hash = murmur.murmur3(text, "symbols-view").toString(16);
   let variantType = hash.charAt(hash.length - 1);
   BADGE_TEXT_HASH_MAP.set(text, variantType);
   return variantType;
@@ -83,13 +83,13 @@ function migrateOldConfigIfNeeded({ force = false } = {}) {
   if (!force) {
     // Look up the schema for `symbols-view` and make sure that the deprecated
     // setting isn't present.
-    let schema = atom.config.getSchema('symbols-view');
-    if (schema?.type === 'any') {
+    let schema = atom.config.getSchema("symbols-view");
+    if (schema?.type === "any") {
       // We might be in a testing environment.
       return;
     }
 
-    if (!schema.properties || ('useEditorGrammarAsCtagsLanguage' in schema.properties)) {
+    if (!schema.properties || "useEditorGrammarAsCtagsLanguage" in schema.properties) {
       // This means the setting is still expected as part of `symbols-view` and
       // should not be migrated.
       return;
@@ -101,17 +101,15 @@ function migrateOldConfigIfNeeded({ force = false } = {}) {
   // migrated to `symbol-provider-ctags.useEditorGrammarAsCtagsLanguage`.
 
   // We're only interested in the value we get directly from the config file.
-  let settings = atom.config.get(
-    'symbols-view',
-    { sources: [atom.config.getUserConfigPath()] }
-  ) || {};
+  let settings =
+    atom.config.get("symbols-view", { sources: [atom.config.getUserConfigPath()] }) || {};
 
-  if ('useEditorGrammarAsCtagsLanguage' in settings) {
+  if ("useEditorGrammarAsCtagsLanguage" in settings) {
     atom.config.set(
-      'symbol-provider-ctags.useEditorGrammarAsCtagsLanguage',
-      settings.useEditorGrammarAsCtagsLanguage
+      "symbol-provider-ctags.useEditorGrammarAsCtagsLanguage",
+      settings.useEditorGrammarAsCtagsLanguage,
     );
-    atom.config.unset('symbols-view.useEditorGrammarAsCtagsLanguage');
+    atom.config.unset("symbols-view.useEditorGrammarAsCtagsLanguage");
   }
 
   // 99% of users won't care that we've migrated this setting, but the other 1%
@@ -128,8 +126,8 @@ function migrateOldConfigIfNeeded({ force = false } = {}) {
   let sources = [];
   for (let { properties, source } of propertySets) {
     if (
-      properties['symbols-view'] &&
-      ('useEditorGrammarAsCtagsLanguage' in properties['symbols-view'])
+      properties["symbols-view"] &&
+      "useEditorGrammarAsCtagsLanguage" in properties["symbols-view"]
     ) {
       sources.push(source);
     }
@@ -137,19 +135,16 @@ function migrateOldConfigIfNeeded({ force = false } = {}) {
 
   if (sources.length > 0) {
     sources = Array.from(new Set(sources));
-    let overrideSources = sources.map(s => `* \`${s}\``).join('\n');
+    let overrideSources = sources.map((s) => `* \`${s}\``).join("\n");
 
-    atom.notifications.addInfo(
-      `Setting migrated`,
-      {
-        description: `${MIGRATED_SETTINGS_MESSAGE}
+    atom.notifications.addInfo(`Setting migrated`, {
+      description: `${MIGRATED_SETTINGS_MESSAGE}
 
 Detected overrides in the following locations:
 
 ${overrideSources}`,
-        dismissable: true
-      }
-    );
+      dismissable: true,
+    });
   }
 }
 
@@ -157,5 +152,5 @@ module.exports = {
   badge,
   isIterable,
   migrateOldConfigIfNeeded,
-  timeout
+  timeout,
 };

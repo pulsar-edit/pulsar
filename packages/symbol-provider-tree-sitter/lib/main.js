@@ -1,16 +1,15 @@
-
-const TreeSitterProvider = require('./tree-sitter-provider');
+const TreeSitterProvider = require("./tree-sitter-provider");
 
 module.exports = {
-  activate () {
+  activate() {
     this.provider = new TreeSitterProvider();
   },
 
-  deactivate () {
+  deactivate() {
     this.provider?.destroy?.();
   },
 
-  provideSymbols () {
+  provideSymbols() {
     return this.provider;
-  }
+  },
 };

@@ -1,12 +1,12 @@
-const Whitespace = require('./whitespace')
+const Whitespace = require("./whitespace");
 
 module.exports = {
-  activate () {
-    this.whitespace = new Whitespace()
+  activate() {
+    this.whitespace = new Whitespace();
   },
 
-  deactivate () {
-    if (this.whitespace) this.whitespace.destroy()
-    this.whitespace = null
-  }
-}
+  deactivate() {
+    if (this.whitespace) this.whitespace.destroy();
+    this.whitespace = null;
+  },
+};

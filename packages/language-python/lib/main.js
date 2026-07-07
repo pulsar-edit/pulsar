@@ -17,14 +17,14 @@ exports.activate = function () {
   //   },
   //   languageScope: null
   // });
-}
+};
 
 exports.consumeHyperlinkInjection = (hyperlink) => {
-  hyperlink.addInjectionPoint('source.python', {
-    types: ['comment', 'string_content']
+  hyperlink.addInjectionPoint("source.python", {
+    types: ["comment", "string_content"],
   });
 };
 
 exports.consumeTodoInjection = (todo) => {
-  todo.addInjectionPoint('source.python', { types: ['comment'] });
+  todo.addInjectionPoint("source.python", { types: ["comment"] });
 };

@@ -293,7 +293,6 @@ type ServiceProvider = {
 
 ```
 
-
 ## Registering your provider with `autocomplete-plus`
 
 In your `package.json`, add:
@@ -329,7 +328,6 @@ module.exports = {
 }
 ```
 
-
 ## Tips
 
 `autocomplete-plus` guesses at the “prefix” — that is, the range of characters before the cursor that might be part of whatever suggestion you will insert.
@@ -338,24 +336,20 @@ For some languages, you may need to override this by specifying a `replacementPr
 
 ```js
 let provider = {
-  selector: 'source.js',
+  selector: "source.js",
   getSuggestions({ editor, bufferPosition }) {
-    let prefix = this.getPrefix(editor, bufferPosition)
+    let prefix = this.getPrefix(editor, bufferPosition);
   },
 
   getPrefix(editor, bufferPosition) {
     // Whatever your prefix regex might be.
-    let regex = /[\w0-9_-]+$/
+    let regex = /[\w0-9_-]+$/;
 
     // Get the text for the line up to the triggered buffer position.
-    let line = line = editor.getTextInRange([
-      [bufferPosition.row, 0],
-      bufferPosition
-    ])
+    let line = (line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]));
 
     // Match the regex to the line, and return the match (if any).
-    return line.match(regex)?.[0] ?? ''
-  }
-
-}
+    return line.match(regex)?.[0] ?? "";
+  },
+};
 ```

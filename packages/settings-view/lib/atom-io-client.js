@@ -1,14 +1,16 @@
-const fs = require('fs-plus');
-const path = require('path');
-const remote = require('@electron/remote');
-const glob = require('glob');
-const request = require('request');
+const fs = require("fs-plus");
+const path = require("path");
+const remote = require("@electron/remote");
+const glob = require("glob");
+const request = require("request");
 
 module.exports = class AtomIoClient {
   constructor(packageManager, baseURL) {
     this.packageManager = packageManager;
     this.baseURL = baseURL;
-    if (this.baseURL == null) { this.baseURL = 'https://api.pulsar-edit.dev/api/'; }
+    if (this.baseURL == null) {
+      this.baseURL = "https://api.pulsar-edit.dev/api/";
+    }
     // 5 hour expiry
     this.expiry = 1000 * 60 * 60 * 5;
     this.createAvatarCache();
@@ -19,7 +21,9 @@ module.exports = class AtomIoClient {
   avatar(login, callback) {
     this.cachedAvatar(login, (err, cached) => {
       let stale;
-      if (cached) { stale = (Date.now() - parseInt(cached.split('-').pop())) > this.expiry; }
+      if (cached) {
+        stale = Date.now() - parseInt(cached.split("-").pop()) > this.expiry;
+      }
       if (cached && (!stale || !this.online())) {
         return callback(null, cached);
       } else {
@@ -42,7 +46,7 @@ module.exports = class AtomIoClient {
 
   featuredPackages(callback) {
     // TODO clean up caching copypasta
-    const data = this.fetchFromCache('packages/featured');
+    const data = this.fetchFromCache("packages/featured");
     if (data) {
       return callback(null, data);
     } else {
@@ -52,7 +56,7 @@ module.exports = class AtomIoClient {
 
   featuredThemes(callback) {
     // TODO clean up caching copypasta
-    const data = this.fetchFromCache('themes/featured');
+    const data = this.fetchFromCache("themes/featured");
     if (data) {
       return callback(null, data);
     } else {
@@ -63,28 +67,32 @@ module.exports = class AtomIoClient {
   getFeatured(loadThemes, callback) {
     // apm already does this, might as well use it instead of request i guess? The
     // downside is that I need to repeat caching logic here.
-    this.packageManager.getFeatured(loadThemes)
-      .then(packages => {
+    this.packageManager
+      .getFeatured(loadThemes)
+      .then((packages) => {
         // copypasta from below
-        const key = loadThemes ? 'themes/featured' : 'packages/featured';
+        const key = loadThemes ? "themes/featured" : "packages/featured";
         const cached = this.deepCache(key, packages);
-          // data: packages
-          // createdOn: Date.now()
+        // data: packages
+        // createdOn: Date.now()
         // localStorage.setItem(@cacheKeyForPath(key), JSON.stringify(cached))
         // end copypasta
         return callback(null, packages);
-    }).catch(error => callback(error, null));
+      })
+      .catch((error) => callback(error, null));
   }
 
   request(path, callback) {
     const options = {
       url: `${this.baseURL}${path}`,
-      headers: {'User-Agent': navigator.userAgent},
-      gzip: true
+      headers: { "User-Agent": navigator.userAgent },
+      gzip: true,
     };
 
     request(options, (err, res, body) => {
-      if (err) { return callback(err); }
+      if (err) {
+        return callback(err);
+      }
 
       try {
         // NOTE: request's json option does not populate err if parsing fails,
@@ -107,11 +115,11 @@ module.exports = class AtomIoClient {
   deepCache(path, body) {
     const cached = {
       data: body,
-      createdOn: Date.now()
+      createdOn: Date.now(),
     };
     localStorage.setItem(this.cacheKeyForPath(path), JSON.stringify(cached));
-    if(body instanceof Array) {
-      body.forEach(child => this.deepCache(`packages/${child.name}`, child));
+    if (body instanceof Array) {
+      body.forEach((child) => this.deepCache(`packages/${child.name}`, child));
     }
     return cached;
   }
@@ -129,7 +137,7 @@ module.exports = class AtomIoClient {
   fetchFromCache(packagePath) {
     let cached = localStorage.getItem(this.cacheKeyForPath(packagePath));
     cached = cached ? this.parseJSON(cached) : undefined;
-    if ((cached != null) && (!this.online() || ((Date.now() - cached.createdOn) < this.expiry))) {
+    if (cached != null && (!this.online() || Date.now() - cached.createdOn < this.expiry)) {
       return cached.data;
     } else {
       // falsy data means "try to hit the network"
@@ -147,12 +155,15 @@ module.exports = class AtomIoClient {
 
   cachedAvatar(login, callback) {
     glob(this.avatarGlob(login), (err, files) => {
-      if (err) { return callback(err); }
+      if (err) {
+        return callback(err);
+      }
       files.sort().reverse();
       for (let imagePath of Array.from(files)) {
         const filename = path.basename(imagePath);
-        const array = filename.split('-'), createdOn = array[array.length - 1];
-        if ((Date.now() - parseInt(createdOn)) < this.expiry) {
+        const array = filename.split("-"),
+          createdOn = array[array.length - 1];
+        if (Date.now() - parseInt(createdOn) < this.expiry) {
           return callback(null, imagePath);
         }
       }
@@ -171,18 +182,24 @@ module.exports = class AtomIoClient {
       const imagePath = this.avatarPath(login);
       const requestObject = {
         url: `https://avatars.githubusercontent.com/${login}`,
-        headers: {'User-Agent': navigator.userAgent}
+        headers: { "User-Agent": navigator.userAgent },
       };
-      return request.head(requestObject, function(error, response, body) {
-        if ((error != null) || (response.statusCode !== 200) || !response.headers['content-type'].startsWith('image/')) {
+      return request.head(requestObject, function (error, response, body) {
+        if (
+          error != null ||
+          response.statusCode !== 200 ||
+          !response.headers["content-type"].startsWith("image/")
+        ) {
           return callback(error);
         } else {
           const writeStream = fs.createWriteStream(imagePath);
-          writeStream.on('finish', () => callback(null, imagePath));
-          writeStream.on('error', function(error) {
+          writeStream.on("finish", () => callback(null, imagePath));
+          writeStream.on("error", function (error) {
             writeStream.close();
             try {
-              if (fs.existsSync(imagePath)) { fs.unlinkSync(imagePath); }
+              if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+              }
             } catch (error1) {}
             return callback(error);
           });
@@ -197,24 +214,29 @@ module.exports = class AtomIoClient {
   // cache updates in place, so it doesn't need to be purged.
 
   expireAvatarCache() {
-    const deleteAvatar = child => {
+    const deleteAvatar = (child) => {
       const avatarPath = path.join(this.getCachePath(), child);
-      fs.unlink(avatarPath, function(error) {
-        if (error && (error.code !== 'ENOENT')) { // Ignore cache paths that don't exist
+      fs.unlink(avatarPath, function (error) {
+        if (error && error.code !== "ENOENT") {
+          // Ignore cache paths that don't exist
           return console.warn(`Error deleting avatar (${error.code}): ${avatarPath}`);
         }
       });
     };
 
-    return fs.readdir(this.getCachePath(), function(error, _files) {
+    return fs.readdir(this.getCachePath(), function (error, _files) {
       let key;
-      if (_files == null) { _files = []; }
+      if (_files == null) {
+        _files = [];
+      }
       const files = {};
       for (let filename of Array.from(_files)) {
-        const parts = filename.split('-');
+        const parts = filename.split("-");
         const stamp = parts.pop();
-        key = parts.join('-');
-        if (files[key] == null) { files[key] = []; }
+        key = parts.join("-");
+        if (files[key] == null) {
+          files[key] = [];
+        }
         files[key].push(`${key}-${stamp}`);
       }
 
@@ -233,23 +255,25 @@ module.exports = class AtomIoClient {
   }
 
   getCachePath() {
-    return this.cachePath != null ? this.cachePath : (this.cachePath = path.join(remote.app.getPath('userData'), 'Cache', 'settings-view'));
+    return this.cachePath != null
+      ? this.cachePath
+      : (this.cachePath = path.join(remote.app.getPath("userData"), "Cache", "settings-view"));
   }
 
   search(query, options) {
-    const qs = {q: query};
+    const qs = { q: query };
 
     if (options.themes) {
-      qs.filter = 'theme';
+      qs.filter = "theme";
     } else if (options.packages) {
-      qs.filter = 'package';
+      qs.filter = "package";
     }
 
     options = {
       url: `${this.baseURL}packages/search`,
-      headers: {'User-Agent': navigator.userAgent},
+      headers: { "User-Agent": navigator.userAgent },
       qs,
-      gzip: true
+      gzip: true,
     };
 
     return new Promise((resolve, reject) => {
@@ -266,18 +290,26 @@ module.exports = class AtomIoClient {
             const body = this.parseJSON(textBody);
             if (body.filter) {
               resolve(
-                body.filter(pkg => (pkg.releases != null ? pkg.releases.latest : undefined) != null)
-                    .map(({readme, metadata, downloads, stargazers_count, repository, badges}) => Object.assign(metadata, {readme, downloads, stargazers_count, badges, repository: repository.url}))
+                body
+                  .filter((pkg) => (pkg.releases != null ? pkg.releases.latest : undefined) != null)
+                  .map(({ readme, metadata, downloads, stargazers_count, repository, badges }) =>
+                    Object.assign(metadata, {
+                      readme,
+                      downloads,
+                      stargazers_count,
+                      badges,
+                      repository: repository.url,
+                    }),
+                  ),
               );
+            } else {
             }
-            else {}
             error = new Error(`Searching for \u201C${query}\u201D failed.\n`);
             error.stderr = "API returned: " + textBody;
             return reject(error);
-
           } catch (e) {
             error = new Error(`Searching for \u201C${query}\u201D failed.`);
-            error.stderr = e.message + '\n' + textBody;
+            error.stderr = e.message + "\n" + textBody;
             return reject(error);
           }
         }

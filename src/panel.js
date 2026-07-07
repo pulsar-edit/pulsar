@@ -1,4 +1,4 @@
-const { Emitter } = require('event-kit');
+const { Emitter } = require("event-kit");
 
 // Extended: A container representing a panel on the edges of the editor window.
 // You should not create a `Panel` directly, instead use {Workspace::addTopPanel}
@@ -29,16 +29,15 @@ module.exports = class Panel {
     this.destroyed = true;
     this.hide();
     if (this.element) this.element.remove();
-    this.emitter.emit('did-destroy', this);
+    this.emitter.emit("did-destroy", this);
     return this.emitter.dispose();
   }
 
   getElement() {
     if (!this.element) {
-      this.element = document.createElement('atom-panel');
-      if (!this.visible) this.element.style.display = 'none';
-      if (this.className)
-        this.element.classList.add(...this.className.split(' '));
+      this.element = document.createElement("atom-panel");
+      if (!this.visible) this.element.style.display = "none";
+      if (this.className) this.element.classList.add(...this.className.split(" "));
       this.element.appendChild(this.viewRegistry.getView(this.item));
     }
     return this.element;
@@ -55,7 +54,7 @@ module.exports = class Panel {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeVisible(callback) {
-    return this.emitter.on('did-change-visible', callback);
+    return this.emitter.on("did-change-visible", callback);
   }
 
   // Public: Invoke the given callback when the pane is destroyed.
@@ -65,7 +64,7 @@ module.exports = class Panel {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy(callback) {
-    return this.emitter.once('did-destroy', callback);
+    return this.emitter.once("did-destroy", callback);
   }
 
   /*
@@ -95,8 +94,8 @@ module.exports = class Panel {
   hide() {
     let wasVisible = this.visible;
     this.visible = false;
-    if (this.element) this.element.style.display = 'none';
-    if (wasVisible) this.emitter.emit('did-change-visible', this.visible);
+    if (this.element) this.element.style.display = "none";
+    if (wasVisible) this.emitter.emit("did-change-visible", this.visible);
   }
 
   // Public: Show this panel
@@ -104,6 +103,6 @@ module.exports = class Panel {
     let wasVisible = this.visible;
     this.visible = true;
     if (this.element) this.element.style.display = null;
-    if (!wasVisible) this.emitter.emit('did-change-visible', this.visible);
+    if (!wasVisible) this.emitter.emit("did-change-visible", this.visible);
   }
 };

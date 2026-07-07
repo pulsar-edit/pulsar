@@ -1,11 +1,13 @@
-const { Point } = require('atom');
+const { Point } = require("atom");
 
 function resolveNodeDescriptor(node, descriptor) {
-  let parts = descriptor.split('.');
+  let parts = descriptor.split(".");
   let result = node;
   while (result !== null && parts.length > 0) {
     let part = parts.shift();
-    if (!result[part]) { return null; }
+    if (!result[part]) {
+      return null;
+    }
     result = result[part];
   }
   return result;
@@ -16,7 +18,7 @@ const PatternCache = {
     this.patternCache ??= new Map();
     let regex = this.patternCache.get(pattern);
     if (!regex) {
-      regex = new RegExp(pattern, 'g');
+      regex = new RegExp(pattern, "g");
       this.patternCache.set(pattern, regex);
     }
     return regex;
@@ -27,7 +29,6 @@ const PatternCache = {
   },
 };
 
-
 // Assign a default icon type for each tag — or what LSP calls “kind.” This
 // list is copied directly from the LSP spec's exhaustive list of potential
 // symbol kinds:
@@ -35,63 +36,62 @@ const PatternCache = {
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#symbolKind
 function iconForTag(tag) {
   switch (tag) {
-    case 'file':
-      return 'icon-file';
-    case 'module':
-      return 'icon-database';
-    case 'namespace':
-      return 'icon-tag';
-    case 'package':
-      return 'icon-package';
-    case 'class':
-      return 'icon-puzzle';
-    case 'method':
-      return 'icon-gear';
-    case 'property':
-      return 'icon-primitive-dot';
-    case 'field':
-      return 'icon-primitive-dot';
-    case 'constructor':
-      return 'icon-tools';
-    case 'enum':
-      return 'icon-list-unordered';
-    case 'interface':
-      return 'icon-key';
-    case 'function':
-      return 'icon-gear';
-    case 'variable':
-      return 'icon-code';
-    case 'constant':
-      return 'icon-primitive-square';
-    case 'string':
-      return 'icon-quote';
-    case 'number':
-      return 'icon-plus';
-    case 'boolean':
-      return 'icon-question';
-    case 'array':
-      return 'icon-list-ordered';
-    case 'object':
-      return 'icon-file-code';
-    case 'key':
-      return 'icon-key';
-    case 'null':
+    case "file":
+      return "icon-file";
+    case "module":
+      return "icon-database";
+    case "namespace":
+      return "icon-tag";
+    case "package":
+      return "icon-package";
+    case "class":
+      return "icon-puzzle";
+    case "method":
+      return "icon-gear";
+    case "property":
+      return "icon-primitive-dot";
+    case "field":
+      return "icon-primitive-dot";
+    case "constructor":
+      return "icon-tools";
+    case "enum":
+      return "icon-list-unordered";
+    case "interface":
+      return "icon-key";
+    case "function":
+      return "icon-gear";
+    case "variable":
+      return "icon-code";
+    case "constant":
+      return "icon-primitive-square";
+    case "string":
+      return "icon-quote";
+    case "number":
+      return "icon-plus";
+    case "boolean":
+      return "icon-question";
+    case "array":
+      return "icon-list-ordered";
+    case "object":
+      return "icon-file-code";
+    case "key":
+      return "icon-key";
+    case "null":
       return null;
-    case 'enum-member':
-      return 'icon-primitive-dot';
-    case 'struct':
-      return 'icon-book';
-    case 'event':
-      return 'icon-calendar';
-    case 'operator':
-      return 'icon-plus';
-    case 'type-parameter':
+    case "enum-member":
+      return "icon-primitive-dot";
+    case "struct":
+      return "icon-book";
+    case "event":
+      return "icon-calendar";
+    case "operator":
+      return "icon-plus";
+    case "type-parameter":
       return null;
     default:
       return null;
   }
 }
-
 
 /**
  * A container capture. When another capture's node is contained by the
@@ -106,7 +106,7 @@ class Container {
     this.organizer = organizer;
     this.props = capture.setProperties || {};
 
-    this.tag = capture.name.substring(capture.name.indexOf('.') + 1);
+    this.tag = capture.name.substring(capture.name.indexOf(".") + 1);
     this.icon = this.resolveIcon();
     this.position = capture.node.range.start;
   }
@@ -134,23 +134,19 @@ class Container {
       return false;
     }
     this.captureFields.set(capture.name, capture);
-    if (capture.name === 'name') {
+    if (capture.name === "name") {
       this.nameCapture = new Name(capture, this.organizer);
     }
     return true;
   }
 
   isValid() {
-    return (
-      this.nameCapture &&
-      this.position instanceof Point
-    );
+    return this.nameCapture && this.position instanceof Point;
   }
 
   resolveIcon() {
-    let icon = this.props['symbol.icon'] ?? iconForTag(this.tag);
-    if (icon && !icon.startsWith('icon-'))
-      icon = `icon-${icon}`;
+    let icon = this.props["symbol.icon"] ?? iconForTag(this.tag);
+    if (icon && !icon.startsWith("icon-")) icon = `icon-${icon}`;
     return icon;
   }
 
@@ -162,7 +158,7 @@ class Container {
       shortName: nameSymbol.shortName,
       tag: nameSymbol.tag ?? this.tag,
       icon: nameSymbol.icon ?? this.icon,
-      position: this.position
+      position: this.position,
     };
 
     if (nameSymbol.context) {
@@ -176,20 +172,20 @@ class Container {
 class Definition extends Container {
   constructor(...args) {
     super(...args);
-    this.type = 'definition';
+    this.type = "definition";
   }
 }
 
 class Reference extends Container {
   constructor(...args) {
     super(...args);
-    this.type = 'reference';
+    this.type = "reference";
   }
 }
 
 class Name {
   constructor(capture, organizer) {
-    this.type = 'name';
+    this.type = "name";
     this.organizer = organizer;
     this.props = capture.setProperties ?? {};
     this.capture = capture;
@@ -209,9 +205,9 @@ class Name {
   resolveName(capture, { short = false } = {}) {
     let { node, props } = this;
     let base = node.text;
-    if (props['symbol.strip']) {
-      let pattern = PatternCache.getOrCompile(props['symbol.strip']);
-      base = base.replace(pattern, '');
+    if (props["symbol.strip"]) {
+      let pattern = PatternCache.getOrCompile(props["symbol.strip"]);
+      base = base.replace(pattern, "");
     }
 
     // The “short name” is the symbol's base name before we prepend or append
@@ -219,16 +215,16 @@ class Name {
     if (short) return base;
 
     // TODO: Regex-based replacement?
-    if (props['symbol.prepend']) {
-      base = `${props['symbol.prepend']}${base}`;
+    if (props["symbol.prepend"]) {
+      base = `${props["symbol.prepend"]}${base}`;
     }
-    if (props['symbol.append']) {
-      base = `${base}${props['symbol.append']}`;
+    if (props["symbol.append"]) {
+      base = `${base}${props["symbol.append"]}`;
     }
 
     let prefix = this.resolvePrefix(capture);
     if (prefix) {
-      let joiner = props['symbol.joiner'] ?? '';
+      let joiner = props["symbol.joiner"] ?? "";
       base = `${prefix}${joiner}${base}`;
     }
     this.organizer.nameCache.set(node.id, base);
@@ -238,15 +234,15 @@ class Name {
   resolveContext() {
     let { node, props } = this;
     let result = null;
-    if (props['symbol.contextNode']) {
-      let contextNode = resolveNodeDescriptor(node, props['symbol.contextNode']);
+    if (props["symbol.contextNode"]) {
+      let contextNode = resolveNodeDescriptor(node, props["symbol.contextNode"]);
       if (contextNode) {
         result = contextNode.text;
       }
     }
 
-    if (props['symbol.context']) {
-      result = props['symbol.context'];
+    if (props["symbol.context"]) {
+      result = props["symbol.context"];
     }
 
     return result;
@@ -254,8 +250,8 @@ class Name {
 
   resolvePrefix() {
     let { node, props } = this;
-    let symbolDescriptor = props['symbol.prependSymbolForNode'];
-    let textDescriptor = props['symbol.prependTextForNode'];
+    let symbolDescriptor = props["symbol.prependSymbolForNode"];
+    let textDescriptor = props["symbol.prependTextForNode"];
 
     // Prepending with a symbol name requires that we already have determined
     // the name for another node, which means the other node must have a
@@ -281,13 +277,12 @@ class Name {
   }
 
   resolveTag() {
-    return this.props['symbol.tag'] ?? null;
+    return this.props["symbol.tag"] ?? null;
   }
 
   resolveIcon() {
-    let icon = this.props['symbol.icon'] ?? null;
-    if (icon && !icon.startsWith('icon-'))
-      icon = `icon-${icon}`;
+    let icon = this.props["symbol.icon"] ?? null;
+    if (icon && !icon.startsWith("icon-")) icon = `icon-${icon}`;
     return icon;
   }
 
@@ -302,7 +297,6 @@ class Name {
 
     return symbol;
   }
-
 }
 
 /**
@@ -326,15 +320,15 @@ class CaptureOrganizer {
   }
 
   isDefinition(capture) {
-    return capture.name.startsWith('definition.');
+    return capture.name.startsWith("definition.");
   }
 
   isReference(capture) {
-    return capture.name.startsWith('reference.');
+    return capture.name.startsWith("reference.");
   }
 
   isName(capture) {
-    return capture.name === 'name';
+    return capture.name === "name";
   }
 
   finish(container) {
@@ -417,7 +411,7 @@ class CaptureOrganizer {
       symbols.push(definition.toSymbol());
     }
 
-    if (atom.config.get('symbol-provider-tree-sitter.includeReferences')) {
+    if (atom.config.get("symbol-provider-tree-sitter.includeReferences")) {
       for (let reference of this.references) {
         if (!reference.isValid()) continue;
         symbols.push(reference.toSymbol());

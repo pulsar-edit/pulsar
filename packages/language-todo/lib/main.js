@@ -1,5 +1,5 @@
-
-const TODO_PATTERN = /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
+const TODO_PATTERN =
+  /\b(TODO|FIXME|CHANGED|XXX|IDEA|HACK|NOTE|REVIEW|NB|BUG|QUESTION|COMBAK|TEMP|DEBUG|OPTIMIZE|WARNING)\b/;
 
 module.exports = {
   provideTodoInjection() {
@@ -51,15 +51,15 @@ module.exports = {
                 let result = options.language(node);
                 if (result !== undefined) return result;
               }
-              return TODO_PATTERN.test(node.text) ? 'todo' : undefined;
+              return TODO_PATTERN.test(node.text) ? "todo" : undefined;
             },
             content(node) {
               return options.content ? options.content(node) : node;
             },
-            languageScope: null
+            languageScope: null,
           });
         }
-      }
+      },
     };
-  }
+  },
 };

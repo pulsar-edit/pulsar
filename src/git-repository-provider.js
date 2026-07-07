@@ -1,8 +1,8 @@
-const fs = require('fs');
-const { Directory } = require('@pulsar-edit/pathwatcher');
-const GitRepository = require('./git-repository');
+const fs = require("fs");
+const { Directory } = require("@pulsar-edit/pathwatcher");
+const GitRepository = require("./git-repository");
 
-const GIT_FILE_REGEX = RegExp('^gitdir: (.+)');
+const GIT_FILE_REGEX = RegExp("^gitdir: (.+)");
 
 // Returns the .gitdir path in the agnostic Git symlink .git file given, or
 // null if the path is not a valid gitfile.
@@ -10,7 +10,7 @@ const GIT_FILE_REGEX = RegExp('^gitdir: (.+)');
 // * `gitFile` {String} path of gitfile to parse
 function pathFromGitFileSync(gitFile) {
   try {
-    const gitFileBuff = fs.readFileSync(gitFile, 'utf8');
+    const gitFileBuff = fs.readFileSync(gitFile, "utf8");
     return gitFileBuff != null ? gitFileBuff.match(GIT_FILE_REGEX)[1] : null;
   } catch (error) {}
 }
@@ -20,8 +20,8 @@ function pathFromGitFileSync(gitFile) {
 //
 // * `gitFile` {String} path of gitfile to parse
 function pathFromGitFile(gitFile) {
-  return new Promise(resolve => {
-    fs.readFile(gitFile, 'utf8', (err, gitFileBuff) => {
+  return new Promise((resolve) => {
+    fs.readFile(gitFile, "utf8", (err, gitFileBuff) => {
       if (err == null && gitFileBuff != null) {
         const result = gitFileBuff.toString().match(GIT_FILE_REGEX);
         resolve(result != null ? result[1] : null);
@@ -41,15 +41,15 @@ function findGitDirectorySync(directory) {
   // TODO: Fix node-pathwatcher/src/directory.coffee so the following methods
   // can return cached values rather than always returning new objects:
   // getParent(), getFile(), getSubdirectory().
-  let gitDir = directory.getSubdirectory('.git');
-  if (typeof gitDir.getPath === 'function') {
+  let gitDir = directory.getSubdirectory(".git");
+  if (typeof gitDir.getPath === "function") {
     const gitDirPath = pathFromGitFileSync(gitDir.getPath());
     if (gitDirPath) {
       gitDir = new Directory(directory.resolve(gitDirPath));
     }
   }
   if (
-    typeof gitDir.existsSync === 'function' &&
+    typeof gitDir.existsSync === "function" &&
     gitDir.existsSync() &&
     isValidGitDirectorySync(gitDir)
   ) {
@@ -71,15 +71,15 @@ async function findGitDirectory(directory) {
   // TODO: Fix node-pathwatcher/src/directory.coffee so the following methods
   // can return cached values rather than always returning new objects:
   // getParent(), getFile(), getSubdirectory().
-  let gitDir = directory.getSubdirectory('.git');
-  if (typeof gitDir.getPath === 'function') {
+  let gitDir = directory.getSubdirectory(".git");
+  if (typeof gitDir.getPath === "function") {
     const gitDirPath = await pathFromGitFile(gitDir.getPath());
     if (gitDirPath) {
       gitDir = new Directory(directory.resolve(gitDirPath));
     }
   }
   if (
-    typeof gitDir.exists === 'function' &&
+    typeof gitDir.exists === "function" &&
     (await gitDir.exists()) &&
     (await isValidGitDirectory(gitDir))
   ) {
@@ -99,7 +99,7 @@ function isValidGitDirectorySync(directory) {
   // To decide whether a directory has a valid .git folder, we use
   // the heuristic adopted by the valid_repository_path() function defined in
   // node_modules/git-utils/deps/libgit2/src/repository.c.
-  const commonDirFile = directory.getSubdirectory('commondir');
+  const commonDirFile = directory.getSubdirectory("commondir");
   let commonDir;
   if (commonDirFile.existsSync()) {
     const commonDirPathBuff = fs.readFileSync(commonDirFile.getPath());
@@ -112,9 +112,9 @@ function isValidGitDirectorySync(directory) {
     commonDir = directory;
   }
   return (
-    directory.getFile('HEAD').existsSync() &&
-    commonDir.getSubdirectory('objects').existsSync() &&
-    commonDir.getSubdirectory('refs').existsSync()
+    directory.getFile("HEAD").existsSync() &&
+    commonDir.getSubdirectory("objects").existsSync() &&
+    commonDir.getSubdirectory("refs").existsSync()
   );
 }
 
@@ -126,12 +126,10 @@ async function isValidGitDirectory(directory) {
   // To decide whether a directory has a valid .git folder, we use
   // the heuristic adopted by the valid_repository_path() function defined in
   // node_modules/git-utils/deps/libgit2/src/repository.c.
-  const commonDirFile = directory.getSubdirectory('commondir');
+  const commonDirFile = directory.getSubdirectory("commondir");
   let commonDir;
   if (await commonDirFile.exists()) {
-    const commonDirPathBuff = await fs.promises.readFile(
-      commonDirFile.getPath()
-    );
+    const commonDirPathBuff = await fs.promises.readFile(commonDirFile.getPath());
     const commonDirPathString = commonDirPathBuff.toString().trim();
     commonDir = new Directory(directory.resolve(commonDirPathString));
     if (!(await commonDir.exists())) {
@@ -141,9 +139,9 @@ async function isValidGitDirectory(directory) {
     commonDir = directory;
   }
   return (
-    (await directory.getFile('HEAD').exists()) &&
-    (await commonDir.getSubdirectory('objects').exists()) &&
-    (await commonDir.getSubdirectory('refs').exists())
+    (await directory.getFile("HEAD").exists()) &&
+    (await commonDir.getSubdirectory("objects").exists()) &&
+    (await commonDir.getSubdirectory("refs").exists())
   );
 }
 
@@ -192,7 +190,7 @@ class GitRepositoryProvider {
     if (!repo) {
       repo = GitRepository.open(gitDirPath, {
         project: this.project,
-        config: this.config
+        config: this.config,
       });
       if (!repo) {
         return null;

@@ -1,5 +1,5 @@
-const { Emitter } = require('event-kit');
-const _ = require('underscore-plus');
+const { Emitter } = require("event-kit");
+const _ = require("underscore-plus");
 
 // Public: A notification to the user containing a message and type.
 module.exports = class Notification {
@@ -16,16 +16,12 @@ module.exports = class Notification {
   }
 
   validate() {
-    if (typeof this.message !== 'string') {
-      throw new Error(
-        `Notification must be created with string message: ${this.message}`
-      );
+    if (typeof this.message !== "string") {
+      throw new Error(`Notification must be created with string message: ${this.message}`);
     }
 
     if (!_.isObject(this.options) || Array.isArray(this.options)) {
-      throw new Error(
-        `Notification must be created with an options object: ${this.options}`
-      );
+      throw new Error(`Notification must be created with an options object: ${this.options}`);
     }
   }
 
@@ -39,7 +35,7 @@ module.exports = class Notification {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDismiss(callback) {
-    return this.emitter.on('did-dismiss', callback);
+    return this.emitter.on("did-dismiss", callback);
   }
 
   // Public: Invoke the given callback when the notification is displayed.
@@ -48,7 +44,7 @@ module.exports = class Notification {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDisplay(callback) {
-    return this.emitter.on('did-display', callback);
+    return this.emitter.on("did-display", callback);
   }
 
   getOptions() {
@@ -90,7 +86,7 @@ module.exports = class Notification {
   dismiss() {
     if (!this.isDismissable() || this.isDismissed()) return;
     this.dismissed = true;
-    this.emitter.emit('did-dismiss', this);
+    this.emitter.emit("did-dismiss", this);
   }
 
   isDismissed() {
@@ -107,22 +103,22 @@ module.exports = class Notification {
 
   setDisplayed(displayed) {
     this.displayed = displayed;
-    this.emitter.emit('did-display', this);
+    this.emitter.emit("did-display", this);
   }
 
   getIcon() {
     if (this.options.icon != null) return this.options.icon;
     switch (this.type) {
-      case 'fatal':
-        return 'bug';
-      case 'error':
-        return 'flame';
-      case 'warning':
-        return 'alert';
-      case 'info':
-        return 'info';
-      case 'success':
-        return 'check';
+      case "fatal":
+        return "bug";
+      case "error":
+        return "flame";
+      case "warning":
+        return "alert";
+      case "info":
+        return "info";
+      case "success":
+        return "check";
     }
   }
 };

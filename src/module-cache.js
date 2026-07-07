@@ -1,6 +1,6 @@
-const Module = require('module');
-const path = require('path');
-const semver = require('semver');
+const Module = require("module");
+const path = require("path");
+const semver = require("semver");
 
 // Extend semver.Range to memoize matched versions for speed
 class Range extends semver.Range {
@@ -35,40 +35,35 @@ const cache = {
   ranges: {},
   registered: false,
   resourcePath: null,
-  resourcePathWithTrailingSlash: null
+  resourcePathWithTrailingSlash: null,
 };
 
 // isAbsolute is inlined from fs-plus so that fs-plus itself can be required
 // from this cache.
 let isAbsolute;
-if (process.platform === 'win32') {
-  isAbsolute = pathToCheck =>
-    pathToCheck &&
-    (pathToCheck[1] === ':' ||
-      (pathToCheck[0] === '\\' && pathToCheck[1] === '\\'));
+if (process.platform === "win32") {
+  isAbsolute = (pathToCheck) =>
+    pathToCheck && (pathToCheck[1] === ":" || (pathToCheck[0] === "\\" && pathToCheck[1] === "\\"));
 } else {
-  isAbsolute = pathToCheck => pathToCheck && pathToCheck[0] === '/';
+  isAbsolute = (pathToCheck) => pathToCheck && pathToCheck[0] === "/";
 }
 
-const isCorePath = pathToCheck =>
-  pathToCheck.startsWith(cache.resourcePathWithTrailingSlash);
+const isCorePath = (pathToCheck) => pathToCheck.startsWith(cache.resourcePathWithTrailingSlash);
 
 function loadDependencies(modulePath, rootPath, rootMetadata, moduleCache) {
-  const fs = require('fs-plus');
+  const fs = require("fs-plus");
 
-  for (let childPath of fs.listSync(path.join(modulePath, 'node_modules'))) {
-    if (path.basename(childPath) === '.bin') continue;
+  for (let childPath of fs.listSync(path.join(modulePath, "node_modules"))) {
+    if (path.basename(childPath) === ".bin") continue;
     if (
       rootPath === modulePath &&
-      (rootMetadata.packageDependencies &&
-        rootMetadata.packageDependencies.hasOwnProperty(
-          path.basename(childPath)
-        ))
+      rootMetadata.packageDependencies &&
+      rootMetadata.packageDependencies.hasOwnProperty(path.basename(childPath))
     ) {
       continue;
     }
 
-    const childMetadataPath = path.join(childPath, 'package.json');
+    const childMetadataPath = path.join(childPath, "package.json");
     if (!fs.isFileSync(childMetadataPath)) continue;
 
     const childMetadata = JSON.parse(fs.readFileSync(childMetadataPath));
@@ -84,7 +79,7 @@ function loadDependencies(modulePath, rootPath, rootMetadata, moduleCache) {
         moduleCache.dependencies.push({
           name: childMetadata.name,
           version: childMetadata.version,
-          path: path.relative(rootPath, mainPath)
+          path: path.relative(rootPath, mainPath),
         });
       }
 
@@ -93,15 +88,10 @@ function loadDependencies(modulePath, rootPath, rootMetadata, moduleCache) {
   }
 }
 
-function loadFolderCompatibility(
-  modulePath,
-  rootPath,
-  rootMetadata,
-  moduleCache
-) {
-  const fs = require('fs-plus');
+function loadFolderCompatibility(modulePath, rootPath, rootMetadata, moduleCache) {
+  const fs = require("fs-plus");
 
-  const metadataPath = path.join(modulePath, 'package.json');
+  const metadataPath = path.join(modulePath, "package.json");
   if (!fs.isFileSync(metadataPath)) return;
 
   const metadata = JSON.parse(fs.readFileSync(metadataPath));
@@ -113,9 +103,9 @@ function loadFolderCompatibility(
     }
   }
 
-  const onDirectory = childPath => path.basename(childPath) !== 'node_modules';
+  const onDirectory = (childPath) => path.basename(childPath) !== "node_modules";
 
-  const extensions = ['.js', '.coffee', '.json', '.node'];
+  const extensions = [".js", ".coffee", ".json", ".node"];
   let paths = {};
   function onFile(childPath) {
     const needle = path.extname(childPath);
@@ -131,14 +121,12 @@ function loadFolderCompatibility(
     moduleCache.folders.push({ paths, dependencies });
   }
 
-  for (let childPath of fs.listSync(path.join(modulePath, 'node_modules'))) {
-    if (path.basename(childPath) === '.bin') continue;
+  for (let childPath of fs.listSync(path.join(modulePath, "node_modules"))) {
+    if (path.basename(childPath) === ".bin") continue;
     if (
       rootPath === modulePath &&
-      (rootMetadata.packageDependencies &&
-        rootMetadata.packageDependencies.hasOwnProperty(
-          path.basename(childPath)
-        ))
+      rootMetadata.packageDependencies &&
+      rootMetadata.packageDependencies.hasOwnProperty(path.basename(childPath))
     ) {
       continue;
     }
@@ -147,22 +135,20 @@ function loadFolderCompatibility(
 }
 
 function loadExtensions(modulePath, rootPath, rootMetadata, moduleCache) {
-  const fs = require('fs-plus');
-  const extensions = ['.js', '.coffee', '.json', '.node'];
-  const nodeModulesPath = path.join(rootPath, 'node_modules');
+  const fs = require("fs-plus");
+  const extensions = [".js", ".coffee", ".json", ".node"];
+  const nodeModulesPath = path.join(rootPath, "node_modules");
 
   function onFile(filePath) {
     filePath = path.relative(rootPath, filePath);
     const segments = filePath.split(path.sep);
-    if (segments.includes('test')) return;
-    if (segments.includes('tests')) return;
-    if (segments.includes('spec')) return;
-    if (segments.includes('specs')) return;
+    if (segments.includes("test")) return;
+    if (segments.includes("tests")) return;
+    if (segments.includes("spec")) return;
+    if (segments.includes("specs")) return;
     if (
       segments.length > 1 &&
-      !['exports', 'lib', 'node_modules', 'src', 'static', 'vendor'].includes(
-        segments[0]
-      )
+      !["exports", "lib", "node_modules", "src", "static", "vendor"].includes(segments[0])
     )
       return;
 
@@ -178,7 +164,7 @@ function loadExtensions(modulePath, rootPath, rootMetadata, moduleCache) {
   function onDirectory(childPath) {
     // Don't include extensions from bundled packages
     // These are generated and stored in the package's own metadata cache
-    if (rootMetadata.name === 'atom') {
+    if (rootMetadata.name === "atom") {
       const parentPath = path.dirname(childPath);
       if (parentPath === nodeModulesPath) {
         const packageName = path.basename(childPath);
@@ -208,20 +194,14 @@ function satisfies(version, rawRange) {
 function resolveFilePath(relativePath, parentModule) {
   if (!relativePath) return;
   if (!(parentModule && parentModule.filename)) return;
-  if (relativePath[0] !== '.' && !isAbsolute(relativePath)) return;
+  if (relativePath[0] !== "." && !isAbsolute(relativePath)) return;
 
-  const resolvedPath = path.resolve(
-    path.dirname(parentModule.filename),
-    relativePath
-  );
+  const resolvedPath = path.resolve(path.dirname(parentModule.filename), relativePath);
   if (!isCorePath(resolvedPath)) return;
 
   let extension = path.extname(resolvedPath);
   if (extension) {
-    if (
-      cache.extensions[extension] &&
-      cache.extensions[extension].has(resolvedPath)
-    )
+    if (cache.extensions[extension] && cache.extensions[extension].has(resolvedPath))
       return resolvedPath;
   } else {
     for (extension in cache.extensions) {
@@ -238,15 +218,14 @@ function resolveModulePath(relativePath, parentModule) {
   if (!relativePath) return;
   if (!(parentModule && parentModule.filename)) return;
 
-  if (!nativeModules) nativeModules = process.binding('natives');
+  if (!nativeModules) nativeModules = process.binding("natives");
   if (nativeModules.hasOwnProperty(relativePath)) return;
-  if (relativePath[0] === '.') return;
+  if (relativePath[0] === ".") return;
   if (isAbsolute(relativePath)) return;
 
   const folderPath = path.dirname(parentModule.filename);
 
-  const range =
-    cache.folders[folderPath] && cache.folders[folderPath][relativePath];
+  const range = cache.folders[folderPath] && cache.folders[folderPath][relativePath];
   if (!range) {
     const builtinPath = cache.builtins[relativePath];
     if (builtinPath) {
@@ -268,33 +247,30 @@ function resolveModulePath(relativePath, parentModule) {
 }
 
 function registerBuiltins(devMode) {
-  if (
-    devMode ||
-    !cache.resourcePath.startsWith(`${process.resourcesPath}${path.sep}`)
-  ) {
-    const fs = require('fs-plus');
-    const atomJsPath = path.join(cache.resourcePath, 'exports', 'atom.js');
+  if (devMode || !cache.resourcePath.startsWith(`${process.resourcesPath}${path.sep}`)) {
+    const fs = require("fs-plus");
+    const atomJsPath = path.join(cache.resourcePath, "exports", "atom.js");
     if (fs.isFileSync(atomJsPath)) {
       cache.builtins.atom = atomJsPath;
     }
   }
   if (cache.builtins.atom == null) {
-    cache.builtins.atom = path.join(cache.resourcePath, 'exports', 'atom.js');
+    cache.builtins.atom = path.join(cache.resourcePath, "exports", "atom.js");
   }
 }
 
-exports.create = function(modulePath) {
-  const fs = require('fs-plus');
+exports.create = function (modulePath) {
+  const fs = require("fs-plus");
 
   modulePath = fs.realpathSync(modulePath);
-  const metadataPath = path.join(modulePath, 'package.json');
+  const metadataPath = path.join(modulePath, "package.json");
   const metadata = JSON.parse(fs.readFileSync(metadataPath));
 
   const moduleCache = {
     version: 1,
     dependencies: [],
     extensions: {},
-    folders: []
+    folders: [],
   };
 
   loadDependencies(modulePath, modulePath, metadata, moduleCache);
@@ -305,11 +281,11 @@ exports.create = function(modulePath) {
   fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
 };
 
-exports.register = function({ resourcePath, devMode } = {}) {
+exports.register = function ({ resourcePath, devMode } = {}) {
   if (cache.registered) return;
 
   const originalResolveFilename = Module._resolveFilename;
-  Module._resolveFilename = function(...args) {
+  Module._resolveFilename = function (...args) {
     let [relativePath, parentModule] = args;
     let resolvedPath = resolveModulePath(relativePath, parentModule);
     if (!resolvedPath) {
@@ -324,7 +300,7 @@ exports.register = function({ resourcePath, devMode } = {}) {
   registerBuiltins(devMode);
 };
 
-exports.add = function(directoryPath, metadata) {
+exports.add = function (directoryPath, metadata) {
   // path.join isn't used in this function for speed since path.join calls
   // path.normalize and all the paths are already normalized here.
 
@@ -344,17 +320,15 @@ exports.add = function(directoryPath, metadata) {
       cache.dependencies[dependency.name] = {};
     }
     if (!cache.dependencies[dependency.name][dependency.version]) {
-      cache.dependencies[dependency.name][
-        dependency.version
-      ] = `${directoryPath}${path.sep}${dependency.path}`;
+      cache.dependencies[dependency.name][dependency.version] =
+        `${directoryPath}${path.sep}${dependency.path}`;
     }
   }
 
   for (const entry of cacheToAdd.folders || []) {
     for (const folderPath of entry.paths) {
       if (folderPath) {
-        cache.folders[`${directoryPath}${path.sep}${folderPath}`] =
-          entry.dependencies;
+        cache.folders[`${directoryPath}${path.sep}${folderPath}`] = entry.dependencies;
       } else {
         cache.folders[directoryPath] = entry.dependencies;
       }

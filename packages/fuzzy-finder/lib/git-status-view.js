@@ -1,32 +1,31 @@
-const fs = require('fs')
-const path = require('path')
+const fs = require("fs");
+const path = require("path");
 
-const FuzzyFinderView = require('./fuzzy-finder-view')
+const FuzzyFinderView = require("./fuzzy-finder-view");
 
-module.exports =
-class GitStatusView extends FuzzyFinderView {
-  async toggle () {
+module.exports = class GitStatusView extends FuzzyFinderView {
+  async toggle() {
     if (this.panel && this.panel.isVisible()) {
-      this.cancel()
+      this.cancel();
     } else if (atom.project.getRepositories().some((repo) => repo)) {
-      const paths = []
+      const paths = [];
       for (const repo of atom.project.getRepositories()) {
         if (repo) {
-          const workingDirectory = repo.getWorkingDirectory()
+          const workingDirectory = repo.getWorkingDirectory();
           for (let filePath in repo.statuses) {
-            filePath = path.join(workingDirectory, filePath)
+            filePath = path.join(workingDirectory, filePath);
             if (fs.lstatSync(filePath).isFile()) {
-              paths.push(filePath)
+              paths.push(filePath);
             }
           }
         }
       }
-      this.show()
-      await this.setItems(this.projectRelativePathsForFilePaths(paths))
+      this.show();
+      await this.setItems(this.projectRelativePathsForFilePaths(paths));
     }
   }
 
-  getEmptyMessage () {
-    return 'Nothing to commit, working directory clean'
+  getEmptyMessage() {
+    return "Nothing to commit, working directory clean";
   }
-}
+};

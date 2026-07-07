@@ -1,4 +1,5 @@
-atom-panel.modal, .overlay {
+atom-panel.modal,
+.overlay {
   color: @text-color;
   background-color: @overlay-background-color;
   padding: @component-padding;
@@ -12,14 +13,15 @@ atom-panel.modal, .overlay {
 
   .select-list ol.list-group,
   &.select-list ol.list-group {
-
     background-color: lighten(@overlay-background-color, 3%);
 
     li {
       padding: @component-padding;
       border-bottom: 1px solid @overlay-background-color;
 
-      &.two-lines { padding: (@component-padding/2) @component-padding; }
+      &.two-lines {
+        padding: (@component-padding / 2) @component-padding;
+      }
 
       .status.icon {
         float: right;

@@ -1,7 +1,7 @@
 /** @babel */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 module.exports = {
   async enumerate() {
@@ -13,9 +13,7 @@ module.exports = {
     const names = atom.packages.getAvailablePackageNames();
     for (let name of names) {
       if (atom.packages.isBundledPackage(name)) {
-        const isDuplicatedPackage = await this.isInstalledAsCommunityPackage(
-          name
-        );
+        const isDuplicatedPackage = await this.isInstalledAsCommunityPackage(name);
         if (isDuplicatedPackage) {
           duplicatePackages.push(name);
         }
@@ -44,7 +42,7 @@ module.exports = {
 
   realpath(path) {
     return new Promise((resolve, reject) => {
-      fs.realpath(path, function(error, realpath) {
+      fs.realpath(path, function (error, realpath) {
         if (error) {
           reject(error);
         } else {
@@ -52,5 +50,5 @@ module.exports = {
         }
       });
     });
-  }
+  },
 };

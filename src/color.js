@@ -12,9 +12,9 @@ module.exports = class Color {
   // Returns a {Color} or `null` if it cannot be parsed.
   static parse(value) {
     switch (typeof value) {
-      case 'string':
+      case "string":
         break;
-      case 'object':
+      case "object":
         if (Array.isArray(value)) {
           return null;
         }
@@ -25,7 +25,7 @@ module.exports = class Color {
     }
 
     if (!ParsedColor) {
-      ParsedColor = require('color');
+      ParsedColor = require("color");
     }
 
     try {
@@ -38,7 +38,7 @@ module.exports = class Color {
       parsedColor.red(),
       parsedColor.green(),
       parsedColor.blue(),
-      parsedColor.alpha()
+      parsedColor.alpha(),
     );
   }
 
@@ -84,7 +84,7 @@ module.exports = class Color {
   // Essential: Returns a {String} in the form `'#abcdef'`.
   toHexString() {
     return `#${numberToHexString(this.red)}${numberToHexString(
-      this.green
+      this.green,
     )}${numberToHexString(this.blue)}`;
   }
 

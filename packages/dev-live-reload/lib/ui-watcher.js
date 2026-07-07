@@ -1,7 +1,7 @@
-const { CompositeDisposable } = require('atom');
+const { CompositeDisposable } = require("atom");
 
-const BaseThemeWatcher = require('./base-theme-watcher');
-const PackageWatcher = require('./package-watcher');
+const BaseThemeWatcher = require("./base-theme-watcher");
+const PackageWatcher = require("./package-watcher");
 
 module.exports = class UIWatcher {
   constructor() {
@@ -39,49 +39,39 @@ module.exports = class UIWatcher {
         for (const theme of atom.themes.getActiveThemes()) {
           this.watchTheme(theme);
         }
-      })
+      }),
     );
 
-    this.subscriptions.add(
-      atom.packages.onDidActivatePackage(pack => this.watchPackage(pack))
-    );
+    this.subscriptions.add(atom.packages.onDidActivatePackage((pack) => this.watchPackage(pack)));
 
     this.subscriptions.add(
-      atom.packages.onDidDeactivatePackage(pack => {
+      atom.packages.onDidDeactivatePackage((pack) => {
         // This only handles packages - onDidChangeActiveThemes handles themes
         const watcher = this.watchedPackages.get(pack.name);
         if (watcher) watcher.destroy();
         this.watchedPackages.delete(pack.name);
-      })
+      }),
     );
   }
 
   watchTheme(theme) {
-    if (PackageWatcher.supportsPackage(theme, 'theme')) {
-      this.watchedThemes.set(
-        theme.name,
-        this.createWatcher(new PackageWatcher(theme))
-      );
+    if (PackageWatcher.supportsPackage(theme, "theme")) {
+      this.watchedThemes.set(theme.name, this.createWatcher(new PackageWatcher(theme)));
     }
   }
 
   watchPackage(pack) {
-    if (PackageWatcher.supportsPackage(pack, 'atom')) {
-      this.watchedPackages.set(
-        pack.name,
-        this.createWatcher(new PackageWatcher(pack))
-      );
+    if (PackageWatcher.supportsPackage(pack, "atom")) {
+      this.watchedPackages.set(pack.name, this.createWatcher(new PackageWatcher(pack)));
     }
   }
 
   createWatcher(watcher) {
     watcher.onDidChangeGlobals(() => {
-      console.log('Global changed, reloading all styles');
+      console.log("Global changed, reloading all styles");
       this.reloadAll();
     });
-    watcher.onDidDestroy(() =>
-      this.watchers.splice(this.watchers.indexOf(watcher), 1)
-    );
+    watcher.onDidDestroy(() => this.watchers.splice(this.watchers.indexOf(watcher), 1));
     this.watchers.push(watcher);
     return watcher;
   }
@@ -89,13 +79,13 @@ module.exports = class UIWatcher {
   reloadAll() {
     this.baseTheme.loadAllStylesheets();
     for (const pack of atom.packages.getActivePackages()) {
-      if (PackageWatcher.supportsPackage(pack, 'atom')) {
+      if (PackageWatcher.supportsPackage(pack, "atom")) {
         pack.reloadStylesheets();
       }
     }
 
     for (const theme of atom.themes.getActiveThemes()) {
-      if (PackageWatcher.supportsPackage(theme, 'theme')) {
+      if (PackageWatcher.supportsPackage(theme, "theme")) {
         theme.reloadStylesheets();
       }
     }

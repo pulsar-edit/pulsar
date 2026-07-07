@@ -1,16 +1,16 @@
 // const { Point } = require('atom');
 
-const SymbolsView = require('./symbols-view');
-const { isIterable, timeout } = require('./util');
+const SymbolsView = require("./symbols-view");
+const { isIterable, timeout } = require("./util");
 
 module.exports = class ProjectView extends SymbolsView {
   constructor(stack, broker) {
     // TODO: Do these defaults make sense? Should we allow a provider to
     // override them?
     super(stack, broker, {
-      emptyMessage: 'Project has no symbols or is empty',
+      emptyMessage: "Project has no symbols or is empty",
       maxResults: 20,
-      isDynamic: true
+      isDynamic: true,
     });
 
     this.shouldReload = true;
@@ -20,7 +20,7 @@ module.exports = class ProjectView extends SymbolsView {
     return super.destroy();
   }
 
-  toggle(filterTerm = '') {
+  toggle(filterTerm = "") {
     if (this.panel.isVisible()) {
       this.cancel();
     } else {
@@ -43,8 +43,8 @@ module.exports = class ProjectView extends SymbolsView {
   isValidSymbol(symbol) {
     if (!super.isValidSymbol(symbol)) return false;
     if (
-      !(typeof symbol.file === 'string' && typeof symbol.directory === 'string') &&
-      !(typeof symbol.path === 'string')
+      !(typeof symbol.file === "string" && typeof symbol.directory === "string") &&
+      !(typeof symbol.path === "string")
     ) {
       return false;
     }
@@ -62,9 +62,7 @@ module.exports = class ProjectView extends SymbolsView {
     this.populate({ retain: true });
   }
 
-  clear() {
-
-  }
+  clear() {}
 
   async populate({ retain = false } = {}) {
     if (this.shouldUseCache()) {
@@ -75,9 +73,9 @@ module.exports = class ProjectView extends SymbolsView {
     let query = this.selectListView?.getQuery();
 
     let listViewOptions = {
-      loadingMessage: this.cachedSymbols ?
-        `Reloading project symbols\u2026` :
-        `Loading project symbols\u2026`
+      loadingMessage: this.cachedSymbols
+        ? `Reloading project symbols\u2026`
+        : `Loading project symbols\u2026`,
     };
 
     if (!this.cachedSymbols) {
@@ -98,18 +96,22 @@ module.exports = class ProjectView extends SymbolsView {
       let options = {
         ...listViewOptions,
         items: symbols,
-        loadingMessage: null
+        loadingMessage: null,
       };
       this.updateView(options);
     });
 
     let loadingTimeout;
     if (retain) {
-      loadingTimeout = setTimeout((timestamp) => {
-        if (timestamp !== this._lastTimestamp) return;
-        if (anySymbolsLoaded) return;
-        this.updateView({ loadingMessage: `Reloading project symbols\u2026` });
-      }, 500, start);
+      loadingTimeout = setTimeout(
+        (timestamp) => {
+          if (timestamp !== this._lastTimestamp) return;
+          if (anySymbolsLoaded) return;
+          this.updateView({ loadingMessage: `Reloading project symbols\u2026` });
+        },
+        500,
+        start,
+      );
     }
 
     if (result?.then) result = await result;
@@ -132,11 +134,11 @@ module.exports = class ProjectView extends SymbolsView {
     return true;
   }
 
-  async generateSymbols(editor, query = '', callback) {
+  async generateSymbols(editor, query = "", callback) {
     this.abortController?.abort();
     this.abortController = new AbortController();
 
-    let meta = { type: 'project', editor, query };
+    let meta = { type: "project", editor, query };
 
     // The signal is how a provider can stop doing work if it's going async,
     // since it'll be able to tell if we've cancelled this command and no
@@ -149,7 +151,7 @@ module.exports = class ProjectView extends SymbolsView {
     // providers that consider themselves up to the task.
     let providers = await this.broker.select(meta, { enforceExclusivity: false });
     if (providers?.length === 0) {
-      console.warn('No providers found!');
+      console.warn("No providers found!");
       return null;
     }
 
@@ -166,7 +168,7 @@ module.exports = class ProjectView extends SymbolsView {
 
     let error = (err, provider) => {
       if (signal.aborted) return;
-      let message = typeof err === 'string' ? err : err.message;
+      let message = typeof err === "string" ? err : err.message;
       console.error(`Error in retrieving symbols from provider ${provider.name}: ${message}`);
     };
 
@@ -177,7 +179,7 @@ module.exports = class ProjectView extends SymbolsView {
         if (symbols?.then) {
           let task = symbols
             .then((result) => done(result, provider))
-            .catch(err => error(err, provider));
+            .catch((err) => error(err, provider));
           tasks.push(task);
         } else if (isIterable(symbols)) {
           done(symbols, provider);

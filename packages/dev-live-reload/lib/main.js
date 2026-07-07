@@ -5,8 +5,8 @@ module.exports = {
     if (atom.packages.hasActivatedInitialPackages()) {
       this.startWatching();
     } else {
-      this.activatedDisposable = atom.packages.onDidActivateInitialPackages(
-        () => this.startWatching()
+      this.activatedDisposable = atom.packages.onDidActivateInitialPackages(() =>
+        this.startWatching(),
       );
     }
   },
@@ -18,13 +18,11 @@ module.exports = {
   },
 
   startWatching() {
-    const UIWatcher = require('./ui-watcher');
+    const UIWatcher = require("./ui-watcher");
     this.uiWatcher = new UIWatcher({ themeManager: atom.themes });
-    this.commandDisposable = atom.commands.add(
-      'atom-workspace',
-      'dev-live-reload:reload-all',
-      () => this.uiWatcher.reloadAll()
+    this.commandDisposable = atom.commands.add("atom-workspace", "dev-live-reload:reload-all", () =>
+      this.uiWatcher.reloadAll(),
     );
     if (this.activatedDisposable) this.activatedDisposable.dispose();
-  }
+  },
 };

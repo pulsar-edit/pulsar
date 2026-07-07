@@ -1,5 +1,5 @@
 const root = document.documentElement;
-const themeName = 'one-light-ui';
+const themeName = "one-light-ui";
 
 module.exports = {
   activate(state) {
@@ -16,7 +16,7 @@ module.exports = {
     unsetTabCloseButton();
     unsetHideDockButtons();
     unsetStickyHeaders();
-  }
+  },
 };
 
 // Font Size -----------------------
@@ -26,7 +26,7 @@ function setFontSize(currentFontSize) {
 }
 
 function unsetFontSize() {
-  root.style.fontSize = '';
+  root.style.fontSize = "";
 }
 
 // Tab Sizing -----------------------
@@ -42,8 +42,8 @@ function unsetTabSizing() {
 // Tab Close Button -----------------------
 
 function setTabCloseButton(tabCloseButton) {
-  if (tabCloseButton === 'Left') {
-    root.setAttribute(`theme-${themeName}-tab-close-button`, 'left');
+  if (tabCloseButton === "Left") {
+    root.setAttribute(`theme-${themeName}-tab-close-button`, "left");
   } else {
     unsetTabCloseButton();
   }
@@ -57,7 +57,7 @@ function unsetTabCloseButton() {
 
 function setHideDockButtons(hideDockButtons) {
   if (hideDockButtons) {
-    root.setAttribute(`theme-${themeName}-dock-buttons`, 'hidden');
+    root.setAttribute(`theme-${themeName}-dock-buttons`, "hidden");
   } else {
     unsetHideDockButtons();
   }
@@ -71,7 +71,7 @@ function unsetHideDockButtons() {
 
 function setStickyHeaders(stickyHeaders) {
   if (stickyHeaders) {
-    root.setAttribute(`theme-${themeName}-sticky-headers`, 'sticky');
+    root.setAttribute(`theme-${themeName}-sticky-headers`, "sticky");
   } else {
     unsetStickyHeaders();
   }

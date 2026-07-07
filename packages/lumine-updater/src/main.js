@@ -18,7 +18,7 @@ class LumineUpdater {
           this.cache.empty("last-update-check");
           this.cache.empty(`installMethod.${atom.getVersion()}`);
         },
-      })
+      }),
     );
 
     if (atom.config.get("lumine-updater.checkForUpdatesOnLaunch")) {
@@ -61,10 +61,7 @@ class LumineUpdater {
     let latestVersion = await this.findNewestRelease();
     let shouldUpdate = !atom.versionSatisfies(`>= ${latestVersion}`);
 
-    if (
-      cachedUpdateCheck?.latestVersion === latestVersion &&
-      !cachedUpdateCheck?.shouldUpdate
-    ) {
+    if (cachedUpdateCheck?.latestVersion === latestVersion && !cachedUpdateCheck?.shouldUpdate) {
       // The user has already been notified about this version and told us not
       // to notify them again until the next release.
       if (manual) {
@@ -84,28 +81,21 @@ class LumineUpdater {
 
   notifyAboutCurrent(latestVersion, manual) {
     if (!manual) return;
-    atom.notifications.addInfo(
-      "Lumine is already up to date.",
-      { dismissable: true }
-    );
+    atom.notifications.addInfo("Lumine is already up to date.", { dismissable: true });
   }
 
   async notifyAboutUpdate(latestVersion) {
     this.cache.setCacheItem("last-update-check", {
       latestVersion: latestVersion,
-      shouldUpdate: true
+      shouldUpdate: true,
     });
 
     findInstallMethod ??= require("./find-install-method.js");
 
     let installMethod =
-      this.cache.getCacheItem(`installMethod.${atom.getVersion()}`) ??
-      (await findInstallMethod());
+      this.cache.getCacheItem(`installMethod.${atom.getVersion()}`) ?? (await findInstallMethod());
 
-    this.cache.setCacheItem(
-      `installMethod.${atom.getVersion()}`,
-      installMethod
-    );
+    this.cache.setCacheItem(`installMethod.${atom.getVersion()}`, installMethod);
 
     let objButtonForInstallMethod = this.getObjButtonForInstallMethod(installMethod);
     let notificationDetailText = this.getNotificationText(installMethod, latestVersion);
@@ -116,39 +106,35 @@ class LumineUpdater {
       return;
     }
 
-    const notification = atom.notifications.addInfo(
-      "An update for Lumine is available.",
-      {
-        description: notificationDetailText,
-        dismissable: true,
-        buttons: [
-          {
-            text: "Dismiss this Version",
-            onDidClick: () => {
-              this.ignoreForThisVersion(latestVersion);
-              notification.dismiss();
-            },
+    const notification = atom.notifications.addInfo("An update for Lumine is available.", {
+      description: notificationDetailText,
+      dismissable: true,
+      buttons: [
+        {
+          text: "Dismiss this Version",
+          onDidClick: () => {
+            this.ignoreForThisVersion(latestVersion);
+            notification.dismiss();
           },
-          {
-            text: "Dismiss until next launch",
-            onDidClick: () => {
-              this.ignoreUntilNextLaunch();
-              notification.dismiss();
-            },
+        },
+        {
+          text: "Dismiss until next launch",
+          onDidClick: () => {
+            this.ignoreUntilNextLaunch();
+            notification.dismiss();
           },
-          // Below we optionally add a button for the install method. That may
-          // open to a Lumine download URL, if available for installation method
-          typeof objButtonForInstallMethod === "object" &&
-            objButtonForInstallMethod
-        ],
-      }
-    );
+        },
+        // Below we optionally add a button for the install method. That may
+        // open to a Lumine download URL, if available for installation method
+        typeof objButtonForInstallMethod === "object" && objButtonForInstallMethod,
+      ],
+    });
   }
 
   ignoreForThisVersion(version) {
     this.cache.setCacheItem("last-update-check", {
       latestVersion: version,
-      shouldUpdate: false
+      shouldUpdate: false,
     });
   }
 
@@ -162,8 +148,7 @@ class LumineUpdater {
 
     switch (installMethod.installMethod) {
       case "Developer Mode":
-        returnText +=
-          "Since you're in developer mode, Lumine trusts you know how to update.";
+        returnText += "Since you're in developer mode, Lumine trusts you know how to update.";
         break;
       case "Safe Mode":
         return null;
@@ -183,24 +168,20 @@ class LumineUpdater {
         returnText += "Install the latest version via Nix.";
         break;
       case "Homebrew Installation":
-        returnText +=
-          "Install the latest version by running `brew upgrade lumine`.";
+        returnText += "Install the latest version by running `brew upgrade lumine`.";
         break;
       case "winget Installation":
-        returnText +=
-          "Install the latest version by running `winget upgrade lumine`.";
+        returnText += "Install the latest version by running `winget upgrade lumine`.";
         break;
       case "Chocolatey Installation":
-        returnText +=
-          "Install the latest version by running `choco upgrade lumine`.";
+        returnText += "Install the latest version by running `choco upgrade lumine`.";
         break;
       case "User Installation":
       case "Machine Installation":
       case "Portable Installation":
       case "Manual Installation":
       default:
-        returnText +=
-          "Download the latest version from the Lumine website or GitHub.";
+        returnText += "Download the latest version from the Lumine website or GitHub.";
         break;
     }
 

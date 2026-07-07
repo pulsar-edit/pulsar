@@ -1,23 +1,23 @@
-const getIconServices = require('../get-icon-services');
-const { Range } = require('atom');
+const getIconServices = require("../get-icon-services");
+const { Range } = require("atom");
 const {
   LeadingContextRow,
   TrailingContextRow,
   ResultPathRow,
   MatchRow,
-  ResultRowGroup
-} = require('./result-row');
-const {showIf} = require('./util');
+  ResultRowGroup,
+} = require("./result-row");
+const { showIf } = require("./util");
 
-const _ = require('underscore-plus');
-const path = require('path');
-const assert = require('assert');
-const etch = require('etch');
+const _ = require("underscore-plus");
+const path = require("path");
+const assert = require("assert");
+const etch = require("etch");
 const $ = etch.dom;
 
 class ResultPathRowView {
-  constructor({groupData, isSelected}) {
-    const props = {groupData, isSelected};
+  constructor({ groupData, isSelected }) {
+    const props = { groupData, isSelected };
     this.props = Object.assign({}, props);
 
     etch.initialize(this);
@@ -25,11 +25,11 @@ class ResultPathRowView {
   }
 
   destroy() {
-    return etch.destroy(this)
+    return etch.destroy(this);
   }
 
-  update({groupData, isSelected}) {
-    const props = {groupData, isSelected};
+  update({ groupData, isSelected }) {
+    const props = { groupData, isSelected };
 
     if (!_.isEqual(props, this.props)) {
       this.props = Object.assign({}, props);
@@ -51,43 +51,43 @@ class ResultPathRowView {
       }
     }
     const groupData = this.props.groupData;
-    return (
-      $.li(
+    return $.li(
+      {
+        className: [
+          // This triggers the CSS displaying the "expand / collapse" arrows
+          // See `styles/lists.less` in the atom-ui repository for details
+          "list-nested-item",
+          groupData.isCollapsed ? "collapsed" : "",
+          this.props.isSelected ? "selected" : "",
+        ]
+          .join(" ")
+          .trim(),
+        key: groupData.filePath,
+      },
+      $.div(
         {
-          className: [
-            // This triggers the CSS displaying the "expand / collapse" arrows
-            // See `styles/lists.less` in the atom-ui repository for details
-            'list-nested-item',
-            groupData.isCollapsed ? 'collapsed' : '',
-            this.props.isSelected ? 'selected' : ''
-          ].join(' ').trim(),
-          key: groupData.filePath
+          className: "list-item path-row",
+          dataset: { filePath: groupData.filePath },
         },
-        $.div(
-          {
-            className: 'list-item path-row',
-            dataset: { filePath: groupData.filePath }
-          },
-          $.span({
-            dataset: {name: path.basename(groupData.filePath)},
-            ref: 'icon',
-            className: 'icon'
-          }),
-          $.span({className: 'path-name bright'}, relativePath),
-          $.span(
-            {ref: 'description', className: 'path-match-number'},
-            `(${groupData.matchCount} match${groupData.matchCount === 1 ? '' : 'es'})`
-          )
-        )
-      )
-    )
+        $.span({
+          dataset: { name: path.basename(groupData.filePath) },
+          ref: "icon",
+          className: "icon",
+        }),
+        $.span({ className: "path-name bright" }, relativePath),
+        $.span(
+          { ref: "description", className: "path-match-number" },
+          `(${groupData.matchCount} match${groupData.matchCount === 1 ? "" : "es"})`,
+        ),
+      ),
+    );
   }
-};
+}
 
 class MatchRowView {
-  constructor({rowData, groupData, isSelected, replacePattern, regex}) {
-    const props = {rowData, groupData, isSelected, replacePattern, regex};
-    const previewData = {matches: rowData.matches, replacePattern, regex};
+  constructor({ rowData, groupData, isSelected, replacePattern, regex }) {
+    const props = { rowData, groupData, isSelected, replacePattern, regex };
+    const previewData = { matches: rowData.matches, replacePattern, regex };
 
     this.props = Object.assign({}, props);
     this.previewData = previewData;
@@ -96,9 +96,9 @@ class MatchRowView {
     etch.initialize(this);
   }
 
-  update({rowData, groupData, isSelected, replacePattern, regex}) {
-    const props = {rowData, groupData, isSelected, replacePattern, regex};
-    const previewData = {matches: rowData.matches, replacePattern, regex};
+  update({ rowData, groupData, isSelected, replacePattern, regex }) {
+    const props = { rowData, groupData, isSelected, replacePattern, regex };
+    const previewData = { matches: rowData.matches, replacePattern, regex };
 
     if (!_.isEqual(props, this.props)) {
       if (!_.isEqual(previewData, this.previewData)) {
@@ -110,7 +110,7 @@ class MatchRowView {
     }
   }
 
-  generatePreviewNode({matches, replacePattern, regex}) {
+  generatePreviewNode({ matches, replacePattern, regex }) {
     const subnodes = [];
 
     let prevMatchEnd = matches[0].lineTextOffset;
@@ -125,7 +125,7 @@ class MatchRowView {
 
       const prefix = match.lineText.slice(prefixStart, matchStart);
 
-      let replacementText = ''
+      let replacementText = "";
       if (replacePattern && regex) {
         replacementText = match.matchText.replace(regex, replacePattern);
       } else if (replacePattern) {
@@ -136,73 +136,63 @@ class MatchRowView {
         $.span({}, prefix),
         $.span(
           {
-            className:
-              `match ${replacementText ? 'highlight-error' : 'highlight-info'}`
+            className: `match ${replacementText ? "highlight-error" : "highlight-info"}`,
           },
-          match.matchText
+          match.matchText,
         ),
         $.span(
           {
-            className: 'replacement highlight-success',
-            style: showIf(replacementText)
+            className: "replacement highlight-success",
+            style: showIf(replacementText),
           },
-          replacementText
-        )
+          replacementText,
+        ),
       );
       prevMatchEnd = range.end.column;
     }
 
     const lastMatch = matches[matches.length - 1];
-    const suffix = lastMatch.lineText.slice(
-      prevMatchEnd - lastMatch.lineTextOffset
-    );
+    const suffix = lastMatch.lineText.slice(prevMatchEnd - lastMatch.lineTextOffset);
 
-    return $.span(
-      {className: 'preview'},
-      ...subnodes,
-      $.span({}, suffix)
-    );
+    return $.span({ className: "preview" }, ...subnodes, $.span({}, suffix));
   }
 
   render() {
-    return (
-      $.li(
-        {
-          className: [
-            'list-item',
-            'match-row',
-            this.props.isSelected ? 'selected' : '',
-            this.props.rowData.separator ? 'separator' : ''
-          ].join(' ').trim(),
-          dataset: {
-            filePath: this.props.groupData.filePath,
-            matchLineNumber: this.props.rowData.lineNumber,
-          }
+    return $.li(
+      {
+        className: [
+          "list-item",
+          "match-row",
+          this.props.isSelected ? "selected" : "",
+          this.props.rowData.separator ? "separator" : "",
+        ]
+          .join(" ")
+          .trim(),
+        dataset: {
+          filePath: this.props.groupData.filePath,
+          matchLineNumber: this.props.rowData.lineNumber,
         },
-        $.span(
-          {className: 'line-number text-subtle'},
-          this.props.rowData.lineNumber + 1
-        ),
-        this.previewNode
-      )
+      },
+      $.span({ className: "line-number text-subtle" }, this.props.rowData.lineNumber + 1),
+      this.previewNode,
     );
   }
-};
+}
 
 class ContextRowView {
-  constructor({rowData, groupData, isSelected}) {
-    const props = {rowData, groupData, isSelected};
+  constructor({ rowData, groupData, isSelected }) {
+    const props = { rowData, groupData, isSelected };
     this.props = Object.assign({}, props);
 
     etch.initialize(this);
   }
 
   destroy() {
-    return etch.destroy(this)
+    return etch.destroy(this);
   }
 
-  update({rowData, groupData, isSelected}) {
-    const props = {rowData, groupData, isSelected};
+  update({ rowData, groupData, isSelected }) {
+    const props = { rowData, groupData, isSelected };
 
     if (!_.isEqual(props, this.props)) {
       this.props = Object.assign({}, props);
@@ -211,23 +201,19 @@ class ContextRowView {
   }
 
   render() {
-    return (
-      $.li(
-        {
-          className: [
-            'list-item',
-            'context-row',
-            this.props.rowData.separator ? 'separator' : ''
-          ].join(' ').trim(),
-          dataset: {
-            filePath: this.props.groupData.filePath,
-            matchLineNumber: this.props.rowData.matchLineNumber
-          },
+    return $.li(
+      {
+        className: ["list-item", "context-row", this.props.rowData.separator ? "separator" : ""]
+          .join(" ")
+          .trim(),
+        dataset: {
+          filePath: this.props.groupData.filePath,
+          matchLineNumber: this.props.rowData.matchLineNumber,
         },
-        $.span({className: 'line-number text-subtle'}, this.props.rowData.lineNumber + 1),
-        $.span({className: 'preview'}, $.span({}, this.props.rowData.line))
-      )
-    )
+      },
+      $.span({ className: "line-number text-subtle" }, this.props.rowData.lineNumber + 1),
+      $.span({ className: "preview" }, $.span({}, this.props.rowData.line)),
+    );
   }
 }
 
@@ -247,15 +233,14 @@ function getRowViewType(row) {
   assert(false);
 }
 
-module.exports =
-class ResultRowView {
-  constructor({item}) {
+module.exports = class ResultRowView {
+  constructor({ item }) {
     const props = {
       rowData: Object.assign({}, item.row.data),
       groupData: Object.assign({}, item.row.group.data),
       isSelected: item.isSelected,
       replacePattern: item.replacePattern,
-      regex: item.regex
+      regex: item.regex,
     };
     this.props = props;
     this.rowViewType = getRowViewType(item.row);
@@ -267,14 +252,14 @@ class ResultRowView {
     return etch.destroy(this);
   }
 
-  update({item}) {
+  update({ item }) {
     const props = {
       rowData: Object.assign({}, item.row.data),
       groupData: Object.assign({}, item.row.group.data),
       isSelected: item.isSelected,
       replacePattern: item.replacePattern,
-      regex: item.regex
-    }
+      regex: item.regex,
+    };
     this.props = props;
     this.rowViewType = getRowViewType(item.row);
     etch.update(this);

@@ -1,4 +1,4 @@
-const BufferedProcess = require('./buffered-process');
+const BufferedProcess = require("./buffered-process");
 
 // Extended: Like {BufferedProcess}, but accepts a Node script as the command
 // to run.
@@ -39,7 +39,7 @@ module.exports = class BufferedNodeProcess extends BufferedProcess {
 
     args = args ? args.slice() : [];
     args.unshift(command);
-    args.unshift('--no-deprecation');
+    args.unshift("--no-deprecation");
 
     super({
       command: process.execPath,
@@ -47,7 +47,7 @@ module.exports = class BufferedNodeProcess extends BufferedProcess {
       options,
       stdout,
       stderr,
-      exit
+      exit,
     });
   }
 };

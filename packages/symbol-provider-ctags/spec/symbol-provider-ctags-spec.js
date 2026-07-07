@@ -1,149 +1,140 @@
-
-const path = require('path');
-const fs = require('fs-plus');
-const temp = require('temp');
-const CTagsProvider = require('../lib/ctags-provider');
+const path = require("path");
+const fs = require("fs-plus");
+const temp = require("temp");
+const CTagsProvider = require("../lib/ctags-provider");
 
 function getEditor() {
   return atom.workspace.getActiveTextEditor();
 }
 
 async function wait(ms) {
-  return new Promise(r => setTimeout(r, ms));
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 async function getProjectSymbols(provider, editor) {
   let symbols = await provider.getSymbols({
-    type: 'project',
+    type: "project",
     editor,
-    paths: atom.project.getPaths()
+    paths: atom.project.getPaths(),
   });
   return symbols;
 }
 
 async function findDeclarationInProject(provider, editor) {
   let symbols = await provider.getSymbols({
-    type: 'project-find',
+    type: "project-find",
     editor,
     paths: atom.project.getPaths(),
-    word: editor.getWordUnderCursor()
+    word: editor.getWordUnderCursor(),
   });
   return symbols;
 }
 
-describe('CTagsProvider', () => {
+describe("CTagsProvider", () => {
   let provider, directory, editor;
 
   beforeEach(() => {
-    jasmine.unspy(global, 'setTimeout');
-    jasmine.unspy(Date, 'now');
+    jasmine.unspy(global, "setTimeout");
+    jasmine.unspy(Date, "now");
 
     provider = new CTagsProvider();
 
-    atom.project.setPaths([
-      temp.mkdirSync('other-dir-'),
-      temp.mkdirSync('atom-symbols-view-')
-    ]);
+    atom.project.setPaths([temp.mkdirSync("other-dir-"), temp.mkdirSync("atom-symbols-view-")]);
 
     directory = atom.project.getDirectories()[1];
-    fs.copySync(
-      path.join(__dirname, 'fixtures', 'js'),
-      atom.project.getPaths()[1]
-    );
+    fs.copySync(path.join(__dirname, "fixtures", "js"), atom.project.getPaths()[1]);
   });
 
-  it('identifies its project root correctly', () => {
+  it("identifies its project root correctly", () => {
     let root = provider.getPackageRoot();
     expect(root).toContain("symbol-provider-ctags");
-    expect(
-      fs.existsSync(path.join(root, "vendor", "ctags-darwin"))
-    ).toBe(true);
+    expect(fs.existsSync(path.join(root, "vendor", "ctags-darwin"))).toBe(true);
   });
 
-  describe('when tags can be generated for a file', () => {
+  describe("when tags can be generated for a file", () => {
     beforeEach(async () => {
-      await atom.workspace.open(directory.resolve('sample.js'));
+      await atom.workspace.open(directory.resolve("sample.js"));
       editor = getEditor();
     });
 
-    it('provides all JavaScript functions', async () => {
+    it("provides all JavaScript functions", async () => {
       let symbols = await provider.getSymbols({
-        type: 'file',
-        editor
+        type: "file",
+        editor,
       });
 
-      expect(symbols[0].name).toBe('quicksort');
+      expect(symbols[0].name).toBe("quicksort");
       expect(symbols[0].position.row).toEqual(0);
 
-      expect(symbols[1].name).toBe('quicksort.sort');
+      expect(symbols[1].name).toBe("quicksort.sort");
       expect(symbols[1].position.row).toEqual(1);
     });
   });
 
-  describe('when the buffer is new and unsaved', () => {
+  describe("when the buffer is new and unsaved", () => {
     beforeEach(async () => {
       await atom.workspace.open();
       editor = getEditor();
     });
 
-    it('does not try to provide symbols', () => {
-      let meta = { type: 'file', editor };
+    it("does not try to provide symbols", () => {
+      let meta = { type: "file", editor };
       expect(provider.canProvideSymbols(meta)).toBe(0);
     });
   });
 
-  describe('when the buffer is modified', () => {
+  describe("when the buffer is modified", () => {
     beforeEach(async () => {
-      await atom.workspace.open(directory.resolve('sample.js'));
+      await atom.workspace.open(directory.resolve("sample.js"));
       editor = getEditor();
     });
 
-    it('returns a lower match score', () => {
+    it("returns a lower match score", () => {
       editor.insertText("\n");
-      let meta = { type: 'file', editor };
+      let meta = { type: "file", editor };
       expect(provider.canProvideSymbols(meta)).toBe(0.89);
     });
   });
 
-  describe('when no tags can be generated for a file', () => {
+  describe("when no tags can be generated for a file", () => {
     beforeEach(async () => {
-      await atom.workspace.open(directory.resolve('no-symbols.js'));
+      await atom.workspace.open(directory.resolve("no-symbols.js"));
       editor = getEditor();
     });
 
-    it('returns an empty array', async () => {
-      let symbols = await provider.getSymbols({ type: 'file', editor });
+    it("returns an empty array", async () => {
+      let symbols = await provider.getSymbols({ type: "file", editor });
       expect(Array.isArray(symbols)).toBe(true);
       expect(symbols.length).toBe(0);
     });
   });
 
-  describe('go to declaration', () => {
+  describe("go to declaration", () => {
     it("returns nothing when no declaration is found", async () => {
-      await atom.workspace.open(directory.resolve('tagged.js'));
+      await atom.workspace.open(directory.resolve("tagged.js"));
       editor = getEditor();
       editor.setCursorBufferPosition([0, 2]);
 
       let symbols = await provider.getSymbols({
-        type: 'project-find',
+        type: "project-find",
         editor,
         paths: atom.project.getPaths(),
-        word: editor.getWordUnderCursor()
+        word: editor.getWordUnderCursor(),
       });
 
       expect(symbols.length).toBe(0);
     });
 
     it("returns one result when there is a single matching declaration", async () => {
-      await atom.workspace.open(directory.resolve('tagged.js'));
+      await atom.workspace.open(directory.resolve("tagged.js"));
       editor = getEditor();
 
       editor.setCursorBufferPosition([6, 24]);
       let symbols = await provider.getSymbols({
-        type: 'project-find',
+        type: "project-find",
         editor,
         paths: atom.project.getPaths(),
-        word: editor.getWordUnderCursor()
+        word: editor.getWordUnderCursor(),
       });
 
       expect(symbols.length).toBe(1);
@@ -151,14 +142,11 @@ describe('CTagsProvider', () => {
     });
 
     it("correctly identifies the tag for a C preprocessor macro", async () => {
-      atom.project.setPaths([temp.mkdirSync('atom-symbols-view-c-')]);
-      fs.copySync(
-        path.join(__dirname, 'fixtures', 'c'),
-        atom.project.getPaths()[0]
-      );
+      atom.project.setPaths([temp.mkdirSync("atom-symbols-view-c-")]);
+      fs.copySync(path.join(__dirname, "fixtures", "c"), atom.project.getPaths()[0]);
 
-      await atom.packages.activatePackage('language-c');
-      await atom.workspace.open('sample.c');
+      await atom.packages.activatePackage("language-c");
+      await atom.workspace.open("sample.c");
 
       editor = getEditor();
       editor.setCursorBufferPosition([4, 4]);
@@ -169,8 +157,8 @@ describe('CTagsProvider', () => {
       expect(symbols[0].position).toEqual([0, 0]);
     });
 
-    it('ignores results that reference nonexistent files', async () => {
-      await atom.workspace.open(directory.resolve('tagged.js'));
+    it("ignores results that reference nonexistent files", async () => {
+      await atom.workspace.open(directory.resolve("tagged.js"));
       editor = getEditor();
       editor.setCursorBufferPosition([8, 14]);
 
@@ -180,15 +168,12 @@ describe('CTagsProvider', () => {
       expect(symbols[0].position).toEqual([8, 0]);
     });
 
-    it('includes ? and ! characters in ruby symbols', async () => {
-      atom.project.setPaths([temp.mkdirSync('atom-symbols-view-ruby-')]);
-      fs.copySync(
-        path.join(__dirname, 'fixtures', 'ruby'),
-        atom.project.getPaths()[0]
-      );
+    it("includes ? and ! characters in ruby symbols", async () => {
+      atom.project.setPaths([temp.mkdirSync("atom-symbols-view-ruby-")]);
+      fs.copySync(path.join(__dirname, "fixtures", "ruby"), atom.project.getPaths()[0]);
 
-      await atom.packages.activatePackage('language-ruby');
-      await atom.workspace.open('file1.rb');
+      await atom.packages.activatePackage("language-ruby");
+      await atom.workspace.open("file1.rb");
       let symbols;
 
       editor = getEditor();
@@ -214,15 +199,12 @@ describe('CTagsProvider', () => {
       expect(symbols[0].position).toEqual([3, 0]);
     });
 
-    it('understands assignment ruby method definitions', async () => {
-      atom.project.setPaths([temp.mkdirSync('atom-symbols-view-ruby-')]);
-      fs.copySync(
-        path.join(__dirname, 'fixtures', 'ruby'),
-        atom.project.getPaths()[0]
-      );
+    it("understands assignment ruby method definitions", async () => {
+      atom.project.setPaths([temp.mkdirSync("atom-symbols-view-ruby-")]);
+      fs.copySync(path.join(__dirname, "fixtures", "ruby"), atom.project.getPaths()[0]);
 
-      await atom.packages.activatePackage('language-ruby');
-      await atom.workspace.open('file1.rb');
+      await atom.packages.activatePackage("language-ruby");
+      await atom.workspace.open("file1.rb");
       let symbols;
 
       editor = getEditor();
@@ -248,15 +230,12 @@ describe('CTagsProvider', () => {
       expect(symbols[0].position).toEqual([11, 0]);
     });
 
-    it('understands fully qualified ruby constant definitions', async () => {
-      atom.project.setPaths([temp.mkdirSync('atom-symbols-view-ruby-')]);
-      fs.copySync(
-        path.join(__dirname, 'fixtures', 'ruby'),
-        atom.project.getPaths()[0]
-      );
+    it("understands fully qualified ruby constant definitions", async () => {
+      atom.project.setPaths([temp.mkdirSync("atom-symbols-view-ruby-")]);
+      fs.copySync(path.join(__dirname, "fixtures", "ruby"), atom.project.getPaths()[0]);
 
-      await atom.packages.activatePackage('language-ruby');
-      await atom.workspace.open('file1.rb');
+      await atom.packages.activatePackage("language-ruby");
+      await atom.workspace.open("file1.rb");
       let symbols;
 
       editor = getEditor();
@@ -278,24 +257,24 @@ describe('CTagsProvider', () => {
     });
   });
 
-  describe('project symbols', () => {
-    it('displays all tags', async () => {
-      await atom.workspace.open(directory.resolve('tagged.js'));
+  describe("project symbols", () => {
+    it("displays all tags", async () => {
+      await atom.workspace.open(directory.resolve("tagged.js"));
       editor = getEditor();
 
       let symbols = await getProjectSymbols(provider, editor);
 
       expect(symbols.length).toBe(4);
 
-      expect(symbols[0].name).toBe('callMeMaybe');
+      expect(symbols[0].name).toBe("callMeMaybe");
       expect(symbols[0].directory).toBe(directory.getPath());
-      expect(symbols[0].file).toBe('tagged.js');
+      expect(symbols[0].file).toBe("tagged.js");
 
-      expect(symbols[3].name).toBe('thisIsCrazy');
+      expect(symbols[3].name).toBe("thisIsCrazy");
       expect(symbols[3].directory).toBe(directory.getPath());
-      expect(symbols[3].file).toBe('tagged.js');
+      expect(symbols[3].file).toBe("tagged.js");
 
-      fs.removeSync(directory.resolve('tags'));
+      fs.removeSync(directory.resolve("tags"));
       await wait(50);
 
       symbols = await getProjectSymbols(provider, editor);

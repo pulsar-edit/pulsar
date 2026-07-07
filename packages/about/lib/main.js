@@ -1,10 +1,9 @@
-
-const UpdateManager = require('./update-manager');
-const About = require('./about');
+const UpdateManager = require("./update-manager");
+const About = require("./about");
 let updateManager;
 
 // The local storage key for the available update version.
-const AboutURI = 'atom://about';
+const AboutURI = "atom://about";
 
 module.exports = {
   activate() {
@@ -36,8 +35,7 @@ module.exports = {
       currentElectronVersion: process.versions.electron,
       currentChromeVersion: process.versions.chrome,
       currentNodeVersion: process.version,
-      updateManager: updateManager
+      updateManager: updateManager,
     });
-  }
-
+  },
 };

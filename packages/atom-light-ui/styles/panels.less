@@ -7,22 +7,27 @@
   }
 }
 
-atom-panel, .tool-panel {
+atom-panel,
+.tool-panel {
   .text(normal);
   position: relative;
 
   background-color: @tool-panel-background-color;
 
-  &.bottom, &.panel-bottom,
-  &.footer, &.footer-bottom {
+  &.bottom,
+  &.panel-bottom,
+  &.footer,
+  &.footer-bottom {
     border-top: 1px solid @tool-panel-border-color;
   }
 
-  &.left, &.panel-left {
+  &.left,
+  &.panel-left {
     border-right: 1px solid @tool-panel-border-color;
   }
 
-  &.right, &.panel-right {
+  &.right,
+  &.panel-right {
     border-left: 1px solid @tool-panel-border-color;
   }
 
@@ -43,7 +48,10 @@ atom-panel, .tool-panel {
   padding: (@component-padding - 2px) @component-padding;
 
   background-color: transparent;
-  background-image: -webkit-linear-gradient(@panel-heading-background-color, darken(@panel-heading-background-color, 10%));
+  background-image: -webkit-linear-gradient(
+    @panel-heading-background-color,
+    darken(@panel-heading-background-color, 10%)
+  );
 
   .btn {
     @bg: lighten(@button-background-color, 10%);

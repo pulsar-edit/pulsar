@@ -5,7 +5,7 @@
  */
 module.exports = {
   create(htmlString) {
-    const template = document.createElement('template');
+    const template = document.createElement("template");
     template.innerHTML = htmlString;
     document.body.appendChild(template);
     return template;
@@ -13,5 +13,5 @@ module.exports = {
 
   render(template) {
     return document.importNode(template.content, true);
-  }
+  },
 };

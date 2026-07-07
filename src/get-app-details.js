@@ -26,9 +26,7 @@ function getAppName() {
   const appNameParts = [app.getName()];
 
   if (releaseChannel !== "stable") {
-    appNameParts.push(
-      releaseChannel.charAt(0).toUpperCase() + releaseChannel.slice(1)
-    );
+    appNameParts.push(releaseChannel.charAt(0).toUpperCase() + releaseChannel.slice(1));
   }
 
   return appNameParts.join(" ");
@@ -38,9 +36,9 @@ function getConfigFilePath(opts = {}) {
   const fs = require("fs");
   const path = require("path");
 
-  let configFilePath = [ "config.json", "config.cson" ].map(file =>
-    path.join(process.env.ATOM_HOME, file)
-  ).find(f => fs.existsSync(f));
+  let configFilePath = ["config.json", "config.cson"]
+    .map((file) => path.join(process.env.ATOM_HOME, file))
+    .find((f) => fs.existsSync(f));
 
   if (configFilePath) {
     return configFilePath;

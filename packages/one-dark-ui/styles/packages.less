@@ -4,9 +4,9 @@
 
 .find-and-replace,
 .project-find {
-  padding: (@ui-padding/4);
+  padding: (@ui-padding / 4);
   .input-block-item {
-    padding: (@ui-padding/4);
+    padding: (@ui-padding / 4);
   }
 }
 
@@ -94,24 +94,25 @@
       }
     }
 
-    &.has-results    .find-container .result-counter { color: @text-color-success; }
-    &.has-no-results .find-container .result-counter { color: @text-color-error; }
+    &.has-results .find-container .result-counter {
+      color: @text-color-success;
+    }
+    &.has-no-results .find-container .result-counter {
+      color: @text-color-error;
+    }
   }
 }
-
-
-
 
 // Timecop ---------------------------
 
 .timecop {
   .timecop-panel {
-    padding: (@component-padding/2);
+    padding: (@component-padding / 2);
     background-color: @level-2-color;
   }
 
   .tool-panel {
-    padding: (@component-padding/2);
+    padding: (@component-padding / 2);
     background-color: @level-2-color;
   }
 
@@ -130,14 +131,12 @@
   }
 }
 
-
 // Command Palette + Fuzzy Finder ---------------------------
 
 .command-palette .list-group .character-match,
 .fuzzy-finder .list-group .character-match {
   color: @accent-only-text-color;
 }
-
 
 // Deprecation Cop ---------------------------
 
@@ -147,7 +146,6 @@
     border-bottom: 1px solid @base-border-color;
   }
 }
-
 
 // Tool Bar ---------------------------
 
@@ -159,13 +157,13 @@
   // just a single border + more spacing
   &.tool-bar-horizontal .tool-bar-spacer {
     border-left: 0 none;
-    margin-left: .5em;
-    margin-right: .5em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
   }
   &.tool-bar-vertical .tool-bar-spacer {
     border-bottom: 0 none;
-    margin-top: .5em;
-    margin-bottom: .5em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
   }
 
   // only show button styles on hover
@@ -176,12 +174,9 @@
   }
 }
 
-
-
 // GitHub package ---------------------------------------------------
 
 .github {
-
   // Fix focus styles
   // Since it's not possible to add a padding to <atom-text-editor>
   // a pseudo element is used to add the border when focused.
@@ -210,7 +205,6 @@
       border-top-right-radius: 0;
     }
 
-
     .Select-option {
       &.is-focused {
         border-bottom-left-radius: 0;
@@ -227,5 +221,4 @@
       background-color: @overlay-background-color;
     }
   }
-
 }

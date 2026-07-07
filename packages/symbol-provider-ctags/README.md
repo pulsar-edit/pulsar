@@ -20,5 +20,5 @@ These commands require a tags file, typically defined at `.tags`/`tags`/`.TAGS`/
 
 Once your tags file is present, these commands can be fulfilled by `symbol-provider-ctags`…
 
-* The **Symbols View: Toggle Project Symbols** command works like **Symbols View: Toggle File Symbols** described above, except it’ll show you symbols from the entire project.
-* The **Symbols View: Go To Declaration** command works like **Symbols View: Toggle Project Symbols**, except the word under the cursor will be pre-filled in the search box, and a result will automatically be opened if it is the only result.
+- The **Symbols View: Toggle Project Symbols** command works like **Symbols View: Toggle File Symbols** described above, except it’ll show you symbols from the entire project.
+- The **Symbols View: Go To Declaration** command works like **Symbols View: Toggle Project Symbols**, except the word under the cursor will be pre-filled in the search box, and a result will automatically be opened if it is the only result.

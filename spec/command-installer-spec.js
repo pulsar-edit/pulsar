@@ -1,7 +1,7 @@
-const path = require('path');
-const fs = require('fs-plus');
-const temp = require('temp').track();
-const CommandInstaller = require('../src/command-installer');
+const path = require("path");
+const fs = require("fs-plus");
+const temp = require("temp").track();
+const CommandInstaller = require("../src/command-installer");
 
 // describe('CommandInstaller on #darwin', () => {
 //   let installer, resourcesPath, installationPath, atomBinPath, apmBinPath;

@@ -1,6 +1,6 @@
 var idCounter = 0;
 
-var nextId = function() {
+var nextId = function () {
   return idCounter++;
 };
 
@@ -91,5 +91,4 @@ module.exports = class LayerDecoration {
     }
     return this.overridePropertiesByMarker.get(marker);
   }
-
 };

@@ -1,4 +1,4 @@
-const { TerminalReporter } = require('jasmine-tagged');
+const { TerminalReporter } = require("jasmine-tagged");
 
 class JasmineListReporter extends TerminalReporter {
   fullDescription(spec) {
@@ -6,7 +6,7 @@ class JasmineListReporter extends TerminalReporter {
   }
 
   reportSpecStarting(spec) {
-    this.print_(this.fullDescription(spec) + ' ');
+    this.print_(this.fullDescription(spec) + " ");
   }
 
   reportSpecResults(spec) {
@@ -15,14 +15,14 @@ class JasmineListReporter extends TerminalReporter {
       return;
     }
 
-    let msg = '';
+    let msg = "";
     if (result.passed()) {
       msg = "\u001b[34m[pass]\u001b[0m";
     } else {
       msg = "\u001b[1m\u001b[31m[FAIL]\u001b[0m";
 
       this.flatFailures ||= [];
-      this.flatFailures.push(getFullDescription(spec, false))
+      this.flatFailures.push(getFullDescription(spec, false));
 
       this.addFailureToFailures_(spec);
     }
@@ -32,10 +32,10 @@ class JasmineListReporter extends TerminalReporter {
   reportFailures_(spec) {
     super.reportFailures_(spec);
 
-    if(this.flatFailures && this.flatFailures.length > 0) {
-      this.printLine_("\n\nALL TESTS THAT FAILED:")
-      for(let failure of this.flatFailures) {
-        this.printLine_(failure)
+    if (this.flatFailures && this.flatFailures.length > 0) {
+      this.printLine_("\n\nALL TESTS THAT FAILED:");
+      for (let failure of this.flatFailures) {
+        this.printLine_(failure);
       }
     }
   }
@@ -43,11 +43,11 @@ class JasmineListReporter extends TerminalReporter {
 
 function getFullDescription(spec, tokens) {
   let fullDescription = spec.description;
-  if(tokens) fullDescription = `it ${fullDescription}`;
+  if (tokens) fullDescription = `it ${fullDescription}`;
 
   let currentSuite = spec.suite;
   while (currentSuite) {
-    if(tokens) {
+    if (tokens) {
       fullDescription = `${currentSuite.description} > ${fullDescription}`;
     } else {
       fullDescription = `${currentSuite.description} ${fullDescription}`;

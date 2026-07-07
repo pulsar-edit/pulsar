@@ -3,7 +3,6 @@
 @import "variables";
 
 .settings-view {
-
   .search-result {
     padding: (@component-padding*1.5);
     margin-bottom: @component-padding;
@@ -16,7 +15,11 @@
     -webkit-user-select: none;
 
     &:hover {
-      background-color: contrast(@package-card-background-color, darken(@package-card-background-color, 2%), lighten(@package-card-background-color, 2%));
+      background-color: contrast(
+        @package-card-background-color,
+        darken(@package-card-background-color, 2%),
+        lighten(@package-card-background-color, 2%)
+      );
     }
     &:active {
       background-color: @package-card-background-color;
@@ -27,7 +30,7 @@
       .avatar,
       .author,
       .stats {
-        opacity: .5;
+        opacity: 0.5;
       }
     }
 
@@ -39,14 +42,14 @@
     }
 
     .search-name {
-      margin-right: .8em;
+      margin-right: 0.8em;
       font-weight: bolder;
       color: @text-color-highlight;
       cursor: pointer;
     }
 
     .search-id {
-      font-size: .8em;
+      font-size: 0.8em;
       margin-right: @component-padding;
       display: block; /* Force newline on item to avoid complex line handling */
       opacity: 0.5;
@@ -65,21 +68,20 @@
 
     .card-name {
       font-weight: 300;
-      margin: 0 0 .2em 0;
+      margin: 0 0 0.2em 0;
       font-size: 1.2em;
       line-height: 1.4;
     }
 
     .search-package-name {
-      margin-right: .2em;
+      margin-right: 0.2em;
       color: @text-color-highlight;
       font-size: 1.2em;
       line-height: 1.4;
     }
 
     .search-result-icon {
-      margin-left: .2em;
+      margin-left: 0.2em;
     }
-
   }
 }

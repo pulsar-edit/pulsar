@@ -1,5 +1,5 @@
-const { Emitter } = require('event-kit');
-const Notification = require('../src/notification');
+const { Emitter } = require("event-kit");
+const Notification = require("../src/notification");
 
 // Public: A notification manager used to create {Notification}s to be shown
 // to the user.
@@ -23,7 +23,7 @@ module.exports = class NotificationManager {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddNotification(callback) {
-    return this.emitter.on('did-add-notification', callback);
+    return this.emitter.on("did-add-notification", callback);
   }
 
   // Public: Invoke the given callback after the notifications have been cleared.
@@ -32,7 +32,7 @@ module.exports = class NotificationManager {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidClearNotifications(callback) {
-    return this.emitter.on('did-clear-notifications', callback);
+    return this.emitter.on("did-clear-notifications", callback);
   }
 
   /*
@@ -64,7 +64,7 @@ module.exports = class NotificationManager {
   //
   // Returns the {Notification} that was added.
   addSuccess(message, options) {
-    return this.addNotification(new Notification('success', message, options));
+    return this.addNotification(new Notification("success", message, options));
   }
 
   // Public: Add an informational notification.
@@ -92,7 +92,7 @@ module.exports = class NotificationManager {
   //
   // Returns the {Notification} that was added.
   addInfo(message, options) {
-    return this.addNotification(new Notification('info', message, options));
+    return this.addNotification(new Notification("info", message, options));
   }
 
   // Public: Add a warning notification.
@@ -120,7 +120,7 @@ module.exports = class NotificationManager {
   //
   // Returns the {Notification} that was added.
   addWarning(message, options) {
-    return this.addNotification(new Notification('warning', message, options));
+    return this.addNotification(new Notification("warning", message, options));
   }
 
   // Public: Add an error notification.
@@ -151,7 +151,7 @@ module.exports = class NotificationManager {
   //
   // Returns the {Notification} that was added.
   addError(message, options) {
-    return this.addNotification(new Notification('error', message, options));
+    return this.addNotification(new Notification("error", message, options));
   }
 
   // Public: Add a fatal error notification.
@@ -182,7 +182,7 @@ module.exports = class NotificationManager {
   //
   // Returns the {Notification} that was added.
   addFatalError(message, options) {
-    return this.addNotification(new Notification('fatal', message, options));
+    return this.addNotification(new Notification("fatal", message, options));
   }
 
   add(type, message, options) {
@@ -191,7 +191,7 @@ module.exports = class NotificationManager {
 
   addNotification(notification) {
     this.notifications.push(notification);
-    this.emitter.emit('did-add-notification', notification);
+    this.emitter.emit("did-add-notification", notification);
     return notification;
   }
 
@@ -213,6 +213,6 @@ module.exports = class NotificationManager {
   // Public: Clear all the notifications.
   clear() {
     this.notifications = [];
-    this.emitter.emit('did-clear-notifications');
+    this.emitter.emit("did-clear-notifications");
   }
 };

@@ -1,29 +1,29 @@
-const fs = require('fs-plus')
-const path = require('path')
+const fs = require("fs-plus");
+const path = require("path");
 
 class DefaultFileIcons {
-  iconClassForPath (filePath, caller) {
-    if (caller !== 'tabs-mru-switcher') return ''
-    if (typeof filePath !== 'string') return 'icon-file-text'
+  iconClassForPath(filePath, caller) {
+    if (caller !== "tabs-mru-switcher") return "";
+    if (typeof filePath !== "string") return "icon-file-text";
 
-    const extension = path.extname(filePath)
+    const extension = path.extname(filePath);
 
     if (fs.isSymbolicLinkSync(filePath)) {
-      return 'icon-file-symlink-file'
+      return "icon-file-symlink-file";
     } else if (fs.isReadmePath(filePath)) {
-      return 'icon-book'
+      return "icon-book";
     } else if (fs.isCompressedExtension(extension)) {
-      return 'icon-file-zip'
+      return "icon-file-zip";
     } else if (fs.isImageExtension(extension)) {
-      return 'icon-file-media'
+      return "icon-file-media";
     } else if (fs.isPdfExtension(extension)) {
-      return 'icon-file-pdf'
+      return "icon-file-pdf";
     } else if (fs.isBinaryExtension(extension)) {
-      return 'icon-file-binary'
+      return "icon-file-binary";
     } else {
-      return 'icon-file-text'
+      return "icon-file-text";
     }
   }
 }
 
-module.exports = new DefaultFileIcons()
+module.exports = new DefaultFileIcons();

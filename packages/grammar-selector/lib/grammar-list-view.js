@@ -1,59 +1,55 @@
-const SelectListView = require('atom-select-list');
+const SelectListView = require("atom-select-list");
 
 module.exports = class GrammarListView {
   constructor() {
-    this.autoDetect = { name: 'Auto Detect' };
+    this.autoDetect = { name: "Auto Detect" };
 
     this.configSubscription = atom.config.observe(
-      'grammar-selector.hideDuplicateTextMateGrammars',
+      "grammar-selector.hideDuplicateTextMateGrammars",
       (value) => {
-        this.hideDuplicateGrammars = value
-      }
+        this.hideDuplicateGrammars = value;
+      },
     );
 
     this.selectListView = new SelectListView({
-      itemsClassList: ['mark-active'],
+      itemsClassList: ["mark-active"],
       items: [],
-      filterKeyForItem: grammar => grammar.name,
-      elementForItem: grammar => {
+      filterKeyForItem: (grammar) => grammar.name,
+      elementForItem: (grammar) => {
         const grammarName = grammar.name || grammar.scopeName;
-        const element = document.createElement('li');
+        const element = document.createElement("li");
         if (grammar === this.currentGrammar) {
-          element.classList.add('active');
+          element.classList.add("active");
         }
-        element.classList.add('grammar-item');
+        element.classList.add("grammar-item");
         element.textContent = grammarName;
         element.dataset.grammar = grammarName;
 
-        const div = document.createElement('div');
-        div.classList.add('pull-right');
+        const div = document.createElement("div");
+        div.classList.add("pull-right");
 
         if (!this.hideDuplicateGrammars) {
           // When we show all grammars, we should add a badge to each grammar
           // to distinguish them from one another in the list.
-          const parser = document.createElement('span');
+          const parser = document.createElement("span");
 
           let badgeText = getBadgeTextForGrammar(grammar);
           let badgeColor = getBadgeColorForGrammar(grammar);
 
-          parser.classList.add(
-            'grammar-selector-parser',
-            'badge',
-            badgeColor
-          );
+          parser.classList.add("grammar-selector-parser", "badge", badgeColor);
           parser.textContent = badgeText;
           if (isModernTreeSitter(grammar)) {
             parser.setAttribute(
-              'title',
-              '(Recommended) A faster parser with improved syntax highlighting & code navigation support.'
+              "title",
+              "(Recommended) A faster parser with improved syntax highlighting & code navigation support.",
             );
           }
           div.appendChild(parser);
         }
 
         if (grammar.scopeName) {
-          const scopeName = document.createElement('scopeName');
-          scopeName.classList.add('badge', 'badge-info');
+          const scopeName = document.createElement("scopeName");
+          scopeName.classList.add("badge", "badge-info");
           scopeName.textContent = grammar.scopeName;
           div.appendChild(scopeName);
           element.appendChild(div);
@@ -61,7 +57,7 @@ module.exports = class GrammarListView {
 
         return element;
       },
-      didConfirmSelection: grammar => {
+      didConfirmSelection: (grammar) => {
         this.cancel();
         if (grammar === this.autoDetect) {
           atom.textEditors.clearGrammarOverride(this.editor);
@@ -71,10 +67,10 @@ module.exports = class GrammarListView {
       },
       didCancelSelection: () => {
         this.cancel();
-      }
+      },
     });
 
-    this.selectListView.element.classList.add('grammar-selector');
+    this.selectListView.element.classList.add("grammar-selector");
   }
 
   destroy() {
@@ -104,11 +100,9 @@ module.exports = class GrammarListView {
   }
 
   getAllDisplayableGrammars() {
-    let allGrammars = atom.grammars
-      .getGrammars({ includeTreeSitter: true })
-      .filter(grammar => {
-        return grammar !== atom.grammars.nullGrammar && grammar.name;
-      });
+    let allGrammars = atom.grammars.getGrammars({ includeTreeSitter: true }).filter((grammar) => {
+      return grammar !== atom.grammars.nullGrammar && grammar.name;
+    });
 
     return allGrammars;
   }
@@ -130,9 +124,9 @@ module.exports = class GrammarListView {
       let grammars = this.getAllDisplayableGrammars();
 
       grammars.sort((a, b) => {
-        if (a.scopeName === 'text.plain') {
+        if (a.scopeName === "text.plain") {
           return -1;
-        } else if (b.scopeName === 'text.plain') {
+        } else if (b.scopeName === "text.plain") {
           return 1;
         } else if (a.name === b.name) {
           return compareGrammarType(a, b);
@@ -164,12 +158,12 @@ module.exports = class GrammarListView {
 // colors. Otherwise we should be looking up these values in a scope-specific
 // manner.
 function getLanguageModeConfig() {
-  let isTreeSitterMode = atom.config.get('core.useTreeSitterParsers');
-  return isTreeSitterMode ? 'web-tree-sitter' : 'textmate';
+  let isTreeSitterMode = atom.config.get("core.useTreeSitterParsers");
+  return isTreeSitterMode ? "web-tree-sitter" : "textmate";
 }
 
 function isModernTreeSitter(grammar) {
-  return grammar.constructor.name === 'WASMTreeSitterGrammar';
+  return grammar.constructor.name === "WASMTreeSitterGrammar";
 }
 
 function compareGrammarType(a, b) {
@@ -179,38 +173,35 @@ function compareGrammarType(a, b) {
 // Given a scope name, determines the user's preferred parser type for that
 // language.
 function getParserPreferenceForScopeName(scopeName) {
-  let useTreeSitterParsers = atom.config.get(
-    'core.useTreeSitterParsers',
-    { scope: [scopeName] }
-  );
+  let useTreeSitterParsers = atom.config.get("core.useTreeSitterParsers", { scope: [scopeName] });
 
   if (!useTreeSitterParsers) {
-    return 'textmate';
+    return "textmate";
   } else {
-    return 'web-tree-sitter';
+    return "web-tree-sitter";
   }
 }
 
 function getBadgeTextForGrammar(grammar) {
   switch (grammar.constructor.name) {
-    case 'Grammar':
-      return 'TextMate';
-    case 'WASMTreeSitterGrammar':
-      return 'Tree-sitter';
+    case "Grammar":
+      return "TextMate";
+    case "WASMTreeSitterGrammar":
+      return "Tree-sitter";
   }
 }
 
 const BADGE_COLORS_BY_LANGUAGE_MODE_CONFIG = {
-  'textmate': {
-    'Grammar': 'badge-success',
-    'TreeSitterGrammar': 'badge-info',
-    'WASMTreeSitterGrammar': 'badge-info'
+  textmate: {
+    Grammar: "badge-success",
+    TreeSitterGrammar: "badge-info",
+    WASMTreeSitterGrammar: "badge-info",
   },
-  'web-tree-sitter': {
-    'WASMTreeSitterGrammar': 'badge-success',
-    'TreeSitterGrammar': 'badge-warning',
-    'Grammar': 'badge-info'
-  }
+  "web-tree-sitter": {
+    WASMTreeSitterGrammar: "badge-success",
+    TreeSitterGrammar: "badge-warning",
+    Grammar: "badge-info",
+  },
 };
 
 function getBadgeColorForGrammar(grammar) {
@@ -222,5 +213,5 @@ function getBadgeColorForGrammar(grammar) {
 function getGrammarScore(grammar) {
   let languageParser = getParserPreferenceForScopeName(grammar.scopeName);
   if (isModernTreeSitter(grammar)) return -2;
-  return languageParser === 'textmate' ? -3 : 0;
+  return languageParser === "textmate" ? -3 : 0;
 }

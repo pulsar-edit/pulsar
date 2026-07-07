@@ -1,11 +1,11 @@
-const PackageGeneratorView = require('./package-generator-view')
+const PackageGeneratorView = require("./package-generator-view");
 
 module.exports = {
-  activate () {
-    this.view = new PackageGeneratorView()
+  activate() {
+    this.view = new PackageGeneratorView();
   },
 
-  deactivate () {
-    if (this.view) this.view.destroy()
-  }
-}
+  deactivate() {
+    if (this.view) this.view.destroy();
+  },
+};

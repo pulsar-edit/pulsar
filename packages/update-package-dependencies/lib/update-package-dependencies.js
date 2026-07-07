@@ -1,12 +1,12 @@
-const { BufferedProcess } = require('atom');
-const UpdatePackageDependenciesStatusView = require('./update-package-dependencies-status-view');
+const { BufferedProcess } = require("atom");
+const UpdatePackageDependenciesStatusView = require("./update-package-dependencies-status-view");
 
 module.exports = {
   activate() {
     this.subscription = atom.commands.add(
-      'atom-workspace',
-      'update-package-dependencies:update',
-      () => this.update()
+      "atom-workspace",
+      "update-package-dependencies:update",
+      () => this.update(),
     );
   },
 
@@ -19,39 +19,36 @@ module.exports = {
   },
 
   consumeStatusBar(statusBar) {
-    this.updatePackageDependenciesStatusView = new UpdatePackageDependenciesStatusView(
-      statusBar
-    );
+    this.updatePackageDependenciesStatusView = new UpdatePackageDependenciesStatusView(statusBar);
   },
 
   update() {
     if (this.process) return; // Do not allow multiple apm processes to run
-    if (this.updatePackageDependenciesStatusView)
-      this.updatePackageDependenciesStatusView.attach();
+    if (this.updatePackageDependenciesStatusView) this.updatePackageDependenciesStatusView.attach();
 
-    let errorOutput = '';
+    let errorOutput = "";
 
     const command = atom.packages.getApmPath();
-    const args = ['install', '--no-color'];
-    const stderr = output => {
+    const args = ["install", "--no-color"];
+    const stderr = (output) => {
       errorOutput += output;
     };
     const options = {
       cwd: this.getActiveProjectPath(),
-      env: Object.assign({}, process.env, { NODE_ENV: 'development' })
+      env: Object.assign({}, process.env, { NODE_ENV: "development" }),
     };
 
-    const exit = code => {
+    const exit = (code) => {
       this.process = null;
       if (this.updatePackageDependenciesStatusView)
         this.updatePackageDependenciesStatusView.detach();
 
       if (code === 0) {
-        atom.notifications.addSuccess('Package dependencies updated');
+        atom.notifications.addSuccess("Package dependencies updated");
       } else {
-        atom.notifications.addError('Failed to update package dependencies', {
+        atom.notifications.addError("Failed to update package dependencies", {
           detail: errorOutput,
-          dismissable: true
+          dismissable: true,
         });
       }
     };
@@ -61,7 +58,7 @@ module.exports = {
       args,
       stderr,
       exit,
-      options
+      options,
     });
   },
 
@@ -72,10 +69,10 @@ module.exports = {
 
   getActiveProjectPath() {
     const activeItem = atom.workspace.getActivePaneItem();
-    if (activeItem && typeof activeItem.getPath === 'function') {
+    if (activeItem && typeof activeItem.getPath === "function") {
       return atom.project.relativizePath(activeItem.getPath())[0];
     } else {
       return atom.project.getPaths()[0];
     }
-  }
+  },
 };

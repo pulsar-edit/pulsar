@@ -1,8 +1,8 @@
-const { Point, Range } = require('atom');
+const { Point, Range } = require("atom");
 
 function isPhpDoc(node) {
   let { text } = node;
-  return text.startsWith('/**') && !text.startsWith('/***')
+  return text.startsWith("/**") && !text.startsWith("/***");
 }
 
 function comparePoints(a, b) {
@@ -43,8 +43,8 @@ function interpret(nodes) {
   let lastIndex = nodes.length - 1;
 
   for (let [index, node] of sorted.entries()) {
-    let isStart = node.type === 'php_tag';
-    let isEnd = node.type === '?>';
+    let isStart = node.type === "php_tag";
+    let isEnd = node.type === "?>";
     let isLast = index === lastIndex;
 
     if (isStart) {
@@ -70,10 +70,7 @@ function interpret(nodes) {
           startPosition: currentStart.startPosition,
           endIndex: Infinity,
           endPosition: Point.INFINITY,
-          range: new Range(
-            currentStart.range.start,
-            Point.INFINITY
-          )
+          range: new Range(currentStart.range.start, Point.INFINITY),
         };
         ranges.push(spec);
         currentStart = null;
@@ -96,10 +93,7 @@ function interpret(nodes) {
         startPosition: currentStart.startPosition,
         endIndex: node.endIndex,
         endPosition: node.endPosition,
-        range: new Range(
-          currentStart.range.start,
-          node.range.end
-        )
+        range: new Range(currentStart.range.start, node.range.end),
       };
       ranges.push(spec);
       currentStart = null;
@@ -109,7 +103,6 @@ function interpret(nodes) {
 }
 
 exports.activate = function () {
-
   // Here's how we handle the mixing of PHP and HTML:
   //
   // * The root language layer uses the `tree-sitter-php` parser, and handles
@@ -135,24 +128,24 @@ exports.activate = function () {
   // the option of re-using another layer's tree, we'd want to do that, but
   // right now there's not a need for such a feature.
 
-  atom.grammars.addInjectionPoint('text.html.php', {
-    type: 'program',
-    language: () => 'html',
+  atom.grammars.addInjectionPoint("text.html.php", {
+    type: "program",
+    language: () => "html",
     content(node) {
-      return node.descendantsOfType('text');
+      return node.descendantsOfType("text");
     },
 
     // We don't need a base scope for this injection because the whole file is
     // already scoped as `text.html.php`. The PHP embeds add a `source.php`
     // scope, but still has `text.html.php` as the root. This is how the TM
     // grammar works, so we're replicating it here.
-    languageScope: null
+    languageScope: null,
   });
 
-  atom.grammars.addInjectionPoint('text.html.php', {
-    type: 'program',
+  atom.grammars.addInjectionPoint("text.html.php", {
+    type: "program",
     language() {
-      return 'internal-php';
+      return "internal-php";
     },
     content(node) {
       // The actual structure of the tree is utter chaos for us. The best way
@@ -171,7 +164,7 @@ exports.activate = function () {
       // TODO: This method should be allowed to return actual ordinary `Range`
       // instances, in which case we'd understand that no futher processing
       // need take place by the language mode.
-      let boundaries = node.descendantsOfType(['php_tag', '?>']);
+      let boundaries = node.descendantsOfType(["php_tag", "?>"]);
       return interpret(boundaries);
     },
     includeChildren: true,
@@ -192,72 +185,71 @@ exports.activate = function () {
     // it allows the injection to decide on a range-by-range basis what the
     // scope name is… _and_ it can return more than one scope name.
     languageScope(grammar, _buffer, range) {
-      let extraScope = range.start.row !== range.end.row ?
-        'meta.embedded.block.php' : 'meta.embedded.line.php';
+      let extraScope =
+        range.start.row !== range.end.row ? "meta.embedded.block.php" : "meta.embedded.line.php";
       return [grammar.scopeName, extraScope];
-    }
+    },
   });
-
 
   // HEREDOCS and NOWDOCS
   // ====================
 
-  atom.grammars.addInjectionPoint('text.html.php', {
-    type: 'heredoc',
+  atom.grammars.addInjectionPoint("text.html.php", {
+    type: "heredoc",
     language(node) {
       let id = node.firstNamedChild;
-      if (id.type !== 'heredoc_start') return null;
+      if (id.type !== "heredoc_start") return null;
       return id.text;
     },
     content(node) {
-      let body = node.children.find(c => c.type === 'heredoc_body');
-      let results = body.children.filter(c => c.type === 'string_value');
+      let body = node.children.find((c) => c.type === "heredoc_body");
+      let results = body.children.filter((c) => c.type === "string_value");
       return results;
-    }
+    },
   });
 
-  atom.grammars.addInjectionPoint('text.html.php', {
-    type: 'nowdoc',
+  atom.grammars.addInjectionPoint("text.html.php", {
+    type: "nowdoc",
     language(node) {
       let id = node.firstNamedChild;
-      if (id.type !== 'heredoc_start') return null;
+      if (id.type !== "heredoc_start") return null;
       return id.text;
     },
     content(node) {
-      let body = node.children.find(c => c.type === 'nowdoc_body');
-      let results = body.children.filter(c => c.type === 'nowdoc_string');
+      let body = node.children.find((c) => c.type === "nowdoc_body");
+      let results = body.children.filter((c) => c.type === "nowdoc_string");
       return results;
-    }
+    },
   });
-
 
   // PHPDoc
   // ======
 
-  atom.grammars.addInjectionPoint('text.html.php', {
-    type: 'comment',
+  atom.grammars.addInjectionPoint("text.html.php", {
+    type: "comment",
     language(node) {
       if (isPhpDoc(node)) {
-        return 'phpdoc';
+        return "phpdoc";
       }
     },
-    content(node) { return node; }
+    content(node) {
+      return node;
+    },
   });
-
 };
 
 // TODOs and URLs
 // ==============
 
 exports.consumeHyperlinkInjection = (hyperlink) => {
-  hyperlink.addInjectionPoint('text.html.php', {
-    types: ['comment', 'string_value'],
+  hyperlink.addInjectionPoint("text.html.php", {
+    types: ["comment", "string_value"],
     language(node) {
       if (isPhpDoc(node)) return null;
-    }
+    },
   });
 };
 
 exports.consumeTodoInjection = (todo) => {
-  todo.addInjectionPoint('text.html.php', { types: ['comment'] });
+  todo.addInjectionPoint("text.html.php", { types: ["comment"] });
 };

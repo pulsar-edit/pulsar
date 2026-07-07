@@ -1,12 +1,12 @@
-const SymbolsView = require('./symbols-view');
-const { timeout } = require('./util');
+const SymbolsView = require("./symbols-view");
+const { timeout } = require("./util");
 
 module.exports = class GoToView extends SymbolsView {
-  constructor (stack, broker) {
+  constructor(stack, broker) {
     super(stack, broker);
   }
 
-  toggle () {
+  toggle() {
     if (this.panel.isVisible()) {
       this.cancel();
     } else {
@@ -14,12 +14,12 @@ module.exports = class GoToView extends SymbolsView {
     }
   }
 
-  detached () {
+  detached() {
     // TODO
     this.abortController?.abort();
   }
 
-  async populate () {
+  async populate() {
     let editor = atom.workspace.getActiveTextEditor();
     if (!editor) return;
 
@@ -27,7 +27,7 @@ module.exports = class GoToView extends SymbolsView {
 
     if (symbols?.length === 0) {
       // TODO
-      console.warn('No symbols!');
+      console.warn("No symbols!");
       return;
     }
 
@@ -40,18 +40,18 @@ module.exports = class GoToView extends SymbolsView {
     this.attach();
   }
 
-  shouldBePending () {
+  shouldBePending() {
     return true;
   }
 
-  async generateSymbols (editor, range = null) {
+  async generateSymbols(editor, range = null) {
     this.abortController?.abort();
     this.abortController = new AbortController();
 
     let meta = {
-      type: 'project-find',
+      type: "project-find",
       editor,
-      paths: atom.project.getPaths()
+      paths: atom.project.getPaths(),
     };
 
     if (range) {
@@ -80,7 +80,7 @@ module.exports = class GoToView extends SymbolsView {
 
     let error = (err, provider) => {
       if (signal.aborted) return;
-      let message = typeof err === 'string' ? err : err.message;
+      let message = typeof err === "string" ? err : err.message;
       console.error(`Error in retrieving symbols from provider ${provider.name}: ${message}`);
     };
 
@@ -90,8 +90,8 @@ module.exports = class GoToView extends SymbolsView {
         let symbols = this.getSymbolsFromProvider(provider, signal, meta);
         if (symbols?.then) {
           let task = symbols
-            .then(result => done(result, provider))
-            .catch(err => error(err, provider));
+            .then((result) => done(result, provider))
+            .catch((err) => error(err, provider));
           tasks.push(task);
         } else {
           done(symbols, provider);

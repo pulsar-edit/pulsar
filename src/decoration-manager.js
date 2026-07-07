@@ -1,6 +1,6 @@
-const { Emitter } = require('event-kit');
-const Decoration = require('./decoration');
-const LayerDecoration = require('./layer-decoration');
+const { Emitter } = require("event-kit");
+const Decoration = require("./decoration");
+const LayerDecoration = require("./layer-decoration");
 
 module.exports = class DecorationManager {
   constructor(editor) {
@@ -25,25 +25,25 @@ module.exports = class DecorationManager {
   }
 
   onDidAddDecoration(callback) {
-    return this.emitter.on('did-add-decoration', callback);
+    return this.emitter.on("did-add-decoration", callback);
   }
 
   onDidRemoveDecoration(callback) {
-    return this.emitter.on('did-remove-decoration', callback);
+    return this.emitter.on("did-remove-decoration", callback);
   }
 
   onDidUpdateDecorations(callback) {
-    return this.emitter.on('did-update-decorations', callback);
+    return this.emitter.on("did-update-decorations", callback);
   }
 
   getDecorations(propertyFilter) {
     let allDecorations = [];
 
-    this.decorationsByMarker.forEach(decorations => {
-      decorations.forEach(decoration => allDecorations.push(decoration));
+    this.decorationsByMarker.forEach((decorations) => {
+      decorations.forEach((decoration) => allDecorations.push(decoration));
     });
     if (propertyFilter != null) {
-      allDecorations = allDecorations.filter(function(decoration) {
+      allDecorations = allDecorations.filter(function (decoration) {
         for (let key in propertyFilter) {
           const value = propertyFilter[key];
           if (decoration.properties[key] !== value) return false;
@@ -55,20 +55,18 @@ module.exports = class DecorationManager {
   }
 
   getLineDecorations(propertyFilter) {
-    return this.getDecorations(propertyFilter).filter(decoration =>
-      decoration.isType('line')
-    );
+    return this.getDecorations(propertyFilter).filter((decoration) => decoration.isType("line"));
   }
 
   getLineNumberDecorations(propertyFilter) {
-    return this.getDecorations(propertyFilter).filter(decoration =>
-      decoration.isType('line-number')
+    return this.getDecorations(propertyFilter).filter((decoration) =>
+      decoration.isType("line-number"),
     );
   }
 
   getHighlightDecorations(propertyFilter) {
-    return this.getDecorations(propertyFilter).filter(decoration =>
-      decoration.isType('highlight')
+    return this.getDecorations(propertyFilter).filter((decoration) =>
+      decoration.isType("highlight"),
     );
   }
 
@@ -76,7 +74,7 @@ module.exports = class DecorationManager {
     const result = [];
     result.push(...Array.from(this.overlayDecorations));
     if (propertyFilter != null) {
-      return result.filter(function(decoration) {
+      return result.filter(function (decoration) {
         for (let key in propertyFilter) {
           const value = propertyFilter[key];
           if (decoration.properties[key] !== value) {
@@ -95,34 +93,25 @@ module.exports = class DecorationManager {
 
     this.decorationCountsByLayer.forEach((count, markerLayer) => {
       const markers = markerLayer.findMarkers({
-        intersectsScreenRowRange: [startScreenRow, endScreenRow - 1]
+        intersectsScreenRowRange: [startScreenRow, endScreenRow - 1],
       });
-      const layerDecorations = this.layerDecorationsByMarkerLayer.get(
-        markerLayer
-      );
-      const hasMarkerDecorations =
-        this.markerDecorationCountsByLayer.get(markerLayer) > 0;
+      const layerDecorations = this.layerDecorationsByMarkerLayer.get(markerLayer);
+      const hasMarkerDecorations = this.markerDecorationCountsByLayer.get(markerLayer) > 0;
 
       for (let i = 0; i < markers.length; i++) {
         const marker = markers[i];
         if (!marker.isValid()) continue;
 
-        let decorationPropertiesForMarker = decorationPropertiesByMarker.get(
-          marker
-        );
+        let decorationPropertiesForMarker = decorationPropertiesByMarker.get(marker);
         if (decorationPropertiesForMarker == null) {
           decorationPropertiesForMarker = [];
-          decorationPropertiesByMarker.set(
-            marker,
-            decorationPropertiesForMarker
-          );
+          decorationPropertiesByMarker.set(marker, decorationPropertiesForMarker);
         }
 
         if (layerDecorations) {
-          layerDecorations.forEach(layerDecoration => {
+          layerDecorations.forEach((layerDecoration) => {
             const properties =
-              layerDecoration.getPropertiesForMarker(marker) ||
-              layerDecoration.getProperties();
+              layerDecoration.getPropertiesForMarker(marker) || layerDecoration.getProperties();
             decorationPropertiesForMarker.push(properties);
           });
         }
@@ -130,7 +119,7 @@ module.exports = class DecorationManager {
         if (hasMarkerDecorations) {
           const decorationsForMarker = this.decorationsByMarker.get(marker);
           if (decorationsForMarker) {
-            decorationsForMarker.forEach(decoration => {
+            decorationsForMarker.forEach((decoration) => {
               decorationPropertiesForMarker.push(decoration.getProperties());
             });
           }
@@ -145,7 +134,7 @@ module.exports = class DecorationManager {
     const decorationsByMarkerId = {};
     for (const layer of this.decorationCountsByLayer.keys()) {
       for (const marker of layer.findMarkers({
-        intersectsScreenRowRange: [startScreenRow, endScreenRow]
+        intersectsScreenRowRange: [startScreenRow, endScreenRow],
       })) {
         const decorations = this.decorationsByMarker.get(marker);
         if (decorations) {
@@ -161,7 +150,7 @@ module.exports = class DecorationManager {
 
     for (const layer of this.decorationCountsByLayer.keys()) {
       for (const marker of layer.findMarkers({
-        intersectsScreenRowRange: [startScreenRow, endScreenRow]
+        intersectsScreenRowRange: [startScreenRow, endScreenRow],
       })) {
         if (marker.isValid()) {
           const screenRange = marker.getScreenRange();
@@ -170,29 +159,26 @@ module.exports = class DecorationManager {
 
           const decorations = this.decorationsByMarker.get(marker);
           if (decorations) {
-            decorations.forEach(decoration => {
+            decorations.forEach((decoration) => {
               decorationsState[decoration.id] = {
                 properties: decoration.properties,
                 screenRange,
                 bufferRange,
-                rangeIsReversed
+                rangeIsReversed,
               };
             });
           }
 
-          const layerDecorations = this.layerDecorationsByMarkerLayer.get(
-            layer
-          );
+          const layerDecorations = this.layerDecorationsByMarkerLayer.get(layer);
           if (layerDecorations) {
-            layerDecorations.forEach(layerDecoration => {
+            layerDecorations.forEach((layerDecoration) => {
               const properties =
-                layerDecoration.getPropertiesForMarker(marker) ||
-                layerDecoration.getProperties();
+                layerDecoration.getPropertiesForMarker(marker) || layerDecoration.getProperties();
               decorationsState[`${layerDecoration.id}-${marker.id}`] = {
                 properties,
                 screenRange,
                 bufferRange,
-                rangeIsReversed
+                rangeIsReversed,
               };
             });
           }
@@ -205,23 +191,17 @@ module.exports = class DecorationManager {
 
   decorateMarker(marker, decorationParams) {
     if (marker.isDestroyed()) {
-      const error = new Error('Cannot decorate a destroyed marker');
+      const error = new Error("Cannot decorate a destroyed marker");
       error.metadata = { markerLayerIsDestroyed: marker.layer.isDestroyed() };
       if (marker.destroyStackTrace != null) {
         error.metadata.destroyStackTrace = marker.destroyStackTrace;
       }
-      if (
-        marker.bufferMarker != null &&
-        marker.bufferMarker.destroyStackTrace != null
-      ) {
-        error.metadata.destroyStackTrace =
-          marker.bufferMarker.destroyStackTrace;
+      if (marker.bufferMarker != null && marker.bufferMarker.destroyStackTrace != null) {
+        error.metadata.destroyStackTrace = marker.bufferMarker.destroyStackTrace;
       }
       throw error;
     }
-    marker = this.displayLayer
-      .getMarkerLayer(marker.layer.id)
-      .getMarker(marker.id);
+    marker = this.displayLayer.getMarkerLayer(marker.layer.id).getMarker(marker.id);
     const decoration = new Decoration(marker, this, decorationParams);
     let decorationsForMarker = this.decorationsByMarker.get(marker);
     if (!decorationsForMarker) {
@@ -229,17 +209,17 @@ module.exports = class DecorationManager {
       this.decorationsByMarker.set(marker, decorationsForMarker);
     }
     decorationsForMarker.add(decoration);
-    if (decoration.isType('overlay')) this.overlayDecorations.add(decoration);
+    if (decoration.isType("overlay")) this.overlayDecorations.add(decoration);
     this.observeDecoratedLayer(marker.layer, true);
     this.editor.didAddDecoration(decoration);
     this.emitDidUpdateDecorations();
-    this.emitter.emit('did-add-decoration', decoration);
+    this.emitter.emit("did-add-decoration", decoration);
     return decoration;
   }
 
   decorateMarkerLayer(markerLayer, decorationParams) {
     if (markerLayer.isDestroyed()) {
-      throw new Error('Cannot decorate a destroyed marker layer');
+      throw new Error("Cannot decorate a destroyed marker layer");
     }
     markerLayer = this.displayLayer.getMarkerLayer(markerLayer.id);
     const decoration = new LayerDecoration(markerLayer, this, decorationParams);
@@ -256,11 +236,11 @@ module.exports = class DecorationManager {
 
   emitDidUpdateDecorations() {
     this.editor.scheduleComponentUpdate();
-    this.emitter.emit('did-update-decorations');
+    this.emitter.emit("did-update-decorations");
   }
 
   decorationDidChangeType(decoration) {
-    if (decoration.isType('overlay')) {
+    if (decoration.isType("overlay")) {
       this.overlayDecorations.add(decoration);
     } else {
       this.overlayDecorations.delete(decoration);
@@ -275,7 +255,7 @@ module.exports = class DecorationManager {
       if (decorations.size === 0) this.decorationsByMarker.delete(marker);
       this.overlayDecorations.delete(decoration);
       this.unobserveDecoratedLayer(marker.layer, true);
-      this.emitter.emit('did-remove-decoration', decoration);
+      this.emitter.emit("did-remove-decoration", decoration);
       this.emitDidUpdateDecorations();
     }
   }
@@ -300,13 +280,13 @@ module.exports = class DecorationManager {
     if (newCount === 1) {
       this.layerUpdateDisposablesByLayer.set(
         layer,
-        layer.onDidUpdate(this.emitDidUpdateDecorations.bind(this))
+        layer.onDidUpdate(this.emitDidUpdateDecorations.bind(this)),
       );
     }
     if (isMarkerDecoration) {
       this.markerDecorationCountsByLayer.set(
         layer,
-        (this.markerDecorationCountsByLayer.get(layer) || 0) + 1
+        (this.markerDecorationCountsByLayer.get(layer) || 0) + 1,
       );
     }
   }
@@ -320,9 +300,7 @@ module.exports = class DecorationManager {
       this.decorationCountsByLayer.set(layer, newCount);
     }
     if (isMarkerDecoration) {
-      this.markerDecorationCountsByLayer.set(
-        this.markerDecorationCountsByLayer.get(layer) - 1
-      );
+      this.markerDecorationCountsByLayer.set(this.markerDecorationCountsByLayer.get(layer) - 1);
     }
   }
 };

@@ -1,5 +1,5 @@
-const { CompositeDisposable, Emitter } = require('atom');
-const Config = require('./config');
+const { CompositeDisposable, Emitter } = require("atom");
+const Config = require("./config");
 
 /**
  * An error thrown when a newly added symbol provider does not conform to its
@@ -9,12 +9,12 @@ const Config = require('./config');
  */
 class InvalidProviderError extends Error {
   constructor(faults, provider) {
-    let packageName = provider.packageName ?
-      `the ${provider.packageName} provider`
-      : 'a symbol provider';
-    let message = `symbols-view failed to consume ${packageName} because certain properties are invalid: ${faults.join(', ')}. Please fix these faults or contact the package author.`;
+    let packageName = provider.packageName
+      ? `the ${provider.packageName} provider`
+      : "a symbol provider";
+    let message = `symbols-view failed to consume ${packageName} because certain properties are invalid: ${faults.join(", ")}. Please fix these faults or contact the package author.`;
     super(message);
-    this.name = 'InvalidProviderError';
+    this.name = "InvalidProviderError";
   }
 }
 
@@ -47,7 +47,7 @@ module.exports = class ProviderBroker {
         continue;
       }
       this.providers.push(provider);
-      this.emitter.emit('did-add-provider', provider);
+      this.emitter.emit("did-add-provider", provider);
       this.observeProvider(provider);
     }
   }
@@ -64,7 +64,7 @@ module.exports = class ProviderBroker {
       if (index === -1) continue;
 
       this.providers.splice(index, 1);
-      this.emitter.emit('did-remove-provider', provider);
+      this.emitter.emit("did-remove-provider", provider);
       this.stopObservingProvider(provider);
     }
   }
@@ -76,12 +76,10 @@ module.exports = class ProviderBroker {
    */
   validateSymbolProvider(provider) {
     let faults = [];
-    if (typeof provider.name !== 'string') faults.push('name');
-    if (typeof provider.packageName !== 'string') faults.push('packageName');
-    if (typeof provider.canProvideSymbols !== 'function')
-      faults.push('canProvideSymbols');
-    if (typeof provider.getSymbols !== 'function')
-      faults.push('getSymbols');
+    if (typeof provider.name !== "string") faults.push("name");
+    if (typeof provider.packageName !== "string") faults.push("packageName");
+    if (typeof provider.canProvideSymbols !== "function") faults.push("canProvideSymbols");
+    if (typeof provider.getSymbols !== "function") faults.push("getSymbols");
 
     if (faults.length > 0) {
       throw new InvalidProviderError(faults, provider);
@@ -103,8 +101,8 @@ module.exports = class ProviderBroker {
 
     disposable.add(
       provider.onShouldClearCache((bundle) => {
-        this.emitter.emit('should-clear-cache', { ...bundle, provider });
-      })
+        this.emitter.emit("should-clear-cache", { ...bundle, provider });
+      }),
     );
   }
 
@@ -122,20 +120,20 @@ module.exports = class ProviderBroker {
   destroy() {
     for (let provider of this.providers) {
       provider?.destroy?.();
-      this.emitter.emit('did-remove-provider', provider);
+      this.emitter.emit("did-remove-provider", provider);
     }
   }
 
   onDidAddProvider(callback) {
-    return this.emitter.on('did-add-provider', callback);
+    return this.emitter.on("did-add-provider", callback);
   }
 
   onDidRemoveProvider(callback) {
-    return this.emitter.on('did-remove-provider', callback);
+    return this.emitter.on("did-remove-provider", callback);
   }
 
   onShouldClearCache(callback) {
-    return this.emitter.on('should-clear-cache', callback);
+    return this.emitter.on("should-clear-cache", callback);
   }
 
   /**
@@ -153,16 +151,15 @@ module.exports = class ProviderBroker {
    *   score.
    */
   getScoreBoost(name, packageName, preferredProviders = []) {
-    let shouldLog = Config.get('enableDebugLogging');
-    if (packageName === 'unknown') return 0;
+    let shouldLog = Config.get("enableDebugLogging");
+    if (packageName === "unknown") return 0;
     let index = preferredProviders.indexOf(packageName);
     if (index === -1) {
       index = preferredProviders.indexOf(name);
     }
     if (index === -1) return 0;
     let scoreBoost = preferredProviders.length - index;
-    if (shouldLog)
-      console.log('Score boost for provider', name, packageName, 'is', scoreBoost);
+    if (shouldLog) console.log("Score boost for provider", name, packageName, "is", scoreBoost);
     return scoreBoost;
   }
 
@@ -176,24 +173,26 @@ module.exports = class ProviderBroker {
    *   of symbol providers.
    */
   async select(meta, { enforceExclusivity = true } = {}) {
-    let shouldLog = Config.get('enableDebugLogging');
+    let shouldLog = Config.get("enableDebugLogging");
     let exclusivesByScore = [];
     let results = [];
 
-    let preferredProviders = Config.getForEditor(meta.editor, 'preferCertainProviders');
+    let preferredProviders = Config.getForEditor(meta.editor, "preferCertainProviders");
 
     if (shouldLog) {
-      console.debug(`Provider broker choosing among ${this.providers.length} candidates:`, this.providers);
-      console.debug('Metadata is:', meta);
+      console.debug(
+        `Provider broker choosing among ${this.providers.length} candidates:`,
+        this.providers,
+      );
+      console.debug("Metadata is:", meta);
     }
 
-    let answers = this.providers.map(provider => {
+    let answers = this.providers.map((provider) => {
       // TODO: This method can reluctantly go async because language clients
       // might have to ask their servers about capabilities. We must introduce
       // a timeout value here so that we don't wait indefinitely for providers
       // to respond.
-      if (shouldLog)
-        console.debug(`Asking provider:`, provider.name, provider);
+      if (shouldLog) console.debug(`Asking provider:`, provider.name, provider);
       return provider.canProvideSymbols(meta);
       // return timeout(provider.canProvideSymbols(meta), 500);
     });
@@ -203,13 +202,12 @@ module.exports = class ProviderBroker {
     for (let [index, provider] of this.providers.entries()) {
       let outcome = outcomes[index];
 
-      if (shouldLog)
-        console.debug(`Outcome for provider`, provider.name, 'is', outcome);
+      if (shouldLog) console.debug(`Outcome for provider`, provider.name, "is", outcome);
 
-      if (outcome.status === 'rejected') continue;
+      if (outcome.status === "rejected") continue;
       let { value: score } = outcome;
-      let name = provider.name ?? 'unknown';
-      let packageName = provider?.packageName ?? 'unknown';
+      let name = provider.name ?? "unknown";
+      let packageName = provider?.packageName ?? "unknown";
 
       // When `enforceExclusivity` is `false`, we'll treat all providers as
       // non-exclusive, even the ones that indicate otherwise.
@@ -219,8 +217,7 @@ module.exports = class ProviderBroker {
       // set if it thinks it's inappropriate for its results to be considered.
       let isExclusive = enforceExclusivity ? (provider?.isExclusive ?? false) : false;
 
-      if (shouldLog)
-        console.debug('Score for', provider.name, 'is:', score);
+      if (shouldLog) console.debug("Score for", provider.name, "is:", score);
 
       if (!score) continue;
       if (score === true) score = 1;
@@ -243,8 +240,7 @@ module.exports = class ProviderBroker {
       results.unshift(exclusive);
     }
 
-    if (shouldLog)
-      console.debug('Returned providers:', results);
+    if (shouldLog) console.debug("Returned providers:", results);
 
     return results;
   }

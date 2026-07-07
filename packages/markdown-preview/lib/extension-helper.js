@@ -1,7 +1,8 @@
-
 function getUserLanguageIds() {
   try {
-    let usersLanguageIDs = atom.config.get("markdown-preview.customSyntaxHighlightingLanguageIdentifiers");
+    let usersLanguageIDs = atom.config.get(
+      "markdown-preview.customSyntaxHighlightingLanguageIdentifiers",
+    );
 
     let obj = {};
 
@@ -18,21 +19,23 @@ function getUserLanguageIds() {
     }
 
     return obj;
-    
-  } catch(err) {
-    atom.notifications.addError(`Unable to load Markdown Preview Custom Syntax Highlighting Language Identifiers\n${err.toString()}`);
+  } catch (err) {
+    atom.notifications.addError(
+      `Unable to load Markdown Preview Custom Syntax Highlighting Language Identifiers\n${err.toString()}`,
+    );
     return {};
   }
 }
 
 function getLanguageIds() {
-
-  let preferredLanguageID = atom.config.get("markdown-preview.syntaxHighlightingLanguageIdentifier");
+  let preferredLanguageID = atom.config.get(
+    "markdown-preview.syntaxHighlightingLanguageIdentifier",
+  );
   let usersLanguageIDs = getUserLanguageIds();
 
   let languageIds;
 
-  switch(preferredLanguageID) {
+  switch (preferredLanguageID) {
     // Defer require for all language id files. First call for an given one will
     // be expensive, but due to the module cache, should be fine afterwards
     // plus only requiring the one needed, should result in less wasted memory
@@ -62,12 +65,12 @@ function getLanguageIds() {
 
 module.exports = {
   scopeForFenceName(fenceName) {
-    fenceName = fenceName.toLowerCase()
+    fenceName = fenceName.toLowerCase();
 
     let scopesByFenceName = getLanguageIds();
 
     return scopesByFenceName.hasOwnProperty(fenceName)
       ? scopesByFenceName[fenceName]
-      : `source.${fenceName}`
-  }
-}
+      : `source.${fenceName}`;
+  },
+};

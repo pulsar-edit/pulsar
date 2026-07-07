@@ -1,7 +1,7 @@
-const { Emitter, Range } = require('atom');
-const Grim = require('grim');
-const TextEditorComponent = require('./text-editor-component');
-const dedent = require('dedent');
+const { Emitter, Range } = require("atom");
+const Grim = require("grim");
+const TextEditorComponent = require("./text-editor-component");
+const dedent = require("dedent");
 
 class TextEditorElement extends HTMLElement {
   initialize(component) {
@@ -34,39 +34,37 @@ class TextEditorElement extends HTMLElement {
     this.emitter = new Emitter();
     this.initialText = this.textContent;
     if (this.tabIndex == null) this.tabIndex = -1;
-    this.addEventListener('focus', event =>
-      this.getComponent().didFocus(event)
-    );
-    this.addEventListener('blur', event => this.getComponent().didBlur(event));
+    this.addEventListener("focus", (event) => this.getComponent().didFocus(event));
+    this.addEventListener("blur", (event) => this.getComponent().didBlur(event));
   }
 
   connectedCallback() {
     this.getComponent().didAttach();
-    this.emitter.emit('did-attach');
+    this.emitter.emit("did-attach");
   }
 
   disconnectedCallback() {
-    this.emitter.emit('did-detach');
+    this.emitter.emit("did-detach");
     this.getComponent().didDetach();
   }
 
   static get observedAttributes() {
-    return ['mini', 'placeholder-text', 'gutter-hidden', 'readonly'];
+    return ["mini", "placeholder-text", "gutter-hidden", "readonly"];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (this.component) {
       switch (name) {
-        case 'mini':
+        case "mini":
           this.getModel().update({ mini: newValue != null });
           break;
-        case 'placeholder-text':
+        case "placeholder-text":
           this.getModel().update({ placeholderText: newValue });
           break;
-        case 'gutter-hidden':
+        case "gutter-hidden":
           this.getModel().update({ lineNumberGutterVisible: newValue == null });
           break;
-        case 'readonly':
+        case "readonly":
           this.getModel().update({ readOnly: newValue != null });
           break;
       }
@@ -94,22 +92,21 @@ class TextEditorElement extends HTMLElement {
   }
 
   updateModelFromAttributes() {
-    const props = { mini: this.hasAttribute('mini') };
-    if (this.hasAttribute('placeholder-text'))
-      props.placeholderText = this.getAttribute('placeholder-text');
-    if (this.hasAttribute('gutter-hidden'))
-      props.lineNumberGutterVisible = false;
+    const props = { mini: this.hasAttribute("mini") };
+    if (this.hasAttribute("placeholder-text"))
+      props.placeholderText = this.getAttribute("placeholder-text");
+    if (this.hasAttribute("gutter-hidden")) props.lineNumberGutterVisible = false;
 
     this.getModel().update(props);
     if (this.initialText) this.getModel().setText(this.initialText);
   }
 
   onDidAttach(callback) {
-    return this.emitter.on('did-attach', callback);
+    return this.emitter.on("did-attach", callback);
   }
 
   onDidDetach(callback) {
-    return this.emitter.on('did-detach', callback);
+    return this.emitter.on("did-detach", callback);
   }
 
   measureDimensions() {
@@ -117,8 +114,7 @@ class TextEditorElement extends HTMLElement {
   }
 
   setWidth(width) {
-    this.style.width =
-      this.getComponent().getGutterContainerWidth() + width + 'px';
+    this.style.width = this.getComponent().getGutterContainerWidth() + width + "px";
   }
 
   getWidth() {
@@ -126,7 +122,7 @@ class TextEditorElement extends HTMLElement {
   }
 
   setHeight(height) {
-    this.style.height = height + 'px';
+    this.style.height = height + "px";
   }
 
   getHeight() {
@@ -134,11 +130,11 @@ class TextEditorElement extends HTMLElement {
   }
 
   onDidChangeScrollLeft(callback) {
-    return this.emitter.on('did-change-scroll-left', callback);
+    return this.emitter.on("did-change-scroll-left", callback);
   }
 
   onDidChangeScrollTop(callback) {
-    return this.emitter.on('did-change-scroll-top', callback);
+    return this.emitter.on("did-change-scroll-top", callback);
   }
 
   // Deprecated: get the width of an `x` character displayed in this element.
@@ -237,9 +233,7 @@ class TextEditorElement extends HTMLElement {
   // Returns an {Object} with two values: `top` and `left`, representing the
   // pixel position.
   pixelPositionForBufferPosition(bufferPosition) {
-    const screenPosition = this.getModel().screenPositionForBufferPosition(
-      bufferPosition
-    );
+    const screenPosition = this.getModel().screenPositionForBufferPosition(bufferPosition);
     return this.getComponent().pixelPositionForScreenPosition(screenPosition);
   }
 
@@ -273,7 +267,7 @@ class TextEditorElement extends HTMLElement {
       top: start.top,
       left: start.left,
       height: end.top + lineHeight - start.top,
-      width: end.left - start.left
+      width: end.left - start.left,
     };
   }
 
@@ -281,7 +275,7 @@ class TextEditorElement extends HTMLElement {
     range = Range.fromObject(range);
     return {
       start: this.pixelPositionForScreenPosition(range.start),
-      end: this.pixelPositionForScreenPosition(range.end)
+      end: this.pixelPositionForScreenPosition(range.end),
     };
   }
 
@@ -289,9 +283,9 @@ class TextEditorElement extends HTMLElement {
     if (!this.component) {
       this.component = new TextEditorComponent({
         element: this,
-        mini: this.hasAttribute('mini'),
+        mini: this.hasAttribute("mini"),
         updatedSynchronously: this.updatedSynchronously,
-        readOnly: this.hasAttribute('readonly')
+        readOnly: this.hasAttribute("readonly"),
       });
       this.updateModelFromAttributes();
     }
@@ -301,15 +295,12 @@ class TextEditorElement extends HTMLElement {
 
   setUpdatedSynchronously(updatedSynchronously) {
     this.updatedSynchronously = updatedSynchronously;
-    if (this.component)
-      this.component.updatedSynchronously = updatedSynchronously;
+    if (this.component) this.component.updatedSynchronously = updatedSynchronously;
     return updatedSynchronously;
   }
 
   isUpdatedSynchronously() {
-    return this.component
-      ? this.component.updatedSynchronously
-      : this.updatedSynchronously;
+    return this.component ? this.component.updatedSynchronously : this.updatedSynchronously;
   }
 
   // Experimental: Invalidate the passed block {Decoration}'s dimensions,
@@ -340,8 +331,7 @@ class TextEditorElement extends HTMLElement {
 
   intersectsVisibleRowRange(startRow, endRow) {
     return !(
-      endRow <= this.getFirstVisibleScreenRow() ||
-      this.getLastVisibleScreenRow() <= startRow
+      endRow <= this.getFirstVisibleScreenRow() || this.getLastVisibleScreenRow() <= startRow
     );
   }
 
@@ -359,10 +349,10 @@ class TextEditorElement extends HTMLElement {
   }
 
   static createTextEditorElement() {
-    return document.createElement('atom-text-editor');
+    return document.createElement("atom-text-editor");
   }
 }
 
-window.customElements.define('atom-text-editor', TextEditorElement);
+window.customElements.define("atom-text-editor", TextEditorElement);
 
 module.exports = TextEditorElement;

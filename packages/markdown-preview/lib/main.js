@@ -1,68 +1,66 @@
-const fs = require('fs-plus')
-const { CompositeDisposable } = require('atom')
+const fs = require("fs-plus");
+const { CompositeDisposable } = require("atom");
 
-let MarkdownPreviewView = null
-let renderer = null
+let MarkdownPreviewView = null;
+let renderer = null;
 
 const isMarkdownPreviewView = function (object) {
   if (MarkdownPreviewView == null) {
-    MarkdownPreviewView = require('./markdown-preview-view')
+    MarkdownPreviewView = require("./markdown-preview-view");
   }
-  return object instanceof MarkdownPreviewView
-}
+  return object instanceof MarkdownPreviewView;
+};
 
 module.exports = {
   activate() {
-    this.disposables = new CompositeDisposable()
-    this.commandSubscriptions = new CompositeDisposable()
+    this.disposables = new CompositeDisposable();
+    this.commandSubscriptions = new CompositeDisposable();
 
-    this.style = new CSSStyleSheet()
+    this.style = new CSSStyleSheet();
 
     // TODO: When we upgrade Electron, we can push onto `adoptedStyleSheets`
     // directly. For now, we have to do this silly thing.
-    let styleSheets = Array.from(document.adoptedStyleSheets ?? [])
-    styleSheets.push(this.style)
-    document.adoptedStyleSheets = styleSheets
+    let styleSheets = Array.from(document.adoptedStyleSheets ?? []);
+    styleSheets.push(this.style);
+    document.adoptedStyleSheets = styleSheets;
 
     this.disposables.add(
-      atom.config.observe('markdown-preview.grammars', grammars => {
-        this.commandSubscriptions.dispose()
-        this.commandSubscriptions = new CompositeDisposable()
+      atom.config.observe("markdown-preview.grammars", (grammars) => {
+        this.commandSubscriptions.dispose();
+        this.commandSubscriptions = new CompositeDisposable();
 
         if (grammars == null) {
-          grammars = []
+          grammars = [];
         }
 
-        for (const grammar of grammars.map(grammar =>
-          grammar.replace(/\./g, ' ')
-        )) {
+        for (const grammar of grammars.map((grammar) => grammar.replace(/\./g, " "))) {
           this.commandSubscriptions.add(
             atom.commands.add(`atom-text-editor[data-grammar='${grammar}']`, {
-              'markdown-preview:toggle': () => this.toggle(),
-              'markdown-preview:copy-html': {
-                displayName: 'Markdown Preview: Copy HTML',
-                didDispatch: () => this.copyHTML()
+              "markdown-preview:toggle": () => this.toggle(),
+              "markdown-preview:copy-html": {
+                displayName: "Markdown Preview: Copy HTML",
+                didDispatch: () => this.copyHTML(),
               },
-              'markdown-preview:save-as-html': {
-                displayName: 'Markdown Preview: Save as HTML',
-                didDispatch: () => this.saveAsHTML()
+              "markdown-preview:save-as-html": {
+                displayName: "Markdown Preview: Save as HTML",
+                didDispatch: () => this.saveAsHTML(),
               },
-              'markdown-preview:toggle-break-on-single-newline': () => {
-                const keyPath = 'markdown-preview.breakOnSingleNewline'
-                atom.config.set(keyPath, !atom.config.get(keyPath))
+              "markdown-preview:toggle-break-on-single-newline": () => {
+                const keyPath = "markdown-preview.breakOnSingleNewline";
+                atom.config.set(keyPath, !atom.config.get(keyPath));
               },
-              'markdown-preview:toggle-github-style': () => {
-                const keyPath = 'markdown-preview.useGitHubStyle'
-                atom.config.set(keyPath, !atom.config.get(keyPath))
-              }
-            })
-          )
+              "markdown-preview:toggle-github-style": () => {
+                const keyPath = "markdown-preview.useGitHubStyle";
+                atom.config.set(keyPath, !atom.config.get(keyPath));
+              },
+            }),
+          );
         }
-      })
-    )
+      }),
+    );
 
     this.disposables.add(
-      atom.config.observe('editor.fontFamily', (fontFamily) => {
+      atom.config.observe("editor.fontFamily", (fontFamily) => {
         // Keep the user's `fontFamily` setting in sync with preview styles.
         // `pre` blocks will use this font automatically, but `code` elements
         // need a specific style rule.
@@ -73,181 +71,164 @@ module.exports = {
           .markdown-preview code {
             font-family: ${fontFamily} !important;
           }
-        `)
-      })
-    )
+        `);
+      }),
+    );
 
-    const previewFile = this.previewFile.bind(this)
-    for (const extension of [
-      'markdown',
-      'md',
-      'mdown',
-      'mkd',
-      'mkdown',
-      'ron',
-      'txt'
-    ]) {
+    const previewFile = this.previewFile.bind(this);
+    for (const extension of ["markdown", "md", "mdown", "mkd", "mkdown", "ron", "txt"]) {
       this.disposables.add(
         atom.commands.add(
           `.tree-view .file .name[data-name$=\\.${extension}]`,
-          'markdown-preview:preview-file',
-          previewFile
-        )
-      )
+          "markdown-preview:preview-file",
+          previewFile,
+        ),
+      );
     }
 
     this.disposables.add(
-      atom.workspace.addOpener(uriToOpen => {
-        let [protocol, path] = uriToOpen.split('://')
-        if (protocol !== 'markdown-preview') {
-          return
+      atom.workspace.addOpener((uriToOpen) => {
+        let [protocol, path] = uriToOpen.split("://");
+        if (protocol !== "markdown-preview") {
+          return;
         }
 
         try {
-          path = decodeURI(path)
+          path = decodeURI(path);
         } catch (error) {
-          return
+          return;
         }
 
-        if (path.startsWith('editor/')) {
-          return this.createMarkdownPreviewView({ editorId: path.substring(7) })
+        if (path.startsWith("editor/")) {
+          return this.createMarkdownPreviewView({ editorId: path.substring(7) });
         } else {
-          return this.createMarkdownPreviewView({ filePath: path })
+          return this.createMarkdownPreviewView({ filePath: path });
         }
-      })
-    )
+      }),
+    );
   },
 
   deactivate() {
-    this.disposables.dispose()
-    this.commandSubscriptions.dispose()
+    this.disposables.dispose();
+    this.commandSubscriptions.dispose();
   },
 
   createMarkdownPreviewView(state) {
     if (state.editorId || fs.isFileSync(state.filePath)) {
       if (MarkdownPreviewView == null) {
-        MarkdownPreviewView = require('./markdown-preview-view')
+        MarkdownPreviewView = require("./markdown-preview-view");
       }
-      return new MarkdownPreviewView(state)
+      return new MarkdownPreviewView(state);
     }
   },
 
   toggle() {
     if (isMarkdownPreviewView(atom.workspace.getActivePaneItem())) {
-      atom.workspace.destroyActivePaneItem()
-      return
+      atom.workspace.destroyActivePaneItem();
+      return;
     }
 
-    const editor = atom.workspace.getActiveTextEditor()
+    const editor = atom.workspace.getActiveTextEditor();
     if (editor == null) {
-      return
+      return;
     }
 
-    const grammars = atom.config.get('markdown-preview.grammars') || []
+    const grammars = atom.config.get("markdown-preview.grammars") || [];
     if (!grammars.includes(editor.getGrammar().scopeName)) {
-      return
+      return;
     }
 
     if (!this.removePreviewForEditor(editor)) {
-      return this.addPreviewForEditor(editor)
+      return this.addPreviewForEditor(editor);
     }
   },
 
   uriForEditor(editor) {
-    return `markdown-preview://editor/${editor.id}`
+    return `markdown-preview://editor/${editor.id}`;
   },
 
   removePreviewForEditor(editor) {
-    const uri = this.uriForEditor(editor)
-    const previewPane = atom.workspace.paneForURI(uri)
+    const uri = this.uriForEditor(editor);
+    const previewPane = atom.workspace.paneForURI(uri);
     if (previewPane != null) {
-      previewPane.destroyItem(previewPane.itemForURI(uri))
-      return true
+      previewPane.destroyItem(previewPane.itemForURI(uri));
+      return true;
     } else {
-      return false
+      return false;
     }
   },
 
   addPreviewForEditor(editor) {
-    const uri = this.uriForEditor(editor)
-    const previousActivePane = atom.workspace.getActivePane()
-    const options = { searchAllPanes: true }
-    if (atom.config.get('markdown-preview.openPreviewInSplitPane')) {
-      options.split = 'right'
+    const uri = this.uriForEditor(editor);
+    const previousActivePane = atom.workspace.getActivePane();
+    const options = { searchAllPanes: true };
+    if (atom.config.get("markdown-preview.openPreviewInSplitPane")) {
+      options.split = "right";
     }
 
-    return atom.workspace
-      .open(uri, options)
-      .then(function (markdownPreviewView) {
-        if (isMarkdownPreviewView(markdownPreviewView)) {
-          previousActivePane.activate()
-        }
-      })
+    return atom.workspace.open(uri, options).then(function (markdownPreviewView) {
+      if (isMarkdownPreviewView(markdownPreviewView)) {
+        previousActivePane.activate();
+      }
+    });
   },
 
   previewFile({ target }) {
-    const filePath = target.dataset.path
+    const filePath = target.dataset.path;
     if (!filePath) {
-      return
+      return;
     }
 
     for (const editor of atom.workspace.getTextEditors()) {
       if (editor.getPath() === filePath) {
-        return this.addPreviewForEditor(editor)
+        return this.addPreviewForEditor(editor);
       }
     }
 
     atom.workspace.open(`markdown-preview://${encodeURI(filePath)}`, {
-      searchAllPanes: true
-    })
+      searchAllPanes: true,
+    });
   },
 
   async copyHTML() {
-    const editor = atom.workspace.getActiveTextEditor()
+    const editor = atom.workspace.getActiveTextEditor();
     if (editor == null) {
-      return
+      return;
     }
 
     if (renderer == null) {
-      renderer = require('./renderer')
+      renderer = require("./renderer");
     }
-    const text = editor.getSelectedText() || editor.getText()
-    const html = await renderer.toHTML(
-      text,
-      editor.getPath(),
-      editor.getGrammar(),
-      editor.id
-    )
+    const text = editor.getSelectedText() || editor.getText();
+    const html = await renderer.toHTML(text, editor.getPath(), editor.getGrammar(), editor.id);
 
-    atom.clipboard.write(html)
+    atom.clipboard.write(html);
   },
 
   saveAsHTML() {
-    const activePaneItem = atom.workspace.getActivePaneItem()
+    const activePaneItem = atom.workspace.getActivePaneItem();
     if (isMarkdownPreviewView(activePaneItem)) {
-      atom.workspace.getActivePane().saveItemAs(activePaneItem)
-      return
+      atom.workspace.getActivePane().saveItemAs(activePaneItem);
+      return;
     }
 
-    const editor = atom.workspace.getActiveTextEditor()
+    const editor = atom.workspace.getActiveTextEditor();
     if (editor == null) {
-      return
+      return;
     }
 
-    const grammars = atom.config.get('markdown-preview.grammars') || []
+    const grammars = atom.config.get("markdown-preview.grammars") || [];
     if (!grammars.includes(editor.getGrammar().scopeName)) {
-      return
+      return;
     }
 
-    const uri = this.uriForEditor(editor)
-    const markdownPreviewPane = atom.workspace.paneForURI(uri)
+    const uri = this.uriForEditor(editor);
+    const markdownPreviewPane = atom.workspace.paneForURI(uri);
     const markdownPreviewPaneItem =
-      markdownPreviewPane != null
-        ? markdownPreviewPane.itemForURI(uri)
-        : undefined
+      markdownPreviewPane != null ? markdownPreviewPane.itemForURI(uri) : undefined;
 
     if (isMarkdownPreviewView(markdownPreviewPaneItem)) {
-      return markdownPreviewPane.saveItemAs(markdownPreviewPaneItem)
+      return markdownPreviewPane.saveItemAs(markdownPreviewPaneItem);
     }
-  }
-}
+  },
+};

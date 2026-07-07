@@ -1,6 +1,6 @@
-const { EventEmitter } = require('events');
-const { Disposable } = require('event-kit');
-const { systemPreferences } = require('electron');
+const { EventEmitter } = require("events");
+const { Disposable } = require("event-kit");
+const { systemPreferences } = require("electron");
 
 // We've written a small Node module to help us get this value from macOS.
 //
@@ -15,7 +15,7 @@ const { systemPreferences } = require('electron');
 //   try to keep those in the main process absent a compelling reason not to.
 // * The renderer can still imperatively get the scrollbar style; it just has
 //   to go (briefly) async to do it.
-const getScrollbarStyle = require('@pulsar-edit/get-scrollbar-style');
+const getScrollbarStyle = require("@pulsar-edit/get-scrollbar-style");
 
 let subscriptionId;
 const EMITTER = new EventEmitter();
@@ -26,25 +26,22 @@ function observeScrollbarStyle(callback) {
 }
 
 function onDidChangeScrollbarStyle(callback) {
-  EMITTER.on('did-change-scrollbar-style', callback);
+  EMITTER.on("did-change-scrollbar-style", callback);
   return new Disposable(() => {
-    EMITTER.off('did-change-scrollbar-style', callback);
+    EMITTER.off("did-change-scrollbar-style", callback);
   });
 }
 
 function initialize() {
   // Scrollbar style is a macOS-only thing, so other platforms don't need to
   // bother with it.
-  if (process.platform !== 'darwin') return;
+  if (process.platform !== "darwin") return;
   subscriptionId = systemPreferences.subscribeLocalNotification(
-    'NSPreferredScrollerStyleDidChangeNotification',
+    "NSPreferredScrollerStyleDidChangeNotification",
     (event, userInfo, object) => {
-      console.log('[scrollbar-style] Metadata:', event, userInfo, object);
-      EMITTER.emit(
-        'did-change-scrollbar-style',
-        valueForNSScrollerStyle(userInfo.NSScrollerStyle)
-      );
-    }
+      console.log("[scrollbar-style] Metadata:", event, userInfo, object);
+      EMITTER.emit("did-change-scrollbar-style", valueForNSScrollerStyle(userInfo.NSScrollerStyle));
+    },
   );
 }
 
@@ -52,14 +49,14 @@ function initialize() {
 function valueForNSScrollerStyle(value) {
   switch (value) {
     case 0:
-      return 'legacy';
+      return "legacy";
     case 1:
-      return 'overlay';
+      return "overlay";
     default:
       // The native module returns `unknown` for values it doesn't recognize,
       // so we'll do the same. This would only happen if macOS added other
       // scrollbar styles in the future.
-      return 'unknown';
+      return "unknown";
   }
 }
 
@@ -75,5 +72,5 @@ module.exports = {
   observeScrollbarStyle,
   onDidChangeScrollbarStyle,
   getScrollbarStyle,
-  destroy
+  destroy,
 };

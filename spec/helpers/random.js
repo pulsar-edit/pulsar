@@ -1,5 +1,5 @@
-const WORDS = require('./words');
-const { Point, Range } = require('@pulsar-edit/text-buffer');
+const WORDS = require("./words");
+const { Point, Range } = require("@pulsar-edit/text-buffer");
 
 exports.getRandomBufferRange = function getRandomBufferRange(random, buffer) {
   const endRow = random(buffer.getLineCount());
@@ -16,7 +16,7 @@ exports.buildRandomLines = function buildRandomLines(random, maxLines) {
     lines.push(buildRandomLine(random));
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 };
 
 function buildRandomLine(random) {
@@ -26,17 +26,17 @@ function buildRandomLine(random) {
     const n = random(10);
 
     if (n < 2) {
-      line.push('\t');
+      line.push("\t");
     } else if (n < 4) {
-      line.push(' ');
+      line.push(" ");
     } else {
       if (line.length > 0 && !/\s/.test(line[line.length - 1])) {
-        line.push(' ');
+        line.push(" ");
       }
 
       line.push(WORDS[random(WORDS.length)]);
     }
   }
 
-  return line.join('');
+  return line.join("");
 }

@@ -1,17 +1,14 @@
-const _ = require('underscore-plus');
-const { CompositeDisposable, Emitter } = require('event-kit');
-const { Point, Range } = require('@pulsar-edit/text-buffer');
-const TokenizedLine = require('./tokenized-line');
-const TokenIterator = require('./token-iterator');
-const ScopeDescriptor = require('./scope-descriptor');
-const NullGrammar = require('./null-grammar');
-const { OnigScanner } = require('second-mate');
-const {
-  toFirstMateScopeId,
-  fromFirstMateScopeId
-} = require('./first-mate-helpers');
-const { selectorMatchesAnyScope } = require('./selectors');
-const { normalizeDelimiters, commentStringsFromDelimiters } = require('./comment-utils.js');
+const _ = require("underscore-plus");
+const { CompositeDisposable, Emitter } = require("event-kit");
+const { Point, Range } = require("@pulsar-edit/text-buffer");
+const TokenizedLine = require("./tokenized-line");
+const TokenIterator = require("./token-iterator");
+const ScopeDescriptor = require("./scope-descriptor");
+const NullGrammar = require("./null-grammar");
+const { OnigScanner } = require("second-mate");
+const { toFirstMateScopeId, fromFirstMateScopeId } = require("./first-mate-helpers");
+const { selectorMatchesAnyScope } = require("./selectors");
+const { normalizeDelimiters, commentStringsFromDelimiters } = require("./comment-utils.js");
 
 const NON_WHITESPACE_REGEX = /\S/;
 
@@ -32,14 +29,15 @@ class TextMateLanguageMode {
     this.config = params.config ?? atom.config;
     this.grammar = params.grammar || NullGrammar;
     this.rootScopeDescriptor = new ScopeDescriptor({
-      scopes: [this.grammar.scopeName]
+      scopes: [this.grammar.scopeName],
     });
-    const largeFileThreshold = this.config.get('editor.largeFileThreshold', { scope: this.rootScopeDescriptor }) ?? 2;
+    const largeFileThreshold =
+      this.config.get("editor.largeFileThreshold", { scope: this.rootScopeDescriptor }) ?? 2;
     this.largeFileMode =
-      params.largeFileMode ?? (largeFileThreshold > 0 && this.buffer.buffer.getLength() >= largeFileThreshold * 1024 * 1024);
-    this.disposables.add(
-      this.grammar.onDidUpdate(() => this.retokenizeLines())
-    );
+      params.largeFileMode ??
+      (largeFileThreshold > 0 &&
+        this.buffer.buffer.getLength() >= largeFileThreshold * 1024 * 1024);
+    this.disposables.add(this.grammar.onDidUpdate(() => this.retokenizeLines()));
     this.retokenizeLines();
   }
 
@@ -68,7 +66,7 @@ class TextMateLanguageMode {
 
   getNonWordCharacters(position) {
     const scope = this.scopeDescriptorForPosition(position);
-    return this.config.get('editor.nonWordCharacters', { scope });
+    return this.config.get("editor.nonWordCharacters", { scope });
   }
 
   /*
@@ -86,14 +84,14 @@ class TextMateLanguageMode {
     const iterator = tokenizedLine.getTokenIterator();
     iterator.next();
     const scopeDescriptor = new ScopeDescriptor({
-      scopes: iterator.getScopes()
+      scopes: iterator.getScopes(),
     });
     return this._suggestedIndentForLineWithScopeAtBufferRow(
       bufferRow,
       line,
       scopeDescriptor,
       tabLength,
-      options
+      options,
     );
   }
 
@@ -104,20 +102,17 @@ class TextMateLanguageMode {
   //
   // Returns a {Number}.
   suggestedIndentForLineAtBufferRow(bufferRow, line, tabLength) {
-    const tokenizedLine = this.buildTokenizedLineForRowWithText(
-      bufferRow,
-      line
-    );
+    const tokenizedLine = this.buildTokenizedLineForRowWithText(bufferRow, line);
     const iterator = tokenizedLine.getTokenIterator();
     iterator.next();
     const scopeDescriptor = new ScopeDescriptor({
-      scopes: iterator.getScopes()
+      scopes: iterator.getScopes(),
     });
     return this._suggestedIndentForLineWithScopeAtBufferRow(
       bufferRow,
       line,
       scopeDescriptor,
-      tabLength
+      tabLength,
     );
   }
 
@@ -134,12 +129,8 @@ class TextMateLanguageMode {
     const currentIndentLevel = this.indentLevelForLine(line, tabLength);
     if (currentIndentLevel === 0) return;
 
-    const scopeDescriptor = this.scopeDescriptorForPosition(
-      new Point(bufferRow, 0)
-    );
-    const decreaseIndentRegex = this.decreaseIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
+    const scopeDescriptor = this.scopeDescriptorForPosition(new Point(bufferRow, 0));
+    const decreaseIndentRegex = this.decreaseIndentRegexForScopeDescriptor(scopeDescriptor);
     if (!decreaseIndentRegex) return;
 
     if (!decreaseIndentRegex.findNextMatchSync(line)) return;
@@ -150,19 +141,14 @@ class TextMateLanguageMode {
     const precedingLine = this.buffer.lineForRow(precedingRow);
     let desiredIndentLevel = this.indentLevelForLine(precedingLine, tabLength);
 
-    const increaseIndentRegex = this.increaseIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
+    const increaseIndentRegex = this.increaseIndentRegexForScopeDescriptor(scopeDescriptor);
     if (increaseIndentRegex) {
       if (!increaseIndentRegex.findNextMatchSync(precedingLine)) desiredIndentLevel -= 1;
     }
 
-    const decreaseNextIndentRegex = this.decreaseNextIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
+    const decreaseNextIndentRegex = this.decreaseNextIndentRegexForScopeDescriptor(scopeDescriptor);
     if (decreaseNextIndentRegex) {
-      if (decreaseNextIndentRegex.findNextMatchSync(precedingLine))
-        desiredIndentLevel -= 1;
+      if (decreaseNextIndentRegex.findNextMatchSync(precedingLine)) desiredIndentLevel -= 1;
     }
 
     if (desiredIndentLevel < 0) return 0;
@@ -175,17 +161,11 @@ class TextMateLanguageMode {
     line,
     scopeDescriptor,
     tabLength,
-    options
+    options,
   ) {
-    const increaseIndentRegex = this.increaseIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
-    const decreaseIndentRegex = this.decreaseIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
-    const decreaseNextIndentRegex = this.decreaseNextIndentRegexForScopeDescriptor(
-      scopeDescriptor
-    );
+    const increaseIndentRegex = this.increaseIndentRegexForScopeDescriptor(scopeDescriptor);
+    const decreaseIndentRegex = this.decreaseIndentRegexForScopeDescriptor(scopeDescriptor);
+    const decreaseNextIndentRegex = this.decreaseNextIndentRegexForScopeDescriptor(scopeDescriptor);
 
     let precedingRow;
     if (!options || options.skipBlankLines !== false) {
@@ -203,10 +183,7 @@ class TextMateLanguageMode {
     if (!this.isRowCommented(precedingRow)) {
       if (increaseIndentRegex && increaseIndentRegex.findNextMatchSync(precedingLine))
         desiredIndentLevel += 1;
-      if (
-        decreaseNextIndentRegex &&
-        decreaseNextIndentRegex.findNextMatchSync(precedingLine)
-      )
+      if (decreaseNextIndentRegex && decreaseNextIndentRegex.findNextMatchSync(precedingLine))
         desiredIndentLevel -= 1;
     }
 
@@ -224,25 +201,25 @@ class TextMateLanguageMode {
 
   commentStringsForPosition(position) {
     const scope = this.scopeDescriptorForPosition(position);
-    const commentStartEntries = this.config.getAll('editor.commentStart', {
-      scope
+    const commentStartEntries = this.config.getAll("editor.commentStart", {
+      scope,
     });
-    const commentEndEntries = this.config.getAll('editor.commentEnd', {
-      scope
+    const commentEndEntries = this.config.getAll("editor.commentEnd", {
+      scope,
     });
     const commentStartEntry = commentStartEntries[0];
-    const commentEndEntry = commentEndEntries.find(entry => {
+    const commentEndEntry = commentEndEntries.find((entry) => {
       return entry.scopeSelector === commentStartEntry.scopeSelector;
     });
     // If a `commentDelimiters` setting exists, return it in its entirety. This
     // can contain more comprehensive delimiter metadata for snippets and other
     // purposes.
-    const commentDelimiters = this.config.get('editor.commentDelimiters', { scope });
+    const commentDelimiters = this.config.get("editor.commentDelimiters", { scope });
     if (commentStartEntry) {
       return {
         commentStartString: commentStartEntry && commentStartEntry.value,
         commentEndString: commentEndEntry && commentEndEntry.value,
-        commentDelimiters: commentDelimiters && normalizeDelimiters(commentDelimiters)
+        commentDelimiters: commentDelimiters && normalizeDelimiters(commentDelimiters),
       };
     } else if (commentDelimiters) {
       return commentStringsFromDelimiters(commentDelimiters);
@@ -264,7 +241,7 @@ class TextMateLanguageMode {
       if (prefixedScope) {
         return prefixedScope;
       } else {
-        prefixedScope = `syntax--${scope.replace(/\./g, ' syntax--')}`;
+        prefixedScope = `syntax--${scope.replace(/\./g, " syntax--")}`;
         prefixedScopes.set(scope, prefixedScope);
         return prefixedScope;
       }
@@ -278,15 +255,18 @@ class TextMateLanguageMode {
   }
 
   onDidChangeHighlighting(fn) {
-    return this.emitter.on('did-change-highlighting', fn);
+    return this.emitter.on("did-change-highlighting", fn);
   }
 
   onDidTokenize(callback) {
-    return this.emitter.on('did-tokenize', callback);
+    return this.emitter.on("did-tokenize", callback);
   }
 
   getGrammarSelectionContent() {
-    return this.buffer.getTextInRange([[0, 0], [10, 0]]);
+    return this.buffer.getTextInRange([
+      [0, 0],
+      [10, 0],
+    ]);
   }
 
   updateForInjection(grammar) {
@@ -308,7 +288,7 @@ class TextMateLanguageMode {
     this.fullyTokenized = false;
     this.tokenizedLines = new Array(this.buffer.getLineCount());
     this.invalidRows = [];
-    if (this.largeFileMode || this.grammar.name === 'Null Grammar') {
+    if (this.largeFileMode || this.grammar.name === "Null Grammar") {
       this.markTokenizationComplete();
     } else {
       this.invalidateRow(0);
@@ -317,7 +297,7 @@ class TextMateLanguageMode {
 
   startTokenizing() {
     this.tokenizationStarted = true;
-    if (this.grammar.name !== 'Null Grammar' && !this.largeFileMode) {
+    if (this.grammar.name !== "Null Grammar" && !this.largeFileMode) {
       this.tokenizeInBackground();
     }
   }
@@ -347,17 +327,14 @@ class TextMateLanguageMode {
         this.tokenizedLines[row] = this.buildTokenizedLineForRow(
           row,
           this.stackForRow(row - 1),
-          this.openScopesForRow(row)
+          this.openScopesForRow(row),
         );
         if (--rowsRemaining === 0) {
           filledRegion = false;
           endRow = row;
           break;
         }
-        if (
-          row === lastRow ||
-          _.isEqual(this.stackForRow(row), previousStack)
-        ) {
+        if (row === lastRow || _.isEqual(this.stackForRow(row), previousStack)) {
           filledRegion = true;
           endRow = row;
           break;
@@ -368,10 +345,7 @@ class TextMateLanguageMode {
       this.validateRow(endRow);
       if (!filledRegion) this.invalidateRow(endRow + 1);
 
-      this.emitter.emit(
-        'did-change-highlighting',
-        Range(Point(startRow, 0), Point(endRow + 1, 0))
-      );
+      this.emitter.emit("did-change-highlighting", Range(Point(startRow, 0), Point(endRow + 1, 0)));
     }
 
     if (this.firstInvalidRow() != null) {
@@ -383,7 +357,7 @@ class TextMateLanguageMode {
 
   markTokenizationComplete() {
     if (!this.fullyTokenized) {
-      this.emitter.emit('did-tokenize');
+      this.emitter.emit("did-tokenize");
     }
     this.fullyTokenized = true;
   }
@@ -403,7 +377,7 @@ class TextMateLanguageMode {
   }
 
   updateInvalidRows(start, end, delta) {
-    this.invalidRows = this.invalidRows.map(row => {
+    this.invalidRows = this.invalidRows.map((row) => {
       if (row < start) {
         return row;
       } else if (start <= row && row <= end) {
@@ -426,26 +400,16 @@ class TextMateLanguageMode {
 
     this.updateInvalidRows(start, end, delta);
     const previousEndStack = this.stackForRow(end); // used in spill detection below
-    if (this.largeFileMode || this.grammar.name === 'Null Grammar') {
-      _.spliceWithArray(
-        this.tokenizedLines,
-        start,
-        oldLineCount,
-        new Array(newLineCount)
-      );
+    if (this.largeFileMode || this.grammar.name === "Null Grammar") {
+      _.spliceWithArray(this.tokenizedLines, start, oldLineCount, new Array(newLineCount));
     } else {
       const newTokenizedLines = this.buildTokenizedLinesForRows(
         start,
         end + delta,
         this.stackForRow(start - 1),
-        this.openScopesForRow(start)
+        this.openScopesForRow(start),
       );
-      _.spliceWithArray(
-        this.tokenizedLines,
-        start,
-        oldLineCount,
-        newTokenizedLines
-      );
+      _.spliceWithArray(this.tokenizedLines, start, oldLineCount, newTokenizedLines);
       const newEndStack = this.stackForRow(end + delta);
       if (newEndStack && !_.isEqual(newEndStack, previousEndStack)) {
         this.invalidateRow(end + delta + 1);
@@ -459,12 +423,7 @@ class TextMateLanguageMode {
     return this.endRowForFoldAtRow(row, 1, true) != null;
   }
 
-  buildTokenizedLinesForRows(
-    startRow,
-    endRow,
-    startingStack,
-    startingopenScopes
-  ) {
+  buildTokenizedLinesForRows(startRow, endRow, startingStack, startingopenScopes) {
     let ruleStack = startingStack;
     let openScopes = startingopenScopes;
     const stopTokenizingAt = startRow + this.chunkSize;
@@ -472,11 +431,7 @@ class TextMateLanguageMode {
     for (let row = startRow, end = endRow; row <= end; row++) {
       let tokenizedLine;
       if ((ruleStack || row === 0) && row < stopTokenizingAt) {
-        tokenizedLine = this.buildTokenizedLineForRow(
-          row,
-          ruleStack,
-          openScopes
-        );
+        tokenizedLine = this.buildTokenizedLineForRow(row, ruleStack, openScopes);
         ruleStack = tokenizedLine.ruleStack;
         openScopes = this.scopesFromTags(openScopes, tokenizedLine.tags);
       }
@@ -496,7 +451,7 @@ class TextMateLanguageMode {
       row,
       this.buffer.lineForRow(row),
       ruleStack,
-      openScopes
+      openScopes,
     );
   }
 
@@ -504,15 +459,10 @@ class TextMateLanguageMode {
     row,
     text,
     currentRuleStack = this.stackForRow(row - 1),
-    openScopes = this.openScopesForRow(row)
+    openScopes = this.openScopesForRow(row),
   ) {
     const lineEnding = this.buffer.lineEndingForRow(row);
-    const { tags, ruleStack } = this.grammar.tokenizeLine(
-      text,
-      currentRuleStack,
-      row === 0,
-      false
-    );
+    const { tags, ruleStack } = this.grammar.tokenizeLine(text, currentRuleStack, row === 0, false);
     return new TokenizedLine({
       openScopes,
       text,
@@ -520,7 +470,7 @@ class TextMateLanguageMode {
       ruleStack,
       lineEnding,
       tokenIterator: this.tokenIterator,
-      grammar: this.grammar
+      grammar: this.grammar,
     });
   }
 
@@ -535,7 +485,7 @@ class TextMateLanguageMode {
         const tags = [
           this.grammar.startIdForScope(this.grammar.scopeName),
           text.length,
-          this.grammar.endIdForScope(this.grammar.scopeName)
+          this.grammar.endIdForScope(this.grammar.scopeName),
         ];
         this.tokenizedLines[bufferRow] = new TokenizedLine({
           openScopes: [],
@@ -543,7 +493,7 @@ class TextMateLanguageMode {
           tags,
           lineEnding,
           tokenIterator: this.tokenIterator,
-          grammar: this.grammar
+          grammar: this.grammar,
         });
         return this.tokenizedLines[bufferRow];
       }
@@ -559,9 +509,7 @@ class TextMateLanguageMode {
   }
 
   stackForRow(bufferRow) {
-    return (
-      this.tokenizedLines[bufferRow] && this.tokenizedLines[bufferRow].ruleStack
-    );
+    return this.tokenizedLines[bufferRow] && this.tokenizedLines[bufferRow].ruleStack;
   }
 
   openScopesForRow(bufferRow) {
@@ -597,9 +545,9 @@ class TextMateLanguageMode {
     let indentLength = 0;
     for (let i = 0, { length } = line; i < length; i++) {
       const char = line[i];
-      if (char === '\t') {
+      if (char === "\t") {
         indentLength += tabLength - (indentLength % tabLength);
-      } else if (char === ' ') {
+      } else if (char === " ") {
         indentLength++;
       } else {
         break;
@@ -610,9 +558,7 @@ class TextMateLanguageMode {
 
   scopeDescriptorForPosition(position) {
     let scopes;
-    const { row, column } = this.buffer.clipPosition(
-      Point.fromObject(position)
-    );
+    const { row, column } = this.buffer.clipPosition(Point.fromObject(position));
 
     const iterator = this.tokenizedLineForRow(row).getTokenIterator();
     while (iterator.next()) {
@@ -638,9 +584,7 @@ class TextMateLanguageMode {
 
   tokenStartPositionForPosition(position) {
     let { row, column } = Point.fromObject(position);
-    column = this.tokenizedLineForRow(row).tokenStartColumnForBufferColumn(
-      column
-    );
+    column = this.tokenizedLineForRow(row).tokenStartColumnForBufferColumn(column);
     return new Point(row, column);
   }
 
@@ -649,7 +593,7 @@ class TextMateLanguageMode {
     position = Point.fromObject(position);
 
     const { openScopes, tags } = this.tokenizedLineForRow(position.row);
-    const scopes = openScopes.map(tag => this.grammar.scopeForId(tag));
+    const scopes = openScopes.map((tag) => this.grammar.scopeForId(tag));
 
     let startColumn = 0;
     for (tokenIndex = 0; tokenIndex < tags.length; tokenIndex++) {
@@ -673,11 +617,7 @@ class TextMateLanguageMode {
     if (!selectorMatchesAnyScope(selector, scopes)) return;
 
     const startScopes = scopes.slice();
-    for (
-      let startTokenIndex = tokenIndex - 1;
-      startTokenIndex >= 0;
-      startTokenIndex--
-    ) {
+    for (let startTokenIndex = tokenIndex - 1; startTokenIndex >= 0; startTokenIndex--) {
       tag = tags[startTokenIndex];
       if (tag < 0) {
         if (tag % 2 === -1) {
@@ -714,10 +654,7 @@ class TextMateLanguageMode {
       }
     }
 
-    return new Range(
-      new Point(position.row, startColumn),
-      new Point(position.row, endColumn)
-    );
+    return new Range(new Point(position.row, startColumn), new Point(position.row, endColumn));
   }
 
   isRowCommented(row) {
@@ -746,10 +683,7 @@ class TextMateLanguageMode {
     let row = 0;
     const lineCount = this.buffer.getLineCount();
     while (row < lineCount) {
-      if (
-        this.indentLevelForLine(this.buffer.lineForRow(row), tabLength) ===
-        indentLevel
-      ) {
+      if (this.indentLevelForLine(this.buffer.lineForRow(row), tabLength) === indentLevel) {
         const endRow = this.endRowForFoldAtRow(row, tabLength);
         if (endRow != null) {
           result.push(Range(Point(row, Infinity), Point(endRow, Infinity)));
@@ -788,11 +722,7 @@ class TextMateLanguageMode {
     if (this.isRowCommented(row - 1)) return;
 
     let endRow;
-    for (
-      let nextRow = row + 1, end = this.buffer.getLineCount();
-      nextRow < end;
-      nextRow++
-    ) {
+    for (let nextRow = row + 1, end = this.buffer.getLineCount(); nextRow < end; nextRow++) {
       if (!this.isRowCommented(nextRow)) break;
       endRow = nextRow;
       if (existenceOnly) break;
@@ -808,11 +738,7 @@ class TextMateLanguageMode {
     const startIndentLevel = this.indentLevelForLine(line, tabLength);
     const scopeDescriptor = this.scopeDescriptorForPosition([row, 0]);
     const foldEndRegex = this.foldEndRegexForScopeDescriptor(scopeDescriptor);
-    for (
-      let nextRow = row + 1, end = this.buffer.getLineCount();
-      nextRow < end;
-      nextRow++
-    ) {
+    for (let nextRow = row + 1, end = this.buffer.getLineCount(); nextRow < end; nextRow++) {
       const line = this.buffer.lineForRow(nextRow);
       if (!NON_WHITESPACE_REGEX.test(line)) continue;
       const indentation = this.indentLevelForLine(line, tabLength);
@@ -829,27 +755,19 @@ class TextMateLanguageMode {
   }
 
   increaseIndentRegexForScopeDescriptor(scope) {
-    return this.regexForPattern(
-      this.config.get('editor.increaseIndentPattern', { scope })
-    );
+    return this.regexForPattern(this.config.get("editor.increaseIndentPattern", { scope }));
   }
 
   decreaseIndentRegexForScopeDescriptor(scope) {
-    return this.regexForPattern(
-      this.config.get('editor.decreaseIndentPattern', { scope })
-    );
+    return this.regexForPattern(this.config.get("editor.decreaseIndentPattern", { scope }));
   }
 
   decreaseNextIndentRegexForScopeDescriptor(scope) {
-    return this.regexForPattern(
-      this.config.get('editor.decreaseNextIndentPattern', { scope })
-    );
+    return this.regexForPattern(this.config.get("editor.decreaseNextIndentPattern", { scope }));
   }
 
   foldEndRegexForScopeDescriptor(scope) {
-    return this.regexForPattern(
-      this.config.get('editor.foldEndPattern', { scope })
-    );
+    return this.regexForPattern(this.config.get("editor.foldEndPattern", { scope }));
   }
 
   regexForPattern(pattern) {
@@ -886,9 +804,7 @@ class TextMateHighlightIterator {
     const currentLine = this.languageMode.tokenizedLineForRow(position.row);
     this.currentLineTags = currentLine.tags;
     this.currentLineLength = currentLine.text.length;
-    const containingScopeIds = currentLine.openScopes.map(id =>
-      fromFirstMateScopeId(id)
-    );
+    const containingScopeIds = currentLine.openScopes.map((id) => fromFirstMateScopeId(id));
 
     let currentColumn = 0;
     for (let index = 0; index < this.currentLineTags.length; index++) {
@@ -936,10 +852,7 @@ class TextMateHighlightIterator {
     if (this.tagIndex == null) {
       this.tagIndex = this.currentLineTags.length;
     }
-    this.position = Point(
-      position.row,
-      Math.min(this.currentLineLength, currentColumn)
-    );
+    this.position = Point(position.row, Math.min(this.currentLineLength, currentColumn));
     return containingScopeIds;
   }
 
@@ -963,8 +876,8 @@ class TextMateHighlightIterator {
               this.position.row,
               Math.min(
                 this.currentLineLength,
-                this.position.column + this.currentLineTags[this.tagIndex]
-              )
+                this.position.column + this.currentLineTags[this.tagIndex],
+              ),
             );
           }
         } else {
@@ -999,9 +912,7 @@ class TextMateHighlightIterator {
 
   moveToNextLine() {
     this.position = Point(this.position.row + 1, 0);
-    const tokenizedLine = this.languageMode.tokenizedLineForRow(
-      this.position.row
-    );
+    const tokenizedLine = this.languageMode.tokenizedLineForRow(this.position.row);
     if (tokenizedLine == null) {
       return false;
     } else {

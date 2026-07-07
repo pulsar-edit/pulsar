@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-const EventKit = require('event-kit');
+const EventKit = require("event-kit");
 const tooltipComponentsByElement = new WeakMap();
-const listen = require('./delegated-listener');
+const listen = require("./delegated-listener");
 
 // This tooltip class is derived from Bootstrap 3, but modified to not require
 // jQuery, which is an expensive dependency we want to eliminate.
 
 let followThroughTimer = null;
 
-const Tooltip = function(element, options, viewRegistry) {
+const Tooltip = function (element, options, viewRegistry) {
   this.options = null;
   this.enabled = null;
   this.timeout = null;
@@ -21,28 +21,28 @@ const Tooltip = function(element, options, viewRegistry) {
   this.init(element, options);
 };
 
-Tooltip.VERSION = '3.3.5';
+Tooltip.VERSION = "3.3.5";
 
 Tooltip.FOLLOW_THROUGH_DURATION = 300;
 
 Tooltip.DEFAULTS = {
   animation: true,
-  placement: 'top',
+  placement: "top",
   selector: false,
   template:
     '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
-  trigger: 'hover focus',
-  title: '',
+  trigger: "hover focus",
+  title: "",
   delay: 0,
   html: false,
   container: false,
   viewport: {
-    selector: 'body',
-    padding: 0
-  }
+    selector: "body",
+    padding: 0,
+  },
 };
 
-Tooltip.prototype.init = function(element, options) {
+Tooltip.prototype.init = function (element, options) {
   this.enabled = true;
   this.element = element;
   this.options = this.getOptions(options);
@@ -50,11 +50,11 @@ Tooltip.prototype.init = function(element, options) {
   this.mutationObserver = new MutationObserver(this.handleMutations.bind(this));
 
   if (this.options.viewport) {
-    if (typeof this.options.viewport === 'function') {
+    if (typeof this.options.viewport === "function") {
       this.viewport = this.options.viewport.call(this, this.element);
     } else {
       this.viewport = document.querySelector(
-        this.options.viewport.selector || this.options.viewport
+        this.options.viewport.selector || this.options.viewport,
       );
     }
   }
@@ -62,25 +62,20 @@ Tooltip.prototype.init = function(element, options) {
 
   if (this.element instanceof document.constructor && !this.options.selector) {
     throw new Error(
-      '`selector` option must be specified when initializing tooltip on the window.document object!'
+      "`selector` option must be specified when initializing tooltip on the window.document object!",
     );
   }
 
-  const triggers = this.options.trigger.split(' ');
+  const triggers = this.options.trigger.split(" ");
 
-  for (let i = triggers.length; i--; ) {
+  for (let i = triggers.length; i--;) {
     var trigger = triggers[i];
 
-    if (trigger === 'click') {
+    if (trigger === "click") {
       this.disposables.add(
-        listen(
-          this.element,
-          'click',
-          this.options.selector,
-          this.toggle.bind(this)
-        )
+        listen(this.element, "click", this.options.selector, this.toggle.bind(this)),
       );
-      this.hideOnClickOutsideOfTooltip = event => {
+      this.hideOnClickOutsideOfTooltip = (event) => {
         const tooltipElement = this.getTooltipElement();
         if (tooltipElement === event.target) return;
         if (tooltipElement.contains(event.target)) return;
@@ -88,93 +83,83 @@ Tooltip.prototype.init = function(element, options) {
         if (this.element.contains(event.target)) return;
         this.hide();
       };
-    } else if (trigger === 'manual') {
+    } else if (trigger === "manual") {
       this.show();
     } else {
       let eventIn, eventOut;
 
-      if (trigger === 'hover') {
+      if (trigger === "hover") {
         this.hideOnKeydownOutsideOfTooltip = () => this.hide();
         if (this.options.selector) {
-          eventIn = 'mouseover';
-          eventOut = 'mouseout';
+          eventIn = "mouseover";
+          eventOut = "mouseout";
         } else {
-          eventIn = 'mouseenter';
-          eventOut = 'mouseleave';
+          eventIn = "mouseenter";
+          eventOut = "mouseleave";
         }
       } else {
-        eventIn = 'focusin';
-        eventOut = 'focusout';
+        eventIn = "focusin";
+        eventOut = "focusout";
       }
 
       this.disposables.add(
-        listen(
-          this.element,
-          eventIn,
-          this.options.selector,
-          this.enter.bind(this)
-        )
+        listen(this.element, eventIn, this.options.selector, this.enter.bind(this)),
       );
       this.disposables.add(
-        listen(
-          this.element,
-          eventOut,
-          this.options.selector,
-          this.leave.bind(this)
-        )
+        listen(this.element, eventOut, this.options.selector, this.leave.bind(this)),
       );
     }
   }
 
   this.options.selector
     ? (this._options = extend({}, this.options, {
-        trigger: 'manual',
-        selector: ''
+        trigger: "manual",
+        selector: "",
       }))
     : this.fixTitle();
 };
 
-Tooltip.prototype.startObservingMutations = function() {
+Tooltip.prototype.startObservingMutations = function () {
   this.mutationObserver.observe(this.getTooltipElement(), {
     attributes: true,
     childList: true,
     characterData: true,
-    subtree: true
+    subtree: true,
   });
 };
 
-Tooltip.prototype.stopObservingMutations = function() {
+Tooltip.prototype.stopObservingMutations = function () {
   this.mutationObserver.disconnect();
 };
 
-Tooltip.prototype.handleMutations = function() {
+Tooltip.prototype.handleMutations = function () {
   window.requestAnimationFrame(
-    function() {
+    function () {
       this.stopObservingMutations();
       this.recalculatePosition();
       this.startObservingMutations();
-    }.bind(this)
+    }.bind(this),
   );
 };
 
-Tooltip.prototype.getDefaults = function() {
+Tooltip.prototype.getDefaults = function () {
   return Tooltip.DEFAULTS;
 };
 
-Tooltip.prototype.getOptions = function(options) {
+Tooltip.prototype.getOptions = function (options) {
   options = extend({}, this.getDefaults(), options);
 
-  if (options.delay && typeof options.delay === 'number') {
+  if (options.delay && typeof options.delay === "number") {
     options.delay = {
       show: options.delay,
-      hide: options.delay
+      hide: options.delay,
     };
   }
 
   return options;
 };
 
-Tooltip.prototype.getDelegateOptions = function() {
+Tooltip.prototype.getDelegateOptions = function () {
   const options = {};
   const defaults = this.getDefaults();
 
@@ -188,41 +173,38 @@ Tooltip.prototype.getDelegateOptions = function() {
   return options;
 };
 
-Tooltip.prototype.enter = function(event) {
+Tooltip.prototype.enter = function (event) {
   if (event) {
     if (event.currentTarget !== this.element) {
       this.getDelegateComponent(event.currentTarget).enter(event);
       return;
     }
 
-    this.inState[event.type === 'focusin' ? 'focus' : 'hover'] = true;
+    this.inState[event.type === "focusin" ? "focus" : "hover"] = true;
   }
 
-  if (
-    this.getTooltipElement().classList.contains('in') ||
-    this.hoverState === 'in'
-  ) {
-    this.hoverState = 'in';
+  if (this.getTooltipElement().classList.contains("in") || this.hoverState === "in") {
+    this.hoverState = "in";
     return;
   }
 
   clearTimeout(this.timeout);
 
-  this.hoverState = 'in';
+  this.hoverState = "in";
 
   if (!this.options.delay || !this.options.delay.show || followThroughTimer) {
     return this.show();
   }
 
   this.timeout = setTimeout(
-    function() {
-      if (this.hoverState === 'in') this.show();
+    function () {
+      if (this.hoverState === "in") this.show();
     }.bind(this),
-    this.options.delay.show
+    this.options.delay.show,
   );
 };
 
-Tooltip.prototype.isInStateTrue = function() {
+Tooltip.prototype.isInStateTrue = function () {
   for (const key in this.inState) {
     if (this.inState[key]) return true;
   }
@@ -230,71 +212,67 @@ Tooltip.prototype.isInStateTrue = function() {
   return false;
 };
 
-Tooltip.prototype.leave = function(event) {
+Tooltip.prototype.leave = function (event) {
   if (event) {
     if (event.currentTarget !== this.element) {
       this.getDelegateComponent(event.currentTarget).leave(event);
       return;
     }
 
-    this.inState[event.type === 'focusout' ? 'focus' : 'hover'] = false;
+    this.inState[event.type === "focusout" ? "focus" : "hover"] = false;
   }
 
   if (this.isInStateTrue()) return;
 
   clearTimeout(this.timeout);
 
-  this.hoverState = 'out';
+  this.hoverState = "out";
 
   if (!this.options.delay || !this.options.delay.hide) return this.hide();
 
   this.timeout = setTimeout(
-    function() {
-      if (this.hoverState === 'out') this.hide();
+    function () {
+      if (this.hoverState === "out") this.hide();
     }.bind(this),
-    this.options.delay.hide
+    this.options.delay.hide,
   );
 };
 
-Tooltip.prototype.show = function() {
+Tooltip.prototype.show = function () {
   if (this.hasContent() && this.enabled) {
     if (this.hideOnClickOutsideOfTooltip) {
-      window.addEventListener('click', this.hideOnClickOutsideOfTooltip, {
-        capture: true
+      window.addEventListener("click", this.hideOnClickOutsideOfTooltip, {
+        capture: true,
       });
     }
 
     if (this.hideOnKeydownOutsideOfTooltip) {
-      window.addEventListener(
-        'keydown',
-        this.hideOnKeydownOutsideOfTooltip,
-        true
-      );
+      window.addEventListener("keydown", this.hideOnKeydownOutsideOfTooltip, true);
     }
 
     const tip = this.getTooltipElement();
     this.startObservingMutations();
-    const tipId = this.getUID('tooltip');
+    const tipId = this.getUID("tooltip");
 
     this.setContent();
-    tip.setAttribute('id', tipId);
-    this.element.setAttribute('aria-describedby', tipId);
+    tip.setAttribute("id", tipId);
+    this.element.setAttribute("aria-describedby", tipId);
 
-    if (this.options.animation) tip.classList.add('fade');
+    if (this.options.animation) tip.classList.add("fade");
 
     let placement =
-      typeof this.options.placement === 'function'
+      typeof this.options.placement === "function"
         ? this.options.placement.call(this, tip, this.element)
         : this.options.placement;
 
     const autoToken = /\s?auto?\s?/i;
     const autoPlace = autoToken.test(placement);
-    if (autoPlace) placement = placement.replace(autoToken, '') || 'top';
+    if (autoPlace) placement = placement.replace(autoToken, "") || "top";
 
     tip.remove();
-    tip.style.top = '0px';
-    tip.style.left = '0px';
-    tip.style.display = 'block';
+    tip.style.top = "0px";
+    tip.style.left = "0px";
+    tip.style.display = "block";
     tip.classList.add(placement);
 
     document.body.appendChild(tip);
@@ -308,37 +286,32 @@ Tooltip.prototype.show = function() {
       const viewportDim = this.viewport.getBoundingClientRect();
 
       placement =
-        placement === 'bottom' && pos.bottom + actualHeight > viewportDim.bottom
-          ? 'top'
-          : placement === 'top' && pos.top - actualHeight < viewportDim.top
-          ? 'bottom'
-          : placement === 'right' && pos.right + actualWidth > viewportDim.width
-          ? 'left'
-          : placement === 'left' && pos.left - actualWidth < viewportDim.left
-          ? 'right'
-          : placement;
+        placement === "bottom" && pos.bottom + actualHeight > viewportDim.bottom
+          ? "top"
+          : placement === "top" && pos.top - actualHeight < viewportDim.top
+            ? "bottom"
+            : placement === "right" && pos.right + actualWidth > viewportDim.width
+              ? "left"
+              : placement === "left" && pos.left - actualWidth < viewportDim.left
+                ? "right"
+                : placement;
 
       tip.classList.remove(orgPlacement);
       tip.classList.add(placement);
     }
 
-    const calculatedOffset = this.getCalculatedOffset(
-      placement,
-      pos,
-      actualWidth,
-      actualHeight
-    );
+    const calculatedOffset = this.getCalculatedOffset(placement, pos, actualWidth, actualHeight);
 
     this.applyPlacement(calculatedOffset, placement);
 
     const prevHoverState = this.hoverState;
     this.hoverState = null;
 
-    if (prevHoverState === 'out') this.leave();
+    if (prevHoverState === "out") this.leave();
   }
 };
 
-Tooltip.prototype.applyPlacement = function(offset, placement) {
+Tooltip.prototype.applyPlacement = function (offset, placement) {
   const tip = this.getTooltipElement();
 
   const width = tip.offsetWidth;
@@ -352,25 +325,20 @@ Tooltip.prototype.applyPlacement = function(offset, placement) {
   offset.top += marginTop;
   offset.left += marginLeft;
 
-  tip.style.top = offset.top + 'px';
-  tip.style.left = offset.left + 'px';
+  tip.style.top = offset.top + "px";
+  tip.style.left = offset.left + "px";
 
-  tip.classList.add('in');
+  tip.classList.add("in");
 
   // check to see if placing tip in new offset caused the tip to resize itself
   const actualWidth = tip.offsetWidth;
   const actualHeight = tip.offsetHeight;
 
-  if (placement === 'top' && actualHeight !== height) {
+  if (placement === "top" && actualHeight !== height) {
     offset.top = offset.top + height - actualHeight;
   }
 
-  const delta = this.getViewportAdjustedDelta(
-    placement,
-    offset,
-    actualWidth,
-    actualHeight
-  );
+  const delta = this.getViewportAdjustedDelta(placement, offset, actualWidth, actualHeight);
 
   if (delta.left) offset.left += delta.left;
   else offset.top += delta.top;
@@ -379,35 +347,35 @@ Tooltip.prototype.applyPlacement = function(offset, placement) {
   const arrowDelta = isVertical
     ? delta.left * 2 - width + actualWidth
     : delta.top * 2 - height + actualHeight;
-  const arrowOffsetPosition = isVertical ? 'offsetWidth' : 'offsetHeight';
+  const arrowOffsetPosition = isVertical ? "offsetWidth" : "offsetHeight";
 
-  tip.style.top = offset.top + 'px';
-  tip.style.left = offset.left + 'px';
+  tip.style.top = offset.top + "px";
+  tip.style.left = offset.left + "px";
 
   this.replaceArrow(arrowDelta, tip[arrowOffsetPosition], isVertical);
 };
 
-Tooltip.prototype.replaceArrow = function(delta, dimension, isVertical) {
+Tooltip.prototype.replaceArrow = function (delta, dimension, isVertical) {
   const arrow = this.getArrowElement();
-  const amount = 50 * (1 - delta / dimension) + '%';
+  const amount = 50 * (1 - delta / dimension) + "%";
 
   if (isVertical) {
     arrow.style.left = amount;
-    arrow.style.top = '';
+    arrow.style.top = "";
   } else {
     arrow.style.top = amount;
-    arrow.style.left = '';
+    arrow.style.left = "";
   }
 };
 
-Tooltip.prototype.setContent = function() {
+Tooltip.prototype.setContent = function () {
   const tip = this.getTooltipElement();
 
   if (this.options.class) {
     tip.classList.add(this.options.class);
   }
 
-  const inner = tip.querySelector('.tooltip-inner');
+  const inner = tip.querySelector(".tooltip-inner");
   if (this.options.item) {
     inner.appendChild(this.viewRegistry.getView(this.options.item));
   } else {
@@ -419,114 +387,91 @@ Tooltip.prototype.setContent = function() {
     }
   }
 
-  tip.classList.remove('fade', 'in', 'top', 'bottom', 'left', 'right');
+  tip.classList.remove("fade", "in", "top", "bottom", "left", "right");
 };
 
-Tooltip.prototype.hide = function(callback) {
+Tooltip.prototype.hide = function (callback) {
   this.inState = {};
 
   if (this.hideOnClickOutsideOfTooltip) {
-    window.removeEventListener('click', this.hideOnClickOutsideOfTooltip, true);
+    window.removeEventListener("click", this.hideOnClickOutsideOfTooltip, true);
   }
 
   if (this.hideOnKeydownOutsideOfTooltip) {
-    window.removeEventListener(
-      'keydown',
-      this.hideOnKeydownOutsideOfTooltip,
-      true
-    );
+    window.removeEventListener("keydown", this.hideOnKeydownOutsideOfTooltip, true);
   }
 
-  this.tip && this.tip.classList.remove('in');
+  this.tip && this.tip.classList.remove("in");
   this.stopObservingMutations();
 
-  if (this.hoverState !== 'in') this.tip && this.tip.remove();
+  if (this.hoverState !== "in") this.tip && this.tip.remove();
 
-  this.element.removeAttribute('aria-describedby');
+  this.element.removeAttribute("aria-describedby");
 
   callback && callback();
 
   this.hoverState = null;
 
   clearTimeout(followThroughTimer);
-  followThroughTimer = setTimeout(function() {
+  followThroughTimer = setTimeout(function () {
     followThroughTimer = null;
   }, Tooltip.FOLLOW_THROUGH_DURATION);
 
   return this;
 };
 
-Tooltip.prototype.fixTitle = function() {
+Tooltip.prototype.fixTitle = function () {
   if (
-    this.element.getAttribute('title') ||
-    typeof this.element.getAttribute('data-original-title') !== 'string'
+    this.element.getAttribute("title") ||
+    typeof this.element.getAttribute("data-original-title") !== "string"
   ) {
-    this.element.setAttribute(
-      'data-original-title',
-      this.element.getAttribute('title') || ''
-    );
-    this.element.setAttribute('title', '');
+    this.element.setAttribute("data-original-title", this.element.getAttribute("title") || "");
+    this.element.setAttribute("title", "");
   }
 };
 
-Tooltip.prototype.hasContent = function() {
+Tooltip.prototype.hasContent = function () {
   return this.getTitle() || this.options.item;
 };
 
-Tooltip.prototype.getCalculatedOffset = function(
-  placement,
-  pos,
-  actualWidth,
-  actualHeight
-) {
-  return placement === 'bottom'
+Tooltip.prototype.getCalculatedOffset = function (placement, pos, actualWidth, actualHeight) {
+  return placement === "bottom"
     ? {
         top: pos.top + pos.height,
-        left: pos.left + pos.width / 2 - actualWidth / 2
+        left: pos.left + pos.width / 2 - actualWidth / 2,
       }
-    : placement === 'top'
-    ? {
-        top: pos.top - actualHeight,
-        left: pos.left + pos.width / 2 - actualWidth / 2
-      }
-    : placement === 'left'
-    ? {
-        top: pos.top + pos.height / 2 - actualHeight / 2,
-        left: pos.left - actualWidth
-      }
-    : /* placement === 'right' */ {
-        top: pos.top + pos.height / 2 - actualHeight / 2,
-        left: pos.left + pos.width
-      };
+    : placement === "top"
+      ? {
+          top: pos.top - actualHeight,
+          left: pos.left + pos.width / 2 - actualWidth / 2,
+        }
+      : placement === "left"
+        ? {
+            top: pos.top + pos.height / 2 - actualHeight / 2,
+            left: pos.left - actualWidth,
+          }
+        : /* placement === 'right' */ {
+            top: pos.top + pos.height / 2 - actualHeight / 2,
+            left: pos.left + pos.width,
+          };
 };
 
-Tooltip.prototype.getViewportAdjustedDelta = function(
-  placement,
-  pos,
-  actualWidth,
-  actualHeight
-) {
+Tooltip.prototype.getViewportAdjustedDelta = function (placement, pos, actualWidth, actualHeight) {
   const delta = { top: 0, left: 0 };
   if (!this.viewport) return delta;
 
-  const viewportPadding =
-    (this.options.viewport && this.options.viewport.padding) || 0;
+  const viewportPadding = (this.options.viewport && this.options.viewport.padding) || 0;
   const viewportDimensions = this.viewport.getBoundingClientRect();
 
   if (/right|left/.test(placement)) {
     const topEdgeOffset = pos.top - viewportPadding - viewportDimensions.scroll;
-    const bottomEdgeOffset =
-      pos.top + viewportPadding - viewportDimensions.scroll + actualHeight;
+    const bottomEdgeOffset = pos.top + viewportPadding - viewportDimensions.scroll + actualHeight;
     if (topEdgeOffset < viewportDimensions.top) {
       // top overflow
       delta.top = viewportDimensions.top - topEdgeOffset;
-    } else if (
-      bottomEdgeOffset >
-      viewportDimensions.top + viewportDimensions.height
-    ) {
+    } else if (bottomEdgeOffset > viewportDimensions.top + viewportDimensions.height) {
       // bottom overflow
-      delta.top =
-        viewportDimensions.top + viewportDimensions.height - bottomEdgeOffset;
+      delta.top = viewportDimensions.top + viewportDimensions.height - bottomEdgeOffset;
     }
   } else {
     const leftEdgeOffset = pos.left - viewportPadding;
@@ -536,64 +481,60 @@ Tooltip.prototype.getViewportAdjustedDelta = function(
       delta.left = viewportDimensions.left - leftEdgeOffset;
     } else if (rightEdgeOffset > viewportDimensions.right) {
       // right overflow
-      delta.left =
-        viewportDimensions.left + viewportDimensions.width - rightEdgeOffset;
+      delta.left = viewportDimensions.left + viewportDimensions.width - rightEdgeOffset;
     }
   }
 
   return delta;
 };
 
-Tooltip.prototype.getTitle = function() {
-  const title = this.element.getAttribute('data-original-title');
+Tooltip.prototype.getTitle = function () {
+  const title = this.element.getAttribute("data-original-title");
   if (title) {
     return title;
   } else {
-    return typeof this.options.title === 'function'
+    return typeof this.options.title === "function"
       ? this.options.title.call(this.element)
       : this.options.title;
   }
 };
 
-Tooltip.prototype.getUID = function(prefix) {
+Tooltip.prototype.getUID = function (prefix) {
   do prefix += ~~(Math.random() * 1000000);
   while (document.getElementById(prefix));
   return prefix;
 };
 
-Tooltip.prototype.getTooltipElement = function() {
+Tooltip.prototype.getTooltipElement = function () {
   if (!this.tip) {
-    let div = document.createElement('div');
+    let div = document.createElement("div");
     div.innerHTML = this.options.template;
     if (div.children.length !== 1) {
-      throw new Error(
-        'Tooltip `template` option must consist of exactly 1 top-level element!'
-      );
+      throw new Error("Tooltip `template` option must consist of exactly 1 top-level element!");
     }
     this.tip = div.firstChild;
   }
   return this.tip;
 };
 
-Tooltip.prototype.getArrowElement = function() {
-  this.arrow =
-    this.arrow || this.getTooltipElement().querySelector('.tooltip-arrow');
+Tooltip.prototype.getArrowElement = function () {
+  this.arrow = this.arrow || this.getTooltipElement().querySelector(".tooltip-arrow");
   return this.arrow;
 };
 
-Tooltip.prototype.enable = function() {
+Tooltip.prototype.enable = function () {
   this.enabled = true;
 };
 
-Tooltip.prototype.disable = function() {
+Tooltip.prototype.disable = function () {
   this.enabled = false;
 };
 
-Tooltip.prototype.toggleEnabled = function() {
+Tooltip.prototype.toggleEnabled = function () {
   this.enabled = !this.enabled;
 };
 
-Tooltip.prototype.toggle = function(event) {
+Tooltip.prototype.toggle = function (event) {
   if (event) {
     if (event.currentTarget !== this.element) {
       this.getDelegateComponent(event.currentTarget).toggle(event);
@@ -604,42 +545,36 @@ Tooltip.prototype.toggle = function(event) {
     if (this.isInStateTrue()) this.enter();
     else this.leave();
   } else {
-    this.getTooltipElement().classList.contains('in')
-      ? this.leave()
-      : this.enter();
+    this.getTooltipElement().classList.contains("in") ? this.leave() : this.enter();
   }
 };
 
-Tooltip.prototype.destroy = function() {
+Tooltip.prototype.destroy = function () {
   clearTimeout(this.timeout);
   this.tip && this.tip.remove();
   this.disposables.dispose();
 };
 
-Tooltip.prototype.getDelegateComponent = function(element) {
+Tooltip.prototype.getDelegateComponent = function (element) {
   let component = tooltipComponentsByElement.get(element);
   if (!component) {
-    component = new Tooltip(
-      element,
-      this.getDelegateOptions(),
-      this.viewRegistry
-    );
+    component = new Tooltip(element, this.getDelegateOptions(), this.viewRegistry);
     tooltipComponentsByElement.set(element, component);
   }
   return component;
 };
 
-Tooltip.prototype.recalculatePosition = function() {
+Tooltip.prototype.recalculatePosition = function () {
   const tip = this.getTooltipElement();
 
   let placement =
-    typeof this.options.placement === 'function'
+    typeof this.options.placement === "function"
       ? this.options.placement.call(this, tip, this.element)
       : this.options.placement;
 
   const autoToken = /\s?auto?\s?/i;
   const autoPlace = autoToken.test(placement);
-  if (autoPlace) placement = placement.replace(autoToken, '') || 'top';
+  if (autoPlace) placement = placement.replace(autoToken, "") || "top";
 
   tip.classList.add(placement);
 
@@ -652,26 +587,21 @@ Tooltip.prototype.recalculatePosition = function() {
     const viewportDim = this.viewport.getBoundingClientRect();
 
     placement =
-      placement === 'bottom' && pos.bottom + actualHeight > viewportDim.bottom
-        ? 'top'
-        : placement === 'top' && pos.top - actualHeight < viewportDim.top
-        ? 'bottom'
-        : placement === 'right' && pos.right + actualWidth > viewportDim.width
-        ? 'left'
-        : placement === 'left' && pos.left - actualWidth < viewportDim.left
-        ? 'right'
-        : placement;
+      placement === "bottom" && pos.bottom + actualHeight > viewportDim.bottom
+        ? "top"
+        : placement === "top" && pos.top - actualHeight < viewportDim.top
+          ? "bottom"
+          : placement === "right" && pos.right + actualWidth > viewportDim.width
+            ? "left"
+            : placement === "left" && pos.left - actualWidth < viewportDim.left
+              ? "right"
+              : placement;
 
     tip.classList.remove(orgPlacement);
     tip.classList.add(placement);
   }
 
-  const calculatedOffset = this.getCalculatedOffset(
-    placement,
-    pos,
-    actualWidth,
-    actualHeight
-  );
+  const calculatedOffset = this.getCalculatedOffset(placement, pos, actualWidth, actualHeight);
   this.applyPlacement(calculatedOffset, placement);
 };
 

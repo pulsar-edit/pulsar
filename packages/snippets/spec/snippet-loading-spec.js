@@ -1,49 +1,52 @@
-const path = require('path');
-const fs = require('fs');
-const temp = require('temp').track();
-const { conditionPromise, timeoutPromise: wait } = require('./async-spec-helpers');
-
+const path = require("path");
+const fs = require("fs");
+const temp = require("temp").track();
+const { conditionPromise, timeoutPromise: wait } = require("./async-spec-helpers");
 
 describe("Snippet Loading", () => {
   let configDirPath, snippetsService;
 
   beforeEach(() => {
-    configDirPath = temp.mkdirSync('atom-config-dir-');
-    spyOn(atom, 'getConfigDirPath').andReturn(configDirPath);
+    configDirPath = temp.mkdirSync("atom-config-dir-");
+    spyOn(atom, "getConfigDirPath").andReturn(configDirPath);
 
-    spyOn(console, 'warn');
-    if (atom.notifications != null) { spyOn(atom.notifications, 'addError'); }
+    spyOn(console, "warn");
+    if (atom.notifications != null) {
+      spyOn(atom.notifications, "addError");
+    }
 
-    spyOn(atom.packages, 'getLoadedPackages').andReturn([
-      atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-snippets')),
-      atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-broken-snippets')),
+    spyOn(atom.packages, "getLoadedPackages").andReturn([
+      atom.packages.loadPackage(path.join(__dirname, "fixtures", "package-with-snippets")),
+      atom.packages.loadPackage(path.join(__dirname, "fixtures", "package-with-broken-snippets")),
     ]);
   });
 
   afterEach(async () => {
     jasmine.useRealClock();
-    await atom.packages.deactivatePackage('snippets');
-    jasmine.unspy(atom.packages, 'getLoadedPackages');
+    await atom.packages.deactivatePackage("snippets");
+    jasmine.unspy(atom.packages, "getLoadedPackages");
     // Give `pathwatcher` some room to breathe.
     await wait(50);
   });
 
-  async function activateSnippetsPackagePromise () {
-    let { mainModule } = await atom.packages.activatePackage('snippets');
+  async function activateSnippetsPackagePromise() {
+    let { mainModule } = await atom.packages.activatePackage("snippets");
     snippetsService = mainModule.provideSnippets();
     mainModule.loaded = false;
     await mainModule.waitForSnippetsLoaded();
 
     await conditionPromise(() => {
       return snippetsService.bundledSnippetsLoaded();
-    }, 'all snippets to load');
+    }, "all snippets to load");
   }
 
   const activateSnippetsPackage = () => {
-    waitsForPromise(() => atom.packages.activatePackage("snippets").then(({ mainModule }) => {
-      snippetsService = mainModule.provideSnippets();
-      mainModule.loaded = false;
-    }));
+    waitsForPromise(() =>
+      atom.packages.activatePackage("snippets").then(({ mainModule }) => {
+        snippetsService = mainModule.provideSnippets();
+        mainModule.loaded = false;
+      }),
+    );
 
     waitsFor("all snippets to load", 3000, () => snippetsService.bundledSnippetsLoaded());
   };
@@ -52,16 +55,16 @@ describe("Snippet Loading", () => {
     activateSnippetsPackage();
 
     runs(() => {
-      const jsonSnippet = snippetsService.snippetsForScopes(['.source.json'])['snip'];
-      expect(jsonSnippet.name).toBe('Atom Snippet');
-      expect(jsonSnippet.prefix).toBe('snip');
+      const jsonSnippet = snippetsService.snippetsForScopes([".source.json"])["snip"];
+      expect(jsonSnippet.name).toBe("Atom Snippet");
+      expect(jsonSnippet.prefix).toBe("snip");
       expect(jsonSnippet.body).toContain('"prefix":');
       expect(jsonSnippet.body).toContain('"body":');
       expect(jsonSnippet.tabStopList.length).toBeGreaterThan(0);
 
-      const csonSnippet = snippetsService.snippetsForScopes(['.source.coffee'])['snip'];
-      expect(csonSnippet.name).toBe('Atom Snippet');
-      expect(csonSnippet.prefix).toBe('snip');
+      const csonSnippet = snippetsService.snippetsForScopes([".source.coffee"])["snip"];
+      expect(csonSnippet.name).toBe("Atom Snippet");
+      expect(csonSnippet.prefix).toBe("snip");
       expect(csonSnippet.body).toContain("'prefix':");
       expect(csonSnippet.body).toContain("'body':");
       expect(csonSnippet.tabStopList.length).toBeGreaterThan(0);
@@ -72,24 +75,24 @@ describe("Snippet Loading", () => {
     activateSnippetsPackage();
 
     runs(() => {
-      let snippet = snippetsService.snippetsForScopes(['.test'])['test'];
-      expect(snippet.prefix).toBe('test');
-      expect(snippet.body).toBe('testing 123');
+      let snippet = snippetsService.snippetsForScopes([".test"])["test"];
+      expect(snippet.prefix).toBe("test");
+      expect(snippet.body).toBe("testing 123");
 
-      snippet = snippetsService.snippetsForScopes(['.test'])['testd'];
-      expect(snippet.prefix).toBe('testd');
-      expect(snippet.body).toBe('testing 456');
-      expect(snippet.description).toBe('a description');
-      expect(snippet.descriptionMoreURL).toBe('http://google.com');
+      snippet = snippetsService.snippetsForScopes([".test"])["testd"];
+      expect(snippet.prefix).toBe("testd");
+      expect(snippet.body).toBe("testing 456");
+      expect(snippet.description).toBe("a description");
+      expect(snippet.descriptionMoreURL).toBe("http://google.com");
 
-      snippet = snippetsService.snippetsForScopes(['.test'])['testlabelleft'];
-      expect(snippet.prefix).toBe('testlabelleft');
-      expect(snippet.body).toBe('testing 456');
-      expect(snippet.leftLabel).toBe('a label');
+      snippet = snippetsService.snippetsForScopes([".test"])["testlabelleft"];
+      expect(snippet.prefix).toBe("testlabelleft");
+      expect(snippet.body).toBe("testing 456");
+      expect(snippet.leftLabel).toBe("a label");
 
-      snippet = snippetsService.snippetsForScopes(['.test'])['testhtmllabels'];
-      expect(snippet.prefix).toBe('testhtmllabels');
-      expect(snippet.body).toBe('testing 456');
+      snippet = snippetsService.snippetsForScopes([".test"])["testhtmllabels"];
+      expect(snippet.prefix).toBe("testhtmllabels");
+      expect(snippet.body).toBe("testing 456");
       expect(snippet.leftLabelHTML).toBe('<span style="color:red">Label</span>');
       expect(snippet.rightLabelHTML).toBe('<span style="color:white">Label</span>');
     });
@@ -97,19 +100,17 @@ describe("Snippet Loading", () => {
 
   it("registers a command if a package snippet defines one", () => {
     waitsForPromise(() => {
-      return atom.packages.activatePackage("snippets").then(
-        ({ mainModule }) => {
-          return new Promise((resolve) => {
-            mainModule.onDidLoadSnippets(resolve);
-          });
-        }
-      );
+      return atom.packages.activatePackage("snippets").then(({ mainModule }) => {
+        return new Promise((resolve) => {
+          mainModule.onDidLoadSnippets(resolve);
+        });
+      });
     });
 
     runs(() => {
-      expect(
-        'package-with-snippets:test-command-name' in atom.commands.registeredCommands
-      ).toBe(true);
+      expect("package-with-snippets:test-command-name" in atom.commands.registeredCommands).toBe(
+        true,
+      );
     });
   });
 
@@ -119,24 +120,28 @@ describe("Snippet Loading", () => {
     runs(() => {
       // Warn about invalid-file, but don't even try to parse a hidden file
       expect(console.warn.calls.length).toBeGreaterThan(0);
-      expect(console.warn.mostRecentCall.args[0]).toMatch(/Error reading.*package-with-broken-snippets/);
+      expect(console.warn.mostRecentCall.args[0]).toMatch(
+        /Error reading.*package-with-broken-snippets/,
+      );
     });
   });
 
   describe("::loadPackageSnippets(callback)", () => {
     const jsPackage = () => {
-      const pack = atom.packages.loadPackage('language-javascript');
+      const pack = atom.packages.loadPackage("language-javascript");
       pack.path = path.join(
         atom.getLoadSettings().resourcePath,
-        'node_modules', 'language-javascript'
+        "node_modules",
+        "language-javascript",
       );
       return pack;
     };
 
-    beforeEach(() => { // simulate a list of packages where the javascript core package is returned at the end
+    beforeEach(() => {
+      // simulate a list of packages where the javascript core package is returned at the end
       atom.packages.getLoadedPackages.andReturn([
-        atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-snippets')),
-        jsPackage()
+        atom.packages.loadPackage(path.join(__dirname, "fixtures", "package-with-snippets")),
+        jsPackage(),
       ]);
     });
 
@@ -149,7 +154,7 @@ describe("Snippet Loading", () => {
       activateSnippetsPackage();
 
       runs(() => {
-        const snippet = snippetsService.snippetsForScopes(['.source.js'])['log'];
+        const snippet = snippetsService.snippetsForScopes([".source.js"])["log"];
         expect(snippet.body).toBe("from-a-community-package");
       });
     });
@@ -159,10 +164,14 @@ describe("Snippet Loading", () => {
     it("invokes listeners when all snippets are loaded", () => {
       let loadedCallback = null;
 
-      waitsFor("package to activate", done => atom.packages.activatePackage("snippets").then(({ mainModule }) => {
-        mainModule.onDidLoadSnippets(loadedCallback = jasmine.createSpy('onDidLoadSnippets callback'));
-        done();
-      }));
+      waitsFor("package to activate", (done) =>
+        atom.packages.activatePackage("snippets").then(({ mainModule }) => {
+          mainModule.onDidLoadSnippets(
+            (loadedCallback = jasmine.createSpy("onDidLoadSnippets callback")),
+          );
+          done();
+        }),
+      );
 
       waitsFor("onDidLoad callback to be called", () => loadedCallback.callCount > 0);
     });
@@ -173,7 +182,9 @@ describe("Snippet Loading", () => {
     beforeEach(async () => {
       jasmine.useRealClock();
       fs.mkdirSync(configDirPath, { recursive: true });
-      fs.writeFileSync(path.join(configDirPath, 'snippets.json'), `\
+      fs.writeFileSync(
+        path.join(configDirPath, "snippets.json"),
+        `\
 {
   ".foo": {
     "foo snippet": {
@@ -182,15 +193,15 @@ describe("Snippet Loading", () => {
     }
   }
 }\
-`
+`,
       );
       await activateSnippetsPackagePromise();
     });
 
     it("loads the snippets from that file", async () => {
-      snippet = snippetsService.snippetsForScopes(['.foo'])['foo'];
+      snippet = snippetsService.snippetsForScopes([".foo"])["foo"];
 
-      expect(snippet.name).toBe('foo snippet');
+      expect(snippet.name).toBe("foo snippet");
       expect(snippet.prefix).toBe("foo");
       expect(snippet.body).toBe("bar1");
     });
@@ -199,7 +210,9 @@ describe("Snippet Loading", () => {
       it("reloads the snippets", async () => {
         jasmine.useRealClock();
         fs.mkdirSync(configDirPath, { recursive: true });
-        fs.writeFileSync(path.join(configDirPath, 'snippets.json'), `\
+        fs.writeFileSync(
+          path.join(configDirPath, "snippets.json"),
+          `\
 {
 ".foo": {
   "foo snippet": {
@@ -208,21 +221,21 @@ describe("Snippet Loading", () => {
   }
 }
 }\
-`
+`,
         );
 
         await conditionPromise(() => {
-          const snippet = snippetsService.snippetsForScopes(['.foo'])['foo'];
-          return snippet && snippet.body === 'bar2';
-        }, 'snippets to be changed');
+          const snippet = snippetsService.snippetsForScopes([".foo"])["foo"];
+          return snippet && snippet.body === "bar2";
+        }, "snippets to be changed");
 
         fs.mkdirSync(configDirPath, { recursive: true });
-        fs.writeFileSync(path.join(configDirPath, 'snippets.json'), "");
+        fs.writeFileSync(path.join(configDirPath, "snippets.json"), "");
 
         await conditionPromise(() => {
-          let result = snippetsService.snippetsForScopes(['.foo'])['foo'];
+          let result = snippetsService.snippetsForScopes([".foo"])["foo"];
           return !result;
-        }, 'snippets to be removed');
+        }, "snippets to be removed");
       });
     });
   });
@@ -231,12 +244,14 @@ describe("Snippet Loading", () => {
     beforeEach(async () => {
       jasmine.useRealClock();
       fs.mkdirSync(configDirPath, { recursive: true });
-      fs.writeFileSync(path.join(configDirPath, 'snippets.cson'), `\
+      fs.writeFileSync(
+        path.join(configDirPath, "snippets.cson"),
+        `\
 ".foo":
   "foo snippet":
     "prefix": "foo"
     "body": "bar1"\
-`
+`,
       );
       await activateSnippetsPackagePromise();
     });
@@ -246,11 +261,11 @@ describe("Snippet Loading", () => {
       let snippet;
 
       await conditionPromise(() => {
-        snippet = snippetsService.snippetsForScopes(['.foo'])['foo'];
+        snippet = snippetsService.snippetsForScopes([".foo"])["foo"];
         return snippet;
       });
 
-      expect(snippet.name).toBe('foo snippet');
+      expect(snippet.name).toBe("foo snippet");
       expect(snippet.prefix).toBe("foo");
       expect(snippet.body).toBe("bar1");
     });
@@ -258,34 +273,35 @@ describe("Snippet Loading", () => {
     describe("when that file changes", () => {
       it("reloads the snippets", async () => {
         fs.mkdirSync(configDirPath, { recursive: true });
-        fs.writeFileSync(path.join(configDirPath, 'snippets.cson'), `\
+        fs.writeFileSync(
+          path.join(configDirPath, "snippets.cson"),
+          `\
 ".foo":
   "foo snippet":
     "prefix": "foo"
     "body": "bar2"\
-`
+`,
         );
 
         await conditionPromise(() => {
-          const snippet = snippetsService.snippetsForScopes(['.foo'])['foo'];
-          return snippet && snippet.body === 'bar2';
-        }, 'snippets to be changed');
-
+          const snippet = snippetsService.snippetsForScopes([".foo"])["foo"];
+          return snippet && snippet.body === "bar2";
+        }, "snippets to be changed");
 
         fs.mkdirSync(configDirPath, { recursive: true });
-        fs.writeFileSync(path.join(configDirPath, 'snippets.cson'), "");
+        fs.writeFileSync(path.join(configDirPath, "snippets.cson"), "");
 
         await conditionPromise(() => {
-          const snippet = snippetsService.snippetsForScopes(['.foo'])['foo'];
+          const snippet = snippetsService.snippetsForScopes([".foo"])["foo"];
           return snippet == null;
-        }, 'snippets to be removed');
+        }, "snippets to be removed");
       });
     });
   });
 
   it("notifies the user when the user snippets file cannot be loaded", async () => {
     jasmine.useRealClock();
-    fs.writeFileSync(path.join(configDirPath, 'snippets.cson'), '".junk":::');
+    fs.writeFileSync(path.join(configDirPath, "snippets.cson"), '".junk":::');
 
     await activateSnippetsPackagePromise();
 
@@ -297,63 +313,65 @@ describe("Snippet Loading", () => {
 
   describe("packages-with-snippets-disabled feature", () => {
     it("disables no snippets if the config option is empty", () => {
-      const originalConfig = atom.config.get('core.packagesWithSnippetsDisabled');
-      atom.config.set('core.packagesWithSnippetsDisabled', []);
+      const originalConfig = atom.config.get("core.packagesWithSnippetsDisabled");
+      atom.config.set("core.packagesWithSnippetsDisabled", []);
 
       activateSnippetsPackage();
       runs(() => {
-        const snippets = snippetsService.snippetsForScopes(['.package-with-snippets-unique-scope']);
+        const snippets = snippetsService.snippetsForScopes([".package-with-snippets-unique-scope"]);
         expect(Object.keys(snippets).length).toBe(1);
-        atom.config.set('core.packagesWithSnippetsDisabled', originalConfig);
+        atom.config.set("core.packagesWithSnippetsDisabled", originalConfig);
       });
     });
 
     it("still includes a disabled package's snippets in the list of unparsed snippets", () => {
-      let originalConfig = atom.config.get('core.packagesWithSnippetsDisabled');
-      atom.config.set('core.packagesWithSnippetsDisabled', []);
+      let originalConfig = atom.config.get("core.packagesWithSnippetsDisabled");
+      atom.config.set("core.packagesWithSnippetsDisabled", []);
 
       activateSnippetsPackage();
       runs(() => {
-        atom.config.set('core.packagesWithSnippetsDisabled', ['package-with-snippets']);
+        atom.config.set("core.packagesWithSnippetsDisabled", ["package-with-snippets"]);
         const allSnippets = snippetsService.getUnparsedSnippets();
-        const scopedSnippet = allSnippets.find(s => s.selectorString === '.package-with-snippets-unique-scope');
+        const scopedSnippet = allSnippets.find(
+          (s) => s.selectorString === ".package-with-snippets-unique-scope",
+        );
         expect(scopedSnippet).not.toBe(undefined);
-        atom.config.set('core.packagesWithSnippetsDisabled', originalConfig);
+        atom.config.set("core.packagesWithSnippetsDisabled", originalConfig);
       });
     });
 
     it("never loads a package's snippets when that package is disabled in config", () => {
-      const originalConfig = atom.config.get('core.packagesWithSnippetsDisabled');
-      atom.config.set('core.packagesWithSnippetsDisabled', ['package-with-snippets']);
+      const originalConfig = atom.config.get("core.packagesWithSnippetsDisabled");
+      atom.config.set("core.packagesWithSnippetsDisabled", ["package-with-snippets"]);
 
       activateSnippetsPackage();
       runs(() => {
-        const snippets = snippetsService.snippetsForScopes(['.package-with-snippets-unique-scope']);
+        const snippets = snippetsService.snippetsForScopes([".package-with-snippets-unique-scope"]);
         expect(Object.keys(snippets).length).toBe(0);
-        atom.config.set('core.packagesWithSnippetsDisabled', originalConfig);
+        atom.config.set("core.packagesWithSnippetsDisabled", originalConfig);
       });
     });
 
     it("unloads and/or reloads snippets from a package if the config option is changed after activation", () => {
-      const originalConfig = atom.config.get('core.packagesWithSnippetsDisabled');
-      atom.config.set('core.packagesWithSnippetsDisabled', []);
+      const originalConfig = atom.config.get("core.packagesWithSnippetsDisabled");
+      atom.config.set("core.packagesWithSnippetsDisabled", []);
 
       activateSnippetsPackage();
       runs(() => {
-        let snippets = snippetsService.snippetsForScopes(['.package-with-snippets-unique-scope']);
+        let snippets = snippetsService.snippetsForScopes([".package-with-snippets-unique-scope"]);
         expect(Object.keys(snippets).length).toBe(1);
 
         // Disable it.
-        atom.config.set('core.packagesWithSnippetsDisabled', ['package-with-snippets']);
-        snippets = snippetsService.snippetsForScopes(['.package-with-snippets-unique-scope']);
+        atom.config.set("core.packagesWithSnippetsDisabled", ["package-with-snippets"]);
+        snippets = snippetsService.snippetsForScopes([".package-with-snippets-unique-scope"]);
         expect(Object.keys(snippets).length).toBe(0);
 
         // Re-enable it.
-        atom.config.set('core.packagesWithSnippetsDisabled', []);
-        snippets = snippetsService.snippetsForScopes(['.package-with-snippets-unique-scope']);
+        atom.config.set("core.packagesWithSnippetsDisabled", []);
+        snippets = snippetsService.snippetsForScopes([".package-with-snippets-unique-scope"]);
         expect(Object.keys(snippets).length).toBe(1);
 
-        atom.config.set('core.packagesWithSnippetsDisabled', originalConfig);
+        atom.config.set("core.packagesWithSnippetsDisabled", originalConfig);
       });
     });
   });

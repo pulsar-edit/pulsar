@@ -16,12 +16,12 @@ Any package can act as a symbol provider. [These are the packages on the Lumine 
 
 ## Commands
 
-|Command|Description|Keybinding (Linux/Windows)|Keybinding (macOS)|
-|-------|-----------|------------------|-----------------|
-|`symbols-view:toggle-file-symbols`|Show all symbols in current file|<kbd>ctrl-r</kbd>|<kbd>cmd-r</kbd>|
-|`symbols-view:toggle-project-symbols`|Show all symbols in the project|<kbd>ctrl-shift-r</kbd>|<kbd>cmd-shift-r</kbd>|
-|`symbols-view:go-to-declaration`|Jump to the symbol under the cursor|<kbd>ctrl-alt-down</kbd>|<kbd>cmd-alt-down</kbd>|
-|`symbols-view:return-from-declaration`|Return from the jump|<kbd>ctrl-alt-up</kbd>|<kbd>cmd-alt-up</kbd>|
-|`symbols-view:show-active-providers`|Display a list of all known symbol providers|||
+| Command                                | Description                                  | Keybinding (Linux/Windows) | Keybinding (macOS)      |
+| -------------------------------------- | -------------------------------------------- | -------------------------- | ----------------------- |
+| `symbols-view:toggle-file-symbols`     | Show all symbols in current file             | <kbd>ctrl-r</kbd>          | <kbd>cmd-r</kbd>        |
+| `symbols-view:toggle-project-symbols`  | Show all symbols in the project              | <kbd>ctrl-shift-r</kbd>    | <kbd>cmd-shift-r</kbd>  |
+| `symbols-view:go-to-declaration`       | Jump to the symbol under the cursor          | <kbd>ctrl-alt-down</kbd>   | <kbd>cmd-alt-down</kbd> |
+| `symbols-view:return-from-declaration` | Return from the jump                         | <kbd>ctrl-alt-up</kbd>     | <kbd>cmd-alt-up</kbd>   |
+| `symbols-view:show-active-providers`   | Display a list of all known symbol providers |                            |                         |
 
 Commands relating to project-wide symbols may fail if no provider can satisfy a request for project-wide symbols. See `symbol-provider-ctags` for more information.

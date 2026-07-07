@@ -16,9 +16,9 @@ If you’re writing your own grammar, or contributing a `tags.scm` to a grammar 
 
 The query syntax starts as a subset of what is described [on this page](https://tree-sitter.github.io/tree-sitter/code-navigation-systems). Here’s what this package can understand:
 
-* A query that consists of a `@definition.THING` capture with a `@name` capture inside will properly be understood as a symbol with a tag corresponding to `THING` and a name corresponding to the `@name` capture’s text.
-* A query that consists of a `@reference.THING` capture with a `@name` capture inside will be ignored by default. If the proper setting is enabled, each of these references will become a symbol with a tag corresponding to `THING` and a name corresponding to the `@name` capture’s text.
-* All other `@name` captures that are not within either a `@definition` or a `@reference` will be considered as a symbol in isolation. (These symbols can still specify a tag via a `#set!` predicate.)
+- A query that consists of a `@definition.THING` capture with a `@name` capture inside will properly be understood as a symbol with a tag corresponding to `THING` and a name corresponding to the `@name` capture’s text.
+- A query that consists of a `@reference.THING` capture with a `@name` capture inside will be ignored by default. If the proper setting is enabled, each of these references will become a symbol with a tag corresponding to `THING` and a name corresponding to the `@name` capture’s text.
+- All other `@name` captures that are not within either a `@definition` or a `@reference` will be considered as a symbol in isolation. (These symbols can still specify a tag via a `#set!` predicate.)
 
 To match the current behavior of the `symbols-view` package, you can usually take a `queries/tags.scm` file from a Tree-sitter repository — many parsers define them — and paste it straight into your grammar’s `tags.scm` file.
 
@@ -61,7 +61,6 @@ The `symbol.prepend` predicate adds a constant string to the beginning of a symb
 ```
 
 The `symbol.append` predicate adds a constant string to the end of a symbol name. For a class `Foo`, this predicate would result in a symbol called `Foo (class)`.
-
 
 ###### symbol.strip
 

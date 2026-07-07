@@ -1,4 +1,4 @@
-const path = require('path')
+const path = require("path");
 
-const fixturePackagesPath = path.resolve(__dirname, '../fixtures/packages');
+const fixturePackagesPath = path.resolve(__dirname, "../fixtures/packages");
 atom.packages.packageDirPaths.unshift(fixturePackagesPath);

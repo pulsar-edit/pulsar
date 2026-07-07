@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-const fs = require('fs-plus');
-const path = require('path');
+const fs = require("fs-plus");
+const path = require("path");
 
 module.exports = class FileSystemBlobStore {
   static load(directory) {
@@ -11,9 +11,9 @@ module.exports = class FileSystemBlobStore {
   }
 
   constructor(directory) {
-    this.blobFilename = path.join(directory, 'BLOB');
-    this.blobMapFilename = path.join(directory, 'MAP');
-    this.lockFilename = path.join(directory, 'LOCK');
+    this.blobFilename = path.join(directory, "BLOB");
+    this.blobMapFilename = path.join(directory, "MAP");
+    this.lockFilename = path.join(directory, "LOCK");
     this.reset();
   }
 
@@ -47,14 +47,14 @@ module.exports = class FileSystemBlobStore {
 
     let acquiredLock = false;
     try {
-      fs.writeFileSync(this.lockFilename, 'LOCK', { flag: 'wx' });
+      fs.writeFileSync(this.lockFilename, "LOCK", { flag: "wx" });
       acquiredLock = true;
 
       fs.writeFileSync(this.blobFilename, blobToStore);
       fs.writeFileSync(this.blobMapFilename, mapToStore);
     } catch (error) {
       // Swallow the exception silently only if we fail to acquire the lock.
-      if (error.code !== 'EEXIST') {
+      if (error.code !== "EEXIST") {
         throw error;
       }
     } finally {
@@ -65,9 +65,7 @@ module.exports = class FileSystemBlobStore {
   }
 
   has(key) {
-    return (
-      this.inMemoryBlobs.has(key) || this.storedBlobMap.hasOwnProperty(key)
-    );
+    return this.inMemoryBlobs.has(key) || this.storedBlobMap.hasOwnProperty(key);
   }
 
   get(key) {
@@ -96,10 +94,7 @@ module.exports = class FileSystemBlobStore {
       return;
     }
 
-    return this.storedBlob.slice.apply(
-      this.storedBlob,
-      this.storedBlobMap[key]
-    );
+    return this.storedBlob.slice.apply(this.storedBlob, this.storedBlobMap[key]);
   }
 
   getDump() {

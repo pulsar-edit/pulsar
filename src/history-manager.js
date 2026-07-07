@@ -1,4 +1,4 @@
-const { Emitter, CompositeDisposable } = require('event-kit');
+const { Emitter, CompositeDisposable } = require("event-kit");
 
 // Extended: History manager for remembering which projects have been opened.
 //
@@ -13,14 +13,12 @@ class HistoryManager {
     this.disposables = new CompositeDisposable();
     this.disposables.add(
       commands.add(
-        'atom-workspace',
-        { 'application:clear-project-history': this.clearProjects.bind(this) },
-        false
-      )
+        "atom-workspace",
+        { "application:clear-project-history": this.clearProjects.bind(this) },
+        false,
+      ),
     );
-    this.disposables.add(
-      project.onDidChangePaths(projectPaths => this.addProject(projectPaths))
-    );
+    this.disposables.add(project.onDidChangePaths((projectPaths) => this.addProject(projectPaths)));
   }
 
   destroy() {
@@ -31,7 +29,7 @@ class HistoryManager {
   //
   // Returns an {Array} of {HistoryProject} objects, most recent first.
   getProjects() {
-    return this.projects.map(p => new HistoryProject(p.paths, p.lastOpened));
+    return this.projects.map((p) => new HistoryProject(p.paths, p.lastOpened));
   }
 
   // Public: Clear all projects from the history.
@@ -53,11 +51,11 @@ class HistoryManager {
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeProjects(callback) {
-    return this.emitter.on('did-change-projects', callback);
+    return this.emitter.on("did-change-projects", callback);
   }
 
   didChangeProjects(args = { reloaded: false }) {
-    this.emitter.emit('did-change-projects', args);
+    this.emitter.emit("did-change-projects", args);
   }
 
   async addProject(paths, lastOpened) {
@@ -99,11 +97,11 @@ class HistoryManager {
   }
 
   async loadState() {
-    const history = await this.stateStore.load('history-manager');
+    const history = await this.stateStore.load("history-manager");
     if (history && history.projects) {
       this.projects = history.projects
-        .filter(p => Array.isArray(p.paths) && p.paths.length > 0)
-        .map(p => new HistoryProject(p.paths, new Date(p.lastOpened)));
+        .filter((p) => Array.isArray(p.paths) && p.paths.length > 0)
+        .map((p) => new HistoryProject(p.paths, new Date(p.lastOpened)));
       this.didChangeProjects({ reloaded: true });
     } else {
       this.projects = [];
@@ -111,11 +109,11 @@ class HistoryManager {
   }
 
   async saveState() {
-    const projects = this.projects.map(p => ({
+    const projects = this.projects.map((p) => ({
       paths: p.paths,
-      lastOpened: p.lastOpened
+      lastOpened: p.lastOpened,
     }));
-    await this.stateStore.save('history-manager', { projects });
+    await this.stateStore.save("history-manager", { projects });
   }
 }
 

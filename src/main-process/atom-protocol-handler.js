@@ -1,6 +1,6 @@
-const { protocol } = require('electron');
-const fs = require('fs');
-const path = require('path');
+const { protocol } = require("electron");
+const fs = require("fs");
+const path = require("path");
 
 // Handles requests with 'atom' protocol.
 //
@@ -18,23 +18,23 @@ module.exports = class AtomProtocolHandler {
     this.loadPaths = [];
 
     if (!safeMode) {
-      this.loadPaths.push(path.join(process.env.ATOM_HOME, 'dev', 'packages'));
-      this.loadPaths.push(path.join(resourcePath, 'packages'));
+      this.loadPaths.push(path.join(process.env.ATOM_HOME, "dev", "packages"));
+      this.loadPaths.push(path.join(resourcePath, "packages"));
     }
 
-    this.loadPaths.push(path.join(process.env.ATOM_HOME, 'packages'));
-    this.loadPaths.push(path.join(resourcePath, 'node_modules'));
+    this.loadPaths.push(path.join(process.env.ATOM_HOME, "packages"));
+    this.loadPaths.push(path.join(resourcePath, "node_modules"));
 
     this.registerAtomProtocol();
   }
 
   // Creates the 'atom' custom protocol handler.
   registerAtomProtocol() {
-    protocol.registerFileProtocol('atom', (request, callback) => {
+    protocol.registerFileProtocol("atom", (request, callback) => {
       const relativePath = path.normalize(request.url.substr(7));
 
       let filePath;
-      if (relativePath.indexOf('assets/') === 0) {
+      if (relativePath.indexOf("assets/") === 0) {
         const assetsPath = path.join(process.env.ATOM_HOME, relativePath);
         try {
           const stat = fs.statSync(assetsPath);

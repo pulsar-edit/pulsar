@@ -1,5 +1,5 @@
-const { CompositeDisposable, Emitter } = require('atom');
-const AboutView = require('./components/about-view');
+const { CompositeDisposable, Emitter } = require("atom");
+const AboutView = require("./components/about-view");
 
 // Deferred requires
 let shell;
@@ -11,24 +11,22 @@ module.exports = class About {
 
     this.state = initialState;
     this.views = {
-      aboutView: null
+      aboutView: null,
     };
 
     this.subscriptions.add(
-      atom.workspace.addOpener(uriToOpen => {
+      atom.workspace.addOpener((uriToOpen) => {
         if (uriToOpen === this.state.uri) {
           return this.deserialize();
         }
-      })
+      }),
     );
 
     this.subscriptions.add(
-      atom.commands.add('atom-workspace', 'about:view-release-notes', () => {
-        shell = shell || require('electron').shell;
-        shell.openExternal(
-          this.state.updateManager.getReleaseNotesURLForCurrentVersion()
-        );
-      })
+      atom.commands.add("atom-workspace", "about:view-release-notes", () => {
+        shell = shell || require("electron").shell;
+        shell.openExternal(this.state.updateManager.getReleaseNotesURLForCurrentVersion());
+      }),
     );
   }
 
@@ -42,7 +40,7 @@ module.exports = class About {
   }
 
   setState(newState) {
-    if (newState && typeof newState === 'object') {
+    if (newState && typeof newState === "object") {
       let { state } = this;
       this.state = Object.assign({}, state, newState);
 
@@ -51,11 +49,11 @@ module.exports = class About {
   }
 
   didChange() {
-    this.emitter.emit('did-change');
+    this.emitter.emit("did-change");
   }
 
   onDidChange(callback) {
-    this.emitter.on('did-change', callback);
+    this.emitter.on("did-change", callback);
   }
 
   deserialize(state) {
@@ -68,7 +66,7 @@ module.exports = class About {
         currentAtomVersion: this.state.currentAtomVersion,
         currentElectronVersion: this.state.currentElectronVersion,
         currentChromeVersion: this.state.currentChromeVersion,
-        currentNodeVersion: this.state.currentNodeVersion
+        currentNodeVersion: this.state.currentNodeVersion,
       });
       this.handleStateChanges();
     }
@@ -84,7 +82,7 @@ module.exports = class About {
           currentAtomVersion: this.state.currentAtomVersion,
           currentElectronVersion: this.state.currentElectronVersion,
           currentChromeVersion: this.state.currentChromeVersion,
-          currentNodeVersion: this.state.currentNodeVersion
+          currentNodeVersion: this.state.currentNodeVersion,
         });
       }
     });

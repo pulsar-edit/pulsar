@@ -1,14 +1,12 @@
-const _ = require('underscore-plus');
-const {CompositeDisposable} = require('atom');
-const ResultsView = require('./results-view');
-const ResultsModel = require('./results-model');
-const {showIf, getSearchResultsMessage, escapeHtml} = require('./util');
-const etch = require('etch');
+const _ = require("underscore-plus");
+const { CompositeDisposable } = require("atom");
+const ResultsView = require("./results-view");
+const ResultsModel = require("./results-model");
+const { showIf, getSearchResultsMessage, escapeHtml } = require("./util");
+const etch = require("etch");
 const $ = etch.dom;
 
-
-module.exports =
-class ResultsPaneView {
+module.exports = class ResultsPaneView {
   constructor() {
     this.model = ResultsPaneView.projectFindView.model;
     this.model.setActive(true);
@@ -24,8 +22,8 @@ class ResultsPaneView {
     etch.initialize(this);
 
     this.onFinishedSearching(this.model.getResultsSummary());
-    this.element.addEventListener('focus', this.focused.bind(this));
-    this.element.addEventListener('click', event => {
+    this.element.addEventListener("focus", this.focused.bind(this));
+    this.element.addEventListener("click", (event) => {
       switch (event.target) {
         case this.refs.collapseAll:
           this.collapseAllResults();
@@ -54,7 +52,7 @@ class ResultsPaneView {
           this.dontOverrideTab();
           break;
       }
-    })
+    });
 
     this.subscriptions = new CompositeDisposable(
       this.model.onDidStartSearching(this.onSearch.bind(this)),
@@ -62,9 +60,15 @@ class ResultsPaneView {
       this.model.onDidClear(this.onCleared.bind(this)),
       this.model.onDidClearReplacementState(this.onReplacementStateCleared.bind(this)),
       this.model.onDidSearchPaths(this.onPathsSearched.bind(this)),
-      this.model.onDidErrorForPath(error => this.appendError(error.message)),
-      atom.config.observe('find-and-replace.searchContextLineCountBefore', this.searchContextLineCountChanged.bind(this)),
-      atom.config.observe('find-and-replace.searchContextLineCountAfter', this.searchContextLineCountChanged.bind(this))
+      this.model.onDidErrorForPath((error) => this.appendError(error.message)),
+      atom.config.observe(
+        "find-and-replace.searchContextLineCountBefore",
+        this.searchContextLineCountChanged.bind(this),
+      ),
+      atom.config.observe(
+        "find-and-replace.searchContextLineCountAfter",
+        this.searchContextLineCountChanged.bind(this),
+      ),
     );
   }
 
@@ -81,133 +85,164 @@ class ResultsPaneView {
   render() {
     const matchCount = this.searchResults && this.searchResults.matchCount;
 
-    return (
+    return $.div(
+      {
+        tabIndex: -1,
+        className: `preview-pane pane-item ${matchCount === 0 ? "no-results" : ""}`,
+      },
+
       $.div(
-        {
-          tabIndex: -1,
-          className: `preview-pane pane-item ${matchCount === 0 ? 'no-results' : ''}`,
-        },
+        { className: "preview-header" },
+        $.span({
+          ref: "previewCount",
+          className: "preview-count inline-block",
+          innerHTML: this.isLoading
+            ? "Searching..."
+            : getSearchResultsMessage(this.searchResults) || "Project search results",
+        }),
 
-        $.div({className: 'preview-header'},
-          $.span({
-            ref: 'previewCount',
-            className: 'preview-count inline-block',
-            innerHTML: this.isLoading
-              ? 'Searching...'
-              : (getSearchResultsMessage(this.searchResults) || 'Project search results')
-          }),
+        $.button(
+          {
+            ref: "dontOverrideTab",
+            style: { display: matchCount == 0 || this.isLoading ? "none" : "" },
+            className: "btn",
+          },
+          "Don't override this tab",
+        ),
 
-          $.button(
-            {
-              ref: 'dontOverrideTab',
-              style: {display: matchCount == 0 || this.isLoading ? 'none' : ''},
-              className: 'btn'
-            }, "Don't override this tab"),
+        $.div(
+          {
+            ref: "previewControls",
+            className: "preview-controls",
+            style: { display: matchCount > 0 ? "" : "none" },
+          },
+
+          this.searchContextLineCountBefore > 0
+            ? $.div(
+                { className: "btn-group" },
+                $.button(
+                  {
+                    ref: "decrementLeadingContextLines",
+                    className:
+                      "btn" +
+                      (this.model && this.model.getFindOptions().leadingContextLineCount === 0
+                        ? " disabled"
+                        : ""),
+                  },
+                  "-",
+                ),
+                $.button(
+                  {
+                    ref: "toggleLeadingContextLines",
+                    className: "btn",
+                  },
+                  $.svg({
+                    className: "icon",
+                    innerHTML: '<use xlink:href="#find-and-replace-context-lines-before" />',
+                  }),
+                ),
+                $.button(
+                  {
+                    ref: "incrementLeadingContextLines",
+                    className:
+                      "btn" +
+                      (this.model &&
+                      this.model.getFindOptions().leadingContextLineCount >=
+                        this.searchContextLineCountBefore
+                        ? " disabled"
+                        : ""),
+                  },
+                  "+",
+                ),
+              )
+            : null,
+
+          this.searchContextLineCountAfter > 0
+            ? $.div(
+                { className: "btn-group" },
+                $.button(
+                  {
+                    ref: "decrementTrailingContextLines",
+                    className:
+                      "btn" +
+                      (this.model && this.model.getFindOptions().trailingContextLineCount === 0
+                        ? " disabled"
+                        : ""),
+                  },
+                  "-",
+                ),
+                $.button(
+                  {
+                    ref: "toggleTrailingContextLines",
+                    className: "btn",
+                  },
+                  $.svg({
+                    className: "icon",
+                    innerHTML: '<use xlink:href="#find-and-replace-context-lines-after" />',
+                  }),
+                ),
+                $.button(
+                  {
+                    ref: "incrementTrailingContextLines",
+                    className:
+                      "btn" +
+                      (this.model.getFindOptions().trailingContextLineCount >=
+                      this.searchContextLineCountAfter
+                        ? " disabled"
+                        : ""),
+                  },
+                  "+",
+                ),
+              )
+            : null,
+
+          $.div(
+            { className: "btn-group" },
+            $.button({ ref: "collapseAll", className: "btn" }, "Collapse All"),
+            $.button({ ref: "expandAll", className: "btn" }, "Expand All"),
+          ),
+        ),
+
+        $.div(
+          { className: "inline-block", style: showIf(this.isLoading) },
+          $.div({ className: "loading loading-spinner-tiny inline-block" }),
 
           $.div(
             {
-              ref: 'previewControls',
-              className: 'preview-controls',
-              style: {display: matchCount > 0 ? '' : 'none'}
+              className: "inline-block",
+              style: showIf(this.isLoading && this.searchingIsSlow),
             },
 
-            this.searchContextLineCountBefore > 0 ?
-              $.div({className: 'btn-group'},
-                $.button(
-                  {
-                    ref: 'decrementLeadingContextLines',
-                    className: 'btn' + (this.model && this.model.getFindOptions().leadingContextLineCount === 0 ? ' disabled' : '')
-                  }, '-'),
-                $.button(
-                  {
-                    ref: 'toggleLeadingContextLines',
-                    className: 'btn'
-                  },
-                  $.svg(
-                    {
-                      className: 'icon',
-                      innerHTML: '<use xlink:href="#find-and-replace-context-lines-before" />'
-                    }
-                  )
-                ),
-                $.button(
-                  {
-                    ref: 'incrementLeadingContextLines',
-                    className: 'btn' + (this.model && this.model.getFindOptions().leadingContextLineCount >= this.searchContextLineCountBefore ? ' disabled' : '')
-                  }, '+')
-              ) : null,
-
-            this.searchContextLineCountAfter > 0 ?
-              $.div({className: 'btn-group'},
-                $.button(
-                  {
-                    ref: 'decrementTrailingContextLines',
-                    className: 'btn' + (this.model && this.model.getFindOptions().trailingContextLineCount === 0 ? ' disabled' : '')
-                  }, '-'),
-                $.button(
-                  {
-                    ref: 'toggleTrailingContextLines',
-                    className: 'btn'
-                  },
-                  $.svg(
-                    {
-                      className: 'icon',
-                      innerHTML: '<use xlink:href="#find-and-replace-context-lines-after" />'
-                    }
-                  )
-                ),
-                $.button(
-                  {
-                    ref: 'incrementTrailingContextLines',
-                    className: 'btn' + (this.model.getFindOptions().trailingContextLineCount >= this.searchContextLineCountAfter ? ' disabled' : '')
-                  }, '+')
-              ) : null,
-
-            $.div({className: 'btn-group'},
-              $.button({ref: 'collapseAll', className: 'btn'}, 'Collapse All'),
-              $.button({ref: 'expandAll', className: 'btn'}, 'Expand All')
-            )
+            $.span(
+              { ref: "searchedCount", className: "searched-count" },
+              this.numberOfPathsSearched.toString(),
+            ),
+            $.span({}, " paths searched"),
           ),
-
-          $.div({className: 'inline-block', style: showIf(this.isLoading)},
-            $.div({className: 'loading loading-spinner-tiny inline-block'}),
-
-            $.div(
-              {
-                className: 'inline-block',
-                style: showIf(this.isLoading && this.searchingIsSlow)
-              },
-
-              $.span({ref: 'searchedCount', className: 'searched-count'},
-                this.numberOfPathsSearched.toString()
-              ),
-              $.span({}, ' paths searched')
-            )
-          )
         ),
+      ),
 
-        $.ul(
-          {
-            ref: 'errorList',
-            className: 'error-list list-group padded',
-            style: showIf(this.searchErrors.length > 0)
-          },
+      $.ul(
+        {
+          ref: "errorList",
+          className: "error-list list-group padded",
+          style: showIf(this.searchErrors.length > 0),
+        },
 
-          ...this.searchErrors.map(message =>
-            $.li({className: 'text-error'}, escapeHtml(message))
-          )
+        ...this.searchErrors.map((message) =>
+          $.li({ className: "text-error" }, escapeHtml(message)),
         ),
+      ),
 
-        etch.dom(ResultsView, {ref: 'resultsView', model: this.model}),
+      etch.dom(ResultsView, { ref: "resultsView", model: this.model }),
 
-        $.ul(
-          {
-            className: 'centered background-message no-results-overlay',
-            style: showIf(matchCount === 0)
-          },
-          $.li({}, 'No Results')
-        )
-      )
+      $.ul(
+        {
+          className: "centered background-message no-results-overlay",
+          style: showIf(matchCount === 0),
+        },
+        $.li({}, "No Results"),
+      ),
     );
   }
 
@@ -216,11 +251,11 @@ class ResultsPaneView {
   }
 
   getTitle() {
-    return 'Project Find Results';
+    return "Project Find Results";
   }
 
   getIconName() {
-    return 'search';
+    return "search";
   }
 
   getURI() {
@@ -232,7 +267,7 @@ class ResultsPaneView {
   }
 
   appendError(message) {
-    this.searchErrors.push(message)
+    this.searchErrors.push(message);
     etch.update(this);
   }
 
@@ -263,9 +298,9 @@ class ResultsPaneView {
   onFinishedSearching(results) {
     this.searchResults = results;
     if (results.searchErrors || results.replacementErrors) {
-      this.searchErrors =
-        _.pluck(results.replacementErrors, 'message')
-        .concat(_.pluck(results.searchErrors, 'message'));
+      this.searchErrors = _.pluck(results.replacementErrors, "message").concat(
+        _.pluck(results.searchErrors, "message"),
+      );
     } else {
       this.searchErrors = [];
     }
@@ -328,8 +363,12 @@ class ResultsPaneView {
   }
 
   searchContextLineCountChanged() {
-    this.searchContextLineCountBefore = atom.config.get('find-and-replace.searchContextLineCountBefore');
-    this.searchContextLineCountAfter = atom.config.get('find-and-replace.searchContextLineCountAfter');
+    this.searchContextLineCountBefore = atom.config.get(
+      "find-and-replace.searchContextLineCountBefore",
+    );
+    this.searchContextLineCountAfter = atom.config.get(
+      "find-and-replace.searchContextLineCountAfter",
+    );
     // update the visible line count in the find options to not exceed the maximum available lines
     let findOptionsChanged = false;
     if (this.searchContextLineCountBefore < this.model.getFindOptions().leadingContextLineCount) {
@@ -346,18 +385,18 @@ class ResultsPaneView {
     }
   }
 
-  dontOverrideTab(){
+  dontOverrideTab() {
     let view = ResultsPaneView.projectFindView;
     view.handleEvents.resetInterface();
     view.model = new ResultsModel(view.model.findOptions);
     this.uri = ResultsPaneView.URI + "/" + this.model.getLastFindPattern();
-    this.refs.dontOverrideTab.classList.add('disabled');
+    this.refs.dontOverrideTab.classList.add("disabled");
 
     view.modelSubscriptions.dispose();
     view.handleEvents.addModelHandlers();
     view.handleEventsForReplace.addReplaceModelHandlers();
     this.separatePane = true;
   }
-}
+};
 
 module.exports.URI = "atom://find-and-replace/project-results";

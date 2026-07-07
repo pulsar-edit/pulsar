@@ -10,7 +10,6 @@
 }
 
 .syntax--entity {
-
   &.syntax--name.syntax--type {
     color: @hue-6-2;
   }
@@ -104,7 +103,8 @@
 .syntax--string {
   color: @hue-4;
 
-  > .syntax--source, .syntax--embedded {
+  > .syntax--source,
+  .syntax--embedded {
     color: @mono-1;
   }
 
@@ -180,7 +180,7 @@
     }
   }
 
-  &.syntax--function  {
+  &.syntax--function {
     color: @hue-1;
 
     &.syntax--any-method {

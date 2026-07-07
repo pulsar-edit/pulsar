@@ -40,16 +40,16 @@ atom-workspace.find-visible {
   @min-width: 200px; // min width before it starts scrolling
 
   -webkit-user-select: none;
-  padding: (@component-padding/2);
+  padding: (@component-padding / 2);
   overflow-x: auto;
 
   .header {
-    padding: (@component-padding/4) (@component-padding/2);
+    padding: (@component-padding / 4) (@component-padding / 2);
     min-width: @min-width;
     line-height: 1.75;
   }
   .header-item {
-    margin: (@component-padding/4) 0;
+    margin: (@component-padding / 4) 0;
   }
 
   .input-block {
@@ -114,14 +114,14 @@ atom-workspace.find-visible {
     color: @text-color-subtle;
     position: relative;
     .options {
-      margin-right: .5em;
+      margin-right: 0.5em;
       color: @text-color;
     }
   }
 
   .btn-group-options {
     display: inline-flex;
-    margin-top: -.1em;
+    margin-top: -0.1em;
 
     .btn {
       width: 36px;
@@ -136,7 +136,6 @@ atom-workspace.find-visible {
       width: 100%;
     }
   }
-
 }
 
 // Buffer find and replace
@@ -170,9 +169,9 @@ atom-workspace.find-visible {
     position: absolute;
     top: 1px;
     right: 0;
-    margin: (@component-padding/2) (@component-padding/2) 0 0;
+    margin: (@component-padding / 2) (@component-padding / 2) 0 0;
     z-index: 2;
-    font-size: .9em;
+    font-size: 0.9em;
     line-height: @component-line-height;
     pointer-events: none;
     .result-counter {
@@ -186,7 +185,9 @@ atom-workspace.find-visible {
 
   opacity: 0;
   transition: opacity 0.5s;
-  &.visible { opacity: 1; }
+  &.visible {
+    opacity: 1;
+  }
 
   position: absolute;
 
@@ -211,7 +212,7 @@ atom-workspace.find-visible {
     height: @wrap-size;
     width: @wrap-size;
     color: @syntax-text-color;
-    opacity: .5;
+    opacity: 0.5;
   }
 }
 
@@ -244,7 +245,7 @@ atom-workspace.find-visible {
   .preview-header {
     display: flex;
     flex-wrap: wrap;
-    padding: (@component-padding/2);
+    padding: (@component-padding / 2);
     align-items: center;
     justify-content: space-between;
     overflow: hidden;
@@ -254,14 +255,14 @@ atom-workspace.find-visible {
   }
 
   .preview-count {
-    margin: (@component-padding/2);
+    margin: (@component-padding / 2);
   }
 
   .preview-controls {
     display: flex;
     flex-wrap: wrap;
     .btn-group {
-      margin: (@component-padding/2);
+      margin: (@component-padding / 2);
     }
   }
 
@@ -293,7 +294,8 @@ atom-workspace.find-visible {
     .list-item {
       padding: 0 0 0 @component-padding;
     }
-    .context-row, .match-row {
+    .context-row,
+    .match-row {
       padding: 0 0 0 @component-padding;
       margin-left: 8px;
 
@@ -332,7 +334,6 @@ atom-workspace.find-visible {
       color: @text-color-selected;
     }
 
-
     .selected {
       .highlight-info {
         box-shadow: inset 0 0 1px lighten(@background-color-info, 50%);
@@ -349,13 +350,16 @@ atom-workspace.find-visible {
   }
 }
 
-.find-container atom-text-editor, .replace-container atom-text-editor {
+.find-container atom-text-editor,
+.replace-container atom-text-editor {
   // Styles for regular expression highlighting
   .syntax--regexp {
     .syntax--escape {
       color: @text-color-info;
     }
-    .syntax--range, .syntax--character-class, .syntax--wildcard {
+    .syntax--range,
+    .syntax--character-class,
+    .syntax--wildcard {
       color: @text-color-success;
     }
     .syntax--wildcard {
@@ -364,7 +368,8 @@ atom-workspace.find-visible {
     .syntax--set {
       color: inherit;
     }
-    .syntax--keyword, .syntax--punctuation {
+    .syntax--keyword,
+    .syntax--punctuation {
       color: @text-color-error;
       font-weight: normal;
     }

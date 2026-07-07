@@ -1,20 +1,25 @@
 ### Contents
-| Filename | Description |
-| - | - |
-| post-checkout | This hook executes after a branch checkout, or branch switch has occurred. |
-| post-merge | This hook executes after a branch merge has occurred |
+
+| Filename         | Description                                                                                                    |
+| ---------------- | -------------------------------------------------------------------------------------------------------------- |
+| post-checkout    | This hook executes after a branch checkout, or branch switch has occurred.                                     |
+| post-merge       | This hook executes after a branch merge has occurred                                                           |
 | update_editor.sh | The actual brains of the hooks. Performs a yarn install, yarn build, yarn build:apm, and syncs all submodules. |
 
 ### Disclaimer
+
 These hooks are not guaranteed. These were made out of convenience and presented to the org as an optional tool for usage.
 
 ### Usage
+
 There are several ways to apply these hooks:
+
 - You can manually copy the files over to the `<lumine-repo-root>/.git/hooks` folder and validate that they are executable - the effect should be immediate. This is the preferred option for Windows.
 - You can use manage_hooks.sh to copy/symlink the hooks you choose. This is the preferred option for Linux/macOS.
   - Your mileage may vary on macOS as it has not been tested outright, but should work in theory.
 
 ### Instructions
+
 - Open your favorite terminal
 - Navigate to `<lumine-repo-root>/hooks`.
   - IMPORTANT: The bash completions will only work within this directory, and are activated when using exactly `./manage-hooks.sh`.

@@ -3,7 +3,6 @@
 @import "variables";
 
 .settings-view {
-
   // TODO: Somehow unify the "card".
 
   .package-card {
@@ -19,7 +18,11 @@
     -webkit-user-select: none;
 
     &:hover {
-      background-color: contrast(@package-card-background-color, darken(@package-card-background-color, 2%), lighten(@package-card-background-color, 2%));
+      background-color: contrast(
+        @package-card-background-color,
+        darken(@package-card-background-color, 2%),
+        lighten(@package-card-background-color, 2%)
+      );
     }
     &:active {
       background-color: @package-card-background-color;
@@ -31,7 +34,7 @@
       .avatar,
       .author,
       .stats {
-        opacity: .5;
+        opacity: 0.5;
       }
     }
 
@@ -57,13 +60,13 @@
       }
     }
     .package-name {
-      margin-right: .5em;
+      margin-right: 0.5em;
       font-weight: bolder;
       color: @text-color-highlight;
     }
 
     .package-version {
-      font-size: .8em;
+      font-size: 0.8em;
       margin-right: @component-padding;
     }
 
@@ -101,23 +104,22 @@
       }
 
       &.icon-check {
-        color: #6CC644;
+        color: #6cc644;
       }
 
       &.icon-alert {
-        color: #BD2C00;
+        color: #bd2c00;
       }
     }
 
     .card-name {
       font-weight: 300;
-      margin: 0 0 .2em 0;
+      margin: 0 0 0.2em 0;
       font-size: 1.2em;
       line-height: 1.4;
     }
 
     .stats {
-
       .stats-item {
         margin-left: (@component-padding*1.5);
         height: 26px;
@@ -200,7 +202,7 @@
         width: 24px;
         display: inline-block;
         vertical-align: middle;
-        background-color: hsla(0,0%,0%,.1);
+        background-color: hsla(0, 0%, 0%, 0.1);
       }
 
       .author {
@@ -213,22 +215,22 @@
     }
 
     .meta-controls {
-      margin-top: (@component-padding/2);
+      margin-top: (@component-padding / 2);
 
       .install-button.is-installing,
       .uninstall-button.is-uninstalling {
         opacity: 1; // override disabled style
-        background-image: linear-gradient(to right, transparent 50%, hsla(0,0%,0%,.15) 50%);
+        background-image: linear-gradient(to right, transparent 50%, hsla(0, 0%, 0%, 0.15) 50%);
         background-size: 10px 100%;
-        -webkit-animation: available-package-is-installing .5s linear infinite;
+        -webkit-animation: available-package-is-installing 0.5s linear infinite;
       }
 
       .status-indicator {
         padding: 0;
-        width: (@component-padding/2);
+        width: (@component-padding / 2);
         min-width: 4px;
         pointer-events: none;
-        transition: background .4s;
+        transition: background 0.4s;
         background: @background-color-success;
         &.is-disabled {
           background: @background-color-warning;
@@ -237,7 +239,7 @@
 
       .btn-toolbar > .btn-group {
         float: left;
-        margin: (@component-padding/2) 0 0 (@component-padding/2);
+        margin: (@component-padding / 2) 0 0 (@component-padding / 2);
       }
     }
 
@@ -267,9 +269,10 @@
       background-color: @package-card-disabled-background-color;
     }
   }
-
 }
 
 @-webkit-keyframes available-package-is-installing {
-  100% { background-position: -10px 0px; }
+  100% {
+    background-position: -10px 0px;
+  }
 }

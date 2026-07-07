@@ -1,80 +1,91 @@
-const {Disposable} = require('atom')
+const { Disposable } = require("atom");
 
-module.exports =
-class EncodingStatusView {
-  constructor (statusBar, encodings) {
-    this.statusBar = statusBar
-    this.encodings = encodings
-    this.element = document.createElement('encoding-selector-status')
-    this.element.classList.add('encoding-status', 'inline-block')
-    this.encodingLink = document.createElement('a')
-    this.encodingLink.classList.add('inline-block')
-    this.element.appendChild(this.encodingLink)
+module.exports = class EncodingStatusView {
+  constructor(statusBar, encodings) {
+    this.statusBar = statusBar;
+    this.encodings = encodings;
+    this.element = document.createElement("encoding-selector-status");
+    this.element.classList.add("encoding-status", "inline-block");
+    this.encodingLink = document.createElement("a");
+    this.encodingLink.classList.add("inline-block");
+    this.element.appendChild(this.encodingLink);
 
-    this.activeItemSubscription = atom.workspace.observeActiveTextEditor(this.subscribeToActiveTextEditor.bind(this))
+    this.activeItemSubscription = atom.workspace.observeActiveTextEditor(
+      this.subscribeToActiveTextEditor.bind(this),
+    );
     const clickHandler = (event) => {
-      event.preventDefault()
-      atom.commands.dispatch(atom.workspace.getActiveTextEditor().element, 'encoding-selector:show')
-    }
-    this.element.addEventListener('click', clickHandler)
-    this.clickSubscription = new Disposable(() => this.element.removeEventListener('click', clickHandler))
+      event.preventDefault();
+      atom.commands.dispatch(
+        atom.workspace.getActiveTextEditor().element,
+        "encoding-selector:show",
+      );
+    };
+    this.element.addEventListener("click", clickHandler);
+    this.clickSubscription = new Disposable(() =>
+      this.element.removeEventListener("click", clickHandler),
+    );
   }
 
-  destroy () {
+  destroy() {
     if (this.activeItemSubscription) {
-      this.activeItemSubscription.dispose()
+      this.activeItemSubscription.dispose();
     }
 
     if (this.encodingSubscription) {
-      this.encodingSubscription.dispose()
+      this.encodingSubscription.dispose();
     }
 
     if (this.clickSubscription) {
-      this.clickSubscription.dispose()
+      this.clickSubscription.dispose();
     }
 
     if (this.tile) {
-      this.tile.destroy()
+      this.tile.destroy();
     }
 
     if (this.tooltip) {
-      this.tooltip.dispose()
+      this.tooltip.dispose();
     }
   }
 
-  attach () {
-    this.tile = this.statusBar.addRightTile({priority: 11, item: this.element})
+  attach() {
+    this.tile = this.statusBar.addRightTile({ priority: 11, item: this.element });
   }
 
-  subscribeToActiveTextEditor () {
+  subscribeToActiveTextEditor() {
     if (this.encodingSubscription) {
-      this.encodingSubscription.dispose()
+      this.encodingSubscription.dispose();
     }
 
-    const editor = atom.workspace.getActiveTextEditor()
+    const editor = atom.workspace.getActiveTextEditor();
     if (editor) {
-      this.encodingSubscription = editor.onDidChangeEncoding(this.updateEncodingText.bind(this))
+      this.encodingSubscription = editor.onDidChangeEncoding(this.updateEncodingText.bind(this));
     }
-    this.updateEncodingText()
+    this.updateEncodingText();
   }
 
-  updateEncodingText () {
+  updateEncodingText() {
     atom.views.updateDocument(() => {
-      const editor = atom.workspace.getActiveTextEditor()
+      const editor = atom.workspace.getActiveTextEditor();
       if (editor && editor.getEncoding()) {
-        const editorEncoding = editor.getEncoding().toLowerCase().replace(/[^0-9a-z]|:\d{4}$/g, '')
-        const encodingLabel = this.encodings[editorEncoding] || {status: editorEncoding}
-        this.encodingLink.textContent = encodingLabel.status
-        this.encodingLink.dataset.encoding = editorEncoding
-        this.element.style.display = ''
+        const editorEncoding = editor
+          .getEncoding()
+          .toLowerCase()
+          .replace(/[^0-9a-z]|:\d{4}$/g, "");
+        const encodingLabel = this.encodings[editorEncoding] || { status: editorEncoding };
+        this.encodingLink.textContent = encodingLabel.status;
+        this.encodingLink.dataset.encoding = editorEncoding;
+        this.element.style.display = "";
 
         if (this.tooltip) {
-          this.tooltip.dispose()
+          this.tooltip.dispose();
         }
-        this.tooltip = atom.tooltips.add(this.encodingLink, {title: `This file uses ${encodingLabel.list} encoding`})
+        this.tooltip = atom.tooltips.add(this.encodingLink, {
+          title: `This file uses ${encodingLabel.list} encoding`,
+        });
       } else {
-        this.element.style.display = 'none'
+        this.element.style.display = "none";
       }
-    })
+    });
   }
-}
+};

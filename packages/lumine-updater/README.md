@@ -12,37 +12,37 @@ Additionally, since the entire process of actually installation is done by the u
 
 If a user would prefer to manually check for any updates available then the following commands are exposed from Lumine Updater to do so:
 
-* `lumine-updater:check-for-update`: Performs an update check and shows a notification if a newer version of Lumine is available.
-* `lumine-updater:clear-cache`: Clears the package's cache and forgets any requests to suppress update checking.
+- `lumine-updater:check-for-update`: Performs an update check and shows a notification if a newer version of Lumine is available.
+- `lumine-updater:clear-cache`: Clears the package's cache and forgets any requests to suppress update checking.
 
 ## The Update Notification
 
 If an update is available, the notification that is shown is intended to be as non-invasive as possible, providing a few possible options:
 
-* Dismiss this Version: This will remove the notification, and prevent an additional notification ever appearing for this version again. Bypassing any cache expirations.
-* Dismiss until next launch: This will remove the notification, but only until the next update check. Which happens automatically at launch, or otherwise can be invoked manually.
-* Download from GitHub: This option is only shown if the installation method was determined to be manually. And clicking it will open the GitHub page containing the specific version to update to.
+- Dismiss this Version: This will remove the notification, and prevent an additional notification ever appearing for this version again. Bypassing any cache expirations.
+- Dismiss until next launch: This will remove the notification, but only until the next update check. Which happens automatically at launch, or otherwise can be invoked manually.
+- Download from GitHub: This option is only shown if the installation method was determined to be manually. And clicking it will open the GitHub page containing the specific version to update to.
 
 ## Supported/Checked/Recognized for Installation Methods
 
 Since a major part of the functionality of this package is attempting to determine the installation method, it's important to list them all here:
 
-* Universal: Developer Mode
-* Universal: Safe Mode
-* Universal: Spec Mode
-* Universal: Custom Release Channel
-* Windows: Chocolatey Installation
-* Windows: winget Installation
-* Windows: User Installation
-* Windows: Machine Installation
-* Windows: Portable Installation
-* Linux: Flatpak Installation
-* Linux: Deb-Get Installation
-* Linux: Nix Installation
-* Linux: Homebrew Installation
-* Linux: Manual Installation
-* macOS: Homebrew Installation
-* macOS: Manual Installation
+- Universal: Developer Mode
+- Universal: Safe Mode
+- Universal: Spec Mode
+- Universal: Custom Release Channel
+- Windows: Chocolatey Installation
+- Windows: winget Installation
+- Windows: User Installation
+- Windows: Machine Installation
+- Windows: Portable Installation
+- Linux: Flatpak Installation
+- Linux: Deb-Get Installation
+- Linux: Nix Installation
+- Linux: Homebrew Installation
+- Linux: Manual Installation
+- macOS: Homebrew Installation
+- macOS: Manual Installation
 
 ## Known Issues
 

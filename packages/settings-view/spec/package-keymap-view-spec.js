@@ -1,15 +1,13 @@
-
 const PackageKeymapView = require("../lib/package-keymap-view.js");
 let view;
 
 describe("PackageKeymapView", () => {
-
   beforeEach(() => {
     // Just prevent this stuff from calling through, it doesn't matter for this test
     spyOn(atom.packages, "getLoadedPackage").andReturn({ keymaps: [] });
 
     view = new PackageKeymapView({
-      name: "test-package"
+      name: "test-package",
     });
   });
 
@@ -29,7 +27,11 @@ describe("PackageKeymapView", () => {
   });
 
   it("should say a selector with the current platform and others listed is compatible", () => {
-    expect(view.selectorIsCompatibleWithPlatform(".platform-linux, .platform-win32", "win32")).toBe(true);
-    expect(view.selectorIsCompatibleWithPlatform(".platform-linux, .platform-win32", "linux")).toBe(true);
+    expect(view.selectorIsCompatibleWithPlatform(".platform-linux, .platform-win32", "win32")).toBe(
+      true,
+    );
+    expect(view.selectorIsCompatibleWithPlatform(".platform-linux, .platform-win32", "linux")).toBe(
+      true,
+    );
   });
 });

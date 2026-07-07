@@ -1,4 +1,3 @@
-
 let UpdateManager = class UpdateManager {
   constructor() {
     this.currentVersion = atom.getVersion();
@@ -9,7 +8,7 @@ let UpdateManager = class UpdateManager {
   }
 
   getReleaseNotesURLForVersion(appVersion) {
-    if (appVersion.startsWith('v')) {
+    if (appVersion.startsWith("v")) {
       appVersion = appVersion.replace("v", "");
     }
 

@@ -1,13 +1,12 @@
-const _ = require('underscore-plus');
+const _ = require("underscore-plus");
 
 const ItemSpecificities = new WeakMap();
 
 // Add an item to a menu, ensuring separators are not duplicated.
 function addItemToMenu(item, menu) {
   const lastMenuItem = _.last(menu);
-  const lastMenuItemIsSpearator =
-    lastMenuItem && lastMenuItem.type === 'separator';
-  if (!(item.type === 'separator' && lastMenuItemIsSpearator)) {
+  const lastMenuItemIsSpearator = lastMenuItem && lastMenuItem.type === "separator";
+  if (!(item.type === "separator" && lastMenuItemIsSpearator)) {
     menu.push(item);
   }
 }
@@ -27,10 +26,7 @@ function merge(menu, item, itemSpecificity = Infinity) {
     for (let submenuItem of item.submenu) {
       merge(matchingItem.submenu, submenuItem, itemSpecificity);
     }
-  } else if (
-    itemSpecificity &&
-    itemSpecificity >= ItemSpecificities.get(matchingItem)
-  ) {
+  } else if (itemSpecificity && itemSpecificity >= ItemSpecificities.get(matchingItem)) {
     menu[matchingItemIndex] = item;
   }
 }
@@ -49,13 +45,16 @@ function unmerge(menu, item) {
     }
   }
 
-  if (matchingItem.submenu == null || matchingItem.submenu.filter( ({type}) => type !== 'separator' ).length === 0) {
+  if (
+    matchingItem.submenu == null ||
+    matchingItem.submenu.filter(({ type }) => type !== "separator").length === 0
+  ) {
     menu.splice(matchingItemIndex, 1);
   }
 }
 
 function findMatchingItemIndex(menu, { type, id, submenu }) {
-  if (type === 'separator') {
+  if (type === "separator") {
     return -1;
   }
   for (let index = 0; index < menu.length; index++) {
@@ -71,32 +70,32 @@ function normalizeLabel(label) {
   if (label == null) {
     return;
   }
-  return process.platform === 'darwin' ? label : label.replace(/&/g, '');
+  return process.platform === "darwin" ? label : label.replace(/&/g, "");
 }
 
 function cloneMenuItem(item) {
   item = _.pick(
     item,
-    'type',
-    'label',
-    'id',
-    'enabled',
-    'visible',
-    'command',
-    'submenu',
-    'commandDetail',
-    'role',
-    'accelerator',
-    'before',
-    'after',
-    'beforeGroupContaining',
-    'afterGroupContaining'
+    "type",
+    "label",
+    "id",
+    "enabled",
+    "visible",
+    "command",
+    "submenu",
+    "commandDetail",
+    "role",
+    "accelerator",
+    "before",
+    "after",
+    "beforeGroupContaining",
+    "afterGroupContaining",
   );
   if (item.id === null || item.id === undefined) {
     item.id = normalizeLabel(item.label);
   }
   if (item.submenu != null) {
-    item.submenu = item.submenu.map(submenuItem => cloneMenuItem(submenuItem));
+    item.submenu = item.submenu.map((submenuItem) => cloneMenuItem(submenuItem));
   }
   return item;
 }
@@ -112,21 +111,18 @@ function acceleratorForKeystroke(keystroke) {
     return null;
   }
   let modifiers = keystroke.split(/-(?=.)/);
-  const key = modifiers
-    .pop()
-    .toUpperCase()
-    .replace('+', 'Plus');
+  const key = modifiers.pop().toUpperCase().replace("+", "Plus");
 
-  modifiers = modifiers.map(modifier =>
+  modifiers = modifiers.map((modifier) =>
     modifier
-      .replace(/shift/gi, 'Shift')
-      .replace(/cmd/gi, 'Command')
-      .replace(/ctrl/gi, 'Ctrl')
-      .replace(/alt/gi, 'Alt')
+      .replace(/shift/gi, "Shift")
+      .replace(/cmd/gi, "Command")
+      .replace(/ctrl/gi, "Ctrl")
+      .replace(/alt/gi, "Alt"),
   );
 
   const keys = [...modifiers, key];
-  return keys.join('+');
+  return keys.join("+");
 }
 
 module.exports = {
@@ -134,5 +130,5 @@ module.exports = {
   unmerge,
   normalizeLabel,
   cloneMenuItem,
-  acceleratorForKeystroke
+  acceleratorForKeystroke,
 };

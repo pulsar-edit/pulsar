@@ -1,40 +1,42 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import {CompositeDisposable, Disposable} from 'atom'
-import etch from 'etch'
-import {shell} from 'electron'
+import { CompositeDisposable, Disposable } from "atom";
+import etch from "etch";
+import { shell } from "electron";
 
 export default class BadgeView {
   constructor(badge) {
     this.badge = badge;
-    this.disposables = new CompositeDisposable()
+    this.disposables = new CompositeDisposable();
 
-    etch.initialize(this)
+    etch.initialize(this);
 
     // Intercept the click request and manually open this URL in a web browser.
     let clickHandler = (event) => {
-      let anchor = event.target.closest('a')
-      if (!anchor) return
-      event.stopPropagation()
-      event.preventDefault()
-      shell.openExternal(anchor.href)
-    }
+      let anchor = event.target.closest("a");
+      if (!anchor) return;
+      event.stopPropagation();
+      event.preventDefault();
+      shell.openExternal(anchor.href);
+    };
 
     if (this.hasLink()) {
-      this.refs.badgeLink.addEventListener('click', clickHandler)
-      this.disposables.add(new Disposable(() => {
-        this.refs.badgeLink.removeEventListener('click', clickHandler)
-      }))
+      this.refs.badgeLink.addEventListener("click", clickHandler);
+      this.disposables.add(
+        new Disposable(() => {
+          this.refs.badgeLink.removeEventListener("click", clickHandler);
+        }),
+      );
     }
   }
 
-  destroy () {
-    this.disposables.dispose()
-    return etch.destroy(this)
+  destroy() {
+    this.disposables.dispose();
+    return etch.destroy(this);
   }
 
-  render () {
+  render() {
     const icons = this.getIcons();
     const classes = this.getClasses();
     const badge = this.badge;
@@ -47,7 +49,8 @@ export default class BadgeView {
           <a href={badge.link} ref="badgeLink">
             <span class={classes}>
               <i class={icons}></i>
-              {badge.title}: <span class="badge-expandable">...</span><span class="badge-text"> {badge.text}</span>
+              {badge.title}: <span class="badge-expandable">...</span>
+              <span class="badge-text"> {badge.text}</span>
             </span>
           </a>
         );
@@ -70,7 +73,8 @@ export default class BadgeView {
         return (
           <span class={classes}>
             <i class={icons}></i>
-            {badge.title}: <span class="badge-expandable">...</span><span class="badge-text"> {badge.text}</span>
+            {badge.title}: <span class="badge-expandable">...</span>
+            <span class="badge-text"> {badge.text}</span>
           </span>
         );
       } else {
@@ -84,25 +88,24 @@ export default class BadgeView {
         );
       }
     }
-
   }
 
-  hasLink () {
+  hasLink() {
     if (typeof this.badge.link === "string") {
       return true;
     }
     return false;
   }
 
-  hasText () {
+  hasText() {
     if (typeof this.badge.text === "string") {
       return true;
     }
     return false;
   }
 
-  getIcons () {
-    switch(this.badge.type) {
+  getIcons() {
+    switch (this.badge.type) {
       case "warn":
         return "icon icon-alert";
         break;
@@ -118,8 +121,8 @@ export default class BadgeView {
     }
   }
 
-  getClasses () {
-    switch(this.badge.type) {
+  getClasses() {
+    switch (this.badge.type) {
       case "warn":
         return "badge badge-error";
         break;
@@ -135,6 +138,5 @@ export default class BadgeView {
     }
   }
 
-  update () {}
-
+  update() {}
 }

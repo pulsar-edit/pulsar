@@ -1,6 +1,6 @@
-const { app, Menu } = require('electron');
-const _ = require('underscore-plus');
-const MenuHelpers = require('../menu-helpers');
+const { app, Menu } = require("electron");
+const _ = require("underscore-plus");
+const MenuHelpers = require("../menu-helpers");
 
 // Used to manage the global application menu.
 //
@@ -23,8 +23,7 @@ module.exports = class ApplicationMenu {
     this.translateTemplate(template, keystrokesByCommand);
     this.substituteVersion(template);
     this.windowTemplates.set(window, template);
-    if (window === this.lastFocusedWindow)
-      return this.setActiveTemplate(template);
+    if (window === this.lastFocusedWindow) return this.setActiveTemplate(template);
   }
 
   setActiveTemplate(template) {
@@ -47,11 +46,11 @@ module.exports = class ApplicationMenu {
       if (template) this.setActiveTemplate(template);
     };
 
-    window.on('focus', focusHandler);
-    window.once('closed', () => {
+    window.on("focus", focusHandler);
+    window.once("closed", () => {
       if (window === this.lastFocusedWindow) this.lastFocusedWindow = null;
       this.windowTemplates.delete(window);
-      window.removeListener('focus', focusHandler);
+      window.removeListener("focus", focusHandler);
     });
 
     this.enableWindowSpecificItems(true);
@@ -68,8 +67,7 @@ module.exports = class ApplicationMenu {
     for (let index in object) {
       const item = object[index];
       items.push(item);
-      if (item.submenu)
-        items = items.concat(this.flattenMenuItems(item.submenu));
+      if (item.submenu) items = items.concat(this.flattenMenuItems(item.submenu));
     }
     return items;
   }
@@ -83,8 +81,7 @@ module.exports = class ApplicationMenu {
     let items = [];
     for (let item of template) {
       items.push(item);
-      if (item.submenu)
-        items = items.concat(this.flattenMenuTemplate(item.submenu));
+      if (item.submenu) items = items.concat(this.flattenMenuTemplate(item.submenu));
     }
     return items;
   }
@@ -101,9 +98,7 @@ module.exports = class ApplicationMenu {
 
   // Replaces VERSION with the current version.
   substituteVersion(template) {
-    let item = this.flattenMenuTemplate(template).find(
-      ({ label }) => label === 'VERSION'
-    );
+    let item = this.flattenMenuTemplate(template).find(({ label }) => label === "VERSION");
     if (item) item.label = `Version ${this.version}`;
   }
 
@@ -113,51 +108,49 @@ module.exports = class ApplicationMenu {
   getDefaultTemplate() {
     return [
       {
-        label: 'Lumine',
-        id: 'Lumine',
+        label: "Lumine",
+        id: "Lumine",
         submenu: [
           {
-            label: 'Reload',
-            id: 'Reload',
-            accelerator: 'Command+R',
+            label: "Reload",
+            id: "Reload",
+            accelerator: "Command+R",
             click: () => {
               const window = this.focusedWindow();
               if (window) window.reload();
-            }
+            },
           },
           {
-            label: 'Close Window',
-            id: 'Close Window',
-            accelerator: 'Command+Shift+W',
+            label: "Close Window",
+            id: "Close Window",
+            accelerator: "Command+Shift+W",
             click: () => {
               const window = this.focusedWindow();
               if (window) window.close();
-            }
+            },
           },
           {
-            label: 'Toggle Dev Tools',
-            id: 'Toggle Dev Tools',
-            accelerator: 'Command+Alt+I',
+            label: "Toggle Dev Tools",
+            id: "Toggle Dev Tools",
+            accelerator: "Command+Alt+I",
             click: () => {
               const window = this.focusedWindow();
               if (window) window.toggleDevTools();
-            }
+            },
           },
           {
-            label: 'Quit',
-            id: 'Quit',
-            accelerator: 'Command+Q',
-            click: () => app.quit()
-          }
-        ]
-      }
+            label: "Quit",
+            id: "Quit",
+            accelerator: "Command+Q",
+            click: () => app.quit(),
+          },
+        ],
+      },
     ];
   }
 
   focusedWindow() {
-    return global.atomApplication
-      .getAllWindows()
-      .find(window => window.isFocused());
+    return global.atomApplication.getAllWindows().find((window) => window.isFocused());
   }
 
   // Combines a menu template with the appropriate keystroke.
@@ -169,7 +162,7 @@ module.exports = class ApplicationMenu {
   //
   // Returns a complete menu configuration object for atom-shell's menu API.
   translateTemplate(template, keystrokesByCommand) {
-    template.forEach(item => {
+    template.forEach((item) => {
       if (item.metadata == null) item.metadata = {};
       if (item.command) {
         const keystrokes = keystrokesByCommand[item.command];
@@ -178,20 +171,18 @@ module.exports = class ApplicationMenu {
           // Electron does not support multi-keystroke accelerators. Therefore,
           // when the command maps to a multi-stroke key binding, show the
           // keystrokes next to the item's label.
-          if (keystroke.includes(' ')) {
+          if (keystroke.includes(" ")) {
             item.label += ` [${_.humanizeKeystroke(keystroke)}]`;
           } else {
             item.accelerator = MenuHelpers.acceleratorForKeystroke(keystroke);
           }
         }
-        item.click = () =>
-          global.atomApplication.sendCommand(item.command, item.commandDetail);
+        item.click = () => global.atomApplication.sendCommand(item.command, item.commandDetail);
         if (!/^application:/.test(item.command)) {
           item.metadata.windowSpecific = true;
         }
       }
-      if (item.submenu)
-        this.translateTemplate(item.submenu, keystrokesByCommand);
+      if (item.submenu) this.translateTemplate(item.submenu, keystrokesByCommand);
     });
     return template;
   }
