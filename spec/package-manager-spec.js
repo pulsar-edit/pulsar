@@ -340,7 +340,7 @@ describe('PackageManager', () => {
       it('adds the package path to the module cache', () => {
         const availablePackage = atom.packages
           .getAvailablePackages()
-          .find(p => p.name === 'spell-check');
+          .find(p => p.name === 'status-bar');
         availablePackage.isBundled = true;
         expect(
           atom.packages.preloadedPackages[availablePackage.name]
@@ -368,7 +368,7 @@ describe('PackageManager', () => {
       it('deactivates it if it had been disabled', () => {
         const availablePackage = atom.packages
           .getAvailablePackages()
-          .find(p => p.name === 'spell-check');
+          .find(p => p.name === 'status-bar');
         availablePackage.isBundled = true;
         expect(
           atom.packages.preloadedPackages[availablePackage.name]
@@ -407,7 +407,7 @@ describe('PackageManager', () => {
       it('deactivates it and reloads the new one if trying to load the same package outside of the bundle', () => {
         const availablePackage = atom.packages
           .getAvailablePackages()
-          .find(p => p.name === 'spell-check');
+          .find(p => p.name === 'status-bar');
         availablePackage.isBundled = true;
         expect(
           atom.packages.preloadedPackages[availablePackage.name]
@@ -444,7 +444,7 @@ describe('PackageManager', () => {
       it('adds the package path to the module cache', () => {
         const availablePackage = atom.packages
           .getAvailablePackages()
-          .find(p => p.name === 'spell-check');
+          .find(p => p.name === 'status-bar');
         availablePackage.isBundled = true;
         const metadata = atom.packages.loadPackageMetadata(availablePackage);
         atom.packages.loadAvailablePackage(availablePackage);
@@ -460,7 +460,7 @@ describe('PackageManager', () => {
     it('requires the main module, loads the config schema and activates keymaps, menus and settings without reactivating them during package activation', () => {
       const availablePackage = atom.packages
         .getAvailablePackages()
-        .find(p => p.name === 'spell-check');
+        .find(p => p.name === 'status-bar');
       availablePackage.isBundled = true;
       const metadata = atom.packages.loadPackageMetadata(availablePackage);
       expect(
@@ -514,7 +514,7 @@ describe('PackageManager', () => {
     it('deactivates disabled keymaps during package activation', () => {
       const availablePackage = atom.packages
         .getAvailablePackages()
-        .find(p => p.name === 'spell-check');
+        .find(p => p.name === 'status-bar');
       availablePackage.isBundled = true;
       const metadata = atom.packages.loadPackageMetadata(availablePackage);
       expect(

@@ -507,10 +507,14 @@ class TreeView {
         let stats = fs.lstatSyncNoException(projectPath);
         if (!stats) continue;
 
-        stats = _.pick(stats, ..._.keys(stats));
+        // Read the date getters from the original Stats object before it is
+        // flattened: as of Node 24 atime/mtime/ctime/birthtime are prototype
+        // getters, so _.keys/_.pick (own enumerable only) drops them.
+        const statFlat = _.pick(stats, ..._.keys(stats));
         for (let key of ['atime', 'birthtime', 'ctime', 'mtime']) {
-          stats[key] = stats[key].getTime();
+          statFlat[key] = stats[key] && stats[key].getTime();
         }
+        stats = statFlat;
 
         let directory = new Directory({
           name: path.basename(projectPath),

@@ -317,8 +317,11 @@ class Directory {
       }
 
       const statFlat = _.pick(stat, _.keys(stat))
+      // Read the date getters from the original Stats object: as of Node 24
+      // atime/mtime/ctime/birthtime are prototype getters, so _.keys/_.pick
+      // (own enumerable only) no longer copies them onto statFlat.
       for (let key of ['atime', 'birthtime', 'ctime', 'mtime']) {
-        statFlat[key] = statFlat[key] && statFlat[key].getTime()
+        statFlat[key] = stat[key] && stat[key].getTime()
       }
 
       if (typeof stat.isDirectory === 'function' && stat.isDirectory()) {

@@ -1,0 +1,22 @@
+diff --git a/node_modules/node-pty/deps/winpty/src/winpty.gyp b/node_modules/node-pty/deps/winpty/src/winpty.gyp
+index 1ac5758..6047590 100644
+--- a/node_modules/node-pty/deps/winpty/src/winpty.gyp
++++ b/node_modules/node-pty/deps/winpty/src/winpty.gyp
+@@ -10,7 +10,7 @@
+     #    make -j4 CXX=i686-w64-mingw32-g++ LDFLAGS="-static -static-libgcc -static-libstdc++"
+ 
+     'variables': {
+-        'WINPTY_COMMIT_HASH%': '<!(cmd /c "cd shared && GetCommitHash.bat")',
++        'WINPTY_COMMIT_HASH%': '<!(cmd /c "cd shared && .\\GetCommitHash.bat")',
+     },
+     'target_defaults' : {
+         'defines' : [
+@@ -22,7 +22,7 @@
+         'include_dirs': [
+             # Add the 'src/gen' directory to the include path and force gyp to
+             # run the script (re)generating the version header.
+-            '<!(cmd /c "cd shared && UpdateGenVersion.bat <(WINPTY_COMMIT_HASH)")',
++            '<!(cmd /c "cd shared && .\\UpdateGenVersion.bat <(WINPTY_COMMIT_HASH)")',
+         ]
+     },
+     'targets' : [
