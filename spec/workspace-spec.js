@@ -761,6 +761,41 @@ describe('Workspace', () => {
         expect(
           workspace.getActiveTextEditor().getCursorBufferPosition()
         ).toEqual([2, 11])
+
+        await workspace.open('a', { initialLine: null, initialColumn: 4 });
+
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([0, 4])
+
+        await workspace.open('a', { initialLine: 2, initialColumn: null });
+
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([2, 0])
+      });
+
+      it('does not throw when opened without position options', async () => {
+        await workspace.open('a', {});
+        await workspace.open('a', { initialLine: null, initialColumn: null });
+        await workspace.open('a', {
+          initialLine: undefined,
+          initialColumn: undefined
+        });
+      });
+
+      it('does not throw when opening a file outside the project with null position options', async () => {
+        // atom-application.js parsePathToOpen() sets initialLine/initialColumn to null
+        // for files opened without a line:column suffix (e.g. via recent files or drag-and-drop)
+        const dir = temp.mkdirSync('outside-project');
+        const filePath = path.join(dir, 'outside.txt');
+        fs.writeFileSync(filePath, 'content outside project\n');
+
+        await workspace.open(filePath, { initialLine: null, initialColumn: null });
+
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([0, 0]);
       });
 
       it('unfolds the fold containing the line', async () => {
