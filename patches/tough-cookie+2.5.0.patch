@@ -1,0 +1,15 @@
+diff --git a/node_modules/tough-cookie/lib/cookie.js b/node_modules/tough-cookie/lib/cookie.js
+index 32dc0f8..3b8bf6d 100644
+--- a/node_modules/tough-cookie/lib/cookie.js
++++ b/node_modules/tough-cookie/lib/cookie.js
+@@ -40,7 +40,9 @@ var VERSION = require('./version');
+ 
+ var punycode;
+ try {
+-  punycode = require('punycode');
++  // Use the userland `punycode` package (trailing slash) instead of the
++  // deprecated built-in `punycode` module (Node DEP0040).
++  punycode = require('punycode/');
+ } catch(e) {
+   console.warn("tough-cookie: can't load punycode; won't use punycode for domain normalization");
+ }
