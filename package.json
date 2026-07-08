@@ -316,7 +316,6 @@
     "random-seed": "0.3.0"
   },
   "resolutions": {
-    "node-abi": "4.33.0",
     "keytar": "7.9.0",
     "nan": "2.28.0",
     "ctags": "https://github.com/pulsar-edit/node-ctags.git#c32ca6017dd3f4ea314d53b044225505820abbe3",
