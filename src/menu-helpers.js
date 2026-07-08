@@ -106,12 +106,51 @@ function cloneMenuItem(item) {
 //
 // Returns a String containing the keystroke in a format that can be interpreted
 //   by Electron to provide nice icons where available.
+// Keystroke key names that differ from Electron's accelerator key codes.
+// https://www.electronjs.org/docs/latest/api/accelerator#available-key-codes
+const ACCELERATOR_KEYS_BY_KEYSTROKE_KEY = {
+  numpad0: "num0",
+  numpad1: "num1",
+  numpad2: "num2",
+  numpad3: "num3",
+  numpad4: "num4",
+  numpad5: "num5",
+  numpad6: "num6",
+  numpad7: "num7",
+  numpad8: "num8",
+  numpad9: "num9",
+};
+
+// Keystrokes made up solely of modifiers (e.g. `ctrl-alt-shift`) have no "real"
+// key, so they can't be expressed as an Electron accelerator.
+const MODIFIER_KEYS = new Set([
+  "ctrl",
+  "control",
+  "cmd",
+  "command",
+  "alt",
+  "option",
+  "shift",
+  "super",
+  "meta",
+]);
+
 function acceleratorForKeystroke(keystroke) {
   if (!keystroke) {
     return null;
   }
   let modifiers = keystroke.split(/-(?=.)/);
-  const key = modifiers.pop().toUpperCase().replace("+", "Plus");
+  const rawKey = modifiers.pop();
+
+  // A keystroke that ends in a modifier isn't a valid accelerator, and Electron
+  // will warn about it, so bail out.
+  if (MODIFIER_KEYS.has(rawKey.toLowerCase())) {
+    return null;
+  }
+
+  const key =
+    ACCELERATOR_KEYS_BY_KEYSTROKE_KEY[rawKey.toLowerCase()] ||
+    rawKey.toUpperCase().replace("+", "Plus");
 
   modifiers = modifiers.map((modifier) =>
     modifier
