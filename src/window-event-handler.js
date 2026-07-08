@@ -231,7 +231,10 @@ module.exports = class WindowEventHandler {
     if (
       !this.reloadRequested &&
       !this.atomEnvironment.inSpecMode() &&
-      this.atomEnvironment.getCurrentWindow().isWebViewFocused()
+      // `BrowserWindow#isWebViewFocused()` no longer exists in modern Electron;
+      // `document.hasFocus()` is the renderer-side equivalent of "is this
+      // window's web view focused".
+      this.document.hasFocus()
     ) {
       this.atomEnvironment.hide();
     }
