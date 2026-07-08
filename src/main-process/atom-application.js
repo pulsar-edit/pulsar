@@ -586,17 +586,7 @@ module.exports = class AtomApplication extends EventEmitter {
     });
 
     this.on("application:open-documentation", () =>
-      shell.openExternal("https://github.com/lumine-code/lumine"),
-    );
-    this.on("application:open-discussions", () =>
-      shell.openExternal("https://github.com/orgs/lumine-code/discussions"),
-    );
-    this.on("application:open-faq", () =>
-      shell.openExternal("https://github.com/lumine-code/lumine/discussions"),
-    );
-    this.on(
-      "application:open-terms-of-use",
-      () => shell.openExternal("https://atom.io/terms"), //TODO: This needs to be updated for when we have our own published on the site
+      shell.openExternal("https://lumine-code.github.io/"),
     );
     this.on("application:report-issue", () =>
       shell.openExternal("https://github.com/lumine-code/lumine/issues/new/choose"),

@@ -1,6 +1,6 @@
 const { Disposable } = require("atom");
 const etch = require("etch");
-const AtomLogo = require("./atom-logo");
+const LumineLogo = require("./lumine-logo");
 const EtchComponent = require("../etch-component");
 
 const $ = etch.dom;
@@ -36,38 +36,14 @@ module.exports = class AboutView extends EtchComponent {
     atom.commands.dispatch(atom.views.getView(atom.workspace), "application:open-license");
   }
 
-  handleTermsOfUseClick(e) {
+  handleDocumentationClick(e) {
     e.preventDefault();
-    atom.openExternal("https://atom.io/terms"); //If we use this then this URL will need updating but button disabled (L#182)
-    // TODO Update to Privacy Policy once `pulsar-edit.github.io` #161 is resolved
-  }
-
-  handleHowToUpdateClick(e) {
-    e.preventDefault();
-    atom.openExternal(
-      "https://github.com/lumine-code/lumine/tree/master/packages/lumine-updater#readme",
-    );
+    atom.commands.dispatch(atom.views.getView(atom.workspace), "application:open-documentation");
   }
 
   executeUpdateAction(e) {
     e.preventDefault();
     atom.commands.dispatch(atom.views.getView(atom.workspace), "lumine-updater:check-for-update");
-  }
-
-  handleShowMoreClick(e) {
-    e.preventDefault();
-    var showMoreDiv = document.querySelector(".show-more");
-    var showMoreText = document.querySelector(".about-more-expand");
-    switch (showMoreText.textContent) {
-      case "Show more":
-        showMoreDiv.classList.toggle("hidden");
-        showMoreText.textContent = "Hide";
-        break;
-      case "Hide":
-        showMoreDiv.classList.toggle("hidden");
-        showMoreText.textContent = "Show more";
-        break;
-    }
   }
 
   render() {
@@ -77,7 +53,12 @@ module.exports = class AboutView extends EtchComponent {
         { className: "about-container min-width-min-content" },
         $.header(
           { className: "about-header" },
-          $.a({ className: "about-atom-io", href: `${atom.branding.urlWeb}` }, $(AtomLogo)),
+          $.a({ className: "about-atom-io", href: `${atom.branding.urlWeb}` }, $(LumineLogo)),
+          $.h1({ className: "about-title" }, `${atom.branding.name}`),
+          $.div(
+            { className: "about-subtitle" },
+            "A Community-led Hyper-Hackable Text Editor. Fork of Atom/Pulsar.",
+          ),
           $.div(
             { className: "about-header-info" },
             $.span(
@@ -87,103 +68,49 @@ module.exports = class AboutView extends EtchComponent {
               },
               $.span(
                 { className: "about-version" },
-                `${this.props.currentAtomVersion} ${process.arch}`,
+                `Lumine: ${this.props.currentAtomVersion} ${process.arch}`,
               ),
               $.span({ className: "icon icon-clippy about-copy-version" }),
             ),
-            $.a(
+            $.span(
               {
-                className: "about-header-release-notes",
-                onclick: this.handleReleaseNotesClick.bind(this),
+                className: "about-version-container electron",
+                onclick: this.handleElectronVersionClick.bind(this),
               },
-              "Release Notes",
-            ),
-          ),
-          $.span(
-            {
-              className: "about-version-container show-more-expand",
-              onclick: this.handleShowMoreClick.bind(this),
-            },
-            $.span({ className: "about-more-expand" }, "Show more"),
-          ),
-          $.div(
-            { className: "show-more hidden about-more-info" },
-            $.div(
-              { className: "about-more-info" },
               $.span(
-                {
-                  className: "about-version-container inline-block electron",
-                  onclick: this.handleElectronVersionClick.bind(this),
-                },
-                $.span(
-                  { className: "about-more-version" },
-                  `Electron: ${this.props.currentElectronVersion} `,
-                ),
-                $.span({ className: "icon icon-clippy about-copy-version" }),
+                { className: "about-version" },
+                `Electron: ${this.props.currentElectronVersion}`,
               ),
+              $.span({ className: "icon icon-clippy about-copy-version" }),
             ),
-            $.div(
-              { className: "about-more-info" },
+            $.span(
+              {
+                className: "about-version-container chrome",
+                onclick: this.handleChromeVersionClick.bind(this),
+              },
               $.span(
-                {
-                  className: "about-version-container inline-block chrome",
-                  onclick: this.handleChromeVersionClick.bind(this),
-                },
-                $.span(
-                  { className: "about-more-version" },
-                  `Chrome: ${this.props.currentChromeVersion} `,
-                ),
-                $.span({ className: "icon icon-clippy about-copy-version" }),
+                { className: "about-version" },
+                `Chrome: ${this.props.currentChromeVersion}`,
               ),
+              $.span({ className: "icon icon-clippy about-copy-version" }),
             ),
-            $.div(
-              { className: "about-more-info" },
+            $.span(
+              {
+                className: "about-version-container node",
+                onclick: this.handleNodeVersionClick.bind(this),
+              },
               $.span(
-                {
-                  className: "about-version-container inline-block node",
-                  onclick: this.handleNodeVersionClick.bind(this),
-                },
-                $.span(
-                  { className: "about-more-version" },
-                  `Node: ${this.props.currentNodeVersion} `,
-                ),
-                $.span({ className: "icon icon-clippy about-copy-version" }),
+                { className: "about-version" },
+                `Node: ${this.props.currentNodeVersion}`,
               ),
+              $.span({ className: "icon icon-clippy about-copy-version" }),
             ),
           ),
         ),
       ),
 
       $.div(
-        { className: "about-updates group-start min-width-min-content" },
-        $.div(
-          { className: "about-updates-box" },
-          $.div(
-            { className: "about-updates-status" },
-            $.div(
-              { className: "about-updates-item app-unsupported" },
-              $.span(
-                { className: "about-updates-label is-strong" },
-                "Updates have been moved to the package ",
-                $.code({ style: { "white-space": "nowrap" } }, "lumine-updater"),
-                ".",
-                $.br(),
-              ),
-              $.a(
-                {
-                  className: "about-updates-instructions",
-                  onclick: this.handleHowToUpdateClick.bind(this),
-                },
-                "How to update",
-              ),
-            ),
-          ),
-          this.renderUpdateChecker(),
-        ),
-      ),
-
-      $.div(
-        { className: "about-actions group-item" },
+        { className: "about-actions group-start min-width-min-content" },
         $.div(
           { className: "btn-group" },
           $.button(
@@ -193,25 +120,29 @@ module.exports = class AboutView extends EtchComponent {
             },
             "License",
           ),
-          //Disabled the below as we don't have this but can reuse if there is the need
-          /*$.button(
+          $.button(
             {
-              className: 'btn terms-of-use',
-              onclick: this.handleTermsOfUseClick.bind(this)
+              className: "btn about-documentation-button",
+              onclick: this.handleDocumentationClick.bind(this),
             },
-            'Terms of Use'
-          )*/
+            "Documentation",
+          ),
+          $.button(
+            {
+              className: "btn about-release-notes-button",
+              onclick: this.handleReleaseNotesClick.bind(this),
+            },
+            "Release Notes",
+          ),
+          this.renderUpdateChecker(),
         ),
       ),
 
       $.div(
         { className: "about-love group-start" },
         $.a({ className: "icon icon-code", href: `${atom.branding.urlGH}` }),
-        $.span({ className: "inline" }, " with "),
-        $.a({ className: "icon icon-heart", href: `${atom.branding.urlWeb}` + "community" }),
-        $.span({ className: "inline" }, " by "),
-        //$.a({ className: 'icon icon-logo-github', href: `${atom.branding.urlWeb}` }) Replace icon with Lumine word logo and delete following line
-        $.a({ className: "inline", href: `${atom.branding.urlWeb}` }, "Lumine Team"),
+        $.span({ className: "about-love-text" }, "Made by Lumine Team"),
+        $.a({ className: "icon icon-heart", href: `${atom.branding.urlForum}` }),
       ),
     );
   }
@@ -230,12 +161,8 @@ module.exports = class AboutView extends EtchComponent {
         {
           className: "btn about-update-action-button",
           onclick: this.executeUpdateAction.bind(this),
-          style: {
-            display: "block",
-            margin: "0 .5em",
-          },
         },
-        "Check Now",
+        "Check for updates",
       );
     }
   }

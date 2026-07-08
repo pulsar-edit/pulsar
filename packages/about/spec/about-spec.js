@@ -43,16 +43,15 @@ describe("About", () => {
     });
   });
 
-  describe("when the show more link is clicked", () => {
-    it("expands to show additional version numbers", async () => {
+  describe("the additional version numbers", () => {
+    it("are shown by default", async () => {
       await atom.workspace.open("atom://about");
       jasmine.attachToDOM(workspaceElement);
 
       let aboutElement = workspaceElement.querySelector(".about");
-      let showMoreElement = aboutElement.querySelector(".show-more-expand");
-      let moreInfoElement = workspaceElement.querySelector(".show-more");
-      showMoreElement.click();
-      expect(moreInfoElement).toBeVisible();
+      expect(aboutElement.querySelector(".electron")).toBeVisible();
+      expect(aboutElement.querySelector(".chrome")).toBeVisible();
+      expect(aboutElement.querySelector(".node")).toBeVisible();
     });
   });
 
@@ -100,7 +99,7 @@ describe("About", () => {
 
       let aboutElement = workspaceElement.querySelector(".about");
       let updateContainer = aboutElement.querySelector(".about-update-action-button");
-      expect(updateContainer.innerText).toBe("Check Now");
+      expect(updateContainer.innerText).toBe("Check for updates");
     });
   });
 });

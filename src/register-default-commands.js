@@ -168,6 +168,9 @@ module.exports = function ({
       "application:open-license": function () {
         return this.getModel().openLicense();
       },
+      "application:open-documentation": function () {
+        return ipcRenderer.send("command", "application:open-documentation");
+      },
       "window:run-package-specs": function () {
         return this.runPackageSpecs();
       },

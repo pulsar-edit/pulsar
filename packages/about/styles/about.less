@@ -12,7 +12,7 @@
   text-align: center;
   font-size: 1.25em;
   line-height: 1.4;
-  padding: 4em;
+  padding: 4em 2em;
   color: @text-color;
   background-color: @base-background-color;
 
@@ -30,20 +30,13 @@
     -webkit-user-drag: none;
   }
 
-  .input-checkbox {
-    margin-top: -0.2em;
-  }
-
   .min-width-min-content {
     min-width: min-content;
   }
 
   // used to group different elements
   .group-start {
-    margin-top: 4em;
-  }
-  .group-item {
-    margin-top: 1.5em;
+    margin-top: 3em;
   }
 }
 
@@ -58,74 +51,99 @@
 
 // Header --------------------------------
 
-.about-atom-io:hover {
-  .about-logo {
-    color: @atom-green;
+.about-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.about-atom-io {
+  display: inline-block;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.03);
   }
 }
 
 .about-logo {
   display: block;
   width: 100%;
-  max-width: 280px;
-  margin: 0 auto 1em auto;
+  max-width: 128px;
+  margin: 0 auto;
+  filter: drop-shadow(0 4px 12px fade(#000, 30%));
+}
+
+.about-title {
+  margin: 0.4em 0 0.1em;
+  font-size: 3.4em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   color: @text-color-highlight;
-  transition: color 0.2s;
+}
+
+.about-subtitle {
+  margin: 1em auto;
+  color: @text-color-subtle;
+  font-size: 1.1em;
 }
 
 .about-header-info {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  column-gap: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  width: 100%;
+  max-width: 30em;
+  margin-top: 2em;
 }
+
 .about-version-container {
-  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  padding: 0.25em 1em;
+  border: 1px solid @base-border-color;
+  border-radius: 2em;
+  background-color: @background-color-highlight;
   white-space: nowrap;
+  vertical-align: middle;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+
   &:hover {
-    color: lighten(@text-color, 15%);
+    color: @text-color-highlight;
+    border-color: @lumine-gold;
   }
   &:active {
     color: lighten(@text-color, 30%);
   }
 }
 
+// Center the version text in the space between the left edge and the copy icon,
+// which stays pinned on the right.
 .about-version {
-  margin-right: 0.5em;
-  font-size: 1.25em;
-  vertical-align: middle;
-}
-
-.about-more-version {
-  color: @text-color-subtle;
-  font-size: 0.9em;
-}
-
-// Updates --------------------------------
-
-.about-updates {
-  width: 100%;
-  max-width: 39em;
-}
-
-.about-updates-box {
-  display: flex;
-  align-items: center;
-  padding: @component-padding;
-  border: 1px solid @base-border-color;
-  border-radius: (@component-border-radius * 2);
-  background-color: @background-color-highlight;
-}
-
-.about-updates-status {
   flex: 1;
-  margin-left: 0.5em;
   text-align: center;
 }
 
-.about-updates-item,
-.about-default-update-message .about-updates-label {
+.about-copy-version {
+  margin-left: 0.5em;
+}
+
+// Actions --------------------------------
+
+.about-actions {
+  .btn-group {
+    display: inline-flex;
+    justify-content: center;
+  }
+
+  .btn {
+    min-width: 7em;
+  }
+}
+
+.about-updates-item {
   display: block;
 }
 
@@ -136,21 +154,14 @@
   }
 }
 
-.about-updates-version {
-  margin: 0 0.4em;
-}
-
-.about-auto-updates {
-  margin-top: 1em;
-  input {
-    margin-right: 0.5em;
-  }
-}
-
 // Love --------------------------------
 
 .about-love {
-  min-width: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75em;
+  color: @text-color-subtle;
 
   .icon::before {
     // Make these octicons look good inlined with text
@@ -159,24 +170,17 @@
     height: auto;
     margin-right: 0;
     font-size: 1.5em;
-    vertical-align: text-top;
   }
 
-  .icon-logo-github::before {
-    font-size: 3.6em;
-    height: 0.36em;
+  .icon-code::before {
+    color: @lumine-gold;
+  }
+
+  .icon-heart::before {
+    color: @lumine-gold;
   }
 }
 
-.about-credits {
-  color: @text-color-subtle;
-}
-
-// the blue squirrel --------------------------------
-
-.about-release-notes {
-  color: @background-color-info;
-  &:hover {
-    color: lighten(@background-color-info, 15%);
-  }
+.about-love-text {
+  text-align: center;
 }
