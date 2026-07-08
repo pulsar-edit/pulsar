@@ -2388,7 +2388,7 @@ atom-slick@^2, atom-slick@^2.0.0:
   dependencies:
     atom-slick "^2.0.0"
     grim "^2.0.1"
-    minimatch "^3.0.3"
+    minimatch "^10.2.5"
     selector-kit "^0.1.0"
     stable "^0.1.8"
     underscore-plus "^1.7.0"
@@ -4576,7 +4576,7 @@ fuzzaldrin@^2.1.0:
   dependencies:
     atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
-    minimatch "~3.1.0"
+    minimatch "^10.2.5"
     underscore-plus "^1.7.0"
     vscode-ripgrep "^1.2.5"
     wrench "^1.5"
@@ -6296,7 +6296,7 @@ minimatch@0.x:
     lru-cache "2"
     sigmund "~1.0.0"
 
-"minimatch@2 || 3", minimatch@^3.0.3, minimatch@^3.0.4, minimatch@^3.0.5, minimatch@^3.1.1, minimatch@~3.1.0:
+"minimatch@2 || 3", minimatch@^3.0.4, minimatch@^3.0.5, minimatch@^3.1.1:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.5.tgz#580c88f8d5445f2bd6aa8f3cadefa0de79fbd69e"
   integrity sha512-VgjWUsnnT6n+NUk6eZq77zeFdpW2LWDzP6zFGrCbHXiYNul5Dzqk2HHQ5uFH2DNW5Xbp8+jVzaeNt94ssEEl4w==
@@ -6310,7 +6310,7 @@ minimatch@3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimatch@^10.0.3, minimatch@^10.1.2, minimatch@^10.2.2, minimatch@^10.2.4, minimatch@^10.2.5:
+minimatch@^10.0.3, minimatch@^10.2.2, minimatch@^10.2.4, minimatch@^10.2.5:
   version "10.2.5"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-10.2.5.tgz#bd48687a0be38ed2961399105600f832095861d1"
   integrity sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==
@@ -8644,7 +8644,7 @@ tough-cookie@~2.5.0:
 "tree-view@file:./packages/tree-view":
   version "0.9.3"
   dependencies:
-    minimatch "^10.1.2"
+    minimatch "^10.2.5"
     natural-compare-lite "^1.4.0"
 
 truncate-utf8-bytes@^1.0.0:

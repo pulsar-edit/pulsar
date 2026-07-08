@@ -11,7 +11,7 @@
   "dependencies": {
     "atom-slick": "^2.0.0",
     "grim": "^2.0.1",
-    "minimatch": "^3.0.3",
+    "minimatch": "^10.2.5",
     "selector-kit": "^0.1.0",
     "stable": "^0.1.8",
     "underscore-plus": "^1.7.0"

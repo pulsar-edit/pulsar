@@ -11,9 +11,12 @@
 // into a set of excluded paths.
 
 const nsfw = require("nsfw");
-const { minimatch } = require("minimatch");
+const minimatchModule = require("minimatch");
 const { fdir } = require("fdir");
 const path = require("path");
+
+const minimatch =
+  typeof minimatchModule === "function" ? minimatchModule : minimatchModule.minimatch;
 
 // A shim over the real `console` methods so that they send log messages back
 // to the renderer process instead of making us dig into their own console.

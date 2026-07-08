@@ -7,7 +7,9 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 
-const { minimatch } = require("minimatch");
+const minimatchModule = require("minimatch");
+const minimatch =
+  typeof minimatchModule === "function" ? minimatchModule : minimatchModule.minimatch;
 
 let Resolve = null;
 
