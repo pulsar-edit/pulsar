@@ -1,5 +1,10 @@
 const crypto = require("crypto");
-const { clipboard } = require("electron");
+// Access the clipboard through the main process via `@electron/remote`. Electron
+// deprecated using the `clipboard` module directly from the renderer process, so
+// this routes reads/writes to the main-process clipboard instead. This matches
+// how the rest of the renderer reaches main-process modules (see electron-shims,
+// context-menu-manager, application-delegate).
+const { clipboard } = require("@electron/remote");
 
 // Extended: Represents the clipboard used for copying and pasting in Lumine.
 //
