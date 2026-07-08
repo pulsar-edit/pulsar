@@ -34,14 +34,8 @@ export default class PackageCard {
       }
     }
 
-    // Default to displaying the download count
-    if (!options.stats) {
-      options.stats = { downloads: true };
-    }
-
     etch.initialize(this);
 
-    this.displayStats(options);
     this.handlePackageEvents();
     this.handleButtonEvents(options);
     this.loadCachedMetadata();
@@ -75,14 +69,9 @@ export default class PackageCard {
     return (
       <div className="package-card col-lg-8">
         <div ref="statsContainer" className="stats pull-right">
-          <span ref="packageStars" className="stats-item">
-            <span ref="stargazerIcon" className="icon icon-star" />
-            <span ref="stargazerCount" className="value" />
-          </span>
-
-          <span ref="packageDownloads" className="stats-item">
-            <span ref="downloadIcon" className="icon icon-cloud-download" />
-            <span ref="downloadCount" className="value" />
+          <span ref="packageSha" className="stats-item" style={{ display: "none" }}>
+            <span className="icon icon-git-branch" />
+            <span ref="shaValue" className="value" />
           </span>
         </div>
 
@@ -308,7 +297,10 @@ export default class PackageCard {
 
     const packageNameClickHandler = (event) => {
       event.stopPropagation();
-      atom.openExternal(`https://web.pulsar-edit.dev/packages/${this.pack.name}`);
+      const repoUrl = repoUrlFromRepository(this.pack.repository);
+      if (repoUrl) {
+        atom.openExternal(repoUrl);
+      }
     };
     this.refs.packageName.addEventListener("click", packageNameClickHandler);
     this.disposables.add(
@@ -319,9 +311,10 @@ export default class PackageCard {
 
     const packageAuthorClickHandler = (event) => {
       event.stopPropagation();
-      atom.openExternal(
-        `https://web.pulsar-edit.dev/users/${ownerFromRepository(this.pack.repository)}`,
-      ); //TODO: Fix - This does not current exist but this will at least be more accurate
+      const owner = ownerFromRepository(this.pack.repository);
+      if (owner) {
+        atom.openExternal(`https://github.com/${owner}`);
+      }
     };
     this.refs.loginLink.addEventListener("click", packageAuthorClickHandler);
     this.disposables.add(
@@ -386,39 +379,14 @@ export default class PackageCard {
         }
       });
     }
-
-    // We don't want to hit the API for this data, if it's a bundled package
-    if (this.pack.repository !== atom.branding.urlCoreRepo) {
-      this.client.package(this.pack.name, (err, data) => {
-        // We don't need to actually handle the error here, we can just skip
-        // showing the download count if there's a problem.
-        if (!err) {
-          if (data == null) {
-            data = {};
-          }
-
-          if (this.pack.apmInstallSource && this.pack.apmInstallSource.type === "git") {
-            this.refs.downloadIcon.classList.remove("icon-cloud-download");
-            this.refs.downloadIcon.classList.add("icon-git-branch");
-            this.refs.downloadCount.textContent = this.pack.apmInstallSource.sha.substr(0, 8);
-          } else {
-            this.refs.stargazerCount.textContent = data.stargazers_count
-              ? parseInt(data.stargazers_count).toLocaleString()
-              : "";
-            this.refs.downloadCount.textContent = data.downloads
-              ? parseInt(data.downloads).toLocaleString()
-              : "";
-          }
-        }
-      });
-    }
   }
 
   updateInterfaceState() {
     this.refs.versionValue.textContent =
       (this.installablePack ? this.installablePack.version : null) || this.pack.version;
     if (this.pack.apmInstallSource && this.pack.apmInstallSource.type === "git") {
-      this.refs.downloadCount.textContent = this.pack.apmInstallSource.sha.substr(0, 8);
+      this.refs.shaValue.textContent = this.pack.apmInstallSource.sha.substr(0, 8);
+      this.refs.packageSha.style.display = "";
     }
 
     this.updateSettingsState();
@@ -528,20 +496,6 @@ export default class PackageCard {
       this.refs.installButtonGroup.style.display = "";
     }
     this.refs.packageActionButtonGroup.style.display = "none";
-  }
-
-  displayStats(options) {
-    if (options && options.stats && options.stats.downloads) {
-      this.refs.packageDownloads.style.display = "";
-    } else {
-      this.refs.packageDownloads.style.display = "none";
-    }
-
-    if (options && options.stats && options.stats.stars) {
-      this.refs.packageStars.style.display = "";
-    } else {
-      this.refs.packageStars.style.display = "none";
-    }
   }
 
   displayGitPackageInstallInformation() {

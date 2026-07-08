@@ -18,7 +18,7 @@ export default class InstallPanel {
     this.packageManager = packageManager;
     this.disposables = new CompositeDisposable();
     this.client = this.packageManager.getClient();
-    this.atomIoURL = "https://web.pulsar-edit.dev/";
+    this.atomIoURL = "https://github.com";
 
     etch.initialize(this);
 

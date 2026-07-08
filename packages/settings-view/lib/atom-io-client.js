@@ -44,44 +44,6 @@ module.exports = class AtomIoClient {
     }
   }
 
-  featuredPackages(callback) {
-    // TODO clean up caching copypasta
-    const data = this.fetchFromCache("packages/featured");
-    if (data) {
-      return callback(null, data);
-    } else {
-      return this.getFeatured(false, callback);
-    }
-  }
-
-  featuredThemes(callback) {
-    // TODO clean up caching copypasta
-    const data = this.fetchFromCache("themes/featured");
-    if (data) {
-      return callback(null, data);
-    } else {
-      return this.getFeatured(true, callback);
-    }
-  }
-
-  getFeatured(loadThemes, callback) {
-    // apm already does this, might as well use it instead of request i guess? The
-    // downside is that I need to repeat caching logic here.
-    this.packageManager
-      .getFeatured(loadThemes)
-      .then((packages) => {
-        // copypasta from below
-        const key = loadThemes ? "themes/featured" : "packages/featured";
-        const cached = this.deepCache(key, packages);
-        // data: packages
-        // createdOn: Date.now()
-        // localStorage.setItem(@cacheKeyForPath(key), JSON.stringify(cached))
-        // end copypasta
-        return callback(null, packages);
-      })
-      .catch((error) => callback(error, null));
-  }
-
   request(path, callback) {
     const options = {
       url: `${this.baseURL}${path}`,
@@ -258,63 +220,6 @@ module.exports = class AtomIoClient {
     return this.cachePath != null
       ? this.cachePath
       : (this.cachePath = path.join(remote.app.getPath("userData"), "Cache", "settings-view"));
-  }
-
-  search(query, options) {
-    const qs = { q: query };
-
-    if (options.themes) {
-      qs.filter = "theme";
-    } else if (options.packages) {
-      qs.filter = "package";
-    }
-
-    options = {
-      url: `${this.baseURL}packages/search`,
-      headers: { "User-Agent": navigator.userAgent },
-      qs,
-      gzip: true,
-    };
-
-    return new Promise((resolve, reject) => {
-      request(options, (err, res, textBody) => {
-        let error;
-        if (err) {
-          error = new Error(`Searching for \u201C${query}\u201D failed.`);
-          error.stderr = err.message;
-          return reject(error);
-        } else {
-          try {
-            // NOTE: request's json option does not populate err if parsing fails,
-            // so we do it manually
-            const body = this.parseJSON(textBody);
-            if (body.filter) {
-              resolve(
-                body
-                  .filter((pkg) => (pkg.releases != null ? pkg.releases.latest : undefined) != null)
-                  .map(({ readme, metadata, downloads, stargazers_count, repository, badges }) =>
-                    Object.assign(metadata, {
-                      readme,
-                      downloads,
-                      stargazers_count,
-                      badges,
-                      repository: repository.url,
-                    }),
-                  ),
-              );
-            } else {
-            }
-            error = new Error(`Searching for \u201C${query}\u201D failed.\n`);
-            error.stderr = "API returned: " + textBody;
-            return reject(error);
-          } catch (e) {
-            error = new Error(`Searching for \u201C${query}\u201D failed.`);
-            error.stderr = e.message + "\n" + textBody;
-            return reject(error);
-          }
-        }
-      });
-    });
   }
 
   parseJSON(s) {

@@ -80,9 +80,8 @@ describe("PackageDetailView", function () {
       SnippetsProvider,
     );
 
-    // PackageCard is a subview, and it calls AtomIoClient::package once to load
-    // metadata from the cache.
-    expect(packageManager.client.package.callCount).toBe(1);
+    // The package is already loaded locally, so no registry request is made.
+    expect(packageManager.client.package.callCount).toBe(0);
   });
 
   it("shows a loading message and calls out to atom.io when package metadata is missing", function () {

@@ -601,30 +601,6 @@ describe("SettingsView", function () {
     });
   });
 
-  describe("when an installed package is clicked from the Install panel", () =>
-    it("displays the package details", function () {
-      waitsFor(() => atom.packages.activatePackage("settings-view"));
-
-      runs(function () {
-        settingsView.packageManager.getClient();
-        spyOn(settingsView.packageManager.client, "featuredPackages").andCallFake((callback) =>
-          callback(null, [{ name: "settings-view" }]),
-        );
-        return settingsView.showPanel("Install");
-      });
-
-      waitsFor(
-        () => settingsView.element.querySelectorAll(".package-card:not(.hidden)").length > 0,
-      );
-
-      runs(function () {
-        settingsView.element.querySelectorAll(".package-card:not(.hidden)")[0].click();
-
-        const packageDetail = settingsView.element.querySelector(".package-detail .active");
-        expect(packageDetail.textContent).toBe("Settings View");
-      });
-    }));
-
   describe("when the active theme has settings", function () {
     let panel = null;
 

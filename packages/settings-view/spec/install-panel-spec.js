@@ -74,11 +74,8 @@ describe("InstallPanel", function () {
 
   describe("searching packages", () =>
     it("does not query the package registry", function () {
-      spyOn(panel.client, "search").andCallThrough();
-
       panel.search("first");
 
-      expect(panel.client.search).not.toHaveBeenCalled();
       expect(panel.refs.searchMessage.textContent).toContain("GitHub repository");
     }));
 

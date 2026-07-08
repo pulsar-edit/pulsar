@@ -130,7 +130,10 @@ export default class PackageDetailView {
 
     const learnMoreButtonClickHandler = (event) => {
       event.preventDefault();
-      atom.openExternal(`https://web.pulsar-edit.dev/packages/${this.pack.name}`);
+      const repoUrl = this.packageManager.getRepositoryUrl(this.pack);
+      if (repoUrl) {
+        atom.openExternal(repoUrl);
+      }
     };
     this.refs.learnMoreButton.addEventListener("click", learnMoreButtonClickHandler);
     this.disposables.add(
@@ -337,7 +340,7 @@ export default class PackageDetailView {
 
               <div ref="buttons" className="btn-wrap-group hidden">
                 <button ref="learnMoreButton" className="btn btn-default icon icon-link">
-                  View on pulsar-edit.dev
+                  View on GitHub
                 </button>
                 <button ref="issueButton" className="btn btn-default icon icon-bug">
                   Report Issue
