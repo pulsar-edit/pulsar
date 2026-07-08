@@ -237,13 +237,32 @@ exports.install = function (resourcesPath, nodeRequire) {
 
   Object.keys(COMPILERS).forEach(function (extension) {
     const compiler = COMPILERS[extension];
+    // Node's built-in loader for this extension, captured before we replace it.
+    // For `.js` on Node 22.12+ this loader is ESM-aware: it routes
+    // `type: module` files through `require(esm)` rather than compiling them as
+    // CommonJS. We defer to it for any file we don't transpile ourselves, so
+    // that ESM dependencies load correctly instead of failing to parse.
+    const defaultLoader = nodeRequire.extensions[extension];
 
     Object.defineProperty(nodeRequire.extensions, extension, {
       enumerable: true,
       writable: false,
       value: function (module, filePath) {
-        const code = compileFileAtPath(compiler, filePath, extension);
-        return module._compile(code, filePath);
+        const sourceCode = fs.readFileSync(filePath, "utf8");
+        if (!compiler.shouldCompile(sourceCode, filePath)) {
+          if (defaultLoader) return defaultLoader(module, filePath);
+          return module._compile(sourceCode, filePath);
+        }
+        const cachePath = compiler.getCachePath(sourceCode, filePath);
+        let compiledCode = readCachedJavaScript(cachePath);
+        if (compiledCode != null) {
+          cacheStats[extension].hits++;
+        } else {
+          cacheStats[extension].misses++;
+          compiledCode = compiler.compile(sourceCode, filePath);
+          writeCachedJavaScript(cachePath, compiledCode);
+        }
+        return module._compile(compiledCode, filePath);
       },
     });
   });

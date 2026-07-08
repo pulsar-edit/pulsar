@@ -172,10 +172,15 @@ function render(text, filePath) {
     cheerio = require("cheerio");
 
     renderer = new marked.Renderer();
-    renderer.listitem = function (text, isTask) {
-      const listAttributes = isTask ? ' class="task-list-item"' : "";
-
-      return `<li ${listAttributes}>${text}</li>\n`;
+    // As of `marked` v15+, renderer methods receive a single token object
+    // (rather than positional strings) and the inner HTML is no longer
+    // pre-rendered for us. Reuse the default `listitem` rendering — which
+    // handles task checkboxes and loose/tight items — and just add the
+    // `task-list-item` class that our stylesheet expects.
+    const baseListitem = marked.Renderer.prototype.listitem;
+    renderer.listitem = function (item) {
+      const html = baseListitem.call(this, item);
+      return item.task ? html.replace(/^<li>/, '<li class="task-list-item">') : html;
     };
   }
 

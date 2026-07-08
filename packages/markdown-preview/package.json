@@ -19,7 +19,7 @@
     "emoji-images": "^0.1.1",
     "fs-plus": "^3.0.0",
     "github-markdown-css": "^5.5.1",
-    "marked": "5.0.3",
+    "marked": "18.0.5",
     "morphdom": "^2.7.2",
     "underscore-plus": "^1.0.0",
     "yaml-front-matter": "^4.1.1"
