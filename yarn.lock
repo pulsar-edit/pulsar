@@ -1704,10 +1704,10 @@
     property-accessors "^1"
     season "^6.0.2"
 
-"@pulsar-edit/fuzzy-native@1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/fuzzy-native/-/fuzzy-native-1.3.1.tgz#fb1e5828408b2d2ade8f51e451862e1675c42d89"
-  integrity sha512-IQZRHllYhXTnAdI4ebaIh+cUid8DIyFri6cdKmNIY9so5j7Y7YdeBE7tno6GwkKjfT3OBXBRDS46dCeKuSljQQ==
+"@pulsar-edit/fuzzy-native@1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/fuzzy-native/-/fuzzy-native-1.3.2.tgz#860ebc509acce0335095d44815495017792da7c9"
+  integrity sha512-a0kfUekIZyXvlsI4+cc5mV47Mxw+1XNpXxQTphzxiF9kVtGqVWlGfO3Kg05oj9I445exvc0xHlhyvTHGEPQnlA==
   dependencies:
     nan "^2.18.0"
 
@@ -2785,10 +2785,10 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-better-sqlite3@11.1.2:
-  version "11.1.2"
-  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-11.1.2.tgz#6c9d064c9f1ff2a7f507477648ca0ba67bf564a3"
-  integrity sha512-gujtFwavWU4MSPT+h9B+4pkvZdyOUkH54zgLdIrMmmmd4ZqiBIrRNBzNzYVFO417xo882uP5HBu4GjOfaSrIQw==
+better-sqlite3@12.11.1:
+  version "12.11.1"
+  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-12.11.1.tgz#067846efabf7671957fc8a9e8df3be39c6cc0b84"
+  integrity sha512-dq9AtApgg5PGFtBzPFSBl3HZQjHok5gaQCM6zh2Yk0aSmDCs1CbnVI8/HgASQkNKsWFpseIO9beg5xxpYhbIfA==
   dependencies:
     bindings "^1.5.0"
     prebuild-install "^7.1.1"
@@ -4111,10 +4111,10 @@ electron-to-chromium@^1.5.227:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.237.tgz#eacf61cef3f6345d0069ab427585c5a04d7084f0"
   integrity sha512-icUt1NvfhGLar5lSWH3tHNzablaA5js3HVHacQimfP8ViEBOQv+L7DKEuHdbTZ0SKCO1ogTJTIL1Gwk9S6Qvcg==
 
-electron@30.5.1:
-  version "30.5.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-30.5.1.tgz#9f6060ce5b869c3803cbf8064305e9c3056c0744"
-  integrity sha512-AhL7+mZ8Lg14iaNfoYTkXQ2qee8mmsQyllKdqxlpv/zrKgfxz6jNVtcRRbQtLxtF8yzcImWdfTQROpYiPumdbw==
+electron@32.3.3:
+  version "32.3.3"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-32.3.3.tgz#000b390f96379b1fd56ca2fcbe9340d266057e83"
+  integrity sha512-7FT8tDg+MueAw8dBn5LJqDvlM4cZkKJhXfgB3w7P5gvSoUQVAY6LIQcXJxgL+vw2rIRY/b9ak7ZBFbCMF2Bk4w==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^20.9.0"
@@ -7247,10 +7247,10 @@ murmurhash-js@^1.0.0:
   resolved "https://registry.yarnpkg.com/murmurhash-js/-/murmurhash-js-1.0.0.tgz#b06278e21fc6c37fa5313732b0412bcb6ae15f51"
   integrity sha512-TvmkNhkv8yct0SVBSy+o8wYzXjE4Zz3PCesbfs8HiCXXdcTuocApFv11UWlNFWKYsP2okqrhb7JNlSm9InBhIw==
 
-nan@2.17.0, nan@2.19.0, nan@^2.14.2, nan@^2.18.0:
-  version "2.19.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.19.0.tgz#bb58122ad55a6c5bc973303908d5b16cfdd5a8c0"
-  integrity sha512-nO1xXxfh/RWNxfd/XPfbIfFk5vgLsAxUR9y5O0cHMJu/AW9U95JLXqthYHjEp+8gQ5p96K9jUp8nbVOxCdRbtw==
+nan@2.17.0, nan@^2.14.2, nan@^2.18.0, nan@^2.27.0:
+  version "2.27.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.27.0.tgz#804e389f4c0e39b729a17eca85c80ebc4355c4c4"
+  integrity sha512-hC+0LidcL3XE4rp1C4H54KujgXKzbfyTngZTwBByQxsOxCEKZT0MPQ4hOKUH2jU1OYstqdDH4onyHPDzcV0XdQ==
 
 nanoid@^3.3.6:
   version "3.3.11"
@@ -7338,10 +7338,10 @@ nise@^4.0.4:
     just-extend "^4.0.2"
     path-to-regexp "^1.7.0"
 
-node-abi@3.63.0, node-abi@^2.21.0, node-abi@^3.3.0, node-abi@^3.45.0:
-  version "3.63.0"
-  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-3.63.0.tgz#9bfbe68b87357f8b508554608b323e9b1052d045"
-  integrity sha512-vAszCsOUrUxjGAmdnM/pq7gUgie0IRteCQMX6d4A534fQCR93EJU5qgzBvU6EkFfK27s0T3HEV3BOyJIr7OMYw==
+node-abi@^2.21.0, node-abi@^3.3.0, node-abi@^3.45.0, node-abi@^3.92.0:
+  version "3.92.0"
+  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-3.92.0.tgz#18e2214677499b8dda81ffcd095afc763d5a9802"
+  integrity sha512-KdHvFWZjEKDf0cakgFjebl371GPsISX2oZHcuyKqM7DtogIsHrqKeLTo8wBHxaXRAQlY2PsPlZmfo+9ZCxEREQ==
   dependencies:
     semver "^7.3.5"
 

@@ -29,9 +29,9 @@ jobs:
           - os: macos-14
             node-architecture: x64
           - os: ubuntu-24.04-arm
-            image: "debian:10"
+            image: "debian:11"
           - os: ubuntu-latest
-            image: "debian:10"
+            image: "debian:11"
       fail-fast: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.image }}
@@ -39,14 +39,36 @@ jobs:
       timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
-    - name: Edit sources.list - Linux
+    # - name: Edit sources.list - Linux
+    #   if: ${{ runner.os == 'Linux' }}
+    #   run: |
+    #     sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+    #     sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
+    #     sed -i '/security/d' /etc/apt/sources.list
+    #     sed -i '/-updates/d' /etc/apt/sources.list
+    - name: Install Modern GCC Toolchain - Linux
       if: ${{ runner.os == 'Linux' }}
       run: |
-        sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
-        sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
+        apt-get update && apt-get install -y curl bzip2
+        if [ "${{ runner.arch }}" = "ARM64" ]; then
+          MAMBA_ARCH=linux-aarch64
+          CONDA_TARGET=aarch64-conda-linux-gnu
+          MULTIARCH=aarch64-linux-gnu
+        else
+          MAMBA_ARCH=linux-64
+          CONDA_TARGET=x86_64-conda-linux-gnu
+          MULTIARCH=x86_64-linux-gnu
+        fi
+        curl -Ls "https://micro.mamba.pm/api/micromamba/${MAMBA_ARCH}/latest" | tar -xvj -C /usr/local bin/micromamba
+        /usr/local/bin/micromamba create -y -p /opt/gcc-toolchain -c conda-forge gcc=12 gxx=12
+        echo "PULSAR_CC=/opt/gcc-toolchain/bin/${CONDA_TARGET}-gcc" >> "$GITHUB_ENV"
+        echo "PULSAR_CXX=/opt/gcc-toolchain/bin/${CONDA_TARGET}-g++" >> "$GITHUB_ENV"
+        echo "PULSAR_CFLAGS=-I/usr/include -I/usr/include/${MULTIARCH}" >> "$GITHUB_ENV"
+        echo "PULSAR_CXXFLAGS=-I/usr/include -I/usr/include/${MULTIARCH}" >> "$GITHUB_ENV"
+        echo "PULSAR_LDFLAGS=-L/usr/lib/${MULTIARCH} -L/usr/lib" >> "$GITHUB_ENV"
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
+      run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ file libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
        libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev # <-- Python-related stuff on this line
 
     - name: Restore Compiled Python from Cache - Linux
@@ -162,13 +184,32 @@ jobs:
         command: yarn install --ignore-engines
         on_retry_command: rm -R node_modules
 
-    - name: Rebuild Pulsar Dependencies for Electron
+    - name: Rebuild Pulsar Dependencies for Electron (non-Linux)
+      if: ${{ runner.os != 'Linux' }}
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
         command: yarn build
+
+    - name: Rebuild Pulsar Dependencies for Electron (Linux)
+      if: ${{ runner.os == 'Linux' }}
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
+      env:
+        CC: ${{ env.PULSAR_CC }}
+        CXX: ${{ env.PULSAR_CXX }}
+        CFLAGS: ${{ env.PULSAR_CFLAGS }}
+        CXXFLAGS: ${{ env.PULSAR_CXXFLAGS }}
+        LDFLAGS: ${{ env.PULSAR_LDFLAGS }}
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: |
+          echo "libx11.so lives at:"
+          dpkg -L libx11-6 | grep '\.so'
+          yarn build
 
     - name: Build ppm
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
@@ -313,7 +354,7 @@ jobs:
     steps:
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
+      run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ file libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
 
     - name: Checkout the latest code
       uses: actions/checkout@v6
