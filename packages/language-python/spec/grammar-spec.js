@@ -5,6 +5,7 @@ const GRAMMAR_TEST_FILES = [
   "syntax_test_python_functions.py",
   "syntax_test_python_lambdas.py",
   "syntax_test_python_typing.py",
+  "syntax_test_python_strings.py",
 ];
 
 describe("Grammar tests", () => {

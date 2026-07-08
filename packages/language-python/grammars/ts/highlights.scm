@@ -193,21 +193,21 @@
 ; name unless someone requests that feature.
 
 ((string) @string.quoted.triple.block.format.python
-  (#match? @string.quoted.triple.block.format.python "^[fFrR]+\"\"\"")
+  (#match? @string.quoted.triple.block.format.python "^[fFtTrR]+\"\"\"")
   (#set! capture.final))
 
 ((string) @string.quoted.triple.block.python
   (#match? @string.quoted.triple.block.python "^[bBrRuU]*\"\"\""))
 
 ((string) @string.quoted.double.single-line.format.python
-  (#match? @string.quoted.double.single-line.format.python "^[fFrR]+\"")
+  (#match? @string.quoted.double.single-line.format.python "^[fFtTrR]+\"")
   (#set! capture.final))
 
 ((string) @string.quoted.double.single-line.python
   (#match? @string.quoted.double.single-line.python "^[bBrRuU]*\"(?!\")"))
 
 ((string) @string.quoted.single.single-line.format.python
-  (#match? @string.quoted.single.single-line.format.python "^[fFrR]+?\'")
+  (#match? @string.quoted.single.single-line.format.python "^[fFtTrR]+?\'")
   (#set! capture.final))
 
 ((string) @string.quoted.single.single-line.python
@@ -228,8 +228,8 @@
   (#is? test.last true))
 
 (string (string_start) @storage.type.string.python
-  (#match? @storage.type.string.python "^[bBfFrRuU]+")
-  (#set! adjust.endAfterFirstMatchOf "^[bBfFrRuU]+"))
+  (#match? @storage.type.string.python "^[bBfFtTrRuU]+")
+  (#set! adjust.endAfterFirstMatchOf "^[bBfFtTrRuU]+"))
 
 
 ; CONSTANTS
@@ -279,7 +279,7 @@
   "try"
 ] @keyword.control.exception._TYPE_.python
 
-("except*" @keyword.control.exception.group-clause.python)
+(except_clause "*" @keyword.control.exception.group-clause.python)
 
 [
   "global"

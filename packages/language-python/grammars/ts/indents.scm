@@ -180,6 +180,12 @@
 ; All this also applies to `elif`.
 ((identifier) @dedent (#match? @dedent "^(elif|else)$"))
 
+; As of tree-sitter-python 0.25, a mis-indented `elif`/`else` (before it's
+; recognized as a proper clause) parses as an `ERROR` node rather than an
+; identifier, so we match that case too. The same spurious-dedent caveat as
+; above applies (e.g. while typing `elsewhere`), which we're OK with.
+((ERROR) @dedent (#match? @dedent "^(elif|else)$"))
+
 ; Likewise, typing `case` at the beginning of a line within a match block — in
 ; cases where it's interpreted as an identifier — strongly suggests that we
 ; should dedent one level so it's properly recognized as a new `case` keyword.
