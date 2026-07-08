@@ -24,7 +24,7 @@
 # If you're having trouble with your keybindings not working, try the
 # Keybinding Resolver: `Cmd+.` on macOS and `Ctrl+.` on other platforms. See the
 # Debugging Guide for more information:
-# * https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#check-your-keybindings
+# * https://docs.pulsar-edit.dev/troubleshooting-pulsar/checking-your-keybindings/
 #
 # This file uses CoffeeScript Object Notation (CSON).
 # If you are unfamiliar with CSON, you can read more about it in the
