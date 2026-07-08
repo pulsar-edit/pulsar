@@ -10,10 +10,14 @@ module.exports = class ApplicationDelegate {
     this._ipcMessageEmitter = null;
   }
 
+  async getStateKey (projectPaths, options) {
+    return await ipcHelpers.call('get-state-key', projectPaths, options);
+  }
+
   ipcMessageEmitter() {
     if (!this._ipcMessageEmitter) {
       this._ipcMessageEmitter = new Emitter();
-      ipcRenderer.on('message', (event, message, detail) => {
+      ipcRenderer.on('message', (_, message, detail) => {
         this._ipcMessageEmitter.emit(message, detail);
       });
     }
@@ -34,7 +38,7 @@ module.exports = class ApplicationDelegate {
 
   pickFolder(callback) {
     const responseChannel = 'atom-pick-folder-response';
-    ipcRenderer.on(responseChannel, function (event, path) {
+    ipcRenderer.on(responseChannel, function (_, path) {
       ipcRenderer.removeAllListeners(responseChannel);
       return callback(path);
     });

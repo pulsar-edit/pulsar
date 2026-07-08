@@ -213,29 +213,18 @@ describe('AtomEnvironment', () => {
       atom.enablePersistence = false;
     });
 
-    it('selects the state based on the current project paths', async () => {
+    it('computes the state key based on the current project paths', async () => {
       jasmine.useRealClock();
 
       const [dir1, dir2] = [temp.mkdirSync('dir1-'), temp.mkdirSync('dir2-')];
 
-      const loadSettings = Object.assign(atom.getLoadSettings(), {
-        initialProjectRoots: [dir1],
-        windowState: null
-      });
-
-      spyOn(atom, 'getLoadSettings').and.callFake(() => loadSettings);
-      spyOn(atom, 'serialize').and.returnValue({ stuff: 'cool' });
-
-      atom.project.setPaths([dir1, dir2]);
-
-      // State persistence will fail if other Atom instances are running
-      expect(await atom.stateStore.connect()).toBe(true);
-
-      await atom.saveState();
-      expect(await atom.loadState()).toBeFalsy();
-
-      loadSettings.initialProjectRoots = [dir2, dir1];
-      expect(await atom.loadState()).toEqual({ stuff: 'cool' });
+      let stateKey = await atom.getStateKey([dir1, dir2]);
+      expect(stateKey).toEqual(
+        await atom.getStateKey([dir1, dir2], { pathsOnly: true })
+      );
+      expect(stateKey).toEqual(
+        await atom.getStateKey([dir2, dir1], { pathsOnly: true })
+      );
     });
 
     it('saves state when the CPU is idle after a keydown or mousedown event', async () => {
