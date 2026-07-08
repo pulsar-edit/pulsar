@@ -985,7 +985,9 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`);
     }
 
     if (typeof minimatch === "undefined" || minimatch === null) {
-      minimatch = require("minimatch");
+      // `minimatch` v10 exports a namespace object rather than the function
+      // itself; the matcher is now a named export.
+      minimatch = require("minimatch").minimatch;
     }
     const fileName = path.basename((left = this.buffer.getPath()) != null ? left : "");
     for (let i = 0; i < this.fileBlacklist.length; i++) {

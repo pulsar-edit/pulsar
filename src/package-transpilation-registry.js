@@ -7,7 +7,7 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 
-const minimatch = require("minimatch");
+const { minimatch } = require("minimatch");
 
 let Resolve = null;
 

@@ -11,7 +11,7 @@
 // into a set of excluded paths.
 
 const nsfw = require("nsfw");
-const minimatch = require("minimatch");
+const { minimatch } = require("minimatch");
 const { fdir } = require("fdir");
 const path = require("path");
 
