@@ -1,0 +1,11 @@
+{
+  "name": "language-diff",
+  "version": "0.1.0",
+  "description": "Diff and patch file support in Atom",
+  "engines": {
+    "atom": "*",
+    "node": "*"
+  },
+  "repository": "https://github.com/lumine-code/lumine",
+  "license": "MIT"
+}

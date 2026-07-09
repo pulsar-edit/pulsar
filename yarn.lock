@@ -5817,6 +5817,9 @@ klaw@^3.0.0:
 "language-css@file:packages/language-css":
   version "0.45.4"
 
+"language-diff@file:packages/language-diff":
+  version "0.1.0"
+
 "language-gfm@file:packages/language-gfm":
   version "0.90.8"
 

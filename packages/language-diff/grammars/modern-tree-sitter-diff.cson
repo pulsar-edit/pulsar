@@ -1,0 +1,18 @@
+name: 'Diff'
+scopeName: 'source.diff'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-diff'
+
+injectionRegex: '^(diff|patch)$'
+
+treeSitter:
+  parserSource: 'github:tree-sitter-grammars/tree-sitter-diff#2520c3f934b3179bb540d23e0ef45f75304b5fed'
+  grammar: 'tree-sitter-diff/tree-sitter-diff.wasm'
+  highlightsQuery: 'tree-sitter-diff/highlights.scm'
+
+fileTypes: [
+  'diff'
+  'patch'
+]
+
+firstLineMatch: '^(diff --git |Index: |--- |\\*\\*\\* |@@ )'
