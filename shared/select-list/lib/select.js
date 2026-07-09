@@ -2,75 +2,9 @@
 
 const { Disposable, CompositeDisposable, TextEditor } = require("atom");
 const etch = require("etch");
-const { removeDiacritics } = require("./helpers");
+const Diacritics = require("diacritic");
 const $ = etch.dom;
 
-/**
- * Fuzzy-searchable select list component exported as `atom.ui.selectList`.
- *
- * Consumers should access this through `atom.ui.selectList`, not by requiring
- * this file directly.
- *
- * @module ui/select-list
- */
-
-/**
- * Options passed to `elementForItem`.
- *
- * @typedef {Object} SelectListItemOptions
- * @property {boolean} selected Whether the item is currently selected.
- * @property {number} index The item's visible index.
- * @property {string|null} filterKey Text used for filtering, when available.
- * @property {number[]|null} matchIndices Lazily computed matched character indices.
- */
-
-/**
- * @callback SelectListElementForItem
- * @param {*} item
- * @param {SelectListItemOptions} options
- * @returns {HTMLElement|Object} An `<li>` element, or data accepted by `createTwoLineItem`.
- */
-
-/**
- * @typedef {Object} SelectListProps
- * @property {*[]} [items=[]] Items displayed by the select list.
- * @property {SelectListElementForItem} elementForItem Creates the visible element for an item.
- * @property {string} [className] Space-separated class names added to the root element.
- * @property {number} [maxResults] Maximum number of visible results.
- * @property {Function} [filter] Custom `(items, query) => items` filter.
- * @property {Function} [filterKeyForItem] Returns the string used to filter an item.
- * @property {Function} [filterQuery] Transforms the query before filtering.
- * @property {boolean} [removeDiacritics] Removes accents from query and item text before matching.
- * @property {Function} [filterScoreModifier] Custom `(score, item) => score` ranking adjustment.
- * @property {string} [algorithm] Fuzzy algorithm, usually `"fuzzaldrin"` or `"command-t"`.
- * @property {number} [numThreads] Worker thread count passed to the fuzzy matcher.
- * @property {number} [maxGap] Maximum character gap for `"command-t"` matching.
- * @property {string} [query] Query text to set during update.
- * @property {boolean} [selectQuery] Whether to select the query editor contents during update.
- * @property {Function} [order] Custom result sort function.
- * @property {string} [emptyMessage] Message shown when there are no items.
- * @property {string} [errorMessage] Error message shown above results.
- * @property {string} [infoMessage] Informational message shown above results.
- * @property {string} [helpMessage] HTML help content toggled by `select-list:help`.
- * @property {string} [helpMarkdown] Markdown help content toggled by `select-list:help`.
- * @property {string} [loadingMessage] Loading message shown instead of empty state.
- * @property {boolean} [loadingSpinner] Whether to show a tiny loading spinner.
- * @property {string|number} [loadingBadge] Badge displayed next to the loading message.
- * @property {string[]} [itemsClassList] Additional class names for the list element.
- * @property {number} [initialSelectionIndex=0] Initially selected visible item index.
- * @property {string} [placeholderText] Query editor placeholder text.
- * @property {boolean} [skipCommandsRegistration] Skips built-in keyboard commands.
- * @property {Function} [didChangeQuery] Called after query changes.
- * @property {Function} [didChangeSelection] Called after selection changes.
- * @property {Function} [didConfirmSelection] Called when the selected item is confirmed.
- * @property {Function} [didConfirmEmptySelection] Called when confirm occurs with no selection.
- * @property {Function} [didCancelSelection] Called on cancel or focus loss.
- * @property {Function} [willShow] Called before the internal panel is shown.
- */
-
-/**
- * Fuzzy-searchable select list view.
- */
 class SelectListView {
   static schedulerInitialized = false;
 
@@ -90,9 +24,6 @@ class SelectListView {
     }
   }
 
-  /**
-   * @param {SelectListProps} props
-   */
   constructor(props) {
     SelectListView.initializeScheduler();
     this.props = props;
@@ -679,7 +610,7 @@ class SelectListView {
     for (const item of this.props.items) {
       let filterKey = this.props.filterKeyForItem ? this.props.filterKeyForItem(item) : item;
       if (this.props.removeDiacritics) {
-        filterKey = removeDiacritics(filterKey);
+        filterKey = Diacritics.clean(filterKey);
       }
       this.candidates.push(filterKey);
       this.itemByIndex.push(item);
@@ -696,7 +627,7 @@ class SelectListView {
       return items;
     }
     if (this.props.removeDiacritics) {
-      query = removeDiacritics(query);
+      query = Diacritics.clean(query);
       this.processedQuery = query;
     }
     const matchOptions = {
@@ -746,7 +677,7 @@ class SelectListView {
     if (this.props.filterKeyForItem) {
       filterKey = this.props.filterKeyForItem(item);
       if (this.props.removeDiacritics) {
-        filterKey = removeDiacritics(filterKey);
+        filterKey = Diacritics.clean(filterKey);
       }
       return filterKey;
     }
@@ -1006,7 +937,7 @@ class ListItemView {
 }
 
 /**
- * Computes fuzzy match indices for text against a query.
+ * Computes fuzzy match indices for a text against a query.
  * @param {string} text - The text to match against
  * @param {string} query - The query to match
  * @param {Object} [options] - Optional settings
@@ -1020,8 +951,8 @@ function getMatchIndices(text, query, options = {}) {
   let processedQuery = query;
 
   if (options.removeDiacritics) {
-    processedText = removeDiacritics(processedText);
-    processedQuery = removeDiacritics(processedQuery);
+    processedText = Diacritics.clean(processedText);
+    processedQuery = Diacritics.clean(processedQuery);
   }
 
   const result = atom.ui.fuzzyMatcher.match(processedText, processedQuery, {
@@ -1031,15 +962,6 @@ function getMatchIndices(text, query, options = {}) {
   return result?.matchIndexes ?? null;
 }
 
-/**
- * Creates a document fragment with matched characters wrapped in spans.
- *
- * @param {string} text
- * @param {number[]|null} matchIndices
- * @param {Object} [options]
- * @param {string} [options.className="character-match"]
- * @returns {DocumentFragment}
- */
 function highlightMatches(text, matchIndices, options = {}) {
   const { className = "character-match" } = options;
   const fragment = document.createDocumentFragment();
@@ -1131,9 +1053,9 @@ function createTwoLineItem({ primary, secondary, icon }) {
   return li;
 }
 
-module.exports ={
-  SelectListView,
-  getMatchIndices,
-  highlightMatches,
-  createTwoLineItem,
-}
+module.exports = SelectListView;
+module.exports.SelectListView = SelectListView;
+module.exports.removeDiacritics = Diacritics.clean;
+module.exports.getMatchIndices = getMatchIndices;
+module.exports.highlightMatches = highlightMatches;
+module.exports.createTwoLineItem = createTwoLineItem;

@@ -1,0 +1,24 @@
+{
+  "name": "select-list",
+  "description": "A general-purpose select list for use in Pulsar packages",
+  "keywords": [
+    "pulsar",
+    "atom",
+    "select",
+    "list",
+    "fuzzy",
+    "filter",
+    "ui"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lumine-code/lumine.git"
+  },
+  "version": "1.6.3",
+  "license": "MIT",
+  "main": "lib/select.js",
+  "dependencies": {
+    "diacritic": "^0.0.2",
+    "etch": "^0.14.0"
+  }
+}
