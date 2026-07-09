@@ -1660,7 +1660,7 @@
     unbzip2-stream "^1.4.3"
     yauzl "^3.2.0"
 
-"@pulsar-edit/pathwatcher@9.0.3", "@pulsar-edit/pathwatcher@^9.0.2":
+"@pulsar-edit/pathwatcher@9.0.3", "@pulsar-edit/pathwatcher@^9.0.2", "@pulsar-edit/pathwatcher@^9.0.3":
   version "9.0.3"
   resolved "https://registry.yarnpkg.com/@pulsar-edit/pathwatcher/-/pathwatcher-9.0.3.tgz#13dcbdbf4115904bfdf76509580612cf09e8043c"
   integrity sha512-S8QwhsUf/x617g6FEuPixdu1c3Mt4kzZsGaTrbogkaCJuY1mMAEkqkp6zEp4MM+UfWFruRszAOkdZYbI5gWW9Q==
@@ -1685,29 +1685,25 @@
     split "^1.0.0"
     temp "^0.8.3"
 
-"@pulsar-edit/superstring@3.0.5", "@pulsar-edit/superstring@^3.0.4", "@pulsar-edit/superstring@^3.0.5":
+"@pulsar-edit/superstring@https://github.com/lumine-code/superstring.git#569946b":
   version "3.0.5"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/superstring/-/superstring-3.0.5.tgz#20e547a06a0692741f38f67e6522e2c68ed6d776"
-  integrity sha512-J92AD7eq7INlwpU6arJj5QBfbTBdW/c81hrmrG36hiubKkx+43NDT9y4+YR4n9SgAyMGuzLU/I9OX3n57njRog==
+  resolved "https://github.com/lumine-code/superstring.git#569946b85f225bed5a1cf7c4d05ba6ff23b4406a"
   dependencies:
     node-addon-api "^8.5.0"
 
-"@pulsar-edit/text-buffer@^14.0.4":
-  version "14.0.4"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/text-buffer/-/text-buffer-14.0.4.tgz#9bf03445ab8da000c9c986255654acf04433e6bb"
-  integrity sha512-KiC/uA7zdnoI2pI3AyoYYXAdL5h6LyHURHl/URxkViQPjGeFXr3vRr6cb9OxsS1NRM4fVFtEdHFG8T7aafDdUQ==
+"@pulsar-edit/text-buffer@https://github.com/lumine-code/text-buffer.git#9e661b0":
+  version "15.0.0"
+  resolved "https://github.com/lumine-code/text-buffer.git#9e661b02fb3a42d0137c4a1d4ff10275ba5a0a7e"
   dependencies:
-    "@pulsar-edit/pathwatcher" "^9.0.2"
-    "@pulsar-edit/superstring" "^3.0.4"
+    "@pulsar-edit/pathwatcher" "^9.0.3"
+    "@pulsar-edit/superstring" "https://github.com/lumine-code/superstring.git#569946b"
     delegato "^1.0.0"
     diff "^2.2.1"
-    emissary "^1.0.0"
     event-kit "^2.4.0"
     fs-admin "^0.19.0"
     fs-plus "^3.0.0"
     grim "^2.0.2"
     mkdirp "^0.5.1"
-    serializable "^1.0.3"
     underscore-plus "^1.0.0"
     winattr "^3.0.0"
 
@@ -3715,7 +3711,7 @@ electron@43.1.0:
     "@electron/get" "^5.0.0"
     "@types/node" "^24.9.0"
 
-emissary@^1.0.0, emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
+emissary@^1.2.0, emissary@^1.3.2, emissary@^1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/emissary/-/emissary-1.3.3.tgz#a618d92d682b232d31111dc3625a5df661799606"
   integrity sha512-pD6FWNBSlEOzSJDCTcSGVLgNnGw5fnCvvGMdQ/TN43efeXZ/QTq8+hZoK3OOEXPRNjMmSJmeOnEJh+bWT5O8rQ==
@@ -4643,11 +4639,6 @@ get-intrinsic@^1.2.4, get-intrinsic@^1.2.5, get-intrinsic@^1.2.6, get-intrinsic@
     has-symbols "^1.1.0"
     hasown "^2.0.2"
     math-intrinsics "^1.1.0"
-
-get-parameter-names@~0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/get-parameter-names/-/get-parameter-names-0.2.0.tgz#a2163ad092e350d94bee2958974fcece1bc53c99"
-  integrity sha512-QgxVvmXNqxCDYMwK8zwM5B0AMoLUGQ9MBw202kELskDTDEIveOwP6zR38F3XLA3v+rsuv6+DtCXjW0AEPE9+4Q==
 
 get-proto@^1.0.1:
   version "1.0.1"
@@ -7456,7 +7447,7 @@ readdirp@~3.6.0:
 "recent-list@file:packages/recent-list":
   version "1.0.3"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.3-5ba0b8c5-038d-4871-8bb9-fee9090f67e6-1783605362648/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.3-76a64776-6575-4ba8-a73d-eb956d1d30e1-1783621565805/shared/select-list"
 
 reduce-flatten@^1.0.1:
   version "1.0.1"
@@ -7823,15 +7814,6 @@ semver@^7.5.4, semver@^7.6.3, semver@^7.8.5:
   version "7.8.5"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.8.5.tgz#39b646037dd50c14fb451e7e4cac58ed8b863f69"
   integrity sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==
-
-serializable@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/serializable/-/serializable-1.0.3.tgz#0a5a8b6b7777cb24544df11a6f889a6d2b3e1189"
-  integrity sha512-x4C87GbC+fSbj1NlmZrKW4tDN+sZodzTZNxELEH4iwXzg4xirHBQOIOpPatmksXkes07ZebIRpo6+UVS0rvwsw==
-  dependencies:
-    get-parameter-names "~0.2.0"
-    mixto "1.x"
-    underscore-plus "1.x"
 
 service-hub@^0.7.4:
   version "0.7.4"
