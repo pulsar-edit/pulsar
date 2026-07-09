@@ -57,7 +57,7 @@ module.exports = class AboutView extends EtchComponent {
           $.h1({ className: "about-title" }, `${atom.branding.name}`),
           $.div(
             { className: "about-subtitle" },
-            "A Community-led Hyper-Hackable Text Editor. Fork of Atom/Pulsar.",
+            "A modern, extensible editor built on the Pulsar and Atom legacy.",
           ),
           $.div(
             { className: "about-header-info" },
