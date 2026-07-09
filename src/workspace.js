@@ -1,5 +1,4 @@
 const _ = require("underscore-plus");
-const url = require("url");
 const path = require("path");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
 const fs = require("fs-plus");
@@ -74,6 +73,14 @@ function normalizePattern(rawPath) {
   // change in behavior, so for now we're going with this as a compromise.
   let prefix = rawPath.includes("/") ? "" : "**/";
   return `${negation}${prefix}${rawPath}`;
+}
+
+function protocolForURI(uri) {
+  try {
+    return new URL(uri).protocol;
+  } catch {
+    return null;
+  }
 }
 
 // Given a path pattern like `foo/bar/baz` and a list of the current root path
@@ -1216,8 +1223,7 @@ module.exports = class Workspace extends Model {
 
       // Avoid adding URLs as recent documents to work-around this Spotlight crash:
       // https://github.com/atom/atom/issues/10071
-      // eslint-disable-next-line n/no-deprecated-api -- url.parse tolerates loose/relative input and exposes slashes/auth; URL migration needs review
-      if (uri && (!url.parse(uri).protocol || process.platform === "win32")) {
+      if (uri && (!protocolForURI(uri) || process.platform === "win32")) {
         this.applicationDelegate.addRecentDocument(uri);
       }
 

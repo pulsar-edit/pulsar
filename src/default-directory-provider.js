@@ -1,7 +1,14 @@
 const { Directory } = require("@pulsar-edit/pathwatcher");
 const fs = require("fs-plus");
 const path = require("path");
-const url = require("url");
+
+function hostForURI(uri) {
+  try {
+    return new URL(uri).host;
+  } catch {
+    return null;
+  }
+}
 
 module.exports = class DefaultDirectoryProvider {
   // Public: Create a Directory that corresponds to the specified URI.
@@ -14,8 +21,7 @@ module.exports = class DefaultDirectoryProvider {
   // * `null` if the given URI is not compatible with this provider.
   directoryForURISync(uri) {
     const normalizedPath = this.normalizePath(uri);
-    // eslint-disable-next-line n/no-deprecated-api -- url.parse tolerates loose/relative input and exposes slashes/auth; URL migration needs review
-    const { host } = url.parse(uri);
+    const host = hostForURI(uri);
     let directoryPath;
     if (host) {
       directoryPath = uri;

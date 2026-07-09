@@ -69,6 +69,7 @@ describe("PaneContainer", () => {
 
     describe("if there are empty panes after deserialization", () => {
       beforeEach(() => {
+        spyOn(console, "warn");
         pane3A.getItems()[0].serialize = () => ({ deserializer: "Bogus" });
       });
 
