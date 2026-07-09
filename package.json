@@ -70,6 +70,7 @@
     "dedent": "^0.7.0",
     "deprecation-cop": "file:packages/deprecation-cop",
     "dev-live-reload": "file:packages/dev-live-reload",
+    "diacritic": "^0.0.2",
     "document-register-element": "https://github.com/pulsar-edit/document-register-element.git#4db07dd",
     "dompurify": "^3.0.6",
     "encoding-selector": "file:packages/encoding-selector",

@@ -45,7 +45,7 @@ const TextBuffer = require("@pulsar-edit/text-buffer");
 const TextEditorRegistry = require("./text-editor-registry");
 const StartupTime = require("./startup-time");
 const { getReleaseChannel } = require("./get-app-details.js");
-const UI = require("./ui.js");
+const UI = require("./ui/index.js");
 const packagejson = require("../package.json");
 
 const { closeAllWatchers } = require("@pulsar-edit/pathwatcher");
