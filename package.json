@@ -301,6 +301,7 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "test:editor": "yarn test:only spec",
+    "test:pkgs": "yarn test:only packages",
     "test:only": "yarn start --test"
   },
   "devDependencies": {
