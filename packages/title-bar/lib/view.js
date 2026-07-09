@@ -44,13 +44,8 @@ class TitleBarView {
     this.configState = configState;
     this.themeManager = new ThemeManager(this);
     this.contextMenuInterceptor = new ContextMenuInterceptor(configState);
-    [
-      this.element,
-      this.titleElement,
-      this.windowControls,
-      this.appIcon,
-      this.controlTilesElement,
-    ] = this.createElement();
+    [this.element, this.titleElement, this.windowControls, this.appIcon, this.controlTilesElement] =
+      this.createElement();
     this.controlTiles = new ControlTiles(this.controlTilesElement);
     this.titleBarVisible = true;
     this.menuBarVisible = true;
@@ -376,10 +371,7 @@ class TitleBarView {
     }
 
     if (process.platform === "darwin") {
-      const action = atom.applicationDelegate?.getUserDefault(
-        "AppleActionOnDoubleClick",
-        "string",
-      );
+      const action = atom.applicationDelegate?.getUserDefault("AppleActionOnDoubleClick", "string");
 
       if (action === "Minimize") {
         atom.applicationDelegate.minimizeWindow();
@@ -478,6 +470,13 @@ class TitleBarView {
 
     if (svg !== undefined) {
       this.appIcon.innerHTML = svg;
+      const svgElement = this.appIcon.querySelector("svg");
+      if (svgElement) {
+        svgElement.setAttribute("width", "24");
+        svgElement.setAttribute("height", "24");
+        svgElement.setAttribute("aria-hidden", "true");
+        svgElement.setAttribute("focusable", "false");
+      }
       this.appIcon.style.display = svg ? "" : "none";
     }
   }
