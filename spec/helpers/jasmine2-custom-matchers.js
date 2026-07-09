@@ -456,6 +456,33 @@ exports.register = (jasmineEnv) => {
         };
       },
 
+      // Legacy jasmine 1.x matcher: the inverse of `toEqual`.
+      toNotEqual: function (util, customEqualityTesters) {
+        return {
+          compare: function (actual, expected) {
+            return {
+              pass: !util.equals(actual, expected, customEqualityTesters),
+              message: `Expected ${actual} not to equal ${expected}`,
+            };
+          },
+        };
+      },
+
+      // Passes when `actual` is an array containing every element of `expected`.
+      toContainAll: function (util, customEqualityTesters) {
+        return {
+          compare: function (actual, expected) {
+            const pass =
+              Array.isArray(actual) &&
+              expected.every((el) => util.contains(actual, el, customEqualityTesters));
+            return {
+              pass,
+              message: `Expected ${JSON.stringify(actual)} to contain all of ${JSON.stringify(expected)}`,
+            };
+          },
+        };
+      },
+
       // `toSatisfy(predicate)` calls `predicate(actual, reason)`; the predicate
       // returns whether the assertion passes and may call `reason(message)` to
       // supply the failure message.

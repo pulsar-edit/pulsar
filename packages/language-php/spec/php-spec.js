@@ -8,13 +8,6 @@ describe("PHP grammar", function () {
 
     runs(function () {
       grammar = atom.grammars.grammarForScopeName("source.php");
-      this.addMatchers({
-        toContainAll(arr) {
-          return arr.every((el) => {
-            return this.actual.includes(el);
-          });
-        },
-      });
     });
   });
 
