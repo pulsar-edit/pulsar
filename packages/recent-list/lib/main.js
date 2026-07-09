@@ -1,4 +1,5 @@
 const { Disposable, CompositeDisposable } = require("atom");
+const { SelectListView, highlightMatches, removeDiacritics } = require("select-list");
 const path = require("path");
 const fs = require("fs");
 
@@ -6,7 +7,7 @@ class RecentList {
   constructor() {
     this.items = [];
     this.restart = true;
-    this.selectList = new atom.ui.selectList.SelectListView({
+    this.selectList = new SelectListView({
       className: "recent-list",
       maxResults: 50,
       emptyMessage: "No matches found",
@@ -110,7 +111,7 @@ class RecentList {
             );
           }),
           texts: project.paths.map((ppath) => {
-            return atom.ui.removeDiacritics(
+            return removeDiacritics(
               ppath
                 .replace(/[\\/]+$/, "")
                 .split(/[\\/]/g)
@@ -125,7 +126,7 @@ class RecentList {
   }
 
   filter(items, query) {
-    query = atom.ui.removeDiacritics(query);
+    query = removeDiacritics(query);
     if (query.length === 0) {
       return items;
     }
@@ -170,7 +171,7 @@ class RecentList {
         line.classList.add("icon-line");
       }
       if (i === item.ibest && indices.length > 0) {
-        line.appendChild(atom.ui.selectList.highlightMatches(item.paths[i], indices));
+        line.appendChild(highlightMatches(item.paths[i], indices));
       } else {
         line.textContent = item.paths[i];
       }

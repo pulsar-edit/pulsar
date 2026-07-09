@@ -8,6 +8,9 @@
     "atom": ">=1.132.2 <2.0.0"
   },
   "main": "./lib/main",
+  "dependencies": {
+    "select-list": "file:../../shared/select-list"
+  },
   "providedServices": {
     "recent-list": {
       "description": "Provides access to the recent projects list manager",
