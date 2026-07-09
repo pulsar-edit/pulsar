@@ -15,4 +15,4 @@ fileTypes: [
   'patch'
 ]
 
-firstLineMatch: '^(diff --git |Index: |--- |\\*\\*\\* |@@ )'
+firstLineRegex: '^(diff --git |Index: |--- |\\*\\*\\* |@@ )'
