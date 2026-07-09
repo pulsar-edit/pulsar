@@ -27,6 +27,14 @@ describe("Title Bar package", () => {
     expect(logo.getAttribute("height")).toBe("24");
   });
 
+  it("uses the Lumine filled logo", () => {
+    atom.config.set("title-bar.logoStyle", "Filled");
+    const logo = workspaceElement.querySelector(".title-bar .app-icon svg");
+
+    expect(logo.innerHTML).toContain("title-bar-lumine-gold-gradient");
+    expect(logo.innerHTML).not.toContain("#662d91");
+  });
+
   it("removes the title bar on deactivate", () => {
     waitsForPromise(() => Promise.resolve(atom.packages.deactivatePackage("title-bar")));
 
