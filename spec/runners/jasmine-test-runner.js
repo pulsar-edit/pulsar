@@ -48,6 +48,7 @@ module.exports = function ({ logFile, headless, testPaths, buildAtomEnvironment 
   require("../helpers/attach-to-dom");
   require("../helpers/deprecation-snapshots");
   require("../helpers/platform-filter");
+  installCustomElementsDefineRetryCompatibility();
 
   const jasmineContent = document.createElement("div");
   jasmineContent.setAttribute("id", "jasmine-content");
@@ -74,6 +75,7 @@ module.exports = function ({ logFile, headless, testPaths, buildAtomEnvironment 
 
       // Force-delete the current env - this way Jasmine will reset and we'll be able to re-run failed specs only. The next time the code calls getEnv(), it'll generate a new environment
       resetJasmineEnv();
+      window.__jasmineRetryingFailures = true;
 
       // As all the jasmine helpers (it, describe, etc..) were registered to the previous environment, we need to re-set them on window
       defineJasmineHelpersOnWindow(jasmine.getEnv());
@@ -315,6 +317,25 @@ const setupLegacyAsyncCompatibility = () => {
   global.waits = window.waits;
   global.waitsFor = window.waitsFor;
   global.waitsForPromise = window.waitsForPromise;
+};
+
+const installCustomElementsDefineRetryCompatibility = () => {
+  if (window.customElements == null || window.customElements.__retryDefineCompatibility) {
+    return;
+  }
+
+  const originalDefine = window.customElements.define.bind(window.customElements);
+  window.customElements.define = (name, constructor, options) => {
+    if (window.__jasmineRetryingFailures && window.customElements.get(name) != null) {
+      return;
+    }
+
+    return originalDefine(name, constructor, options);
+  };
+
+  Object.defineProperty(window.customElements, "__retryDefineCompatibility", {
+    value: true,
+  });
 };
 
 const runWithLegacyAsyncQueue = (fn) => {

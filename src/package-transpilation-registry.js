@@ -21,19 +21,21 @@ class PackageTranspilationRegistry {
   }
 
   addTranspilerConfigForPath(packagePath, packageName, packageMeta, config) {
-    this.configByPackagePath[packagePath] = {
+    const normalizedPackagePath = normalizeFilePath(packagePath);
+    this.configByPackagePath[normalizedPackagePath] = {
       name: packageName,
       meta: packageMeta,
-      path: packagePath,
+      path: normalizedPackagePath,
       specs: config.map((spec) => Object.assign({}, spec)),
     };
   }
 
   removeTranspilerConfigForPath(packagePath) {
-    delete this.configByPackagePath[packagePath];
-    const packagePathWithSep = packagePath.endsWith(path.sep)
-      ? path.join(packagePath)
-      : path.join(packagePath) + path.sep;
+    const normalizedPackagePath = normalizeFilePath(packagePath);
+    delete this.configByPackagePath[normalizedPackagePath];
+    const packagePathWithSep = normalizedPackagePath.endsWith(path.sep)
+      ? path.join(normalizedPackagePath)
+      : path.join(normalizedPackagePath) + path.sep;
     Object.keys(this.specByFilePath).forEach((filePath) => {
       if (path.join(filePath).startsWith(packagePathWithSep)) {
         delete this.specByFilePath[filePath];
@@ -79,9 +81,12 @@ class PackageTranspilationRegistry {
   }
 
   getPackageTranspilerSpecForFilePath(filePath) {
-    if (this.specByFilePath[filePath] !== undefined) return this.specByFilePath[filePath];
+    const normalizedFilePath = normalizeFilePath(filePath);
+    if (this.specByFilePath[normalizedFilePath] !== undefined) {
+      return this.specByFilePath[normalizedFilePath];
+    }
 
-    let thisPath = filePath;
+    let thisPath = normalizedFilePath;
     let lastPath = null;
     // Iterate parents from the file path to the root, checking at each level
     // to see if a package manages transpilation for that directory.
@@ -91,18 +96,19 @@ class PackageTranspilationRegistry {
       // until we reach the root
       let config = this.configByPackagePath[thisPath];
       if (config) {
-        const relativePath = path.relative(thisPath, filePath);
+        const relativePath = path.relative(thisPath, normalizedFilePath);
         if (
           relativePath.startsWith(`node_modules${path.sep}`) ||
           relativePath.indexOf(`${path.sep}node_modules${path.sep}`) > -1
         ) {
           return false;
         }
+        const globPath = normalizeGlobPath(relativePath);
         for (let i = 0; i < config.specs.length; i++) {
           const spec = config.specs[i];
-          if (minimatch(filePath, path.join(config.path, spec.glob))) {
+          if (minimatch(globPath, normalizeGlobPath(spec.glob))) {
             spec._config = config;
-            this.specByFilePath[filePath] = spec;
+            this.specByFilePath[normalizedFilePath] = spec;
             return spec;
           }
         }
@@ -112,7 +118,7 @@ class PackageTranspilationRegistry {
       thisPath = path.join(thisPath, "..");
     }
 
-    this.specByFilePath[filePath] = null;
+    this.specByFilePath[normalizedFilePath] = null;
     return null;
   }
 
@@ -191,5 +197,8 @@ class PackageTranspilationRegistry {
     }
   }
 }
+
+const normalizeFilePath = (filePath) => path.normalize(filePath);
+const normalizeGlobPath = (filePath) => filePath.replace(/\\/g, "/");
 
 module.exports = PackageTranspilationRegistry;

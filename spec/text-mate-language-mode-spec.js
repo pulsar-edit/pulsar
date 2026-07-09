@@ -483,6 +483,8 @@ describe("TextMateLanguageMode", () => {
         languageMode.destroy();
         buffer.release();
       });
+
+      xit("has no active assertions");
     });
 
     describe("when tokenization completes", () => {
