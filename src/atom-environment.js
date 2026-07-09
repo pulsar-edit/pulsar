@@ -1060,7 +1060,7 @@ class AtomEnvironment {
     };
   }
 
-  async prepareToUnloadEditorWindow() {
+  async prepareToUnloadEditorWindow(options = {}) {
     try {
       await this.saveState({ isUnloading: true });
     } catch (error) {
@@ -1076,7 +1076,9 @@ class AtomEnvironment {
 
     if (closing) {
       this.unloading = true;
-      await this.packages.deactivatePackages();
+      if (options.deactivatePackages !== false) {
+        await this.packages.deactivatePackages();
+      }
     }
     return closing;
   }

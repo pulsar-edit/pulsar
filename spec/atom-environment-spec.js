@@ -310,6 +310,33 @@ describe("AtomEnvironment", () => {
       atomEnv.destroy();
     });
 
+    it("does not wait for package deactivation when preparing to reload", async () => {
+      const atomEnv = new AtomEnvironment({
+        applicationDelegate: global.atom.applicationDelegate,
+      });
+      atomEnv.initialize({
+        window: {
+          requestIdleCallback() {},
+          addEventListener() {},
+          removeEventListener() {},
+        },
+        document: document.implementation.createHTMLDocument(),
+      });
+
+      spyOn(atomEnv, "saveState");
+      spyOn(atomEnv.packages, "deactivatePackages").and.returnValue(new Promise(() => {}));
+
+      const shouldUnload = await atomEnv.prepareToUnloadEditorWindow({
+        deactivatePackages: false,
+      });
+
+      expect(shouldUnload).toBe(true);
+      expect(atomEnv.saveState).toHaveBeenCalledWith({ isUnloading: true });
+      expect(atomEnv.packages.deactivatePackages).not.toHaveBeenCalled();
+
+      atomEnv.destroy();
+    });
+
     it("serializes the project state with all the options supplied in saveState", async () => {
       spyOn(atom.project, "serialize").and.returnValue({ foo: 42 });
 

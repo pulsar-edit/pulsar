@@ -45,11 +45,11 @@
       if (getWindowLoadSettings().profileStartup) {
         profileStartup(Date.now() - startTime);
       } else {
+        const loadTime = Date.now() - startTime;
         StartupTime.addMarker("window:setup-window:start");
-        setupWindow().then(() => {
-          StartupTime.addMarker("window:setup-window:end");
-        });
-        setLoadTime(Date.now() - startTime);
+        await setupWindow();
+        StartupTime.addMarker("window:setup-window:end");
+        setLoadTime(loadTime);
       }
     } catch (error) {
       handleSetupError(error);
@@ -114,11 +114,13 @@
     function profile() {
       console.profile("startup");
       const startTime = Date.now();
-      setupWindow().then(function () {
-        setLoadTime(Date.now() - startTime + initialTime);
-        console.profileEnd("startup");
-        console.log("Switch to the Profiles tab to view the created startup profile");
-      });
+      setupWindow()
+        .then(function () {
+          setLoadTime(Date.now() - startTime + initialTime);
+          console.profileEnd("startup");
+          console.log("Switch to the Profiles tab to view the created startup profile");
+        })
+        .catch(handleSetupError);
     }
 
     const webContents = remote.getCurrentWindow().webContents;

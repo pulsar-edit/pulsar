@@ -288,7 +288,7 @@ module.exports = class AtomWindow extends EventEmitter {
     if (this.isSpec) this.browserWindow.on("blur", () => this.browserWindow.focusOnWebView());
   }
 
-  async prepareToUnload() {
+  async prepareToUnload(options = {}) {
     if (this.isSpecWindow()) return true;
 
     this.lastPrepareToUnloadPromise = new Promise((resolve) => {
@@ -303,7 +303,7 @@ module.exports = class AtomWindow extends EventEmitter {
         }
       };
       ipcMain.on("did-prepare-to-unload", callback);
-      this.browserWindow.webContents.send("prepare-to-unload");
+      this.browserWindow.webContents.send("prepare-to-unload", options);
     });
 
     return this.lastPrepareToUnloadPromise;
@@ -470,7 +470,7 @@ module.exports = class AtomWindow extends EventEmitter {
     this.loadedPromise = new Promise((resolve) => {
       this.resolveLoadedPromise = resolve;
     });
-    this.prepareToUnload().then((canUnload) => {
+    this.prepareToUnload({ deactivatePackages: false }).then((canUnload) => {
       if (canUnload) this.browserWindow.reload();
     });
     return this.loadedPromise;

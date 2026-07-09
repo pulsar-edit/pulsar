@@ -313,8 +313,8 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidRequestUnload(callback) {
-    const outerCallback = async (event, _message) => {
-      const shouldUnload = await callback(event);
+    const outerCallback = async (_event, message) => {
+      const shouldUnload = await callback(message || {});
       ipcRenderer.send("did-prepare-to-unload", shouldUnload);
     };
 

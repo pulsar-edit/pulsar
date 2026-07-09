@@ -200,6 +200,21 @@ describe("AtomWindow", function () {
     });
   });
 
+  describe("reload", function () {
+    it("prepares to unload without waiting for package deactivation", async function () {
+      const w = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow,
+      });
+      w.prepareToUnload = sinon.stub().resolves(true);
+
+      w.reload();
+      await Promise.resolve();
+
+      assert.isTrue(w.prepareToUnload.calledWith({ deactivatePackages: false }));
+      assert.isTrue(w.browserWindow.behavior.reloaded);
+    });
+  });
+
   describe("isWebViewFocused", function () {
     it("returns false when no web contents are focused", function () {
       sinon.stub(webContents, "getFocusedWebContents").returns(null);
@@ -484,6 +499,7 @@ class StubBrowserWindow extends EventEmitter {
     this.sent = [];
     this.behavior = {
       focusOnWebView: false,
+      reloaded: false,
     };
 
     this.webContents = new EventEmitter();
@@ -494,6 +510,10 @@ class StubBrowserWindow extends EventEmitter {
   }
 
   loadURL() {}
+
+  reload() {
+    this.behavior.reloaded = true;
+  }
 
   focusOnWebView() {
     this.behavior.focusOnWebView = true;
