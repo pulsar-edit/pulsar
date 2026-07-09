@@ -1,6 +1,6 @@
 {
 	"version": 3,
-	"file": "web-tree-sitter.d.ts",
+	"file": "web-tree-sitter.d.cts",
 	"names": [
 		"Point",
 		"Range",

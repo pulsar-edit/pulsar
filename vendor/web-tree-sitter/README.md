@@ -10,7 +10,10 @@ We also take advantage of the custom build by adding a check for a common failur
 
 ## Check out the modified branch for the version we’re targeting
 
-At time of writing, Pulsar was targeting `web-tree-sitter` version **0.23.0**, so a branch exists [on our fork](https://github.com/pulsar-edit/tree-sitter/tree/v0-23-0-modified) called `v0-23-0-modified`. That branch contains a modified `stdlib-symbols.txt` file and a modified script for building `web-tree-sitter`.
+At time of writing, Lumine was targeting `web-tree-sitter` version **0.26.10** from the upstream Tree-sitter repository. Patch the upstream source before building:
+
+* Add `"isalnum",` to `lib/src/wasm/stdlib-symbols.txt`.
+* Add `"-s", "DYNAMIC_EXECUTION=0",` to the Emscripten flags in `crates/xtask/src/build_wasm.rs`.
 
 When we target a newer version of `web-tree-sitter`, a similar branch should be created against the corresponding upstream tag. The commits that were applied on the previous modified branch should be able to be cherry-picked onto the new one rather easily.
 
@@ -35,9 +38,19 @@ Switch to the `lib/binding_web` directory, then run:
 ```sh
 npm install
 CJS=true npm run build
+npm run build:dts
 ```
 
 This generates a CommonJS version of `web-tree-sitter`, along with a `.wasm` file and a `.d.ts` file.
+
+The `DYNAMIC_EXECUTION=0` setting is required for Lumine's renderer CSP. It prevents Emscripten glue from depending on `eval`/`new Function`, so the app can run without `'unsafe-eval'` in `script-src`.
+
+On Windows, the upstream `cargo xtask build-wasm` path may need `LIBCLANG_PATH` set for `bindgen`. This build used:
+
+```powershell
+python -m pip install --target C:\Data\Develop\Various\libclang-python libclang
+$env:LIBCLANG_PATH = 'C:\Data\Develop\Various\libclang-python\clang\native'
+```
 
 ## Copy it to `vendor`
 
@@ -75,7 +88,7 @@ function resolveSymbol(sym) {
     resolved = moduleExports[sym];
   }
   if (!resolved) {
-    console.warn(`Warning: parser wants to call function ${sym}, but it is not defined. If parsing fails, this is probably the reason why. Please report this to the Pulsar team so that this parser can be supported properly.`);
+    console.warn(`Warning: parser wants to call function ${sym}, but it is not defined. If parsing fails, this is probably the reason why. Please report this to the Lumine team so that this parser can be supported properly.`);
   }
   return resolved;
 }
