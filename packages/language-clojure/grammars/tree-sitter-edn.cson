@@ -8,6 +8,7 @@ fileTypes: [
 ]
 treeSitter:
   parserSource: 'github:mauricioszabo/tree-sitter-clojure#inner-strings'
+  wasmBuildTool: 'tree-sitter-cli#v0.26.10'
   grammar: 'ts/grammar.wasm'
   highlightsQuery: [
     'ts/edn-only-highlights.scm'

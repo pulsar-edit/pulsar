@@ -183,7 +183,6 @@
     "underscore-plus": "^1.7.0",
     "update-package-dependencies": "file:./packages/update-package-dependencies",
     "vscode-ripgrep": "1.9.0",
-    "web-tree-sitter": "0.20.7",
     "welcome": "file:packages/welcome",
     "recent-list": "file:packages/recent-list",
     "whitespace": "file:./packages/whitespace",

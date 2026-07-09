@@ -813,6 +813,11 @@ var require_web_tree_sitter = __commonJS({
                     return memoryBase;
                   case "__table_base":
                     return tableBase;
+                  case "__stack_pointer":
+                    return wasmImports.__stack_pointer ||= new WebAssembly.Global(
+                      { value: "i32", mutable: true },
+                      stackSave()
+                    );
                 }
                 if (prop in wasmImports && !wasmImports[prop].stub) {
                   var res = wasmImports[prop];

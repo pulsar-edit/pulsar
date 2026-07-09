@@ -455,6 +455,22 @@ exports.register = (jasmineEnv) => {
           },
         };
       },
+
+      // `toSatisfy(predicate)` calls `predicate(actual, reason)`; the predicate
+      // returns whether the assertion passes and may call `reason(message)` to
+      // supply the failure message.
+      toSatisfy: function (util, customEqualityTesters) {
+        return {
+          compare: function (actual, predicate) {
+            let message = `Expected ${actual} to satisfy predicate`;
+            const reason = (m) => {
+              message = m;
+            };
+            const pass = predicate(actual, reason);
+            return { pass, message };
+          },
+        };
+      },
     });
   });
 };

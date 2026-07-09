@@ -1,3 +1,1 @@
-; Placeholder
-
-(tag (name) @storage.type.class.todo)
+(todo_token) @storage.type.class.todo

@@ -12,6 +12,7 @@ comments:
 
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-typescript#v0.23.0'
+  wasmBuildTool: 'tree-sitter-cli#v0.26.10'
   languageSegment: 'ts.tsx'
   grammar: 'tree-sitter-tsx/tree-sitter-tsx.wasm'
   highlightsQuery: [

@@ -1,10 +1,9 @@
 /*
  * This script is called via `validate-wasm-grammar-prs.yml`
  * It's purpose is to ensure that everytime a `.wasm` file is changed in a PR
- * That the `parserSource` key of the grammar that uses that specific `.wasm`
- * file is also updated.
- * This way we can ensure that the `parserSource` is always accurate, and is
- * never forgotten about.
+ * That the `parserSource` key or WASM build metadata of the grammar that uses
+ * that specific `.wasm` file is also updated. This way we can ensure that the
+ * `parserSource` is always accurate and ABI-only rebuilds are documented.
  */
 
 const cp = require("node:child_process");
@@ -58,8 +57,9 @@ if (wasmFilesChanged.length === 0) {
   process.exit(0);
 }
 
-// Now for every single wasm file that's been changed, we must validate those changes
-// are also accompanied by a change in the `parserSource` key
+// Now for every single wasm file that's been changed, we must validate those
+// changes are also accompanied by a change in the parser source or build
+// metadata.
 
 for (const wasmFile of wasmFilesChanged) {
   // Ignore files that have been deleted or moved.
@@ -133,6 +133,10 @@ for (const wasmFile of wasmFilesChanged) {
         const oldContents = CSON.readFileSync(path.join(wasmPath, "..", `OLD-${file}`));
         const oldParserSource = oldContents.treeSitter?.parserSource ?? "";
         const newParserSource = contents.treeSitter?.parserSource ?? "";
+        const oldWasmBuildTool = oldContents.treeSitter?.wasmBuildTool ?? "";
+        const newWasmBuildTool = contents.treeSitter?.wasmBuildTool ?? "";
+        const oldWasmBuildPatch = oldContents.treeSitter?.wasmBuildPatch ?? "";
+        const newWasmBuildPatch = contents.treeSitter?.wasmBuildPatch ?? "";
 
         if (newParserSource.length === 0) {
           console.error(`Failed to find the new \`parserSource\` within: '${filePath}'`);
@@ -140,15 +144,22 @@ for (const wasmFile of wasmFilesChanged) {
           process.exit(1);
         }
 
-        if (oldParserSource == newParserSource) {
-          // The repo and commit is identical! This means it hasn't been updated
-          console.error(`The \`parserSource\` key of '${filePath}' has not been updated!`);
-          console.error(`Current key: ${newParserSource} - Old key: ${oldParserSource}`);
+        if (
+          oldParserSource == newParserSource &&
+          oldWasmBuildTool == newWasmBuildTool &&
+          oldWasmBuildPatch == newWasmBuildPatch
+        ) {
+          console.error(
+            `Neither \`parserSource\` nor WASM build metadata of '${filePath}' has been updated!`,
+          );
+          console.error(`Current parserSource: ${newParserSource} - Old: ${oldParserSource}`);
+          console.error(`Current wasmBuildTool: ${newWasmBuildTool} - Old: ${oldWasmBuildTool}`);
+          console.error(`Current wasmBuildPatch: ${newWasmBuildPatch} - Old: ${oldWasmBuildPatch}`);
           process.exit(1);
         }
 
         // Else it looks like it has been updated properly
-        console.log(`Validated \`parserSource\` has been updated within '${filePath}' properly.`);
+        console.log(`Validated WASM metadata has been updated within '${filePath}' properly.`);
       } else {
         if (verbose) {
           console.log(

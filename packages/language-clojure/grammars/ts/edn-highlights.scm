@@ -38,4 +38,4 @@
  (#set! clojure.dismissTag true)
  (#set! capture.final true))
 
-("ERROR" @invalid.illegal)
+(ERROR) @invalid.illegal

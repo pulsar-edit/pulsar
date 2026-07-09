@@ -25,12 +25,29 @@ const LINE_LENGTH_LIMIT_FOR_HIGHLIGHTING = 10000;
 const REPARSE_BUDGET_PER_TRANSACTION_MILLIS = 10;
 
 const PARSE_JOB_LIMIT_MICROS = 3000;
+const INITIAL_PARSE_JOB_LIMIT_MICROS = 30000;
 const PARSERS_IN_USE = new Set();
 
 const FUNCTION_TRUE = () => true;
 
 function isParseTimeout(err) {
   return err.message.includes("Parsing failed");
+}
+
+function parserSupportsTimeoutMicros(parser) {
+  return typeof parser.setTimeoutMicros === "function";
+}
+
+function parseWithProgressTimeout(parser, callback, oldTree, includedRanges, timeoutMicros) {
+  let options = { includedRanges };
+
+  if (timeoutMicros != null) {
+    let now = globalThis.performance?.now?.bind(globalThis.performance) ?? Date.now;
+    let deadline = now() + timeoutMicros / 1000;
+    options.progressCallback = () => now() >= deadline;
+  }
+
+  return parser.parse(callback, oldTree, options);
 }
 
 function last(array) {
@@ -785,8 +802,12 @@ class WASMTreeSitterLanguageMode {
   parseAsync(language, oldTree, includedRanges, { tag = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
+    let supportsTimeoutMicros = parserSupportsTimeoutMicros(parser);
+    let timeoutMicros = oldTree ? this.syncTimeoutMicros : INITIAL_PARSE_JOB_LIMIT_MICROS;
     parser.reset();
-    parser.setTimeoutMicros(this.syncTimeoutMicros);
+    if (supportsTimeoutMicros) {
+      parser.setTimeoutMicros(timeoutMicros);
+    }
     PARSERS_IN_USE.add(parser);
 
     // When you edit a tree, the positions of nodes in the tree are adjusted
@@ -834,7 +855,9 @@ class WASMTreeSitterLanguageMode {
           console.log(`(async: ${batchCount} batches)`);
         }
       }
-      parser.setTimeoutMicros(null);
+      if (supportsTimeoutMicros) {
+        parser.setTimeoutMicros(null);
+      }
       PARSERS_IN_USE.delete(parser);
     };
 
@@ -844,7 +867,18 @@ class WASMTreeSitterLanguageMode {
 
     try {
       // Attempt a synchronous parse.
-      tree = parser.parse(callback, oldTree, { includedRanges });
+      tree = supportsTimeoutMicros
+        ? parser.parse(callback, oldTree, { includedRanges })
+        : parseWithProgressTimeout(
+          parser,
+          callback,
+          oldTree,
+          includedRanges,
+          timeoutMicros
+        );
+      if (!supportsTimeoutMicros && tree === null) {
+        throw new Error("Parsing failed");
+      }
     } catch (err) {
       if (!isParseTimeout(err)) {
         throw err;
@@ -856,7 +890,19 @@ class WASMTreeSitterLanguageMode {
         const parseJob = () => {
           try {
             batchCount++;
-            tree = parser.parse(callback, oldTree, { includedRanges });
+            tree = supportsTimeoutMicros
+              ? parser.parse(callback, oldTree, { includedRanges })
+              : parseWithProgressTimeout(
+                parser,
+                callback,
+                oldTree,
+                includedRanges,
+                timeoutMicros
+              );
+            if (!supportsTimeoutMicros && tree === null) {
+              setImmediate(parseJob);
+              return;
+            }
           } catch (err) {
             if (!isParseTimeout(err)) {
               return reject(err);
@@ -881,7 +927,9 @@ class WASMTreeSitterLanguageMode {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     parser.reset();
-    parser.setTimeoutMicros(null);
+    if (parserSupportsTimeoutMicros(parser)) {
+      parser.setTimeoutMicros(null);
+    }
 
     let text = this.buffer.getText();
     this.cachedCurrentBufferText = text;

@@ -8,6 +8,7 @@ injectionRegex: '^(c|C)$'
 
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-c#212a80f86452bb1316324fa0db730cf52f29e05a'
+  wasmBuildTool: 'tree-sitter-cli#v0.26.10'
   grammar: 'tree-sitter-c/tree-sitter-c.wasm'
   languageSegment: 'c'
   highlightsQuery: [

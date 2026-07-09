@@ -7,6 +7,7 @@ injectionRegex: '^(markdown|MARKDOWN|gfm|GFM)$'
 
 treeSitter:
   parserSource: 'github:tree-sitter-grammars/tree-sitter-markdown/tree-sitter-markdown#a3481e1db0b5f9aecfa7124d362a6485286a8e72'
+  wasmBuildTool: 'tree-sitter-cli#v0.26.10'
   grammar: 'tree-sitter-markdown/tree-sitter-markdown.wasm'
   highlightsQuery: 'tree-sitter-markdown/highlights.scm'
   foldsQuery: 'tree-sitter-markdown/folds.scm'

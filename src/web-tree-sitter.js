@@ -34,13 +34,7 @@
 // * tree-sitter-html
 // * tree-sitter-svelte
 //
-const USE_CUSTOM_WEB_TREE_SITTER = true;
-
-let bundle;
-if (USE_CUSTOM_WEB_TREE_SITTER) {
-  bundle = require("../vendor/web-tree-sitter/web-tree-sitter");
-} else {
-  bundle = require("web-tree-sitter");
-}
-
-module.exports = bundle;
+// Always use the custom vendored build. Once `tree-sitter build-wasm` can build
+// the extra stdlib symbols we need, we can go back to the NPM `web-tree-sitter`
+// (re-add it to `package.json` at that point).
+module.exports = require("../vendor/web-tree-sitter/web-tree-sitter");

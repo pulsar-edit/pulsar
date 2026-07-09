@@ -16,6 +16,7 @@ injectionRegex: '^(scss|SCSS)$'
 
 treeSitter:
   parserSource: 'github:simeonoff/tree-sitter-scss#28ef291704ec6996b5a1484995ad89ebb66111e0'
+  wasmBuildTool: 'tree-sitter-cli#v0.26.10'
   grammar: 'tree-sitter/tree-sitter-scss.wasm'
   highlightsQuery: 'tree-sitter/highlights.scm'
   foldsQuery: 'tree-sitter/folds.scm'

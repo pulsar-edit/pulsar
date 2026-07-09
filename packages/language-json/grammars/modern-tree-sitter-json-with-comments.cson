@@ -7,6 +7,7 @@ injectionRegex: "^(jsonc|JSONC)$"
 
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-json#3fef30de8aee74600f25ec2e319b62a1a870d51e'
+  wasmBuildTool: 'tree-sitter-cli#v0.26.10'
   grammar: 'tree-sitter/tree-sitter-json.wasm'
   highlightsQuery: 'tree-sitter/queries/highlights.scm'
   indentsQuery: 'tree-sitter/queries/indents.scm'

@@ -28,6 +28,7 @@ fileTypes: [
 
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-python#v0.25.0'
+  wasmBuildTool: 'tree-sitter-cli#v0.26.10'
   grammar: 'ts/tree-sitter-python.wasm'
   highlightsQuery: 'ts/highlights.scm'
   tagsQuery: 'ts/tags.scm'

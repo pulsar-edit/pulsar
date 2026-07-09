@@ -16,6 +16,7 @@ firstLineRegex: '^\\s*<\\?(?:php|PHP|=|\\s|$)|^\\#!.*(?:\\s|\\/)php\\d?'
 
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-php#27afeb02e49ff30acd17b67897b1c0114561a38c'
+  wasmBuildTool: 'tree-sitter-cli#v0.26.10'
   grammar: 'tree-sitter/tree-sitter-php.wasm'
 
 fileTypes: [

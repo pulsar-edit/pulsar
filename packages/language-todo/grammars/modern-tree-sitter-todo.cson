@@ -5,5 +5,8 @@ parser: 'tree-sitter-todo'
 
 injectionRegex: '^(todo|TODO)$'
 treeSitter:
+  parserSource: 'github:Aerijo/tree-sitter-todo#5b789e4cf7909a6fa6358404e7d74a8bb63418c9'
+  wasmBuildTool: 'tree-sitter-cli#v0.26.10'
+  wasmBuildPatch: 'C scanner port for tree-sitter-cli#v0.26.10 WASM builds'
   grammar: 'ts/tree-sitter-todo.wasm'
   highlightsQuery: 'ts/highlights.scm'

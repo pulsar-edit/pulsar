@@ -9,6 +9,7 @@ firstLineRegex: "<(?:!DOCTYPE\\s*)?html|-\\*-(?:\\s*(?=[^:;\\s]+\\s*-\\*-)|(?:.*
 
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-html#v0.23.0'
+  wasmBuildTool: 'tree-sitter-cli#v0.26.10'
   grammar: 'tree-sitter-html/tree-sitter-html.wasm'
   highlightsQuery: 'tree-sitter-html/highlights.scm'
   foldsQuery: 'tree-sitter-html/folds.scm'

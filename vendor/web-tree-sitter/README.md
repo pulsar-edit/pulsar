@@ -14,6 +14,9 @@ At time of writing, Lumine was targeting `web-tree-sitter` version **0.26.10** f
 
 * Add `"isalnum",` to `lib/src/wasm/stdlib-symbols.txt`.
 * Add `"-s", "DYNAMIC_EXECUTION=0",` to the Emscripten flags in `crates/xtask/src/build_wasm.rs`.
+* Patch the generated dynamic loader proxy in `web-tree-sitter.js` so `__stack_pointer`
+  imports are satisfied with a mutable `WebAssembly.Global`. Some grammar WASMs
+  built with `tree-sitter-cli#v0.26.10` import that global.
 
 When we target a newer version of `web-tree-sitter`, a similar branch should be created against the corresponding upstream tag. The commits that were applied on the previous modified branch should be able to be cherry-picked onto the new one rather easily.
 
