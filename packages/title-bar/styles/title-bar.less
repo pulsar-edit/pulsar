@@ -1,0 +1,880 @@
+// Fallback if theme does not support scrollbars-visible-always
+.scrollbars-visible-always() {
+}
+
+@import "ui-variables";
+@import "atom";
+
+// ============================================================================
+// CSS Custom Properties (User Customizable)
+// Override these in your styles.less to customize the title bar appearance.
+// Example: :root { --title-bar-height: 40px; }
+// ============================================================================
+
+:root {
+  // Layout
+  --title-bar-height: 32px;
+  --title-bar-control-width: 46px;
+  --title-bar-icon-size: 24px;
+  --title-bar-icon-margin: 8px;
+
+  // Menu
+  --title-bar-menu-font-size: @font-size;
+  --title-bar-menu-item-height: 28px;
+  --title-bar-menu-item-padding: 14px;
+  --title-bar-menu-item-margin: 3px;
+  --title-bar-menu-item-radius: 4px;
+  --title-bar-menu-box-radius: 6px;
+  --title-bar-menu-box-min-width: 200px;
+  --title-bar-menu-box-shadow: 0 2px 8px fade(#000, 16%);
+  --title-bar-menu-label-padding: 8px;
+  --title-bar-menu-label-radius: 0px;
+
+  // Title
+  --title-bar-title-font-size: @font-size;
+
+  // Transitions
+  --title-bar-transition-fast: 0.05s;
+  --title-bar-transition-normal: 0.1s;
+  --title-bar-transition-slow: 0.15s;
+
+  // Windows 11 theme colors
+  --title-bar-win11-button-hover-bg: fade(@text-color, 12%);
+  --title-bar-win11-button-active-bg: fade(@text-color, 8%);
+  --title-bar-close-hover-bg: #c42b1c;
+  --title-bar-close-hover-color: #fff;
+
+  // macOS Tahoe theme colors
+  --title-bar-macos-close: #ff5f57;
+  --title-bar-macos-minimize: #febc2e;
+  --title-bar-macos-maximize: #28c840;
+  --title-bar-macos-blurred: #ddd;
+
+  // GNOME theme colors
+  --title-bar-gnome-close-hover-bg: #e55b4a;
+  --title-bar-gnome-close-hover-color: #fff;
+  --title-bar-gnome-button-hover-bg: fade(@text-color, 12%);
+  --title-bar-gnome-button-active-bg: fade(@text-color, 18%);
+}
+
+// Internal Less variables (mapped from CSS custom properties for compatibility)
+@title-bar-height: var(--title-bar-height);
+@control-width: var(--title-bar-control-width);
+@control-height: var(--title-bar-height);
+@menu-height: 24px;
+
+// ============================================================================
+// Scrollbar Styles
+// Using .scrollbars-visible-always() from atom on parent elements to style
+// descendant scrollbars. The scrollable .menu-box elements just need overflow.
+// ============================================================================
+
+.menu-scrollable() {
+  overflow-y: auto;
+  overflow-x: hidden;
+  direction: rtl;
+
+  > * {
+    direction: ltr;
+  }
+}
+
+// ============================================================================
+// Shared Menu Box Styles (used by app menu and context menu)
+// ============================================================================
+
+.menu-box-base() {
+  min-width: var(--title-bar-menu-box-min-width);
+  background-color: @overlay-background-color;
+  cursor: default;
+  border: 1px solid @overlay-border-color;
+  border-radius: var(--title-bar-menu-box-radius);
+  box-shadow: var(--title-bar-menu-box-shadow);
+  padding: 6px 0;
+  font-family: "Segoe UI", @font-family;
+  font-size: var(--title-bar-menu-font-size);
+  font-weight: 400;
+  contain: layout style;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.menu-box-content() {
+  hr {
+    height: 1px;
+    border: none;
+    background-color: @base-border-color;
+    margin: 4px 0;
+
+    &:first-child,
+    &:last-child {
+      display: none;
+    }
+  }
+
+  .menu-item {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--title-bar-menu-item-height);
+    padding: 0 var(--title-bar-menu-item-padding);
+    margin: 0 var(--title-bar-menu-item-margin);
+    border-radius: var(--title-bar-menu-item-radius);
+    color: @text-color;
+    transition: background-color var(--title-bar-transition-fast) ease;
+
+    &.disabled {
+      color: @text-color-subtle;
+    }
+
+    &.invisible {
+      display: none;
+    }
+
+    .menu-item-keystroke {
+      display: inline-flex;
+      align-items: center;
+      height: 100%;
+      white-space: nowrap;
+      margin-left: 24px;
+      color: @text-color-subtle;
+      font-size: var(--title-bar-menu-font-size);
+    }
+
+    &:hover:not(.disabled),
+    &.selected:not(.disabled) {
+      background-color: @background-color-highlight;
+    }
+
+    &:active:not(.disabled) {
+      background-color: @background-color-selected;
+    }
+
+    .menu-item-submenu {
+      position: absolute;
+    }
+
+    &.has-sub > .menu-item-keystroke:after {
+      content: "";
+      display: block;
+      width: 0;
+      height: 0;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      border-left: 5px solid currentColor;
+      margin-left: 8px;
+      margin-right: -4px;
+      opacity: 0.7;
+    }
+
+    .menu-item-name {
+      white-space: nowrap;
+    }
+
+    &.menu-item-multipath {
+      height: auto;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      align-items: flex-start;
+
+      .menu-item-path-line {
+        line-height: 20px;
+        white-space: nowrap;
+      }
+    }
+
+    &.bounce {
+      animation: item-bounce 0.15s ease;
+    }
+  }
+
+  .menu-item-submenu {
+    display: block;
+    visibility: hidden;
+    .menu-box-base();
+  }
+
+  .menu-item.open > .menu-item-submenu {
+    visibility: visible;
+  }
+
+  // Show .open highlight only when menu-box is not being hovered
+  &:not(:hover) .menu-item.open {
+    background-color: @background-color-highlight;
+  }
+}
+
+.title-bar {
+  -webkit-app-region: drag;
+  app-region: drag;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: @title-bar-height;
+  color: @text-color;
+  background-color: @app-background-color;
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: visible;
+  z-index: 900;
+  font-family: "Segoe UI", @font-family;
+
+  &.no-title-bar {
+    display: none;
+  }
+  margin-top: 4px;
+  contain: layout style;
+
+  .app-icon {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // Scale down if title-bar is smaller than icon size
+    width: min(var(--title-bar-icon-size), calc(var(--title-bar-height) - 8px));
+    height: 100%;
+    order: 0;
+    flex-shrink: 0;
+    margin-left: var(--title-bar-icon-margin);
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  // Top edge drag area for window dragging at screen edge
+  &:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -4px;
+    width: 100%;
+    height: 4px;
+    -webkit-app-region: drag;
+    app-region: drag;
+  }
+
+  > .custom-title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+    font-size: var(--title-bar-title-font-size);
+    font-weight: 400;
+    color: @text-color;
+    width: max-content;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .control-tiles {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+    display: flex;
+    align-items: center;
+    height: calc(100% + 4px);
+    margin-top: -4px;
+    margin-left: auto;
+    order: 2;
+    margin-right: 12px;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    z-index: 1;
+
+    &:empty {
+      display: none;
+    }
+
+    &,
+    * {
+      -webkit-app-region: no-drag;
+      app-region: no-drag;
+    }
+
+    .inline-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: @text-color-subtle;
+      cursor: default;
+      transition:
+        background-color var(--title-bar-transition-normal) ease,
+        color var(--title-bar-transition-normal) ease;
+
+      svg {
+        display: block;
+      }
+
+      &:hover {
+        background-color: fade(@text-color, 10%);
+        color: @text-color;
+      }
+
+      &:active {
+        background-color: fade(@text-color, 6%);
+      }
+    }
+  }
+
+  // When control-tiles is empty, window-buttons needs the auto margin
+  .control-tiles:empty + .window-buttons {
+    margin-left: auto;
+  }
+
+  .window-buttons {
+    display: flex;
+    align-items: center;
+    height: calc(100% + 4px);
+    margin-top: -4px;
+    order: 3;
+    z-index: 1;
+    flex-shrink: 0;
+
+    button {
+      -webkit-app-region: no-drag;
+      app-region: no-drag;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      padding-top: 4px;
+      border: none;
+      background: transparent;
+      width: @control-width;
+      height: 100%;
+      color: @text-color;
+      cursor: default;
+      transition: background-color var(--title-bar-transition-normal) ease;
+
+      svg {
+        display: block;
+      }
+
+      &:hover {
+        background-color: fade(@text-color, 10%);
+      }
+
+      &:active {
+        background-color: fade(@text-color, 6%);
+      }
+
+      &.disabled {
+        color: @text-color-subtle;
+        pointer-events: none;
+      }
+
+      &.btn-minimize {
+        order: 1;
+      }
+
+      &.btn-maximize {
+        order: 2;
+      }
+
+      &.btn-close {
+        order: 3;
+        &:hover {
+          background-color: var(--title-bar-close-hover-bg);
+          color: var(--title-bar-close-hover-color);
+        }
+        &:active {
+          background-color: fade(#c42b1c, 80%);
+          color: fade(#fff, 70%);
+        }
+      }
+    }
+  }
+
+  .title-bar-tiles {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    // gap: 4px;
+
+    &:empty {
+      display: none;
+    }
+
+    &,
+    * {
+      -webkit-app-region: no-drag;
+      app-region: no-drag;
+    }
+
+    &.tiles-left {
+      order: 1;
+      margin-left: 8px;
+    }
+
+    &.tiles-right {
+      order: 4;
+      margin-right: 8px;
+    }
+
+    > * {
+      display: inline-flex;
+      align-items: center;
+      height: 100%;
+    }
+  }
+
+  .app-menu {
+    -webkit-app-region: drag;
+    app-region: drag;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: auto;
+    height: 100%;
+    order: 1;
+    padding-left: var(--title-bar-menu-label-padding);
+    font-family: "Segoe UI", @font-family;
+    font-weight: 400;
+    font-size: var(--title-bar-menu-font-size);
+    overflow: visible;
+    z-index: 2;
+
+    // When Alt is pressed, show underlines
+    &.alt-down .menu-label u {
+      text-decoration: underline;
+    }
+
+    .menu-label u {
+      text-decoration: none;
+    }
+
+    &.no-menu-bar {
+      display: flex;
+      .menu-label {
+        -webkit-app-region: drag;
+        app-region: drag;
+        opacity: 0;
+        transform: translateX(-12px);
+        pointer-events: none;
+      }
+    }
+
+    .menu-label {
+      -webkit-app-region: no-drag;
+      app-region: no-drag;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      height: calc(100% + 4px);
+      margin-top: -4px;
+      padding: 0 var(--title-bar-menu-label-padding);
+      padding-top: 4px;
+      opacity: 1;
+      transform: translateX(0);
+      transition:
+        opacity var(--title-bar-transition-slow) ease,
+        transform var(--title-bar-transition-slow) ease;
+      // Apply scrollbar styles to descendant .menu-box elements
+      .scrollbars-visible-always();
+
+      // Stagger animation for each menu label
+      @label-delay: 0.02s;
+      &:nth-child(1) {
+        transition-delay: @label-delay * 0;
+      }
+      &:nth-child(2) {
+        transition-delay: @label-delay * 1;
+      }
+      &:nth-child(3) {
+        transition-delay: @label-delay * 2;
+      }
+      &:nth-child(4) {
+        transition-delay: @label-delay * 3;
+      }
+      &:nth-child(5) {
+        transition-delay: @label-delay * 4;
+      }
+      &:nth-child(6) {
+        transition-delay: @label-delay * 5;
+      }
+      &:nth-child(7) {
+        transition-delay: @label-delay * 6;
+      }
+      &:nth-child(8) {
+        transition-delay: @label-delay * 7;
+      }
+      color: @text-color;
+
+      // Highlight area (visual only)
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: var(--title-bar-menu-label-radius);
+        background-color: transparent;
+        transition: background-color var(--title-bar-transition-normal) ease;
+        z-index: -1;
+      }
+
+      &.open::before,
+      &.focused::before,
+      &:hover::before {
+        background-color: fade(@text-color, 8%);
+      }
+
+      &:active::before {
+        background-color: fade(@text-color, 5%);
+      }
+
+      .menu-box {
+        display: block;
+        visibility: hidden;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 2px;
+        z-index: 99999;
+        transform: translate(-4px, 0);
+        will-change: visibility;
+        .menu-box-base();
+        .menu-box-content();
+        .menu-scrollable();
+
+        // App menu specific: submenu offset
+        .menu-item .menu-item-submenu {
+          top: -6px;
+        }
+      }
+    }
+
+    span.open > .menu-box {
+      visibility: visible;
+    }
+
+    div.open > .menu-box {
+      display: initial;
+      visibility: visible;
+    }
+  }
+
+  // Reverse controls (left side)
+  &.reverse-controls {
+    .control-tiles {
+      order: 1;
+      margin-left: 12px;
+      margin-right: auto;
+    }
+
+    .control-tiles:empty + .window-buttons {
+      margin-left: 0;
+      margin-right: auto;
+    }
+
+    .window-buttons {
+      margin-left: 0;
+      order: 0;
+    }
+  }
+}
+
+// Fix dock toggles being unclickable without a window frame
+.atom-dock-inner:not(.atom-dock-open) {
+  pointer-events: none;
+
+  &:not(.bottom) > .atom-dock-mask {
+    width: 8px !important;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  > .atom-dock-toggle-button {
+    pointer-events: all;
+  }
+
+  > .atom-dock-toggle-button.left {
+    margin-left: -8px;
+  }
+
+  > .atom-dock-toggle-button.right {
+    margin-right: -8px;
+  }
+}
+
+@keyframes item-bounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Window Control Themes
+
+/** macOS Tahoe style */
+.title-bar.theme-macos-tahoe {
+  .control-tiles {
+    order: 1;
+    margin-left: 12px;
+    margin-right: auto;
+  }
+
+  .control-tiles:empty + .window-buttons {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  .window-buttons {
+    flex-direction: row-reverse;
+    padding-left: 4px;
+    margin-left: 0;
+    order: 0;
+
+    button {
+      position: relative;
+      width: 20px;
+      background-color: transparent;
+      transition: all var(--title-bar-transition-slow) ease;
+
+      svg {
+        display: none;
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        transition: background-color var(--title-bar-transition-slow) ease;
+      }
+
+      &:hover,
+      &:active {
+        background-color: transparent;
+      }
+
+      &.btn-close {
+        order: 3;
+        &::before {
+          background-color: var(--title-bar-macos-close);
+        }
+        &:hover::before {
+          background-color: color-mix(in srgb, var(--title-bar-macos-close) 90%, black);
+        }
+      }
+
+      &.btn-minimize {
+        order: 2;
+        &::before {
+          background-color: var(--title-bar-macos-minimize);
+        }
+        &:hover::before {
+          background-color: color-mix(in srgb, var(--title-bar-macos-minimize) 90%, black);
+        }
+      }
+
+      &.btn-maximize {
+        order: 1;
+        &::before {
+          background-color: var(--title-bar-macos-maximize);
+        }
+        &:hover::before {
+          background-color: color-mix(in srgb, var(--title-bar-macos-maximize) 90%, black);
+        }
+      }
+    }
+  }
+}
+
+body.is-blurred {
+  .title-bar.theme-macos-tahoe .window-buttons:not(:hover) button::before {
+    background-color: var(--title-bar-macos-blurred);
+  }
+}
+
+// macOS: Move logo to right side
+.title-bar.theme-macos-tahoe {
+  .app-icon {
+    order: 10;
+    margin-left: 0;
+    margin-right: var(--title-bar-icon-margin);
+  }
+
+  .app-menu {
+    order: 2;
+
+    // Reverse animation direction (app-menu is on right side)
+    &.no-menu-bar .menu-label {
+      transform: translateX(12px);
+    }
+
+    // Reverse stagger animation order (rightmost appears first)
+    @label-delay: 0.02s;
+    .menu-label {
+      &:nth-last-child(1) {
+        transition-delay: @label-delay * 0;
+      }
+      &:nth-last-child(2) {
+        transition-delay: @label-delay * 1;
+      }
+      &:nth-last-child(3) {
+        transition-delay: @label-delay * 2;
+      }
+      &:nth-last-child(4) {
+        transition-delay: @label-delay * 3;
+      }
+      &:nth-last-child(5) {
+        transition-delay: @label-delay * 4;
+      }
+      &:nth-last-child(6) {
+        transition-delay: @label-delay * 5;
+      }
+      &:nth-last-child(7) {
+        transition-delay: @label-delay * 6;
+      }
+      &:nth-last-child(8) {
+        transition-delay: @label-delay * 7;
+      }
+    }
+  }
+}
+
+/** Windows 11 style */
+.title-bar.theme-windows-11 {
+  .window-buttons button:not(.btn-close) {
+    &:hover {
+      background-color: var(--title-bar-win11-button-hover-bg);
+    }
+
+    &:active {
+      background-color: var(--title-bar-win11-button-active-bg);
+    }
+  }
+}
+
+/** GNOME/Adwaita style */
+.title-bar.theme-gnome {
+  .window-buttons {
+    padding-right: 4px;
+    gap: 4px;
+
+    button {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      padding: 0; // Reset base padding for proper centering
+      border-radius: 50%;
+      background-color: transparent;
+      transition: background-color var(--title-bar-transition-normal) ease;
+
+      svg {
+        width: 10px;
+        height: 10px;
+        stroke-width: 1.5;
+      }
+
+      &:hover {
+        background-color: var(--title-bar-gnome-button-hover-bg);
+      }
+
+      &:active {
+        background-color: var(--title-bar-gnome-button-active-bg);
+      }
+
+      &.btn-close {
+        order: 3;
+        &:hover {
+          background-color: var(--title-bar-gnome-close-hover-bg);
+          color: var(--title-bar-gnome-close-hover-color);
+        }
+        &:active {
+          background-color: color-mix(in srgb, var(--title-bar-gnome-close-hover-bg) 80%, black);
+        }
+      }
+
+      &.btn-minimize {
+        order: 1;
+      }
+
+      &.btn-maximize {
+        order: 2;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// Context Menu (right-click menu)
+// ============================================================================
+
+.context-menu-container {
+  position: fixed;
+  z-index: 99999;
+  pointer-events: auto;
+  cursor: default;
+  // Apply scrollbar styles to descendant .menu-box elements
+  .scrollbars-visible-always();
+
+  .context-menu-box {
+    display: block;
+    .menu-box-base();
+    .menu-box-content();
+    .menu-scrollable();
+
+    // Context menu specific: disabled items not clickable
+    .menu-item.disabled {
+      pointer-events: none;
+    }
+  }
+}
+
+// ============================================================================
+// App Menu Submenu Portal (for scroll support)
+// ============================================================================
+
+.app-menu-submenu-portal,
+.context-menu-submenu-portal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  pointer-events: none;
+  // Apply scrollbar styles to descendant .menu-box elements
+  .scrollbars-visible-always();
+
+  > .menu-box {
+    position: fixed;
+    pointer-events: auto;
+    visibility: hidden;
+    .menu-box-base();
+    .menu-box-content();
+    .menu-scrollable();
+
+    &.visible {
+      visibility: visible;
+    }
+  }
+}

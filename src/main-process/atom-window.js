@@ -68,8 +68,6 @@ module.exports = class AtomWindow extends EventEmitter {
     // Don't set icon on Windows so the exe's ico will be used as window and
     // taskbar's icon. See https://github.com/atom/atom/issues/4811 for more.
     if (process.platform === "linux") options.icon = nativeImage.createFromPath(ICON_PATH);
-    if (this.shouldAddCustomTitleBar()) options.titleBarStyle = "hidden";
-    if (this.shouldAddCustomInsetTitleBar()) options.titleBarStyle = "hiddenInset";
     if (this.shouldHideTitleBar()) options.frame = false;
 
     // Enabling window transparency creates several downstream issues relating
@@ -158,6 +156,22 @@ module.exports = class AtomWindow extends EventEmitter {
 
     this.browserWindow.on("leave-full-screen", () => {
       this.browserWindow.webContents.send("did-leave-full-screen");
+    });
+
+    this.browserWindow.on("maximize", () => {
+      this.browserWindow.webContents.send("did-maximize-window");
+    });
+
+    this.browserWindow.on("unmaximize", () => {
+      this.browserWindow.webContents.send("did-unmaximize-window");
+    });
+
+    this.browserWindow.on("focus", () => {
+      this.browserWindow.webContents.send("did-focus-window");
+    });
+
+    this.browserWindow.on("blur", () => {
+      this.browserWindow.webContents.send("did-blur-window");
     });
 
     this.browserWindow.loadURL(
@@ -383,22 +397,6 @@ module.exports = class AtomWindow extends EventEmitter {
 
   getSimpleFullscreen() {
     return this.atomApplication.config.get("core.simpleFullScreenWindows");
-  }
-
-  shouldAddCustomTitleBar() {
-    return (
-      !this.isSpec &&
-      process.platform === "darwin" &&
-      this.atomApplication.config.get("core.titleBar") === "custom"
-    );
-  }
-
-  shouldAddCustomInsetTitleBar() {
-    return (
-      !this.isSpec &&
-      process.platform === "darwin" &&
-      this.atomApplication.config.get("core.titleBar") === "custom-inset"
-    );
   }
 
   shouldHideTitleBar() {

@@ -35,7 +35,6 @@ const CommandInstaller = require("./command-installer");
 const CoreURIHandlers = require("./core-uri-handlers");
 const ProtocolHandlerInstaller = require("./protocol-handler-installer");
 const Project = require("./project");
-const TitleBar = require("./title-bar");
 const Workspace = require("./workspace");
 const PaneContainer = require("./pane-container");
 const PaneAxis = require("./pane-axis");
@@ -998,27 +997,7 @@ class AtomEnvironment {
       await this.deserialize(state);
       this.deserializeTimings.atom = Date.now() - startTime;
 
-      if (process.platform === "darwin" && this.config.get("core.titleBar") === "custom") {
-        this.workspace.addHeaderPanel({
-          item: new TitleBar({
-            workspace: this.workspace,
-            themes: this.themes,
-            applicationDelegate: this.applicationDelegate,
-          }),
-        });
-        this.document.body.classList.add("custom-title-bar");
-      }
-      if (process.platform === "darwin" && this.config.get("core.titleBar") === "custom-inset") {
-        this.workspace.addHeaderPanel({
-          item: new TitleBar({
-            workspace: this.workspace,
-            themes: this.themes,
-            applicationDelegate: this.applicationDelegate,
-          }),
-        });
-        this.document.body.classList.add("custom-inset-title-bar");
-      }
-      if (process.platform === "darwin" && this.config.get("core.titleBar") === "hidden") {
+      if (this.config.get("core.titleBar") === "hidden") {
         this.document.body.classList.add("hidden-title-bar");
       }
 

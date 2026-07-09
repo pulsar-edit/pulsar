@@ -1,0 +1,72 @@
+{
+  "name": "title-bar",
+  "version": "1.0.5",
+  "description": "Theme-aware custom title bar with integrated menu.",
+  "main": "./lib/main.js",
+  "keywords": [
+    "title bar"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lumine-code/lumine",
+    "directory": "packages/title-bar"
+  },
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.100.0 <2.0.0"
+  },
+  "providedServices": {
+    "title-bar": {
+      "versions": {
+        "1.0.0": "provideControlTiles"
+      }
+    }
+  },
+  "configSchema": {
+    "controlTheme": {
+      "order": 1,
+      "title": "Window Controls Theme",
+      "type": "string",
+      "enum": [
+        "Default",
+        "Windows 11",
+        "macOS Tahoe",
+        "GNOME"
+      ],
+      "default": "Default"
+    },
+    "logoStyle": {
+      "order": 2,
+      "title": "Logo Style",
+      "type": "string",
+      "enum": [
+        "Default",
+        "Filled",
+        "Unfilled",
+        "None"
+      ],
+      "default": "Default"
+    },
+    "customContextMenus": {
+      "order": 3,
+      "title": "Custom Context Menus",
+      "description": "Use custom styled HTML context menus instead of native Electron menus. Matches the title bar styling.",
+      "type": "boolean",
+      "default": true
+    },
+    "autoHide": {
+      "order": 4,
+      "title": "Auto Hide Menu Bar",
+      "description": "Automatically hide the menu bar and toggle it by pressing Alt.",
+      "type": "boolean",
+      "default": true
+    },
+    "altGivesFocus": {
+      "order": 5,
+      "title": "Alt Gives Focus",
+      "description": "Releasing the alt key gives focus to the application menu.",
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

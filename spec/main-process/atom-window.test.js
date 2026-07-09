@@ -117,66 +117,20 @@ describe("AtomWindow", function () {
   });
 
   describe("launch behavior", function () {
-    if (process.platform === "darwin") {
-      it('sets titleBarStyle to "hidden" for a custom title bar on non-spec windows', function () {
-        app.config["core.titleBar"] = "custom";
+    it('sets frame to "false" for a hidden title bar on non-spec windows', function () {
+      app.config["core.titleBar"] = "hidden";
 
-        const { browserWindow: w0 } = new AtomWindow(app, service, {
-          browserWindowConstructor: StubBrowserWindow,
-        });
-        assert.strictEqual(w0.options.titleBarStyle, "hidden");
-
-        const { browserWindow: w1 } = new AtomWindow(app, service, {
-          browserWindowConstructor: StubBrowserWindow,
-          isSpec: true,
-        });
-        assert.isUndefined(w1.options.titleBarStyle);
+      const { browserWindow: w0 } = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow,
       });
+      assert.isFalse(w0.options.frame);
 
-      it('sets titleBarStyle to "hiddenInset" for a custom inset title bar on non-spec windows', function () {
-        app.config["core.titleBar"] = "custom-inset";
-
-        const { browserWindow: w0 } = new AtomWindow(app, service, {
-          browserWindowConstructor: StubBrowserWindow,
-        });
-        assert.strictEqual(w0.options.titleBarStyle, "hiddenInset");
-
-        const { browserWindow: w1 } = new AtomWindow(app, service, {
-          browserWindowConstructor: StubBrowserWindow,
-          isSpec: true,
-        });
-        assert.isUndefined(w1.options.titleBarStyle);
+      const { browserWindow: w1 } = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow,
+        isSpec: true,
       });
-      it('sets frame to "false" for a hidden title bar on non-spec windows', function () {
-        app.config["core.titleBar"] = "hidden";
-
-        const { browserWindow: w0 } = new AtomWindow(app, service, {
-          browserWindowConstructor: StubBrowserWindow,
-        });
-        assert.isFalse(w0.options.frame);
-
-        const { browserWindow: w1 } = new AtomWindow(app, service, {
-          browserWindowConstructor: StubBrowserWindow,
-          isSpec: true,
-        });
-        assert.isUndefined(w1.options.frame);
-      });
-    } else {
-      it('sets frame to "false" for a hidden title bar on non-spec windows', function () {
-        app.config["core.titleBar"] = "hidden";
-
-        const { browserWindow: w0 } = new AtomWindow(app, service, {
-          browserWindowConstructor: StubBrowserWindow,
-        });
-        assert.isFalse(w0.options.frame);
-
-        const { browserWindow: w1 } = new AtomWindow(app, service, {
-          browserWindowConstructor: StubBrowserWindow,
-          isSpec: true,
-        });
-        assert.isUndefined(w1.options.frame);
-      });
-    }
+      assert.isUndefined(w1.options.frame);
+    });
 
     it("opens initial locations", async function () {
       const locationsToOpen = [
@@ -502,7 +456,7 @@ describe("AtomWindow", function () {
 class StubApplication {
   constructor(sinon) {
     this.config = {
-      "core.titleBar": "native",
+      "core.titleBar": "hidden",
       get: (key) => this.config[key] || null,
     };
     this.configFile = {

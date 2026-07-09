@@ -132,6 +132,22 @@ module.exports = class ApplicationDelegate {
     return ipcHelpers.on(ipcRenderer, "did-leave-full-screen", callback);
   }
 
+  onDidMaximizeWindow(callback) {
+    return ipcHelpers.on(ipcRenderer, "did-maximize-window", callback);
+  }
+
+  onDidUnmaximizeWindow(callback) {
+    return ipcHelpers.on(ipcRenderer, "did-unmaximize-window", callback);
+  }
+
+  onDidFocusWindow(callback) {
+    return ipcHelpers.on(ipcRenderer, "did-focus-window", callback);
+  }
+
+  onDidBlurWindow(callback) {
+    return ipcHelpers.on(ipcRenderer, "did-blur-window", callback);
+  }
+
   async openWindowDevTools() {
     // Defer DevTools interaction to the next tick, because using them during
     // event handling causes some wrong input events to be triggered on

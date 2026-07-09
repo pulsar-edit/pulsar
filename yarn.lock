@@ -8193,6 +8193,9 @@ stat-mode@^1.0.0:
     grim "^2.0.1"
     underscore-plus "^1.0.0"
 
+"title-bar@file:packages/title-bar":
+  version "1.0.5"
+
 stop-iteration-iterator@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/stop-iteration-iterator/-/stop-iteration-iterator-1.1.0.tgz#f481ff70a548f6124d0312c3aa14cbfa7aa542ad"

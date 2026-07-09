@@ -39,10 +39,10 @@ const configSchema = {
       },
       titleBar: {
         type: "string",
-        default: "native",
-        enum: ["native", "hidden"],
+        default: "hidden",
+        enum: ["hidden", "native"],
         description:
-          "Experimental:  The title bar can  be completely `hidden`.<br>This setting will require a relaunch of Lumine to take effect.",
+          "Internal title bar mode. Lumine starts with the native title bar hidden so packages can provide a custom title bar.",
       },
       versionPinnedPackages: {
         type: "array",
@@ -645,13 +645,6 @@ if (["win32", "linux"].includes(process.platform)) {
 }
 
 if (process.platform === "darwin") {
-  configSchema.core.properties.titleBar = {
-    type: "string",
-    default: "native",
-    enum: ["native", "custom", "custom-inset", "hidden"],
-    description:
-      "Experimental: A `custom` title bar adapts to theme colors. Choosing `custom-inset` adds a bit more padding. The title bar can also be completely `hidden`.<br>Note: Switching to a custom or hidden title bar will compromise some functionality.<br>This setting will require a relaunch of Lumine to take effect.",
-  };
   configSchema.core.properties.simpleFullScreenWindows = {
     type: "boolean",
     default: false,
