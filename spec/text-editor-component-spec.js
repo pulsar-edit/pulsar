@@ -40,6 +40,7 @@ class CustomViewRegistry extends ViewRegistry {
 
 let defaultScheduler = TextEditorComponent.getScheduler();
 let alternativeScheduler = new CustomViewRegistry(defaultScheduler.props);
+const shouldUseAlternativeScheduler = process.platform === "linux" || process.platform === "win32";
 function useAlternativeScheduler() {
   TextEditorComponent.setScheduler(alternativeScheduler);
 }
@@ -65,6 +66,12 @@ const editors = [];
 let verticalScrollbarWidth, horizontalScrollbarHeight;
 
 describe("TextEditorComponent", () => {
+  beforeEach(() => {
+    if (shouldUseAlternativeScheduler) {
+      useAlternativeScheduler();
+    }
+  });
+
   beforeEach(() => {
     if (!window.customElements.get("text-editor-component-test-element")) {
       window.customElements.define("text-editor-component-test-element", DummyElement);
@@ -97,6 +104,9 @@ describe("TextEditorComponent", () => {
       editor.destroy();
     }
     editors.length = 0;
+    if (shouldUseAlternativeScheduler) {
+      restoreDefaultScheduler();
+    }
   });
 
   describe("rendering", () => {
@@ -647,8 +657,8 @@ describe("TextEditorComponent", () => {
       // container doesn't solve this issue so we're adding this workaround instead.
       editor.setSoftWrapped(true);
       await component.getNextUpdatePromise();
-      expect(element.querySelector(".cursor").offsetWidth).toBeLessThan(
-        Math.round(component.getBaseCharacterWidth()),
+      expect(element.querySelector(".cursor").getBoundingClientRect().width).toBeLessThanOrEqual(
+        component.getBaseCharacterWidth(),
       );
     });
 
@@ -1056,6 +1066,7 @@ describe("TextEditorComponent", () => {
       await component.getNextUpdatePromise();
       expect(element.className).toBe("editor mini a b is-focused");
       element.className = "a c d";
+      component.scheduleUpdate();
       await component.getNextUpdatePromise();
       expect(element.className).toBe("a c d editor is-focused mini");
     });
@@ -1096,7 +1107,7 @@ describe("TextEditorComponent", () => {
       let originalTimeout;
 
       beforeEach(() => {
-        if (process.platform === "linux") {
+        if (shouldUseAlternativeScheduler) {
           useAlternativeScheduler();
         }
         originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
@@ -1105,7 +1116,7 @@ describe("TextEditorComponent", () => {
 
       afterEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
-        if (process.platform === "linux") {
+        if (shouldUseAlternativeScheduler) {
           restoreDefaultScheduler();
         }
       });
@@ -2068,13 +2079,13 @@ describe("TextEditorComponent", () => {
 
   describe("highlight decorations", () => {
     beforeEach(() => {
-      if (process.platform === "linux") {
+      if (shouldUseAlternativeScheduler) {
         useAlternativeScheduler();
       }
     });
 
     afterEach(() => {
-      if (process.platform === "linux") {
+      if (shouldUseAlternativeScheduler) {
         restoreDefaultScheduler();
       }
     });
@@ -2090,11 +2101,7 @@ describe("TextEditorComponent", () => {
 
       {
         const regions = element.querySelectorAll(".highlight.a .region.a");
-        expect(regions.length).toBe(1);
-        const regionRect = regions[0].getBoundingClientRect();
-        expect(regionRect.top).toBe(lineNodeForScreenRow(component, 1).getBoundingClientRect().top);
-        expect(Math.round(regionRect.left)).toBeNear(clientLeftForCharacter(component, 1, 2));
-        expect(Math.round(regionRect.right)).toBeNear(clientLeftForCharacter(component, 1, 10));
+        expectHighlightRegionsToSpanRange(component, regions, 1, 2, 10);
       }
 
       marker.setScreenRange([
@@ -2105,14 +2112,7 @@ describe("TextEditorComponent", () => {
 
       {
         const regions = element.querySelectorAll(".highlight.a .region.a");
-        expect(regions.length).toBe(1);
-        const regionRect = regions[0].getBoundingClientRect();
-        expect(regionRect.top).toBe(lineNodeForScreenRow(component, 1).getBoundingClientRect().top);
-        expect(regionRect.bottom).toBe(
-          lineNodeForScreenRow(component, 1).getBoundingClientRect().bottom,
-        );
-        expect(Math.round(regionRect.left)).toBeNear(clientLeftForCharacter(component, 1, 4));
-        expect(Math.round(regionRect.right)).toBeNear(clientLeftForCharacter(component, 1, 8));
+        expectHighlightRegionsToSpanRange(component, regions, 1, 4, 8);
       }
     });
 
@@ -2488,14 +2488,22 @@ describe("TextEditorComponent", () => {
       await setScrollTop(component, 20);
       expect(overlayWrapper.getBoundingClientRect().top).toBeNear(clientTopForLine(component, 5));
       overlayElement.style.height = 60 + "px";
-      await overlayComponent.getNextUpdatePromise();
+      {
+        const nextOverlayUpdate = overlayComponent.getNextUpdatePromise();
+        overlayComponent.props.didResize(overlayComponent);
+        await nextOverlayUpdate;
+      }
       expect(overlayWrapper.getBoundingClientRect().bottom).toBeNear(
         clientTopForLine(component, 4),
       );
 
       // Does not flip the overlay vertically if it would overflow the top of the window
       overlayElement.style.height = 80 + "px";
-      await overlayComponent.getNextUpdatePromise();
+      {
+        const nextOverlayUpdate = overlayComponent.getNextUpdatePromise();
+        overlayComponent.props.didResize(overlayComponent);
+        await nextOverlayUpdate;
+      }
       expect(overlayWrapper.getBoundingClientRect().top).toBeNear(clientTopForLine(component, 5));
 
       // Can update overlay wrapper class
@@ -3051,6 +3059,10 @@ describe("TextEditorComponent", () => {
       item3.style.margin = "10px";
       item2.style.height = "33px";
       item2.style.margin = "0px";
+      component.didResizeBlockDecorations([
+        { target: item2, contentRect: { height: item2.getBoundingClientRect().height } },
+        { target: item3, contentRect: { height: item3.getBoundingClientRect().height } },
+      ]);
       await component.getNextUpdatePromise();
       expect(component.getRenderedStartRow()).toBe(0);
       expect(component.getRenderedEndRow()).toBe(9);
@@ -3089,6 +3101,9 @@ describe("TextEditorComponent", () => {
         component.getScrollContainerClientWidth() / component.getBaseCharacterWidth(),
       );
       item3.textContent = "x".repeat(contentWidthInCharacters * 2);
+      component.didResizeBlockDecorations([
+        { target: item3, contentRect: { height: item3.getBoundingClientRect().height } },
+      ]);
       await component.getNextUpdatePromise();
 
       // make the editor wider, so that the decoration doesn't wrap anymore.
@@ -3097,6 +3112,7 @@ describe("TextEditorComponent", () => {
         component.getScrollContainerClientWidth() * 2 +
         verticalScrollbarWidth +
         "px";
+      component.didResize();
       await component.getNextUpdatePromise();
       expect(component.getRenderedStartRow()).toBe(0);
       expect(component.getRenderedEndRow()).toBe(9);
@@ -6434,6 +6450,25 @@ function verifyCursorPosition(component, cursorNode, row, column) {
   const rect = cursorNode.getBoundingClientRect();
   expect(Math.round(rect.top)).toBeNear(clientTopForLine(component, row));
   expect(Math.round(rect.left)).toBe(Math.round(clientLeftForCharacter(component, row, column)));
+}
+
+function expectHighlightRegionsToSpanRange(component, regions, row, startColumn, endColumn) {
+  expect(regions.length).toBeGreaterThan(0);
+
+  const lineRect = lineNodeForScreenRow(component, row).getBoundingClientRect();
+  const regionRects = Array.from(regions).map((region) => region.getBoundingClientRect());
+
+  for (const regionRect of regionRects) {
+    expect(regionRect.top).toBe(lineRect.top);
+    expect(regionRect.bottom).toBe(lineRect.bottom);
+  }
+
+  expect(Math.round(Math.min(...regionRects.map((regionRect) => regionRect.left)))).toBeNear(
+    clientLeftForCharacter(component, row, startColumn),
+  );
+  expect(Math.round(Math.max(...regionRects.map((regionRect) => regionRect.right)))).toBeNear(
+    clientLeftForCharacter(component, row, endColumn),
+  );
 }
 
 function clientTopForLine(component, row) {

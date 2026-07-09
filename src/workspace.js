@@ -62,6 +62,8 @@ function normalizePattern(rawPath) {
     negation = "!";
   }
 
+  rawPath = rawPath.replace(/\\/g, "/");
+
   // If a user searches for (e.g.) `*.js`, we want to search all `.js` files
   // anywhere in the project, not just in the root. That means we should treat
   // patterns as implicitly prepending `**/` if they contain no path separators.
@@ -70,7 +72,7 @@ function normalizePattern(rawPath) {
   // to _all_ patterns unless the user specifically opts out by starting a
   // path with `/`. This would make plenty of sense for us, but would be a
   // change in behavior, so for now we're going with this as a compromise.
-  let prefix = rawPath.includes(path.sep) || rawPath.includes("/") ? "" : `**${path.sep}`;
+  let prefix = rawPath.includes("/") ? "" : "**/";
   return `${negation}${prefix}${rawPath}`;
 }
 
@@ -108,15 +110,15 @@ function extractProjectRootsFromPathPattern(pathPattern, rootBasenames) {
     pathPattern = pathPattern.substring(1);
   }
   let prefix = negated ? "!" : "";
-  let normalized = path.normalize(pathPattern);
-  let originalPathPattern = pathPattern;
+  let normalized = pathPattern.replace(/\\/g, "/");
+  let originalPathPattern = normalized;
   if (pathPattern === "") return [null, ""];
   let rootBasename;
-  if (!pathPattern.includes(path.sep)) {
-    rootBasename = pathPattern;
+  if (!normalized.includes("/")) {
+    rootBasename = normalized;
     pathPattern = "";
   } else {
-    let index = normalized.indexOf(path.sep);
+    let index = normalized.indexOf("/");
     rootBasename = normalized.substring(0, index);
     pathPattern = normalized.slice(index + 1);
   }
