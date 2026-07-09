@@ -292,7 +292,7 @@
   "scripts": {
     "build": "electron-rebuild",
     "postinstall": "patch-package",
-    "start": "electron --no-sandbox --enable-logging . -f",
+    "start": "electron --no-sandbox --enable-logging . -f --dev",
     "dist": "node script/electron-builder.js",
     "full": "yarn install && yarn build && yarn dist",
     "lint": "eslint .",
