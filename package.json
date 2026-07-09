@@ -32,7 +32,7 @@
     "@jasminejs/reporters": "1.0.0",
     "@parcel/watcher": "^2.5.0",
     "@pulsar-edit/atom-keymap": "^9.1.0",
-    "@pulsar-edit/fuzzy-native": "https://github.com/lumine-code/fuzzy-native.git#eae88f7",
+    "@pulsar-edit/fuzzy-native": "https://github.com/lumine-code/fuzzy-native.git#0fe203c",
     "@pulsar-edit/get-scrollbar-style": "^1.0.1",
     "@pulsar-edit/git-utils": "^7.0.1",
     "@pulsar-edit/pathwatcher": "^9.0.2",
