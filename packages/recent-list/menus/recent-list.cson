@@ -1,0 +1,13 @@
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      {
+        'label': 'Recent List'
+        'submenu': [
+            {'label': 'Toggle' , 'command': 'recent-list:toggle'}
+        ]
+      }
+    ]
+  }
+]

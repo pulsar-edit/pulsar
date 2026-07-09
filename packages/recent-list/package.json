@@ -1,0 +1,26 @@
+{
+  "name": "recent-list",
+  "description": "Quick access to recently opened projects",
+  "repository": "https://github.com/lumine-code/lumine",
+  "version": "1.0.3",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.132.2 <2.0.0"
+  },
+  "main": "./lib/main",
+  "providedServices": {
+    "recent-list": {
+      "description": "Provides access to the recent projects list manager",
+      "versions": {
+        "1.0.0": "provideRecentList"
+      }
+    }
+  },
+  "consumedServices": {
+    "open-external": {
+      "versions": {
+        "^1.0.0": "consumeOpenExternalService"
+      }
+    }
+  }
+}

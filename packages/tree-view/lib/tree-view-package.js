@@ -213,6 +213,11 @@ module.exports = class TreeViewPackage {
         if (this.treeView.addProjectsView)
           this.treeView.addProjectsView.setProjectList(this.projectList);
       }
+      if (this.recentList) {
+        this.treeView.recentList = this.recentList;
+        if (this.treeView.addProjectsView)
+          this.treeView.addProjectsView.setRecentList(this.recentList);
+      }
       this.reattachSpecialRoots();
     }
     return this.treeView;

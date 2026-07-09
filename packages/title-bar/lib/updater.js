@@ -74,7 +74,7 @@ class MenuUpdater {
       }
 
       // Skip if template submenu is empty but DOM has items - this indicates
-      // dynamic content that's about to be repopulated (e.g., "Reopen Project")
+      // dynamic content that's about to be repopulated.
       if (templateItem.submenu.length === 0 && itemSub.length > 0) {
         return;
       }
@@ -148,14 +148,6 @@ class MenuUpdater {
       if (a.getCommand() !== undefined) {
         const commandMatch = a.getCommand() === b.command;
         if (!commandMatch) return false;
-
-        // For reopen-project, compare by paths only — index shifts after deletion
-        // and would cause all subsequent items to be replaced unnecessarily
-        if (a.getCommand() === "application:reopen-project") {
-          const pathsA = a.getCommandDetail()?.paths;
-          const pathsB = b.commandDetail?.paths;
-          return JSON.stringify(pathsA) === JSON.stringify(pathsB);
-        }
 
         // For all other commands, compare full commandDetail
         const detailA = a.getCommandDetail();

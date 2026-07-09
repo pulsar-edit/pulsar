@@ -95,28 +95,6 @@ class MenuItem {
       self.commandDetail = menuItem.commandDetail;
     }
 
-    if (
-      menuItem.command === "application:reopen-project" &&
-      menuItem.commandDetail?.paths?.length
-    ) {
-      const paths = menuItem.commandDetail.paths;
-      itemEl.addEventListener("contextmenu", (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        atom.history.removeProject(paths);
-      });
-      if (paths.length > 1) {
-        menuItemName.innerHTML = "";
-        for (const p of paths) {
-          const line = document.createElement("div");
-          line.classList.add("menu-item-path-line");
-          line.textContent = p;
-          menuItemName.appendChild(line);
-        }
-        itemEl.classList.add("menu-item-multipath");
-      }
-    }
-
     if (menuItem.submenu instanceof Array) {
       if (menuItem.submenu.length === 0) {
         // Create empty submenu container for dynamic population
@@ -274,10 +252,6 @@ class MenuItem {
       return;
     }
 
-    if (this.isReopenProjectCommand()) {
-      return this.reopenProjectInNewWindow();
-    }
-
     if (exceptionCommands.has(this.command)) {
       getIpcRenderer().send("command", this.command);
       return;
@@ -309,9 +283,7 @@ class MenuItem {
     setTimeout(() => {
       let result;
       if (command !== undefined) {
-        if (MenuItem.isReopenProjectCommand(command, commandDetail)) {
-          result = MenuItem.reopenProjectInNewWindow(commandDetail);
-        } else if (exceptionCommands.has(command)) {
+        if (exceptionCommands.has(command)) {
           result = getIpcRenderer().send("command", command);
         } else {
           result = atom.commands.dispatch(target, command, commandDetail);
@@ -329,10 +301,6 @@ class MenuItem {
       return;
     }
 
-    if (MenuItem.isReopenProjectCommand(command, commandDetail)) {
-      return MenuItem.reopenProjectInNewWindow(commandDetail);
-    }
-
     if (exceptionCommands.has(command)) {
       getIpcRenderer().send("command", command);
       return;
@@ -346,27 +314,6 @@ class MenuItem {
       atom.workspace.getActivePane().getElement();
 
     await atom.commands.dispatch(target, command, commandDetail);
-  }
-
-  isReopenProjectCommand() {
-    return MenuItem.isReopenProjectCommand(this.command, this.commandDetail);
-  }
-
-  reopenProjectInNewWindow() {
-    return MenuItem.reopenProjectInNewWindow(this.commandDetail);
-  }
-
-  static isReopenProjectCommand(command, commandDetail) {
-    return command === "application:reopen-project" && commandDetail?.paths?.length;
-  }
-
-  static reopenProjectInNewWindow(commandDetail) {
-    return atom.open({
-      pathsToOpen: commandDetail.paths,
-      newWindow: true,
-      safeMode: atom.inSafeMode?.(),
-      devMode: atom.inDevMode?.(),
-    });
   }
 
   addChild(item) {

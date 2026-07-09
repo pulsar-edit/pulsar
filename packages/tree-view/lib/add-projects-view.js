@@ -36,11 +36,10 @@ module.exports = class AddProjectView {
     this.reopenProjectButton = document.createElement("button");
     this.reopenProjectButton.classList.add("btn");
     this.reopenProjectButton.innerText = "Reopen a project";
+    this.reopenProjectButton.style.display = "none";
     this.reopenProjectButton.addEventListener("click", () => {
       if (this.recentList) {
-        atom.commands.dispatch(this.element, "recent-list:toggle");
-      } else {
-        atom.commands.dispatch(this.element, "application:reopen-project");
+        this.recentList.toggle();
       }
     });
     this.element.appendChild(this.reopenProjectButton);
@@ -69,6 +68,10 @@ module.exports = class AddProjectView {
   }
 
   setRecentList(recentList) {
-    this.recentList = recentList;
+    this.recentList = typeof recentList?.toggle === "function" ? recentList : null;
+    this.reopenProjectButton.style.display = this.recentList ? "" : "none";
+    if (!this.recentList) {
+      this.reopenProjectButton.classList.remove("selected");
+    }
   }
 };

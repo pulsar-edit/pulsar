@@ -304,11 +304,6 @@ const configSchema = {
         description:
           "When selected 'no', a blank environment is loaded. When selected 'yes' and Lumine is started from the icon or `lumine` by itself from the command line, restores the last state of all Lumine windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Lumine windows always, no matter how Lumine is started.",
       },
-      reopenProjectMenuCount: {
-        description: "How many recent projects to show in the Reopen Project menu.",
-        type: "integer",
-        default: 15,
-      },
       automaticallyUpdate: {
         description:
           "Automatically update Lumine when a new release is available. **Note**: Currently not functional, please download new releases from [Lumine releases](https://github.com/lumine-code/lumine/releases)",

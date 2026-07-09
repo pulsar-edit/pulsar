@@ -4,7 +4,7 @@ const { Emitter, CompositeDisposable } = require("event-kit");
 //
 // An instance of this class is always available as the `atom.history` global.
 //
-// The project history is used to enable the 'Reopen Project' menu.
+// The project history is used to populate recent project lists.
 class HistoryManager {
   constructor({ project, commands, stateStore }) {
     this.stateStore = stateStore;
