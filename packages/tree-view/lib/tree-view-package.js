@@ -25,29 +25,26 @@ module.exports = class TreeViewPackage {
     );
 
     this.getTreeViewInstance();
-    this.patchWorkspaceRestore();
 
-    const openAndShow = async () => {
+    const openByDefault = async () => {
       const showOnAttach = !atom.workspace.getActivePaneItem();
-      await atom.workspace.open(this.treeView, {
+      const item = await atom.workspace.openDefaultItem(this.treeView, {
         searchAllPanes: true,
         activatePane: showOnAttach,
         activateItem: showOnAttach,
       });
-      if (atom.config.get("tree-view.hiddenOnStartup")) {
-        this.treeView.hide();
-      } else {
+      if (item) {
         this.treeView.show(false);
       }
     };
 
     if (atom.packages.hasActivatedInitialPackages()) {
-      this.treeViewOpenPromise = openAndShow();
+      this.treeViewOpenPromise = openByDefault();
     } else {
       this.treeViewOpenPromise = new Promise((resolve) => {
         this.disposables.add(
           atom.packages.onDidActivateInitialPackages(async () => {
-            await openAndShow();
+            await openByDefault();
             resolve();
           }),
         );
@@ -60,42 +57,6 @@ module.exports = class TreeViewPackage {
     await this.treeViewOpenPromise; // Wait for Tree View to finish opening before destroying it
     if (this.treeView) this.treeView.destroy();
     this.treeView = null;
-  }
-
-  // HACK: Pulsar's `isPermanentDockItem` API conflates two concerns: the
-  // close-button visibility and destruction protection during workspace state
-  // restoration. Returning `true` hides the X button; returning `false` shows
-  // it but lets `restoreStateIntoThisEnvironment` destroy the tree view when
-  // switching projects (setPaths → IPC → pane.destroy → destroyItems).
-  //
-  // Workaround: return `false` from `isPermanentDockItem` (so the X button is
-  // shown) and monkey-patch `restoreStateIntoThisEnvironment` to pull the tree
-  // view out of its pane before panes are destroyed, then re-add it after.
-  //
-  // See: https://github.com/pulsar-edit/pulsar/pull/1410
-  patchWorkspaceRestore() {
-    const origRestore = atom.restoreStateIntoThisEnvironment;
-    atom.restoreStateIntoThisEnvironment = (state) => {
-      const treeView = this.treeView;
-      const pane = treeView ? atom.workspace.paneForItem(treeView) : null;
-      if (pane) pane.removeItem(treeView, false);
-      const result = origRestore.call(atom, state);
-      if (treeView) {
-        atom.workspace
-          .open(treeView, {
-            searchAllPanes: true,
-            activatePane: false,
-            activateItem: false,
-          })
-          .then(() => treeView.show(false));
-      }
-      return result;
-    };
-    this.disposables.add(
-      new Disposable(() => {
-        atom.restoreStateIntoThisEnvironment = origRestore;
-      }),
-    );
   }
 
   consumeElementIcons(service) {

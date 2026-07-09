@@ -234,6 +234,11 @@ const ALL_LOCATIONS = ["center", "left", "right", "bottom"];
 // or more of the following values: `'center'`, `'left'`, `'right'`, or
 // `'bottom'`.
 //
+// #### `shouldOpenByDefault()`
+//
+// Tells the workspace whether this item should be opened in a fresh workspace
+// when no saved workspace layout has been restored.
+//
 // #### `isPermanentDockItem()`
 //
 // Tells the workspace whether or not this item can be closed by the user by
@@ -332,6 +337,7 @@ module.exports = class Workspace extends Model {
     this.emitter = new Emitter();
     this.openers = [];
     this.destroyedItemURIs = [];
+    this.hasRestoredState = false;
     this.stoppedChangingActivePaneItemTimeout = null;
 
     this.scandalDirectorySearcher = new DefaultDirectorySearcher();
@@ -491,6 +497,7 @@ module.exports = class Workspace extends Model {
 
     this.openers = [];
     this.destroyedItemURIs = [];
+    this.hasRestoredState = false;
     if (this.element) {
       this.element.destroy();
       this.element = null;
@@ -542,6 +549,7 @@ module.exports = class Workspace extends Model {
   }
 
   deserialize(state, deserializerManager) {
+    this.hasRestoredState = true;
     const packagesWithActiveGrammars =
       state.packagesWithActiveGrammars != null ? state.packagesWithActiveGrammars : [];
     for (let packageName of packagesWithActiveGrammars) {
@@ -1110,6 +1118,35 @@ module.exports = class Workspace extends Model {
   /*
   Section: Opening
   */
+
+  // Extended: Open an item only when it opts into default opening and no saved
+  // workspace layout has been restored.
+  async openDefaultItem(item, options = {}) {
+    if (typeof item?.shouldOpenByDefault !== "function" || !item.shouldOpenByDefault()) {
+      return;
+    }
+
+    let uri;
+    if (typeof item.getURI === "function") {
+      uri = item.getURI();
+    } else if (typeof item.getUri === "function") {
+      uri = item.getUri();
+    }
+
+    if (this.paneForItem(item) || (uri && this.paneForURI(uri))) {
+      return;
+    }
+
+    if (this.hasRestoredState) {
+      return;
+    }
+
+    if (uri && this.destroyedItemURIs.includes(uri)) {
+      return;
+    }
+
+    return this.open(item, options);
+  }
 
   // Essential: Opens the given URI in Lumine asynchronously.
   // If the URI is already open, the existing item for that URI will be

@@ -235,10 +235,8 @@ class TreeView {
     return ["left", "right"];
   }
 
-  // Returns false so the dock tab shows an X close button. Workspace state
-  // restoration protection is handled via monkey-patch in tree-view-package.js.
-  isPermanentDockItem() {
-    return false;
+  shouldOpenByDefault() {
+    return !atom.config.get("tree-view.hiddenOnStartup");
   }
 
   getPreferredWidth() {
