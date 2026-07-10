@@ -553,6 +553,14 @@ const configSchema = {
         description:
           "When soft wrap is enabled, defines length of additional indentation applied to wrapped lines, in number of characters.",
       },
+      softWrapDebounceInterval: {
+        type: "integer",
+        default: 100,
+        minimum: 0,
+        maximum: 1000,
+        description:
+          "When soft wrap is enabled, delays re-wrapping while the editor width is changing (for example during a pane resize) until the width has been stable for this many milliseconds. `0` re-wraps immediately. Higher values reduce CPU usage while resizing large files, at the cost of briefly showing stale wrapping.",
+      },
       scrollSensitivity: {
         type: "integer",
         default: 40,

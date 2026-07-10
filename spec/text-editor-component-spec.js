@@ -5665,6 +5665,207 @@ describe("TextEditorComponent", () => {
       expect(component.getScrollTopRow()).toBe(4);
     });
 
+    it("keeps the viewport visually stable when a soft-wrap reflow follows a manual scroll", async () => {
+      const { component } = buildComponent({
+        softWrapped: true,
+        autoHeight: false,
+      });
+      await setEditorHeightInLines(component, 10);
+      await setEditorWidthInCharacters(component, 40);
+
+      // Scroll into the middle of the document via a manual scroll.
+      await setScrollTop(component, Math.round(component.getMaxScrollTop() / 2));
+      component.lastScrollWasManual = true;
+
+      // Distance from the viewport top to the top of the row at the midpoint.
+      const midPixel = component.getScrollTop() + component.getScrollContainerClientHeight() / 2;
+      const midScreenRow = component.rowForPixelPosition(midPixel);
+      const midBufferPosition = component.props.model.bufferPositionForScreenPosition([
+        midScreenRow,
+        0,
+      ]);
+      const offsetBefore =
+        component.pixelPositionBeforeBlocksForRow(midScreenRow) - component.getScrollTop();
+
+      // Narrow the editor to force a soft-wrap reflow.
+      await setEditorWidthInCharacters(component, 20);
+
+      const newScreenRow =
+        component.props.model.screenPositionForBufferPosition(midBufferPosition).row;
+      const offsetAfter =
+        component.pixelPositionBeforeBlocksForRow(newScreenRow) - component.getScrollTop();
+      expect(Math.abs(offsetAfter - offsetBefore)).toBeLessThan(component.getLineHeight());
+    });
+
+    it("keeps the cursor line visually stable when a soft-wrap reflow follows a cursor move", async () => {
+      const { component, editor } = buildComponent({
+        softWrapped: true,
+        autoHeight: false,
+      });
+      await setEditorHeightInLines(component, 10);
+      await setEditorWidthInCharacters(component, 40);
+
+      // Move the cursor down; autoscroll marks this as a non-manual movement.
+      editor.setCursorScreenPosition([12, 0]);
+      await component.getNextUpdatePromise();
+      const offsetBefore =
+        component.pixelPositionBeforeBlocksForRow(editor.getCursorScreenPosition().row) -
+        component.getScrollTop();
+
+      await setEditorWidthInCharacters(component, 20);
+
+      const offsetAfter =
+        component.pixelPositionBeforeBlocksForRow(editor.getCursorScreenPosition().row) -
+        component.getScrollTop();
+      expect(Math.abs(offsetAfter - offsetBefore)).toBeLessThan(component.getLineHeight());
+    });
+
+    it("keeps an unfocused editor stable when another editor on the same buffer edits above its viewport", async () => {
+      const editor = buildEditor({ autoHeight: false });
+      const { component } = buildComponent({ editor: editor.copy(), autoHeight: false });
+      await setEditorHeightInLines(component, 6);
+      await setEditorWidthInCharacters(component, 40);
+
+      await setScrollTop(component, Math.round(component.getMaxScrollTop() / 2));
+
+      const scrollTopBefore = component.getScrollTop();
+      const lineHeight = component.getLineHeight();
+
+      // Insert three lines at the very top of the shared buffer.
+      editor.getBuffer().insert([0, 0], "one\ntwo\nthree\n");
+      await component.getNextUpdatePromise();
+
+      expect(component.getScrollTop()).toBeNear(scrollTopBefore + 3 * lineHeight);
+    });
+
+    it("keeps the last line stable across a soft-wrap reflow when scrolled past the end", async () => {
+      const { component, editor } = buildComponent({
+        softWrapped: true,
+        autoHeight: false,
+      });
+      editor.update({ scrollPastEnd: true });
+      await setEditorHeightInLines(component, 10);
+      await setEditorWidthInCharacters(component, 40);
+
+      // Scroll to the very bottom so the last line sits in the top half of the
+      // viewport (more than half a screen past the end).
+      await setScrollTop(component, component.getMaxScrollTop());
+      component.lastScrollWasManual = true;
+
+      const lastRow = editor.getLastScreenRow();
+      const offsetBefore =
+        component.pixelPositionBeforeBlocksForRow(lastRow) - component.getScrollTop();
+
+      await setEditorWidthInCharacters(component, 20);
+
+      const newLastRow = editor.getLastScreenRow();
+      const offsetAfter =
+        component.pixelPositionBeforeBlocksForRow(newLastRow) - component.getScrollTop();
+      expect(Math.abs(offsetAfter - offsetBefore)).toBeLessThan(component.getLineHeight());
+    });
+
+    it("debounces the soft-wrap reflow while the width is changing when softWrapDebounceInterval is set", async () => {
+      jasmine.useRealClock();
+      const { component, editor } = buildComponent({
+        softWrapped: true,
+        autoHeight: false,
+      });
+      await setEditorHeightInLines(component, 10);
+      await setEditorWidthInCharacters(component, 40);
+
+      // Enable debouncing only after the initial layout has settled, so the
+      // baseline width reflects the 40-character width.
+      editor.update({ softWrapDebounceInterval: 50 });
+      const widthBefore = editor.getEditorWidthInChars();
+
+      // Narrowing the editor should not re-wrap immediately while debouncing.
+      await setEditorWidthInCharacters(component, 20);
+      expect(editor.getEditorWidthInChars()).toBe(widthBefore);
+
+      // Once the width settles for the debounce interval, the reflow happens.
+      await conditionPromise(() => editor.getEditorWidthInChars() !== widthBefore);
+      expect(editor.getEditorWidthInChars()).toBeLessThan(widthBefore);
+    });
+
+    it("preserves the visual scroll position when copied into a pane with a different width", async () => {
+      const { component, editor } = buildComponent({
+        softWrapped: true,
+        autoHeight: false,
+      });
+      await setEditorHeightInLines(component, 10);
+      await setEditorWidthInCharacters(component, 40);
+
+      // Put the cursor mid-document and scroll it into view.
+      editor.setCursorBufferPosition([12, 0]);
+      await component.getNextUpdatePromise();
+      const anchorBufferPosition = editor.getCursorBufferPosition();
+      const offsetBefore =
+        component.pixelPositionBeforeBlocksForRow(editor.getCursorScreenPosition().row) -
+        component.getScrollTop();
+
+      // Copy the editor and display it in a narrower pane (different soft wrap).
+      const copy = editor.copy();
+      editors.push(copy);
+      const copyElement = copy.getElement();
+      const copyComponent = copy.component;
+      copyElement.style.height = component.getLineHeight() * 10 + "px";
+      copyElement.style.width =
+        component.getGutterContainerWidth() +
+        25 * component.measurements.baseCharacterWidth +
+        verticalScrollbarWidth +
+        "px";
+      jasmine.attachToDOM(copyElement);
+      await conditionPromise(() => copyComponent.hasInitialMeasurements);
+
+      // The anchored buffer position should keep the same offset from the top
+      // of the viewport, even though the narrower width wraps lines differently.
+      const copyScreenRow = copy.screenPositionForBufferPosition(anchorBufferPosition).row;
+      const offsetAfter =
+        copyComponent.pixelPositionBeforeBlocksForRow(copyScreenRow) - copyComponent.getScrollTop();
+      expect(Math.abs(offsetAfter - offsetBefore)).toBeLessThan(2 * copyComponent.getLineHeight());
+    });
+
+    it("preserves the past-end scroll position when copied into a pane with a different width", async () => {
+      const { component, editor } = buildComponent({
+        softWrapped: true,
+        autoHeight: false,
+      });
+      editor.update({ scrollPastEnd: true });
+      await setEditorHeightInLines(component, 10);
+      await setEditorWidthInCharacters(component, 40);
+
+      // Put the cursor on the last line (so a copy doesn't autoscroll away from
+      // it) and scroll into the past-end zone.
+      editor.setCursorBufferPosition(editor.getEofBufferPosition());
+      await setScrollTop(component, component.getMaxScrollTop());
+      component.lastScrollWasManual = true;
+
+      const lastRow = editor.getLastScreenRow();
+      const anchorBufferPosition = editor.bufferPositionForScreenPosition([lastRow, 0]);
+      const offsetBefore =
+        component.pixelPositionBeforeBlocksForRow(lastRow) - component.getScrollTop();
+
+      const copy = editor.copy();
+      editors.push(copy);
+      const copyElement = copy.getElement();
+      const copyComponent = copy.component;
+      copyElement.style.height = component.getLineHeight() * 10 + "px";
+      copyElement.style.width =
+        component.getGutterContainerWidth() +
+        25 * component.measurements.baseCharacterWidth +
+        verticalScrollbarWidth +
+        "px";
+      jasmine.attachToDOM(copyElement);
+      await conditionPromise(() => copyComponent.hasInitialMeasurements);
+
+      // The last line should keep the same offset from the viewport top, with
+      // the past-end zone reproduced below it.
+      const copyLastRow = copy.screenPositionForBufferPosition(anchorBufferPosition).row;
+      const offsetAfter =
+        copyComponent.pixelPositionBeforeBlocksForRow(copyLastRow) - copyComponent.getScrollTop();
+      expect(Math.abs(offsetAfter - offsetBefore)).toBeLessThan(2 * copyComponent.getLineHeight());
+    });
+
     it("gracefully handles the editor being hidden after a styling change", async () => {
       jasmine.useRealClock();
       jasmine.filterByPlatform({ only: ["linux"] });

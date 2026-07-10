@@ -135,6 +135,14 @@ module.exports = class TextEditorComponent {
     this.scrollLeftPending = false;
     this.scrollTop = 0;
     this.scrollLeft = 0;
+    // Tracks whether the last vertical viewport change was a manual scroll (as
+    // opposed to a cursor/autoscroll move). Used to pick the scroll anchor that
+    // keeps the viewport visually stable across soft-wrap reflows.
+    this.lastScrollWasManual = false;
+    this.scrollAnchorBeforeReset = null;
+    // Coalesces width-driven soft-wrap reflows when softWrapDebounceInterval > 0.
+    this.softWrapDebounceTimer = null;
+    this.flushingSoftWrapColumn = false;
     this.previousScrollWidth = 0;
     this.previousScrollHeight = 0;
     this.lastKeydown = null;
@@ -173,6 +181,9 @@ module.exports = class TextEditorComponent {
     this.textDecorationBoundaries = [];
     this.pendingScrollTopRow = this.props.initialScrollTopRow;
     this.pendingScrollLeftColumn = this.props.initialScrollLeftColumn;
+    // A buffer-based scroll anchor (from a copied editor) takes precedence over
+    // pendingScrollTopRow so the visual position survives a different width.
+    this.pendingScrollAnchor = this.props.initialScrollAnchor;
     this.tabIndex =
       this.props.element && this.props.element.tabIndex ? this.props.element.tabIndex : -1;
 
@@ -1542,6 +1553,10 @@ module.exports = class TextEditorComponent {
 
   didDetach() {
     if (this.attached) {
+      if (this.softWrapDebounceTimer) {
+        clearTimeout(this.softWrapDebounceTimer);
+        this.softWrapDebounceTimer = null;
+      }
       this.intersectionObserver.disconnect();
       this.resizeObserver.disconnect();
       if (this.gutterContainerResizeObserver) this.gutterContainerResizeObserver.disconnect();
@@ -1642,6 +1657,8 @@ module.exports = class TextEditorComponent {
     const scrollTopChanged =
       wheelDeltaY !== 0 && this.setScrollTop(this.getScrollTop() - wheelDeltaY);
 
+    if (scrollTopChanged) this.lastScrollWasManual = true;
+
     if (scrollLeftChanged || scrollTopChanged) {
       event.preventDefault();
       this.updateSync();
@@ -1685,6 +1702,7 @@ module.exports = class TextEditorComponent {
     let scrollLeftChanged = false;
     if (!this.scrollTopPending) {
       scrollTopChanged = this.setScrollTop(this.refs.verticalScrollbar?.element.scrollTop ?? 0);
+      if (scrollTopChanged) this.lastScrollWasManual = true;
     }
     if (!this.scrollLeftPending) {
       scrollLeftChanged = this.setScrollLeft(
@@ -2166,12 +2184,22 @@ module.exports = class TextEditorComponent {
 
   didRequestAutoscroll(autoscroll) {
     this.pendingAutoscroll = autoscroll;
+    // An autoscroll request reflects a cursor/selection move rather than a
+    // manual scroll, so anchor to the cursor line on the next reflow.
+    this.lastScrollWasManual = false;
     this.scheduleUpdate();
   }
 
   flushPendingLogicalScrollPosition() {
     let changedScrollTop = false;
-    if (this.pendingScrollTopRow > 0) {
+    if (this.pendingScrollAnchor) {
+      // Restore the source viewport's buffer position, mapped through this
+      // editor's (possibly different) width.
+      this.restoreScrollAnchor(this.pendingScrollAnchor);
+      this.pendingScrollAnchor = null;
+      this.pendingScrollTopRow = null;
+      changedScrollTop = true;
+    } else if (this.pendingScrollTopRow > 0) {
       changedScrollTop = this.setScrollTopRow(this.pendingScrollTopRow, false);
       this.pendingScrollTopRow = null;
     }
@@ -2276,27 +2304,47 @@ module.exports = class TextEditorComponent {
   updateModelSoftWrapColumn() {
     const { model } = this.props;
     const newEditorWidthInChars = this.getScrollContainerClientWidthInBaseCharacters();
-    if (newEditorWidthInChars !== model.getEditorWidthInChars()) {
-      this.suppressUpdates = true;
+    if (newEditorWidthInChars === model.getEditorWidthInChars()) return;
 
-      const renderedStartRow = this.getRenderedStartRow();
-      this.props.model.setEditorWidthInChars(newEditorWidthInChars);
-
-      // Relaying a change in to the editor's client width may cause the
-      // vertical scrollbar to appear or disappear, which causes the editor's
-      // client width to change *again*. Make sure the display layer is fully
-      // populated for the visible area before recalculating the editor's
-      // width in characters. Then update the display layer *again* just in
-      // case a change in scrollbar visibility causes lines to wrap
-      // differently. We capture the renderedStartRow before resetting the
-      // display layer because once it has been reset, we can't compute the
-      // rendered start row accurately. 😥
-      this.populateVisibleRowRange(renderedStartRow);
-      this.props.model.setEditorWidthInChars(this.getScrollContainerClientWidthInBaseCharacters());
-      this.derivedDimensionsCache = {};
-
-      this.suppressUpdates = false;
+    // Optionally coalesce rapid width changes (e.g. during a pane resize) into a
+    // single reflow once the width settles, to avoid re-wrapping every frame on
+    // large files. The trailing flush re-enters this method with the flag set.
+    const debounceInterval = model.getSoftWrapDebounceInterval();
+    if (
+      debounceInterval > 0 &&
+      this.hasInitialMeasurements &&
+      !this.flushingSoftWrapColumn &&
+      model.isSoftWrapped()
+    ) {
+      if (this.softWrapDebounceTimer) clearTimeout(this.softWrapDebounceTimer);
+      this.softWrapDebounceTimer = setTimeout(() => {
+        this.softWrapDebounceTimer = null;
+        this.flushingSoftWrapColumn = true;
+        this.scheduleUpdate();
+      }, debounceInterval);
+      return;
     }
+    this.flushingSoftWrapColumn = false;
+
+    this.suppressUpdates = true;
+
+    const renderedStartRow = this.getRenderedStartRow();
+    this.props.model.setEditorWidthInChars(newEditorWidthInChars);
+
+    // Relaying a change in to the editor's client width may cause the
+    // vertical scrollbar to appear or disappear, which causes the editor's
+    // client width to change *again*. Make sure the display layer is fully
+    // populated for the visible area before recalculating the editor's
+    // width in characters. Then update the display layer *again* just in
+    // case a change in scrollbar visibility causes lines to wrap
+    // differently. We capture the renderedStartRow before resetting the
+    // display layer because once it has been reset, we can't compute the
+    // rendered start row accurately. 😥
+    this.populateVisibleRowRange(renderedStartRow);
+    this.props.model.setEditorWidthInChars(this.getScrollContainerClientWidthInBaseCharacters());
+    this.derivedDimensionsCache = {};
+
+    this.suppressUpdates = false;
   }
 
   // This method exists because it existed in the previous implementation and some
@@ -2829,14 +2877,40 @@ module.exports = class TextEditorComponent {
     }
   }
 
+  // Called by the model just before the display layer resets its screen-row
+  // geometry. Records where the viewport is anchored (in buffer coordinates)
+  // while the old geometry is still queryable, so didResetDisplayLayer can put
+  // the same content back under the viewport after the rows are re-wrapped.
+  willResetDisplayLayer() {
+    this.scrollAnchorBeforeReset = this.captureScrollAnchor();
+  }
+
   didResetDisplayLayer() {
     this.spliceLineTopIndex(0, Infinity, Infinity);
+    if (this.scrollAnchorBeforeReset) {
+      this.restoreScrollAnchor(this.scrollAnchorBeforeReset);
+      this.scrollAnchorBeforeReset = null;
+    }
     this.scheduleUpdate();
   }
 
   didChangeDisplayLayer(changes) {
+    // Screen-row changes entirely above the viewport shift every visible row by
+    // the same amount. Compensate scrollTop by that delta so the visible
+    // content stays put. This keeps unfocused split editors on the same buffer
+    // stable while another editor inserts or removes lines above their
+    // viewport. The focused editor's own edits are usually at (or below) its
+    // cursor, so they don't trigger compensation and native behavior is kept.
+    const firstVisibleRow = this.hasInitialMeasurements ? this.getFirstVisibleRow() : null;
+    let screenRowDelta = 0;
+
     for (let i = 0; i < changes.length; i++) {
       const { oldRange, newRange } = changes[i];
+      if (firstVisibleRow !== null && newRange.start.row < firstVisibleRow) {
+        const oldRows = oldRange.end.row - oldRange.start.row;
+        const newRows = newRange.end.row - newRange.start.row;
+        screenRowDelta += newRows - oldRows;
+      }
       this.spliceLineTopIndex(
         newRange.start.row,
         oldRange.end.row - oldRange.start.row,
@@ -2844,7 +2918,57 @@ module.exports = class TextEditorComponent {
       );
     }
 
+    if (screenRowDelta !== 0) {
+      const lineHeight = this.getLineHeight();
+      if (lineHeight) this.setScrollTop(this.getScrollTop() + screenRowDelta * lineHeight);
+    }
+
     this.scheduleUpdate();
+  }
+
+  // Records a viewport anchor in buffer coordinates that survives a soft-wrap
+  // reflow. When the last vertical movement was a cursor/autoscroll and the
+  // cursor is on-screen, the cursor's line is anchored; otherwise the row at
+  // the vertical midpoint of the viewport is anchored. `offset` is the pixel
+  // distance from the viewport top to the top of the anchored row, so the row
+  // can be placed back at the same visual position after re-wrapping.
+  captureScrollAnchor() {
+    if (!this.hasInitialMeasurements) return null;
+
+    const { model } = this.props;
+    const scrollTop = this.getScrollTop();
+
+    let screenRow = null;
+    if (!this.lastScrollWasManual) {
+      const cursorRow = model.getCursorScreenPosition().row;
+      if (cursorRow >= this.getFirstVisibleRow() && cursorRow <= this.getLastVisibleRow()) {
+        screenRow = cursorRow;
+      }
+    }
+    if (screenRow === null) {
+      // Anchor the row at the vertical midpoint of the viewport. When scrolled
+      // more than half a screen past the end (scrollPastEnd), the midpoint
+      // falls into the empty region below the content; anchor the last line
+      // where it currently sits instead, so it stays put like a cursor resting
+      // there rather than being pulled up to the midpoint.
+      const midpointPixel = scrollTop + this.getScrollContainerClientHeight() / 2;
+      const contentBottom = this.getContentHeight();
+      const anchorPixel =
+        midpointPixel > contentBottom ? contentBottom - this.getLineHeight() / 2 : midpointPixel;
+      screenRow = this.rowForPixelPosition(anchorPixel);
+    }
+
+    const bufferPosition = model.bufferPositionForScreenPosition(Point(screenRow, 0));
+    const rowTop = this.pixelPositionBeforeBlocksForRow(screenRow);
+    return { bufferPosition, offset: rowTop - scrollTop };
+  }
+
+  restoreScrollAnchor(anchor) {
+    if (!anchor || !this.hasInitialMeasurements) return;
+
+    const screenPosition = this.props.model.screenPositionForBufferPosition(anchor.bufferPosition);
+    const rowTop = this.pixelPositionBeforeBlocksForRow(screenPosition.row);
+    this.setScrollTop(rowTop - anchor.offset);
   }
 
   didChangeSelectionRange() {
@@ -2926,7 +3050,18 @@ module.exports = class TextEditorComponent {
           this.heightsByBlockDecoration.delete(decoration);
           this.blockDecorationsByElement.delete(element);
           this.blockDecorationResizeObserver.unobserve(element);
-          this.lineTopIndex.removeBlock(decoration);
+          // Removing a block above the viewport shrinks the space above it, so
+          // anchor the viewport to keep the visible content from jumping (e.g.
+          // clearing inline results from a package like Hydrogen). Skip while
+          // the editor is being torn down, where adjusting scroll would fire
+          // spurious scroll events.
+          if (this.props.model.isDestroyed()) {
+            this.lineTopIndex.removeBlock(decoration);
+          } else {
+            const anchor = this.captureScrollAnchor();
+            this.lineTopIndex.removeBlock(decoration);
+            this.restoreScrollAnchor(anchor);
+          }
           this.scheduleUpdate();
         }
       });

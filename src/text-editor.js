@@ -146,6 +146,7 @@ module.exports = class TextEditor {
     }
     this.initialScrollTopRow = params.initialScrollTopRow;
     this.initialScrollLeftColumn = params.initialScrollLeftColumn;
+    this.initialScrollAnchor = params.initialScrollAnchor;
     this.decorationManager = params.decorationManager;
     this.selectionsMarkerLayer = params.selectionsMarkerLayer;
     this.mini = params.mini != null ? params.mini : false;
@@ -160,6 +161,8 @@ module.exports = class TextEditor {
     this.autoWidth = params.autoWidth;
     this.scrollPastEnd = params.scrollPastEnd != null ? params.scrollPastEnd : false;
     this.scrollSensitivity = params.scrollSensitivity != null ? params.scrollSensitivity : 40;
+    this.softWrapDebounceInterval =
+      params.softWrapDebounceInterval != null ? params.softWrapDebounceInterval : 0;
     this.editorWidthInChars = params.editorWidthInChars;
     this.invisibles = params.invisibles;
     this.showIndentGuide = params.showIndentGuide;
@@ -392,6 +395,10 @@ module.exports = class TextEditor {
           this.updateScrollSensitivity(value, false);
           break;
 
+        case "softWrapDebounceInterval":
+          this.updateSoftWrapDebounceInterval(value, false);
+          break;
+
         case "encoding":
           this.updateEncoding(value, false);
           break;
@@ -499,6 +506,11 @@ module.exports = class TextEditor {
   }
 
   finishUpdate(displayLayerParams = {}) {
+    // Capture a visual scroll anchor before the display layer resets its
+    // screen-row geometry (e.g. soft-wrap toggle, tab width, or a width-driven
+    // rewrap during resize). The component restores it in didResetDisplayLayer
+    // once the new geometry is in place, so the viewport stays visually stable.
+    if (this.component) this.component.willResetDisplayLayer();
     this.displayLayer.reset(displayLayerParams);
 
     if (this.component) {
@@ -525,6 +537,11 @@ module.exports = class TextEditor {
 
   updateScrollSensitivity(value, finish) {
     this.scrollSensitivity = value;
+    if (finish) this.finishUpdate();
+  }
+
+  updateSoftWrapDebounceInterval(value, finish) {
+    this.softWrapDebounceInterval = value;
     if (finish) this.finishUpdate();
   }
 
@@ -1199,19 +1216,27 @@ module.exports = class TextEditor {
       this.buffer.getMarkerLayer(this.selectionsMarkerLayer.id).copy().id,
     );
     const softTabs = this.getSoftTabs();
+    const initialScrollTopRow = this.getScrollTopRow();
+    // Capture a buffer-based anchor so the copy shows the same visual position
+    // even when it lands in a pane with a different width (and thus soft wrap).
+    const initialScrollAnchor = this.component ? this.component.captureScrollAnchor() : null;
     return new TextEditor({
       buffer: this.buffer,
       selectionsMarkerLayer,
       softTabs,
       suppressCursorCreation: true,
       tabLength: this.getTabLength(),
-      initialScrollTopRow: this.getScrollTopRow(),
+      initialScrollTopRow,
       initialScrollLeftColumn: this.getScrollLeftColumn(),
+      initialScrollAnchor,
       assert: this.assert,
       displayLayer,
       grammar: this.getGrammar(),
       autoWidth: this.autoWidth,
       autoHeight: this.autoHeight,
+      // Inherit scrollPastEnd so a copy scrolled into the past-end zone has the
+      // room to restore the same visual position instead of clamping.
+      scrollPastEnd: this.scrollPastEnd,
       showCursorOnSelection: this.showCursorOnSelection,
     });
   }
@@ -4992,6 +5017,14 @@ module.exports = class TextEditor {
     return this.scrollSensitivity;
   }
 
+  // Experimental: How long (in milliseconds) to wait for the editor width to
+  // settle before re-wrapping soft-wrapped lines. `0` re-wraps immediately.
+  //
+  // Returns a non-negative {Number}.
+  getSoftWrapDebounceInterval() {
+    return this.softWrapDebounceInterval;
+  }
+
   // Experimental: Does this editor show cursors while there is a selection?
   //
   // Returns a positive {Boolean}.
@@ -5065,6 +5098,7 @@ module.exports = class TextEditor {
         updatedSynchronously: TextEditorElement.prototype.updatedSynchronously,
         initialScrollTopRow: this.initialScrollTopRow,
         initialScrollLeftColumn: this.initialScrollLeftColumn,
+        initialScrollAnchor: this.initialScrollAnchor,
       });
     }
     return this.component.element;
