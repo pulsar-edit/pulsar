@@ -7,12 +7,7 @@
   'alt-cmd-.': 'bracket-matcher:close-tag'
   'ctrl-backspace': 'bracket-matcher:remove-matching-brackets'
 
-'.platform-linux atom-text-editor':
-  'ctrl-alt-,': 'bracket-matcher:select-inside-brackets'
-  'ctrl-alt-.': 'bracket-matcher:close-tag'
-  'ctrl-alt-backspace': 'bracket-matcher:remove-matching-brackets'
-
-'.platform-win32 atom-text-editor':
+'.platform-linux atom-text-editor, .platform-win32 atom-text-editor':
   'ctrl-alt-,': 'bracket-matcher:select-inside-brackets'
   'ctrl-alt-.': 'bracket-matcher:close-tag'
   'ctrl-alt-backspace': 'bracket-matcher:remove-matching-brackets'

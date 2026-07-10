@@ -1,8 +1,2 @@
-'.platform-darwin, .platform-darwin .command-palette atom-text-editor':
-  'cmd-shift-p': 'command-palette:toggle'
-
-'.platform-win32, .platform-win32 .command-palette atom-text-editor':
-  'ctrl-shift-p': 'command-palette:toggle'
-
-'.platform-linux, .platform-linux .command-palette atom-text-editor':
-  'ctrl-shift-p': 'command-palette:toggle'
+'body, .command-palette atom-text-editor':
+  'cmdorctrl-shift-p': 'command-palette:toggle'
