@@ -15,7 +15,7 @@ describe("CommandPaletteView", () => {
     workspaceElement = atom.views.getView(atom.workspace);
     document.body.appendChild(workspaceElement);
     document.body.focus();
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
   });
 
   afterEach(() => {

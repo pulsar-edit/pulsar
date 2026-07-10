@@ -47,9 +47,6 @@ class GoToLineView {
     if (!this.panel.isVisible()) return;
     this.miniEditor.setText("");
     this.panel.hide();
-    if (this.miniEditor.element.hasFocus()) {
-      this.restoreFocus();
-    }
   }
 
   navigate(options = {}) {
@@ -77,21 +74,8 @@ class GoToLineView {
     });
   }
 
-  storeFocusedElement() {
-    this.previouslyFocusedElement = document.activeElement;
-    return this.previouslyFocusedElement;
-  }
-
-  restoreFocus() {
-    if (this.previouslyFocusedElement && this.previouslyFocusedElement.parentElement) {
-      return this.previouslyFocusedElement.focus();
-    }
-    atom.views.getView(atom.workspace).focus();
-  }
-
   open() {
     if (this.panel.isVisible() || !atom.workspace.getActiveTextEditor()) return;
-    this.storeFocusedElement();
     this.panel.show();
     this.message.textContent =
       'Enter a <row> or <row>:<column> to go there. Examples: "3" for row 3 or "2:7" for row 2 and column 7';

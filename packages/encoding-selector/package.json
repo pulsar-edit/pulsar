@@ -10,9 +10,9 @@
     "atom": "*"
   },
   "dependencies": {
-    "atom-select-list": "^0.7.0",
     "iconv-lite": "^0.4.4",
-    "jschardet": "^1.1.0"
+    "jschardet": "^1.1.0",
+    "select-list": "file:../../shared/select-list"
   },
   "consumedServices": {
     "status-bar": {

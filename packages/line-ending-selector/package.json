@@ -10,7 +10,7 @@
     "atom": "*"
   },
   "dependencies": {
-    "atom-select-list": "^0.7.0",
+    "select-list": "file:../../shared/select-list",
     "underscore-plus": "^1.7.0"
   },
   "consumedServices": {

@@ -1,4 +1,4 @@
-const SelectListView = require("atom-select-list");
+const { SelectListView, highlightMatches } = require("select-list");
 
 module.exports = class GrammarListView {
   constructor() {
@@ -12,17 +12,18 @@ module.exports = class GrammarListView {
     );
 
     this.selectListView = new SelectListView({
+      className: "grammar-selector",
       itemsClassList: ["mark-active"],
       items: [],
       filterKeyForItem: (grammar) => grammar.name,
-      elementForItem: (grammar) => {
+      elementForItem: (grammar, { matchIndices }) => {
         const grammarName = grammar.name || grammar.scopeName;
         const element = document.createElement("li");
         if (grammar === this.currentGrammar) {
           element.classList.add("active");
         }
         element.classList.add("grammar-item");
-        element.textContent = grammarName;
+        element.appendChild(highlightMatches(grammarName, matchIndices));
         element.dataset.grammar = grammarName;
 
         const div = document.createElement("div");
@@ -69,34 +70,17 @@ module.exports = class GrammarListView {
         this.cancel();
       },
     });
-
-    this.selectListView.element.classList.add("grammar-selector");
   }
 
   destroy() {
     this.cancel();
+    this.configSubscription.dispose();
     return this.selectListView.destroy();
   }
 
   cancel() {
-    if (this.panel != null) {
-      this.panel.destroy();
-    }
-    this.panel = null;
     this.currentGrammar = null;
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus();
-      this.previouslyFocusedElement = null;
-    }
-  }
-
-  attach() {
-    this.previouslyFocusedElement = document.activeElement;
-    if (this.panel == null) {
-      this.panel = atom.workspace.addModalPanel({ item: this.selectListView });
-    }
-    this.selectListView.focus();
-    this.selectListView.reset();
+    this.selectListView.hide();
   }
 
   getAllDisplayableGrammars() {
@@ -108,7 +92,7 @@ module.exports = class GrammarListView {
   }
 
   async toggle() {
-    if (this.panel != null) {
+    if (this.selectListView.isVisible()) {
       this.cancel();
       return;
     }
@@ -148,8 +132,9 @@ module.exports = class GrammarListView {
       }
 
       grammars.unshift(this.autoDetect);
+      this.selectListView.reset();
       await this.selectListView.update({ items: grammars });
-      this.attach();
+      this.selectListView.show();
     }
   }
 };

@@ -14,5 +14,7 @@
       "fuzzy-workspace:toggle"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "select-list": "file:../../shared/select-list"
+  }
 }

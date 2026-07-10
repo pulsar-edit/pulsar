@@ -2135,7 +2135,7 @@ foo\
         availableSnippetsView.selectListView.refs.queryEditor.element,
         "snippets:available",
       );
-      expect(atom.workspace.getModalPanels().length).toBe(0);
+      expect(atom.workspace.getModalPanels().filter((panel) => panel.isVisible()).length).toBe(0);
     });
   });
 });

@@ -7,7 +7,7 @@ module.exports = class GoToView extends SymbolsView {
   }
 
   toggle() {
-    if (this.panel.isVisible()) {
+    if (this.isVisible()) {
       this.cancel();
     } else {
       this.populate();

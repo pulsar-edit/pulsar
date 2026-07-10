@@ -1,6 +1,6 @@
 {
   "name": "select-list",
-  "description": "A general-purpose select list for use in Pulsar packages",
+  "description": "A general-purpose select list for use in Lumine packages",
   "keywords": [
     "pulsar",
     "atom",
@@ -14,7 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/lumine-code/lumine.git"
   },
-  "version": "1.6.3",
+  "version": "1.7.0",
   "license": "MIT",
   "main": "lib/select.js",
   "dependencies": {

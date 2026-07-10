@@ -1,18 +1,15 @@
 "use babel";
 
-import SelectListView from "atom-select-list";
+import { SelectListView } from "select-list";
 
 import { TextEditor } from "atom";
 import { setLineEnding } from "./main";
 
 export class Selector {
   lineEndingListView;
-  modalPanel;
-  previousActivePane;
 
   // Make a selector object (should be called once)
   constructor(selectorItems) {
-    // Defining a SelectListView with methods - https://github.com/atom/atom-select-list
     this.lineEndingListView = new SelectListView({
       // an array containing the objects you want to show in the select list
       items: selectorItems,
@@ -43,35 +40,21 @@ export class Selector {
         this.hide();
       },
     });
-
-    // Adding SelectListView to panel
-    this.modalPanel = atom.workspace.addModalPanel({
-      item: this.lineEndingListView,
-    });
   }
 
   // Show a selector object
   show() {
-    this.previousActivePane = atom.workspace.getActivePane();
-
-    // Show selector
     this.lineEndingListView.reset();
-    this.modalPanel.show();
-    this.lineEndingListView.focus();
+    this.lineEndingListView.show();
   }
 
   // Hide a selector
   hide() {
-    // hide modal panel
-    this.modalPanel.hide();
-    // focus on the previous active pane
-    this.previousActivePane.activate();
+    this.lineEndingListView.hide();
   }
 
   // Dispose selector
   dispose() {
     this.lineEndingListView.destroy();
-    this.modalPanel.destroy();
-    this.modalPanel = null;
   }
 }

@@ -44,7 +44,6 @@ describe("Package Generator", () => {
     it("detaches from the DOM and focuses the the previously focused element", () => {
       jasmine.attachToDOM(getWorkspaceView());
       packageGeneratorView.attach("theme");
-      expect(packageGeneratorView.previouslyFocusedElement).not.toBeUndefined();
 
       expect(document.activeElement.closest("atom-text-editor")).toBe(
         packageGeneratorView.element.querySelector("atom-text-editor"),

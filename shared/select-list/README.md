@@ -1,8 +1,8 @@
 # select-list
 
-Fuzzy-searchable select list component for [Pulsar](https://pulsar-edit.dev/). An [etch component](https://github.com/atom/etch) with keyboard/mouse navigation and built-in panel management.
+Fuzzy-searchable select list component for Lumine. An [etch component](https://github.com/atom/etch) with keyboard/mouse navigation and built-in panel management.
 
-Fork of [atom-select-list](https://github.com/atom/atom-select-list). Designed exclusively for use in Pulsar packages.
+Fork of [atom-select-list](https://github.com/atom/atom-select-list). Designed exclusively for use in Lumine packages.
 
 ## Features
 
@@ -27,13 +27,14 @@ When creating a new instance of a select list, or when calling `update` on an ex
     - `index: Number`: item's index.
     - `filterKey: String|null`: the text that was matched against (from `filterKeyForItem` or item itself).
     - `matchIndices: [Number]|null`: lazy getter - character indices in `filterKey` that matched the query. Only computed when accessed.
+    - `visible: Boolean`: `false` only when `initiallyVisibleItemCount` is set and the item is still outside the visible area; return a cheap placeholder element (e.g. an empty `li`) in that case — the item re-renders with `visible: true` once scrolled into view.
 
 #### Optional
 
 - `items: [Object]`: an array containing the objects you want to show in the select list.
 - `className: String`: CSS class name(s) to add to the select list element. Multiple classes can be space-separated.
 - `maxResults: Number`: the number of maximum items that are shown.
-- `filter: (items: [Object], query: String) -> [Object]`: a function that allows to decide which items to show whenever the query changes. By default, it uses Pulsar's built-in fuzzy matcher.
+- `filter: (items: [Object], query: String) -> [Object]`: a function that allows to decide which items to show whenever the query changes. By default, it uses Lumine's built-in fuzzy matcher.
 - `filterKeyForItem: (item: Object) -> String`: when `filter` is not provided, this function will be called to retrieve a string property on each item and that will be used to filter them.
 - `filterQuery: (query: String) -> String`: a function that allows to apply a transformation to the user query and whose return value will be used to filter items.
 - `removeDiacritics: Boolean`: when `true`, removes diacritical marks from both the query and item text before filtering, enabling accent-insensitive matching (e.g., "cafe" matches "café").
@@ -48,13 +49,15 @@ When creating a new instance of a select list, or when calling `update` on an ex
 - `errorMessage: String`: a string that needs to be set when you want to notify the user that an error occurred.
 - `infoMessage: String`: a string that needs to be set when you want to provide some information to the user.
 - `helpMessage: String`: HTML content to display when help is toggled.
-- `helpMarkdown: String`: markdown content to display when help is toggled. Rendered using Pulsar's built-in markdown renderer.
+- `helpMarkdown: String`: markdown content to display when help is toggled. Rendered using Lumine's built-in markdown renderer.
 - `loadingMessage: String`: a string that needs to be set when you are loading items in the background.
 - `loadingSpinner: Boolean`: show spinner next to loading message.
 - `loadingBadge: String/Number`: a string or number that needs to be set when the progress status changes.
 - `itemsClassList: [String]`: an array of strings that will be added as class names to the items element.
 - `initialSelectionIndex: Number`: the index of the item to initially select; defaults to `0`.
+- `initiallyVisibleItemCount: Number`: render only the first N items eagerly; items beyond that count get `visible: false` in `elementForItem` and are re-rendered when scrolled into view (via `IntersectionObserver`). Useful for very long lists with expensive item rendering. Constructor-only — cannot be changed via `update`.
 - `placeholderText: String`: placeholder text to display in the query editor when empty.
+- `panelItem: Object`: the item passed to `atom.workspace.addModalPanel` (defaults to the select list itself). Useful when a wrapper view should be exposed as `panel.item`; the object must have an `element` property. Constructor-only.
 - `skipCommandsRegistration: Boolean`: when `true`, skips registering default keyboard commands.
 
 ### Registered commands
@@ -90,6 +93,7 @@ By default, the component registers these commands on its element:
 - `hide()`: Hides the panel and restores focus to the previously focused element.
 - `toggle()`: Toggles the visibility of the panel.
 - `isVisible()`: Returns `true` if the panel is currently visible.
+- `getPanel()`: Returns the modal panel hosting the select list, creating it hidden on first access.
 - `isHelpMode()`: Returns `true` if help is currently displayed.
 - `toggleHelp()`: Toggles help message visibility. Only works if `helpMessage` is set.
 - `hideHelp()`: Hides help message if currently shown.

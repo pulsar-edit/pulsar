@@ -989,7 +989,7 @@ describe("SymbolsView", () => {
         symbolsView.selectListView.selectNext();
         expect(editor.getCursorBufferPosition()).toEqual([3, 4]);
 
-        await symbolsView.cancel();
+        await symbolsView.didCancelSelection();
         expect(editor.getSelectedBufferRanges()).toEqual(bufferRanges);
       });
     });

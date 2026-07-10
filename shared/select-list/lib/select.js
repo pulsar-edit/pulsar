@@ -30,6 +30,9 @@ class SelectListView {
     if (!Object.prototype.hasOwnProperty.call(this.props, "initialSelectionIndex")) {
       this.props.initialSelectionIndex = 0;
     }
+    if (this.props.initiallyVisibleItemCount) {
+      this.initializeVisibilityObserver();
+    }
     if (!this.props.items) {
       this.props.items = [];
     } else {
@@ -76,6 +79,26 @@ class SelectListView {
         editorElement.removeEventListener("keydown", didKeyDown, true);
       }),
     );
+  }
+
+  /**
+   * Creates the IntersectionObserver used when `initiallyVisibleItemCount` is
+   * set. Items beyond that count render with `visible: false` until they are
+   * scrolled into view, at which point they re-render with `visible: true`.
+   */
+  initializeVisibilityObserver() {
+    this.visibilityObserver = new IntersectionObserver((changes) => {
+      for (const change of changes) {
+        if (change.intersectionRatio > 0) {
+          const element = change.target;
+          this.visibilityObserver.unobserve(element);
+          const index = Array.from(this.refs.items.children).indexOf(element);
+          if (index >= 0) {
+            this.renderItemAtIndex(index);
+          }
+        }
+      }
+    });
   }
 
   /**
@@ -131,6 +154,9 @@ class SelectListView {
    */
   destroy() {
     this.disposables.dispose();
+    if (this.visibilityObserver) {
+      this.visibilityObserver.disconnect();
+    }
     this.filterMatcher = null;
     this.indexMatcher = null;
     this.cachedCandidates = null;
@@ -162,12 +188,24 @@ class SelectListView {
 
     this.refs.queryEditor.selectAll();
 
-    if (!this.panel) {
-      this.panel = atom.workspace.addModalPanel({ item: this, visible: false });
-    }
-
-    this.panel.show();
+    this.getPanel().show();
     this.focus();
+  }
+
+  /**
+   * Returns the modal panel that hosts the select list, creating it (hidden)
+   * on first access. The panel's item is `props.panelItem` when provided,
+   * otherwise the select list itself.
+   * @returns {Panel} The modal panel
+   */
+  getPanel() {
+    if (!this.panel) {
+      this.panel = atom.workspace.addModalPanel({
+        item: this.props.panelItem ?? this,
+        visible: false,
+      });
+    }
+    return this.panel;
   }
 
   /**
@@ -423,10 +461,21 @@ class SelectListView {
     if (this.items && this.items.length > 0) {
       const className = ["list-group"].concat(this.props.itemsClassList || []).join(" ");
 
+      if (this.visibilityObserver) {
+        etch.getScheduler().updateDocument(() => {
+          if (!this.refs.items) return;
+          Array.from(this.refs.items.children)
+            .slice(this.props.initiallyVisibleItemCount)
+            .forEach((element) => this.visibilityObserver.observe(element));
+        });
+      }
+
       this.listItems = this.items.map((item, index) => {
         const selected = this.getSelectedItem() === item;
         const filterKey = this.getFilterKey(item);
-        const opts = { selected, index, filterKey };
+        const visible =
+          !this.visibilityObserver || index < this.props.initiallyVisibleItemCount;
+        const opts = { selected, index, filterKey, visible };
         // Lazy getter - matchIndices only computed when accessed
         Object.defineProperty(opts, "matchIndices", {
           get: () => this.getMatchIndices(item, filterKey),
@@ -575,6 +624,9 @@ class SelectListView {
    */
   filterItems(updateComponent) {
     this.listItems = null;
+    if (this.visibilityObserver) {
+      this.visibilityObserver.disconnect();
+    }
     this.matchIndicesMap = new Map();
     this.filterKeyMap = new Map();
 
@@ -751,13 +803,16 @@ class SelectListView {
     const item = this.items[index];
     const selected = this.getSelectedItem() === item;
     const filterKey = this.getFilterKey(item);
-    const opts = { selected, index, filterKey };
+    const opts = { selected, index, filterKey, visible: true };
     // Lazy getter - matchIndices only computed when accessed
     Object.defineProperty(opts, "matchIndices", {
       get: () => this.getMatchIndices(item, filterKey),
       enumerable: true,
     });
     const component = this.listItems[index].component;
+    if (this.visibilityObserver) {
+      this.visibilityObserver.unobserve(component.element);
+    }
     component.update({
       element: this.resolveElement(item, opts),
       selected: selected,

@@ -1,17 +1,18 @@
 /** @babel */
 
-import SelectListView from "atom-select-list";
+import { SelectListView, getMatchIndices, highlightMatches } from "select-list";
 import { humanizeKeystroke } from "underscore-plus";
 
 export default class CommandPaletteView {
   constructor(initiallyVisibleItemCount = 10) {
     this.keyBindingsForActiveElement = [];
     this.selectListView = new SelectListView({
+      className: "command-palette",
       initiallyVisibleItemCount: initiallyVisibleItemCount, // just for being able to disable visible-on-render in spec
       items: [],
       filter: this.filter,
       emptyMessage: "No matches found",
-      elementForItem: (item, { index, selected, visible }) => {
+      elementForItem: (item, { selected, visible }) => {
         if (!visible) {
           return document.createElement("li");
         }
@@ -40,7 +41,9 @@ export default class CommandPaletteView {
         leftBlock.appendChild(titleEl);
 
         const query = this.selectListView.getQuery();
-        this.highlightMatchesInElement(item.displayName, query, titleEl);
+        titleEl.appendChild(
+          highlightMatches(item.displayName, getMatchIndices(item.displayName, query)),
+        );
 
         if (selected) {
           let secondaryEl = document.createElement("div");
@@ -54,9 +57,9 @@ export default class CommandPaletteView {
           if (Array.isArray(item.tags)) {
             const matchingTags = item.tags
               .map((t) => [t, atom.ui.fuzzyMatcher.score(t, query)])
-              .filter(([t, s]) => s > 0)
-              .sort((a, b) => a.s - b.s)
-              .map(([t, s]) => t);
+              .filter(([, s]) => s > 0)
+              .sort((a, b) => a[1] - b[1])
+              .map(([t]) => t);
 
             if (matchingTags.length > 0) {
               secondaryEl.appendChild(this.createTags(matchingTags, query));
@@ -78,7 +81,6 @@ export default class CommandPaletteView {
         this.hide();
       },
     });
-    this.selectListView.element.classList.add("command-palette");
   }
 
   async destroy() {
@@ -86,7 +88,7 @@ export default class CommandPaletteView {
   }
 
   toggle() {
-    if (this.panel && this.panel.isVisible()) {
+    if (this.selectListView.isVisible()) {
       this.hide();
       return Promise.resolve();
     } else {
@@ -95,14 +97,8 @@ export default class CommandPaletteView {
   }
 
   async show(showHiddenCommands = false) {
-    if (!this.panel) {
-      this.panel = atom.workspace.addModalPanel({ item: this.selectListView });
-    }
-
     if (!this.preserveLastSearch) {
       this.selectListView.reset();
-    } else {
-      this.selectListView.refs.queryEditor.selectAll();
     }
 
     this.activeElement =
@@ -116,58 +112,16 @@ export default class CommandPaletteView {
     commandsForActiveElement.sort((a, b) => a.displayName.localeCompare(b.displayName));
     await this.selectListView.update({ items: commandsForActiveElement });
 
-    this.previouslyFocusedElement = document.activeElement;
-    this.panel.show();
-    this.selectListView.focus();
+    this.selectListView.show();
   }
 
   hide() {
-    this.panel.hide();
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus();
-      this.previouslyFocusedElement = null;
-    }
+    this.selectListView.hide();
   }
 
   async update(props) {
-    if (props.hasOwnProperty("preserveLastSearch")) {
+    if (Object.prototype.hasOwnProperty.call(props, "preserveLastSearch")) {
       this.preserveLastSearch = props.preserveLastSearch;
-    }
-  }
-
-  highlightMatchesInElement(text, query, el) {
-    const matches = atom.ui.fuzzyMatcher.match(text, query, { recordMatchIndexes: true });
-    let matchedChars = [];
-    let lastIndex = 0;
-    const matchIndexes = matches ? (matches.matchIndexes ?? []) : [];
-    matchIndexes.forEach((matchIndex) => {
-      const unmatched = text.substring(lastIndex, matchIndex);
-      if (unmatched) {
-        if (matchedChars.length > 0) {
-          const matchSpan = document.createElement("span");
-          matchSpan.classList.add("character-match");
-          matchSpan.textContent = matchedChars.join("");
-          el.appendChild(matchSpan);
-          matchedChars = [];
-        }
-
-        el.appendChild(document.createTextNode(unmatched));
-      }
-
-      matchedChars.push(text[matchIndex]);
-      lastIndex = matchIndex + 1;
-    });
-
-    if (matchedChars.length > 0) {
-      const matchSpan = document.createElement("span");
-      matchSpan.classList.add("character-match");
-      matchSpan.textContent = matchedChars.join("");
-      el.appendChild(matchSpan);
-    }
-
-    const unmatched = text.substring(lastIndex);
-    if (unmatched) {
-      el.appendChild(document.createTextNode(unmatched));
     }
   }
 
@@ -210,7 +164,7 @@ export default class CommandPaletteView {
       whiteSpace: "nowrap",
       overflow: "hidden",
     });
-    this.highlightMatchesInElement(description, query, descriptionEl);
+    descriptionEl.appendChild(highlightMatches(description, getMatchIndices(description, query)));
     return descriptionEl;
   }
 
@@ -221,7 +175,7 @@ export default class CommandPaletteView {
       display: "inline",
       padding: 0,
     });
-    this.highlightMatchesInElement(tagText, query, tagEl);
+    tagEl.appendChild(highlightMatches(tagText, getMatchIndices(tagText, query)));
     return tagEl;
   }
 

@@ -137,7 +137,7 @@ class PanelContainerElement extends HTMLElement {
       this.priorFocus.focus();
     } else if (typeof atom !== "undefined") {
       const pane = atom.workspace.getActivePane();
-      if (pane) pane.activate();
+      if (pane && !pane.isDestroyed()) pane.activate();
     }
     this.priorFocus = null;
   }

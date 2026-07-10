@@ -34,7 +34,8 @@
     }
   },
   "dependencies": {
-    "@vscode/ripgrep": "1.18.0"
+    "@vscode/ripgrep": "1.18.0",
+    "select-list": "file:../../shared/select-list"
   },
   "configSchema": {
     "ignoredNames": {

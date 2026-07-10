@@ -1,7 +1,7 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import SelectListView from "atom-select-list";
+import { SelectListView } from "select-list";
 import etch from "etch";
 import dedent from "dedent";
 import CodeBlock from "./code-block";
@@ -9,7 +9,7 @@ import CodeBlock from "./code-block";
 export default class ExampleSelectListView {
   constructor() {
     this.jsExampleCode = dedent`
-    import SelectListView from 'atom-select-list'
+    import { SelectListView } from 'select-list'
 
     const selectListView = new SelectListView({
       items: ['one', 'two', 'three'],
@@ -51,8 +51,8 @@ export default class ExampleSelectListView {
             <SelectListView
               items={["one", "two", "three"]}
               elementForItem={this.elementForItem.bind(this)}
-              onDidConfirmSelection={this.didConfirmSelection.bind(this)}
-              onDidCancelSelection={this.didCancelSelection.bind(this)}
+              didConfirmSelection={this.didConfirmSelection.bind(this)}
+              didCancelSelection={this.didCancelSelection.bind(this)}
             />
           </atom-panel>
         </div>

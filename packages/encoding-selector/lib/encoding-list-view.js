@@ -1,21 +1,22 @@
 const iconv = require("iconv-lite");
 const jschardet = require("jschardet");
 const fs = require("fs");
-const SelectListView = require("atom-select-list");
+const { SelectListView, highlightMatches } = require("select-list");
 
 module.exports = class EncodingListView {
   constructor(encodings) {
     this.encodings = encodings;
     this.selectListView = new SelectListView({
+      className: "encoding-selector",
       itemsClassList: ["mark-active"],
       items: [],
       filterKeyForItem: (encoding) => encoding.name,
-      elementForItem: (encoding) => {
+      elementForItem: (encoding, { matchIndices }) => {
         const element = document.createElement("li");
         if (encoding.id === this.currentEncoding) {
           element.classList.add("active");
         }
-        element.textContent = encoding.name;
+        element.appendChild(highlightMatches(encoding.name, matchIndices));
         element.dataset.encoding = encoding.id;
         return element;
       },
@@ -31,7 +32,6 @@ module.exports = class EncodingListView {
         this.cancel();
       },
     });
-    this.selectListView.element.classList.add("encoding-selector");
   }
 
   destroy() {
@@ -40,28 +40,12 @@ module.exports = class EncodingListView {
   }
 
   cancel() {
-    if (this.panel != null) {
-      this.panel.destroy();
-    }
-    this.panel = null;
     this.currentEncoding = null;
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus();
-      this.previouslyFocusedElement = null;
-    }
-  }
-
-  attach() {
-    this.previouslyFocusedElement = document.activeElement;
-    if (this.panel == null) {
-      this.panel = atom.workspace.addModalPanel({ item: this.selectListView });
-    }
-    this.selectListView.focus();
-    this.selectListView.reset();
+    this.selectListView.hide();
   }
 
   async toggle() {
-    if (this.panel != null) {
+    if (this.selectListView.isVisible()) {
       this.cancel();
     } else if (atom.workspace.getActiveTextEditor()) {
       const editor = atom.workspace.getActiveTextEditor();
@@ -76,8 +60,9 @@ module.exports = class EncodingListView {
         encodingItems.push({ id, name: this.encodings[id].list });
       }
 
+      this.selectListView.reset();
       await this.selectListView.update({ items: encodingItems });
-      this.attach();
+      this.selectListView.show();
     }
   }
 

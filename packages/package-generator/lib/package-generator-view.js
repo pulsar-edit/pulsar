@@ -51,7 +51,6 @@ module.exports = class PackageGeneratorView {
     this.mode = mode;
     if (this.panel == null)
       this.panel = atom.workspace.addModalPanel({ item: this, visible: false });
-    this.previouslyFocusedElement = document.activeElement;
     this.panel.show();
     this.message.textContent = `Enter ${this.mode} path`;
     if (this.mode === "package") {
@@ -79,7 +78,6 @@ module.exports = class PackageGeneratorView {
   close() {
     if (!this.panel.isVisible()) return;
     this.panel.hide();
-    if (this.previouslyFocusedElement != null) this.previouslyFocusedElement.focus();
   }
 
   confirm() {

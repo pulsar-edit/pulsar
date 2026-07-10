@@ -52,7 +52,8 @@
   "dependencies": {
     "async": "3.2.6",
     "minimatch": "^10.2.5",
-    "@vscode/ripgrep": "1.18.0"
+    "@vscode/ripgrep": "1.18.0",
+    "select-list": "file:../../shared/select-list"
   },
   "configSchema": {
     "ignoredNames": {

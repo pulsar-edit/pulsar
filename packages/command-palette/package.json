@@ -15,13 +15,13 @@
     "atom": "*"
   },
   "dependencies": {
-    "atom-select-list": "^0.7.1",
+    "select-list": "file:../../shared/select-list",
     "underscore-plus": "^1.0.0"
   },
   "devDependencies": {
     "event-kit": "^2.4.0",
-    "semver": "^5.4.1",
-    "sinon": "^3.2.1"
+    "semver": "^7.8.5",
+    "sinon": "^9.2.1"
   },
   "backgroundTips": [
     "Everything Lumine can do is in the Command Palette. See it by using {atom-workspace>command-palette:toggle}"

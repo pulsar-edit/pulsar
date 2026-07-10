@@ -1,31 +1,20 @@
 /** @babel */
 
 import _ from "underscore-plus";
-import SelectListView from "atom-select-list";
+import { SelectListView } from "select-list";
 
 export default class SnippetsAvailable {
   constructor(snippets) {
-    this.panel = null;
     this.snippets = snippets;
     this.selectListView = new SelectListView({
+      className: "available-snippets",
+      panelItem: this,
       items: [],
       filterKeyForItem: (snippet) => snippet.searchText,
-      elementForItem: (snippet) => {
-        const li = document.createElement("li");
-        li.classList.add("two-lines");
-
-        const primaryLine = document.createElement("div");
-        primaryLine.classList.add("primary-line");
-        primaryLine.textContent = snippet.prefix;
-        li.appendChild(primaryLine);
-
-        const secondaryLine = document.createElement("div");
-        secondaryLine.classList.add("secondary-line");
-        secondaryLine.textContent = snippet.name;
-        li.appendChild(secondaryLine);
-
-        return li;
-      },
+      elementForItem: (snippet) => ({
+        primary: snippet.prefix,
+        secondary: snippet.name,
+      }),
       didConfirmSelection: (snippet) => {
         for (const cursor of this.editor.getCursors()) {
           this.snippets.insert(snippet.bodyText, this.editor, cursor);
@@ -39,33 +28,27 @@ export default class SnippetsAvailable {
         this.cancel();
       },
     });
-    this.selectListView.element.classList.add("available-snippets");
     this.element = this.selectListView.element;
   }
 
   async toggle(editor) {
     this.editor = editor;
-    if (this.panel != null) {
+    if (this.selectListView.isVisible()) {
       this.cancel();
     } else {
       this.selectListView.reset();
       await this.populate();
-      this.attach();
+      this.selectListView.show();
     }
   }
 
   cancel() {
     this.editor = null;
+    this.selectListView.hide();
+  }
 
-    if (this.panel != null) {
-      this.panel.destroy();
-      this.panel = null;
-    }
-
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus();
-      this.previouslyFocusedElement = null;
-    }
+  destroy() {
+    return this.selectListView.destroy();
   }
 
   populate() {
@@ -74,11 +57,5 @@ export default class SnippetsAvailable {
       snippet.searchText = _.compact([snippet.prefix, snippet.name]).join(" ");
     }
     return this.selectListView.update({ items: snippets });
-  }
-
-  attach() {
-    this.previouslyFocusedElement = document.activeElement;
-    this.panel = atom.workspace.addModalPanel({ item: this });
-    this.selectListView.focus();
   }
 }

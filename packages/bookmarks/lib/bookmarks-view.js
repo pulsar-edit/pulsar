@@ -1,11 +1,12 @@
 const path = require("path");
 
-const SelectListView = require("atom-select-list");
+const { SelectListView } = require("select-list");
 
 module.exports = class BookmarksView {
   constructor(editorsBookmarks) {
     this.editorsBookmarks = editorsBookmarks;
     this.selectList = new SelectListView({
+      className: "bookmarks-view",
       emptyMessage: "No bookmarks found",
       items: [],
       filterKeyForItem: (bookmark) => bookmark.filterText,
@@ -44,16 +45,10 @@ module.exports = class BookmarksView {
         return li;
       },
     });
-    this.selectList.element.classList.add("bookmarks-view");
   }
 
   destroy() {
     this.selectList.destroy();
-    this.getModalPanel().destroy();
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus();
-      this.previouslyFocusedElement = null;
-    }
   }
 
   async show() {
@@ -75,25 +70,12 @@ module.exports = class BookmarksView {
       }
     }
 
-    this.previouslyFocusedElement = document.activeElement;
     this.selectList.reset();
     await this.selectList.update({ items: bookmarks });
-    this.getModalPanel().show();
-    this.selectList.focus();
+    this.selectList.show();
   }
 
   hide() {
-    this.getModalPanel().hide();
-    if (this.previouslyFocusedElement) {
-      this.previouslyFocusedElement.focus();
-      this.previouslyFocusedElement = null;
-    }
-  }
-
-  getModalPanel() {
-    if (!this.modalPanel) {
-      this.modalPanel = atom.workspace.addModalPanel({ item: this.selectList });
-    }
-    return this.modalPanel;
+    this.selectList.hide();
   }
 };

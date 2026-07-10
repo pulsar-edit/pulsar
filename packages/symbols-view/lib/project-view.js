@@ -21,7 +21,7 @@ module.exports = class ProjectView extends SymbolsView {
   }
 
   toggle(filterTerm = "") {
-    if (this.panel.isVisible()) {
+    if (this.isVisible()) {
       this.cancel();
     } else {
       this.populate();

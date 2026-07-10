@@ -1,5 +1,5 @@
 const { CompositeDisposable, Point } = require("atom");
-const { match } = require("fuzzaldrin");
+const { highlightMatches } = require("select-list");
 
 const Config = require("./config");
 const SymbolsView = require("./symbols-view");
@@ -92,10 +92,7 @@ class FileView extends SymbolsView {
     return super.destroy();
   }
 
-  elementForItem({ position, name, tag, icon, context, providerName }) {
-    // Style matched characters in search results.
-    const matches = match(name, this.selectListView.getFilterQuery());
-
+  elementForItem({ position, name, tag, icon, context, providerName }, options) {
     let badges = [];
     if (providerName && this.shouldShowProviderName) {
       badges.push(providerName);
@@ -116,7 +113,7 @@ class FileView extends SymbolsView {
     // The “primary” results line shows the symbol's name and its tag, if any.
     let primary = el(
       `div.${primaryLineClasses.join(".")}`,
-      el("div.name", SymbolsView.highlightMatches(this, name, matches)),
+      el("div.name", highlightMatches(name, options.matchIndices)),
       badges &&
         el("div.badge-container", ...badges.map((b) => badge(b, { variant: this.useBadgeColors }))),
     );
@@ -157,7 +154,7 @@ class FileView extends SymbolsView {
   }
 
   async toggle(filterTerm = "") {
-    if (this.panel.isVisible()) await this.cancel();
+    if (this.isVisible()) await this.cancel();
     let editor = this.getEditor();
     // Remember exactly where the editor is so that we can restore that state
     // if the user cancels.
