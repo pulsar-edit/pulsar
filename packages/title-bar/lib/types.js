@@ -67,7 +67,7 @@ const logoStyles = {
         <stop offset="100%" stop-color="#9a6214"/>
       </radialGradient>
     </defs>
-    <circle cx="64" cy="64" r="60" fill="url(#title-bar-lumine-gold-gradient)"/>
+    <circle class="title-bar-logo-disc" cx="64" cy="64" r="60" fill="url(#title-bar-lumine-gold-gradient)"/>
     <circle cx="64" cy="64" r="9.6" fill="#fff"/>
     <path d="M53.1,72.3c-.6,0-1.3.3-1.8.8-.8.8-1,1.9-.6,2.8l-5.2,2-21.4,25.5.5.5,25.5-21.4,2-5.2c.3.1.6.2,1,.2.6,0,1.3-.3,1.8-.8,1-1,1-2.6,0-3.6-.5-.5-1.1-.7-1.8-.7h0Z" fill="#fff"/>
     <path d="M49,100.3c2.4,0,5-.3,7.7-.9,9.4-2.1,18.9-7.7,27-15.8,5.4-5.4,9.8-11.6,12.7-18l-2.5-2.4-.2.5v.3c-2.9,6.1-7,12.1-12.3,17.3-7.6,7.6-16.7,12.9-25.4,14.9-6.5,1.5-12.3,1-16.7-1.5l-2.6,2.2c3.5,2.2,7.6,3.3,12.4,3.3h0Z" fill="#fff"/>

@@ -17,6 +17,8 @@
   --title-bar-control-width: 46px;
   --title-bar-icon-size: 24px;
   --title-bar-icon-margin: 8px;
+  // Dev mode: disc color mirrors the app's dev-channel icon (beta-next)
+  --title-bar-dev-color: #91522d;
 
   // Menu
   --title-bar-menu-font-size: @font-size;
@@ -234,6 +236,16 @@
       display: block;
       width: 100%;
       height: auto;
+    }
+
+    // Dev mode: recolor the logo to match the app's dev-channel icon.
+    // Filled variant: retint the gold disc; Unfilled variant: retint currentColor.
+    &.dev-mode {
+      color: var(--title-bar-dev-color);
+
+      .title-bar-logo-disc {
+        fill: var(--title-bar-dev-color);
+      }
     }
   }
 

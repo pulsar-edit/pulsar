@@ -468,6 +468,9 @@ class TitleBarView {
     const resolvedStyle = resolveLogoStyle(style, this.configState.windowControlTheme);
     const svg = logoStyles[resolvedStyle];
 
+    // Reflect dev mode on the app icon, mirroring the app's dev-channel icon.
+    this.appIcon.classList.toggle("dev-mode", atom.inDevMode());
+
     if (svg !== undefined) {
       this.appIcon.innerHTML = svg;
       const svgElement = this.appIcon.querySelector("svg");
