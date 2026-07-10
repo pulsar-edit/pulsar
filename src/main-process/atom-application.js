@@ -656,7 +656,7 @@ module.exports = class AtomApplication extends EventEmitter {
     this.openPathOnEvent("application:open-your-stylesheet", "atom://.lumine/stylesheet");
     this.openPathOnEvent(
       "application:open-license",
-      path.join(process.resourcesPath, "LICENSE.md"),
+      path.join(process.resourcesPath, "LICENSE"),
     );
 
     this.configFile.onDidChange((settings) => {

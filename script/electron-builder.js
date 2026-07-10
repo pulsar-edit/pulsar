@@ -222,7 +222,7 @@ let options = {
   extraResources: [
     { from: "lumine.sh", to: `${baseName}.sh` },
     { from: ICONS.png, to: "lumine.png" },
-    { from: "LICENSE.md", to: "LICENSE.md" },
+    { from: "LICENSE", to: "LICENSE" },
   ],
   compression: "normal",
   deb: {

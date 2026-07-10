@@ -1430,11 +1430,11 @@ module.exports = class Workspace extends Model {
 
   // Open Lumine's license in the active pane.
   openLicense() {
-    const resPath = path.join(process.resourcesPath, "LICENSE.md");
+    const resPath = path.join(process.resourcesPath, "LICENSE");
     if (fs.existsSync(resPath)) {
       return this.open(resPath);
     } else {
-      return this.open(path.join(__dirname, "..", "LICENSE.md"));
+      return this.open(path.join(__dirname, "..", "LICENSE"));
     }
   }
 
