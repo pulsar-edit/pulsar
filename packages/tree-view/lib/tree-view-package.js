@@ -27,15 +27,14 @@ module.exports = class TreeViewPackage {
     this.getTreeViewInstance();
 
     const openByDefault = async () => {
+      if (atom.config.get("tree-view.hiddenOnStartup")) return;
       const showOnAttach = !atom.workspace.getActivePaneItem();
-      const item = await atom.workspace.openDefaultItem(this.treeView, {
+      await atom.workspace.open(this.getTreeViewInstance(), {
         searchAllPanes: true,
         activatePane: showOnAttach,
         activateItem: showOnAttach,
       });
-      if (item) {
-        this.treeView.show(false);
-      }
+      await this.getTreeViewInstance().show(false);
     };
 
     if (atom.packages.hasActivatedInitialPackages()) {

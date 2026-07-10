@@ -243,10 +243,12 @@ const ALL_LOCATIONS = ["center", "left", "right", "bottom"];
 // or more of the following values: `'center'`, `'left'`, `'right'`, or
 // `'bottom'`.
 //
-// #### `shouldOpenByDefault()`
+// #### `isPersistentDockItem()`
 //
-// Tells the workspace whether this item should be opened in a fresh workspace
-// when no saved workspace layout has been restored.
+// Tells the workspace that this item should survive restoring a saved
+// workspace layout into the current window. Persistent items are carried over
+// to the restored layout instead of being destroyed along with the previous
+// one. Unlike permanent dock items, the user can still close them at any time.
 //
 // #### `isPermanentDockItem()`
 //
@@ -344,7 +346,6 @@ module.exports = class Workspace extends Model {
     this.emitter = new Emitter();
     this.openers = [];
     this.destroyedItemURIs = [];
-    this.hasRestoredState = false;
     this.stoppedChangingActivePaneItemTimeout = null;
 
     this.scandalDirectorySearcher = new DefaultDirectorySearcher();
@@ -504,7 +505,6 @@ module.exports = class Workspace extends Model {
 
     this.openers = [];
     this.destroyedItemURIs = [];
-    this.hasRestoredState = false;
     if (this.element) {
       this.element.destroy();
       this.element = null;
@@ -550,7 +550,6 @@ module.exports = class Workspace extends Model {
   }
 
   deserialize(state, deserializerManager) {
-    this.hasRestoredState = true;
     const packagesWithActiveGrammars =
       state.packagesWithActiveGrammars != null ? state.packagesWithActiveGrammars : [];
     for (let packageName of packagesWithActiveGrammars) {
@@ -563,6 +562,29 @@ module.exports = class Workspace extends Model {
       this.destroyedItemURIs = state.destroyedItemURIs;
     }
 
+    // Carry persistent items over to the restored layout instead of destroying
+    // them with the current one. The detach, teardown, restore, and re-attach
+    // all happen in the same tick so the swap causes no visible flicker.
+    const restoringLayout = state.paneContainers || state.paneContainer;
+    const persistentItems = [];
+    if (restoringLayout) {
+      for (const item of this.getPaneItems()) {
+        if (typeof item.isPersistentDockItem !== "function" || !item.isPersistentDockItem()) {
+          continue;
+        }
+        const container = this.paneContainerForItem(item);
+        persistentItems.push({
+          item,
+          location: container.getLocation(),
+          visible: typeof container.isVisible === "function" ? container.isVisible() : true,
+        });
+        this.paneForItem(item).removeItem(item, true);
+      }
+      for (const pane of this.getPanes()) {
+        pane.destroy();
+      }
+    }
+
     if (state.paneContainers) {
       this.paneContainers.center.deserialize(state.paneContainers.center, deserializerManager);
       this.paneContainers.left.deserialize(state.paneContainers.left, deserializerManager);
@@ -571,6 +593,28 @@ module.exports = class Workspace extends Model {
     } else if (state.paneContainer) {
       // TODO: Remove this fallback once a lot of time has passed since 1.17 was released
       this.paneContainers.center.deserialize(state.paneContainer, deserializerManager);
+    }
+
+    for (const { item, location, visible } of persistentItems) {
+      let uri;
+      if (typeof item.getURI === "function") uri = item.getURI();
+
+      let container;
+      if (this.paneForItem(item)) {
+        container = this.paneContainerForItem(item);
+      } else if (uri && this.paneForURI(uri)) {
+        // The restored layout recreated its own copy of the item.
+        if (typeof item.destroy === "function") item.destroy();
+        container = this.paneContainerForURI(uri);
+      } else {
+        container = this.paneContainers[location] || this.paneContainers.center;
+        const pane = container.getActivePane();
+        pane.addItem(item);
+        pane.activateItem(item);
+      }
+      if (visible && container && typeof container.show === "function") {
+        container.show();
+      }
     }
 
     this.hasActiveTextEditor = this.getActiveTextEditor() != null;
@@ -1112,35 +1156,6 @@ module.exports = class Workspace extends Model {
   /*
   Section: Opening
   */
-
-  // Extended: Open an item only when it opts into default opening and no saved
-  // workspace layout has been restored.
-  async openDefaultItem(item, options = {}) {
-    if (typeof item?.shouldOpenByDefault !== "function" || !item.shouldOpenByDefault()) {
-      return;
-    }
-
-    let uri;
-    if (typeof item.getURI === "function") {
-      uri = item.getURI();
-    } else if (typeof item.getUri === "function") {
-      uri = item.getUri();
-    }
-
-    if (this.paneForItem(item) || (uri && this.paneForURI(uri))) {
-      return;
-    }
-
-    if (this.hasRestoredState) {
-      return;
-    }
-
-    if (uri && this.destroyedItemURIs.includes(uri)) {
-      return;
-    }
-
-    return this.open(item, options);
-  }
 
   // Essential: Opens the given URI in Lumine asynchronously.
   // If the URI is already open, the existing item for that URI will be

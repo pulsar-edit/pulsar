@@ -1373,9 +1373,8 @@ class AtomEnvironment {
 
   restoreStateIntoThisEnvironment(state) {
     state.fullScreen = this.isFullScreen();
-    for (let pane of this.workspace.getPanes()) {
-      pane.destroy();
-    }
+    // The current panes are destroyed by Workspace::deserialize, which carries
+    // persistent items over to the restored layout without flicker.
     return this.deserialize(state);
   }
 

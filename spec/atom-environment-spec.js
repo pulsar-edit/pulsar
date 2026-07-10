@@ -531,6 +531,36 @@ describe("AtomEnvironment", () => {
         env2.destroy();
       });
 
+      it("keeps persistent items open when restoring the saved state into the current environment", async () => {
+        const projectPath = temp.mkdirSync();
+
+        const env1 = new AtomEnvironment({
+          applicationDelegate: atom.applicationDelegate,
+        });
+        env1.project.setPaths([projectPath]);
+        const env1State = env1.serialize();
+        env1.destroy();
+
+        const env2 = new AtomEnvironment({
+          applicationDelegate: atom.applicationDelegate,
+        });
+        const persistentItem = {
+          element: document.createElement("div"),
+          getTitle: () => "Persistent Item",
+          getURI: () => "atom://persistent-item",
+          getDefaultLocation: () => "left",
+          isPersistentDockItem: () => true,
+        };
+        await env2.workspace.open(persistentItem, { activatePane: false });
+        env2.workspace.getLeftDock().show();
+
+        await env2.attemptRestoreProjectStateForPaths(env1State, [projectPath]);
+
+        expect(env2.workspace.paneForURI("atom://persistent-item")).toBeTruthy();
+        expect(env2.workspace.getLeftDock().isVisible()).toBe(true);
+        env2.destroy();
+      });
+
       describe("when a dock has a non-text editor", () => {
         it("doesn't prompt the user to restore state", () => {
           const dock = atom.workspace.getLeftDock();

@@ -235,8 +235,8 @@ class TreeView {
     return ["left", "right"];
   }
 
-  shouldOpenByDefault() {
-    return !atom.config.get("tree-view.hiddenOnStartup");
+  isPersistentDockItem() {
+    return true;
   }
 
   getPreferredWidth() {

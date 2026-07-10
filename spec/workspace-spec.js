@@ -133,68 +133,6 @@ describe("Workspace", () => {
     });
   });
 
-  describe("::openDefaultItem(item, options)", () => {
-    function buildDefaultItem(uri, shouldOpenByDefault = true) {
-      return {
-        element: document.createElement("div"),
-        getTitle: () => "Default Item",
-        getURI: () => uri,
-        getDefaultLocation: () => "left",
-        shouldOpenByDefault: () => shouldOpenByDefault,
-      };
-    }
-
-    it("opens an item that opts into default opening", async () => {
-      const item = buildDefaultItem("atom://default-item");
-
-      const openedItem = await workspace.openDefaultItem(item, { activatePane: false });
-
-      expect(openedItem).toBe(item);
-      expect(workspace.paneForItem(item)).toBe(workspace.getLeftDock().getActivePane());
-    });
-
-    it("does not open an item that opts out of default opening", async () => {
-      const item = buildDefaultItem("atom://default-item", false);
-
-      const openedItem = await workspace.openDefaultItem(item, { activatePane: false });
-
-      expect(openedItem).toBeUndefined();
-      expect(workspace.paneForItem(item)).toBeUndefined();
-    });
-
-    it("does not reopen an item that restored workspace state already contains", async () => {
-      const item = buildDefaultItem("atom://default-item");
-      await workspace.open(item);
-      workspace.getLeftDock().hide();
-
-      const openedItem = await workspace.openDefaultItem(item, { activatePane: false });
-
-      expect(openedItem).toBeUndefined();
-      expect(workspace.getLeftDock().isVisible()).toBe(false);
-    });
-
-    it("does not open an item omitted from restored workspace state", async () => {
-      const state = workspace.serialize();
-      workspace.deserialize(state, atom.deserializers);
-      const item = buildDefaultItem("atom://default-item");
-
-      const openedItem = await workspace.openDefaultItem(item, { activatePane: false });
-
-      expect(openedItem).toBeUndefined();
-      expect(workspace.paneForItem(item)).toBeUndefined();
-    });
-
-    it("does not reopen an item recorded as user-closed in saved workspace state", async () => {
-      const item = buildDefaultItem("atom://default-item");
-      workspace.destroyedItemURIs.push(item.getURI());
-
-      const openedItem = await workspace.openDefaultItem(item, { activatePane: false });
-
-      expect(openedItem).toBeUndefined();
-      expect(workspace.paneForItem(item)).toBeUndefined();
-    });
-  });
-
   describe("::open(itemOrURI, options)", () => {
     let openEvents = null;
 
