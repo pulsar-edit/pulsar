@@ -1,0 +1,60 @@
+{
+  "name": "open-external",
+  "author": "lumine-code",
+  "description": "Open files and directories with external applications",
+  "repository": "https://github.com/lumine-code/lumine",
+  "version": "2.2.0",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "main": "./lib/main",
+  "consumedServices": {
+    "tree-view": {
+      "versions": {
+        "^1.0.0": "consumeTreeView"
+      }
+    }
+  },
+  "providedServices": {
+    "open-external": {
+      "description": "Allows packages to register handlers for external file operations",
+      "versions": {
+        "1.0.0": "provideOpenExternalService"
+      }
+    }
+  },
+  "configSchema": {
+    "flag": {
+      "order": 1,
+      "title": "Open unsupported files externally",
+      "description": "Automatically open files with a configured extension in their system application.",
+      "type": "boolean",
+      "default": true
+    },
+    "list": {
+      "order": 2,
+      "title": "External file extensions",
+      "description": "File extensions to open externally, without leading dots.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "doc",
+        "docx",
+        "xls",
+        "xlsx",
+        "ppt",
+        "pptx",
+        "rtf",
+        "exe",
+        "dwg",
+        "dxf",
+        "sofistik",
+        "cdb",
+        "plb"
+      ]
+    }
+  }
+}

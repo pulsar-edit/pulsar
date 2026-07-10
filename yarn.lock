@@ -6969,6 +6969,9 @@ onetime@^5.1.0, onetime@^5.1.2:
   dependencies:
     mimic-fn "^2.1.0"
 
+"open-external@file:packages/open-external":
+  version "2.2.0"
+
 "open-on-github@file:packages/open-on-github":
   version "1.0.0"
 

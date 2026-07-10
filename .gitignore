@@ -1,5 +1,6 @@
 *.swp
 *~
+.dev
 .DS_Store
 .eslintcache
 Thumbs.db
