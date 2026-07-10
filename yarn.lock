@@ -1933,6 +1933,84 @@
   resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-8.63.0.tgz#6b32b0a5913520554d81a986acfffba2d32b6963"
   integrity sha512-xyLtl9DUBBFrcJS4x2pIqGLH68/tC2uOa4Z7pUteW09D3bXnnXUom4dyPikzWgB7llmIc1zoeI3aoUdC4rPK/Q==
 
+"@vscode/ripgrep-darwin-arm64@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-darwin-arm64/-/ripgrep-darwin-arm64-1.18.0.tgz"
+  integrity sha512-r3ktHSvbFycQNF6sl7sNDPocpsI7J+mEzh1IaZFkY0spm3k2Z9t8hPAeOK7+p0l6p6/swkQC14XWX01low+94Q==
+
+"@vscode/ripgrep-darwin-x64@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-darwin-x64/-/ripgrep-darwin-x64-1.18.0.tgz"
+  integrity sha512-25b4gWbL138dGuQU244ebCKKc0q05ULBMoFSz9oAEUHNeqK/lOJViDS7DRvbDazzAzSEdan391Znks/R5mkaTQ==
+
+"@vscode/ripgrep-linux-arm64@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-linux-arm64/-/ripgrep-linux-arm64-1.18.0.tgz"
+  integrity sha512-lQ/5zTG++U0E3IhVgS4EPTTn/U4okncaRMM5GOFfOYZywS4nuD31GhkHbNYlDk5CuDC68+hYJ0/eQeyCKJDA+g==
+
+"@vscode/ripgrep-linux-arm@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-linux-arm/-/ripgrep-linux-arm-1.18.0.tgz"
+  integrity sha512-GDAvufNDHu8zqLEmXstalQF0Wh6wQvdsBi/Vg3Yi3CK4a8XoFXqqXVEHEZ9xQz3t0NfoSEc9JbvK9DDS6FxyxQ==
+
+"@vscode/ripgrep-linux-ia32@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-linux-ia32/-/ripgrep-linux-ia32-1.18.0.tgz"
+  integrity sha512-YWLkSUtFd4Jh5EepIhA9RJSfv3uMAVMo+2rBIGHPBnvgLrZciIs2cDKei1/p6Wc/aCzUoHyMAg2R6tw4ZCBKGg==
+
+"@vscode/ripgrep-linux-ppc64@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-linux-ppc64/-/ripgrep-linux-ppc64-1.18.0.tgz"
+  integrity sha512-quXVY8fwQ8O/lvU1yrSqSl3jlUzysRSb+AfUfCL/tRtphxsKlFvPAejryZ6vg4Bgvn8XL74xb4qMCDmWgYrT5w==
+
+"@vscode/ripgrep-linux-riscv64@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-linux-riscv64/-/ripgrep-linux-riscv64-1.18.0.tgz"
+  integrity sha512-f5kBQBrWfQt8Q7OhSORuNDei5dkYagBj3y4jImSUXGMy8B/Ke7SltSRcUtjPv166FAFfHCAmWuZp3+cWnX2/Vw==
+
+"@vscode/ripgrep-linux-s390x@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-linux-s390x/-/ripgrep-linux-s390x-1.18.0.tgz"
+  integrity sha512-rTOcJFGGcl2c07RUOWUo4U1ndnemKhY6A9hnMB18uk7jSgJc0d/QLBGWMWpumdtoJtpizn/wIv5mXIisJukusQ==
+
+"@vscode/ripgrep-linux-x64@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-linux-x64/-/ripgrep-linux-x64-1.18.0.tgz"
+  integrity sha512-mQ3bVrUpnD2vs7QT0vX90Lt0cnUq467uFtEktIdsJJmW296RoSULRGqWgzG1AKxyBpNDD6l4ZO4qKf6SgyC23Q==
+
+"@vscode/ripgrep-win32-arm64@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-win32-arm64/-/ripgrep-win32-arm64-1.18.0.tgz"
+  integrity sha512-vfTIjq1OHnzUjxZcHVQAMbnggp8dpGf+0QKFOZHwWPqFwXxQC8eCWM+5NUdoJ6yrElCeMzoUTXoK/LdZaniB+Q==
+
+"@vscode/ripgrep-win32-ia32@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-win32-ia32/-/ripgrep-win32-ia32-1.18.0.tgz"
+  integrity sha512-//rfAE+BOw5AC2EMmepmiE36jUuevtQYNQqqlw1s3m9FlRxjxEut97RkRPHAu9BG4mSojatZx+kXZXNdyI9caQ==
+
+"@vscode/ripgrep-win32-x64@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep-win32-x64/-/ripgrep-win32-x64-1.18.0.tgz"
+  integrity sha512-KNPvtElldqILHdnAetujPaowkNbpqJy3ssIGGN6F6Kve9Qi+nNLI2DN01O83JjCEVQbCzl8Ov3QZ9Eov3BR8Dg==
+
+"@vscode/ripgrep@1.18.0":
+  version "1.18.0"
+  resolved "https://registry.npmjs.org/@vscode/ripgrep/-/ripgrep-1.18.0.tgz"
+  integrity sha512-ns5lWe44tSfbTMbVUsyB+I1819PVSw4AdpgK0RNkzfWfwy6+3IUNSxwSrfTno1/oWaS/hERNz+XLWVyga2aJBQ==
+  optionalDependencies:
+    "@vscode/ripgrep-darwin-arm64" "1.18.0"
+    "@vscode/ripgrep-darwin-x64" "1.18.0"
+    "@vscode/ripgrep-linux-arm" "1.18.0"
+    "@vscode/ripgrep-linux-arm64" "1.18.0"
+    "@vscode/ripgrep-linux-ia32" "1.18.0"
+    "@vscode/ripgrep-linux-ppc64" "1.18.0"
+    "@vscode/ripgrep-linux-riscv64" "1.18.0"
+    "@vscode/ripgrep-linux-s390x" "1.18.0"
+    "@vscode/ripgrep-linux-x64" "1.18.0"
+    "@vscode/ripgrep-win32-arm64" "1.18.0"
+    "@vscode/ripgrep-win32-ia32" "1.18.0"
+    "@vscode/ripgrep-win32-x64" "1.18.0"
+
 "@xmldom/xmldom@^0.8.5", "@xmldom/xmldom@^0.8.8":
   version "0.8.11"
   resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.11.tgz#b79de2d67389734c57c52595f7a7305e30c2d608"
@@ -2005,11 +2083,6 @@ acorn@^8.16.0:
   version "8.17.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.17.0.tgz#1785adb84faf8d8add10369b93826fc2bd08f1fe"
   integrity sha512-xRQbDb9BnwDafYNn6Vwl839DYVjqXYb1XVGtWAZ1kcDc6iwAL4hg3B1dZlRiuENFeO2H53gFG3in621AdERVAg==
-
-agent-base@5:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-5.1.1.tgz#e8fb3f242959db44d63be665db7a8e739537a32c"
-  integrity sha512-TMeqbNl2fMW0nMjTEPOwe3J/PRFP4vqeoNuQMG0HlMrtm5QxKqdvAkZ1pRBQ/ulIyDD5Yq0nJ7YbdD8ey0TO3g==
 
 agent-base@6, agent-base@^6.0.2:
   version "6.0.2"
@@ -4579,15 +4652,21 @@ fuzzaldrin@^2.1.0:
   resolved "https://registry.yarnpkg.com/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz#90204c3e2fdaa6941bb28d16645d418063a90e9b"
   integrity sha512-zgllBYwfHR5P3CncJiGbGVPpa3iFYW1yuPaIv8DiTVRrcg5/6uETNL5zvIoKflG1aifXVUZTlIroDehw4WygGA==
 
-"fuzzy-finder@file:packages/fuzzy-finder":
-  version "1.14.3"
+"fuzzy-explorer@file:packages/fuzzy-explorer":
+  version "0.3.4"
   dependencies:
-    atom-select-list "^0.7.0"
-    fs-plus "^3.0.0"
+    "@vscode/ripgrep" "1.18.0"
+    minimatch "^10.0.1"
+
+"fuzzy-files@file:packages/fuzzy-files":
+  version "2.0.1"
+  dependencies:
+    "@vscode/ripgrep" "1.18.0"
+    async "3.2.6"
     minimatch "^10.2.5"
-    underscore-plus "^1.7.0"
-    vscode-ripgrep "^1.2.5"
-    wrench "^1.5"
+
+"fuzzy-workspace@file:packages/fuzzy-workspace":
+  version "1.0.1"
 
 gauge@~2.7.3:
   version "2.7.4"
@@ -5022,14 +5101,6 @@ http2-wrapper@^1.0.0-beta.5.2:
   dependencies:
     quick-lru "^5.1.1"
     resolve-alpn "^1.0.0"
-
-https-proxy-agent@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-4.0.0.tgz#702b71fb5520a132a66de1f67541d9e62154d82b"
-  integrity sha512-zoDhWrkR3of1l9QAL8/scJZyLu8j/gBkcwcaQOZh7Gyh/+uJQzGVETdgT30akuwkpL8HTRfssqI3BZuV18teDg==
-  dependencies:
-    agent-base "5"
-    debug "4"
 
 https-proxy-agent@^5.0.0:
   version "5.0.1"
@@ -6316,7 +6387,7 @@ minimatch@3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimatch@^10.0.3, minimatch@^10.2.2, minimatch@^10.2.4, minimatch@^10.2.5:
+minimatch@^10.0.1, minimatch@^10.0.3, minimatch@^10.2.2, minimatch@^10.2.4, minimatch@^10.2.5:
   version "10.2.5"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-10.2.5.tgz#bd48687a0be38ed2961399105600f832095861d1"
   integrity sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==
@@ -7344,11 +7415,6 @@ property-accessors@^1, property-accessors@^1.1:
     es6-weak-map "^0.1.2"
     mixto "1.x"
 
-proxy-from-env@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/proxy-from-env/-/proxy-from-env-1.1.0.tgz#e102f16ca355424865755d2c9e8ea4f24d58c3e2"
-  integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
-
 prr@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/prr/-/prr-1.0.1.tgz#d3fc114ba06995a45ec6893f484ceb1d78f5f476"
@@ -7462,7 +7528,7 @@ readdirp@~3.6.0:
 "recent-list@file:packages/recent-list":
   version "1.0.3"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.3-e5387f05-5c2f-4a77-ad6e-631bbb95838c-1783623961442/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.3-b9c02817-521d-4b6b-8d8a-e5365e88886c-1783665259534/shared/select-list"
 
 reduce-flatten@^1.0.1:
   version "1.0.1"
@@ -8960,22 +9026,6 @@ vscode-oniguruma@^1.7.0:
   resolved "https://registry.yarnpkg.com/vscode-oniguruma/-/vscode-oniguruma-1.7.0.tgz#439bfad8fe71abd7798338d1cd3dc53a8beea94b"
   integrity sha512-L9WMGRfrjOhgHSdOYgCt/yRMsXzLDJSL7BPrOZt73gU0iWO4mpqzqQzOz5srxqTvMBaR0XZTSrVWo4j55Rc6cA==
 
-vscode-ripgrep@1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/vscode-ripgrep/-/vscode-ripgrep-1.9.0.tgz#d6cdea4d290f3c2919472cdcfe2440d5fb1f99db"
-  integrity sha512-7jyAC/NNfvMPZgCVkyqIn0STYJ7wIk3PF2qA2cX1sEutx1g/e2VtgKAodXnfpreJq4993JT/BSIigOv/0lBSzg==
-  dependencies:
-    https-proxy-agent "^4.0.0"
-    proxy-from-env "^1.1.0"
-
-vscode-ripgrep@^1.2.5:
-  version "1.13.2"
-  resolved "https://registry.yarnpkg.com/vscode-ripgrep/-/vscode-ripgrep-1.13.2.tgz#8ccebc33f14d54442c4b11962aead163c55b506e"
-  integrity sha512-RlK9U87EokgHfiOjDQ38ipQQX936gWOcWPQaJpYf+kAkz1PQ1pK2n7nhiscdOmLu6XGjTs7pWFJ/ckonpN7twQ==
-  dependencies:
-    https-proxy-agent "^4.0.0"
-    proxy-from-env "^1.1.0"
-
 walk-back@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/walk-back/-/walk-back-2.0.1.tgz#554e2a9d874fac47a8cb006bf44c2f0c4998a0a4"
@@ -9002,11 +9052,6 @@ wcwidth@^1.0.1:
   integrity sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==
   dependencies:
     defaults "^1.0.3"
-
-web-tree-sitter@0.20.7:
-  version "0.20.7"
-  resolved "https://registry.yarnpkg.com/web-tree-sitter/-/web-tree-sitter-0.20.7.tgz#b0ddb78e8244221a3100f432c7e162516cd9cd09"
-  integrity sha512-flC9JJmTII9uAeeYpWF8hxDJ7bfY+leldQryetll8Nv4WgI+MXc6h7TiyAZASWl9uC9TvmfdgOjZn1DAQecb3A==
 
 "welcome@file:packages/welcome":
   version "0.36.9"
@@ -9201,11 +9246,6 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
-
-wrench@^1.5:
-  version "1.5.9"
-  resolved "https://registry.yarnpkg.com/wrench/-/wrench-1.5.9.tgz#411691c63a9b2531b1700267279bdeca23b2142a"
-  integrity sha512-QH+8W9n0UGDAxnRDOkQzG1N277GTaBgMDNdckluqnAY773njfs1gfo867IbMMbGjOZZof+zlRIUeQ9XN8VUHUQ==
 
 xml@^1.0.0:
   version "1.0.1"

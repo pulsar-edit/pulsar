@@ -100,7 +100,7 @@ class Matcher {
 
 /*
   Essential: The {fuzzyMatcher} API, the same used in the autocomplete,
-  fuzzy-finder core package, command pallete, etc.
+  fuzzy file search, command palette, etc.
   An instance of this API is available via the `atom.ui.fuzzyMatcher` global.
 
   This API have two parts - the filtering of an array of candidates, and the

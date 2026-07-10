@@ -1,0 +1,96 @@
+{
+  "name": "fuzzy-files",
+  "description": "Quickly find and take an action over project files",
+  "repository": "https://github.com/lumine-code/lumine",
+  "version": "2.0.1",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.132.0 <2.0.0"
+  },
+  "main": "./lib/main",
+  "activationCommands": {
+    "atom-workspace": [
+      "fuzzy-files:toggle",
+      "fuzzy-files:refresh"
+    ]
+  },
+  "providedServices": {
+    "fuzzy-files.score-modifier": {
+      "versions": {
+        "1.0.0": "provideScoreModifier"
+      }
+    }
+  },
+  "consumedServices": {
+    "atom.file-icons": {
+      "versions": {
+        "1.0.0": "consumeClassIcons"
+      }
+    },
+    "open-external": {
+      "versions": {
+        "1.0.0": "consumeOpenExternalService"
+      }
+    },
+    "windows-clip": {
+      "versions": {
+        "1.0.0": "consumeWindowsClip"
+      }
+    },
+    "claude-chat": {
+      "versions": {
+        "1.0.0": "consumeClaudeChat"
+      }
+    },
+    "tree-view-plus": {
+      "versions": {
+        "1.0.0": "consumeTreeViewPlus"
+      }
+    }
+  },
+  "dependencies": {
+    "async": "3.2.6",
+    "minimatch": "^10.2.5",
+    "@vscode/ripgrep": "1.18.0"
+  },
+  "configSchema": {
+    "ignoredNames": {
+      "order": 1,
+      "title": "List of ignore glob patterns",
+      "description": "Files and directories matching these patterns are ignored. This list is merged with the list defined by the core `Ignored Names' configuration setting.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "useRipGrep": {
+      "order": 2,
+      "title": "Use RipGrep",
+      "description": "Use the substantially faster ripgrep crawler.",
+      "type": "boolean",
+      "default": true
+    },
+    "separator": {
+      "order": 3,
+      "title": "Type of separator in file paths",
+      "description": "Type of separator for the file path when copying or pasting.",
+      "type": "integer",
+      "enum": [
+        {
+          "value": 0,
+          "description": "Default"
+        },
+        {
+          "value": 1,
+          "description": "Forward Slash"
+        },
+        {
+          "value": 2,
+          "description": "Backslash"
+        }
+      ],
+      "default": 0
+    }
+  }
+}

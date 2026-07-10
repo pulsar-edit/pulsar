@@ -1,0 +1,72 @@
+{
+  "name": "fuzzy-explorer",
+  "description": "Fuzzy search files across user-defined directories",
+  "repository": "https://github.com/lumine-code/lumine",
+  "version": "0.3.4",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.132.0 <2.0.0"
+  },
+  "main": "./lib/main",
+  "activationCommands": {
+    "atom-workspace": [
+      "fuzzy-explorer:toggle",
+      "fuzzy-explorer:refresh",
+      "fuzzy-explorer:edit"
+    ]
+  },
+  "consumedServices": {
+    "atom.file-icons": {
+      "versions": {
+        "1.0.0": "consumeClassIcons"
+      }
+    },
+    "open-external": {
+      "versions": {
+        "^1.0.0": "consumeOpenExternalService"
+      }
+    },
+    "claude-chat": {
+      "versions": {
+        "^1.0.0": "consumeClaudeChat"
+      }
+    }
+  },
+  "dependencies": {
+    "minimatch": "^10.0.1",
+    "@vscode/ripgrep": "1.18.0"
+  },
+  "configSchema": {
+    "ignoredNames": {
+      "order": 1,
+      "title": "Ignored Names",
+      "description": "List of glob patterns. Files matching these patterns will be ignored.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
+    },
+    "separator": {
+      "order": 2,
+      "title": "Type of separator in file paths",
+      "description": "Type of separator for the file path when copying or pasting.",
+      "type": "integer",
+      "enum": [
+        {
+          "value": 0,
+          "description": "Default"
+        },
+        {
+          "value": 1,
+          "description": "Forward Slash"
+        },
+        {
+          "value": 2,
+          "description": "Backslash"
+        }
+      ],
+      "default": 0
+    }
+  }
+}

@@ -4,6 +4,8 @@ const ipcHelpers = require("./ipc-helpers");
 const { Emitter, Disposable } = require("event-kit");
 const getWindowLoadSettings = require("./get-window-load-settings");
 
+const WINDOW_EVENT_CHANNEL = "window-event";
+
 module.exports = class ApplicationDelegate {
   constructor() {
     this.pendingSettingsUpdateCount = 0;
@@ -333,6 +335,22 @@ module.exports = class ApplicationDelegate {
 
   didChangeHistoryManager() {
     return ipcRenderer.send("did-change-history-manager");
+  }
+
+  emitToOtherWindows(eventName, ...args) {
+    if (typeof eventName !== "string") {
+      throw new TypeError("Window event name must be a string");
+    }
+    return ipcRenderer.send(WINDOW_EVENT_CHANNEL, eventName, ...args);
+  }
+
+  onDidReceiveWindowEvent(eventName, callback) {
+    const outerCallback = (_event, receivedEventName, ...args) => {
+      if (receivedEventName === eventName) callback(...args);
+    };
+
+    ipcRenderer.on(WINDOW_EVENT_CHANNEL, outerCallback);
+    return new Disposable(() => ipcRenderer.removeListener(WINDOW_EVENT_CHANNEL, outerCallback));
   }
 
   openExternal(url) {

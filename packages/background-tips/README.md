@@ -11,7 +11,7 @@ Packages can contribute tips by adding a `backgroundTips` array to their `packag
 ```json
 "backgroundTips": [
   "You can toggle the Tree View with {atom-workspace>tree-view:toggle}",
-  "You can open any file quickly using {atom-workspace>fuzzy-finder:toggle-file-finder}"
+  "You can open any file quickly using {atom-workspace>fuzzy-files:toggle}"
 ]
 ```
 

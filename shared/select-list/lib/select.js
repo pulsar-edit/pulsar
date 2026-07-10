@@ -708,7 +708,7 @@ class SelectListView {
       return null;
     }
 
-    // Use reusable matcher for index computation (like fuzzy-finder)
+    // Use reusable matcher for index computation.
     if (!this.indexMatcher) {
       this.indexMatcher = atom.ui.fuzzyMatcher.setCandidates([filterKey]);
     } else {

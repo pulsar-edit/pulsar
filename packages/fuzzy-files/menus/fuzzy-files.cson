@@ -1,0 +1,14 @@
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      {
+        'label': 'Fuzzy Files'
+        'submenu': [
+            {'label': 'Toggle' , 'command': 'fuzzy-files:toggle'}
+            {'label': 'Refresh' , 'command': 'fuzzy-files:refresh'}
+        ]
+      }
+    ]
+  }
+]

@@ -5,7 +5,7 @@ const Grim = require("grim");
 
 // Extended: Run a node script in a separate process.
 //
-// Used by the fuzzy-finder and [find in project](https://github.com/lumine-code/lumine/blob/master/src/scan-handler.js).
+// Used by fuzzy file search and [find in project](https://github.com/lumine-code/lumine/blob/master/src/scan-handler.js).
 //
 // For a real-world example, see the [scan-handler](https://github.com/lumine-code/lumine/blob/master/src/scan-handler.js)
 // and the [instantiation of the task](https://github.com/lumine-code/lumine/blob/master/src/project.js).

@@ -35,6 +35,7 @@ let Resolve = null;
 const ConfigSchema = require("../config-schema");
 
 const LocationSuffixRegExp = /(:\d+)(:\d+)?$/;
+const WINDOW_EVENT_CHANNEL = "window-event";
 
 // Increment this when changing the serialization format of `${ATOM_HOME}/storage/application.json` used by
 // AtomApplication::saveCurrentWindowOptions() and AtomApplication::loadPreviousWindowOptions() in a backward-
@@ -782,6 +783,19 @@ module.exports = class AtomApplication extends EventEmitter {
         for (let atomWindow of this.getAllWindows()) {
           const { webContents } = atomWindow.browserWindow;
           if (webContents !== event.sender) webContents.send("did-change-history-manager");
+        }
+      }),
+    );
+
+    this.disposable.add(
+      ipcHelpers.on(ipcMain, WINDOW_EVENT_CHANNEL, (event, eventName, ...args) => {
+        if (typeof eventName !== "string") return;
+
+        for (let atomWindow of this.getAllWindows()) {
+          const { webContents } = atomWindow.browserWindow;
+          if (webContents !== event.sender) {
+            webContents.send(WINDOW_EVENT_CHANNEL, eventName, ...args);
+          }
         }
       }),
     );
