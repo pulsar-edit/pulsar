@@ -306,6 +306,20 @@
     -webkit-user-select: none;
   }
 
+  .setting-key {
+    margin-left: 0.5em;
+    font-family: monospace;
+    font-size: 0.85em;
+    color: @text-color-subtle;
+    -webkit-user-select: text;
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+  }
+  .control-group:hover .setting-key,
+  .sub-section-heading:hover .setting-key {
+    opacity: 1;
+  }
+
   .setting-description {
     color: @text-color-subtle;
     -webkit-user-select: none;

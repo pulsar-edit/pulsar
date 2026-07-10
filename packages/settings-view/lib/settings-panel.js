@@ -516,6 +516,21 @@ function elementForSetting(namespace, name, value) {
   return controlGroup;
 }
 
+function settingKeyElement(keyPath) {
+  const keySpan = document.createElement("span");
+  keySpan.classList.add("setting-key");
+  keySpan.textContent = keyPath;
+  return keySpan;
+}
+
+function settingTitleElement(keyPath, name) {
+  const titleDiv = document.createElement("div");
+  titleDiv.classList.add("setting-title");
+  titleDiv.textContent = getSettingTitle(keyPath, name);
+  titleDiv.appendChild(settingKeyElement(keyPath));
+  return titleDiv;
+}
+
 function elementForOptions(namespace, name, value, { radio = false }) {
   let keyPath = `${namespace}.${name}`;
   let schema = atom.config.getSchema(keyPath);
@@ -526,10 +541,7 @@ function elementForOptions(namespace, name, value, { radio = false }) {
   const label = document.createElement("label");
   label.classList.add("control-label");
 
-  const titleDiv = document.createElement("div");
-  titleDiv.classList.add("setting-title");
-  titleDiv.textContent = getSettingTitle(keyPath, name);
-  label.appendChild(titleDiv);
+  label.appendChild(settingTitleElement(keyPath, name));
 
   const descriptionDiv = document.createElement("div");
   descriptionDiv.classList.add("setting-description");
@@ -557,10 +569,7 @@ function elementForCheckbox(namespace, name, value) {
   input.classList.add("input-checkbox");
   label.appendChild(input);
 
-  const titleDiv = document.createElement("div");
-  titleDiv.classList.add("setting-title");
-  titleDiv.textContent = getSettingTitle(keyPath, name);
-  label.appendChild(titleDiv);
+  label.appendChild(settingTitleElement(keyPath, name));
   div.appendChild(label);
 
   const descriptionDiv = document.createElement("div");
@@ -585,10 +594,7 @@ function elementForColor(namespace, name, value) {
   input.type = "color";
   label.appendChild(input);
 
-  const titleDiv = document.createElement("div");
-  titleDiv.classList.add("setting-title");
-  titleDiv.textContent = getSettingTitle(keyPath, name);
-  label.appendChild(titleDiv);
+  label.appendChild(settingTitleElement(keyPath, name));
   div.appendChild(label);
 
   const descriptionDiv = document.createElement("div");
@@ -608,10 +614,7 @@ function elementForEditor(namespace, name, value) {
   const label = document.createElement("label");
   label.classList.add("control-label");
 
-  const titleDiv = document.createElement("div");
-  titleDiv.classList.add("setting-title");
-  titleDiv.textContent = getSettingTitle(keyPath, name);
-  label.appendChild(titleDiv);
+  label.appendChild(settingTitleElement(keyPath, name));
 
   const descriptionDiv = document.createElement("div");
   descriptionDiv.classList.add("setting-description");
@@ -643,10 +646,7 @@ function elementForArray(namespace, name, value) {
   const label = document.createElement("label");
   label.classList.add("control-label");
 
-  const titleDiv = document.createElement("div");
-  titleDiv.classList.add("setting-title");
-  titleDiv.textContent = getSettingTitle(keyPath, name);
-  label.appendChild(titleDiv);
+  label.appendChild(settingTitleElement(keyPath, name));
 
   const descriptionDiv = document.createElement("div");
   descriptionDiv.classList.add("setting-description");
@@ -687,6 +687,7 @@ function elementForObject(namespace, name, value) {
     const h3 = document.createElement("h3");
     h3.classList.add("sub-section-heading", "has-items");
     h3.textContent = getSettingTitle(keyPath, name);
+    h3.appendChild(settingKeyElement(keyPath));
     section.appendChild(h3);
 
     const descriptionDiv = document.createElement("div");
