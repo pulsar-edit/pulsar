@@ -1,0 +1,78 @@
+{
+  "name": "column-selection",
+  "author": "lumine-code",
+  "description": "Create rectangular selections across lines by dragging",
+  "version": "1.0.0",
+  "license": "MIT",
+  "repository": "https://github.com/lumine-code/lumine",
+  "main": "./lib/main",
+  "engines": {
+    "atom": "*"
+  },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
+  "configSchema": {
+    "mouseButton": {
+      "order": 1,
+      "title": "Mouse button",
+      "description": "The mouse button that starts a column selection. Choose None to use only sticky or picker mode.",
+      "type": "integer",
+      "enum": [
+        {
+          "description": "None",
+          "value": 0
+        },
+        {
+          "description": "Left",
+          "value": 1
+        },
+        {
+          "description": "Middle",
+          "value": 2
+        },
+        {
+          "description": "Right",
+          "value": 3
+        }
+      ],
+      "default": 3
+    },
+    "selectKey": {
+      "order": 2,
+      "title": "Select key",
+      "description": "The modifier required to start column selection.",
+      "type": "integer",
+      "enum": [
+        {
+          "description": "None",
+          "value": 0
+        },
+        {
+          "description": "Shift",
+          "value": 1
+        },
+        {
+          "description": "Alt",
+          "value": 2
+        },
+        {
+          "description": "Ctrl",
+          "value": 3
+        }
+      ],
+      "default": 0
+    },
+    "statusBar": {
+      "order": 3,
+      "title": "Status bar icon",
+      "description": "Show the column selection mode indicator in the status bar.",
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
