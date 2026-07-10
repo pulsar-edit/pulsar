@@ -4,31 +4,38 @@ Customize the window title with a template.
 
 ## Features
 
-- **Template-based title**: compose the window title from placeholders like the project title, file name, or git branch.
+- **Template-based title**: compose the window title with a Liquid template from variables like the project title, file name, or git branch.
 - **Project awareness**: shows the matching project title from the `project-list` package when the window's roots match a saved project.
-- **Safe fallback**: if the template renders empty, the default title is kept untouched.
+- **Safe fallback**: if the template renders empty or fails, the default title is kept untouched.
 
 ## Configuration
 
-The `Window Title Template` setting is a plain string with `{placeholder}` variables. Available placeholders:
+The `Window Title Template` setting is a [LiquidJS](https://liquidjs.com/) template. Use `{{ variable }}` to output a value and tags such as `{% if variable %}...{% else %}...{% endif %}` for conditional content. Available variables:
 
-| Placeholder          | Value                                                             |
-| -------------------- | ----------------------------------------------------------------- |
-| `{projectTitle}`     | Title of the matched project from the project-list configuration. |
-| `{projectName}`      | Base name of the first project root.                              |
-| `{projectPath}`      | Full path of the first project root.                              |
-| `{fileName}`         | Name of the active file (or the active item's title).             |
-| `{filePath}`         | Full path of the active file.                                     |
-| `{relativeFilePath}` | Path of the active file relative to its project root.             |
-| `{gitHead}`          | Short head (branch) of the first project repository.              |
-| `{appName}`          | Application name.                                                 |
-| `{devMode}`          | `dev` when the window runs in dev mode, empty otherwise.          |
-| `{safeMode}`         | `safe` when the window runs in safe mode, empty otherwise.        |
+| Variable           | Value                                                             |
+| ------------------ | ----------------------------------------------------------------- |
+| `projectTitle`     | Title of the matched project from the project-list configuration. |
+| `projectPaths`     | All project roots, joined with a comma.                           |
+| `projectName`      | Base name of the first project root.                              |
+| `projectPath`      | Full path of the first project root.                              |
+| `fileName`         | Name of the active file (or the active item's title).             |
+| `filePath`         | Full path of the active file.                                     |
+| `relativeFilePath` | Path of the active file relative to its project root.             |
+| `gitHead`          | Short head (branch) of the first project repository.              |
+| `appName`          | Application name.                                                 |
+| `devMode`          | `true` when the window runs in dev mode.                          |
+| `safeMode`         | `true` when the window runs in safe mode.                         |
 
-Empty placeholders are removed, together with leftover empty brackets and doubled whitespace. Example:
+Unavailable variables render as empty strings; leftover empty brackets and doubled whitespace are cleaned up. The default template shows the project title when the window matches a saved project. Otherwise, it shows the active file name and project paths. It adds a `[Dev]`/`[Safe]` marker when running in dev or safe mode:
 
 ```
-{projectTitle} — {fileName} [{gitHead}]
+{% if projectTitle %}{{ projectTitle }}{% else %}{{ fileName }} — {{ projectPaths }}{% endif %}{% if devMode %} [Dev]{% endif %}{% if safeMode %} [Safe]{% endif %}
+```
+
+A richer example:
+
+```
+{% if projectTitle %}{{ projectTitle }}{% else %}{{ projectName }}{% endif %} — {{ fileName }} [{{ gitHead }}]
 ```
 
 ## Services

@@ -9,6 +9,9 @@
     "atom": "*"
   },
   "main": "./lib/main",
+  "dependencies": {
+    "liquidjs": "^10.27.2"
+  },
   "consumedServices": {
     "project-list": {
       "versions": {
@@ -20,9 +23,9 @@
     "template": {
       "order": 1,
       "title": "Window Title Template",
-      "description": "Template for the window title. Placeholders: `{projectTitle}`, `{projectName}`, `{projectPath}`, `{fileName}`, `{filePath}`, `{relativeFilePath}`, `{gitHead}`, `{appName}`, `{devMode}`, `{safeMode}`. Empty placeholders are removed. If the template renders empty, the default title is kept.",
+      "description": "Liquid template for the window title. Variables: `projectTitle`, `projectPaths`, `projectName`, `projectPath`, `fileName`, `filePath`, `relativeFilePath`, `gitHead`, `appName`, `devMode`, `safeMode`. Supports tags such as `{% if devMode %} [Dev]{% endif %}`. If the template renders empty, the default title is kept.",
       "type": "string",
-      "default": "{projectTitle}"
+      "default": "{% if projectTitle %}{{ projectTitle }}{% else %}{{ fileName }} — {{ projectPaths }}{% endif %}{% if devMode %} [Dev]{% endif %}{% if safeMode %} [Safe]{% endif %}"
     }
   }
 }

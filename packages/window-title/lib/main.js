@@ -1,9 +1,13 @@
 const { CompositeDisposable, Disposable } = require("atom");
+const { Liquid } = require("liquidjs");
 const path = require("path");
+
+const templateEngine = new Liquid({ jsTruthy: true });
 
 module.exports = {
   activate() {
     this.template = "";
+    this.parsedTemplate = null;
     this.projectList = null;
     this.indexRequested = false;
 
@@ -20,6 +24,16 @@ module.exports = {
     this.disposables = new CompositeDisposable(
       atom.config.observe("window-title.template", (value) => {
         this.template = value || "";
+        this.parsedTemplate = null;
+        if (this.template.trim()) {
+          try {
+            this.parsedTemplate = templateEngine.parse(this.template);
+          } catch (error) {
+            atom.notifications.addWarning("window-title: invalid template", {
+              detail: error.message || String(error),
+            });
+          }
+        }
         this.requestProjectListIndex();
         atom.workspace.updateWindowTitle();
       }),
@@ -55,20 +69,23 @@ module.exports = {
     if (this.indexRequested || !this.projectList) {
       return;
     }
-    if (/\{projectTitle\}/.test(this.template)) {
+    if (this.template.includes("projectTitle")) {
       this.indexRequested = true;
       this.projectList.updateView();
     }
   },
 
   render() {
-    if (!this.template.trim()) {
+    if (!this.parsedTemplate) {
       return null;
     }
-    const variables = this.variables();
-    let title = this.template.replace(/\{([a-zA-Z]+)\}/g, (match, name) =>
-      Object.prototype.hasOwnProperty.call(variables, name) ? variables[name] : "",
-    );
+    let title;
+    try {
+      title = templateEngine.renderSync(this.parsedTemplate, this.variables());
+    } catch {
+      // a template that fails at render time keeps the default title
+      return null;
+    }
     title = title
       .replace(/\[\s*\]|\(\s*\)/g, "")
       .replace(/\s{2,}/g, " ")
@@ -82,12 +99,14 @@ module.exports = {
       activeItem && typeof activeItem.getPath === "function" ? activeItem.getPath() : null;
     const itemTitle =
       activeItem && typeof activeItem.getTitle === "function" ? activeItem.getTitle() : "";
-    const projectPath = atom.project.getPaths()[0];
+    const projectPaths = atom.project.getPaths();
+    const projectPath = projectPaths[0];
     const repository = atom.project.getRepositories().find(Boolean);
     const currentProject = this.projectList ? this.projectList.getCurrentProject() : null;
     const relativeFilePath = itemPath ? atom.project.relativizePath(itemPath)[1] : null;
     return {
       projectTitle: currentProject ? currentProject.title : "",
+      projectPaths: projectPaths.join(", "),
       projectName: projectPath ? path.basename(projectPath) : "",
       projectPath: projectPath || "",
       fileName: itemPath ? path.basename(itemPath) : itemTitle || "",
@@ -98,8 +117,8 @@ module.exports = {
           ? repository.getShortHead() || ""
           : "",
       appName: atom.getAppName(),
-      devMode: atom.inDevMode() ? "dev" : "",
-      safeMode: atom.inSafeMode() ? "safe" : "",
+      devMode: atom.inDevMode(),
+      safeMode: atom.inSafeMode(),
     };
   },
 };
