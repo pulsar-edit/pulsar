@@ -38,6 +38,12 @@ const EVENT_MAP = {
   change: "updated",
 };
 
+// The default backend probes for a Watchman server first; on Windows that
+// probe runs `watchman get-sockname` through `_popen` (cmd.exe), which
+// flashes an empty console window. Pin the backend there so the probe never
+// runs; elsewhere the probe is windowless and the default order is fine.
+const BACKEND = process.platform === "win32" ? "windows" : undefined;
+
 // A class designed to imitate the object that is returned by `@parcel/watcher`
 // when it watches directories; this one is for when we watch individual files.
 class FileHandle {
@@ -119,6 +125,7 @@ async function handleMessage(message) {
         if (fs.lstatSync(normalizedPath).isDirectory()) {
           let handle = await watcher.subscribe(normalizedPath, wrappedHandler, {
             ignore,
+            backend: BACKEND,
           });
           WATCHERS_BY_PATH.set(instance, handle);
         } else {
