@@ -67,7 +67,7 @@ describe("PackageCard", function () {
 
   it("removes the uninstall button if a package has is a bundled package", function () {
     setPackageStatusSpies({ installed: true, disabled: false, hasSettings: true });
-    card = new PackageCard({ name: "find-and-replace" }, new SettingsView(), packageManager);
+    card = new PackageCard({ name: "search-panel" }, new SettingsView(), packageManager);
     jasmine.attachToDOM(card.element);
     expect(card.refs.uninstallButton).not.toBeVisible();
   });
@@ -75,7 +75,7 @@ describe("PackageCard", function () {
   it("displays the new version in the update button", function () {
     setPackageStatusSpies({ installed: true, disabled: false, hasSettings: true });
     card = new PackageCard(
-      { name: "find-and-replace", version: "1.0.0", latestVersion: "1.2.0" },
+      { name: "search-panel", version: "1.0.0", latestVersion: "1.2.0" },
       new SettingsView(),
       packageManager,
     );
@@ -87,7 +87,7 @@ describe("PackageCard", function () {
   it("displays the new version in the update button when the package is disabled", function () {
     setPackageStatusSpies({ installed: true, disabled: true, hasSettings: true });
     card = new PackageCard(
-      { name: "find-and-replace", version: "1.0.0", latestVersion: "1.2.0" },
+      { name: "search-panel", version: "1.0.0", latestVersion: "1.2.0" },
       new SettingsView(),
       packageManager,
     );

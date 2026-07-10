@@ -2433,7 +2433,7 @@ module.exports = class Workspace extends Model {
     // Make sure the Promise that is returned to the client is cancelable. To
     // be consistent with the existing behavior, instead of cancel() rejecting
     // the promise, it should resolve it with the special value 'cancelled'. At
-    // least the built-in find-and-replace package relies on this behavior.
+    // least the built-in search-panel package relies on this behavior.
     let isCancelled = false;
     const cancellablePromise = new Promise((resolve, reject) => {
       const onSuccess = function () {

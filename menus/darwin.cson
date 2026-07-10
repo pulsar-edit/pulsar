@@ -189,7 +189,7 @@
   }
 
   {
-    label: 'Find'
+    label: 'Search'
     submenu: []
   }
 

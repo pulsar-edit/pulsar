@@ -4,9 +4,7 @@ const { Emitter } = require("event-kit");
 // You should not create a `Panel` directly, instead use {Workspace::addTopPanel}
 // and friends to add panels.
 //
-// Examples: [status-bar](https://github.com/atom/status-bar)
-// and [find-and-replace](https://github.com/atom/find-and-replace) both use
-// panels.
+// Examples: status-bar and search-panel both use panels.
 module.exports = class Panel {
   /*
   Section: Construction and Destruction

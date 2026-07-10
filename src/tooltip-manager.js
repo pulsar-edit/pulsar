@@ -40,7 +40,7 @@ let Tooltip = null;
 // ```js
 // disposable = atom.tooltips.add(this.caseOptionButton, {
 //   title: 'Match Case',
-//   keyBindingCommand: 'find-and-replace:toggle-case-option',
+//   keyBindingCommand: 'search-panel:toggle-case-option',
 //   keyBindingTarget: this.findEditor.element
 // })
 // ```

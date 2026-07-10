@@ -1248,7 +1248,7 @@ export default class StyleguideView {
             <p>
               You do not create the markup directly. You call
               <code>{`element.setTooltip(title, {command, commandElement}={})`}</code>. Passing in a{" "}
-              <code>command</code> (like <code>find-and-replace:show-find</code>) and
+              <code>command</code> (like <code>search-panel:show</code>) and
               <code>commandElement</code> (context for the command) will yield a tip with a
               keystroke.
             </p>
@@ -1274,8 +1274,7 @@ export default class StyleguideView {
             title="Messages"
           >
             <p>
-              Use to convey info to the user when something happens. See{" "}
-              <code>find-and-replace</code>
+              Use to convey info to the user when something happens. See <code>search-panel</code>
               for an example.
             </p>
 

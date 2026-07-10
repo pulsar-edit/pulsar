@@ -172,7 +172,7 @@
   }
 
   {
-    label: 'F&ind'
+    label: '&Search'
     submenu: []
   }
 
