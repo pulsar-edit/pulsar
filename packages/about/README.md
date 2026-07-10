@@ -1,18 +1,19 @@
-# About package
+# about
 
 View useful information about your Lumine installation.
 
-![About Lumine](https://cloud.githubusercontent.com/assets/16760489/19395499/69bbb780-922d-11e6-9779-2b8327027ea5.png)
+## Features
 
-This is a package for [Lumine](https://pulsar-edit.dev), a community-led hyper-hackable text editor
+- **Installation details**: shows the current Lumine version, license, and Terms of Use.
+- **Cross-platform view**: opens a consistent About view on every supported platform.
+- **Release notes**: links out to the release notes for the running version.
 
-## Usage
+## Commands
 
-This package provides a cross-platform "About Lumine" view that displays information about your Lumine installation, which currently includes the current version, the license, and the Terms of Use.
+Commands available in `atom-workspace`:
+
+- `about:view-release-notes`: open the release notes for the current version in your browser.
 
 ## Contributing
 
-Always feel free to help out! Whether it's filing bugs and feature requests
-or working on some of the open issues, Lumine's [contributing guide](https://github.com/pulsar-edit/.github/blob/main/CONTRIBUTING.md)
-will help get you started while the [guide for contributing to packages](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#contributing-to-packages)
-has some extra information.
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

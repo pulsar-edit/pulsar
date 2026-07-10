@@ -1,12 +1,13 @@
 {
   "name": "language-python",
+  "author": "lumine-code",
   "main": "lib/main",
-  "version": "0.53.6",
+  "version": "1.0.0",
   "engines": {
     "atom": "*",
     "node": ">=12"
   },
-  "description": "Python language support in Atom",
+  "description": "Python language support in Lumine",
   "keywords": [
     "tree-sitter"
   ],

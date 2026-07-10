@@ -1,32 +1,38 @@
-# Open on GitHub package
+# open-on-github
 
-Provides commands to quickly view the current file on GitHub.com (The Website).
+View the active file and its repository on github.com.
+
+## Features
+
+- **Open in browser**: open the current file, blame, or history view on github.com.
+- **Repository views**: jump to the repository, its issues, or its pull requests.
+- **Branch compare**: open the compare page for the current branch.
+- **Copy URL**: copy a github.com URL for the current file and selected lines.
+- **Remote detection**: guesses the repository URL from the Git remote and branch, with `git config` overrides.
+
+## Commands
+
+Commands available in `atom-pane`:
+
+- `open-on-github:file`: open the current file on github.com,
+- `open-on-github:file-on-master`: open the current file on the default branch,
+- `open-on-github:blame`: open the blame view for the current file,
+- `open-on-github:history`: open the history view for the current file,
+- `open-on-github:issues`: open the repository issues,
+- `open-on-github:pull-requests`: open the repository pull requests,
+- `open-on-github:copy-url`: copy the github.com URL for the current file,
+- `open-on-github:branch-compare`: open the compare page for the current branch,
+- `open-on-github:repository`: open the repository on github.com.
 
 ## Usage
 
-When editing a file in Lumine, use the command palette or keyboard shortcuts to:
-
-- Open the file on github.com <kbd>alt-g, o</kbd>
-- Open the blame view for the file on github.com <kbd>alt-g, b</kbd>
-- Open the history view for the file on github.com <kbd>alt-g, h</kbd>
-- Open the issues view for the repository the file belongs to on github.com <kbd>alt-g, i</kbd>
-- Open the pull requests view for the repository the file belongs to on github.com <kbd>alt-g, p</kbd>
-- Open the compare page for the current branch on github.com <kbd>alt-g, r</kbd>
-- Copy the github.com URL for the currently selected lines <kbd>alt-g, c</kbd>
-
-![Command Palette](https://f.cloud.github.com/assets/671378/2241755/23cb72f8-9ce2-11e3-9109-36c76a030f6a.png)
-
-## Remote URL detection
-
-The GitHub repository URL is guessed from the current branch and Git remote information. To override the defaults, you can use `git config` to set the remote and branch name:
+The GitHub repository URL is guessed from the current branch and Git remote information. To override the defaults, use `git config` to set the remote and branch name:
 
 ```
 git config atom.open-on-github.remote upstream
 git config atom.open-on-github.branch some-branch
 ```
 
----
+## Contributing
 
-Inspired by the [GitHub Tools package][github-tools] for Sublime Text 2.
-
-[github-tools]: https://github.com/temochka/sublime-text-2-github-tools
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

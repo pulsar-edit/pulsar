@@ -1,8 +1,30 @@
-# Styleguide package
+# styleguide
 
-Styleguide will show you all the UI components used in Lumine. It is useful as a reference when developing themes and packages.
+A visual styleguide of Lumine's UI components.
 
-- <kbd>cmd-ctrl-shift-g</kbd> (macOS) and <kbd>ctrl-shift-g</kbd> (Windows and Linux) opens it in a new tab
-- You can click on the section headings to expand/collapse them
+## Features
 
-![Demo](https://cloud.githubusercontent.com/assets/378023/15767543/ccecf9bc-2983-11e6-9c5e-d228d39f52b0.png)
+- **Component reference**: shows all of the UI components used in Lumine in one place.
+- **Theme and package aid**: acts as a reference while developing themes and packages.
+- **Collapsible sections**: click section headings to expand or collapse them.
+
+## Commands
+
+Commands available in `atom-workspace`:
+
+- `styleguide:show`: open the styleguide in a new tab.
+
+## Customization
+
+Tweak the styleguide layout by adding CSS to your `styles.less`:
+
+```less
+.styleguide {
+  padding: 20px;
+  font-size: 14px;
+}
+```
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

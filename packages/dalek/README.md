@@ -1,19 +1,25 @@
 # dalek
 
-**EXTERMINATEs** core packages installed in `~/.lumine/packages`.
+EXTERMINATEs core packages that have been installed as community packages in `~/.lumine/packages`.
 
-## Why worry?
+## Features
 
-When people install core Lumine packages as if they are community packages, it can cause many problems that are very hard to diagnose. This package is intended to notify people when they are in this precarious position so they can take corrective action.
+- **Duplicate detection**: finds core packages that were installed again as community packages.
+- **Warning notifications**: deprecation-warns you about each duplicate so you can correct it.
+- **Startup check**: runs automatically once the initial packages have activated.
 
-## I got a warning, what do I do?
+## Usage
 
-1. Note down the packages named in the notification
-2. Exit Lumine
-3. Open a command prompt
-4. For each package named in the notification, execute `lumine -p uninstall [package-name]`
-5. Start Lumine again normally to verify that the warning notification no longer appears
+When people install core Lumine packages as if they are community packages, it can cause problems that are very hard to diagnose. This package notifies you when you are in that position so you can take corrective action.
 
-## I have more questions. Where can I ask them?
+If you get a warning:
 
-Please feel free to ask in any of our [Community Areas](https://pulsar-edit.dev/community.html).
+1. Note down the packages named in the notification.
+2. Exit Lumine.
+3. Open a command prompt.
+4. For each package named in the notification, execute `lumine -p uninstall [package-name]`.
+5. Start Lumine again normally to verify that the warning notification no longer appears.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

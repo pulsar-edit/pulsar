@@ -1,8 +1,9 @@
 {
   "name": "language-java",
+  "author": "lumine-code",
   "main": "lib/main",
-  "version": "0.32.1",
-  "description": "Java language support in Atom",
+  "version": "1.0.0",
+  "description": "Java language support in Lumine",
   "engines": {
     "atom": "*",
     "node": ">=14"

@@ -1,6 +1,7 @@
 {
   "name": "archive-view",
-  "version": "0.66.0",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "description": "View the files and folders inside archive files",
   "main": "./lib/archive-editor",
   "dependencies": {

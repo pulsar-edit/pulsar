@@ -1,8 +1,9 @@
 {
   "name": "language-yaml",
-  "version": "0.32.0",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "lib/main",
-  "description": "YAML language support in Atom",
+  "description": "YAML language support in Lumine",
   "engines": {
     "atom": "*",
     "node": ">=12"

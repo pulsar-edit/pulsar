@@ -1,12 +1,13 @@
 {
   "name": "line-ending-selector",
-  "version": "0.7.7",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
   "description": "Select the line ending to use for the current editor.",
   "license": "MIT",
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {
-    "atom": "^1.0.0"
+    "atom": "*"
   },
   "dependencies": {
     "atom-select-list": "^0.7.0",
@@ -21,15 +22,16 @@
   },
   "configSchema": {
     "defaultLineEnding": {
+      "order": 1,
       "title": "Default line ending",
       "description": "Line ending to use for new files",
       "type": "string",
-      "default": "OS Default",
       "enum": [
         "OS Default",
         "LF",
         "CRLF"
-      ]
+      ],
+      "default": "OS Default"
     }
   }
 }

@@ -1,6 +1,7 @@
 {
   "name": "wrap-guide",
-  "version": "0.41.1",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
   "description": "Displays a vertical line at the 80th character in the editor.\nThis packages uses the config value of `editor.preferredLineLength` when set.",
   "license": "MIT",
@@ -10,25 +11,34 @@
   },
   "configSchema": {
     "columns": {
-      "default": [],
+      "order": 1,
+      "title": "Columns",
+      "description": "Display guides at each of the listed character widths. Leave blank for one guide at your `editor.preferredLineLength`.",
       "type": "array",
       "items": {
         "type": "integer"
       },
-      "description": "Display guides at each of the listed character widths. Leave blank for one guide at your `editor.preferredLineLength`."
+      "default": []
     },
     "modifyPreferredLineLength": {
-      "default": true,
+      "order": 2,
+      "title": "Modify Preferred Line Length",
+      "description": "Modify the Editor's Preferred Line Length when changing Wrap Guide's Columns setting.",
       "type": "boolean",
-      "description": "Modify the Editor's Preferred Line Length when changing Wrap Guide's Columns setting."
+      "default": true
     },
     "enabled": {
-      "default": true,
-      "type": "boolean"
+      "order": 3,
+      "title": "Enabled",
+      "description": "Show the wrap guide in editors.",
+      "type": "boolean",
+      "default": true
     },
     "showWrapGuide": {
-      "type": "string",
+      "order": 4,
+      "title": "Show Wrap Guide",
       "description": "Choose when to show the wrap guide.",
+      "type": "string",
       "enum": [
         {
           "value": "always",

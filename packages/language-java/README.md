@@ -1,7 +1,20 @@
-# Java language support in Lumine
+# language-java
 
-Add syntax highlighting and snippets to Java/JSP files in Lumine.
+Java support for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Java TextMate bundle](https://github.com/textmate/java.tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides both Tree-sitter and TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for Java and JSP files.
+- **Snippets**: shortcuts for common declarations and control structures.
+- **Code folding**: collapse blocks, classes, and comments.
+- **Comment toggling**: line and block comment support.
+
+## Services
+
+- **hyperlink.injection** (`0.1.0`): consumed to highlight URLs inside code and comments as clickable links.
+- **todo.injection** (`0.1.0`): consumed to highlight `TODO`-style markers inside comments.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

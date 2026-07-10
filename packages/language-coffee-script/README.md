@@ -1,7 +1,14 @@
-# CoffeeScript language support in Lumine
+# language-coffee-script
 
-Adds syntax highlighting and snippets to CoffeeScript files in Lumine.
+CoffeeScript support for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [CoffeeScript TextMate bundle](https://github.com/jashkenas/coffee-script-tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for CoffeeScript and Literate CoffeeScript files.
+- **Snippets**: shortcuts for common declarations and control structures.
+- **Comment toggling**: line and block comment support.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

@@ -1,6 +1,7 @@
 {
   "name": "go-to-line",
-  "version": "0.33.0",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/go-to-line-view",
   "description": "Jump to a specific editor line number with `ctrl-g`.",
   "license": "MIT",

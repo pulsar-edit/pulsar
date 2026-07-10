@@ -1,11 +1,12 @@
 {
   "name": "fuzzy-explorer",
+  "author": "lumine-code",
   "description": "Fuzzy search files across user-defined directories",
   "repository": "https://github.com/lumine-code/lumine",
-  "version": "0.3.4",
+  "version": "1.0.0",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.132.0 <2.0.0"
+    "atom": "*"
   },
   "main": "./lib/main",
   "activationCommands": {
@@ -41,10 +42,10 @@
       "title": "Ignored Names",
       "description": "List of glob patterns. Files matching these patterns will be ignored.",
       "type": "array",
-      "default": [],
       "items": {
         "type": "string"
-      }
+      },
+      "default": []
     },
     "separator": {
       "order": 2,

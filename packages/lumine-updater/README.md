@@ -1,49 +1,21 @@
-# Lumine Updater
+# lumine-updater
 
-Update utility for Lumine. On launch of Lumine, `lumine-updater` will check for any new releases available via GitHub APIs. And if one is available will display a notification for the user to be able to install the new version.
+Detect new Lumine releases on launch and notify you when an update is available.
 
-If the user seems to have installed Lumine manually, a link will be opened directly to the resource on GitHub, allowing the user to then download the correct file as needed, and install it. Otherwise if it seems the user has installed Lumine via various recognized package managers, then Lumine Updater will present a notification that an update is available, and provide the commands needed to preform the update themselves if they so wish.
+## Features
 
-This package is made to be minimally invasive, while still allowing users to be aware of new Lumine versions without any manual effort.
+- **Launch check**: checks GitHub for new Lumine releases when the editor starts.
+- **Update notification**: shows a non-invasive notification when a newer version exists.
+- **Install detection**: recognizes the installation method and tailors update guidance accordingly.
+- **Manual checks**: trigger an update check on demand from the command palette.
 
-Additionally, since the entire process of actually installation is done by the user, there is no need for complex Squirrel logic, or expensive certifications to allow Squirrel to work.
+## Commands
 
-## Command Palette
+Commands available in `atom-workspace`:
 
-If a user would prefer to manually check for any updates available then the following commands are exposed from Lumine Updater to do so:
+- `lumine-updater:check-for-update`: check for updates and notify if a newer version is available,
+- `lumine-updater:clear-cache`: clear the cached update state and re-enable suppressed checks.
 
-- `lumine-updater:check-for-update`: Performs an update check and shows a notification if a newer version of Lumine is available.
-- `lumine-updater:clear-cache`: Clears the package's cache and forgets any requests to suppress update checking.
+## Contributing
 
-## The Update Notification
-
-If an update is available, the notification that is shown is intended to be as non-invasive as possible, providing a few possible options:
-
-- Dismiss this Version: This will remove the notification, and prevent an additional notification ever appearing for this version again. Bypassing any cache expirations.
-- Dismiss until next launch: This will remove the notification, but only until the next update check. Which happens automatically at launch, or otherwise can be invoked manually.
-- Download from GitHub: This option is only shown if the installation method was determined to be manually. And clicking it will open the GitHub page containing the specific version to update to.
-
-## Supported/Checked/Recognized for Installation Methods
-
-Since a major part of the functionality of this package is attempting to determine the installation method, it's important to list them all here:
-
-- Universal: Developer Mode
-- Universal: Safe Mode
-- Universal: Spec Mode
-- Universal: Custom Release Channel
-- Windows: Chocolatey Installation
-- Windows: winget Installation
-- Windows: User Installation
-- Windows: Machine Installation
-- Windows: Portable Installation
-- Linux: Flatpak Installation
-- Linux: Deb-Get Installation
-- Linux: Nix Installation
-- Linux: Homebrew Installation
-- Linux: Manual Installation
-- macOS: Homebrew Installation
-- macOS: Manual Installation
-
-## Known Issues
-
-It's important to remember that this update system is in no way integrated with the rest of Lumine. The toggles within Lumine to update automatically are ignored. The About view will still be unable to alert of new versions, nor track progress on installation. Those systems should eventually be removed, or mothballed, in favour of this.
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

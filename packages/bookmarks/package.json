@@ -1,8 +1,9 @@
 {
   "name": "bookmarks",
-  "version": "0.46.0",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
-  "description": "Can mark lines, then jump back to them",
+  "description": "Mark lines in the editor and jump back to them",
   "license": "MIT",
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {

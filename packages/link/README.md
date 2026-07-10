@@ -1,11 +1,18 @@
-# Link package
+# link
 
-Opens http(s) links under the cursor.
+Open the http(s) link under the cursor in your default browser.
 
-### Commands and Keybindings
+## Features
 
-| Command     | Selector           | Description                             | Keybinding (Linux) | Keybinding (macOS)      | Keybinding (Windows) |
-| ----------- | ------------------ | --------------------------------------- | ------------------ | ----------------------- | -------------------- |
-| `link:open` | `atom-text-editor` | Opens the http(s) link under the cursor |                    | <kbd>ctrl-shift-o</kbd> |                      |
+- **Open links**: open the http(s) link under the cursor without leaving the editor.
+- **Cursor aware**: detects the link at the current cursor position in any editor.
 
-Custom keybindings can be added by referencing the above commands. To learn more, visit the [Using Lumine: Basic Customization](https://pulsar-edit.dev/docs/launch-manual/sections/using-lumine/#basic-customization) or [Behind Lumine: Keymaps In-Depth](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine#keymaps-in-depth) sections of the Lumine documentation.
+## Commands
+
+Commands available in `atom-text-editor`:
+
+- `link:open`: open the http(s) link under the cursor.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

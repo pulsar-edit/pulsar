@@ -1,12 +1,13 @@
 {
   "name": "notifications",
+  "author": "lumine-code",
   "main": "./lib/main",
-  "version": "0.73.0",
+  "version": "1.0.0",
   "repository": "https://github.com/lumine-code/lumine",
   "description": "A tidy way to display Lumine notifications.",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": "*"
   },
   "dependencies": {
     "fs-plus": "^3.0.0",
@@ -20,15 +21,19 @@
   },
   "configSchema": {
     "showErrorsInDevMode": {
+      "order": 1,
+      "title": "Show Errors In Dev Mode",
+      "description": "Show notifications for uncaught exceptions even if Lumine is running in dev mode. If this config setting is disabled, uncaught exceptions will trigger the dev tools to open and be logged in the console tab.",
       "type": "boolean",
-      "default": false,
-      "description": "Show notifications for uncaught exceptions even if Lumine is running in dev mode. If this config setting is disabled, uncaught exceptions will trigger the dev tools to open and be logged in the console tab."
+      "default": false
     },
     "defaultTimeout": {
+      "order": 2,
+      "title": "Default Timeout",
+      "description": "The default notification timeout for a non-dismissable notification.",
       "type": "integer",
-      "default": 5000,
       "minimum": 1000,
-      "description": "The default notification timeout for a non-dismissable notification."
+      "default": 5000
     }
   },
   "deserializers": {

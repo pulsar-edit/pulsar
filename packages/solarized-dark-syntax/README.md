@@ -1,9 +1,17 @@
-# Solarized Dark Syntax theme
+# solarized-dark-syntax
 
-Lumine theme using the ever popular dark [solarized](http://ethanschoonover.com/solarized) colors.
+A Lumine syntax theme using the popular dark Solarized colors.
 
-<img alt="screenshot" src="https://cloud.githubusercontent.com/assets/378023/12602908/9c252b08-c4f0-11e5-8833-6aad91b8fa34.png" srcset="https://cloud.githubusercontent.com/assets/378023/12602909/9c25b366-c4f0-11e5-9f5d-aa6a517f7d7e.png 2x">
+## Features
 
-This theme is installed by default with Lumine and can be activated by going to
-the _Themes_ section in the Settings view (`cmd-,`) and selecting it from the
-_Syntax Themes_ dropdown menu.
+- **Solarized palette**: brings the well-known dark Solarized color scheme to Lumine.
+- **Broad language coverage**: styles tokens consistently across many supported grammars.
+- **Bundled by default**: ships with Lumine and is ready to enable from the theme settings.
+
+## Usage
+
+Activate the theme from **Settings > Themes** by selecting "Solarized Dark" from the Syntax Themes dropdown.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

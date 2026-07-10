@@ -1,6 +1,7 @@
 {
   "name": "language-rust-bundled",
-  "version": "0.1.1",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "description": "Rust support for Lumine",
   "keywords": [
     "language",
@@ -11,7 +12,7 @@
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.0.0 <2.0.0",
+    "atom": "*",
     "node": ">=12"
   },
   "consumedServices": {

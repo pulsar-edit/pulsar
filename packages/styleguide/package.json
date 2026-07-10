@@ -1,7 +1,8 @@
 {
   "name": "styleguide",
+  "author": "lumine-code",
   "main": "./lib/styleguide",
-  "version": "0.49.12",
+  "version": "1.0.0",
   "description": "A visual styleguide of the Lumines's UI components.",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",

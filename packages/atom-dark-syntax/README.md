@@ -1,9 +1,17 @@
-# Lumine Dark Syntax theme
+# atom-dark-syntax
 
 A dark syntax theme for Lumine.
 
-This theme is installed by default with Lumine and can be activated by going to
-the _Themes_ section in the Settings view (`cmd-,`) and selecting it from the
-_Syntax Themes_ dropdown menu.
+## Features
 
-![](https://f.cloud.github.com/assets/671378/2264549/f49e9bf2-9e73-11e3-9329-e2d59dd1b119.png)
+- **Dark palette**: applies a dark color scheme tuned for comfortable code reading.
+- **Broad language coverage**: styles tokens consistently across many supported grammars.
+- **Bundled by default**: ships with Lumine and is ready to enable from the theme settings.
+
+## Usage
+
+Activate the theme from **Settings > Themes** by selecting "Atom Dark" from the Syntax Themes dropdown.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

@@ -1,8 +1,9 @@
 {
   "name": "language-json",
+  "author": "lumine-code",
   "main": "lib/main",
-  "version": "1.0.5",
-  "description": "JSON language support in Atom",
+  "version": "1.0.0",
+  "description": "JSON language support in Lumine",
   "engines": {
     "atom": "*",
     "node": ">=12"
@@ -11,9 +12,10 @@
   "license": "MIT",
   "configSchema": {
     "allowCommentsInJsonFiles": {
-      "type": "boolean",
+      "order": 1,
       "title": "Allow Comments in .json files",
       "description": "When checked, will allow comments in `.json` files even though they’re not valid according to the official JSON specification. When unchecked, comments in `.json` files will be marked as invalid, and only files with the `.jsonc` extension will mark comments as valid and allowed. (It’s recommended to reload your window or restart Lumine after changing this setting.)",
+      "type": "boolean",
       "default": false
     }
   },

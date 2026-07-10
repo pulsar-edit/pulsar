@@ -1,145 +1,78 @@
 # tree-view
 
-Enhanced tree view for exploring and opening project files.
+Explore and open project files in a tree-like view of your directories.
 
 ## Features
 
-- **Configurable click behavior**: Open files and expand folders on single or double click. Double-clicking a file always opens it without pending state. The arrow icon always responds to a single click regardless of the folder click setting.
-- **Middle-click selection**: Middle-click selects an entry without triggering scroll or open behavior.
-- **Alt+click open externally**: Alt+click on a file opens it in an external program via the `open-external` service.
-- **Natural sorting**: Treats multi-digit numbers atomically (e.g., `file2` before `file10`). Choose between natural sort and locale-aware collation.
-- **Base name grouping**: Sort by filename base and extension independently, so files with the same base name are grouped together.
-- **Configurable duplicate copy names**: Choose system-default, legacy, Windows, macOS, or Linux/GNOME naming when pasted copies collide.
-- **Debounced file watching**: Rapid file creation/deletion no longer causes excessive reloads. File system events are batched with a 100ms debounce.
-- **Survives workspace restoration**: The tree view is closeable via the X button, but protected from accidental destruction during project switching.
-- **Bug fixes**: Fixed expansion state serialization, drag-and-drop URI handling, copy dialog crash, move entry error handling, continuous selection, and split pane `ItemRegistry` error.
-- **Project list integration**: When the [project-list](https://github.com/asiloisad/pulsar-project-list) package is installed, the empty project view shows a "List projects" button.
-- **Recent list integration**: When a `recent-list` service provider is installed, the empty project view shows a "Reopen a project" button.
-- **Lightweight dependencies**: Removed `underscore-plus` and `fs-plus` in favor of native Node.js APIs.
-- **Special roots service**: Provides a `tree-view-roots` service that lets external packages inject virtual root sections into the tree view. Used by [tree-view-favourites](https://github.com/asiloisad/pulsar-tree-view-favourites) to add favourite sections.
-
-## Installation
-
-To install `tree-view` search for [tree-view](https://web.pulsar-edit.dev/packages/tree-view) in the Install pane of the Pulsar settings or run `ppm install tree-view`. Alternatively, you can run `ppm install asiloisad/pulsar-tree-view` to install a package directly from the GitHub repository.
+- **Configurable click behavior**: open files and expand folders on single or double click.
+- **Open externally**: alt-click a file to open it in an external program through the `open-external` service.
+- **Flexible sorting**: choose locale-aware or natural sort, list folders before files, and group entries by base name.
+- **Duplicate copy names**: pick system-default, legacy, Windows, macOS, or Linux naming when pasted copies collide.
+- **Debounced file watching**: rapid file creation and deletion is batched so the tree does not reload excessively.
+- **Virtual root sections**: let external packages inject their own root sections above the project folders.
 
 ## Commands
 
+Commands available in `atom-workspace`:
+
+- `tree-view:show`: show the tree view,
 - `tree-view:toggle`: toggle the tree view,
-- `tree-view:reveal-active-file`: reveal the active file,
-- `tree-view:toggle-focus`: open and focus tree view, or return focus to editor if already focused,
-- `tree-view:copy`: copy selected entries,
-- `tree-view:cut`: cut selected entries,
+- `tree-view:toggle-focus`: open and focus the tree view, or return focus to the editor if already focused,
+- `tree-view:reveal-active-file`: reveal the active file in the tree view,
+- `tree-view:add-file`: create a new file,
+- `tree-view:add-folder`: create a new folder,
+- `tree-view:duplicate`: duplicate the selected entry,
+- `tree-view:remove`: delete the selected entries,
+- `tree-view:rename`: rename the selected entry,
+- `tree-view:show-current-file-in-file-manager`: show the active file in the system file manager.
+
+Commands available in `.tree-view`:
+
+- `tree-view:expand-item`: open the selected entry with pending state,
+- `tree-view:recursive-expand-directory`: recursively expand the selected directory,
+- `tree-view:collapse-directory`: collapse the selected directory,
+- `tree-view:recursive-collapse-directory`: recursively collapse the selected directory,
+- `tree-view:collapse-all`: collapse all directories,
+- `tree-view:open-selected-entry`: open the selected entry,
+- `tree-view:open-selected-entry-right`: open the selected entry in a split to the right,
+- `tree-view:open-selected-entry-left`: open the selected entry in a split to the left,
+- `tree-view:open-selected-entry-up`: open the selected entry in a split above,
+- `tree-view:open-selected-entry-down`: open the selected entry in a split below,
+- `tree-view:open-selected-entry-in-pane-1..9`: open the selected entry in the numbered pane,
+- `tree-view:move`: move or rename the selected entry,
+- `tree-view:copy`: copy the selected entries,
+- `tree-view:cut`: cut the selected entries,
 - `tree-view:paste`: paste entries,
-- `tree-view:open-selected-entry-right`,
-- `tree-view:open-selected-entry-left`,
-- `tree-view:open-selected-entry-up`,
-- `tree-view:open-selected-entry-down`,
-- `tree-view:open-selected-entry-in-pane-1..9`.
+- `tree-view:copy-full-path`: copy the full path of the selected entry,
+- `tree-view:copy-project-path`: copy the project-relative path of the selected entry,
+- `tree-view:show-in-file-manager`: show the selected entry in the system file manager,
+- `tree-view:open-in-new-window`: open the selected entry in a new window,
+- `tree-view:unfocus`: return focus to the editor,
+- `tree-view:toggle-vcs-ignored-files`: toggle visibility of VCS-ignored files,
+- `tree-view:toggle-ignored-names`: toggle visibility of ignored names,
+- `tree-view:remove-project-folder`: remove the selected project folder.
 
-## Consumed Service `project-list`
+## Services
 
-When the [project-list](https://github.com/asiloisad/pulsar-project-list) package is installed, the empty project view (shown when no folders are open) gains a "List projects" button that toggles the project list.
+- **tree-view** (`1.0.0`): provided to expose the selected paths and entry elements of the tree, matching the API of the built-in tree view.
+- **tree-view** (`1.0.0`): provided to add reveal and navigation support on top of the base tree view API.
+- **tree-view-roots** (`1.0.0`): provided to let external packages register virtual root sections above the project folders.
+- **atom.file-icons** (`1.0.0`): consumed to show file-type icons next to entries.
+- **file-icons.element-icons** (`1.0.0`): consumed to show element-based file-type icons next to entries.
+- **open-external** (`1.0.0`): consumed to open files with the configured external application.
+- **project-list** (`1.0.0`): consumed to add a "List projects" button to the empty project view.
+- **recent-list** (`1.0.0`): consumed to add a "Reopen a project" button to the empty project view.
 
-## Consumed Service `recent-list`
+## Customization
 
-When a `recent-list` service provider is installed, the empty project view (shown when no folders are open) gains a "Reopen a project" button that toggles the recent projects list through the service API.
+Adjust the tree's appearance by adding CSS to your `styles.less`. For example, to enlarge the entry text and loosen the row spacing:
 
-## Provided Service `tree-view`
-
-Compatibility service matching the API of the built-in tree-view package.
-
-In your `package.json`:
-
-```json
-{
-  "consumedServices": {
-    "tree-view": {
-      "versions": { "1.0.0": "consumeTreeView" }
-    }
-  }
+```less
+.tree-view {
+  font-size: 14px;
+  line-height: 1.6;
 }
 ```
-
-In your main module:
-
-```javascript
-consumeTreeView(service) {
-  this.treeViewService = service;
-  return new Disposable(() => { this.treeViewService = null; });
-}
-```
-
-The service provides:
-
-- `selectedPaths()`: returns an array of currently selected file/directory paths.
-- `entryForPath(filePath)`: returns the DOM entry element for the given path, or `null` if not found.
-
-## Provided Service `tree-view`
-
-Extended tree view API. Use this instead of `tree-view` when you need functionality beyond what the built-in package provides.
-
-In your `package.json`:
-
-```json
-{
-  "consumedServices": {
-    "tree-view": {
-      "versions": { "1.0.0": "consumeTreeViewPlus" }
-    }
-  }
-}
-```
-
-In your main module:
-
-```javascript
-consumeTreeViewPlus(service) {
-  this.treeViewService = service;
-  return new Disposable(() => { this.treeViewService = null; });
-}
-```
-
-The service provides everything from `tree-view`, plus:
-
-- `revealPath(filePath, options)`: expands parent directories and selects the entry for `filePath`, scrolling it into view. Accepts `{ show, focus }` options to control tree view visibility and focus.
-
-## Provided Service `tree-view-roots`
-
-Allows external packages to inject virtual root sections into the tree view above the project folders. Used by [tree-view-favourites](https://github.com/asiloisad/pulsar-tree-view-favourites) to add favourite sections.
-
-In your `package.json`:
-
-```json
-{
-  "consumedServices": {
-    "tree-view-roots": {
-      "versions": { "1.0.0": "consumeRoots" }
-    }
-  }
-}
-```
-
-In your main module:
-
-```javascript
-consumeRoots(api) {
-  this.handle = api.registerRoot({
-    name: 'My Section',        // Section header text
-    iconClass: 'icon-star',    // Icon class for the header
-    className: 'my-section',   // CSS class for the section container
-    entryClassName: 'my-entry', // CSS class for each entry
-    getEntries: () => [...],   // Function returning an array of file paths
-    onDrop: (paths) => {...},  // Called when entries are dropped onto this section
-  })
-}
-```
-
-The returned handle provides:
-
-- `handle.element`: the section's DOM element (or `null` if not attached)
-- `handle.update()`: re-reads entries and re-renders
-- `handle.toggle()`: toggle section visibility
-- `handle.dispose()`: remove the section
 
 ## Contributing
 

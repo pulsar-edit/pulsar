@@ -1,6 +1,7 @@
 {
   "name": "image-view",
-  "version": "0.64.0",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "description": "Open images in an editor",
   "main": "./lib/main",
   "repository": "https://github.com/lumine-code/lumine",
@@ -21,5 +22,15 @@
   },
   "deserializers": {
     "ImageEditor": "deserialize"
+  },
+  "configSchema": {
+    "defaultBackgroundColor": {
+      "order": 1,
+      "title": "Default Background Color",
+      "description": "Background color shown behind transparent images.",
+      "type": "string",
+      "enum": ["white", "black", "transparent"],
+      "default": "transparent"
+    }
   }
 }

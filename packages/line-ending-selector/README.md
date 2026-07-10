@@ -1,31 +1,26 @@
-# Line Ending Selector package
+# line-ending-selector
 
-![status bar tile](https://cloud.githubusercontent.com/assets/1305617/9274149/6b317568-4293-11e5-83ba-614a6c0d9890.png)
+Show and change the line ending used by the current editor.
 
-This is an [Lumine](https://pulsar-edit.dev) package that displays the current line ending type of a file: `CRLF` (Windows), `LF` (Unix), or `Mixed` (both). It also lets you change the line ending of a file.
+## Features
 
-## To Use
+- **Line ending indicator**: displays the current line ending (`CRLF`, `LF`, or `Mixed`) in the status bar.
+- **Quick switching**: pick a new line ending from a modal in the status bar.
+- **Conversion commands**: convert the active file to `LF` or `CRLF`.
+- **Default line ending**: choose the line ending applied to newly created files.
 
-When the package is activated it will show the current line ending of the file in the right side of the status-bar. If a new file is created the line ending will start with the system default: `CRLF` for Windows, `LF` for Mac and Linux, and `CR` for old-style Mac files. If a file contains multiple line-ending types it will display `Mixed`.
+## Commands
 
-### Changing a File's Line Ending
+Commands available in `atom-text-editor`:
 
-You can click the line ending in the status-bar to open a modal with the line ending options. Selecting a different line ending will change each line of the file in the active editor.
+- `line-ending-selector:show`: open the line ending picker,
+- `line-ending-selector:convert-to-LF`: convert the file to `LF` line endings,
+- `line-ending-selector:convert-to-CRLF`: convert the file to `CRLF` line endings.
 
-![modal](https://cloud.githubusercontent.com/assets/1305617/9273907/2be5c136-4291-11e5-94af-65ece408eb12.png)
+## Services
 
-**Line Endings**
+- **status-bar** (`^1.0.0`): consumed to show the current line ending in the status bar.
 
-- `LF` is "\n"
-- `CRLF` is "\r\n"
+## Contributing
 
-**Note:** Because the `CR` line ending style is not used in any modern operating system, this package only supports converting _from_ `CR` line endings not to it.
-
-### Lumine Commands
-
-You can also change a file's line endings by using or <kbd>cmd-shift-P</kbd> searching for these commands:
-
-```text
-line-ending-selector:convert-to-LF
-line-ending-selector:convert-to-CRLF
-```
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

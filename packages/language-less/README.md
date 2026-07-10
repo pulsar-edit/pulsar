@@ -1,7 +1,12 @@
-# Less language support in Lumine
+# language-less
 
-Adds syntax highlighting to [Less](http://lesscss.org) files in Lumine.
+Less support for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Less TextMate bundle](https://github.com/textmate/less.tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for Less files.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

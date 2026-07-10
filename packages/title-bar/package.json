@@ -1,19 +1,16 @@
 {
   "name": "title-bar",
-  "version": "1.0.5",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "description": "Theme-aware custom title bar with integrated menu.",
   "main": "./lib/main.js",
   "keywords": [
     "title bar"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lumine-code/lumine",
-    "directory": "packages/title-bar"
-  },
+  "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.100.0 <2.0.0"
+    "atom": "*"
   },
   "providedServices": {
     "title-bar": {
@@ -26,6 +23,7 @@
     "controlTheme": {
       "order": 1,
       "title": "Window Controls Theme",
+      "description": "Visual style used for the window control buttons.",
       "type": "string",
       "enum": [
         "Default",
@@ -38,6 +36,7 @@
     "logoStyle": {
       "order": 2,
       "title": "Logo Style",
+      "description": "Style of the logo shown in the title bar.",
       "type": "string",
       "enum": [
         "Default",

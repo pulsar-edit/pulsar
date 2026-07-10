@@ -1,12 +1,17 @@
-# Base16 Tomorrow Dark Syntax theme
+# base16-tomorrow-dark-theme
 
-Lumine theme using the ever popular [Base16 Tomorrow](https://web.archive.org/web/20220806075017/https://chriskempson.com/projects/base16/) dark colors.
+A Lumine syntax theme using the popular Base16 Tomorrow dark colors.
 
-![Base16 Tomorrow light](https://cloud.githubusercontent.com/assets/378023/10118589/f108a568-64b6-11e5-8438-eb34dc9b40a1.png)
+## Features
 
-## Install
+- **Base16 Tomorrow palette**: brings the well-known dark Tomorrow color scheme to Lumine.
+- **Broad language coverage**: styles tokens consistently across many supported grammars.
+- **Bundled by default**: ships with Lumine and is ready to enable from the theme settings.
 
-This theme is installed by default with Lumine and can be activated by going to the _Themes_ section in the Settings view (`cmd-,`) and selecting it from the _Syntax Themes_ drop-down menu.
+## Usage
 
-A
-[light version](../base16-tomorrow-light-theme) of this theme is also available.
+Activate the theme from **Settings > Themes** by selecting it from the Syntax Themes dropdown. A light version is also available as `base16-tomorrow-light-theme`.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

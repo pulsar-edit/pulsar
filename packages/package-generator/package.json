@@ -1,6 +1,7 @@
 {
   "name": "package-generator",
-  "version": "1.3.0",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
   "description": "Generates and opens a new sample package, language, or syntax theme.",
   "license": "MIT",
@@ -22,18 +23,22 @@
   },
   "configSchema": {
     "createInDevMode": {
-      "default": false,
+      "order": 1,
+      "title": "Create In Dev Mode",
+      "description": "When disabled, generated packages are linked into Lumine in both normal mode and dev mode. When enabled, generated packages are linked into Lumine only in dev mode.",
       "type": "boolean",
-      "description": "When disabled, generated packages are linked into Lumine in both normal mode and dev mode. When enabled, generated packages are linked into Lumine only in dev mode."
+      "default": false
     },
     "packageSyntax": {
-      "default": "javascript",
+      "order": 2,
+      "title": "Package Syntax",
+      "description": "The syntax to generate packages with.",
       "type": "string",
       "enum": [
         "coffeescript",
         "javascript"
       ],
-      "description": "The syntax to generate packages with."
+      "default": "javascript"
     }
   }
 }

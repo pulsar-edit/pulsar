@@ -1,11 +1,18 @@
-## One Light Syntax theme
+# one-light-syntax
 
-![one-syntax-light](https://cloud.githubusercontent.com/assets/378023/7783214/c146b4e6-0174-11e5-8377-a57cf0274d5d.png)
+A light syntax theme for Lumine.
 
-> The font used in the screenshot is [Fira Mono](https://github.com/mozilla/Fira).
+## Features
 
-There is also a matching [UI theme](../one-light-ui).
+- **Light palette**: applies the One Light color scheme tuned for comfortable code reading.
+- **Broad language coverage**: styles tokens consistently across many supported grammars.
+- **Matching UI theme**: pairs naturally with the One Light UI theme.
+- **Bundled by default**: ships with Lumine and is ready to enable from the theme settings.
 
-### Install
+## Usage
 
-This theme is installed by default with Lumine and can be activated by going to the **Settings > Themes** section and selecting it from the **Syntax Themes** drop-down menu.
+Activate the theme from **Settings > Themes** by selecting "One Light" from the Syntax Themes dropdown.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

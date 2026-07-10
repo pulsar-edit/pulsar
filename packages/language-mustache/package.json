@@ -1,7 +1,8 @@
 {
   "name": "language-mustache",
-  "version": "0.14.5",
-  "description": "Mustache language support in Atom",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "Mustache language support in Lumine",
   "license": "MIT",
   "engines": {
     "atom": "*",

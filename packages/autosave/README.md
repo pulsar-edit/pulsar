@@ -1,35 +1,19 @@
-# Autosave package
+# autosave
 
-Autosaves editor when they lose focus, are destroyed, or when the window is closed.
+Save editors when they lose focus or are closed.
 
-This package is disabled by default and can be enabled via the `autosave.enabled` config
-setting or by checking _Enabled_ in the settings for the _autosave_ package in the
-Settings view.
+## Features
 
-## Service API
+- **Save on blur**: saves an editor when it loses focus.
+- **Save on close**: saves an item when its pane is closed or the window is closed.
+- **Conflict aware**: skips saving files that are in conflict when prompting is enabled.
+- **Opt-in**: disabled by default and enabled through the `autosave.enabled` setting.
+- **Exclusion hook**: lets other packages exclude items from autosaving through the provided service.
 
-The service exposes an object with a function `dontSaveIf`, which accepts a callback.
-Callbacks will be invoked with each pane item eligible for an autosave and if the callback
-returns true, the item will be skipped.
+## Services
 
-### Usage
+- **autosave** (`1.0.0`): provided to expose a `dontSaveIf` callback so other packages can exclude specific pane items from being autosaved.
 
-#### package.json
+## Contributing
 
-```json
-"consumedServices": {
-  "autosave": {
-    "versions": {
-      "1.0.0": "consumeAutosave"
-    }
-  }
-}
-```
-
-#### package initialize
-
-```javascript
-consumeAutosave({dontSaveIf}) {
-  dontSaveIf(paneItem -> paneItem.getPath() === '/dont/autosave/me.coffee')
-}
-```
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

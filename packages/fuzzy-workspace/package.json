@@ -1,11 +1,12 @@
 {
   "name": "fuzzy-workspace",
+  "author": "lumine-code",
   "description": "Quickly find and focus any open item across the workspace",
   "repository": "https://github.com/lumine-code/lumine",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.132.0 <2.0.0"
+    "atom": "*"
   },
   "main": "./lib/main",
   "activationCommands": {

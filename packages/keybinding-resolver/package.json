@@ -1,12 +1,13 @@
 {
   "name": "keybinding-resolver",
+  "author": "lumine-code",
   "main": "./lib/main",
-  "version": "0.39.1",
+  "version": "1.0.0",
   "description": "Show what commands a keybinding resolves to",
   "license": "MIT",
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {
-    "atom": ">=1.17.0"
+    "atom": "*"
   },
   "deserializers": {
     "keybinding-resolver/KeyBindingResolverView": "deserializeKeyBindingResolverView"

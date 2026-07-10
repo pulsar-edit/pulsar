@@ -1,10 +1,18 @@
-# CSS Autocomplete package
+# autocomplete-css
 
-CSS property name and value autocompletions in Lumine. Uses the
-[autocomplete-plus](https://github.com/pulsar-edit/autocomplete-plus) package.
+CSS property name and value autocompletions in Lumine.
 
-This is powered by the list of CSS property and values [here](https://github.com/adobe/brackets/blob/master/src/extensions/default/CSSCodeHints/CSSProperties.json).
+## Features
 
-![css-completions](https://cloud.githubusercontent.com/assets/671378/6357910/b9ecbe7c-bc1c-11e4-89b1-033e626c891f.gif)
+- **Property completions**: suggests CSS property names as you type.
+- **Value completions**: suggests valid values for the current property.
+- **Pseudo-selector completions**: suggests pseudo-selectors and pseudo-elements.
+- **Language support**: works in CSS, Sass, SCSS, and PostCSS source.
 
-You can update the prebuilt list of completions by running `node ./update/update.js` at the root of this package and checking for changes within `completions.json`. This does rely on having dev dependencies installed, so ensure you install all dependencies before doing so.
+## Services
+
+- **autocomplete.provider** (`2.0.0`): provided to supply CSS property and value suggestions to autocomplete-plus.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

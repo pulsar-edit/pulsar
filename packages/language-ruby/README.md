@@ -1,7 +1,18 @@
-# Ruby language support in Lumine
+# language-ruby
 
-Adds syntax highlighting and snippets to Ruby files in Lumine.
+Ruby support for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Ruby TextMate bundle](https://github.com/textmate/ruby.tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides both Tree-sitter and TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for Ruby, ERB, Gemfiles, and embedded regular expressions.
+- **Snippets**: shortcuts for common Ruby constructs.
+
+## Services
+
+- **hyperlink.injection** (`0.1.0`): consumed to highlight URLs inside Ruby files as clickable links.
+- **todo.injection** (`0.1.0`): consumed to highlight `TODO`-style markers inside comments.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

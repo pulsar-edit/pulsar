@@ -1,7 +1,8 @@
 {
   "name": "dev-live-reload",
+  "author": "lumine-code",
   "main": "./lib/main",
-  "version": "0.48.1",
+  "version": "1.0.0",
   "description": "Live reload Lumine themes and packages.",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",

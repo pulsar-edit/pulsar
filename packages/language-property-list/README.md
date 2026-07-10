@@ -1,10 +1,13 @@
-# Property list support in Lumine
+# language-property-list
 
-Adds syntax highlighting and snippets to [plist](https://en.wikipedia.org/wiki/Property_list)
-files in Lumine.
+Property list support for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
-from the [Property List TextMate bundle](https://github.com/textmate/property-list.tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a
-pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for old-style and XML plist files.
+- **Snippets**: shortcuts for common property list structures.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

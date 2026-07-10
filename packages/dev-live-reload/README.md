@@ -1,13 +1,23 @@
-# Dev Live Reload package
+# dev-live-reload
 
-This live reloads the Lumine `.less` files. You edit styles and they are magically reflected in any running Lumine windows. Magic! :tophat: :sparkles: :rabbit2:
+Live reload Lumine themes and packages as you edit their stylesheets.
 
-Installed by default on Lumine windows running in dev mode. Use the "Application: Open Dev" command to open a new dev mode window.
+## Features
 
-Use <kbd>meta-shift-ctrl-r</kbd> to reload all core and package stylesheets.
+- **Live style reload**: reflects edits to `.less` files in any running Lumine window instantly.
+- **Dev mode default**: installed by default on Lumine windows running in dev mode.
+- **Theme and package watching**: watches core, theme, and package stylesheets for changes.
 
-This package is **experimental**, it does not handle the following:
+## Commands
 
-- File additions to a theme. New files will not be watched.
+Commands available in `atom-workspace`:
 
-![gif](https://f.cloud.github.com/assets/69169/1387004/d2dc45f2-3b84-11e3-877e-cac8c51e9702.gif)
+- `dev-live-reload:reload-all`: reload all core and package stylesheets.
+
+## Usage
+
+This package is experimental and does not handle file additions to a theme; newly created files will not be watched.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

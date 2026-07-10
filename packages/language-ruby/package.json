@@ -1,7 +1,8 @@
 {
   "name": "language-ruby",
-  "version": "0.73.0",
-  "description": "Ruby language support in Atom",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "Ruby language support in Lumine",
   "keywords": [
     "tree-sitter"
   ],

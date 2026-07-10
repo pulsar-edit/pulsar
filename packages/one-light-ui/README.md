@@ -1,28 +1,19 @@
-## One Light UI theme
+# one-light-ui
 
-A light UI theme that adapts to most syntax themes.
+A light UI theme for Lumine that adapts to most syntax themes.
 
-![One light UI](https://cloud.githubusercontent.com/assets/378023/26246819/0826f04e-3cd6-11e7-98eb-cd94bc48b090.png)
+## Features
 
-> The font used in the screenshot is [Fira Mono](https://github.com/mozilla/Fira).
+- **Adaptive coloring**: picks up the background hue of the active syntax theme so light and dark combos stay coherent.
+- **Font scaling**: adjust the overall UI size from the theme settings.
+- **Tab sizing**: choose between Even, Maximum, and Minimum tab layouts.
+- **Configurable chrome**: reposition tab close buttons, hide dock toggle buttons, and make tree-view project headers sticky.
 
-### Install
+## Usage
 
-This theme comes bundled with Lumine and can be activated by going to the **Settings > Themes** section and selecting "One Light" from the **UI Themes** drop-down menu.
+Activate the theme from **Settings > Themes** by selecting "One Light" as the UI theme. Adjust its options under **Settings > Themes > One Light UI > Settings**.
 
-### Settings
-
-In the theme settings you can:
-
-- Change the **Font Size** to scale the whole UI up or down.
-- Choose between 3 **Tab Sizing** modes.
-- Hide the **dock buttons**.
-
-To make changes, go to `Settings > Themes > One Light UI > Settings` or the cog icon next to the theme picker.
-
-### Customize
-
-It's also possible to resize only certain areas by adding the following to your `styles.less` (Use DevTools to find the right selectors):
+You can also resize individual areas by targeting the theme in your `styles.less`:
 
 ```css
 .theme-one-light-ui {
@@ -38,7 +29,6 @@ It's also possible to resize only certain areas by adding the following to your 
 }
 ```
 
-### FAQ
+## Contributing
 
-**Why do the colors change when I switch Syntax themes.**
-This UI theme uses the same background color as the chosen syntax theme. If that syntax theme has a dark background color, it only uses its hue, but otherwise stays light. This lets you use light-dark combos.
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

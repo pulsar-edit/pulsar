@@ -1,11 +1,18 @@
-## One Dark Syntax theme
+# one-dark-syntax
 
-![one-dark-syntax](https://user-images.githubusercontent.com/238929/40553597-5f741518-6000-11e8-9068-70dfc5008b54.png)
+A dark syntax theme for Lumine.
 
-> The font used in the screenshot is [Fira Mono](https://github.com/mozilla/Fira).
+## Features
 
-There is also a matching [UI theme](https://atom.io/themes/one-dark-ui).
+- **Dark palette**: applies the One Dark color scheme tuned for comfortable code reading.
+- **Broad language coverage**: styles tokens consistently across many supported grammars.
+- **Matching UI theme**: pairs naturally with the One Dark UI theme.
+- **Bundled by default**: ships with Lumine and is ready to enable from the theme settings.
 
-### Install
+## Usage
 
-This theme is installed by default with Lumine and can be activated by going to the **Settings > Themes** section and selecting it from the **Syntax Themes** drop-down menu.
+Activate the theme from **Settings > Themes** by selecting "One Dark" from the Syntax Themes dropdown.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

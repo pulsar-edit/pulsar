@@ -1,10 +1,11 @@
 {
   "name": "language-css",
-  "description": "CSS support in Atom",
+  "author": "lumine-code",
+  "description": "CSS support in Lumine",
   "keywords": [
     "tree-sitter"
   ],
-  "version": "0.45.4",
+  "version": "1.0.0",
   "engines": {
     "atom": "*",
     "node": ">=14"

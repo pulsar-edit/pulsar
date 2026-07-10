@@ -1,15 +1,19 @@
-# JSON language support in Lumine
+# language-json
 
-Adds syntax highlighting of JSON files in Lumine.
+JSON support for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [JSON TextMate bundle](https://github.com/textmate/json.tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides both Tree-sitter and TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for JSON and JSONC files.
+- **Comment tolerance**: an optional grammar and setting for allowing comments in JSON files.
+- **Code folding**: collapse objects and arrays.
 
-## Comments in JSON
+## Services
 
-Comments are disallowed in the JSON specification, but many libraries for parsing JSON tolerate their presence.
+- **hyperlink.injection** (`0.1.0`): consumed to highlight URLs inside strings as clickable links.
+- **todo.injection** (`0.1.0`): consumed to highlight `TODO`-style markers inside comments.
 
-This package contains two grammars: **JSON** and **JSON with Comments**. The **JSON with Comments** grammar is used by default with `.jsonc` files (the JSON-with-comments file extension popularized by Visual Studio Code) and supports comments. A user can also switch to this grammar manually via the grammar selector.
+## Contributing
 
-By default, the **JSON** grammar marks comments as illegal. But you can opt into tolerance of comments in `.json` files by enabling the **Allow Comments in .json files** option.
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

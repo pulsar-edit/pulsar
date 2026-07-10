@@ -1,7 +1,13 @@
-# Ruby on Rails language support in Lumine
+# language-ruby-on-rails
 
-Adds syntax highlighting and snippets to Rails files in Lumine.
+Ruby on Rails support for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Ruby on Rails TextMate bundle](https://github.com/drnic/ruby-on-rails-tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for Rails HTML, JavaScript, RJS, and SQL files.
+- **Snippets**: shortcuts for common Rails constructs.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

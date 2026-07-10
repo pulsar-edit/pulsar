@@ -1,12 +1,13 @@
 {
   "name": "autocomplete-atom-api",
-  "version": "0.10.7",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "description": "Lumine API autocompletions",
   "main": "./lib/main",
   "license": "MIT",
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {
-    "atom": ">=0.174.0 <2.0.0"
+    "atom": "*"
   },
   "providedServices": {
     "autocomplete.provider": {

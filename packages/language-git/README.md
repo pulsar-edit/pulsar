@@ -1,29 +1,14 @@
-# Git editing support in Lumine
+# language-git
 
-Adds syntax highlighting to Git commit, merge, and rebase messages edited in Lumine.
+Git editing support for Lumine.
 
-You can configure Lumine to be your Git editor with the following command:
+## Features
 
-```sh
-git config --global core.editor "lumine --wait"
-```
+- **Grammars**: provides TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for Git commit, merge, and rebase messages.
+- **Commit message hints**: warning and error highlighting for common commit message convention violations.
+- **Snippets**: shortcut for scaffolding a commit message.
 
-## Commit message highlighting
+## Contributing
 
-This package uses warning and error highlighting to help bring attention to some violations of [standard conventions around commit message best practices](http://chris.beams.io/posts/git-commit/#seven-rules):
-
-1. If the subject line goes beyond 50 characters and again if it goes beyond 72 characters
-1. If the subject line begins with a lower-case letter (emoji at the beginning of the subject line won't be highlighted)
-1. If the subject line ends with a period
-1. If any non-comment body line goes beyond 72 characters
-
-## Diff highlighting
-
-If [language-diff](https://web.pulsar-edit.dev/packages/language-diff) is installed, the
-diff part of `git commit --verbose` messages is highlighted as well.
-
-## Background
-
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Git TextMate bundle](https://github.com/textmate/git.tmbundle).
-
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

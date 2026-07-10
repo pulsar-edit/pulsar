@@ -1,7 +1,8 @@
 {
   "name": "language-make",
-  "version": "0.23.0",
-  "description": "Make language support in Atom",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "Make language support in Lumine",
   "engines": {
     "atom": "*",
     "node": "*"

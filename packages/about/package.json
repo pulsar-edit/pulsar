@@ -1,13 +1,13 @@
 {
   "name": "about",
-  "author": "Machisté N. Quintana <mnquintana@users.noreply.github.com>",
+  "author": "lumine-code",
   "main": "./lib/main",
-  "version": "1.9.1",
+  "version": "1.0.0",
   "description": "View useful information about your Lumine installation.",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.7 <2.0.0"
+    "atom": "*"
   },
   "dependencies": {
     "etch": "^0.14.1"

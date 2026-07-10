@@ -1,12 +1,13 @@
 {
   "name": "autocomplete-plus",
-  "version": "2.42.6",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main.js",
-  "description": "Display possible completions in the editor while typing",
+  "description": "Display possible completions in the Lumine editor while typing",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">=0.189.0 <2.0.0"
+    "atom": "*"
   },
   "dependencies": {
     "atom-slick": "^2.0.0",
@@ -47,32 +48,32 @@
   },
   "configSchema": {
     "enableAutoActivation": {
+      "order": 1,
       "title": "Show Suggestions On Keystroke",
       "description": "Suggestions will show as you type if this preference is enabled. If it is disabled, you can still see suggestions by using the keymapping for 'autocomplete-plus:activate' (shown below).",
       "type": "boolean",
-      "default": true,
-      "order": 1
+      "default": true
     },
     "autoActivationDelay": {
+      "order": 2,
       "title": "Delay Before Suggestions Are Shown",
       "description": "If you are experiencing performance issues when typing, you should try increasing this value to a non-zero number (e.g. 100).",
       "type": "integer",
-      "default": 0,
-      "order": 2
+      "default": 0
     },
     "maxVisibleSuggestions": {
+      "order": 3,
       "title": "Maximum Visible Suggestions",
       "description": "The suggestion list will only show this many suggestions.",
       "type": "integer",
-      "default": 10,
       "minimum": 1,
-      "order": 3
+      "default": 10
     },
     "confirmCompletion": {
+      "order": 4,
       "title": "Keymap For Confirming A Suggestion",
       "description": "You should use the key(s) indicated here to confirm a suggestion from the suggestion list and have it inserted into the file.",
       "type": "string",
-      "default": "tab and enter",
       "enum": [
         "tab",
         "enter",
@@ -80,146 +81,151 @@
         "tab always, enter when suggestion explicitly selected",
         "none"
       ],
-      "order": 4
+      "default": "tab and enter"
     },
     "useCoreMovementCommands": {
+      "order": 5,
       "title": "Use Core Movement Commands",
-      "description": "Disable this if you want to bind your own keystrokes to move around the suggestion list. You will also need to add definitions to your keymap. See: https://github.com/lumine-code/lumine/blob/master/packages/autocomplete-plus/README.md#remapping-movement-commands",
+      "description": "Disable this if you want to bind your own keystrokes to move around the suggestion list. You will also need to add definitions to your keymap.",
       "type": "boolean",
-      "default": true,
-      "order": 5
+      "default": true
     },
     "fileBlacklist": {
+      "order": 6,
       "title": "File Blacklist",
       "description": "Suggestions will not be provided for files matching this list, e.g. `*.md` for Markdown files. To blacklist more than one file extension, use comma as a separator, e.g. `*.md, *.txt` (both Markdown and text files).",
       "type": "array",
+      "items": {
+        "type": "string"
+      },
       "default": [
         ".*"
-      ],
-      "items": {
-        "type": "string"
-      },
-      "order": 6
+      ]
     },
     "scopeBlacklist": {
+      "order": 7,
       "title": "Scope Blacklist",
-      "description": "Suggestions will not be provided for scopes matching this list. See: https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine/#scoped-settings-scopes-and-scope-descriptors",
+      "description": "Suggestions will not be provided for scopes matching this list.",
       "type": "array",
-      "default": [],
       "items": {
         "type": "string"
       },
-      "order": 7
+      "default": []
     },
     "includeCompletionsFromAllBuffers": {
+      "order": 8,
       "title": "Include Completions From All Buffers",
       "description": "For grammars with no registered provider(s), the default provider will include completions from all buffers, instead of just the buffer you are currently editing.",
       "type": "boolean",
-      "default": true,
-      "order": 8
+      "default": true
     },
     "strictMatching": {
+      "order": 9,
       "title": "Use Strict Matching For Built-In Provider",
       "description": "Fuzzy searching is performed if this is disabled; if it is enabled, suggestions must begin with the prefix from the current word.",
       "type": "boolean",
-      "default": false,
-      "order": 9
+      "default": false
     },
     "firstCharacterMustMatch": {
+      "order": 10,
       "title": "Enforce First-Character Match",
       "description": "When this is enabled, the first character of the suggestion option must match the first character the user types, even when using fuzzy searching.",
       "type": "boolean",
-      "default": false,
-      "order": 9.5
+      "default": false
     },
     "minimumWordLength": {
+      "order": 11,
+      "title": "Minimum Word Length",
       "description": "Only autocomplete when you've typed at least this many characters. Note: May not affect external providers.",
       "type": "integer",
-      "default": 3,
-      "order": 10
+      "default": 3
     },
     "extraWordCharacters": {
+      "order": 12,
+      "title": "Extra Word Characters",
       "description": "Characters to consider part of words for the purpose of autocomplete, even if they are included in the editor.nonWordCharacters setting",
       "type": "string",
-      "default": "",
-      "order": 10.5
+      "default": ""
     },
     "enableBuiltinProvider": {
+      "order": 13,
       "title": "Enable Built-In Provider",
       "description": "The package comes with a built-in provider that will provide suggestions using the words in your current buffer or all open buffers. You will get better suggestions by installing additional autocomplete+ providers. To stop using the built-in provider, disable this option.",
       "type": "boolean",
-      "default": true,
-      "order": 11
+      "default": true
     },
     "builtinProviderBlacklist": {
+      "order": 14,
       "title": "Built-In Provider Blacklist",
       "description": "Don't use the built-in provider for these selector(s).",
       "type": "string",
-      "default": ".source.gfm",
-      "order": 12
+      "default": ".source.gfm"
     },
     "backspaceTriggersAutocomplete": {
+      "order": 15,
       "title": "Allow Backspace To Trigger Autocomplete",
       "description": "If enabled, typing `backspace` will show the suggestion list if suggestions are available. If disabled, suggestions will not be shown while backspacing.",
       "type": "boolean",
-      "default": false,
-      "order": 13
+      "default": false
     },
     "enableAutoConfirmSingleSuggestion": {
+      "order": 16,
       "title": "Automatically Confirm Single Suggestion",
       "description": "If enabled, automatically insert suggestion on manual activation with 'autocomplete-plus:activate' when there is only one match.",
       "type": "boolean",
-      "default": true,
-      "order": 14
+      "default": true
     },
     "suggestionListFollows": {
+      "order": 17,
       "title": "Suggestions List Follows",
       "description": "With 'Cursor' the suggestion list appears at the cursor's position. With 'Word' it appears at the beginning of the word that's being completed.",
       "type": "string",
-      "default": "Word",
       "enum": [
         "Word",
         "Cursor"
       ],
-      "order": 15
+      "default": "Word"
     },
     "suppressActivationForEditorClasses": {
+      "order": 18,
       "title": "Suppress Activation For Editor Classes",
       "description": "Don't auto-activate when any of these classes are present in the editor.",
       "type": "array",
+      "items": {
+        "type": "string"
+      },
       "default": [
         "vim-mode.command-mode",
         "vim-mode.visual-mode",
         "vim-mode.operator-pending-mode"
-      ],
-      "items": {
-        "type": "string"
-      },
-      "order": 17
+      ]
     },
     "consumeSuffix": {
+      "order": 19,
       "title": "Consume suggestion text following the cursor",
       "description": "Completing a suggestion consumes text following the cursor matching the suffix of the chosen suggestion.",
       "type": "boolean",
-      "default": true,
-      "order": 18
+      "default": true
     },
     "useLocalityBonus": {
+      "order": 20,
+      "title": "Use Locality Bonus",
       "description": "Gives words near the cursor position a higher score than those far away",
       "type": "boolean",
-      "default": true,
-      "order": 20
+      "default": true
     },
     "enableExtendedUnicodeSupport": {
+      "order": 21,
+      "title": "Enable Extended Unicode Support",
       "description": "Identifies non-latin alphabet characters as letters",
       "type": "boolean",
-      "default": false,
-      "order": 21
+      "default": false
     },
     "similarSuggestionRemoval": {
+      "order": 22,
+      "title": "Similar Suggestion Removal",
       "description": "Should similar suggestions be removed from the list? If so how to determine they are similar.",
       "type": "string",
-      "default": "none",
       "enum": [
         {
           "value": "none",
@@ -230,13 +236,14 @@
           "description": "Remove when the insertion text or snippet match"
         }
       ],
-      "order": 22
+      "default": "none"
     },
     "moveToCancel": {
+      "order": 23,
+      "title": "Move To Cancel",
       "description": "Moving up when the first item is selected or down when the last item is selected cancels the suggestion list.",
       "type": "boolean",
-      "default": false,
-      "order": 23
+      "default": false
     }
   }
 }

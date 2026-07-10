@@ -1,7 +1,8 @@
 {
   "name": "language-clojure",
-  "version": "0.22.8",
-  "description": "Clojure language support in Atom",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "Clojure language support in Lumine",
   "main": "lib/main",
   "engines": {
     "atom": "*",
@@ -11,19 +12,25 @@
   "license": "MIT",
   "configSchema": {
     "dismissTag": {
+      "order": 1,
+      "title": "Dismiss Tag",
+      "description": "Highlights forms after #_ as comments",
       "type": "boolean",
-      "default": true,
-      "description": "Highlights forms after #_ as comments"
+      "default": true
     },
     "commentTag": {
+      "order": 2,
+      "title": "Comment Tag",
+      "description": "Highlights forms like (comment ...) as comments",
       "type": "boolean",
-      "default": false,
-      "description": "Highlights forms like (comment ...) as comments"
+      "default": false
     },
     "markDeprecations": {
+      "order": 3,
+      "title": "Mark Deprecations",
+      "description": "Marks deprecations like `use`",
       "type": "boolean",
-      "default": true,
-      "description": "Marks deprecations like `use`"
+      "default": true
     }
   }
 }

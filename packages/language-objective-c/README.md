@@ -1,7 +1,13 @@
-# Objective-C language support in Lumine
+# language-objective-c
 
-Adds syntax highlighting and snippets to Objective-C files in Lumine.
+Objective-C support for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [Objective-C TextMate bundle](https://github.com/textmate/objective-c.tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for Objective-C files.
+- **Snippets**: shortcuts for common declarations and control structures.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

@@ -1,12 +1,13 @@
 {
   "name": "incompatible-packages",
+  "author": "lumine-code",
   "main": "./lib/main",
-  "version": "0.27.3",
+  "version": "1.0.0",
   "description": "Show incompatible packages",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": "*"
   },
   "dependencies": {
     "etch": "^0.12.2"

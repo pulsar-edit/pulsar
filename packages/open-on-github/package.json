@@ -1,6 +1,7 @@
 {
   "name": "open-on-github",
-  "version": "1.3.2",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
   "description": "View the active file on github.com",
   "repository": "https://github.com/lumine-code/lumine",
@@ -27,9 +28,11 @@
   },
   "configSchema": {
     "includeLineNumbersInUrls": {
-      "default": true,
+      "order": 1,
+      "title": "Include Line Numbers In URLs",
+      "description": "Include the line range selected in the editor when opening or copying URLs to the clipboard. When opened in the browser, the GitHub page will automatically scroll to the selected line range.",
       "type": "boolean",
-      "description": "Include the line range selected in the editor when opening or copying URLs to the clipboard. When opened in the browser, the GitHub page will automatically scroll to the selected line range."
+      "default": true
     }
   }
 }

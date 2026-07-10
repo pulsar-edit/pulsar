@@ -1,31 +1,38 @@
 {
   "name": "welcome",
-  "version": "0.36.9",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "description": "Welcome users to Lumine with useful information",
   "main": "./lib/main",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": "*"
   },
   "scripts": {
     "test": "atom --test test/*.test.js"
   },
   "configSchema": {
     "showOnStartup": {
+      "order": 1,
+      "title": "Show On Startup",
+      "description": "Show welcome panes with useful information when opening a new Lumine window.",
       "type": "boolean",
-      "default": true,
-      "description": "Show welcome panes with useful information when opening a new Lumine window."
+      "default": true
     },
     "showChangeLog": {
+      "order": 2,
+      "title": "Show Change Log",
+      "description": "Show a Change Log after an update.",
       "type": "boolean",
-      "default": true,
-      "description": "Show a Change Log after an update."
+      "default": true
     },
     "lastViewedChangeLog": {
+      "order": 3,
+      "title": "Last Viewed Change Log",
+      "description": "This is used to keep track of what Change Logs you've dismissed. Change this value to see one again.",
       "type": "string",
-      "default": "0.0.0",
-      "description": "This is used to keep track of what Change Logs you've dismissed. Change this value to see one again."
+      "default": "0.0.0"
     }
   },
   "deserializers": {

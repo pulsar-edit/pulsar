@@ -1,12 +1,13 @@
 {
   "name": "dalek",
+  "author": "lumine-code",
   "main": "./lib/main",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "EXTERMINATEs built-in packages installed in ~/.lumine/packages",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.12.7 <2.0.0"
+    "atom": "*"
   },
   "dependencies": {
     "grim": "^2.0.3"

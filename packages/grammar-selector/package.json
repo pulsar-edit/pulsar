@@ -1,6 +1,7 @@
 {
   "name": "grammar-selector",
-  "version": "0.50.1",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
   "description": "Select the grammar to use for the current editor with `ctrl-shift-L`.",
   "license": "MIT",
@@ -20,15 +21,18 @@
   },
   "configSchema": {
     "showOnRightSideOfStatusBar": {
+      "order": 1,
+      "title": "Show On Right Side Of Status Bar",
+      "description": "Show the active pane item’s language on the right side of Lumine’s status bar, instead of the left.",
       "type": "boolean",
-      "default": true,
-      "description": "Show the active pane item’s language on the right side of Lumine’s status bar, instead of the left."
+      "default": true
     },
     "hideDuplicateTextMateGrammars": {
-      "type": "boolean",
-      "default": true,
+      "order": 2,
       "title": "Hide Duplicate Grammars",
-      "description": "Hides non-preferred grammars when there is more than one grammar. When checked, whichever grammar is preferred for a given scope name (TextMate or Tree-sitter) will be the only one shown. When unchecked, all grammars will always be shown in the list, regardless of the user’s settings."
+      "description": "Hides non-preferred grammars when there is more than one grammar. When checked, whichever grammar is preferred for a given scope name (TextMate or Tree-sitter) will be the only one shown. When unchecked, all grammars will always be shown in the list, regardless of the user’s settings.",
+      "type": "boolean",
+      "default": true
     }
   }
 }

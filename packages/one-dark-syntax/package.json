@@ -1,7 +1,8 @@
 {
   "name": "one-dark-syntax",
+  "author": "lumine-code",
   "theme": "syntax",
-  "version": "1.8.4",
+  "version": "1.0.0",
   "description": "A dark syntax theme",
   "keywords": [
     "dark",
@@ -11,6 +12,6 @@
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": "*"
   }
 }

@@ -1,6 +1,7 @@
 {
   "name": "bracket-matcher",
-  "version": "0.92.0",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
   "description": "Highlight the matching bracket for the `(){}[]` character under the cursor. Move the cursor to the matching bracket with `ctrl-m`.",
   "repository": "https://github.com/lumine-code/lumine",
@@ -13,8 +14,13 @@
   },
   "configSchema": {
     "autocompleteCharacters": {
+      "order": 1,
+      "title": "Autocomplete Characters",
       "description": "Autocompleted characters treated as matching pairs, such as `()`, and `{}`.",
       "type": "array",
+      "items": {
+        "type": "string"
+      },
       "default": [
         "()",
         "[]",
@@ -26,42 +32,49 @@
         "‘’",
         "«»",
         "‹›"
-      ],
-      "items": {
-        "type": "string"
-      }
+      ]
     },
     "pairsWithExtraNewline": {
+      "order": 2,
+      "title": "Pairs With Extra Newline",
       "description": "Automatically add a newline between the pair when enter is pressed.",
       "type": "array",
+      "items": {
+        "type": "string"
+      },
       "default": [
         "()",
         "[]",
         "{}"
-      ],
-      "items": {
-        "type": "string"
-      }
+      ]
     },
     "autocompleteBrackets": {
+      "order": 3,
+      "title": "Autocomplete Brackets",
+      "description": "Autocomplete bracket and quote characters, such as `(` and `)`, and `\"`.",
       "type": "boolean",
-      "default": true,
-      "description": "Autocomplete bracket and quote characters, such as `(` and `)`, and `\"`."
+      "default": true
     },
     "wrapSelectionsInBrackets": {
+      "order": 4,
+      "title": "Wrap Selections In Brackets",
+      "description": "Wrap selected text in brackets or quotes when the editor contains selections and the opening bracket or quote is typed.",
       "type": "boolean",
-      "default": true,
-      "description": "Wrap selected text in brackets or quotes when the editor contains selections and the opening bracket or quote is typed."
+      "default": true
     },
     "highlightMatchingLineNumber": {
+      "order": 5,
+      "title": "Highlight Matching Line Number",
+      "description": "Highlight the line number of the matching bracket.",
       "type": "boolean",
-      "default": false,
-      "description": "Highlight the line number of the matching bracket."
+      "default": false
     },
     "alwaysSkipClosingPairs": {
+      "order": 6,
+      "title": "Always Skip Closing Pairs",
+      "description": "Always skip closing pairs in front of the cursor.",
       "type": "boolean",
-      "default": false,
-      "description": "Always skip closing pairs in front of the cursor."
+      "default": false
     }
   }
 }

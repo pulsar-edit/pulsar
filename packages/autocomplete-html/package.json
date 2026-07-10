@@ -1,12 +1,13 @@
 {
   "name": "autocomplete-html",
-  "version": "0.8.9",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "description": "HTML element and attribute autocompletions",
   "main": "./lib/main",
   "license": "MIT",
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {
-    "atom": ">=0.174.0 <2.0.0"
+    "atom": "*"
   },
   "scripts": {
     "update": "node ./update/update.js",

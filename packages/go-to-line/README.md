@@ -1,5 +1,19 @@
-# Go To Line package
+# go-to-line
 
-Move the cursor to a specific line in the editor using <kbd>ctrl-g</kbd>.
+Jump the cursor to a specific line number in the editor.
 
-![](https://f.cloud.github.com/assets/671378/2241602/fdd88c4c-9cd8-11e3-9d14-74844ec7da01.png)
+## Features
+
+- **Line navigation**: moves the cursor to the line number you type.
+- **Column support**: accepts `line:column` input to place the cursor at a specific column.
+- **Numeric input**: restricts entry to digits and colons for quick, error-free navigation.
+
+## Commands
+
+Commands available in `atom-text-editor`:
+
+- `go-to-line:toggle`: open the go-to-line prompt for the active editor.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

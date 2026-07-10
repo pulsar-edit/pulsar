@@ -1,6 +1,12 @@
-# language-diff package
+# language-diff
 
-Diff and patch file support in Lumine.
+Diff and patch file support for Lumine.
 
-The TextMate grammar is adapted from `textmate/diff.tmbundle` at commit
-`0593bb775eab1824af97ef2172fd38822abd97d7`.
+## Features
+
+- **Grammars**: provides both Tree-sitter and TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for diff and patch files.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

@@ -1,6 +1,7 @@
 {
   "name": "link",
-  "version": "0.31.6",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/link",
   "description": "Opens http(s) links under the cursor",
   "license": "MIT",

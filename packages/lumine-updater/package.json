@@ -7,9 +7,9 @@
     "test": "lumine --test spec"
   },
   "engines": {
-    "atom": ">=1.106.0 <2.0.0"
+    "atom": "*"
   },
-  "author": "confused-Techie",
+  "author": "lumine-code",
   "license": "MIT",
   "repository": "https://github.com/lumine-code/lumine",
   "dependencies": {
@@ -20,9 +20,11 @@
   },
   "configSchema": {
     "checkForUpdatesOnLaunch": {
+      "order": 1,
+      "title": "Check For Updates On Launch",
+      "description": "If Lumine Updater should check for an update to Lumine as soon as Lumine launches.",
       "type": "boolean",
-      "default": true,
-      "description": "If Lumine Updater should check for an update to Lumine as soon as Lumine launches."
+      "default": true
     }
   }
 }

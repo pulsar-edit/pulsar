@@ -1,17 +1,68 @@
-# Find and Replace package
+# find-and-replace
 
-Find and replace in the current buffer or across the entire project.
+Find and replace text in the current buffer or across the entire project in Lumine.
 
-## Find in buffer
+## Features
 
-Using the shortcut <kbd>cmd-f</kbd> (Mac) or <kbd>ctrl-f</kbd> (Windows and Linux).
-![screen shot 2013-11-26 at 12 25 22 pm](https://f.cloud.github.com/assets/69169/1625938/a859fa70-56d9-11e3-8b2a-ac37c5033159.png)
+- **Buffer search**: find and replace matches within the active editor.
+- **Project search**: search and replace across every file in the project.
+- **Search options**: toggle regex, case-sensitive, whole-word, and selection-only matching.
+- **Multiple selections**: select the next or all occurrences of the current match for simultaneous editing.
+- **Search history**: cycle through and reuse previous find and replace patterns.
+- **Result markers**: expose the marker layer of search results to other packages through a service.
 
-## Find in project
+## Commands
 
-Using the shortcut <kbd>cmd-shift-f</kbd> (Mac) or <kbd>ctrl-shift-f</kbd> (Windows and Linux).
-![screen shot 2013-11-26 at 12 26 02 pm](https://f.cloud.github.com/assets/69169/1625945/b216d7b8-56d9-11e3-8b14-6afc33467be9.png)
+Commands available in `atom-workspace`:
 
-## Provided Service
+- `find-and-replace:show`: open the buffer find panel,
+- `find-and-replace:toggle`: toggle the buffer find panel,
+- `find-and-replace:show-replace`: open the buffer find panel focused on the replace field,
+- `find-and-replace:find-all`: find and mark every match in the buffer,
+- `find-and-replace:find-next`: move to the next match,
+- `find-and-replace:find-previous`: move to the previous match,
+- `find-and-replace:find-next-selected`: use the selection as the pattern and find the next match,
+- `find-and-replace:find-previous-selected`: use the selection as the pattern and find the previous match,
+- `find-and-replace:use-selection-as-find-pattern`: set the find pattern from the current selection,
+- `find-and-replace:use-selection-as-replace-pattern`: set the replace pattern from the current selection,
+- `find-and-replace:replace-next`: replace the current match and move to the next,
+- `find-and-replace:replace-previous`: replace the current match and move to the previous,
+- `find-and-replace:replace-all`: replace every match in the buffer,
+- `find-and-replace:clear-history`: clear the stored find and replace history,
+- `project-find:show`: open the project find panel,
+- `project-find:toggle`: toggle the project find panel,
+- `project-find:show-in-current-directory`: open the project find panel scoped to the selected directory.
 
-If you need access the marker layer containing result markers for a given editor, use the `find-and-replace@0.0.1` service. The service exposes one method, `resultsMarkerLayerForTextEditor`, which takes a `TextEditor` and returns a `TextEditorMarkerLayer` that you can interact with. Keep in mind that any work you do in synchronous event handlers on this layer will impact the performance of find and replace.
+Commands available in `.editor:not(.mini)`:
+
+- `find-and-replace:select-next`: add the next occurrence of the current selection to the selections,
+- `find-and-replace:select-all`: add every occurrence of the current selection to the selections,
+- `find-and-replace:select-undo`: remove the last selection added,
+- `find-and-replace:select-skip`: skip the current occurrence and select the next.
+
+Commands available in `.list-item.match-row` and `.list-item.path-row`:
+
+- `find-and-replace:open-in-new-tab`: open the result in a new tab,
+- `find-and-replace:copy-path`: copy the path of the result.
+
+## Services
+
+- **find-and-replace** (`0.0.1`): provided to expose `resultsMarkerLayerForTextEditor`, returning the marker layer of search results for a given editor.
+- **atom.file-icons** (`1.0.0`): consumed to show file-type icons next to project search results.
+- **file-icons.element-icons** (`1.0.0`): consumed to show element-based file-type icons next to project search results.
+- **autocomplete.watchEditor** (`1.0.0`): consumed to enable autocompletion inside the find search field.
+
+## Customization
+
+Restyle the find-and-replace panel by adding CSS to your `styles.less`. For example, to add extra padding and a top border:
+
+```less
+.find-and-replace {
+  padding: 8px;
+  border-top: 1px solid fade(#000, 20%);
+}
+```
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

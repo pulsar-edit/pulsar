@@ -1,14 +1,18 @@
-# Wrap Guide package
+# wrap-guide
 
-The `wrap-guide` package places a vertical line in each editor at a certain column to guide your formatting, so lines do not exceed a certain width.
+Displays a vertical line in the editor to guide line length.
 
-By default, the wrap-guide is placed at the value of `editor.preferredLineLength` config setting. The 80th column is used as the fallback if the config value is unset.
+## Features
 
-![](https://f.cloud.github.com/assets/671378/2241976/dbf6a8f6-9ced-11e3-8fef-d8a226301530.png)
+- **Wrap guide line**: places a vertical line at a column so lines do not exceed a chosen width.
+- **Preferred line length**: uses the `editor.preferredLineLength` value, falling back to the 80th column.
+- **Multiple guides**: shows several guide lines at custom columns.
+- **Scoped control**: enables or disables the guide per language through scoped configuration.
+- **Styling**: lets you change the guide's color and width with your own CSS/LESS.
 
 ## Configuration
 
-You can customize where the column is placed for different file types by opening the Settings View and configuring the "Preferred Line Length" value. If you do not want the guide to show for a particular language, that can be set using scoped configuration. For example, to turn off the guide for GitHub-Flavored Markdown, you can add the following to your `config.cson`:
+Disable the guide for a particular language through scoped configuration in your `config.cson`. For example, to turn it off for GitHub-Flavored Markdown:
 
 ```coffeescript
 '.source.gfm':
@@ -16,20 +20,24 @@ You can customize where the column is placed for different file types by opening
     'enabled': false
 ```
 
-It is possible to configure the color and/or width of the line by adding the following CSS/LESS to your `styles.less`:
-
-```css
-atom-text-editor .wrap-guide {
-  width: 10px;
-  background-color: red;
-}
-```
-
-Multiple guide lines are also supported. For example, add the following to your `config.cson` to create four columns at the indicated positions:
+Show multiple guide lines by listing the columns. The right-most line acts as your `editor.preferredLineLength`:
 
 ```coffeescript
 'wrap-guide':
   'columns': [72, 80, 100, 120]
 ```
 
-> Note: When using multiple guide lines, the right-most guide line functions as your `editor.preferredLineLength` setting.
+## Customization
+
+Change the guide's color and width by adding CSS to your `styles.less`:
+
+```less
+atom-text-editor .wrap-guide {
+  width: 10px;
+  background-color: red;
+}
+```
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

@@ -1,11 +1,12 @@
 {
   "name": "language-go",
-  "description": "Go language support in Atom",
+  "author": "lumine-code",
+  "description": "Go language support in Lumine",
   "main": "lib/main",
   "keywords": [
     "tree-sitter"
   ],
-  "version": "0.47.3",
+  "version": "1.0.0",
   "license": "MIT",
   "engines": {
     "atom": "*",

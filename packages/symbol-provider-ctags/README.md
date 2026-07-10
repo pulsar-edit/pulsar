@@ -1,24 +1,18 @@
-# symbol-provider-ctags package
+# symbol-provider-ctags
 
-Provides symbols to `symbols-view` via `ctags`.
+Provides symbols to symbols-view via ctags.
 
-This is the approach historically used by `symbols-view` — now spun out into its own “provider” package among several.
+## Features
 
-This symbol provider will typically be used on non-Tree-sitter grammars, and possibly when performing a project-wide search. Symbol-based navigation on files with Tree-sitter grammars will typically be provided by `symbol-provider-tree-sitter`.
+- **File symbols**: scans the current file with ctags to list its symbols, without needing a tags file.
+- **Project symbols**: reads a project tags file to list symbols across the whole project.
+- **Go to declaration**: resolves the word under the cursor to its declaration using the project tags file.
+- **Broad language support**: works with any language present in its ctags config file.
 
-## Language support
+## Services
 
-This provider supports any language that is present in its config file, and detects any symbols that match the specified patterns. If your language isn’t supported and you can help add support, we’ll happily accept a pull request.
+- **symbol.provider** (`1.0.0`): provided to supply symbols for a given file or project to symbols-view.
 
-## Toggle file symbols
+## Contributing
 
-For the **Symbols View: Toggle File Symbols** command, `ctags` will scan the file on disk and emit its tag information to stdout, where it is read by this package. You don’t need a `TAGS` file to do a symbol search within a single file.
-
-## Toggle Project Symbols, Go To Declaration
-
-These commands require a tags file, typically defined at `.tags`/`tags`/`.TAGS`/`TAGS` in the root of your project. This package cannot generate (or regenerate) your tags file, since it doesn’t know which files to include. You can run `ctags` regularly on your own to generate this file. Consult [the documentation for Exuberant Ctags](https://ctags.sourceforge.net/ctags.html) for more information.
-
-Once your tags file is present, these commands can be fulfilled by `symbol-provider-ctags`…
-
-- The **Symbols View: Toggle Project Symbols** command works like **Symbols View: Toggle File Symbols** described above, except it’ll show you symbols from the entire project.
-- The **Symbols View: Go To Declaration** command works like **Symbols View: Toggle Project Symbols**, except the word under the cursor will be pre-filled in the search box, and a result will automatically be opened if it is the only result.
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

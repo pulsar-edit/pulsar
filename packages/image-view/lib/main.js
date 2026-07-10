@@ -6,14 +6,6 @@ const { CompositeDisposable } = require("atom");
 const imageExtensions = [".bmp", ".gif", ".ico", ".jpeg", ".jpg", ".png", ".webp"];
 
 module.exports = {
-  config: {
-    defaultBackgroundColor: {
-      type: "string",
-      enum: ["white", "black", "transparent"],
-      default: "transparent",
-    },
-  },
-
   activate() {
     this.imageEditorStatusView = null;
     this.disposables = new CompositeDisposable();

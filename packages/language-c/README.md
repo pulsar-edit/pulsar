@@ -1,9 +1,20 @@
-# C/C++ language support in Lumine
+# language-c
 
-Adds syntax highlighting and snippets to C/C++ files in Lumine.
+C and C++ support for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
-from the [C TextMate bundle](https://github.com/textmate/c.tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a
-pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides both Tree-sitter and TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for C and C++ files.
+- **Snippets**: shortcuts for common declarations, control structures, and preprocessor directives.
+- **Code folding**: collapse blocks, functions, and comments.
+- **Comment toggling**: line and block comment support.
+
+## Services
+
+- **hyperlink.injection** (`0.1.0`): consumed to highlight URLs inside code and comments as clickable links.
+- **todo.injection** (`0.1.0`): consumed to highlight `TODO`-style markers inside comments.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

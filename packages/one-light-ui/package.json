@@ -1,8 +1,9 @@
 {
   "name": "one-light-ui",
+  "author": "lumine-code",
   "theme": "ui",
-  "version": "1.12.5",
-  "description": "One light UI theme developed for Atom, repurposed for Lumine",
+  "version": "1.0.0",
+  "description": "One light UI theme for Lumine",
   "keywords": [
     "light",
     "adaptive",
@@ -12,14 +13,14 @@
   "repository": "https://github.com/lumine-code/lumine",
   "main": "lib/main",
   "engines": {
-    "atom": ">0.40.0"
+    "atom": "*"
   },
   "configSchema": {
     "fontSize": {
+      "order": 1,
       "title": "Font Size",
       "description": "Change the font size for the UI.",
       "type": "integer",
-      "default": 12,
       "enum": [
         10,
         11,
@@ -33,43 +34,44 @@
         19,
         20
       ],
-      "order": 1
+      "default": 12
     },
     "tabSizing": {
+      "order": 2,
       "title": "Tab Sizing",
       "description": "In Even mode all tabs will be the same size. Great for quickly closing many tabs. In Maximum mode the tabs will expand to take up the full width. In Minimum mode the tabs will only take as little space as needed and also show longer file names.",
       "type": "string",
-      "default": "Even",
       "enum": [
         "Even",
         "Maximum",
         "Minimum"
       ],
-      "order": 2
+      "default": "Even"
     },
     "tabCloseButton": {
+      "order": 3,
       "title": "Tab Close Button",
       "description": "Choose the position of the close button shown in tabs.",
       "type": "string",
-      "default": "Right",
       "enum": [
         "Left",
         "Right"
       ],
-      "order": 3
+      "default": "Right"
     },
     "hideDockButtons": {
+      "order": 4,
       "title": "Hide dock toggle buttons",
       "description": "Note: When hiding the toggle buttons, opening a dock needs to be done by using the keyboard or other alternatives.",
       "type": "boolean",
-      "default": "false",
-      "order": 4
+      "default": "false"
     },
     "stickyHeaders": {
+      "order": 5,
       "title": "Make tree-view project headers sticky",
+      "description": "Keep tree-view project folder headers pinned to the top while scrolling.",
       "type": "boolean",
-      "default": "false",
-      "order": 5
+      "default": "false"
     }
   }
 }

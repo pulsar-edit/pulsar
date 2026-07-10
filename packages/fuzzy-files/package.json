@@ -1,11 +1,12 @@
 {
   "name": "fuzzy-files",
+  "author": "lumine-code",
   "description": "Quickly find and take an action over project files",
   "repository": "https://github.com/lumine-code/lumine",
-  "version": "2.0.1",
+  "version": "1.0.0",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.132.0 <2.0.0"
+    "atom": "*"
   },
   "main": "./lib/main",
   "activationCommands": {

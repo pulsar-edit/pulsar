@@ -1,8 +1,9 @@
 {
   "name": "markdown-preview",
-  "version": "0.160.2",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
-  "description": "Open a rendered version of the Markdown in the current editor with `ctrl-shift-m`.",
+  "description": "Open a rendered version of the Markdown in the current editor.",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
@@ -32,31 +33,37 @@
   },
   "configSchema": {
     "breakOnSingleNewline": {
+      "order": 2,
+      "title": "Break On Single Newline",
+      "description": "In Markdown, a single newline character doesn't cause a line break in the generated HTML. In GitHub Flavored Markdown, that is not true. Enable this config option to insert line breaks in rendered HTML for single newlines in Markdown source.",
       "type": "boolean",
-      "order": 1,
-      "default": false,
-      "description": "In Markdown, a single newline character doesn't cause a line break in the generated HTML. In GitHub Flavored Markdown, that is not true. Enable this config option to insert line breaks in rendered HTML for single newlines in Markdown source."
+      "default": false
     },
     "liveUpdate": {
+      "order": 3,
+      "title": "Live Update",
+      "description": "Re-render the preview as the contents of the source changes, without requiring the source buffer to be saved. If disabled, the preview is re-rendered only when the buffer is saved to disk.",
       "type": "boolean",
-      "order": 2,
-      "default": true,
-      "description": "Re-render the preview as the contents of the source changes, without requiring the source buffer to be saved. If disabled, the preview is re-rendered only when the buffer is saved to disk."
+      "default": true
     },
     "openPreviewInSplitPane": {
-      "order": 3,
+      "order": 4,
+      "title": "Open Preview In Split Pane",
+      "description": "Open the preview in a split pane. If disabled, the preview is opened in a new tab in the same pane.",
       "type": "boolean",
-      "default": true,
-      "description": "Open the preview in a split pane. If disabled, the preview is opened in a new tab in the same pane."
+      "default": true
     },
     "allowUnsafeProtocols": {
-      "order": 4,
+      "order": 5,
+      "title": "Allow Unsafe Protocols",
+      "description": "Allow HTML attributes to use protocols normally considered unsafe such as `file://` and absolute paths on Windows.",
       "type": "boolean",
-      "default": false,
-      "description": "Allow HTML attributes to use protocols normally considered unsafe such as `file://` and absolute paths on Windows."
+      "default": false
     },
     "grammars": {
-      "order": 0,
+      "order": 1,
+      "title": "Grammars",
+      "description": "List of scopes for languages for which previewing is enabled. See [this README](https://github.com/lumine-code/lumine/tree/master/packages/spell-check#readme) for more information on finding the correct scope for a specific language.",
       "type": "array",
       "default": [
         "source.gfm",
@@ -65,22 +72,20 @@
         "text.md",
         "text.plain",
         "text.plain.null-grammar"
-      ],
-      "description": "List of scopes for languages for which previewing is enabled. See [this README](https://github.com/pulsar-edit/spell-check#readme) for more information on finding the correct scope for a specific language."
+      ]
     },
     "useGitHubStyle": {
-      "order": 5,
+      "order": 6,
       "title": "Use GitHub.com Style",
+      "description": "Use the same CSS styles for preview as the ones used on GitHub.com.",
       "type": "boolean",
-      "default": false,
-      "description": "Use the same CSS styles for preview as the ones used on GitHub.com."
+      "default": false
     },
     "gitHubStyleMode": {
-      "order": 6,
+      "order": 7,
       "title": "GitHub.com Style Mode",
-      "type": "string",
-      "default": "auto",
       "description": "Whether to use light-mode GitHub CSS, dark-mode GitHub CSS, or system default (based on your operating system preferences). Has no effect unless **Use GitHub.com Style** is enabled.",
+      "type": "string",
       "enum": [
         {
           "value": "auto",
@@ -94,14 +99,14 @@
           "value": "dark",
           "description": "Dark"
         }
-      ]
+      ],
+      "default": "auto"
     },
     "syntaxHighlightingLanguageIdentifier": {
-      "order": 7,
+      "order": 8,
       "title": "Syntax Highlighting Language Identifiers",
       "description": "Syntax Highlighting System to use for code block language identification. See [the README](https://github.com/lumine-code/lumine/tree/master/packages/markdown-preview#readme) for details.",
       "type": "string",
-      "default": "linguist",
       "enum": [
         {
           "value": "linguist",
@@ -119,14 +124,19 @@
           "value": "highlightjs",
           "description": "HighlightJS: Markdown-IT"
         }
-      ]
+      ],
+      "default": "linguist"
     },
     "customSyntaxHighlightingLanguageIdentifiers": {
+      "order": 9,
+      "title": "Custom Syntax Highlighting Language Identifiers",
       "description": "Comma-separated list of syntax language identifiers to map to any language. See [the README](https://github.com/lumine-code/lumine/tree/master/packages/markdown-preview#readme) for usage.",
       "type": "string",
       "default": ""
     },
     "useOriginalParser": {
+      "order": 10,
+      "title": "Use Original Parser",
       "description": "When checked, will use the original Markdown parser for `markdown-preview` (`marked`). When unchecked, will use the new Markdown parser built into Lumine (`markdown-it`).",
       "type": "boolean",
       "default": true

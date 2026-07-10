@@ -1,7 +1,8 @@
 {
   "name": "language-javascript",
-  "version": "0.134.2",
-  "description": "JavaScript language support in Atom",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "JavaScript language support in Lumine",
   "engines": {
     "atom": "*",
     "node": ">=16"
@@ -14,57 +15,59 @@
   ],
   "configSchema": {
     "indentation": {
+      "order": 1,
       "title": "Indentation",
+      "description": "Fine-tune automatic indentation behavior for JavaScript.",
       "type": "object",
       "properties": {
         "indentBraces": {
-          "title": "Indent Curly Braces",
-          "type": "boolean",
-          "default": true,
           "order": 1,
-          "description": "Indent after `{`."
+          "title": "Indent Curly Braces",
+          "description": "Indent after `{`.",
+          "type": "boolean",
+          "default": true
         },
         "indentBrackets": {
-          "title": "Indent Brackets",
-          "type": "boolean",
-          "default": true,
           "order": 2,
-          "description": "Indent after `[`."
+          "title": "Indent Brackets",
+          "description": "Indent after `[`.",
+          "type": "boolean",
+          "default": true
         },
         "indentParentheses": {
-          "title": "Indent Parentheses",
-          "type": "boolean",
-          "default": true,
           "order": 3,
-          "description": "Indent after `(`."
+          "title": "Indent Parentheses",
+          "description": "Indent after `(`.",
+          "type": "boolean",
+          "default": true
         },
         "alignCaseWithSwitch": {
-          "title": "Align “case” With ”switch”",
-          "type": "boolean",
-          "default": false,
           "order": 4,
-          "description": "When enabled, `case` and `default` statements in `switch` blocks will match the indent level of the enclosing `switch` instead of indenting themselves one level."
+          "title": "Align “case” With ”switch”",
+          "description": "When enabled, `case` and `default` statements in `switch` blocks will match the indent level of the enclosing `switch` instead of indenting themselves one level.",
+          "type": "boolean",
+          "default": false
         },
         "indentAfterBracelessIf": {
-          "title": "Indent After Braceless “if” And “else”",
-          "type": "boolean",
-          "default": true,
           "order": 5,
-          "description": "When enabled, `if` and `else` statements without a brace on the initial line will trigger an indent, then a dedent after a single statement. Disable if your brace style is incompatible with this pattern."
+          "title": "Indent After Braceless “if” And “else”",
+          "description": "When enabled, `if` and `else` statements without a brace on the initial line will trigger an indent, then a dedent after a single statement. Disable if your brace style is incompatible with this pattern.",
+          "type": "boolean",
+          "default": true
         },
         "addHangingIndentAfterLogicalOperators": {
-          "title": "Add Hanging Indent After Logical Operators",
-          "type": "boolean",
-          "default": true,
           "order": 6,
-          "description": "When enabled, will add a hanging indent when a line ends with `&&` or `||`, continuing the indent until the end of the statement."
+          "title": "Add Hanging Indent After Logical Operators",
+          "description": "When enabled, will add a hanging indent when a line ends with `&&` or `||`, continuing the indent until the end of the statement.",
+          "type": "boolean",
+          "default": true
         },
         "addHangingIndentAfterTernaryOperators": {
-          "title": "Add Hanging Indent After Ternary Operators",
-          "type": "boolean",
-          "default": true,
           "order": 7,
-          "description": "When enabled, will add a hanging indent when a line ends with `?`, continuing the indent through the ensuing `:` until the end of the statement."
+          "title": "Add Hanging Indent After Ternary Operators",
+          "description": "When enabled, will add a hanging indent when a line ends with `?`, continuing the indent through the ensuing `:` until the end of the statement.",
+          "type": "boolean",
+          "default": true
         }
       }
     }

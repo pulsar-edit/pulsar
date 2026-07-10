@@ -1,14 +1,30 @@
-# Timecop package
+# timecop
 
-Displays information about where time is spent while Lumine loads.
+Display information about where time is spent while Lumine loads.
 
-- Startup time
-- Compile cache
-- Package loading time
-- Package activation time
-- Theme loading time
-- Theme activation time
+## Features
 
-![](https://cloud.githubusercontent.com/assets/378023/20422582/9e5907f8-adae-11e6-8267-faa3514de896.png)
+- **Startup breakdown**: shows overall startup and compile cache timing.
+- **Package timing**: reports how long packages take to load and activate.
+- **Theme timing**: reports how long themes take to load and activate.
+- **Slowdown hints**: highlights the packages and themes that cost the most time.
 
-Inspired by [Timecop](http://www.imdb.com/title/tt0111438/) the movie. :watch: :rotating_light:
+## Commands
+
+Commands available in `atom-workspace`:
+
+- `timecop:view`: open the Timecop view with load timing details.
+
+## Customization
+
+Change the background of the Timecop panel by adding CSS to your `styles.less`:
+
+```less
+.timecop .timecop-panel {
+  background-color: #21252b;
+}
+```
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

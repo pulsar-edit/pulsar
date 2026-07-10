@@ -1,7 +1,8 @@
 {
-  "version": "0.60.20",
+  "version": "1.0.0",
   "name": "language-c",
-  "description": "Atom language support for C/C++",
+  "author": "lumine-code",
+  "description": "Language support for C/C++ in Lumine",
   "keywords": [
     "tree-sitter"
   ],

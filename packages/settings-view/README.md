@@ -1,62 +1,48 @@
-# Settings View package
+# settings-view
 
-Edit core configuration settings, install and configure packages, and change themes from within Lumine.
+Edit config settings, install packages, and change themes in Lumine.
 
-![Settings View](https://cloud.githubusercontent.com/assets/118951/16886698/b0ca5fae-4a8a-11e6-8afc-2c03fda4618c.PNG)
+## Features
 
-## Usage
+- **Settings editor**: browse and change core and editor settings from a single view.
+- **Package management**: install, uninstall, and update community packages.
+- **Theme management**: install, uninstall, and switch between UI and syntax themes.
+- **Keybinding browser**: view all active keybindings in one place.
+- **Settings search**: find individual settings by name across every panel.
+- **Status bar integration**: open settings from the status bar and see when package updates are available.
 
-You can open the Settings View by navigating to
-_**LNX**_: _Edit > Preferences_ -
-_**MAC**_: _Lumine > Preferences_ -
-_**WIN**_: _File > Settings_.
+## Commands
 
-In order to install new packages and themes, click on the _Install_ section on the left-hand side.
-Once installed, community packages/themes and their settings are housed within their respective section.
-All packages/themes that have updates will be listed under the _Updates_ section. Finally, all keybindings (including ones that community packages have added) are available in the _Keybindings_ section.
+Commands available in `atom-workspace`:
 
-Want to learn more? Check out the [Getting Started: Lumine Basics](https://pulsar-edit.dev/docs/launch-manual/sections/getting-started/#lumine-basics) and [Using Lumine: Lumine Packages](https://pulsar-edit.dev/docs/launch-manual/sections/using-lumine/#lumine-packages) sections in the Lumine Launch Manual.
+- `settings-view:open`: open the settings view,
+- `settings-view:core`: open the core settings panel,
+- `settings-view:editor`: open the editor settings panel,
+- `settings-view:show-keybindings`: open the keybindings panel,
+- `settings-view:change-themes`: open the themes panel to change themes,
+- `settings-view:install-packages-and-themes`: open the install panel,
+- `settings-view:view-installed-themes`: open the themes panel to view installed themes,
+- `settings-view:uninstall-themes`: open the themes panel to manage themes,
+- `settings-view:view-installed-packages`: open the packages panel,
+- `settings-view:uninstall-packages`: open the packages panel to manage packages,
+- `settings-view:check-for-package-updates`: open the updates panel,
+- `settings-view:system`: open the system panel (Windows only).
 
-### Commands and Keybindings
+## Services
 
-All of the following commands are under the `atom-workspace` selector.
+- **status-bar** (`^1.0.0`): consumed to add a settings icon and a package-updates indicator to the status bar.
+- **snippets** (`0.1.0`): consumed to read user snippets so they can be displayed alongside settings.
 
-| Command                                                                                                                                                                                                                                                                                                                                                                                | Description                                               | Keybinding (Linux) | Keybinding (macOS) | Keybinding (Windows) |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ------------------ | ------------------ | -------------------- |
-| `settings-view:open`                                                                                                                                                                                                                                                                                                                                                                   | Opens the Settings View                                   | <kbd>ctrl-,</kbd>  | <kbd>cmd-,</kbd>   | <kbd>ctrl-,</kbd>    |
-| `settings-view:core`                                                                                                                                                                                                                                                                                                                                                                   | Opens the _Core_ section of the Settings View             |
-| `settings-view:editor`                                                                                                                                                                                                                                                                                                                                                                 | Opens the _Editor_ section of the Settings View           |
-| `settings-view:system`                                                                                                                                                                                                                                                                                                                                                                 | Opens the _System_ section of the Settings View (Windows) |
-| `settings-view:show-keybindings`                                                                                                                                                                                                                                                                                                                                                       | Opens the _Keybindings_ section of the Settings View      |
-| `settings-view:uninstall-packages`                                                                                                                                                                                                                                                                                                                                                     | Opens the _Packages_ section of the Settings View         |
-| `settings-view:change-themes`                                                                                                                                                                                                                                                                                                                                                          | Opens the _Themes_ section of the Settings View           |
-| `settings-view:uninstall-themes`                                                                                                                                                                                                                                                                                                                                                       | Opens the _Themes_ section of the Settings View           |
-| `settings-view:check-for-updates`                                                                                                                                                                                                                                                                                                                                                      | Opens the _Updates_ section of the Settings View          |
-| `settings-view:install-packages-and-themes`                                                                                                                                                                                                                                                                                                                                            | Opens the _Install_ section of the Settings View          |
-| Custom keybindings can be added by referencing the above commands. To learn more, visit the [Using Lumine: Basic Customization](https://pulsar-edit.dev/docs/launch-manual/sections/using-lumine/#basic-customization) or [Behind Lumine: Keymaps In-Depth](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine/#keymaps-in-depth) sections in the Lumine Launch Manual. |
+## Customization
 
-## Customize
-
-The Settings View package uses the `ui-variables` to match a theme's color scheme. You can still customize the UI in your `styles.less` file. For example:
+Adjust the settings view to taste by adding CSS to your `styles.less`:
 
 ```less
-// Change the color of the titles
-.settings-view .section .section-heading {
-  color: white;
-}
-
-// Change the font size of the setting descriptions
-.settings-view .setting-description {
-  font-size: 13px;
+.settings-view {
+  font-size: 15px;
 }
 ```
 
-Use the [developer tools](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#developer-tools) to find more selectors.
-
 ## Contributing
 
-Always feel free to help out! Whether it's [filing bugs and feature requests](https://github.com/lumine-code/lumine/issues/new) or working on some of the [open issues](https://github.com/lumine-code/lumine/issues), Lumine's [contributing guide](https://github.com/pulsar-edit/.github/blob/main/CONTRIBUTING.md) will help get you started while the [guide for contributing to packages](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#contributing-to-official-lumine-packages) has some extra information.
-
-## License
-
-MIT License. See [the license](https://github.com/lumine-code/lumine/blob/master/LICENSE.md) for more details.
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

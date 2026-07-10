@@ -4,91 +4,68 @@ Quickly find and take an action over project files.
 
 ## Features
 
-- **Fast fuzzy search**: Uses algorithm with smart scoring. Results are ranked by match quality, adjusted by relative distance from the active editor file and directory depth. Files closer to your current context appear higher.
-- **Line navigation**: Jump to specific line using `:` syntax (e.g., `file.js:42`).
-- **Multiple projects**: Supports multiple project paths.
-- **Real-time updates**: Auto-refreshes on file create/delete/rename.
-- **File icons**: Display file icons in the list, via [file-icons](https://github.com/file-icons/atom).
-- **External opening**: Open files with external applications through the `open-external` service.
-- **Chat attachment**: Attach file to Claude chat context through the `claude-chat` service.
-- **Clipboard support**: Copy/cut file to Windows clipboard through the `windows-clip` service.
-- **Tree view reveal**: Reveal selected file in tree view through the `tree-view-plus` service.
+- **Fast fuzzy search**: ranks results by match quality, adjusted by distance from the active file and directory depth.
+- **Line navigation**: jumps to a specific line using `:` syntax such as `file.js:42`.
+- **Multiple projects**: searches across every open project path.
+- **Real-time updates**: auto-refreshes on file create, delete, and rename.
+- **Path actions**: copies, inserts, or reveals file paths in several formats.
+- **Service integration**: opens files externally, reveals them in the tree view, and copies them to the clipboard through optional services.
 
 ## Commands
 
 Commands available in `atom-workspace`:
 
-- `fuzzy-files:toggle`: toggle fuzzy files panel,
-- `fuzzy-files:refresh`: refresh file cache.
+- `fuzzy-files:toggle`: toggle the fuzzy files panel,
+- `fuzzy-files:refresh`: refresh the file cache.
 
 Commands available in `.fuzzy-files`:
 
-- `select-list:open`: open file,
-- `select-list:open-external`: open file externally,
-- `select-list:show-in-folder`: show in folder,
-- `select-list:trash`: move file to trash,
-- `select-list:split-left/right/up/down`: open in split pane,
-- `select-list:refresh-index`: refresh file index,
-- `select-list:copy-relative-path`: copy relative path,
-- `select-list:copy-project-path`: copy project path,
-- `select-list:copy-absolute-path`: copy absolute path,
-- `select-list:copy-file-name`: copy file name,
-- `select-list:insert-relative-path`: insert relative path,
-- `select-list:insert-project-path`: insert project path,
-- `select-list:insert-absolute-path`: insert absolute path,
-- `select-list:insert-file-name`: insert file name,
-- `select-list:use-default-separator`: use default separator,
-- `select-list:use-forward-slashes`: use forward slash,
-- `select-list:use-backslashes`: use backslash,
-- `select-list:query-selected-path`: set query from selected item path,
-- `select-list:query-selection`: set query from editor selection,
-- `select-list:reveal-in-tree-view`: reveal selected file in tree view,
-- `select-list:cut-file`: cut selected file,
-- `select-list:copy-file`: copy selected file.
+- `select-list:open`: open the selected file,
+- `select-list:open-external`: open the selected file externally,
+- `select-list:show-in-folder`: show the selected file in its folder,
+- `select-list:trash`: move the selected file to the trash,
+- `select-list:split-left/right/up/down`: open the selected file in a split pane,
+- `select-list:refresh-index`: refresh the file index,
+- `select-list:copy-relative-path`: copy the relative path,
+- `select-list:copy-project-path`: copy the project path,
+- `select-list:copy-absolute-path`: copy the absolute path,
+- `select-list:copy-file-name`: copy the file name,
+- `select-list:insert-relative-path`: insert the relative path,
+- `select-list:insert-project-path`: insert the project path,
+- `select-list:insert-absolute-path`: insert the absolute path,
+- `select-list:insert-file-name`: insert the file name,
+- `select-list:use-default-separator`: use the default path separator,
+- `select-list:use-forward-slashes`: use forward slashes in paths,
+- `select-list:use-backslashes`: use backslashes in paths,
+- `select-list:query-selected-path`: set the query from the selected item path,
+- `select-list:query-selection`: set the query from the editor selection,
+- `select-list:reveal-in-tree-view`: reveal the selected file in the tree view,
+- `select-list:cut-file`: cut the selected file,
+- `select-list:copy-file`: copy the selected file,
+- `select-list:claude-chat`: attach the selected file to claude-chat.
 
-## Provided Service `fuzzy-files.score-modifier`
+## Services
 
-Allows other packages to register functions that modify the score of search results. Consumer packages can use this to boost or penalize specific files in the ranking.
+- **fuzzy-files.score-modifier** (`1.0.0`): provided to let other packages register functions that boost or penalize the score of search results.
+- **atom.file-icons** (`1.0.0`): consumed to show file-type icons next to results.
+- **open-external** (`1.0.0`): consumed to open files with the configured external application.
+- **windows-clip** (`1.0.0`): consumed to copy and cuts files to the Windows clipboard.
+- **claude-chat** (`1.0.0`): consumed to attach the selected file to a claude-chat session.
+- **tree-view-plus** (`1.0.0`): consumed to reveal the selected file in the tree view.
 
-In your `package.json`:
+## Customization
 
-```json
-{
-  "consumedServices": {
-    "fuzzy-files.score-modifier": {
-      "versions": { "^1.0.0": "consumeScoreModifier" }
-    }
+Resize the results panel by adding CSS to your `styles.less`:
+
+```less
+.fuzzy-files {
+  font-size: 14px;
+  .list-group {
+    max-height: 20em;
   }
 }
 ```
 
-In your main module:
+## Contributing
 
-```javascript
-consumeScoreModifier(service) {
-  return service.add((score, item) => {
-    // item: { fPath, aPath, pPath, nPath, rPath, distance }
-    return score * multiplier;
-  });
-}
-```
-
-## Consumed Service `atom.file-icons`
-
-Displays file type icons next to entries in the file list. Provided by [file-icons](https://github.com/file-icons/atom).
-
-## Consumed Service `open-external`
-
-Opens files with external applications.
-
-## Consumed Service `claude-chat`
-
-Attaches selected files to the Claude chat context.
-
-## Consumed Service `windows-clip`
-
-Copy and cut files to the Windows clipboard.
-
-## Consumed Service `tree-view-plus`
-
-Reveals the selected file in the tree view.
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

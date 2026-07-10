@@ -47,3 +47,26 @@ Create a config file at the Lumine config path, `explorer.cson`, with an array o
   "E:/Documents/**/*.md"
 ]
 ```
+
+## Services
+
+- **atom.file-icons** (`1.0.0`): consumed to show file-type icons next to results.
+- **open-external** (`^1.0.0`): consumed to open files with the configured external application.
+- **claude-chat** (`^1.0.0`): consumed to attach the selected file to a claude-chat session.
+
+## Customization
+
+Resize the results panel by adding CSS to your `styles.less`:
+
+```less
+.fuzzy-explorer {
+  font-size: 14px;
+  .list-group {
+    max-height: 20em;
+  }
+}
+```
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

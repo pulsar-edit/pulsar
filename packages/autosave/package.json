@@ -1,12 +1,13 @@
 {
   "name": "autosave",
+  "author": "lumine-code",
   "main": "./lib/autosave",
-  "version": "0.24.6",
+  "version": "1.0.0",
   "private": true,
   "description": "Save editors when they lose focus or are closed",
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {
-    "atom": ">0.27.0"
+    "atom": "*"
   },
   "providedServices": {
     "autosave": {
@@ -18,6 +19,9 @@
   },
   "configSchema": {
     "enabled": {
+      "order": 1,
+      "title": "Enabled",
+      "description": "Save files automatically when they lose focus or their pane is closed.",
       "type": "boolean",
       "default": false
     }

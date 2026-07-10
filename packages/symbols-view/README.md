@@ -1,27 +1,45 @@
 # symbols-view
 
-Display a list of symbols in the editor. Typically, a symbol will correspond to a meaningful part of a source code file (like a function definition) but can refer to other important parts of files depending on context.
+Jump to a function, method, or symbol in the current editor or across the project.
 
-## Providers
+## Features
 
-`symbols-view` uses a provider/subscriber model similar to that of `autocomplete-plus`. This package implements the UI, but it relies on other packages to suggest symbols.
-
-### Built-in providers
-
-The original symbol provider, `ctags`, now lives in its own provider package called `symbol-provider-ctags`. Another package, `symbol-provider-tree-sitter`, is the preferred provider (by default) in buffers that use a Tree-sitter grammar.
-
-### Community package providers
-
-Any package can act as a symbol provider. [These are the packages on the Lumine Package Repository that provide the `symbol.provider` service.](https://web.pulsar-edit.dev/packages?service=symbol.provider&serviceType=provided)
+- **File symbols**: browse and jump to any symbol in the active editor.
+- **Project symbols**: search for symbols across the entire project.
+- **Go to declaration**: navigate to the declaration of the symbol under the cursor.
+- **Return from declaration**: jump back to where you were before following a declaration.
+- **Pluggable providers**: gather symbols from any package that supplies a symbol provider.
+- **Hyperclick support**: follow a symbol to its declaration with a click.
 
 ## Commands
 
-| Command                                | Description                                  | Keybinding (Linux/Windows) | Keybinding (macOS)      |
-| -------------------------------------- | -------------------------------------------- | -------------------------- | ----------------------- |
-| `symbols-view:toggle-file-symbols`     | Show all symbols in current file             | <kbd>ctrl-r</kbd>          | <kbd>cmd-r</kbd>        |
-| `symbols-view:toggle-project-symbols`  | Show all symbols in the project              | <kbd>ctrl-shift-r</kbd>    | <kbd>cmd-shift-r</kbd>  |
-| `symbols-view:go-to-declaration`       | Jump to the symbol under the cursor          | <kbd>ctrl-alt-down</kbd>   | <kbd>cmd-alt-down</kbd> |
-| `symbols-view:return-from-declaration` | Return from the jump                         | <kbd>ctrl-alt-up</kbd>     | <kbd>cmd-alt-up</kbd>   |
-| `symbols-view:show-active-providers`   | Display a list of all known symbol providers |                            |                         |
+Commands available in `atom-workspace`:
 
-Commands relating to project-wide symbols may fail if no provider can satisfy a request for project-wide symbols. See `symbol-provider-ctags` for more information.
+- `symbols-view:toggle-project-symbols`: search for a symbol across the whole project,
+- `symbols-view:show-active-providers`: list the symbol providers currently available.
+
+Commands available in `atom-text-editor:not([mini])`:
+
+- `symbols-view:toggle-file-symbols`: browse the symbols in the active editor,
+- `symbols-view:go-to-declaration`: jump to the declaration of the symbol under the cursor,
+- `symbols-view:return-from-declaration`: return to the position before the last declaration jump.
+
+## Services
+
+- **hyperclick** (`0.1.0`): provided to let you follow a symbol to its declaration with a click.
+- **symbol.provider** (`1.0.0`): consumed to allow external sources to suggest symbols for a given file or project.
+
+## Customization
+
+Restyle the symbols list by adding CSS to your `styles.less`. For example, to enlarge the entries and loosen their spacing:
+
+```less
+.symbols-view .list-group li {
+  font-size: 14px;
+  padding: 6px 10px;
+}
+```
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

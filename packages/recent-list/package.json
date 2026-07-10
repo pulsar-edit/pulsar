@@ -1,11 +1,12 @@
 {
   "name": "recent-list",
+  "author": "lumine-code",
   "description": "Quick access to recently opened projects",
   "repository": "https://github.com/lumine-code/lumine",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.132.2 <2.0.0"
+    "atom": "*"
   },
   "main": "./lib/main",
   "dependencies": {

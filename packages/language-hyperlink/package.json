@@ -1,8 +1,9 @@
 {
   "name": "language-hyperlink",
-  "version": "0.17.1",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "lib/main",
-  "description": "Hyperlink colorization in Atom",
+  "description": "Hyperlink colorization in Lumine",
   "engines": {
     "atom": "*",
     "node": ">=14"

@@ -1,8 +1,9 @@
 {
   "name": "language-sass",
-  "version": "0.62.2",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "lib/main",
-  "description": "Sass/SCSS language support in Atom",
+  "description": "Sass/SCSS language support in Lumine",
   "license": "MIT",
   "engines": {
     "atom": "*",

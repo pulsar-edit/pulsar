@@ -1,7 +1,8 @@
 {
   "name": "language-text",
-  "version": "0.7.4",
-  "description": "Plain text support in Atom",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "Plain text support in Lumine",
   "engines": {
     "atom": "*",
     "node": "*"

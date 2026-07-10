@@ -1,10 +1,12 @@
-# Source code support in Lumine
+# language-source
 
-Adds basic comment, indent, and outdent patterns used as a fallback by all
-source files in Lumine.
+Base source file support for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
-from the [Source TextMate bundle](https://github.com/textmate/source.tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a
-pull request to add snippets, make grammar tweaks, etc.
+- **Comment toggling**: provides fallback comment patterns shared by all source files.
+- **Indentation**: provides fallback indent and outdent rules for source files.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

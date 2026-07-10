@@ -1,6 +1,7 @@
 {
   "name": "status-bar",
-  "version": "1.8.17",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
   "description": "Display information about the current editor such as cursor position, file path, grammar, current branch, ahead/behind commits counts, and line diff count.",
   "repository": "https://github.com/lumine-code/lumine",
@@ -24,28 +25,32 @@
   },
   "configSchema": {
     "isVisible": {
+      "order": 4,
+      "title": "Is Visible",
+      "description": "Show status bar at the bottom of the workspace",
       "type": "boolean",
-      "default": true,
-      "description": "Show status bar at the bottom of the workspace"
+      "default": true
     },
     "fullWidth": {
       "order": 1,
-      "type": "boolean",
-      "default": true,
       "title": "Full-width",
-      "description": "Fit the status-bar to the window's full-width"
+      "description": "Fit the status-bar to the window's full-width",
+      "type": "boolean",
+      "default": true
     },
     "cursorPositionFormat": {
       "order": 2,
+      "title": "Cursor Position Format",
+      "description": "Format for the cursor position status bar element, where %L is the line number and %C is the column number",
       "type": "string",
-      "default": "%L:%C",
-      "description": "Format for the cursor position status bar element, where %L is the line number and %C is the column number"
+      "default": "%L:%C"
     },
     "selectionCountFormat": {
-      "order": 2,
+      "order": 3,
+      "title": "Selection Count Format",
+      "description": "Format for the selection count status bar element, where %L is the line count and %C is the character count",
       "type": "string",
-      "default": "(%L, %C)",
-      "description": "Format for the selection count status bar element, where %L is the line count and %C is the character count"
+      "default": "(%L, %C)"
     }
   }
 }

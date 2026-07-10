@@ -1,6 +1,7 @@
 {
   "name": "command-palette",
-  "version": "0.43.5",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/command-palette-package",
   "description": "Find and run available commands using `cmd-shift-p` (macOS) or `ctrl-shift-p` (Linux/Windows).",
   "activationCommands": {
@@ -27,9 +28,11 @@
   ],
   "configSchema": {
     "preserveLastSearch": {
+      "order": 1,
+      "title": "Preserve Last Search",
+      "description": "Preserve the last search when reopening the command palette.",
       "type": "boolean",
-      "default": false,
-      "description": "Preserve the last search when reopening the command palette."
+      "default": false
     }
   }
 }

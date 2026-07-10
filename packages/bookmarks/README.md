@@ -1,17 +1,43 @@
-# Bookmarks package
+# bookmarks
 
-Bookmark lines in the editor.
+Mark lines in the editor and jump back to them.
 
-### Commands and Keybindings
+## Features
 
-| Command                                 | Description                                | Keybinding (Linux)       | Keybinding (macOS)      | Keybinding (Windows)     |
-| --------------------------------------- | ------------------------------------------ | ------------------------ | ----------------------- | ------------------------ |
-| `bookmarks:toggle-bookmark`             | Add/remove a bookmark on the current line  | <kbd>ctrl-shift-f2</kbd> | <kbd>cmd-f2</kbd>       | <kbd>alt-ctrl-f2</kbd>   |
-| `bookmarks:clear-bookmarks`             | Remove all bookmarks in the current editor | <kbd>alt-shift-f2</kbd>  | <kbd>cmd-shift-f2</kbd> | <kbd>ctrl-shift-f2</kbd> |
-| `bookmarks:view-all`                    | View all the bookmarks                     | <kbd>ctrl-f2</kbd>       | <kbd>ctrl-f2</kbd>      | <kbd>ctrl-f2</kbd>       |
-| `bookmarks:jump-to-next-bookmark`       | Move the cursor to the next bookmark       | <kbd>f2</kbd>            | <kbd>f2</kbd>           | <kbd>f2</kbd>            |
-| `bookmarks:jump-to-previous-bookmark`   | Move the cursor to the previous bookmark   | <kbd>shift-f2</kbd>      | <kbd>shift-f2</kbd>     | <kbd>shift-f2</kbd>      |
-| `bookmarks:select-to-next-bookmark`     | Select the text to the next bookmark       |                          |                         |                          |
-| `bookmarks:select-to-previous-bookmark` | Select the text to the previous bookmark   |                          |                         |                          |
+- **Line bookmarks**: toggle a bookmark on any line and see it highlighted in the gutter.
+- **Quick navigation**: jump to the next or previous bookmark in the editor.
+- **Range selection**: select the text between the cursor and the surrounding bookmarks.
+- **Bookmark browser**: view all bookmarks across open editors and jump straight to one.
 
-![](https://cloud.githubusercontent.com/assets/1545996/10419203/97d75e32-7035-11e5-818f-5b34d60865c1.png)
+## Commands
+
+Commands available in `atom-workspace`:
+
+- `bookmarks:view-all`: view all bookmarks in a searchable list.
+
+Commands available in `atom-text-editor`:
+
+- `bookmarks:toggle-bookmark`: add or remove a bookmark on the current line,
+- `bookmarks:clear-bookmarks`: remove all bookmarks in the editor,
+- `bookmarks:jump-to-next-bookmark`: move the cursor to the next bookmark,
+- `bookmarks:jump-to-previous-bookmark`: move the cursor to the previous bookmark,
+- `bookmarks:select-to-next-bookmark`: select from the cursor to the next bookmark,
+- `bookmarks:select-to-previous-bookmark`: select from the cursor to the previous bookmark.
+
+## Services
+
+- **bookmarks** (`1.0.0`): provided to expose the list of bookmarks to any package that wants to know about them.
+
+## Customization
+
+Change the color of the bookmark marker in the gutter by adding CSS to your `styles.less`:
+
+```less
+atom-text-editor .gutter .line-number.bookmarked .icon-right:before {
+  color: #e5c07b;
+}
+```
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

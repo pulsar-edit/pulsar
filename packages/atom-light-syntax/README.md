@@ -1,9 +1,17 @@
-# Lumine Light Syntax theme
+# atom-light-syntax
 
 A light syntax theme for Lumine.
 
-This theme is installed by default with Lumine and can be activated by going to
-the _Themes_ section in the Settings view (`cmd-,`) and selecting it from the
-_Syntax Themes_ dropdown menu.
+## Features
 
-![](https://f.cloud.github.com/assets/671378/2264690/886ce496-9e75-11e3-971a-9a24f359c481.png)
+- **Light palette**: applies a bright color scheme tuned for comfortable code reading.
+- **Broad language coverage**: styles tokens consistently across many supported grammars.
+- **Bundled by default**: ships with Lumine and is ready to enable from the theme settings.
+
+## Usage
+
+Activate the theme from **Settings > Themes** by selecting "Atom Light" from the Syntax Themes dropdown.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

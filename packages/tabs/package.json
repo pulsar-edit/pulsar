@@ -1,12 +1,13 @@
 {
   "name": "tabs",
-  "version": "0.110.2",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
   "description": "Display a selectable tab for each editor open.",
   "license": "MIT",
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {
-    "atom": ">=1.17.0"
+    "atom": "*"
   },
   "dependencies": {
     "fs-plus": "^3.0.0",
@@ -27,16 +28,23 @@
   },
   "configSchema": {
     "showIcons": {
+      "order": 1,
+      "title": "Show Icons",
+      "description": "Show icons in tabs for panes which define an icon, such as the Settings and Project Find Results.",
       "type": "boolean",
-      "default": true,
-      "description": "Show icons in tabs for panes which define an icon, such as the Settings and Project Find Results."
+      "default": true
     },
     "alwaysShowTabBar": {
+      "order": 2,
+      "title": "Always Show Tab Bar",
+      "description": "Show the tab bar even when only one tab is open.",
       "type": "boolean",
-      "default": true,
-      "description": "Show the tab bar even when only one tab is open."
+      "default": true
     },
     "tabScrolling": {
+      "order": 3,
+      "title": "Tab Scrolling",
+      "description": "Jump to next or previous tab by scrolling on the tab bar.",
       "type": [
         "boolean",
         "string"
@@ -46,36 +54,42 @@
         false,
         "platform"
       ],
-      "default": "platform",
-      "description": "Jump to next or previous tab by scrolling on the tab bar."
+      "default": "platform"
     },
     "tabScrollingThreshold": {
+      "order": 4,
+      "title": "Tab Scrolling Threshold",
+      "description": "Threshold for switching to the next/previous tab when the `Tab Scrolling` config setting is enabled. Higher numbers mean that a longer scroll is needed to jump to the next/previous tab.",
       "type": "integer",
-      "default": 120,
-      "description": "Threshold for switching to the next/previous tab when the `Tab Scrolling` config setting is enabled. Higher numbers mean that a longer scroll is needed to jump to the next/previous tab."
+      "default": 120
     },
     "enableVcsColoring": {
-      "type": "boolean",
+      "order": 5,
       "title": "Enable VCS Coloring",
-      "default": false,
-      "description": "Color file names in tabs based on VCS status, similar to how file names are colored in the tree view."
+      "description": "Color file names in tabs based on VCS status, similar to how file names are colored in the tree view.",
+      "type": "boolean",
+      "default": false
     },
     "addNewTabsAtEnd": {
+      "order": 6,
+      "title": "Add New Tabs At End",
+      "description": "Add new tabs at the end of the tab bar, rather than after active tab.",
       "type": "boolean",
-      "default": false,
-      "description": "Add new tabs at the end of the tab bar, rather than after active tab."
+      "default": false
     },
     "enableMruTabSwitching": {
-      "type": "boolean",
+      "order": 7,
       "title": "Enable MRU Tab Switching",
-      "default": true,
-      "description": "Enable tab switching in most-recently-used order. This setting has no effect if ctrl-tab or ctrl-shift-tab are already rebound via your keymap or another package."
+      "description": "Enable tab switching in most-recently-used order. This setting has no effect if ctrl-tab or ctrl-shift-tab are already rebound via your keymap or another package.",
+      "type": "boolean",
+      "default": true
     },
     "displayMruTabList": {
-      "type": "boolean",
+      "order": 8,
       "title": "Display MRU Tab Switching List",
-      "default": true,
-      "description": "When MRU Tab Switching is enabled, display the most-recently-used tab list."
+      "description": "When MRU Tab Switching is enabled, display the most-recently-used tab list.",
+      "type": "boolean",
+      "default": true
     }
   }
 }

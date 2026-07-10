@@ -1,7 +1,14 @@
-# C# language support in Lumine
+# language-csharp
 
-Adds syntax highlighting and snippets to C# files in Lumine.
+C# support for Lumine.
 
-The C# grammar comes from the [.NET Foundation's C# grammar](https://github.com/dotnet/csharp-tmLanguage)
+## Features
 
-Contributions and issues with the the grammar should be raised upstream.
+- **Grammars**: provides both Tree-sitter and TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for C# files.
+- **Snippets**: shortcuts for common declarations and control structures.
+- **Comment toggling**: line and block comment support.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

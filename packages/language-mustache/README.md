@@ -1,5 +1,12 @@
-# Mustache/Handlebars support in Lumine
+# language-mustache
 
-Adds syntax highlighting to [Mustache](http://mustache.github.io) and [Handlebars](http://handlebarsjs.com) files in Lumine.
+Mustache and Handlebars support for Lumine.
 
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+## Features
+
+- **Grammars**: provides TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for Mustache and Handlebars files.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

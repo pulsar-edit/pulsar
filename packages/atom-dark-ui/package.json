@@ -1,11 +1,12 @@
 {
   "name": "atom-dark-ui",
+  "author": "lumine-code",
   "theme": "ui",
-  "version": "0.53.3",
+  "version": "1.0.0",
   "description": "A dark UI theme for Lumine",
   "license": "MIT",
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {
-    "atom": ">0.40.0"
+    "atom": "*"
   }
 }

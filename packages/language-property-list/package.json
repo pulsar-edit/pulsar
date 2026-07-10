@@ -1,7 +1,8 @@
 {
   "name": "language-property-list",
-  "version": "0.9.1",
-  "description": "Property List support in Atom",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "Property List support in Lumine",
   "engines": {
     "atom": "*",
     "node": "*"

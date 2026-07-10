@@ -1,6 +1,7 @@
 {
   "name": "snippets",
-  "version": "1.8.0",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/snippets",
   "description": "Expand snippets matching the current prefix with `tab`.",
   "repository": "https://github.com/lumine-code/lumine",

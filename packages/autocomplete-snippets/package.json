@@ -1,12 +1,13 @@
 {
   "name": "autocomplete-snippets",
+  "author": "lumine-code",
   "main": "./lib/autocomplete-snippets",
-  "version": "1.12.1",
+  "version": "1.0.0",
   "description": "Adds snippets to autocomplete+ suggestions",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">=0.174.0 <2.0.0"
+    "atom": "*"
   },
   "providedServices": {
     "autocomplete.provider": {

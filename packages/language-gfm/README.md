@@ -1,5 +1,17 @@
-# GitHub flavored Markdown package
+# language-gfm
 
-Adds syntax highlighting and snippets to [GitHub flavored Markdown](https://help.github.com/articles/github-flavored-markdown) files in Lumine.
+GitHub Flavored Markdown (GFM) support for Lumine.
 
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+## Features
+
+- **Grammars**: provides both Tree-sitter and TextMate grammars.
+- **Syntax highlighting**: full grammar coverage for GitHub Flavored Markdown files.
+- **Snippets**: shortcuts for common Markdown constructs.
+
+## Services
+
+- **hyperlink.injection** (`0.1.0`): consumed to highlight URLs inside documents as clickable links.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

@@ -1,10 +1,14 @@
-## Background Tips package
+# background-tips
 
-Displays tips about Lumine in the background when there are no open editors.
+Displays tips about Lumine in the background when there are no editors open.
 
-![Screen shot](https://f.cloud.github.com/assets/69169/1796267/c3de038c-6a60-11e3-8bf8-36f45684902c.png)
+## Features
 
-### Contributing tips
+- **Idle tips**: shows helpful tips whenever the workspace has no open editors.
+- **Live keybindings**: replaces `{command}` placeholders with the current keybinding for that command.
+- **Package contributions**: lets any package add its own tips through a `backgroundTips` array.
+
+## Usage
 
 Packages can contribute tips by adding a `backgroundTips` array to their `package.json`. Each entry is a string displayed as-is, with optional `{command}` placeholders that are replaced by the current keybinding for that command.
 
@@ -21,3 +25,7 @@ The placeholder syntax is `{command}` or `{scope>command}`:
 - `{scope>command}` resolves the keybinding for the given CSS selector scope (e.g. `atom-workspace`, `atom-text-editor`, `body`).
 
 If the command in a placeholder has no keybinding defined, the tip is skipped entirely.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

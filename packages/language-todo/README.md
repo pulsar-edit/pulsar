@@ -1,8 +1,17 @@
-# TODO support in Lumine
+# language-todo
 
-Adds syntax highlighting to `TODO`, `FIXME`, `CHANGED`, `XXX`, `IDEA`, `HACK`, `NOTE`, `REVIEW`, `NB`, `BUG`, `QUESTION`, `COMBAK`, `TEMP`, `DEBUG`, `OPTIMIZE`, and `WARNING` in comments
-and text in Lumine.
+TODO/FIXME highlighting for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate) from the [TODO TextMate bundle](https://github.com/textmate/todo.tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides both Tree-sitter and TextMate grammars.
+- **Syntax highlighting**: highlights `TODO`, `FIXME`, `CHANGED`, `XXX`, `IDEA`, `HACK`, `NOTE`, `REVIEW`, `NB`, `BUG`, `QUESTION`, `COMBAK`, `TEMP`, `DEBUG`, `OPTIMIZE`, and `WARNING` markers in comments and text.
+- **Snippets**: shortcuts for common TODO-style markers.
+
+## Services
+
+- **todo.injection** (`0.1.0`): provided to highlight `TODO`-style markers inside other languages' comments.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

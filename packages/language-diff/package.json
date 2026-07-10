@@ -1,7 +1,8 @@
 {
   "name": "language-diff",
-  "version": "0.1.0",
-  "description": "Diff and patch file support in Atom",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "Diff and patch file support in Lumine",
   "engines": {
     "atom": "*",
     "node": "*"

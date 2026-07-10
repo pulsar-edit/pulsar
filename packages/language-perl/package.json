@@ -1,7 +1,8 @@
 {
   "name": "language-perl",
-  "version": "0.38.1",
-  "description": "Perl language support in Atom",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "Perl language support in Lumine",
   "engines": {
     "atom": "*",
     "node": "*"

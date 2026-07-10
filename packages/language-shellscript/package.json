@@ -1,8 +1,9 @@
 {
   "name": "language-shellscript",
-  "version": "0.28.2",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "lib/main",
-  "description": "ShellScript language support in Atom",
+  "description": "ShellScript language support in Lumine",
   "keywords": [
     "tree-sitter"
   ],

@@ -1,10 +1,16 @@
-# Hyperlink colorization in Lumine
+# language-hyperlink
 
-Adds syntax highlighting to hyperlinks embedded in strings, comments, and plain
-text in Lumine.
+Hyperlink colorization for Lumine.
 
-Originally [converted](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#converting-from-textmate)
-from the [Hyperlink Helper TextMate bundle](https://github.com/textmate/hyperlink-helper.tmbundle).
+## Features
 
-Contributions are greatly appreciated. Please fork this repository and open a
-pull request to add snippets, make grammar tweaks, etc.
+- **Grammars**: provides both Tree-sitter and TextMate grammars.
+- **Syntax highlighting**: highlights hyperlinks embedded in strings, comments, and plain text.
+
+## Services
+
+- **hyperlink.injection** (`0.1.0`): provided to let other language packages highlight URLs inside their strings and comments as clickable links.
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

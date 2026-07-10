@@ -1,13 +1,14 @@
 {
   "name": "background-tips",
+  "author": "lumine-code",
   "main": "./lib/background-tips",
-  "version": "0.28.1",
+  "version": "1.0.0",
   "private": true,
   "description": "Displays tips about Lumine in the background when there are no editors open.",
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">0.42.0"
+    "atom": "*"
   },
   "backgroundTips": [
     "You can split your editor into multiple panes with {pane:split-right-and-copy-active-item}",

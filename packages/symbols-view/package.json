@@ -1,5 +1,6 @@
 {
   "name": "symbols-view",
+  "author": "lumine-code",
   "version": "1.0.0",
   "main": "./lib/main",
   "types": "./lib/main.d.ts",
@@ -11,55 +12,63 @@
   },
   "configSchema": {
     "quickJumpToFileSymbol": {
-      "default": true,
-      "type": "boolean",
       "order": 1,
-      "description": "Automatically visit selected file-symbols as you navigate the symbols list."
+      "title": "Quick Jump To File Symbol",
+      "description": "Automatically visit selected file-symbols as you navigate the symbols list.",
+      "type": "boolean",
+      "default": true
     },
     "showIconsInSymbolsView": {
-      "default": true,
-      "type": "boolean",
       "order": 2,
-      "description": "When enabled, an icon will be shown alongside a symbol if the symbol provider specifies one."
+      "title": "Show Icons In Symbols View",
+      "description": "When enabled, an icon will be shown alongside a symbol if the symbol provider specifies one.",
+      "type": "boolean",
+      "default": true
     },
     "useBadgeColors": {
-      "default": false,
-      "type": "boolean",
       "order": 3,
-      "description": "Whether to use an assortment of colors for symbol badges. If enabled, each badge will be one of sixteen colors based on its text. Badge colors are generated automatically as hue variants of your theme’s ordinary badge color."
+      "title": "Use Badge Colors",
+      "description": "Whether to use an assortment of colors for symbol badges. If enabled, each badge will be one of sixteen colors based on its text. Badge colors are generated automatically as hue variants of your theme’s ordinary badge color.",
+      "type": "boolean",
+      "default": false
     },
     "prefillSelectedText": {
-      "default": true,
-      "type": "boolean",
       "order": 4,
-      "description": "When enabled, any text you may have selected in the active editor will be used as the search query in the symbols list."
+      "title": "Prefill Selected Text",
+      "description": "When enabled, any text you may have selected in the active editor will be used as the search query in the symbols list.",
+      "type": "boolean",
+      "default": true
     },
     "showProviderNamesInSymbolsView": {
-      "default": false,
-      "type": "boolean",
       "order": 5,
-      "description": "When enabled, the name of the provider will be shown alongside each result."
+      "title": "Show Provider Names In Symbols View",
+      "description": "When enabled, the name of the provider will be shown alongside each result.",
+      "type": "boolean",
+      "default": false
     },
     "preferCertainProviders": {
-      "default": [],
-      "type": "array",
       "order": 6,
+      "title": "Prefer Certain Providers",
+      "description": "A comma-separated list of preferred providers. Used to help break ties when more than one provider can contribute symbols. Anything on this list will be preferred over anything not on this list, and earlier items will be preferred over later items. (A provider can be identified by its official name or its package name; run the **Symbols View: Show Active Providers** command to see both values.)",
+      "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "A comma-separated list of preferred providers. Used to help break ties when more than one provider can contribute symbols. Anything on this list will be preferred over anything not on this list, and earlier items will be preferred over later items. (A provider can be identified by its official name or its package name; run the **Symbols View: Show Active Providers** command to see both values.)"
+      "default": []
     },
     "providerTimeout": {
-      "default": 2000,
-      "type": "number",
       "order": 7,
-      "description": "How long providers have to respond to symbol requests before this package gives up and shows the list. If a certain provider is particularly slow, you may have to increase this value. (Does not apply to project-wide symbol search **if** the list is already visible.)"
+      "title": "Provider Timeout",
+      "description": "How long providers have to respond to symbol requests before this package gives up and shows the list. If a certain provider is particularly slow, you may have to increase this value. (Does not apply to project-wide symbol search **if** the list is already visible.)",
+      "type": "number",
+      "default": 2000
     },
     "enableDebugLogging": {
-      "default": false,
+      "order": 8,
+      "title": "Enable Debug Logging",
+      "description": "Whether to log certain diagnostic information to the console. (For example: which provider is chosen for a given task.)",
       "type": "boolean",
-      "order": 10,
-      "description": "Whether to log certain diagnostic information to the console. (For example: which provider is chosen for a given task.)"
+      "default": false
     }
   },
   "consumedServices": {

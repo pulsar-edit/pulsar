@@ -1,46 +1,30 @@
-# Bracket Matcher package
+# bracket-matcher
 
-Highlights and jumps between `[]`, `()`, and `{}`. Also highlights matching XML
-and HTML tags.
+Highlights and jumps between matching brackets, and autocompletes brackets and quotes.
 
-Autocompletes `[]`, `()`, `{}`, `""`, `''`, `“”`, `‘’`, `«»`, `‹›`, and
-backticks by default.
+## Features
 
-Use <kbd>ctrl-m</kbd> to jump to the bracket matching the one adjacent to the cursor.
-It jumps to the nearest enclosing bracket when there's no adjacent bracket,
+- **Bracket highlighting**: highlights the bracket matching the `(){}[]` character under the cursor.
+- **Tag matching**: highlights matching XML and HTML tags.
+- **Autocompletion**: inserts the closing bracket or quote when an opening one is typed.
+- **Selection wrapping**: wraps selected text in brackets or quotes when the opening character is typed.
+- **Scoped pairs**: customizes matching pairs globally or per language.
 
-Use <kbd>ctrl-cmd-m</kbd> to select all the text inside the current brackets.
+## Commands
 
-Use <kbd>alt-cmd-.</kbd> to close the current XML/HTML tag.
+Commands available in `atom-text-editor`:
 
----
+- `bracket-matcher:go-to-matching-bracket`: move the cursor to the matching bracket,
+- `bracket-matcher:go-to-enclosing-bracket`: move the cursor to the nearest enclosing bracket,
+- `bracket-matcher:select-inside-brackets`: select the text inside the current brackets,
+- `bracket-matcher:select-matching-brackets`: select both matching brackets,
+- `bracket-matcher:remove-matching-brackets`: remove both matching brackets,
+- `bracket-matcher:remove-brackets-from-selection`: remove the brackets surrounding the selection,
+- `bracket-matcher:close-tag`: close the current XML/HTML tag.
 
-### Configuration
+## Configuration
 
-Matching brackets and quotes are sensibly inserted for you. If you dislike this
-functionality, you can disable it from the Bracket Matcher section of the
-Settings View.
-
-#### Custom Pairs
-
-You can customize matching pairs in Bracket Matcher at any time. You can do so either globally via the Settings View or at the scope level via your `config.cson`. Changes take effect immediately.
-
-- **Autocomplete Characters** - Comma-separated pairs that the editor will treat as brackets / quotes. Entries in this field override the package defaults.
-  - For example: `<>, (), []`
-
-- **Pairs With Extra Newline** - Comma-separated pairs that enhance the editor's auto indent feature. When used, a newline is automatically added between the pair when enter is pressed between them. Note: This feature is meant to be used in combination with brackets defined for indentation by the active language package (`increaseIndentPattern` / `decreaseIndentPattern`).
-  Example:
-
-```
-fn main() {
-    | <---- Cursor positioned at one indent level higher
-}
-```
-
-#### Scoped settings
-
-In addition to the global settings, you are also able to add scope-specific modifications to Lumine in your `config.cson`. This is especially useful for editor rule changes specific to each language. Scope-specific settings override package defaults _and_ global settings.
-Example:
+Matching pairs can be customized per language through scoped settings in your `config.cson`, overriding the package defaults. Changes take effect immediately. For example:
 
 ```cson
 ".rust.source":
@@ -54,3 +38,7 @@ Example:
       "``"
     ]
 ```
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!

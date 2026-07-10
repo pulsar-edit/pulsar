@@ -1,8 +1,9 @@
 {
   "name": "one-light-syntax",
+  "author": "lumine-code",
   "theme": "syntax",
-  "version": "1.8.4",
-  "description": "One light syntax theme developed for Atom, repurposed for Lumine",
+  "version": "1.0.0",
+  "description": "One light syntax theme for Lumine",
   "keywords": [
     "light",
     "syntax"
@@ -10,6 +11,6 @@
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "engines": {
-    "atom": ">0.40.0"
+    "atom": "*"
   }
 }

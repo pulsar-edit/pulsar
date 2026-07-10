@@ -1,8 +1,9 @@
 {
   "name": "language-php",
-  "version": "0.48.1",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "lib/main",
-  "description": "PHP language support in Atom",
+  "description": "PHP language support in Lumine",
   "engines": {
     "atom": "*",
     "node": ">=12"

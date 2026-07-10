@@ -1,15 +1,16 @@
 {
   "name": "tree-view",
-  "version": "0.9.3",
+  "author": "lumine-code",
+  "version": "1.0.0",
   "main": "./lib/main",
-  "description": "Enhanced tree view for exploring and opening project files",
-  "repository": "https://github.com/asiloisad/pulsar-tree-view",
+  "description": "Enhanced tree view for exploring and opening project files in Lumine",
+  "repository": "https://github.com/lumine-code/lumine",
   "bugs": {
-    "url": "https://github.com/asiloisad/pulsar-tree-view/issues"
+    "url": "https://github.com/lumine-code/lumine/issues"
   },
   "license": "MIT",
   "engines": {
-    "atom": ">=1.132.0 <2.0.0"
+    "atom": "*"
   },
   "dependencies": {
     "minimatch": "^10.2.5",
@@ -72,8 +73,9 @@
   "configSchema": {
     "sortMethod": {
       "order": 1,
+      "title": "Sort Method",
+      "description": "Method used to sort files and directories in the tree view.",
       "type": "string",
-      "default": "default",
       "enum": [
         {
           "value": "default",
@@ -84,24 +86,27 @@
           "description": "Natural sort (alphabetical and numbers)"
         }
       ],
-      "description": "Method used to sort files and directories in the tree view."
+      "default": "default"
     },
     "sortFoldersBeforeFiles": {
       "order": 2,
+      "title": "Sort Folders Before Files",
+      "description": "When listing directory items, list subdirectories before listing files.",
       "type": "boolean",
-      "default": true,
-      "description": "When listing directory items, list subdirectories before listing files."
+      "default": true
     },
     "sortByBase": {
       "order": 3,
+      "title": "Sort By Base",
+      "description": "Sort by filename base and extension independently. Files with the same base name are grouped together.",
       "type": "boolean",
-      "default": true,
-      "description": "Sort by filename base and extension independently. Files with the same base name are grouped together."
+      "default": true
     },
     "duplicateCopyNameStyle": {
       "order": 4,
+      "title": "Duplicate Copy Name Style",
+      "description": "Naming style used when copy-pasting an entry where an item with the same name already exists.",
       "type": "string",
-      "default": "system",
       "enum": [
         {
           "value": "system",
@@ -124,69 +129,77 @@
           "description": "Linux/GNOME style: file (copy).txt, file (another copy).txt"
         }
       ],
-      "description": "Naming style used when copy-pasting an entry where an item with the same name already exists."
+      "default": "system"
     },
     "showOnRightSide": {
       "order": 5,
+      "title": "Show On Right Side",
+      "description": "Show the tree view on the right side of the workspace.",
       "type": "boolean",
-      "default": false,
-      "description": "Show the tree view on the right side of the workspace."
+      "default": false
     },
     "squashDirectoryNames": {
       "order": 6,
-      "type": "boolean",
-      "default": false,
       "title": "Collapse directories",
-      "description": "Collapse directories that only contain a single directory."
+      "description": "Collapse directories that only contain a single directory.",
+      "type": "boolean",
+      "default": false
     },
     "hideVcsIgnoredFiles": {
       "order": 7,
-      "type": "boolean",
-      "default": false,
       "title": "Hide VCS Ignored Files",
-      "description": "Don't show files and directories ignored by the current project's VCS system. For example, projects using Git have these paths defined in their `.gitignore` file."
+      "description": "Don't show files and directories ignored by the current project's VCS system. For example, projects using Git have these paths defined in their `.gitignore` file.",
+      "type": "boolean",
+      "default": false
     },
     "hideIgnoredNames": {
       "order": 8,
+      "title": "Hide Ignored Names",
+      "description": "Don't show items matched by the `Ignored Names` core config setting.",
       "type": "boolean",
-      "default": false,
-      "description": "Don't show items matched by the `Ignored Names` core config setting."
+      "default": false
     },
     "autoReveal": {
       "order": 9,
+      "title": "Auto Reveal",
+      "description": "Reveal tree view entries when they become the active pane item.",
       "type": "boolean",
-      "default": false,
-      "description": "Reveal tree view entries when they become the active pane item."
+      "default": false
     },
     "focusOnReveal": {
       "order": 10,
+      "title": "Focus On Reveal",
+      "description": "Focus the tree view when revealing entries.",
       "type": "boolean",
-      "default": true,
-      "description": "Focus the tree view when revealing entries."
+      "default": true
     },
     "alwaysOpenExisting": {
       "order": 11,
+      "title": "Always Open Existing",
+      "description": "When opening a file, always focus an already-existing view of the file even if it's in another pane.",
       "type": "boolean",
-      "default": false,
-      "description": "When opening a file, always focus an already-existing view of the file even if it's in another pane."
+      "default": false
     },
     "hiddenOnStartup": {
       "order": 12,
+      "title": "Hidden On Startup",
+      "description": "When Lumine is opened, the view is hidden.",
       "type": "boolean",
-      "default": false,
-      "description": "When Pulsar is opened, the view is hidden."
+      "default": false
     },
     "fileDoubleClick": {
       "order": 13,
+      "title": "File Double Click",
+      "description": "Require double click to open files. When enabled, single click only selects the entry.",
       "type": "boolean",
-      "default": false,
-      "description": "Require double click to open files. When enabled, single click only selects the entry."
+      "default": false
     },
     "dirDoubleClick": {
       "order": 14,
+      "title": "Dir Double Click",
+      "description": "Require double click to expand/collapse folders. When enabled, single click only selects the entry. The arrow icon always responds to a single click.",
       "type": "boolean",
-      "default": false,
-      "description": "Require double click to expand/collapse folders. When enabled, single click only selects the entry. The arrow icon always responds to a single click."
+      "default": false
     }
   }
 }

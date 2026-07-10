@@ -1,10 +1,32 @@
-# Keybinding Resolver package
+# keybinding-resolver
 
-Shows what commands a keybinding resolves to.
+Show what commands a keybinding resolves to.
 
-You can open and close the resolver using <kbd>Cmd+.</kbd> (macOS) or <kbd>Ctrl+.</kbd> (Linux and Windows).
+## Features
 
-Please note the clipboard icon which can be selected to copy the given keybinding
-directive so that you can easily paste it into your keymap files.
+- **Keybinding inspection**: displays every command a pressed keybinding maps to.
+- **Resolution order**: highlights which binding wins and which are shadowed.
+- **Copy directive**: copies the selected keybinding directive so you can paste it into a keymap file.
 
-![](https://user-images.githubusercontent.com/4137660/44482876-8de73a80-a617-11e8-8bd5-24023c96b39e.png)
+## Commands
+
+Commands available in `atom-workspace`:
+
+- `key-binding-resolver:toggle`: open or close the keybinding resolver panel.
+
+## Customization
+
+Restyle the resolver panel by adding CSS to your `styles.less`:
+
+```less
+.key-binding-resolver {
+  font-size: 13px;
+  .panel-heading {
+    background-color: fade(blue, 10%);
+  }
+}
+```
+
+## Contributing
+
+Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!
