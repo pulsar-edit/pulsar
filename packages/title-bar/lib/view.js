@@ -64,17 +64,13 @@ class TitleBarView {
     this.handleTitleBarDoubleClick = this.handleTitleBarDoubleClick.bind(this);
     this.element.addEventListener("dblclick", this.handleTitleBarDoubleClick);
 
-    this.titleObserver = new MutationObserver((mutations) => {
-      mutations.forEach((o) => {
-        if (o.type === "childList") {
-          this.setTitleText(o.target.textContent || "Lumine");
-        }
-      });
-    });
+    // Chromium updates an existing <title> text node in place (characterData
+    // mutation on the child), so childList alone misses most title changes
+    this.titleObserver = new MutationObserver(() => this.updateTitleText());
 
     const realTitle = document.querySelector("title");
     if (realTitle !== null) {
-      this.titleObserver.observe(realTitle, { childList: true });
+      this.titleObserver.observe(realTitle, { childList: true, characterData: true, subtree: true });
     }
 
     const menuTemplate = MenuUpdater.getTemplate();
@@ -393,11 +389,6 @@ class TitleBarView {
   setMenuBarVisible(flag) {
     this.menuBarVisible = flag;
     Utils.setToggleClass(this.appMenu.getElement(), "no-menu-bar", !flag);
-  }
-
-  setTitleText(title) {
-    this.titleElement.textContent = title;
-    this.debouncedCheckTitleCollision();
   }
 
   updateTitleText() {
