@@ -2096,6 +2096,10 @@ module.exports = class Workspace extends Model {
   //     opens and will restore the previously selected element when the modal closes. Lumine will
   //     also automatically restrict user tab focus within your modal while it is open.
   //     (default: false)
+  //   * `restoreFocus` (optional) {Boolean} false if you want to manage focus restoration
+  //     yourself. By default, when a modal panel is hidden, focus returns to the element
+  //     that was focused before the modal opened — or, for chained modals, before the
+  //     first modal in the chain opened. (default: true)
   //
   // Returns a {Panel}
   addModalPanel(options = {}) {

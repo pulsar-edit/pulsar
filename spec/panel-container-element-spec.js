@@ -241,5 +241,74 @@ describe("PanelContainerElement", () => {
         expect(document.activeElement).toBe(previousActiveElement);
       });
     });
+
+    describe("restoreFocus", () => {
+      let outsideEl;
+
+      function createPanel(options = {}) {
+        const panel = new Panel(
+          { item: new TestPanelContainerItem(), visible: false, ...options },
+          atom.views,
+        );
+        container.addPanel(panel);
+        const inputEl = document.createElement("input");
+        panel.getElement().appendChild(inputEl);
+        return [panel, inputEl];
+      }
+
+      beforeEach(() => {
+        outsideEl = document.createElement("input");
+        jasmineContent.appendChild(outsideEl);
+        outsideEl.focus();
+      });
+
+      it("returns focus to the previously focused element when the panel hides", () => {
+        const [panel, inputEl] = createPanel();
+
+        panel.show();
+        inputEl.focus();
+        panel.hide();
+
+        expect(document.activeElement).toBe(outsideEl);
+      });
+
+      it("returns focus to the element focused before the first modal in a chain", () => {
+        const [panelA, inputA] = createPanel();
+        const [panelB, inputB] = createPanel();
+
+        panelA.show();
+        inputA.focus();
+
+        panelB.show(); // hides panelA
+        inputB.focus();
+        expect(panelA.isVisible()).toBe(false);
+
+        panelB.hide();
+        expect(document.activeElement).toBe(outsideEl);
+      });
+
+      it("does not steal focus when the user has already focused elsewhere", () => {
+        const [panel, inputEl] = createPanel();
+        const otherEl = document.createElement("input");
+        jasmineContent.appendChild(otherEl);
+
+        panel.show();
+        inputEl.focus();
+        otherEl.focus();
+        panel.hide();
+
+        expect(document.activeElement).toBe(otherEl);
+      });
+
+      it("does nothing when restoreFocus is disabled", () => {
+        const [panel, inputEl] = createPanel({ restoreFocus: false });
+
+        panel.show();
+        inputEl.focus();
+        panel.hide();
+
+        expect(document.activeElement).not.toBe(outsideEl);
+      });
+    });
   });
 });

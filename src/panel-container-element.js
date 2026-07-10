@@ -61,6 +61,19 @@ class PanelContainerElement extends HTMLElement {
         }),
       );
 
+      if (panel.restoreFocus) {
+        if (panel.isVisible()) this.capturePriorFocus();
+        this.subscriptions.add(
+          panel.onDidChangeVisible((visible) => {
+            if (visible) {
+              this.capturePriorFocus();
+            } else {
+              this.restorePriorFocus(panelElement);
+            }
+          }),
+        );
+      }
+
       if (panel.autoFocus) {
         const focusOptions = {
           // focus-trap will attempt to give focus to the first tabbable element
@@ -71,6 +84,9 @@ class PanelContainerElement extends HTMLElement {
           // on visibility changes
           escapeDeactivates: false,
           delayInitialFocus: false,
+          // focus restoration is handled centrally by the container, which
+          // tracks focus across chained modals instead of per activation
+          returnFocusOnDeactivate: false,
         };
 
         if (panel.autoFocus !== true) {
@@ -96,6 +112,34 @@ class PanelContainerElement extends HTMLElement {
     if (this.parentNode != null) {
       this.parentNode.removeChild(this);
     }
+  }
+
+  // Remembers where focus was before a modal opened. When modals open on top
+  // of each other, only the element focused before the first modal is kept.
+  capturePriorFocus() {
+    const active = document.activeElement;
+    if (active && active !== document.body && !this.contains(active)) {
+      this.priorFocus = active;
+    }
+  }
+
+  restorePriorFocus(panelElement) {
+    if (!this.priorFocus) return;
+
+    // another modal took over — keep the prior focus for when it closes
+    if (this.model.getPanels().some((panel) => panel.isVisible())) return;
+
+    // the user moved focus elsewhere themselves — don't steal it back
+    const active = document.activeElement;
+    if (active && active !== document.body && !panelElement.contains(active)) return;
+
+    if (this.priorFocus.isConnected) {
+      this.priorFocus.focus();
+    } else if (typeof atom !== "undefined") {
+      const pane = atom.workspace.getActivePane();
+      if (pane) pane.activate();
+    }
+    this.priorFocus = null;
   }
 
   hideAllPanelsExcept(excludedPanel) {

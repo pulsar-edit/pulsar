@@ -10,10 +10,11 @@ module.exports = class Panel {
   Section: Construction and Destruction
   */
 
-  constructor({ item, autoFocus, visible, priority, className }, viewRegistry) {
+  constructor({ item, autoFocus, restoreFocus, visible, priority, className }, viewRegistry) {
     this.destroyed = false;
     this.item = item;
     this.autoFocus = autoFocus == null ? false : autoFocus;
+    this.restoreFocus = restoreFocus == null ? true : restoreFocus;
     this.visible = visible == null ? true : visible;
     this.priority = priority == null ? 100 : priority;
     this.className = className;

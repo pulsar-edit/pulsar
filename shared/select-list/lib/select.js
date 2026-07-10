@@ -160,11 +160,6 @@ class SelectListView {
       this.props.willShow();
     }
 
-    const active = document.activeElement;
-    if (active && !active.closest(".modal")) {
-      document.priorFocus = active;
-    }
-
     this.refs.queryEditor.selectAll();
 
     if (!this.panel) {
@@ -176,7 +171,8 @@ class SelectListView {
   }
 
   /**
-   * Hides the select list and restores focus to the previously focused element.
+   * Hides the select list. Focus returns to the previously focused element
+   * via the workspace's modal panel focus restoration.
    */
   hide() {
     if (!this.isVisible()) {
@@ -185,11 +181,6 @@ class SelectListView {
 
     if (this.panel) {
       this.panel.hide();
-    }
-
-    if (document.priorFocus) {
-      document.priorFocus.focus();
-      delete document.priorFocus;
     }
   }
 
