@@ -200,7 +200,6 @@ describe("TextEditorComponent", () => {
         expect(actualWidth).toBe(expectedWidth + "px");
       }
 
-       
       {
         // Make sure we do not throw an error if a synchronous update is
         // triggered before measuring the longest line from a
@@ -557,51 +556,6 @@ describe("TextEditorComponent", () => {
       await component.getNextUpdatePromise();
       cursorNodes = Array.from(element.querySelectorAll(".cursor"));
       expect(cursorNodes.length).toBe(0);
-    });
-
-    it("hides cursors with non-empty selections when showCursorOnSelection is false", async () => {
-      const { component, element, editor } = buildComponent();
-      editor.setSelectedScreenRanges([
-        [
-          [0, 0],
-          [0, 3],
-        ],
-        [
-          [1, 0],
-          [1, 0],
-        ],
-      ]);
-      await component.getNextUpdatePromise();
-      {
-        const cursorNodes = Array.from(element.querySelectorAll(".cursor"));
-        expect(cursorNodes.length).toBe(2);
-        verifyCursorPosition(component, cursorNodes[0], 0, 3);
-        verifyCursorPosition(component, cursorNodes[1], 1, 0);
-      }
-
-      editor.update({ showCursorOnSelection: false });
-      await component.getNextUpdatePromise();
-      {
-        const cursorNodes = Array.from(element.querySelectorAll(".cursor"));
-        expect(cursorNodes.length).toBe(1);
-        verifyCursorPosition(component, cursorNodes[0], 1, 0);
-      }
-
-      editor.setSelectedScreenRanges([
-        [
-          [0, 0],
-          [0, 3],
-        ],
-        [
-          [1, 0],
-          [1, 4],
-        ],
-      ]);
-      await component.getNextUpdatePromise();
-      {
-        const cursorNodes = Array.from(element.querySelectorAll(".cursor"));
-        expect(cursorNodes.length).toBe(0);
-      }
     });
 
     /**

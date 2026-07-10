@@ -99,11 +99,7 @@ module.exports = class PackageGeneratorView {
   }
 
   getPackagesDirectory() {
-    return (
-      process.env.ATOM_REPOS_HOME ||
-      atom.config.get("core.projectHome") ||
-      path.join(fs.getHomeDirectory(), "github")
-    );
+    return path.join(atom.getConfigDirPath(), "packages");
   }
 
   validPackagePath() {
@@ -138,7 +134,7 @@ module.exports = class PackageGeneratorView {
     this.runCommand(atom.packages.getApmPath(), args, callback);
   }
 
-  isStoredInDotAtom(packagePath) {
+  isStoredInConfigPackagesDirectory(packagePath) {
     const packagesPath = path.join(atom.getConfigDirPath(), "packages", path.sep);
     if (packagePath.startsWith(packagesPath)) return true;
 
@@ -149,7 +145,7 @@ module.exports = class PackageGeneratorView {
   createPackageFiles(callback) {
     const packagePath = this.getPackagePath();
 
-    if (this.isStoredInDotAtom(packagePath)) {
+    if (this.isStoredInConfigPackagesDirectory(packagePath)) {
       this.initPackage(packagePath, callback);
     } else {
       this.initPackage(packagePath, () => this.linkPackage(packagePath, callback));

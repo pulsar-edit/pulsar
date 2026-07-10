@@ -98,9 +98,7 @@ class AtomEnvironment {
       properties: _.clone(ConfigSchema),
     });
 
-    this.stateStore = new StateStore("AtomEnvironments", 1, {
-      config: this.config,
-    });
+    this.stateStore = new StateStore("AtomEnvironments", 1);
 
     /** @type {KeymapManager} */
     this.keymaps = new KeymapManager({
@@ -143,7 +141,6 @@ class AtomEnvironment {
       styleManager: this.styles,
       notificationManager: this.notifications,
       viewRegistry: this.views,
-      applicationDelegate: this.applicationDelegate,
     });
 
     /** @type {MenuManager} */
@@ -255,16 +252,8 @@ class AtomEnvironment {
       configDirPath: this.getConfigDirPath(),
     });
 
-    ConfigSchema.projectHome = {
-      type: "string",
-      default: path.join(fs.getHomeDirectory(), "github"),
-      description:
-        "The directory where projects are assumed to be located. Packages created using the Package Generator will be stored here by default.",
-    };
-
     this.config.initialize({
       mainSource: this.enablePersistence && path.join(this.configDirPath, "config.cson"),
-      projectHomeSchema: ConfigSchema.projectHome,
     });
     this.config.resetUserSettings(userSettings);
 
@@ -405,6 +394,7 @@ class AtomEnvironment {
   observeAutoHideMenuBar() {
     this.disposables.add(
       this.config.onDidChange("core.autoHideMenuBar", ({ newValue }) => {
+        if (newValue === undefined) { newValue = true; }
         this.setAutoHideMenuBar(newValue);
       }),
     );
@@ -1172,12 +1162,11 @@ class AtomEnvironment {
   }
 
   /**
-   * Visually and audibly trigger a beep.
+   * Visually trigger a beep.
    * @fires beep
    * @category Messaging the User
    */
   beep() {
-    if (this.config.get("core.audioBeep")) this.applicationDelegate.playBeepSound();
     this.emitter.emit("did-beep");
   }
 

@@ -430,15 +430,11 @@ class Config {
     this.initialize(params);
   }
 
-  initialize({ saveCallback, mainSource, projectHomeSchema }) {
+  initialize({ saveCallback, mainSource }) {
     if (saveCallback) {
       this.saveCallback = saveCallback;
     }
     if (mainSource) this.mainSource = mainSource;
-    if (projectHomeSchema) {
-      this.schema.properties.core.properties.projectHome = projectHomeSchema;
-      this.defaultSettings.core.projectHome = projectHomeSchema.default;
-    }
   }
 
   clear() {

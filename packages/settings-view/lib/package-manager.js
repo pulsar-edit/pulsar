@@ -160,11 +160,6 @@ module.exports = class PackageManager {
     }, callback);
   }
 
-  getVersionPinnedPackages() {
-    let left;
-    return (left = atom.config.get("core.versionPinnedPackages")) != null ? left : [];
-  }
-
   clearOutdatedCache() {
     return (this.apmCache.loadOutdated = {
       value: null,
@@ -606,13 +601,9 @@ module.exports = class PackageManager {
 
   async getGitPackageUpdates() {
     const updates = [];
-    const pinnedPackages = this.getVersionPinnedPackages();
     const gitPackages = this.getLocalPackages().git;
 
     for (const pack of gitPackages) {
-      if (pinnedPackages.includes(pack.name)) {
-        continue;
-      }
       const source = pack.apmInstallSource && pack.apmInstallSource.source;
       const currentSha = pack.apmInstallSource && pack.apmInstallSource.sha;
       if (!source || !currentSha) {

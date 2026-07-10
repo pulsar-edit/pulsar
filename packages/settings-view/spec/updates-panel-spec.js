@@ -39,20 +39,6 @@ describe("UpdatesPanel", function () {
     expect(panel.refs.noUpdatesMessage.style.display).not.toBe("none");
   });
 
-  describe("version pinned packages message", function () {
-    it("shows a message when there are pinned version packages", function () {
-      spyOn(packageManager, "getVersionPinnedPackages").andReturn(["foo", "bar", "baz"]);
-      panel.beforeShow({ updates: [] });
-      expect(panel.refs.versionPinnedPackagesMessage.style.display).not.toBe("none");
-    });
-
-    it("does not show a message when there are no version pinned packages", function () {
-      spyOn(packageManager, "getVersionPinnedPackages").andReturn([]);
-      panel.beforeShow({ updates: [] });
-      expect(panel.refs.versionPinnedPackagesMessage.style.display).toBe("none");
-    });
-  });
-
   describe("the Update All button", function () {
     const packA = {
       name: "test-package-a",

@@ -169,8 +169,6 @@ module.exports = class TextEditor {
     this.softWrapped = params.softWrapped;
     this.softWrapAtPreferredLineLength = params.softWrapAtPreferredLineLength;
     this.preferredLineLength = params.preferredLineLength;
-    this.showCursorOnSelection =
-      params.showCursorOnSelection != null ? params.showCursorOnSelection : true;
     this.maxScreenLineLength = params.maxScreenLineLength;
     this.softTabs = params.softTabs != null ? params.softTabs : true;
     this.autoIndent = params.autoIndent != null ? params.autoIndent : true;
@@ -491,10 +489,6 @@ module.exports = class TextEditor {
           this.updateAutoWidth(value, false);
           break;
 
-        case "showCursorOnSelection":
-          this.updateShowCursorOnSelection(value, false);
-          break;
-
         default:
           if (param !== "ref" && param !== "key") {
             throw new TypeError(`Invalid TextEditor parameter: '${param}'`);
@@ -741,14 +735,6 @@ module.exports = class TextEditor {
   updateAutoWidth(value, finish) {
     if (value !== this.autoWidth) {
       this.autoWidth = value;
-    }
-    if (finish) this.finishUpdate();
-  }
-
-  updateShowCursorOnSelection(value, finish) {
-    if (value !== this.showCursorOnSelection) {
-      this.showCursorOnSelection = value;
-      if (this.component) this.component.scheduleUpdate();
     }
     if (finish) this.finishUpdate();
   }
@@ -1237,7 +1223,6 @@ module.exports = class TextEditor {
       // Inherit scrollPastEnd so a copy scrolled into the past-end zone has the
       // room to restore the same visual position instead of clamping.
       scrollPastEnd: this.scrollPastEnd,
-      showCursorOnSelection: this.showCursorOnSelection,
     });
   }
 
@@ -3312,7 +3297,6 @@ module.exports = class TextEditor {
     const cursor = new Cursor({
       editor: this,
       marker,
-      showCursorOnSelection: this.showCursorOnSelection,
     });
     this.cursors.push(cursor);
     this.cursorsByMarkerId.set(marker.id, cursor);
@@ -5023,13 +5007,6 @@ module.exports = class TextEditor {
   // Returns a non-negative {Number}.
   getSoftWrapDebounceInterval() {
     return this.softWrapDebounceInterval;
-  }
-
-  // Experimental: Does this editor show cursors while there is a selection?
-  //
-  // Returns a positive {Boolean}.
-  getShowCursorOnSelection() {
-    return this.showCursorOnSelection;
   }
 
   // Experimental: Are line numbers enabled for this editor?

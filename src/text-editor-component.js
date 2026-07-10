@@ -1149,7 +1149,6 @@ module.exports = class TextEditorComponent {
 
   addCursorDecorationToMeasure(decoration, marker, screenRange, reversed) {
     const { model } = this.props;
-    if (!model.getShowCursorOnSelection() && !screenRange.isEmpty()) return;
 
     let decorationToMeasure = this.decorationsToMeasure.cursors.get(marker);
     if (!decorationToMeasure) {

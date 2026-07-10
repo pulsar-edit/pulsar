@@ -1,12 +1,10 @@
 "use strict";
-const IndexedDB = require("./state-store/indexed-db");
 const SQL = require("./state-store/sql");
 
 module.exports = class StateStore {
-  constructor(databaseName, version, { config }) {
+  constructor(databaseName, version) {
     this.databaseName = databaseName;
     this.version = version;
-    this.config = config;
   }
 
   initialize({ configDirPath }) {
@@ -14,8 +12,7 @@ module.exports = class StateStore {
   }
 
   isConnected() {
-    let impl = this._getImplementation();
-    return impl?.isConnected() ?? false;
+    return this.sql?.isConnected() ?? false;
   }
 
   connect() {
@@ -47,26 +44,13 @@ module.exports = class StateStore {
     return this._getOrCreateImplementation().dbPromise;
   }
 
-  _getImplementation() {
-    if (this.config.get("core.useLegacySessionStore")) {
-      return this.indexed;
-    } else {
-      return this.sql;
-    }
-  }
-
   _getOrCreateImplementation() {
-    if (this.config.get("core.useLegacySessionStore")) {
-      this.indexed ??= new IndexedDB(this.databaseName, this.version);
-      return this.indexed;
-    } else {
-      if (!this.configDirPath) {
-        throw new Error(`state-store: Must initialize with configDirPath`);
-      }
-      this.sql ??= new SQL(this.databaseName, this.version, {
-        storagePath: this.configDirPath,
-      });
-      return this.sql;
+    if (!this.configDirPath) {
+      throw new Error(`state-store: Must initialize with configDirPath`);
     }
+    this.sql ??= new SQL(this.databaseName, this.version, {
+      storagePath: this.configDirPath,
+    });
+    return this.sql;
   }
 };

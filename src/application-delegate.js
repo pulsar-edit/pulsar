@@ -1,4 +1,4 @@
-const { ipcRenderer, shell } = require("electron");
+const { ipcRenderer } = require("electron");
 const remote = require("@electron/remote");
 const ipcHelpers = require("./ipc-helpers");
 const { Emitter, Disposable } = require("event-kit");
@@ -28,10 +28,6 @@ module.exports = class ApplicationDelegate {
 
   open(params) {
     return ipcRenderer.send("open", params);
-  }
-
-  setWindowTheme(params) {
-    return ipcRenderer.send("setWindowTheme", params);
   }
 
   pickFolder(callback) {
@@ -283,10 +279,6 @@ module.exports = class ApplicationDelegate {
       }
       return this.getCurrentWindow().showSaveDialog(options);
     }
-  }
-
-  playBeepSound() {
-    return shell.beep();
   }
 
   onDidOpenLocations(callback) {

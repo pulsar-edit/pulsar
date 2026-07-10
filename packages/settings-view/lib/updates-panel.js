@@ -111,11 +111,6 @@ export default class UpdatesPanel {
               </div>
             </div>
 
-            <div ref="versionPinnedPackagesMessage" className="alert alert-warning icon icon-alert">
-              The following packages are pinned to their current version and are not being checked
-              for updates:{" "}
-              <strong>{this.packageManager.getVersionPinnedPackages().join(", ")}</strong>
-            </div>
             <div ref="updateErrors" />
             <div
               ref="checkingMessage"
@@ -154,10 +149,6 @@ export default class UpdatesPanel {
       this.availableUpdates = [];
       this.clearPackageCards();
       this.checkForUpdates();
-    }
-
-    if (this.packageManager.getVersionPinnedPackages().length === 0) {
-      this.refs.versionPinnedPackagesMessage.style.display = "none";
     }
   }
 

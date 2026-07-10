@@ -5,7 +5,6 @@ const _ = require("underscore-plus");
 const { Emitter } = require("event-kit");
 const fs = require("fs-plus");
 const LessCompileCache = require("./less-compile-cache");
-const Color = require("./color");
 
 // Keeping a reference to the entire object so that it can be mocked more
 // easily in the specs.
@@ -19,15 +18,7 @@ async function wait(ms) {
 //
 // An instance of this class is always available as the `atom.themes` global.
 module.exports = class ThemeManager {
-  constructor({
-    packageManager,
-    config,
-    styleManager,
-    notificationManager,
-    viewRegistry,
-    applicationDelegate,
-  }) {
-    this.applicationDelegate = applicationDelegate;
+  constructor({ packageManager, config, styleManager, notificationManager, viewRegistry }) {
     this.packageManager = packageManager;
     this.config = config;
     this.styleManager = styleManager;
@@ -377,20 +368,6 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     return this.styleSheetDisposablesBySourcePath[path];
   }
 
-  refreshWindowTheme() {
-    let bgColor = Color.parse(getComputedStyle(document.documentElement).backgroundColor);
-
-    let luminosity = 0.2126 * bgColor.red + 0.7152 * bgColor.green + 0.0722 * bgColor.blue;
-    // ^^ Luminosity per ITU-R BT.709
-    if (luminosity < 40) {
-      // Considered Dark
-      this.applicationDelegate.setWindowTheme("dark");
-    } else {
-      // Considered Bright
-      this.applicationDelegate.setWindowTheme("light");
-    }
-  }
-
   activateThemes() {
     return new Promise((resolve) => {
       // @config.observe runs the callback once, then on subsequent changes.
@@ -413,9 +390,6 @@ On Linux there are currently problems with watch sizes. See [this document][watc
             this.refreshLessCache(); // Update cache again now that @getActiveThemes() is populated
             await this.loadUserStylesheet();
             this.reloadBaseStylesheets();
-            if (this.config.get("editor.syncWindowThemeWithLumineTheme")) {
-              this.refreshWindowTheme();
-            }
             this.initialLoadComplete = true;
             this.emitter.emit("did-change-active-themes");
             resolve();

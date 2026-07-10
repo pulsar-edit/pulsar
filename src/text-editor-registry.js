@@ -9,7 +9,6 @@ const EDITOR_PARAMS_BY_SETTING_KEY = [
   ["editor.showInvisibles", "showInvisibles"],
   ["editor.tabLength", "tabLength"],
   ["editor.invisibles", "invisibles"],
-  ["editor.showCursorOnSelection", "showCursorOnSelection"],
   ["editor.showIndentGuide", "showIndentGuide"],
   ["editor.showLineNumbers", "showLineNumbers"],
   ["editor.softWrap", "softWrapped"],

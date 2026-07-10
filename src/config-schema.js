@@ -37,23 +37,6 @@ const configSchema = {
 
         description: "List of names of installed packages which are not loaded at startup.",
       },
-      titleBar: {
-        type: "string",
-        default: "hidden",
-        enum: ["hidden", "native"],
-        description:
-          "Internal title bar mode. Lumine starts with the native title bar hidden so packages can provide a custom title bar.",
-      },
-      versionPinnedPackages: {
-        type: "array",
-        default: [],
-
-        items: {
-          type: "string",
-        },
-
-        description: "List of names of installed packages which are not automatically updated.",
-      },
       customFileTypes: {
         type: "object",
         default: {},
@@ -92,12 +75,6 @@ const configSchema = {
           type: "string",
         },
         description: "Names of UI and syntax themes which will be used when Lumine starts.",
-      },
-      audioBeep: {
-        type: "boolean",
-        default: true,
-        description:
-          "Trigger the system's beep sound when certain actions cannot be executed or there are no results.",
       },
       closeDeletedFileTabs: {
         type: "boolean",
@@ -304,12 +281,6 @@ const configSchema = {
         description:
           "When selected 'no', a blank environment is loaded. When selected 'yes' and Lumine is started from the icon or `lumine` by itself from the command line, restores the last state of all Lumine windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Lumine windows always, no matter how Lumine is started.",
       },
-      automaticallyUpdate: {
-        description:
-          "Automatically update Lumine when a new release is available. **Note**: Currently not functional, please download new releases from [Lumine releases](https://github.com/lumine-code/lumine/releases)",
-        type: "boolean",
-        default: false,
-      },
       useProxySettingsWhenCallingApm: {
         title: "Use Proxy Settings When Calling PPM",
         description:
@@ -354,19 +325,6 @@ const configSchema = {
         title: "Use Tree-sitter Parsers",
         description: "Use Tree-sitter parsers for supported languages.",
       },
-      useLegacyTreeSitter: {
-        type: "boolean",
-        default: false,
-        title: "Use Legacy Tree-sitter Implementation",
-        description: "This setting no longer has any effect and will be removed soon.",
-      },
-      useLegacySessionStore: {
-        type: "boolean",
-        default: true,
-        title: "Use Legacy Session Store",
-        description:
-          "Opt into the legacy Atom session store (IndexedDB) instead of the new SQLite backend (We plan to remove this legacy system soon).",
-      },
       colorProfile: {
         description:
           "Specify whether Lumine should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Lumine to take effect.",
@@ -394,17 +352,6 @@ const configSchema = {
           "Whether Lumine should transform deprecated Mathematical Expressions in community package style sheets. Increases compatibility, as well as startup time.",
         type: "boolean",
         default: true,
-      },
-      addCurrentTabToWindowTitle: {
-        description: "Add the current tab title to the Lumine Window title.",
-        type: "boolean",
-        default: true,
-      },
-      syncWindowThemeWithLumineTheme: {
-        description:
-          "When changing the theme within Lumine also change the theme of the window on the operating system.",
-        type: "boolean",
-        default: false,
       },
     },
   },
@@ -458,11 +405,6 @@ const configSchema = {
         type: ["string", "number"],
         default: 1.5,
         description: "Height of editor lines, as a multiplier of font size.",
-      },
-      showCursorOnSelection: {
-        type: "boolean",
-        default: true,
-        description: "Show cursor while there is a selection.",
       },
       showInvisibles: {
         type: "boolean",
@@ -631,15 +573,6 @@ const configSchema = {
     },
   },
 };
-
-if (["win32", "linux"].includes(process.platform)) {
-  configSchema.core.properties.autoHideMenuBar = {
-    type: "boolean",
-    default: false,
-    description:
-      "Automatically hide the menu bar and toggle it by pressing Alt. This is only supported on Windows & Linux.",
-  };
-}
 
 if (process.platform === "darwin") {
   configSchema.core.properties.simpleFullScreenWindows = {

@@ -34,29 +34,11 @@ describe("Package Generator", () => {
         packageGeneratorView.attach(type);
         const editor = packageGeneratorView.miniEditor;
         expect(editor.getSelectedText()).toEqual(typeToSelectedTextMap.get(type));
-        const base = atom.config.get("core.projectHome");
+        const base = path.join(atom.getConfigDirPath(), "packages");
         expect(editor.getText()).toEqual(path.join(base, name));
       });
     });
   }
-
-  describe("when ATOM_REPOS_HOME is set", () => {
-    beforeEach(() => {
-      process.env.ATOM_REPOS_HOME = "/atom/repos/home";
-    });
-
-    afterEach(() => {
-      delete process.env.ATOM_REPOS_HOME;
-    });
-
-    it("overrides the default path", () => {
-      packageGeneratorView.attach("package");
-      const editor = packageGeneratorView.miniEditor;
-      expect(editor.getSelectedText()).toEqual("my-package");
-      const base = "/atom/repos/home";
-      expect(editor.getText()).toEqual(path.join(base, "my-package"));
-    });
-  });
 
   describe("when the modal panel is canceled", () => {
     it("detaches from the DOM and focuses the the previously focused element", () => {
@@ -143,7 +125,9 @@ describe("Package Generator", () => {
 
         const generatePackage = async (insidePackagesDirectory) => {
           const editor = packageGeneratorView.miniEditor;
-          spyOn(packageGeneratorView, "isStoredInDotAtom").andReturn(insidePackagesDirectory);
+          spyOn(packageGeneratorView, "isStoredInConfigPackagesDirectory").andReturn(
+            insidePackagesDirectory,
+          );
           expect(packageGeneratorView.element.parentElement).toBeTruthy();
           editor.setText(packagePath);
           apmExecute = spyOn(packageGeneratorView, "runCommand").andCallFake(

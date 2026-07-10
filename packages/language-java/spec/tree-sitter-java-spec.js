@@ -20,7 +20,6 @@ xdescribe("Tree-sitter based Java grammar", function () {
 
   beforeEach(function () {
     atom.config.set("core.useTreeSitterParsers", true);
-    atom.config.set("core.useLegacyTreeSitter", true);
 
     waitsForPromise(() => atom.packages.activatePackage("language-java"));
 

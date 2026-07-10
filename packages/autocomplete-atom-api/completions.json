@@ -148,7 +148,7 @@
       "name": "beep",
       "text": "beep()",
       "snippet": null,
-      "description": "Visually and audibly trigger a beep. ",
+      "description": "Visually trigger a beep. ",
       "descriptionMoreURL": "https://atom.io/docs/api/latest/AtomEnvironment#instance-beep",
       "type": "method"
     },

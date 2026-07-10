@@ -339,9 +339,7 @@ module.exports = class Workspace extends Model {
     this.textEditorRegistry = params.textEditorRegistry;
     this.styleManager = params.styleManager;
     this.draggingItem = false;
-    this.itemLocationStore = new StateStore("AtomPreviousItemLocations", 1, {
-      config: this.config,
-    });
+    this.itemLocationStore = new StateStore("AtomPreviousItemLocations", 1);
 
     this.emitter = new Emitter();
     this.openers = [];
@@ -524,12 +522,6 @@ module.exports = class Workspace extends Model {
     this.subscribeToAddedItems();
     this.subscribeToMovedItems();
     this.subscribeToDockToggling();
-
-    this.disposables.add(
-      this.config.onDidChange("core.addCurrentTabToWindowTitle", () => {
-        this.updateWindowTitle();
-      }),
-    );
   }
 
   consumeServices({ serviceHub }) {
@@ -814,15 +806,8 @@ module.exports = class Workspace extends Model {
     }
 
     const titleParts = [];
-    if (item != null && projectPath != null && this.config.get("core.addCurrentTabToWindowTitle")) {
+    if (item != null && projectPath != null) {
       titleParts.push(itemTitle, projectPath);
-      representedPath = itemPath != null ? itemPath : projectPath;
-    } else if (
-      item != null &&
-      projectPath != null &&
-      !this.config.get("core.addCurrentTabToWindowTitle")
-    ) {
-      titleParts.push(projectPath);
       representedPath = itemPath != null ? itemPath : projectPath;
     } else if (projectPath != null) {
       titleParts.push(projectPath);

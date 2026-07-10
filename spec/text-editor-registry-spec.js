@@ -310,13 +310,12 @@ describe("TextEditorRegistry", function () {
         let disposable = registry.maintainConfig(editor);
         expect(editor.getSoftTabs()).toBe(true);
 
-         
         editor.setText(dedent`
           {
           	hello;
           }
         `);
-         
+
         disposable.dispose();
         disposable = registry.maintainConfig(editor);
         expect(editor.getSoftTabs()).toBe(false);
@@ -333,7 +332,6 @@ describe("TextEditorRegistry", function () {
         disposable = registry.maintainConfig(editor);
         expect(editor.getSoftTabs()).toBe(false);
 
-         
         editor.setText(dedent`
           /*
            * Comment with a leading space.
@@ -343,7 +341,7 @@ describe("TextEditorRegistry", function () {
           	hello;
           }
         `);
-         
+
         disposable.dispose();
         disposable = registry.maintainConfig(editor);
         expect(editor.getSoftTabs()).toBe(false);
@@ -406,19 +404,6 @@ describe("TextEditorRegistry", function () {
 
       atom.config.set("editor.atomicSoftTabs", true);
       expect(editor.hasAtomicSoftTabs()).toBe(true);
-    });
-
-    it("enables or disables cursor on selection visibility based on the config", async function () {
-      editor.update({ showCursorOnSelection: true });
-      expect(editor.getShowCursorOnSelection()).toBe(true);
-
-      atom.config.set("editor.showCursorOnSelection", false);
-      registry.maintainConfig(editor);
-      await initialPackageActivation;
-      expect(editor.getShowCursorOnSelection()).toBe(false);
-
-      atom.config.set("editor.showCursorOnSelection", true);
-      expect(editor.getShowCursorOnSelection()).toBe(true);
     });
 
     it("enables or disables line numbers based on the config", async function () {

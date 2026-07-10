@@ -400,7 +400,7 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   shouldHideTitleBar() {
-    return !this.isSpec && this.atomApplication.config.get("core.titleBar") === "hidden";
+    return !this.isSpec && this.atomApplication.config.get("core.titleBar") !== "native";
   }
 
   close() {

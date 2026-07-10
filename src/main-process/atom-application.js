@@ -9,17 +9,7 @@ const FileRecoveryService = require("./file-recovery-service");
 const StartupTime = require("../startup-time");
 const ipcHelpers = require("../ipc-helpers");
 const { getConfigFilePath } = require("../get-app-details.js");
-const {
-  BrowserWindow,
-  Menu,
-  app,
-  clipboard,
-  dialog,
-  ipcMain,
-  shell,
-  screen,
-  nativeTheme,
-} = require("electron");
+const { BrowserWindow, Menu, app, clipboard, dialog, ipcMain, shell, screen } = require("electron");
 const { CompositeDisposable, Disposable } = require("event-kit");
 const crypto = require("crypto");
 const fs = require("fs-plus");
@@ -796,14 +786,6 @@ module.exports = class AtomApplication extends EventEmitter {
           if (webContents !== event.sender) {
             webContents.send(WINDOW_EVENT_CHANNEL, eventName, ...args);
           }
-        }
-      }),
-    );
-
-    this.disposable.add(
-      ipcHelpers.on(ipcMain, "setWindowTheme", (event, options) => {
-        if (options && typeof options === "string") {
-          nativeTheme.themeSource = options;
         }
       }),
     );

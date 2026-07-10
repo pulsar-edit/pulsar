@@ -158,14 +158,12 @@ describe("TextEditor", () => {
     it("returns a different editor with the same initial state", async () => {
       expect(editor.getAutoHeight()).toBeFalsy();
       expect(editor.getAutoWidth()).toBeFalsy();
-      expect(editor.getShowCursorOnSelection()).toBeTruthy();
 
       const element = editor.getElement();
       element.setHeight(100);
       element.setWidth(100);
       jasmine.attachToDOM(element);
 
-      editor.update({ showCursorOnSelection: false });
       editor.setSelectedBufferRange([
         [1, 2],
         [3, 4],
@@ -197,7 +195,6 @@ describe("TextEditor", () => {
       expect(editor2.isFoldedAtBufferRow(4)).toBeTruthy();
       expect(editor2.getAutoWidth()).toBe(false);
       expect(editor2.getAutoHeight()).toBe(false);
-      expect(editor2.getShowCursorOnSelection()).toBeFalsy();
 
       // editor2 can now diverge from its origin edit session
       editor2.getLastSelection().setBufferRange([
@@ -5338,7 +5335,7 @@ describe("TextEditor", () => {
           await atom.packages.activatePackage("language-go");
           editor.update({ autoIndent: true });
           atom.grammars.assignLanguageMode(editor, "source.go");
-          editor.setText('fmt.Printf("some%s",\n	"thing")');  
+          editor.setText('fmt.Printf("some%s",\n	"thing")');
           editor.setCursorBufferPosition([1, 10]);
           editor.insertNewline();
           expect(editor.indentationForBufferRow(1)).toBe(1);
