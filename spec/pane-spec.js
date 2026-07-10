@@ -67,6 +67,14 @@ describe("Pane", () => {
     terminatePendingState() {
       return this.emitter.emit("terminate-pending-state");
     }
+
+    onDidChange(callback) {
+      return this.emitter.on("did-change", callback);
+    }
+
+    change() {
+      return this.emitter.emit("did-change");
+    }
   }
 
   beforeEach(() => {
@@ -355,6 +363,64 @@ describe("Pane", () => {
       expect(pane.getPendingItem()).toBeNull();
       pane.setPendingItem("fake item");
       expect(pane.getPendingItem()).toEqual("fake item");
+    });
+  });
+
+  describe("::togglePendingItem", () => {
+    it("marks the active item as pending when it is not pending", () => {
+      const pane = new Pane(paneParams({ items: [new Item("A"), new Item("B")] }));
+      const [itemA] = pane.getItems();
+      pane.activateItem(itemA);
+      expect(pane.getPendingItem()).toBeNull();
+      pane.togglePendingItem();
+      expect(pane.getPendingItem()).toBe(itemA);
+    });
+
+    it("clears the pending item when the active item is already pending", () => {
+      const pane = new Pane(paneParams({ items: [new Item("A"), new Item("B")] }));
+      const [itemA] = pane.getItems();
+      pane.activateItem(itemA);
+      pane.setPendingItem(itemA);
+      pane.togglePendingItem();
+      expect(pane.getPendingItem()).toBeNull();
+    });
+
+    it("clears the pending item once a re-pended item changes", () => {
+      const pane = new Pane(paneParams({ items: [new Item("A"), new Item("B")] }));
+      const [itemA] = pane.getItems();
+      pane.activateItem(itemA);
+
+      // Terminate once so the item's own one-shot flag would no longer fire.
+      pane.togglePendingItem();
+      itemA.terminatePendingState();
+      expect(pane.getPendingItem()).toBeNull();
+
+      // Re-pend and confirm a subsequent change still clears the pending state.
+      pane.togglePendingItem();
+      expect(pane.getPendingItem()).toBe(itemA);
+      itemA.change();
+      expect(pane.getPendingItem()).toBeNull();
+    });
+  });
+
+  describe("::onItemDidBecomePendingState callback", () => {
+    it("is called with the item that became pending", () => {
+      const pane = new Pane(paneParams({ items: [new Item("A")] }));
+      const [itemA] = pane.getItems();
+      const becamePending = [];
+      pane.onItemDidBecomePendingState((item) => becamePending.push(item));
+      pane.setPendingItem(itemA);
+      expect(becamePending).toEqual([itemA]);
+    });
+
+    it("is not called when the pending item is cleared", () => {
+      const pane = new Pane(paneParams({ items: [new Item("A")] }));
+      const [itemA] = pane.getItems();
+      pane.setPendingItem(itemA);
+      const spy = jasmine.createSpy("onItemDidBecomePendingState");
+      pane.onItemDidBecomePendingState(spy);
+      pane.clearPendingItem();
+      expect(spy).not.toHaveBeenCalled();
     });
   });
 

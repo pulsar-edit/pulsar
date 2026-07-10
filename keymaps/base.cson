@@ -17,6 +17,10 @@
   'shift-tab': 'editor:outdent-selected-rows'
   'ctrl-shift-k': 'editor:delete-line'
 
+'atom-workspace':
+  # Lumine Specific
+  'shift-escape': 'pane:toggle-pending-item'
+
 '.select-list atom-text-editor[mini]':
   'enter': 'core:confirm'
 

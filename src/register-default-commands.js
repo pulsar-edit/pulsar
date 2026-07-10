@@ -60,6 +60,9 @@ module.exports = function ({
       "pane:move-item-left": function () {
         return this.getModel().getActivePane().moveItemLeft();
       },
+      "pane:toggle-pending-item": function () {
+        return this.getModel().getActivePane().togglePendingItem();
+      },
       "window:increase-font-size": function () {
         return this.getModel().increaseFontSize();
       },

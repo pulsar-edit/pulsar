@@ -66,7 +66,9 @@ module.exports = class Pane {
     this.setPendingItem = this.setPendingItem.bind(this);
     this.getPendingItem = this.getPendingItem.bind(this);
     this.clearPendingItem = this.clearPendingItem.bind(this);
+    this.togglePendingItem = this.togglePendingItem.bind(this);
     this.onItemDidTerminatePendingState = this.onItemDidTerminatePendingState.bind(this);
+    this.onItemDidBecomePendingState = this.onItemDidBecomePendingState.bind(this);
     this.saveItem = this.saveItem.bind(this);
     this.saveItemAs = this.saveItemAs.bind(this);
 
@@ -88,6 +90,7 @@ module.exports = class Pane {
     this.emitter = new Emitter();
     this.alive = true;
     this.subscriptionsPerItem = new WeakMap();
+    this.pendingItemSubscription = null;
     this.items = [];
     this.itemStack = [];
     this.container = null;
@@ -682,9 +685,16 @@ module.exports = class Pane {
   setPendingItem(item) {
     if (this.pendingItem !== item) {
       const mostRecentPendingItem = this.pendingItem;
+      if (this.pendingItemSubscription) {
+        this.pendingItemSubscription.dispose();
+        this.pendingItemSubscription = null;
+      }
       this.pendingItem = item;
       if (mostRecentPendingItem) {
         this.emitter.emit("item-did-terminate-pending-state", mostRecentPendingItem);
+      }
+      if (item) {
+        this.emitter.emit("item-did-become-pending-state", item);
       }
     }
   }
@@ -697,8 +707,33 @@ module.exports = class Pane {
     this.setPendingItem(null);
   }
 
+  // Public: Toggle the pending state of the active item.
+  //
+  // Clears the pending item if the active item is already pending, otherwise
+  // marks the active item as pending. When marking an item pending, its
+  // `onDidChange` is watched so that editing it clears the pending state, the
+  // same way natively-previewed items behave. This is required because
+  // `terminatePendingState` is one-shot: once an item has terminated it never
+  // emits again, so a re-pended item could not otherwise clear itself.
+  togglePendingItem() {
+    const item = this.getActiveItem();
+    if (!item) return;
+    if (this.getPendingItem() === item) {
+      this.clearPendingItem();
+    } else {
+      this.setPendingItem(item);
+      if (typeof item.onDidChange === "function") {
+        this.pendingItemSubscription = item.onDidChange(() => this.clearPendingItem());
+      }
+    }
+  }
+
   onItemDidTerminatePendingState(callback) {
     return this.emitter.on("item-did-terminate-pending-state", callback);
+  }
+
+  onItemDidBecomePendingState(callback) {
+    return this.emitter.on("item-did-become-pending-state", callback);
   }
 
   // Public: Add the given items to the pane.
@@ -1170,6 +1205,10 @@ module.exports = class Pane {
 
     this.emitter.emit("will-destroy");
     this.alive = false;
+    if (this.pendingItemSubscription) {
+      this.pendingItemSubscription.dispose();
+      this.pendingItemSubscription = null;
+    }
     if (this.container) {
       this.container.willDestroyPane({ pane: this });
       if (this.isActive()) this.container.activateNextPane();

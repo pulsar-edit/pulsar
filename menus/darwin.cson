@@ -138,6 +138,8 @@
           { label: 'Split Left', command: 'pane:split-left-and-copy-active-item' }
           { label: 'Split Right', command: 'pane:split-right-and-copy-active-item' }
           { type: 'separator' }
+          { label: 'Toggle Pending State', command: 'pane:toggle-pending-item' }
+          { type: 'separator' }
           { label: 'Focus Next Pane', command: 'window:focus-next-pane' }
           { label: 'Focus Previous Pane', command: 'window:focus-previous-pane' }
           { type: 'separator' }

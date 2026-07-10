@@ -73,6 +73,16 @@ class TabView {
       }),
     );
 
+    if (typeof this.pane.onItemDidBecomePendingState === "function") {
+      this.subscriptions.add(
+        this.pane.onItemDidBecomePendingState((item) => {
+          if (item === this.item) {
+            return this.setPending();
+          }
+        }),
+      );
+    }
+
     if (typeof this.item.onDidChangeTitle === "function") {
       const onDidChangeTitleDisposable = this.item.onDidChangeTitle(titleChangedHandler);
       if (Disposable.isDisposable(onDidChangeTitleDisposable)) {
@@ -367,6 +377,11 @@ class TabView {
     } else if (this.item.terminatePendingState != null) {
       return this.item.terminatePendingState();
     }
+  }
+
+  setPending() {
+    this.itemTitle.classList.add("temp");
+    return this.element.classList.add("pending-tab");
   }
 
   clearPending() {
