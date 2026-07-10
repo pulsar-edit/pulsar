@@ -13,6 +13,14 @@ let ICON_PATH = path.resolve(process.resourcesPath, "lumine.png");
 if (!fs.existsSync(ICON_PATH)) {
   ICON_PATH = path.resolve(__dirname, "..", "..", "resources", "lumine.png");
 }
+const DEV_ICON_PATH = path.resolve(
+  __dirname,
+  "..",
+  "..",
+  "resources",
+  "app-icons",
+  "beta-next.png",
+);
 
 let includeShellLoadTime = true;
 let nextId = 0;
@@ -65,9 +73,13 @@ module.exports = class AtomWindow extends EventEmitter {
       simpleFullscreen: this.getSimpleFullscreen(),
     };
 
-    // Don't set icon on Windows so the exe's ico will be used as window and
-    // taskbar's icon. See https://github.com/atom/atom/issues/4811 for more.
+    // Packaged Windows builds inherit the window and taskbar icon from the
+    // executable. Development builds run through Electron's executable, so
+    // give those windows the development-channel icon explicitly instead.
     if (process.platform === "linux") options.icon = nativeImage.createFromPath(ICON_PATH);
+    if (process.platform === "win32" && this.devMode) {
+      options.icon = nativeImage.createFromPath(DEV_ICON_PATH);
+    }
     if (this.shouldHideTitleBar()) options.frame = false;
 
     // Enabling window transparency creates several downstream issues relating

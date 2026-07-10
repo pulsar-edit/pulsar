@@ -115,6 +115,18 @@ describe("AtomWindow", function () {
   });
 
   describe("launch behavior", function () {
+    it("sets the Lumine window icon for development mode on Windows", function () {
+      const { browserWindow } = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow,
+        devMode: true,
+      });
+
+      if (process.platform === "win32") {
+        assert.isDefined(browserWindow.options.icon);
+        assert.isFalse(browserWindow.options.icon.isEmpty());
+      }
+    });
+
     it('sets frame to "false" for a hidden title bar on non-spec windows', function () {
       app.config["core.titleBar"] = "hidden";
 
