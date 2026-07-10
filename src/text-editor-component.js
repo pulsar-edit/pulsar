@@ -1769,6 +1769,10 @@ module.exports = class TextEditorComponent {
         this.props.model.selectLeft();
       }
 
+      // In overtype mode, expand empty selections over the following character
+      // so the typed text overwrites it instead of being inserted before it.
+      this.props.model.applyOvertype();
+
       this.props.model.insertText(event.data, { groupUndo: true });
     }
   }
@@ -2953,27 +2957,44 @@ module.exports = class TextEditorComponent {
       }
     }
     if (screenRow === null) {
-      // Anchor the row at the vertical midpoint of the viewport. When scrolled
-      // more than half a screen past the end (scrollPastEnd), the midpoint
-      // falls into the empty region below the content; anchor the last line
-      // where it currently sits instead, so it stays put like a cursor resting
-      // there rather than being pulled up to the midpoint.
       const midpointPixel = scrollTop + this.getScrollContainerClientHeight() / 2;
       const contentBottom = this.getContentHeight();
-      const anchorPixel =
-        midpointPixel > contentBottom ? contentBottom - this.getLineHeight() / 2 : midpointPixel;
-      screenRow = this.rowForPixelPosition(anchorPixel);
+      if (midpointPixel > contentBottom) {
+        // Scrolled more than half a screen past the end (scrollPastEnd): anchor
+        // the distance from the maximum scroll so the empty past-end gap below
+        // the content keeps its size. This is relative to the scroll extent
+        // rather than a buffer position, so it survives a copy that wraps to a
+        // different height (where a content-relative anchor drifts, since the
+        // content height is only approximate for the unrendered rows).
+        return {
+          type: "bottom",
+          bottomOffset: Math.max(0, this.getMaxScrollTop() - scrollTop),
+          wasManual: this.lastScrollWasManual,
+        };
+      }
+      // Otherwise anchor the row at the vertical midpoint of the viewport.
+      screenRow = this.rowForPixelPosition(midpointPixel);
     }
 
     const bufferPosition = model.bufferPositionForScreenPosition(Point(screenRow, 0));
     const rowTop = this.pixelPositionBeforeBlocksForRow(screenRow);
     // Carry the anchor mode (scroll midpoint vs. cursor) so an editor restoring
     // this anchor keeps re-anchoring the same way across later reflows.
-    return { bufferPosition, offset: rowTop - scrollTop, wasManual: this.lastScrollWasManual };
+    return {
+      type: "row",
+      bufferPosition,
+      offset: rowTop - scrollTop,
+      wasManual: this.lastScrollWasManual,
+    };
   }
 
   restoreScrollAnchor(anchor) {
     if (!anchor || !this.hasInitialMeasurements) return;
+
+    if (anchor.type === "bottom") {
+      this.setScrollTop(this.getMaxScrollTop() - anchor.bottomOffset);
+      return;
+    }
 
     const screenPosition = this.props.model.screenPositionForBufferPosition(anchor.bufferPosition);
     const rowTop = this.pixelPositionBeforeBlocksForRow(screenPosition.row);

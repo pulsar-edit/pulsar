@@ -1,0 +1,31 @@
+@import 'syntax-variables';
+
+atom-text-editor.overtype-cursor .cursors .cursor
+{
+  opacity: 1;
+  color: transparent;
+  transition-property: background-color, border-color, opacity;
+  transition-duration: 3ms;
+  border: 1px solid @syntax-cursor-color;
+  background-color: fade(@syntax-cursor-color, 20%);
+}
+
+atom-text-editor.overtype-cursor .cursors.blink-off .cursor
+{
+  border: none;
+}
+
+atom-text-editor.overtype-cursor:not(.is-focused) .cursors .cursor
+{
+  display: none;
+}
+
+@import "ui-variables";
+
+.status-bar .overtype-mode-icon .icon::before {
+  margin-right: 0px;
+}
+
+.status-bar .overtype-mode-icon .active {
+  color: @text-color-success;
+}

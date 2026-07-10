@@ -1,0 +1,14 @@
+'menu': [
+  {
+    label: 'Packages'
+    submenu: [
+      {
+        label: 'Overtype Mode'
+        submenu: [
+          { label: 'Toggle Global', command: 'overtype-mode:toggle-global' }
+          { label: 'Toggle Editor', command: 'overtype-mode:toggle-editor' }
+        ]
+      }
+    ]
+  }
+]

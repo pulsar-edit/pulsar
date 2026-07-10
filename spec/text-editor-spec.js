@@ -4913,6 +4913,92 @@ describe("TextEditor", () => {
       });
     });
 
+    describe("overtype mode", () => {
+      describe(".isOvertypeMode()/.setOvertypeMode()/.toggleOvertypeMode()", () => {
+        it("is disabled by default", () => {
+          expect(editor.isOvertypeMode()).toBe(false);
+        });
+
+        it("enables, disables and toggles the mode", () => {
+          expect(editor.setOvertypeMode(true)).toBe(true);
+          expect(editor.isOvertypeMode()).toBe(true);
+          expect(editor.toggleOvertypeMode()).toBe(false);
+          expect(editor.isOvertypeMode()).toBe(false);
+        });
+
+        it("coerces the argument to a boolean", () => {
+          editor.setOvertypeMode(1);
+          expect(editor.isOvertypeMode()).toBe(true);
+          editor.setOvertypeMode(0);
+          expect(editor.isOvertypeMode()).toBe(false);
+        });
+
+        it("emits did-change-overtype-mode only when the value actually changes", () => {
+          const changes = [];
+          editor.onDidChangeOvertypeMode((value) => changes.push(value));
+          editor.setOvertypeMode(false);
+          expect(changes).toEqual([]);
+          editor.setOvertypeMode(true);
+          editor.setOvertypeMode(true);
+          editor.setOvertypeMode(false);
+          expect(changes).toEqual([true, false]);
+        });
+      });
+
+      describe(".applyOvertype()", () => {
+        it("does nothing when overtype mode is disabled", () => {
+          editor.setCursorBufferPosition([0, 0]);
+          editor.applyOvertype();
+          expect(editor.getLastSelection().isEmpty()).toBe(true);
+          editor.insertText("X");
+          expect(buffer.lineForRow(0)).toBe("Xvar quicksort = function () {");
+        });
+
+        it("expands an empty selection so the typed text overwrites the next character", () => {
+          editor.setOvertypeMode(true);
+          editor.setCursorBufferPosition([0, 0]);
+          editor.applyOvertype();
+          editor.insertText("X");
+          expect(buffer.lineForRow(0)).toBe("Xar quicksort = function () {");
+        });
+
+        it("inserts rather than overwriting at the end of a line", () => {
+          editor.setOvertypeMode(true);
+          editor.setCursorBufferPosition([0, 0]);
+          editor.moveToEndOfLine();
+          editor.applyOvertype();
+          editor.insertText("X");
+          expect(buffer.lineForRow(0)).toBe("var quicksort = function () {X");
+          expect(buffer.lineForRow(1)).toBe("  var sort = function(items) {");
+        });
+
+        it("leaves non-empty selections untouched and replaces them as usual", () => {
+          editor.setOvertypeMode(true);
+          editor.setSelectedBufferRange([
+            [0, 0],
+            [0, 3],
+          ]);
+          editor.applyOvertype();
+          expect(editor.getLastSelection().getBufferRange()).toEqual([
+            [0, 0],
+            [0, 3],
+          ]);
+          editor.insertText("X");
+          expect(buffer.lineForRow(0)).toBe("X quicksort = function () {");
+        });
+
+        it("overwrites at every empty cursor when there are multiple selections", () => {
+          editor.setOvertypeMode(true);
+          editor.setCursorBufferPosition([0, 0]);
+          editor.addCursorAtBufferPosition([1, 2]);
+          editor.applyOvertype();
+          editor.insertText("X");
+          expect(buffer.lineForRow(0)).toBe("Xar quicksort = function () {");
+          expect(buffer.lineForRow(1)).toBe("  Xar sort = function(items) {");
+        });
+      });
+    });
+
     describe(".insertText(text)", () => {
       describe("when there is a single selection", () => {
         beforeEach(() =>

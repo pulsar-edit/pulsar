@@ -182,6 +182,7 @@ module.exports = class TextEditor {
     this.maxScreenLineLength =
       params.maxScreenLineLength != null ? params.maxScreenLineLength : 500;
     this.showLineNumbers = params.showLineNumbers != null ? params.showLineNumbers : true;
+    this.overtypeMode = params.overtypeMode != null ? params.overtypeMode : false;
     const { tabLength = 2 } = params;
 
     this.alive = true;
@@ -952,6 +953,17 @@ module.exports = class TextEditor {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeSoftWrapped(callback) {
     return this.emitter.on("did-change-soft-wrapped", callback);
+  }
+
+  // Extended: Calls your `callback` when overtype (overwrite) mode is enabled or
+  // disabled for this editor.
+  //
+  // * `callback` {Function}
+  //   * `overtypeMode` {Boolean} indicating the new state.
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidChangeOvertypeMode(callback) {
+    return this.emitter.on("did-change-overtype-mode", callback);
   }
 
   // Extended: Calls your `callback` when the buffer's encoding has changed.
@@ -4175,6 +4187,52 @@ module.exports = class TextEditor {
   // Returns a {Boolean}.
   toggleSoftWrapped() {
     return this.setSoftWrapped(!this.isSoftWrapped());
+  }
+
+  // Essential: Determine whether overtype (overwrite) mode is enabled for this
+  // editor. In overtype mode, typing replaces the character following the cursor
+  // instead of inserting before it.
+  //
+  // Returns a {Boolean}.
+  isOvertypeMode() {
+    return this.overtypeMode;
+  }
+
+  // Essential: Enable or disable overtype (overwrite) mode for this editor.
+  //
+  // * `overtypeMode` A {Boolean}.
+  //
+  // Returns a {Boolean}.
+  setOvertypeMode(overtypeMode) {
+    overtypeMode = !!overtypeMode;
+    if (overtypeMode !== this.overtypeMode) {
+      this.overtypeMode = overtypeMode;
+      this.emitter.emit("did-change-overtype-mode", overtypeMode);
+    }
+    return this.overtypeMode;
+  }
+
+  // Essential: Toggle overtype (overwrite) mode for this editor.
+  //
+  // Returns a {Boolean}.
+  toggleOvertypeMode() {
+    return this.setOvertypeMode(!this.overtypeMode);
+  }
+
+  // Extended: When overtype mode is active, expand each empty selection one
+  // character to the right (except at the end of a line) so that the text about
+  // to be inserted overwrites the following character rather than being inserted
+  // before it. Non-empty selections are left untouched and replaced as usual.
+  //
+  // Called by the editor component immediately before inserting genuinely typed
+  // text; it has no effect unless {::isOvertypeMode} is `true`.
+  applyOvertype() {
+    if (!this.overtypeMode) return;
+    for (const selection of this.getSelections()) {
+      if (selection.isEmpty() && !selection.cursor.isAtEndOfLine()) {
+        selection.selectRight();
+      }
+    }
   }
 
   // Essential: Gets the column at which column will soft wrap

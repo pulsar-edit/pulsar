@@ -1,0 +1,28 @@
+{
+  "name": "overtype-mode",
+  "author": "lumine-code",
+  "description": "Replace existing text as you type instead of inserting",
+  "version": "1.0.0",
+  "license": "MIT",
+  "repository": "https://github.com/lumine-code/lumine",
+  "main": "./lib/main",
+  "engines": {
+    "atom": "*"
+  },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
+  "configSchema": {
+    "statusBar": {
+      "order": 1,
+      "title": "Status bar icon",
+      "description": "Show status icon in the status bar.",
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
