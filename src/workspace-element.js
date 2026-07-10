@@ -250,9 +250,6 @@ class WorkspaceElement extends HTMLElement {
     this.verticalAxis.appendChild(this.paneContainer);
     this.addEventListener("focus", this.handleFocus.bind(this));
 
-    this.addEventListener("mousewheel", this.handleMousewheel.bind(this), {
-      capture: true,
-    });
     window.addEventListener("dragstart", this.handleDragStart);
     window.addEventListener("mousemove", this.handleEdgesMouseMove);
 
@@ -353,22 +350,6 @@ class WorkspaceElement extends HTMLElement {
   checkCleanupDockHoverEvents() {
     if (this.cursorInCenter && !this.hoveredDock) {
       window.removeEventListener("dragend", this.handleDockDragEnd);
-    }
-  }
-
-  handleMousewheel(event) {
-    if (
-      event.ctrlKey &&
-      this.config.get("editor.zoomFontWhenCtrlScrolling") &&
-      event.target.closest("atom-text-editor") != null
-    ) {
-      if (event.wheelDeltaY > 0) {
-        this.model.increaseFontSize();
-      } else if (event.wheelDeltaY < 0) {
-        this.model.decreaseFontSize();
-      }
-      event.preventDefault();
-      event.stopPropagation();
     }
   }
 

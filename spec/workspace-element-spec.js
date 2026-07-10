@@ -963,54 +963,6 @@ describe("WorkspaceElement", () => {
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
     });
 
-    it("increases or decreases the font size when a ctrl-mousewheel event occurs", () => {
-      atom.config.set("editor.zoomFontWhenCtrlScrolling", true);
-      atom.config.set("editor.fontSize", 12);
-
-      // Zoom out
-      editorElement.querySelector("span").dispatchEvent(
-        new WheelEvent("mousewheel", {
-          wheelDeltaY: -10,
-          ctrlKey: true,
-        }),
-      );
-      expect(atom.config.get("editor.fontSize")).toBe(11);
-
-      // Zoom in
-      editorElement.querySelector("span").dispatchEvent(
-        new WheelEvent("mousewheel", {
-          wheelDeltaY: 10,
-          ctrlKey: true,
-        }),
-      );
-      expect(atom.config.get("editor.fontSize")).toBe(12);
-
-      // Not on an atom-text-editor
-      workspaceElement.dispatchEvent(
-        new WheelEvent("mousewheel", {
-          wheelDeltaY: 10,
-          ctrlKey: true,
-        }),
-      );
-      expect(atom.config.get("editor.fontSize")).toBe(12);
-
-      // No ctrl key
-      editorElement.querySelector("span").dispatchEvent(
-        new WheelEvent("mousewheel", {
-          wheelDeltaY: 10,
-        }),
-      );
-      expect(atom.config.get("editor.fontSize")).toBe(12);
-
-      atom.config.set("editor.zoomFontWhenCtrlScrolling", false);
-      editorElement.querySelector("span").dispatchEvent(
-        new WheelEvent("mousewheel", {
-          wheelDeltaY: 10,
-          ctrlKey: true,
-        }),
-      );
-      expect(atom.config.get("editor.fontSize")).toBe(12);
-    });
   });
 
   describe("panel containers", () => {

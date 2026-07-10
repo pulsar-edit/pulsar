@@ -622,12 +622,6 @@ const configSchema = {
           },
         },
       },
-      zoomFontWhenCtrlScrolling: {
-        type: "boolean",
-        default: process.platform !== "darwin",
-        description:
-          "Change the editor font size when pressing the Ctrl key and scrolling the mouse up/down.",
-      },
       multiCursorOnClick: {
         type: "boolean",
         default: true,
