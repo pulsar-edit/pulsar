@@ -168,48 +168,9 @@ module.exports = class PackageManager {
     return this.emitter.on("did-unload-package", callback);
   }
 
-  // Returns the command needed to invoke PPM.
-  static getCommandName(_version) {
-    let commandName = "ppm";
-    return process.platform === "win32" ? `${commandName}.cmd` : commandName;
-  }
-
-  // Returns the path at which the `ppm` binary (formerly `apm`) is believed to
-  // exist.
-  static possibleApmPaths(version) {
-    if (process.env.APM_PATH) {
-      return process.env.APM_PATH;
-    }
-
-    const commandName = this.getCommandName(version);
-    const bundledPPMRoot = path.join(process.resourcesPath, "app", "ppm", "bin", commandName);
-    const unbundledPPMRoot = path.join(__dirname, "..", "ppm", "bin", commandName);
-
-    if (fs.isFileSync(bundledPPMRoot)) {
-      return bundledPPMRoot;
-    } else {
-      return unbundledPPMRoot;
-    }
-  }
-
   /*
   Section: Package system data
   */
-
-  // Public: Get the path to the apm command.
-  //
-  // Uses the value of the `core.apmPath` config setting if it exists.
-  //
-  // Return a {String} file path to apm.
-  getApmPath() {
-    const configPath = atom.config.get("core.apmPath");
-    if (configPath || this.apmPath) {
-      return configPath || this.apmPath;
-    } else {
-      this.apmPath = PackageManager.possibleApmPaths();
-      return this.apmPath;
-    }
-  }
 
   // Public: Get the paths being used to look for packages.
   //

@@ -29,7 +29,7 @@ ATOM_ADD=false
 ATOM_NEW_WINDOW=false
 EXIT_CODE_OVERRIDE=
 
-while getopts ":anwtfvhp-:" opt; do
+while getopts ":anwtfvh-:" opt; do
   case "$opt" in
     -)
       case "${OPTARG}" in
@@ -48,8 +48,8 @@ while getopts ":anwtfvhp-:" opt; do
         foreground|benchmark|benchmark-test|test)
           EXPECT_OUTPUT=1
           ;;
-        package)
-          PACKAGE_MODE=1
+        install|uninstall|list|link|unlink)
+          EXPECT_OUTPUT=1
           ;;
         enable-electron-logging)
           export ELECTRON_ENABLE_LOGGING=1
@@ -64,9 +64,6 @@ while getopts ":anwtfvhp-:" opt; do
       ;;
     w)
       WAIT=1
-      ;;
-    p)
-      PACKAGE_MODE=1
       ;;
     f|t|h|v)
       EXPECT_OUTPUT=1
@@ -90,20 +87,6 @@ then
 fi
 mkdir -p "$ATOM_HOME"
 export ATOM_HOME
-
-if [ $PACKAGE_MODE ]; then
-  # If `-p` or `--package` is present, then we'll be discarding all arguments
-  # prior to (and including) `-p`/`--package` and passing the rest to `ppm`.
-  loop_done=0
-  while [ $loop_done -eq 0 ]
-  do
-    if [[ "$1" == "-p" || "$1" == "--package" || "$1" == "" ]]; then
-      # We'll shift one last time and then we'll be done.
-      loop_done=1
-    fi
-    shift
-  done
-fi
 
 if [ $OS == 'Mac' ]; then
   if [ -L "$0" ]; then
@@ -153,19 +136,11 @@ if [ $OS == 'Mac' ]; then
   fi
 
   LUMINE_EXECUTABLE="$LUMINE_PATH/$ATOM_APP_NAME/Contents/MacOS/$ATOM_EXECUTABLE_NAME"
-  PPM_EXECUTABLE="$LUMINE_PATH/$ATOM_APP_NAME/Contents/Resources/app/ppm/bin/ppm"
 
   # Exit if Lumine can't be found.
   if [ ! -x "${LUMINE_EXECUTABLE}" ]; then
     echoerr "Cannot locate ${ATOM_APP_NAME}; it is usually located in /Applications. Set the LUMINE_PATH environment variable to the directory containing ${ATOM_APP_NAME}."
     exit 1
-  fi
-
-  # If `-p` or `--package` was specified, call `ppm` with all the arguments
-  # that followed it instead of calling the Lumine executable directly.
-  if [ $PACKAGE_MODE ]; then
-    "$PPM_EXECUTABLE" "$@"
-    exit $?
   fi
 
   if [ $EXPECT_OUTPUT ]; then
@@ -234,17 +209,6 @@ elif [ $OS == 'Linux' ]; then
   fi
 
   LUMINE_EXECUTABLE="$LUMINE_PATH/$ATOM_EXECUTABLE_NAME"
-
-  PPM_EXECUTABLE_NAME="ppm"
-
-  PPM_EXECUTABLE="$LUMINE_PATH/resources/app/ppm/bin/$PPM_EXECUTABLE_NAME"
-
-  # If `-p` or `--package` was specified, call `ppm` with all the arguments
-  # that followed it instead of calling the Lumine executable directly.
-  if [ $PACKAGE_MODE ]; then
-    "$PPM_EXECUTABLE" "$@"
-    exit $?
-  fi
 
   if [ $EXPECT_OUTPUT ]; then
     "$LUMINE_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox

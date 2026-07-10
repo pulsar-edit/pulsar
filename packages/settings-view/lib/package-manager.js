@@ -54,19 +54,6 @@ module.exports = class PackageManager {
     return schema != null && schema.type !== "any";
   }
 
-  runCommand(args, callback) {
-    const command = atom.packages.getApmPath();
-    const outputLines = [];
-    const stdout = (lines) => outputLines.push(lines);
-    const errorLines = [];
-    const stderr = (lines) => errorLines.push(lines);
-    const exit = (code) => callback(code, outputLines.join("\n"), errorLines.join("\n"));
-
-    args.push("--no-color");
-
-    return new BufferedProcess({ command, args, stdout, stderr, exit });
-  }
-
   loadInstalled(callback) {
     try {
       return callback(null, this.getLocalPackages());
@@ -602,23 +589,3 @@ module.exports = class PackageManager {
     return subscriptions;
   }
 };
-
-const createJsonParseError = (message, parseError, stdout) => {
-  const error = new Error(message);
-  error.stdout = "";
-  error.stderr = `${parseError.message}: ${stdout}`;
-  return error;
-};
-
-const createProcessError = (message, processError) => {
-  const error = new Error(message);
-  error.stdout = "";
-  error.stderr = processError.message;
-  return error;
-};
-
-const handleProcessErrors = (apmProcess, message, callback) =>
-  apmProcess.onWillThrowError(function ({ error, handle }) {
-    handle();
-    return callback(createProcessError(message, error));
-  });

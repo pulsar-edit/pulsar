@@ -23,13 +23,13 @@ module.exports = {
   },
 
   update() {
-    if (this.process) return; // Do not allow multiple apm processes to run
+    if (this.process) return; // Do not allow multiple npm processes to run
     if (this.updatePackageDependenciesStatusView) this.updatePackageDependenciesStatusView.attach();
 
     let errorOutput = "";
 
-    const command = atom.packages.getApmPath();
-    const args = ["install", "--no-color"];
+    const command = process.platform === "win32" ? "npm.cmd" : "npm";
+    const args = ["install"];
     const stderr = (output) => {
       errorOutput += output;
     };

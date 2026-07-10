@@ -40,17 +40,4 @@ else
     exit 1
 fi
 
-echo '  Rebuilding PPM'
-if [[ -d "ppm" ]]; then
-    yarn build:apm &> /dev/null
-    if [[ $? == 0 ]]; then
-        echo '    PPM build completed successfully'
-    else
-        echo '    PPM build failed'
-        exit 1
-    fi
-else
-    echo '    PPM folder not found'
-fi
-
 git submodule sync && git submodule update

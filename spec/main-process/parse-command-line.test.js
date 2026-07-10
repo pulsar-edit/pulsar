@@ -113,4 +113,37 @@ describe("parseCommandLine", () => {
       assert.deepEqual(args.pathsToOpen, ["/some/path", "some/other/path", "./another-path.file"]);
     });
   });
+
+  describe("package-management commands", () => {
+    it("parses --install", () => {
+      const args = parseCommandLine(["--install", "owner/repo"]);
+      assert.deepEqual(args.packageCommand, { name: "install", arg: "owner/repo", dev: false });
+      assert.deepEqual(args.pathsToOpen, []);
+    });
+
+    it("parses --uninstall", () => {
+      const args = parseCommandLine(["--uninstall", "my-package"]);
+      assert.deepEqual(args.packageCommand, { name: "uninstall", arg: "my-package", dev: false });
+    });
+
+    it("parses --list", () => {
+      const args = parseCommandLine(["--list"]);
+      assert.deepEqual(args.packageCommand, { name: "list", arg: null, dev: false });
+    });
+
+    it("parses --link with --dev", () => {
+      const args = parseCommandLine(["--link", "/some/path", "--dev"]);
+      assert.deepEqual(args.packageCommand, { name: "link", arg: "/some/path", dev: true });
+    });
+
+    it("parses --unlink", () => {
+      const args = parseCommandLine(["--unlink", "my-package"]);
+      assert.deepEqual(args.packageCommand, { name: "unlink", arg: "my-package", dev: false });
+    });
+
+    it("is null for a normal launch", () => {
+      const args = parseCommandLine(["/some/path"]);
+      assert.isNull(args.packageCommand);
+    });
+  });
 });

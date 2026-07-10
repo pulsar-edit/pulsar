@@ -13,8 +13,8 @@
 #
 # 1. Some command-line arguments, like `--wait`, don't work properly unless
 #    they rely on `lumine.sh` to do some work for them.
-# 2. `lumine.sh` can intercept the `-p`/`--package` switch (signaling that the
-#     user wants to run `ppm`) and call it more quickly than Lumine can.
+# 2. `lumine.sh` runs the package-management commands (like `--install`) in the
+#    foreground so their output is shown and the shell waits for them to finish.
 #
 # This is pretty easy to do with an AppImage, but `electron-builder` isn't
 # customizable enough for us to make that change without it affecting other

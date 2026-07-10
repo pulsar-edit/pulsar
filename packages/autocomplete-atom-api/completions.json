@@ -3415,14 +3415,6 @@
       "type": "method"
     },
     {
-      "name": "getApmPath",
-      "text": "getApmPath()",
-      "snippet": null,
-      "description": "Get the path to the apm command.",
-      "descriptionMoreURL": "https://atom.io/docs/api/latest/PackageManager#instance-getApmPath",
-      "type": "method"
-    },
-    {
       "name": "getAvailablePackageMetadata",
       "text": "getAvailablePackageMetadata()",
       "snippet": null,

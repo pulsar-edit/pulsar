@@ -30,6 +30,13 @@ module.exports = function parseCommandLine(processArgs) {
 
     Paths that start with \`atom://\` will be interpreted as URLs.
 
+    Package Management:
+      lumine --install <owner/repo>   Install a package from GitHub.
+      lumine --uninstall <name>       Uninstall an installed package.
+      lumine --list                   List installed packages.
+      lumine --link <path>            Symlink a local package (add --dev for dev packages).
+      lumine --unlink <path|name>     Remove a symlinked package.
+
     Environment Variables:
 
       LUMINE_RESOURCE_PATH    The path from which Lumine loads source code in dev mode.
@@ -99,7 +106,25 @@ module.exports = function parseCommandLine(processArgs) {
   options
     .alias("p", "package")
     .boolean("p")
-    .describe("package", "This option is no longer supported.");
+    .describe("package", "Deprecated. Use --install, --uninstall, --list, --link or --unlink.");
+  options
+    .string("install")
+    .describe("install", "Install a package by `owner/repo` shorthand or a Git URL.");
+  options
+    .string("uninstall")
+    .describe("uninstall", "Uninstall an installed community package by name.");
+  options
+    .boolean("list")
+    .describe("list", "List installed community and development packages.");
+  options
+    .string("link")
+    .describe(
+      "link",
+      "Symlink a local package directory into ~/.lumine/packages (add --dev to link into dev/packages).",
+    );
+  options
+    .string("unlink")
+    .describe("unlink", "Remove a symlinked package by name or path (add --dev to only affect dev/packages).");
   options.boolean("uri-handler");
   options
     .version(
@@ -115,7 +140,8 @@ module.exports = function parseCommandLine(processArgs) {
 
   if (args["package"]) {
     process.stderr.write(
-      "The external Lumine package manager command has been removed. Install packages from Settings using a GitHub repository URL.\n",
+      "The `--package`/`-p` option has been replaced. Use `lumine --install owner/repo`, " +
+        "`--uninstall <name>`, `--list`, `--link <path>` or `--unlink <path>`.\n",
     );
     process.exit(1);
     return;
@@ -198,7 +224,25 @@ module.exports = function parseCommandLine(processArgs) {
     process.env.PATH = args["path-environment"];
   }
 
+  // Headless package-management commands. When present, `start.js` runs the
+  // command and exits without opening an editor window. `--dev` links/unlinks
+  // packages under `dev/packages` instead of `packages`.
+  let packageCommand = null;
+  const linkToDev = Boolean(args["dev"]);
+  if (typeof args["install"] === "string") {
+    packageCommand = { name: "install", arg: args["install"], dev: linkToDev };
+  } else if (typeof args["uninstall"] === "string") {
+    packageCommand = { name: "uninstall", arg: args["uninstall"], dev: linkToDev };
+  } else if (args["list"]) {
+    packageCommand = { name: "list", arg: null, dev: linkToDev };
+  } else if (typeof args["link"] === "string") {
+    packageCommand = { name: "link", arg: args["link"], dev: linkToDev };
+  } else if (typeof args["unlink"] === "string") {
+    packageCommand = { name: "unlink", arg: args["unlink"], dev: linkToDev };
+  }
+
   return {
+    packageCommand,
     pathsToOpen,
     urlsToOpen,
     executedFrom,

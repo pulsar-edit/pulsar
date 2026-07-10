@@ -14,7 +14,6 @@ describe("PackageCard", function () {
 
   beforeEach(function () {
     packageManager = new PackageManager();
-    spyOn(packageManager, "runCommand");
   });
 
   it("doesn't show the disable control for a theme", function () {

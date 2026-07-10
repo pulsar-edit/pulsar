@@ -1171,8 +1171,8 @@ module.exports = class Package {
     let stderr = "";
     let stdout = "";
     return new BufferedProcess({
-      command: this.packageManager.getApmPath(),
-      args: ["rebuild", "--no-color"],
+      command: process.platform === "win32" ? "npm.cmd" : "npm",
+      args: ["rebuild"],
       options: { cwd: this.path },
       stderr(output) {
         stderr += output;

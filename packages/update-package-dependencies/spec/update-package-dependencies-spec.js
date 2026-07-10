@@ -2,10 +2,7 @@ const os = require("os");
 const path = require("path");
 const updatePackageDependencies = require("../lib/update-package-dependencies");
 
-let baseExecutableName = "ppm";
-if (process.env.ATOM_BASE_NAME === "lumine-next") {
-  baseExecutableName = "ppm-next";
-}
+const baseExecutableName = process.platform === "win32" ? "npm.cmd" : "npm";
 
 describe("Update Package Dependencies", () => {
   let projectPath = null;
@@ -28,20 +25,16 @@ describe("Update Package Dependencies", () => {
       if (updatePackageDependencies.process) exit(0);
     });
 
-    it("runs the `apm install` command", () => {
+    it("runs the `npm install` command", () => {
       updatePackageDependencies.update();
 
       expect(updatePackageDependencies.runBufferedProcess).toHaveBeenCalled();
-      if (process.platform !== "win32") {
-        expect(command.endsWith(`/${baseExecutableName}`)).toBe(true);
-      } else {
-        expect(command.endsWith(`\\${baseExecutableName}.cmd`)).toBe(true);
-      }
-      expect(args).toEqual(["install", "--no-color"]);
+      expect(command).toBe(baseExecutableName);
+      expect(args).toEqual(["install"]);
       expect(options.cwd).toEqual(projectPath);
     });
 
-    it("only allows one apm process to be spawned at a time", () => {
+    it("only allows one npm process to be spawned at a time", () => {
       updatePackageDependencies.update();
       expect(updatePackageDependencies.runBufferedProcess.callCount).toBe(1);
 
