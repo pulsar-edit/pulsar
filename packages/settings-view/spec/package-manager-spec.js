@@ -5,7 +5,6 @@ describe("PackageManager", function () {
   let [packageManager] = [];
 
   beforeEach(function () {
-    atom.config.set("core.useProxySettingsWhenCallingApm", false);
     packageManager = new PackageManager();
   });
 

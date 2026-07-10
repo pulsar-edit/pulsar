@@ -13,8 +13,6 @@ module.exports = class PackageManager {
   constructor() {
     // Millisecond expiry for cached loadOutdated, etc. values
     this.CACHE_EXPIRY = 1000 * 60 * 10;
-    this.setProxyServers = this.setProxyServers.bind(this);
-    this.setProxyServersAsync = this.setProxyServersAsync.bind(this);
     this.packagePromises = [];
     this.apmCache = {
       loadOutdated: {
@@ -56,41 +54,6 @@ module.exports = class PackageManager {
     return schema != null && schema.type !== "any";
   }
 
-  setProxyServers(callback) {
-    const { session } = atom.getCurrentWindow().webContents;
-    session.resolveProxy("http://atom.io", (httpProxy) => {
-      this.applyProxyToEnv("http_proxy", httpProxy);
-      session.resolveProxy("https://pulsar-edit.dev", (httpsProxy) => {
-        this.applyProxyToEnv("https_proxy", httpsProxy);
-        return callback();
-      });
-    });
-  }
-
-  setProxyServersAsync(callback) {
-    const httpProxyPromise = atom
-      .resolveProxy("http://atom.io")
-      .then((proxy) => this.applyProxyToEnv("http_proxy", proxy));
-    const httpsProxyPromise = atom
-      .resolveProxy("https://pulsar-edit.dev")
-      .then((proxy) => this.applyProxyToEnv("https_proxy", proxy));
-    return Promise.all([httpProxyPromise, httpsProxyPromise]).then(callback);
-  }
-
-  applyProxyToEnv(envName, proxy) {
-    if (proxy != null) {
-      proxy = proxy.split(" ");
-      switch (proxy[0].trim().toUpperCase()) {
-        case "DIRECT":
-          delete process.env[envName];
-          break;
-        case "PROXY":
-          process.env[envName] = "http://" + proxy[1];
-          break;
-      }
-    }
-  }
-
   runCommand(args, callback) {
     const command = atom.packages.getApmPath();
     const outputLines = [];
@@ -101,24 +64,7 @@ module.exports = class PackageManager {
 
     args.push("--no-color");
 
-    if (atom.config.get("core.useProxySettingsWhenCallingApm")) {
-      const bufferedProcess = new BufferedProcess({
-        command,
-        args,
-        stdout,
-        stderr,
-        exit,
-        autoStart: false,
-      });
-      if (atom.resolveProxy != null) {
-        this.setProxyServersAsync(() => bufferedProcess.start());
-      } else {
-        this.setProxyServers(() => bufferedProcess.start());
-      }
-      return bufferedProcess;
-    } else {
-      return new BufferedProcess({ command, args, stdout, stderr, exit });
-    }
+    return new BufferedProcess({ command, args, stdout, stderr, exit });
   }
 
   loadInstalled(callback) {
