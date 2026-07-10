@@ -140,6 +140,20 @@ module.exports = class TextEditorComponent {
     // keeps the viewport visually stable across soft-wrap reflows.
     this.lastScrollWasManual = false;
     this.scrollAnchorBeforeReset = null;
+    // A viewport anchor captured just before a display-layer reset, to be
+    // re-applied on the next update once the spatial index has been repopulated.
+    // The restore is deferred (rather than run inside didResetDisplayLayer)
+    // because the reset clears the spatial index, so scroll geometry read
+    // synchronously there (e.g. getMaxScrollTop, which falls back to the
+    // unwrapped buffer height while indexedBufferRowCount is 0) would be wrong.
+    this.pendingReflowScrollAnchor = null;
+    // The anchor inherited from the editor this one was copied from, kept
+    // around after its first application. A new split pane passes through
+    // several transient layouts (placeholder height, width still settling);
+    // re-capturing an anchor from those would drift the viewport away from the
+    // source position, so reflows re-apply this anchor instead until the user
+    // scrolls, moves the cursor, or edits.
+    this.settlingScrollAnchor = null;
     // Coalesces width-driven soft-wrap reflows when softWrapDebounceInterval > 0.
     this.softWrapDebounceTimer = null;
     this.flushingSoftWrapColumn = false;
@@ -391,6 +405,18 @@ module.exports = class TextEditorComponent {
     }
     this.populateVisibleRowRange(this.getRenderedStartRow());
     this.populateVisibleTiles();
+    // Now that the visible rows are indexed again, apply a copy's inherited
+    // anchor once the layout is real, or re-apply the anchor captured before a
+    // display-layer reset (soft-wrap toggle, resize, tab width, etc.). Scroll
+    // geometry is trustworthy here, so a past-end/bottom anchor lands
+    // correctly. If it moved the viewport, repopulate for the corrected range.
+    const anchorRestored = this.pendingScrollAnchor
+      ? this.flushPendingCopyScrollAnchor()
+      : this.flushPendingReflowScrollAnchor();
+    if (anchorRestored) {
+      this.populateVisibleRowRange(this.getRenderedStartRow());
+      this.populateVisibleTiles();
+    }
     this.queryScreenLinesToRender();
     this.queryLongestLine();
     this.queryLineNumbersToRender();
@@ -1656,7 +1682,11 @@ module.exports = class TextEditorComponent {
     const scrollTopChanged =
       wheelDeltaY !== 0 && this.setScrollTop(this.getScrollTop() - wheelDeltaY);
 
-    if (scrollTopChanged) this.lastScrollWasManual = true;
+    if (scrollTopChanged) {
+      this.lastScrollWasManual = true;
+      // The user took over the viewport; stop pinning the inherited anchor.
+      this.settlingScrollAnchor = null;
+    }
 
     if (scrollLeftChanged || scrollTopChanged) {
       event.preventDefault();
@@ -1676,7 +1706,16 @@ module.exports = class TextEditorComponent {
         }
 
         this.resizeObserver.disconnect();
-        this.scheduleUpdate();
+        if (this.pendingScrollAnchor) {
+          // A copy is waiting for its first real layout to restore the source's
+          // viewport. ResizeObserver fires after layout but before paint, so an
+          // immediate update applies the anchor without flashing the
+          // provisional position for a frame (a scheduled update would run at
+          // the next frame's rAF, after this frame painted).
+          this.updateSync();
+        } else {
+          this.scheduleUpdate();
+        }
         process.nextTick(() => {
           this.resizeObserver.observe(this.element);
         });
@@ -1701,7 +1740,11 @@ module.exports = class TextEditorComponent {
     let scrollLeftChanged = false;
     if (!this.scrollTopPending) {
       scrollTopChanged = this.setScrollTop(this.refs.verticalScrollbar?.element.scrollTop ?? 0);
-      if (scrollTopChanged) this.lastScrollWasManual = true;
+      if (scrollTopChanged) {
+        this.lastScrollWasManual = true;
+        // The user took over the viewport; stop pinning the inherited anchor.
+        this.settlingScrollAnchor = null;
+      }
     }
     if (!this.scrollLeftPending) {
       scrollLeftChanged = this.setScrollLeft(
@@ -2190,23 +2233,25 @@ module.exports = class TextEditorComponent {
     // An autoscroll request reflects a cursor/selection move rather than a
     // manual scroll, so anchor to the cursor line on the next reflow.
     this.lastScrollWasManual = false;
+    // The user took over the viewport; stop pinning the inherited anchor.
+    this.settlingScrollAnchor = null;
     this.scheduleUpdate();
   }
 
   flushPendingLogicalScrollPosition() {
     let changedScrollTop = false;
     if (this.pendingScrollAnchor) {
-      // Restore the source viewport's buffer position, mapped through this
-      // editor's (possibly different) width. Inherit the source's anchor mode
-      // so a resize that settles afterward (e.g. a new split pane taking half
-      // the width) re-anchors consistently instead of snapping to the cursor.
-      if (this.pendingScrollAnchor.wasManual != null) {
-        this.lastScrollWasManual = this.pendingScrollAnchor.wasManual;
+      // May decline (and stay pending) while the container has no real height;
+      // updateSyncBeforeMeasuringContent retries once the layout is real.
+      changedScrollTop = this.flushPendingCopyScrollAnchor();
+      if (!changedScrollTop && this.pendingScrollAnchor) {
+        // Still pending: position provisionally (without consuming the anchor)
+        // so any frame painted before the layout settles already shows the
+        // right region instead of the top of the buffer. A row anchor doesn't
+        // depend on the viewport height, so this is usually already exact; the
+        // authoritative restore corrects any residue before the next paint.
+        changedScrollTop = this.restoreScrollAnchor(this.pendingScrollAnchor);
       }
-      this.restoreScrollAnchor(this.pendingScrollAnchor);
-      this.pendingScrollAnchor = null;
-      this.pendingScrollTopRow = null;
-      changedScrollTop = true;
     } else if (this.pendingScrollTopRow > 0) {
       changedScrollTop = this.setScrollTopRow(this.pendingScrollTopRow, false);
       this.pendingScrollTopRow = null;
@@ -2221,6 +2266,33 @@ module.exports = class TextEditorComponent {
     if (changedScrollTop || changedScrollLeft) {
       this.updateSync();
     }
+  }
+
+  // Applies the viewport anchor inherited from the editor this one was copied
+  // from, restoring the source's visual position through this editor's own
+  // (possibly different) soft-wrap geometry. Declines while the scroll
+  // container has no real height yet — a freshly split pane is measured before
+  // the layout settles, and an anchor restored (and later re-captured) against
+  // that placeholder geometry drifts the viewport away from the source.
+  flushPendingCopyScrollAnchor() {
+    if (!this.pendingScrollAnchor || !this.hasInitialMeasurements) return false;
+    if (this.getScrollContainerClientHeight() <= 0) return false;
+
+    const anchor = this.pendingScrollAnchor;
+    this.pendingScrollAnchor = null;
+    this.pendingScrollTopRow = null;
+    // Inherit the source's anchor mode so later reflows re-anchor the same way
+    // (scroll midpoint vs. cursor) instead of snapping to the cursor.
+    if (anchor.wasManual != null) {
+      this.lastScrollWasManual = anchor.wasManual;
+    }
+    // Keep re-applying this anchor across the reflows a new split pane goes
+    // through while the panes resize into place; drop any reflow anchor
+    // captured from the transient geometry before this authoritative restore.
+    this.settlingScrollAnchor = anchor;
+    this.pendingReflowScrollAnchor = null;
+    this.scrollAnchorBeforeReset = null;
+    return this.restoreScrollAnchor(anchor);
   }
 
   autoscrollVertically(screenRange, options) {
@@ -2887,25 +2959,51 @@ module.exports = class TextEditorComponent {
 
   // Called by the model just before the display layer resets its screen-row
   // geometry. Records where the viewport is anchored (in buffer coordinates)
-  // while the old geometry is still queryable, so didResetDisplayLayer can put
-  // the same content back under the viewport after the rows are re-wrapped.
+  // while the old geometry is still fully populated and queryable, so the next
+  // update can put the same content back under the viewport after re-wrapping.
   willResetDisplayLayer() {
+    // A copy's inherited anchor hasn't been applied yet; there is no viewport
+    // state worth capturing, and the pending anchor is restored later anyway.
+    if (this.pendingScrollAnchor) return;
+    // A single reflow can reset the display layer more than once (e.g.
+    // updateModelSoftWrapColumn relays the width twice around a scrollbar
+    // measurement). Only capture on the first reset of a cycle so the anchor
+    // reflects the settled pre-reflow geometry rather than a half-reset,
+    // not-yet-restored intermediate state.
+    if (this.pendingReflowScrollAnchor) return;
     // While a freshly copied editor's layout is still settling, re-apply its
     // exact source anchor across each reflow instead of re-capturing (which
-    // would drift with the transient width).
-    this.scrollAnchorBeforeReset = this.captureScrollAnchor();
+    // would drift with the transient width and placeholder height).
+    this.scrollAnchorBeforeReset = this.settlingScrollAnchor || this.captureScrollAnchor();
   }
 
   didResetDisplayLayer() {
     this.spliceLineTopIndex(0, Infinity, Infinity);
+    // Defer the restore: the reset just cleared the spatial index, so scroll
+    // geometry is not yet trustworthy here. flushPendingReflowScrollAnchor
+    // re-applies the anchor on the next update, once the visible rows have been
+    // repopulated. Restoring synchronously here would read a bogus
+    // getMaxScrollTop (the un-indexed layer reports its unwrapped height) and
+    // snap a past-end viewport to the wrong place.
     if (this.scrollAnchorBeforeReset) {
-      this.restoreScrollAnchor(this.scrollAnchorBeforeReset);
+      this.pendingReflowScrollAnchor = this.scrollAnchorBeforeReset;
       this.scrollAnchorBeforeReset = null;
     }
     this.scheduleUpdate();
   }
 
+  flushPendingReflowScrollAnchor() {
+    if (!this.pendingReflowScrollAnchor || !this.hasInitialMeasurements) return false;
+    const anchor = this.pendingReflowScrollAnchor;
+    this.pendingReflowScrollAnchor = null;
+    return this.restoreScrollAnchor(anchor);
+  }
+
   didChangeDisplayLayer(changes) {
+    // An edit means the settling window is over (and the anchor's buffer
+    // position may no longer point at the same content); resume normal
+    // capture-on-reflow behavior.
+    if (changes.length > 0) this.settlingScrollAnchor = null;
     // Screen-row changes entirely above the viewport shift every visible row by
     // the same amount. Compensate scrollTop by that delta so the visible
     // content stays put. This keeps unfocused split editors on the same buffer
@@ -2950,10 +3048,17 @@ module.exports = class TextEditorComponent {
     const scrollTop = this.getScrollTop();
 
     let screenRow = null;
+    let bufferPosition = null;
     if (!this.lastScrollWasManual) {
-      const cursorRow = model.getCursorScreenPosition().row;
+      const cursorScreenPosition = model.getCursorScreenPosition();
+      const cursorRow = cursorScreenPosition.row;
       if (cursorRow >= this.getFirstVisibleRow() && cursorRow <= this.getLastVisibleRow()) {
         screenRow = cursorRow;
+        // Anchor the cursor's actual buffer position, not column 0 of its
+        // current wrapped screen row. After the width changes, that wrapped
+        // segment may start at a different buffer column; anchoring its old
+        // start would therefore preserve the wrong visual row.
+        bufferPosition = model.getCursorBufferPosition();
       }
     }
     if (screenRow === null) {
@@ -2963,7 +3068,7 @@ module.exports = class TextEditorComponent {
         // Scrolled more than half a screen past the end (scrollPastEnd): anchor
         // the distance from the maximum scroll so the empty past-end gap below
         // the content keeps its size. This is relative to the scroll extent
-        // rather than a buffer position, so it survives a copy that wraps to a
+        // rather than a buffer position, so it survives a reflow that wraps to a
         // different height (where a content-relative anchor drifts, since the
         // content height is only approximate for the unrendered rows).
         return {
@@ -2976,7 +3081,9 @@ module.exports = class TextEditorComponent {
       screenRow = this.rowForPixelPosition(midpointPixel);
     }
 
-    const bufferPosition = model.bufferPositionForScreenPosition(Point(screenRow, 0));
+    if (bufferPosition === null) {
+      bufferPosition = model.bufferPositionForScreenPosition(Point(screenRow, 0));
+    }
     const rowTop = this.pixelPositionBeforeBlocksForRow(screenRow);
     // Carry the anchor mode (scroll midpoint vs. cursor) so an editor restoring
     // this anchor keeps re-anchoring the same way across later reflows.
@@ -2988,17 +3095,30 @@ module.exports = class TextEditorComponent {
     };
   }
 
+  // Returns whether the scroll position changed.
   restoreScrollAnchor(anchor) {
-    if (!anchor || !this.hasInitialMeasurements) return;
+    if (!anchor || !this.hasInitialMeasurements) return false;
 
+    let changed;
     if (anchor.type === "bottom") {
-      this.setScrollTop(this.getMaxScrollTop() - anchor.bottomOffset);
-      return;
+      // Populate the spatial index through the end of the buffer so
+      // getMaxScrollTop reflects the real wrapped height rather than the
+      // approximation derived from the rows indexed so far. A bottom anchor
+      // means the viewport is at the very end, so this work is needed to
+      // render there anyway.
+      const { model } = this.props;
+      model.screenPositionForBufferPosition(model.getBuffer().getEndPosition());
+      this.derivedDimensionsCache = {};
+      const target = this.getMaxScrollTop() - anchor.bottomOffset;
+      changed = this.setScrollTop(target);
+      return changed;
     }
 
     const screenPosition = this.props.model.screenPositionForBufferPosition(anchor.bufferPosition);
     const rowTop = this.pixelPositionBeforeBlocksForRow(screenPosition.row);
-    this.setScrollTop(rowTop - anchor.offset);
+    const target = rowTop - anchor.offset;
+    changed = this.setScrollTop(target);
+    return changed;
   }
 
   didChangeSelectionRange() {

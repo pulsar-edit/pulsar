@@ -7026,6 +7026,9 @@ os-locale@^1.4.0:
   dependencies:
     lcid "^1.0.0"
 
+"overtype-mode@file:packages/overtype-mode":
+  version "1.0.0"
+
 own-keys@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/own-keys/-/own-keys-1.0.1.tgz#e4006910a2bf913585289676eebd6f390cf51358"
@@ -7513,7 +7516,7 @@ readdirp@~3.6.0:
 "recent-list@file:packages/recent-list":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-9ceb1fd8-53bb-43af-bf3f-b9299e5d52b7-1783688807423/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-a3b3fd3a-c831-4dd4-aa92-85f5581f4501-1783695651461/shared/select-list"
 
 reduce-flatten@^1.0.1:
   version "1.0.1"
