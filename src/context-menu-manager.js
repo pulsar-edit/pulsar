@@ -187,11 +187,11 @@ module.exports = class ContextMenuManager {
         });
         const keystrokes = keymaps && keymaps[0] ? keymaps[0].keystrokes : undefined;
         if (keystrokes) {
-          // Electron does not support multi-keystroke accelerators. Therefore,
-          // when the command maps to a multi-stroke key binding, show the
-          // keystrokes next to the item's label.
+          // Electron does not support multi-keystroke accelerators. Expose
+          // them separately so the native menu path can render them next to
+          // the item's label without polluting the label itself.
           if (keystrokes.includes(" ")) {
-            item.label += ` [${_.humanizeKeystroke(keystrokes)}]`;
+            item.multiKeystrokeLabel = _.humanizeKeystroke(keystrokes);
           } else {
             item.accelerator = MenuHelpers.acceleratorForKeystroke(keystrokes);
           }
@@ -251,12 +251,26 @@ module.exports = class ContextMenuManager {
     return item;
   }
 
+  // The native menu cannot render multi-keystroke accelerators, so show the
+  // keystrokes next to the item's label instead.
+  appendMultiKeystrokeLabels(template) {
+    for (const item of template) {
+      if (item.multiKeystrokeLabel) {
+        item.label += ` [${item.multiKeystrokeLabel}]`;
+      }
+      if (Array.isArray(item.submenu)) {
+        this.appendMultiKeystrokeLabels(item.submenu);
+      }
+    }
+  }
+
   showForEvent(event) {
     this.activeElement = event.target;
     const menuTemplate = this.templateForEvent(event);
     if (!(menuTemplate && menuTemplate.length > 0)) {
       return;
     }
+    this.appendMultiKeystrokeLabels(menuTemplate);
     remote.getCurrentWindow().emit("context-menu", menuTemplate);
   }
 

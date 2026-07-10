@@ -428,12 +428,13 @@ describe("ContextMenuManager", function () {
 
       child.focus();
 
-      const label = process.platform === "darwin" ? "⌃A ⌃B" : "Ctrl+A Ctrl+B";
+      const keystrokeLabel = process.platform === "darwin" ? "⌃A ⌃B" : "Ctrl+A Ctrl+B";
       expect(contextMenu.templateForEvent({ target: child })).toEqual([
         {
-          label: `Multi-keystroke command [${label}]`,
+          label: "Multi-keystroke command",
           id: `Multi-keystroke command`,
           command: "test:multi-keystroke-command",
+          multiKeystrokeLabel: keystrokeLabel,
         },
       ]);
     });

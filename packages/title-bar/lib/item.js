@@ -118,9 +118,7 @@ class MenuItem {
   }
 
   static createContextMenuItem(template, targetElement) {
-    // Clean up labels for context menus
-    const cleanedTemplate = MenuItem.cleanTemplateLabels(template);
-    const item = MenuItem.createMenuItem(cleanedTemplate);
+    const item = MenuItem.createMenuItem(template);
     item.targetElement = targetElement;
 
     // Recursively set targetElement on submenu items
@@ -129,24 +127,6 @@ class MenuItem {
     }
 
     return item;
-  }
-
-  static cleanTemplateLabels(template) {
-    if (!template) return template;
-
-    const cleaned = { ...template };
-
-    // Clean the label if present
-    if (cleaned.label) {
-      cleaned.label = Utils.cleanContextMenuLabel(cleaned.label);
-    }
-
-    // Recursively clean submenu items
-    if (cleaned.submenu && Array.isArray(cleaned.submenu)) {
-      cleaned.submenu = cleaned.submenu.map((item) => MenuItem.cleanTemplateLabels(item));
-    }
-
-    return cleaned;
   }
 
   static setTargetElementRecursive(item, targetElement) {
