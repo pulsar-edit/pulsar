@@ -357,9 +357,9 @@ h2 {
 
         await atom.themes.activateThemes();
         let styleElementRemovedHandler = jasmine.createSpy("styleElementRemovedHandler");
-        let styleElementAddedHandler = jasmine.createSpy("styleElementAddedHandler");
+        let styleElementUpdatedHandler = jasmine.createSpy("styleElementUpdatedHandler");
         atom.styles.onDidRemoveStyleElement(styleElementRemovedHandler);
-        atom.styles.onDidAddStyleElement(styleElementAddedHandler);
+        atom.styles.onDidUpdateStyleElement(styleElementUpdatedHandler);
 
         spyOn(atom.themes, "loadUserStylesheet").and.callThrough();
 
@@ -371,19 +371,19 @@ h2 {
           return getComputedStyle(document.body).borderStyle === "dashed";
         });
 
-        expect(styleElementRemovedHandler).toHaveBeenCalled();
-        expect(styleElementRemovedHandler.calls.argsFor(0)[0].textContent).toContain("dotted");
+        // The style element is updated in place rather than removed and
+        // re-added, so the user styles never leave the DOM.
+        expect(styleElementRemovedHandler).not.toHaveBeenCalled();
+        expect(styleElementUpdatedHandler).toHaveBeenCalled();
+        expect(styleElementUpdatedHandler.calls.argsFor(0)[0].textContent).toContain("dashed");
 
-        expect(styleElementAddedHandler).toHaveBeenCalled();
-        // console.log('args:', styleElementRemovedHandler.calls.argsFor(0));
-        expect(styleElementAddedHandler.calls.argsFor(0)[0].textContent).toContain("dashed");
-
-        styleElementRemovedHandler.calls.reset();
         fs.removeSync(userStylesheetPath);
 
         await waitForCondition(() => {
           return getComputedStyle(document.body).borderStyle === "none";
         });
+
+        expect(styleElementRemovedHandler).toHaveBeenCalled();
       });
     });
 
@@ -398,15 +398,16 @@ h2 {
         atom.notifications.onDidAddNotification(addErrorHandler);
       });
 
-      it("creates an error notification and does not add the stylesheet", async () => {
+      it("creates an error notification and keeps the previous stylesheet", async () => {
         await atom.themes.loadUserStylesheet();
         expect(addErrorHandler).toHaveBeenCalled();
         const note = addErrorHandler.calls.mostRecent().args[0];
         expect(note.getType()).toBe("error");
         expect(note.getMessage()).toContain("Error loading");
-        expect(
-          atom.styles.styleElementsBySourcePath[atom.styles.getUserStyleSheetPath()],
-        ).toBeUndefined();
+        const styleElement =
+          atom.styles.styleElementsBySourcePath[atom.styles.getUserStyleSheetPath()];
+        expect(styleElement).not.toBeUndefined();
+        expect(styleElement.textContent).toContain("dotted");
       });
     });
 

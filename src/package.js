@@ -791,14 +791,19 @@ module.exports = class Package {
       settings.deactivate(this.config);
     }
 
-    if (this.stylesheetDisposables) this.stylesheetDisposables.dispose();
+    this.deactivateStylesheets();
     if (this.activationDisposables) this.activationDisposables.dispose();
     if (this.keymapDisposables) this.keymapDisposables.dispose();
 
-    this.stylesheetsActivated = false;
     this.grammarsActivated = false;
     this.settingsActivated = false;
     this.menusActivated = false;
+  }
+
+  deactivateStylesheets() {
+    if (this.stylesheetDisposables) this.stylesheetDisposables.dispose();
+    this.stylesheetDisposables = null;
+    this.stylesheetsActivated = false;
   }
 
   reloadStylesheets() {

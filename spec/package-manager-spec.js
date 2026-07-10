@@ -1576,7 +1576,9 @@ describe("PackageManager", () => {
         expect(atom.config.get("core.disabledPackages")).not.toContain(packageName);
 
         await new Promise((resolve) => {
-          atom.themes.onDidChangeActiveThemes(resolve);
+          atom.packages.onDidDeactivatePackage((p) => {
+            if (p.name === packageName) resolve();
+          });
           atom.packages.disablePackage(packageName);
         });
 

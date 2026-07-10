@@ -28,10 +28,9 @@ module.exports = class ThemeManager {
     this.styleSheetDisposablesBySourcePath = {};
     this.lessCache = null;
     this.initialLoadComplete = false;
+    this.themeImportPathsOverride = null;
+    this.themeSwitchPromise = Promise.resolve();
     this.packageManager.registerPackageActivator(this, ["theme"]);
-    this.packageManager.onDidActivateInitialPackages(() => {
-      this.onDidChangeActiveThemes(() => this.packageManager.reloadActivePackageStyleSheets());
-    });
 
     this.reloadStylesheet = _.debounce(() => {
       this.loadUserStylesheet();
@@ -209,14 +208,21 @@ module.exports = class ThemeManager {
     this.userStylesheetSubscription?.dispose();
     this.userStylesheetSubscription = null;
 
-    this.userStyleSheetDisposable?.dispose();
-    this.userStyleSheetDisposable = null;
-
     // Pause a moment for file-watcher cleanup.
     await wait(10);
   }
 
+  removeUserStylesheet() {
+    this.userStyleSheetDisposable?.dispose();
+    this.userStyleSheetDisposable = null;
+  }
+
   async loadUserStylesheet() {
+    await this.watchUserStylesheet();
+    this.applyUserStylesheet(this.readUserStylesheet());
+  }
+
+  async watchUserStylesheet() {
     await this.unwatchUserStylesheet();
 
     const userStylesheetPath = this.styleManager.getUserStyleSheetPath();
@@ -249,16 +255,36 @@ On Linux there are currently problems with watch sizes. See [this document][watc
       }
       this.notificationManager.addError(message, { dismissable: true });
     }
+  }
 
-    let userStylesheetContents;
-    try {
-      userStylesheetContents = this.loadStylesheet(userStylesheetPath, true);
-    } catch {
-      return;
+  readUserStylesheet() {
+    const sourcePath = this.styleManager.getUserStyleSheetPath();
+    if (!fs.isFileSync(sourcePath)) {
+      return { sourcePath, exists: false, contents: null };
     }
 
-    this.userStyleSheetDisposable = this.styleManager.addStyleSheet(userStylesheetContents, {
-      sourcePath: userStylesheetPath,
+    try {
+      return { sourcePath, exists: true, contents: this.loadStylesheet(sourcePath, true) };
+    } catch {
+      // Compile error — the notification was already shown; keep the
+      // previous styles applied.
+      return { sourcePath, exists: true, contents: null };
+    }
+  }
+
+  applyUserStylesheet({ sourcePath, exists, contents }) {
+    if (!exists) {
+      this.removeUserStylesheet();
+      return;
+    }
+    if (contents == null) return;
+
+    // `addStyleSheet` updates the existing style element in place when the
+    // source path matches, so the user styles never leave the DOM. Drop the
+    // old disposable without disposing it — disposing would remove the
+    // reused element.
+    this.userStyleSheetDisposable = this.styleManager.addStyleSheet(contents, {
+      sourcePath,
       priority: 2,
     });
   }
@@ -372,36 +398,135 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     return new Promise((resolve) => {
       // @config.observe runs the callback once, then on subsequent changes.
       this.config.observe("core.themes", () => {
-        this.deactivateThemes().then(() => {
-          this.warnForNonExistentThemes();
-          this.refreshLessCache(); // Update cache for packages in core.themes config
-
-          const promises = [];
-          for (const themeName of this.getEnabledThemeNames()) {
-            if (this.packageManager.resolvePackagePath(themeName)) {
-              promises.push(this.packageManager.activatePackage(themeName));
-            } else {
-              console.warn(`Failed to activate theme '${themeName}' because it isn't installed.`);
-            }
-          }
-
-          return Promise.all(promises).then(async () => {
-            this.addActiveThemeClasses();
-            this.refreshLessCache(); // Update cache again now that @getActiveThemes() is populated
-            await this.loadUserStylesheet();
-            this.reloadBaseStylesheets();
-            this.initialLoadComplete = true;
-            this.emitter.emit("did-change-active-themes");
+        // Serialize switches so a rapid re-toggle can't interleave with the
+        // previous switch's package bookkeeping.
+        this.themeSwitchPromise = this.themeSwitchPromise
+          .then(() => this.switchThemes())
+          .then(resolve, (error) => {
+            console.error("Failed to switch themes", error);
             resolve();
           });
-        });
       });
     });
+  }
+
+  async switchThemes() {
+    this.warnForNonExistentThemes();
+
+    // The old themes' style sheets stay in the DOM while the new themes load
+    // and compile, so the window never paints unstyled.
+    const oldThemes = this.getActiveThemes();
+    const enabledThemeNames = this.getEnabledThemeNames();
+
+    // Compile against the new theme set's import paths even though the old
+    // themes are still active.
+    this.themeImportPathsOverride = this.getImportPathsForThemeNames(enabledThemeNames);
+    this.refreshLessCache();
+
+    const newThemes = [];
+    for (const themeName of enabledThemeNames) {
+      if (!this.packageManager.resolvePackagePath(themeName)) {
+        console.warn(`Failed to activate theme '${themeName}' because it isn't installed.`);
+        continue;
+      }
+      const pack = this.packageManager.loadPackage(themeName);
+      if (pack == null) continue;
+      // Theme packages compile their style sheets on activation, not on load,
+      // so compile here — before the swap — against the new import paths.
+      // `activate` recompiles later, but that hits the compile cache.
+      try {
+        pack.loadStylesheets();
+      } catch (error) {
+        pack.handleError(`Failed to load the ${pack.name} theme stylesheets`, error);
+      }
+      newThemes.push(pack);
+    }
+
+    // Everything else that bakes theme variables into its CSS — the base
+    // stylesheet, the user stylesheet, and the active packages' style sheets —
+    // also compiles now, so the whole window can restyle in a single frame.
+    let baseStylesheetPath, baseStylesheet;
+    try {
+      baseStylesheetPath = this.resolveStylesheet("../static/atom");
+      baseStylesheet = this.loadStylesheet(baseStylesheetPath);
+    } catch {
+      baseStylesheet = null;
+    }
+
+    const userStylesheet = this.readUserStylesheet();
+
+    const activePackages = this.packageManager
+      .getActivePackages()
+      .filter((pack) => pack.getType() !== "theme" && typeof pack.loadStylesheets === "function");
+    for (const pack of activePackages) {
+      try {
+        pack.loadStylesheets();
+      } catch (error) {
+        pack.handleError(`Failed to reload the ${pack.name} package stylesheets`, error);
+      }
+    }
+
+    // Apply all the precompiled styles in one synchronous block; the browser
+    // cannot paint a frame in the middle of it.
+    const applyStyles = () => {
+      this.removeActiveThemeClasses(oldThemes);
+      for (const pack of oldThemes) pack.deactivateStylesheets();
+      for (const pack of newThemes) pack.activateStylesheets();
+      this.addActiveThemeClasses(newThemes);
+      if (baseStylesheet != null) {
+        this.applyStylesheet(baseStylesheetPath, baseStylesheet, -2, true);
+      }
+      this.applyUserStylesheet(userStylesheet);
+      for (const pack of activePackages) {
+        pack.deactivateStylesheets();
+        pack.activateStylesheets();
+      }
+    };
+
+    // Cross-fade between the two themes; the compositor snapshots the old
+    // rendering before `applyStyles` mutates the page.
+    if (
+      this.initialLoadComplete &&
+      !document.hidden &&
+      typeof document.startViewTransition === "function"
+    ) {
+      const transition = document.startViewTransition(applyStyles);
+      // Hidden, occluded, or otherwise render-throttled windows may never get
+      // the rendering opportunity the transition callback waits for; force the
+      // swap through rather than stalling the switch. Skipping still invokes
+      // the update callback.
+      const timer = setTimeout(() => transition.skipTransition(), 100);
+      try {
+        await transition.updateCallbackDone;
+      } finally {
+        clearTimeout(timer);
+      }
+    } else {
+      applyStyles();
+    }
+
+    // Complete the package lifecycle switch. Themes present in both sets stay
+    // active; their recompiled styles were already re-attached above, and
+    // `activatePackage` skips re-attaching because `stylesheetsActivated` is
+    // set.
+    const newThemeNames = new Set(newThemes.map((pack) => pack.name));
+    const themesToDeactivate = oldThemes.filter((pack) => !newThemeNames.has(pack.name));
+    await Promise.all(
+      themesToDeactivate.map((pack) => this.packageManager.deactivatePackage(pack.name)),
+    );
+    await Promise.all(newThemes.map((pack) => this.packageManager.activatePackage(pack.name)));
+
+    this.themeImportPathsOverride = null;
+    this.refreshLessCache(); // Update cache again now that @getActiveThemes() is populated
+    await this.watchUserStylesheet();
+    this.initialLoadComplete = true;
+    this.emitter.emit("did-change-active-themes");
   }
 
   deactivateThemes() {
     this.removeActiveThemeClasses();
     this.unwatchUserStylesheet();
+    this.removeUserStylesheet();
     const results = this.getActiveThemes().map((pack) =>
       this.packageManager.deactivatePackage(pack.name),
     );
@@ -412,18 +537,18 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     return this.initialLoadComplete;
   }
 
-  addActiveThemeClasses() {
+  addActiveThemeClasses(themes = this.getActiveThemes()) {
     const workspaceElement = this.viewRegistry.getView(this.workspace);
     if (workspaceElement) {
-      for (const pack of this.getActiveThemes()) {
+      for (const pack of themes) {
         workspaceElement.classList.add(`theme-${pack.name}`);
       }
     }
   }
 
-  removeActiveThemeClasses() {
+  removeActiveThemeClasses(themes = this.getActiveThemes()) {
     const workspaceElement = this.viewRegistry.getView(this.workspace);
-    for (const pack of this.getActiveThemes()) {
+    for (const pack of themes) {
       workspaceElement.classList.remove(`theme-${pack.name}`);
     }
   }
@@ -433,21 +558,31 @@ On Linux there are currently problems with watch sizes. See [this document][watc
   }
 
   getImportPaths() {
-    let themePaths;
+    if (this.themeImportPathsOverride) {
+      return this.themeImportPathsOverride;
+    }
+
     const activeThemes = this.getActiveThemes();
     if (activeThemes.length > 0) {
-      themePaths = activeThemes.filter((theme) => theme).map((theme) => theme.getStylesheetsPath());
-    } else {
-      themePaths = [];
-      for (const themeName of this.getEnabledThemeNames()) {
-        const themePath = this.packageManager.resolvePackagePath(themeName);
-        if (themePath) {
-          const deprecatedPath = path.join(themePath, "stylesheets");
-          if (fs.isDirectorySync(deprecatedPath)) {
-            themePaths.push(deprecatedPath);
-          } else {
-            themePaths.push(path.join(themePath, "styles"));
-          }
+      return activeThemes
+        .filter((theme) => theme)
+        .map((theme) => theme.getStylesheetsPath())
+        .filter((themePath) => fs.isDirectorySync(themePath));
+    }
+
+    return this.getImportPathsForThemeNames(this.getEnabledThemeNames());
+  }
+
+  getImportPathsForThemeNames(themeNames) {
+    const themePaths = [];
+    for (const themeName of themeNames) {
+      const themePath = this.packageManager.resolvePackagePath(themeName);
+      if (themePath) {
+        const deprecatedPath = path.join(themePath, "stylesheets");
+        if (fs.isDirectorySync(deprecatedPath)) {
+          themePaths.push(deprecatedPath);
+        } else {
+          themePaths.push(path.join(themePath, "styles"));
         }
       }
     }
