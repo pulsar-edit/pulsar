@@ -1,7 +1,9 @@
 const fs = require("fs-plus");
 const path = require("path");
 const remote = require("@electron/remote");
-const glob = require("glob");
+// glob >=9 exports named functions; older hoisted versions expose the callable module
+const globPkg = require("glob");
+const glob = typeof globPkg === "function" ? require("util").promisify(globPkg) : globPkg.glob;
 const request = require("request");
 
 module.exports = class AtomIoClient {
@@ -116,10 +118,7 @@ module.exports = class AtomIoClient {
   }
 
   cachedAvatar(login, callback) {
-    glob(this.avatarGlob(login), (err, files) => {
-      if (err) {
-        return callback(err);
-      }
+    glob(this.avatarGlob(login)).then((files) => {
       files.sort().reverse();
       for (let imagePath of Array.from(files)) {
         const filename = path.basename(imagePath);
@@ -130,7 +129,7 @@ module.exports = class AtomIoClient {
         }
       }
       return callback(null, null);
-    });
+    }, callback);
   }
 
   avatarGlob(login) {

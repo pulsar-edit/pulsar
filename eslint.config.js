@@ -36,14 +36,15 @@ module.exports = [
           argsIgnorePattern: "^_",
         },
       ],
-      // `atom` and `electron` are provided by the Lumine/Electron runtime,
-      // not resolvable via npm — allow them across all resolution rules.
-      "n/no-missing-require": ["error", { allowModules: ["atom", "electron"] }],
-      "n/no-missing-import": ["error", { allowModules: ["atom", "electron"] }],
-      "n/no-unpublished-require": ["error", { allowModules: ["atom", "electron"] }],
-      "n/no-unpublished-import": ["error", { allowModules: ["atom", "electron"] }],
-      "n/no-extraneous-require": ["error", { allowModules: ["atom", "electron"] }],
-      "n/no-extraneous-import": ["error", { allowModules: ["atom", "electron"] }],
+      // `atom` and `electron` are provided by the Lumine/Electron runtime, and
+      // `season` by the editor's root dependencies — none resolvable from a
+      // bundled package's own manifest, so allow them across resolution rules.
+      "n/no-missing-require": ["error", { allowModules: ["atom", "electron", "season"] }],
+      "n/no-missing-import": ["error", { allowModules: ["atom", "electron", "season"] }],
+      "n/no-unpublished-require": ["error", { allowModules: ["atom", "electron", "season"] }],
+      "n/no-unpublished-import": ["error", { allowModules: ["atom", "electron", "season"] }],
+      "n/no-extraneous-require": ["error", { allowModules: ["atom", "electron", "season"] }],
+      "n/no-extraneous-import": ["error", { allowModules: ["atom", "electron", "season"] }],
       // `localStorage`/`navigator` here are Chromium (renderer) globals, not
       // Node's newer experimental builtins of the same name.
       "n/no-unsupported-features/node-builtins": [

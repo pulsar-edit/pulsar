@@ -1,0 +1,28 @@
+{
+  "name": "window-title",
+  "author": "lumine-code",
+  "description": "Customize the window title with a template",
+  "repository": "https://github.com/lumine-code/lumine",
+  "version": "1.0.0",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "main": "./lib/main",
+  "consumedServices": {
+    "project-list": {
+      "versions": {
+        "^1.0.0": "consumeProjectList"
+      }
+    }
+  },
+  "configSchema": {
+    "template": {
+      "order": 1,
+      "title": "Window Title Template",
+      "description": "Template for the window title. Placeholders: `{projectTitle}`, `{projectName}`, `{projectPath}`, `{fileName}`, `{filePath}`, `{relativeFilePath}`, `{gitHead}`, `{appName}`, `{devMode}`, `{safeMode}`. Empty placeholders are removed. If the template renders empty, the default title is kept.",
+      "type": "string",
+      "default": "{projectTitle}"
+    }
+  }
+}

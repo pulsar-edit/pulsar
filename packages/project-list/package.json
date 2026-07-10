@@ -1,0 +1,54 @@
+{
+  "name": "project-list",
+  "author": "lumine-code",
+  "description": "Quick access and switching between projects",
+  "repository": "https://github.com/lumine-code/lumine",
+  "version": "1.0.0",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "main": "./lib/main",
+  "dependencies": {
+    "select-list": "file:../../shared/select-list",
+    "glob": "^13.0.6"
+  },
+  "providedServices": {
+    "project-list": {
+      "description": "Provides access to the project list manager",
+      "versions": {
+        "1.0.0": "provideProjectList"
+      }
+    }
+  },
+  "consumedServices": {
+    "open-external": {
+      "versions": {
+        "^1.0.0": "consumeOpenExternalService"
+      }
+    }
+  },
+  "configSchema": {
+    "useCache": {
+      "order": 1,
+      "title": "Use cached data",
+      "description": "Dump the project list to a cache file. Useful if scanning is used.",
+      "type": "boolean",
+      "default": true
+    },
+    "checkExists": {
+      "order": 2,
+      "title": "Existing items only",
+      "description": "Add an item to the list only if at least one of its paths exists.",
+      "type": "boolean",
+      "default": true
+    },
+    "parseTitleTags": {
+      "order": 3,
+      "title": "Parse [tags] in titles",
+      "description": "Parse and style [tag] patterns in project titles as tag elements.",
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
