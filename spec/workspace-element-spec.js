@@ -1030,6 +1030,67 @@ describe("WorkspaceElement", () => {
     });
   });
 
+  describe("splitting and copying an editor preserves the scroll position", () => {
+    it("keeps the copied editor at the same visual position (diagnostic)", async () => {
+      jasmine.useRealClock();
+      const workspaceElement = atom.workspace.getElement();
+      workspaceElement.style.height = "400px";
+      workspaceElement.style.width = "1000px";
+      jasmine.attachToDOM(workspaceElement);
+
+      atom.config.set("editor.softWrap", true);
+      const editor = await atom.workspace.open();
+      const lines = [];
+      for (let i = 0; i < 400; i++) lines.push(`line ${i} ` + "word ".repeat(30));
+      editor.setText(lines.join("\n"));
+
+      const sourceComponent = editor.getElement().component;
+      await conditionPromise(
+        () => sourceComponent.hasInitialMeasurements && sourceComponent.getMaxScrollTop() > 0,
+      );
+      await sourceComponent.getNextUpdatePromise();
+
+      sourceComponent.setScrollTop(Math.round(sourceComponent.getMaxScrollTop() / 2));
+      sourceComponent.lastScrollWasManual = true;
+      await sourceComponent.getNextUpdatePromise();
+
+      const midPixel =
+        sourceComponent.getScrollTop() + sourceComponent.getScrollContainerClientHeight() / 2;
+      const midRow = sourceComponent.rowForPixelPosition(midPixel);
+      const midBufferPosition = editor.bufferPositionForScreenPosition([midRow, 0]);
+
+      atom.workspace.getActivePane().splitRight({ copyActiveItem: true });
+      const copyEditor = atom.workspace.getActivePane().getActiveItem();
+      const copyComponent = copyEditor.getElement().component;
+
+      // Wait for the new pane to settle to roughly half the width.
+      await conditionPromise(
+        () =>
+          copyComponent.hasInitialMeasurements &&
+          copyComponent.getScrollContainerClientWidth() > 0 &&
+          copyComponent.getScrollContainerClientWidth() < 600,
+      );
+      await copyComponent.getNextUpdatePromise();
+
+      const lineHeight = copyComponent.getLineHeight();
+      const sourceRowAfter = editor.screenPositionForBufferPosition(midBufferPosition).row;
+      const sourceOffsetAfter =
+        sourceComponent.pixelPositionBeforeBlocksForRow(sourceRowAfter) -
+        sourceComponent.getScrollTop();
+      const copyRow = copyEditor.screenPositionForBufferPosition(midBufferPosition).row;
+      const copyOffset =
+        copyComponent.pixelPositionBeforeBlocksForRow(copyRow) - copyComponent.getScrollTop();
+
+      // The copied editor lands on the same visual position as the source: the
+      // anchored buffer row sits at the same viewport offset, and the overall
+      // scroll matches (both panes now share the settled half width).
+      expect(Math.abs(copyOffset - sourceOffsetAfter)).toBeLessThan(lineHeight);
+      expect(Math.abs(copyComponent.getScrollTop() - sourceComponent.getScrollTop())).toBeLessThan(
+        2 * lineHeight,
+      );
+    });
+  });
+
   describe("the 'window:toggle-invisibles' command", () => {
     it("shows/hides invisibles in all open and future editors", () => {
       const workspaceElement = atom.workspace.getElement();

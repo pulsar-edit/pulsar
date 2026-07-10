@@ -1223,6 +1223,11 @@ module.exports = class TextEditor {
       // Inherit scrollPastEnd so a copy scrolled into the past-end zone has the
       // room to restore the same visual position instead of clamping.
       scrollPastEnd: this.scrollPastEnd,
+      // Inherit the soft-wrap state so the copy keeps the same screen geometry;
+      // otherwise it would unwrap on first render and land at a wrong scroll
+      // position even though the copied display layer was wrapped.
+      softWrapped: this.softWrapped,
+      softWrapAtPreferredLineLength: this.softWrapAtPreferredLineLength,
     });
   }
 

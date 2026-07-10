@@ -2193,7 +2193,12 @@ module.exports = class TextEditorComponent {
     let changedScrollTop = false;
     if (this.pendingScrollAnchor) {
       // Restore the source viewport's buffer position, mapped through this
-      // editor's (possibly different) width.
+      // editor's (possibly different) width. Inherit the source's anchor mode
+      // so a resize that settles afterward (e.g. a new split pane taking half
+      // the width) re-anchors consistently instead of snapping to the cursor.
+      if (this.pendingScrollAnchor.wasManual != null) {
+        this.lastScrollWasManual = this.pendingScrollAnchor.wasManual;
+      }
       this.restoreScrollAnchor(this.pendingScrollAnchor);
       this.pendingScrollAnchor = null;
       this.pendingScrollTopRow = null;
@@ -2881,6 +2886,9 @@ module.exports = class TextEditorComponent {
   // while the old geometry is still queryable, so didResetDisplayLayer can put
   // the same content back under the viewport after the rows are re-wrapped.
   willResetDisplayLayer() {
+    // While a freshly copied editor's layout is still settling, re-apply its
+    // exact source anchor across each reflow instead of re-capturing (which
+    // would drift with the transient width).
     this.scrollAnchorBeforeReset = this.captureScrollAnchor();
   }
 
@@ -2959,7 +2967,9 @@ module.exports = class TextEditorComponent {
 
     const bufferPosition = model.bufferPositionForScreenPosition(Point(screenRow, 0));
     const rowTop = this.pixelPositionBeforeBlocksForRow(screenRow);
-    return { bufferPosition, offset: rowTop - scrollTop };
+    // Carry the anchor mode (scroll midpoint vs. cursor) so an editor restoring
+    // this anchor keeps re-anchoring the same way across later reflows.
+    return { bufferPosition, offset: rowTop - scrollTop, wasManual: this.lastScrollWasManual };
   }
 
   restoreScrollAnchor(anchor) {

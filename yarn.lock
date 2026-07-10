@@ -2070,7 +2070,7 @@ abbrev@^4.0.0:
   integrity sha512-a1wflyaL0tHtJSmLSOVybYhy22vRih4eduhhrkcjgrWGnRfrZtovJ2FRjxuTtkkj47O/baf0R86QU5OuYpz8fA==
 
 "about@file:packages/about":
-  version "1.9.1"
+  version "1.0.0"
   dependencies:
     etch "^0.14.1"
 
@@ -2246,7 +2246,7 @@ aproba@^1.0.3:
   integrity sha512-Y9J6ZjXtoYh8RnXVCMOU/ttDmk1aBjunq9vO0ta5x85WDQiQfUF9sIPBITdbiiIVcBo03Hi3jMxigBtsddlXRw==
 
 "archive-view@file:packages/archive-view":
-  version "0.66.0"
+  version "1.0.0"
   dependencies:
     "@pulsar-edit/ls-archive" "^2.0.0"
     etch "^0.14.1"
@@ -2410,10 +2410,10 @@ at-least-node@^1.0.0:
   integrity sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==
 
 "atom-dark-syntax@file:packages/atom-dark-syntax":
-  version "0.29.1"
+  version "1.0.0"
 
 "atom-dark-ui@file:packages/atom-dark-ui":
-  version "0.53.3"
+  version "1.0.0"
 
 atom-grammar-test@^0.6.3:
   version "0.6.4"
@@ -2424,10 +2424,10 @@ atom-grammar-test@^0.6.3:
     escape-string-regexp "^1.0.5"
 
 "atom-light-syntax@file:packages/atom-light-syntax":
-  version "0.29.1"
+  version "1.0.0"
 
 "atom-light-ui@file:packages/atom-light-ui":
-  version "0.46.3"
+  version "1.0.0"
 
 atom-select-list@^0.7.0, atom-select-list@^0.7.1:
   version "0.7.2"
@@ -2451,16 +2451,16 @@ atom-slick@^2, atom-slick@^2.0.0:
   integrity sha512-yKl/4ZHeP3v6gtncnX6pAPFNv3gQNNYlXMk1QYP5gYB6xq2xqkFXbpwQo3IixGUZMf+DHilAmHOrS21QKLLi9g==
 
 "autocomplete-atom-api@file:packages/autocomplete-atom-api":
-  version "0.10.7"
+  version "1.0.0"
 
 "autocomplete-css@file:packages/autocomplete-css":
-  version "0.17.5"
+  version "1.0.0"
 
 "autocomplete-html@file:packages/autocomplete-html":
-  version "0.8.9"
+  version "1.0.0"
 
 "autocomplete-plus@file:./packages/autocomplete-plus":
-  version "2.42.6"
+  version "1.0.0"
   dependencies:
     atom-slick "^2.0.0"
     grim "^2.0.1"
@@ -2470,15 +2470,15 @@ atom-slick@^2, atom-slick@^2.0.0:
     underscore-plus "^1.7.0"
 
 "autocomplete-snippets@file:packages/autocomplete-snippets":
-  version "1.12.1"
+  version "1.0.0"
 
 "autoflow@file:packages/autoflow":
-  version "0.29.4"
+  version "1.0.0"
   dependencies:
     underscore-plus "^1.7.0"
 
 "autosave@file:./packages/autosave":
-  version "0.24.6"
+  version "1.0.0"
 
 available-typed-arrays@^1.0.7:
   version "1.0.7"
@@ -2599,7 +2599,7 @@ babel-preset-atomic@^5.0.0:
     "@types/babel__preset-env" "7.9.2"
 
 "background-tips@file:packages/background-tips":
-  version "0.28.1"
+  version "1.0.0"
   dependencies:
     underscore-plus "1.x"
 
@@ -2614,10 +2614,10 @@ balanced-match@^4.0.2:
   integrity sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==
 
 "base16-tomorrow-dark-theme@file:packages/base16-tomorrow-dark-theme":
-  version "1.6.0"
+  version "1.0.0"
 
 "base16-tomorrow-light-theme@file:packages/base16-tomorrow-light-theme":
-  version "1.6.0"
+  version "1.0.0"
 
 base64-js@^1.3.1, base64-js@^1.5.1:
   version "1.5.1"
@@ -2649,11 +2649,6 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.3.0.tgz#f6e14a97858d327252200242d4ccfe522c445522"
   integrity sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==
 
-binary-search@^1.3.3:
-  version "1.3.6"
-  resolved "https://registry.yarnpkg.com/binary-search/-/binary-search-1.3.6.tgz#e32426016a0c5092f0f3598836a1c7da3560565c"
-  integrity sha512-nbE1WxOTTrUWIfsfZ4aHGYu5DOuNkbxGokjV6Z2kxfJK3uaAb8zNK1muzOeipoLHZjInT4Br88BHpzevc681xA==
-
 bindings@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
@@ -2676,7 +2671,7 @@ bluebird@^3.7.2:
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
 
 "bookmarks@file:packages/bookmarks":
-  version "0.46.0"
+  version "1.0.0"
   dependencies:
     atom-select-list "^0.7.0"
 
@@ -2722,7 +2717,7 @@ braces@^3.0.3, braces@~3.0.2:
     fill-range "^7.1.1"
 
 "bracket-matcher@file:packages/bracket-matcher":
-  version "0.92.0"
+  version "1.0.0"
   dependencies:
     underscore-plus "1.x"
 
@@ -3235,7 +3230,7 @@ command-line-usage@^4.1.0:
     typical "^2.6.1"
 
 "command-palette@file:packages/command-palette":
-  version "0.43.5"
+  version "1.0.0"
   dependencies:
     atom-select-list "^0.7.1"
     underscore-plus "^1.0.0"
@@ -3409,7 +3404,7 @@ d@~0.1.1:
     es5-ext "~0.10.2"
 
 "dalek@file:packages/dalek":
-  version "0.2.2"
+  version "1.0.0"
   dependencies:
     grim "^2.0.3"
 
@@ -3562,7 +3557,7 @@ delegato@^1.0.0:
     mixto "1.x"
 
 "deprecation-cop@file:packages/deprecation-cop":
-  version "0.56.9"
+  version "1.0.0"
   dependencies:
     etch "0.9.0"
     fs-plus "^3.0.0"
@@ -3580,7 +3575,7 @@ detect-libc@^2.0.0, detect-libc@^2.0.1, detect-libc@^2.0.3:
   integrity sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==
 
 "dev-live-reload@file:packages/dev-live-reload":
-  version "0.48.1"
+  version "1.0.0"
   dependencies:
     fs-plus "^3.0.0"
 
@@ -3817,7 +3812,7 @@ emoji-regex@^8.0.0:
   integrity sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==
 
 "encoding-selector@file:packages/encoding-selector":
-  version "0.23.9"
+  version "1.0.0"
   dependencies:
     atom-select-list "^0.7.0"
     iconv-lite "^0.4.4"
@@ -4395,15 +4390,6 @@ fill-range@^7.1.1:
   dependencies:
     to-regex-range "^5.0.1"
 
-"find-and-replace@file:packages/find-and-replace":
-  version "0.219.8"
-  dependencies:
-    binary-search "^1.3.3"
-    etch "0.9.3"
-    fs-plus "^3.0.0"
-    temp "^0.8.3"
-    underscore-plus "1.x"
-
 find-parent-dir@^0.3.0:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/find-parent-dir/-/find-parent-dir-0.3.1.tgz#c5c385b96858c3351f95d446cab866cbf9f11125"
@@ -4653,19 +4639,19 @@ fuzzaldrin@^2.1.0:
   integrity sha512-zgllBYwfHR5P3CncJiGbGVPpa3iFYW1yuPaIv8DiTVRrcg5/6uETNL5zvIoKflG1aifXVUZTlIroDehw4WygGA==
 
 "fuzzy-explorer@file:packages/fuzzy-explorer":
-  version "0.3.4"
+  version "1.0.0"
   dependencies:
     "@vscode/ripgrep" "1.18.0"
 
 "fuzzy-files@file:packages/fuzzy-files":
-  version "2.0.1"
+  version "1.0.0"
   dependencies:
     "@vscode/ripgrep" "1.18.0"
     async "3.2.6"
     minimatch "^10.2.5"
 
 "fuzzy-workspace@file:packages/fuzzy-workspace":
-  version "1.0.1"
+  version "1.0.0"
 
 gauge@~2.7.3:
   version "2.7.4"
@@ -4774,7 +4760,7 @@ getpass@^0.1.1:
     assert-plus "^1.0.0"
 
 "git-diff@file:packages/git-diff":
-  version "1.3.9"
+  version "1.0.0"
   dependencies:
     atom-select-list "^0.8.1"
 
@@ -4894,7 +4880,7 @@ globrex@^0.1.2:
   integrity sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==
 
 "go-to-line@file:packages/go-to-line":
-  version "0.33.0"
+  version "1.0.0"
 
 gopd@^1.0.1, gopd@^1.2.0:
   version "1.2.0"
@@ -4924,7 +4910,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9,
   integrity sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==
 
 "grammar-selector@file:packages/grammar-selector":
-  version "0.50.1"
+  version "1.0.0"
   dependencies:
     atom-select-list "^0.7.0"
 
@@ -5172,7 +5158,7 @@ image-size@~0.5.0:
   integrity sha512-6TDAlDPZxUFCv+fuOkIoXT/V/f3Qbq8e37p+YOiYrUv3v9cc3/6x78VdfPgFVaB9dZYeLUfKgHRebpkm/oP2VQ==
 
 "image-view@file:packages/image-view":
-  version "0.64.0"
+  version "1.0.0"
   dependencies:
     bytes "^3.0.0"
     etch "0.9.0"
@@ -5191,7 +5177,7 @@ imurmurhash@^0.1.4:
   integrity sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==
 
 "incompatible-packages@file:packages/incompatible-packages":
-  version "0.27.3"
+  version "1.0.0"
   dependencies:
     etch "^0.12.2"
 
@@ -5844,7 +5830,7 @@ key-path-helpers@^0.4.0:
   integrity sha512-WGl1FG6zjyXCU6YrOVrvanyN3iiLFPLr/UmZ/jGiEOd7CXQV83/Ng5aLGK/Erehtr1nxU8dOwnRjseQDGElMQw==
 
 "keybinding-resolver@file:./packages/keybinding-resolver":
-  version "0.39.1"
+  version "1.0.0"
   dependencies:
     etch "0.9.0"
     fs-plus "^3.0.0"
@@ -5880,111 +5866,111 @@ klaw@^3.0.0:
     graceful-fs "^4.1.9"
 
 "language-c@file:packages/language-c":
-  version "0.60.20"
+  version "1.0.0"
 
 "language-clojure@file:packages/language-clojure":
-  version "0.22.8"
+  version "1.0.0"
 
 "language-coffee-script@file:packages/language-coffee-script":
-  version "0.50.0"
+  version "1.0.0"
 
 "language-csharp@file:packages/language-csharp":
-  version "1.1.0"
+  version "1.0.0"
 
 "language-css@file:packages/language-css":
-  version "0.45.4"
+  version "1.0.0"
 
 "language-diff@file:packages/language-diff":
-  version "0.1.0"
+  version "1.0.0"
 
 "language-gfm@file:packages/language-gfm":
-  version "0.90.8"
+  version "1.0.0"
 
 "language-git@file:packages/language-git":
-  version "0.19.1"
+  version "1.0.0"
 
 "language-go@file:packages/language-go":
-  version "0.47.3"
+  version "1.0.0"
 
 "language-html@file:packages/language-html":
-  version "0.53.1"
+  version "1.0.0"
   dependencies:
     atom-grammar-test "^0.6.3"
 
 "language-hyperlink@file:packages/language-hyperlink":
-  version "0.17.1"
+  version "1.0.0"
 
 "language-java@file:packages/language-java":
-  version "0.32.1"
+  version "1.0.0"
 
 "language-javascript@file:packages/language-javascript":
-  version "0.134.2"
+  version "1.0.0"
 
 "language-json@file:packages/language-json":
-  version "1.0.5"
+  version "1.0.0"
 
 "language-less@file:packages/language-less":
-  version "0.34.3"
+  version "1.0.0"
 
 "language-make@file:packages/language-make":
-  version "0.23.0"
+  version "1.0.0"
 
 "language-mustache@file:packages/language-mustache":
-  version "0.14.5"
+  version "1.0.0"
 
 "language-objective-c@file:packages/language-objective-c":
-  version "0.16.0"
+  version "1.0.0"
 
 "language-perl@file:packages/language-perl":
-  version "0.38.1"
+  version "1.0.0"
 
 "language-php@file:packages/language-php":
-  version "0.48.1"
+  version "1.0.0"
 
 "language-property-list@file:packages/language-property-list":
-  version "0.9.1"
+  version "1.0.0"
 
 "language-python@file:packages/language-python":
-  version "0.53.6"
+  version "1.0.0"
 
 "language-ruby-on-rails@file:packages/language-ruby-on-rails":
-  version "0.25.3"
+  version "1.0.0"
 
 "language-ruby@file:packages/language-ruby":
-  version "0.73.0"
+  version "1.0.0"
 
 "language-rust-bundled@file:packages/language-rust-bundled":
-  version "0.1.1"
+  version "1.0.0"
 
 "language-sass@file:packages/language-sass":
-  version "0.62.2"
+  version "1.0.0"
 
 "language-shellscript@file:packages/language-shellscript":
-  version "0.28.2"
+  version "1.0.0"
 
 "language-source@file:packages/language-source":
-  version "0.9.0"
+  version "1.0.0"
 
 "language-sql@file:packages/language-sql":
-  version "0.25.10"
+  version "1.0.0"
 
 "language-text@file:packages/language-text":
-  version "0.7.4"
+  version "1.0.0"
 
 "language-todo@file:packages/language-todo":
-  version "0.29.4"
+  version "1.0.0"
 
 "language-toml@file:packages/language-toml":
-  version "0.20.0"
+  version "1.0.0"
 
 "language-typescript@file:packages/language-typescript":
-  version "0.6.4"
+  version "1.0.0"
 
 "language-xml@file:packages/language-xml":
-  version "0.35.3"
+  version "1.0.0"
 
 "language-yaml@file:packages/language-yaml":
-  version "0.32.0"
+  version "1.0.0"
 
 lazy-val@^1.0.5:
   version "1.0.5"
@@ -6033,7 +6019,7 @@ levn@^0.4.1:
     type-check "~0.4.0"
 
 "line-ending-selector@file:packages/line-ending-selector":
-  version "0.7.7"
+  version "1.0.0"
   dependencies:
     atom-select-list "^0.7.0"
     underscore-plus "^1.7.0"
@@ -6051,7 +6037,7 @@ lines-and-columns@^1.1.6:
   integrity sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==
 
 "link@file:packages/link":
-  version "0.31.6"
+  version "1.0.0"
   dependencies:
     underscore-plus "^1.7.0"
 
@@ -6249,7 +6235,7 @@ markdown-it@^14.3.0:
     uc.micro "^2.1.0"
 
 "markdown-preview@file:./packages/markdown-preview":
-  version "0.160.2"
+  version "1.0.0"
   dependencies:
     cheerio "^1.0.0-rc.3"
     dedent "^1.5.3"
@@ -6841,7 +6827,7 @@ normalize-url@^6.0.1:
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
 
 "notifications@file:./packages/notifications":
-  version "0.73.0"
+  version "1.0.0"
   dependencies:
     fs-plus "^3.0.0"
     moment "^2.19.3"
@@ -6962,16 +6948,16 @@ once@^1.3.0, once@^1.3.1, once@^1.4.0:
     wrappy "1"
 
 "one-dark-syntax@file:packages/one-dark-syntax":
-  version "1.8.4"
+  version "1.0.0"
 
 "one-dark-ui@file:packages/one-dark-ui":
-  version "1.12.5"
+  version "1.0.0"
 
 "one-light-syntax@file:packages/one-light-syntax":
-  version "1.8.4"
+  version "1.0.0"
 
 "one-light-ui@file:packages/one-light-ui":
-  version "1.12.5"
+  version "1.0.0"
 
 onetime@^5.1.0, onetime@^5.1.2:
   version "5.1.2"
@@ -6981,7 +6967,7 @@ onetime@^5.1.0, onetime@^5.1.2:
     mimic-fn "^2.1.0"
 
 "open-on-github@file:packages/open-on-github":
-  version "1.3.2"
+  version "1.0.0"
 
 open@^7.4.2:
   version "7.4.2"
@@ -7095,7 +7081,7 @@ p-try@^2.0.0:
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
 "package-generator@file:packages/package-generator":
-  version "1.3.0"
+  version "1.0.0"
   dependencies:
     fs-plus "^3.0.0"
     temp "^0.9.0"
@@ -7525,9 +7511,9 @@ readdirp@~3.6.0:
     picomatch "^2.2.1"
 
 "recent-list@file:packages/recent-list":
-  version "1.0.3"
+  version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.3-6a560492-4901-4a8d-b0f6-cccda93667fe-1783672770546/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-9ceb1fd8-53bb-43af-bf3f-b9299e5d52b7-1783688807423/shared/select-list"
 
 reduce-flatten@^1.0.1:
   version "1.0.1"
@@ -7829,6 +7815,11 @@ scoped-property-store@^0.17.0:
     key-path-helpers "^0.1.0"
     underscore-plus "^1.6.3"
 
+"search-panel@file:packages/search-panel":
+  version "2.0.1"
+  dependencies:
+    etch "0.9.3"
+
 season@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/season/-/season-6.0.2.tgz#9da58fb1ddd24824d7621b2dc63a7123b50217b6"
@@ -7940,7 +7931,7 @@ set-proto@^1.0.0:
     es-object-atoms "^1.0.0"
 
 "settings-view@file:packages/settings-view":
-  version "0.261.11"
+  version "1.0.0"
   dependencies:
     async "^3.2.0"
     etch "0.9.0"
@@ -8092,7 +8083,7 @@ smart-buffer@^4.0.2, smart-buffer@^4.2.0:
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
 "snippets@file:./packages/snippets":
-  version "1.8.0"
+  version "1.0.0"
   dependencies:
     async "3.2.6"
     atom-select-list "^0.7.0"
@@ -8120,10 +8111,10 @@ socks@^2.6.2:
     smart-buffer "^4.2.0"
 
 "solarized-dark-syntax@file:packages/solarized-dark-syntax":
-  version "1.3.0"
+  version "1.0.0"
 
 "solarized-light-syntax@file:packages/solarized-light-syntax":
-  version "1.3.0"
+  version "1.0.0"
 
 sort-array@^5.0.0:
   version "5.1.1"
@@ -8265,7 +8256,7 @@ stat-mode@^1.0.0:
   integrity sha512-jH9EhtKIjuXZ2cWxmXS8ZP80XyC3iasQxMDV8jzhNJpfDb7VbQLVW4Wvsxz9QZvzV+G4YoSfBUVKDOyxLzi/sg==
 
 "status-bar@file:packages/status-bar":
-  version "1.8.17"
+  version "1.0.0"
   dependencies:
     fs-plus "^3.0.1"
     grim "^2.0.1"
@@ -8423,7 +8414,7 @@ strip-json-comments@^3.1.0:
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
 
 "styleguide@file:./packages/styleguide":
-  version "0.49.12"
+  version "1.0.0"
   dependencies:
     atom-select-list "^0.7.0"
     dedent "^0.7.0"
@@ -8512,7 +8503,7 @@ table-layout@^0.4.2:
     wordwrapjs "^3.0.0"
 
 "tabs@file:packages/tabs":
-  version "0.110.2"
+  version "1.0.0"
   dependencies:
     fs-plus "^3.0.0"
     temp "~0.8.1"
@@ -8653,7 +8644,7 @@ through@2, through@2.3.x, through@^2.3.8, through@~2.3, through@~2.3.1:
   integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
 
 "timecop@file:./packages/timecop":
-  version "0.36.2"
+  version "1.0.0"
   dependencies:
     dedent "^0.7.0"
     etch "^0.12.6"
@@ -8680,7 +8671,7 @@ tinyglobby@^0.2.12:
     picomatch "^4.0.4"
 
 "title-bar@file:packages/title-bar":
-  version "1.0.5"
+  version "1.0.0"
 
 tmp-promise@^3.0.2:
   version "3.0.3"
@@ -8723,7 +8714,7 @@ tough-cookie@~2.5.0:
     punycode "^2.1.1"
 
 "tree-view@file:./packages/tree-view":
-  version "0.9.3"
+  version "1.0.0"
   dependencies:
     minimatch "^10.2.5"
     natural-compare-lite "^1.4.0"
@@ -8970,7 +8961,7 @@ update-browserslist-db@^1.1.3:
     picocolors "^1.1.1"
 
 "update-package-dependencies@file:./packages/update-package-dependencies":
-  version "0.13.1"
+  version "1.0.0"
 
 uri-js@^4.2.2:
   version "4.4.1"
@@ -9053,7 +9044,7 @@ wcwidth@^1.0.1:
     defaults "^1.0.3"
 
 "welcome@file:packages/welcome":
-  version "0.36.9"
+  version "1.0.0"
   dependencies:
     etch "0.9.0"
 
@@ -9156,7 +9147,7 @@ which@^6.0.0:
     isexe "^4.0.0"
 
 "whitespace@file:./packages/whitespace":
-  version "0.37.8"
+  version "1.0.0"
 
 wide-align@1.1.3:
   version "1.1.3"
@@ -9239,7 +9230,7 @@ wrap-ansi@^7.0.0:
     strip-ansi "^6.0.0"
 
 "wrap-guide@file:./packages/wrap-guide":
-  version "0.41.1"
+  version "1.0.0"
 
 wrappy@1:
   version "1.0.2"
