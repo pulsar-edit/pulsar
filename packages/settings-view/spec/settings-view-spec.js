@@ -225,7 +225,7 @@ describe("SettingsView", function () {
       describe("settings-view:core", () =>
         it("opens the core settings view", function () {
           openWithCommand("settings-view:editor");
-          runs(() => openWithCommand("settings-view:core"));
+          openWithCommand("settings-view:core");
           runs(() =>
             expect(atom.workspace.getActivePaneItem().activePanel).toEqual({
               name: "Core",

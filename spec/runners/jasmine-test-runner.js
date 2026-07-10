@@ -19,6 +19,10 @@ temp.track();
 
 const specMetadataById = new Map();
 let currentLegacyAsyncQueue = null;
+// The `this` (spec user context) of the currently-running spec/hook. Legacy
+// `runs()`/`waitsFor()` callbacks must be invoked with this context so that
+// specs sharing state via `this.foo` keep working.
+let currentLegacyContext = undefined;
 const realSetTimeout = window.setTimeout.bind(window);
 const realClearTimeout = window.clearTimeout.bind(window);
 
@@ -135,6 +139,7 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
 
       jasmineEnv[key](name, function (done) {
         installLegacyUserContext(this, jasmineEnv);
+        currentLegacyContext = this;
         try {
           if (originalFn.length === 0) {
             runWithLegacyAsyncQueue(() => originalFn.call(this)).then(() => done(), (error) => {
@@ -164,6 +169,7 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
     window[key] = (originalFn, timeout) => {
       jasmineEnv[key](function (done) {
         installLegacyUserContext(this, jasmineEnv);
+        currentLegacyContext = this;
         try {
           if (originalFn.length === 0) {
             runWithLegacyAsyncQueue(() => originalFn.call(this)).then(() => done(), (error) => {
@@ -280,11 +286,15 @@ const setupLegacySpyCompatibility = () => {
 };
 
 const setupLegacyAsyncCompatibility = () => {
-  window.runs = (fn) => enqueueLegacyAsyncStep(() => Promise.resolve(fn()));
+  window.runs = (fn) => {
+    const ctx = currentLegacyContext;
+    return enqueueLegacyAsyncStep(() => Promise.resolve(fn.call(ctx)));
+  };
 
   window.waitsFor = (...args) => {
     const { label, timeout, condition } = parseWaitsForArgs(args);
-    return enqueueLegacyAsyncStep(() => waitForCondition(condition, label, timeout));
+    const ctx = currentLegacyContext;
+    return enqueueLegacyAsyncStep(() => waitForCondition(condition, label, timeout, ctx));
   };
 
   window.waits = (timeout = 0) => {
@@ -404,6 +414,10 @@ const parseWaitsForPromiseArgs = (args) => {
     label = args[0].label ?? label;
     shouldReject = args[0].shouldReject ?? false;
     promiseFactory = args[1];
+  } else if (args.length > 1 && typeof args[0] === "string") {
+    // Legacy `waitsForPromise(description, factory)` form.
+    label = args[0];
+    promiseFactory = args[1];
   }
 
   return {
@@ -413,7 +427,7 @@ const parseWaitsForPromiseArgs = (args) => {
   };
 };
 
-const waitForCondition = (condition, label, timeout) => {
+const waitForCondition = (condition, label, timeout, ctx) => {
   if (typeof condition !== "function") {
     return Promise.resolve();
   }
@@ -424,7 +438,7 @@ const waitForCondition = (condition, label, timeout) => {
         () => reject(new Error(`Timed out waiting for ${label}`)),
         timeout,
       );
-      condition(() => {
+      condition.call(ctx, () => {
         realClearTimeout(timeoutId);
         resolve();
       });
@@ -436,7 +450,7 @@ const waitForCondition = (condition, label, timeout) => {
     const check = () => {
       let result;
       try {
-        result = condition();
+        result = condition.call(ctx);
       } catch (error) {
         reject(error);
         return;

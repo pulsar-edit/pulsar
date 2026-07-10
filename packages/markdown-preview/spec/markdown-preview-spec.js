@@ -433,7 +433,8 @@ describe("Markdown Preview", function () {
       );
 
       runs(() => {
-        expect(atom.clipboard.read()).toBe(`\
+        // Windows' clipboard normalizes line endings to CRLF on the round-trip.
+        expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 <p><em>italic</em></p>
 <p><strong>bold</strong></p>
 <p>encoding \u2192 issue</p>\

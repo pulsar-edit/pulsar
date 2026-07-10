@@ -468,6 +468,18 @@ exports.register = (jasmineEnv) => {
         };
       },
 
+      // Legacy jasmine 1.x matcher: the inverse of `toBe`.
+      toNotBe: function (util, customEqualityTesters) {
+        return {
+          compare: function (actual, expected) {
+            return {
+              pass: actual !== expected,
+              message: `Expected ${actual} not to be ${expected}`,
+            };
+          },
+        };
+      },
+
       // Passes when `actual` is an array containing every element of `expected`.
       toContainAll: function (util, customEqualityTesters) {
         return {

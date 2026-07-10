@@ -11,7 +11,7 @@ describe("lumine-updater findInstallChannel", () => {
     });
     it("fails if lumine isn't included in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-lumine" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-installed" });
 
       let installCheck = findInstallChannel.windows_chocoInstalled();
       expect(installCheck).toBe(false);
@@ -41,7 +41,7 @@ describe("lumine-updater findInstallChannel", () => {
     });
     it("fails if lumine isn't found in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-lumine" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-installed" });
 
       let installCheck = findInstallChannel.windows_wingetInstalled();
       expect(installCheck).toBe(false);
@@ -71,7 +71,7 @@ describe("lumine-updater findInstallChannel", () => {
     });
     it("fails if lumine isn't found in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-lumine" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-installed" });
 
       let installCheck = findInstallChannel.linux_macos_homebrewInstalled();
       expect(installCheck).toBe(false);
@@ -101,7 +101,7 @@ describe("lumine-updater findInstallChannel", () => {
     });
     it("fails if lumine isn't found in stdout", () => {
       spyOn(shell, "which").andReturn(true);
-      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-lumine" });
+      spyOn(shell, "exec").andReturn({ code: 0, stdout: "not-installed" });
 
       let installCheck = findInstallChannel.linux_debGetInstalled();
       expect(installCheck).toBe(false);

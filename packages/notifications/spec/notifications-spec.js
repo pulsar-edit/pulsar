@@ -987,7 +987,7 @@
               expect(button.textContent).toContain('View Issue');
               expect(button.getAttribute('href')).toBe('http://url.com/ok');
               expect(fatalNotification.textContent).toContain('already been reported');
-              return expect(fetch.calls[0].args[0]).toContain(encodeURIComponent('someguy/somepackage'));
+              return expect(fetch.calls.argsFor(0)[0]).toContain(encodeURIComponent('someguy/somepackage'));
             });
           });
           return describe("when the issue is closed", function() {

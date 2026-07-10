@@ -2027,7 +2027,7 @@ describe("TabBarView", () => {
       it("updates status for items in the repository", () => {
         tab.updateVcsStatus.reset();
         repository.emitDidChangeStatuses();
-        expect(tab.updateVcsStatus.calls.length).toEqual(1);
+        expect(tab.updateVcsStatus.calls.count()).toEqual(1);
       });
 
       it("updates the status of an item if it has changed", () => {
@@ -2039,13 +2039,13 @@ describe("TabBarView", () => {
         expect(tabBar.element.querySelectorAll(".tab")[1].querySelector(".title")).toHaveClass(
           "status-modified",
         );
-        expect(repository.getCachedPathStatus.calls.length).toBe(0);
+        expect(repository.getCachedPathStatus.calls.count()).toBe(0);
       });
 
       it("does not update status for items not in the repository", () => {
         tab1.updateVcsStatus.reset();
         repository.emitDidChangeStatuses();
-        expect(tab1.updateVcsStatus.calls.length).toEqual(0);
+        expect(tab1.updateVcsStatus.calls.count()).toEqual(0);
       });
     });
 
@@ -2053,13 +2053,13 @@ describe("TabBarView", () => {
       it("does not update VCS subscription if the item's path remains the same", () => {
         tab.setupVcsStatus.reset();
         tab.item.buffer.emitter.emit("did-save", { path: tab.path });
-        expect(tab.setupVcsStatus.calls.length).toBe(0);
+        expect(tab.setupVcsStatus.calls.count()).toBe(0);
       });
 
       it("updates VCS subscription if the item's path has changed", () => {
         tab.setupVcsStatus.reset();
         tab.item.buffer.emitter.emit("did-save", { path: "/some/other/path" });
-        expect(tab.setupVcsStatus.calls.length).toBe(1);
+        expect(tab.setupVcsStatus.calls.count()).toBe(1);
       });
     });
 

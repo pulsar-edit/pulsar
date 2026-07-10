@@ -189,7 +189,7 @@ describe("UpdatesPanel", function () {
       packageManager.emitPackageEvent("updating", packA);
       panel.updateAll();
 
-      expect(cardA.update.calls.length).toBe(1);
+      expect(cardA.update.calls.count()).toBe(1);
     });
   });
 

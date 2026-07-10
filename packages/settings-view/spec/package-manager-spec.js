@@ -87,7 +87,7 @@ describe("PackageManager", function () {
 
       runs(function () {
         let installEmittedCount = 0;
-        for (let call of Array.from(packageManager.emitPackageEvent.calls)) {
+        for (let call of packageManager.emitPackageEvent.calls.all()) {
           if (call.args[0] === "installed") {
             expect(call.args[1]).not.toEqual(originalPackObject);
             expect(call.args[1].moreInfo).toEqual("yep");

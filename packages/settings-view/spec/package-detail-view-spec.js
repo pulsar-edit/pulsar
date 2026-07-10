@@ -72,6 +72,7 @@ describe("PackageDetailView", function () {
   });
 
   it("does not call the atom.io api for package metadata when present", function () {
+    atom.packages.loadPackage(path.join(__dirname, "fixtures", "package-with-config"));
     packageManager.client = createClientSpy();
     view = new PackageDetailView(
       { name: "package-with-config" },

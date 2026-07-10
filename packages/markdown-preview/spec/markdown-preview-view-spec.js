@@ -222,8 +222,8 @@ end\
     describe("when the image uses an absolute path that does not exist", function () {
       it("resolves to a path relative to the project root", function () {
         const image = preview.element.querySelector("img[alt=Image2]");
-        expect(image.src).toMatch(
-          url.parse(atom.project.getDirectories()[0].resolve("tmp/image2.png")),
+        expect(image.getAttribute("src")).toBe(
+          atom.project.getDirectories()[0].resolve("tmp/image2.png"),
         );
       });
     });
@@ -235,13 +235,17 @@ end\
         atom.config.set("markdown-preview.allowUnsafeProtocols", true);
 
         const filePath = path.join(temp.mkdirSync("atom"), "foo.md");
-        fs.writeFileSync(filePath, `![absolute](${filePath})`);
+        // Use forward slashes in the Markdown URL so the absolute path is a
+        // valid link on Windows too (backslashes get percent-encoded).
+        fs.writeFileSync(filePath, `![absolute](${filePath.replace(/\\/g, "/")})`);
         preview = new MarkdownPreviewView({ filePath });
         jasmine.attachToDOM(preview.element);
 
         await preview.renderMarkdown();
 
-        expect(preview.element.querySelector("img[alt=absolute]").src).toMatch(url.parse(filePath));
+        expect(preview.element.querySelector("img[alt=absolute]").getAttribute("src")).toBe(
+          filePath,
+        );
       });
     });
 
@@ -475,13 +479,13 @@ end\
         selection.addRange(range);
 
         atom.commands.dispatch(preview.element, "core:copy");
-        const clipboardText = atom.clipboard.read();
+        // Windows' clipboard normalizes line endings to CRLF on the round-trip.
+        const clipboardText = atom.clipboard.read().replace(/\r\n/g, "\n");
 
         expect(clipboardText).toBe(`\
 if a === 3 {
   b = 5
 }
-
 enc\
 `);
       });

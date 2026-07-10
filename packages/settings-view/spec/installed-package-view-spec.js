@@ -255,7 +255,7 @@ describe("InstalledPackageView", function () {
               ".package-snippets-table tbody tr:nth-child(1) td.snippet-body .snippet-copy-btn",
             )
             .click();
-          expect(atom.clipboard.read()).toBe(`\
+          expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 \n'.b.source':
   'BAR':
     'prefix': 'b'
@@ -271,7 +271,7 @@ describe("InstalledPackageView", function () {
               ".package-snippets-table tbody tr:nth-child(1) td.snippet-body .btn:nth-child(2)",
             )
             .click();
-          expect(atom.clipboard.read()).toBe(`\
+          expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 \n  ".b.source": {
     "BAR": {
       "prefix": "b",
@@ -413,7 +413,7 @@ describe("InstalledPackageView", function () {
       it("writes a CSON snippet to the clipboard", () => {
         spyOn(atom.keymaps, "getUserKeymapPath").andReturn("keymap.cson");
         card.element.querySelector(".copy-icon").click();
-        expect(atom.clipboard.read()).toBe(`\
+        expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 'test':
   'cmd-g': 'language-test:run'\
 `);
@@ -423,7 +423,7 @@ describe("InstalledPackageView", function () {
       it("writes a JSON snippet to the clipboard", () => {
         spyOn(atom.keymaps, "getUserKeymapPath").andReturn("keymap.json");
         card.element.querySelector(".copy-icon").click();
-        expect(atom.clipboard.read()).toBe(`\
+        expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 "test": {
   "cmd-g": "language-test:run"
 }\

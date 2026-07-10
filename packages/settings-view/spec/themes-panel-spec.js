@@ -137,11 +137,9 @@ describe("ThemesPanel", function () {
     });
 
     it("adds newly installed themes to the list", async () => {
-      let installCallback;
-      spyOn(packageManager, "runCommand").andCallFake(function (_args, callback) {
-        installCallback = callback;
-        return { onWillThrowError() {} };
-      });
+      spyOn(packageManager, "installGitHubPackage").andReturn(
+        Promise.resolve({ name: "another-user-theme", theme: "ui" }),
+      );
       spyOn(atom.packages, "loadPackage").andCallFake((name) =>
         installed.user.push({ name, theme: "ui" }),
       );
@@ -152,15 +150,11 @@ describe("ThemesPanel", function () {
       ).toBe(1);
 
       packageManager.install({ name: "another-user-theme", theme: "ui" });
-      installCallback(0, "", "");
 
-      await wait(ThemesPanel.loadPackagesDelay());
-      runs(function () {
-        expect(panel.refs.communityCount.textContent.trim()).toBe("2");
-        expect(
-          panel.refs.communityPackages.querySelectorAll(".package-card:not(.hidden)").length,
-        ).toBe(2);
-      });
+      await conditionPromise(() => panel.refs.communityCount.textContent.trim() === "2");
+      expect(
+        panel.refs.communityPackages.querySelectorAll(".package-card:not(.hidden)").length,
+      ).toBe(2);
     });
 
     it("collapses/expands a sub-section if its header is clicked", function () {

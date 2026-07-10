@@ -25,17 +25,10 @@ describe("lumine-updater cache", () => {
     expect(expiry).toBe(false);
   });
 
-  if (jasmine.version_.major > 1) {
-    // TODO: The current version right now is 1.3.1 of jasmine-node
-    // https://github.com/kevinsawicki/jasmine-node
-    //
-    // This is an unmaintained package that tried to implement jasmine for node,
-    // however we have an official jasmine implementation since then
-    it("returns not expired if offline", () => {
-      spyOnProperty(window.navigator, "onLine").and.returnValue(false);
+  it("returns not expired if offline", () => {
+    spyOnProperty(window.navigator, "onLine").and.returnValue(false);
 
-      let expiry = cache.isItemExpired({ createdOn: 0 }, "some-key");
-      expect(expiry).toBe(false);
-    });
-  }
+    let expiry = cache.isItemExpired({ createdOn: 0 }, "some-key");
+    expect(expiry).toBe(false);
+  });
 });

@@ -58,7 +58,7 @@ describe("KeybindingsPanel", function () {
       it("writes a CSON snippet to the clipboard", function () {
         spyOn(atom.keymaps, "getUserKeymapPath").andReturn("keymap.cson");
         panel.element.querySelector(".copy-icon").click();
-        expect(atom.clipboard.read()).toBe(`\
+        expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 '.editor, .platform-test':
   'ctrl-a': 'core:select-all'\
 `);
@@ -68,7 +68,7 @@ describe("KeybindingsPanel", function () {
       it("writes a JSON snippet to the clipboard", function () {
         spyOn(atom.keymaps, "getUserKeymapPath").andReturn("keymap.json");
         panel.element.querySelector(".copy-icon").click();
-        expect(atom.clipboard.read()).toBe(`\
+        expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 ".editor, .platform-test": {
   "ctrl-a": "core:select-all"
 }\
@@ -79,7 +79,7 @@ describe("KeybindingsPanel", function () {
       it("escapes the backslashes before copying", function () {
         spyOn(atom.keymaps, "getUserKeymapPath").andReturn("keymap.cson");
         panel.element.querySelectorAll(".copy-icon")[2].click();
-        expect(atom.clipboard.read()).toBe(`\
+        expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 '.editor':
   'shift-\\\\ \\\\': 'core:undo'\
 `);
@@ -88,7 +88,7 @@ describe("KeybindingsPanel", function () {
       it("escapes the single quotes before copying", function () {
         spyOn(atom.keymaps, "getUserKeymapPath").andReturn("keymap.cson");
         panel.element.querySelectorAll(".copy-icon")[1].click();
-        expect(atom.clipboard.read()).toBe(`\
+        expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 'atom-text-editor[data-grammar~=\\'css\\']':
   'ctrl-z\\'': 'core:toggle'\
 `);
