@@ -161,6 +161,15 @@ module.exports = class TextEditor {
     this.autoWidth = params.autoWidth;
     this.scrollPastEnd = params.scrollPastEnd != null ? params.scrollPastEnd : false;
     this.scrollSensitivity = params.scrollSensitivity != null ? params.scrollSensitivity : 40;
+    // Raw default is false so directly-constructed editors (specs, embedders)
+    // scroll instantly; the config default of true reaches workspace editors
+    // via the TextEditorRegistry.
+    this.smoothScrolling = params.smoothScrolling != null ? params.smoothScrolling : false;
+    this.wheelSmoothness = params.wheelSmoothness != null ? params.wheelSmoothness : 8;
+    this.commandSmoothness = params.commandSmoothness != null ? params.commandSmoothness : 12;
+    this.altWheelMultiplier = params.altWheelMultiplier != null ? params.altWheelMultiplier : 7.5;
+    this.scrollCommandDistance =
+      params.scrollCommandDistance != null ? params.scrollCommandDistance : 1;
     this.softWrapDebounceInterval =
       params.softWrapDebounceInterval != null ? params.softWrapDebounceInterval : 0;
     this.editorWidthInChars = params.editorWidthInChars;
@@ -394,6 +403,26 @@ module.exports = class TextEditor {
           this.updateScrollSensitivity(value, false);
           break;
 
+        case "smoothScrolling":
+          this.updateSmoothScrolling(value, false);
+          break;
+
+        case "wheelSmoothness":
+          this.updateWheelSmoothness(value, false);
+          break;
+
+        case "commandSmoothness":
+          this.updateCommandSmoothness(value, false);
+          break;
+
+        case "altWheelMultiplier":
+          this.updateAltWheelMultiplier(value, false);
+          break;
+
+        case "scrollCommandDistance":
+          this.updateScrollCommandDistance(value, false);
+          break;
+
         case "softWrapDebounceInterval":
           this.updateSoftWrapDebounceInterval(value, false);
           break;
@@ -532,6 +561,31 @@ module.exports = class TextEditor {
 
   updateScrollSensitivity(value, finish) {
     this.scrollSensitivity = value;
+    if (finish) this.finishUpdate();
+  }
+
+  updateSmoothScrolling(value, finish) {
+    this.smoothScrolling = value;
+    if (finish) this.finishUpdate();
+  }
+
+  updateWheelSmoothness(value, finish) {
+    this.wheelSmoothness = value;
+    if (finish) this.finishUpdate();
+  }
+
+  updateCommandSmoothness(value, finish) {
+    this.commandSmoothness = value;
+    if (finish) this.finishUpdate();
+  }
+
+  updateAltWheelMultiplier(value, finish) {
+    this.altWheelMultiplier = value;
+    if (finish) this.finishUpdate();
+  }
+
+  updateScrollCommandDistance(value, finish) {
+    this.scrollCommandDistance = value;
     if (finish) this.finishUpdate();
   }
 
@@ -5062,6 +5116,46 @@ module.exports = class TextEditor {
   // Returns a positive {Number}.
   getScrollSensitivity() {
     return this.scrollSensitivity;
+  }
+
+  // Experimental: Are mouse wheel and scroll command movements animated?
+  //
+  // Returns a {Boolean}.
+  getSmoothScrolling() {
+    return this.smoothScrolling;
+  }
+
+  // Experimental: How gradually does the editor glide toward the target
+  // position when scrolling with the mouse wheel?
+  //
+  // Returns a positive {Number}.
+  getWheelSmoothness() {
+    return this.wheelSmoothness;
+  }
+
+  // Experimental: How gradually does the editor glide when scrolling via the
+  // scroll commands?
+  //
+  // Returns a positive {Number}.
+  getCommandSmoothness() {
+    return this.commandSmoothness;
+  }
+
+  // Experimental: Speed multiplier applied to wheel scrolling while holding
+  // `alt`.
+  //
+  // Returns a positive {Number}.
+  getAltWheelMultiplier() {
+    return this.altWheelMultiplier;
+  }
+
+  // Experimental: Distance scrolled by the scroll commands, as a fraction of
+  // the editor height. Seeded from config; the increase/decrease scroll
+  // distance commands adjust it per editor.
+  //
+  // Returns a positive {Number}.
+  getScrollCommandDistance() {
+    return this.scrollCommandDistance;
   }
 
   // Experimental: How long (in milliseconds) to wait for the editor width to

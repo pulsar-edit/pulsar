@@ -88,6 +88,10 @@
   'ctrl-shift-c': 'editor:copy-path'
   'alt-up': 'editor:select-larger-syntax-node'
   'alt-down': 'editor:select-smaller-syntax-node'
+  'alt-pageup': 'editor:scroll-up'
+  'alt-pagedown': 'editor:scroll-down'
+  'alt-shift-pageup': 'editor:increase-scroll-distance'
+  'alt-shift-pagedown': 'editor:decrease-scroll-distance'
 
   # Sublime Parity
   'tab': 'editor:indent'

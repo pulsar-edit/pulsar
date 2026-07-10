@@ -204,6 +204,7 @@ class WorkspaceElement extends HTMLElement {
     this.handleDragStart = this.handleDragStart.bind(this);
     this.handleDragEnd = this.handleDragEnd.bind(this);
     this.handleDrop = this.handleDrop.bind(this);
+    this.handleCtrlWheel = this.handleCtrlWheel.bind(this);
 
     this.model = model;
     this.viewRegistry = viewRegistry;
@@ -227,6 +228,7 @@ class WorkspaceElement extends HTMLElement {
       new Disposable(() => {
         this.paneContainer.removeEventListener("mouseenter", this.handleCenterEnter);
         this.paneContainer.removeEventListener("mouseleave", this.handleCenterLeave);
+        this.removeEventListener("wheel", this.handleCtrlWheel, { capture: true });
         window.removeEventListener("mousemove", this.handleEdgesMouseMove);
         window.removeEventListener("dragend", this.handleDockDragEnd);
         window.removeEventListener("dragstart", this.handleDragStart);
@@ -249,6 +251,9 @@ class WorkspaceElement extends HTMLElement {
     this.paneContainer = this.model.getCenter().paneContainer.getElement();
     this.verticalAxis.appendChild(this.paneContainer);
     this.addEventListener("focus", this.handleFocus.bind(this));
+    // Capture phase, so a handled ctrl+wheel never reaches the editor's own
+    // wheel handler.
+    this.addEventListener("wheel", this.handleCtrlWheel, { capture: true, passive: false });
 
     window.addEventListener("dragstart", this.handleDragStart);
     window.addEventListener("mousemove", this.handleEdgesMouseMove);
@@ -309,6 +314,32 @@ class WorkspaceElement extends HTMLElement {
     this.model.setDraggingItem(null);
     window.removeEventListener("dragend", this.handleDragEnd, true);
     window.removeEventListener("drop", this.handleDrop, true);
+  }
+
+  // Holding ctrl while wheel scrolling over a center-pane text editor scrolls
+  // every visible center-pane text editor together.
+  handleCtrlWheel(event) {
+    if (!event.ctrlKey) return;
+    if (!this.config.get("editor.ctrlWheelScrollsAllPanes")) return;
+    if (!this.paneContainer) return;
+    const sourceEditorElement = event.target.closest && event.target.closest("atom-text-editor:not([mini])");
+    if (!sourceEditorElement || !this.paneContainer.contains(sourceEditorElement)) return;
+
+    // Normalize once against the source editor (its line height and element
+    // size); each target editor applies its own sensitivity and smoothness.
+    const { x, y } = sourceEditorElement.getComponent().normalizedWheelDeltas(event);
+
+    let anyAccepted = false;
+    for (const pane of this.model.getCenter().getPanes()) {
+      const item = pane.getActiveItem();
+      if (!this.model.isTextEditor(item)) continue;
+      const component = item.getElement().getComponent();
+      anyAccepted = component.applyWheelScroll(x, y) || anyAccepted;
+    }
+    if (anyAccepted) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   }
 
   handleCenterEnter(_event) {

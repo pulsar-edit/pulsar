@@ -684,6 +684,22 @@ module.exports = function ({
       "editor:scroll-to-cursor": function () {
         return this.scrollToCursorPosition();
       },
+      "editor:scroll-up": function () {
+        return scrollEditorByPage(this, -1);
+      },
+      "editor:scroll-down": function () {
+        return scrollEditorByPage(this, 1);
+      },
+      "editor:increase-scroll-distance": function () {
+        return this.update({
+          scrollCommandDistance: Math.min(64, this.getScrollCommandDistance() * 2),
+        });
+      },
+      "editor:decrease-scroll-distance": function () {
+        return this.update({
+          scrollCommandDistance: Math.max(0.015625, this.getScrollCommandDistance() / 2),
+        });
+      },
     }),
     false,
   );
@@ -786,5 +802,34 @@ var copyPathToClipboard = function (editor, project, clipboard, relative) {
       filePath = project.relativize(filePath);
     }
     clipboard.write(filePath);
+  }
+};
+
+var scrollEditorByPage = function (editor, direction) {
+  const element = editor.getElement();
+  if (!element) return;
+  const component = element.getComponent();
+  const deltaY = direction * element.offsetHeight * editor.getScrollCommandDistance();
+
+  if (editor.getSmoothScrolling()) {
+    // reset: true restarts the glide from the current position, so rapid
+    // repeated invocations don't accumulate an unbounded target.
+    const accepted = component.scrollAnimator.scrollBy({
+      y: deltaY,
+      smoothness: editor.getCommandSmoothness(),
+      reset: true,
+    });
+    if (accepted) {
+      component.lastScrollWasManual = true;
+      // The user took over the viewport; stop pinning the inherited anchor.
+      component.settlingScrollAnchor = null;
+    }
+  } else {
+    if (component.setScrollTop(component.getScrollTop() + deltaY)) {
+      component.lastScrollWasManual = true;
+      // The user took over the viewport; stop pinning the inherited anchor.
+      component.settlingScrollAnchor = null;
+      component.updateSync();
+    }
   }
 };

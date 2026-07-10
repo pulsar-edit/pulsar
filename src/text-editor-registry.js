@@ -22,6 +22,11 @@ const EDITOR_PARAMS_BY_SETTING_KEY = [
   ["editor.scrollPastEnd", "scrollPastEnd"],
   ["editor.undoGroupingInterval", "undoGroupingInterval"],
   ["editor.scrollSensitivity", "scrollSensitivity"],
+  ["editor.smoothScrolling.enabled", "smoothScrolling"],
+  ["editor.smoothScrolling.wheelSmoothness", "wheelSmoothness"],
+  ["editor.smoothScrolling.commandSmoothness", "commandSmoothness"],
+  ["editor.altWheelMultiplier", "altWheelMultiplier"],
+  ["editor.scrollCommandDistance", "scrollCommandDistance"],
 ];
 
 // Experimental: This global registry tracks registered `TextEditors`.

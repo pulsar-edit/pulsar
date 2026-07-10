@@ -606,8 +606,72 @@ const configSchema = {
         type: "boolean",
         default: false,
       },
-      undoGroupingInterval: {
+      smoothScrolling: {
         order: 29,
+        title: "Smooth Scrolling",
+        description: "Animated scrolling of text editors.",
+        type: "object",
+        properties: {
+          enabled: {
+            order: 1,
+            title: "Enabled",
+            description:
+              "Animate mouse wheel and scroll command movements instead of jumping instantly.",
+            type: "boolean",
+            default: true,
+          },
+          wheelSmoothness: {
+            order: 2,
+            title: "Wheel Smoothness",
+            description:
+              "How gradually the editor glides toward the target position when scrolling with the mouse wheel. Higher values feel floatier.",
+            type: "integer",
+            minimum: 1,
+            maximum: 20,
+            default: 8,
+          },
+          commandSmoothness: {
+            order: 3,
+            title: "Command Smoothness",
+            description:
+              "How gradually the editor glides when scrolling via the `editor:scroll-up` and `editor:scroll-down` commands.",
+            type: "integer",
+            minimum: 1,
+            maximum: 50,
+            default: 12,
+          },
+        },
+      },
+      altWheelMultiplier: {
+        order: 30,
+        title: "Alt Wheel Multiplier",
+        description:
+          "Speed multiplier applied to wheel scrolling while holding `alt`. Set to `1` to disable.",
+        type: "number",
+        minimum: 1,
+        maximum: 100,
+        default: 7.5,
+      },
+      scrollCommandDistance: {
+        order: 31,
+        title: "Scroll Command Distance",
+        description:
+          "Distance scrolled by `editor:scroll-up` and `editor:scroll-down`, as a fraction of the editor height. `editor:increase-scroll-distance` and `editor:decrease-scroll-distance` double or halve it per editor without changing this setting.",
+        type: "number",
+        minimum: 0.015625,
+        maximum: 64,
+        default: 1,
+      },
+      ctrlWheelScrollsAllPanes: {
+        order: 32,
+        title: "Ctrl Wheel Scrolls All Panes",
+        description:
+          "Holding `ctrl` while wheel scrolling over a text editor scrolls every visible center pane editor together.",
+        type: "boolean",
+        default: true,
+      },
+      undoGroupingInterval: {
+        order: 33,
         title: "Undo Grouping Interval",
         description:
           "Time interval in milliseconds within which text editing operations will be grouped together in the undo history.",
@@ -616,7 +680,7 @@ const configSchema = {
         default: 300,
       },
       confirmCheckoutHeadRevision: {
-        order: 30,
+        order: 34,
         title: "Confirm Checkout HEAD Revision",
         description:
           "Show confirmation dialog when checking out the HEAD revision and discarding changes to current file since last commit.",
@@ -624,7 +688,7 @@ const configSchema = {
         default: true,
       },
       invisibles: {
-        order: 31,
+        order: 35,
         title: "Invisibles",
         description:
           "A hash of characters Lumine will use to render whitespace characters. Keys are whitespace character types, values are rendered characters (use value false to turn off individual whitespace character types).",
@@ -669,7 +733,7 @@ const configSchema = {
         },
       },
       multiCursorOnClick: {
-        order: 32,
+        order: 36,
         title: "Multi Cursor On Click",
         description:
           "Add multiple cursors when pressing the Ctrl key (Command key on macOS) and clicking the editor.",

@@ -137,6 +137,14 @@ class TextEditorElement extends HTMLElement {
     return this.emitter.on("did-change-scroll-top", callback);
   }
 
+  onDidStartScrollAnimation(callback) {
+    return this.emitter.on("did-start-scroll-animation", callback);
+  }
+
+  onDidEndScrollAnimation(callback) {
+    return this.emitter.on("did-end-scroll-animation", callback);
+  }
+
   // Deprecated: get the width of an `x` character displayed in this element.
   //
   // Returns a {Number} of pixels.

@@ -1172,4 +1172,92 @@ describe("WorkspaceElement", () => {
       );
     });
   });
+
+  describe("ctrl+wheel scrolling over a text editor", () => {
+    const FRAME = 1000 / 60;
+    let workspaceElement, editor1, editor2, component1, component2;
+
+    function stubAnimationFrames(component) {
+      component.scrollAnimator.raf = () => 0;
+      component.scrollAnimator.caf = () => {};
+    }
+
+    function driveAnimationToCompletion(component, maxFrames = 1000) {
+      let frames = 0;
+      while (component.scrollAnimator.isAnimating() && frames < maxFrames) {
+        component.scrollAnimator.advance(FRAME);
+        frames++;
+      }
+      expect(component.scrollAnimator.isAnimating()).toBe(false);
+    }
+
+    beforeEach(async () => {
+      workspaceElement = atom.workspace.getElement();
+      workspaceElement.style.height = "200px";
+      workspaceElement.style.width = "600px";
+      jasmine.attachToDOM(workspaceElement);
+
+      editor1 = await atom.workspace.open();
+      editor1.setText("one\n".repeat(100));
+      editor2 = await atom.workspace.open(null, { split: "right" });
+      editor2.setText("two\n".repeat(100));
+
+      component1 = editor1.getElement().getComponent();
+      component2 = editor2.getElement().getComponent();
+      stubAnimationFrames(component1);
+      stubAnimationFrames(component2);
+      await component1.getNextUpdatePromise();
+    });
+
+    it("scrolls all visible center-pane editors together", () => {
+      const event = new WheelEvent("wheel", {
+        deltaY: 50,
+        deltaMode: 0,
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+      editor1.getElement().dispatchEvent(event);
+
+      expect(event.defaultPrevented).toBe(true);
+      driveAnimationToCompletion(component1);
+      driveAnimationToCompletion(component2);
+      expect(component1.getScrollTop()).toBeGreaterThan(0);
+      expect(component2.getScrollTop()).toBeGreaterThan(0);
+      expect(component1.getScrollTop()).toBe(component2.getScrollTop());
+    });
+
+    it("scrolls only the hovered editor when the setting is disabled", () => {
+      atom.config.set("editor.ctrlWheelScrollsAllPanes", false);
+
+      const event = new WheelEvent("wheel", {
+        deltaY: 50,
+        deltaMode: 0,
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+      editor1.getElement().dispatchEvent(event);
+
+      driveAnimationToCompletion(component1);
+      driveAnimationToCompletion(component2);
+      expect(component1.getScrollTop()).toBeGreaterThan(0);
+      expect(component2.getScrollTop()).toBe(0);
+    });
+
+    it("ignores ctrl+wheel events that don't originate from a text editor", () => {
+      const event = new WheelEvent("wheel", {
+        deltaY: 50,
+        deltaMode: 0,
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+      workspaceElement.dispatchEvent(event);
+
+      expect(event.defaultPrevented).toBe(false);
+      expect(component1.getScrollTop()).toBe(0);
+      expect(component2.getScrollTop()).toBe(0);
+    });
+  });
 });

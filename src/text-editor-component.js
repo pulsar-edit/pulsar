@@ -2,6 +2,7 @@ const etch = require("etch");
 const { Point, Range } = require("@pulsar-edit/text-buffer");
 const LineTopIndex = require("line-top-index");
 const TextEditor = require("./text-editor");
+const ScrollAnimator = require("./scroll-animator");
 const { isPairedCharacter, hasRtlText } = require("./text-utils");
 const electron = require("electron");
 const clipboard = electron.clipboard;
@@ -17,6 +18,10 @@ const KOREAN_CHARACTER = "세";
 const NBSP_CHARACTER = "\u00a0";
 const ZERO_WIDTH_NBSP_CHARACTER = "\ufeff";
 const MOUSE_DRAG_AUTOSCROLL_MARGIN = 40;
+// The legacy `mousewheel` handler consumed `wheelDelta` (120 per notch); the
+// standard `wheel` event reports `deltaY` of 100 per notch. This factor
+// preserves the historical scroll speed at a given scroll sensitivity.
+const WHEEL_DELTA_PARITY = 1.2;
 const CURSOR_BLINK_RESUME_DELAY = 300;
 const CURSOR_BLINK_PERIOD = 800;
 
@@ -202,6 +207,7 @@ module.exports = class TextEditorComponent {
       this.props.element && this.props.element.tabIndex ? this.props.element.tabIndex : -1;
 
     this.measuredContent = false;
+    this.scrollAnimator = new ScrollAnimator(this);
     this.queryGuttersToRender();
     this.queryMaxLineNumberDigits();
     this.observeBlockDecorations();
@@ -540,7 +546,7 @@ module.exports = class TextEditorComponent {
         attributes,
         dataset,
         tabIndex: -1,
-        on: { mousewheel: this.didMouseWheel },
+        on: { wheel: this.didMouseWheel },
       },
       $.div(
         {
@@ -1578,6 +1584,7 @@ module.exports = class TextEditorComponent {
 
   didDetach() {
     if (this.attached) {
+      this.scrollAnimator.cancel();
       if (this.softWrapDebounceTimer) {
         clearTimeout(this.softWrapDebounceTimer);
         this.softWrapDebounceTimer = null;
@@ -1659,28 +1666,79 @@ module.exports = class TextEditorComponent {
   }
 
   didMouseWheel(event) {
-    const scrollSensitivity = this.props.model.getScrollSensitivity() / 100;
+    const { x, y } = this.normalizedWheelDeltas(event);
+    if (this.applyWheelScroll(x, y)) event.preventDefault();
+  }
 
-    let { wheelDeltaX, wheelDeltaY } = event;
+  // Converts a `wheel` event into pre-sensitivity pixel deltas, applying
+  // delta-mode normalization, axis dominance, the non-darwin shift swap, and
+  // the alt speed multiplier.
+  normalizedWheelDeltas(event) {
+    let deltaX = event.deltaX || 0;
+    let deltaY = event.deltaY || 0;
 
-    if (Math.abs(wheelDeltaX) > Math.abs(wheelDeltaY)) {
-      wheelDeltaX = wheelDeltaX * scrollSensitivity;
-      wheelDeltaY = 0;
+    if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+      // Fall back to a nominal line height if the wheel event arrives before
+      // the initial measurement.
+      const lineHeight = this.hasInitialMeasurements ? this.getLineHeight() : 16;
+      deltaX *= lineHeight;
+      deltaY *= lineHeight;
+    } else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+      deltaX *= this.element.offsetWidth;
+      deltaY *= this.element.offsetHeight;
+    }
+
+    deltaX *= WHEEL_DELTA_PARITY;
+    deltaY *= WHEEL_DELTA_PARITY;
+
+    // Scroll only along the dominant axis of the gesture.
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      deltaY = 0;
     } else {
-      wheelDeltaX = 0;
-      wheelDeltaY = wheelDeltaY * scrollSensitivity;
+      deltaX = 0;
     }
 
     if (this.getPlatform() !== "darwin" && event.shiftKey) {
-      let temp = wheelDeltaX;
-      wheelDeltaX = wheelDeltaY;
-      wheelDeltaY = temp;
+      const temp = deltaX;
+      deltaX = deltaY;
+      deltaY = temp;
     }
 
-    const scrollLeftChanged =
-      wheelDeltaX !== 0 && this.setScrollLeft(this.getScrollLeft() - wheelDeltaX);
-    const scrollTopChanged =
-      wheelDeltaY !== 0 && this.setScrollTop(this.getScrollTop() - wheelDeltaY);
+    const altWheelMultiplier = this.props.model.getAltWheelMultiplier();
+    if (event.altKey && altWheelMultiplier !== 1) {
+      deltaX *= altWheelMultiplier;
+      deltaY *= altWheelMultiplier;
+    }
+
+    return { x: deltaX, y: deltaY };
+  }
+
+  // Scrolls this editor by pre-sensitivity pixel deltas, animating when smooth
+  // scrolling is enabled. Returns whether the scroll was accepted, so wheel
+  // events can chain to outer scroll containers when the editor is at an edge.
+  applyWheelScroll(x, y) {
+    const model = this.props.model;
+    const scrollSensitivity = model.getScrollSensitivity() / 100;
+    x *= scrollSensitivity;
+    y *= scrollSensitivity;
+    if (x === 0 && y === 0) return false;
+
+    if (model.getSmoothScrolling() && !model.isMini()) {
+      const accepted = this.scrollAnimator.scrollBy({
+        x,
+        y,
+        smoothness: model.getWheelSmoothness(),
+      });
+      if (accepted) {
+        this.lastScrollWasManual = true;
+        // The user took over the viewport; stop pinning the inherited anchor.
+        this.settlingScrollAnchor = null;
+      }
+      return accepted;
+    }
+
+    const scrollLeftChanged = x !== 0 && this.setScrollLeft(this.getScrollLeft() + x);
+    const scrollTopChanged = y !== 0 && this.setScrollTop(this.getScrollTop() + y);
 
     if (scrollTopChanged) {
       this.lastScrollWasManual = true;
@@ -1689,9 +1747,10 @@ module.exports = class TextEditorComponent {
     }
 
     if (scrollLeftChanged || scrollTopChanged) {
-      event.preventDefault();
       this.updateSync();
+      return true;
     }
+    return false;
   }
 
   didResize() {
@@ -3470,6 +3529,17 @@ module.exports = class TextEditorComponent {
       Math.max(0, Math.min(this.getMaxScrollTop(), scrollTop)),
     );
     if (scrollTop !== this.scrollTop) {
+      // A scroll that doesn't originate from the animator's own frame means
+      // something else took over the viewport; stop the glide where it is.
+      // Value-changing sets only: the dummy scrollbar echoes the current
+      // position back through here after every frame.
+      if (
+        this.scrollAnimator &&
+        this.scrollAnimator.isAnimating() &&
+        !this.scrollAnimator.applyingFrame
+      ) {
+        this.scrollAnimator.cancel();
+      }
       this.derivedDimensionsCache = {};
       this.scrollTopPending = true;
       this.scrollTop = scrollTop;
@@ -3503,6 +3573,17 @@ module.exports = class TextEditorComponent {
       Math.max(0, Math.min(this.getMaxScrollLeft(), scrollLeft)),
     );
     if (scrollLeft !== this.scrollLeft) {
+      // A scroll that doesn't originate from the animator's own frame means
+      // something else took over the viewport; stop the glide where it is.
+      // Value-changing sets only: the dummy scrollbar echoes the current
+      // position back through here after every frame.
+      if (
+        this.scrollAnimator &&
+        this.scrollAnimator.isAnimating() &&
+        !this.scrollAnimator.applyingFrame
+      ) {
+        this.scrollAnimator.cancel();
+      }
       this.scrollLeftPending = true;
       this.scrollLeft = scrollLeft;
       this.element.emitter.emit("did-change-scroll-left", scrollLeft);
