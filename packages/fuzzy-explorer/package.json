@@ -33,7 +33,6 @@
     }
   },
   "dependencies": {
-    "minimatch": "^10.0.1",
     "@vscode/ripgrep": "1.18.0"
   },
   "configSchema": {

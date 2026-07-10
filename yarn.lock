@@ -1619,9 +1619,9 @@
     property-accessors "^1"
     season "^6.0.2"
 
-"@pulsar-edit/fuzzy-native@https://github.com/lumine-code/fuzzy-native.git#0fe203c":
+"@pulsar-edit/fuzzy-native@https://github.com/lumine-code/fuzzy-native.git#5f60efb":
   version "1.4.0"
-  resolved "https://github.com/lumine-code/fuzzy-native.git#0fe203c702e8b8d7e5b99a30727a90876d6bba82"
+  resolved "https://github.com/lumine-code/fuzzy-native.git#5f60efbb977a5e0077038526f6b21db746219018"
   dependencies:
     node-addon-api "^8.8.0"
 
@@ -4656,7 +4656,6 @@ fuzzaldrin@^2.1.0:
   version "0.3.4"
   dependencies:
     "@vscode/ripgrep" "1.18.0"
-    minimatch "^10.0.1"
 
 "fuzzy-files@file:packages/fuzzy-files":
   version "2.0.1"
@@ -6387,7 +6386,7 @@ minimatch@3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimatch@^10.0.1, minimatch@^10.0.3, minimatch@^10.2.2, minimatch@^10.2.4, minimatch@^10.2.5:
+minimatch@^10.0.3, minimatch@^10.2.2, minimatch@^10.2.4, minimatch@^10.2.5:
   version "10.2.5"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-10.2.5.tgz#bd48687a0be38ed2961399105600f832095861d1"
   integrity sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==
@@ -7528,7 +7527,7 @@ readdirp@~3.6.0:
 "recent-list@file:packages/recent-list":
   version "1.0.3"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.3-b9c02817-521d-4b6b-8d8a-e5365e88886c-1783665259534/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.3-6a560492-4901-4a8d-b0f6-cccda93667fe-1783672770546/shared/select-list"
 
 reduce-flatten@^1.0.1:
   version "1.0.1"

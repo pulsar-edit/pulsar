@@ -608,27 +608,32 @@ class SelectListView {
     this.candidates = [];
     this.itemByIndex = [];
     for (const item of this.props.items) {
-      let filterKey = this.props.filterKeyForItem ? this.props.filterKeyForItem(item) : item;
-      if (this.props.removeDiacritics) {
-        filterKey = Diacritics.clean(filterKey);
-      }
+      // Keep the original (possibly accented) filter key; diacritic folding is
+      // handled inside the native matcher via the `ignoreDiacritics` option so
+      // that reported match indexes line up with the original text.
+      const filterKey = this.props.filterKeyForItem ? this.props.filterKeyForItem(item) : item;
       this.candidates.push(filterKey);
       this.itemByIndex.push(item);
+    }
+    // When a custom `filter` is supplied, the built-in fuzzy matcher is never
+    // used, so skip building it. This also avoids handing non-string filter
+    // keys (e.g. object items without a `filterKeyForItem`) to the native
+    // matcher, which requires strings.
+    if (this.props.filter) {
+      return;
     }
     if (this.filterMatcher) {
       atom.ui.fuzzyMatcher.setCandidates(this.filterMatcher, this.candidates);
     } else {
-      this.filterMatcher = atom.ui.fuzzyMatcher.setCandidates(this.candidates);
+      this.filterMatcher = atom.ui.fuzzyMatcher.setCandidates(this.candidates, {
+        ignoreDiacritics: !!this.props.removeDiacritics,
+      });
     }
   }
 
   fuzzyFilter(items, query) {
     if (query.length === 0) {
       return items;
-    }
-    if (this.props.removeDiacritics) {
-      query = Diacritics.clean(query);
-      this.processedQuery = query;
     }
     const matchOptions = {
       recordMatchIndexes: false,
@@ -673,13 +678,10 @@ class SelectListView {
     let filterKey = this.filterKeyMap?.get(item);
     if (filterKey) return filterKey;
 
-    // Compute from filterKeyForItem
+    // Compute from filterKeyForItem. The original (accented) key is returned;
+    // the native matcher folds diacritics internally when enabled.
     if (this.props.filterKeyForItem) {
-      filterKey = this.props.filterKeyForItem(item);
-      if (this.props.removeDiacritics) {
-        filterKey = Diacritics.clean(filterKey);
-      }
-      return filterKey;
+      return this.props.filterKeyForItem(item);
     }
 
     // Fall back to item itself if string
@@ -708,9 +710,12 @@ class SelectListView {
       return null;
     }
 
-    // Use reusable matcher for index computation.
+    // Use reusable matcher for index computation. It folds diacritics the same
+    // way as the filter matcher so indexes map back to the original filterKey.
     if (!this.indexMatcher) {
-      this.indexMatcher = atom.ui.fuzzyMatcher.setCandidates([filterKey]);
+      this.indexMatcher = atom.ui.fuzzyMatcher.setCandidates([filterKey], {
+        ignoreDiacritics: !!this.props.removeDiacritics,
+      });
     } else {
       atom.ui.fuzzyMatcher.setCandidates(this.indexMatcher, [filterKey]);
     }
@@ -941,21 +946,15 @@ class ListItemView {
  * @param {string} text - The text to match against
  * @param {string} query - The query to match
  * @param {Object} [options] - Optional settings
- * @param {boolean} [options.removeDiacritics=false] - Whether to remove diacritics before matching
+ * @param {boolean} [options.removeDiacritics=false] - Match accent-insensitively.
+ *   Folding is done natively; the returned indices refer to the original `text`.
  * @returns {number[]|null} Array of character indices that matched, or null if no match
  */
 function getMatchIndices(text, query, options = {}) {
   if (!text || !query) return null;
 
-  let processedText = text;
-  let processedQuery = query;
-
-  if (options.removeDiacritics) {
-    processedText = Diacritics.clean(processedText);
-    processedQuery = Diacritics.clean(processedQuery);
-  }
-
-  const result = atom.ui.fuzzyMatcher.match(processedText, processedQuery, {
+  const result = atom.ui.fuzzyMatcher.match(text, query, {
+    ignoreDiacritics: !!options.removeDiacritics,
     recordMatchIndexes: true,
   });
 

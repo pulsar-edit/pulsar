@@ -10,6 +10,9 @@ const fuzzyNative = require("@pulsar-edit/fuzzy-native");
   * `matcherOrCandidates` - either a {Matcher} returned from a previous call
     from `setCandidates`, or an array of string candidates to be filtered
   * `candidates` - an array of string candidates to be filtered
+  * `options` - only used when creating a new {Matcher} (i.e. when
+    `matcherOrCandidates` is an array). Supports `ignoreDiacritics` (Boolean)
+    to enable accent-insensitive matching. Fixed at construction time.
 
   ## Examples
   ```js
@@ -20,16 +23,25 @@ const fuzzyNative = require("@pulsar-edit/fuzzy-native");
                      // second position with a lower score
   ```
 */
-function setCandidates(matcherOrCandidates, candidates) {
-  if (candidates) {
+function setCandidates(matcherOrCandidates, candidates, options) {
+  if (Array.isArray(candidates)) {
+    // Reuse an existing {Matcher}. Construction-time options (e.g.
+    // `ignoreDiacritics`) already live on it and don't need re-passing.
     matcherOrCandidates.fuzzyMatcher.setCandidates(
       [...Array(candidates.length).keys()],
       candidates,
     );
     return matcherOrCandidates;
   } else {
+    // Create a new {Matcher}. Here `candidates` (the second arg) is actually
+    // the options object, if any.
+    const opts = candidates || {};
     return new Matcher(
-      new fuzzyNative.Matcher([...Array(matcherOrCandidates.length).keys()], matcherOrCandidates),
+      new fuzzyNative.Matcher(
+        [...Array(matcherOrCandidates.length).keys()],
+        matcherOrCandidates,
+        opts,
+      ),
     );
   }
 }
@@ -121,8 +133,13 @@ const fuzzyMatcher = {
 
   // The same as {setCandidates} with a single candidate. Returns just the
   // match, if there's one (can return `undefined`).
+  //
+  // Accepts `ignoreDiacritics` in `opts` to fold accents before matching
+  // (e.g. "cafe" matches "café"); indexes are reported against the original.
   match(candidate, query, opts = {}) {
-    const matcher = setCandidates([candidate]);
+    const matcher = setCandidates([candidate], {
+      ignoreDiacritics: opts.ignoreDiacritics,
+    });
     return matcher.match(query, opts)[0];
   },
 };

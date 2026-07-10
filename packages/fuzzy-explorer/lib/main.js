@@ -1,7 +1,6 @@
 const { CompositeDisposable, Disposable, Task } = require("atom");
 const { SelectListView, createTwoLineItem, highlightMatches } = require("select-list");
 const { clipboard, shell } = require("electron");
-const minimatch = require("minimatch");
 const path = require("path");
 const fs = require("fs");
 const CSON = require("season");
@@ -233,7 +232,6 @@ module.exports = {
 
   parseIgnores() {
     this.ignores = [];
-    this.Ignores = [];
     for (let ignore of atom.config.get("core.ignoredNames") || []) {
       this.ignores.push(ignore);
       this.ignores.push("**/" + ignore);
@@ -244,17 +242,6 @@ module.exports = {
       this.ignores.push("**/" + ignore);
       this.ignores.push("**/" + ignore + "/**");
     }
-    const Minimatch = minimatch.Minimatch;
-    for (let ignore of this.ignores) {
-      this.Ignores.push(new Minimatch(ignore, { matchBase: true, dot: true }));
-    }
-  },
-
-  isIgnored(filePath) {
-    for (let pattern of this.Ignores) {
-      if (pattern.match(filePath)) return true;
-    }
-    return false;
   },
 
   build() {
@@ -304,10 +291,7 @@ module.exports = {
       );
       task.on("fuzzy-explorer:entries", (entries) => {
         for (const filePath of entries) {
-          const normalized = path.normalize(filePath);
-          if (!this.isIgnored(normalized)) {
-            itemSet.add(normalized);
-          }
+          itemSet.add(path.normalize(filePath));
         }
         resolve();
       });
