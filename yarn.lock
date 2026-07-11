@@ -2683,7 +2683,7 @@ bluebird@^3.7.2, bluebird@~3.7.2:
 "bookmarks@file:packages/bookmarks":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-0bc61110-ef02-4d43-91a0-f61a853dedfc-1783795910278/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-ccd61423-35e6-42ac-a245-465b27ec8ee4-1783809032024/shared/select-list"
 
 boolbase@^1.0.0:
   version "1.0.0"
@@ -3249,7 +3249,7 @@ command-line-usage@^4.1.0:
 "command-palette@file:packages/command-palette":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-43c51cc5-76e8-4e4a-bf5a-18d2097cf0c8-1783795910285/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-e05922a2-3f58-4b5e-b51e-c3fbb521fdbc-1783809032030/shared/select-list"
     underscore-plus "^1.0.0"
 
 commander@^10.0.0:
@@ -3827,7 +3827,7 @@ emoji-regex@^8.0.0:
   dependencies:
     iconv-lite "^0.4.4"
     jschardet "^1.1.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-ce8fe8e9-28cf-472a-8bfb-e11ef4c755d7-1783795910292/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-eb99dd87-bc1a-4eec-8863-06ac7d57c4ec-1783809032035/shared/select-list"
 
 encoding-sniffer@^0.2.1:
   version "0.2.1"
@@ -4695,7 +4695,7 @@ functions-have-names@^1.2.3:
   version "1.0.0"
   dependencies:
     "@vscode/ripgrep" "1.18.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-8d73701e-cbef-497e-82f7-702fe4c37531-1783795910294/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-e22aa3b6-bcef-48a4-966c-aaec05e761c7-1783809032038/shared/select-list"
 
 "fuzzy-files@file:packages/fuzzy-files":
   version "1.0.0"
@@ -4703,12 +4703,12 @@ functions-have-names@^1.2.3:
     "@vscode/ripgrep" "1.18.0"
     async "3.2.6"
     minimatch "^10.2.5"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-a108c8d3-5ce0-4838-af41-be13046016f7-1783795910296/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-7689aeac-e764-46af-b0da-1404d3a0044e-1783809032040/shared/select-list"
 
 "fuzzy-workspace@file:packages/fuzzy-workspace":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-c676a31a-e47a-4a13-9869-3f09a1d7c825-1783795910297/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-6cc24b5d-5afb-4e64-ae1c-abc4ef12b931-1783809032041/shared/select-list"
 
 gauge@~2.7.3:
   version "2.7.4"
@@ -4819,7 +4819,7 @@ getpass@^0.1.1:
 "git-diff@file:packages/git-diff":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-d838ccb6-86c8-4d86-8e6e-0c2d4341788d-1783795910299/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-276490ce-64d4-46a7-8bfb-42fdc98cedc8-1783809032042/shared/select-list"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -4970,7 +4970,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9,
 "grammar-selector@file:packages/grammar-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-724c2be1-2d4b-4fde-9edb-3fe447231f1d-1783795910302/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-d4933d56-9c71-4ef3-9b08-bd6a59a2e799-1783809032045/shared/select-list"
 
 grim@2.0.3, grim@^2.0.1, grim@^2.0.2, grim@^2.0.3:
   version "2.0.3"
@@ -6097,7 +6097,7 @@ levn@^0.4.1:
 "line-ending-selector@file:packages/line-ending-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-43dd7275-c455-4bc6-8a2c-61fa2db462c8-1783795910356/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-3aad1042-1cd2-464c-ad42-f67358bcf015-1783809032097/shared/select-list"
     underscore-plus "^1.7.0"
 
 line-top-index@0.3.1:
@@ -7042,7 +7042,7 @@ once@^1.3.0, once@^1.3.1, once@^1.4.0:
   dependencies:
     wrappy "1"
 
-"one@file:packages/one":
+"one-theme@file:packages/one-theme":
   version "1.0.0"
 
 onetime@^5.1.0, onetime@^5.1.2:
@@ -7171,13 +7171,6 @@ p-try@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
-
-"package-generator@file:packages/package-generator":
-  version "1.0.0"
-  dependencies:
-    fs-plus "^3.0.0"
-    temp "^0.9.0"
-    underscore-plus "^1.0.0"
 
 parent-module@^1.0.0:
   version "1.0.1"
@@ -7482,7 +7475,7 @@ progress@^2.0.3:
   version "1.0.0"
   dependencies:
     glob "^13.0.6"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-a36ee3fb-7052-478e-b6c2-82f06a8d707e-1783795910401/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-c043610d-6af3-4f75-a825-9740a178fee5-1783809032141/shared/select-list"
 
 promise-inflight@^1.0.1:
   version "1.0.1"
@@ -7644,7 +7637,7 @@ readdirp@~3.6.0:
 "recent-list@file:packages/recent-list":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-b0f90cb7-eabb-4b7a-a240-d4a01838bb78-1783795910403/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-07b86dc1-b445-42f1-8efb-506f65f36975-1783809032143/shared/select-list"
 
 reduce-flatten@^1.0.1:
   version "1.0.1"
@@ -8235,7 +8228,7 @@ smart-buffer@^4.2.0:
     pegjs "^0.10.0"
     scoped-property-store "^0.17.0"
     season "^6.0.2"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-0530f606-4f79-4fc5-9d59-8c206f592969-1783795910413/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-93e522d2-e91a-402d-9095-97d0bdcd7fad-1783809032154/shared/select-list"
     temp "~0.8.0"
     underscore-plus "^1.0.0"
 
@@ -8563,7 +8556,7 @@ strip-json-comments@^3.1.0:
   dependencies:
     dedent "^0.7.0"
     etch "0.9.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-035fb076-5af6-44e0-9e0a-0ed2af8426e6-1783795910416/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-a66bbe9e-1c49-4b81-abdb-e97d3dfb4df2-1783809032156/shared/select-list"
 
 sumchecker@^3.0.1:
   version "3.0.1"
@@ -8628,7 +8621,7 @@ supports-preserve-symlinks-flag@^1.0.0:
   dependencies:
     fs-plus "^3.1.1"
     murmurhash-js "^1.0.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-1ca0e3ff-ccfb-4068-8b9e-765768fea49d-1783795910421/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-723d1891-4573-46d8-a0c7-87fc59646411-1783809032160/shared/select-list"
 
 tabbable@^5.1.5:
   version "5.3.3"
@@ -9124,9 +9117,6 @@ update-browserslist-db@^1.1.3:
   dependencies:
     escalade "^3.2.0"
     picocolors "^1.1.1"
-
-"update-package-dependencies@file:./packages/update-package-dependencies":
-  version "1.0.0"
 
 uri-js@^4.2.2:
   version "4.4.1"
