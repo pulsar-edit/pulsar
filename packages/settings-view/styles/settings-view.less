@@ -544,6 +544,25 @@
         justify-content: space-between;
       }
     }
+    .theme-mode-item {
+      flex-basis: 100%;
+      select.form-control {
+        max-width: 320px;
+      }
+    }
+    .theme-pair .controls {
+      justify-content: flex-start;
+    }
+    .theme-pair-select {
+      margin-top: @component-padding;
+      .theme-description {
+        margin-bottom: (@component-padding / 2);
+      }
+    }
+    .theme-active-badge {
+      margin-left: (@component-padding / 2);
+      vertical-align: middle;
+    }
   }
 
   .packages {

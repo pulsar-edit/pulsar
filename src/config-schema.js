@@ -1,6 +1,3 @@
-// This is loaded by atom-environment.coffee. See
-// https://atom.io/docs/api/latest/Config for more information about config
-// schemas. TODO: Link to Lumine API site when documented
 const configSchema = {
   core: {
     type: "object",
@@ -80,7 +77,41 @@ const configSchema = {
       themes: {
         order: 7,
         title: "Themes",
-        description: "Names of UI and syntax themes which will be used when Lumine starts.",
+        description:
+          "Names of the UI and syntax themes currently in use. Derived from `Theme Mode` and the light/dark theme settings; changing it directly updates the pair for the active mode.",
+        type: "array",
+        items: {
+          type: "string",
+        },
+        default: ["one-dark-ui", "one-dark-syntax"],
+      },
+      themeMode: {
+        order: 7.1,
+        title: "Theme Mode",
+        description:
+          "Which theme pair to use: follow the operating system's light/dark preference, or force one.",
+        type: "string",
+        default: "system",
+        enum: [
+          { value: "system", description: "Follow system" },
+          { value: "light", description: "Light" },
+          { value: "dark", description: "Dark" },
+        ],
+      },
+      themesLight: {
+        order: 7.2,
+        title: "Light Themes",
+        description: "Names of the UI and syntax themes used when the light mode is in effect.",
+        type: "array",
+        items: {
+          type: "string",
+        },
+        default: ["one-light-ui", "one-light-syntax"],
+      },
+      themesDark: {
+        order: 7.3,
+        title: "Dark Themes",
+        description: "Names of the UI and syntax themes used when the dark mode is in effect.",
         type: "array",
         items: {
           type: "string",

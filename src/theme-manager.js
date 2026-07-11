@@ -396,8 +396,28 @@ On Linux there are currently problems with watch sizes. See [this document][watc
 
   activateThemes() {
     return new Promise((resolve) => {
+      // Created lazily so specs can install a fake before activation.
+      if (this.systemThemeQuery == null) {
+        this.systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      }
+
+      // An explicitly configured `core.themes` (legacy configs, specs) seeds
+      // the pair for the current mode before the mode takes over.
+      const configuredThemes = this.config.get("core.themes", {
+        sources: [this.config.getUserConfigPath()],
+      });
+      if (Array.isArray(configuredThemes)) {
+        this.syncThemesToModePair();
+      }
+
+      // Derive `core.themes` from the theme mode before observing it, so the
+      // initial observation already sees the derived pair and only one
+      // activation runs.
+      this.applyThemeMode();
+
       // @config.observe runs the callback once, then on subsequent changes.
       this.config.observe("core.themes", () => {
+        this.syncThemesToModePair();
         // Serialize switches so a rapid re-toggle can't interleave with the
         // previous switch's package bookkeeping.
         this.themeSwitchPromise = this.themeSwitchPromise
@@ -407,7 +427,51 @@ On Linux there are currently problems with watch sizes. See [this document][watc
             resolve();
           });
       });
+
+      this.config.onDidChange("core.themeMode", () => this.applyThemeMode());
+      this.config.onDidChange("core.themesLight", () => this.applyThemeMode());
+      this.config.onDidChange("core.themesDark", () => this.applyThemeMode());
+      this.systemThemeQuery.addEventListener("change", () => {
+        if (this.config.get("core.themeMode") === "system") this.applyThemeMode();
+      });
     });
+  }
+
+  // Whether the dark theme pair should be in effect for the current mode.
+  isDarkThemeMode() {
+    const mode = this.config.get("core.themeMode");
+    return mode === "dark" || (mode !== "light" && Boolean(this.systemThemeQuery?.matches));
+  }
+
+  // Point `core.themes` at the pair selected by `core.themeMode`.
+  applyThemeMode() {
+    if (this.applyingThemeMode) return;
+
+    const pair = this.config.get(this.isDarkThemeMode() ? "core.themesDark" : "core.themesLight");
+    if (!Array.isArray(pair)) return;
+
+    this.applyingThemeMode = true;
+    try {
+      this.config.set("core.themes", pair);
+    } finally {
+      this.applyingThemeMode = false;
+    }
+  }
+
+  // A direct `core.themes` change (settings view, `ThemePackage.enable`)
+  // becomes the new preference for whichever pair is currently in effect.
+  syncThemesToModePair() {
+    if (this.applyingThemeMode) return;
+
+    const themes = this.config.get("core.themes");
+    if (!Array.isArray(themes)) return;
+
+    this.applyingThemeMode = true;
+    try {
+      this.config.set(this.isDarkThemeMode() ? "core.themesDark" : "core.themesLight", themes);
+    } finally {
+      this.applyingThemeMode = false;
+    }
   }
 
   async switchThemes() {
@@ -514,7 +578,16 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     await Promise.all(
       themesToDeactivate.map((pack) => this.packageManager.deactivatePackage(pack.name)),
     );
-    await Promise.all(newThemes.map((pack) => this.packageManager.activatePackage(pack.name)));
+    // Re-register sequentially so the active-package order — which
+    // `getImportPaths` and `getActiveThemes` reflect — matches the enabled
+    // order. Continuing themes are dropped from the registry first (their
+    // style sheets stay attached) and re-added at the right position.
+    for (const pack of newThemes) {
+      delete this.packageManager.activePackages[pack.name];
+    }
+    for (const pack of newThemes) {
+      await this.packageManager.activatePackage(pack.name);
+    }
 
     this.themeImportPathsOverride = null;
     this.refreshLessCache(); // Update cache again now that @getActiveThemes() is populated

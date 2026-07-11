@@ -18,6 +18,8 @@ describe("ThemesPanel", function () {
     atom.packages.loadPackage("atom-light-syntax");
     atom.packages.loadPackage("atom-dark-syntax");
     atom.packages.packageDirPaths.push(path.join(__dirname, "fixtures"));
+    atom.config.set("core.themeMode", "dark");
+    atom.config.set("core.themesLight", ["atom-light-ui", "atom-light-syntax"]);
     atom.config.set("core.themes", ["atom-dark-ui", "atom-dark-syntax"]);
     reloadedHandler = jasmine.createSpy("reloadedHandler");
     atom.themes.onDidChangeActiveThemes(reloadedHandler);
@@ -45,45 +47,71 @@ describe("ThemesPanel", function () {
     waitsForPromise(() => Promise.resolve(atom.themes.deactivateThemes()));
   }); // Ensure works on promise and non-promise versions
 
-  it("selects the active syntax and UI themes", function () {
-    expect(panel.refs.uiMenu.value).toBe("atom-dark-ui");
-    expect(panel.refs.syntaxMenu.value).toBe("atom-dark-syntax");
+  it("selects the configured mode and theme pairs", function () {
+    expect(panel.refs.modeMenu.value).toBe("dark");
+    expect(panel.refs.darkUiMenu.value).toBe("atom-dark-ui");
+    expect(panel.refs.darkSyntaxMenu.value).toBe("atom-dark-syntax");
+    expect(panel.refs.lightUiMenu.value).toBe("atom-light-ui");
+    expect(panel.refs.lightSyntaxMenu.value).toBe("atom-light-syntax");
+    expect(panel.refs.darkActiveBadge.style.display).toBe("");
+    expect(panel.refs.lightActiveBadge.style.display).toBe("none");
   });
 
-  describe("when a UI theme is selected", () =>
-    it("updates the 'core.themes' config key with the selected UI theme", function () {
-      for (let child of Array.from(panel.refs.uiMenu.children)) {
+  describe("when a UI theme is selected for the active pair", () =>
+    it("updates the pair config key and switches the active themes", function () {
+      for (let child of Array.from(panel.refs.darkUiMenu.children)) {
         child.selected = child.value === "atom-light-ui";
         child.dispatchEvent(new Event("change", { bubbles: true }));
       }
       waitsFor(() => reloadedHandler.callCount === 2);
-      runs(() =>
-        expect(atom.config.get("core.themes")).toEqual(["atom-light-ui", "atom-dark-syntax"]),
-      );
+      runs(function () {
+        expect(atom.config.get("core.themesDark")).toEqual(["atom-light-ui", "atom-dark-syntax"]);
+        expect(atom.config.get("core.themes")).toEqual(["atom-light-ui", "atom-dark-syntax"]);
+      });
     }));
 
-  describe("when a syntax theme is selected", () =>
-    it("updates the 'core.themes' config key with the selected syntax theme", function () {
-      for (let child of Array.from(panel.refs.syntaxMenu.children)) {
-        child.selected = child.value === "atom-light-syntax";
+  describe("when a syntax theme is selected for the inactive pair", () =>
+    it("updates the pair config key without switching the active themes", function () {
+      reloadedHandler.reset();
+      for (let child of Array.from(panel.refs.lightSyntaxMenu.children)) {
+        child.selected = child.value === "atom-dark-syntax";
         child.dispatchEvent(new Event("change", { bubbles: true }));
       }
-      waitsFor(() => reloadedHandler.callCount === 2);
-      runs(() =>
-        expect(atom.config.get("core.themes")).toEqual(["atom-dark-ui", "atom-light-syntax"]),
+      waitsFor(
+        () => atom.config.get("core.themesLight")[1] === "atom-dark-syntax",
+        "the light pair to update",
       );
+      runs(function () {
+        expect(atom.config.get("core.themesLight")).toEqual(["atom-light-ui", "atom-dark-syntax"]);
+        expect(atom.config.get("core.themes")).toEqual(["atom-dark-ui", "atom-dark-syntax"]);
+        expect(reloadedHandler.callCount).toBe(0);
+      });
     }));
 
-  describe("when the 'core.config' key changes", () =>
+  describe("when the theme mode is selected", () =>
+    it("updates 'core.themeMode' and switches to the matching pair", function () {
+      panel.refs.modeMenu.value = "light";
+      panel.refs.modeMenu.dispatchEvent(new Event("change", { bubbles: true }));
+
+      waitsFor(() => reloadedHandler.callCount === 2);
+      runs(function () {
+        expect(atom.config.get("core.themeMode")).toBe("light");
+        expect(atom.config.get("core.themes")).toEqual(["atom-light-ui", "atom-light-syntax"]);
+        expect(panel.refs.lightActiveBadge.style.display).toBe("");
+        expect(panel.refs.darkActiveBadge.style.display).toBe("none");
+      });
+    }));
+
+  describe("when the theme pair config keys change", () =>
     it("refreshes the theme menus", function () {
       reloadedHandler.reset();
-      atom.config.set("core.themes", ["atom-light-ui", "atom-light-syntax"]);
+      atom.config.set("core.themesDark", ["atom-light-ui", "atom-light-syntax"]);
 
       waitsFor(() => reloadedHandler.callCount === 1);
 
       runs(function () {
-        expect(panel.refs.uiMenu.value).toBe("atom-light-ui");
-        expect(panel.refs.syntaxMenu.value).toBe("atom-light-syntax");
+        expect(panel.refs.darkUiMenu.value).toBe("atom-light-ui");
+        expect(panel.refs.darkSyntaxMenu.value).toBe("atom-light-syntax");
       });
     }));
 

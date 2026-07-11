@@ -1565,8 +1565,8 @@ describe("PackageManager", () => {
 
         // enabling of theme
         let promise = new Promise((resolve) =>
-          atom.packages.onDidActivatePackage(() => {
-            resolve();
+          atom.packages.onDidActivatePackage((p) => {
+            if (p.name === packageName) resolve();
           }),
         );
         const pack = atom.packages.enablePackage(packageName);

@@ -47,7 +47,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
 
     this.disposables = new CompositeDisposable();
     this.disposables.add(
-      this.packageManager.on("theme-install-failed theme-uninstall-failed", ({ pack, error }) => {
+      this.packageManager.on("theme-install-failed theme-uninstall-failed", ({ error }) => {
         this.refs.themeErrors.appendChild(new ErrorView(this.packageManager, error).element);
       }),
     );
@@ -76,9 +76,9 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
     );
     this.loadPackages();
 
+    let loadPackagesTimeout;
     this.disposables.add(
       this.packageManager.on("theme-installed theme-uninstalled", () => {
-        let loadPackagesTimeout;
         clearTimeout(loadPackagesTimeout);
         loadPackagesTimeout = setTimeout(() => {
           this.populateThemeMenus();
@@ -88,11 +88,20 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
     );
 
     this.disposables.add(atom.themes.onDidChangeActiveThemes(() => this.updateActiveThemes()));
-    this.disposables.add(atom.tooltips.add(this.refs.activeUiThemeSettings, { title: "Settings" }));
-    this.disposables.add(
-      atom.tooltips.add(this.refs.activeSyntaxThemeSettings, { title: "Settings" }),
-    );
+    for (const ref of [
+      "lightUiThemeSettings",
+      "lightSyntaxThemeSettings",
+      "darkUiThemeSettings",
+      "darkSyntaxThemeSettings",
+    ]) {
+      this.disposables.add(atom.tooltips.add(this.refs[ref], { title: "Settings" }));
+    }
     this.updateActiveThemes();
+    this.disposables.add(
+      atom.config.onDidChange("core.themeMode", () => this.updateThemeSelections()),
+      atom.config.onDidChange("core.themesLight", () => this.updateThemeSelections()),
+      atom.config.onDidChange("core.themesDark", () => this.updateThemeSelections()),
+    );
 
     this.disposables.add(
       this.refs.filterEditor.onDidStopChanging(() => {
@@ -131,48 +140,122 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
             </div>
 
             <div className="themes-picker">
-              <div className="themes-picker-item control-group">
+              <div className="themes-picker-item theme-mode-item control-group">
                 <div className="controls">
                   <label className="control-label">
-                    <div className="setting-title themes-label text">UI Theme</div>
+                    <div className="setting-title themes-label text">Theme Mode</div>
                     <div className="setting-description text theme-description">
-                      This styles the tabs, status bar, tree view, and dropdowns
+                      Follow the system light/dark preference or force one
                     </div>
                   </label>
                   <div className="select-container">
                     <select
-                      ref="uiMenu"
+                      ref="modeMenu"
                       className="form-control"
-                      onchange={this.didChangeUiMenu.bind(this)}
-                    />
-                    <button
-                      ref="activeUiThemeSettings"
-                      className="btn icon icon-gear active-theme-settings"
-                      onclick={this.didClickActiveUiThemeSettings.bind(this)}
-                    />
+                      onchange={this.didChangeModeMenu.bind(this)}
+                    >
+                      <option value="system">Follow System</option>
+                      <option value="light">Light</option>
+                      <option value="dark">Dark</option>
+                    </select>
                   </div>
                 </div>
               </div>
 
-              <div className="themes-picker-item control-group">
+              <div className="themes-picker-item theme-pair control-group">
                 <div className="controls">
                   <label className="control-label">
-                    <div className="setting-title themes-label text">Syntax Theme</div>
+                    <div className="setting-title themes-label text">
+                      Light Themes
+                      <span
+                        ref="lightActiveBadge"
+                        className="badge badge-flexible theme-active-badge"
+                      >
+                        active
+                      </span>
+                    </div>
                     <div className="setting-description text theme-description">
-                      This styles the text inside the editor
+                      UI and syntax themes used when the light mode is in effect
                     </div>
                   </label>
-                  <div className="select-container">
-                    <select
-                      ref="syntaxMenu"
-                      className="form-control"
-                      onchange={this.didChangeSyntaxMenu.bind(this)}
-                    />
-                    <button
-                      ref="activeSyntaxThemeSettings"
-                      className="btn icon icon-gear active-syntax-settings"
-                      onclick={this.didClickActiveSyntaxThemeSettings.bind(this)}
-                    />
+                  <div className="theme-pair-select">
+                    <div className="setting-description text theme-description">UI Theme</div>
+                    <div className="select-container">
+                      <select
+                        ref="lightUiMenu"
+                        className="form-control"
+                        onchange={this.didChangeThemeMenu.bind(this)}
+                      />
+                      <button
+                        ref="lightUiThemeSettings"
+                        className="btn icon icon-gear active-theme-settings light-ui-theme-settings"
+                        onclick={this.didClickThemeSettings.bind(this, "lightUiMenu")}
+                      />
+                    </div>
+                  </div>
+                  <div className="theme-pair-select">
+                    <div className="setting-description text theme-description">Syntax Theme</div>
+                    <div className="select-container">
+                      <select
+                        ref="lightSyntaxMenu"
+                        className="form-control"
+                        onchange={this.didChangeThemeMenu.bind(this)}
+                      />
+                      <button
+                        ref="lightSyntaxThemeSettings"
+                        className="btn icon icon-gear active-theme-settings light-syntax-theme-settings"
+                        onclick={this.didClickThemeSettings.bind(this, "lightSyntaxMenu")}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="themes-picker-item theme-pair control-group">
+                <div className="controls">
+                  <label className="control-label">
+                    <div className="setting-title themes-label text">
+                      Dark Themes
+                      <span
+                        ref="darkActiveBadge"
+                        className="badge badge-flexible theme-active-badge"
+                      >
+                        active
+                      </span>
+                    </div>
+                    <div className="setting-description text theme-description">
+                      UI and syntax themes used when the dark mode is in effect
+                    </div>
+                  </label>
+                  <div className="theme-pair-select">
+                    <div className="setting-description text theme-description">UI Theme</div>
+                    <div className="select-container">
+                      <select
+                        ref="darkUiMenu"
+                        className="form-control"
+                        onchange={this.didChangeThemeMenu.bind(this)}
+                      />
+                      <button
+                        ref="darkUiThemeSettings"
+                        className="btn icon icon-gear active-theme-settings dark-ui-theme-settings"
+                        onclick={this.didClickThemeSettings.bind(this, "darkUiMenu")}
+                      />
+                    </div>
+                  </div>
+                  <div className="theme-pair-select">
+                    <div className="setting-description text theme-description">Syntax Theme</div>
+                    <div className="select-container">
+                      <select
+                        ref="darkSyntaxMenu"
+                        className="form-control"
+                        onchange={this.didChangeThemeMenu.bind(this)}
+                      />
+                      <button
+                        ref="darkSyntaxThemeSettings"
+                        className="btn icon icon-gear active-theme-settings dark-syntax-theme-settings"
+                        onclick={this.didClickThemeSettings.bind(this, "darkSyntaxMenu")}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -185,7 +268,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
             <div className="section-heading icon icon-paintcan">
               Installed Themes
               <span ref="totalPackages" className="section-heading-count badge badge-flexible">
-                …
+                â€¦
               </span>
             </div>
             <div className="editor-container">
@@ -198,7 +281,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
               <h3 ref="communityThemesHeader" className="sub-section-heading icon icon-paintcan">
                 Community Themes
                 <span ref="communityCount" className="section-heading-count badge badge-flexible">
-                  …
+                  â€¦
                 </span>
               </h3>
               <div ref="communityPackages" className="container package-container">
@@ -206,7 +289,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
                   ref="communityLoadingArea"
                   className="alert alert-info loading-area icon icon-hourglass"
                 >
-                  Loading themes…
+                  Loading themesâ€¦
                 </div>
               </div>
             </section>
@@ -215,7 +298,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
               <h3 ref="coreThemesHeader" className="sub-section-heading icon icon-paintcan">
                 Core Themes
                 <span ref="coreCount" className="section-heading-count badge badge-flexible">
-                  …
+                  â€¦
                 </span>
               </h3>
               <div ref="corePackages" className="container package-container">
@@ -223,7 +306,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
                   ref="coreLoadingArea"
                   className="alert alert-info loading-area icon icon-hourglass"
                 >
-                  Loading themes…
+                  Loading themesâ€¦
                 </div>
               </div>
             </section>
@@ -232,7 +315,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
               <h3 ref="developmentThemesHeader" className="sub-section-heading icon icon-paintcan">
                 Development Themes
                 <span ref="devCount" className="section-heading-count badge badge-flexible">
-                  …
+                  â€¦
                 </span>
               </h3>
               <div ref="devPackages" className="container package-container">
@@ -240,7 +323,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
                   ref="devLoadingArea"
                   className="alert alert-info loading-area icon icon-hourglass"
                 >
-                  Loading themes…
+                  Loading themesâ€¦
                 </div>
               </div>
             </section>
@@ -249,7 +332,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
               <h3 ref="gitThemesHeader" className="sub-section-heading icon icon-paintcan">
                 Git Themes
                 <span ref="gitCount" className="section-heading-count badge badge-flexible">
-                  …
+                  â€¦
                 </span>
               </h3>
               <div ref="gitPackages" className="container package-container">
@@ -257,7 +340,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
                   ref="gitLoadingArea"
                   className="alert alert-info loading-area icon icon-hourglass"
                 >
-                  Loading themes…
+                  Loading themesâ€¦
                 </div>
               </div>
             </section>
@@ -317,90 +400,88 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
       });
   }
 
-  // Update the active UI and syntax themes and populate the menu
+  // Repopulate the theme menus and reflect the configured selections.
   updateActiveThemes() {
-    this.activeUiTheme = this.getActiveUiTheme();
-    this.activeSyntaxTheme = this.getActiveSyntaxTheme();
     this.populateThemeMenus();
-    this.toggleActiveThemeButtons();
-  }
-
-  toggleActiveThemeButtons() {
-    if (this.hasSettings(this.activeUiTheme)) {
-      this.refs.activeUiThemeSettings.style.display = "";
-    } else {
-      this.refs.activeUiThemeSettings.style.display = "none";
-    }
-
-    if (this.hasSettings(this.activeSyntaxTheme)) {
-      this.refs.activeSyntaxThemeSettings.display = "";
-    } else {
-      this.refs.activeSyntaxThemeSettings.display = "none";
-    }
   }
 
   hasSettings(packageName) {
     return this.packageManager.packageHasSettings(packageName);
   }
 
-  // Populate the theme menus from the theme manager's active themes
+  // Populate the theme menus from the loaded themes.
   populateThemeMenus() {
-    this.refs.uiMenu.innerHTML = "";
-    this.refs.syntaxMenu.innerHTML = "";
+    const uiMenus = [this.refs.lightUiMenu, this.refs.darkUiMenu];
+    const syntaxMenus = [this.refs.lightSyntaxMenu, this.refs.darkSyntaxMenu];
+    for (const menu of uiMenus.concat(syntaxMenus)) {
+      menu.innerHTML = "";
+    }
+
     const availableThemes = _.sortBy(atom.themes.getLoadedThemes(), "name");
     for (let { name, metadata } of availableThemes) {
-      switch (metadata.theme) {
-        case "ui": {
-          const themeItem = this.createThemeMenuItem(name);
-          if (name === this.activeUiTheme) {
-            themeItem.selected = true;
-          }
-          this.refs.uiMenu.appendChild(themeItem);
-          break;
-        }
-        case "syntax": {
-          const themeItem = this.createThemeMenuItem(name);
-          if (name === this.activeSyntaxTheme) {
-            themeItem.selected = true;
-          }
-          this.refs.syntaxMenu.appendChild(themeItem);
-          break;
-        }
+      const menus =
+        metadata.theme === "ui" ? uiMenus : metadata.theme === "syntax" ? syntaxMenus : [];
+      for (const menu of menus) {
+        menu.appendChild(this.createThemeMenuItem(name));
       }
     }
+
+    this.updateThemeSelections();
   }
 
-  // Get the name of the active ui theme.
-  getActiveUiTheme() {
-    for (let { name, metadata } of atom.themes.getActiveThemes()) {
-      if (metadata.theme === "ui") {
+  // Reflect the mode and theme pair settings in the pickers.
+  updateThemeSelections() {
+    this.refs.modeMenu.value = atom.config.get("core.themeMode");
+
+    const lightPair = atom.config.get("core.themesLight") || [];
+    const darkPair = atom.config.get("core.themesDark") || [];
+    this.refs.lightUiMenu.value = this.themeOfTypeFromPair(lightPair, "ui") || "";
+    this.refs.lightSyntaxMenu.value = this.themeOfTypeFromPair(lightPair, "syntax") || "";
+    this.refs.darkUiMenu.value = this.themeOfTypeFromPair(darkPair, "ui") || "";
+    this.refs.darkSyntaxMenu.value = this.themeOfTypeFromPair(darkPair, "syntax") || "";
+
+    const dark = atom.themes.isDarkThemeMode();
+    this.refs.lightActiveBadge.style.display = dark ? "none" : "";
+    this.refs.darkActiveBadge.style.display = dark ? "" : "none";
+
+    this.updateThemeSettingsButtons();
+  }
+
+  // Pick the theme of the given type ("ui" or "syntax") out of a pair array.
+  themeOfTypeFromPair(pair, type) {
+    for (const name of pair) {
+      const pack = atom.packages.getLoadedPackage(name);
+      if (pack && pack.metadata && pack.metadata.theme === type) {
         return name;
       }
     }
-    return null;
+    return type === "ui" ? pair[0] : pair[1];
   }
 
-  // Get the name of the active syntax theme.
-  getActiveSyntaxTheme() {
-    for (let { name, metadata } of atom.themes.getActiveThemes()) {
-      if (metadata.theme === "syntax") {
-        return name;
-      }
+  updateThemeSettingsButtons() {
+    const buttonsByMenu = [
+      ["lightUiMenu", "lightUiThemeSettings"],
+      ["lightSyntaxMenu", "lightSyntaxThemeSettings"],
+      ["darkUiMenu", "darkUiThemeSettings"],
+      ["darkSyntaxMenu", "darkSyntaxThemeSettings"],
+    ];
+    for (const [menuRef, buttonRef] of buttonsByMenu) {
+      const themeName = this.refs[menuRef].value;
+      this.refs[buttonRef].style.display = themeName && this.hasSettings(themeName) ? "" : "none";
     }
-    return null;
   }
 
-  // Update the config with the selected themes
+  // Update the config with the selected theme pairs.
   updateThemeConfig() {
-    const themes = [];
-    if (this.activeUiTheme) {
-      themes.push(this.activeUiTheme);
+    const lightPair = [this.refs.lightUiMenu.value, this.refs.lightSyntaxMenu.value].filter(
+      Boolean,
+    );
+    const darkPair = [this.refs.darkUiMenu.value, this.refs.darkSyntaxMenu.value].filter(Boolean);
+    if (lightPair.length > 0) {
+      atom.config.set("core.themesLight", lightPair);
     }
-    if (this.activeSyntaxTheme) {
-      themes.push(this.activeSyntaxTheme);
-    }
-    if (themes.length > 0) {
-      atom.config.set("core.themes", themes);
+    if (darkPair.length > 0) {
+      atom.config.set("core.themesDark", darkPair);
     }
   }
 
@@ -545,36 +626,23 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
     atom.commands.dispatch(atom.views.getView(atom.workspace), "application:open-your-stylesheet");
   }
 
-  didChangeUiMenu() {
-    this.activeUiTheme = this.refs.uiMenu.value;
+  didChangeModeMenu() {
+    atom.config.set("core.themeMode", this.refs.modeMenu.value);
+  }
+
+  didChangeThemeMenu() {
+    this.updateThemeSettingsButtons();
     this.scheduleUpdateThemeConfig();
   }
 
-  didChangeSyntaxMenu() {
-    this.activeSyntaxTheme = this.refs.syntaxMenu.value;
-    this.scheduleUpdateThemeConfig();
-  }
-
-  didClickActiveUiThemeSettings(event) {
+  didClickThemeSettings(menuRef, event) {
     event.stopPropagation();
-    const theme = atom.themes.getActiveThemes().find((theme) => theme.metadata.theme === "ui");
-    const activeUiTheme = theme != null ? theme.metadata : null;
-    if (activeUiTheme != null) {
-      this.settingsView.showPanel(this.activeUiTheme, {
+    const themeName = this.refs[menuRef].value;
+    const pack = atom.packages.getLoadedPackage(themeName);
+    if (pack != null) {
+      this.settingsView.showPanel(themeName, {
         back: "Themes",
-        pack: activeUiTheme,
-      });
-    }
-  }
-
-  didClickActiveSyntaxThemeSettings(event) {
-    event.stopPropagation();
-    const theme = atom.themes.getActiveThemes().find((theme) => theme.metadata.theme === "syntax");
-    const activeSyntaxTheme = theme != null ? theme.metadata : null;
-    if (activeSyntaxTheme != null) {
-      this.settingsView.showPanel(this.activeSyntaxTheme, {
-        back: "Themes",
-        pack: activeSyntaxTheme,
+        pack: pack.metadata,
       });
     }
   }

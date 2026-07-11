@@ -15,7 +15,9 @@ describe("atom.themes", () => {
     await atom.themes.deactivateThemes();
     try {
       temp.cleanupSync();
-    } catch (error) {}
+    } catch {
+      // Temp cleanup is best-effort.
+    }
   });
 
   describe("theme getters and setters", () => {
@@ -167,6 +169,78 @@ describe("atom.themes", () => {
       expect(workspaceElement).toHaveClass("theme-theme-with-syntax-variables");
       expect(workspaceElement).not.toHaveClass("theme-atom-dark-ui");
       expect(workspaceElement).not.toHaveClass("theme-atom-dark-syntax");
+    });
+  });
+
+  describe("when the core.themeMode config value changes", () => {
+    let systemThemeQuery, systemThemeListeners;
+
+    beforeEach(() => {
+      jasmine.useRealClock();
+      systemThemeListeners = [];
+      systemThemeQuery = {
+        matches: true,
+        addEventListener(event, listener) {
+          systemThemeListeners.push(listener);
+        },
+      };
+      atom.themes.systemThemeQuery = systemThemeQuery;
+      atom.config.set("core.themesLight", ["atom-light-ui", "atom-light-syntax"]);
+      atom.config.set("core.themesDark", ["atom-dark-ui", "atom-dark-syntax"]);
+    });
+
+    async function waitForThemeChange(fn) {
+      let didChangeActiveThemesHandler = jasmine.createSpy();
+      atom.themes.onDidChangeActiveThemes(didChangeActiveThemesHandler);
+      fn();
+      await waitForCondition(() => didChangeActiveThemesHandler.calls.count() === 1);
+    }
+
+    it("applies the pair matching the mode and follows the system preference", async () => {
+      atom.config.set("core.themeMode", "system");
+      await atom.themes.activateThemes();
+
+      expect(atom.config.get("core.themes")).toEqual(["atom-dark-ui", "atom-dark-syntax"]);
+      expect(atom.themes.getActiveThemeNames()).toContain("atom-dark-ui");
+
+      await waitForThemeChange(() => atom.config.set("core.themeMode", "light"));
+      expect(atom.config.get("core.themes")).toEqual(["atom-light-ui", "atom-light-syntax"]);
+      expect(atom.themes.getActiveThemeNames()).toContain("atom-light-ui");
+
+      await waitForThemeChange(() => atom.config.set("core.themeMode", "dark"));
+      expect(atom.themes.getActiveThemeNames()).toContain("atom-dark-ui");
+
+      // In system mode, an OS preference change switches the pair.
+      systemThemeQuery.matches = false;
+      await waitForThemeChange(() => atom.config.set("core.themeMode", "system"));
+      expect(atom.themes.getActiveThemeNames()).toContain("atom-light-ui");
+
+      await waitForThemeChange(() => {
+        systemThemeQuery.matches = true;
+        for (const listener of systemThemeListeners) listener();
+      });
+      expect(atom.themes.getActiveThemeNames()).toContain("atom-dark-ui");
+    });
+
+    it("stores direct core.themes changes into the pair for the active mode", async () => {
+      atom.config.set("core.themeMode", "dark");
+      await atom.themes.activateThemes();
+
+      atom.config.set("core.themes", ["atom-light-ui", "atom-dark-syntax"]);
+      expect(atom.config.get("core.themesDark")).toEqual(["atom-light-ui", "atom-dark-syntax"]);
+      expect(atom.config.get("core.themesLight")).toEqual(["atom-light-ui", "atom-light-syntax"]);
+    });
+
+    it("seeds the active mode's pair from a preconfigured core.themes", async () => {
+      atom.config.set("core.themeMode", "dark");
+      atom.config.set("core.themes", ["theme-with-ui-variables", "theme-with-syntax-variables"]);
+      await atom.themes.activateThemes();
+
+      expect(atom.config.get("core.themesDark")).toEqual([
+        "theme-with-ui-variables",
+        "theme-with-syntax-variables",
+      ]);
+      expect(atom.themes.getActiveThemeNames()).toContain("theme-with-ui-variables");
     });
   });
 

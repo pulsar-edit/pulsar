@@ -609,6 +609,7 @@ describe("SettingsView", function () {
       atom.packages.packageDirPaths.push(path.join(__dirname, "fixtures"));
       atom.packages.loadPackage("ui-theme-with-config");
       atom.packages.loadPackage("syntax-theme-with-config");
+      atom.config.set("core.themeMode", "dark");
       atom.config.set("core.themes", ["ui-theme-with-config", "syntax-theme-with-config"]);
 
       const reloadedHandler = jasmine.createSpy("reloadedHandler");
@@ -628,21 +629,20 @@ describe("SettingsView", function () {
     describe("when the UI theme's settings button is clicked", () => {
       it("navigates to that theme's detail view", function () {
         jasmine.attachToDOM(settingsView.element);
-        expect(panel.querySelector(".active-theme-settings")).toBeVisible();
+        expect(panel.querySelector(".dark-ui-theme-settings")).toBeVisible();
 
-        panel.querySelector(".active-theme-settings").click();
+        panel.querySelector(".dark-ui-theme-settings").click();
         const packageDetail = settingsView.element.querySelector(".package-detail li.active");
         expect(packageDetail.textContent).toBe("Ui Theme With Config");
-        console.log("done!");
       });
     });
 
     describe("when the syntax theme's settings button is clicked", () => {
       it("navigates to that theme's detail view", function () {
         jasmine.attachToDOM(settingsView.element);
-        expect(panel.querySelector(".active-syntax-settings")).toBeVisible();
+        expect(panel.querySelector(".dark-syntax-theme-settings")).toBeVisible();
 
-        panel.querySelector(".active-syntax-settings").click();
+        panel.querySelector(".dark-syntax-theme-settings").click();
         const packageDetail = settingsView.element.querySelector(".package-detail li.active");
         expect(packageDetail.textContent).toBe("Syntax Theme With Config");
       });
