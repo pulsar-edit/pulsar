@@ -140,7 +140,13 @@ module.exports = class StyleManager {
     let textContent = source;
     let deprecationMessages = [];
 
-    if (!params.skipDeprecatedSelectorsTransformation) {
+    // The deprecated-style transformations upgrade stylesheets authored as
+    // Less for older versions of the editor. Hand-authored plain CSS must
+    // never be rewritten — the math transform in particular can mangle
+    // data: URIs and modern CSS functions.
+    const lessSource = params.sourcePath == null || path.extname(params.sourcePath) === ".less";
+
+    if (lessSource && !params.skipDeprecatedSelectorsTransformation) {
       const transformed = this.upgradeStyleSheet(
         textContent,
         params.context,
@@ -151,7 +157,7 @@ module.exports = class StyleManager {
       deprecationMessages.push(transformed.deprecationMessage);
     }
 
-    if (!params.skipDeprecatedMathUsageTransformation) {
+    if (lessSource && !params.skipDeprecatedMathUsageTransformation) {
       const transformed = this.upgradeStyleSheet(
         textContent,
         params.context,

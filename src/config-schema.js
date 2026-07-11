@@ -74,50 +74,6 @@ const configSchema = {
         ],
         default: "prompt",
       },
-      themes: {
-        order: 7,
-        title: "Themes",
-        description:
-          "Names of the UI and syntax themes currently in use. Derived from `Theme Mode` and the light/dark theme settings; changing it directly updates the pair for the active mode.",
-        type: "array",
-        items: {
-          type: "string",
-        },
-        default: ["one-dark-ui", "one-dark-syntax"],
-      },
-      themeMode: {
-        order: 7.1,
-        title: "Theme Mode",
-        description:
-          "Which theme pair to use: follow the operating system's light/dark preference, or force one.",
-        type: "string",
-        default: "system",
-        enum: [
-          { value: "system", description: "Follow system" },
-          { value: "light", description: "Light" },
-          { value: "dark", description: "Dark" },
-        ],
-      },
-      themesLight: {
-        order: 7.2,
-        title: "Light Themes",
-        description: "Names of the UI and syntax themes used when the light mode is in effect.",
-        type: "array",
-        items: {
-          type: "string",
-        },
-        default: ["one-light-ui", "one-light-syntax"],
-      },
-      themesDark: {
-        order: 7.3,
-        title: "Dark Themes",
-        description: "Names of the UI and syntax themes used when the dark mode is in effect.",
-        type: "array",
-        items: {
-          type: "string",
-        },
-        default: ["one-dark-ui", "one-dark-syntax"],
-      },
       closeDeletedFileTabs: {
         order: 8,
         title: "Close Deleted File Tabs",
@@ -404,6 +360,44 @@ const configSchema = {
           "Whether Lumine should transform deprecated Mathematical Expressions in community package style sheets. Increases compatibility, as well as startup time.",
         type: "boolean",
         default: true,
+      },
+    },
+  },
+  theme: {
+    type: "object",
+    properties: {
+      mode: {
+        order: 1,
+        title: "Mode",
+        description:
+          "Which theme pair to use: follow the operating system's light/dark preference, or force one.",
+        type: "string",
+        default: "system",
+        enum: [
+          { value: "system", description: "Follow system" },
+          { value: "light", description: "Light" },
+          { value: "dark", description: "Dark" },
+        ],
+      },
+      light: {
+        order: 2,
+        title: "Light Themes",
+        description: "Names of the UI and syntax themes used when the light mode is in effect.",
+        type: "array",
+        items: {
+          type: "string",
+        },
+        default: ["one-day-ui", "one-day-syntax"],
+      },
+      dark: {
+        order: 3,
+        title: "Dark Themes",
+        description: "Names of the UI and syntax themes used when the dark mode is in effect.",
+        type: "array",
+        items: {
+          type: "string",
+        },
+        default: ["one-night-ui", "one-night-syntax"],
       },
     },
   },

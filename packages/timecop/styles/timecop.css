@@ -1,0 +1,66 @@
+.timecop {
+  .timecop-panel {
+    background-color: var(--tool-panel-background-color);
+  }
+
+  overflow: auto;
+
+  .panels {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .package-panel {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+
+    .list-group {
+      overflow: hidden;
+    }
+
+    .inset-panel {
+      width: 100%;
+    }
+  }
+
+  .text-info {
+    margin-bottom: var(--component-padding);
+  }
+
+  .timing,
+  .list-item {
+    display: flex;
+    justify-content: space-between;
+    .inline-block:last-child {
+      margin-right: 0;
+    }
+  }
+
+  .timing {
+    margin-bottom: var(--component-padding);
+  }
+
+  .list-item {
+    margin-top: calc(var(--component-padding) / 2);
+    margin-bottom: calc(var(--component-padding) / 2);
+  }
+
+  .package {
+    color: var(--text-color);
+    &:hover {
+      text-decoration: none;
+      color: var(--text-color-selected);
+    }
+  }
+  .timecop-line {
+    flex: 1 1 0;
+    margin-right: var(--component-padding);
+    margin-top: 0.8em;
+    border-top: 1px dashed rgb(from var(--text-color) r g b / 20%);
+  }
+
+  .package:hover + .timecop-line {
+    border-color: rgb(from var(--text-color) r g b / 60%);
+  }
+}

@@ -1,0 +1,4 @@
+.encoding-status a,
+.encoding-status a:hover {
+  color: var(--text-color);
+}

@@ -1,0 +1,11 @@
+.icon::before {
+  margin-right: var(--component-icon-padding);
+}
+
+a.icon {
+  text-decoration: none;
+  color: var(--text-color);
+  &:hover {
+    color: var(--text-color-highlight);
+  }
+}

@@ -1,0 +1,75 @@
+atom-text-editor {
+  .gutter .line-number {
+    &.git-line-modified {
+      border-left: 2px solid var(--syntax-color-modified);
+      padding-left: calc(0.5em - 2px);
+    }
+
+    &.git-line-added {
+      border-left: 2px solid var(--syntax-color-added);
+      padding-left: calc(0.5em - 2px);
+    }
+
+    &.git-line-removed:before,
+    &.git-previous-line-removed:before {
+      position: absolute;
+      left: 0;
+      height: 0;
+      width: 0;
+      content: "";
+      border: solid transparent;
+      border-left-color: var(--syntax-color-removed);
+      border-width: 4px;
+      margin-top: -4px;
+      pointer-events: none;
+    }
+    &.git-line-removed:before {
+      bottom: -4px;
+    }
+    &.git-previous-line-removed:before {
+      top: 0;
+    }
+  }
+
+  .gutter.git-diff-icon .line-number {
+    border-left-width: 0;
+    padding-left: 1.4em; /* space for diff icon */
+
+    &:before {
+      font-family: "Octicons Regular";
+      font-weight: normal;
+      font-style: normal;
+      content: "";
+      display: inline-block;
+      position: absolute;
+      top: 0.2em;
+      left: 0.4em;
+      height: 0px; /* make sure it doesnt affect the gutter line height. */
+      width: 1em;
+      font-size: 0.75em;
+    }
+
+    &.git-line-modified:before {
+      content: "\f052";
+      color: var(--syntax-color-modified);
+    }
+
+    &.git-line-added:before {
+      content: "\f05d";
+      color: var(--syntax-color-added);
+    }
+
+    &.git-line-removed:before,
+    &.git-previous-line-removed:before {
+      border: none; /* reset triangle */
+      content: "\f0ca";
+      color: var(--syntax-color-removed);
+    }
+    &.git-line-removed:before {
+      top: 1em;
+    }
+    &.git-previous-line-removed:before {
+      top: 0;
+    }
+  }
+}

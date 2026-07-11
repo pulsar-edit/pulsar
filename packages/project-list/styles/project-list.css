@@ -1,0 +1,16 @@
+.project-list .tag {
+  margin-right: 5px;
+  border: solid 1px;
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  vertical-align: baseline;
+  color: var(--syntax-color-constant);
+}
+
+.project-list .square {
+  color: var(--ui-site-color-2);
+}
+
+.project-list .secondary-line {
+  display: block !important;
+}

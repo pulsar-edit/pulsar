@@ -1,0 +1,215 @@
+.notifications-log {
+  /* Package-local values (converted from Less variables) */
+  --notifications-log-icon-size: 30px;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+
+  header {
+    flex: none;
+    background-color: var(--base-background-color);
+    border-bottom: 1px solid var(--base-border-color);
+
+    button {
+      border: none;
+      width: var(--notifications-log-icon-size);
+      height: var(--notifications-log-icon-size);
+      margin: 1px;
+      padding: 0;
+      color: var(--text-color-subtle);
+      opacity: 0.5;
+      background: var(--base-background-color);
+    }
+
+    .notifications-clear-log {
+      float: right;
+    }
+  }
+
+  .notifications-log-items {
+    flex: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+
+    .notifications-log-item {
+      display: flex;
+      box-sizing: content-box; /* Keep spacing even */
+      border-bottom: 1px solid var(--base-border-color);
+      max-height: var(--notifications-log-icon-size);
+      overflow: hidden;
+
+      .notifications-log-notification {
+        flex: auto;
+        display: flex;
+        position: relative;
+        padding-left: var(--notifications-log-icon-size);
+        overflow: hidden;
+
+        &.icon:before {
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: var(--notifications-log-icon-size);
+          height: 100%;
+          padding-top: calc(var(--component-padding) / 2);
+          text-align: center;
+        }
+
+        .message {
+          flex: 0 1 auto;
+          word-wrap: break-word;
+          padding: calc(var(--component-padding) / 2) var(--component-padding);
+          border-left: 1px solid var(--base-border-color);
+        }
+
+        .btn-toolbar {
+          flex: 1 0 auto;
+          display: flex;
+          align-items: center;
+          white-space: nowrap;
+
+          &:empty {
+            display: none;
+          }
+
+          .btn-copy-report {
+            vertical-align: middle;
+            margin-left: calc(var(--component-padding) / 2);
+
+            &::before {
+              margin: 0;
+            }
+          }
+        }
+      }
+
+      .timestamp {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        text-align: center;
+        line-height: var(--notifications-log-icon-size);
+        padding: 0 var(--component-padding);
+      }
+    }
+  }
+}
+
+/* Types -------------------------------
+   Each type expands the former .type(@txt; @bg) and .log(@txt; @bg)
+   Less mixins with its text contract variable. */
+
+.notifications-log {
+  /* fatal */
+  .notification-type.fatal {
+    &.show-type {
+      color: var(--text-color-error);
+      opacity: 1;
+    }
+  }
+
+  .hide-fatal li.fatal {
+    display: none;
+  }
+
+  .notifications-log-notification.fatal {
+    .message {
+      color: var(--text-color-error);
+    }
+
+    &.icon:before {
+      color: var(--text-color-error);
+    }
+  }
+
+  /* error */
+  .notification-type.error {
+    &.show-type {
+      color: var(--text-color-error);
+      opacity: 1;
+    }
+  }
+
+  .hide-error li.error {
+    display: none;
+  }
+
+  .notifications-log-notification.error {
+    .message {
+      color: var(--text-color-error);
+    }
+
+    &.icon:before {
+      color: var(--text-color-error);
+    }
+  }
+
+  /* warning */
+  .notification-type.warning {
+    &.show-type {
+      color: var(--text-color-warning);
+      opacity: 1;
+    }
+  }
+
+  .hide-warning li.warning {
+    display: none;
+  }
+
+  .notifications-log-notification.warning {
+    .message {
+      color: var(--text-color-warning);
+    }
+
+    &.icon:before {
+      color: var(--text-color-warning);
+    }
+  }
+
+  /* info */
+  .notification-type.info {
+    &.show-type {
+      color: var(--text-color-info);
+      opacity: 1;
+    }
+  }
+
+  .hide-info li.info {
+    display: none;
+  }
+
+  .notifications-log-notification.info {
+    .message {
+      color: var(--text-color-info);
+    }
+
+    &.icon:before {
+      color: var(--text-color-info);
+    }
+  }
+
+  /* success */
+  .notification-type.success {
+    &.show-type {
+      color: var(--text-color-success);
+      opacity: 1;
+    }
+  }
+
+  .hide-success li.success {
+    display: none;
+  }
+
+  .notifications-log-notification.success {
+    .message {
+      color: var(--text-color-success);
+    }
+
+    &.icon:before {
+      color: var(--text-color-success);
+    }
+  }
+}

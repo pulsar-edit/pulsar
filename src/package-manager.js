@@ -588,6 +588,25 @@ module.exports = class PackageManager {
       return loadedPackage;
     }
 
+    let metadata;
+    if (preloadedPackage != null && availablePackage.isBundled) {
+      metadata = preloadedPackage.metadata;
+    } else {
+      try {
+        metadata = this.loadPackageMetadata(availablePackage) || {};
+      } catch (error) {
+        this.handleMetadataError(error, availablePackage.path);
+        return null;
+      }
+    }
+
+    // A multi-theme package (a `themes` array in package.json) additionally
+    // registers one ThemePackage per declared theme. The container package
+    // itself still loads normally below, so its `main`/`configSchema` apply.
+    if (Array.isArray(metadata.themes) && metadata.themes.length > 0) {
+      this.registerThemesFromPackage(availablePackage, metadata);
+    }
+
     if (preloadedPackage != null) {
       if (availablePackage.isBundled) {
         preloadedPackage.finishLoading();
@@ -597,14 +616,6 @@ module.exports = class PackageManager {
         preloadedPackage.deactivate();
         delete preloadedPackage[availablePackage.name];
       }
-    }
-
-    let metadata;
-    try {
-      metadata = this.loadPackageMetadata(availablePackage) || {};
-    } catch (error) {
-      this.handleMetadataError(error, availablePackage.path);
-      return null;
     }
 
     const options = {
@@ -631,6 +642,60 @@ module.exports = class PackageManager {
     this.loadedPackages[pack.name] = pack;
     this.emitter.emit("did-load-package", pack);
     return pack;
+  }
+
+  // Register one virtual ThemePackage per entry of a `themes` array. Each
+  // entry has a `name`, a `theme` type ("ui" or "syntax"), and optionally a
+  // `styles` directory relative to the package root (defaults to
+  // `styles/<theme name>`). The containing package is loaded separately as a
+  // normal package (see loadAvailablePackage).
+  registerThemesFromPackage(availablePackage, metadata) {
+    for (const entry of metadata.themes) {
+      if (!entry || typeof entry.name !== "string" || !entry.theme) {
+        console.warn(
+          `Ignoring an invalid entry in the 'themes' of the '${availablePackage.name}' package.`,
+        );
+        continue;
+      }
+
+      if (this.getLoadedPackage(entry.name) != null) {
+        continue;
+      }
+
+      const themeMetadata = { ...metadata, name: entry.name, theme: entry.theme };
+      delete themeMetadata.themes;
+      delete themeMetadata.main;
+      delete themeMetadata.configSchema;
+
+      // `styles` may be a single directory or an ordered list (shared
+      // directories first, the theme's own directory last).
+      const stylesDirs = Array.isArray(entry.styles)
+        ? entry.styles
+        : [entry.styles ?? path.join("styles", entry.name)];
+
+      const pack = new ThemePackage({
+        path: availablePackage.path,
+        name: entry.name,
+        metadata: themeMetadata,
+        themeStylesDirectories: stylesDirs.map((dir) => path.join(availablePackage.path, dir)),
+        bundledPackage: availablePackage.isBundled,
+        packageManager: this,
+        config: this.config,
+        styleManager: this.styleManager,
+        commandRegistry: this.commandRegistry,
+        keymapManager: this.keymapManager,
+        notificationManager: this.notificationManager,
+        grammarRegistry: this.grammarRegistry,
+        themeManager: this.themeManager,
+        menuManager: this.menuManager,
+        contextMenuManager: this.contextMenuManager,
+        deserializerManager: this.deserializerManager,
+        viewRegistry: this.viewRegistry,
+      });
+      pack.load();
+      this.loadedPackages[pack.name] = pack;
+      this.emitter.emit("did-load-package", pack);
+    }
   }
 
   unloadPackages() {

@@ -1,0 +1,21 @@
+/*
+ * Git Status
+ * --------------------------------------------------
+ * (Less `&-suffix` concatenation expanded to full selectors.)
+ */
+
+.status-ignored {
+  color: var(--text-color-subtle);
+}
+.status-added {
+  color: var(--text-color-success);
+}
+.status-modified {
+  color: var(--text-color-warning);
+}
+.status-removed {
+  color: var(--text-color-error);
+}
+.status-renamed {
+  color: var(--text-color-info);
+}

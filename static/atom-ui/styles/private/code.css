@@ -1,0 +1,73 @@
+/*
+ * Code (inline and block)
+ * --------------------------------------------------
+ */
+
+/* File-local values derived from the Bootstrap-flavored variables.less */
+:root {
+  /* floor(@font-size-base * @line-height-base) */
+  --line-height-computed: round(down, var(--font-size) * 1.428571429, 1px);
+}
+
+/* Inline and block code styles */
+code,
+kbd,
+pre,
+samp {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace; /* @font-family-monospace */
+}
+
+/* Inline code */
+code {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: var(--text-color-highlight); /* @code-color */
+  background-color: var(--background-color-highlight); /* @code-bg */
+  border-radius: 4px; /* @border-radius-base */
+}
+
+/* User input typically entered via keyboard */
+kbd {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: var(--text-color-highlight); /* @code-color */
+  background-color: var(--background-color-highlight); /* @code-bg */
+  border-radius: 3px; /* @border-radius-small */
+
+  kbd {
+    padding: 0;
+    font-size: 100%;
+    font-weight: bold;
+  }
+}
+
+/* Blocks of code */
+pre {
+  display: block;
+  padding: calc((var(--line-height-computed) - 1px) / 2);
+  margin: 0 0 calc(var(--line-height-computed) / 2);
+  font-size: calc(var(--font-size) - 1px); /* 14px to 13px */
+  line-height: 1.428571429; /* @line-height-base */
+  word-break: break-all;
+  word-wrap: break-word;
+  color: var(--text-color-highlight); /* @pre-color */
+  background-color: var(--background-color-highlight); /* @pre-bg */
+  border: 1px solid var(--base-border-color); /* @pre-border-color */
+  border-radius: 4px; /* @border-radius-base */
+
+  /* Account for some code outputs that place code tags in pre tags */
+  code {
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    white-space: pre-wrap;
+    background-color: transparent;
+    border-radius: 0;
+  }
+}
+
+/* Enable scrollable blocks of code */
+.pre-scrollable {
+  max-height: 340px; /* @pre-scrollable-max-height */
+  overflow-y: scroll;
+}

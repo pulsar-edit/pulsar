@@ -1,0 +1,17 @@
+/* Links */
+
+a {
+  cursor: pointer;
+  color: var(--text-color-highlight);
+  text-decoration: none;
+  &:hover,
+  &:focus {
+    color: var(--text-color-highlight);
+    text-decoration: underline;
+  }
+  &:focus {
+    /* .tab-focus() */
+    outline: 2px auto var(--text-color-info);
+    outline-offset: -2px;
+  }
+}

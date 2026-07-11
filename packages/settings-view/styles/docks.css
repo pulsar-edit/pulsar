@@ -1,0 +1,150 @@
+/* Dock overrides
+   Allows settings to be used in left/right dock */
+
+atom-dock.left .settings-view,
+atom-dock.right .settings-view {
+  flex-direction: column;
+
+  &.pane-item {
+    background-color: var(--tool-panel-background-color);
+  }
+
+  .config-menu {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: calc(var(--component-padding) / 2);
+    min-width: 0;
+    max-width: none;
+    border: none;
+    border-bottom: 1px solid var(--base-border-color);
+    background-color: inherit;
+    overflow-x: initial;
+
+    .nav {
+      display: contents; /* hide from DOM */
+
+      & > li > a {
+        padding: 0 0.5em;
+        border-radius: var(--component-border-radius);
+      }
+
+      .icon:before {
+        display: none;
+      }
+    }
+
+    .button-area {
+      display: contents; /* hide from DOM */
+
+      .icon-link-external {
+        font-size: 0;
+        width: auto;
+        margin: 0 calc(var(--component-padding) / 2);
+        padding: calc(var(--component-padding) / 4) calc(var(--component-padding) / 2);
+        overflow: hidden;
+        &:before {
+          font-size: 16px;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .panels .panels-item {
+    min-width: 100px;
+  }
+
+  .section,
+  .section:first-child,
+  .settings-view .section:last-child {
+    padding: calc(var(--component-padding) * 1.5);
+  }
+
+  .sub-section:not(.collapsed) .package-container {
+    padding-bottom: 0;
+  }
+
+  section .section-heading,
+  .section .section-heading {
+    font-size: 1.25em;
+  }
+
+  .sub-section .sub-section-heading {
+    font-size: 1.15em;
+
+    &.has-items::before {
+      margin-right: 0;
+      font-size: 1.15em;
+    }
+  }
+
+  .setting-title {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: var(--text-color-highlight);
+  }
+
+  .form-control {
+    font-size: 1.1em;
+  }
+
+  .package-card {
+    padding: var(--component-padding);
+    font-size: inherit;
+    background-color: color-mix(in srgb, var(--tool-panel-background-color) 25%, var(--base-background-color));
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--tool-panel-background-color) 75%, var(--base-background-color));
+    }
+
+    .package-name {
+      font-size: inherit;
+      font-weight: 600;
+    }
+
+    .package-version {
+      font-size: 0.9em;
+      color: var(--text-color-subtle);
+      font-weight: 400;
+    }
+
+    .meta {
+      display: block;
+    }
+
+    .meta-user .avatar {
+      width: 20px;
+      height: 20px;
+    }
+    .meta-user .author {
+      margin-left: 0.5em;
+    }
+
+    .btn-toolbar {
+      .btn-group {
+        display: flex;
+        float: none;
+        .btn {
+          flex: 1 1 auto;
+          overflow: hidden;
+          &.status-indicator {
+            flex: none;
+            border: none;
+          }
+        }
+      }
+    }
+  }
+
+  .themes-panel {
+    .themes-picker-item {
+      margin-top: calc(var(--component-padding) * 1.5);
+    }
+    .theme-description {
+      margin: calc(var(--component-padding) / 2) 0;
+    }
+  }
+}

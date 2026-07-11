@@ -1,0 +1,224 @@
+/*
+ * Fallback values for the theme variable contract (see src/theme-variables.js).
+ *
+ * Loaded before every other core stylesheet so that each var(--…) in core and
+ * bundled-package CSS always resolves, even while themes are switching or when
+ * a theme fails to load. Active themes override these on :root at a higher
+ * stylesheet priority.
+ *
+ * The core entries mirror static/variables/ui-variables.less and
+ * syntax-variables.less name for name (a spec enforces this). The extended
+ * entries are derived from the core contract with relative colors, so a legacy
+ * ui/syntax theme that only defines the classic contract still produces a
+ * coherent extended palette.
+ */
+
+:root {
+  /* --- ui: text --- */
+  --text-color: #333;
+  --text-color-subtle: #777;
+  --text-color-highlight: #111;
+  --text-color-selected: var(--text-color-highlight);
+  --text-color-info: #5293d8;
+  --text-color-success: #1fe977;
+  --text-color-warning: #f78a46;
+  --text-color-error: #c00;
+
+  /* --- ui: background --- */
+  --background-color-info: #0098ff;
+  --background-color-success: #17ca65;
+  --background-color-warning: #ff4800;
+  --background-color-error: #c00;
+  --background-color-highlight: hsla(0, 0%, 0%, 0.1);
+  --background-color-selected: var(--background-color-highlight);
+  --app-background-color: #fff;
+
+  /* --- ui: base --- */
+  --base-background-color: #fff;
+  --base-border-color: #eee;
+
+  /* --- ui: components --- */
+  --pane-item-background-color: var(--base-background-color);
+  --pane-item-border-color: var(--base-border-color);
+  --input-background-color: #fff;
+  --input-border-color: var(--base-border-color);
+  --tool-panel-background-color: #f4f4f4;
+  --tool-panel-border-color: var(--base-border-color);
+  --inset-panel-background-color: #eee;
+  --inset-panel-border-color: var(--base-border-color);
+  --panel-heading-background-color: #ddd;
+  --panel-heading-border-color: transparent;
+  --overlay-background-color: #f4f4f4;
+  --overlay-border-color: var(--base-border-color);
+  --button-background-color: #ccc;
+  --button-background-color-hover: hsl(from var(--button-background-color) h s calc(l + 5));
+  --button-background-color-selected: var(--button-background-color-hover);
+  --button-border-color: #aaa;
+  --tab-bar-background-color: #fff;
+  --tab-bar-border-color: hsl(from var(--tab-background-color-active) h s calc(l - 10));
+  --tab-background-color: #f4f4f4;
+  --tab-background-color-active: #fff;
+  --tab-border-color: var(--base-border-color);
+  --tree-view-background-color: var(--tool-panel-background-color);
+  --tree-view-border-color: var(--tool-panel-border-color);
+  --scrollbar-color: var(--background-color-highlight);
+  --scrollbar-background-color: var(--app-background-color);
+
+  /* --- ui: site colors --- */
+  --ui-site-color-1: var(--background-color-success);
+  --ui-site-color-2: var(--background-color-info);
+  --ui-site-color-3: var(--background-color-warning);
+  --ui-site-color-4: #db2ff4;
+  --ui-site-color-5: #f5e11d;
+
+  /* --- ui: sizes --- */
+  --font-size: 13px;
+  --input-font-size: 14px;
+  --disclosure-arrow-size: 12px;
+  --component-padding: 10px;
+  --component-icon-padding: 5px;
+  --component-icon-size: 16px;
+  --component-line-height: 25px;
+  --component-border-radius: 2px;
+  --tab-height: 30px;
+
+  /* --- ui: other --- */
+  --font-family: system-ui;
+  --use-custom-controls: true;
+
+  /* --- ui extended: text --- */
+  --text-color-faded: rgb(from var(--text-color) r g b / 20%);
+  --text-color-added: var(--text-color-success);
+  --text-color-ignored: var(--text-color-subtle);
+  --text-color-modified: var(--text-color-warning);
+  --text-color-removed: var(--text-color-error);
+  --text-color-renamed: var(--text-color-info);
+
+  /* --- ui extended: readable text on colored backgrounds --- */
+  --text-color-on-info: lch(from var(--background-color-info) calc((49.44 - l) * infinity) 0 0);
+  --text-color-on-success: lch(from var(--background-color-success) calc((49.44 - l) * infinity) 0 0);
+  --text-color-on-warning: lch(from var(--background-color-warning) calc((49.44 - l) * infinity) 0 0);
+  --text-color-on-error: lch(from var(--background-color-error) calc((49.44 - l) * infinity) 0 0);
+
+  /* --- ui extended: background levels --- */
+  --level-1-color: hsl(from var(--base-background-color) h s calc(l + 6));
+  --level-2-color: var(--base-background-color);
+  --level-3-color: hsl(from var(--base-background-color) h s calc(l - 3));
+  --level-3-color-hover: hsl(from var(--level-3-color) h s calc(l + 6));
+  --level-3-color-active: hsl(from var(--level-3-color) h s calc(l + 3));
+
+  /* --- ui extended: accent --- */
+  --accent-color: var(--background-color-info);
+  --accent-text-color: lch(from var(--accent-color) calc((49.44 - l) * infinity) 0 0);
+  --accent-bg-color: var(--background-color-info);
+  --accent-bg-text-color: lch(from var(--accent-bg-color) calc((49.44 - l) * infinity) 0 0);
+  --accent-only-text-color: var(--text-color-info);
+
+  /* --- ui extended: components --- */
+  --badge-background-color: hsl(from var(--background-color-highlight) h s calc(l + 6) / alpha);
+  --button-text-color-selected: var(--accent-bg-text-color);
+  --button-border-color-selected: var(--base-border-color);
+  --checkbox-background-color: rgb(from var(--accent-bg-color) r g b / 33%);
+  --input-background-color-focus: color-mix(in srgb, var(--accent-bg-color) 10%, var(--input-background-color));
+  --input-selection-color: color-mix(in srgb, var(--accent-color) 25%, var(--input-background-color));
+  --input-selection-color-focus: color-mix(in srgb, var(--accent-color) 50%, var(--input-background-color));
+  --overlay-backdrop-color: hsl(from var(--base-background-color) h s calc(l * 0.2));
+  --overlay-backdrop-opacity: 0.75;
+  --progress-background-color: var(--accent-color);
+  --scrollbar-color-editor: hsl(from var(--syntax-background-color) h s calc(l + 16));
+  --scrollbar-background-color-editor: var(--syntax-background-color);
+  --tab-text-color: var(--text-color-subtle);
+  --tab-text-color-active: var(--text-color-highlight);
+  --tab-text-color-editor: lch(from var(--syntax-background-color) calc((49.44 - l) * infinity) 0 0);
+  --tab-background-color-editor: var(--syntax-background-color);
+  --tab-inactive-status-added: rgb(from var(--text-color-success) r g b / 55%);
+  --tab-inactive-status-modified: rgb(from var(--text-color-warning) r g b / 55%);
+  --tooltip-background-color: var(--accent-bg-color);
+  --tooltip-text-color: var(--accent-bg-text-color);
+  --tooltip-text-key-color: var(--tooltip-background-color);
+  --tooltip-background-key-color: var(--tooltip-text-color);
+
+  /* --- ui extended: sizes --- */
+  --ui-size: 1em;
+  --ui-input-size: calc(var(--ui-size) * 1.15);
+  --ui-padding: calc(var(--ui-size) * 1.5);
+  --ui-padding-pane: calc(var(--ui-size) * 0.5);
+  --ui-padding-icon: calc(var(--ui-padding) / 3.3);
+  --ui-line-height: calc(var(--ui-size) * 2);
+  --ui-tab-height: calc(var(--ui-size) * 2.5);
+
+  /* --- ui extended: package overrides --- */
+  --settings-list-background-color: hsl(from var(--level-2-color) h s calc(l - 1.5));
+  --theme-config-box-shadow: inset 0 0 3px hsla(0, 0%, 100%, 0.4), 0 1px 3px hsla(0, 0%, 0%, 0.2);
+  --theme-config-box-shadow-selected: inset 0 1px 3px hsla(0, 0%, 0%, 0.1);
+  --theme-config-border-selected: hsla(0, 0%, 100%, 0.75);
+
+  /* --- syntax: general --- */
+  --syntax-text-color: #333;
+  --syntax-cursor-color: #333;
+  --syntax-selection-color: #69c;
+  --syntax-selection-flash-color: #00f;
+  --syntax-background-color: #fff;
+
+  /* --- syntax: guides --- */
+  --syntax-wrap-guide-color: #ccc;
+  --syntax-indent-guide-color: #ccc;
+  --syntax-invisible-character-color: #ccc;
+
+  /* --- syntax: find and replace markers --- */
+  --syntax-result-marker-color: #444;
+  --syntax-result-marker-color-selected: #000;
+
+  /* --- syntax: gutter --- */
+  --syntax-gutter-text-color: #333;
+  --syntax-gutter-text-color-selected: #000;
+  --syntax-gutter-background-color: #ccc;
+  --syntax-gutter-background-color-selected: #eee;
+
+  /* --- syntax: git diff --- */
+  --syntax-color-added: green;
+  --syntax-color-modified: orange;
+  --syntax-color-removed: red;
+  --syntax-color-renamed: blue;
+
+  /* --- syntax: language entities --- */
+  --syntax-color-variable: #df6a73;
+  --syntax-color-constant: #df6a73;
+  --syntax-color-property: #df6a73;
+  --syntax-color-value: #d29b67;
+  --syntax-color-function: #61aeef;
+  --syntax-color-method: var(--syntax-color-function);
+  --syntax-color-class: #e5c17c;
+  --syntax-color-keyword: #a431c4;
+  --syntax-color-tag: #b72424;
+  --syntax-color-attribute: #87400d;
+  --syntax-color-import: #97c378;
+  --syntax-color-snippet: #97c378;
+  --syntax-color-string: #97c378;
+  --syntax-color-comment: #888;
+
+  /* --- terminal --- */
+  --terminal-text-color: var(--syntax-text-color);
+  --terminal-background-color: var(--syntax-background-color);
+  --terminal-selection-background-color: var(--syntax-selection-color);
+  --terminal-selection-text-color: var(--syntax-text-color);
+  --terminal-cursor-color: var(--syntax-cursor-color);
+  --terminal-result-marker-color: var(--syntax-result-marker-color);
+  --terminal-result-marker-color-selected: var(--syntax-result-marker-color-selected);
+  --terminal-color-black: hsl(from var(--syntax-text-color) h s calc(l + 10));
+  --terminal-color-red: #b72424;
+  --terminal-color-green: hsl(from #97c378 h s calc(l - 10));
+  --terminal-color-yellow: #e5c17c;
+  --terminal-color-blue: #0e528c;
+  --terminal-color-magenta: #a431c4;
+  --terminal-color-cyan: #61aeef;
+  --terminal-color-white: hsl(from var(--syntax-background-color) h s calc(l - 20));
+  --terminal-color-bright-black: hsl(from var(--terminal-color-black) h s calc(l + 10));
+  --terminal-color-bright-red: #df6a73;
+  --terminal-color-bright-green: #97c378;
+  --terminal-color-bright-yellow: hsl(from var(--terminal-color-yellow) h s calc(l + 10));
+  --terminal-color-bright-blue: hsl(from var(--terminal-color-blue) h s calc(l + 10));
+  --terminal-color-bright-magenta: hsl(from var(--terminal-color-magenta) h s calc(l + 10));
+  --terminal-color-bright-cyan: hsl(from var(--terminal-color-cyan) h s calc(l + 10));
+  --terminal-color-bright-white: hsl(from var(--terminal-color-white) h s calc(l + 10));
+}

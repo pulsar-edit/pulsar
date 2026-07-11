@@ -1,0 +1,5 @@
+/* Highlight matched text */
+.command-palette .list-group .character-match {
+  color: var(--text-color-highlight);
+  font-weight: bold;
+}

@@ -21,16 +21,19 @@ module.exports = class PackageWatcher extends Watcher {
       watchedPaths.push(stylesheet);
     };
 
-    const stylesheetsPath = this.pack.getStylesheetsPath();
-
-    if (fs.isDirectorySync(stylesheetsPath)) {
-      this.watchDirectory(stylesheetsPath);
-    }
+    // Themes provided by a multi-theme package draw styles from several
+    // directories (shared directories plus the theme's own).
+    const stylesheetsPaths = this.pack.themeStylesDirectories ?? [this.pack.getStylesheetsPath()];
 
     const stylesheetPaths = new Set(this.pack.getStylesheetPaths());
-    const onFile = (stylesheetPath) => stylesheetPaths.add(stylesheetPath);
-    const onFolder = () => true;
-    fs.traverseTreeSync(stylesheetsPath, onFile, onFolder);
+    for (const stylesheetsPath of stylesheetsPaths) {
+      if (!fs.isDirectorySync(stylesheetsPath)) continue;
+      this.watchDirectory(stylesheetsPath);
+
+      const onFile = (stylesheetPath) => stylesheetPaths.add(stylesheetPath);
+      const onFolder = () => true;
+      fs.traverseTreeSync(stylesheetsPath, onFile, onFolder);
+    }
 
     for (let stylesheet of stylesheetPaths) {
       watchPath(stylesheet);

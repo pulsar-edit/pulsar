@@ -1,0 +1,94 @@
+/*
+ * Checkbox
+ * -------------------------
+ */
+
+.input-checkbox {
+  &:active {
+    background-color: var(--accent-color);
+  }
+  &:before,
+  &:after {
+    background-color: var(--accent-text-color);
+  }
+  &:checked {
+    background-color: var(--accent-color);
+  }
+
+  &:indeterminate {
+    background-color: var(--accent-color);
+  }
+}
+
+/*
+ * Radio
+ * -------------------------
+ */
+
+.input-radio {
+  &:before {
+    background-color: var(--accent-text-color);
+  }
+  &:active {
+    background-color: var(--accent-color);
+  }
+  &:checked {
+    background-color: var(--accent-color);
+  }
+}
+
+/*
+ * Range (Slider)
+ * -------------------------
+ */
+
+.input-range {
+  &::-webkit-slider-thumb {
+    background-color: var(--accent-color);
+  }
+}
+
+/*
+ * Toggle
+ * -------------------------
+ */
+
+.input-toggle {
+  &:checked {
+    background-color: var(--accent-color);
+  }
+  &:before {
+    background-color: var(--accent-text-color);
+  }
+}
+
+/* States ------------------------- */
+
+.input-checkbox,
+.input-text,
+.input-search,
+.input-number,
+.input-textarea,
+.input-select,
+.input-color {
+  &:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 1px var(--accent-color);
+  }
+}
+
+.input-text,
+.input-search,
+.input-number,
+.input-textarea {
+  &:invalid {
+    border-color: var(--text-color-error);
+    box-shadow: 0 0 0 1px var(--text-color-error);
+    background-color: color-mix(
+      in srgb,
+      var(--text-color-error) 10%,
+      var(--input-background-color)
+    );
+  }
+}

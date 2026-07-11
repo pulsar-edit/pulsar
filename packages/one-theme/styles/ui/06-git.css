@@ -1,0 +1,20 @@
+.status {
+  font-weight: normal;
+  color: var(--text-color);
+}
+.status-added {
+  color: var(--text-color-success);
+} /* green */
+.status-ignored {
+  font-weight: normal;
+  color: var(--text-color-subtle);
+} /* faded */
+.status-modified {
+  color: var(--text-color-warning);
+} /* orange */
+.status-removed {
+  color: var(--text-color-error);
+} /* red */
+.status-renamed {
+  color: var(--text-color-info);
+} /* blue */

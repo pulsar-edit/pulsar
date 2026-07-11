@@ -1,0 +1,41 @@
+atom-text-editor {
+  .lines {
+    .markup {
+      &.git-commit {
+        &.changed {
+          color: var(--syntax-color-modified);
+        }
+
+        &.deleted {
+          color: var(--syntax-color-removed);
+        }
+
+        &.inserted {
+          color: var(--syntax-color-added);
+        }
+      }
+    }
+  }
+}
+
+/* The Less version defined a fallback @syntax-selection-flash-color of
+   rgba(100, 255, 100, 0.7) when the syntax theme didn't provide one. Here the
+   contract fallback in static/variables/base-variables.css plays that role,
+   so a plain var() always resolves. */
+
+@keyframes flash {
+  from {
+    background-color: var(--syntax-selection-flash-color);
+  }
+  to {
+    /* The Less source emitted `background-color: null`, an invalid declaration
+       that the parser drops — so the `to` keyframe animates back to the
+       element's own computed background color. Left empty to preserve that. */
+  }
+}
+
+atom-text-editor .flash.selection .region {
+  animation-name: flash;
+  animation-duration: 0.5s;
+  animation-iteration-count: 1;
+}

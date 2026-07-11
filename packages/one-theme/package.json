@@ -1,0 +1,79 @@
+{
+  "name": "one-theme",
+  "author": "lumine-code",
+  "main": "lib/main",
+  "themes": [
+    {
+      "name": "one-day-ui",
+      "theme": "ui",
+      "styles": [
+        "styles/ui",
+        "styles/day-ui"
+      ]
+    },
+    {
+      "name": "one-day-syntax",
+      "theme": "syntax",
+      "styles": "styles/day-syntax"
+    },
+    {
+      "name": "one-night-ui",
+      "theme": "ui",
+      "styles": [
+        "styles/ui",
+        "styles/night-ui"
+      ]
+    },
+    {
+      "name": "one-night-syntax",
+      "theme": "syntax",
+      "styles": "styles/night-syntax"
+    }
+  ],
+  "version": "1.0.0",
+  "description": "The One themes for Lumine: day and night UI and syntax themes.",
+  "keywords": [
+    "theme",
+    "ui",
+    "syntax",
+    "light",
+    "dark"
+  ],
+  "repository": "https://github.com/lumine-code/lumine",
+  "license": "MIT",
+  "engines": {
+    "atom": "*"
+  },
+  "configSchema": {
+    "tabSizing": {
+      "order": 1,
+      "title": "Tab Sizing",
+      "description": "In Even mode all tabs will be the same size. Great for quickly closing many tabs. In Maximum mode the tabs will expand to take up the full width. In Minimum mode the tabs will only take as little space as needed and also show longer file names.",
+      "type": "string",
+      "enum": ["Even", "Maximum", "Minimum"],
+      "default": "Even"
+    },
+    "tabCloseButton": {
+      "order": 2,
+      "title": "Tab Close Button",
+      "description": "Choose the position of the close button shown in tabs.",
+      "type": "string",
+      "enum": ["Left", "Right"],
+      "default": "Right"
+    },
+    "hideDockButtons": {
+      "order": 3,
+      "title": "Hide Dock Toggle Buttons",
+      "description": "Note: When hiding the toggle buttons, opening a dock needs to be done by using the keyboard or other alternatives.",
+      "type": "boolean",
+      "default": false
+    },
+    "stickyHeaders": {
+      "order": 4,
+      "title": "Make Tree-View Project Headers Sticky",
+      "description": "Keep tree-view project folder headers pinned to the top while scrolling.",
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

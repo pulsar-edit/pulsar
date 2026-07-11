@@ -1,0 +1,78 @@
+.badge {
+  /* File-local: default .badge-size() padding, round(@font-size / 4) */
+  --badge-padding: round(var(--font-size) / 4, 1px);
+
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+  font-weight: normal;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: 1em;
+
+  /* Color (.badge-color() inlined) ---------------------- */
+
+  color: var(--text-color-selected);
+  background-color: var(--background-color-selected);
+
+  /* Size (.badge-size() inlined, default @size: @font-size) ---------------------- */
+
+  font-size: var(--font-size);
+  min-width: calc(var(--font-size) + var(--badge-padding) * 2);
+  padding: var(--badge-padding) round(var(--badge-padding) * 1.5, 1px);
+
+  &:empty {
+    display: none; /* Hide when un-used */
+  }
+
+  &.badge-info {
+    color: white;
+    background-color: var(--background-color-info);
+  }
+  &.badge-success {
+    color: white;
+    background-color: var(--background-color-success);
+  }
+  &.badge-warning {
+    color: white;
+    background-color: var(--background-color-warning);
+  }
+  &.badge-error {
+    color: white;
+    background-color: var(--background-color-error);
+  }
+
+  /* Fixed size (.badge-size(18px/14px/10px) computed) */
+  &.badge-large {
+    font-size: 18px;
+    min-width: 28px;
+    padding: 5px 8px;
+  }
+  &.badge-medium {
+    font-size: 14px;
+    min-width: 22px;
+    padding: 4px 6px;
+  }
+  &.badge-small {
+    font-size: 10px;
+    min-width: 16px;
+    padding: 3px 5px;
+  }
+
+  /* Flexible size
+     The size changes depending on the parent element
+     Best used for larger sizes, since em's can cause rounding errors
+     (@size: 0.8em; @padding: @size / 2) */
+  &.badge-flexible {
+    font-size: 0.8em;
+    min-width: 1.6em;
+    padding: 0.4em 0.6em;
+  }
+
+  /* Icon ---------------------- */
+
+  &.icon {
+    font-size: round(var(--component-icon-size) * 0.8, 1px);
+    padding: var(--component-icon-padding) calc(var(--component-icon-padding) * 2);
+  }
+}

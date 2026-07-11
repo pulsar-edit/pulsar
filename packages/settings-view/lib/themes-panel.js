@@ -96,9 +96,9 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
     }
     this.updateActiveThemes();
     this.disposables.add(
-      atom.config.onDidChange("core.themeMode", () => this.updateThemeSelections()),
-      atom.config.onDidChange("core.themesLight", () => this.updateThemeSelections()),
-      atom.config.onDidChange("core.themesDark", () => this.updateThemeSelections()),
+      atom.config.onDidChange("theme.mode", () => this.updateThemeSelections()),
+      atom.config.onDidChange("theme.light", () => this.updateThemeSelections()),
+      atom.config.onDidChange("theme.dark", () => this.updateThemeSelections()),
     );
 
     this.disposables.add(
@@ -332,10 +332,13 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
   }
 
   filterThemes(packages) {
-    packages.dev = packages.dev.filter(({ theme }) => theme);
-    packages.user = packages.user.filter(({ theme }) => theme);
-    packages.core = packages.core.filter(({ theme }) => theme);
-    packages.git = (packages.git || []).filter(({ theme }) => theme);
+    // A package is a theme when it declares a `theme` type or provides
+    // multiple themes through a `themes` array.
+    const isTheme = ({ theme, themes }) => theme || (Array.isArray(themes) && themes.length > 0);
+    packages.dev = packages.dev.filter(isTheme);
+    packages.user = packages.user.filter(isTheme);
+    packages.core = packages.core.filter(isTheme);
+    packages.git = (packages.git || []).filter(isTheme);
     packages.community = packages.user.concat(packages.git);
 
     for (let packageType of ["dev", "core", "community"]) {
@@ -409,10 +412,10 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
 
   // Reflect the mode and theme pair settings in the pickers.
   updateThemeSelections() {
-    this.refs.modeMenu.value = atom.config.get("core.themeMode");
+    this.refs.modeMenu.value = atom.config.get("theme.mode");
 
-    const lightPair = atom.config.get("core.themesLight") || [];
-    const darkPair = atom.config.get("core.themesDark") || [];
+    const lightPair = atom.config.get("theme.light") || [];
+    const darkPair = atom.config.get("theme.dark") || [];
     this.refs.lightUiMenu.value = this.themeOfTypeFromPair(lightPair, "ui") || "";
     this.refs.lightSyntaxMenu.value = this.themeOfTypeFromPair(lightPair, "syntax") || "";
     this.refs.darkUiMenu.value = this.themeOfTypeFromPair(darkPair, "ui") || "";
@@ -456,10 +459,10 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
     );
     const darkPair = [this.refs.darkUiMenu.value, this.refs.darkSyntaxMenu.value].filter(Boolean);
     if (lightPair.length > 0) {
-      atom.config.set("core.themesLight", lightPair);
+      atom.config.set("theme.light", lightPair);
     }
     if (darkPair.length > 0) {
-      atom.config.set("core.themesDark", darkPair);
+      atom.config.set("theme.dark", darkPair);
     }
   }
 
@@ -587,7 +590,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
   }
 
   didChangeModeMenu() {
-    atom.config.set("core.themeMode", this.refs.modeMenu.value);
+    atom.config.set("theme.mode", this.refs.modeMenu.value);
   }
 
   didChangeThemeMenu() {

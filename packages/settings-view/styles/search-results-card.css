@@ -1,0 +1,84 @@
+.settings-view {
+  .search-result {
+    padding: calc(var(--component-padding) * 1.5);
+    margin-bottom: var(--component-padding);
+    list-style-type: none;
+    font-size: 1.2em;
+    border-radius: calc(var(--component-border-radius) * 2);
+    border: 1px solid var(--base-border-color);
+    background-color: var(--package-card-background-color);
+    overflow: hidden;
+    -webkit-user-select: none;
+
+    &:hover {
+      /* contrast(@package-card-background-color, darken(…, 2%), lighten(…, 2%)) */
+      background-color: hsl(from var(--package-card-background-color) h s calc(l - 2));
+
+      @container style(--settings-view-package-card-dark-flag: white) {
+        background-color: hsl(from var(--package-card-background-color) h s calc(l + 2));
+      }
+    }
+    &:active {
+      background-color: var(--package-card-background-color);
+    }
+    &.disabled {
+      background-color: var(--package-card-disabled-background-color);
+      .body,
+      .avatar,
+      .author,
+      .stats {
+        opacity: 0.5;
+      }
+    }
+
+    &.col-lg-4 {
+      min-width: 190px;
+      padding: var(--component-padding) 0;
+      padding-left: var(--component-padding);
+      padding-right: var(--component-padding);
+    }
+
+    .search-name {
+      margin-right: 0.8em;
+      font-weight: bolder;
+      color: var(--text-color-highlight);
+      cursor: pointer;
+    }
+
+    .search-id {
+      font-size: 0.8em;
+      margin-right: var(--component-padding);
+      display: block; /* Force newline on item to avoid complex line handling */
+      opacity: 0.5;
+    }
+
+    .search-description {
+      color: var(--text-color);
+      overflow: hidden;
+      min-height: 38px;
+      max-height: 38px;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* number of lines to show */
+      -webkit-box-orient: vertical;
+    }
+
+    .card-name {
+      font-weight: 300;
+      margin: 0 0 0.2em 0;
+      font-size: 1.2em;
+      line-height: 1.4;
+    }
+
+    .search-package-name {
+      margin-right: 0.2em;
+      color: var(--text-color-highlight);
+      font-size: 1.2em;
+      line-height: 1.4;
+    }
+
+    .search-result-icon {
+      margin-left: 0.2em;
+    }
+  }
+}

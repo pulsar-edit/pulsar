@@ -1,0 +1,54 @@
+/*
+ * Loading
+ * --------------------------------------------------
+ * (.loading-spinner(@size) inlined for each size.)
+ */
+
+.loading-spinner-tiny {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-image: url(images/octocat-spinner-128.gif);
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  &.inline-block {
+    display: inline-block;
+  }
+}
+.loading-spinner-small {
+  display: block;
+  width: 32px;
+  height: 32px;
+  background-image: url(images/octocat-spinner-128.gif);
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  &.inline-block {
+    display: inline-block;
+  }
+}
+.loading-spinner-medium {
+  display: block;
+  width: 48px;
+  height: 48px;
+  background-image: url(images/octocat-spinner-128.gif);
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  &.inline-block {
+    display: inline-block;
+  }
+}
+.loading-spinner-large {
+  display: block;
+  width: 64px;
+  height: 64px;
+  background-image: url(images/octocat-spinner-128.gif);
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  &.inline-block {
+    display: inline-block;
+  }
+}

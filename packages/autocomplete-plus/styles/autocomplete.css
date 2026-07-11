@@ -1,0 +1,326 @@
+/* NOTE: the Less version opened with a fallback mixin that defined
+   @syntax-color-attribute (#888) for syntax themes predating v1.93. It is
+   obsolete: --syntax-color-attribute always resolves via the fallbacks in
+   static/variables/base-variables.css. */
+
+autocomplete-suggestion-list {
+  /* Package-local values (converted from Less variables) */
+  --autocomplete-font-size-small: 0.9em;
+  --autocomplete-type-icon-font-size: 1em;
+  --autocomplete-type-letter-icon-font-size: var(--autocomplete-font-size-small);
+  --autocomplete-row-line-height: 2em;
+  --autocomplete-item-padding: 0.75em;
+  --autocomplete-item-side-padding: 0.6em;
+}
+
+atom-overlay.autocomplete-plus {
+  z-index: 12; /* higher than docks */
+}
+
+autocomplete-suggestion-list.select-list.popover-list {
+  width: auto !important; /* TODO: Can be removed once the inline style is gone */
+  display: inline-block;
+  min-width: 243px; /* Try and fail until the specs pass */
+  padding: 0;
+  overflow: hidden;
+  color: var(--text-color);
+
+  .suggestion-list-scroller {
+    overflow-y: auto;
+  }
+
+  .suggestion-description {
+    padding: 5px 0;
+    padding-left: var(--autocomplete-item-side-padding);
+    padding-right: var(--autocomplete-item-side-padding);
+    min-height: var(--autocomplete-row-line-height);
+    line-height: 1.3;
+    background: hsl(from var(--overlay-background-color) h s calc(l - 4));
+    border-radius: 0 0 var(--component-border-radius) var(--component-border-radius);
+
+    /* let the other sibling decide how large the container should be */
+    width: min-content;
+    min-width: 100%;
+  }
+
+  .suggestion-description-content {
+    font-size: calc(var(--font-size) + 1px);
+    font-family: var(--font-family);
+    max-height: 33vh;
+    display: block;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+
+  .suggestion-description-more-link {
+    font-size: calc(var(--font-size) + 1px);
+    font-family: var(--font-family);
+    color: var(--text-color-info);
+  }
+
+  input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  ol.list-group {
+    margin-top: 0;
+    display: table;
+    width: 100%;
+    margin-right: 10px; /* Needed to prevent horizontal scrolling when right label is too long */
+
+    li {
+      display: table-row;
+      color: var(--text-color);
+      line-height: var(--autocomplete-row-line-height);
+
+      > span {
+        display: table-cell;
+        vertical-align: middle;
+      }
+
+      &:after {
+        clear: both;
+        display: block;
+        content: " ";
+      }
+
+      &.selected {
+        .word {
+          color: rgb(from var(--text-color-selected) r g b / calc(alpha - 0.2));
+        }
+        .character-match {
+          color: var(--text-color-selected);
+        }
+        .left-label,
+        .right-label,
+        .snippet-completion {
+          color: rgb(from var(--text-color-selected) r g b / calc(alpha - 0.5));
+        }
+      }
+    }
+  }
+}
+
+autocomplete-suggestion-list {
+  .icon-container {
+    width: var(--autocomplete-row-line-height);
+    padding-left: 0;
+    padding-right: var(--autocomplete-item-padding);
+    &:empty {
+      width: var(--autocomplete-item-side-padding);
+      padding: 0;
+    }
+  }
+
+  .icon {
+    display: block;
+    width: var(--autocomplete-row-line-height);
+    line-height: var(--autocomplete-row-line-height);
+    text-align: center;
+    font-style: normal;
+    font-weight: bold;
+
+    color: var(--text-color-subtle);
+    background: rgb(from var(--text-color) r g b / calc(alpha - 0.9));
+
+    &:empty {
+      display: none;
+    }
+    > *::before {
+      font-size: var(--autocomplete-type-icon-font-size);
+      width: var(--autocomplete-type-icon-font-size);
+      height: var(--autocomplete-type-icon-font-size);
+    }
+
+    .icon-letter {
+      /* I'm failing to vert center these letters. So shift them up... */
+      position: relative;
+      top: -0.1em;
+      font-size: var(--autocomplete-type-letter-icon-font-size);
+      line-height: var(--autocomplete-type-letter-icon-font-size);
+    }
+  }
+
+  .left-label {
+    text-align: right;
+    padding-right: var(--autocomplete-item-padding);
+    vertical-align: middle;
+
+    font-size: var(--autocomplete-font-size-small);
+    color: var(--text-color-subtle);
+
+    &:empty {
+      padding-right: 0;
+    }
+  }
+
+  .right-label {
+    padding-right: var(--autocomplete-item-padding);
+    font-size: var(--autocomplete-font-size-small);
+    color: var(--text-color-subtle);
+
+    &:empty {
+      padding-right: 0;
+    }
+  }
+
+  .word-container {
+    padding-right: var(--autocomplete-item-padding);
+  }
+
+  .word {
+    float: left;
+  }
+
+  .character-match {
+    font-weight: bold;
+    color: var(--text-color-highlight);
+  }
+
+  .snippet-completion {
+    color: var(--text-color-subtle);
+  }
+
+  /* Here we set the max width of the popup */
+  .left-label {
+    max-width: 20vw;
+  }
+  .word {
+    max-width: 35vw;
+  }
+  .right-label {
+    max-width: 25vw;
+  }
+
+  .word,
+  .left-label,
+  .right-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Type icons (expanded from the Less `.make-type-icon()` mixin). */
+  .icon.attribute {
+    color: var(--syntax-color-attribute);
+    background: rgb(from var(--syntax-color-attribute) r g b / calc(alpha - 0.8));
+  }
+  .icon.builtin {
+    color: var(--syntax-color-keyword);
+    background: rgb(from var(--syntax-color-keyword) r g b / calc(alpha - 0.8));
+  }
+  .icon.class {
+    color: var(--syntax-color-class);
+    background: rgb(from var(--syntax-color-class) r g b / calc(alpha - 0.8));
+  }
+  .icon.constant {
+    color: var(--syntax-color-constant);
+    background: rgb(from var(--syntax-color-constant) r g b / calc(alpha - 0.8));
+  }
+  .icon.function {
+    color: var(--syntax-color-function);
+    background: rgb(from var(--syntax-color-function) r g b / calc(alpha - 0.8));
+  }
+  .icon.import {
+    color: var(--syntax-color-import);
+    background: rgb(from var(--syntax-color-import) r g b / calc(alpha - 0.8));
+  }
+  .icon.keyword {
+    color: var(--syntax-color-keyword);
+    background: rgb(from var(--syntax-color-keyword) r g b / calc(alpha - 0.8));
+  }
+  .icon.method {
+    color: var(--syntax-color-method);
+    background: rgb(from var(--syntax-color-method) r g b / calc(alpha - 0.8));
+  }
+  .icon.module {
+    color: var(--syntax-color-import);
+    background: rgb(from var(--syntax-color-import) r g b / calc(alpha - 0.8));
+  }
+  .icon.mixin {
+    color: var(--syntax-color-class);
+    background: rgb(from var(--syntax-color-class) r g b / calc(alpha - 0.8));
+  }
+  .icon.package {
+    color: var(--syntax-color-import);
+    background: rgb(from var(--syntax-color-import) r g b / calc(alpha - 0.8));
+  }
+  .icon.property {
+    color: var(--syntax-color-property);
+    background: rgb(from var(--syntax-color-property) r g b / calc(alpha - 0.8));
+  }
+  .icon.require {
+    color: var(--syntax-color-import);
+    background: rgb(from var(--syntax-color-import) r g b / calc(alpha - 0.8));
+  }
+  .icon.snippet {
+    color: var(--syntax-color-snippet);
+    background: rgb(from var(--syntax-color-snippet) r g b / calc(alpha - 0.8));
+  }
+  .icon.tag {
+    color: var(--syntax-color-tag);
+    background: rgb(from var(--syntax-color-tag) r g b / calc(alpha - 0.8));
+  }
+  .icon.type {
+    color: var(--syntax-color-class);
+    background: rgb(from var(--syntax-color-class) r g b / calc(alpha - 0.8));
+  }
+  .icon.value {
+    color: var(--syntax-color-value);
+    background: rgb(from var(--syntax-color-value) r g b / calc(alpha - 0.8));
+  }
+  .icon.variable {
+    color: var(--syntax-color-variable);
+    background: rgb(from var(--syntax-color-variable) r g b / calc(alpha - 0.8));
+  }
+  .icon.selector {
+    color: var(--syntax-color-attribute);
+    background: rgb(from var(--syntax-color-attribute) r g b / calc(alpha - 0.8));
+  }
+  .icon.pseudo-selector {
+    color: var(--syntax-color-attribute);
+    background: rgb(from var(--syntax-color-attribute) r g b / calc(alpha - 0.8));
+  }
+}
+
+/* Low-contrast correction (converted from the guarded `.make-type-icon()`
+   mixin). The Less guard fired when the HSV value of the type color was
+   within 20 points of @overlay-background-color's HSV value; the correction
+   then pushed the color 30% away from the overlay background
+   (`contrast(@overlay-background-color, darken(@color, 30%), lighten(@color, 30%))`).
+
+   Evaluated against the bundled palettes:
+   - one-night (overlay #252830, HSV value 18.8): every type color has an HSV
+     value of 75+ — the guard is false for all types, so no overrides.
+   - one-day (overlay #f2f2f2, HSV value 94.9): true for the class (79.6),
+     function/method (94.8), tag (89.3) and variable (89.3) colors — mapped to
+     the icon types class/mixin/type, function, method, tag and variable —
+     and false for the attribute/selector (71.6), keyword/builtin (65.2),
+     constant (71.6), import/module/package/require (65.2), property (25.9),
+     snippet (63.0) and value (25.9) colors. The light overlay picks the
+     darkened variant. */
+:where(.theme-one-day-ui) autocomplete-suggestion-list {
+  .icon.class,
+  .icon.mixin,
+  .icon.type {
+    color: hsl(from var(--syntax-color-class) h s calc(l - 30));
+    background: hsl(from var(--syntax-color-class) h s calc(l - 30) / calc(alpha - 0.8));
+  }
+  .icon.function {
+    color: hsl(from var(--syntax-color-function) h s calc(l - 30));
+    background: hsl(from var(--syntax-color-function) h s calc(l - 30) / calc(alpha - 0.8));
+  }
+  .icon.method {
+    color: hsl(from var(--syntax-color-method) h s calc(l - 30));
+    background: hsl(from var(--syntax-color-method) h s calc(l - 30) / calc(alpha - 0.8));
+  }
+  .icon.tag {
+    color: hsl(from var(--syntax-color-tag) h s calc(l - 30));
+    background: hsl(from var(--syntax-color-tag) h s calc(l - 30) / calc(alpha - 0.8));
+  }
+  .icon.variable {
+    color: hsl(from var(--syntax-color-variable) h s calc(l - 30));
+    background: hsl(from var(--syntax-color-variable) h s calc(l - 30) / calc(alpha - 0.8));
+  }
+}

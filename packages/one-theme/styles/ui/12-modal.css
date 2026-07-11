@@ -1,0 +1,126 @@
+/* @modal-padding and @modal-width inlined below (each used once). */
+
+atom-panel-container.modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+atom-panel.modal {
+  position: relative;
+  width: 100%;
+  max-width: calc(var(--ui-size) * 50);
+  margin: 0 auto;
+  left: initial;
+  color: var(--text-color);
+  background-color: transparent;
+  padding: calc(var(--ui-padding) / 2);
+
+  &.from-top {
+    top: calc(var(--component-padding) * 5);
+  }
+
+  atom-text-editor[mini] {
+    margin-bottom: calc(var(--ui-padding) / 2);
+  }
+
+  .select-list ol.list-group,
+  &.select-list ol.list-group {
+    border: 1px solid var(--overlay-border-color);
+    background-color: hsl(from var(--overlay-background-color) h s calc(l + 2));
+
+    &:empty {
+      border: none;
+      margin-top: 0;
+    }
+
+    li {
+      padding: calc(var(--ui-padding) / 2) calc(var(--ui-padding) / 1.5);
+      line-height: var(--ui-line-height);
+      border-bottom: 1px solid var(--overlay-border-color);
+
+      &:last-of-type {
+        border-bottom: none;
+      }
+
+      .icon::before {
+        margin-left: 1px;
+      }
+
+      .icon.status {
+        float: right;
+        margin-left: var(--ui-padding-icon);
+        &:before {
+          margin-left: 0;
+          margin-right: 0;
+        }
+      }
+
+      &.selected {
+        .status.icon {
+          color: var(--text-color-selected);
+        }
+      }
+    }
+  }
+
+  .select-list .key-binding {
+    margin-top: -1px;
+    margin-left: calc(var(--ui-padding) / 2);
+    margin-right: calc(var(--ui-padding) / -3 + 1px);
+  }
+
+  .select-list .primary-line {
+    display: block;
+  }
+
+  & > * {
+    position: relative; /* fixes stacking order */
+  }
+
+  .command-palette {
+    padding: 1px; /* prevents the box-shadow of the input from being cut off */
+    background-color: var(--overlay-background-color);
+  }
+
+  /* Container */
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    background-color: var(--overlay-background-color);
+    border-radius: calc(var(--component-border-radius) * 2);
+    box-shadow: 0 6px 12px -2px hsla(0, 0%, 0%, 0.4);
+  }
+
+  /* Backdrop */
+  /* TODO: Add extra wrapper to translate individually or easier positioning */
+
+  &:after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: var(--overlay-backdrop-color);
+    opacity: var(--overlay-backdrop-opacity);
+    backface-visibility: hidden; /* fixes scrollbar on retina screens */
+    -webkit-animation: overlay-fade 0.24s cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+}
+
+@-webkit-keyframes overlay-fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: var(--overlay-backdrop-opacity);
+  }
+}

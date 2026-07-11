@@ -1560,7 +1560,7 @@ describe("PackageManager", () => {
       it("enables and disables a theme", async () => {
         jasmine.useRealClock();
         const packageName = "theme-with-package-file";
-        expect(atom.config.get("core.themes")).not.toContain(packageName);
+        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).not.toContain(packageName);
         expect(atom.config.get("core.disabledPackages")).not.toContain(packageName);
 
         // enabling of theme
@@ -1572,7 +1572,7 @@ describe("PackageManager", () => {
         const pack = atom.packages.enablePackage(packageName);
         await promise;
         expect(atom.packages.isPackageActive(packageName)).toBe(true);
-        expect(atom.config.get("core.themes")).toContain(packageName);
+        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).toContain(packageName);
         expect(atom.config.get("core.disabledPackages")).not.toContain(packageName);
 
         await new Promise((resolve) => {
@@ -1583,8 +1583,8 @@ describe("PackageManager", () => {
         });
 
         expect(atom.packages.getActivePackages()).not.toContain(pack);
-        expect(atom.config.get("core.themes")).not.toContain(packageName);
-        expect(atom.config.get("core.themes")).not.toContain(packageName);
+        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).not.toContain(packageName);
+        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).not.toContain(packageName);
         expect(atom.config.get("core.disabledPackages")).not.toContain(packageName);
       });
     });

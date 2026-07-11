@@ -1,0 +1,24 @@
+/*
+ * Package-local variables shared by the settings-view stylesheets
+ * (Less: variables.less, imported after ui-variables.less).
+ */
+
+/*
+ * White when the package-card background is dark (HSL lightness < 50%) and
+ * black otherwise. Replaces the Less contrast(@package-card-background-color, …)
+ * calls at runtime; the registered <color> syntax lets style container queries
+ * compare the resolved color instead of the raw token stream.
+ */
+@property --settings-view-package-card-dark-flag {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: black;
+}
+
+.settings-view {
+  --package-card-background-color: hsl(from var(--tool-panel-background-color) h s calc(l + 8));
+  --package-card-disabled-background-color: hsl(from var(--package-card-background-color) h s calc(l - 3));
+  --settings-view-package-card-dark-flag: hsl(
+    from var(--package-card-background-color) 0 0 calc((50 - l) * infinity) / 1
+  );
+}

@@ -1,0 +1,118 @@
+/* Generate 16 different badge colors.
+ *
+ * We need colors that vary from one another, but they need to harmonize with
+ * the user's chosen UI theme. So we just move around the color wheel in
+ * 22.5-degree (360 / 16) steps, starting with the UI theme's own badge
+ * background color, and varying the hue while keeping the saturation and
+ * lightness constant.
+ *
+ * (Expanded from the Less `.badge-variant(@char, @num)` mixin loop, where
+ * each variant was `spin(@background-color-info, (360 / 16) * @num)`.)
+ */
+.symbols-view-badge-variant-0 {
+  background-color: hsl(from var(--background-color-info) h s l) !important;
+}
+.symbols-view-badge-variant-1 {
+  background-color: hsl(from var(--background-color-info) calc(h + 22.5) s l) !important;
+}
+.symbols-view-badge-variant-2 {
+  background-color: hsl(from var(--background-color-info) calc(h + 45) s l) !important;
+}
+.symbols-view-badge-variant-3 {
+  background-color: hsl(from var(--background-color-info) calc(h + 67.5) s l) !important;
+}
+.symbols-view-badge-variant-4 {
+  background-color: hsl(from var(--background-color-info) calc(h + 90) s l) !important;
+}
+.symbols-view-badge-variant-5 {
+  background-color: hsl(from var(--background-color-info) calc(h + 112.5) s l) !important;
+}
+.symbols-view-badge-variant-6 {
+  background-color: hsl(from var(--background-color-info) calc(h + 135) s l) !important;
+}
+.symbols-view-badge-variant-7 {
+  background-color: hsl(from var(--background-color-info) calc(h + 157.5) s l) !important;
+}
+.symbols-view-badge-variant-8 {
+  background-color: hsl(from var(--background-color-info) calc(h + 180) s l) !important;
+}
+.symbols-view-badge-variant-9 {
+  background-color: hsl(from var(--background-color-info) calc(h + 202.5) s l) !important;
+}
+.symbols-view-badge-variant-a {
+  background-color: hsl(from var(--background-color-info) calc(h + 225) s l) !important;
+}
+.symbols-view-badge-variant-b {
+  background-color: hsl(from var(--background-color-info) calc(h + 247.5) s l) !important;
+}
+.symbols-view-badge-variant-c {
+  background-color: hsl(from var(--background-color-info) calc(h + 270) s l) !important;
+}
+.symbols-view-badge-variant-d {
+  background-color: hsl(from var(--background-color-info) calc(h + 292.5) s l) !important;
+}
+.symbols-view-badge-variant-e {
+  background-color: hsl(from var(--background-color-info) calc(h + 315) s l) !important;
+}
+.symbols-view-badge-variant-f {
+  background-color: hsl(from var(--background-color-info) calc(h + 337.5) s l) !important;
+}
+
+/* Highlight matched text */
+.symbols-view .list-group .character-match {
+  color: var(--text-color-highlight);
+  font-weight: bold;
+}
+
+atom-panel.modal .symbols-view {
+  .primary-line {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+
+    &.icon::before {
+      margin-left: 0;
+    }
+
+    .name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: pre;
+      margin-right: auto;
+    }
+
+    .badge-container {
+      display: block;
+      flex-grow: 0;
+      display: flex;
+      flex-direction: row;
+
+      .badge:not(:last-child) {
+        margin-right: 5px;
+      }
+    }
+
+    .badge-symbol-tag {
+      text-transform: capitalize;
+    }
+  }
+
+  .secondary-line {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    max-width: 100%;
+
+    .location {
+      display: block;
+    }
+
+    .context {
+      display: block;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      flex-grow: 0;
+    }
+  }
+}

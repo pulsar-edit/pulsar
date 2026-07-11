@@ -1,0 +1,16 @@
+.grammar-item {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+.grammar-status a,
+.grammar-status a:hover {
+  color: var(--text-color);
+}
+
+.grammar-selector-parser {
+  margin-right: var(--component-padding);
+}

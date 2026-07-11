@@ -1,0 +1,25 @@
+/*
+ * Scaffolding
+ * --------------------------------------------------
+ */
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box; /* Reset the box-sizing */
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+html {
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  line-height: 1.428571429; /* 20/14 */
+  color: var(--text-color);
+  background-color: var(--app-background-color);
+}

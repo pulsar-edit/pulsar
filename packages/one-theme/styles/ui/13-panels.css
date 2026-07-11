@@ -1,0 +1,93 @@
+/* Panels */
+
+atom-panel {
+  font-weight: normal;
+  color: var(--text-color);
+  position: relative;
+  border-bottom: 1px solid var(--base-border-color);
+
+  &.top {
+    border-right: 1px solid var(--base-border-color);
+  }
+  &.left {
+    border-right: 1px solid var(--base-border-color);
+  }
+  &.right {
+    border-left: 1px solid var(--base-border-color);
+  }
+  &.bottom {
+    border-right: 1px solid var(--base-border-color);
+  }
+  &.footer:last-child {
+    border-bottom: none;
+  }
+  &.tool-panel:empty {
+    border: none;
+  }
+}
+
+.panel {
+  &.bordered {
+    border: 1px solid var(--base-border-color);
+    border-radius: var(--component-border-radius);
+  }
+}
+
+.inset-panel {
+  position: relative;
+  background-color: var(--inset-panel-background-color);
+  border-radius: var(--component-border-radius);
+  &.bordered {
+    border: 1px solid var(--base-border-color);
+    border-radius: var(--component-border-radius);
+  }
+  & .panel-heading {
+    border-color: var(--inset-panel-border-color);
+  }
+}
+
+.panel-heading {
+  font-weight: normal;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--panel-heading-border-color);
+  background-color: var(--panel-heading-background-color);
+
+  .btn {
+    padding-left: 8px;
+    padding-right: 8px;
+    /* .btn-default() expanded with each color lightened by 10% */
+    color: hsl(from var(--text-color) h s calc(l + 10));
+    text-shadow: none;
+    border: 1px solid var(--button-border-color);
+    background-color: hsl(from var(--button-background-color) h s calc(l + 10));
+    background-image: linear-gradient(
+      hsl(from var(--button-background-color) h s calc(l + 12)),
+      hsl(from var(--button-background-color) h s calc(l + 10))
+    );
+
+    &:hover {
+      color: var(--text-color-highlight);
+      background-image: linear-gradient(
+        hsl(from var(--button-background-color-hover) h s calc(l + 12)),
+        hsl(from var(--button-background-color-hover) h s calc(l + 10))
+      );
+    }
+    &:active {
+      background: hsl(from var(--button-background-color) h s calc(l + 6));
+      box-shadow: none;
+    }
+    &.selected {
+      background: hsl(from var(--button-background-color-selected) h s calc(l + 10));
+    }
+    &.selected:focus,
+    &.selected:hover {
+      background: hsl(from var(--button-background-color-selected) h s calc(l + 12));
+    }
+    &:focus {
+      /* unfortunately :focus styles stay even after releasing mouse. */
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 1px var(--accent-color);
+    }
+  }
+}

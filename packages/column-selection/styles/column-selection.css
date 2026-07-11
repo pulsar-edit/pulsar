@@ -1,0 +1,11 @@
+.status-bar .column-selection-icon .icon::before {
+  margin-right: 0;
+}
+
+.status-bar .column-selection-icon .sticky {
+  color: var(--text-color-success);
+}
+
+.status-bar .column-selection-icon .picker {
+  color: var(--text-color-warning);
+}

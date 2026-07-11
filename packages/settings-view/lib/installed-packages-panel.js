@@ -183,10 +183,13 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
   }
 
   filterPackages(packages) {
-    packages.dev = packages.dev.filter(({ theme }) => !theme);
-    packages.user = packages.user.filter(({ theme }) => !theme);
-    packages.core = packages.core.filter(({ theme }) => !theme);
-    packages.git = (packages.git || []).filter(({ theme }) => !theme);
+    // A package is a theme (shown in the Themes panel, not here) when it
+    // declares a `theme` type or provides multiple themes via a `themes` array.
+    const isTheme = ({ theme, themes }) => theme || (Array.isArray(themes) && themes.length > 0);
+    packages.dev = packages.dev.filter((p) => !isTheme(p));
+    packages.user = packages.user.filter((p) => !isTheme(p));
+    packages.core = packages.core.filter((p) => !isTheme(p));
+    packages.git = (packages.git || []).filter((p) => !isTheme(p));
     packages.community = packages.user.concat(packages.git);
 
     for (let packageType of ["dev", "core", "community"]) {

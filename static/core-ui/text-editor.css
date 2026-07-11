@@ -1,0 +1,218 @@
+/* Containment values from core-ui/utils inlined at each use site
+   (e.g. `layout paint style` = contain_except_size). */
+
+:root {
+  /* Fixes specs */
+  --editor-font-family: Menlo, Consolas, "DejaVu Sans Mono", monospace;
+}
+
+atom-text-editor {
+  contain: layout paint style; /* contain_except_size */
+  display: flex;
+  cursor: text;
+  font-family: var(--editor-font-family);
+  font-size: var(--editor-font-size);
+  line-height: var(--editor-line-height);
+
+  .gutter-container {
+    contain: layout paint style; /* contain_except_size */
+    width: min-content;
+    background-color: inherit;
+    cursor: default;
+  }
+
+  .gutter {
+    contain: layout paint style; /* contain_except_size */
+    overflow: hidden;
+    z-index: 0;
+    text-align: right;
+    min-width: 1em;
+    box-sizing: border-box;
+    background-color: inherit;
+    position: relative;
+  }
+
+  .gutter:hover {
+    .line-number.foldable .icon-right {
+      contain: paint style; /* contain_except_layout_size */
+      visibility: visible;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .gutter,
+  .gutter:hover {
+    .line-number.folded .icon-right {
+      contain: paint style; /* contain_except_layout_size */
+
+      /* .octicon(chevron-right, 0.8em) */
+      &::before {
+        font-family: "Octicons Regular";
+        font-weight: normal;
+        font-style: normal;
+        display: inline-block;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        text-decoration: none;
+        font-size: 0.8em;
+        width: 0.8em;
+        height: 0.8em;
+        content: "\f078"; /* chevron-right */
+      }
+
+      visibility: visible;
+
+      &::before {
+        position: relative;
+        left: -0.1em;
+      }
+    }
+  }
+
+  .line-numbers {
+    contain: layout paint style; /* contain_except_size */
+    width: max-content;
+    background-color: inherit;
+  }
+
+  .line-number {
+    contain: layout paint style; /* contain_except_size */
+    padding-left: 0.5em;
+    white-space: nowrap;
+    opacity: 0.6;
+    position: relative;
+
+    .icon-right {
+      contain: paint style; /* contain_except_layout_size */
+
+      /* .octicon(chevron-down, 0.8em) */
+      &::before {
+        font-family: "Octicons Regular";
+        font-weight: normal;
+        font-style: normal;
+        display: inline-block;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        text-decoration: none;
+        font-size: 0.8em;
+        width: 0.8em;
+        height: 0.8em;
+        content: "\f0a3"; /* chevron-down */
+      }
+
+      display: inline-block;
+      visibility: hidden;
+      opacity: 0.6;
+      padding: 0 0.4em;
+
+      &::before {
+        text-align: center;
+      }
+    }
+  }
+
+  .highlight {
+    contain: layout size style; /* contain_except_paint */
+    background: none;
+    padding: 0;
+  }
+
+  .highlight .region {
+    contain: layout size style; /* contain_except_paint */
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .selection .region {
+    background-color: var(--syntax-selection-color);
+  }
+
+  .line {
+    white-space: pre;
+    contain: layout paint style; /* contain_except_size */
+
+    &.cursor-line .fold-marker::after {
+      opacity: 1;
+    }
+  }
+
+  .fold-marker {
+    contain: layout size paint style; /* contain_all */
+    cursor: default;
+
+    &::after {
+      /* .icon(0.8em, inline) */
+      font-family: "Octicons Regular";
+      font-weight: normal;
+      font-style: normal;
+      display: inline;
+      line-height: 1;
+      -webkit-font-smoothing: antialiased;
+      text-decoration: none;
+      font-size: 0.8em;
+      width: 0.8em;
+      height: 0.8em;
+
+      content: "\f09a"; /* ellipsis */
+      padding-left: 0.2em;
+    }
+  }
+
+  .placeholder-text {
+    contain: layout paint style; /* contain_except_size */
+    position: absolute;
+    color: var(--text-color-subtle);
+  }
+
+  .invisible-character {
+    contain: layout size paint style; /* contain_all */
+    font-weight: normal !important;
+    font-style: normal !important;
+  }
+
+  .indent-guide {
+    contain: paint style; /* contain_except_layout_size */
+    display: inline-block;
+    box-shadow: inset 1px 0;
+  }
+
+  .cursor {
+    contain: layout size paint style; /* contain_all */
+    z-index: 4;
+    pointer-events: none;
+    box-sizing: border-box;
+    position: absolute;
+    border-left: 1px solid;
+    opacity: 0;
+  }
+
+  &.is-focused .cursor {
+    opacity: 1;
+  }
+
+  .cursors.blink-off .cursor {
+    opacity: 0;
+  }
+
+  /* Atom manages the selection independent of Blink / the OS. We never want a
+     native selection. */
+  user-select: none;
+}
+
+atom-text-editor[mini] {
+  contain: layout paint style; /* contain_except_size */
+  font-size: var(--input-font-size);
+  line-height: var(--component-line-height);
+  max-height: calc(var(--component-line-height) + 2px); /* +2 for borders */
+  overflow: auto;
+}
+
+atom-overlay {
+  contain: layout style; /* contain_except_size_paint */
+  position: fixed;
+  display: block;
+  z-index: 4;
+}

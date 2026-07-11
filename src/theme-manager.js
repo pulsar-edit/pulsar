@@ -5,10 +5,56 @@ const _ = require("underscore-plus");
 const { Emitter } = require("event-kit");
 const fs = require("fs-plus");
 const LessCompileCache = require("./less-compile-cache");
+const { UI_VARIABLES, SYNTAX_VARIABLES } = require("./theme-variables");
+const { writeShimDirectory } = require("./theme-variable-shim");
 
 // Keeping a reference to the entire object so that it can be mocked more
 // easily in the specs.
 const watcher = require("./path-watcher");
+
+// The core stylesheets, in loading order (relative to static/). Plain CSS —
+// all theming flows through the custom-property contract at runtime, so the
+// base never recompiles on theme switches.
+const BASE_STYLESHEETS = [
+  "variables/base-variables.css",
+  "icons/octicons.css",
+  "normalize.css",
+  "scaffolding.css",
+  "core-ui/cursors.css",
+  "core-ui/theme-transition.css",
+  "core-ui/panels.css",
+  "core-ui/docks.css",
+  "core-ui/panes.css",
+  "core-ui/syntax.css",
+  "core-ui/text-editor.css",
+  "core-ui/workspace-view.css",
+  "atom-ui/styles/private/scaffolding.css",
+  "atom-ui/styles/private/alerts.css",
+  "atom-ui/styles/private/close.css",
+  "atom-ui/styles/private/code.css",
+  "atom-ui/styles/private/forms.css",
+  "atom-ui/styles/private/links.css",
+  "atom-ui/styles/private/navs.css",
+  "atom-ui/styles/private/sections.css",
+  "atom-ui/styles/private/tables.css",
+  "atom-ui/styles/private/utilities.css",
+  "atom-ui/styles/badges.css",
+  "atom-ui/styles/button-groups.css",
+  "atom-ui/styles/buttons.css",
+  "atom-ui/styles/git-status.css",
+  "atom-ui/styles/icons.css",
+  "atom-ui/styles/inputs.css",
+  "atom-ui/styles/layout.css",
+  "atom-ui/styles/lists.css",
+  "atom-ui/styles/loading.css",
+  "atom-ui/styles/messages.css",
+  "atom-ui/styles/modals.css",
+  "atom-ui/styles/panels.css",
+  "atom-ui/styles/select-list.css",
+  "atom-ui/styles/site-colors.css",
+  "atom-ui/styles/text.css",
+  "atom-ui/styles/tooltip.css",
+];
 
 async function wait(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -29,6 +75,7 @@ module.exports = class ThemeManager {
     this.lessCache = null;
     this.initialLoadComplete = false;
     this.themeImportPathsOverride = null;
+    this.themeShimDir = null;
     this.themeSwitchPromise = Promise.resolve();
     this.packageManager.registerPackageActivator(this, ["theme"]);
 
@@ -111,58 +158,53 @@ module.exports = class ThemeManager {
   Section: Managing Enabled Themes
   */
 
+  // The config key holding the theme pair for the mode currently in effect.
+  getActiveThemesKeyPath() {
+    return this.isDarkThemeMode() ? "theme.dark" : "theme.light";
+  }
+
   warnForNonExistentThemes() {
-    let themeNames = this.config.get("core.themes") || [];
+    let themeNames = this.config.get(this.getActiveThemesKeyPath()) || [];
     if (!Array.isArray(themeNames)) {
       themeNames = [themeNames];
     }
     for (let themeName of themeNames) {
-      if (
-        !themeName ||
-        typeof themeName !== "string" ||
-        !this.packageManager.resolvePackagePath(themeName)
-      ) {
+      if (!themeName || typeof themeName !== "string" || !this.isThemeInstalled(themeName)) {
         console.warn(`Enabled theme '${themeName}' is not installed.`);
       }
     }
+  }
+
+  // A theme is installed when it is already loaded (which covers themes
+  // provided by multi-theme packages) or when its name resolves to a package
+  // on disk.
+  isThemeInstalled(themeName) {
+    return (
+      this.packageManager.getLoadedPackage(themeName) != null ||
+      this.packageManager.resolvePackagePath(themeName) != null
+    );
   }
 
   // Public: Get the enabled theme names from the config.
   //
   // Returns an array of theme names in the order that they should be activated.
   getEnabledThemeNames() {
-    let themeNames = this.config.get("core.themes") || [];
+    let themeNames = this.config.get(this.getActiveThemesKeyPath()) || [];
     if (!Array.isArray(themeNames)) {
       themeNames = [themeNames];
     }
     themeNames = themeNames.filter(
-      (themeName) =>
-        typeof themeName === "string" && this.packageManager.resolvePackagePath(themeName),
+      (themeName) => typeof themeName === "string" && this.isThemeInstalled(themeName),
     );
 
-    // Use a built-in syntax and UI theme any time the configured themes are not
-    // available.
-    if (themeNames.length < 2) {
-      const builtInThemeNames = [
-        "atom-dark-syntax",
-        "atom-dark-ui",
-        "atom-light-syntax",
-        "atom-light-ui",
-        "base16-tomorrow-dark-theme",
-        "base16-tomorrow-light-theme",
-        "solarized-dark-syntax",
-        "solarized-light-syntax",
-      ];
-      themeNames = _.intersection(themeNames, builtInThemeNames);
-      if (themeNames.length === 0) {
-        themeNames = ["one-dark-syntax", "one-dark-ui"];
-      } else if (themeNames.length === 1) {
-        if (themeNames[0].endsWith("-ui")) {
-          themeNames.unshift("one-dark-syntax");
-        } else {
-          themeNames.push("one-dark-ui");
-        }
-      }
+    // Nothing usable configured: fall back to the bundled pair matching the
+    // current mode. A configured half pair (only a ui or only a syntax theme)
+    // runs alone on top of the base-variables fallbacks.
+    if (themeNames.length === 0) {
+      themeNames = this.isDarkThemeMode()
+        ? ["one-night-ui", "one-night-syntax"]
+        : ["one-day-ui", "one-day-syntax"];
+      themeNames = themeNames.filter((name) => this.isThemeInstalled(name));
     }
 
     // Reverse so the first (top) theme is loaded after the others. We want
@@ -170,9 +212,139 @@ module.exports = class ThemeManager {
     return themeNames.reverse();
   }
 
+  // Returns the `theme` field of the named theme's metadata ("ui" or
+  // "syntax"), or null when the theme can't be found.
+  getThemeType(themeName) {
+    const loadedPackage = this.packageManager.getLoadedPackage(themeName);
+    if (loadedPackage) {
+      return loadedPackage.metadata.theme || null;
+    }
+    const packagePath = this.packageManager.resolvePackagePath(themeName);
+    if (!packagePath) return null;
+    const metadata = this.packageManager.loadPackageMetadata(packagePath, true);
+    return metadata?.theme || null;
+  }
+
   /*
   Section: Private
   */
+
+  // The styles directory of the named theme, or null.
+  getThemeStylesPath(themeName) {
+    const loadedPackage = this.packageManager.getLoadedPackage(themeName);
+    if (loadedPackage != null) {
+      return loadedPackage.getStylesheetsPath();
+    }
+    const packagePath = this.packageManager.resolvePackagePath(themeName);
+    if (!packagePath) return null;
+    const deprecatedPath = path.join(packagePath, "stylesheets");
+    if (fs.isDirectorySync(deprecatedPath)) return deprecatedPath;
+    return path.join(packagePath, "styles");
+  }
+
+  // A modern theme defines its palette as CSS custom properties in a
+  // variables.css inside its styles directory. Returns that path, or null for
+  // legacy Less themes.
+  getThemeVariablesPath(themeName) {
+    const stylesPath = this.getThemeStylesPath(themeName);
+    if (!stylesPath) return null;
+    const variablesPath = path.join(stylesPath, "variables.css");
+    return fs.isFileSync(variablesPath) ? variablesPath : null;
+  }
+
+  // For the modern themes in `themeNames`, write the generated Less shim
+  // (ui-variables.less / syntax-variables.less derived from their CSS
+  // palettes) and return its directory; returns null when no enabled theme is
+  // modern. The directory is added to the Less import path so community
+  // stylesheets keep compiling against the classic contract. Only the sides
+  // (ui / syntax) provided by modern themes are generated — a legacy theme in
+  // the pair keeps providing its own Less variables directly.
+  generateThemeShims(themeNames) {
+    const paletteSources = [];
+    const modernThemeNames = [];
+    const modernTypes = new Set();
+
+    for (const themeName of themeNames) {
+      const variablesPath = this.getThemeVariablesPath(themeName);
+      if (!variablesPath) continue;
+      try {
+        paletteSources.push(fs.readFileSync(variablesPath, "utf8"));
+        modernThemeNames.push(themeName);
+        modernTypes.add(this.getThemeType(themeName) === "syntax" ? "syntax" : "ui");
+      } catch (error) {
+        this.notificationManager.addError(
+          `Failed to read the '${themeName}' theme's variables.css`,
+          { detail: error.message, dismissable: true },
+        );
+      }
+    }
+
+    if (paletteSources.length === 0) return null;
+
+    try {
+      return writeShimDirectory(modernThemeNames.join("+"), paletteSources.join("\n"), {
+        includeUi: modernTypes.has("ui"),
+        includeSyntax: modernTypes.has("syntax"),
+      });
+    } catch (error) {
+      this.notificationManager.addError("Failed to generate the theme's Less variable shim", {
+        detail: error.message,
+        dismissable: true,
+      });
+      return null;
+    }
+  }
+
+  // The custom-properties bridge exposes a legacy (ui/syntax) theme's Less
+  // variables as CSS custom properties on :root, so core and bundled-package
+  // CSS is themed correctly by community themes that predate the custom
+  // property contract.
+  getBridgeSourcePath() {
+    return path.join(this.resourcePath, "static", "custom-properties-bridge.css");
+  }
+
+  buildBridgeSource(includeUi, includeSyntax) {
+    const lines = [
+      // Fallbacks first, then the
+      // active theme's definitions (Less last-wins). The syntax pair must come
+      // before the ui pair — a ui theme may itself import "syntax-variables",
+      // and Less's import-once semantics would otherwise let the fallback
+      // shadow the theme's values.
+      '@import "variables/syntax-variables";',
+      '@import "syntax-variables";',
+      '@import "variables/ui-variables";',
+      '@import "ui-variables";',
+      ":root {",
+    ];
+    const names = [...(includeUi ? UI_VARIABLES : []), ...(includeSyntax ? SYNTAX_VARIABLES : [])];
+    for (const name of names) {
+      lines.push(`  --${name}: @${name};`);
+    }
+    lines.push("}");
+    return lines.join("\n");
+  }
+
+  // Compile the bridge against the current import paths, covering only the
+  // given sides of the contract. Returns the CSS or null when compilation
+  // fails (a notification is shown).
+  compileCustomPropertiesBridge(includeUi, includeSyntax) {
+    this.ensureLessCache();
+    // The virtual path lives directly under static/ so that relative
+    // resolution does not shadow the theme's own ui-variables.less.
+    const virtualPath = path.join(this.resourcePath, "static", "custom-properties-bridge.less");
+    try {
+      return this.lessCache.cssForFile(
+        virtualPath,
+        this.buildBridgeSource(includeUi, includeSyntax),
+      );
+    } catch (error) {
+      this.notificationManager.addError("Failed to compile the theme variables bridge", {
+        detail: error.message,
+        dismissable: true,
+      });
+      return null;
+    }
+  }
 
   // Resolve and apply the stylesheet specified by the path.
   //
@@ -293,8 +465,28 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     this.reloadBaseStylesheets();
   }
 
+  getBaseStylesheetPath() {
+    return path.join(this.resourcePath, "static", "atom.css");
+  }
+
+  // The absolute paths of the files the base stylesheet is built from
+  // (used by dev-live-reload to watch them).
+  getBaseStylesheetFilePaths() {
+    const staticPath = path.join(this.resourcePath, "static");
+    return BASE_STYLESHEETS.map((relativePath) => path.join(staticPath, relativePath));
+  }
+
+  buildBaseStylesheet() {
+    const staticPath = path.join(this.resourcePath, "static");
+    return BASE_STYLESHEETS.map(
+      (relativePath) =>
+        `/* --- ${relativePath} --- */\n` +
+        fs.readFileSync(path.join(staticPath, relativePath), "utf8"),
+    ).join("\n");
+  }
+
   reloadBaseStylesheets() {
-    this.requireStylesheet("../static/atom", -2, true);
+    this.applyStylesheet(this.getBaseStylesheetPath(), this.buildBaseStylesheet(), -2, true, true);
   }
 
   stylesheetElementForId(id) {
@@ -318,7 +510,7 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     }
   }
 
-  loadLessStylesheet(lessStylesheetPath, importFallbackVariables = false) {
+  ensureLessCache() {
     if (this.lessCache == null) {
       this.lessCache = new LessCompileCache({
         resourcePath: this.resourcePath,
@@ -327,6 +519,11 @@ On Linux there are currently problems with watch sizes. See [this document][watc
         importPaths: this.getImportPaths(),
       });
     }
+    return this.lessCache;
+  }
+
+  loadLessStylesheet(lessStylesheetPath, importFallbackVariables = false) {
+    this.ensureLessCache();
 
     try {
       if (importFallbackVariables) {
@@ -401,77 +598,42 @@ On Linux there are currently problems with watch sizes. See [this document][watc
         this.systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
       }
 
-      // An explicitly configured `core.themes` (legacy configs, specs) seeds
-      // the pair for the current mode before the mode takes over.
-      const configuredThemes = this.config.get("core.themes", {
-        sources: [this.config.getUserConfigPath()],
-      });
-      if (Array.isArray(configuredThemes)) {
-        this.syncThemesToModePair();
-      }
-
-      // Derive `core.themes` from the theme mode before observing it, so the
-      // initial observation already sees the derived pair and only one
-      // activation runs.
-      this.applyThemeMode();
-
-      // @config.observe runs the callback once, then on subsequent changes.
-      this.config.observe("core.themes", () => {
-        this.syncThemesToModePair();
-        // Serialize switches so a rapid re-toggle can't interleave with the
-        // previous switch's package bookkeeping.
+      // Serialize switches so a rapid re-toggle can't interleave with the
+      // previous switch's package bookkeeping. The active pair is derived from
+      // `theme.mode` + `theme.light`/`theme.dark`, so we switch whenever any of
+      // those (or the system preference, under `mode: system`) changes.
+      const queueSwitch = (onSettled) => {
         this.themeSwitchPromise = this.themeSwitchPromise
           .then(() => this.switchThemes())
-          .then(resolve, (error) => {
-            console.error("Failed to switch themes", error);
-            resolve();
-          });
-      });
+          .then(
+            () => onSettled?.(),
+            (error) => {
+              console.error(`Failed to switch themes: ${error?.stack ?? error}`);
+              onSettled?.();
+            },
+          );
+      };
 
-      this.config.onDidChange("core.themeMode", () => this.applyThemeMode());
-      this.config.onDidChange("core.themesLight", () => this.applyThemeMode());
-      this.config.onDidChange("core.themesDark", () => this.applyThemeMode());
+      // The initial activation resolves the returned promise.
+      queueSwitch(resolve);
+
+      this.config.onDidChange("theme.mode", () => queueSwitch());
+      this.config.onDidChange("theme.light", () => {
+        if (!this.isDarkThemeMode()) queueSwitch();
+      });
+      this.config.onDidChange("theme.dark", () => {
+        if (this.isDarkThemeMode()) queueSwitch();
+      });
       this.systemThemeQuery.addEventListener("change", () => {
-        if (this.config.get("core.themeMode") === "system") this.applyThemeMode();
+        if (this.config.get("theme.mode") === "system") queueSwitch();
       });
     });
   }
 
   // Whether the dark theme pair should be in effect for the current mode.
   isDarkThemeMode() {
-    const mode = this.config.get("core.themeMode");
+    const mode = this.config.get("theme.mode");
     return mode === "dark" || (mode !== "light" && Boolean(this.systemThemeQuery?.matches));
-  }
-
-  // Point `core.themes` at the pair selected by `core.themeMode`.
-  applyThemeMode() {
-    if (this.applyingThemeMode) return;
-
-    const pair = this.config.get(this.isDarkThemeMode() ? "core.themesDark" : "core.themesLight");
-    if (!Array.isArray(pair)) return;
-
-    this.applyingThemeMode = true;
-    try {
-      this.config.set("core.themes", pair);
-    } finally {
-      this.applyingThemeMode = false;
-    }
-  }
-
-  // A direct `core.themes` change (settings view, `ThemePackage.enable`)
-  // becomes the new preference for whichever pair is currently in effect.
-  syncThemesToModePair() {
-    if (this.applyingThemeMode) return;
-
-    const themes = this.config.get("core.themes");
-    if (!Array.isArray(themes)) return;
-
-    this.applyingThemeMode = true;
-    try {
-      this.config.set(this.isDarkThemeMode() ? "core.themesDark" : "core.themesLight", themes);
-    } finally {
-      this.applyingThemeMode = false;
-    }
   }
 
   async switchThemes() {
@@ -483,13 +645,18 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     const enabledThemeNames = this.getEnabledThemeNames();
 
     // Compile against the new theme set's import paths even though the old
-    // themes are still active.
+    // themes are still active. A dual theme additionally contributes the
+    // generated Less shim directory derived from its CSS palette.
+    this.themeShimDir = this.generateThemeShims(enabledThemeNames);
     this.themeImportPathsOverride = this.getImportPathsForThemeNames(enabledThemeNames);
+    if (this.themeShimDir) {
+      this.themeImportPathsOverride.push(this.themeShimDir);
+    }
     this.refreshLessCache();
 
     const newThemes = [];
     for (const themeName of enabledThemeNames) {
-      if (!this.packageManager.resolvePackagePath(themeName)) {
+      if (!this.isThemeInstalled(themeName)) {
         console.warn(`Failed to activate theme '${themeName}' because it isn't installed.`);
         continue;
       }
@@ -506,18 +673,26 @@ On Linux there are currently problems with watch sizes. See [this document][watc
       newThemes.push(pack);
     }
 
-    // Everything else that bakes theme variables into its CSS — the base
-    // stylesheet, the user stylesheet, and the active packages' style sheets —
-    // also compiles now, so the whole window can restyle in a single frame.
-    let baseStylesheetPath, baseStylesheet;
-    try {
-      baseStylesheetPath = this.resolveStylesheet("../static/atom");
-      baseStylesheet = this.loadStylesheet(baseStylesheetPath);
-    } catch {
-      baseStylesheet = null;
-    }
-
+    // Everything else that bakes theme variables into its compiled CSS — the
+    // user stylesheet and the active packages' style sheets — also compiles
+    // now, so the whole window can restyle in a single frame. The core base
+    // stylesheet is plain CSS on the custom-property contract and never needs
+    // recompiling.
     const userStylesheet = this.readUserStylesheet();
+
+    // Legacy Less themes don't define the CSS custom-property contract
+    // themselves; compile the bridge that derives it from their Less
+    // variables. Only the sides actually provided by legacy themes are
+    // bridged, so a modern theme paired with a legacy one is not overridden.
+    const legacyTypes = new Set();
+    for (const themeName of enabledThemeNames) {
+      if (this.getThemeVariablesPath(themeName)) continue;
+      legacyTypes.add(this.getThemeType(themeName) === "syntax" ? "syntax" : "ui");
+    }
+    const needsBridge = legacyTypes.size > 0;
+    const bridgeCss = needsBridge
+      ? this.compileCustomPropertiesBridge(legacyTypes.has("ui"), legacyTypes.has("syntax"))
+      : null;
 
     const activePackages = this.packageManager
       .getActivePackages()
@@ -535,11 +710,13 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     const applyStyles = () => {
       this.removeActiveThemeClasses(oldThemes);
       for (const pack of oldThemes) pack.deactivateStylesheets();
+      if (bridgeCss != null) {
+        this.applyStylesheet(this.getBridgeSourcePath(), bridgeCss, 1, true, true);
+      } else if (!needsBridge) {
+        this.removeStylesheet(this.getBridgeSourcePath());
+      }
       for (const pack of newThemes) pack.activateStylesheets();
       this.addActiveThemeClasses(newThemes);
-      if (baseStylesheet != null) {
-        this.applyStylesheet(baseStylesheetPath, baseStylesheet, -2, true);
-      }
       this.applyUserStylesheet(userStylesheet);
       for (const pack of activePackages) {
         pack.deactivateStylesheets();
@@ -555,6 +732,8 @@ On Linux there are currently problems with watch sizes. See [this document][watc
       typeof document.startViewTransition === "function"
     ) {
       const transition = document.startViewTransition(applyStyles);
+      // A skipped transition rejects `finished`; that's expected, not an error.
+      transition.finished.catch(() => {});
       // Hidden, occluded, or otherwise render-throttled windows may never get
       // the rendering opportunity the transition callback waits for; force the
       // swap through rather than stalling the switch. Skipping still invokes
@@ -597,6 +776,7 @@ On Linux there are currently problems with watch sizes. See [this document][watc
   }
 
   deactivateThemes() {
+    this.themeShimDir = null;
     this.removeActiveThemeClasses();
     this.unwatchUserStylesheet();
     this.removeUserStylesheet();
@@ -635,28 +815,29 @@ On Linux there are currently problems with watch sizes. See [this document][watc
       return this.themeImportPathsOverride;
     }
 
+    let themePaths;
     const activeThemes = this.getActiveThemes();
     if (activeThemes.length > 0) {
-      return activeThemes
+      themePaths = activeThemes
         .filter((theme) => theme)
         .map((theme) => theme.getStylesheetsPath())
         .filter((themePath) => fs.isDirectorySync(themePath));
+    } else {
+      themePaths = this.getImportPathsForThemeNames(this.getEnabledThemeNames());
     }
 
-    return this.getImportPathsForThemeNames(this.getEnabledThemeNames());
+    if (this.themeShimDir) {
+      themePaths = themePaths.concat([this.themeShimDir]);
+    }
+    return themePaths;
   }
 
   getImportPathsForThemeNames(themeNames) {
     const themePaths = [];
     for (const themeName of themeNames) {
-      const themePath = this.packageManager.resolvePackagePath(themeName);
-      if (themePath) {
-        const deprecatedPath = path.join(themePath, "stylesheets");
-        if (fs.isDirectorySync(deprecatedPath)) {
-          themePaths.push(deprecatedPath);
-        } else {
-          themePaths.push(path.join(themePath, "styles"));
-        }
+      const stylesPath = this.getThemeStylesPath(themeName);
+      if (stylesPath) {
+        themePaths.push(stylesPath);
       }
     }
 

@@ -1,0 +1,123 @@
+/*
+ * one-day palette — the UI side of the theme variable contract as CSS
+ * custom properties.
+ *
+ * Values must stay concrete (hex/hsl/rgba or plain var() aliases within this
+ * file): Lumine derives the legacy Less ui-variables/syntax-variables shim for
+ * community packages from this file, and Less color functions need concrete
+ * colors to operate on. See src/theme-variable-shim.js.
+ */
+
+:root {
+  --text-color: hsl(230, 1%, 26%);
+  --text-color-subtle: hsl(230, 1%, 56%);
+  --text-color-highlight: hsl(230, 1%, 14%);
+  --text-color-selected: hsl(230, 1%, 2%);
+  --text-color-info: hsl(208, 100%, 54%);
+  --text-color-success: hsl(132, 60%, 44%);
+  --text-color-warning: hsl(37, 90%, 44%);
+  --text-color-error: hsl(0, 90%, 56%);
+  --background-color-info: hsl(208, 100%, 56%);
+  --background-color-success: hsl(132, 52%, 48%);
+  --background-color-warning: hsl(40, 60%, 48%);
+  --background-color-error: hsl(5, 72%, 56%);
+  --background-color-highlight: hsl(230, 1%, 90%);
+  --background-color-selected: hsl(230, 1%, 86%);
+  --app-background-color: hsl(230, 1%, 92%);
+  --base-background-color: hsl(230, 1%, 98%);
+  --base-border-color: hsl(230, 1%, 86%);
+  --pane-item-background-color: hsl(230, 1%, 98%);
+  --pane-item-border-color: hsl(230, 1%, 86%);
+  --input-background-color: hsl(0, 0%, 100%);
+  --input-border-color: hsl(230, 1%, 86%);
+  --tool-panel-background-color: hsl(230, 1%, 92%);
+  --tool-panel-border-color: hsl(230, 1%, 86%);
+  --inset-panel-background-color: hsl(0, 0%, 100%);
+  --inset-panel-border-color: hsla(230, 1%, 86%, 0.85);
+  --panel-heading-background-color: hsl(230, 1%, 98%);
+  --panel-heading-border-color: hsl(230, 1%, 86%);
+  --overlay-background-color: #f2f2f2;
+  --overlay-border-color: hsl(230, 1%, 86%);
+  --button-background-color: hsl(0, 0%, 100%);
+  --button-background-color-hover: hsl(0, 0%, 96%);
+  --button-background-color-selected: #5871ef;
+  --button-border-color: hsl(230, 1%, 86%);
+  --tab-bar-background-color: hsl(230, 1%, 92%);
+  --tab-bar-border-color: hsl(230, 1%, 86%);
+  --tab-background-color: hsl(230, 1%, 92%);
+  --tab-background-color-active: hsl(230, 1%, 98%);
+  --tab-border-color: hsl(230, 1%, 86%);
+  --tree-view-background-color: hsl(230, 1%, 92%);
+  --tree-view-border-color: hsl(230, 1%, 86%);
+  --scrollbar-color: hsl(230, 1%, 78%);
+  --scrollbar-background-color: hsl(230, 1%, 92%);
+  --ui-site-color-1: hsl(208, 100%, 56%);
+  --ui-site-color-2: hsl(132, 48%, 48%);
+  --ui-site-color-3: hsl(40, 60%, 52%);
+  --ui-site-color-4: #d831b0;
+  --ui-site-color-5: #ebdd5b;
+  --font-size: 12px;
+  --input-font-size: 14px;
+  --disclosure-arrow-size: 12px;
+  --component-padding: 10px;
+  --component-icon-padding: 5px;
+  --component-icon-size: 16px;
+  --component-line-height: 25px;
+  --component-border-radius: 3px;
+  --tab-height: 30px;
+  --font-family: system-ui;
+  --use-custom-controls: true;
+  --text-color-faded: hsla(230, 1%, 26%, 0.3);
+  --text-color-added: hsl(132, 60%, 44%);
+  --text-color-ignored: hsl(230, 1%, 56%);
+  --text-color-modified: hsl(37, 90%, 44%);
+  --text-color-removed: hsl(0, 90%, 56%);
+  --text-color-renamed: hsl(208, 100%, 54%);
+  --level-1-color: hsl(0, 0%, 100%);
+  --level-2-color: hsl(230, 1%, 98%);
+  --level-3-color: hsl(230, 1%, 92%);
+  --level-3-color-hover: hsl(230, 1%, 86%);
+  --level-3-color-active: hsl(230, 1%, 89%);
+  --accent-color: #556de8;
+  --accent-text-color: #fff;
+  --accent-bg-color: #5871ef;
+  --accent-bg-text-color: #fff;
+  --accent-only-text-color: #304ee2;
+  --badge-background-color: hsl(230, 1%, 86%);
+  --button-text-color-selected: #fff;
+  --button-border-color-selected: #556de8;
+  --checkbox-background-color: rgba(88, 113, 239, 0.33);
+  --input-background-color-focus: hsl(230, 100%, 96%);
+  --input-selection-color: #e2e6fc;
+  --input-selection-color-focus: #cbd2f9;
+  --overlay-backdrop-color: hsl(230, 0.4%, 78.4%);
+  --overlay-backdrop-opacity: 0.66;
+  --progress-background-color: #556de8;
+  --scrollbar-color-editor: hsl(230, 1%, 84%);
+  --scrollbar-background-color-editor: hsl(230, 1%, 98%);
+  --tab-text-color: hsl(230, 1%, 56%);
+  --tab-text-color-active: hsl(230, 1%, 14%);
+  --tab-text-color-editor: hsl(230, 1%, 14%);
+  --tab-background-color-editor: hsl(230, 1%, 98%);
+  --tab-inactive-status-added: hsla(132, 60%, 44%, 0.77);
+  --tab-inactive-status-modified: hsla(37, 90%, 44%, 0.77);
+  --tooltip-background-color: #5871ef;
+  --tooltip-text-color: #fff;
+  --tooltip-text-key-color: #5871ef;
+  --tooltip-background-key-color: #fff;
+  --ui-size: 1em;
+  --ui-input-size: 1.15em;
+  --ui-padding: 1.5em;
+  --ui-padding-pane: 0.5em;
+  --ui-padding-icon: 0.45454545em;
+  --ui-line-height: 2em;
+  --ui-tab-height: 2.5em;
+  --settings-list-background-color: hsl(230, 1%, 95%);
+  --theme-config-box-shadow: inset 0 1px 2px hsla(0, 0%, 0%, 0.2), 0 1px 0 hsla(0, 0%, 100%, 0.3);
+  --theme-config-box-shadow-selected: inset 0 1px 3px hsla(0, 0%, 0%, 0.2);
+  --theme-config-border-selected: hsla(0, 0%, 0%, 0.5);
+  --text-color-on-info: #fff;
+  --text-color-on-success: #fff;
+  --text-color-on-warning: #fff;
+  --text-color-on-error: #fff;
+}

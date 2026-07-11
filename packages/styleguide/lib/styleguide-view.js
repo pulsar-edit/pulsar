@@ -1,6 +1,7 @@
 /** @babel */
 /** @jsx etch.dom */
 
+import { CompositeDisposable } from "atom";
 import etch from "etch";
 import dedent from "dedent";
 import CodeBlock from "./code-block";
@@ -20,9 +21,23 @@ export default class StyleguideView {
         section.expand();
       }
     }
+
+    // Fill in the resolved value of every theme variable next to its swatch,
+    // and keep it current as the active theme changes or sections expand.
+    this.disposables = new CompositeDisposable();
+    this.disposables.add(
+      atom.themes.onDidChangeActiveThemes(() => this.updateResolvedValues()),
+    );
+    this.element.addEventListener("click", (event) => {
+      if (event.target.closest(".section-heading")) {
+        requestAnimationFrame(() => this.updateResolvedValues());
+      }
+    });
+    requestAnimationFrame(() => this.updateResolvedValues());
   }
 
   destroy() {
+    this.disposables?.dispose();
     this.sections = null;
   }
 
@@ -86,98 +101,278 @@ export default class StyleguideView {
             title="Variables"
           >
             <p>
-              Use these UI variables in your package's stylesheets. They are set by UI themes and
-              therefore your package will match the overall look. Make sure to @import
-              'ui-variables' in your stylesheets to use these variables.
+              Use these theme variables in your package's stylesheets so it matches the overall
+              look. They are CSS custom properties set by the active themes &mdash; consume them
+              with <code>var()</code>, for example{" "}
+              <code>color: var(--text-color);</code> or{" "}
+              <code>background-color: var(--accent-bg-color);</code>. The value shown next to each
+              name is what the currently active theme resolves it to.
             </p>
+            <p>
+              The names mirror the classic Less <code>ui-variables</code> contract 1:1; the full
+              manifest lives in <code>src/theme-variables.js</code>. Compatibility note: Less
+              stylesheets may still <code>@import "ui-variables";</code> and use variables such as{" "}
+              <code>@text-color</code> &mdash; Lumine generates the Less variables from the active
+              theme's CSS palette automatically.
+            </p>
+
             <h2>Text colors</h2>
-            {this.renderExampleHTML(dedent`
-              <div class="is-color text-color">@text-color</div>
-              <div class="is-color text-color-subtle">@text-color-subtle</div>
-              <div class="is-color text-color-highlight">@text-color-highlight</div>
-              <div class="is-color text-color-selected">@text-color-selected</div>
-              <div class="is-color"></div>
-              <div class="is-color text-color-info">@text-color-info</div>
-              <div class="is-color text-color-success">@text-color-success</div>
-              <div class="is-color text-color-warning">@text-color-warning</div>
-              <div class="is-color text-color-error">@text-color-error</div>
-            `)}
+            {this.renderVars("is-color", [
+              "text-color",
+              "text-color-subtle",
+              "text-color-highlight",
+              "text-color-selected",
+              "",
+              "text-color-info",
+              "text-color-success",
+              "text-color-warning",
+              "text-color-error",
+            ])}
 
             <h2>Background colors</h2>
-            {this.renderExampleHTML(dedent`
-              <div class="is-color background-color-info">@background-color-info</div>
-              <div class="is-color background-color-success">@background-color-success</div>
-              <div class="is-color background-color-warning">@background-color-warning</div>
-              <div class="is-color background-color-error">@background-color-error</div>
-              <div class="is-color"></div>
-              <div class="is-color background-color-highlight">@background-color-highlight</div>
-              <div class="is-color background-color-selected">@background-color-selected</div>
-              <div class="is-color app-background-color">@app-background-color</div>
-            `)}
+            {this.renderVars("is-color", [
+              "background-color-info",
+              "background-color-success",
+              "background-color-warning",
+              "background-color-error",
+              "",
+              "background-color-highlight",
+              "background-color-selected",
+              "app-background-color",
+            ])}
 
             <h2>Base colors</h2>
-            {this.renderExampleHTML(dedent`
-              <div class="is-color base-background-color">@base-background-color</div>
-              <div class="is-color base-border-color">@base-border-color</div>
-            `)}
+            {this.renderVars("is-color", ["base-background-color", "base-border-color"])}
 
             <h2>Component colors</h2>
-            {this.renderExampleHTML(dedent`
-              <div class="is-color pane-item-background-color">@pane-item-background-color</div>
-              <div class="is-color pane-item-border-color">@pane-item-border-color</div>
-              <div class="is-color"></div>
-              <div class="is-color input-background-color">@input-background-color</div>
-              <div class="is-color input-border-color">@input-border-color</div>
-              <div class="is-color"></div>
-              <div class="is-color tool-panel-background-color">@tool-panel-background-color</div>
-              <div class="is-color tool-panel-border-color">@tool-panel-border-color</div>
-              <div class="is-color inset-panel-background-color">@inset-panel-background-color</div>
-              <div class="is-color inset-panel-border-color">@inset-panel-border-color</div>
-              <div class="is-color panel-heading-background-color">@panel-heading-background-color</div>
-              <div class="is-color panel-heading-border-color">@panel-heading-border-color</div>
-              <div class="is-color overlay-background-color">@overlay-background-color</div>
-              <div class="is-color overlay-border-color">@overlay-border-color</div>
-              <div class="is-color"></div>
-              <div class="is-color button-background-color">@button-background-color</div>
-              <div class="is-color button-background-color-hover">@button-background-color-hover</div>
-              <div class="is-color button-background-color-selected">@button-background-color-selected</div>
-              <div class="is-color button-border-color">@button-border-color</div>
-              <div class="color"></div>
-              <div class="is-color tab-bar-background-color">@tab-bar-background-color</div>
-              <div class="is-color tab-bar-border-color">@tab-bar-border-color</div>
-              <div class="is-color tab-background-color">@tab-background-color</div>
-              <div class="is-color tab-background-color-active">@tab-background-color-active</div>
-              <div class="is-color tab-border-color">@tab-border-color</div>
-              <div class="is-color"></div>
-              <div class="is-color tree-view-background-color">@tree-view-background-color</div>
-              <div class="is-color tree-view-border-color">@tree-view-border-color</div>
-            `)}
+            {this.renderVars("is-color", [
+              "pane-item-background-color",
+              "pane-item-border-color",
+              "",
+              "input-background-color",
+              "input-border-color",
+              "",
+              "tool-panel-background-color",
+              "tool-panel-border-color",
+              "inset-panel-background-color",
+              "inset-panel-border-color",
+              "panel-heading-background-color",
+              "panel-heading-border-color",
+              "overlay-background-color",
+              "overlay-border-color",
+              "",
+              "button-background-color",
+              "button-background-color-hover",
+              "button-background-color-selected",
+              "button-border-color",
+              "",
+              "tab-bar-background-color",
+              "tab-bar-border-color",
+              "tab-background-color",
+              "tab-background-color-active",
+              "tab-border-color",
+              "",
+              "tree-view-background-color",
+              "tree-view-border-color",
+              "",
+              "scrollbar-color",
+              "scrollbar-background-color",
+            ])}
 
             <h2>Site colors</h2>
-            {this.renderExampleHTML(dedent`
-              <div class="is-color ui-site-color-1">@ui-site-color-1</div>
-              <div class="is-color ui-site-color-2">@ui-site-color-2</div>
-              <div class="is-color ui-site-color-3">@ui-site-color-3</div>
-              <div class="is-color ui-site-color-4">@ui-site-color-4</div>
-              <div class="is-color ui-site-color-5">@ui-site-color-5</div>
-            `)}
+            {this.renderVars("is-color", [
+              "ui-site-color-1",
+              "ui-site-color-2",
+              "ui-site-color-3",
+              "ui-site-color-4",
+              "ui-site-color-5",
+            ])}
 
             <h2>Sizes</h2>
-            {this.renderExampleHTML(dedent`
-              <div class="is-size disclosure-arrow-size">@disclosure-arrow-size</div>
-              <div class="is-size component-padding">@component-padding</div>
-              <div class="is-size component-icon-padding">@component-icon-padding</div>
-              <div class="is-size component-icon-size">@component-icon-size</div>
-              <div class="is-size component-line-height">@component-line-height</div>
-              <div class="is-size tab-height">@tab-height</div>
-              <div class="is-size font-size">@font-size</div>
-            `)}
+            {this.renderVars("is-size", [
+              "disclosure-arrow-size",
+              "component-padding",
+              "component-icon-padding",
+              "component-icon-size",
+              "component-line-height",
+              "tab-height",
+              "font-size",
+              "input-font-size",
+            ])}
 
             <h2>Misc</h2>
-            {this.renderExampleHTML(dedent`
-              <div class="is-radius component-border-radius">@component-border-radius</div>
-              <div class="is-font font-family">@font-family</div>
-            `)}
+            {this.renderVars("is-radius", ["component-border-radius"])}
+            {this.renderVars("is-font", ["font-family"])}
+
+            <h2>Accent colors</h2>
+            <p>
+              Derived accent colors. The <code>--*-text-color</code> variants are pre-computed to
+              stay readable on their matching background.
+            </p>
+            {this.renderVars("is-color", [
+              "accent-color",
+              "accent-text-color",
+              "accent-bg-color",
+              "accent-bg-text-color",
+              "accent-only-text-color",
+            ])}
+
+            <h2>Readable text on colored backgrounds</h2>
+            <p>
+              Use these instead of the old Less <code>contrast()</code> function &mdash; each is a
+              foreground color guaranteed to read against its matching{" "}
+              <code>--background-color-*</code>.
+            </p>
+            {this.renderVars("is-color", [
+              "text-color-on-info",
+              "text-color-on-success",
+              "text-color-on-warning",
+              "text-color-on-error",
+            ])}
+
+            <h2>Status text colors</h2>
+            {this.renderVars("is-color", [
+              "text-color-added",
+              "text-color-modified",
+              "text-color-removed",
+              "text-color-renamed",
+              "text-color-ignored",
+              "text-color-faded",
+            ])}
+
+            <h2>Background levels</h2>
+            <p>Progressively contrasting surface colors, from raised to recessed.</p>
+            {this.renderVars("is-color", [
+              "level-1-color",
+              "level-2-color",
+              "level-3-color",
+              "level-3-color-hover",
+              "level-3-color-active",
+            ])}
+
+            <h2>Editor-adjacent colors</h2>
+            {this.renderVars("is-color", [
+              "tab-text-color",
+              "tab-text-color-active",
+              "tab-text-color-editor",
+              "tab-background-color-editor",
+              "tab-inactive-status-added",
+              "tab-inactive-status-modified",
+              "",
+              "scrollbar-color-editor",
+              "scrollbar-background-color-editor",
+            ])}
+
+            <h2>Tooltip colors</h2>
+            {this.renderVars("is-color", [
+              "tooltip-background-color",
+              "tooltip-text-color",
+              "tooltip-text-key-color",
+              "tooltip-background-key-color",
+            ])}
+
+            <h2>Other component colors</h2>
+            {this.renderVars("is-color", [
+              "badge-background-color",
+              "button-text-color-selected",
+              "button-border-color-selected",
+              "checkbox-background-color",
+              "input-background-color-focus",
+              "input-selection-color",
+              "input-selection-color-focus",
+              "overlay-backdrop-color",
+              "progress-background-color",
+              "settings-list-background-color",
+            ])}
+
+            <h2>Extended sizes</h2>
+            <p>
+              Relative sizes used by the bundled themes. They are <code>em</code>-based so they
+              scale with the UI font size.
+            </p>
+            {this.renderVars("is-size", [
+              "ui-size",
+              "ui-input-size",
+              "ui-padding",
+              "ui-padding-pane",
+              "ui-padding-icon",
+              "ui-line-height",
+              "ui-tab-height",
+            ])}
+          </StyleguideSection>
+
+          <StyleguideSection
+            onDidInitialize={this.didInitializeSection.bind(this)}
+            name="authoring-themes"
+            title="Authoring themes"
+          >
+            <p>
+              A theme sets the variables above. Themes come in two types &mdash; a{" "}
+              <code>ui</code> theme styles the chrome (docks, tabs, panels) and a{" "}
+              <code>syntax</code> theme styles the editor &mdash; and the two are chosen
+              independently, so a UI theme can pair with any syntax theme.
+            </p>
+
+            <h2>The palette</h2>
+            <p>
+              A modern theme defines its palette as CSS custom properties in a{" "}
+              <code>variables.css</code> file. Values must be concrete colors (Lumine derives the
+              Less <code>ui-variables</code> for community packages from them):
+            </p>
+            <div className="example">
+              <div className="example-code">
+                <CodeBlock
+                  cssClass="example-css"
+                  grammarScopeName="source.css"
+                  code={dedent`
+                    :root {
+                      --text-color: hsl(220, 13%, 66%);
+                      --base-background-color: hsl(220, 13%, 18%);
+                      --accent-color: hsl(220, 100%, 66%);
+                      /* ...the rest of the contract... */
+                    }
+                  `}
+                />
+              </div>
+            </div>
+
+            <h2>One package, several themes</h2>
+            <p>
+              A single package can ship several selectable themes with a <code>themes</code> array
+              in its <code>package.json</code>. Each entry names the theme, its type, and the
+              directory holding its styles (a list of directories may be given to share a common
+              base):
+            </p>
+            <div className="example">
+              <div className="example-code">
+                <CodeBlock
+                  cssClass="example-css"
+                  grammarScopeName="source.json"
+                  code={dedent`
+                    {
+                      "name": "one-theme",
+                      "themes": [
+                        { "name": "one-day-ui", "theme": "ui", "styles": ["styles/ui", "styles/day-ui"] },
+                        { "name": "one-day-syntax", "theme": "syntax", "styles": "styles/day-syntax" },
+                        { "name": "one-night-ui", "theme": "ui", "styles": ["styles/ui", "styles/night-ui"] },
+                        { "name": "one-night-syntax", "theme": "syntax", "styles": "styles/night-syntax" }
+                      ]
+                    }
+                  `}
+                />
+              </div>
+            </div>
+            <p>
+              A single-theme package instead uses a top-level <code>"theme": "ui"</code> (or{" "}
+              <code>"syntax"</code>) and puts its stylesheets in <code>styles/</code>. A syntax
+              theme scopes its rules to the editor by naming a file{" "}
+              <code>*.atom-text-editor.css</code>.
+            </p>
+            <p>
+              Legacy themes that predate the CSS palette still work: define the classic Less{" "}
+              <code>ui-variables.less</code> / <code>syntax-variables.less</code> and Lumine
+              bridges them to the custom properties above automatically.
+            </p>
           </StyleguideSection>
 
           <StyleguideSection
@@ -186,16 +381,13 @@ export default class StyleguideView {
             title="Icons"
           >
             <p>
-              Atom comes bundled with the Octicons. It lets you easily add icons to your packages.
+              Lumine comes bundled with the Octicons. It lets you easily add icons to your
+              packages.
             </p>
             <p>
               Currently version <code>4.4.0</code> is available. In addition some older icons from
               version <code>2.1.2</code> are still kept for backwards compatibility. Make sure to
-              use the <code>icon icon-</code> prefix in front of an icon name. See the{" "}
-              <a href="http://flight-manual.atom.io/hacking-atom/sections/iconography/">
-                documentation
-              </a>{" "}
-              for more details.
+              use the <code>icon icon-</code> prefix in front of an icon name.
             </p>
 
             <h2>Octicons</h2>
@@ -567,8 +759,8 @@ export default class StyleguideView {
 
             <h2>ui-site-* classes</h2>
             <p>
-              These classes only set the background color, no other styles. You can also use LESS
-              variables <code>@ui-site-#</code> in your plugins where
+              These classes only set the background color, no other styles. You can also use the
+              CSS custom properties <code>var(--ui-site-color-#)</code> in your packages where{" "}
               <code>#</code> is a number between 1 and 5.
             </p>
             <p>Site colors will always be in the color progression you see here.</p>
@@ -611,7 +803,7 @@ export default class StyleguideView {
 
             <h2>Badge sizes</h2>
             <p>
-              By default the <code>@font-size</code> variable from themes is used. Additionally
+              By default the <code>--font-size</code> variable from themes is used. Additionally
               there are also 3 predefined sizes.
             </p>
             {this.renderExampleHTML(dedent`
@@ -808,7 +1000,7 @@ export default class StyleguideView {
             name="panel"
             title="Panels"
           >
-            <p>A container attached to some side of the Atom UI.</p>
+            <p>A container attached to some side of the Lumine UI.</p>
             {this.renderExampleHTML(dedent`
               <atom-panel>
                 Some content
@@ -1371,6 +1563,67 @@ export default class StyleguideView {
         </div>
       </div>
     );
+  }
+
+  // Render a row of variable swatches. `kind` is the visualization class
+  // (`is-color`, `is-size`, `is-radius`, `is-font`); an empty name renders a
+  // spacer. Each swatch draws itself from `--swatch` and carries its variable
+  // name in `data-var` so updateResolvedValues can label it.
+  renderVars(kind, names) {
+    const html = names
+      .map((name) =>
+        name === ""
+          ? `<div class="${kind} is-spacer"></div>`
+          : `<div class="${kind}" data-var="${name}" style="--swatch: var(--${name})">--${name}</div>`,
+      )
+      .join("\n");
+    return (
+      <div className="example">
+        <div className="example-rendered" innerHTML={html} />
+      </div>
+    );
+  }
+
+  // Label every variable swatch with the value the active theme resolves it
+  // to. A hidden probe element resolves each `var()` to a used value (an
+  // actual color / length / font family), which also works while a section is
+  // collapsed.
+  updateResolvedValues() {
+    const container = this.element;
+    if (!container) return;
+
+    const probe = document.createElement("span");
+    probe.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;display:block;";
+    container.appendChild(probe);
+    try {
+      for (const el of container.querySelectorAll("[data-var]")) {
+        const name = el.dataset.var;
+        let value;
+        if (el.classList.contains("is-color")) {
+          probe.style.color = `var(--${name})`;
+          value = getComputedStyle(probe).color;
+          probe.style.color = "";
+        } else if (el.classList.contains("is-font")) {
+          probe.style.fontFamily = `var(--${name})`;
+          value = getComputedStyle(probe).fontFamily;
+          probe.style.fontFamily = "";
+        } else {
+          probe.style.width = `var(--${name})`;
+          value = getComputedStyle(probe).width;
+          probe.style.width = "";
+        }
+
+        let label = el.querySelector(":scope > .is-value");
+        if (!label) {
+          label = document.createElement("span");
+          label.className = "is-value";
+          el.appendChild(label);
+        }
+        label.textContent = value;
+      }
+    } finally {
+      container.removeChild(probe);
+    }
   }
 
   didInitializeSection(section) {

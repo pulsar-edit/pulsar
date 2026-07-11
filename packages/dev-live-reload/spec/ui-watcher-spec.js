@@ -4,6 +4,13 @@ const UIWatcher = require("../lib/ui-watcher");
 
 const { conditionPromise, timeoutPromise: wait } = require("./async-spec-helpers");
 
+// The active theme pair is derived from the mode and the light/dark pairs;
+// set both so the active pair is the given list regardless of mode.
+function setActiveThemes(names) {
+  atom.config.set("theme.light", names);
+  atom.config.set("theme.dark", names);
+}
+
 describe("UIWatcher", () => {
   let uiWatcher = null;
 
@@ -85,7 +92,7 @@ describe("UIWatcher", () => {
   describe("when a package global file changes", () => {
     beforeEach(async () => {
       jasmine.useRealClock();
-      atom.config.set("core.themes", [
+      setActiveThemes([
         "theme-with-ui-variables",
         "theme-with-multiple-imported-files",
       ]);
@@ -160,7 +167,7 @@ describe("UIWatcher", () => {
     let pack = null;
     beforeEach(async () => {
       jasmine.useRealClock();
-      atom.config.set("core.themes", ["theme-with-syntax-variables", "theme-with-index-less"]);
+      setActiveThemes(["theme-with-syntax-variables", "theme-with-index-less"]);
       await atom.themes.activateThemes();
       uiWatcher = new UIWatcher();
       pack = atom.themes.getActiveThemes()[0];
@@ -190,7 +197,7 @@ describe("UIWatcher", () => {
     let pack = null;
     beforeEach(async () => {
       jasmine.useRealClock();
-      atom.config.set("core.themes", [
+      setActiveThemes([
         "theme-with-syntax-variables",
         "theme-with-multiple-imported-files",
       ]);
@@ -222,14 +229,14 @@ describe("UIWatcher", () => {
     it("unwatches when a theme is deactivated", async () => {
       jasmine.useRealClock();
 
-      atom.config.set("core.themes", []);
+      setActiveThemes([]);
       await conditionPromise(() => !uiWatcher.watchedThemes["theme-with-multiple-imported-files"]);
     });
 
     it("watches a new theme when it is deactivated", async () => {
       jasmine.useRealClock();
 
-      atom.config.set("core.themes", ["theme-with-syntax-variables", "theme-with-package-file"]);
+      setActiveThemes(["theme-with-syntax-variables", "theme-with-package-file"]);
       await conditionPromise(() => uiWatcher.watchedThemes.get("theme-with-package-file"));
 
       pack = atom.themes.getActiveThemes()[0];

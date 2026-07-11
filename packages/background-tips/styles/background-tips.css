@@ -1,0 +1,31 @@
+background-tips {
+  display: block;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+
+  .background-message {
+    user-select: none;
+    cursor: default;
+
+    .message {
+      padding: 0 calc(var(--component-padding) * 3);
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      &.fade-in {
+        opacity: 1;
+      }
+
+      .keystroke {
+        border: 2px solid;
+        padding: 0 calc(var(--component-padding) / 2);
+        border-radius: calc(var(--component-border-radius) * 3);
+        font-family: "Helvetica Neue", Arial, sans-serif;
+      }
+    }
+  }
+}

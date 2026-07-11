@@ -1,0 +1,113 @@
+/* Theme config
+   These attributes are set on the root element by this package's main module
+   (lib/main.js) whenever the corresponding one-theme settings change. */
+
+/* Tabs ---------------------------------------------- */
+
+/* Even (default) */
+
+.tab-bar {
+  .tab,
+  .tab.active {
+    flex: 1 1 0;
+    max-width: 22em;
+    min-width: 7em; /* ~ icon + 6 characters */
+  }
+  atom-dock & {
+    .tab,
+    .tab.active {
+      max-width: none;
+    }
+  }
+
+  /* TODO: Turn this into a config
+     Truncates the beginning instead
+     .title.title.title {
+       direction: rtl; (change direction)
+     }
+  */
+}
+
+/* Maximum (full width) */
+
+[ui-tabsizing="maximum"] .tab-bar {
+  .tab,
+  .tab.active {
+    max-width: none;
+  }
+}
+
+/* Minimum (show long paths) */
+
+[ui-tabsizing="minimum"] .tab-bar {
+  .tab,
+  .tab.active {
+    flex: 0 0 auto;
+    min-width: 2.75em;
+    max-width: 23.1em; /* 7em tab-min-width * 3.3 */
+  }
+  atom-dock {
+    .tab,
+    .tab.active {
+      max-width: 14em; /* 7em tab-min-width * 2 */
+    }
+  }
+}
+
+/* Tabs: close button position  ------------------------------ */
+
+[ui-tab-close-button="left"] {
+  .tab-bar .tab {
+    .close-icon {
+      right: auto;
+      left: 0.5em; /* icon-padding-right, same as tabs */
+    }
+  }
+}
+
+/* Hide docks toggle buttons ------------------------------ */
+
+[ui-dock-buttons="hidden"] {
+  /* Hide docks when not open */
+  .atom-dock-inner:not(.atom-dock-open) {
+    display: none;
+  }
+
+  /* Hide toggle buttons */
+  .atom-dock-toggle-button {
+    display: none;
+  }
+}
+
+/* Sticky Projects ------------------------------ */
+
+[ui-sticky-headers="sticky"] {
+  .tree-view {
+    .project-root-header {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      padding-left: 5px;
+      padding-right: 10px;
+      border-bottom: 1px solid var(--base-border-color);
+      background-color: var(--tree-view-background-color);
+    }
+    .project-root.project-root {
+      margin-left: -5px;
+      margin-right: -10px;
+
+      /* Disable selection */
+      &::before {
+        display: none;
+      }
+
+      /* Add selection back */
+      &.selected .project-root-header {
+        background-color: var(--background-color-selected);
+      }
+    }
+    &:focus .selected .project-root-header.project-root-header {
+      background: var(--button-background-color-selected);
+    }
+  }
+}

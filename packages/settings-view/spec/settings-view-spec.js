@@ -609,8 +609,8 @@ describe("SettingsView", function () {
       atom.packages.packageDirPaths.push(path.join(__dirname, "fixtures"));
       atom.packages.loadPackage("ui-theme-with-config");
       atom.packages.loadPackage("syntax-theme-with-config");
-      atom.config.set("core.themeMode", "dark");
-      atom.config.set("core.themes", ["ui-theme-with-config", "syntax-theme-with-config"]);
+      atom.config.set("theme.mode", "dark");
+      atom.config.set("theme.dark", ["ui-theme-with-config", "syntax-theme-with-config"]);
 
       const reloadedHandler = jasmine.createSpy("reloadedHandler");
       atom.themes.onDidChangeActiveThemes(reloadedHandler);

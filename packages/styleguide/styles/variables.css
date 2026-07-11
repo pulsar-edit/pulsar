@@ -1,0 +1,59 @@
+.styleguide [data-name="variables"] {
+  /* Each swatch draws its own color/size from the --swatch custom property,
+     which the markup sets to var(--<name>). */
+
+  .is-color,
+  .is-size,
+  .is-radius,
+  .is-font {
+    display: block;
+    padding: 2px 0;
+  }
+
+  .is-color:before,
+  .is-size:after,
+  .is-radius:after {
+    content: "";
+    display: inline-block;
+    height: 20px;
+    vertical-align: middle;
+  }
+
+  .is-color:before {
+    width: 20%;
+    margin-right: calc(var(--component-padding) * 1.5);
+    border-radius: 3px;
+    background-color: var(--swatch);
+    box-shadow: inset 0 0 0 1px var(--base-border-color);
+  }
+
+  .is-size:after {
+    width: var(--swatch);
+    height: 4px;
+    margin-left: calc(var(--component-padding) * 1.5);
+    background-color: var(--text-color);
+  }
+
+  .is-radius:after {
+    width: 20px;
+    margin-left: calc(var(--component-padding) * 1.5);
+    border-radius: var(--swatch);
+    background-color: var(--text-color);
+  }
+
+  .is-font {
+    font-family: var(--swatch);
+  }
+
+  .is-spacer {
+    height: var(--component-padding);
+  }
+
+  /* The resolved value injected next to each swatch by updateResolvedValues. */
+  .is-value {
+    margin-left: 0.6em;
+    color: var(--text-color-subtle);
+    font-family: var(--editor-font-family, monospace);
+    font-size: 0.9em;
+  }
+}

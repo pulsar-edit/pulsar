@@ -1,0 +1,80 @@
+.key-binding-resolver {
+  overflow: auto;
+
+  .panel-heading {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .panel-body {
+    padding: 0 var(--component-padding);
+  }
+
+  table {
+    tr:not(:last-child) {
+      border-bottom: 1px solid var(--base-border-color);
+    }
+
+    .used {
+      color: var(--text-color-success);
+    }
+
+    .unused {
+      color: var(--text-color);
+    }
+
+    .unmatched {
+      color: var(--text-color-subtle);
+    }
+
+    /* move icon so text is aligned when wrapped */
+    .command {
+      padding-left: var(--component-icon-size);
+      &:before {
+        position: absolute;
+        margin-left: calc(-1 * var(--component-icon-size));
+      }
+    }
+
+    .used .command::before,
+    .unused .command::before {
+      font-family: "Octicons Regular";
+      font-weight: normal;
+      font-style: normal;
+      display: inline-block;
+      line-height: 1;
+      -webkit-font-smoothing: antialiased;
+      text-decoration: none;
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      content: "\f03a";
+    }
+
+    .unmatched .command::before {
+      font-family: "Octicons Regular";
+      font-weight: normal;
+      font-style: normal;
+      display: inline-block;
+      line-height: 1;
+      -webkit-font-smoothing: antialiased;
+      text-decoration: none;
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      content: "\f081";
+    }
+
+    .command,
+    .selector,
+    .source {
+      min-width: 10em;
+      word-break: break-word; /* wrap long path names */
+    }
+
+    .source {
+      cursor: pointer;
+    }
+  }
+}

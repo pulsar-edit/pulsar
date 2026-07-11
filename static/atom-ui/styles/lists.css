@@ -1,0 +1,382 @@
+/*
+ * List options
+ * --------------------------------------------------
+ */
+
+/* Unstyled keeps list items block level, just removes default browser padding and list-style */
+.list-unstyled {
+  padding-left: 0;
+  list-style: none;
+}
+
+/* Inline turns list items into inline-block */
+.list-inline {
+  /* .list-unstyled() */
+  padding-left: 0;
+  list-style: none;
+  margin-left: -5px;
+
+  > li {
+    display: inline-block;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+/*
+ * List groups
+ * --------------------------------------------------
+ */
+
+/* Individual list items
+
+   Use on `li`s or `div`s within the `.list-group` parent. */
+
+.list-group-item {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  /* Place the border on the list items and negative margin up for better styling */
+  margin-bottom: -1px;
+  background-color: #fff; /* @list-group-bg */
+  border: 1px solid #ddd; /* @list-group-border */
+
+  /* Round the first and last items */
+  &:first-child {
+    /* .border-top-radius(@list-group-border-radius) */
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+  }
+  &:last-child {
+    margin-bottom: 0;
+    /* .border-bottom-radius(@list-group-border-radius) */
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
+
+/* Interactive list items
+
+   Use anchor or button elements instead of `li`s or `div`s to create interactive items.
+   Includes an extra `.active` modifier class for showing selected items. */
+
+a.list-group-item,
+button.list-group-item {
+  color: #555; /* @list-group-link-color */
+
+  .list-group-item-heading {
+    color: #333; /* @list-group-link-heading-color */
+  }
+
+  /* Hover state */
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: #555; /* @list-group-link-hover-color */
+    background-color: #f5f5f5; /* @list-group-hover-bg */
+  }
+}
+
+button.list-group-item {
+  width: 100%;
+  text-align: left;
+}
+
+.list-group-item {
+  /* Disabled state */
+  &.disabled,
+  &.disabled:hover,
+  &.disabled:focus {
+    background-color: #eee; /* @list-group-disabled-bg: @gray-lighter */
+    color: #777; /* @list-group-disabled-color: @gray-light */
+    cursor: not-allowed; /* @cursor-disabled */
+
+    /* Force color to inherit for custom content */
+    .list-group-item-heading {
+      color: inherit;
+    }
+    .list-group-item-text {
+      color: #777; /* @list-group-disabled-text-color */
+    }
+  }
+
+  /* Active class on item itself, not parent */
+  &.active,
+  &.active:hover,
+  &.active:focus {
+    z-index: 2; /* Place active items above their siblings for proper border styling */
+    color: #fff; /* @list-group-active-color */
+    background-color: var(--text-color-info); /* @list-group-active-bg: @component-active-bg: @brand-primary */
+    border-color: var(--text-color-info); /* @list-group-active-border */
+
+    /* Force color to inherit for custom content */
+    .list-group-item-heading,
+    .list-group-item-heading > small,
+    .list-group-item-heading > .small {
+      color: inherit;
+    }
+    .list-group-item-text {
+      color: hsl(from var(--text-color-info) h s calc(l + 40)); /* lighten(@list-group-active-bg, 40%) */
+    }
+  }
+}
+
+/* Contextual variants
+
+   Add modifier classes to change text and background color on individual items.
+   Organizationally, this must come after the `:hover` states.
+   (.list-group-item-variant() inlined.) */
+
+.list-group-item-success {
+  color: #3c763d; /* @state-success-text */
+  background-color: #dff0d8; /* @state-success-bg */
+
+  a&,
+  button& {
+    color: #3c763d;
+
+    .list-group-item-heading {
+      color: inherit;
+    }
+
+    &:hover,
+    &:focus {
+      color: #3c763d;
+      background-color: #d0e9c6; /* darken(#dff0d8, 5%) */
+    }
+    &.active,
+    &.active:hover,
+    &.active:focus {
+      color: #fff;
+      background-color: #3c763d;
+      border-color: #3c763d;
+    }
+  }
+}
+.list-group-item-info {
+  color: #31708f; /* @state-info-text */
+  background-color: #d9edf7; /* @state-info-bg */
+
+  a&,
+  button& {
+    color: #31708f;
+
+    .list-group-item-heading {
+      color: inherit;
+    }
+
+    &:hover,
+    &:focus {
+      color: #31708f;
+      background-color: #c4e3f3; /* darken(#d9edf7, 5%) */
+    }
+    &.active,
+    &.active:hover,
+    &.active:focus {
+      color: #fff;
+      background-color: #31708f;
+      border-color: #31708f;
+    }
+  }
+}
+.list-group-item-warning {
+  color: #8a6d3b; /* @state-warning-text */
+  background-color: #fcf8e3; /* @state-warning-bg */
+
+  a&,
+  button& {
+    color: #8a6d3b;
+
+    .list-group-item-heading {
+      color: inherit;
+    }
+
+    &:hover,
+    &:focus {
+      color: #8a6d3b;
+      background-color: #faf2cc; /* darken(#fcf8e3, 5%) */
+    }
+    &.active,
+    &.active:hover,
+    &.active:focus {
+      color: #fff;
+      background-color: #8a6d3b;
+      border-color: #8a6d3b;
+    }
+  }
+}
+.list-group-item-danger {
+  color: #a94442; /* @state-danger-text */
+  background-color: #f2dede; /* @state-danger-bg */
+
+  a&,
+  button& {
+    color: #a94442;
+
+    .list-group-item-heading {
+      color: inherit;
+    }
+
+    &:hover,
+    &:focus {
+      color: #a94442;
+      background-color: #ebcccc; /* darken(#f2dede, 5%) */
+    }
+    &.active,
+    &.active:hover,
+    &.active:focus {
+      color: #fff;
+      background-color: #a94442;
+      border-color: #a94442;
+    }
+  }
+}
+
+/* Custom content options
+
+   Extra classes for creating well-formatted content within `.list-group-item`s. */
+
+.list-group-item-heading {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+.list-group-item-text {
+  margin-bottom: 0;
+  line-height: 1.3;
+}
+
+/* This is a bootstrap override
+   --------------------------------------------- */
+
+.list-group,
+.list-group .list-group-item {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  position: static;
+}
+
+.list-group,
+.list-tree {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  cursor: default;
+
+  li:not(.list-nested-item),
+  li.list-nested-item > .list-item {
+    line-height: var(--component-line-height);
+    text-wrap: none;
+    white-space: nowrap;
+  }
+
+  /* The background highlight uses ::before rather than the item background so
+     it can span the entire width of the parent container rather than the size
+     of the list item. */
+  .selected::before {
+    content: "";
+    background-color: var(--background-color-selected);
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--component-line-height);
+  }
+
+  /* Make sure the background highlight is below the content. */
+  .selected > * {
+    position: relative;
+  }
+
+  .icon::before {
+    margin-right: var(--component-icon-padding);
+    position: relative;
+    top: 1px;
+  }
+  .no-icon {
+    padding-left: calc(var(--component-icon-padding) + var(--component-icon-size));
+  }
+}
+
+/*
+ * List Tree
+ * --------------------------------------------------
+ */
+
+/* Handle indentation of the tree. Assume disclosure arrows. */
+
+.list-tree {
+  .list-nested-item > .list-tree > li,
+  .list-nested-item > .list-group > li {
+    padding-left: calc(var(--component-icon-size) + var(--component-icon-padding));
+  }
+
+  &.has-collapsable-children {
+    /* File-local: @disclosure-arrow-padding */
+    --disclosure-arrow-padding: calc(var(--disclosure-arrow-size) + var(--component-icon-padding));
+
+    li.list-item {
+      margin-left: var(--disclosure-arrow-padding);
+    }
+
+    .list-nested-item.collapsed > .list-group,
+    .list-nested-item.collapsed > .list-tree {
+      display: none;
+    }
+
+    /* Nested items always get disclosure arrows
+       (.octicon(chevron-down, @disclosure-arrow-size) inlined) */
+    .list-nested-item > .list-item {
+      &::before {
+        font-family: "Octicons Regular";
+        font-weight: normal;
+        font-style: normal;
+        display: inline-block;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        text-decoration: none;
+        font-size: var(--disclosure-arrow-size);
+        width: var(--disclosure-arrow-size);
+        height: var(--disclosure-arrow-size);
+        content: "\f0a3"; /* @chevron-down */
+      }
+      &::before {
+        position: relative;
+        top: -1px;
+        margin-right: var(--component-icon-padding);
+      }
+    }
+    /* (.octicon(chevron-right, @disclosure-arrow-size) inlined) */
+    .list-nested-item.collapsed > .list-item {
+      &::before {
+        font-family: "Octicons Regular";
+        font-weight: normal;
+        font-style: normal;
+        display: inline-block;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        text-decoration: none;
+        font-size: var(--disclosure-arrow-size);
+        width: var(--disclosure-arrow-size);
+        height: var(--disclosure-arrow-size);
+        content: "\f078"; /* @chevron-right */
+      }
+      &::before {
+        left: 1px;
+      }
+    }
+
+    .list-nested-item > .list-tree > li,
+    .list-nested-item > .list-group > li {
+      padding-left: var(--disclosure-arrow-padding);
+    }
+
+    /* You want a subtree to be flat -- no collapsable children */
+    .has-flat-children,
+    &.has-flat-children {
+      li.list-item {
+        margin-left: 0;
+      }
+    }
+  }
+}

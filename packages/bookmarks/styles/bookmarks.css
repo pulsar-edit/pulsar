@@ -1,0 +1,18 @@
+atom-text-editor {
+  .gutter .line-number.bookmarked .icon-right {
+    visibility: visible;
+
+    &:before {
+      content: "\f07b";
+      color: #09c;
+    }
+  }
+}
+
+.bookmarks-view {
+  .bookmark {
+    .line-text {
+      font-family: monospace;
+    }
+  }
+}

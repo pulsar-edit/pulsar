@@ -1,0 +1,54 @@
+/*
+ * Scaffolding
+ * --------------------------------------------------
+ */
+
+/* File-local values derived from the Bootstrap-flavored variables.less */
+:root {
+  /* floor(@font-size-base * @line-height-base) */
+  --line-height-computed: round(down, var(--font-size) * 1.428571429, 1px);
+}
+
+/* Remove focus style, be sure to add them back where useful */
+:focus {
+  outline: none;
+}
+
+/* Reset fonts for relevant elements */
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Figures
+   We reset this here because previously Normalize had no `figure` margins. This
+   ensures we don't break anyone's use of the element. */
+
+figure {
+  margin: 0;
+}
+
+/* Images */
+
+img {
+  vertical-align: middle;
+}
+
+/* Responsive images (ensure images don't scale beyond their parents) */
+.img-responsive {
+  display: block;
+  max-width: 100%; /* Set a maximum relative to the parent */
+}
+
+/* Horizontal rules */
+
+hr {
+  margin-top: var(--line-height-computed);
+  margin-bottom: var(--line-height-computed);
+  border: 0;
+  border-top: 1px solid #eee; /* @hr-border: @gray-lighter */
+}

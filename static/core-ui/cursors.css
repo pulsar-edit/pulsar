@@ -1,0 +1,63 @@
+/*
+ * Native-CSS build of cursors.less.
+ *
+ * The Less version guarded these rules with compile-time
+ * `when (lightness(@…-background-color) < 50%)` checks. Here the guard is
+ * evaluated at runtime: each flag below computes to `white` when the
+ * corresponding background is dark (lightness < 50%) and `black` otherwise,
+ * and the registered <color> syntax lets a style container query compare the
+ * resolved color instead of the raw token stream.
+ */
+
+@property --cursors-syntax-background-dark-flag {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: black;
+}
+
+@property --cursors-input-background-dark-flag {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: black;
+}
+
+:root {
+  --cursors-syntax-background-dark-flag: hsl(
+    from var(--syntax-background-color) 0 0 calc((50 - l) * infinity) / 1
+  );
+  --cursors-input-background-dark-flag: hsl(
+    from var(--input-background-color) 0 0 calc((50 - l) * infinity) / 1
+  );
+}
+
+/* Editors */
+@container style(--cursors-syntax-background-dark-flag: white) {
+  .platform-darwin atom-text-editor:not([mini]) {
+    /* .cursor-white() */
+    cursor:
+      -webkit-image-set(
+          url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=")
+            1x,
+          url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAAz0lEQVRIx2NgYGBY/R8I/vx5eelX3n82IJ9FxGf6tksvf/8FiTMQAcAGQMDvSwu09abffY8QYSAScNk45G198eX//yev73/4///701eh//kZSARckrNBRvz//+8+6ZohwCzjGNjdgQxkAg7B9WADeBjIBqtJCbhRA0YNoIkBSNmaPEMoNmA0FkYNoFKhapJ6FGyAH3nauaSmPfwI0v/3OukVi0CIZ+F25KrtYcx/CTIy0e+rC7R1Z4KMICVTQQ14feVXIbR695u14+Ir4gwAAD49E54wc1kWAAAAAElFTkSuQmCC")
+            2x
+        )
+        5 8,
+      text;
+  }
+}
+
+/* Mini Editors */
+@container style(--cursors-input-background-dark-flag: white) {
+  .platform-darwin atom-text-editor[mini] {
+    /* .cursor-white() */
+    cursor:
+      -webkit-image-set(
+          url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAL0lEQVQoz2NgCD3x//9/BhBYBWdhgFVAiVW4JBFKGIa4AqD0//9D3pt4I4tAdAMAHTQ/j5Zom30AAAAASUVORK5CYII=")
+            1x,
+          url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAAz0lEQVRIx2NgYGBY/R8I/vx5eelX3n82IJ9FxGf6tksvf/8FiTMQAcAGQMDvSwu09abffY8QYSAScNk45G198eX//yev73/4///701eh//kZSARckrNBRvz//+8+6ZohwCzjGNjdgQxkAg7B9WADeBjIBqtJCbhRA0YNoIkBSNmaPEMoNmA0FkYNoFKhapJ6FGyAH3nauaSmPfwI0v/3OukVi0CIZ+F25KrtYcx/CTIy0e+rC7R1Z4KMICVTQQ14feVXIbR695u14+Ir4gwAAD49E54wc1kWAAAAAElFTkSuQmCC")
+            2x
+        )
+        5 8,
+      text;
+  }
+}

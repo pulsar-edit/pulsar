@@ -1,0 +1,16 @@
+{
+  "name": "multi-theme-package",
+  "version": "1.0.0",
+  "themes": [
+    {
+      "name": "multi-alpha-ui",
+      "theme": "ui",
+      "styles": "styles/alpha"
+    },
+    {
+      "name": "multi-alpha-syntax",
+      "theme": "syntax",
+      "styles": "styles/alpha-syntax"
+    }
+  ]
+}

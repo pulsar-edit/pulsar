@@ -50,6 +50,10 @@ export default class ExampleSelectListView {
           <atom-panel className="modal">
             <SelectListView
               items={["one", "two", "three"]}
+              // This is a static showcase, not a live picker in a fixed modal.
+              // Auto-selecting an item would call scrollIntoViewIfNeeded and
+              // scroll the whole styleguide down to this mid-page example.
+              initialSelectionIndex={undefined}
               elementForItem={this.elementForItem.bind(this)}
               didConfirmSelection={this.didConfirmSelection.bind(this)}
               didCancelSelection={this.didCancelSelection.bind(this)}

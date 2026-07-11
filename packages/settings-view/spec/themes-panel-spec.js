@@ -13,14 +13,11 @@ describe("ThemesPanel", function () {
 
   beforeEach(async () => {
     jasmine.useRealClock();
-    atom.packages.loadPackage("atom-light-ui");
-    atom.packages.loadPackage("atom-dark-ui");
-    atom.packages.loadPackage("atom-light-syntax");
-    atom.packages.loadPackage("atom-dark-syntax");
+    atom.packages.loadPackage("one-theme");
     atom.packages.packageDirPaths.push(path.join(__dirname, "fixtures"));
-    atom.config.set("core.themeMode", "dark");
-    atom.config.set("core.themesLight", ["atom-light-ui", "atom-light-syntax"]);
-    atom.config.set("core.themes", ["atom-dark-ui", "atom-dark-syntax"]);
+    atom.config.set("theme.mode", "dark");
+    atom.config.set("theme.light", ["one-day-ui", "one-day-syntax"]);
+    atom.config.set("theme.dark", ["one-night-ui", "one-night-syntax"]);
     reloadedHandler = jasmine.createSpy("reloadedHandler");
     atom.themes.onDidChangeActiveThemes(reloadedHandler);
     await atom.themes.activatePackages();
@@ -49,10 +46,10 @@ describe("ThemesPanel", function () {
 
   it("selects the configured mode and theme pairs", function () {
     expect(panel.refs.modeMenu.value).toBe("dark");
-    expect(panel.refs.darkUiMenu.value).toBe("atom-dark-ui");
-    expect(panel.refs.darkSyntaxMenu.value).toBe("atom-dark-syntax");
-    expect(panel.refs.lightUiMenu.value).toBe("atom-light-ui");
-    expect(panel.refs.lightSyntaxMenu.value).toBe("atom-light-syntax");
+    expect(panel.refs.darkUiMenu.value).toBe("one-night-ui");
+    expect(panel.refs.darkSyntaxMenu.value).toBe("one-night-syntax");
+    expect(panel.refs.lightUiMenu.value).toBe("one-day-ui");
+    expect(panel.refs.lightSyntaxMenu.value).toBe("one-day-syntax");
     expect(panel.refs.darkActiveBadge.style.display).toBe("");
     expect(panel.refs.lightActiveBadge.style.display).toBe("none");
   });
@@ -60,13 +57,13 @@ describe("ThemesPanel", function () {
   describe("when a UI theme is selected for the active pair", () =>
     it("updates the pair config key and switches the active themes", function () {
       for (let child of Array.from(panel.refs.darkUiMenu.children)) {
-        child.selected = child.value === "atom-light-ui";
+        child.selected = child.value === "one-day-ui";
         child.dispatchEvent(new Event("change", { bubbles: true }));
       }
       waitsFor(() => reloadedHandler.callCount === 2);
       runs(function () {
-        expect(atom.config.get("core.themesDark")).toEqual(["atom-light-ui", "atom-dark-syntax"]);
-        expect(atom.config.get("core.themes")).toEqual(["atom-light-ui", "atom-dark-syntax"]);
+        expect(atom.config.get("theme.dark")).toEqual(["one-day-ui", "one-night-syntax"]);
+        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).toEqual(["one-day-ui", "one-night-syntax"]);
       });
     }));
 
@@ -74,29 +71,29 @@ describe("ThemesPanel", function () {
     it("updates the pair config key without switching the active themes", function () {
       reloadedHandler.reset();
       for (let child of Array.from(panel.refs.lightSyntaxMenu.children)) {
-        child.selected = child.value === "atom-dark-syntax";
+        child.selected = child.value === "one-night-syntax";
         child.dispatchEvent(new Event("change", { bubbles: true }));
       }
       waitsFor(
-        () => atom.config.get("core.themesLight")[1] === "atom-dark-syntax",
+        () => atom.config.get("theme.light")[1] === "one-night-syntax",
         "the light pair to update",
       );
       runs(function () {
-        expect(atom.config.get("core.themesLight")).toEqual(["atom-light-ui", "atom-dark-syntax"]);
-        expect(atom.config.get("core.themes")).toEqual(["atom-dark-ui", "atom-dark-syntax"]);
+        expect(atom.config.get("theme.light")).toEqual(["one-day-ui", "one-night-syntax"]);
+        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).toEqual(["one-night-ui", "one-night-syntax"]);
         expect(reloadedHandler.callCount).toBe(0);
       });
     }));
 
   describe("when the theme mode is selected", () =>
-    it("updates 'core.themeMode' and switches to the matching pair", function () {
+    it("updates 'theme.mode' and switches to the matching pair", function () {
       panel.refs.modeMenu.value = "light";
       panel.refs.modeMenu.dispatchEvent(new Event("change", { bubbles: true }));
 
       waitsFor(() => reloadedHandler.callCount === 2);
       runs(function () {
-        expect(atom.config.get("core.themeMode")).toBe("light");
-        expect(atom.config.get("core.themes")).toEqual(["atom-light-ui", "atom-light-syntax"]);
+        expect(atom.config.get("theme.mode")).toBe("light");
+        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).toEqual(["one-day-ui", "one-day-syntax"]);
         expect(panel.refs.lightActiveBadge.style.display).toBe("");
         expect(panel.refs.darkActiveBadge.style.display).toBe("none");
       });
@@ -105,13 +102,13 @@ describe("ThemesPanel", function () {
   describe("when the theme pair config keys change", () =>
     it("refreshes the theme menus", function () {
       reloadedHandler.reset();
-      atom.config.set("core.themesDark", ["atom-light-ui", "atom-light-syntax"]);
+      atom.config.set("theme.dark", ["one-day-ui", "one-day-syntax"]);
 
       waitsFor(() => reloadedHandler.callCount === 1);
 
       runs(function () {
-        expect(panel.refs.darkUiMenu.value).toBe("atom-light-ui");
-        expect(panel.refs.darkSyntaxMenu.value).toBe("atom-light-syntax");
+        expect(panel.refs.darkUiMenu.value).toBe("one-day-ui");
+        expect(panel.refs.darkSyntaxMenu.value).toBe("one-day-syntax");
       });
     }));
 
@@ -161,6 +158,27 @@ describe("ThemesPanel", function () {
         "manual-theme",
         "repository-theme",
       ]);
+    });
+
+    it("treats packages with a `themes` array as themes", function () {
+      const packages = panel.filterThemes({
+        user: [],
+        git: [],
+        core: [
+          {
+            name: "multi-theme",
+            themes: [
+              { name: "multi-theme-ui", theme: "ui" },
+              { name: "multi-theme-syntax", theme: "syntax" },
+            ],
+          },
+          { name: "not-a-theme", version: "1.0.0" },
+          { name: "empty-themes", themes: [] },
+        ],
+        dev: [],
+      });
+
+      expect(packages.core.map(({ name }) => name)).toEqual(["multi-theme"]);
     });
 
     it("filters themes by name", async () => {
