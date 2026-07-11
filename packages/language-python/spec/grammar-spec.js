@@ -10,7 +10,7 @@ const GRAMMAR_TEST_FILES = [
 
 describe("Grammar tests", () => {
   beforeEach(async () => {
-    atom.config.set("core.useTreeSitterParsers", true);
+    atom.config.set("language.useTreeSitterParsers", true);
     await atom.packages.activatePackage("language-python");
   });
 

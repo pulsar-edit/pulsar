@@ -1,5 +1,5 @@
 '.source.rust':
-  'editor':
+  'language':
     'commentStart': '// '
     'commentDelimiters':
       'line': '//'

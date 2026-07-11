@@ -5,7 +5,7 @@ describe("TOML grammar", function () {
     waitsForPromise(() => atom.packages.activatePackage("language-toml"));
 
     runs(function () {
-      atom.config.set("core.useTreeSitterParsers", false);
+      atom.config.set("language.useTreeSitterParsers", false);
       grammar = atom.grammars.grammarForScopeName("source.toml");
     });
   });

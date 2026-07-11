@@ -2,7 +2,7 @@ describe("Python grammar", () => {
   let grammar = null;
 
   beforeEach(async () => {
-    atom.config.set("core.useTreeSitterParsers", false);
+    atom.config.set("language.useTreeSitterParsers", false);
     await atom.packages.activatePackage("language-python");
     grammar = atom.grammars.grammarForScopeName("source.python");
   });

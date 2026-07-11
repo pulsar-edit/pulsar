@@ -371,15 +371,8 @@ const configSchema = {
         ],
         default: "default",
       },
-      useTreeSitterParsers: {
-        order: 18,
-        title: "Use Tree-sitter Parsers",
-        description: "Use Tree-sitter parsers for supported languages.",
-        type: "boolean",
-        default: true,
-      },
       colorProfile: {
-        order: 19,
+        order: 18,
         title: "Color Profile",
         description:
           "Specify whether Lumine should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Lumine to take effect.",
@@ -397,7 +390,7 @@ const configSchema = {
         default: "default",
       },
       transformDeprecatedStyleSheetSelectors: {
-        order: 20,
+        order: 19,
         title: "Transform Deprecated Style Sheet Selectors",
         description:
           "Whether Lumine should transform deprecated DOM Selectors in community package style sheets. Increases compatibility, as well as startup time.",
@@ -405,7 +398,7 @@ const configSchema = {
         default: true,
       },
       transformDeprecatedStyleSheetMathExpressions: {
-        order: 21,
+        order: 20,
         title: "Transform Deprecated Style Sheet Math Expressions",
         description:
           "Whether Lumine should transform deprecated Mathematical Expressions in community package style sheets. Increases compatibility, as well as startup time.",
@@ -417,58 +410,15 @@ const configSchema = {
   editor: {
     type: "object",
     properties: {
-      commentStart: {
-        order: 1,
-        title: "Comment Start",
-        description:
-          "Scope-specific string that begins a line comment. Set by language packages; not intended to be configured directly.",
-        type: ["string", "null"],
-      },
-      commentEnd: {
-        order: 2,
-        title: "Comment End",
-        description:
-          "Scope-specific string that ends a block comment. Set by language packages; not intended to be configured directly.",
-        type: ["string", "null"],
-      },
-      increaseIndentPattern: {
-        order: 3,
-        title: "Increase Indent Pattern",
-        description:
-          "Scope-specific regular expression; a line matching it increases the indentation of the following line.",
-        type: ["string", "null"],
-      },
-      decreaseIndentPattern: {
-        order: 4,
-        title: "Decrease Indent Pattern",
-        description:
-          "Scope-specific regular expression; a line matching it decreases its own indentation.",
-        type: ["string", "null"],
-      },
-      foldEndPattern: {
-        order: 5,
-        title: "Fold End Pattern",
-        description: "Scope-specific regular expression that marks the end of a foldable region.",
-        type: ["string", "null"],
-      },
-      largeFileThreshold: {
-        order: 6,
-        title: "Large File Threshold",
-        description:
-          "Files larger than this size in megabytes will open in large file mode with syntax highlighting disabled. Only applies to TextMate grammars; Tree-sitter grammars handle large files efficiently without this limitation. Set to 0 to always enable syntax highlighting regardless of file size.",
-        type: "number",
-        minimum: 0,
-        default: 2,
-      },
       fontFamily: {
-        order: 7,
+        order: 1,
         title: "Font Family",
         description: "The name of the font family used for editor text.",
         type: "string",
         default: "Menlo, Consolas, DejaVu Sans Mono, monospace",
       },
       fontSize: {
-        order: 8,
+        order: 2,
         title: "Font Size",
         description: "Height in pixels of editor text.",
         type: "integer",
@@ -477,7 +427,7 @@ const configSchema = {
         default: 14,
       },
       defaultFontSize: {
-        order: 9,
+        order: 3,
         title: "Default Font Size",
         description: "Default height in pixels of the editor text. Useful when resetting font size",
         type: "integer",
@@ -486,74 +436,21 @@ const configSchema = {
         default: 14,
       },
       lineHeight: {
-        order: 10,
+        order: 4,
         title: "Line Height",
         description: "Height of editor lines, as a multiplier of font size.",
         type: ["string", "number"],
         default: 1.5,
       },
-      showInvisibles: {
-        order: 11,
-        title: "Show Invisibles",
-        description:
-          "Render placeholders for invisible characters, such as tabs, spaces and newlines.",
-        type: "boolean",
-        default: false,
-      },
-      showIndentGuide: {
-        order: 12,
-        title: "Show Indent Guide",
-        description: "Show indentation indicators in the editor.",
-        type: "boolean",
-        default: false,
-      },
       showLineNumbers: {
-        order: 13,
+        order: 5,
         title: "Show Line Numbers",
         description: "Show line numbers in the editor's gutter.",
         type: "boolean",
         default: true,
       },
-      atomicSoftTabs: {
-        order: 14,
-        title: "Atomic Soft Tabs",
-        description: "Skip over tab-length runs of leading whitespace when moving the cursor.",
-        type: "boolean",
-        default: true,
-      },
-      autoIndent: {
-        order: 15,
-        title: "Auto Indent",
-        description: "Automatically indent the cursor when inserting a newline.",
-        type: "boolean",
-        default: true,
-      },
-      autoIndentOnPaste: {
-        order: 16,
-        title: "Auto Indent On Paste",
-        description:
-          "Automatically indent pasted text based on the indentation of the previous line.",
-        type: "boolean",
-        default: true,
-      },
-      nonWordCharacters: {
-        order: 17,
-        title: "Non Word Characters",
-        description: "A string of non-word characters to define word boundaries.",
-        type: "string",
-        default: "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?-…",
-      },
-      preferredLineLength: {
-        order: 18,
-        title: "Preferred Line Length",
-        description:
-          "Identifies the length of a line which is used when wrapping text with the `Soft Wrap At Preferred Line Length` setting enabled, in number of characters.",
-        type: "integer",
-        minimum: 1,
-        default: 80,
-      },
       maxScreenLineLength: {
-        order: 19,
+        order: 6,
         title: "Max Screen Line Length",
         description:
           "Defines the maximum width of the editor window before soft wrapping is enforced, in number of characters.",
@@ -561,58 +458,8 @@ const configSchema = {
         minimum: 500,
         default: 500,
       },
-      tabLength: {
-        order: 20,
-        title: "Tab Length",
-        description: "Number of spaces used to represent a tab.",
-        type: "integer",
-        minimum: 1,
-        default: 2,
-      },
-      softWrap: {
-        order: 21,
-        title: "Soft Wrap",
-        description:
-          "Wraps lines that exceed the width of the window. When `Soft Wrap At Preferred Line Length` is set, it will wrap to the number of characters defined by the `Preferred Line Length` setting.",
-        type: "boolean",
-        default: false,
-      },
-      softTabs: {
-        order: 22,
-        title: "Soft Tabs",
-        description:
-          'If the `Tab Type` config setting is set to "auto" and autodetection of tab type from buffer content fails, then this config setting determines whether a soft tab or a hard tab will be inserted when the Tab key is pressed.',
-        type: "boolean",
-        default: true,
-      },
-      tabType: {
-        order: 23,
-        title: "Tab Type",
-        description:
-          'Determine character inserted when Tab key is pressed. Possible values: "auto", "soft" and "hard". When set to "soft" or "hard", soft tabs (spaces) or hard tabs (tab characters) are used. When set to "auto", the editor auto-detects the tab type based on the contents of the buffer (it uses the first leading whitespace on a non-comment line), or uses the value of the Soft Tabs config setting if auto-detection fails.',
-        type: "string",
-        enum: ["auto", "soft", "hard"],
-        default: "auto",
-      },
-      softWrapAtPreferredLineLength: {
-        order: 24,
-        title: "Soft Wrap At Preferred Line Length",
-        description:
-          "Instead of wrapping lines to the window's width, wrap lines to the number of characters defined by the `Preferred Line Length` setting. This will only take effect when the soft wrap config setting is enabled globally or for the current language. **Note:** If you want to hide the wrap guide (the vertical line) you can disable the `wrap-guide` package.",
-        type: "boolean",
-        default: false,
-      },
-      softWrapHangingIndent: {
-        order: 25,
-        title: "Soft Wrap Hanging Indent",
-        description:
-          "When soft wrap is enabled, defines length of additional indentation applied to wrapped lines, in number of characters.",
-        type: "integer",
-        minimum: 0,
-        default: 0,
-      },
       softWrapDebounceInterval: {
-        order: 26,
+        order: 7,
         title: "Soft Wrap Debounce Interval",
         description:
           "When soft wrap is enabled, delays re-wrapping while the editor width is changing (for example during a pane resize) until the width has been stable for this many milliseconds. `0` re-wraps immediately. Higher values reduce CPU usage while resizing large files, at the cost of briefly showing stale wrapping.",
@@ -622,7 +469,7 @@ const configSchema = {
         default: 100,
       },
       scrollSensitivity: {
-        order: 27,
+        order: 8,
         title: "Scroll Sensitivity",
         description: "Determines how fast the editor scrolls when using a mouse or trackpad.",
         type: "integer",
@@ -631,14 +478,14 @@ const configSchema = {
         default: 40,
       },
       scrollPastEnd: {
-        order: 28,
+        order: 9,
         title: "Scroll Past End",
         description: "Allow the editor to be scrolled past the end of the last line.",
         type: "boolean",
         default: false,
       },
       smoothScrolling: {
-        order: 29,
+        order: 10,
         title: "Smooth Scrolling",
         description: "Animated scrolling of text editors.",
         type: "object",
@@ -674,7 +521,7 @@ const configSchema = {
         },
       },
       altWheelMultiplier: {
-        order: 30,
+        order: 11,
         title: "Alt Wheel Multiplier",
         description:
           "Speed multiplier applied to wheel scrolling while holding `alt`. Set to `1` to disable.",
@@ -684,7 +531,7 @@ const configSchema = {
         default: 7.5,
       },
       scrollCommandDistance: {
-        order: 31,
+        order: 12,
         title: "Scroll Command Distance",
         description:
           "Distance scrolled by `editor:scroll-up` and `editor:scroll-down`, as a fraction of the editor height. `editor:increase-scroll-distance` and `editor:decrease-scroll-distance` double or halve it per editor without changing this setting.",
@@ -694,7 +541,7 @@ const configSchema = {
         default: 1,
       },
       ctrlWheelScrollsAllPanes: {
-        order: 32,
+        order: 13,
         title: "Ctrl Wheel Scrolls All Panes",
         description:
           "Holding `ctrl` while wheel scrolling over a text editor scrolls every visible center pane editor together.",
@@ -702,7 +549,7 @@ const configSchema = {
         default: true,
       },
       undoGroupingInterval: {
-        order: 33,
+        order: 14,
         title: "Undo Grouping Interval",
         description:
           "Time interval in milliseconds within which text editing operations will be grouped together in the undo history.",
@@ -711,7 +558,7 @@ const configSchema = {
         default: 300,
       },
       confirmCheckoutHeadRevision: {
-        order: 34,
+        order: 15,
         title: "Confirm Checkout HEAD Revision",
         description:
           "Show confirmation dialog when checking out the HEAD revision and discarding changes to current file since last commit.",
@@ -719,7 +566,7 @@ const configSchema = {
         default: true,
       },
       invisibles: {
-        order: 35,
+        order: 16,
         title: "Invisibles",
         description:
           "A hash of characters Lumine will use to render whitespace characters. Keys are whitespace character types, values are rendered characters (use value false to turn off individual whitespace character types).",
@@ -764,7 +611,7 @@ const configSchema = {
         },
       },
       multiCursorOnClick: {
-        order: 36,
+        order: 17,
         title: "Multi Cursor On Click",
         description:
           "Add multiple cursors when pressing the Ctrl key (Command key on macOS) and clicking the editor.",
@@ -773,11 +620,169 @@ const configSchema = {
       },
     },
   },
+  language: {
+    type: "object",
+    properties: {
+      tabLength: {
+        order: 1,
+        title: "Tab Length",
+        description: "Number of spaces used to represent a tab.",
+        type: "integer",
+        minimum: 1,
+        default: 2,
+      },
+      tabType: {
+        order: 2,
+        title: "Tab Type",
+        description:
+          'Determine character inserted when Tab key is pressed. Possible values: "auto", "soft" and "hard". When set to "soft" or "hard", soft tabs (spaces) or hard tabs (tab characters) are used. When set to "auto", the editor auto-detects the tab type based on the contents of the buffer (it uses the first leading whitespace on a non-comment line), or uses the value of the Soft Tabs config setting if auto-detection fails.',
+        type: "string",
+        enum: ["auto", "soft", "hard"],
+        default: "auto",
+      },
+      softTabs: {
+        order: 3,
+        title: "Soft Tabs",
+        description:
+          'If the `Tab Type` config setting is set to "auto" and autodetection of tab type from buffer content fails, then this config setting determines whether a soft tab or a hard tab will be inserted when the Tab key is pressed.',
+        type: "boolean",
+        default: true,
+      },
+      atomicSoftTabs: {
+        order: 4,
+        title: "Atomic Soft Tabs",
+        description: "Skip over tab-length runs of leading whitespace when moving the cursor.",
+        type: "boolean",
+        default: true,
+      },
+      autoIndent: {
+        order: 5,
+        title: "Auto Indent",
+        description: "Automatically indent the cursor when inserting a newline.",
+        type: "boolean",
+        default: true,
+      },
+      autoIndentOnPaste: {
+        order: 6,
+        title: "Auto Indent On Paste",
+        description:
+          "Automatically indent pasted text based on the indentation of the previous line.",
+        type: "boolean",
+        default: true,
+      },
+      nonWordCharacters: {
+        order: 7,
+        title: "Non Word Characters",
+        description: "A string of non-word characters to define word boundaries.",
+        type: "string",
+        default: "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?-…",
+      },
+      softWrap: {
+        order: 8,
+        title: "Soft Wrap",
+        description:
+          "Wraps lines that exceed the width of the window. When `Soft Wrap At Preferred Line Length` is set, it will wrap to the number of characters defined by the `Preferred Line Length` setting.",
+        type: "boolean",
+        default: false,
+      },
+      softWrapAtPreferredLineLength: {
+        order: 9,
+        title: "Soft Wrap At Preferred Line Length",
+        description:
+          "Instead of wrapping lines to the window's width, wrap lines to the number of characters defined by the `Preferred Line Length` setting. This will only take effect when the soft wrap config setting is enabled globally or for the current language. **Note:** If you want to hide the wrap guide (the vertical line) you can disable the `wrap-guide` package.",
+        type: "boolean",
+        default: false,
+      },
+      preferredLineLength: {
+        order: 10,
+        title: "Preferred Line Length",
+        description:
+          "Identifies the length of a line which is used when wrapping text with the `Soft Wrap At Preferred Line Length` setting enabled, in number of characters.",
+        type: "integer",
+        minimum: 1,
+        default: 80,
+      },
+      softWrapHangingIndent: {
+        order: 11,
+        title: "Soft Wrap Hanging Indent",
+        description:
+          "When soft wrap is enabled, defines length of additional indentation applied to wrapped lines, in number of characters.",
+        type: "integer",
+        minimum: 0,
+        default: 0,
+      },
+      showIndentGuide: {
+        order: 12,
+        title: "Show Indent Guide",
+        description: "Show indentation indicators in the editor.",
+        type: "boolean",
+        default: false,
+      },
+      showInvisibles: {
+        order: 13,
+        title: "Show Invisibles",
+        description:
+          "Render placeholders for invisible characters, such as tabs, spaces and newlines.",
+        type: "boolean",
+        default: false,
+      },
+      useTreeSitterParsers: {
+        order: 14,
+        title: "Use Tree-sitter Parsers",
+        description: "Use Tree-sitter parsers for supported languages.",
+        type: "boolean",
+        default: true,
+      },
+      largeFileThreshold: {
+        order: 15,
+        title: "Large File Threshold",
+        description:
+          "Files larger than this size in megabytes will open in large file mode with syntax highlighting disabled. Only applies to TextMate grammars; Tree-sitter grammars handle large files efficiently without this limitation. Set to 0 to always enable syntax highlighting regardless of file size.",
+        type: "number",
+        minimum: 0,
+        default: 2,
+      },
+      commentStart: {
+        order: 16,
+        title: "Comment Start",
+        description:
+          "Scope-specific string that begins a line comment. Set by language packages; not intended to be configured directly.",
+        type: ["string", "null"],
+      },
+      commentEnd: {
+        order: 17,
+        title: "Comment End",
+        description:
+          "Scope-specific string that ends a block comment. Set by language packages; not intended to be configured directly.",
+        type: ["string", "null"],
+      },
+      increaseIndentPattern: {
+        order: 18,
+        title: "Increase Indent Pattern",
+        description:
+          "Scope-specific regular expression; a line matching it increases the indentation of the following line.",
+        type: ["string", "null"],
+      },
+      decreaseIndentPattern: {
+        order: 19,
+        title: "Decrease Indent Pattern",
+        description:
+          "Scope-specific regular expression; a line matching it decreases its own indentation.",
+        type: ["string", "null"],
+      },
+      foldEndPattern: {
+        order: 20,
+        title: "Fold End Pattern",
+        description: "Scope-specific regular expression that marks the end of a foldable region.",
+        type: ["string", "null"],
+      },
+    },
+  },
 };
 
 if (process.platform === "darwin") {
   configSchema.core.properties.simpleFullScreenWindows = {
-    order: 22,
+    order: 21,
     title: "Simple Full Screen Windows",
     description:
       "Use pre-Lion fullscreen on macOS. This does not create a new desktop space for Lumine on fullscreen mode.",
@@ -788,7 +793,7 @@ if (process.platform === "darwin") {
 
 if (process.platform === "linux") {
   configSchema.editor.properties.selectionClipboard = {
-    order: 33,
+    order: 18,
     title: "Selection Clipboard",
     description: "Enable pasting on middle mouse button click.",
     type: "boolean",

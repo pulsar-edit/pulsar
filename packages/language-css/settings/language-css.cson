@@ -1,7 +1,5 @@
 '.source.css':
-  'core':
-    'languageParser': 'textmate'
-  'editor':
+  'language':
     'commentStart': '/*'
     'commentEnd': '*/'
     'commentDelimiters':

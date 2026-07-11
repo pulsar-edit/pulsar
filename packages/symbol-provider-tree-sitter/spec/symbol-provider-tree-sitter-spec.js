@@ -35,7 +35,7 @@ describe("TreeSitterProvider", () => {
   beforeEach(async () => {
     jasmine.useRealClock();
 
-    atom.config.set("core.useTreeSitterParsers", true);
+    atom.config.set("language.useTreeSitterParsers", true);
     atom.config.set("core.useExperimentalModernTreeSitter", true);
     await atom.packages.activatePackage("language-javascript");
 
@@ -82,7 +82,7 @@ describe("TreeSitterProvider", () => {
 
   describe("when a non-tree-sitter grammar is used for a file", () => {
     beforeEach(async () => {
-      atom.config.set("core.useTreeSitterParsers", false);
+      atom.config.set("language.useTreeSitterParsers", false);
       atom.config.set("core.useExperimentalModernTreeSitter", false);
       await atom.workspace.open(directory.resolve("sample.js"));
       editor = getEditor();

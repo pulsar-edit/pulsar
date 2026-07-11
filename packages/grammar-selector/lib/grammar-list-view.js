@@ -143,7 +143,7 @@ module.exports = class GrammarListView {
 // colors. Otherwise we should be looking up these values in a scope-specific
 // manner.
 function getLanguageModeConfig() {
-  let isTreeSitterMode = atom.config.get("core.useTreeSitterParsers");
+  let isTreeSitterMode = atom.config.get("language.useTreeSitterParsers");
   return isTreeSitterMode ? "web-tree-sitter" : "textmate";
 }
 
@@ -158,7 +158,9 @@ function compareGrammarType(a, b) {
 // Given a scope name, determines the user's preferred parser type for that
 // language.
 function getParserPreferenceForScopeName(scopeName) {
-  let useTreeSitterParsers = atom.config.get("core.useTreeSitterParsers", { scope: [scopeName] });
+  let useTreeSitterParsers = atom.config.get("language.useTreeSitterParsers", {
+    scope: [scopeName],
+  });
 
   if (!useTreeSitterParsers) {
     return "textmate";

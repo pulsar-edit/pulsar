@@ -1,5 +1,5 @@
 '.source.perl':
-  'editor':
+  'language':
     'foldEndPattern': '(\\*/|^\\s*(\\}|\\]|\\)))'
     'increaseIndentPattern': '^.*\\{\\}?\\s*$'
     'decreaseIndentPattern': '^\\s*\\}'
@@ -8,7 +8,7 @@
       'line': '#'
     'nonWordCharacters': '/\\()"\':,.;<>~!#^&*|+=[]{}`?-'
 '.source.perl6':
-  'editor':
+  'language':
     'foldEndPattern': '(\\*/|^\\s*(\\}|\\]|\\)))'
     'increaseIndentPattern': '^.*\\{\\}?\\s*$'
     'decreaseIndentPattern': '^\\s*\\}'

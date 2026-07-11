@@ -2,7 +2,7 @@ describe("Shell session grammar", () => {
   let grammar = null;
 
   beforeEach(() => {
-    atom.config.set("core.useTreeSitterParsers", false);
+    atom.config.set("language.useTreeSitterParsers", false);
 
     waitsForPromise(() => atom.packages.activatePackage("language-shellscript"));
 

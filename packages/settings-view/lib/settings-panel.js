@@ -6,22 +6,6 @@ import CollapsibleSectionPanel from "./collapsible-section-panel";
 import { getSettingDescription } from "./rich-description";
 import { getSettingTitle } from "./rich-title";
 
-const SCOPED_SETTINGS = [
-  "autoIndent",
-  "autoIndentOnPaste",
-  "invisibles",
-  "nonWordCharacters",
-  "preferredLineLength",
-  "scrollPastEnd",
-  "showIndentGuide",
-  "showInvisibles",
-  "softWrap",
-  "softWrapAtPreferredLineLength",
-  "softWrapHangingIndent",
-  "tabLength",
-  "tabType",
-];
-
 export default class SettingsPanel extends CollapsibleSectionPanel {
   constructor(options = {}) {
     super();
@@ -32,10 +16,14 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     this.disposables = new CompositeDisposable();
     let settings;
     if (this.options.scopeName) {
-      namespace = "editor";
+      namespace = "language";
       settings = {};
-      for (const name of SCOPED_SETTINGS) {
-        settings[name] = getWithoutProjectOverride(name, { scope: [this.options.scopeName] });
+      const schema = atom.config.getSchema("language");
+      const properties = (schema && schema.properties) || {};
+      for (const name of Object.keys(properties)) {
+        settings[name] = getWithoutProjectOverride(`language.${name}`, {
+          scope: [this.options.scopeName],
+        });
       }
     } else {
       settings = getWithoutProjectOverride(namespace);
@@ -208,8 +196,8 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     if (this.options.scopeName != null) {
       // If the unscoped default is the same as the scoped default, check the actual config.cson
       // to make sure that there isn't a non-default value that is overriding the scoped value
-      // For example: the default editor.tabLength is 2, but if someone sets it to 4
-      // the above check still returns 2 and not 4 for a scoped editor.tabLength,
+      // For example: the default language.tabLength is 2, but if someone sets it to 4
+      // the above check still returns 2 and not 4 for a scoped language.tabLength,
       // because it bypasses config.cson.
       if (
         atom.config.get(name, { excludeSources: [atom.config.getUserConfigPath()] }) ===
@@ -471,7 +459,7 @@ function elementForSetting(namespace, name, value) {
     } // Handled in the URI Handler panel
   }
 
-  if (namespace === "editor") {
+  if (namespace === "language") {
     // There's no global default for these, they are defined by language packages
     if (
       [

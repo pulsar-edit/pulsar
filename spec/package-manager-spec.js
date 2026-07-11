@@ -1206,7 +1206,7 @@ describe("PackageManager", () => {
       });
 
       it("loads any tree-sitter grammars defined in the package", async () => {
-        atom.config.set("core.useTreeSitterParsers", true);
+        atom.config.set("language.useTreeSitterParsers", true);
         await atom.packages.activatePackage("package-with-tree-sitter-grammar");
         const grammar = atom.grammars.selectGrammar("test.somelang");
         expect(grammar.name).toBe("Some Language");
@@ -1219,7 +1219,7 @@ describe("PackageManager", () => {
       it("loads the scoped properties", async () => {
         await atom.packages.activatePackage("package-with-settings");
         expect(
-          atom.config.get("editor.increaseIndentPattern", {
+          atom.config.get("language.increaseIndentPattern", {
             scope: [".source.omg"],
           }),
         ).toBe("^a");
@@ -1408,14 +1408,14 @@ describe("PackageManager", () => {
     it("removes the package's scoped-properties", async () => {
       await atom.packages.activatePackage("package-with-settings");
       expect(
-        atom.config.get("editor.increaseIndentPattern", {
+        atom.config.get("language.increaseIndentPattern", {
           scope: [".source.omg"],
         }),
       ).toBe("^a");
 
       await atom.packages.deactivatePackage("package-with-settings");
       expect(
-        atom.config.get("editor.increaseIndentPattern", {
+        atom.config.get("language.increaseIndentPattern", {
           scope: [".source.omg"],
         }),
       ).toBeUndefined();

@@ -148,11 +148,11 @@ module.exports = {
   },
 
   getTabLength(editor) {
-    return atom.config.get("editor.tabLength", { scope: editor.getRootScopeDescriptor() }) ?? 2;
+    return atom.config.get("language.tabLength", { scope: editor.getRootScopeDescriptor() }) ?? 2;
   },
 
   getPreferredLineLength(editor) {
-    return atom.config.get("editor.preferredLineLength", {
+    return atom.config.get("language.preferredLineLength", {
       scope: editor.getRootScopeDescriptor(),
     });
   },

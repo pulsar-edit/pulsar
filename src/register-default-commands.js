@@ -240,13 +240,13 @@ module.exports = function ({
         return this.getModel().saveAll();
       },
       "window:toggle-invisibles": function () {
-        return config.set("editor.showInvisibles", !config.get("editor.showInvisibles"));
+        return config.set("language.showInvisibles", !config.get("language.showInvisibles"));
       },
       "window:log-deprecation-warnings": function () {
         return Grim.logDeprecations();
       },
       "window:toggle-auto-indent": function () {
-        return config.set("editor.autoIndent", !config.get("editor.autoIndent"));
+        return config.set("language.autoIndent", !config.get("language.autoIndent"));
       },
       "pane:reopen-closed-item": function () {
         return this.getModel().reopenItem();
@@ -676,7 +676,7 @@ module.exports = function ({
         return copyPathToClipboard(this, project, clipboard, true);
       },
       "editor:toggle-indent-guide": function () {
-        return config.set("editor.showIndentGuide", !config.get("editor.showIndentGuide"));
+        return config.set("language.showIndentGuide", !config.get("language.showIndentGuide"));
       },
       "editor:toggle-line-numbers": function () {
         return config.set("editor.showLineNumbers", !config.get("editor.showLineNumbers"));

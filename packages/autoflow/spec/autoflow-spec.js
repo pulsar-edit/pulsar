@@ -12,8 +12,8 @@ describe("Autoflow package", () => {
         editor = atom.workspace.getActiveTextEditor();
         editorElement = atom.views.getView(editor);
 
-        atom.config.set("editor.preferredLineLength", 30);
-        atom.config.set("editor.tabLength", tabLength);
+        atom.config.set("language.preferredLineLength", 30);
+        atom.config.set("language.tabLength", tabLength);
 
         activationPromise = atom.packages.activatePackage("autoflow");
 
@@ -24,7 +24,7 @@ describe("Autoflow package", () => {
     });
 
     it("uses the preferred line length based on the editor's scope", () => {
-      atom.config.set("editor.preferredLineLength", 4, {
+      atom.config.set("language.preferredLineLength", 4, {
         scopeSelector: ".text.plain.null-grammar",
       });
       editor.setText("foo bar");
@@ -37,7 +37,7 @@ bar\
 `);
     });
 
-    it("rearranges line breaks in the current selection to ensure lines are shorter than config.editor.preferredLineLength honoring tabLength", () => {
+    it("rearranges line breaks in the current selection to ensure lines are shorter than config.language.preferredLineLength honoring tabLength", () => {
       editor.setText(
         "\t\tThis is the first paragraph and it is longer than the preferred line length so it should be reflowed.\n\n\t\tThis is a short paragraph.\n\n\t\tAnother long paragraph, it should also be reflowed with the use of this single command.",
       );
@@ -51,7 +51,7 @@ bar\
       );
     });
 
-    it("rearranges line breaks in the current selection to ensure lines are shorter than config.editor.preferredLineLength", () => {
+    it("rearranges line breaks in the current selection to ensure lines are shorter than config.language.preferredLineLength", () => {
       editor.setText(`\
 This is the first paragraph and it is longer than the preferred line length so it should be reflowed.
 

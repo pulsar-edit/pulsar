@@ -1,5 +1,5 @@
 '.source.makefile':
-  'editor':
+  'language':
     'increaseIndentPattern': '^[^\\t ]+:'
     'commentStart': '# '
     'commentDelimiters':

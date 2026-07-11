@@ -959,7 +959,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`);
     let suffix = suggestion.snippet != null ? suggestion.snippet : suggestion.text;
     const endPosition = [bufferPosition.row, bufferPosition.column + suffix.length];
     const endOfLineText = editor.getTextInBufferRange([bufferPosition, endPosition]);
-    const nonWordCharacters = new Set(atom.config.get("editor.nonWordCharacters").split(""));
+    const nonWordCharacters = new Set(atom.config.get("language.nonWordCharacters").split(""));
     while (suffix) {
       if (endOfLineText.startsWith(suffix) && !nonWordCharacters.has(suffix[0])) {
         break;

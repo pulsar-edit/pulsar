@@ -1,5 +1,5 @@
 ".source.css.less":
-  editor:
+  language:
     commentStart: "// "
     commentDelimiters:
       line: '//'

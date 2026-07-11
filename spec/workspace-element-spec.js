@@ -962,7 +962,6 @@ describe("WorkspaceElement", () => {
       expect(getComputedStyle(editorElement).lineHeight).toBe("27.2px");
       expect(editor.getLineHeightInPixels()).not.toBe(initialLineHeight);
     });
-
   });
 
   describe("panel containers", () => {
@@ -1038,7 +1037,7 @@ describe("WorkspaceElement", () => {
       workspaceElement.style.width = "1000px";
       jasmine.attachToDOM(workspaceElement);
 
-      atom.config.set("editor.softWrap", true);
+      atom.config.set("language.softWrap", true);
       const editor = await atom.workspace.open();
       const lines = [];
       for (let i = 0; i < 400; i++) lines.push(`line ${i} ` + "word ".repeat(30));
@@ -1094,11 +1093,11 @@ describe("WorkspaceElement", () => {
   describe("the 'window:toggle-invisibles' command", () => {
     it("shows/hides invisibles in all open and future editors", () => {
       const workspaceElement = atom.workspace.getElement();
-      expect(atom.config.get("editor.showInvisibles")).toBe(false);
+      expect(atom.config.get("language.showInvisibles")).toBe(false);
       atom.commands.dispatch(workspaceElement, "window:toggle-invisibles");
-      expect(atom.config.get("editor.showInvisibles")).toBe(true);
+      expect(atom.config.get("language.showInvisibles")).toBe(true);
       atom.commands.dispatch(workspaceElement, "window:toggle-invisibles");
-      expect(atom.config.get("editor.showInvisibles")).toBe(false);
+      expect(atom.config.get("language.showInvisibles")).toBe(false);
     });
   });
 

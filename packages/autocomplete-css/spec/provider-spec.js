@@ -109,7 +109,7 @@ describe("CSS property name and value autocompletions", async () => {
         await atom.workspace.open(packagesToTest[packageLabel].file);
         editor = atom.workspace.getActiveTextEditor();
         await whenEditorReady(editor);
-        atom.config.set("core.useTreeSitterParsers", meta.useTreeSitter ?? false);
+        atom.config.set("language.useTreeSitterParsers", meta.useTreeSitter ?? false);
       });
 
       it("returns tag completions when not in a property list", async () => {

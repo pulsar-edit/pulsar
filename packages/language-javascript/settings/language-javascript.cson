@@ -1,5 +1,5 @@
 '.source.js':
-  'editor':
+  'language':
     'nonWordCharacters': '/\\()"\':,.;<>~!#@%^&*|+=[]{}`?-…'
     'commentStart': '// '
     'commentDelimiters':
@@ -16,14 +16,14 @@
       '
 
 '.source.js .meta.block.jsx.js':
-  'editor':
+  'language':
     'commentStart': '{/*'
     'commentEnd': '*/}'
     'commentDelimiters':
       'block': ['{/*', '*/}']
 
 '.source.js .meta.jsx.inside-tag.js':
-  'editor':
+  'language':
     'commentStart': '{/*'
     'commentEnd': '*/}'
     'commentDelimiters':

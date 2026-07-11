@@ -76,7 +76,7 @@ describe("TextEditorRegistry", function () {
 
   describe(".build", function () {
     it("constructs a TextEditor with the right parameters based on its path and text", function () {
-      atom.config.set("editor.tabLength", 8, { scope: ".source.js" });
+      atom.config.set("language.tabLength", 8, { scope: ".source.js" });
 
       const languageMode = {
         grammar: NullGrammar,
@@ -269,24 +269,24 @@ describe("TextEditorRegistry", function () {
       editor.update({ tabLength: 4 });
       expect(editor.getTabLength()).toBe(4);
 
-      atom.config.set("editor.tabLength", 8);
+      atom.config.set("language.tabLength", 8);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getTabLength()).toBe(8);
 
-      atom.config.set("editor.tabLength", 4);
+      atom.config.set("language.tabLength", 4);
       expect(editor.getTabLength()).toBe(4);
     });
 
     it('enables soft tabs when the tabType config setting is "soft"', async function () {
-      atom.config.set("editor.tabType", "soft");
+      atom.config.set("language.tabType", "soft");
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftTabs()).toBe(true);
     });
 
     it('disables soft tabs when the tabType config setting is "hard"', async function () {
-      atom.config.set("editor.tabType", "hard");
+      atom.config.set("language.tabType", "hard");
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftTabs()).toBe(false);
@@ -298,7 +298,7 @@ describe("TextEditorRegistry", function () {
         await atom.packages.activatePackage("language-javascript");
         atom.grammars.assignLanguageMode(editor, "source.js");
         let languageMode = setupLanguageMode(editor);
-        atom.config.set("editor.tabType", "auto");
+        atom.config.set("language.tabType", "auto");
         await initialPackageActivation;
         await languageMode.ready;
 
@@ -367,11 +367,11 @@ describe("TextEditorRegistry", function () {
         await initialPackageActivation;
 
         editor.setText("abc\ndef");
-        atom.config.set("editor.softTabs", true);
-        atom.config.set("editor.tabType", "auto");
+        atom.config.set("language.softTabs", true);
+        atom.config.set("language.tabType", "auto");
         expect(editor.getSoftTabs()).toBe(true);
 
-        atom.config.set("editor.softTabs", false);
+        atom.config.set("language.softTabs", false);
         expect(editor.getSoftTabs()).toBe(false);
       });
     });
@@ -380,16 +380,16 @@ describe("TextEditorRegistry", function () {
       editor.update({ softTabs: true });
       expect(editor.getSoftTabs()).toBe(true);
 
-      atom.config.set("editor.tabType", "hard");
+      atom.config.set("language.tabType", "hard");
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftTabs()).toBe(false);
 
-      atom.config.set("editor.tabType", "soft");
+      atom.config.set("language.tabType", "soft");
       expect(editor.getSoftTabs()).toBe(true);
 
-      atom.config.set("editor.tabType", "auto");
-      atom.config.set("editor.softTabs", true);
+      atom.config.set("language.tabType", "auto");
+      atom.config.set("language.softTabs", true);
       expect(editor.getSoftTabs()).toBe(true);
     });
 
@@ -397,12 +397,12 @@ describe("TextEditorRegistry", function () {
       editor.update({ atomicSoftTabs: true });
       expect(editor.hasAtomicSoftTabs()).toBe(true);
 
-      atom.config.set("editor.atomicSoftTabs", false);
+      atom.config.set("language.atomicSoftTabs", false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.hasAtomicSoftTabs()).toBe(false);
 
-      atom.config.set("editor.atomicSoftTabs", true);
+      atom.config.set("language.atomicSoftTabs", true);
       expect(editor.hasAtomicSoftTabs()).toBe(true);
     });
 
@@ -429,7 +429,7 @@ describe("TextEditorRegistry", function () {
       });
       expect(editor.getInvisibles()).toEqual(invisibles1);
 
-      atom.config.set("editor.showInvisibles", true);
+      atom.config.set("language.showInvisibles", true);
       atom.config.set("editor.invisibles", invisibles2);
       registry.maintainConfig(editor);
       await initialPackageActivation;
@@ -438,7 +438,7 @@ describe("TextEditorRegistry", function () {
       atom.config.set("editor.invisibles", invisibles1);
       expect(editor.getInvisibles()).toEqual(invisibles1);
 
-      atom.config.set("editor.showInvisibles", false);
+      atom.config.set("language.showInvisibles", false);
       expect(editor.getInvisibles()).toEqual({});
     });
 
@@ -446,12 +446,12 @@ describe("TextEditorRegistry", function () {
       editor.update({ showIndentGuide: true });
       expect(editor.doesShowIndentGuide()).toBe(true);
 
-      atom.config.set("editor.showIndentGuide", false);
+      atom.config.set("language.showIndentGuide", false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.doesShowIndentGuide()).toBe(false);
 
-      atom.config.set("editor.showIndentGuide", true);
+      atom.config.set("language.showIndentGuide", true);
       expect(editor.doesShowIndentGuide()).toBe(true);
     });
 
@@ -459,12 +459,12 @@ describe("TextEditorRegistry", function () {
       editor.update({ softWrapped: true });
       expect(editor.isSoftWrapped()).toBe(true);
 
-      atom.config.set("editor.softWrap", false);
+      atom.config.set("language.softWrap", false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.isSoftWrapped()).toBe(false);
 
-      atom.config.set("editor.softWrap", true);
+      atom.config.set("language.softWrap", true);
       expect(editor.isSoftWrapped()).toBe(true);
     });
 
@@ -472,12 +472,12 @@ describe("TextEditorRegistry", function () {
       editor.update({ softWrapHangingIndentLength: 4 });
       expect(editor.getSoftWrapHangingIndentLength()).toBe(4);
 
-      atom.config.set("editor.softWrapHangingIndent", 2);
+      atom.config.set("language.softWrapHangingIndent", 2);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftWrapHangingIndentLength()).toBe(2);
 
-      atom.config.set("editor.softWrapHangingIndent", 4);
+      atom.config.set("language.softWrapHangingIndent", 4);
       expect(editor.getSoftWrapHangingIndentLength()).toBe(4);
     });
 
@@ -491,13 +491,13 @@ describe("TextEditorRegistry", function () {
 
       expect(editor.getSoftWrapColumn()).toBe(80);
 
-      atom.config.set("editor.softWrap", true);
-      atom.config.set("editor.softWrapAtPreferredLineLength", false);
+      atom.config.set("language.softWrap", true);
+      atom.config.set("language.softWrapAtPreferredLineLength", false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getSoftWrapColumn()).toBe(120);
 
-      atom.config.set("editor.softWrapAtPreferredLineLength", true);
+      atom.config.set("language.softWrapAtPreferredLineLength", true);
       expect(editor.getSoftWrapColumn()).toBe(80);
     });
 
@@ -509,7 +509,7 @@ describe("TextEditorRegistry", function () {
 
       expect(editor.getSoftWrapColumn()).toBe(1500);
 
-      atom.config.set("editor.softWrap", false);
+      atom.config.set("language.softWrap", false);
       atom.config.set("editor.maxScreenLineLength", 500);
       registry.maintainConfig(editor);
       await initialPackageActivation;
@@ -520,12 +520,12 @@ describe("TextEditorRegistry", function () {
       editor.update({ preferredLineLength: 80 });
       expect(editor.getPreferredLineLength()).toBe(80);
 
-      atom.config.set("editor.preferredLineLength", 110);
+      atom.config.set("language.preferredLineLength", 110);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getPreferredLineLength()).toBe(110);
 
-      atom.config.set("editor.preferredLineLength", 80);
+      atom.config.set("language.preferredLineLength", 80);
       expect(editor.getPreferredLineLength()).toBe(80);
     });
 
@@ -533,12 +533,12 @@ describe("TextEditorRegistry", function () {
       editor.update({ autoIndent: true });
       expect(editor.shouldAutoIndent()).toBe(true);
 
-      atom.config.set("editor.autoIndent", false);
+      atom.config.set("language.autoIndent", false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.shouldAutoIndent()).toBe(false);
 
-      atom.config.set("editor.autoIndent", true);
+      atom.config.set("language.autoIndent", true);
       expect(editor.shouldAutoIndent()).toBe(true);
     });
 
@@ -546,12 +546,12 @@ describe("TextEditorRegistry", function () {
       editor.update({ autoIndentOnPaste: true });
       expect(editor.shouldAutoIndentOnPaste()).toBe(true);
 
-      atom.config.set("editor.autoIndentOnPaste", false);
+      atom.config.set("language.autoIndentOnPaste", false);
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.shouldAutoIndentOnPaste()).toBe(false);
 
-      atom.config.set("editor.autoIndentOnPaste", true);
+      atom.config.set("language.autoIndentOnPaste", true);
       expect(editor.shouldAutoIndentOnPaste()).toBe(true);
     });
 

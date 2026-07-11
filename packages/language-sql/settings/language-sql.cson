@@ -1,5 +1,5 @@
 '.source.sql':
-  'editor':
+  'language':
     'commentStart': '-- '
     'commentDelimiters':
       'line': '--'

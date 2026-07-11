@@ -3,7 +3,7 @@ const path = require("path");
 
 function setConfigForLanguageMode(mode) {
   let useTreeSitterParsers = mode !== "textmate";
-  atom.config.set("core.useTreeSitterParsers", useTreeSitterParsers);
+  atom.config.set("language.useTreeSitterParsers", useTreeSitterParsers);
 }
 
 describe("Clojure grammars", () => {

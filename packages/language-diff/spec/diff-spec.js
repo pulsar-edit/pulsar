@@ -1,5 +1,5 @@
 function setConfigForLanguageMode(mode) {
-  atom.config.set("core.useTreeSitterParsers", mode !== "textmate");
+  atom.config.set("language.useTreeSitterParsers", mode !== "textmate");
 }
 
 describe("Diff grammars", () => {

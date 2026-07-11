@@ -117,7 +117,7 @@ describe("EditorPanel", function () {
   it("shows the package settings notes for core and editor settings", function () {
     expect(panel.element.querySelector("#editor-settings-note")).toExist();
     expect(panel.element.querySelector("#editor-settings-note").textContent).toContain(
-      "Check language settings",
+      "Languages panel",
     );
   });
 });

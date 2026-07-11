@@ -316,14 +316,14 @@ describe("Config", () => {
 
     describe("when the key-path is null", () =>
       it("sets the root object", () => {
-        expect(atom.config.set(null, { editor: { tabLength: 6 } })).toBe(true);
-        expect(atom.config.get("editor.tabLength")).toBe(6);
+        expect(atom.config.set(null, { language: { tabLength: 6 } })).toBe(true);
+        expect(atom.config.get("language.tabLength")).toBe(6);
         expect(
           atom.config.set(null, {
-            editor: { tabLength: 8, scopeSelector: [".source.js"] },
+            language: { tabLength: 8, scopeSelector: [".source.js"] },
           }),
         ).toBe(true);
-        expect(atom.config.get("editor.tabLength", { scope: [".source.js"] })).toBe(8);
+        expect(atom.config.get("language.tabLength", { scope: [".source.js"] })).toBe(8);
       }));
 
     describe("when the value equals the default value", () =>

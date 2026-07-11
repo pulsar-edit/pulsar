@@ -1,7 +1,7 @@
 '.source.git-config':
-  'editor':
+  'language':
     'commentStart': '# '
 '.text.git-commit':
-  'editor':
+  'language':
     'foldEndPattern': '^---'
     'preferredLineLength': 72

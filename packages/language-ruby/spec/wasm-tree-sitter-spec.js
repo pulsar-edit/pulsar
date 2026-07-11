@@ -5,7 +5,7 @@ const { Point } = require("atom");
 xdescribe("WASM Tree-sitter Ruby grammar", () => {
   beforeEach(async () => {
     await atom.packages.activatePackage("language-ruby");
-    atom.config.set("core.useTreeSitterParsers", true);
+    atom.config.set("language.useTreeSitterParsers", true);
   });
 
   it("tokenizes symbols", async () => {

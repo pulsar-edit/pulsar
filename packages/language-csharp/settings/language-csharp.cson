@@ -1,5 +1,5 @@
 '.source.cs':
-  'editor':
+  'language':
     'commentStart': '// '
     'commentDelimiters':
       'line': '//'

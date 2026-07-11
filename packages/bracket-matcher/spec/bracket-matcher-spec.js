@@ -1095,7 +1095,7 @@ describe("bracket matching", () => {
     beforeEach(async () => {
       editor.buffer.setText("");
       await editorReady(languageMode);
-      atom.config.set("editor.autoIndent", true);
+      atom.config.set("language.autoIndent", true);
     });
 
     describe("when more than one character is inserted", () => {
@@ -1646,9 +1646,9 @@ describe("bracket matching", () => {
         });
       });
 
-      describe("when editor.autoIndent is disabled", () => {
+      describe("when language.autoIndent is disabled", () => {
         beforeEach(() => {
-          atom.config.set("editor.autoIndent", false);
+          atom.config.set("language.autoIndent", false);
         });
 
         it("does not auto-indent the empty line and closing bracket", () => {

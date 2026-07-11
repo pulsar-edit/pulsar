@@ -1,5 +1,3 @@
- 
-
 const fs = require("fs");
 const path = require("path");
 const dedent = require("dedent");
@@ -52,7 +50,7 @@ describe("WASMTreeSitterLanguageMode", () => {
     editor = await atom.workspace.open("");
     buffer = editor.getBuffer();
     editor.displayLayer.reset({ foldCharacter: "…" });
-    atom.config.set("core.useTreeSitterParsers", true);
+    atom.config.set("language.useTreeSitterParsers", true);
   });
 
   afterEach(() => {
@@ -3734,12 +3732,12 @@ describe("WASMTreeSitterLanguageMode", () => {
 
   describe(".commentStringsForPosition(position)", () => {
     beforeEach(() => {
-      atom.config.unset("editor.commentDelimiters", { scopeSelector: ".source.js" });
-      atom.config.unset("editor.commentStart", { scopeSelector: ".source.js" });
-      atom.config.unset("editor.commentEnd", { scopeSelector: ".source.js" });
-      atom.config.unset("editor.commentDelimiters", { scopeSelector: ".text.html.basic" });
-      atom.config.unset("editor.commentStart", { scopeSelector: ".text.html.basic" });
-      atom.config.unset("editor.commentEnd", { scopeSelector: ".text.html.basic" });
+      atom.config.unset("language.commentDelimiters", { scopeSelector: ".source.js" });
+      atom.config.unset("language.commentStart", { scopeSelector: ".source.js" });
+      atom.config.unset("language.commentEnd", { scopeSelector: ".source.js" });
+      atom.config.unset("language.commentDelimiters", { scopeSelector: ".text.html.basic" });
+      atom.config.unset("language.commentStart", { scopeSelector: ".text.html.basic" });
+      atom.config.unset("language.commentEnd", { scopeSelector: ".text.html.basic" });
     });
 
     it("returns the correct comment strings for nested languages", async () => {
@@ -3756,7 +3754,7 @@ describe("WASMTreeSitterLanguageMode", () => {
       atom.grammars.addGrammar(htmlGrammar);
 
       atom.config.set(
-        "editor.commentDelimiters",
+        "language.commentDelimiters",
         {
           line: "//",
           block: ["/*", "*/"],
@@ -3764,19 +3762,19 @@ describe("WASMTreeSitterLanguageMode", () => {
         { scopeSelector: ".source.js" },
       );
 
-      atom.config.set("editor.commentStart", "//", { scopeSelector: ".source.js" });
+      atom.config.set("language.commentStart", "//", { scopeSelector: ".source.js" });
 
       atom.config.set(
-        "editor.commentDelimiters",
+        "language.commentDelimiters",
         {
           block: ["<!--", "-->"],
         },
         { scopeSelector: ".text.html.basic" },
       );
 
-      atom.config.set("editor.commentStart", "<!--", { scopeSelector: ".text.html.basic" });
+      atom.config.set("language.commentStart", "<!--", { scopeSelector: ".text.html.basic" });
 
-      atom.config.set("editor.commentEnd", "-->", { scopeSelector: ".text.html.basic" });
+      atom.config.set("language.commentEnd", "-->", { scopeSelector: ".text.html.basic" });
 
       const languageMode = new WASMTreeSitterLanguageMode({
         grammar: htmlGrammar,
@@ -3931,7 +3929,7 @@ describe("WASMTreeSitterLanguageMode", () => {
       });
 
       atom.config.set(
-        "editor.commentDelimiters",
+        "language.commentDelimiters",
         {
           line: "//",
           block: ["/*", "*/"],
@@ -3940,7 +3938,7 @@ describe("WASMTreeSitterLanguageMode", () => {
       );
 
       atom.config.set(
-        "editor.commentDelimiters",
+        "language.commentDelimiters",
         {
           block: ["<!--", "-->"],
         },

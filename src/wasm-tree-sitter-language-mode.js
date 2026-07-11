@@ -327,7 +327,7 @@ class WASMTreeSitterLanguageMode {
 
   getNonWordCharacters(position) {
     const scope = this.scopeDescriptorForPosition(position);
-    return this.config.get("editor.nonWordCharacters", { scope });
+    return this.config.get("language.nonWordCharacters", { scope });
   }
 
   getRootParser() {
@@ -869,13 +869,7 @@ class WASMTreeSitterLanguageMode {
       // Attempt a synchronous parse.
       tree = supportsTimeoutMicros
         ? parser.parse(callback, oldTree, { includedRanges })
-        : parseWithProgressTimeout(
-          parser,
-          callback,
-          oldTree,
-          includedRanges,
-          timeoutMicros
-        );
+        : parseWithProgressTimeout(parser, callback, oldTree, includedRanges, timeoutMicros);
       if (!supportsTimeoutMicros && tree === null) {
         throw new Error("Parsing failed");
       }
@@ -892,13 +886,7 @@ class WASMTreeSitterLanguageMode {
             batchCount++;
             tree = supportsTimeoutMicros
               ? parser.parse(callback, oldTree, { includedRanges })
-              : parseWithProgressTimeout(
-                parser,
-                callback,
-                oldTree,
-                includedRanges,
-                timeoutMicros
-              );
+              : parseWithProgressTimeout(parser, callback, oldTree, includedRanges, timeoutMicros);
             if (!supportsTimeoutMicros && tree === null) {
               setImmediate(parseJob);
               return;
@@ -1317,8 +1305,8 @@ class WASMTreeSitterLanguageMode {
     // Ask the config system if it has a setting for this scope. This allows
     // for overrides from the grammar default.
     const scope = this.scopeDescriptorForPosition(range.start);
-    const commentStartEntries = this.config.getAll("editor.commentStart", { scope });
-    const commentEndEntries = this.config.getAll("editor.commentEnd", { scope });
+    const commentStartEntries = this.config.getAll("language.commentStart", { scope });
+    const commentEndEntries = this.config.getAll("language.commentEnd", { scope });
 
     // If a `commentDelimiters` setting exists, attach it to the return object.
     // This can contain more comprehensive delimiter metadata for snippets and
@@ -5239,7 +5227,7 @@ class IndentResolver {
     //
     // We call `Math.floor` because we should only subtract whole units of
     // indentation here. “Leading whitespace” seems not to consider (for
-    // example) a single leading space character if `editor.tabLength` is `2`.
+    // example) a single leading space character if `language.tabLength` is `2`.
     let adjustedIndent = Math.max(finalIndent - Math.floor(existingIndent), 0);
 
     // Emit an event with all this information. This makes it possible for
@@ -5274,7 +5262,7 @@ class IndentResolver {
   // {::suggestedIndentForEditedBufferRow} invoke this callback.
   //
   // One indentation “level” consists of either (a) one tab character, or (b)
-  // one multiple of `editor.tabLength` spaces (if `editor.softTabs` is
+  // one multiple of `language.tabLength` spaces (if `language.softTabs` is
   // `true`).
   //
   // - `callback` A {Function} that takes one parameter:

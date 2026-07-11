@@ -129,6 +129,12 @@ export default class SearchSettingsPanel extends CollapsibleSectionPanel {
       useFilter = true;
     }
 
+    if (text.startsWith("language: ")) {
+      searchTerm = text.replace("language: ", "");
+      namedFilter = "language";
+      useFilter = true;
+    }
+
     for (const setting in this.settingsSchema) {
       // The top level item should always be an object, but just in case we will check.
       // If the top level item returned is not an object it will NOT be listed

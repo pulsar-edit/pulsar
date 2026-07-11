@@ -4,7 +4,7 @@ const dedent = require("dedent");
 // Keeping it around so that the logic can be adapted later.
 xdescribe("Tree-sitter HTML grammar", () => {
   beforeEach(async () => {
-    atom.config.set("core.useTreeSitterParsers", true);
+    atom.config.set("language.useTreeSitterParsers", true);
     await atom.packages.activatePackage("language-html");
   });
 

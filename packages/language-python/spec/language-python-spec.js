@@ -4,7 +4,7 @@ describe("Python settings", () => {
   afterEach(() => editor.destroy());
 
   beforeEach(async () => {
-    atom.config.set("core.useTreeSitterParsers", false);
+    atom.config.set("language.useTreeSitterParsers", false);
     editor = await atom.workspace.open();
     languageMode = editor.languageMode;
     await atom.packages.activatePackage("language-python");

@@ -10,7 +10,7 @@ describe("TextMateLanguageMode", () => {
 
   beforeEach(async () => {
     config = atom.config;
-    config.set("core.useTreeSitterParsers", false);
+    config.set("language.useTreeSitterParsers", false);
     // enable async tokenization
     TextMateLanguageMode.prototype.chunkSize = 5;
     jasmine.unspy(TextMateLanguageMode.prototype, "tokenizeInBackground");
@@ -20,7 +20,7 @@ describe("TextMateLanguageMode", () => {
   afterEach(() => {
     buffer && buffer.destroy();
     languageMode && languageMode.destroy();
-    config.unset("core.useTreeSitterParsers");
+    config.unset("language.useTreeSitterParsers");
   });
 
   describe("when the editor is constructed with the largeFileMode option set to true", () => {
@@ -51,13 +51,13 @@ describe("TextMateLanguageMode", () => {
     });
   });
 
-  describe("editor.largeFileThreshold config", () => {
+  describe("language.largeFileThreshold config", () => {
     afterEach(() => {
-      config.unset("editor.largeFileThreshold");
+      config.unset("language.largeFileThreshold");
     });
 
     it("uses the configured threshold to determine large file mode", () => {
-      config.set("editor.largeFileThreshold", 0.001); // 1KB
+      config.set("language.largeFileThreshold", 0.001); // 1KB
       const line = "a b c d\n";
       buffer = new TextBuffer(line.repeat(200)); // ~1.6KB
       languageMode = new TextMateLanguageMode({
@@ -69,7 +69,7 @@ describe("TextMateLanguageMode", () => {
     });
 
     it("disables automatic large file mode when threshold is 0", () => {
-      config.set("editor.largeFileThreshold", 0);
+      config.set("language.largeFileThreshold", 0);
       const line = "a b c d\n";
       buffer = new TextBuffer(line.repeat(256 * 1024)); // 2MB
       languageMode = new TextMateLanguageMode({
@@ -81,7 +81,7 @@ describe("TextMateLanguageMode", () => {
     });
 
     it("respects explicit largeFileMode param over config", () => {
-      config.set("editor.largeFileThreshold", 0);
+      config.set("language.largeFileThreshold", 0);
       buffer = new TextBuffer("small file");
       languageMode = new TextMateLanguageMode({
         buffer,

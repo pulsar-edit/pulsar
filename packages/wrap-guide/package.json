@@ -3,7 +3,7 @@
   "author": "lumine-code",
   "version": "1.0.0",
   "main": "./lib/main",
-  "description": "Displays a vertical line at the 80th character in the editor.\nThis packages uses the config value of `editor.preferredLineLength` when set.",
+  "description": "Displays a vertical line at the 80th character in the editor.\nThis packages uses the config value of `language.preferredLineLength` when set.",
   "license": "MIT",
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {
@@ -13,7 +13,7 @@
     "columns": {
       "order": 1,
       "title": "Columns",
-      "description": "Display guides at each of the listed character widths. Leave blank for one guide at your `editor.preferredLineLength`.",
+      "description": "Display guides at each of the listed character widths. Leave blank for one guide at your `language.preferredLineLength`.",
       "type": "array",
       "items": {
         "type": "integer"

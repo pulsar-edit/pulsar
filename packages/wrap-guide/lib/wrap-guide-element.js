@@ -38,7 +38,7 @@ module.exports = class WrapGuideElement {
       case "atPreferredLineLength":
         this.#_shouldShow =
           this.editor.isSoftWrapped() &&
-          atom.config.get("editor.softWrapAtPreferredLineLength", {
+          atom.config.get("language.softWrapAtPreferredLineLength", {
             scope: this.editor.getRootScopeDescriptor(),
           });
         break;
@@ -118,7 +118,7 @@ module.exports = class WrapGuideElement {
 
     this.softWrapAPLLsubscriptions.add(
       atom.config.onDidChange(
-        "editor.softWrapAtPreferredLineLength",
+        "language.softWrapAtPreferredLineLength",
         { scope: this.editor.getRootScopeDescriptor() },
         async ({ newValue }) => {
           if (this.when === null) return;
@@ -143,7 +143,7 @@ module.exports = class WrapGuideElement {
     };
     this.configSubscriptions.add(
       atom.config.onDidChange(
-        "editor.preferredLineLength",
+        "language.preferredLineLength",
         { scope: this.editor.getRootScopeDescriptor() },
         updatePreferredLineLengthCallback,
       ),
@@ -164,7 +164,7 @@ module.exports = class WrapGuideElement {
       if (columns != null ? columns.length : undefined) {
         atom.config.set("wrap-guide.columns", columns);
         if (atom.config.get("wrap-guide.modifyPreferredLineLength")) {
-          atom.config.set("editor.preferredLineLength", columns[columns.length - 1], {
+          atom.config.set("language.preferredLineLength", columns[columns.length - 1], {
             scopeSelector: `.${this.editor.getGrammar().scopeName}`,
           });
         }
@@ -181,7 +181,7 @@ module.exports = class WrapGuideElement {
   }
 
   getDefaultColumn() {
-    return atom.config.get("editor.preferredLineLength", {
+    return atom.config.get("language.preferredLineLength", {
       scope: this.editor.getRootScopeDescriptor(),
     });
   }

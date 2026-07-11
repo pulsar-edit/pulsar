@@ -39,7 +39,7 @@ module.exports = {
 
       let wordRegExp = cursor.wordRegExp();
       if (hasRubyScope) {
-        nonWordCharacters = atom.config.get("editor.nonWordCharacters", { scope });
+        nonWordCharacters = atom.config.get("language.nonWordCharacters", { scope });
         nonWordCharacters = nonWordCharacters.replace(/:/g, "");
         wordRegExp = new RegExp(
           `[^\\s${_.escapeRegExp(nonWordCharacters)}]+([!?]|\\s*=>?)?|[<=>]+`,

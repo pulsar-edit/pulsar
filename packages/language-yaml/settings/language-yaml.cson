@@ -1,5 +1,5 @@
 '.source.yaml':
-  'editor':
+  'language':
     'autoIndentOnPaste': false
     'commentStart': '# '
     'commentDelimiters':

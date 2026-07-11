@@ -5,7 +5,7 @@ describe("SassDoc grammar", function () {
     // There isn't a Tree-sitter grammar for SassDoc that I'm aware of. Users
     // who expect thorough highlighting of SassDoc can add a scope-specific
     // override to prefer the TextMate-style SCSS grammar.
-    atom.config.set("core.useTreeSitterParsers", false);
+    atom.config.set("language.useTreeSitterParsers", false);
     waitsForPromise(() => atom.packages.activatePackage("language-sass"));
 
     runs(() => (grammar = atom.grammars.grammarForScopeName("source.css.scss")));

@@ -46,7 +46,7 @@ export default class EditorPanel {
         <SettingsPanel
           namespace="editor"
           icon="code"
-          note={`<div class="text icon icon-question" id="editor-settings-note" tabindex="-1">These settings are related to text editing. Some of these can be overriden on a per-language basis. Check language settings by clicking its package card in the <a class="link packages-open">Packages list</a>.</div>`}
+          note={`<div class="text icon icon-question" id="editor-settings-note" tabindex="-1">These settings apply to every text editor. Settings that can differ per language, such as indentation and soft wrap, live in the <a class="link languages-open">Languages panel</a>.</div>`}
         />
       </div>
     );
@@ -61,9 +61,9 @@ export default class EditorPanel {
   }
 
   didClick(event) {
-    const target = event.target.closest(".packages-open");
+    const target = event.target.closest(".languages-open");
     if (target) {
-      atom.workspace.open("atom://config/packages");
+      atom.workspace.open("atom://config/languages");
     }
   }
 

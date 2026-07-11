@@ -14,7 +14,7 @@ describe("Language-C", function () {
   let grammar = null;
 
   beforeEach(function () {
-    atom.config.set("core.useTreeSitterParsers", false);
+    atom.config.set("language.useTreeSitterParsers", false);
 
     return waitsForPromise(() => atom.packages.activatePackage("language-c"));
   });

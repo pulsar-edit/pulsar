@@ -175,7 +175,7 @@ module.exports = class WASMTreeSitterGrammar {
   //
   getCommentDelimiters() {
     // Prefer the config system. It's a better place for this data to live.
-    let commentDelimiters = atom.config.get("editor.commentDelimiters", {
+    let commentDelimiters = atom.config.get("language.commentDelimiters", {
       scope: [this.scopeName],
     });
     if (commentDelimiters) return commentDelimiters;
@@ -187,8 +187,8 @@ module.exports = class WASMTreeSitterGrammar {
 
     // If even that doesn't exist, we can fall back onto the older config
     // settings.
-    let start = atom.config.get("editor.commentStart", { scope: [this.scope] });
-    let end = atom.config.get("editor.commentEnd", { scope: [this.scope] });
+    let start = atom.config.get("language.commentStart", { scope: [this.scope] });
+    let end = atom.config.get("language.commentEnd", { scope: [this.scope] });
 
     return normalizeDelimiters({ start, end });
   }

@@ -1,5 +1,3 @@
- 
-
 const { TextEditor } = require("atom");
 const {
   conditionPromise,
@@ -591,7 +589,7 @@ describe("Autocomplete Manager", () => {
 
           mainModule.consumeProvider(provider, 4);
 
-          atom.config.set("editor.nonWordCharacters", "-");
+          atom.config.set("language.nonWordCharacters", "-");
           editor.insertText(" $foo-$ba");
           editor.insertText("r");
           await suggestionsPromise;
@@ -1196,7 +1194,7 @@ describe("Autocomplete Manager", () => {
 
       describe("providers using the 4.0 API", () => {
         it("replaces the entire prefix by default, regardless of the characters it contains", async () => {
-          atom.config.set("editor.nonWordCharacters", "-");
+          atom.config.set("language.nonWordCharacters", "-");
           provider = {
             scopeSelector: "*",
             inclusionPriority: 100,

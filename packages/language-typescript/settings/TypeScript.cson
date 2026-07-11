@@ -1,5 +1,5 @@
 '.source.ts':
-  'editor':
+  'language':
     'commentStart': '// '
     'commentDelimiters':
       'line': '//'

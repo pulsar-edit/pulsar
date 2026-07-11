@@ -154,7 +154,7 @@ module.exports = class Cursor extends Model {
 
   // Public: Returns whether the cursor is currently between a word and non-word
   // character. The non-word characters are defined by the
-  // `editor.nonWordCharacters` config value.
+  // `language.nonWordCharacters` config value.
   //
   // This method returns false if the character before or after the cursor is
   // whitespace.

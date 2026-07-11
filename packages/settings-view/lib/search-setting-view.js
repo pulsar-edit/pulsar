@@ -66,6 +66,9 @@ export default class SearchSettingView {
       case "editor":
         return "icon icon-code search-result-icon";
         break;
+      case "language":
+        return "icon icon-globe search-result-icon";
+        break;
       default:
         return "icon icon-package search-result-icon";
         break;
@@ -96,6 +99,9 @@ export default class SearchSettingView {
           break;
         case "editor":
           atom.workspace.open("atom://config/editor");
+          break;
+        case "language":
+          atom.workspace.open("atom://config/languages");
           break;
         default:
           // The handling for any packages name

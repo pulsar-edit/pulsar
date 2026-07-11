@@ -1,7 +1,7 @@
 '.text.html':
   'autocomplete':
     'extraWordCharacters': '-'
-  'editor':
+  'language':
     'commentStart': '<!-- '
     'commentEnd': ' -->'
     'commentDelimiters':

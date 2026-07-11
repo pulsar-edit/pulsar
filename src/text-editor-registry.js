@@ -5,20 +5,20 @@ const ScopeDescriptor = require("./scope-descriptor");
 
 const EDITOR_PARAMS_BY_SETTING_KEY = [
   ["core.fileEncoding", "encoding"],
-  ["editor.atomicSoftTabs", "atomicSoftTabs"],
-  ["editor.showInvisibles", "showInvisibles"],
-  ["editor.tabLength", "tabLength"],
+  ["language.atomicSoftTabs", "atomicSoftTabs"],
+  ["language.showInvisibles", "showInvisibles"],
+  ["language.tabLength", "tabLength"],
   ["editor.invisibles", "invisibles"],
-  ["editor.showIndentGuide", "showIndentGuide"],
+  ["language.showIndentGuide", "showIndentGuide"],
   ["editor.showLineNumbers", "showLineNumbers"],
-  ["editor.softWrap", "softWrapped"],
-  ["editor.softWrapHangingIndent", "softWrapHangingIndentLength"],
-  ["editor.softWrapAtPreferredLineLength", "softWrapAtPreferredLineLength"],
+  ["language.softWrap", "softWrapped"],
+  ["language.softWrapHangingIndent", "softWrapHangingIndentLength"],
+  ["language.softWrapAtPreferredLineLength", "softWrapAtPreferredLineLength"],
   ["editor.softWrapDebounceInterval", "softWrapDebounceInterval"],
-  ["editor.preferredLineLength", "preferredLineLength"],
+  ["language.preferredLineLength", "preferredLineLength"],
   ["editor.maxScreenLineLength", "maxScreenLineLength"],
-  ["editor.autoIndent", "autoIndent"],
-  ["editor.autoIndentOnPaste", "autoIndentOnPaste"],
+  ["language.autoIndent", "autoIndent"],
+  ["language.autoIndentOnPaste", "autoIndentOnPaste"],
   ["editor.scrollPastEnd", "scrollPastEnd"],
   ["editor.undoGroupingInterval", "undoGroupingInterval"],
   ["editor.scrollSensitivity", "scrollSensitivity"],
@@ -178,8 +178,8 @@ module.exports = class TextEditorRegistry {
       editor.setSoftTabs(
         shouldEditorUseSoftTabs(
           editor,
-          this.config.get("editor.tabType", configOptions),
-          this.config.get("editor.softTabs", configOptions),
+          this.config.get("language.tabType", configOptions),
+          this.config.get("language.softTabs", configOptions),
         ),
       );
     };
@@ -290,8 +290,8 @@ module.exports = class TextEditorRegistry {
       }
 
       const updateTabTypes = () => {
-        const tabType = this.config.get("editor.tabType", configOptions);
-        const softTabs = this.config.get("editor.softTabs", configOptions);
+        const tabType = this.config.get("language.tabType", configOptions);
+        const softTabs = this.config.get("language.softTabs", configOptions);
         this.editorsWithMaintainedConfig.forEach((editor) => {
           if (editor.getRootScopeDescriptor().isEqual(scopeDescriptor)) {
             editor.setSoftTabs(shouldEditorUseSoftTabs(editor, tabType, softTabs));
@@ -300,8 +300,8 @@ module.exports = class TextEditorRegistry {
       };
 
       this.subscriptions.add(
-        this.config.onDidChange("editor.tabType", configOptions, updateTabTypes),
-        this.config.onDidChange("editor.softTabs", configOptions, updateTabTypes),
+        this.config.onDidChange("language.tabType", configOptions, updateTabTypes),
+        this.config.onDidChange("language.softTabs", configOptions, updateTabTypes),
       );
     }
   }

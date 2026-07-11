@@ -1,5 +1,5 @@
 '.text.xml':
-  'editor':
+  'language':
     'commentStart': '<!-- '
     'commentEnd': ' -->'
     'commentDelimiters':

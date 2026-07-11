@@ -7855,7 +7855,7 @@
       "name": "setTabLength",
       "text": null,
       "snippet": "setTabLength(${1:tabLength})",
-      "description": "Set the on-screen length of tab characters. Setting this to a\n{Number} This will override the `editor.tabLength` setting.",
+      "description": "Set the on-screen length of tab characters. Setting this to a\n{Number} This will override the `language.tabLength` setting.",
       "descriptionMoreURL": "https://atom.io/docs/api/latest/TextEditor#instance-setTabLength",
       "type": "method"
     },

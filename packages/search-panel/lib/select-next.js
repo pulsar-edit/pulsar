@@ -124,7 +124,7 @@ module.exports = class SelectNext {
     let text = escapeRegExp(selection.getText());
 
     if (this.wordSelected) {
-      const nonWordCharacters = atom.config.get("editor.nonWordCharacters");
+      const nonWordCharacters = atom.config.get("language.nonWordCharacters");
       text = `(^|[ \t${escapeRegExp(
         nonWordCharacters,
       )}]+)${text}(?=$|[\\s${escapeRegExp(nonWordCharacters)}]+)`;
@@ -156,7 +156,7 @@ module.exports = class SelectNext {
   }
 
   isNonWordCharacter(character) {
-    const nonWordCharacters = atom.config.get("editor.nonWordCharacters");
+    const nonWordCharacters = atom.config.get("language.nonWordCharacters");
     return new RegExp(`[ \t${escapeRegExp(nonWordCharacters)}]`).test(character);
   }
 

@@ -3,7 +3,7 @@ const { SelectListView } = require("select-list");
 
 function setConfigForLanguageMode(mode) {
   let useTreeSitterParsers = mode !== "textmate";
-  atom.config.set("core.useTreeSitterParsers", useTreeSitterParsers);
+  atom.config.set("language.useTreeSitterParsers", useTreeSitterParsers);
 }
 
 describe("GrammarSelector", () => {

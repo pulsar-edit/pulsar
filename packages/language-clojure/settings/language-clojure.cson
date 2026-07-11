@@ -1,5 +1,5 @@
 '.source.clojure':
-  'editor':
+  'language':
     'commentStart': '; '
     'nonWordCharacters': '/\\()"\':,;~^[]{}`'
     'commentDelimiters':

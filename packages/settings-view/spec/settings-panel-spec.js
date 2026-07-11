@@ -222,53 +222,53 @@ describe("SettingsPanel", () => {
           },
         };
 
-        atom.config.setScopedDefaultsFromSchema("editor.tabLength", schema);
-        expect(atom.config.get("editor.tabLength")).toBe(2);
+        atom.config.setScopedDefaultsFromSchema("language.tabLength", schema);
+        expect(atom.config.get("language.tabLength")).toBe(2);
       });
 
       it("displays the scoped default", () => {
         settingsPanel = new SettingsPanel({
-          namespace: "editor",
+          namespace: "language",
           includeTitle: false,
           scopeName: ".source.python",
         });
-        const tabLengthEditor = settingsPanel.element.querySelector('[id="editor.tabLength"]');
+        const tabLengthEditor = settingsPanel.element.querySelector('[id="language.tabLength"]');
         expect(tabLengthEditor.getModel().getText()).toBe("");
         expect(tabLengthEditor.getModel().getPlaceholderText()).toBe("Default: 4");
       });
 
       it("allows the scoped setting to be changed to its normal default if the unscoped value is different", () => {
-        atom.config.set("editor.tabLength", 8);
+        atom.config.set("language.tabLength", 8);
 
         settingsPanel = new SettingsPanel({
-          namespace: "editor",
+          namespace: "language",
           includeTitle: false,
           scopeName: ".source.js",
         });
-        const tabLengthEditor = settingsPanel.element.querySelector('[id="editor.tabLength"]');
+        const tabLengthEditor = settingsPanel.element.querySelector('[id="language.tabLength"]');
         expect(tabLengthEditor.getModel().getText()).toBe("");
         expect(tabLengthEditor.getModel().getPlaceholderText()).toBe("Default: 8");
 
         // This is the unscoped default, but it differs from the current unscoped value
-        settingsPanel.set("editor.tabLength", 2);
+        settingsPanel.set("language.tabLength", 2);
         expect(tabLengthEditor.getModel().getText()).toBe("2");
-        expect(atom.config.get("editor.tabLength", { scope: ["source.js"] })).toBe(2);
+        expect(atom.config.get("language.tabLength", { scope: ["source.js"] })).toBe(2);
       });
 
       it("allows the scoped setting to be changed to the unscoped default if it is different", () => {
         settingsPanel = new SettingsPanel({
-          namespace: "editor",
+          namespace: "language",
           includeTitle: false,
           scopeName: ".source.python",
         });
-        const tabLengthEditor = settingsPanel.element.querySelector('[id="editor.tabLength"]');
+        const tabLengthEditor = settingsPanel.element.querySelector('[id="language.tabLength"]');
         expect(tabLengthEditor.getModel().getText()).toBe("");
         expect(tabLengthEditor.getModel().getPlaceholderText()).toBe("Default: 4");
 
         // This is the unscoped default, but it differs from the scoped default
-        settingsPanel.set("editor.tabLength", 2);
+        settingsPanel.set("language.tabLength", 2);
         expect(tabLengthEditor.getModel().getText()).toBe("2");
-        expect(atom.config.get("editor.tabLength", { scope: ["source.python"] })).toBe(2);
+        expect(atom.config.get("language.tabLength", { scope: ["source.python"] })).toBe(2);
       });
     });
   });

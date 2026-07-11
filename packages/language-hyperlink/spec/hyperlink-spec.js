@@ -8,7 +8,7 @@ describe("Hyperlink grammar", function () {
     // line in isolation, which is something that a `WASMTreeSitterGrammar`
     // cannot do. This package will need specialized tests for the modern
     // Tree-sitter world the same way that most other language packages do.
-    atom.config.set("core.useTreeSitterParsers", false);
+    atom.config.set("language.useTreeSitterParsers", false);
     waitsForPromise(() => atom.packages.activatePackage("language-hyperlink"));
 
     runs(() => (grammar = atom.grammars.grammarForScopeName("text.hyperlink")));

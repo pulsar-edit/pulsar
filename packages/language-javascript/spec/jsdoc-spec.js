@@ -2,7 +2,7 @@ describe("JSDoc grammar", function () {
   let grammar = null;
 
   beforeEach(function () {
-    atom.config.set("core.useTreeSitterParsers", false);
+    atom.config.set("language.useTreeSitterParsers", false);
 
     waitsForPromise(() => atom.packages.activatePackage("language-javascript"));
 

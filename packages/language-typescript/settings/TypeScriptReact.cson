@@ -1,5 +1,5 @@
 '.source.tsx':
-  'editor':
+  'language':
     'commentStart': '// '
     'commentDelimiters':
       'line': '//'
@@ -15,7 +15,7 @@
       '
 
 '.meta.tag.tsx, .meta.block.jsx.ts.tsx':
-  'editor':
+  'language':
     'commentStart': '{/* ',
     'commentEnd': ' */}',
     'commentDelimiters':
@@ -24,7 +24,7 @@
     'decreaseIndentPattern': "^\\s*(\\s*/[*].*[*]/\\s*)*[}\\])]|^\\s*(</|/>)"
 
 '.meta.tag.tsx .meta.block.ts.tsx':
-  editor:
+  language:
     commentStart: '// '
     comments:
       line: '//'

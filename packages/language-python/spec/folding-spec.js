@@ -22,7 +22,7 @@ describe("Python folding (modern Tree-sitter)", () => {
   }
 
   beforeEach(async () => {
-    atom.config.set("core.useTreeSitterParsers", true);
+    atom.config.set("language.useTreeSitterParsers", true);
 
     editor = await atom.workspace.open();
     editor.displayLayer.reset({ foldCharacter: "…" });

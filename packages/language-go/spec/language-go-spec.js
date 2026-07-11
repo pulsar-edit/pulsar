@@ -4,7 +4,7 @@ describe("Go settings", function () {
   afterEach(() => editor.destroy());
 
   beforeEach(function () {
-    atom.config.set("core.useTreeSitterParsers", false);
+    atom.config.set("language.useTreeSitterParsers", false);
 
     waitsForPromise(() =>
       atom.workspace.open().then(function (o) {

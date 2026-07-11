@@ -142,7 +142,7 @@ module.exports = class BracketMatcher {
       this.editor.transact(() => {
         this.origEditorInsertText("\n\n");
         this.editor.moveUp();
-        if (this.getScopedSetting("editor.autoIndent")) {
+        if (this.getScopedSetting("language.autoIndent")) {
           const cursorRow = this.editor.getCursorBufferPosition().row;
           this.editor.autoIndentBufferRows(cursorRow, cursorRow + 1);
         }

@@ -239,7 +239,7 @@ module.exports = class Whitespace {
     let scope = editor.getRootScopeDescriptor();
     let fileTabSize = editor.getTabLength();
 
-    let userTabSize = atom.config.get("editor.tabLength", {
+    let userTabSize = atom.config.get("language.tabLength", {
       scope: scope,
     });
 

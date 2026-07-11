@@ -1,5 +1,5 @@
 '.source.sass':
-  'editor':
+  'language':
     'autoIndentOnPaste': false
     'increaseIndentPattern': '''(?x)
       ^(?!\\s*$)\\s* # Start of non empty line
@@ -16,12 +16,12 @@
     '''
 
 '.source.css.scss':
-  'editor':
+  'language':
     'increaseIndentPattern': '(^.*\\{[^}]*$)'
     'decreaseIndentPattern': '^\\s*\\}'
 
 '.source.sass, .source.css.scss':
-  'editor':
+  'language':
     'nonWordCharacters': '/\\()"\':,.;<>~!#%^&*|+=[]{}`?…'
     'commentStart': '// '
     'commentDelimiters':

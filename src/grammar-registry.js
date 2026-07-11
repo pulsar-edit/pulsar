@@ -53,7 +53,7 @@ module.exports = class GrammarRegistry {
     };
 
     this.subscriptions.add(
-      this.config.onDidChange("core.useTreeSitterParsers", onLanguageModeChange),
+      this.config.onDidChange("language.useTreeSitterParsers", onLanguageModeChange),
     );
   }
 
@@ -230,7 +230,7 @@ module.exports = class GrammarRegistry {
     return { grammar: bestMatch, score: highestScore };
   }
 
-  // Looks up a scope-specific `core.useTreeSitterParsers` setting. This allows
+  // Looks up a scope-specific `language.useTreeSitterParsers` setting. This allows
   // users to opt into or out of Tree-sitter parsers on a language-by-language
   // basis.
   getLanguageParserForScope(scope) {
@@ -238,7 +238,7 @@ module.exports = class GrammarRegistry {
       scope = new ScopeDescriptor({ scopes: [scope] });
     }
 
-    let useTreeSitterParsers = this.config.get("core.useTreeSitterParsers", { scope });
+    let useTreeSitterParsers = this.config.get("language.useTreeSitterParsers", { scope });
     return useTreeSitterParsers ? "wasm-tree-sitter" : "textmate";
   }
 

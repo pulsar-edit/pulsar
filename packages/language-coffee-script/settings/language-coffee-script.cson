@@ -1,10 +1,10 @@
 '.source.coffee, .source.litcoffee, .source.coffee.md':
-  'editor':
+  'language':
     'commentStart': '# '
     'commentDelimiters':
       'line': '#'
 '.source.coffee':
-  'editor':
+  'language':
     'autoIndentOnPaste': false
     'increaseIndentPattern': '(?x)
       ^\\s*

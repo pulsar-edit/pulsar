@@ -94,7 +94,7 @@ describe("ScopeResolver", () => {
     editor = await atom.workspace.open("");
     buffer = editor.getBuffer();
     atom.grammars.addGrammar(grammar);
-    atom.config.set("core.useTreeSitterParsers", true);
+    atom.config.set("language.useTreeSitterParsers", true);
   });
 
   afterEach(() => {

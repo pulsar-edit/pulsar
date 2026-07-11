@@ -1,5 +1,5 @@
 '.source.plist':
-  'editor':
+  'language':
     'commentStart': '// '
     'commentDelimiters':
       'line': '//'

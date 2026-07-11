@@ -5,7 +5,7 @@ Displays a vertical line in the editor to guide line length.
 ## Features
 
 - **Wrap guide line**: places a vertical line at a column so lines do not exceed a chosen width.
-- **Preferred line length**: uses the `editor.preferredLineLength` value, falling back to the 80th column.
+- **Preferred line length**: uses the `language.preferredLineLength` value, falling back to the 80th column.
 - **Multiple guides**: shows several guide lines at custom columns.
 - **Scoped control**: enables or disables the guide per language through scoped configuration.
 - **Styling**: lets you change the guide's color and width with your own CSS/LESS.
@@ -20,7 +20,7 @@ Disable the guide for a particular language through scoped configuration in your
     'enabled': false
 ```
 
-Show multiple guide lines by listing the columns. The right-most line acts as your `editor.preferredLineLength`:
+Show multiple guide lines by listing the columns. The right-most line acts as your `language.preferredLineLength`:
 
 ```coffeescript
 'wrap-guide':

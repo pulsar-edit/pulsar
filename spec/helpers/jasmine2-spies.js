@@ -50,7 +50,7 @@ exports.register = (jasmineEnv) => {
     atom.config.set("core.destroyEmptyPanes", false);
     atom.config.set("editor.fontFamily", "Courier");
     atom.config.set("editor.fontSize", 16);
-    atom.config.set("editor.autoIndent", false);
+    atom.config.set("language.autoIndent", false);
     atom.config.set("core.disabledPackages", [
       "package-that-throws-an-exception",
       "package-with-broken-package-json",

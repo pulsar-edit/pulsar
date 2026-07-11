@@ -6,7 +6,7 @@ Reflow the current selection so that no line is longer than the preferred line l
 
 - **Selection reflow**: rewraps the selected text to fit within the target line width.
 - **Paragraph reflow**: reflows the current paragraph when nothing is selected.
-- **Configurable width**: uses the `editor.preferredLineLength` config value when set, defaulting to 80 characters.
+- **Configurable width**: uses the `language.preferredLineLength` config value when set, defaulting to 80 characters.
 
 ## Commands
 

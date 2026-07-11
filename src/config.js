@@ -13,6 +13,67 @@ const ScopeDescriptor = require("./scope-descriptor");
 
 const schemaEnforcers = {};
 
+// Settings that moved into the `language` namespace, keyed by the namespace
+// they used to live in.
+const LEGACY_LANGUAGE_KEYS_BY_NAMESPACE = {
+  editor: [
+    "atomicSoftTabs",
+    "autoIndent",
+    "autoIndentOnPaste",
+    "commentDelimiters",
+    "commentEnd",
+    "commentStart",
+    "decreaseIndentPattern",
+    "decreaseNextIndentPattern",
+    "foldEndPattern",
+    "increaseIndentPattern",
+    "largeFileThreshold",
+    "nonWordCharacters",
+    "preferredLineLength",
+    "showIndentGuide",
+    "showInvisibles",
+    "softTabs",
+    "softWrap",
+    "softWrapAtPreferredLineLength",
+    "softWrapHangingIndent",
+    "tabLength",
+    "tabType",
+  ],
+  core: ["useTreeSitterParsers"],
+};
+
+// Rewrites one config-file section (global or scoped) so that legacy entries
+// of moved settings load as `language.*`. Returns a new object when a
+// migration happened; the input is never mutated.
+function migrateLegacyLanguageSettings(settings) {
+  if (settings == null || typeof settings !== "object") return settings;
+
+  let result = settings;
+  for (const namespace in LEGACY_LANGUAGE_KEYS_BY_NAMESPACE) {
+    const namespaceSettings = result[namespace];
+    if (namespaceSettings == null || typeof namespaceSettings !== "object") continue;
+    const movedKeys = LEGACY_LANGUAGE_KEYS_BY_NAMESPACE[namespace].filter(
+      (key) => namespaceSettings[key] !== undefined,
+    );
+    if (movedKeys.length === 0) continue;
+
+    const remaining = Object.assign({}, namespaceSettings);
+    const language = Object.assign({}, result.language);
+    for (const key of movedKeys) {
+      if (language[key] === undefined) language[key] = remaining[key];
+      delete remaining[key];
+    }
+
+    result = Object.assign({}, result, { language });
+    if (Object.keys(remaining).length > 0) {
+      result[namespace] = remaining;
+    } else {
+      delete result[namespace];
+    }
+  }
+  return result;
+}
+
 // Essential: Used to access all of Lumine's configuration details.
 //
 // An instance of this class is always available as the `atom.config` global.
@@ -561,18 +622,18 @@ class Config {
   // ```
   //
   // With scope descriptors you can get settings within a specific editor
-  // scope. For example, you might want to know `editor.tabLength` for ruby
+  // scope. For example, you might want to know `language.tabLength` for ruby
   // files.
   //
   // ```coffee
-  // atom.config.get('editor.tabLength', scope: ['source.ruby']) # => 2
+  // atom.config.get('language.tabLength', scope: ['source.ruby']) # => 2
   // ```
   //
   // This setting in ruby files might be different than the global tabLength setting
   //
   // ```coffee
-  // atom.config.get('editor.tabLength') # => 4
-  // atom.config.get('editor.tabLength', scope: ['source.ruby']) # => 2
+  // atom.config.get('language.tabLength') # => 4
+  // atom.config.get('language.tabLength', scope: ['source.ruby']) # => 2
   // ```
   //
   // You can get the language scope descriptor via
@@ -580,14 +641,14 @@ class Config {
   // for the editor's language.
   //
   // ```coffee
-  // atom.config.get('editor.tabLength', scope: @editor.getRootScopeDescriptor()) # => 2
+  // atom.config.get('language.tabLength', scope: @editor.getRootScopeDescriptor()) # => 2
   // ```
   //
   // Additionally, you can get the setting at the specific cursor position.
   //
   // ```coffee
   // scopeDescriptor = @editor.getLastCursor().getScopeDescriptor()
-  // atom.config.get('editor.tabLength', scope: scopeDescriptor) # => 2
+  // atom.config.get('language.tabLength', scope: scopeDescriptor) # => 2
   // ```
   //
   // * `keyPath` The {String} name of the key to retrieve.
@@ -680,20 +741,20 @@ class Config {
   // ```
   //
   // You can also set scoped settings. For example, you might want change the
-  // `editor.tabLength` only for ruby files.
+  // `language.tabLength` only for ruby files.
   //
   // ```coffee
-  // atom.config.get('editor.tabLength') # => 4
-  // atom.config.get('editor.tabLength', scope: ['source.ruby']) # => 4
-  // atom.config.get('editor.tabLength', scope: ['source.js']) # => 4
+  // atom.config.get('language.tabLength') # => 4
+  // atom.config.get('language.tabLength', scope: ['source.ruby']) # => 4
+  // atom.config.get('language.tabLength', scope: ['source.js']) # => 4
   //
   // # Set ruby to 2
-  // atom.config.set('editor.tabLength', 2, scopeSelector: '.source.ruby') # => true
+  // atom.config.set('language.tabLength', 2, scopeSelector: '.source.ruby') # => true
   //
   // # Notice it's only set to 2 in the case of ruby
-  // atom.config.get('editor.tabLength') # => 4
-  // atom.config.get('editor.tabLength', scope: ['source.ruby']) # => 2
-  // atom.config.get('editor.tabLength', scope: ['source.js']) # => 4
+  // atom.config.get('language.tabLength') # => 4
+  // atom.config.get('language.tabLength', scope: ['source.ruby']) # => 2
+  // atom.config.get('language.tabLength', scope: ['source.js']) # => 4
   // ```
   //
   // * `keyPath` The {String} name of the key.
@@ -996,8 +1057,12 @@ class Config {
       const scopedSettings = newSettings;
       newSettings = newSettings["*"];
       delete scopedSettings["*"];
+      for (const selector in scopedSettings) {
+        scopedSettings[selector] = migrateLegacyLanguageSettings(scopedSettings[selector]);
+      }
       this.resetScopedSettings(scopedSettings, { source });
     }
+    newSettings = migrateLegacyLanguageSettings(newSettings);
 
     return this.transact(() => {
       this._clearUnscopedSettingsForSource(source);

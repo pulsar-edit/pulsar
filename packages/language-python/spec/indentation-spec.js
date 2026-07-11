@@ -24,7 +24,7 @@ describe("Python indentation (modern Tree-sitter)", () => {
   }
 
   beforeEach(async () => {
-    atom.config.set("core.useTreeSitterParsers", true);
+    atom.config.set("language.useTreeSitterParsers", true);
 
     editor = await atom.workspace.open();
     await atom.packages.activatePackage("language-python");

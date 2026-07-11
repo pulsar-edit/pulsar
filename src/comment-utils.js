@@ -65,13 +65,13 @@ function commentStringsFromDelimiters(meta) {
   return result;
 }
 
-// Given a scope, return a single object of `editor.commentDelimiters` data.
+// Given a scope, return a single object of `language.commentDelimiters` data.
 // Needed because an ordinary config lookup will “blend” objects from cascading
 // scopes — which is usually the behavior we want! Just not this time.
 function getDelimitersForScope(scope) {
   let reversed = [...scope.scopes].reverse();
   let mapped = reversed.map((scope) => {
-    return atom.config.get("editor.commentDelimiters", { scope: [scope] });
+    return atom.config.get("language.commentDelimiters", { scope: [scope] });
   });
   let result = mapped.find((setting) => !!setting);
   return result ? normalizeDelimiters(result) : result;

@@ -1,5 +1,5 @@
 '.source.java':
-  'editor':
+  'language':
     'commentStart': '// '
     'commentDelimiters':
       'block': ['/*', '*/']
@@ -8,7 +8,7 @@
     'increaseIndentPattern': '^.*\\{(\\}|[^}"\']*)$|^\\s*(public|private|protected):\\s*$'
     'decreaseIndentPattern': '^(.*\\*/)?\\s*\\}|^\\s*(public|private|protected):\\s*$'
 '.text.html.jsp':
-  'editor':
+  'language':
     'foldEndPattern': '\\*\\*/|^\\s*\\}'
     'commentStart': '<%-- '
     'commentEnd': ' --%>'
@@ -17,15 +17,15 @@
     'increaseIndentPattern': '^\\s*<(([^!/?]|%)(?!.+?([/%]>|</.+?>))|[%!]--\\s*$)'
     'decreaseIndentPattern': '^\\s*(</[^>]+>|-->|--%>)'
 '.text.junit-test-report':
-  'editor':
+  'language':
     'foldEndPattern': '^\\s*(\\}|// \\}\\}\\}$)'
 '.source.java-properties':
-  'editor':
+  'language':
     'commentStart': '# '
     'commentDelimiters':
       'line': '#'
 '.keyword.other.documentation.javadoc.java':
-  'editor':
+  'language':
     'completions': [
       'author'
       'deprecated'

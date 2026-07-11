@@ -1,4 +1,3 @@
-
 const { TextEditor } = require("atom");
 const { conditionPromise } = require("./spec-helper");
 const path = require("path");
@@ -99,7 +98,7 @@ describe("SubsequenceProvider", () => {
   });
 
   it("does not return the prefix as a suggestion", async () => {
-    atom.config.set("editor.nonWordCharacters", "-");
+    atom.config.set("language.nonWordCharacters", "-");
     atom.config.set("autocomplete-plus.extraWordCharacters", "-");
 
     editor.moveToBottom();
@@ -220,12 +219,12 @@ describe("SubsequenceProvider", () => {
     });
   });
 
-  describe("when editor.nonWordCharacters changes", () => {
-    it("includes characters that are included in the `autocomplete-plus.extraWordCharacters` setting or not excluded in the `editor.nonWordCharacters` setting", async () => {
+  describe("when language.nonWordCharacters changes", () => {
+    it("includes characters that are included in the `autocomplete-plus.extraWordCharacters` setting or not excluded in the `language.nonWordCharacters` setting", async () => {
       const scopeSelector = editor.getLastCursor().getScopeDescriptor().getScopeChain();
       editor.insertText("good$noodles good-beef ");
 
-      atom.config.set("editor.nonWordCharacters", "$-", { scopeSelector });
+      atom.config.set("language.nonWordCharacters", "$-", { scopeSelector });
       let sugs = await suggestionsForPrefix(provider, editor, "good");
       expect(sugs).not.toContain("good$noodles");
       expect(sugs).not.toContain("good-beef");
@@ -235,7 +234,7 @@ describe("SubsequenceProvider", () => {
       expect(sugs).toContain("good-beef");
       expect(sugs).not.toContain("good$noodles");
 
-      atom.config.set("editor.nonWordCharacters", "-", { scopeSelector });
+      atom.config.set("language.nonWordCharacters", "-", { scopeSelector });
       sugs = await suggestionsForPrefix(provider, editor, "good");
       expect(sugs).toContain("good-beef");
       expect(sugs).toContain("good$noodles");

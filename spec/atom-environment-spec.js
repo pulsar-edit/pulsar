@@ -60,7 +60,7 @@ describe("AtomEnvironment", () => {
     it("loads the default core config schema", () => {
       expect(atom.config.get("core.excludeVcsIgnoredPaths")).toBe(true);
       expect(atom.config.get("core.followSymlinks")).toBe(true);
-      expect(atom.config.get("editor.showInvisibles")).toBe(false);
+      expect(atom.config.get("language.showInvisibles")).toBe(false);
     });
   });
 

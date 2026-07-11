@@ -1,5 +1,5 @@
 '.source.gfm:not(.markup.code)':
-  'editor':
+  'language':
     'softWrap': true
     'commentStart': '<!-- '
     'commentEnd': ' -->'
