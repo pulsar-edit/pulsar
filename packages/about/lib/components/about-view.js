@@ -46,6 +46,10 @@ module.exports = class AboutView extends EtchComponent {
     atom.commands.dispatch(atom.views.getView(atom.workspace), "lumine-updater:check-for-update");
   }
 
+  handleShowOnStartupChange(e) {
+    atom.config.set("welcome.showOnStartup", e.target.checked);
+  }
+
   render() {
     return $.div(
       { className: "pane-item native-key-bindings about" },
@@ -139,10 +143,24 @@ module.exports = class AboutView extends EtchComponent {
       ),
 
       $.div(
+        { className: "about-startup" },
+        $.label(
+          { className: "about-startup-label" },
+          $.input({
+            className: "input-checkbox",
+            type: "checkbox",
+            checked: atom.config.get("welcome.showOnStartup"),
+            onchange: this.handleShowOnStartupChange.bind(this),
+          }),
+          " Show when opening Lumine",
+        ),
+      ),
+
+      $.div(
         { className: "about-love group-start" },
-        $.a({ className: "icon icon-code", href: `${atom.branding.urlGH}` }),
-        $.span({ className: "about-love-text" }, "Made by Lumine Team"),
-        $.a({ className: "icon icon-heart", href: `${atom.branding.urlForum}` }),
+        $.a({ className: "icon icon-code" }),
+        $.span({ className: "about-team-text" }, "Made by Lumine Team"),
+        $.a({ className: "icon icon-code" }),
       ),
     );
   }

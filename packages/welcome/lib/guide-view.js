@@ -8,17 +8,20 @@ export default class GuideView {
     this.props = props;
     this.brand = atom.branding.name;
     this.didClickProjectButton = this.didClickProjectButton.bind(this);
-    this.didClickGitButton = this.didClickGitButton.bind(this);
-    this.didClickGitHubButton = this.didClickGitHubButton.bind(this);
     this.didClickPackagesButton = this.didClickPackagesButton.bind(this);
     this.didClickThemesButton = this.didClickThemesButton.bind(this);
     this.didClickStylingButton = this.didClickStylingButton.bind(this);
     this.didClickInitScriptButton = this.didClickInitScriptButton.bind(this);
     this.didClickSnippetsButton = this.didClickSnippetsButton.bind(this);
+    this.didChangeShowOnStartup = this.didChangeShowOnStartup.bind(this);
     etch.initialize(this);
   }
 
   update() { }
+
+  didChangeShowOnStartup(e) {
+    atom.config.set('welcome.showGuideOnStartup', e.target.checked);
+  }
 
   render() {
     return (
@@ -63,45 +66,6 @@ export default class GuideView {
               </div>
             </details>
 
-            <details className="welcome-card" {...this.getSectionProps('git')}>
-              <summary className="welcome-summary icon icon-mark-github">
-                Version control with{' '}
-                <span class="welcome-highlight">Git and GitHub</span>
-              </summary>
-              <div className="welcome-detail">
-                <p>
-                  <img
-                    className="welcome-img"
-                    src="atom://welcome/assets/package.svg"
-                  />
-                </p>
-                <p>
-                  Track changes to your code as you work. Branch, commit, push,
-                  and pull without leaving the comfort of your editor.
-                  Collaborate with other developers on GitHub.
-                </p>
-                <p>
-                  <button
-                    onclick={this.didClickGitButton}
-                    className="btn btn-primary inline-block"
-                  >
-                    Open the Git panel
-                  </button>
-                  <button
-                    onclick={this.didClickGitHubButton}
-                    className="btn btn-primary inline-block"
-                  >
-                    Open the GitHub panel
-                  </button>
-                </p>
-                <p className="welcome-note">
-                  <strong>Next time:</strong> You can toggle the Git tab by
-                  clicking on the
-                  <span className="icon icon-diff" /> button in your status bar.
-                </p>
-              </div>
-            </details>
-
             <details
               className="welcome-card"
               {...this.getSectionProps('packages')}
@@ -142,7 +106,7 @@ export default class GuideView {
               {...this.getSectionProps('themes')}
             >
               <summary className="welcome-summary icon icon-paintcan">
-                Choose a <span class="welcome-highlight">Theme</span>
+                Choose a <span className="welcome-highlight">Theme</span>
               </summary>
               <div className="welcome-detail">
                 <p>
@@ -178,7 +142,7 @@ export default class GuideView {
               {...this.getSectionProps('styling')}
             >
               <summary className="welcome-summary icon icon-paintcan">
-                Customize the <span class="welcome-highlight">Styling</span>
+                Customize the <span className="welcome-highlight">Styling</span>
               </summary>
               <div className="welcome-detail">
                 <p>
@@ -202,7 +166,7 @@ export default class GuideView {
                 <p>Now uncomment some of the examples or try your own</p>
                 <p className="welcome-note">
                   <strong>Next time:</strong> You can open your stylesheet from
-                  Menu {this.getApplicationMenuName()}.
+                  Menu > {this.getApplicationMenuName()}.
                 </p>
               </div>
             </details>
@@ -212,7 +176,7 @@ export default class GuideView {
               {...this.getSectionProps('init-script')}
             >
               <summary className="welcome-summary icon icon-code">
-                Hack on the <span class="welcome-highlight">Init Script</span>
+                Hack on the <span className="welcome-highlight">Init Script</span>
               </summary>
               <div className="welcome-detail">
                 <p>
@@ -247,7 +211,7 @@ export default class GuideView {
               {...this.getSectionProps('snippets')}
             >
               <summary className="welcome-summary icon icon-code">
-                Add a <span class="welcome-highlight">Snippet</span>
+                Add a <span className="welcome-highlight">Snippet</span>
               </summary>
               <div className="welcome-detail">
                 <p>
@@ -287,7 +251,7 @@ export default class GuideView {
               {...this.getSectionProps('shortcuts')}
             >
               <summary className="welcome-summary icon icon-keyboard">
-                Learn <span class="welcome-highlight">Keyboard Shortcuts</span>
+                Learn <span className="welcome-highlight">Keyboard Shortcuts</span>
               </summary>
               <div className="welcome-detail">
                 <p>
@@ -315,6 +279,16 @@ export default class GuideView {
                 </p>
               </div>
             </details>
+
+            <label className="welcome-startup">
+              <input
+                className="input-checkbox"
+                type="checkbox"
+                checked={atom.config.get('welcome.showGuideOnStartup')}
+                onchange={this.didChangeShowOnStartup}
+              />
+              Show when opening {this.brand}
+            </label>
           </section>
         </div>
       </div>
@@ -382,20 +356,6 @@ export default class GuideView {
     atom.commands.dispatch(
       atom.views.getView(atom.workspace),
       'application:open'
-    );
-  }
-
-  didClickGitButton() {
-    atom.commands.dispatch(
-      atom.views.getView(atom.workspace),
-      'github:toggle-git-tab'
-    );
-  }
-
-  didClickGitHubButton() {
-    atom.commands.dispatch(
-      atom.views.getView(atom.workspace),
-      'github:toggle-github-tab'
     );
   }
 

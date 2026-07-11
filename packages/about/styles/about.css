@@ -1,7 +1,7 @@
-@import "ui-variables";
-@import "variables";
-
 .about {
+  /* Package-local palette (was styles/variables.less) */
+  --lumine-gold: #cf9723;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,15 +13,15 @@
   font-size: 1.25em;
   line-height: 1.4;
   padding: 4em 2em;
-  color: @text-color;
-  background-color: @base-background-color;
+  color: var(--text-color);
+  background-color: var(--base-background-color);
 
   button {
     cursor: default;
   }
 
   a:focus {
-    // Don't use Bootstrap default here
+    /* Don't use Bootstrap default here */
     color: inherit;
   }
 
@@ -34,7 +34,7 @@
     min-width: min-content;
   }
 
-  // used to group different elements
+  /* used to group different elements */
   .group-start {
     margin-top: 3em;
   }
@@ -49,7 +49,7 @@
   }
 }
 
-// Header --------------------------------
+/* Header -------------------------------- */
 
 .about-header {
   display: flex;
@@ -71,7 +71,7 @@
   width: 100%;
   max-width: 128px;
   margin: 0 auto;
-  filter: drop-shadow(0 4px 12px fade(#000, 30%));
+  filter: drop-shadow(0 4px 12px rgb(from #000 r g b / 30%));
 }
 
 .about-title {
@@ -79,12 +79,12 @@
   font-size: 3.4em;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: @text-color-highlight;
+  color: var(--text-color-highlight);
 }
 
 .about-subtitle {
   margin: 1em auto;
-  color: @text-color-subtle;
+  color: var(--text-color-subtle);
   font-size: 1.1em;
 }
 
@@ -101,9 +101,9 @@
   display: flex;
   align-items: center;
   padding: 0.25em 1em;
-  border: 1px solid @base-border-color;
+  border: 1px solid var(--base-border-color);
   border-radius: 2em;
-  background-color: @background-color-highlight;
+  background-color: var(--background-color-highlight);
   white-space: nowrap;
   vertical-align: middle;
   transition:
@@ -111,16 +111,16 @@
     border-color 0.2s;
 
   &:hover {
-    color: @text-color-highlight;
-    border-color: @lumine-gold;
+    color: var(--text-color-highlight);
+    border-color: var(--lumine-gold);
   }
   &:active {
-    color: lighten(@text-color, 30%);
+    color: hsl(from var(--text-color) h s calc(l + 30));
   }
 }
 
-// Center the version text in the space between the left edge and the copy icon,
-// which stays pinned on the right.
+/* Center the version text in the space between the left edge and the copy icon,
+   which stays pinned on the right. */
 .about-version {
   flex: 1;
   text-align: center;
@@ -130,7 +130,7 @@
   margin-left: 0.5em;
 }
 
-// Actions --------------------------------
+/* Actions -------------------------------- */
 
 .about-actions {
   .btn-group {
@@ -143,28 +143,42 @@
   }
 }
 
+.about-startup {
+  margin-top: 1.5em;
+  color: var(--text-color-subtle);
+}
+
+.about-startup-label {
+  cursor: default;
+
+  .input-checkbox {
+    margin-right: 0.5em;
+    vertical-align: middle;
+  }
+}
+
 .about-updates-item {
   display: block;
 }
 
 .about-updates-label {
-  color: @text-color-subtle;
+  color: var(--text-color-subtle);
   &.is-strong {
-    color: @text-color;
+    color: var(--text-color);
   }
 }
 
-// Love --------------------------------
+/* Love -------------------------------- */
 
 .about-love {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.75em;
-  color: @text-color-subtle;
+  color: var(--text-color-subtle);
 
   .icon::before {
-    // Make these octicons look good inlined with text
+    /* Make these octicons look good inlined with text */
     position: relative;
     width: auto;
     height: auto;
@@ -173,14 +187,14 @@
   }
 
   .icon-code::before {
-    color: @lumine-gold;
+    color: var(--lumine-gold);
   }
 
   .icon-heart::before {
-    color: @lumine-gold;
+    color: var(--lumine-gold);
   }
 }
 
-.about-love-text {
+.about-team-text {
   text-align: center;
 }

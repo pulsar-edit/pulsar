@@ -2,9 +2,9 @@
 
 import { CompositeDisposable } from "atom";
 
-let WelcomeView, GuideView, ChangeLogView;
+let GuideView, ChangeLogView;
 
-const WELCOME_URI = "atom://welcome/welcome";
+const ABOUT_URI = "atom://about";
 const GUIDE_URI = "atom://welcome/guide";
 const CHANGELOG_URI = "atom://welcome/changelog";
 
@@ -16,14 +16,6 @@ export default class WelcomePackage {
       atom.workspace.addOpener((filePath) => {
         if (filePath === CHANGELOG_URI) {
           return this.createChangeLogView({ uri: CHANGELOG_URI });
-        }
-      }),
-    );
-
-    this.subscriptions.add(
-      atom.workspace.addOpener((filePath) => {
-        if (filePath === WELCOME_URI) {
-          return this.createWelcomeView({ uri: WELCOME_URI });
         }
       }),
     );
@@ -42,8 +34,10 @@ export default class WelcomePackage {
       atom.commands.add("atom-workspace", "welcome:showchangelog", () => this.showChangeLog()),
     );
 
-    if (atom.config.get("welcome.showOnStartup")) {
-      await this.show();
+    const showAbout = atom.config.get("welcome.showOnStartup");
+    const showGuide = atom.config.get("welcome.showGuideOnStartup");
+    if (showAbout || showGuide) {
+      await this.show({ about: showAbout, guide: showGuide });
     }
 
     if (atom.config.get("welcome.showChangeLog")) {
@@ -55,30 +49,34 @@ export default class WelcomePackage {
     }
   }
 
-  show() {
-    return Promise.all([
-      atom.workspace.open(WELCOME_URI, { split: "left" }),
-      atom.workspace.open(GUIDE_URI, { split: "right" }),
-    ]);
+  async show({ about = true, guide = true } = {}) {
+    const opened = [];
+    if (about) {
+      // The About pane (owned by the `about` package) serves as the info panel.
+      // Ensure that package is active before opening its atom://about URI.
+      await atom.packages.activatePackage("about");
+      opened.push(atom.workspace.open(ABOUT_URI, { split: "left" }));
+    }
+    if (guide) {
+      opened.push(atom.workspace.open(GUIDE_URI, { split: "right" }));
+    }
+    return Promise.all(opened);
   }
 
   showChangeLog() {
-    if (atom.config.get("welcome.showOnStartup")) {
-      // If the welcome view will also appear open the changelog on the bottom pane
+    const paneWillShow =
+      atom.config.get("welcome.showOnStartup") || atom.config.get("welcome.showGuideOnStartup");
+    if (paneWillShow) {
+      // If a welcome pane will also appear, open the changelog on the bottom pane
       return Promise.all([atom.workspace.open(CHANGELOG_URI, { split: "down" })]);
     } else {
-      // But if the welcome view is disabled, show the changelog in place of the welcome view.
+      // But if no welcome pane is shown, show the changelog in its place.
       return Promise.all([atom.workspace.open(CHANGELOG_URI, { split: "left" })]);
     }
   }
 
   deactivate() {
     this.subscriptions.dispose();
-  }
-
-  createWelcomeView(state) {
-    if (WelcomeView == null) WelcomeView = require("./welcome-view");
-    return new WelcomeView(state);
   }
 
   createGuideView(state) {

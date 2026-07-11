@@ -11,6 +11,7 @@ describe("Welcome", () => {
   beforeEach(() => {
     welcomePackage = new WelcomePackage();
     atom.config.set("welcome.showOnStartup", true);
+    atom.config.set("welcome.showGuideOnStartup", true);
   });
 
   afterEach(() => {
@@ -25,7 +26,7 @@ describe("Welcome", () => {
     it("opens the welcome panes", () => {
       const panes = atom.workspace.getCenter().getPanes();
       assert.equal(panes.length, 2);
-      assert.equal(panes[0].getItems()[0].getTitle(), "Welcome");
+      assert.equal(panes[0].getItems()[0].getTitle(), "About");
       assert.equal(panes[1].getItems()[0].getTitle(), "Welcome Guide");
     });
   });
@@ -39,7 +40,7 @@ describe("Welcome", () => {
       it("shows the welcome panes", () => {
         const panes = atom.workspace.getCenter().getPanes();
         assert.equal(panes.length, 2);
-        assert.equal(panes[0].getItems()[0].getTitle(), "Welcome");
+        assert.equal(panes[0].getItems()[0].getTitle(), "About");
         assert.equal(panes[1].getItems()[0].getTitle(), "Welcome Guide");
       }));
 
@@ -58,7 +59,7 @@ describe("Welcome", () => {
 
         const panes = atom.workspace.getCenter().getPanes();
         assert.equal(panes.length, 2);
-        assert.equal(panes[0].getItems()[0].getTitle(), "Welcome");
+        assert.equal(panes[0].getItems()[0].getTitle(), "About");
       });
     });
 

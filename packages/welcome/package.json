@@ -15,20 +15,27 @@
   "configSchema": {
     "showOnStartup": {
       "order": 1,
-      "title": "Show On Startup",
-      "description": "Show welcome panes with useful information when opening a new Lumine window.",
+      "title": "Show About On Startup",
+      "description": "Show the About pane when opening a new Lumine window.",
+      "type": "boolean",
+      "default": true
+    },
+    "showGuideOnStartup": {
+      "order": 2,
+      "title": "Show Guide On Startup",
+      "description": "Show the getting-started Guide when opening a new Lumine window.",
       "type": "boolean",
       "default": true
     },
     "showChangeLog": {
-      "order": 2,
+      "order": 3,
       "title": "Show Change Log",
       "description": "Show a Change Log after an update.",
       "type": "boolean",
       "default": true
     },
     "lastViewedChangeLog": {
-      "order": 3,
+      "order": 4,
       "title": "Last Viewed Change Log",
       "description": "This is used to keep track of what Change Logs you've dismissed. Change this value to see one again.",
       "type": "string",
@@ -36,9 +43,7 @@
     }
   },
   "deserializers": {
-    "WelcomeView": "createWelcomeView",
-    "GuideView": "createGuideView",
-    "ConsentView": "createConsentView"
+    "GuideView": "createGuideView"
   },
   "dependencies": {
     "etch": "0.9.0"
