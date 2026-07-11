@@ -46,8 +46,7 @@ class MenuLabel {
 
     labelItem.submenu.forEach((o) => {
       try {
-        const cleanedItem = MenuItem.cleanTemplateLabels(o);
-        self.addChild(MenuItem.createMenuItem(cleanedItem));
+        self.addChild(MenuItem.createMenuItem(o));
       } catch (e) {
         console.error(e);
       }

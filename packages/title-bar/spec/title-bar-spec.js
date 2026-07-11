@@ -19,6 +19,12 @@ describe("Title Bar package", () => {
     expect(titleBar.querySelector(".btn-close")).toExist();
   });
 
+  it("populates the application menu", () => {
+    const titleBar = workspaceElement.querySelector(".title-bar");
+
+    expect(titleBar.querySelector(".app-menu .menu-item")).toExist();
+  });
+
   it("sets intrinsic logo dimensions before styles load", () => {
     atom.config.set("title-bar.logoStyle", "Filled");
     const logo = workspaceElement.querySelector(".title-bar .app-icon svg");
