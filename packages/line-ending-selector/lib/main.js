@@ -119,6 +119,7 @@ export function consumeStatusBar(statusBar) {
 
   statusBarItem.onClick(() => {
     const editor = atom.workspace.getActiveTextEditor();
+    if (!editor) return;
     atom.commands.dispatch(atom.views.getView(editor), "line-ending-selector:show");
   });
 
