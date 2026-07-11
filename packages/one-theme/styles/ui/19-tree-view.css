@@ -29,6 +29,28 @@
       background: var(--button-background-color-selected);
     }
   }
+
+  /* Hover highlight — a full-width bar like the selected state, shown only on
+     the row directly under the cursor. Files use their own ::before; folders
+     use the nested-item's ::before (the header's ::before is the disclosure
+     arrow). `:has(li:hover)` keeps ancestor folders from lighting up when a
+     descendant row is hovered. */
+  li.list-item:not(.list-nested-item):not(.selected):hover::before,
+  .list-nested-item:not(.selected):not(:has(li:hover)):hover::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--ui-line-height);
+    background: var(--background-color-highlight);
+    pointer-events: none;
+  }
+
+  /* Keep the row's content above the hover bar. */
+  li.list-item:not(.list-nested-item):not(.selected):hover > *,
+  .list-nested-item:not(.selected):not(:has(li:hover)):hover > .list-item {
+    position: relative;
+  }
 }
 
 /* Upstream hardcoded `.theme-one-dark-ui` here (a dead rule in one-light-ui),

@@ -14,7 +14,7 @@
   --syntax-selection-color: hsl(220, 13%, 28%);
   --syntax-selection-flash-color: hsl(220, 100%, 66%);
   --syntax-background-color: hsl(220, 13%, 18%);
-  --syntax-wrap-guide-color: hsla(220, 14%, 71%, 0.15);
+  --syntax-wrap-guide-color: hsla(220, 14%, 71%, 0.02);
   --syntax-indent-guide-color: hsla(220, 14%, 71%, 0.15);
   --syntax-invisible-character-color: hsla(220, 14%, 71%, 0.15);
   --syntax-result-marker-color: hsla(220, 100%, 66%, 0.24);

@@ -1,5 +1,3 @@
-/* @modal-padding and @modal-width inlined below (each used once). */
-
 atom-panel-container.modal {
   position: absolute;
   top: 0;
@@ -10,24 +8,32 @@ atom-panel-container.modal {
 atom-panel.modal {
   position: relative;
   width: 100%;
-  max-width: calc(var(--ui-size) * 50);
+  max-width: min(92vw, calc(var(--ui-size) * 70));
   margin: 0 auto;
   left: initial;
   color: var(--text-color);
   background-color: transparent;
   padding: calc(var(--ui-padding) / 2);
+  animation: modal-appear 0.18s cubic-bezier(0.215, 0.61, 0.355, 1);
 
   &.from-top {
-    top: calc(var(--component-padding) * 5);
+    top: calc(var(--component-padding) * 8);
   }
 
   atom-text-editor[mini] {
-    margin-bottom: calc(var(--ui-padding) / 2);
+    margin-bottom: calc(var(--ui-padding) * 0.75);
+    font-size: calc(var(--input-font-size) * 1.05);
   }
 
   .select-list ol.list-group,
   &.select-list ol.list-group {
+    /* Taller than the default select list so more results are visible; scales
+       with the window height and caps so it always fits above the fold. */
+    max-height: min(70vh, calc(var(--ui-line-height) * 24));
+    /* Scroll vertically; clip the rounded corners horizontally. */
+    overflow: hidden auto;
     border: 1px solid var(--overlay-border-color);
+    border-radius: calc(var(--component-border-radius) * 2);
     background-color: hsl(from var(--overlay-background-color) h s calc(l + 2));
 
     &:empty {
@@ -36,12 +42,16 @@ atom-panel.modal {
     }
 
     li {
-      padding: calc(var(--ui-padding) / 2) calc(var(--ui-padding) / 1.5);
+      padding: calc(var(--ui-padding) * 0.6) calc(var(--ui-padding) / 1.5);
       line-height: var(--ui-line-height);
       border-bottom: 1px solid var(--overlay-border-color);
 
       &:last-of-type {
         border-bottom: none;
+      }
+
+      &:hover:not(.selected) {
+        background-color: hsl(from var(--overlay-background-color) h s calc(l + 5));
       }
 
       .icon::before {
@@ -94,8 +104,11 @@ atom-panel.modal {
     bottom: 0;
     z-index: 0;
     background-color: var(--overlay-background-color);
-    border-radius: calc(var(--component-border-radius) * 2);
-    box-shadow: 0 6px 12px -2px hsla(0, 0%, 0%, 0.4);
+    border-radius: calc(var(--component-border-radius) * 3);
+    box-shadow:
+      inset 0 0 0 1px var(--overlay-border-color),
+      0 4px 12px -4px hsla(0, 0%, 0%, 0.35),
+      0 20px 48px -12px hsla(0, 0%, 0%, 0.55);
   }
 
   /* Backdrop */
@@ -111,6 +124,7 @@ atom-panel.modal {
     z-index: -1;
     background: var(--overlay-backdrop-color);
     opacity: var(--overlay-backdrop-opacity);
+    backdrop-filter: blur(3px);
     backface-visibility: hidden; /* fixes scrollbar on retina screens */
     -webkit-animation: overlay-fade 0.24s cubic-bezier(0.215, 0.61, 0.355, 1);
   }
@@ -122,5 +136,14 @@ atom-panel.modal {
   }
   100% {
     opacity: var(--overlay-backdrop-opacity);
+  }
+}
+
+@keyframes modal-appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }

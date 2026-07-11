@@ -342,6 +342,10 @@ export default class GuideView {
     return 'Welcome Guide';
   }
 
+  getIconName() {
+    return 'book';
+  }
+
   isEqual(other) {
     return other instanceof GuideView;
   }
