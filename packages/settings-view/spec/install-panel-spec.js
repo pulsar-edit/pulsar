@@ -76,7 +76,7 @@ describe("InstallPanel", function () {
     it("does not query the package registry", function () {
       panel.search("first");
 
-      expect(panel.refs.searchMessage.textContent).toContain("GitHub repository");
+      expect(panel.refs.searchMessage.textContent).toContain("Git URL");
     }));
 
   describe("searching git packages", function () {
@@ -112,7 +112,7 @@ describe("InstallPanel", function () {
       const query = "this-package-is-so-normal";
       panel.performSearchForQuery(query);
       expect(panel.showGitInstallPackageCard).not.toHaveBeenCalled();
-      expect(panel.refs.searchMessage.textContent).toContain("GitHub repository");
+      expect(panel.refs.searchMessage.textContent).toContain("Git URL");
     });
 
     describe("when a package with the same gitUrlInfo property is installed", function () {

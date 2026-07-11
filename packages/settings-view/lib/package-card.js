@@ -502,7 +502,9 @@ export default class PackageCard {
     this.refs.metaUserContainer.remove();
     this.refs.statsContainer.remove();
     const { gitUrlInfo } = this.pack;
-    if (gitUrlInfo.default === "shortcut") {
+    if (!gitUrlInfo) {
+      this.refs.packageDescription.textContent = this.pack.repository || this.pack.name;
+    } else if (gitUrlInfo.default === "shortcut") {
       this.refs.packageDescription.textContent = gitUrlInfo.https();
     } else {
       this.refs.packageDescription.textContent = gitUrlInfo.toString();

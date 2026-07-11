@@ -3,7 +3,6 @@ const path = require("path");
 const fs = require("fs-plus");
 const InstalledPackagesPanel = require("../lib/installed-packages-panel");
 const PackageManager = require("../lib/package-manager");
-const PackageCard = require("../lib/package-card");
 const SettingsView = require("../lib/settings-view");
 
 describe("InstalledPackagesPanel", function () {
@@ -81,6 +80,20 @@ describe("InstalledPackagesPanel", function () {
       expect(
         this.panel.refs.devPackages.querySelectorAll(".package-card:not(.hidden)").length,
       ).toBe(1);
+    });
+
+    it("shows repository installs as community packages", function () {
+      const packages = this.panel.filterPackages({
+        user: [{ name: "manual-package" }],
+        git: [{ name: "repository-package", apmInstallSource: { type: "git" } }],
+        core: [],
+        dev: [],
+      });
+
+      expect(packages.community.map(({ name }) => name)).toEqual([
+        "manual-package",
+        "repository-package",
+      ]);
     });
 
     it("filters packages by name", function () {
@@ -259,7 +272,7 @@ describe("InstalledPackagesPanel", function () {
       expect(this.panel.element.querySelector(".section-heading-count").textContent).toMatch(
         /^0+$/,
       );
-      expect(this.panel.element.querySelectorAll(".sub-section .icon-package").length).toBe(4);
+      expect(this.panel.element.querySelectorAll(".sub-section .icon-package").length).toBe(3);
       expect(
         this.panel.element.querySelectorAll(".sub-section .icon-package.has-items").length,
       ).toBe(0);
@@ -291,7 +304,7 @@ describe("InstalledPackagesPanel", function () {
       expect(this.panel.element.querySelector(".section-heading-count").textContent).toMatch(
         /^(0\/0)+$/,
       );
-      expect(this.panel.element.querySelectorAll(".sub-section .icon-package").length).toBe(4);
+      expect(this.panel.element.querySelectorAll(".sub-section .icon-package").length).toBe(3);
       expect(
         this.panel.element.querySelectorAll(".sub-section .icon-paintcan.has-items").length,
       ).toBe(0);

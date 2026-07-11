@@ -6,6 +6,11 @@ const hostedGitInfo = require("hosted-git-info");
 const os = require("os");
 const path = require("path");
 const semver = require("semver");
+const {
+  cloneUrlForRepository,
+  parsePackageSource,
+  resolvePackageSource,
+} = require("../../../src/package-source"); // eslint-disable-line n/no-unpublished-require
 
 const Client = require("./atom-io-client");
 
@@ -65,7 +70,6 @@ module.exports = class PackageManager {
   loadFeatured(loadThemes, callback) {
     if (!callback) {
       callback = loadThemes;
-      loadThemes = false;
     }
 
     return callback(null, []);
@@ -199,7 +203,7 @@ module.exports = class PackageManager {
     };
 
     if ((apmInstallSource != null ? apmInstallSource.type : undefined) !== "git") {
-      const error = new Error("Only GitHub package updates are supported.");
+      const error = new Error("Only Git repository package updates are supported.");
       error.packageInstallError = !theme;
       return onError(error);
     }
@@ -429,68 +433,91 @@ module.exports = class PackageManager {
   }
 
   getGitHubInfo(source) {
-    const gitUrlInfo = hostedGitInfo.fromUrl(source);
+    const { repository } = parsePackageSource(source);
+    const gitUrlInfo = hostedGitInfo.fromUrl(repository);
     return gitUrlInfo && gitUrlInfo.type === "github" ? gitUrlInfo : null;
   }
 
   getCloneUrl(source) {
-    const gitUrlInfo = this.getGitHubInfo(source);
-    if (!gitUrlInfo) {
-      throw new Error(
-        "Enter a GitHub repository such as owner/repo or https://github.com/owner/repo.",
-      );
-    }
+    return cloneUrlForRepository(parsePackageSource(source).repository);
+  }
 
-    if (gitUrlInfo.default === "sshurl") {
-      return gitUrlInfo.toString();
-    } else {
-      return gitUrlInfo.https().replace(/^git\+https:/, "https:");
-    }
+  resolvePackageSource(source) {
+    return resolvePackageSource(source, async (cloneUrl, options, patterns) => {
+      const { stdout } = await this.runProcess(this.getGitCommand(), [
+        "ls-remote",
+        ...options,
+        cloneUrl,
+        ...patterns,
+      ]);
+      return stdout;
+    });
   }
 
   async installGitHubPackage(pack) {
     const source = pack.name;
-    const cloneUrl = this.getCloneUrl(source);
+    const resolvedSource = await this.resolvePackageSource(source);
     const cloneDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "lumine-package-")));
 
-    await this.runProcess(this.getGitCommand(), ["clone", "--depth", "1", cloneUrl, cloneDir]);
-    const { stdout: shaOutput } = await this.runProcess(
-      this.getGitCommand(),
-      ["rev-parse", "HEAD"],
-      { cwd: cloneDir },
-    );
-    await this.runProcess(this.getNpmCommand(), ["install", "--production"], { cwd: cloneDir });
-
-    const metadataFilePath = CSON.resolve(path.join(cloneDir, "package"));
-    if (!metadataFilePath) {
-      throw new Error(
-        "The GitHub repository does not contain a package.json or package.cson file.",
+    try {
+      await this.runProcess(this.getGitCommand(), ["init"], { cwd: cloneDir });
+      await this.runProcess(
+        this.getGitCommand(),
+        ["remote", "add", "origin", resolvedSource.cloneUrl],
+        { cwd: cloneDir },
       );
+      await this.runProcess(
+        this.getGitCommand(),
+        ["fetch", "--depth", "1", "origin", resolvedSource.fetchRef],
+        { cwd: cloneDir },
+      );
+      await this.runProcess(this.getGitCommand(), ["checkout", "--detach", "FETCH_HEAD"], {
+        cwd: cloneDir,
+      });
+      const { stdout: shaOutput } = await this.runProcess(
+        this.getGitCommand(),
+        ["rev-parse", "HEAD"],
+        { cwd: cloneDir },
+      );
+      const sha = shaOutput.trim();
+      if (resolvedSource.sha && sha !== resolvedSource.sha) {
+        throw new Error(`Repository ref changed while installing ${source}; please try again.`);
+      }
+
+      await this.runProcess(this.getNpmCommand(), ["install", "--omit=dev"], { cwd: cloneDir });
+
+      const metadataFilePath = CSON.resolve(path.join(cloneDir, "package"));
+      if (!metadataFilePath) {
+        throw new Error("The repository does not contain a package.json or package.cson file.");
+      }
+
+      const metadata = CSON.readFileSync(metadataFilePath);
+      metadata.apmInstallSource = {
+        type: "git",
+        source: resolvedSource.source,
+        repository: resolvedSource.repository,
+        selector: resolvedSource.selector,
+        updatePolicy: resolvedSource.updatePolicy,
+        sha,
+      };
+      this.writePackageMetadata(metadataFilePath, metadata);
+
+      const packageName = metadata.name || path.basename(resolvedSource.repository);
+      this.unload(packageName);
+      const targetDir = path.join(this.getAtomPackagesDirectory(), packageName);
+      fs.removeSync(targetDir);
+      fs.copySync(cloneDir, targetDir);
+      fs.removeSync(path.join(targetDir, ".git"));
+
+      return _.extend({}, pack, metadata, {
+        name: packageName,
+        installPath: targetDir,
+        gitUrlInfo: pack.gitUrlInfo,
+        apmInstallSource: metadata.apmInstallSource,
+      });
+    } finally {
+      fs.removeSync(cloneDir);
     }
-
-    const metadata = CSON.readFileSync(metadataFilePath);
-    const sha = shaOutput.trim();
-    metadata.apmInstallSource = {
-      type: "git",
-      source,
-      sha,
-    };
-    this.writePackageMetadata(metadataFilePath, metadata);
-
-    const packageName = metadata.name || path.basename(source);
-    this.unload(packageName);
-    const targetDir = path.join(this.getAtomPackagesDirectory(), packageName);
-    fs.removeSync(targetDir);
-    fs.copySync(cloneDir, targetDir);
-    fs.removeSync(path.join(targetDir, ".git"));
-    fs.removeSync(cloneDir);
-
-    return _.extend({}, pack, metadata, {
-      name: packageName,
-      installPath: targetDir,
-      gitUrlInfo: pack.gitUrlInfo,
-      apmInstallSource: metadata.apmInstallSource,
-    });
   }
 
   writePackageMetadata(metadataFilePath, metadata) {
@@ -543,18 +570,35 @@ module.exports = class PackageManager {
         continue;
       }
 
+      if (pack.apmInstallSource.updatePolicy === "pinned") {
+        continue;
+      }
+
       try {
-        const cloneUrl = this.getCloneUrl(source);
-        const { stdout } = await this.runProcess(this.getGitCommand(), [
-          "ls-remote",
-          cloneUrl,
-          "HEAD",
-        ]);
-        const latestSha = stdout.trim().split(/\s+/)[0];
-        if (latestSha && latestSha !== currentSha) {
-          updates.push(_.extend({}, pack, { latestSha }));
+        // Old installs did not record a selector and tracked the default branch.
+        const resolved = pack.apmInstallSource.updatePolicy
+          ? await this.resolvePackageSource(source)
+          : null;
+        let latestSha;
+        let latestVersion;
+        if (resolved) {
+          latestSha = resolved.sha;
+          latestVersion = resolved.version;
+        } else {
+          const cloneUrl = this.getCloneUrl(source);
+          const { stdout } = await this.runProcess(this.getGitCommand(), [
+            "ls-remote",
+            cloneUrl,
+            "HEAD",
+          ]);
+          latestSha = stdout.trim().split(/\s+/)[0];
         }
-      } catch (error) {}
+        if (latestSha && latestSha !== currentSha) {
+          updates.push(_.extend({}, pack, { latestSha, latestVersion }));
+        }
+      } catch {
+        // A single unreachable repository must not prevent other update checks.
+      }
     }
 
     return updates;

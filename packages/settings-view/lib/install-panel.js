@@ -5,6 +5,9 @@ import path from "path";
 import etch from "etch";
 import hostedGitInfo from "hosted-git-info";
 
+// eslint-disable-next-line n/no-unpublished-require
+const { cloneUrlForRepository, parsePackageSource } = require("../../../src/package-source");
+
 import { CompositeDisposable, TextEditor } from "atom";
 
 import PackageCard from "./package-card";
@@ -24,7 +27,7 @@ export default class InstallPanel {
 
     this.refs.searchMessage.style.display = "none";
 
-    this.refs.searchEditor.setPlaceholderText("GitHub repository");
+    this.refs.searchEditor.setPlaceholderText("owner/repo[@tag|#commit|~branch]");
     this.searchType = "packages";
     this.disposables.add(
       this.packageManager.on("package-install-failed", ({ error }) => {
@@ -40,7 +43,14 @@ export default class InstallPanel {
             ? this.currentGitPackageCard.pack.gitUrlInfo
             : null;
 
-        if (gitUrlInfo && gitUrlInfo === pack.gitUrlInfo) {
+        const sourceMatches =
+          this.currentGitPackageCard &&
+          this.currentGitPackageCard.pack &&
+          (this.currentGitPackageCard.pack.name ===
+            (pack.apmInstallSource && pack.apmInstallSource.source) ||
+            this.currentGitPackageCard.pack.repository ===
+              (pack.apmInstallSource && pack.apmInstallSource.repository));
+        if ((gitUrlInfo && gitUrlInfo === pack.gitUrlInfo) || sourceMatches) {
           this.updateGitPackageCard(pack);
         }
       }),
@@ -108,7 +118,9 @@ export default class InstallPanel {
 
             <div className="text native-key-bindings" tabIndex="-1">
               <span className="icon icon-question" />
-              <span ref="publishedToText">Packages are installed from </span>
+              <span ref="publishedToText">
+                Packages are installed from Git repositories such as{" "}
+              </span>
               <a className="link" onclick={this.didClickOpenAtomIo.bind(this)}>
                 GitHub
               </a>
@@ -160,16 +172,17 @@ export default class InstallPanel {
       this.searchType = "themes";
       this.refs.searchThemesButton.classList.add("selected");
       this.refs.searchPackagesButton.classList.remove("selected");
-      this.refs.searchEditor.setPlaceholderText("GitHub repository");
-      this.refs.publishedToText.textContent = "Themes are installed from ";
+      this.refs.searchEditor.setPlaceholderText("owner/repo[@tag|#commit|~branch]");
+      this.refs.publishedToText.textContent = "Themes are installed from Git repositories such as ";
       this.atomIoURL = "https://github.com";
       this.loadFeaturedPackages(true);
     } else if (searchType === "package") {
       this.searchType = "packages";
       this.refs.searchPackagesButton.classList.add("selected");
       this.refs.searchThemesButton.classList.remove("selected");
-      this.refs.searchEditor.setPlaceholderText("GitHub repository");
-      this.refs.publishedToText.textContent = "Packages are installed from ";
+      this.refs.searchEditor.setPlaceholderText("owner/repo[@tag|#commit|~branch]");
+      this.refs.publishedToText.textContent =
+        "Packages are installed from Git repositories such as ";
       this.atomIoURL = "https://github.com";
       this.loadFeaturedPackages();
     }
@@ -198,32 +211,37 @@ export default class InstallPanel {
   }
 
   performSearch() {
-    const query = this.refs.searchEditor.getText().trim().toLowerCase();
+    // Git refs, and paths on some Git servers, are case-sensitive.
+    const query = this.refs.searchEditor.getText().trim();
     if (query) {
       this.performSearchForQuery(query);
     }
   }
 
   performSearchForQuery(query) {
-    const gitUrlInfo = hostedGitInfo.fromUrl(query);
-    if (gitUrlInfo && gitUrlInfo.type === "github") {
-      const type = gitUrlInfo.default;
-      if (type === "sshurl" || type === "https" || type === "shortcut") {
-        this.showGitInstallPackageCard({ name: query, gitUrlInfo });
-      }
-    } else {
+    try {
+      const parsed = parsePackageSource(query);
+      cloneUrlForRepository(parsed.repository);
+      const gitUrlInfo = hostedGitInfo.fromUrl(parsed.repository);
+      this.showGitInstallPackageCard({
+        name: query,
+        repository: parsed.repository,
+        gitUrlInfo: gitUrlInfo && gitUrlInfo.type === "github" ? gitUrlInfo : null,
+      });
+    } catch {
       this.showGitHubOnlyMessage(query);
     }
   }
 
-  showGitHubOnlyMessage(query) {
+  showGitHubOnlyMessage(_query) {
     if (this.currentGitPackageCard) {
       this.currentGitPackageCard.destroy();
       this.currentGitPackageCard = null;
     }
 
     this.refs.resultsContainer.innerHTML = "";
-    this.refs.searchMessage.textContent = `Enter a GitHub repository such as owner/repo or https://github.com/owner/repo`;
+    this.refs.searchMessage.textContent =
+      "Use owner/repo, owner/repo@tag, owner/repo#commit, or owner/repo~branch. Git URLs support explicit #branch:, #tag:, and #commit: selectors.";
     this.refs.searchMessage.style.display = "";
   }
 
@@ -251,9 +269,10 @@ export default class InstallPanel {
     this.addPackageCardView(this.refs.resultsContainer, this.currentGitPackageCard);
   }
 
-  async search(query) {
+  async search(_query) {
     this.refs.resultsContainer.innerHTML = "";
-    this.refs.searchMessage.textContent = `Enter a GitHub repository such as owner/repo or https://github.com/owner/repo`;
+    this.refs.searchMessage.textContent =
+      "Use owner/repo, owner/repo@tag, owner/repo#commit, or owner/repo~branch. Git URLs support explicit #branch:, #tag:, and #commit: selectors.";
     this.refs.searchMessage.style.display = "";
   }
 
@@ -288,11 +307,11 @@ export default class InstallPanel {
     if (loadThemes) {
       this.refs.installHeading.textContent = "Install Themes";
       this.refs.featuredHeading.textContent = "GitHub Themes";
-      this.refs.loadingMessage.textContent = "Enter a GitHub repository above.";
+      this.refs.loadingMessage.textContent = "Enter a Git repository above.";
     } else {
       this.refs.installHeading.textContent = "Install Packages";
       this.refs.featuredHeading.textContent = "GitHub Packages";
-      this.refs.loadingMessage.textContent = "Enter a GitHub repository above.";
+      this.refs.loadingMessage.textContent = "Enter a Git repository above.";
     }
 
     this.refs.loadingMessage.style.display = "";

@@ -31,7 +31,7 @@ module.exports = function parseCommandLine(processArgs) {
     Paths that start with \`atom://\` will be interpreted as URLs.
 
     Package Management:
-      lumine --install <owner/repo>   Install a package from GitHub.
+      lumine --install <repository>   Install a package from its latest semver tag.
       lumine --uninstall <name>       Uninstall an installed package.
       lumine --list                   List installed packages.
       lumine --link <path>            Symlink a local package (add --dev for dev packages).
@@ -109,13 +109,14 @@ module.exports = function parseCommandLine(processArgs) {
     .describe("package", "Deprecated. Use --install, --uninstall, --list, --link or --unlink.");
   options
     .string("install")
-    .describe("install", "Install a package by `owner/repo` shorthand or a Git URL.");
+    .describe(
+      "install",
+      "Install from owner/repo[@tag|#commit|~branch], or use #branch:, #tag:, or #commit: with a Git URL.",
+    );
   options
     .string("uninstall")
     .describe("uninstall", "Uninstall an installed community package by name.");
-  options
-    .boolean("list")
-    .describe("list", "List installed community and development packages.");
+  options.boolean("list").describe("list", "List installed community and development packages.");
   options
     .string("link")
     .describe(
@@ -124,7 +125,10 @@ module.exports = function parseCommandLine(processArgs) {
     );
   options
     .string("unlink")
-    .describe("unlink", "Remove a symlinked package by name or path (add --dev to only affect dev/packages).");
+    .describe(
+      "unlink",
+      "Remove a symlinked package by name or path (add --dev to only affect dev/packages).",
+    );
   options.boolean("uri-handler");
   options
     .version(

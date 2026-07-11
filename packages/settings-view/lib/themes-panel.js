@@ -27,8 +27,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
     this.items = {
       dev: new List("name"),
       core: new List("name"),
-      user: new List("name"),
-      git: new List("name"),
+      community: new List("name"),
     };
     this.itemViews = {
       dev: new ListView(this.items.dev, this.refs.devPackages, this.createPackageCard.bind(this)),
@@ -37,12 +36,11 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
         this.refs.corePackages,
         this.createPackageCard.bind(this),
       ),
-      user: new ListView(
-        this.items.user,
+      community: new ListView(
+        this.items.community,
         this.refs.communityPackages,
         this.createPackageCard.bind(this),
       ),
-      git: new ListView(this.items.git, this.refs.gitPackages, this.createPackageCard.bind(this)),
     };
 
     this.disposables = new CompositeDisposable();
@@ -296,7 +294,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
 
             <section className="sub-section core-packages">
               <h3 ref="coreThemesHeader" className="sub-section-heading icon icon-paintcan">
-                Core Themes
+                Bundled Themes
                 <span ref="coreCount" className="section-heading-count badge badge-flexible">
                   â€¦
                 </span>
@@ -327,23 +325,6 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
                 </div>
               </div>
             </section>
-
-            <section className="sub-section git-packages">
-              <h3 ref="gitThemesHeader" className="sub-section-heading icon icon-paintcan">
-                Git Themes
-                <span ref="gitCount" className="section-heading-count badge badge-flexible">
-                  â€¦
-                </span>
-              </h3>
-              <div ref="gitPackages" className="container package-container">
-                <div
-                  ref="gitLoadingArea"
-                  className="alert alert-info loading-area icon icon-hourglass"
-                >
-                  Loading themesâ€¦
-                </div>
-              </div>
-            </section>
           </div>
         </section>
       </div>
@@ -355,8 +336,9 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
     packages.user = packages.user.filter(({ theme }) => theme);
     packages.core = packages.core.filter(({ theme }) => theme);
     packages.git = (packages.git || []).filter(({ theme }) => theme);
+    packages.community = packages.user.concat(packages.git);
 
-    for (let packageType of ["dev", "core", "user", "git"]) {
+    for (let packageType of ["dev", "core", "community"]) {
       for (let pack of packages[packageType]) {
         pack.owner = ownerFromRepository(pack.repository);
       }
@@ -367,8 +349,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
   sortThemes(packages) {
     packages.dev.sort(packageComparatorAscending);
     packages.core.sort(packageComparatorAscending);
-    packages.user.sort(packageComparatorAscending);
-    packages.git.sort(packageComparatorAscending);
+    packages.community.sort(packageComparatorAscending);
     return packages;
   }
 
@@ -386,10 +367,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
         this.items.core.setItems(this.packages.core);
 
         this.refs.communityLoadingArea.remove();
-        this.items.user.setItems(this.packages.user);
-
-        this.refs.gitLoadingArea.remove();
-        this.items.git.setItems(this.packages.git);
+        this.items.community.setItems(this.packages.community);
 
         // TODO show empty mesage per section
 
@@ -511,7 +489,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
       return;
     }
 
-    for (let packageType of ["dev", "core", "user", "git"]) {
+    for (let packageType of ["dev", "core", "community"]) {
       const allViews = this.itemViews[packageType].getViews();
       const activeViews = this.itemViews[packageType].filterViews((pack) => {
         if (text === "") {
@@ -545,7 +523,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
     this.updateSectionCount(
       this.refs.communityThemesHeader,
       this.refs.communityCount,
-      this.packages.user.length,
+      this.packages.community.length,
     );
     this.updateSectionCount(
       this.refs.coreThemesHeader,
@@ -557,13 +535,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
       this.refs.devCount,
       this.packages.dev.length,
     );
-    this.updateSectionCount(
-      this.refs.gitThemesHeader,
-      this.refs.gitCount,
-      this.packages.git.length,
-    );
-
-    this.refs.totalPackages.textContent = `${this.packages.user.length + this.packages.core.length + this.packages.dev.length + this.packages.git.length}`;
+    this.refs.totalPackages.textContent = `${this.packages.community.length + this.packages.core.length + this.packages.dev.length}`;
   }
 
   updateFilteredSectionCounts() {
@@ -572,7 +544,7 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
       this.refs.communityThemesHeader,
       this.refs.communityCount,
       community,
-      this.packages.user.length,
+      this.packages.community.length,
     );
 
     const dev = this.notHiddenCardsLength(this.refs.devPackages);
@@ -591,20 +563,9 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
       this.packages.core.length,
     );
 
-    const git = this.notHiddenCardsLength(this.refs.gitPackages);
-    this.updateSectionCount(
-      this.refs.gitThemesHeader,
-      this.refs.gitCount,
-      git,
-      this.packages.git.length,
-    );
-
-    const shownThemes = dev + core + community + git;
+    const shownThemes = dev + core + community;
     const totalThemes =
-      this.packages.user.length +
-      this.packages.core.length +
-      this.packages.dev.length +
-      this.packages.git.length;
+      this.packages.community.length + this.packages.core.length + this.packages.dev.length;
     this.refs.totalPackages.textContent = `${shownThemes}/${totalThemes}`;
   }
 
@@ -613,7 +574,6 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
       this.refs.communityThemesHeader,
       this.refs.coreThemesHeader,
       this.refs.developmentThemesHeader,
-      this.refs.gitThemesHeader,
     ]);
   }
 

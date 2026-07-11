@@ -149,6 +149,20 @@ describe("ThemesPanel", function () {
       expect(panel.refs.devPackages.querySelectorAll(".package-card:not(.hidden)").length).toBe(1);
     });
 
+    it("shows repository themes as community themes", function () {
+      const packages = panel.filterThemes({
+        user: [{ name: "manual-theme", theme: "syntax" }],
+        git: [{ name: "repository-theme", theme: "ui", apmInstallSource: { type: "git" } }],
+        core: [],
+        dev: [],
+      });
+
+      expect(packages.community.map(({ name }) => name)).toEqual([
+        "manual-theme",
+        "repository-theme",
+      ]);
+    });
+
     it("filters themes by name", async () => {
       panel.refs.filterEditor.setText("user-");
       await wait(panel.refs.filterEditor.getBuffer().stoppedChangingDelay);
@@ -271,7 +285,7 @@ describe("ThemesPanel", function () {
       for (let heading of Array.from(panel.element.querySelector(".section-heading-count"))) {
         expect(heading.textContent).toMatch(/^0+$/);
       }
-      expect(panel.element.querySelectorAll(".sub-section .icon-paintcan").length).toBe(4);
+      expect(panel.element.querySelectorAll(".sub-section .icon-paintcan").length).toBe(3);
       expect(panel.element.querySelectorAll(".sub-section .icon-paintcan.has-items").length).toBe(
         0,
       );
@@ -297,7 +311,7 @@ describe("ThemesPanel", function () {
       for (let heading of Array.from(panel.element.querySelector(".section-heading-count"))) {
         expect(heading.textContent).toMatch(/^(0\/0)+$/);
       }
-      expect(panel.element.querySelectorAll(".sub-section .icon-paintcan").length).toBe(4);
+      expect(panel.element.querySelectorAll(".sub-section .icon-paintcan").length).toBe(3);
       expect(panel.element.querySelectorAll(".sub-section .icon-paintcan.has-items").length).toBe(
         0,
       );

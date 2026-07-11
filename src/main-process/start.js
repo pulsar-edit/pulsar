@@ -50,7 +50,8 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   // --link, --unlink). Run the command and exit without opening a window.
   if (args.packageCommand) {
     const { runPackageCommand } = require("./package-cli");
-    process.exit(runPackageCommand(args.packageCommand));
+    runPackageCommand(args.packageCommand).then((code) => process.exit(code));
+    return;
   }
 
   // Persist V8 bytecode of compiled modules across launches to speed up startup.

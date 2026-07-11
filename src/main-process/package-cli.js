@@ -14,6 +14,7 @@ const os = require("os");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const CSON = require("season");
+const { resolvePackageSource } = require("../package-source");
 
 function packagesDirectory() {
   return path.join(process.env.ATOM_HOME, "packages");
@@ -63,20 +64,6 @@ function capture(command, args, options = {}) {
   return result.stdout;
 }
 
-// Turns an `owner/repo` shorthand or a GitHub URL into a clone URL.
-function resolveCloneUrl(source) {
-  const trimmed = source.trim();
-  if (/^https?:\/\//.test(trimmed) || /^git@/.test(trimmed)) {
-    return trimmed.replace(/^git\+/, "");
-  }
-  if (/^[\w.-]+\/[\w.-]+$/.test(trimmed)) {
-    return `https://github.com/${trimmed}.git`;
-  }
-  throw new Error(
-    `Enter a GitHub repository such as owner/repo or https://github.com/owner/repo, got "${source}".`,
-  );
-}
-
 function readMetadata(packagePath) {
   const metadataPath = CSON.resolve(path.join(packagePath, "package"));
   if (!metadataPath) {
@@ -93,19 +80,29 @@ function writeMetadata(metadataPath, metadata) {
   }
 }
 
-function install(source) {
+async function install(source) {
   if (!source) {
     throw new Error("Specify a package to install, e.g. `lumine --install owner/repo`.");
   }
 
-  const cloneUrl = resolveCloneUrl(source);
+  const resolvedSource = await resolvePackageSource(source, async (cloneUrl, options, patterns) =>
+    capture(gitCommand(), ["ls-remote", ...options, cloneUrl, ...patterns]),
+  );
   const cloneDir = fs.mkdtempSync(path.join(os.tmpdir(), "lumine-package-"));
 
   try {
     console.log(`Installing ${source}…`);
-    run(gitCommand(), ["clone", "--depth", "1", cloneUrl, cloneDir]);
+    run(gitCommand(), ["init"], { cwd: cloneDir });
+    run(gitCommand(), ["remote", "add", "origin", resolvedSource.cloneUrl], { cwd: cloneDir });
+    run(gitCommand(), ["fetch", "--depth", "1", "origin", resolvedSource.fetchRef], {
+      cwd: cloneDir,
+    });
+    run(gitCommand(), ["checkout", "--detach", "FETCH_HEAD"], { cwd: cloneDir });
     const sha = capture(gitCommand(), ["rev-parse", "HEAD"], { cwd: cloneDir }).trim();
-    run(npmCommand(), ["install", "--production"], { cwd: cloneDir });
+    if (resolvedSource.sha && sha !== resolvedSource.sha) {
+      throw new Error(`Repository ref changed while installing ${source}; please try again.`);
+    }
+    run(npmCommand(), ["install", "--omit=dev"], { cwd: cloneDir });
 
     const read = readMetadata(cloneDir);
     if (!read) {
@@ -113,10 +110,17 @@ function install(source) {
     }
 
     const { path: metadataPath, metadata } = read;
-    metadata.apmInstallSource = { type: "git", source, sha };
+    metadata.apmInstallSource = {
+      type: "git",
+      source: resolvedSource.source,
+      repository: resolvedSource.repository,
+      selector: resolvedSource.selector,
+      updatePolicy: resolvedSource.updatePolicy,
+      sha,
+    };
     writeMetadata(metadataPath, metadata);
 
-    const name = metadata.name || path.basename(source);
+    const name = metadata.name || path.basename(resolvedSource.repository);
     const targetDir = path.join(packagesDirectory(), name);
     fs.rmSync(targetDir, { recursive: true, force: true });
     fs.mkdirSync(packagesDirectory(), { recursive: true });
@@ -154,7 +158,9 @@ function listDirectory(directory) {
   }
   return fs
     .readdirSync(directory, { withFileTypes: true })
-    .filter((entry) => !entry.name.startsWith(".") && (entry.isDirectory() || entry.isSymbolicLink()))
+    .filter(
+      (entry) => !entry.name.startsWith(".") && (entry.isDirectory() || entry.isSymbolicLink()),
+    )
     .map((entry) => {
       const version = readVersion(path.join(directory, entry.name));
       return version ? `${entry.name}@${version}` : entry.name;
@@ -239,7 +245,7 @@ const COMMANDS = { install, uninstall, list, link, unlink };
 
 // Runs a parsed package command. `command` is `{ name, arg, dev }`. Returns a
 // process exit code.
-function runPackageCommand(command) {
+async function runPackageCommand(command) {
   const handler = COMMANDS[command.name];
   if (!handler) {
     process.stderr.write(`Unknown package command: ${command.name}\n`);
@@ -247,7 +253,7 @@ function runPackageCommand(command) {
   }
 
   try {
-    handler(command.arg, { dev: command.dev });
+    await handler(command.arg, { dev: command.dev });
     return 0;
   } catch (error) {
     process.stderr.write(`${error.message || error}\n`);

@@ -25,8 +25,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
     this.items = {
       dev: new List("name"),
       core: new List("name"),
-      user: new List("name"),
-      git: new List("name"),
+      community: new List("name"),
     };
     this.itemViews = {
       dev: new ListView(this.items.dev, this.refs.devPackages, this.createPackageCard.bind(this)),
@@ -35,12 +34,11 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
         this.refs.corePackages,
         this.createPackageCard.bind(this),
       ),
-      user: new ListView(
-        this.items.user,
+      community: new ListView(
+        this.items.community,
         this.refs.communityPackages,
         this.createPackageCard.bind(this),
       ),
-      git: new ListView(this.items.git, this.refs.gitPackages, this.createPackageCard.bind(this)),
     };
 
     this.subscriptions = new CompositeDisposable();
@@ -52,7 +50,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
     this.subscriptions.add(
       this.packageManager.on(
         "package-install-failed theme-install-failed package-uninstall-failed theme-uninstall-failed package-update-failed theme-update-failed",
-        ({ pack, error }) => {
+        ({ error }) => {
           this.refs.updateErrors.appendChild(new ErrorView(this.packageManager, error).element);
         },
       ),
@@ -147,7 +145,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
 
             <section className="sub-section core-packages">
               <h3 ref="corePackagesHeader" className="sub-section-heading icon icon-package">
-                Core Packages
+                Bundled Packages
                 <span ref="coreCount" className="section-heading-count badge badge-flexible">
                   …
                 </span>
@@ -178,23 +176,6 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
                 </div>
               </div>
             </section>
-
-            <section className="sub-section git-packages">
-              <h3 ref="gitPackagesHeader" className="sub-section-heading icon icon-package">
-                Git Packages
-                <span ref="gitCount" className="section-heading-count badge badge-flexible">
-                  …
-                </span>
-              </h3>
-              <div ref="gitPackages" className="container package-container">
-                <div
-                  ref="gitLoadingArea"
-                  className="alert alert-info loading-area icon icon-hourglass"
-                >
-                  Loading packages…
-                </div>
-              </div>
-            </section>
           </div>
         </section>
       </div>
@@ -206,8 +187,9 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
     packages.user = packages.user.filter(({ theme }) => !theme);
     packages.core = packages.core.filter(({ theme }) => !theme);
     packages.git = (packages.git || []).filter(({ theme }) => !theme);
+    packages.community = packages.user.concat(packages.git);
 
-    for (let packageType of ["dev", "core", "user", "git"]) {
+    for (let packageType of ["dev", "core", "community"]) {
       for (let pack of packages[packageType]) {
         pack.owner = ownerFromRepository(pack.repository);
       }
@@ -219,8 +201,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
   sortPackages(packages) {
     packages.dev.sort(packageComparatorAscending);
     packages.core.sort(packageComparatorAscending);
-    packages.user.sort(packageComparatorAscending);
-    packages.git.sort(packageComparatorAscending);
+    packages.community.sort(packageComparatorAscending);
     return packages;
   }
 
@@ -244,10 +225,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
         this.items.core.setItems(this.packages.core);
 
         this.refs.communityLoadingArea.remove();
-        this.items.user.setItems(this.packages.user);
-
-        this.refs.gitLoadingArea.remove();
-        this.items.git.setItems(this.packages.git);
+        this.items.community.setItems(this.packages.community);
 
         // TODO show empty mesage per section
 
@@ -262,7 +240,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
   }
 
   displayPackageUpdates(packagesWithUpdates) {
-    for (const packageType of ["dev", "core", "user", "git"]) {
+    for (const packageType of ["dev", "core", "community"]) {
       for (const packageCard of this.itemViews[packageType].getViews()) {
         const newVersion = packagesWithUpdates[packageCard.pack.name];
         if (newVersion) {
@@ -281,7 +259,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
       return;
     }
 
-    for (let packageType of ["dev", "core", "user", "git"]) {
+    for (let packageType of ["dev", "core", "community"]) {
       const allViews = this.itemViews[packageType].getViews();
       const activeViews = this.itemViews[packageType].filterViews((pack) => {
         if (text === "") {
@@ -315,7 +293,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
     this.updateSectionCount(
       this.refs.communityPackagesHeader,
       this.refs.communityCount,
-      this.packages.user.length,
+      this.packages.community.length,
     );
     this.updateSectionCount(
       this.refs.corePackagesHeader,
@@ -327,17 +305,8 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
       this.refs.devCount,
       this.packages.dev.length,
     );
-    this.updateSectionCount(
-      this.refs.gitPackagesHeader,
-      this.refs.gitCount,
-      this.packages.git.length,
-    );
-
     const totalPackages =
-      this.packages.user.length +
-      this.packages.core.length +
-      this.packages.dev.length +
-      this.packages.git.length;
+      this.packages.community.length + this.packages.core.length + this.packages.dev.length;
     this.refs.totalPackages.textContent = totalPackages.toString();
   }
 
@@ -347,7 +316,7 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
       this.refs.communityPackagesHeader,
       this.refs.communityCount,
       community,
-      this.packages.user.length,
+      this.packages.community.length,
     );
 
     const core = this.notHiddenCardsLength(this.refs.corePackages);
@@ -366,20 +335,9 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
       this.packages.dev.length,
     );
 
-    const git = this.notHiddenCardsLength(this.refs.gitPackages);
-    this.updateSectionCount(
-      this.refs.gitPackagesHeader,
-      this.refs.gitCount,
-      git,
-      this.packages.git.length,
-    );
-
-    const shownPackages = dev + core + community + git;
+    const shownPackages = dev + core + community;
     const totalPackages =
-      this.packages.user.length +
-      this.packages.core.length +
-      this.packages.dev.length +
-      this.packages.git.length;
+      this.packages.community.length + this.packages.core.length + this.packages.dev.length;
     this.refs.totalPackages.textContent = `${shownPackages}/${totalPackages}`;
   }
 
@@ -388,7 +346,6 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
       this.refs.communityPackagesHeader,
       this.refs.corePackagesHeader,
       this.refs.devPackagesHeader,
-      this.refs.gitPackagesHeader,
     ]);
   }
 

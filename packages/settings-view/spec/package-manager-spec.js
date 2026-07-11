@@ -33,7 +33,7 @@ describe("PackageManager", function () {
     }));
 
   describe("::install()", function () {
-    it("fails for non-GitHub package names", function () {
+    it("fails for invalid repository names", function () {
       const installCallback = jasmine.createSpy("installCallback");
       packageManager.install({ name: "something" }, installCallback);
 
@@ -42,7 +42,7 @@ describe("PackageManager", function () {
       runs(function () {
         const installError = installCallback.argsForCall[0][0];
         expect(installError.packageInstallError).toBe(true);
-        expect(installError.message).toContain("GitHub repository");
+        expect(installError.message).toContain("owner/repo");
       });
     });
 
@@ -110,7 +110,7 @@ describe("PackageManager", function () {
       runs(function () {
         const updateError = updateCallback.argsForCall[0][0];
         expect(updateError.packageInstallError).toBe(true);
-        expect(updateError.message).toContain("Only GitHub package updates");
+        expect(updateError.message).toContain("Only Git repository package updates");
       });
     });
 
@@ -206,6 +206,63 @@ describe("PackageManager", function () {
         expect(packageManager.getGitPackageUpdates.callCount).toBe(1);
         expect(packageManager.apmCache.loadOutdated.value).toEqual([{ name: "boop" }]);
       });
+    });
+  });
+
+  describe("::getGitPackageUpdates()", function () {
+    it("finds a newer tag for packages installed with the default selector", function () {
+      spyOn(packageManager, "getLocalPackages").andReturn({
+        git: [
+          {
+            name: "sample",
+            version: "1.0.0",
+            apmInstallSource: {
+              type: "git",
+              source: "owner/sample",
+              updatePolicy: "latest-tag",
+              sha: "1111111111111111111111111111111111111111",
+            },
+          },
+        ],
+      });
+      spyOn(packageManager, "resolvePackageSource").andReturn(
+        Promise.resolve({
+          sha: "2222222222222222222222222222222222222222",
+          version: "2.0.0",
+        }),
+      );
+
+      waitsForPromise(() =>
+        packageManager.getGitPackageUpdates().then((updates) => {
+          expect(updates.length).toBe(1);
+          expect(updates[0].latestSha).toBe("2222222222222222222222222222222222222222");
+          expect(updates[0].latestVersion).toBe("2.0.0");
+        }),
+      );
+    });
+
+    it("does not check explicitly pinned tags or commits", function () {
+      spyOn(packageManager, "getLocalPackages").andReturn({
+        git: [
+          {
+            name: "sample",
+            apmInstallSource: {
+              type: "git",
+              source: "owner/sample#tag:v1.0.0",
+              updatePolicy: "pinned",
+              sha: "1111111111111111111111111111111111111111",
+            },
+          },
+        ],
+      });
+      spyOn(packageManager, "resolvePackageSource");
+
+      waitsForPromise(() =>
+        packageManager.getGitPackageUpdates().then((updates) => {
+          expect(updates).toEqual([]);
+          expect(packageManager.resolvePackageSource).not.toHaveBeenCalled();
+        }),
+      );
     });
   });
 });
