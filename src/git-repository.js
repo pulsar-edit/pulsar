@@ -156,7 +156,7 @@ module.exports = class GitRepository {
   //
   // * `callback` {Function}
   //   * `event` {Object}
-  //     * `path` {String} the old parameters the decoration used to have
+  //     * `path` {String} the path whose status changed
   //     * `pathStatus` {Number} representing the status. This value can be passed to
   //       {::isStatusModified} or {::isStatusNew} to get more information.
   //
@@ -165,7 +165,7 @@ module.exports = class GitRepository {
     return this.emitter.on("did-change-status", callback);
   }
 
-  // Public: Invoke the given callback when a multiple files' statuses have
+  // Public: Invoke the given callback when multiple files' statuses have
   // changed. For example, on window focus, the status of all the paths in the
   // repo is checked. If any of them have changed, this will be fired. Call
   // {::getPathStatus} to get the status for your path of choice.
@@ -238,7 +238,7 @@ module.exports = class GitRepository {
 
   // Public: Is the given path a submodule in the repository?
   //
-  // * `path` The {String} path to check.
+  // * `filePath` The {String} path to check.
   //
   // Returns a {Boolean}.
   isSubmodule(filePath) {
@@ -359,7 +359,7 @@ module.exports = class GitRepository {
 
   // Public: Get the status of a directory in the repository's working directory.
   //
-  // * `path` The {String} path to check.
+  // * `directoryPath` The {String} directory path to check.
   //
   // Returns a {Number} representing the status. This value can be passed to
   // {::isStatusModified} or {::isStatusNew} to get more information.

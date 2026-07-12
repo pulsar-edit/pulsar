@@ -1008,7 +1008,7 @@ module.exports = class Workspace extends Model {
 
   // Extended: Invoke the given callback when a pane is added to the workspace.
   //
-  // * `callback` {Function} to be called panes are added.
+  // * `callback` {Function} to be called when panes are added.
   //   * `event` {Object} with the following keys:
   //     * `pane` The added pane.
   //
@@ -1036,7 +1036,7 @@ module.exports = class Workspace extends Model {
   // Extended: Invoke the given callback when a pane is destroyed in the
   // workspace.
   //
-  // * `callback` {Function} to be called panes are destroyed.
+  // * `callback` {Function} to be called when panes are destroyed.
   //   * `event` {Object} with the following keys:
   //     * `pane` The destroyed pane.
   //
@@ -1074,7 +1074,7 @@ module.exports = class Workspace extends Model {
   // Extended: Invoke the given callback with the current active pane and when
   // the active pane changes.
   //
-  // * `callback` {Function} to be called with the current and future active#
+  // * `callback` {Function} to be called with the current and future active
   //   panes.
   //   * `pane` A {Pane} that is the current return value of {::getActivePane}.
   //
@@ -1137,7 +1137,7 @@ module.exports = class Workspace extends Model {
   // Extended: Invoke the given callback when a text editor is added to the
   // workspace.
   //
-  // * `callback` {Function} to be called panes are added.
+  // * `callback` {Function} to be called when text editors are added.
   //   * `event` {Object} with the following keys:
   //     * `textEditor` {TextEditor} that was added.
   //     * `pane` {Pane} containing the added text editor.
@@ -1162,7 +1162,7 @@ module.exports = class Workspace extends Model {
   // activated. If no URI is given, or no registered opener can open
   // the URI, a new empty {TextEditor} will be created.
   //
-  // * `uri` (optional) A {String} containing a URI.
+  // * `itemOrURI` (optional) An item to open or a {String} containing a URI.
   // * `options` (optional) {Object}
   //   * `initialLine` A {Number} indicating which row to move the cursor to
   //     initially. Defaults to `0`.
@@ -1798,10 +1798,10 @@ module.exports = class Workspace extends Model {
   //
   // * `item` the Item that the returned pane container must contain.
   //
-  // Returns a {Dock}, the {WorkspaceCenter}, or `undefined` if no item exists
-  // with the given URI.
-  paneContainerForItem(uri) {
-    return this.getPaneContainers().find((container) => container.paneForItem(uri));
+  // Returns a {Dock}, the {WorkspaceCenter}, or `undefined` if no pane container
+  // contains the given item.
+  paneContainerForItem(item) {
+    return this.getPaneContainers().find((container) => container.paneForItem(item));
   }
 
   // Extended: Get the first {Pane} that contains an item with the given URI.
@@ -2557,7 +2557,7 @@ module.exports = class Workspace extends Model {
   //
   // * `filePath` {String} representing the absolute path to a file in the
   //   project. (Any external path will automatically return `false`.)
-  // * `patterns` {Array} of strings that describe glob patterns. Identical to
+  // * `rawPatterns` {Array} of strings that describe glob patterns. Identical to
   //   (and uses the same glob semantics as) the `options.paths` argument of
   //   {::scan}.
   //

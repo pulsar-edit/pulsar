@@ -499,7 +499,7 @@ module.exports = class Dock {
   // changing or closing tabs and ensures critical UI feedback, like changing the
   // highlighted tab, gets priority over work that can be done asynchronously.
   //
-  // * `callback` {Function} to be called when the active pane item stopts
+  // * `callback` {Function} to be called when the active pane item stops
   //   changing.
   //   * `item` The active pane item.
   //
@@ -521,7 +521,7 @@ module.exports = class Dock {
 
   // Extended: Invoke the given callback when a pane is added to the dock.
   //
-  // * `callback` {Function} to be called panes are added.
+  // * `callback` {Function} to be called when panes are added.
   //   * `event` {Object} with the following keys:
   //     * `pane` The added pane.
   //
@@ -544,7 +544,7 @@ module.exports = class Dock {
 
   // Extended: Invoke the given callback when a pane is destroyed in the dock.
   //
-  // * `callback` {Function} to be called panes are destroyed.
+  // * `callback` {Function} to be called when panes are destroyed.
   //   * `event` {Object} with the following keys:
   //     * `pane` The destroyed pane.
   //
@@ -578,7 +578,7 @@ module.exports = class Dock {
   // Extended: Invoke the given callback with the current active pane and when
   // the active pane changes.
   //
-  // * `callback` {Function} to be called with the current and future active#
+  // * `callback` {Function} to be called with the current and future active
   //   panes.
   //   * `pane` A {Pane} that is the current return value of {::getActivePane}.
   //
@@ -652,7 +652,7 @@ module.exports = class Dock {
 
   // Essential: Get the active {Pane}'s active item.
   //
-  // Returns an pane item {Object}.
+  // Returns a pane item {Object}.
   getActivePaneItem() {
     return this.paneContainer.getActivePaneItem();
   }

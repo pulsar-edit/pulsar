@@ -113,8 +113,8 @@ module.exports = class Decoration {
   //
   // * `callback` {Function}
   //   * `event` {Object}
-  //     * `oldProperties` {Object} the old parameters the decoration used to have
-  //     * `newProperties` {Object} the new parameters the decoration now has
+  //     * `oldProperties` {Object} the decoration's previous properties
+  //     * `newProperties` {Object} the decoration's new properties
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeProperties(callback) {

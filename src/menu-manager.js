@@ -19,7 +19,8 @@ if (buildMetadata) {
 //
 // ## Menu CSON Format
 //
-// Here is an example from the [tree-view](https://github.com/atom/tree-view/blob/master/menus/tree-view.cson):
+// Here is an example from Lumine's bundled
+// [tree-view](https://github.com/lumine-code/lumine/blob/master/packages/tree-view/menus/tree-view-plus.cson):
 //
 // ```coffee
 // [
@@ -58,7 +59,7 @@ if (buildMetadata) {
 // ]
 // ```
 //
-// See {::add} for more info about adding menu's directly.
+// See {::add} for more information about adding menus directly.
 module.exports = class MenuManager {
   constructor({ resourcePath, keymapManager, packageManager }) {
     this.resourcePath = resourcePath;
@@ -141,7 +142,7 @@ module.exports = class MenuManager {
       // Selector isn't valid
       return false;
     }
-    // Simulate an atom-text-editor element attached to a atom-workspace element attached
+    // Simulate an atom-text-editor element attached to an atom-workspace element attached
     // to a body element that has the same classes as the current body element.
     if (this.testEditor == null) {
       // Use new document so that custom elements don't actually get created

@@ -81,8 +81,8 @@ module.exports = class ContextMenuManager {
   // To add a context menu, pass a selector matching the elements to which you
   // want the menu to apply as the top level key, followed by a menu descriptor.
   // The invocation below adds a global 'Help' context menu item and a 'History'
-  // submenu on the editor supporting undo/redo. This is just for example
-  // purposes and not the way the menu is actually configured in Atom by default.
+  // submenu on the editor supporting undo/redo. This is only an example and is
+  // not how Lumine's menu is configured by default.
   //
   // ```javascript
   // atom.contextMenu.add({

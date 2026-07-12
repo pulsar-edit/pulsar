@@ -324,7 +324,7 @@ class AtomEnvironment {
    * @name preloadPackages
    * @private
    * @memberof AtomEnvironment
-   * @desc Returns output of `preloadPackages()` for this Classes Instance of `Packages`.
+   * @desc Returns the result of calling `preloadPackages()` on this environment's package manager.
    */
   preloadPackages() {
     return this.packages.preloadPackages();
@@ -489,8 +489,8 @@ class AtomEnvironment {
   // * `callback` {Function} to be called whenever there is an unhandled error
   //   * `event` {Object}
   //     * `originalError` {Object} the original error object
-  //     * `message` {String} the original error object
-  //     * `url` {String} Url to the file where the error originated.
+  //     * `message` {String} the error message
+  //     * `url` {String} URL to the file where the error originated.
   //     * `line` {Number}
   //     * `column` {Number}
   //     * `preventDefault` {Function} call this to avoid popping up the dev tools.
@@ -505,8 +505,8 @@ class AtomEnvironment {
   // * `callback` {Function} to be called whenever there is an unhandled error
   //   * `event` {Object}
   //     * `originalError` {Object} the original error object
-  //     * `message` {String} the original error object
-  //     * `url` {String} Url to the file where the error originated.
+  //     * `message` {String} the error message
+  //     * `url` {String} URL to the file where the error originated.
   //     * `line` {Number}
   //     * `column` {Number}
   //
@@ -525,7 +525,7 @@ class AtomEnvironment {
   // Extended: Invoke the given callback as soon as the shell environment is
   // loaded (or immediately if it was already loaded).
   //
-  // * `callback` {Function} to be called whenever there is an unhandled error
+  // * `callback` {Function} to be called once the shell environment is loaded.
   whenShellEnvironmentLoaded(callback) {
     if (this.shellEnvironmentLoaded) {
       callback();
@@ -617,7 +617,7 @@ class AtomEnvironment {
     return this.loadTime;
   }
 
-  // Public: Get the all the markers with the information about startup time.
+  // Public: Get all markers containing startup timing information.
   //
   // Returns an array of timing markers.
   // Each timing is an object with two keys:
@@ -1210,7 +1210,7 @@ class AtomEnvironment {
   // })
   // ```
   //
-  // * `options` An options {Object}. If the callback argument is also supplied, see the documentation at
+  // * `options` An {Object} of options. If the callback argument is also supplied, see the documentation at
   // https://electronjs.org/docs/api/dialog#dialogshowmessageboxbrowserwindow-options-callback for the list of
   // available options. Otherwise, only the following keys are accepted:
   //   * `message` The {String} message to display.

@@ -106,7 +106,7 @@ module.exports = class BufferedProcess {
   Section: Event Subscription
   */
 
-  // Public: Will call your callback when an error will be raised by the process.
+  // Public: Invoke the given callback when the process raises an error.
   // Usually this is due to the command not being available or not on the PATH.
   // You can call `handle()` on the object passed to your callback to indicate
   // that you have handled this error.

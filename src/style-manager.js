@@ -416,7 +416,7 @@ function transformDeprecatedMathUsage(css, _context) {
   const cssKeyIgnoreList = ["font", "background", "grid-column", "cursor", "aspect-ratio"];
   // There are certain functions that may be used within a CSS value, where `/`
   // or other mathematical expressions are valid, and we do not want to modify.
-  // In those cases, if we find the existance of that function within, then we
+  // In those cases, if we find the existence of that function within, then we
   // stop modifying that value completely.
   const cssValueIgnoreList = /hsl|abs|acos|asin|atan|atan2|cos|mod|rem|sign|sin|tan|url/g;
 

@@ -184,7 +184,7 @@ function migrateLegacyThemeSettings(settings) {
 //   # ...
 // ```
 //
-// See [package docs](https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#package-word-count) for
+// See the [package tutorial](https://docs.pulsar-edit.dev/developing-for-pulsar/package-word-count/) for
 // more info.
 //
 // ## Config Schemas
@@ -586,7 +586,7 @@ class Config {
   //   * `scope` (optional) {ScopeDescriptor} describing a path from
   //     the root of the syntax tree to a token. Get one by calling
   //     {editor.getLastCursor().getScopeDescriptor()}. See {::get} for examples.
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://docs.pulsar-edit.dev/infrastructure/scoped-settings/)
   //     for more information.
   // * `callback` {Function} to call when the value of the key changes.
   //   * `value` the new value of the key
@@ -623,7 +623,7 @@ class Config {
   //   * `scope` (optional) {ScopeDescriptor} describing a path from
   //     the root of the syntax tree to a token. Get one by calling
   //     {editor.getLastCursor().getScopeDescriptor()}. See {::get} for examples.
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://docs.pulsar-edit.dev/infrastructure/scoped-settings/)
   //     for more information.
   // * `callback` {Function} to call when the value of the key changes.
   //   * `event` {Object}
@@ -705,7 +705,7 @@ class Config {
   //   * `scope` (optional) {ScopeDescriptor} describing a path from
   //     the root of the syntax tree to a token. Get one by calling
   //     {editor.getLastCursor().getScopeDescriptor()}
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://docs.pulsar-edit.dev/infrastructure/scoped-settings/)
   //     for more information.
   //
   // Returns the value from Lumine's default settings, the user's configuration
@@ -806,7 +806,7 @@ class Config {
   //   setting to the default value.
   // * `options` (optional) {Object}
   //   * `scopeSelector` (optional) {String}. eg. '.source.ruby'
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-lumine#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://docs.pulsar-edit.dev/infrastructure/scoped-settings/)
   //     for more information.
   //   * `source` (optional) {String} The name of a file with which the setting
   //     is associated. Defaults to the user's config file.

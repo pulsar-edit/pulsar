@@ -282,7 +282,7 @@ module.exports = class Pane {
 
   // Public: Invoke the given callback when an item is added to the pane.
   //
-  // * `callback` {Function} to be called with when items are added.
+  // * `callback` {Function} to be called when items are added.
   //   * `event` {Object} with the following keys:
   //     * `item` The added pane item.
   //     * `index` {Number} indicating where the item is located.
@@ -294,7 +294,7 @@ module.exports = class Pane {
 
   // Public: Invoke the given callback when an item is removed from the pane.
   //
-  // * `callback` {Function} to be called with when items are removed.
+  // * `callback` {Function} to be called when items are removed.
   //   * `event` {Object} with the following keys:
   //     * `item` The removed pane item.
   //     * `index` {Number} indicating where the item was located.
@@ -306,7 +306,7 @@ module.exports = class Pane {
 
   // Public: Invoke the given callback before an item is removed from the pane.
   //
-  // * `callback` {Function} to be called with when items are removed.
+  // * `callback` {Function} to be called before items are removed.
   //   * `event` {Object} with the following keys:
   //     * `item` The pane item to be removed.
   //     * `index` {Number} indicating where the item is located.
@@ -316,7 +316,7 @@ module.exports = class Pane {
 
   // Public: Invoke the given callback when an item is moved within the pane.
   //
-  // * `callback` {Function} to be called with when items are moved.
+  // * `callback` {Function} to be called when items are moved.
   //   * `event` {Object} with the following keys:
   //     * `item` The removed pane item.
   //     * `oldIndex` {Number} indicating where the item was located.
@@ -344,7 +344,7 @@ module.exports = class Pane {
   // Public: Invoke the given callback when the value of {::getActiveItem}
   // changes.
   //
-  // * `callback` {Function} to be called with when the active item changes.
+  // * `callback` {Function} to be called when the active item changes.
   //   * `activeItem` The current active item.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
@@ -356,7 +356,7 @@ module.exports = class Pane {
   // has been called, either initiating or continuing a forward MRU traversal of
   // pane items.
   //
-  // * `callback` {Function} to be called with when the active item changes.
+  // * `callback` {Function} to be called when the active item changes.
   //   * `nextRecentlyUsedItem` The next MRU item, now being set active
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
@@ -368,7 +368,7 @@ module.exports = class Pane {
   // has been called, either initiating or continuing a reverse MRU traversal of
   // pane items.
   //
-  // * `callback` {Function} to be called with when the active item changes.
+  // * `callback` {Function} to be called when the active item changes.
   //   * `previousRecentlyUsedItem` The previous MRU item, now being set active
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
@@ -381,7 +381,7 @@ module.exports = class Pane {
   // current active item to the top of the stack. Typically bound to a modifier
   // (e.g. CTRL) key up event.
   //
-  // * `callback` {Function} to be called with when the MRU traversal is done.
+  // * `callback` {Function} to be called when the MRU traversal is done.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDoneChoosingMRUItem(callback) {
@@ -799,7 +799,7 @@ module.exports = class Pane {
   // Public: Move the given item to the given index.
   //
   // * `item` The item to move.
-  // * `index` {Number} indicating the index to which to move the item.
+  // * `newIndex` {Number} indicating the index to which to move the item.
   moveItem(item, newIndex) {
     const oldIndex = this.items.indexOf(item);
     this.items.splice(oldIndex, 1);

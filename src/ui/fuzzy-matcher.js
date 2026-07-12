@@ -70,10 +70,10 @@ class Matcher {
       optional, meaning they all have defaults
       * `algorithm` Either "fuzzaldrin" or "command-t". Defaults to "fuzzaldrin"
         (the **opposite** of @pulsar-edit/fuzzy-native)
-      * `maxResults` The number of results to be returned. Defaults to Infinite,
-        meaning that it'll return _all results_ that did match. Please notice
-        that this have no difference in actual filtering speed
-      * `recordMatchIndexes` If `true`, returns also `matchIndexes`, an array
+      * `maxResults` The number of results to return. Defaults to `Infinity`,
+        meaning that it'll return _all results_ that did match. Note
+        that this has no effect on filtering speed
+      * `recordMatchIndexes` If `true`, also returns `matchIndexes`, an array
         of numbers where each number is the index (0-based) of the character
         that was matched. Defaults to `false`
       * `numThreads` The number of threads to filter. Defaults to 80% of the

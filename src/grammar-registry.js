@@ -682,7 +682,7 @@ module.exports = class GrammarRegistry {
 
   // Extended: Get all the grammars in this registry.
   //
-  // * `options` (optional) {Object}
+  // * `params` (optional) {Object}
   //   * `includeTreeSitter` (optional) {Boolean} Set to include
   //     [Tree-sitter](https://github.blog/2018-10-31-atoms-new-parsing-system/) grammars
   //

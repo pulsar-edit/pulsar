@@ -386,7 +386,7 @@ class NSFWWatcher extends WorkerProcessWatcher {
 // within active project directories, use {Project::onDidChangeFiles} instead.
 //
 // Multiple PathWatchers may be backed by a single native watcher to conserve
-// operation system resources.
+// operating-system resources.
 //
 // Call {::dispose} to stop receiving events and, if possible, release
 // underlying resources. A PathWatcher may be added to a {CompositeDisposable}

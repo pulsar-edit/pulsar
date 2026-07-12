@@ -95,8 +95,8 @@ module.exports = class Gutter {
   // ## Arguments
   //
   // * `marker` A {DisplayMarker} you want this decoration to follow.
-  // * `decorationParams` An {Object} representing the decoration. It is passed
-  //   to {TextEditor::decorateMarker} as its `decorationParams` and so supports
+  // * `options` An {Object} representing the decoration. It is passed
+  //   to {TextEditor::decorateMarker} as its options argument and so supports
   //   all options documented there.
   //   * `type` __Caveat__: set to `'line-number'` if this is the line-number
   //     gutter, `'gutter'` otherwise. This cannot be overridden.

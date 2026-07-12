@@ -42,7 +42,7 @@ module.exports = class NotificationManager {
   // Public: Add a success notification.
   //
   // * `message` A {String} message
-  // * `options` (optional) An options {Object} with the following keys:
+  // * `options` (optional) An {Object} with the following keys:
   //    * `buttons` (optional) An {Array} of {Object} where each {Object} has
   //      the following options:
   //      * `className` (optional) {String} a class name to add to the button's
@@ -70,7 +70,7 @@ module.exports = class NotificationManager {
   // Public: Add an informational notification.
   //
   // * `message` A {String} message
-  // * `options` (optional) An options {Object} with the following keys:
+  // * `options` (optional) An {Object} with the following keys:
   //    * `buttons` (optional) An {Array} of {Object} where each {Object} has
   //      the following options:
   //      * `className` (optional) {String} a class name to add to the button's
@@ -98,7 +98,7 @@ module.exports = class NotificationManager {
   // Public: Add a warning notification.
   //
   // * `message` A {String} message
-  // * `options` (optional) An options {Object} with the following keys:
+  // * `options` (optional) An {Object} with the following keys:
   //    * `buttons` (optional) An {Array} of {Object} where each {Object} has
   //      the following options:
   //      * `className` (optional) {String} a class name to add to the button's
@@ -126,7 +126,7 @@ module.exports = class NotificationManager {
   // Public: Add an error notification.
   //
   // * `message` A {String} message
-  // * `options` (optional) An options {Object} with the following keys:
+  // * `options` (optional) An {Object} with the following keys:
   //    * `buttons` (optional) An {Array} of {Object} where each {Object} has
   //      the following options:
   //      * `className` (optional) {String} a class name to add to the button's
@@ -157,7 +157,7 @@ module.exports = class NotificationManager {
   // Public: Add a fatal error notification.
   //
   // * `message` A {String} message
-  // * `options` (optional) An options {Object} with the following keys:
+  // * `options` (optional) An {Object} with the following keys:
   //    * `buttons` (optional) An {Array} of {Object} where each {Object} has
   //      the following options:
   //      * `className` (optional) {String} a class name to add to the button's

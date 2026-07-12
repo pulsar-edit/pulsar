@@ -1694,7 +1694,7 @@ module.exports = class TextEditor {
   // Returns the range for the given buffer row.
   //
   // * `row` A row {Number}.
-  // * `options` (optional) An options hash with an `includeNewline` key.
+  // * `options` (optional) An options object with an `includeNewline` key.
   //
   // Returns a {Range}.
   bufferRangeForBufferRow(row, options) {
@@ -2519,7 +2519,7 @@ module.exports = class TextEditor {
   // conversion, which only makes a difference when `options` are supplied.
   //
   // * `bufferPosition` A {Point} or {Array} of [row, column].
-  // * `options` (optional) An options hash for {::clipScreenPosition}.
+  // * `options` (optional) An options object for {::clipScreenPosition}.
   //
   // Returns a {Point}.
   screenPositionForBufferPosition(bufferPosition, options) {
@@ -2552,7 +2552,7 @@ module.exports = class TextEditor {
   // The position is clipped via {::clipScreenPosition} prior to the conversion.
   //
   // * `bufferPosition` A {Point} or {Array} of [row, column].
-  // * `options` (optional) An options hash for {::clipScreenPosition}.
+  // * `options` (optional) An options object for {::clipScreenPosition}.
   //
   // Returns a {Point}.
   bufferPositionForScreenPosition(screenPosition, options) {
@@ -2690,7 +2690,7 @@ module.exports = class TextEditor {
   // Extended: Clip the start and end of the given range to valid positions on screen.
   // See {::clipScreenPosition} for more information.
   //
-  // * `range` The {Range} to clip.
+  // * `screenRange` The {Range} to clip.
   // * `options` (optional) See {::clipScreenPosition} `options`.
   //
   // Returns a {Range}.
@@ -2877,8 +2877,8 @@ module.exports = class TextEditor {
   // buffer is changed, so if you mark a particular word, the marker will remain
   // over that word even if the word's location in the buffer changes.
   //
-  // * `range` A {Range} or range-compatible {Array}
-  // * `properties` A hash of key-value pairs to associate with the marker. There
+  // * `bufferRange` A {Range} or range-compatible {Array}
+  // * `options` A hash of key-value pairs to associate with the marker. There
   //   are also reserved property names that have marker-specific meaning.
   //   * `maintainHistory` (optional) {Boolean} Whether to store this marker's
   //     range before and after each change in the undo history. This allows the
@@ -2911,8 +2911,8 @@ module.exports = class TextEditor {
   // buffer is changed, so if you mark a particular word, the marker will remain
   // over that word even if the word's location in the buffer changes.
   //
-  // * `range` A {Range} or range-compatible {Array}
-  // * `properties` A hash of key-value pairs to associate with the marker. There
+  // * `screenRange` A {Range} or range-compatible {Array}
+  // * `options` A hash of key-value pairs to associate with the marker. There
   //   are also reserved property names that have marker-specific meaning.
   //   * `maintainHistory` (optional) {Boolean} Whether to store this marker's
   //     range before and after each change in the undo history. This allows the
@@ -3005,7 +3005,7 @@ module.exports = class TextEditor {
   // In addition, there are several special properties that will be compared
   // with the range of the markers rather than their properties.
   //
-  // * `properties` An {Object} containing properties that each returned marker
+  // * `params` An {Object} containing properties that each returned marker
   //   must satisfy. Markers can be associated with custom properties, which are
   //   compared with basic equality. In addition, several reserved properties
   //   can be used to filter markers based on their current range:
@@ -3430,7 +3430,7 @@ module.exports = class TextEditor {
   // selections, they are reduced to a single selection with the given range.
   //
   // * `bufferRange` A {Range} or range-compatible {Array}.
-  // * `options` (optional) An options {Object}:
+  // * `options` (optional) An {Object} of options:
   //   * `reversed` A {Boolean} indicating whether to create the selection in a
   //     reversed orientation.
   //   * `preserveFolds` A {Boolean}, which if `true` preserves the fold settings after the
@@ -3443,7 +3443,7 @@ module.exports = class TextEditor {
   // selections, they are replaced by new selections with the given ranges.
   //
   // * `bufferRanges` An {Array} of {Range}s or range-compatible {Array}s.
-  // * `options` (optional) An options {Object}:
+  // * `options` (optional) An {Object} of options:
   //   * `reversed` A {Boolean} indicating whether to create the selection in a
   //     reversed orientation.
   //   * `preserveFolds` A {Boolean}, which if `true` preserves the fold settings after the
@@ -3490,7 +3490,7 @@ module.exports = class TextEditor {
   // selections, they are reduced to a single selection with the given range.
   //
   // * `screenRange` A {Range} or range-compatible {Array}.
-  // * `options` (optional) An options {Object}:
+  // * `options` (optional) An {Object} of options:
   //   * `reversed` A {Boolean} indicating whether to create the selection in a
   //     reversed orientation.
   setSelectedScreenRange(screenRange, options) {
@@ -3504,7 +3504,7 @@ module.exports = class TextEditor {
   // selections, they are replaced by new selections with the given ranges.
   //
   // * `screenRanges` An {Array} of {Range}s or range-compatible {Array}s.
-  // * `options` (optional) An options {Object}:
+  // * `options` (optional) An {Object} of options:
   //   * `reversed` A {Boolean} indicating whether to create the selection in a
   //     reversed orientation.
   setSelectedScreenRanges(screenRanges, options = {}) {
@@ -3531,7 +3531,7 @@ module.exports = class TextEditor {
   // Essential: Add a selection for the given range in buffer coordinates.
   //
   // * `bufferRange` A {Range}
-  // * `options` (optional) An options {Object}:
+  // * `options` (optional) An {Object} of options:
   //   * `reversed` A {Boolean} indicating whether to create the selection in a
   //     reversed orientation.
   //   * `preserveFolds` A {Boolean}, which if `true` preserves the fold settings after the
@@ -3557,7 +3557,7 @@ module.exports = class TextEditor {
   // Essential: Add a selection for the given range in screen coordinates.
   //
   // * `screenRange` A {Range}
-  // * `options` (optional) An options {Object}:
+  // * `options` (optional) An {Object} of options:
   //   * `reversed` A {Boolean} indicating whether to create the selection in a
   //     reversed orientation.
   //   * `preserveFolds` A {Boolean}, which if `true` preserves the fold settings after the
@@ -4852,7 +4852,7 @@ module.exports = class TextEditor {
   //
   // A *foldable* row is a row that *starts* a row range that can be folded.
   //
-  // * `bufferRow` A {Number}
+  // * `screenRow` A {Number}
   //
   // Returns a {Boolean}.
   isFoldableAtScreenRow(screenRow) {
@@ -5539,7 +5539,7 @@ module.exports = class TextEditor {
   // Given a buffer row, indent it.
   //
   // * bufferRow - The row {Number}.
-  // * options - An options {Object} to pass through to {TextEditor::setIndentationForBufferRow}.
+  // * options - An {Object} of options to pass through to {TextEditor::setIndentationForBufferRow}.
   autoIndentBufferRow(bufferRow, options) {
     const indentLevel = this.suggestedIndentForBufferRow(bufferRow, options);
     if (indentLevel?.then) {

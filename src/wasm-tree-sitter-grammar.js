@@ -204,7 +204,7 @@ module.exports = class WASMTreeSitterGrammar {
   // Extended: Retrieves the Tree-sitter `Language` instance associated with
   // this grammar _if_ it has already been loaded.
   //
-  // Language instances cannot be retrieved synchrously, so this will return
+  // Language instances cannot be retrieved synchronously, so this will return
   // `undefined` if the instance has not yet been loaded. In that case, going
   // async will be unavoidable, and you’ll need to call {::getLanguage}.
   getLanguageSync() {
@@ -483,7 +483,7 @@ module.exports = class WASMTreeSitterGrammar {
 
   // Extended: Calls `callback` when this grammar first loads its query files.
   //
-  // Since a grammar may not load immedately on startup, this method makes it
+  // Since a grammar may not load immediately on startup, this method makes it
   // easier to hook into the query life cycle in order to modify or augment a
   // grammar's default queries.
   //
@@ -552,10 +552,10 @@ module.exports = class WASMTreeSitterGrammar {
   // But modern Tree-sitter grammars cannot be injected into legacy Tree-sitter
   // grammars, and vice versa.
   //
-  // * `options` The options for the injection point:
-  //   * `type` A {String} describing type of node to inject into.
+  // * `injectionPoint` The options for the injection point:
+  //   * `type` A {String} describing the type of node to inject into.
   //   * `language` A {Function} that should return a string describing the
-  //     language that should inject into this area. The string should be a
+  //     language that should be injected into this area. The string should be a
   //     short, unambiguous description of the language; it will be tested
   //     against other grammars’ `injectionRegex` properties. Receives one
   //     parameter:
@@ -585,7 +585,7 @@ module.exports = class WASMTreeSitterGrammar {
   //   * `coverShallowerScopes` (optional) {Boolean} controlling whether the
   //     injection should prevent the parent grammar (and any of its
   //     ancestors) from applying scope boundaries within its injection
-  //     range(s). Defalts to `false`.
+  //     range(s). Defaults to `false`.
   //   * `languageScope` (optional) A value that determines what scope, if
   //     any, is added to the injection as its “base” scope name. Can be a
   //     {String}, {null}, or a {Function} that returns either of these values.

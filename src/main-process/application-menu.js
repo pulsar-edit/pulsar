@@ -56,7 +56,7 @@ module.exports = class ApplicationMenu {
     this.enableWindowSpecificItems(true);
   }
 
-  // Flattens the given menu and submenu items into an single Array.
+  // Flattens the given menu and submenu items into a single Array.
   //
   // menu - A complete menu configuration object for atom-shell's menu API.
   //
@@ -72,7 +72,7 @@ module.exports = class ApplicationMenu {
     return items;
   }
 
-  // Flattens the given menu template into an single Array.
+  // Flattens the given menu template into a single Array.
   //
   // template - An object describing the menu item.
   //

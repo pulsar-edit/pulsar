@@ -2238,7 +2238,7 @@ class HighlightIterator {
 
     // The contract of `LayerHighlightIterator#seek` is different from the
     // contract of `HighlightIterator#seek`. Instead of an array of open
-    // scopes, we have it return an two-item array.
+    // scopes, we have it return a two-item array.
     //
     // The first item is a boolean that indicates whether the iterator needs to
     // mark anything _within_ the range that will be highlighted. If not, it
