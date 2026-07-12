@@ -279,7 +279,7 @@
   },
   "private": true,
   "scripts": {
-    "build": "electron-rebuild",
+    "build": "electron-rebuild && electron-rebuild --force --only ctags --build-from-source",
     "postinstall": "patch-package",
     "start": "electron --no-sandbox --enable-logging . -f --dev",
     "dist": "node script/electron-builder.js",

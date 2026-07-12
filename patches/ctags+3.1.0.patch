@@ -1,0 +1,15 @@
+diff --git a/node_modules/ctags/src/tags.cc b/node_modules/ctags/src/tags.cc
+index 01d2de6..c07e610 100644
+--- a/node_modules/ctags/src/tags.cc
++++ b/node_modules/ctags/src/tags.cc
+@@ -21,7 +21,9 @@ void Tags::Init(Local<Object> target) {
+               newTemplate->GetFunction(context).ToLocalChecked());
+ }
+ 
+-NODE_MODULE(ctags, Tags::Init)
++NODE_MODULE_INIT() {
++  Tags::Init(exports);
++}
+ 
+ NAN_METHOD(Tags::New) {
+   Tags *tags = new Tags(Local<String>::Cast(info[0]));
