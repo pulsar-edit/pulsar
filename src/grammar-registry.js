@@ -191,6 +191,10 @@ module.exports = class GrammarRegistry {
       buffer.getPath(),
       getGrammarSelectionContent(buffer)
     );
+
+    // Emit an event whenever a grammar is auto-assigned
+    this.emitter.emit("did-auto-assign-grammar", { grammar: result.grammar, buffer: buffer });
+
     this.languageOverridesByBufferId.delete(buffer.id);
     this.grammarScoresByBuffer.set(buffer, result.score);
     if (result.grammar !== buffer.getLanguageMode().grammar) {
