@@ -18,11 +18,21 @@ CHANNEL=stable
 export ATOM_BASE_NAME
 export ATOM_CHANNEL=$CHANNEL
 
-# Only set the ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT env var if it hasn't
-# been set.
-if [ -z "$ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT" ]
+# Only infer ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT when the caller has not
+# set it explicitly. AppImages use this same script for terminal and desktop
+# launches, so the embedded desktop file cannot always provide the distinction.
+if [ -z "${ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT+x}" ]
 then
-  export ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT=true
+  if [ -n "${APPIMAGE:-}" ] &&
+     [ ! -t 0 ] && [ ! -t 1 ] && [ ! -t 2 ] &&
+     { [ -z "${TERM:-}" ] || [ "${TERM:-}" = "dumb" ]; }
+  then
+    # A standalone AppImage launched without a terminal needs the user's login
+    # shell environment, just like a launch through the desktop file.
+    export ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT=false
+  else
+    export ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT=true
+  fi
 fi
 
 ATOM_ADD=false
