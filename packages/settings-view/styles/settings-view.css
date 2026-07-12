@@ -615,7 +615,7 @@
       padding-top: var(--component-padding);
       padding-left: var(--component-padding);
 
-      td {
+    td {
         white-space: nowrap;
       }
 
@@ -898,13 +898,191 @@
     margin-left: calc(var(--component-padding) / 2);
   }
 
-  .keybinding-panel .is-user {
-    color: var(--text-color-selected);
-    background-color: var(--background-color-selected);
+  .keybindings-heading-row {
+    display: flex;
+    gap: var(--component-padding);
+    align-items: center;
+    justify-content: space-between;
+
+    .section-heading {
+      margin-bottom: 0;
+    }
+  }
+
+  .keybinding-panel {
+    container-type: inline-size;
+
+    > * {
+      width: 100%;
+      max-width: 1200px;
+    }
+  }
+
+  .keybindings-actions {
+    display: flex;
+    gap: calc(var(--component-padding) / 2);
+    flex-wrap: wrap;
+  }
+
+  .keybindings-help {
+    margin: var(--component-padding) 0 0;
+  }
+
+  .keybindings-search-row {
+    display: flex;
+    gap: calc(var(--component-padding) / 2);
+    align-items: stretch;
+
+    .editor-container {
+      flex: 1;
+      margin-bottom: var(--component-padding);
+    }
+
+    > .btn {
+      flex: none;
+      margin-top: calc(var(--component-padding) * 2);
+    }
+  }
+
+  .keybindings-source-filters {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .keybindings-result-status {
+    min-height: var(--component-line-height);
+    margin: var(--component-padding) 0;
+  }
+
+  .keybindings-empty-state {
+    margin: 0;
+  }
+
+  .keybindings-table {
+    width: 100%;
+    table-layout: fixed;
+
+    col.keystroke {
+      width: 12%;
+    }
+    col.command {
+      width: 30%;
+    }
+    col.source {
+      width: 15%;
+    }
+    col.selector {
+      width: 35%;
+    }
+    col.actions {
+      width: 8%;
+    }
+
+    td,
+    th {
+      vertical-align: top;
+    }
+
+    td.command,
+    td.selector,
+    td.keystroke {
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    td.keystroke[rowspan] {
+      vertical-align: middle;
+    }
+
+    .keybinding-mobile-shortcut {
+      display: none;
+    }
+
+    kbd {
+      display: inline-block;
+      padding: 0;
+      color: var(--text-color-highlight);
+      font-family: monospace;
+      font-size: 1em;
+      font-weight: 600;
+      line-height: inherit;
+      white-space: nowrap;
+      border: none;
+      background: none;
+      box-shadow: none;
+    }
+
+    .keybinding-source-badge {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .copy-keybinding {
+      min-width: 68px;
+
+      &.copied {
+        color: var(--text-color-success);
+      }
+    }
   }
 
   .btn-wrap-group .btn {
     margin: 0 calc(var(--component-padding) / 2) calc(var(--component-padding) / 2) 0;
+  }
+}
+
+@container (max-width: 650px) {
+  .keybindings-heading-row {
+    display: block;
+  }
+
+  .keybindings-actions {
+    margin-top: var(--component-padding);
+  }
+
+  .keybindings-table {
+    display: block;
+
+    colgroup,
+    thead {
+      display: none;
+    }
+
+    tbody {
+      display: block;
+    }
+
+    tr {
+      display: block;
+      margin-bottom: var(--component-padding);
+      padding: calc(var(--component-padding) / 2) var(--component-padding);
+      border: 1px solid var(--base-border-color);
+      border-radius: var(--component-border-radius);
+      background-color: var(--base-background-color);
+    }
+
+    td {
+      display: grid;
+      grid-template-columns: 82px minmax(0, 1fr);
+      gap: var(--component-padding);
+      width: 100%;
+      height: auto;
+      padding: calc(var(--component-padding) / 2) 0;
+      white-space: normal;
+      overflow: visible;
+
+      &::before {
+        content: attr(data-label);
+        color: var(--text-color-subtle);
+        font-weight: 600;
+      }
+    }
+
+    .keybinding-mobile-shortcut {
+      display: grid;
+    }
   }
 }
 
