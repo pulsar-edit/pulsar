@@ -4,28 +4,6 @@
   "description": "Find and replace within buffers and across the project.",
   "version": "0.219.8",
   "license": "MIT",
-  "activationCommands": {
-    "atom-workspace": [
-      "project-find:show",
-      "project-find:toggle",
-      "project-find:show-in-current-directory",
-      "find-and-replace:show",
-      "find-and-replace:toggle",
-      "find-and-replace:find-all",
-      "find-and-replace:find-next",
-      "find-and-replace:find-previous",
-      "find-and-replace:find-next-selected",
-      "find-and-replace:find-previous-selected",
-      "find-and-replace:use-selection-as-find-pattern",
-      "find-and-replace:use-selection-as-replace-pattern",
-      "find-and-replace:show-replace",
-      "find-and-replace:replace-next",
-      "find-and-replace:replace-all",
-      "find-and-replace:select-next",
-      "find-and-replace:select-all",
-      "find-and-replace:clear-history"
-    ]
-  },
   "repository": "https://github.com/pulsar-edit/find-and-replace",
   "engines": {
     "atom": "*"
@@ -66,6 +44,11 @@
     }
   },
   "configSchema": {
+    "showInMenuBar": {
+      "type": "boolean",
+      "default": true,
+      "description": "Shows the 'Find' tab in the top menu bar for easy access."
+    },
     "focusEditorAfterSearch": {
       "type": "boolean",
       "default": false,
