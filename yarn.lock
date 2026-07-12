@@ -1981,9 +1981,9 @@ babel-plugin-polyfill-corejs3@^1.0.0:
     "@babel/helper-define-polyfill-provider" "^1.0.0"
     core-js-compat "^3.48.0"
 
-"babel-preset-atomic@https://github.com/lumine-code/babel-preset-atomic.git#9ace752":
+"babel-preset-atomic@https://github.com/lumine-code/babel-preset-atomic.git#0b5bbf6":
   version "5.0.0"
-  resolved "https://github.com/lumine-code/babel-preset-atomic.git#9ace752d27a0e1b8dce5ae8d3a804043c6db195a"
+  resolved "https://github.com/lumine-code/babel-preset-atomic.git#0b5bbf65c95fc5d063593a31de0530f46ec1d131"
   dependencies:
     "@babel/core" "^8.0.1"
     "@babel/plugin-transform-class-properties" "^8.0.1"

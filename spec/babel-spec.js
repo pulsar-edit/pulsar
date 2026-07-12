@@ -40,6 +40,13 @@ describe("Babel transpiler support", function () {
       expect(transpiled(3)).toBe(4);
     }));
 
+  describe("when a .js file contains a legacy JSX pragma", () =>
+    it("transpiles it using the classic JSX runtime", function () {
+      const element = require("./fixtures/babel/jsx-pragma.js");
+      expect(element[0]).toBe("div");
+      expect(element[1]).toEqual({ className: "settings-view" });
+    }));
+
   describe("when a .js file starts with 'use babel';", () =>
     it("transpiles it using babel", function () {
       const transpiled = require("./fixtures/babel/babel-single-quotes.js");

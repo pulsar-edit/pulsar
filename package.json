@@ -50,7 +50,7 @@
     "autocomplete-snippets": "file:packages/autocomplete-snippets",
     "autoflow": "file:packages/autoflow",
     "autosave": "file:./packages/autosave",
-    "babel-preset-atomic": "https://github.com/lumine-code/babel-preset-atomic.git#9ace752",
+    "babel-preset-atomic": "https://github.com/lumine-code/babel-preset-atomic.git#0b5bbf6",
     "background-tips": "file:packages/background-tips",
     "better-sqlite3": "12.11.1",
     "bookmarks": "file:packages/bookmarks",
