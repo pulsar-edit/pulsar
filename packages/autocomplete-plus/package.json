@@ -15,7 +15,7 @@
     "minimatch": "^10.2.5",
     "selector-kit": "^0.1.0",
     "stable": "^0.1.8",
-    "underscore-plus": "^1.7.0"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   },
   "devDependencies": {
     "fs-plus": "^3.1.1",

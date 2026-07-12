@@ -58,8 +58,8 @@ async function modifyMainPackageJson(
 const builder = require("electron-builder");
 
 const ARGS = yargs(hideBin(process.argv))
-  .command("[platform]", "build for a given platform", () => {
-    return yargs.positional("platform", {
+  .command("[platform]", "build for a given platform", (command) => {
+    return command.positional("platform", {
       describe: 'One of "mac", "linux", or "win".',
     });
   })

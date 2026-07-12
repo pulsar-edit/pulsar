@@ -13,7 +13,7 @@
     "etch": "0.9.0",
     "fs-plus": "^3.0.0",
     "grim": "^2.0.1",
-    "underscore-plus": "^1.7.0"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   },
   "consumedServices": {
     "status-bar": {

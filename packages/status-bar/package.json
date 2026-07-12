@@ -12,7 +12,7 @@
   "dependencies": {
     "fs-plus": "^3.0.1",
     "grim": "^2.0.1",
-    "underscore-plus": "^1.0.0"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   },
   "providedServices": {
     "status-bar": {

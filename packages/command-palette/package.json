@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "select-list": "file:../../shared/select-list",
-    "underscore-plus": "^1.0.0"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   },
   "devDependencies": {
     "event-kit": "^2.4.0",

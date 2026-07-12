@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "select-list": "file:../../shared/select-list",
-    "underscore-plus": "^1.7.0"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   },
   "consumedServices": {
     "status-bar": {

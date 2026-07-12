@@ -10,7 +10,8 @@ module.exports = function parseCommandLine(processArgs) {
   // We don't need this flag, and yargs interprets it as many short flags. So, we filter it out.
   const filteredArgs = processArgs.filter((arg) => !arg.startsWith("-psn_"));
 
-  const options = yargs(filteredArgs).wrap(yargs.terminalWidth());
+  const options = yargs(filteredArgs);
+  options.wrap(options.terminalWidth());
   const version = app.getVersion();
   options.usage(
     dedent`Lumine Editor v${version}

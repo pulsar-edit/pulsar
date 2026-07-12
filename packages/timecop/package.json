@@ -15,6 +15,6 @@
   "dependencies": {
     "dedent": "^0.7.0",
     "etch": "^0.12.6",
-    "underscore-plus": "^1.0.0"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   }
 }

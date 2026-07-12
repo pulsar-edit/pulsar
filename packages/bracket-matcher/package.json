@@ -10,7 +10,7 @@
     "atom": "*"
   },
   "dependencies": {
-    "underscore-plus": "1.x"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   },
   "configSchema": {
     "autocompleteCharacters": {

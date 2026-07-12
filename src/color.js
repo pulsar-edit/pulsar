@@ -25,7 +25,7 @@ module.exports = class Color {
     }
 
     if (!ParsedColor) {
-      ParsedColor = require("color");
+      ParsedColor = require("color").default;
     }
 
     try {

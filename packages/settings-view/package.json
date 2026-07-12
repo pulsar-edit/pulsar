@@ -76,7 +76,7 @@
     "request": "^2.83.0",
     "season": "^6.0.2",
     "semver": "^5.3.0",
-    "underscore-plus": "^1.0.6"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   },
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {

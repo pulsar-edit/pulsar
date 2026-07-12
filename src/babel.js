@@ -41,17 +41,29 @@ exports.getCachePath = function (sourceCode) {
 };
 
 exports.compile = function (sourceCode, filePath) {
-  if (!babel) {
-    babel = require("@babel/core");
-  }
   if (process.platform === "win32") {
     filePath = "file:///" + path.resolve(filePath).replace(/\\/g, "/");
   }
 
-  return babel.transformSync(sourceCode, {
-    filename: filePath,
-    configFile,
-  }).code;
+  const stdoutWrite = process.stdout.write;
+  const stderrWrite = process.stderr.write;
+
+  process.stdout.write = () => true;
+  process.stderr.write = () => true;
+
+  try {
+    if (!babel) {
+      babel = require("@babel/core");
+    }
+
+    return babel.transformSync(sourceCode, {
+      filename: filePath,
+      configFile,
+    }).code;
+  } finally {
+    process.stdout.write = stdoutWrite;
+    process.stderr.write = stderrWrite;
+  }
 };
 
 function createVersionAndOptionsDigest(version, options) {

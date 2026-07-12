@@ -16,7 +16,7 @@
     "scoped-property-store": "^0.17.0",
     "season": "^6.0.2",
     "temp": "~0.8.0",
-    "underscore-plus": "^1.0.0"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   },
   "providedServices": {
     "snippets": {

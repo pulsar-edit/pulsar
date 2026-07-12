@@ -12,7 +12,7 @@
   "dependencies": {
     "fs-plus": "^3.0.0",
     "temp": "~0.8.1",
-    "underscore-plus": "1.x"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   },
   "consumedServices": {
     "atom.file-icons": {

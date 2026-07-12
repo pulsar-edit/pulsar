@@ -22,7 +22,7 @@
     "github-markdown-css": "^5.5.1",
     "marked": "18.0.5",
     "morphdom": "^2.7.2",
-    "underscore-plus": "^1.0.0",
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3",
     "yaml-front-matter": "^4.1.1"
   },
   "devDependencies": {

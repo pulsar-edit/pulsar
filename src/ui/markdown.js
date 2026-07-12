@@ -136,7 +136,7 @@ function renderMarkdown(content, givenOpts = {}) {
   };
 
   if (opts.useDefaultEmoji) {
-    mdComponents.deps.markdownItEmoji ??= require("markdown-it-emoji");
+    mdComponents.deps.markdownItEmoji ??= require("markdown-it-emoji").full;
     md.use(mdComponents.deps.markdownItEmoji, {});
   }
   if (opts.useGitHubHeadings) {

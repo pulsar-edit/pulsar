@@ -1,5 +1,3 @@
-const { notarize } = require("@electron/notarize");
-
 // https://kilianvalkhof.com/2019/electron/notarizing-your-electron-application/
 
 /**
@@ -13,36 +11,24 @@ exports.default = async function notarizing(ctx) {
   const teamId = process.env.TEAM_ID;
   const appname = ctx.packager.appInfo.productFilename;
 
-  if (!appleId || !appleIdPassword) {
+  if (!appleId || !appleIdPassword || !teamId) {
     console.error(
-      "environment variables APPLEID and APPLEID_PASSWORD are not both present, skipping notarisation",
+      "environment variables APPLEID, APPLEID_PASSWORD, and TEAM_ID are not all present, skipping notarisation",
     );
     return;
   }
 
+  const { notarize } = await import("@electron/notarize");
+
   /** @type {Parameters<typeof notarize>[0]} */
-  let notarise_args = {
-    appBundleId: "io.github.lumine-code.lumine",
+  const notarise_args = {
     appPath: `${ctx.appOutDir}/${appname}.app`,
     appleId,
     appleIdPassword,
+    teamId,
   };
 
-  if (!teamId) {
-    console.log("no TEAM_ID, using (legacy) altool");
-    notarise_args = {
-      ...notarise_args,
-      tool: "legacy",
-    };
-  } else {
-    console.log("using notarytool");
-
-    notarise_args = {
-      ...notarise_args,
-      tool: "notarytool",
-      teamId,
-    };
-  }
+  console.log("using notarytool");
 
   // eslint-disable-next-line n/no-extraneous-require -- build-only transitive dep
   require("debug").enable("electron-notarize");

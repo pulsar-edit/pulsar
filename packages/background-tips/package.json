@@ -17,6 +17,6 @@
     "You can toggle line comments with {atom-text-editor>editor:toggle-line-comments}"
   ],
   "dependencies": {
-    "underscore-plus": "1.x"
+    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   }
 }

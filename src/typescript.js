@@ -8,6 +8,9 @@ const defaultOptions = {
   target: "es2023",
   module: "commonjs",
   sourceMap: true,
+  // Preserve the permissive runtime transpilation behavior used before
+  // TypeScript 6 enabled strict mode by default.
+  strict: false,
   // By default, do not complain if definition files are missing.
   skipLibCheck: true,
   types: [],
