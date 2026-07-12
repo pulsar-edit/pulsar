@@ -289,7 +289,7 @@
   "private": true,
   "scripts": {
     "build": "electron-rebuild",
-    "build:apm": "cd ppm && yarn install",
+    "build:apm": "yarn --cwd ./ppm install --production",
     "start": "electron --no-sandbox --enable-logging . -f",
     "dist": "node script/electron-builder.js",
     "js-docs": "jsdoc2md --files src --configure docs/.jsdoc.json > ./docs/Pulsar-API-Documentation.md",
