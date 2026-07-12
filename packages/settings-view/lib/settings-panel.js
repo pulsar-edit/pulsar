@@ -443,7 +443,8 @@ function addOverrideWarning(name, element) {
 }
 
 function elementForSetting(namespace, name, value) {
-  let hasOverride = settingHasProjectOverride(`${namespace}.${name}`);
+  const keyPath = `${namespace}.${name}`;
+  let hasOverride = settingHasProjectOverride(keyPath);
   if (namespace === "core") {
     if (name === "themes") {
       return document.createDocumentFragment();
@@ -476,12 +477,13 @@ function elementForSetting(namespace, name, value) {
 
   const controlGroup = document.createElement("div");
   controlGroup.classList.add("control-group");
+  controlGroup.dataset.settingKey = keyPath;
 
   const controls = document.createElement("div");
   controls.classList.add("controls");
   controlGroup.appendChild(controls);
 
-  let el = addOverrideWarning(`${namespace}.${name}`, controlGroup);
+  let el = addOverrideWarning(keyPath, controlGroup);
   el.style.display = hasOverride ? "block" : "none";
 
   let schema = atom.config.getSchema(`${namespace}.${name}`);

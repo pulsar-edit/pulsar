@@ -1,83 +1,153 @@
 const SearchSettingsPanel = require("../lib/search-settings-panel");
 
 describe("SearchSettingsPanel", () => {
+  let searchSettingsPanel;
+
+  beforeEach(() => {
+    searchSettingsPanel = new SearchSettingsPanel(null);
+  });
+
+  afterEach(() => {
+    searchSettingsPanel.destroy();
+  });
+
   describe("handleSettingsString", () => {
-    let searchSettingsPanel = null;
-
-    beforeEach(() => {
-      searchSettingsPanel = new SearchSettingsPanel(null);
+    it("handles null values", () => {
+      expect(searchSettingsPanel.handleSettingsString(null)).toBe("");
     });
 
-    it("Is able to handle null values", () => {
-      let string = searchSettingsPanel.handleSettingsString(null);
-      expect(string).toBe("");
-    });
-
-    it("Is able to convert upercase to lowercase", () => {
-      let string = searchSettingsPanel.handleSettingsString("Hello World");
-      expect(string).toBe("hello world");
-    });
-
-    it("Does nothing to an already lowercase string", () => {
-      let string = searchSettingsPanel.handleSettingsString("hello world");
-      expect(string).toBe("hello world");
+    it("converts uppercase to lowercase", () => {
+      expect(searchSettingsPanel.handleSettingsString("Hello World")).toBe("hello world");
     });
   });
 
   describe("getScore", () => {
-    let searchSettingsPanel = null;
-
-    beforeEach(() => {
-      searchSettingsPanel = new SearchSettingsPanel(null);
+    it("returns a positive score and match indexes for a matching query", () => {
+      const result = searchSettingsPanel.getScore("hello world", "hello");
+      expect(result.score).toBeGreaterThan(0);
+      expect(result.matchIndexes.length).toBeGreaterThan(0);
     });
 
-    it("Returns a properly structured object", () => {
-      let obj = searchSettingsPanel.getScore("hello world", "hello");
-      expect(typeof obj === "object").toBe(true);
-      expect(typeof obj.score === "number").toBe(true);
-      expect(Array.isArray(obj.matchIndexes)).toBe(true);
-    });
-
-    it("Returns a positive score for a matching query", () => {
-      let obj = searchSettingsPanel.getScore("hello world", "hello");
-      expect(obj.score).toBeGreaterThan(0);
-      expect(obj.matchIndexes.length).toBeGreaterThan(0);
-    });
-
-    it("Returns zero score for non-matching query", () => {
-      let obj = searchSettingsPanel.getScore("hello", "xyz");
-      expect(obj.score).toBe(0);
-      expect(obj.matchIndexes.length).toBe(0);
-    });
-
-    it("Returns zero score for empty inputs", () => {
-      let obj = searchSettingsPanel.getScore(null, "hello");
-      expect(obj.score).toBe(0);
-      obj = searchSettingsPanel.getScore("hello", null);
-      expect(obj.score).toBe(0);
+    it("returns zero for non-matching and empty inputs", () => {
+      expect(searchSettingsPanel.getScore("hello", "xyz")).toEqual({
+        score: 0,
+        matchIndexes: [],
+      });
+      expect(searchSettingsPanel.getScore(null, "hello")).toEqual({
+        score: 0,
+        matchIndexes: [],
+      });
     });
   });
 
   describe("generateRanks", () => {
-    let searchSettingsPanel = null;
-
-    beforeEach(() => {
-      searchSettingsPanel = new SearchSettingsPanel(null);
-    });
-
-    it("Returns a properly structured object", () => {
-      let obj = searchSettingsPanel.generateRanks(
+    it("ranks primary fields", () => {
+      const result = searchSettingsPanel.generateRanks(
         "tab",
         "Tab Setting",
         "Just a friendly tab setting",
         "tabs",
         "tabSetting",
       );
+      expect(result.totalScore).toBeGreaterThan(0);
+      expect(result.matchIndexes.length).toBeGreaterThan(0);
+    });
 
-      expect(typeof obj.totalScore === "number").toBe(true);
-      expect(obj.totalScore).toBeGreaterThan(0);
-      expect(Array.isArray(obj.matchIndexes)).toBe(true);
-      expect(obj.matchIndexes.length).toBeGreaterThan(0);
+    it("allows description-only matches with a lower weight", () => {
+      const result = searchSettingsPanel.generateRanks(
+        "indentation",
+        "Width",
+        "Controls automatic indentation behavior",
+        "editor",
+        "tabLength",
+      );
+      expect(result.totalScore).toBeGreaterThan(0);
+    });
+  });
+
+  describe("schema collection", () => {
+    it("recursively indexes nested settings without mutating their schemas", () => {
+      const schema = {
+        example: {
+          type: "object",
+          properties: {
+            group: {
+              type: "object",
+              title: "Group",
+              properties: {
+                child: {
+                  type: "boolean",
+                  title: "Child",
+                  description: "A nested setting",
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const results = searchSettingsPanel.collectSettings(schema);
+      expect(results.map((result) => result.path)).toEqual([
+        "example.group",
+        "example.group.child",
+      ]);
+      expect(schema.example.properties.group.path).not.toBeDefined();
+      expect(schema.example.properties.group.rank).not.toBeDefined();
+    });
+
+    it("omits settings that have no editable destination", () => {
+      const results = searchSettingsPanel.collectSettings({
+        core: {
+          type: "object",
+          properties: {
+            customFileTypes: { type: "object", properties: {} },
+            themes: { type: "array" },
+          },
+        },
+      });
+      expect(results.map((result) => result.path)).toEqual(["core.themes"]);
+    });
+  });
+
+  describe("query filters", () => {
+    it("switches the active filter when a filter button is clicked", () => {
+      const editorButton = searchSettingsPanel.refs.filterGroup.querySelector(
+        '[data-search-filter="editor"]',
+      );
+      editorButton.click();
+
+      expect(searchSettingsPanel.activeFilter).toBe("editor");
+      expect(editorButton).toHaveClass("selected");
+      expect(editorButton.getAttribute("aria-pressed")).toBe("true");
+      expect(
+        searchSettingsPanel.refs.filterGroup.querySelector('[data-search-filter="all"]'),
+      ).not.toHaveClass("selected");
+    });
+
+    it("supports case-insensitive namespace prefixes", () => {
+      expect(searchSettingsPanel.parseQuery("Editor: font size")).toEqual({
+        filter: "editor",
+        searchTerm: "font size",
+      });
+    });
+
+    it("uses the selected filter when no prefix is present", () => {
+      searchSettingsPanel.activeFilter = "packages";
+      expect(searchSettingsPanel.parseQuery("spell check")).toEqual({
+        filter: "packages",
+        searchTerm: "spell check",
+      });
+    });
+  });
+
+  describe("search states", () => {
+    it("shows guidance before a query and a useful empty result message", () => {
+      expect(searchSettingsPanel.refs.resultsSection).toBeHidden();
+      expect(searchSettingsPanel.refs.searchStatus.textContent).toContain("Type a setting name");
+
+      searchSettingsPanel.updateSearchState("empty", { query: "does-not-exist" });
+      expect(searchSettingsPanel.refs.resultsSection).toBeHidden();
+      expect(searchSettingsPanel.refs.searchStatus.textContent).toContain("No settings found");
     });
   });
 });

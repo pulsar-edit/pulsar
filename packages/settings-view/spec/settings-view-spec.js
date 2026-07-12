@@ -299,7 +299,6 @@ describe("SettingsView", function () {
             }),
           );
         }));
-
     });
 
     describe("when atom.workspace.open() is used with a config URI", function () {
@@ -588,6 +587,46 @@ describe("SettingsView", function () {
           });
         });
       });
+    });
+  });
+
+  describe("opening a search result", () => {
+    it("routes settings that live outside the Core panel", () => {
+      spyOn(settingsView, "showPanel");
+      spyOn(settingsView, "revealSetting");
+
+      settingsView.openSetting("core.themes");
+      expect(settingsView.showPanel).toHaveBeenCalledWith("Themes", {
+        uri: "atom://config/themes",
+      });
+
+      settingsView.openSetting("core.uriHandlerRegistration");
+      expect(settingsView.showPanel).toHaveBeenCalledWith("URI Handling", {
+        uri: "atom://config/uri-handling",
+      });
+    });
+
+    it("expands, scrolls to, focuses, and highlights a nested setting", () => {
+      const panelElement = document.createElement("div");
+      const section = document.createElement("section");
+      section.classList.add("sub-section", "collapsed");
+      const target = document.createElement("div");
+      target.dataset.settingKey = "example.group.enabled";
+      target.scrollIntoView = jasmine.createSpy("scrollIntoView");
+      const input = document.createElement("input");
+      target.appendChild(input);
+      section.appendChild(target);
+      panelElement.appendChild(section);
+      jasmine.attachToDOM(panelElement);
+
+      settingsView.panelsByName.Example = { element: panelElement };
+      settingsView.activePanel = { name: "Example", options: {} };
+
+      expect(settingsView.revealSetting("example.group.enabled")).toBe(true);
+      expect(section).not.toHaveClass("collapsed");
+      expect(target).toHaveClass("search-settings-match");
+      expect(target.scrollIntoView).toHaveBeenCalledWith({ block: "center" });
+      expect(document.activeElement).toBe(input);
     });
   });
 

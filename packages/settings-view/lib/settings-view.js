@@ -72,6 +72,7 @@ export default class SettingsView {
 
   destroy() {
     this.destroyed = true;
+    clearTimeout(this.revealSettingTimeout);
     this.disposables.dispose();
     for (let name in this.panelsByName) {
       const panel = this.panelsByName[name];
@@ -360,6 +361,82 @@ export default class SettingsView {
         this.showPanel(panelName, { uri });
       }
     }
+  }
+
+  openSetting(path) {
+    const namespace = path.split(".")[0];
+    let panelName;
+    let options = { uri: `atom://config/${namespace}` };
+
+    if (path === "core.themes") {
+      panelName = "Themes";
+      options.uri = "atom://config/themes";
+    } else if (path === "core.disabledPackages") {
+      panelName = "Packages";
+      options.uri = "atom://config/packages";
+    } else if (path === "core.uriHandlerRegistration") {
+      panelName = "URI Handling";
+      options.uri = "atom://config/uri-handling";
+    } else if (namespace === "core") {
+      panelName = "Core";
+      options.uri = "atom://config/core";
+    } else if (namespace === "editor") {
+      panelName = "Editor";
+      options.uri = "atom://config/editor";
+    } else if (namespace === "language") {
+      panelName = "Languages";
+      options.uri = "atom://config/languages";
+    } else {
+      panelName = namespace;
+      options = {
+        uri: `atom://config/packages/${namespace}`,
+        pack: { name: namespace },
+        back: "Search",
+      };
+    }
+
+    this.showPanel(panelName, options);
+    process.nextTick(() => this.revealSetting(path));
+  }
+
+  revealSetting(path) {
+    const panel = this.activePanel && this.panelsByName[this.activePanel.name];
+    if (!panel || !panel.element) return false;
+
+    const settingElement = Array.from(panel.element.querySelectorAll("[data-setting-key]")).find(
+      (element) => element.dataset.settingKey === path,
+    );
+    const inputElement = Array.from(panel.element.querySelectorAll("[id]")).find(
+      (element) => element.id === path,
+    );
+    const target = settingElement || inputElement;
+    if (!target) return false;
+
+    let collapsedParent = target.closest(".sub-section.collapsed");
+    while (collapsedParent) {
+      collapsedParent.classList.remove("collapsed");
+      collapsedParent = collapsedParent.parentElement.closest(".sub-section.collapsed");
+    }
+
+    if (this.revealedSettingElement) {
+      this.revealedSettingElement.classList.remove("search-settings-match");
+    }
+    clearTimeout(this.revealSettingTimeout);
+    this.revealedSettingElement = target;
+    target.classList.add("search-settings-match");
+    target.scrollIntoView({ block: "center" });
+
+    const focusTarget =
+      target.querySelector(
+        "input, select, atom-text-editor, button, [tabindex]:not([tabindex='-1'])",
+      ) || inputElement;
+    if (focusTarget) focusTarget.focus();
+
+    this.revealSettingTimeout = setTimeout(() => {
+      target.classList.remove("search-settings-match");
+      if (this.revealedSettingElement === target) this.revealedSettingElement = null;
+    }, 1200);
+    return true;
   }
 
   appendPanel(panel, options) {
