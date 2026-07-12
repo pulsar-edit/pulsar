@@ -8,6 +8,7 @@ module.exports = class UIWatcher {
     this.subscriptions = new CompositeDisposable();
     this.reloadAll = this.reloadAll.bind(this);
     this.watchers = [];
+    this.destroyed = false;
     this.baseTheme = this.createWatcher(new BaseThemeWatcher());
     this.watchPackages();
   }
@@ -67,31 +68,29 @@ module.exports = class UIWatcher {
   }
 
   createWatcher(watcher) {
-    watcher.onDidChangeGlobals(() => {
-      console.log("Global changed, reloading all styles");
-      this.reloadAll();
+    watcher.onDidChangeGlobals(() => this.reloadAll());
+    watcher.onDidDestroy(() => {
+      const index = this.watchers.indexOf(watcher);
+      if (index >= 0) this.watchers.splice(index, 1);
     });
-    watcher.onDidDestroy(() => this.watchers.splice(this.watchers.indexOf(watcher), 1));
     this.watchers.push(watcher);
     return watcher;
   }
 
   reloadAll() {
     this.baseTheme.loadAllStylesheets();
-    for (const pack of atom.packages.getActivePackages()) {
-      if (PackageWatcher.supportsPackage(pack, "atom")) {
-        pack.reloadStylesheets();
-      }
+    for (const watcher of this.watchedPackages.values()) {
+      watcher.loadAllStylesheets();
     }
 
-    for (const theme of atom.themes.getActiveThemes()) {
-      if (PackageWatcher.supportsPackage(theme, "theme")) {
-        theme.reloadStylesheets();
-      }
+    for (const watcher of this.watchedThemes.values()) {
+      watcher.loadAllStylesheets();
     }
   }
 
   destroy() {
+    if (this.destroyed) return;
+    this.destroyed = true;
     this.subscriptions.dispose();
     this.baseTheme.destroy();
     for (const pack of this.watchedPackages.values()) {

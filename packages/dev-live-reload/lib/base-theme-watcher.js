@@ -15,7 +15,7 @@ module.exports = class BaseThemeWatcher extends Watcher {
   }
 
   loadStylesheet() {
-    this.loadAllStylesheets();
+    this.scheduleReload(() => this.loadAllStylesheets());
   }
 
   loadAllStylesheets() {

@@ -86,7 +86,7 @@ describe("Dev Live Reload", () => {
       const { mainModule } = await atom.packages.activatePackage("dev-live-reload");
       expect(mainModule.uiWatcher).not.toBeNull();
 
-      spyOn(mainModule.uiWatcher, "destroy");
+      spyOn(mainModule.uiWatcher, "destroy").and.callThrough();
 
       await atom.packages.deactivatePackage("dev-live-reload");
       expect(mainModule.uiWatcher.destroy).toHaveBeenCalled();

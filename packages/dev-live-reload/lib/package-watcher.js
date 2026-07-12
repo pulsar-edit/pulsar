@@ -1,4 +1,5 @@
 const fs = require("fs-plus");
+const path = require("path");
 
 const Watcher = require("./watcher");
 
@@ -15,38 +16,61 @@ module.exports = class PackageWatcher extends Watcher {
   }
 
   watch() {
-    const watchedPaths = [];
-    const watchPath = (stylesheet) => {
-      if (!watchedPaths.includes(stylesheet)) this.watchFile(stylesheet);
-      watchedPaths.push(stylesheet);
-    };
-
     // Themes provided by a multi-theme package draw styles from several
     // directories (shared directories plus the theme's own).
-    const stylesheetsPaths = this.pack.themeStylesDirectories ?? [this.pack.getStylesheetsPath()];
+    this.stylesheetsPaths = this.pack.themeStylesDirectories ?? [this.pack.getStylesheetsPath()];
 
-    const stylesheetPaths = new Set(this.pack.getStylesheetPaths());
-    for (const stylesheetsPath of stylesheetsPaths) {
+    for (const stylesheetsPath of this.stylesheetsPaths) {
       if (!fs.isDirectorySync(stylesheetsPath)) continue;
-      this.watchDirectory(stylesheetsPath);
-
-      const onFile = (stylesheetPath) => stylesheetPaths.add(stylesheetPath);
-      const onFolder = () => true;
-      fs.traverseTreeSync(stylesheetsPath, onFile, onFolder);
+      this.watchDirectory(stylesheetsPath, () => this.handleDirectoryChange());
     }
 
-    for (let stylesheet of stylesheetPaths) {
-      watchPath(stylesheet);
+    this.syncStylesheetWatchers();
+  }
+
+  syncStylesheetWatchers() {
+    const stylesheetPaths = new Set(this.pack.getStylesheetPaths());
+    for (const stylesheetsPath of this.stylesheetsPaths) {
+      if (!fs.isDirectorySync(stylesheetsPath)) continue;
+
+      const onFile = (stylesheetPath) => {
+        if ([".css", ".less"].includes(path.extname(stylesheetPath).toLowerCase())) {
+          stylesheetPaths.add(stylesheetPath);
+        }
+      };
+      fs.traverseTreeSync(stylesheetsPath, onFile, () => true);
     }
+
+    const watchedPaths = new Set(
+      this.entities.filter((entity) => entity.isFile()).map((entity) => entity.getPath()),
+    );
+    for (const stylesheetPath of stylesheetPaths) {
+      if (!watchedPaths.has(stylesheetPath)) this.watchFile(stylesheetPath);
+    }
+  }
+
+  handleDirectoryChange() {
+    this.syncStylesheetWatchers();
+    this.queueReload(false);
   }
 
   loadStylesheet(pathName) {
-    if (pathName.includes("variables")) this.emitGlobalsChanged();
-    this.loadAllStylesheets();
+    this.queueReload(path.basename(pathName).includes("variables"));
+  }
+
+  queueReload(globalsChanged) {
+    this.globalsChanged ||= globalsChanged;
+    this.scheduleReload(() => {
+      if (this.globalsChanged) {
+        this.globalsChanged = false;
+        this.emitGlobalsChanged();
+      } else {
+        this.loadAllStylesheets();
+      }
+    });
   }
 
   loadAllStylesheets() {
-    console.log("Reloading package", this.pack.name);
     this.pack.reloadStylesheets();
   }
 };

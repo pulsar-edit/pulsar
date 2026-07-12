@@ -4,7 +4,7 @@ Live reload Lumine themes and packages as you edit their stylesheets.
 
 ## Features
 
-- **Live style reload**: reflects edits to `.less` files in any running Lumine window instantly.
+- **Live style reload**: reflects edits to `.css` and `.less` files in any running Lumine window instantly.
 - **Dev mode default**: installed by default on Lumine windows running in dev mode.
 - **Theme and package watching**: watches core, theme, and package stylesheets for changes.
 
@@ -16,7 +16,7 @@ Commands available in `atom-workspace`:
 
 ## Usage
 
-This package is experimental and does not handle file additions to a theme; newly created files will not be watched.
+New `.css` and `.less` files added within an active package or theme's styles directories are picked up without reloading the window.
 
 ## Contributing
 

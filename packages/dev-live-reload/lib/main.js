@@ -1,5 +1,5 @@
 module.exports = {
-  activate(state) {
+  activate(_state) {
     if (!atom.inDevMode() || atom.inSpecMode()) return;
 
     if (atom.packages.hasActivatedInitialPackages()) {
@@ -19,7 +19,7 @@ module.exports = {
 
   startWatching() {
     const UIWatcher = require("./ui-watcher");
-    this.uiWatcher = new UIWatcher({ themeManager: atom.themes });
+    this.uiWatcher = new UIWatcher();
     this.commandDisposable = atom.commands.add("atom-workspace", "dev-live-reload:reload-all", () =>
       this.uiWatcher.reloadAll(),
     );

@@ -7,17 +7,22 @@ module.exports = class Watcher {
     this.emitter = new Emitter();
     this.disposables = new CompositeDisposable();
     this.entities = []; // Used for specs
+    this.reloadTimer = null;
+    this.destroyed = false;
   }
 
   onDidDestroy(callback) {
-    this.emitter.on("did-destroy", callback);
+    return this.emitter.on("did-destroy", callback);
   }
 
   onDidChangeGlobals(callback) {
-    this.emitter.on("did-change-globals", callback);
+    return this.emitter.on("did-change-globals", callback);
   }
 
   destroy() {
+    if (this.destroyed) return;
+    this.destroyed = true;
+    clearTimeout(this.reloadTimer);
     this.disposables.dispose();
     this.entities = null;
     this.emitter.emit("did-destroy");
@@ -28,7 +33,7 @@ module.exports = class Watcher {
     // override me
   }
 
-  loadStylesheet(stylesheetPath) {
+  loadStylesheet(_stylesheetPath) {
     // override me
   }
 
@@ -40,16 +45,18 @@ module.exports = class Watcher {
     this.emitter.emit("did-change-globals");
   }
 
-  watchDirectory(directoryPath) {
-    if (this.isInAsarArchive(directoryPath)) return;
-    const entity = new Directory(directoryPath);
-    this.disposables.add(entity.onDidChange(() => this.loadAllStylesheets()));
-    this.entities.push(entity);
+  scheduleReload(callback) {
+    clearTimeout(this.reloadTimer);
+    this.reloadTimer = setTimeout(() => {
+      this.reloadTimer = null;
+      if (!this.destroyed) callback();
+    }, 25);
   }
 
-  watchGlobalFile(filePath) {
-    const entity = new File(filePath);
-    this.disposables.add(entity.onDidChange(() => this.emitGlobalsChanged()));
+  watchDirectory(directoryPath, callback = () => this.loadAllStylesheets()) {
+    if (this.isInAsarArchive(directoryPath)) return;
+    const entity = new Directory(directoryPath);
+    this.disposables.add(entity.onDidChange(callback));
     this.entities.push(entity);
   }
 
