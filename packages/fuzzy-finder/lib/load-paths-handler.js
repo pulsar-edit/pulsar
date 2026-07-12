@@ -18,19 +18,22 @@ const realRgPath = rgPath.replace(/\bapp\.asar\b/, 'app.asar.unpacked')
 // with a maximum value of 8 and minimum of 1.
 const MaxConcurrentCrawls = Math.min(Math.max(os.cpus().length - 1, 8), 1)
 
-const emittedPaths = new Set()
+const trackedPaths = new Set()
+const ignoredPaths = new Set()
 
 class PathLoader {
-  constructor (rootPath, ignoreVcsIgnores, traverseSymlinkDirectories, ignoredNames, useRipGrep) {
+  constructor (rootPath, options) {
     this.rootPath = rootPath
-    this.ignoreVcsIgnores = ignoreVcsIgnores
-    this.traverseSymlinkDirectories = traverseSymlinkDirectories
-    this.ignoredNames = ignoredNames
-    this.useRipGrep = useRipGrep
+    this.ignoreVcsIgnores = options.ignoreVcsIgnores
+    this.traverseSymlinkDirectories = options.followSymlinks
+    this.ignoredNames = options.ignoredNames
+    this.useRipGrep = options.useRipGrep
+    this.indexIgnoredPaths = options.indexIgnoredPaths
     this.paths = []
+    this.ignoredPaths = []
     this.inodes = new Set()
     this.repo = null
-    if (ignoreVcsIgnores && !this.useRipGrep) {
+    if (this.ignoreVcsIgnores && !this.useRipGrep) {
       const repo = GitRepository.open(this.rootPath, {refreshOnWindowFocus: false})
       if ((repo && repo.relativize(path.join(this.rootPath, 'test'))) === 'test') {
         this.repo = repo
@@ -40,7 +43,11 @@ class PathLoader {
 
   load (done) {
     if (this.useRipGrep) {
-      this.loadFromRipGrep().then(done)
+      // first, load tracked paths and populate the set of tracked paths
+      // then, load all paths (tracked and not), using the above set to differentiate
+      this.loadFromRipGrep()
+        .then(() => this.indexIgnoredPaths && this.loadFromRipGrep({loadIgnoredPaths: true}))
+        .then(done)
 
       return
     }
@@ -52,11 +59,11 @@ class PathLoader {
     })
   }
 
-  async loadFromRipGrep () {
+  async loadFromRipGrep (options = {}) {
     return new Promise((resolve) => {
       const args = ['--files', '--hidden', '--sort', 'path']
 
-      if (!this.ignoreVcsIgnores) {
+      if (!this.ignoreVcsIgnores || options.loadIgnoredPaths) {
         args.push('--no-ignore')
       }
 
@@ -64,8 +71,10 @@ class PathLoader {
         args.push('--follow')
       }
 
-      for (let ignoredName of this.ignoredNames) {
-        args.push('-g', '!' + ignoredName.pattern)
+      if (! options.loadIgnoredPaths) {
+          for (let ignoredName of this.ignoredNames) {
+            args.push('-g', '!' + ignoredName.pattern)
+          }
       }
 
       if (this.ignoreVcsIgnores) {
@@ -81,7 +90,12 @@ class PathLoader {
         output = files.pop()
 
         for (const file of files) {
-          this.pathLoaded(path.join(this.rootPath, file))
+          let loadedPath = path.join(this.rootPath, file)
+          if (options.loadIgnoredPaths) {
+            this.ignoredPathLoaded(loadedPath)
+          } else {
+            this.trackedPathLoaded(loadedPath)
+          }
         }
       })
       result.stderr.on('data', () => {
@@ -105,25 +119,45 @@ class PathLoader {
     }
   }
 
-  pathLoaded (loadedPath, done) {
-    if (!emittedPaths.has(loadedPath)) {
+  trackedPathLoaded (loadedPath, done) {
+    if (!trackedPaths.has(loadedPath)) {
+      trackedPaths.add(loadedPath)
       this.paths.push(loadedPath)
-      emittedPaths.add(loadedPath)
     }
 
     if (this.paths.length === PathsChunkSize) {
       this.flushPaths()
     }
+
+    done && done()
+  }
+
+  ignoredPathLoaded (loadedPath, done) {
+    if (trackedPaths.has(loadedPath)) {
+        return
+    }
+
+    if (!ignoredPaths.has(loadedPath)) {
+      ignoredPaths.add(loadedPath)
+      this.ignoredPaths.push(loadedPath)
+    }
+
+    if (this.ignoredPaths.length === PathsChunkSize) {
+      this.flushPaths()
+    }
+
     done && done()
   }
 
   flushPaths () {
-    emit('load-paths:paths-found', this.paths)
+    emit('load-paths:paths-found', {paths: this.paths, ignoredPaths: this.ignoredPaths})
     this.paths = []
+    this.ignoredPaths = []
   }
 
   loadPath (pathToLoad, root, done) {
-    if (this.isIgnored(pathToLoad) && !root) return done()
+    const isIgnored = this.isIgnored(pathToLoad)
+    if (isIgnored && !this.indexIgnoredPaths && !root) return done()
 
     fs.lstat(pathToLoad, (error, stats) => {
       if (error != null) { return done() }
@@ -137,7 +171,13 @@ class PathLoader {
           }
 
           if (stats.isFile()) {
-            this.pathLoaded(pathToLoad, done)
+            if (!isIgnored ) {
+              this.trackedPathLoaded(pathToLoad, done)
+            } else if (this.indexIgnoredPaths) {
+              this.ignoredPathLoaded(pathToLoad, done)
+            } else {
+              done()
+            }
           } else if (stats.isDirectory()) {
             if (this.traverseSymlinkDirectories) {
               this.loadFolder(pathToLoad, done)
@@ -151,9 +191,22 @@ class PathLoader {
       } else {
         this.inodes.add(stats.ino)
         if (stats.isDirectory()) {
-          this.loadFolder(pathToLoad, done)
+          // descend into the .git dir only if we're including ignored paths
+          // FIXME this it not correct if the repo dir is non-default
+          // FIXME / is not platform agnostic
+          if (!pathToLoad.match(/(^|\/)\.git/) || !this.ignoreVcsIgnores) {
+            this.loadFolder(pathToLoad, done)
+          } else {
+            done()
+          }
         } else if (stats.isFile()) {
-          this.pathLoaded(pathToLoad, done)
+          if (!isIgnored) {
+            this.trackedPathLoaded(pathToLoad, done)
+          } else if (this.indexIgnoredPaths) {
+            this.ignoredPathLoaded(pathToLoad, done)
+          } else {
+            done()
+          }
         } else {
           done()
         }
@@ -174,30 +227,23 @@ class PathLoader {
   }
 }
 
-module.exports = function (rootPaths, followSymlinks, ignoreVcsIgnores, ignores, useRipGrep) {
-  const ignoredNames = []
-  for (let ignore of ignores) {
+module.exports = function (rootPaths, options) {
+  const ignoredNameMatchers = []
+  for (let ignore of options.ignoredNames) {
     if (ignore) {
       try {
-        ignoredNames.push(new Minimatch(ignore, {matchBase: true, dot: true}))
+        ignoredNameMatchers.push(new Minimatch(ignore, {matchBase: true, dot: true}))
       } catch (error) {
         console.warn(`Error parsing ignore pattern (${ignore}): ${error.message}`)
       }
     }
   }
+  options.ignoredNames = ignoredNameMatchers
 
   async.eachLimit(
     rootPaths,
     MaxConcurrentCrawls,
-    (rootPath, next) =>
-      new PathLoader(
-        rootPath,
-        ignoreVcsIgnores,
-        followSymlinks,
-        ignoredNames,
-        useRipGrep
-      ).load(next)
-    ,
+    (rootPath, next) => new PathLoader(rootPath, options).load(next),
     this.async()
   )
 }

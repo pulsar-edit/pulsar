@@ -1,8 +1,5 @@
 const {CompositeDisposable, Disposable} = require('atom')
 const getIconServices = require('./get-icon-services')
-const ReporterProxy = require('./reporter-proxy')
-
-const metricsReporter = new ReporterProxy()
 
 module.exports = {
   activate (state) {
@@ -51,6 +48,7 @@ module.exports = {
       this.gitStatusView = null
     }
     this.projectPaths = null
+    this.ignoredPaths = null
     this.stopLoadPathsTask()
     this.active = false
   },
@@ -71,12 +69,6 @@ module.exports = {
     if (this.projectView) this.projectView.setTeletypeService(teletypeService)
   },
 
-  consumeMetricsReporter (metricsReporterService) {
-    metricsReporter.setReporter(metricsReporterService)
-
-    return new Disposable(() => metricsReporter.unsetReporter())
-  },
-
   serialize () {
     const paths = {}
     for (let editor of atom.workspace.getTextEditors()) {
@@ -91,8 +83,9 @@ module.exports = {
 
     if (this.projectView == null) {
       const ProjectView = require('./project-view')
-      this.projectView = new ProjectView(this.projectPaths, metricsReporter)
+      this.projectView = new ProjectView(this.projectPaths, this.ignoredPaths)
       this.projectPaths = null
+      this.ignoredPaths = null
       if (this.teletypeService) {
         this.projectView.setTeletypeService(this.teletypeService)
       }
@@ -103,7 +96,7 @@ module.exports = {
   createGitStatusView () {
     if (this.gitStatusView == null) {
       const GitStatusView = require('./git-status-view')
-      this.gitStatusView = new GitStatusView(metricsReporter)
+      this.gitStatusView = new GitStatusView()
     }
     return this.gitStatusView
   },
@@ -111,7 +104,7 @@ module.exports = {
   createBufferView () {
     if (this.bufferView == null) {
       const BufferView = require('./buffer-view')
-      this.bufferView = new BufferView(metricsReporter)
+      this.bufferView = new BufferView()
       if (this.teletypeService) {
         this.bufferView.setTeletypeService(this.teletypeService)
       }
@@ -126,11 +119,13 @@ module.exports = {
     if (atom.project.getPaths().length === 0) return
 
     const PathLoader = require('./path-loader')
-    this.loadPathsTask = PathLoader.startTask((projectPaths) => {
+    this.loadPathsTask = PathLoader.startTask((projectPaths, ignoredPaths) => {
       this.projectPaths = projectPaths
-    }, metricsReporter)
+      this.ignoredPaths = ignoredPaths
+    })
     this.projectPathsSubscription = atom.project.onDidChangePaths(() => {
       this.projectPaths = null
+      this.ignoredPaths = null
       this.stopLoadPathsTask()
     })
   },
