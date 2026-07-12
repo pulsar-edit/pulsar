@@ -30,7 +30,7 @@
   "dependencies": {
     "async": "3.2.6",
     "fs-plus": "^3.1.1",
-    "ctags": "https://github.com/lumine-code/node-ctags.git#f5afc38"
+    "ctags": "https://github.com/lumine-code/node-ctags.git#c1bcce005e9c4f4ed7cfaea0f0c1fa7fe70fd88c"
   },
   "devDependencies": {
     "eslint": "^8.39.0",

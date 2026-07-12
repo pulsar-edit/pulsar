@@ -1,4 +1,4 @@
-const { assert } = require("chai");
+const assert = require("./assert");
 const parseCommandLine = require("../../src/main-process/parse-command-line");
 
 describe("parseCommandLine", () => {

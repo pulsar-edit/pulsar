@@ -1314,13 +1314,13 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@pulsar-edit/atom-keymap@https://github.com/lumine-code/atom-keymap.git#4448053":
+"@pulsar-edit/atom-keymap@https://github.com/lumine-code/atom-keymap.git#7e3b341177f059974049ac0c2f95d4f3f441f743":
   version "9.1.0"
-  resolved "https://github.com/lumine-code/atom-keymap.git#4448053539ad734b8ba78ffd61acb0d8d072b25e"
+  resolved "https://github.com/lumine-code/atom-keymap.git#7e3b341177f059974049ac0c2f95d4f3f441f743"
   dependencies:
     "@electron/rebuild" "^4.2.0"
-    "@pulsar-edit/keyboard-layout" "^3.0.5"
-    "@pulsar-edit/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#e256588"
+    "@pulsar-edit/keyboard-layout" "https://github.com/lumine-code/keyboard-layout.git#862dfbaa62ec7d70e560fdfe975b8660febae70f"
+    "@pulsar-edit/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#74455395539148bf35a19212c8f1af65366358f9"
     clear-cut "^2"
     event-kit "^2.5.3"
     fs-plus "^3.0.0"
@@ -1340,25 +1340,16 @@
   dependencies:
     node-addon-api "^6.1.0"
 
-"@pulsar-edit/git-utils@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/git-utils/-/git-utils-7.0.1.tgz#5b1cd4902851b5473e67d1a9b2056472f4df1ecc"
-  integrity sha512-ZFrx+c/+4wrJD7IdEZbTh5RXpmnyLFINSPqzqtmtnNhuBbUxXIFG7BYglJ5N8c4ffJP4JjWzqQqBdYb/6BM16w==
-  dependencies:
-    fs-plus "^3.0.0"
-    nan "^2.14.2"
-
-"@pulsar-edit/git-utils@https://github.com/lumine-code/git-utils.git#4348998":
+"@pulsar-edit/git-utils@https://github.com/lumine-code/git-utils.git#43489980cb6b42e46956b1a77985709cf5fb4bfe":
   version "8.1.0"
   resolved "https://github.com/lumine-code/git-utils.git#43489980cb6b42e46956b1a77985709cf5fb4bfe"
   dependencies:
     fs-plus "^3.0.0"
     node-addon-api "^8.2.1"
 
-"@pulsar-edit/keyboard-layout@^3.0.5":
+"@pulsar-edit/keyboard-layout@https://github.com/lumine-code/keyboard-layout.git#862dfbaa62ec7d70e560fdfe975b8660febae70f":
   version "3.0.5"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/keyboard-layout/-/keyboard-layout-3.0.5.tgz#efe5c73a5619e40cc1569030e28947176f013a6b"
-  integrity sha512-+Fr3is/HY7E1in7ZgRvCDjkUDDfO8mZdFC1YqaGabUSfMzRAg/jMBR7VEvm57avr1mqpFNOjh+QRzxZciml3YA==
+  resolved "https://github.com/lumine-code/keyboard-layout.git#862dfbaa62ec7d70e560fdfe975b8660febae70f"
   dependencies:
     event-kit "^2.0.0"
     node-addon-api "^7.1.1"
@@ -1375,9 +1366,9 @@
     unbzip2-stream "^1.4.3"
     yauzl "^3.2.0"
 
-"@pulsar-edit/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#e256588":
+"@pulsar-edit/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#74455395539148bf35a19212c8f1af65366358f9":
   version "9.0.4"
-  resolved "https://github.com/lumine-code/node-pathwatcher.git#e256588d7a898969509534f4b690260950395169"
+  resolved "https://github.com/lumine-code/node-pathwatcher.git#74455395539148bf35a19212c8f1af65366358f9"
   dependencies:
     async "~0.2.10"
     event-kit "^2.1.0"
@@ -1386,30 +1377,29 @@
     iconv-lite "~0.4.4"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
 
-"@pulsar-edit/scandal@^4.0.0":
+"@pulsar-edit/scandal@https://github.com/lumine-code/scandal.git#951e504d07d22184200c0cac19da1f7a979c1e7d":
   version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/scandal/-/scandal-4.0.0.tgz#0a43a5d3be7fcecd87b010fe1f2cac105dc4d807"
-  integrity sha512-ZX+AL68+/zwqsPzEPyNJG3AHmRtkzU5dIMvSreT/qqlz1brs9b3aD8zeEDRL981YJ9btbLiM9Ng0gzSroL0rSw==
+  resolved "https://github.com/lumine-code/scandal.git#951e504d07d22184200c0cac19da1f7a979c1e7d"
   dependencies:
-    "@pulsar-edit/git-utils" "^7.0.1"
+    "@pulsar-edit/git-utils" "https://github.com/lumine-code/git-utils.git#43489980cb6b42e46956b1a77985709cf5fb4bfe"
     argparse "^1.0.2"
     isbinaryfile "^3.0.3"
     minimatch "^2.0.9"
     split "^1.0.0"
     temp "^0.8.3"
 
-"@pulsar-edit/superstring@https://github.com/lumine-code/superstring.git#569946b":
+"@pulsar-edit/superstring@https://github.com/lumine-code/superstring.git#24d41fc832e04c939a0d55feaef246e1b7e80083":
   version "3.0.5"
-  resolved "https://github.com/lumine-code/superstring.git#569946b85f225bed5a1cf7c4d05ba6ff23b4406a"
+  resolved "https://github.com/lumine-code/superstring.git#24d41fc832e04c939a0d55feaef246e1b7e80083"
   dependencies:
     node-addon-api "^8.5.0"
 
-"@pulsar-edit/text-buffer@https://github.com/lumine-code/text-buffer.git#242456a":
+"@pulsar-edit/text-buffer@https://github.com/lumine-code/text-buffer.git#0aa5085ba58a3bc1336150c712ad641e96413ca4":
   version "15.0.0"
-  resolved "https://github.com/lumine-code/text-buffer.git#242456a6f2b08c0d3440967f551b88f10b4b3520"
+  resolved "https://github.com/lumine-code/text-buffer.git#0aa5085ba58a3bc1336150c712ad641e96413ca4"
   dependencies:
-    "@pulsar-edit/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#e256588"
-    "@pulsar-edit/superstring" "https://github.com/lumine-code/superstring.git#569946b"
+    "@pulsar-edit/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#74455395539148bf35a19212c8f1af65366358f9"
+    "@pulsar-edit/superstring" "https://github.com/lumine-code/superstring.git#24d41fc832e04c939a0d55feaef246e1b7e80083"
     delegato "^1.0.0"
     diff "^2.2.1"
     event-kit "^2.4.0"
@@ -2023,7 +2013,7 @@ base64-js@^1.3.1, base64-js@^1.5.1:
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
 
-baseline-browser-mapping@^2.10.42, baseline-browser-mapping@^2.8.9:
+baseline-browser-mapping@^2.10.42:
   version "2.10.43"
   resolved "https://registry.yarnpkg.com/baseline-browser-mapping/-/baseline-browser-mapping-2.10.43.tgz#7b5d11590ce5acdbe4859443e3c940e81ce8c02d"
   integrity sha512-AjYpR78kDWAY3Efj+cDTFH9t9SCoL7OoTp1BOb0mQV7S+6CiLwnWM3FyxhJtdPufDFKzmCSFoUncKjWgJEZTCQ==
@@ -2034,21 +2024,6 @@ bcrypt-pbkdf@^1.0.0:
   integrity sha512-qeFIXtP4MSoi6NLqO12WfqARWWuCKi2Rn/9hJLEmtB5yTNr9DqFWkJRCf2qShWzPeAMRnOgCrq0sg/KLv5ES9w==
   dependencies:
     tweetnacl "^0.14.3"
-
-better-sqlite3@12.11.1:
-  version "12.11.1"
-  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-12.11.1.tgz#067846efabf7671957fc8a9e8df3be39c6cc0b84"
-  integrity sha512-dq9AtApgg5PGFtBzPFSBl3HZQjHok5gaQCM6zh2Yk0aSmDCs1CbnVI8/HgASQkNKsWFpseIO9beg5xxpYhbIfA==
-  dependencies:
-    bindings "^1.5.0"
-    prebuild-install "^7.1.1"
-
-bindings@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
-  integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
-  dependencies:
-    file-uri-to-path "1.0.0"
 
 bl@^4.0.3:
   version "4.1.0"
@@ -2067,7 +2042,7 @@ bluebird@~3.7.2:
 "bookmarks@file:packages/bookmarks":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-cbcb63bf-7cf7-40f3-8022-fc3b7a867cc4-1783892529520/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-5674b550-d578-40c6-bef7-b18a131904d2-1783898790413/shared/select-list"
 
 boolbase@^1.0.0:
   version "1.0.0"
@@ -2264,7 +2239,7 @@ camelcase@^6.0.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.3.0.tgz#5685b95eb209ac9c0c177467778c9c84df58ba9a"
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
-caniuse-lite@^1.0.30001746, caniuse-lite@^1.0.30001803:
+caniuse-lite@^1.0.30001803:
   version "1.0.30001805"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001805.tgz#78d5d5968a69b7ff81af87a96d7ddc7ea6670b1e"
   integrity sha512-52noaS3DubycKSXaU30TwPGIp+POyQSUVa5jBEq3vkRkY0kjyb3LQgvhU6WGyCcyXqVLWO0Cw0Q6BSdD0kUfVA==
@@ -2273,11 +2248,6 @@ caseless@~0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
   integrity sha512-4tYFyifaFfGacoiObjJegolkwSU4xQNGbVgUiNYVUxbQ2x2lUsFvY4hVgVzGiIe6WLOPqycWXA40l+PWsxthUw==
-
-chai@6.2.2:
-  version "6.2.2"
-  resolved "https://registry.yarnpkg.com/chai/-/chai-6.2.2.tgz#ae41b52c9aca87734505362717f3255facda360e"
-  integrity sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==
 
 chalk@^4.1.0, chalk@^4.1.1, chalk@^4.1.2:
   version "4.1.2"
@@ -2440,37 +2410,10 @@ color-convert@^2.0.1:
   dependencies:
     color-name "~1.1.4"
 
-color-convert@^3.1.3:
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-3.1.3.tgz#db6627b97181cb8facdfce755ae26f97ab0711f1"
-  integrity sha512-fasDH2ont2GqF5HpyO4w0+BcewlhHEZOFn9c1ckZdHpJ56Qb7MHhH/IcJZbBGgvdtwdwNbLvxiBEdg336iA9Sg==
-  dependencies:
-    color-name "^2.0.0"
-
-color-name@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/color-name/-/color-name-2.1.0.tgz#0b677385c1c4b4edfdeaf77e38fa338e3a40b693"
-  integrity sha512-1bPaDNFm0axzE4MEAzKPuqKWeRaT43U/hyxKPBdqTfmPF+d6n7FSoTFxLVULUJOmiLp01KjhIPPH+HrXZJN4Rg==
-
 color-name@~1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
   integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
-
-color-string@^2.1.3:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/color-string/-/color-string-2.1.4.tgz#9dcf566ff976e23368c8bd673f5c35103ab41058"
-  integrity sha512-Bb6Cq8oq0IjDOe8wJmi4JeNn763Xs9cfrBcaylK1tPypWzyoy2G3l90v9k64kjphl/ZJjPIShFztenRomi8WTg==
-  dependencies:
-    color-name "^2.0.0"
-
-color@5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/color/-/color-5.0.3.tgz#f79390b1b778e222ffbb54304d3dbeaef633f97f"
-  integrity sha512-ezmVcLR3xAVp8kYOm4GS45ZLLgIE6SPAFoduLr6hTDajwb3KZ2F46gulK3XpcwRFb5KKGCSezCBAY4Dw4HsyXA==
-  dependencies:
-    color-convert "^3.1.3"
-    color-string "^2.1.3"
 
 colors@^1.4.0:
   version "1.4.0"
@@ -2490,7 +2433,7 @@ combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
 "command-palette@file:packages/command-palette":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-2be463b5-19b2-4cfb-a852-79efa16ec2b2-1783892529527/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-6605f25e-5f31-414b-846d-e20ada9bf49d-1783898790419/shared/select-list"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
 
 commander@^10.0.0:
@@ -2609,12 +2552,11 @@ cssesc@^3.0.0:
   resolved "https://registry.yarnpkg.com/cssesc/-/cssesc-3.0.0.tgz#37741919903b868565e1c09ea747445cd18983ee"
   integrity sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==
 
-"ctags@https://github.com/lumine-code/node-ctags.git#f5afc38":
+"ctags@https://github.com/lumine-code/node-ctags.git#c1bcce005e9c4f4ed7cfaea0f0c1fa7fe70fd88c":
   version "3.1.0"
-  resolved "https://github.com/lumine-code/node-ctags.git#f5afc38f2199a749ce0d53368b17d02b0124e9a9"
+  resolved "https://github.com/lumine-code/node-ctags.git#c1bcce005e9c4f4ed7cfaea0f0c1fa7fe70fd88c"
   dependencies:
-    event-stream "~3.1.0"
-    nan "^2.14.0"
+    node-addon-api "^8.5.0"
 
 "dalek@file:packages/dalek":
   version "1.0.0"
@@ -2874,11 +2816,6 @@ duplexer2@~0.1.4:
   dependencies:
     readable-stream "^2.0.2"
 
-duplexer@~0.1.1:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/duplexer/-/duplexer-0.1.2.tgz#3abe43aef3835f8ae077d136ddce0f276b0400e6"
-  integrity sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==
-
 eastasianwidth@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/eastasianwidth/-/eastasianwidth-0.2.0.tgz#696ce2ec0aa0e6ea93a397ffcf24aa7840c827cb"
@@ -2930,11 +2867,6 @@ electron-publish@26.15.3:
     lazy-val "^1.0.5"
     mime "^2.5.2"
 
-electron-to-chromium@^1.5.227:
-  version "1.5.237"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.237.tgz#eacf61cef3f6345d0069ab427585c5a04d7084f0"
-  integrity sha512-icUt1NvfhGLar5lSWH3tHNzablaA5js3HVHacQimfP8ViEBOQv+L7DKEuHdbTZ0SKCO1ogTJTIL1Gwk9S6Qvcg==
-
 electron-to-chromium@^1.5.389:
   version "1.5.389"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.389.tgz#538be9ebec78026d4daba6be321ab854dfac2a8f"
@@ -2979,7 +2911,7 @@ empathic@^2.0.1:
   dependencies:
     iconv-lite "^0.4.4"
     jschardet "^1.1.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-ffe20870-34c5-405d-8a17-b9bf0f195297-1783892529536/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-2cff8d5f-323a-40f3-b7d2-fe386a628bc8-1783898790425/shared/select-list"
 
 encoding-sniffer@^0.2.1:
   version "0.2.1"
@@ -3261,19 +3193,6 @@ event-kit@^2.0.0, event-kit@^2.1.0, event-kit@^2.4.0, event-kit@^2.5.2, event-ki
   version "2.5.3"
   resolved "https://codeload.github.com/pulsar-edit/event-kit/tar.gz/80b551c1d03dd05795500f0c71dcf15be3a23c63"
 
-event-stream@~3.1.0:
-  version "3.1.7"
-  resolved "https://registry.yarnpkg.com/event-stream/-/event-stream-3.1.7.tgz#b4c540012d0fe1498420f3d8946008db6393c37a"
-  integrity sha512-ddACn1VEffD+nvbofs8gs/0qJZC9gtEGLG+WykE//rinSpYLSaTsnN96eVQV+gHdUhV/nVtxUNKC3OjrApuEMw==
-  dependencies:
-    duplexer "~0.1.1"
-    from "~0"
-    map-stream "~0.1.0"
-    pause-stream "0.0.11"
-    split "0.2"
-    stream-combiner "~0.0.4"
-    through "~2.3.1"
-
 execa@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/execa/-/execa-5.1.1.tgz#f80ad9cbf4298f7bd1d4c9555c21e93741c411dd"
@@ -3368,11 +3287,6 @@ file-entry-cache@^8.0.0:
   integrity sha512-XXTUwCvisa5oacNGRP9SfNtYBNAMi+RPwBFmblZEF7N7swHYQS6/Zfk7SRwx4D5j3CH211YNRco1DEMNVfZCnQ==
   dependencies:
     flat-cache "^4.0.0"
-
-file-uri-to-path@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz#553a7b8446ff6f684359c445f1e37a05dacc33dd"
-  integrity sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==
 
 filelist@^1.0.4:
   version "1.0.4"
@@ -3511,11 +3425,6 @@ formidable@^3.5.4:
     dezalgo "^1.0.4"
     once "^1.4.0"
 
-from@~0:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/from/-/from-0.1.7.tgz#83c60afc58b9c56997007ed1a768b3ab303a44fe"
-  integrity sha512-twe20eF1OxVxp/ML/kq2p1uc6KvFK/+vs8WjEbeKmV2He22MKm7YF2ANIt+EOqhJ5L3K/SuuPhk0hWQDjOM23g==
-
 fs-admin@0.20.0:
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/fs-admin/-/fs-admin-0.20.0.tgz#ea11d4886e77bb0d12df073d342a0d7076de7956"
@@ -3621,7 +3530,7 @@ function-bind@^1.1.2:
   version "1.0.0"
   dependencies:
     "@vscode/ripgrep" "1.18.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-22089abc-1074-49ee-b58e-bacbd92c2a83-1783892529539/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-6a1c6562-5688-4a64-91d8-2aeb776895e0-1783898790429/shared/select-list"
 
 "fuzzy-files@file:packages/fuzzy-files":
   version "1.0.0"
@@ -3629,12 +3538,12 @@ function-bind@^1.1.2:
     "@vscode/ripgrep" "1.18.0"
     async "3.2.6"
     minimatch "^10.2.5"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-2fc77bdc-7d5e-4ee1-9dc6-d18c1873cfe1-1783892529541/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-31fc4d3a-8b6e-4bfb-bf5a-598b1ee01649-1783898790430/shared/select-list"
 
 "fuzzy-workspace@file:packages/fuzzy-workspace":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-44bb3e78-415d-4bac-8c29-6ddb3145dc68-1783892529543/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-42a39f66-4f23-48d9-82c6-cb427b7196be-1783898790432/shared/select-list"
 
 gauge@~2.7.3:
   version "2.7.4"
@@ -3731,7 +3640,7 @@ getpass@^0.1.1:
 "git-diff@file:packages/git-diff":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-95fa3994-41db-4b7c-ab36-8cf6efbbfbca-1783892529545/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-f53993a7-743f-44fe-b0ed-1292d3f8e243-1783898790433/shared/select-list"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -3871,7 +3780,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0,
 "grammar-selector@file:packages/grammar-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-a2e569e3-415b-43fa-9ff6-7b4562e25752-1783892529550/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-c7b8474c-2bec-4fab-aab0-8705c635c97b-1783898790438/shared/select-list"
 
 grim@2.0.3, grim@^2.0.1, grim@^2.0.2, grim@^2.0.3:
   version "2.0.3"
@@ -4621,7 +4530,7 @@ levn@^0.4.1:
 "line-ending-selector@file:packages/line-ending-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-b3433f10-eb6f-4881-b210-2c95f0609a99-1783892529620/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-8ec12cd5-0be8-442b-9987-4aaea9cdcf0e-1783898790505/shared/select-list"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
 
 line-top-index@0.3.1:
@@ -4722,11 +4631,6 @@ make-dir@^2.1.0:
   dependencies:
     pify "^4.0.1"
     semver "^5.6.0"
-
-map-stream@~0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/map-stream/-/map-stream-0.1.0.tgz#e56aa94c4c8055a16404a0674b78f215f7c8e194"
-  integrity sha512-CkYQrPYZfWnu/DAmVCpTSX/xHpKZ80eKh2lAkyA6AJTef6bW+6JpbQZN5rofum7da+SyN1bi5ctTm+lTfcCW3g==
 
 markdown-it-emoji@^3.0.0:
   version "3.0.0"
@@ -5064,11 +4968,6 @@ murmurhash-js@^1.0.0:
   resolved "https://registry.yarnpkg.com/murmurhash-js/-/murmurhash-js-1.0.0.tgz#b06278e21fc6c37fa5313732b0412bcb6ae15f51"
   integrity sha512-TvmkNhkv8yct0SVBSy+o8wYzXjE4Zz3PCesbfs8HiCXXdcTuocApFv11UWlNFWKYsP2okqrhb7JNlSm9InBhIw==
 
-nan@^2.14.0, nan@^2.14.2:
-  version "2.28.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.28.0.tgz#126717fd359d5a03d3edf7c44e6ce9b707fb57f5"
-  integrity sha512-fTsDz99OTq2sVePhGdp4qQhggZFtKr64ZNVyVajRKtMOkJxYekplBh577PiJB12v/D3s2E5cGtOI45LWp6rnLQ==
-
 nanoid@^3.3.12:
   version "3.3.15"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.15.tgz#36c490fad8c6e86c824c940dfdde999b69ed4316"
@@ -5198,11 +5097,6 @@ node-int64@^0.4.0:
   integrity sha512-metH/nfz0gCT4NgraasId8+nd8Q3D8wRvMJHnzsWFXWZHSFSe2YtOhwkws7hqZfJbxvz42TGn4VQPXR0HephuQ==
   dependencies:
     node-addon-api "^7.1.0"
-
-node-releases@^2.0.21:
-  version "2.0.23"
-  resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-2.0.23.tgz#2ecf3d7ba571ece05c67c77e5b7b1b6fb9e18cea"
-  integrity sha512-cCmFDMSm26S6tQSDpBCg/NR8NENrVPhAJSf+XbxBG4rPFaaonlEoE9wHQmun+cls499TQGSb7ZyPBRlzgKfpeg==
 
 node-releases@^2.0.51:
   version "2.0.51"
@@ -5491,13 +5385,6 @@ path-scurry@^2.0.2:
     lru-cache "^11.0.0"
     minipass "^7.1.2"
 
-pause-stream@0.0.11:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/pause-stream/-/pause-stream-0.0.11.tgz#fe5a34b0cbce12b5aa6a2b403ee2e73b602f1445"
-  integrity sha512-e3FBlXLmN/D1S+zHzanP4E/4Z60oFAa3O051qt1pxa7DEJWKAyil6upYVXCWadEnuoqa4Pkc9oUx9zsxYeRv8A==
-  dependencies:
-    through "~2.3"
-
 pe-library@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/pe-library/-/pe-library-0.4.1.tgz#e269be0340dcb13aa6949d743da7d658c3e2fbea"
@@ -5609,7 +5496,7 @@ prebuild-install@^6.0.0:
     tar-fs "^2.0.0"
     tunnel-agent "^0.6.0"
 
-prebuild-install@^7.0.1, prebuild-install@^7.1.1:
+prebuild-install@^7.0.1:
   version "7.1.3"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-7.1.3.tgz#d630abad2b147443f20a212917beae68b8092eec"
   integrity sha512-8Mf2cbV7x1cXPUILADGI3wuhfqWvtiLA1iclTDbFRZkgRQS0NqsPZphna9V+HyTEadheuPmjaJMsbzKQFOzLug==
@@ -5656,7 +5543,7 @@ progress@^2.0.3:
   version "1.0.0"
   dependencies:
     glob "^13.0.6"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-4401ddf6-fe86-4822-8c10-ae279ff7ff01-1783892529659/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-ca8ab538-f169-41ca-a1dc-dbc98bf1eb0b-1783898790541/shared/select-list"
 
 promise-retry@^2.0.1:
   version "2.0.1"
@@ -5810,7 +5697,7 @@ readdirp@^4.0.1:
 "recent-list@file:packages/recent-list":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-32ac760b-c2ff-4350-8f31-70ef3eef151d-1783892529660/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-20fcd9f6-f450-4576-a8cf-7b1b4edd28bd-1783898790543/shared/select-list"
 
 regenerate-unicode-properties@^10.2.2:
   version "10.2.2"
@@ -6259,7 +6146,7 @@ slash@^2.0.0:
     pegjs "^0.10.0"
     scoped-property-store "^0.17.0"
     season "^6.0.2"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-ee291fd9-9d7f-49c0-b359-1e51d402c0f0-1783892529675/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-ac6dff64-e048-4eb8-b703-5b75d75ccb0e-1783898790556/shared/select-list"
     temp "~0.8.0"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
 
@@ -6336,13 +6223,6 @@ split2@^3.0.0:
   dependencies:
     readable-stream "^3.0.0"
 
-split@0.2:
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/split/-/split-0.2.10.tgz#67097c601d697ce1368f418f06cd201cf0521a57"
-  integrity sha512-e0pKq+UUH2Xq/sXbYpZBZc3BawsfDZ7dgv+JtRTUPNcvF5CMR4Y9cvJqkMY0MoxWzTHvZuz1beg6pNEKlszPiQ==
-  dependencies:
-    through "2"
-
 split@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/split/-/split-1.0.1.tgz#605bd9be303aa59fb35f9229fbea0ddec9ea07d9"
@@ -6398,13 +6278,6 @@ stat-mode@^1.0.0:
     fs-plus "^3.0.1"
     grim "^2.0.1"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
-
-stream-combiner@~0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/stream-combiner/-/stream-combiner-0.0.4.tgz#4d5e433c185261dde623ca3f44c586bcf5c4ad14"
-  integrity sha512-rT00SPnTVyRsaSz5zgSPma/aHSOic5U1prhYdRy5HS2kTZviFpmDgzilbtsJsxiroqACmayynDN/9VzIbX5DOw==
-  dependencies:
-    duplexer "~0.1.1"
 
 "string-width-cjs@npm:string-width@^4.2.0":
   version "4.2.3"
@@ -6513,7 +6386,7 @@ strip-json-comments@~2.0.1:
   dependencies:
     dedent "^0.7.0"
     etch "0.9.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-4c7cb601-8b40-420a-b294-0df405373a5a-1783892529679/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-7618f36c-f584-454a-b1e9-487ac6fc4ccd-1783898790561/shared/select-list"
 
 sumchecker@^3.0.1:
   version "3.0.1"
@@ -6560,7 +6433,7 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   dependencies:
     async "3.2.6"
-    ctags "^3.1.0"
+    ctags "https://github.com/lumine-code/node-ctags.git#c1bcce005e9c4f4ed7cfaea0f0c1fa7fe70fd88c"
     fs-plus "^3.1.1"
 
 "symbol-provider-tree-sitter@file:./packages/symbol-provider-tree-sitter":
@@ -6571,7 +6444,7 @@ supports-preserve-symlinks-flag@^1.0.0:
   dependencies:
     fs-plus "^3.1.1"
     murmurhash-js "^1.0.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-761bad16-dc2e-4aab-8c0f-e17a1133dd0c-1783892529687/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-37dfdbfe-d5e8-480f-af92-33515838a135-1783898790566/shared/select-list"
 
 tabbable@^6.5.0:
   version "6.5.0"
@@ -6681,7 +6554,7 @@ through2@^4.0.0:
   dependencies:
     readable-stream "3"
 
-through@2, through@2.3.x, through@^2.3.8, through@~2.3, through@~2.3.1:
+through@2, through@2.3.x, through@^2.3.8:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
@@ -6918,14 +6791,6 @@ unzipper@^0.12.3:
     fs-extra "11.3.1"
     graceful-fs "^4.2.2"
     node-int64 "^0.4.0"
-
-update-browserslist-db@^1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/update-browserslist-db/-/update-browserslist-db-1.1.3.tgz#348377dd245216f9e7060ff50b15a1b740b75420"
-  integrity sha512-UxhIZQ+QInVdunkDAaiazvvT/+fXL5Osr0JZlJulepYu6Jd7qJtDZjlur0emRlT71EN3ScPoE7gvsuIKKNavKw==
-  dependencies:
-    escalade "^3.2.0"
-    picocolors "^1.1.1"
 
 update-browserslist-db@^1.2.3:
   version "1.2.3"

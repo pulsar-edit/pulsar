@@ -1,5 +1,9 @@
 /** @babel */
 
+const path = require("path");
+// Electron 43 ships the synchronous Node SQLite API used by the state store.
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
+const { DatabaseSync } = require("node:sqlite");
 const StateStore = require("../src/state-store.js");
 
 describe("StateStore", () => {
@@ -49,8 +53,23 @@ describe("StateStore", () => {
       const store = new StateStore(databaseName, version);
       store.initialize({ configDirPath: atom.getConfigDirPath() });
       const instance = await store.dbPromise;
-      const Database = require("better-sqlite3");
-      expect(instance instanceof Database).toBe(true);
+      expect(instance instanceof DatabaseSync).toBe(true);
+    });
+
+    it("reads state from an existing SQLite database", async () => {
+      const existingDatabaseName = `${databaseName}-existing`;
+      const table = `${existingDatabaseName}${version}`;
+      const databasePath = path.join(atom.getConfigDirPath(), "session-store.db");
+      const database = new DatabaseSync(databasePath);
+      database.exec(`CREATE TABLE IF NOT EXISTS "${table}" (key VARCHAR, value JSON)`);
+      database
+        .prepare(`REPLACE INTO "${table}" VALUES (?, ?)`)
+        .run("existing-key", JSON.stringify({ value: { migrated: true } }));
+      database.close();
+
+      const store = new StateStore(existingDatabaseName, version);
+      store.initialize({ configDirPath: atom.getConfigDirPath() });
+      expect(await store.load("existing-key")).toEqual({ migrated: true });
     });
   });
 });
