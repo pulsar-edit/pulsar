@@ -1686,9 +1686,9 @@
     fs-plus "^3.0.0"
     nan "^2.14.2"
 
-"@pulsar-edit/git-utils@https://github.com/lumine-code/git-utils.git#436f81b":
+"@pulsar-edit/git-utils@https://github.com/lumine-code/git-utils.git#4348998":
   version "8.1.0"
-  resolved "https://github.com/lumine-code/git-utils.git#436f81ba0f7fc2470863501e9702d6595cee0b89"
+  resolved "https://github.com/lumine-code/git-utils.git#43489980cb6b42e46956b1a77985709cf5fb4bfe"
   dependencies:
     fs-plus "^3.0.0"
     node-addon-api "^8.2.1"
