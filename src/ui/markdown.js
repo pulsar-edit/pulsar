@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs");
+const { pathToFileURL } = require("url");
 const MarkdownIt = require("markdown-it");
 const { TextEditor } = require("atom");
 
@@ -104,6 +105,10 @@ function renderMarkdown(content, givenOpts = {}) {
     return typeof opts.rootDomain === "string" && opts.rootDomain.length > 1;
   };
 
+  const validateFilePath = () => {
+    return typeof opts.filePath === "string" && opts.filePath.length > 1;
+  };
+
   const cleanRootDomain = () => {
     // We will also remove any trailing `/` as link resolvers down the line add them in
     return opts.rootDomain.replace(".git", "").replace(/\/$/, "");
@@ -145,72 +150,68 @@ function renderMarkdown(content, givenOpts = {}) {
       divWrap: opts.taskCheckboxDivWrap,
     });
   }
-  if (opts.transformImageLinks && validateRootDomain()) {
+  if (opts.transformImageLinks && (validateRootDomain() || validateFilePath())) {
     // Here we will take any links for images provided in the content, and do
     // our best to ensure they can accurately resolve.
     const defaultImageRenderer = md.renderer.rules.image; // We want to keep access to this
 
-    // Determines when we handle links if the item could be a local file or not
-    let couldBeLocalItem;
-    if (typeof opts.filePath != "string" || opts.filePath.length < 1) {
-      couldBeLocalItem = false;
-    } else {
-      couldBeLocalItem = true;
-    }
+    const hasRootDomain = validateRootDomain();
+    const hasFilePath = validateFilePath();
+    const hasGitHubRoot = hasRootDomain && opts.rootDomain.includes("github.");
+
+    const isFile = (filePath) => {
+      try {
+        return fs.statSync(filePath).isFile();
+      } catch {
+        return false;
+      }
+    };
+
+    const resolveLocalImage = (source) => {
+      if (!hasFilePath) return null;
+
+      if (mdComponents.reg.localLinks.rootDir.test(source)) {
+        if (isFile(source)) return pathToFileURL(source).href;
+
+        const [rootDirectory] = atom.project.relativizePath(opts.filePath);
+        if (!rootDirectory) return null;
+
+        const candidate = path.join(
+          rootDirectory,
+          source.replace(mdComponents.reg.localLinks.rootDir, ""),
+        );
+        return isFile(candidate) ? pathToFileURL(candidate).href : null;
+      }
+
+      const candidate = path.resolve(
+        path.dirname(opts.filePath),
+        source.replace(mdComponents.reg.localLinks.currentDir, ""),
+      );
+      return isFile(candidate) ? pathToFileURL(candidate).href : null;
+    };
+
+    const resolveRemoteImage = (source) => {
+      if (!hasRootDomain) return null;
+
+      const relativeSource = source
+        .replace(mdComponents.reg.localLinks.currentDir, "")
+        .replace(mdComponents.reg.localLinks.rootDir, "");
+      if (hasGitHubRoot) {
+        return `${cleanRootDomain()}/raw/HEAD/${relativeSource}`;
+      }
+      return `${cleanRootDomain()}/${relativeSource}`;
+    };
 
     md.renderer.rules.image = (tokens, idx, options, env, self) => {
-      let token = tokens[idx];
+      const token = tokens[idx];
+      const source = token.attrGet("src");
+      const isRelative =
+        !source.startsWith("http") && !mdComponents.reg.globalLinks.base64.test(source);
 
-      // Lets say content contains './my-cool-image.png'
-      // We need to turn it into something like this:
-      // https://github.com/USER/REPO/raw/HEAD/my-cool-image.png
-      if (mdComponents.reg.localLinks.currentDir.test(token.attrGet("src"))) {
-        let rawLink = token.attrGet("src");
-        rawLink = rawLink.replace(mdComponents.reg.localLinks.currentDir, "");
-        // Now we need to handle links for both the web and locally
-        // We can do this by first checking if the link resolves locally
-        if (couldBeLocalItem) {
-          let newSrc = path.resolve(path.dirname(opts.filePath, rawLink));
-          if (!fs.lstatSync(newSrc).isFile()) {
-            token.attrSet("src", newSrc);
-          } else {
-            token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
-          }
-        } else {
-          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
-        }
-      } else if (mdComponents.reg.localLinks.rootDir.test(token.attrGet("src"))) {
-        let rawLink = token.attrGet("src");
-        rawLink = rawLink.replace(mdComponents.reg.localLinks.rootDir, "");
-        // Now to handle the possible web or local link
-        if (couldBeLocalItem) {
-          const [rootDirectory] = atom.project.relativePath(opts.filePath);
-          let newSrc = path.join(rootDirectory, rawLink);
-          if (!fs.lstatSync(newSrc).isFile() && rootDirectory) {
-            token.attrSet("src", newSrc);
-          } else {
-            token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
-          }
-        } else {
-          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
-        }
-      } else if (
-        !token.attrGet("src").startsWith("http") &&
-        !mdComponents.reg.globalLinks.base64.test(token.attrGet("src"))
-      ) {
-        // Check for implicit relative urls
-        let rawLink = token.attrGet("src");
-        token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawLink}`);
-      } else if (
-        [".gif", ".png", ".jpg", ".jpeg", ".webp"].find((ext) =>
-          token.attrGet("src").endsWith(ext),
-        ) &&
-        token.attrGet("src").startsWith("https://github.com") &&
-        token.attrGet("src").includes("blob")
-      ) {
-        // Should match any image being distributed from GitHub that's using `blob` instead of `raw` causing images to not load correctly
-        let rawLink = token.attrGet("src");
-        token.attrSet("src", rawLink.replace("blob", "raw"));
+      if (isRelative) {
+        token.attrSet("src", resolveLocalImage(source) ?? resolveRemoteImage(source) ?? source);
+      } else if (source.startsWith("https://github.com") && source.includes("/blob/")) {
+        token.attrSet("src", source.replace("/blob/", "/raw/"));
       }
 
       // pass token to default renderer
@@ -463,7 +464,10 @@ function renderMarkdown(content, givenOpts = {}) {
   if (opts.sanitize) {
     mdComponents.deps.domPurify ??= require("dompurify");
 
-    rendered = mdComponents.deps.domPurify.sanitize(rendered, opts);
+    rendered = mdComponents.deps.domPurify.sanitize(rendered, {
+      ALLOW_UNKNOWN_PROTOCOLS: opts.sanitizeAllowUnknownProtocols,
+      ALLOW_SELF_CLOSE_IN_ATTR: opts.sanitizeAllowSelfClose,
+    });
   }
 
   return rendered;

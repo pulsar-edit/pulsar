@@ -71,6 +71,18 @@ describe("PackageDetailView", function () {
     expect(view.refs.title.textContent).toBe("Package With Config");
   });
 
+  it("renders an installed package README with its file path", function () {
+    const packagePath = path.join(__dirname, "fixtures", "package-with-readme");
+    atom.packages.loadPackage(packagePath);
+    const pack = atom.packages.getLoadedPackage("package-with-readme");
+    const render = spyOn(atom.ui.markdown, "render").andCallThrough();
+
+    view = new PackageDetailView(pack, new SettingsView(), packageManager, SnippetsProvider);
+
+    expect(render).toHaveBeenCalled();
+    expect(render.mostRecentCall.args[1].filePath).toBe(path.join(packagePath, "README.md"));
+  });
+
   it("does not call the atom.io api for package metadata when present", function () {
     atom.packages.loadPackage(path.join(__dirname, "fixtures", "package-with-config"));
     packageManager.client = createClientSpy();

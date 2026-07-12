@@ -467,7 +467,7 @@ export default class PackageDetailView {
 
     if (this.pack.path) {
       // If package is installed, use installed path
-      readmeSrc = this.pack.path;
+      readmeSrc = this.readmePath || path.join(this.pack.path, "README.md");
       readmeIsLocal = true;
     } else {
       // If package isn't installed, use url path

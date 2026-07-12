@@ -1,4 +1,6 @@
 const dedent = require("dedent");
+const path = require("path");
+const { pathToFileURL } = require("url");
 
 describe("Renders Markdown", () => {
   describe("properly when given no opts", () => {
@@ -64,6 +66,48 @@ describe("Renders Markdown", () => {
   });
 
   describe("transforms images correctly", () => {
+    it("resolves images relative to a local Markdown file", () => {
+      const readmePath = path.join(
+        __dirname,
+        "fixtures",
+        "packages",
+        "package-with-index",
+        "index.coffee",
+      );
+
+      expect(
+        atom.ui.markdown.render("![Local image](./index.coffee)", {
+          filePath: readmePath,
+        }),
+      ).toBe(`<p><img src="${pathToFileURL(readmePath).href}" alt="Local image"></p>\n`);
+    });
+
+    it("leaves missing local images unchanged", () => {
+      const readmePath = path.join(
+        __dirname,
+        "fixtures",
+        "packages",
+        "package-with-index",
+        "README.md",
+      );
+
+      expect(
+        atom.ui.markdown.render("![Missing](./missing.png)", {
+          filePath: readmePath,
+        }),
+      ).toBe('<p><img src="./missing.png" alt="Missing"></p>\n');
+    });
+
+    it("resolves images against non-GitHub root domains", () => {
+      expect(
+        atom.ui.markdown.render("![Remote image](./static/image.png)", {
+          rootDomain: "https://example.com/packages/example",
+        }),
+      ).toBe(
+        '<p><img src="https://example.com/packages/example/static/image.png" alt="Remote image"></p>\n',
+      );
+    });
+
     it("properly handles a standard PNG image", () => {
       expect(
         atom.ui.markdown.render("![Alt Text](/image-link.png)", {
