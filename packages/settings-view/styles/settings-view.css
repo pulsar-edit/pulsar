@@ -713,6 +713,12 @@
       width: 100%;
     }
 
+    /* Space the first card from the search row (the browse message that
+       normally provides this gap is hidden once cards render). */
+    .package-container:not(:empty) {
+      margin-top: calc(var(--component-padding) * 2);
+    }
+
     .search-container {
       display: flex;
       flex-wrap: wrap;
@@ -867,14 +873,6 @@
   font-family: monospace;
   white-space: pre !important;
   text-align: left;
-}
-
-.package-updates-status-view:hover {
-  text-decoration: underline;
-}
-
-.available-updates-status {
-  padding-left: 2px;
 }
 
 /* Overrides

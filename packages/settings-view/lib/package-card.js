@@ -4,9 +4,18 @@
 import { CompositeDisposable, Disposable } from "atom";
 import etch from "etch";
 import BadgeView from "./badge-view";
+import fs from "fs";
 import path from "path";
+import semver from "semver";
 
-import { ownerFromRepository, repoUrlFromRepository } from "./utils";
+import {
+  ownerFromRepository,
+  repoUrlFromRepository,
+  repoReferenceFromRepository,
+  packageOriginKey,
+  installedOriginKeys,
+  getInstalledPackageMetadata,
+} from "./utils";
 
 export default class PackageCard {
   constructor(pack, settingsView, packageManager, options = {}) {
@@ -34,6 +43,8 @@ export default class PackageCard {
       }
     }
 
+    this.adoptInstalledState();
+
     etch.initialize(this);
 
     this.handlePackageEvents();
@@ -47,7 +58,10 @@ export default class PackageCard {
       this.refs.enablementButton.remove();
     }
 
-    if (atom.packages.isBundledPackage(this.pack.name)) {
+    // Only strip the install/uninstall buttons for the genuine bundled package.
+    // A community package that merely shares a bundled package's name keeps its
+    // buttons so the conflict state can show a disabled Install with a reason.
+    if (atom.packages.isBundledPackage(this.pack.name) && !this.installedOriginDiffers()) {
       this.refs.installButtonGroup.remove();
       this.refs.uninstallButton.remove();
     }
@@ -61,13 +75,24 @@ export default class PackageCard {
   }
 
   render() {
+    // Before install, a Git card's `name` is the raw source (e.g.
+    // "owner/repo@1.0.0"), so fall back to the repository's project name for a
+    // clean label. Once installed we know the real package.json name, which can
+    // differ from the repository name (repo "pulsar-invert-colors" ships package
+    // "invert-colors"), so prefer it.
+    const knowsRealName = this.pack.apmInstallSource != null || this.isInstalled();
     const displayName =
-      (this.pack.gitUrlInfo ? this.pack.gitUrlInfo.project : this.pack.name) || "";
+      (this.pack.gitUrlInfo && !knowsRealName ? this.pack.gitUrlInfo.project : this.pack.name) ||
+      "";
     const owner = ownerFromRepository(this.pack.repository);
+    const repoReference = repoReferenceFromRepository(this.pack.repository);
     const description = this.pack.description || "";
+    const cardClasses = `package-card col-lg-8${
+      this.pack.source === "pulsar" ? " pulsar-source" : ""
+    }`;
 
     return (
-      <div className="package-card col-lg-8">
+      <div className={cardClasses}>
         <div ref="statsContainer" className="stats pull-right">
           <span ref="packageSha" className="stats-item" style={{ display: "none" }}>
             <span className="icon icon-git-branch" />
@@ -82,10 +107,14 @@ export default class PackageCard {
             </a>
             <span className="package-version">
               <span ref="versionValue" className="value">
-                {String(this.pack.version)}
+                {this.pack.version == null ? "" : String(this.pack.version)}
               </span>
             </span>
-            <span ref="badges"></span>
+            {repoReference ? (
+              <a ref="repoLink" className="package-repo">
+                {repoReference}
+              </a>
+            ) : null}
           </h4>
           <span ref="packageDescription" className="package-description">
             {description}
@@ -109,6 +138,7 @@ export default class PackageCard {
           </div>
           <div className="meta-controls">
             <div className="btn-toolbar">
+              <span ref="badges" className="package-badges"></span>
               <div ref="updateButtonGroup" className="btn-group">
                 <button
                   type="button"
@@ -174,20 +204,17 @@ export default class PackageCard {
         this.refs.versionValue.textContent = packageVersion;
         if (packageVersion !== this.pack.version) {
           this.refs.versionValue.classList.add("text-warning");
-          this.refs.packageMessage.classList.add("text-warning");
-          this.refs.packageMessage.textContent = `Version ${packageVersion} is not the latest version available for this package, but it's the latest that is compatible with your version of Lumine.`;
+          this.compatibleVersionNote = `Version ${packageVersion} is the latest that is compatible with your Lumine version, not the newest available.`;
+        } else {
+          this.compatibleVersionNote = null;
         }
 
         this.installablePack = pack;
         this.hasCompatibleVersion = true;
       } else {
         this.hasCompatibleVersion = false;
+        this.compatibleVersionNote = null;
         this.refs.versionValue.classList.add("text-error");
-        this.refs.packageMessage.classList.add("text-error");
-        this.refs.packageMessage.insertAdjacentText(
-          "beforeend",
-          `There's no version of this package that is compatible with your Lumine version. The version must satisfy ${this.pack.engines.atom}.`,
-        );
         console.error(
           `No available version compatible with the installed Lumine version: ${atom.getVersion()}`,
         );
@@ -203,6 +230,8 @@ export default class PackageCard {
     } else {
       const clickHandler = (event) => {
         event.stopPropagation();
+        // The installed package merely shares its name — don't link to it.
+        if (this.originConflict) return;
         this.settingsView.showPanel(this.pack.name, {
           back: options ? options.back : null,
           pack: this.pack,
@@ -248,23 +277,26 @@ export default class PackageCard {
 
     const updateButtonClickHandler = (event) => {
       event.stopPropagation();
+
+      // Capture the version labels before updating: the "updated" event clears
+      // newVersion/newSha, and a tag-tracked git update has no latestSha, so
+      // branch on which kind of update this is rather than assuming a sha.
+      let oldVersion = "";
+      let newVersion = "";
+      if (this.newSha) {
+        const installedSha = this.pack.apmInstallSource && this.pack.apmInstallSource.sha;
+        oldVersion = installedSha ? installedSha.substr(0, 8) : "";
+        newVersion = this.newSha.substr(0, 8);
+      } else if (this.newVersion) {
+        oldVersion =
+          (this.pack.apmInstallSource && this.pack.apmInstallSource.version) ||
+          this.pack.version ||
+          "";
+        newVersion = this.newVersion;
+      }
+      const detail = oldVersion && newVersion ? `${oldVersion} -> ${newVersion}` : "";
+
       this.update().then(() => {
-        let oldVersion = "";
-        let newVersion = "";
-
-        if (this.pack.apmInstallSource && this.pack.apmInstallSource.type === "git") {
-          oldVersion = this.pack.apmInstallSource.sha.substr(0, 8);
-          newVersion = `${this.pack.latestSha.substr(0, 8)}`;
-        } else if (this.pack.version && this.pack.latestVersion) {
-          oldVersion = this.pack.version;
-          newVersion = this.pack.latestVersion;
-        }
-
-        let detail = "";
-        if (oldVersion && newVersion) {
-          detail = `${oldVersion} -> ${newVersion}`;
-        }
-
         const notification = atom.notifications.addSuccess(
           `Restart Lumine to complete the update of \`${this.pack.name}\`.`,
           {
@@ -302,6 +334,14 @@ export default class PackageCard {
         atom.openExternal(repoUrl);
       }
     };
+    if (this.refs.repoLink) {
+      this.refs.repoLink.addEventListener("click", packageNameClickHandler);
+      this.disposables.add(
+        new Disposable(() => {
+          this.refs.repoLink.removeEventListener("click", packageNameClickHandler);
+        }),
+      );
+    }
     this.refs.packageName.addEventListener("click", packageNameClickHandler);
     this.disposables.add(
       new Disposable(() => {
@@ -364,6 +404,14 @@ export default class PackageCard {
   }
 
   destroy() {
+    if (this.installNoteTooltip) {
+      this.installNoteTooltip.dispose();
+      this.installNoteTooltip = null;
+    }
+    if (this.badgeViews) {
+      for (const badgeView of this.badgeViews) badgeView.destroy();
+      this.badgeViews = [];
+    }
     this.disposables.dispose();
     return etch.destroy(this);
   }
@@ -371,7 +419,11 @@ export default class PackageCard {
   loadCachedMetadata() {
     if (repoUrlFromRepository(this.pack.repository) === atom.branding.urlCoreRepo) {
       // Don't hit the web for our bundled packages. Just use the local image.
-      this.refs.avatar.src = `file://${path.join(process.resourcesPath, "lumine.png")}`;
+      let avatarPath = path.join(process.resourcesPath, "lumine.png");
+      if (!fs.existsSync(avatarPath)) {
+        avatarPath = path.join(atom.getLoadSettings().resourcePath, "resources", "lumine.png");
+      }
+      this.refs.avatar.src = `file://${avatarPath}`;
     } else {
       this.client.avatar(ownerFromRepository(this.pack.repository), (err, avatarPath) => {
         if (!err && avatarPath) {
@@ -384,14 +436,37 @@ export default class PackageCard {
   updateInterfaceState() {
     this.refs.versionValue.textContent =
       (this.installablePack ? this.installablePack.version : null) || this.pack.version;
-    if (this.pack.apmInstallSource && this.pack.apmInstallSource.type === "git") {
-      this.refs.shaValue.textContent = this.pack.apmInstallSource.sha.substr(0, 8);
+
+    // The Git ref indicator describes what is installed, so only show it while
+    // the package is actually installed — not on an Install card or after an
+    // uninstall.
+    const gitRef = this.isInstalled() ? this.gitInstallRef() : null;
+    if (gitRef) {
+      this.refs.shaValue.textContent = gitRef;
       this.refs.packageSha.style.display = "";
+    } else {
+      this.refs.packageSha.style.display = "none";
     }
 
     this.updateSettingsState();
     this.updateInstalledState();
     this.updateDisabledState();
+  }
+
+  // The Git ref worth showing beside the version: a branch name or short commit
+  // for branch/commit installs. Tag and latest-tag installs return null because
+  // the version already reflects the installed tag.
+  gitInstallRef() {
+    const install = this.pack.apmInstallSource;
+    if (!install || install.type !== "git") return null;
+    const selector = install.selector;
+    if (selector) {
+      if (selector.type === "tag" || selector.type === "latest") return null;
+      if (selector.type === "branch") return selector.value;
+      if (selector.type === "commit") return (selector.value || install.sha || "").substr(0, 8);
+    }
+    // Legacy installs without a selector fall back to the commit sha.
+    return install.sha ? install.sha.substr(0, 8) : null;
   }
 
   updateSettingsState() {
@@ -403,11 +478,13 @@ export default class PackageCard {
   }
 
   addBadges() {
+    this.badgeViews = [];
     if (Array.isArray(this.pack.badges)) {
       // This safety check is especially needed, as any cached package
       // data will not contain the badges field
       for (const badge of this.pack.badges) {
-        let badgeView = new BadgeView(badge);
+        const badgeView = new BadgeView(badge);
+        this.badgeViews.push(badgeView);
         this.refs.badges.appendChild(badgeView.element);
       }
     }
@@ -447,13 +524,106 @@ export default class PackageCard {
 
   updateInstalledState() {
     if (this.isInstalled()) {
+      if (this.installedOriginDiffers()) {
+        this.displayConflictingOriginState();
+        return;
+      }
+      this.clearConflictingOriginState();
       this.displayInstalledState();
     } else {
+      this.clearConflictingOriginState();
       this.displayNotInstalledState();
     }
   }
 
+  // Annotates the Install button with a hover note explaining a caveat. When
+  // `blocking` is true the button is also shown disabled (install is not
+  // possible); otherwise it stays usable and the note is purely informational.
+  setInstallNote(message, blocking) {
+    this.installBlocked = !!blocking;
+    this.refs.installButton.classList.toggle("disabled", !!blocking);
+    if (this.installNote !== message) {
+      if (this.installNoteTooltip) {
+        this.installNoteTooltip.dispose();
+        this.installNoteTooltip = null;
+      }
+      if (message) {
+        this.installNoteTooltip = atom.tooltips.add(this.refs.installButtonGroup, {
+          title: message,
+        });
+      }
+      this.installNote = message;
+    }
+  }
+
+  clearInstallNote() {
+    this.installBlocked = false;
+    this.installNote = null;
+    this.refs.installButton.classList.remove("disabled");
+    if (this.installNoteTooltip) {
+      this.installNoteTooltip.dispose();
+      this.installNoteTooltip = null;
+    }
+  }
+
+  incompatibleMessage() {
+    const engine = this.pack.engines && this.pack.engines.atom ? this.pack.engines.atom : "*";
+    return `No version of this package is compatible with your Lumine version. It requires ${engine}.`;
+  }
+
+  // The installed package merely shares its name with this card's package.
+  // Keep Install visible but disabled — installing would overwrite the
+  // unrelated package — and explain why on hover. Uninstall/settings stay
+  // hidden so they can't act on the unrelated package.
+  displayConflictingOriginState() {
+    this.originConflict = true;
+    this.refs.updateButtonGroup.style.display = "none";
+    this.refs.packageActionButtonGroup.style.display = "none";
+    this.refs.installButtonGroup.style.display = "";
+    this.setInstallNote(
+      `A different package named “${this.pack.name}” is already installed. Uninstall it before installing this one.`,
+      true,
+    );
+  }
+
+  clearConflictingOriginState() {
+    if (!this.originConflict) return;
+    this.originConflict = false;
+    this.clearInstallNote();
+  }
+
+  // When the card's package is already installed from the same origin, adopt
+  // the installed package's install source and offer an update if this card
+  // describes a newer version.
+  adoptInstalledState() {
+    if (!this.pack.version || !this.pack.repository || !this.isInstalled()) return;
+    const metadata = this.getInstalledMetadata();
+    if (!metadata || this.installedOriginDiffers()) return;
+    if (metadata.apmInstallSource && !this.pack.apmInstallSource) {
+      this.pack.apmInstallSource = metadata.apmInstallSource;
+    }
+    if (
+      semver.valid(metadata.version) &&
+      semver.valid(this.pack.version) &&
+      semver.gt(this.pack.version, metadata.version)
+    ) {
+      this.newVersion = this.pack.version;
+    }
+  }
+
+  getInstalledMetadata() {
+    return getInstalledPackageMetadata(this.pack.name);
+  }
+
+  installedOriginDiffers() {
+    const originKey = packageOriginKey(this.pack.repository);
+    if (!originKey) return false;
+    const installedKeys = installedOriginKeys(this.getInstalledMetadata());
+    return installedKeys.length > 0 && !installedKeys.includes(originKey);
+  }
+
   displayInstalledState() {
+    this.clearInstallNote();
     if (this.newVersion || this.newSha) {
       this.refs.updateButtonGroup.style.display = "";
       if (this.newVersion) {
@@ -486,12 +656,17 @@ export default class PackageCard {
 
   setNotInstalledStateButtons() {
     if (!this.hasCompatibleVersion) {
-      this.refs.installButtonGroup.style.display = "none";
+      // No compatible version: show a disabled Install with the reason on hover.
+      this.setInstallNote(this.incompatibleMessage(), true);
+      this.refs.installButtonGroup.style.display = "";
       this.refs.updateButtonGroup.style.display = "none";
     } else if (this.newVersion || this.newSha) {
+      this.clearInstallNote();
       this.refs.updateButtonGroup.style.display = "";
       this.refs.installButtonGroup.style.display = "none";
     } else {
+      // Usable Install, optionally with an informational compatibility note.
+      this.setInstallNote(this.compatibleVersionNote || null, false);
       this.refs.updateButtonGroup.style.display = "none";
       this.refs.installButtonGroup.style.display = "";
     }
@@ -543,19 +718,28 @@ export default class PackageCard {
       }),
     );
 
-    this.subscribeToPackageEvent("package-installing theme-installing", () => {
-      this.updateInterfaceState();
-      this.refs.installButton.disabled = true;
-      this.refs.installButton.classList.add("is-installing");
+    this.subscribeToPackageEvent("package-installing theme-installing", (pack) => {
+      if (this.isSameOriginEvent(pack)) {
+        this.updateInterfaceState();
+        this.refs.installButton.disabled = true;
+        this.refs.installButton.classList.add("is-installing");
+      } else {
+        // A different package with the same name is being installed; this one
+        // can't be installed until that finishes, so show it disabled — not the
+        // "installing" spinner.
+        this.setInstallNote(`Installing “${pack.name}”…`, true);
+      }
     });
 
-    this.subscribeToPackageEvent("package-updating theme-updating", () => {
+    this.subscribeToPackageEvent("package-updating theme-updating", (pack) => {
+      if (!this.isSameOriginEvent(pack)) return;
       this.updateInterfaceState();
       this.refs.updateButton.disabled = true;
       this.refs.updateButton.classList.add("is-installing");
     });
 
-    this.subscribeToPackageEvent("package-uninstalling theme-uninstalling", () => {
+    this.subscribeToPackageEvent("package-uninstalling theme-uninstalling", (pack) => {
+      if (!this.isSameOriginEvent(pack)) return;
       this.updateInterfaceState();
       this.refs.enablementButton.disabled = true;
       this.refs.uninstallButton.disabled = true;
@@ -564,7 +748,13 @@ export default class PackageCard {
 
     this.subscribeToPackageEvent(
       "package-installed package-install-failed theme-installed theme-install-failed",
-      () => {
+      (pack) => {
+        // A different same-named install finished: re-evaluate — this card is
+        // now either in conflict (it succeeded) or installable again (it failed).
+        if (!this.isSameOriginEvent(pack)) {
+          this.updateInterfaceState();
+          return;
+        }
         const loadedPack = atom.packages.getLoadedPackage(this.pack.name);
         const version = loadedPack && loadedPack.metadata ? loadedPack.metadata.version : null;
         if (version) {
@@ -576,7 +766,11 @@ export default class PackageCard {
       },
     );
 
-    this.subscribeToPackageEvent("package-updated theme-updated", () => {
+    this.subscribeToPackageEvent("package-updated theme-updated", (pack) => {
+      if (!this.isSameOriginEvent(pack)) {
+        this.updateInterfaceState();
+        return;
+      }
       const loadedPack = atom.packages.getLoadedPackage(this.pack.name);
       const metadata = loadedPack ? loadedPack.metadata : null;
       if (metadata && metadata.version) {
@@ -594,7 +788,8 @@ export default class PackageCard {
       this.updateInterfaceState();
     });
 
-    this.subscribeToPackageEvent("package-update-failed theme-update-failed", () => {
+    this.subscribeToPackageEvent("package-update-failed theme-update-failed", (pack) => {
+      if (!this.isSameOriginEvent(pack)) return;
       this.refs.updateButton.disabled = false;
       this.refs.updateButton.classList.remove("is-installing");
       this.updateInterfaceState();
@@ -602,7 +797,11 @@ export default class PackageCard {
 
     this.subscribeToPackageEvent(
       "package-uninstalled package-uninstall-failed theme-uninstalled theme-uninstall-failed",
-      () => {
+      (pack) => {
+        if (!this.isSameOriginEvent(pack)) {
+          this.updateInterfaceState();
+          return;
+        }
         this.newVersion = null;
         this.newSha = null;
         this.refs.enablementButton.disabled = false;
@@ -611,6 +810,20 @@ export default class PackageCard {
         this.updateInterfaceState();
       },
     );
+  }
+
+  // The event's pack shares this card's NAME (subscribeToPackageEvent filters by
+  // name). Returns whether it is also the SAME package by origin — i.e. the
+  // event is about this card's package rather than a different same-named one.
+  isSameOriginEvent(pack) {
+    const cardKey = packageOriginKey(this.pack.repository);
+    const eventKey = packageOriginKey(
+      pack.installSource ||
+        (pack.apmInstallSource && pack.apmInstallSource.source) ||
+        pack.repository,
+    );
+    if (!cardKey || !eventKey) return true;
+    return cardKey === eventKey;
   }
 
   isInstalled() {
@@ -645,6 +858,11 @@ export default class PackageCard {
   */
 
   install() {
+    // Install is blocked (name conflict or no compatible version); the button
+    // is shown disabled with a hover note explaining why.
+    if (this.installBlocked) {
+      return;
+    }
     this.packageManager.install(
       this.installablePack != null ? this.installablePack : this.pack,
       (error) => {

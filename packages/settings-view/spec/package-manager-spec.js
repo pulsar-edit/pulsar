@@ -1,3 +1,5 @@
+const fs = require("fs-plus");
+const os = require("os");
 const path = require("path");
 const PackageManager = require("../lib/package-manager");
 
@@ -144,15 +146,226 @@ describe("PackageManager", function () {
     });
   });
 
+  describe("::assertNoNameCollision()", function () {
+    let packagesDir;
+
+    const writeInstalledMetadata = (name, metadata) => {
+      const packageDir = path.join(packagesDir, name);
+      fs.makeTreeSync(packageDir);
+      fs.writeFileSync(
+        path.join(packageDir, "package.json"),
+        JSON.stringify({ name, ...metadata }),
+      );
+    };
+
+    beforeEach(function () {
+      packagesDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "lumine-spec-")));
+      spyOn(packageManager, "getAtomPackagesDirectory").andReturn(packagesDir);
+    });
+
+    afterEach(function () {
+      fs.removeSync(packagesDir);
+    });
+
+    it("throws for names of bundled packages", function () {
+      expect(() =>
+        packageManager.assertNoNameCollision("settings-view", { repository: "user/settings-view" }),
+      ).toThrow();
+    });
+
+    it("throws when a package with the same name but another origin is installed", function () {
+      writeInstalledMetadata("shared-name", {
+        repository: "https://github.com/someone-else/shared-name.git",
+      });
+      expect(() =>
+        packageManager.assertNoNameCollision("shared-name", {
+          repository: "user/shared-name",
+          source: "user/shared-name",
+        }),
+      ).toThrow();
+    });
+
+    it("allows reinstalling the same package", function () {
+      writeInstalledMetadata("shared-name", {
+        repository: "https://github.com/user/shared-name.git",
+      });
+      expect(() =>
+        packageManager.assertNoNameCollision("shared-name", {
+          repository: "user/shared-name",
+          source: "user/shared-name@1.2.0",
+        }),
+      ).not.toThrow();
+    });
+
+    it("allows installing when nothing with that name is installed", function () {
+      expect(() =>
+        packageManager.assertNoNameCollision("free-name", { repository: "user/free-name" }),
+      ).not.toThrow();
+    });
+
+    it("allows overwriting an installed package without origin information", function () {
+      writeInstalledMetadata("shared-name", {});
+      expect(() =>
+        packageManager.assertNoNameCollision("shared-name", { repository: "user/shared-name" }),
+      ).not.toThrow();
+    });
+  });
+
   describe("::uninstall()", function () {
     it("removes the package from the core.disabledPackages list", function () {
       const uninstallCallback = jasmine.createSpy("uninstallCallback");
       atom.config.set("core.disabledPackages", ["something"]);
 
-      packageManager.uninstall({ name: "something" }, uninstallCallback);
+      waitsForPromise(() => packageManager.uninstall({ name: "something" }, uninstallCallback));
 
-      expect(uninstallCallback).toHaveBeenCalled();
-      expect(atom.config.get("core.disabledPackages")).not.toContain("something");
+      runs(() => {
+        expect(uninstallCallback).toHaveBeenCalled();
+        expect(atom.config.get("core.disabledPackages")).not.toContain("something");
+      });
+    });
+
+    it("awaits async deactivation before unloading an active package", function () {
+      // Reproduces the "Tried to unload active package" error: deactivation is
+      // async, so unloading must wait for it to complete.
+      let deactivated = false;
+      spyOn(atom.packages, "isPackageActive").andCallFake(() => !deactivated);
+      spyOn(atom.packages, "deactivatePackage").andCallFake(() =>
+        Promise.resolve().then(() => {
+          deactivated = true;
+        }),
+      );
+      spyOn(atom.packages, "isPackageLoaded").andReturn(true);
+      spyOn(atom.packages, "unloadPackage").andCallFake((name) => {
+        if (atom.packages.isPackageActive(name)) {
+          throw new Error(`Tried to unload active package '${name}'`);
+        }
+      });
+      spyOn(atom.packages, "resolvePackagePath").andReturn(null);
+
+      const uninstallCallback = jasmine.createSpy("uninstallCallback");
+      waitsForPromise(() => packageManager.uninstall({ name: "active-pkg" }, uninstallCallback));
+
+      runs(() => {
+        expect(atom.packages.deactivatePackage).toHaveBeenCalledWith("active-pkg");
+        expect(atom.packages.unloadPackage).toHaveBeenCalledWith("active-pkg");
+        expect(uninstallCallback).toHaveBeenCalled();
+        expect(uninstallCallback.mostRecentCall.args[0]).toBeUndefined();
+      });
+    });
+  });
+
+  describe("::pinSourceToVersion()", function () {
+    it("pins an owner/repo shorthand with @version", function () {
+      expect(packageManager.pinSourceToVersion({ repository: "owner/repo" }, "4.0.0")).toBe(
+        "owner/repo@4.0.0",
+      );
+    });
+
+    it("pins a Git URL with an explicit #tag: selector", function () {
+      expect(
+        packageManager.pinSourceToVersion({ repository: "https://github.com/owner/repo" }, "4.0.0"),
+      ).toBe("https://github.com/owner/repo#tag:4.0.0");
+    });
+  });
+
+  describe("::removePackageDir()", function () {
+    it("removes a directory tree asynchronously, including nested folders", function () {
+      const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "lumine-rm-")));
+      fs.makeTreeSync(path.join(dir, "node_modules", "dep", "deep"));
+      fs.writeFileSync(path.join(dir, "node_modules", "dep", "deep", "index.js"), "x");
+      expect(fs.existsSync(dir)).toBe(true);
+
+      waitsForPromise(() => packageManager.removePackageDir(dir));
+      runs(() => expect(fs.existsSync(dir)).toBe(false));
+    });
+
+    it("resolves without error when the directory is already gone", function () {
+      waitsForPromise(() =>
+        packageManager.removePackageDir(path.join(os.tmpdir(), "lumine-not-there-xyz")),
+      );
+    });
+  });
+
+  describe("::copyPackageDir()", function () {
+    it("copies a directory tree asynchronously", function () {
+      const source = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "lumine-src-")));
+      const parent = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "lumine-dst-")));
+      const target = path.join(parent, "copied");
+      fs.makeTreeSync(path.join(source, "lib"));
+      fs.writeFileSync(path.join(source, "lib", "main.js"), "module.exports = 1;");
+
+      waitsForPromise(() => packageManager.copyPackageDir(source, target));
+      runs(() => {
+        expect(fs.existsSync(path.join(target, "lib", "main.js"))).toBe(true);
+        fs.removeSync(source);
+        fs.removeSync(parent);
+      });
+    });
+  });
+
+  describe("::installGitHubPackage()", function () {
+    it("reinstalls an installed package from its recorded source, not the bare name", function () {
+      spyOn(packageManager, "resolvePackageSource").andReturn(Promise.reject(new Error("stop")));
+      const pack = {
+        name: "hydrogen-next",
+        apmInstallSource: { type: "git", source: "lumine-code/hydrogen-next" },
+      };
+
+      let rejected = false;
+      waitsForPromise(() =>
+        packageManager.installGitHubPackage(pack).catch(() => (rejected = true)),
+      );
+
+      runs(() => {
+        expect(rejected).toBe(true);
+        expect(packageManager.resolvePackageSource).toHaveBeenCalledWith(
+          "lumine-code/hydrogen-next",
+        );
+      });
+    });
+
+    it("preserves an explicit version selector from installSource", function () {
+      spyOn(packageManager, "resolvePackageSource").andReturn(Promise.reject(new Error("stop")));
+      const pack = {
+        name: "asiloisad/pulsar-invert-colors@0.4.0",
+        installSource: "asiloisad/pulsar-invert-colors@0.4.0",
+        repository: "asiloisad/pulsar-invert-colors",
+      };
+
+      let rejected = false;
+      waitsForPromise(() =>
+        packageManager.installGitHubPackage(pack).catch(() => (rejected = true)),
+      );
+
+      runs(() => {
+        expect(rejected).toBe(true);
+        // The pinned tag must survive; installing the bare repo would grab latest.
+        expect(packageManager.resolvePackageSource).toHaveBeenCalledWith(
+          "asiloisad/pulsar-invert-colors@0.4.0",
+        );
+      });
+    });
+
+    it("installs from the repository when no installSource is present, not the bare name", function () {
+      spyOn(packageManager, "resolvePackageSource").andReturn(Promise.reject(new Error("stop")));
+      // A catalog/registry pack that carries only name + repository (+ version).
+      const pack = {
+        name: "hydrogen-next",
+        repository: "lumine-code/hydrogen-next",
+        version: "4.14.1",
+      };
+
+      let rejected = false;
+      waitsForPromise(() =>
+        packageManager.installGitHubPackage(pack).catch(() => (rejected = true)),
+      );
+
+      runs(() => {
+        expect(rejected).toBe(true);
+        // The pinned-version attempt must target the repository, never "hydrogen-next".
+        const source = packageManager.resolvePackageSource.mostRecentCall.args[0];
+        expect(source).toContain("lumine-code/hydrogen-next");
+      });
     });
   });
 

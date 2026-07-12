@@ -385,10 +385,16 @@ module.exports = class PackageManager {
 
     for (const packageName in this.packageDependencies) {
       if (!packagesByName.has(packageName)) {
+        // Bundled dependencies delivered through node_modules (e.g. Git-sourced
+        // packages that aren't vendored into packages/). Derive isBundled from
+        // the path so that, in dev mode running from source, they are treated
+        // as non-bundled like the packages/ entries instead of being singled
+        // out under "Bundled Packages".
+        const packagePath = path.join(this.resourcePath, "node_modules", packageName);
         packages.push({
           name: packageName,
-          path: path.join(this.resourcePath, "node_modules", packageName),
-          isBundled: true,
+          path: packagePath,
+          isBundled: this.isBundledPackagePath(packagePath),
         });
       }
     }

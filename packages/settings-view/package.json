@@ -10,15 +10,34 @@
     "deferActivation": false
   },
   "configSchema": {
-    "packageUpdateConcurrency": {
+    "communityPackageCatalogs": {
       "order": 1,
+      "title": "Community Package Catalogs",
+      "description": "Ordered catalog repositories or index URLs aggregated by the Install panel. Earlier sources take precedence when package names overlap.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "https://raw.githubusercontent.com/lumine-code/packages/main/index.json"
+      ]
+    },
+    "includePulsarPackageResults": {
+      "order": 2,
+      "title": "Include results from the Pulsar package registry",
+      "description": "When searching community packages, also live-search the Pulsar package registry (api.pulsar-edit.dev). Results are fetched per search, never downloaded in bulk.",
+      "type": "boolean",
+      "default": false
+    },
+    "packageUpdateConcurrency": {
+      "order": 3,
       "title": "Maximum simultaneous package updates",
       "description": "Limit how many processes run simultaneously during package updates. If your machine slows down while updating many packages at once, set this value to a small positive number (e.g., `1` or `2`).",
       "type": "integer",
       "default": -1
     },
     "searchSettingsMinimumScore": {
-      "order": 2,
+      "order": 4,
       "title": "Search Settings Minimum Score to Display Results",
       "description": "Set the minimum similarity score required for a setting to appear in the search results, when searching for settings. Score range is 0.0 to 1.0.",
       "type": "number",
@@ -27,21 +46,21 @@
       "default": 0.05
     },
     "searchSettingsMetadata": {
-      "order": 3,
+      "order": 5,
       "title": "Display Search Settings Metadata along with Search Results",
       "description": "Whether or not to display search metadata with the search results. Metadata will appear as `{namespace}.{settingName}:{searchScore}`.",
       "type": "boolean",
       "default": false
     },
     "enableSettingsSearch": {
-      "order": 4,
+      "order": 6,
       "title": "Enable Experimental Settings Search Feature",
       "description": "Will enable or disable the new Experimental Settings Search.",
       "type": "boolean",
       "default": true
     },
     "showSettingsIconInStatusBar": {
-      "order": 5,
+      "order": 7,
       "title": "Show Settings Icon in Status Bar",
       "description": "Whether or not to show a settings icon in the Lumine Status Bar.",
       "type": "boolean",

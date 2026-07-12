@@ -57,8 +57,13 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
     );
 
     let loadPackagesTimeout;
+    // Rebuild the list when a package is installed or updated. Uninstalls are
+    // deliberately excluded: the card flips itself to the not-installed state
+    // (showing an Install button) and stays in place, which reads better than
+    // the whole list flickering. The uninstalled package drops out on the next
+    // full load (e.g. reopening the panel).
     this.subscriptions.add(
-      this.packageManager.on("package-updated package-installed package-uninstalled", () => {
+      this.packageManager.on("package-updated package-installed", () => {
         clearTimeout(loadPackagesTimeout);
         loadPackagesTimeout = setTimeout(
           this.loadPackages.bind(this),

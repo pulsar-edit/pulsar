@@ -4,6 +4,9 @@
 import { CompositeDisposable, Disposable } from "atom";
 import etch from "etch";
 
+// Renders a package badge (e.g. Pulsar's "Outdated" / "Made for Pulsar") as a
+// small colored dot. The badge title and text are shown in a hover tooltip, and
+// clicking a badge that carries a link opens it in the browser.
 export default class BadgeView {
   constructor(badge) {
     this.badge = badge;
@@ -11,21 +14,20 @@ export default class BadgeView {
 
     etch.initialize(this);
 
-    // Intercept the click request and manually open this URL in a web browser.
-    let clickHandler = (event) => {
-      let anchor = event.target.closest("a");
-      if (!anchor) return;
-      event.stopPropagation();
-      event.preventDefault();
-      atom.openExternal(anchor.href);
-    };
+    const tooltip = this.tooltipText();
+    if (tooltip) {
+      this.disposables.add(atom.tooltips.add(this.element, { title: tooltip }));
+    }
 
     if (this.hasLink()) {
-      this.refs.badgeLink.addEventListener("click", clickHandler);
+      const clickHandler = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        atom.openExternal(this.badge.link);
+      };
+      this.element.addEventListener("click", clickHandler);
       this.disposables.add(
-        new Disposable(() => {
-          this.refs.badgeLink.removeEventListener("click", clickHandler);
-        }),
+        new Disposable(() => this.element.removeEventListener("click", clickHandler)),
       );
     }
   }
@@ -35,107 +37,35 @@ export default class BadgeView {
     return etch.destroy(this);
   }
 
+  update() {}
+
   render() {
-    const icons = this.getIcons();
-    const classes = this.getClasses();
-    const badge = this.badge;
+    const classes = `package-badge-dot ${this.dotClass()}${this.hasLink() ? " has-link" : ""}`;
+    return <span className={classes} />;
+  }
 
-    if (this.hasLink()) {
-      if (this.hasText()) {
-        // Link and Text
-
-        return (
-          <a href={badge.link} ref="badgeLink">
-            <span class={classes}>
-              <i class={icons}></i>
-              {badge.title}: <span class="badge-expandable">...</span>
-              <span class="badge-text"> {badge.text}</span>
-            </span>
-          </a>
-        );
-      } else {
-        // Link no text
-
-        return (
-          <a href={badge.link}>
-            <span class={classes}>
-              <i class={icons}></i>
-              {badge.title}
-            </span>
-          </a>
-        );
-      }
-    } else {
-      if (this.hasText()) {
-        // No Link, has Text
-
-        return (
-          <span class={classes}>
-            <i class={icons}></i>
-            {badge.title}: <span class="badge-expandable">...</span>
-            <span class="badge-text"> {badge.text}</span>
-          </span>
-        );
-      } else {
-        // No Link, no text
-
-        return (
-          <span class={classes}>
-            <i class={icons}></i>
-            {badge.title}
-          </span>
-        );
-      }
-    }
+  tooltipText() {
+    return [this.badge.title, this.badge.text]
+      .filter((part) => typeof part === "string")
+      .join(": ");
   }
 
   hasLink() {
-    if (typeof this.badge.link === "string") {
-      return true;
-    }
-    return false;
+    return typeof this.badge.link === "string";
   }
 
-  hasText() {
-    if (typeof this.badge.text === "string") {
-      return true;
-    }
-    return false;
-  }
-
-  getIcons() {
+  dotClass() {
     switch (this.badge.type) {
       case "warn":
-        return "icon icon-alert";
-        break;
+        return "badge-dot-warn";
       case "success":
-        return "icon icon-check";
-        break;
+        return "badge-dot-success";
       case "info":
-        return "icon icon-info";
-        break;
+        return "badge-dot-info";
+      case "error":
+        return "badge-dot-error";
       default:
-        return "";
-        break;
+        return "badge-dot-default";
     }
   }
-
-  getClasses() {
-    switch (this.badge.type) {
-      case "warn":
-        return "badge badge-error";
-        break;
-      case "success":
-        return "badge badge-success";
-        break;
-      case "info":
-        return "badge badge-info";
-        break;
-      default:
-        return "badge";
-        break;
-    }
-  }
-
-  update() {}
 }

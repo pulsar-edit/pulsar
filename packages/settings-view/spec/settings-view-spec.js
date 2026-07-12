@@ -305,8 +305,8 @@ describe("SettingsView", function () {
           openWithCommand("settings-view:check-for-package-updates");
           runs(() =>
             expect(atom.workspace.getActivePaneItem().activePanel).toEqual({
-              name: "Updates",
-              options: { uri: "atom://config/updates" },
+              name: "Install",
+              options: { uri: "atom://config/install" },
             }),
           );
         }));
@@ -405,8 +405,9 @@ describe("SettingsView", function () {
 
         waits(1);
         runs(function () {
+          // The legacy updates URI redirects to the Install panel.
           expect(settingsView.activePanel).toEqual({
-            name: "Updates",
+            name: "Install",
             options: { uri: "atom://config/updates" },
           });
           expect(focusIsWithinActivePanel()).toBe(true);
@@ -570,7 +571,6 @@ describe("SettingsView", function () {
             settingsView.getOrCreatePanel("Keybindings"),
             settingsView.getOrCreatePanel("Packages"),
             settingsView.getOrCreatePanel("Themes"),
-            settingsView.getOrCreatePanel("Updates"),
             settingsView.getOrCreatePanel("Install"),
           ];
           const systemPanel = settingsView.getOrCreatePanel("System");

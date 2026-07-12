@@ -13,6 +13,9 @@ const {
 } = require("../../../src/package-source"); // eslint-disable-line n/no-unpublished-require
 
 const Client = require("./atom-io-client");
+const CommunityPackageCatalogClient = require("./community-package-catalog-client");
+const PulsarPackageClient = require("./pulsar-package-client");
+const { packageOriginKey, installedOriginKeys } = require("./utils");
 
 module.exports = class PackageManager {
   constructor() {
@@ -31,6 +34,18 @@ module.exports = class PackageManager {
 
   getClient() {
     return this.client != null ? this.client : (this.client = new Client(this));
+  }
+
+  getCatalogClient() {
+    return this.catalogClient != null
+      ? this.catalogClient
+      : (this.catalogClient = new CommunityPackageCatalogClient());
+  }
+
+  getPulsarClient() {
+    return this.pulsarClient != null
+      ? this.pulsarClient
+      : (this.pulsarClient = new PulsarPackageClient());
   }
 
   isPackageInstalled(packageName) {
@@ -224,10 +239,12 @@ module.exports = class PackageManager {
     );
   }
 
-  unload(name) {
+  async unload(name) {
     if (atom.packages.isPackageLoaded(name)) {
       if (atom.packages.isPackageActive(name)) {
-        atom.packages.deactivatePackage(name);
+        // Deactivation may be async; await it so unloadPackage() doesn't throw
+        // "Tried to unload active package".
+        await atom.packages.deactivatePackage(name);
       }
       return atom.packages.unloadPackage(name);
     }
@@ -273,12 +290,8 @@ module.exports = class PackageManager {
     );
   }
 
-  uninstall(pack, callback) {
+  async uninstall(pack, callback) {
     const { name } = pack;
-
-    if (atom.packages.isPackageActive(name)) {
-      atom.packages.deactivatePackage(name);
-    }
 
     const errorMessage = `Uninstalling \u201C${name}\u201D failed.`;
     const onError = (error) => {
@@ -291,13 +304,14 @@ module.exports = class PackageManager {
       const packagePath =
         atom.packages.resolvePackagePath(name) || path.join(this.getAtomPackagesDirectory(), name);
       if (atom.packages.isPackageActive(name)) {
-        atom.packages.deactivatePackage(name);
+        // Await async deactivation before unloading (see ::unload).
+        await atom.packages.deactivatePackage(name);
       }
       if (atom.packages.isPackageLoaded(name)) {
         atom.packages.unloadPackage(name);
       }
       if (fs.isDirectorySync(packagePath)) {
-        fs.removeSync(packagePath);
+        await this.removePackageDir(packagePath);
       }
       this.clearOutdatedCache();
       this.removePackageNameFromDisabledPackages(name);
@@ -454,9 +468,70 @@ module.exports = class PackageManager {
     });
   }
 
+  // Builds the source pinned to a specific version, honoring shorthand vs URL.
+  pinSourceToVersion(parsed, version) {
+    if (/^[\w.-]+\/[\w.-]+$/.test(parsed.repository)) {
+      return `${parsed.repository}@${version}`;
+    }
+    return `${parsed.repository}#tag:${version}`;
+  }
+
+  // Removes a directory tree robustly and asynchronously. Async matters: a
+  // synchronous remove of a deep node_modules tree blocks the renderer thread
+  // and freezes the editor. Node's rm also retries on Windows' transient
+  // ENOTEMPTY/EBUSY/EPERM (antivirus/indexer locks) and force-removes read-only
+  // entries such as those under .git — fs-plus's bundled rimraf does neither.
+  removePackageDir(dirPath) {
+    return require("fs").promises.rm(dirPath, {
+      recursive: true,
+      force: true,
+      maxRetries: 10,
+      retryDelay: 100,
+    });
+  }
+
+  // Copies a directory tree asynchronously, so copying a large package (deep
+  // node_modules) doesn't block the renderer thread like fs.copySync would.
+  copyPackageDir(sourceDir, targetDir) {
+    return require("fs").promises.cp(sourceDir, targetDir, { recursive: true });
+  }
+
   async installGitHubPackage(pack) {
-    const source = pack.name;
-    const resolvedSource = await this.resolvePackageSource(source);
+    const requestedSource =
+      pack.installSource ||
+      (pack.apmInstallSource &&
+        pack.apmInstallSource.type === "git" &&
+        pack.apmInstallSource.source) ||
+      // The repository (owner/repo or a Git URL) is the reliable origin; fall
+      // back to it before the bare package name, which is not a valid Git source
+      // on its own. Catalog/registry packs may omit an explicit installSource.
+      (typeof pack.repository === "string" && pack.repository) ||
+      pack.name;
+    const parsed = parsePackageSource(requestedSource);
+    // For a fresh install of an unpinned source with a known version, install
+    // exactly the version the user was looking at — a release pushed between
+    // browsing and installing shouldn't be silently substituted. The recorded
+    // update policy stays "latest-tag" so future updates still track releases.
+    let pinnedVersion =
+      !pack.apmInstallSource &&
+      parsed.selector.type === "latest" &&
+      pack.version &&
+      semver.valid(pack.version)
+        ? pack.version
+        : null;
+    let source = pinnedVersion ? this.pinSourceToVersion(parsed, pinnedVersion) : requestedSource;
+
+    let resolvedSource;
+    try {
+      resolvedSource = await this.resolvePackageSource(source);
+    } catch (error) {
+      if (!pinnedVersion) throw error;
+      // The exact version tag was not found; fall back to the latest available.
+      pinnedVersion = null;
+      source = requestedSource;
+      resolvedSource = await this.resolvePackageSource(source);
+    }
+
     const cloneDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "lumine-package-")));
 
     try {
@@ -494,20 +569,27 @@ module.exports = class PackageManager {
       const metadata = CSON.readFileSync(metadataFilePath);
       metadata.apmInstallSource = {
         type: "git",
-        source: resolvedSource.source,
+        // When pinned to a browsed version, record the unpinned source and a
+        // latest-tag policy so updates keep tracking new releases even though a
+        // specific version was installed now.
+        source: pinnedVersion ? parsed.repository : resolvedSource.source,
         repository: resolvedSource.repository,
-        selector: resolvedSource.selector,
-        updatePolicy: resolvedSource.updatePolicy,
+        selector: pinnedVersion
+          ? { type: "latest", value: resolvedSource.selector.value }
+          : resolvedSource.selector,
+        updatePolicy: pinnedVersion ? "latest-tag" : resolvedSource.updatePolicy,
+        version: resolvedSource.version,
         sha,
       };
       this.writePackageMetadata(metadataFilePath, metadata);
 
       const packageName = metadata.name || path.basename(resolvedSource.repository);
-      this.unload(packageName);
+      this.assertNoNameCollision(packageName, resolvedSource);
+      await this.unload(packageName);
       const targetDir = path.join(this.getAtomPackagesDirectory(), packageName);
-      fs.removeSync(targetDir);
-      fs.copySync(cloneDir, targetDir);
-      fs.removeSync(path.join(targetDir, ".git"));
+      await this.removePackageDir(targetDir);
+      await this.copyPackageDir(cloneDir, targetDir);
+      await this.removePackageDir(path.join(targetDir, ".git"));
 
       return _.extend({}, pack, metadata, {
         name: packageName,
@@ -516,8 +598,45 @@ module.exports = class PackageManager {
         apmInstallSource: metadata.apmInstallSource,
       });
     } finally {
-      fs.removeSync(cloneDir);
+      await this.removePackageDir(cloneDir);
     }
+  }
+
+  // Refuses to overwrite a package that shares its name with the one being
+  // installed but comes from a different repository. Reinstalls and updates of
+  // the same package are allowed through.
+  assertNoNameCollision(packageName, resolvedSource) {
+    if (atom.packages.isBundledPackage(packageName)) {
+      throw new Error(`"${packageName}" is bundled with Lumine and cannot be replaced.`);
+    }
+
+    const installedDir = path.join(this.getAtomPackagesDirectory(), packageName);
+    let metadata = null;
+    try {
+      const metadataFilePath = CSON.resolve(path.join(installedDir, "package"));
+      if (metadataFilePath) metadata = CSON.readFileSync(metadataFilePath);
+    } catch {
+      return;
+    }
+    if (!metadata) return;
+
+    const installedKeys = installedOriginKeys(metadata);
+    if (installedKeys.length === 0) return;
+
+    const candidateKeys = [resolvedSource.repository, resolvedSource.source]
+      .map(packageOriginKey)
+      .filter(Boolean);
+    if (candidateKeys.some((key) => installedKeys.includes(key))) return;
+
+    const installedOrigin =
+      typeof metadata.repository === "string"
+        ? metadata.repository
+        : metadata.repository && metadata.repository.url;
+    throw new Error(
+      `A different package named "${packageName}" is already installed${
+        installedOrigin ? ` from ${installedOrigin}` : ""
+      }. Uninstall it before installing this one.`,
+    );
   }
 
   writePackageMetadata(metadataFilePath, metadata) {

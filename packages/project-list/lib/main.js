@@ -232,11 +232,15 @@ class ProjectList {
     });
   }
 
-  async observeConfigFile() {
+  async ensureConfigFile() {
     if (!(await this.configFile.exists())) {
       await this.configFile.create();
       await this.configFile.write("[]");
     }
+  }
+
+  async observeConfigFile() {
+    await this.ensureConfigFile();
     this.disposables.add(
       this.configFile.onDidChange(
         debounce(async () => {
@@ -454,9 +458,7 @@ class ProjectList {
   }
 
   async buildCache() {
-    if (!(await this.configFile.exists())) {
-      throw new Error("Config file does not exists");
-    }
+    await this.ensureConfigFile();
     const configData = CSON.parse(await this.configFile.read());
     if (configData instanceof Error) {
       throw new Error(configData.message);

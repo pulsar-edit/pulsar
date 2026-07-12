@@ -136,22 +136,25 @@ describe("InstalledPackagesPanel", function () {
       });
     });
 
-    it("removes uninstalled packages from the list", function () {
+    it("keeps uninstalled packages visible without rebuilding the list", function () {
       expect(this.panel.refs.communityCount.textContent.trim()).toBe("1");
       expect(
         this.panel.refs.communityPackages.querySelectorAll(".package-card:not(.hidden)").length,
       ).toBe(1);
 
+      spyOn(this.panel, "loadPackages").andCallThrough();
       this.installed.user = [];
       this.packageManager.emitter.emit("package-uninstalled", { pack: { name: "user-package" } });
 
       advanceClock(InstalledPackagesPanel.loadPackagesDelay());
       waits(1);
       runs(function () {
-        expect(this.panel.refs.communityCount.textContent.trim()).toBe("0");
+        // The list is not rebuilt; the card stays in place (the card itself
+        // switches to the not-installed state).
+        expect(this.panel.loadPackages).not.toHaveBeenCalled();
         expect(
           this.panel.refs.communityPackages.querySelectorAll(".package-card:not(.hidden)").length,
-        ).toBe(0);
+        ).toBe(1);
       });
     });
   });

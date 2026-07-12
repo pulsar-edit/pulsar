@@ -11,7 +11,9 @@ class LumineUpdater {
     this.disposables.add(
       atom.commands.add("atom-workspace", {
         "lumine-updater:check-for-update": () => {
-          this.checkForUpdates({ manual: true });
+          this.checkForUpdates({ manual: true }).catch((error) =>
+            console.warn("Lumine update check failed:", error),
+          );
         },
         "lumine-updater:clear-cache": () => {
           this.cache.empty("last-update-check");
@@ -21,7 +23,7 @@ class LumineUpdater {
     );
 
     if (atom.config.get("lumine-updater.checkForUpdatesOnLaunch")) {
-      this.checkForUpdates();
+      this.checkForUpdates().catch((error) => console.warn("Lumine update check failed:", error));
     }
   }
 
@@ -33,10 +35,18 @@ class LumineUpdater {
   async findNewestRelease() {
     superagent ??= require("superagent");
 
-    let res = await superagent
-      .get("https://api.github.com/repos/lumine-code/lumine/releases")
-      .set("Accept", "application/vnd.github+json")
-      .set("User-Agent", "Lumine.Lumine-Updater");
+    let res;
+    try {
+      res = await superagent
+        .get("https://api.github.com/repos/lumine-code/lumine/releases")
+        .set("Accept", "application/vnd.github+json")
+        .set("User-Agent", "Lumine.Lumine-Updater");
+    } catch {
+      // superagent rejects on network errors, timeouts, and non-2xx responses
+      // (e.g. a 504 from GitHub). Treat any failure as "no update available"
+      // rather than letting it surface as an unhandled rejection.
+      return "0.0.0";
+    }
 
     if (res.status !== 200) {
       // Lie and say it's something that will never update

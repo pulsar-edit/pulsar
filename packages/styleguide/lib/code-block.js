@@ -45,7 +45,7 @@ module.exports = class CodeBlock {
         //
         // This is how we balance assigning the grammar for the “wrong”
         // language mode… versus waiting for another one that may never arrive.
-        setTimeout(resolve(grammar), 1000);
+        setTimeout(() => resolve(grammar), 1000);
       });
     });
 

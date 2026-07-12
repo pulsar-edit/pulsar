@@ -1,0 +1,94 @@
+.settings-view .catalog-sources {
+  display: flex;
+  flex-direction: column;
+  gap: var(--component-padding);
+  margin-top: calc(var(--component-padding) * 2);
+}
+
+.settings-view .catalog-sources .catalog-sources-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--component-padding);
+}
+
+/* Drop the empty list out of the flow so it adds no phantom gap. */
+.settings-view .catalog-sources .catalog-sources-list:empty {
+  display: none;
+}
+
+.settings-view .catalog-source {
+  display: flex;
+  align-items: stretch;
+  gap: var(--component-padding);
+}
+
+.settings-view .catalog-source .editor-container {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.settings-view .catalog-source-button {
+  flex: 0 0 auto;
+  width: 32px;
+  height: auto;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.settings-view .catalog-source-button::before {
+  margin-right: 0;
+}
+
+.settings-view .catalog-source-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--component-padding);
+}
+
+/* Not flex: let the checkbox align to the label via its own vertical-align:
+   middle, exactly like the standard settings checkboxes. margin-left: auto
+   still pushes the label to the right within the flex actions row. */
+.settings-view .pulsar-toggle {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.settings-view .pulsar-toggle .input-checkbox {
+  margin: 0 0.5em 0 0;
+}
+
+/* Icon-only button, pushed to the right of the filter group; it wraps onto its
+   own line when the search row runs out of width. */
+.settings-view .search-container .check-updates-button {
+  flex: 0 0 auto;
+  width: 32px;
+  padding-left: 0;
+  padding-right: 0;
+  margin: calc(var(--component-padding) / 2);
+  margin-left: auto;
+}
+
+.settings-view .search-container .check-updates-button::before {
+  margin-right: 0;
+}
+
+.settings-view .search-container .check-updates-button.is-checking {
+  pointer-events: none;
+}
+
+.settings-view .search-container .check-updates-button.is-checking::before {
+  animation: settings-view-pulse 1s ease-in-out infinite;
+}
+
+@keyframes settings-view-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}

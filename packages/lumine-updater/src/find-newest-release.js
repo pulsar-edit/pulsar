@@ -3,12 +3,18 @@ let superagent;
 module.exports = async function findNewestRelease() {
   superagent ??= require("superagent");
 
-  let res = await superagent
-    .get("https://api.github.com/repos/lumine-code/lumine/releases")
-    .set("Accept", "application/vnd.github+json")
-    .set("User-Agent", "Lumine.Lumine-Updater");
+  let res;
+  try {
+    res = await superagent
+      .get("https://api.github.com/repos/lumine-code/lumine/releases")
+      .set("Accept", "application/vnd.github+json")
+      .set("User-Agent", "Lumine.Lumine-Updater");
+  } catch {
+    // superagent rejects on network errors, timeouts, and non-2xx responses.
+    return "0.0.0";
+  }
 
-  if (res.status !== 200) {
+  if (res.status !== 200 || !Array.isArray(res.body) || res.body.length === 0) {
     // Lie and say it's something that will never update
     return "0.0.0";
   }

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    {
+      "name": "local-package",
+      "repository": "owner/local-package",
+      "description": "Loaded from a local catalog"
+    }
+  ]
+}

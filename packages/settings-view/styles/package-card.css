@@ -67,6 +67,36 @@
       margin-right: var(--component-padding);
     }
 
+    /* Packages sourced from the Pulsar registry get a purple install action. */
+    &.pulsar-source .install-button {
+      color: white;
+      border-color: hsl(266, 55%, 42%);
+      background-color: hsl(266, 55%, 50%);
+      background-image: linear-gradient(hsl(266, 55%, 53%), hsl(266, 55%, 50%));
+      &:hover {
+        background-image: linear-gradient(hsl(266, 55%, 58%), hsl(266, 55%, 55%));
+      }
+    }
+
+    .package-repo {
+      float: right;
+      font-size: 0.8em;
+      font-weight: normal;
+      color: var(--text-color-subtle);
+      &:hover {
+        color: var(--text-color-info);
+        text-decoration: underline;
+      }
+    }
+
+    .install-button.disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      &:hover {
+        background-image: none;
+      }
+    }
+
     .description {
       color: var(--text-color);
       overflow: hidden;
@@ -148,20 +178,35 @@
       line-height: 1.4;
     }
 
-    .badge:hover .badge-text {
-      display: contents;
+    .package-badges {
+      display: inline-flex;
+      align-items: center;
+      margin: calc(var(--component-padding) / 2) 0 0 calc(var(--component-padding) / 2);
     }
 
-    .badge:hover .badge-expandable {
-      display: none;
-    }
-
-    .badge-expandable {
-      display: contents;
-    }
-
-    .badge-text {
-      display: none;
+    .package-badge-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      margin-right: 0.4em;
+      border-radius: 50%;
+      vertical-align: middle;
+      background-color: var(--text-color-subtle);
+      &.has-link {
+        cursor: pointer;
+      }
+      &.badge-dot-warn {
+        background-color: var(--background-color-warning);
+      }
+      &.badge-dot-success {
+        background-color: var(--background-color-success);
+      }
+      &.badge-dot-info {
+        background-color: var(--background-color-info);
+      }
+      &.badge-dot-error {
+        background-color: var(--background-color-error);
+      }
     }
 
     .meta {
@@ -199,7 +244,9 @@
         width: 24px;
         display: inline-block;
         vertical-align: middle;
-        background-color: hsla(0, 0%, 0%, 0.1);
+        /* Transparent so logo avatars (e.g. the Lumine mark) aren't boxed in a
+           grey square — matches the bundled packages shown in Packages/Themes. */
+        background-color: transparent;
       }
 
       .author {
@@ -234,8 +281,12 @@
         }
       }
 
+      .btn-toolbar {
+        display: flex;
+        align-items: center;
+      }
+
       .btn-toolbar > .btn-group {
-        float: left;
         margin: calc(var(--component-padding) / 2) 0 0 calc(var(--component-padding) / 2);
       }
     }

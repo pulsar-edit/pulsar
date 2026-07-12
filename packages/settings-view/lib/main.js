@@ -1,7 +1,6 @@
 let SettingsView = null;
 let settingsView = null;
-
-let statusView = null;
+let statusViewIcon = null;
 
 const PackageManager = require("./package-manager");
 let packageManager = null;
@@ -73,7 +72,10 @@ module.exports = {
         atom.workspace.open(`${CONFIG_URI}/packages`);
       },
       "settings-view:check-for-package-updates"() {
-        atom.workspace.open(`${CONFIG_URI}/updates`);
+        atom.workspace.open(`${CONFIG_URI}/install`);
+      },
+      "settings-view:check-updates"() {
+        atom.workspace.open(`${CONFIG_URI}/install/check-updates`);
       },
     });
 
@@ -88,10 +90,8 @@ module.exports = {
 
   deactivate() {
     if (settingsView) settingsView.destroy();
-    if (statusView) statusView.destroy();
     settingsView = null;
     packageManager = null;
-    statusView = null;
     atom.notifications.addWarning(
       "Warning! You have disabled the settings-view package. To enable it again, edit the [`config.cson`](https://pulsar-edit.dev/docs/launch-manual/sections/using-lumine/#global-configuration-settings) by removing the `settings-view` entry from `core: disabled packages:`",
     );
@@ -99,13 +99,6 @@ module.exports = {
 
   consumeStatusBar(statusBar) {
     if (packageManager == null) packageManager = new PackageManager();
-    packageManager.getOutdated().then((updates) => {
-      if (packageManager) {
-        const PackageUpdatesStatusView = require("./package-updates-status-view");
-        statusView = new PackageUpdatesStatusView();
-        statusView.initialize(statusBar, packageManager, updates);
-      }
-    });
 
     // Attach a settings button to the status bar
     if (atom.config.get("settings-view.showSettingsIconInStatusBar")) {
