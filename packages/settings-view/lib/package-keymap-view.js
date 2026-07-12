@@ -81,39 +81,41 @@ export default class PackageKeymapView {
   render() {
     return (
       <section className="section package-keymap-section">
-        <div className="section-heading icon icon-keyboard">Keybindings</div>
-        <div className="checkbox">
-          <label for="toggleKeybindings">
-            <input
-              id="toggleKeybindings"
-              className="input-checkbox"
-              type="checkbox"
-              ref="keybindingToggle"
-            />
-            <div className="setting-title">Enable</div>
-          </label>
-          <div className="setting-description">
-            {
-              "Disable this if you want to bind your own keystrokes for this package's commands in your keymap."
-            }
+        <div className="section-container">
+          <div className="section-heading icon icon-keyboard">Keybindings</div>
+          <div className="checkbox">
+            <label for="toggleKeybindings">
+              <input
+                id="toggleKeybindings"
+                className="input-checkbox"
+                type="checkbox"
+                ref="keybindingToggle"
+              />
+              <div className="setting-title">Enable</div>
+            </label>
+            <div className="setting-description">
+              {
+                "Disable this if you want to bind your own keystrokes for this package's commands in your keymap."
+              }
+            </div>
           </div>
+          <table className="package-keymap-table table native-key-bindings text">
+            <caption className="sr-only">Package keybindings</caption>
+            <col className="keystroke" />
+            <col className="command" />
+            <col className="selector" />
+            <col className="actions" />
+            <thead>
+              <tr>
+                <th scope="col">Shortcut</th>
+                <th scope="col">Command</th>
+                <th scope="col">Context</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody ref="keybindingItems" />
+          </table>
         </div>
-        <table className="package-keymap-table table native-key-bindings text">
-          <caption className="sr-only">Package keybindings</caption>
-          <col className="keystroke" />
-          <col className="command" />
-          <col className="selector" />
-          <col className="actions" />
-          <thead>
-            <tr>
-              <th scope="col">Shortcut</th>
-              <th scope="col">Command</th>
-              <th scope="col">Context</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody ref="keybindingItems" />
-        </table>
       </section>
     );
   }
