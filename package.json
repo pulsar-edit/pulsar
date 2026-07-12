@@ -149,7 +149,7 @@
     "open-external": "file:packages/open-external",
     "open-on-github": "file:packages/open-on-github",
     "overtype-mode": "file:packages/overtype-mode",
-    "postcss": "8.5.17",
+    "postcss": "8.5.18",
     "postcss-selector-parser": "7.1.4",
     "project-list": "file:packages/project-list",
     "recent-list": "file:packages/recent-list",
