@@ -1,9 +1,0 @@
-diff --git a/node_modules/ctags/src/tags.cc b/node_modules/ctags/src/tags.cc
-index 01d2de6..c07e610 100644
---- a/node_modules/ctags/src/tags.cc
-+++ b/node_modules/ctags/src/tags.cc
-@@ -24 +24,3 @@
--NODE_MODULE(ctags, Tags::Init)
-+NODE_MODULE_INIT() {
-+  Tags::Init(exports);
-+}

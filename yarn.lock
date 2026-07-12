@@ -2609,10 +2609,9 @@ cssesc@^3.0.0:
   resolved "https://registry.yarnpkg.com/cssesc/-/cssesc-3.0.0.tgz#37741919903b868565e1c09ea747445cd18983ee"
   integrity sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==
 
-ctags@^3.1.0:
+"ctags@https://github.com/lumine-code/node-ctags.git#f5afc38":
   version "3.1.0"
-  resolved "https://registry.yarnpkg.com/ctags/-/ctags-3.1.0.tgz#07f133401d573f4614d1eabffb4f7127afcff402"
-  integrity sha512-7/aiGLj8Ih7Ko3bAAg8bQUwHjOGXKQ7XC+bv+vLh84BtkVodPEOpOnr65FnWjX2oFWoKSaDuxe7jFHudD2Q0uw==
+  resolved "https://github.com/lumine-code/node-ctags.git#f5afc38f2199a749ce0d53368b17d02b0124e9a9"
   dependencies:
     event-stream "~3.1.0"
     nan "^2.14.0"
