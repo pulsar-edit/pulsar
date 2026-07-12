@@ -1,7 +1,7 @@
 const { CompositeDisposable } = require("atom");
 
-let superagent;
 let findInstallMethod;
+let findNewestRelease;
 
 class LumineUpdater {
   activate() {
@@ -33,34 +33,8 @@ class LumineUpdater {
   }
 
   async findNewestRelease() {
-    superagent ??= require("superagent");
-
-    let res;
-    try {
-      res = await superagent
-        .get("https://api.github.com/repos/lumine-code/lumine/releases")
-        .set("Accept", "application/vnd.github+json")
-        .set("User-Agent", "Lumine.Lumine-Updater");
-    } catch {
-      // superagent rejects on network errors, timeouts, and non-2xx responses
-      // (e.g. a 504 from GitHub). Treat any failure as "no update available"
-      // rather than letting it surface as an unhandled rejection.
-      return "0.0.0";
-    }
-
-    if (res.status !== 200) {
-      // Lie and say it's something that will never update
-      return "0.0.0";
-    }
-
-    // We get the results ordered by newest tag first, so we can just check the
-    // first item. If the repo has no releases yet, the body is an empty array,
-    // so fall back to the "never update" sentinel.
-    if (!Array.isArray(res.body) || res.body.length === 0) {
-      return "0.0.0";
-    }
-
-    return res.body[0].tag_name;
+    findNewestRelease ??= require("./find-newest-release.js");
+    return findNewestRelease();
   }
 
   async checkForUpdates({ manual = false } = {}) {
@@ -198,8 +172,6 @@ class LumineUpdater {
   }
 
   getObjButtonForInstallMethod(installMethod) {
-    let returnObj = null;
-
     const openWebGitHub = (e) => {
       e.preventDefault();
       let latestVersion = this.cache.getCacheItem("last-update-check")?.latestVersion;
@@ -211,14 +183,11 @@ class LumineUpdater {
       case "User Installation":
       case "Machine Installation":
       default:
-        returnObj = {
+        return {
           text: "Download from GitHub",
           onDidClick: openWebGitHub,
         };
-        break;
     }
-
-    return returnObj;
   }
 }
 

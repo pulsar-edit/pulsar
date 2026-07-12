@@ -18,7 +18,7 @@ describe("LumineUpdater", () => {
 
   describe("when lumine-updater:check-for-updates is triggered", () => {
     beforeEach(async () => {
-      spyOn(pack.mainModule, "checkForUpdates");
+      spyOn(pack.mainModule, "checkForUpdates").andReturn(Promise.resolve());
     });
     it("triggers an update check", () => {
       atom.commands.dispatch(workspaceElement, "lumine-updater:check-for-update");
