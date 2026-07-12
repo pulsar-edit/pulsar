@@ -26,20 +26,6 @@
       "description": "Show the getting-started Guide when opening a new Lumine window.",
       "type": "boolean",
       "default": true
-    },
-    "showChangeLog": {
-      "order": 3,
-      "title": "Show Change Log",
-      "description": "Show a Change Log after an update.",
-      "type": "boolean",
-      "default": true
-    },
-    "lastViewedChangeLog": {
-      "order": 4,
-      "title": "Last Viewed Change Log",
-      "description": "This is used to keep track of what Change Logs you've dismissed. Change this value to see one again.",
-      "type": "string",
-      "default": "0.0.0"
     }
   },
   "deserializers": {

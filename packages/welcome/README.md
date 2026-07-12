@@ -6,15 +6,13 @@ Welcomes users to Lumine with useful information the first time it is opened.
 
 - **About pane on startup**: opens the About pane with useful information when Lumine is first opened.
 - **Getting-started guide**: shows a guide pane with tips for getting started.
-- **Change log**: displays a change log after Lumine is updated.
 - **Startup control**: independently choose whether the About pane and the Guide appear on startup, from a checkbox on each.
 
 ## Commands
 
 Commands available in `atom-workspace`:
 
-- `welcome:show`: open the About and guide panes,
-- `welcome:showchangelog`: open the change log for the current version.
+- `welcome:show`: open the About and guide panes.
 
 ## Customization
 
