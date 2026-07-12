@@ -31,7 +31,9 @@ export default class PackageDetailView {
     this.packageManager = packageManager;
     this.snippetsProvider = snippetsProvider;
     this.disposables = new CompositeDisposable();
+    this.collapsedPackageSections = new Set();
     etch.initialize(this);
+    this.setupCollapsibleSections();
     this.loadPackage();
 
     this.disposables.add(
@@ -273,6 +275,63 @@ export default class PackageDetailView {
     return etch.destroy(this);
   }
 
+  setupCollapsibleSections() {
+    const toggleHandler = (event) => {
+      const toggle = event.target.closest(".package-section-toggle");
+      if (!toggle || !this.refs.sections.contains(toggle)) return;
+
+      const section = toggle.closest(".package-collapsible-section");
+      const key = section.dataset.packageSectionKey;
+      const collapsed = section.classList.toggle("is-collapsed");
+      toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      if (collapsed) {
+        this.collapsedPackageSections.add(key);
+      } else {
+        this.collapsedPackageSections.delete(key);
+      }
+    };
+    this.refs.sections.addEventListener("click", toggleHandler);
+    this.disposables.add(
+      new Disposable(() => this.refs.sections.removeEventListener("click", toggleHandler)),
+    );
+
+    this.sectionsObserver = new MutationObserver(() => this.enhancePackageSections());
+    this.sectionsObserver.observe(this.refs.sections, { childList: true, subtree: true });
+    this.disposables.add(new Disposable(() => this.sectionsObserver.disconnect()));
+  }
+
+  enhancePackageSections() {
+    for (const section of this.refs.sections.querySelectorAll("section.section")) {
+      if (section.classList.contains("package-collapsible-section")) continue;
+
+      const heading =
+        section.querySelector(":scope > .section-heading") ||
+        section.querySelector(":scope > .section-container > .section-heading");
+      if (!heading) continue;
+
+      const key = this.packageSectionKey(heading.textContent);
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = heading.className;
+      toggle.classList.add("package-section-toggle");
+      while (heading.firstChild) toggle.appendChild(heading.firstChild);
+      heading.replaceWith(toggle);
+
+      section.classList.add("package-collapsible-section");
+      section.dataset.packageSectionKey = key;
+      const collapsed = this.collapsedPackageSections.has(key);
+      section.classList.toggle("is-collapsed", collapsed);
+      toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    }
+  }
+
+  packageSectionKey(title) {
+    return String(title)
+      .trim()
+      .toLocaleLowerCase()
+      .replace(/\s+/g, "-");
+  }
+
   update() {}
 
   beforeShow(opts) {
@@ -491,6 +550,7 @@ export default class PackageDetailView {
       this.refs.sections.appendChild(readmeView.element);
     }
     this.readmeView = readmeView;
+    this.enhancePackageSections();
   }
 
   subscribeToPackageManager() {

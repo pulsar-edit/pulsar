@@ -71,6 +71,48 @@ describe("PackageDetailView", function () {
     expect(view.refs.title.textContent).toBe("Package With Config");
   });
 
+  it("makes package sections accessible and collapsible", () => {
+    atom.packages.loadPackage(path.join(__dirname, "fixtures", "package-with-config"));
+    const pack = atom.packages.getLoadedPackage("package-with-config");
+    view = new PackageDetailView(pack, new SettingsView(), packageManager, SnippetsProvider);
+
+    const toggles = view.refs.sections.querySelectorAll(".package-section-toggle");
+    expect(toggles.length).toBeGreaterThan(1);
+    for (const toggle of toggles) {
+      expect(toggle.tagName).toBe("BUTTON");
+      expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    }
+
+    const settingsSection = view.refs.sections.querySelector(".settings-panel");
+    const settingsToggle = settingsSection.querySelector(".package-section-toggle");
+    settingsToggle.click();
+    expect(settingsSection).toHaveClass("is-collapsed");
+    expect(settingsToggle.getAttribute("aria-expanded")).toBe("false");
+
+    settingsToggle.click();
+    expect(settingsSection).not.toHaveClass("is-collapsed");
+    expect(settingsToggle.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("preserves collapsed package sections when their contents refresh", () => {
+    atom.packages.loadPackage(path.join(__dirname, "fixtures", "package-with-config"));
+    const pack = atom.packages.getLoadedPackage("package-with-config");
+    view = new PackageDetailView(pack, new SettingsView(), packageManager, SnippetsProvider);
+
+    view.refs.sections
+      .querySelector('[data-package-section-key="settings"] .package-section-toggle')
+      .click();
+    view.updateInstalledState();
+
+    const refreshedSection = view.refs.sections.querySelector(
+      '[data-package-section-key="settings"]',
+    );
+    expect(refreshedSection).toHaveClass("is-collapsed");
+    expect(
+      refreshedSection.querySelector(".package-section-toggle").getAttribute("aria-expanded"),
+    ).toBe("false");
+  });
+
   it("renders an installed package README with its file path", function () {
     const packagePath = path.join(__dirname, "fixtures", "package-with-readme");
     atom.packages.loadPackage(packagePath);

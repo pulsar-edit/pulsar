@@ -412,7 +412,7 @@ describe("InstalledPackageView", function () {
     describe("when the keybinding file ends in .cson", () =>
       it("writes a CSON snippet to the clipboard", () => {
         spyOn(atom.keymaps, "getUserKeymapPath").andReturn("keymap.cson");
-        card.element.querySelector(".copy-icon").click();
+        card.element.querySelector(".copy-keybinding").click();
         expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 'test':
   'cmd-g': 'language-test:run'\
@@ -422,7 +422,7 @@ describe("InstalledPackageView", function () {
     describe("when the keybinding file ends in .json", () => {
       it("writes a JSON snippet to the clipboard", () => {
         spyOn(atom.keymaps, "getUserKeymapPath").andReturn("keymap.json");
-        card.element.querySelector(".copy-icon").click();
+        card.element.querySelector(".copy-keybinding").click();
         expect(atom.clipboard.read().replace(/\r\n/g, "\n")).toBe(`\
 "test": {
   "cmd-g": "language-test:run"

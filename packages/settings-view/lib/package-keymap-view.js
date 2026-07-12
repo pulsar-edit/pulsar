@@ -5,7 +5,6 @@ import path from "path";
 import _ from "underscore-plus";
 import { Disposable, CompositeDisposable } from "atom";
 import etch from "etch";
-import KeybindingsPanel from "./keybindings-panel";
 
 // Displays the keybindings for a package namespace
 export default class PackageKeymapView {
@@ -13,6 +12,7 @@ export default class PackageKeymapView {
     this.pack = pack;
     this.namespace = this.pack.name;
     this.disposables = new CompositeDisposable();
+    this.copyFeedbackTimeouts = new Set();
     etch.initialize(this);
 
     const packagesWithKeymapsDisabled = atom.config.get("core.packagesWithKeymapsDisabled") || [];
@@ -36,18 +36,19 @@ export default class PackageKeymapView {
       }),
     );
 
-    const copyIconClickHandler = (event) => {
-      const target = event.target.closest(".copy-icon");
+    const copyButtonClickHandler = (event) => {
+      const target = event.target.closest(".copy-keybinding");
       if (target) {
         event.preventDefault();
         event.stopPropagation();
         this.writeKeyBindingToClipboard(target.closest("tr").dataset);
+        this.showCopyFeedback(target);
       }
     };
-    this.element.addEventListener("click", copyIconClickHandler);
+    this.element.addEventListener("click", copyButtonClickHandler);
     this.disposables.add(
       new Disposable(() => {
-        this.element.removeEventListener("click", copyIconClickHandler);
+        this.element.removeEventListener("click", copyButtonClickHandler);
       }),
     );
 
@@ -57,7 +58,7 @@ export default class PackageKeymapView {
     // eslint-disable-next-line no-unused-vars
     for (let [packageKeymapsPath, keymap] of atom.packages.getLoadedPackage(this.namespace)
       .keymaps) {
-      if (keymap.length > 0) {
+      if (Object.keys(keymap || {}).length > 0) {
         hasKeymaps = true;
         break;
       }
@@ -71,13 +72,15 @@ export default class PackageKeymapView {
   update() {}
 
   destroy() {
+    for (const timeout of this.copyFeedbackTimeouts) clearTimeout(timeout);
+    this.copyFeedbackTimeouts.clear();
     this.disposables.dispose();
     return etch.destroy(this);
   }
 
   render() {
     return (
-      <section className="section">
+      <section className="section package-keymap-section">
         <div className="section-heading icon icon-keyboard">Keybindings</div>
         <div className="checkbox">
           <label for="toggleKeybindings">
@@ -95,13 +98,18 @@ export default class PackageKeymapView {
             }
           </div>
         </div>
-        <table className="package-keymap-table table native-key-bindings text" tabIndex="-1">
+        <table className="package-keymap-table table native-key-bindings text">
+          <caption className="sr-only">Package keybindings</caption>
+          <col className="keystroke" />
+          <col className="command" />
+          <col className="selector" />
+          <col className="actions" />
           <thead>
             <tr>
-              <th>Keystroke</th>
-              <th>Command</th>
-              <th>Selector</th>
-              <th>Source</th>
+              <th scope="col">Shortcut</th>
+              <th scope="col">Command</th>
+              <th scope="col">Context</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody ref="keybindingItems" />
@@ -137,66 +145,104 @@ export default class PackageKeymapView {
       }
     }
 
-    for (const keyBinding of keyBindings) {
-      const { command, keystrokes, selector, source } = keyBinding;
-      if (!command) {
-        continue;
-      }
-
-      if (!this.selectorIsCompatibleWithPlatform(selector)) {
-        continue;
-      }
-
-      const keyBindingRow = document.createElement("tr");
-      keyBindingRow.dataset.selector = selector;
-      keyBindingRow.dataset.keystrokes = keystrokes;
-      keyBindingRow.dataset.command = command;
-
-      const keystrokesTd = document.createElement("td");
-
-      const copyIconSpan = document.createElement("span");
-      copyIconSpan.classList.add("icon", "icon-clippy", "copy-icon");
-      keystrokesTd.appendChild(copyIconSpan);
-
-      const keystrokesSpan = document.createElement("span");
-      keystrokesSpan.textContent = keystrokes;
-      keystrokesTd.appendChild(keystrokesSpan);
-
-      keyBindingRow.appendChild(keystrokesTd);
-
-      const commandTd = document.createElement("td");
-      commandTd.textContent = command;
-      keyBindingRow.appendChild(commandTd);
-
-      const selectorTd = document.createElement("td");
-      selectorTd.textContent = selector;
-      keyBindingRow.appendChild(selectorTd);
-
-      const sourceTd = document.createElement("td");
-      sourceTd.textContent = KeybindingsPanel.determineSource(source);
-      keyBindingRow.appendChild(sourceTd);
-
-      this.refs.keybindingItems.appendChild(keyBindingRow);
+    const visibleBindings = keyBindings
+      .filter(({ command, selector }) => command && this.selectorIsCompatibleWithPlatform(selector))
+      .sort((a, b) => {
+        return (
+          String(a.keystrokes).localeCompare(String(b.keystrokes)) ||
+          String(a.command).localeCompare(String(b.command)) ||
+          String(a.selector).localeCompare(String(b.selector))
+        );
+      });
+    const groupCounts = visibleBindings.reduce((counts, binding) => {
+      counts.set(binding.keystrokes, (counts.get(binding.keystrokes) || 0) + 1);
+      return counts;
+    }, new Map());
+    const renderedShortcuts = new Set();
+    const fragment = document.createDocumentFragment();
+    for (const keyBinding of visibleBindings) {
+      const renderShortcut = !renderedShortcuts.has(keyBinding.keystrokes);
+      renderedShortcuts.add(keyBinding.keystrokes);
+      fragment.appendChild(
+        this.elementForKeyBinding(keyBinding, {
+          renderShortcut,
+          shortcutRowSpan: groupCounts.get(keyBinding.keystrokes),
+        }),
+      );
     }
+    this.refs.keybindingItems.appendChild(fragment);
+  }
+
+  elementForKeyBinding(keyBinding, { renderShortcut, shortcutRowSpan }) {
+    const { command, keystrokes, selector } = keyBinding;
+    const row = document.createElement("tr");
+    row.dataset.selector = selector;
+    row.dataset.keystrokes = keystrokes;
+    row.dataset.command = command;
+
+    const shortcutCell = this.createCell("keystroke", "Shortcut");
+    const shortcut = document.createElement("kbd");
+    shortcut.textContent = keystrokes;
+    shortcutCell.appendChild(shortcut);
+    if (renderShortcut) {
+      shortcutCell.rowSpan = shortcutRowSpan;
+    } else {
+      shortcutCell.classList.add("keybinding-mobile-shortcut");
+    }
+    row.appendChild(shortcutCell);
+
+    const commandCell = this.createCell("command", "Command");
+    commandCell.textContent = command;
+    commandCell.title = command;
+    row.appendChild(commandCell);
+
+    const selectorCell = this.createCell("selector", "Context");
+    selectorCell.textContent = selector;
+    selectorCell.title = selector;
+    row.appendChild(selectorCell);
+
+    const actionsCell = this.createCell("actions", "Actions");
+    const copyButton = document.createElement("button");
+    copyButton.type = "button";
+    copyButton.classList.add("btn", "btn-xs", "icon", "icon-clippy", "copy-keybinding");
+    copyButton.textContent = "Copy";
+    copyButton.setAttribute("aria-label", `Copy override for ${keystrokes}`);
+    actionsCell.appendChild(copyButton);
+    row.appendChild(actionsCell);
+    return row;
+  }
+
+  createCell(className, label) {
+    const cell = document.createElement("td");
+    cell.classList.add(className);
+    cell.dataset.label = label;
+    return cell;
   }
 
   writeKeyBindingToClipboard({ selector, keystrokes, command }) {
-    let content;
     const keymapExtension = path.extname(atom.keymaps.getUserKeymapPath());
-    if (keymapExtension === ".cson") {
-      content = `\
-'${selector}':
-  '${keystrokes}': '${command}'\
-`;
-    } else {
-      content = `\
-"${selector}": {
-  "${keystrokes}": "${command}"
-}\
-`;
-    }
+    const escapeCSON = (input) => {
+      return JSON.stringify(input).slice(1, -1).replace(/\\"/g, '"').replace(/'/g, "\\'");
+    };
+    const content =
+      keymapExtension === ".cson"
+        ? `'${escapeCSON(selector)}':\n  '${escapeCSON(keystrokes)}': '${escapeCSON(command)}'`
+        : `${JSON.stringify(selector)}: {\n  ${JSON.stringify(keystrokes)}: ${JSON.stringify(command)}\n}`;
 
     atom.clipboard.write(content);
+  }
+
+  showCopyFeedback(button) {
+    button.textContent = "Copied";
+    button.classList.add("copied");
+    const timeout = setTimeout(() => {
+      this.copyFeedbackTimeouts.delete(timeout);
+      if (button.isConnected) {
+        button.textContent = "Copy";
+        button.classList.remove("copied");
+      }
+    }, 1200);
+    this.copyFeedbackTimeouts.add(timeout);
   }
 
   selectorIsCompatibleWithPlatform(selector, platform = process.platform) {
