@@ -262,6 +262,7 @@
       margin-top: calc(var(--component-padding) / 2);
 
       .install-button.is-installing,
+      .replace-button.is-installing,
       .uninstall-button.is-uninstalling {
         opacity: 1; /* override disabled style */
         background-image: linear-gradient(to right, transparent 50%, hsla(0, 0%, 0%, 0.15) 50%);

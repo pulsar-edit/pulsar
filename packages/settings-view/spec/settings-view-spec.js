@@ -300,16 +300,6 @@ describe("SettingsView", function () {
           );
         }));
 
-      describe("settings-view:check-for-package-updates", () =>
-        it("opens the settings view to the install page", function () {
-          openWithCommand("settings-view:check-for-package-updates");
-          runs(() =>
-            expect(atom.workspace.getActivePaneItem().activePanel).toEqual({
-              name: "Install",
-              options: { uri: "atom://config/install" },
-            }),
-          );
-        }));
     });
 
     describe("when atom.workspace.open() is used with a config URI", function () {

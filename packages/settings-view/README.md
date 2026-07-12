@@ -25,7 +25,7 @@ Commands available in `atom-workspace`:
 - `settings-view:uninstall-themes`: open the themes panel to manage themes,
 - `settings-view:view-installed-packages`: open the packages panel,
 - `settings-view:uninstall-packages`: open the packages panel to manage packages,
-- `settings-view:check-for-package-updates`: open the updates panel,
+- `settings-view:check-updates`: open the install panel and check for package updates,
 - `settings-view:system`: open the system panel (Windows only).
 
 ## Services

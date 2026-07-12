@@ -241,10 +241,50 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
         this.displayPackageUpdates(packagesWithUpdates);
 
         this.matchPackages();
+        this.warnDirectoryNameMismatches();
       })
       .catch((error) => {
         console.error(error.message, error.stack);
       });
+  }
+
+  // A package's install directory is its identity, so a folder that does not
+  // match the package.json "name" silently breaks its commands, settings, and
+  // activation. Surface these once so the user can rename the directory. Each
+  // name is warned at most once per panel so repeated loads don't spam.
+  warnDirectoryNameMismatches() {
+    if (!this.warnedMismatches) this.warnedMismatches = new Set();
+    const mismatched = [];
+    for (const type of ["dev", "community"]) {
+      for (const pack of this.packages[type] || []) {
+        if (
+          pack.directoryName &&
+          pack.name &&
+          pack.directoryName !== pack.name &&
+          !this.warnedMismatches.has(pack.name)
+        ) {
+          this.warnedMismatches.add(pack.name);
+          mismatched.push(pack);
+        }
+      }
+    }
+    if (mismatched.length === 0) return;
+
+    const list = mismatched
+      .map((pack) => `- \`${pack.directoryName}\` should be \`${pack.name}\``)
+      .join("\n");
+    atom.notifications.addWarning(
+      mismatched.length === 1
+        ? "A package is installed in a directory that does not match its name"
+        : "Some packages are installed in directories that do not match their names",
+      {
+        description:
+          "The install directory is the package's identity, so a mismatch breaks its " +
+          "commands, settings, and activation. Rename each directory to match its " +
+          `\`package.json\` name:\n\n${list}`,
+        dismissable: true,
+      },
+    );
   }
 
   displayPackageUpdates(packagesWithUpdates) {

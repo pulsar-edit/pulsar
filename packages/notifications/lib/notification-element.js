@@ -240,7 +240,7 @@ module.exports = NotificationElement = (function () {
             issueButton.textContent = "Check for package updates";
             issueButton.addEventListener("click", function (e) {
               e.preventDefault();
-              const command = "settings-view:check-for-package-updates";
+              const command = "settings-view:check-updates";
               return atom.commands.dispatch(atom.views.getView(atom.workspace), command);
             });
 

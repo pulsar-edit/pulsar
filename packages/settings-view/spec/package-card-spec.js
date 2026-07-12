@@ -105,6 +105,81 @@ describe("PackageCard", function () {
     });
   });
 
+  describe("directory name mismatch", function () {
+    it("warns when the install directory does not match the package name", function () {
+      setPackageStatusSpies({ installed: true, disabled: false });
+      card = new PackageCard(
+        { name: "invert-colors", directoryName: "pulsar-invert-colors" },
+        new SettingsView(),
+        packageManager,
+      );
+      expect(card.refs.packageMessage.textContent).toContain("pulsar-invert-colors");
+      expect(card.refs.packageMessage.textContent).toContain("invert-colors");
+      expect(card.refs.packageMessage).toHaveClass("text-error");
+    });
+
+    it("does not warn when the directory matches the package name", function () {
+      setPackageStatusSpies({ installed: true, disabled: false });
+      card = new PackageCard(
+        { name: "invert-colors", directoryName: "invert-colors" },
+        new SettingsView(),
+        packageManager,
+      );
+      expect(card.refs.packageMessage.textContent).toBe("");
+      expect(card.refs.packageMessage).not.toHaveClass("text-error");
+    });
+
+    it("does not warn for a card without directory information", function () {
+      setPackageStatusSpies({ installed: false, disabled: false });
+      card = new PackageCard(
+        { name: "some-package", repository: "owner/some-package" },
+        new SettingsView(),
+        packageManager,
+      );
+      expect(card.refs.packageMessage.textContent).toBe("");
+    });
+  });
+
+  describe("replacing a conflicting package", function () {
+    it("offers Replace when a different package holds the name, and swaps on click", function () {
+      setPackageStatusSpies({ installed: true, disabled: false });
+      spyOn(PackageCard.prototype, "getInstalledMetadata").andReturn({
+        name: "linter",
+        version: "1.0.0",
+        apmInstallSource: { type: "git", origin: "author-a/linter" },
+      });
+      const uninstallSpy = spyOn(packageManager, "uninstall").andCallFake((pack, cb) => cb());
+      const installSpy = spyOn(packageManager, "install");
+
+      card = new PackageCard(
+        { name: "linter", repository: "author-b/linter", installSource: "author-b/linter" },
+        new SettingsView(),
+        packageManager,
+      );
+      jasmine.attachToDOM(card.element);
+
+      expect(card.refs.replaceButton).toBeVisible();
+      expect(card.refs.installButton).not.toBeVisible();
+
+      card.refs.replaceButton.click();
+
+      expect(uninstallSpy).toHaveBeenCalled();
+      expect(uninstallSpy.mostRecentCall.args[0].name).toBe("linter");
+      expect(installSpy).toHaveBeenCalled();
+    });
+
+    it("hides Replace for a normal installable package", function () {
+      setPackageStatusSpies({ installed: false, disabled: false });
+      card = new PackageCard(
+        { name: "solo", repository: "owner/solo", installSource: "owner/solo" },
+        new SettingsView(),
+        packageManager,
+      );
+      jasmine.attachToDOM(card.element);
+      expect(card.refs.replaceButton).not.toBeVisible();
+    });
+  });
+
   it("marks Pulsar-sourced packages with a purple install action", function () {
     setPackageStatusSpies({ installed: false, disabled: false });
     card = new PackageCard(
@@ -319,7 +394,7 @@ describe("PackageCard", function () {
       upstreamCard.destroy();
     });
 
-    it("disables the install button with an explanatory tooltip", function () {
+    it("offers Replace instead of Install, with an explanatory tooltip", function () {
       setPackageStatusSpies({ installed: true, disabled: false, hasSettings: true });
       spyOn(PackageCard.prototype, "getInstalledMetadata").andReturn({
         name: "shared-name",
@@ -331,8 +406,8 @@ describe("PackageCard", function () {
         packageManager,
       );
       jasmine.attachToDOM(card.element);
-      expect(card.refs.installButton).toBeVisible();
-      expect(card.refs.installButton).toHaveClass("disabled");
+      expect(card.refs.installButton).not.toBeVisible();
+      expect(card.refs.replaceButton).toBeVisible();
       expect(card.refs.uninstallButton).not.toBeVisible();
       expect(card.refs.settingsButton).not.toBeVisible();
       expect(card.installNoteTooltip).toBeTruthy();

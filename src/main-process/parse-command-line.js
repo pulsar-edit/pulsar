@@ -70,10 +70,6 @@ module.exports = function parseCommandLine(processArgs) {
   options
     .boolean("safe")
     .describe("safe", "Do not load packages from ~/.lumine/packages or ~/.lumine/dev/packages.");
-  options.boolean("benchmark").describe("benchmark", "This option is no longer supported.");
-  options
-    .boolean("benchmark-test")
-    .describe("benchmark-test", "This option is no longer supported.");
   options
     .alias("t", "test")
     .boolean("t")
@@ -168,8 +164,6 @@ module.exports = function parseCommandLine(processArgs) {
 
   const addToLastWindow = args["add"];
   const safeMode = args["safe"];
-  const benchmark = args["benchmark"];
-  const benchmarkTest = args["benchmark-test"];
   const test = args["test"];
   const mainProcess = args["main-process"];
   const timeout = args["timeout"];
@@ -264,8 +258,6 @@ module.exports = function parseCommandLine(processArgs) {
     addToLastWindow,
     mainProcess,
     useCrashReporter,
-    benchmark,
-    benchmarkTest,
     env: process.env,
   };
 };

@@ -303,6 +303,30 @@ describe("PackageManager", function () {
     });
   });
 
+  describe("::getGitRemoteOrigin()", function () {
+    it("returns the canonical origin of a checkout's remote", function () {
+      spyOn(packageManager, "runProcess").andReturn(
+        Promise.resolve({ stdout: "https://github.com/Author/Repo.git\n" }),
+      );
+
+      let origin;
+      waitsForPromise(() =>
+        packageManager.getGitRemoteOrigin("/some/path").then((result) => (origin = result)),
+      );
+      runs(() => expect(origin).toBe("Author/Repo"));
+    });
+
+    it("returns null when the directory has no remote", function () {
+      spyOn(packageManager, "runProcess").andReturn(Promise.reject(new Error("not a repo")));
+
+      let origin = "unset";
+      waitsForPromise(() =>
+        packageManager.getGitRemoteOrigin("/some/path").then((result) => (origin = result)),
+      );
+      runs(() => expect(origin).toBe(null));
+    });
+  });
+
   describe("::installGitHubPackage()", function () {
     it("reinstalls an installed package from its recorded source, not the bare name", function () {
       spyOn(packageManager, "resolvePackageSource").andReturn(Promise.reject(new Error("stop")));

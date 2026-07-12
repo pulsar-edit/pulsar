@@ -196,13 +196,6 @@ module.exports = class AtomApplication extends EventEmitter {
     }
 
     // We haven't returned yet, so another editor main process must be running.
-    if (options.benchmark || options.benchmarkTest) {
-      // We have to log this quite early -- here is the latest we can log this
-      // and have it show in the same terminal where the second instance of the
-      // editor is being launched. The Promise below hands things off
-      // to the existing, older editor main process that is already running.
-      console.log("The benchmarking feature has been removed.");
-    }
 
     return new Promise((resolve) => {
       const client = net.connect({ path: socketPath }, () => {
@@ -320,7 +313,7 @@ module.exports = class AtomApplication extends EventEmitter {
     let optionsForWindowsToOpen = [];
     let shouldReopenPreviousWindows = false;
 
-    if (options.test || options.benchmark || options.benchmarkTest) {
+    if (options.test) {
       optionsForWindowsToOpen.push(options);
     } else if (options.newWindow) {
       shouldReopenPreviousWindows = false;
@@ -360,8 +353,6 @@ module.exports = class AtomApplication extends EventEmitter {
       executedFrom,
       foldersToOpen,
       urlsToOpen,
-      benchmark,
-      benchmarkTest,
       test,
       pidToKillWhenClosed,
       devMode,
@@ -387,15 +378,6 @@ module.exports = class AtomApplication extends EventEmitter {
         timeout,
         env,
       });
-    } else if (benchmark || benchmarkTest) {
-      // We are keeping these startup options so we can print a removal message.
-      // Printing a message saying benchmarks are removed will help avoid
-      // confusion about the editor failing to launch in this mode.
-      console.log("The benchmarking feature has been removed.");
-      if (this.getAllWindows().length === 0) {
-        console.log("Quitting.");
-        app.quit();
-      }
     } else if (
       (pathsToOpen && pathsToOpen.length > 0) ||
       (foldersToOpen && foldersToOpen.length > 0)
@@ -654,10 +636,7 @@ module.exports = class AtomApplication extends EventEmitter {
     this.openPathOnEvent("application:open-your-keymap", "atom://.lumine/keymap");
     this.openPathOnEvent("application:open-your-snippets", "atom://.lumine/snippets");
     this.openPathOnEvent("application:open-your-stylesheet", "atom://.lumine/stylesheet");
-    this.openPathOnEvent(
-      "application:open-license",
-      path.join(process.resourcesPath, "LICENSE"),
-    );
+    this.openPathOnEvent("application:open-license", path.join(process.resourcesPath, "LICENSE"));
 
     this.configFile.onDidChange((settings) => {
       for (let window of this.getAllWindows()) {
@@ -859,14 +838,6 @@ module.exports = class AtomApplication extends EventEmitter {
             options,
           ),
         );
-      }),
-    );
-
-    this.disposable.add(
-      ipcHelpers.on(ipcMain, "run-benchmarks", (_event, _benchmarksPath) => {
-        // Printing a message saying benchmarks are removed will help avoid
-        // confusion about the benchmarking feature not working.
-        console.log("The benchmarking feature has been removed.");
       }),
     );
 
@@ -1663,9 +1634,7 @@ module.exports = class AtomApplication extends EventEmitter {
     let atomTestRunner = packageMetadata.atomTestRunner;
 
     if (!atomTestRunner) {
-      process.stdout.write(
-        "atomTestRunner was not defined, using runners/jasmine-test-runner.\n",
-      );
+      process.stdout.write("atomTestRunner was not defined, using runners/jasmine-test-runner.\n");
       atomTestRunner = "runners/jasmine-test-runner";
     }
 

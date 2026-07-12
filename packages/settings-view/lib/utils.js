@@ -25,7 +25,7 @@ const ownerFromRepository = (repository) => {
 const repoUrlFromRepository = (repository) => {
   if (!repository) return "";
 
-  let repo = repository;
+  let repo;
 
   if (typeof repository === "string") {
     repo = repository;
@@ -70,19 +70,54 @@ const packageOriginKey = (repository) => normalizeRepository(repository, { lower
 // A human-facing "owner/repo" reference for display, preserving case.
 const repoReferenceFromRepository = (repository) => normalizeRepository(repository);
 
-// The origin key(s) identifying where an installed package actually came from.
-// Prefers apmInstallSource (the source it was fetched from) over the package.json
-// "repository" field, which is unreliable in forks — a fork usually still points
-// its repository at the upstream, which would otherwise make an unrelated
+// Package identity, in one place.
+//
+// A package has two identities that must not be confused:
+//   * its NAME is the install SLOT — the install directory, command prefix,
+//     config namespace, and activation. Only one package per name can be
+//     installed, so the name is unique *among installed packages* but NOT
+//     globally: the same name may be published from many sources.
+//   * its ORIGIN is the SOURCE PATH (the repository / install source). This is
+//     the globally unique identity used to browse, deduplicate catalogs, match
+//     update candidates, and decide whether an install would collide.
+//
+// `packageOrigin` resolves the origin from whatever shape it is handed (a
+// catalog entry, a Pulsar entry, a Git-install card, or installed metadata),
+// most authoritative first. The package.json `repository` field is the LAST
+// resort because it is unreliable in forks — a fork usually still points its
+// repository at the upstream, which would otherwise make an unrelated
 // same-named package look like the installed one.
+const packageOrigin = (pack) => {
+  if (!pack) return "";
+  const install = pack.apmInstallSource;
+  const candidates = [
+    // `apmInstallSource.origin` is the canonical origin recorded at install time
+    // from the source actually cloned — authoritative, so it wins.
+    install && install.origin,
+    pack.installSource,
+    install && install.source,
+    install && install.repository,
+    pack.repository,
+  ];
+  for (const candidate of candidates) {
+    const key = packageOriginKey(candidate);
+    if (key) return key;
+  }
+  return "";
+};
+
+// The full identity of a package: its install slot (name) and its unique origin.
+const packageCoordinate = (pack) => ({
+  name: pack ? pack.name : undefined,
+  origin: packageOrigin(pack),
+});
+
+// The origin key(s) identifying where an installed package actually came from.
+// Kept as an array for callers that match with `includes`; today this is the
+// single canonical origin.
 const installedOriginKeys = (metadata) => {
-  if (!metadata) return [];
-  const install = metadata.apmInstallSource;
-  const refs =
-    install && (install.source || install.repository)
-      ? [install.source, install.repository]
-      : [metadata.repository];
-  return refs.map(packageOriginKey).filter(Boolean);
+  const origin = packageOrigin(metadata);
+  return origin ? [origin] : [];
 };
 
 // Returns the metadata of the installed package with the given name, whether
@@ -123,6 +158,8 @@ module.exports = {
   repoUrlFromRepository,
   packageOriginKey,
   repoReferenceFromRepository,
+  packageOrigin,
+  packageCoordinate,
   installedOriginKeys,
   getInstalledPackageMetadata,
   packageComparatorAscending,

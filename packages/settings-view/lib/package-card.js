@@ -12,8 +12,7 @@ import {
   ownerFromRepository,
   repoUrlFromRepository,
   repoReferenceFromRepository,
-  packageOriginKey,
-  installedOriginKeys,
+  packageOrigin,
   getInstalledPackageMetadata,
 } from "./utils";
 
@@ -72,6 +71,24 @@ export default class PackageCard {
 
     this.hasCompatibleVersion = true;
     this.updateInterfaceState();
+    this.resolveOriginFromGitRemote();
+  }
+
+  // Migration for packages placed or linked by hand (no apmInstallSource): their
+  // package.json "repository" may point upstream, so identify them by their Git
+  // checkout's own remote instead. Runs in the background and only when there is
+  // no authoritative origin already; our own installs record one, so they and
+  // bundled packages are skipped.
+  resolveOriginFromGitRemote() {
+    const install = this.pack.apmInstallSource;
+    if (install && (install.origin || install.source || install.repository)) return;
+    if (!this.pack.path || !this.isInstalled()) return;
+    if (atom.packages.isBundledPackage(this.pack.name)) return;
+    this.packageManager.getGitRemoteOrigin(this.pack.path).then((origin) => {
+      if (!origin || this.destroyed) return;
+      this.pack.apmInstallSource = { ...(this.pack.apmInstallSource || {}), type: "git", origin };
+      this.updateInterfaceState();
+    });
   }
 
   render() {
@@ -155,6 +172,14 @@ export default class PackageCard {
                   ref="installButton"
                 >
                   Install
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-warning icon icon-sync replace-button"
+                  ref="replaceButton"
+                  style={{ display: "none" }}
+                >
+                  Replace
                 </button>
               </div>
               <div ref="packageActionButtonGroup" className="btn-group">
@@ -261,6 +286,17 @@ export default class PackageCard {
     this.disposables.add(
       new Disposable(() => {
         this.refs.installButton.removeEventListener("click", installButtonClickHandler);
+      }),
+    );
+
+    const replaceButtonClickHandler = (event) => {
+      event.stopPropagation();
+      this.replace();
+    };
+    this.refs.replaceButton.addEventListener("click", replaceButtonClickHandler);
+    this.disposables.add(
+      new Disposable(() => {
+        this.refs.replaceButton.removeEventListener("click", replaceButtonClickHandler);
       }),
     );
 
@@ -404,6 +440,7 @@ export default class PackageCard {
   }
 
   destroy() {
+    this.destroyed = true;
     if (this.installNoteTooltip) {
       this.installNoteTooltip.dispose();
       this.installNoteTooltip = null;
@@ -451,6 +488,29 @@ export default class PackageCard {
     this.updateSettingsState();
     this.updateInstalledState();
     this.updateDisabledState();
+    this.updateDirectoryNameWarning();
+  }
+
+  // Warns when a package's install directory does not match its package.json
+  // "name". The directory IS the install slot, so a mismatch silently breaks the
+  // package's require path, command prefix, config namespace, and activation.
+  // This happens with packages placed or linked by hand — e.g. a repository
+  // cloned into a folder named after the repo rather than the package.
+  updateDirectoryNameWarning() {
+    const message = this.refs.packageMessage;
+    const dirName = this.pack.directoryName;
+    if (dirName && this.pack.name && dirName !== this.pack.name) {
+      message.classList.add("text-error");
+      message.textContent =
+        `This package is installed in a directory named “${dirName}”, but its ` +
+        `package.json name is “${this.pack.name}”. Rename the directory to ` +
+        `“${this.pack.name}” so its commands, settings, and activation work.`;
+      message.style.display = "";
+    } else if (message.classList.contains("text-error")) {
+      message.classList.remove("text-error");
+      message.textContent = "";
+      message.style.display = "none";
+    }
   }
 
   // The Git ref worth showing beside the version: a branch name or short commit
@@ -580,8 +640,25 @@ export default class PackageCard {
     this.refs.updateButtonGroup.style.display = "none";
     this.refs.packageActionButtonGroup.style.display = "none";
     this.refs.installButtonGroup.style.display = "";
+
+    if (atom.packages.isBundledPackage(this.pack.name)) {
+      // The name belongs to a bundled package, which cannot be uninstalled — so
+      // Replace is impossible. Keep a disabled Install with the reason.
+      this.refs.installButton.style.display = "";
+      this.refs.replaceButton.style.display = "none";
+      this.setInstallNote(
+        `“${this.pack.name}” is a bundled Lumine package and cannot be replaced.`,
+        true,
+      );
+      return;
+    }
+
+    // A plain Install would overwrite the unrelated package, so offer only
+    // Replace; the reason is on hover.
+    this.refs.installButton.style.display = "none";
+    this.refs.replaceButton.style.display = "";
     this.setInstallNote(
-      `A different package named “${this.pack.name}” is already installed. Uninstall it before installing this one.`,
+      `A different package named “${this.pack.name}” is already installed. Replace uninstalls it and installs this one.`,
       true,
     );
   }
@@ -615,11 +692,14 @@ export default class PackageCard {
     return getInstalledPackageMetadata(this.pack.name);
   }
 
+  // True when this card's package shares its NAME with an installed package but
+  // comes from a different ORIGIN (source path) — i.e. installing this one would
+  // collide with an unrelated same-named package that is already installed.
   installedOriginDiffers() {
-    const originKey = packageOriginKey(this.pack.repository);
-    if (!originKey) return false;
-    const installedKeys = installedOriginKeys(this.getInstalledMetadata());
-    return installedKeys.length > 0 && !installedKeys.includes(originKey);
+    const cardOrigin = packageOrigin(this.pack);
+    if (!cardOrigin) return false;
+    const installedOrigin = packageOrigin(this.getInstalledMetadata());
+    return !!installedOrigin && installedOrigin !== cardOrigin;
   }
 
   displayInstalledState() {
@@ -655,6 +735,10 @@ export default class PackageCard {
   }
 
   setNotInstalledStateButtons() {
+    // Replace only applies in the conflict state; a plain not-installed card
+    // shows a normal Install and no Replace.
+    this.refs.replaceButton.style.display = "none";
+    this.refs.installButton.style.display = "";
     if (!this.hasCompatibleVersion) {
       // No compatible version: show a disabled Install with the reason on hover.
       this.setInstallNote(this.incompatibleMessage(), true);
@@ -816,14 +900,10 @@ export default class PackageCard {
   // name). Returns whether it is also the SAME package by origin — i.e. the
   // event is about this card's package rather than a different same-named one.
   isSameOriginEvent(pack) {
-    const cardKey = packageOriginKey(this.pack.repository);
-    const eventKey = packageOriginKey(
-      pack.installSource ||
-        (pack.apmInstallSource && pack.apmInstallSource.source) ||
-        pack.repository,
-    );
-    if (!cardKey || !eventKey) return true;
-    return cardKey === eventKey;
+    const cardOrigin = packageOrigin(this.pack);
+    const eventOrigin = packageOrigin(pack);
+    if (!cardOrigin || !eventOrigin) return true;
+    return cardOrigin === eventOrigin;
   }
 
   isInstalled() {
@@ -880,6 +960,50 @@ export default class PackageCard {
         }
       },
     );
+  }
+
+  // Conflict-state action: the install slot (name) is taken by a different
+  // package, so uninstall that one and install this one in a single step. The
+  // reused name means this package inherits the existing `name.*` settings and
+  // `name:` keybindings.
+  replace() {
+    const button = this.refs.replaceButton;
+    if (button.disabled) return;
+    const installedMetadata = this.getInstalledMetadata();
+    const occupant = {
+      name: this.pack.name,
+      theme: installedMetadata ? installedMetadata.theme : this.pack.theme,
+    };
+    button.disabled = true;
+    button.classList.add("is-installing");
+    this.packageManager.uninstall(occupant, (uninstallError) => {
+      if (uninstallError != null) {
+        button.disabled = false;
+        button.classList.remove("is-installing");
+        console.error(
+          `Uninstalling ${this.type} ${this.pack.name} for replacement failed`,
+          uninstallError.stack != null ? uninstallError.stack : uninstallError,
+          uninstallError.stderr,
+        );
+        return;
+      }
+      // The slot is free now; install this package. The install/uninstall events
+      // re-render the card, so the Replace button is superseded automatically.
+      this.originConflict = false;
+      this.installBlocked = false;
+      this.packageManager.install(
+        this.installablePack != null ? this.installablePack : this.pack,
+        (installError) => {
+          if (installError != null) {
+            console.error(
+              `Installing ${this.type} ${this.pack.name} failed`,
+              installError.stack != null ? installError.stack : installError,
+              installError.stderr,
+            );
+          }
+        },
+      );
+    });
   }
 
   update() {

@@ -15,7 +15,7 @@ const {
 const Client = require("./atom-io-client");
 const CommunityPackageCatalogClient = require("./community-package-catalog-client");
 const PulsarPackageClient = require("./pulsar-package-client");
-const { packageOriginKey, installedOriginKeys } = require("./utils");
+const { packageOrigin, repoReferenceFromRepository } = require("./utils");
 
 module.exports = class PackageManager {
   constructor() {
@@ -468,6 +468,27 @@ module.exports = class PackageManager {
     });
   }
 
+  // Reads the origin remote of an installed package's Git checkout and returns
+  // its canonical origin (owner/repo), or null. This is the migration path for
+  // packages placed or linked by hand (no apmInstallSource): their package.json
+  // "repository" may point upstream, but the checkout's own remote is the truth.
+  // Our own installs strip .git, so this resolves only for hand-managed checkouts.
+  async getGitRemoteOrigin(installPath) {
+    if (!installPath) return null;
+    try {
+      const { stdout } = await this.runProcess(this.getGitCommand(), [
+        "-C",
+        installPath,
+        "config",
+        "--get",
+        "remote.origin.url",
+      ]);
+      return repoReferenceFromRepository(stdout.trim()) || null;
+    } catch {
+      return null;
+    }
+  }
+
   // Builds the source pinned to a specific version, honoring shorthand vs URL.
   pinSourceToVersion(parsed, version) {
     if (/^[\w.-]+\/[\w.-]+$/.test(parsed.repository)) {
@@ -569,6 +590,11 @@ module.exports = class PackageManager {
       const metadata = CSON.readFileSync(metadataFilePath);
       metadata.apmInstallSource = {
         type: "git",
+        // The canonical origin (owner/repo) of what was actually cloned. This is
+        // the package's authoritative identity — recorded once here so no reader
+        // ever re-derives it from the package.json "repository" field, which is
+        // unreliable in forks.
+        origin: repoReferenceFromRepository(resolvedSource.repository),
         // When pinned to a browsed version, record the unpinned source and a
         // latest-tag policy so updates keep tracking new releases even though a
         // specific version was installed now.
@@ -602,9 +628,10 @@ module.exports = class PackageManager {
     }
   }
 
-  // Refuses to overwrite a package that shares its name with the one being
-  // installed but comes from a different repository. Reinstalls and updates of
-  // the same package are allowed through.
+  // Enforces the install-slot invariant: a name can be installed once. Refuses
+  // to overwrite a package that shares its name with the one being installed but
+  // comes from a different origin (source path). Reinstalls and updates of the
+  // same package — same origin — are allowed through.
   assertNoNameCollision(packageName, resolvedSource) {
     if (atom.packages.isBundledPackage(packageName)) {
       throw new Error(`"${packageName}" is bundled with Lumine and cannot be replaced.`);
@@ -620,21 +647,22 @@ module.exports = class PackageManager {
     }
     if (!metadata) return;
 
-    const installedKeys = installedOriginKeys(metadata);
-    if (installedKeys.length === 0) return;
+    const installedOrigin = packageOrigin(metadata);
+    if (!installedOrigin) return;
 
-    const candidateKeys = [resolvedSource.repository, resolvedSource.source]
-      .map(packageOriginKey)
-      .filter(Boolean);
-    if (candidateKeys.some((key) => installedKeys.includes(key))) return;
+    const candidateOrigin = packageOrigin({
+      installSource: resolvedSource.source,
+      repository: resolvedSource.repository,
+    });
+    if (candidateOrigin && candidateOrigin === installedOrigin) return;
 
-    const installedOrigin =
+    const installedFrom =
       typeof metadata.repository === "string"
         ? metadata.repository
         : metadata.repository && metadata.repository.url;
     throw new Error(
       `A different package named "${packageName}" is already installed${
-        installedOrigin ? ` from ${installedOrigin}` : ""
+        installedFrom ? ` from ${installedFrom}` : ""
       }. Uninstall it before installing this one.`,
     );
   }
@@ -658,6 +686,14 @@ module.exports = class PackageManager {
         name: metadata.name || pack.name,
         path: pack.path,
       });
+
+      // Record the install directory's own name so the UI can flag a package
+      // whose folder does not match its package.json "name" — the folder IS the
+      // install slot, so a mismatch breaks require, commands, config, and
+      // activation. Bundled packages are curated and always match; skip them.
+      if (!pack.isBundled && pack.path) {
+        packageInfo.directoryName = path.basename(pack.path);
+      }
 
       if (packageInfo.apmInstallSource && packageInfo.apmInstallSource.type === "git") {
         packages.git.push(packageInfo);

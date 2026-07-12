@@ -13,7 +13,7 @@ import { CompositeDisposable, Disposable, TextEditor } from "atom";
 
 import PackageCard from "./package-card";
 import ErrorView from "./error-view";
-import { packageOriginKey, installedOriginKeys, getInstalledPackageMetadata } from "./utils";
+import { packageOrigin, getInstalledPackageMetadata } from "./utils";
 const { normalizeCatalogSource } = require("./community-package-catalog-client");
 
 const PackageNameRegex = /config\/install\/(?:package|theme):([a-z0-9-_]+)/i;
@@ -359,9 +359,9 @@ export default class InstallPanel {
     if (!this.packageManager.isPackageInstalled(pack.name)) return false;
     const metadata = this.getInstalledMetadata(pack.name);
     if (!metadata) return false;
-    const originKey = packageOriginKey(pack.repository);
-    const installedKeys = installedOriginKeys(metadata);
-    if (!originKey || !installedKeys.includes(originKey)) return false;
+    const origin = packageOrigin(pack);
+    const installedOrigin = packageOrigin(metadata);
+    if (!origin || origin !== installedOrigin) return false;
     return (
       semver.valid(metadata.version) &&
       semver.valid(pack.version) &&
@@ -512,7 +512,7 @@ export default class InstallPanel {
       }
       if (!result.catalog) continue;
       for (const pack of result.catalog.packages) {
-        const key = packageOriginKey(pack.repository);
+        const key = packageOrigin(pack);
         if (key && origins.has(key)) continue;
         if (key) origins.add(key);
         this.catalogPackages.push(pack);
@@ -534,7 +534,7 @@ export default class InstallPanel {
     const packages = [...this.catalogPackages, ...extra]
       .filter((pack) => this.matchesFilter(pack))
       .filter((pack) => {
-        const key = packageOriginKey(pack.repository);
+        const key = packageOrigin(pack);
         if (key && origins.has(key)) return false;
         if (key) origins.add(key);
         return true;
@@ -542,7 +542,7 @@ export default class InstallPanel {
       .sort(
         (left, right) =>
           left.name.localeCompare(right.name) ||
-          packageOriginKey(left.repository).localeCompare(packageOriginKey(right.repository)),
+          packageOrigin(left).localeCompare(packageOrigin(right)),
       );
     for (const pack of packages) {
       const card = this.getPackageCardView(pack);
@@ -586,7 +586,7 @@ export default class InstallPanel {
   }
 
   addResultCard(pack, origins, results) {
-    const key = packageOriginKey(pack.repository);
+    const key = packageOrigin(pack);
     if (key && origins.has(key)) return;
     if (key) origins.add(key);
     results.push(pack);
