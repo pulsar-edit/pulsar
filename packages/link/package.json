@@ -15,6 +15,6 @@
     ]
   },
   "dependencies": {
-    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
+    "underscore-plus": "https://github.com/lumine-code/underscore-plus.git#02b4e5a0f0f85fdf2ef5550db7131db0bda4937a"
   }
 }

@@ -13,10 +13,10 @@
     "async": "3.2.6",
     "select-list": "file:../../shared/select-list",
     "pegjs": "^0.10.0",
-    "@lumine-code/scoped-property-store": "https://github.com/lumine-code/scoped-property-store.git#c801326f52bac9c19116ebc3c4fbfe84eae5ac89",
-    "season": "^6.0.2",
+    "@lumine-code/scoped-property-store": "https://github.com/lumine-code/scoped-property-store.git#0599ad1ee770e987682a3c13c1dedc458a86d5d5",
+    "season": "https://github.com/lumine-code/season.git#fcc131d0eb05d6ff1667c91b23d795fdd6fb2324",
     "temp": "~0.8.0",
-    "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
+    "underscore-plus": "https://github.com/lumine-code/underscore-plus.git#02b4e5a0f0f85fdf2ef5550db7131db0bda4937a"
   },
   "providedServices": {
     "snippets": {
