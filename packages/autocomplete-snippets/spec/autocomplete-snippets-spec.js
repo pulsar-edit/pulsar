@@ -2,9 +2,9 @@ describe("AutocompleteSnippets", () => {
   let [completionDelay, editor, editorView] = [];
 
   beforeEach(() => {
-    atom.config.set("autocomplete-plus.enableAutoActivation", true);
+    atom.config.set("autocomplete.enableAutoActivation", true);
     completionDelay = 100;
-    atom.config.set("autocomplete-plus.autoActivationDelay", completionDelay);
+    atom.config.set("autocomplete.autoActivationDelay", completionDelay);
     completionDelay += 100; // Rendering delay
 
     const workspaceElement = atom.views.getView(atom.workspace);
@@ -26,7 +26,7 @@ describe("AutocompleteSnippets", () => {
           .activatePackage("autocomplete-snippets")
           .then(({ mainModule }) => (autocompleteSnippetsMainModule = mainModule)),
 
-        atom.packages.activatePackage("autocomplete-plus"),
+        atom.packages.activatePackage("autocomplete"),
         atom.packages.activatePackage("snippets").then(({ mainModule }) => {
           snippetsMainModule = mainModule;
           snippetsMainModule.loaded = false;
@@ -43,10 +43,10 @@ describe("AutocompleteSnippets", () => {
     waitsFor("all snippets to load", 3000, () => snippetsMainModule.loaded);
   });
 
-  describe("when autocomplete-plus is enabled", () => {
+  describe("when autocomplete is enabled", () => {
     it("shows autocompletions when there are snippets available", () => {
       runs(() => {
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         editor.moveToBottom();
         editor.insertText("D");
@@ -56,18 +56,18 @@ describe("AutocompleteSnippets", () => {
       });
 
       waitsFor("autocomplete view to appear", 1000, () =>
-        editorView.querySelector(".autocomplete-plus span.word"),
+        editorView.querySelector(".autocomplete span.word"),
       );
 
       runs(() => {
-        expect(editorView.querySelector(".autocomplete-plus span.word")).toHaveText("do");
-        expect(editorView.querySelector(".autocomplete-plus span.right-label")).toHaveText("do");
+        expect(editorView.querySelector(".autocomplete span.word")).toHaveText("do");
+        expect(editorView.querySelector(".autocomplete span.right-label")).toHaveText("do");
       });
     });
 
     it("expands the snippet on confirm", () => {
       runs(() => {
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         editor.moveToBottom();
         editor.insertText("D");
@@ -77,11 +77,11 @@ describe("AutocompleteSnippets", () => {
       });
 
       waitsFor("autocomplete view to appear", 1000, () =>
-        editorView.querySelector(".autocomplete-plus span.word"),
+        editorView.querySelector(".autocomplete span.word"),
       );
 
       runs(() => {
-        atom.commands.dispatch(editorView, "autocomplete-plus:confirm");
+        atom.commands.dispatch(editorView, "autocomplete:confirm");
         expect(editor.getText()).toContain("} while (true)");
       });
     });

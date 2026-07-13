@@ -592,7 +592,7 @@ describe("HTML autocompletions", () => {
 
     const { args } = atom.commands.dispatch.mostRecentCall;
     expect(args[0].tagName.toLowerCase()).toBe("atom-text-editor");
-    expect(args[1]).toBe("autocomplete-plus:activate");
+    expect(args[1]).toBe("autocomplete:activate");
   });
 
   it("does not error in EJS documents", async () => {

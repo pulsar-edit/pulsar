@@ -2,22 +2,22 @@
 beforeEach(() => {
   spyOn(atom.views, "readDocument").andCallFake((fn) => fn());
   spyOn(atom.views, "updateDocument").andCallFake((fn) => fn());
-  atom.config.set("autocomplete-plus.minimumWordLength", 1);
-  atom.config.set("autocomplete-plus.suggestionListFollows", "Word");
-  atom.config.set("autocomplete-plus.useCoreMovementCommands", true);
-  atom.config.set("autocomplete-plus.includeCompletionsFromAllBuffers", false);
+  atom.config.set("autocomplete.minimumWordLength", 1);
+  atom.config.set("autocomplete.suggestionListFollows", "Word");
+  atom.config.set("autocomplete.useCoreMovementCommands", true);
+  atom.config.set("autocomplete.includeCompletionsFromAllBuffers", false);
 });
 
 function waitForAutocomplete(editor) {
   const editorView = atom.views.getView(editor);
 
-  return conditionPromise(() => editorView.querySelectorAll(".autocomplete-plus li").length > 0);
+  return conditionPromise(() => editorView.querySelectorAll(".autocomplete li").length > 0);
 }
 
 function waitForAutocompleteToDisappear(editor) {
   const editorView = atom.views.getView(editor);
 
-  return conditionPromise(() => editorView.querySelectorAll(".autocomplete-plus li").length === 0);
+  return conditionPromise(() => editorView.querySelectorAll(".autocomplete li").length === 0);
 }
 
 let triggerAutocompletion = (editor, moveCursor = true, char = "f") => {
@@ -31,18 +31,18 @@ let triggerAutocompletion = (editor, moveCursor = true, char = "f") => {
 async function waitForDeferredSuggestions(editorView, totalSuggestions) {
   await conditionPromise(() =>
     editorView.querySelector(
-      ".autocomplete-plus autocomplete-suggestion-list .suggestion-list-scroller",
+      ".autocomplete autocomplete-suggestion-list .suggestion-list-scroller",
     ),
   );
 
   const scroller = editorView.querySelector(
-    ".autocomplete-plus autocomplete-suggestion-list .suggestion-list-scroller",
+    ".autocomplete autocomplete-suggestion-list .suggestion-list-scroller",
   );
   scroller.scrollTo(0, 100);
   scroller.scrollTo(0, 0);
 
   await conditionPromise(
-    () => editorView.querySelectorAll(".autocomplete-plus li").length === totalSuggestions,
+    () => editorView.querySelectorAll(".autocomplete li").length === totalSuggestions,
   );
 }
 

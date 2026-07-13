@@ -37,7 +37,7 @@ function isTagStart({ prefix, scopeDescriptor, bufferPosition, editor }) {
     return hasTagScope(scopeDescriptor.getScopesArray());
   }
 
-  // autocomplete-plus's default prefix setting does not capture <. Manually check for it.
+  // autocomplete's default prefix setting does not capture <. Manually check for it.
   prefix = editor.getTextInRange([[bufferPosition.row, bufferPosition.column - 1], bufferPosition]);
 
   const scopes = scopeDescriptor.getScopesArray();

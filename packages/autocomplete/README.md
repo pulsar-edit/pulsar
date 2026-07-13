@@ -1,4 +1,4 @@
-# autocomplete-plus
+# autocomplete
 
 Display possible completions in the Lumine editor while you type.
 
@@ -15,14 +15,14 @@ Display possible completions in the Lumine editor while you type.
 
 Commands available in `atom-text-editor`:
 
-- `autocomplete-plus:activate`: manually show the suggestion list for the current word,
-- `autocomplete-plus:navigate-to-description-more-link`: open the "more" link of the selected suggestion's description externally.
+- `autocomplete:activate`: manually show the suggestion list for the current word,
+- `autocomplete:navigate-to-description-more-link`: open the "more" link of the selected suggestion's description externally.
 
 Commands available in `atom-text-editor.autocomplete-active`:
 
-- `autocomplete-plus:confirm`: insert the selected suggestion,
-- `autocomplete-plus:confirmIfNonDefault`: insert the suggestion only if it is not the default selection,
-- `autocomplete-plus:cancel`: dismiss the suggestion list.
+- `autocomplete:confirm`: insert the selected suggestion,
+- `autocomplete:confirmIfNonDefault`: insert the suggestion only if it is not the default selection,
+- `autocomplete:cancel`: dismiss the suggestion list.
 
 ## Services
 

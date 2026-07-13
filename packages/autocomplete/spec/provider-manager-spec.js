@@ -6,7 +6,7 @@ describe("Provider Manager", () => {
   let [providerManager, testProvider, registration] = [];
 
   beforeEach(() => {
-    atom.config.set("autocomplete-plus.enableBuiltinProvider", true);
+    atom.config.set("autocomplete.enableBuiltinProvider", true);
     providerManager = new ProviderManager();
     providerManager.initialize();
     testProvider = {
@@ -39,7 +39,7 @@ describe("Provider Manager", () => {
   });
 
   describe("when no providers have been registered, and enableBuiltinProvider is true", () => {
-    beforeEach(() => atom.config.set("autocomplete-plus.enableBuiltinProvider", true));
+    beforeEach(() => atom.config.set("autocomplete.enableBuiltinProvider", true));
 
     it("is constructed correctly", () => {
       expect(providerManager.providers).toBeDefined();
@@ -324,7 +324,7 @@ describe("Provider Manager", () => {
   });
 
   describe("when no providers have been registered, and enableBuiltinProvider is false", () => {
-    beforeEach(() => atom.config.set("autocomplete-plus.enableBuiltinProvider", false));
+    beforeEach(() => atom.config.set("autocomplete.enableBuiltinProvider", false));
 
     it("does not register the default provider for all scopes", () => {
       expect(providerManager.applicableProviders(["workspace-center"], "*").length).toBe(0);
@@ -337,7 +337,7 @@ describe("Provider Manager", () => {
     let [testProvider1, testProvider2, testProvider3, testProvider4, testProvider5] = [];
 
     beforeEach(() => {
-      atom.config.set("autocomplete-plus.enableBuiltinProvider", true);
+      atom.config.set("autocomplete.enableBuiltinProvider", true);
       providerManager = new ProviderManager();
       providerManager.initialize();
 
@@ -472,7 +472,7 @@ describe("Provider Manager", () => {
       expect(
         providerManager.applicableProviders(["workspace-center"], ".source.js .comment"),
       ).toHaveLength(4);
-      atom.config.set("autocomplete-plus.scopeBlacklist", [".source.js .comment"]);
+      atom.config.set("autocomplete.scopeBlacklist", [".source.js .comment"]);
       expect(
         providerManager.applicableProviders(["workspace-center"], ".source.js .comment"),
       ).toHaveLength(0);
@@ -482,7 +482,7 @@ describe("Provider Manager", () => {
       expect(
         providerManager.applicableProviders(["workspace-center"], ".source.js .comment"),
       ).toHaveLength(4);
-      atom.config.set("autocomplete-plus.scopeBlacklist", [".source.js *"]);
+      atom.config.set("autocomplete.scopeBlacklist", [".source.js *"]);
       expect(
         providerManager.applicableProviders(["workspace-center"], ".source.js .comment"),
       ).toHaveLength(0);
@@ -492,7 +492,7 @@ describe("Provider Manager", () => {
       expect(
         providerManager.applicableProviders(["workspace-center"], ".source.js .comment"),
       ).toHaveLength(4);
-      atom.config.set("autocomplete-plus.scopeBlacklist", [".source.js *"]);
+      atom.config.set("autocomplete.scopeBlacklist", [".source.js *"]);
       expect(
         providerManager.applicableProviders(["workspace-center"], ".source.js .comment .other"),
       ).toHaveLength(0);
@@ -502,7 +502,7 @@ describe("Provider Manager", () => {
       expect(
         providerManager.applicableProviders(["workspace-center"], ".source.js .comment"),
       ).toHaveLength(4);
-      atom.config.set("autocomplete-plus.scopeBlacklist", [".source.coffee *"]);
+      atom.config.set("autocomplete.scopeBlacklist", [".source.coffee *"]);
       expect(
         providerManager.applicableProviders(["workspace-center"], ".source.js .comment"),
       ).toHaveLength(4);
@@ -563,7 +563,7 @@ describe("Provider Manager", () => {
     ] = [];
 
     beforeEach(() => {
-      atom.config.set("autocomplete-plus.enableBuiltinProvider", true);
+      atom.config.set("autocomplete.enableBuiltinProvider", true);
       providerManager = new ProviderManager();
       providerManager.initialize();
       defaultProvider = providerManager.defaultProvider;
@@ -635,7 +635,7 @@ describe("Provider Manager", () => {
   describe("when suggestionPriorities are the same", () => {
     let [provider1, provider2, provider3] = [];
     beforeEach(() => {
-      atom.config.set("autocomplete-plus.enableBuiltinProvider", true);
+      atom.config.set("autocomplete.enableBuiltinProvider", true);
       providerManager = new ProviderManager();
       providerManager.initialize();
 

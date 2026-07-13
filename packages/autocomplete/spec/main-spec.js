@@ -14,8 +14,8 @@ describe("Autocomplete", () => {
     jasmine.useRealClock();
 
     // Set to live completion
-    atom.config.set("autocomplete-plus.enableAutoActivation", true);
-    atom.config.set("autocomplete-plus.fileBlacklist", [".*", "*.md"]);
+    atom.config.set("autocomplete.enableAutoActivation", true);
+    atom.config.set("autocomplete.fileBlacklist", [".*", "*.md"]);
 
     let workspaceElement = atom.views.getView(atom.workspace);
     jasmine.attachToDOM(workspaceElement);
@@ -24,7 +24,7 @@ describe("Autocomplete", () => {
     await atom.packages.activatePackage("language-javascript");
 
     // Activate the package
-    mainModule = (await atom.packages.activatePackage("autocomplete-plus")).mainModule;
+    mainModule = (await atom.packages.activatePackage("autocomplete")).mainModule;
 
     await conditionPromise(
       () => mainModule.autocompleteManager && mainModule.autocompleteManager.ready,
@@ -37,7 +37,7 @@ describe("Autocomplete", () => {
   describe("@activate()", () =>
     it("activates autocomplete and initializes AutocompleteManager", () => {
       expect(autocompleteManager).toBeDefined();
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
     }));
 
   describe("@deactivate()", () => {
@@ -48,11 +48,11 @@ describe("Autocomplete", () => {
 
       await waitForAutocomplete(editor);
 
-      expect(editorView.querySelector(".autocomplete-plus")).toExist();
+      expect(editorView.querySelector(".autocomplete")).toExist();
 
       // Deactivate the package
-      await atom.packages.deactivatePackage("autocomplete-plus");
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      await atom.packages.deactivatePackage("autocomplete");
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
     });
   });
 });

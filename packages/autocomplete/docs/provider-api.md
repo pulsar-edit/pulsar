@@ -193,7 +193,7 @@ type Suggestion = {
 } & { text: string } | { snippet: string } | { textEdit: TextEdit};
 
 /**
- * The provider object that you should make available to `autocomplete-plus`.
+ * The provider object that you should make available to `autocomplete`.
  * This should be the return value of whatever method you specified in your
  * `providedServices` metadata.
  */
@@ -230,9 +230,9 @@ type ServiceProvider = {
   suggestionPriority: number,
 
   /**
-   * When `true`, `autocomplete-plus` expects to receive many suggestions and
+   * When `true`, `autocomplete` expects to receive many suggestions and
    * will filter the list based on what's already been typed in the token. When
-   * `false`, you assert that whatever you deliver to `autocomplete-plus` has
+   * `false`, you assert that whatever you deliver to `autocomplete` has
    * already been filtered.
    */
   filterSuggestions: boolean,
@@ -293,7 +293,7 @@ type ServiceProvider = {
 
 ```
 
-## Registering your provider with `autocomplete-plus`
+## Registering your provider with `autocomplete`
 
 In your `package.json`, add:
 
@@ -330,7 +330,7 @@ module.exports = {
 
 ## Tips
 
-`autocomplete-plus` guesses at the “prefix” — that is, the range of characters before the cursor that might be part of whatever suggestion you will insert.
+`autocomplete` guesses at the “prefix” — that is, the range of characters before the cursor that might be part of whatever suggestion you will insert.
 
 For some languages, you may need to override this by specifying a `replacementPrefix` value for each suggestion:
 

@@ -32,12 +32,12 @@ module.exports = class ProviderManager {
     this.subscriptions.add(this.globalBlacklist);
 
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.enableBuiltinProvider", (value) =>
+      atom.config.observe("autocomplete.enableBuiltinProvider", (value) =>
         this.toggleDefaultProvider(value),
       ),
     );
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.scopeBlacklist", (value) =>
+      atom.config.observe("autocomplete.scopeBlacklist", (value) =>
         this.setGlobalBlacklist(value),
       ),
     );

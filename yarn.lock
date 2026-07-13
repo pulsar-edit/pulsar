@@ -1943,7 +1943,7 @@ atom-slick@^2, atom-slick@^2.0.0:
 "autocomplete-html@file:packages/autocomplete-html":
   version "1.0.0"
 
-"autocomplete-plus@file:./packages/autocomplete-plus":
+"autocomplete@file:./packages/autocomplete":
   version "1.0.0"
   dependencies:
     atom-slick "^2.0.0"

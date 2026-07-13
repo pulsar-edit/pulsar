@@ -1,5 +1,5 @@
 {
-  "name": "autocomplete-plus",
+  "name": "autocomplete",
   "author": "lumine-code",
   "version": "1.0.0",
   "main": "./lib/main.js",
@@ -50,7 +50,7 @@
     "enableAutoActivation": {
       "order": 1,
       "title": "Show Suggestions On Keystroke",
-      "description": "Suggestions will show as you type if this preference is enabled. If it is disabled, you can still see suggestions by using the keymapping for 'autocomplete-plus:activate' (shown below).",
+      "description": "Suggestions will show as you type if this preference is enabled. If it is disabled, you can still see suggestions by using the keymapping for 'autocomplete:activate' (shown below).",
       "type": "boolean",
       "default": true
     },
@@ -171,7 +171,7 @@
     "enableAutoConfirmSingleSuggestion": {
       "order": 16,
       "title": "Automatically Confirm Single Suggestion",
-      "description": "If enabled, automatically insert suggestion on manual activation with 'autocomplete-plus:activate' when there is only one match.",
+      "description": "If enabled, automatically insert suggestion on manual activation with 'autocomplete:activate' when there is only one match.",
       "type": "boolean",
       "default": true
     },

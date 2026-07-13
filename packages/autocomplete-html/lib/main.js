@@ -32,7 +32,7 @@ const provider = {
   },
 
   triggerAutocomplete(editor) {
-    atom.commands.dispatch(editor.getElement(), "autocomplete-plus:activate", {
+    atom.commands.dispatch(editor.getElement(), "autocomplete:activate", {
       activatedManually: false,
     });
   },

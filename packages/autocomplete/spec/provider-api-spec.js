@@ -18,11 +18,11 @@ describe("Provider API", () => {
     jasmine.useRealClock();
 
     // Set to live completion
-    atom.config.set("autocomplete-plus.enableAutoActivation", true);
+    atom.config.set("autocomplete.enableAutoActivation", true);
     atom.config.set("editor.fontSize", "16");
 
     // Set the completion delay
-    atom.config.set("autocomplete-plus.autoActivationDelay", 100);
+    atom.config.set("autocomplete.autoActivationDelay", 100);
 
     let workspaceElement = atom.views.getView(atom.workspace);
     jasmine.attachToDOM(workspaceElement);
@@ -30,7 +30,7 @@ describe("Provider API", () => {
     // Activate the package
     await atom.packages.activatePackage("language-javascript");
     editor = await atom.workspace.open("sample.js");
-    mainModule = (await atom.packages.activatePackage("autocomplete-plus")).mainModule;
+    mainModule = (await atom.packages.activatePackage("autocomplete")).mainModule;
 
     await conditionPromise(() => {
       autocompleteManager = mainModule.autocompleteManager;
@@ -407,11 +407,11 @@ describe("Provider API", () => {
     const getSuggestions = () =>
       autocompleteManager.suggestionList.items.map(({ text }) => ({ text }));
     const triggerAutocompletion = () => {
-      atom.commands.dispatch(atom.views.getView(editor), "autocomplete-plus:activate");
+      atom.commands.dispatch(atom.views.getView(editor), "autocomplete:activate");
       return waitForAutocomplete(editor);
     };
     const confirmChoice = () => {
-      atom.commands.dispatch(atom.views.getView(editor), "autocomplete-plus:confirm");
+      atom.commands.dispatch(atom.views.getView(editor), "autocomplete:confirm");
       return waitForAutocompleteToDisappear(editor);
     };
 
@@ -455,7 +455,7 @@ describe("Provider API", () => {
 
     describe("when `firstCharacterMustMatch` is `true`", () => {
       beforeEach(() => {
-        atom.config.set("autocomplete-plus.firstCharacterMustMatch", true);
+        atom.config.set("autocomplete.firstCharacterMustMatch", true);
       });
 
       it("ignores `prefix` if `ranges` is present", async () => {
@@ -551,12 +551,12 @@ describe("Provider API", () => {
 
   describe("Provider API v5.1.0", () => {
     function triggerAutocompletion() {
-      atom.commands.dispatch(atom.views.getView(editor), "autocomplete-plus:activate");
+      atom.commands.dispatch(atom.views.getView(editor), "autocomplete:activate");
       return waitForAutocomplete(editor);
     }
 
     function confirmChoice() {
-      atom.commands.dispatch(atom.views.getView(editor), "autocomplete-plus:confirm");
+      atom.commands.dispatch(atom.views.getView(editor), "autocomplete:confirm");
       return waitForAutocompleteToDisappear(editor);
     }
 

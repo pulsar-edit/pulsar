@@ -24,14 +24,14 @@ module.exports = class SuggestionList {
 
     this.subscriptions.add(
       atom.commands.add("atom-text-editor.autocomplete-active", {
-        "autocomplete-plus:confirm": this.confirmSelection,
-        "autocomplete-plus:confirmIfNonDefault": this.confirmSelectionIfNonDefault,
-        "autocomplete-plus:cancel": this.cancel,
+        "autocomplete:confirm": this.confirmSelection,
+        "autocomplete:confirmIfNonDefault": this.confirmSelectionIfNonDefault,
+        "autocomplete:cancel": this.cancel,
       }),
     );
     this.subscriptions.add(
       atom.config.observe(
-        "autocomplete-plus.enableExtendedUnicodeSupport",
+        "autocomplete.enableExtendedUnicodeSupport",
         (enableExtendedUnicodeSupport) => {
           if (enableExtendedUnicodeSupport) {
             this.wordPrefixRegex = new RegExp(`^[${UnicodeLetters}\\d_-]`);
@@ -58,17 +58,17 @@ module.exports = class SuggestionList {
     }
     this.bindings = new CompositeDisposable();
 
-    const completionKey = atom.config.get("autocomplete-plus.confirmCompletion") || "";
+    const completionKey = atom.config.get("autocomplete.confirmCompletion") || "";
 
     const keys = {};
     if (completionKey.indexOf("tab") > -1) {
-      keys["tab"] = "autocomplete-plus:confirm";
+      keys["tab"] = "autocomplete:confirm";
     }
     if (completionKey.indexOf("enter") > -1) {
       if (completionKey.indexOf("always") > -1) {
-        keys["enter"] = "autocomplete-plus:confirmIfNonDefault";
+        keys["enter"] = "autocomplete:confirmIfNonDefault";
       } else {
-        keys["enter"] = "autocomplete-plus:confirm";
+        keys["enter"] = "autocomplete:confirm";
       }
     }
 
@@ -78,8 +78,8 @@ module.exports = class SuggestionList {
       }),
     );
 
-    const useCoreMovementCommands = atom.config.get("autocomplete-plus.useCoreMovementCommands");
-    const commandNamespace = useCoreMovementCommands ? "core" : "autocomplete-plus";
+    const useCoreMovementCommands = atom.config.get("autocomplete.useCoreMovementCommands");
+    const commandNamespace = useCoreMovementCommands ? "core" : "autocomplete";
 
     const commands = {};
     commands[`${commandNamespace}:move-up`] = (event) => {
@@ -122,7 +122,7 @@ module.exports = class SuggestionList {
     this.bindings.add(atom.commands.add(atom.views.getView(editor), commands));
 
     return this.bindings.add(
-      atom.config.onDidChange("autocomplete-plus.useCoreMovementCommands", () => {
+      atom.config.onDidChange("autocomplete.useCoreMovementCommands", () => {
         return this.addBindings(editor);
       }),
     );
@@ -241,7 +241,7 @@ module.exports = class SuggestionList {
   }
 
   show(editor, options) {
-    if (atom.config.get("autocomplete-plus.suggestionListFollows") === "Cursor") {
+    if (atom.config.get("autocomplete.suggestionListFollows") === "Cursor") {
       return this.showAtCursorPosition(editor, options);
     } else {
       let { prefix } = options;
@@ -287,7 +287,7 @@ module.exports = class SuggestionList {
           type: "overlay",
           item: this.suggestionListElement,
           position: "tail",
-          class: "autocomplete-plus",
+          class: "autocomplete",
         });
         const editorElement = atom.views.getView(this.activeEditor);
         if (editorElement && editorElement.classList) {
@@ -321,7 +321,7 @@ module.exports = class SuggestionList {
       this.overlayDecoration = editor.decorateMarker(marker, {
         type: "overlay",
         item: this.suggestionListElement,
-        class: "autocomplete-plus",
+        class: "autocomplete",
       });
       return this.addBindings(editor);
     }

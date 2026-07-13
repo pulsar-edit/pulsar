@@ -11,7 +11,7 @@ CSS property name and value autocompletions in Lumine.
 
 ## Services
 
-- **autocomplete.provider** (`2.0.0`): provided to supply CSS property and value suggestions to autocomplete-plus.
+- **autocomplete.provider** (`2.0.0`): provided to supply CSS property and value suggestions to autocomplete.
 
 ## Contributing
 

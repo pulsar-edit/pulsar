@@ -10,11 +10,11 @@ describe("Async providers", () => {
     jasmine.useRealClock();
 
     // Set to live completion
-    atom.config.set("autocomplete-plus.enableAutoActivation", true);
+    atom.config.set("autocomplete.enableAutoActivation", true);
     atom.config.set("editor.fontSize", "16");
 
     // Set the completion delay
-    atom.config.set("autocomplete-plus.autoActivationDelay", 100);
+    atom.config.set("autocomplete.autoActivationDelay", 100);
 
     let workspaceElement = atom.views.getView(atom.workspace);
     jasmine.attachToDOM(workspaceElement);
@@ -24,7 +24,7 @@ describe("Async providers", () => {
     await atom.packages.activatePackage("language-javascript");
 
     // Activate the package
-    mainModule = (await atom.packages.activatePackage("autocomplete-plus")).mainModule;
+    mainModule = (await atom.packages.activatePackage("autocomplete")).mainModule;
 
     await conditionPromise(() => {
       autocompleteManager = mainModule.autocompleteManager;
@@ -114,12 +114,12 @@ describe("Async providers", () => {
       await timeoutPromise(100);
 
       // Expect nothing because the provider has not come back yet
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
 
       // Wait til the longass provider comes back
       await timeoutPromise(1000);
 
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
     });
   });
 });

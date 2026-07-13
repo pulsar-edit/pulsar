@@ -42,17 +42,17 @@ describe("Autocomplete Manager", () => {
     jasmine.useRealClock();
     gutterWidth = null;
     // Set to live completion
-    atom.config.set("autocomplete-plus.enableAutoActivation", true);
+    atom.config.set("autocomplete.enableAutoActivation", true);
     atom.config.set("editor.fontSize", "16");
 
     // Set the completion delay
-    atom.config.set("autocomplete-plus.autoActivationDelay", 100);
+    atom.config.set("autocomplete.autoActivationDelay", 100);
 
     workspaceElement = atom.views.getView(atom.workspace);
     jasmine.attachToDOM(workspaceElement);
 
-    atom.config.set("autocomplete-plus.maxVisibleSuggestions", 10);
-    atom.config.set("autocomplete-plus.consumeSuffix", true);
+    atom.config.set("autocomplete.maxVisibleSuggestions", 10);
+    atom.config.set("autocomplete.consumeSuffix", true);
   });
 
   describe("when an external provider is registered", () => {
@@ -61,7 +61,7 @@ describe("Autocomplete Manager", () => {
     beforeEach(async () => {
       editor = await atom.workspace.open("");
       editorView = atom.views.getView(editor);
-      mainModule = (await atom.packages.activatePackage("autocomplete-plus")).mainModule;
+      mainModule = (await atom.packages.activatePackage("autocomplete")).mainModule;
       await conditionPromise(() => mainModule.autocompleteManager);
 
       provider = {
@@ -84,9 +84,9 @@ describe("Autocomplete Manager", () => {
 
       let suggestion, triggerPosition;
       let suggestionListView = editorView.querySelector(
-        ".autocomplete-plus autocomplete-suggestion-list",
+        ".autocomplete autocomplete-suggestion-list",
       );
-      atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+      atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
 
       expect(provider.onDidInsertSuggestion).toHaveBeenCalled();
 
@@ -99,33 +99,33 @@ describe("Autocomplete Manager", () => {
 
     it("closes the suggestion list when saving", async () => {
       let directory = temp.mkdirSync();
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
 
       editor.insertText("a");
       await waitForAutocomplete(editor);
 
       await new Promise((resolve) => {
         editor.getBuffer().onDidSave(() => {
-          expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+          expect(editorView.querySelector(".autocomplete")).not.toExist();
           resolve();
         });
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         editor.saveAs(path.join(directory, "spec", "tmp", "issue-11.js"));
       });
     });
 
     it("does not show suggestions after a word has been confirmed", async () => {
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
       for (let i = 0; i < "red".length; i++) {
         let c = "red"[i];
         editor.insertText(c);
       }
       await waitForAutocomplete(editor);
 
-      expect(editorView.querySelector(".autocomplete-plus")).toExist();
-      atom.commands.dispatch(editorView, "autocomplete-plus:confirm");
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).toExist();
+      atom.commands.dispatch(editorView, "autocomplete:confirm");
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
     });
 
     it("works after closing one of the copied tabs", async () => {
@@ -137,27 +137,27 @@ describe("Autocomplete Manager", () => {
 
       await waitForAutocomplete(editor);
 
-      expect(editorView.querySelector(".autocomplete-plus")).toExist();
+      expect(editorView.querySelector(".autocomplete")).toExist();
     });
 
     it("closes the suggestion list when entering an empty string (e.g. carriage return)", async () => {
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
       editor.insertText("a");
       await waitForAutocomplete(editor);
 
-      expect(editorView.querySelector(".autocomplete-plus")).toExist();
+      expect(editorView.querySelector(".autocomplete")).toExist();
       editor.insertText("\r");
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
     });
 
     it("it refocuses the editor after pressing enter", async () => {
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
       editor.insertText("a");
       await waitForAutocomplete(editor);
 
-      expect(editorView.querySelector(".autocomplete-plus")).toExist();
+      expect(editorView.querySelector(".autocomplete")).toExist();
       editor.insertText("\n");
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
       expect(editorView).toHaveFocus();
     });
 
@@ -166,21 +166,21 @@ describe("Autocomplete Manager", () => {
         ["acd", "ade"].filter((t) => t.startsWith(prefix)).map((t) => ({ text: t })),
       );
 
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
 
       // Trigger an autocompletion
       editor.moveToBottom();
       editor.insertText("a");
       await waitForAutocomplete(editor);
 
-      expect(editorView.querySelector(".autocomplete-plus")).toExist();
+      expect(editorView.querySelector(".autocomplete")).toExist();
 
       editor.insertText("b");
       await waitForAutocompleteToDisappear(editor);
     });
 
     it("does not show the suggestion list when pasting", async () => {
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
       editor.insertText("red");
       await waitForAutocompleteToDisappear(editor);
     });
@@ -194,10 +194,10 @@ describe("Autocomplete Manager", () => {
       editorView.focus();
 
       expect(editorView).toHaveFocus();
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
 
       expect(editorView2).not.toHaveFocus();
-      expect(editorView2.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView2.querySelector(".autocomplete")).not.toExist();
 
       editor.insertText("r");
 
@@ -209,16 +209,16 @@ describe("Autocomplete Manager", () => {
       expect(editorView).toHaveFocus();
       expect(editorView2).not.toHaveFocus();
 
-      expect(editorView.querySelector(".autocomplete-plus")).toExist();
-      expect(editorView2.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).toExist();
+      expect(editorView2.querySelector(".autocomplete")).not.toExist();
 
-      atom.commands.dispatch(editorView, "autocomplete-plus:confirm");
+      atom.commands.dispatch(editorView, "autocomplete:confirm");
 
       expect(editorView).toHaveFocus();
       expect(editorView2).not.toHaveFocus();
 
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
-      expect(editorView2.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
+      expect(editorView2.querySelector(".autocomplete")).not.toExist();
     });
 
     it("does not display empty suggestions", async () => {
@@ -227,17 +227,17 @@ describe("Autocomplete Manager", () => {
         return list.map((text) => ({ text }));
       });
 
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
       editor.insertText("a");
       await waitForAutocomplete(editor);
 
-      expect(editorView.querySelector(".autocomplete-plus")).toExist();
-      expect(editorView.querySelectorAll(".autocomplete-plus li")).toHaveLength(2);
+      expect(editorView.querySelector(".autocomplete")).toExist();
+      expect(editorView.querySelectorAll(".autocomplete li")).toHaveLength(2);
     });
 
     describe("when the fileBlacklist option is set", () => {
       beforeEach(() => {
-        atom.config.set("autocomplete-plus.fileBlacklist", [".*", "*.md"]);
+        atom.config.set("autocomplete.fileBlacklist", [".*", "*.md"]);
         editor.getBuffer().setPath("blacklisted.md");
       });
 
@@ -261,14 +261,14 @@ describe("Autocomplete Manager", () => {
         editor.insertText("a");
 
         await waitForAutocompleteToDisappear(editor);
-        atom.commands.dispatch(editorView, "autocomplete-plus:cancel");
+        atom.commands.dispatch(editorView, "autocomplete:cancel");
 
         editor.getBuffer().setPath("not-blackslisted.txt");
         editor.insertText("a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
-        atom.commands.dispatch(editorView, "autocomplete-plus:cancel");
+        expect(editorView.querySelector(".autocomplete")).toExist();
+        atom.commands.dispatch(editorView, "autocomplete:cancel");
 
         editor.getBuffer().setPath("blackslisted.md");
         editor.insertText("a");
@@ -299,12 +299,12 @@ describe("Autocomplete Manager", () => {
           return list.map((text) => ({ text }));
         });
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         editor.insertText("a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
-        expect(editorView.querySelectorAll(".autocomplete-plus li")).toHaveLength(2);
+        expect(editorView.querySelector(".autocomplete")).toExist();
+        expect(editorView.querySelectorAll(".autocomplete li")).toHaveLength(2);
       });
     });
 
@@ -315,12 +315,12 @@ describe("Autocomplete Manager", () => {
           { text: "abc", type: " another ~ function   " },
         ]);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         editor.insertText("a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
-        let items = editorView.querySelectorAll(".autocomplete-plus li");
+        expect(editorView.querySelector(".autocomplete")).toExist();
+        let items = editorView.querySelectorAll(".autocomplete li");
         expect(items).toHaveLength(2);
         expect(items[0].querySelector(".icon").className).toBe("icon local function");
         expect(items[1].querySelector(".icon").className).toBe("icon another ~ function");
@@ -333,12 +333,12 @@ describe("Autocomplete Manager", () => {
           { text: "abc", className: " another  ~ function   " },
         ]);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         editor.insertText("a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
-        let items = editorView.querySelectorAll(".autocomplete-plus li");
+        expect(editorView.querySelector(".autocomplete")).toExist();
+        let items = editorView.querySelectorAll(".autocomplete li");
         expect(items[0].className).toBe("selected local function");
         expect(items[1].className).toBe("another ~ function");
       }));
@@ -363,9 +363,9 @@ describe("Autocomplete Manager", () => {
         await waitForAutocomplete(editor);
 
         ({ autocompleteManager } = mainModule);
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
 
-        atom.commands.dispatch(editorView, "autocomplete-plus:confirm");
+        atom.commands.dispatch(editorView, "autocomplete:confirm");
 
         expect(editor.lineTextForBufferRow(0)).toBe("shift:extra:shift");
         expect(editor.getCursorBufferPosition()).toEqual([0, 17]);
@@ -393,7 +393,7 @@ describe("Autocomplete Manager", () => {
 
         ({ autocompleteManager } = mainModule);
         editorView = atom.views.getView(editor);
-        atom.commands.dispatch(editorView, "autocomplete-plus:confirm");
+        atom.commands.dispatch(editorView, "autocomplete:confirm");
 
         expect(editor.lineTextForBufferRow(0)).toBe("sh:extra:ah");
         expect(editor.getSelections().length).toEqual(2);
@@ -412,7 +412,7 @@ describe("Autocomplete Manager", () => {
 
     describe("suppression for editorView classes", () => {
       beforeEach(() => {
-        atom.config.set("autocomplete-plus.suppressActivationForEditorClasses", [
+        atom.config.set("autocomplete.suppressActivationForEditorClasses", [
           "vim-mode.command-mode",
           "vim-mode . visual-mode",
           " vim-mode.operator-pending-mode ",
@@ -424,18 +424,18 @@ describe("Autocomplete Manager", () => {
         editorView.classList.add("vim-mode");
         editorView.classList.add("insert-mode");
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         triggerAutocompletion(editor);
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
       });
 
       it("should not show the suggestion list when the suppression list does match", async () => {
         editorView.classList.add("vim-mode");
         editorView.classList.add("command-mode");
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         triggerAutocompletion(editor);
         await waitForAutocompleteToDisappear(editor);
       });
@@ -444,7 +444,7 @@ describe("Autocomplete Manager", () => {
         editorView.classList.add("vim-mode");
         editorView.classList.add("operator-pending-mode");
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         triggerAutocompletion(editor);
         await waitForAutocompleteToDisappear(editor);
       });
@@ -453,7 +453,7 @@ describe("Autocomplete Manager", () => {
         editorView.classList.add("vim-mode");
         editorView.classList.add("visual-mode");
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         triggerAutocompletion(editor);
         await waitForAutocompleteToDisappear(editor);
       });
@@ -462,21 +462,21 @@ describe("Autocomplete Manager", () => {
         editorView.classList.add("vim-mode");
         editorView.classList.add("some-unforeseen-mode");
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         triggerAutocompletion(editor);
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
       });
 
       it("should show the suggestion list when the suppression list does not match", async () => {
         editorView.classList.add("command-mode");
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         triggerAutocompletion(editor);
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
       });
     });
 
@@ -640,7 +640,7 @@ describe("Autocomplete Manager", () => {
         editor.insertText("2");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         editor.setTextInBufferRange(
           [
             [0, 0],
@@ -648,7 +648,7 @@ describe("Autocomplete Manager", () => {
           ],
           "*",
         );
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         editor.setTextInBufferRange(
           [
             [0, 0],
@@ -656,13 +656,13 @@ describe("Autocomplete Manager", () => {
           ],
           "\n",
         );
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
       });
     });
 
     describe("when number of suggestions > maxVisibleSuggestions", () => {
       beforeEach(() => {
-        atom.config.set("autocomplete-plus.maxVisibleSuggestions", 2);
+        atom.config.set("autocomplete.maxVisibleSuggestions", 2);
       });
 
       describe("when a suggestion description is not specified", () => {
@@ -673,117 +673,117 @@ describe("Autocomplete Manager", () => {
         });
 
         it("scrolls the list always showing the selected item", async () => {
-          expect(editorView.querySelector(".autocomplete-plus")).toExist();
+          expect(editorView.querySelector(".autocomplete")).toExist();
           let itemHeight = parseInt(
-            getComputedStyle(editorView.querySelector(".autocomplete-plus li")).height,
+            getComputedStyle(editorView.querySelector(".autocomplete li")).height,
           );
 
           let suggestionList = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
           let scroller = suggestionList.querySelector(".suggestion-list-scroller");
 
           expect(scroller.scrollTop).toBe(0);
           atom.commands.dispatch(suggestionList, "core:move-down");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[1]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[1]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(0);
 
           atom.commands.dispatch(suggestionList, "core:move-down");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[2]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[2]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(itemHeight);
 
           atom.commands.dispatch(suggestionList, "core:move-down");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[3]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[3]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(itemHeight * 2);
 
           atom.commands.dispatch(suggestionList, "core:move-down");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[0]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(0);
 
           atom.commands.dispatch(suggestionList, "core:move-up");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[3]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[3]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(itemHeight * 2);
 
           atom.commands.dispatch(suggestionList, "core:move-up");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[2]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[2]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(itemHeight * 2);
 
           atom.commands.dispatch(suggestionList, "core:move-up");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[1]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[1]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(itemHeight);
 
           atom.commands.dispatch(suggestionList, "core:move-up");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[0]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(0);
         });
 
         it("pages up and down when core:page-up and core:page-down are used", () => {
           let itemHeight = parseInt(
-            getComputedStyle(editorView.querySelector(".autocomplete-plus li")).height,
+            getComputedStyle(editorView.querySelector(".autocomplete li")).height,
           );
           let suggestionList = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
           let scroller = suggestionList.querySelector(".suggestion-list-scroller");
           expect(scroller.scrollTop).toBe(0);
 
           atom.commands.dispatch(suggestionList, "core:page-down");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[2]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[2]).toHaveClass("selected");
 
           atom.commands.dispatch(suggestionList, "core:page-down");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[3]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[3]).toHaveClass("selected");
 
           atom.commands.dispatch(suggestionList, "core:page-down");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[3]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[3]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(itemHeight * 2);
 
           atom.commands.dispatch(suggestionList, "core:page-up");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[1]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[1]).toHaveClass("selected");
 
           atom.commands.dispatch(suggestionList, "core:page-up");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[0]).toHaveClass("selected");
 
           atom.commands.dispatch(suggestionList, "core:page-up");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[0]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(0);
         });
 
         it("moves to the top and bottom when core:move-to-top and core:move-to-bottom are used", () => {
           let itemHeight = parseInt(
-            getComputedStyle(editorView.querySelector(".autocomplete-plus li")).height,
+            getComputedStyle(editorView.querySelector(".autocomplete li")).height,
           );
           let suggestionList = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
           let scroller = suggestionList.querySelector(".suggestion-list-scroller");
           expect(scroller.scrollTop).toBe(0);
 
           atom.commands.dispatch(suggestionList, "core:move-to-bottom");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[3]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[3]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(itemHeight * 2);
 
           atom.commands.dispatch(suggestionList, "core:move-to-bottom");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[3]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[3]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(itemHeight * 2);
 
           atom.commands.dispatch(suggestionList, "core:move-to-top");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[0]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(0);
 
           atom.commands.dispatch(suggestionList, "core:move-to-top");
-          expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).toHaveClass("selected");
+          expect(editorView.querySelectorAll(".autocomplete li")[0]).toHaveClass("selected");
           expect(scroller.scrollTop).toBe(0);
         });
 
         it("only shows the maxVisibleSuggestions in the suggestion popup", () => {
-          expect(editorView.querySelector(".autocomplete-plus")).toExist();
+          expect(editorView.querySelector(".autocomplete")).toExist();
           let itemHeight = parseInt(
-            getComputedStyle(editorView.querySelector(".autocomplete-plus li")).height,
+            getComputedStyle(editorView.querySelector(".autocomplete li")).height,
           );
-          expect(editorView.querySelectorAll(".autocomplete-plus li")).toHaveLength(4);
+          expect(editorView.querySelectorAll(".autocomplete li")).toHaveLength(4);
 
           let suggestionList = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
           expect(suggestionList.offsetHeight).toBe(2 * itemHeight);
           expect(
@@ -803,17 +803,17 @@ describe("Autocomplete Manager", () => {
           await waitForAutocomplete(editor);
           await waitForDeferredSuggestions(editorView, 4);
 
-          expect(editorView.querySelector(".autocomplete-plus")).toExist();
+          expect(editorView.querySelector(".autocomplete")).toExist();
           let itemHeight = parseInt(
-            getComputedStyle(editorView.querySelector(".autocomplete-plus li")).height,
+            getComputedStyle(editorView.querySelector(".autocomplete li")).height,
           );
-          expect(editorView.querySelectorAll(".autocomplete-plus li")).toHaveLength(4);
+          expect(editorView.querySelectorAll(".autocomplete li")).toHaveLength(4);
 
           let suggestionList = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
           let descriptionHeight = parseInt(
-            getComputedStyle(editorView.querySelector(".autocomplete-plus .suggestion-description"))
+            getComputedStyle(editorView.querySelector(".autocomplete .suggestion-description"))
               .height,
           );
           expect(suggestionList.offsetHeight).toBe(2 * itemHeight + descriptionHeight);
@@ -838,12 +838,12 @@ describe("Autocomplete Manager", () => {
           await waitForDeferredSuggestions(editorView, 4);
 
           let suggestionList = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
           expect(suggestionList).toExist();
 
           expect(
-            editorView.querySelector(".autocomplete-plus .suggestion-description strong")
+            editorView.querySelector(".autocomplete .suggestion-description strong")
               .textContent,
           ).toEqual("mmmmmmmmmmmmmmmmmmmmmmmmmm");
 
@@ -852,12 +852,12 @@ describe("Autocomplete Manager", () => {
           await waitForAutocomplete(editor);
 
           suggestionList = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
           expect(suggestionList).toExist();
 
           expect(
-            editorView.querySelector(".autocomplete-plus .suggestion-description strong")
+            editorView.querySelector(".autocomplete .suggestion-description strong")
               .textContent,
           ).toEqual("mmmmmmmmmmmmmmmmmmmmmm");
         });
@@ -879,7 +879,7 @@ describe("Autocomplete Manager", () => {
           await waitForDeferredSuggestions(editorView, 4);
 
           let suggestionList = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
           expect(suggestionList).toExist();
 
@@ -891,7 +891,7 @@ describe("Autocomplete Manager", () => {
           await waitForAutocomplete(editor);
 
           suggestionList = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
           expect(suggestionList).toExist();
 
@@ -909,29 +909,29 @@ describe("Autocomplete Manager", () => {
         triggerAutocompletion(editor, true, "a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         suggestionList = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
       });
 
       it("binds to custom commands when unset, and binds back to core commands when set", () => {
         atom.commands.dispatch(suggestionList, "core:move-down");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[1]).toHaveClass("selected");
+        expect(editorView.querySelectorAll(".autocomplete li")[1]).toHaveClass("selected");
 
-        atom.config.set("autocomplete-plus.useCoreMovementCommands", false);
+        atom.config.set("autocomplete.useCoreMovementCommands", false);
 
         atom.commands.dispatch(suggestionList, "core:move-down");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[1]).toHaveClass("selected");
-        atom.commands.dispatch(suggestionList, "autocomplete-plus:move-down");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[2]).toHaveClass("selected");
+        expect(editorView.querySelectorAll(".autocomplete li")[1]).toHaveClass("selected");
+        atom.commands.dispatch(suggestionList, "autocomplete:move-down");
+        expect(editorView.querySelectorAll(".autocomplete li")[2]).toHaveClass("selected");
 
-        atom.config.set("autocomplete-plus.useCoreMovementCommands", true);
+        atom.config.set("autocomplete.useCoreMovementCommands", true);
 
-        atom.commands.dispatch(suggestionList, "autocomplete-plus:move-down");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[2]).toHaveClass("selected");
+        atom.commands.dispatch(suggestionList, "autocomplete:move-down");
+        expect(editorView.querySelectorAll(".autocomplete li")[2]).toHaveClass("selected");
         atom.commands.dispatch(suggestionList, "core:move-down");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[3]).toHaveClass("selected");
+        expect(editorView.querySelectorAll(".autocomplete li")[3]).toHaveClass("selected");
       });
     });
 
@@ -939,37 +939,37 @@ describe("Autocomplete Manager", () => {
       let [suggestionList] = [];
 
       beforeEach(async () => {
-        atom.config.set("autocomplete-plus.useCoreMovementCommands", false);
+        atom.config.set("autocomplete.useCoreMovementCommands", false);
         triggerAutocompletion(editor, true, "a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         suggestionList = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
       });
 
       it("responds to all the custom movement commands and to no core commands", () => {
         atom.commands.dispatch(suggestionList, "core:move-down");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).toHaveClass("selected");
+        expect(editorView.querySelectorAll(".autocomplete li")[0]).toHaveClass("selected");
 
-        atom.commands.dispatch(suggestionList, "autocomplete-plus:move-down");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[1]).toHaveClass("selected");
+        atom.commands.dispatch(suggestionList, "autocomplete:move-down");
+        expect(editorView.querySelectorAll(".autocomplete li")[1]).toHaveClass("selected");
 
-        atom.commands.dispatch(suggestionList, "autocomplete-plus:move-up");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).toHaveClass("selected");
+        atom.commands.dispatch(suggestionList, "autocomplete:move-up");
+        expect(editorView.querySelectorAll(".autocomplete li")[0]).toHaveClass("selected");
 
-        atom.commands.dispatch(suggestionList, "autocomplete-plus:page-down");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).not.toHaveClass("selected");
+        atom.commands.dispatch(suggestionList, "autocomplete:page-down");
+        expect(editorView.querySelectorAll(".autocomplete li")[0]).not.toHaveClass("selected");
 
-        atom.commands.dispatch(suggestionList, "autocomplete-plus:page-up");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).toHaveClass("selected");
+        atom.commands.dispatch(suggestionList, "autocomplete:page-up");
+        expect(editorView.querySelectorAll(".autocomplete li")[0]).toHaveClass("selected");
 
-        atom.commands.dispatch(suggestionList, "autocomplete-plus:move-to-bottom");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[3]).toHaveClass("selected");
+        atom.commands.dispatch(suggestionList, "autocomplete:move-to-bottom");
+        expect(editorView.querySelectorAll(".autocomplete li")[3]).toHaveClass("selected");
 
-        atom.commands.dispatch(suggestionList, "autocomplete-plus:move-to-top");
-        expect(editorView.querySelectorAll(".autocomplete-plus li")[0]).toHaveClass("selected");
+        atom.commands.dispatch(suggestionList, "autocomplete:move-to-top");
+        expect(editorView.querySelectorAll(".autocomplete li")[0]).toHaveClass("selected");
       });
     });
 
@@ -993,23 +993,23 @@ describe("Autocomplete Manager", () => {
           triggerAutocompletion(editor, true, "m");
           await waitForAutocomplete(editor);
 
-          let wordElement = editorView.querySelector(".autocomplete-plus span.word");
+          let wordElement = editorView.querySelector(".autocomplete span.word");
           expect(wordElement.textContent).toBe("method(something)");
           expect(wordElement.querySelector(".snippet-completion").textContent).toBe("something");
 
-          let wordElements = editorView.querySelectorAll(".autocomplete-plus span.word");
+          let wordElements = editorView.querySelectorAll(".autocomplete span.word");
           expect(wordElements).toHaveLength(4);
         });
 
-        it("accepts the snippet when autocomplete-plus:confirm is triggered", async () => {
+        it("accepts the snippet when autocomplete:confirm is triggered", async () => {
           triggerAutocompletion(editor, true, "m");
           await waitForAutocomplete(editor);
 
           let suggestionListView = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
-          atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
-          expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+          atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
+          expect(editorView.querySelector(".autocomplete")).not.toExist();
           expect(editor.getSelectedText()).toBe("something");
         });
 
@@ -1018,7 +1018,7 @@ describe("Autocomplete Manager", () => {
           await waitForAutocomplete(editor);
 
           // Value in list
-          let wordElements = editorView.querySelectorAll(".autocomplete-plus span.word");
+          let wordElements = editorView.querySelectorAll(".autocomplete span.word");
           expect(wordElements).toHaveLength(4);
           expect(wordElements[3].textContent).toBe("namespace\\method4(something)");
 
@@ -1027,10 +1027,10 @@ describe("Autocomplete Manager", () => {
 
           // Value in editor
           let suggestionListView = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
-          atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
-          expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+          atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
+          expect(editorView.querySelector(".autocomplete")).not.toExist();
           expect(editor.getText()).toBe("namespace\\method4(something)");
         });
       });
@@ -1042,7 +1042,7 @@ describe("Autocomplete Manager", () => {
           { text: "items", replacementPrefix: prefix },
         ]);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         editor.moveToBottom();
         editor.insertText("i");
@@ -1051,9 +1051,9 @@ describe("Autocomplete Manager", () => {
 
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
 
-        let word = editorView.querySelector(".autocomplete-plus li span.word");
+        let word = editorView.querySelector(".autocomplete li span.word");
         expect(word.childNodes).toHaveLength(5);
         expect(word.childNodes[0]).toHaveClass("character-match");
         expect(word.childNodes[1].nodeType).toBe(NodeTypeText);
@@ -1067,7 +1067,7 @@ describe("Autocomplete Manager", () => {
           { text: "apply", replacementPrefix: prefix },
         ]);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         editor.moveToBottom();
         editor.insertText("a");
@@ -1076,9 +1076,9 @@ describe("Autocomplete Manager", () => {
 
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
 
-        let word = editorView.querySelector(".autocomplete-plus li span.word");
+        let word = editorView.querySelector(".autocomplete li span.word");
         expect(word.childNodes).toHaveLength(4);
         expect(word.childNodes[0]).toHaveClass("character-match");
         expect(word.childNodes[1]).toHaveClass("character-match");
@@ -1100,12 +1100,12 @@ describe("Autocomplete Manager", () => {
 
           await waitForAutocomplete(editor);
 
-          expect(editorView.querySelector(".autocomplete-plus")).toExist();
+          expect(editorView.querySelector(".autocomplete")).toExist();
 
           let characterMatches = editorView.querySelectorAll(
-            ".autocomplete-plus li span.word .character-match",
+            ".autocomplete li span.word .character-match",
           );
-          let text = editorView.querySelector(".autocomplete-plus li span.word").textContent;
+          let text = editorView.querySelector(".autocomplete li span.word").textContent;
           expect(characterMatches).toHaveLength(0);
           expect(text).toBe("omgnope");
         });
@@ -1120,9 +1120,9 @@ describe("Autocomplete Manager", () => {
             editor.insertText("c");
             await waitForAutocomplete(editor);
 
-            let word = editorView.querySelector(".autocomplete-plus li span.word");
+            let word = editorView.querySelector(".autocomplete li span.word");
             let charMatch = editorView.querySelector(
-              ".autocomplete-plus li span.word .character-match",
+              ".autocomplete li span.word .character-match",
             );
             expect(word.textContent).toBe("ab(c)c");
             expect(charMatch.textContent).toBe("c");
@@ -1140,11 +1140,11 @@ describe("Autocomplete Manager", () => {
             editor.insertText("f");
             await waitForAutocomplete(editor);
 
-            let word = editorView.querySelector(".autocomplete-plus li span.word");
+            let word = editorView.querySelector(".autocomplete li span.word");
             expect(word.textContent).toBe("abcde(e, f)f");
 
             let charMatches = editorView.querySelectorAll(
-              ".autocomplete-plus li span.word .character-match",
+              ".autocomplete li span.word .character-match",
             );
             expect(charMatches[0].textContent).toBe("c");
             expect(charMatches[0].parentNode).toHaveClass("word");
@@ -1169,11 +1169,11 @@ describe("Autocomplete Manager", () => {
 
         expect(editor.getText()).toBe("abcm");
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         let suggestionListView = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
-        atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+        atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
         expect(editor.getText()).toBe("something");
       });
 
@@ -1184,11 +1184,11 @@ describe("Autocomplete Manager", () => {
 
         expect(editor.getText()).toBe("abc.");
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         let suggestionListView = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
-        atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+        atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
         expect(editor.getText()).toBe("abc.something");
       });
 
@@ -1214,11 +1214,11 @@ describe("Autocomplete Manager", () => {
           editor.insertText("o");
           await waitForAutocomplete(editor);
 
-          expect(editorView.querySelector(".autocomplete-plus")).toExist();
+          expect(editorView.querySelector(".autocomplete")).toExist();
           let suggestionListView = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
-          atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+          atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
           expect(editor.getText()).toBe("$food $food");
         });
       });
@@ -1241,9 +1241,9 @@ describe("Autocomplete Manager", () => {
         await waitForAutocomplete(editor);
 
         let suggestionListView = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
-        atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+        atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
         expect(editor.getText()).toBe("something");
         expect(suggestion.replacementPrefix).toBe("som");
         expect(suggestion.isPrefixModified).toBe(true);
@@ -1255,18 +1255,18 @@ describe("Autocomplete Manager", () => {
         await waitForAutocomplete(editor);
 
         let suggestionListView = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
-        atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+        atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
         expect(editor.getText()).toBe("something");
         expect(suggestion.replacementPrefix).toBe("somet");
         expect(suggestion.isPrefixModified).toBe(true);
       });
     });
 
-    describe("when autocomplete-plus.suggestionListFollows is 'Cursor'", () => {
+    describe("when autocomplete.suggestionListFollows is 'Cursor'", () => {
       beforeEach(() => {
-        atom.config.set("autocomplete-plus.suggestionListFollows", "Cursor");
+        atom.config.set("autocomplete.suggestionListFollows", "Cursor");
       });
 
       it("places the suggestion list at the cursor", async () => {
@@ -1279,12 +1279,12 @@ describe("Autocomplete Manager", () => {
         triggerAutocompletion(editor, false, "c");
         await waitForAutocomplete(editor);
 
-        let overlayElement = editorView.querySelector(".autocomplete-plus");
+        let overlayElement = editorView.querySelector(".autocomplete");
         expect(overlayElement).toExist();
         expect(overlayElement.style.left).toBe(pixelLeftForBufferPosition([0, 10]));
 
         let suggestionList = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
         expect(suggestionList.style["margin-left"]).toBeFalsy();
       });
@@ -1294,14 +1294,14 @@ describe("Autocomplete Manager", () => {
           ["acd", "ade"].filter((t) => t.startsWith(prefix)).map((t) => ({ text: t })),
         );
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         // Trigger an autocompletion
         editor.moveToBottom();
         editor.insertText("a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
 
         editor.insertText("b");
         await waitForAutocompleteToDisappear(editor);
@@ -1312,7 +1312,7 @@ describe("Autocomplete Manager", () => {
           ["acd", "ade"].filter((t) => t.startsWith(prefix)).map((t) => ({ text: t })),
         );
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         // Trigger an autocompletion
         editor.moveToBottom();
@@ -1324,9 +1324,9 @@ describe("Autocomplete Manager", () => {
       });
     });
 
-    describe("when autocomplete-plus.suggestionListFollows is 'Word'", () => {
+    describe("when autocomplete.suggestionListFollows is 'Word'", () => {
       beforeEach(() => {
-        atom.config.set("autocomplete-plus.suggestionListFollows", "Word");
+        atom.config.set("autocomplete.suggestionListFollows", "Word");
       });
 
       it("opens to the correct position, and correctly closes on cancel", async () => {
@@ -1334,7 +1334,7 @@ describe("Autocomplete Manager", () => {
         triggerAutocompletion(editor, false, "c");
         await waitForAutocomplete(editor);
 
-        let overlayElement = editorView.querySelector(".autocomplete-plus");
+        let overlayElement = editorView.querySelector(".autocomplete");
         expect(overlayElement).toExist();
         expect(overlayElement.style.left).toHaveNearPixels(pixelLeftForBufferPosition([0, 12]));
       });
@@ -1348,7 +1348,7 @@ describe("Autocomplete Manager", () => {
         triggerAutocompletion(editor, false, ":");
         await waitForAutocomplete(editor);
 
-        let overlayElement = editorView.querySelector(".autocomplete-plus");
+        let overlayElement = editorView.querySelector(".autocomplete");
         expect(overlayElement).toExist();
         expect(overlayElement.style.left).toBe(pixelLeftForBufferPosition([0, 14]));
       });
@@ -1364,10 +1364,10 @@ describe("Autocomplete Manager", () => {
         await waitForAutocomplete(editor);
 
         let suggestionList = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
         let wordContainer = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list .word-container",
+          ".autocomplete autocomplete-suggestion-list .word-container",
         );
         let marginLeft = parseInt(suggestionList.style["margin-left"]);
         expect(Math.abs(wordContainer.offsetLeft + marginLeft)).toBeLessThan(2);
@@ -1381,7 +1381,7 @@ describe("Autocomplete Manager", () => {
         editor.insertText(" ");
         await waitForAutocomplete(editor);
 
-        overlayElement = editorView.querySelector(".autocomplete-plus");
+        overlayElement = editorView.querySelector(".autocomplete");
         expect(overlayElement.style.left).toBe(pixelLeftForBufferPosition([0, 14]));
         editor.insertText("a");
         await waitForAutocomplete(editor);
@@ -1422,7 +1422,7 @@ describe("Autocomplete Manager", () => {
         editor.insertText("d");
         await waitForAutocomplete(editor);
 
-        overlayElement = editorView.querySelector(".autocomplete-plus");
+        overlayElement = editorView.querySelector(".autocomplete");
 
         // TODO: See comment above.
         // expect(overlayElement.style.left).toBe(pixelLeftForBufferPosition([0, 12]))
@@ -1454,26 +1454,26 @@ describe("Autocomplete Manager", () => {
         triggerAutocompletion(editor, false, "a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
 
         // Accept suggestion
         let suggestionListView = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
-        atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+        atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
       });
 
       it("hides the suggestions list when a suggestion is clicked on", async () => {
         triggerAutocompletion(editor, false, "a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
 
         // Accept suggestion
         let suggestionListView = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
         let firstOption = suggestionListView.querySelector("li");
 
@@ -1484,7 +1484,7 @@ describe("Autocomplete Manager", () => {
         simulateClick(firstOption);
 
         // Ensure the menu is closed…
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         // …and our editor still has focus.
         await conditionPromise(() => {
           return document.activeElement.closest("atom-text-editor") === editorView;
@@ -1504,9 +1504,9 @@ describe("Autocomplete Manager", () => {
           await waitForAutocomplete(editor);
 
           let suggestionListView = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
-          atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+          atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
 
           expect(editor.getText()).toBe("ok then a.someMethod()");
         });
@@ -1515,7 +1515,7 @@ describe("Autocomplete Manager", () => {
       describe("when the alternate keyboard integration is used", () => {
         beforeEach(() =>
           atom.config.set(
-            "autocomplete-plus.confirmCompletion",
+            "autocomplete.confirmCompletion",
             "tab always, enter when suggestion explicitly selected",
           ),
         );
@@ -1569,7 +1569,7 @@ describe("Autocomplete Manager", () => {
       });
 
       describe("when tab is used to accept suggestions", () => {
-        beforeEach(() => atom.config.set("autocomplete-plus.confirmCompletion", "tab"));
+        beforeEach(() => atom.config.set("autocomplete.confirmCompletion", "tab"));
 
         it("inserts the word and moves the cursor to the end of the word", async () => {
           triggerAutocompletion(editor, false, "a");
@@ -1601,7 +1601,7 @@ describe("Autocomplete Manager", () => {
       });
 
       describe("when enter is used to accept suggestions", () => {
-        beforeEach(() => atom.config.set("autocomplete-plus.confirmCompletion", "enter"));
+        beforeEach(() => atom.config.set("autocomplete.confirmCompletion", "enter"));
 
         it("inserts the word and moves the cursor to the end of the word", async () => {
           triggerAutocompletion(editor, false, "a");
@@ -1644,9 +1644,9 @@ describe("Autocomplete Manager", () => {
           await waitForAutocomplete(editor);
 
           let suggestionListView = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
-          atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+          atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
 
           expect(editor.getText()).toBe("oneomgtwothree");
         });
@@ -1656,7 +1656,7 @@ describe("Autocomplete Manager", () => {
             { text: "oneomgtwo", replacementPrefix: "one" },
           ]);
 
-          atom.config.set("autocomplete-plus.consumeSuffix", false);
+          atom.config.set("autocomplete.consumeSuffix", false);
 
           editor.setText("ontwothree");
           editor.setCursorBufferPosition([0, 2]);
@@ -1664,9 +1664,9 @@ describe("Autocomplete Manager", () => {
           await waitForAutocomplete(editor);
 
           let suggestionListView = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
-          atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+          atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
 
           expect(editor.getText()).toBe("oneomgtwotwothree");
         });
@@ -1682,9 +1682,9 @@ describe("Autocomplete Manager", () => {
           await waitForAutocomplete(editor);
 
           let suggestionListView = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
-          atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+          atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
 
           expect(editor.getText()).toBe("(oneomgtwo())three");
         });
@@ -1704,9 +1704,9 @@ describe("Autocomplete Manager", () => {
           await waitForAutocomplete(editor);
 
           let suggestionListView = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
-          atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+          atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
 
           expect(editor.getText()).toBe("oneomgTwotwothree");
         });
@@ -1715,36 +1715,36 @@ describe("Autocomplete Manager", () => {
 
     describe("when auto-activation is disabled", () => {
       beforeEach(() => {
-        atom.config.set("autocomplete-plus.enableAutoActivation", false);
+        atom.config.set("autocomplete.enableAutoActivation", false);
       });
 
       it("does not show suggestions after a delay", async () => {
         triggerAutocompletion(editor);
         await timeoutPromise(100);
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
       });
 
       it("shows suggestions when explicitly triggered", async () => {
         triggerAutocompletion(editor);
         await timeoutPromise(100);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
-        atom.commands.dispatch(editorView, "autocomplete-plus:activate");
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
+        atom.commands.dispatch(editorView, "autocomplete:activate");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
       });
 
       it("stays open when typing", async () => {
         triggerAutocompletion(editor, false, "a");
         await timeoutPromise(100);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
-        atom.commands.dispatch(editorView, "autocomplete-plus:activate");
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
+        atom.commands.dispatch(editorView, "autocomplete:activate");
         await waitForAutocomplete(editor);
 
         editor.insertText("b");
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
       });
 
       it("accepts the suggestion if there is one", async () => {
@@ -1753,11 +1753,11 @@ describe("Autocomplete Manager", () => {
         triggerAutocompletion(editor);
         await timeoutPromise(100);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
-        atom.commands.dispatch(editorView, "autocomplete-plus:activate");
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
+        atom.commands.dispatch(editorView, "autocomplete:activate");
         await timeoutPromise(100);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         expect(editor.getText()).toBe("omgok");
       });
 
@@ -1767,8 +1767,8 @@ describe("Autocomplete Manager", () => {
         triggerAutocompletion(editor);
         await timeoutPromise(100);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
-        atom.commands.dispatch(editorView, "autocomplete-plus:activate", {
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
+        atom.commands.dispatch(editorView, "autocomplete:activate", {
           activatedManually: false,
         });
         await waitForAutocomplete(editor);
@@ -1780,9 +1780,9 @@ describe("Autocomplete Manager", () => {
         triggerAutocompletion(editor);
         await timeoutPromise(100);
 
-        atom.config.set("autocomplete-plus.enableAutoConfirmSingleSuggestion", false);
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
-        atom.commands.dispatch(editorView, "autocomplete-plus:activate");
+        atom.config.set("autocomplete.enableAutoConfirmSingleSuggestion", false);
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
+        atom.commands.dispatch(editorView, "autocomplete:activate");
         await waitForAutocomplete(editor);
       });
 
@@ -1796,8 +1796,8 @@ describe("Autocomplete Manager", () => {
         triggerAutocompletion(editor);
         await timeoutPromise(100);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
-        atom.commands.dispatch(editorView, "autocomplete-plus:activate");
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
+        atom.commands.dispatch(editorView, "autocomplete:activate");
         await waitForAutocomplete(editor);
 
         expect(receivedOptions).toBeDefined();
@@ -1817,10 +1817,10 @@ describe("Autocomplete Manager", () => {
         });
 
         editor.insertText("a");
-        atom.commands.dispatch(editorView, "autocomplete-plus:activate");
+        atom.commands.dispatch(editorView, "autocomplete:activate");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelectorAll(".autocomplete-plus li")).toHaveLength(2);
+        expect(editorView.querySelectorAll(".autocomplete li")).toHaveLength(2);
 
         editor.insertText("b");
         await waitForAutocomplete(editor);
@@ -1844,11 +1844,11 @@ def`);
           triggerAutocompletion(editor, false, "m");
           await waitForAutocomplete(editor);
 
-          expect(editorView.querySelector(".autocomplete-plus")).toExist();
+          expect(editorView.querySelector(".autocomplete")).toExist();
           let suggestionListView = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
-          atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+          atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
           expect(editor.getText()).toBe(`asomething asomething
 defm`);
         });
@@ -1871,11 +1871,11 @@ def`);
           triggerAutocompletion(editor, false, "m");
           await waitForAutocomplete(editor);
 
-          expect(editorView.querySelector(".autocomplete-plus")).toExist();
+          expect(editorView.querySelector(".autocomplete")).toExist();
           let suggestionListView = editorView.querySelector(
-            ".autocomplete-plus autocomplete-suggestion-list",
+            ".autocomplete autocomplete-suggestion-list",
           );
-          atom.commands.dispatch(suggestionListView, "autocomplete-plus:confirm");
+          atom.commands.dispatch(suggestionListView, "autocomplete:confirm");
           expect(editor.getText()).toBe(`aok(omg) aok(omg)
 defm`);
         });
@@ -1892,7 +1892,7 @@ defm`);
 
         triggerAutocompletion(editor, false, "a");
         await waitForAutocomplete(editor);
-        let items = editorView.querySelectorAll(".autocomplete-plus li");
+        let items = editorView.querySelectorAll(".autocomplete li");
         expect(items[0]).toHaveClass("selected");
         expect(items[1]).not.toHaveClass("selected");
         expect(items[2]).not.toHaveClass("selected");
@@ -1900,7 +1900,7 @@ defm`);
         // Select previous item
         atom.commands.dispatch(editorView, "core:move-up");
 
-        items = editorView.querySelectorAll(".autocomplete-plus li");
+        items = editorView.querySelectorAll(".autocomplete li");
         expect(items[0]).not.toHaveClass("selected");
         expect(items[1]).not.toHaveClass("selected");
         expect(items[2]).toHaveClass("selected");
@@ -1919,20 +1919,20 @@ defm`);
         atom.commands.dispatch(editorView, "core:move-up");
         await timeoutPromise(1);
 
-        let autocomplete = editorView.querySelector(".autocomplete-plus");
+        let autocomplete = editorView.querySelector(".autocomplete");
         expect(autocomplete).toExist();
 
         editor.insertText("a");
         await waitForAutocomplete(editor);
 
-        autocomplete = editorView.querySelector(".autocomplete-plus");
+        autocomplete = editorView.querySelector(".autocomplete");
         expect(autocomplete).toExist();
 
         // one item displayed, should close
         atom.commands.dispatch(editorView, "core:move-up");
         await timeoutPromise(1);
 
-        autocomplete = editorView.querySelector(".autocomplete-plus");
+        autocomplete = editorView.querySelector(".autocomplete");
         expect(autocomplete).not.toExist();
       });
 
@@ -1949,12 +1949,12 @@ defm`);
         editor.backspace();
         await waitForAutocomplete(editor);
 
-        let autocomplete = editorView.querySelector(".autocomplete-plus");
+        let autocomplete = editorView.querySelector(".autocomplete");
         expect(autocomplete).toExist();
 
         atom.commands.dispatch(editorView, "core:move-up");
 
-        autocomplete = editorView.querySelector(".autocomplete-plus");
+        autocomplete = editorView.querySelector(".autocomplete");
         expect(autocomplete).toExist();
       });
     });
@@ -1966,7 +1966,7 @@ defm`);
         triggerAutocompletion(editor, false, "a");
         await waitForAutocomplete(editor);
 
-        let items = editorView.querySelectorAll(".autocomplete-plus li");
+        let items = editorView.querySelectorAll(".autocomplete li");
         expect(items[0]).toHaveClass("selected");
         expect(items[1]).not.toHaveClass("selected");
         expect(items[2]).not.toHaveClass("selected");
@@ -1974,7 +1974,7 @@ defm`);
         // Select next item
         atom.commands.dispatch(editorView, "core:move-down");
 
-        items = editorView.querySelectorAll(".autocomplete-plus li");
+        items = editorView.querySelectorAll(".autocomplete li");
         expect(items[0]).not.toHaveClass("selected");
         expect(items[1]).toHaveClass("selected");
         expect(items[2]).not.toHaveClass("selected");
@@ -1990,15 +1990,15 @@ defm`);
         triggerAutocompletion(editor, false, "a");
         await waitForAutocomplete(editor);
 
-        let items = editorView.querySelectorAll(".autocomplete-plus li");
+        let items = editorView.querySelectorAll(".autocomplete li");
         expect(items[0]).toHaveClass("selected");
         expect(items[1]).not.toHaveClass("selected");
         expect(items[2]).not.toHaveClass("selected");
 
         let suggestionListView = editorView.querySelector(
-          ".autocomplete-plus autocomplete-suggestion-list",
+          ".autocomplete autocomplete-suggestion-list",
         );
-        items = editorView.querySelectorAll(".autocomplete-plus li");
+        items = editorView.querySelectorAll(".autocomplete li");
 
         atom.commands.dispatch(suggestionListView, "core:move-down");
         expect(items[1]).toHaveClass("selected");
@@ -2020,9 +2020,9 @@ defm`);
         it("displays the text in the suggestion", async () => {
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
-          let iconContainer = editorView.querySelector(".autocomplete-plus li .icon-container");
-          let leftLabel = editorView.querySelector(".autocomplete-plus li .right-label");
-          let rightLabel = editorView.querySelector(".autocomplete-plus li .right-label");
+          let iconContainer = editorView.querySelector(".autocomplete li .icon-container");
+          let leftLabel = editorView.querySelector(".autocomplete li .right-label");
+          let rightLabel = editorView.querySelector(".autocomplete li .right-label");
 
           expect(iconContainer.childNodes).toHaveLength(0);
           expect(leftLabel.childNodes).toHaveLength(0);
@@ -2039,7 +2039,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let icon = editorView.querySelector(".autocomplete-plus li .icon-container .icon");
+          let icon = editorView.querySelector(".autocomplete li .icon-container .icon");
           expect(icon.textContent).toBe("o");
         });
       });
@@ -2053,7 +2053,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let icon = editorView.querySelector(".autocomplete-plus li .icon-container .icon i");
+          let icon = editorView.querySelector(".autocomplete li .icon-container .icon i");
           expect(icon).toHaveClass("icon-move-right");
         });
       });
@@ -2067,7 +2067,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let iconContainer = editorView.querySelector(".autocomplete-plus li .icon-container");
+          let iconContainer = editorView.querySelector(".autocomplete li .icon-container");
           expect(iconContainer.childNodes).toHaveLength(0);
         });
       });
@@ -2083,7 +2083,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let icon = editorView.querySelector(".autocomplete-plus li .icon-container .icon .omg");
+          let icon = editorView.querySelector(".autocomplete li .icon-container .icon .omg");
           expect(icon).toExist();
         });
       });
@@ -2099,7 +2099,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let iconContainer = editorView.querySelector(".autocomplete-plus li .icon-container");
+          let iconContainer = editorView.querySelector(".autocomplete li .icon-container");
           expect(iconContainer.childNodes).toHaveLength(0);
         });
       });
@@ -2115,7 +2115,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let icon = editorView.querySelector(".autocomplete-plus li .icon-container .icon");
+          let icon = editorView.querySelector(".autocomplete li .icon-container .icon");
           expect(icon.textContent).toBe("s");
         });
       });
@@ -2129,7 +2129,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let iconContainer = editorView.querySelector(".autocomplete-plus li .icon-container");
+          let iconContainer = editorView.querySelector(".autocomplete li .icon-container");
           expect(iconContainer.childNodes).toHaveLength(0);
         });
       });
@@ -2145,7 +2145,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let label = editorView.querySelector(".autocomplete-plus li .right-label");
+          let label = editorView.querySelector(".autocomplete li .right-label");
           expect(label).toHaveText('<i class="something">sometext</i>');
         });
       });
@@ -2161,7 +2161,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let label = editorView.querySelector(".autocomplete-plus li .right-label .something");
+          let label = editorView.querySelector(".autocomplete li .right-label .something");
           expect(label).toHaveText("sometext");
         });
       });
@@ -2177,7 +2177,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let label = editorView.querySelector(".autocomplete-plus li .left-label");
+          let label = editorView.querySelector(".autocomplete li .left-label");
           expect(label).toHaveText('<i class="something">sometext</i>');
         });
       });
@@ -2193,7 +2193,7 @@ defm`);
           triggerAutocompletion(editor);
           await waitForAutocomplete(editor);
 
-          let label = editorView.querySelector(".autocomplete-plus li .left-label .something");
+          let label = editorView.querySelector(".autocomplete li .left-label .something");
           expect(label).toHaveText("sometext");
         });
       });
@@ -2212,7 +2212,7 @@ defm`);
         await waitForAutocomplete(editor);
 
         // Get the second item
-        let item = editorView.querySelectorAll(".autocomplete-plus li")[1];
+        let item = editorView.querySelectorAll(".autocomplete li")[1];
 
         // Click the item, expect list to be hidden and text to be added
         let mouse = document.createEvent("MouseEvents");
@@ -2222,7 +2222,7 @@ defm`);
         mouse.initMouseEvent("mouseup", true, true, window);
         item.dispatchEvent(mouse);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         expect(editor.getBuffer().getLastLine()).toEqual(item.textContent.trim());
       });
 
@@ -2231,7 +2231,7 @@ defm`);
         await waitForAutocomplete(editor);
 
         let description = editorView.querySelector(
-          ".autocomplete-plus .suggestion-description-content",
+          ".autocomplete .suggestion-description-content",
         );
 
         // Click the description, expect list to still show
@@ -2242,7 +2242,7 @@ defm`);
         mouse.initMouseEvent("mouseup", true, true, window);
         description.dispatchEvent(mouse);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
       });
     });
 
@@ -2256,8 +2256,8 @@ defm`);
         triggerAutocompletion(editor, true, "a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
-        atom.commands.dispatch(editorView, "autocomplete-plus:navigate-to-description-more-link");
+        expect(editorView.querySelector(".autocomplete")).toExist();
+        atom.commands.dispatch(editorView, "autocomplete:navigate-to-description-more-link");
         expect(atom.openExternal).toHaveBeenCalled();
       });
 
@@ -2268,8 +2268,8 @@ defm`);
         triggerAutocompletion(editor, true, "a");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
-        atom.commands.dispatch(editorView, "autocomplete-plus:navigate-to-description-more-link");
+        expect(editorView.querySelector(".autocomplete")).toExist();
+        atom.commands.dispatch(editorView, "autocomplete:navigate-to-description-more-link");
         expect(atom.openExternal).not.toHaveBeenCalled();
       });
     });
@@ -2283,7 +2283,7 @@ defm`);
       await atom.packages.activatePackage("language-text");
 
       // Activate the package
-      mainModule = (await atom.packages.activatePackage("autocomplete-plus")).mainModule;
+      mainModule = (await atom.packages.activatePackage("autocomplete")).mainModule;
 
       await conditionPromise(() => {
         return mainModule && mainModule.autocompleteManager && mainModule.autocompleteManager.ready;
@@ -2295,7 +2295,7 @@ defm`);
     });
 
     describe("when strict matching is used", () => {
-      beforeEach(() => atom.config.set("autocomplete-plus.strictMatching", true));
+      beforeEach(() => atom.config.set("autocomplete.strictMatching", true));
 
       it("using strict matching does not cause issues when typing", async () => {
         editor.moveToBottom();
@@ -2312,14 +2312,14 @@ defm`);
 
   describe("when opening a javascript file", () => {
     beforeEach(async () => {
-      atom.config.set("autocomplete-plus.enableAutoActivation", true);
+      atom.config.set("autocomplete.enableAutoActivation", true);
 
       editor = await atom.workspace.open("sample.js");
       editorView = atom.views.getView(editor);
 
       await atom.packages.activatePackage("language-javascript");
 
-      mainModule = (await atom.packages.activatePackage("autocomplete-plus")).mainModule;
+      mainModule = (await atom.packages.activatePackage("autocomplete")).mainModule;
 
       await conditionPromise(() => {
         autocompleteManager = mainModule.autocompleteManager;
@@ -2333,25 +2333,25 @@ defm`);
 
     describe("when the built-in provider is disabled", () =>
       it("should not show the suggestion list", async () => {
-        atom.config.set("autocomplete-plus.enableBuiltinProvider", false);
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        atom.config.set("autocomplete.enableBuiltinProvider", false);
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         triggerAutocompletion(editor);
         await timeoutPromise(100);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
       }));
 
     describe("when the buffer changes", () => {
       it("should show the suggestion list when suggestions are found", async () => {
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         triggerAutocompletion(editor);
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
 
         // Check suggestions
         let suggestions = ["function", "if", "left", "shift"];
-        let s = editorView.querySelectorAll(".autocomplete-plus li span.word");
+        let s = editorView.querySelectorAll(".autocomplete li span.word");
         for (let i = 0; i < s.length; i++) {
           let item = s[i];
           expect(item.innerText).toEqual(suggestions[i]);
@@ -2359,7 +2359,7 @@ defm`);
       });
 
       it("should not show the suggestion list when no suggestions are found", async () => {
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         editor.moveToBottom();
         editor.insertText("x");
@@ -2368,46 +2368,46 @@ defm`);
       });
 
       it("shows the suggestion list on backspace if allowed", async () => {
-        atom.config.set("autocomplete-plus.backspaceTriggersAutocomplete", true);
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        atom.config.set("autocomplete.backspaceTriggersAutocomplete", true);
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         editor.moveToBottom();
         editor.insertText("f");
         editor.insertText("u");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         editor.insertText("\r");
         await waitForAutocompleteToDisappear(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         let key = atom.keymaps.constructor.buildKeydownEvent("backspace", {
           target: document.activeElement,
         });
         atom.keymaps.handleKeyboardEvent(key);
         await timeoutPromise(100);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         key = atom.keymaps.constructor.buildKeydownEvent("backspace", {
           target: document.activeElement,
         });
         atom.keymaps.handleKeyboardEvent(key);
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         expect(editor.lineTextForBufferRow(13)).toBe("f");
       });
 
       it("does not shows the suggestion list on backspace if disallowed", async () => {
-        atom.config.set("autocomplete-plus.backspaceTriggersAutocomplete", false);
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        atom.config.set("autocomplete.backspaceTriggersAutocomplete", false);
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         editor.moveToBottom();
         editor.insertText("f");
         editor.insertText("u");
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         editor.insertText("\r");
 
         await waitForAutocompleteToDisappear(editor);
@@ -2423,18 +2423,18 @@ defm`);
         atom.keymaps.handleKeyboardEvent(key);
         await timeoutPromise(100);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
         expect(editor.lineTextForBufferRow(13)).toBe("f");
       });
 
       it("keeps the suggestion list open when it's already open on backspace", async () => {
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         editor.moveToBottom();
         editor.insertText("f");
         editor.insertText("u");
         await waitForAutocomplete(editor);
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
 
         let key = atom.keymaps.constructor.buildKeydownEvent("backspace", {
           target: document.activeElement,
@@ -2442,13 +2442,13 @@ defm`);
         atom.keymaps.handleKeyboardEvent(key);
         await waitForAutocomplete(editor);
 
-        expect(editorView.querySelector(".autocomplete-plus")).toExist();
+        expect(editorView.querySelector(".autocomplete")).toExist();
         expect(editor.lineTextForBufferRow(13)).toBe("f");
       });
 
       it("does not open the suggestion on backspace when it's closed", async () => {
-        atom.config.set("autocomplete-plus.backspaceTriggersAutocomplete", false);
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        atom.config.set("autocomplete.backspaceTriggersAutocomplete", false);
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
 
         editor.setCursorBufferPosition([2, 39]); // at the end of `items`
 
@@ -2458,7 +2458,7 @@ defm`);
         atom.keymaps.handleKeyboardEvent(key);
 
         await timeoutPromise(100);
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
       });
 
       it("does not update the suggestion list while composition is in progress", async () => {
@@ -2515,7 +2515,7 @@ defm`);
 
         await timeoutPromise(100);
 
-        expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+        expect(editorView.querySelector(".autocomplete")).not.toExist();
       });
     });
 
@@ -2536,12 +2536,12 @@ defm`);
 
   describe("when a long completion exists", () => {
     beforeEach(async () => {
-      atom.config.set("autocomplete-plus.enableAutoActivation", true);
+      atom.config.set("autocomplete.enableAutoActivation", true);
 
       editor = await atom.workspace.open("samplelong.js");
 
       // Activate the package
-      mainModule = (await atom.packages.activatePackage("autocomplete-plus")).mainModule;
+      mainModule = (await atom.packages.activatePackage("autocomplete")).mainModule;
 
       await conditionPromise(() => mainModule.autocompleteManager);
       autocompleteManager = mainModule.autocompleteManager;
@@ -2566,7 +2566,7 @@ defm`);
 
     beforeEach(async () => {
       // Activate package.
-      const pck = await atom.packages.activatePackage("autocomplete-plus");
+      const pck = await atom.packages.activatePackage("autocomplete");
       mainModule = pck.mainModule;
 
       autocompleteManager = mainModule.autocompleteManager;
@@ -2606,9 +2606,9 @@ defm`);
       triggerAutocompletion(bottomEditor);
       await waitForAutocomplete(bottomEditor);
 
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
 
-      let items = bottomEditorView.querySelectorAll(".autocomplete-plus li");
+      let items = bottomEditorView.querySelectorAll(".autocomplete li");
       expect(items.length).toEqual(1);
       expect(items[0].innerText.trim()).toEqual("bottom");
 
@@ -2616,9 +2616,9 @@ defm`);
       triggerAutocompletion(editor);
       await waitForAutocomplete(editor);
 
-      expect(bottomEditorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(bottomEditorView.querySelector(".autocomplete")).not.toExist();
 
-      items = editorView.querySelectorAll(".autocomplete-plus li");
+      items = editorView.querySelectorAll(".autocomplete li");
       expect(items.length).toEqual(1);
       expect(items[0].innerText.trim()).toEqual("center");
     });
@@ -2628,7 +2628,7 @@ defm`);
       bottomEditorView.focus();
       triggerAutocompletion(bottomEditor);
       await timeoutPromise(100);
-      expect(bottomEditorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(bottomEditorView.querySelector(".autocomplete")).not.toExist();
     });
   });
 });

@@ -11,7 +11,7 @@ describe("Autocomplete Manager", () => {
   beforeEach(() => {
     atom.workspace.project.setPaths([path.join(__dirname, "fixtures")]);
     // Set to live completion
-    atom.config.set("autocomplete-plus.enableAutoActivation", true);
+    atom.config.set("autocomplete.enableAutoActivation", true);
     atom.config.set("editor.fontSize", "16");
 
     let workspaceElement = atom.views.getView(atom.workspace);
@@ -21,14 +21,14 @@ describe("Autocomplete Manager", () => {
   describe("Undo a completion", () => {
     beforeEach(async () => {
       jasmine.useRealClock();
-      atom.config.set("autocomplete-plus.enableAutoActivation", true);
+      atom.config.set("autocomplete.enableAutoActivation", true);
 
       editor = await atom.workspace.open("sample.js");
 
       await atom.packages.activatePackage("language-javascript");
 
       // Activate the package
-      mainModule = (await atom.packages.activatePackage("autocomplete-plus")).mainModule;
+      mainModule = (await atom.packages.activatePackage("autocomplete")).mainModule;
 
       await conditionPromise(
         () => mainModule.autocompleteManager && mainModule.autocompleteManager.ready,
@@ -45,7 +45,7 @@ describe("Autocomplete Manager", () => {
 
       // Accept suggestion
       editorView = atom.views.getView(editor);
-      atom.commands.dispatch(editorView, "autocomplete-plus:confirm");
+      atom.commands.dispatch(editorView, "autocomplete:confirm");
 
       expect(editor.getBuffer().getLastLine()).toEqual("function");
 

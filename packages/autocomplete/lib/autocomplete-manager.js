@@ -77,7 +77,7 @@ module.exports = class AutocompleteManager {
 
     this.subscriptions.add(
       atom.config.observe(
-        "autocomplete-plus.enableExtendedUnicodeSupport",
+        "autocomplete.enableExtendedUnicodeSupport",
         (enableExtendedUnicodeSupport) => {
           if (enableExtendedUnicodeSupport) {
             this.prefixRegex = new RegExp(
@@ -242,27 +242,27 @@ module.exports = class AutocompleteManager {
       }),
     );
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.backspaceTriggersAutocomplete", (value) => {
+      atom.config.observe("autocomplete.backspaceTriggersAutocomplete", (value) => {
         this.backspaceTriggersAutocomplete = value;
       }),
     );
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.enableAutoActivation", (value) => {
+      atom.config.observe("autocomplete.enableAutoActivation", (value) => {
         this.autoActivationEnabled = value;
       }),
     );
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.enableAutoConfirmSingleSuggestion", (value) => {
+      atom.config.observe("autocomplete.enableAutoConfirmSingleSuggestion", (value) => {
         this.autoConfirmSingleSuggestionEnabled = value;
       }),
     );
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.consumeSuffix", (value) => {
+      atom.config.observe("autocomplete.consumeSuffix", (value) => {
         this.consumeSuffix = value;
       }),
     );
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.fileBlacklist", (value) => {
+      atom.config.observe("autocomplete.fileBlacklist", (value) => {
         if (value) {
           this.fileBlacklist = value.map((s) => {
             return s.trim();
@@ -272,7 +272,7 @@ module.exports = class AutocompleteManager {
       }),
     );
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.suppressActivationForEditorClasses", (value) => {
+      atom.config.observe("autocomplete.suppressActivationForEditorClasses", (value) => {
         this.suppressForClasses = [];
         for (let i = 0; i < value.length; i++) {
           const selector = value[i];
@@ -305,7 +305,7 @@ module.exports = class AutocompleteManager {
   handleCommands() {
     return this.subscriptions.add(
       atom.commands.add("atom-text-editor", {
-        "autocomplete-plus:activate": (event) => {
+        "autocomplete:activate": (event) => {
           this.shouldDisplaySuggestions = true;
           let activatedManually = true;
           if (
@@ -317,7 +317,7 @@ module.exports = class AutocompleteManager {
           }
           this.findSuggestions(activatedManually);
         },
-        "autocomplete-plus:navigate-to-description-more-link": () => {
+        "autocomplete:navigate-to-description-more-link": () => {
           let suggestionListView = atom.views.getView(this.editor);
           let descriptionContainer = suggestionListView.querySelector(".suggestion-description");
           if (descriptionContainer !== null && descriptionContainer.style.display === "block") {
@@ -515,7 +515,7 @@ module.exports = class AutocompleteManager {
     // We envision this will eventually go away altogether, but as an
     // intermediate step, we've turned it into an option that is `false` by
     // default.
-    let firstCharacterMustMatch = atom.config.get("autocomplete-plus.firstCharacterMustMatch");
+    let firstCharacterMustMatch = atom.config.get("autocomplete.firstCharacterMustMatch");
 
     for (let i = 0; i < suggestions.length; i++) {
       // `sortScore` mostly preserves in the original sorting. The function is
@@ -638,7 +638,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`);
   }
 
   displaySuggestions(suggestions, options) {
-    switch (atom.config.get("autocomplete-plus.similarSuggestionRemoval")) {
+    switch (atom.config.get("autocomplete.similarSuggestionRemoval")) {
       case "textOrSnippet": {
         suggestions = this.getUniqueSuggestions(
           suggestions,
@@ -1004,7 +1004,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`);
 
   // Private: Gets called when the content has been modified
   requestNewSuggestions() {
-    let delay = atom.config.get("autocomplete-plus.autoActivationDelay");
+    let delay = atom.config.get("autocomplete.autoActivationDelay");
 
     if (this.delayTimeout != null) {
       clearTimeout(this.delayTimeout);

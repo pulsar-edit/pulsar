@@ -22,13 +22,13 @@ module.exports = class SubsequenceProvider {
       atomConfig: this.atomConfig,
     });
 
-    // make this.X available where X is the autocomplete-plus.X setting
+    // make this.X available where X is the autocomplete.X setting
     const settings = [
-      "autocomplete-plus.enableExtendedUnicodeSupport", // TODO
-      "autocomplete-plus.minimumWordLength",
-      "autocomplete-plus.includeCompletionsFromAllBuffers",
-      "autocomplete-plus.useLocalityBonus",
-      "autocomplete-plus.strictMatching",
+      "autocomplete.enableExtendedUnicodeSupport", // TODO
+      "autocomplete.minimumWordLength",
+      "autocomplete.includeCompletionsFromAllBuffers",
+      "autocomplete.useLocalityBonus",
+      "autocomplete.strictMatching",
     ];
     settings.forEach((property) => {
       this.subscriptions.add(

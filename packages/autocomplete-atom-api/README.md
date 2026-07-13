@@ -10,7 +10,7 @@ Autocompletions for the Lumine API available from the `atom.` global.
 
 ## Services
 
-- **autocomplete.provider** (`2.0.0`): provided to supply `atom.` API suggestions to autocomplete-plus.
+- **autocomplete.provider** (`2.0.0`): provided to supply `atom.` API suggestions to autocomplete.
 
 ## Contributing
 

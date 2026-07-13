@@ -61,7 +61,7 @@ module.exports = {
   },
 
   triggerAutocomplete(editor) {
-    return atom.commands.dispatch(atom.views.getView(editor), "autocomplete-plus:activate", {
+    return atom.commands.dispatch(atom.views.getView(editor), "autocomplete:activate", {
       activatedManually: false,
     });
   },

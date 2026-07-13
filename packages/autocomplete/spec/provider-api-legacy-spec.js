@@ -13,18 +13,18 @@ describe("Provider API Legacy", () => {
     jasmine.snapshotDeprecations();
 
     // Set to live completion
-    atom.config.set("autocomplete-plus.enableAutoActivation", true);
+    atom.config.set("autocomplete.enableAutoActivation", true);
     atom.config.set("editor.fontSize", "16");
 
     // Set the completion delay
-    atom.config.set("autocomplete-plus.autoActivationDelay", 100);
+    atom.config.set("autocomplete.autoActivationDelay", 100);
 
     let workspaceElement = atom.views.getView(atom.workspace);
     jasmine.attachToDOM(workspaceElement);
 
     await atom.packages.activatePackage("language-javascript");
     editor = await atom.workspace.open("sample.js");
-    mainModule = (await atom.packages.activatePackage("autocomplete-plus")).mainModule;
+    mainModule = (await atom.packages.activatePackage("autocomplete")).mainModule;
     await conditionPromise(() => {
       autocompleteManager = mainModule.autocompleteManager;
       return autocompleteManager;

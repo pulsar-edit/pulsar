@@ -40,7 +40,7 @@ return sort(Array.apply(this, arguments));
     atom.config.set("autosave.enabled", true);
 
     // Set to live completion
-    atom.config.set("autocomplete-plus.enableAutoActivation", true);
+    atom.config.set("autocomplete.enableAutoActivation", true);
     atom.config.set("editor.fontSize", "16");
 
     let workspaceElement = atom.views.getView(atom.workspace);
@@ -54,7 +54,7 @@ return sort(Array.apply(this, arguments));
     await atom.packages.activatePackage("language-javascript");
 
     // Activate the package
-    mainModule = (await atom.packages.activatePackage("autocomplete-plus")).mainModule;
+    mainModule = (await atom.packages.activatePackage("autocomplete")).mainModule;
 
     await conditionPromise(
       () => mainModule && mainModule.autocompleteManager && mainModule.autocompleteManager.ready,
@@ -82,7 +82,7 @@ return sort(Array.apply(this, arguments));
 
   describe("autosave compatibility", () =>
     it("keeps the suggestion list open while saving", async () => {
-      expect(editorView.querySelector(".autocomplete-plus")).not.toExist();
+      expect(editorView.querySelector(".autocomplete")).not.toExist();
       // Trigger an autocompletion
       const firstEventPromise = createSuggestionsPromise();
 
@@ -93,15 +93,15 @@ return sort(Array.apply(this, arguments));
 
       const secondEventPromise = createSuggestionsPromise();
       editor.save();
-      expect(editorView.querySelector(".autocomplete-plus")).toExist();
+      expect(editorView.querySelector(".autocomplete")).toExist();
       editor.insertText("u");
       await secondEventPromise;
 
       editor.save();
-      expect(editorView.querySelector(".autocomplete-plus")).toExist();
+      expect(editorView.querySelector(".autocomplete")).toExist();
       // Accept suggestion
       let suggestionListView = autocompleteManager.suggestionList.suggestionListElement;
-      atom.commands.dispatch(suggestionListView.element, "autocomplete-plus:confirm");
+      atom.commands.dispatch(suggestionListView.element, "autocomplete:confirm");
       expect(editor.getBuffer().getLastLine()).toEqual("function");
     }));
 });

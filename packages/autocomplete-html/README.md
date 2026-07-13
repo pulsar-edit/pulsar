@@ -10,7 +10,7 @@ HTML element and attribute autocompletions in Lumine.
 
 ## Services
 
-- **autocomplete.provider** (`2.0.0`): provided to supply HTML element and attribute suggestions to autocomplete-plus.
+- **autocomplete.provider** (`2.0.0`): provided to supply HTML element and attribute suggestions to autocomplete.
 
 ## Contributing
 

@@ -79,17 +79,17 @@ module.exports = class SuggestionListElement {
     this.subscriptions.add(this.model.onDidDispose(this.dispose.bind(this)));
 
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.suggestionListFollows", (suggestionListFollows) => {
+      atom.config.observe("autocomplete.suggestionListFollows", (suggestionListFollows) => {
         this.suggestionListFollows = suggestionListFollows;
       }),
     );
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.maxVisibleSuggestions", (maxVisibleSuggestions) => {
+      atom.config.observe("autocomplete.maxVisibleSuggestions", (maxVisibleSuggestions) => {
         this.maxVisibleSuggestions = maxVisibleSuggestions;
       }),
     );
     this.subscriptions.add(
-      atom.config.observe("autocomplete-plus.moveToCancel", (moveToCancel) => {
+      atom.config.observe("autocomplete.moveToCancel", (moveToCancel) => {
         this.moveToCancel = moveToCancel;
       }),
     );

@@ -13,7 +13,7 @@ autocomplete-suggestion-list {
   --autocomplete-item-side-padding: 0.6em;
 }
 
-atom-overlay.autocomplete-plus {
+atom-overlay.autocomplete {
   z-index: 12; /* higher than docks */
 }
 
