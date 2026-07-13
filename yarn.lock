@@ -1183,9 +1183,9 @@
   dependencies:
     node-addon-api "^8.5.0"
 
-"@lumine-code/fuzzy-native@https://github.com/lumine-code/fuzzy-native.git#8d48f36ef66036ebfaa9707b5f09ae8177d1de88":
+"@lumine-code/fuzzy-native@https://github.com/lumine-code/fuzzy-native.git#a1d0ff955057ef5e4e9fde9e2185c45bc350234e":
   version "2.0.0"
-  resolved "https://github.com/lumine-code/fuzzy-native.git#8d48f36ef66036ebfaa9707b5f09ae8177d1de88"
+  resolved "https://github.com/lumine-code/fuzzy-native.git#a1d0ff955057ef5e4e9fde9e2185c45bc350234e"
   dependencies:
     node-addon-api "^8.8.0"
 
