@@ -1,4 +1,4 @@
-# language-rust-bundled
+# language-rust
 
 Rust support for Lumine.
 

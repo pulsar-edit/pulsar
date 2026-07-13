@@ -1,5 +1,5 @@
 {
-  "name": "language-rust-bundled",
+  "name": "language-rust",
   "author": "lumine-code",
   "version": "1.0.0",
   "description": "Rust support for Lumine",

@@ -4491,7 +4491,7 @@ klaw-sync@^6.0.0:
 "language-ruby@file:packages/language-ruby":
   version "1.0.0"
 
-"language-rust-bundled@file:packages/language-rust-bundled":
+"language-rust@file:packages/language-rust":
   version "1.0.0"
 
 "language-sass@file:packages/language-sass":

@@ -30,7 +30,7 @@ const jsdocGrammarPath = resolve("language-javascript/grammars/modern-tree-sitte
 const htmlGrammarPath = resolve("language-html/grammars/modern-tree-sitter-html.cson");
 const ejsGrammarPath = resolve("language-html/grammars/modern-tree-sitter-ejs.cson");
 const rubyGrammarPath = resolve("language-ruby/grammars/modern-tree-sitter-ruby.cson");
-const rustGrammarPath = resolve("language-rust-bundled/grammars/modern-tree-sitter-rust.cson");
+const rustGrammarPath = resolve("language-rust/grammars/modern-tree-sitter-rust.cson");
 
 let jsConfig = CSON.readFileSync(jsGrammarPath);
 let jsRegexConfig = CSON.readFileSync(jsRegexGrammarPath);
