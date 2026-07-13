@@ -1189,6 +1189,12 @@
   dependencies:
     node-addon-api "^8.8.0"
 
+"@lumine-code/get-scrollbar-style@https://github.com/lumine-code/get-scrollbar-style.git#a985db7252b4b51fe67122226e3ad9884a419e03":
+  version "2.0.0"
+  resolved "https://github.com/lumine-code/get-scrollbar-style.git#a985db7252b4b51fe67122226e3ad9884a419e03"
+  dependencies:
+    node-addon-api "^8.9.0"
+
 "@lumine-code/git-utils@https://github.com/lumine-code/git-utils.git#a37861c2c6b09c2980e116d30e191416e630d391":
   version "9.0.0"
   resolved "https://github.com/lumine-code/git-utils.git#a37861c2c6b09c2980e116d30e191416e630d391"
@@ -1462,13 +1468,6 @@
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
-
-"@pulsar-edit/get-scrollbar-style@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/get-scrollbar-style/-/get-scrollbar-style-1.0.1.tgz#00a45b768ec3451c57e194538e96ad30f26b28e8"
-  integrity sha512-1DMvPe0iOUleVh+Kcd5gx+A7UiHemYgJ/2GCPiVH2PGWBlPdjYsbl0RHW77CEEhzVENXEUYta7F6DXCWiz8fUA==
-  dependencies:
-    node-addon-api "^6.1.0"
 
 "@pulsar-edit/ls-archive@^2.0.0":
   version "2.0.0"
@@ -5107,11 +5106,6 @@ node-addon-api@^4.2.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-4.3.0.tgz#52a1a0b475193e0928e98e0426a0d1254782b77f"
   integrity sha512-73sE9+3UaLYYFmDsFZnqCInzPyh3MqIwZO9cw58yIqAZhONrrabrYyYe3TuIqtIiOuTXVhsGau8hcrhhwSsDIQ==
-
-node-addon-api@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-6.1.0.tgz#ac8470034e58e67d0c6f1204a18ae6995d9c0d76"
-  integrity sha512-+eawOlIgy680F0kBzPUNFhMZGtJ1YmqM6l4+Crf4IkImjYrO/mqPwRMh352g23uIaQKFItcQ64I7KMaJxHgAVA==
 
 node-addon-api@^7.0.0, node-addon-api@^7.1.0, node-addon-api@^7.1.1:
   version "7.1.1"

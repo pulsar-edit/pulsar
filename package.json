@@ -42,7 +42,7 @@
     "@lumine-code/service-hub": "https://github.com/lumine-code/service-hub.git#b47f6d90c5e4e4ff8a4d3a6cbac3436386e69941",
     "@lumine-code/superstring": "https://github.com/lumine-code/superstring.git#1e04592de92c3957e1dff8da3a09f2b9d8fe2987",
     "@lumine-code/text-buffer": "https://github.com/lumine-code/text-buffer.git#47a4e051d7cbdafae639c5a4c97dc646b859aeb9",
-    "@pulsar-edit/get-scrollbar-style": "^1.0.1",
+    "@lumine-code/get-scrollbar-style": "https://github.com/lumine-code/get-scrollbar-style.git#a985db7252b4b51fe67122226e3ad9884a419e03",
     "@vscode/ripgrep": "1.18.0",
     "about": "file:packages/about",
     "archive-view": "file:packages/archive-view",
