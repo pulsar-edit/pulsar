@@ -10,8 +10,8 @@
     "atom": "*"
   },
   "dependencies": {
-    "@lumine-code/second-mate": "https://github.com/lumine-code/second-mate.git#fac9624d67c03f9f24aaabcf534468184c513ec0",
-    "underscore-plus": "https://github.com/lumine-code/underscore-plus.git#02b4e5a0f0f85fdf2ef5550db7131db0bda4937a"
+    "@lumine-code/second-mate": "https://github.com/lumine-code/second-mate.git#ed4d772d396b0a28dd79e6df962a1558b7340867",
+    "underscore-plus": "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
   },
   "configSchema": {
     "autocompleteCharacters": {

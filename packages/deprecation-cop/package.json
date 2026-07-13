@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "etch": "0.9.0",
-    "fs-plus": "https://github.com/lumine-code/fs-plus.git#c00d99a85642969635218ed8862a37f7a0bce6e2",
+    "fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
     "grim": "^2.0.1",
-    "underscore-plus": "https://github.com/lumine-code/underscore-plus.git#02b4e5a0f0f85fdf2ef5550db7131db0bda4937a"
+    "underscore-plus": "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
   },
   "consumedServices": {
     "status-bar": {
