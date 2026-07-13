@@ -1,0 +1,7 @@
+// Compatibility entry point for community packages that still import the
+// classic Atom base stylesheet. Core UI rules are loaded as CSS by
+// ThemeManager; only the Less variable contract belongs in package builds.
+@import "variables/syntax-variables";
+@import "syntax-variables";
+@import "variables/ui-variables";
+@import "ui-variables";

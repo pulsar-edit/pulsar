@@ -676,6 +676,21 @@ h2 {
   });
 
   describe("modern themes (CSS custom-property palettes)", () => {
+    it("keeps the legacy atom Less import available to community packages", async () => {
+      setActiveThemes(["theme-modern-ui", "theme-modern-syntax"]);
+      await atom.themes.activateThemes();
+
+      const lessPath = path.join(temp.mkdirSync("atom"), "legacy-import.less");
+      fs.writeFileSync(
+        lessPath,
+        '@import "atom";\n.legacy-import { color: @text-color; background: @syntax-background-color; }',
+      );
+
+      const css = atom.themes.loadLessStylesheet(lessPath);
+      expect(css).toContain("#123456");
+      expect(css).toContain("#654321");
+    });
+
     it("exposes the palette to Less through a generated shim directory", async () => {
       setActiveThemes(["theme-modern-ui", "theme-modern-syntax"]);
 
