@@ -36,7 +36,7 @@
     "@lumine-code/fuzzy-native": "https://github.com/lumine-code/fuzzy-native.git#7dc348747e6a585f37baf6272e841547e31eb1d2",
     "@lumine-code/git-utils": "https://github.com/lumine-code/git-utils.git#902c0ef4035d870cc4b968baebd06eab3d8acf3e",
     "@lumine-code/pathwatcher": "https://github.com/lumine-code/node-pathwatcher.git#de08d8a2c3bd1c18aabc0669920c7ae2e895241a",
-    "@lumine-code/scandal": "https://github.com/lumine-code/scandal.git#e96df0353a3d4b540ed46a9ae5bfb561f310bccf",
+    "@lumine-code/scandal": "https://github.com/lumine-code/scandal.git#72f9304fe0c5d17b1a22e295f0ce2d08c717ab8c",
     "@lumine-code/scoped-property-store": "https://github.com/lumine-code/scoped-property-store.git#bf91d2339edf35f3bdedeb72e957a928fea4e20e",
     "@lumine-code/second-mate": "https://github.com/lumine-code/second-mate.git#ed4d772d396b0a28dd79e6df962a1558b7340867",
     "@lumine-code/service-hub": "https://github.com/lumine-code/service-hub.git#a64d2bda0088f74a455556503c98cb4075fc187f",
