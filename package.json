@@ -32,7 +32,7 @@
     "@jasminejs/reporters": "1.0.0",
     "@parcel/watcher": "^2.5.0",
     "@lumine-code/atom-keymap": "https://github.com/lumine-code/atom-keymap.git#65c7c104ea79fbfd5f597ad6d53ede15a06e35b3",
-    "@lumine-code/babel-preset": "https://github.com/lumine-code/babel-preset-atomic.git#008b394856eb5e1924c86ddede3e3072b676fd4c",
+    "@lumine-code/babel-preset": "https://github.com/lumine-code/babel-preset.git#008b394856eb5e1924c86ddede3e3072b676fd4c",
     "@lumine-code/fuzzy-native": "https://github.com/lumine-code/fuzzy-native.git#8d48f36ef66036ebfaa9707b5f09ae8177d1de88",
     "@lumine-code/git-utils": "https://github.com/lumine-code/git-utils.git#a37861c2c6b09c2980e116d30e191416e630d391",
     "@lumine-code/pathwatcher": "https://github.com/lumine-code/node-pathwatcher.git#2e957c8139cab478e0dc9ecbdb424f09ca80a53e",

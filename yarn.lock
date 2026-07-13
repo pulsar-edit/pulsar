@@ -1155,9 +1155,9 @@
     grim "^2.0.3"
     season "^6.0.2"
 
-"@lumine-code/babel-preset@https://github.com/lumine-code/babel-preset-atomic.git#008b394856eb5e1924c86ddede3e3072b676fd4c":
+"@lumine-code/babel-preset@https://github.com/lumine-code/babel-preset.git#008b394856eb5e1924c86ddede3e3072b676fd4c":
   version "6.0.0"
-  resolved "https://github.com/lumine-code/babel-preset-atomic.git#008b394856eb5e1924c86ddede3e3072b676fd4c"
+  resolved "https://github.com/lumine-code/babel-preset.git#008b394856eb5e1924c86ddede3e3072b676fd4c"
   dependencies:
     "@babel/plugin-proposal-decorators" "^8.0.2"
     "@babel/plugin-transform-class-properties" "^8.0.1"
