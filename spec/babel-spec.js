@@ -3,8 +3,10 @@
 // See https://github.com/atom/electron/issues/2033
 process.env.DEBUG = "*";
 
+const fs = require("fs");
 const path = require("path");
 const temp = require("temp").track();
+const Babel = require("../src/babel");
 const CompileCache = require("../src/compile-cache");
 
 describe("Babel transpiler support", function () {
@@ -46,6 +48,26 @@ describe("Babel transpiler support", function () {
       expect(element[0]).toBe("div");
       expect(element[1]).toEqual({ className: "settings-view" });
     }));
+
+  describe("when JSX text contains legacy unescaped characters", function () {
+    it("escapes them before transpiling", function () {
+      const source = `/** @babel */
+/** @jsx createElement */
+const createElement = (...args) => args;
+module.exports = <p>Menu > Settings } Advanced</p>;`;
+      const compiled = Babel.compile(source, "legacy-jsx-text.js");
+      const compiledPath = path.join(temp.mkdirSync("legacy-jsx-text"), "compiled.js");
+
+      fs.writeFileSync(compiledPath, compiled);
+      const element = require(compiledPath);
+
+      expect(element[2]).toBe("Menu > Settings } Advanced");
+    });
+
+    it("does not hide unrelated parse errors", function () {
+      expect(() => Babel.compile("/** @babel */\nconst value = ;", "invalid.js")).toThrow();
+    });
+  });
 
   describe("when a .js file contains a legacy decorator", () =>
     it("transpiles the decorator before class properties", function () {

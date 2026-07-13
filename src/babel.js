@@ -56,15 +56,51 @@ exports.compile = function (sourceCode, filePath) {
       babel = require("@babel/core");
     }
 
-    return babel.transformSync(sourceCode, {
-      filename: filePath,
-      configFile,
-    }).code;
+    return transformWithLegacyJSXText(sourceCode, filePath);
   } finally {
     process.stdout.write = stdoutWrite;
     process.stderr.write = stderrWrite;
   }
 };
+
+function transformWithLegacyJSXText(sourceCode, filePath) {
+  let compatibleSourceCode = sourceCode;
+
+  while (true) {
+    try {
+      return babel.transformSync(compatibleSourceCode, {
+        filename: filePath,
+        configFile,
+      }).code;
+    } catch (error) {
+      const escapedSourceCode = escapeLegacyJSXTextCharacter(compatibleSourceCode, error);
+
+      if (escapedSourceCode == null) throw error;
+      compatibleSourceCode = escapedSourceCode;
+    }
+  }
+}
+
+function escapeLegacyJSXTextCharacter(sourceCode, error) {
+  if (
+    error.code !== "BABEL_PARSE_ERROR" ||
+    error.reasonCode !== "UnexpectedToken" ||
+    error.syntaxPlugin !== "jsx" ||
+    !Number.isInteger(error.pos)
+  ) {
+    return null;
+  }
+
+  const character = sourceCode[error.pos];
+  const suggestion = character === ">" ? "&gt;" : character === "}" ? "&rbrace;" : null;
+  if (suggestion == null) return null;
+
+  const expectedMessage = `Unexpected token \`${character}\`. Did you mean \`${suggestion}\``;
+  if (!error.message.includes(expectedMessage)) return null;
+
+  const replacement = character === "}" ? "&#125;" : suggestion;
+  return sourceCode.slice(0, error.pos) + replacement + sourceCode.slice(error.pos + 1);
+}
 
 function createVersionAndOptionsDigest(version, options) {
   return crypto
