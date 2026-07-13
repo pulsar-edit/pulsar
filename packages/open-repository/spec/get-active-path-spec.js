@@ -12,7 +12,7 @@ const img1 = path.resolve(__dirname, "./fixtures/project/img1.png");
 // interacting with the workspace) never lets the spec's `done` fire under the
 // Jasmine 6 runner in this Electron build — every spec times out at 5000ms even
 // though the hook and spec bodies run to completion, and the hang also poisons
-// the sibling `github-file-spec` when both run together. Pre-existing and
+// the sibling `repository-file-spec` when both run together. Pre-existing and
 // unrelated to grammar work; re-enable once the runner's async hook handling is
 // sorted out. See task to fix the runner/async interaction.
 xdescribe("getActivePath", function () {

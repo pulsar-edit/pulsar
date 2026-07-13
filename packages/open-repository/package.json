@@ -1,0 +1,38 @@
+{
+  "name": "open-repository",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "main": "./lib/main",
+  "description": "View the active file and repository on its Git host's website",
+  "repository": "https://github.com/lumine-code/lumine",
+  "license": "MIT",
+  "activationCommands": {
+    "atom-pane": [
+      "open-repository:blame",
+      "open-repository:branch-compare",
+      "open-repository:copy-url",
+      "open-repository:file",
+      "open-repository:file-on-master",
+      "open-repository:history",
+      "open-repository:issues",
+      "open-repository:pull-requests",
+      "open-repository:repository"
+    ]
+  },
+  "engines": {
+    "atom": "*"
+  },
+  "devDependencies": {
+    "fs-plus": "^3.0.1",
+    "temp": "^0.9.0"
+  },
+  "configSchema": {
+    "includeLineNumbersInUrls": {
+      "order": 1,
+      "title": "Include Line Numbers In URLs",
+      "description": "Include the line range selected in the editor when opening or copying URLs to the clipboard. When opened in the browser, the host's page will automatically scroll to the selected line range.",
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

@@ -1,0 +1,9 @@
+'atom-workspace':
+  'alt-g o': 'open-repository:file'
+  'alt-g b': 'open-repository:blame'
+  'alt-g h': 'open-repository:history'
+  'alt-g i': 'open-repository:issues'
+  'alt-g p': 'open-repository:pull-requests'
+  'alt-g c': 'open-repository:copy-url'
+  'alt-g r': 'open-repository:branch-compare'
+  'alt-g g': 'open-repository:repository'

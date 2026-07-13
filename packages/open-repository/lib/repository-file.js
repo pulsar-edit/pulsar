@@ -1,33 +1,106 @@
 /** @babel */
 
 import { Range } from "atom";
-import { parse as parseURL } from "url";
 import path from "path";
 
-export default class GitHubFile {
+// Web-URL schemes for the supported hosting providers. Each entry maps a
+// repository web URL (`base`), a git ref and a repo-relative path to the routes
+// that provider exposes. Only the standard "repository" hosts live here; the
+// GitHub-only wiki and gist layouts are handled directly on the class because
+// their URLs are shaped too differently to share this interface.
+const PROVIDERS = {
+  github: {
+    label: "GitHub",
+    blobURL: (base, ref, filePath) => `${base}/blob/${ref}/${filePath}`,
+    blameURL: (base, ref, filePath) => `${base}/blame/${ref}/${filePath}`,
+    historyURL: (base, ref, filePath) => `${base}/commits/${ref}/${filePath}`,
+    issuesURL: (base) => `${base}/issues`,
+    pullRequestsURL: (base) => `${base}/pulls`,
+    branchCompareURL: (base, branch) => `${base}/compare/${branch}`,
+    lineRange: (startRow, endRow) =>
+      startRow === endRow ? `#L${startRow}` : `#L${startRow}-L${endRow}`,
+  },
+  gitlab: {
+    label: "GitLab",
+    blobURL: (base, ref, filePath) => `${base}/-/blob/${ref}/${filePath}`,
+    blameURL: (base, ref, filePath) => `${base}/-/blame/${ref}/${filePath}`,
+    historyURL: (base, ref, filePath) => `${base}/-/commits/${ref}/${filePath}`,
+    issuesURL: (base) => `${base}/-/issues`,
+    pullRequestsURL: (base) => `${base}/-/merge_requests`,
+    // GitLab has no single-ref compare page; its analog of GitHub's "compare"
+    // (which prompts to open a PR) is the "new merge request" form.
+    branchCompareURL: (base, branch) =>
+      `${base}/-/merge_requests/new?merge_request[source_branch]=${branch}`,
+    lineRange: (startRow, endRow) =>
+      startRow === endRow ? `#L${startRow}` : `#L${startRow}-${endRow}`,
+  },
+  bitbucket: {
+    label: "Bitbucket",
+    blobURL: (base, ref, filePath) => `${base}/src/${ref}/${filePath}`,
+    blameURL: (base, ref, filePath) => `${base}/annotate/${ref}/${filePath}`,
+    historyURL: (base, ref, filePath) => `${base}/history-node/${ref}/${filePath}`,
+    issuesURL: (base) => `${base}/issues`,
+    pullRequestsURL: (base) => `${base}/pull-requests`,
+    branchCompareURL: (base, branch) => `${base}/pull-requests/new?source=${branch}`,
+    lineRange: (startRow, endRow) =>
+      startRow === endRow ? `#lines-${startRow}` : `#lines-${startRow}:${endRow}`,
+  },
+};
+
+export default class RepositoryFile {
   // Public
   static fromPath(filePath) {
-    return new GitHubFile(filePath);
+    return new RepositoryFile(filePath);
   }
 
   constructor(filePath) {
     this.filePath = filePath;
+    this.type = "none";
     const [rootDir] = atom.project.relativizePath(this.filePath);
 
     if (rootDir != null) {
       const rootDirIndex = atom.project.getPaths().indexOf(rootDir);
       this.repo = atom.project.getRepositories()[rootDirIndex];
-      this.type = "none";
       if (this.repo && this.gitURL()) {
-        if (this.isGitHubWikiURL(this.githubRepoURL())) {
+        const webURL = this.repoWebURL();
+        if (this.isWikiURL(webURL)) {
           this.type = "wiki";
-        } else if (this.isGistURL(this.githubRepoURL())) {
+        } else if (this.isGistURL(webURL)) {
           this.type = "gist";
         } else {
           this.type = "repo";
+          this.providerKey = this.detectProvider(webURL);
         }
       }
     }
+  }
+
+  // Internal: the URL scheme for the detected host. Only meaningful when
+  // `this.type === "repo"`.
+  get provider() {
+    return PROVIDERS[this.providerKey];
+  }
+
+  // Internal: choose the hosting provider for a plain repository URL. An explicit
+  // `git config atom.open-repository.provider` wins (useful for self-hosted
+  // instances); otherwise we guess from the host and default to GitHub, which
+  // also covers GitHub Enterprise and unknown hosts.
+  detectProvider(webURL) {
+    const configured = this.repo
+      .getConfigValue("atom.open-repository.provider", this.filePath)
+      ?.toLowerCase();
+    if (configured && PROVIDERS[configured]) {
+      return configured;
+    }
+
+    const host = this.hostOf(webURL).toLowerCase();
+    if (host === "gitlab.com" || host.startsWith("gitlab.")) {
+      return "gitlab";
+    }
+    if (host === "bitbucket.org") {
+      return "bitbucket";
+    }
+    return "github";
   }
 
   // Public
@@ -99,36 +172,27 @@ export default class GitHubFile {
 
   openRepository() {
     if (this.validateRepo()) {
-      this.openURLInBrowser(this.githubRepoURL());
+      this.openURLInBrowser(this.repoWebURL());
     }
   }
 
   getLineRangeSuffix(lineRange) {
-    if (
-      lineRange &&
-      this.type !== "wiki" &&
-      atom.config.get("open-on-github.includeLineNumbersInUrls")
-    ) {
-      lineRange = Range.fromObject(lineRange);
-      const startRow = lineRange.start.row + 1;
-      const endRow = lineRange.end.row + 1;
-
-      if (startRow === endRow) {
-        if (this.type === "gist") {
-          return `-L${startRow}`;
-        } else {
-          return `#L${startRow}`;
-        }
-      } else {
-        if (this.type === "gist") {
-          return `-L${startRow}-L${endRow}`;
-        } else {
-          return `#L${startRow}-L${endRow}`;
-        }
-      }
-    } else {
+    if (!lineRange || this.type === "wiki") {
       return "";
     }
+    if (!atom.config.get("open-repository.includeLineNumbersInUrls")) {
+      return "";
+    }
+
+    const range = Range.fromObject(lineRange);
+    const startRow = range.start.row + 1;
+    const endRow = range.end.row + 1;
+
+    if (this.type === "gist") {
+      return startRow === endRow ? `-L${startRow}` : `-L${startRow}-L${endRow}`;
+    }
+
+    return this.provider.lineRange(startRow, endRow);
   }
 
   // Internal
@@ -138,9 +202,6 @@ export default class GitHubFile {
       return false;
     } else if (!this.gitURL()) {
       atom.notifications.addWarning(`No URL defined for remote: ${this.remoteName()}`);
-      return false;
-    } else if (!this.githubRepoURL()) {
-      atom.notifications.addWarning(`Remote URL is not hosted on GitHub: ${this.gitURL()}`);
       return false;
     }
     return true;
@@ -153,24 +214,30 @@ export default class GitHubFile {
 
   // Internal
   blobURL() {
-    const gitHubRepoURL = this.githubRepoURL();
+    const base = this.repoWebURL();
     const repoRelativePath = this.repoRelativePath();
 
     if (this.type === "wiki") {
-      return `${gitHubRepoURL}/${this.extractFileName(repoRelativePath)}`;
+      return `${base}/${this.extractFileName(repoRelativePath)}`;
     } else if (this.type === "gist") {
-      return `${gitHubRepoURL}#file-${this.encodeSegments(repoRelativePath.replace(/\./g, "-"))}`;
+      return `${base}#file-${this.encodeSegments(repoRelativePath.replace(/\./g, "-"))}`;
     } else {
-      return `${gitHubRepoURL}/blob/${this.remoteBranchName()}/${this.encodeSegments(repoRelativePath)}`;
+      return this.provider.blobURL(
+        base,
+        this.remoteBranchName(),
+        this.encodeSegments(repoRelativePath),
+      );
     }
   }
 
   // Internal
   blobURLForMaster() {
-    const gitHubRepoURL = this.githubRepoURL();
-
     if (this.type === "repo") {
-      return `${gitHubRepoURL}/blob/master/${this.encodeSegments(this.repoRelativePath())}`;
+      return this.provider.blobURL(
+        this.repoWebURL(),
+        "master",
+        this.encodeSegments(this.repoRelativePath()),
+      );
     } else {
       return this.blobURL(); // Only repos have branches
     }
@@ -178,50 +245,61 @@ export default class GitHubFile {
 
   // Internal
   shaURL() {
-    const gitHubRepoURL = this.githubRepoURL();
+    const base = this.repoWebURL();
     const encodedSHA = this.encodeSegments(this.sha());
     const repoRelativePath = this.repoRelativePath();
 
     if (this.type === "wiki") {
-      return `${gitHubRepoURL}/${this.extractFileName(repoRelativePath)}/${encodedSHA}`;
+      return `${base}/${this.extractFileName(repoRelativePath)}/${encodedSHA}`;
     } else if (this.type === "gist") {
-      return `${gitHubRepoURL}/${encodedSHA}#file-${this.encodeSegments(repoRelativePath.replace(/\./g, "-"))}`;
+      return `${base}/${encodedSHA}#file-${this.encodeSegments(repoRelativePath.replace(/\./g, "-"))}`;
     } else {
-      return `${gitHubRepoURL}/blob/${encodedSHA}/${this.encodeSegments(repoRelativePath)}`;
+      return this.provider.blobURL(base, encodedSHA, this.encodeSegments(repoRelativePath));
     }
   }
 
   // Internal
   blameURL() {
-    return `${this.githubRepoURL()}/blame/${this.remoteBranchName()}/${this.encodeSegments(this.repoRelativePath())}`;
+    return this.provider.blameURL(
+      this.repoWebURL(),
+      this.remoteBranchName(),
+      this.encodeSegments(this.repoRelativePath()),
+    );
   }
 
   // Internal
   historyURL() {
-    const gitHubRepoURL = this.githubRepoURL();
+    const base = this.repoWebURL();
 
     if (this.type === "wiki") {
-      return `${gitHubRepoURL}/${this.extractFileName(this.repoRelativePath())}/_history`;
+      return `${base}/${this.extractFileName(this.repoRelativePath())}/_history`;
     } else if (this.type === "gist") {
-      return `${gitHubRepoURL}/revisions`;
+      return `${base}/revisions`;
     } else {
-      return `${gitHubRepoURL}/commits/${this.remoteBranchName()}/${this.encodeSegments(this.repoRelativePath())}`;
+      return this.provider.historyURL(
+        base,
+        this.remoteBranchName(),
+        this.encodeSegments(this.repoRelativePath()),
+      );
     }
   }
 
   // Internal
   issuesURL() {
-    return `${this.githubRepoURL()}/issues`;
+    return this.provider.issuesURL(this.repoWebURL());
   }
 
   // Internal
   pullRequestsURL() {
-    return `${this.githubRepoURL()}/pulls`;
+    return this.provider.pullRequestsURL(this.repoWebURL());
   }
 
   // Internal
   branchCompareURL() {
-    return `${this.githubRepoURL()}/compare/${this.encodeSegments(this.branchName())}`;
+    return this.provider.branchCompareURL(
+      this.repoWebURL(),
+      this.encodeSegments(this.branchName()),
+    );
   }
 
   encodeSegments(segments = "") {
@@ -246,8 +324,9 @@ export default class GitHubFile {
     }
   }
 
-  // Internal
-  githubRepoURL() {
+  // Internal: normalize the git remote URL to a browsable `https://host/owner/repo`
+  // web URL, regardless of the protocol the remote uses.
+  repoWebURL() {
     let url = this.gitURL();
 
     if (url.match(/git@[^:]+:/)) {
@@ -272,37 +351,24 @@ export default class GitHubFile {
     // Change .wiki to /wiki
     url = url.replace(/\.wiki$/, "/wiki");
 
-    if (!this.isBitbucketURL(url)) {
-      return url;
-    }
+    return url;
   }
 
-  isGistURL(url) {
+  isGistURL(url = this.repoWebURL()) {
+    return this.hostOf(url) === "gist.github.com";
+  }
+
+  // Internal: the host of a URL, or "" when it cannot be parsed.
+  hostOf(url) {
     try {
-      const { host } = parseURL(url);
-
-      return host === "gist.github.com";
-    } catch (error) {
-      return false;
+      return new URL(url).host;
+    } catch {
+      return "";
     }
   }
 
-  isGitHubWikiURL(url) {
+  isWikiURL(url) {
     return /\/wiki$/.test(url);
-  }
-
-  isBitbucketURL(url) {
-    if (url.startsWith("git@bitbucket.org")) {
-      return true;
-    }
-
-    try {
-      const { host } = parseURL(url);
-
-      return host === "bitbucket.org";
-    } catch (error) {
-      return false;
-    }
   }
 
   // Internal
@@ -312,7 +378,7 @@ export default class GitHubFile {
 
   // Internal
   remoteName() {
-    const gitConfigRemote = this.repo.getConfigValue("atom.open-on-github.remote", this.filePath);
+    const gitConfigRemote = this.repo.getConfigValue("atom.open-repository.remote", this.filePath);
 
     if (gitConfigRemote) {
       return gitConfigRemote;
@@ -360,7 +426,7 @@ export default class GitHubFile {
 
   // Internal
   remoteBranchName() {
-    const gitConfigBranch = this.repo.getConfigValue("atom.open-on-github.branch", this.filePath);
+    const gitConfigBranch = this.repo.getConfigValue("atom.open-repository.branch", this.filePath);
 
     if (gitConfigBranch) {
       return gitConfigBranch;

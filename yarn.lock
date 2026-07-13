@@ -5261,7 +5261,7 @@ onetime@^5.1.2:
 "open-external@file:packages/open-external":
   version "2.2.0"
 
-"open-on-github@file:packages/open-on-github":
+"open-repository@file:packages/open-repository":
   version "1.0.0"
 
 open@^7.4.2:
