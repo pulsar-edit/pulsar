@@ -12,10 +12,11 @@ const {
   resolvePackageSource,
 } = require("../../../src/package-source"); // eslint-disable-line n/no-unpublished-require
 
-const Client = require("./atom-io-client");
-const CommunityPackageCatalogClient = require("./community-package-catalog-client");
-const PulsarPackageClient = require("./pulsar-package-client");
 const { packageOrigin, repoReferenceFromRepository } = require("./utils");
+
+// The HTTP clients pull in `request` (~120ms to require), which dominates
+// package activation. They are only needed when the user opens the Install or
+// Updates tabs, so require them lazily inside their getters instead of eagerly.
 
 module.exports = class PackageManager {
   constructor() {
@@ -33,19 +34,21 @@ module.exports = class PackageManager {
   }
 
   getClient() {
-    return this.client != null ? this.client : (this.client = new Client(this));
+    if (this.client != null) return this.client;
+    const Client = require("./atom-io-client");
+    return (this.client = new Client(this));
   }
 
   getCatalogClient() {
-    return this.catalogClient != null
-      ? this.catalogClient
-      : (this.catalogClient = new CommunityPackageCatalogClient());
+    if (this.catalogClient != null) return this.catalogClient;
+    const CommunityPackageCatalogClient = require("./community-package-catalog-client");
+    return (this.catalogClient = new CommunityPackageCatalogClient());
   }
 
   getPulsarClient() {
-    return this.pulsarClient != null
-      ? this.pulsarClient
-      : (this.pulsarClient = new PulsarPackageClient());
+    if (this.pulsarClient != null) return this.pulsarClient;
+    const PulsarPackageClient = require("./pulsar-package-client");
+    return (this.pulsarClient = new PulsarPackageClient());
   }
 
   isPackageInstalled(packageName) {
