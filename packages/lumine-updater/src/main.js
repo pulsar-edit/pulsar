@@ -1,4 +1,4 @@
-const { CompositeDisposable } = require("atom");
+const { CompositeDisposable, Disposable } = require("atom");
 
 let findInstallMethod;
 let findNewestRelease;
@@ -23,7 +23,18 @@ class LumineUpdater {
     );
 
     if (atom.config.get("lumine-updater.checkForUpdatesOnLaunch")) {
-      this.checkForUpdates().catch((error) => console.warn("Lumine update check failed:", error));
+      // An update check isn't urgent, and it pulls in a heavy HTTP client
+      // (superagent, ~75ms to require). Defer it off the activation path so it
+      // runs once the window is idle instead of blocking startup.
+      const handle = window.requestIdleCallback(
+        () => {
+          this.checkForUpdates().catch((error) =>
+            console.warn("Lumine update check failed:", error),
+          );
+        },
+        { timeout: 5000 },
+      );
+      this.disposables.add(new Disposable(() => window.cancelIdleCallback(handle)));
     }
   }
 
