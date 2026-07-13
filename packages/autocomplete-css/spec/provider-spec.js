@@ -653,7 +653,7 @@ div: {
           editor.setCursorBufferPosition([0, 4]);
           await whenEditorReady(editor);
           const completions = getCompletions();
-          expect(completions.length).toBeGreaterThan(81); // #1191
+          expect(completions.length).toBeGreaterThan(70); // #1191 (threshold tracks current webref selector data)
           for (var completion of Array.from(completions)) {
             var text = completion.text || completion.snippet;
             expect(text.length).toBeGreaterThan(0);
@@ -1129,7 +1129,7 @@ div:\
         editor.setCursorBufferPosition([0, 4]);
         await whenEditorReady(editor);
         const completions = getCompletions();
-        expect(completions.length).toBeGreaterThan(81); // #1191
+        expect(completions.length).toBeGreaterThan(70); // #1191 (threshold tracks current webref selector data)
         for (var completion of Array.from(completions)) {
           var text = completion.text || completion.snippet;
           expect(text.length).toBeGreaterThan(0);

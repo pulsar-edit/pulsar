@@ -249,7 +249,17 @@ async function getDescriptionOfProp(name) {
   // While this seems strange, it's because some selectors are part of other
   // specs and may not be worth mentioning standalone.
   let file;
-  let filePath = ["css", "svg/attribute", "svg/element"]
+  // MDN reorganized its reference docs under `reference/` subfolders, so check
+  // the new locations first and fall back to the legacy flat layout.
+  let filePath = [
+    "css/reference/properties",
+    "css/reference/at-rules",
+    "css",
+    "svg/reference/attributes",
+    "svg/attribute",
+    "svg/reference/elements",
+    "svg/element",
+  ]
     .map((path) => `./content/files/en-us/web/${path}/${name}/index.md`)
     .find((f) => fs.existsSync(f));
 
@@ -468,6 +478,11 @@ function dedupPropValues(values) {
   return out;
 }
 
-downloadGitRepo("github:mdn/content", "./content", () => {
+if (fs.existsSync("./content")) {
+  // Reuse an already-downloaded copy of mdn/content instead of cloning it again.
   update(process.argv.slice(2));
-});
+} else {
+  downloadGitRepo("github:mdn/content", "./content", () => {
+    update(process.argv.slice(2));
+  });
+}

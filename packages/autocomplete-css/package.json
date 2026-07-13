@@ -16,6 +16,9 @@
       }
     }
   },
+  "scripts": {
+    "update": "node ./update/update.js"
+  },
   "devDependencies": {
     "@webref/css": "^6.18.1",
     "@webref/elements": "^2.4.0",
