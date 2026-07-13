@@ -1142,6 +1142,139 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@lumine-code/atom-keymap@https://github.com/lumine-code/atom-keymap.git#65c7c104ea79fbfd5f597ad6d53ede15a06e35b3":
+  version "10.0.0"
+  resolved "https://github.com/lumine-code/atom-keymap.git#65c7c104ea79fbfd5f597ad6d53ede15a06e35b3"
+  dependencies:
+    "@electron/rebuild" "^4.2.0"
+    "@lumine-code/keyboard-layout" "https://github.com/lumine-code/keyboard-layout.git#eafa20675d3124fb993d4a5ee959dfeb57cf04a5"
+    "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#2e957c8139cab478e0dc9ecbdb424f09ca80a53e"
+    clear-cut "^2"
+    event-kit "^2.5.3"
+    fs-plus "^3.0.0"
+    grim "^2.0.3"
+    season "^6.0.2"
+
+"@lumine-code/babel-preset@https://github.com/lumine-code/babel-preset-atomic.git#008b394856eb5e1924c86ddede3e3072b676fd4c":
+  version "6.0.0"
+  resolved "https://github.com/lumine-code/babel-preset-atomic.git#008b394856eb5e1924c86ddede3e3072b676fd4c"
+  dependencies:
+    "@babel/plugin-proposal-decorators" "^8.0.2"
+    "@babel/plugin-transform-class-properties" "^8.0.1"
+    "@babel/plugin-transform-export-namespace-from" "^8.0.1"
+    "@babel/plugin-transform-json-strings" "^8.0.1"
+    "@babel/plugin-transform-logical-assignment-operators" "^8.0.1"
+    "@babel/plugin-transform-modules-commonjs" "^8.0.1"
+    "@babel/plugin-transform-nullish-coalescing-operator" "^8.0.1"
+    "@babel/plugin-transform-numeric-separator" "^8.0.1"
+    "@babel/plugin-transform-optional-chaining" "^8.0.1"
+    "@babel/plugin-transform-private-methods" "^8.0.1"
+    "@babel/plugin-transform-private-property-in-object" "^8.0.1"
+    "@babel/plugin-transform-reserved-words" "^8.0.1"
+    "@babel/preset-env" "^8.0.2"
+    "@babel/preset-flow" "^8.0.1"
+    "@babel/preset-react" "^8.0.1"
+    "@babel/preset-typescript" "^8.0.1"
+    babel-plugin-add-module-exports "^1.0.4"
+
+"@lumine-code/ctags@https://github.com/lumine-code/node-ctags.git#8f79b0a864031804125523312b4a660218bf01fa":
+  version "4.0.0"
+  resolved "https://github.com/lumine-code/node-ctags.git#8f79b0a864031804125523312b4a660218bf01fa"
+  dependencies:
+    node-addon-api "^8.5.0"
+
+"@lumine-code/fuzzy-native@https://github.com/lumine-code/fuzzy-native.git#8d48f36ef66036ebfaa9707b5f09ae8177d1de88":
+  version "2.0.0"
+  resolved "https://github.com/lumine-code/fuzzy-native.git#8d48f36ef66036ebfaa9707b5f09ae8177d1de88"
+  dependencies:
+    node-addon-api "^8.8.0"
+
+"@lumine-code/git-utils@https://github.com/lumine-code/git-utils.git#a37861c2c6b09c2980e116d30e191416e630d391":
+  version "9.0.0"
+  resolved "https://github.com/lumine-code/git-utils.git#a37861c2c6b09c2980e116d30e191416e630d391"
+  dependencies:
+    fs-plus "^3.0.0"
+    node-addon-api "^8.2.1"
+
+"@lumine-code/keyboard-layout@https://github.com/lumine-code/keyboard-layout.git#eafa20675d3124fb993d4a5ee959dfeb57cf04a5":
+  version "4.0.0"
+  resolved "https://github.com/lumine-code/keyboard-layout.git#eafa20675d3124fb993d4a5ee959dfeb57cf04a5"
+  dependencies:
+    event-kit "^2.0.0"
+    node-addon-api "^7.1.1"
+
+"@lumine-code/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#2e957c8139cab478e0dc9ecbdb424f09ca80a53e":
+  version "10.0.0"
+  resolved "https://github.com/lumine-code/node-pathwatcher.git#2e957c8139cab478e0dc9ecbdb424f09ca80a53e"
+  dependencies:
+    async "~0.2.10"
+    event-kit "^2.1.0"
+    fs-plus "^3.0.0"
+    grim "^2.0.1"
+    iconv-lite "~0.4.4"
+    underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
+
+"@lumine-code/scandal@https://github.com/lumine-code/scandal.git#8b2fcb6e0a2f2470cc4b11af49d7a9d3ab450868":
+  version "5.0.0"
+  resolved "https://github.com/lumine-code/scandal.git#8b2fcb6e0a2f2470cc4b11af49d7a9d3ab450868"
+  dependencies:
+    "@lumine-code/git-utils" "https://github.com/lumine-code/git-utils.git#a37861c2c6b09c2980e116d30e191416e630d391"
+    argparse "^1.0.2"
+    isbinaryfile "^3.0.3"
+    minimatch "^2.0.9"
+    split "^1.0.0"
+    temp "^0.8.3"
+
+"@lumine-code/scoped-property-store@https://github.com/lumine-code/scoped-property-store.git#c801326f52bac9c19116ebc3c4fbfe84eae5ac89":
+  version "1.0.0"
+  resolved "https://github.com/lumine-code/scoped-property-store.git#c801326f52bac9c19116ebc3c4fbfe84eae5ac89"
+  dependencies:
+    atom-slick "^2"
+    event-kit "^2.5.3"
+    grim "^2.0.3"
+    key-path-helpers "^0.1.0"
+    underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
+
+"@lumine-code/second-mate@https://github.com/lumine-code/second-mate.git#98f3f7240c0856141ddf7fb1bb111b685b4b45c8":
+  version "9.0.0"
+  resolved "https://github.com/lumine-code/second-mate.git#98f3f7240c0856141ddf7fb1bb111b685b4b45c8"
+  dependencies:
+    event-kit "^2.5.3"
+    fs-plus "^3.0.0"
+    grim "^2.0.3"
+    season "^6.0.2"
+    underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
+    vscode-oniguruma "^1.7.0"
+
+"@lumine-code/service-hub@https://github.com/lumine-code/service-hub.git#b47f6d90c5e4e4ff8a4d3a6cbac3436386e69941":
+  version "1.0.0"
+  resolved "https://github.com/lumine-code/service-hub.git#b47f6d90c5e4e4ff8a4d3a6cbac3436386e69941"
+  dependencies:
+    event-kit "^2.5.2"
+    semver "^5.3.0"
+
+"@lumine-code/superstring@https://github.com/lumine-code/superstring.git#f1eea53826a54b5a246d262cdb5e43765d212332":
+  version "4.0.0"
+  resolved "https://github.com/lumine-code/superstring.git#f1eea53826a54b5a246d262cdb5e43765d212332"
+  dependencies:
+    node-addon-api "^8.5.0"
+
+"@lumine-code/text-buffer@https://github.com/lumine-code/text-buffer.git#03f960e7f1008a826d94f18224796f7ede119a1c":
+  version "16.0.0"
+  resolved "https://github.com/lumine-code/text-buffer.git#03f960e7f1008a826d94f18224796f7ede119a1c"
+  dependencies:
+    "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#2e957c8139cab478e0dc9ecbdb424f09ca80a53e"
+    "@lumine-code/superstring" "https://github.com/lumine-code/superstring.git#f1eea53826a54b5a246d262cdb5e43765d212332"
+    delegato "^1.0.0"
+    diff "^2.2.1"
+    event-kit "^2.4.0"
+    fs-admin "^0.19.0"
+    fs-plus "^3.0.0"
+    grim "^2.0.2"
+    mkdirp "^0.5.1"
+    underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
+    winattr "^3.0.0"
+
 "@malept/cross-spawn-promise@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@malept/cross-spawn-promise/-/cross-spawn-promise-2.0.0.tgz#d0772de1aa680a0bfb9ba2f32b4c828c7857cb9d"
@@ -1330,45 +1463,12 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@pulsar-edit/atom-keymap@https://github.com/lumine-code/atom-keymap.git#7e3b341177f059974049ac0c2f95d4f3f441f743":
-  version "9.1.0"
-  resolved "https://github.com/lumine-code/atom-keymap.git#7e3b341177f059974049ac0c2f95d4f3f441f743"
-  dependencies:
-    "@electron/rebuild" "^4.2.0"
-    "@pulsar-edit/keyboard-layout" "https://github.com/lumine-code/keyboard-layout.git#862dfbaa62ec7d70e560fdfe975b8660febae70f"
-    "@pulsar-edit/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#74455395539148bf35a19212c8f1af65366358f9"
-    clear-cut "^2"
-    event-kit "^2.5.3"
-    fs-plus "^3.0.0"
-    grim "^2.0.3"
-    season "^6.0.2"
-
-"@pulsar-edit/fuzzy-native@https://github.com/lumine-code/fuzzy-native.git#5f60efb":
-  version "1.4.0"
-  resolved "https://github.com/lumine-code/fuzzy-native.git#5f60efbb977a5e0077038526f6b21db746219018"
-  dependencies:
-    node-addon-api "^8.8.0"
-
 "@pulsar-edit/get-scrollbar-style@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@pulsar-edit/get-scrollbar-style/-/get-scrollbar-style-1.0.1.tgz#00a45b768ec3451c57e194538e96ad30f26b28e8"
   integrity sha512-1DMvPe0iOUleVh+Kcd5gx+A7UiHemYgJ/2GCPiVH2PGWBlPdjYsbl0RHW77CEEhzVENXEUYta7F6DXCWiz8fUA==
   dependencies:
     node-addon-api "^6.1.0"
-
-"@pulsar-edit/git-utils@https://github.com/lumine-code/git-utils.git#43489980cb6b42e46956b1a77985709cf5fb4bfe":
-  version "8.1.0"
-  resolved "https://github.com/lumine-code/git-utils.git#43489980cb6b42e46956b1a77985709cf5fb4bfe"
-  dependencies:
-    fs-plus "^3.0.0"
-    node-addon-api "^8.2.1"
-
-"@pulsar-edit/keyboard-layout@https://github.com/lumine-code/keyboard-layout.git#862dfbaa62ec7d70e560fdfe975b8660febae70f":
-  version "3.0.5"
-  resolved "https://github.com/lumine-code/keyboard-layout.git#862dfbaa62ec7d70e560fdfe975b8660febae70f"
-  dependencies:
-    event-kit "^2.0.0"
-    node-addon-api "^7.1.1"
 
 "@pulsar-edit/ls-archive@^2.0.0":
   version "2.0.0"
@@ -1381,50 +1481,6 @@
     tar "^7.5.9"
     unbzip2-stream "^1.4.3"
     yauzl "^3.2.0"
-
-"@pulsar-edit/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#74455395539148bf35a19212c8f1af65366358f9":
-  version "9.0.4"
-  resolved "https://github.com/lumine-code/node-pathwatcher.git#74455395539148bf35a19212c8f1af65366358f9"
-  dependencies:
-    async "~0.2.10"
-    event-kit "^2.1.0"
-    fs-plus "^3.0.0"
-    grim "^2.0.1"
-    iconv-lite "~0.4.4"
-    underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
-
-"@pulsar-edit/scandal@https://github.com/lumine-code/scandal.git#951e504d07d22184200c0cac19da1f7a979c1e7d":
-  version "4.0.0"
-  resolved "https://github.com/lumine-code/scandal.git#951e504d07d22184200c0cac19da1f7a979c1e7d"
-  dependencies:
-    "@pulsar-edit/git-utils" "https://github.com/lumine-code/git-utils.git#43489980cb6b42e46956b1a77985709cf5fb4bfe"
-    argparse "^1.0.2"
-    isbinaryfile "^3.0.3"
-    minimatch "^2.0.9"
-    split "^1.0.0"
-    temp "^0.8.3"
-
-"@pulsar-edit/superstring@https://github.com/lumine-code/superstring.git#24d41fc832e04c939a0d55feaef246e1b7e80083":
-  version "3.0.5"
-  resolved "https://github.com/lumine-code/superstring.git#24d41fc832e04c939a0d55feaef246e1b7e80083"
-  dependencies:
-    node-addon-api "^8.5.0"
-
-"@pulsar-edit/text-buffer@https://github.com/lumine-code/text-buffer.git#0aa5085ba58a3bc1336150c712ad641e96413ca4":
-  version "15.0.0"
-  resolved "https://github.com/lumine-code/text-buffer.git#0aa5085ba58a3bc1336150c712ad641e96413ca4"
-  dependencies:
-    "@pulsar-edit/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#74455395539148bf35a19212c8f1af65366358f9"
-    "@pulsar-edit/superstring" "https://github.com/lumine-code/superstring.git#24d41fc832e04c939a0d55feaef246e1b7e80083"
-    delegato "^1.0.0"
-    diff "^2.2.1"
-    event-kit "^2.4.0"
-    fs-admin "^0.19.0"
-    fs-plus "^3.0.0"
-    grim "^2.0.2"
-    mkdirp "^0.5.1"
-    underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
-    winattr "^3.0.0"
 
 "@sindresorhus/base62@^1.0.0":
   version "1.0.0"
@@ -1934,13 +1990,16 @@ atom-slick@^2, atom-slick@^2.0.0:
   resolved "https://registry.yarnpkg.com/atom-slick/-/atom-slick-2.0.0.tgz#ff0dbe15be2c4eda268b9d30d76e2517e0b7d3ca"
   integrity sha512-yKl/4ZHeP3v6gtncnX6pAPFNv3gQNNYlXMk1QYP5gYB6xq2xqkFXbpwQo3IixGUZMf+DHilAmHOrS21QKLLi9g==
 
-"autocomplete-lumine@file:packages/autocomplete-lumine":
-  version "1.0.0"
-
 "autocomplete-css@file:packages/autocomplete-css":
   version "1.0.0"
 
 "autocomplete-html@file:packages/autocomplete-html":
+  version "1.0.0"
+
+"autocomplete-lumine@file:packages/autocomplete-lumine":
+  version "1.0.0"
+
+"autocomplete-snippets@file:packages/autocomplete-snippets":
   version "1.0.0"
 
 "autocomplete@file:./packages/autocomplete":
@@ -1952,9 +2011,6 @@ atom-slick@^2, atom-slick@^2.0.0:
     selector-kit "^0.1.0"
     stable "^0.1.8"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
-
-"autocomplete-snippets@file:packages/autocomplete-snippets":
-  version "1.0.0"
 
 "autoflow@file:packages/autoflow":
   version "1.0.0"
@@ -1986,28 +2042,6 @@ babel-plugin-polyfill-corejs3@^1.0.0:
   dependencies:
     "@babel/helper-define-polyfill-provider" "^1.0.0"
     core-js-compat "^3.48.0"
-
-"babel-preset-atomic@https://github.com/lumine-code/babel-preset-atomic.git#925689569c9c74086ed49946d1e48b49a8c37dbe":
-  version "5.0.0"
-  resolved "https://github.com/lumine-code/babel-preset-atomic.git#925689569c9c74086ed49946d1e48b49a8c37dbe"
-  dependencies:
-    "@babel/plugin-proposal-decorators" "^8.0.2"
-    "@babel/plugin-transform-class-properties" "^8.0.1"
-    "@babel/plugin-transform-export-namespace-from" "^8.0.1"
-    "@babel/plugin-transform-json-strings" "^8.0.1"
-    "@babel/plugin-transform-logical-assignment-operators" "^8.0.1"
-    "@babel/plugin-transform-modules-commonjs" "^8.0.1"
-    "@babel/plugin-transform-nullish-coalescing-operator" "^8.0.1"
-    "@babel/plugin-transform-numeric-separator" "^8.0.1"
-    "@babel/plugin-transform-optional-chaining" "^8.0.1"
-    "@babel/plugin-transform-private-methods" "^8.0.1"
-    "@babel/plugin-transform-private-property-in-object" "^8.0.1"
-    "@babel/plugin-transform-reserved-words" "^8.0.1"
-    "@babel/preset-env" "^8.0.2"
-    "@babel/preset-flow" "^8.0.1"
-    "@babel/preset-react" "^8.0.1"
-    "@babel/preset-typescript" "^8.0.1"
-    babel-plugin-add-module-exports "^1.0.4"
 
 "background-tips@file:packages/background-tips":
   version "1.0.0"
@@ -2058,7 +2092,7 @@ bluebird@~3.7.2:
 "bookmarks@file:packages/bookmarks":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-2d87e7ef-201b-4b81-ae04-4af826c8ef21-1783901711010/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-ded6a052-476b-4a15-bb70-d6fca394b074-1783937700553/shared/select-list"
 
 boolbase@^1.0.0:
   version "1.0.0"
@@ -2109,6 +2143,7 @@ braces@^3.0.3:
 "bracket-matcher@file:packages/bracket-matcher":
   version "1.0.0"
   dependencies:
+    "@lumine-code/second-mate" "https://github.com/lumine-code/second-mate.git#98f3f7240c0856141ddf7fb1bb111b685b4b45c8"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
 
 browser-stdout@^1.3.1:
@@ -2476,7 +2511,7 @@ combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
 "command-palette@file:packages/command-palette":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-36a6dc75-6eca-4972-8476-0fedb2eac68e-1783901711019/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-5945d7eb-490d-4512-94ff-589218c4d677-1783937700561/shared/select-list"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
 
 commander@^10.0.0:
@@ -2594,12 +2629,6 @@ cssesc@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/cssesc/-/cssesc-3.0.0.tgz#37741919903b868565e1c09ea747445cd18983ee"
   integrity sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==
-
-"ctags@https://github.com/lumine-code/node-ctags.git#c1bcce005e9c4f4ed7cfaea0f0c1fa7fe70fd88c":
-  version "3.1.0"
-  resolved "https://github.com/lumine-code/node-ctags.git#c1bcce005e9c4f4ed7cfaea0f0c1fa7fe70fd88c"
-  dependencies:
-    node-addon-api "^8.5.0"
 
 "dalek@file:packages/dalek":
   version "1.0.0"
@@ -2954,7 +2983,7 @@ empathic@^2.0.1:
   dependencies:
     iconv-lite "^0.4.4"
     jschardet "^1.1.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-5b0f9f58-8a0f-4e39-98b9-b36292e17a75-1783901711027/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-8d09adac-d535-4c35-9bc0-6f2ccff58af6-1783937700569/shared/select-list"
 
 encoding-sniffer@^0.2.1:
   version "0.2.1"
@@ -3573,7 +3602,7 @@ function-bind@^1.1.2:
   version "1.0.0"
   dependencies:
     "@vscode/ripgrep" "1.18.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-56a3c838-64e7-4b25-a2ae-45c3a45582a8-1783901711033/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-8672864f-af32-4ccb-b834-9f83fa671707-1783937700573/shared/select-list"
 
 "fuzzy-files@file:packages/fuzzy-files":
   version "1.0.0"
@@ -3581,12 +3610,12 @@ function-bind@^1.1.2:
     "@vscode/ripgrep" "1.18.0"
     async "3.2.6"
     minimatch "^10.2.5"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-a2d9747c-d786-4904-8d3e-c1b9c9236442-1783901711035/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-32e0cc0f-3c98-47fb-bb9d-a62b70c19fd8-1783937700575/shared/select-list"
 
 "fuzzy-workspace@file:packages/fuzzy-workspace":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-8b101eea-a1e6-48a8-952f-3896e17ea39a-1783901711037/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-2527a3eb-9ee5-454b-aaa1-74ccedd3afac-1783937700577/shared/select-list"
 
 gauge@~2.7.3:
   version "2.7.4"
@@ -3683,7 +3712,7 @@ getpass@^0.1.1:
 "git-diff@file:packages/git-diff":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-2008873a-5df5-491b-ac73-db663433d73b-1783901711038/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-a68e4fe8-3977-40e5-a475-2169eff65339-1783937700578/shared/select-list"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -3823,7 +3852,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0,
 "grammar-selector@file:packages/grammar-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-b163f25c-0d26-4655-91ae-99f097fbf9e4-1783901711043/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-ef9411dc-a39b-473c-a0c0-214a01c3a931-1783937700582/shared/select-list"
 
 grim@2.0.3, grim@^2.0.1, grim@^2.0.2, grim@^2.0.3:
   version "2.0.3"
@@ -4573,7 +4602,7 @@ levn@^0.4.1:
 "line-ending-selector@file:packages/line-ending-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-76e14b77-9996-4252-b950-e1fc4bf1ad07-1783901711119/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-bb4535e1-5cf2-43cf-b1fd-f16c2ca574ed-1783937700650/shared/select-list"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
 
 line-top-index@0.3.1:
@@ -5586,7 +5615,7 @@ progress@^2.0.3:
   version "1.0.0"
   dependencies:
     glob "^13.0.6"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-9fe8c532-80e2-4cd4-b172-f4d98e19f4be-1783901711194/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-f63597de-5ec4-4498-91ad-c2ea8d7064d2-1783937700693/shared/select-list"
 
 promise-retry@^2.0.1:
   version "2.0.1"
@@ -5740,7 +5769,7 @@ readdirp@^4.0.1:
 "recent-list@file:packages/recent-list":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-3e687182-18fe-4c7b-84a0-ad74590fe631-1783901711197/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-9560548b-3479-44c0-af37-9ec40dd53c93-1783937700695/shared/select-list"
 
 regenerate-unicode-properties@^10.2.2:
   version "10.2.2"
@@ -5928,16 +5957,6 @@ sax@^1.2.4:
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.4.1.tgz#44cc8988377f126304d3b3fc1010c733b929ef0f"
   integrity sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==
 
-scoped-property-store@^0.17.0, "scoped-property-store@https://github.com/lumine-code/scoped-property-store.git#3ceced1":
-  version "0.17.0"
-  resolved "https://github.com/lumine-code/scoped-property-store.git#3ceced160507f38164e09d70b4b859abead716ae"
-  dependencies:
-    atom-slick "^2"
-    event-kit "^2.5.3"
-    grim "^2.0.3"
-    key-path-helpers "^0.1.0"
-    underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
-
 "search-panel@file:packages/search-panel":
   version "2.0.1"
   dependencies:
@@ -5951,17 +5970,6 @@ season@^6.0.2:
     cson-parser "^1.3.0"
     fs-plus "^3.0.0"
     yargs "^3.23.0"
-
-"second-mate@https://github.com/lumine-code/second-mate.git#aff2d38":
-  version "8.0.0"
-  resolved "https://github.com/lumine-code/second-mate.git#aff2d380f22ac530a6f61e19da381dba12fbc161"
-  dependencies:
-    event-kit "^2.5.3"
-    fs-plus "^3.0.0"
-    grim "^2.0.3"
-    season "^6.0.2"
-    underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
-    vscode-oniguruma "^1.7.0"
 
 "select-list@file:./shared/select-list", "select-list@file:shared/select-list":
   version "1.7.0"
@@ -6024,13 +6032,6 @@ serialize-javascript@^6.0.2:
   integrity sha512-Saa1xPByTTq2gdeFZYLLo+RFE35NHZkAbqZeWNd3BpzppeVisAqpDjcp8dyf6uIvEqJRd46jemmyA4iFIeVk8g==
   dependencies:
     randombytes "^2.1.0"
-
-"service-hub@https://github.com/lumine-code/service-hub.git#a48fc8e":
-  version "0.7.4"
-  resolved "https://github.com/lumine-code/service-hub.git#a48fc8eece6ffb17cc527863223649934f7d1ab2"
-  dependencies:
-    event-kit "^2.5.2"
-    semver "^5.3.0"
 
 set-blocking@~2.0.0:
   version "2.0.0"
@@ -6185,11 +6186,11 @@ slash@^2.0.0:
 "snippets@file:./packages/snippets":
   version "1.0.0"
   dependencies:
+    "@lumine-code/scoped-property-store" "https://github.com/lumine-code/scoped-property-store.git#c801326f52bac9c19116ebc3c4fbfe84eae5ac89"
     async "3.2.6"
     pegjs "^0.10.0"
-    scoped-property-store "^0.17.0"
     season "^6.0.2"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-03d735e6-bf94-4db6-845e-8399d1057c70-1783901711212/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-455f5023-c579-41ec-a8d2-eb90dfc6eb90-1783937700707/shared/select-list"
     temp "~0.8.0"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
 
@@ -6429,7 +6430,7 @@ strip-json-comments@~2.0.1:
   dependencies:
     dedent "^0.7.0"
     etch "0.9.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-68839fe5-f55d-483f-a50e-bc6a3df24075-1783901711217/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-6be06a2b-9d1a-4976-9d2c-9313b8014186-1783937700711/shared/select-list"
 
 sumchecker@^3.0.1:
   version "3.0.1"
@@ -6475,8 +6476,8 @@ supports-preserve-symlinks-flag@^1.0.0:
 "symbol-provider-ctags@file:./packages/symbol-provider-ctags":
   version "1.0.0"
   dependencies:
+    "@lumine-code/ctags" "https://github.com/lumine-code/node-ctags.git#8f79b0a864031804125523312b4a660218bf01fa"
     async "3.2.6"
-    ctags "https://github.com/lumine-code/node-ctags.git#c1bcce005e9c4f4ed7cfaea0f0c1fa7fe70fd88c"
     fs-plus "^3.1.1"
 
 "symbol-provider-tree-sitter@file:./packages/symbol-provider-tree-sitter":
@@ -6487,7 +6488,7 @@ supports-preserve-symlinks-flag@^1.0.0:
   dependencies:
     fs-plus "^3.1.1"
     murmurhash-js "^1.0.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-e24f2fe2-85a0-4556-9e48-87073fa389e9-1783901711222/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-97448d8e-7c18-4d3d-a85b-c139d5a943fc-1783937700716/shared/select-list"
 
 tabbable@^6.5.0:
   version "6.5.0"

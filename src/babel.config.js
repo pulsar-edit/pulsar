@@ -1,6 +1,6 @@
 let presets = [
   [
-    "babel-preset-atomic",
+    "@lumine-code/babel-preset",
     {
       // transform ES modules to commonjs
       keepModules: false,

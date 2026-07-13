@@ -1,4 +1,4 @@
-const fuzzyNative = require("@pulsar-edit/fuzzy-native");
+const fuzzyNative = require("@lumine-code/fuzzy-native");
 
 /*
   # Name: setCandidates
@@ -69,7 +69,7 @@ class Matcher {
     * `options` Key/map to customize the details of the search. All keys are
       optional, meaning they all have defaults
       * `algorithm` Either "fuzzaldrin" or "command-t". Defaults to "fuzzaldrin"
-        (the **opposite** of @pulsar-edit/fuzzy-native)
+        (the **opposite** of @lumine-code/fuzzy-native)
       * `maxResults` The number of results to return. Defaults to `Infinity`,
         meaning that it'll return _all results_ that did match. Note
         that this has no effect on filtering speed

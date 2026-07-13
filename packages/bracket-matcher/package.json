@@ -10,6 +10,7 @@
     "atom": "*"
   },
   "dependencies": {
+    "@lumine-code/second-mate": "https://github.com/lumine-code/second-mate.git#98f3f7240c0856141ddf7fb1bb111b685b4b45c8",
     "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   },
   "configSchema": {

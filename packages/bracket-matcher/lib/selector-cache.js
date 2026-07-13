@@ -1,4 +1,4 @@
-const { ScopeSelector } = require("second-mate");
+const { ScopeSelector } = require("@lumine-code/second-mate");
 const cache = {};
 
 exports.get = function (selector) {

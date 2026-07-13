@@ -1,4 +1,4 @@
-const KeymapManager = require("@pulsar-edit/atom-keymap");
+const KeymapManager = require("@lumine-code/atom-keymap");
 const WindowEventHandler = require("../src/window-event-handler");
 
 describe("WindowEventHandler", () => {

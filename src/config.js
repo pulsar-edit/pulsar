@@ -8,7 +8,7 @@ const {
   splitKeyPath,
 } = require("key-path-helpers");
 const Color = require("./color");
-const ScopedPropertyStore = require("scoped-property-store");
+const ScopedPropertyStore = require("@lumine-code/scoped-property-store");
 const ScopeDescriptor = require("./scope-descriptor");
 
 const schemaEnforcers = {};

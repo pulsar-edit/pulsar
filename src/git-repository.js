@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs-plus");
 const _ = require("underscore-plus");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
-const GitUtils = require("@pulsar-edit/git-utils");
+const GitUtils = require("@lumine-code/git-utils");
 
 let nextId = 0;
 

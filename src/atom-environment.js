@@ -40,14 +40,14 @@ const PaneAxis = require("./pane-axis");
 const Pane = require("./pane");
 const Dock = require("./dock");
 const TextEditor = require("./text-editor");
-const TextBuffer = require("@pulsar-edit/text-buffer");
+const TextBuffer = require("@lumine-code/text-buffer");
 const TextEditorRegistry = require("./text-editor-registry");
 const StartupTime = require("./startup-time");
 const { getReleaseChannel } = require("./get-app-details.js");
 const UI = require("./ui/index.js");
 const packagejson = require("../package.json");
 
-const { closeAllWatchers } = require("@pulsar-edit/pathwatcher");
+const { closeAllWatchers } = require("@lumine-code/pathwatcher");
 const stat = util.promisify(fs.stat);
 
 let nextId = 0;

@@ -1,7 +1,7 @@
 /* global emit */
 
 const async = require("async");
-const ctags = require("ctags");
+const ctags = require("@lumine-code/ctags");
 const getTagsFile = require("./get-tags-file");
 
 module.exports = function loadTags(directoryPaths) {

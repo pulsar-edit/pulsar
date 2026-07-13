@@ -4,7 +4,7 @@ const fs = require("fs-plus");
 const Grim = require("grim");
 const dedent = require("dedent");
 const { CompositeDisposable, Disposable, Emitter } = require("event-kit");
-const TextBuffer = require("@pulsar-edit/text-buffer");
+const TextBuffer = require("@lumine-code/text-buffer");
 const { Point, Range } = TextBuffer;
 const DecorationManager = require("./decoration-manager");
 const Cursor = require("./cursor");
@@ -13,7 +13,7 @@ const NullGrammar = require("./null-grammar");
 const TextMateLanguageMode = require("./text-mate-language-mode");
 const ScopeDescriptor = require("./scope-descriptor");
 
-const TextMateScopeSelector = require("second-mate").ScopeSelector;
+const TextMateScopeSelector = require("@lumine-code/second-mate").ScopeSelector;
 const GutterContainer = require("./gutter-container");
 let TextEditorComponent = null;
 let TextEditorElement = null;

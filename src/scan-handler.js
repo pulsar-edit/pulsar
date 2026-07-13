@@ -2,7 +2,7 @@
 const path = require("path");
 const async = require("async");
 
-const { PathSearcher, PathScanner, search } = require("@pulsar-edit/scandal");
+const { PathSearcher, PathScanner, search } = require("@lumine-code/scandal");
 
 module.exports = function (rootPaths, regexSource, options, searchOptions = {}) {
   const callback = this.async();

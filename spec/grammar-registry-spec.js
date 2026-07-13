@@ -2,10 +2,10 @@ const dedent = require("dedent");
 const path = require("path");
 const fs = require("fs-plus");
 const temp = require("temp").track();
-const TextBuffer = require("@pulsar-edit/text-buffer");
+const TextBuffer = require("@lumine-code/text-buffer");
 const GrammarRegistry = require("../src/grammar-registry");
 const WASMTreeSitterGrammar = require("../src/wasm-tree-sitter-grammar");
-const SecondMate = require("second-mate");
+const SecondMate = require("@lumine-code/second-mate");
 const { OnigScanner } = SecondMate;
 
 // Expects one of `textmate`, `node-tree-sitter`, or `wasm-tree-sitter`.

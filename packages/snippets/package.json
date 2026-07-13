@@ -13,7 +13,7 @@
     "async": "3.2.6",
     "select-list": "file:../../shared/select-list",
     "pegjs": "^0.10.0",
-    "scoped-property-store": "^0.17.0",
+    "@lumine-code/scoped-property-store": "https://github.com/lumine-code/scoped-property-store.git#c801326f52bac9c19116ebc3c4fbfe84eae5ac89",
     "season": "^6.0.2",
     "temp": "~0.8.0",
     "underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"

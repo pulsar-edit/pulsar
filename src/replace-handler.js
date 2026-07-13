@@ -1,5 +1,5 @@
 /* global emit */ // injected by Atom's task runner
-const { PathReplacer } = require("@pulsar-edit/scandal");
+const { PathReplacer } = require("@lumine-code/scandal");
 
 module.exports = function (filePaths, regexSource, regexFlags, replacementText) {
   const callback = this.async();

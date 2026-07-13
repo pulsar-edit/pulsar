@@ -6,7 +6,7 @@ const { Emitter } = require("event-kit");
 const fs = require("fs-plus");
 const CSON = require("season");
 
-const ServiceHub = require("service-hub");
+const ServiceHub = require("@lumine-code/service-hub");
 const Package = require("./package");
 const ThemePackage = require("./theme-package");
 const packageJSON = require("../package.json");

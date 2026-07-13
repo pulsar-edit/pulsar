@@ -4,7 +4,7 @@ const _ = require("underscore-plus");
 const async = require("async");
 const CSON = require("season");
 const fs = require("fs");
-const ScopedPropertyStore = require("scoped-property-store");
+const ScopedPropertyStore = require("@lumine-code/scoped-property-store");
 
 const Snippet = require("./snippet");
 const SnippetExpansion = require("./snippet-expansion");

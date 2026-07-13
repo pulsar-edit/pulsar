@@ -9,7 +9,7 @@ const { clipboard } = require("electron");
 const os = require("os");
 const Pane = require("../src/pane");
 const TextEditor = require("../src/text-editor");
-const TextBuffer = require("@pulsar-edit/text-buffer");
+const TextBuffer = require("@lumine-code/text-buffer");
 const TextMateLanguageMode = require("../src/text-mate-language-mode");
 const WASMTreeSitterLanguageMode = require("../src/wasm-tree-sitter-language-mode");
 

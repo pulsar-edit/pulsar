@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { Directory } = require("@pulsar-edit/pathwatcher");
+const { Directory } = require("@lumine-code/pathwatcher");
 const GitRepository = require("./git-repository");
 
 const GIT_FILE_REGEX = RegExp("^gitdir: (.+)");
@@ -100,7 +100,7 @@ async function findGitDirectory(directory) {
 function isValidGitDirectorySync(directory) {
   // To decide whether a directory has a valid .git folder, we use
   // the heuristic adopted by the valid_repository_path() function defined in
-  // node_modules/git-utils/deps/libgit2/src/repository.c.
+  // node_modules/@lumine-code/git-utils/deps/libgit2/src/repository.c.
   const commonDirFile = directory.getSubdirectory("commondir");
   let commonDir;
   if (commonDirFile.existsSync()) {
@@ -127,7 +127,7 @@ function isValidGitDirectorySync(directory) {
 async function isValidGitDirectory(directory) {
   // To decide whether a directory has a valid .git folder, we use
   // the heuristic adopted by the valid_repository_path() function defined in
-  // node_modules/git-utils/deps/libgit2/src/repository.c.
+  // node_modules/@lumine-code/git-utils/deps/libgit2/src/repository.c.
   const commonDirFile = directory.getSubdirectory("commondir");
   let commonDir;
   if (await commonDirFile.exists()) {
