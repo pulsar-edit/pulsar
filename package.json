@@ -146,7 +146,7 @@
     "natural-compare-lite": "^1.4.0",
     "normalize-package-data": "9.0.0",
     "notifications": "file:./packages/notifications",
-    "nsfw": "https://github.com/Axosoft/nsfw#b3308a9fcff0a0c4b0b17284e4fbaa1cab8ae8d",
+    "nsfw": "2.3.1",
     "one-theme": "file:packages/one-theme",
     "open-external": "file:packages/open-external",
     "open-repository": "file:packages/open-repository",

@@ -5197,9 +5197,10 @@ npmlog@^4.0.1:
     gauge "~2.7.3"
     set-blocking "~2.0.0"
 
-"nsfw@https://github.com/Axosoft/nsfw#b3308a9fcff0a0c4b0b17284e4fbaa1cab8ae8d":
-  version "2.2.5"
-  resolved "https://github.com/Axosoft/nsfw#b3308a9fcff0a0c4b0b17284e4fbaa1cab8ae8de"
+nsfw@2.3.1:
+  version "2.3.1"
+  resolved "https://registry.npmjs.org/nsfw/-/nsfw-2.3.1.tgz#5ffd32b184ee887437411833fe9af26959dd259f"
+  integrity sha512-017wsh/hyyFAeUhmo59N4c1aTRcJa3CFSSDfneYrcA43F5YmVvKnaQWE22nT409ojzsQosJa3dVcy+JKqO2C8A==
   dependencies:
     node-addon-api "*"
 
