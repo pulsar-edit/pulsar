@@ -216,9 +216,13 @@ function getElementDescription(element) {
 
   // First lets find the file, but when not initially found, we will continue
   // to search valid locations. Since MDN has content of valid tags seperated
-  // by essentially the spec they exist in.
+  // by essentially the spec they exist in. MDN reorganized its docs under
+  // `reference/elements/`, so check there first and fall back to the old layout.
   const filePath = ["html", "svg", "mathml"]
-    .map((path) => `./node_modules/content/files/en-us/web/${path}/element/${element}/index.md`)
+    .flatMap((path) => [
+      `./node_modules/content/files/en-us/web/${path}/reference/elements/${element}/index.md`,
+      `./node_modules/content/files/en-us/web/${path}/element/${element}/index.md`,
+    ])
     .find((f) => fs.existsSync(f));
 
   if (filePath) {
