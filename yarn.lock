@@ -1142,13 +1142,13 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@lumine-code/atom-keymap@https://github.com/lumine-code/atom-keymap.git#65c7c104ea79fbfd5f597ad6d53ede15a06e35b3":
+"@lumine-code/atom-keymap@https://github.com/lumine-code/atom-keymap.git#3e88b19cf449e44e078052e4cfe837a842b1a525":
   version "10.0.0"
-  resolved "https://github.com/lumine-code/atom-keymap.git#65c7c104ea79fbfd5f597ad6d53ede15a06e35b3"
+  resolved "https://github.com/lumine-code/atom-keymap.git#3e88b19cf449e44e078052e4cfe837a842b1a525"
   dependencies:
     "@electron/rebuild" "^4.2.0"
     "@lumine-code/keyboard-layout" "https://github.com/lumine-code/keyboard-layout.git#eafa20675d3124fb993d4a5ee959dfeb57cf04a5"
-    "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#2e957c8139cab478e0dc9ecbdb424f09ca80a53e"
+    "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#4f06786694a4c1fcedec309e1769efcea06ceb04"
     clear-cut "^2"
     event-kit "^2.5.3"
     fs-plus "^3.0.0"
@@ -1203,20 +1203,21 @@
     event-kit "^2.0.0"
     node-addon-api "^7.1.1"
 
-"@lumine-code/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#2e957c8139cab478e0dc9ecbdb424f09ca80a53e":
+"@lumine-code/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#4f06786694a4c1fcedec309e1769efcea06ceb04":
   version "10.0.0"
-  resolved "https://github.com/lumine-code/node-pathwatcher.git#2e957c8139cab478e0dc9ecbdb424f09ca80a53e"
+  resolved "https://github.com/lumine-code/node-pathwatcher.git#4f06786694a4c1fcedec309e1769efcea06ceb04"
   dependencies:
     async "~0.2.10"
     event-kit "^2.1.0"
     fs-plus "^3.0.0"
     grim "^2.0.1"
     iconv-lite "~0.4.4"
+    node-addon-api "^8.1.0"
     underscore-plus "npm:@pulsar-edit/underscore-plus@1.8.3"
 
-"@lumine-code/scandal@https://github.com/lumine-code/scandal.git#8b2fcb6e0a2f2470cc4b11af49d7a9d3ab450868":
+"@lumine-code/scandal@https://github.com/lumine-code/scandal.git#d2bfbd16c8c5e51552979261491a4e6f9150e460":
   version "5.0.0"
-  resolved "https://github.com/lumine-code/scandal.git#8b2fcb6e0a2f2470cc4b11af49d7a9d3ab450868"
+  resolved "https://github.com/lumine-code/scandal.git#d2bfbd16c8c5e51552979261491a4e6f9150e460"
   dependencies:
     "@lumine-code/git-utils" "https://github.com/lumine-code/git-utils.git#a37861c2c6b09c2980e116d30e191416e630d391"
     argparse "^1.0.2"
@@ -1253,19 +1254,18 @@
     event-kit "^2.5.2"
     semver "^5.3.0"
 
-"@lumine-code/superstring@https://github.com/lumine-code/superstring.git#f1eea53826a54b5a246d262cdb5e43765d212332":
+"@lumine-code/superstring@https://github.com/lumine-code/superstring.git#1e04592de92c3957e1dff8da3a09f2b9d8fe2987":
   version "4.0.0"
-  resolved "https://github.com/lumine-code/superstring.git#f1eea53826a54b5a246d262cdb5e43765d212332"
+  resolved "https://github.com/lumine-code/superstring.git#1e04592de92c3957e1dff8da3a09f2b9d8fe2987"
   dependencies:
-    node-addon-api "^8.5.0"
+    node-addon-api "^8.9.0"
 
-"@lumine-code/text-buffer@https://github.com/lumine-code/text-buffer.git#03f960e7f1008a826d94f18224796f7ede119a1c":
+"@lumine-code/text-buffer@https://github.com/lumine-code/text-buffer.git#47a4e051d7cbdafae639c5a4c97dc646b859aeb9":
   version "16.0.0"
-  resolved "https://github.com/lumine-code/text-buffer.git#03f960e7f1008a826d94f18224796f7ede119a1c"
+  resolved "https://github.com/lumine-code/text-buffer.git#47a4e051d7cbdafae639c5a4c97dc646b859aeb9"
   dependencies:
-    "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#2e957c8139cab478e0dc9ecbdb424f09ca80a53e"
-    "@lumine-code/superstring" "https://github.com/lumine-code/superstring.git#f1eea53826a54b5a246d262cdb5e43765d212332"
-    delegato "^1.0.0"
+    "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#4f06786694a4c1fcedec309e1769efcea06ceb04"
+    "@lumine-code/superstring" "https://github.com/lumine-code/superstring.git#1e04592de92c3957e1dff8da3a09f2b9d8fe2987"
     diff "^2.2.1"
     event-kit "^2.4.0"
     fs-admin "^0.19.0"
@@ -2730,13 +2730,6 @@ delegates@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
   integrity sha512-bd2L678uiWATM6m5Z1VzNCErI3jiGzt6HGY8OVICs40JQq/HALfbyNJmp0UDakEY4pMMaN0Ly5om/B1VI/+xfQ==
-
-delegato@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/delegato/-/delegato-1.0.0.tgz#c7324adbf31fa3d96d1fd60bf368c5fcca269510"
-  integrity sha512-r+J744mBk2gl4omoAl1xFoDJHDI2N7arkvgZI4F0mbZgqsN9HCfZtoMs3KnDevvU+erkSeBsNx13r33VIEH4FQ==
-  dependencies:
-    mixto "1.x"
 
 "deprecation-cop@file:packages/deprecation-cop":
   version "1.0.0"
@@ -4935,11 +4928,6 @@ minizlib@^3.1.0:
   dependencies:
     minipass "^7.1.2"
 
-mixto@1.x:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/mixto/-/mixto-1.0.0.tgz#c320ef61b52f2898f522e17d8bbc6d506d8425b6"
-  integrity sha512-g2Kg8O3ww9RbWuPnAgTsAhe+aBwVXoo/lhYyDKTYPiLKdJofAr97O8zTFzW5UfiJUoeJbmXLmcjDAF7/Egwi8Q==
-
 mkdirp-classic@^0.5.2, mkdirp-classic@^0.5.3:
   version "0.5.3"
   resolved "https://registry.yarnpkg.com/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz#fa10c9115cc6d8865be221ba47ee9bed78601113"
@@ -5130,7 +5118,7 @@ node-addon-api@^7.0.0, node-addon-api@^7.1.0, node-addon-api@^7.1.1:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-7.1.1.tgz#1aba6693b0f255258a049d621329329322aad558"
   integrity sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==
 
-node-addon-api@^8.2.1, node-addon-api@^8.8.0:
+node-addon-api@^8.1.0, node-addon-api@^8.2.1, node-addon-api@^8.8.0, node-addon-api@^8.9.0:
   version "8.9.0"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-8.9.0.tgz#d2467090e6195c428ccd510dfd604f01c027f0a0"
   integrity sha512-ekZMeaaIzSQTSpr7X2X3iJM7lTzgnx8ahAG9pJfT/7+14mlEM8ZYQ9cgCDvSSRbReFK0oHli3WrZdCiRsgAT9Q==
