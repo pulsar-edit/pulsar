@@ -47,6 +47,12 @@ describe("Babel transpiler support", function () {
       expect(element[1]).toEqual({ className: "settings-view" });
     }));
 
+  describe("when a .js file contains a legacy decorator", () =>
+    it("transpiles the decorator before class properties", function () {
+      const Display = require("./fixtures/babel/legacy-decorator.js");
+      expect(Display.observed).toBe(true);
+    }));
+
   describe("when a .js file starts with 'use babel';", () =>
     it("transpiles it using babel", function () {
       const transpiled = require("./fixtures/babel/babel-single-quotes.js");
