@@ -651,9 +651,12 @@ describe("Project", () => {
         const [repo1, repo2, repo3] = atom.project.getRepositories();
         expect(repo1).toBeNull();
         expect(repo2.getShortHead()).toBe("master");
-        expect(repo2.getPath()).toBe(fs.realpathSync(path.join(directory2, ".git")));
+        // `realpathSync.native` canonicalizes 8.3 short path segments (e.g. a
+        // shortened temp dir) to their long form, matching how git-utils
+        // resolves the repository path. Plain `realpathSync` leaves them short.
+        expect(repo2.getPath()).toBe(fs.realpathSync.native(path.join(directory2, ".git")));
         expect(repo3.getShortHead()).toBe("master");
-        expect(repo3.getPath()).toBe(fs.realpathSync(path.join(directory3, ".git")));
+        expect(repo3.getPath()).toBe(fs.realpathSync.native(path.join(directory3, ".git")));
       });
 
       it("calls callbacks registered with ::onDidChangePaths", () => {
