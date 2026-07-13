@@ -356,7 +356,7 @@ describe("TextEditorRegistry", function () {
           }
         `);
         disposable.dispose();
-        disposable = registry.maintainConfig(editor);
+        registry.maintainConfig(editor);
         expect(editor.getSoftTabs()).toBe(true);
       });
     });
@@ -630,6 +630,5 @@ function retainedEditorCount(registry) {
   const editors = new Set();
   registry.editors.forEach((e) => editors.add(e));
   registry.editorsWithMaintainedConfig.forEach((e) => editors.add(e));
-  registry.editorsWithMaintainedGrammar.forEach((e) => editors.add(e));
   return editors.size;
 }

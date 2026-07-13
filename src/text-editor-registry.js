@@ -41,21 +41,12 @@ const EDITOR_PARAMS_BY_SETTING_KEY = [
 // done using your editor, be sure to call `dispose` on the returned disposable
 // to avoid leaking editors.
 module.exports = class TextEditorRegistry {
-  constructor({ config, assert, packageManager }) {
+  constructor({ config, assert, grammarRegistry, packageManager }) {
     this.config = config;
     this.assert = assert;
+    this.grammarRegistry = grammarRegistry;
     this.packageManager = packageManager;
     this.clear();
-  }
-
-  deserialize(state) {
-    this.editorGrammarOverrides = state.editorGrammarOverrides;
-  }
-
-  serialize() {
-    return {
-      editorGrammarOverrides: Object.assign({}, this.editorGrammarOverrides),
-    };
   }
 
   clear() {
@@ -68,9 +59,6 @@ module.exports = class TextEditorRegistry {
     this.emitter = new Emitter();
     this.scopesWithConfigSubscriptions = new Set();
     this.editorsWithMaintainedConfig = new Set();
-    this.editorsWithMaintainedGrammar = new Set();
-    this.editorGrammarOverrides = {};
-    this.editorGrammarScores = new WeakMap();
   }
 
   destroy() {
@@ -125,18 +113,8 @@ module.exports = class TextEditorRegistry {
   // Returns the currently active text editor, or `null` if there is none.
   getActiveTextEditor() {
     for (let ed of this.editors) {
-      // fast path, works as long as there's a shadow DOM inside the text editor
-      if (ed.getElement() === document.activeElement) {
+      if (ed.getElement().contains(document.activeElement)) {
         return ed;
-      } else {
-        let editorElement = ed.getElement();
-        let current = document.activeElement;
-        while (current) {
-          if (current === editorElement) {
-            return ed;
-          }
-          current = current.parentNode;
-        }
       }
     }
     return null;
@@ -153,7 +131,7 @@ module.exports = class TextEditorRegistry {
     return this.emitter.on("did-add-editor", callback);
   }
 
-  // Keep a {TextEditor}'s configuration in sync with Atom's settings.
+  // Keep a {TextEditor}'s configuration in sync with Lumine's settings.
   //
   // * `editor` The editor whose configuration will be maintained.
   //
@@ -206,16 +184,16 @@ module.exports = class TextEditorRegistry {
   // Returns a {Disposable} that can be used to stop updating the editor's
   // grammar.
   maintainGrammar(editor) {
-    atom.grammars.maintainLanguageMode(editor.getBuffer());
+    return this.grammarRegistry.maintainLanguageMode(editor.getBuffer());
   }
 
   // Deprecated: Force a {TextEditor} to use a different grammar than the
   // one that would otherwise be selected for it.
   //
-  // * `editor` The editor whose gramamr will be set.
+  // * `editor` The editor whose grammar will be set.
   // * `languageId` The {String} language ID for the desired {Grammar}.
   setGrammarOverride(editor, languageId) {
-    atom.grammars.assignLanguageMode(editor.getBuffer(), languageId);
+    this.grammarRegistry.assignLanguageMode(editor.getBuffer(), languageId);
   }
 
   // Deprecated: Retrieve the grammar scope name that has been set as a
@@ -226,18 +204,23 @@ module.exports = class TextEditorRegistry {
   // Returns a {String} scope name, or `null` if no override has been set
   // for the given editor.
   getGrammarOverride(editor) {
-    return atom.grammars.getAssignedLanguageId(editor.getBuffer());
+    return this.grammarRegistry.getAssignedLanguageId(editor.getBuffer());
   }
 
   // Deprecated: Remove any grammar override that has been set for the given {TextEditor}.
   //
   // * `editor` The editor.
   clearGrammarOverride(editor) {
-    atom.grammars.autoAssignLanguageMode(editor.getBuffer());
+    this.grammarRegistry.autoAssignLanguageMode(editor.getBuffer());
   }
 
   async updateAndMonitorEditorSettings(editor, oldLanguageMode) {
     await this.packageManager.getActivatePromise();
+    // The editor may have been un-maintained or the registry destroyed while
+    // waiting for package activation.
+    if (!this.editorsWithMaintainedConfig || !this.editorsWithMaintainedConfig.has(editor)) {
+      return;
+    }
     this.updateEditorSettingsForLanguageMode(editor, oldLanguageMode);
     this.subscribeToSettingsForEditorScope(editor);
   }
@@ -268,8 +251,6 @@ module.exports = class TextEditorRegistry {
   }
 
   subscribeToSettingsForEditorScope(editor) {
-    if (!this.editorsWithMaintainedConfig) return;
-
     const scopeDescriptor = editor.getRootScopeDescriptor();
     const scopeChain = scopeDescriptor.getScopeChain();
 
