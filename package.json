@@ -71,7 +71,7 @@
     "dompurify": "^3.4.12",
     "encoding-selector": "file:packages/encoding-selector",
     "etch": "0.14.1",
-    "event-kit": "^2.5.3",
+    "event-kit": "github:pulsar-edit/event-kit",
     "fdir": "^6.5.0",
     "find-parent-dir": "^0.3.0",
     "focus-trap": "8.2.2",
