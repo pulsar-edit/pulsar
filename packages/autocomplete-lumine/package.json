@@ -20,6 +20,8 @@
     "update": "node ./update/update.js"
   },
   "devDependencies": {
+    "joanna": "^0.0.11",
+    "tello": "^1.2.0",
     "temp": "^0.9.0"
   }
 }
