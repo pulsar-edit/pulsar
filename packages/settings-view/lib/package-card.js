@@ -71,24 +71,6 @@ export default class PackageCard {
 
     this.hasCompatibleVersion = true;
     this.updateInterfaceState();
-    this.resolveOriginFromGitRemote();
-  }
-
-  // Migration for packages placed or linked by hand (no apmInstallSource): their
-  // package.json "repository" may point upstream, so identify them by their Git
-  // checkout's own remote instead. Runs in the background and only when there is
-  // no authoritative origin already; our own installs record one, so they and
-  // bundled packages are skipped.
-  resolveOriginFromGitRemote() {
-    const install = this.pack.apmInstallSource;
-    if (install && (install.origin || install.source || install.repository)) return;
-    if (!this.pack.path || !this.isInstalled()) return;
-    if (atom.packages.isBundledPackage(this.pack.name)) return;
-    this.packageManager.getGitRemoteOrigin(this.pack.path).then((origin) => {
-      if (!origin || this.destroyed) return;
-      this.pack.apmInstallSource = { ...(this.pack.apmInstallSource || {}), type: "git", origin };
-      this.updateInterfaceState();
-    });
   }
 
   render() {
@@ -696,6 +678,9 @@ export default class PackageCard {
   // comes from a different ORIGIN (source path) — i.e. installing this one would
   // collide with an unrelated same-named package that is already installed.
   installedOriginDiffers() {
+    // A pack with a local install path was read from the install slot itself,
+    // so this card IS the installed package — never a same-name collision.
+    if (this.pack.path) return false;
     const cardOrigin = packageOrigin(this.pack);
     if (!cardOrigin) return false;
     const installedOrigin = packageOrigin(this.getInstalledMetadata());

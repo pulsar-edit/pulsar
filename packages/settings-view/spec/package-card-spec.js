@@ -178,6 +178,31 @@ describe("PackageCard", function () {
       jasmine.attachToDOM(card.element);
       expect(card.refs.replaceButton).not.toBeVisible();
     });
+
+    it("never conflicts with itself when the card is built from the installed package", function () {
+      // A hand-linked checkout can report identities that disagree between
+      // sources (e.g. a stale Git remote vs an updated package.json), but a
+      // card carrying the install path IS the installed package.
+      setPackageStatusSpies({ installed: true, disabled: false });
+      spyOn(PackageCard.prototype, "getInstalledMetadata").andReturn({
+        name: "linter",
+        version: "1.0.0",
+        repository: "https://github.com/new-owner/linter",
+      });
+      card = new PackageCard(
+        {
+          name: "linter",
+          version: "1.0.0",
+          path: "/home/user/.editor/packages/linter",
+          repository: "old-owner/linter",
+        },
+        new SettingsView(),
+        packageManager,
+      );
+      jasmine.attachToDOM(card.element);
+      expect(card.refs.replaceButton).not.toBeVisible();
+      expect(card.refs.uninstallButton).toBeVisible();
+    });
   });
 
   it("marks Pulsar-sourced packages with a purple install action", function () {

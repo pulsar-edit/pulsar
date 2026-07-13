@@ -468,27 +468,6 @@ module.exports = class PackageManager {
     });
   }
 
-  // Reads the origin remote of an installed package's Git checkout and returns
-  // its canonical origin (owner/repo), or null. This is the migration path for
-  // packages placed or linked by hand (no apmInstallSource): their package.json
-  // "repository" may point upstream, but the checkout's own remote is the truth.
-  // Our own installs strip .git, so this resolves only for hand-managed checkouts.
-  async getGitRemoteOrigin(installPath) {
-    if (!installPath) return null;
-    try {
-      const { stdout } = await this.runProcess(this.getGitCommand(), [
-        "-C",
-        installPath,
-        "config",
-        "--get",
-        "remote.origin.url",
-      ]);
-      return repoReferenceFromRepository(stdout.trim()) || null;
-    } catch {
-      return null;
-    }
-  }
-
   // Builds the source pinned to a specific version, honoring shorthand vs URL.
   pinSourceToVersion(parsed, version) {
     if (/^[\w.-]+\/[\w.-]+$/.test(parsed.repository)) {
