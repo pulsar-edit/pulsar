@@ -1,5 +1,5 @@
 const path = require("path");
-const LessCache = require("less-cache");
+const LessCache = require("@lumine-code/less-cache");
 
 // {LessCache} wrapper used by {ThemeManager} to read stylesheets.
 module.exports = class LessCompileCache {

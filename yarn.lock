@@ -1209,6 +1209,12 @@
     event-kit "^2.0.0"
     node-addon-api "^7.1.1"
 
+"@lumine-code/less-cache@https://github.com/lumine-code/less-cache.git#6ea15bb4788569ff97126f070e67bb5f3730233d":
+  version "3.0.0"
+  resolved "https://github.com/lumine-code/less-cache.git#6ea15bb4788569ff97126f070e67bb5f3730233d"
+  dependencies:
+    less "^4.6.7"
+
 "@lumine-code/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#4f06786694a4c1fcedec309e1769efcea06ceb04":
   version "10.0.0"
   resolved "https://github.com/lumine-code/node-pathwatcher.git#4f06786694a4c1fcedec309e1769efcea06ceb04"
@@ -2563,12 +2569,12 @@ cookiejar@^2.1.4:
   resolved "https://registry.yarnpkg.com/cookiejar/-/cookiejar-2.1.4.tgz#ee669c1fea2cf42dc31585469d193fef0d65771b"
   integrity sha512-LDx6oHrK+PhzLKJU9j5S7/Y3jM/mUHvD/DeI1WQmJn652iPC5Y4TBzC9l+5OMOXlyTTA+SmVUPm0HQUwpD5Jqw==
 
-copy-anything@^2.0.1:
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/copy-anything/-/copy-anything-2.0.6.tgz#092454ea9584a7b7ad5573062b2a87f5900fc480"
-  integrity sha512-1j20GZTsvKNkc4BY3NpMOM8tt///wY3FpIzozTOFO2ffuZcV61nojHXVKIy3WM+7ADCy5FVhdZYHYDdgTU0yJw==
+copy-anything@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/copy-anything/-/copy-anything-3.0.5.tgz#2d92dce8c498f790fa7ad16b01a1ae5a45b020a0"
+  integrity sha512-yCEafptTtb4bk7GLEQoM8KVJpxAfdBJYaXyzQEgQQQgYrZiDp8SJmGKlYza6CYjEDNstAdNdKA3UuoULlEbS6w==
   dependencies:
-    is-what "^3.14.1"
+    is-what "^4.1.8"
 
 core-js-compat@^3.48.0:
   version "3.49.0"
@@ -4152,10 +4158,10 @@ is-unicode-supported@^0.1.0:
   resolved "https://registry.yarnpkg.com/is-unicode-supported/-/is-unicode-supported-0.1.0.tgz#3f26c76a809593b52bfa2ecb5710ed2779b522a7"
   integrity sha512-knxG2q4UC3u8stRGyAVJCOdxFmv5DZiRcdlIaAQXAbSfJya+OhopNotLQrstBhququ4ZpuKbDc/8S6mgXgPFPw==
 
-is-what@^3.14.1:
-  version "3.14.1"
-  resolved "https://registry.yarnpkg.com/is-what/-/is-what-3.14.1.tgz#e1222f46ddda85dead0fd1c9df131760e77755c1"
-  integrity sha512-sNxgpk9793nzSs7bA6JQJGeIuRBQhAaNGG77kzYQgMkrID+lS6SlK07K5LaptscDlSaIgH+GPFzf+d75FVxozA==
+is-what@^4.1.8:
+  version "4.1.16"
+  resolved "https://registry.yarnpkg.com/is-what/-/is-what-4.1.16.tgz#1ad860a19da8b4895ad5495da3182ce2acdd7a6f"
+  integrity sha512-ZhMwEosbFJkA0YhFnNDgTM4ZxDRsS6HqTo7qsZM08fehyRYIYa0yHu5R6mgo1n/8MgaPBXiPimPD77baVFYg+A==
 
 is-wsl@^2.1.1:
   version "2.2.0"
@@ -4557,28 +4563,18 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-less-cache@pulsar-edit/less-cache#v2.0.1:
-  version "2.0.1"
-  resolved "https://codeload.github.com/pulsar-edit/less-cache/tar.gz/40bf113d57aa29d93f7a0d7d575c72045467f016"
+less@^4.6.7:
+  version "4.6.7"
+  resolved "https://registry.yarnpkg.com/less/-/less-4.6.7.tgz#15adef08189a6d06ca16876ab2de174d18e3ac59"
+  integrity sha512-o3UxHBPPVY1HtCXx15/z1NlknQiWyafRNbtLEv+6xFaDRI2g2xPKIH43do9dSwt8bGLTsjNSaifa48N3d6odsQ==
   dependencies:
-    fs-plus "^3.1.1"
-    less "^4.1.3"
-    underscore-plus "^1.7.0"
-    walkdir "^0.4.1"
-
-less@^4.1.3:
-  version "4.4.2"
-  resolved "https://registry.yarnpkg.com/less/-/less-4.4.2.tgz#fa4291fdb0334de91163622cc038f4bd3eb6b8d7"
-  integrity sha512-j1n1IuTX1VQjIy3tT7cyGbX7nvQOsFLoIqobZv4ttI5axP923gA44zUj6miiA6R5Aoms4sEGVIIcucXUbRI14g==
-  dependencies:
-    copy-anything "^2.0.1"
+    copy-anything "^3.0.5"
     parse-node-version "^1.0.1"
-    tslib "^2.3.0"
   optionalDependencies:
     errno "^0.1.1"
     graceful-fs "^4.1.2"
     image-size "~0.5.0"
-    make-dir "^2.1.0"
+    make-dir "^5.1.0"
     mime "^1.4.1"
     needle "^3.1.0"
     source-map "~0.6.0"
@@ -4688,13 +4684,10 @@ lru-cache@^6.0.0:
     superagent "^10.0.0"
     winreg "^1.2.4"
 
-make-dir@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-2.1.0.tgz#5f0310e18b8be898cc07009295a30ae41e91e6f5"
-  integrity sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA==
-  dependencies:
-    pify "^4.0.1"
-    semver "^5.6.0"
+make-dir@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-5.1.0.tgz#59b2d9acf7ffa543d14238617a697458fa8dd5c9"
+  integrity sha512-IfpFq6UM39dUNiphpA6uDezNx/AvWyhwfICWPR3t1VspkgkMZrL+Rk1RbN1bx+aeNYwOrqGJgEgV3yotk+ZUVw==
 
 markdown-it-emoji@^3.0.0:
   version "3.0.0"
@@ -5474,11 +5467,6 @@ picomatch@^4.0.3, picomatch@^4.0.4:
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-4.0.5.tgz#51ea57a17d86f605f81039595fbc40ed06a55fab"
   integrity sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==
 
-pify@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/pify/-/pify-4.0.1.tgz#4b2cd25c50d598735c50292224fd8c6df41e3231"
-  integrity sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==
-
 pkijs@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/pkijs/-/pkijs-3.4.0.tgz#d9164def30ff6d97be2d88966d5e36192499ca9c"
@@ -5976,7 +5964,7 @@ semver@7.8.5, semver@^7.3.2, semver@^7.5.4, semver@^7.6.3, semver@^7.7.3, semver
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.8.5.tgz#39b646037dd50c14fb451e7e4cac58ed8b863f69"
   integrity sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==
 
-semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@^5.6.0:
+semver@^5.3.0, semver@^5.4.1, semver@^5.5.0:
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.2.tgz#48d55db737c3287cd4835e17fa13feace1c41ef8"
   integrity sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g==
@@ -6668,7 +6656,7 @@ truncate-utf8-bytes@^1.0.0:
   dependencies:
     utf8-byte-length "^1.0.1"
 
-tslib@^2.0.0, tslib@^2.3.0, tslib@^2.8.1:
+tslib@^2.0.0, tslib@^2.8.1:
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
   integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
@@ -6732,7 +6720,7 @@ unbzip2-stream@^1.4.3:
     buffer "^5.2.1"
     through "^2.3.8"
 
-underscore-plus@1.x, underscore-plus@^1.7.0, "underscore-plus@npm:@pulsar-edit/underscore-plus@1.8.3":
+underscore-plus@1.x, "underscore-plus@npm:@pulsar-edit/underscore-plus@1.8.3":
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/@pulsar-edit/underscore-plus/-/underscore-plus-1.8.3.tgz#588ac69f214f3082684ace9f18352362bc490cd6"
   integrity sha512-s4cbK1imHEvUJcPKdaoMz2fg49XWjlhqq0Qd0cvVREeswLKyKsMRH/GvvE9sxGfv1qIZaGRAWn/6y+8kViVP2Q==
@@ -6875,7 +6863,7 @@ walkdir@0.0.7:
   resolved "https://registry.yarnpkg.com/walkdir/-/walkdir-0.0.7.tgz#04da0270a87a778540173cdbf0a2db499a8d9e29"
   integrity sha512-onj2wLVXrMWx/Ptvb1fobwLsoU/Aah+WHzcdu1iUXDKaJX12HWQsTF/41TwUBSULvNf+EjYMXoKePPt3x8FcXA==
 
-"walkdir@>= 0.0.1", walkdir@^0.4.1:
+"walkdir@>= 0.0.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/walkdir/-/walkdir-0.4.1.tgz#dc119f83f4421df52e3061e514228a2db20afa39"
   integrity sha512-3eBwRyEln6E1MSzcxcVpQIhRG8Q1jLvEqRmCZqS3dsfXEDR/AhOF4d+jHg1qvDCpYaVRZjENPQyrVxAkQqxPgQ==
