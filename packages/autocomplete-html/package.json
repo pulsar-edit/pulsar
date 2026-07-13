@@ -22,11 +22,9 @@
   },
   "devDependencies": {
     "@webref/elements": "^2.1.0",
-    "chrome-devtools-frontend": "^1.0.1070764",
+    "chrome-devtools-frontend": "1.0.1070764",
     "content": "github:mdn/content",
-    "esm": "^3.2.25",
     "jest": "^29.4.3",
-    "joi": "^17.8.3",
-    "ts-import": "^2.0.40"
+    "joi": "^17.8.3"
   }
 }

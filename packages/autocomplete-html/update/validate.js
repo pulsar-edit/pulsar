@@ -8,7 +8,9 @@ function htmlElementsRaw(obj) {
       // Details on the spec
       title: Joi.string().required(), // The title of the spec
       url: Joi.string().required(), // URL to the definition of the spec
-    }).required(),
+    })
+      .unknown()
+      .required(),
     elements: Joi.array()
       .items(
         // the elements object is an array of objects
@@ -18,10 +20,13 @@ function htmlElementsRaw(obj) {
           // ^ The interface name will match one from DevTools data.
           obsolete: Joi.boolean().truthy().optional(),
           // ^ The optional and uncommon boolean to indicate an element is absolete
-        }).required(),
+        })
+          // Tolerate additive fields @webref/elements may introduce (e.g. `href`).
+          .unknown()
+          .required(),
       )
       .required(),
-  });
+  }).unknown();
 
   let valid = true;
   let error = [];

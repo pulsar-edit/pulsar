@@ -4,7 +4,10 @@
       "description": "The <clipPath> SVG element defines a clipping path, to be used by the clip-path property."
     },
     "mask": {
-      "description": "The <mask> element defines an alpha mask for compositing the current object into the background. A mask is used/referenced using the mask property."
+      "description": "The <mask> SVG element defines a mask for compositing the current object into the background. A mask is used/referenced using the mask property and CSS mask-image property."
+    },
+    "fencedframe": {
+      "description": "SeeCompatTable"
     },
     "filter": {
       "description": "The <filter> SVG element defines a custom filter effect by grouping atomic filter primitives. It is never rendered itself, but must be used by the filter attribute on SVG elements, or the filter CSS property for SVG/HTML elements."
@@ -43,7 +46,7 @@
       "description": "The <feDisplacementMap> SVG filter primitive uses the pixel values from the image from in2 to spatially displace the image from in."
     },
     "feDropShadow": {
-      "description": "The SVG <feDropShadow> filter primitive creates a drop shadow of the input image. It can only be used inside a SVGElement('filter') element."
+      "description": "The <feDropShadow> SVG filter primitive creates a drop shadow of the input image. It can only be used inside a SVGElement('filter') element."
     },
     "feFlood": {
       "description": "The <feFlood> SVG filter primitive fills the filter subregion with the color and opacity defined by flood-color and flood-opacity."
@@ -58,13 +61,13 @@
       "description": "The <feMerge> SVG element allows filter effects to be applied concurrently instead of sequentially. This is achieved by other filters storing their output via the  SVGAttr(result)  attribute and then accessing it in a  SVGElement(feMergeNode)  child."
     },
     "feMergeNode": {
-      "description": "The feMergeNode takes the result of another filter to be processed by its parent  SVGElement(feMerge) ."
+      "description": "The <feMergeNode> SVG takes the result of another filter to be processed by its parent  SVGElement(feMerge) ."
     },
     "feMorphology": {
       "description": "The <feMorphology> SVG filter primitive is used to erode or dilate the input image. Its usefulness lies especially in fattening or thinning effects."
     },
     "feOffset": {
-      "description": "The <feOffset> SVG filter primitive allows to offset the input image. The input image as a whole is offset by the values specified in the dx and dy attributes."
+      "description": "The <feOffset> SVG filter primitive enables offsetting an input image relative to its current position. The input image as a whole is offset by the values specified in the dx and dy attributes."
     },
     "feSpecularLighting": {
       "description": "The <feSpecularLighting> SVG filter primitive lights a source graphic using the alpha channel as a bump map. The resulting image is an RGBA image based on the light color. The lighting calculation follows the standard specular component of the Phong lighting model. The resulting image depends on the light color, light position and surface geometry of the input bump map. The result of the lighting calculation is added. The filter primitive assumes that the viewer is at infinity in the z direction."
@@ -76,13 +79,471 @@
       "description": "The <feTurbulence> SVG filter primitive creates an image using the Perlin turbulence function. It allows the synthesis of artificial textures like clouds or marble. The resulting image will fill the entire filter primitive subregion."
     },
     "feDistantLight": {
-      "description": "The <feDistantLight> filter primitive defines a distant light source that can be used within a lighting filter primitive: feDiffuseLighting or feSpecularLighting."
+      "description": "The <feDistantLight> SVG element defines a distant light source that can be used within a lighting filter primitive: feDiffuseLighting or feSpecularLighting."
     },
     "fePointLight": {
-      "description": "The <fePointLight> filter primitive defines a light source which allows to create a point light effect. It that can be used within a lighting filter primitive: feDiffuseLighting or feSpecularLighting."
+      "description": "The <fePointLight> SVG element defines a light source which allows to create a point light effect. It can be used within a lighting filter primitive: feDiffuseLighting or feSpecularLighting."
     },
     "feSpotLight": {
-      "description": "The <feSpotLight> SVG filter primitive defines a light source that can be used to create a spotlight effect."
+      "description": "The <feSpotLight> SVG element defines a light source that can be used to create a spotlight effect."
+    },
+    "geolocation": {
+      "description": "SeeCompatTable"
+    },
+    "ruby": {
+      "attributes": [
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": "The <ruby> HTML element represents small annotations that are rendered above, below, or next to base text, usually used for showing the pronunciation of East Asian characters. It can also be used for annotating other kinds of text, but this usage is less common."
+    },
+    "rb": {
+      "attributes": [
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": "deprecated_header"
+    },
+    "rt": {
+      "attributes": [
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": "The <rt> HTML element specifies the ruby text component of a ruby annotation, which is used to provide pronunciation, translation, or transliteration information for East Asian typography. The <rt> element must always be contained within a ruby element."
+    },
+    "rtc": {
+      "attributes": [
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": "deprecated_header"
+    },
+    "rp": {
+      "attributes": [
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": "The <rp> HTML element is used to provide fall-back parentheses for browsers that do not support display of ruby annotations using the HTMLElement(ruby)  element. One <rp> element should enclose each of the opening and closing parentheses that wrap the rt element that contains the annotation's text."
     },
     "html": {
       "attributes": [
@@ -174,7 +635,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <html> HTML element represents the root (top-level element) of an HTML document, so it is also referred to as the _root element_. All other elements must be descendants of this element."
+      "description": "The <html> HTML element represents the root (top-level element) of an HTML document, so it is also referred to as the _root element_. All other elements must be descendants of this element. There can be only one <html> element in a document."
     },
     "head": {
       "attributes": [
@@ -265,10 +726,10 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <head> HTML element contains machine-readable information (metadata) about the document, like its title, scripts, and style sheets."
+      "description": "The <head> HTML element contains machine-readable information (metadata) about the document, like its title, scripts, and style sheets. There can be only one <head> element in an HTML document."
     },
     "title": {
-      "description": "The <title> HTML element defines the document's title that is shown in a glossary(Browser, browser)'s title bar or a page's tab. It only contains text; tags within the element are ignored."
+      "description": "The <title> HTML element defines the document's title that is shown in a glossary(Browser, browser)'s title bar or a page's tab. It only contains text; HTML tags within the element, if any, are also treated as plain text."
     },
     "base": {
       "attributes": [
@@ -567,7 +1028,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <meta> HTML element represents Metadata,metadata that cannot be represented by other HTML meta-related elements, like base, link, script, style or title."
+      "description": "The <meta> HTML element represents Metadata,metadata that cannot be represented by other meta-related elements, such as base, link, script, style, or title."
     },
     "style": {
       "description": "The <style> HTML element contains style information for a document, or part of a document. It contains CSS, which is applied to the contents of the document containing the <style> element."
@@ -1139,7 +1600,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest."
+      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest. By default, all heading elements create a block-level box in the layout, starting on a new line and taking up the full width available in their containing block."
     },
     "h2": {
       "attributes": [
@@ -1231,7 +1692,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest."
+      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest. By default, all heading elements create a block-level box in the layout, starting on a new line and taking up the full width available in their containing block."
     },
     "h3": {
       "attributes": [
@@ -1323,7 +1784,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest."
+      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest. By default, all heading elements create a block-level box in the layout, starting on a new line and taking up the full width available in their containing block."
     },
     "h4": {
       "attributes": [
@@ -1415,7 +1876,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest."
+      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest. By default, all heading elements create a block-level box in the layout, starting on a new line and taking up the full width available in their containing block."
     },
     "h5": {
       "attributes": [
@@ -1507,7 +1968,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest."
+      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest. By default, all heading elements create a block-level box in the layout, starting on a new line and taking up the full width available in their containing block."
     },
     "h6": {
       "attributes": [
@@ -1599,7 +2060,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest."
+      "description": "The <h1> to <h6> HTML elements represent six levels of section headings. <h1> is the highest section level and <h6> is the lowest. By default, all heading elements create a block-level box in the layout, starting on a new line and taking up the full width available in their containing block."
     },
     "hgroup": {
       "attributes": [
@@ -1690,7 +2151,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <hgroup> HTML element represents a heading and related content. It groups a single [<h1>–<h6>](/en-US/docs/Web/HTML/Element/Heading_Elements) element with one or more [<p>](/en-US/docs/Web/HTML/Element/p)."
+      "description": "The <hgroup> HTML element represents a heading and related content. It groups a single [<h1>–<h6>](/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements) element with one or more [<p>](/en-US/docs/Web/HTML/Reference/Elements/p)."
     },
     "header": {
       "attributes": [
@@ -2243,7 +2704,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <pre> HTML element represents preformatted text which is to be presented exactly as written in the HTML file. The text is typically rendered using a non-proportional, or monospaced, font. Whitespace inside this element is displayed as written."
+      "description": "The <pre> HTML element represents preformatted text which is to be presented exactly as written in the HTML file. The text is typically rendered using a non-proportional, or monospaced font."
     },
     "blockquote": {
       "attributes": [
@@ -3164,7 +3625,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <figcaption> HTML element represents a caption or legend describing the rest of the contents of its parent figure element."
+      "description": "The <figcaption> HTML element represents a caption or legend describing the rest of the contents of its parent figure element, providing the <figure> an glossary(accessible name)."
     },
     "main": {
       "attributes": [
@@ -3257,6 +3718,97 @@
       ],
       "description": "The <main> HTML element represents the dominant content of the body of a document. The main content area consists of content that is directly related to or expands upon the central topic of a document, or the central functionality of an application."
     },
+    "search": {
+      "attributes": [
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": "The <search> HTML element is a container representing the parts of the document or application with form controls or other content related to performing a search or filtering operation. The <search> element semantically identifies the purpose of the element's contents as having search or filtering capabilities. The search or filtering functionality can be for the website or application, the current web page or document, or the entire Internet or subsection thereof."
+    },
     "div": {
       "attributes": [
         "align",
@@ -3347,7 +3899,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <div> HTML element is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g. styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element)."
+      "description": "The <div> HTML element is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g., styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element)."
     },
     "a": {
       "description": "The <a> HTML element (or _anchor_ element), with its href attribute, creates a hyperlink to web pages, files, email addresses, locations in the same page, or anything else a URL can address."
@@ -3805,7 +4357,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <cite> HTML element is used to mark up the title of a cited creative work. The reference may be in an abbreviated form according to context-appropriate conventions related to citation metadata."
+      "description": "The <cite> HTML element is used to mark up the title of a creative work. The reference may be in an abbreviated form according to context-appropriate conventions related to citation metadata."
     },
     "q": {
       "attributes": [
@@ -3988,7 +4540,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <dfn> HTML element is used to indicate the term being defined within the context of a definition phrase or sentence. The ancestor p element, the dd pairing, or the nearest section ancestor of the <dfn> element, is considered to be the definition of the term."
+      "description": "The <dfn> HTML element indicates a term to be defined. The <dfn> element should be used in a complete definition statement, where the full definition of the term can be one of the following:"
     },
     "abbr": {
       "attributes": [
@@ -4080,279 +4632,6 @@
         "ariaValueText"
       ],
       "description": "The <abbr> HTML element represents an abbreviation or acronym."
-    },
-    "ruby": {
-      "attributes": [
-        "inert",
-        "accessKey",
-        "accessKeyLabel",
-        "innerText",
-        "outerText",
-        "namespaceURI",
-        "prefix",
-        "localName",
-        "tagName",
-        "id",
-        "className",
-        "classList",
-        "slot",
-        "attributes",
-        "shadowRoot",
-        "oncopy",
-        "oncut",
-        "onpaste",
-        "contentEditable",
-        "enterKeyHint",
-        "isContentEditable",
-        "inputMode",
-        "dataset",
-        "tabIndex",
-        "nodeType",
-        "nodeName",
-        "baseURI",
-        "isConnected",
-        "ownerDocument",
-        "parentNode",
-        "parentElement",
-        "childNodes",
-        "firstChild",
-        "lastChild",
-        "previousSibling",
-        "nextSibling",
-        "nodeValue",
-        "textContent",
-        "children",
-        "firstElementChild",
-        "lastElementChild",
-        "childElementCount",
-        "previousElementSibling",
-        "nextElementSibling",
-        "assignedSlot",
-        "role",
-        "ariaAtomic",
-        "ariaAutoComplete",
-        "ariaBusy",
-        "ariaChecked",
-        "ariaColCount",
-        "ariaColIndex",
-        "ariaColIndexText",
-        "ariaColSpan",
-        "ariaCurrent",
-        "ariaDescription",
-        "ariaDisabled",
-        "ariaExpanded",
-        "ariaHasPopup",
-        "ariaHidden",
-        "ariaInvalid",
-        "ariaKeyShortcuts",
-        "ariaLabel",
-        "ariaLevel",
-        "ariaLive",
-        "ariaModal",
-        "ariaMultiLine",
-        "ariaMultiSelectable",
-        "ariaOrientation",
-        "ariaPlaceholder",
-        "ariaPosInSet",
-        "ariaPressed",
-        "ariaReadOnly",
-        "ariaRequired",
-        "ariaRoleDescription",
-        "ariaRowCount",
-        "ariaRowIndex",
-        "ariaRowIndexText",
-        "ariaRowSpan",
-        "ariaSelected",
-        "ariaSetSize",
-        "ariaSort",
-        "ariaValueMax",
-        "ariaValueMin",
-        "ariaValueNow",
-        "ariaValueText"
-      ],
-      "description": "The <ruby> HTML element represents small annotations that are rendered above, below, or next to base text, usually used for showing the pronunciation of East Asian characters. It can also be used for annotating other kinds of text, but this usage is less common."
-    },
-    "rt": {
-      "attributes": [
-        "inert",
-        "accessKey",
-        "accessKeyLabel",
-        "innerText",
-        "outerText",
-        "namespaceURI",
-        "prefix",
-        "localName",
-        "tagName",
-        "id",
-        "className",
-        "classList",
-        "slot",
-        "attributes",
-        "shadowRoot",
-        "oncopy",
-        "oncut",
-        "onpaste",
-        "contentEditable",
-        "enterKeyHint",
-        "isContentEditable",
-        "inputMode",
-        "dataset",
-        "tabIndex",
-        "nodeType",
-        "nodeName",
-        "baseURI",
-        "isConnected",
-        "ownerDocument",
-        "parentNode",
-        "parentElement",
-        "childNodes",
-        "firstChild",
-        "lastChild",
-        "previousSibling",
-        "nextSibling",
-        "nodeValue",
-        "textContent",
-        "children",
-        "firstElementChild",
-        "lastElementChild",
-        "childElementCount",
-        "previousElementSibling",
-        "nextElementSibling",
-        "assignedSlot",
-        "role",
-        "ariaAtomic",
-        "ariaAutoComplete",
-        "ariaBusy",
-        "ariaChecked",
-        "ariaColCount",
-        "ariaColIndex",
-        "ariaColIndexText",
-        "ariaColSpan",
-        "ariaCurrent",
-        "ariaDescription",
-        "ariaDisabled",
-        "ariaExpanded",
-        "ariaHasPopup",
-        "ariaHidden",
-        "ariaInvalid",
-        "ariaKeyShortcuts",
-        "ariaLabel",
-        "ariaLevel",
-        "ariaLive",
-        "ariaModal",
-        "ariaMultiLine",
-        "ariaMultiSelectable",
-        "ariaOrientation",
-        "ariaPlaceholder",
-        "ariaPosInSet",
-        "ariaPressed",
-        "ariaReadOnly",
-        "ariaRequired",
-        "ariaRoleDescription",
-        "ariaRowCount",
-        "ariaRowIndex",
-        "ariaRowIndexText",
-        "ariaRowSpan",
-        "ariaSelected",
-        "ariaSetSize",
-        "ariaSort",
-        "ariaValueMax",
-        "ariaValueMin",
-        "ariaValueNow",
-        "ariaValueText"
-      ],
-      "description": "The <rt> HTML element specifies the ruby text component of a ruby annotation, which is used to provide pronunciation, translation, or transliteration information for East Asian typography. The <rt> element must always be contained within a ruby element."
-    },
-    "rp": {
-      "attributes": [
-        "inert",
-        "accessKey",
-        "accessKeyLabel",
-        "innerText",
-        "outerText",
-        "namespaceURI",
-        "prefix",
-        "localName",
-        "tagName",
-        "id",
-        "className",
-        "classList",
-        "slot",
-        "attributes",
-        "shadowRoot",
-        "oncopy",
-        "oncut",
-        "onpaste",
-        "contentEditable",
-        "enterKeyHint",
-        "isContentEditable",
-        "inputMode",
-        "dataset",
-        "tabIndex",
-        "nodeType",
-        "nodeName",
-        "baseURI",
-        "isConnected",
-        "ownerDocument",
-        "parentNode",
-        "parentElement",
-        "childNodes",
-        "firstChild",
-        "lastChild",
-        "previousSibling",
-        "nextSibling",
-        "nodeValue",
-        "textContent",
-        "children",
-        "firstElementChild",
-        "lastElementChild",
-        "childElementCount",
-        "previousElementSibling",
-        "nextElementSibling",
-        "assignedSlot",
-        "role",
-        "ariaAtomic",
-        "ariaAutoComplete",
-        "ariaBusy",
-        "ariaChecked",
-        "ariaColCount",
-        "ariaColIndex",
-        "ariaColIndexText",
-        "ariaColSpan",
-        "ariaCurrent",
-        "ariaDescription",
-        "ariaDisabled",
-        "ariaExpanded",
-        "ariaHasPopup",
-        "ariaHidden",
-        "ariaInvalid",
-        "ariaKeyShortcuts",
-        "ariaLabel",
-        "ariaLevel",
-        "ariaLive",
-        "ariaModal",
-        "ariaMultiLine",
-        "ariaMultiSelectable",
-        "ariaOrientation",
-        "ariaPlaceholder",
-        "ariaPosInSet",
-        "ariaPressed",
-        "ariaReadOnly",
-        "ariaRequired",
-        "ariaRoleDescription",
-        "ariaRowCount",
-        "ariaRowIndex",
-        "ariaRowIndexText",
-        "ariaRowSpan",
-        "ariaSelected",
-        "ariaSetSize",
-        "ariaSort",
-        "ariaValueMax",
-        "ariaValueMin",
-        "ariaValueNow",
-        "ariaValueText"
-      ],
-      "description": "The <rp> HTML element is used to provide fall-back parentheses for browsers that do not support display of ruby annotations using the HTMLElement(ruby)  element. One <rp> element should enclose each of the opening and closing parentheses that wrap the rt element that contains the annotation's text."
     },
     "data": {
       "attributes": [
@@ -5355,7 +5634,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <u> HTML element represents a span of inline text which should be rendered in a way that indicates that it has a non-textual annotation. This is rendered by default as a simple solid underline, but may be altered using CSS."
+      "description": "The <u> HTML element represents a span of inline text which should be rendered in a way that indicates that it has a non-textual annotation. This is rendered by default as a single solid underline, but may be altered using CSS."
     },
     "mark": {
       "attributes": [
@@ -5719,7 +5998,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <span> HTML element is a generic inline container for phrasing content, which does not inherently represent anything. It can be used to group elements for styling purposes (using the class or id attributes), or because they share attribute values, such as lang. It should be used only when no other semantic element is appropriate. <span> is very much like a div element, but div is a block-level element whereas a <span> is an inline element."
+      "description": "The <span> HTML element is a generic inline container for phrasing content, which does not inherently represent anything. It can be used to group elements for styling purposes (using the class or id attributes), or because they share attribute values, such as lang. It should be used only when no other semantic element is appropriate. <span> is very much like a div element, but div is a block-level element whereas a <span> is an inline-level element."
     },
     "br": {
       "attributes": [
@@ -6277,7 +6556,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <source> HTML element specifies multiple media resources for the picture, the audio element, or the video element. It is a glossary(void element), meaning that it has no content and does not have a closing tag. It is commonly used to offer the same media content in multiple file formats in order to provide compatibility with a broad range of browsers given their differing support for image file formats and media file formats."
+      "description": "The <source> HTML element specifies one or more media resources for the picture, audio, and video elements. It is a glossary(void element), which means that it has no content and does not require a closing tag. This element is commonly used to offer the same media content in multiple file formats in order to provide compatibility with a broad range of browsers given their differing support for image file formats and media file formats."
     },
     "img": {
       "attributes": [
@@ -6954,7 +7233,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <audio> HTML element is used to embed sound content in documents. It may contain one or more audio sources, represented using the src attribute or the source element: the browser will choose the most suitable one. It can also be the destination for streamed media, using a MediaStream."
+      "description": "The <audio> HTML element is used to embed sound content in documents. It may contain one or more audio sources, represented using the src attribute or the source element: the browser will choose the most suitable one."
     },
     "track": {
       "attributes": [
@@ -7052,7 +7331,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <track> HTML element is used as a child of the media elements, audio and video. It lets you specify timed text tracks (or time-based data), for example to automatically handle subtitles. The tracks are formatted in WebVTT format (.vtt files) — Web Video Text Tracks."
+      "description": "The <track> HTML element is used as a child of the media elements, audio and video."
     },
     "map": {
       "attributes": [
@@ -7362,7 +7641,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <table> HTML element represents tabular data — that is, information presented in a two-dimensional table comprised of rows and columns of cells containing data."
+      "description": "The <table> HTML element represents tabular data—that is, information presented in a two-dimensional table comprised of rows and columns of cells containing data."
     },
     "caption": {
       "attributes": [
@@ -7454,7 +7733,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <caption> HTML element specifies the caption (or title) of a table."
+      "description": "The <caption> HTML element specifies the caption (or title) of a table, providing the table an glossary(accessible name) or glossary(accessible description)."
     },
     "colgroup": {
       "attributes": [
@@ -7648,7 +7927,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <col> HTML element defines a column within a table and is used for defining common semantics on all common cells. It is generally found within a colgroup element."
+      "description": "The <col> HTML element defines one or more columns in a column group represented by its parent colgroup element. The <col> element is only valid as a child of a colgroup element that has no span attribute defined."
     },
     "tbody": {
       "attributes": [
@@ -7744,7 +8023,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <tbody> HTML element encapsulates a set of table rows (tr elements), indicating that they comprise the body of the table (table)."
+      "description": "The <tbody> HTML element encapsulates a set of table rows (tr elements), indicating that they comprise the body of a table's (main) data."
     },
     "thead": {
       "attributes": [
@@ -7840,7 +8119,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <thead> HTML element defines a set of rows defining the head of the columns of the table."
+      "description": "The <thead> HTML element encapsulates a set of table rows (tr elements), indicating that they comprise the head of a table with information about the table's columns. This is usually in the form of column headers (th elements)."
     },
     "tfoot": {
       "attributes": [
@@ -7936,7 +8215,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <tfoot> HTML element defines a set of rows summarizing the columns of the table."
+      "description": "The <tfoot> HTML element encapsulates a set of table rows (tr elements), indicating that they comprise the foot of a table with information about the table's columns. This is usually a summary of the columns, e.g., a sum of the given numbers in a column."
     },
     "tr": {
       "attributes": [
@@ -8141,7 +8420,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <td> HTML element defines a cell of a table that contains data. It participates in the _table model_."
+      "description": "The <td> HTML element defines a cell of a table that contains data and may be used as a child of the tr element."
     },
     "th": {
       "attributes": [
@@ -8247,7 +8526,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <th> HTML element defines a cell as header of a group of table cells. The exact nature of this group is defined by the htmlattrxref(scope, th) and htmlattrxref(headers, th) attributes."
+      "description": "The <th> HTML element defines a cell as the header of a group of table cells and may be used as a child of the tr element. The exact nature of this group is defined by the scope and headers attributes."
     },
     "form": {
       "attributes": [
@@ -9681,6 +9960,9 @@
       ],
       "description": "The <legend> HTML element represents a caption for the content of its parent fieldset."
     },
+    "selectedcontent": {
+      "description": "The <selectedcontent> HTML is used inside a select element to display the contents of its currently selected option within its first child button. This enables you to style all parts of a <select> element, referred to as customizable selects."
+    },
     "details": {
       "attributes": [
         "open",
@@ -9955,7 +10237,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <dialog> HTML element represents a dialog box or other interactive component, such as a dismissible alert, inspector, or subwindow."
+      "description": "The <dialog> HTML element represents a modal or non-modal dialog box or other interactive component, such as a dismissible alert, inspector, or subwindow."
     },
     "script": {
       "description": "The <script> HTML element is used to embed executable code or data; this is typically used to embed or refer to JavaScript code. The <script> element can also be used with other languages, such as WebGL's GLSL shader programming language and JSON."
@@ -10141,7 +10423,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <template> HTML element is a mechanism for holding HTML that is not to be rendered immediately when a page is loaded but may be instantiated subsequently during runtime using JavaScript."
+      "description": "The <template> HTML element serves as a mechanism for holding HTML fragments, which can either be used later via JavaScript or generated immediately into shadow DOM."
     },
     "slot": {
       "attributes": [
@@ -10233,7 +10515,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <slot> HTML element—part of the Web Components technology suite—is a placeholder inside a web component that you can fill with your own markup, which lets you create separate DOM trees and present them together."
+      "description": "The <slot> HTML element is a placeholder inside a Web Component that you can fill with your own markup when the component is used."
     },
     "canvas": {
       "attributes": [
@@ -10417,7 +10699,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The obsolete HTML Applet Element (<applet>) embeds a Java applet into the document; this element has been deprecated in favor of object."
+      "description": ""
     },
     "acronym": {
       "attributes": [
@@ -10508,7 +10790,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "## Summary"
+      "description": "deprecated_header"
     },
     "bgsound": {
       "attributes": [
@@ -10599,7 +10881,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <bgsound> HTML element is deprecated. It sets up a sound file to play in the background while the page is used; use audio instead."
+      "description": ""
     },
     "dir": {
       "attributes": [
@@ -10691,7 +10973,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <dir> HTML element is used as a container for a directory of files and/or folders, potentially with styles and icons applied by the Glossary(user agent). Do not use this obsolete element; instead, you should use the ul element for lists, including lists of files."
+      "description": "Deprecated_Header"
     },
     "frame": {
       "attributes": [
@@ -10792,7 +11074,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <frame> HTML element defines a particular area in which another HTML document can be displayed. A frame should be used within a frameset."
+      "description": "Deprecated_Header"
     },
     "frameset": {
       "attributes": [
@@ -10901,7 +11183,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <frameset> HTML element is used to contain frame elements."
+      "description": "Deprecated_header"
     },
     "noframes": {
       "attributes": [
@@ -10992,7 +11274,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <noframes> HTML element provides content to be presented in browsers that don't support (or have disabled support for) the frame element. Although most commonly-used browsers support frames, there are exceptions, including certain special-use browsers including some mobile browsers, as well as text-mode browsers."
+      "description": "deprecated_header"
     },
     "isindex": {
       "attributes": [
@@ -11174,7 +11456,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <keygen> HTML element exists to facilitate generation of key material, and submission of the public key as part of an HTML form. This mechanism is designed for use with Web-based certificate management systems. It is expected that the <keygen> element will be used in an HTML form along with other information needed to construct a certificate request, and that the result of the process will be a signed certificate."
+      "description": ""
     },
     "listing": {
       "attributes": [
@@ -11357,7 +11639,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <menuitem> HTML element represents a command that a user is able to invoke through a popup menu. This includes context menus, as well as menus that might be attached to a menu button."
+      "description": ""
     },
     "nextid": {
       "attributes": [
@@ -11539,7 +11821,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <noembed> HTML element is an obsolete, non-standard way to provide alternative, or fallback, content for browsers that do not support the embed element or do not support the type of embedded content an author wishes to use. This element was deprecated in HTML 4.01 and above in favor of placing fallback content between the opening and closing tags of an object element."
+      "description": "deprecated_header"
     },
     "param": {
       "attributes": [
@@ -11634,7 +11916,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <param> HTML element defines parameters for an object element."
+      "description": "Deprecated_Header"
     },
     "plaintext": {
       "attributes": [
@@ -11725,189 +12007,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <plaintext> HTML element renders everything following the start tag as raw text, ignoring any following HTML. There is no closing tag, since everything after it is considered raw text."
-    },
-    "rb": {
-      "attributes": [
-        "inert",
-        "accessKey",
-        "accessKeyLabel",
-        "innerText",
-        "outerText",
-        "namespaceURI",
-        "prefix",
-        "localName",
-        "tagName",
-        "id",
-        "className",
-        "classList",
-        "slot",
-        "attributes",
-        "shadowRoot",
-        "oncopy",
-        "oncut",
-        "onpaste",
-        "contentEditable",
-        "enterKeyHint",
-        "isContentEditable",
-        "inputMode",
-        "dataset",
-        "tabIndex",
-        "nodeType",
-        "nodeName",
-        "baseURI",
-        "isConnected",
-        "ownerDocument",
-        "parentNode",
-        "parentElement",
-        "childNodes",
-        "firstChild",
-        "lastChild",
-        "previousSibling",
-        "nextSibling",
-        "nodeValue",
-        "textContent",
-        "children",
-        "firstElementChild",
-        "lastElementChild",
-        "childElementCount",
-        "previousElementSibling",
-        "nextElementSibling",
-        "assignedSlot",
-        "role",
-        "ariaAtomic",
-        "ariaAutoComplete",
-        "ariaBusy",
-        "ariaChecked",
-        "ariaColCount",
-        "ariaColIndex",
-        "ariaColIndexText",
-        "ariaColSpan",
-        "ariaCurrent",
-        "ariaDescription",
-        "ariaDisabled",
-        "ariaExpanded",
-        "ariaHasPopup",
-        "ariaHidden",
-        "ariaInvalid",
-        "ariaKeyShortcuts",
-        "ariaLabel",
-        "ariaLevel",
-        "ariaLive",
-        "ariaModal",
-        "ariaMultiLine",
-        "ariaMultiSelectable",
-        "ariaOrientation",
-        "ariaPlaceholder",
-        "ariaPosInSet",
-        "ariaPressed",
-        "ariaReadOnly",
-        "ariaRequired",
-        "ariaRoleDescription",
-        "ariaRowCount",
-        "ariaRowIndex",
-        "ariaRowIndexText",
-        "ariaRowSpan",
-        "ariaSelected",
-        "ariaSetSize",
-        "ariaSort",
-        "ariaValueMax",
-        "ariaValueMin",
-        "ariaValueNow",
-        "ariaValueText"
-      ],
-      "description": "The <rb> HTML element is used to delimit the base text component of a HTMLElement(ruby)  annotation, i.e. the text that is being annotated. One <rb> element should wrap each separate atomic segment of the base text."
-    },
-    "rtc": {
-      "attributes": [
-        "inert",
-        "accessKey",
-        "accessKeyLabel",
-        "innerText",
-        "outerText",
-        "namespaceURI",
-        "prefix",
-        "localName",
-        "tagName",
-        "id",
-        "className",
-        "classList",
-        "slot",
-        "attributes",
-        "shadowRoot",
-        "oncopy",
-        "oncut",
-        "onpaste",
-        "contentEditable",
-        "enterKeyHint",
-        "isContentEditable",
-        "inputMode",
-        "dataset",
-        "tabIndex",
-        "nodeType",
-        "nodeName",
-        "baseURI",
-        "isConnected",
-        "ownerDocument",
-        "parentNode",
-        "parentElement",
-        "childNodes",
-        "firstChild",
-        "lastChild",
-        "previousSibling",
-        "nextSibling",
-        "nodeValue",
-        "textContent",
-        "children",
-        "firstElementChild",
-        "lastElementChild",
-        "childElementCount",
-        "previousElementSibling",
-        "nextElementSibling",
-        "assignedSlot",
-        "role",
-        "ariaAtomic",
-        "ariaAutoComplete",
-        "ariaBusy",
-        "ariaChecked",
-        "ariaColCount",
-        "ariaColIndex",
-        "ariaColIndexText",
-        "ariaColSpan",
-        "ariaCurrent",
-        "ariaDescription",
-        "ariaDisabled",
-        "ariaExpanded",
-        "ariaHasPopup",
-        "ariaHidden",
-        "ariaInvalid",
-        "ariaKeyShortcuts",
-        "ariaLabel",
-        "ariaLevel",
-        "ariaLive",
-        "ariaModal",
-        "ariaMultiLine",
-        "ariaMultiSelectable",
-        "ariaOrientation",
-        "ariaPlaceholder",
-        "ariaPosInSet",
-        "ariaPressed",
-        "ariaReadOnly",
-        "ariaRequired",
-        "ariaRoleDescription",
-        "ariaRowCount",
-        "ariaRowIndex",
-        "ariaRowIndexText",
-        "ariaRowSpan",
-        "ariaSelected",
-        "ariaSetSize",
-        "ariaSort",
-        "ariaValueMax",
-        "ariaValueMin",
-        "ariaValueNow",
-        "ariaValueText"
-      ],
-      "description": "The <rtc> HTML element embraces semantic annotations of characters presented in a ruby of rb elements used inside of  HTMLElement(ruby)  element. rb elements can have both pronunciation (rt) and semantic (rtc) annotations."
+      "description": "deprecated_header"
     },
     "strike": {
       "attributes": [
@@ -11998,7 +12098,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <strike> HTML element places a strikethrough (horizontal line) over text."
+      "description": "deprecated_header"
     },
     "xmp": {
       "attributes": [
@@ -12090,7 +12190,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "## Summary"
+      "description": "deprecated_header"
     },
     "basefont": {
       "attributes": [
@@ -12272,7 +12372,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <big> HTML deprecated element renders the enclosed text at a font size one level larger than the surrounding text (medium becomes large, for example). The size is capped at the browser's maximum permitted font size."
+      "description": "deprecated_header"
     },
     "blink": {
       "attributes": [
@@ -12363,7 +12463,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <blink> HTML element is a non-standard element which causes the enclosed text to flash slowly."
+      "description": ""
     },
     "center": {
       "attributes": [
@@ -12454,7 +12554,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <center> HTML element is a block-level element that displays its block-level or inline contents centered horizontally within its containing element. The container is usually, but isn't required to be, body."
+      "description": "deprecated_header"
     },
     "font": {
       "attributes": [
@@ -12548,7 +12648,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <font> HTML element defines the font size, color and face for its content."
+      "description": "Deprecated_Header"
     },
     "marquee": {
       "attributes": [
@@ -12650,7 +12750,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <marquee> HTML element is used to insert a scrolling area of text. You can control what happens when the text reaches the edges of its content area using its attributes."
+      "description": "Deprecated_Header"
     },
     "multicol": {
       "attributes": [
@@ -12832,7 +12932,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <nobr> HTML element prevents the text it contains from automatically wrapping across multiple lines, potentially resulting in the user having to scroll horizontally to see the entire width of the text."
+      "description": "deprecated_header"
     },
     "spacer": {
       "attributes": [
@@ -12923,7 +13023,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <spacer> HTML element is an obsolete HTML element which allowed insertion of empty spaces on pages. It was devised by Netscape to accomplish the same effect as a single-pixel layout image, which was something web designers used to use to add white spaces to web pages without actually using an image. However, <spacer> is no longer supported by any major browser and the same effects can now be achieved using simple CSS."
+      "description": ""
     },
     "tt": {
       "attributes": [
@@ -13014,7 +13114,7 @@
         "ariaValueNow",
         "ariaValueText"
       ],
-      "description": "The <tt> HTML element creates inline text which is presented using the Glossary(user agent, user agent's) default monospace font face. This element was created for the purpose of rendering text as it would be displayed on a fixed-width display such as a teletype, text-only screen, or line printer."
+      "description": "deprecated_header"
     },
     "math": {
       "description": "The <math> MathML element is the top-level MathML element, used to write a single mathematical formula. It can be placed in HTML content where flow content is permitted."
@@ -13023,7 +13123,7 @@
       "description": "The <mtext> MathML element is used to render arbitrary text with _no_ notational meaning, such as comments or annotations."
     },
     "mi": {
-      "description": "The <mi> MathML element indicates that the content should be rendered as an identifier such as function names, variables or symbolic constants. You can also have arbitrary text in it to mark up terms."
+      "description": "The <mi> MathML element indicates that the content should be rendered as an identifier, such as a function name, variable or symbolic constant."
     },
     "mn": {
       "description": "The <mn> MathML element represents a numeric literal which is normally a sequence of digits with a possible separator (a dot or a comma). However, it is also allowed to have arbitrary text in it which is actually a numeric quantity, for example eleven."
@@ -13080,10 +13180,10 @@
       "description": "The <munderover> MathML element is used to attach accents or limits both under and over an expression."
     },
     "mmultiscripts": {
-      "description": "The <mmultiscripts> MathML element is used to attach an arbitrary number of subscripts and superscripts to an expression at once, generalizing the  MathMLElement(msubsup)  element. Scripts can be either prescripts (placed before the expression) or postscripts (placed after it)."
+      "description": "The <mmultiscripts> MathML element is used to attach an arbitrary number of subscripts and superscripts to an expression at once, generalizing the  MathMLElement(msubsup)  element. Scripts can be either pre-scripts (placed before the expression) or post-scripts (placed after it)."
     },
     "mprescripts": {
-      "description": ""
+      "description": "The <mprescripts> MathML element is used within an  MathMLElement(mmultiscripts)  element to indicate the start of the pre-scripts elements (subscripts and superscripts that are placed before the base expression)."
     },
     "mtable": {
       "description": "The <mtable> MathML element allows you to create tables or matrices. Its children are  MathMLElement(mtr)  elements (representing rows), each of them having  MathMLElement(mtd)  elements as its children (representing cells). These elements are similar to  HTMLElement(table) ,  HTMLElement(tr)  and  HTMLElement(td)  elements of HTML."
@@ -13095,112 +13195,109 @@
       "description": "The <mtd> MathML element represents a cell in a table or a matrix. It may only appear in a  MathMLElement(mtr)  element. This element is similar to the  HTMLElement(td)  element of HTML."
     },
     "maction": {
-      "description": "The <maction> MathML element allows to bind actions to mathematical expressions. By default, only the first child is rendered but some browsers may take into account actiontype and selection attributes to implement custom behaviors."
+      "description": "Deprecated_Header"
     },
     "semantics": {
       "description": "The <semantics> MathML element associates annotations with a MathML expression, for example its text source as a lightweight markup language or mathematical meaning expressed in a special XML dialect. Typically, its structure is:"
     },
     "annotation": {
-      "description": ""
+      "description": "The <annotation> MathML element contains an annotation to the MathML expression in a textual format, for example LaTeX."
     },
     "annotation-xml": {
-      "description": ""
+      "description": "The <annotation-xml> MathML element contains an annotation to the MathML expression in the XML format, for example Content MathML or SVG."
     },
     "model": {
       "description": ""
     },
     "portal": {
-      "description": "The <portal> HTML element enables the embedding of another HTML page into the current one for the purposes of allowing smoother navigation into new pages."
+      "description": ""
     },
     "animate": {
-      "description": "The SVG <animate> element provides a way to animate an attribute of an element over time."
+      "description": "The <animate> SVG element provides a way to animate an attribute of an element over time."
     },
     "set": {
-      "description": "The SVG <set> element provides a simple means of just setting the value of an attribute for a specified duration."
-    },
-    "discard": {
-      "description": "The <discard> SVG element allows authors to specify the time at which particular elements are to be discarded, thereby reducing the resources required by an SVG user agent. This is particularly useful to help SVG viewers conserve memory while displaying long-running documents."
+      "description": "The <set> SVG element provides a method of setting the value of an attribute for a specified duration."
     },
     "animateMotion": {
-      "description": "The SVG <animateMotion> element provides a way to define how an element moves along a motion path."
+      "description": "The <animateMotion> SVG element provides a way to define how an element moves along a motion path."
     },
     "mpath": {
-      "description": "The <mpath> sub-element for the animateMotion element provides the ability to reference an external path element as the definition of a motion path."
+      "description": "The <mpath> SVG sub-element for the animateMotion element provides the ability to reference an external path element as the definition of a motion path."
     },
     "animateTransform": {
-      "description": "The animateTransform element animates a transformation attribute on its target element, thereby allowing animations to control translation, scaling, rotation, and/or skewing."
+      "description": "The <animateTransform> SVG element animates a transformation attribute on its target element, thereby allowing animations to control translation, scaling, rotation, and/or skewing."
+    },
+    "path": {
+      "description": "The <path> SVG element is the generic element to define a shape. All the basic shapes can be created with a path element."
     },
     "svg": {
-      "description": "The svg element is a container that defines a new coordinate system and viewport. It is used as the outermost element of SVG documents, but it can also be used to embed an SVG fragment inside an SVG or HTML document."
+      "description": "The <svg> SVG element is a container that defines a new coordinate system and viewport. It is used as the outermost element of SVG documents, but it can also be used to embed an SVG fragment inside an SVG or HTML document."
     },
     "g": {
       "description": "The <g> SVG element is a container used to group other SVG elements."
     },
     "defs": {
-      "description": "The <defs> element is used to store graphical objects that will be used at a later time. Objects created inside a <defs> element are not rendered directly. To display them you have to reference them (with a use element for example)."
+      "description": "The <defs> SVG element is used to store graphical objects that will be used at a later time. Objects created inside a <defs> element are not rendered directly. To display them you have to reference them (with a use element for example)."
     },
     "desc": {
-      "description": "The <desc> element provides an accessible, long-text description of any SVG container element or graphics element."
+      "description": "The <desc> SVG element provides an accessible, long-text description of any SVG container element or graphics element."
     },
     "symbol": {
-      "description": "The <symbol> element is used to define graphical template objects which can be instantiated by a use element."
+      "description": "The <symbol> SVG element is used to define graphical template objects which can be instantiated by a use element."
     },
     "use": {
-      "description": "The <use> element takes nodes from within the SVG document, and duplicates them somewhere else."
+      "description": "The <use> element takes nodes from within an SVG document, and duplicates them somewhere else."
     },
     "image": {
-      "description": "The <image> HTML element is an ancient and poorly supported precursor to the img element."
+      "description": "The <image> SVG element includes images inside SVG documents. It can display glossary(raster image) files or other SVG files."
     },
     "switch": {
       "description": "The <switch> SVG element evaluates any requiredFeatures, requiredExtensions and systemLanguage attributes on its direct child elements in order, and then renders the first child where these attributes evaluate to true."
     },
-    "path": {
-      "description": "The <path> SVG element is the generic element to define a shape. All the basic shapes can be created with a path element."
-    },
     "rect": {
-      "description": "The <rect> element is a basic SVG shape that draws rectangles, defined by their position, width, and height. The rectangles may have their corners rounded."
+      "description": "The <rect> SVG element is a basic SVG shape that draws rectangles, defined by their position, width, and height. The rectangles may have their corners rounded."
     },
     "circle": {
       "description": "The <circle> SVG element is an SVG basic shape, used to draw circles based on a center point and a radius."
     },
     "ellipse": {
-      "description": "The <ellipse> element is an SVG basic shape, used to create ellipses based on a center coordinate, and both their x and y radius."
+      "description": "The <ellipse> SVG element is an SVG basic shape, used to create ellipses based on a center coordinate, and both their x and y radius."
     },
     "line": {
-      "description": "The <line> element is an SVG basic shape used to create a line connecting two points."
+      "description": "The <line> SVG element is an SVG basic shape used to create a line connecting two points."
     },
     "polyline": {
       "description": "The <polyline> SVG element is an SVG basic shape that creates straight lines connecting several points. Typically a polyline is used to create open shapes as the last point doesn't have to be connected to the first point. For closed shapes see the polygon element."
     },
     "polygon": {
-      "description": "The <polygon> element defines a closed shape consisting of a set of connected straight line segments. The last point is connected to the first point."
+      "description": "The <polygon> SVG element defines a closed shape consisting of a set of connected straight line segments. The last point is connected to the first point."
     },
     "text": {
-      "description": "The SVG <text> element draws a graphics element consisting of text. It's possible to apply a gradient, pattern, clipping path, mask, or filter to <text>, like any other SVG graphics element."
+      "description": "The <text> SVG element draws a graphics element consisting of text. It's possible to apply a gradient, pattern, clipping path, mask, or filter to <text>, like any other SVG graphics element."
     },
     "tspan": {
-      "description": "The SVG <tspan> element defines a subtext within a SVGElement('text') element or another <tspan> element. It allows for adjustment of the style and/or position of that subtext as needed."
+      "description": "The <tspan> SVG element defines a subtext within a SVGElement('text') element or another <tspan> element. It allows for adjustment of the style and/or position of that subtext as needed."
     },
     "textPath": {
-      "description": "To render text along the shape of a path, enclose the text in a <textPath> element that has an href attribute with a reference to the path element."
+      "description": "The <textPath> SVG element is used to render text along the shape of a path element."
     },
     "marker": {
-      "description": "The <marker> element defines a graphic used for drawing arrowheads or polymarkers on a given path, line, polyline or polygon element."
+      "description": "The <marker> SVG element defines a graphic used for drawing arrowheads or polymarkers on a given path, line, polyline or polygon element."
     },
     "linearGradient": {
-      "description": "The <linearGradient> element lets authors define linear gradients to apply to other SVG elements."
+      "description": "The <linearGradient> SVG element lets authors define linear gradients to apply to other SVG elements."
     },
     "radialGradient": {
-      "description": "The <radialGradient> element lets authors define radial gradients that can be applied to fill or stroke of graphical elements."
+      "description": "The <radialGradient> SVG element lets authors define radial gradients that can be applied to fill or stroke of graphical elements."
     },
     "stop": {
-      "description": "The SVG <stop> element defines a color and its position to use on a gradient. This element is always a child of a linearGradient or radialGradient element."
+      "description": "The <stop> SVG element defines a color and its position to use on a gradient. This element is always a child of a linearGradient or radialGradient element."
     },
     "pattern": {
-      "description": "The <pattern> element defines a graphics object which can be redrawn at repeated x- and y-coordinate intervals (tiled) to cover an area."
+      "description": "The <pattern> SVG element defines a graphics object which can be redrawn at repeated x- and y-coordinate intervals (tiled) to cover an area."
     },
     "view": {
-      "description": "A view is a defined way to view the image, like a zoom level or a detail view."
+      "description": "The <view> SVG element defines a particular view of an SVG document. A specific view can be displayed by referencing the <view> element's id as the target fragment of a URL."
     },
     "metadata": {
       "description": "The <metadata> SVG element adds metadata to SVG content. Metadata is structured information about data. The contents of <metadata> should be elements from other XML Glossary(namespace, namespaces) such as RDF, FOAF, etc."
@@ -13229,17 +13326,28 @@
       "description": "The id of a menu to use as the contextual menu for this element."
     },
     "dir": {
-      "attribOption": ["ltr", "rtl"],
+      "attribOption": [
+        "ltr",
+        "rtl"
+      ],
       "global": "true",
       "description": "An enumerated attribute indicates the directionality of the element's text."
     },
     "draggable": {
-      "attribOption": ["auto", "false", "true"],
+      "attribOption": [
+        "auto",
+        "false",
+        "true"
+      ],
       "global": "true",
       "description": "An enumerated attribute that indicates whether the element can be dragged, using the HTML Drag and Drop API."
     },
     "dropzone": {
-      "attribOption": ["copy", "move", "link"],
+      "attribOption": [
+        "copy",
+        "move",
+        "link"
+      ],
       "global": "true",
       "description": "An enumerated attribute indicating what types of content can be dropped on an element, using the Drag and Drop API."
     },
@@ -13738,13 +13846,21 @@
       "global": "true"
     },
     "aria-autocomplete": {
-      "attribOption": ["inline", "list", "both", "none"]
+      "attribOption": [
+        "inline",
+        "list",
+        "both",
+        "none"
+      ]
     },
     "aria-activedescendant": {
       "global": "true"
     },
     "aria-atomic": {
-      "attribOption": ["true", "false"],
+      "attribOption": [
+        "true",
+        "false"
+      ],
       "global": "true",
       "type": "boolean"
     },
@@ -13753,7 +13869,12 @@
       "type": "boolean"
     },
     "aria-checked": {
-      "attribOption": ["true", "false", "mixed", "undefined"]
+      "attribOption": [
+        "true",
+        "false",
+        "mixed",
+        "undefined"
+      ]
     },
     "aria-controls": {
       "global": "true"
@@ -13762,35 +13883,64 @@
       "global": "true"
     },
     "aria-disabled": {
-      "attribOption": ["true", "false"],
+      "attribOption": [
+        "true",
+        "false"
+      ],
       "global": "true"
     },
     "aria-dropeffect": {
-      "attribOption": ["copy", "move", "link", "execute", "popup", "none"],
+      "attribOption": [
+        "copy",
+        "move",
+        "link",
+        "execute",
+        "popup",
+        "none"
+      ],
       "global": "true"
     },
     "aria-expanded": {
-      "attribOption": ["true", "false", "undefined"]
+      "attribOption": [
+        "true",
+        "false",
+        "undefined"
+      ]
     },
     "aria-flowto": {
       "global": "true"
     },
     "aria-grabbed": {
-      "attribOption": ["true", "false", "undefined"],
+      "attribOption": [
+        "true",
+        "false",
+        "undefined"
+      ],
       "global": "true"
     },
     "aria-haspopup": {
-      "attribOption": ["true", "false"],
+      "attribOption": [
+        "true",
+        "false"
+      ],
       "global": "true",
       "type": "boolean"
     },
     "aria-hidden": {
-      "attribOption": ["true", "false"],
+      "attribOption": [
+        "true",
+        "false"
+      ],
       "global": "true",
       "type": "boolean"
     },
     "aria-invalid": {
-      "attribOption": ["grammar", "false", "spelling", "true"],
+      "attribOption": [
+        "grammar",
+        "false",
+        "spelling",
+        "true"
+      ],
       "global": "true"
     },
     "aria-label": {
@@ -13801,44 +13951,83 @@
     },
     "aria-level": {},
     "aria-live": {
-      "attribOption": ["off", "polite", "assertive"],
+      "attribOption": [
+        "off",
+        "polite",
+        "assertive"
+      ],
       "global": "true"
     },
     "aria-multiline": {
-      "attribOption": ["true", "false"],
+      "attribOption": [
+        "true",
+        "false"
+      ],
       "type": "boolean"
     },
     "aria-multiselectable": {
-      "attribOption": ["true", "false"],
+      "attribOption": [
+        "true",
+        "false"
+      ],
       "type": "boolean"
     },
     "aria-orientation": {
-      "attribOption": ["vertical", "horizontal"]
+      "attribOption": [
+        "vertical",
+        "horizontal"
+      ]
     },
     "aria-owns": {
       "global": "true"
     },
     "aria-posinset": {},
     "aria-pressed": {
-      "attribOption": ["true", "false", "mixed", "undefined"]
+      "attribOption": [
+        "true",
+        "false",
+        "mixed",
+        "undefined"
+      ]
     },
     "aria-readonly": {
-      "attribOption": ["true", "false"]
+      "attribOption": [
+        "true",
+        "false"
+      ]
     },
     "aria-relevant": {
-      "attribOption": ["additions", "removals", "text", "all", "additions text"],
+      "attribOption": [
+        "additions",
+        "removals",
+        "text",
+        "all",
+        "additions text"
+      ],
       "global": "true"
     },
     "aria-required": {
-      "attribOption": ["true", "false"],
+      "attribOption": [
+        "true",
+        "false"
+      ],
       "type": "boolean"
     },
     "aria-selected": {
-      "attribOption": ["true", "false", "undefined"]
+      "attribOption": [
+        "true",
+        "false",
+        "undefined"
+      ]
     },
     "aria-setsize": {},
     "aria-sort": {
-      "attribOption": ["ascending", "descending", "none", "other"]
+      "attribOption": [
+        "ascending",
+        "descending",
+        "none",
+        "other"
+      ]
     },
     "aria-valuemax": {},
     "aria-valuemin": {},
@@ -13883,7 +14072,14 @@
       "type": "flag"
     },
     "autocapitalize": {
-      "attribOption": ["off", "none", "on", "sentences", "words", "characters"],
+      "attribOption": [
+        "off",
+        "none",
+        "on",
+        "sentences",
+        "words",
+        "characters"
+      ],
       "global": "true",
       "description": "Controls whether and how text input is automatically capitalized."
     },
@@ -13960,7 +14156,11 @@
       "type": "flag"
     },
     "behavior": {
-      "attribOption": ["scroll", "slide", "alternate"]
+      "attribOption": [
+        "scroll",
+        "slide",
+        "alternate"
+      ]
     },
     "bgcolor": {
       "type": "color"
@@ -14039,29 +14239,50 @@
       "type": "flag"
     },
     "direction": {
-      "attribOption": ["left", "right", "up", "down"]
+      "attribOption": [
+        "left",
+        "right",
+        "up",
+        "down"
+      ]
     },
     "dirname": {},
     "disabled": {
       "type": "flag"
     },
     "enctype": {
-      "attribOption": ["application/x-www-form-urlencoded", "multipart/form-data", "text/plain"]
+      "attribOption": [
+        "application/x-www-form-urlencoded",
+        "multipart/form-data",
+        "text/plain"
+      ]
     },
     "for": {},
     "form": {},
     "formaction": {},
     "formenctype": {
-      "attribOption": ["application/x-www-form-urlencoded", "multipart/form-data", "text/plain"]
+      "attribOption": [
+        "application/x-www-form-urlencoded",
+        "multipart/form-data",
+        "text/plain"
+      ]
     },
     "formmethod": {
-      "attribOption": ["get", "post"]
+      "attribOption": [
+        "get",
+        "post"
+      ]
     },
     "formnovalidate": {
       "type": "flag"
     },
     "formtarget": {
-      "attribOption": ["_blank", "_parent", "_self", "_top"]
+      "attribOption": [
+        "_blank",
+        "_parent",
+        "_self",
+        "_top"
+      ]
     },
     "headers": {},
     "height": {},
@@ -14070,17 +14291,31 @@
     "hreflang": {},
     "hspace": {},
     "http-equiv": {
-      "attribOption": ["content-type", "default-style", "refresh"]
+      "attribOption": [
+        "content-type",
+        "default-style",
+        "refresh"
+      ]
     },
     "icon": {},
     "ismap": {
       "type": "flag"
     },
     "keytype": {
-      "attribOption": ["dsa", "ec", "rsa"]
+      "attribOption": [
+        "dsa",
+        "ec",
+        "rsa"
+      ]
     },
     "kind": {
-      "attribOption": ["captions", "chapters", "descriptions", "metadata", "subtitles"]
+      "attribOption": [
+        "captions",
+        "chapters",
+        "descriptions",
+        "metadata",
+        "subtitles"
+      ]
     },
     "label": {},
     "list": {},
@@ -14143,7 +14378,10 @@
     },
     "mediagroup": {},
     "method": {
-      "attribOption": ["get", "post"]
+      "attribOption": [
+        "get",
+        "post"
+      ]
     },
     "min": {},
     "multiple": {
@@ -14154,7 +14392,13 @@
     },
     "name": {},
     "meta/name": {
-      "attribOption": ["application-name", "author", "description", "generator", "keywords"]
+      "attribOption": [
+        "application-name",
+        "author",
+        "description",
+        "generator",
+        "keywords"
+      ]
     },
     "novalidate": {
       "type": "flag"
@@ -14167,7 +14411,11 @@
     "placeholder": {},
     "poster": {},
     "preload": {
-      "attribOption": ["auto", "metadata", "none"]
+      "attribOption": [
+        "auto",
+        "metadata",
+        "none"
+      ]
     },
     "pubdate": {},
     "radiogroup": {},
@@ -14218,7 +14466,12 @@
     "rows": {},
     "rowspan": {},
     "sandbox": {
-      "attribOption": ["allow-forms", "allow-same-origin", "allow-scripts", "allow-top-navigation"]
+      "attribOption": [
+        "allow-forms",
+        "allow-same-origin",
+        "allow-scripts",
+        "allow-top-navigation"
+      ]
     },
     "seamless": {
       "type": "flag"
@@ -14227,7 +14480,12 @@
       "type": "flag"
     },
     "scope": {
-      "attribOption": ["col", "colgroup", "row", "rowgroup"]
+      "attribOption": [
+        "col",
+        "colgroup",
+        "row",
+        "rowgroup"
+      ]
     },
     "scoped": {
       "type": "boolean"
@@ -14235,11 +14493,18 @@
     "scrollamount": {},
     "scrolldelay": {},
     "shape": {
-      "attribOption": ["circle", "default", "poly", "rect"]
+      "attribOption": [
+        "circle",
+        "default",
+        "poly",
+        "rect"
+      ]
     },
     "size": {},
     "sizes": {
-      "attribOption": ["any"]
+      "attribOption": [
+        "any"
+      ]
     },
     "span": {},
     "src": {},
@@ -14249,10 +14514,18 @@
     "start": {},
     "step": {},
     "target": {
-      "attribOption": ["_blank", "_parent", "_self", "_top"]
+      "attribOption": [
+        "_blank",
+        "_parent",
+        "_self",
+        "_top"
+      ]
     },
     "translate": {
-      "attribOption": ["no", "yes"],
+      "attribOption": [
+        "no",
+        "yes"
+      ],
       "global": "true",
       "description": "Used to specify whether an element's translatable attribute values and its text node children should be translated."
     },
@@ -14261,19 +14534,39 @@
     },
     "type": {},
     "button/type": {
-      "attribOption": ["button", "reset", "submit"]
+      "attribOption": [
+        "button",
+        "reset",
+        "submit"
+      ]
     },
     "command/type": {
-      "attribOption": ["command", "checkbox", "radio"]
+      "attribOption": [
+        "command",
+        "checkbox",
+        "radio"
+      ]
     },
     "link/type": {
-      "attribOption": ["text/css"]
+      "attribOption": [
+        "text/css"
+      ]
     },
     "menu/type": {
-      "attribOption": ["context", "list", "toolbar"]
+      "attribOption": [
+        "context",
+        "list",
+        "toolbar"
+      ]
     },
     "ol/type": {
-      "attribOption": ["1", "a", "A", "i", "I"]
+      "attribOption": [
+        "1",
+        "a",
+        "A",
+        "i",
+        "I"
+      ]
     },
     "script/type": {
       "attribOption": [
@@ -14293,7 +14586,9 @@
       ]
     },
     "style/type": {
-      "attribOption": ["text/css"]
+      "attribOption": [
+        "text/css"
+      ]
     },
     "input/type": {
       "attribOption": [
@@ -14327,7 +14622,10 @@
     "vspace": {},
     "width": {},
     "wrap": {
-      "attribOption": ["hard", "soft"]
+      "attribOption": [
+        "hard",
+        "soft"
+      ]
     },
     "nonce": {
       "global": "true",

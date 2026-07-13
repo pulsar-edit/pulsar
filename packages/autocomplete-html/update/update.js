@@ -51,15 +51,19 @@
   to automatically generate the needed data.
 */
 
-const chromiumElementsShim = require("./chromium-elements-shim.js");
 const curatedAttributes = require("./curated-attributes.json");
 const validate = require("./validate.js");
-const elements = require("@webref/elements");
 const fs = require("fs");
 
 let GLOBAL_ATTRIBUTES = [];
 
 async function update() {
+  // Loaded lazily so that requiring this module (e.g. from update.test.js) does
+  // not pull in Babel or the ESM-only `@webref/elements`, which the test runner
+  // cannot transform.
+  const chromiumElementsShim = require("./chromium-elements-shim.js");
+  const elements = require("@webref/elements");
+
   const chromiumElements = await chromiumElementsShim.bootstrap();
   const htmlElementsRaw = await elements.listAll();
 
@@ -220,7 +224,10 @@ function getElementDescription(element) {
   // `reference/elements/`, so check there first and fall back to the old layout.
   const filePath = ["html", "svg", "mathml"]
     .flatMap((path) => [
+      // HTML uses `reference/elements` (plural); SVG and MathML use
+      // `reference/element` (singular). Keep the pre-reorg `element` as fallback.
       `./node_modules/content/files/en-us/web/${path}/reference/elements/${element}/index.md`,
+      `./node_modules/content/files/en-us/web/${path}/reference/element/${element}/index.md`,
       `./node_modules/content/files/en-us/web/${path}/element/${element}/index.md`,
     ])
     .find((f) => fs.existsSync(f));
@@ -270,7 +277,9 @@ function sanitizeDescription(input) {
   // eg. [HTML](/en-US/docs/Web/HTML) => HTML
 }
 
-update();
+if (require.main === module) {
+  update();
+}
 
 module.exports = {
   sanitizeDescription,
