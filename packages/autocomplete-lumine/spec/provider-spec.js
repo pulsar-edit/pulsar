@@ -1,6 +1,6 @@
 const temp = require("temp");
 
-describe("Atom API autocompletions", () => {
+describe("Lumine API autocompletions", () => {
   let [editor, provider] = [];
   const conditionPromise = async (condition, description = "condition") => {
     const startedAt = Date.now();
@@ -31,15 +31,15 @@ describe("Atom API autocompletions", () => {
 
   beforeEach(async () => {
     jasmine.useRealClock();
-    await atom.packages.activatePackage("autocomplete-atom-api");
-    provider = atom.packages.getActivePackage("autocomplete-atom-api").mainModule.getProvider();
+    await atom.packages.activatePackage("autocomplete-lumine");
+    provider = atom.packages.getActivePackage("autocomplete-lumine").mainModule.getProvider();
     await conditionPromise(() => Object.keys(provider.completions).length > 0, "completions");
     await conditionPromise(() => provider.packageDirectories?.length > 0, "package directories");
     await atom.workspace.open("test.js");
     editor = atom.workspace.getActiveTextEditor();
   });
 
-  it("only includes completions in files that are in an Atom package or Atom core", () => {
+  it("only includes completions in files that are in a Lumine package or Lumine core", () => {
     const emptyProjectPath = temp.mkdirSync("atom-project-");
     atom.project.setPaths([emptyProjectPath]);
 
@@ -104,9 +104,7 @@ describe("Atom API autocompletions", () => {
     expect(getCompletions()[6].snippet).toBe("confirm(${1:options})");
     expect(getCompletions()[6].type).toBe("method");
     expect(getCompletions()[6].leftLabel).toBe("Number");
-    expect(getCompletions()[6].descriptionMoreURL).toBe(
-      "https://atom.io/docs/api/latest/AtomEnvironment#instance-confirm",
-    );
+    expect(getCompletions()[6].descriptionMoreURL).toBeUndefined();
   });
 
   it("includes methods on atom global properties", () => {

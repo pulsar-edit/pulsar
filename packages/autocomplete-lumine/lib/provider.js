@@ -10,7 +10,7 @@ module.exports = {
   filterSuggestions: true,
 
   getSuggestions({ bufferPosition, editor }) {
-    if (!this.isEditingAnAtomPackageFile(editor)) {
+    if (!this.isEditingALuminePackageFile(editor)) {
       return;
     }
     const line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]);
@@ -34,7 +34,7 @@ module.exports = {
               return;
             }
             this.readMetadata(directory, (error, metadata) => {
-              if (this.isAtomPackage(metadata) || this.isAtomCore(metadata)) {
+              if (this.isLuminePackage(metadata) || this.isLumineCore(metadata)) {
                 this.packageDirectories.push(directory);
               }
               resolve();
@@ -58,15 +58,15 @@ module.exports = {
     });
   },
 
-  isAtomPackage(metadata) {
+  isLuminePackage(metadata) {
     return metadata?.engines?.atom?.length > 0;
   },
 
-  isAtomCore(metadata) {
-    return metadata?.name === "atom";
+  isLumineCore(metadata) {
+    return metadata?.name === "lumine";
   },
 
-  isEditingAnAtomPackageFile(editor) {
+  isEditingALuminePackageFile(editor) {
     const editorPath = editor.getPath();
     if (editorPath != null) {
       const parsedPath = path.parse(editorPath);

@@ -141,7 +141,7 @@ let options = {
     "!**/node_modules/babel-core/lib/transformation/transforers/spec", // Ignore babel-core spec
     "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector}/spec",
     "!**/{link,grammar-selector,json-schema-traverse,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
-    "!**/{archive-view,autocomplete,autocomplete-atom-api,autocomplete-css,autosave}/spec",
+    "!**/{archive-view,autocomplete,autocomplete-lumine,autocomplete-css,autosave}/spec",
 
     // Other Exclusions
     "!**/._*",
