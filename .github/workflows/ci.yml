@@ -94,12 +94,22 @@ jobs:
         run: |
           prefix=""
           if [ "$RUNNER_OS" = "Linux" ]; then prefix="xvfb-run --auto-servernum"; fi
-          # Retry once: Windows runners intermittently crash the renderer with
-          # an access violation unrelated to the specs (the suite passes when
-          # the crash does not strike).
-          if ! $prefix yarn test:editor; then
+          # macOS runners have no GNU `timeout`; Homebrew coreutils ships it
+          # as `gtimeout`. Without either, the step timeout is the backstop.
+          if command -v timeout >/dev/null 2>&1; then
+            guard="timeout 2700"
+          elif command -v gtimeout >/dev/null 2>&1; then
+            guard="gtimeout 2700"
+          else
+            guard=""
+          fi
+          # Guard each attempt (a wedged Electron session never exits on its
+          # own) and retry once: Windows runners intermittently crash or hang
+          # the renderer for reasons unrelated to the specs (the suite passes
+          # when that does not strike).
+          if ! $guard $prefix yarn test:editor; then
             echo "Retrying editor specs after failure..."
-            $prefix yarn test:editor
+            $guard $prefix yarn test:editor
           fi
       # Run each bundled package in its own Electron session. The combined
       # `yarn test:pkgs` session suffers cross-package state leakage (~200
