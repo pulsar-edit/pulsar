@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint and format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      # Linting needs the dev dependencies but no native builds, so skip install
+      # scripts (Electron download, node-gyp, patch-package) for a fast job.
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-scripts
+      - name: Lint
+        run: yarn lint
+      - name: Check formatting
+        run: yarn format:check
+
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    # Native rebuild plus the full editor and package suites are slow.
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        # The editor requires Node >= 24.18 (see .nvmrc / package.json engines),
+        # so unlike the standalone packages there is no Node 20 entry.
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Enable Git symlinks on Windows
+        if: runner.os == 'Windows'
+        run: git config --global core.symlinks true
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - name: Install Linux build and headless-display dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libx11-dev libxkbfile-dev libsecret-1-dev
+      # `postinstall` (patch-package) and several native install scripts fail or
+      # are wasted here: node-pty's Windows build is broken until patched, and
+      # the native modules are rebuilt for Electron below regardless. Install
+      # without scripts, then reproduce the pieces we actually need.
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-scripts
+      - name: Apply patches
+        run: npx patch-package
+      - name: Download the Electron binary
+        run: node ./node_modules/electron/install.js
+      - name: Rebuild native modules for Electron
+        run: yarn build
+      - name: Run editor specs (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum yarn test:editor
+      - name: Run editor specs (macOS and Windows)
+        if: runner.os != 'Linux'
+        run: yarn test:editor
+      - name: Run bundled package specs (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum yarn test:pkgs
+      - name: Run bundled package specs (macOS and Windows)
+        if: runner.os != 'Linux'
+        run: yarn test:pkgs
