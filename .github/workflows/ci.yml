@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      build:
+        description: Also build distributable binaries
+        type: boolean
+        default: false
   workflow_call:
 
 permissions:
@@ -19,9 +24,14 @@ env:
   ATOM_JASMINE_REPORTER: list
 
 # The full matrix is expensive (~20-45 minutes per platform), so CI is opt-in
-# for ordinary pushes: include `[ci]` anywhere in the head commit message to
-# run it. Pull requests, manual dispatch (`gh workflow run ci.yml`), and
-# reusable calls always run.
+# for ordinary pushes via head commit message markers:
+#   [ci]    run the test jobs
+#   [cd]    build distributable binaries
+#   [ci/cd] both
+# `contains()` is substring-based and `[ci/cd]` contains neither `[ci]` nor
+# `[cd]`, so every condition names it explicitly. Pull requests, manual
+# dispatch (`gh workflow run ci.yml`), and reusable calls always run the tests;
+# dispatch builds binaries when its `build` input is set.
 
 jobs:
   lint:
@@ -29,7 +39,7 @@ jobs:
     # debt, so these steps report their findings without failing the run. Once
     # the debt is cleared, drop the `continue-on-error` flags to make it gate.
     name: Lint and format (advisory)
-    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[ci]')
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[ci]') || contains(github.event.head_commit.message, '[ci/cd]')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -50,7 +60,7 @@ jobs:
 
   test:
     name: Test on ${{ matrix.os }}
-    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[ci]')
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[ci]') || contains(github.event.head_commit.message, '[ci/cd]')
     runs-on: ${{ matrix.os }}
     # Native rebuild plus the full editor and package suites are slow, and the
     # spec steps may retry once after an intermittent renderer crash.
@@ -158,3 +168,51 @@ jobs:
           done
           if [ -n "$failed" ]; then echo "Failed packages:$failed"; fi
           exit $status
+
+  build:
+    name: Build on ${{ matrix.os }}
+    if: >-
+      (github.event_name == 'push' &&
+        (contains(github.event.head_commit.message, '[cd]') ||
+         contains(github.event.head_commit.message, '[ci/cd]'))) ||
+      (github.event_name == 'workflow_dispatch' && inputs.build)
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    env:
+      # No signing identities are configured on CI; build unsigned binaries.
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
+      # Same install sequence as the test job; see the comments there.
+      - name: Install dependencies
+        shell: bash
+        run: |
+          install() { yarn install --frozen-lockfile --ignore-scripts --network-concurrency 1; }
+          install || install || install
+      - name: Apply patches
+        run: npx patch-package
+      - name: Download the Electron binary
+        run: node ./node_modules/electron/install.js
+      - name: Rebuild native modules for Electron
+        run: yarn build
+      - name: Build distributable binaries
+        run: yarn dist
+      - name: Upload binaries
+        uses: actions/upload-artifact@v6
+        with:
+          name: lumine-${{ matrix.os }}
+          path: binaries/
+          retention-days: 14
