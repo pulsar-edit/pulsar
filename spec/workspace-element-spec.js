@@ -1071,6 +1071,17 @@ describe("WorkspaceElement", () => {
       );
       await copyComponent.getNextUpdatePromise();
 
+      // The source pane reflows to the same half width in parallel and may
+      // settle later than the copy; only once both panes agree on width and
+      // wrapping are their absolute scroll positions comparable.
+      await conditionPromise(
+        () =>
+          Math.abs(
+            sourceComponent.getScrollContainerClientWidth() -
+              copyComponent.getScrollContainerClientWidth(),
+          ) <= 1 && editor.getScreenLineCount() === copyEditor.getScreenLineCount(),
+      );
+
       const lineHeight = copyComponent.getLineHeight();
       const sourceRowAfter = editor.screenPositionForBufferPosition(midBufferPosition).row;
       const sourceOffsetAfter =

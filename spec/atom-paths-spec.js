@@ -121,9 +121,11 @@ describe("AtomPaths", () => {
         jasmine.filterByPlatform({ except: ["win32"] }, done);
 
         fs.mkdirSync(electronUserDataPath);
-        fs.chmodSync(electronUserDataPath, 444);
+        // Octal modes: the decimal literals used previously produced modes
+        // without owner write/execute, so the folder could never be cleaned up.
+        fs.chmodSync(electronUserDataPath, 0o444);
         atomPaths.setUserData(app);
-        fs.chmodSync(electronUserDataPath, 666);
+        fs.chmodSync(electronUserDataPath, 0o755);
         expect(app.getPath("userData")).toEqual(defaultElectronUserDataPath);
 
         done();
