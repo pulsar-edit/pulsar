@@ -1308,9 +1308,12 @@ describe("TextEditorComponent", () => {
 
   describe("autoscroll", () => {
     it("automatically scrolls vertically when the requested range is within the vertical scroll margin of the top or bottom", async () => {
-      const { component, editor } = buildComponent({
-        height: 120 + horizontalScrollbarHeight,
-      });
+      // Size the editor in line-height units so the visible row count does not
+      // depend on the platform's font metrics.
+      const { component, element, editor } = buildComponent({ autoHeight: false });
+      element.style.height =
+        7.5 * component.measurements.lineHeight + horizontalScrollbarHeight + "px";
+      await component.getNextUpdatePromise();
       expect(component.getLastVisibleRow()).toBe(7);
 
       editor.scrollToScreenRange([
@@ -1384,7 +1387,11 @@ describe("TextEditorComponent", () => {
     });
 
     it("autoscrolls the given range to the center of the screen if the `center` option is true", async () => {
-      const { component, editor } = buildComponent({ height: 50 });
+      // Size the editor in line-height units so the visible row count does not
+      // depend on the platform's font metrics.
+      const { component, element, editor } = buildComponent({ autoHeight: false });
+      element.style.height = 3.125 * component.measurements.lineHeight + "px";
+      await component.getNextUpdatePromise();
       expect(component.getLastVisibleRow()).toBe(2);
 
       editor.scrollToScreenRange(
@@ -1528,8 +1535,11 @@ describe("TextEditorComponent", () => {
       const expectedScrollTop = Math.round(6 * component.getLineHeight());
       expect(component.getScrollTopRow()).toBeNear(6);
       expect(component.getScrollTop()).toBeNear(expectedScrollTop);
+      // The component rounds fractional line heights to whole pixels
+      // internally, so compare the transform against the actual scrollTop
+      // rather than recomputing (and re-rounding) it here.
       expect(component.refs.content.style.transform).toBe(
-        `translate(0px, -${expectedScrollTop}px)`,
+        `translate(0px, -${component.getScrollTop()}px)`,
       );
 
       // Allows the scrollTopRow to be updated while attached
@@ -2531,11 +2541,14 @@ describe("TextEditorComponent", () => {
     }
 
     it("renders overlay elements at the specified screen position unless it would overflow the window", async () => {
-      const { component, editor } = buildComponent({
+      const { component, element, editor } = buildComponent({
         width: 200,
         height: 100,
         attach: false,
       });
+      // Use a whole-pixel line height so the overflow-flip decisions below do
+      // not depend on the platform's font metrics.
+      element.style.lineHeight = "16px";
       const fakeWindow = attachFakeWindow(component);
 
       await setScrollTop(component, 50);

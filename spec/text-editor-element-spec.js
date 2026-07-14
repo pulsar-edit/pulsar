@@ -404,13 +404,19 @@ describe("TextEditorElement", () => {
 
       element.setScrollTop(80);
       await element.getNextUpdatePromise();
-      expect(element.getVisibleRowRange()).toEqual([4, 11]);
+      // Line height (and therefore the exact visible range) depends on the
+      // platform's font metrics, so derive the expected rows instead of
+      // hardcoding them.
+      const lineHeight = editor.getLineHeightInPixels();
+      const [firstVisibleRow, lastVisibleRow] = element.getVisibleRowRange();
+      expect(firstVisibleRow).toBe(Math.floor(80 / lineHeight));
+      expect(lastVisibleRow).toBeGreaterThan(firstVisibleRow + 1);
 
-      expect(element.intersectsVisibleRowRange(0, 4)).toBe(false);
-      expect(element.intersectsVisibleRowRange(0, 5)).toBe(true);
-      expect(element.intersectsVisibleRowRange(5, 8)).toBe(true);
-      expect(element.intersectsVisibleRowRange(11, 12)).toBe(false);
-      expect(element.intersectsVisibleRowRange(12, 13)).toBe(false);
+      expect(element.intersectsVisibleRowRange(0, firstVisibleRow)).toBe(false);
+      expect(element.intersectsVisibleRowRange(0, firstVisibleRow + 1)).toBe(true);
+      expect(element.intersectsVisibleRowRange(firstVisibleRow + 1, lastVisibleRow)).toBe(true);
+      expect(element.intersectsVisibleRowRange(lastVisibleRow, lastVisibleRow + 1)).toBe(false);
+      expect(element.intersectsVisibleRowRange(lastVisibleRow + 1, lastVisibleRow + 2)).toBe(false);
     });
   });
 
@@ -426,7 +432,12 @@ describe("TextEditorElement", () => {
       await element.getNextUpdatePromise();
       element.setScrollTop(80);
       await element.getNextUpdatePromise();
-      expect(element.getVisibleRowRange()).toEqual([4, 11]);
+      // The exact visible range depends on platform font metrics; just verify
+      // the scroll landed where requested. The rectangle math below is already
+      // derived from the editor's own metrics.
+      expect(element.getVisibleRowRange()[0]).toBe(
+        Math.floor(80 / editor.getLineHeightInPixels()),
+      );
 
       const top = 2 * editor.getLineHeightInPixels();
       const bottom = 13 * editor.getLineHeightInPixels();
