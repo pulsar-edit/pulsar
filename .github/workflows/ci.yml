@@ -187,3 +187,28 @@ jobs:
           done
           if [ -n "$failed" ]; then echo "Failed packages:$failed"; fi
           exit $status
+      # The crash reporter (enabled by default on Windows/Linux, see
+      # src/main-process/start.js) writes renderer minidumps to
+      # ~/.lumine/crashdumps even when a later attempt turns the job green.
+      # Surface them so native crashes can be analyzed offline.
+      - name: Stage crash dumps
+        if: always()
+        shell: bash
+        run: |
+          dumpdir="$HOME/.lumine/crashdumps"
+          if [ -d "$dumpdir" ] && find "$dumpdir" -name '*.dmp' | grep -q .; then
+            mkdir -p crashdumps-artifact
+            cp -r "$dumpdir"/. crashdumps-artifact/
+            echo "Found crash dumps:"
+            find crashdumps-artifact -name '*.dmp'
+          else
+            echo "No crash dumps found."
+          fi
+      - name: Upload crash dumps
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: crashdumps-${{ matrix.os }}
+          path: crashdumps-artifact/
+          if-no-files-found: ignore
+          retention-days: 7
