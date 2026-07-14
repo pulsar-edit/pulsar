@@ -606,7 +606,14 @@ module.exports = class TextEditorComponent {
 
     if (this.hasInitialMeasurements) {
       style.left = this.getGutterContainerWidth() + "px";
-      style.width = this.getScrollContainerWidth() + "px";
+      if (this.props.model.getAutoWidth()) {
+        style.width = this.getScrollContainerWidth() + "px";
+      } else {
+        // Pin to the live right edge instead of a measured pixel width so the
+        // dummy scrollbars stay attached while the editor is resized;
+        // measurements only catch up on the next scheduled update.
+        style.right = 0;
+      }
     }
 
     return $.div(
