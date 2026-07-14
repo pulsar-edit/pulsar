@@ -60,7 +60,8 @@ function waitsForPromise(fn) {
   const promise = fn();
   global.waitsFor("spec promise to resolve", function (done) {
     promise.then(done, function (error) {
-      jasmine.getEnv().currentSpec.fail(error);
+      // Jasmine 6 exposes a global `fail`; the Jasmine 1 `currentSpec` API is gone.
+      fail(error);
       done();
     });
   });

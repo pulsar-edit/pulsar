@@ -117,8 +117,13 @@ module.exports = class AtomIoClient {
     return path.join(this.getCachePath(), `${login}-${Date.now()}`);
   }
 
+  // Wraps the glob library so tests can stub filesystem failures.
+  glob(pattern) {
+    return glob(pattern);
+  }
+
   cachedAvatar(login, callback) {
-    glob(this.avatarGlob(login)).then((files) => {
+    this.glob(this.avatarGlob(login)).then((files) => {
       files.sort().reverse();
       for (let imagePath of Array.from(files)) {
         const filename = path.basename(imagePath);

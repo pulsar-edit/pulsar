@@ -325,18 +325,22 @@ describe("SettingsPanel", () => {
       expect(controlGroups[0].querySelectorAll(".sub-section .sub-section-heading")).toHaveLength(
         1,
       );
-      expect(controlGroups[0].querySelector(".sub-section .sub-section-heading").textContent).toBe(
-        "Bar group",
-      );
+      // The heading holds the title text node followed by a `.setting-key`
+      // span with the key path, so compare only the title text node.
+      expect(
+        controlGroups[0].querySelector(".sub-section .sub-section-heading").childNodes[0]
+          .textContent,
+      ).toBe("Bar group");
       expect(controlGroups[0].querySelectorAll(".sub-section .sub-section-body")).toHaveLength(1);
       let subsectionBody = controlGroups[0].querySelector(".sub-section .sub-section-body");
       expect(subsectionBody.querySelectorAll(".control-group")).toHaveLength(1);
       expect(controlGroups[1].querySelectorAll(".sub-section .sub-section-heading")).toHaveLength(
         1,
       );
-      expect(controlGroups[1].querySelector(".sub-section .sub-section-heading").textContent).toBe(
-        "Baz Group",
-      );
+      expect(
+        controlGroups[1].querySelector(".sub-section .sub-section-heading").childNodes[0]
+          .textContent,
+      ).toBe("Baz Group");
       expect(controlGroups[1].querySelectorAll(".sub-section .sub-section-body")).toHaveLength(1);
       subsectionBody = controlGroups[1].querySelector(".sub-section .sub-section-body");
       expect(subsectionBody.querySelectorAll(".control-group")).toHaveLength(1);

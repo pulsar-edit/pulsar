@@ -43,10 +43,9 @@ describe("AtomIoClient", function () {
   });
 
   it("handles glob errors", function () {
-    spyOn(this.client, "avatarGlob").andReturn(`${__dirname}/**`);
-    spyOn(require("fs"), "readdir").andCallFake((dirPath, callback) =>
-      process.nextTick(() => callback(new Error("readdir error"))),
-    );
+    // The glob library no longer lists directories through the callback `fs`
+    // API, so inject the failure at the client's own glob seam.
+    spyOn(this.client, "glob").andReturn(Promise.reject(new Error("readdir error")));
 
     const callback = jasmine.createSpy("cacheAvatar callback");
     this.client.cachedAvatar("fakeperson", callback);

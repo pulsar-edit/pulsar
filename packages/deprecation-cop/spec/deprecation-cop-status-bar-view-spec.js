@@ -57,7 +57,7 @@ describe("DeprecationCopStatusBarView", () => {
         `\
 atom-text-editor::shadow { color: red; }\
 `,
-        { sourcePath: "file-1" },
+        { sourcePath: "file-1.less" },
       );
       expect(statusBarView.textContent).toBe("1 deprecation");
       expect(statusBarView).toBeVisible();
@@ -65,7 +65,7 @@ atom-text-editor::shadow { color: red; }\
         `\
 atom-text-editor::shadow { color: blue; }\
 `,
-        { sourcePath: "file-2" },
+        { sourcePath: "file-2.less" },
       );
       expect(statusBarView.textContent).toBe("2 deprecations");
       expect(statusBarView).toBeVisible();

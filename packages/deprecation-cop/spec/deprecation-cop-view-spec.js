@@ -42,17 +42,17 @@ describe("DeprecationCopView", () => {
   if (atom.styles.getDeprecations != null) {
     it("displays deprecated selectors", () => {
       atom.styles.addStyleSheet("atom-text-editor::shadow { color: red }", {
-        sourcePath: path.join("some-dir", "packages", "package-1", "file-1.css"),
+        sourcePath: path.join("some-dir", "packages", "package-1", "file-1.less"),
       });
       atom.styles.addStyleSheet("atom-text-editor::shadow { color: yellow }", {
         context: "atom-text-editor",
-        sourcePath: path.join("some-dir", "packages", "package-1", "file-2.css"),
+        sourcePath: path.join("some-dir", "packages", "package-1", "file-2.less"),
       });
       atom.styles.addStyleSheet("atom-text-editor::shadow { color: blue }", {
-        sourcePath: path.join("another-dir", "packages", "package-2", "file-3.css"),
+        sourcePath: path.join("another-dir", "packages", "package-2", "file-3.less"),
       });
       atom.styles.addStyleSheet("atom-text-editor::shadow { color: gray }", {
-        sourcePath: path.join("another-dir", "node_modules", "package-3", "file-4.css"),
+        sourcePath: path.join("another-dir", "node_modules", "package-3", "file-4.less"),
       });
 
       const promise = etch.getScheduler().getNextUpdatePromise();
@@ -69,11 +69,11 @@ describe("DeprecationCopView", () => {
         expect(packageDeprecationItems.length).toBe(2);
         expect(packageDeprecationItems[0].textContent).toMatch(/atom-text-editor/);
         expect(packageDeprecationItems[0].querySelector("a").href).toMatch(
-          "some-dir/packages/package-1/file-1.css",
+          "some-dir/packages/package-1/file-1.less",
         );
         expect(packageDeprecationItems[1].textContent).toMatch(/:host/);
         expect(packageDeprecationItems[1].querySelector("a").href).toMatch(
-          "some-dir/packages/package-1/file-2.css",
+          "some-dir/packages/package-1/file-2.less",
         );
       });
     });
