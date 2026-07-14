@@ -1,4 +1,4 @@
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const { CompositeDisposable } = require("atom");
 
 let MarkdownPreviewView = null;

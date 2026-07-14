@@ -15,10 +15,10 @@
     "minimatch": "^10.2.5",
     "selector-kit": "^0.1.0",
     "stable": "^0.1.8",
-    "underscore-plus": "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
   },
   "devDependencies": {
-    "fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
+    "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
     "temp": "^0.9.4"
   },
   "providedServices": {

@@ -1,6 +1,6 @@
 const { it, fit, ffit, beforeEach, afterEach } = require("./async-spec-helpers"); // eslint-disable-line no-unused-vars
 
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 const temp = require("temp").track();
 

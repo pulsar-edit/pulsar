@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 
-const CSON = require("season");
+const CSON = require("@lumine-code/season");
 
 const PackageManager = require("../lib/package-manager");
 const ThemesPanel = require("../lib/themes-panel");

@@ -9,7 +9,7 @@
 const cp = require("node:child_process");
 const path = require("node:path");
 const fs = require("node:fs");
-const CSON = require("season");
+const CSON = require("@lumine-code/season");
 
 // Change this if you want more logs
 let verbose = true;

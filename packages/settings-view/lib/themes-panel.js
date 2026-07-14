@@ -2,7 +2,7 @@
 /** @jsx etch.dom */
 
 import etch from "etch";
-import _ from "underscore-plus";
+import _ from "@lumine-code/underscore-plus";
 import { CompositeDisposable, TextEditor } from "atom";
 
 import CollapsibleSectionPanel from "./collapsible-section-panel";

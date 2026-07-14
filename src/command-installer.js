@@ -1,5 +1,5 @@
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const { getReleaseChannel } = require("./get-app-details.js");
 
 module.exports = class CommandInstaller {

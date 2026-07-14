@@ -1,6 +1,6 @@
 "use strict";
 
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const crypto = require("crypto");
 const path = require("path");
 
@@ -26,7 +26,7 @@ function shouldCompile() {
 
 function getCachePath(sourceCode) {
   if (typescriptVersionDir == null) {
-    const version = require("typescript/package.json").version;
+    const version = require("@typescript/typescript6/package.json").version;
     typescriptVersionDir = path.join("ts", createVersionAndOptionsDigest(version, defaultOptions));
   }
 
@@ -37,7 +37,7 @@ function getCachePath(sourceCode) {
 }
 
 function compile(sourceCode, filePath) {
-  TypeScript ??= require("typescript");
+  TypeScript ??= require("@typescript/typescript6");
 
   if (process.platform === "win32") {
     filePath = "file:///" + path.resolve(filePath).replace(/\\/g, "/");

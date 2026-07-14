@@ -1,6 +1,6 @@
 const { Point, Range } = require("@lumine-code/text-buffer");
 const { Emitter } = require("event-kit");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const Model = require("./model");
 
 const EmptyLineRegExp = /(\r\n[\t ]*\r\n)|(\n[\t ]*\n)/g;

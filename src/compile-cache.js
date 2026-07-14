@@ -5,7 +5,7 @@
 // Lumine's compile-cache when installing or updating packages, called by apm's Node-js
 
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const sourceMapSupport = require("@atom/source-map-support");
 
 const PackageTranspilationRegistry = require("./package-transpilation-registry");
@@ -64,7 +64,7 @@ exports.addPathToCache = function (filePath, atomHome) {
 
   if (extension === ".cson") {
     if (!CSON) {
-      CSON = require("season");
+      CSON = require("@lumine-code/season");
       CSON.setCacheDir(this.getCacheDirectory());
     }
     return CSON.readFileSync(filePath);

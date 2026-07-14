@@ -6,8 +6,8 @@ const TextEditor = require("../src/text-editor");
 const Workspace = require("../src/workspace");
 const Project = require("../src/project");
 const platform = require("./helpers/platform");
-const _ = require("underscore-plus");
-const fs = require("fs-plus");
+const _ = require("@lumine-code/underscore-plus");
+const fs = require("@lumine-code/fs-plus");
 const AtomEnvironment = require("../src/atom-environment");
 const { conditionPromise, timeoutPromise } = require("./helpers/async-spec-helpers");
 

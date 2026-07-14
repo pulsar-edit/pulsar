@@ -1,9 +1,9 @@
 /* global snapshotAuxiliaryData */
 
 const path = require("path");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const { Emitter } = require("event-kit");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const LessCompileCache = require("./less-compile-cache");
 const { UI_VARIABLES, SYNTAX_VARIABLES } = require("./theme-variables");
 const { writeShimDirectory } = require("./theme-variable-shim");

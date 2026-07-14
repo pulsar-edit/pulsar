@@ -1,6 +1,6 @@
 "use babel";
 
-import _ from "underscore-plus";
+import _ from "@lumine-code/underscore-plus";
 import { CompositeDisposable, Disposable } from "atom";
 import { Selector } from "./selector";
 import StatusBarItem from "./status-bar-item";

@@ -1,5 +1,5 @@
 const SettingsPanel = require("../lib/settings-panel");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 describe("SettingsPanel", () => {
   let settingsPanel = null;

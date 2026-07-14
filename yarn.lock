@@ -1142,18 +1142,18 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@lumine-code/atom-keymap@https://github.com/lumine-code/atom-keymap.git#58e99c336b6fe0000484fa34320e756f311e6dc2":
+"@lumine-code/atom-keymap@https://github.com/lumine-code/atom-keymap.git#5b1bdbeabc5d6296b31342a566e5fa8cd2597d56":
   version "10.0.0"
-  resolved "https://github.com/lumine-code/atom-keymap.git#58e99c336b6fe0000484fa34320e756f311e6dc2"
+  resolved "https://github.com/lumine-code/atom-keymap.git#5b1bdbeabc5d6296b31342a566e5fa8cd2597d56"
   dependencies:
     "@electron/rebuild" "^4.2.0"
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     "@lumine-code/keyboard-layout" "https://github.com/lumine-code/keyboard-layout.git#925a7d94243fa2ef3e971513feea36b85374a3de"
     "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#de08d8a2c3bd1c18aabc0669920c7ae2e895241a"
+    "@lumine-code/season" "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
     clear-cut "^2"
     event-kit "^2.5.3"
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     grim "^2.0.3"
-    season "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
 
 "@lumine-code/babel-preset@https://github.com/lumine-code/babel-preset.git#a80d58111ba850aa4e9b6f6426815f50f3e066b8":
   version "6.0.0"
@@ -1190,6 +1190,10 @@
   dependencies:
     node-addon-api "^8.5.0"
 
+"@lumine-code/fs-plus@https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be":
+  version "4.0.0"
+  resolved "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+
 "@lumine-code/fuzzy-native@https://github.com/lumine-code/fuzzy-native.git#7dc348747e6a585f37baf6272e841547e31eb1d2":
   version "2.0.0"
   resolved "https://github.com/lumine-code/fuzzy-native.git#7dc348747e6a585f37baf6272e841547e31eb1d2"
@@ -1200,6 +1204,13 @@
   version "2.0.0"
   resolved "https://github.com/lumine-code/get-scrollbar-style.git#ffd0f75e724e0281bd4c4425985e02e524a0192f"
   dependencies:
+    node-addon-api "^8.9.0"
+
+"@lumine-code/git-utils@https://github.com/lumine-code/git-utils.git#520b32f5d15cbe803b9426e882ded74bf2480ffb":
+  version "9.0.0"
+  resolved "https://github.com/lumine-code/git-utils.git#520b32f5d15cbe803b9426e882ded74bf2480ffb"
+  dependencies:
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     node-addon-api "^8.9.0"
 
 "@lumine-code/git-utils@https://github.com/lumine-code/git-utils.git#902c0ef4035d870cc4b968baebd06eab3d8acf3e":
@@ -1229,6 +1240,12 @@
     underscore "^1.13.8"
     walkdir "^0.4.1"
 
+"@lumine-code/jasmine-tagged@https://github.com/lumine-code/jasmine-tagged.git#34af73e9edd3127422a5e8b8205ccd43e868ccc4":
+  version "2.0.0"
+  resolved "https://github.com/lumine-code/jasmine-tagged.git#34af73e9edd3127422a5e8b8205ccd43e868ccc4"
+  dependencies:
+    "@lumine-code/jasmine-focused" "https://github.com/lumine-code/jasmine-focused.git#6d04426bcb107dc44b148a6d48172c918326c068"
+
 "@lumine-code/keyboard-layout@https://github.com/lumine-code/keyboard-layout.git#925a7d94243fa2ef3e971513feea36b85374a3de":
   version "4.0.0"
   resolved "https://github.com/lumine-code/keyboard-layout.git#925a7d94243fa2ef3e971513feea36b85374a3de"
@@ -1241,6 +1258,18 @@
   resolved "https://github.com/lumine-code/less-cache.git#7364eaecafc710a5c5515f4f8a43747a209d5646"
   dependencies:
     less "^4.6.7"
+
+"@lumine-code/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#76026dbe75792baf86b95781a59452726b72d7d0":
+  version "10.0.0"
+  resolved "https://github.com/lumine-code/node-pathwatcher.git#76026dbe75792baf86b95781a59452726b72d7d0"
+  dependencies:
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    async "^3.2.6"
+    event-kit "^2.1.0"
+    grim "^2.0.1"
+    iconv-lite "^0.7.3"
+    node-addon-api "^8.9.0"
 
 "@lumine-code/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#de08d8a2c3bd1c18aabc0669920c7ae2e895241a":
   version "10.0.0"
@@ -1274,15 +1303,21 @@
     grim "^2.0.3"
     key-path-helpers "^0.4.0"
 
-"@lumine-code/second-mate@https://github.com/lumine-code/second-mate.git#ed4d772d396b0a28dd79e6df962a1558b7340867":
-  version "9.0.0"
-  resolved "https://github.com/lumine-code/second-mate.git#ed4d772d396b0a28dd79e6df962a1558b7340867"
+"@lumine-code/season@https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d":
+  version "7.0.0"
+  resolved "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
   dependencies:
+    cson-parser "^4.0.9"
+
+"@lumine-code/second-mate@https://github.com/lumine-code/second-mate.git#6d4ce175d7a3a754e36a5bbd5eec5c98b5b6abc3":
+  version "9.0.0"
+  resolved "https://github.com/lumine-code/second-mate.git#6d4ce175d7a3a754e36a5bbd5eec5c98b5b6abc3"
+  dependencies:
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/season" "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     event-kit "^2.5.3"
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     grim "^2.0.3"
-    season "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     vscode-oniguruma "^2.0.1"
 
 "@lumine-code/service-hub@https://github.com/lumine-code/service-hub.git#a64d2bda0088f74a455556503c98cb4075fc187f":
@@ -1298,18 +1333,18 @@
   dependencies:
     node-addon-api "^8.9.0"
 
-"@lumine-code/text-buffer@https://github.com/lumine-code/text-buffer.git#a7c9df1ab36b03f55bb600ad1c46a143ce976d42":
+"@lumine-code/text-buffer@https://github.com/lumine-code/text-buffer.git#3d353866734e84fdc77035f207275e0fc0fc76f6":
   version "16.0.0"
-  resolved "https://github.com/lumine-code/text-buffer.git#a7c9df1ab36b03f55bb600ad1c46a143ce976d42"
+  resolved "https://github.com/lumine-code/text-buffer.git#3d353866734e84fdc77035f207275e0fc0fc76f6"
   dependencies:
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#de08d8a2c3bd1c18aabc0669920c7ae2e895241a"
     "@lumine-code/superstring" "https://github.com/lumine-code/superstring.git#27b8f39a0d7dbbdfc458355231d7f68f141010d5"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     diff "^9.0.0"
     event-kit "^2.5.3"
     fs-admin "^0.20.0"
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     grim "^2.0.3"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     winattr "^3.0.0"
 
 "@lumine-code/underscore-plus@https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65":
@@ -1658,6 +1693,13 @@
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-6.0.3.tgz#90251dc007916e972786cb94d74d15b185577d21"
   integrity sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==
+
+"@typescript/typescript6@6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@typescript/typescript6/-/typescript6-6.0.2.tgz#79e0e47492564c83f8602013d7dd10d5ebc51a8c"
+  integrity sha512-mbCddXd+jm7hfx7w2YU64/Av4/NqqeG3GoRZgxPcgoTxYjhrcfJRw9ULch71SS4G+Q3bOXFhRvPqjguN0Hyp5w==
+  dependencies:
+    "@typescript/old" "npm:typescript@^6"
 
 "@vscode/ripgrep-darwin-arm64@1.18.0":
   version "1.18.0"
@@ -2013,17 +2055,17 @@ atom-slick@^2, atom-slick@^2.0.0:
 "autocomplete@file:./packages/autocomplete":
   version "1.0.0"
   dependencies:
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     atom-slick "^2.0.0"
     grim "^2.0.1"
     minimatch "^10.2.5"
     selector-kit "^0.1.0"
     stable "^0.1.8"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 "autoflow@file:packages/autoflow":
   version "1.0.0"
   dependencies:
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 "autosave@file:./packages/autosave":
   version "1.0.0"
@@ -2054,7 +2096,7 @@ babel-plugin-polyfill-corejs3@^1.0.0:
 "background-tips@file:packages/background-tips":
   version "1.0.0"
   dependencies:
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 balanced-match@^1.0.0:
   version "1.0.2"
@@ -2100,7 +2142,7 @@ bluebird@~3.7.2:
 "bookmarks@file:packages/bookmarks":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-210ac575-c755-4a27-95ea-bce42ce7d9c9-1784034711477/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-06cb3eab-095c-4783-8858-3bcfa5353e5d-1784046995732/shared/select-list"
 
 boolbase@^1.0.0:
   version "1.0.0"
@@ -2151,8 +2193,7 @@ braces@^3.0.3:
 "bracket-matcher@file:packages/bracket-matcher":
   version "1.0.0"
   dependencies:
-    "@lumine-code/second-mate" "https://github.com/lumine-code/second-mate.git#ed4d772d396b0a28dd79e6df962a1558b7340867"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    "@lumine-code/second-mate" "https://github.com/lumine-code/second-mate.git#6d4ce175d7a3a754e36a5bbd5eec5c98b5b6abc3"
 
 browser-stdout@^1.3.1:
   version "1.3.1"
@@ -2471,8 +2512,8 @@ combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
 "command-palette@file:packages/command-palette":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-db7bbbba-c95d-4bbb-9da0-01c8044949d1-1784034711542/shared/select-list"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-34a2dd31-83ba-42a4-af1a-a7c388acc127-1784046999794/shared/select-list"
 
 commander@^10.0.0:
   version "10.0.1"
@@ -2672,10 +2713,10 @@ delayed-stream@~1.0.0:
 "deprecation-cop@file:packages/deprecation-cop":
   version "1.0.0"
   dependencies:
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     etch "0.9.0"
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     grim "^2.0.1"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 detect-libc@^2.0.0, detect-libc@^2.0.3:
   version "2.1.2"
@@ -2690,7 +2731,7 @@ detect-node@^2.0.4:
 "dev-live-reload@file:packages/dev-live-reload":
   version "1.0.0"
   dependencies:
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
 
 dezalgo@^1.0.4:
   version "1.0.4"
@@ -2904,7 +2945,7 @@ empathic@^2.0.1:
   dependencies:
     iconv-lite "^0.4.4"
     jschardet "^1.1.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-af166a96-7ef4-43ce-ac8e-c094fdb89bc2-1784034711597/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-0c7894d1-12a2-47ce-b304-c5c138d0ca88-1784047003694/shared/select-list"
 
 encoding-sniffer@^0.2.1:
   version "0.2.1"
@@ -3497,7 +3538,7 @@ function-bind@^1.1.2:
   version "1.0.0"
   dependencies:
     "@vscode/ripgrep" "1.18.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-e2975f3c-0803-428a-9dda-f9a062e3b1fa-1784034711618/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-9beed076-5742-4cf4-8538-04d415d3a4ad-1784047005619/shared/select-list"
 
 "fuzzy-files@file:packages/fuzzy-files":
   version "1.0.0"
@@ -3505,12 +3546,12 @@ function-bind@^1.1.2:
     "@vscode/ripgrep" "1.18.0"
     async "3.2.6"
     minimatch "^10.2.5"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-684b5e42-5994-4efb-9b45-0e71942971cd-1784034711633/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-fb12ecff-bb7f-4dc8-967e-f2cd671cddf7-1784047005621/shared/select-list"
 
 "fuzzy-workspace@file:packages/fuzzy-workspace":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-23b688c8-89f8-44a0-a768-45326e4f7050-1784034711648/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-e6422477-6891-47aa-bf50-b3b86c4da462-1784047005623/shared/select-list"
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
@@ -3585,7 +3626,7 @@ getpass@^0.1.1:
 "git-diff@file:packages/git-diff":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-47641b22-7d62-4c24-ab73-438a047ebab0-1784034711662/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-3bffb94d-0861-4725-b2ac-04c4c69e4607-1784047005626/shared/select-list"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -3717,7 +3758,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0,
 "grammar-selector@file:packages/grammar-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-a8f1db2f-4a77-4890-83a2-675ca044acb7-1784034711690/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-987b7444-db5d-4c05-835b-138b5078eba9-1784047005630/shared/select-list"
 
 grim@2.0.3, grim@^2.0.1, grim@^2.0.3:
   version "2.0.3"
@@ -4090,13 +4131,6 @@ jasmine-core@~6.3.0:
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-6.3.0.tgz#ff8e4e771a4c8e7bebd0966bc4625f000f78fa84"
   integrity sha512-eMm5qBovNjNoGOcgE/W207+wrcK5zrQv0Rg/rWGboUJUmZp0dFCpHTyjpuDAfCwRCqg7f9U2q2jtv/aUuzdCQg==
 
-"jasmine-focused@https://github.com/lumine-code/jasmine-focused.git#6d04426bcb107dc44b148a6d48172c918326c068":
-  version "2.0.0"
-  resolved "https://github.com/lumine-code/jasmine-focused.git#6d04426bcb107dc44b148a6d48172c918326c068"
-  dependencies:
-    "@lumine-code/jasmine-node" "https://github.com/lumine-code/jasmine-node.git#e8f7ea4bdcff09d812afdf356f95ccff91f26aa4"
-    walkdir "^0.4.1"
-
 jasmine-json@~0.0:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/jasmine-json/-/jasmine-json-0.0.3.tgz#5e2e8fd50aa585700e8f359af696b0ba964f8387"
@@ -4109,12 +4143,6 @@ jasmine-reporters@^2.5.2:
   dependencies:
     "@xmldom/xmldom" "^0.8.5"
     mkdirp "^1.0.4"
-
-"jasmine-tagged@https://github.com/lumine-code/jasmine-tagged.git#34af73e9edd3127422a5e8b8205ccd43e868ccc4":
-  version "2.0.0"
-  resolved "https://github.com/lumine-code/jasmine-tagged.git#34af73e9edd3127422a5e8b8205ccd43e868ccc4"
-  dependencies:
-    "@lumine-code/jasmine-focused" "https://github.com/lumine-code/jasmine-focused.git#6d04426bcb107dc44b148a6d48172c918326c068"
 
 jasmine@6.3.0:
   version "6.3.0"
@@ -4255,8 +4283,8 @@ key-path-helpers@^0.4.0:
 "keybinding-resolver@file:./packages/keybinding-resolver":
   version "1.0.0"
   dependencies:
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     etch "0.9.0"
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     temp "^0.9.0"
 
 keyv@^4.0.0, keyv@^4.5.4:
@@ -4412,8 +4440,8 @@ levn@^0.4.1:
 "line-ending-selector@file:packages/line-ending-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-80fc7663-a27f-40be-bc81-5b599b9eab50-1784034712234/shared/select-list"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-152880c3-f401-42e5-a0f4-19eb30ad8c6d-1784047009622/shared/select-list"
 
 line-top-index@0.3.1:
   version "0.3.1"
@@ -4425,7 +4453,7 @@ line-top-index@0.3.1:
 "link@file:packages/link":
   version "1.0.0"
   dependencies:
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 linkify-it@^5.0.2:
   version "5.0.2"
@@ -4539,15 +4567,15 @@ markdown-it@^14.3.0:
 "markdown-preview@file:./packages/markdown-preview":
   version "1.0.0"
   dependencies:
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     cheerio "^1.0.0-rc.3"
     dedent "^1.5.3"
     dompurify "^3.2.6"
     emoji-images "^0.1.1"
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     github-markdown-css "^5.5.1"
     marked "18.0.5"
     morphdom "^2.7.2"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     yaml-front-matter "^4.1.1"
 
 marked@18.0.5:
@@ -4933,7 +4961,7 @@ normalize-url@^6.0.1:
 "notifications@file:./packages/notifications":
   version "1.0.0"
   dependencies:
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     moment "^2.19.3"
     semver "^7.0.0"
     stacktrace-parser "^0.1.3"
@@ -5299,7 +5327,7 @@ progress@^2.0.3:
   version "1.0.0"
   dependencies:
     glob "^13.0.6"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-9173f1cb-7b86-4bb6-a354-de21bb5a4ee9-1784034712388/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-1b86963a-16fc-4325-9452-9623f00200a8-1784047013697/shared/select-list"
 
 promise-retry@^2.0.1:
   version "2.0.1"
@@ -5453,7 +5481,7 @@ readdirp@^4.0.1:
 "recent-list@file:packages/recent-list":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-bb52f40b-2e3c-49fd-9dad-637079143a1e-1784034712402/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-7a5f6cf3-4140-4867-b1d6-a89c34ab1f4d-1784047013699/shared/select-list"
 
 regenerate-unicode-properties@^10.2.2:
   version "10.2.2"
@@ -5639,12 +5667,6 @@ sax@^1.2.4:
   dependencies:
     etch "0.9.3"
 
-"season@https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d":
-  version "7.0.0"
-  resolved "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
-  dependencies:
-    cson-parser "^4.0.9"
-
 "select-list@file:./shared/select-list", "select-list@file:shared/select-list":
   version "1.7.0"
   dependencies:
@@ -5722,15 +5744,15 @@ set-function-length@^1.2.2:
 "settings-view@file:packages/settings-view":
   version "1.0.0"
   dependencies:
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/season" "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     async "^3.2.0"
     etch "0.9.0"
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     glob "^13.0.6"
     hosted-git-info "^2.8.9"
     request "^2.83.0"
-    season "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
     semver "^5.3.0"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 shebang-command@^2.0.0:
   version "2.0.0"
@@ -5842,12 +5864,12 @@ slash@^2.0.0:
   version "1.0.0"
   dependencies:
     "@lumine-code/scoped-property-store" "https://github.com/lumine-code/scoped-property-store.git#bf91d2339edf35f3bdedeb72e957a928fea4e20e"
+    "@lumine-code/season" "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     async "3.2.6"
     pegjs "^0.10.0"
-    season "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-336e1ab0-042f-474c-97c1-6cdbc908c9ce-1784034712460/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-85a84d2f-7773-4388-85e3-11d5bc3683af-1784047017606/shared/select-list"
     temp "~0.8.0"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 source-map-js@^1.2.1:
   version "1.2.1"
@@ -5967,9 +5989,9 @@ stat-mode@^1.0.0:
 "status-bar@file:packages/status-bar":
   version "1.0.0"
   dependencies:
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     grim "^2.0.1"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 "string-width-cjs@npm:string-width@^4.2.0":
   version "4.2.3"
@@ -6062,7 +6084,7 @@ strip-json-comments@~2.0.1:
   dependencies:
     dedent "^0.7.0"
     etch "0.9.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-fc3fc4d4-3334-425a-8ed5-8fc344379778-1784034712494/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-57c6099d-c26c-47aa-b606-dbcb2de76767-1784047021490/shared/select-list"
 
 sumchecker@^3.0.1:
   version "3.0.1"
@@ -6109,8 +6131,8 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   dependencies:
     "@lumine-code/ctags" "https://github.com/lumine-code/node-ctags.git#0e15977c7b637fc64e6dbeac315a61190fc19a19"
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     async "3.2.6"
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
 
 "symbol-provider-tree-sitter@file:./packages/symbol-provider-tree-sitter":
   version "1.0.0"
@@ -6118,9 +6140,9 @@ supports-preserve-symlinks-flag@^1.0.0:
 "symbols-view@file:./packages/symbols-view":
   version "1.0.0"
   dependencies:
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     murmurhash-js "^1.0.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-a0c73143-08eb-4b10-bfbf-eaca0d0f1abc-1784034712541/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-2da020d9-0f75-4525-973c-9c70fb99041c-1784047023376/shared/select-list"
 
 tabbable@^6.5.0:
   version "6.5.0"
@@ -6130,9 +6152,9 @@ tabbable@^6.5.0:
 "tabs@file:packages/tabs":
   version "1.0.0"
   dependencies:
-    fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     temp "~0.8.1"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 tapable@^2.3.3:
   version "2.3.3"
@@ -6238,9 +6260,9 @@ through@2, through@2.3.x, through@^2.3.8:
 "timecop@file:./packages/timecop":
   version "1.0.0"
   dependencies:
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     dedent "^0.7.0"
     etch "^0.12.6"
-    underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 tiny-async-pool@1.3.0:
   version "1.3.0"
@@ -6361,13 +6383,6 @@ type-fest@^0.7.1:
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.7.1.tgz#8dda65feaf03ed78f0a3f9678f1869147f7c5c48"
   integrity sha512-Ne2YiiGN8bmrmJJEuTWTLJR32nh/JdL1+PSicowtNb0WFpn59GK8/lfD61bVtzguz7b3PBt74nxpv/Pw5po5Rg==
-
-"typescript@npm:@typescript/typescript6@6.0.2":
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/@typescript/typescript6/-/typescript6-6.0.2.tgz#79e0e47492564c83f8602013d7dd10d5ebc51a8c"
-  integrity sha512-mbCddXd+jm7hfx7w2YU64/Av4/NqqeG3GoRZgxPcgoTxYjhrcfJRw9ULch71SS4G+Q3bOXFhRvPqjguN0Hyp5w==
-  dependencies:
-    "@typescript/old" "npm:typescript@^6"
 
 uc.micro@^2.0.0, uc.micro@^2.1.0:
   version "2.1.0"

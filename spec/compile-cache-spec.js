@@ -9,7 +9,7 @@ const path = require("path");
 const temp = require("temp").track();
 const babelCompiler = require("../src/babel");
 const CoffeeScript = require("coffeescript");
-const CSON = require("season");
+const CSON = require("@lumine-code/season");
 const TypeScriptTranspiler = require("../src/typescript");
 const CompileCache = require("../src/compile-cache");
 

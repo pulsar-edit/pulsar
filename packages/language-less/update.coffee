@@ -3,7 +3,7 @@
 path = require 'path'
 superagent = require 'superagent'
 Promise = require 'bluebird'
-CSON = require 'season'
+CSON = require '@lumine-code/season'
 
 FunctionsURL = 'https://raw.githubusercontent.com/less/less-docs/master/content/functions/data/functions.json'
 

@@ -1,5 +1,5 @@
 const temp = require("temp");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 const { promisify } = require("util");
 const { File, Directory } = require("atom");

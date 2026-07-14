@@ -1,10 +1,10 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import _ from "underscore-plus";
+import _ from "@lumine-code/underscore-plus";
 import { CompositeDisposable } from "atom";
 import etch from "etch";
-import fs from "fs-plus";
+import fs from "@lumine-code/fs-plus";
 import Grim from "grim";
 import path from "path";
 

@@ -3,10 +3,10 @@ const path = require("path");
 const util = require("util");
 const { ipcRenderer } = require("electron");
 
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const { deprecate } = require("grim");
 const { CompositeDisposable, Disposable, Emitter } = require("event-kit");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const { mapSourcePosition } = require("@atom/source-map-support");
 const semver = require("semver");
 const WindowEventHandler = require("./window-event-handler");

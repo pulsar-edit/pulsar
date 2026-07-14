@@ -2,7 +2,7 @@ const { BufferedProcess, CompositeDisposable, File, Point } = require("atom");
 
 const TagReader = require("./tag-reader");
 const getTagsFile = require("./get-tags-file");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 
 class CtagsProvider {

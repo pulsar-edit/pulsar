@@ -3,7 +3,7 @@
 
 import path from "path";
 import etch from "etch";
-import _ from "underscore-plus";
+import _ from "@lumine-code/underscore-plus";
 import { CompositeDisposable, Disposable } from "atom";
 
 import GeneralPanel from "./general-panel";

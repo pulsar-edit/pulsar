@@ -10,7 +10,7 @@ jasmine = jasmineVendor.jasmine;
 require("jasmine-json");
 
 if (!jasmine.TerminalReporter) {
-  const { jasmineNode } = require("jasmine-node/lib/jasmine-node/reporter");
+  const { jasmineNode } = require("@lumine-code/jasmine-node/lib/jasmine-node/reporter");
 
   jasmine.TerminalReporter = jasmineNode.TerminalReporter;
 }

@@ -1,7 +1,7 @@
 /* globals assert */
 
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const url = require("url");
 const { EventEmitter } = require("events");
 const temp = require("temp").track();

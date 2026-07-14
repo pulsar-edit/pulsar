@@ -1,7 +1,7 @@
 const { CompositeDisposable } = require("atom");
 const TooltipManager = require("../src/tooltip-manager");
 const Tooltip = require("../src/tooltip");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 describe("TooltipManager", () => {
   let manager, element;

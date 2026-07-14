@@ -1,5 +1,5 @@
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const temp = require("temp").track();
 const MarkdownPreviewView = require("../lib/markdown-preview-view");
 const { TextEditor } = require("atom");

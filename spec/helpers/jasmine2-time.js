@@ -1,4 +1,4 @@
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const { mockDebounce } = require("../helpers/mock-debounce");
 
 jasmine.useRealClock = function () {

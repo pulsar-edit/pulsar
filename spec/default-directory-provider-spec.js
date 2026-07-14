@@ -1,6 +1,6 @@
 const DefaultDirectoryProvider = require("../src/default-directory-provider");
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const temp = require("temp").track();
 
 describe("DefaultDirectoryProvider", function () {

@@ -1,7 +1,7 @@
 const path = require("path");
 const Grim = require("grim");
 const DeprecationCopView = require("../lib/deprecation-cop-view");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 describe("DeprecationCopStatusBarView", () => {
   let [deprecatedMethod, statusBarView, workspaceElement] = [];

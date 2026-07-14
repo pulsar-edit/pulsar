@@ -1,4 +1,4 @@
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const StartDotRegex = /^\.?/;
 
 // Represents a single unit of text as selected by a grammar.

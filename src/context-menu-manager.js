@@ -1,12 +1,12 @@
 const path = require("path");
-const CSON = require("season");
-const fs = require("fs-plus");
+const CSON = require("@lumine-code/season");
+const fs = require("@lumine-code/fs-plus");
 const { calculateSpecificity, validateSelector } = require("clear-cut");
 const { Disposable } = require("event-kit");
 const remote = require("@electron/remote");
 const MenuHelpers = require("./menu-helpers");
 const { sortMenuItems } = require("./menu-sort-helpers");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 const buildMetadata = require("../package.json");
 var platformContextMenu;

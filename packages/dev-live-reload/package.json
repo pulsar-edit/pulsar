@@ -7,7 +7,7 @@
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
   "dependencies": {
-    "fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
   },
   "engines": {
     "atom": "*"

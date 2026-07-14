@@ -1,4 +1,4 @@
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const { CompositeDisposable, Emitter } = require("event-kit");
 const { Point, Range } = require("@lumine-code/text-buffer");
 const TokenizedLine = require("./tokenized-line");

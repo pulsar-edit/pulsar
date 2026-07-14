@@ -1,5 +1,5 @@
 const Mocha = require("mocha");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const assert = require("./assert");
 
 module.exports = function (testPaths) {

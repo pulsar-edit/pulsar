@@ -3,7 +3,7 @@ const getIconServices = require("./get-icon-services");
 const layout = require("./layout");
 const TabBarView = require("./tab-bar-view.js");
 const MRUListView = require("./mru-list-view");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 module.exports = {
   activate() {

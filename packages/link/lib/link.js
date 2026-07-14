@@ -1,5 +1,5 @@
 const url = require("url");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 const LINK_SCOPE_REGEX = /markup\.underline\.link/;
 

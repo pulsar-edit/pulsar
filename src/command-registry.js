@@ -2,7 +2,7 @@
 
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
 const { calculateSpecificity, validateSelector } = require("clear-cut");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 let SequenceCount = 0;
 

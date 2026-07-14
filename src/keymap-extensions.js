@@ -1,7 +1,7 @@
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 const KeymapManager = require("@lumine-code/atom-keymap");
-const CSON = require("season");
+const CSON = require("@lumine-code/season");
 
 const buildMetadata = require("../package.json");
 var bundledKeymaps;

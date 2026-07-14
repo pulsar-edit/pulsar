@@ -1,7 +1,7 @@
 const { dialog } = require("electron");
 const crypto = require("crypto");
 const Path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 
 module.exports = class FileRecoveryService {
   constructor(recoveryDirectory) {

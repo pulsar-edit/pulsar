@@ -10,7 +10,7 @@
 let AtomReporter;
 const path = require("path");
 const process = require("process");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const grim = require("grim");
 const listen = require("../../src/delegated-listener");
 const ipcHelpers = require("../../src/ipc-helpers");

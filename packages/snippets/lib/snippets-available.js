@@ -1,6 +1,6 @@
 /** @babel */
 
-import _ from "underscore-plus";
+import _ from "@lumine-code/underscore-plus";
 import { SelectListView } from "select-list";
 
 export default class SnippetsAvailable {

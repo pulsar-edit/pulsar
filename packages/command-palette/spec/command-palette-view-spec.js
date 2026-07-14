@@ -1,6 +1,6 @@
 /** @babel */
 
-import _ from "underscore-plus";
+import _ from "@lumine-code/underscore-plus";
 import assert from "assert";
 import semver from "semver";
 import sinon from "sinon";

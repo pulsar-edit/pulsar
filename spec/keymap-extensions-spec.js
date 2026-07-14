@@ -1,5 +1,5 @@
 const temp = require("temp").track();
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 
 describe("keymap-extensions", function () {
   beforeEach(function () {

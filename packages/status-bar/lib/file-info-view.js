@@ -1,6 +1,6 @@
 const { Disposable } = require("atom");
 const url = require("url");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 
 module.exports = class FileInfoView {
   constructor() {

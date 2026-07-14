@@ -1,5 +1,5 @@
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 
 // # Platform specific helpers
 module.exports = {

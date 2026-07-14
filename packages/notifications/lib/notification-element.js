@@ -8,7 +8,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 let NotificationElement;
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 
 const NotificationIssue = require("./notification-issue");
 const TemplateHelper = require("./template-helper");

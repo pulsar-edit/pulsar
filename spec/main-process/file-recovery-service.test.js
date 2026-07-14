@@ -1,11 +1,11 @@
 const { dialog } = require("electron");
 const FileRecoveryService = require("../../src/main-process/file-recovery-service");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const fsreal = require("fs");
 const EventEmitter = require("events").EventEmitter;
 const assert = require("./assert");
 const sinon = require("sinon");
-const { escapeRegExp } = require("underscore-plus");
+const { escapeRegExp } = require("@lumine-code/underscore-plus");
 const temp = require("temp").track();
 
 describe("FileRecoveryService", function () {

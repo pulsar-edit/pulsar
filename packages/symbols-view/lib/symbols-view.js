@@ -1,5 +1,5 @@
 const Path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const Config = require("./config");
 const { CompositeDisposable, Point } = require("atom");
 const { SelectListView, highlightMatches } = require("select-list");

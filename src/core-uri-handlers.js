@@ -1,4 +1,4 @@
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 
 // Converts a query string parameter for a line or column number
 // to a zero-based line or column number for the Lumine API.

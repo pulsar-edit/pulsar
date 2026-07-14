@@ -1,4 +1,4 @@
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
 const TextEditor = require("./text-editor");
 const ScopeDescriptor = require("./scope-descriptor");

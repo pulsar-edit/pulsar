@@ -1,5 +1,5 @@
 const CommandRegistry = require("../src/command-registry");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 describe("CommandRegistry", () => {
   let registry, parent, child, grandchild;

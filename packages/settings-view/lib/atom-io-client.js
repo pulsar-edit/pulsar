@@ -1,4 +1,4 @@
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 const remote = require("@electron/remote");
 // glob >=9 exports named functions; older hoisted versions expose the callable module

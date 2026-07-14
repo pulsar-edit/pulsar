@@ -4,8 +4,8 @@
 import path from "path";
 import url from "url";
 
-import _ from "underscore-plus";
-import fs from "fs-plus";
+import _ from "@lumine-code/underscore-plus";
+import fs from "@lumine-code/fs-plus";
 import { CompositeDisposable, Disposable } from "atom";
 import etch from "etch";
 

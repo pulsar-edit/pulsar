@@ -1,7 +1,7 @@
 /** @babel */
 
 import { CompositeDisposable, Disposable, TextEditor } from "atom";
-import _ from "underscore-plus";
+import _ from "@lumine-code/underscore-plus";
 import CollapsibleSectionPanel from "./collapsible-section-panel";
 import { getSettingDescription } from "./rich-description";
 import { getSettingTitle } from "./rich-title";

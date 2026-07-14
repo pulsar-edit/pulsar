@@ -8,7 +8,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 const Grim = require("grim");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const temp = require("temp");
 const path = require("path");
 const { ipcRenderer } = require("electron");
@@ -17,7 +17,7 @@ temp.track();
 
 module.exports = function ({ logFile, headless, testPaths, buildAtomEnvironment }) {
   require("../helpers/jasmine-singleton");
-  require("jasmine-focused");
+  require("@lumine-code/jasmine-focused");
 
   const normalizeComments = require("../helpers/normalize-comments");
   for (let key in normalizeComments) {
@@ -239,7 +239,7 @@ var buildTerminalReporter = function (logFile, resolveWithExitCode) {
     const { JasmineListReporter } = require("../helpers/jasmine-list-reporter");
     return new JasmineListReporter(options);
   } else {
-    const { TerminalReporter } = require("jasmine-tagged");
+    const { TerminalReporter } = require("@lumine-code/jasmine-tagged");
     return new TerminalReporter(options);
   }
 };

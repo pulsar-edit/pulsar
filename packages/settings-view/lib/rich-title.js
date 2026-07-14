@@ -1,4 +1,4 @@
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 module.exports = {
   getSettingTitle(keyPath, name) {

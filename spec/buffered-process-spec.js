@@ -1,7 +1,7 @@
  
 const ChildProcess = require("child_process");
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const BufferedProcess = require("../src/buffered-process");
 
 describe("BufferedProcess", function () {

@@ -1,6 +1,6 @@
 const path = require("path");
 
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const InstalledPackagesPanel = require("../lib/installed-packages-panel");
 const PackageManager = require("../lib/package-manager");
 const SettingsView = require("../lib/settings-view");

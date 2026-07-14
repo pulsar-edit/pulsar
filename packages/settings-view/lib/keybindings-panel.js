@@ -3,7 +3,7 @@
 
 import { CompositeDisposable, Disposable, TextEditor } from "atom";
 import etch from "etch";
-import _ from "underscore-plus";
+import _ from "@lumine-code/underscore-plus";
 import path from "path";
 
 export default class KeybindingsPanel {

@@ -3,7 +3,7 @@ const { SelectListView, createTwoLineItem, highlightMatches } = require("select-
 const { clipboard, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
-const CSON = require("season");
+const CSON = require("@lumine-code/season");
 
 const CACHE_UPDATED_CHANNEL = "fuzzy-explorer:cache-updated";
 

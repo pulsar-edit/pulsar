@@ -1,6 +1,6 @@
 const { Disposable, CompositeDisposable } = require("event-kit");
 const listen = require("./delegated-listener");
-const { debounce } = require("underscore-plus");
+const { debounce } = require("@lumine-code/underscore-plus");
 
 // Handles low-level events related to the `window`.
 module.exports = class WindowEventHandler {

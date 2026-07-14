@@ -1,5 +1,5 @@
 const { Emitter, CompositeDisposable } = require("event-kit");
-const { flatten } = require("underscore-plus");
+const { flatten } = require("@lumine-code/underscore-plus");
 const Model = require("./model");
 const { createPaneAxisElement } = require("./pane-axis-element");
 

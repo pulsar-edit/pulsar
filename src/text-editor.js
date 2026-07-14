@@ -1,6 +1,6 @@
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const Grim = require("grim");
 const dedent = require("dedent");
 const { CompositeDisposable, Disposable, Emitter } = require("event-kit");

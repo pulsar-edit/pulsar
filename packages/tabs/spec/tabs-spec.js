@@ -1,4 +1,4 @@
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const path = require("path");
 const temp = require("temp");
 const TabBarView = require("../lib/tab-bar-view");

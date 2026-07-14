@@ -1,5 +1,5 @@
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 
 module.exports = class StorageFolder {
   constructor(containingPath) {

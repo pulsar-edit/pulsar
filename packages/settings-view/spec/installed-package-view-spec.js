@@ -13,7 +13,7 @@ const PackageManager = require("../lib/package-manager");
 const SettingsView = require("../lib/settings-view");
 const PackageKeymapView = require("../lib/package-keymap-view");
 const PackageSnippetsView = require("../lib/package-snippets-view");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 let SnippetsProvider = {
   getSnippets() {

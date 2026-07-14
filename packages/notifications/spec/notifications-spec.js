@@ -2,7 +2,7 @@
 (function() {
   var Notification, NotificationElement, NotificationIssue, UserUtils, fs, generateException, generateFakeFetchResponses, path, ref, temp;
 
-  fs = require('fs-plus');
+  fs = require('@lumine-code/fs-plus');
 
   path = require('path');
 

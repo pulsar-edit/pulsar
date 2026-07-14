@@ -2,7 +2,7 @@ const { Point, Task } = require("atom");
 const util = require("util");
 const ctags = require("@lumine-code/ctags");
 const getTagsFile = require("./get-tags-file");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 let handlerPath = require.resolve("./load-tags-handler");
 

@@ -1,6 +1,6 @@
 const path = require("path");
 const Module = require("module");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const temp = require("temp").track();
 const crypto = require("crypto");
 const ModuleCache = require("../src/module-cache");
@@ -61,7 +61,7 @@ describe("ModuleCache", function () {
           {
             paths: [""],
             dependencies: {
-              "underscore-plus": "*",
+              "@lumine-code/underscore-plus": "*",
             },
           },
         ],
@@ -71,9 +71,9 @@ describe("ModuleCache", function () {
       _atomModuleCache: {
         dependencies: [
           {
-            name: "underscore-plus",
-            version: require("underscore-plus/package.json").version,
-            path: path.join("node_modules", "underscore-plus", "lib", "underscore-plus.js"),
+            name: "@lumine-code/underscore-plus",
+            version: require("@lumine-code/underscore-plus/package.json").version,
+            path: path.join("node_modules", "@lumine-code", "underscore-plus", "lib", "underscore-plus.js"),
           },
         ],
       },
@@ -83,7 +83,7 @@ describe("ModuleCache", function () {
     fs.writeFileSync(
       indexPath,
       `\
-exports.load = function() { require('underscore-plus'); };\
+exports.load = function() { require('@lumine-code/underscore-plus'); };\
 `,
     );
 
@@ -101,7 +101,7 @@ exports.load = function() { require('underscore-plus'); };\
           {
             paths: [""],
             dependencies: {
-              "underscore-plus": "0.0.1",
+              "@lumine-code/underscore-plus": "0.0.1",
             },
           },
         ],
@@ -111,9 +111,9 @@ exports.load = function() { require('underscore-plus'); };\
       _atomModuleCache: {
         dependencies: [
           {
-            name: "underscore-plus",
-            version: require("underscore-plus/package.json").version,
-            path: path.join("node_modules", "underscore-plus", "lib", "underscore-plus.js"),
+            name: "@lumine-code/underscore-plus",
+            version: require("@lumine-code/underscore-plus/package.json").version,
+            path: path.join("node_modules", "@lumine-code", "underscore-plus", "lib", "underscore-plus.js"),
           },
         ],
       },
@@ -123,7 +123,7 @@ exports.load = function() { require('underscore-plus'); };\
     fs.writeFileSync(
       indexPath,
       `\
-exports.load = function() { require('underscore-plus'); };\
+exports.load = function() { require('@lumine-code/underscore-plus'); };\
 `,
     );
 

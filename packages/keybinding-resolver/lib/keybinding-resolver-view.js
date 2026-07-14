@@ -1,7 +1,7 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import fs from "fs-plus";
+import fs from "@lumine-code/fs-plus";
 import etch from "etch";
 import { CompositeDisposable } from "atom";
 import path from "path";

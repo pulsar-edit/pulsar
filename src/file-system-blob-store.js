@@ -1,6 +1,6 @@
 "use strict";
 
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 
 module.exports = class FileSystemBlobStore {

@@ -1,6 +1,6 @@
 const Grim = require("grim");
 const path = require("path");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const etch = require("etch");
 
 describe("DeprecationCopView", () => {

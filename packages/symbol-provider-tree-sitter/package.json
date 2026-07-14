@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "eslint": "^8.44.0",
-    "fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
+    "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
     "temp": "^0.9.4"
   }
 }

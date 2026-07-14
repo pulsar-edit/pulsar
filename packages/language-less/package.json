@@ -11,7 +11,7 @@
   "repository": "https://github.com/lumine-code/lumine",
   "devDependencies": {
     "bluebird": "^2.9.25",
-    "season": "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d",
+    "@lumine-code/season": "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d",
     "superagent": "^8.0.9"
   }
 }

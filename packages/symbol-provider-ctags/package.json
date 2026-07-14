@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "async": "3.2.6",
-    "fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
+    "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
     "@lumine-code/ctags": "https://github.com/lumine-code/node-ctags.git#0e15977c7b637fc64e6dbeac315a61190fc19a19"
   },
   "devDependencies": {

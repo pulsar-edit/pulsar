@@ -14,9 +14,9 @@
     "select-list": "file:../../shared/select-list",
     "pegjs": "^0.10.0",
     "@lumine-code/scoped-property-store": "https://github.com/lumine-code/scoped-property-store.git#bf91d2339edf35f3bdedeb72e957a928fea4e20e",
-    "season": "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d",
+    "@lumine-code/season": "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d",
     "temp": "~0.8.0",
-    "underscore-plus": "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
   },
   "providedServices": {
     "snippets": {

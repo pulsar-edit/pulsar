@@ -2,7 +2,7 @@
 /** @jsx etch.dom */
 
 import etch from "etch";
-import _ from "underscore-plus";
+import _ from "@lumine-code/underscore-plus";
 import { Disposable, CompositeDisposable } from "atom";
 import { getSettingDescription } from "./rich-description";
 import { getSettingTitle } from "./rich-title";

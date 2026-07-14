@@ -7,7 +7,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 const { Notification, CompositeDisposable } = require("atom");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 let StackTraceParser = null;
 const NotificationElement = require("./notification-element");
 const NotificationsLog = require("./notifications-log");

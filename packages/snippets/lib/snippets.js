@@ -1,8 +1,8 @@
 const path = require("path");
 const { Emitter, Disposable, CompositeDisposable, File } = require("atom");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const async = require("async");
-const CSON = require("season");
+const CSON = require("@lumine-code/season");
 const fs = require("fs");
 const ScopedPropertyStore = require("@lumine-code/scoped-property-store");
 

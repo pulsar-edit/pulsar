@@ -1,5 +1,5 @@
 const { Directory } = require("@lumine-code/pathwatcher");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 
 function hostForURI(uri) {

@@ -1,6 +1,6 @@
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const Grim = require("grim");
-const CSON = require("season");
+const CSON = require("@lumine-code/season");
 const SecondMate = require("@lumine-code/second-mate");
 const { Disposable, CompositeDisposable, Emitter } = require("event-kit");
 const TextMateLanguageMode = require("./text-mate-language-mode");
@@ -8,7 +8,7 @@ const WASMTreeSitterLanguageMode = require("./wasm-tree-sitter-language-mode");
 const WASMTreeSitterGrammar = require("./wasm-tree-sitter-grammar");
 const ScopeDescriptor = require("./scope-descriptor");
 const Token = require("./token");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const { Point, Range } = require("@lumine-code/text-buffer");
 
 const PATH_SPLIT_REGEX = new RegExp("[/.]");

@@ -1,8 +1,8 @@
 const path = require("path");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const { ipcRenderer } = require("electron");
-const CSON = require("season");
-const fs = require("fs-plus");
+const CSON = require("@lumine-code/season");
+const fs = require("@lumine-code/fs-plus");
 const { Disposable } = require("event-kit");
 const MenuHelpers = require("./menu-helpers");
 

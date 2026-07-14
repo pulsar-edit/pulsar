@@ -1,7 +1,7 @@
 /** @babel */
 
 import { SelectListView, getMatchIndices, highlightMatches } from "select-list";
-import { humanizeKeystroke } from "underscore-plus";
+import { humanizeKeystroke } from "@lumine-code/underscore-plus";
 
 export default class CommandPaletteView {
   constructor(initiallyVisibleItemCount = 10) {

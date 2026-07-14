@@ -3,8 +3,8 @@ const StartupTime = require("../startup-time");
 StartupTime.setStartTime();
 
 const path = require("path");
-const fs = require("fs-plus");
-const CSON = require("season");
+const fs = require("@lumine-code/fs-plus");
+const CSON = require("@lumine-code/season");
 const yargs = require("yargs");
 const { app, protocol } = require("electron");
 

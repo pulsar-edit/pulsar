@@ -1,4 +1,4 @@
-const { extend } = require("underscore-plus");
+const { extend } = require("@lumine-code/underscore-plus");
 const { Emitter } = require("event-kit");
 const Grim = require("grim");
 const fs = require("fs");

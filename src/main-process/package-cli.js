@@ -13,7 +13,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { spawnSync } = require("child_process");
-const CSON = require("season");
+const CSON = require("@lumine-code/season");
 const { resolvePackageSource } = require("../package-source");
 
 function packagesDirectory() {

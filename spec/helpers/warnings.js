@@ -1,5 +1,5 @@
 const pathwatcher = require("@lumine-code/pathwatcher");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const Grim = require("grim");
 
 exports.warnIfLeakingPathSubscriptions = function () {

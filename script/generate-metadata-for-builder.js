@@ -1,7 +1,7 @@
 "use strict";
 
-const CSON = require("season");
-const fs = require("fs-plus");
+const CSON = require("@lumine-code/season");
+const fs = require("@lumine-code/fs-plus");
 const normalizePackageData = require("normalize-package-data");
 const path = require("path");
 

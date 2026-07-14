@@ -1,5 +1,5 @@
 const etch = require("etch");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const { CompositeDisposable, Emitter } = require("event-kit");
 const PaneContainer = require("./pane-container");
 const TextEditor = require("./text-editor");

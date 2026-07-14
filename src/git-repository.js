@@ -1,6 +1,6 @@
 const path = require("path");
-const fs = require("fs-plus");
-const _ = require("underscore-plus");
+const fs = require("@lumine-code/fs-plus");
+const _ = require("@lumine-code/underscore-plus");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
 const GitUtils = require("@lumine-code/git-utils");
 

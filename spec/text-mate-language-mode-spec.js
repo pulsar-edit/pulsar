@@ -2,7 +2,7 @@ const NullGrammar = require("../src/null-grammar");
 const TextMateLanguageMode = require("../src/text-mate-language-mode");
 const TextBuffer = require("@lumine-code/text-buffer");
 const { Point } = TextBuffer;
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const dedent = require("dedent");
 
 describe("TextMateLanguageMode", () => {

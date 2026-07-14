@@ -5,7 +5,7 @@ const globPkg = require("glob");
 const glob = typeof globPkg === "function" ? require("util").promisify(globPkg) : globPkg.glob;
 const fs = require("fs");
 const path = require("path");
-const CSON = require("season");
+const CSON = require("@lumine-code/season");
 
 const CACHE_UPDATED_CHANNEL = "project-list:cache-updated";
 

@@ -3,9 +3,9 @@
 const ipcHelpers = require("./ipc-helpers");
 const { ipcRenderer } = require("electron");
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const { CompositeDisposable, Disposable } = require("event-kit");
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 
 // Asks for the current scrollbar style, then subscribes to a handler so it can
 // be notified of further changes. Returns a `Disposable`.

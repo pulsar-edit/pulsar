@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const path = require("path");
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const { UI_VARIABLES, UI_VARIABLES_EXTENDED, SYNTAX_VARIABLES } = require("./theme-variables");
 
 // Generates the Less compatibility shim for modern ("dual") themes.

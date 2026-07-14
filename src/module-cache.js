@@ -51,7 +51,7 @@ if (process.platform === "win32") {
 const isCorePath = (pathToCheck) => pathToCheck.startsWith(cache.resourcePathWithTrailingSlash);
 
 function loadDependencies(modulePath, rootPath, rootMetadata, moduleCache) {
-  const fs = require("fs-plus");
+  const fs = require("@lumine-code/fs-plus");
 
   for (let childPath of fs.listSync(path.join(modulePath, "node_modules"))) {
     if (path.basename(childPath) === ".bin") continue;
@@ -89,7 +89,7 @@ function loadDependencies(modulePath, rootPath, rootMetadata, moduleCache) {
 }
 
 function loadFolderCompatibility(modulePath, rootPath, rootMetadata, moduleCache) {
-  const fs = require("fs-plus");
+  const fs = require("@lumine-code/fs-plus");
 
   const metadataPath = path.join(modulePath, "package.json");
   if (!fs.isFileSync(metadataPath)) return;
@@ -135,7 +135,7 @@ function loadFolderCompatibility(modulePath, rootPath, rootMetadata, moduleCache
 }
 
 function loadExtensions(modulePath, rootPath, rootMetadata, moduleCache) {
-  const fs = require("fs-plus");
+  const fs = require("@lumine-code/fs-plus");
   const extensions = [".js", ".coffee", ".json", ".node"];
   const nodeModulesPath = path.join(rootPath, "node_modules");
 
@@ -249,7 +249,7 @@ function resolveModulePath(relativePath, parentModule) {
 
 function registerBuiltins(devMode) {
   if (devMode || !cache.resourcePath.startsWith(`${process.resourcesPath}${path.sep}`)) {
-    const fs = require("fs-plus");
+    const fs = require("@lumine-code/fs-plus");
     const atomJsPath = path.join(cache.resourcePath, "exports", "atom.js");
     if (fs.isFileSync(atomJsPath)) {
       cache.builtins.atom = atomJsPath;
@@ -261,7 +261,7 @@ function registerBuiltins(devMode) {
 }
 
 exports.create = function (modulePath) {
-  const fs = require("fs-plus");
+  const fs = require("@lumine-code/fs-plus");
 
   modulePath = fs.realpathSync(modulePath);
   const metadataPath = path.join(modulePath, "package.json");

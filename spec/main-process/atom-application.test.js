@@ -3,7 +3,7 @@
 const path = require("path");
 const { EventEmitter } = require("events");
 const temp = require("temp").track();
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const electron = require("electron");
 const sandbox = require("sinon").createSandbox();
 

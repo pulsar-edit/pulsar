@@ -1,4 +1,4 @@
-const fs = require("fs-plus");
+const fs = require("@lumine-code/fs-plus");
 const temp = require("temp");
 const path = require("path");
 

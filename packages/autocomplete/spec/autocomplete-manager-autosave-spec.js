@@ -2,7 +2,7 @@
 
 let temp = require("temp").track();
 import path from "path";
-import fs from "fs-plus";
+import fs from "@lumine-code/fs-plus";
 import { conditionPromise } from "./spec-helper";
 
 describe("Autocomplete Manager", () => {

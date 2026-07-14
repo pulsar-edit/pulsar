@@ -1,4 +1,4 @@
-const _ = require("underscore-plus");
+const _ = require("@lumine-code/underscore-plus");
 const ChildProcess = require("child_process");
 const { Emitter } = require("event-kit");
 

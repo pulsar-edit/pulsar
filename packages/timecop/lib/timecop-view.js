@@ -1,7 +1,7 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import _ from "underscore-plus";
+import _ from "@lumine-code/underscore-plus";
 import dedent from "dedent";
 import etch from "etch";
 import CachePanelView from "./cache-panel-view";

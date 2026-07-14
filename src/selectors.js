@@ -1,6 +1,6 @@
 module.exports = { selectorMatchesAnyScope, matcherForSelector };
 
-const { isSubset } = require("underscore-plus");
+const { isSubset } = require("@lumine-code/underscore-plus");
 
 // Private: Parse a selector into parts.
 //          If already parsed, returns the selector unmodified.
