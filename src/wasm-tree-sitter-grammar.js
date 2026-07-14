@@ -376,7 +376,9 @@ module.exports = class WASMTreeSitterGrammar {
           // if (inDevMode) { console.timeEnd(timeTag); }
           reject(error);
         }
-      });
+        // Propagate a failed language load; otherwise this promise never
+        // settles and callers await it forever.
+      }, reject);
     }).finally(() => {
       this.promisesForQueries.delete(queryType);
     });
