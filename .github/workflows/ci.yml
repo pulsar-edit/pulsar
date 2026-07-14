@@ -66,8 +66,16 @@ jobs:
       # are wasted here: node-pty's Windows build is broken until patched, and
       # the native modules are rebuilt for Electron below regardless. Install
       # without scripts, then reproduce the pieces we actually need.
+      #
+      # Preparing the many git-hosted `@lumine-code` forks is flaky on Windows
+      # (yarn classic intermittently fails packing a git dependency with
+      # `ENOENT ... .yarn-tarball.tgz`). Serialize the work and retry a couple
+      # of times to absorb it.
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-scripts
+        shell: bash
+        run: |
+          install() { yarn install --frozen-lockfile --ignore-scripts --network-concurrency 1; }
+          install || install || install
       - name: Apply patches
         run: npx patch-package
       - name: Download the Electron binary

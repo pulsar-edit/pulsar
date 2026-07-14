@@ -7,7 +7,15 @@ const { CompositeDisposable, Emitter } = require("event-kit");
 const { File } = require("@lumine-code/pathwatcher");
 const { normalizeDelimiters } = require("./comment-utils.js");
 
-const parserInitPromise = Parser.init();
+// Load the runtime Wasm through Node's `fs` rather than letting the emscripten
+// module `fetch` it. In Electron's renderer, `web-tree-sitter` takes its
+// browser code path (process.type === "renderer"), and `fetch` of a `file://`
+// URL is blocked on macOS and Linux, so the parser would never initialize.
+const parserInitPromise = Parser.init({
+  wasmBinary: fs.readFileSync(
+    path.join(__dirname, "..", "vendor", "web-tree-sitter", "web-tree-sitter.wasm"),
+  ),
+});
 
 function isPosition(obj) {
   return "row" in obj && "column" in obj;
@@ -85,7 +93,11 @@ module.exports = class WASMTreeSitterGrammar {
     if (this.LANGUAGE_CACHE.has(grammarPath)) {
       return this.LANGUAGE_CACHE.get(grammarPath);
     }
-    let language = await Language.load(grammarPath);
+    // Read the grammar Wasm ourselves and hand `Language.load` the bytes; a bare
+    // path would make it `fetch` a `file://` URL, which fails in Electron's
+    // renderer on macOS and Linux (see `parserInitPromise` above).
+    let input = typeof grammarPath === "string" ? fs.readFileSync(grammarPath) : grammarPath;
+    let language = await Language.load(input);
     this.LANGUAGE_CACHE.set(grammarPath, language);
     return language;
   }
