@@ -1,0 +1,103 @@
+name: Release
+
+# Cutting a release is deliberate and separate from CI. Tests already run on
+# every push to `master` (see ci.yml), so this workflow only builds the
+# distributable binaries and stages them.
+#
+#   tag vX.Y.Z            build 3-OS binaries -> DRAFT GitHub Release
+#   tag vX.Y.Z-rc.N       same, marked as a pre-release (still a draft)
+#   manual dispatch       build binaries as artifacts only (no release)
+#
+# The release stays a DRAFT until a human reviews the binaries and clicks
+# Publish. This is separate from publishing the @lumine-code/* npm packages.
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  # Never cancel a release build midway.
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    env:
+      # No signing identities are configured; build unsigned binaries.
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev
+      # Same install sequence as ci.yml's test job: skip the failing/wasted
+      # install scripts, then reproduce the pieces we need. Serialize and retry
+      # to absorb the flaky git-dependency packing on Windows.
+      - name: Install dependencies
+        shell: bash
+        run: |
+          install() { yarn install --frozen-lockfile --ignore-scripts --network-concurrency 1; }
+          install || install || install
+      - name: Apply patches
+        run: npx patch-package
+      - name: Download the Electron binary
+        run: node ./node_modules/electron/install.js
+      - name: Rebuild native modules for Electron
+        run: yarn build
+      # No GH_TOKEN here, so electron-builder does not auto-publish; the draft
+      # release is created explicitly in the release job below.
+      - name: Build distributable binaries
+        run: yarn dist
+      - name: Upload binaries
+        uses: actions/upload-artifact@v6
+        with:
+          name: lumine-${{ matrix.os }}
+          path: binaries/
+          retention-days: 14
+
+  release:
+    name: Draft GitHub Release
+    needs: build
+    # Only a tag push produces a release; manual dispatch just leaves artifacts.
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v6
+        with:
+          path: artifacts
+      - name: Create draft release with binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          # Pre-release tags (v1.2.3-rc.1) are flagged as such but still drafted.
+          prerelease=""
+          case "$tag" in *-*) prerelease="--prerelease" ;; esac
+          mapfile -t files < <(find artifacts -type f)
+          echo "Attaching ${#files[@]} file(s) to draft release $tag"
+          gh release create "$tag" \
+            --draft \
+            $prerelease \
+            --title "$tag" \
+            --generate-notes \
+            "${files[@]}"
