@@ -244,6 +244,9 @@ let options = {
 
   linux: {
     executableName: baseName,
+    // deb/rpm need a maintainer email, which the manifest's plain
+    // `author: "lumine-code"` does not carry.
+    maintainer: "lumine-code <lumine-code@users.noreply.github.com>",
     // Giving a single PNG icon to electron-builder prevents the correct
     // construction of the icon path, so we have to specify a folder containing
     // multiple icons named each with its size.
