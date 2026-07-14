@@ -2100,7 +2100,7 @@ bluebird@~3.7.2:
 "bookmarks@file:packages/bookmarks":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-9559fa55-af4b-43e2-8fc6-180f66c7d5eb-1783982050704/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-210ac575-c755-4a27-95ea-bce42ce7d9c9-1784034711477/shared/select-list"
 
 boolbase@^1.0.0:
   version "1.0.0"
@@ -2471,7 +2471,7 @@ combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
 "command-palette@file:packages/command-palette":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-68f3b55c-9f0b-4432-b0c5-67c0a52f798c-1783982050711/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-db7bbbba-c95d-4bbb-9da0-01c8044949d1-1784034711542/shared/select-list"
     underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 commander@^10.0.0:
@@ -2904,7 +2904,7 @@ empathic@^2.0.1:
   dependencies:
     iconv-lite "^0.4.4"
     jschardet "^1.1.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-c35c7977-9bef-437e-9901-ace916946edd-1783982050719/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-af166a96-7ef4-43ce-ac8e-c094fdb89bc2-1784034711597/shared/select-list"
 
 encoding-sniffer@^0.2.1:
   version "0.2.1"
@@ -3181,10 +3181,6 @@ event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.1.0, event-kit@^2.5.2, event-kit
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/event-kit/-/event-kit-2.5.3.tgz#d47e4bc116ec0aacd00263791fa1a55eb5e79ba1"
   integrity sha512-b7Qi1JNzY4BfAYfnIRanLk0DOD1gdkWHT4GISIn8Q2tAf3LpU8SP2CMwWaq40imYoKWbtN4ZhbSRxvsnikooZQ==
-
-"event-kit@github:pulsar-edit/event-kit":
-  version "2.5.3"
-  resolved "https://codeload.github.com/pulsar-edit/event-kit/tar.gz/80b551c1d03dd05795500f0c71dcf15be3a23c63"
 
 execa@^5.1.1:
   version "5.1.1"
@@ -3501,7 +3497,7 @@ function-bind@^1.1.2:
   version "1.0.0"
   dependencies:
     "@vscode/ripgrep" "1.18.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-deb24e92-8002-4c84-bda2-2466f77d1205-1783982050721/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-e2975f3c-0803-428a-9dda-f9a062e3b1fa-1784034711618/shared/select-list"
 
 "fuzzy-files@file:packages/fuzzy-files":
   version "1.0.0"
@@ -3509,12 +3505,12 @@ function-bind@^1.1.2:
     "@vscode/ripgrep" "1.18.0"
     async "3.2.6"
     minimatch "^10.2.5"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-949b8ecc-804d-482a-8df1-6607add7256b-1783982050723/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-684b5e42-5994-4efb-9b45-0e71942971cd-1784034711633/shared/select-list"
 
 "fuzzy-workspace@file:packages/fuzzy-workspace":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-c53f128f-1bf9-45b8-9b75-767b1dcd1964-1783982050725/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-23b688c8-89f8-44a0-a768-45326e4f7050-1784034711648/shared/select-list"
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
@@ -3589,7 +3585,7 @@ getpass@^0.1.1:
 "git-diff@file:packages/git-diff":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-68755de0-9949-41a9-b208-41b77d231e4c-1783982050727/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-47641b22-7d62-4c24-ab73-438a047ebab0-1784034711662/shared/select-list"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -3721,7 +3717,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0,
 "grammar-selector@file:packages/grammar-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-5aa4a4ce-7fab-4bac-8106-416da07a55e9-1783982050731/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-a8f1db2f-4a77-4890-83a2-675ca044acb7-1784034711690/shared/select-list"
 
 grim@2.0.3, grim@^2.0.1, grim@^2.0.3:
   version "2.0.3"
@@ -4416,7 +4412,7 @@ levn@^0.4.1:
 "line-ending-selector@file:packages/line-ending-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-ffbafd9e-c63a-4821-a2b0-a079bb770465-1783982050791/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-80fc7663-a27f-40be-bc81-5b599b9eab50-1784034712234/shared/select-list"
     underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
 line-top-index@0.3.1:
@@ -4500,7 +4496,7 @@ lru-cache@^6.0.0:
 "lumine-updater@file:packages/lumine-updater":
   version "1.0.0"
   dependencies:
-    event-kit "github:pulsar-edit/event-kit"
+    event-kit "^2.5.3"
     shelljs "^0.10.0"
     superagent "^10.0.0"
     winreg "^1.2.4"
@@ -5303,7 +5299,7 @@ progress@^2.0.3:
   version "1.0.0"
   dependencies:
     glob "^13.0.6"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-e9abd4e2-a31c-4b93-9788-afaf5d15ba23-1783982050843/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-9173f1cb-7b86-4bb6-a354-de21bb5a4ee9-1784034712388/shared/select-list"
 
 promise-retry@^2.0.1:
   version "2.0.1"
@@ -5457,7 +5453,7 @@ readdirp@^4.0.1:
 "recent-list@file:packages/recent-list":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-28a9ca6e-e224-4a42-8503-2f60f47ee8b3-1783982050846/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-bb52f40b-2e3c-49fd-9dad-637079143a1e-1784034712402/shared/select-list"
 
 regenerate-unicode-properties@^10.2.2:
   version "10.2.2"
@@ -5849,7 +5845,7 @@ slash@^2.0.0:
     async "3.2.6"
     pegjs "^0.10.0"
     season "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-323eb2da-fe77-4d0a-9532-90bef7b90afd-1783982050857/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-336e1ab0-042f-474c-97c1-6cdbc908c9ce-1784034712460/shared/select-list"
     temp "~0.8.0"
     underscore-plus "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
 
@@ -6066,7 +6062,7 @@ strip-json-comments@~2.0.1:
   dependencies:
     dedent "^0.7.0"
     etch "0.9.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-af493694-bc22-4557-af09-ae6d72a5ac9f-1783982050862/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-fc3fc4d4-3334-425a-8ed5-8fc344379778-1784034712494/shared/select-list"
 
 sumchecker@^3.0.1:
   version "3.0.1"
@@ -6124,7 +6120,7 @@ supports-preserve-symlinks-flag@^1.0.0:
   dependencies:
     fs-plus "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     murmurhash-js "^1.0.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-fceb5803-063e-408b-a5ec-adf191bc7536-1783982050866/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-a0c73143-08eb-4b10-bfbf-eaca0d0f1abc-1784034712541/shared/select-list"
 
 tabbable@^6.5.0:
   version "6.5.0"
