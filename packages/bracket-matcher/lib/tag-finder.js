@@ -1,6 +1,6 @@
 const { Range } = require("atom");
-const _ = require("underscore-plus");
 const SelfClosingTags = require("./self-closing-tags");
+const { escapeRegExp } = require("./helpers");
 
 const TAG_SELECTOR_REGEX = /(\b|\.)(meta\.tag|punctuation\.definition\.tag)/;
 const COMMENT_SELECTOR_REGEX = /(\b|\.)comment/;
@@ -34,7 +34,7 @@ module.exports = class TagFinder {
   }
 
   patternForTagName(tagName) {
-    tagName = _.escapeRegExp(tagName);
+    tagName = escapeRegExp(tagName);
     // 1. Start tag
     // 2. Tag name
     // 3. Attributes (optional)
@@ -56,31 +56,10 @@ module.exports = class TagFinder {
   }
 
   scopesForPositionMatchRegex(position, regex) {
-    const { tokenizedBuffer, buffer } = this.editor;
-    const { grammar } = tokenizedBuffer;
-    let column = 0;
-    const line = tokenizedBuffer.tokenizedLineForRow(position.row);
-    if (line == null) {
-      return false;
-    }
-    const lineLength = buffer.lineLengthForRow(position.row);
-    const scopeIds = line.openScopes.slice();
-    for (let i = 0; i < line.tags.length; i++) {
-      const tag = line.tags[i];
-      if (tag >= 0) {
-        const nextColumn = column + tag;
-        if (nextColumn > position.column || nextColumn === lineLength) {
-          break;
-        }
-        column = nextColumn;
-      } else if ((tag & 1) === 1) {
-        scopeIds.push(tag);
-      } else {
-        scopeIds.pop();
-      }
-    }
-
-    return scopeIds.some((scopeId) => regex.test(grammar.scopeForId(scopeId)));
+    // Ask the language mode for the scopes directly; this works for both
+    // TextMate and Tree-sitter grammars, unlike walking tokenized lines.
+    const scopes = this.editor.scopeDescriptorForBufferPosition(position).getScopesArray();
+    return scopes.some((scope) => regex.test(scope));
   }
 
   findStartTag(tagName, endPosition, fullRange = false) {
@@ -254,7 +233,7 @@ module.exports = class TagFinder {
     let stack = tags;
     const stackLength = stack.length;
     const tag = tags[tags.length - 1];
-    const escapedTag = _.escapeRegExp(tag);
+    const escapedTag = escapeRegExp(tag);
     stack = this.parseFragment(
       fragment,
       stack,

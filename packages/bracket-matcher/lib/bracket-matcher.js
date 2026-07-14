@@ -1,6 +1,6 @@
-const _ = require("underscore-plus");
 const { CompositeDisposable } = require("atom");
 const SelectorCache = require("./selector-cache");
+const { adviseBefore } = require("./helpers");
 
 module.exports = class BracketMatcher {
   constructor(editor, editorElement, matchManager) {
@@ -13,9 +13,9 @@ module.exports = class BracketMatcher {
     this.bracketMarkers = [];
 
     this.origEditorInsertText = this.editor.insertText.bind(this.editor);
-    _.adviseBefore(this.editor, "insertText", this.insertText);
-    _.adviseBefore(this.editor, "insertNewline", this.insertNewline);
-    _.adviseBefore(this.editor, "backspace", this.backspace);
+    adviseBefore(this.editor, "insertText", this.insertText);
+    adviseBefore(this.editor, "insertNewline", this.insertNewline);
+    adviseBefore(this.editor, "backspace", this.backspace);
 
     this.subscriptions.add(
       atom.commands.add(
@@ -104,8 +104,10 @@ module.exports = class BracketMatcher {
     }
 
     if (skipOverExistingClosingBracket) {
-      if (bracketMarker) bracketMarker.destroy();
-      _.remove(this.bracketMarkers, bracketMarker);
+      if (bracketMarker) {
+        bracketMarker.destroy();
+        this.bracketMarkers.splice(this.bracketMarkers.indexOf(bracketMarker), 1);
+      }
       this.editor.moveRight();
       return false;
     } else if (autoCompleteOpeningBracket) {

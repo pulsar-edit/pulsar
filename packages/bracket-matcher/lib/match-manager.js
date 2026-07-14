@@ -1,11 +1,11 @@
-const _ = require("underscore-plus");
 const { CompositeDisposable } = require("atom");
+const { escapeRegExp } = require("./helpers");
 
 module.exports = class MatchManager {
   appendPair(pairList, [itemLeft, itemRight]) {
     const newPair = {};
     newPair[itemLeft] = itemRight;
-    pairList = _.extend(pairList, newPair);
+    Object.assign(pairList, newPair);
   }
 
   processAutoPairs(autocompletePairs, pairedList, dataFun) {
@@ -39,7 +39,7 @@ module.exports = class MatchManager {
     );
     for (let startPair in this.pairedCharacters) {
       const endPair = this.pairedCharacters[startPair];
-      this.pairRegexes[startPair] = new RegExp(`[${_.escapeRegExp(startPair + endPair)}]`, "g");
+      this.pairRegexes[startPair] = new RegExp(`[${escapeRegExp(startPair + endPair)}]`, "g");
     }
   }
 

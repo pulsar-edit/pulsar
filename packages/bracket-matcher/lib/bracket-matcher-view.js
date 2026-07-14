@@ -1,6 +1,5 @@
-const { CompositeDisposable } = require("atom");
-const _ = require("underscore-plus");
-const { Range, Point } = require("atom");
+const { CompositeDisposable, Emitter, Range, Point } = require("atom");
+const { escapeRegExp } = require("./helpers");
 const TagFinder = require("./tag-finder");
 
 const MAX_ROWS_TO_SCAN = 10000;
@@ -18,6 +17,7 @@ module.exports = class BracketMatcherView {
     this.matchManager = matchManager;
     this.gutter = this.editor.gutterWithName("line-number");
     this.subscriptions = new CompositeDisposable();
+    this.emitter = new Emitter();
     this.tagFinder = new TagFinder(this.editor);
     this.pairHighlighted = false;
     this.tagHighlighted = false;
@@ -64,6 +64,13 @@ module.exports = class BracketMatcherView {
 
   destroy() {
     this.subscriptions.dispose();
+    this.emitter.dispose();
+  }
+
+  // Public: Invoke the given callback whenever the highlighted match changes,
+  // including when it clears. Consumed through the `bracket-matcher` service.
+  onDidChangeMatch(callback) {
+    return this.emitter.on("did-change-match", callback);
   }
 
   updateMatch() {
@@ -75,7 +82,10 @@ module.exports = class BracketMatcherView {
     this.pairHighlighted = false;
     this.tagHighlighted = false;
 
-    if (!this.editor.getLastSelection().isEmpty()) return;
+    if (!this.editor.getLastSelection().isEmpty()) {
+      this.emitter.emit("did-change-match");
+      return;
+    }
 
     const { position, matchPosition } = this.findCurrentPair();
 
@@ -100,7 +110,10 @@ module.exports = class BracketMatcherView {
         ({ startRange, endRange } = this.findMatchingTagNameRangesWithSyntaxTree());
       } else {
         ({ startRange, endRange } = this.tagFinder.findMatchingTags());
-        if (this.isCursorOnCommentOrString()) return;
+        if (this.isCursorOnCommentOrString()) {
+          this.emitter.emit("did-change-match");
+          return;
+        }
       }
       if (startRange) {
         highlightTag = true;
@@ -108,12 +121,16 @@ module.exports = class BracketMatcherView {
       }
     }
 
-    if (!highlightTag && !highlightPair) return;
+    if (!highlightTag && !highlightPair) {
+      this.emitter.emit("did-change-match");
+      return;
+    }
 
     this.startMarker = this.createMarker(startRange);
     this.endMarker = this.createMarker(endRange);
     this.pairHighlighted = highlightPair;
     this.tagHighlighted = highlightTag;
+    this.emitter.emit("did-change-match");
   }
 
   selectMatchingBrackets() {
@@ -284,7 +301,9 @@ module.exports = class BracketMatcherView {
 
   findContainingTagsWithSyntaxTree(position) {
     let startTag, endTag;
-    if (position.column === this.editor.buffer.lineLengthForRow(position.row)) position.column--;
+    // Step back one column without mutating the caller-owned point.
+    if (position.column === this.editor.buffer.lineLengthForRow(position.row))
+      position = position.traverse([0, -1]);
     this.editor.buffer.getLanguageMode().getSyntaxNodeAtPosition(position, (node) => {
       if (node.type.includes("element") && node.childCount > 0) {
         const { firstChild, lastChild } = node;
@@ -394,8 +413,10 @@ module.exports = class BracketMatcherView {
 
   findPrecedingStartBracketWithRegexSearch(cursorPosition) {
     const scanRange = new Range(Point.ZERO, cursorPosition);
-    const startBracket = _.escapeRegExp(_.keys(this.matchManager.pairedCharacters).join(""));
-    const endBracket = _.escapeRegExp(_.keys(this.matchManager.pairedCharactersInverse).join(""));
+    const startBracket = escapeRegExp(Object.keys(this.matchManager.pairedCharacters).join(""));
+    const endBracket = escapeRegExp(
+      Object.keys(this.matchManager.pairedCharactersInverse).join(""),
+    );
     const combinedRegExp = new RegExp(`[${startBracket}${endBracket}]`, "g");
     const startBracketRegExp = new RegExp(`[${startBracket}]`, "g");
     const endBracketRegExp = new RegExp(`[${endBracket}]`, "g");
