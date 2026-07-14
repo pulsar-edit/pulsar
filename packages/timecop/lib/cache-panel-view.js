@@ -91,7 +91,7 @@ export default class CachePanelView {
   getCsonCompiles() {
     try {
       const CSON = require(
-        path.join(atom.getLoadSettings().resourcePath, "node_modules", "season"),
+        path.join(atom.getLoadSettings().resourcePath, "node_modules", "@lumine-code", "season"),
       );
       if (CSON.getCacheMisses) {
         return CSON.getCacheMisses() || 0;
