@@ -498,7 +498,10 @@
             var detail, message, packageDir, packagesDir, stack;
             spyOn(atom, 'inDevMode').andReturn(false);
             generateFakeFetchResponses();
-            packagesDir = path.join(temp.mkdirSync('atom-packages-'), '.atom', 'packages');
+            // Resolve the temp directory to its real path: on macOS the temp
+            // root is itself a symlink (/var -> /private/var), which would make
+            // the package-name lookup miss the realpathed stack frames.
+            packagesDir = path.join(fs.realpathSync(temp.mkdirSync('atom-packages-')), '.atom', 'packages');
             atom.packages.packageDirPaths.push(packagesDir);
             packageDir = path.join(packagesDir, '..', '..', 'github', 'linked-package');
             fs.makeTreeSync(path.dirname(path.join(packagesDir, 'linked-package')));
