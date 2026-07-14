@@ -1,4 +1,10 @@
-async function conditionPromise(condition, description = "anonymous condition") {
+async function conditionPromise(
+  condition,
+  description = "anonymous condition",
+  // Filesystem-watcher and other event-driven conditions are markedly slower to
+  // settle on loaded CI runners (especially Windows), so allow more headroom there.
+  timeout = process.env.CI ? 30000 : 5000,
+) {
   const startTime = Date.now();
 
   while (true) {
@@ -13,7 +19,7 @@ async function conditionPromise(condition, description = "anonymous condition") 
       return;
     }
 
-    if (Date.now() - startTime > 5000) {
+    if (Date.now() - startTime > timeout) {
       throw new Error("Timed out waiting on " + description);
     }
   }

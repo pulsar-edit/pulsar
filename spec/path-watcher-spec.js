@@ -415,6 +415,9 @@ describe("watchPath", function () {
 
         disposables.add(watcher0, watcher1);
 
+        // Let the native watchers finish arming before triggering the change, so
+        // slow CI runners (notably Windows) don't miss the event and hang.
+        await wait(process.env.CI ? 2000 : 0);
         await writeFile(path.join(realRootDir, "foo.txt"), "!");
         await conditionPromise(() => {
           return events0.length > 0 && events1.length > 0 && events0.length === events1.length;
@@ -450,6 +453,9 @@ describe("watchPath", function () {
 
         disposables.add(watcher0, watcher1);
 
+        // Let the native watchers finish arming before triggering the change, so
+        // slow CI runners (notably Windows) don't miss the event and hang.
+        await wait(process.env.CI ? 2000 : 0);
         await writeFile(path.join(realRootDir, "foo.txt"), "!");
         await conditionPromise(() => {
           return events0.length > 0 && events1.length > 0 && events0.length === events1.length;
@@ -480,6 +486,8 @@ describe("watchPath", function () {
         });
         disposables.add(watcher0);
 
+        // Let the native watcher finish arming before triggering the change.
+        await wait(process.env.CI ? 2000 : 0);
         await writeFile(path.join(realRootDir, "foo.txt"), "!");
         await conditionPromise(() => events0.length > 0);
 
@@ -574,6 +582,10 @@ describe("watchPath", function () {
 
         expect(subWatcher0.native).toBe(parentWatcher.native);
         expect(subWatcher1.native).toBe(parentWatcher.native);
+
+        // Let the adopted native watcher finish arming before triggering changes,
+        // so slow CI runners (notably Windows) don't drop events and hang.
+        await wait(process.env.CI ? 2000 : 0);
 
         // Ensure events are filtered correctly
         await Promise.all([
