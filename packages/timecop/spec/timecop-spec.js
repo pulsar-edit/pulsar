@@ -16,6 +16,10 @@ describe("Timecop", () => {
 
     spyOn(CSON, "getCacheMisses").andReturn(10);
 
+    // The Less cache is created lazily on the first Less compile, which never
+    // happens now that the bundled themes ship plain CSS.
+    atom.themes.lessCache ??= {};
+    atom.themes.lessCache.cache ??= { stats: {} };
     atom.themes.lessCache.cache.stats.misses = 12;
 
     await atom.packages.activatePackage("timecop");

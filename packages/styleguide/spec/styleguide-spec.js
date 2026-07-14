@@ -1,4 +1,4 @@
-const { it, fit, ffit, beforeEach, afterEach } = require("./async-spec-helpers"); // eslint-disable-line no-unused-vars
+const { it, fit, ffit, beforeEach, afterEach, conditionPromise } = require("./async-spec-helpers"); // eslint-disable-line no-unused-vars
 
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -21,13 +21,22 @@ describe("Style Guide", () => {
 
     it("assigns a grammar to its editors even if present before the correct grammar is added", async () => {
       jasmine.useRealClock();
-      await wait(100);
-      let editor = styleGuideView.element.querySelector(".example-html atom-text-editor");
-      let te = editor.getModel();
+      // Sections render on later animation frames and the grammar assignment
+      // happens asynchronously after the language package activates, so poll
+      // instead of sleeping for a fixed interval.
+      await conditionPromise(
+        () => styleGuideView.element.querySelector(".example-html atom-text-editor") != null,
+        "the HTML example editor to render",
+      );
+      const editor = styleGuideView.element.querySelector(".example-html atom-text-editor");
+      const te = editor.getModel();
       expect(te.getGrammar()?.scopeName).toBe("text.plain.null-grammar");
 
       await atom.packages.activatePackage("language-html");
-      await wait(100);
+      await conditionPromise(
+        () => te.getGrammar()?.scopeName === "text.html.basic",
+        "the HTML grammar to be assigned",
+      );
 
       expect(te.getGrammar()?.scopeName).toBe("text.html.basic");
     });

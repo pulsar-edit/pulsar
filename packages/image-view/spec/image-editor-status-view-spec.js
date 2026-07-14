@@ -6,7 +6,7 @@ const {
   afterEach,
   conditionPromise,
   emitterEventPromise,
-} = require("./async-spec-helpers");  
+} = require("./async-spec-helpers");
 
 const fs = require("fs");
 const path = require("path");
@@ -77,6 +77,9 @@ describe("ImageEditorStatusView", () => {
   });
 
   it("updates when the image is reloaded", async () => {
+    // The reload URI is cache-busted with `Date.now()`; the mocked spec clock
+    // would freeze it, so the image would never load again.
+    jasmine.useRealClock();
     const editor = await atom.workspace.open(filePath);
     const view = editor.view;
     view.element.style.height = "100px";
@@ -86,7 +89,14 @@ describe("ImageEditorStatusView", () => {
     let imageSizeStatus = statusBar.leftPanel.querySelector(".status-image");
     expect(imageSizeStatus.textContent).toBe("10x10 392B");
 
-    spyOn(fs, "statSync").andReturn({ size: 300 });
+    // The spy intercepts every `statSync` caller, so delegate to the real
+    // implementation and only fake the image's reported size.
+    const realStatSync = fs.statSync;
+    spyOn(fs, "statSync").andCallFake((statPath, ...args) => {
+      const stats = realStatSync(statPath, ...args);
+      if (statPath === editor.getPath()) stats.size = 300;
+      return stats;
+    });
     editor.view.updateImageURI();
 
     await emitterEventPromise(editor.view.emitter, "did-update");
