@@ -47,22 +47,20 @@ describe("PulsarPackageClient", function () {
 
   describe("getPackage", function () {
     it("fetches a single package by name and normalizes it", function () {
-      const requestImpl = jasmine.createSpy("request").andCallFake((options, callback) =>
-        callback(
-          null,
-          { statusCode: 200 },
-          {
+      const fetchImpl = jasmine.createSpy("fetch").andCallFake(() =>
+        Promise.resolve(
+          jsonResponse(200, {
             name: "hydrogen",
             repository: { url: "https://github.com/nteract/hydrogen" },
             releases: { latest: "2.16.3" },
-          },
+          }),
         ),
       );
-      const client = new PulsarPackageClient({ requestImpl });
+      const client = new PulsarPackageClient({ fetchImpl });
 
       waitsForPromise(() =>
         client.getPackage("hydrogen").then((pack) => {
-          expect(requestImpl.mostRecentCall.args[0].url).toContain("/packages/hydrogen");
+          expect(fetchImpl.mostRecentCall.args[0]).toContain("/packages/hydrogen");
           expect(pack.name).toBe("hydrogen");
           expect(pack.version).toBe("2.16.3");
           expect(pack.source).toBe("pulsar");
@@ -71,13 +69,13 @@ describe("PulsarPackageClient", function () {
     });
 
     it("returns null for a blank name without querying the registry", function () {
-      const requestImpl = jasmine.createSpy("request");
-      const client = new PulsarPackageClient({ requestImpl });
+      const fetchImpl = jasmine.createSpy("fetch");
+      const client = new PulsarPackageClient({ fetchImpl });
 
       waitsForPromise(() =>
         client.getPackage("  ").then((pack) => {
           expect(pack).toBe(null);
-          expect(requestImpl).not.toHaveBeenCalled();
+          expect(fetchImpl).not.toHaveBeenCalled();
         }),
       );
     });
@@ -85,19 +83,19 @@ describe("PulsarPackageClient", function () {
 
   describe("search", function () {
     it("queries the registry search endpoint and normalizes the results", function () {
-      const requestImpl = jasmine
-        .createSpy("request")
-        .andCallFake((options, callback) =>
-          callback(null, { statusCode: 200 }, [
+      const fetchImpl = jasmine.createSpy("fetch").andCallFake(() =>
+        Promise.resolve(
+          jsonResponse(200, [
             { name: "found", repository: { url: "https://github.com/owner/found" } },
             { name: "no-repo" },
           ]),
-        );
-      const client = new PulsarPackageClient({ requestImpl });
+        ),
+      );
+      const client = new PulsarPackageClient({ fetchImpl });
 
       waitsForPromise(() =>
         client.search("code").then((results) => {
-          expect(requestImpl.mostRecentCall.args[0].url).toContain("/packages/search?q=code");
+          expect(fetchImpl.mostRecentCall.args[0]).toContain("/packages/search?q=code");
           expect(results.map((pack) => pack.name)).toEqual(["found"]);
           expect(results[0].source).toBe("pulsar");
         }),
@@ -105,20 +103,20 @@ describe("PulsarPackageClient", function () {
     });
 
     it("does not query the registry for a blank query", function () {
-      const requestImpl = jasmine.createSpy("request");
-      const client = new PulsarPackageClient({ requestImpl });
+      const fetchImpl = jasmine.createSpy("fetch");
+      const client = new PulsarPackageClient({ fetchImpl });
 
       waitsForPromise(() =>
         client.search("   ").then((results) => {
           expect(results).toEqual([]);
-          expect(requestImpl).not.toHaveBeenCalled();
+          expect(fetchImpl).not.toHaveBeenCalled();
         }),
       );
     });
 
     it("rejects on a non-success status", function () {
-      const requestImpl = (options, callback) => callback(null, { statusCode: 500 }, "");
-      const client = new PulsarPackageClient({ requestImpl });
+      const fetchImpl = () => Promise.resolve(jsonResponse(500, ""));
+      const client = new PulsarPackageClient({ fetchImpl });
 
       let rejected = false;
       waitsForPromise(() => client.search("code").catch(() => (rejected = true)));
@@ -126,3 +124,11 @@ describe("PulsarPackageClient", function () {
     });
   });
 });
+
+// A minimal stand-in for the fetch Response used by PulsarPackageClient.get.
+function jsonResponse(status, body) {
+  return {
+    status,
+    json: () => Promise.resolve(body),
+  };
+}

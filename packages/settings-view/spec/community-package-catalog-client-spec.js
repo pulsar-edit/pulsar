@@ -14,6 +14,14 @@ function createStorage() {
   };
 }
 
+// A minimal stand-in for the fetch Response used by the catalog client.
+function jsonResponse(status, body) {
+  return {
+    status,
+    json: () => Promise.resolve(body),
+  };
+}
+
 describe("CommunityPackageCatalogClient", function () {
   it("normalizes repository shorthands and index URLs", function () {
     expect(normalizeCatalogSource("owner/catalog")).toBe(
@@ -93,17 +101,15 @@ describe("CommunityPackageCatalogClient", function () {
   it("uses a fresh cache without requesting the catalog again", function () {
     let now = 100;
     const storage = createStorage();
-    const requestImpl = jasmine.createSpy("requestImpl").andCallFake((_options, callback) =>
-      callback(
-        null,
-        { statusCode: 200 },
-        {
+    const fetchImpl = jasmine.createSpy("fetchImpl").andCallFake(() =>
+      Promise.resolve(
+        jsonResponse(200, {
           schemaVersion: 1,
           packages: [{ name: "cached", repository: "owner/cached" }],
-        },
+        }),
       ),
     );
-    const client = new CommunityPackageCatalogClient({ requestImpl, storage, now: () => now });
+    const client = new CommunityPackageCatalogClient({ fetchImpl, storage, now: () => now });
 
     waitsForPromise(() =>
       client
@@ -114,23 +120,21 @@ describe("CommunityPackageCatalogClient", function () {
         })
         .then((catalog) => {
           expect(catalog.packages[0].name).toBe("cached");
-          expect(requestImpl.callCount).toBe(1);
+          expect(fetchImpl.callCount).toBe(1);
         }),
     );
   });
 
   it("preserves repository selectors when reading cached metadata", function () {
     const storage = createStorage();
-    const requestImpl = (_options, callback) =>
-      callback(
-        null,
-        { statusCode: 200 },
-        {
+    const fetchImpl = () =>
+      Promise.resolve(
+        jsonResponse(200, {
           schemaVersion: 1,
           packages: [{ name: "selected", repository: "owner/selected@2.1.0" }],
-        },
+        }),
       );
-    const client = new CommunityPackageCatalogClient({ requestImpl, storage, now: () => 100 });
+    const client = new CommunityPackageCatalogClient({ fetchImpl, storage, now: () => 100 });
 
     waitsForPromise(() =>
       client
@@ -145,24 +149,22 @@ describe("CommunityPackageCatalogClient", function () {
   it("never touches the network in cacheOnly mode", function () {
     let now = 100;
     const storage = createStorage();
-    const requestImpl = jasmine.createSpy("requestImpl").andCallFake((_options, callback) =>
-      callback(
-        null,
-        { statusCode: 200 },
-        {
+    const fetchImpl = jasmine.createSpy("fetchImpl").andCallFake(() =>
+      Promise.resolve(
+        jsonResponse(200, {
           schemaVersion: 1,
           packages: [{ name: "cached", repository: "owner/cached" }],
-        },
+        }),
       ),
     );
-    const client = new CommunityPackageCatalogClient({ requestImpl, storage, now: () => now });
+    const client = new CommunityPackageCatalogClient({ fetchImpl, storage, now: () => now });
 
     waitsForPromise(() =>
       client
         .load("https://example.test/index.json", { cacheOnly: true })
         .then((catalog) => {
           expect(catalog).toBeNull();
-          expect(requestImpl.callCount).toBe(0);
+          expect(fetchImpl.callCount).toBe(0);
           return client.load("https://example.test/index.json");
         })
         .then(() => {
@@ -171,7 +173,7 @@ describe("CommunityPackageCatalogClient", function () {
         })
         .then((catalog) => {
           expect(catalog.packages[0].name).toBe("cached");
-          expect(requestImpl.callCount).toBe(1);
+          expect(fetchImpl.callCount).toBe(1);
         }),
     );
   });
@@ -180,18 +182,16 @@ describe("CommunityPackageCatalogClient", function () {
     let fail = false;
     let now = 100;
     const storage = createStorage();
-    const requestImpl = (_options, callback) => {
-      if (fail) return callback(new Error("offline"));
-      callback(
-        null,
-        { statusCode: 200 },
-        {
+    const fetchImpl = () => {
+      if (fail) return Promise.reject(new Error("offline"));
+      return Promise.resolve(
+        jsonResponse(200, {
           schemaVersion: 1,
           packages: [{ name: "offline", repository: "owner/offline" }],
-        },
+        }),
       );
     };
-    const client = new CommunityPackageCatalogClient({ requestImpl, storage, now: () => now });
+    const client = new CommunityPackageCatalogClient({ fetchImpl, storage, now: () => now });
 
     waitsForPromise(() =>
       client

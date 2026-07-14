@@ -1,4 +1,3 @@
-const request = require("request");
 const fs = require("fs");
 const path = require("path");
 const { fileURLToPath, pathToFileURL } = require("url");
@@ -57,8 +56,12 @@ function normalizeCatalogSource(source) {
 }
 
 module.exports = class CommunityPackageCatalogClient {
-  constructor({ requestImpl = request, storage = createMemoryStorage(), now = Date.now } = {}) {
-    this.requestImpl = requestImpl;
+  constructor({
+    fetchImpl = (...args) => fetch(...args),
+    storage = createMemoryStorage(),
+    now = Date.now,
+  } = {}) {
+    this.fetchImpl = fetchImpl;
     this.storage = storage;
     this.now = now;
   }
@@ -86,39 +89,21 @@ module.exports = class CommunityPackageCatalogClient {
     }
   }
 
-  fetch(url, source = url) {
+  async fetch(url, source = url) {
     if (url.startsWith("file://")) {
-      return fs.promises
-        .readFile(fileURLToPath(url), "utf8")
-        .then((body) => this.validate(JSON.parse(body), source));
+      const body = await fs.promises.readFile(fileURLToPath(url), "utf8");
+      return this.validate(JSON.parse(body), source);
     }
 
-    return new Promise((resolve, reject) => {
-      this.requestImpl(
-        {
-          url,
-          headers: { "User-Agent": navigator.userAgent },
-          gzip: true,
-        },
-        (error, response, body) => {
-          if (error) return reject(error);
-          if (!response || response.statusCode < 200 || response.statusCode >= 300) {
-            return reject(
-              new Error(
-                `Community package catalog request failed with status ${response?.statusCode || "unknown"}.`,
-              ),
-            );
-          }
-
-          try {
-            const value = typeof body === "string" ? JSON.parse(body) : body;
-            resolve(this.validate(value, source));
-          } catch (parseError) {
-            reject(parseError);
-          }
-        },
-      );
+    const response = await this.fetchImpl(url, {
+      headers: { "User-Agent": navigator.userAgent },
     });
+    if (!response || response.status < 200 || response.status >= 300) {
+      throw new Error(
+        `Community package catalog request failed with status ${response?.status || "unknown"}.`,
+      );
+    }
+    return this.validate(await response.json(), source);
   }
 
   validate(value, source) {

@@ -15,7 +15,6 @@
   "dependencies": {
     "event-kit": "^2.5.3",
     "shelljs": "^0.10.0",
-    "superagent": "^10.0.0",
     "winreg": "^1.2.4"
   },
   "configSchema": {

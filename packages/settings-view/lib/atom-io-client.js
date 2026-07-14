@@ -4,7 +4,6 @@ const remote = require("@electron/remote");
 // glob >=9 exports named functions; older hoisted versions expose the callable module
 const globPkg = require("glob");
 const glob = typeof globPkg === "function" ? require("util").promisify(globPkg) : globPkg.glob;
-const request = require("request");
 
 module.exports = class AtomIoClient {
   constructor(packageManager, baseURL) {
@@ -47,21 +46,15 @@ module.exports = class AtomIoClient {
   }
 
   request(path, callback) {
-    const options = {
-      url: `${this.baseURL}${path}`,
-      headers: { "User-Agent": navigator.userAgent },
-      gzip: true,
-    };
+    const url = `${this.baseURL}${path}`;
+    const options = { headers: { "User-Agent": navigator.userAgent } };
 
-    request(options, (err, res, body) => {
-      if (err) {
-        return callback(err);
-      }
-
-      try {
-        // NOTE: request's json option does not populate err if parsing fails,
-        // so we do it manually
-        body = this.parseJSON(body);
+    fetch(url, options)
+      .then((response) => response.text())
+      .then((text) => {
+        // NOTE: parse the body manually so a malformed response surfaces as an
+        // error to the callback rather than resolving with garbage.
+        const body = this.parseJSON(text);
         delete body.versions;
 
         const cached = this.deepCache(path, body);
@@ -69,11 +62,9 @@ module.exports = class AtomIoClient {
         //   data: body
         //   createdOn: Date.now()
         // localStorage.setItem(@cacheKeyForPath(path), JSON.stringify(cached))
-        return callback(err, cached.data);
-      } catch (error) {
-        return callback(error);
-      }
-    });
+        callback(null, cached.data);
+      })
+      .catch((error) => callback(error));
   }
 
   deepCache(path, body) {
@@ -146,32 +137,27 @@ module.exports = class AtomIoClient {
       return callback(null, null);
     } else {
       const imagePath = this.avatarPath(login);
-      const requestObject = {
-        url: `https://avatars.githubusercontent.com/${login}`,
-        headers: { "User-Agent": navigator.userAgent },
-      };
-      return request.head(requestObject, function (error, response, body) {
-        if (
-          error != null ||
-          response.statusCode !== 200 ||
-          !response.headers["content-type"].startsWith("image/")
-        ) {
-          return callback(error);
-        } else {
-          const writeStream = fs.createWriteStream(imagePath);
-          writeStream.on("finish", () => callback(null, imagePath));
-          writeStream.on("error", function (error) {
-            writeStream.close();
-            try {
-              if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-              }
-            } catch (error1) {}
-            return callback(error);
+      const url = `https://avatars.githubusercontent.com/${login}`;
+      fetch(url, { headers: { "User-Agent": navigator.userAgent } })
+        .then(async (response) => {
+          const contentType = response.headers.get("content-type") || "";
+          if (!response.ok || !contentType.startsWith("image/")) {
+            return callback(null);
+          }
+          const buffer = Buffer.from(await response.arrayBuffer());
+          fs.writeFile(imagePath, buffer, (error) => {
+            if (error) {
+              try {
+                if (fs.existsSync(imagePath)) {
+                  fs.unlinkSync(imagePath);
+                }
+              } catch (error1) {}
+              return callback(error);
+            }
+            callback(null, imagePath);
           });
-          return request(requestObject).pipe(writeStream);
-        }
-      });
+        })
+        .catch((error) => callback(error));
     }
   }
 

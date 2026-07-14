@@ -1,18 +1,16 @@
 # Run this to update the list of builtin less functions
 
 path = require 'path'
-superagent = require 'superagent'
-Promise = require 'bluebird'
 CSON = require '@lumine-code/season'
 
 FunctionsURL = 'https://raw.githubusercontent.com/less/less-docs/master/content/functions/data/functions.json'
 
 functionsPromise = new Promise (resolve) ->
-  superagent.get(FunctionsURL).set('Accept', 'application/json').then (response) ->
+  fetch(FunctionsURL, headers: { Accept: 'application/json' }).then (response) ->
     if response.status isnt 200
       console.error("Request failed: #{response.status}")
-      resolve(null)
-    resolve(JSON.parse(response.text)) # SuperAgent should be able to autoparse the response.body but seems to fail doing so in CoffeeScript
+      return resolve(null)
+    response.text().then (text) -> resolve(JSON.parse(text))
   .catch (error) ->
     console.error(error)
     resolve(null)

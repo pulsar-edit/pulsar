@@ -89,7 +89,6 @@ const downloadGitRepo = require("download-git-repo");
 const css = require("@webref/css");
 const elements = require("@webref/elements");
 const fs = require("fs");
-const superagent = require("superagent");
 const CSSParser = require("./cssValueDefinitionSyntaxExtractor.js");
 const manualPropertyDesc = require("./manual-property-desc.json");
 
@@ -165,16 +164,18 @@ function sortByLength(obj) {
 
 async function sortByPopularity(obj) {
   try {
-    const res = await superagent.get("https://chromestatus.com/data/csspopularity");
+    const res = await fetch("https://chromestatus.com/data/csspopularity");
     if (res.status !== 200) {
       console.error(res);
       process.exit(1);
     }
 
+    const popularity = await res.json();
+
     let newObj = {};
 
-    for (prop in res.body) {
-      let property = res.body[prop].property_name;
+    for (prop in popularity) {
+      let property = popularity[prop].property_name;
 
       if (typeof obj[property] === "object") {
         newObj[property] = obj[property];
@@ -427,15 +428,13 @@ async function getPseudoSelectors() {
   // collect it manually.
 
   try {
-    const res = await superagent.get(
-      "https://github.com/w3c/webref/raw/main/ed/css/selectors.json",
-    );
+    const res = await fetch("https://github.com/w3c/webref/raw/main/ed/css/selectors.json");
     if (res.status !== 200) {
       console.error(res);
       process.exit(1);
     }
 
-    const selectors = JSON.parse(res.text);
+    const selectors = JSON.parse(await res.text());
 
     let newObj = {};
 
@@ -443,15 +442,13 @@ async function getPseudoSelectors() {
       newObj[item.name] = { description: item.prose ?? "" };
     }
 
-    const res2 = await superagent.get(
-      "https://github.com/w3c/webref/raw/main/ed/css/css-pseudo.json",
-    );
+    const res2 = await fetch("https://github.com/w3c/webref/raw/main/ed/css/css-pseudo.json");
     if (res2.status !== 200) {
       console.error(res2);
       process.exit(1);
     }
 
-    const psuedoSelectors = JSON.parse(res2.text);
+    const psuedoSelectors = JSON.parse(await res2.text());
 
     for (const item of psuedoSelectors.selectors) {
       newObj[item.name] = { description: item.prose ?? "" };

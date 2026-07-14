@@ -1,5 +1,3 @@
-const request = require("request");
-
 const PULSAR_API = "https://api.pulsar-edit.dev/api";
 const SEARCH_LIMIT = 25;
 
@@ -44,8 +42,8 @@ function normalizePulsarPackage(entry) {
 }
 
 module.exports = class PulsarPackageClient {
-  constructor({ requestImpl = request } = {}) {
-    this.requestImpl = requestImpl;
+  constructor({ fetchImpl = (...args) => fetch(...args) } = {}) {
+    this.fetchImpl = fetchImpl;
   }
 
   // Fetches a single package's details from the Pulsar registry, returning the
@@ -70,32 +68,16 @@ module.exports = class PulsarPackageClient {
       .slice(0, SEARCH_LIMIT);
   }
 
-  get(pathAndQuery) {
-    return new Promise((resolve, reject) => {
-      this.requestImpl(
-        {
-          url: `${PULSAR_API}${pathAndQuery}`,
-          headers: { "User-Agent": navigator.userAgent, Accept: "application/json" },
-          gzip: true,
-          json: true,
-        },
-        (error, response, body) => {
-          if (error) return reject(error);
-          if (!response || response.statusCode < 200 || response.statusCode >= 300) {
-            return reject(
-              new Error(
-                `Pulsar registry request failed with status ${response?.statusCode || "unknown"}.`,
-              ),
-            );
-          }
-          try {
-            resolve(typeof body === "string" ? JSON.parse(body) : body);
-          } catch (parseError) {
-            reject(parseError);
-          }
-        },
-      );
+  async get(pathAndQuery) {
+    const response = await this.fetchImpl(`${PULSAR_API}${pathAndQuery}`, {
+      headers: { "User-Agent": navigator.userAgent, Accept: "application/json" },
     });
+    if (!response || response.status < 200 || response.status >= 300) {
+      throw new Error(
+        `Pulsar registry request failed with status ${response?.status || "unknown"}.`,
+      );
+    }
+    return response.json();
   }
 };
 

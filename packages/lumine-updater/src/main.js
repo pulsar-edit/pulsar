@@ -23,9 +23,9 @@ class LumineUpdater {
     );
 
     if (atom.config.get("lumine-updater.checkForUpdatesOnLaunch")) {
-      // An update check isn't urgent, and it pulls in a heavy HTTP client
-      // (superagent, ~75ms to require). Defer it off the activation path so it
-      // runs once the window is idle instead of blocking startup.
+      // An update check isn't urgent and makes a network request. Defer it off
+      // the activation path so it runs once the window is idle instead of
+      // blocking startup.
       const handle = window.requestIdleCallback(
         () => {
           this.checkForUpdates().catch((error) =>
