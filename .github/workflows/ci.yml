@@ -82,15 +82,36 @@ jobs:
         run: node ./node_modules/electron/install.js
       - name: Rebuild native modules for Electron
         run: yarn build
-      - name: Run editor specs (Linux)
-        if: runner.os == 'Linux'
-        run: xvfb-run --auto-servernum yarn test:editor
-      - name: Run editor specs (macOS and Windows)
-        if: runner.os != 'Linux'
-        run: yarn test:editor
-      - name: Run bundled package specs (Linux)
-        if: runner.os == 'Linux'
-        run: xvfb-run --auto-servernum yarn test:pkgs
-      - name: Run bundled package specs (macOS and Windows)
-        if: runner.os != 'Linux'
-        run: yarn test:pkgs
+      - name: Run editor specs
+        shell: bash
+        timeout-minutes: 60
+        run: |
+          prefix=""
+          if [ "$RUNNER_OS" = "Linux" ]; then prefix="xvfb-run --auto-servernum"; fi
+          $prefix yarn test:editor
+      # Run each bundled package in its own Electron session. The combined
+      # `yarn test:pkgs` session suffers cross-package state leakage (~200
+      # spurious failures) and has hung CI runners; per-package isolation
+      # matches how the packages are developed and verified. The `timeout`
+      # guard turns any hung package into a fast failure with logs intact.
+      - name: Run bundled package specs
+        shell: bash
+        timeout-minutes: 90
+        run: |
+          prefix=""
+          if [ "$RUNNER_OS" = "Linux" ]; then prefix="xvfb-run --auto-servernum"; fi
+          status=0
+          failed=""
+          for d in packages/*/spec; do
+            pkg="${d#packages/}"
+            pkg="${pkg%/spec}"
+            echo "::group::$pkg"
+            if ! timeout 600 $prefix yarn start --test "$d"; then
+              echo "::error::Package specs failed: $pkg"
+              failed="$failed $pkg"
+              status=1
+            fi
+            echo "::endgroup::"
+          done
+          if [ -n "$failed" ]; then echo "Failed packages:$failed"; fi
+          exit $status
