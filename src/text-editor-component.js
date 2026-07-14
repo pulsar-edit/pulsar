@@ -1456,8 +1456,16 @@ module.exports = class TextEditorComponent {
       // nodes themselves and get some `ClientRects`.
       let screenLineStart = this.renderedScreenLineForRow(start.row);
       let screenLineEnd = this.renderedScreenLineForRow(end.row);
-      let { textNodes: startTextNodes } = this.lineComponentsByScreenLineId.get(screenLineStart.id);
-      let { textNodes: endTextNodes } = this.lineComponentsByScreenLineId.get(screenLineEnd.id);
+      // A buffer change between measuring and rendering (e.g. a suggestion's
+      // text edit inserting a newline) can shift screen lines so the marked
+      // rows are no longer rendered. Skip the highlight for this frame; the
+      // next update sees consistent state.
+      let startComponent =
+        screenLineStart && this.lineComponentsByScreenLineId.get(screenLineStart.id);
+      let endComponent = screenLineEnd && this.lineComponentsByScreenLineId.get(screenLineEnd.id);
+      if (!startComponent || !endComponent) continue;
+      let { textNodes: startTextNodes } = startComponent;
+      let { textNodes: endTextNodes } = endComponent;
 
       let startClientRects;
       let endClientRects = null;
