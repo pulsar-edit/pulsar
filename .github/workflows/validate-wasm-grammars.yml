@@ -1,0 +1,29 @@
+name: Validate WASM Grammar Changes
+
+# Any change to a committed grammar `.wasm` binary must be accompanied by an
+# update to the `parserSource` key in the corresponding `grammar.cson`, so the
+# binary's provenance stays traceable. Adapted from the upstream Pulsar check.
+
+on:
+  pull_request:
+    paths:
+      - "**.wasm"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # The validation script compares against earlier commits.
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-scripts
+      - name: Run validation script
+        run: node ./script/validate-wasm-grammar-prs.js

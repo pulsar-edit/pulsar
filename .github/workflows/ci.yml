@@ -13,6 +13,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Print one line per spec instead of dots; CI logs stay readable and a hang
+  # points at the exact spec.
+  ATOM_JASMINE_REPORTER: list
+
 jobs:
   lint:
     # Advisory only: the repository carries pre-existing eslint and formatting
