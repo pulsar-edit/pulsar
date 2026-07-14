@@ -18,12 +18,18 @@ env:
   # points at the exact spec.
   ATOM_JASMINE_REPORTER: list
 
+# The full matrix is expensive (~20-45 minutes per platform), so CI is opt-in
+# for ordinary pushes: include `[ci]` anywhere in the head commit message to
+# run it. Pull requests, manual dispatch (`gh workflow run ci.yml`), and
+# reusable calls always run.
+
 jobs:
   lint:
     # Advisory only: the repository carries pre-existing eslint and formatting
     # debt, so these steps report their findings without failing the run. Once
     # the debt is cleared, drop the `continue-on-error` flags to make it gate.
     name: Lint and format (advisory)
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[ci]')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -44,6 +50,7 @@ jobs:
 
   test:
     name: Test on ${{ matrix.os }}
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[ci]')
     runs-on: ${{ matrix.os }}
     # Native rebuild plus the full editor and package suites are slow, and the
     # spec steps may retry once after an intermittent renderer crash.
