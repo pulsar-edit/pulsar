@@ -1073,14 +1073,19 @@ describe("WorkspaceElement", () => {
 
       // The source pane reflows to the same half width in parallel and may
       // settle later than the copy; only once both panes agree on width and
-      // wrapping are their absolute scroll positions comparable.
-      await conditionPromise(
-        () =>
+      // wrapping are their absolute scroll positions comparable. Headless CI
+      // windows don't reliably deliver ResizeObserver callbacks, so nudge both
+      // components to re-measure on every poll, as a real resize event would.
+      await conditionPromise(() => {
+        sourceComponent.didResize();
+        copyComponent.didResize();
+        return (
           Math.abs(
             sourceComponent.getScrollContainerClientWidth() -
               copyComponent.getScrollContainerClientWidth(),
-          ) <= 1 && editor.getScreenLineCount() === copyEditor.getScreenLineCount(),
-      );
+          ) <= 1 && editor.getScreenLineCount() === copyEditor.getScreenLineCount()
+        );
+      });
 
       const lineHeight = copyComponent.getLineHeight();
       const sourceRowAfter = editor.screenPositionForBufferPosition(midBufferPosition).row;
