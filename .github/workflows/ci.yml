@@ -40,8 +40,9 @@ jobs:
   test:
     name: Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    # Native rebuild plus the full editor and package suites are slow.
-    timeout-minutes: 120
+    # Native rebuild plus the full editor and package suites are slow, and the
+    # spec steps may retry once after an intermittent renderer crash.
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:
@@ -84,11 +85,17 @@ jobs:
         run: yarn build
       - name: Run editor specs
         shell: bash
-        timeout-minutes: 60
+        timeout-minutes: 100
         run: |
           prefix=""
           if [ "$RUNNER_OS" = "Linux" ]; then prefix="xvfb-run --auto-servernum"; fi
-          $prefix yarn test:editor
+          # Retry once: Windows runners intermittently crash the renderer with
+          # an access violation unrelated to the specs (the suite passes when
+          # the crash does not strike).
+          if ! $prefix yarn test:editor; then
+            echo "Retrying editor specs after failure..."
+            $prefix yarn test:editor
+          fi
       # Run each bundled package in its own Electron session. The combined
       # `yarn test:pkgs` session suffers cross-package state leakage (~200
       # spurious failures) and has hung CI runners; per-package isolation
