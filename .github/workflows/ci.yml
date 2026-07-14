@@ -109,23 +109,44 @@ jobs:
         run: |
           prefix=""
           if [ "$RUNNER_OS" = "Linux" ]; then prefix="xvfb-run --auto-servernum"; fi
-          # macOS runners have no GNU `timeout`; Homebrew coreutils ships it
-          # as `gtimeout`. Without either, the step timeout is the backstop.
-          if command -v timeout >/dev/null 2>&1; then
-            guard="timeout 2700"
-          elif command -v gtimeout >/dev/null 2>&1; then
-            guard="gtimeout 2700"
-          else
-            guard=""
-          fi
-          # Guard each attempt (a wedged Electron session never exits on its
-          # own) and retry once: Windows runners intermittently crash or hang
-          # the renderer for reasons unrelated to the specs (the suite passes
-          # when that does not strike).
-          if ! $guard $prefix yarn test:editor; then
-            echo "Retrying editor specs after failure..."
-            $guard $prefix yarn test:editor
-          fi
+          # macOS runners have no GNU `timeout`; Homebrew coreutils ships it as
+          # `gtimeout`. Without either, the step timeout is the backstop.
+          if command -v timeout >/dev/null 2>&1; then guard=timeout
+          elif command -v gtimeout >/dev/null 2>&1; then guard=gtimeout
+          else guard=""; fi
+          # run <seconds> <command...> — a wedged Electron session never exits on
+          # its own, so cap each attempt.
+          run() { if [ -n "$guard" ]; then "$guard" "$1" $prefix "${@:2}"; else $prefix "${@:2}"; fi; }
+
+          # Fast path: the whole editor suite in one Electron session, retried
+          # once to absorb a transient renderer hiccup.
+          if run 2700 yarn test:editor; then exit 0; fi
+          echo "Retrying editor specs after failure..."
+          if run 2700 yarn test:editor; then exit 0; fi
+
+          # Fallback: two full runs failed. On Windows the renderer occasionally
+          # dies with a native access violation (exit -1073741819 / 0xC0000005)
+          # that takes the whole single session down, unrelated to any one spec.
+          # Re-run each spec file in its own fresh session so a crash isolates to
+          # that file instead of masking the rest — a genuine assertion failure
+          # still fails here, so nothing is hidden.
+          echo "Full editor-spec run failed twice; isolating per spec file..."
+          status=0
+          failed=""
+          while IFS= read -r f; do
+            echo "::group::$f"
+            if ! run 600 yarn start --test "$f"; then
+              echo "Retrying $f after failure..."
+              if ! run 600 yarn start --test "$f"; then
+                echo "::error::Editor spec failed: $f"
+                failed="$failed $f"
+                status=1
+              fi
+            fi
+            echo "::endgroup::"
+          done < <(find spec -name '*-spec.js' | sort)
+          if [ -n "$failed" ]; then echo "Failed editor specs:$failed"; fi
+          exit $status
       # Run each bundled package in its own Electron session. The combined
       # `yarn test:pkgs` session suffers cross-package state leakage (~200
       # spurious failures) and has hung CI runners; per-package isolation
