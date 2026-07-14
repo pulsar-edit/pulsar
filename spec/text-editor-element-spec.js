@@ -435,9 +435,7 @@ describe("TextEditorElement", () => {
       // The exact visible range depends on platform font metrics; just verify
       // the scroll landed where requested. The rectangle math below is already
       // derived from the editor's own metrics.
-      expect(element.getVisibleRowRange()[0]).toBe(
-        Math.floor(80 / editor.getLineHeightInPixels()),
-      );
+      expect(element.getVisibleRowRange()[0]).toBe(Math.floor(80 / editor.getLineHeightInPixels()));
 
       const top = 2 * editor.getLineHeightInPixels();
       const bottom = 13 * editor.getLineHeightInPixels();
