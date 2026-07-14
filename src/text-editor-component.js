@@ -5340,10 +5340,13 @@ function clientRectsForTextNodes(textNodes, startColumn, endColumn) {
   return consolidateClientRects(rangeForMeasurement.getClientRects());
 }
 
-// Returns whether two `DOMRect`s overlap.
-function rectsOverlap(rectA, rectB) {
-  if (rectA.right < rectB.left) return false;
-  if (rectA.left > rectB.right) return false;
+// Returns whether two `DOMRect`s overlap. `epsilon` widens the comparison so
+// rects separated by a sub-pixel seam still count; fonts with fractional
+// glyph advances (common on Windows) produce adjacent inline boxes whose
+// edges don't line up exactly.
+function rectsOverlap(rectA, rectB, epsilon = 0) {
+  if (rectA.right + epsilon < rectB.left) return false;
+  if (rectA.left > rectB.right + epsilon) return false;
   if (rectA.top > rectB.bottom) return false;
   if (rectA.bottom < rectB.top) return false;
   return true;
@@ -5363,13 +5366,16 @@ function mergeOverlappingRects(rectA, rectB) {
 }
 
 // Given any number of `DOMRect`s that might overlap, consolidate them into
-// a discrete number of `DOMRect`s that do not overlap.
+// a discrete number of `DOMRect`s that do not overlap. Rects within a pixel
+// of one another are treated as contiguous so sub-pixel seams between inline
+// boxes don't split a highlight; genuinely separate runs (e.g. RTL segments)
+// sit much further apart.
 function consolidateClientRects(clientRects) {
   let results = [];
   for (let i = 0; i < clientRects.length; i++) {
     let rect = clientRects[i];
     let previousRect = results[results.length - 1];
-    if (previousRect && rectsOverlap(previousRect, rect)) {
+    if (previousRect && rectsOverlap(previousRect, rect, 1)) {
       results[results.length - 1] = mergeOverlappingRects(previousRect, rect);
     } else {
       results.push(rect);
