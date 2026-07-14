@@ -27,7 +27,7 @@ describe("Welcome", () => {
       const panes = atom.workspace.getCenter().getPanes();
       assert.equal(panes.length, 2);
       assert.equal(panes[0].getItems()[0].getTitle(), "About");
-      assert.equal(panes[1].getItems()[0].getTitle(), "Welcome Guide");
+      assert.equal(panes[1].getItems()[0].getTitle(), "Guide");
     });
   });
 
@@ -41,7 +41,7 @@ describe("Welcome", () => {
         const panes = atom.workspace.getCenter().getPanes();
         assert.equal(panes.length, 2);
         assert.equal(panes[0].getItems()[0].getTitle(), "About");
-        assert.equal(panes[1].getItems()[0].getTitle(), "Welcome Guide");
+        assert.equal(panes[1].getItems()[0].getTitle(), "Guide");
       }));
 
     describe("the welcome:show command", () => {

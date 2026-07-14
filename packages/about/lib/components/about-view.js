@@ -143,6 +143,13 @@ module.exports = class AboutView extends EtchComponent {
       ),
 
       $.div(
+        { className: "about-love group-start" },
+        $.a({ className: "icon icon-code" }),
+        $.span({ className: "about-team-text" }, "Made by Lumine Team"),
+        $.a({ className: "icon icon-code" }),
+      ),
+
+      $.div(
         { className: "about-startup" },
         $.label(
           { className: "about-startup-label" },
@@ -154,13 +161,6 @@ module.exports = class AboutView extends EtchComponent {
           }),
           " Show when opening Lumine",
         ),
-      ),
-
-      $.div(
-        { className: "about-love group-start" },
-        $.a({ className: "icon icon-code" }),
-        $.span({ className: "about-team-text" }, "Made by Lumine Team"),
-        $.a({ className: "icon icon-code" }),
       ),
     );
   }

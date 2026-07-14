@@ -1,10 +1,24 @@
 .welcome {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   font-size: 1.25em;
   line-height: 1.4;
   color: var(--text-color);
   background-color: var(--base-background-color);
   overflow-x: auto;
+
+  /* Flexible spacers split the free space 1:2, placing the content block's
+     center at one-third of the pane height. They collapse to zero when the
+     content overflows, so nothing is ever clipped. */
+  &::before {
+    content: "";
+    flex: 1;
+  }
+  &::after {
+    content: "";
+    flex: 2;
+  }
 
   /* Overrides ---------------------- */
 
@@ -37,7 +51,7 @@
   width: 100%;
   max-width: 580px;
   min-width: 300px;
-  margin: auto;
+  margin: 0 auto;
   padding: 3em 2em;
 }
 
@@ -202,7 +216,9 @@ details[open] .welcome-summary:before {
 }
 
 .welcome .welcome-startup {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-top: 2em;
 }
 

@@ -38,6 +38,18 @@
   .group-start {
     margin-top: 3em;
   }
+
+  /* Flexible spacers split the free space 1:2, placing the content block's
+     center at one-third of the pane height. They collapse to zero when the
+     content overflows, so nothing is ever clipped. */
+  &::before {
+    content: "";
+    flex: 1;
+  }
+  &::after {
+    content: "";
+    flex: 2;
+  }
 }
 
 .about-container {

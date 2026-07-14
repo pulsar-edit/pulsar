@@ -339,7 +339,7 @@ export default class GuideView {
   }
 
   getTitle() {
-    return 'Welcome Guide';
+    return 'Guide';
   }
 
   getIconName() {
