@@ -17,3 +17,7 @@ spec/fixtures/sample.txt text eol=lf
 
 # Windows bash scripts are also Unix LF endings
 *.sh		eol=lf
+
+# Bundled package spec fixtures assert exact byte content (line endings,
+# character offsets); check them out verbatim on every platform.
+packages/*/spec/fixtures/** -text

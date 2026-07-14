@@ -429,6 +429,13 @@ describe("TabBarView", () => {
       container.appendChild(tabBar.element);
       jasmine.attachToDOM(container);
 
+      // Pin the tab widths so that which tabs are visible does not depend on
+      // the platform's font metrics: three 45px tabs fit the 150px container,
+      // the fourth overflows.
+      const style = document.createElement("style");
+      style.textContent = ".tab-bar .tab { width: 45px; flex: none; }";
+      jasmine.attachToDOM(style);
+
       // Expect there to be content to scroll
       expect(tabBar.element.scrollWidth).toBeGreaterThan(tabBar.element.clientWidth);
     });

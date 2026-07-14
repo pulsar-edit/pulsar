@@ -100,13 +100,22 @@ jobs:
         run: |
           prefix=""
           if [ "$RUNNER_OS" = "Linux" ]; then prefix="xvfb-run --auto-servernum"; fi
+          # macOS runners have no GNU `timeout`; Homebrew coreutils ships it
+          # as `gtimeout`. Without either, the step timeout is the backstop.
+          if command -v timeout >/dev/null 2>&1; then
+            guard="timeout 600"
+          elif command -v gtimeout >/dev/null 2>&1; then
+            guard="gtimeout 600"
+          else
+            guard=""
+          fi
           status=0
           failed=""
           for d in packages/*/spec; do
             pkg="${d#packages/}"
             pkg="${pkg%/spec}"
             echo "::group::$pkg"
-            if ! timeout 600 $prefix yarn start --test "$d"; then
+            if ! $guard $prefix yarn start --test "$d"; then
               echo "::error::Package specs failed: $pkg"
               failed="$failed $pkg"
               status=1
