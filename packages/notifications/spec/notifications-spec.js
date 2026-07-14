@@ -508,6 +508,15 @@
             fs.symlinkSync(packageDir, path.join(packagesDir, 'linked-package'), 'junction');
             fs.writeFileSync(path.join(packageDir, 'package.json'), "{\n  \"name\": \"linked-package\",\n  \"version\": \"1.0.0\",\n  \"repository\": \"https://github.com/pulsar-edit/notifications\"\n}");
             atom.packages.enablePackage('linked-package');
+            // TEMP diagnostic for macOS CI: linked-package name resolution fails there.
+            console.error("LINKED-PKG DEBUG " + JSON.stringify({
+              loadedPath: atom.packages.getLoadedPackage("linked-package") && atom.packages.getLoadedPackage("linked-package").path,
+              available: atom.packages.getAvailablePackageNames().indexOf("linked-package") !== -1,
+              disabled: atom.packages.isPackageDisabled("linked-package"),
+              packageDir: packageDir,
+              realPackageDir: fs.realpathSync(packageDir),
+              packagesDir: packagesDir
+            }));
             stack = "ReferenceError: path is not defined\n  at Object.module.exports.LinkedPackage.wow (" + (path.join(fs.realpathSync(packageDir), 'linked-package.coffee')) + ":29:15)\n  at atom-workspace.subscriptions.add.atom.commands.add.linked-package:wow (" + (path.join(packageDir, 'linked-package.coffee')) + ":18:102)\n  at CommandRegistry.module.exports.CommandRegistry.handleCommandEvent (/Applications/Lumine.app/Contents/Resources/app/src/command-registry.js:238:29)\n  at /Applications/Lumine.app/Contents/Resources/app/src/command-registry.js:3:61\n  at CommandPaletteView.module.exports.CommandPaletteView.confirmed (/Applications/Lumine.app/Contents/Resources/app/node_modules/command-palette/lib/command-palette-view.js:159:32)";
             detail = "At " + (path.join(packageDir, 'linked-package.coffee')) + ":41";
             message = "Uncaught ReferenceError: path is not defined";

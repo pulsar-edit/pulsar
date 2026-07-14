@@ -115,10 +115,15 @@ jobs:
             pkg="${d#packages/}"
             pkg="${pkg%/spec}"
             echo "::group::$pkg"
+            # Retry once: Windows runners intermittently crash the renderer
+            # with an access violation unrelated to the package under test.
             if ! $guard $prefix yarn start --test "$d"; then
-              echo "::error::Package specs failed: $pkg"
-              failed="$failed $pkg"
-              status=1
+              echo "Retrying $pkg after failure..."
+              if ! $guard $prefix yarn start --test "$d"; then
+                echo "::error::Package specs failed: $pkg"
+                failed="$failed $pkg"
+                status=1
+              fi
             fi
             echo "::endgroup::"
           done
