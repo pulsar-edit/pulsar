@@ -1090,6 +1090,40 @@ describe("WorkspaceElement", () => {
     });
   });
 
+  describe("destroying a large soft-wrapped editor while attached", () => {
+    it("does not crash the renderer process (regression)", async () => {
+      // Destroying an attached editor emits synchronous marker and decoration
+      // events mid-teardown. With the synchronous updates used in specs,
+      // rendering from those events repopulated the destroyed display layer's
+      // spatial index and read the already-released buffer, crashing the
+      // renderer process natively.
+      jasmine.useRealClock();
+      const workspaceElement = atom.workspace.getElement();
+      workspaceElement.style.height = "400px";
+      workspaceElement.style.width = "1000px";
+      jasmine.attachToDOM(workspaceElement);
+
+      atom.config.set("language.softWrap", true);
+      const editor = await atom.workspace.open();
+      const lines = [];
+      for (let i = 0; i < 400; i++) lines.push(`line ${i} ` + "word ".repeat(30));
+      editor.setText(lines.join("\n"));
+
+      const component = editor.getElement().component;
+      await conditionPromise(
+        () => component.hasInitialMeasurements && component.getMaxScrollTop() > 0,
+      );
+      await component.getNextUpdatePromise();
+      expect(editor.getScreenLineCount()).toBeGreaterThan(400);
+
+      editor.destroy();
+
+      // Reaching this point without the renderer process crashing is the real
+      // assertion of this spec.
+      expect(editor.isDestroyed()).toBe(true);
+    });
+  });
+
   describe("the 'window:toggle-invisibles' command", () => {
     it("shows/hides invisibles in all open and future editors", () => {
       const workspaceElement = atom.workspace.getElement();

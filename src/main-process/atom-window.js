@@ -263,9 +263,11 @@ module.exports = class AtomWindow extends EventEmitter {
       if (result.response === 0) this.browserWindow.destroy();
     });
 
-    this.browserWindow.webContents.on("render-process-gone", async () => {
+    this.browserWindow.webContents.on("render-process-gone", async (event, details) => {
       if (this.headless) {
-        console.log("Renderer process crashed, exiting");
+        console.log(
+          `Renderer process gone (reason: ${details.reason}, exitCode: ${details.exitCode}), exiting`,
+        );
         this.atomApplication.exit(100);
         return;
       }
