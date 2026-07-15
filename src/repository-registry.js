@@ -54,6 +54,8 @@ module.exports = class RepositoryRegistry {
     this.entriesById = new Map();
     this.entryByRepository = new WeakMap();
     this.operationProviders = [];
+    this.workspaceOperationTails = new Map();
+    this.pendingWorkspaceOperations = new Map();
     this.bufferOwners = new Map();
     this.rootPaths = [];
     this.scanGeneration = 0;
@@ -289,9 +291,14 @@ module.exports = class RepositoryRegistry {
   }
 
   addOperationProvider(provider) {
-    if (!provider || typeof provider.createRepositoryOperations !== "function") {
+    if (
+      !provider ||
+      (typeof provider.createRepositoryOperations !== "function" &&
+        typeof provider.initializeRepository !== "function" &&
+        typeof provider.cloneRepository !== "function")
+    ) {
       throw new TypeError(
-        "Repository operation providers must implement createRepositoryOperations(context)",
+        "Repository operation providers must implement repository, initialize, or clone operations",
       );
     }
 
@@ -346,12 +353,128 @@ module.exports = class RepositoryRegistry {
     const entries = repository
       ? [this.entryByRepository.get(repository)].filter(Boolean)
       : Array.from(this.entriesById.values());
-    return Object.freeze(
-      entries.flatMap((entry) =>
-        Array.from(entry.pendingOperations.values(), (operation) =>
+    const operations = entries.flatMap((entry) =>
+      Array.from(entry.pendingOperations.values(), (operation) =>
+        this.operationSnapshot(operation),
+      ),
+    );
+    if (!repository) {
+      operations.push(
+        ...Array.from(this.pendingWorkspaceOperations.values(), (operation) =>
           this.operationSnapshot(operation),
         ),
-      ),
+      );
+    }
+    return Object.freeze(operations);
+  }
+
+  getWorkspaceOperationCapabilities() {
+    const capabilities = [];
+    if (this.findWorkspaceOperationProvider("initialize")) capabilities.push("initialize");
+    if (this.findWorkspaceOperationProvider("clone")) capabilities.push("clone");
+    return Object.freeze(capabilities);
+  }
+
+  canPerformWorkspaceOperation(operationName) {
+    return this.findWorkspaceOperationProvider(operationName) != null;
+  }
+
+  initialize(directoryPath, options) {
+    return this.performWorkspaceOperation("initialize", directoryPath, [directoryPath, options]);
+  }
+
+  clone(remoteUrl, destinationPath, options) {
+    return this.performWorkspaceOperation("clone", destinationPath, [
+      remoteUrl,
+      destinationPath,
+      options,
+    ]);
+  }
+
+  async registerCreatedRepository(directoryPath, operationName) {
+    const registration = await this.add(directoryPath);
+    if (registration) return registration.repository;
+
+    const error = new Error(
+      `Git ${operationName} completed, but no repository was found at: ${directoryPath}`,
+    );
+    error.code = "ERR_REPOSITORY_DISCOVERY_FAILED";
+    error.operation = operationName;
+    error.directoryPath = directoryPath;
+    throw error;
+  }
+
+  performWorkspaceOperation(operationName, workingDirectory, args) {
+    const queueKey = normalizePath(workingDirectory);
+    const operation = {
+      id: this.nextOperationId++,
+      repository: null,
+      workingDirectory,
+      name: operationName,
+      status: "queued",
+      queuedAt: Date.now(),
+      startedAt: null,
+    };
+    this.pendingWorkspaceOperations.set(operation.id, operation);
+    this.emitter.emit("did-queue-operation", this.operationSnapshot(operation));
+
+    const execute = async () => {
+      operation.status = "running";
+      operation.startedAt = Date.now();
+      this.emitter.emit("did-start-operation", this.operationSnapshot(operation));
+
+      let operationError = null;
+      try {
+        const provider = this.findWorkspaceOperationProvider(operationName);
+        if (!provider) {
+          const error = new Error(`No provider implements repository operation: ${operationName}`);
+          error.code = "ERR_REPOSITORY_OPERATION_UNAVAILABLE";
+          error.operation = operationName;
+          throw error;
+        }
+        const methodName =
+          operationName === "initialize" ? "initializeRepository" : "cloneRepository";
+        await provider[methodName](...args);
+        return await this.registerCreatedRepository(workingDirectory, operationName);
+      } catch (error) {
+        operationError = error;
+        throw error;
+      } finally {
+        this.pendingWorkspaceOperations.delete(operation.id);
+        this.emitter.emit(
+          "did-finish-operation",
+          Object.freeze({
+            ...this.operationSnapshot(operation),
+            status: operationError ? "failed" : "succeeded",
+            finishedAt: Date.now(),
+            error: operationError,
+          }),
+        );
+      }
+    };
+
+    const previous = this.workspaceOperationTails.get(queueKey) || Promise.resolve();
+    const result = previous.then(execute);
+    const tail = result.catch(() => {});
+    this.workspaceOperationTails.set(queueKey, tail);
+    tail.then(() => {
+      if (this.workspaceOperationTails.get(queueKey) === tail) {
+        this.workspaceOperationTails.delete(queueKey);
+      }
+    });
+    return result;
+  }
+
+  findWorkspaceOperationProvider(operationName) {
+    const methodName =
+      operationName === "initialize"
+        ? "initializeRepository"
+        : operationName === "clone"
+          ? "cloneRepository"
+          : null;
+    if (!methodName) return null;
+    return (
+      this.operationProviders.find((provider) => typeof provider[methodName] === "function") || null
     );
   }
 
@@ -430,6 +553,7 @@ module.exports = class RepositoryRegistry {
       repository: operation.repository,
       name: operation.name,
       status: operation.status,
+      workingDirectory: operation.workingDirectory || null,
       queuedAt: operation.queuedAt,
       startedAt: operation.startedAt,
     });
@@ -454,6 +578,10 @@ module.exports = class RepositoryRegistry {
     if (!entry || !this.operationProviders.includes(provider)) return null;
     if (entry.operationImplementations.has(provider)) {
       return entry.operationImplementations.get(provider);
+    }
+    if (typeof provider.createRepositoryOperations !== "function") {
+      entry.operationImplementations.set(provider, null);
+      return null;
     }
 
     const implementation = provider.createRepositoryOperations({

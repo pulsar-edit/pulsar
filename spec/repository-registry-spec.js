@@ -568,6 +568,78 @@ describe("RepositoryRegistry", () => {
     await Promise.all([first, second]);
   });
 
+  it("initializes and registers a repository through a workspace provider", async () => {
+    const workdir = temp.mkdirSync("initialized-repository");
+    let initializeOptions;
+    registry.addOperationProvider({
+      async initializeRepository(directoryPath, options) {
+        initializeOptions = options;
+        repositories.push(new FakeRepository(directoryPath));
+      },
+    });
+
+    expect(registry.canPerformWorkspaceOperation("initialize")).toBe(true);
+    expect(registry.getWorkspaceOperationCapabilities()).toEqual(["initialize"]);
+    const repository = await registry.initialize(workdir, { initialBranch: "main" });
+
+    expect(repository).toBe(repositories[0]);
+    expect(initializeOptions).toEqual({ initialBranch: "main" });
+    expect(registry.getRepositories()).toEqual([repository]);
+    registry.setProjectRoots([]);
+    expect(repository.isDestroyed()).toBe(false);
+    registry.forget(repository);
+    expect(repository.isDestroyed()).toBe(true);
+  });
+
+  it("clones and registers a repository through a workspace provider", async () => {
+    const destinationPath = path.join(temp.mkdirSync("clone-parent"), "cloned");
+    let cloneArguments;
+    registry.addOperationProvider({
+      async cloneRepository(remoteUrl, workdir, options) {
+        cloneArguments = { remoteUrl, workdir, options };
+        repositories.push(new FakeRepository(workdir));
+      },
+    });
+
+    const repository = await registry.clone("https://example.com/repository.git", destinationPath, {
+      branch: "main",
+    });
+
+    expect(cloneArguments).toEqual({
+      remoteUrl: "https://example.com/repository.git",
+      workdir: destinationPath,
+      options: { branch: "main" },
+    });
+    expect(repository).toBe(repositories[0]);
+    expect(registry.getForPath(path.join(destinationPath, "README.md"))).toBe(repository);
+  });
+
+  it("serializes initialize and clone operations targeting the same destination", async () => {
+    const destinationPath = path.join(temp.mkdirSync("workspace-operation-parent"), "repository");
+    const calls = [];
+    let finishInitialize;
+    registry.addOperationProvider({
+      initializeRepository() {
+        calls.push("initialize");
+        return new Promise((resolve) => (finishInitialize = resolve));
+      },
+      cloneRepository() {
+        calls.push("clone");
+        repositories.push(new FakeRepository(destinationPath));
+      },
+    });
+
+    const initialize = registry.initialize(destinationPath).catch((error) => error);
+    const clone = registry.clone("https://example.com/repository.git", destinationPath);
+    await Promise.resolve();
+    expect(calls).toEqual(["initialize"]);
+
+    finishInitialize();
+    await initialize;
+    await clone;
+    expect(calls).toEqual(["initialize", "clone"]);
+  });
+
   it("keeps a repository until its last open buffer is destroyed", async () => {
     const workdir = temp.mkdirSync("buffer-owned-repository");
     const repository = new FakeRepository(workdir);
