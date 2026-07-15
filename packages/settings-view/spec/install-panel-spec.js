@@ -125,9 +125,29 @@ describe("InstallPanel", function () {
     );
   });
 
-  it("does not load any catalogs just from opening the tab", function () {
+  it("does not load any catalogs just from constructing the panel", function () {
     expect(catalogClient.load).not.toHaveBeenCalled();
     expect(panel.catalogFetched).toBe(false);
+  });
+
+  it("fetches the catalogs the first time the tab is shown", function () {
+    catalogClient.load.reset();
+    panel.beforeShow();
+
+    expect(panel.catalogFetched).toBe(true);
+    expect(catalogClient.load).toHaveBeenCalledWith("official/catalog", {
+      refresh: false,
+      cacheOnly: false,
+    });
+  });
+
+  it("does not re-fetch on later shows", function () {
+    panel.beforeShow();
+    expect(panel.catalogFetched).toBe(true);
+    catalogClient.load.reset();
+
+    panel.beforeShow();
+    expect(catalogClient.load).not.toHaveBeenCalled();
   });
 
   it("downloads the catalogs without the cache when fetch is clicked", function () {

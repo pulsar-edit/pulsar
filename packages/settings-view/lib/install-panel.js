@@ -131,8 +131,7 @@ export default class InstallPanel {
     );
 
     this.renderCatalogSources();
-    // Nothing is loaded on open: the catalogs are fetched on the first search
-    // (or when the user clicks Fetch), never just from opening the tab.
+    // Populated on first show (see beforeShow); until then nothing is loaded.
     this.catalogPromise = Promise.resolve({ schemaVersion: 1, packages: [] });
   }
 
@@ -304,6 +303,19 @@ export default class InstallPanel {
   }
 
   beforeShow(options) {
+    // Fetch the community catalogs the first time the panel is shown, so the
+    // browse list is populated on open instead of waiting for a search or a
+    // manual Fetch click. The in-memory cache means this hits the network once
+    // per window and is reused (within TTL) by later loads. Starting it here,
+    // before the URI handling below, lets any incoming search reuse this fetch
+    // rather than triggering its own.
+    if (!this.initialFetchStarted) {
+      this.initialFetchStarted = true;
+      if (!this.catalogFetched && this.getCatalogSources().length) {
+        this.catalogPromise = this.loadCatalog();
+      }
+    }
+
     if (options && options.uri) {
       if (/config\/install\/check-updates\b/.test(options.uri)) {
         this.checkForUpdates();
