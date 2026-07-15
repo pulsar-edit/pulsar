@@ -35,6 +35,7 @@ const CoreURIHandlers = require("./core-uri-handlers");
 const ProtocolHandlerInstaller = require("./protocol-handler-installer");
 const Project = require("./project");
 const RepositoryRegistry = require("./repository-registry");
+const DugiteRepositoryOperationProvider = require("./dugite-repository-operation-provider");
 const Workspace = require("./workspace");
 const PaneContainer = require("./pane-container");
 const PaneAxis = require("./pane-axis");
@@ -162,6 +163,9 @@ class AtomEnvironment {
       config: this.config,
       notificationManager: this.notifications,
       packageManager: this.packages,
+    });
+    this.repositories.addOperationProvider(new DugiteRepositoryOperationProvider(), {
+      fallback: true,
     });
     /** @type {Project} */
     this.project = new Project({

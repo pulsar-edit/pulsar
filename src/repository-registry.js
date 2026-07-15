@@ -291,7 +291,7 @@ module.exports = class RepositoryRegistry {
     }
   }
 
-  addOperationProvider(provider) {
+  addOperationProvider(provider, { fallback = false } = {}) {
     if (this.destroyed) throw new Error("Cannot add a provider to a destroyed RepositoryRegistry");
     if (
       !provider ||
@@ -304,7 +304,8 @@ module.exports = class RepositoryRegistry {
       );
     }
 
-    this.operationProviders.unshift(provider);
+    if (fallback) this.operationProviders.push(provider);
+    else this.operationProviders.unshift(provider);
     this.emitOperationProviderChange();
 
     return new Disposable(() => {

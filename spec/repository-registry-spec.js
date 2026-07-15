@@ -387,6 +387,30 @@ describe("RepositoryRegistry", () => {
     expect(repository.refreshStatusCount).toBe(1);
   });
 
+  it("uses service providers before the built-in fallback provider", async () => {
+    const workdir = temp.mkdirSync("fallback-operation-provider");
+    const repository = new FakeRepository(workdir);
+    repositories.push(repository);
+    registry.setProjectRoots([directoryFor(workdir)]);
+    registry.addOperationProvider(
+      {
+        createRepositoryOperations() {
+          return { commit: async () => "fallback" };
+        },
+      },
+      { fallback: true },
+    );
+    const override = registry.addOperationProvider({
+      createRepositoryOperations() {
+        return { commit: async () => "override" };
+      },
+    });
+
+    expect(await repository.getOperations().commit("Subject")).toBe("override");
+    override.dispose();
+    expect(await repository.getOperations().commit("Subject")).toBe("fallback");
+  });
+
   it("does not report a successful write as failed when cache refresh fails", async () => {
     const workdir = temp.mkdirSync("failed-operation-refresh");
     const repository = new FakeRepository(workdir);

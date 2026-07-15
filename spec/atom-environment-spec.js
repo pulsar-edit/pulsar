@@ -64,6 +64,15 @@ describe("AtomEnvironment", () => {
     });
   });
 
+  describe("the repository platform", () => {
+    it("installs Dugite as the default operation provider", () => {
+      expect(atom.repositories.getWorkspaceOperationCapabilities()).toEqual([
+        "initialize",
+        "clone",
+      ]);
+    });
+  });
+
   describe("window onerror handler", () => {
     let devToolsPromise = null;
     beforeEach(() => {
