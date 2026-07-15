@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "select-list": "file:../../shared/select-list",
-    "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274"
   },
   "consumedServices": {
     "status-bar": {

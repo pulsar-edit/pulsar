@@ -29,8 +29,8 @@
   },
   "dependencies": {
     "async": "3.2.6",
-    "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
-    "@lumine-code/ctags": "https://github.com/lumine-code/node-ctags.git#0e15977c7b637fc64e6dbeac315a61190fc19a19"
+    "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#742e3e166f56261189ff245a63967b8f1970fadd",
+    "@lumine-code/ctags": "https://github.com/lumine-code/node-ctags.git#aba00bacd5fb82daad785000e731041e4f58d620"
   },
   "devDependencies": {
     "eslint": "^10.7.0",
