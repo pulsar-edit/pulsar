@@ -256,15 +256,18 @@ describe("SettingsView", function () {
           );
         }));
 
-      describe("settings-view:change-themes", () =>
-        it("opens the settings view to the themes page", function () {
-          openWithCommand("settings-view:change-themes");
-          runs(() =>
-            expect(atom.workspace.getActivePaneItem().activePanel).toEqual({
-              name: "Themes",
-              options: { uri: "atom://config/themes" },
-            }),
-          );
+      describe("the theme mode commands", () =>
+        it("set theme.mode without opening a settings view", function () {
+          const workspaceElement = atom.views.getView(atom.workspace);
+
+          atom.commands.dispatch(workspaceElement, "settings-view:use-dark-mode");
+          expect(atom.config.get("theme.mode")).toBe("dark");
+
+          atom.commands.dispatch(workspaceElement, "settings-view:use-light-mode");
+          expect(atom.config.get("theme.mode")).toBe("light");
+
+          atom.commands.dispatch(workspaceElement, "settings-view:use-system-mode");
+          expect(atom.config.get("theme.mode")).toBe("system");
         }));
 
       describe("settings-view:uninstall-themes", () =>

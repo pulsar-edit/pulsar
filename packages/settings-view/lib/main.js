@@ -53,9 +53,6 @@ module.exports = {
       "settings-view:show-keybindings"() {
         atom.workspace.open(`${CONFIG_URI}/keybindings`);
       },
-      "settings-view:change-themes"() {
-        atom.workspace.open(`${CONFIG_URI}/themes`);
-      },
       "settings-view:install-packages-and-themes"() {
         atom.workspace.open(`${CONFIG_URI}/install`);
       },
@@ -64,6 +61,15 @@ module.exports = {
       },
       "settings-view:uninstall-themes"() {
         atom.workspace.open(`${CONFIG_URI}/themes`);
+      },
+      "settings-view:use-light-mode"() {
+        atom.config.set("theme.mode", "light");
+      },
+      "settings-view:use-dark-mode"() {
+        atom.config.set("theme.mode", "dark");
+      },
+      "settings-view:use-system-mode"() {
+        atom.config.set("theme.mode", "system");
       },
       "settings-view:view-installed-packages"() {
         atom.workspace.open(`${CONFIG_URI}/packages`);
