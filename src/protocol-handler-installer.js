@@ -51,7 +51,7 @@ module.exports = class ProtocolHandlerInstaller {
       case NEVER:
         if (process.platform === "win32") {
           // Only win32 supports deregistration
-          const Registry = require("winreg");
+          const Registry = require("./win-registry.js");
           const commandKey = new Registry({ hive: "HKCR", key: `\\atom` });
           commandKey.destroy((_err, _val) => {
             /* no op */

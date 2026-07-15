@@ -1,4 +1,4 @@
-const Registry = require("winreg");
+const Registry = require("./win-registry.js");
 const shell = require("shelljs");
 const fs = require("fs");
 

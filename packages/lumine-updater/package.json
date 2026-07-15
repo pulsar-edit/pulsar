@@ -14,8 +14,7 @@
   "repository": "https://github.com/lumine-code/lumine",
   "dependencies": {
     "event-kit": "^2.5.3",
-    "shelljs": "^0.10.0",
-    "winreg": "^1.2.4"
+    "shelljs": "^0.10.0"
   },
   "configSchema": {
     "checkForUpdatesOnLaunch": {

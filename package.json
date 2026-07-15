@@ -180,7 +180,6 @@
     "welcome": "file:packages/welcome",
     "whitespace": "file:./packages/whitespace",
     "window-title": "file:packages/window-title",
-    "winreg": "^1.2.1",
     "wrap-guide": "file:./packages/wrap-guide",
     "yaml-front-matter": "^4.1.1",
     "yargs": "18.0.0"

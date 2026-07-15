@@ -1,4 +1,4 @@
-const Registry = require("winreg");
+const Registry = require("../win-registry.js");
 const { execFile } = require("child_process");
 const Path = require("path");
 const { getAppName } = require("../get-app-details.js");
