@@ -498,6 +498,22 @@ describe("Built-in Status Bar Tiles", function () {
 
     beforeEach(() => ([gitView] = statusBar.getRightTiles().map((tile) => tile.getItem())));
 
+    it("ignores updates while the environment is being destroyed", function () {
+      const gitController = atom.packages.getActivePackage("status-bar").mainModule.gitInfo;
+      const wasDestroying = atom.isDestroying;
+      const getActiveItem = spyOn(gitController, "getActiveItem").andCallFake(() => {
+        throw new Error("workspace is unavailable");
+      });
+
+      try {
+        atom.isDestroying = true;
+        expect(() => gitController.update()).not.toThrow();
+        expect(getActiveItem).not.toHaveBeenCalled();
+      } finally {
+        atom.isDestroying = wasDestroying;
+      }
+    });
+
     // Disabled: these tests copy a bare `.git` fixture into an os.tmpdir()
     // working dir via `setupWorkingDir`, but `atom.repositories.getForPath()`
     // stays null for that path — the git repository provider never creates a

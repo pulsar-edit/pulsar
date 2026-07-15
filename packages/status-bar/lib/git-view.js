@@ -17,6 +17,7 @@ module.exports = class GitView {
       this.subscribeToRepositories();
     });
     this.repositoryRegistrySubscription = atom.repositories.onDidChange(() => {
+      if (atom.isDestroying) return;
       this.subscribeToRepositories();
       this.update();
     });
@@ -132,10 +133,12 @@ module.exports = class GitView {
   }
 
   getActiveItem() {
-    return atom.workspace.getCenter().getActivePaneItem();
+    return atom.workspace?.getCenter?.()?.getActivePaneItem?.();
   }
 
   update() {
+    if (atom.isDestroying) return;
+
     const repo = this.getRepositoryForActiveItem();
     this.updateBranchText(repo);
     this.updateAheadBehindCount(repo);
