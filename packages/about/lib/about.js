@@ -24,10 +24,14 @@ module.exports = class About {
         atom.openExternal(this.state.updateManager.getReleaseNotesURLForCurrentVersion());
       }),
     );
+
+    this.handleStateChanges();
   }
 
   destroy() {
-    if (this.views.aboutView) this.views.aboutView.destroy();
+    if (this.views.aboutView && !this.views.aboutView.isDestroyed()) {
+      this.views.aboutView.destroy();
+    }
     this.views.aboutView = null;
 
     this.setState({ updateManager: null });
@@ -53,7 +57,7 @@ module.exports = class About {
   }
 
   deserialize(state) {
-    if (!this.views.aboutView) {
+    if (!this.views.aboutView || this.views.aboutView.isDestroyed()) {
       this.setState(state);
 
       this.views.aboutView = new AboutView({
@@ -64,7 +68,6 @@ module.exports = class About {
         currentChromeVersion: this.state.currentChromeVersion,
         currentNodeVersion: this.state.currentNodeVersion,
       });
-      this.handleStateChanges();
     }
 
     return this.views.aboutView;

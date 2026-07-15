@@ -451,22 +451,19 @@ describe("Workspace", () => {
       });
 
       describe("when the item already exists in another pane", () => {
-        it("rejects the promise", async () => {
+        it("activates the item in the pane that already contains it", async () => {
           const item = document.createElement("div");
 
           await atom.workspace.open(item);
+          const originalPane = atom.workspace.getActivePane();
           await atom.workspace.open(null, { split: "right" });
           expect(atom.workspace.getActivePaneItem()).not.toBe(item);
           expect(atom.workspace.getActivePane().getItems().length).toBe(1);
 
-          let rejection;
-          try {
-            await atom.workspace.open(item);
-          } catch (error) {
-            rejection = error;
-          }
-
-          expect(rejection.message).toMatch(/The workspace can only contain one instance of item/);
+          await atom.workspace.open(item);
+          expect(atom.workspace.getActivePane()).toBe(originalPane);
+          expect(atom.workspace.getActivePaneItem()).toBe(item);
+          expect(originalPane.getItems().length).toBe(1);
         });
       });
     });

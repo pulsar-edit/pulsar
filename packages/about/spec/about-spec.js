@@ -31,6 +31,34 @@ describe("About", () => {
     });
   });
 
+  describe("when the About view is already open in another pane", () => {
+    it("activates the existing view instead of adding a duplicate", async () => {
+      const item = await atom.workspace.open("atom://about", { split: "left" });
+      const aboutPane = atom.workspace.paneForItem(item);
+      const otherPane = aboutPane.splitRight();
+      expect(atom.workspace.getActivePane()).toBe(otherPane);
+
+      const reopened = await atom.workspace.open("atom://about");
+      expect(reopened).toBe(item);
+      expect(atom.workspace.getActivePane()).toBe(aboutPane);
+      expect(atom.workspace.getPaneItems().filter((i) => i === item).length).toBe(1);
+    });
+  });
+
+  describe("when the About view is reopened after being destroyed", () => {
+    it("creates a fresh view", async () => {
+      const item = await atom.workspace.open("atom://about");
+      const pane = atom.workspace.paneForItem(item);
+      pane.destroyItem(item);
+      expect(item.isDestroyed()).toBe(true);
+
+      const reopened = await atom.workspace.open("atom://about");
+      expect(reopened).not.toBe(item);
+      expect(reopened.isDestroyed()).toBe(false);
+      expect(reopened.getURI()).toBe("atom://about");
+    });
+  });
+
   describe("when the Lumine version number is clicked", () => {
     it("copies the version number to the clipboard", async () => {
       await atom.workspace.open("atom://about");

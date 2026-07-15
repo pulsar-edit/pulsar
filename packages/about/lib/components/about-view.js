@@ -192,6 +192,19 @@ module.exports = class AboutView extends EtchComponent {
     };
   }
 
+  getURI() {
+    return this.props.uri;
+  }
+
+  destroy() {
+    this.destroyed = true;
+    super.destroy();
+  }
+
+  isDestroyed() {
+    return this.destroyed === true;
+  }
+
   onDidChangeTitle() {
     return new Disposable();
   }

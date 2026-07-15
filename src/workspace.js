@@ -1279,7 +1279,13 @@ module.exports = class Workspace extends Model {
         item = item || (await this.createItemForURI(uri, options));
         if (!item) return;
 
-        if (options.pane) {
+        // An opener may return an item that is already in the workspace, e.g.
+        // a package reusing a singleton view for its URI. Adding such an item
+        // to a second pane is illegal, so activate it where it already lives.
+        const existingPane = this.paneForItem(item);
+        if (existingPane) {
+          pane = existingPane;
+        } else if (options.pane) {
           pane = options.pane;
         } else {
           let location = options.location;
