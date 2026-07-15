@@ -1,29 +1,10 @@
 /* Panels */
 
+/* Workspace panels are separated by background shades, not borders. */
 atom-panel {
   font-weight: normal;
   color: var(--text-color);
   position: relative;
-  border-bottom: 1px solid var(--base-border-color);
-
-  &.top {
-    border-right: 1px solid var(--base-border-color);
-  }
-  &.left {
-    border-right: 1px solid var(--base-border-color);
-  }
-  &.right {
-    border-left: 1px solid var(--base-border-color);
-  }
-  &.bottom {
-    border-right: 1px solid var(--base-border-color);
-  }
-  &.footer:last-child {
-    border-bottom: none;
-  }
-  &.tool-panel:empty {
-    border: none;
-  }
 }
 
 .panel {

@@ -1,19 +1,21 @@
-atom-pane-container {
-  atom-pane {
-    position: relative;
-    border-right: 1px solid var(--base-border-color);
-    border-bottom: 1px solid var(--base-border-color);
+/* Panes — floating rounded cards on the app background, in the center and
+   in the docks alike. The 3px container padding plus 3px pane margins give a
+   uniform 6px gap that also hosts the pane resize handles. */
 
-    .item-views {
-      /* prevent atom-text-editor from leaking ouside might improve performance */
-      overflow: hidden;
-    }
-  }
+atom-pane-container {
+  padding: 3px;
 }
 
-/* Hide right-most border */
-atom-pane:only-child,
-atom-pane-axis.pane-row > atom-pane:last-child,
-atom-pane-axis.pane-column:last-child > atom-pane {
-  border-right: none;
+atom-pane-container atom-pane {
+  position: relative;
+  margin: 3px;
+  border: none;
+  border-radius: calc(var(--component-border-radius) * 1.5);
+  overflow: hidden;
+  background-color: var(--pane-item-background-color);
+
+  .item-views {
+    /* prevent atom-text-editor from leaking ouside might improve performance */
+    overflow: hidden;
+  }
 }

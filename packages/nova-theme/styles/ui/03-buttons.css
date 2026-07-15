@@ -1,12 +1,13 @@
 /* Buttons — flat, rounded, with a soft accent focus ring (no gradients). */
 
 .btn {
-  --btn-padding: 0 calc(var(--ui-size) / 1.25);
+  --btn-pill-radius: calc(var(--ui-line-height) / 2);
+  --btn-padding: 0 var(--ui-size);
   height: initial;
   padding: var(--btn-padding);
   font-size: var(--ui-size);
   line-height: var(--ui-line-height);
-  border-radius: var(--component-border-radius);
+  border-radius: var(--btn-pill-radius);
 }
 
 /* .btn-default() mixin, expanded separately for .btn and .btn.btn-default
@@ -266,6 +267,19 @@
 }
 
 /* Button Group ----------------------- */
+
+/* Groups form a single pill: square inner corners, rounded outer ends. */
+.btn-group > .btn {
+  border-radius: 0;
+  &:first-child {
+    border-top-left-radius: var(--btn-pill-radius);
+    border-bottom-left-radius: var(--btn-pill-radius);
+  }
+  &:last-child {
+    border-top-right-radius: var(--btn-pill-radius);
+    border-bottom-right-radius: var(--btn-pill-radius);
+  }
+}
 
 .btn-group > .btn {
   z-index: 0;

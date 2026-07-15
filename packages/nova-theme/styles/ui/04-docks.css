@@ -1,5 +1,27 @@
 /* Docks ------------------------------ */
 
+/* Docks are separated from the center by the card gaps instead of borders. */
+
+/* The dock mask sits behind the carded pane; paint it with the app void
+   color (not the tool-panel color) so the dock's pane card floats on the
+   same backdrop as the center cards. */
+.atom-dock-mask {
+  background-color: var(--app-background-color);
+}
+
+/* Dock toggle buttons — clean round handles on the card surface so they read
+   as a nub of the dock card rather than a tool-panel-colored disc on the
+   darker void. */
+.atom-dock-toggle-button-inner {
+  background-color: var(--pane-item-background-color);
+  border: 1px solid var(--base-border-color);
+  color: var(--text-color-subtle);
+}
+.atom-dock-toggle-button:hover .atom-dock-toggle-button-inner {
+  background-color: var(--background-color-highlight);
+  color: var(--accent-color);
+}
+
 /* Make handles not take up any space when dock is open */
 .atom-dock-resize-handle {
   position: absolute;
@@ -20,23 +42,4 @@
     left: 0;
     right: 0;
   }
-}
-
-/* Add borders */
-.atom-dock-inner.atom-dock-open.left {
-  border-right: 1px solid var(--base-border-color);
-}
-.atom-dock-inner.atom-dock-open.right {
-  border-left: 1px solid var(--base-border-color);
-}
-
-/* Make toggle buttons cover ^ border */
-.atom-dock-toggle-button.left {
-  margin-left: -2px;
-}
-.atom-dock-toggle-button.right {
-  margin-right: -2px;
-}
-.atom-dock-inner:not(.atom-dock-open) .atom-dock-toggle-button.bottom {
-  margin-bottom: -1px;
 }

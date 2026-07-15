@@ -1,10 +1,13 @@
-/* Tree view — rounded, inset selection and hover rows. */
+/* Tree view — a floating card surface with rounded, inset selection and hover
+   rows. */
 
 .tree-view {
-  --list-row-inset: 4px;
+  --list-row-inset: 6px;
   font-size: var(--ui-size);
-  background: var(--tree-view-background-color);
-  padding-top: var(--list-row-inset);
+  /* Transparent so the sidebar reads as the pane card's own surface, floating
+     on the app void like the editor cards. */
+  background: transparent;
+  padding: var(--list-row-inset) var(--list-row-inset) var(--component-padding);
 
   .project-root.project-root {
     &:before {
@@ -13,6 +16,11 @@
     }
     & > .header .name {
       line-height: var(--ui-tab-height);
+      font-size: 0.9em;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--text-color-subtle);
     }
   }
 
@@ -51,13 +59,11 @@
     pointer-events: none;
   }
 
-  /* Project root headers are taller than plain rows and span the full panel
-     width; match their hover bar to the selection style. */
+  /* Project root headers are taller than plain rows; match their hover bar
+     to the header height, inset and rounded like the item rows. */
   .project-root.project-root:not(.selected):not(:has(li:hover)):hover::before {
     height: var(--ui-tab-height);
-    left: 0;
-    right: 0;
-    border-radius: 0;
+    border-radius: var(--component-border-radius);
   }
 
   /* Keep the row's content above the hover bar. */
@@ -96,11 +102,9 @@
   border-radius: var(--component-border-radius);
 }
 
-/* The project root rows span the full panel width. */
+/* The project root rows use the same inset rounded bar as the item rows. */
 .tree-view .project-root.project-root::before {
-  left: 0;
-  right: 0;
-  border-radius: 0;
+  border-radius: var(--component-border-radius);
 }
 
 /* icon */

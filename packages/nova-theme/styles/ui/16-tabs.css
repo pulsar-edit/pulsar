@@ -7,7 +7,9 @@
   --tab-pill-height: calc(var(--ui-tab-height) - var(--tab-pill-inset) * 2);
   position: relative;
   height: var(--ui-tab-height);
-  background: var(--tab-bar-background-color);
+  /* Transparent so the pane card surface shows through; the active pill
+     raises above it. */
+  background: transparent;
   overflow-x: auto;
   overflow-y: hidden;
   border-radius: 0;

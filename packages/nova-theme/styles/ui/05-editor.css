@@ -16,7 +16,7 @@ atom-text-editor[mini] {
   line-height: var(--ui-line-height);
   max-height: calc(var(--ui-line-height) * 5); /* rows */
   padding-left: calc(var(--ui-padding) / 3);
-  border-radius: var(--component-border-radius);
+  border-radius: calc(var(--component-border-radius) * 1.5);
   color: var(--text-color-highlight);
   border: 1px solid var(--input-border-color);
   background-color: var(--input-background-color);
