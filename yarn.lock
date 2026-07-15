@@ -1271,6 +1271,18 @@
     iconv-lite "^0.7.3"
     node-addon-api "^8.9.0"
 
+"@lumine-code/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#d3303cce3e1e1eea7a7d2757141228ce929cff72":
+  version "10.0.0"
+  resolved "https://github.com/lumine-code/node-pathwatcher.git#d3303cce3e1e1eea7a7d2757141228ce929cff72"
+  dependencies:
+    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
+    async "^3.2.6"
+    event-kit "^2.1.0"
+    grim "^2.0.1"
+    iconv-lite "^0.7.3"
+    node-addon-api "^8.9.0"
+
 "@lumine-code/scandal@https://github.com/lumine-code/scandal.git#72f9304fe0c5d17b1a22e295f0ce2d08c717ab8c":
   version "5.0.0"
   resolved "https://github.com/lumine-code/scandal.git#72f9304fe0c5d17b1a22e295f0ce2d08c717ab8c"
@@ -1321,12 +1333,12 @@
   dependencies:
     node-addon-api "^8.9.0"
 
-"@lumine-code/text-buffer@https://github.com/lumine-code/text-buffer.git#150739e05fb62150ccee10e4542dc53721389e62":
+"@lumine-code/text-buffer@https://github.com/lumine-code/text-buffer.git#62de9faf160ab6e69f346608c030be188fd3270a":
   version "16.0.0"
-  resolved "https://github.com/lumine-code/text-buffer.git#150739e05fb62150ccee10e4542dc53721389e62"
+  resolved "https://github.com/lumine-code/text-buffer.git#62de9faf160ab6e69f346608c030be188fd3270a"
   dependencies:
     "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
-    "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#a3f906dbddc9ae21e21873b33a6e25a70fd4f4f0"
+    "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#d3303cce3e1e1eea7a7d2757141228ce929cff72"
     "@lumine-code/superstring" "https://github.com/lumine-code/superstring.git#4743f207372cd24778873a0c44e7aa8dfd741de2"
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     diff "^9.0.0"
@@ -2079,7 +2091,7 @@ bluebird@~3.7.2:
 "bookmarks@file:packages/bookmarks":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-6f88f690-675f-40c0-8ecd-94e18e5b7be4-1784090809384/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-d4e629eb-334e-4f80-a5d9-4f80d4b6b3ce-1784094028533/shared/select-list"
 
 boolbase@^1.0.0:
   version "1.0.0"
@@ -2445,7 +2457,7 @@ combined-stream@^1.0.8:
   version "1.0.0"
   dependencies:
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-b8bd8110-3a07-4bb6-89b0-9071843d91e1-1784090809391/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-89977d62-0ae3-44b4-984d-45074f6b9943-1784094028539/shared/select-list"
 
 commander@^10.0.0:
   version "10.0.1"
@@ -2839,7 +2851,7 @@ empathic@^2.0.1:
   dependencies:
     iconv-lite "^0.4.4"
     jschardet "^1.1.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-dfa9c733-d5c7-4cce-84f4-8ff8dff269dd-1784090809399/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-73abfe27-013e-4c72-ae7b-6d867e253027-1784094028547/shared/select-list"
 
 encoding-sniffer@^0.2.1:
   version "0.2.1"
@@ -3378,7 +3390,7 @@ function-bind@^1.1.2:
   version "1.0.0"
   dependencies:
     "@vscode/ripgrep" "1.18.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-fbbe65a3-00a9-456c-ab38-8fc90987e427-1784090809402/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-c9cbe91f-9c17-4dd4-bc59-6e43021b15ec-1784094028549/shared/select-list"
 
 "fuzzy-files@file:packages/fuzzy-files":
   version "1.0.0"
@@ -3386,12 +3398,12 @@ function-bind@^1.1.2:
     "@vscode/ripgrep" "1.18.0"
     async "3.2.6"
     minimatch "^10.2.5"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-958e31da-9982-4049-a936-ce49d3513fd9-1784090809404/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-d78ad93b-d195-47d4-9991-db39bd678ab6-1784094028551/shared/select-list"
 
 "fuzzy-workspace@file:packages/fuzzy-workspace":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-959a6aa8-93dc-4b1a-93b1-0f1f27557434-1784090809407/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-7cd32bc3-a2ef-4f1f-bc2d-17c56d545a94-1784094028552/shared/select-list"
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
@@ -3459,7 +3471,7 @@ get-tsconfig@^4.8.1:
 "git-diff@file:packages/git-diff":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-d19d5206-302e-486d-b6fc-e747ea6f7425-1784090809409/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-05ab7e10-25cb-4b24-97dc-9de633dbf9c2-1784094028554/shared/select-list"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -3591,7 +3603,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0,
 "grammar-selector@file:packages/grammar-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-1b16ce85-9678-41ac-86c0-d948fd24b660-1784090809412/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-6579c3ad-ef72-4dec-a34b-8cfab40adfaf-1784094028557/shared/select-list"
 
 grim@2.0.3, grim@^2.0.1, grim@^2.0.3:
   version "2.0.3"
@@ -4222,7 +4234,7 @@ levn@^0.4.1:
   version "1.0.0"
   dependencies:
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-ed589ec2-40c7-4183-aba0-add47515fcbc-1784090809482/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-d5f840f8-4683-4aff-8cbe-22bb25e7c940-1784094028613/shared/select-list"
 
 line-top-index@0.3.1:
   version "0.3.1"
@@ -5087,7 +5099,7 @@ progress@^2.0.3:
   version "1.0.0"
   dependencies:
     glob "^13.0.6"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-3718d9d1-16ca-4cb6-a46c-9caf7fe21bd3-1784090809521/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-72a1e169-92ac-476c-bc21-7122d2ea5076-1784094028654/shared/select-list"
 
 promise-retry@^2.0.1:
   version "2.0.1"
@@ -5222,7 +5234,7 @@ readdirp@^4.0.1:
 "recent-list@file:packages/recent-list":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-c6618de6-d123-4660-bd2f-24d61ac12feb-1784090809523/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-da8b98ff-8197-49da-bd01-e2058617550c-1784094028655/shared/select-list"
 
 regenerate-unicode-properties@^10.2.2:
   version "10.2.2"
@@ -5542,7 +5554,7 @@ slash@^2.0.0:
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     async "3.2.6"
     pegjs "^0.10.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-3c437f03-5b68-4cf2-b94e-55d4a892e057-1784090809532/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-ab8e30b5-858d-4cb2-ad41-77b40bd1682c-1784094028662/shared/select-list"
     temp "~0.8.0"
 
 source-map-js@^1.2.1:
@@ -5743,7 +5755,7 @@ strip-json-comments@~2.0.1:
   dependencies:
     dedent "^0.7.0"
     etch "0.9.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-395c870a-4e30-42cd-9419-bb5a21f9c784-1784090809537/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-f4e0f189-1374-4e87-8c51-ea3f9b792f64-1784094028666/shared/select-list"
 
 sumchecker@^3.0.1:
   version "3.0.1"
@@ -5786,7 +5798,7 @@ supports-preserve-symlinks-flag@^1.0.0:
   dependencies:
     "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     murmurhash-js "^1.0.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-56aa7a37-4030-4e8e-b09c-ec5133e79b05-1784090809543/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-4a0424b5-a14c-41ec-badd-02349c767b4f-1784094028670/shared/select-list"
 
 tabbable@^6.5.0:
   version "6.5.0"
