@@ -21,7 +21,7 @@
   "devDependencies": {
     "event-kit": "2.5.3",
     "semver": "^7.8.5",
-    "sinon": "^9.2.1"
+    "sinon": "^22.0.0"
   },
   "backgroundTips": [
     "Everything Lumine can do is in the Command Palette. See it by using {atom-workspace>command-palette:toggle}"

@@ -2090,7 +2090,7 @@ bluebird@~3.7.2:
 "bookmarks@file:packages/bookmarks":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-ac9e9b0f-0ff3-4a2f-aa85-e021c439fbc5-1784108295290/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-b35ada64-17fe-4448-a113-ce01c33e1429-1784109467883/shared/select-list"
 
 boolbase@^1.0.0:
   version "1.0.0"
@@ -2294,21 +2294,21 @@ cheerio-select@^2.1.0:
     domhandler "^5.0.3"
     domutils "^3.0.1"
 
-cheerio@^1.0.0-rc.3:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/cheerio/-/cheerio-1.1.2.tgz#26af77e89336c81c63ea83197f868b4cbd351369"
-  integrity sha512-IkxPpb5rS/d1IiLbHMgfPuS0FgiWTtFIm/Nj+2woXDLTZ7fOT2eqzgYbdMlLweqlHbsZjxEChoVK+7iph7jyQg==
+cheerio@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/cheerio/-/cheerio-1.2.0.tgz#f23b777c49021ead7475dcf3390d3535a7f896d6"
+  integrity sha512-WDrybc/gKFpTYQutKIK6UvfcuxijIZfMfXaYm8NMsPQxSYvf+13fXUJ4rztGGbJcBQ/GF55gvrZ0Bc0bj/mqvg==
   dependencies:
     cheerio-select "^2.1.0"
     dom-serializer "^2.0.0"
     domhandler "^5.0.3"
     domutils "^3.2.2"
     encoding-sniffer "^0.2.1"
-    htmlparser2 "^10.0.0"
+    htmlparser2 "^10.1.0"
     parse5 "^7.3.0"
     parse5-htmlparser2-tree-adapter "^7.1.0"
     parse5-parser-stream "^7.1.2"
-    undici "^7.12.0"
+    undici "^7.19.0"
     whatwg-mimetype "^4.0.0"
 
 chevrotain@^0.18.0:
@@ -2456,7 +2456,7 @@ combined-stream@^1.0.8:
   version "1.0.0"
   dependencies:
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-27ac7d32-ae55-4975-b9d7-03f8bef98a43-1784108295297/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-8e45a56b-4431-4ece-8228-8ac99ea3c206-1784109467889/shared/select-list"
 
 commander@^10.0.0:
   version "10.0.1"
@@ -2631,7 +2631,7 @@ delayed-stream@~1.0.0:
   dependencies:
     "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
-    etch "0.9.0"
+    etch "^0.14.1"
     grim "^2.0.1"
 
 detect-libc@^2.0.0, detect-libc@^2.0.3:
@@ -2721,7 +2721,7 @@ dompurify@^3.4.12:
   optionalDependencies:
     "@types/trusted-types" "^2.0.7"
 
-domutils@^3.0.1, domutils@^3.2.1, domutils@^3.2.2:
+domutils@^3.0.1, domutils@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/domutils/-/domutils-3.2.2.tgz#edbfe2b668b0c1d97c24baf0f1062b132221bc78"
   integrity sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==
@@ -2806,10 +2806,10 @@ electron-to-chromium@^1.5.389:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.389.tgz#538be9ebec78026d4daba6be321ab854dfac2a8f"
   integrity sha512-cEto7aeOqBfU1D+c5py5pE+ooscKE75JifxLBdFUZsqAxRS6y7kebtxAZvICszSl05gPjYHDTjY+lXpyGvpJbg==
 
-electron@43.1.0:
-  version "43.1.0"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-43.1.0.tgz#bf620e32bb919009f564a05804f6e89477ef9ec2"
-  integrity sha512-DPfxpQLd4NL3BJ8DBxYAfmLUKKesF5Rx9dQx5FyczAP8bhOPScjHE48GArVeXu68LlAainuwkmQTQvdZwpIIAQ==
+electron@43.1.1:
+  version "43.1.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-43.1.1.tgz#a7309c6a625d6f6621b1108a65bd53ada1184fa9"
+  integrity sha512-I5c5vfuVvaXpWx3IZdwvXgxQW44+e7OP1wXGVQkogLeSFSkUZ6sLCcWV05AdEcs65AO5tAIJJwbp7ixw+LdarA==
   dependencies:
     "@electron-internal/extract-zip" "^1.0.1"
     "@electron/get" "^5.0.0"
@@ -2843,8 +2843,8 @@ empathic@^2.0.1:
 "encoding-selector@file:packages/encoding-selector":
   version "1.0.0"
   dependencies:
-    jschardet "^1.1.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-9bb49f00-9cf3-4aad-99dd-2137fc778339-1784108295303/shared/select-list"
+    jschardet "^3.1.4"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-121b1894-f901-4826-b1cc-ba70ee3eb864-1784109467895/shared/select-list"
 
 encoding-sniffer@^0.2.1:
   version "0.2.1"
@@ -2878,6 +2878,11 @@ entities@^6.0.0:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/entities/-/entities-6.0.1.tgz#c28c34a43379ca7f61d074130b2f5f7020a30694"
   integrity sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==
+
+entities@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/entities/-/entities-7.0.1.tgz#26e8a88889db63417dcb9a1e79a3f1bc92b5976b"
+  integrity sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==
 
 env-paths@^2.2.0:
   version "2.2.1"
@@ -3101,21 +3106,6 @@ etch@0.14.1, etch@^0.14.0, etch@^0.14.1:
   version "0.14.1"
   resolved "https://registry.yarnpkg.com/etch/-/etch-0.14.1.tgz#48286244c9fc44a9bb097a433a561fb1da6b58c9"
   integrity sha512-+IwqSDBhaQFMUHJu4L/ir0dhDoW5IIihg4Z9lzsIxxne8V0PlSg0gnk2STaKWjGJQnDR4cxpA+a/dORX9kycTA==
-
-etch@0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/etch/-/etch-0.9.0.tgz#09226988f2cee0690bdf208ccb25e414d5dfad5f"
-  integrity sha512-UG0mzvvs8JyBo4tDG39mqGuZ7zZGKFn9QOzO+BhrKe17R/f+3U+jFgA/bjW/gTA2ykytcE/Qm826ltykCiIrFA==
-
-etch@0.9.3:
-  version "0.9.3"
-  resolved "https://registry.yarnpkg.com/etch/-/etch-0.9.3.tgz#daec52995bf613503d6b92b41f54a2eaa12e322b"
-  integrity sha512-BqN9PcqhpyUPwrWf/jiWHYGQnaOgR0m6WKxyAIn0le95FF7RSeCy7jJYyJfVq67s6x0tgn+b6mbGmfpNH6xHMw==
-
-etch@^0.12.2, etch@^0.12.6:
-  version "0.12.8"
-  resolved "https://registry.yarnpkg.com/etch/-/etch-0.12.8.tgz#c24bc9bd3a6148f62204ce8643d2e899b9ecb9de"
-  integrity sha512-dFLRe4wLroVtwzyy1vGlE3BSDZHiL0kZME5XgNGzZIULcYTvVno8vbiIleAesoKJmwWaxDTzG+4eppg2zk14JQ==
 
 event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.1.0, event-kit@^2.5.2, event-kit@^2.5.3:
   version "2.5.3"
@@ -3378,7 +3368,7 @@ function-bind@^1.1.2:
   version "1.0.0"
   dependencies:
     "@vscode/ripgrep" "1.18.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-ed2a15bb-5466-4e3f-8cf9-f56a40863980-1784108295305/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-8dfd13b4-f0df-43d7-9452-0da541fafec3-1784109468164/shared/select-list"
 
 "fuzzy-files@file:packages/fuzzy-files":
   version "1.0.0"
@@ -3386,12 +3376,12 @@ function-bind@^1.1.2:
     "@vscode/ripgrep" "1.18.0"
     async "3.2.6"
     minimatch "^10.2.5"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-98a32d74-4d20-45e6-83fa-e75b4cb7ac9e-1784108295307/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-6bd17429-e058-405b-aa99-d0bdc765810b-1784109468166/shared/select-list"
 
 "fuzzy-workspace@file:packages/fuzzy-workspace":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-cb55beed-56c8-41b6-9ce3-704a740cf221-1784108295309/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-a6559f5c-5ae9-4712-9acb-138c7371620d-1784109468168/shared/select-list"
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
@@ -3459,7 +3449,7 @@ get-tsconfig@^4.8.1:
 "git-diff@file:packages/git-diff":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-6a8aeb27-33a7-4854-a36e-94f20d1b08e7-1784108295310/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-1b4d82d3-8e72-4d99-b20f-708ac4acc93a-1784109468169/shared/select-list"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -3591,7 +3581,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0,
 "grammar-selector@file:packages/grammar-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-1e14db16-3893-49af-92ac-8f20a968f1a9-1784108295313/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-91d6d725-c989-424c-a031-b7049ee54305-1784109468172/shared/select-list"
 
 grim@2.0.3, grim@^2.0.1, grim@^2.0.3:
   version "2.0.3"
@@ -3667,15 +3657,15 @@ html-entities@^2.6.0:
   resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-2.6.0.tgz#7c64f1ea3b36818ccae3d3fb48b6974208e984f8"
   integrity sha512-kig+rMn/QOVRvr7c86gQ8lWXq+Hkv6CbAH1hLu+RG338StTpE8Z0b44SDVaqVu7HGKf27frdmUYEs9hTUX/cLQ==
 
-htmlparser2@^10.0.0:
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-10.0.0.tgz#77ad249037b66bf8cc99c6e286ef73b83aeb621d"
-  integrity sha512-TwAZM+zE5Tq3lrEHvOlvwgj1XLWQCtaaibSN11Q+gGBAS7Y1uZSWwXXRe4iF6OXnaq1riyQAPFOBtYc77Mxq0g==
+htmlparser2@^10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-10.1.0.tgz#fe3f2e12c73b6e462d4e10395db9c1119e4d6ae4"
+  integrity sha512-VTZkM9GWRAtEpveh7MSF6SjjrpNVNNVJfFup7xTY3UpFtm67foy9HDVXneLtFVt4pMz5kZtgNcvCniNFb1hlEQ==
   dependencies:
     domelementtype "^2.3.0"
     domhandler "^5.0.3"
-    domutils "^3.2.1"
-    entities "^6.0.0"
+    domutils "^3.2.2"
+    entities "^7.0.1"
 
 http-cache-semantics@^4.0.0:
   version "4.2.0"
@@ -3749,7 +3739,7 @@ image-size@~0.5.0:
   version "1.0.0"
   dependencies:
     bytes "^3.0.0"
-    etch "0.9.0"
+    etch "^0.14.1"
 
 import-meta-resolve@^4.2.0:
   version "4.2.0"
@@ -3764,7 +3754,7 @@ imurmurhash@^0.1.4:
 "incompatible-packages@file:packages/incompatible-packages":
   version "1.0.0"
   dependencies:
-    etch "^0.12.2"
+    etch "^0.14.1"
 
 inflight@^1.0.4:
   version "1.0.6"
@@ -3967,10 +3957,10 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
-jschardet@^1.1.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/jschardet/-/jschardet-1.6.0.tgz#c7d1a71edcff2839db2f9ec30fc5d5ebd3c1a678"
-  integrity sha512-xYuhvQ7I9PDJIGBWev9xm0+SMSed3ZDBAmvVjbFR1ZRLAF+vlXcQu6cRI9uAlj81rzikElRVteehwV7DuX2ZmQ==
+jschardet@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/jschardet/-/jschardet-3.1.4.tgz#fff6e3c4b7867b361c2acc3870c42ea25d4f675b"
+  integrity sha512-/kmVISmrwVwtyYU40iQUOp3SUPk2dhNCMsZBQX0R1/jZ8maaXJ/oZIzUOiyOqcgtLnETFKYChbJ5iDC/eWmFHg==
 
 jsdoc-type-pratt-parser@~7.2.0:
   version "7.2.0"
@@ -4053,7 +4043,7 @@ key-path-helpers@^0.4.0:
   version "1.0.0"
   dependencies:
     "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
-    etch "0.9.0"
+    etch "^0.14.1"
     temp "^0.9.0"
 
 keyv@^4.0.0, keyv@^4.5.4:
@@ -4210,7 +4200,7 @@ levn@^0.4.1:
   version "1.0.0"
   dependencies:
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-a2673137-1b2c-4948-8d28-f178ac58803d-1784108295367/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-dd51a8cf-007d-40c7-bb12-7fa7236ebfd6-1784109468226/shared/select-list"
 
 line-top-index@0.3.1:
   version "0.3.1"
@@ -4337,7 +4327,7 @@ markdown-it@^14.3.0:
   dependencies:
     "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
-    cheerio "^1.0.0-rc.3"
+    cheerio "^1.2.0"
     dedent "^1.5.3"
     dompurify "^3.2.6"
     emoji-images "^0.1.1"
@@ -5069,7 +5059,7 @@ progress@^2.0.3:
   version "1.0.0"
   dependencies:
     glob "^13.0.6"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-ed2ae255-9051-475c-a091-3e1a704b191f-1784108295399/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-330c9396-4090-4c3c-802c-44c233765bef-1784109468588/shared/select-list"
 
 promise-retry@^2.0.1:
   version "2.0.1"
@@ -5204,7 +5194,7 @@ readdirp@^4.0.1:
 "recent-list@file:packages/recent-list":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-6e27a4af-5e14-4dd4-8959-7eb407ac93b7-1784108295401/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-03de5752-29b5-446e-8808-a194f98c83ff-1784109468589/shared/select-list"
 
 regenerate-unicode-properties@^10.2.2:
   version "10.2.2"
@@ -5362,7 +5352,7 @@ sax@^1.2.4:
 "search-panel@file:packages/search-panel":
   version "2.0.1"
   dependencies:
-    etch "0.9.3"
+    etch "^0.14.1"
 
 "select-list@file:./shared/select-list", "select-list@file:shared/select-list":
   version "1.7.0"
@@ -5445,7 +5435,7 @@ set-function-length@^1.2.2:
     "@lumine-code/season" "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d"
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     async "^3.2.0"
-    etch "0.9.0"
+    etch "^0.14.1"
     glob "^13.0.6"
     semver "^5.3.0"
 
@@ -5523,7 +5513,7 @@ slash@^2.0.0:
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     async "3.2.6"
     pegjs "^0.10.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-6ad72ebf-7c9e-4f2d-9071-90eb3dbe5fa3-1784108295409/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-dbbcedb3-90b7-4739-a5ec-de3c061019d0-1784109468596/shared/select-list"
     temp "~0.8.0"
 
 source-map-js@^1.2.1:
@@ -5718,8 +5708,8 @@ strip-json-comments@~2.0.1:
   version "1.0.0"
   dependencies:
     dedent "^1.7.2"
-    etch "0.9.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-98f049cd-371a-4e49-ad05-3a677c867a7e-1784108295413/shared/select-list"
+    etch "^0.14.1"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-2e52b099-f62f-45bb-ab21-f31b0dab0d69-1784109468600/shared/select-list"
 
 sumchecker@^3.0.1:
   version "3.0.1"
@@ -5762,7 +5752,7 @@ supports-preserve-symlinks-flag@^1.0.0:
   dependencies:
     "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be"
     murmurhash-js "^1.0.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-bdf6c11c-f617-4f3a-a801-411c233799cc-1784108295417/shared/select-list"
+    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-37f47af6-ba92-4b9e-a6a9-455ca05e0294-1784109468604/shared/select-list"
 
 tabbable@^6.5.0:
   version "6.5.0"
@@ -5882,7 +5872,7 @@ through@2, through@2.3.x, through@^2.3.8:
   dependencies:
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
     dedent "^1.7.2"
-    etch "^0.12.6"
+    etch "^0.14.1"
 
 tiny-async-pool@1.3.0:
   version "1.3.0"
@@ -6024,12 +6014,7 @@ undici@^6.25.0:
   resolved "https://registry.yarnpkg.com/undici/-/undici-6.27.0.tgz#41f9e48f7c5a40d27376caaead8c9a9fc7bca9c4"
   integrity sha512-YmfV3YnEDzXRC5lZ2jWtWWHKGUm1zIt8AhesR1tens+HTNv+YZlN/dp6G727LOvMJ8xjP9Be7Y2Sdr96LDm+pg==
 
-undici@^7.12.0:
-  version "7.16.0"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-7.16.0.tgz#cb2a1e957726d458b536e3f076bf51f066901c1a"
-  integrity sha512-QEg3HPMll0o3t2ourKwOeUAZ159Kn9mx5pnzHRQO8+Wixmh88YdZRiIwat0iNzNNXn0yoEtXJqFpyW7eM8BV7g==
-
-undici@^7.24.4:
+undici@^7.19.0, undici@^7.24.4:
   version "7.28.0"
   resolved "https://registry.yarnpkg.com/undici/-/undici-7.28.0.tgz#97d64564198b285bc281f0e8e29597e3d11fe7ec"
   integrity sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==
@@ -6135,7 +6120,7 @@ webcrypto-core@^1.9.2:
 "welcome@file:packages/welcome":
   version "1.0.0"
   dependencies:
-    etch "0.9.0"
+    etch "^0.14.1"
 
 whatwg-encoding@^3.1.1:
   version "3.1.1"

@@ -96,7 +96,7 @@
     "select-list": "file:../../shared/select-list"
   },
   "devDependencies": {
-    "eslint": "^8.39.0",
+    "eslint": "^10.7.0",
     "temp": "^0.9.4"
   }
 }

@@ -69,7 +69,7 @@
   },
   "dependencies": {
     "async": "^3.2.0",
-    "etch": "0.9.0",
+    "etch": "^0.14.1",
     "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
     "glob": "^13.0.6",
     "@lumine-code/season": "https://github.com/lumine-code/season.git#721e25f3a41fd9b73419bba7af5057c1a006fd5d",

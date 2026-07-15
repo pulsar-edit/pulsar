@@ -8,7 +8,7 @@
   "license": "MIT",
   "dependencies": {
     "dedent": "^1.7.2",
-    "etch": "0.9.0",
+    "etch": "^0.14.1",
     "select-list": "file:../../shared/select-list"
   },
   "deserializers": {

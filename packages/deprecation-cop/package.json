@@ -10,7 +10,7 @@
     "atom": "*"
   },
   "dependencies": {
-    "etch": "0.9.0",
+    "etch": "^0.14.1",
     "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
     "grim": "^2.0.1",
     "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"

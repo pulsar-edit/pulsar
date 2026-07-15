@@ -33,7 +33,7 @@
     "atom": "*"
   },
   "dependencies": {
-    "etch": "0.9.3"
+    "etch": "^0.14.1"
   },
   "consumedServices": {
     "atom.file-icons": {

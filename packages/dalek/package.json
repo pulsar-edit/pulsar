@@ -13,6 +13,6 @@
     "grim": "^2.0.3"
   },
   "devDependencies": {
-    "sinon": "^15.2.0"
+    "sinon": "^22.0.0"
   }
 }

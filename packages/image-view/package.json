@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "bytes": "^3.0.0",
-    "etch": "0.9.0"
+    "etch": "^0.14.1"
   },
   "consumedServices": {
     "status-bar": {

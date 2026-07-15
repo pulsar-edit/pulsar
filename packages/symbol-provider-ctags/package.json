@@ -33,7 +33,7 @@
     "@lumine-code/ctags": "https://github.com/lumine-code/node-ctags.git#0e15977c7b637fc64e6dbeac315a61190fc19a19"
   },
   "devDependencies": {
-    "eslint": "^8.39.0",
+    "eslint": "^10.7.0",
     "temp": "^0.9.4"
   }
 }

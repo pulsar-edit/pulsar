@@ -32,6 +32,6 @@
     "GuideView": "createGuideView"
   },
   "dependencies": {
-    "etch": "0.9.0"
+    "etch": "^0.14.1"
   }
 }
