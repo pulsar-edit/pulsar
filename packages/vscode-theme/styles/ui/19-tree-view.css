@@ -1,0 +1,114 @@
+.tree-view {
+  font-size: var(--ui-size);
+  background: var(--tree-view-background-color);
+
+  .project-root.project-root {
+    &:before {
+      height: var(--ui-tab-height);
+      background-clip: padding-box;
+    }
+    & > .header .name {
+      line-height: var(--ui-tab-height);
+    }
+  }
+
+  /* Selected state */
+  .selected:before {
+    background: var(--background-color-selected);
+  }
+
+  /* Focus + selected state */
+  &:focus {
+    .selected.list-item > .name, /* files */
+    .selected.list-nested-item > .list-item > .name, /* folders */
+    .selected.list-nested-item > .header:before {
+      /* arrow icon */
+      color: var(--accent-bg-text-color);
+    }
+    .selected:before {
+      background: var(--button-background-color-selected);
+    }
+  }
+
+  /* Hover highlight — a full-width bar like the selected state, shown only on
+     the row directly under the cursor. Files use their own ::before; folders
+     use the nested-item's ::before (the header's ::before is the disclosure
+     arrow). `:has(li:hover)` keeps ancestor folders from lighting up when a
+     descendant row is hovered. */
+  li.list-item:not(.list-nested-item):not(.selected):hover::before,
+  .list-nested-item:not(.selected):not(:has(li:hover)):hover::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--ui-line-height);
+    background: var(--background-color-highlight);
+    pointer-events: none;
+  }
+
+  /* Project root headers are taller than plain rows; match their hover bar
+     to the header height. */
+  .project-root.project-root:not(.selected):not(:has(li:hover)):hover::before {
+    height: var(--ui-tab-height);
+  }
+
+  /* Keep the row's content above the hover bar. */
+  li.list-item:not(.list-nested-item):not(.selected):hover > *,
+  .list-nested-item:not(.selected):not(:has(li:hover)):hover > .list-item {
+    position: relative;
+  }
+}
+
+/* Night-only rule inherited from the One Dark lineage. */
+:where(.theme-vscode-night-ui) .tree-view .project-root.project-root::before {
+  border-top: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.tree-view-resizer {
+  .tree-view-resize-handle {
+    width: 8px;
+  }
+}
+
+/* Variable height, based on ems */
+.list-group li:not(.list-nested-item),
+.list-tree li:not(.list-nested-item),
+.list-group li.list-nested-item > .list-item,
+.list-tree li.list-nested-item > .list-item {
+  line-height: var(--ui-line-height);
+}
+
+.list-group .selected::before,
+.list-tree .selected::before {
+  height: var(--ui-line-height);
+}
+
+/* icon */
+.list-group .icon,
+.list-tree .icon {
+  display: inline-block;
+  height: inherit;
+  &::before {
+    top: initial;
+    line-height: inherit;
+    height: inherit;
+    vertical-align: top;
+  }
+}
+
+/* Arrow icon */
+.list-group,
+.list-tree {
+  .header.header.header.header::before {
+    top: initial;
+    line-height: inherit;
+    height: inherit;
+    vertical-align: top;
+    font-size: inherit;
+  }
+}
+.tree-view
+  .project-root-header.project-root-header.project-root-header.project-root-header::before {
+  line-height: var(--ui-tab-height);
+}

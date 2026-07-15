@@ -1,0 +1,46 @@
+/* Editor in a panel */
+
+/* TODO: Find a better selector, maybe a new class like atom-text-editor[medium] */
+atom-panel-container atom-text-editor.is-focused {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 1px var(--accent-color);
+}
+
+/* Mini */
+/* Usually just single line inputs */
+
+atom-text-editor[mini] {
+  overflow: auto;
+  font-size: var(--ui-input-size);
+  line-height: var(--ui-line-height);
+  max-height: calc(var(--ui-line-height) * 5); /* rows */
+  padding-left: calc(var(--ui-padding) / 3);
+  border-radius: var(--component-border-radius);
+  color: var(--text-color-highlight);
+  border: 1px solid var(--input-border-color);
+  background-color: var(--input-background-color);
+
+  .placeholder-text {
+    color: var(--text-color-subtle);
+  }
+
+  .selection .region {
+    background-color: var(--input-selection-color);
+  }
+
+  .cursor {
+    border-color: var(--accent-color);
+    border-width: 2px;
+  }
+
+  &.is-focused {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 1px var(--accent-color);
+    background-color: var(--input-background-color-focus);
+    .selection .region {
+      background-color: var(--input-selection-color-focus);
+    }
+  }
+}

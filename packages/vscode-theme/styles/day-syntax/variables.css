@@ -1,0 +1,84 @@
+/*
+ * vscode-day palette — the syntax side of the theme variable contract as CSS
+ * custom properties, following the VS Code Light+ token colors on the
+ * Light Modern editor surface.
+ *
+ * Values must stay concrete (hex/hsl/rgba or plain var() aliases within this
+ * file): Lumine derives the legacy Less ui-variables/syntax-variables shim for
+ * community packages from this file, and Less color functions need concrete
+ * colors to operate on. See src/theme-variable-shim.js.
+ */
+
+:root {
+  --syntax-text-color: #3b3b3b;
+  --syntax-cursor-color: #000000;
+  --syntax-selection-color: #add6ff;
+  --syntax-selection-flash-color: #005fb8;
+  --syntax-background-color: #ffffff;
+  --syntax-wrap-guide-color: rgba(59, 59, 59, 0.08);
+  --syntax-indent-guide-color: #d3d3d3;
+  --syntax-invisible-character-color: rgba(59, 59, 59, 0.25);
+  --syntax-result-marker-color: rgba(234, 92, 0, 0.3);
+  --syntax-result-marker-color-selected: #005fb8;
+  --syntax-gutter-text-color: #6e7681;
+  --syntax-gutter-text-color-selected: #171184;
+  --syntax-gutter-background-color: #ffffff;
+  --syntax-gutter-background-color-selected: #f2f2f2;
+  --syntax-color-added: #107c10;
+  --syntax-color-modified: #005fb8;
+  --syntax-color-removed: #cd3131;
+  --syntax-color-renamed: #007100;
+  --syntax-color-variable: #001080;
+  --syntax-color-constant: #098658;
+  --syntax-color-property: #001080;
+  --syntax-color-value: #0451a5;
+  --syntax-color-function: #795e26;
+  --syntax-color-method: #795e26;
+  --syntax-color-class: #267f99;
+  --syntax-color-keyword: #af00db;
+  --syntax-color-tag: #800000;
+  --syntax-color-attribute: #e50000;
+  --syntax-color-import: #af00db;
+  --syntax-color-snippet: #a31515;
+  --syntax-color-string: #a31515;
+  --syntax-color-comment: #008000;
+  --terminal-text-color: #3b3b3b;
+  --terminal-background-color: #f8f8f8;
+  --terminal-selection-background-color: #add6ff;
+  --terminal-selection-text-color: #3b3b3b;
+  --terminal-cursor-color: #000000;
+  --terminal-result-marker-color: rgba(234, 92, 0, 0.3);
+  --terminal-result-marker-color-selected: #005fb8;
+  --terminal-color-black: #000000;
+  --terminal-color-red: #cd3131;
+  --terminal-color-green: #00bc00;
+  --terminal-color-yellow: #949800;
+  --terminal-color-blue: #0451a5;
+  --terminal-color-magenta: #bc05bc;
+  --terminal-color-cyan: #0598bc;
+  --terminal-color-white: #555555;
+  --terminal-color-bright-black: #666666;
+  --terminal-color-bright-red: #cd3131;
+  --terminal-color-bright-green: #14ce14;
+  --terminal-color-bright-yellow: #b5ba00;
+  --terminal-color-bright-blue: #0451a5;
+  --terminal-color-bright-magenta: #bc05bc;
+  --terminal-color-bright-cyan: #0598bc;
+  --terminal-color-bright-white: #a5a5a5;
+  --mono-1: #3b3b3b;
+  --mono-2: #616161;
+  --mono-3: #8e8e8e;
+  --hue-1: #267f99;
+  --hue-2: #0451a5;
+  --hue-3: #af00db;
+  --hue-4: #008000;
+  --hue-5: #cd3131;
+  --hue-5-2: #a31515;
+  --hue-6: #e50000;
+  --hue-6-2: #795e26;
+  --syntax-fg: var(--mono-1);
+  --syntax-bg: #ffffff;
+  --syntax-gutter: #6e7681;
+  --syntax-guide: #d3d3d3;
+  --syntax-accent: #005fb8;
+}

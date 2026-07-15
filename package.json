@@ -175,6 +175,7 @@
     "title-bar": "file:packages/title-bar",
     "tree-view": "file:./packages/tree-view",
     "@typescript/typescript6": "6.0.2",
+    "vscode-theme": "file:packages/vscode-theme",
     "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274",
     "welcome": "file:packages/welcome",
     "whitespace": "file:./packages/whitespace",
@@ -187,6 +188,7 @@
   "packageDependencies": {
     "nova-theme": "file:./packages/nova-theme",
     "one-theme": "file:./packages/one-theme",
+    "vscode-theme": "file:./packages/vscode-theme",
     "about": "file:./packages/about",
     "archive-view": "file:./packages/archive-view",
     "autocomplete-lumine": "file:packages/autocomplete-lumine",

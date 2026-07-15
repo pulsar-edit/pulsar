@@ -1,0 +1,123 @@
+/*
+ * vscode-night palette — the UI side of the theme variable contract as CSS
+ * custom properties, following the VS Code Dark Modern colors.
+ *
+ * Values must stay concrete (hex/hsl/rgba or plain var() aliases within this
+ * file): Lumine derives the legacy Less ui-variables/syntax-variables shim for
+ * community packages from this file, and Less color functions need concrete
+ * colors to operate on. See src/theme-variable-shim.js.
+ */
+
+:root {
+  --text-color: #cccccc;
+  --text-color-subtle: #9d9d9d;
+  --text-color-highlight: #ffffff;
+  --text-color-selected: #ffffff;
+  --text-color-info: #3794ff;
+  --text-color-success: #89d185;
+  --text-color-warning: #cca700;
+  --text-color-error: #f85149;
+  --background-color-info: #0078d4;
+  --background-color-success: #107c10;
+  --background-color-warning: #986f0b;
+  --background-color-error: #b42318;
+  --background-color-highlight: #2a2d2e;
+  --background-color-selected: #37373d;
+  --app-background-color: #181818;
+  --base-background-color: #1f1f1f;
+  --base-border-color: #2b2b2b;
+  --pane-item-background-color: #1f1f1f;
+  --pane-item-border-color: #2b2b2b;
+  --input-background-color: #313131;
+  --input-border-color: #3c3c3c;
+  --tool-panel-background-color: #181818;
+  --tool-panel-border-color: #2b2b2b;
+  --inset-panel-background-color: #202020;
+  --inset-panel-border-color: rgba(43, 43, 43, 0.85);
+  --panel-heading-background-color: #1f1f1f;
+  --panel-heading-border-color: #2b2b2b;
+  --overlay-background-color: #222222;
+  --overlay-border-color: #3c3c3c;
+  --button-background-color: #313131;
+  --button-background-color-hover: #3c3c3c;
+  --button-background-color-selected: #04395e;
+  --button-border-color: rgba(255, 255, 255, 0.07);
+  --tab-bar-background-color: #181818;
+  --tab-bar-border-color: #2b2b2b;
+  --tab-background-color: #181818;
+  --tab-background-color-active: #1f1f1f;
+  --tab-border-color: #2b2b2b;
+  --tree-view-background-color: #181818;
+  --tree-view-border-color: #2b2b2b;
+  --scrollbar-color: rgba(121, 121, 121, 0.4);
+  --scrollbar-background-color: #181818;
+  --ui-site-color-1: hsl(208, 100%, 50%);
+  --ui-site-color-2: hsl(160, 70%, 42%);
+  --ui-site-color-3: hsl(32, 60%, 50%);
+  --ui-site-color-4: #d831b0;
+  --ui-site-color-5: #ebdd5b;
+  --font-size: 12px;
+  --input-font-size: 14px;
+  --disclosure-arrow-size: 12px;
+  --component-padding: 10px;
+  --component-icon-padding: 5px;
+  --component-icon-size: 16px;
+  --component-line-height: 25px;
+  --component-border-radius: 4px;
+  --tab-height: 35px;
+  --font-family: system-ui;
+  --use-custom-controls: true;
+  --text-color-faded: rgba(204, 204, 204, 0.3);
+  --text-color-added: #81b88b;
+  --text-color-ignored: #8c8c8c;
+  --text-color-modified: #e2c08d;
+  --text-color-removed: #f85149;
+  --text-color-renamed: #3794ff;
+  --level-1-color: #313131;
+  --level-2-color: #1f1f1f;
+  --level-3-color: #181818;
+  --level-3-color-hover: #303030;
+  --level-3-color-active: #262626;
+  --accent-color: #0078d4;
+  --accent-text-color: #ffffff;
+  --accent-bg-color: #0078d4;
+  --accent-bg-text-color: #ffffff;
+  --accent-only-text-color: #4daafc;
+  --badge-background-color: #616161;
+  --button-text-color-selected: #ffffff;
+  --button-border-color-selected: rgba(255, 255, 255, 0.07);
+  --checkbox-background-color: rgba(0, 120, 212, 0.33);
+  --input-background-color-focus: #313131;
+  --input-selection-color: #3a3d41;
+  --input-selection-color-focus: #264f78;
+  --overlay-backdrop-color: hsl(0, 0%, 0%);
+  --overlay-backdrop-opacity: 0.45;
+  --progress-background-color: #0078d4;
+  --scrollbar-color-editor: rgba(121, 121, 121, 0.4);
+  --scrollbar-background-color-editor: #1f1f1f;
+  --tab-text-color: #9d9d9d;
+  --tab-text-color-active: #ffffff;
+  --tab-text-color-editor: #ffffff;
+  --tab-background-color-editor: #1f1f1f;
+  --tab-inactive-status-added: rgba(129, 184, 139, 0.55);
+  --tab-inactive-status-modified: rgba(226, 192, 141, 0.55);
+  --tooltip-background-color: #202020;
+  --tooltip-text-color: #cccccc;
+  --tooltip-text-key-color: #cccccc;
+  --tooltip-background-key-color: #3c3c3c;
+  --ui-size: 1em;
+  --ui-input-size: 1.15em;
+  --ui-padding: 1.5em;
+  --ui-padding-pane: 0.5em;
+  --ui-padding-icon: 0.45454545em;
+  --ui-line-height: 2em;
+  --ui-tab-height: 2.9em;
+  --settings-list-background-color: #1c1c1c;
+  --theme-config-box-shadow: inset 0 0 3px hsla(0, 0%, 100%, 0.4), 0 1px 3px hsla(0, 0%, 0%, 0.2);
+  --theme-config-box-shadow-selected: inset 0 1px 3px hsla(0, 0%, 0%, 0.1);
+  --theme-config-border-selected: hsla(0, 0%, 100%, 0.75);
+  --text-color-on-info: #ffffff;
+  --text-color-on-success: #ffffff;
+  --text-color-on-warning: #ffffff;
+  --text-color-on-error: #ffffff;
+}
