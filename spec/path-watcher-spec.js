@@ -537,6 +537,10 @@ describe("watchPath", function () {
         expect(rootWatcher.native).toBe(childWatcher.native);
         expect(rootWatcher.native.isRunning()).toBe(true);
 
+        // Let the native watcher finish arming before triggering the change,
+        // so slow CI runners (notably Windows) don't miss the event and hang.
+        await wait(process.env.CI ? 2000 : 0);
+
         const firstChanges = Promise.all([
           waitForChanges(rootWatcher, subFile),
           waitForChanges(childWatcher, subFile),

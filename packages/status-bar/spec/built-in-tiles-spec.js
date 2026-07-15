@@ -608,9 +608,27 @@ describe("Built-in Status Bar Tiles", function () {
     describe("the git status label", function () {
       let [repo, filePath, originalPathText, newPath, ignorePath, ignoredPath, projectPath] = [];
 
-      beforeEach(function () {
+      // Renaming the fixture's git directory races with the previous spec's
+      // repository releasing its handles inside it (status refreshes run
+      // asynchronously), and Windows refuses to rename a directory that any
+      // process still has open. Retry briefly until the handles are gone.
+      async function moveWithRetries(source, target) {
+        for (let attempt = 0; ; attempt++) {
+          try {
+            return fs.moveSync(source, target);
+          } catch (error) {
+            if (attempt >= 40) throw error;
+            await new Promise((resolve) => setTimeout(resolve, 50));
+          }
+        }
+      }
+
+      beforeEach(async function () {
         projectPath = atom.project.getDirectories()[0].resolve("git/working-dir");
-        fs.moveSync(path.join(projectPath, "git.git"), path.join(projectPath, ".git"));
+        // Drop any repository from a previous spec so its handles inside the
+        // git directory are released before the rename.
+        atom.project.setPaths([]);
+        await moveWithRetries(path.join(projectPath, "git.git"), path.join(projectPath, ".git"));
         atom.project.setPaths([projectPath]);
         filePath = atom.project.getDirectories()[0].resolve("a.txt");
         newPath = atom.project.getDirectories()[0].resolve("new.txt");
@@ -623,15 +641,17 @@ describe("Built-in Status Bar Tiles", function () {
 
         repo = atom.project.getRepositories()[0];
         originalPathText = fs.readFileSync(filePath, "utf8");
-        return waitsForPromise(() => repo.refreshStatus());
+        await repo.refreshStatus();
       });
 
-      afterEach(function () {
+      afterEach(async function () {
         fs.writeFileSync(filePath, originalPathText);
         fs.removeSync(newPath);
         fs.removeSync(ignorePath);
         fs.removeSync(ignoredPath);
-        return fs.moveSync(path.join(projectPath, ".git"), path.join(projectPath, "git.git"));
+        // Release the repository's handles before renaming; see beforeEach.
+        atom.project.setPaths([]);
+        await moveWithRetries(path.join(projectPath, ".git"), path.join(projectPath, "git.git"));
       });
 
       it("displays the modified icon for a changed file", function () {
