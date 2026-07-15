@@ -16,7 +16,7 @@ const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 const os = require("os");
 const net = require("net");
-const url = require("url");
+const parseUri = require("../parse-uri");
 const { promisify } = require("util");
 const { EventEmitter } = require("events");
 const _ = require("@lumine-code/underscore-plus");
@@ -1444,9 +1444,8 @@ module.exports = class AtomApplication extends EventEmitter {
   //   :devMode - Boolean to control the opened window's dev mode.
   //   :safeMode - Boolean to control the opened window's safe mode.
   openUrl({ urlToOpen, devMode, safeMode, env }) {
-    // eslint-disable-next-line n/no-deprecated-api -- url.parse tolerates loose/relative input and exposes slashes/auth; URL migration needs review
-    const parsedUrl = url.parse(urlToOpen, true);
-    if (parsedUrl.protocol !== "atom:") return;
+    const parsedUrl = parseUri(urlToOpen);
+    if (!parsedUrl || parsedUrl.protocol !== "atom:") return;
 
     const pack = this.findPackageWithName(parsedUrl.host, devMode);
     if (pack && pack.urlMain) {
@@ -1722,10 +1721,11 @@ module.exports = class AtomApplication extends EventEmitter {
       path.resolve(executedFrom, fs.normalize(result.pathToOpen)),
     );
 
-    // eslint-disable-next-line n/no-deprecated-api -- url.parse tolerates loose/relative input and exposes slashes/auth; URL migration needs review
-    if (!url.parse(result.pathToOpen).protocol) {
+    if (!URL.canParse(result.pathToOpen)) {
       // If this isn't a URL, it's a file path. File paths need to be resolved
       // and normalized, whereas we assume URLs are already unambiguous.
+      // Absolute Windows paths parse as URLs with a drive-letter scheme and
+      // are left as-is; they are already absolute.
       result.pathToOpen = normalizedPath;
     }
 

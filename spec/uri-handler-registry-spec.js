@@ -1,8 +1,26 @@
 /** @babel */
 
-import url from "url";
-
 import URIHandlerRegistry from "../src/uri-handler-registry";
+
+// The object shape handlers receive is public API: it must stay compatible
+// with the output of Node's legacy `url.parse(uri, true)`.
+function parsedUri(host, pathname, href) {
+  return {
+    protocol: "atom:",
+    slashes: true,
+    auth: null,
+    host,
+    port: null,
+    hostname: host,
+    hash: null,
+    search: null,
+    // Like legacy `url.parse(uri, true)`, `query` has a null prototype.
+    query: Object.create(null),
+    pathname,
+    path: pathname,
+    href,
+  };
+}
 
 describe("URIHandlerRegistry", () => {
   let registry;
@@ -23,14 +41,14 @@ describe("URIHandlerRegistry", () => {
 
     await registry.handleURI("atom://test-package/path");
     expect(testPackageSpy).toHaveBeenCalledWith(
-      url.parse("atom://test-package/path", true),
+      parsedUri("test-package", "/path", "atom://test-package/path"),
       "atom://test-package/path",
     );
     expect(otherPackageSpy).not.toHaveBeenCalled();
 
     await registry.handleURI("atom://other-package/path");
     expect(otherPackageSpy).toHaveBeenCalledWith(
-      url.parse("atom://other-package/path", true),
+      parsedUri("other-package", "/path", "atom://other-package/path"),
       "atom://other-package/path",
     );
   });
@@ -63,7 +81,7 @@ describe("URIHandlerRegistry", () => {
             id: idx + 1,
             uri: u,
             handled: !u.match(/fake/),
-            host: url.parse(u).host,
+            host: new URL(u).host,
           };
         })
         .reverse(),

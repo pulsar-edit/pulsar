@@ -1,4 +1,3 @@
-const url = require("url");
 const _ = require("@lumine-code/underscore-plus");
 
 const LINK_SCOPE_REGEX = /markup\.underline\.link/;
@@ -25,7 +24,7 @@ module.exports = {
       link = this.linkForName(editor, link);
     }
 
-    const { protocol } = url.parse(link);
+    const protocol = URL.parse(link)?.protocol;
     if (protocol === "http:" || protocol === "https:" || protocol === "atom:") {
       atom.openExternal(link);
     }

@@ -2,7 +2,6 @@
 /** @jsx etch.dom */
 
 import path from "path";
-import url from "url";
 
 import _ from "@lumine-code/underscore-plus";
 import fs from "@lumine-code/fs-plus";
@@ -63,7 +62,7 @@ export default class PackageDetailView {
       event.preventDefault();
       const repoUrl = this.packageManager.getRepositoryUrl(this.pack);
       if (typeof repoUrl === "string") {
-        if (url.parse(repoUrl).pathname === "/lumine-code/lumine") {
+        if (URL.parse(repoUrl)?.pathname === "/lumine-code/lumine") {
           atom.openExternal(`${repoUrl}/tree/master/packages/${this.pack.name}`);
         } else {
           atom.openExternal(repoUrl);
@@ -326,10 +325,7 @@ export default class PackageDetailView {
   }
 
   packageSectionKey(title) {
-    return String(title)
-      .trim()
-      .toLocaleLowerCase()
-      .replace(/\s+/g, "-");
+    return String(title).trim().toLocaleLowerCase().replace(/\s+/g, "-");
   }
 
   update() {}
@@ -431,7 +427,7 @@ export default class PackageDetailView {
 
     const repoUrl = this.packageManager.getRepositoryUrl(this.pack);
     if (repoUrl) {
-      const repoName = url.parse(repoUrl).pathname;
+      const repoName = URL.parse(repoUrl)?.pathname ?? repoUrl;
       this.refs.packageRepo.textContent = repoName.substring(1);
       this.refs.packageRepo.style.display = "";
     } else {

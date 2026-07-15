@@ -1,5 +1,4 @@
 const { Disposable } = require("atom");
-const url = require("url");
 const fs = require("@lumine-code/fs-plus");
 
 module.exports = class FileInfoView {
@@ -79,7 +78,10 @@ module.exports = class FileInfoView {
 
     // An item path could be a url, we only want to copy the `path` part
     if (path?.indexOf("://") > 0) {
-      ({ path } = url.parse(path));
+      const parsed = URL.parse(path);
+      if (parsed) {
+        path = parsed.pathname + parsed.search;
+      }
     }
     return path;
   }

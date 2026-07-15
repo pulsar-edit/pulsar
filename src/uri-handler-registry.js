@@ -1,4 +1,4 @@
-const url = require("url");
+const parseUri = require("./parse-uri");
 const { Emitter, Disposable } = require("event-kit");
 
 // Private: Associates listener functions with URIs from outside the application.
@@ -19,9 +19,9 @@ const { Emitter, Disposable } = require("event-kit");
 // `package.json` called "uriHandler". The value of this key should be an object
 // that contains, at minimum, a key named "method". This is the name of the method
 // on your package object that Lumine will call when it receives a URI your package
-// is responsible for handling. It will pass the parsed URI as the first argument (by using
-// [Node's `url.parse(uri, true)`](https://nodejs.org/docs/latest/api/url.html#url_url_parse_urlstring_parsequerystring_slashesdenotehost))
-// and the raw URI string as the second argument.
+// is responsible for handling. It will pass the parsed URI as the first argument (an
+// object with the same shape as the output of Node's legacy `url.parse(uri, true)`,
+// including a `query` object) and the raw URI string as the second argument.
 //
 // By default, Lumine will defer activation of your package until a URI it needs to handle
 // is triggered. If you need your package to activate right away, you can add
@@ -89,8 +89,10 @@ module.exports = class URIHandlerRegistry {
   }
 
   async handleURI(uri) {
-    // eslint-disable-next-line n/no-deprecated-api -- url.parse tolerates loose/relative input and exposes slashes/auth; URL migration needs review
-    const parsed = url.parse(uri, true);
+    const parsed = parseUri(uri);
+    if (!parsed) {
+      throw new Error(`URIHandlerRegistry#handleURI asked to handle an invalid URI: ${uri}`);
+    }
     const { protocol, slashes, auth, port, host } = parsed;
     if (protocol !== "atom:" || slashes !== true || auth || port) {
       throw new Error(`URIHandlerRegistry#handleURI asked to handle an invalid URI: ${uri}`);

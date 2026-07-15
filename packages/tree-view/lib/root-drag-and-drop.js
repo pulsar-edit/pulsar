@@ -1,5 +1,3 @@
-const url = require("url");
-
 module.exports = class RootDragAndDropHandler {
   constructor(treeView) {
     this.onDragStart = this.onDragStart.bind(this);
@@ -78,11 +76,7 @@ module.exports = class RootDragAndDropHandler {
   }
 
   uriHasProtocol(uri) {
-    try {
-      return url.parse(uri).protocol != null;
-    } catch (error) {
-      return false;
-    }
+    return URL.canParse(uri);
   }
 
   onDragEnter(e) {

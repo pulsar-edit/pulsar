@@ -1,5 +1,4 @@
 const path = require("path");
-const url = require("url");
 const Package = require("../src/package");
 const PackageManager = require("../src/package-manager");
 const temp = require("temp").track();
@@ -1235,7 +1234,24 @@ describe("PackageManager", () => {
         const activationPromise = atom.packages.activatePackage("package-with-uri-handler");
         atom.dispatchURIMessage(uri);
         await activationPromise;
-        expect(mod.handleURI).toHaveBeenCalledWith(url.parse(uri, true), uri);
+        expect(mod.handleURI).toHaveBeenCalledWith(
+          {
+            protocol: "atom:",
+            slashes: true,
+            auth: null,
+            host: "package-with-uri-handler",
+            port: null,
+            hostname: "package-with-uri-handler",
+            hash: null,
+            search: "?with=args",
+            // Like legacy `url.parse(uri, true)`, `query` has a null prototype.
+            query: Object.assign(Object.create(null), { with: "args" }),
+            pathname: "/some/url",
+            path: "/some/url?with=args",
+            href: uri,
+          },
+          uri,
+        );
       });
     });
 
