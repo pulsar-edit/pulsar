@@ -2,13 +2,23 @@
   font-size: var(--ui-size);
   background: var(--tree-view-background-color);
 
+  /* Project roots read as sidebar section headers, like the VS Code
+     explorer: compact, bold, uppercase. */
+  /* Pinned to --font-size so it resolves identically inside the smaller
+     header label font. */
+  --root-header-height: calc(var(--font-size) * 2.1);
+
   .project-root.project-root {
     &:before {
-      height: var(--ui-tab-height);
+      height: var(--root-header-height);
       background-clip: padding-box;
     }
     & > .header .name {
-      line-height: var(--ui-tab-height);
+      line-height: var(--root-header-height);
+      font-size: 0.85em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
   }
 
@@ -49,7 +59,7 @@
   /* Project root headers are taller than plain rows; match their hover bar
      to the header height. */
   .project-root.project-root:not(.selected):not(:has(li:hover)):hover::before {
-    height: var(--ui-tab-height);
+    height: var(--root-header-height);
   }
 
   /* Keep the row's content above the hover bar. */
@@ -110,5 +120,5 @@
 }
 .tree-view
   .project-root-header.project-root-header.project-root-header.project-root-header::before {
-  line-height: var(--ui-tab-height);
+  line-height: var(--root-header-height);
 }

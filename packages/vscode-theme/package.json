@@ -51,7 +51,7 @@
       "description": "In Even mode all tabs will be the same size. Great for quickly closing many tabs. In Maximum mode the tabs will expand to take up the full width. In Minimum mode the tabs will only take as little space as needed and also show longer file names.",
       "type": "string",
       "enum": ["Even", "Maximum", "Minimum"],
-      "default": "Even"
+      "default": "Minimum"
     },
     "tabCloseButton": {
       "order": 2,

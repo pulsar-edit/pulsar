@@ -62,6 +62,10 @@
       right: auto;
       left: 0.5em; /* icon-padding-right, same as tabs */
     }
+    /* Reserve the close-button room on the left instead. */
+    .title.title {
+      margin: 0 0.66em 0 1.8em;
+    }
   }
 }
 

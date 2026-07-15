@@ -8,8 +8,9 @@ describe("vscode-theme", () => {
   it("applies its appearance settings as root attributes", async () => {
     await atom.packages.activatePackage("vscode-theme");
 
-    // Defaults.
-    expect(root.getAttribute("vscode-tabsizing")).toBe("even");
+    // Defaults. Tab sizing defaults to Minimum so tabs fit their content,
+    // like VS Code.
+    expect(root.getAttribute("vscode-tabsizing")).toBe("minimum");
     expect(root.hasAttribute("vscode-tab-close-button")).toBe(false);
     expect(root.hasAttribute("vscode-dock-buttons")).toBe(false);
     expect(root.hasAttribute("vscode-sticky-headers")).toBe(false);

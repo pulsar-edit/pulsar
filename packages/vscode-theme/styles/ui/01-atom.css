@@ -10,51 +10,39 @@ atom-workspace {
   background-color: var(--app-background-color);
 }
 
-/* Scrollbars ------------------------------------ */
+/* Scrollbars — flat rectangular thumbs on a transparent track, like the
+   VS Code overlay scrollbars. ------------------------------------ */
 
 .scrollbars-visible-always {
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 14px;
+    height: 14px;
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--scrollbar-background-color);
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-    border: 3px solid var(--scrollbar-background-color);
+    border: none;
+    border-radius: 0;
     background: var(--scrollbar-color);
-    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--scrollbar-color) 60%, var(--text-color-subtle));
   }
 
   ::-webkit-scrollbar-corner {
-    background: var(--scrollbar-background-color);
-  }
-
-  ::-webkit-scrollbar-thumb:vertical:active {
-    border-radius: 0;
-    border-left-width: 0;
-    border-right-width: 0;
-  }
-
-  ::-webkit-scrollbar-thumb:horizontal:active {
-    border-radius: 0;
-    border-top-width: 0;
-    border-bottom-width: 0;
+    background: transparent;
   }
 
   atom-text-editor {
-    ::-webkit-scrollbar-track {
-      background: var(--scrollbar-background-color-editor);
-    }
-    ::-webkit-scrollbar-corner {
-      background: var(--scrollbar-background-color-editor);
-    }
     ::-webkit-scrollbar-thumb {
-      border-color: var(--scrollbar-background-color-editor);
       background: var(--scrollbar-color-editor);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: color-mix(in srgb, var(--scrollbar-color-editor) 60%, var(--text-color-subtle));
     }
   }
 }

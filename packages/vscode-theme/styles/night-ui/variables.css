@@ -56,7 +56,7 @@
   --ui-site-color-3: hsl(32, 60%, 50%);
   --ui-site-color-4: #d831b0;
   --ui-site-color-5: #ebdd5b;
-  --font-size: 12px;
+  --font-size: 13px;
   --input-font-size: 14px;
   --disclosure-arrow-size: 12px;
   --component-padding: 10px;
@@ -91,7 +91,7 @@
   --input-selection-color: #3a3d41;
   --input-selection-color-focus: #264f78;
   --overlay-backdrop-color: hsl(0, 0%, 0%);
-  --overlay-backdrop-opacity: 0.45;
+  --overlay-backdrop-opacity: 0;
   --progress-background-color: #0078d4;
   --scrollbar-color-editor: rgba(121, 121, 121, 0.4);
   --scrollbar-background-color-editor: #1f1f1f;
@@ -110,8 +110,8 @@
   --ui-padding: 1.5em;
   --ui-padding-pane: 0.5em;
   --ui-padding-icon: 0.45454545em;
-  --ui-line-height: 2em;
-  --ui-tab-height: 2.9em;
+  --ui-line-height: 1.75em;
+  --ui-tab-height: 2.7em;
   --settings-list-background-color: #1c1c1c;
   --theme-config-box-shadow: inset 0 0 3px hsla(0, 0%, 100%, 0.4), 0 1px 3px hsla(0, 0%, 0%, 0.2);
   --theme-config-box-shadow-selected: inset 0 1px 3px hsla(0, 0%, 0%, 0.1);

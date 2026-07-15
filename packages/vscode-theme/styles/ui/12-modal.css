@@ -8,7 +8,8 @@ atom-panel-container.modal {
 atom-panel.modal {
   position: relative;
   width: 100%;
-  max-width: min(92vw, calc(var(--ui-size) * 70));
+  /* Narrow and near the top edge, like the VS Code quick input. */
+  max-width: min(92vw, calc(var(--ui-size) * 50));
   margin: 0 auto;
   left: initial;
   color: var(--text-color);
@@ -17,11 +18,11 @@ atom-panel.modal {
   animation: modal-appear 0.18s cubic-bezier(0.215, 0.61, 0.355, 1);
 
   &.from-top {
-    top: calc(var(--component-padding) * 8);
+    top: calc(var(--component-padding) * 2);
   }
 
   atom-text-editor[mini] {
-    margin-bottom: calc(var(--ui-padding) * 0.75);
+    margin-bottom: calc(var(--ui-padding) / 3);
     font-size: calc(var(--input-font-size) * 1.05);
   }
 
@@ -41,9 +42,10 @@ atom-panel.modal {
       margin-top: 0;
     }
 
-    /* Full-width rows without separators, like the VS Code quick input. */
+    /* Compact full-width rows without separators, like the VS Code quick
+       input. */
     li {
-      padding: calc(var(--ui-padding) * 0.4) calc(var(--ui-padding) / 1.5);
+      padding: calc(var(--ui-padding) * 0.15) calc(var(--ui-padding) / 1.5);
       line-height: var(--ui-line-height);
 
       &:hover:not(.selected) {
