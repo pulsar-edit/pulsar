@@ -69,7 +69,7 @@ module.exports = class CursorPositionView {
 
     this.viewUpdatePending = true;
     this.updateSubscription = atom.views.updateDocument(() => {
-      const position = atom.workspace.getActiveTextEditor()?.getCursorBufferPosition();
+      const position = atom.workspace?.getActiveTextEditor()?.getCursorBufferPosition();
       this.viewUpdatePending = false;
       if (position) {
         this.row = position.row + 1;
