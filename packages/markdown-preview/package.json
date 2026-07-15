@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "cheerio": "^1.2.0",
-    "dedent": "^1.5.3",
-    "dompurify": "^3.2.6",
+    "dedent": "^1.7.2",
+    "dompurify": "^3.4.12",
     "emoji-images": "^0.1.1",
     "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#6be512460cd7a6d617277f9608b3fcba264cb3be",
     "github-markdown-css": "^5.5.1",
