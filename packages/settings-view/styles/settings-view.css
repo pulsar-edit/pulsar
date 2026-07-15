@@ -612,10 +612,13 @@
     .package-keymap-table,
     .package-grammars-table,
     .package-snippets-table {
+      /* Keep the left padding inside the 100% width; without border-box the
+         padding is added on top and the right edge overflows (clipped). */
+      box-sizing: border-box;
       padding-top: var(--component-padding);
       padding-left: var(--component-padding);
 
-    td {
+      td {
         white-space: nowrap;
       }
 
@@ -642,13 +645,21 @@
         width: 40%;
       }
       col.actions {
-        width: 10%;
+        /* Fixed so the Copy button always fits instead of being clipped at
+           narrow widths (matches the main keybindings table). */
+        width: 100px;
       }
 
       td.command,
       td.selector {
         white-space: normal;
         overflow-wrap: anywhere;
+      }
+
+      td.actions,
+      th.actions {
+        overflow: visible;
+        white-space: nowrap;
       }
 
       td.keystroke[rowspan] {
@@ -1087,10 +1098,12 @@
       width: 15%;
     }
     col.selector {
-      width: 35%;
+      width: 39%;
     }
     col.actions {
-      width: 8%;
+      /* Fixed so the Copy button always fits: a percentage column shrinks below
+         the button's min-width at narrow panel widths and clips it. */
+      width: 100px;
     }
 
     td,
@@ -1103,6 +1116,13 @@
     td.keystroke {
       white-space: normal;
       overflow-wrap: anywhere;
+    }
+
+    td.actions,
+    th.actions {
+      /* The base .table rule clips overflow; keep the button visible. */
+      overflow: visible;
+      white-space: nowrap;
     }
 
     td.keystroke[rowspan] {
