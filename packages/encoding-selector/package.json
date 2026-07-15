@@ -10,7 +10,6 @@
     "atom": "*"
   },
   "dependencies": {
-    "iconv-lite": "^0.4.4",
     "jschardet": "^1.1.0",
     "select-list": "file:../../shared/select-list"
   },

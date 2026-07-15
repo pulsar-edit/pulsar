@@ -3,7 +3,7 @@
 
 import path from "path";
 import etch from "etch";
-import hostedGitInfo from "hosted-git-info";
+import gitHubUrlInfo from "./github-url-info";
 import semver from "semver";
 
 // eslint-disable-next-line n/no-unpublished-require
@@ -391,7 +391,7 @@ export default class InstallPanel {
     try {
       const parsed = parsePackageSource(query);
       cloneUrlForRepository(parsed.repository);
-      const gitUrlInfo = hostedGitInfo.fromUrl(parsed.repository);
+      const gitUrlInfo = gitHubUrlInfo.fromUrl(parsed.repository);
       return this.showGitInstallPackageCard({
         name: query,
         // The typed query is the exact source to install — it may carry a

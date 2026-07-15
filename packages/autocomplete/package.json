@@ -14,7 +14,6 @@
     "grim": "^2.0.1",
     "minimatch": "^10.2.5",
     "selector-kit": "^0.1.0",
-    "stable": "^0.1.8",
     "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
   },
   "devDependencies": {

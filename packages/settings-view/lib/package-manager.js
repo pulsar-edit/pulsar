@@ -2,7 +2,7 @@ const _ = require("@lumine-code/underscore-plus");
 const { BufferedProcess, CompositeDisposable, Emitter } = require("atom");
 const CSON = require("@lumine-code/season");
 const fs = require("@lumine-code/fs-plus");
-const hostedGitInfo = require("hosted-git-info");
+const gitHubUrlInfo = require("./github-url-info");
 const os = require("os");
 const path = require("path");
 const semver = require("semver");
@@ -447,12 +447,6 @@ module.exports = class PackageManager {
         reject(error);
       });
     });
-  }
-
-  getGitHubInfo(source) {
-    const { repository } = parsePackageSource(source);
-    const gitUrlInfo = hostedGitInfo.fromUrl(repository);
-    return gitUrlInfo && gitUrlInfo.type === "github" ? gitUrlInfo : null;
   }
 
   getCloneUrl(source) {

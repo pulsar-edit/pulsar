@@ -102,7 +102,7 @@ module.exports = async function ({ blobStore }) {
     updateProcessEnv(env);
 
     // Set up optional transpilation for packages under test if any
-    const FindParentDir = require("find-parent-dir");
+    const FindParentDir = require("./find-parent-dir");
     const packageRoot = FindParentDir.sync(testPaths[0], "package.json");
     if (packageRoot) {
       const packageMetadata = require(path.join(packageRoot, "package.json"));

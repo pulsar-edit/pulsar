@@ -14,7 +14,7 @@
   "license": "MIT",
   "repository": "https://github.com/lumine-code/lumine",
   "devDependencies": {
-    "dedent": "^0.7.0"
+    "dedent": "^1.7.2"
   },
   "consumedServices": {
     "hyperlink.injection": {

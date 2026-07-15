@@ -1,4 +1,4 @@
-const FindParentDir = require("find-parent-dir");
+const FindParentDir = require("../../src/find-parent-dir");
 const path = require("path");
 const _ = require("@lumine-code/underscore-plus");
 const TextEditorElement = require("../../src/text-editor-element");

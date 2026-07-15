@@ -13,7 +13,7 @@
     "TimecopView": "createTimecopView"
   },
   "dependencies": {
-    "dedent": "^0.7.0",
+    "dedent": "^1.7.2",
     "etch": "^0.12.6",
     "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#330ad1fe2fae4e495a5f52939d8d1d7592ce4e65"
   }

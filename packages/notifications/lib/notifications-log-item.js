@@ -8,7 +8,7 @@
  */
 let NotificationsLogItem;
 const { Emitter, CompositeDisposable, Disposable } = require("atom");
-const moment = require("moment");
+const { formatAbsolute, formatRelative } = require("./timestamp-format");
 
 module.exports = NotificationsLogItem = (function () {
   NotificationsLogItem = class NotificationsLogItem {
@@ -30,9 +30,9 @@ module.exports = NotificationsLogItem = (function () {
 
       this.timestamp = document.createElement("div");
       this.timestamp.classList.add("timestamp");
-      this.notification.moment = moment(this.notification.getTimestamp());
+      this.timestampDate = this.notification.getTimestamp();
       this.subscriptions.add(
-        atom.tooltips.add(this.timestamp, { title: this.notification.moment.format("ll LTS") }),
+        atom.tooltips.add(this.timestamp, { title: formatAbsolute(this.timestampDate) }),
       );
       this.updateTimestamp();
       this.timestampInterval = setInterval(this.updateTimestamp.bind(this), 60 * 1000);
@@ -114,7 +114,7 @@ module.exports = NotificationsLogItem = (function () {
     }
 
     updateTimestamp() {
-      return (this.timestamp.textContent = this.notification.moment.fromNow());
+      return (this.timestamp.textContent = formatRelative(this.timestampDate));
     }
   };
   NotificationsLogItem.initClass();

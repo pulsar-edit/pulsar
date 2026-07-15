@@ -1,7 +1,6 @@
 const { CompositeDisposable, Disposable } = require("atom");
 const { isFunction, isString } = require("./type-helpers");
 const { Selector } = require("selector-kit");
-const stableSort = require("stable");
 const grim = require("grim");
 const { selectorsMatchScopeChain } = require("./scope-helpers");
 const { API_VERSION } = require("./private-symbols");
@@ -111,7 +110,8 @@ module.exports = class ProviderManager {
 
   sortProviders(providers, scopeDescriptor) {
     const scopeChain = scopeChainForScopeDescriptor(scopeDescriptor);
-    return stableSort(providers, (providerA, providerB) => {
+    // Array.prototype.sort is stable (ES2019); slice() keeps this non-mutating.
+    return providers.slice().sort((providerA, providerB) => {
       const priorityA =
         providerA.provider.suggestionPriority != null ? providerA.provider.suggestionPriority : 1;
       const priorityB =

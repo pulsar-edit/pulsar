@@ -1,4 +1,3 @@
-const iconv = require("iconv-lite");
 const jschardet = require("jschardet");
 const fs = require("fs");
 const { SelectListView, highlightMatches } = require("select-list");
@@ -77,8 +76,11 @@ module.exports = class EncodingListView {
             encoding = "utf8";
           }
 
-          if (iconv.encodingExists(encoding)) {
-            editor.setEncoding(encoding.toLowerCase().replace(/[^0-9a-z]|:\d{4}$/g, ""));
+          // Only switch to an encoding this picker actually offers (its ids are
+          // defined in main.js and passed in as `this.encodings`).
+          const id = encoding.toLowerCase().replace(/[^0-9a-z]|:\d{4}$/g, "");
+          if (this.encodings[id]) {
+            editor.setEncoding(id);
           }
         }
       });

@@ -17,7 +17,7 @@
     "atom-grammar-test": "^0.6.3"
   },
   "devDependencies": {
-    "dedent": "^0.7.0"
+    "dedent": "^1.7.2"
   },
   "consumedServices": {
     "hyperlink.injection": {

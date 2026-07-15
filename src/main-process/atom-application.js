@@ -1621,7 +1621,7 @@ module.exports = class AtomApplication extends EventEmitter {
   }
 
   resolveTestRunnerPath(testPath) {
-    FindParentDir ||= require("find-parent-dir");
+    FindParentDir ||= require("../find-parent-dir");
 
     let packageRoot = FindParentDir.sync(testPath, "package.json");
 

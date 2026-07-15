@@ -16,7 +16,7 @@ const _ = require("@lumine-code/underscore-plus");
 const fs = require("@lumine-code/fs-plus");
 const Grim = require("grim");
 const pathwatcher = require("@lumine-code/pathwatcher");
-const FindParentDir = require("find-parent-dir");
+const FindParentDir = require("../../src/find-parent-dir");
 const { CompositeDisposable } = require("event-kit");
 
 const TextEditor = require("../../src/text-editor");
