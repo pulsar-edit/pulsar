@@ -5,6 +5,7 @@ const TextBuffer = require("@lumine-code/text-buffer");
 const TextEditor = require("../src/text-editor");
 const Workspace = require("../src/workspace");
 const Project = require("../src/project");
+const RepositoryRegistry = require("../src/repository-registry");
 const platform = require("./helpers/platform");
 const _ = require("@lumine-code/underscore-plus");
 const fs = require("@lumine-code/fs-plus");
@@ -48,12 +49,18 @@ describe("Workspace", () => {
     const projectState = atom.project.serialize({ isUnloading: true });
     workspace.destroy();
     atom.project.destroy();
+    atom.repositories.destroy();
+    atom.repositories = new RepositoryRegistry({
+      config: atom.config,
+      notificationManager: atom.notifications,
+    });
     atom.project = new Project({
       notificationManager: atom.notifications,
       packageManager: atom.packages,
       confirm: atom.confirm.bind(atom),
       applicationDelegate: atom.applicationDelegate,
       grammarRegistry: atom.grammars,
+      repositoryRegistry: atom.repositories,
     });
 
     await atom.project.deserialize(projectState);

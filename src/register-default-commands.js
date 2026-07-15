@@ -7,6 +7,7 @@ module.exports = function ({
   config,
   notificationManager,
   project,
+  repositories,
   clipboard,
 }) {
   commandRegistry.add(
@@ -143,6 +144,9 @@ module.exports = function ({
       },
       "application:add-project-folder": function () {
         return atom.addProjectFolder();
+      },
+      "repositories:rescan": function () {
+        return repositories.rescan();
       },
       "application:minimize": function () {
         return ipcRenderer.send("command", "application:minimize");

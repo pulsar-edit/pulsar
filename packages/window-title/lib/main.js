@@ -101,7 +101,11 @@ module.exports = {
       activeItem && typeof activeItem.getTitle === "function" ? activeItem.getTitle() : "";
     const projectPaths = atom.project.getPaths();
     const projectPath = projectPaths[0];
-    const repository = atom.project.getRepositories().find(Boolean);
+    const repository =
+      atom.repositories.getForPath(itemPath) ||
+      atom.repositories.getForPath(projectPath) ||
+      atom.repositories.getRepositories()[0] ||
+      null;
     const currentProject = this.projectList ? this.projectList.getCurrentProject() : null;
     const relativeFilePath = itemPath ? atom.project.relativizePath(itemPath)[1] : null;
     return {

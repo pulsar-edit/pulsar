@@ -24,6 +24,7 @@ module.exports = class Project extends Model {
     config,
     applicationDelegate,
     grammarRegistry,
+    repositoryRegistry,
   }) {
     super();
     this.notificationManager = notificationManager;
@@ -33,16 +34,18 @@ module.exports = class Project extends Model {
     this.emitter = new Emitter();
     this.buffers = [];
     this.rootDirectories = [];
-    this.repositories = [];
     this.directoryProviders = [];
     this.defaultDirectoryProvider = new DefaultDirectoryProvider();
     this.repositoryPromisesByPath = new Map();
     this.repositoryProviders = [new GitRepositoryProvider(this, config)];
+    if (!repositoryRegistry) throw new Error("Project requires a RepositoryRegistry");
+    this.repositoryRegistry = repositoryRegistry;
     this.loadPromisesByPath = {};
     this.watcherPromisesByPath = {};
     this.retiredBufferIDs = new Set();
     this.retiredBufferPaths = new Set();
     this.subscriptions = new CompositeDisposable();
+    this.repositoryRegistry.attachProject(this);
     this.consumeServices(packageManager);
   }
 
@@ -50,21 +53,19 @@ module.exports = class Project extends Model {
     for (let buffer of this.buffers.slice()) {
       buffer.destroy();
     }
-    for (let repository of this.repositories.slice()) {
-      if (repository != null) repository.destroy();
-    }
+    this.repositoryRegistry.detachProject(this);
     for (let path in this.watcherPromisesByPath) {
       this.watcherPromisesByPath[path].then((watcher) => {
         watcher.dispose();
       });
     }
     this.rootDirectories = [];
-    this.repositories = [];
   }
 
   reset(packageManager) {
     this.emitter.dispose();
     this.emitter = new Emitter();
+    this.repositoryRegistry.resetProjectSubscriptions();
 
     this.subscriptions.dispose();
     this.subscriptions = new CompositeDisposable();
@@ -254,7 +255,7 @@ module.exports = class Project extends Model {
   }
 
   // Public: Invoke the given callback with all current and future
-  // repositories in the project.
+  // repositories known to this window.
   //
   // * `callback` {Function} to be called with current and future
   //    repositories.
@@ -264,17 +265,11 @@ module.exports = class Project extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to
   // unsubscribe.
   observeRepositories(callback) {
-    for (const repo of this.repositories) {
-      if (repo != null) {
-        callback(repo);
-      }
-    }
-
-    return this.onDidAddRepository(callback);
+    return this.repositoryRegistry.observeRepositories(callback);
   }
 
   // Public: Invoke the given callback when a repository is added to the
-  // project.
+  // window registry.
   //
   // * `callback` {Function} to be called when a repository is added.
   //   * `repository` A {GitRepository}.
@@ -282,25 +277,29 @@ module.exports = class Project extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to
   // unsubscribe.
   onDidAddRepository(callback) {
-    return this.emitter.on("did-add-repository", callback);
+    return this.repositoryRegistry.onDidAddRepository(callback);
+  }
+
+  onDidRemoveRepository(callback) {
+    return this.repositoryRegistry.onDidRemoveRepository(callback);
   }
 
   /*
   Section: Accessing the git repository
   */
 
-  // Public: Get an {Array} of {GitRepository}s associated with the project's
-  // directories.
-  //
-  // This method will be removed in 2.0 because it does synchronous I/O.
-  // Prefer the following, which evaluates to a {Promise} that resolves to an
-  // {Array} of {GitRepository} objects:
-  // ```
-  // Promise.all(atom.project.getDirectories().map(
-  //     atom.project.repositoryForDirectory.bind(atom.project)))
-  // ```
+  // Public: Get all {GitRepository}s known to the window registry. Repository
+  // order is independent of project root order.
   getRepositories() {
-    return this.repositories;
+    return this.repositoryRegistry.getRepositories();
+  }
+
+  repositoryForPath(filePath) {
+    return this.repositoryRegistry.resolveForPath(filePath);
+  }
+
+  repositoryForPathSync(filePath) {
+    return this.repositoryRegistry.resolveForPathSync(filePath);
   }
 
   // Public: Get the repository for a given directory asynchronously.
@@ -311,6 +310,10 @@ module.exports = class Project extends Model {
   // * {GitRepository} if a repository can be created for the given directory
   // * `null` if no repository can be created for the given directory.
   repositoryForDirectory(directory) {
+    return this.repositoryRegistry.resolveDirectory(directory);
+  }
+
+  repositoryForDirectoryFromProviders(directory) {
     const pathForDirectory = directory.getRealPathSync();
     let promise = this.repositoryPromisesByPath.get(pathForDirectory);
     if (!promise) {
@@ -335,6 +338,14 @@ module.exports = class Project extends Model {
       this.repositoryPromisesByPath.set(pathForDirectory, promise);
     }
     return promise;
+  }
+
+  repositoryForDirectoryFromProvidersSync(directory) {
+    for (const provider of this.repositoryProviders) {
+      const repository = provider.repositoryForDirectorySync?.(directory);
+      if (repository) return repository;
+    }
+    return null;
   }
 
   /*
@@ -362,11 +373,7 @@ module.exports = class Project extends Model {
   //   * `exact` If `true`, only add a `projectPath` if it names an existing directory. If `false` and any `projectPath`
   //     is a file or does not exist, its parent directory will be added instead. Default: `false`.
   setPaths(projectPaths, options = {}) {
-    for (let repository of this.repositories) {
-      if (repository != null) repository.destroy();
-    }
     this.rootDirectories = [];
-    this.repositories = [];
 
     for (let path in this.watcherPromisesByPath) {
       this.watcherPromisesByPath[path].then((watcher) => {
@@ -380,6 +387,7 @@ module.exports = class Project extends Model {
       try {
         this.addPath(projectPath, {
           emitEvent: false,
+          reconcileRepositories: false,
           mustExist: true,
           exact: options.exact === true,
         });
@@ -392,6 +400,7 @@ module.exports = class Project extends Model {
       }
     }
 
+    this.repositoryRegistry.setProjectRoots(this.rootDirectories);
     this.emitter.emit("did-change-paths", projectPaths);
 
     if (options.mustExist === true && missingProjectPaths.length > 0) {
@@ -459,18 +468,8 @@ module.exports = class Project extends Model {
       }
     }
 
-    let repo = null;
-    for (let provider of this.repositoryProviders) {
-      if (provider.repositoryForDirectorySync) {
-        repo = provider.repositoryForDirectorySync(directory);
-      }
-      if (repo) {
-        break;
-      }
-    }
-    this.repositories.push(repo != null ? repo : null);
-    if (repo != null) {
-      this.emitter.emit("did-add-repository", repo);
+    if (options.reconcileRepositories !== false) {
+      this.repositoryRegistry.setProjectRoots(this.rootDirectories);
     }
 
     if (options.emitEvent !== false) {
@@ -486,9 +485,14 @@ module.exports = class Project extends Model {
   addPaths(projectPaths, options = {}) {
     const pathsBefore = this.getPaths().length;
     for (const projectPath of projectPaths) {
-      this.addPath(projectPath, { ...options, emitEvent: false });
+      this.addPath(projectPath, {
+        ...options,
+        emitEvent: false,
+        reconcileRepositories: false,
+      });
     }
     if (this.getPaths().length !== pathsBefore) {
+      this.repositoryRegistry.setProjectRoots(this.rootDirectories);
       this.emitter.emit("did-change-paths", this.getPaths());
     }
   }
@@ -551,14 +555,11 @@ module.exports = class Project extends Model {
 
     if (indexToRemove != null) {
       this.rootDirectories.splice(indexToRemove, 1);
-      const [removedRepository] = this.repositories.splice(indexToRemove, 1);
-      if (!this.repositories.includes(removedRepository)) {
-        if (removedRepository) removedRepository.destroy();
-      }
       if (this.watcherPromisesByPath[projectPath] != null) {
         this.watcherPromisesByPath[projectPath].then((w) => w.dispose());
       }
       delete this.watcherPromisesByPath[projectPath];
+      this.repositoryRegistry.setProjectRoots(this.rootDirectories);
       this.emitter.emit("did-change-paths", this.getPaths());
       return true;
     } else {
@@ -666,10 +667,10 @@ module.exports = class Project extends Model {
 
     return serviceHub.consume("atom.repository-provider", "^0.1.0", (provider) => {
       this.repositoryProviders.unshift(provider);
-      if (this.repositories.includes(null)) {
-        this.setPaths(this.getPaths());
-      }
+      this.repositoryPromisesByPath.clear();
+      this.repositoryRegistry.rescan();
       return new Disposable(() => {
+        this.repositoryPromisesByPath.clear();
         return this.repositoryProviders.splice(this.repositoryProviders.indexOf(provider), 1);
       });
     });

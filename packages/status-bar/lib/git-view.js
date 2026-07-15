@@ -1,5 +1,5 @@
 const _ = require("@lumine-code/underscore-plus");
-const { CompositeDisposable, GitRepositoryAsync } = require("atom");
+const { CompositeDisposable } = require("atom");
 
 module.exports = class GitView {
   constructor() {
@@ -15,6 +15,10 @@ module.exports = class GitView {
     });
     this.projectPathSubscription = atom.project.onDidChangePaths(() => {
       this.subscribeToRepositories();
+    });
+    this.repositoryRegistrySubscription = atom.repositories.onDidChange(() => {
+      this.subscribeToRepositories();
+      this.update();
     });
     this.subscribeToRepositories();
     this.subscribeToActiveItem();
@@ -76,10 +80,10 @@ module.exports = class GitView {
 
     const result = [];
 
-    for (let repo of atom.project.getRepositories()) {
+    for (let repo of atom.repositories.getRepositories()) {
       if (repo != null) {
         this.repositorySubscriptions.add(
-          repo.onDidChangeStatus(({ path, status }) => {
+          repo.onDidChangeStatus(({ path }) => {
             if (path === this.getActiveItemPath()) {
               this.update();
             }
@@ -102,6 +106,7 @@ module.exports = class GitView {
   destroy() {
     this.activeItemSubscription?.dispose();
     this.projectPathSubscription?.dispose();
+    this.repositoryRegistrySubscription?.dispose();
     this.savedSubscription?.dispose();
     this.repositorySubscriptions?.dispose();
     this.branchTooltipDisposable?.dispose();
@@ -115,17 +120,15 @@ module.exports = class GitView {
   }
 
   getRepositoryForActiveItem() {
-    const [rootDir] = atom.project.relativizePath(this.getActiveItemPath());
-    const rootDirIndex = atom.project.getPaths().indexOf(rootDir);
-    if (rootDirIndex >= 0) {
-      return atom.project.getRepositories()[rootDirIndex];
-    } else {
-      for (let repo of atom.project.getRepositories()) {
-        if (repo) {
-          return repo;
-        }
-      }
+    const itemPath = this.getActiveItemPath();
+    if (itemPath) return atom.repositories.getForPath(itemPath);
+
+    for (const projectPath of atom.project.getPaths()) {
+      const repository = atom.repositories.getForPath(projectPath);
+      if (repository) return repository;
     }
+
+    return atom.repositories.getRepositories()[0] || null;
   }
 
   getActiveItem() {
@@ -162,7 +165,7 @@ module.exports = class GitView {
 
     const itemPath = this.getActiveItemPath();
     if (itemPath) {
-      return atom.project.contains(itemPath);
+      return atom.repositories.getForPath(itemPath) === repo;
     } else {
       return this.getActiveItem() == null;
     }

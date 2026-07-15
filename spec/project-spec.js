@@ -6,12 +6,27 @@ const path = require("path");
 const { Directory } = require("@lumine-code/pathwatcher");
 const { stopAllWatchers } = require("../src/path-watcher");
 const GitRepository = require("../src/git-repository");
+const RepositoryRegistry = require("../src/repository-registry");
 
 describe("Project", () => {
+  const standaloneRegistries = [];
+  const buildProject = (options) => {
+    const repositoryRegistry = new RepositoryRegistry({
+      config: atom.config,
+      notificationManager: atom.notifications,
+    });
+    standaloneRegistries.push(repositoryRegistry);
+    return new Project({ ...options, repositoryRegistry });
+  };
+
   beforeEach(() => {
     const directory = atom.project.getDirectories()[0];
     const paths = directory ? [directory.resolve("dir")] : [null];
     atom.project.setPaths(paths);
+  });
+
+  afterEach(() => {
+    for (const registry of standaloneRegistries.splice(0)) registry.destroy();
   });
 
   describe("serialization", () => {
@@ -32,7 +47,7 @@ describe("Project", () => {
     });
 
     it("does not deserialize paths to directories that don't exist", async () => {
-      deserializedProject = new Project({
+      deserializedProject = buildProject({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
@@ -52,7 +67,7 @@ describe("Project", () => {
       const childPath = path.join(temp.mkdirSync("atom-spec-project"), "child");
       fs.mkdirSync(childPath);
 
-      deserializedProject = new Project({
+      deserializedProject = buildProject({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
@@ -76,7 +91,7 @@ describe("Project", () => {
 
       expect(atom.project.getBuffers().length).toBe(1);
 
-      deserializedProject = new Project({
+      deserializedProject = buildProject({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
@@ -92,7 +107,7 @@ describe("Project", () => {
       await atom.workspace.open("a");
 
       expect(atom.project.getBuffers().length).toBe(1);
-      deserializedProject = new Project({
+      deserializedProject = buildProject({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
@@ -113,7 +128,7 @@ describe("Project", () => {
 
       expect(atom.project.getBuffers().length).toBe(1);
       fs.mkdirSync(pathToOpen);
-      deserializedProject = new Project({
+      deserializedProject = buildProject({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
@@ -135,7 +150,7 @@ describe("Project", () => {
 
       expect(atom.project.getBuffers().length).toBe(1);
       fs.chmodSync(pathToOpen, "000");
-      deserializedProject = new Project({
+      deserializedProject = buildProject({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
@@ -155,7 +170,7 @@ describe("Project", () => {
 
       expect(atom.project.getBuffers().length).toBe(1);
       fs.unlinkSync(pathToOpen);
-      deserializedProject = new Project({
+      deserializedProject = buildProject({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
@@ -175,7 +190,7 @@ describe("Project", () => {
       atom.workspace.getActiveTextEditor().setText("unsaved\n");
       expect(atom.project.getBuffers().length).toBe(1);
 
-      deserializedProject = new Project({
+      deserializedProject = buildProject({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
@@ -197,7 +212,7 @@ describe("Project", () => {
       let markerA = layerA.markPosition([0, 3]);
 
       bufferA.append("!");
-      notQuittingProject = new Project({
+      notQuittingProject = buildProject({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
@@ -210,7 +225,7 @@ describe("Project", () => {
         x.getMarker(markerA.id),
       ).toBeUndefined();
       expect(notQuittingProject.getBuffers()[0].undo()).toBe(false);
-      quittingProject = new Project({
+      quittingProject = buildProject({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
@@ -342,15 +357,31 @@ describe("Project", () => {
 
     beforeEach(() => {
       fakeRepository = {
+        workingDirectory: null,
+        destroyed: false,
+        getWorkingDirectory() {
+          return this.workingDirectory;
+        },
+        getPath() {
+          return path.join(this.workingDirectory, ".git");
+        },
+        isDestroyed() {
+          return this.destroyed;
+        },
+        onDidDestroy() {
+          return { dispose() {} };
+        },
         destroy() {
-          return null;
+          this.destroyed = true;
         },
       };
       fakeRepositoryProvider = {
         repositoryForDirectory(directory) {
+          fakeRepository.workingDirectory = directory.getPath();
           return Promise.resolve(fakeRepository);
         },
         repositoryForDirectorySync(directory) {
+          fakeRepository.workingDirectory = directory.getPath();
           return fakeRepository;
         },
       };
@@ -359,19 +390,20 @@ describe("Project", () => {
     it("uses it to create repositories for any directories that need one", () => {
       const projectPath = temp.mkdirSync("atom-project");
       atom.project.setPaths([projectPath]);
-      expect(atom.project.getRepositories()).toEqual([null]);
+      expect(atom.repositories.getForPath(projectPath)).toBeNull();
 
       atom.packages.serviceHub.provide("atom.repository-provider", "0.1.0", fakeRepositoryProvider);
-      atom.project.getRepositories()[0] === fakeRepository;
+      expect(atom.project.repositoryForPathSync(projectPath)).toBe(fakeRepository);
     });
 
-    it("does not create any new repositories if every directory has a repository", () => {
-      const repositories = atom.project.getRepositories();
-      expect(repositories.length).toEqual(1);
-      expect(repositories[0]).toBeTruthy();
+    it("allows a newly provided repository to become the nearest repository", () => {
+      const projectPath = atom.project.getPaths()[0];
+      const repository = atom.repositories.getForPath(projectPath);
+      expect(repository).toBeTruthy();
 
       atom.packages.serviceHub.provide("atom.repository-provider", "0.1.0", fakeRepositoryProvider);
-      expect(atom.project.getRepositories()).toBe(repositories);
+      expect(atom.repositories.getForPath(projectPath)).toBe(fakeRepository);
+      expect(repository.isDestroyed()).toBe(false);
     });
 
     it("stops using it to create repositories when the service is removed", () => {
@@ -384,8 +416,9 @@ describe("Project", () => {
       );
 
       disposable.dispose();
-      atom.project.addPath(temp.mkdirSync("atom-project"));
-      expect(atom.project.getRepositories()).toEqual([null]);
+      const projectPath = temp.mkdirSync("atom-project");
+      atom.project.addPath(projectPath);
+      expect(atom.repositories.getForPath(projectPath)).toBeNull();
     });
   });
 
@@ -606,8 +639,8 @@ describe("Project", () => {
       const dirPath = directory.getRealPathSync();
       expect(result.getPath()).toBe(path.join(dirPath, ".git"));
 
-      // Verify that the result is cached.
-      expect(atom.project.repositoryForDirectory(directory)).toBe(promise);
+      // Verify that the repository identity is cached.
+      expect(await atom.project.repositoryForDirectory(directory)).toBe(result);
     });
 
     it("creates a new repository if a previous one with the same directory had been destroyed", async () => {
@@ -648,7 +681,9 @@ describe("Project", () => {
 
         atom.project.setPaths([directory1, directory2, directory3]);
 
-        const [repo1, repo2, repo3] = atom.project.getRepositories();
+        const repo1 = atom.repositories.getForPath(directory1);
+        const repo2 = atom.repositories.getForPath(directory2);
+        const repo3 = atom.repositories.getForPath(directory3);
         expect(repo1).toBeNull();
         expect(repo2.getShortHead()).toBe("master");
         // `realpathSync.native` canonicalizes 8.3 short path segments (e.g. a
@@ -977,14 +1012,16 @@ describe("Project", () => {
       atom.project.setPaths([directory1]);
 
       const disposable = atom.project.observeRepositories((repo) => observed.push(repo));
-      expect(observed.length).toBe(1);
-      expect(observed[0].getReferenceTarget("refs/heads/master")).toBe(
+      const firstRepository = atom.repositories.getForPath(directory1);
+      expect(observed).toContain(firstRepository);
+      expect(firstRepository.getReferenceTarget("refs/heads/master")).toBe(
         "ef046e9eecaa5255ea5e9817132d4001724d6ae1",
       );
 
       atom.project.addPath(directory2);
-      expect(observed.length).toBe(2);
-      expect(observed[1].getReferenceTarget("refs/heads/master")).toBe(
+      const secondRepository = atom.repositories.getForPath(directory2);
+      expect(observed).toContain(secondRepository);
+      expect(secondRepository.getReferenceTarget("refs/heads/master")).toBe(
         "d2b0ad9cbc6f6c4372e8956e5cc5af771b2342e5",
       );
 

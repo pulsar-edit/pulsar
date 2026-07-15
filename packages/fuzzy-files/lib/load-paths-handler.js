@@ -26,6 +26,7 @@ class PathLoader {
     ignoredNames,
     useRipGrep,
     emittedPaths,
+    repositoryPaths = [],
   ) {
     this.rootPath = rootPath;
     this.ignoreVcsIgnores = ignoreVcsIgnores;
@@ -35,12 +36,20 @@ class PathLoader {
     this.emittedPaths = emittedPaths;
     this.paths = [];
     this.inodes = new Set();
-    this.repo = null;
+    this.repositories = [];
     if (ignoreVcsIgnores && !this.useRipGrep) {
-      const repo = GitRepository.open(this.rootPath, { refreshOnWindowFocus: false });
-      if ((repo && repo.relativize(path.join(this.rootPath, "test"))) === "test") {
-        this.repo = repo;
+      for (const repositoryPath of repositoryPaths) {
+        const relative = path.relative(this.rootPath, repositoryPath);
+        const rootRelative = path.relative(repositoryPath, this.rootPath);
+        const relatesToRoot =
+          (!relative.startsWith("..") && !path.isAbsolute(relative)) ||
+          (!rootRelative.startsWith("..") && !path.isAbsolute(rootRelative));
+        if (!relatesToRoot) continue;
+
+        const repo = GitRepository.open(repositoryPath, { refreshOnWindowFocus: false });
+        if (repo) this.repositories.push({ path: repo.getWorkingDirectory(), repo });
       }
+      this.repositories.sort((left, right) => right.path.length - left.path.length);
     }
   }
 
@@ -53,7 +62,7 @@ class PathLoader {
 
     this.loadPath(this.rootPath, true, () => {
       this.flushPaths();
-      if (this.repo != null) this.repo.destroy();
+      for (const { repo } of this.repositories) repo.destroy();
       done();
     });
   }
@@ -102,7 +111,11 @@ class PathLoader {
 
   isIgnored(loadedPath) {
     const relativePath = path.relative(this.rootPath, loadedPath);
-    if (this.repo && this.repo.isPathIgnored(relativePath)) {
+    const repository = this.repositories.find(({ path: repositoryPath }) => {
+      const relative = path.relative(repositoryPath, loadedPath);
+      return !relative.startsWith("..") && !path.isAbsolute(relative);
+    });
+    if (repository?.repo.isPathIgnored(loadedPath)) {
       return true;
     } else {
       for (let ignoredName of this.ignoredNames) {
@@ -182,7 +195,14 @@ class PathLoader {
   }
 }
 
-module.exports = function (rootPaths, followSymlinks, ignoreVcsIgnores, ignores, useRipGrep) {
+module.exports = function (
+  rootPaths,
+  followSymlinks,
+  ignoreVcsIgnores,
+  ignores,
+  useRipGrep,
+  repositoryPaths = [],
+) {
   const emittedPaths = new Set();
   const ignoredNames = [];
   for (let ignore of ignores) {
@@ -206,6 +226,7 @@ module.exports = function (rootPaths, followSymlinks, ignoreVcsIgnores, ignores,
         ignoredNames,
         useRipGrep,
         emittedPaths,
+        repositoryPaths,
       ).load(next),
     this.async(),
   );

@@ -327,8 +327,57 @@ const configSchema = {
         ],
         default: "default",
       },
-      colorProfile: {
+      repositoryScanDepth: {
         order: 18,
+        title: "Repository Scan Depth",
+        description:
+          "Automatically scan this many directory levels below each project root for nested Git repositories. Repositories containing a project root and repositories resolved from open files are always detected.",
+        type: "integer",
+        minimum: 0,
+        maximum: 10,
+        default: 1,
+      },
+      repositoryWatchDiscovery: {
+        order: 19,
+        title: "Watch For Repositories",
+        description:
+          "Detect Git repositories created or removed below project roots. Disable this on very large directory trees and use the repository rescan command instead.",
+        type: "boolean",
+        default: false,
+      },
+      repositoryWatchDepth: {
+        order: 20,
+        title: "Repository Watch Depth",
+        description:
+          "Process repository discovery events at this many directory levels below each project root when repository watching is enabled.",
+        type: "integer",
+        minimum: 0,
+        maximum: 10,
+        default: 1,
+      },
+      repositoryMaxCount: {
+        order: 21,
+        title: "Maximum Repository Count",
+        description:
+          "Maximum number of repositories that automatic project scanning may add to a window. Manually opened repositories are not rejected by this limit.",
+        type: "integer",
+        minimum: 1,
+        maximum: 1000,
+        default: 100,
+      },
+      repositoryExcludedDirectories: {
+        order: 22,
+        title: "Repository Scan Exclusions",
+        description:
+          "Directory names to skip while scanning project roots for nested Git repositories. The .git and node_modules directories are always skipped.",
+        type: "array",
+        items: {
+          type: "string",
+        },
+        default: [],
+      },
+      colorProfile: {
+        order: 23,
         title: "Color Profile",
         description:
           "Specify whether Lumine should use the operating system's color profile (recommended) or an alternative color profile.<br>Changing this setting will require a relaunch of Lumine to take effect.",
@@ -346,7 +395,7 @@ const configSchema = {
         default: "default",
       },
       transformDeprecatedStyleSheetSelectors: {
-        order: 19,
+        order: 24,
         title: "Transform Deprecated Style Sheet Selectors",
         description:
           "Whether Lumine should transform deprecated DOM Selectors in community package style sheets. Increases compatibility, as well as startup time.",
@@ -354,7 +403,7 @@ const configSchema = {
         default: true,
       },
       transformDeprecatedStyleSheetMathExpressions: {
-        order: 20,
+        order: 25,
         title: "Transform Deprecated Style Sheet Math Expressions",
         description:
           "Whether Lumine should transform deprecated Mathematical Expressions in community package style sheets. Increases compatibility, as well as startup time.",

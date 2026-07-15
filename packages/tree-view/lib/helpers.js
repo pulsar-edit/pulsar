@@ -69,10 +69,7 @@ function getDuplicateCopyPath(initialPath, newDirectoryPath, options = {}) {
   if (!pathExists(newPath)) return newPath;
 
   const extension = isDirectory ? "" : getFullExtension(newPath);
-  const basePath = path.join(
-    path.dirname(newPath),
-    path.basename(newPath, extension),
-  );
+  const basePath = path.join(path.dirname(newPath), path.basename(newPath, extension));
   const resolvedStyle = resolveDuplicateCopyNameStyle(style, platform);
 
   let index = 1;
@@ -86,14 +83,7 @@ function getDuplicateCopyPath(initialPath, newDirectoryPath, options = {}) {
 
 module.exports = {
   repoForPath(goalPath) {
-    const iterable = atom.project.getPaths();
-    for (let i = 0; i < iterable.length; i++) {
-      const projectPath = iterable[i];
-      if (goalPath === projectPath || goalPath.indexOf(projectPath + path.sep) === 0) {
-        return atom.project.getRepositories()[i];
-      }
-    }
-    return null;
+    return atom.repositories.getForPath(goalPath);
   },
 
   getStyleObject(el) {

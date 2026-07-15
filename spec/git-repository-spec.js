@@ -3,6 +3,7 @@ const fs = require("@lumine-code/fs-plus");
 const temp = require("temp").track();
 const GitRepository = require("../src/git-repository");
 const Project = require("../src/project");
+const RepositoryRegistry = require("../src/repository-registry");
 
 describe("GitRepository", () => {
   let repo;
@@ -372,10 +373,11 @@ describe("GitRepository", () => {
   });
 
   describe("when a project is deserialized", () => {
-    let buffer, project2, statusHandler;
+    let buffer, project2, repositoryRegistry2, statusHandler;
 
     afterEach(() => {
       if (project2) project2.destroy();
+      if (repositoryRegistry2) repositoryRegistry2.destroy();
     });
 
     it("subscribes to all the serialized buffers in the project", async () => {
@@ -383,12 +385,17 @@ describe("GitRepository", () => {
 
       await atom.workspace.open("file.txt");
 
+      repositoryRegistry2 = new RepositoryRegistry({
+        config: atom.config,
+        notificationManager: atom.notifications,
+      });
       project2 = new Project({
         notificationManager: atom.notifications,
         packageManager: atom.packages,
         confirm: atom.confirm,
         grammarRegistry: atom.grammars,
         applicationDelegate: atom.applicationDelegate,
+        repositoryRegistry: repositoryRegistry2,
       });
       await project2.deserialize(atom.project.serialize({ isUnloading: false }));
 

@@ -136,6 +136,11 @@ module.exports = class GitRepository {
     return this.repo == null;
   }
 
+  // Public: Returns whether this repository's Git directory still exists.
+  isPresent() {
+    return !this.isDestroyed() && fs.existsSync(this.path || this.getPath());
+  }
+
   // Public: Invoke the given callback when this GitRepository's destroy() method
   // is invoked.
   //
@@ -505,7 +510,7 @@ module.exports = class GitRepository {
   subscribeToBuffer(buffer) {
     const getBufferPathStatus = () => {
       const bufferPath = buffer.getPath();
-      if (bufferPath) this.getPathStatus(bufferPath);
+      if (bufferPath && !this.isDestroyed()) this.getPathStatus(bufferPath);
     };
 
     getBufferPathStatus();

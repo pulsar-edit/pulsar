@@ -10,6 +10,10 @@ module.exports = {
     ignoredNames = ignoredNames.concat(atom.config.get("core.ignoredNames") || []);
     const ignoreVcsIgnores = atom.config.get("core.excludeVcsIgnoredPaths");
     const projectPaths = atom.project.getPaths().map((path) => fs.realpathSync(path));
+    const repositoryPaths = atom.repositories
+      .getRepositories()
+      .map((repository) => repository.getWorkingDirectory?.())
+      .filter(Boolean);
     const useRipGrep = atom.config.get("fuzzy-files.useRipGrep");
 
     const startTime = performance.now();
@@ -21,6 +25,7 @@ module.exports = {
       ignoreVcsIgnores,
       ignoredNames,
       useRipGrep,
+      repositoryPaths,
       () => {
         callback(results);
 

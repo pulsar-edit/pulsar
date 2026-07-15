@@ -1,7 +1,6 @@
 "use babel";
 
 import getIconServices from "./get-icon-services";
-import path from "path";
 
 export default class MRUItemView {
   initialize(listView, item) {
@@ -58,14 +57,6 @@ export default class MRUItemView {
   }
 
   static repositoryForPath(filePath) {
-    if (filePath) {
-      const projectPaths = atom.project.getPaths();
-      for (let i = 0; i < projectPaths.length; i++) {
-        if (filePath === projectPaths[i] || filePath.startsWith(projectPaths[i] + path.sep)) {
-          return atom.project.getRepositories()[i];
-        }
-      }
-    }
-    return null;
+    return filePath ? atom.repositories.getForPath(filePath) : null;
   }
 }

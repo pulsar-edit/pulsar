@@ -16,6 +16,7 @@ export default class GitDiffView {
     this.editor = editor;
     this.editorElement = editorElement;
     this.repository = null;
+    this.repositorySubscriptionGeneration = 0;
     this.markers = new Map();
 
     // Assign `null` to all possible child vars here so the JS engine doesn't
@@ -30,7 +31,7 @@ export default class GitDiffView {
 
     subscribeToRepository();
 
-    this.subscriptions.add(atom.project.onDidChangePaths(subscribeToRepository));
+    this.subscriptions.add(atom.repositories.onDidChange(subscribeToRepository));
   }
 
   /**
@@ -40,6 +41,7 @@ export default class GitDiffView {
    *   object components that are guarunteed to exist at all times.
    */
   destroy() {
+    this.repositorySubscriptionGeneration++;
     this.subscriptions.dispose();
     this.destroyChildren();
     this.markers.clear();
@@ -76,6 +78,7 @@ export default class GitDiffView {
    * @describe handles all subscriptions based on the repository in focus
    */
   async subscribeToRepository() {
+    const generation = ++this.repositorySubscriptionGeneration;
     if (this._repoSubs !== null) {
       this._repoSubs.dispose();
       this.subscriptions.remove(this._repoSubs);
@@ -84,7 +87,15 @@ export default class GitDiffView {
     // Don't cache the path unless we know we need it.
     let editorPath = this.editor.getPath();
 
-    this.repository = await repositoryForPath(editorPath);
+    const repository = await repositoryForPath(editorPath);
+    if (
+      generation !== this.repositorySubscriptionGeneration ||
+      editorPath !== this.editor.getPath()
+    ) {
+      return;
+    }
+
+    this.repository = repository;
     if (this.repository !== null) {
       this.editorPath = editorPath;
       this.buffer = this.editor.getBuffer();
@@ -96,15 +107,11 @@ export default class GitDiffView {
       this._repoSubs = new CompositeDisposable(
         this.repository.onDidDestroy(subscribeToRepository),
         this.repository.onDidChangeStatuses(scheduleUpdate),
-        this.repository.onDidChangeStatus((changedPath) => {
+        this.repository.onDidChangeStatus(({ path: changedPath }) => {
           if (changedPath === this.editorPath) scheduleUpdate();
         }),
         this.editor.onDidStopChanging(scheduleUpdate),
-        this.editor.onDidChangePath(() => {
-          this.editorPath = this.editor.getPath();
-          this.buffer = this.editor.getBuffer();
-          scheduleUpdate();
-        }),
+        this.editor.onDidChangePath(subscribeToRepository),
         atom.commands.add(
           this.editorElement,
           "git-diff:move-to-next-diff",

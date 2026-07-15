@@ -1979,8 +1979,10 @@ describe("TabBarView", () => {
         ).map((callback) => callback(event));
       };
 
-      // Mock atom.project to pretend we are working within a repository
-      spyOn(atom.project, "repositoryForDirectory").andReturn(Promise.resolve(repository));
+      // Mock the repository registry to pretend we are working within a repository.
+      spyOn(atom.repositories, "resolveForPath").andCallFake((filePath) =>
+        Promise.resolve(filePath === tab1.path ? null : repository),
+      );
 
       atom.config.set("tabs.enableVcsColoring", true);
 

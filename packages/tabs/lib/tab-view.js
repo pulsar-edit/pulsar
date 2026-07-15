@@ -37,6 +37,7 @@ class TabView {
     }
 
     this.subscriptions = new CompositeDisposable();
+    this.vcsResolutionGeneration = 0;
 
     this.handleEvents();
     this.updateDataAttributes();
@@ -107,6 +108,7 @@ class TabView {
       this.updateDataAttributes();
       this.updateTitle();
       this.updateTooltip();
+      if (atom.config.get("tabs.enableVcsColoring")) this.setupVcsStatus();
       return this.updateIcon();
     };
 
@@ -215,6 +217,11 @@ class TabView {
       atom.config.observe("tabs.showIcons", () => {
         return this.updateIconVisibility();
       }),
+      atom.repositories.onDidChange(() => {
+        if (atom.config.get("tabs.enableVcsColoring") && this.path != null) {
+          this.setupVcsStatus();
+        }
+      }),
     );
 
     return this.subscriptions.add(
@@ -277,6 +284,7 @@ class TabView {
   }
 
   destroy() {
+    this.vcsResolutionGeneration++;
     if (this.subscriptions != null) {
       this.subscriptions.dispose();
     }
@@ -428,7 +436,11 @@ class TabView {
     if (this.path == null) {
       return;
     }
-    return this.repoForPath(this.path).then((repo) => {
+    const filePath = this.path;
+    const generation = ++this.vcsResolutionGeneration;
+    return this.repoForPath(filePath).then((repo) => {
+      if (generation !== this.vcsResolutionGeneration || filePath !== this.path) return;
+      this.unsetVcsStatus();
       this.subscribeToRepo(repo);
       return this.updateVcsStatus(repo);
     });
@@ -460,13 +472,8 @@ class TabView {
     );
   }
 
-  repoForPath() {
-    for (let dir of atom.project.getDirectories()) {
-      if (dir.contains(this.path)) {
-        return atom.project.repositoryForDirectory(dir);
-      }
-    }
-    return Promise.resolve(null);
+  repoForPath(filePath = this.path) {
+    return atom.repositories.resolveForPath(filePath);
   }
 
   // Update the VCS status property of this tab using the repo.
@@ -503,6 +510,7 @@ class TabView {
   }
 
   unsetVcsStatus() {
+    this.vcsResolutionGeneration++;
     if (this.repoSubscriptions != null) {
       this.repoSubscriptions.dispose();
     }

@@ -56,11 +56,9 @@ export default class RepositoryFile {
   constructor(filePath) {
     this.filePath = filePath;
     this.type = "none";
-    const [rootDir] = atom.project.relativizePath(this.filePath);
+    this.repo = atom.repositories.resolveForPathSync(this.filePath);
 
-    if (rootDir != null) {
-      const rootDirIndex = atom.project.getPaths().indexOf(rootDir);
-      this.repo = atom.project.getRepositories()[rootDirIndex];
+    if (this.repo != null) {
       if (this.repo && this.gitURL()) {
         const webURL = this.repoWebURL();
         if (this.isWikiURL(webURL)) {

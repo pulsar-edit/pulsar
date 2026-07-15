@@ -174,7 +174,7 @@ module.exports = class Directory {
   isPathIgnored(filePath) {
     if (atom.config.get("tree-view.hideVcsIgnoredFiles")) {
       const repo = repoForPath(this.path);
-      if (repo && repo.isProjectAtRoot() && repo.isPathIgnored(filePath)) return true;
+      if (repo && repo.isPathIgnored(filePath)) return true;
     }
 
     if (atom.config.get("tree-view.hideIgnoredNames")) {
@@ -495,9 +495,7 @@ const collatorCompare = new Intl.Collator(undefined, { numeric: true, sensitivit
   .compare;
 
 function getCompareFn() {
-  return atom.config.get("tree-view.sortMethod") === "natural"
-    ? naturalCompare
-    : collatorCompare;
+  return atom.config.get("tree-view.sortMethod") === "natural" ? naturalCompare : collatorCompare;
 }
 
 function parseEntryName(value) {

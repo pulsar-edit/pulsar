@@ -34,6 +34,7 @@ const CommandInstaller = require("./command-installer");
 const CoreURIHandlers = require("./core-uri-handlers");
 const ProtocolHandlerInstaller = require("./protocol-handler-installer");
 const Project = require("./project");
+const RepositoryRegistry = require("./repository-registry");
 const Workspace = require("./workspace");
 const PaneContainer = require("./pane-container");
 const PaneAxis = require("./pane-axis");
@@ -156,6 +157,11 @@ class AtomEnvironment {
     this.packages.setContextMenuManager(this.contextMenu);
     this.packages.setThemeManager(this.themes);
 
+    /** @type {RepositoryRegistry} */
+    this.repositories = new RepositoryRegistry({
+      config: this.config,
+      notificationManager: this.notifications,
+    });
     /** @type {Project} */
     this.project = new Project({
       notificationManager: this.notifications,
@@ -163,6 +169,7 @@ class AtomEnvironment {
       grammarRegistry: this.grammars,
       config: this.config,
       applicationDelegate: this.applicationDelegate,
+      repositoryRegistry: this.repositories,
     });
     this.commandInstaller = new CommandInstaller(this.applicationDelegate);
     this.protocolHandlerInstaller = new ProtocolHandlerInstaller();
@@ -368,6 +375,7 @@ class AtomEnvironment {
       commandInstaller: this.commandInstaller,
       notificationManager: this.notifications,
       project: this.project,
+      repositories: this.repositories,
       clipboard: this.clipboard,
     });
   }
@@ -394,7 +402,9 @@ class AtomEnvironment {
   observeAutoHideMenuBar() {
     this.disposables.add(
       this.config.onDidChange("core.autoHideMenuBar", ({ newValue }) => {
-        if (newValue === undefined) { newValue = true; }
+        if (newValue === undefined) {
+          newValue = true;
+        }
         this.setAutoHideMenuBar(newValue);
       }),
     );
@@ -453,6 +463,8 @@ class AtomEnvironment {
     this.themes.workspace = null;
     if (this.project) this.project.destroy();
     this.project = null;
+    if (this.repositories) this.repositories.destroy();
+    this.repositories = null;
     this.commands.clear();
     if (this.stylesElement) this.stylesElement.remove();
     this.uriHandlerRegistry.destroy();

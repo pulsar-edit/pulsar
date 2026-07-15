@@ -61,12 +61,9 @@ class IconServices {
         iconClass = "icon-file-symlink-directory";
       } else {
         iconClass = "icon-file-directory";
-        if (view.directory.isRoot) {
-          const repo = repoForPath(view.directory.path);
-          if (repo && repo.isProjectAtRoot()) iconClass = "icon-repo";
-        } else {
-          if (view.directory.submodule) iconClass = "icon-file-submodule";
-        }
+        const repo = repoForPath(view.directory.path);
+        if (repo && repo.relativize(view.directory.path) === "") iconClass = "icon-repo";
+        else if (view.directory.submodule) iconClass = "icon-file-submodule";
       }
       classes.push(iconClass);
     }

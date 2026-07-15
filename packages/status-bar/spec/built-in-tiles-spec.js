@@ -499,7 +499,7 @@ describe("Built-in Status Bar Tiles", function () {
     beforeEach(() => ([gitView] = statusBar.getRightTiles().map((tile) => tile.getItem())));
 
     // Disabled: these tests copy a bare `.git` fixture into an os.tmpdir()
-    // working dir via `setupWorkingDir`, but `atom.project.getRepositories()[0]`
+    // working dir via `setupWorkingDir`, but `atom.repositories.getForPath()`
     // stays null for that path — the git repository provider never creates a
     // repo for the copied fixture (git-utils repo detection; see the sibling
     // "git status label" describe, which uses an in-place fixture and works).
@@ -511,7 +511,7 @@ describe("Built-in Status Bar Tiles", function () {
         const workingDir = setupWorkingDir("ahead-behind-repo");
         atom.project.setPaths([workingDir]);
         const filePath = atom.project.getDirectories()[0].resolve("a.txt");
-        const repo = atom.project.getRepositories()[0];
+        const repo = atom.repositories.getForPath(workingDir);
 
         waitsForPromise(() => atom.workspace.open(filePath).then(() => repo.refreshStatus()));
 
@@ -528,7 +528,7 @@ describe("Built-in Status Bar Tiles", function () {
         const workingDir = setupWorkingDir("no-ahead-behind-repo");
         atom.project.setPaths([workingDir]);
         const filePath = atom.project.getDirectories()[0].resolve("a.txt");
-        const repo = atom.project.getRepositories()[0];
+        const repo = atom.repositories.getForPath(workingDir);
 
         waitsForPromise(() => atom.workspace.open(filePath).then(() => repo.refreshStatus()));
 
@@ -559,7 +559,7 @@ describe("Built-in Status Bar Tiles", function () {
         waitsForPromise(() => atom.workspace.open("a.txt"));
 
         runs(function () {
-          const currentBranch = atom.project.getRepositories()[0].getShortHead();
+          const currentBranch = atom.repositories.getForPath(projectPath).getShortHead();
           expect(gitView.branchArea).toBeVisible();
           expect(gitView.branchLabel.textContent).toBe(currentBranch);
 
@@ -579,7 +579,7 @@ describe("Built-in Status Bar Tiles", function () {
         waitsForPromise(() => atom.workspace.open("a.txt"));
 
         runs(function () {
-          const currentBranch = atom.project.getRepositories()[0].getShortHead();
+          const currentBranch = atom.repositories.getForPath(projectPath).getShortHead();
           return hover(gitView.branchArea, () =>
             expect(document.body.querySelector(".tooltip").innerText).toBe(
               `On branch ${currentBranch}`,
@@ -639,7 +639,7 @@ describe("Built-in Status Bar Tiles", function () {
         fs.writeFileSync(ignoredPath, "");
         jasmine.attachToDOM(workspaceElement);
 
-        repo = atom.project.getRepositories()[0];
+        repo = atom.repositories.getForPath(projectPath);
         originalPathText = fs.readFileSync(filePath, "utf8");
         await repo.refreshStatus();
       });
