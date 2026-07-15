@@ -447,6 +447,7 @@ describe("RepositoryRegistry", () => {
     });
 
     const commit = repository.getOperations().commit("Subject");
+    await Promise.resolve();
     registry.setProjectRoots([]);
     providerDisposable.dispose();
     expect(repository.isDestroyed()).toBe(false);
@@ -456,6 +457,115 @@ describe("RepositoryRegistry", () => {
     expect(await commit).toBe("done");
     expect(destroyCount).toBe(1);
     expect(repository.isDestroyed()).toBe(true);
+  });
+
+  it("serializes writes to one repository and emits operation lifecycle events", async () => {
+    const workdir = temp.mkdirSync("serialized-repository-operations");
+    const repository = new FakeRepository(workdir);
+    const calls = [];
+    const events = [];
+    let finishFirst;
+    repositories.push(repository);
+    registry.setProjectRoots([directoryFor(workdir)]);
+    registry.addOperationProvider({
+      createRepositoryOperations() {
+        return {
+          commit(message) {
+            calls.push(message);
+            if (message === "first") {
+              return new Promise((resolve) => (finishFirst = resolve));
+            }
+            return Promise.resolve(message);
+          },
+        };
+      },
+    });
+    const operations = repository.getOperations();
+    operations.onDidQueueOperation((event) => events.push(`queued:${event.id}`));
+    operations.onDidStartOperation((event) => events.push(`started:${event.id}`));
+    operations.onDidFinishOperation((event) => events.push(`${event.status}:${event.id}`));
+
+    const first = operations.commit("first");
+    const second = operations.commit("second");
+    await Promise.resolve();
+
+    expect(calls).toEqual(["first"]);
+    expect(operations.getPendingOperations().map((operation) => operation.status)).toEqual([
+      "running",
+      "queued",
+    ]);
+
+    finishFirst("first");
+    expect(await first).toBe("first");
+    expect(await second).toBe("second");
+    expect(calls).toEqual(["first", "second"]);
+    expect(events).toEqual([
+      "queued:1",
+      "queued:2",
+      "started:1",
+      "succeeded:1",
+      "started:2",
+      "succeeded:2",
+    ]);
+    expect(operations.getPendingOperations()).toEqual([]);
+  });
+
+  it("continues a repository queue after a failed write", async () => {
+    const workdir = temp.mkdirSync("failed-queued-operation");
+    const repository = new FakeRepository(workdir);
+    let callCount = 0;
+    repositories.push(repository);
+    registry.setProjectRoots([directoryFor(workdir)]);
+    registry.addOperationProvider({
+      createRepositoryOperations() {
+        return {
+          commit() {
+            callCount++;
+            if (callCount === 1) throw new Error("commit failed");
+            return "second-commit";
+          },
+        };
+      },
+    });
+
+    const first = repository
+      .getOperations()
+      .commit("first")
+      .catch((error) => error.message);
+    const second = repository.getOperations().commit("second");
+
+    expect(await first).toBe("commit failed");
+    expect(await second).toBe("second-commit");
+  });
+
+  it("runs writes to different repositories in parallel", async () => {
+    const firstPath = temp.mkdirSync("parallel-repository-one");
+    const secondPath = temp.mkdirSync("parallel-repository-two");
+    const firstRepository = new FakeRepository(firstPath);
+    const secondRepository = new FakeRepository(secondPath);
+    const started = [];
+    let finishWrites;
+    const writes = new Promise((resolve) => (finishWrites = resolve));
+    repositories.push(firstRepository, secondRepository);
+    registry.setProjectRoots([directoryFor(firstPath), directoryFor(secondPath)]);
+    registry.addOperationProvider({
+      createRepositoryOperations({ workingDirectory }) {
+        return {
+          commit() {
+            started.push(workingDirectory);
+            return writes;
+          },
+        };
+      },
+    });
+
+    const first = firstRepository.getOperations().commit("first");
+    const second = secondRepository.getOperations().commit("second");
+    await Promise.resolve();
+
+    expect(started).toEqual([firstPath, secondPath]);
+    finishWrites();
+    await Promise.all([first, second]);
   });
 
   it("keeps a repository until its last open buffer is destroyed", async () => {

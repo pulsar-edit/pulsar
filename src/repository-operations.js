@@ -17,6 +17,28 @@ class RepositoryOperations {
     return this.registry.getOperationCapabilities(this.repository);
   }
 
+  getPendingOperations() {
+    return this.registry.getPendingOperations(this.repository);
+  }
+
+  onDidQueueOperation(callback) {
+    return this.registry.onDidQueueOperation((event) => {
+      if (event.repository === this.repository) callback(event);
+    });
+  }
+
+  onDidStartOperation(callback) {
+    return this.registry.onDidStartOperation((event) => {
+      if (event.repository === this.repository) callback(event);
+    });
+  }
+
+  onDidFinishOperation(callback) {
+    return this.registry.onDidFinishOperation((event) => {
+      if (event.repository === this.repository) callback(event);
+    });
+  }
+
   execute(operationName, ...args) {
     return this.registry.performOperation(this.repository, operationName, args);
   }
@@ -136,6 +158,10 @@ RepositoryOperations.standardCapabilities = Object.freeze(
       name !== "constructor" &&
       name !== "isAvailable" &&
       name !== "getCapabilities" &&
+      name !== "getPendingOperations" &&
+      name !== "onDidQueueOperation" &&
+      name !== "onDidStartOperation" &&
+      name !== "onDidFinishOperation" &&
       name !== "execute",
   ),
 );

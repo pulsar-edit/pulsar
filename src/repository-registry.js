@@ -58,6 +58,7 @@ module.exports = class RepositoryRegistry {
     this.rootPaths = [];
     this.scanGeneration = 0;
     this.version = 0;
+    this.nextOperationId = 1;
     this.destroyed = false;
     this.didNotifyRepositoryLimit = false;
 
@@ -173,6 +174,18 @@ module.exports = class RepositoryRegistry {
 
   onDidChange(callback) {
     return this.emitter.on("did-change", callback);
+  }
+
+  onDidQueueOperation(callback) {
+    return this.emitter.on("did-queue-operation", callback);
+  }
+
+  onDidStartOperation(callback) {
+    return this.emitter.on("did-start-operation", callback);
+  }
+
+  onDidFinishOperation(callback) {
+    return this.emitter.on("did-finish-operation", callback);
   }
 
   getForPath(filePath) {
@@ -329,31 +342,96 @@ module.exports = class RepositoryRegistry {
     return Object.freeze(Array.from(capabilities));
   }
 
+  getPendingOperations(repository) {
+    const entries = repository
+      ? [this.entryByRepository.get(repository)].filter(Boolean)
+      : Array.from(this.entriesById.values());
+    return Object.freeze(
+      entries.flatMap((entry) =>
+        Array.from(entry.pendingOperations.values(), (operation) =>
+          this.operationSnapshot(operation),
+        ),
+      ),
+    );
+  }
+
   performOperation(repository, operationName, args = []) {
     if (typeof operationName !== "string" || operationName.length === 0) {
       return Promise.reject(new TypeError("Repository operation name must be a non-empty string"));
     }
 
-    return this.runOperation(repository, async () => {
-      const record = this.findOperationImplementation(repository, operationName);
-      if (!record) {
-        const error = new Error(`No provider implements repository operation: ${operationName}`);
-        error.code = "ERR_REPOSITORY_OPERATION_UNAVAILABLE";
-        error.operation = operationName;
-        throw error;
-      }
+    return this.runOperation(repository, () => {
+      const entry = this.entryByRepository.get(repository);
+      const operation = {
+        id: this.nextOperationId++,
+        repository,
+        name: operationName,
+        status: "queued",
+        queuedAt: Date.now(),
+        startedAt: null,
+      };
+      entry.pendingOperations.set(operation.id, operation);
+      this.emitter.emit("did-queue-operation", this.operationSnapshot(operation));
 
-      record.activeOperations++;
-      try {
-        const result = await record.implementation[operationName](...args);
-        await this.refreshRepositoryAfterOperation(repository);
-        return result;
-      } finally {
-        record.activeOperations--;
-        if (record.pendingDisposal && record.activeOperations === 0) {
-          record.implementation.destroy?.();
+      const execute = async () => {
+        operation.status = "running";
+        operation.startedAt = Date.now();
+        this.emitter.emit("did-start-operation", this.operationSnapshot(operation));
+
+        let operationError = null;
+        try {
+          const record = this.findOperationImplementation(repository, operationName);
+          if (!record) {
+            const error = new Error(
+              `No provider implements repository operation: ${operationName}`,
+            );
+            error.code = "ERR_REPOSITORY_OPERATION_UNAVAILABLE";
+            error.operation = operationName;
+            throw error;
+          }
+
+          record.activeOperations++;
+          try {
+            const result = await record.implementation[operationName](...args);
+            await this.refreshRepositoryAfterOperation(repository);
+            return result;
+          } finally {
+            record.activeOperations--;
+            if (record.pendingDisposal && record.activeOperations === 0) {
+              record.implementation.destroy?.();
+            }
+          }
+        } catch (error) {
+          operationError = error;
+          throw error;
+        } finally {
+          entry.pendingOperations.delete(operation.id);
+          this.emitter.emit(
+            "did-finish-operation",
+            Object.freeze({
+              ...this.operationSnapshot(operation),
+              status: operationError ? "failed" : "succeeded",
+              finishedAt: Date.now(),
+              error: operationError,
+            }),
+          );
         }
-      }
+      };
+
+      const result = entry.operationTail.then(execute);
+      entry.operationTail = result.catch(() => {});
+      return result;
+    });
+  }
+
+  operationSnapshot(operation) {
+    return Object.freeze({
+      id: operation.id,
+      repository: operation.repository,
+      name: operation.name,
+      status: operation.status,
+      queuedAt: operation.queuedAt,
+      startedAt: operation.startedAt,
     });
   }
 
@@ -787,6 +865,8 @@ module.exports = class RepositoryRegistry {
       manualOwners: new Set(),
       pins: new Set(),
       operationOwners: new Set(),
+      operationTail: Promise.resolve(),
+      pendingOperations: new Map(),
       operationImplementations: new Map(),
       operations: null,
       missing: false,
