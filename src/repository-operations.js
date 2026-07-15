@@ -43,10 +43,6 @@ class RepositoryOperations {
     return this.registry.performOperation(this.repository, operationName, args);
   }
 
-  init(options) {
-    return this.execute("init", options);
-  }
-
   stageFiles(paths, options) {
     return this.execute("stageFiles", paths, options);
   }

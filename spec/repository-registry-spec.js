@@ -337,6 +337,22 @@ describe("RepositoryRegistry", () => {
     expect(await repository.getOperations().commit("Subject")).toBe("service-commit");
   });
 
+  it("fully releases a workspace-only provider when it is disposed", () => {
+    const workdir = temp.mkdirSync("workspace-only-provider");
+    const repository = new FakeRepository(workdir);
+    const provider = { initializeRepository() {} };
+    repositories.push(repository);
+    registry.setProjectRoots([directoryFor(workdir)]);
+    const providerDisposable = registry.addOperationProvider(provider);
+
+    expect(repository.getOperations().isAvailable("commit")).toBe(false);
+    const entry = registry.entryByRepository.get(repository);
+    expect(entry.operationImplementations.has(provider)).toBe(true);
+
+    providerDisposable.dispose();
+    expect(entry.operationImplementations.has(provider)).toBe(false);
+  });
+
   it("dispatches writes through a provider that arrives after discovery", async () => {
     const workdir = temp.mkdirSync("late-operation-provider");
     const repository = new FakeRepository(workdir);
@@ -638,6 +654,19 @@ describe("RepositoryRegistry", () => {
     await initialize;
     await clone;
     expect(calls).toEqual(["initialize", "clone"]);
+  });
+
+  it("rejects workspace operations after the registry is destroyed", async () => {
+    registry.addOperationProvider({ initializeRepository() {} });
+    registry.destroy();
+
+    let error;
+    try {
+      await registry.initialize(temp.mkdirSync("destroyed-registry-operation"));
+    } catch (caughtError) {
+      error = caughtError;
+    }
+    expect(error.message).toContain("destroyed RepositoryRegistry");
   });
 
   it("keeps a repository until its last open buffer is destroyed", async () => {

@@ -133,6 +133,7 @@ module.exports = class RepositoryRegistry {
       entry.repository.setOperations?.(null);
       if (!entry.repository.isDestroyed?.()) entry.repository.destroy();
     }
+    this.operationProviders = [];
 
     this.emitter.dispose();
   }
@@ -291,6 +292,7 @@ module.exports = class RepositoryRegistry {
   }
 
   addOperationProvider(provider) {
+    if (this.destroyed) throw new Error("Cannot add a provider to a destroyed RepositoryRegistry");
     if (
       !provider ||
       (typeof provider.createRepositoryOperations !== "function" &&
@@ -310,8 +312,8 @@ module.exports = class RepositoryRegistry {
       if (index < 0) return;
       this.operationProviders.splice(index, 1);
       for (const entry of this.entriesById.values()) {
-        const record = entry.operationImplementations.get(provider);
-        if (record) {
+        if (entry.operationImplementations.has(provider)) {
+          const record = entry.operationImplementations.get(provider);
           entry.operationImplementations.delete(provider);
           this.disposeOperationImplementation(record);
         }
@@ -405,6 +407,9 @@ module.exports = class RepositoryRegistry {
   }
 
   performWorkspaceOperation(operationName, workingDirectory, args) {
+    if (this.destroyed) {
+      return Promise.reject(new Error("Cannot run an operation on a destroyed RepositoryRegistry"));
+    }
     const queueKey = normalizePath(workingDirectory);
     const operation = {
       id: this.nextOperationId++,
@@ -416,12 +421,16 @@ module.exports = class RepositoryRegistry {
       startedAt: null,
     };
     this.pendingWorkspaceOperations.set(operation.id, operation);
-    this.emitter.emit("did-queue-operation", this.operationSnapshot(operation));
+    if (!this.destroyed) {
+      this.emitter.emit("did-queue-operation", this.operationSnapshot(operation));
+    }
 
     const execute = async () => {
       operation.status = "running";
       operation.startedAt = Date.now();
-      this.emitter.emit("did-start-operation", this.operationSnapshot(operation));
+      if (!this.destroyed) {
+        this.emitter.emit("did-start-operation", this.operationSnapshot(operation));
+      }
 
       let operationError = null;
       try {
@@ -441,15 +450,17 @@ module.exports = class RepositoryRegistry {
         throw error;
       } finally {
         this.pendingWorkspaceOperations.delete(operation.id);
-        this.emitter.emit(
-          "did-finish-operation",
-          Object.freeze({
-            ...this.operationSnapshot(operation),
-            status: operationError ? "failed" : "succeeded",
-            finishedAt: Date.now(),
-            error: operationError,
-          }),
-        );
+        if (!this.destroyed) {
+          this.emitter.emit(
+            "did-finish-operation",
+            Object.freeze({
+              ...this.operationSnapshot(operation),
+              status: operationError ? "failed" : "succeeded",
+              finishedAt: Date.now(),
+              error: operationError,
+            }),
+          );
+        }
       }
     };
 
@@ -494,12 +505,16 @@ module.exports = class RepositoryRegistry {
         startedAt: null,
       };
       entry.pendingOperations.set(operation.id, operation);
-      this.emitter.emit("did-queue-operation", this.operationSnapshot(operation));
+      if (!this.destroyed) {
+        this.emitter.emit("did-queue-operation", this.operationSnapshot(operation));
+      }
 
       const execute = async () => {
         operation.status = "running";
         operation.startedAt = Date.now();
-        this.emitter.emit("did-start-operation", this.operationSnapshot(operation));
+        if (!this.destroyed) {
+          this.emitter.emit("did-start-operation", this.operationSnapshot(operation));
+        }
 
         let operationError = null;
         try {
@@ -529,15 +544,17 @@ module.exports = class RepositoryRegistry {
           throw error;
         } finally {
           entry.pendingOperations.delete(operation.id);
-          this.emitter.emit(
-            "did-finish-operation",
-            Object.freeze({
-              ...this.operationSnapshot(operation),
-              status: operationError ? "failed" : "succeeded",
-              finishedAt: Date.now(),
-              error: operationError,
-            }),
-          );
+          if (!this.destroyed) {
+            this.emitter.emit(
+              "did-finish-operation",
+              Object.freeze({
+                ...this.operationSnapshot(operation),
+                status: operationError ? "failed" : "succeeded",
+                finishedAt: Date.now(),
+                error: operationError,
+              }),
+            );
+          }
         }
       };
 
