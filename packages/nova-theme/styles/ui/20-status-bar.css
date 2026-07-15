@@ -2,7 +2,9 @@
   font-size: var(--ui-size);
   height: var(--ui-tab-height); /* same as tabs */
   line-height: var(--ui-tab-height);
-  background-color: var(--level-3-color);
+  /* Match the title bar and the app void so the status bar blends into the
+     frame around the floating cards. */
+  background-color: var(--app-background-color);
 
   .flexbox-repaint-hack {
     padding: 0; /* override default */
@@ -23,10 +25,12 @@
 
     &:hover {
       text-decoration: none;
-      background-color: var(--level-3-color-hover);
+      /* Text-tinted overlay like the title bar's window controls, so the
+         hover reads on the app-colored bar in both light and dark. */
+      background-color: rgb(from var(--text-color) r g b / 10%);
     }
     &:active {
-      background-color: var(--level-3-color-active);
+      background-color: rgb(from var(--text-color) r g b / 16%);
     }
 
     /* reset on child inline-block */

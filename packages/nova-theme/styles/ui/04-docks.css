@@ -22,6 +22,22 @@
   color: var(--accent-color);
 }
 
+/* The button anchors to the dock's outer edge, but the dock's pane is inset
+   as a card. Pull it in by the card gap (3px container padding + 3px pane
+   margin) so its flat edge meets the card instead of floating in the void. */
+.atom-dock-toggle-button {
+  --dock-card-gap: 6px;
+  &.left {
+    left: calc(100% - var(--dock-card-gap));
+  }
+  &.right {
+    right: calc(100% - var(--dock-card-gap));
+  }
+  &.bottom {
+    bottom: calc(100% - var(--dock-card-gap));
+  }
+}
+
 /* Make handles not take up any space when dock is open */
 .atom-dock-resize-handle {
   position: absolute;
