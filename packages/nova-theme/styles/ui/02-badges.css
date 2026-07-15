@@ -1,0 +1,14 @@
+.badge {
+  padding: calc(var(--ui-padding) / 4) calc(var(--ui-padding) / 2.5);
+  min-width: calc(var(--ui-padding) * 1.25);
+  font-weight: normal;
+  color: var(--text-color-highlight);
+  border-radius: calc(var(--ui-size) * 2);
+  background-color: var(--badge-background-color);
+
+  /* Icon ---------------------- */
+  &.icon {
+    font-size: var(--ui-size);
+    padding: var(--ui-padding-icon) calc(var(--ui-padding-icon) * 1.5);
+  }
+}

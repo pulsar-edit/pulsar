@@ -1,0 +1,229 @@
+/* Overrides packages */
+
+/* search-panel + search-panel-project --------------------------- */
+
+.search-panel,
+.search-panel-project {
+  padding: calc(var(--ui-padding) / 4);
+  .input-block-item {
+    padding: calc(var(--ui-padding) / 4);
+  }
+}
+
+/* search-panel-editor */
+.search-panel-editor {
+  .header,
+  .input-block {
+    min-width: calc(var(--ui-size) * 22);
+  }
+
+  .input-block-item {
+    flex: 1 1 calc(var(--ui-size) * 22);
+  }
+  .input-block-item--flex {
+    flex: 100 1 calc(var(--ui-size) * 22);
+  }
+
+  .btn,
+  .btn-group-options .btn {
+    font-size: calc(var(--ui-size) * 1.1);
+    padding: 0;
+  }
+
+  .btn-group-options .btn,
+  .btn-group-options .btn.option-selection,
+  .btn-group-options .btn.option-whole-word {
+    padding: 0;
+    font-size: var(--ui-input-size); /* keep same as text input */
+  }
+
+  .find-container atom-text-editor {
+    padding-right: calc(var(--ui-size) * 5); /* leave some room for the results count */
+  }
+  .find-meta-container {
+    top: 0;
+    font-size: var(--ui-size);
+    line-height: calc(var(--ui-size) * 2.5);
+  }
+}
+
+/* search-panel-project */
+.search-panel-project {
+  .header,
+  .input-block {
+    min-width: calc(var(--ui-size) * 15);
+  }
+
+  .input-block-item {
+    flex: 1 1 calc(var(--ui-size) * 14);
+  }
+  .input-block-item--flex {
+    flex: 100 1 calc(var(--ui-size) * 20);
+  }
+
+  .btn {
+    font-size: calc(var(--ui-size) * 1.1);
+    padding: 0;
+  }
+  .btn-group-options .btn {
+    padding: 0;
+    font-size: var(--ui-input-size); /* keep same as text input */
+  }
+}
+
+/* Colorize search-panel-editor based on results */
+/* Less guard `when (@ui-hue >= 190) and (@ui-hue <= 340)` is true for both
+   palettes (night hue 220, day hue 230), so this applies unconditionally. */
+.search-panel-editor {
+  &.has-no-results .find-container atom-text-editor[mini].is-focused {
+    border-color: var(--text-color-error);
+    box-shadow: 0 0 0 1px var(--text-color-error);
+    background-color: color-mix(in srgb, var(--text-color-error) 10%, var(--input-background-color));
+    .selection .region {
+      background-color: color-mix(in srgb, var(--text-color-error) 50%, var(--input-background-color));
+    }
+    .cursor {
+      border-color: var(--text-color-error);
+    }
+  }
+
+  &.has-results .find-container atom-text-editor[mini].is-focused {
+    border-color: var(--text-color-success);
+    box-shadow: 0 0 0 1px var(--text-color-success);
+    background-color: color-mix(in srgb, var(--text-color-success) 10%, var(--input-background-color));
+    .selection .region {
+      background-color: color-mix(in srgb, var(--text-color-success) 50%, var(--input-background-color));
+    }
+    .cursor {
+      border-color: var(--text-color-success);
+    }
+  }
+
+  &.has-results .find-container .result-counter {
+    color: var(--text-color-success);
+  }
+  &.has-no-results .find-container .result-counter {
+    color: var(--text-color-error);
+  }
+}
+
+/* Timecop --------------------------- */
+
+.timecop {
+  .timecop-panel {
+    padding: calc(var(--component-padding) / 2);
+    background-color: var(--level-2-color);
+  }
+
+  .tool-panel {
+    padding: calc(var(--component-padding) / 2);
+    background-color: var(--level-2-color);
+  }
+
+  .inset-panel {
+    border: 1px solid var(--base-border-color);
+  }
+
+  .panel-heading {
+    font-weight: normal;
+    color: var(--text-color-highlight);
+    border-color: var(--base-border-color);
+    background-color: var(--level-1-color);
+  }
+
+  .list-item .inline-block {
+    line-height: 1.5;
+  }
+}
+
+/* Command Palette + Fuzzy Files --------------------------- */
+
+.command-palette .list-group .character-match,
+.fuzzy-files .list-group .character-match {
+  color: var(--accent-only-text-color);
+}
+
+/* Deprecation Cop --------------------------- */
+
+.deprecation-cop {
+  .deprecation-overview {
+    background-color: var(--level-2-color);
+    border-bottom: 1px solid var(--base-border-color);
+  }
+}
+
+/* Tool Bar --------------------------- */
+
+.tool-bar {
+  /* Make it look the same as other panels */
+  background-color: var(--level-3-color);
+  border: none;
+
+  /* just a single border + more spacing */
+  &.tool-bar-horizontal .tool-bar-spacer {
+    border-left: 0 none;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+  }
+  &.tool-bar-vertical .tool-bar-spacer {
+    border-bottom: 0 none;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+
+  /* only show button styles on hover */
+  button.tool-bar-btn {
+    background-color: var(--level-3-color);
+    background-image: none;
+    border-color: var(--level-3-color);
+  }
+}
+
+/* GitHub package --------------------------------------------------- */
+
+/* Fix focus styles
+   Since it's not possible to add a padding to <atom-text-editor>
+   a pseudo element is used to add the border when focused. */
+.github-CommitView-editor atom-text-editor.is-focused {
+  box-shadow: none;
+  &:before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 2px solid;
+    border-color: inherit;
+    border-radius: var(--component-border-radius);
+  }
+}
+
+/* Add focus styles since :focus doesn't work */
+.github-CommitView-coAuthorEditor {
+  &.is-focused {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 35%, transparent);
+  }
+  &.is-open {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .Select-option {
+    &.is-focused {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      color: var(--accent-text-color);
+      background-color: var(--accent-color);
+    }
+  }
+  .Select-menu-outer {
+    left: -2px;
+    right: -2px;
+    bottom: 100%;
+    border: 2px solid var(--accent-color);
+    background-color: var(--overlay-background-color);
+  }
+}

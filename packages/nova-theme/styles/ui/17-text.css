@@ -1,0 +1,130 @@
+h1,
+h2,
+h3 {
+  line-height: 1em;
+  margin-bottom: 15px;
+}
+h1 {
+  font-size: 2em;
+}
+h2 {
+  font-size: 1.5em;
+}
+h3 {
+  font-size: 1.2em;
+}
+
+p {
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+label {
+  font-weight: normal;
+}
+
+pre {
+  box-shadow: none;
+  color: var(--text-color);
+  background: var(--inset-panel-background-color);
+  border-radius: var(--component-border-radius);
+  border: none;
+  margin: 0;
+}
+
+code {
+  font-weight: normal;
+  color: var(--text-color-highlight);
+  background: var(--background-color-highlight);
+  border-radius: var(--component-border-radius);
+}
+
+.selected {
+  font-weight: normal;
+  color: var(--text-color-highlight);
+}
+
+.text-smaller {
+  font-size: 0.9em;
+}
+
+.text-subtle {
+  font-weight: normal;
+  color: var(--text-color-subtle);
+}
+.text-highlight {
+  font-weight: normal;
+  color: var(--text-color-highlight);
+}
+
+.text-error {
+  color: var(--text-color-error);
+}
+.text-info {
+  color: var(--text-color-info);
+  &:hover {
+    color: var(--text-color-info);
+  }
+}
+.text-warning {
+  color: var(--text-color-warning);
+  &:hover {
+    color: var(--text-color-warning);
+  }
+}
+.text-success {
+  color: var(--text-color-success);
+  &:hover {
+    color: var(--text-color-success);
+  }
+}
+
+.highlight-mixin {
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.highlight {
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 700;
+  color: var(--text-color-highlight);
+  background-color: var(--background-color-highlight);
+}
+
+.highlight-info {
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 500;
+  color: white;
+  text-shadow: 0 1px 0px hsla(0, 0%, 0%, 0.2);
+  background-color: var(--background-color-info);
+}
+.highlight-warning {
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 500;
+  color: white;
+  text-shadow: 0 1px 0px hsla(0, 0%, 0%, 0.2);
+  background-color: var(--background-color-warning);
+}
+.highlight-error {
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 500;
+  color: white;
+  text-shadow: 0 1px 0px hsla(0, 0%, 0%, 0.2);
+  background-color: var(--background-color-error);
+}
+.highlight-success {
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 500;
+  color: white;
+  text-shadow: 0 1px 0px hsla(0, 0%, 0%, 0.2);
+  background-color: var(--background-color-success);
+}
+
+.results-view .path-details.list-item {
+  color: hsl(from var(--text-color-highlight) h s calc(l - 18));
+}

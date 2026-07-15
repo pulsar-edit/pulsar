@@ -146,6 +146,7 @@
     "normalize-package-data": "9.0.0",
     "notifications": "file:./packages/notifications",
     "nsfw": "2.3.1",
+    "nova-theme": "file:packages/nova-theme",
     "one-theme": "file:packages/one-theme",
     "open-external": "file:packages/open-external",
     "open-repository": "file:packages/open-repository",
@@ -184,6 +185,7 @@
     "yargs": "18.0.0"
   },
   "packageDependencies": {
+    "nova-theme": "file:./packages/nova-theme",
     "one-theme": "file:./packages/one-theme",
     "about": "file:./packages/about",
     "archive-view": "file:./packages/archive-view",

@@ -1,0 +1,83 @@
+/*
+ * nova-day palette — the syntax side of the theme variable contract as CSS
+ * custom properties.
+ *
+ * Values must stay concrete (hex/hsl/rgba or plain var() aliases within this
+ * file): Lumine derives the legacy Less ui-variables/syntax-variables shim for
+ * community packages from this file, and Less color functions need concrete
+ * colors to operate on. See src/theme-variable-shim.js.
+ */
+
+:root {
+  --syntax-text-color: hsl(228, 10%, 26%);
+  --syntax-cursor-color: #4f58d6;
+  --syntax-selection-color: hsl(230, 60%, 92%);
+  --syntax-selection-flash-color: #7a83f2;
+  --syntax-background-color: hsl(0, 0%, 100%);
+  --syntax-wrap-guide-color: hsla(228, 10%, 26%, 0.08);
+  --syntax-indent-guide-color: hsla(228, 10%, 26%, 0.15);
+  --syntax-invisible-character-color: hsla(228, 10%, 26%, 0.18);
+  --syntax-result-marker-color: hsla(233, 70%, 60%, 0.2);
+  --syntax-result-marker-color-selected: #4f58d6;
+  --syntax-gutter-text-color: hsl(228, 8%, 60%);
+  --syntax-gutter-text-color-selected: hsl(228, 10%, 26%);
+  --syntax-gutter-background-color: hsl(0, 0%, 100%);
+  --syntax-gutter-background-color-selected: hsl(230, 50%, 94%);
+  --syntax-color-added: hsl(150, 65%, 34%);
+  --syntax-color-modified: hsl(38, 90%, 46%);
+  --syntax-color-removed: hsl(4, 90%, 52%);
+  --syntax-color-renamed: hsl(215, 95%, 56%);
+  --syntax-color-variable: hsl(355, 65%, 46%);
+  --syntax-color-constant: hsl(29, 90%, 38%);
+  --syntax-color-property: hsl(228, 10%, 26%);
+  --syntax-color-value: hsl(228, 10%, 26%);
+  --syntax-color-function: hsl(215, 85%, 44%);
+  --syntax-color-method: hsl(215, 85%, 44%);
+  --syntax-color-class: hsl(38, 80%, 36%);
+  --syntax-color-keyword: hsl(265, 65%, 50%);
+  --syntax-color-tag: hsl(355, 65%, 46%);
+  --syntax-color-attribute: hsl(29, 90%, 38%);
+  --syntax-color-import: hsl(265, 65%, 50%);
+  --syntax-color-snippet: hsl(120, 45%, 34%);
+  --syntax-color-string: hsl(120, 45%, 34%);
+  --syntax-color-comment: hsl(228, 8%, 55%);
+  --terminal-text-color: hsl(228, 10%, 26%);
+  --terminal-background-color: hsl(0, 0%, 100%);
+  --terminal-selection-background-color: hsl(230, 60%, 92%);
+  --terminal-selection-text-color: hsl(228, 10%, 26%);
+  --terminal-cursor-color: #4f58d6;
+  --terminal-result-marker-color: hsla(233, 70%, 60%, 0.2);
+  --terminal-result-marker-color-selected: #4f58d6;
+  --terminal-color-black: hsl(228, 10%, 26%);
+  --terminal-color-red: hsl(355, 65%, 46%);
+  --terminal-color-green: hsl(120, 45%, 34%);
+  --terminal-color-yellow: hsl(29, 90%, 38%);
+  --terminal-color-blue: hsl(215, 85%, 44%);
+  --terminal-color-magenta: hsl(265, 65%, 50%);
+  --terminal-color-cyan: hsl(190, 75%, 34%);
+  --terminal-color-white: hsl(228, 12%, 78%);
+  --terminal-color-bright-black: hsl(228, 10%, 36%);
+  --terminal-color-bright-red: hsl(355, 65%, 56%);
+  --terminal-color-bright-green: hsl(120, 45%, 44%);
+  --terminal-color-bright-yellow: hsl(29, 90%, 48%);
+  --terminal-color-bright-blue: hsl(215, 85%, 54%);
+  --terminal-color-bright-magenta: hsl(265, 65%, 60%);
+  --terminal-color-bright-cyan: hsl(190, 75%, 44%);
+  --terminal-color-bright-white: hsl(228, 12%, 88%);
+  --mono-1: hsl(228, 10%, 26%);
+  --mono-2: hsl(228, 8%, 44%);
+  --mono-3: hsl(228, 6%, 62%);
+  --hue-1: hsl(190, 75%, 34%);
+  --hue-2: hsl(215, 85%, 44%);
+  --hue-3: hsl(265, 65%, 50%);
+  --hue-4: hsl(120, 45%, 34%);
+  --hue-5: hsl(355, 65%, 46%);
+  --hue-5-2: hsl(344, 80%, 42%);
+  --hue-6: hsl(29, 90%, 38%);
+  --hue-6-2: hsl(38, 80%, 36%);
+  --syntax-fg: var(--mono-1);
+  --syntax-bg: hsl(0, 0%, 100%);
+  --syntax-gutter: hsl(228, 8%, 60%);
+  --syntax-guide: hsla(228, 10%, 26%, 0.15);
+  --syntax-accent: #4f58d6;
+}

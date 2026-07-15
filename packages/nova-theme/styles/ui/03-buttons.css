@@ -1,0 +1,341 @@
+/* Buttons — flat, rounded, with a soft accent focus ring (no gradients). */
+
+.btn {
+  --btn-padding: 0 calc(var(--ui-size) / 1.25);
+  height: initial;
+  padding: var(--btn-padding);
+  font-size: var(--ui-size);
+  line-height: var(--ui-line-height);
+  border-radius: var(--component-border-radius);
+}
+
+/* .btn-default() mixin, expanded separately for .btn and .btn.btn-default
+   to keep the per-selector specificity of the compiled Less output. */
+
+.btn {
+  color: var(--text-color);
+  text-shadow: none;
+  border: 1px solid var(--button-border-color);
+  background-color: var(--button-background-color);
+  background-image: none;
+
+  &:hover {
+    color: var(--text-color-highlight);
+    background-color: var(--button-background-color-hover);
+  }
+  &:active {
+    background: hsl(from var(--button-background-color) h s calc(l - 4));
+    box-shadow: none;
+  }
+  &.selected {
+    background: var(--button-background-color-selected);
+  }
+  &.selected:focus,
+  &.selected:hover {
+    background: hsl(from var(--button-background-color-selected) h s calc(l + 2));
+  }
+  &:focus {
+    /* unfortunately :focus styles stay even after releasing mouse. */
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 35%, transparent);
+  }
+}
+
+.btn.btn-default {
+  color: var(--text-color);
+  text-shadow: none;
+  border: 1px solid var(--button-border-color);
+  background-color: var(--button-background-color);
+  background-image: none;
+
+  &:hover {
+    color: var(--text-color-highlight);
+    background-color: var(--button-background-color-hover);
+  }
+  &:active {
+    background: hsl(from var(--button-background-color) h s calc(l - 4));
+    box-shadow: none;
+  }
+  &.selected {
+    background: var(--button-background-color-selected);
+  }
+  &.selected:focus,
+  &.selected:hover {
+    background: hsl(from var(--button-background-color-selected) h s calc(l + 2));
+  }
+  &:focus {
+    /* unfortunately :focus styles stay even after releasing mouse. */
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 35%, transparent);
+  }
+}
+
+/* .btn-variant() mixin, expanded per variant */
+
+.btn.btn-primary {
+  color: var(--accent-bg-text-color);
+  text-shadow: none;
+  border: 1px solid transparent;
+  background-color: var(--accent-bg-color);
+  background-image: none;
+
+  &:hover {
+    color: var(--accent-bg-text-color);
+    background-color: hsl(from var(--accent-bg-color) h s calc(l + 4));
+  }
+  &:active {
+    background: hsl(from var(--accent-bg-color) h s calc(l - 4));
+    box-shadow: none;
+  }
+  &.selected {
+    background: hsl(from var(--accent-bg-color) h calc(s + 20) calc(l - 12));
+  }
+  &.selected:focus,
+  &.selected:hover {
+    background: hsl(from var(--accent-bg-color) h calc(s + 20) calc(l - 10));
+  }
+  &:focus {
+    outline: none;
+    color: var(--accent-bg-text-color);
+    border-color: transparent;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-bg-color) 40%, transparent);
+  }
+
+  &.icon:before {
+    color: var(--accent-bg-text-color);
+  }
+}
+
+.btn.btn-info {
+  color: var(--text-color-on-info);
+  text-shadow: none;
+  border: 1px solid transparent;
+  background-color: var(--background-color-info);
+  background-image: none;
+
+  &:hover {
+    color: var(--text-color-on-info);
+    background-color: hsl(from var(--background-color-info) h s calc(l + 4));
+  }
+  &:active {
+    background: hsl(from var(--background-color-info) h s calc(l - 4));
+    box-shadow: none;
+  }
+  &.selected {
+    background: hsl(from var(--background-color-info) h calc(s + 20) calc(l - 12));
+  }
+  &.selected:focus,
+  &.selected:hover {
+    background: hsl(from var(--background-color-info) h calc(s + 20) calc(l - 10));
+  }
+  &:focus {
+    outline: none;
+    color: var(--text-color-on-info);
+    border-color: transparent;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--background-color-info) 40%, transparent);
+  }
+
+  &.icon:before {
+    color: var(--text-color-on-info);
+  }
+}
+
+.btn.btn-success {
+  color: var(--text-color-on-success);
+  text-shadow: none;
+  border: 1px solid transparent;
+  background-color: var(--background-color-success);
+  background-image: none;
+
+  &:hover {
+    color: var(--text-color-on-success);
+    background-color: hsl(from var(--background-color-success) h s calc(l + 4));
+  }
+  &:active {
+    background: hsl(from var(--background-color-success) h s calc(l - 4));
+    box-shadow: none;
+  }
+  &.selected {
+    background: hsl(from var(--background-color-success) h calc(s + 20) calc(l - 12));
+  }
+  &.selected:focus,
+  &.selected:hover {
+    background: hsl(from var(--background-color-success) h calc(s + 20) calc(l - 10));
+  }
+  &:focus {
+    outline: none;
+    color: var(--text-color-on-success);
+    border-color: transparent;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--background-color-success) 40%, transparent);
+  }
+
+  &.icon:before {
+    color: var(--text-color-on-success);
+  }
+}
+
+.btn.btn-warning {
+  color: var(--text-color-on-warning);
+  text-shadow: none;
+  border: 1px solid transparent;
+  background-color: var(--background-color-warning);
+  background-image: none;
+
+  &:hover {
+    color: var(--text-color-on-warning);
+    background-color: hsl(from var(--background-color-warning) h s calc(l + 4));
+  }
+  &:active {
+    background: hsl(from var(--background-color-warning) h s calc(l - 4));
+    box-shadow: none;
+  }
+  &.selected {
+    background: hsl(from var(--background-color-warning) h calc(s + 20) calc(l - 12));
+  }
+  &.selected:focus,
+  &.selected:hover {
+    background: hsl(from var(--background-color-warning) h calc(s + 20) calc(l - 10));
+  }
+  &:focus {
+    outline: none;
+    color: var(--text-color-on-warning);
+    border-color: transparent;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--background-color-warning) 40%, transparent);
+  }
+
+  &.icon:before {
+    color: var(--text-color-on-warning);
+  }
+}
+
+.btn.btn-error {
+  color: var(--text-color-on-error);
+  text-shadow: none;
+  border: 1px solid transparent;
+  background-color: var(--background-color-error);
+  background-image: none;
+
+  &:hover {
+    color: var(--text-color-on-error);
+    background-color: hsl(from var(--background-color-error) h s calc(l + 4));
+  }
+  &:active {
+    background: hsl(from var(--background-color-error) h s calc(l - 4));
+    box-shadow: none;
+  }
+  &.selected {
+    background: hsl(from var(--background-color-error) h calc(s + 20) calc(l - 12));
+  }
+  &.selected:focus,
+  &.selected:hover {
+    background: hsl(from var(--background-color-error) h calc(s + 20) calc(l - 10));
+  }
+  &:focus {
+    outline: none;
+    color: var(--text-color-on-error);
+    border-color: transparent;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--background-color-error) 40%, transparent);
+  }
+
+  &.icon:before {
+    color: var(--text-color-on-error);
+  }
+}
+
+/* Button Sizes ----------------------- */
+
+.btn.btn-xs,
+.btn-group-xs > .btn {
+  font-size: calc(var(--ui-size) * 0.8);
+  line-height: var(--ui-line-height);
+  padding: var(--btn-padding);
+}
+.btn.btn-sm,
+.btn-group-sm > .btn {
+  font-size: calc(var(--ui-size) * 0.9);
+  line-height: var(--ui-line-height);
+  padding: var(--btn-padding);
+}
+.btn.btn-lg,
+.btn-group-lg > .btn {
+  font-size: calc(var(--ui-size) * 1.5);
+  line-height: var(--ui-line-height);
+  padding: var(--btn-padding);
+}
+
+/* Button Group ----------------------- */
+
+.btn-group > .btn {
+  z-index: 0;
+  &:hover {
+    z-index: 0;
+  }
+  &.btn:focus {
+    z-index: 1;
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 35%, transparent);
+  }
+
+  &:first-child {
+    border-left: 1px solid var(--button-border-color);
+  }
+  &:last-child,
+  &.selected:last-child {
+    border-right: 1px solid var(--button-border-color);
+  }
+
+  /* hide border on colored variants */
+  &.btn-primary:first-child,
+  &.btn-info:first-child,
+  &.btn-success:first-child,
+  &.btn-warning:first-child,
+  &.btn-error:first-child {
+    border-left-color: transparent;
+  }
+
+  &.btn-primary:last-child,
+  &.btn-info:last-child,
+  &.btn-success:last-child,
+  &.btn-warning:last-child,
+  &.btn-error:last-child {
+    border-right-color: transparent;
+  }
+
+  &.selected,
+  &.selected:first-child,
+  &.selected:last-child {
+    color: var(--button-text-color-selected);
+    border-color: var(--button-border-color-selected);
+  }
+
+  :where(.theme-nova-day-ui) & {
+    &.selected + .btn {
+      border-left-color: var(--button-border-color-selected);
+    }
+    &.selected + .selected {
+      border-left-color: color-mix(
+        in srgb,
+        var(--button-border-color) 50%,
+        var(--button-border-color-selected)
+      );
+    }
+  }
+
+  &.selected:focus {
+    border-color: var(--button-background-color-selected);
+    box-shadow: 0 0 0 2px
+      color-mix(in srgb, var(--button-background-color-selected) 40%, transparent);
+  }
+}
+
+/* Button Icons ----------------------- */
+
+.btn.icon:before {
+  width: auto;
+  height: auto;
+  font-size: 1.333333em;
+  vertical-align: -0.1em;
+}

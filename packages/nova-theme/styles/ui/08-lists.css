@@ -1,0 +1,216 @@
+.list-group,
+.list-tree {
+  li:not(.list-nested-item),
+  li.list-nested-item > .list-item {
+    font-weight: normal;
+    color: var(--text-color);
+  }
+
+  /* .generate-list-item-text-color() mixin, expanded per class */
+  li:not(.list-nested-item).text-subtle,
+  li.list-nested-item.text-subtle > .list-item {
+    font-weight: normal;
+    color: var(--text-color-subtle);
+  }
+  li:not(.list-nested-item).text-info,
+  li.list-nested-item.text-info > .list-item {
+    color: var(--text-color-info);
+  }
+  li:not(.list-nested-item).text-success,
+  li.list-nested-item.text-success > .list-item {
+    color: var(--text-color-success);
+  }
+  li:not(.list-nested-item).text-warning,
+  li.list-nested-item.text-warning > .list-item {
+    color: var(--text-color-warning);
+  }
+  li:not(.list-nested-item).text-error,
+  li.list-nested-item.text-error > .list-item {
+    color: var(--text-color-error);
+  }
+  li:not(.list-nested-item).text-selected,
+  li.list-nested-item.text-selected > .list-item {
+    font-weight: normal;
+    color: var(--text-color-highlight);
+  }
+
+  /* .generate-list-item-status-color() mixin, expanded per status */
+  li:not(.list-nested-item).status-added,
+  li.list-nested-item.status-added > .list-item {
+    color: var(--text-color-added);
+  }
+  li:not(.list-nested-item).selected.status-added,
+  li.list-nested-item.selected.status-added > .list-item {
+    color: var(--text-color-added);
+  }
+
+  li:not(.list-nested-item).status-ignored,
+  li.list-nested-item.status-ignored > .list-item {
+    color: var(--text-color-ignored);
+  }
+  li:not(.list-nested-item).selected.status-ignored,
+  li.list-nested-item.selected.status-ignored > .list-item {
+    color: var(--text-color-ignored);
+  }
+
+  li:not(.list-nested-item).status-modified,
+  li.list-nested-item.status-modified > .list-item {
+    color: var(--text-color-modified);
+  }
+  li:not(.list-nested-item).selected.status-modified,
+  li.list-nested-item.selected.status-modified > .list-item {
+    color: var(--text-color-modified);
+  }
+
+  li:not(.list-nested-item).status-removed,
+  li.list-nested-item.status-removed > .list-item {
+    color: var(--text-color-removed);
+  }
+  li:not(.list-nested-item).selected.status-removed,
+  li.list-nested-item.selected.status-removed > .list-item {
+    color: var(--text-color-removed);
+  }
+
+  li:not(.list-nested-item).status-renamed,
+  li.list-nested-item.status-renamed > .list-item {
+    color: var(--text-color-renamed);
+  }
+  li:not(.list-nested-item).selected.status-renamed,
+  li.list-nested-item.selected.status-renamed > .list-item {
+    color: var(--text-color-renamed);
+  }
+
+  li:not(.list-nested-item).selected,
+  li.list-nested-item.selected > .list-item {
+    font-weight: normal;
+    color: var(--text-color-highlight);
+  }
+
+  .no-icon {
+    padding-left: calc(var(--ui-padding-icon) + var(--component-icon-size));
+  }
+}
+
+.list-tree.has-collapsable-children .list-nested-item > .list-item::before {
+  text-align: center;
+}
+
+.select-list ol.list-group {
+  li.two-lines {
+    .secondary-line {
+      color: var(--text-color-subtle);
+    }
+    &.selected .secondary-line {
+      color: rgb(from var(--text-color-highlight) r g b / 50%);
+      text-shadow: none;
+    }
+  }
+
+  /* Reset icon to allow nesting */
+  .icon {
+    display: initial;
+    height: initial;
+  }
+
+  /* We want to highlight the background of the list items because we dont
+     know their size. */
+  li.selected {
+    background-color: var(--background-color-selected);
+    border-radius: var(--component-border-radius);
+    &:before {
+      display: none;
+    }
+  }
+
+  &.mark-active {
+    --active-icon-size: 14px;
+
+    /* pad in front of the text where the icon would be We'll pad the non-
+       active items with a 'fake' icon so other classes can pad the item
+       without worrying about the icon padding. */
+    li:before {
+      content: "";
+      background-color: transparent;
+      position: static;
+      display: inline-block;
+      left: auto;
+      right: auto;
+      height: var(--active-icon-size);
+      width: var(--active-icon-size);
+      font-size: var(--active-icon-size);
+    }
+    > li:not(.active):before {
+      margin-right: var(--ui-padding-icon);
+    }
+    li.active {
+      /* .octicon(check, --active-icon-size) mixin, expanded */
+      &::before {
+        font-family: "Octicons Regular";
+        font-weight: normal;
+        font-style: normal;
+        display: inline-block;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        text-decoration: none;
+        font-size: var(--active-icon-size);
+        width: var(--active-icon-size);
+        height: var(--active-icon-size);
+        content: "\f03a"; /* @check octicon */
+      }
+      &:before {
+        margin-right: var(--ui-padding-icon);
+        color: var(--text-color-success);
+      }
+    }
+  }
+}
+
+.select-list.popover-list {
+  --popover-list-padding: calc(var(--ui-padding) / 4);
+  background-color: var(--overlay-background-color);
+  box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.3);
+  padding: var(--popover-list-padding);
+  border-radius: var(--component-border-radius);
+
+  atom-text-editor[mini] {
+    margin-bottom: var(--popover-list-padding);
+  }
+
+  ol.list-group {
+    margin-top: var(--popover-list-padding);
+  }
+
+  .list-group li {
+    padding-left: var(--popover-list-padding);
+  }
+
+  /* Un-reset icon in popover lists */
+  .icon.icon {
+    display: inline-block;
+    height: inherit;
+  }
+}
+
+.ui-sortable {
+  li {
+    line-height: 2.5;
+  }
+
+  /* For sortable lists in the settings view */
+  li.ui-sortable-placeholder {
+    visibility: visible !important;
+    background-color: hsl(from var(--pane-item-background-color) h s calc(l - 10));
+  }
+}
+
+li.ui-draggable-dragging,
+li.ui-sortable-helper {
+  line-height: var(--ui-line-height);
+  height: var(--ui-line-height);
+  border: 0;
+  border-radius: 0;
+  list-style: none;
+  padding: 0 var(--ui-padding);
+  background: var(--background-color-highlight);
+  box-shadow: 0 0 1px var(--base-border-color);
+}

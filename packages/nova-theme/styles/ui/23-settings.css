@@ -1,0 +1,150 @@
+/* Settings */
+
+.settings-view {
+  /* Menu ------------------------------ */
+
+  .config-menu {
+    position: relative;
+    min-width: calc(var(--ui-size) * 15);
+    max-width: calc(var(--ui-size) * 20);
+    border-width: 0 1px 0 0;
+    border-image: linear-gradient(var(--level-2-color) 10px, var(--base-border-color) 200px) 0 1 0 0 stretch;
+    background: var(--level-2-color);
+
+    .btn {
+      white-space: initial;
+      font-size: calc(var(--ui-size) * 0.889); /* step -1 of modular scale 1.125 */
+      line-height: 1;
+      padding: calc(var(--ui-padding) / 3) calc(var(--ui-padding) / 2);
+      &::before {
+        vertical-align: middle;
+      }
+    }
+  }
+  .nav {
+    & > li > a {
+      padding: calc(var(--ui-padding) / 2) var(--ui-padding);
+      line-height: var(--ui-line-height);
+    }
+  }
+
+  /* Sections ------------------------------ */
+
+  & > .panels {
+    background-color: var(--level-2-color);
+  }
+
+  .section-container {
+    max-width: calc(var(--ui-size) * 60);
+  }
+
+  .section,
+  .section:first-child,
+  .section:last-child {
+    padding: calc(var(--ui-padding) * 3);
+  }
+
+  .themes-panel .control-group {
+    margin-top: calc(var(--ui-padding) * 2);
+  }
+
+  /* Titles ------------------------------ */
+
+  .section .section-heading {
+    margin-bottom: calc(var(--ui-padding) / 1.5);
+  }
+
+  .sub-section-heading.icon:before,
+  .section-heading.icon:before {
+    margin-right: var(--ui-padding-icon);
+  }
+
+  /* Cards ------------------------------ */
+
+  .sub-section:not(.collapsed) .package-container {
+    padding-bottom: calc(var(--component-padding) * 3);
+  }
+
+  .package-card {
+    padding: var(--ui-padding);
+    .meta-controls .status-indicator {
+      width: calc(var(--ui-padding) / 4);
+      &:before {
+        content: "\00a0"; /* fixes 0 height */
+      }
+    }
+  }
+
+  /* Components ------------------------------ */
+
+  .icon::before {
+    color: var(--text-color-subtle);
+  }
+
+  .editor-container {
+    margin: var(--ui-padding) 0;
+  }
+
+  .form-control {
+    font-size: calc(var(--ui-size) * 1.25);
+    height: var(--ui-line-height);
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .update-all-button {
+    font-size: 0.75em;
+  }
+
+  /* .btn-variant(@accent-bg-color) inlined, flat; contrast() -> --accent-bg-text-color */
+  .install-button {
+    color: var(--accent-bg-text-color);
+    text-shadow: none;
+    border: 1px solid transparent;
+    background-color: var(--accent-bg-color);
+    background-image: none;
+
+    &:hover {
+      color: var(--accent-bg-text-color);
+      background-color: hsl(from var(--accent-bg-color) h s calc(l + 4));
+    }
+    &:active {
+      background: hsl(from var(--accent-bg-color) h s calc(l - 4));
+      box-shadow: none;
+    }
+    &.selected {
+      background: hsl(from var(--accent-bg-color) h calc(s + 20) calc(l - 12));
+    }
+    &.selected:focus,
+    &.selected:hover {
+      background: hsl(from var(--accent-bg-color) h calc(s + 20) calc(l - 10));
+    }
+    &:focus {
+      /* unfortunately :focus styles stay even after releasing mouse. */
+      outline: none;
+      color: var(--accent-bg-text-color);
+      border-color: transparent;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-bg-color) 40%, transparent);
+    }
+
+    &.icon:before {
+      color: var(--accent-bg-text-color);
+    }
+  }
+
+  input[type="checkbox"] {
+    background-color: var(--background-color-selected);
+    &:active,
+    &:checked {
+      background-color: var(--accent-color);
+    }
+    &:before,
+    &:after {
+      background-color: var(--accent-text-color);
+    }
+  }
+
+  .search-container .btn {
+    font-size: var(--ui-input-size);
+  }
+}

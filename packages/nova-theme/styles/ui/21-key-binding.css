@@ -1,0 +1,12 @@
+.key-binding {
+  display: inline-block;
+  margin-left: var(--ui-padding-icon);
+  padding: 0 calc(var(--ui-padding) / 4);
+  line-height: 2;
+  font-family: inherit;
+  font-size: max(1em, calc(var(--ui-size) * 0.85));
+  letter-spacing: calc(var(--ui-size) / 10);
+  border-radius: var(--component-border-radius);
+  color: var(--accent-bg-text-color);
+  background-color: var(--accent-bg-color);
+}

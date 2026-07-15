@@ -1,0 +1,1085 @@
+/*
+ * nova-night syntax styles — based on the one-night syntax styles (One Dark lineage).
+ * Palette lives in variables.css.
+ */
+
+/* --- editor --- */
+
+/* Editor styles (background, gutter, guides) */
+
+atom-text-editor {
+  background-color: var(--syntax-background-color);
+  color: var(--syntax-text-color);
+
+  .line.cursor-line {
+    /* needs to be semi-transparent to show search results */
+    background-color: hsla(220, 100%, 80%, 0.04);
+  }
+
+  .invisible {
+    color: var(--syntax-text-color);
+  }
+
+  .cursor {
+    border-left: 2px solid var(--syntax-cursor-color);
+  }
+
+  .selection .region {
+    background-color: var(--syntax-selection-color);
+  }
+
+  .bracket-matcher .region {
+    border-bottom: 1px solid var(--syntax-cursor-color);
+    box-sizing: border-box;
+  }
+
+  .invisible-character {
+    color: var(--syntax-invisible-character-color);
+  }
+
+  .indent-guide {
+    color: var(--syntax-indent-guide-color);
+  }
+
+  .wrap-guide {
+    background-color: var(--syntax-wrap-guide-color);
+  }
+
+  /* find + replace */
+  .find-result .region.region.region,
+  .current-result .region.region.region {
+    border-radius: 2px;
+    background-color: var(--syntax-result-marker-color);
+    transition: border-color 0.4s;
+  }
+  .find-result .region.region.region {
+    border: 2px solid transparent;
+  }
+  .current-result .region.region.region {
+    border: 2px solid var(--syntax-result-marker-color-selected);
+    transition-duration: 0.1s;
+  }
+
+  .gutter {
+    .line-number {
+      color: var(--syntax-gutter-text-color);
+      -webkit-font-smoothing: antialiased;
+
+      &.cursor-line {
+        color: var(--syntax-gutter-text-color-selected);
+        background-color: var(--syntax-gutter-background-color-selected);
+      }
+      &.cursor-line-no-selection {
+        background-color: transparent;
+      }
+
+      .icon-right {
+        color: var(--syntax-text-color);
+      }
+    }
+
+    &:not(.git-diff-icon) .line-number.git-line-removed {
+      &.git-line-removed::before {
+        bottom: -3px;
+      }
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
+        width: 25px;
+        border-bottom: 1px dotted rgb(from var(--syntax-color-removed) r g b / 50%);
+        pointer-events: none;
+      }
+    }
+  }
+
+  .gutter .line-number.folded,
+  .gutter .line-number:after,
+  .fold-marker:after {
+    color: var(--syntax-gutter-text-color-selected);
+  }
+}
+
+/* --- syntax-legacy/_base --- */
+
+/* Language syntax highlighting */
+
+.syntax--comment {
+  color: var(--mono-3);
+  font-style: italic;
+
+  .syntax--markup.syntax--link {
+    color: var(--mono-3);
+  }
+}
+
+.syntax--entity {
+  &.syntax--name.syntax--type {
+    color: var(--hue-6-2);
+  }
+
+  &.syntax--other.syntax--inherited-class {
+    color: var(--hue-6-2);
+  }
+}
+
+.syntax--keyword {
+  color: var(--hue-3);
+
+  &.syntax--control {
+    color: var(--hue-3);
+  }
+
+  &.syntax--operator {
+    color: var(--hue-3);
+  }
+
+  &.syntax--other.syntax--special-method {
+    color: var(--hue-2);
+  }
+
+  &.syntax--other.syntax--unit {
+    color: var(--hue-6);
+  }
+}
+
+.syntax--storage {
+  color: var(--hue-3);
+
+  &.syntax--type {
+    &.syntax--annotation,
+    &.syntax--primitive {
+      color: var(--hue-3);
+    }
+  }
+
+  &.syntax--modifier {
+    &.syntax--package,
+    &.syntax--import {
+      color: var(--mono-1);
+    }
+  }
+}
+
+.syntax--constant {
+  color: var(--hue-6);
+
+  &.syntax--variable {
+    color: var(--hue-6);
+  }
+
+  &.syntax--character.syntax--escape {
+    color: var(--hue-1);
+  }
+
+  &.syntax--numeric {
+    color: var(--hue-6);
+  }
+
+  &.syntax--other.syntax--color {
+    color: var(--hue-1);
+  }
+
+  &.syntax--other.syntax--symbol {
+    color: var(--hue-1);
+  }
+}
+
+/* Style `property` (anywhere in a scope name) like `variable` to keep
+   continuity of appearance after some scope name changes in
+   JavaScript/TypeScript. */
+.syntax--property {
+  color: var(--hue-5);
+}
+
+.syntax--variable {
+  color: var(--hue-5);
+
+  &.syntax--interpolation {
+    color: var(--hue-5-2);
+  }
+
+  &.syntax--parameter {
+    color: var(--mono-1);
+  }
+}
+
+.syntax--string {
+  color: var(--hue-4);
+
+  > .syntax--source,
+  .syntax--embedded {
+    color: var(--mono-1);
+  }
+
+  &.syntax--regexp {
+    color: var(--hue-1);
+
+    .syntax--source.syntax--ruby.syntax--embedded {
+      color: var(--hue-6-2);
+    }
+  }
+
+  &.syntax--other.syntax--link {
+    color: var(--hue-5);
+  }
+}
+
+.syntax--punctuation {
+  &.syntax--definition {
+    &.syntax--comment {
+      color: var(--mono-3);
+    }
+
+    &.syntax--method-parameters,
+    &.syntax--function-parameters,
+    &.syntax--parameters,
+    &.syntax--separator,
+    &.syntax--seperator,
+    &.syntax--array {
+      color: var(--mono-1);
+    }
+
+    &.syntax--bold {
+      color: var(--hue-6-2);
+      font-weight: bold;
+    }
+
+    &.syntax--italic {
+      color: var(--hue-3);
+      font-style: italic;
+    }
+  }
+
+  &.syntax--section {
+    &.syntax--embedded {
+      color: var(--hue-5-2);
+    }
+
+    &.syntax--method,
+    &.syntax--class,
+    &.syntax--inner-class {
+      color: var(--mono-1);
+    }
+  }
+}
+
+.syntax--support {
+  &.syntax--class,
+  &.syntax--module {
+    color: var(--hue-6-2);
+  }
+
+  &.syntax--namespace {
+    color: var(--hue-6-2);
+  }
+
+  &.syntax--type {
+    color: var(--hue-1);
+  }
+
+  &.syntax--other {
+    &.syntax--function {
+      color: var(--hue-2);
+    }
+  }
+
+  &.syntax--function {
+    color: var(--hue-1);
+
+    &.syntax--any-method {
+      color: var(--hue-2);
+    }
+  }
+}
+
+.syntax--entity {
+  &.syntax--name.syntax--function {
+    color: var(--hue-2);
+  }
+
+  &.syntax--name.syntax--class,
+  &.syntax--name.syntax--type.syntax--class {
+    color: var(--hue-6-2);
+  }
+
+  &.syntax--name.syntax--section {
+    color: var(--hue-2);
+  }
+
+  &.syntax--name.syntax--tag {
+    color: var(--hue-5);
+  }
+
+  &.syntax--other.syntax--attribute-name {
+    color: var(--hue-6);
+
+    &.syntax--id {
+      color: var(--hue-2);
+    }
+  }
+}
+
+.syntax--meta {
+  &.syntax--class:not(.syntax--block) {
+    color: var(--hue-6-2);
+
+    &.syntax--body {
+      color: var(--mono-1);
+    }
+  }
+
+  &.syntax--method-call,
+  &.syntax--method {
+    color: var(--mono-1);
+  }
+
+  &.syntax--definition {
+    &.syntax--variable {
+      color: var(--hue-5);
+    }
+  }
+
+  &.syntax--link {
+    color: var(--hue-6);
+  }
+
+  &.syntax--require {
+    color: var(--hue-2);
+  }
+
+  &.syntax--selector {
+    color: var(--hue-3);
+  }
+
+  &.syntax--separator {
+    color: var(--mono-1);
+  }
+
+  &.syntax--tag {
+    color: var(--mono-1);
+  }
+}
+
+.syntax--underline {
+  text-decoration: underline;
+}
+
+.syntax--none {
+  color: var(--mono-1);
+}
+
+.syntax--invalid {
+  &.syntax--deprecated {
+    color: hsl(from var(--syntax-color-modified) h s calc(l - 50)) !important;
+    background-color: var(--syntax-color-modified) !important;
+  }
+  &.syntax--illegal {
+    color: white !important;
+    background-color: var(--syntax-color-removed) !important;
+  }
+}
+
+/* Languages ------------------------------------------------- */
+
+.syntax--markup {
+  &.syntax--bold {
+    color: var(--hue-6);
+    font-weight: bold;
+  }
+
+  &.syntax--changed {
+    color: var(--hue-3);
+  }
+
+  &.syntax--deleted {
+    color: var(--hue-5);
+  }
+
+  &.syntax--italic {
+    color: var(--hue-3);
+    font-style: italic;
+  }
+
+  &.syntax--heading {
+    color: var(--hue-5);
+
+    .syntax--punctuation.syntax--definition.syntax--heading {
+      color: var(--hue-5);
+    }
+  }
+
+  &.syntax--link {
+    color: var(--hue-1);
+  }
+
+  &.syntax--inserted {
+    color: var(--hue-4);
+  }
+
+  &.syntax--quote {
+    color: var(--hue-6);
+  }
+
+  &.syntax--raw {
+    color: var(--hue-4);
+  }
+
+  /* Horizontal rules in GFM used to be scoped as `comment.hr`. For continuity,
+     we assign the color of a comment to this new scope. */
+  &.syntax--horizontal-rule {
+    color: var(--mono-3);
+  }
+}
+
+/* --- syntax-legacy/cs --- */
+
+.syntax--source.syntax--cs {
+  .syntax--keyword.syntax--operator {
+    color: var(--hue-3);
+  }
+}
+
+/* --- syntax-legacy/css --- */
+
+.syntax--source.syntax--css {
+  /* highlight properties/values if they are supported */
+  .syntax--property-name,
+  .syntax--property-value {
+    color: var(--mono-2);
+    &.syntax--support {
+      color: var(--mono-1);
+    }
+  }
+}
+
+/* --- syntax-legacy/elixir --- */
+
+.syntax--source.syntax--elixir {
+  .syntax--source.syntax--embedded.syntax--source {
+    color: var(--mono-1);
+  }
+  .syntax--constant.syntax--language,
+  .syntax--constant.syntax--numeric,
+  .syntax--constant.syntax--definition {
+    color: var(--hue-2);
+  }
+  .syntax--variable.syntax--definition,
+  .syntax--variable.syntax--anonymous {
+    color: var(--hue-3);
+  }
+  .syntax--parameter.syntax--variable.syntax--function {
+    color: var(--hue-6);
+    font-style: italic;
+  }
+  .syntax--quoted {
+    color: var(--hue-4);
+  }
+  .syntax--keyword.syntax--special-method,
+  .syntax--embedded.syntax--section,
+  .syntax--embedded.syntax--source.syntax--empty {
+    color: var(--hue-5);
+  }
+  .syntax--readwrite.syntax--module {
+    .syntax--punctuation {
+      color: var(--hue-5);
+    }
+  }
+  .syntax--regexp.syntax--section,
+  .syntax--regexp.syntax--string {
+    color: var(--hue-5-2);
+  }
+  .syntax--separator,
+  .syntax--keyword.syntax--operator {
+    color: var(--hue-6);
+  }
+  .syntax--variable.syntax--constant {
+    color: var(--hue-6-2);
+  }
+  .syntax--array,
+  .syntax--scope,
+  .syntax--section {
+    color: var(--mono-2);
+  }
+}
+
+/* --- syntax-legacy/gfm --- */
+
+.syntax--source.syntax--gfm {
+  .syntax--markup {
+    -webkit-font-smoothing: auto;
+  }
+
+  .syntax--link .syntax--entity {
+    color: var(--hue-2);
+  }
+
+  .syntax--punctuation.syntax--definition.syntax--list-item {
+    color: var(--hue-5);
+  }
+
+  .syntax--meta.syntax--link.syntax--text {
+    color: var(--hue-2);
+  }
+}
+
+/* --- syntax-legacy/ini --- */
+
+.syntax--source.syntax--ini {
+  .syntax--keyword.syntax--other.syntax--definition.syntax--ini {
+    color: var(--hue-5);
+  }
+}
+
+/* --- syntax-legacy/java --- */
+
+.syntax--source.syntax--java {
+  .syntax--storage {
+    &.syntax--modifier.syntax--import {
+      color: var(--hue-6-2);
+    }
+
+    &.syntax--type {
+      color: var(--hue-6-2);
+    }
+  }
+  .syntax--keyword.syntax--operator.syntax--instanceof {
+    color: var(--hue-3);
+  }
+}
+
+.syntax--source.syntax--java-properties {
+  .syntax--meta.syntax--key-pair {
+    color: var(--hue-5);
+
+    & > .syntax--punctuation {
+      color: var(--mono-1);
+    }
+  }
+}
+
+/* --- syntax-legacy/typescript --- */
+
+.syntax--source.syntax--ts {
+  .syntax--keyword.syntax--operator {
+    color: var(--hue-1);
+  }
+}
+
+.syntax--source.syntax--flow {
+  .syntax--keyword.syntax--operator {
+    color: var(--hue-1);
+  }
+}
+
+/* --- syntax-legacy/json --- */
+
+.syntax--source.syntax--json {
+  .syntax--meta.syntax--structure.syntax--dictionary.syntax--json {
+    & > .syntax--string.syntax--quoted.syntax--json {
+      color: var(--hue-5);
+
+      & > .syntax--punctuation.syntax--string {
+        color: var(--hue-5);
+      }
+    }
+  }
+
+  /* Color JSON keys differently from other strings. */
+  .syntax--meta.syntax--structure.syntax--key {
+    .syntax--string.syntax--quoted.syntax--double {
+      color: var(--hue-5);
+    }
+  }
+
+  .syntax--meta.syntax--structure.syntax--dictionary.syntax--json,
+  .syntax--meta.syntax--structure.syntax--array.syntax--json {
+    & > .syntax--value.syntax--json > .syntax--string.syntax--quoted.syntax--json,
+    &
+      > .syntax--value.syntax--json
+      > .syntax--string.syntax--quoted.syntax--json
+      > .syntax--punctuation {
+      color: var(--hue-4);
+    }
+
+    & > .syntax--constant.syntax--language.syntax--json {
+      color: var(--hue-1);
+    }
+  }
+}
+
+/* --- syntax-legacy/ng --- */
+
+.syntax--ng {
+  &.syntax--interpolation {
+    color: var(--hue-5);
+
+    &.syntax--begin,
+    &.syntax--end {
+      color: var(--hue-2);
+    }
+
+    .syntax--function {
+      color: var(--hue-5);
+
+      &.syntax--begin,
+      &.syntax--end {
+        color: var(--hue-2);
+      }
+    }
+
+    .syntax--bool {
+      color: var(--hue-6);
+    }
+
+    .syntax--bracket {
+      color: var(--mono-1);
+    }
+  }
+
+  &.syntax--pipe,
+  &.syntax--operator {
+    color: var(--mono-1);
+  }
+
+  &.syntax--tag {
+    color: var(--hue-1);
+  }
+
+  &.syntax--attribute-with-value {
+    .syntax--attribute-name {
+      color: var(--hue-6-2);
+    }
+
+    .syntax--string {
+      color: var(--hue-3);
+
+      &.syntax--begin,
+      &.syntax--end {
+        color: var(--mono-1);
+      }
+    }
+  }
+}
+
+/* --- syntax-legacy/php --- */
+
+.syntax--source.syntax--php {
+  .syntax--class.syntax--bracket {
+    color: var(--mono-1);
+  }
+}
+
+/* --- syntax/base --- */
+
+/*
+   This defines styling rules for syntax classes.
+
+   When styling rules conflict:
+   - The last rule overrides previous rules.
+   - The rule with most classes and pseudo-classes overrides the last rule.
+*/
+
+/* if for and del let = && */
+.syntax--keyword {
+  color: var(--hue-3);
+
+  /* int char float */
+  &.syntax--type {
+    color: var(--hue-1);
+  }
+
+  /* super */
+  &.syntax--function {
+    color: var(--hue-5);
+  }
+
+  /* this self */
+  &.syntax--variable {
+    color: var(--hue-5);
+  }
+}
+
+/* identifier */
+.syntax--entity {
+  color: var(--mono-1);
+
+  /* function(parameter) */
+  &.syntax--parameter {
+    color: var(--mono-1);
+  }
+
+  /* self cls iota */
+  &.syntax--support {
+    color: var(--hue-5);
+  }
+
+  /* @entity.decorator */
+  &.syntax--decorator:last-child {
+    color: var(--hue-2);
+  }
+
+  /* label: */
+  &.syntax--label {
+    text-decoration: underline;
+  }
+
+  /* function method */
+  &.syntax--function {
+    color: var(--hue-2);
+  }
+
+  /* add */
+  &.syntax--operator {
+    color: var(--hue-2);
+
+    /* %>% <=> */
+    &.syntax--symbolic {
+      color: var(--mono-1);
+    }
+  }
+
+  /* String Class int rune list */
+  &.syntax--type {
+    color: var(--hue-1);
+  }
+
+  /* div span */
+  &.syntax--tag {
+    color: var(--hue-5);
+  }
+
+  /* href src alt */
+  &.syntax--attribute {
+    color: var(--hue-6);
+  }
+}
+
+/* () [] {} => @ */
+.syntax--punctuation {
+  color: var(--mono-1);
+
+  &.syntax--accessor {
+    color: var(--mono-1);
+
+    /* . -> :: */
+    &.syntax--member,
+    &.syntax--scope {
+      color: var(--hue-3);
+    }
+  }
+
+  /* { } ~~~ */
+  &.syntax--embedded {
+    color: var(--hue-3);
+  }
+}
+
+/* "string" */
+.syntax--string {
+  color: var(--hue-4);
+
+  /* :immutable */
+  &.syntax--immutable {
+    color: var(--hue-4);
+  }
+
+  /* {placeholder} %().2f */
+  &.syntax--part {
+    color: var(--hue-1);
+  }
+
+  /* ${ } */
+  &.syntax--interpolation {
+    color: var(--hue-3);
+  }
+
+  /* /^reg[ex]?p/ */
+  &.syntax--regexp {
+    color: var(--hue-4);
+
+    /* ^ $ \b ? + i */
+    &.syntax--language {
+      color: var(--hue-3);
+    }
+
+    /* <variable> \1 */
+    &.syntax--variable {
+      color: var(--hue-2);
+    }
+
+    /* ( ) [^ ] (?= ) | */
+    &.syntax--punctuation {
+      color: var(--hue-3);
+    }
+  }
+}
+
+/* literal 4 1.3 true nil */
+.syntax--constant {
+  color: var(--hue-6);
+
+  /* &lt; 'a' */
+  &.syntax--character {
+    color: var(--hue-4);
+
+    /* \" \' \g \. */
+    &.syntax--escape {
+      color: var(--hue-4);
+    }
+
+    /* \u2661 \n \t \W . */
+    &.syntax--code {
+      color: var(--hue-1);
+    }
+  }
+}
+
+/* text */
+.syntax--text {
+  color: var(--mono-1);
+}
+
+/* __formatted__ */
+.syntax--markup {
+  /* # Heading */
+  &.syntax--heading {
+    color: var(--hue-5);
+  }
+
+  /* 1. * - */
+  &.syntax--list.syntax--punctuation {
+    color: var(--hue-5);
+  }
+
+  /* > quote */
+  &.syntax--quote {
+    color: var(--mono-3);
+    font-style: italic;
+  }
+
+  /* **bold** */
+  &.syntax--bold {
+    color: var(--hue-6);
+    font-weight: bold;
+  }
+
+  /* *italic* */
+  &.syntax--italic {
+    color: var(--hue-3);
+    font-style: italic;
+  }
+
+  /* __underline__ */
+  &.syntax--underline {
+    color: var(--hue-1);
+    text-decoration: underline;
+  }
+
+  /* ~~strike~~ */
+  &.syntax--strike {
+    color: var(--hue-5);
+  }
+
+  /* `raw` */
+  &.syntax--raw {
+    color: var(--hue-4);
+  }
+
+  /* url.com (path) */
+  &.syntax--link {
+    color: var(--hue-1);
+  }
+
+  /* [alt] ![alt] */
+  &.syntax--alt {
+    color: var(--hue-2);
+  }
+
+  /* {++ inserted ++} */
+  &.syntax--inserted {
+    color: var(--hue-4);
+
+    .syntax--punctuation {
+      color: var(--hue-4);
+    }
+  }
+
+  /* {== highlighted ==} */
+  &.syntax--highlighted {
+    color: var(--hue-4);
+
+    .syntax--punctuation {
+      color: var(--hue-4);
+    }
+  }
+
+  /* {-- deleted --} */
+  &.syntax--deleted {
+    color: var(--hue-5);
+
+    .syntax--punctuation {
+      color: var(--hue-5);
+    }
+  }
+
+  /* {~~ from~>to ~~} */
+  &.syntax--changed {
+    color: var(--hue-3);
+
+    .syntax--punctuation {
+      color: var(--hue-3);
+    }
+  }
+
+  /* {>> commented <<} */
+  &.syntax--commented {
+    color: var(--mono-3);
+
+    .syntax--punctuation {
+      color: var(--mono-3);
+    }
+  }
+}
+
+/* comment */
+.syntax--comment {
+  color: var(--mono-3);
+  font-style: italic;
+
+  /* @param TODO NOTE */
+  &.syntax--caption {
+    color: hsl(from var(--mono-3) h s calc(l + 6));
+    font-weight: bold;
+  }
+
+  /* variable function type */
+  &.syntax--term {
+    color: hsl(from var(--mono-3) h s calc(l + 9));
+  }
+
+  /* { } / . */
+  &.syntax--punctuation {
+    color: var(--mono-3);
+    font-weight: normal;
+  }
+}
+
+/* 0invalid */
+.syntax--invalid:not(.syntax--punctuation) {
+  /* §illegal */
+  &.syntax--illegal {
+    color: white !important;
+    background-color: var(--syntax-color-removed) !important;
+  }
+
+  /* obsolete() */
+  &.syntax--deprecated {
+    color: hsl(from var(--syntax-color-modified) h s calc(l - 50)) !important;
+    background-color: var(--syntax-color-modified) !important;
+  }
+}
+
+/* --- syntax/css --- */
+
+.syntax--source.syntax--css {
+  .syntax--entity {
+    /* function() */
+    &.syntax--function {
+      color: var(--mono-2);
+
+      /* url rgb */
+      &.syntax--support {
+        color: var(--hue-1);
+      }
+    }
+
+    /* .class :pseudo-class attribute */
+    &.syntax--selector {
+      color: var(--hue-6);
+
+      /* div span */
+      &.syntax--tag {
+        color: var(--hue-5);
+      }
+
+      /* #id */
+      &.syntax--id {
+        color: var(--hue-2);
+      }
+    }
+
+    /* property: constant */
+    &.syntax--property {
+      color: var(--mono-2);
+
+      /* height position border */
+      &.syntax--support {
+        color: var(--mono-1);
+      }
+    }
+
+    /* --variable */
+    &.syntax--variable {
+      color: var(--hue-5);
+    }
+  }
+
+  /* property: constant */
+  .syntax--constant {
+    color: var(--mono-2);
+
+    /* flex solid bold */
+    &.syntax--support {
+      color: var(--mono-1);
+    }
+
+    /* 3px 4em */
+    &.syntax--numeric {
+      color: var(--hue-6);
+    }
+
+    /* screen print */
+    &.syntax--media {
+      color: var(--hue-6);
+    }
+
+    /* #b294bb blue red */
+    &.syntax--color {
+      color: var(--hue-6);
+    }
+
+    /* from to */
+    &.syntax--offset {
+      color: var(--mono-1);
+    }
+
+    /* [attribute=attribute-value] */
+    &.syntax--attribute-value {
+      color: var(--hue-4);
+    }
+  }
+
+  .syntax--punctuation {
+    /* . : :: */
+    &.syntax--selector {
+      color: var(--hue-6);
+
+      /* * */
+      &.syntax--wildcard {
+        color: var(--hue-5);
+      }
+
+      /* # */
+      &.syntax--id {
+        color: var(--hue-2);
+      }
+
+      /* [] */
+      &.syntax--attribute {
+        color: var(--mono-1);
+      }
+    }
+  }
+}

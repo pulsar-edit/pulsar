@@ -1,0 +1,241 @@
+/* Tabs — Nova pill tabs
+   The tab bar is a flat strip; each tab is a rounded pill floating inside it.
+   The active pill is elevated by shade, not by borders. */
+
+.tab-bar {
+  --tab-pill-inset: 4px;
+  --tab-pill-height: calc(var(--ui-tab-height) - var(--tab-pill-inset) * 2);
+  position: relative;
+  height: var(--ui-tab-height);
+  background: var(--tab-bar-background-color);
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: 0;
+  padding: 0 var(--tab-pill-inset);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:empty {
+    display: none;
+  }
+
+  /* Tab ---------------------- */
+
+  .tab {
+    position: relative;
+    top: 0;
+    padding: 0;
+    margin: var(--tab-pill-inset) 2px 0;
+    height: var(--tab-pill-height);
+    font-size: inherit;
+    line-height: var(--tab-pill-height);
+    color: var(--tab-text-color);
+    background-color: transparent;
+    border-radius: var(--component-border-radius);
+    transition: background-color 0.08s;
+
+    &:hover:not(.active) {
+      background-color: color-mix(
+        in srgb,
+        var(--tab-background-color-active) 55%,
+        transparent
+      );
+    }
+    &.active {
+      color: var(--tab-text-color-active);
+      background-color: var(--tab-background-color-active);
+    }
+
+    /* Title ---------------------- */
+
+    .title {
+      text-align: center;
+      margin: 0 0.66em;
+    }
+
+    /* VCS coloring ---------------------- */
+    &:not(.active) .status-added {
+      color: var(--tab-inactive-status-added);
+    }
+    &:not(.active) .status-modified {
+      color: var(--tab-inactive-status-modified);
+    }
+
+    /* Icons ---------------------- */
+
+    .title.title:before {
+      margin-right: 0.3em;
+      width: auto;
+      height: auto;
+      line-height: 1;
+      font-size: 1.125em;
+      vertical-align: -0.0625em; /* Adjust center for the 0.1em font-size increase */
+    }
+
+    /* Close icon ---------------------- */
+
+    .close-icon {
+      top: calc((var(--tab-pill-height) - 1.5em) / 2);
+      right: 0.4em;
+      z-index: 2;
+      font-size: 1em;
+      width: 1.5em;
+      height: 1.5em;
+      line-height: 1.5;
+      text-align: center;
+      border-radius: calc(var(--component-border-radius) - 2px);
+      background-color: inherit;
+      overflow: hidden;
+      transform: scale(0);
+      transition: transform 0.08s;
+      &:hover {
+        color: var(--accent-bg-text-color);
+        background-color: var(--accent-bg-color);
+      }
+      &:active {
+        background-color: rgb(from var(--accent-bg-color) r g b / 50%);
+      }
+      &::before {
+        z-index: 1;
+        font-size: 1.1em;
+        vertical-align: -0.05em; /* Adjust center for the 0.1em font-size increase */
+        width: auto;
+        height: auto;
+        pointer-events: none;
+      }
+    }
+    &:hover .close-icon {
+      transform: scale(1);
+      transition-duration: 0.16s;
+    }
+  }
+
+  /* Modified icon ---------------------- */
+
+  .tab.modified {
+    &:hover .close-icon {
+      color: var(--accent-color);
+      &:hover {
+        color: var(--accent-bg-text-color);
+      }
+    }
+    &:not(:hover) .close-icon {
+      top: calc((var(--tab-pill-height) - 1.5em) / 2);
+      right: 0.4em;
+      width: 1.5em;
+      height: 1.5em;
+      line-height: 1.5;
+      color: var(--accent-color);
+      border-radius: calc(var(--component-border-radius) - 2px);
+      border: none;
+      transform: scale(1);
+      &::before {
+        content: "\f052";
+        display: inline-block;
+      }
+    }
+  }
+
+  /* Dragging ---------------------- */
+
+  .tab.is-dragging {
+    opacity: 0.5;
+
+    .close-icon,
+    &:before {
+      visibility: hidden;
+    }
+  }
+
+  .placeholder {
+    position: relative;
+    pointer-events: none;
+
+    /* bar */
+    &:before {
+      z-index: 1;
+      margin: 0;
+      width: 2px;
+      height: var(--ui-tab-height);
+      border-radius: 1px;
+      background-color: var(--accent-color);
+    }
+
+    /* arrow */
+    &:after {
+      z-index: 0;
+      top: calc(var(--ui-tab-height) / 2);
+      margin: -4px 0 0 -3px;
+      border-radius: 0;
+      border: 4px solid var(--accent-color);
+      transform: rotate(45deg);
+      background: transparent;
+    }
+
+    &:last-child {
+      &:before {
+        margin-left: -2px;
+      }
+      &:after {
+        transform: none;
+        margin-left: -10px;
+        border-color: transparent var(--accent-color) transparent transparent;
+      }
+    }
+  }
+
+  /* Overrides ---------------------- */
+
+  /* keep tabs same size when active */
+  .tab,
+  .tab.active {
+    padding-right: 0;
+    .title {
+      padding: 0;
+    }
+  }
+}
+
+/* Active/focused pane marker — a short rounded underline inside the pill
+   instead of the classic side bar. */
+
+atom-pane-axis > atom-pane.active,
+atom-pane-container > atom-pane.pane {
+  .tab.active:before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+    bottom: 0;
+    left: 0.66em;
+    right: 0.66em;
+    height: 2px;
+    border-radius: 1px;
+    background: color-mix(in srgb, var(--text-color) 33%, var(--tab-background-color-active));
+  }
+}
+.pane:focus-within {
+  .tab.active:before {
+    background: var(--accent-color);
+  }
+}
+
+/* hide marker in docks */
+atom-dock .tab-bar .tab::before {
+  display: none;
+}
+
+/* Custom tabs -------------- */
+
+.tab-bar .tab.active {
+  &[data-type$="Editor"],
+  &[data-type$="AboutView"],
+  &[data-type$="TimecopView"],
+  &[data-type$="StyleguideView"],
+  &[data-type="MarkdownPreviewView"] {
+    color: var(--tab-text-color-editor);
+    background-color: var(--tab-background-color-editor);
+  }
+}
