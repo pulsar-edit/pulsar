@@ -68,7 +68,7 @@
       "title": "Enable VCS Coloring",
       "description": "Color file names in tabs based on VCS status, similar to how file names are colored in the tree view.",
       "type": "boolean",
-      "default": false
+      "default": true
     },
     "addNewTabsAtEnd": {
       "order": 6,

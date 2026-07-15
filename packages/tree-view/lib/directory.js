@@ -145,9 +145,9 @@ module.exports = class Directory {
       newStatus = "ignored-name";
     } else {
       let status = 0;
-      if (this.isRoot) {
+      if (repo.relativize(this.path) === "") {
         // repo.getDirectoryStatus will always fail for the
-        // root because the path is relativized + concatenated with '/'
+        // repository root because the path is relativized + concatenated with '/'
         // making the matching string be '/'.  Then path.indexOf('/')
         // is run and will never match beginning of string with a leading '/'
         for (let statusPath in repo.statuses) {
