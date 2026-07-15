@@ -10,7 +10,7 @@
     "atom": "*"
   },
   "dependencies": {
-    "@lumine-code/second-mate": "https://github.com/lumine-code/second-mate.git#6d4ce175d7a3a754e36a5bbd5eec5c98b5b6abc3"
+    "@lumine-code/second-mate": "https://github.com/lumine-code/second-mate.git#c5f04791e783586ae0fb3778601cfd41cbc9d243"
   },
   "providedServices": {
     "bracket-matcher": {
