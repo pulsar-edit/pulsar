@@ -187,7 +187,14 @@ describe("TextEditorComponent", () => {
         // Get the next update promise synchronously here to ensure we don't
         // miss the update while polling the condition.
         const nextUpdatePromise = component.getNextUpdatePromise();
-        await conditionPromise(() => editor.getApproximateLongestScreenRow() === 6);
+        // Drive the requestIdleCallback-scheduled background work directly: a
+        // loaded CI renderer can starve idle callbacks (or grant them sub-2ms
+        // deadlines, below the display layer's minimum chunk) for longer than
+        // any reasonable poll timeout.
+        await conditionPromise(() => {
+          editor.doBackgroundWork({ didTimeout: false, timeRemaining: () => 100 });
+          return editor.getApproximateLongestScreenRow() === 6;
+        });
         await nextUpdatePromise;
 
         // Capture the width of the lines before requesting the width of
