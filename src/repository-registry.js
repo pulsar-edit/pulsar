@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const { CompositeDisposable, Disposable, Emitter } = require("event-kit");
+const RepositoryOperations = require("./repository-operations");
 
 const DEFAULT_EXCLUDED_DIRECTORIES = new Set([".git", "node_modules"]);
 
@@ -42,7 +43,7 @@ function pathDepth(relativePath) {
 // Owns every Git repository known to this window. Project roots are discovery
 // seeds and lifetime owners, but repository identity is independent of roots.
 module.exports = class RepositoryRegistry {
-  constructor({ project, config, notificationManager }) {
+  constructor({ project, config, notificationManager, packageManager }) {
     this.project = null;
     this.config = config;
     this.notificationManager = notificationManager;
@@ -52,6 +53,7 @@ module.exports = class RepositoryRegistry {
 
     this.entriesById = new Map();
     this.entryByRepository = new WeakMap();
+    this.operationProviders = [];
     this.bufferOwners = new Map();
     this.rootPaths = [];
     this.scanGeneration = 0;
@@ -63,6 +65,16 @@ module.exports = class RepositoryRegistry {
       this.subscriptions.add(
         this.config.onDidChange("core.repositoryScanDepth", () => this.rescan()),
         this.config.onDidChange("core.repositoryExcludedDirectories", () => this.rescan()),
+      );
+    }
+
+    if (packageManager?.serviceHub) {
+      this.subscriptions.add(
+        packageManager.serviceHub.consume(
+          "atom.repository-operation-provider",
+          "^1.0.0",
+          (provider) => this.addOperationProvider(provider),
+        ),
       );
     }
 
@@ -114,6 +126,8 @@ module.exports = class RepositoryRegistry {
     this.entriesById.clear();
     for (const entry of entries) {
       entry.destroySubscription.dispose();
+      this.disposeOperationImplementations(entry, { force: true });
+      entry.repository.setOperations?.(null);
       if (!entry.repository.isDestroyed?.()) entry.repository.destroy();
     }
 
@@ -259,6 +273,165 @@ module.exports = class RepositoryRegistry {
       entry.operationOwners.delete(token);
       this.prune(entry);
     }
+  }
+
+  addOperationProvider(provider) {
+    if (!provider || typeof provider.createRepositoryOperations !== "function") {
+      throw new TypeError(
+        "Repository operation providers must implement createRepositoryOperations(context)",
+      );
+    }
+
+    this.operationProviders.unshift(provider);
+    this.emitOperationProviderChange();
+
+    return new Disposable(() => {
+      const index = this.operationProviders.indexOf(provider);
+      if (index < 0) return;
+      this.operationProviders.splice(index, 1);
+      for (const entry of this.entriesById.values()) {
+        const record = entry.operationImplementations.get(provider);
+        if (record) {
+          entry.operationImplementations.delete(provider);
+          this.disposeOperationImplementation(record);
+        }
+      }
+      this.emitOperationProviderChange();
+    });
+  }
+
+  getOperations(repository) {
+    return this.entryByRepository.get(repository)?.operations || null;
+  }
+
+  canPerformOperation(repository, operationName) {
+    return this.findOperationImplementation(repository, operationName) != null;
+  }
+
+  getOperationCapabilities(repository) {
+    const capabilities = new Set();
+    for (const provider of this.operationProviders) {
+      const record = this.getOperationImplementation(repository, provider);
+      if (!record) continue;
+
+      for (const operationName of RepositoryOperations.standardCapabilities) {
+        if (this.operationImplementationSupports(record, operationName)) {
+          capabilities.add(operationName);
+        }
+      }
+      const customCapabilities = record.implementation.getCapabilities?.() || [];
+      for (const operationName of customCapabilities) {
+        if (this.operationImplementationSupports(record, operationName)) {
+          capabilities.add(operationName);
+        }
+      }
+    }
+    return Object.freeze(Array.from(capabilities));
+  }
+
+  performOperation(repository, operationName, args = []) {
+    if (typeof operationName !== "string" || operationName.length === 0) {
+      return Promise.reject(new TypeError("Repository operation name must be a non-empty string"));
+    }
+
+    return this.runOperation(repository, async () => {
+      const record = this.findOperationImplementation(repository, operationName);
+      if (!record) {
+        const error = new Error(`No provider implements repository operation: ${operationName}`);
+        error.code = "ERR_REPOSITORY_OPERATION_UNAVAILABLE";
+        error.operation = operationName;
+        throw error;
+      }
+
+      record.activeOperations++;
+      try {
+        const result = await record.implementation[operationName](...args);
+        await this.refreshRepositoryAfterOperation(repository);
+        return result;
+      } finally {
+        record.activeOperations--;
+        if (record.pendingDisposal && record.activeOperations === 0) {
+          record.implementation.destroy?.();
+        }
+      }
+    });
+  }
+
+  findOperationImplementation(repository, operationName) {
+    for (const provider of this.operationProviders) {
+      const record = this.getOperationImplementation(repository, provider);
+      if (record && this.operationImplementationSupports(record, operationName)) return record;
+    }
+    return null;
+  }
+
+  operationImplementationSupports(record, operationName) {
+    if (typeof record.implementation[operationName] !== "function") return false;
+    if (RepositoryOperations.standardCapabilities.includes(operationName)) return true;
+    return (record.implementation.getCapabilities?.() || []).includes(operationName);
+  }
+
+  getOperationImplementation(repository, provider) {
+    const entry = this.entryByRepository.get(repository);
+    if (!entry || !this.operationProviders.includes(provider)) return null;
+    if (entry.operationImplementations.has(provider)) {
+      return entry.operationImplementations.get(provider);
+    }
+
+    const implementation = provider.createRepositoryOperations({
+      repository,
+      workingDirectory: entry.workingDirectory,
+      gitDirectory: repository.getPath?.() || null,
+    });
+    const record = implementation
+      ? { implementation, activeOperations: 0, pendingDisposal: false }
+      : null;
+    entry.operationImplementations.set(provider, record);
+    return record;
+  }
+
+  disposeOperationImplementation(record, { force = false } = {}) {
+    if (!record) return;
+    if (!force && record.activeOperations > 0) {
+      record.pendingDisposal = true;
+    } else {
+      record.implementation.destroy?.();
+    }
+  }
+
+  disposeOperationImplementations(entry, options) {
+    for (const record of entry.operationImplementations.values()) {
+      this.disposeOperationImplementation(record, options);
+    }
+    entry.operationImplementations.clear();
+  }
+
+  async refreshRepositoryAfterOperation(repository) {
+    if (repository.isDestroyed?.()) return;
+    try {
+      repository.refreshIndex?.();
+      await repository.refreshStatus?.();
+    } catch (error) {
+      // The Git command has already succeeded. Never report it as failed (and
+      // invite a dangerous retry) merely because the read cache did not refresh.
+      this.notificationManager?.addWarning("Repository refresh failed after Git operation", {
+        detail: error.message,
+        dismissable: true,
+      });
+    }
+  }
+
+  emitOperationProviderChange() {
+    if (this.destroyed || this.entriesById.size === 0) return;
+    const repositories = this.getRepositories();
+    this.emitChange({
+      added: [],
+      removed: [],
+      updated: repositories,
+      rootsAdded: [],
+      rootsRemoved: [],
+      routingChangedPrefixes: [],
+    });
   }
 
   async add(filePath, { persist = true } = {}) {
@@ -614,6 +787,8 @@ module.exports = class RepositoryRegistry {
       manualOwners: new Set(),
       pins: new Set(),
       operationOwners: new Set(),
+      operationImplementations: new Map(),
+      operations: null,
       missing: false,
       newlyRegistered: true,
       removing: false,
@@ -630,6 +805,8 @@ module.exports = class RepositoryRegistry {
 
     this.entriesById.set(id, entry);
     this.entryByRepository.set(repository, entry);
+    entry.operations = new RepositoryOperations(this, repository);
+    repository.setOperations?.(entry.operations);
 
     if (emit) {
       entry.newlyRegistered = false;
@@ -690,6 +867,8 @@ module.exports = class RepositoryRegistry {
     entry.removing = true;
     this.entriesById.delete(entry.id);
     entry.destroySubscription.dispose();
+    this.disposeOperationImplementations(entry);
+    entry.repository.setOperations?.(null);
 
     if (destroy && !entry.repository.isDestroyed?.()) entry.repository.destroy();
 

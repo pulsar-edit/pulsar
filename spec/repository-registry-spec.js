@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const { Emitter } = require("event-kit");
+const { Disposable, Emitter } = require("event-kit");
 const temp = require("temp").track();
 
 const RepositoryRegistry = require("../src/repository-registry");
@@ -13,6 +13,9 @@ class FakeRepository {
     fs.mkdirSync(this.gitDirectory, { recursive: true });
     this.emitter = new Emitter();
     this.destroyed = false;
+    this.operations = null;
+    this.refreshIndexCount = 0;
+    this.refreshStatusCount = 0;
   }
 
   getWorkingDirectory() {
@@ -29,6 +32,22 @@ class FakeRepository {
 
   isPresent() {
     return fs.existsSync(this.gitDirectory);
+  }
+
+  setOperations(operations) {
+    this.operations = operations;
+  }
+
+  getOperations() {
+    return this.operations;
+  }
+
+  refreshIndex() {
+    this.refreshIndexCount++;
+  }
+
+  async refreshStatus() {
+    this.refreshStatusCount++;
   }
 
   onDidDestroy(callback) {
@@ -272,6 +291,170 @@ describe("RepositoryRegistry", () => {
 
     completeOperation("done");
     expect(await operation).toBe("done");
+    expect(repository.isDestroyed()).toBe(true);
+  });
+
+  it("assigns a stable write facade when a repository is registered", () => {
+    const workdir = temp.mkdirSync("repository-operations-facade");
+    const repository = new FakeRepository(workdir);
+    repositories.push(repository);
+
+    registry.setProjectRoots([directoryFor(workdir)]);
+
+    expect(repository.getOperations()).toBe(registry.getOperations(repository));
+    expect(repository.getOperations().isAvailable()).toBe(false);
+  });
+
+  it("consumes operation providers directly from the package service hub", async () => {
+    registry.destroy();
+    let consumeService;
+    let consumeVersion;
+    let consumeCallback;
+    const packageManager = {
+      serviceHub: {
+        consume(service, version, callback) {
+          consumeService = service;
+          consumeVersion = version;
+          consumeCallback = callback;
+          return new Disposable();
+        },
+      },
+    };
+    registry = new RepositoryRegistry({ project, config: config(), packageManager });
+    const workdir = temp.mkdirSync("operation-provider-service");
+    const repository = new FakeRepository(workdir);
+    repositories.push(repository);
+    registry.setProjectRoots([directoryFor(workdir)]);
+
+    consumeCallback({
+      createRepositoryOperations() {
+        return { commit: async () => "service-commit" };
+      },
+    });
+
+    expect(consumeService).toBe("atom.repository-operation-provider");
+    expect(consumeVersion).toBe("^1.0.0");
+    expect(await repository.getOperations().commit("Subject")).toBe("service-commit");
+  });
+
+  it("dispatches writes through a provider that arrives after discovery", async () => {
+    const workdir = temp.mkdirSync("late-operation-provider");
+    const repository = new FakeRepository(workdir);
+    const commits = [];
+    let providerContext;
+    repositories.push(repository);
+    registry.setProjectRoots([directoryFor(workdir)]);
+    const operations = repository.getOperations();
+
+    registry.addOperationProvider({
+      createRepositoryOperations(context) {
+        providerContext = context;
+        return {
+          async commit(message, options) {
+            commits.push({ message, options });
+            return "created-commit";
+          },
+        };
+      },
+    });
+
+    expect(operations.isAvailable("commit")).toBe(true);
+    expect(operations.getCapabilities()).toContain("commit");
+    expect(await operations.commit("Subject", { amend: true })).toBe("created-commit");
+    expect(providerContext).toEqual({
+      repository,
+      workingDirectory: workdir,
+      gitDirectory: repository.getPath(),
+    });
+    expect(commits).toEqual([{ message: "Subject", options: { amend: true } }]);
+    expect(repository.refreshIndexCount).toBe(1);
+    expect(repository.refreshStatusCount).toBe(1);
+  });
+
+  it("does not report a successful write as failed when cache refresh fails", async () => {
+    const workdir = temp.mkdirSync("failed-operation-refresh");
+    const repository = new FakeRepository(workdir);
+    repositories.push(repository);
+    registry.setProjectRoots([directoryFor(workdir)]);
+    repository.refreshStatus = async () => {
+      throw new Error("refresh failed");
+    };
+    registry.addOperationProvider({
+      createRepositoryOperations() {
+        return { commit: async () => "created-commit" };
+      },
+    });
+
+    expect(await repository.getOperations().commit("Subject")).toBe("created-commit");
+  });
+
+  it("reports an unavailable operation with a stable error code", async () => {
+    const workdir = temp.mkdirSync("unavailable-operation");
+    const repository = new FakeRepository(workdir);
+    repositories.push(repository);
+    registry.setProjectRoots([directoryFor(workdir)]);
+
+    let error;
+    try {
+      await repository.getOperations().push("origin", "main");
+    } catch (caughtError) {
+      error = caughtError;
+    }
+
+    expect(error.code).toBe("ERR_REPOSITORY_OPERATION_UNAVAILABLE");
+    expect(error.operation).toBe("push");
+  });
+
+  it("only exposes explicitly declared provider extensions", async () => {
+    const workdir = temp.mkdirSync("custom-operation-capability");
+    const repository = new FakeRepository(workdir);
+    repositories.push(repository);
+    registry.setProjectRoots([directoryFor(workdir)]);
+    registry.addOperationProvider({
+      createRepositoryOperations() {
+        return {
+          customWrite: async () => "custom-result",
+          internalHelper: async () => "must-not-be-public",
+          getCapabilities: () => ["customWrite"],
+        };
+      },
+    });
+
+    const operations = repository.getOperations();
+    expect(operations.getCapabilities()).toContain("customWrite");
+    expect(await operations.execute("customWrite")).toBe("custom-result");
+    expect(operations.isAvailable("internalHelper")).toBe(false);
+  });
+
+  it("keeps an active provider implementation alive until its write completes", async () => {
+    const workdir = temp.mkdirSync("active-operation-provider");
+    const repository = new FakeRepository(workdir);
+    let finishCommit;
+    let destroyCount = 0;
+    repositories.push(repository);
+    registry.setProjectRoots([directoryFor(workdir)]);
+    const providerDisposable = registry.addOperationProvider({
+      createRepositoryOperations() {
+        return {
+          commit() {
+            return new Promise((resolve) => (finishCommit = resolve));
+          },
+          destroy() {
+            destroyCount++;
+          },
+        };
+      },
+    });
+
+    const commit = repository.getOperations().commit("Subject");
+    registry.setProjectRoots([]);
+    providerDisposable.dispose();
+    expect(repository.isDestroyed()).toBe(false);
+    expect(destroyCount).toBe(0);
+
+    finishCommit("done");
+    expect(await commit).toBe("done");
+    expect(destroyCount).toBe(1);
     expect(repository.isDestroyed()).toBe(true);
   });
 

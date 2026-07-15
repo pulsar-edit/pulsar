@@ -91,6 +91,7 @@ module.exports = class GitRepository {
 
     this.project = options.project;
     this.config = options.config;
+    this.operations = null;
 
     if (options.refreshOnWindowFocus || options.refreshOnWindowFocus == null) {
       const onWindowFocus = () => {
@@ -118,6 +119,7 @@ module.exports = class GitRepository {
   // libgit2 repository handle. This method is idempotent.
   destroy() {
     this.repo = null;
+    this.operations = null;
 
     if (this.emitter) {
       this.emitter.emit("did-destroy");
@@ -139,6 +141,16 @@ module.exports = class GitRepository {
   // Public: Returns whether this repository's Git directory still exists.
   isPresent() {
     return !this.isDestroyed() && fs.existsSync(this.path || this.getPath());
+  }
+
+  // Public: Returns the stable write facade assigned by atom.repositories.
+  // Its methods are enabled by atom.repository-operation-provider services.
+  getOperations() {
+    return this.operations;
+  }
+
+  setOperations(operations) {
+    this.operations = operations;
   }
 
   // Public: Invoke the given callback when this GitRepository's destroy() method

@@ -161,6 +161,7 @@ class AtomEnvironment {
     this.repositories = new RepositoryRegistry({
       config: this.config,
       notificationManager: this.notifications,
+      packageManager: this.packages,
     });
     /** @type {Project} */
     this.project = new Project({
