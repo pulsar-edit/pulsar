@@ -33,6 +33,12 @@ module.exports = {
           root.removeAttribute("ui-sticky-headers");
         }
       }),
+      // Selects the One themes for both modes; the active pair follows
+      // theme.mode as usual.
+      atom.commands.add("atom-workspace", "one-theme:select", () => {
+        atom.config.set("theme.light", ["one-day-ui", "one-day-syntax"]);
+        atom.config.set("theme.dark", ["one-night-ui", "one-night-syntax"]);
+      }),
     );
   },
 

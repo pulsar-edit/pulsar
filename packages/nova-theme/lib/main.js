@@ -35,6 +35,12 @@ module.exports = {
           root.removeAttribute("nova-sticky-headers");
         }
       }),
+      // Selects the Nova themes for both modes; the active pair follows
+      // theme.mode as usual.
+      atom.commands.add("atom-workspace", "nova-theme:select", () => {
+        atom.config.set("theme.light", ["nova-day-ui", "nova-day-syntax"]);
+        atom.config.set("theme.dark", ["nova-night-ui", "nova-night-syntax"]);
+      }),
     );
   },
 

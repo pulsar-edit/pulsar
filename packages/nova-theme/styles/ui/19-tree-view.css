@@ -51,6 +51,15 @@
     pointer-events: none;
   }
 
+  /* Project root headers are taller than plain rows and span the full panel
+     width; match their hover bar to the selection style. */
+  .project-root.project-root:not(.selected):not(:has(li:hover)):hover::before {
+    height: var(--ui-tab-height);
+    left: 0;
+    right: 0;
+    border-radius: 0;
+  }
+
   /* Keep the row's content above the hover bar. */
   li.list-item:not(.list-nested-item):not(.selected):hover > *,
   .list-nested-item:not(.selected):not(:has(li:hover)):hover > .list-item {

@@ -37,4 +37,13 @@ describe("one-theme", () => {
     expect(root.hasAttribute("ui-tabsizing")).toBe(false);
     expect(root.hasAttribute("ui-dock-buttons")).toBe(false);
   });
+
+  it("selects its theme pairs with the select command", async () => {
+    await atom.packages.activatePackage("one-theme");
+
+    atom.commands.dispatch(atom.views.getView(atom.workspace), "one-theme:select");
+
+    expect(atom.config.get("theme.light")).toEqual(["one-day-ui", "one-day-syntax"]);
+    expect(atom.config.get("theme.dark")).toEqual(["one-night-ui", "one-night-syntax"]);
+  });
 });

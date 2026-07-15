@@ -10,6 +10,12 @@ The Nova themes for Lumine: modern day and night UI and syntax themes.
 - **Borderless layering**: panels are separated by background shades instead of hard borders wherever possible.
 - **Configurable tabs and docks**: tab sizing, close-button position, dock toggle buttons, and sticky tree-view headers.
 
+## Commands
+
+Commands available in `atom-workspace`:
+
+- `nova-theme:select`: sets the Nova day and night pairs as the light and dark themes.
+
 ## Contributing
 
 Got ideas to make this package better, found a bug, or want to help add new features? Just drop your thoughts on GitHub. Any feedback is welcome!
