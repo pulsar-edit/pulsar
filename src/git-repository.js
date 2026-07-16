@@ -5,6 +5,8 @@ const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
 const GitUtils = require("@lumine-code/git-utils");
 const DugiteRepositoryStatusProvider = require("./dugite-repository-status-provider");
 const DugiteRepositoryRefsProvider = require("./dugite-repository-refs-provider");
+const DugiteRepositoryDiffProvider = require("./dugite-repository-diff-provider");
+const { parseDiffPatch } = require("./repository-diff");
 const { EMPTY_STATUS_SNAPSHOT, parseStatusSnapshot } = require("./repository-status-snapshot");
 const { EMPTY_REFS_SNAPSHOT, parseRefsSnapshot } = require("./repository-refs-snapshot");
 
@@ -130,6 +132,7 @@ module.exports = class GitRepository {
     this.refsSnapshotDebounceMs = options.refsSnapshotDebounceMs ?? 150;
     this.refsSnapshotRefreshTimer = null;
     this.pendingRefsSnapshotLoad = null;
+    this.diffProvider = options.diffProvider || new DugiteRepositoryDiffProvider();
     this.upstream = { ahead: 0, behind: 0 };
     for (let submodulePath in this.repo.submodules) {
       const submoduleRepo = this.repo.submodules[submodulePath];
@@ -171,6 +174,7 @@ module.exports = class GitRepository {
     this.operations = null;
     this.statusSnapshotProvider = null;
     this.refsSnapshotProvider = null;
+    this.diffProvider = null;
     this.statusEntriesByPath.clear();
     this.directoryStatusAggregates.clear();
     if (this.statusSnapshotRefreshTimer != null) {
@@ -770,6 +774,58 @@ module.exports = class GitRepository {
     this.refsSnapshotCacheKey = cacheKey;
     this.emitter.emit("did-change-refs-snapshot", snapshot);
     return snapshot;
+  }
+
+  // Public: Compute a structured diff between two endpoints.
+  //
+  // * `options` An {Object} with the following keys:
+  //   * `from` and `to`, endpoint objects — one of `{type: "commit", revision}`,
+  //     `{type: "index"}`, `{type: "worktree"}`, `{type: "file", path}`, or
+  //     `{type: "empty"}`. Supported pairs: index→worktree (default),
+  //     commit→index, commit→worktree, commit→commit, file→file, empty↔file.
+  //   * `paths` An {Array} of pathspecs limiting the diff.
+  //   * `context` {Number} of context lines (default 3).
+  //   * `ignoreWhitespace` {Boolean} to pass `--ignore-all-space`.
+  //   * `maxBytes` {Number} output limit; exceeding it rejects with an error
+  //     whose `code` is `ERR_GIT_DIFF_TOO_LARGE`.
+  //   * `signal` An `AbortSignal` for cancellation.
+  //
+  // Returns a {Promise} resolving to a frozen
+  // `{schemaVersion, files, rawPatch}` object; each file carries paths,
+  // status, similarity, binary flag, modes, and hunks with classified lines.
+  async getDiff({
+    from = { type: "index" },
+    to = { type: "worktree" },
+    paths = [],
+    context = 3,
+    ignoreWhitespace = false,
+    maxBytes = 10 * 1024 * 1024,
+    signal,
+  } = {}) {
+    const provider = this.diffProvider;
+    if (!provider || this.isDestroyed()) throw new Error("Repository has been destroyed");
+
+    let rawPatch;
+    try {
+      rawPatch = await provider.getDiffPatch(
+        this.getWorkingDirectory(),
+        { from, to, paths, context, ignoreWhitespace },
+        { maxBuffer: maxBytes, signal },
+      );
+    } catch (error) {
+      if (error?.code === "ERR_CHILD_PROCESS_STDIO_MAXBUFFER") {
+        const tooLarge = new Error(
+          `Git diff output exceeded the ${maxBytes} byte limit; raise maxBytes or narrow paths`,
+        );
+        tooLarge.code = "ERR_GIT_DIFF_TOO_LARGE";
+        tooLarge.cause = error;
+        throw tooLarge;
+      }
+      throw error;
+    }
+
+    const { files } = parseDiffPatch(rawPatch);
+    return Object.freeze({ schemaVersion: 1, files, rawPatch });
   }
 
   // Public: Returns true if the given status indicates modification.
