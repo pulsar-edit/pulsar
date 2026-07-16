@@ -85,6 +85,13 @@
       "type": "property"
     },
     {
+      "name": "repositories",
+      "text": "repositories",
+      "description": "A {RepositoryRegistry} instance.",
+      "leftLabel": "RepositoryRegistry",
+      "type": "property"
+    },
+    {
       "name": "styles",
       "text": "styles",
       "description": "A {StyleManager} instance.",
@@ -1372,6 +1379,22 @@
       "type": "method"
     },
     {
+      "name": "ensureRefsSnapshot",
+      "text": null,
+      "snippet": "ensureRefsSnapshot(${1:options})",
+      "description": "Resolve with an initialized refs snapshot, loading it on first\ncall. Concurrent callers share one in-flight refresh.",
+      "leftLabel": "Promise",
+      "type": "method"
+    },
+    {
+      "name": "ensureStatusSnapshot",
+      "text": null,
+      "snippet": "ensureStatusSnapshot(${1:options})",
+      "description": "Resolve with an initialized status snapshot, loading it on first\ncall. Concurrent callers share one in-flight refresh.",
+      "leftLabel": "Promise",
+      "type": "method"
+    },
+    {
       "name": "getAheadBehindCount",
       "text": null,
       "snippet": "getAheadBehindCount(${1:reference}, ${2:path})",
@@ -1380,11 +1403,11 @@
       "type": "method"
     },
     {
-      "name": "getCachedPathStatus",
+      "name": "getBlame",
       "text": null,
-      "snippet": "getCachedPathStatus(${1:path})",
-      "description": "Get the cached status for the given path.",
-      "leftLabel": "Number",
+      "snippet": "getBlame(${1:filePath}, ${2:options})",
+      "description": "Read line-by-line blame for a file.",
+      "leftLabel": "Promise",
       "type": "method"
     },
     {
@@ -1396,11 +1419,35 @@
       "type": "method"
     },
     {
+      "name": "getCommit",
+      "text": null,
+      "snippet": "getCommit(${1:sha})",
+      "description": "Read one commit with its changed-file summary.",
+      "leftLabel": "Promise",
+      "type": "method"
+    },
+    {
+      "name": "getCommits",
+      "text": null,
+      "snippet": "getCommits(${1:options})",
+      "description": "Read paginated commit history.",
+      "leftLabel": "Promise",
+      "type": "method"
+    },
+    {
       "name": "getConfigValue",
       "text": null,
       "snippet": "getConfigValue(${1:key}, ${2:path})",
       "description": "",
       "leftLabel": null,
+      "type": "method"
+    },
+    {
+      "name": "getDiff",
+      "text": null,
+      "snippet": "getDiff(${1:options})",
+      "description": "Compute a structured diff between two endpoints.",
+      "leftLabel": "Promise",
       "type": "method"
     },
     {
@@ -1412,11 +1459,18 @@
       "type": "method"
     },
     {
-      "name": "getDirectoryStatus",
+      "name": "getDirectoryStatusSummary",
       "text": null,
-      "snippet": "getDirectoryStatus(${1:directoryPath})",
-      "description": "Get the status of a directory in the repository's working directory.",
-      "leftLabel": "Number",
+      "snippet": "getDirectoryStatusSummary(${1:directoryPath})",
+      "description": "Aggregate classified status for a directory, including the\nrepository root. Same sourcing and shape as {::getPathStatusSummary}\n(without `renamed`); returns `null` when nothing below the directory has\na reportable status.",
+      "type": "method"
+    },
+    {
+      "name": "getFileAtRevision",
+      "text": null,
+      "snippet": "getFileAtRevision(${1:filePath}, ${2:revision}, ${3:options})",
+      "description": "Read a file's contents at a revision.",
+      "leftLabel": "Promise",
       "type": "method"
     },
     {
@@ -1425,6 +1479,14 @@
       "snippet": "getLineDiffs(${1:path}, ${2:text})",
       "description": "Retrieves the line diffs comparing the `HEAD` version of the given\npath and the given text.",
       "leftLabel": "Array",
+      "type": "method"
+    },
+    {
+      "name": "getOperations",
+      "text": "getOperations()",
+      "snippet": null,
+      "description": "",
+      "leftLabel": null,
       "type": "method"
     },
     {
@@ -1444,11 +1506,11 @@
       "type": "method"
     },
     {
-      "name": "getPathStatus",
+      "name": "getPathStatusSummary",
       "text": null,
-      "snippet": "getPathStatus(${1:path})",
-      "description": "Get the status of a single path in the repository.",
-      "leftLabel": "Number",
+      "snippet": "getPathStatusSummary(${1:filePath})",
+      "description": "Classified status for one path, independent of git-utils status\nbits. Prefers the detailed status snapshot when it has loaded and falls\nback to the synchronous cache, so consumers paint instantly on startup and\nupgrade automatically. Paths only the synchronous cache knows (files\ninside submodules) always use the cache.",
+      "leftLabel": null,
       "type": "method"
     },
     {
@@ -1468,11 +1530,32 @@
       "type": "method"
     },
     {
+      "name": "getRefsSnapshot",
+      "text": "getRefsSnapshot()",
+      "snippet": null,
+      "description": "Return the latest immutable refs snapshot. It contains `head`,\nlocal `branches` with upstream tracking, `remoteBranches`, `tags`,\n`remotes` with fetch and push URLs, `worktrees`, and a monotonic\n`generation`. The initial snapshot has `initialized: false`; subscribe\nwith {::onDidChangeRefsSnapshot} or call {::ensureRefsSnapshot} to load\nit.",
+      "type": "method"
+    },
+    {
       "name": "getShortHead",
       "text": null,
       "snippet": "getShortHead(${1:path})",
       "description": "Retrieves a shortened version of the HEAD reference value.",
       "leftLabel": "String",
+      "type": "method"
+    },
+    {
+      "name": "getStatusEntry",
+      "text": null,
+      "snippet": "getStatusEntry(${1:filePath})",
+      "description": "Return detailed cached status for a repository path, or `null`.",
+      "type": "method"
+    },
+    {
+      "name": "getStatusSnapshot",
+      "text": "getStatusSnapshot()",
+      "snippet": null,
+      "description": "Return the latest immutable detailed status snapshot. It contains\n`head`, `upstream`, per-file staged/unstaged/conflict state, aggregate\n`counts`, and a monotonic `generation`. The initial snapshot has\n`initialized: false`; subscribe with {::onDidChangeStatusSnapshot} or call\n{::ensureStatusSnapshot} to load it.",
       "type": "method"
     },
     {
@@ -1540,25 +1623,17 @@
       "type": "method"
     },
     {
-      "name": "isProjectAtRoot",
-      "text": "isProjectAtRoot()",
+      "name": "isPresent",
+      "text": "isPresent()",
       "snippet": null,
       "description": "",
       "leftLabel": null,
       "type": "method"
     },
     {
-      "name": "isStatusModified",
-      "text": null,
-      "snippet": "isStatusModified(${1:status})",
-      "description": "",
-      "leftLabel": null,
-      "type": "method"
-    },
-    {
-      "name": "isStatusNew",
-      "text": null,
-      "snippet": "isStatusNew(${1:status})",
+      "name": "isProjectAtRoot",
+      "text": "isProjectAtRoot()",
+      "snippet": null,
       "description": "",
       "leftLabel": null,
       "type": "method"
@@ -1572,10 +1647,26 @@
       "type": "method"
     },
     {
+      "name": "onDidChangeRefsSnapshot",
+      "text": null,
+      "snippet": "onDidChangeRefsSnapshot(${1:callback})",
+      "description": "Invoke the given callback when the repository refs snapshot\nchanges. Subscribing declares interest exactly like\n{::onDidChangeStatusSnapshot}: the first subscriber triggers a lazy load\nand refs stay fresh with debounced background refreshes.",
+      "leftLabel": "Disposable",
+      "type": "method"
+    },
+    {
       "name": "onDidChangeStatus",
       "text": null,
       "snippet": "onDidChangeStatus(${1:callback})",
       "description": "Invoke the given callback when a specific file's status has\nchanged. When a file is updated, reloaded, etc, and the status changes, this\nwill be fired.",
+      "leftLabel": "Disposable",
+      "type": "method"
+    },
+    {
+      "name": "onDidChangeStatusSnapshot",
+      "text": null,
+      "snippet": "onDidChangeStatusSnapshot(${1:callback})",
+      "description": "Invoke the given callback when the detailed repository status\nsnapshot changes.",
       "leftLabel": "Disposable",
       "type": "method"
     },
@@ -1593,6 +1684,20 @@
       "snippet": "onDidDestroy(${1:callback})",
       "description": "Invoke the given callback when this GitRepository's destroy() method\nis invoked.",
       "leftLabel": "Disposable",
+      "type": "method"
+    },
+    {
+      "name": "refreshRefsSnapshot",
+      "text": null,
+      "snippet": "refreshRefsSnapshot(${1:options})",
+      "description": "Refresh the refs snapshot with Dugite. Reads branches, tags,\nremotes, worktrees, and the exact HEAD state in one pass; stale\nout-of-order responses are discarded and identical raw output does not\nemit a change event.",
+      "type": "method"
+    },
+    {
+      "name": "refreshStatusSnapshot",
+      "text": null,
+      "snippet": "refreshStatusSnapshot(${1:options})",
+      "description": "Refresh the detailed branch and file status snapshot with Dugite.\nThis is intentionally independent from the synchronous git-utils cache so\nhot path coloring never waits for a Git subprocess.",
       "type": "method"
     },
     {
@@ -2735,13 +2840,6 @@
       "type": "method"
     },
     {
-      "name": "getRepositories",
-      "text": "getRepositories()",
-      "snippet": null,
-      "description": "Get an {Array} of {GitRepository}s associated with the project's\ndirectories.",
-      "type": "method"
-    },
-    {
       "name": "getWatcherPromise",
       "text": null,
       "snippet": "getWatcherPromise(${1:projectPath})",
@@ -2758,26 +2856,10 @@
       "type": "method"
     },
     {
-      "name": "observeRepositories",
-      "text": null,
-      "snippet": "observeRepositories(${1:callback})",
-      "description": "Invoke the given callback with all current and future\nrepositories in the project.",
-      "leftLabel": "Disposable",
-      "type": "method"
-    },
-    {
       "name": "onDidAddBuffer",
       "text": null,
       "snippet": "onDidAddBuffer(${1:callback})",
       "description": "Invoke the given callback when a text buffer is added to the\nproject.",
-      "leftLabel": "Disposable",
-      "type": "method"
-    },
-    {
-      "name": "onDidAddRepository",
-      "text": null,
-      "snippet": "onDidAddRepository(${1:callback})",
-      "description": "Invoke the given callback when a repository is added to the\nproject.",
       "leftLabel": "Disposable",
       "type": "method"
     },
