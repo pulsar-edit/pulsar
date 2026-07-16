@@ -39,6 +39,10 @@ describe("HistoryManager", () => {
 
   afterEach(async () => {
     await stateStore.clear();
+    // Release the connection so its WAL lock on the shared session store is not
+    // held across every spec in this file, which intermittently starved later
+    // specs' connections on CI.
+    stateStore.close();
   });
 
   describe("constructor", () => {
