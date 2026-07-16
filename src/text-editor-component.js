@@ -2738,7 +2738,12 @@ module.exports = class TextEditorComponent {
   measureLongestLineWidth() {
     if (this.longestLineToMeasure) {
       const lineComponent = this.lineComponentsByScreenLineId.get(this.longestLineToMeasure.id);
-      this.measurements.longestLineWidth = lineComponent.element.firstChild.offsetWidth;
+      // Use the fractional bounding-box width rather than the integer
+      // `offsetWidth`. `getContentWidth` ceils this, so a rounded-down
+      // `offsetWidth` could leave the content box ~1px short of the real line,
+      // clipping the last glyph and stopping horizontal scroll early.
+      this.measurements.longestLineWidth =
+        lineComponent.element.firstChild.getBoundingClientRect().width;
       this.longestLineToMeasure = null;
     }
   }
