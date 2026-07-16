@@ -304,8 +304,10 @@ module.exports = class PackageManager {
 
     try {
       this.emitPackageEvent("uninstalling", pack);
-      const packagePath =
-        atom.packages.resolvePackagePath(name) || path.join(this.getAtomPackagesDirectory(), name);
+      // resolvePackagePath() canonicalizes symlinks, which would make uninstall
+      // remove a linked package's source instead of its entry in the user
+      // packages directory.
+      const packagePath = path.join(this.getAtomPackagesDirectory(), name);
       if (atom.packages.isPackageActive(name)) {
         // Await async deactivation before unloading (see ::unload).
         await atom.packages.deactivatePackage(name);
@@ -313,7 +315,7 @@ module.exports = class PackageManager {
       if (atom.packages.isPackageLoaded(name)) {
         atom.packages.unloadPackage(name);
       }
-      if (fs.isDirectorySync(packagePath)) {
+      if (fs.isDirectorySync(packagePath) || fs.isSymbolicLinkSync(packagePath)) {
         await this.removePackageDir(packagePath);
       }
       this.clearOutdatedCache();

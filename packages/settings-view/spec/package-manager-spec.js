@@ -252,6 +252,38 @@ describe("PackageManager", function () {
         expect(uninstallCallback.mostRecentCall.args[0]).toBeUndefined();
       });
     });
+
+    it("removes only a user package symlink and preserves its source directory", function () {
+      const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "lumine-uninstall-")));
+      const packagesDir = path.join(root, "packages");
+      const sourceDir = path.join(root, "linked-package-source");
+      const packagePath = path.join(packagesDir, "linked-package");
+      const sourceFile = path.join(sourceDir, "keep.txt");
+      fs.makeTreeSync(packagesDir);
+      fs.makeTreeSync(sourceDir);
+      fs.writeFileSync(sourceFile, "keep");
+      fs.symlinkSync(sourceDir, packagePath, process.platform === "win32" ? "junction" : "dir");
+
+      spyOn(packageManager, "getAtomPackagesDirectory").andReturn(packagesDir);
+      // This is the dangerous value returned by core for a linked package.
+      spyOn(atom.packages, "resolvePackagePath").andReturn(sourceDir);
+
+      waitsForPromise(() => packageManager.uninstall({ name: "linked-package" }));
+
+      runs(() => {
+        const packageEntryExists = fs.existsSync(packagePath);
+        const sourceFileExists = fs.existsSync(sourceFile);
+        try {
+          fs.unlinkSync(packagePath);
+        } catch (error) {
+          if (error.code !== "ENOENT") throw error;
+        }
+        fs.removeSync(root);
+
+        expect(packageEntryExists).toBe(false);
+        expect(sourceFileExists).toBe(true);
+      });
+    });
   });
 
   describe("::pinSourceToVersion()", function () {
