@@ -149,6 +149,14 @@ class MenuUpdater {
         const commandMatch = a.getCommand() === b.command;
         if (!commandMatch) return false;
 
+        // For reopen-project, compare by paths only — index shifts after deletion
+        // and would cause all subsequent items to be replaced unnecessarily
+        if (a.getCommand() === "application:reopen-project") {
+          const pathsA = a.getCommandDetail()?.paths;
+          const pathsB = b.commandDetail?.paths;
+          return JSON.stringify(pathsA) === JSON.stringify(pathsB);
+        }
+
         // For all other commands, compare full commandDetail
         const detailA = a.getCommandDetail();
         const detailB = b.commandDetail;
