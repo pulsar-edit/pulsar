@@ -21,6 +21,8 @@ module.exports = class GitView {
       this.subscribeToRepositories();
       this.update();
     });
+    this.activeSnapshotRepository = null;
+    this.snapshotSubscription = null;
     this.subscribeToRepositories();
     this.subscribeToActiveItem();
   }
@@ -110,6 +112,8 @@ module.exports = class GitView {
     this.repositoryRegistrySubscription?.dispose();
     this.savedSubscription?.dispose();
     this.repositorySubscriptions?.dispose();
+    this.snapshotSubscription?.dispose();
+    this.activeSnapshotRepository = null;
     this.branchTooltipDisposable?.dispose();
     this.commitsAheadTooltipDisposable?.dispose();
     this.commitsBehindTooltipDisposable?.dispose();
@@ -140,21 +144,59 @@ module.exports = class GitView {
     if (atom.isDestroying) return;
 
     const repo = this.getRepositoryForActiveItem();
+    this.subscribeToActiveRepository(repo);
     this.updateBranchText(repo);
     this.updateAheadBehindCount(repo);
     this.updateStatusText(repo);
   }
 
+  // Keep exactly one status snapshot subscription, targeting the repository of
+  // the active item. Subscribing is what makes the repository load and refresh
+  // its snapshot; this view never triggers refreshes itself.
+  subscribeToActiveRepository(repo) {
+    if (repo === this.activeSnapshotRepository) return;
+
+    this.snapshotSubscription?.dispose();
+    this.activeSnapshotRepository = repo;
+    this.snapshotSubscription = repo?.onDidChangeStatusSnapshot(() => this.update());
+  }
+
+  // The status snapshot describes the root repository, so it does not apply to
+  // paths inside a submodule; those stay on the synchronous per-path API.
+  getSnapshotForActiveItem(repo) {
+    const snapshot = repo.getStatusSnapshot();
+    if (!snapshot.initialized) return null;
+    const itemPath = this.getActiveItemPath();
+    if (itemPath && repo.isSubmodule(itemPath)) return null;
+    return snapshot;
+  }
+
   updateBranchText(repo) {
     if (this.showGitInformation(repo)) {
-      const head = repo.getShortHead(this.getActiveItemPath());
+      const snapshot = this.getSnapshotForActiveItem(repo);
+      let head, tooltip;
+      if (snapshot) {
+        if (snapshot.head.detached) {
+          head = snapshot.head.oid ? snapshot.head.oid.slice(0, 7) : "";
+          tooltip = `Detached at ${head}`;
+        } else if (snapshot.head.unborn) {
+          head = snapshot.head.name;
+          tooltip = `On unborn branch ${head}`;
+        } else {
+          head = snapshot.head.name;
+          tooltip = `On branch ${head}`;
+        }
+      } else {
+        head = repo.getShortHead(this.getActiveItemPath());
+        tooltip = `On branch ${head}`;
+      }
       this.branchLabel.textContent = head;
       if (head) {
         this.branchArea.style.display = "";
       }
       this.branchTooltipDisposable?.dispose();
       this.branchTooltipDisposable = atom.tooltips.add(this.branchArea, {
-        title: `On branch ${head}`,
+        title: tooltip,
       });
     } else {
       this.branchArea.style.display = "none";
@@ -181,7 +223,10 @@ module.exports = class GitView {
     }
 
     const itemPath = this.getActiveItemPath();
-    const { ahead, behind } = repo.getCachedUpstreamAheadBehindCount(itemPath);
+    const snapshot = this.getSnapshotForActiveItem(repo);
+    const { ahead = 0, behind = 0 } = snapshot
+      ? snapshot.upstream || {}
+      : repo.getCachedUpstreamAheadBehindCount(itemPath);
     if (ahead > 0) {
       this.commitsAhead.textContent = ahead;
       this.commitsAhead.style.display = "";

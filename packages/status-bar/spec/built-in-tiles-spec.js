@@ -612,6 +612,100 @@ describe("Built-in Status Bar Tiles", function () {
         runs(() => expect(gitView.branchArea).toBeHidden());
       });
 
+      describe("when the status snapshot loads", function () {
+        let repo = null;
+        let snapshotOutput = null;
+        let gitController = null;
+
+        beforeEach(function () {
+          gitController = atom.packages.getActivePackage("status-bar").mainModule.gitInfo;
+          atom.project.setPaths([projectPath]);
+
+          waitsForPromise(() => atom.workspace.open("a.txt"));
+
+          runs(function () {
+            repo = atom.repositories.getForPath(projectPath);
+            repo.statusSnapshotProvider = {
+              getStatus: () => Promise.resolve(snapshotOutput),
+            };
+          });
+        });
+
+        it("renders the branch from the snapshot head", function () {
+          snapshotOutput = "# branch.oid abc123\0# branch.head snapshot-branch\0";
+
+          waitsForPromise(() => repo.refreshStatusSnapshot());
+
+          runs(function () {
+            expect(gitView.branchArea).toBeVisible();
+            expect(gitView.branchLabel.textContent).toBe("snapshot-branch");
+          });
+        });
+
+        it("renders a detached HEAD as a short commit id", function () {
+          snapshotOutput = "# branch.oid 0123456789abcdef0123456789abcdef01234567\0# branch.head (detached)\0";
+
+          waitsForPromise(() => repo.refreshStatusSnapshot());
+
+          runs(function () {
+            expect(gitView.branchLabel.textContent).toBe("0123456");
+            return hover(gitView.branchArea, () =>
+              expect(document.body.querySelector(".tooltip").innerText).toBe(
+                "Detached at 0123456",
+              ),
+            );
+          });
+        });
+
+        it("renders an unborn branch by its target name", function () {
+          snapshotOutput = "# branch.oid (initial)\0# branch.head fresh-start\0";
+
+          waitsForPromise(() => repo.refreshStatusSnapshot());
+
+          runs(function () {
+            expect(gitView.branchLabel.textContent).toBe("fresh-start");
+            return hover(gitView.branchArea, () =>
+              expect(document.body.querySelector(".tooltip").innerText).toBe(
+                "On unborn branch fresh-start",
+              ),
+            );
+          });
+        });
+
+        it("shows ahead and behind counts from the snapshot upstream", function () {
+          snapshotOutput = [
+            "# branch.oid abc123",
+            "# branch.head main",
+            "# branch.upstream origin/main",
+            "# branch.ab +3 -2",
+            "",
+          ].join("\0");
+
+          waitsForPromise(() => repo.refreshStatusSnapshot());
+
+          runs(function () {
+            const aheadElement = document.body.querySelector(".commits-ahead-label");
+            const behindElement = document.body.querySelector(".commits-behind-label");
+            expect(aheadElement.textContent).toBe("3");
+            expect(behindElement.textContent).toBe("2");
+            expect(aheadElement).toBeVisible();
+            expect(behindElement).toBeVisible();
+          });
+        });
+
+        it("re-targets the snapshot subscription when the active item leaves the repository", function () {
+          runs(() => expect(gitController.activeSnapshotRepository).toBe(repo));
+
+          waitsForPromise(() => atom.workspace.open(path.join(os.tmpdir(), "outside.txt")));
+
+          runs(() => expect(gitController.activeSnapshotRepository).toBeNull());
+
+          waitsForPromise(() => atom.workspace.open(path.join(projectPath, "a.txt")));
+
+          runs(() => expect(gitController.activeSnapshotRepository).toBe(repo));
+        });
+      });
+
       it("doesn't display the current branch for a file outside the current project", function () {
         waitsForPromise(() =>
           atom.workspace.open(path.join(os.tmpdir(), "atom-specs", "not-in-project.txt")),
