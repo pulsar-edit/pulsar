@@ -6,7 +6,13 @@ const GitUtils = require("@lumine-code/git-utils");
 const DugiteRepositoryStatusProvider = require("./dugite-repository-status-provider");
 const DugiteRepositoryRefsProvider = require("./dugite-repository-refs-provider");
 const DugiteRepositoryDiffProvider = require("./dugite-repository-diff-provider");
+const DugiteRepositoryHistoryProvider = require("./dugite-repository-history-provider");
 const { parseDiffPatch } = require("./repository-diff");
+const {
+  parseCommitRecords,
+  parseNameStatusTokens,
+  parseBlamePorcelain,
+} = require("./repository-history");
 const { EMPTY_STATUS_SNAPSHOT, parseStatusSnapshot } = require("./repository-status-snapshot");
 const { EMPTY_REFS_SNAPSHOT, parseRefsSnapshot } = require("./repository-refs-snapshot");
 
@@ -133,6 +139,7 @@ module.exports = class GitRepository {
     this.refsSnapshotRefreshTimer = null;
     this.pendingRefsSnapshotLoad = null;
     this.diffProvider = options.diffProvider || new DugiteRepositoryDiffProvider();
+    this.historyProvider = options.historyProvider || new DugiteRepositoryHistoryProvider();
     this.upstream = { ahead: 0, behind: 0 };
     for (let submodulePath in this.repo.submodules) {
       const submoduleRepo = this.repo.submodules[submodulePath];
@@ -175,6 +182,7 @@ module.exports = class GitRepository {
     this.statusSnapshotProvider = null;
     this.refsSnapshotProvider = null;
     this.diffProvider = null;
+    this.historyProvider = null;
     this.statusEntriesByPath.clear();
     this.directoryStatusAggregates.clear();
     if (this.statusSnapshotRefreshTimer != null) {
@@ -826,6 +834,120 @@ module.exports = class GitRepository {
 
     const { files } = parseDiffPatch(rawPatch);
     return Object.freeze({ schemaVersion: 1, files, rawPatch });
+  }
+
+  // Turn an absolute or repository-relative path into the forward-slash
+  // relative form Git commands expect in pathspecs and `rev:path` arguments.
+  posixRelativePath(filePath) {
+    const relativePath = this.relativize(String(filePath));
+    if (relativePath == null) return String(filePath).split(path.sep).join("/");
+    return relativePath.split(path.sep).join("/");
+  }
+
+  requireHistoryProvider() {
+    const provider = this.historyProvider;
+    if (!provider || this.isDestroyed()) throw new Error("Repository has been destroyed");
+    return provider;
+  }
+
+  // Public: Read paginated commit history.
+  //
+  // * `options` An {Object} with the following keys:
+  //   * `revision` {String} starting revision (default `"HEAD"`).
+  //   * `path` {String} to limit history to one path, following renames.
+  //   * `limit` {Number} page size (default 50).
+  //   * `cursor` the `nextCursor` value from a previous page.
+  //   * `signal` An `AbortSignal` for cancellation.
+  //
+  // Returns a {Promise} resolving to a frozen `{commits, hasMore, nextCursor}`
+  // object. Each commit has `sha`, `parents`, `author`, `committer`,
+  // `subject`, and `body`. An unborn repository resolves to an empty page.
+  async getCommits({ revision = "HEAD", path: pathOption = null, limit = 50, cursor = null, signal } = {}) {
+    const provider = this.requireHistoryProvider();
+    const effectiveRevision = cursor?.revision ?? revision;
+    const skip = cursor?.skip ?? 0;
+
+    const output = await provider.getLog(
+      this.getWorkingDirectory(),
+      {
+        revision: effectiveRevision,
+        path: pathOption ? this.posixRelativePath(pathOption) : null,
+        limit: limit + 1,
+        skip,
+      },
+      { signal },
+    );
+
+    const records = parseCommitRecords(output);
+    const hasMore = records.length > limit;
+    const commits = Object.freeze(records.slice(0, limit));
+    return Object.freeze({
+      commits,
+      hasMore,
+      nextCursor: hasMore
+        ? Object.freeze({ revision: effectiveRevision, skip: skip + limit })
+        : null,
+    });
+  }
+
+  // Public: Read one commit with its changed-file summary.
+  //
+  // * `sha` The {String} commit id or any revision expression.
+  //
+  // Returns a {Promise} resolving to the commit object extended with
+  // `changedFiles`: `[{path, originalPath, status, similarity}]`.
+  async getCommit(sha, { signal } = {}) {
+    const provider = this.requireHistoryProvider();
+    const workingDirectory = this.getWorkingDirectory();
+    const [logOutput, nameStatusOutput] = await Promise.all([
+      provider.getLog(workingDirectory, { revision: sha, limit: 1 }, { signal }),
+      provider.getNameStatus(workingDirectory, sha, { signal }),
+    ]);
+
+    const [commit] = parseCommitRecords(logOutput);
+    if (!commit) return null;
+    return Object.freeze({
+      ...commit,
+      changedFiles: Object.freeze(parseNameStatusTokens(nameStatusOutput)),
+    });
+  }
+
+  // Public: Read a file's contents at a revision.
+  //
+  // * `filePath` A {String} path, absolute or repository-relative.
+  // * `revision` A {String} revision expression.
+  // * `options` An optional {Object}: `encoding` (default `"utf8"`, pass
+  //   `"buffer"` for a {Buffer}) and `signal`.
+  //
+  // Returns a {Promise} resolving to the contents, or `null` when the path
+  // does not exist at that revision.
+  getFileAtRevision(filePath, revision, { encoding = "utf8", signal } = {}) {
+    const provider = this.requireHistoryProvider();
+    return provider.getFileAtRevision(
+      this.getWorkingDirectory(),
+      this.posixRelativePath(filePath),
+      revision,
+      { encoding: encoding === "buffer" ? "buffer" : encoding, signal },
+    );
+  }
+
+  // Public: Read line-by-line blame for a file.
+  //
+  // * `filePath` A {String} path, absolute or repository-relative.
+  // * `options` An optional {Object}: `revision` to blame at a specific
+  //   revision, and `signal`.
+  //
+  // Returns a {Promise} resolving to a frozen `{revision, lines}` object
+  // where each line has `line`, `originalLine`, `sha`, `author`, `summary`.
+  async getBlame(filePath, { revision = null, signal } = {}) {
+    const provider = this.requireHistoryProvider();
+    const output = await provider.getBlame(
+      this.getWorkingDirectory(),
+      this.posixRelativePath(filePath),
+      { revision },
+      { signal },
+    );
+    return Object.freeze({ revision, lines: parseBlamePorcelain(output) });
   }
 
   // Public: Returns true if the given status indicates modification.
