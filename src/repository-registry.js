@@ -239,20 +239,12 @@ module.exports = class RepositoryRegistry {
     return this.register(repository)?.repository || this.getForPath(filePath);
   }
 
-  repositoryForPath(filePath) {
-    return this.resolveForPath(filePath);
-  }
-
   resolveForPathSync(filePath) {
     if (!filePath) return null;
     if (!this.project) return this.getForPath(filePath);
     const directory = this.project.getDirectoryForProjectPath(filePath);
     const repository = this.project.repositoryForDirectoryFromProvidersSync(directory);
     return this.register(repository)?.repository || this.getForPath(filePath);
-  }
-
-  repositoryForPathSync(filePath) {
-    return this.resolveForPathSync(filePath);
   }
 
   async resolveDirectory(directory) {

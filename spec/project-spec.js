@@ -393,7 +393,7 @@ describe("Project", () => {
       expect(atom.repositories.getForPath(projectPath)).toBeNull();
 
       atom.packages.serviceHub.provide("atom.repository-provider", "0.1.0", fakeRepositoryProvider);
-      expect(atom.project.repositoryForPathSync(projectPath)).toBe(fakeRepository);
+      expect(atom.repositories.resolveForPathSync(projectPath)).toBe(fakeRepository);
     });
 
     it("allows a newly provided repository to become the nearest repository", () => {
@@ -843,7 +843,7 @@ describe("Project", () => {
     it("removes the directory and repository for the path", () => {
       const result = atom.project.removePath(atom.project.getPaths()[0]);
       expect(atom.project.getDirectories()).toEqual([]);
-      expect(atom.project.getRepositories()).toEqual([]);
+      expect(atom.repositories.getRepositories()).toEqual([]);
       expect(atom.project.getPaths()).toEqual([]);
       expect(result).toBe(true);
       expect(onDidChangePathsSpy).toHaveBeenCalled();
@@ -861,7 +861,7 @@ describe("Project", () => {
       atom.project.setPaths([__dirname, path.join(__dirname, "..", "src")]);
       atom.project.removePath(__dirname);
       expect(atom.project.getPaths()).toEqual([path.join(__dirname, "..", "src")]);
-      expect(atom.project.getRepositories()[0].isSubmodule("src")).toBe(false);
+      expect(atom.repositories.getRepositories()[0].isSubmodule("src")).toBe(false);
     });
 
     it("removes a path that is represented as a URI", () => {
@@ -995,7 +995,7 @@ describe("Project", () => {
     });
   });
 
-  describe(".observeRepositories()", () => {
+  describe("atom.repositories.observeRepositories() driven by project roots", () => {
     it("invokes the observer with current and future repositories", () => {
       const observed = [];
 
@@ -1011,7 +1011,7 @@ describe("Project", () => {
 
       atom.project.setPaths([directory1]);
 
-      const disposable = atom.project.observeRepositories((repo) => observed.push(repo));
+      const disposable = atom.repositories.observeRepositories((repo) => observed.push(repo));
       const firstRepository = atom.repositories.getForPath(directory1);
       expect(observed).toContain(firstRepository);
       expect(firstRepository.getReferenceTarget("refs/heads/master")).toBe(
@@ -1029,10 +1029,10 @@ describe("Project", () => {
     });
   });
 
-  describe(".onDidAddRepository()", () => {
+  describe("atom.repositories.onDidAddRepository() driven by project roots", () => {
     it("invokes callback when a path is added and the path is the root of a repository", () => {
       const observed = [];
-      const disposable = atom.project.onDidAddRepository((repo) => observed.push(repo));
+      const disposable = atom.repositories.onDidAddRepository((repo) => observed.push(repo));
 
       const projectRootPath = temp.mkdirSync();
       const fixtureRepoPath = fs.absolute(path.join(__dirname, "fixtures", "git", "master.git"));
@@ -1049,7 +1049,7 @@ describe("Project", () => {
 
     it("invokes callback when a path is added and the path is subdirectory of a repository", () => {
       const observed = [];
-      const disposable = atom.project.onDidAddRepository((repo) => observed.push(repo));
+      const disposable = atom.repositories.onDidAddRepository((repo) => observed.push(repo));
 
       const projectRootPath = temp.mkdirSync();
       const fixtureRepoPath = fs.absolute(path.join(__dirname, "fixtures", "git", "master.git"));
@@ -1069,7 +1069,7 @@ describe("Project", () => {
 
     it("does not invoke callback when a path is added and the path is not part of a repository", () => {
       const observed = [];
-      const disposable = atom.project.onDidAddRepository((repo) => observed.push(repo));
+      const disposable = atom.repositories.onDidAddRepository((repo) => observed.push(repo));
 
       atom.project.addPath(temp.mkdirSync("not-a-repository"));
       expect(observed.length).toBe(0);

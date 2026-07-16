@@ -225,7 +225,7 @@ describe("GitRepository", () => {
     });
   });
 
-  describe(".getDirectoryStatus(path)", () => {
+  describe(".getDirectoryStatusSummary(path)", () => {
     let directoryPath, filePath;
 
     beforeEach(() => {
@@ -235,11 +235,11 @@ describe("GitRepository", () => {
       filePath = path.join(directoryPath, "b.txt");
     });
 
-    it("gets the status based on the files inside the directory", () => {
-      expect(repo.isStatusModified(repo.getDirectoryStatus(directoryPath))).toBe(false);
+    it("aggregates the status of the files inside the directory", () => {
+      expect(repo.getDirectoryStatusSummary(directoryPath)).toBeNull();
       fs.writeFileSync(filePath, "abc");
       repo.getPathStatus(filePath);
-      expect(repo.isStatusModified(repo.getDirectoryStatus(directoryPath))).toBe(true);
+      expect(repo.getDirectoryStatusSummary(directoryPath).modified).toBe(true);
     });
   });
 
@@ -279,7 +279,7 @@ describe("GitRepository", () => {
       fs.writeFileSync(filePath, "");
       atom.project.setPaths([subDir]);
       await atom.workspace.open("b.txt");
-      repo = atom.project.getRepositories()[0];
+      repo = atom.repositories.getRepositories()[0];
 
       await repo.refreshStatus();
       const status = repo.getCachedPathStatus(filePath);
@@ -760,7 +760,7 @@ describe("GitRepository", () => {
     beforeEach(async () => {
       atom.project.setPaths([copyRepository()]);
       const refreshPromise = new Promise((resolve) =>
-        atom.project.getRepositories()[0].onDidChangeStatuses(resolve),
+        atom.repositories.getRepositories()[0].onDidChangeStatuses(resolve),
       );
       editor = await atom.workspace.open("other.txt");
       await refreshPromise;
@@ -770,7 +770,7 @@ describe("GitRepository", () => {
       editor.insertNewline();
 
       const statusHandler = jasmine.createSpy("statusHandler");
-      atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
+      atom.repositories.getRepositories()[0].onDidChangeStatus(statusHandler);
 
       await editor.save();
       expect(statusHandler.calls.count()).toBe(1);
@@ -784,7 +784,7 @@ describe("GitRepository", () => {
       fs.writeFileSync(editor.getPath(), "changed");
 
       const statusHandler = jasmine.createSpy("statusHandler");
-      atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
+      atom.repositories.getRepositories()[0].onDidChangeStatus(statusHandler);
 
       await editor.getBuffer().reload();
       expect(statusHandler.calls.count()).toBe(1);
@@ -801,7 +801,7 @@ describe("GitRepository", () => {
       fs.writeFileSync(editor.getPath(), "changed");
 
       const statusHandler = jasmine.createSpy("statusHandler");
-      atom.project.getRepositories()[0].onDidChangeStatus(statusHandler);
+      atom.repositories.getRepositories()[0].onDidChangeStatus(statusHandler);
       editor.getBuffer().emitter.emit("did-change-path");
       expect(statusHandler.calls.count()).toBe(1);
       expect(statusHandler).toHaveBeenCalledWith({
@@ -813,7 +813,7 @@ describe("GitRepository", () => {
     });
 
     it("stops listening to the buffer when the repository is destroyed (regression)", () => {
-      atom.project.getRepositories()[0].destroy();
+      atom.repositories.getRepositories()[0].destroy();
       expect(() => editor.save()).not.toThrow();
     });
   });
@@ -849,7 +849,7 @@ describe("GitRepository", () => {
       buffer.append("changes");
 
       statusHandler = jasmine.createSpy("statusHandler");
-      project2.getRepositories()[0].onDidChangeStatus(statusHandler);
+      repositoryRegistry2.getRepositories()[0].onDidChangeStatus(statusHandler);
       await buffer.save();
 
       expect(statusHandler.calls.count()).toBe(1);

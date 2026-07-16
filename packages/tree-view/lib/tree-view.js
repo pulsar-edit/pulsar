@@ -371,9 +371,9 @@ class TreeView {
       // …when we detect new/deleted files in the project.
       atom.project.onDidChangePaths(debounce(() => this.updateRoots(), 50)),
       // …when a git repository is added (e.g. git init) — rebuild so items subscribe to the new repo.
-      atom.project.onDidAddRepository(debounce(() => this.updateRoots(), 50)),
+      atom.repositories.onDidAddRepository(debounce(() => this.updateRoots(), 50)),
       // …when any repo is destroyed (e.g. .git deleted) — rebuild so items lose their git colors.
-      atom.project.observeRepositories((repo) => {
+      atom.repositories.observeRepositories((repo) => {
         this.disposables.add(repo.onDidDestroy(debounce(() => this.updateRoots(), 50)));
       }),
       // …when the user changes any of the settings that affect what gets shown

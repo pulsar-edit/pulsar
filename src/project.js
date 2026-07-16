@@ -254,53 +254,9 @@ module.exports = class Project extends Model {
     return this.emitter.on("did-change-files", callback);
   }
 
-  // Public: Invoke the given callback with all current and future
-  // repositories known to this window.
-  //
-  // * `callback` {Function} to be called with current and future
-  //    repositories.
-  //   * `repository` A {GitRepository} that is present at the time of
-  //     subscription or that is added at some later time.
-  //
-  // Returns a {Disposable} on which `.dispose()` can be called to
-  // unsubscribe.
-  observeRepositories(callback) {
-    return this.repositoryRegistry.observeRepositories(callback);
-  }
-
-  // Public: Invoke the given callback when a repository is added to the
-  // window registry.
-  //
-  // * `callback` {Function} to be called when a repository is added.
-  //   * `repository` A {GitRepository}.
-  //
-  // Returns a {Disposable} on which `.dispose()` can be called to
-  // unsubscribe.
-  onDidAddRepository(callback) {
-    return this.repositoryRegistry.onDidAddRepository(callback);
-  }
-
-  onDidRemoveRepository(callback) {
-    return this.repositoryRegistry.onDidRemoveRepository(callback);
-  }
-
   /*
   Section: Accessing the git repository
   */
-
-  // Public: Get all {GitRepository}s known to the window registry. Repository
-  // order is independent of project root order.
-  getRepositories() {
-    return this.repositoryRegistry.getRepositories();
-  }
-
-  repositoryForPath(filePath) {
-    return this.repositoryRegistry.resolveForPath(filePath);
-  }
-
-  repositoryForPathSync(filePath) {
-    return this.repositoryRegistry.resolveForPathSync(filePath);
-  }
 
   // Public: Get the repository for a given directory asynchronously.
   //

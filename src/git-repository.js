@@ -492,28 +492,8 @@ module.exports = class GitRepository {
     return this.getRepo().isIgnored(this.relativize(path));
   }
 
-  // Public: Get the status of a directory in the repository's working directory.
-  //
-  // * `directoryPath` The {String} directory path to check.
-  //
-  // Returns a {Number} representing the status. This value can be passed to
-  // {::isStatusModified} or {::isStatusNew} to get more information.
-  getDirectoryStatus(directoryPath) {
-    directoryPath = `${this.relativize(directoryPath)}/`;
-    let directoryStatus = 0;
-    for (let statusPath in this.statuses) {
-      const status = this.statuses[statusPath];
-      if (statusPath.startsWith(directoryPath)) directoryStatus |= status;
-    }
-    return directoryStatus;
-  }
-
-  // Public: Get the status of a single path in the repository.
-  //
-  // * `path` A {String} repository-relative path.
-  //
-  // Returns a {Number} representing the status. This value can be passed to
-  // {::isStatusModified} or {::isStatusNew} to get more information.
+  // Refresh the cached git-utils status of a single path. Internal engine for
+  // {::getPathStatusSummary}; consumers read summaries instead of status bits.
   getPathStatus(path) {
     const repo = this.getRepo(path);
     const relativePath = this.relativize(path);
@@ -533,11 +513,8 @@ module.exports = class GitRepository {
     return pathStatus;
   }
 
-  // Public: Get the cached status for the given path.
-  //
-  // * `path` A {String} path in the repository, relative or absolute.
-  //
-  // Returns a status {Number} or null if the path is not in the cache.
+  // Cached git-utils status bits for a path. Internal; consumers read
+  // {::getPathStatusSummary} instead.
   getCachedPathStatus(path) {
     return this.statuses[this.relativize(path)];
   }
@@ -950,20 +927,11 @@ module.exports = class GitRepository {
     return Object.freeze({ revision, lines: parseBlamePorcelain(output) });
   }
 
-  // Public: Returns true if the given status indicates modification.
-  //
-  // * `status` A {Number} representing the status.
-  //
-  // Returns a {Boolean} that's true if the `status` indicates modification.
+  // Internal git-utils status-bit classifiers behind the summary API.
   isStatusModified(status) {
     return this.getRepo().isStatusModified(status);
   }
 
-  // Public: Returns true if the given status indicates a new path.
-  //
-  // * `status` A {Number} representing the status.
-  //
-  // Returns a {Boolean} that's true if the `status` indicates a new path.
   isStatusNew(status) {
     return this.getRepo().isStatusNew(status);
   }
