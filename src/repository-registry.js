@@ -639,6 +639,9 @@ module.exports = class RepositoryRegistry {
       if (repository.refreshStatusSnapshot && repository.getStatusSnapshot?.().initialized) {
         refreshes.push(repository.refreshStatusSnapshot());
       }
+      if (repository.refreshRefsSnapshot && repository.getRefsSnapshot?.().initialized) {
+        refreshes.push(repository.refreshRefsSnapshot());
+      }
       await Promise.all(refreshes);
     } catch (error) {
       // The Git command has already succeeded. Never report it as failed (and

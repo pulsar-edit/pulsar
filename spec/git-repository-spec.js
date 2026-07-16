@@ -502,6 +502,121 @@ describe("GitRepository", () => {
     });
   });
 
+  describe("refs snapshot scheduling", () => {
+    let refsOutputs, refsSnapshotProvider;
+
+    const runScheduler = async () => {
+      advanceClock(1);
+      for (let i = 0; i < 5; i++) await Promise.resolve();
+    };
+
+    const makeOutputs = (branch) => ({
+      forEachRef: `refs/heads/${branch}\0${branch}\0aaaa\0commit\0\0\0\0\0*\0`,
+      remotes: "",
+      worktrees: "",
+      symbolicHead: `refs/heads/${branch}\n`,
+      headOid: "aaaa\n",
+    });
+
+    beforeEach(() => {
+      refsOutputs = makeOutputs("main");
+      refsSnapshotProvider = {
+        getRefs: jasmine.createSpy("getRefs").andCallFake(() => Promise.resolve(refsOutputs)),
+      };
+      repo = new GitRepository(copyRepository(), {
+        refreshOnWindowFocus: false,
+        refsSnapshotDebounceMs: 0,
+        refsSnapshotProvider,
+      });
+    });
+
+    it("loads the refs snapshot when the first subscriber attaches", async () => {
+      expect(repo.getRefsSnapshot().initialized).toBe(false);
+
+      const snapshotPromise = new Promise((resolve) => repo.onDidChangeRefsSnapshot(resolve));
+      await runScheduler();
+
+      const snapshot = await snapshotPromise;
+      expect(snapshot.initialized).toBe(true);
+      expect(snapshot.head.name).toBe("main");
+      expect(snapshot.branches[0].isHead).toBe(true);
+      expect(repo.getRefsSnapshot()).toBe(snapshot);
+      expect(refsSnapshotProvider.getRefs.calls.count()).toBe(1);
+    });
+
+    it("does not emit when the raw outputs are unchanged", async () => {
+      const changeHandler = jasmine.createSpy("changeHandler");
+      repo.onDidChangeRefsSnapshot(changeHandler);
+      await runScheduler();
+
+      const firstSnapshot = await repo.refreshRefsSnapshot();
+      expect(await repo.refreshRefsSnapshot()).toBe(firstSnapshot);
+      expect(changeHandler.calls.count()).toBe(1);
+
+      refsOutputs = makeOutputs("feature");
+      const secondSnapshot = await repo.refreshRefsSnapshot();
+      expect(secondSnapshot.generation).toBe(2);
+      expect(secondSnapshot.head.name).toBe("feature");
+      expect(changeHandler.calls.count()).toBe(2);
+    });
+
+    it("does not let an older concurrent refresh replace a newer refs snapshot", async () => {
+      const resolvers = [];
+      refsSnapshotProvider.getRefs.andCallFake(
+        () => new Promise((resolve) => resolvers.push(resolve)),
+      );
+
+      const olderRefresh = repo.refreshRefsSnapshot();
+      const newerRefresh = repo.refreshRefsSnapshot();
+      resolvers[1](makeOutputs("newest"));
+      const newerSnapshot = await newerRefresh;
+      resolvers[0](makeOutputs("older"));
+
+      expect(await olderRefresh).toBe(newerSnapshot);
+      expect(repo.getRefsSnapshot().head.name).toBe("newest");
+    });
+
+    it("refreshes refs after refreshStatus while a subscriber exists", async () => {
+      repo.onDidChangeRefsSnapshot(() => {});
+      await runScheduler();
+
+      refsOutputs = makeOutputs("switched");
+      await repo.refreshStatus();
+      await runScheduler();
+
+      expect(repo.getRefsSnapshot().head.name).toBe("switched");
+      expect(refsSnapshotProvider.getRefs.calls.count()).toBe(2);
+    });
+
+    it("shares one in-flight load between concurrent ensureRefsSnapshot callers", async () => {
+      const resolvers = [];
+      refsSnapshotProvider.getRefs.andCallFake(
+        () => new Promise((resolve) => resolvers.push(resolve)),
+      );
+
+      const firstEnsure = repo.ensureRefsSnapshot();
+      const secondEnsure = repo.ensureRefsSnapshot();
+      resolvers[0](refsOutputs);
+
+      const snapshot = await firstEnsure;
+      expect(await secondEnsure).toBe(snapshot);
+      expect(refsSnapshotProvider.getRefs.calls.count()).toBe(1);
+      expect(await repo.ensureRefsSnapshot()).toBe(snapshot);
+      expect(refsSnapshotProvider.getRefs.calls.count()).toBe(1);
+    });
+
+    it("clears the pending refresh timer on destroy", () => {
+      const scheduled = new GitRepository(copyRepository(), {
+        refreshOnWindowFocus: false,
+        refsSnapshotDebounceMs: 1000,
+        refsSnapshotProvider,
+      });
+      scheduled.onDidChangeRefsSnapshot(() => {});
+      scheduled.destroy();
+      expect(scheduled.refsSnapshotRefreshTimer).toBeNull();
+    });
+  });
+
   describe("status summaries", () => {
     let output, statusSnapshotProvider, workingDirectory;
 

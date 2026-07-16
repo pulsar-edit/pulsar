@@ -4,7 +4,9 @@ const _ = require("@lumine-code/underscore-plus");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
 const GitUtils = require("@lumine-code/git-utils");
 const DugiteRepositoryStatusProvider = require("./dugite-repository-status-provider");
+const DugiteRepositoryRefsProvider = require("./dugite-repository-refs-provider");
 const { EMPTY_STATUS_SNAPSHOT, parseStatusSnapshot } = require("./repository-status-snapshot");
+const { EMPTY_REFS_SNAPSHOT, parseRefsSnapshot } = require("./repository-refs-snapshot");
 
 let nextId = 0;
 
@@ -120,6 +122,14 @@ module.exports = class GitRepository {
     this.statusSnapshotDebounceMs = options.statusSnapshotDebounceMs ?? 150;
     this.statusSnapshotRefreshTimer = null;
     this.pendingStatusSnapshotLoad = null;
+    this.refsSnapshotProvider = options.refsSnapshotProvider || new DugiteRepositoryRefsProvider();
+    this.refsSnapshot = EMPTY_REFS_SNAPSHOT;
+    this.refsSnapshotCacheKey = null;
+    this.refsSnapshotRefreshCount = 0;
+    this.refsSnapshotSubscriberCount = 0;
+    this.refsSnapshotDebounceMs = options.refsSnapshotDebounceMs ?? 150;
+    this.refsSnapshotRefreshTimer = null;
+    this.pendingRefsSnapshotLoad = null;
     this.upstream = { ahead: 0, behind: 0 };
     for (let submodulePath in this.repo.submodules) {
       const submoduleRepo = this.repo.submodules[submodulePath];
@@ -156,14 +166,20 @@ module.exports = class GitRepository {
   // libgit2 repository handle. This method is idempotent.
   destroy() {
     this.statusSnapshotRefreshCount++;
+    this.refsSnapshotRefreshCount++;
     this.repo = null;
     this.operations = null;
     this.statusSnapshotProvider = null;
+    this.refsSnapshotProvider = null;
     this.statusEntriesByPath.clear();
     this.directoryStatusAggregates.clear();
     if (this.statusSnapshotRefreshTimer != null) {
       clearTimeout(this.statusSnapshotRefreshTimer);
       this.statusSnapshotRefreshTimer = null;
+    }
+    if (this.refsSnapshotRefreshTimer != null) {
+      clearTimeout(this.refsSnapshotRefreshTimer);
+      this.refsSnapshotRefreshTimer = null;
     }
 
     if (this.emitter) {
@@ -259,6 +275,27 @@ module.exports = class GitRepository {
       if (disposed) return;
       disposed = true;
       this.statusSnapshotSubscriberCount--;
+      subscription.dispose();
+    });
+  }
+
+  // Public: Invoke the given callback when the repository refs snapshot
+  // changes. Subscribing declares interest exactly like
+  // {::onDidChangeStatusSnapshot}: the first subscriber triggers a lazy load
+  // and refs stay fresh with debounced background refreshes.
+  //
+  // * `callback` {Function} called with an immutable refs snapshot.
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidChangeRefsSnapshot(callback) {
+    this.refsSnapshotSubscriberCount++;
+    this.scheduleRefsSnapshotRefresh();
+    const subscription = this.emitter.on("did-change-refs-snapshot", callback);
+    let disposed = false;
+    return new Disposable(() => {
+      if (disposed) return;
+      disposed = true;
+      this.refsSnapshotSubscriberCount--;
       subscription.dispose();
     });
   }
@@ -666,6 +703,75 @@ module.exports = class GitRepository {
     return Object.freeze({ source: "cache", conflicted: false, modified, added });
   }
 
+  // Public: Return the latest immutable refs snapshot. It contains `head`,
+  // local `branches` with upstream tracking, `remoteBranches`, `tags`,
+  // `remotes` with fetch and push URLs, `worktrees`, and a monotonic
+  // `generation`. The initial snapshot has `initialized: false`; subscribe
+  // with {::onDidChangeRefsSnapshot} or call {::ensureRefsSnapshot} to load
+  // it.
+  getRefsSnapshot() {
+    return this.refsSnapshot;
+  }
+
+  // Public: Resolve with an initialized refs snapshot, loading it on first
+  // call. Concurrent callers share one in-flight refresh.
+  //
+  // Returns a {Promise} that resolves to the snapshot.
+  async ensureRefsSnapshot(options = {}) {
+    if (this.refsSnapshot.initialized) return this.refsSnapshot;
+    if (!this.pendingRefsSnapshotLoad) {
+      this.pendingRefsSnapshotLoad = this.refreshRefsSnapshot(options).finally(() => {
+        this.pendingRefsSnapshotLoad = null;
+      });
+    }
+    return this.pendingRefsSnapshotLoad;
+  }
+
+  // Schedule a background refs refresh with the same coalescing rules as
+  // {::scheduleStatusSnapshotRefresh}.
+  scheduleRefsSnapshotRefresh() {
+    if (this.isDestroyed() || this.refsSnapshotSubscriberCount === 0) return;
+    if (this.refsSnapshotRefreshTimer != null) return;
+    this.refsSnapshotRefreshTimer = setTimeout(() => {
+      this.refsSnapshotRefreshTimer = null;
+      if (this.isDestroyed()) return;
+      this.refreshRefsSnapshot().catch(() => {});
+    }, this.refsSnapshotDebounceMs);
+  }
+
+  // Public: Refresh the refs snapshot with Dugite. Reads branches, tags,
+  // remotes, worktrees, and the exact HEAD state in one pass; stale
+  // out-of-order responses are discarded and identical raw output does not
+  // emit a change event.
+  async refreshRefsSnapshot(options = {}) {
+    const provider = this.refsSnapshotProvider;
+    if (!provider || this.isDestroyed()) throw new Error("Repository has been destroyed");
+
+    const refreshCount = ++this.refsSnapshotRefreshCount;
+    const outputs = await provider.getRefs(this.getWorkingDirectory(), options);
+
+    if (this.isDestroyed() || refreshCount !== this.refsSnapshotRefreshCount) {
+      return this.refsSnapshot;
+    }
+
+    const cacheKey = [
+      outputs.forEachRef,
+      outputs.remotes,
+      outputs.worktrees,
+      outputs.symbolicHead,
+      outputs.headOid,
+    ].join("\0");
+    if (cacheKey === this.refsSnapshotCacheKey) return this.refsSnapshot;
+
+    const snapshot = parseRefsSnapshot(outputs, {
+      generation: this.refsSnapshot.generation + 1,
+    });
+    this.refsSnapshot = snapshot;
+    this.refsSnapshotCacheKey = cacheKey;
+    this.emitter.emit("did-change-refs-snapshot", snapshot);
+    return snapshot;
+  }
+
   // Public: Returns true if the given status indicates modification.
   //
   // * `status` A {Number} representing the status.
@@ -868,5 +974,6 @@ module.exports = class GitRepository {
 
     if (!statusesUnchanged) this.emitter.emit("did-change-statuses");
     this.scheduleStatusSnapshotRefresh();
+    this.scheduleRefsSnapshotRefresh();
   }
 };
