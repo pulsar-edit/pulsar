@@ -732,6 +732,7 @@ module.exports = class TextEditorComponent {
             displayLayer: this.props.model.displayLayer,
             nodePool: this.lineNodesPool,
             lineComponentsByScreenLineId,
+            horizontalPixelPositionsByScreenLineId: this.horizontalPixelPositionsByScreenLineId,
           }),
         );
       }
@@ -747,6 +748,7 @@ module.exports = class TextEditorComponent {
               displayLayer: this.props.model.displayLayer,
               nodePool: this.lineNodesPool,
               lineComponentsByScreenLineId,
+              horizontalPixelPositionsByScreenLineId: this.horizontalPixelPositionsByScreenLineId,
             }),
           );
         }
@@ -4690,6 +4692,7 @@ class LinesTileComponent {
       nodePool,
       displayLayer,
       lineComponentsByScreenLineId,
+      horizontalPixelPositionsByScreenLineId,
     } = this.props;
 
     this.lineComponents = [];
@@ -4702,6 +4705,7 @@ class LinesTileComponent {
         displayLayer,
         nodePool,
         lineComponentsByScreenLineId,
+        horizontalPixelPositionsByScreenLineId,
       });
       this.element.appendChild(component.element);
       this.lineComponents.push(component);
@@ -4717,6 +4721,7 @@ class LinesTileComponent {
       nodePool,
       displayLayer,
       lineComponentsByScreenLineId,
+      horizontalPixelPositionsByScreenLineId,
     } = newProps;
 
     const oldScreenLines = oldProps.screenLines;
@@ -4743,6 +4748,7 @@ class LinesTileComponent {
           displayLayer,
           nodePool,
           lineComponentsByScreenLineId,
+          horizontalPixelPositionsByScreenLineId,
         });
         this.element.appendChild(newScreenLineComponent.element);
         this.lineComponents.push(newScreenLineComponent);
@@ -4783,6 +4789,7 @@ class LinesTileComponent {
               displayLayer,
               nodePool,
               lineComponentsByScreenLineId,
+              horizontalPixelPositionsByScreenLineId,
             });
             this.element.insertBefore(
               newScreenLineComponent.element,
@@ -4816,6 +4823,7 @@ class LinesTileComponent {
             displayLayer,
             nodePool,
             lineComponentsByScreenLineId,
+            horizontalPixelPositionsByScreenLineId,
           });
           this.element.insertBefore(newScreenLineComponent.element, oldScreenLineComponent.element);
           oldScreenLineComponent.destroy();
@@ -4997,10 +5005,19 @@ class LineComponent {
   }
 
   destroy() {
-    const { nodePool, lineComponentsByScreenLineId, screenLine } = this.props;
+    const { nodePool, lineComponentsByScreenLineId, horizontalPixelPositionsByScreenLineId, screenLine } =
+      this.props;
 
     if (lineComponentsByScreenLineId.get(screenLine.id) === this) {
       lineComponentsByScreenLineId.delete(screenLine.id);
+      // Evict this line's cached horizontal pixel positions. The cache is keyed
+      // by screen-line id, which changes on every edit, so without eviction it
+      // grows unbounded for the life of the editor. Scoping it to currently
+      // rendered lines keeps it bounded by the viewport; a line scrolled back
+      // into view is re-measured cheaply on its next update.
+      if (horizontalPixelPositionsByScreenLineId) {
+        horizontalPixelPositionsByScreenLineId.delete(screenLine.id);
+      }
     }
 
     this.element.remove();
