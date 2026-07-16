@@ -1724,8 +1724,9 @@ module.exports = class TextEditorComponent {
   }
 
   // Converts a `wheel` event into pre-sensitivity pixel deltas, applying
-  // delta-mode normalization, axis dominance, the non-darwin shift swap, and
-  // the alt speed multiplier.
+  // delta-mode normalization, the non-darwin shift swap, and the alt speed
+  // multiplier. Both axes are preserved so diagonal trackpad gestures pan
+  // smoothly instead of locking to the dominant axis per event.
   normalizedWheelDeltas(event) {
     let deltaX = event.deltaX || 0;
     let deltaY = event.deltaY || 0;
@@ -1743,13 +1744,6 @@ module.exports = class TextEditorComponent {
 
     deltaX *= WHEEL_DELTA_PARITY;
     deltaY *= WHEEL_DELTA_PARITY;
-
-    // Scroll only along the dominant axis of the gesture.
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      deltaY = 0;
-    } else {
-      deltaX = 0;
-    }
 
     if (this.getPlatform() !== "darwin" && event.shiftKey) {
       const temp = deltaX;

@@ -1613,7 +1613,7 @@ describe("TextEditorComponent", () => {
   });
 
   describe("scrolling via the mouse wheel", () => {
-    it("scrolls vertically or horizontally depending on whether deltaX or deltaY is larger", () => {
+    it("scrolls both axes by their respective deltas", () => {
       const scrollSensitivity = 25;
       // deltaY of 100 corresponds to the legacy wheelDelta of 120 per notch.
       const wheelDeltaParity = 1.2;
@@ -1627,11 +1627,14 @@ describe("TextEditorComponent", () => {
       // stub in place for Event.preventDefault()
       const eventPreventDefaultStub = function () {};
 
+      const factor = wheelDeltaParity * (scrollSensitivity / 100);
+
       {
-        const expectedScrollTop = 20 * wheelDeltaParity * (scrollSensitivity / 100);
-        const expectedScrollLeft = component.getScrollLeft();
+        // A diagonal gesture moves both axes at once.
+        const expectedScrollTop = 20 * factor;
+        const expectedScrollLeft = 10 * factor;
         component.didMouseWheel({
-          deltaX: 5,
+          deltaX: 10,
           deltaY: 20,
           deltaMode: 0,
           preventDefault: eventPreventDefaultStub,
@@ -1644,11 +1647,10 @@ describe("TextEditorComponent", () => {
       }
 
       {
-        const expectedScrollTop =
-          component.getScrollTop() - 10 * wheelDeltaParity * (scrollSensitivity / 100);
-        const expectedScrollLeft = component.getScrollLeft();
+        const expectedScrollTop = component.getScrollTop() - 10 * factor;
+        const expectedScrollLeft = component.getScrollLeft() + 10 * factor;
         component.didMouseWheel({
-          deltaX: 5,
+          deltaX: 10,
           deltaY: -10,
           deltaMode: 0,
           preventDefault: eventPreventDefaultStub,
@@ -1661,28 +1663,11 @@ describe("TextEditorComponent", () => {
       }
 
       {
-        const expectedScrollTop = component.getScrollTop();
-        const expectedScrollLeft = 20 * wheelDeltaParity * (scrollSensitivity / 100);
-        component.didMouseWheel({
-          deltaX: 20,
-          deltaY: -10,
-          deltaMode: 0,
-          preventDefault: eventPreventDefaultStub,
-        });
-        expect(component.getScrollTop()).toBeNear(expectedScrollTop);
-        expect(component.getScrollLeft()).toBeNear(expectedScrollLeft);
-        expect(component.refs.content.style.transform).toBe(
-          `translate(${-expectedScrollLeft}px, ${-expectedScrollTop}px)`,
-        );
-      }
-
-      {
-        const expectedScrollTop = component.getScrollTop();
-        const expectedScrollLeft =
-          component.getScrollLeft() - 10 * wheelDeltaParity * (scrollSensitivity / 100);
+        const expectedScrollTop = component.getScrollTop() + 10 * factor;
+        const expectedScrollLeft = component.getScrollLeft() - 10 * factor;
         component.didMouseWheel({
           deltaX: -10,
-          deltaY: 8,
+          deltaY: 10,
           deltaMode: 0,
           preventDefault: eventPreventDefaultStub,
         });
