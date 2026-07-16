@@ -155,6 +155,17 @@
   }
 }
 
+.about-updates-item {
+  display: block;
+}
+
+.about-updates-label {
+  color: var(--text-color-subtle);
+  &.is-strong {
+    color: var(--text-color);
+  }
+}
+
 .about-startup {
   margin-top: 1.5em;
   color: var(--text-color-subtle);
@@ -166,17 +177,6 @@
   .input-checkbox {
     margin-right: 0.5em;
     vertical-align: middle;
-  }
-}
-
-.about-updates-item {
-  display: block;
-}
-
-.about-updates-label {
-  color: var(--text-color-subtle);
-  &.is-strong {
-    color: var(--text-color);
   }
 }
 

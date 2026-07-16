@@ -1036,7 +1036,7 @@ class AtomEnvironment {
       );
 
       StartupTime.addMarker("window:environment:start-editor-window:activate-packages");
-      this.packages.activate();
+      await this.packages.activate();
       this.keymaps.loadUserKeymap();
       if (!this.getLoadSettings().safeMode) this.requireUserInitScript();
 

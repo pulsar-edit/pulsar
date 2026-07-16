@@ -6,8 +6,12 @@ let updateManager;
 const AboutURI = "atom://about";
 
 module.exports = {
-  activate() {
+  async activate() {
     this.createModel();
+
+    if (atom.config.get("about.showOnStartup")) {
+      await atom.workspace.open(AboutURI);
+    }
   },
 
   deactivate() {

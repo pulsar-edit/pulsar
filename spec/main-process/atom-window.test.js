@@ -57,7 +57,7 @@ describe("AtomWindow", function () {
       await new Promise((resolve, reject) => {
         const config = dedent`
           '*':
-            welcome:
+            about:
               showOnStartup: false
         `;
 

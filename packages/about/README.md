@@ -7,6 +7,7 @@ View useful information about your Lumine installation.
 - **Installation details**: shows the current Lumine version, license, and Terms of Use.
 - **Cross-platform view**: opens a consistent About view on every supported platform.
 - **Release notes**: links out to the release notes for the running version.
+- **Startup control**: opens on startup by default and can be disabled from the About pane.
 
 ## Commands
 

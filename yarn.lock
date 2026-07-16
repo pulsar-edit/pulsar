@@ -6145,11 +6145,6 @@ webcrypto-core@^1.9.2:
     asn1js "^3.0.10"
     tslib "^2.8.1"
 
-"welcome@file:packages/welcome":
-  version "1.0.0"
-  dependencies:
-    etch "^0.14.1"
-
 whatwg-encoding@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/whatwg-encoding/-/whatwg-encoding-3.1.1.tgz#d0f4ef769905d426e1688f3e34381a99b60b76e5"

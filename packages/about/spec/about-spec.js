@@ -3,7 +3,33 @@ describe("About", () => {
 
   beforeEach(async () => {
     workspaceElement = atom.views.getView(atom.workspace);
+    atom.config.set("about.showOnStartup", false);
     await atom.packages.activatePackage("about");
+  });
+
+  describe("startup", () => {
+    it("opens About by default", async () => {
+      await atom.packages.deactivatePackage("about");
+      atom.config.unset("about.showOnStartup");
+
+      await atom.packages.activatePackage("about");
+
+      expect(atom.workspace.getActivePaneItem().getURI()).toBe("atom://about");
+    });
+
+    it("stores the startup checkbox preference", async () => {
+      atom.config.set("about.showOnStartup", true);
+      await atom.workspace.open("atom://about");
+      jasmine.attachToDOM(workspaceElement);
+
+      const checkbox = workspaceElement.querySelector(".about-startup .input-checkbox");
+      expect(checkbox.checked).toBe(true);
+
+      checkbox.checked = false;
+      checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+
+      expect(atom.config.get("about.showOnStartup")).toBe(false);
+    });
   });
 
   it("deserializes correctly", () => {

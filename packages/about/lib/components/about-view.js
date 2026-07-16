@@ -47,7 +47,7 @@ module.exports = class AboutView extends EtchComponent {
   }
 
   handleShowOnStartupChange(e) {
-    atom.config.set("welcome.showOnStartup", e.target.checked);
+    atom.config.set("about.showOnStartup", e.target.checked);
   }
 
   render() {
@@ -92,10 +92,7 @@ module.exports = class AboutView extends EtchComponent {
                 className: "about-version-container chrome",
                 onclick: this.handleChromeVersionClick.bind(this),
               },
-              $.span(
-                { className: "about-version" },
-                `Chrome: ${this.props.currentChromeVersion}`,
-              ),
+              $.span({ className: "about-version" }, `Chrome: ${this.props.currentChromeVersion}`),
               $.span({ className: "icon icon-clippy about-copy-version" }),
             ),
             $.span(
@@ -103,10 +100,7 @@ module.exports = class AboutView extends EtchComponent {
                 className: "about-version-container node",
                 onclick: this.handleNodeVersionClick.bind(this),
               },
-              $.span(
-                { className: "about-version" },
-                `Node: ${this.props.currentNodeVersion}`,
-              ),
+              $.span({ className: "about-version" }, `Node: ${this.props.currentNodeVersion}`),
               $.span({ className: "icon icon-clippy about-copy-version" }),
             ),
           ),
@@ -156,7 +150,7 @@ module.exports = class AboutView extends EtchComponent {
           $.input({
             className: "input-checkbox",
             type: "checkbox",
-            checked: atom.config.get("welcome.showOnStartup"),
+            checked: atom.config.get("about.showOnStartup"),
             onchange: this.handleShowOnStartupChange.bind(this),
           }),
           " Show when opening Lumine",

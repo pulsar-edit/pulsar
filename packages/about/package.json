@@ -12,6 +12,15 @@
   "dependencies": {
     "etch": "^0.14.1"
   },
+  "configSchema": {
+    "showOnStartup": {
+      "order": 1,
+      "title": "Show About On Startup",
+      "description": "Show the About pane when opening a new Lumine window.",
+      "type": "boolean",
+      "default": true
+    }
+  },
   "deserializers": {
     "AboutView": "deserializeAboutView"
   }
