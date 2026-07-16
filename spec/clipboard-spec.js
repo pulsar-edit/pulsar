@@ -57,13 +57,17 @@ describe("Clipboard", () => {
   });
 
   describe("ClipboardEvent data", () => {
-    it("writes only plain text and VS Code-compatible editor metadata", () => {
+    it("writes plain text, VS Code metadata, and Lumine editor metadata", () => {
       const clipboardData = createClipboardData();
       const metadata = { indentBasis: 0, fullLine: true };
 
       atom.clipboard.createDataTransferClipboard(clipboardData).write("next\n", metadata);
 
-      expect(clipboardData.types).toEqual(["text/plain", "vscode-editor-data"]);
+      expect(clipboardData.types).toEqual([
+        "text/plain",
+        "vscode-editor-data",
+        "application/lumine-text-editor",
+      ]);
       expect(clipboardData.getData("text/plain").replace(/\r\n/g, "\n")).toBe("next\n");
 
       const editorData = JSON.parse(clipboardData.getData("vscode-editor-data"));
@@ -74,6 +78,10 @@ describe("Clipboard", () => {
       expect(editorData.lumine.version).toBe(1);
       expect(editorData.lumine.signature).toEqual(jasmine.any(String));
       expect(editorData.lumine.metadata).toEqual(metadata);
+
+      expect(JSON.parse(clipboardData.getData("application/lumine-text-editor"))).toEqual(
+        editorData.lumine,
+      );
     });
 
     it("reads Lumine metadata in a different clipboard instance", () => {
@@ -85,6 +93,7 @@ describe("Clipboard", () => {
         ],
       };
       atom.clipboard.createDataTransferClipboard(clipboardData).write("one\ntwo", metadata);
+      clipboardData.setData("vscode-editor-data", "");
 
       const otherRendererClipboard = new Clipboard();
       expect(otherRendererClipboard.createDataTransferClipboard(clipboardData).readWithMetadata()).toEqual({

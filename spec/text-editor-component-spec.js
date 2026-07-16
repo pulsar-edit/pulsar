@@ -5454,6 +5454,28 @@ describe("TextEditorComponent", () => {
       expect(event.preventDefault).toHaveBeenCalled();
     });
 
+    it("offers clipboard event data to paste providers before inserting text", () => {
+      const { component, editor } = buildComponent({ text: "target" });
+      const clipboardData = createClipboardData({ "text/plain": "replacement" });
+      const provider = {
+        handlePaste: jasmine.createSpy("handlePaste").and.callFake((context) => {
+          expect(context.target).toEqual({ type: "text-editor", editor });
+          expect(context.clipboardData).toBe(clipboardData);
+          expect(context.clipboard.readWithMetadata()).toEqual({ text: "replacement" });
+          return true;
+        }),
+      };
+      const registration = TextEditor.pasteProviderRegistry.add(provider);
+      const event = { clipboardData, preventDefault: jasmine.createSpy("preventDefault") };
+
+      component.didPaste(event);
+
+      expect(provider.handlePaste).toHaveBeenCalled();
+      expect(editor.getText()).toBe("target");
+      expect(event.preventDefault).toHaveBeenCalled();
+      registration.dispose();
+    });
+
     it("prevents the browser's default processing for the event on Linux", () => {
       const { component } = buildComponent({ platform: "linux" });
       const event = { preventDefault: () => {} };

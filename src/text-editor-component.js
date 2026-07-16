@@ -1884,7 +1884,28 @@ module.exports = class TextEditorComponent {
       this.pendingPasteOperation = null;
     }
 
-    if (!operation.handled) this.props.model.pasteText(options);
+    if (
+      !operation.handled &&
+      !this.handlePasteProviders({
+        clipboard: this.props.model.constructor.clipboard,
+        options,
+      })
+    ) {
+      this.props.model.pasteText(options);
+    }
+  }
+
+  handlePasteProviders({ clipboard, clipboardData = null, options = {} }) {
+    const { model } = this.props;
+    const registry = model.constructor.pasteProviderRegistry;
+    if (!registry) return false;
+
+    return registry.handlePaste({
+      target: { type: "text-editor", editor: model },
+      clipboard,
+      clipboardData,
+      options,
+    });
   }
 
   performClipboardOperation(type, onlySelectedText) {
@@ -1950,7 +1971,10 @@ module.exports = class TextEditorComponent {
       const clipboard = this.props.model.constructor.clipboard.createDataTransferClipboard(
         event.clipboardData,
       );
-      this.props.model.pasteText({ ...operation?.options, clipboard });
+      const options = operation?.options || {};
+      if (!this.handlePasteProviders({ clipboard, clipboardData: event.clipboardData, options })) {
+        this.props.model.pasteText({ ...options, clipboard });
+      }
       event.preventDefault();
       if (operation) operation.handled = true;
     } else if (this.getPlatform() === "linux") {

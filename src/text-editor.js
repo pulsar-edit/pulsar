@@ -75,6 +75,10 @@ module.exports = class TextEditor {
     this.clipboard = clipboard;
   }
 
+  static setPasteProviderRegistry(pasteProviderRegistry) {
+    this.pasteProviderRegistry = pasteProviderRegistry;
+  }
+
   static setScheduler(scheduler) {
     if (TextEditorComponent == null) {
       TextEditorComponent = require("./text-editor-component");

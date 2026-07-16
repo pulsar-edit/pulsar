@@ -8,6 +8,7 @@ const { clipboard } = require("@electron/remote");
 
 const VSCODE_EDITOR_DATA_FORMAT = "vscode-editor-data";
 const VSCODE_EDITOR_DATA_VERSION = 1;
+const LUMINE_TEXT_EDITOR_DATA_FORMAT = "application/lumine-text-editor";
 const LUMINE_EDITOR_DATA_VERSION = 1;
 
 // Extended: Represents the clipboard used for copying and pasting in Lumine.
@@ -93,8 +94,14 @@ module.exports = class Clipboard {
 
     try {
       const text = clipboardData.getData("text/plain");
+      const lumineData = this.readDataTransferData(
+        clipboardData,
+        LUMINE_TEXT_EDITOR_DATA_FORMAT,
+      );
       const serialized = clipboardData.getData(VSCODE_EDITOR_DATA_FORMAT);
-      const metadata = this.metadataFromSerializedEditorData(serialized, text);
+      const metadata =
+        this.metadataFromLumineEditorData(lumineData, text) ||
+        this.metadataFromSerializedEditorData(serialized, text);
       return metadata ? { text, metadata } : { text };
     } catch {
       return { text: "" };
@@ -103,17 +110,39 @@ module.exports = class Clipboard {
 
   writeToDataTransfer(clipboardData, text, metadata) {
     text = this.normalizeText(text);
-    const editorData = this.buildVSCodeEditorData(text, metadata);
+    const lumineData = this.buildLumineEditorData(text, metadata);
+    const editorData = this.buildVSCodeEditorData(metadata, lumineData);
 
     clipboardData.setData("text/plain", text);
     clipboardData.setData(VSCODE_EDITOR_DATA_FORMAT, JSON.stringify(editorData));
+    if (lumineData) {
+      this.writeDataTransferData(
+        clipboardData,
+        LUMINE_TEXT_EDITOR_DATA_FORMAT,
+        lumineData,
+      );
+    }
 
     this.signatureForMetadata = this.md5(text);
     this.metadata = metadata;
     return { text, metadata };
   }
 
-  buildVSCodeEditorData(text, metadata) {
+  buildLumineEditorData(text, metadata) {
+    if (metadata == null) return null;
+    try {
+      JSON.stringify(metadata);
+      return {
+        version: LUMINE_EDITOR_DATA_VERSION,
+        signature: this.signatureForText(text),
+        metadata,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  buildVSCodeEditorData(metadata, lumineData) {
     const selections = Array.isArray(metadata?.selections) ? metadata.selections : null;
     const isFromEmptySelection = selections
       ? selections.length > 0 && selections.every((selection) => selection?.fullLine === true)
@@ -130,19 +159,36 @@ module.exports = class Clipboard {
       mode: null,
     };
 
-    try {
-      JSON.stringify(metadata);
-      editorData.lumine = {
-        version: LUMINE_EDITOR_DATA_VERSION,
-        signature: this.signatureForText(text),
-        metadata,
-      };
-    } catch {
-      // VS Code-compatible metadata remains available even when a package has
-      // attached renderer-local metadata that cannot be serialized.
-    }
+    if (lumineData) editorData.lumine = lumineData;
 
     return editorData;
+  }
+
+  writeDataTransferData(clipboardData, format, data) {
+    clipboardData.setData(format, JSON.stringify(data));
+  }
+
+  readDataTransferData(clipboardData, format) {
+    if (typeof clipboardData?.getData !== "function") return null;
+    try {
+      return this.parseDataTransferData(clipboardData.getData(format));
+    } catch {
+      return null;
+    }
+  }
+
+  parseDataTransferData(serialized) {
+    if (!serialized) return null;
+    let data;
+    try {
+      data = JSON.parse(serialized);
+    } catch {
+      return null;
+    }
+    if (data == null || typeof data !== "object" || Array.isArray(data)) {
+      return null;
+    }
+    return data;
   }
 
   // Public: Read the text from the clipboard.
@@ -184,6 +230,12 @@ module.exports = class Clipboard {
 
   readNativeMetadata(text) {
     try {
+      const lumineData = this.parseDataTransferData(
+        clipboard.read(LUMINE_TEXT_EDITOR_DATA_FORMAT),
+      );
+      const metadata = this.metadataFromLumineEditorData(lumineData, text);
+      if (metadata) return metadata;
+
       const serialized = clipboard.read(VSCODE_EDITOR_DATA_FORMAT);
       return this.metadataFromSerializedEditorData(serialized, text);
     } catch {
@@ -204,18 +256,21 @@ module.exports = class Clipboard {
     if (editorData?.version !== VSCODE_EDITOR_DATA_VERSION) return null;
 
     if (editorData.lumine != null) {
-      const lumineData = editorData.lumine;
-      if (
-        lumineData.version !== LUMINE_EDITOR_DATA_VERSION ||
-        lumineData.signature !== this.signatureForText(text) ||
-        !this.isValidMetadata(lumineData.metadata)
-      ) {
-        return null;
-      }
-      return lumineData.metadata;
+      return this.metadataFromLumineEditorData(editorData.lumine, text);
     }
 
     return this.metadataFromVSCodeEditorData(editorData);
+  }
+
+  metadataFromLumineEditorData(lumineData, text) {
+    if (
+      lumineData?.version !== LUMINE_EDITOR_DATA_VERSION ||
+      lumineData.signature !== this.signatureForText(text) ||
+      !this.isValidMetadata(lumineData.metadata)
+    ) {
+      return null;
+    }
+    return lumineData.metadata;
   }
 
   metadataFromVSCodeEditorData(editorData) {

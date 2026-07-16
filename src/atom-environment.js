@@ -44,6 +44,7 @@ const Dock = require("./dock");
 const TextEditor = require("./text-editor");
 const TextBuffer = require("@lumine-code/text-buffer");
 const TextEditorRegistry = require("./text-editor-registry");
+const PasteProviderRegistry = require("./paste-provider-registry");
 const StartupTime = require("./startup-time");
 const { getReleaseChannel } = require("./get-app-details.js");
 const UI = require("./ui/index.js");
@@ -186,6 +187,8 @@ class AtomEnvironment {
       assert: this.assert.bind(this),
       packageManager: this.packages,
     });
+    this.pasteProviders = new PasteProviderRegistry();
+    TextEditor.setPasteProviderRegistry(this.pasteProviders);
 
     /** @type {Workspace} */
     this.workspace = new Workspace({
@@ -449,6 +452,7 @@ class AtomEnvironment {
     this.workspace.initialize({ configDirPath: this.getConfigDirPath() });
     this.grammars.clear();
     this.textEditors.clear();
+    this.pasteProviders.clear();
     this.views.clear();
     this.pathsWithWaitSessions.clear();
   }
