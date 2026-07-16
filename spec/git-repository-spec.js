@@ -220,7 +220,7 @@ describe("GitRepository", () => {
       });
 
       fs.writeFileSync(filePath, "abc");
-      status = repo.getPathStatus(filePath);
+      repo.getPathStatus(filePath);
       expect(statusHandler.calls.count()).toBe(1);
     });
   });
@@ -305,6 +305,75 @@ describe("GitRepository", () => {
       fs.writeFileSync(modifiedPath, originalContent);
       await repo.refreshStatus();
       expect(repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))).toBeFalsy();
+    });
+  });
+
+  describe(".refreshStatusSnapshot()", () => {
+    let output, statusSnapshotProvider, workingDirectory;
+
+    beforeEach(() => {
+      workingDirectory = copyRepository();
+      output = ["# branch.oid abc123", "# branch.head main", "? new file.txt", ""].join("\0");
+      statusSnapshotProvider = {
+        getStatus: jasmine.createSpy("getStatus").andCallFake(() => Promise.resolve(output)),
+      };
+      repo = new GitRepository(workingDirectory, {
+        refreshOnWindowFocus: false,
+        statusSnapshotProvider,
+      });
+    });
+
+    it("caches immutable entries and only emits semantic changes", async () => {
+      const changeHandler = jasmine.createSpy("changeHandler");
+      repo.onDidChangeStatusSnapshot(changeHandler);
+
+      const firstSnapshot = await repo.refreshStatusSnapshot();
+      const secondSnapshot = await repo.refreshStatusSnapshot();
+
+      expect(firstSnapshot.initialized).toBe(true);
+      expect(firstSnapshot.generation).toBe(1);
+      expect(secondSnapshot).toBe(firstSnapshot);
+      expect(changeHandler.calls.count()).toBe(1);
+      expect(repo.getStatusEntry("new file.txt")).toBe(firstSnapshot.files[0]);
+      expect(repo.getStatusEntry(path.join(workingDirectory, "new file.txt"))).toBe(
+        firstSnapshot.files[0],
+      );
+
+      output = "# branch.oid abc123\0# branch.head main\0";
+      const cleanSnapshot = await repo.refreshStatusSnapshot();
+      expect(cleanSnapshot.generation).toBe(2);
+      expect(cleanSnapshot.files).toEqual([]);
+      expect(repo.getStatusEntry("new file.txt")).toBeNull();
+      expect(changeHandler.calls.count()).toBe(2);
+    });
+
+    it("forwards cancellation and ignored-file options", async () => {
+      const signal = {};
+      const snapshot = await repo.refreshStatusSnapshot({ includeIgnored: true, signal });
+
+      expect(snapshot.includesIgnored).toBe(true);
+      const [statusPath, statusOptions] = statusSnapshotProvider.getStatus.calls.argsFor(0);
+      expect(statusPath).toBe(repo.getWorkingDirectory());
+      expect(statusOptions.includeIgnored).toBe(true);
+      expect(statusOptions.signal).toBe(signal);
+    });
+
+    it("does not let an older concurrent refresh replace a newer snapshot", async () => {
+      const resolvers = [];
+      statusSnapshotProvider.getStatus.andCallFake(
+        () => new Promise((resolve) => resolvers.push(resolve)),
+      );
+
+      const olderRefresh = repo.refreshStatusSnapshot();
+      const newerRefresh = repo.refreshStatusSnapshot();
+      resolvers[1]("# branch.oid newest\0# branch.head main\0? newest.txt\0");
+      const newerSnapshot = await newerRefresh;
+      resolvers[0]("# branch.oid older\0# branch.head main\0? older.txt\0");
+
+      expect(await olderRefresh).toBe(newerSnapshot);
+      expect(repo.getStatusSnapshot()).toBe(newerSnapshot);
+      expect(repo.getStatusEntry("newest.txt")).toBe(newerSnapshot.files[0]);
+      expect(repo.getStatusEntry("older.txt")).toBeNull();
     });
   });
 

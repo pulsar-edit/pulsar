@@ -114,11 +114,18 @@ describe("DugiteRepositoryOperationProvider", () => {
       await repository.getOperations().setConfig("user.name", "Lumine Specs");
       await repository.getOperations().setConfig("user.email", "specs@lumine.invalid");
       fs.writeFileSync(path.join(workingDirectory, "public-api.txt"), "public api\n");
+
+      const untrackedSnapshot = await repository.refreshStatusSnapshot();
+      expect(repository.getStatusEntry("public-api.txt")).toBe(untrackedSnapshot.files[0]);
+      expect(repository.getStatusEntry("public-api.txt").untracked).toBe(true);
+
       await repository.getOperations().stageFiles(["public-api.txt"]);
+      expect(repository.getStatusEntry("public-api.txt").indexStatus).toBe("A");
       await repository.getOperations().commit("Public API commit");
 
       expect(repository.getShortHead()).toBe("main");
       expect(repository.isPathModified("public-api.txt")).toBe(false);
+      expect(repository.getStatusSnapshot().files).toEqual([]);
     } finally {
       atom.repositories.forget(repository);
     }

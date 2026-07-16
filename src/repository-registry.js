@@ -634,7 +634,12 @@ module.exports = class RepositoryRegistry {
     if (repository.isDestroyed?.()) return;
     try {
       repository.refreshIndex?.();
-      await repository.refreshStatus?.();
+      const refreshes = [];
+      if (repository.refreshStatus) refreshes.push(repository.refreshStatus());
+      if (repository.refreshStatusSnapshot && repository.getStatusSnapshot?.().initialized) {
+        refreshes.push(repository.refreshStatusSnapshot());
+      }
+      await Promise.all(refreshes);
     } catch (error) {
       // The Git command has already succeeded. Never report it as failed (and
       // invite a dangerous retry) merely because the read cache did not refresh.

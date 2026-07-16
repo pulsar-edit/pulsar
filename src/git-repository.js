@@ -3,14 +3,21 @@ const fs = require("@lumine-code/fs-plus");
 const _ = require("@lumine-code/underscore-plus");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
 const GitUtils = require("@lumine-code/git-utils");
+const DugiteRepositoryStatusProvider = require("./dugite-repository-status-provider");
+const { EMPTY_STATUS_SNAPSHOT, parseStatusSnapshot } = require("./repository-status-snapshot");
 
 let nextId = 0;
+
+function statusPathKey(filePath) {
+  const normalized = filePath.split(path.sep).join("/").replace(/^\.\//, "");
+  return process.platform === "win32" ? normalized.toLowerCase() : normalized;
+}
 
 // Extended: Represents the underlying git operations performed by Lumine.
 //
 // This class shouldn't be instantiated directly but instead by accessing the
-// `atom.project` global and calling `getRepositories()`. Note that this will
-// only be available when the project is backed by a Git repository.
+// `atom.repositories` and calling `getRepositories()` or `getForPath()`. It is
+// independent from project roots and may represent containing or nested repos.
 //
 // This class handles submodules automatically by taking a `path` argument to many
 // of the methods.  This `path` argument will determine which underlying
@@ -19,7 +26,7 @@ let nextId = 0;
 // For a repository with submodules this would have the following outcome:
 //
 // ```coffee
-// repo = atom.project.getRepositories()[0]
+// repo = atom.repositories.getRepositories()[0]
 // repo.getShortHead() # 'master'
 // repo.getShortHead('vendor/path/to/a/submodule') # 'dead1234'
 // ```
@@ -29,7 +36,7 @@ let nextId = 0;
 // ### Logging the URL of the origin remote
 //
 // ```coffee
-// git = atom.project.getRepositories()[0]
+// git = atom.repositories.getRepositories()[0]
 // console.log git.getOriginURL()
 // ```
 //
@@ -83,6 +90,12 @@ module.exports = class GitRepository {
 
     this.statusRefreshCount = 0;
     this.statuses = {};
+    this.statusSnapshotProvider =
+      options.statusSnapshotProvider || new DugiteRepositoryStatusProvider();
+    this.statusSnapshot = EMPTY_STATUS_SNAPSHOT;
+    this.statusSnapshotCacheKey = null;
+    this.statusSnapshotRefreshCount = 0;
+    this.statusEntriesByPath = new Map();
     this.upstream = { ahead: 0, behind: 0 };
     for (let submodulePath in this.repo.submodules) {
       const submoduleRepo = this.repo.submodules[submodulePath];
@@ -97,6 +110,7 @@ module.exports = class GitRepository {
       const onWindowFocus = () => {
         this.refreshIndex();
         this.refreshStatus();
+        if (this.statusSnapshot.initialized) this.refreshStatusSnapshot();
       };
 
       window.addEventListener("focus", onWindowFocus);
@@ -118,8 +132,11 @@ module.exports = class GitRepository {
   // This destroys any tasks and subscriptions and releases the underlying
   // libgit2 repository handle. This method is idempotent.
   destroy() {
+    this.statusSnapshotRefreshCount++;
     this.repo = null;
     this.operations = null;
+    this.statusSnapshotProvider = null;
+    this.statusEntriesByPath.clear();
 
     if (this.emitter) {
       this.emitter.emit("did-destroy");
@@ -192,6 +209,16 @@ module.exports = class GitRepository {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeStatuses(callback) {
     return this.emitter.on("did-change-statuses", callback);
+  }
+
+  // Public: Invoke the given callback when the detailed repository status
+  // snapshot changes.
+  //
+  // * `callback` {Function} called with an immutable status snapshot.
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidChangeStatusSnapshot(callback) {
+    return this.emitter.on("did-change-status-snapshot", callback);
   }
 
   /*
@@ -421,6 +448,56 @@ module.exports = class GitRepository {
   // Returns a status {Number} or null if the path is not in the cache.
   getCachedPathStatus(path) {
     return this.statuses[this.relativize(path)];
+  }
+
+  // Public: Return the latest immutable detailed status snapshot. It contains
+  // `head`, `upstream`, per-file staged/unstaged/conflict state, aggregate
+  // `counts`, and a monotonic `generation`. The initial snapshot has
+  // `initialized: false`; call {::refreshStatusSnapshot} to load it.
+  getStatusSnapshot() {
+    return this.statusSnapshot;
+  }
+
+  // Public: Return detailed cached status for a repository path, or `null`.
+  getStatusEntry(filePath) {
+    if (filePath == null) return null;
+    const inputPath = String(filePath);
+    const relativePath = path.isAbsolute(inputPath) ? this.relativize(inputPath) : inputPath;
+    return this.statusEntriesByPath.get(statusPathKey(relativePath)) || null;
+  }
+
+  // Public: Refresh the detailed branch and file status snapshot with Dugite.
+  // This is intentionally independent from the synchronous git-utils cache so
+  // hot path coloring never waits for a Git subprocess.
+  async refreshStatusSnapshot(options = {}) {
+    const provider = this.statusSnapshotProvider;
+    if (!provider || this.isDestroyed()) throw new Error("Repository has been destroyed");
+
+    const refreshCount = ++this.statusSnapshotRefreshCount;
+    const includeIgnored = options.includeIgnored === true;
+    const output = await provider.getStatus(this.getWorkingDirectory(), {
+      ...options,
+      includeIgnored,
+    });
+
+    if (this.isDestroyed() || refreshCount !== this.statusSnapshotRefreshCount) {
+      return this.statusSnapshot;
+    }
+
+    const cacheKey = `${includeIgnored ? "ignored" : "tracked"}\0${output}`;
+    if (cacheKey === this.statusSnapshotCacheKey) return this.statusSnapshot;
+
+    const snapshot = parseStatusSnapshot(output, {
+      generation: this.statusSnapshot.generation + 1,
+      includesIgnored: includeIgnored,
+    });
+    this.statusSnapshot = snapshot;
+    this.statusSnapshotCacheKey = cacheKey;
+    this.statusEntriesByPath = new Map(
+      snapshot.files.map((entry) => [statusPathKey(entry.path), entry]),
+    );
+    this.emitter.emit("did-change-status-snapshot", snapshot);
+    return snapshot;
   }
 
   // Public: Returns true if the given status indicates modification.
