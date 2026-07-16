@@ -587,6 +587,10 @@ class TreeView {
   // Update the state of the tree view by synchronizing it with the state of
   // the filesystem and the user's current settings.
   updateRoots(expansionStates = {}) {
+    // Repository destruction can schedule this callback while the window is
+    // shutting down, after AtomEnvironment has already cleared its project.
+    if (atom.isDestroying || !atom.project) return;
+
     let selectedPaths = this.selectedPaths();
     let oldExpansionStates = {};
     for (let root of this.roots) {
