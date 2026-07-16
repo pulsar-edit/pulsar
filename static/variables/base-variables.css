@@ -133,6 +133,7 @@
   --tab-background-color-editor: var(--syntax-background-color);
   --tab-inactive-status-added: rgb(from var(--text-color-success) r g b / 55%);
   --tab-inactive-status-modified: rgb(from var(--text-color-warning) r g b / 55%);
+  --tab-inactive-status-conflicted: rgb(from var(--text-color-error) r g b / 55%);
   --tooltip-background-color: var(--accent-bg-color);
   --tooltip-text-color: var(--accent-bg-text-color);
   --tooltip-text-key-color: var(--tooltip-background-color);

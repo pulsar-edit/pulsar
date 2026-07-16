@@ -13,6 +13,25 @@ function statusPathKey(filePath) {
   return process.platform === "win32" ? normalized.toLowerCase() : normalized;
 }
 
+// Classify a snapshot entry the way the legacy git-utils status bits were
+// classified by consumers (modified beats added, matching the old
+// isStatusModified-first checks) so hybrid rendering never flickers when the
+// snapshot supersedes the synchronous cache.
+function summaryFromStatusEntry(entry) {
+  const conflicted = entry.conflicted;
+  const modified =
+    !conflicted &&
+    ((entry.indexStatus != null && entry.indexStatus !== "A") || entry.worktreeStatus != null);
+  const added = !conflicted && !modified && (entry.untracked || entry.indexStatus === "A");
+  return Object.freeze({
+    source: "snapshot",
+    conflicted,
+    modified,
+    added,
+    renamed: entry.kind === "renamed" || entry.kind === "copied",
+  });
+}
+
 // Extended: Represents the underlying git operations performed by Lumine.
 //
 // This class shouldn't be instantiated directly but instead by accessing the
@@ -96,6 +115,7 @@ module.exports = class GitRepository {
     this.statusSnapshotCacheKey = null;
     this.statusSnapshotRefreshCount = 0;
     this.statusEntriesByPath = new Map();
+    this.directoryStatusAggregates = new Map();
     this.statusSnapshotSubscriberCount = 0;
     this.statusSnapshotDebounceMs = options.statusSnapshotDebounceMs ?? 150;
     this.statusSnapshotRefreshTimer = null;
@@ -140,6 +160,7 @@ module.exports = class GitRepository {
     this.operations = null;
     this.statusSnapshotProvider = null;
     this.statusEntriesByPath.clear();
+    this.directoryStatusAggregates.clear();
     if (this.statusSnapshotRefreshTimer != null) {
       clearTimeout(this.statusSnapshotRefreshTimer);
       this.statusSnapshotRefreshTimer = null;
@@ -548,8 +569,101 @@ module.exports = class GitRepository {
     this.statusEntriesByPath = new Map(
       snapshot.files.map((entry) => [statusPathKey(entry.path), entry]),
     );
+    this.directoryStatusAggregates = this.buildDirectoryStatusAggregates(snapshot);
     this.emitter.emit("did-change-status-snapshot", snapshot);
     return snapshot;
+  }
+
+  // One pass over the snapshot's changed files, OR-ing each file's
+  // classification into every ancestor directory ("" is the repository root),
+  // so directory queries never rescan the file list.
+  buildDirectoryStatusAggregates(snapshot) {
+    const aggregates = new Map();
+    for (const entry of snapshot.files) {
+      if (entry.ignored) continue;
+      const summary = summaryFromStatusEntry(entry);
+      if (!summary.conflicted && !summary.modified && !summary.added) continue;
+
+      let key = statusPathKey(entry.path);
+      do {
+        const separatorIndex = key.lastIndexOf("/");
+        key = separatorIndex === -1 ? "" : key.slice(0, separatorIndex);
+        let aggregate = aggregates.get(key);
+        if (!aggregate) {
+          aggregate = { conflicted: false, modified: false, added: false };
+          aggregates.set(key, aggregate);
+        }
+        aggregate.conflicted = aggregate.conflicted || summary.conflicted;
+        aggregate.modified = aggregate.modified || summary.modified;
+        aggregate.added = aggregate.added || summary.added;
+      } while (key !== "");
+    }
+    return aggregates;
+  }
+
+  // Public: Classified status for one path, independent of git-utils status
+  // bits. Prefers the detailed status snapshot when it has loaded and falls
+  // back to the synchronous cache, so consumers paint instantly on startup and
+  // upgrade automatically. Paths only the synchronous cache knows (files
+  // inside submodules) always use the cache.
+  //
+  // * `filePath` A {String} path, absolute or repository-relative.
+  //
+  // Returns a frozen `{source, conflicted, modified, added, renamed}` object
+  // where `source` is `"snapshot"` or `"cache"`, or `null` for clean, ignored,
+  // and unknown paths.
+  getPathStatusSummary(filePath) {
+    if (filePath == null || this.isDestroyed()) return null;
+
+    if (this.statusSnapshot.initialized) {
+      const entry = this.getStatusEntry(filePath);
+      if (entry) return entry.ignored ? null : summaryFromStatusEntry(entry);
+    }
+
+    const status = this.statuses[this.relativize(String(filePath))];
+    if (!status) return null;
+    const modified = this.isStatusModified(status);
+    const added = !modified && this.isStatusNew(status);
+    if (!modified && !added) return null;
+    return Object.freeze({ source: "cache", conflicted: false, modified, added, renamed: false });
+  }
+
+  // Public: Aggregate classified status for a directory, including the
+  // repository root. Same sourcing and shape as {::getPathStatusSummary}
+  // (without `renamed`); returns `null` when nothing below the directory has
+  // a reportable status.
+  getDirectoryStatusSummary(directoryPath) {
+    if (directoryPath == null || this.isDestroyed()) return null;
+    const relativePath = this.relativize(String(directoryPath));
+    if (relativePath == null) return null;
+
+    if (this.statusSnapshot.initialized) {
+      const aggregate = this.directoryStatusAggregates.get(statusPathKey(relativePath));
+      if (aggregate) {
+        return Object.freeze({
+          source: "snapshot",
+          conflicted: aggregate.conflicted,
+          modified: aggregate.modified,
+          added: aggregate.added,
+        });
+      }
+      // No aggregate: the directory is clean as far as the snapshot knows.
+      // Fall through to the cache, which additionally tracks changes inside
+      // submodules that the root-repository snapshot cannot see.
+    }
+
+    const prefix = relativePath === "" ? "" : `${relativePath}/`;
+    let combinedStatus = 0;
+    for (const statusPath in this.statuses) {
+      if (prefix === "" || statusPath.startsWith(prefix)) {
+        combinedStatus |= this.statuses[statusPath];
+      }
+    }
+    if (combinedStatus === 0) return null;
+    const modified = this.isStatusModified(combinedStatus);
+    const added = !modified && this.isStatusNew(combinedStatus);
+    if (!modified && !added) return null;
+    return Object.freeze({ source: "cache", conflicted: false, modified, added });
   }
 
   // Public: Returns true if the given status indicates modification.

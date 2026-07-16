@@ -502,6 +502,143 @@ describe("GitRepository", () => {
     });
   });
 
+  describe("status summaries", () => {
+    let output, statusSnapshotProvider, workingDirectory;
+
+    beforeEach(() => {
+      workingDirectory = copyRepository();
+      output = "# branch.oid abc123\0# branch.head main\0";
+      statusSnapshotProvider = {
+        getStatus: jasmine.createSpy("getStatus").andCallFake(() => Promise.resolve(output)),
+      };
+      repo = new GitRepository(workingDirectory, {
+        refreshOnWindowFocus: false,
+        statusSnapshotProvider,
+      });
+    });
+
+    it("classifies from the synchronous cache before the snapshot loads", async () => {
+      const filePath = path.join(workingDirectory, "dir", "b.txt");
+      fs.writeFileSync(filePath, "changed");
+      await repo.refreshStatus();
+
+      const fileSummary = repo.getPathStatusSummary(filePath);
+      expect(fileSummary.source).toBe("cache");
+      expect(fileSummary.modified).toBe(true);
+      expect(fileSummary.added).toBe(false);
+      expect(fileSummary.conflicted).toBe(false);
+
+      const directorySummary = repo.getDirectoryStatusSummary(path.join(workingDirectory, "dir"));
+      expect(directorySummary.source).toBe("cache");
+      expect(directorySummary.modified).toBe(true);
+
+      const rootSummary = repo.getDirectoryStatusSummary(workingDirectory);
+      expect(rootSummary.source).toBe("cache");
+      expect(rootSummary.modified).toBe(true);
+
+      expect(repo.getPathStatusSummary(path.join(workingDirectory, "no-such-file.txt"))).toBeNull();
+    });
+
+    it("pins the snapshot classification to the legacy modified-beats-added order", async () => {
+      output = [
+        "# branch.oid abc123",
+        "# branch.head main",
+        "1 .M N... 100644 100644 100644 aaa bbb modified.txt",
+        "1 A. N... 000000 100644 100644 000 bbb added.txt",
+        "1 AM N... 000000 100644 100644 000 bbb added-modified.txt",
+        "1 .D N... 100644 100644 000000 aaa bbb deleted.txt",
+        "2 R. N... 100644 100644 100644 aaa bbb R100 renamed.txt",
+        "old-name.txt",
+        "u UU N... 100644 100644 100644 100644 aaa bbb ccc conflicted.txt",
+        "? untracked.txt",
+        "",
+      ].join("\0");
+      await repo.refreshStatusSnapshot();
+
+      const summaryOf = (name) => repo.getPathStatusSummary(name);
+      expect(summaryOf("modified.txt")).toEqual(
+        jasmine.objectContaining({ source: "snapshot", modified: true, added: false }),
+      );
+      expect(summaryOf("added.txt")).toEqual(
+        jasmine.objectContaining({ added: true, modified: false }),
+      );
+      expect(summaryOf("added-modified.txt")).toEqual(
+        jasmine.objectContaining({ modified: true, added: false }),
+      );
+      expect(summaryOf("deleted.txt")).toEqual(jasmine.objectContaining({ modified: true }));
+      expect(summaryOf("renamed.txt")).toEqual(
+        jasmine.objectContaining({ modified: true, renamed: true }),
+      );
+      expect(summaryOf("conflicted.txt")).toEqual(
+        jasmine.objectContaining({ conflicted: true, modified: false, added: false }),
+      );
+      expect(summaryOf("untracked.txt")).toEqual(
+        jasmine.objectContaining({ added: true, modified: false }),
+      );
+      expect(summaryOf("absent.txt")).toBeNull();
+    });
+
+    it("aggregates directory status from the snapshot in one pass", async () => {
+      output = [
+        "# branch.oid abc123",
+        "# branch.head main",
+        "1 .M N... 100644 100644 100644 aaa bbb src/a.txt",
+        "u UU N... 100644 100644 100644 100644 aaa bbb ccc src/deep/c.txt",
+        "? src/deep/new.txt",
+        "",
+      ].join("\0");
+      await repo.refreshStatusSnapshot();
+
+      const deep = repo.getDirectoryStatusSummary(path.join(workingDirectory, "src", "deep"));
+      expect(deep.source).toBe("snapshot");
+      expect(deep.conflicted).toBe(true);
+      expect(deep.added).toBe(true);
+      expect(deep.modified).toBe(false);
+
+      const src = repo.getDirectoryStatusSummary(path.join(workingDirectory, "src"));
+      expect(src.conflicted).toBe(true);
+      expect(src.modified).toBe(true);
+      expect(src.added).toBe(true);
+
+      const root = repo.getDirectoryStatusSummary(workingDirectory);
+      expect(root.source).toBe("snapshot");
+      expect(root.conflicted).toBe(true);
+
+      expect(repo.getDirectoryStatusSummary(path.join(workingDirectory, "dir"))).toBeNull();
+    });
+
+    it("rebuilds the aggregates when a newer snapshot arrives", async () => {
+      output = [
+        "# branch.oid abc123",
+        "# branch.head main",
+        "1 .M N... 100644 100644 100644 aaa bbb src/a.txt",
+        "",
+      ].join("\0");
+      await repo.refreshStatusSnapshot();
+      expect(repo.getDirectoryStatusSummary(workingDirectory).modified).toBe(true);
+
+      output = "# branch.oid abc123\0# branch.head main\0";
+      await repo.refreshStatusSnapshot();
+      expect(repo.getDirectoryStatusSummary(workingDirectory)).toBeNull();
+    });
+
+    it("keeps snapshot-era queries working for paths only the cache knows", async () => {
+      const filePath = path.join(workingDirectory, "dir", "b.txt");
+      fs.writeFileSync(filePath, "changed");
+      await repo.refreshStatus();
+      await repo.refreshStatusSnapshot();
+
+      // The fake snapshot reports a clean tree; the cache still knows the
+      // change, mirroring how submodule contents surface only in the cache.
+      const summary = repo.getPathStatusSummary(filePath);
+      expect(summary.source).toBe("cache");
+      expect(summary.modified).toBe(true);
+
+      const directorySummary = repo.getDirectoryStatusSummary(path.join(workingDirectory, "dir"));
+      expect(directorySummary.source).toBe("cache");
+    });
+  });
+
   describe("buffer events", () => {
     let editor;
 

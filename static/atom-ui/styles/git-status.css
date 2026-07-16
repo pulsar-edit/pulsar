@@ -19,3 +19,6 @@
 .status-renamed {
   color: var(--text-color-info);
 }
+.status-conflicted {
+  color: var(--text-color-error);
+}
