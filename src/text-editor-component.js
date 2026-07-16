@@ -1509,11 +1509,17 @@ module.exports = class TextEditorComponent {
 
       const pixelTop = this.pixelPositionAfterBlocksForRow(row);
       const pixelLeft = this.pixelLeftForRowAndColumn(row, column);
+      // A buffer change between measuring and rendering can shift screen lines
+      // so this row's horizontal position was never measured. Skip the cursor
+      // for this frame (as highlights do) rather than pushing a NaN pixelLeft/
+      // pixelWidth; the next update sees consistent state.
+      if (pixelLeft == null) return;
       let pixelWidth;
       if (cursor.columnWidth === 0) {
         pixelWidth = this.getBaseCharacterWidth();
       } else {
-        pixelWidth = this.pixelLeftForRowAndColumn(row, column + 1) - pixelLeft;
+        const nextPixelLeft = this.pixelLeftForRowAndColumn(row, column + 1);
+        pixelWidth = nextPixelLeft == null ? this.getBaseCharacterWidth() : nextPixelLeft - pixelLeft;
       }
 
       const cursorPosition = {
