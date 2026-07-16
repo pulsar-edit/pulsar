@@ -1,5 +1,5 @@
 const { CompositeDisposable, Point } = require("atom");
-const { highlightMatches } = require("select-list");
+const { highlightMatches } = require("@lumine-code/select-list");
 
 const Config = require("./config");
 const SymbolsView = require("./symbols-view");

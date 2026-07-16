@@ -1,5 +1,5 @@
 const path = require("path");
-const { SelectListView } = require("select-list");
+const { SelectListView } = require("@lumine-code/select-list");
 
 function setConfigForLanguageMode(mode) {
   let useTreeSitterParsers = mode !== "textmate";

@@ -2,7 +2,7 @@ const Path = require("path");
 const fs = require("@lumine-code/fs-plus");
 const Config = require("./config");
 const { CompositeDisposable, Point } = require("atom");
-const { SelectListView, highlightMatches } = require("select-list");
+const { SelectListView, highlightMatches } = require("@lumine-code/select-list");
 
 const el = require("./element-builder");
 const { badge } = require("./util");

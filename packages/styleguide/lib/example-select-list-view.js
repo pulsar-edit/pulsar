@@ -1,7 +1,7 @@
 /** @babel */
 /** @jsx etch.dom */
 
-import { SelectListView } from "select-list";
+import { SelectListView } from "@lumine-code/select-list";
 import etch from "etch";
 import dedent from "dedent";
 import CodeBlock from "./code-block";
@@ -9,7 +9,7 @@ import CodeBlock from "./code-block";
 export default class ExampleSelectListView {
   constructor() {
     this.jsExampleCode = dedent`
-    import { SelectListView } from 'select-list'
+    import { SelectListView } from '@lumine-code/select-list'
 
     const selectListView = new SelectListView({
       items: ['one', 'two', 'three'],

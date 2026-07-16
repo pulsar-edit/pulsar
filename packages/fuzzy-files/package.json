@@ -53,7 +53,7 @@
     "async": "3.2.6",
     "minimatch": "^10.2.5",
     "@vscode/ripgrep": "1.18.0",
-    "select-list": "file:../../shared/select-list"
+    "@lumine-code/select-list": "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
   },
   "configSchema": {
     "ignoredNames": {

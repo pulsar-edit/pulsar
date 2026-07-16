@@ -1,5 +1,9 @@
 const { CompositeDisposable, Disposable, Task } = require("atom");
-const { SelectListView, createTwoLineItem, highlightMatches } = require("select-list");
+const {
+  SelectListView,
+  createTwoLineItem,
+  highlightMatches,
+} = require("@lumine-code/select-list");
 const { clipboard, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");

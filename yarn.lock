@@ -1279,6 +1279,13 @@
     grim "^2.0.3"
     vscode-oniguruma "^2.0.1"
 
+"@lumine-code/select-list@https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5":
+  version "2.0.0"
+  resolved "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
+  dependencies:
+    diacritic "^0.0.2"
+    etch "^0.14.0"
+
 "@lumine-code/service-hub@https://github.com/lumine-code/service-hub.git#5422895489f0ba2379cdbd0fc6c9ca87d446cd9b":
   version "1.0.0"
   resolved "https://github.com/lumine-code/service-hub.git#5422895489f0ba2379cdbd0fc6c9ca87d446cd9b"
@@ -2096,7 +2103,7 @@ bluebird@~3.7.2:
 "bookmarks@file:packages/bookmarks":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-bookmarks-1.0.0-288c816d-5e37-4b2b-b13c-81d95558feaa-1784124824806/shared/select-list"
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
 
 boolbase@^1.0.0:
   version "1.0.0"
@@ -2456,8 +2463,8 @@ combined-stream@^1.0.8:
 "command-palette@file:packages/command-palette":
   version "1.0.0"
   dependencies:
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-command-palette-1.0.0-ac99d19e-c271-400b-b975-9d4e41a2ae74-1784124824812/shared/select-list"
 
 commander@^10.0.0:
   version "10.0.1"
@@ -2840,8 +2847,8 @@ empathic@^2.0.1:
 "encoding-selector@file:packages/encoding-selector":
   version "1.0.0"
   dependencies:
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
     jschardet "^3.1.4"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-encoding-selector-1.0.0-a0f48074-05e1-4e87-b20b-290559dbf05d-1784124824819/shared/select-list"
 
 encoding-sniffer@^0.2.1:
   version "0.2.1"
@@ -3372,21 +3379,21 @@ function-bind@^1.1.2:
 "fuzzy-explorer@file:packages/fuzzy-explorer":
   version "1.0.0"
   dependencies:
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
     "@vscode/ripgrep" "1.18.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-explorer-1.0.0-f730d47b-73dd-4ac3-b504-468be6fae29c-1784124824821/shared/select-list"
 
 "fuzzy-files@file:packages/fuzzy-files":
   version "1.0.0"
   dependencies:
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
     "@vscode/ripgrep" "1.18.0"
     async "3.2.6"
     minimatch "^10.2.5"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-files-1.0.0-7e5117b2-7c56-4280-b6b9-4290e896b284-1784124824822/shared/select-list"
 
 "fuzzy-workspace@file:packages/fuzzy-workspace":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-fuzzy-workspace-1.0.0-942cd478-52a3-4250-866f-a5a3e8d0340c-1784124824824/shared/select-list"
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
@@ -3454,7 +3461,7 @@ get-tsconfig@^4.8.1:
 "git-diff@file:packages/git-diff":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-git-diff-1.0.0-5c5935ca-47ed-4848-bae8-bf890b33ee0a-1784124824825/shared/select-list"
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
 
 github-from-package@0.0.0:
   version "0.0.0"
@@ -3586,7 +3593,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0,
 "grammar-selector@file:packages/grammar-selector":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-grammar-selector-1.0.0-291adcba-6fd2-492a-892f-283ecbdfc2bf-1784124824829/shared/select-list"
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
 
 grim@2.0.3, grim@^2.0.1, grim@^2.0.3:
   version "2.0.3"
@@ -4201,8 +4208,8 @@ levn@^0.4.1:
 "line-ending-selector@file:packages/line-ending-selector":
   version "1.0.0"
   dependencies:
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-line-ending-selector-1.0.0-8c7b0998-d240-4214-a1f8-3ef121ae6a59-1784124824883/shared/select-list"
 
 line-top-index@0.3.1:
   version "0.3.1"
@@ -5057,8 +5064,8 @@ progress@^2.0.3:
 "project-list@file:packages/project-list":
   version "1.0.0"
   dependencies:
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
     glob "^13.0.6"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-project-list-1.0.0-6bea2c21-5e36-4e2e-923d-4090420e3f9b-1784124824916/shared/select-list"
 
 promise-retry@^2.0.1:
   version "2.0.1"
@@ -5193,7 +5200,7 @@ readdirp@^4.0.1:
 "recent-list@file:packages/recent-list":
   version "1.0.0"
   dependencies:
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-recent-list-1.0.0-5b5b4d50-143f-4b59-abc4-88c506235a52-1784124824918/shared/select-list"
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
 
 regenerate-unicode-properties@^10.2.2:
   version "10.2.2"
@@ -5348,12 +5355,6 @@ sax@^1.2.4:
   dependencies:
     etch "^0.14.1"
 
-"select-list@file:./shared/select-list", "select-list@file:shared/select-list":
-  version "1.7.0"
-  dependencies:
-    diacritic "^0.0.2"
-    etch "^0.14.0"
-
 selector-kit@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/selector-kit/-/selector-kit-0.1.0.tgz#304338fceccea35ec28ffaddb792ab7715633e6f"
@@ -5504,10 +5505,10 @@ slash@^2.0.0:
   dependencies:
     "@lumine-code/scoped-property-store" "https://github.com/lumine-code/scoped-property-store.git#e8921f85773c625dd95d6711969bfa8d1d42369f"
     "@lumine-code/season" "https://github.com/lumine-code/season.git#8cd50d17ce33826ea2e55d18e936b1f1aeb96342"
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274"
     async "3.2.6"
     pegjs "^0.10.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-snippets-1.0.0-2507f761-ed06-42b4-befa-104ef7552ab6-1784124824925/shared/select-list"
     temp "~0.8.0"
 
 source-map-js@^1.2.1:
@@ -5710,9 +5711,9 @@ strip-json-comments@~2.0.1:
 "styleguide@file:./packages/styleguide":
   version "1.0.0"
   dependencies:
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
     dedent "^1.7.2"
     etch "^0.14.1"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-styleguide-1.0.0-2fedfc5e-5e5a-48e9-a0fc-f77c208273a2-1784124824929/shared/select-list"
 
 sumchecker@^3.0.1:
   version "3.0.1"
@@ -5754,8 +5755,8 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   dependencies:
     "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#742e3e166f56261189ff245a63967b8f1970fadd"
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
     murmurhash-js "^1.0.0"
-    select-list "file:../../../../Users/asiloisad/AppData/Local/Yarn/Cache/v6/npm-symbols-view-1.0.0-0927cbdd-e0d1-4640-b23a-fc3b036d72ce-1784124824933/shared/select-list"
 
 tabbable@^6.5.0:
   version "6.5.0"
@@ -5923,6 +5924,8 @@ tinyglobby@^0.2.12:
 
 "title-bar@file:packages/title-bar":
   version "1.0.0"
+  dependencies:
+    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274"
 
 tmp-promise@^3.0.2:
   version "3.0.3"

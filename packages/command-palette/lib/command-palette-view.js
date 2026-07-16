@@ -1,6 +1,10 @@
 /** @babel */
 
-import { SelectListView, getMatchIndices, highlightMatches } from "select-list";
+import {
+  SelectListView,
+  getMatchIndices,
+  highlightMatches,
+} from "@lumine-code/select-list";
 import { humanizeKeystroke } from "@lumine-code/underscore-plus";
 
 export default class CommandPaletteView {

@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "async": "3.2.6",
-    "select-list": "file:../../shared/select-list",
+    "@lumine-code/select-list": "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5",
     "pegjs": "^0.10.0",
     "@lumine-code/scoped-property-store": "https://github.com/lumine-code/scoped-property-store.git#e8921f85773c625dd95d6711969bfa8d1d42369f",
     "@lumine-code/season": "https://github.com/lumine-code/season.git#8cd50d17ce33826ea2e55d18e936b1f1aeb96342",

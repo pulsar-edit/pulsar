@@ -1,6 +1,6 @@
 const jschardet = require("jschardet");
 const fs = require("fs");
-const { SelectListView, highlightMatches } = require("select-list");
+const { SelectListView, highlightMatches } = require("@lumine-code/select-list");
 
 module.exports = class EncodingListView {
   constructor(encodings) {

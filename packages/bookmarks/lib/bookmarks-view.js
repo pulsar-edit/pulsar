@@ -1,6 +1,6 @@
 const path = require("path");
 
-const { SelectListView } = require("select-list");
+const { SelectListView } = require("@lumine-code/select-list");
 
 module.exports = class BookmarksView {
   constructor(editorsBookmarks) {

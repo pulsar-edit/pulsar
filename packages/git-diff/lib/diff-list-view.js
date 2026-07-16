@@ -1,6 +1,6 @@
 "use babel";
 
-import { SelectListView, highlightMatches } from "select-list";
+import { SelectListView, highlightMatches } from "@lumine-code/select-list";
 import repositoryForPath from "./helpers";
 
 export default class DiffListView {

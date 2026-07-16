@@ -10,7 +10,7 @@
     "atom": "*"
   },
   "dependencies": {
-    "select-list": "file:../../shared/select-list"
+    "@lumine-code/select-list": "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
   },
   "devDependencies": {
     "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#742e3e166f56261189ff245a63967b8f1970fadd",

@@ -1,4 +1,4 @@
-const { SelectListView, highlightMatches } = require("select-list");
+const { SelectListView, highlightMatches } = require("@lumine-code/select-list");
 
 module.exports = class GrammarListView {
   constructor() {

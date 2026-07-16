@@ -1,6 +1,6 @@
 "use babel";
 
-import { SelectListView } from "select-list";
+import { SelectListView } from "@lumine-code/select-list";
 
 import { TextEditor } from "atom";
 import { setLineEnding } from "./main";

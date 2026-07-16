@@ -1,5 +1,9 @@
 const { CompositeDisposable, Disposable } = require("atom");
-const { SelectListView, createTwoLineItem, highlightMatches } = require("select-list");
+const {
+  SelectListView,
+  createTwoLineItem,
+  highlightMatches,
+} = require("@lumine-code/select-list");
 const { shell, clipboard } = require("electron");
 const minimatch = require("minimatch");
 const path = require("path");

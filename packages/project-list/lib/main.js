@@ -1,5 +1,5 @@
 const { CompositeDisposable, Disposable, Emitter, File, Task } = require("atom");
-const { SelectListView, highlightMatches } = require("select-list");
+const { SelectListView, highlightMatches } = require("@lumine-code/select-list");
 // glob >=9 exports named functions; older hoisted versions expose the callable module
 const globPkg = require("glob");
 const glob = typeof globPkg === "function" ? require("util").promisify(globPkg) : globPkg.glob;

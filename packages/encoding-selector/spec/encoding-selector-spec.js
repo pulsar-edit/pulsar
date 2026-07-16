@@ -1,4 +1,4 @@
-const { SelectListView: SelectList } = require("select-list");
+const { SelectListView: SelectList } = require("@lumine-code/select-list");
 // const {it, fit, ffit, beforeEach, afterEach} = require('./async-spec-helpers') // eslint-disable-line
 const path = require("path");
 
