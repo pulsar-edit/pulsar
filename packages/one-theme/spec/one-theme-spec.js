@@ -9,12 +9,18 @@ describe("one-theme", () => {
     await atom.packages.activatePackage("one-theme");
 
     // Defaults.
+    expect(root.hasAttribute("ui-variant")).toBe(false);
     expect(root.getAttribute("ui-tabsizing")).toBe("even");
     expect(root.hasAttribute("ui-tab-close-button")).toBe(false);
     expect(root.hasAttribute("ui-dock-buttons")).toBe(false);
     expect(root.hasAttribute("ui-sticky-headers")).toBe(false);
 
     // Changing a setting updates the matching attribute.
+    atom.config.set("one-theme.variant", "Pure");
+    expect(root.getAttribute("ui-variant")).toBe("pure");
+    atom.config.set("one-theme.variant", "Default");
+    expect(root.hasAttribute("ui-variant")).toBe(false);
+
     atom.config.set("one-theme.tabSizing", "Maximum");
     expect(root.getAttribute("ui-tabsizing")).toBe("maximum");
 
@@ -30,10 +36,12 @@ describe("one-theme", () => {
 
   it("removes the attributes when deactivated", async () => {
     await atom.packages.activatePackage("one-theme");
+    atom.config.set("one-theme.variant", "Pure");
     atom.config.set("one-theme.hideDockButtons", true);
     expect(root.getAttribute("ui-dock-buttons")).toBe("hidden");
 
     await atom.packages.deactivatePackage("one-theme");
+    expect(root.hasAttribute("ui-variant")).toBe(false);
     expect(root.hasAttribute("ui-tabsizing")).toBe(false);
     expect(root.hasAttribute("ui-dock-buttons")).toBe(false);
   });

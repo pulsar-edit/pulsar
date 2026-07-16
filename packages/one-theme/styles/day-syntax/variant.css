@@ -1,0 +1,48 @@
+/*
+ * Pure variant of the one-day syntax palette — a neutral, pure-white
+ * background with a blue accent. Active while lib/main.js sets the
+ * `ui-variant="pure"` root attribute (one-theme.variant = "Pure").
+ *
+ * Derived from the one-day palette by desaturating the background config
+ * (hue 0, saturation 0%, brightness 100%) and pinning the accent to blue.
+ * The Less shim for community packages keeps the default palette: only
+ * the plain `:root` block in variables.css feeds the shim.
+ */
+
+:root[ui-variant="pure"] {
+  --syntax-text-color: hsl(0, 8%, 24%);
+  --syntax-cursor-color: hsl(220, 100%, 66%);
+  --syntax-selection-color: hsl(0, 0%, 92%);
+  --syntax-selection-flash-color: hsl(220, 100%, 66%);
+  --syntax-background-color: hsl(0, 0%, 100%);
+  --syntax-wrap-guide-color: hsla(0, 8%, 24%, 0.2);
+  --syntax-indent-guide-color: hsla(0, 8%, 24%, 0.2);
+  --syntax-invisible-character-color: hsla(0, 8%, 24%, 0.2);
+  --syntax-result-marker-color: hsla(220, 100%, 66%, 0.2);
+  --syntax-result-marker-color-selected: hsl(220, 100%, 66%);
+  --syntax-gutter-text-color: hsl(0, 0%, 64%);
+  --syntax-gutter-text-color-selected: hsl(0, 8%, 24%);
+  --syntax-gutter-background-color: hsl(0, 0%, 100%);
+  --syntax-gutter-background-color-selected: hsl(0, 0%, 92%);
+  --syntax-color-property: hsl(0, 8%, 24%);
+  --syntax-color-value: hsl(0, 8%, 24%);
+  --terminal-text-color: hsl(0, 8%, 24%);
+  --terminal-background-color: hsl(0, 0%, 100%);
+  --terminal-selection-background-color: hsl(0, 0%, 92%);
+  --terminal-selection-text-color: hsl(0, 8%, 24%);
+  --terminal-cursor-color: hsl(220, 100%, 66%);
+  --terminal-result-marker-color: hsla(220, 100%, 66%, 0.2);
+  --terminal-result-marker-color-selected: hsl(220, 100%, 66%);
+  --terminal-color-black: hsl(0, 8%, 24%);
+  --terminal-color-white: hsl(0, 0%, 80%);
+  --terminal-color-bright-black: hsl(0, 8%, 34%);
+  --terminal-color-bright-white: hsl(0, 0%, 90%);
+  --mono-1: hsl(0, 8%, 24%);
+  --mono-2: hsl(0, 6%, 44%);
+  --mono-3: hsl(0, 4%, 64%);
+  --syntax-fg: hsl(0, 8%, 24%);
+  --syntax-bg: hsl(0, 0%, 100%);
+  --syntax-gutter: hsl(0, 0%, 64%);
+  --syntax-guide: hsla(0, 8%, 24%, 0.2);
+  --syntax-accent: hsl(220, 100%, 66%);
+}

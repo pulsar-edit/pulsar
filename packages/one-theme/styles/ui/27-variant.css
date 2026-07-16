@@ -1,0 +1,140 @@
+/* Pure variant UI polish — a flatter, rounder take on the One UI. Active
+   while lib/main.js sets the `ui-variant="pure"` root attribute
+   (one-theme.variant = "Pure"). The matching palettes live in each theme's
+   variant.css. */
+
+@keyframes variant-placeholder-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+[ui-variant="pure"] {
+  /* Flat default buttons ------------------------------ */
+
+  .btn,
+  .btn.btn-default {
+    background-image: none;
+
+    &:hover {
+      background-image: none;
+      background-color: var(--button-background-color-hover);
+    }
+  }
+
+  .btn-group > .btn.btn:active {
+    outline: 2px auto var(--text-color-info);
+    outline-offset: -2px;
+  }
+
+  /* Badges ------------------------------ */
+
+  .badge {
+    display: inline-flex;
+    justify-content: center;
+  }
+
+  /* Inputs ------------------------------ */
+
+  atom-text-editor .placeholder-text {
+    color: var(--text-color-subtle);
+    padding-left: 4px;
+    animation: variant-placeholder-pulse 4s ease-in-out infinite;
+  }
+
+  /* Git gutter markers as colored line numbers ------------------------------ */
+
+  atom-text-editor .gutter .line-number {
+    &.git-line-added {
+      border-left: none;
+      color: var(--text-color-success);
+    }
+    &.git-line-modified {
+      border-left: none;
+      color: var(--text-color-warning);
+    }
+  }
+
+  /* Modals ------------------------------ */
+
+  atom-panel.modal {
+    max-width: min(92vw, 80em);
+    animation-duration: 0.1s;
+
+    .select-list ol.list-group,
+    &.select-list ol.list-group {
+      border: none;
+      background-color: transparent;
+
+      li {
+        margin: 2px 0;
+        border-bottom: none;
+        border-radius: var(--component-border-radius);
+        backface-visibility: hidden; /* fix scroll rendering */
+
+        &:hover:not(.selected) {
+          background-color: var(--background-color-highlight);
+        }
+        &.selected {
+          background-color: var(--background-color-selected);
+        }
+      }
+    }
+
+    .select-list .markdown {
+      cursor: default;
+      p,
+      ul {
+        margin-bottom: 0;
+        line-height: 1.8;
+      }
+      ul,
+      ol {
+        padding-left: 2.5em;
+      }
+    }
+
+    .select-list .empty-message {
+      color: var(--text-color-info);
+      margin-top: 10px;
+    }
+
+    .select-list .error-message {
+      color: var(--text-color-error);
+      margin-top: 10px;
+    }
+
+    /* Container */
+    &:before {
+      border-radius: calc(var(--component-border-radius) * 2);
+      box-shadow:
+        0 6px 24px hsla(0, 0%, 0%, 0.12),
+        0 2px 8px hsla(0, 0%, 0%, 0.08);
+    }
+
+    /* Backdrop */
+    &:after {
+      animation-duration: 0.1s;
+    }
+  }
+
+  /* Overlay shadows ------------------------------ */
+
+  .select-list.popover-list {
+    box-shadow: 0 4px 16px -2px hsla(0, 0%, 0%, 0.2);
+  }
+
+  .tooltip .tooltip-inner {
+    box-shadow: 0 4px 12px -2px hsla(0, 0%, 0%, 0.15);
+  }
+
+  /* Fuzzy match highlighting (global) ------------------------------ */
+
+  .character-match {
+    color: var(--accent-only-text-color) !important;
+  }
+}

@@ -9,6 +9,13 @@ let subscriptions = null;
 module.exports = {
   activate() {
     subscriptions = new CompositeDisposable(
+      atom.config.observe("one-theme.variant", (variant) => {
+        if (variant === "Pure") {
+          root.setAttribute("ui-variant", "pure");
+        } else {
+          root.removeAttribute("ui-variant");
+        }
+      }),
       atom.config.observe("one-theme.tabSizing", (tabSizing) => {
         root.setAttribute("ui-tabsizing", tabSizing.toLowerCase());
       }),
@@ -45,6 +52,7 @@ module.exports = {
   deactivate() {
     subscriptions?.dispose();
     subscriptions = null;
+    root.removeAttribute("ui-variant");
     root.removeAttribute("ui-tabsizing");
     root.removeAttribute("ui-tab-close-button");
     root.removeAttribute("ui-dock-buttons");

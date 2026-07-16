@@ -1,0 +1,69 @@
+/*
+ * Pure variant of the one-day UI palette — neutral grays over a pure-white
+ * editor background, blue accents (hue 220), and a slightly rounder radius.
+ * Active while lib/main.js sets the `ui-variant="pure"` root attribute
+ * (one-theme.variant = "Pure").
+ *
+ * The Less shim for community packages keeps the default palette: only the
+ * plain `:root` block in variables.css feeds the shim.
+ */
+
+:root[ui-variant="pure"] {
+  --text-color: hsl(0, 0%, 28%);
+  --text-color-subtle: hsl(0, 0%, 58%);
+  --text-color-highlight: hsl(0, 0%, 16%);
+  --text-color-selected: hsl(0, 0%, 4%);
+  --background-color-highlight: hsl(0, 0%, 92%);
+  --background-color-selected: hsl(0, 0%, 88%);
+  --app-background-color: hsl(0, 0%, 94%);
+  --base-background-color: hsl(0, 0%, 100%);
+  --base-border-color: hsl(0, 0%, 88%);
+  --pane-item-background-color: hsl(0, 0%, 100%);
+  --pane-item-border-color: hsl(0, 0%, 88%);
+  --input-border-color: hsl(0, 0%, 88%);
+  --tool-panel-background-color: hsl(0, 0%, 94%);
+  --tool-panel-border-color: hsl(0, 0%, 88%);
+  --inset-panel-border-color: hsla(0, 0%, 88%, 0.85);
+  --panel-heading-background-color: hsl(0, 0%, 100%);
+  --panel-heading-border-color: hsl(0, 0%, 88%);
+  --overlay-background-color: #f7f7f7;
+  --overlay-border-color: hsl(0, 0%, 88%);
+  --button-background-color-selected: #5a8ae9;
+  --button-border-color: hsl(0, 0%, 88%);
+  --tab-bar-background-color: hsl(0, 0%, 94%);
+  --tab-bar-border-color: hsl(0, 0%, 88%);
+  --tab-background-color: hsl(0, 0%, 94%);
+  --tab-background-color-active: hsl(0, 0%, 100%);
+  --tab-border-color: hsl(0, 0%, 88%);
+  --tree-view-background-color: hsl(0, 0%, 94%);
+  --tree-view-border-color: hsl(0, 0%, 88%);
+  --scrollbar-color: hsl(0, 0%, 80%);
+  --scrollbar-background-color: hsl(0, 0%, 94%);
+  --component-border-radius: 6px;
+  --text-color-faded: hsla(0, 0%, 28%, 0.3);
+  --text-color-ignored: hsl(0, 0%, 58%);
+  --level-2-color: hsl(0, 0%, 100%);
+  --level-3-color: hsl(0, 0%, 94%);
+  --level-3-color-hover: hsl(0, 0%, 88%);
+  --level-3-color-active: hsl(0, 0%, 91%);
+  --accent-color: #5282e0;
+  --accent-bg-color: #5a8ae9;
+  --accent-only-text-color: #2f67d8;
+  --badge-background-color: hsl(0, 0%, 88%);
+  --button-border-color-selected: #5282e0;
+  --checkbox-background-color: rgba(90, 138, 233, 0.33);
+  --input-background-color-focus: hsl(220, 100%, 96%);
+  --input-selection-color: #dce6fb;
+  --input-selection-color-focus: #c3d5f7;
+  --overlay-backdrop-color: hsl(0, 0%, 80%);
+  --progress-background-color: #5282e0;
+  --scrollbar-color-editor: hsl(0, 0%, 86%);
+  --scrollbar-background-color-editor: hsl(0, 0%, 100%);
+  --tab-text-color: hsl(0, 0%, 58%);
+  --tab-text-color-active: hsl(0, 0%, 16%);
+  --tab-text-color-editor: hsl(0, 0%, 16%);
+  --tab-background-color-editor: hsl(0, 0%, 100%);
+  --tooltip-background-color: #5a8ae9;
+  --tooltip-text-key-color: #5a8ae9;
+  --settings-list-background-color: hsl(0, 0%, 97%);
+}

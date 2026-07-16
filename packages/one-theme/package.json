@@ -14,7 +14,10 @@
     {
       "name": "one-day-syntax",
       "theme": "syntax",
-      "styles": "styles/day-syntax"
+      "styles": [
+        "styles/syntax",
+        "styles/day-syntax"
+      ]
     },
     {
       "name": "one-night-ui",
@@ -27,7 +30,10 @@
     {
       "name": "one-night-syntax",
       "theme": "syntax",
-      "styles": "styles/night-syntax"
+      "styles": [
+        "styles/syntax",
+        "styles/night-syntax"
+      ]
     }
   ],
   "version": "1.0.0",
@@ -45,31 +51,49 @@
     "atom": "*"
   },
   "configSchema": {
-    "tabSizing": {
+    "variant": {
       "order": 1,
+      "title": "Variant",
+      "description": "Default keeps the classic One palettes. Pure switches both the day and night themes to a neutral variant — pure-white day background, desaturated night — with blue accents and flatter, rounder controls.",
+      "type": "string",
+      "enum": [
+        "Default",
+        "Pure"
+      ],
+      "default": "Default"
+    },
+    "tabSizing": {
+      "order": 2,
       "title": "Tab Sizing",
       "description": "In Even mode all tabs will be the same size. Great for quickly closing many tabs. In Maximum mode the tabs will expand to take up the full width. In Minimum mode the tabs will only take as little space as needed and also show longer file names.",
       "type": "string",
-      "enum": ["Even", "Maximum", "Minimum"],
+      "enum": [
+        "Even",
+        "Maximum",
+        "Minimum"
+      ],
       "default": "Even"
     },
     "tabCloseButton": {
-      "order": 2,
+      "order": 3,
       "title": "Tab Close Button",
       "description": "Choose the position of the close button shown in tabs.",
       "type": "string",
-      "enum": ["Left", "Right"],
+      "enum": [
+        "Left",
+        "Right"
+      ],
       "default": "Right"
     },
     "hideDockButtons": {
-      "order": 3,
+      "order": 4,
       "title": "Hide Dock Toggle Buttons",
       "description": "Note: When hiding the toggle buttons, opening a dock needs to be done by using the keyboard or other alternatives.",
       "type": "boolean",
       "default": false
     },
     "stickyHeaders": {
-      "order": 4,
+      "order": 5,
       "title": "Make Tree-View Project Headers Sticky",
       "description": "Keep tree-view project folder headers pinned to the top while scrolling.",
       "type": "boolean",

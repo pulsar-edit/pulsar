@@ -8,6 +8,7 @@ The One themes for Lumine: day and night UI and syntax themes.
 - **CSS custom properties**: each theme defines its palette as CSS custom properties in a `variables.css`, the source of truth for the theme variable contract.
 - **Less compatibility**: community packages that import `ui-variables`/`syntax-variables` keep working — Lumine generates the Less shim from the palettes automatically.
 - **Mix and match**: any theme can be paired with a community counterpart, e.g. `one-night-ui` with a third-party syntax theme.
+- **Pure variant**: an optional neutral variant of both palettes — pure-white day background, desaturated night — with blue accents and flatter, rounder controls.
 
 ## Commands
 

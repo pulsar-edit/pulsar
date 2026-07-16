@@ -1,0 +1,40 @@
+/*
+ * Pure variant of the one-night syntax palette — the night counterpart of
+ * the pure day palette: the blue tint is stripped from the background config
+ * (hue 0, saturation 0%, brightness 18%) while the accent stays blue. Active
+ * while lib/main.js sets the `ui-variant="pure"` root attribute
+ * (one-theme.variant = "Pure").
+ *
+ * The Less shim for community packages keeps the default palette: only the
+ * plain `:root` block in variables.css feeds the shim.
+ */
+
+:root[ui-variant="pure"] {
+  --syntax-text-color: hsl(0, 14%, 71%);
+  --syntax-selection-color: hsl(0, 0%, 28%);
+  --syntax-background-color: hsl(0, 0%, 18%);
+  --syntax-wrap-guide-color: hsla(0, 14%, 71%, 0.15);
+  --syntax-indent-guide-color: hsla(0, 14%, 71%, 0.15);
+  --syntax-invisible-character-color: hsla(0, 14%, 71%, 0.15);
+  --syntax-gutter-text-color: hsl(0, 14%, 45%);
+  --syntax-gutter-text-color-selected: hsl(0, 14%, 71%);
+  --syntax-gutter-background-color: hsl(0, 0%, 18%);
+  --syntax-gutter-background-color-selected: hsl(0, 0%, 26%);
+  --syntax-color-property: hsl(0, 14%, 71%);
+  --syntax-color-value: hsl(0, 14%, 71%);
+  --terminal-text-color: hsl(0, 14%, 71%);
+  --terminal-background-color: hsl(0, 0%, 18%);
+  --terminal-selection-background-color: hsl(0, 0%, 28%);
+  --terminal-selection-text-color: hsl(0, 14%, 71%);
+  --terminal-color-black: hsl(0, 0%, 18%);
+  --terminal-color-white: hsl(0, 14%, 71%);
+  --terminal-color-bright-black: hsl(0, 0%, 28%);
+  --terminal-color-bright-white: hsl(0, 14%, 81%);
+  --mono-1: hsl(0, 14%, 71%);
+  --mono-2: hsl(0, 9%, 55%);
+  --mono-3: hsl(0, 10%, 40%);
+  --syntax-fg: hsl(0, 14%, 71%);
+  --syntax-bg: hsl(0, 0%, 18%);
+  --syntax-gutter: hsl(0, 14%, 45%);
+  --syntax-guide: hsla(0, 14%, 71%, 0.15);
+}

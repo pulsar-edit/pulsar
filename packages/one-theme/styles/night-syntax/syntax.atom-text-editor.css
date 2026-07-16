@@ -14,6 +14,12 @@ atom-text-editor {
   .line.cursor-line {
     /* needs to be semi-transparent to show search results */
     background-color: hsla(220, 100%, 80%, 0.04);
+    /* Ligatures joining across the caret are distracting while typing. */
+    font-variant-ligatures: none;
+  }
+
+  &[mini] {
+    font-variant-ligatures: none;
   }
 
   .invisible {
@@ -22,6 +28,7 @@ atom-text-editor {
 
   .cursor {
     border-left: 2px solid var(--syntax-cursor-color);
+    transition: opacity 0.5s;
   }
 
   .selection .region {
@@ -107,7 +114,6 @@ atom-text-editor {
 
 .syntax--comment {
   color: var(--mono-3);
-  font-style: italic;
 
   .syntax--markup.syntax--link {
     color: var(--mono-3);
@@ -946,7 +952,6 @@ atom-text-editor {
 /* comment */
 .syntax--comment {
   color: var(--mono-3);
-  font-style: italic;
 
   /* @param TODO NOTE */
   &.syntax--caption {
