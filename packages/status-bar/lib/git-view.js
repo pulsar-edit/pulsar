@@ -264,6 +264,8 @@ module.exports = class GitView {
       "status-added",
       "icon-diff-ignored",
       "status-ignored",
+      "icon-alert",
+      "status-conflicted",
     );
   }
 
@@ -323,6 +325,15 @@ module.exports = class GitView {
     this.updateTooltipText("File is ignored by git");
   }
 
+  updateAsConflictedFile() {
+    this.clearStatus();
+
+    this.gitStatusIcon.classList.add("icon-alert", "status-conflicted");
+    this.gitStatusIcon.textContent = "";
+    this.gitStatus.style.display = "";
+    this.updateTooltipText("File has merge conflicts");
+  }
+
   updateTooltipText(text) {
     this.statusTooltipDisposable?.dispose();
     if (text) {
@@ -338,13 +349,17 @@ module.exports = class GitView {
 
     const itemPath = this.getActiveItemPath();
     if (this.showGitInformation(repo) && itemPath != null) {
-      const status = repo.getCachedPathStatus(itemPath) ?? 0;
-      if (repo.isStatusNew(status)) {
-        return this.updateAsNewFile();
+      const summary = repo.getPathStatusSummary(itemPath);
+      if (summary?.conflicted) {
+        return this.updateAsConflictedFile();
       }
 
-      if (repo.isStatusModified(status)) {
+      if (summary?.modified) {
         return this.updateAsModifiedFile(repo, itemPath);
+      }
+
+      if (summary?.added) {
+        return this.updateAsNewFile();
       }
 
       if (repo.isPathIgnored(itemPath)) {

@@ -84,6 +84,7 @@ module.exports = class DirectoryView {
       "status-ignored-name",
       "status-modified",
       "status-added",
+      "status-conflicted",
     );
     if (this.directory.status != null) {
       this.element.classList.add(`status-${this.directory.status}`);

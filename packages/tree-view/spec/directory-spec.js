@@ -5,17 +5,12 @@ const path = require("path");
 
 const Directory = require("../lib/directory");
 
-function repositoryFor({ relativePath, statuses, directoryStatus = 0 }) {
+function repositoryFor({ directoryStatusSummary = null } = {}) {
   return {
-    statuses,
-    getDirectoryStatus: jasmine.createSpy("getDirectoryStatus").andReturn(directoryStatus),
+    getDirectoryStatusSummary: jasmine
+      .createSpy("getDirectoryStatusSummary")
+      .andReturn(directoryStatusSummary),
     isPathIgnored: jasmine.createSpy("isPathIgnored").andReturn(false),
-    isStatusModified(status) {
-      return (status & 1) !== 0;
-    },
-    isStatusNew(status) {
-      return (status & 2) !== 0;
-    },
     isSubmodule() {
       return false;
     },
@@ -25,8 +20,8 @@ function repositoryFor({ relativePath, statuses, directoryStatus = 0 }) {
     onDidChangeStatuses() {
       return new Disposable();
     },
-    relativize() {
-      return relativePath;
+    onDidChangeStatusSnapshot() {
+      return new Disposable();
     },
   };
 }
@@ -63,30 +58,41 @@ describe("TreeView Directory Git status", () => {
     }
   });
 
-  it("aggregates status for a nested repository root", () => {
-    const directoryPath = makeTemporaryDirectory("nested-repository-directory");
+  it("colors a directory from the repository's directory status summary", () => {
+    const directoryPath = makeTemporaryDirectory("summary-modified-directory");
     const repository = repositoryFor({
-      relativePath: "",
-      statuses: { "modified.txt": 1 },
+      directoryStatusSummary: { source: "cache", conflicted: false, modified: true, added: false },
     });
 
     directory = createDirectory(directoryPath, repository);
 
     expect(directory.status).toBe("modified");
-    expect(repository.getDirectoryStatus).not.toHaveBeenCalled();
+    expect(repository.getDirectoryStatusSummary).toHaveBeenCalledWith(directoryPath);
   });
 
-  it("limits a project root inside a repository to its displayed subtree", () => {
-    const directoryPath = makeTemporaryDirectory("project-root-inside-repository");
+  it("gives conflicts priority over other states", () => {
+    const directoryPath = makeTemporaryDirectory("summary-conflicted-directory");
     const repository = repositoryFor({
-      relativePath: "packages/application",
-      statuses: { "outside-project.txt": 1 },
-      directoryStatus: 0,
+      directoryStatusSummary: {
+        source: "snapshot",
+        conflicted: true,
+        modified: true,
+        added: true,
+      },
     });
+
+    directory = createDirectory(directoryPath, repository);
+
+    expect(directory.status).toBe("conflicted");
+  });
+
+  it("stays uncolored when the summary reports nothing below the directory", () => {
+    const directoryPath = makeTemporaryDirectory("summary-clean-directory");
+    const repository = repositoryFor({ directoryStatusSummary: null });
 
     directory = createDirectory(directoryPath, repository, { isRoot: true });
 
     expect(directory.status).toBeNull();
-    expect(repository.getDirectoryStatus).toHaveBeenCalledWith(directoryPath);
+    expect(repository.getDirectoryStatusSummary).toHaveBeenCalledWith(directoryPath);
   });
 });

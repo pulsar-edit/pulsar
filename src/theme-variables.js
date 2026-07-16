@@ -137,6 +137,7 @@ const UI_VARIABLES_EXTENDED = [
   "tab-background-color-editor",
   "tab-inactive-status-added",
   "tab-inactive-status-modified",
+  "tab-inactive-status-conflicted",
   "tooltip-background-color",
   "tooltip-text-color",
   "tooltip-text-key-color",

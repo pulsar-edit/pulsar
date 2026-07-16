@@ -107,6 +107,7 @@ export default class GitDiffView {
       this._repoSubs = new CompositeDisposable(
         this.repository.onDidDestroy(subscribeToRepository),
         this.repository.onDidChangeStatuses(scheduleUpdate),
+        this.repository.onDidChangeStatusSnapshot(scheduleUpdate),
         this.repository.onDidChangeStatus(({ path: changedPath }) => {
           if (changedPath === this.editorPath) scheduleUpdate();
         }),
@@ -222,6 +223,14 @@ export default class GitDiffView {
       if (this.diffs) for (const diff of this.diffs) this.markers.get(diff)?.destroy();
 
       this.markers.clear();
+
+      // Line diffs against HEAD are meaningless for untracked files and
+      // misleading while a merge conflict is unresolved.
+      const statusEntry = this.repository.getStatusEntry(this.editorPath);
+      if (statusEntry?.untracked || statusEntry?.conflicted) {
+        this.diffs = [];
+        return;
+      }
 
       const text = this.buffer.getText();
       this.diffs = this.repository.getLineDiffs(this.editorPath, text);

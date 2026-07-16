@@ -131,6 +131,11 @@ module.exports = class Directory {
         this.updateStatus(repo);
       }),
     );
+    this.subscriptions.add(
+      repo.onDidChangeStatusSnapshot(() => {
+        this.updateStatus(repo);
+      }),
+    );
   }
 
   // Update the status property of this directory using the repo.
@@ -144,23 +149,15 @@ module.exports = class Directory {
     } else if (this.ignoredNames.matches(this.path)) {
       newStatus = "ignored-name";
     } else {
-      let status = 0;
-      if (repo.relativize(this.path) === "") {
-        // repo.getDirectoryStatus will always fail for the
-        // repository root because the path is relativized + concatenated with '/'
-        // making the matching string be '/'.  Then path.indexOf('/')
-        // is run and will never match beginning of string with a leading '/'
-        for (let statusPath in repo.statuses) {
-          status |= parseInt(repo.statuses[statusPath], 10);
+      const summary = repo.getDirectoryStatusSummary(this.path);
+      if (summary != null) {
+        if (summary.conflicted) {
+          newStatus = "conflicted";
+        } else if (summary.modified) {
+          newStatus = "modified";
+        } else if (summary.added) {
+          newStatus = "added";
         }
-      } else {
-        status = repo.getDirectoryStatus(this.path);
-      }
-
-      if (repo.isStatusModified(status)) {
-        newStatus = "modified";
-      } else if (repo.isStatusNew(status)) {
-        newStatus = "added";
       }
     }
 

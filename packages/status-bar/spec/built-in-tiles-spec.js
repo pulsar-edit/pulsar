@@ -631,6 +631,14 @@ describe("Built-in Status Bar Tiles", function () {
           });
         });
 
+        afterEach(function () {
+          // The registry keeps this repository instance alive across specs
+          // while the project roots are unchanged; destroy it so the fake
+          // snapshot provider and loaded snapshot cannot leak into later
+          // describes.
+          if (repo && !repo.isDestroyed()) repo.destroy();
+        });
+
         it("renders the branch from the snapshot head", function () {
           snapshotOutput = "# branch.oid abc123\0# branch.head snapshot-branch\0";
 

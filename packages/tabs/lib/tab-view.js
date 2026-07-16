@@ -461,8 +461,13 @@ class TabView {
     this.repoSubscriptions.add(
       repo.onDidChangeStatus((event) => {
         if (event.path === this.path) {
-          return this.updateVcsStatus(repo, event.pathStatus);
+          return this.updateVcsStatus(repo);
         }
+      }),
+    );
+    this.repoSubscriptions.add(
+      repo.onDidChangeStatusSnapshot(() => {
+        this.updateVcsStatus(repo);
       }),
     );
     return this.repoSubscriptions.add(
@@ -477,7 +482,7 @@ class TabView {
   }
 
   // Update the VCS status property of this tab using the repo.
-  updateVcsStatus(repo, status) {
+  updateVcsStatus(repo) {
     if (repo == null) {
       return;
     }
@@ -486,13 +491,15 @@ class TabView {
     if (repo.isPathIgnored(this.path)) {
       newStatus = "ignored";
     } else {
-      if (status == null) {
-        status = repo.getCachedPathStatus(this.path);
-      }
-      if (repo.isStatusModified(status)) {
-        newStatus = "modified";
-      } else if (repo.isStatusNew(status)) {
-        newStatus = "added";
+      const summary = repo.getPathStatusSummary(this.path);
+      if (summary != null) {
+        if (summary.conflicted) {
+          newStatus = "conflicted";
+        } else if (summary.modified) {
+          newStatus = "modified";
+        } else if (summary.added) {
+          newStatus = "added";
+        }
       }
     }
 
@@ -503,7 +510,12 @@ class TabView {
   }
 
   updateVcsColoring() {
-    this.itemTitle.classList.remove("status-ignored", "status-modified", "status-added");
+    this.itemTitle.classList.remove(
+      "status-ignored",
+      "status-modified",
+      "status-added",
+      "status-conflicted",
+    );
     if (this.status && atom.config.get("tabs.enableVcsColoring")) {
       return this.itemTitle.classList.add(`status-${this.status}`);
     }

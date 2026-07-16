@@ -42,6 +42,7 @@ module.exports = class FileView {
       "status-ignored-name",
       "status-modified",
       "status-added",
+      "status-conflicted",
     );
     if (this.file.status != null) {
       this.element.classList.add(`status-${this.file.status}`);

@@ -63,9 +63,14 @@ module.exports = class File {
         this.updateStatus(repo);
       }),
     );
+    this.subscriptions.add(
+      repo.onDidChangeStatusSnapshot(() => {
+        this.updateStatus(repo);
+      }),
+    );
   }
 
-  // Update the status property of this directory using the repo.
+  // Update the status property of this file using the repo.
   updateStatus() {
     const repo = repoForPath(this.path);
     if (repo == null) return;
@@ -76,11 +81,15 @@ module.exports = class File {
     } else if (this.ignoredNames.matches(this.path)) {
       newStatus = "ignored-name";
     } else {
-      const status = repo.getCachedPathStatus(this.path);
-      if (repo.isStatusModified(status)) {
-        newStatus = "modified";
-      } else if (repo.isStatusNew(status)) {
-        newStatus = "added";
+      const summary = repo.getPathStatusSummary(this.path);
+      if (summary != null) {
+        if (summary.conflicted) {
+          newStatus = "conflicted";
+        } else if (summary.modified) {
+          newStatus = "modified";
+        } else if (summary.added) {
+          newStatus = "added";
+        }
       }
     }
 

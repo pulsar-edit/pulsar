@@ -17,14 +17,17 @@ export default class MRUItemView {
     }
 
     const repo = MRUItemView.repositoryForPath(this.itemPath);
-    if (repo != null) {
+    const summary = repo?.getPathStatusSummary(this.itemPath);
+    if (summary != null) {
       const statusIconDiv = document.createElement("div");
-      const status = repo.getCachedPathStatus(this.itemPath);
-      if (repo.isStatusNew(status)) {
-        statusIconDiv.className = "status status-added icon icon-diff-added";
+      if (summary.conflicted) {
+        statusIconDiv.className = "status status-conflicted icon icon-alert";
         this.element.appendChild(statusIconDiv);
-      } else if (repo.isStatusModified(status)) {
+      } else if (summary.modified) {
         statusIconDiv.className = "status status-modified icon icon-diff-modified";
+        this.element.appendChild(statusIconDiv);
+      } else if (summary.added) {
+        statusIconDiv.className = "status status-added icon icon-diff-added";
         this.element.appendChild(statusIconDiv);
       }
     }

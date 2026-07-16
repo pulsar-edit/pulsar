@@ -1944,14 +1944,10 @@ describe("TabBarView", () => {
       spyOn(tab1, "updateVcsStatus").andCallThrough();
 
       // Mock the repository
-      repository = jasmine.createSpyObj("repo", [
-        "isPathIgnored",
-        "getCachedPathStatus",
-        "isStatusNew",
-        "isStatusModified",
-      ]);
-      repository.isStatusNew.andCallFake((status) => status === "new");
-      repository.isStatusModified.andCallFake((status) => status === "modified");
+      repository = jasmine.createSpyObj("repo", ["isPathIgnored", "getPathStatusSummary"]);
+      repository.onDidChangeStatusSnapshot = function () {
+        return { dispose() {} };
+      };
 
       repository.onDidChangeStatus = function (callback) {
         if (this.changeStatusCallbacks == null) {
@@ -1996,7 +1992,12 @@ describe("TabBarView", () => {
 
     describe("when working inside a VCS repository", () => {
       it("adds custom style for new items", () => {
-        repository.getCachedPathStatus.andReturn("new");
+        repository.getPathStatusSummary.andReturn({
+          source: "cache",
+          conflicted: false,
+          modified: false,
+          added: true,
+        });
         tab.updateVcsStatus(repository);
         expect(tabBar.element.querySelectorAll(".tab")[1].querySelector(".title")).toHaveClass(
           "status-added",
@@ -2004,10 +2005,28 @@ describe("TabBarView", () => {
       });
 
       it("adds custom style for modified items", () => {
-        repository.getCachedPathStatus.andReturn("modified");
+        repository.getPathStatusSummary.andReturn({
+          source: "cache",
+          conflicted: false,
+          modified: true,
+          added: false,
+        });
         tab.updateVcsStatus(repository);
         expect(tabBar.element.querySelectorAll(".tab")[1].querySelector(".title")).toHaveClass(
           "status-modified",
+        );
+      });
+
+      it("adds custom style for conflicted items", () => {
+        repository.getPathStatusSummary.andReturn({
+          source: "snapshot",
+          conflicted: true,
+          modified: false,
+          added: false,
+        });
+        tab.updateVcsStatus(repository);
+        expect(tabBar.element.querySelectorAll(".tab")[1].querySelector(".title")).toHaveClass(
+          "status-conflicted",
         );
       });
 
@@ -2040,15 +2059,19 @@ describe("TabBarView", () => {
       });
 
       it("updates the status of an item if it has changed", () => {
-        repository.getCachedPathStatus.reset();
         expect(tabBar.element.querySelectorAll(".tab")[1].querySelector(".title")).not.toHaveClass(
           "status-modified",
         );
-        repository.emitDidChangeStatus({ path: tab.path, pathStatus: "modified" });
+        repository.getPathStatusSummary.andReturn({
+          source: "cache",
+          conflicted: false,
+          modified: true,
+          added: false,
+        });
+        repository.emitDidChangeStatus({ path: tab.path });
         expect(tabBar.element.querySelectorAll(".tab")[1].querySelector(".title")).toHaveClass(
           "status-modified",
         );
-        expect(repository.getCachedPathStatus.calls.count()).toBe(0);
       });
 
       it("does not update status for items not in the repository", () => {
@@ -2074,7 +2097,13 @@ describe("TabBarView", () => {
 
     describe("when enableVcsColoring changes in package settings", () => {
       it("removes status from the tab if enableVcsColoring is set to false", () => {
-        repository.emitDidChangeStatus({ path: tab.path, pathStatus: "new" });
+        repository.getPathStatusSummary.andReturn({
+          source: "cache",
+          conflicted: false,
+          modified: false,
+          added: true,
+        });
+        repository.emitDidChangeStatus({ path: tab.path });
 
         expect(tabBar.element.querySelectorAll(".tab")[1].querySelector(".title")).toHaveClass(
           "status-added",
@@ -2087,7 +2116,12 @@ describe("TabBarView", () => {
 
       it("adds status to the tab if enableVcsColoring is set to true", () => {
         atom.config.set("tabs.enableVcsColoring", false);
-        repository.getCachedPathStatus.andReturn("modified");
+        repository.getPathStatusSummary.andReturn({
+          source: "cache",
+          conflicted: false,
+          modified: true,
+          added: false,
+        });
         expect(tabBar.element.querySelectorAll(".tab")[1].querySelector(".title")).not.toHaveClass(
           "status-modified",
         );
