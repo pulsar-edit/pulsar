@@ -1,4 +1,4 @@
-const { humanizeKeystroke } = require("./humankeys");
+const { humanizeKeystroke } = require("@lumine-code/underscore-plus");
 
 class Utils {
   static formatKeystroke(keystroke) {

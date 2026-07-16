@@ -1,3 +1,5 @@
+const { Utils } = require("../lib/utils");
+
 describe("Title Bar package", () => {
   let workspaceElement;
 
@@ -46,6 +48,20 @@ describe("Title Bar package", () => {
 
     runs(() => {
       expect(workspaceElement.querySelector(".title-bar")).toBeNull();
+    });
+  });
+
+  describe("keystroke formatting", () => {
+    it("formats modifiers, shifted symbols, and multi-stroke bindings", () => {
+      if (process.platform === "darwin") {
+        expect(Utils.formatKeystroke("cmdorctrl-shift-f")).toBe("⌘⇧F");
+        expect(Utils.formatKeystroke("cmd-|")).toBe("⌘⇧\\");
+        expect(Utils.formatKeystroke("cmd-k right")).toBe("⌘K →");
+      } else {
+        expect(Utils.formatKeystroke("cmdorctrl-shift-f")).toBe("Ctrl+Shift+F");
+        expect(Utils.formatKeystroke("cmd-|")).toBe("Cmd+Shift+\\");
+        expect(Utils.formatKeystroke("cmd-k right")).toBe("Cmd+K Right");
+      }
     });
   });
 });

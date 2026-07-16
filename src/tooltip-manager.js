@@ -195,14 +195,8 @@ module.exports = class TooltipManager {
   }
 };
 
-function humanizeKeystrokes(keystroke) {
-  let keystrokes = keystroke.split(" ");
-  keystrokes = keystrokes.map((stroke) => _.humanizeKeystroke(stroke));
-  return keystrokes.join(" ");
-}
-
 function getKeystroke(bindings) {
   if (bindings && bindings.length) {
-    return `<span class="keystroke">${humanizeKeystrokes(bindings[0].keystrokes)}</span>`;
+    return `<span class="keystroke">${_.humanizeKeystroke(bindings[0].keystrokes)}</span>`;
   }
 }

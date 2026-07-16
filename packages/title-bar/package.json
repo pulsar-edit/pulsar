@@ -9,6 +9,9 @@
   ],
   "repository": "https://github.com/lumine-code/lumine",
   "license": "MIT",
+  "dependencies": {
+    "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274"
+  },
   "engines": {
     "atom": "*"
   },
