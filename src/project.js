@@ -65,7 +65,6 @@ module.exports = class Project extends Model {
   reset(packageManager) {
     this.emitter.dispose();
     this.emitter = new Emitter();
-    this.repositoryRegistry.resetProjectSubscriptions();
 
     this.subscriptions.dispose();
     this.subscriptions = new CompositeDisposable();
@@ -74,6 +73,11 @@ module.exports = class Project extends Model {
       if (buffer != null) buffer.destroy();
     }
     this.buffers = [];
+    // Specs may destroy the window's project and then reset it. Destroying
+    // detached this project from the repository registry, so re-attach before
+    // any root or buffer bookkeeping runs (attaching also resets the
+    // registry's project subscriptions against the fresh emitter).
+    if (!this.repositoryRegistry.destroyed) this.repositoryRegistry.attachProject(this);
     this.setPaths([]);
     this.loadPromisesByPath = {};
     this.retiredBufferIDs = new Set();

@@ -977,6 +977,9 @@ module.exports = class RepositoryRegistry {
   }
 
   synchronizeBufferOwners() {
+    // A destroyed Project detaches itself; root changes delivered afterwards
+    // have no buffers to reconcile.
+    if (!this.project) return;
     for (const buffer of this.project.getBuffers()) {
       const owner = this.bufferOwners.get(buffer);
       if (owner) owner.update();

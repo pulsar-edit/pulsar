@@ -1078,6 +1078,18 @@ describe("Project", () => {
     });
   });
 
+  describe(".reset()", () => {
+    it("re-attaches the repository registry when a destroyed project is reset", () => {
+      // Legacy window specs destroy the window's project and rely on the
+      // between-spec reset to bring it back; the registry must survive that.
+      atom.project.destroy();
+      expect(() => atom.project.reset(atom.packages)).not.toThrow();
+
+      atom.project.setPaths([__dirname]);
+      expect(atom.repositories.getForPath(__dirname)).toBeTruthy();
+    });
+  });
+
   describe(".relativize(path)", () => {
     it("returns the path, relative to whichever root directory it is inside of", () => {
       atom.project.addPath(temp.mkdirSync("another-path"));
