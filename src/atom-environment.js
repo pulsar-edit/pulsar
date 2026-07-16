@@ -25,6 +25,7 @@ const CommandRegistry = require("./command-registry");
 const URIHandlerRegistry = require("./uri-handler-registry");
 const GrammarRegistry = require("./grammar-registry");
 const { HistoryManager } = require("./history-manager");
+const ReopenProjectMenuManager = require("./reopen-project-menu-manager");
 const StyleManager = require("./style-manager");
 const PackageManager = require("./package-manager");
 const ThemeManager = require("./theme-manager");
@@ -1046,7 +1047,21 @@ class AtomEnvironment {
       await this.openInitialEmptyEditorIfNecessary();
     });
 
-    const loadHistoryPromise = this.history.loadState();
+    const loadHistoryPromise = this.history.loadState().then(() => {
+      this.reopenProjectMenuManager = new ReopenProjectMenuManager({
+        menu: this.menu,
+        commands: this.commands,
+        history: this.history,
+        config: this.config,
+        open: (paths) =>
+          this.open({
+            pathsToOpen: paths,
+            safeMode: this.inSafeMode(),
+            devMode: this.inDevMode(),
+          }),
+      });
+      this.reopenProjectMenuManager.update();
+    });
 
     const output = await Promise.all([
       loadStatePromise,

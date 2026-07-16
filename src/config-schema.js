@@ -74,6 +74,13 @@ const configSchema = {
         ],
         default: "prompt",
       },
+      reopenProjectMenuCount: {
+        order: 7,
+        title: "Reopen Project Menu Count",
+        description: "How many recent projects to show in the Reopen Project menu.",
+        type: "integer",
+        default: 15,
+      },
       closeDeletedFileTabs: {
         order: 8,
         title: "Close Deleted File Tabs",
