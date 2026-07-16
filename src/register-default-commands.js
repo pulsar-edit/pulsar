@@ -511,15 +511,19 @@ module.exports = function ({
       "core:cut": function () {
         return this.getElement().cutSelectedText();
       },
-      "core:paste": function () {
-        return this.getElement().pasteText();
+      "core:paste": function (event) {
+        return this.getElement().pasteText(undefined, event);
       },
-      "editor:paste-without-reformatting": function () {
-        return this.getElement().pasteText({
-          normalizeLineEndings: false,
-          autoIndent: false,
-          preserveTrailingLineIndentation: true,
-        });
+      "editor:paste-without-reformatting": function (event) {
+        return this.getElement().pasteText(
+          {
+            normalizeLineEndings: false,
+            autoIndent: false,
+            preserveTrailingLineIndentation: true,
+            skipPasteProviders: true,
+          },
+          event,
+        );
       },
       "editor:delete-to-previous-word-boundary": function () {
         return this.deleteToPreviousWordBoundary();

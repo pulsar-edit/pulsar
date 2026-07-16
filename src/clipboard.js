@@ -6,8 +6,7 @@ const crypto = require("crypto");
 // context-menu-manager, application-delegate).
 const { clipboard } = require("@electron/remote");
 
-const VSCODE_EDITOR_DATA_FORMAT = "vscode-editor-data";
-const VSCODE_EDITOR_DATA_VERSION = 1;
+const VSCODE_COPY_METADATA_FORMAT = "application/vnd.code.copymetadata";
 const LUMINE_TEXT_EDITOR_DATA_FORMAT = "application/lumine-text-editor";
 const LUMINE_EDITOR_DATA_VERSION = 1;
 
@@ -98,10 +97,12 @@ module.exports = class Clipboard {
         clipboardData,
         LUMINE_TEXT_EDITOR_DATA_FORMAT,
       );
-      const serialized = clipboardData.getData(VSCODE_EDITOR_DATA_FORMAT);
-      const metadata =
-        this.metadataFromLumineEditorData(lumineData, text) ||
-        this.metadataFromSerializedEditorData(serialized, text);
+      const serializedCopyMetadata = clipboardData.getData(VSCODE_COPY_METADATA_FORMAT);
+      const lumineMetadata = this.metadataFromLumineEditorData(lumineData, text);
+      const vscodeCopyMetadata = lumineMetadata
+        ? null
+        : this.metadataFromSerializedCopyMetadata(serializedCopyMetadata);
+      const metadata = lumineMetadata || vscodeCopyMetadata;
       return metadata ? { text, metadata } : { text };
     } catch {
       return { text: "" };
@@ -111,10 +112,10 @@ module.exports = class Clipboard {
   writeToDataTransfer(clipboardData, text, metadata) {
     text = this.normalizeText(text);
     const lumineData = this.buildLumineEditorData(text, metadata);
-    const editorData = this.buildVSCodeEditorData(metadata, lumineData);
+    const copyMetadata = this.buildVSCodeCopyMetadata(metadata);
 
     clipboardData.setData("text/plain", text);
-    clipboardData.setData(VSCODE_EDITOR_DATA_FORMAT, JSON.stringify(editorData));
+    clipboardData.setData(VSCODE_COPY_METADATA_FORMAT, JSON.stringify(copyMetadata));
     if (lumineData) {
       this.writeDataTransferData(
         clipboardData,
@@ -142,9 +143,9 @@ module.exports = class Clipboard {
     }
   }
 
-  buildVSCodeEditorData(metadata, lumineData) {
+  buildVSCodeCopyMetadata(metadata) {
     const selections = Array.isArray(metadata?.selections) ? metadata.selections : null;
-    const isFromEmptySelection = selections
+    const pasteOnNewLine = selections
       ? selections.length > 0 && selections.every((selection) => selection?.fullLine === true)
       : metadata?.fullLine === true;
     const multicursorText =
@@ -152,16 +153,13 @@ module.exports = class Clipboard {
         ? selections.map((selection) => selection.text)
         : null;
 
-    const editorData = {
-      version: VSCODE_EDITOR_DATA_VERSION,
-      isFromEmptySelection,
-      multicursorText,
-      mode: null,
+    return {
+      defaultPastePayload: {
+        multicursorText,
+        pasteOnNewLine,
+        mode: null,
+      },
     };
-
-    if (lumineData) editorData.lumine = lumineData;
-
-    return editorData;
   }
 
   writeDataTransferData(clipboardData, format, data) {
@@ -231,35 +229,48 @@ module.exports = class Clipboard {
   readNativeMetadata(text) {
     try {
       const lumineData = this.parseDataTransferData(
-        clipboard.read(LUMINE_TEXT_EDITOR_DATA_FORMAT),
+        this.readNativeFormat(LUMINE_TEXT_EDITOR_DATA_FORMAT),
       );
       const metadata = this.metadataFromLumineEditorData(lumineData, text);
       if (metadata) return metadata;
 
-      const serialized = clipboard.read(VSCODE_EDITOR_DATA_FORMAT);
-      return this.metadataFromSerializedEditorData(serialized, text);
+      const serializedCopyMetadata = this.readNativeFormat(VSCODE_COPY_METADATA_FORMAT);
+      return this.metadataFromSerializedCopyMetadata(serializedCopyMetadata);
     } catch {
       return null;
     }
   }
 
-  metadataFromSerializedEditorData(serialized, text) {
+  readNativeFormat(format) {
+    if (typeof clipboard.readBuffer === "function") {
+      try {
+        const buffer = clipboard.readBuffer(format);
+        if (buffer?.length > 0) {
+          return buffer.toString("utf8").replace(/\0+$/, "");
+        }
+      } catch {
+        // Fall through to Electron's string-format reader below.
+      }
+    }
+
+    try {
+      return clipboard.read(format);
+    } catch {
+      return "";
+    }
+  }
+
+  metadataFromSerializedCopyMetadata(serialized) {
     if (!serialized) return null;
 
-    let editorData;
-    try {
-      editorData = JSON.parse(serialized);
-    } catch {
-      return null;
-    }
+    const copyMetadata = this.parseDataTransferData(serialized);
+    const payload = copyMetadata?.defaultPastePayload;
+    if (payload == null || typeof payload !== "object" || Array.isArray(payload)) return null;
 
-    if (editorData?.version !== VSCODE_EDITOR_DATA_VERSION) return null;
-
-    if (editorData.lumine != null) {
-      return this.metadataFromLumineEditorData(editorData.lumine, text);
-    }
-
-    return this.metadataFromVSCodeEditorData(editorData);
+    return this.metadataFromVSCodeEditorData({
+      isFromEmptySelection: payload.pasteOnNewLine,
+      multicursorText: payload.multicursorText,
+    });
   }
 
   metadataFromLumineEditorData(lumineData, text) {

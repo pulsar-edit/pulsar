@@ -102,6 +102,7 @@ module.exports = class TextEditorComponent {
     this.updateScheduled = false;
     this.suppressUpdates = false;
     this.hasInitialMeasurements = false;
+    this.pendingNativePasteOperation = null;
     this.measurements = {
       lineHeight: 0,
       baseCharacterWidth: 0,
@@ -1890,9 +1891,25 @@ module.exports = class TextEditorComponent {
     this.performClipboardOperation("cut", false);
   }
 
-  pasteText(options = {}) {
+  pasteText(options = {}, commandEvent = null) {
+    if (
+      commandEvent?.originalEvent?.type === "keydown" &&
+      typeof commandEvent.abortKeyBinding === "function"
+    ) {
+      const nativeOperation = { options };
+      this.pendingNativePasteOperation = nativeOperation;
+      commandEvent.abortKeyBinding();
+      setTimeout(() => {
+        if (this.pendingNativePasteOperation === nativeOperation) {
+          this.pendingNativePasteOperation = null;
+        }
+      }, 0);
+      return;
+    }
+
     const operation = { options, handled: false };
     this.pendingPasteOperation = operation;
+    const { skipPasteProviders, ...editorOptions } = options;
 
     try {
       this.getHiddenInput().focus({ preventScroll: true });
@@ -1904,14 +1921,14 @@ module.exports = class TextEditorComponent {
       this.pendingPasteOperation = null;
     }
 
-    if (
-      !operation.handled &&
-      !this.handlePasteProviders({
-        clipboard: this.props.model.constructor.clipboard,
-        options,
-      })
-    ) {
-      this.props.model.pasteText(options);
+    if (!operation.handled) {
+      const handledByProvider =
+        !skipPasteProviders &&
+        this.handlePasteProviders({
+          clipboard: this.props.model.constructor.clipboard,
+          options: editorOptions,
+        });
+      if (!handledByProvider) this.props.model.pasteText(editorOptions);
     }
   }
 
@@ -1987,13 +2004,23 @@ module.exports = class TextEditorComponent {
 
   didPaste(event) {
     const operation = this.pendingPasteOperation;
-    if (event.clipboardData && (this.getPlatform() !== "linux" || operation)) {
+    const nativeOperation = this.pendingNativePasteOperation;
+    this.pendingNativePasteOperation = null;
+    if (event.clipboardData && (this.getPlatform() !== "linux" || operation || nativeOperation)) {
       const clipboard = this.props.model.constructor.clipboard.createDataTransferClipboard(
         event.clipboardData,
       );
-      const options = operation?.options || {};
-      if (!this.handlePasteProviders({ clipboard, clipboardData: event.clipboardData, options })) {
-        this.props.model.pasteText({ ...options, clipboard });
+      const options = operation?.options || nativeOperation?.options || {};
+      const { skipPasteProviders, ...editorOptions } = options;
+      const handledByProvider =
+        !skipPasteProviders &&
+        this.handlePasteProviders({
+          clipboard,
+          clipboardData: event.clipboardData,
+          options: editorOptions,
+        });
+      if (!handledByProvider) {
+        this.props.model.pasteText({ ...editorOptions, clipboard });
       }
       event.preventDefault();
       if (operation) operation.handled = true;

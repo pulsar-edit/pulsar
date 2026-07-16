@@ -98,8 +98,8 @@ class TextEditorElement extends HTMLElement {
     return this.getComponent().cutSelectedText();
   }
 
-  pasteText(options) {
-    return this.getComponent().pasteText(options);
+  pasteText(options, commandEvent) {
+    return this.getComponent().pasteText(options, commandEvent);
   }
 
   setModel(model) {

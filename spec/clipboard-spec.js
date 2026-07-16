@@ -57,7 +57,7 @@ describe("Clipboard", () => {
   });
 
   describe("ClipboardEvent data", () => {
-    it("writes plain text, VS Code metadata, and Lumine editor metadata", () => {
+    it("writes plain text, current VS Code metadata, and Lumine editor metadata", () => {
       const clipboardData = createClipboardData();
       const metadata = { indentBasis: 0, fullLine: true };
 
@@ -65,23 +65,23 @@ describe("Clipboard", () => {
 
       expect(clipboardData.types).toEqual([
         "text/plain",
-        "vscode-editor-data",
+        "application/vnd.code.copymetadata",
         "application/lumine-text-editor",
       ]);
       expect(clipboardData.getData("text/plain").replace(/\r\n/g, "\n")).toBe("next\n");
 
-      const editorData = JSON.parse(clipboardData.getData("vscode-editor-data"));
-      expect(editorData.version).toBe(1);
-      expect(editorData.isFromEmptySelection).toBe(true);
-      expect(editorData.multicursorText).toBe(null);
-      expect(editorData.mode).toBe(null);
-      expect(editorData.lumine.version).toBe(1);
-      expect(editorData.lumine.signature).toEqual(jasmine.any(String));
-      expect(editorData.lumine.metadata).toEqual(metadata);
+      expect(JSON.parse(clipboardData.getData("application/vnd.code.copymetadata"))).toEqual({
+        defaultPastePayload: {
+          multicursorText: null,
+          pasteOnNewLine: true,
+          mode: null,
+        },
+      });
 
-      expect(JSON.parse(clipboardData.getData("application/lumine-text-editor"))).toEqual(
-        editorData.lumine,
-      );
+      const lumineData = JSON.parse(clipboardData.getData("application/lumine-text-editor"));
+      expect(lumineData.version).toBe(1);
+      expect(lumineData.signature).toEqual(jasmine.any(String));
+      expect(lumineData.metadata).toEqual(metadata);
     });
 
     it("reads Lumine metadata in a different clipboard instance", () => {
@@ -93,7 +93,6 @@ describe("Clipboard", () => {
         ],
       };
       atom.clipboard.createDataTransferClipboard(clipboardData).write("one\ntwo", metadata);
-      clipboardData.setData("vscode-editor-data", "");
 
       const otherRendererClipboard = new Clipboard();
       expect(otherRendererClipboard.createDataTransferClipboard(clipboardData).readWithMetadata()).toEqual({
@@ -102,14 +101,15 @@ describe("Clipboard", () => {
       });
     });
 
-    it("reads VS Code linewise and multicursor metadata", () => {
+    it("reads current VS Code copy metadata", () => {
       const clipboardData = createClipboardData({
         "text/plain": "one\ntwo",
-        "vscode-editor-data": JSON.stringify({
-          version: 1,
-          isFromEmptySelection: true,
-          multicursorText: ["one", "two"],
-          mode: null,
+        "application/vnd.code.copymetadata": JSON.stringify({
+          defaultPastePayload: {
+            pasteOnNewLine: true,
+            multicursorText: ["one", "two"],
+            mode: null,
+          },
         }),
       });
 

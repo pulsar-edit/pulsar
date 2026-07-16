@@ -173,6 +173,14 @@ module.exports = class ApplicationMenu {
           // keystrokes next to the item's label.
           if (keystroke.includes(" ")) {
             item.label += ` [${_.humanizeKeystroke(keystroke)}]`;
+          } else if (
+            item.command === "core:paste" ||
+            item.command === "editor:paste-without-reformatting"
+          ) {
+            // Paste must reach the renderer as a keyboard event so Chromium can
+            // expose custom formats through ClipboardEvent. Show the shortcut
+            // without creating a second command source in Electron's menu.
+            item.label += ` [${_.humanizeKeystroke(keystroke)}]`;
           } else {
             item.accelerator = MenuHelpers.acceleratorForKeystroke(keystroke);
           }

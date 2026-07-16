@@ -5422,7 +5422,7 @@ describe("TextEditorComponent", () => {
   });
 
   describe("clipboard events", () => {
-    it("writes linewise copy metadata to the VS Code clipboard format", () => {
+    it("writes linewise copy metadata to the current VS Code clipboard format", () => {
       const { component, editor } = buildComponent({ text: "first\nsecond" });
       editor.setCursorBufferPosition([0, 2]);
       const clipboardData = createClipboardData();
@@ -5431,9 +5431,10 @@ describe("TextEditorComponent", () => {
       component.didCopy(event);
 
       expect(clipboardData.getData("text/plain").replace(/\r\n/g, "\n")).toBe("first\n");
-      expect(JSON.parse(clipboardData.getData("vscode-editor-data")).isFromEmptySelection).toBe(
-        true,
-      );
+      expect(
+        JSON.parse(clipboardData.getData("application/vnd.code.copymetadata"))
+          .defaultPastePayload.pasteOnNewLine,
+      ).toBe(true);
       expect(event.preventDefault).toHaveBeenCalled();
     });
 
@@ -5480,6 +5481,32 @@ describe("TextEditorComponent", () => {
 
       expect(provider.handlePaste).toHaveBeenCalled();
       expect(editor.getText()).toBe("target");
+      expect(event.preventDefault).toHaveBeenCalled();
+      registration.dispose();
+    });
+
+    it("bypasses paste providers when pasting without reformatting", () => {
+      const { component, editor } = buildComponent({ text: "target" });
+      editor.setCursorBufferPosition([0, 0]);
+      const clipboardData = createClipboardData({ "text/plain": "one\ttwo" });
+      const provider = {
+        handlePaste: jasmine.createSpy("handlePaste").and.returnValue(true),
+      };
+      const registration = TextEditor.pasteProviderRegistry.add(provider);
+      const event = { clipboardData, preventDefault: jasmine.createSpy("preventDefault") };
+
+      component.pendingNativePasteOperation = {
+        options: {
+          normalizeLineEndings: false,
+          autoIndent: false,
+          preserveTrailingLineIndentation: true,
+          skipPasteProviders: true,
+        },
+      };
+      component.didPaste(event);
+
+      expect(provider.handlePaste).not.toHaveBeenCalled();
+      expect(editor.getText()).toBe("one\ttwotarget");
       expect(event.preventDefault).toHaveBeenCalled();
       registration.dispose();
     });
