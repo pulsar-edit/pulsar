@@ -96,6 +96,10 @@ module.exports = class GitRepository {
     this.statusSnapshotCacheKey = null;
     this.statusSnapshotRefreshCount = 0;
     this.statusEntriesByPath = new Map();
+    this.statusSnapshotSubscriberCount = 0;
+    this.statusSnapshotDebounceMs = options.statusSnapshotDebounceMs ?? 150;
+    this.statusSnapshotRefreshTimer = null;
+    this.pendingStatusSnapshotLoad = null;
     this.upstream = { ahead: 0, behind: 0 };
     for (let submodulePath in this.repo.submodules) {
       const submoduleRepo = this.repo.submodules[submodulePath];
@@ -110,7 +114,6 @@ module.exports = class GitRepository {
       const onWindowFocus = () => {
         this.refreshIndex();
         this.refreshStatus();
-        if (this.statusSnapshot.initialized) this.refreshStatusSnapshot();
       };
 
       window.addEventListener("focus", onWindowFocus);
@@ -137,6 +140,10 @@ module.exports = class GitRepository {
     this.operations = null;
     this.statusSnapshotProvider = null;
     this.statusEntriesByPath.clear();
+    if (this.statusSnapshotRefreshTimer != null) {
+      clearTimeout(this.statusSnapshotRefreshTimer);
+      this.statusSnapshotRefreshTimer = null;
+    }
 
     if (this.emitter) {
       this.emitter.emit("did-destroy");
@@ -214,11 +221,25 @@ module.exports = class GitRepository {
   // Public: Invoke the given callback when the detailed repository status
   // snapshot changes.
   //
+  // Subscribing declares interest: the repository lazily loads the first
+  // snapshot and keeps it fresh with debounced background refreshes while at
+  // least one subscriber exists. Consumers never call
+  // {::refreshStatusSnapshot} themselves.
+  //
   // * `callback` {Function} called with an immutable status snapshot.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeStatusSnapshot(callback) {
-    return this.emitter.on("did-change-status-snapshot", callback);
+    this.statusSnapshotSubscriberCount++;
+    this.scheduleStatusSnapshotRefresh();
+    const subscription = this.emitter.on("did-change-status-snapshot", callback);
+    let disposed = false;
+    return new Disposable(() => {
+      if (disposed) return;
+      disposed = true;
+      this.statusSnapshotSubscriberCount--;
+      subscription.dispose();
+    });
   }
 
   /*
@@ -436,6 +457,7 @@ module.exports = class GitRepository {
     }
     if (currentPathStatus !== pathStatus) {
       this.emitter.emit("did-change-status", { path, pathStatus });
+      this.scheduleStatusSnapshotRefresh();
     }
 
     return pathStatus;
@@ -453,9 +475,39 @@ module.exports = class GitRepository {
   // Public: Return the latest immutable detailed status snapshot. It contains
   // `head`, `upstream`, per-file staged/unstaged/conflict state, aggregate
   // `counts`, and a monotonic `generation`. The initial snapshot has
-  // `initialized: false`; call {::refreshStatusSnapshot} to load it.
+  // `initialized: false`; subscribe with {::onDidChangeStatusSnapshot} or call
+  // {::ensureStatusSnapshot} to load it.
   getStatusSnapshot() {
     return this.statusSnapshot;
+  }
+
+  // Public: Resolve with an initialized status snapshot, loading it on first
+  // call. Concurrent callers share one in-flight refresh.
+  //
+  // Returns a {Promise} that resolves to the snapshot.
+  async ensureStatusSnapshot(options = {}) {
+    if (this.statusSnapshot.initialized) return this.statusSnapshot;
+    if (!this.pendingStatusSnapshotLoad) {
+      this.pendingStatusSnapshotLoad = this.refreshStatusSnapshot(options).finally(() => {
+        this.pendingStatusSnapshotLoad = null;
+      });
+    }
+    return this.pendingStatusSnapshotLoad;
+  }
+
+  // Schedule a background snapshot refresh. Calls within the debounce window
+  // coalesce into a single Git subprocess; the window is not extended by
+  // repeated calls, so a continuous event stream cannot starve the refresh.
+  scheduleStatusSnapshotRefresh() {
+    if (this.isDestroyed() || this.statusSnapshotSubscriberCount === 0) return;
+    if (this.statusSnapshotRefreshTimer != null) return;
+    this.statusSnapshotRefreshTimer = setTimeout(() => {
+      this.statusSnapshotRefreshTimer = null;
+      if (this.isDestroyed()) return;
+      // Background refreshes must never surface as unhandled rejections; the
+      // stale-suppression counter and cache key keep failed runs harmless.
+      this.refreshStatusSnapshot().catch(() => {});
+    }, this.statusSnapshotDebounceMs);
   }
 
   // Public: Return detailed cached status for a repository path, or `null`.
@@ -659,7 +711,7 @@ module.exports = class GitRepository {
 
     const statuses = {};
     const repoStatus =
-      relativeProjectPaths.length > 0
+      relativeProjectPaths?.length > 0
         ? await repo.getStatusAsync(relativeProjectPaths)
         : await repo.getStatusAsync();
     for (let filePath in repoStatus) {
@@ -701,5 +753,6 @@ module.exports = class GitRepository {
     }
 
     if (!statusesUnchanged) this.emitter.emit("did-change-statuses");
+    this.scheduleStatusSnapshotRefresh();
   }
 };

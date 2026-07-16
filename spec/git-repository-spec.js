@@ -377,6 +377,131 @@ describe("GitRepository", () => {
     });
   });
 
+  describe("status snapshot scheduling", () => {
+    let output, statusSnapshotProvider;
+
+    // The spec clock is fake: advanceClock() fires the debounce timer, then a
+    // few microtask turns let the provider promise settle.
+    const runScheduler = async () => {
+      advanceClock(1);
+      for (let i = 0; i < 5; i++) await Promise.resolve();
+    };
+
+    beforeEach(() => {
+      output = "# branch.oid abc123\0# branch.head main\0? new.txt\0";
+      statusSnapshotProvider = {
+        getStatus: jasmine.createSpy("getStatus").andCallFake(() => Promise.resolve(output)),
+      };
+      repo = new GitRepository(copyRepository(), {
+        refreshOnWindowFocus: false,
+        statusSnapshotDebounceMs: 0,
+        statusSnapshotProvider,
+      });
+    });
+
+    it("loads the snapshot when the first subscriber attaches", async () => {
+      expect(repo.getStatusSnapshot().initialized).toBe(false);
+
+      const snapshotPromise = new Promise((resolve) => repo.onDidChangeStatusSnapshot(resolve));
+      await runScheduler();
+
+      const snapshot = await snapshotPromise;
+      expect(snapshot.initialized).toBe(true);
+      expect(repo.getStatusSnapshot()).toBe(snapshot);
+      expect(statusSnapshotProvider.getStatus.calls.count()).toBe(1);
+    });
+
+    it("coalesces refresh triggers within the debounce window", async () => {
+      repo.onDidChangeStatusSnapshot(() => {});
+      repo.onDidChangeStatusSnapshot(() => {});
+      repo.scheduleStatusSnapshotRefresh();
+      repo.scheduleStatusSnapshotRefresh();
+
+      await runScheduler();
+      await runScheduler();
+
+      expect(statusSnapshotProvider.getStatus.calls.count()).toBe(1);
+    });
+
+    it("does not spawn a status subprocess without subscribers", async () => {
+      await repo.refreshStatus();
+      repo.getPathStatus("a.txt");
+      await runScheduler();
+
+      expect(statusSnapshotProvider.getStatus.calls.count()).toBe(0);
+    });
+
+    it("refreshes after refreshStatus while a subscriber exists", async () => {
+      repo.onDidChangeStatusSnapshot(() => {});
+      await runScheduler();
+
+      output = "# branch.oid def456\0# branch.head main\0? other.txt\0";
+      await repo.refreshStatus();
+      await runScheduler();
+
+      expect(repo.getStatusSnapshot().files[0].path).toBe("other.txt");
+      expect(statusSnapshotProvider.getStatus.calls.count()).toBe(2);
+    });
+
+    it("stops scheduling after the last subscriber is disposed", async () => {
+      const subscription = repo.onDidChangeStatusSnapshot(() => {});
+      await runScheduler();
+
+      subscription.dispose();
+      subscription.dispose();
+      repo.scheduleStatusSnapshotRefresh();
+      await runScheduler();
+
+      expect(statusSnapshotProvider.getStatus.calls.count()).toBe(1);
+    });
+
+    it("refreshes on resubscription so a returning consumer never sees stale state", async () => {
+      const subscription = repo.onDidChangeStatusSnapshot(() => {});
+      await runScheduler();
+      subscription.dispose();
+
+      repo.onDidChangeStatusSnapshot(() => {});
+      await runScheduler();
+
+      expect(statusSnapshotProvider.getStatus.calls.count()).toBe(2);
+    });
+
+    it("shares one in-flight load between concurrent ensureStatusSnapshot callers", async () => {
+      const resolvers = [];
+      statusSnapshotProvider.getStatus.andCallFake(
+        () => new Promise((resolve) => resolvers.push(resolve)),
+      );
+
+      const firstEnsure = repo.ensureStatusSnapshot();
+      const secondEnsure = repo.ensureStatusSnapshot();
+      resolvers[0](output);
+
+      const snapshot = await firstEnsure;
+      expect(await secondEnsure).toBe(snapshot);
+      expect(snapshot.initialized).toBe(true);
+      expect(statusSnapshotProvider.getStatus.calls.count()).toBe(1);
+
+      expect(await repo.ensureStatusSnapshot()).toBe(snapshot);
+      expect(statusSnapshotProvider.getStatus.calls.count()).toBe(1);
+    });
+
+    it("survives destruction while a refresh is scheduled or in flight", async () => {
+      statusSnapshotProvider.getStatus.andCallFake(() => new Promise(() => {}));
+      repo.onDidChangeStatusSnapshot(() => {});
+      repo.destroy();
+      await runScheduler();
+
+      const scheduled = new GitRepository(copyRepository(), {
+        refreshOnWindowFocus: false,
+        statusSnapshotDebounceMs: 1000,
+        statusSnapshotProvider,
+      });
+      scheduled.onDidChangeStatusSnapshot(() => {});
+      scheduled.destroy();
+      expect(scheduled.statusSnapshotRefreshTimer).toBeNull();
+    });
+  });
+
   describe("buffer events", () => {
     let editor;
 
