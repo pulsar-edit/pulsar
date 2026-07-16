@@ -51,12 +51,12 @@ class RepositoryOperations {
     return this.execute("unstageFiles", paths, options);
   }
 
-  stageFileModeChange(filePath, mode) {
-    return this.execute("stageFileModeChange", filePath, mode);
+  stageFileModeChange(filePath, mode, options) {
+    return this.execute("stageFileModeChange", filePath, mode, options);
   }
 
-  stageFileSymlinkChange(filePath) {
-    return this.execute("stageFileSymlinkChange", filePath);
+  stageFileSymlinkChange(filePath, options) {
+    return this.execute("stageFileSymlinkChange", filePath, options);
   }
 
   applyPatch(patch, options) {
@@ -71,20 +71,20 @@ class RepositoryOperations {
     return this.execute("merge", reference, options);
   }
 
-  abortMerge() {
-    return this.execute("abortMerge");
+  abortMerge(options) {
+    return this.execute("abortMerge", options);
   }
 
-  checkoutSide(side, paths) {
-    return this.execute("checkoutSide", side, paths);
+  checkoutSide(side, paths, options) {
+    return this.execute("checkoutSide", side, paths, options);
   }
 
   checkout(reference, options) {
     return this.execute("checkout", reference, options);
   }
 
-  checkoutFiles(paths, reference) {
-    return this.execute("checkoutFiles", paths, reference);
+  checkoutFiles(paths, reference, options) {
+    return this.execute("checkoutFiles", paths, reference, options);
   }
 
   fetch(remote, reference, options) {
@@ -99,12 +99,12 @@ class RepositoryOperations {
     return this.execute("push", remote, reference, options);
   }
 
-  reset(mode, reference) {
-    return this.execute("reset", mode, reference);
+  reset(mode, reference, options) {
+    return this.execute("reset", mode, reference, options);
   }
 
-  deleteRef(reference) {
-    return this.execute("deleteRef", reference);
+  deleteRef(reference, options) {
+    return this.execute("deleteRef", reference, options);
   }
 
   updateSubmodules(paths, options) {
@@ -119,32 +119,39 @@ class RepositoryOperations {
     return this.execute("unsetConfig", key, options);
   }
 
-  addRemote(name, url) {
-    return this.execute("addRemote", name, url);
+  addRemote(name, url, options) {
+    return this.execute("addRemote", name, url, options);
   }
 
-  removeRemote(name) {
-    return this.execute("removeRemote", name);
+  removeRemote(name, options) {
+    return this.execute("removeRemote", name, options);
   }
 
-  setRemoteUrl(name, url) {
-    return this.execute("setRemoteUrl", name, url);
+  setRemoteUrl(name, url, options) {
+    return this.execute("setRemoteUrl", name, url, options);
   }
 
   createBlob(options) {
     return this.execute("createBlob", options);
   }
 
-  expandBlobToFile(filePath, sha) {
-    return this.execute("expandBlobToFile", filePath, sha);
+  expandBlobToFile(filePath, sha, options) {
+    return this.execute("expandBlobToFile", filePath, sha, options);
   }
 
-  mergeFile(oursPath, basePath, theirsPath, resultPath) {
-    return this.execute("mergeFile", oursPath, basePath, theirsPath, resultPath);
+  mergeFile(oursPath, basePath, theirsPath, resultPath, options) {
+    return this.execute("mergeFile", oursPath, basePath, theirsPath, resultPath, options);
   }
 
-  writeMergeConflictToIndex(filePath, baseSha, oursSha, theirsSha) {
-    return this.execute("writeMergeConflictToIndex", filePath, baseSha, oursSha, theirsSha);
+  writeMergeConflictToIndex(filePath, baseSha, oursSha, theirsSha, options) {
+    return this.execute(
+      "writeMergeConflictToIndex",
+      filePath,
+      baseSha,
+      oursSha,
+      theirsSha,
+      options,
+    );
   }
 }
 

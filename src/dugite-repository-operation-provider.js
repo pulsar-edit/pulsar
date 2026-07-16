@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { resolveGitBinary } = require("dugite");
 
 const DugiteRunner = require("./dugite-runner");
 const { DugiteOperationError } = DugiteRunner;
@@ -85,6 +86,7 @@ class DugiteRepositoryOperations {
     addBooleanFlag(args, options.noVerify, "--no-verify");
     addBooleanFlag(args, options.signoff, "--signoff");
     if (options.verbatim) args.push("--cleanup=verbatim");
+    else if (options.cleanup) args.push(`--cleanup=${options.cleanup}`);
     if (options.gpgSign === true) args.push("--gpg-sign");
     else if (typeof options.gpgSign === "string") args.push(`--gpg-sign=${options.gpgSign}`);
 
@@ -248,12 +250,18 @@ class DugiteRepositoryOperations {
   }
 
   async mergeFile(oursPath, basePath, theirsPath, resultPath, options = {}) {
-    const result = await this.provider.runResult(
-      ["merge-file", "--stdout", oursPath, basePath, theirsPath],
-      this.workingDirectory,
-      { ...options, allowedExitCodes: [0, 1] },
-    );
-    await fs.promises.writeFile(resultPath, result.stdout);
+    const args = ["merge-file", "--stdout"];
+    for (const label of options.labels || []) {
+      args.push("-L", label);
+    }
+    args.push(oursPath, basePath, theirsPath);
+    const result = await this.provider.runResult(args, this.workingDirectory, {
+      ...options,
+      allowedExitCodes: [0, 1],
+    });
+    // Relative input paths are given to Git relative to the working directory,
+    // so interpret the result path the same way.
+    await fs.promises.writeFile(path.resolve(this.workingDirectory, resultPath), result.stdout);
     return result.exitCode;
   }
 
@@ -264,18 +272,35 @@ class DugiteRepositoryOperations {
       const match = /^(\d+)\s+[0-9a-f]+\s+(\d)\t/.exec(line);
       if (match) modes.set(Number(match[2]), match[1]);
     }
-    const fallbackMode = modes.get(2) || modes.get(3) || modes.get(1) || "100644";
-    const input = [
-      `${modes.get(1) || fallbackMode} ${baseSha} 1\t${filePath}`,
-      `${modes.get(2) || fallbackMode} ${oursSha} 2\t${filePath}`,
-      `${modes.get(3) || fallbackMode} ${theirsSha} 3\t${filePath}`,
-      "",
-    ].join("\n");
-    return this.run(["update-index", "--index-info"], { ...options, stdin: input });
+    const fallbackMode = options.mode || modes.get(2) || modes.get(3) || modes.get(1) || "100644";
+    // Git requires removing any existing entry before higher order stages can
+    // be written, so start with a mode-0 line. Stages without a blob (for
+    // example an added-by-both conflict with no common base) are omitted.
+    const lines = [`0 ${"0".repeat(40)}\t${filePath}`];
+    const stages = [
+      [baseSha, 1],
+      [oursSha, 2],
+      [theirsSha, 3],
+    ];
+    for (const [sha, stage] of stages) {
+      if (sha) lines.push(`${modes.get(stage) || fallbackMode} ${sha} ${stage}\t${filePath}`);
+    }
+    return this.run(["update-index", "--index-info"], {
+      ...options,
+      stdin: `${lines.join("\n")}\n`,
+    });
   }
 }
 
 module.exports = class DugiteRepositoryOperationProvider extends DugiteRunner {
+  executeGit(args, workingDirectory, options = {}) {
+    return this.execute(args, workingDirectory, options);
+  }
+
+  getGitExecutablePath() {
+    return resolveGitBinary();
+  }
+
   createRepositoryOperations({ workingDirectory }) {
     return new DugiteRepositoryOperations(this, workingDirectory);
   }

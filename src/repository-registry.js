@@ -289,10 +289,11 @@ module.exports = class RepositoryRegistry {
       !provider ||
       (typeof provider.createRepositoryOperations !== "function" &&
         typeof provider.initializeRepository !== "function" &&
-        typeof provider.cloneRepository !== "function")
+        typeof provider.cloneRepository !== "function" &&
+        typeof provider.executeGit !== "function")
     ) {
       throw new TypeError(
-        "Repository operation providers must implement repository, initialize, or clone operations",
+        "Repository operation providers must implement repository, workspace, or Git transport operations",
       );
     }
 
@@ -372,6 +373,31 @@ module.exports = class RepositoryRegistry {
 
   canPerformWorkspaceOperation(operationName) {
     return this.findWorkspaceOperationProvider(operationName) != null;
+  }
+
+  canExecuteGitCommands() {
+    return this.findGitCommandProvider() != null;
+  }
+
+  executeGit(args, workingDirectory, options) {
+    if (this.destroyed) {
+      return Promise.reject(new Error("Cannot execute Git with a destroyed RepositoryRegistry"));
+    }
+    if (!Array.isArray(args)) {
+      return Promise.reject(new TypeError("Git arguments must be an array"));
+    }
+
+    const provider = this.findGitCommandProvider();
+    if (!provider) {
+      const error = new Error("No provider implements raw Git command execution");
+      error.code = "ERR_GIT_EXECUTION_UNAVAILABLE";
+      return Promise.reject(error);
+    }
+    return provider.executeGit(args, workingDirectory, options);
+  }
+
+  getGitExecutablePath() {
+    return this.findGitCommandProvider()?.getGitExecutablePath?.() || null;
   }
 
   initialize(directoryPath, options) {
@@ -479,6 +505,12 @@ module.exports = class RepositoryRegistry {
     if (!methodName) return null;
     return (
       this.operationProviders.find((provider) => typeof provider[methodName] === "function") || null
+    );
+  }
+
+  findGitCommandProvider() {
+    return (
+      this.operationProviders.find((provider) => typeof provider.executeGit === "function") || null
     );
   }
 

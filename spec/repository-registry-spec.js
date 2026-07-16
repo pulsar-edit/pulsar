@@ -654,6 +654,43 @@ describe("RepositoryRegistry", () => {
     expect(registry.getForPath(path.join(destinationPath, "README.md"))).toBe(repository);
   });
 
+  it("executes raw Git commands through the preferred transport provider", async () => {
+    const calls = [];
+    registry.addOperationProvider(
+      {
+        executeGit() {
+          throw new Error("fallback provider should not be used");
+        },
+      },
+      { fallback: true },
+    );
+    registry.addOperationProvider({
+      executeGit(args, workingDirectory, options) {
+        calls.push({ args, workingDirectory, options });
+        return Promise.resolve({ exitCode: 0, stdout: "ok", stderr: "" });
+      },
+      getGitExecutablePath() {
+        return "/embedded/git";
+      },
+    });
+    const workingDirectory = temp.mkdirSync("raw-git-transport");
+
+    expect(registry.canExecuteGitCommands()).toBe(true);
+    expect(registry.getGitExecutablePath()).toBe("/embedded/git");
+    expect(await registry.executeGit(["status"], workingDirectory, { stdin: "input" })).toEqual({
+      exitCode: 0,
+      stdout: "ok",
+      stderr: "",
+    });
+    expect(calls).toEqual([
+      {
+        args: ["status"],
+        workingDirectory,
+        options: { stdin: "input" },
+      },
+    ]);
+  });
+
   it("serializes initialize and clone operations targeting the same destination", async () => {
     const destinationPath = path.join(temp.mkdirSync("workspace-operation-parent"), "repository");
     const calls = [];

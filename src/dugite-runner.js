@@ -44,15 +44,23 @@ class DugiteRunner {
       LC_ALL: "C",
       ...options.env,
     };
-    const result = await this.execute([...COLOR_CONFIG, ...args], workingDirectory, {
-      env: environment,
-      stdin: options.stdin,
-      encoding: options.encoding,
-      maxBuffer: options.maxBuffer,
-      signal: options.signal,
-      killSignal: options.killSignal,
-      processCallback: options.processCallback,
-    });
+    const configArguments = [];
+    for (const [key, value] of Object.entries(options.config || {})) {
+      configArguments.push("-c", `${key}=${value}`);
+    }
+    const result = await this.execute(
+      [...COLOR_CONFIG, ...configArguments, ...args],
+      workingDirectory,
+      {
+        env: environment,
+        stdin: options.stdin,
+        encoding: options.encoding,
+        maxBuffer: options.maxBuffer,
+        signal: options.signal,
+        killSignal: options.killSignal,
+        processCallback: options.processCallback,
+      },
+    );
     const allowedExitCodes = options.allowedExitCodes || [0];
     if (!allowedExitCodes.includes(result.exitCode)) {
       throw new DugiteOperationError(args[0], result);
