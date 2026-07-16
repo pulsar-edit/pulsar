@@ -3,65 +3,123 @@ const { Liquid } = require("liquidjs");
 const path = require("path");
 
 const templateEngine = new Liquid({ jsTruthy: true });
+const modeSuffix = "{% if devMode %} [Dev]{% endif %}{% if safeMode %} [Safe]{% endif %}";
+const presetTemplates = Object.freeze({
+  Project:
+    "{% if projectTitle %}{{ projectTitle }}{% else %}{{ projectName }}{% endif %}" + modeSuffix,
+  File: "{{ fileName }}" + modeSuffix,
+  "Project and File":
+    "{% if projectTitle %}{{ projectTitle }}{% else %}{{ projectName }}{% endif %}{% if fileName %} — {{ fileName }}{% endif %}" +
+    modeSuffix,
+  "Full Path": "{{ filePath }}" + modeSuffix,
+});
 
 module.exports = {
   activate() {
+    this.active = true;
+    this.templateSelection = "";
+    this.customTemplate = "";
     this.template = "";
     this.parsedTemplate = null;
     this.projectList = null;
     this.indexRequested = false;
 
-    // wrap the core title renderer; the original is a pre-bound instance property
-    this.originalUpdateWindowTitle = atom.workspace.updateWindowTitle;
-    atom.workspace.updateWindowTitle = () => {
-      this.originalUpdateWindowTitle();
-      const title = this.render();
-      if (title) {
-        document.title = title;
-      }
-    };
-
     this.disposables = new CompositeDisposable(
       atom.config.observe("window-title.template", (value) => {
-        this.template = value || "";
-        this.parsedTemplate = null;
-        if (this.template.trim()) {
-          try {
-            this.parsedTemplate = templateEngine.parse(this.template);
-          } catch (error) {
-            atom.notifications.addWarning("window-title: invalid template", {
-              detail: error.message || String(error),
-            });
-          }
-        }
-        this.requestProjectListIndex();
-        atom.workspace.updateWindowTitle();
+        this.templateSelection = value || "";
+        this.updateTemplate();
       }),
+      atom.config.observe("window-title.custom", (value) => {
+        this.customTemplate = value || "";
+        this.updateTemplate();
+      }),
+      atom.project.onDidChangePaths(() => this.updateTitle()),
+      atom.workspace.onDidChangeActivePaneItem(() => this.subscribeToActiveItem()),
     );
+    this.subscribeToActiveItem();
+  },
+
+  updateTemplate() {
+    this.template =
+      presetTemplates[this.templateSelection] ||
+      (this.templateSelection === "Custom" ? this.customTemplate : this.templateSelection);
+    this.parsedTemplate = null;
+    if (this.template.trim()) {
+      try {
+        this.parsedTemplate = templateEngine.parse(this.template);
+      } catch (error) {
+        atom.notifications.addWarning("window-title: invalid template", {
+          detail: error.message || String(error),
+        });
+      }
+    }
+    this.requestProjectListIndex();
+    this.updateTitle();
   },
 
   deactivate() {
+    this.active = false;
     this.disposables.dispose();
-    if (this.originalUpdateWindowTitle) {
-      atom.workspace.updateWindowTitle = this.originalUpdateWindowTitle;
-      this.originalUpdateWindowTitle = null;
-      atom.workspace.updateWindowTitle();
-    }
+    this.activeItemSubscription?.dispose();
+    this.activeItemSubscription = null;
+    this.setDefaultTitle();
   },
 
   consumeProjectList(projectList) {
     this.projectList = projectList;
     const subscription = projectList.onDidChangeCurrentProject(() => {
-      atom.workspace.updateWindowTitle();
+      this.updateTitle();
     });
     this.requestProjectListIndex();
-    atom.workspace.updateWindowTitle();
+    this.updateTitle();
     return new Disposable(() => {
       subscription.dispose();
       this.projectList = null;
       this.indexRequested = false;
-      atom.workspace.updateWindowTitle();
+      this.updateTitle();
     });
+  },
+
+  subscribeToActiveItem() {
+    this.activeItemSubscription?.dispose();
+    this.activeItemSubscription = null;
+
+    const activeItem = atom.workspace.getActivePaneItem();
+    if (activeItem && typeof activeItem.onDidChangeTitle === "function") {
+      this.activeItemSubscription = activeItem.onDidChangeTitle(() => this.updateTitle());
+    } else if (activeItem && typeof activeItem.on === "function") {
+      const updateTitle = () => this.updateTitle();
+      const subscription = activeItem.on("title-changed", updateTitle);
+      if (subscription && typeof subscription.dispose === "function") {
+        this.activeItemSubscription = subscription;
+      } else if (typeof activeItem.off === "function") {
+        this.activeItemSubscription = new Disposable(() => {
+          activeItem.off("title-changed", updateTitle);
+        });
+      }
+    }
+
+    this.updateTitle();
+  },
+
+  updateTitle() {
+    if (!this.active) {
+      this.setDefaultTitle();
+      return;
+    }
+    document.title = this.render() || "Lumine";
+    atom.applicationDelegate?.setRepresentedFilename?.(this.representedFilename());
+  },
+
+  setDefaultTitle() {
+    document.title = "Lumine";
+    atom.applicationDelegate?.setRepresentedFilename?.("");
+  },
+
+  representedFilename() {
+    const activeItem = atom.workspace.getActivePaneItem();
+    const itemPath = activeItem?.getPath?.();
+    return itemPath || atom.project.getPaths()[0] || "";
   },
 
   // the project list indexes lazily; trigger it only when the template needs it
@@ -83,7 +141,7 @@ module.exports = {
     try {
       title = templateEngine.renderSync(this.parsedTemplate, this.variables());
     } catch {
-      // a template that fails at render time keeps the default title
+      // a template that fails at render time falls back to the application title
       return null;
     }
     title = title
@@ -111,6 +169,7 @@ module.exports = {
     return {
       projectTitle: currentProject ? currentProject.title : "",
       projectPaths: projectPaths.join(", "),
+      projectCount: projectPaths.length,
       projectName: projectPath ? path.basename(projectPath) : "",
       projectPath: projectPath || "",
       fileName: itemPath ? path.basename(itemPath) : itemTitle || "",

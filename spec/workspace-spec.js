@@ -122,10 +122,6 @@ describe("Workspace", () => {
         expect(untitledEditor.getText()).toBe("An untitled editor.");
 
         expect(atom.workspace.getActiveTextEditor().getPath()).toBe(editor3.getPath());
-        const pathEscaped = fs.tildify(escapeStringRegex(atom.project.getPaths()[0]));
-        expect(document.title).toMatch(
-          new RegExp(`^${path.basename(editor3.getLongTitle())} \\u2014 ${pathEscaped}`),
-        );
       });
     });
 
@@ -1729,141 +1725,14 @@ describe("Workspace", () => {
   });
 
   describe("document.title", () => {
-    describe("when there is no item open", () => {
-      it("sets the title to the project path", () =>
-        expect(document.title).toMatch(escapeStringRegex(fs.tildify(atom.project.getPaths()[0]))));
+    it("is not changed by workspace activity", async () => {
+      document.title = "Lumine";
 
-      it("sets the title to 'untitled' if there is no project path", () => {
-        atom.project.setPaths([]);
-        expect(document.title).toMatch(/^untitled/);
-      });
-    });
+      await atom.workspace.open("b");
+      atom.project.setPaths([]);
+      atom.workspace.getActiveTextEditor().buffer.setPath(path.join(temp.dir, "renamed"));
 
-    describe("when the active pane item's path is not inside a project path", () => {
-      beforeEach(async () => {
-        await atom.workspace.open("b");
-        atom.project.setPaths([]);
-      });
-
-      it("sets the title to the pane item's title plus the item's path", () => {
-        const item = atom.workspace.getActivePaneItem();
-        const pathEscaped = fs.tildify(escapeStringRegex(path.dirname(item.getPath())));
-        expect(document.title).toMatch(new RegExp(`^${item.getTitle()} \\u2014 ${pathEscaped}`));
-      });
-
-      describe("when the title of the active pane item changes", () => {
-        it("updates the window title based on the item's new title", () => {
-          const editor = atom.workspace.getActivePaneItem();
-          editor.buffer.setPath(path.join(temp.dir, "hi"));
-          const pathEscaped = fs.tildify(escapeStringRegex(path.dirname(editor.getPath())));
-          expect(document.title).toMatch(
-            new RegExp(`^${editor.getTitle()} \\u2014 ${pathEscaped}`),
-          );
-        });
-      });
-
-      describe("when the active pane's item changes", () => {
-        it("updates the title to the new item's title plus the project path", () => {
-          atom.workspace.getActivePane().activateNextItem();
-          const item = atom.workspace.getActivePaneItem();
-          const pathEscaped = fs.tildify(escapeStringRegex(path.dirname(item.getPath())));
-          expect(document.title).toMatch(new RegExp(`^${item.getTitle()} \\u2014 ${pathEscaped}`));
-        });
-      });
-
-      describe("when an inactive pane's item changes", () => {
-        it("does not update the title", () => {
-          const pane = atom.workspace.getActivePane();
-          pane.splitRight();
-          const initialTitle = document.title;
-          pane.activateNextItem();
-          expect(document.title).toBe(initialTitle);
-        });
-      });
-    });
-
-    describe("when the active pane item is inside a project path", () => {
-      beforeEach(async () => {
-        await atom.workspace.open("b");
-      });
-
-      describe("when there is an active pane item", () => {
-        it("sets the title to the pane item's title plus the project path", () => {
-          const item = atom.workspace.getActivePaneItem();
-          const pathEscaped = fs.tildify(escapeStringRegex(atom.project.getPaths()[0]));
-          expect(document.title).toMatch(new RegExp(`^${item.getTitle()} \\u2014 ${pathEscaped}`));
-        });
-      });
-
-      describe("when the title of the active pane item changes", () => {
-        it("updates the window title based on the item's new title", () => {
-          const editor = atom.workspace.getActivePaneItem();
-          editor.buffer.setPath(path.join(atom.project.getPaths()[0], "hi"));
-          const pathEscaped = fs.tildify(escapeStringRegex(atom.project.getPaths()[0]));
-          expect(document.title).toMatch(
-            new RegExp(`^${editor.getTitle()} \\u2014 ${pathEscaped}`),
-          );
-        });
-      });
-
-      describe("when the active pane's item changes", () => {
-        it("updates the title to the new item's title plus the project path", () => {
-          atom.workspace.getActivePane().activateNextItem();
-          const item = atom.workspace.getActivePaneItem();
-          const pathEscaped = fs.tildify(escapeStringRegex(atom.project.getPaths()[0]));
-          expect(document.title).toMatch(new RegExp(`^${item.getTitle()} \\u2014 ${pathEscaped}`));
-        });
-      });
-
-      describe("when the last pane item is removed", () => {
-        it("updates the title to the project's first path", () => {
-          atom.workspace.getActivePane().destroy();
-          expect(atom.workspace.getActivePaneItem()).toBeUndefined();
-          expect(document.title).toMatch(escapeStringRegex(fs.tildify(atom.project.getPaths()[0])));
-        });
-      });
-
-      describe("when an inactive pane's item changes", () => {
-        it("does not update the title", () => {
-          const pane = atom.workspace.getActivePane();
-          pane.splitRight();
-          const initialTitle = document.title;
-          pane.activateNextItem();
-          expect(document.title).toBe(initialTitle);
-        });
-      });
-    });
-
-    describe("when the workspace is deserialized", () => {
-      beforeEach(async () => {
-        await atom.workspace.open("a");
-      });
-
-      it("updates the title to contain the project's path", async () => {
-        document.title = null;
-
-        const atom2 = new AtomEnvironment({
-          applicationDelegate: atom.applicationDelegate,
-        });
-        atom2.initialize({
-          window: document.createElement("div"),
-          document: Object.assign(document.createElement("div"), {
-            body: document.createElement("div"),
-            head: document.createElement("div"),
-          }),
-        });
-
-        await atom2.project.deserialize(atom.project.serialize());
-
-        atom2.workspace.deserialize(atom.workspace.serialize(), atom2.deserializers);
-        const item = atom2.workspace.getActivePaneItem();
-        const pathEscaped = fs.tildify(escapeStringRegex(atom.project.getPaths()[0]));
-        expect(document.title).toMatch(
-          new RegExp(`^${item.getLongTitle()} \\u2014 ${pathEscaped}`),
-        );
-
-        atom2.destroy();
-      });
+      expect(document.title).toBe("Lumine");
     });
   });
 
@@ -3614,7 +3483,3 @@ describe("Workspace", () => {
     });
   });
 });
-
-function escapeStringRegex(string) {
-  return string.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&");
-}

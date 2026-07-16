@@ -320,7 +320,6 @@ module.exports = class Workspace extends Model {
     super(...arguments);
 
     this.disposables = new CompositeDisposable();
-    this.updateWindowTitle = this.updateWindowTitle.bind(this);
     this.updateDocumentEdited = this.updateDocumentEdited.bind(this);
     this.didDestroyPaneItem = this.didDestroyPaneItem.bind(this);
     this.didChangeActivePaneOnPaneContainer = this.didChangeActivePaneOnPaneContainer.bind(this);
@@ -518,7 +517,6 @@ module.exports = class Workspace extends Model {
 
     this.itemLocationStore.initialize({ configDirPath });
 
-    this.project.onDidChangePaths(this.updateWindowTitle);
     this.subscribeToAddedItems();
     this.subscribeToMovedItems();
     this.subscribeToDockToggling();
@@ -618,8 +616,6 @@ module.exports = class Workspace extends Model {
     }
 
     this.hasActiveTextEditor = this.getActiveTextEditor() != null;
-
-    this.updateWindowTitle();
   }
 
   getPackageNamesWithActiveGrammars() {
@@ -692,23 +688,11 @@ module.exports = class Workspace extends Model {
   }
 
   didChangeActivePaneItem(item) {
-    this.updateWindowTitle();
     this.updateDocumentEdited();
     if (this.activeItemSubscriptions) this.activeItemSubscriptions.dispose();
     this.activeItemSubscriptions = new CompositeDisposable();
 
-    let modifiedSubscription, titleSubscription;
-
-    if (item != null && typeof item.onDidChangeTitle === "function") {
-      titleSubscription = item.onDidChangeTitle(this.updateWindowTitle);
-    } else if (item != null && typeof item.on === "function") {
-      titleSubscription = item.on("title-changed", this.updateWindowTitle);
-      if (titleSubscription == null || typeof titleSubscription.dispose !== "function") {
-        titleSubscription = new Disposable(() => {
-          item.off("title-changed", this.updateWindowTitle);
-        });
-      }
-    }
+    let modifiedSubscription;
 
     if (item != null && typeof item.onDidChangeModified === "function") {
       modifiedSubscription = item.onDidChangeModified(this.updateDocumentEdited);
@@ -721,9 +705,6 @@ module.exports = class Workspace extends Model {
       }
     }
 
-    if (titleSubscription != null) {
-      this.activeItemSubscriptions.add(titleSubscription);
-    }
     if (modifiedSubscription != null) {
       this.activeItemSubscriptions.add(modifiedSubscription);
     }
@@ -813,61 +794,6 @@ module.exports = class Workspace extends Model {
         });
       });
     }
-  }
-
-  // Updates the application's title and proxy icon based on whichever file is
-  // open.
-  updateWindowTitle() {
-    let itemPath, itemTitle, projectPath, representedPath;
-    const appName = atom.getAppName();
-    const left = this.project.getPaths();
-    const projectPaths = left != null ? left : [];
-    const item = this.getActivePaneItem();
-    if (item) {
-      itemPath = typeof item.getPath === "function" ? item.getPath() : undefined;
-      const longTitle = typeof item.getLongTitle === "function" ? item.getLongTitle() : undefined;
-      itemTitle =
-        longTitle == null
-          ? typeof item.getTitle === "function"
-            ? item.getTitle()
-            : undefined
-          : longTitle;
-      projectPath = _.find(
-        projectPaths,
-        (projectPath) =>
-          itemPath === projectPath ||
-          (itemPath != null ? itemPath.startsWith(projectPath + path.sep) : undefined),
-      );
-    }
-    if (itemTitle == null) {
-      itemTitle = "untitled";
-    }
-    if (projectPath == null) {
-      projectPath = itemPath ? path.dirname(itemPath) : projectPaths[0];
-    }
-    if (projectPath != null) {
-      projectPath = fs.tildify(projectPath);
-    }
-
-    const titleParts = [];
-    if (item != null && projectPath != null) {
-      titleParts.push(itemTitle, projectPath);
-      representedPath = itemPath != null ? itemPath : projectPath;
-    } else if (projectPath != null) {
-      titleParts.push(projectPath);
-      representedPath = projectPath;
-    } else {
-      titleParts.push(itemTitle);
-      representedPath = "";
-    }
-
-    if (process.platform !== "darwin") {
-      titleParts.push(appName);
-    }
-
-    document.title = titleParts.join(" \u2014 ");
-    this.applicationDelegate.setRepresentedFilename(representedPath);
-    this.emitter.emit("did-change-window-title");
   }
 
   // On macOS, fades the application window's proxy icon when the current file
@@ -1147,10 +1073,6 @@ module.exports = class Workspace extends Model {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidAddTextEditor(callback) {
     return this.emitter.on("did-add-text-editor", callback);
-  }
-
-  onDidChangeWindowTitle(callback) {
-    return this.emitter.on("did-change-window-title", callback);
   }
 
   /*

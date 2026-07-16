@@ -1,7 +1,7 @@
 {
   "name": "window-title",
   "author": "lumine-code",
-  "description": "Customize the window title with a template",
+  "description": "Choose a preset or customize the window title with a Liquid template.",
   "repository": "https://github.com/lumine-code/lumine",
   "version": "1.0.0",
   "license": "MIT",
@@ -22,8 +22,22 @@
   "configSchema": {
     "template": {
       "order": 1,
-      "title": "Window Title Template",
-      "description": "Liquid template for the window title. Variables: `projectTitle`, `projectPaths`, `projectName`, `projectPath`, `fileName`, `filePath`, `relativeFilePath`, `gitHead`, `appName`, `devMode`, `safeMode`. Supports tags such as `{% if devMode %} [Dev]{% endif %}`. If the template renders empty, the default title is kept.",
+      "title": "Window Title",
+      "description": "Select the information shown in the window title. Choose `Custom` to use the template below.",
+      "type": "string",
+      "enum": [
+        "Project",
+        "File",
+        "Project and File",
+        "Full Path",
+        "Custom"
+      ],
+      "default": "Project and File"
+    },
+    "custom": {
+      "order": 2,
+      "title": "Custom Template",
+      "description": "Liquid template used when `Window Title` is `Custom`. Variables: `projectTitle`, `projectPaths`, `projectCount`, `projectName`, `projectPath`, `fileName`, `filePath`, `relativeFilePath`, `gitHead`, `appName`, `devMode`, `safeMode`. Supports tags such as `{% if devMode %} [Dev]{% endif %}`. If the template renders empty, the title falls back to `Lumine`.",
       "type": "string",
       "default": "{% if projectTitle %}{{ projectTitle }}{% else %}{{ fileName }} — {{ projectPaths }}{% endif %}{% if devMode %} [Dev]{% endif %}{% if safeMode %} [Safe]{% endif %}"
     }

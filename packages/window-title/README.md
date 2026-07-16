@@ -1,21 +1,24 @@
 # window-title
 
-Customize the window title with a template.
+Choose a preset or customize the window title with a Liquid template.
 
 ## Features
 
-- **Template-based title**: compose the window title with a Liquid template from variables like the project title, file name, or git branch.
+- **Preset and custom titles**: choose a project, file, project-and-file, or full-path title, or compose one with a Liquid template.
 - **Project awareness**: shows the matching project title from the `project-list` package when the window's roots match a saved project.
-- **Safe fallback**: if the template renders empty or fails, the default title is kept untouched.
+- **Safe fallback**: if the template renders empty or fails, the title falls back to `Lumine`.
 
 ## Configuration
 
-The `Window Title Template` setting is a [LiquidJS](https://liquidjs.com/) template. Use `{{ variable }}` to output a value and tags such as `{% if variable %}...{% else %}...{% endif %}` for conditional content. Available variables:
+The `Window Title` setting provides `Project`, `File`, `Project and File`, and `Full Path` presets. Presets also append `[Dev]` and `[Safe]` markers when those modes are active.
+
+Choose `Custom` to use the `Custom Template` setting. Custom titles use [LiquidJS](https://liquidjs.com/) syntax: `{{ variable }}` outputs a value, and tags such as `{% if variable %}...{% else %}...{% endif %}` add conditional content. Available variables:
 
 | Variable           | Value                                                             |
 | ------------------ | ----------------------------------------------------------------- |
 | `projectTitle`     | Title of the matched project from the project-list configuration. |
 | `projectPaths`     | All project roots, joined with a comma.                           |
+| `projectCount`     | Number of project roots in the window.                            |
 | `projectName`      | Base name of the first project root.                              |
 | `projectPath`      | Full path of the first project root.                              |
 | `fileName`         | Name of the active file (or the active item's title).             |
@@ -26,16 +29,26 @@ The `Window Title Template` setting is a [LiquidJS](https://liquidjs.com/) templ
 | `devMode`          | `true` when the window runs in dev mode.                          |
 | `safeMode`         | `true` when the window runs in safe mode.                         |
 
-Unavailable variables render as empty strings; leftover empty brackets and doubled whitespace are cleaned up. The default template shows the project title when the window matches a saved project. Otherwise, it shows the active file name and project paths. It adds a `[Dev]`/`[Safe]` marker when running in dev or safe mode:
+Unavailable variables render as empty strings; leftover empty brackets and doubled whitespace are cleaned up.
+
+## Examples
+
+After selecting `Custom`, use the saved project title when available, or the active file and project roots otherwise. This example also marks development and safe-mode windows:
 
 ```
 {% if projectTitle %}{{ projectTitle }}{% else %}{{ fileName }} — {{ projectPaths }}{% endif %}{% if devMode %} [Dev]{% endif %}{% if safeMode %} [Safe]{% endif %}
 ```
 
-A richer example:
+Show the number of roots only when the window contains more than one:
 
 ```
-{% if projectTitle %}{{ projectTitle }}{% else %}{{ projectName }}{% endif %} — {{ fileName }} [{{ gitHead }}]
+{% if projectCount > 1 %}{{ projectCount }} roots — {% endif %}{{ fileName }}
+```
+
+Combine the project, relative file path, and current Git branch:
+
+```
+{% if projectTitle %}{{ projectTitle }}{% else %}{{ projectName }}{% endif %} — {{ relativeFilePath }} [{{ gitHead }}]
 ```
 
 ## Services
