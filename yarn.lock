@@ -1293,19 +1293,19 @@
     event-kit "^2.5.2"
     semver "^7.8.5"
 
-"@lumine-code/superstring@https://github.com/lumine-code/superstring.git#44429ba3bba7a65edcdaee2cf79052d4d8bd6623":
+"@lumine-code/superstring@https://github.com/lumine-code/superstring.git#02dc4482caffa94023dd9386d53397b73236b05d":
   version "4.0.0"
-  resolved "https://github.com/lumine-code/superstring.git#44429ba3bba7a65edcdaee2cf79052d4d8bd6623"
+  resolved "https://github.com/lumine-code/superstring.git#02dc4482caffa94023dd9386d53397b73236b05d"
   dependencies:
     node-addon-api "^8.9.0"
 
-"@lumine-code/text-buffer@https://github.com/lumine-code/text-buffer.git#23822647cde1ae4653636967ce89204f94dc908b":
+"@lumine-code/text-buffer@https://github.com/lumine-code/text-buffer.git#f575e4215f29204861b396148c6272369e526991":
   version "16.0.0"
-  resolved "https://github.com/lumine-code/text-buffer.git#23822647cde1ae4653636967ce89204f94dc908b"
+  resolved "https://github.com/lumine-code/text-buffer.git#f575e4215f29204861b396148c6272369e526991"
   dependencies:
     "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#742e3e166f56261189ff245a63967b8f1970fadd"
     "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#ffe5b7b29242c9031e11a0df85f7c0d79f6cc990"
-    "@lumine-code/superstring" "https://github.com/lumine-code/superstring.git#44429ba3bba7a65edcdaee2cf79052d4d8bd6623"
+    "@lumine-code/superstring" "https://github.com/lumine-code/superstring.git#02dc4482caffa94023dd9386d53397b73236b05d"
     "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274"
     diff "^9.0.0"
     event-kit "^2.5.3"
