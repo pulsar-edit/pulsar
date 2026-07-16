@@ -269,7 +269,7 @@ class TextMateLanguageMode {
     ]);
   }
 
-  updateForInjection(grammar) {
+  updateInjectionsForGrammar(grammar) {
     if (!grammar.injectionSelector) return;
     for (const tokenizedLine of this.tokenizedLines) {
       if (tokenizedLine) {
@@ -281,6 +281,12 @@ class TextMateLanguageMode {
         }
       }
     }
+  }
+
+  // Deprecated alias of `updateInjectionsForGrammar`, kept for packages that
+  // still use the legacy method name.
+  updateForInjection(grammar) {
+    return this.updateInjectionsForGrammar(grammar);
   }
 
   retokenizeLines() {

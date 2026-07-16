@@ -30,14 +30,9 @@ const PARSERS_IN_USE = new Set();
 
 const FUNCTION_TRUE = () => true;
 
-function isParseTimeout(err) {
-  return err.message.includes("Parsing failed");
-}
-
-function parserSupportsTimeoutMicros(parser) {
-  return typeof parser.setTimeoutMicros === "function";
-}
-
+// Parse with a time budget. Returns `null` when the budget is exhausted
+// before the parse completes; the parser retains its progress, so calling
+// this again with the same arguments resumes where it left off.
 function parseWithProgressTimeout(parser, callback, oldTree, includedRanges, timeoutMicros) {
   let options = { includedRanges };
 
@@ -392,7 +387,6 @@ class WASMTreeSitterLanguageMode {
     for (const marker of this.injectionsMarkerLayer.getMarkers()) {
       marker.languageLayer.handleTextChange(edit, oldText, newText);
     }
-    this.cachedCurrentBufferText = this.buffer.getText();
   }
 
   bufferDidFinishTransaction({ changes }) {
@@ -572,8 +566,8 @@ class WASMTreeSitterLanguageMode {
     return result;
   }
 
-  // TODO: This is the original name for the method below. It makes no sense.
-  // Rename it everywhere when legacy Tree-sitter is retired.
+  // Deprecated alias of {::updateInjectionsForGrammar}, kept for packages
+  // that still use the legacy Tree-sitter method name.
   updateForInjection(grammar) {
     return this.updateInjectionsForGrammar(grammar);
   }
@@ -602,8 +596,8 @@ class WASMTreeSitterLanguageMode {
     // to cut down on redundant lookups.
     let cache = new Map();
 
-    // Each layer calls `updateForInjection` on its children, so we need only
-    // start the process.
+    // Each layer calls `updateInjectionsForGrammar` on its children, so we
+    // need only start the process.
     this.rootLanguageLayer.updateInjectionsForGrammar(grammar, cache);
     cache.clear();
   }
@@ -802,12 +796,8 @@ class WASMTreeSitterLanguageMode {
   parseAsync(language, oldTree, includedRanges, { tag = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
-    let supportsTimeoutMicros = parserSupportsTimeoutMicros(parser);
     let timeoutMicros = oldTree ? this.syncTimeoutMicros : INITIAL_PARSE_JOB_LIMIT_MICROS;
     parser.reset();
-    if (supportsTimeoutMicros) {
-      parser.setTimeoutMicros(timeoutMicros);
-    }
     PARSERS_IN_USE.add(parser);
 
     // When you edit a tree, the positions of nodes in the tree are adjusted
@@ -835,11 +825,12 @@ class WASMTreeSitterLanguageMode {
     // accurate captures.
     let parseDone = false;
     let text = this.buffer.getText();
-    this.cachedCurrentBufferText = text;
     let callback = (index, _, endIndex) => {
       // Stick with a frozen copy of the text at parse time… until parsing is
-      // done, at which point we should use the latest buffer text.
-      let currentText = parseDone ? this.cachedCurrentBufferText : text;
+      // done, at which point we should use the latest buffer text. (The
+      // buffer caches the result of `getText` until its next change, so this
+      // does not re-build the string on every lookup.)
+      let currentText = parseDone ? this.buffer.getText() : text;
       return currentText.slice(index, endIndex);
     };
 
@@ -855,9 +846,6 @@ class WASMTreeSitterLanguageMode {
           console.log(`(async: ${batchCount} batches)`);
         }
       }
-      if (supportsTimeoutMicros) {
-        parser.setTimeoutMicros(null);
-      }
       PARSERS_IN_USE.delete(parser);
     };
 
@@ -865,40 +853,25 @@ class WASMTreeSitterLanguageMode {
       console.time(tag);
     }
 
-    try {
-      // Attempt a synchronous parse.
-      tree = supportsTimeoutMicros
-        ? parser.parse(callback, oldTree, { includedRanges })
-        : parseWithProgressTimeout(parser, callback, oldTree, includedRanges, timeoutMicros);
-      if (!supportsTimeoutMicros && tree === null) {
-        throw new Error("Parsing failed");
-      }
-    } catch (err) {
-      if (!isParseTimeout(err)) {
-        throw err;
-      }
+    // Attempt a synchronous parse.
+    tree = parseWithProgressTimeout(parser, callback, oldTree, includedRanges, timeoutMicros);
 
+    if (tree === null) {
       // The parse couldn't be completed in the allotted time, so we'll go
-      // async and return a promise.
+      // async and return a promise. Each batch resumes the previous partial
+      // parse rather than starting over.
       return new Promise((resolve, reject) => {
         const parseJob = () => {
           try {
             batchCount++;
-            tree = supportsTimeoutMicros
-              ? parser.parse(callback, oldTree, { includedRanges })
-              : parseWithProgressTimeout(parser, callback, oldTree, includedRanges, timeoutMicros);
-            if (!supportsTimeoutMicros && tree === null) {
-              setImmediate(parseJob);
-              return;
-            }
+            tree = parseWithProgressTimeout(parser, callback, oldTree, includedRanges, timeoutMicros);
           } catch (err) {
-            if (!isParseTimeout(err)) {
-              return reject(err);
-            }
+            return reject(err);
+          }
+          if (tree === null) {
             setImmediate(parseJob);
             return;
           }
-
           cleanup();
           resolve(tree);
         };
@@ -915,15 +888,9 @@ class WASMTreeSitterLanguageMode {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     parser.reset();
-    if (parserSupportsTimeoutMicros(parser)) {
-      parser.setTimeoutMicros(null);
-    }
 
-    let text = this.buffer.getText();
-    this.cachedCurrentBufferText = text;
     let callback = (index, _, endIndex) => {
-      let currentText = this.cachedCurrentBufferText;
-      return currentText.slice(index, endIndex);
+      return this.buffer.getText().slice(index, endIndex);
     };
 
     if (devMode && tag) {
