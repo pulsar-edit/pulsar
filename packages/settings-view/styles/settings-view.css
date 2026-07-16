@@ -708,27 +708,6 @@
       cursor: pointer;
       appearance: none;
 
-      &::after {
-        content: "\f0a3";
-        flex: none;
-        width: var(--component-icon-size);
-        height: var(--component-icon-size);
-        margin-left: auto;
-        color: var(--text-color-subtle);
-        font-family: "Octicons Regular";
-        font-size: var(--component-icon-size);
-        font-style: normal;
-        font-weight: normal;
-        line-height: 1;
-        text-align: center;
-        -webkit-font-smoothing: antialiased;
-      }
-
-      &:hover::after,
-      &:focus::after {
-        color: var(--text-color-highlight);
-      }
-
       &:focus-visible {
         outline: 2px solid var(--text-color-info);
         outline-offset: calc(var(--component-padding) / 2);
@@ -738,10 +717,6 @@
     .package-collapsible-section.is-collapsed {
       > .package-section-toggle {
         margin-bottom: 0;
-
-        &::after {
-          content: "\f078";
-        }
       }
 
       > .section-container > .package-section-toggle {
