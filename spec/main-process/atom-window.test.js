@@ -210,6 +210,43 @@ describe("AtomWindow", function () {
     });
   });
 
+  describe("sendToRenderer", function () {
+    it("relays window state events to the renderer", function () {
+      const w = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow,
+      });
+
+      w.browserWindow.emit("focus");
+      w.browserWindow.emit("blur");
+
+      assert.deepEqual(w.browserWindow.sent, [["did-focus-window"], ["did-blur-window"]]);
+    });
+
+    it("drops messages once the window or its renderer is gone", function () {
+      const w = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow,
+      });
+      w.browserWindow.destroy();
+
+      w.browserWindow.emit("focus");
+      w.browserWindow.emit("blur");
+      w.sendMessage("some-message");
+
+      assert.lengthOf(w.browserWindow.sent, 0);
+    });
+
+    it("swallows a send to a frame disposed after the destroyed checks", function () {
+      const w = new AtomWindow(app, service, {
+        browserWindowConstructor: StubBrowserWindow,
+      });
+      w.browserWindow.webContents.send = () => {
+        throw new Error("Render frame was disposed before WebFrameMain could be accessed");
+      };
+
+      assert.doesNotThrow(() => w.browserWindow.emit("blur"));
+    });
+  });
+
   describe("reload", function () {
     it("prepares to unload without waiting for package deactivation", async function () {
       const w = new AtomWindow(app, service, {
@@ -507,6 +544,7 @@ class StubBrowserWindow extends EventEmitter {
     super();
     this.options = options;
     this.sent = [];
+    this.destroyed = false;
     this.behavior = {
       focusOnWebView: false,
       reloaded: false,
@@ -517,9 +555,18 @@ class StubBrowserWindow extends EventEmitter {
       this.sent.push(args);
     };
     this.webContents.setVisualZoomLevelLimits = () => {};
+    this.webContents.isDestroyed = () => this.destroyed;
   }
 
   loadURL() {}
+
+  isDestroyed() {
+    return this.destroyed;
+  }
+
+  destroy() {
+    this.destroyed = true;
+  }
 
   reload() {
     this.behavior.reloaded = true;

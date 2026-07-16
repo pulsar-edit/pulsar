@@ -163,27 +163,27 @@ module.exports = class AtomWindow extends EventEmitter {
     });
 
     this.browserWindow.on("enter-full-screen", () => {
-      this.browserWindow.webContents.send("did-enter-full-screen");
+      this.sendToRenderer("did-enter-full-screen");
     });
 
     this.browserWindow.on("leave-full-screen", () => {
-      this.browserWindow.webContents.send("did-leave-full-screen");
+      this.sendToRenderer("did-leave-full-screen");
     });
 
     this.browserWindow.on("maximize", () => {
-      this.browserWindow.webContents.send("did-maximize-window");
+      this.sendToRenderer("did-maximize-window");
     });
 
     this.browserWindow.on("unmaximize", () => {
-      this.browserWindow.webContents.send("did-unmaximize-window");
+      this.sendToRenderer("did-unmaximize-window");
     });
 
     this.browserWindow.on("focus", () => {
-      this.browserWindow.webContents.send("did-focus-window");
+      this.sendToRenderer("did-focus-window");
     });
 
     this.browserWindow.on("blur", () => {
-      this.browserWindow.webContents.send("did-blur-window");
+      this.sendToRenderer("did-blur-window");
     });
 
     this.browserWindow.loadURL(
@@ -317,7 +317,7 @@ module.exports = class AtomWindow extends EventEmitter {
         }
       };
       ipcMain.on("did-prepare-to-unload", callback);
-      this.browserWindow.webContents.send("prepare-to-unload", options);
+      this.sendToRenderer("prepare-to-unload", options);
     });
 
     return this.lastPrepareToUnloadPromise;
@@ -362,7 +362,7 @@ module.exports = class AtomWindow extends EventEmitter {
       ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT,
     } = env;
 
-    this.browserWindow.webContents.send("environment", {
+    this.sendToRenderer("environment", {
       NODE_ENV,
       NODE_PATH,
       ATOM_HOME,
@@ -371,8 +371,23 @@ module.exports = class AtomWindow extends EventEmitter {
     });
   }
 
+  // Window events such as `blur` and `focus` can arrive during close or
+  // reload, after the renderer's main frame has already been disposed.
+  // Sending IPC at that point has no renderer left to act on it, so drop the
+  // message instead of letting Electron log a disposed-frame error.
+  sendToRenderer(channel, ...args) {
+    if (this.browserWindow.isDestroyed()) return;
+    const contents = this.browserWindow.webContents;
+    if (contents.isDestroyed()) return;
+    try {
+      contents.send(channel, ...args);
+    } catch {
+      // The frame was disposed between the check and the send.
+    }
+  }
+
   sendMessage(message, detail) {
-    this.browserWindow.webContents.send("message", message, detail);
+    this.sendToRenderer("message", message, detail);
   }
 
   sendCommand(command, ...args) {
@@ -395,12 +410,12 @@ module.exports = class AtomWindow extends EventEmitter {
   }
 
   sendURIMessage(uri) {
-    this.browserWindow.webContents.send("uri-message", uri);
+    this.sendToRenderer("uri-message", uri);
   }
 
   sendCommandToBrowserWindow(command, ...args) {
     const action = args[0] && args[0].contextCommand ? "context-command" : "command";
-    this.browserWindow.webContents.send(action, command, ...args);
+    this.sendToRenderer(action, command, ...args);
   }
 
   getDimensions() {
