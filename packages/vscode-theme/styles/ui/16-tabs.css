@@ -258,3 +258,21 @@ atom-dock .tab-bar .tab::before {
     background-color: var(--tab-background-color-editor); /* Match syntax background color */
   }
 }
+
+/* Tab sizing -------------- */
+
+/* Tabs fit their content and show long paths, like VS Code. */
+.tab-bar {
+  .tab,
+  .tab.active {
+    flex: 0 0 auto;
+    min-width: 2.75em;
+    max-width: 23.1em; /* 7em tab-min-width * 3.3 */
+  }
+  atom-dock & {
+    .tab,
+    .tab.active {
+      max-width: none;
+    }
+  }
+}

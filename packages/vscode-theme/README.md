@@ -8,7 +8,6 @@ The VSCode themes for Lumine: day and night UI and syntax themes following the V
 - **Signature details**: a colored top border on the focused pane's active tab, the #04395e/#005fb8 list selections, and flat blue primary buttons.
 - **Day and night pair**: `vscode-day-ui`/`vscode-day-syntax` and `vscode-night-ui`/`vscode-night-syntax` follow the system theme mode out of the box.
 - **Dark+ and Light+ tokens**: the classic VS Code syntax colors, including the matching terminal ANSI palette.
-- **Configurable tabs and docks**: tab sizing, close-button position, dock toggle buttons, and sticky tree-view headers.
 
 ## Commands
 

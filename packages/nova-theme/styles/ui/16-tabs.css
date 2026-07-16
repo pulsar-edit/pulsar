@@ -39,11 +39,7 @@
     transition: background-color 0.08s;
 
     &:hover:not(.active) {
-      background-color: color-mix(
-        in srgb,
-        var(--tab-background-color-active) 55%,
-        transparent
-      );
+      background-color: color-mix(in srgb, var(--tab-background-color-active) 55%, transparent);
     }
     &.active {
       color: var(--tab-text-color-active);
@@ -239,5 +235,22 @@ atom-dock .tab-bar .tab::before {
   &[data-type="MarkdownPreviewView"] {
     color: var(--tab-text-color-editor);
     background-color: var(--tab-background-color-editor);
+  }
+}
+
+/* Tab sizing -------------- */
+
+.tab-bar {
+  .tab,
+  .tab.active {
+    flex: 1 1 0;
+    max-width: 22em;
+    min-width: 7em; /* ~ icon + 6 characters */
+  }
+  atom-dock & {
+    .tab,
+    .tab.active {
+      max-width: none;
+    }
   }
 }
