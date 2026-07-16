@@ -1,0 +1,65 @@
+.image-paste.save-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--image-paste-dialog-spacing, 10px);
+}
+
+atom-panel.modal .image-paste.save-dialog atom-text-editor[mini] {
+  margin-bottom: 0;
+}
+
+.image-paste.save-dialog .image-paste-preview {
+  position: relative;
+  align-self: center;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.image-paste.save-dialog .image-paste-warning {
+  position: absolute;
+  z-index: 1;
+  top: 0.75rem;
+  left: 50%;
+  width: max-content;
+  padding: 0.45rem 0.75rem;
+  color: var(--text-color-warning);
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+  background-color: var(
+    --image-paste-warning-background-color,
+    color-mix(
+      in srgb,
+      var(--background-color-warning) 12%,
+      var(--overlay-background-color)
+    )
+  );
+  border: 1px solid color-mix(in srgb, var(--background-color-warning) 55%, transparent);
+  border-radius: var(--component-border-radius);
+  box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 20%);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.image-paste.save-dialog .image-paste-warning:empty {
+  display: none;
+}
+
+.image-paste.save-dialog .image-paste-preview img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: var(--image-paste-preview-max-height, calc(100vh - 10rem));
+  box-sizing: border-box;
+  background-color: var(
+    --image-paste-preview-background-color,
+    var(--inset-panel-background-color)
+  );
+  border: 1px solid var(--base-border-color);
+  border-radius: var(--component-border-radius);
+  object-fit: contain;
+  object-position: center;
+}

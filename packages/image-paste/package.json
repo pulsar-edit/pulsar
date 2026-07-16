@@ -1,0 +1,48 @@
+{
+  "name": "image-paste",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "Paste clipboard images into projects as image files.",
+  "main": "./lib/main",
+  "repository": "https://github.com/lumine-code/lumine",
+  "bugs": {
+    "url": "https://github.com/lumine-code/lumine/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@electron/remote": "2.1.3"
+  },
+  "engines": {
+    "atom": "*"
+  },
+  "consumedServices": {
+    "tree-view": {
+      "versions": {
+        "^1.0.0": "consumeTreeView"
+      }
+    }
+  },
+  "configSchema": {
+    "assetsDirectory": {
+      "order": 1,
+      "title": "Assets Directory",
+      "description": "Project-relative directory used when saving images pasted into text editors.",
+      "type": "string",
+      "default": "assets"
+    },
+    "forwardSlash": {
+      "order": 2,
+      "title": "Use Forward Slashes",
+      "description": "Insert image paths with forward slashes in text editors.",
+      "type": "boolean",
+      "default": true
+    },
+    "imagePreview": {
+      "order": 3,
+      "title": "Image Preview",
+      "description": "Show an image preview in the save dialog.",
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
