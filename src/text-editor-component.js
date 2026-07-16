@@ -2756,13 +2756,18 @@ module.exports = class TextEditorComponent {
   measureLongestLineWidth() {
     if (this.longestLineToMeasure) {
       const lineComponent = this.lineComponentsByScreenLineId.get(this.longestLineToMeasure.id);
-      // Keep this as the integer `offsetWidth` rather than the fractional
-      // `getBoundingClientRect().width`. The rest of the positioning system
-      // rounds to whole pixels (see measureHorizontalPositionsOnLine), so the
-      // `.lines` width must stay consistent with the rounded pixel position of
-      // the longest line's end; a fractional width desyncs it and shifts
-      // `getContentWidth` by a pixel.
-      this.measurements.longestLineWidth = lineComponent.element.firstChild.offsetWidth;
+      // This width must live on the same pixel grid as the horizontal
+      // positions (see measureHorizontalPositionsOnLine): `.lines` width is
+      // derived from it and the width specs assert it against the measured
+      // position of the longest line's end, so the two paths must quantize
+      // identically. Snapping the fractional bounding-box width to the
+      // physical pixel grid guarantees that at every device pixel ratio; at a
+      // ratio of 1 it equals the old integer `offsetWidth`. Do not mix grids
+      // here (raw fractional or plain offsetWidth) — that desyncs the paths
+      // and shifts `getContentWidth` by a pixel.
+      this.measurements.longestLineWidth = roundToPhysicalPixelBoundary(
+        lineComponent.element.firstChild.getBoundingClientRect().width,
+      );
       this.longestLineToMeasure = null;
     }
   }
@@ -2856,7 +2861,17 @@ module.exports = class TextEditorComponent {
             lineNodeClientLeft = lineNode.getBoundingClientRect().left;
           }
 
-          positions.set(nextColumnToMeasure, Math.round(clientPixelPosition - lineNodeClientLeft));
+          // Snap to the physical (device) pixel grid rather than whole CSS
+          // pixels. On scaled displays this keeps cursors and selection edges
+          // on the true glyph boundary (up to half a CSS pixel closer on
+          // fractional-advance fonts) while staying aligned to hardware pixels
+          // so carets render crisp. At a device pixel ratio of 1 this is
+          // identical to Math.round, preserving the integer invariants the
+          // width specs rely on.
+          positions.set(
+            nextColumnToMeasure,
+            roundToPhysicalPixelBoundary(clientPixelPosition - lineNodeClientLeft),
+          );
           continue columnLoop;
         } else {
           textNodesIndex++;
@@ -2877,7 +2892,10 @@ module.exports = class TextEditorComponent {
         lineNodeClientLeft = lineNode.getBoundingClientRect().left;
       }
 
-      positions.set(nextColumnToMeasure, Math.round(lastTextNodeRight - lineNodeClientLeft));
+      positions.set(
+        nextColumnToMeasure,
+        roundToPhysicalPixelBoundary(lastTextNodeRight - lineNodeClientLeft),
+      );
     }
   }
 
