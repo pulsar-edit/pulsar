@@ -491,10 +491,10 @@ module.exports = function ({
     "atom-text-editor",
     stopEventPropagationAndGroupUndo(config, {
       "core:copy": function () {
-        return this.copySelectedText();
+        return this.getElement().copySelectedText();
       },
       "editor:copy-selection": function () {
-        return this.copyOnlySelectedText();
+        return this.getElement().copyOnlySelectedText();
       },
     }),
     false,
@@ -509,13 +509,13 @@ module.exports = function ({
         return this.delete();
       },
       "core:cut": function () {
-        return this.cutSelectedText();
+        return this.getElement().cutSelectedText();
       },
       "core:paste": function () {
-        return this.pasteText();
+        return this.getElement().pasteText();
       },
       "editor:paste-without-reformatting": function () {
-        return this.pasteText({
+        return this.getElement().pasteText({
           normalizeLineEndings: false,
           autoIndent: false,
           preserveTrailingLineIndentation: true,

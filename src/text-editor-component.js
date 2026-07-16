@@ -79,6 +79,8 @@ module.exports = class TextEditorComponent {
     this.updateSync = this.updateSync.bind(this);
     this.didBlurHiddenInput = this.didBlurHiddenInput.bind(this);
     this.didFocusHiddenInput = this.didFocusHiddenInput.bind(this);
+    this.didCopy = this.didCopy.bind(this);
+    this.didCut = this.didCut.bind(this);
     this.didPaste = this.didPaste.bind(this);
     this.didTextInput = this.didTextInput.bind(this);
     this.didKeydown = this.didKeydown.bind(this);
@@ -766,6 +768,8 @@ module.exports = class TextEditorComponent {
       key: "cursorsAndInput",
       didBlurHiddenInput: this.didBlurHiddenInput,
       didFocusHiddenInput: this.didFocusHiddenInput,
+      didCopy: this.didCopy,
+      didCut: this.didCut,
       didTextInput: this.didTextInput,
       didPaste: this.didPaste,
       didKeydown: this.didKeydown,
@@ -1854,14 +1858,107 @@ module.exports = class TextEditorComponent {
     }
   }
 
+  copySelectedText() {
+    this.performClipboardOperation("copy", false);
+  }
+
+  copyOnlySelectedText() {
+    this.performClipboardOperation("copy", true);
+  }
+
+  cutSelectedText() {
+    this.performClipboardOperation("cut", false);
+  }
+
+  pasteText(options = {}) {
+    const operation = { options, handled: false };
+    this.pendingPasteOperation = operation;
+
+    try {
+      this.getHiddenInput().focus({ preventScroll: true });
+      const { ownerDocument } = this.element;
+      if (typeof ownerDocument.execCommand === "function") ownerDocument.execCommand("paste");
+    } catch {
+      // Fall through to the existing direct clipboard implementation below.
+    } finally {
+      this.pendingPasteOperation = null;
+    }
+
+    if (!operation.handled) this.props.model.pasteText(options);
+  }
+
+  performClipboardOperation(type, onlySelectedText) {
+    const operation = { type, onlySelectedText, handled: false };
+    this.pendingClipboardOperation = operation;
+
+    try {
+      this.getHiddenInput().focus({ preventScroll: true });
+      const { ownerDocument } = this.element;
+      if (typeof ownerDocument.execCommand === "function") ownerDocument.execCommand(type);
+    } catch {
+      // Fall through to the existing direct clipboard implementation below.
+    } finally {
+      this.pendingClipboardOperation = null;
+    }
+
+    if (!operation.handled) {
+      if (type === "cut") {
+        this.props.model.cutSelectedText();
+      } else if (onlySelectedText) {
+        this.props.model.copyOnlySelectedText();
+      } else {
+        this.props.model.copySelectedText();
+      }
+    }
+  }
+
+  didCopy(event) {
+    this.writeClipboardEvent(event, false);
+  }
+
+  didCut(event) {
+    this.writeClipboardEvent(event, true);
+  }
+
+  writeClipboardEvent(event, isCut) {
+    if (!event.clipboardData) return;
+
+    const clipboard = this.props.model.constructor.clipboard.createDataTransferClipboard(
+      event.clipboardData,
+    );
+    const operation = this.pendingClipboardOperation;
+
+    if (isCut) {
+      this.props.model.cutSelectedText({ clipboard });
+    } else if (operation?.onlySelectedText) {
+      this.props.model.copyOnlySelectedText(clipboard);
+    } else {
+      this.props.model.copySelectedText(clipboard);
+    }
+
+    const matchesPendingOperation =
+      operation && operation.type === (isCut ? "cut" : "copy");
+    if (clipboard.didWrite() || matchesPendingOperation) {
+      event.preventDefault();
+      if (matchesPendingOperation) operation.handled = true;
+    }
+  }
+
   didPaste(event) {
-    // On Linux, Chromium translates a middle-button mouse click into a
-    // mousedown event *and* a paste event. Since Lumine supports the middle mouse
-    // click as a way of closing a tab, we only want the mousedown event, not
-    // the paste event. And since we don't use the `paste` event for any
-    // behavior in Lumine, we can no-op the event to eliminate this issue.
-    // See https://github.com/atom/atom/pull/15183#issue-248432413.
-    if (this.getPlatform() === "linux") event.preventDefault();
+    const operation = this.pendingPasteOperation;
+    if (event.clipboardData && (this.getPlatform() !== "linux" || operation)) {
+      const clipboard = this.props.model.constructor.clipboard.createDataTransferClipboard(
+        event.clipboardData,
+      );
+      this.props.model.pasteText({ ...operation?.options, clipboard });
+      event.preventDefault();
+      if (operation) operation.handled = true;
+    } else if (this.getPlatform() === "linux") {
+      // Chromium translates a middle-button mouse click into a mousedown and a
+      // paste event on Linux. Preserve Lumine's existing suppression unless the
+      // paste event was explicitly requested by the editor command above.
+      event.preventDefault();
+    }
   }
 
   didTextInput(event) {
@@ -4459,6 +4556,8 @@ class CursorsAndInputComponent {
       hiddenInputPosition,
       didBlurHiddenInput,
       didFocusHiddenInput,
+      didCopy,
+      didCut,
       didPaste,
       didTextInput,
       didKeydown,
@@ -4486,6 +4585,8 @@ class CursorsAndInputComponent {
       on: {
         blur: didBlurHiddenInput,
         focus: didFocusHiddenInput,
+        copy: didCopy,
+        cut: didCut,
         paste: didPaste,
         textInput: didTextInput,
         keydown: didKeydown,

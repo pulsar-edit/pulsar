@@ -6,6 +6,10 @@ const crypto = require("crypto");
 // context-menu-manager, application-delegate).
 const { clipboard } = require("@electron/remote");
 
+const VSCODE_EDITOR_DATA_FORMAT = "vscode-editor-data";
+const VSCODE_EDITOR_DATA_VERSION = 1;
+const LUMINE_EDITOR_DATA_VERSION = 1;
+
 // Extended: Represents the clipboard used for copying and pasting in Lumine.
 //
 // An instance of this class is always available as the `atom.clipboard` global.
@@ -47,6 +51,14 @@ module.exports = class Clipboard {
     return crypto.createHash("md5").update(text, "utf8").digest("hex");
   }
 
+  normalizeText(text) {
+    return text.replace(/\r\n?|\n/g, process.platform === "win32" ? "\r\n" : "\n");
+  }
+
+  signatureForText(text) {
+    return this.md5(text.replace(/\r\n?|\n/g, "\n"));
+  }
+
   // Public: Write the given text to the clipboard.
   //
   // The metadata associated with the text is available by calling
@@ -55,11 +67,82 @@ module.exports = class Clipboard {
   // * `text` The {String} to store.
   // * `metadata` (optional) The additional info to associate with the text.
   write(text, metadata) {
-    text = text.replace(/\r?\n/g, process.platform === "win32" ? "\r\n" : "\n");
+    text = this.normalizeText(text);
 
     this.signatureForMetadata = this.md5(text);
     this.metadata = metadata;
     clipboard.writeText(text);
+  }
+
+  createDataTransferClipboard(clipboardData) {
+    let state = this.readFromDataTransfer(clipboardData);
+    let didWrite = false;
+
+    return {
+      write: (text, metadata) => {
+        state = this.writeToDataTransfer(clipboardData, text, metadata);
+        didWrite = true;
+      },
+      readWithMetadata: () => state,
+      didWrite: () => didWrite,
+    };
+  }
+
+  readFromDataTransfer(clipboardData) {
+    if (typeof clipboardData.getData !== "function") return { text: "" };
+
+    try {
+      const text = clipboardData.getData("text/plain");
+      const serialized = clipboardData.getData(VSCODE_EDITOR_DATA_FORMAT);
+      const metadata = this.metadataFromSerializedEditorData(serialized, text);
+      return metadata ? { text, metadata } : { text };
+    } catch {
+      return { text: "" };
+    }
+  }
+
+  writeToDataTransfer(clipboardData, text, metadata) {
+    text = this.normalizeText(text);
+    const editorData = this.buildVSCodeEditorData(text, metadata);
+
+    clipboardData.setData("text/plain", text);
+    clipboardData.setData(VSCODE_EDITOR_DATA_FORMAT, JSON.stringify(editorData));
+
+    this.signatureForMetadata = this.md5(text);
+    this.metadata = metadata;
+    return { text, metadata };
+  }
+
+  buildVSCodeEditorData(text, metadata) {
+    const selections = Array.isArray(metadata?.selections) ? metadata.selections : null;
+    const isFromEmptySelection = selections
+      ? selections.length > 0 && selections.every((selection) => selection?.fullLine === true)
+      : metadata?.fullLine === true;
+    const multicursorText =
+      selections && selections.length > 1
+        ? selections.map((selection) => selection.text)
+        : null;
+
+    const editorData = {
+      version: VSCODE_EDITOR_DATA_VERSION,
+      isFromEmptySelection,
+      multicursorText,
+      mode: null,
+    };
+
+    try {
+      JSON.stringify(metadata);
+      editorData.lumine = {
+        version: LUMINE_EDITOR_DATA_VERSION,
+        signature: this.signatureForText(text),
+        metadata,
+      };
+    } catch {
+      // VS Code-compatible metadata remains available even when a package has
+      // attached renderer-local metadata that cannot be serialized.
+    }
+
+    return editorData;
   }
 
   // Public: Read the text from the clipboard.
@@ -89,10 +172,97 @@ module.exports = class Clipboard {
   // * `metadata` The metadata stored by an earlier call to {::write}.
   readWithMetadata() {
     const text = this.read();
+    const nativeMetadata = this.readNativeMetadata(text);
+    if (nativeMetadata) return { text, metadata: nativeMetadata };
+
     if (this.signatureForMetadata === this.md5(text)) {
       return { text, metadata: this.metadata };
     } else {
       return { text };
     }
+  }
+
+  readNativeMetadata(text) {
+    try {
+      const serialized = clipboard.read(VSCODE_EDITOR_DATA_FORMAT);
+      return this.metadataFromSerializedEditorData(serialized, text);
+    } catch {
+      return null;
+    }
+  }
+
+  metadataFromSerializedEditorData(serialized, text) {
+    if (!serialized) return null;
+
+    let editorData;
+    try {
+      editorData = JSON.parse(serialized);
+    } catch {
+      return null;
+    }
+
+    if (editorData?.version !== VSCODE_EDITOR_DATA_VERSION) return null;
+
+    if (editorData.lumine != null) {
+      const lumineData = editorData.lumine;
+      if (
+        lumineData.version !== LUMINE_EDITOR_DATA_VERSION ||
+        lumineData.signature !== this.signatureForText(text) ||
+        !this.isValidMetadata(lumineData.metadata)
+      ) {
+        return null;
+      }
+      return lumineData.metadata;
+    }
+
+    return this.metadataFromVSCodeEditorData(editorData);
+  }
+
+  metadataFromVSCodeEditorData(editorData) {
+    const metadata = {};
+    let hasMetadata = false;
+
+    if (typeof editorData.isFromEmptySelection === "boolean") {
+      metadata.fullLine = editorData.isFromEmptySelection;
+      hasMetadata = true;
+    }
+
+    if (
+      Array.isArray(editorData.multicursorText) &&
+      editorData.multicursorText.length > 0 &&
+      editorData.multicursorText.every((text) => typeof text === "string")
+    ) {
+      metadata.selections = editorData.multicursorText.map((text) => ({
+        text,
+        fullLine: editorData.isFromEmptySelection === true,
+      }));
+      hasMetadata = true;
+    }
+
+    return hasMetadata ? metadata : null;
+  }
+
+  isValidMetadata(metadata) {
+    if (metadata == null || typeof metadata !== "object" || Array.isArray(metadata)) {
+      return false;
+    }
+
+    if (metadata.fullLine != null && typeof metadata.fullLine !== "boolean") return false;
+    if (metadata.indentBasis != null && !Number.isFinite(metadata.indentBasis)) return false;
+
+    if (metadata.selections != null) {
+      if (!Array.isArray(metadata.selections)) return false;
+      return metadata.selections.every(
+        (selection) =>
+          selection != null &&
+          typeof selection === "object" &&
+          !Array.isArray(selection) &&
+          typeof selection.text === "string" &&
+          (selection.fullLine == null || typeof selection.fullLine === "boolean") &&
+          (selection.indentBasis == null || Number.isFinite(selection.indentBasis)),
+      );
+    }
+
+    return true;
   }
 };

@@ -86,6 +86,22 @@ class TextEditorElement extends HTMLElement {
     return this.getComponent().props.model;
   }
 
+  copySelectedText() {
+    return this.getComponent().copySelectedText();
+  }
+
+  copyOnlySelectedText() {
+    return this.getComponent().copyOnlySelectedText();
+  }
+
+  cutSelectedText() {
+    return this.getComponent().cutSelectedText();
+  }
+
+  pasteText(options) {
+    return this.getComponent().pasteText(options);
+  }
+
   setModel(model) {
     this.getComponent().update({ model });
     this.updateModelFromAttributes();

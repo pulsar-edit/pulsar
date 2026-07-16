@@ -857,9 +857,14 @@ module.exports = class Selection {
   // * `maintainClipboard` {Boolean} (default: false) See {::copy}
   // * `fullLine` {Boolean} (default: false) See {::copy}
   // * `bypassReadOnly` {Boolean} (default: false) Must be `true` to modify text within a read-only editor.
-  cut(maintainClipboard = false, fullLine = false, bypassReadOnly = false) {
+  cut(
+    maintainClipboard = false,
+    fullLine = false,
+    bypassReadOnly = false,
+    clipboard = this.editor.constructor.clipboard,
+  ) {
     if (!this.ensureWritable("cut", { bypassReadOnly })) return;
-    this.copy(maintainClipboard, fullLine);
+    this.copy(maintainClipboard, fullLine, clipboard);
     this.delete({ bypassReadOnly });
   }
 
@@ -872,7 +877,11 @@ module.exports = class Selection {
   // * `fullLine` {Boolean} if `true`, the copied text will always be pasted
   //   at the beginning of the line containing the cursor, regardless of the
   //   cursor's horizontal position. (default: false)
-  copy(maintainClipboard = false, fullLine = false) {
+  copy(
+    maintainClipboard = false,
+    fullLine = false,
+    clipboard = this.editor.constructor.clipboard,
+  ) {
     if (this.isEmpty()) return;
     const { start, end } = this.getBufferRange();
     const selectionText = this.editor.getTextInRange([start, end]);
@@ -880,7 +889,7 @@ module.exports = class Selection {
     const startLevel = this.editor.indentLevelForLine(precedingText);
 
     if (maintainClipboard) {
-      let { text: clipboardText, metadata } = this.editor.constructor.clipboard.readWithMetadata();
+      let { text: clipboardText, metadata } = clipboard.readWithMetadata();
       if (!metadata) metadata = {};
       if (!metadata.selections) {
         metadata.selections = [
@@ -896,9 +905,9 @@ module.exports = class Selection {
         indentBasis: startLevel,
         fullLine,
       });
-      this.editor.constructor.clipboard.write([clipboardText, selectionText].join("\n"), metadata);
+      clipboard.write([clipboardText, selectionText].join("\n"), metadata);
     } else {
-      this.editor.constructor.clipboard.write(selectionText, {
+      clipboard.write(selectionText, {
         indentBasis: startLevel,
         fullLine,
       });

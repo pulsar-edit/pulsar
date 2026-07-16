@@ -4565,27 +4565,27 @@ module.exports = class TextEditor {
   */
 
   // Essential: For each selection, copy the selected text.
-  copySelectedText() {
+  copySelectedText(clipboard = this.constructor.clipboard) {
     let maintainClipboard = false;
     for (let selection of this.getSelectionsOrderedByBufferPosition()) {
       if (selection.isEmpty()) {
         const previousRange = selection.getBufferRange();
         selection.selectLine();
-        selection.copy(maintainClipboard, true);
+        selection.copy(maintainClipboard, true, clipboard);
         selection.setBufferRange(previousRange);
       } else {
-        selection.copy(maintainClipboard, false);
+        selection.copy(maintainClipboard, false, clipboard);
       }
       maintainClipboard = true;
     }
   }
 
   // Private: For each selection, only copy highlighted text.
-  copyOnlySelectedText() {
+  copyOnlySelectedText(clipboard = this.constructor.clipboard) {
     let maintainClipboard = false;
     for (let selection of this.getSelectionsOrderedByBufferPosition()) {
       if (!selection.isEmpty()) {
-        selection.copy(maintainClipboard, false);
+        selection.copy(maintainClipboard, false, clipboard);
         maintainClipboard = true;
       }
     }
@@ -4597,13 +4597,14 @@ module.exports = class TextEditor {
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor.
   cutSelectedText(options = {}) {
     if (!this.ensureWritable("cutSelectedText", options)) return;
+    const clipboard = options.clipboard || this.constructor.clipboard;
     let maintainClipboard = false;
     this.mutateSelectedText((selection) => {
       if (selection.isEmpty()) {
         selection.selectLine();
-        selection.cut(maintainClipboard, true, options.bypassReadOnly);
+        selection.cut(maintainClipboard, true, options.bypassReadOnly, clipboard);
       } else {
-        selection.cut(maintainClipboard, false, options.bypassReadOnly);
+        selection.cut(maintainClipboard, false, options.bypassReadOnly, clipboard);
       }
       maintainClipboard = true;
     });
@@ -4619,8 +4620,10 @@ module.exports = class TextEditor {
   // * `options` (optional) See {Selection::insertText}.
   pasteText(options = {}) {
     if (!this.ensureWritable("parseText", options)) return;
+    const clipboard = options.clipboard || this.constructor.clipboard;
     options = Object.assign({}, options);
-    let { text: clipboardText, metadata } = this.constructor.clipboard.readWithMetadata();
+    delete options.clipboard;
+    let { text: clipboardText, metadata } = clipboard.readWithMetadata();
     if (!this.emitWillInsertTextEvent(clipboardText)) return false;
     let languageMode = this.buffer.getLanguageMode();
 

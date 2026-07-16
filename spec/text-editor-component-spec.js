@@ -14,6 +14,18 @@ const Grim = require("grim");
 const electron = require("electron");
 const clipboard = electron.clipboard;
 
+function createClipboardData(initialData = {}) {
+  const data = new Map(Object.entries(initialData));
+  return {
+    getData(type) {
+      return data.get(type) || "";
+    },
+    setData(type, value) {
+      data.set(type, value);
+    },
+  };
+}
+
 // Define a custom scheduler that uses `setTimeout` instead of
 // `requestAnimationFrame` because the latter behaves slowly when the browser
 // does not think the editor is visible.
@@ -5409,7 +5421,39 @@ describe("TextEditorComponent", () => {
     });
   });
 
-  describe("paste event", () => {
+  describe("clipboard events", () => {
+    it("writes linewise copy metadata to the VS Code clipboard format", () => {
+      const { component, editor } = buildComponent({ text: "first\nsecond" });
+      editor.setCursorBufferPosition([0, 2]);
+      const clipboardData = createClipboardData();
+      const event = { clipboardData, preventDefault: jasmine.createSpy("preventDefault") };
+
+      component.didCopy(event);
+
+      expect(clipboardData.getData("text/plain").replace(/\r\n/g, "\n")).toBe("first\n");
+      expect(JSON.parse(clipboardData.getData("vscode-editor-data")).isFromEmptySelection).toBe(
+        true,
+      );
+      expect(event.preventDefault).toHaveBeenCalled();
+    });
+
+    it("pastes a linewise copy from another renderer at the start of the line", () => {
+      const clipboardData = createClipboardData();
+      TextEditor.clipboard
+        .createDataTransferClipboard(clipboardData)
+        .write("first\n", { indentBasis: 0, fullLine: true });
+      TextEditor.clipboard.reset();
+
+      const { component, editor } = buildComponent({ text: "target" });
+      editor.setCursorBufferPosition([0, 3]);
+      const event = { clipboardData, preventDefault: jasmine.createSpy("preventDefault") };
+
+      component.didPaste(event);
+
+      expect(editor.getText().replace(/\r\n/g, "\n")).toBe("first\ntarget");
+      expect(event.preventDefault).toHaveBeenCalled();
+    });
+
     it("prevents the browser's default processing for the event on Linux", () => {
       const { component } = buildComponent({ platform: "linux" });
       const event = { preventDefault: () => {} };
