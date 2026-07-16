@@ -1,4 +1,5 @@
 const { MenuLabel } = require("./label.js");
+const { MenuItem } = require("./item.js");
 const { Utils } = require("./utils.js");
 
 // Lazy require to avoid circular dependency
@@ -19,6 +20,14 @@ class ApplicationMenu {
     this.parent = parent;
     this.cachedOpenLeaf = null;
     this._skipBlurCount = 0;
+    this.overflowStartIndex = this.labels.length;
+    this.portalContainer = null;
+
+    this.overflowLabel = MenuLabel.createMenuLabel({ label: "...", submenu: [] });
+    this.overflowLabel.setParent(this);
+    this.overflowLabel.getElement().classList.add("overflow-menu-label", "overflowed");
+    this.overflowLabel.getElement().setAttribute("aria-label", "More application menus");
+    this.element.appendChild(this.overflowLabel.getElement());
 
     // Store handler references for cleanup
     this.clickHandler = () => this.blur();
@@ -62,7 +71,7 @@ class ApplicationMenu {
       target.setOpen(false);
       return;
     }
-    this.labels.forEach((o) => {
+    this.getAllLabels().forEach((o) => {
       o.setOpen(false);
     });
     target.setOpen(true);
@@ -275,12 +284,19 @@ class ApplicationMenu {
       if (this.showingAltKeys && !e.repeat && this.parent?.isMenuBarVisible()) {
         let handled = false;
 
-        this.labels.some((o) => {
+        this.labels.some((o, index) => {
           if (o.getAltTrigger() !== undefined && o.getAltTrigger() === e.key.toLowerCase()) {
             if (focusedLabel) {
               focusedLabel.setFocused(false);
             }
-            o.setOpen(true);
+            if (index < this.overflowStartIndex) {
+              o.setOpen(true);
+            } else {
+              const overflowItem = this.overflowLabel.getSubmenu()[index - this.overflowStartIndex];
+              this.overflowLabel.setOpen(true);
+              overflowItem?.setOpen(true);
+              overflowItem?.getSubmenu()?.selectFirstItem();
+            }
             Utils.stopEvent(e);
             handled = true;
             return true;
@@ -378,7 +394,7 @@ class ApplicationMenu {
   close() {
     this.cachedOpenLeaf = null; // Invalidate cache
     const bar = getTitleBar();
-    this.labels.forEach((o) => {
+    this.getAllLabels().forEach((o) => {
       if (o.isOpen()) {
         o.setOpen(false);
       }
@@ -399,56 +415,63 @@ class ApplicationMenu {
   }
 
   openFirstLabel() {
-    this.labels[0]?.setOpen(true);
+    this.getNavigableLabels()[0]?.setOpen(true);
   }
 
   openLastLabel() {
-    this.labels[this.labels.length - 1]?.setOpen(true);
+    const labels = this.getNavigableLabels();
+    labels[labels.length - 1]?.setOpen(true);
   }
 
   openNextLabel() {
     let label = this.getOpenLabel();
     if (label) {
+      const labels = this.getNavigableLabels();
       label.setOpen(false);
-      this.labels[Utils.mod(this.labels.indexOf(label) + 1, this.labels.length)].setOpen(true);
+      labels[Utils.mod(labels.indexOf(label) + 1, labels.length)]?.setOpen(true);
     }
   }
 
   openPreviousLabel() {
     let label = this.getOpenLabel();
     if (label) {
+      const labels = this.getNavigableLabels();
       label.setOpen(false);
-      this.labels[Utils.mod(this.labels.indexOf(label) - 1, this.labels.length)].setOpen(true);
+      labels[Utils.mod(labels.indexOf(label) - 1, labels.length)]?.setOpen(true);
     }
   }
 
   focusFirstLabel() {
-    this.labels.forEach((o) => {
+    const labels = this.getNavigableLabels();
+    this.getAllLabels().forEach((o) => {
       o.setFocused(false);
     });
-    this.labels[0]?.setFocused(true);
+    labels[0]?.setFocused(true);
   }
 
   focusLastLabel() {
-    this.labels.forEach((o) => {
+    const labels = this.getNavigableLabels();
+    this.getAllLabels().forEach((o) => {
       o.setFocused(false);
     });
-    this.labels[this.labels.length - 1]?.setFocused(true);
+    labels[labels.length - 1]?.setFocused(true);
   }
 
   focusNextLabel() {
     let label = this.getFocusedLabel();
     if (label) {
+      const labels = this.getNavigableLabels();
       label.setFocused(false);
-      this.labels[Utils.mod(this.labels.indexOf(label) + 1, this.labels.length)].setFocused(true);
+      labels[Utils.mod(labels.indexOf(label) + 1, labels.length)]?.setFocused(true);
     }
   }
 
   focusPreviousLabel() {
     let label = this.getFocusedLabel();
     if (label) {
+      const labels = this.getNavigableLabels();
       label.setFocused(false);
-      this.labels[Utils.mod(this.labels.indexOf(label) - 1, this.labels.length)].setFocused(true);
+      labels[Utils.mod(labels.indexOf(label) - 1, labels.length)]?.setFocused(true);
     }
   }
 
@@ -475,7 +498,7 @@ class ApplicationMenu {
       return curr;
     };
 
-    this.labels.some((o) => {
+    this.getNavigableLabels().some((o) => {
       if (o.isOpen()) {
         result = o;
         let tmp = recurseItem(o);
@@ -513,7 +536,7 @@ class ApplicationMenu {
       return curr;
     };
 
-    this.labels.some((o) => {
+    this.getNavigableLabels().some((o) => {
       if (o.isOpen()) {
         let tmp = recurseItem(o);
         if (tmp !== null) {
@@ -528,11 +551,11 @@ class ApplicationMenu {
   }
 
   getOpenLabel() {
-    return this.labels.find((o) => o.isOpen()) || null;
+    return this.getNavigableLabels().find((o) => o.isOpen()) || null;
   }
 
   getFocusedLabel() {
-    return this.labels.find((o) => o.isFocused()) || null;
+    return this.getNavigableLabels().find((o) => o.isFocused()) || null;
   }
 
   getElement() {
@@ -541,6 +564,80 @@ class ApplicationMenu {
 
   getLabels() {
     return this.labels;
+  }
+
+  getAllLabels() {
+    return [...this.labels, this.overflowLabel];
+  }
+
+  getNavigableLabels() {
+    return this.getAllLabels().filter(
+      (label) => !label.getElement().classList.contains("overflowed"),
+    );
+  }
+
+  getOverflowStartIndex() {
+    return this.overflowStartIndex;
+  }
+
+  setOverflowStartIndex(index, force = false) {
+    const overflowStartIndex = Math.max(0, Math.min(index, this.labels.length));
+    if (!force && overflowStartIndex === this.overflowStartIndex) {
+      return;
+    }
+
+    this.cachedOpenLeaf = null;
+    this.overflowLabel.setOpen(false);
+    this.overflowLabel.setFocused(false);
+    this.clearOverflowItems();
+    this.overflowStartIndex = overflowStartIndex;
+
+    this.labels.forEach((label, labelIndex) => {
+      const overflowed = labelIndex >= overflowStartIndex;
+      label.getElement().classList.toggle("overflowed", overflowed);
+      if (overflowed) {
+        label.setOpen(false);
+        label.setFocused(false);
+        this.overflowLabel.addChild(
+          MenuItem.createMenuItem({
+            label: label.getLabelText(),
+            submenu: label.getSubmenu().map((item) => item.serialize()),
+          }),
+        );
+      }
+    });
+
+    const hasOverflow = overflowStartIndex < this.labels.length;
+    this.overflowLabel.getElement().classList.toggle("overflowed", !hasOverflow);
+    if (hasOverflow && this.portalContainer) {
+      this.overflowLabel.moveSubmenusToPortal(this.portalContainer);
+    }
+  }
+
+  measureOverflowLabelWidth() {
+    const element = this.overflowLabel.getElement();
+    const wasOverflowed = element.classList.contains("overflowed");
+    const previousVisibility = element.style.visibility;
+
+    element.classList.remove("overflowed");
+    element.style.visibility = "hidden";
+    const width = element.getBoundingClientRect().width;
+    element.style.visibility = previousVisibility;
+    element.classList.toggle("overflowed", wasOverflowed);
+
+    return width;
+  }
+
+  clearOverflowItems() {
+    [...this.overflowLabel.getSubmenu()].forEach((item) => {
+      this.removePortaledSubmenus(item);
+      this.overflowLabel.removeChild(item);
+    });
+  }
+
+  removePortaledSubmenus(item) {
+    item.getSubmenu()?.forEach((child) => this.removePortaledSubmenus(child));
+    item.portalElement?.remove();
   }
 
   isOpen() {
@@ -554,33 +651,37 @@ class ApplicationMenu {
   addLabel(labelItem) {
     labelItem.setParent(this);
     this.labels.push(labelItem);
-    this.element.appendChild(labelItem.getElement());
+    this.element.insertBefore(labelItem.getElement(), this.overflowLabel.getElement());
+    this.overflowStartIndex = this.labels.length;
   }
 
   insertLabel(item, index) {
+    const referenceElement = this.labels[index]?.getElement() || this.overflowLabel.getElement();
     item.setParent(this);
     this.labels.splice(index, 0, item);
-    this.element.insertBefore(
-      item.getElement(),
-      item.getElement().parentElement?.children[index] || null,
-    );
+    this.element.insertBefore(item.getElement(), referenceElement);
+    this.setOverflowStartIndex(this.labels.length, true);
   }
 
   removeLabel(x) {
     if (x instanceof MenuLabel) {
       this.labels.splice(this.labels.indexOf(x), 1);
       x.getElement().parentElement?.removeChild(x.getElement());
+      this.setOverflowStartIndex(this.labels.length, true);
       return;
     }
 
     const item = this.labels.splice(x, 1)[0];
     item?.getElement().parentElement?.removeChild(item?.getElement());
+    this.setOverflowStartIndex(this.labels.length, true);
   }
 
   setupSubmenuPortals(portalContainer) {
+    this.portalContainer = portalContainer;
     this.labels.forEach((label) => {
       label.moveSubmenusToPortal(portalContainer);
     });
+    this.overflowLabel.moveSubmenusToPortal(portalContainer);
   }
 
   destroy() {
@@ -588,6 +689,7 @@ class ApplicationMenu {
     document.body.removeEventListener("keydown", this.keydownHandler);
     document.body.removeEventListener("keyup", this.keyupHandler);
     this.paneItemDisposable?.dispose();
+    this.clearOverflowItems();
   }
 }
 

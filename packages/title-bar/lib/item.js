@@ -141,14 +141,23 @@ class MenuItem {
   }
 
   serialize() {
-    return {
+    if (this.separator) {
+      return { type: "separator" };
+    }
+
+    const result = {
       label: this.labelText,
-      command: this.command,
-      commandDetail: this.commandDetail,
-      submenu: this.submenu?.map((o) => {
-        return o.serialize();
-      }),
     };
+
+    if (!this.enabled) result.enabled = false;
+    if (!this.visible) result.visible = false;
+    if (this.command !== undefined) result.command = this.command;
+    if (this.commandDetail !== undefined) result.commandDetail = this.commandDetail;
+    if (this.submenu !== undefined) {
+      result.submenu = this.submenu.map((o) => o.serialize());
+    }
+
+    return result;
   }
 
   onMouseClick(e) {

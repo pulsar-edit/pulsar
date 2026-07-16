@@ -1,4 +1,7 @@
 const { Utils } = require("../lib/utils");
+const { ApplicationMenu } = require("../lib/app-menu");
+const { MenuLabel } = require("../lib/label");
+const { calculateAvailableMenuWidth, calculateVisibleLabelCount } = require("../lib/view");
 
 describe("Title Bar package", () => {
   let workspaceElement;
@@ -62,6 +65,137 @@ describe("Title Bar package", () => {
         expect(Utils.formatKeystroke("cmd-|")).toBe("Cmd+Shift+\\");
         expect(Utils.formatKeystroke("cmd-k right")).toBe("Cmd+K Right");
       }
+    });
+  });
+
+  describe("responsive application menu", () => {
+    let appMenu;
+
+    const parent = {
+      isMenuBarVisible() {
+        return true;
+      },
+      isTitleBarVisible() {
+        return true;
+      },
+      setMenuBarVisible() {},
+    };
+
+    const template = [
+      {
+        label: "&File",
+        submenu: [{ label: "&New", command: "application:new-file" }],
+      },
+      {
+        label: "&Edit",
+        submenu: [
+          { label: "&Undo", command: "core:undo" },
+          { type: "separator" },
+          { label: "Disabled", command: "example:disabled", enabled: false },
+        ],
+      },
+      {
+        label: "&Help",
+        submenu: [{ label: "&About", command: "application:about" }],
+      },
+    ];
+
+    afterEach(() => {
+      appMenu?.destroy();
+      appMenu?.getElement().remove();
+      appMenu = null;
+    });
+
+    it("reserves the overflow label before hiding trailing labels", () => {
+      expect(calculateVisibleLabelCount([40, 40, 40], 120, 24)).toBe(3);
+      expect(calculateVisibleLabelCount([40, 40, 40], 104, 24)).toBe(2);
+      expect(calculateVisibleLabelCount([40, 40, 40], 20, 24)).toBe(0);
+    });
+
+    it("reserves title space from the application menu's anchored edge", () => {
+      const titleRect = { left: 450, right: 550 };
+
+      expect(calculateAvailableMenuWidth({ left: 32, right: 332 }, titleRect, 8, 8, false)).toBe(
+        402,
+      );
+      expect(calculateAvailableMenuWidth({ left: 700, right: 1000 }, titleRect, 8, 8, true)).toBe(
+        434,
+      );
+    });
+
+    it("moves trailing menus into an overflow submenu and restores them", () => {
+      appMenu = ApplicationMenu.createApplicationMenu(template, parent);
+      appMenu.setOverflowStartIndex(1);
+
+      expect(appMenu.getNavigableLabels().map((label) => label.getLabelText())).toEqual([
+        "&File",
+        "...",
+      ]);
+      expect(appMenu.overflowLabel.getSubmenu().map((item) => item.getLabelText())).toEqual([
+        "&Edit",
+        "&Help",
+      ]);
+      expect(appMenu.overflowLabel.getSubmenu()[0].getSubmenu()[1].isSeparator()).toBe(true);
+      expect(appMenu.overflowLabel.getSubmenu()[0].getSubmenu()[2].isEnabled()).toBe(false);
+
+      appMenu.setOverflowStartIndex(template.length);
+
+      expect(appMenu.getNavigableLabels().map((label) => label.getLabelText())).toEqual([
+        "&File",
+        "&Edit",
+        "&Help",
+      ]);
+      expect(appMenu.overflowLabel.getSubmenu().length).toBe(0);
+    });
+
+    it("includes the overflow label in keyboard navigation", () => {
+      appMenu = ApplicationMenu.createApplicationMenu(template, parent);
+      appMenu.setOverflowStartIndex(1);
+
+      appMenu.focusFirstLabel();
+      expect(appMenu.getFocusedLabel().getLabelText()).toBe("&File");
+
+      appMenu.focusNextLabel();
+      expect(appMenu.getFocusedLabel().getLabelText()).toBe("...");
+
+      appMenu.focusNextLabel();
+      expect(appMenu.getFocusedLabel().getLabelText()).toBe("&File");
+    });
+
+    it("opens an overflowed menu through its mnemonic", () => {
+      appMenu = ApplicationMenu.createApplicationMenu(template, parent);
+      appMenu.setOverflowStartIndex(1);
+      appMenu.showAltKeys(true);
+
+      const event = {
+        key: "h",
+        repeat: false,
+        stopPropagation() {},
+        preventDefault() {},
+      };
+      appMenu.onKeyDown(event);
+
+      const helpItem = appMenu.overflowLabel.getSubmenu()[1];
+      expect(appMenu.getOpenLabel()).toBe(appMenu.overflowLabel);
+      expect(helpItem.isOpen()).toBe(true);
+      expect(helpItem.getSubmenu().getSelected().getLabelText()).toBe("&About");
+    });
+
+    it("clears overflow state when the canonical menu changes", () => {
+      appMenu = ApplicationMenu.createApplicationMenu(template, parent);
+      appMenu.setOverflowStartIndex(1);
+
+      appMenu.insertLabel(
+        MenuLabel.createMenuLabel({
+          label: "&View",
+          submenu: [{ label: "Toggle", command: "example:toggle" }],
+        }),
+        1,
+      );
+
+      expect(appMenu.getOverflowStartIndex()).toBe(4);
+      expect(appMenu.getNavigableLabels().length).toBe(4);
+      expect(appMenu.overflowLabel.getSubmenu().length).toBe(0);
     });
   });
 });

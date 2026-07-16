@@ -39,6 +39,32 @@ function throttle(fn, limit) {
   };
 }
 
+function calculateVisibleLabelCount(labelWidths, availableWidth, overflowWidth) {
+  const totalWidth = labelWidths.reduce((sum, width) => sum + width, 0);
+  if (totalWidth <= availableWidth) {
+    return labelWidths.length;
+  }
+
+  let usedWidth = overflowWidth;
+  let visibleCount = 0;
+  for (const width of labelWidths) {
+    if (usedWidth + width > availableWidth) {
+      break;
+    }
+    usedWidth += width;
+    visibleCount++;
+  }
+
+  return visibleCount;
+}
+
+function calculateAvailableMenuWidth(menuRect, titleRect, leadingWidth, titleGap, menuOnRight) {
+  const availableWidth = menuOnRight
+    ? menuRect.right - titleRect.right - leadingWidth - titleGap
+    : titleRect.left - menuRect.left - leadingWidth - titleGap;
+  return Math.max(0, availableWidth);
+}
+
 class TitleBarView {
   constructor(configState) {
     this.configState = configState;
@@ -70,7 +96,11 @@ class TitleBarView {
 
     const realTitle = document.querySelector("title");
     if (realTitle !== null) {
-      this.titleObserver.observe(realTitle, { childList: true, characterData: true, subtree: true });
+      this.titleObserver.observe(realTitle, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
     }
 
     const menuTemplate = MenuUpdater.getTemplate();
@@ -97,6 +127,7 @@ class TitleBarView {
 
     atom.themes.onDidChangeActiveThemes(() => {
       this.updateTransforms();
+      this.debouncedCheckTitleCollision();
     });
 
     // Activate custom context menus if enabled
@@ -401,13 +432,36 @@ class TitleBarView {
 
   checkTitleCollision() {
     requestAnimationFrame(() => {
-      const menuRect = this.appMenu.getElement().getBoundingClientRect();
-      const titleRect = this.titleElement.getBoundingClientRect();
+      const labels = this.appMenu.getLabels();
+      this.appMenu.setOverflowStartIndex(labels.length);
+      this.titleElement.style.visibility = "visible";
 
-      if (Utils.domRectIntersects(menuRect, titleRect)) {
+      const menuElement = this.appMenu.getElement();
+      const menuRect = menuElement.getBoundingClientRect();
+      const titleRect = this.titleElement.getBoundingClientRect();
+      const labelWidths = labels.map((label) => label.getElement().getBoundingClientRect().width);
+      const firstLabelRect = labels[0]?.getElement().getBoundingClientRect();
+      const leadingWidth = firstLabelRect ? firstLabelRect.left - menuRect.left : 0;
+      const configuredGap = Number.parseFloat(
+        getComputedStyle(this.element).getPropertyValue("--title-bar-title-gap"),
+      );
+      const titleGap = Number.isFinite(configuredGap) ? configuredGap : 8;
+      const menuOnRight = this.element.classList.contains("theme-macos-tahoe");
+      const availableWidth = calculateAvailableMenuWidth(
+        menuRect,
+        titleRect,
+        leadingWidth,
+        titleGap,
+        menuOnRight,
+      );
+      const overflowWidth = this.appMenu.measureOverflowLabelWidth();
+      const visibleCount = calculateVisibleLabelCount(labelWidths, availableWidth, overflowWidth);
+
+      this.appMenu.setOverflowStartIndex(visibleCount);
+      const finalMenuRect = menuElement.getBoundingClientRect();
+
+      if (Utils.domRectIntersects(finalMenuRect, titleRect)) {
         this.titleElement.style.visibility = "hidden";
-      } else {
-        this.titleElement.style.visibility = "visible";
       }
     });
   }
@@ -473,6 +527,10 @@ class TitleBarView {
       }
       this.appIcon.style.display = svg ? "" : "none";
     }
+
+    if (this.appMenu) {
+      this.debouncedCheckTitleCollision();
+    }
   }
 
   isTitleBarVisible() {
@@ -484,4 +542,8 @@ class TitleBarView {
   }
 }
 
-module.exports = { TitleBarView };
+module.exports = {
+  TitleBarView,
+  calculateAvailableMenuWidth,
+  calculateVisibleLabelCount,
+};

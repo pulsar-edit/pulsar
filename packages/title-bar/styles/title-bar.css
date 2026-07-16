@@ -26,6 +26,7 @@
 
   /* Title */
   --title-bar-title-font-size: var(--font-size);
+  --title-bar-title-gap: 8px;
 
   /* Transitions */
   --title-bar-transition-fast: 0.05s;
@@ -415,6 +416,10 @@
         transition-delay: 0.14s;
       }
       color: var(--text-color);
+
+      &.overflowed {
+        display: none;
+      }
 
       /* Highlight area (visual only) */
       &::before {
