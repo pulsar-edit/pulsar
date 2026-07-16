@@ -97,11 +97,16 @@ module.exports = class Clipboard {
         clipboardData,
         LUMINE_TEXT_EDITOR_DATA_FORMAT,
       );
-      const serializedCopyMetadata = clipboardData.getData(VSCODE_COPY_METADATA_FORMAT);
       const lumineMetadata = this.metadataFromLumineEditorData(lumineData, text);
-      const vscodeCopyMetadata = lumineMetadata
-        ? null
-        : this.metadataFromSerializedCopyMetadata(serializedCopyMetadata);
+      // A Lumine payload that fails validation is stale, and the VS Code copy
+      // metadata written alongside it carries no signature, so it is equally
+      // stale. Only fall back to it when the clipboard has no Lumine payload.
+      const vscodeCopyMetadata =
+        lumineData == null
+          ? this.metadataFromSerializedCopyMetadata(
+              clipboardData.getData(VSCODE_COPY_METADATA_FORMAT),
+            )
+          : null;
       const metadata = lumineMetadata || vscodeCopyMetadata;
       return metadata ? { text, metadata } : { text };
     } catch {
@@ -233,6 +238,9 @@ module.exports = class Clipboard {
       );
       const metadata = this.metadataFromLumineEditorData(lumineData, text);
       if (metadata) return metadata;
+      // Same staleness rule as readFromDataTransfer: an invalid Lumine payload
+      // means the companion VS Code copy metadata is stale too.
+      if (lumineData != null) return null;
 
       const serializedCopyMetadata = this.readNativeFormat(VSCODE_COPY_METADATA_FORMAT);
       return this.metadataFromSerializedCopyMetadata(serializedCopyMetadata);
