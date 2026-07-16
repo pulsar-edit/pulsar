@@ -2756,12 +2756,13 @@ module.exports = class TextEditorComponent {
   measureLongestLineWidth() {
     if (this.longestLineToMeasure) {
       const lineComponent = this.lineComponentsByScreenLineId.get(this.longestLineToMeasure.id);
-      // Use the fractional bounding-box width rather than the integer
-      // `offsetWidth`. `getContentWidth` ceils this, so a rounded-down
-      // `offsetWidth` could leave the content box ~1px short of the real line,
-      // clipping the last glyph and stopping horizontal scroll early.
-      this.measurements.longestLineWidth =
-        lineComponent.element.firstChild.getBoundingClientRect().width;
+      // Keep this as the integer `offsetWidth` rather than the fractional
+      // `getBoundingClientRect().width`. The rest of the positioning system
+      // rounds to whole pixels (see measureHorizontalPositionsOnLine), so the
+      // `.lines` width must stay consistent with the rounded pixel position of
+      // the longest line's end; a fractional width desyncs it and shifts
+      // `getContentWidth` by a pixel.
+      this.measurements.longestLineWidth = lineComponent.element.firstChild.offsetWidth;
       this.longestLineToMeasure = null;
     }
   }
