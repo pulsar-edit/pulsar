@@ -153,10 +153,15 @@ describe("ArchiveEditorView", () => {
       spyOn(File.prototype, "getPath").and.returnValue("nested-renamed.tar");
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
       spyOn(archiveEditorView, "refresh").and.callThrough();
-      spyOn(archiveEditorView, "getTitle");
+      // The view's contract on rename is to refresh and notify title observers
+      // (via `did-change-title`); it is the tab bar, not the view, that calls
+      // `getTitle`. Assert the notification the view is actually responsible
+      // for so the spec does not depend on external UI being present.
+      const didChangeTitle = jasmine.createSpy("didChangeTitle");
+      archiveEditorView.onDidChangeTitle(didChangeTitle);
       onDidRenameCallback();
       expect(archiveEditorView.refresh).toHaveBeenCalled();
-      expect(archiveEditorView.getTitle).toHaveBeenCalled();
+      expect(didChangeTitle).toHaveBeenCalled();
     });
   });
 
