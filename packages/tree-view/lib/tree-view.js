@@ -1,6 +1,9 @@
 const path = require("path");
+const os = require("os");
+const { fileURLToPath, pathToFileURL } = require("url");
+const { webUtils } = require("electron");
 const fs = require("./fs-compat");
-const { CompositeDisposable, Emitter } = require("atom");
+const { CompositeDisposable, Disposable, Emitter } = require("atom");
 
 const { repoForPath, getStyleObject, getDuplicateCopyPath } = require("./helpers");
 
@@ -17,6 +20,8 @@ const RootDragAndDrop = require("./root-drag-and-drop");
 const { SpecialRootSection } = require("./special-root-view");
 
 const TREE_VIEW_URI = "atom://tree-view";
+const TREE_VIEW_CLIPBOARD_FORMAT = "application/lumine-tree-view";
+const TREE_VIEW_CLIPBOARD_VERSION = 1;
 
 function toggleConfig(keyPath) {
   return atom.config.set(keyPath, !atom.config.get(keyPath));
@@ -36,6 +41,8 @@ class TreeView {
   constructor(state) {
     this.onDragLeave = this.onDragLeave.bind(this);
     this.onDragEnter = this.onDragEnter.bind(this);
+    this.didCopy = this.didCopy.bind(this);
+    this.didPaste = this.didPaste.bind(this);
 
     this.onStylesheetsChanged = this.onStylesheetsChanged.bind(this);
     this.moveConflictingEntry = this.moveConflictingEntry.bind(this);
@@ -307,6 +314,14 @@ class TreeView {
     this.element.addEventListener("dragleave", (e) => this.onDragLeave(e));
     this.element.addEventListener("dragover", (e) => this.onDragOver(e));
     this.element.addEventListener("drop", (e) => this.onDrop(e));
+    this.element.addEventListener("copy", this.didCopy);
+    this.element.addEventListener("paste", this.didPaste);
+    this.disposables.add(
+      new Disposable(() => {
+        this.element.removeEventListener("copy", this.didCopy);
+        this.element.removeEventListener("paste", this.didPaste);
+      }),
+    );
 
     atom.commands.add(this.element, {
       "core:move-up": (e) => this.moveUp(e),
@@ -1175,28 +1190,56 @@ class TreeView {
 
   // Public: Copy the path of the selected entry or entries.
   //
-  // Save the path in localStorage so that copying from two different instances
-  // of Pulsar works as intended.
+  // Write paths to the native clipboard so they can be pasted across windows.
   copySelectedEntries() {
-    let selectedPaths = this.selectedPaths();
-    if (!(selectedPaths && selectedPaths.length > 0)) return;
-
-    // Save to localStorage so we can paste across multiple open apps.
-    window.localStorage.removeItem("tree-view:cutPath");
-    window.localStorage["tree-view:copyPath"] = JSON.stringify(selectedPaths);
+    return this.performCopyOperation("copy");
   }
 
   // Public: Cut the path of the selected entry or entries.
   //
-  // Save the path in localStorage so that cutting from two different instances
-  // of Pulsar works as intended.
+  // Write paths to the native clipboard so they can be moved across windows.
   cutSelectedEntries() {
-    let selectedPaths = this.selectedPaths();
-    if (!(selectedPaths && selectedPaths.length > 0)) return;
+    return this.performCopyOperation("cut");
+  }
 
-    // Save to localStorage so we can paste across multiple open apps.
-    window.localStorage.removeItem("tree-view:copyPath");
-    window.localStorage["tree-view:cutPath"] = JSON.stringify(selectedPaths);
+  performCopyOperation(operation) {
+    const paths = this.selectedPaths();
+    if (paths.length === 0) return false;
+
+    const pendingOperation = { operation, paths, handled: false };
+    this.pendingCopyOperation = pendingOperation;
+    try {
+      this.element.focus({ preventScroll: true });
+      this.element.ownerDocument.execCommand("copy");
+    } catch {
+      // Fall back to plain text below when ClipboardEvent is unavailable.
+    } finally {
+      this.pendingCopyOperation = null;
+    }
+
+    if (!pendingOperation.handled) atom.clipboard.write(paths.join(os.EOL));
+    return pendingOperation.handled;
+  }
+
+  didCopy(event) {
+    if (!event.clipboardData) return;
+    const pendingOperation = this.pendingCopyOperation;
+    const paths = pendingOperation?.paths || this.selectedPaths();
+    if (paths.length === 0) return;
+
+    const operation = pendingOperation?.operation || "copy";
+    event.clipboardData.setData("text/plain", paths.join(os.EOL));
+    event.clipboardData.setData(
+      "text/uri-list",
+      paths.map((entryPath) => pathToFileURL(entryPath).href).join("\r\n"),
+    );
+    atom.clipboard.writeDataTransferData(
+      event.clipboardData,
+      TREE_VIEW_CLIPBOARD_FORMAT,
+      { version: TREE_VIEW_CLIPBOARD_VERSION, operation, paths },
+    );
+    event.preventDefault();
+    if (pendingOperation) pendingOperation.handled = true;
   }
 
   // Public: Paste a copied or cut item.
@@ -1204,38 +1247,107 @@ class TreeView {
   // If a file is selected, the file's parent directory is used as the paste
   // destination.
   pasteEntries() {
-    let selectedEntry = this.selectedEntry();
-    if (!selectedEntry) return;
+    const targetPath = this.getPasteTargetPath();
+    if (!targetPath) return false;
 
-    let cutPaths = null,
-      copiedPaths = null;
-    if (window.localStorage["tree-view:cutPath"]) {
-      cutPaths = JSON.parse(window.localStorage["tree-view:cutPath"]);
+    const pendingOperation = { targetPath, handled: false };
+    this.pendingPasteOperation = pendingOperation;
+    try {
+      this.element.focus({ preventScroll: true });
+      this.element.ownerDocument.execCommand("paste");
+    } catch {
+      // Fall through to non-text paste providers below.
+    } finally {
+      this.pendingPasteOperation = null;
     }
-    if (window.localStorage["tree-view:copyPath"]) {
-      copiedPaths = JSON.parse(window.localStorage["tree-view:copyPath"]);
-    }
-    // Both the copy action and the cut action delete the opposite
-    // `localStorage` entry, so only one of these should ever exist.
-    let initialPaths = copiedPaths ?? cutPaths;
-    if (!(initialPaths && initialPaths.length > 0)) return;
 
-    let newDirectoryPath = selectedEntry.getPath();
-    if (selectedEntry.classList.contains("file")) {
-      newDirectoryPath = path.dirname(newDirectoryPath);
+    if (!pendingOperation.handled) {
+      pendingOperation.handled = atom.pasteProviders.handlePaste({
+        target: { type: "directory", path: targetPath },
+      });
     }
+    return pendingOperation.handled;
+  }
+
+  didPaste(event) {
+    if (!event.clipboardData) return;
+    const targetPath = this.pendingPasteOperation?.targetPath || this.getPasteTargetPath();
+    if (!targetPath) return;
+
+    const clipboardEntry = this.readTreeClipboardData(event.clipboardData);
+    const handled = clipboardEntry
+      ? this.pastePaths(clipboardEntry.paths, clipboardEntry.operation, targetPath)
+      : atom.pasteProviders.handlePaste({
+          target: { type: "directory", path: targetPath },
+          clipboardData: event.clipboardData,
+        });
+
+    event.preventDefault();
+    if (this.pendingPasteOperation) this.pendingPasteOperation.handled = handled;
+  }
+
+  readTreeClipboardData(clipboardData) {
+    const data = atom.clipboard.readDataTransferData(
+      clipboardData,
+      TREE_VIEW_CLIPBOARD_FORMAT,
+    );
+    if (
+      data?.version === TREE_VIEW_CLIPBOARD_VERSION &&
+      ["copy", "cut"].includes(data.operation) &&
+      Array.isArray(data.paths) &&
+      data.paths.length > 0 &&
+      data.paths.every((entryPath) => typeof entryPath === "string" && entryPath.length > 0)
+    ) {
+      return data;
+    }
+
+    const uriList = clipboardData.getData("text/uri-list");
+    const paths = [];
+    if (uriList) {
+      for (const uri of uriList.split(/\r?\n/)) {
+        if (!uri || uri.startsWith("#")) continue;
+        try {
+          if (new URL(uri).protocol === "file:") paths.push(fileURLToPath(uri));
+        } catch {
+          // Ignore malformed and non-file clipboard entries.
+        }
+      }
+    }
+
+    if (paths.length === 0) {
+      for (const file of Array.from(clipboardData.files || [])) {
+        try {
+          const filePath = webUtils?.getPathForFile?.(file) || file.path;
+          if (filePath) paths.push(filePath);
+        } catch {
+          if (file.path) paths.push(file.path);
+        }
+      }
+    }
+    return paths.length > 0 ? { operation: "copy", paths } : null;
+  }
+
+  getPasteTargetPath() {
+    const selectedEntry = this.selectedEntry();
+    if (!selectedEntry) return null;
+    const selectedPath = selectedEntry.getPath();
+    return selectedEntry.classList.contains("file") ? path.dirname(selectedPath) : selectedPath;
+  }
+
+  pastePaths(initialPaths, operation, newDirectoryPath) {
     let results = [];
     for (let initialPath of initialPaths) {
       if (fs.existsSync(initialPath)) {
-        if (copiedPaths) {
+        if (operation === "copy") {
           results.push(this.copyEntry(initialPath, newDirectoryPath));
-        } else if (cutPaths) {
+        } else if (operation === "cut") {
           if (!this.moveEntry(initialPath, newDirectoryPath)) {
             break;
           }
         }
       }
     }
+    return results.length > 0 || operation === "cut";
   }
 
   add(isCreatingFile) {

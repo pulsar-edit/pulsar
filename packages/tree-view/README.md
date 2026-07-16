@@ -7,7 +7,7 @@ Explore and open project files in a tree-like view of your directories.
 - **Configurable click behavior**: open files and expand folders on single or double click.
 - **Open externally**: alt-click a file to open it in an external program through the `open-external` service.
 - **Flexible sorting**: choose locale-aware or natural sort, list folders before files, and group entries by base name.
-- **Duplicate copy names**: pick system-default, legacy, Windows, macOS, or Linux naming when pasted copies collide.
+- **Native clipboard**: copy or cut entries across windows and external applications while preserving platform-specific duplicate names.
 - **Debounced file watching**: rapid file creation and deletion is batched so the tree does not reload excessively.
 - **Virtual root sections**: let external packages inject their own root sections above the project folders.
 
