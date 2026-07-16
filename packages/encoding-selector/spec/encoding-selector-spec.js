@@ -106,6 +106,16 @@ describe("EncodingSelector", () => {
         await atom.packages.deactivatePackage("encoding-selector");
         expect(encodingStatus.parentElement).toBeNull();
       });
+
+      it("cancels a pending label update", async () => {
+        const updateSubscription = jasmine.createSpyObj("update subscription", ["dispose"]);
+        spyOn(atom.views, "updateDocument").andReturn(updateSubscription);
+
+        editor.setEncoding("utf16le");
+        await atom.packages.deactivatePackage("encoding-selector");
+
+        expect(updateSubscription.dispose).toHaveBeenCalled();
+      });
     });
   });
 });

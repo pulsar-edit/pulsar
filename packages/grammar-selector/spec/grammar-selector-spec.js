@@ -285,12 +285,23 @@ describe("GrammarSelector", () => {
         expect(eventHandler).toHaveBeenCalled();
       }));
 
-    describe("when the package is deactivated", () =>
+    describe("when the package is deactivated", () => {
       it("removes the view", () => {
         spyOn(grammarTile, "destroy");
         atom.packages.deactivatePackage("grammar-selector");
         expect(grammarTile.destroy).toHaveBeenCalled();
-      }));
+      });
+
+      it("cancels a pending label update", async () => {
+        const updateSubscription = jasmine.createSpyObj("update subscription", ["dispose"]);
+        spyOn(atom.views, "updateDocument").andReturn(updateSubscription);
+
+        editor.setGrammar(atom.grammars.nullGrammar);
+        await atom.packages.deactivatePackage("grammar-selector");
+
+        expect(updateSubscription.dispose).toHaveBeenCalled();
+      });
+    });
   });
 
   // TODO: These tests will need to be altered when we remove legacy

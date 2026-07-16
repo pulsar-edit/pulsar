@@ -39,6 +39,11 @@ module.exports = class EncodingStatusView {
       this.clickSubscription.dispose();
     }
 
+    if (this.updateSubscription) {
+      this.updateSubscription.dispose();
+      this.updateSubscription = null;
+    }
+
     if (this.tile) {
       this.tile.destroy();
     }
@@ -65,8 +70,13 @@ module.exports = class EncodingStatusView {
   }
 
   updateEncodingText() {
-    atom.views.updateDocument(() => {
-      const editor = atom.workspace.getActiveTextEditor();
+    if (this.updateSubscription) {
+      this.updateSubscription.dispose();
+    }
+
+    this.updateSubscription = atom.views.updateDocument(() => {
+      this.updateSubscription = null;
+      const editor = atom.workspace?.getActiveTextEditor();
       if (editor && editor.getEncoding()) {
         const editorEncoding = editor
           .getEncoding()

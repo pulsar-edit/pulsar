@@ -57,6 +57,11 @@ module.exports = class GrammarStatusView {
       this.configSubscription.dispose();
     }
 
+    if (this.updateSubscription) {
+      this.updateSubscription.dispose();
+      this.updateSubscription = null;
+    }
+
     if (this.tile) {
       this.tile.destroy();
     }
@@ -80,8 +85,13 @@ module.exports = class GrammarStatusView {
   }
 
   updateGrammarText() {
-    atom.views.updateDocument(() => {
-      const editor = atom.workspace.getActiveTextEditor();
+    if (this.updateSubscription) {
+      this.updateSubscription.dispose();
+    }
+
+    this.updateSubscription = atom.views.updateDocument(() => {
+      this.updateSubscription = null;
+      const editor = atom.workspace?.getActiveTextEditor();
       const grammar = editor ? editor.getGrammar() : null;
 
       if (this.tooltip) {
@@ -90,12 +100,8 @@ module.exports = class GrammarStatusView {
       }
 
       if (grammar) {
-        let grammarName = null;
-        if (grammar === atom.grammars.nullGrammar) {
-          grammarName = "Plain Text";
-        } else {
-          grammarName = grammar.name || grammar.scopeName;
-        }
+        const grammarName =
+          grammar === atom.grammars.nullGrammar ? "Plain Text" : grammar.name || grammar.scopeName;
 
         this.grammarLink.textContent = grammarName;
         this.grammarLink.dataset.grammar = grammarName;
