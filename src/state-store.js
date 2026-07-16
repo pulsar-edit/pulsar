@@ -39,6 +39,14 @@ module.exports = class StateStore {
     return this._getOrCreateImplementation().count();
   }
 
+  // Release the backing connection. A subsequent operation lazily recreates it.
+  close() {
+    if (this.sql) {
+      this.sql.close();
+      this.sql = null;
+    }
+  }
+
   get dbPromise() {
     // Exposed due to usage in [`project-plus`](https://web.pulsar-edit.dev/packages/project-plus)
     return this._getOrCreateImplementation().dbPromise;
