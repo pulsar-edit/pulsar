@@ -1528,11 +1528,12 @@ module.exports = class TextEditorComponent {
     });
   }
 
-  updateOverlayToRender(decoration) {
-    const windowInnerHeight = this.getWindowInnerHeight();
-    const windowInnerWidth = this.getWindowInnerWidth();
-    const contentClientRect = this.refs.content.getBoundingClientRect();
-
+  updateOverlayToRender(
+    decoration,
+    contentClientRect = this.refs.content.getBoundingClientRect(),
+    windowInnerHeight = this.getWindowInnerHeight(),
+    windowInnerWidth = this.getWindowInnerWidth(),
+  ) {
     const { element, screenPosition, avoidOverflow } = decoration;
     const { row, column } = screenPosition;
     let wrapperTop =
@@ -1570,9 +1571,20 @@ module.exports = class TextEditorComponent {
     const overlayCount = this.decorationsToRender.overlays.length;
     if (overlayCount === 0) return null;
 
+    // These are constant across every overlay this frame; read them once rather
+    // than re-measuring the content rect (a layout read) per overlay.
+    const contentClientRect = this.refs.content.getBoundingClientRect();
+    const windowInnerHeight = this.getWindowInnerHeight();
+    const windowInnerWidth = this.getWindowInnerWidth();
+
     for (let i = 0; i < overlayCount; i++) {
       const decoration = this.decorationsToRender.overlays[i];
-      this.updateOverlayToRender(decoration);
+      this.updateOverlayToRender(
+        decoration,
+        contentClientRect,
+        windowInnerHeight,
+        windowInnerWidth,
+      );
     }
   }
 
