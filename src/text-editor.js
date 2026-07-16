@@ -168,9 +168,12 @@ module.exports = class TextEditor {
     // Raw default is false so directly-constructed editors (specs, embedders)
     // scroll instantly; the config default of true reaches workspace editors
     // via the TextEditorRegistry.
-    this.smoothScrolling = params.smoothScrolling != null ? params.smoothScrolling : false;
-    this.wheelSmoothness = params.wheelSmoothness != null ? params.wheelSmoothness : 8;
-    this.commandSmoothness = params.commandSmoothness != null ? params.commandSmoothness : 12;
+    // null means "not managed": editors that no TextEditorRegistry configures
+    // (for example editors embedded in package views) follow the global
+    // smooth-scrolling settings instead of silently disabling the feature.
+    this.smoothScrolling = params.smoothScrolling != null ? params.smoothScrolling : null;
+    this.wheelSmoothness = params.wheelSmoothness != null ? params.wheelSmoothness : null;
+    this.commandSmoothness = params.commandSmoothness != null ? params.commandSmoothness : null;
     this.altWheelMultiplier = params.altWheelMultiplier != null ? params.altWheelMultiplier : 7.5;
     this.scrollCommandDistance =
       params.scrollCommandDistance != null ? params.scrollCommandDistance : 1;
@@ -5129,7 +5132,8 @@ module.exports = class TextEditor {
   //
   // Returns a {Boolean}.
   getSmoothScrolling() {
-    return this.smoothScrolling;
+    if (this.smoothScrolling != null) return this.smoothScrolling;
+    return atom.config.get("editor.smoothScrolling.enabled");
   }
 
   // Experimental: How gradually does the editor glide toward the target
@@ -5137,7 +5141,8 @@ module.exports = class TextEditor {
   //
   // Returns a positive {Number}.
   getWheelSmoothness() {
-    return this.wheelSmoothness;
+    if (this.wheelSmoothness != null) return this.wheelSmoothness;
+    return atom.config.get("editor.smoothScrolling.wheelSmoothness");
   }
 
   // Experimental: How gradually does the editor glide when scrolling via the
@@ -5145,7 +5150,8 @@ module.exports = class TextEditor {
   //
   // Returns a positive {Number}.
   getCommandSmoothness() {
-    return this.commandSmoothness;
+    if (this.commandSmoothness != null) return this.commandSmoothness;
+    return atom.config.get("editor.smoothScrolling.commandSmoothness");
   }
 
   // Experimental: Speed multiplier applied to wheel scrolling while holding

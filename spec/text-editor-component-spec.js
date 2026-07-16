@@ -1621,6 +1621,8 @@ describe("TextEditorComponent", () => {
         height: 50,
         width: 50,
         scrollSensitivity,
+        // Pin the instant path: an unset param follows the global setting.
+        smoothScrolling: false,
       });
       // stub in place for Event.preventDefault()
       const eventPreventDefaultStub = function () {};
@@ -1700,6 +1702,8 @@ describe("TextEditorComponent", () => {
         height: 50,
         width: 50,
         scrollSensitivity,
+        // Pin the instant path: an unset param follows the global setting.
+        smoothScrolling: false,
       });
       // stub in place for Event.preventDefault()
       const eventPreventDefaultStub = function () {};
@@ -1912,6 +1916,26 @@ describe("TextEditorComponent", () => {
       component.didMouseWheel({ deltaX: 0, deltaY: -20, deltaMode: 0, preventDefault });
       expect(preventDefault).not.toHaveBeenCalled();
       expect(component.scrollAnimator.isAnimating()).toBe(false);
+    });
+
+    it("follows the global setting for editors no TextEditorRegistry configures", () => {
+      // Editors embedded in package views (for example diff views) are never
+      // registered with atom.textEditors, so their params stay unset.
+      const { component } = buildSmoothComponent({ smoothScrolling: undefined });
+
+      atom.config.set("editor.smoothScrolling.enabled", true);
+      const preventDefault = jasmine.createSpy("preventDefault");
+      component.didMouseWheel({ deltaX: 0, deltaY: 20, deltaMode: 0, preventDefault });
+      expect(component.scrollAnimator.isAnimating()).toBe(true);
+      expect(component.getScrollTop()).toBe(0);
+      driveAnimationToCompletion(component);
+      expect(component.getScrollTop()).toBeNear(20 * wheelDeltaParity * 0.25);
+
+      atom.config.set("editor.smoothScrolling.enabled", false);
+      const scrollTop = component.getScrollTop();
+      component.didMouseWheel({ deltaX: 0, deltaY: 20, deltaMode: 0, preventDefault });
+      expect(component.scrollAnimator.isAnimating()).toBe(false);
+      expect(component.getScrollTop()).toBeNear(scrollTop + 20 * wheelDeltaParity * 0.25);
     });
 
     it("applies the alt wheel multiplier", () => {
@@ -5432,8 +5456,8 @@ describe("TextEditorComponent", () => {
 
       expect(clipboardData.getData("text/plain").replace(/\r\n/g, "\n")).toBe("first\n");
       expect(
-        JSON.parse(clipboardData.getData("application/vnd.code.copymetadata"))
-          .defaultPastePayload.pasteOnNewLine,
+        JSON.parse(clipboardData.getData("application/vnd.code.copymetadata")).defaultPastePayload
+          .pasteOnNewLine,
       ).toBe(true);
       expect(event.preventDefault).toHaveBeenCalled();
     });
