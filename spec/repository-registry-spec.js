@@ -842,10 +842,27 @@ describe("RepositoryRegistry", () => {
       expect(events.at(-1).workingDirectory).toBe(workdirB);
     });
 
-    it("falls back to another repository when the active one is removed and no file is focused", async () => {
+    it("clears the active repository when the active one is removed and a path-less item is focused", async () => {
       registry.attachWorkspace(workspace);
       workspace.setActiveItem(itemFor(path.join(workdirB, "file.txt")));
       workspace.setActiveItem({});
+      expect(registry.getActiveRepository()).toBe(repoB);
+
+      repositories.splice(repositories.indexOf(repoB), 1);
+      repoB.destroy();
+      await flushMicrotasks();
+
+      // A focused path-less item means the workspace center is not empty, so the
+      // registry does not adopt an unrelated repository; it goes neutral. A
+      // repository is only adopted as a default when the center is empty.
+      expect(registry.getActiveRepository()).toBeNull();
+      expect(registry.getActiveRepositoryContext().workingDirectory).toBeNull();
+    });
+
+    it("adopts a repository when the active one is removed and the center is empty", async () => {
+      registry.attachWorkspace(workspace);
+      workspace.setActiveItem(itemFor(path.join(workdirB, "file.txt")));
+      workspace.setActiveItem(null);
       expect(registry.getActiveRepository()).toBe(repoB);
 
       repositories.splice(repositories.indexOf(repoB), 1);

@@ -246,8 +246,12 @@ module.exports = class RepositoryRegistry {
 
     // Path-less items (settings tabs, untitled buffers) keep the current
     // context so transient tabs never blank it out.
-    if (this.activeRepository && !this.activeRepository.isDestroyed?.()) return;
-    if (!this.activeRepository && this.activeWorkingDirectory) return;
+    if (this.activeRepository && !this.activeRepository.isDestroyed?.()) {
+      return;
+    }
+    if (!this.activeRepository && this.activeWorkingDirectory) {
+      return;
+    }
     const context = this.defaultActiveContext();
     this.applyActiveRepository(context.repository, {
       workingDirectory: context.workingDirectory,
@@ -287,15 +291,30 @@ module.exports = class RepositoryRegistry {
   }
 
   defaultActiveContext() {
+    // Adopt a repository as the default only when the workspace center is empty
+    // (no active pane item). When any item is focused — a file, even one in a
+    // no-repo root, or a path-less tab such as the About page — the panel
+    // follows that item instead of jumping to an arbitrary discovered repo.
+    const centerItem = this.workspace?.getCenter?.().getActivePaneItem?.();
+    if (centerItem) {
+      return { repository: null, workingDirectory: null };
+    }
+
     for (const rootPath of this.rootPaths) {
       const repository = this.getForPath(rootPath);
-      if (repository) return { repository, workingDirectory: null };
+      if (repository) {
+        return { repository, workingDirectory: null };
+      }
     }
     const repositories = this.getRepositories();
-    if (repositories.length > 0) return { repository: repositories[0], workingDirectory: null };
+    if (repositories.length > 0) {
+      return { repository: repositories[0], workingDirectory: null };
+    }
     // A window whose roots hold no repositories still gets a context, so a
     // fresh project can offer initialize/clone for its first root.
-    if (this.rootPaths.length > 0) return { repository: null, workingDirectory: this.rootPaths[0] };
+    if (this.rootPaths.length > 0) {
+      return { repository: null, workingDirectory: this.rootPaths[0] };
+    }
     return { repository: null, workingDirectory: null };
   }
 
@@ -1037,14 +1056,20 @@ module.exports = class RepositoryRegistry {
       });
     }
 
-    // Root changes can invalidate a null-repository context (its directory was
-    // removed) or create the first context for a window that had none.
+    // Recompute the active context only to adopt a repository that arrived with
+    // the roots, or to invalidate a no-repository context whose directory was
+    // removed. Do NOT eagerly default to a no-repository first root here: at
+    // startup, repositories are still being discovered asynchronously, and
+    // defaulting now flashes an empty "initialize here" context before the real
+    // repository is adopted. A genuinely repository-less window still gets its
+    // no-repository context from deriveActiveContext when an item is focused.
+    const activeDirInvalidated =
+      this.activeWorkingDirectory &&
+      rootsRemoved.some((rootPath) => pathContains(rootPath, this.activeWorkingDirectory));
     if (
       !this.activeRepositoryPinned &&
       !this.activeRepository &&
-      (rootsAdded.length > 0 || rootsRemoved.length > 0 || added.length > 0) &&
-      (!this.activeWorkingDirectory ||
-        rootsRemoved.some((rootPath) => pathContains(rootPath, this.activeWorkingDirectory)))
+      (added.length > 0 || activeDirInvalidated)
     ) {
       this.recomputeActiveRepository();
     }
