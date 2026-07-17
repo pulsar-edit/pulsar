@@ -1029,48 +1029,15 @@ module.exports = class GitRepository {
   Section: Retrieving Diffs
   */
 
-  // Public: Retrieves the number of lines added and removed to a path.
-  //
-  // This compares the working directory contents of the path to the `HEAD`
-  // version.
-  //
-  // * `path` The {String} path to check.
-  //
-  // Returns an {Object} with the following keys:
-  //   * `added` The {Number} of added lines.
-  //   * `deleted` The {Number} of deleted lines.
-  getDiffStats(path) {
-    const repo = this.getRepo(path);
-    return repo.getDiffStats(repo.relativize(path));
-  }
-
-  // Public: Retrieves the line diffs comparing the `HEAD` version of the given
-  // path and the given text.
-  //
-  // * `path` The {String} path relative to the repository.
-  // * `text` The {String} to compare against the `HEAD` contents
-  //
-  // Returns an {Array} of hunk {Object}s with the following keys:
-  //   * `oldStart` The line {Number} of the old hunk.
-  //   * `newStart` The line {Number} of the new hunk.
-  //   * `oldLines` The {Number} of lines in the old hunk.
-  //   * `newLines` The {Number} of lines in the new hunk
-  getLineDiffs(path, text) {
-    // Ignore eol of line differences on windows so that files checked in as
-    // LF don't report every line modified when the text contains CRLF endings.
-    const options = { ignoreEolWhitespace: process.platform === "win32" };
-    const repo = this.getRepo(path);
-    return repo.getLineDiffs(repo.relativize(path), text, options);
-  }
-
-  // Public: Like {::getLineDiffs}, but computed off the renderer thread by the
+  // Public: Computes gutter line diffs off the renderer thread via the
   // git-host worker (fetching and caching the HEAD blob, diffing in JS) instead
   // of synchronously via libgit2.
   //
   // * `filePath` The {String} path relative to the repository.
   // * `text` The {String} to compare against the `HEAD` contents.
   //
-  // Returns a {Promise} resolving to the same hunk {Array} as {::getLineDiffs}.
+  // Returns a {Promise} resolving to an {Array} of hunk {Object}s, each with
+  // `oldStart`, `newStart`, `oldLines`, and `newLines`.
   getLineDiffsAsync(filePath, text) {
     if (this.isDestroyed()) return Promise.resolve([]);
     const repo = this.getRepo(filePath);
