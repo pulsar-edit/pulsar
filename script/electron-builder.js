@@ -73,7 +73,7 @@ const ARGS = yargs(hideBin(process.argv))
 
 const displayName = "Lumine";
 const baseName = "lumine";
-const iconName = "beta";
+const iconName = "lumine";
 
 const ICONS = {
   png: `resources/app-icons/${iconName}.png`,

@@ -11,16 +11,8 @@ const StartupTime = require("../startup-time");
 
 let ICON_PATH = path.resolve(process.resourcesPath, "lumine.png");
 if (!fs.existsSync(ICON_PATH)) {
-  ICON_PATH = path.resolve(__dirname, "..", "..", "resources", "lumine.png");
+  ICON_PATH = path.resolve(__dirname, "..", "..", "resources", "app-icons", "lumine.png");
 }
-const DEV_ICON_PATH = path.resolve(
-  __dirname,
-  "..",
-  "..",
-  "resources",
-  "app-icons",
-  "beta-next.png",
-);
 
 let includeShellLoadTime = true;
 let nextId = 0;
@@ -73,12 +65,11 @@ module.exports = class AtomWindow extends EventEmitter {
       simpleFullscreen: this.getSimpleFullscreen(),
     };
 
-    // Packaged Windows builds inherit the window and taskbar icon from the
-    // executable. Development builds run through Electron's executable, so
-    // give those windows the development-channel icon explicitly instead.
+    // Packaged Windows builds inherit the icon from the executable. Source
+    // builds run through Electron's executable, so set the same Lumine icon.
     if (process.platform === "linux") options.icon = nativeImage.createFromPath(ICON_PATH);
-    if (process.platform === "win32" && this.devMode) {
-      options.icon = nativeImage.createFromPath(DEV_ICON_PATH);
+    if (process.platform === "win32" && process.defaultApp) {
+      options.icon = nativeImage.createFromPath(ICON_PATH);
     }
     if (this.shouldHideTitleBar()) options.frame = false;
 

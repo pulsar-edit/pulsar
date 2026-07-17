@@ -4,7 +4,6 @@ const StatusBarView = require("./status-bar-view");
 const FileInfoView = require("./file-info-view");
 const CursorPositionView = require("./cursor-position-view");
 const SelectionCountView = require("./selection-count-view");
-const LaunchModeView = require("./launch-mode-view");
 
 module.exports = {
   activate() {
@@ -33,12 +32,6 @@ module.exports = {
         atom.config.set("status-bar.isVisible", true);
       }
     });
-
-    const { safeMode, devMode } = atom.getLoadSettings();
-    if (safeMode || devMode) {
-      const launchModeView = new LaunchModeView({ safeMode, devMode });
-      this.statusBar.addLeftTile({ item: launchModeView.element, priority: -1 });
-    }
 
     this.fileInfo = new FileInfoView();
     this.statusBar.addLeftTile({ item: this.fileInfo.element, priority: 40 });

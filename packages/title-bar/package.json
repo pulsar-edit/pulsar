@@ -36,35 +36,22 @@
       ],
       "default": "Default"
     },
-    "logoStyle": {
-      "order": 2,
-      "title": "Logo Style",
-      "description": "Style of the logo shown in the title bar.",
-      "type": "string",
-      "enum": [
-        "Default",
-        "Filled",
-        "Unfilled",
-        "None"
-      ],
-      "default": "Default"
-    },
     "customContextMenus": {
-      "order": 3,
+      "order": 2,
       "title": "Custom Context Menus",
       "description": "Use custom styled HTML context menus instead of native Electron menus. Matches the title bar styling.",
       "type": "boolean",
       "default": true
     },
     "autoHide": {
-      "order": 4,
+      "order": 3,
       "title": "Auto Hide Menu Bar",
       "description": "Automatically hide the menu bar and toggle it by pressing Alt.",
       "type": "boolean",
       "default": true
     },
     "altGivesFocus": {
-      "order": 5,
+      "order": 4,
       "title": "Alt Gives Focus",
       "description": "Releasing the alt key gives focus to the application menu.",
       "type": "boolean",

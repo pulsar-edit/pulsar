@@ -70,13 +70,6 @@ class TitleBar {
       atom.config.observe("title-bar.controlTheme", (value) => {
         TitleBar.configState.windowControlTheme = value;
         this.titleBarView.getThemeManager().setWindowControlTheme(value);
-        this.titleBarView.setLogoStyle(TitleBar.configState.logoStyle);
-      }),
-    );
-    this.subscriptions.add(
-      atom.config.observe("title-bar.logoStyle", (value) => {
-        TitleBar.configState.logoStyle = value;
-        this.titleBarView.setLogoStyle(value);
       }),
     );
     this.subscriptions.add(

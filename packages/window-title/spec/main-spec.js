@@ -38,17 +38,16 @@ describe("Window Title package", () => {
     expect(setRepresentedFilename).toHaveBeenCalledWith(renamedPath);
 
     atom.config.set("window-title.template", "Full Path");
-    const modeSuffix = `${atom.inDevMode() ? " [Dev]" : ""}${atom.inSafeMode() ? " [Safe]" : ""}`;
-    expect(document.title).toBe(renamedPath + modeSuffix);
+    expect(document.title).toBe(renamedPath);
 
     atom.config.set("window-title.template", "File");
-    expect(document.title).toBe("renamed.js" + modeSuffix);
+    expect(document.title).toBe("renamed.js");
 
     atom.config.set("window-title.template", "Project");
-    expect(document.title).toBe(path.basename(projectPath) + modeSuffix);
+    expect(document.title).toBe(path.basename(projectPath));
 
     atom.config.set("window-title.template", "Project and File");
-    expect(document.title).toBe(`${path.basename(projectPath)} — renamed.js${modeSuffix}`);
+    expect(document.title).toBe(`${path.basename(projectPath)} — renamed.js`);
   });
 
   it("updates when project paths change", async () => {
@@ -67,13 +66,12 @@ describe("Window Title package", () => {
 
   it("omits the project-and-file separator when there is no file", async () => {
     const projectPath = path.resolve(__dirname, "..");
-    const modeSuffix = `${atom.inDevMode() ? " [Dev]" : ""}${atom.inSafeMode() ? " [Safe]" : ""}`;
     atom.project.setPaths([projectPath]);
     atom.config.set("window-title.template", "Project and File");
 
     await atom.packages.activatePackage("window-title");
 
-    expect(document.title).toBe(path.basename(projectPath) + modeSuffix);
+    expect(document.title).toBe(path.basename(projectPath));
   });
 
   it("updates for legacy pane items and removes their listener on deactivation", async () => {

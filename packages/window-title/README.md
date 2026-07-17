@@ -10,7 +10,7 @@ Choose a preset or customize the window title with a Liquid template.
 
 ## Configuration
 
-The `Window Title` setting provides `Project`, `File`, `Project and File`, and `Full Path` presets. Presets also append `[Dev]` and `[Safe]` markers when those modes are active.
+The `Window Title` setting provides `Project`, `File`, `Project and File`, and `Full Path` presets.
 
 Choose `Custom` to use the `Custom Template` setting. Custom titles use [LiquidJS](https://liquidjs.com/) syntax: `{{ variable }}` outputs a value, and tags such as `{% if variable %}...{% else %}...{% endif %}` add conditional content. Available variables:
 

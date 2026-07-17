@@ -3,15 +3,12 @@ const { Liquid } = require("liquidjs");
 const path = require("path");
 
 const templateEngine = new Liquid({ jsTruthy: true });
-const modeSuffix = "{% if devMode %} [Dev]{% endif %}{% if safeMode %} [Safe]{% endif %}";
 const presetTemplates = Object.freeze({
-  Project:
-    "{% if projectTitle %}{{ projectTitle }}{% else %}{{ projectName }}{% endif %}" + modeSuffix,
-  File: "{{ fileName }}" + modeSuffix,
+  Project: "{% if projectTitle %}{{ projectTitle }}{% else %}{{ projectName }}{% endif %}",
+  File: "{{ fileName }}",
   "Project and File":
-    "{% if projectTitle %}{{ projectTitle }}{% else %}{{ projectName }}{% endif %}{% if fileName %} — {{ fileName }}{% endif %}" +
-    modeSuffix,
-  "Full Path": "{{ filePath }}" + modeSuffix,
+    "{% if projectTitle %}{{ projectTitle }}{% else %}{{ projectName }}{% endif %}{% if fileName %} — {{ fileName }}{% endif %}",
+  "Full Path": "{{ filePath }}",
 });
 
 module.exports = {

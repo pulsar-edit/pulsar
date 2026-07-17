@@ -1,7 +1,11 @@
 const { Utils } = require("../lib/utils");
 const { ApplicationMenu } = require("../lib/app-menu");
 const { MenuLabel } = require("../lib/label");
-const { calculateAvailableMenuWidth, calculateVisibleLabelCount } = require("../lib/view");
+const {
+  calculateAvailableMenuWidth,
+  calculateVisibleLabelCount,
+  resolveLaunchMode,
+} = require("../lib/view");
 
 describe("Title Bar package", () => {
   let workspaceElement;
@@ -31,19 +35,29 @@ describe("Title Bar package", () => {
   });
 
   it("sets intrinsic logo dimensions before styles load", () => {
-    atom.config.set("title-bar.logoStyle", "Filled");
-    const logo = workspaceElement.querySelector(".title-bar .app-icon svg");
+    const logo = workspaceElement.querySelector(".title-bar .app-icon img");
 
     expect(logo.getAttribute("width")).toBe("24");
     expect(logo.getAttribute("height")).toBe("24");
   });
 
-  it("uses the Lumine filled logo", () => {
-    atom.config.set("title-bar.logoStyle", "Filled");
-    const logo = workspaceElement.querySelector(".title-bar .app-icon svg");
+  it("uses the canonical Lumine logo", () => {
+    const logo = workspaceElement.querySelector(".title-bar .app-icon img");
 
-    expect(logo.innerHTML).toContain("title-bar-lumine-gold-gradient");
-    expect(logo.innerHTML).not.toContain("#662d91");
+    expect(logo.src.replace(/\\/g, "/")).toMatch(/\/resources\/app-icons\/lumine\.svg$/);
+    expect(logo.complete).toBe(true);
+    expect(logo.naturalWidth).toBe(128);
+  });
+
+  it("prioritizes safe, source, and dev launch modes for the logo indicator", () => {
+    // Safe mode wins even when a source checkout also reports dev/source.
+    expect(resolveLaunchMode({ sourceMode: true, devMode: true, safeMode: true })).toBe("safe");
+    expect(resolveLaunchMode({ sourceMode: false, devMode: false, safeMode: true })).toBe("safe");
+    // `yarn start` reports both source and dev; source marks it distinctly.
+    expect(resolveLaunchMode({ sourceMode: true, devMode: true, safeMode: false })).toBe("source");
+    // A bare dev window (packaged build) has neither safe nor source set.
+    expect(resolveLaunchMode({ sourceMode: false, devMode: true, safeMode: false })).toBe("dev");
+    expect(resolveLaunchMode({ sourceMode: false, devMode: false, safeMode: false })).toBeNull();
   });
 
   it("removes the title bar on deactivate", () => {

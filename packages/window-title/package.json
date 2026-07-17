@@ -39,7 +39,7 @@
       "title": "Custom Template",
       "description": "Liquid template used when `Window Title` is `Custom`. Variables: `projectTitle`, `projectPaths`, `projectCount`, `projectName`, `projectPath`, `fileName`, `filePath`, `relativeFilePath`, `gitHead`, `appName`, `devMode`, `safeMode`. Supports tags such as `{% if devMode %} [Dev]{% endif %}`. If the template renders empty, the title falls back to `Lumine`.",
       "type": "string",
-      "default": "{% if projectTitle %}{{ projectTitle }}{% else %}{{ fileName }} — {{ projectPaths }}{% endif %}{% if devMode %} [Dev]{% endif %}{% if safeMode %} [Safe]{% endif %}"
+      "default": "{% if projectTitle %}{{ projectTitle }}{% else %}{{ fileName }} — {{ projectPaths }}{% endif %}"
     }
   }
 }

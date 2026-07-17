@@ -10,7 +10,9 @@
   --title-bar-control-width: 46px;
   --title-bar-icon-size: 24px;
   --title-bar-icon-margin: 8px;
-  --title-bar-dev-color: #91522d;
+  --title-bar-dev-indicator-color: var(--text-color-error);
+  --title-bar-safe-indicator-color: var(--text-color-success);
+  --title-bar-source-indicator-color: var(--text-color-info);
 
   /* Menu */
   --title-bar-menu-font-size: var(--font-size);
@@ -132,19 +134,41 @@
     order: 0;
     flex-shrink: 0;
     margin-left: var(--title-bar-icon-margin);
+    position: relative;
 
-    svg {
+    img {
       display: block;
       width: 100%;
       height: auto;
     }
 
-    &.dev-mode {
-      color: var(--title-bar-dev-color);
+    &::after {
+      content: "";
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: calc(100% + 5px);
+      aspect-ratio: 1;
+      box-sizing: border-box;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
 
-      .title-bar-logo-disc {
-        fill: var(--title-bar-dev-color);
-      }
+    &.dev-mode::after {
+      display: block;
+      color: var(--title-bar-dev-indicator-color);
+    }
+
+    &.safe-mode::after {
+      display: block;
+      color: var(--title-bar-safe-indicator-color);
+    }
+
+    &.source-mode::after {
+      display: block;
+      color: var(--title-bar-source-indicator-color);
     }
   }
 

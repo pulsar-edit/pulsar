@@ -440,7 +440,12 @@ export default class PackageCard {
       // Don't hit the web for our bundled packages. Just use the local image.
       let avatarPath = path.join(process.resourcesPath, "lumine.png");
       if (!fs.existsSync(avatarPath)) {
-        avatarPath = path.join(atom.getLoadSettings().resourcePath, "resources", "lumine.png");
+        avatarPath = path.join(
+          atom.getLoadSettings().resourcePath,
+          "resources",
+          "app-icons",
+          "lumine.png",
+        );
       }
       this.refs.avatar.src = `file://${avatarPath}`;
     } else {

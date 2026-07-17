@@ -3,8 +3,9 @@ const { Utils } = require("./utils.js");
 const { ThemeManager } = require("./theme.js");
 const { MenuUpdater } = require("./updater.js");
 const { ContextMenuInterceptor } = require("./context-menu-interceptor.js");
-const { logoStyles, resolveLogoStyle } = require("./types.js");
 const { ControlTiles } = require("./control-tiles.js");
+const path = require("path");
+const { pathToFileURL } = require("url");
 
 // Debounce helper
 function debounce(fn, delay) {
@@ -65,6 +66,17 @@ function calculateAvailableMenuWidth(menuRect, titleRect, leadingWidth, titleGap
   return Math.max(0, availableWidth);
 }
 
+function resolveLaunchMode({ devMode, safeMode, sourceMode }) {
+  // Safe mode is a warning state and always wins. From a source checkout
+  // `sourceMode` (Electron's unpackaged `process.defaultApp`) is true even
+  // though `--dev` is also set, so it must outrank dev to mark `yarn start`
+  // distinctly; a bare `--dev` window only appears in packaged builds.
+  if (safeMode) return "safe";
+  if (sourceMode) return "source";
+  if (devMode) return "dev";
+  return null;
+}
+
 class TitleBarView {
   constructor(configState) {
     this.configState = configState;
@@ -78,7 +90,7 @@ class TitleBarView {
     this.windowState = this.readWindowState();
     this.originalMenuUpdateFn = undefined;
     this.menuUpdatePending = false;
-    this.setLogoStyle(configState.logoStyle);
+    this.updateLaunchMode();
 
     // Bind debounced/throttled methods
     this.debouncedCheckTitleCollision = debounce(() => this.checkTitleCollision(), 150);
@@ -144,6 +156,16 @@ class TitleBarView {
     // App icon at leftmost position
     const appIcon = document.createElement("div");
     appIcon.classList.add("app-icon");
+    const logo = document.createElement("img");
+    logo.src = pathToFileURL(
+      path.join(atom.getLoadSettings().resourcePath, "resources", "app-icons", "lumine.svg"),
+    ).href;
+    logo.width = 24;
+    logo.height = 24;
+    logo.alt = "";
+    logo.setAttribute("aria-hidden", "true");
+    logo.setAttribute("draggable", "false");
+    appIcon.appendChild(logo);
     appIcon.addEventListener("click", () => {
       atom.commands.dispatch(atom.views.getView(atom.workspace), "application:about");
     });
@@ -509,28 +531,19 @@ class TitleBarView {
     return this.controlTiles;
   }
 
-  setLogoStyle(style) {
-    const resolvedStyle = resolveLogoStyle(style, this.configState.windowControlTheme);
-    const svg = logoStyles[resolvedStyle];
+  updateLaunchMode() {
+    const launchMode = resolveLaunchMode({
+      devMode: atom.inDevMode(),
+      safeMode: atom.inSafeMode(),
+      sourceMode: Boolean(process.defaultApp) && !atom.inSpecMode(),
+    });
 
-    // Reflect dev mode on the app icon, mirroring the app's dev-channel icon.
-    this.appIcon.classList.toggle("dev-mode", atom.inDevMode());
-
-    if (svg !== undefined) {
-      this.appIcon.innerHTML = svg;
-      const svgElement = this.appIcon.querySelector("svg");
-      if (svgElement) {
-        svgElement.setAttribute("width", "24");
-        svgElement.setAttribute("height", "24");
-        svgElement.setAttribute("aria-hidden", "true");
-        svgElement.setAttribute("focusable", "false");
-      }
-      this.appIcon.style.display = svg ? "" : "none";
+    for (const mode of ["dev", "safe", "source"]) {
+      this.appIcon.classList.toggle(`${mode}-mode`, launchMode === mode);
     }
 
-    if (this.appMenu) {
-      this.debouncedCheckTitleCollision();
-    }
+    const modeLabel = launchMode === "source" ? "source mode" : `${launchMode} mode`;
+    this.appIcon.title = launchMode ? `Lumine (${modeLabel})` : "Lumine";
   }
 
   isTitleBarVisible() {
@@ -546,4 +559,5 @@ module.exports = {
   TitleBarView,
   calculateAvailableMenuWidth,
   calculateVisibleLabelCount,
+  resolveLaunchMode,
 };

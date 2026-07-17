@@ -41,6 +41,15 @@ describe("About", () => {
     expect(deserializedAboutView).toBeTruthy();
   });
 
+  it("uses the canonical Lumine logo", async () => {
+    await atom.workspace.open("atom://about");
+    jasmine.attachToDOM(workspaceElement);
+    const logo = workspaceElement.querySelector(".about-logo");
+
+    expect(logo.tagName).toBe("IMG");
+    expect(logo.src.replace(/\\/g, "/")).toMatch(/\/resources\/app-icons\/lumine\.svg$/);
+  });
+
   describe("when the about:about-atom command is triggered", () => {
     it("shows the About Lumine view", async () => {
       // Attaching the workspaceElement to the DOM is required to allow the

@@ -1,6 +1,7 @@
 const { Disposable } = require("atom");
 const etch = require("etch");
-const LumineLogo = require("./lumine-logo");
+const path = require("path");
+const { pathToFileURL } = require("url");
 const EtchComponent = require("../etch-component");
 
 const $ = etch.dom;
@@ -57,7 +58,23 @@ module.exports = class AboutView extends EtchComponent {
         { className: "about-container min-width-min-content" },
         $.header(
           { className: "about-header" },
-          $.a({ className: "about-atom-io", href: `${atom.branding.urlWeb}` }, $(LumineLogo)),
+          $.a(
+            { className: "about-atom-io", href: `${atom.branding.urlWeb}` },
+            $.img({
+              className: "about-logo",
+              src: pathToFileURL(
+                path.join(
+                  atom.getLoadSettings().resourcePath,
+                  "resources",
+                  "app-icons",
+                  "lumine.svg",
+                ),
+              ).href,
+              alt: "",
+              width: 128,
+              height: 128,
+            }),
+          ),
           $.h1({ className: "about-title" }, `${atom.branding.name}`),
           $.div(
             { className: "about-subtitle" },

@@ -58,7 +58,6 @@
 .status-bar.status-bar {
   /* Read-only -> Remove hover effect */
   .is-read-only, /* <- use this class in packages */
-  status-bar-launch-mode,
   busy-signal {
     &:hover,
     &:active,
@@ -79,7 +78,6 @@
   }
 
   /* Remove margin for icon without text */
-  status-bar-launch-mode::before, /* Launch mode */
   .about-release-notes::before, /* New release squirrel */
   .PortalStatusBarIndicator .icon::before, /* Teletype */
   .icon.is-icon-only::before {

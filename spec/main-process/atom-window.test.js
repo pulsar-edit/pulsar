@@ -115,13 +115,12 @@ describe("AtomWindow", function () {
   });
 
   describe("launch behavior", function () {
-    it("sets the Lumine window icon for development mode on Windows", function () {
+    it("sets the Lumine window icon for source launches on Windows", function () {
       const { browserWindow } = new AtomWindow(app, service, {
         browserWindowConstructor: StubBrowserWindow,
-        devMode: true,
       });
 
-      if (process.platform === "win32") {
+      if (process.platform === "win32" && process.defaultApp) {
         assert.isDefined(browserWindow.options.icon);
         assert.isFalse(browserWindow.options.icon.isEmpty());
       }
