@@ -6833,6 +6833,8 @@ markdown-it@^14.1.0:
     emoji-images "^0.1.1"
     fs-plus "^3.0.0"
     github-markdown-css "^5.5.1"
+    github-slugger "^1.1.1"
+    innertext "^1.0.1"
     marked "5.0.3"
     morphdom "^2.7.2"
     underscore-plus "^1.0.0"
