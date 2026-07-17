@@ -76,7 +76,14 @@ function summaryFromStatusEntry(entry) {
 // ```
 module.exports = class GitRepository {
   static exists(path) {
-    const git = this.open(path);
+    let git;
+    try {
+      git = this.open(path);
+    } catch {
+      // A dubious-ownership rejection (or any other open failure) means we
+      // cannot vouch for a repository here; treat it as absent.
+      return false;
+    }
     if (git) {
       git.destroy();
       return true;
@@ -103,7 +110,12 @@ module.exports = class GitRepository {
     }
     try {
       return new GitRepository(path, options);
-    } catch {
+    } catch (error) {
+      // Surface a dubious-ownership rejection so the caller can offer a bypass;
+      // every other failure just means "no repository here".
+      if (error && error.code === "DubiousOwnership") {
+        throw error;
+      }
       return null;
     }
   }

@@ -1,5 +1,7 @@
 const fs = require("fs");
+const path = require("path");
 const { Directory } = require("@lumine-code/pathwatcher");
+const GitUtils = require("@lumine-code/git-utils");
 const GitRepository = require("./git-repository");
 
 const GIT_FILE_REGEX = RegExp("^gitdir: (.+)");
@@ -155,6 +157,9 @@ class GitRepositoryProvider {
     this.project = project;
     this.config = config;
     this.pathToRepository = {};
+    // `.git` paths already reported so a repeated scan does not stack duplicate
+    // dubious-ownership notifications for the same repository.
+    this.dubiousOwnershipNotified = new Set();
   }
 
   // Returns a {Promise} that resolves with either:
@@ -190,10 +195,18 @@ class GitRepositoryProvider {
     const gitDirPath = gitDir.getPath();
     let repo = this.pathToRepository[gitDirPath];
     if (!repo) {
-      repo = GitRepository.open(gitDirPath, {
-        project: this.project,
-        config: this.config,
-      });
+      try {
+        repo = GitRepository.open(gitDirPath, {
+          project: this.project,
+          config: this.config,
+        });
+      } catch (error) {
+        if (error && error.code === "DubiousOwnership") {
+          this.notifyDubiousOwnership(gitDirPath, error);
+          return null;
+        }
+        throw error;
+      }
       if (!repo) {
         return null;
       }
@@ -203,6 +216,45 @@ class GitRepositoryProvider {
       repo.refreshStatus();
     }
     return repo;
+  }
+
+  // libgit2 refuses a repository whose directory is owned by another account
+  // (git's "dubious ownership"). Rather than silently omitting it, tell the user
+  // and offer a session bypass that disables the ownership check and re-scans.
+  notifyDubiousOwnership(gitDirPath, error) {
+    if (this.dubiousOwnershipNotified.has(gitDirPath)) return;
+    this.dubiousOwnershipNotified.add(gitDirPath);
+
+    const notifications = globalThis.atom?.notifications;
+    if (!notifications) return;
+
+    const workingDirectory =
+      path.basename(gitDirPath) === ".git" ? path.dirname(gitDirPath) : gitDirPath;
+
+    const notification = notifications.addError("Git: repository ownership mismatch", {
+      description:
+        `Lumine could not open the Git repository at <code>${workingDirectory}</code> ` +
+        "because its directory is owned by a different user account. This is common on " +
+        "Windows when a repository was cloned from an elevated (Administrator) terminal, " +
+        "or when opening a WSL path from Windows.",
+      detail:
+        `${error.message}\n\n` +
+        "Choose “Silence this session” to open it anyway until Lumine restarts, or fix it " +
+        "permanently by taking ownership of the directory or adding it to Git's " +
+        "safe.directory list.",
+      dismissable: true,
+      buttons: [
+        {
+          text: "Silence this session",
+          onDidClick: () => {
+            GitUtils.setOwnerValidation(false);
+            this.dubiousOwnershipNotified.clear();
+            notification.dismiss();
+            this.project?.repositoryRegistry?.rescan?.();
+          },
+        },
+      ],
+    });
   }
 }
 
