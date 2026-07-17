@@ -47,6 +47,9 @@ describe("TreeView dialogs", () => {
 
       const header = dialog.inputDialogView.element.querySelector("label.icon");
       expect(header.textContent).toContain("file");
+      expect(dialog.inputDialogView.refs.infoMessage.textContent).toContain(
+        "relative to the project root",
+      );
 
       let created = null;
       dialog.onDidCreateFile((createdPath) => (created = createdPath));

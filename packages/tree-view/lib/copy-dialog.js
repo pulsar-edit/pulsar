@@ -7,6 +7,7 @@ module.exports = class CopyDialog extends Dialog {
   constructor(initialPath, { onCopy }) {
     super({
       prompt: "Enter the new path for the duplicate.",
+      info: "Paths are relative to the project root unless absolute.",
       initialPath: atom.project.relativize(initialPath),
       select: true,
       iconClass: "icon-arrow-right",

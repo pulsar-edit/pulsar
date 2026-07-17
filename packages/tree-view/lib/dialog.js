@@ -8,7 +8,7 @@ module.exports = class Dialog {
     if (param == null) {
       param = {};
     }
-    const { initialPath, select, iconClass, prompt, checkboxes } = param;
+    const { initialPath, select, iconClass, prompt, info, checkboxes } = param;
     this.emitter = new Emitter();
     this.disposables = new CompositeDisposable();
 
@@ -23,6 +23,7 @@ module.exports = class Dialog {
     this.inputDialogView = new InputDialogView({
       className: "tree-view-dialog",
       headerElement: this.promptText,
+      infoMessage: info,
       checkboxes,
       didChangeQuery: () => this.showError(),
       didConfirm: (newPath) => this.onConfirm(newPath),

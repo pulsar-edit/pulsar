@@ -14,6 +14,7 @@ module.exports = class MoveDialog extends Dialog {
 
     super({
       prompt,
+      info: "Paths are relative to the project root unless absolute. Missing parent folders are created automatically.",
       initialPath: atom.project.relativize(initialPath),
       select: true,
       iconClass: "icon-arrow-right",

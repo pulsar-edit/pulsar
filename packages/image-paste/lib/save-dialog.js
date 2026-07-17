@@ -21,6 +21,7 @@ module.exports = class SaveDialog {
 
     this.inputDialogView = new InputDialogView({
       className: "image-paste save-dialog",
+      infoMessage: "Enter a path relative to the current project or directory for the pasted image.",
       contentElement: this.previewElement,
       didChangeQuery: () => this.clearWarning(),
       didConfirm: () => this.confirm(),

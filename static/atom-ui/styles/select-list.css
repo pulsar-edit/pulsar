@@ -49,6 +49,19 @@
   }
 }
 
+/* Input dialog info text */
+
+.input-dialog .info-message {
+  margin-top: var(--component-padding);
+  color: var(--text-color-subtle);
+}
+
+/* A prompt label rendered above the query editor needs room below it. */
+.input-dialog > label.icon {
+  display: block;
+  margin-bottom: calc(var(--component-padding) / 2);
+}
+
 /* Input dialog checkbox row */
 
 .input-dialog-checkboxes {

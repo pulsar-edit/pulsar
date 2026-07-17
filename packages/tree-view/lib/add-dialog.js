@@ -22,6 +22,9 @@ module.exports = class AddDialog extends Dialog {
 
     super({
       prompt: "Enter the path for the new " + (isCreatingFile ? "file." : "folder."),
+      info: isCreatingFile
+        ? "Paths are relative to the project root unless absolute."
+        : "Paths are relative to the project root unless absolute. Nested folders are created as needed.",
       initialPath: relativeDirectoryPath,
       select: false,
       iconClass: isCreatingFile ? "icon-file-add" : "icon-file-directory-create",
