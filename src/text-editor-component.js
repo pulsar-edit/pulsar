@@ -1901,29 +1901,18 @@ module.exports = class TextEditorComponent {
       return;
     }
 
-    const operation = { options, handled: false };
-    this.pendingPasteOperation = operation;
+    // Renderer-initiated `execCommand("paste")` never fires a ClipboardEvent
+    // (Chromium reserves paste for native keystrokes and menu actions), so a
+    // paste command that did not arrive as a keystroke reads the clipboard
+    // directly. Metadata copied in another window is unavailable here.
     const { skipPasteProviders, ...editorOptions } = options;
-
-    try {
-      this.getHiddenInput().focus({ preventScroll: true });
-      const { ownerDocument } = this.element;
-      if (typeof ownerDocument.execCommand === "function") ownerDocument.execCommand("paste");
-    } catch {
-      // Fall through to the existing direct clipboard implementation below.
-    } finally {
-      this.pendingPasteOperation = null;
-    }
-
-    if (!operation.handled) {
-      const handledByProvider =
-        !skipPasteProviders &&
-        this.handlePasteProviders({
-          clipboard: this.props.model.constructor.clipboard,
-          options: editorOptions,
-        });
-      if (!handledByProvider) this.props.model.pasteText(editorOptions);
-    }
+    const handledByProvider =
+      !skipPasteProviders &&
+      this.handlePasteProviders({
+        clipboard: this.props.model.constructor.clipboard,
+        options: editorOptions,
+      });
+    if (!handledByProvider) this.props.model.pasteText(editorOptions);
   }
 
   handlePasteProviders({ clipboard, clipboardData = null, options = {} }) {
@@ -1997,14 +1986,13 @@ module.exports = class TextEditorComponent {
   }
 
   didPaste(event) {
-    const operation = this.pendingPasteOperation;
     const nativeOperation = this.pendingNativePasteOperation;
     this.pendingNativePasteOperation = null;
-    if (event.clipboardData && (this.getPlatform() !== "linux" || operation || nativeOperation)) {
+    if (event.clipboardData && (this.getPlatform() !== "linux" || nativeOperation)) {
       const clipboard = this.props.model.constructor.clipboard.createDataTransferClipboard(
         event.clipboardData,
       );
-      const options = operation?.options || nativeOperation?.options || {};
+      const options = nativeOperation?.options || {};
       const { skipPasteProviders, ...editorOptions } = options;
       const handledByProvider =
         !skipPasteProviders &&
@@ -2017,7 +2005,6 @@ module.exports = class TextEditorComponent {
         this.props.model.pasteText({ ...editorOptions, clipboard });
       }
       event.preventDefault();
-      if (operation) operation.handled = true;
     } else if (this.getPlatform() === "linux") {
       // Chromium translates a middle-button mouse click into a mousedown and a
       // paste event on Linux. Preserve Lumine's existing suppression unless the

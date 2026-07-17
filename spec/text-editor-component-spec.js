@@ -5458,11 +5458,11 @@ describe("TextEditorComponent", () => {
       editor.setCursorBufferPosition([0, 3]);
       const event = { clipboardData, preventDefault: jasmine.createSpy("preventDefault") };
 
-      // A real Ctrl+V routes through `pasteText`, which sets a pending paste
-      // operation before the browser fires the paste event. Without it, Linux
-      // suppresses the event (middle-click protection), so simulate it here to
-      // exercise the same cross-platform path the command uses.
-      component.pendingPasteOperation = { options: {}, handled: false };
+      // A real Ctrl+V aborts the key binding and records a pending native
+      // paste operation before the browser fires the paste event. Without it,
+      // Linux suppresses the event (middle-click protection), so simulate it
+      // here to exercise the same cross-platform path the keystroke uses.
+      component.pendingNativePasteOperation = { options: {} };
       component.didPaste(event);
 
       expect(editor.getText().replace(/\r\n/g, "\n")).toBe("first\ntarget");
@@ -5485,7 +5485,7 @@ describe("TextEditorComponent", () => {
 
       // Simulate the pending operation a real Ctrl+V establishes so the paste
       // event is honored on Linux as well (see the linewise paste spec above).
-      component.pendingPasteOperation = { options: {}, handled: false };
+      component.pendingNativePasteOperation = { options: {} };
       component.didPaste(event);
 
       expect(provider.handlePaste).toHaveBeenCalled();

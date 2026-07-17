@@ -279,55 +279,20 @@ module.exports = class Clipboard {
   // Public: Read the text from the clipboard and return both the text and the
   // associated metadata.
   //
+  // Metadata copied in another window only flows through paste
+  // ClipboardEvents (see {::createDataTransferClipboard}): Chromium stores
+  // DataTransfer custom formats in a private bundle that Electron's clipboard
+  // API cannot read back, so there is no native-format fallback here.
+  //
   // Returns an {Object} with the following keys:
   // * `text` The {String} clipboard text.
   // * `metadata` The metadata stored by an earlier call to {::write}.
   readWithMetadata() {
     const text = this.read();
-    const nativeMetadata = this.readNativeMetadata(text);
-    if (nativeMetadata) return { text, metadata: nativeMetadata };
-
     if (this.signatureForMetadata === this.md5(text)) {
       return { text, metadata: this.metadata };
     } else {
       return { text };
-    }
-  }
-
-  readNativeMetadata(text) {
-    try {
-      const lumineData = this.parseDataTransferData(
-        this.readNativeFormat(LUMINE_TEXT_EDITOR_DATA_FORMAT),
-      );
-      const metadata = this.metadataFromLumineEditorData(lumineData, text);
-      if (metadata) return metadata;
-      // Same staleness rule as readFromDataTransfer: an invalid Lumine payload
-      // means the companion VS Code copy metadata is stale too.
-      if (lumineData != null) return null;
-
-      const serializedCopyMetadata = this.readNativeFormat(VSCODE_COPY_METADATA_FORMAT);
-      return this.metadataFromSerializedCopyMetadata(serializedCopyMetadata);
-    } catch {
-      return null;
-    }
-  }
-
-  readNativeFormat(format) {
-    if (typeof clipboard.readBuffer === "function") {
-      try {
-        const buffer = clipboard.readBuffer(format);
-        if (buffer?.length > 0) {
-          return buffer.toString("utf8").replace(/\0+$/, "");
-        }
-      } catch {
-        // Fall through to Electron's string-format reader below.
-      }
-    }
-
-    try {
-      return clipboard.read(format);
-    } catch {
-      return "";
     }
   }
 
