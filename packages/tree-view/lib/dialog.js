@@ -1,5 +1,6 @@
-const { TextEditor, CompositeDisposable, Disposable, Emitter, Range, Point } = require("atom");
+const { CompositeDisposable, Emitter, Range, Point } = require("atom");
 const path = require("path");
+const { InputDialogView } = require("@lumine-code/select-list");
 const { getFullExtension } = require("./helpers");
 
 module.exports = class Dialog {
@@ -7,43 +8,28 @@ module.exports = class Dialog {
     if (param == null) {
       param = {};
     }
-    const { initialPath, select, iconClass, prompt } = param;
+    const { initialPath, select, iconClass, prompt, checkboxes } = param;
     this.emitter = new Emitter();
     this.disposables = new CompositeDisposable();
 
-    this.element = document.createElement("div");
-    this.element.classList.add("tree-view-dialog");
-
+    // The prompt renders above the input as an icon label.
     this.promptText = document.createElement("label");
     this.promptText.classList.add("icon");
     if (iconClass) {
       this.promptText.classList.add(iconClass);
     }
     this.promptText.textContent = prompt;
-    this.element.appendChild(this.promptText);
 
-    this.miniEditor = new TextEditor({ mini: true });
-    const blurHandler = () => {
-      if (document.hasFocus()) {
-        return this.close();
-      }
-    };
-    this.miniEditor.element.addEventListener("blur", blurHandler);
-    this.disposables.add(atom.textEditors.add(this.miniEditor));
-    this.disposables.add(
-      new Disposable(() => this.miniEditor.element.removeEventListener("blur", blurHandler)),
-    );
-    this.disposables.add(this.miniEditor.onDidChange(() => this.showError()));
-    this.element.appendChild(this.miniEditor.element);
-
-    this.errorMessage = document.createElement("div");
-    this.errorMessage.classList.add("error-message");
-    this.element.appendChild(this.errorMessage);
-
-    atom.commands.add(this.element, {
-      "core:confirm": () => this.onConfirm(this.miniEditor.getText()),
-      "core:cancel": () => this.cancel(),
+    this.inputDialogView = new InputDialogView({
+      className: "tree-view-dialog",
+      headerElement: this.promptText,
+      checkboxes,
+      didChangeQuery: () => this.showError(),
+      didConfirm: (newPath) => this.onConfirm(newPath),
+      didCancel: () => this.cancel(),
     });
+    this.element = this.inputDialogView.element;
+    this.miniEditor = this.inputDialogView.refs.queryEditor;
 
     this.miniEditor.setText(initialPath);
 
@@ -57,25 +43,23 @@ module.exports = class Dialog {
       } else {
         selectionEnd = initialPath.length - extension.length;
       }
-      this.miniEditor.setSelectedBufferRange(
-        Range(Point(0, selectionStart), Point(0, selectionEnd)),
-      );
+      this.selectionRange = Range(Point(0, selectionStart), Point(0, selectionEnd));
     }
   }
 
   attach() {
-    this.panel = atom.workspace.addModalPanel({ item: this });
-    this.miniEditor.element.focus();
+    this.inputDialogView.show();
+    // Show() selects the whole query; restore the narrower base-name selection.
+    if (this.selectionRange) {
+      this.miniEditor.setSelectedBufferRange(this.selectionRange);
+    }
     this.miniEditor.scrollToCursorPosition();
   }
 
   close() {
-    const { panel } = this;
-    this.panel = null;
-    panel?.destroy();
     this.emitter.dispose();
     this.disposables.dispose();
-    this.miniEditor.destroy();
+    this.inputDialogView.destroy();
     const activePane = atom.workspace.getCenter().getActivePane();
     if (!activePane.isDestroyed()) {
       return activePane.activate();
@@ -91,7 +75,7 @@ module.exports = class Dialog {
     if (message == null) {
       message = "";
     }
-    this.errorMessage.textContent = message;
+    this.inputDialogView.update({ errorMessage: message });
     if (message) {
       this.element.classList.add("error");
       window.setTimeout(() => this.element.classList.remove("error"), 300);

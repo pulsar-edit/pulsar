@@ -10,6 +10,9 @@ module.exports = class CopyDialog extends Dialog {
       initialPath: atom.project.relativize(initialPath),
       select: true,
       iconClass: "icon-arrow-right",
+      checkboxes: [
+        { label: "Open file after copying", config: "tree-view.openAfterCopy" },
+      ],
     });
 
     this.initialPath = initialPath;
@@ -48,6 +51,9 @@ module.exports = class CopyDialog extends Dialog {
       } else {
         fs.copy(this.initialPath, newPath, () => {
           this.onCopy?.({ initialPath: this.initialPath, newPath });
+          if (!atom.config.get("tree-view.openAfterCopy")) {
+            return;
+          }
           const openOptions = { activatePane: true };
           if (activeEditor) {
             openOptions.initialLine = activeEditor.getLastCursor().getBufferRow();

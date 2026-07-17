@@ -49,6 +49,22 @@
   }
 }
 
+/* Input dialog checkbox row */
+
+.input-dialog-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--component-padding);
+}
+
+.input-dialog-checkboxes .input-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
 /* Popover List */
 
 .select-list.popover-list {
