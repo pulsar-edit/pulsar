@@ -656,6 +656,66 @@ describe("GitRepository", () => {
     });
   });
 
+  describe("ref reads backed by the refs snapshot", () => {
+    let repoWithRefs;
+
+    beforeEach(async () => {
+      const forEachRef = [
+        // main branch, tracking origin/main, 2 ahead and 1 behind, is HEAD
+        "refs/heads/main\0main\0aaaa1111\0commit\0\0refs/remotes/origin/main\0origin/main\0ahead 2, behind 1\0*\0",
+        "refs/remotes/origin/main\0origin/main\0bbbb2222\0commit\0\0\0\0\0\0",
+        "refs/tags/v1\0v1\0cccc3333\0commit\0\0\0\0\0\0",
+      ].join("\n");
+      const refsSnapshotProvider = {
+        getRefs: () =>
+          Promise.resolve({
+            forEachRef,
+            remotes:
+              "origin\thttps://github.com/some-user/some-repo.git (fetch)\n" +
+              "origin\thttps://github.com/some-user/some-repo.git (push)",
+            worktrees: "",
+            symbolicHead: "refs/heads/main\n",
+            headOid: "aaaa1111\n",
+          }),
+      };
+      repoWithRefs = new GitRepository(copyRepository(), {
+        refreshOnWindowFocus: false,
+        refsSnapshotProvider,
+      });
+      await repoWithRefs.refreshRefsSnapshot();
+    });
+
+    afterEach(() => {
+      if (repoWithRefs && !repoWithRefs.isDestroyed()) repoWithRefs.destroy();
+    });
+
+    it("resolves reference targets from the snapshot without libgit2", () => {
+      expect(repoWithRefs.getReferenceTarget("HEAD")).toBe("aaaa1111");
+      expect(repoWithRefs.getReferenceTarget("refs/heads/main")).toBe("aaaa1111");
+      expect(repoWithRefs.getReferenceTarget("refs/remotes/origin/main")).toBe("bbbb2222");
+      expect(repoWithRefs.getReferenceTarget("refs/tags/v1")).toBe("cccc3333");
+      expect(repoWithRefs.hasBranch("main")).toBe(true);
+    });
+
+    it("lists references from the snapshot", () => {
+      expect(repoWithRefs.getReferences()).toEqual({
+        heads: ["refs/heads/main"],
+        remotes: ["refs/remotes/origin/main"],
+        tags: ["refs/tags/v1"],
+      });
+    });
+
+    it("reads the upstream branch and ahead/behind counts from the snapshot", () => {
+      expect(repoWithRefs.getUpstreamBranch()).toBe("refs/remotes/origin/main");
+      expect(repoWithRefs.getAheadBehindCount("main")).toEqual({ ahead: 2, behind: 1 });
+      expect(repoWithRefs.getCachedUpstreamAheadBehindCount()).toEqual({ ahead: 2, behind: 1 });
+    });
+
+    it("reads the origin URL from the snapshot remotes", () => {
+      expect(repoWithRefs.getOriginURL()).toBe("https://github.com/some-user/some-repo.git");
+    });
+  });
+
   describe("status summaries", () => {
     let output, statusSnapshotProvider, workingDirectory;
 

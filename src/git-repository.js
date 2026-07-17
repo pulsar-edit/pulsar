@@ -6,6 +6,7 @@ const GitUtils = require("@lumine-code/git-utils");
 const {
   GitHostStatusProvider,
   GitHostRefsProvider,
+  GitHostConfigProvider,
   GitHostDiffProvider,
   GitHostHistoryProvider,
 } = require("./git-host-providers");
@@ -163,6 +164,7 @@ module.exports = class GitRepository {
     this.pendingRefsSnapshotLoad = null;
     this.diffProvider = options.diffProvider || new GitHostDiffProvider();
     this.historyProvider = options.historyProvider || new GitHostHistoryProvider();
+    this.configProvider = options.configProvider || new GitHostConfigProvider();
     this.upstream = { ahead: 0, behind: 0 };
     for (let submodulePath in this.repo.submodules) {
       const submoduleRepo = this.repo.submodules[submodulePath];
@@ -208,6 +210,7 @@ module.exports = class GitRepository {
     this.refsSnapshotProvider = null;
     this.diffProvider = null;
     this.historyProvider = null;
+    this.configProvider = null;
     this.statusEntriesByPath.clear();
     this.directoryStatusAggregates.clear();
     if (this.statusSnapshotRefreshTimer != null) {
@@ -433,6 +436,14 @@ module.exports = class GitRepository {
   // * `path`      The {String} path in the repository to get this information for,
   //   only needed if the repository contains submodules.
   getAheadBehindCount(reference, path) {
+    if (!path && this.refsSnapshot.initialized) {
+      const branch = this.refsSnapshotBranchForReference(reference);
+      if (branch) {
+        return branch.upstream
+          ? { ahead: branch.upstream.ahead, behind: branch.upstream.behind }
+          : { ahead: 0, behind: 0 };
+      }
+    }
     return this.getRepo(path).getAheadBehindCount(reference);
   }
 
@@ -446,6 +457,12 @@ module.exports = class GitRepository {
   //   * `ahead`  The {Number} of commits ahead.
   //   * `behind` The {Number} of commits behind.
   getCachedUpstreamAheadBehindCount(path) {
+    if (!path && this.refsSnapshot.initialized) {
+      const branch = this.refsSnapshot.branches.find((entry) => entry.isHead);
+      if (branch?.upstream) {
+        return { ahead: branch.upstream.ahead, behind: branch.upstream.behind };
+      }
+    }
     return this.getRepo(path).upstream || this.upstream;
   }
 
@@ -458,11 +475,27 @@ module.exports = class GitRepository {
     return this.getRepo(path).getConfigValue(key);
   }
 
+  // Public: Asynchronously read a git configuration value via the git-host
+  // worker (`git config --get`), the off-thread replacement for the synchronous
+  // libgit2 {::getConfigValue}. Resolves to the value or `null` when unset.
+  //
+  // * `key` The {String} configuration key to look up.
+  //
+  // Returns a {Promise} resolving to a {String} or `null`.
+  getConfigValueAsync(key) {
+    if (!this.configProvider || this.isDestroyed()) return Promise.resolve(null);
+    return this.configProvider.getConfigValue(this.getWorkingDirectory(), key);
+  }
+
   // Public: Returns the origin url of the repository.
   //
   // * `path` (optional) {String} path in the repository to get this information
   //   for, only needed if the repository has submodules.
   getOriginURL(path) {
+    if (!path && this.refsSnapshot.initialized) {
+      const origin = this.refsSnapshot.remotes.find((remote) => remote.name === "origin");
+      if (origin) return origin.fetchUrl ?? null;
+    }
     return this.getConfigValue("remote.origin.url", path);
   }
 
@@ -474,6 +507,10 @@ module.exports = class GitRepository {
   //
   // Returns a {String} branch name such as `refs/remotes/origin/master`.
   getUpstreamBranch(path) {
+    if (!path && this.refsSnapshot.initialized) {
+      const branch = this.refsSnapshot.branches.find((entry) => entry.isHead);
+      return branch?.upstream?.ref ?? null;
+    }
     return this.getRepo(path).getUpstreamBranch();
   }
 
@@ -487,6 +524,14 @@ module.exports = class GitRepository {
   //  * `remotes` An {Array} of remote reference names.
   //  * `tags`    An {Array} of tag reference names.
   getReferences(path) {
+    if (!path && this.refsSnapshot.initialized) {
+      const snapshot = this.refsSnapshot;
+      return {
+        heads: snapshot.branches.map((branch) => branch.ref),
+        remotes: snapshot.remoteBranches.map((branch) => branch.ref),
+        tags: snapshot.tags.map((tag) => tag.ref),
+      };
+    }
     return this.getRepo(path).getReferences();
   }
 
@@ -496,7 +541,43 @@ module.exports = class GitRepository {
   // * `path` An optional {String} path in the repo to get the reference target
   //   for. Only needed if the repository contains submodules.
   getReferenceTarget(reference, path) {
+    if (!path && this.refsSnapshot.initialized) {
+      const target = this.refsSnapshotReferenceTarget(reference);
+      // `undefined` means the snapshot does not know this ref (e.g. a raw SHA or
+      // a note ref); fall through to libgit2. `null` is a definitive answer
+      // (an unborn HEAD).
+      if (target !== undefined) return target;
+    }
     return this.getRepo(path).getReferenceTarget(reference);
+  }
+
+  // Resolve the branch entry a ref/name refers to in the refs snapshot, or the
+  // current HEAD branch when no reference is given.
+  refsSnapshotBranchForReference(reference) {
+    if (!reference) {
+      return this.refsSnapshot.branches.find((branch) => branch.isHead) || null;
+    }
+    return (
+      this.refsSnapshot.branches.find(
+        (branch) => branch.ref === reference || branch.name === reference,
+      ) || null
+    );
+  }
+
+  // Resolve a fully-qualified ref (or `HEAD`) to its object id using the refs
+  // snapshot. Returns `undefined` when the snapshot cannot resolve it, so the
+  // caller can fall back to a live lookup.
+  refsSnapshotReferenceTarget(reference) {
+    if (!reference) return undefined;
+    if (reference === "HEAD") return this.refsSnapshot.head?.oid ?? null;
+    const snapshot = this.refsSnapshot;
+    const branch = snapshot.branches.find((entry) => entry.ref === reference);
+    if (branch) return branch.oid;
+    const remoteBranch = snapshot.remoteBranches.find((entry) => entry.ref === reference);
+    if (remoteBranch) return remoteBranch.oid;
+    const tag = snapshot.tags.find((entry) => entry.ref === reference);
+    if (tag) return tag.oid;
+    return undefined;
   }
 
   /*
