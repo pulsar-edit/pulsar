@@ -23,8 +23,7 @@ describe("Built-in Status Bar Tiles", function () {
       waitsForPromise(() => atom.workspace.open("sample.js"));
 
       runs(function () {
-        let launchMode;
-        [launchMode, fileInfo, cursorPosition, selectionCount] = statusBar
+        [fileInfo, cursorPosition, selectionCount] = statusBar
           .getLeftTiles()
           .map((tile) => tile.getItem());
         editor = atom.workspace.getActiveTextEditor();
@@ -324,7 +323,7 @@ describe("Built-in Status Bar Tiles", function () {
         waitsForPromise(() => atom.packages.activatePackage("status-bar"));
         runs(function () {
           statusBar = workspaceElement.querySelector("status-bar");
-          selectionCount = statusBar.getLeftTiles()[3].getItem();
+          selectionCount = statusBar.getLeftTiles()[2].getItem();
 
           atom.workspace.getActivePane().activateItem(document.createElement("div"));
           expect(editor.getSelectedBufferRange()).toEqual([

@@ -11,6 +11,9 @@ function repositoryFor({ directoryStatusSummary = null } = {}) {
       .createSpy("getDirectoryStatusSummary")
       .andReturn(directoryStatusSummary),
     isPathIgnored: jasmine.createSpy("isPathIgnored").andReturn(false),
+    getWorkingDirectory() {
+      return null;
+    },
     isSubmodule() {
       return false;
     },
