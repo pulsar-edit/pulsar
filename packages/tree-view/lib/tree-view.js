@@ -1136,7 +1136,7 @@ class TreeView {
                 failedDeletions.push(selectedPath);
               })
               .finally(() => {
-                repoForPath(selectedPath)?.getPathStatus(selectedPath);
+                repoForPath(selectedPath)?.scheduleStatusSnapshotRefresh();
               });
 
             deletionPromises.push(promise);
@@ -1440,8 +1440,7 @@ class TreeView {
       this.emitter.emit("entry-copied", { initialPath, newPath });
       let repo = repoForPath(newPath);
       if (repo) {
-        repo.getPathStatus(initialPath);
-        repo.getPathStatus(newPath);
+        repo.scheduleStatusSnapshotRefresh();
       }
     } catch (error) {
       this.emitter.emit("copy-entry-failed", { initialPath, newPath });
@@ -1477,8 +1476,7 @@ class TreeView {
       this.emitter.emit("entry-moved", { initialPath, newPath });
       let repo = repoForPath(newPath);
       if (repo) {
-        repo.getPathStatus(initialPath);
-        repo.getPathStatus(newPath);
+        repo.scheduleStatusSnapshotRefresh();
       }
     } catch (error) {
       if (error.code === "EEXIST") {
@@ -1510,8 +1508,7 @@ class TreeView {
             this.emitter.emit("entry-moved", { initialPath, newPath });
             let repo = repoForPath(newPath);
             if (repo) {
-              repo.getPathStatus(initialPath);
-              repo.getPathStatus(newPath);
+              repo.scheduleStatusSnapshotRefresh();
             }
             break;
           }

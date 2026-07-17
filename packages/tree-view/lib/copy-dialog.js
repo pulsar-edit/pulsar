@@ -62,8 +62,7 @@ module.exports = class CopyDialog extends Dialog {
         });
       }
       if ((repo = repoForPath(newPath))) {
-        repo.getPathStatus(this.initialPath);
-        repo.getPathStatus(newPath);
+        repo.scheduleStatusSnapshotRefresh();
       }
       return this.close();
     } catch (error) {

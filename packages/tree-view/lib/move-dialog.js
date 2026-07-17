@@ -74,8 +74,7 @@ module.exports = class MoveDialog extends Dialog {
       fs.moveSync(this.initialPath, newPath);
       this.onMove?.({ initialPath: this.initialPath, newPath });
       if ((repo = repoForPath(newPath))) {
-        repo.getPathStatus(this.initialPath);
-        repo.getPathStatus(newPath);
+        repo.scheduleStatusSnapshotRefresh();
       }
       return this.close();
     } catch (error) {

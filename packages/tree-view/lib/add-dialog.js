@@ -66,7 +66,7 @@ module.exports = class AddDialog extends Dialog {
           return this.showError(`File names must not end with a '${path.sep}' character.`);
         } else {
           fs.writeFileSync(newPath, "");
-          repoForPath(newPath)?.getPathStatus(newPath);
+          repoForPath(newPath)?.scheduleStatusSnapshotRefresh();
           this.emitter.emit("did-create-file", newPath);
           return this.close();
         }
