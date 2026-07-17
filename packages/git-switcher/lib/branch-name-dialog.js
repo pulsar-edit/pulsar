@@ -1,37 +1,34 @@
-const { SelectListView } = require("@lumine-code/select-list");
+const { InputDialogView } = require("@lumine-code/select-list");
 
-// Branch-name prompt implemented as an empty SelectListView: its query is the
-// proposed name, and confirming with no selected item submits that query.
+// Branch-name prompt built on InputDialogView: the query is the proposed name
+// and confirming submits it.
 module.exports = class BranchNameDialog {
   constructor() {
-    this.selectListView = new SelectListView({
+    this.inputDialogView = new InputDialogView({
       className: "git-switcher-branch-name-dialog",
-      items: [],
-      infoMessage: null,
-      didChangeQuery: () => this.selectListView.update({ errorMessage: null }),
-      didConfirmEmptySelection: () => this.confirm(),
-      didCancelSelection: () => this.hide(),
+      didChangeQuery: () => this.inputDialogView.update({ errorMessage: null }),
+      didConfirm: () => this.confirm(),
+      didCancel: () => this.hide(),
     });
   }
 
   show({ prompt, onConfirm }) {
     this.onConfirm = onConfirm;
     this.pending = false;
-    this.selectListView.reset();
-    this.selectListView.update({
-      items: [],
+    this.inputDialogView.reset();
+    this.inputDialogView.update({
       infoMessage: prompt,
       errorMessage: null,
       placeholderText: "Branch name",
     });
-    this.selectListView.show();
+    this.inputDialogView.show();
   }
 
   async confirm() {
-    const name = this.selectListView.getQuery().trim();
+    const name = this.inputDialogView.getQuery().trim();
     if (this.pending) return;
     if (!name) {
-      await this.selectListView.update({ errorMessage: "Enter a branch name." });
+      await this.inputDialogView.update({ errorMessage: "Enter a branch name." });
       return;
     }
 
@@ -42,10 +39,10 @@ module.exports = class BranchNameDialog {
   }
 
   hide() {
-    this.selectListView.hide();
+    this.inputDialogView.hide();
   }
 
   destroy() {
-    this.selectListView.destroy();
+    this.inputDialogView.destroy();
   }
 };

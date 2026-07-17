@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@vscode/ripgrep": "1.18.0",
-    "@lumine-code/select-list": "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
+    "@lumine-code/select-list": "https://github.com/lumine-code/select-list.git#1caf31cbca096e432bd12a844e53525a3188d0ff"
   },
   "configSchema": {
     "ignoredNames": {

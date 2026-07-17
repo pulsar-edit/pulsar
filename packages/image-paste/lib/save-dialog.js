@@ -1,22 +1,14 @@
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
-const { CompositeDisposable, Disposable, TextEditor } = require("atom");
+const { InputDialogView } = require("@lumine-code/select-list");
 
 module.exports = class SaveDialog {
   constructor({ nativeImage }) {
     this.nativeImage = nativeImage;
-    this.disposables = new CompositeDisposable();
-    this.element = document.createElement("div");
-    this.element.classList.add("dialog", "image-paste", "save-dialog");
-
-    this.miniEditor = new TextEditor({ mini: true });
-    this.element.appendChild(this.miniEditor.element);
-    this.disposables.add(atom.textEditors.add(this.miniEditor));
 
     this.previewElement = document.createElement("div");
     this.previewElement.classList.add("image-paste-preview");
-    this.element.appendChild(this.previewElement);
 
     this.warningElement = document.createElement("div");
     this.warningElement.classList.add("image-paste-warning");
@@ -27,31 +19,23 @@ module.exports = class SaveDialog {
     this.imageElement.alt = "Clipboard image preview";
     this.previewElement.appendChild(this.imageElement);
 
-    const blurHandler = () => {
-      if (document.hasFocus()) this.hide();
-    };
-    this.miniEditor.element.addEventListener("blur", blurHandler);
-    this.disposables.add(
-      new Disposable(() => this.miniEditor.element.removeEventListener("blur", blurHandler)),
-      this.miniEditor.onDidChange(() => this.clearWarning()),
-      atom.commands.add(this.element, {
-        "core:confirm": () => this.confirm(),
-        "core:cancel": () => this.hide(),
-      }),
-    );
+    this.inputDialogView = new InputDialogView({
+      className: "image-paste save-dialog",
+      contentElement: this.previewElement,
+      didChangeQuery: () => this.clearWarning(),
+      didConfirm: () => this.confirm(),
+      didCancel: () => this.hide(),
+    });
+    this.miniEditor = this.inputDialogView.refs.queryEditor;
   }
 
   destroy() {
-    this.panel?.destroy();
-    this.panel = null;
-    this.miniEditor.destroy();
-    this.disposables.dispose();
+    this.inputDialogView.destroy();
   }
 
   prepare({ target, pngBuffer, sourceName = null }) {
     this.target = target;
     this.pngBuffer = Buffer.from(pngBuffer);
-    this.overwritePath = null;
     this.saving = false;
 
     const hash = crypto.createHash("md5").update(this.pngBuffer).digest("hex").slice(0, 8);
@@ -78,27 +62,16 @@ module.exports = class SaveDialog {
       initialPath = initialPath.replace(/\\/g, "/");
     }
     this.miniEditor.setText(initialPath);
-    this.selectBaseName(initialPath);
     this.clearWarning();
     this.imageElement.src = atom.config.get("image-paste.imagePreview")
       ? `data:image/png;base64,${this.pngBuffer.toString("base64")}`
       : "";
-    this.show();
-  }
-
-  show() {
-    if (!this.panel) this.panel = atom.workspace.addModalPanel({ item: this });
-    const activeElement = document.activeElement;
-    if (activeElement && !activeElement.closest(".modal")) this.priorFocus = activeElement;
-    this.panel.show();
-    this.miniEditor.element.focus();
+    this.inputDialogView.show();
+    this.selectBaseName(initialPath);
   }
 
   hide() {
-    if (!this.panel?.isVisible()) return;
-    this.panel.hide();
-    this.priorFocus?.focus();
-    this.priorFocus = null;
+    this.inputDialogView.hide();
   }
 
   clearWarning() {

@@ -198,12 +198,11 @@ describe("git-switcher", () => {
     spyOn(operations, "checkout").andReturn(Promise.resolve());
 
     branchListView.performAction("create");
-    const nameListView = branchListView.branchNameDialog.selectListView;
-    expect(nameListView.props.items).toEqual([]);
-    expect(nameListView.props.infoMessage).toBe("Please provide a new branch name");
-    expect(nameListView.refs.queryEditor.getPlaceholderText()).toBe("Branch name");
-    nameListView.refs.queryEditor.setText("new-branch");
-    await nameListView.props.didConfirmEmptySelection();
+    const nameInputDialogView = branchListView.branchNameDialog.inputDialogView;
+    expect(nameInputDialogView.props.infoMessage).toBe("Please provide a new branch name");
+    expect(nameInputDialogView.refs.queryEditor.getPlaceholderText()).toBe("Branch name");
+    nameInputDialogView.refs.queryEditor.setText("new-branch");
+    await nameInputDialogView.props.didConfirm();
     expect(operations.checkout).toHaveBeenCalledWith("new-branch", { createNew: true });
 
     await branchListView.showReferenceList("create-from", repoA.repository);
@@ -211,8 +210,8 @@ describe("git-switcher", () => {
       (item) => item.reference === "main",
     );
     branchListView.confirmReference(main);
-    nameListView.refs.queryEditor.setText("from-main");
-    await nameListView.props.didConfirmEmptySelection();
+    nameInputDialogView.refs.queryEditor.setText("from-main");
+    await nameInputDialogView.props.didConfirm();
     expect(operations.checkout).toHaveBeenCalledWith("from-main", {
       createNew: true,
       startPoint: "main",
