@@ -208,6 +208,7 @@ class AtomEnvironment {
     });
 
     this.themes.workspace = this.workspace;
+    this.repositories.attachWorkspace(this.workspace);
 
     if (this.keymaps.canLoadBundledKeymapsFromMemory()) {
       this.keymaps.loadBundledKeymaps();
@@ -451,6 +452,9 @@ class AtomEnvironment {
     this.registerDefaultOpeners();
     this.project.reset(this.packages);
     this.workspace.initialize({ configDirPath: this.getConfigDirPath() });
+    // The reset recreated the pane containers, so the registry's active-item
+    // subscription must be rebuilt against the new center.
+    this.repositories.attachWorkspace(this.workspace);
     this.grammars.clear();
     this.textEditors.clear();
     this.pasteProviders.clear();

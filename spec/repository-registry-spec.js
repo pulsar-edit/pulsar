@@ -691,6 +691,149 @@ describe("RepositoryRegistry", () => {
     ]);
   });
 
+  describe("active repository", () => {
+    class FakeWorkspace {
+      constructor() {
+        this.emitter = new Emitter();
+        this.activeItem = null;
+        this.center = {
+          onDidChangeActivePaneItem: (callback) =>
+            this.emitter.on("did-change-active-pane-item", callback),
+          getActivePaneItem: () => this.activeItem,
+        };
+      }
+
+      getCenter() {
+        return this.center;
+      }
+
+      setActiveItem(item) {
+        this.activeItem = item;
+        this.emitter.emit("did-change-active-pane-item", item);
+      }
+    }
+
+    function itemFor(filePath) {
+      return { getPath: () => filePath };
+    }
+
+    async function flushMicrotasks() {
+      // The harness fakes timers, so drain the microtask queue directly.
+      for (let i = 0; i < 10; i++) {
+        await Promise.resolve();
+      }
+    }
+
+    let workspace;
+    let workdirA;
+    let workdirB;
+    let repoA;
+    let repoB;
+
+    beforeEach(() => {
+      workspace = new FakeWorkspace();
+      workdirA = temp.mkdirSync("active-repository-a");
+      workdirB = temp.mkdirSync("active-repository-b");
+      repoA = new FakeRepository(workdirA);
+      repoB = new FakeRepository(workdirB);
+      repositories.push(repoA, repoB);
+      registry.setProjectRoots([directoryFor(workdirA), directoryFor(workdirB)]);
+    });
+
+    it("follows the active pane item and keeps the current repository for other items", () => {
+      const events = [];
+      registry.onDidChangeActiveRepository((event) => events.push(event));
+      registry.attachWorkspace(workspace);
+
+      // Registering the project roots already adopted the first repository.
+      expect(registry.getActiveRepository()).toBe(repoA);
+      expect(registry.isActiveRepositoryPinned()).toBe(false);
+
+      workspace.setActiveItem(itemFor(path.join(workdirB, "file.txt")));
+      expect(registry.getActiveRepository()).toBe(repoB);
+
+      // Items without a path (settings tabs) and paths outside every
+      // repository keep the current selection.
+      workspace.setActiveItem({});
+      expect(registry.getActiveRepository()).toBe(repoB);
+      workspace.setActiveItem(itemFor(path.join(temp.mkdirSync("active-outside"), "loose.txt")));
+      expect(registry.getActiveRepository()).toBe(repoB);
+
+      workspace.setActiveItem(itemFor(path.join(workdirA, "back.txt")));
+      expect(registry.getActiveRepository()).toBe(repoA);
+
+      expect(events.map((event) => event.repository)).toEqual([repoB, repoA]);
+    });
+
+    it("pins a manual selection until it is cleared", () => {
+      registry.attachWorkspace(workspace);
+      workspace.setActiveItem(itemFor(path.join(workdirA, "file.txt")));
+
+      registry.setActiveRepository(repoB, { pin: true });
+      expect(registry.getActiveRepository()).toBe(repoB);
+      expect(registry.isActiveRepositoryPinned()).toBe(true);
+
+      workspace.setActiveItem(itemFor(path.join(workdirA, "other.txt")));
+      expect(registry.getActiveRepository()).toBe(repoB);
+
+      registry.setActiveRepository(null);
+      expect(registry.isActiveRepositoryPinned()).toBe(false);
+      // Recomputed from the workspace's current active item.
+      expect(registry.getActiveRepository()).toBe(repoA);
+    });
+
+    it("allows an unpinned manual selection to be superseded by the next item change", () => {
+      registry.attachWorkspace(workspace);
+
+      registry.setActiveRepository(repoB);
+      expect(registry.getActiveRepository()).toBe(repoB);
+      expect(registry.isActiveRepositoryPinned()).toBe(false);
+
+      workspace.setActiveItem(itemFor(path.join(workdirA, "file.txt")));
+      expect(registry.getActiveRepository()).toBe(repoA);
+    });
+
+    it("falls back to another repository when the active one is removed", async () => {
+      const events = [];
+      registry.attachWorkspace(workspace);
+      workspace.setActiveItem(itemFor(path.join(workdirB, "file.txt")));
+      expect(registry.getActiveRepository()).toBe(repoB);
+      registry.onDidChangeActiveRepository((event) => events.push(event));
+
+      repositories.splice(repositories.indexOf(repoB), 1);
+      repoB.destroy();
+      await flushMicrotasks();
+
+      expect(registry.getActiveRepository()).toBe(repoA);
+      expect(events.map((event) => event.repository)).toEqual([null, repoA]);
+    });
+
+    it("keeps a pinned out-of-project repository alive until it is deactivated", () => {
+      registry.attachWorkspace(workspace);
+      const workdirC = temp.mkdirSync("active-repository-c");
+      const repoC = new FakeRepository(workdirC);
+      repositories.push(repoC);
+      registry.resolveForPathSync(path.join(workdirC, "file.txt"));
+
+      registry.setActiveRepository(repoC, { pin: true });
+      expect(registry.getRepositories()).toContain(repoC);
+
+      registry.setActiveRepository(repoA);
+      expect(repoC.isDestroyed()).toBe(true);
+    });
+
+    it("resolves and activates a repository by path", async () => {
+      registry.attachWorkspace(workspace);
+      const repository = await registry.setActiveRepositoryForPath(
+        path.join(workdirB, "deep", "file.txt"),
+        { pin: true },
+      );
+      expect(repository).toBe(repoB);
+      expect(registry.getActiveRepository()).toBe(repoB);
+      expect(registry.isActiveRepositoryPinned()).toBe(true);
+    });
+  });
+
   it("serializes initialize and clone operations targeting the same destination", async () => {
     const destinationPath = path.join(temp.mkdirSync("workspace-operation-parent"), "repository");
     const calls = [];

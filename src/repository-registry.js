@@ -50,6 +50,11 @@ module.exports = class RepositoryRegistry {
     this.emitter = new Emitter();
     this.subscriptions = new CompositeDisposable();
     this.projectSubscriptions = new CompositeDisposable();
+    this.workspaceSubscriptions = new CompositeDisposable();
+    this.workspace = null;
+    this.activeRepository = null;
+    this.activeRepositoryPinned = false;
+    this.activeRepositoryPin = null;
 
     this.entriesById = new Map();
     this.entryByRepository = new WeakMap();
@@ -108,11 +113,170 @@ module.exports = class RepositoryRegistry {
     this.bufferOwners.clear();
     this.rootPaths = [];
 
+    // Release the active repository before pruning so its keep-alive pin
+    // cannot hold a repository across a project detach.
+    this.applyActiveRepository(null, { pinned: false });
+
     for (const entry of Array.from(this.entriesById.values())) {
       entry.rootOwners.clear();
       this.prune(entry);
     }
     this.project = null;
+  }
+
+  // Follow the workspace's active pane item to maintain the active repository.
+  // Safe to call again after the workspace resets its pane containers.
+  attachWorkspace(workspace) {
+    if (this.destroyed) throw new Error("Cannot attach a destroyed RepositoryRegistry");
+    this.workspaceSubscriptions.dispose();
+    this.workspaceSubscriptions = new CompositeDisposable();
+    this.workspace = workspace;
+    this.workspaceSubscriptions.add(
+      workspace.getCenter().onDidChangeActivePaneItem((item) => {
+        this.updateActiveRepositoryFromPaneItem(item);
+      }),
+    );
+    this.updateActiveRepositoryFromPaneItem(workspace.getCenter().getActivePaneItem());
+  }
+
+  detachWorkspace(workspace) {
+    if (this.workspace !== workspace) return;
+    this.workspaceSubscriptions.dispose();
+    this.workspaceSubscriptions = new CompositeDisposable();
+    this.workspace = null;
+  }
+
+  // Public: The repository the window is currently working in, or null. It
+  // follows the active pane item unless a consumer pinned a selection with
+  // {::setActiveRepository}, and prefers keeping the current repository when
+  // the active item has no path or lies outside every known repository.
+  getActiveRepository() {
+    return this.activeRepository;
+  }
+
+  // Public: Whether the active repository is pinned to a manual selection.
+  isActiveRepositoryPinned() {
+    return this.activeRepositoryPinned;
+  }
+
+  // Public: Invoke the callback with `{repository, pinned}` whenever the
+  // active repository or its pinned state changes.
+  onDidChangeActiveRepository(callback) {
+    return this.emitter.on("did-change-active-repository", callback);
+  }
+
+  // Public: Invoke the callback with the current `{repository, pinned}` state
+  // immediately, and again on every change.
+  observeActiveRepository(callback) {
+    callback(
+      Object.freeze({ repository: this.activeRepository, pinned: this.activeRepositoryPinned }),
+    );
+    return this.onDidChangeActiveRepository(callback);
+  }
+
+  // Public: Select the active repository manually. Passing `pin: true` keeps
+  // the selection until it is cleared; otherwise the next pane item change may
+  // move the active repository again. Passing null clears any pin and
+  // recomputes the active repository from the workspace.
+  setActiveRepository(repository, { pin = false } = {}) {
+    if (this.destroyed) throw new Error("Cannot activate a repository on a destroyed registry");
+
+    if (repository == null) {
+      this.activeRepositoryPinned = false;
+      this.recomputeActiveRepository({ emitOnPinChange: true });
+      return;
+    }
+
+    const entry = this.entryByRepository.get(repository) || this.register(repository);
+    if (!entry) {
+      throw new TypeError("Cannot activate an unregistered or destroyed repository");
+    }
+    this.applyActiveRepository(entry.repository, { pinned: pin });
+  }
+
+  // Public: Resolve the repository for a path and make it the active one.
+  // Resolves to the repository, or null when the path is not in a repository.
+  async setActiveRepositoryForPath(filePath, { pin = false } = {}) {
+    const repository = await this.resolveForPath(filePath);
+    if (!repository || this.destroyed) return null;
+    this.setActiveRepository(repository, { pin });
+    return repository;
+  }
+
+  // Items may report the repository they belong to either through a file path
+  // or, for path-less views such as terminals and diff panes, through a
+  // working directory.
+  static pathForPaneItem(item) {
+    if (typeof item?.getWorkingDirectory === "function") {
+      const workingDirectory = item.getWorkingDirectory();
+      if (workingDirectory) return workingDirectory;
+    }
+    return typeof item?.getPath === "function" ? item.getPath() : null;
+  }
+
+  updateActiveRepositoryFromPaneItem(item) {
+    if (this.destroyed || this.activeRepositoryPinned) return;
+
+    const itemPath = RepositoryRegistry.pathForPaneItem(item);
+    if (itemPath) {
+      const repository = this.resolveForPathSync(itemPath);
+      if (repository) {
+        this.applyActiveRepository(repository, { pinned: false });
+        return;
+      }
+    }
+
+    // Items without a path, and items outside every repository, keep the
+    // current active repository so transient tabs never blank it out.
+    if (!this.activeRepository || this.activeRepository.isDestroyed?.()) {
+      this.applyActiveRepository(this.defaultActiveRepository(), { pinned: false });
+    }
+  }
+
+  recomputeActiveRepository({ emitOnPinChange = false } = {}) {
+    const item = this.workspace?.getCenter?.().getActivePaneItem?.();
+    const itemPath = RepositoryRegistry.pathForPaneItem(item);
+    let repository = itemPath ? this.resolveForPathSync(itemPath) : null;
+    if (!repository && this.activeRepository && !this.activeRepository.isDestroyed?.()) {
+      repository = this.activeRepository;
+    }
+    if (!repository) repository = this.defaultActiveRepository();
+    this.applyActiveRepository(repository, { pinned: false, emitOnPinChange });
+  }
+
+  defaultActiveRepository() {
+    for (const rootPath of this.rootPaths) {
+      const repository = this.getForPath(rootPath);
+      if (repository) return repository;
+    }
+    const repositories = this.getRepositories();
+    return repositories.length > 0 ? repositories[0] : null;
+  }
+
+  applyActiveRepository(repository, { pinned, emitOnPinChange = true } = {}) {
+    const normalized = repository && !repository.isDestroyed?.() ? repository : null;
+    const nextPinned = normalized ? pinned : false;
+    const repositoryChanged = normalized !== this.activeRepository;
+    const pinChanged = nextPinned !== this.activeRepositoryPinned;
+    if (!repositoryChanged && !(pinChanged && emitOnPinChange)) {
+      this.activeRepositoryPinned = nextPinned;
+      return;
+    }
+
+    // Only a pinned manual selection keeps its repository alive; an
+    // automatically selected repository follows the normal ownership
+    // lifecycle and falls back through removeEntry when it goes away.
+    // Acquire the new pin before releasing the old one so a pin-state-only
+    // change can never prune the repository in between.
+    const nextPin = normalized && nextPinned ? this.retain(normalized, "active-repository") : null;
+    if (this.activeRepositoryPin) this.activeRepositoryPin.dispose();
+    this.activeRepositoryPin = nextPin;
+    this.activeRepository = normalized;
+    this.activeRepositoryPinned = nextPinned;
+    this.emitter.emit(
+      "did-change-active-repository",
+      Object.freeze({ repository: normalized, pinned: nextPinned }),
+    );
   }
 
   destroy() {
@@ -121,6 +285,10 @@ module.exports = class RepositoryRegistry {
     this.scanGeneration++;
     this.subscriptions.dispose();
     this.projectSubscriptions.dispose();
+    this.workspaceSubscriptions.dispose();
+    this.workspace = null;
+    this.activeRepository = null;
+    this.activeRepositoryPin = null;
 
     for (const owner of this.bufferOwners.values()) owner.subscriptions.dispose();
     this.bufferOwners.clear();
@@ -1080,6 +1248,16 @@ module.exports = class RepositoryRegistry {
         routingChangedPrefixes: [workingDirectory],
       });
     }
+
+    // A window without an active repository adopts the first one that appears.
+    if (!this.activeRepository) {
+      queueMicrotask(() => {
+        if (!this.destroyed && !this.activeRepository) {
+          this.recomputeActiveRepository();
+        }
+      });
+    }
+
     return entry;
   }
 
@@ -1130,6 +1308,15 @@ module.exports = class RepositoryRegistry {
     entry.destroySubscription.dispose();
     this.disposeOperationImplementations(entry);
     entry.repository.setOperations?.(null);
+
+    if (entry.repository === this.activeRepository) {
+      this.applyActiveRepository(null, { pinned: false });
+      queueMicrotask(() => {
+        if (!this.destroyed && !this.activeRepository) {
+          this.recomputeActiveRepository({ emitOnPinChange: true });
+        }
+      });
+    }
 
     if (destroy && !entry.repository.isDestroyed?.()) entry.repository.destroy();
 
