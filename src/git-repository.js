@@ -3,10 +3,12 @@ const fs = require("@lumine-code/fs-plus");
 const _ = require("@lumine-code/underscore-plus");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
 const GitUtils = require("@lumine-code/git-utils");
-const DugiteRepositoryStatusProvider = require("./dugite-repository-status-provider");
-const DugiteRepositoryRefsProvider = require("./dugite-repository-refs-provider");
-const DugiteRepositoryDiffProvider = require("./dugite-repository-diff-provider");
-const DugiteRepositoryHistoryProvider = require("./dugite-repository-history-provider");
+const {
+  GitHostStatusProvider,
+  GitHostRefsProvider,
+  GitHostDiffProvider,
+  GitHostHistoryProvider,
+} = require("./git-host-providers");
 const { parseDiffPatch } = require("./repository-diff");
 const {
   parseCommitRecords,
@@ -131,18 +133,19 @@ module.exports = class GitRepository {
 
     this.statusRefreshCount = 0;
     this.statuses = {};
-    this.statusSnapshotProvider =
-      options.statusSnapshotProvider || new DugiteRepositoryStatusProvider();
+    this.statusSnapshotProvider = options.statusSnapshotProvider || new GitHostStatusProvider();
     this.statusSnapshot = EMPTY_STATUS_SNAPSHOT;
     this.statusSnapshotCacheKey = null;
     this.statusSnapshotRefreshCount = 0;
     this.statusEntriesByPath = new Map();
     this.directoryStatusAggregates = new Map();
+    this.ignoredFileKeys = new Set();
+    this.ignoredDirKeys = [];
     this.statusSnapshotSubscriberCount = 0;
     this.statusSnapshotDebounceMs = options.statusSnapshotDebounceMs ?? 150;
     this.statusSnapshotRefreshTimer = null;
     this.pendingStatusSnapshotLoad = null;
-    this.refsSnapshotProvider = options.refsSnapshotProvider || new DugiteRepositoryRefsProvider();
+    this.refsSnapshotProvider = options.refsSnapshotProvider || new GitHostRefsProvider();
     this.refsSnapshot = EMPTY_REFS_SNAPSHOT;
     this.refsSnapshotCacheKey = null;
     this.refsSnapshotRefreshCount = 0;
@@ -150,8 +153,8 @@ module.exports = class GitRepository {
     this.refsSnapshotDebounceMs = options.refsSnapshotDebounceMs ?? 150;
     this.refsSnapshotRefreshTimer = null;
     this.pendingRefsSnapshotLoad = null;
-    this.diffProvider = options.diffProvider || new DugiteRepositoryDiffProvider();
-    this.historyProvider = options.historyProvider || new DugiteRepositoryHistoryProvider();
+    this.diffProvider = options.diffProvider || new GitHostDiffProvider();
+    this.historyProvider = options.historyProvider || new GitHostHistoryProvider();
     this.upstream = { ahead: 0, behind: 0 };
     for (let submodulePath in this.repo.submodules) {
       const submoduleRepo = this.repo.submodules[submodulePath];
@@ -504,6 +507,28 @@ module.exports = class GitRepository {
     return this.getRepo().isIgnored(this.relativize(path));
   }
 
+  // Public: Like {::isPathIgnored}, but resolved synchronously from the Dugite
+  // status snapshot's ignored entries instead of libgit2. Falls back to
+  // {::isPathIgnored} until the first snapshot loads so first paint is unchanged.
+  //
+  // * `filePath` The {String} path to check.
+  //
+  // Returns a {Boolean} that's true if the `filePath` is ignored.
+  isPathIgnoredCached(filePath) {
+    if (this.isDestroyed()) return false;
+
+    if (this.statusSnapshot.initialized) {
+      const relativePath = this.relativize(String(filePath));
+      if (relativePath == null || relativePath === "") return false;
+      const key = statusPathKey(relativePath);
+      if (this.ignoredFileKeys.has(key)) return true;
+      return this.ignoredDirKeys.some((dir) => key === dir || key.startsWith(`${dir}/`));
+    }
+
+    // Pre-snapshot fallback (removed with git-utils in a later phase).
+    return this.getRepo().isIgnored(this.relativize(filePath));
+  }
+
   // Refresh the cached git-utils status of a single path. Internal engine for
   // {::getPathStatusSummary}; consumers read summaries instead of status bits.
   getPathStatus(path) {
@@ -585,7 +610,10 @@ module.exports = class GitRepository {
     if (!provider || this.isDestroyed()) throw new Error("Repository has been destroyed");
 
     const refreshCount = ++this.statusSnapshotRefreshCount;
-    const includeIgnored = options.includeIgnored === true;
+    // Ignored entries are included by default so tree-view/tabs can resolve
+    // ignore state synchronously from the snapshot ({::isPathIgnoredCached}).
+    // Pass `includeIgnored: false` explicitly to opt out.
+    const includeIgnored = options.includeIgnored !== false;
     const output = await provider.getStatus(this.getWorkingDirectory(), {
       ...options,
       includeIgnored,
@@ -608,8 +636,28 @@ module.exports = class GitRepository {
       snapshot.files.map((entry) => [statusPathKey(entry.path), entry]),
     );
     this.directoryStatusAggregates = this.buildDirectoryStatusAggregates(snapshot);
+    this.rebuildIgnoredIndex(snapshot);
     this.emitter.emit("did-change-status-snapshot", snapshot);
     return snapshot;
+  }
+
+  // Index the snapshot's ignored entries for O(1) `isPathIgnoredCached` lookups.
+  // `git status --ignored=matching` collapses a fully-ignored directory to a
+  // single `path/` entry, so those are kept as directory prefixes and everything
+  // beneath them counts as ignored; individually-ignored files are exact keys.
+  rebuildIgnoredIndex(snapshot) {
+    const ignoredFileKeys = new Set();
+    const ignoredDirKeys = [];
+    for (const entry of snapshot.files) {
+      if (!entry.ignored) continue;
+      if (entry.path.endsWith("/")) {
+        ignoredDirKeys.push(statusPathKey(entry.path.slice(0, -1)));
+      } else {
+        ignoredFileKeys.add(statusPathKey(entry.path));
+      }
+    }
+    this.ignoredFileKeys = ignoredFileKeys;
+    this.ignoredDirKeys = ignoredDirKeys;
   }
 
   // One pass over the snapshot's changed files, OR-ing each file's
@@ -851,7 +899,13 @@ module.exports = class GitRepository {
   // Returns a {Promise} resolving to a frozen `{commits, hasMore, nextCursor}`
   // object. Each commit has `sha`, `parents`, `author`, `committer`,
   // `subject`, and `body`. An unborn repository resolves to an empty page.
-  async getCommits({ revision = "HEAD", path: pathOption = null, limit = 50, cursor = null, signal } = {}) {
+  async getCommits({
+    revision = "HEAD",
+    path: pathOption = null,
+    limit = 50,
+    cursor = null,
+    signal,
+  } = {}) {
     const provider = this.requireHistoryProvider();
     const effectiveRevision = cursor?.revision ?? revision;
     const skip = cursor?.skip ?? 0;
@@ -984,6 +1038,30 @@ module.exports = class GitRepository {
     const options = { ignoreEolWhitespace: process.platform === "win32" };
     const repo = this.getRepo(path);
     return repo.getLineDiffs(repo.relativize(path), text, options);
+  }
+
+  // Public: Like {::getLineDiffs}, but computed off the renderer thread by the
+  // git-host worker (fetching and caching the HEAD blob, diffing in JS) instead
+  // of synchronously via libgit2.
+  //
+  // * `filePath` The {String} path relative to the repository.
+  // * `text` The {String} to compare against the `HEAD` contents.
+  //
+  // Returns a {Promise} resolving to the same hunk {Array} as {::getLineDiffs}.
+  getLineDiffsAsync(filePath, text) {
+    if (this.isDestroyed()) return Promise.resolve([]);
+    const repo = this.getRepo(filePath);
+    const relativePosixPath = repo.relativize(filePath).split(path.sep).join("/");
+    // The status snapshot's head oid keys the worker's blob cache. It only
+    // applies to the top-level repository; a file inside a submodule resolves
+    // its own HEAD in the worker (headOid left null).
+    const headOid = repo === this.repo ? (this.statusSnapshot?.head?.oid ?? null) : null;
+    return this.diffProvider.getLineDiffs(repo.getWorkingDirectory(), {
+      relativePosixPath,
+      headOid,
+      text,
+      ignoreEolWhitespace: process.platform === "win32",
+    });
   }
 
   /*

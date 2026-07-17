@@ -157,12 +157,14 @@ describe("GitDiff package", () => {
   describe("move-to-next-diff/move-to-previous-diff events", () => {
     it("moves the cursor to first character of the next/previous diff line", () => {
       editor.insertText("a");
-      waitsFor(() => editor.getMarkers().length > 0);
-      runs(() => {
-        editor.setCursorBufferPosition([5]);
-        editor.deleteLine();
-        advanceClock(editor.getBuffer().stoppedChangingDelay);
+      editor.setCursorBufferPosition([5]);
+      editor.deleteLine();
+      advanceClock(editor.getBuffer().stoppedChangingDelay);
 
+      // The diff is computed off-thread by the git-host worker now, so wait for
+      // the deletion marker before exercising the navigation commands.
+      waitsFor(() => editorElement.querySelectorAll(".git-line-removed").length > 0);
+      runs(() => {
         editor.setCursorBufferPosition([0]);
         atom.commands.dispatch(editorElement, "git-diff:move-to-next-diff");
         expect(editor.getCursorBufferPosition()).toEqual([4, 4]);
@@ -174,12 +176,12 @@ describe("GitDiff package", () => {
 
     it("wraps around to the first/last diff in the file", () => {
       editor.insertText("a");
-      waitsFor(() => editor.getMarkers().length > 0);
-      runs(() => {
-        editor.setCursorBufferPosition([5]);
-        editor.deleteLine();
-        advanceClock(editor.getBuffer().stoppedChangingDelay);
+      editor.setCursorBufferPosition([5]);
+      editor.deleteLine();
+      advanceClock(editor.getBuffer().stoppedChangingDelay);
 
+      waitsFor(() => editorElement.querySelectorAll(".git-line-removed").length > 0);
+      runs(() => {
         editor.setCursorBufferPosition([0]);
         atom.commands.dispatch(editorElement, "git-diff:move-to-next-diff");
         expect(editor.getCursorBufferPosition().toArray()).toEqual([4, 4]);
@@ -200,7 +202,7 @@ describe("GitDiff package", () => {
         editor.setCursorBufferPosition([5]);
         editor.deleteLine();
         advanceClock(editor.getBuffer().stoppedChangingDelay);
-        waitsFor(() => editor.getMarkers().length > 0);
+        waitsFor(() => editorElement.querySelectorAll(".git-line-removed").length > 0);
 
         runs(() => {
           editor.setCursorBufferPosition([0]);

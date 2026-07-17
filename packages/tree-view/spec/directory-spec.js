@@ -10,7 +10,7 @@ function repositoryFor({ directoryStatusSummary = null } = {}) {
     getDirectoryStatusSummary: jasmine
       .createSpy("getDirectoryStatusSummary")
       .andReturn(directoryStatusSummary),
-    isPathIgnored: jasmine.createSpy("isPathIgnored").andReturn(false),
+    isPathIgnoredCached: jasmine.createSpy("isPathIgnoredCached").andReturn(false),
     getWorkingDirectory() {
       return null;
     },

@@ -1944,7 +1944,7 @@ describe("TabBarView", () => {
       spyOn(tab1, "updateVcsStatus").andCallThrough();
 
       // Mock the repository
-      repository = jasmine.createSpyObj("repo", ["isPathIgnored", "getPathStatusSummary"]);
+      repository = jasmine.createSpyObj("repo", ["isPathIgnoredCached", "getPathStatusSummary"]);
       repository.onDidChangeStatusSnapshot = function () {
         return { dispose() {} };
       };
@@ -2031,7 +2031,7 @@ describe("TabBarView", () => {
       });
 
       it("adds custom style for ignored items", () => {
-        repository.isPathIgnored.andReturn(true);
+        repository.isPathIgnoredCached.andReturn(true);
         tab.updateVcsStatus(repository);
         expect(tabBar.element.querySelectorAll(".tab")[1].querySelector(".title")).toHaveClass(
           "status-ignored",

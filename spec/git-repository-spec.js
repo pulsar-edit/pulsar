@@ -358,6 +358,24 @@ describe("GitRepository", () => {
       expect(statusOptions.signal).toBe(signal);
     });
 
+    it("resolves ignore state from the snapshot's ignored entries", async () => {
+      output = [
+        "# branch.oid abc123",
+        "# branch.head main",
+        "! secret.key",
+        "! node_modules/",
+        "",
+      ].join("\0");
+      await repo.refreshStatusSnapshot();
+
+      expect(repo.isPathIgnoredCached(path.join(workingDirectory, "secret.key"))).toBe(true);
+      expect(repo.isPathIgnoredCached(path.join(workingDirectory, "node_modules", "foo.js"))).toBe(
+        true,
+      );
+      expect(repo.isPathIgnoredCached(path.join(workingDirectory, "node_modules"))).toBe(true);
+      expect(repo.isPathIgnoredCached(path.join(workingDirectory, "src", "index.js"))).toBe(false);
+    });
+
     it("does not let an older concurrent refresh replace a newer snapshot", async () => {
       const resolvers = [];
       statusSnapshotProvider.getStatus.andCallFake(
@@ -759,11 +777,10 @@ describe("GitRepository", () => {
 
     beforeEach(async () => {
       atom.project.setPaths([copyRepository()]);
-      const refreshPromise = new Promise((resolve) =>
-        atom.repositories.getRepositories()[0].onDidChangeStatuses(resolve),
-      );
       editor = await atom.workspace.open("other.txt");
-      await refreshPromise;
+      // Discovery no longer eagerly refreshes status; load the baseline
+      // explicitly so buffer-save status transitions are observable.
+      await atom.repositories.getRepositories()[0].refreshStatus();
     });
 
     it("emits a status-changed event when a buffer is saved", async () => {

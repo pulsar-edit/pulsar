@@ -40,7 +40,7 @@ export default class DiffListView {
       this.editor = editor;
       const repository = await repositoryForPath(this.editor.getPath());
       let diffs = repository
-        ? repository.getLineDiffs(this.editor.getPath(), this.editor.getText())
+        ? await repository.getLineDiffsAsync(this.editor.getPath(), this.editor.getText())
         : [];
       if (!diffs) diffs = [];
       for (let diff of diffs) {

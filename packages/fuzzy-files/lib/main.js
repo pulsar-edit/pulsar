@@ -1,9 +1,5 @@
 const { CompositeDisposable, Disposable } = require("atom");
-const {
-  SelectListView,
-  createTwoLineItem,
-  highlightMatches,
-} = require("@lumine-code/select-list");
+const { SelectListView, createTwoLineItem, highlightMatches } = require("@lumine-code/select-list");
 const { shell, clipboard } = require("electron");
 const minimatch = require("minimatch");
 const path = require("path");
@@ -132,9 +128,6 @@ module.exports = {
         this.restartCache();
       }),
       atom.config.onDidChange("fuzzy-files.ignoredNames", () => {
-        this.restartCache();
-      }),
-      atom.config.onDidChange("fuzzy-files.useRipGrep", () => {
         this.restartCache();
       }),
       atom.workspace.onDidChangeActivePaneItem(() => {

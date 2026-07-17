@@ -17,6 +17,7 @@ export default class GitDiffView {
     this.editorElement = editorElement;
     this.repository = null;
     this.repositorySubscriptionGeneration = 0;
+    this.diffUpdateGeneration = 0;
     this.markers = new Map();
 
     // Assign `null` to all possible child vars here so the JS engine doesn't
@@ -42,6 +43,7 @@ export default class GitDiffView {
    */
   destroy() {
     this.repositorySubscriptionGeneration++;
+    this.diffUpdateGeneration++;
     this.subscriptions.dispose();
     this.destroyChildren();
     this.markers.clear();
@@ -217,46 +219,65 @@ export default class GitDiffView {
    *   git modifications, additions, and deletions. The current algorithm
    *   just redraws the markers each call.
    */
-  updateDiffs() {
-    if (this.buffer.getLength() < MAX_BUFFER_LENGTH_TO_DIFF) {
-      // Before we redraw the diffs, tear down the old markers.
-      if (this.diffs) for (const diff of this.diffs) this.markers.get(diff)?.destroy();
+  async updateDiffs() {
+    if (this.buffer.getLength() >= MAX_BUFFER_LENGTH_TO_DIFF) return;
 
-      this.markers.clear();
+    // The diff is now computed off-thread by the git-host worker, so guard
+    // against a newer update (or teardown) landing before this one resolves.
+    const generation = ++this.diffUpdateGeneration;
 
-      // Line diffs against HEAD are meaningless for untracked files and
-      // misleading while a merge conflict is unresolved.
-      const statusEntry = this.repository.getStatusEntry(this.editorPath);
-      if (statusEntry?.untracked || statusEntry?.conflicted) {
-        this.diffs = [];
+    // Line diffs against HEAD are meaningless for untracked files and
+    // misleading while a merge conflict is unresolved.
+    const statusEntry = this.repository.getStatusEntry(this.editorPath);
+    let diffs;
+    if (statusEntry?.untracked || statusEntry?.conflicted) {
+      diffs = [];
+    } else {
+      const text = this.buffer.getText();
+      try {
+        diffs = await this.repository.getLineDiffsAsync(this.editorPath, text);
+      } catch {
         return;
       }
+      diffs = diffs || []; // Sanitize type to array.
+    }
 
-      const text = this.buffer.getText();
-      this.diffs = this.repository.getLineDiffs(this.editorPath, text);
-      this.diffs = this.diffs || []; // Sanitize type to array.
+    // A newer update superseded this one, or the view was torn down while the
+    // worker was busy; drop the stale result without touching the markers.
+    if (
+      generation !== this.diffUpdateGeneration ||
+      this.buffer == null ||
+      this.repository == null
+    ) {
+      return;
+    }
+    if (this.buffer.isDestroyed?.()) return;
 
-      for (const diff of this.diffs) {
-        const { newStart, oldLines, newLines } = diff;
-        const startRow = newStart - 1;
-        const endRow = newStart + newLines - 1;
+    // Redraw: tear down the old markers, then mark the new hunks.
+    if (this.diffs) for (const diff of this.diffs) this.markers.get(diff)?.destroy();
+    this.markers.clear();
+    this.diffs = diffs;
 
-        let mark;
+    for (const diff of this.diffs) {
+      const { newStart, oldLines, newLines } = diff;
+      const startRow = newStart - 1;
+      const endRow = newStart + newLines - 1;
 
-        if (oldLines === 0 && newLines > 0) {
-          mark = this.markRange(startRow, endRow, "git-line-added");
-        } else if (newLines === 0 && oldLines > 0) {
-          if (startRow < 0) {
-            mark = this.markRange(0, 0, "git-previous-line-removed");
-          } else {
-            mark = this.markRange(startRow, startRow, "git-line-removed");
-          }
+      let mark;
+
+      if (oldLines === 0 && newLines > 0) {
+        mark = this.markRange(startRow, endRow, "git-line-added");
+      } else if (newLines === 0 && oldLines > 0) {
+        if (startRow < 0) {
+          mark = this.markRange(0, 0, "git-previous-line-removed");
         } else {
-          mark = this.markRange(startRow, endRow, "git-line-modified");
+          mark = this.markRange(startRow, startRow, "git-line-removed");
         }
-
-        this.markers.set(diff, mark);
+      } else {
+        mark = this.markRange(startRow, endRow, "git-line-modified");
       }
+
+      this.markers.set(diff, mark);
     }
   }
 

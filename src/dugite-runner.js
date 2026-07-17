@@ -1,5 +1,52 @@
 const { exec, parseError } = require("dugite");
 
+// Bound the number of concurrent `git` child processes across the whole
+// renderer. Opening a project with many repositories otherwise fires a burst of
+// status/refs refreshes — the refs provider alone spawns five `git` processes
+// per repository — flooding the OS with dozens of simultaneous spawns at
+// startup. A shared FIFO semaphore flattens that burst into a bounded pipeline
+// without changing any provider's observable behavior.
+const DEFAULT_MAX_CONCURRENT_GIT = 6;
+
+class Semaphore {
+  constructor(max) {
+    this.max = max;
+    this.active = 0;
+    this.queue = [];
+  }
+
+  async acquire() {
+    if (this.active < this.max) {
+      this.active++;
+      return;
+    }
+    await new Promise((resolve) => this.queue.push(resolve));
+  }
+
+  release() {
+    const next = this.queue.shift();
+    if (next) {
+      // Hand the freed slot directly to the next waiter without dropping the
+      // active count, so a synchronous acquire() cannot slip in and exceed max.
+      next();
+    } else {
+      this.active--;
+    }
+  }
+
+  async run(fn) {
+    await this.acquire();
+    try {
+      return await fn();
+    } finally {
+      this.release();
+    }
+  }
+}
+
+// Process-wide limiter shared by every DugiteRunner instance.
+const sharedGitLimiter = new Semaphore(DEFAULT_MAX_CONCURRENT_GIT);
+
 const COLOR_CONFIG = [
   "-c",
   "color.branch=false",
@@ -28,8 +75,9 @@ class DugiteOperationError extends Error {
 }
 
 class DugiteRunner {
-  constructor({ execute = exec } = {}) {
+  constructor({ execute = exec, limiter = sharedGitLimiter } = {}) {
     this.execute = execute;
+    this.limiter = limiter;
   }
 
   async run(args, workingDirectory, options = {}) {
@@ -48,10 +96,8 @@ class DugiteRunner {
     for (const [key, value] of Object.entries(options.config || {})) {
       configArguments.push("-c", `${key}=${value}`);
     }
-    const result = await this.execute(
-      [...COLOR_CONFIG, ...configArguments, ...args],
-      workingDirectory,
-      {
+    const runExec = () =>
+      this.execute([...COLOR_CONFIG, ...configArguments, ...args], workingDirectory, {
         env: environment,
         stdin: options.stdin,
         encoding: options.encoding,
@@ -59,8 +105,10 @@ class DugiteRunner {
         signal: options.signal,
         killSignal: options.killSignal,
         processCallback: options.processCallback,
-      },
-    );
+      });
+    // Interactive/credential operations may block for a long time; keep them out
+    // of the shared read budget so a hung prompt cannot starve status refreshes.
+    const result = options.allowPrompt ? await runExec() : await this.limiter.run(runExec);
     const allowedExitCodes = options.allowedExitCodes || [0];
     if (!allowedExitCodes.includes(result.exitCode)) {
       throw new DugiteOperationError(args[0], result);
@@ -71,3 +119,6 @@ class DugiteRunner {
 
 module.exports = DugiteRunner;
 module.exports.DugiteOperationError = DugiteOperationError;
+module.exports.Semaphore = Semaphore;
+module.exports.sharedGitLimiter = sharedGitLimiter;
+module.exports.DEFAULT_MAX_CONCURRENT_GIT = DEFAULT_MAX_CONCURRENT_GIT;

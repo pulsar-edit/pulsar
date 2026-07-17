@@ -144,7 +144,7 @@ module.exports = class Directory {
     if (repo == null) return;
 
     let newStatus = null;
-    if (repo.isPathIgnored(this.path)) {
+    if (repo.isPathIgnoredCached(this.path)) {
       newStatus = "ignored";
     } else if (this.ignoredNames.matches(this.path)) {
       newStatus = "ignored-name";
@@ -171,7 +171,7 @@ module.exports = class Directory {
   isPathIgnored(filePath) {
     if (atom.config.get("tree-view.hideVcsIgnoredFiles")) {
       const repo = repoForPath(this.path);
-      if (repo && repo.isPathIgnored(filePath)) return true;
+      if (repo && repo.isPathIgnoredCached(filePath)) return true;
     }
 
     if (atom.config.get("tree-view.hideIgnoredNames")) {

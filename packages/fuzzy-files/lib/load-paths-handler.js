@@ -1,73 +1,33 @@
 /* global emit */
 
 const async = require("async");
-const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const { GitRepository } = require("atom");
 const { Minimatch } = require("minimatch");
 const childProcess = require("child_process");
 const { rgPath } = require("@vscode/ripgrep");
 
 const PathsChunkSize = 100;
 
-// Use the unpacked path if the ripgrep binary is in asar archive.
+// Use the unpacked path if the ripgrep binary is in an asar archive.
 const realRgPath = rgPath.replace(/\bapp\.asar\b/, "app.asar.unpacked");
 
-// Define the maximum number of concurrent crawling processes based on the number of CPUs
-// with a maximum value of 8 and minimum of 1.
+// Cap concurrent crawls at one per CPU (minus one), between 1 and 8.
 const MaxConcurrentCrawls = Math.min(Math.max(os.cpus().length - 1, 1), 8);
 
+// Crawls a single project root with ripgrep. ripgrep honors `.gitignore`
+// natively (unless `--no-ignore` is passed), so no VCS integration is needed.
 class PathLoader {
-  constructor(
-    rootPath,
-    ignoreVcsIgnores,
-    traverseSymlinkDirectories,
-    ignoredNames,
-    useRipGrep,
-    emittedPaths,
-    repositoryPaths = [],
-  ) {
+  constructor(rootPath, ignoreVcsIgnores, traverseSymlinkDirectories, ignoredNames, emittedPaths) {
     this.rootPath = rootPath;
     this.ignoreVcsIgnores = ignoreVcsIgnores;
     this.traverseSymlinkDirectories = traverseSymlinkDirectories;
     this.ignoredNames = ignoredNames;
-    this.useRipGrep = useRipGrep;
     this.emittedPaths = emittedPaths;
     this.paths = [];
-    this.inodes = new Set();
-    this.repositories = [];
-    if (ignoreVcsIgnores && !this.useRipGrep) {
-      for (const repositoryPath of repositoryPaths) {
-        const relative = path.relative(this.rootPath, repositoryPath);
-        const rootRelative = path.relative(repositoryPath, this.rootPath);
-        const relatesToRoot =
-          (!relative.startsWith("..") && !path.isAbsolute(relative)) ||
-          (!rootRelative.startsWith("..") && !path.isAbsolute(rootRelative));
-        if (!relatesToRoot) continue;
-
-        const repo = GitRepository.open(repositoryPath, { refreshOnWindowFocus: false });
-        if (repo) this.repositories.push({ path: repo.getWorkingDirectory(), repo });
-      }
-      this.repositories.sort((left, right) => right.path.length - left.path.length);
-    }
   }
 
   load(done) {
-    if (this.useRipGrep) {
-      this.loadFromRipGrep().then(done);
-
-      return;
-    }
-
-    this.loadPath(this.rootPath, true, () => {
-      this.flushPaths();
-      for (const { repo } of this.repositories) repo.destroy();
-      done();
-    });
-  }
-
-  async loadFromRipGrep() {
     return new Promise((resolve) => {
       const args = ["--files", "--hidden", "--sort", "path"];
 
@@ -79,13 +39,13 @@ class PathLoader {
         args.push("--follow");
       }
 
-      for (let ignoredName of this.ignoredNames) {
+      for (const ignoredName of this.ignoredNames) {
         args.push("-g", "!" + ignoredName.pattern);
       }
 
       if (this.ignoreVcsIgnores) {
-        if (!args.includes("!.git")) args.push("-g", "!.git");
-        if (!args.includes("!.hg")) args.push("-g", "!.hg");
+        args.push("-g", "!.git");
+        args.push("-g", "!.hg");
       }
 
       let output = "";
@@ -106,25 +66,10 @@ class PathLoader {
         this.flushPaths();
         resolve();
       });
-    });
+    }).then(done);
   }
 
-  isIgnored(loadedPath) {
-    const relativePath = path.relative(this.rootPath, loadedPath);
-    const repository = this.repositories.find(({ path: repositoryPath }) => {
-      const relative = path.relative(repositoryPath, loadedPath);
-      return !relative.startsWith("..") && !path.isAbsolute(relative);
-    });
-    if (repository?.repo.isPathIgnored(loadedPath)) {
-      return true;
-    } else {
-      for (let ignoredName of this.ignoredNames) {
-        if (ignoredName.match(relativePath)) return true;
-      }
-    }
-  }
-
-  pathLoaded(loadedPath, done) {
+  pathLoaded(loadedPath) {
     if (!this.emittedPaths.has(loadedPath)) {
       this.paths.push(loadedPath);
       this.emittedPaths.add(loadedPath);
@@ -133,76 +78,15 @@ class PathLoader {
     if (this.paths.length === PathsChunkSize) {
       this.flushPaths();
     }
-    done && done();
   }
 
   flushPaths() {
     emit("load-paths:paths-found", this.paths);
     this.paths = [];
   }
-
-  loadPath(pathToLoad, root, done) {
-    if (this.isIgnored(pathToLoad) && !root) return done();
-
-    fs.lstat(pathToLoad, (error, stats) => {
-      if (error != null) {
-        return done();
-      }
-      if (stats.isSymbolicLink()) {
-        fs.stat(pathToLoad, (error, stats) => {
-          if (error != null) return done();
-          if (this.inodes.has(stats.ino)) {
-            return done();
-          } else {
-            this.inodes.add(stats.ino);
-          }
-
-          if (stats.isFile()) {
-            this.pathLoaded(pathToLoad, done);
-          } else if (stats.isDirectory()) {
-            if (this.traverseSymlinkDirectories) {
-              this.loadFolder(pathToLoad, done);
-            } else {
-              done();
-            }
-          } else {
-            done();
-          }
-        });
-      } else {
-        this.inodes.add(stats.ino);
-        if (stats.isDirectory()) {
-          this.loadFolder(pathToLoad, done);
-        } else if (stats.isFile()) {
-          this.pathLoaded(pathToLoad, done);
-        } else {
-          done();
-        }
-      }
-    });
-  }
-
-  loadFolder(folderPath, done) {
-    fs.readdir(folderPath, (_, children = []) => {
-      async.each(
-        children,
-        (childName, next) => {
-          this.loadPath(path.join(folderPath, childName), false, next);
-        },
-        done,
-      );
-    });
-  }
 }
 
-module.exports = function (
-  rootPaths,
-  followSymlinks,
-  ignoreVcsIgnores,
-  ignores,
-  useRipGrep,
-  repositoryPaths = [],
-) {
+module.exports = function (rootPaths, followSymlinks, ignoreVcsIgnores, ignores) {
   const emittedPaths = new Set();
   const ignoredNames = [];
   for (let ignore of ignores) {
@@ -219,15 +103,9 @@ module.exports = function (
     rootPaths,
     MaxConcurrentCrawls,
     (rootPath, next) =>
-      new PathLoader(
-        rootPath,
-        ignoreVcsIgnores,
-        followSymlinks,
-        ignoredNames,
-        useRipGrep,
-        emittedPaths,
-        repositoryPaths,
-      ).load(next),
+      new PathLoader(rootPath, ignoreVcsIgnores, followSymlinks, ignoredNames, emittedPaths).load(
+        next,
+      ),
     this.async(),
   );
 };

@@ -488,7 +488,7 @@ class TabView {
     }
 
     let newStatus = null;
-    if (repo.isPathIgnored(this.path)) {
+    if (repo.isPathIgnoredCached(this.path)) {
       newStatus = "ignored";
     } else {
       const summary = repo.getPathStatusSummary(this.path);

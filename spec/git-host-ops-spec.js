@@ -1,0 +1,104 @@
+const DugiteRunner = require("../src/dugite-runner");
+const createGitHostOps = require("../src/git-host-ops");
+
+// Exercises the git-host op registry in-process (no fork) against a fake
+// `execute`, mirroring how dugite-repository-*-provider specs inject execute.
+describe("git-host ops", () => {
+  let calls;
+
+  function opsReturning(result) {
+    calls = [];
+    const execute = (args, cwd, options) => {
+      calls.push({ args, cwd, options });
+      return Promise.resolve({ exitCode: 0, stdout: "OUT", stderr: "", ...result });
+    };
+    return createGitHostOps(new DugiteRunner({ execute }));
+  }
+
+  it("runs status with porcelain v2 and returns the raw stdout", async () => {
+    const ops = opsReturning();
+    const result = await ops.status(
+      { workingDirectory: "/repo", options: { includeIgnored: true } },
+      {},
+    );
+    expect(result).toBe("OUT");
+    expect(calls[0].cwd).toBe("/repo");
+    expect(calls[0].args).toContain("status");
+    expect(calls[0].args).toContain("--porcelain=v2");
+    expect(calls[0].args).toContain("--ignored=matching");
+  });
+
+  it("fans refs out to five git commands and returns the raw bundle", async () => {
+    const ops = opsReturning();
+    const result = await ops.refs({ workingDirectory: "/repo", options: {} }, {});
+    expect(calls.length).toBe(5);
+    expect(result).toEqual({
+      forEachRef: "OUT",
+      remotes: "OUT",
+      worktrees: "OUT",
+      symbolicHead: "OUT",
+      headOid: "OUT",
+    });
+  });
+
+  it("maps a diff request onto git diff arguments", async () => {
+    const ops = opsReturning();
+    await ops.diffPatch(
+      {
+        workingDirectory: "/repo",
+        request: { from: { type: "index" }, to: { type: "worktree" }, context: 3 },
+        options: {},
+      },
+      {},
+    );
+    expect(calls[0].args).toContain("diff");
+    expect(calls[0].args).toContain("--patch");
+    expect(calls[0].args).toContain("--unified=3");
+  });
+
+  it("threads the worker AbortSignal through to the runner", async () => {
+    const ops = opsReturning();
+    const controller = new AbortController();
+    await ops.status({ workingDirectory: "/repo", options: {} }, { signal: controller.signal });
+    expect(calls[0].options.signal).toBe(controller.signal);
+  });
+
+  it("keeps unborn/missing-path handling in the worker op (returns null)", async () => {
+    const execute = () =>
+      Promise.resolve({
+        exitCode: 128,
+        stdout: "",
+        stderr: "fatal: path 'x' does not exist in 'HEAD'",
+      });
+    const ops = createGitHostOps(new DugiteRunner({ execute }));
+    const result = await ops.fileAtRevision(
+      { workingDirectory: "/repo", relativePosixPath: "x", revision: "HEAD", options: {} },
+      {},
+    );
+    expect(result).toBeNull();
+  });
+
+  it("fetches the HEAD blob for lineDiff and returns hunks", async () => {
+    const ops = opsReturning({ stdout: "a\nb\nc\n" });
+    const hunks = await ops.lineDiff(
+      { workingDirectory: "/repo", relativePosixPath: "f.txt", headOid: "abc", text: "a\nB\nc\n" },
+      {},
+    );
+    expect(calls[0].args).toContain("show");
+    expect(calls[0].args).toContain("abc:f.txt");
+    expect(hunks).toEqual([{ oldStart: 2, oldLines: 1, newStart: 2, newLines: 1 }]);
+  });
+
+  it("caches the HEAD blob per oid so repeated lineDiffs do not re-fetch", async () => {
+    const ops = opsReturning({ stdout: "a\nb\nc\n" });
+    const payload = {
+      workingDirectory: "/repo",
+      relativePosixPath: "f.txt",
+      headOid: "abc",
+      text: "a\nB\nc\n",
+    };
+    await ops.lineDiff(payload, {});
+    await ops.lineDiff({ ...payload, text: "a\nZ\nc\n" }, {});
+    expect(calls.length).toBe(1);
+  });
+});

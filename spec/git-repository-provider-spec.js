@@ -28,9 +28,17 @@ describe("GitRepositoryProvider", () => {
         expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe("git");
+      });
 
-        // Refresh should be started
-        await new Promise((resolve) => result.onDidChangeStatuses(resolve));
+      it("does not eagerly refresh status at open time", async () => {
+        // The provider no longer forces a native git-utils status pass when a
+        // repository is discovered; consumers drive refreshes by subscribing to
+        // the Dugite snapshot. This keeps startup off the per-repo status burst.
+        const refreshStatus = spyOn(GitRepository.prototype, "refreshStatus").and.callThrough();
+        const directory = new Directory(path.join(__dirname, "fixtures", "git", "master.git"));
+        const result = await provider.repositoryForDirectory(directory);
+        expect(result).toEqual(jasmine.any(GitRepository));
+        expect(refreshStatus).not.toHaveBeenCalled();
       });
 
       it("resolves with the same GitRepository for different Directory objects in the same repo", async () => {
@@ -118,15 +126,12 @@ describe("GitRepositoryProvider", () => {
 
   describe(".repositoryForDirectorySync(directory)", () => {
     describe("when specified a Directory with a Git repository", () => {
-      it("resolves with a GitRepository", async () => {
+      it("resolves with a GitRepository", () => {
         const directory = new Directory(path.join(__dirname, "fixtures", "git", "master.git"));
         const result = provider.repositoryForDirectorySync(directory);
         expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
         expect(result.getType()).toBe("git");
-
-        // Refresh should be started
-        await new Promise((resolve) => result.onDidChangeStatuses(resolve));
       });
 
       it("resolves with the same GitRepository for different Directory objects in the same repo", () => {

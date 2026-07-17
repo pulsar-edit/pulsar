@@ -76,7 +76,7 @@ module.exports = class File {
     if (repo == null) return;
 
     let newStatus = null;
-    if (repo.isPathIgnored(this.path)) {
+    if (repo.isPathIgnoredCached(this.path)) {
       newStatus = "ignored";
     } else if (this.ignoredNames.matches(this.path)) {
       newStatus = "ignored-name";
