@@ -41,6 +41,14 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
+  // Specs drive rendering through requestAnimationFrame promises. On Windows,
+  // Chromium's native window-occlusion tracking stops compositing for a fully
+  // covered window even with `backgroundThrottling: false`, stalling animation
+  // frames for seconds and timing out whichever spec happens to be running.
+  if (args.test) {
+    app.commandLine.appendSwitch("disable-features", "CalculateNativeWinOcclusion");
+  }
+
   const releaseChannel = getReleaseChannel(app.getVersion());
   process.env.ATOM_CHANNEL ??= releaseChannel;
   atomPaths.setAtomHome(app.getPath("home"));
