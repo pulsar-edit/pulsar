@@ -383,6 +383,14 @@ module.exports = class GitRepository {
   //
   // Returns a {String}.
   getShortHead(path) {
+    // For the top-level repository, read the head from the status snapshot
+    // (reliably loaded whenever the UI shows this repo). Submodule paths and the
+    // pre-snapshot beat fall back to libgit2 (removed in a later phase).
+    if (!path && this.statusSnapshot.initialized && this.statusSnapshot.head) {
+      const head = this.statusSnapshot.head;
+      if (head.name) return head.name;
+      if (head.detached && head.oid) return head.oid.slice(0, 7);
+    }
     return this.getRepo(path).getShortHead();
   }
 
