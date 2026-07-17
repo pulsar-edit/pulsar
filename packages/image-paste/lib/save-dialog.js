@@ -21,7 +21,8 @@ module.exports = class SaveDialog {
 
     this.inputDialogView = new InputDialogView({
       className: "image-paste save-dialog",
-      infoMessage: "Enter a path relative to the current project or directory for the pasted image.",
+      infoMessage:
+        "Enter a path relative to the current project or directory for the pasted image.",
       contentElement: this.previewElement,
       didChangeQuery: () => this.clearWarning(),
       didConfirm: () => this.confirm(),
@@ -95,7 +96,9 @@ module.exports = class SaveDialog {
   }
 
   normalizeImagePath(relativePath) {
-    relativePath = String(relativePath).trim().replace(/[<>:"|?*\0]/g, "");
+    relativePath = String(relativePath)
+      .trim()
+      .replace(/[<>:"|?*\0]/g, "");
     const extension = path.extname(relativePath).toLowerCase();
     if ([".png", ".jpg", ".jpeg"].includes(extension)) return relativePath;
     if (extension) return relativePath.slice(0, -extension.length) + ".png";

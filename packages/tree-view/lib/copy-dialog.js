@@ -11,9 +11,7 @@ module.exports = class CopyDialog extends Dialog {
       initialPath: atom.project.relativize(initialPath),
       select: true,
       iconClass: "icon-arrow-right",
-      checkboxes: [
-        { label: "Open file after copying", config: "tree-view.openAfterCopy" },
-      ],
+      checkboxes: [{ label: "Open file after copying", config: "tree-view.openAfterCopy" }],
     });
 
     this.initialPath = initialPath;
