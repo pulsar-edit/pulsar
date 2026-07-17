@@ -1,9 +1,12 @@
+const path = require("path");
+
 const { CompositeDisposable, Disposable } = require("atom");
 
 const { repositoryDisplayName, repositoryWorkingDirectory } = require("./helpers");
 
-// Status bar tile showing the window's active repository. Hidden when the
-// window knows fewer than two repositories, since there is nothing to switch.
+// Status bar tile showing the window's active repository context. Always
+// visible: a context without a repository renders the focused directory in a
+// dimmed "no repo" state instead of hiding.
 module.exports = class RepositoryStatusView {
   constructor({ onDidClick } = {}) {
     this.element = document.createElement("git-switcher-repository");
@@ -110,24 +113,26 @@ module.exports = class RepositoryStatusView {
       return;
     }
 
-    const repositories = atom.repositories.getRepositories();
-    const active = atom.repositories.getActiveRepository();
-    if (!active || repositories.length < 2) {
-      this.element.style.display = "none";
+    const { repository, workingDirectory, pinned } = atom.repositories.getActiveRepositoryContext();
+    this.element.classList.toggle("no-repository", !repository);
+    this.icon.classList.toggle("icon-repo", !pinned);
+    this.icon.classList.toggle("icon-lock", pinned);
+    this.tooltipDisposable?.dispose();
+
+    if (repository) {
+      this.nameLabel.textContent = repositoryDisplayName(repository);
+      const repositoryDirectory = repositoryWorkingDirectory(repository) || "";
+      this.tooltipDisposable = atom.tooltips.add(this.element, {
+        title: pinned ? `${repositoryDirectory} (pinned)` : repositoryDirectory,
+      });
       return;
     }
 
-    this.element.style.display = "";
-    this.nameLabel.textContent = repositoryDisplayName(active);
-
-    const pinned = atom.repositories.isActiveRepositoryPinned();
-    this.icon.classList.toggle("icon-repo", !pinned);
-    this.icon.classList.toggle("icon-lock", pinned);
-
-    this.tooltipDisposable?.dispose();
-    const workingDirectory = repositoryWorkingDirectory(active) || "";
+    // The focused location is not inside any repository; show where a new one
+    // would be initialized or cloned.
+    this.nameLabel.textContent = workingDirectory ? path.basename(workingDirectory) : "No repository";
     this.tooltipDisposable = atom.tooltips.add(this.element, {
-      title: pinned ? `${workingDirectory} (pinned)` : workingDirectory,
+      title: workingDirectory ? `${workingDirectory} (not a repository)` : "No repository",
     });
   }
 

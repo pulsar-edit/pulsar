@@ -63,16 +63,40 @@ describe("git-switcher", () => {
     atom.repositories.setActiveRepository(null);
   });
 
-  it("hides the repository tile when only one repository is known", () => {
+  it("stays visible and reflects a context without a repository", () => {
     const repositoryView = mainModule.repositoryStatusView;
-    // The spec environment knows ambient repositories; pin the census.
-    spyOn(atom.repositories, "getRepositories").andReturn([repoA.repository]);
-    repositoryView.update();
-    expect(repositoryView.element.style.display).toBe("none");
+    const branchView = mainModule.branchStatusView;
+    const outsideDir = makeWorkdir("git-switcher-outside-");
+    spyOn(atom.repositories, "getActiveRepository").andReturn(null);
+    spyOn(atom.repositories, "getActiveRepositoryContext").andReturn({
+      repository: null,
+      workingDirectory: outsideDir,
+      pinned: false,
+    });
 
-    atom.repositories.getRepositories.andReturn([repoA.repository, repoB.repository]);
     repositoryView.update();
+    branchView.update();
+
     expect(repositoryView.element.style.display).toBe("");
+    expect(repositoryView.element.classList.contains("no-repository")).toBe(true);
+    expect(repositoryView.nameLabel.textContent).toBe(path.basename(outsideDir));
+    expect(branchView.element.style.display).toBe("");
+    expect(branchView.element.classList.contains("no-repository")).toBe(true);
+    expect(branchView.branchLabel.textContent).toBe("No repository");
+
+    // Returning to a repository clears the no-repo state.
+    atom.repositories.getActiveRepository.andReturn(repoA.repository);
+    atom.repositories.getActiveRepositoryContext.andReturn({
+      repository: repoA.repository,
+      workingDirectory: repoA.workingDirectory,
+      pinned: false,
+    });
+    repositoryView.update();
+    branchView.update();
+    expect(repositoryView.element.classList.contains("no-repository")).toBe(false);
+    expect(repositoryView.nameLabel.textContent).toBe(path.basename(repoA.workingDirectory));
+    expect(branchView.element.classList.contains("no-repository")).toBe(false);
+    expect(branchView.branchLabel.textContent).toBe("main");
   });
 
   it("cycles repositories with the mouse wheel and toggles the pin with middle click", () => {
