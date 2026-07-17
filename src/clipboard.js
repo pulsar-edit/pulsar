@@ -108,7 +108,15 @@ module.exports = class Clipboard {
             )
           : null;
       const metadata = lumineMetadata || vscodeCopyMetadata;
-      return metadata ? { text, metadata } : { text };
+      if (metadata) return { text, metadata };
+      // Chromium strips the custom formats from some paste events — natively,
+      // ctrl+shift+v means "paste and match style". Fall back to the metadata
+      // of this window's last write while the text still matches it, exactly
+      // like {::readWithMetadata}.
+      if (this.metadata != null && this.signatureForMetadata === this.md5(text)) {
+        return { text, metadata: this.metadata };
+      }
+      return { text };
     } catch {
       return { text: "" };
     }

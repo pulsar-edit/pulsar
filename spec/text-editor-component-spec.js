@@ -5520,6 +5520,56 @@ describe("TextEditorComponent", () => {
       registration.dispose();
     });
 
+    it("keeps this window's copy metadata when Chromium strips the custom formats", () => {
+      // Ctrl+Shift+V natively means "paste and match style", so Chromium
+      // delivers the paste event with only text/plain. Multi-selection
+      // metadata from the window's own copy must still distribute one copied
+      // selection per cursor.
+      const { component, editor } = buildComponent({ text: "alpha beta\ngamma delta" });
+      editor.setSelectedBufferRanges([
+        [
+          [0, 0],
+          [0, 5],
+        ],
+        [
+          [1, 0],
+          [1, 5],
+        ],
+      ]);
+      const copyData = createClipboardData();
+      component.didCopy({ clipboardData: copyData, preventDefault: () => {} });
+
+      editor.setSelectedBufferRanges([
+        [
+          [0, 10],
+          [0, 10],
+        ],
+        [
+          [1, 11],
+          [1, 11],
+        ],
+      ]);
+      const strippedData = createClipboardData({
+        "text/plain": copyData.getData("text/plain"),
+      });
+      const event = {
+        clipboardData: strippedData,
+        preventDefault: jasmine.createSpy("preventDefault"),
+      };
+      component.pendingNativePasteOperation = {
+        options: {
+          normalizeLineEndings: false,
+          autoIndent: false,
+          preserveTrailingLineIndentation: true,
+          skipPasteProviders: true,
+        },
+      };
+      component.didPaste(event);
+
+      expect(editor.getText()).toBe("alpha betaalpha\ngamma deltagamma");
+      expect(event.preventDefault).toHaveBeenCalled();
+    });
+
     it("prevents the browser's default processing for the event on Linux", () => {
       const { component } = buildComponent({ platform: "linux" });
       const event = { preventDefault: () => {} };

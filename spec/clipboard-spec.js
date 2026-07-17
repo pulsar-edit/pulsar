@@ -125,6 +125,33 @@ describe("Clipboard", () => {
       });
     });
 
+    it("falls back to this window's metadata when the custom formats are stripped", () => {
+      const clipboardData = createClipboardData();
+      atom.clipboard
+        .createDataTransferClipboard(clipboardData)
+        .write("stripped formats", { fullLine: true });
+
+      const textOnly = createClipboardData({
+        "text/plain": clipboardData.getData("text/plain"),
+      });
+      expect(atom.clipboard.createDataTransferClipboard(textOnly).readWithMetadata()).toEqual({
+        text: "stripped formats",
+        metadata: { fullLine: true },
+      });
+    });
+
+    it("does not reuse this window's metadata once the plain text differs", () => {
+      const clipboardData = createClipboardData();
+      atom.clipboard
+        .createDataTransferClipboard(clipboardData)
+        .write("stripped formats", { fullLine: true });
+
+      const textOnly = createClipboardData({ "text/plain": "something else" });
+      expect(atom.clipboard.createDataTransferClipboard(textOnly).readWithMetadata()).toEqual({
+        text: "something else",
+      });
+    });
+
     it("ignores stale Lumine metadata when the plain text has changed", () => {
       const clipboardData = createClipboardData();
       atom.clipboard
