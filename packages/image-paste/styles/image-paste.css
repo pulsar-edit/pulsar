@@ -1,7 +1,6 @@
 .image-paste.save-dialog {
   display: flex;
   flex-direction: column;
-  gap: var(--image-paste-dialog-spacing, 10px);
 }
 
 atom-panel.modal .image-paste.save-dialog atom-text-editor[mini] {
@@ -52,6 +51,8 @@ atom-panel.modal .image-paste.save-dialog atom-text-editor[mini] {
   width: auto;
   height: auto;
   max-width: 100%;
+
+  margin-top:1em;
   max-height: var(--image-paste-preview-max-height, calc(100vh - 10rem));
   box-sizing: border-box;
   background-color: var(
