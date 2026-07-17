@@ -56,6 +56,13 @@ describe("StateStore", () => {
       expect(instance instanceof DatabaseSync).toBe(true);
     });
 
+    it("configures a busy timeout so concurrently restored windows wait for the lock", async () => {
+      const store = new StateStore(databaseName, version);
+      store.initialize({ configDirPath: atom.getConfigDirPath() });
+      const db = await store.dbPromise;
+      expect(db.prepare("PRAGMA busy_timeout").get().timeout).toBe(5000);
+    });
+
     it("reads state from an existing SQLite database", async () => {
       const existingDatabaseName = `${databaseName}-existing`;
       const table = `${existingDatabaseName}${version}`;

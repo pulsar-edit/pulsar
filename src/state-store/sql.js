@@ -17,6 +17,12 @@ module.exports = class SQLStateStore {
       // Initialize inside the try so a transient failure (e.g. a WAL lock on the
       // shared session store) can't escape the constructor leaving a half-open
       // connection leaked. Close the partially-opened handle before bailing.
+      //
+      // Several windows restored together open this database concurrently, and
+      // the journal-mode switch plus table creation take write locks. The
+      // default busy timeout is 0, which turns that startup race into an
+      // immediate "database is locked" failure, so wait for the lock instead.
+      db.exec("PRAGMA busy_timeout = 5000");
       db.exec("PRAGMA journal_mode = WAL");
       db.exec(`CREATE TABLE IF NOT EXISTS ${this.tableName} (key VARCHAR, value JSON)`);
       db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS "${table}_index" ON ${this.tableName}(key)`);
