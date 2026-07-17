@@ -16,6 +16,26 @@ class FakeRepository {
     this.operations = null;
     this.refreshIndexCount = 0;
     this.refreshStatusCount = 0;
+    this.refreshStatusSnapshotCount = 0;
+    this.refreshRefsSnapshotCount = 0;
+    this.statusSnapshot = { initialized: true };
+    this.refsSnapshot = { initialized: true };
+  }
+
+  getStatusSnapshot() {
+    return this.statusSnapshot;
+  }
+
+  getRefsSnapshot() {
+    return this.refsSnapshot;
+  }
+
+  async refreshStatusSnapshot() {
+    this.refreshStatusSnapshotCount++;
+  }
+
+  async refreshRefsSnapshot() {
+    this.refreshRefsSnapshotCount++;
   }
 
   getWorkingDirectory() {
@@ -383,8 +403,8 @@ describe("RepositoryRegistry", () => {
       gitDirectory: repository.getPath(),
     });
     expect(commits).toEqual([{ message: "Subject", options: { amend: true } }]);
-    expect(repository.refreshIndexCount).toBe(1);
-    expect(repository.refreshStatusCount).toBe(1);
+    expect(repository.refreshStatusSnapshotCount).toBe(1);
+    expect(repository.refreshRefsSnapshotCount).toBe(1);
   });
 
   it("uses service providers before the built-in fallback provider", async () => {
@@ -416,7 +436,7 @@ describe("RepositoryRegistry", () => {
     const repository = new FakeRepository(workdir);
     repositories.push(repository);
     registry.setProjectRoots([directoryFor(workdir)]);
-    repository.refreshStatus = async () => {
+    repository.refreshStatusSnapshot = async () => {
       throw new Error("refresh failed");
     };
     registry.addOperationProvider({

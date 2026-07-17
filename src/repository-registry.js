@@ -916,9 +916,7 @@ module.exports = class RepositoryRegistry {
   async refreshRepositoryAfterOperation(repository) {
     if (repository.isDestroyed?.()) return;
     try {
-      repository.refreshIndex?.();
       const refreshes = [];
-      if (repository.refreshStatus) refreshes.push(repository.refreshStatus());
       if (repository.refreshStatusSnapshot && repository.getStatusSnapshot?.().initialized) {
         refreshes.push(repository.refreshStatusSnapshot());
       }

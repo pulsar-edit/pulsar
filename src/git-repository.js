@@ -175,8 +175,10 @@ module.exports = class GitRepository {
 
     if (options.refreshOnWindowFocus || options.refreshOnWindowFocus == null) {
       const onWindowFocus = () => {
-        this.refreshIndex();
-        this.refreshStatus();
+        // Refresh the Dugite snapshots (subscriber-gated) rather than the
+        // legacy libgit2 status cache when the window regains focus.
+        this.scheduleStatusSnapshotRefresh();
+        this.scheduleRefsSnapshotRefresh();
       };
 
       window.addEventListener("focus", onWindowFocus);
