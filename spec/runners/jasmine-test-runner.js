@@ -350,13 +350,20 @@ const installCustomElementsDefineRetryCompatibility = () => {
 
 const runWithLegacyAsyncQueue = (fn) => {
   const previousQueue = currentLegacyAsyncQueue;
-  currentLegacyAsyncQueue = [];
+  const queue = [];
+  currentLegacyAsyncQueue = queue;
 
   return Promise.resolve()
     .then(fn)
-    .then(() => flushLegacyAsyncQueue())
+    .then(() => flushLegacyAsyncQueue(queue))
     .finally(() => {
-      currentLegacyAsyncQueue = previousQueue;
+      // When a spec times out, Jasmine starts the next spec while this chain
+      // is still pending. By the time it settles, another spec owns the
+      // queue; restoring the stale reference here would clobber that spec's
+      // queue mid-run and crash its flush.
+      if (currentLegacyAsyncQueue === queue) {
+        currentLegacyAsyncQueue = previousQueue;
+      }
     });
 };
 
@@ -367,9 +374,11 @@ const enqueueLegacyAsyncStep = (step) => {
   currentLegacyAsyncQueue.push(step);
 };
 
-const flushLegacyAsyncQueue = async () => {
-  while (currentLegacyAsyncQueue.length > 0) {
-    const step = currentLegacyAsyncQueue.shift();
+const flushLegacyAsyncQueue = async (queue) => {
+  // Stop when the spec no longer owns the queue (see runWithLegacyAsyncQueue):
+  // a timed-out spec must not run its remaining steps inside a later spec.
+  while (queue.length > 0 && currentLegacyAsyncQueue === queue) {
+    const step = queue.shift();
     await step();
   }
 };
