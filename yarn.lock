@@ -3463,6 +3463,11 @@ get-tsconfig@^4.8.1:
   dependencies:
     "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
 
+"git-switcher@file:packages/git-switcher":
+  version "1.0.0"
+  dependencies:
+    "@lumine-code/select-list" "https://github.com/lumine-code/select-list.git#06cd67f52c8fd900b2ba876361f1a3c2228180d5"
+
 github-from-package@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
