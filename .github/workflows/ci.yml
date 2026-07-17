@@ -80,9 +80,11 @@ jobs:
           cache: yarn
       - name: Install Linux build and headless-display dependencies
         if: runner.os == 'Linux'
+        # fonts-noto-cjk backs the editor's double-width/half-width/Korean
+        # character measurements in the text-editor-component specs.
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb libx11-dev libxkbfile-dev libsecret-1-dev
+          sudo apt-get install -y xvfb libx11-dev libxkbfile-dev libsecret-1-dev fonts-noto-cjk
       # `postinstall` (patch-package) and several native install scripts fail or
       # are wasted here: node-pty's Windows build is broken until patched, and
       # the native modules are rebuilt for Electron below regardless. Install

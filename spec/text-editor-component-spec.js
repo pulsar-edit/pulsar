@@ -577,34 +577,36 @@ describe("TextEditorComponent", () => {
       expect(cursorNodes.length).toBe(0);
     });
 
-    /**
-     * TODO: FAILING TEST - This test fails with the following output:
-     * Error: Timed out waiting on anonymous condition at
-     * conditionPromise (/home/runner/work/lumine/lumine/spec/async-spec-helpers.js:20:13)
-     */
-    xit("blinks cursors when the editor is focused and the cursors are not moving", async () => {
+    it("blinks cursors when the editor is focused and the cursors are not moving", async () => {
       assertDocumentFocused();
-      const { component, element, editor } = buildComponent();
-      component.props.cursorBlinkPeriod = 30;
-      component.props.cursorBlinkResumeDelay = 30;
+      // Leave cursorBlinkResumeDelay at its default so the post-movement
+      // assertions at the end cannot race a resumed blink cycle.
+      const { component, element, editor } = buildComponent({ cursorBlinkPeriod: 40 });
       editor.addCursorAtScreenPosition([1, 0]);
 
       element.focus();
       await component.getNextUpdatePromise();
       const [cursor1, cursor2] = element.querySelectorAll(".cursor");
 
-      await conditionPromise(
-        () =>
-          getComputedStyle(cursor1).opacity === "1" && getComputedStyle(cursor2).opacity === "1",
-      );
-      await conditionPromise(
-        () =>
-          getComputedStyle(cursor1).opacity === "0" && getComputedStyle(cursor2).opacity === "0",
-      );
-      await conditionPromise(
-        () =>
-          getComputedStyle(cursor1).opacity === "1" && getComputedStyle(cursor2).opacity === "1",
-      );
+      // Every blink toggle performs a cursor-only update, so waiting on update
+      // promises observes each phase instead of sampling the blink interval on
+      // a coarser timer grid.
+      const waitForCursorOpacity = async (opacity) => {
+        for (let i = 0; i < 100; i++) {
+          if (
+            getComputedStyle(cursor1).opacity === opacity &&
+            getComputedStyle(cursor2).opacity === opacity
+          ) {
+            return;
+          }
+          await component.getNextUpdatePromise();
+        }
+        throw new Error(`Timed out waiting for cursor opacity ${opacity}`);
+      };
+
+      await waitForCursorOpacity("1");
+      await waitForCursorOpacity("0");
+      await waitForCursorOpacity("1");
 
       editor.moveRight();
       await component.getNextUpdatePromise();
@@ -5876,13 +5878,9 @@ describe("TextEditorComponent", () => {
   });
 
   describe("styling changes", () => {
-    /**
-     * TODO: FAILING TEST - This test fails with the following output:
-     * Expected 7.234375 not to be 7.234375.
-     * Expected 7.234375 not to be 7.234375.
-     * Expected 7.234375 not to be 7.234375.
-     */
-    xit("updates the rendered content based on new measurements when the font dimensions change", async () => {
+    // The double/half/Korean width preconditions need a CJK-capable font;
+    // the Linux CI job installs fonts-noto-cjk for this spec.
+    it("updates the rendered content based on new measurements when the font dimensions change", async () => {
       const { component, element, editor } = buildComponent({
         rowsPerTile: 1,
         autoHeight: false,
@@ -6908,6 +6906,8 @@ function buildComponent(params = {}) {
   const component = new TextEditorComponent({
     model: editor,
     rowsPerTile: params.rowsPerTile,
+    cursorBlinkPeriod: params.cursorBlinkPeriod,
+    cursorBlinkResumeDelay: params.cursorBlinkResumeDelay,
     updatedSynchronously: params.updatedSynchronously || false,
     platform: params.platform,
     chromeVersion: params.chromeVersion,
