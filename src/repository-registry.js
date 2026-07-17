@@ -1301,7 +1301,7 @@ module.exports = class RepositoryRegistry {
     if (known) return known;
 
     const workingDirectory = repository.getWorkingDirectory();
-    const openedWorkingDirectory = repository.repo?.openedWorkingDirectory;
+    const openedWorkingDirectory = repository.openedWorkingDirectoryPath;
     const id = this.repositoryId(repository, workingDirectory);
     const existing = this.entriesById.get(id);
     if (existing) return existing;

@@ -30,10 +30,14 @@ module.exports = {
         this.customTemplate = value || "";
         this.updateTemplate();
       }),
-      atom.project.onDidChangePaths(() => this.updateTitle()),
+      atom.project.onDidChangePaths(() => {
+        this.subscribeToRepository();
+        this.updateTitle();
+      }),
       atom.workspace.onDidChangeActivePaneItem(() => this.subscribeToActiveItem()),
     );
     this.subscribeToActiveItem();
+    this.subscribeToRepository();
   },
 
   updateTemplate() {
@@ -59,7 +63,37 @@ module.exports = {
     this.disposables.dispose();
     this.activeItemSubscription?.dispose();
     this.activeItemSubscription = null;
+    this.repositorySubscription?.dispose();
+    this.repositorySubscription = null;
     this.setDefaultTitle();
+  },
+
+  // Resolve the repository whose branch the title reflects, mirroring the
+  // lookup in variables().
+  currentRepository() {
+    const activeItem = atom.workspace.getActivePaneItem();
+    const itemPath =
+      activeItem && typeof activeItem.getPath === "function" ? activeItem.getPath() : null;
+    const projectPath = atom.project.getPaths()[0];
+    return (
+      atom.repositories.getForPath(itemPath) ||
+      atom.repositories.getForPath(projectPath) ||
+      atom.repositories.getRepositories()[0] ||
+      null
+    );
+  },
+
+  // The short head is read synchronously from the repository's status snapshot,
+  // which loads lazily on its first subscriber. Subscribe here so the branch in
+  // the title appears once the snapshot loads and updates when it changes.
+  subscribeToRepository() {
+    this.repositorySubscription?.dispose();
+    this.repositorySubscription = null;
+
+    const repository = this.currentRepository();
+    if (repository && typeof repository.onDidChangeStatusSnapshot === "function") {
+      this.repositorySubscription = repository.onDidChangeStatusSnapshot(() => this.updateTitle());
+    }
   },
 
   consumeProjectList(projectList) {
@@ -96,6 +130,7 @@ module.exports = {
       }
     }
 
+    this.subscribeToRepository();
     this.updateTitle();
   },
 
@@ -156,11 +191,7 @@ module.exports = {
       activeItem && typeof activeItem.getTitle === "function" ? activeItem.getTitle() : "";
     const projectPaths = atom.project.getPaths();
     const projectPath = projectPaths[0];
-    const repository =
-      atom.repositories.getForPath(itemPath) ||
-      atom.repositories.getForPath(projectPath) ||
-      atom.repositories.getRepositories()[0] ||
-      null;
+    const repository = this.currentRepository();
     const currentProject = this.projectList ? this.projectList.getCurrentProject() : null;
     const relativeFilePath = itemPath ? atom.project.relativizePath(itemPath)[1] : null;
     return {

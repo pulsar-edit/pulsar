@@ -36,8 +36,10 @@ function statOrNull(candidate) {
 }
 
 // libgit2's valid-repository heuristic (valid_repository_path): a directory is a
-// Git directory when it has a HEAD file plus objects/ and refs/, following the
-// `commondir` pointer used by linked worktrees.
+// Git directory when it has a HEAD file plus objects/ and refs/ directories,
+// following the `commondir` pointer used by linked worktrees. Matching libgit2,
+// objects/ and refs/ must be directories — a bare file of the same name (as in
+// the "invalid repository" specs) does not qualify.
 function isGitDirectory(directory) {
   let commonDir = directory;
   try {
@@ -49,10 +51,12 @@ function isGitDirectory(directory) {
   } catch {
     // No commondir file: the directory is its own common directory.
   }
+  const objects = statOrNull(path.join(commonDir, "objects"));
+  const refs = statOrNull(path.join(commonDir, "refs"));
   return (
     Boolean(statOrNull(path.join(directory, "HEAD"))) &&
-    Boolean(statOrNull(path.join(commonDir, "objects"))) &&
-    Boolean(statOrNull(path.join(commonDir, "refs")))
+    Boolean(objects && objects.isDirectory()) &&
+    Boolean(refs && refs.isDirectory())
   );
 }
 

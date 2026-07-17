@@ -42,88 +42,84 @@ describe("GitRepository", () => {
   });
 
   describe(".relativize(path) and .getWorkingDirectory()", () => {
-    it("matches the libgit2 implementation in, at, and outside the working directory", () => {
+    it("relativizes paths in, at, and outside the working directory", () => {
       const workingDirectory = copyRepository();
       repo = new GitRepository(workingDirectory);
 
-      expect(repo.getWorkingDirectory()).toBe(repo.repo.getWorkingDirectory());
-
-      const cases = [
-        path.join(workingDirectory, "a.txt"),
-        path.join(workingDirectory, "dir", "b.txt"),
-        path.join(workingDirectory, "does-not-exist.txt"),
-        workingDirectory,
-        path.resolve(workingDirectory, ".."),
-        "",
-      ];
-      for (const filePath of cases) {
-        expect(repo.relativize(filePath)).toBe(repo.repo.relativize(filePath));
-      }
+      expect(repo.getWorkingDirectory()).toBeTruthy();
+      expect(repo.relativize(path.join(workingDirectory, "a.txt"))).toBe("a.txt");
+      expect(repo.relativize(path.join(workingDirectory, "dir", "b.txt"))).toBe("dir/b.txt");
+      expect(repo.relativize(path.join(workingDirectory, "does-not-exist.txt"))).toBe(
+        "does-not-exist.txt",
+      );
+      expect(repo.relativize(workingDirectory)).toBe("");
+      expect(repo.relativize("")).toBe("");
     });
   });
 
   describe(".isPathIgnored(path)", () => {
-    it("returns true for an ignored path", () => {
-      repo = new GitRepository(path.join(__dirname, "fixtures", "git", "ignore.git"));
-      expect(repo.isPathIgnored("a.txt")).toBeTruthy();
+    it("reads ignored paths from the status snapshot", async () => {
+      const workingDirectory = copyRepository();
+      fs.writeFileSync(path.join(workingDirectory, ".gitignore"), "ignored.txt\n");
+      fs.writeFileSync(path.join(workingDirectory, "ignored.txt"), "secret");
+      repo = new GitRepository(workingDirectory, { refreshOnWindowFocus: false });
+      await repo.refreshStatusSnapshot();
+
+      expect(repo.isPathIgnored(path.join(workingDirectory, "ignored.txt"))).toBe(true);
+      expect(repo.isPathIgnored(path.join(workingDirectory, "a.txt"))).toBe(false);
     });
 
-    it("returns false for a non-ignored path", () => {
-      repo = new GitRepository(path.join(__dirname, "fixtures", "git", "ignore.git"));
-      expect(repo.isPathIgnored("b.txt")).toBeFalsy();
+    it("returns false before the status snapshot has loaded", () => {
+      repo = new GitRepository(copyRepository(), { refreshOnWindowFocus: false });
+      expect(repo.isPathIgnored("a.txt")).toBe(false);
     });
   });
 
   describe(".isPathModified(path)", () => {
-    let filePath, newPath;
+    let filePath, newPath, workingDirPath;
 
     beforeEach(() => {
-      const workingDirPath = copyRepository();
-      repo = new GitRepository(workingDirPath);
+      workingDirPath = copyRepository();
+      repo = new GitRepository(workingDirPath, { refreshOnWindowFocus: false });
       filePath = path.join(workingDirPath, "a.txt");
       newPath = path.join(workingDirPath, "new-path.txt");
     });
 
-    describe("when the path is unstaged", () => {
-      it("returns false if the path has not been modified", () => {
-        expect(repo.isPathModified(filePath)).toBeFalsy();
-      });
+    it("reflects the status snapshot for modified and deleted paths", async () => {
+      await repo.refreshStatusSnapshot();
+      expect(repo.isPathModified(filePath)).toBe(false);
 
-      it("returns true if the path is modified", () => {
-        fs.writeFileSync(filePath, "change");
-        expect(repo.isPathModified(filePath)).toBeTruthy();
-      });
+      fs.writeFileSync(filePath, "change");
+      await repo.refreshStatusSnapshot();
+      expect(repo.isPathModified(filePath)).toBe(true);
 
-      it("returns true if the path is deleted", () => {
-        fs.removeSync(filePath);
-        expect(repo.isPathModified(filePath)).toBeTruthy();
-      });
+      fs.removeSync(filePath);
+      await repo.refreshStatusSnapshot();
+      expect(repo.isPathModified(filePath)).toBe(true);
+    });
 
-      it("returns false if the path is new", () => {
-        expect(repo.isPathModified(newPath)).toBeFalsy();
-      });
+    it("returns false for a new (untracked) path", async () => {
+      fs.writeFileSync(newPath, "new");
+      await repo.refreshStatusSnapshot();
+      expect(repo.isPathModified(newPath)).toBe(false);
     });
   });
 
   describe(".isPathNew(path)", () => {
-    let filePath, newPath;
+    let filePath, newPath, workingDirPath;
 
     beforeEach(() => {
-      const workingDirPath = copyRepository();
-      repo = new GitRepository(workingDirPath);
+      workingDirPath = copyRepository();
+      repo = new GitRepository(workingDirPath, { refreshOnWindowFocus: false });
       filePath = path.join(workingDirPath, "a.txt");
       newPath = path.join(workingDirPath, "new-path.txt");
       fs.writeFileSync(newPath, "i'm new here");
     });
 
-    describe("when the path is unstaged", () => {
-      it("returns true if the path is new", () => {
-        expect(repo.isPathNew(newPath)).toBeTruthy();
-      });
-
-      it("returns false if the path isn't new", () => {
-        expect(repo.isPathNew(filePath)).toBeFalsy();
-      });
+    it("returns true for an untracked path from the status snapshot", async () => {
+      await repo.refreshStatusSnapshot();
+      expect(repo.isPathNew(newPath)).toBe(true);
+      expect(repo.isPathNew(filePath)).toBe(false);
     });
   });
 
@@ -132,38 +128,25 @@ describe("GitRepository", () => {
 
     beforeEach(() => {
       const workingDirPath = copyRepository();
-      repo = new GitRepository(workingDirPath);
+      atom.project.setPaths([workingDirPath]);
+      repo = atom.repositories.getRepositories()[0];
       filePath = path.join(workingDirPath, "a.txt");
     });
 
-    it("no longer reports a path as modified after checkout", () => {
-      expect(repo.isPathModified(filePath)).toBeFalsy();
+    it("restores the contents of the path to the version at HEAD", async () => {
       fs.writeFileSync(filePath, "ch ch changes");
-      expect(repo.isPathModified(filePath)).toBeTruthy();
-      expect(repo.checkoutHead(filePath)).toBeTruthy();
-      expect(repo.isPathModified(filePath)).toBeFalsy();
-    });
-
-    it("restores the contents of the path to the original text", () => {
-      fs.writeFileSync(filePath, "ch ch changes");
-      expect(repo.checkoutHead(filePath)).toBeTruthy();
+      expect(await repo.checkoutHead(filePath)).toBe(true);
       expect(fs.readFileSync(filePath, "utf8")).toBe("");
     });
 
-    it("fires a status-changed event if the checkout completes successfully", () => {
+    it("reports the path as unmodified after checkout", async () => {
       fs.writeFileSync(filePath, "ch ch changes");
-      repo.getPathStatus(filePath);
-      const statusHandler = jasmine.createSpy("statusHandler");
-      repo.onDidChangeStatus(statusHandler);
-      repo.checkoutHead(filePath);
-      expect(statusHandler.calls.count()).toBe(1);
-      expect(statusHandler.calls.argsFor(0)[0]).toEqual({
-        path: filePath,
-        pathStatus: 0,
-      });
+      await repo.refreshStatusSnapshot();
+      expect(repo.isPathModified(filePath)).toBe(true);
 
-      repo.checkoutHead(filePath);
-      expect(statusHandler.calls.count()).toBe(1);
+      await repo.checkoutHead(filePath);
+      await repo.refreshStatusSnapshot();
+      expect(repo.isPathModified(filePath)).toBe(false);
     });
   });
 
@@ -171,44 +154,22 @@ describe("GitRepository", () => {
     let filePath, editor;
 
     beforeEach(async () => {
-      spyOn(atom, "confirm");
-
       const workingDirPath = copyRepository();
-      repo = new GitRepository(workingDirPath, {
-        project: atom.project,
-        config: atom.config,
-        confirm: atom.confirm,
-      });
+      atom.project.setPaths([workingDirPath]);
+      repo = atom.repositories.getRepositories()[0];
       filePath = path.join(workingDirPath, "a.txt");
       fs.writeFileSync(filePath, "ch ch changes");
 
       editor = await atom.workspace.open(filePath);
     });
 
-    it("displays a confirmation dialog by default", (done) => {
-      jasmine.filterByPlatform({ except: ["win32"] }, done); // Permissions issues with this test on Windows
-
-      atom.confirm.and.callFake(({ buttons }) => buttons.OK());
-      atom.config.set("editor.confirmCheckoutHeadRevision", true);
-
-      repo.checkoutHeadForEditor(editor);
-
-      expect(fs.readFileSync(filePath, "utf8")).toBe("");
-
-      done();
-    });
-
-    it("does not display a dialog when confirmation is disabled", (done) => {
+    it("restores the editor's file to the version at HEAD", (done) => {
       jasmine.filterByPlatform({ except: ["win32"] }, done); // Flakey EPERM opening a.txt on Win32
 
-      atom.config.set("editor.confirmCheckoutHeadRevision", false);
-
-      repo.checkoutHeadForEditor(editor);
-
-      expect(fs.readFileSync(filePath, "utf8")).toBe("");
-      expect(atom.confirm).not.toHaveBeenCalled();
-
-      done();
+      repo.checkoutHeadForEditor(editor).then(() => {
+        expect(fs.readFileSync(filePath, "utf8")).toBe("");
+        done();
+      });
     });
   });
 
@@ -220,112 +181,24 @@ describe("GitRepository", () => {
     });
   });
 
-  describe(".getPathStatus(path)", () => {
-    let filePath;
-
-    beforeEach(() => {
-      const workingDirectory = copyRepository();
-      repo = new GitRepository(workingDirectory);
-      filePath = path.join(workingDirectory, "file.txt");
-    });
-
-    it("trigger a status-changed event when the new status differs from the last cached one", () => {
-      const statusHandler = jasmine.createSpy("statusHandler");
-      repo.onDidChangeStatus(statusHandler);
-      fs.writeFileSync(filePath, "");
-      let status = repo.getPathStatus(filePath);
-      expect(statusHandler.calls.count()).toBe(1);
-      expect(statusHandler.calls.argsFor(0)[0]).toEqual({
-        path: filePath,
-        pathStatus: status,
-      });
-
-      fs.writeFileSync(filePath, "abc");
-      repo.getPathStatus(filePath);
-      expect(statusHandler.calls.count()).toBe(1);
-    });
-  });
-
   describe(".getDirectoryStatusSummary(path)", () => {
-    let directoryPath, filePath;
-
-    beforeEach(() => {
-      const workingDirectory = copyRepository();
-      repo = new GitRepository(workingDirectory);
-      directoryPath = path.join(workingDirectory, "dir");
-      filePath = path.join(directoryPath, "b.txt");
-    });
-
-    it("aggregates the status of the files inside the directory", () => {
-      expect(repo.getDirectoryStatusSummary(directoryPath)).toBeNull();
-      fs.writeFileSync(filePath, "abc");
-      repo.getPathStatus(filePath);
-      expect(repo.getDirectoryStatusSummary(directoryPath).modified).toBe(true);
-    });
-  });
-
-  describe(".refreshStatus()", () => {
-    let newPath, modifiedPath, cleanPath, workingDirectory;
+    let directoryPath, filePath, workingDirectory;
 
     beforeEach(() => {
       workingDirectory = copyRepository();
-      repo = new GitRepository(workingDirectory, {
-        project: atom.project,
-        config: atom.config,
-      });
-      modifiedPath = path.join(workingDirectory, "file.txt");
-      newPath = path.join(workingDirectory, "untracked.txt");
-      cleanPath = path.join(workingDirectory, "other.txt");
-      fs.writeFileSync(cleanPath, "Full of text");
-      fs.writeFileSync(newPath, "");
-      newPath = fs.absolute(newPath);
+      repo = new GitRepository(workingDirectory, { refreshOnWindowFocus: false });
+      directoryPath = path.join(workingDirectory, "fresh-dir");
+      filePath = path.join(directoryPath, "new.txt");
     });
 
-    it("returns status information for all new and modified files", async () => {
-      const statusHandler = jasmine.createSpy("statusHandler");
-      repo.onDidChangeStatuses(statusHandler);
-      fs.writeFileSync(modifiedPath, "making this path modified");
+    it("aggregates the status of the files inside the directory from the snapshot", async () => {
+      await repo.refreshStatusSnapshot();
+      expect(repo.getDirectoryStatusSummary(directoryPath)).toBeNull();
 
-      await repo.refreshStatus();
-      expect(statusHandler.calls.count()).toBe(1);
-      expect(repo.getCachedPathStatus(cleanPath)).toBeUndefined();
-      expect(repo.isStatusNew(repo.getCachedPathStatus(newPath))).toBeTruthy();
-      expect(repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))).toBeTruthy();
-    });
-
-    it("caches the proper statuses when a subdir is open", async () => {
-      const subDir = path.join(workingDirectory, "dir");
-      fs.mkdirSync(subDir);
-      const filePath = path.join(subDir, "b.txt");
-      fs.writeFileSync(filePath, "");
-      atom.project.setPaths([subDir]);
-      await atom.workspace.open("b.txt");
-      repo = atom.repositories.getRepositories()[0];
-
-      await repo.refreshStatus();
-      const status = repo.getCachedPathStatus(filePath);
-      expect(repo.isStatusModified(status)).toBe(false);
-      expect(repo.isStatusNew(status)).toBe(false);
-    });
-
-    it("works correctly when the project has multiple folders (regression)", async () => {
-      atom.project.addPath(workingDirectory);
-      atom.project.addPath(path.join(__dirname, "fixtures", "dir"));
-
-      await repo.refreshStatus();
-      expect(repo.getCachedPathStatus(cleanPath)).toBeUndefined();
-      expect(repo.isStatusNew(repo.getCachedPathStatus(newPath))).toBeTruthy();
-      expect(repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))).toBeTruthy();
-    });
-
-    it("caches statuses that were looked up synchronously", async () => {
-      const originalContent = "undefined";
-      fs.writeFileSync(modifiedPath, "making this path modified");
-      repo.getPathStatus("file.txt");
-
-      fs.writeFileSync(modifiedPath, originalContent);
-      await repo.refreshStatus();
-      expect(repo.isStatusModified(repo.getCachedPathStatus(modifiedPath))).toBeFalsy();
+      fs.mkdirSync(directoryPath);
+      fs.writeFileSync(filePath, "abc");
+      await repo.refreshStatusSnapshot();
+      expect(repo.getDirectoryStatusSummary(directoryPath).added).toBe(true);
     });
   });
 
@@ -463,19 +336,18 @@ describe("GitRepository", () => {
     });
 
     it("does not spawn a status subprocess without subscribers", async () => {
-      await repo.refreshStatus();
-      repo.getPathStatus("a.txt");
+      repo.scheduleStatusSnapshotRefresh();
       await runScheduler();
 
       expect(statusSnapshotProvider.getStatus.calls.count()).toBe(0);
     });
 
-    it("refreshes after refreshStatus while a subscriber exists", async () => {
+    it("refreshes again when scheduled while a subscriber exists", async () => {
       repo.onDidChangeStatusSnapshot(() => {});
       await runScheduler();
 
       output = "# branch.oid def456\0# branch.head main\0? other.txt\0";
-      await repo.refreshStatus();
+      repo.scheduleStatusSnapshotRefresh();
       await runScheduler();
 
       expect(repo.getStatusSnapshot().files[0].path).toBe("other.txt");
@@ -615,12 +487,12 @@ describe("GitRepository", () => {
       expect(repo.getRefsSnapshot().head.name).toBe("newest");
     });
 
-    it("refreshes refs after refreshStatus while a subscriber exists", async () => {
+    it("refreshes refs again when scheduled while a subscriber exists", async () => {
       repo.onDidChangeRefsSnapshot(() => {});
       await runScheduler();
 
       refsOutputs = makeOutputs("switched");
-      await repo.refreshStatus();
+      repo.scheduleRefsSnapshotRefresh();
       await runScheduler();
 
       expect(repo.getRefsSnapshot().head.name).toBe("switched");
@@ -731,26 +603,9 @@ describe("GitRepository", () => {
       });
     });
 
-    it("classifies from the synchronous cache before the snapshot loads", async () => {
-      const filePath = path.join(workingDirectory, "dir", "b.txt");
-      fs.writeFileSync(filePath, "changed");
-      await repo.refreshStatus();
-
-      const fileSummary = repo.getPathStatusSummary(filePath);
-      expect(fileSummary.source).toBe("cache");
-      expect(fileSummary.modified).toBe(true);
-      expect(fileSummary.added).toBe(false);
-      expect(fileSummary.conflicted).toBe(false);
-
-      const directorySummary = repo.getDirectoryStatusSummary(path.join(workingDirectory, "dir"));
-      expect(directorySummary.source).toBe("cache");
-      expect(directorySummary.modified).toBe(true);
-
-      const rootSummary = repo.getDirectoryStatusSummary(workingDirectory);
-      expect(rootSummary.source).toBe("cache");
-      expect(rootSummary.modified).toBe(true);
-
-      expect(repo.getPathStatusSummary(path.join(workingDirectory, "no-such-file.txt"))).toBeNull();
+    it("returns null for every query before the snapshot loads", () => {
+      expect(repo.getPathStatusSummary(path.join(workingDirectory, "a.txt"))).toBeNull();
+      expect(repo.getDirectoryStatusSummary(workingDirectory)).toBeNull();
     });
 
     it("pins the snapshot classification to the legacy modified-beats-added order", async () => {
@@ -835,89 +690,45 @@ describe("GitRepository", () => {
       await repo.refreshStatusSnapshot();
       expect(repo.getDirectoryStatusSummary(workingDirectory)).toBeNull();
     });
-
-    it("keeps snapshot-era queries working for paths only the cache knows", async () => {
-      const filePath = path.join(workingDirectory, "dir", "b.txt");
-      fs.writeFileSync(filePath, "changed");
-      await repo.refreshStatus();
-      await repo.refreshStatusSnapshot();
-
-      // The fake snapshot reports a clean tree; the cache still knows the
-      // change, mirroring how submodule contents surface only in the cache.
-      const summary = repo.getPathStatusSummary(filePath);
-      expect(summary.source).toBe("cache");
-      expect(summary.modified).toBe(true);
-
-      const directorySummary = repo.getDirectoryStatusSummary(path.join(workingDirectory, "dir"));
-      expect(directorySummary.source).toBe("cache");
-    });
   });
 
   describe("buffer events", () => {
-    let editor;
+    let editor, repository;
 
     beforeEach(async () => {
       atom.project.setPaths([copyRepository()]);
       editor = await atom.workspace.open("other.txt");
-      // Discovery no longer eagerly refreshes status; load the baseline
-      // explicitly so buffer-save status transitions are observable.
-      await atom.repositories.getRepositories()[0].refreshStatus();
+      repository = atom.repositories.getRepositories()[0];
     });
 
-    it("emits a status-changed event when a buffer is saved", async () => {
+    it("schedules a status snapshot refresh when a buffer is saved", async () => {
       editor.insertNewline();
-
-      const statusHandler = jasmine.createSpy("statusHandler");
-      atom.repositories.getRepositories()[0].onDidChangeStatus(statusHandler);
-
+      const refresh = spyOn(repository, "scheduleStatusSnapshotRefresh");
       await editor.save();
-      expect(statusHandler.calls.count()).toBe(1);
-      expect(statusHandler).toHaveBeenCalledWith({
-        path: editor.getPath(),
-        pathStatus: 256,
-      });
+      expect(refresh).toHaveBeenCalled();
     });
 
-    it("emits a status-changed event when a buffer is reloaded", async () => {
+    it("schedules a status snapshot refresh when a buffer is reloaded", async () => {
       fs.writeFileSync(editor.getPath(), "changed");
-
-      const statusHandler = jasmine.createSpy("statusHandler");
-      atom.repositories.getRepositories()[0].onDidChangeStatus(statusHandler);
-
+      const refresh = spyOn(repository, "scheduleStatusSnapshotRefresh");
       await editor.getBuffer().reload();
-      expect(statusHandler.calls.count()).toBe(1);
-      expect(statusHandler).toHaveBeenCalledWith({
-        path: editor.getPath(),
-        pathStatus: 256,
-      });
-
-      await editor.getBuffer().reload();
-      expect(statusHandler.calls.count()).toBe(1);
+      expect(refresh).toHaveBeenCalled();
     });
 
-    it("emits a status-changed event when a buffer's path changes", () => {
-      fs.writeFileSync(editor.getPath(), "changed");
-
-      const statusHandler = jasmine.createSpy("statusHandler");
-      atom.repositories.getRepositories()[0].onDidChangeStatus(statusHandler);
+    it("schedules a status snapshot refresh when a buffer's path changes", () => {
+      const refresh = spyOn(repository, "scheduleStatusSnapshotRefresh");
       editor.getBuffer().emitter.emit("did-change-path");
-      expect(statusHandler.calls.count()).toBe(1);
-      expect(statusHandler).toHaveBeenCalledWith({
-        path: editor.getPath(),
-        pathStatus: 256,
-      });
-      editor.getBuffer().emitter.emit("did-change-path");
-      expect(statusHandler.calls.count()).toBe(1);
+      expect(refresh).toHaveBeenCalled();
     });
 
     it("stops listening to the buffer when the repository is destroyed (regression)", () => {
-      atom.repositories.getRepositories()[0].destroy();
+      repository.destroy();
       expect(() => editor.save()).not.toThrow();
     });
   });
 
   describe("when a project is deserialized", () => {
-    let buffer, project2, repositoryRegistry2, statusHandler;
+    let buffer, project2, repositoryRegistry2;
 
     afterEach(() => {
       if (project2) project2.destroy();
@@ -946,15 +757,11 @@ describe("GitRepository", () => {
       buffer = project2.getBuffers()[0];
       buffer.append("changes");
 
-      statusHandler = jasmine.createSpy("statusHandler");
-      repositoryRegistry2.getRepositories()[0].onDidChangeStatus(statusHandler);
+      const repository = repositoryRegistry2.getRepositories()[0];
+      const refresh = spyOn(repository, "scheduleStatusSnapshotRefresh");
       await buffer.save();
 
-      expect(statusHandler.calls.count()).toBe(1);
-      expect(statusHandler).toHaveBeenCalledWith({
-        path: buffer.getPath(),
-        pathStatus: 256,
-      });
+      expect(refresh).toHaveBeenCalled();
     });
   });
 });

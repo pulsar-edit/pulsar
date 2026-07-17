@@ -1,8 +1,7 @@
 const path = require("path");
 const fs = require("@lumine-code/fs-plus");
-const _ = require("@lumine-code/underscore-plus");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
-const GitUtils = require("@lumine-code/git-utils");
+const { discoverRepositoryDescriptor } = require("./git-repository-descriptor");
 const {
   GitHostStatusProvider,
   GitHostRefsProvider,
@@ -128,20 +127,18 @@ module.exports = class GitRepository {
     this.id = nextId++;
     this.emitter = new Emitter();
     this.subscriptions = new CompositeDisposable();
-    this.repo = GitUtils.open(path);
-    if (this.repo == null) {
+    this.descriptor = discoverRepositoryDescriptor(path);
+    if (this.descriptor == null) {
       throw new Error(`No Git repository found searching path: ${path}`);
     }
 
     // Cache the working directory and filesystem traits once so path routing
-    // (getWorkingDirectory/relativize) needs no native call per query. These are
-    // fixed for the repository's lifetime.
-    this.workingDirectoryPath = this.repo.getWorkingDirectory();
-    this.openedWorkingDirectoryPath = this.repo.openedWorkingDirectory || null;
-    this.caseInsensitiveFs = this.repo.caseInsensitiveFs === true;
+    // (getWorkingDirectory/relativize) needs no filesystem walk per query. These
+    // are fixed for the repository's lifetime.
+    this.workingDirectoryPath = this.descriptor.getWorkingDirectory();
+    this.openedWorkingDirectoryPath = this.descriptor.openedWorkingDirectory || null;
+    this.caseInsensitiveFs = this.descriptor.caseInsensitiveFs === true;
 
-    this.statusRefreshCount = 0;
-    this.statuses = {};
     this.statusSnapshotProvider = options.statusSnapshotProvider || new GitHostStatusProvider();
     this.statusSnapshot = EMPTY_STATUS_SNAPSHOT;
     this.statusSnapshotCacheKey = null;
@@ -166,10 +163,6 @@ module.exports = class GitRepository {
     this.historyProvider = options.historyProvider || new GitHostHistoryProvider();
     this.configProvider = options.configProvider || new GitHostConfigProvider();
     this.upstream = { ahead: 0, behind: 0 };
-    for (let submodulePath in this.repo.submodules) {
-      const submoduleRepo = this.repo.submodules[submodulePath];
-      submoduleRepo.upstream = { ahead: 0, behind: 0 };
-    }
 
     this.project = options.project;
     this.config = options.config;
@@ -204,7 +197,7 @@ module.exports = class GitRepository {
   destroy() {
     this.statusSnapshotRefreshCount++;
     this.refsSnapshotRefreshCount++;
-    this.repo = null;
+    this.descriptor = null;
     this.operations = null;
     this.statusSnapshotProvider = null;
     this.refsSnapshotProvider = null;
@@ -236,7 +229,7 @@ module.exports = class GitRepository {
 
   // Public: Returns a {Boolean} indicating if this repository has been destroyed.
   isDestroyed() {
-    return this.repo == null;
+    return this.descriptor == null;
   }
 
   // Public: Returns whether this repository's Git directory still exists.
@@ -275,8 +268,10 @@ module.exports = class GitRepository {
   // * `callback` {Function}
   //   * `event` {Object}
   //     * `path` {String} the path whose status changed
-  //     * `pathStatus` {Number} representing the status. This value can be passed to
-  //       {::isStatusModified} or {::isStatusNew} to get more information.
+  //     * `pathStatus` {Number} representing the status.
+  //
+  // Note: prefer {::onDidChangeStatusSnapshot}, which fires for every status
+  // change; this legacy per-path event is retained for API compatibility.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidChangeStatus(callback) {
@@ -284,9 +279,8 @@ module.exports = class GitRepository {
   }
 
   // Public: Invoke the given callback when multiple files' statuses have
-  // changed. For example, on window focus, the status of all the paths in the
-  // repo is checked. If any of them have changed, this will be fired. Call
-  // {::getPathStatus} to get the status for your path of choice.
+  // changed. Prefer {::onDidChangeStatusSnapshot}; this legacy event is retained
+  // for API compatibility.
   //
   // * `callback` {Function}
   //
@@ -355,7 +349,8 @@ module.exports = class GitRepository {
   // Public: Returns the {String} path of the repository.
   getPath() {
     if (this.path == null) {
-      this.path = fs.absolute(this.getRepo().getPath());
+      if (this.isDestroyed()) throw new Error("Repository has been destroyed");
+      this.path = fs.absolute(this.descriptor.getPath());
     }
     return this.path;
   }
@@ -400,16 +395,20 @@ module.exports = class GitRepository {
   //   for, only needed if the repository contains submodules.
   //
   // Returns a {String}.
-  getShortHead(path) {
-    // For the top-level repository, read the head from the status snapshot
-    // (reliably loaded whenever the UI shows this repo). Submodule paths and the
-    // pre-snapshot beat fall back to libgit2 (removed in a later phase).
-    if (!path && this.statusSnapshot.initialized && this.statusSnapshot.head) {
-      const head = this.statusSnapshot.head;
-      if (head.name) return head.name;
-      if (head.detached && head.oid) return head.oid.slice(0, 7);
+  getShortHead() {
+    if (this.isDestroyed()) throw new Error("Repository has been destroyed");
+    // Read the head from whichever snapshot has loaded. Both carry the branch
+    // name (or a shortened oid for a detached HEAD); the status snapshot is the
+    // one the file-tree/tab UI keeps warm, the refs snapshot backs the branch
+    // switcher and window title.
+    for (const snapshot of [this.statusSnapshot, this.refsSnapshot]) {
+      if (snapshot.initialized && snapshot.head) {
+        const head = snapshot.head;
+        if (head.name) return head.name;
+        if (head.detached && head.oid) return head.oid.slice(0, 7);
+      }
     }
-    return this.getRepo(path).getShortHead();
+    return "";
   }
 
   // Public: Is the given path a submodule in the repository?
@@ -418,15 +417,8 @@ module.exports = class GitRepository {
   //
   // Returns a {Boolean}.
   isSubmodule(filePath) {
-    if (!filePath) return false;
-
-    const repo = this.getRepo(filePath);
-    if (repo.isSubmodule(repo.relativize(filePath))) {
-      return true;
-    } else {
-      // Check if the filePath is a working directory in a repo that isn't the root.
-      return repo !== this.getRepo() && repo.relativize(path.join(filePath, "dir")) === "dir";
-    }
+    if (!filePath || this.isDestroyed()) return false;
+    return this.descriptor.isSubmodule(this.relativize(filePath));
   }
 
   // Public: Returns the number of commits behind the current branch is from the
@@ -435,16 +427,14 @@ module.exports = class GitRepository {
   // * `reference` The {String} branch reference name.
   // * `path`      The {String} path in the repository to get this information for,
   //   only needed if the repository contains submodules.
-  getAheadBehindCount(reference, path) {
-    if (!path && this.refsSnapshot.initialized) {
+  getAheadBehindCount(reference) {
+    if (this.refsSnapshot.initialized) {
       const branch = this.refsSnapshotBranchForReference(reference);
-      if (branch) {
-        return branch.upstream
-          ? { ahead: branch.upstream.ahead, behind: branch.upstream.behind }
-          : { ahead: 0, behind: 0 };
+      if (branch?.upstream) {
+        return { ahead: branch.upstream.ahead, behind: branch.upstream.behind };
       }
     }
-    return this.getRepo(path).getAheadBehindCount(reference);
+    return { ahead: 0, behind: 0 };
   }
 
   // Public: Get the cached ahead/behind commit counts for the current branch's
@@ -456,14 +446,14 @@ module.exports = class GitRepository {
   // Returns an {Object} with the following keys:
   //   * `ahead`  The {Number} of commits ahead.
   //   * `behind` The {Number} of commits behind.
-  getCachedUpstreamAheadBehindCount(path) {
-    if (!path && this.refsSnapshot.initialized) {
+  getCachedUpstreamAheadBehindCount() {
+    if (this.refsSnapshot.initialized) {
       const branch = this.refsSnapshot.branches.find((entry) => entry.isHead);
       if (branch?.upstream) {
         return { ahead: branch.upstream.ahead, behind: branch.upstream.behind };
       }
     }
-    return this.getRepo(path).upstream || this.upstream;
+    return this.upstream;
   }
 
   // Public: Returns the git configuration value specified by the key.
@@ -471,13 +461,9 @@ module.exports = class GitRepository {
   // * `key`  The {String} key for the configuration to lookup.
   // * `path` An optional {String} path in the repository to get this information
   //   for, only needed if the repository has submodules.
-  getConfigValue(key, path) {
-    return this.getRepo(path).getConfigValue(key);
-  }
-
   // Public: Asynchronously read a git configuration value via the git-host
   // worker (`git config --get`), the off-thread replacement for the synchronous
-  // libgit2 {::getConfigValue}. Resolves to the value or `null` when unset.
+  // libgit2 config lookup. Resolves to the value or `null` when unset.
   //
   // * `key` The {String} configuration key to look up.
   //
@@ -487,16 +473,15 @@ module.exports = class GitRepository {
     return this.configProvider.getConfigValue(this.getWorkingDirectory(), key);
   }
 
-  // Public: Returns the origin url of the repository.
-  //
-  // * `path` (optional) {String} path in the repository to get this information
-  //   for, only needed if the repository has submodules.
-  getOriginURL(path) {
-    if (!path && this.refsSnapshot.initialized) {
+  // Public: Returns the origin url of the repository, read from the refs
+  // snapshot's remotes. Returns `null` until the snapshot has loaded or when the
+  // repository has no `origin` remote.
+  getOriginURL() {
+    if (this.refsSnapshot.initialized) {
       const origin = this.refsSnapshot.remotes.find((remote) => remote.name === "origin");
       if (origin) return origin.fetchUrl ?? null;
     }
-    return this.getConfigValue("remote.origin.url", path);
+    return null;
   }
 
   // Public: Returns the upstream branch for the current HEAD, or null if there
@@ -506,12 +491,12 @@ module.exports = class GitRepository {
   //   only needed if the repository contains submodules.
   //
   // Returns a {String} branch name such as `refs/remotes/origin/master`.
-  getUpstreamBranch(path) {
-    if (!path && this.refsSnapshot.initialized) {
+  getUpstreamBranch() {
+    if (this.refsSnapshot.initialized) {
       const branch = this.refsSnapshot.branches.find((entry) => entry.isHead);
       return branch?.upstream?.ref ?? null;
     }
-    return this.getRepo(path).getUpstreamBranch();
+    return null;
   }
 
   // Public: Gets all the local and remote references.
@@ -523,16 +508,13 @@ module.exports = class GitRepository {
   //  * `heads`   An {Array} of head reference names.
   //  * `remotes` An {Array} of remote reference names.
   //  * `tags`    An {Array} of tag reference names.
-  getReferences(path) {
-    if (!path && this.refsSnapshot.initialized) {
-      const snapshot = this.refsSnapshot;
-      return {
-        heads: snapshot.branches.map((branch) => branch.ref),
-        remotes: snapshot.remoteBranches.map((branch) => branch.ref),
-        tags: snapshot.tags.map((tag) => tag.ref),
-      };
-    }
-    return this.getRepo(path).getReferences();
+  getReferences() {
+    const snapshot = this.refsSnapshot;
+    return {
+      heads: snapshot.branches.map((branch) => branch.ref),
+      remotes: snapshot.remoteBranches.map((branch) => branch.ref),
+      tags: snapshot.tags.map((tag) => tag.ref),
+    };
   }
 
   // Public: Returns the current {String} SHA for the given reference.
@@ -540,15 +522,12 @@ module.exports = class GitRepository {
   // * `reference` The {String} reference to get the target of.
   // * `path` An optional {String} path in the repo to get the reference target
   //   for. Only needed if the repository contains submodules.
-  getReferenceTarget(reference, path) {
-    if (!path && this.refsSnapshot.initialized) {
+  getReferenceTarget(reference) {
+    if (this.refsSnapshot.initialized) {
       const target = this.refsSnapshotReferenceTarget(reference);
-      // `undefined` means the snapshot does not know this ref (e.g. a raw SHA or
-      // a note ref); fall through to libgit2. `null` is a definitive answer
-      // (an unborn HEAD).
       if (target !== undefined) return target;
     }
-    return this.getRepo(path).getReferenceTarget(reference);
+    return null;
   }
 
   // Resolve the branch entry a ref/name refers to in the refs snapshot, or the
@@ -584,80 +563,53 @@ module.exports = class GitRepository {
   Section: Reading Status
   */
 
-  // Public: Returns true if the given path is modified.
+  // Public: Returns true if the given path is modified, read from the detailed
+  // status snapshot. Returns false until the snapshot has loaded.
   //
   // * `path` The {String} path to check.
   //
   // Returns a {Boolean} that's true if the `path` is modified.
   isPathModified(path) {
-    return this.isStatusModified(this.getPathStatus(path));
+    const summary = this.getPathStatusSummary(path);
+    return Boolean(summary && summary.modified);
   }
 
-  // Public: Returns true if the given path is new.
+  // Public: Returns true if the given path is new, read from the detailed status
+  // snapshot. Returns false until the snapshot has loaded.
   //
   // * `path` The {String} path to check.
   //
   // Returns a {Boolean} that's true if the `path` is new.
   isPathNew(path) {
-    return this.isStatusNew(this.getPathStatus(path));
+    const summary = this.getPathStatusSummary(path);
+    return Boolean(summary && summary.added);
   }
 
-  // Public: Is the given path ignored?
+  // Public: Is the given path ignored? Resolved from the detailed status
+  // snapshot's ignored entries; returns false until the snapshot has loaded.
   //
   // * `path` The {String} path to check.
   //
   // Returns a {Boolean} that's true if the `path` is ignored.
   isPathIgnored(path) {
-    return this.getRepo().isIgnored(this.relativize(path));
+    return this.isPathIgnoredCached(path);
   }
 
-  // Public: Like {::isPathIgnored}, but resolved synchronously from the Dugite
-  // status snapshot's ignored entries instead of libgit2. Falls back to
-  // {::isPathIgnored} until the first snapshot loads so first paint is unchanged.
+  // Public: Whether the given path is ignored, resolved synchronously from the
+  // Dugite status snapshot's ignored entries. Returns false until the first
+  // snapshot loads.
   //
   // * `filePath` The {String} path to check.
   //
   // Returns a {Boolean} that's true if the `filePath` is ignored.
   isPathIgnoredCached(filePath) {
-    if (this.isDestroyed()) return false;
+    if (this.isDestroyed() || !this.statusSnapshot.initialized) return false;
 
-    if (this.statusSnapshot.initialized) {
-      const relativePath = this.relativize(String(filePath));
-      if (relativePath == null || relativePath === "") return false;
-      const key = statusPathKey(relativePath);
-      if (this.ignoredFileKeys.has(key)) return true;
-      return this.ignoredDirKeys.some((dir) => key === dir || key.startsWith(`${dir}/`));
-    }
-
-    // Pre-snapshot fallback (removed with git-utils in a later phase).
-    return this.getRepo().isIgnored(this.relativize(filePath));
-  }
-
-  // Refresh the cached git-utils status of a single path. Internal engine for
-  // {::getPathStatusSummary}; consumers read summaries instead of status bits.
-  getPathStatus(path) {
-    const repo = this.getRepo(path);
-    const relativePath = this.relativize(path);
-    const currentPathStatus = this.statuses[relativePath] || 0;
-    let pathStatus = repo.getStatus(repo.relativize(path)) || 0;
-    if (repo.isStatusIgnored(pathStatus)) pathStatus = 0;
-    if (pathStatus > 0) {
-      this.statuses[relativePath] = pathStatus;
-    } else {
-      delete this.statuses[relativePath];
-    }
-    if (currentPathStatus !== pathStatus) {
-      this.emitter.emit("did-change-status", { path, pathStatus });
-      this.scheduleStatusSnapshotRefresh();
-    }
-
-    return pathStatus;
-  }
-
-  // Cached git-utils status bits for a path. Internal; consumers read
-  // {::getPathStatusSummary} instead.
-  getCachedPathStatus(path) {
-    return this.statuses[this.relativize(path)];
+    const relativePath = this.relativize(String(filePath));
+    if (relativePath == null || relativePath === "") return false;
+    const key = statusPathKey(relativePath);
+    if (this.ignoredFileKeys.has(key)) return true;
+    return this.ignoredDirKeys.some((dir) => key === dir || key.startsWith(`${dir}/`));
   }
 
   // Public: Return the latest immutable detailed status snapshot. It contains
@@ -791,31 +743,20 @@ module.exports = class GitRepository {
     return aggregates;
   }
 
-  // Public: Classified status for one path, independent of git-utils status
-  // bits. Prefers the detailed status snapshot when it has loaded and falls
-  // back to the synchronous cache, so consumers paint instantly on startup and
-  // upgrade automatically. Paths only the synchronous cache knows (files
-  // inside submodules) always use the cache.
+  // Public: Classified status for one path, read from the detailed status
+  // snapshot.
   //
   // * `filePath` A {String} path, absolute or repository-relative.
   //
   // Returns a frozen `{source, conflicted, modified, added, renamed}` object
-  // where `source` is `"snapshot"` or `"cache"`, or `null` for clean, ignored,
-  // and unknown paths.
+  // (`source` is always `"snapshot"`), or `null` for clean, ignored, unknown,
+  // and pre-snapshot paths.
   getPathStatusSummary(filePath) {
-    if (filePath == null || this.isDestroyed()) return null;
+    if (filePath == null || this.isDestroyed() || !this.statusSnapshot.initialized) return null;
 
-    if (this.statusSnapshot.initialized) {
-      const entry = this.getStatusEntry(filePath);
-      if (entry) return entry.ignored ? null : summaryFromStatusEntry(entry);
-    }
-
-    const status = this.statuses[this.relativize(String(filePath))];
-    if (!status) return null;
-    const modified = this.isStatusModified(status);
-    const added = !modified && this.isStatusNew(status);
-    if (!modified && !added) return null;
-    return Object.freeze({ source: "cache", conflicted: false, modified, added, renamed: false });
+    const entry = this.getStatusEntry(filePath);
+    if (!entry || entry.ignored) return null;
+    return summaryFromStatusEntry(entry);
   }
 
   // Public: Aggregate classified status for a directory, including the
@@ -823,37 +764,20 @@ module.exports = class GitRepository {
   // (without `renamed`); returns `null` when nothing below the directory has
   // a reportable status.
   getDirectoryStatusSummary(directoryPath) {
-    if (directoryPath == null || this.isDestroyed()) return null;
+    if (directoryPath == null || this.isDestroyed() || !this.statusSnapshot.initialized) {
+      return null;
+    }
     const relativePath = this.relativize(String(directoryPath));
     if (relativePath == null) return null;
 
-    if (this.statusSnapshot.initialized) {
-      const aggregate = this.directoryStatusAggregates.get(statusPathKey(relativePath));
-      if (aggregate) {
-        return Object.freeze({
-          source: "snapshot",
-          conflicted: aggregate.conflicted,
-          modified: aggregate.modified,
-          added: aggregate.added,
-        });
-      }
-      // No aggregate: the directory is clean as far as the snapshot knows.
-      // Fall through to the cache, which additionally tracks changes inside
-      // submodules that the root-repository snapshot cannot see.
-    }
-
-    const prefix = relativePath === "" ? "" : `${relativePath}/`;
-    let combinedStatus = 0;
-    for (const statusPath in this.statuses) {
-      if (prefix === "" || statusPath.startsWith(prefix)) {
-        combinedStatus |= this.statuses[statusPath];
-      }
-    }
-    if (combinedStatus === 0) return null;
-    const modified = this.isStatusModified(combinedStatus);
-    const added = !modified && this.isStatusNew(combinedStatus);
-    if (!modified && !added) return null;
-    return Object.freeze({ source: "cache", conflicted: false, modified, added });
+    const aggregate = this.directoryStatusAggregates.get(statusPathKey(relativePath));
+    if (!aggregate) return null;
+    return Object.freeze({
+      source: "snapshot",
+      conflicted: aggregate.conflicted,
+      modified: aggregate.modified,
+      added: aggregate.added,
+    });
   }
 
   // Public: Return the latest immutable refs snapshot. It contains `head`,
@@ -1097,15 +1021,6 @@ module.exports = class GitRepository {
     return Object.freeze({ revision, lines: parseBlamePorcelain(output) });
   }
 
-  // Internal git-utils status-bit classifiers behind the summary API.
-  isStatusModified(status) {
-    return this.getRepo().isStatusModified(status);
-  }
-
-  isStatusNew(status) {
-    return this.getRepo().isStatusNew(status);
-  }
-
   /*
   Section: Retrieving Diffs
   */
@@ -1121,13 +1036,12 @@ module.exports = class GitRepository {
   // `oldStart`, `newStart`, `oldLines`, and `newLines`.
   getLineDiffsAsync(filePath, text) {
     if (this.isDestroyed()) return Promise.resolve([]);
-    const repo = this.getRepo(filePath);
-    const relativePosixPath = repo.relativize(filePath).split(path.sep).join("/");
-    // The status snapshot's head oid keys the worker's blob cache. It only
-    // applies to the top-level repository; a file inside a submodule resolves
-    // its own HEAD in the worker (headOid left null).
-    const headOid = repo === this.repo ? (this.statusSnapshot?.head?.oid ?? null) : null;
-    return this.diffProvider.getLineDiffs(repo.getWorkingDirectory(), {
+    const relativePosixPath = this.relativize(filePath).split(path.sep).join("/");
+    // The status snapshot's head oid keys the worker's blob cache; a HEAD move
+    // produces a fresh key. Files inside submodules are owned by their own
+    // repository, so this repository always keys against its own HEAD.
+    const headOid = this.statusSnapshot?.head?.oid ?? null;
+    return this.diffProvider.getLineDiffs(this.getWorkingDirectory(), {
       relativePosixPath,
       headOid,
       text,
@@ -1140,34 +1054,39 @@ module.exports = class GitRepository {
   */
 
   // Public: Restore the contents of a path in the working directory and index
-  // to the version at `HEAD`.
+  // to the version at `HEAD`, via the repository operation provider
+  // (`git checkout HEAD -- <path>`).
   //
-  // This is essentially the same as running:
+  // * `filePath` The {String} path to checkout.
   //
-  // ```sh
-  //   git reset HEAD -- <path>
-  //   git checkout HEAD -- <path>
-  // ```
-  //
-  // * `path` The {String} path to checkout.
-  //
-  // Returns a {Boolean} that's true if the method was successful.
-  checkoutHead(path) {
-    const repo = this.getRepo(path);
-    const headCheckedOut = repo.checkoutHead(repo.relativize(path));
-    if (headCheckedOut) this.getPathStatus(path);
-    return headCheckedOut;
+  // Returns a {Promise} resolving to a {Boolean} that's true on success.
+  async checkoutHead(filePath) {
+    if (this.isDestroyed()) return false;
+    const operations = this.getOperations();
+    if (!operations) return false;
+
+    await operations.checkoutFiles([this.posixRelativePath(filePath)], "HEAD");
+    this.scheduleStatusSnapshotRefresh();
+    return true;
   }
 
-  // Public: Checks out a branch in your repository.
+  // Public: Checks out a branch in your repository via the repository operation
+  // provider.
   //
   // * `reference` The {String} reference to checkout.
   // * `create`    A {Boolean} value which, if true creates the new reference if
   //   it doesn't exist.
   //
-  // Returns a Boolean that's true if the method was successful.
-  checkoutReference(reference, create) {
-    return this.getRepo().checkoutReference(reference, create);
+  // Returns a {Promise} resolving to a {Boolean} that's true on success.
+  async checkoutReference(reference, create) {
+    if (this.isDestroyed()) return false;
+    const operations = this.getOperations();
+    if (!operations) return false;
+
+    await operations.checkout(reference, { createNew: create });
+    this.scheduleStatusSnapshotRefresh();
+    this.scheduleRefsSnapshotRefresh();
+    return true;
   }
 
   /*
@@ -1176,16 +1095,15 @@ module.exports = class GitRepository {
 
   // Subscribes to buffer events.
   subscribeToBuffer(buffer) {
-    const getBufferPathStatus = () => {
+    const refreshStatusForBuffer = () => {
       const bufferPath = buffer.getPath();
-      if (bufferPath && !this.isDestroyed()) this.getPathStatus(bufferPath);
+      if (bufferPath && !this.isDestroyed()) this.scheduleStatusSnapshotRefresh();
     };
 
-    getBufferPathStatus();
     const bufferSubscriptions = new CompositeDisposable();
-    bufferSubscriptions.add(buffer.onDidSave(getBufferPathStatus));
-    bufferSubscriptions.add(buffer.onDidReload(getBufferPathStatus));
-    bufferSubscriptions.add(buffer.onDidChangePath(getBufferPathStatus));
+    bufferSubscriptions.add(buffer.onDidSave(refreshStatusForBuffer));
+    bufferSubscriptions.add(buffer.onDidReload(refreshStatusForBuffer));
+    bufferSubscriptions.add(buffer.onDidChangePath(refreshStatusForBuffer));
     bufferSubscriptions.add(
       buffer.onDidDestroy(() => {
         bufferSubscriptions.dispose();
@@ -1196,91 +1114,12 @@ module.exports = class GitRepository {
   }
 
   // Subscribes to editor view event.
-  checkoutHeadForEditor(editor) {
+  async checkoutHeadForEditor(editor) {
     const buffer = editor.getBuffer();
     const bufferPath = buffer.getPath();
     if (bufferPath) {
-      this.checkoutHead(bufferPath);
+      await this.checkoutHead(bufferPath);
       return buffer.reload();
     }
-  }
-
-  // Returns the corresponding {Repository}
-  getRepo(path) {
-    if (this.repo) {
-      return this.repo.submoduleForPath(path) || this.repo;
-    } else {
-      throw new Error("Repository has been destroyed");
-    }
-  }
-
-  // Reread the index to update any values that have changed since the
-  // last time the index was read.
-  refreshIndex() {
-    return this.getRepo().refreshIndex();
-  }
-
-  // Refreshes the current git status in an outside process and asynchronously
-  // updates the relevant properties.
-  async refreshStatus() {
-    const statusRefreshCount = ++this.statusRefreshCount;
-    const repo = this.getRepo();
-
-    const relativeProjectPaths =
-      this.project &&
-      this.project
-        .getPaths()
-        .map((projectPath) => this.relativize(projectPath))
-        .filter((projectPath) => projectPath.length > 0 && !path.isAbsolute(projectPath));
-
-    const branch = await repo.getHeadAsync();
-    const upstream = await repo.getAheadBehindCountAsync();
-
-    const statuses = {};
-    const repoStatus =
-      relativeProjectPaths?.length > 0
-        ? await repo.getStatusAsync(relativeProjectPaths)
-        : await repo.getStatusAsync();
-    for (let filePath in repoStatus) {
-      statuses[filePath] = repoStatus[filePath];
-    }
-
-    const submodules = {};
-    for (let submodulePath in repo.submodules) {
-      const submoduleRepo = repo.submodules[submodulePath];
-      submodules[submodulePath] = {
-        branch: await submoduleRepo.getHeadAsync(),
-        upstream: await submoduleRepo.getAheadBehindCountAsync(),
-      };
-
-      const workingDirectoryPath = submoduleRepo.getWorkingDirectory();
-      const submoduleStatus = await submoduleRepo.getStatusAsync();
-      for (let filePath in submoduleStatus) {
-        const absolutePath = path.join(workingDirectoryPath, filePath);
-        const relativizePath = repo.relativize(absolutePath);
-        statuses[relativizePath] = submoduleStatus[filePath];
-      }
-    }
-
-    if (this.statusRefreshCount !== statusRefreshCount || this.isDestroyed()) return;
-
-    const statusesUnchanged =
-      _.isEqual(branch, this.branch) &&
-      _.isEqual(statuses, this.statuses) &&
-      _.isEqual(upstream, this.upstream) &&
-      _.isEqual(submodules, this.submodules);
-
-    this.branch = branch;
-    this.statuses = statuses;
-    this.upstream = upstream;
-    this.submodules = submodules;
-
-    for (let submodulePath in repo.submodules) {
-      repo.submodules[submodulePath].upstream = submodules[submodulePath].upstream;
-    }
-
-    if (!statusesUnchanged) this.emitter.emit("did-change-statuses");
-    this.scheduleStatusSnapshotRefresh();
-    this.scheduleRefsSnapshotRefresh();
   }
 };

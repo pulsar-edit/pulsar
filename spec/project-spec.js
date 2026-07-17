@@ -670,7 +670,7 @@ describe("Project", () => {
     });
 
     describe("when path is a directory", () => {
-      it("assigns the directories and repositories", () => {
+      it("assigns the directories and repositories", async () => {
         const directory1 = temp.mkdirSync("non-git-repo");
         const directory2 = temp.mkdirSync("git-repo1");
         const directory3 = temp.mkdirSync("git-repo2");
@@ -685,10 +685,13 @@ describe("Project", () => {
         const repo2 = atom.repositories.getForPath(directory2);
         const repo3 = atom.repositories.getForPath(directory3);
         expect(repo1).toBeNull();
+        // The short head is read from the refs snapshot, loaded on demand.
+        await repo2.ensureRefsSnapshot();
+        await repo3.ensureRefsSnapshot();
         expect(repo2.getShortHead()).toBe("master");
         // `realpathSync.native` canonicalizes 8.3 short path segments (e.g. a
-        // shortened temp dir) to their long form, matching how git-utils
-        // resolves the repository path. Plain `realpathSync` leaves them short.
+        // shortened temp dir) to their long form, matching how the repository
+        // resolves its path. Plain `realpathSync` leaves them short.
         expect(repo2.getPath()).toBe(fs.realpathSync.native(path.join(directory2, ".git")));
         expect(repo3.getShortHead()).toBe("master");
         expect(repo3.getPath()).toBe(fs.realpathSync.native(path.join(directory3, ".git")));
@@ -996,7 +999,7 @@ describe("Project", () => {
   });
 
   describe("atom.repositories.observeRepositories() driven by project roots", () => {
-    it("invokes the observer with current and future repositories", () => {
+    it("invokes the observer with current and future repositories", async () => {
       const observed = [];
 
       const directory1 = temp.mkdirSync("git-repo1");
@@ -1014,6 +1017,7 @@ describe("Project", () => {
       const disposable = atom.repositories.observeRepositories((repo) => observed.push(repo));
       const firstRepository = atom.repositories.getForPath(directory1);
       expect(observed).toContain(firstRepository);
+      await firstRepository.ensureRefsSnapshot();
       expect(firstRepository.getReferenceTarget("refs/heads/master")).toBe(
         "ef046e9eecaa5255ea5e9817132d4001724d6ae1",
       );
@@ -1021,6 +1025,7 @@ describe("Project", () => {
       atom.project.addPath(directory2);
       const secondRepository = atom.repositories.getForPath(directory2);
       expect(observed).toContain(secondRepository);
+      await secondRepository.ensureRefsSnapshot();
       expect(secondRepository.getReferenceTarget("refs/heads/master")).toBe(
         "d2b0ad9cbc6f6c4372e8956e5cc5af771b2342e5",
       );
@@ -1030,7 +1035,7 @@ describe("Project", () => {
   });
 
   describe("atom.repositories.onDidAddRepository() driven by project roots", () => {
-    it("invokes callback when a path is added and the path is the root of a repository", () => {
+    it("invokes callback when a path is added and the path is the root of a repository", async () => {
       const observed = [];
       const disposable = atom.repositories.onDidAddRepository((repo) => observed.push(repo));
 
@@ -1040,6 +1045,7 @@ describe("Project", () => {
 
       atom.project.addPath(projectRootPath);
       expect(observed.length).toBe(1);
+      await observed[0].ensureRefsSnapshot();
       expect(observed[0].getOriginURL()).toEqual(
         "https://github.com/example-user/example-repo.git",
       );
@@ -1047,7 +1053,7 @@ describe("Project", () => {
       disposable.dispose();
     });
 
-    it("invokes callback when a path is added and the path is subdirectory of a repository", () => {
+    it("invokes callback when a path is added and the path is subdirectory of a repository", async () => {
       const observed = [];
       const disposable = atom.repositories.onDidAddRepository((repo) => observed.push(repo));
 
@@ -1060,6 +1066,7 @@ describe("Project", () => {
 
       atom.project.addPath(projectSubDirPath);
       expect(observed.length).toBe(1);
+      await observed[0].ensureRefsSnapshot();
       expect(observed[0].getOriginURL()).toEqual(
         "https://github.com/example-user/example-repo.git",
       );

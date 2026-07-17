@@ -31,14 +31,17 @@ describe("GitRepositoryProvider", () => {
       });
 
       it("does not eagerly refresh status at open time", async () => {
-        // The provider no longer forces a native git-utils status pass when a
-        // repository is discovered; consumers drive refreshes by subscribing to
-        // the Dugite snapshot. This keeps startup off the per-repo status burst.
-        const refreshStatus = spyOn(GitRepository.prototype, "refreshStatus").and.callThrough();
+        // The provider no longer forces a status pass when a repository is
+        // discovered; consumers drive refreshes by subscribing to the Dugite
+        // snapshot. This keeps startup off the per-repo status burst.
+        const refreshStatusSnapshot = spyOn(
+          GitRepository.prototype,
+          "refreshStatusSnapshot",
+        ).and.callThrough();
         const directory = new Directory(path.join(__dirname, "fixtures", "git", "master.git"));
         const result = await provider.repositoryForDirectory(directory);
         expect(result).toEqual(jasmine.any(GitRepository));
-        expect(refreshStatus).not.toHaveBeenCalled();
+        expect(refreshStatusSnapshot).not.toHaveBeenCalled();
       });
 
       it("resolves with the same GitRepository for different Directory objects in the same repo", async () => {

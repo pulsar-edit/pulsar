@@ -2566,7 +2566,7 @@ module.exports = class Workspace extends Model {
         const repository = await this.project.repositoryForDirectory(
           new Directory(editor.getDirectoryPath()),
         );
-        if (repository) repository.checkoutHeadForEditor(editor);
+        if (repository) await repository.checkoutHeadForEditor(editor);
       };
 
       if (this.config.get("editor.confirmCheckoutHeadRevision")) {
