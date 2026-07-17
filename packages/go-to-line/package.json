@@ -13,5 +13,8 @@
   "repository": "https://github.com/lumine-code/lumine",
   "engines": {
     "atom": "*"
+  },
+  "dependencies": {
+    "@lumine-code/select-list": "https://github.com/lumine-code/select-list.git#ce68df17b97d2bab99f4e0bd5ce45001922c167d"
   }
 }
