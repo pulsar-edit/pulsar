@@ -53,7 +53,7 @@ module.exports = class StatusBarView {
     const newPriority =
       options?.priority != null
         ? options?.priority
-        : this.leftTiles[this.leftTiles.length - 1].priority + 1;
+        : (this.leftTiles[this.leftTiles.length - 1]?.priority ?? 0) + 1;
     let nextItem = null;
     for (index = 0; index < this.leftTiles.length; index++) {
       const { priority, item } = this.leftTiles[index];
@@ -75,7 +75,7 @@ module.exports = class StatusBarView {
     let index;
     const newItem = options.item;
     const newPriority =
-      options?.priority != null ? options?.priority : this.rightTiles[0].priority + 1;
+      options?.priority != null ? options?.priority : (this.rightTiles[0]?.priority ?? 0) + 1;
     let nextItem = null;
     for (index = 0; index < this.rightTiles.length; index++) {
       const { priority, item } = this.rightTiles[index];

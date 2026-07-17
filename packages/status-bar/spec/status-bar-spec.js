@@ -115,13 +115,5 @@ describe("Status Bar package", function () {
       expect(statusBarService.getRightTiles()).not.toContain(tile);
     });
 
-    it("allows the git info tile to be disabled", function () {
-      const getGitInfoTile = () =>
-        statusBar.getRightTiles().find((tile) => tile.item.matches(".git-view"));
-
-      expect(getGitInfoTile()).not.toBeUndefined();
-      statusBarService.disableGitInfoTile();
-      expect(getGitInfoTile()).toBeUndefined();
-    });
   });
 });

@@ -4,7 +4,6 @@ const StatusBarView = require("./status-bar-view");
 const FileInfoView = require("./file-info-view");
 const CursorPositionView = require("./cursor-position-view");
 const SelectionCountView = require("./selection-count-view");
-const GitView = require("./git-view");
 const LaunchModeView = require("./launch-mode-view");
 
 module.exports = {
@@ -49,17 +48,11 @@ module.exports = {
 
     this.selectionCount = new SelectionCountView();
     this.statusBar.addLeftTile({ item: this.selectionCount.element, priority: 2 });
-
-    this.gitInfo = new GitView();
-    this.gitInfoTile = this.statusBar.addRightTile({ item: this.gitInfo.element, priority: 0 });
   },
 
   deactivate() {
     this.statusBarVisibilitySubscription?.dispose();
     this.statusBarVisibilitySubscription = null;
-
-    this.gitInfo?.destroy();
-    this.gitInfo = null;
 
     this.fileInfo?.destroy();
     this.fileInfo = null;
@@ -101,7 +94,6 @@ module.exports = {
       addRightTile: this.statusBar.addRightTile.bind(this.statusBar),
       getLeftTiles: this.statusBar.getLeftTiles.bind(this.statusBar),
       getRightTiles: this.statusBar.getRightTiles.bind(this.statusBar),
-      disableGitInfoTile: this.gitInfoTile.destroy.bind(this.gitInfoTile),
     };
   },
 

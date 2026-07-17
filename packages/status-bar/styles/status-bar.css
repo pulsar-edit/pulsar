@@ -104,10 +104,6 @@ status-bar {
     display: none;
   }
 
-  .git-view {
-    display: inline-block;
-  }
-
   .cursor-position a,
   .cursor-position a:hover {
     color: var(--text-color);

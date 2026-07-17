@@ -1,13 +1,12 @@
 # status-bar
 
-Display information about the current editor such as cursor position, file path, grammar, current branch, ahead/behind commit counts, and line diff count.
+Display information about the current editor such as cursor position, file path, grammar, and selection count.
 
 ## Features
 
 - **Cursor position**: shows the current line and column of the cursor.
 - **Selection count**: shows the line and character count of the active selection.
 - **File info**: shows the path and grammar of the current editor.
-- **Git status**: shows the current branch, ahead/behind commit counts, and line diff count.
 - **Tile host**: lets other packages add custom tiles to the left or right side of the bar.
 
 ## Commands
