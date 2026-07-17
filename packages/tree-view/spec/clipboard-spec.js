@@ -1,103 +1,95 @@
 const path = require("path");
-const { pathToFileURL } = require("url");
+const os = require("os");
 const TreeView = require("../lib/tree-view");
 
-function createClipboardData(initialData = {}) {
-  const data = new Map(Object.entries(initialData));
-  return {
-    getData(type) {
-      return data.get(type) || "";
-    },
-    setData(type, value) {
-      data.set(type, value);
-    },
-    get types() {
-      return Array.from(data.keys());
-    },
-  };
-}
-
 describe("TreeView clipboard data", () => {
-  it("writes standard path formats and versioned copy metadata", () => {
+  it("writes versioned copy metadata for the selected paths", () => {
     const paths = [path.resolve("one.txt"), path.resolve("two.txt")];
-    const clipboardData = createClipboardData();
-    const pendingCopyOperation = { operation: "cut", paths, handled: false };
-    const treeView = {
-      pendingCopyOperation,
-      selectedPaths: () => [],
-    };
-    const event = { clipboardData, preventDefault: jasmine.createSpy("preventDefault") };
+    const treeView = { selectedPaths: () => paths };
+    spyOn(atom.clipboard, "writeNativeData").and.returnValue(Promise.resolve(true));
 
-    TreeView.prototype.didCopy.call(treeView, event);
+    const handled = TreeView.prototype.performCopyOperation.call(treeView, "cut");
 
-    expect(clipboardData.types).toEqual([
-      "text/plain",
-      "text/uri-list",
+    expect(handled).toBe(true);
+    expect(atom.clipboard.writeNativeData).toHaveBeenCalledWith(
+      paths.join(os.EOL),
       "application/lumine-tree-view",
-    ]);
-    expect(clipboardData.getData("text/uri-list")).toBe(
-      paths.map((entryPath) => pathToFileURL(entryPath).href).join("\r\n"),
+      { version: 1, operation: "cut", paths },
     );
-    expect(JSON.parse(clipboardData.getData("application/lumine-tree-view"))).toEqual({
-      version: 1,
-      operation: "cut",
-      paths,
-    });
-    expect(pendingCopyOperation.handled).toBe(true);
-    expect(event.preventDefault).toHaveBeenCalled();
   });
 
-  it("reads tree metadata written by another renderer", () => {
+  it("does not touch the clipboard when nothing is selected", () => {
+    const treeView = { selectedPaths: () => [] };
+    spyOn(atom.clipboard, "writeNativeData");
+
+    expect(TreeView.prototype.performCopyOperation.call(treeView, "copy")).toBe(false);
+    expect(atom.clipboard.writeNativeData).not.toHaveBeenCalled();
+  });
+
+  it("reads tree metadata written by another renderer", async () => {
     const paths = [path.resolve("one.txt")];
-    const clipboardData = createClipboardData({
-      "application/lumine-tree-view": JSON.stringify({
-        version: 1,
-        operation: "copy",
-        paths,
-      }),
-    });
+    spyOn(atom.clipboard, "readNativeData").and.returnValue(
+      Promise.resolve({ version: 1, operation: "copy", paths }),
+    );
 
-    expect(TreeView.prototype.readTreeClipboardData.call({}, clipboardData)).toEqual({
-      version: 1,
-      operation: "copy",
-      paths,
-    });
+    const entry = await TreeView.prototype.readTreeClipboardData.call({});
+
+    expect(atom.clipboard.readNativeData).toHaveBeenCalledWith("application/lumine-tree-view");
+    expect(entry).toEqual({ version: 1, operation: "copy", paths });
   });
 
-  it("accepts standard file URI lists from other applications", () => {
-    const paths = [path.resolve("one.txt"), path.resolve("two.txt")];
-    const clipboardData = createClipboardData({
-      "text/uri-list": paths.map((entryPath) => pathToFileURL(entryPath).href).join("\n"),
-    });
-
-    expect(TreeView.prototype.readTreeClipboardData.call({}, clipboardData)).toEqual({
-      operation: "copy",
-      paths,
-    });
+  it("rejects unknown versions, operations, and malformed path lists", async () => {
+    const readNativeData = spyOn(atom.clipboard, "readNativeData");
+    const rejected = [
+      { version: 2, operation: "copy", paths: ["a"] },
+      { version: 1, operation: "duplicate", paths: ["a"] },
+      { version: 1, operation: "copy", paths: [] },
+      { version: 1, operation: "copy", paths: ["a", 7] },
+      { version: 1, operation: "copy", paths: ["a", ""] },
+      null,
+    ];
+    for (const data of rejected) {
+      readNativeData.and.returnValue(Promise.resolve(data));
+      expect(await TreeView.prototype.readTreeClipboardData.call({})).toBeNull();
+    }
   });
 
-  it("pastes tree entries before offering the clipboard to other providers", () => {
+  it("pastes tree entries before offering the clipboard to other providers", async () => {
     const paths = [path.resolve("one.txt")];
-    const clipboardData = createClipboardData({
-      "application/lumine-tree-view": JSON.stringify({
-        version: 1,
-        operation: "copy",
-        paths,
-      }),
-    });
+    const targetPath = path.resolve("target");
     const treeView = {
-      pendingPasteOperation: { targetPath: path.resolve("target"), handled: false },
+      getPasteTargetPath: () => targetPath,
       readTreeClipboardData: TreeView.prototype.readTreeClipboardData,
       pastePaths: jasmine.createSpy("pastePaths").and.returnValue(true),
     };
+    spyOn(atom.clipboard, "readNativeData").and.returnValue(
+      Promise.resolve({ version: 1, operation: "cut", paths }),
+    );
     spyOn(atom.pasteProviders, "handlePaste").and.returnValue(true);
-    const event = { clipboardData, preventDefault: jasmine.createSpy("preventDefault") };
 
-    TreeView.prototype.didPaste.call(treeView, event);
+    const handled = await TreeView.prototype.pasteEntries.call(treeView);
 
-    expect(treeView.pastePaths).toHaveBeenCalledWith(paths, "copy", path.resolve("target"));
+    expect(handled).toBe(true);
+    expect(treeView.pastePaths).toHaveBeenCalledWith(paths, "cut", targetPath);
     expect(atom.pasteProviders.handlePaste).not.toHaveBeenCalled();
-    expect(treeView.pendingPasteOperation.handled).toBe(true);
-    expect(event.preventDefault).toHaveBeenCalled();
+  });
+
+  it("falls back to paste providers when the clipboard has no tree entry", async () => {
+    const targetPath = path.resolve("target");
+    const treeView = {
+      getPasteTargetPath: () => targetPath,
+      readTreeClipboardData: TreeView.prototype.readTreeClipboardData,
+      pastePaths: jasmine.createSpy("pastePaths"),
+    };
+    spyOn(atom.clipboard, "readNativeData").and.returnValue(Promise.resolve(null));
+    spyOn(atom.pasteProviders, "handlePaste").and.returnValue(true);
+
+    const handled = await TreeView.prototype.pasteEntries.call(treeView);
+
+    expect(handled).toBe(true);
+    expect(treeView.pastePaths).not.toHaveBeenCalled();
+    expect(atom.pasteProviders.handlePaste).toHaveBeenCalledWith({
+      target: { type: "directory", path: targetPath },
+    });
   });
 });

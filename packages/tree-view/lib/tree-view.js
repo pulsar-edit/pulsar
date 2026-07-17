@@ -1,9 +1,7 @@
 const path = require("path");
 const os = require("os");
-const { fileURLToPath, pathToFileURL } = require("url");
-const { webUtils } = require("electron");
 const fs = require("./fs-compat");
-const { CompositeDisposable, Disposable, Emitter } = require("atom");
+const { CompositeDisposable, Emitter } = require("atom");
 
 const { repoForPath, getStyleObject, getDuplicateCopyPath } = require("./helpers");
 
@@ -41,8 +39,6 @@ class TreeView {
   constructor(state) {
     this.onDragLeave = this.onDragLeave.bind(this);
     this.onDragEnter = this.onDragEnter.bind(this);
-    this.didCopy = this.didCopy.bind(this);
-    this.didPaste = this.didPaste.bind(this);
 
     this.onStylesheetsChanged = this.onStylesheetsChanged.bind(this);
     this.moveConflictingEntry = this.moveConflictingEntry.bind(this);
@@ -314,14 +310,6 @@ class TreeView {
     this.element.addEventListener("dragleave", (e) => this.onDragLeave(e));
     this.element.addEventListener("dragover", (e) => this.onDragOver(e));
     this.element.addEventListener("drop", (e) => this.onDrop(e));
-    this.element.addEventListener("copy", this.didCopy);
-    this.element.addEventListener("paste", this.didPaste);
-    this.disposables.add(
-      new Disposable(() => {
-        this.element.removeEventListener("copy", this.didCopy);
-        this.element.removeEventListener("paste", this.didPaste);
-      }),
-    );
 
     atom.commands.add(this.element, {
       "core:move-up": (e) => this.moveUp(e),
@@ -1206,95 +1194,43 @@ class TreeView {
     return this.performCopyOperation("cut");
   }
 
+  // Clipboard events cannot carry the copied paths for the tree view: the
+  // renderer may not trigger `execCommand("paste")`, and Chromium targets
+  // ClipboardEvents at the focused editable element or `document.body`, never
+  // at a non-editable panel. Write the payload with the async Clipboard API
+  // instead, which registers the format with the operating system.
   performCopyOperation(operation) {
     const paths = this.selectedPaths();
     if (paths.length === 0) return false;
 
-    const pendingOperation = { operation, paths, handled: false };
-    this.pendingCopyOperation = pendingOperation;
-    try {
-      this.element.focus({ preventScroll: true });
-      this.element.ownerDocument.execCommand("copy");
-    } catch {
-      // Fall back to plain text below when ClipboardEvent is unavailable.
-    } finally {
-      this.pendingCopyOperation = null;
-    }
-
-    if (!pendingOperation.handled) atom.clipboard.write(paths.join(os.EOL));
-    return pendingOperation.handled;
-  }
-
-  didCopy(event) {
-    if (!event.clipboardData) return;
-    const pendingOperation = this.pendingCopyOperation;
-    const paths = pendingOperation?.paths || this.selectedPaths();
-    if (paths.length === 0) return;
-
-    const operation = pendingOperation?.operation || "copy";
-    event.clipboardData.setData("text/plain", paths.join(os.EOL));
-    event.clipboardData.setData(
-      "text/uri-list",
-      paths.map((entryPath) => pathToFileURL(entryPath).href).join("\r\n"),
-    );
-    atom.clipboard.writeDataTransferData(
-      event.clipboardData,
-      TREE_VIEW_CLIPBOARD_FORMAT,
-      { version: TREE_VIEW_CLIPBOARD_VERSION, operation, paths },
-    );
-    event.preventDefault();
-    if (pendingOperation) pendingOperation.handled = true;
+    atom.clipboard.writeNativeData(paths.join(os.EOL), TREE_VIEW_CLIPBOARD_FORMAT, {
+      version: TREE_VIEW_CLIPBOARD_VERSION,
+      operation,
+      paths,
+    });
+    return true;
   }
 
   // Public: Paste a copied or cut item.
   //
   // If a file is selected, the file's parent directory is used as the paste
   // destination.
-  pasteEntries() {
+  async pasteEntries() {
     const targetPath = this.getPasteTargetPath();
     if (!targetPath) return false;
 
-    const pendingOperation = { targetPath, handled: false };
-    this.pendingPasteOperation = pendingOperation;
-    try {
-      this.element.focus({ preventScroll: true });
-      this.element.ownerDocument.execCommand("paste");
-    } catch {
-      // Fall through to non-text paste providers below.
-    } finally {
-      this.pendingPasteOperation = null;
+    const clipboardEntry = await this.readTreeClipboardData();
+    if (clipboardEntry) {
+      return this.pastePaths(clipboardEntry.paths, clipboardEntry.operation, targetPath);
     }
 
-    if (!pendingOperation.handled) {
-      pendingOperation.handled = atom.pasteProviders.handlePaste({
-        target: { type: "directory", path: targetPath },
-      });
-    }
-    return pendingOperation.handled;
+    return atom.pasteProviders.handlePaste({
+      target: { type: "directory", path: targetPath },
+    });
   }
 
-  didPaste(event) {
-    if (!event.clipboardData) return;
-    const targetPath = this.pendingPasteOperation?.targetPath || this.getPasteTargetPath();
-    if (!targetPath) return;
-
-    const clipboardEntry = this.readTreeClipboardData(event.clipboardData);
-    const handled = clipboardEntry
-      ? this.pastePaths(clipboardEntry.paths, clipboardEntry.operation, targetPath)
-      : atom.pasteProviders.handlePaste({
-          target: { type: "directory", path: targetPath },
-          clipboardData: event.clipboardData,
-        });
-
-    event.preventDefault();
-    if (this.pendingPasteOperation) this.pendingPasteOperation.handled = handled;
-  }
-
-  readTreeClipboardData(clipboardData) {
-    const data = atom.clipboard.readDataTransferData(
-      clipboardData,
-      TREE_VIEW_CLIPBOARD_FORMAT,
-    );
+  async readTreeClipboardData() {
+    const data = await atom.clipboard.readNativeData(TREE_VIEW_CLIPBOARD_FORMAT);
     if (
       data?.version === TREE_VIEW_CLIPBOARD_VERSION &&
       ["copy", "cut"].includes(data.operation) &&
@@ -1304,31 +1240,7 @@ class TreeView {
     ) {
       return data;
     }
-
-    const uriList = clipboardData.getData("text/uri-list");
-    const paths = [];
-    if (uriList) {
-      for (const uri of uriList.split(/\r?\n/)) {
-        if (!uri || uri.startsWith("#")) continue;
-        try {
-          if (new URL(uri).protocol === "file:") paths.push(fileURLToPath(uri));
-        } catch {
-          // Ignore malformed and non-file clipboard entries.
-        }
-      }
-    }
-
-    if (paths.length === 0) {
-      for (const file of Array.from(clipboardData.files || [])) {
-        try {
-          const filePath = webUtils?.getPathForFile?.(file) || file.path;
-          if (filePath) paths.push(filePath);
-        } catch {
-          if (file.path) paths.push(file.path);
-        }
-      }
-    }
-    return paths.length > 0 ? { operation: "copy", paths } : null;
+    return null;
   }
 
   getPasteTargetPath() {

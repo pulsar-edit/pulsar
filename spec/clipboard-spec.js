@@ -137,4 +137,86 @@ describe("Clipboard", () => {
       });
     });
   });
+
+  describe("native custom-format data", () => {
+    it("writes text and a web custom format through the async clipboard API", async () => {
+      spyOn(navigator.clipboard, "write").and.returnValue(Promise.resolve());
+
+      const written = await atom.clipboard.writeNativeData("one two", "application/lumine-probe", {
+        version: 1,
+        value: "data",
+      });
+
+      expect(written).toBe(true);
+      const [items] = navigator.clipboard.write.calls.mostRecent().args;
+      expect(items.length).toBe(1);
+      expect(Array.from(items[0].types)).toEqual(["text/plain", "web application/lumine-probe"]);
+      expect(await (await items[0].getType("text/plain")).text()).toBe("one two");
+      expect(
+        JSON.parse(await (await items[0].getType("web application/lumine-probe")).text()),
+      ).toEqual({ version: 1, value: "data" });
+    });
+
+    it("falls back to plain text when the async clipboard API is unavailable", async () => {
+      spyOn(navigator.clipboard, "write").and.returnValue(
+        Promise.reject(new Error("Document is not focused.")),
+      );
+
+      const written = await atom.clipboard.writeNativeData(
+        "fallback text",
+        "application/lumine-probe",
+        {
+          version: 1,
+        },
+      );
+
+      expect(written).toBe(false);
+      expect(atom.clipboard.read()).toBe("fallback text");
+    });
+
+    it("reads back the payload for the requested format", async () => {
+      const payload = { version: 1, value: "data" };
+      spyOn(navigator.clipboard, "read").and.returnValue(
+        Promise.resolve([
+          { types: ["text/plain"] },
+          {
+            types: ["web application/lumine-probe"],
+            getType: async () => new Blob([JSON.stringify(payload)]),
+          },
+        ]),
+      );
+
+      expect(await atom.clipboard.readNativeData("application/lumine-probe")).toEqual(payload);
+    });
+
+    it("returns null for missing formats, invalid payloads, and read failures", async () => {
+      const read = spyOn(navigator.clipboard, "read");
+
+      read.and.returnValue(Promise.resolve([{ types: ["text/plain"] }]));
+      expect(await atom.clipboard.readNativeData("application/lumine-probe")).toBeNull();
+
+      read.and.returnValue(
+        Promise.resolve([
+          {
+            types: ["web application/lumine-probe"],
+            getType: async () => new Blob(["not json"]),
+          },
+        ]),
+      );
+      expect(await atom.clipboard.readNativeData("application/lumine-probe")).toBeNull();
+
+      read.and.returnValue(
+        Promise.resolve([
+          {
+            types: ["web application/lumine-probe"],
+            getType: async () => new Blob(["[1, 2]"]),
+          },
+        ]),
+      );
+      expect(await atom.clipboard.readNativeData("application/lumine-probe")).toBeNull();
+
+      read.and.returnValue(Promise.reject(new Error("Document is not focused.")));
+      expect(await atom.clipboard.readNativeData("application/lumine-probe")).toBeNull();
+    });
+  });
 });

@@ -171,6 +171,61 @@ module.exports = class Clipboard {
     clipboardData.setData(format, JSON.stringify(data));
   }
 
+  // Public: Write text plus a JSON payload for a custom format to the system
+  // clipboard through the async Clipboard API.
+  //
+  // Chromium registers `web `-prefixed custom formats with the operating
+  // system, so any window can read the payload back with {::readNativeData}.
+  // Custom formats written through a DataTransfer during a copy event are only
+  // readable inside paste ClipboardEvents, and renderer-initiated
+  // `execCommand("paste")` never fires one, so this is the only way to
+  // round-trip a custom format without a native paste keystroke.
+  //
+  // * `text` The plain-text {String} to store alongside the payload.
+  // * `format` The MIME-style format {String}, without the `web ` prefix.
+  // * `data` The JSON-serializable payload.
+  //
+  // Returns a {Promise} that resolves to `true` when the payload was written,
+  // or `false` when only the plain text could be written.
+  async writeNativeData(text, format, data) {
+    text = this.normalizeText(text);
+    try {
+      const type = `web ${format}`;
+      const item = new ClipboardItem({
+        "text/plain": new Blob([text], { type: "text/plain" }),
+        [type]: new Blob([JSON.stringify(data)], { type }),
+      });
+      await navigator.clipboard.write([item]);
+      return true;
+    } catch {
+      clipboard.writeText(text);
+      return false;
+    }
+  }
+
+  // Public: Read a JSON payload written by {::writeNativeData} in this or any
+  // other window.
+  //
+  // * `format` The MIME-style format {String}, without the `web ` prefix.
+  //
+  // Returns a {Promise} that resolves to the parsed payload {Object}, or
+  // `null` when the clipboard holds no valid payload for the format.
+  async readNativeData(format) {
+    try {
+      const type = `web ${format}`;
+      for (const item of await navigator.clipboard.read()) {
+        if (item.types.includes(type)) {
+          const blob = await item.getType(type);
+          return this.parseDataTransferData(await blob.text());
+        }
+      }
+    } catch {
+      // Fall through to the null return below: an unfocused document or a
+      // clipboard owned by another application reads as "no payload".
+    }
+    return null;
+  }
+
   readDataTransferData(clipboardData, format) {
     if (typeof clipboardData?.getData !== "function") return null;
     try {
