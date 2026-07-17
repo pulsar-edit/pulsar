@@ -48,29 +48,77 @@ const PROVIDERS = {
 };
 
 export default class RepositoryFile {
-  // Public
-  static fromPath(filePath) {
-    return new RepositoryFile(filePath);
+  // Public: Resolve a RepositoryFile whose git data (refs snapshot + the git
+  // config keys it consults) has been loaded off the renderer thread. The URL
+  // builders below stay synchronous by reading the values cached here.
+  static async fromPath(filePath) {
+    const file = new RepositoryFile(filePath);
+    await file.load();
+    return file;
   }
 
   constructor(filePath) {
     this.filePath = filePath;
     this.type = "none";
-    this.repo = atom.repositories.resolveForPathSync(this.filePath);
+    this.repo = filePath ? atom.repositories.resolveForPathSync(filePath) : null;
+    this.configCache = {};
+    this.shortHead = null;
+    this.headSha = null;
+    this.providerKey = undefined;
+  }
 
-    if (this.repo != null) {
-      if (this.repo && this.gitURL()) {
-        const webURL = this.repoWebURL();
-        if (this.isWikiURL(webURL)) {
-          this.type = "wiki";
-        } else if (this.isGistURL(webURL)) {
-          this.type = "gist";
-        } else {
-          this.type = "repo";
-          this.providerKey = this.detectProvider(webURL);
-        }
+  // Internal: Load everything the URL builders need — the refs snapshot (for the
+  // HEAD branch, SHA, and remote URLs) plus the handful of git config keys this
+  // package honors — and detect the hosting provider. Resolving happens through
+  // the git-host worker so the renderer thread never blocks on libgit2 or a git
+  // subprocess.
+  async load() {
+    if (!this.repo) return this;
+
+    const snapshot = await this.repo.ensureRefsSnapshot();
+    const head = snapshot.head;
+    this.shortHead = head ? head.name || (head.detached && head.oid ? head.oid.slice(0, 7) : null) : null;
+    this.headSha = head?.oid ?? null;
+
+    const [providerOverride, remoteOverride, branchOverride] = await Promise.all([
+      this.repo.getConfigValueAsync("atom.open-repository.provider"),
+      this.repo.getConfigValueAsync("atom.open-repository.remote"),
+      this.repo.getConfigValueAsync("atom.open-repository.branch"),
+    ]);
+    this.configCache["atom.open-repository.provider"] = providerOverride;
+    this.configCache["atom.open-repository.remote"] = remoteOverride;
+    this.configCache["atom.open-repository.branch"] = branchOverride;
+
+    if (this.shortHead) {
+      const [branchRemote, branchMerge] = await Promise.all([
+        this.repo.getConfigValueAsync(`branch.${this.shortHead}.remote`),
+        this.repo.getConfigValueAsync(`branch.${this.shortHead}.merge`),
+      ]);
+      this.configCache[`branch.${this.shortHead}.remote`] = branchRemote;
+      this.configCache[`branch.${this.shortHead}.merge`] = branchMerge;
+    }
+
+    // Resolve the tracking remote's URL from the refs snapshot when possible,
+    // falling back to a direct config read (covers a remote configured without
+    // a fetch refspec).
+    const remoteName = this.remoteName() ?? "origin";
+    const snapshotRemote = snapshot.remotes.find((remote) => remote.name === remoteName);
+    this.configCache[`remote.${remoteName}.url`] =
+      snapshotRemote?.fetchUrl ??
+      (await this.repo.getConfigValueAsync(`remote.${remoteName}.url`));
+
+    if (this.gitURL()) {
+      const webURL = this.repoWebURL();
+      if (this.isWikiURL(webURL)) {
+        this.type = "wiki";
+      } else if (this.isGistURL(webURL)) {
+        this.type = "gist";
+      } else {
+        this.type = "repo";
+        this.providerKey = this.detectProvider(webURL);
       }
     }
+    return this;
   }
 
   // Internal: the URL scheme for the detected host. Only meaningful when
@@ -84,9 +132,7 @@ export default class RepositoryFile {
   // instances); otherwise we guess from the host and default to GitHub, which
   // also covers GitHub Enterprise and unknown hosts.
   detectProvider(webURL) {
-    const configured = this.repo
-      .getConfigValue("atom.open-repository.provider", this.filePath)
-      ?.toLowerCase();
+    const configured = this.getConfigValue("atom.open-repository.provider")?.toLowerCase();
     if (configured && PROVIDERS[configured]) {
       return configured;
     }
@@ -99,6 +145,12 @@ export default class RepositoryFile {
       return "bitbucket";
     }
     return "github";
+  }
+
+  // Internal: a git config value preloaded during {::load}. The URL builders
+  // stay synchronous by reading this cache instead of hitting libgit2.
+  getConfigValue(key) {
+    return this.configCache[key] ?? null;
   }
 
   // Public
@@ -316,9 +368,9 @@ export default class RepositoryFile {
   gitURL() {
     const remoteName = this.remoteName();
     if (remoteName != null) {
-      return this.repo.getConfigValue(`remote.${remoteName}.url`, this.filePath);
+      return this.getConfigValue(`remote.${remoteName}.url`);
     } else {
-      return this.repo.getConfigValue(`remote.origin.url`, this.filePath);
+      return this.getConfigValue(`remote.origin.url`);
     }
   }
 
@@ -371,24 +423,24 @@ export default class RepositoryFile {
 
   // Internal
   repoRelativePath() {
-    return this.repo.getRepo(this.filePath).relativize(this.filePath);
+    return this.repo.relativize(this.filePath);
   }
 
   // Internal
   remoteName() {
-    const gitConfigRemote = this.repo.getConfigValue("atom.open-repository.remote", this.filePath);
+    const gitConfigRemote = this.getConfigValue("atom.open-repository.remote");
 
     if (gitConfigRemote) {
       return gitConfigRemote;
     }
 
-    const shortBranch = this.repo.getShortHead(this.filePath);
+    const shortBranch = this.shortHead;
 
     if (!shortBranch) {
       return null;
     }
 
-    const branchRemote = this.repo.getConfigValue(`branch.${shortBranch}.remote`, this.filePath);
+    const branchRemote = this.getConfigValue(`branch.${shortBranch}.remote`);
 
     if (branchRemote && branchRemote.length > 0) {
       return branchRemote;
@@ -399,18 +451,18 @@ export default class RepositoryFile {
 
   // Internal
   sha() {
-    return this.repo.getReferenceTarget("HEAD", this.filePath);
+    return this.headSha;
   }
 
   // Internal
   branchName() {
-    const shortBranch = this.repo.getShortHead(this.filePath);
+    const shortBranch = this.shortHead;
 
     if (!shortBranch) {
       return null;
     }
 
-    const branchMerge = this.repo.getConfigValue(`branch.${shortBranch}.merge`, this.filePath);
+    const branchMerge = this.getConfigValue(`branch.${shortBranch}.merge`);
     if (!(branchMerge && branchMerge.length > 11)) {
       return shortBranch;
     }
@@ -424,7 +476,7 @@ export default class RepositoryFile {
 
   // Internal
   remoteBranchName() {
-    const gitConfigBranch = this.repo.getConfigValue("atom.open-repository.branch", this.filePath);
+    const gitConfigBranch = this.getConfigValue("atom.open-repository.branch");
 
     if (gitConfigBranch) {
       return gitConfigBranch;

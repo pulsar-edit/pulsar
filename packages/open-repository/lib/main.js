@@ -20,44 +20,61 @@ function getSelectedRange() {
   }
 }
 
+// Resolving a RepositoryFile now loads its git data off the renderer thread, so
+// the command handlers capture any selection range synchronously first, then act
+// on the resolved file. A resolution failure surfaces as a warning instead of an
+// unhandled rejection.
+function runOnRepositoryFile(itemPath, action) {
+  RepositoryFile.fromPath(itemPath).then(action, (error) => {
+    atom.notifications.addWarning("Unable to resolve the repository for this file", {
+      detail: error.message,
+      dismissable: true,
+    });
+  });
+}
+
 module.exports = {
   activate() {
     this.commandsSubscription = new Disposable();
     this.commandsSubscription = atom.commands.add("atom-pane", {
       "open-repository:file": pathCommand((itemPath) => {
-        RepositoryFile.fromPath(itemPath).open(getSelectedRange());
+        const range = getSelectedRange();
+        runOnRepositoryFile(itemPath, (file) => file.open(range));
       }),
 
       "open-repository:file-on-master": pathCommand((itemPath) => {
-        RepositoryFile.fromPath(itemPath).openOnMaster(getSelectedRange());
+        const range = getSelectedRange();
+        runOnRepositoryFile(itemPath, (file) => file.openOnMaster(range));
       }),
 
       "open-repository:blame": pathCommand((itemPath) => {
-        RepositoryFile.fromPath(itemPath).blame(getSelectedRange());
+        const range = getSelectedRange();
+        runOnRepositoryFile(itemPath, (file) => file.blame(range));
       }),
 
       "open-repository:history": pathCommand((itemPath) => {
-        RepositoryFile.fromPath(itemPath).history();
+        runOnRepositoryFile(itemPath, (file) => file.history());
       }),
 
       "open-repository:issues": pathCommand((itemPath) => {
-        RepositoryFile.fromPath(itemPath).openIssues();
+        runOnRepositoryFile(itemPath, (file) => file.openIssues());
       }),
 
       "open-repository:pull-requests": pathCommand((itemPath) => {
-        RepositoryFile.fromPath(itemPath).openPullRequests();
+        runOnRepositoryFile(itemPath, (file) => file.openPullRequests());
       }),
 
       "open-repository:copy-url": pathCommand((itemPath) => {
-        RepositoryFile.fromPath(itemPath).copyURL(getSelectedRange());
+        const range = getSelectedRange();
+        runOnRepositoryFile(itemPath, (file) => file.copyURL(range));
       }),
 
       "open-repository:branch-compare": pathCommand((itemPath) => {
-        RepositoryFile.fromPath(itemPath).openBranchCompare();
+        runOnRepositoryFile(itemPath, (file) => file.openBranchCompare());
       }),
 
       "open-repository:repository": pathCommand((itemPath) => {
-        RepositoryFile.fromPath(itemPath).openRepository();
+        runOnRepositoryFile(itemPath, (file) => file.openRepository());
       }),
     });
   },

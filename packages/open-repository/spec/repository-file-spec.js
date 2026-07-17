@@ -30,7 +30,7 @@ describe("RepositoryFile", function () {
     async function setupRepositoryFile(filePath = "some-dir/some-file.md") {
       atom.project.setPaths([workingDirPath]);
       editor = await atom.workspace.open(filePath);
-      repositoryFile = RepositoryFile.fromPath(editor.getPath());
+      repositoryFile = await RepositoryFile.fromPath(editor.getPath());
       return repositoryFile;
     }
 
@@ -68,7 +68,7 @@ describe("RepositoryFile", function () {
         describe("when the file has a '#' in its name", () => {
           it("opens the GitHub.com blob URL for the file", async () => {
             editor = await atom.workspace.open("a/b#/test#hash.md");
-            repositoryFile = RepositoryFile.fromPath(editor.getPath());
+            repositoryFile = await RepositoryFile.fromPath(editor.getPath());
             spyOn(repositoryFile, "openURLInBrowser");
             repositoryFile.open();
             expect(repositoryFile.openURLInBrowser).toHaveBeenCalledWith(
@@ -959,9 +959,7 @@ describe("RepositoryFile", function () {
   describe("detectProvider", () => {
     function repoFileWithConfig(configValues = {}) {
       const file = new RepositoryFile();
-      file.repo = {
-        getConfigValue: (key) => configValues[key] ?? null,
-      };
+      file.configCache = configValues;
       return file;
     }
 
