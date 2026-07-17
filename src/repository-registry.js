@@ -53,6 +53,7 @@ module.exports = class RepositoryRegistry {
     this.workspaceSubscriptions = new CompositeDisposable();
     this.workspace = null;
     this.activeRepository = null;
+    this.activeWorkingDirectory = null;
     this.activeRepositoryPinned = false;
     this.activeRepositoryPin = null;
 
@@ -148,10 +149,24 @@ module.exports = class RepositoryRegistry {
 
   // Public: The repository the window is currently working in, or null. It
   // follows the active pane item unless a consumer pinned a selection with
-  // {::setActiveRepository}, and prefers keeping the current repository when
-  // the active item has no path or lies outside every known repository.
+  // {::setActiveRepository}. An item whose path lies outside every repository
+  // clears it; only path-less items keep the current selection.
   getActiveRepository() {
     return this.activeRepository;
+  }
+
+  // Public: The active repository context as `{repository, workingDirectory,
+  // pinned}`. The working directory is always present while a file-backed item
+  // is focused: it is the repository's working directory, or, when the item's
+  // path lies outside every repository, the directory a consumer would
+  // initialize or clone into (its containing project root, or the item's own
+  // directory).
+  getActiveRepositoryContext() {
+    return Object.freeze({
+      repository: this.activeRepository,
+      workingDirectory: this.activeWorkingDirectory,
+      pinned: this.activeRepositoryPinned,
+    });
   }
 
   // Public: Whether the active repository is pinned to a manual selection.
@@ -159,18 +174,17 @@ module.exports = class RepositoryRegistry {
     return this.activeRepositoryPinned;
   }
 
-  // Public: Invoke the callback with `{repository, pinned}` whenever the
-  // active repository or its pinned state changes.
+  // Public: Invoke the callback with `{repository, workingDirectory, pinned}`
+  // whenever the active repository context changes, including moves between
+  // out-of-repository directories while the repository stays null.
   onDidChangeActiveRepository(callback) {
     return this.emitter.on("did-change-active-repository", callback);
   }
 
-  // Public: Invoke the callback with the current `{repository, pinned}` state
-  // immediately, and again on every change.
+  // Public: Invoke the callback with the current `{repository,
+  // workingDirectory, pinned}` state immediately, and again on every change.
   observeActiveRepository(callback) {
-    callback(
-      Object.freeze({ repository: this.activeRepository, pinned: this.activeRepositoryPinned }),
-    );
+    callback(this.getActiveRepositoryContext());
     return this.onDidChangeActiveRepository(callback);
   }
 
@@ -219,46 +233,98 @@ module.exports = class RepositoryRegistry {
 
     const itemPath = RepositoryRegistry.pathForPaneItem(item);
     if (itemPath) {
+      // The context follows every file-backed item, even outside all known
+      // repositories, so consumers can offer initialize/clone for the focused
+      // location instead of showing an unrelated repository.
       const repository = this.resolveForPathSync(itemPath);
-      if (repository) {
-        this.applyActiveRepository(repository, { pinned: false });
-        return;
-      }
+      this.applyActiveRepository(repository, {
+        workingDirectory: repository ? null : this.contextDirectoryFor(item, itemPath),
+        pinned: false,
+      });
+      return;
     }
 
-    // Items without a path, and items outside every repository, keep the
-    // current active repository so transient tabs never blank it out.
-    if (!this.activeRepository || this.activeRepository.isDestroyed?.()) {
-      this.applyActiveRepository(this.defaultActiveRepository(), { pinned: false });
-    }
+    // Path-less items (settings tabs, untitled buffers) keep the current
+    // context so transient tabs never blank it out.
+    if (this.activeRepository && !this.activeRepository.isDestroyed?.()) return;
+    if (!this.activeRepository && this.activeWorkingDirectory) return;
+    const context = this.defaultActiveContext();
+    this.applyActiveRepository(context.repository, {
+      workingDirectory: context.workingDirectory,
+      pinned: false,
+    });
   }
 
   recomputeActiveRepository({ emitOnPinChange = false } = {}) {
+    const context = this.deriveActiveContext();
+    this.applyActiveRepository(context.repository, {
+      workingDirectory: context.workingDirectory,
+      pinned: false,
+      emitOnPinChange,
+    });
+  }
+
+  deriveActiveContext() {
     const item = this.workspace?.getCenter?.().getActivePaneItem?.();
     const itemPath = RepositoryRegistry.pathForPaneItem(item);
-    let repository = itemPath ? this.resolveForPathSync(itemPath) : null;
-    if (!repository && this.activeRepository && !this.activeRepository.isDestroyed?.()) {
-      repository = this.activeRepository;
+    if (itemPath) {
+      const repository = this.resolveForPathSync(itemPath);
+      return {
+        repository,
+        workingDirectory: repository ? null : this.contextDirectoryFor(item, itemPath),
+      };
     }
-    if (!repository) repository = this.defaultActiveRepository();
-    this.applyActiveRepository(repository, { pinned: false, emitOnPinChange });
+    if (this.activeRepository && !this.activeRepository.isDestroyed?.()) {
+      return { repository: this.activeRepository, workingDirectory: null };
+    }
+    if (this.activeWorkingDirectory) {
+      // A repository may have appeared at the focused out-of-repository
+      // directory (for example after `initialize` completes).
+      const repository = this.getForPath(this.activeWorkingDirectory);
+      return { repository, workingDirectory: repository ? null : this.activeWorkingDirectory };
+    }
+    return this.defaultActiveContext();
   }
 
-  defaultActiveRepository() {
+  defaultActiveContext() {
     for (const rootPath of this.rootPaths) {
       const repository = this.getForPath(rootPath);
-      if (repository) return repository;
+      if (repository) return { repository, workingDirectory: null };
     }
     const repositories = this.getRepositories();
-    return repositories.length > 0 ? repositories[0] : null;
+    if (repositories.length > 0) return { repository: repositories[0], workingDirectory: null };
+    // A window whose roots hold no repositories still gets a context, so a
+    // fresh project can offer initialize/clone for its first root.
+    if (this.rootPaths.length > 0) return { repository: null, workingDirectory: this.rootPaths[0] };
+    return { repository: null, workingDirectory: null };
   }
 
-  applyActiveRepository(repository, { pinned, emitOnPinChange = true } = {}) {
+  contextDirectoryFor(item, itemPath) {
+    const containingRoot = this.rootPaths.find((rootPath) => pathContains(rootPath, itemPath));
+    if (containingRoot) return containingRoot;
+    // pathForPaneItem prefers getWorkingDirectory, so a truthy working
+    // directory means itemPath already names a directory.
+    if (typeof item?.getWorkingDirectory === "function" && item.getWorkingDirectory()) {
+      return itemPath;
+    }
+    return path.dirname(itemPath);
+  }
+
+  applyActiveRepository(
+    repository,
+    { workingDirectory = null, pinned, emitOnPinChange = true } = {},
+  ) {
     const normalized = repository && !repository.isDestroyed?.() ? repository : null;
+    const nextWorkingDirectory = normalized
+      ? normalized.getWorkingDirectory()
+      : workingDirectory || null;
     const nextPinned = normalized ? pinned : false;
     const repositoryChanged = normalized !== this.activeRepository;
+    const workingDirectoryChanged =
+      (nextWorkingDirectory ? normalizePath(nextWorkingDirectory) : null) !==
+      (this.activeWorkingDirectory ? normalizePath(this.activeWorkingDirectory) : null);
     const pinChanged = nextPinned !== this.activeRepositoryPinned;
-    if (!repositoryChanged && !(pinChanged && emitOnPinChange)) {
+    if (!repositoryChanged && !workingDirectoryChanged && !(pinChanged && emitOnPinChange)) {
       this.activeRepositoryPinned = nextPinned;
       return;
     }
@@ -272,10 +338,15 @@ module.exports = class RepositoryRegistry {
     if (this.activeRepositoryPin) this.activeRepositoryPin.dispose();
     this.activeRepositoryPin = nextPin;
     this.activeRepository = normalized;
+    this.activeWorkingDirectory = nextWorkingDirectory;
     this.activeRepositoryPinned = nextPinned;
     this.emitter.emit(
       "did-change-active-repository",
-      Object.freeze({ repository: normalized, pinned: nextPinned }),
+      Object.freeze({
+        repository: normalized,
+        workingDirectory: nextWorkingDirectory,
+        pinned: nextPinned,
+      }),
     );
   }
 
@@ -288,6 +359,7 @@ module.exports = class RepositoryRegistry {
     this.workspaceSubscriptions.dispose();
     this.workspace = null;
     this.activeRepository = null;
+    this.activeWorkingDirectory = null;
     this.activeRepositoryPin = null;
 
     for (const owner of this.bufferOwners.values()) owner.subscriptions.dispose();
@@ -963,6 +1035,18 @@ module.exports = class RepositoryRegistry {
           ...updated.map((repository) => repository.getWorkingDirectory()),
         ],
       });
+    }
+
+    // Root changes can invalidate a null-repository context (its directory was
+    // removed) or create the first context for a window that had none.
+    if (
+      !this.activeRepositoryPinned &&
+      !this.activeRepository &&
+      (rootsAdded.length > 0 || rootsRemoved.length > 0 || added.length > 0) &&
+      (!this.activeWorkingDirectory ||
+        rootsRemoved.some((rootPath) => pathContains(rootPath, this.activeWorkingDirectory)))
+    ) {
+      this.recomputeActiveRepository();
     }
 
     if (scan) {

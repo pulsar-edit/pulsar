@@ -740,7 +740,7 @@ describe("RepositoryRegistry", () => {
       registry.setProjectRoots([directoryFor(workdirA), directoryFor(workdirB)]);
     });
 
-    it("follows the active pane item and keeps the current repository for other items", () => {
+    it("follows the active pane item, including paths outside every repository", () => {
       const events = [];
       registry.onDidChangeActiveRepository((event) => events.push(event));
       registry.attachWorkspace(workspace);
@@ -748,21 +748,51 @@ describe("RepositoryRegistry", () => {
       // Registering the project roots already adopted the first repository.
       expect(registry.getActiveRepository()).toBe(repoA);
       expect(registry.isActiveRepositoryPinned()).toBe(false);
+      expect(registry.getActiveRepositoryContext().workingDirectory).toBe(workdirA);
 
       workspace.setActiveItem(itemFor(path.join(workdirB, "file.txt")));
       expect(registry.getActiveRepository()).toBe(repoB);
 
-      // Items without a path (settings tabs) and paths outside every
-      // repository keep the current selection.
+      // Items without a path (settings tabs) keep the current selection.
       workspace.setActiveItem({});
       expect(registry.getActiveRepository()).toBe(repoB);
-      workspace.setActiveItem(itemFor(path.join(temp.mkdirSync("active-outside"), "loose.txt")));
-      expect(registry.getActiveRepository()).toBe(repoB);
+
+      // A path outside every repository clears the repository but keeps a
+      // working directory, so consumers can offer initialize and clone.
+      const outsideDir = temp.mkdirSync("active-outside");
+      workspace.setActiveItem(itemFor(path.join(outsideDir, "loose.txt")));
+      expect(registry.getActiveRepository()).toBeNull();
+      expect(registry.getActiveRepositoryContext().workingDirectory).toBe(outsideDir);
+
+      // Path-less items also keep a null-repository context.
+      workspace.setActiveItem({});
+      expect(registry.getActiveRepository()).toBeNull();
+      expect(registry.getActiveRepositoryContext().workingDirectory).toBe(outsideDir);
+
+      // Directory-backed items use their working directory as-is.
+      const terminalDir = temp.mkdirSync("active-terminal");
+      workspace.setActiveItem({ getWorkingDirectory: () => terminalDir });
+      expect(registry.getActiveRepositoryContext().workingDirectory).toBe(terminalDir);
 
       workspace.setActiveItem(itemFor(path.join(workdirA, "back.txt")));
       expect(registry.getActiveRepository()).toBe(repoA);
 
-      expect(events.map((event) => event.repository)).toEqual([repoB, repoA]);
+      expect(events.map((event) => [event.repository, event.workingDirectory])).toEqual([
+        [repoB, workdirB],
+        [null, outsideDir],
+        [null, terminalDir],
+        [repoA, workdirA],
+      ]);
+    });
+
+    it("anchors an out-of-repository path inside a project root to that root", () => {
+      registry.attachWorkspace(workspace);
+      const bareRoot = temp.mkdirSync("active-bare-root");
+      registry.setProjectRoots([directoryFor(workdirA), directoryFor(bareRoot)]);
+
+      workspace.setActiveItem(itemFor(path.join(bareRoot, "nested", "file.txt")));
+      expect(registry.getActiveRepository()).toBeNull();
+      expect(registry.getActiveRepositoryContext().workingDirectory).toBe(bareRoot);
     });
 
     it("pins a manual selection until it is cleared", () => {
@@ -793,7 +823,7 @@ describe("RepositoryRegistry", () => {
       expect(registry.getActiveRepository()).toBe(repoA);
     });
 
-    it("falls back to another repository when the active one is removed", async () => {
+    it("keeps a null-repository context on the focused item when its repository is removed", async () => {
       const events = [];
       registry.attachWorkspace(workspace);
       workspace.setActiveItem(itemFor(path.join(workdirB, "file.txt")));
@@ -804,8 +834,46 @@ describe("RepositoryRegistry", () => {
       repoB.destroy();
       await flushMicrotasks();
 
+      // The focused file is still inside workdirB, so the context stays there
+      // instead of jumping to an unrelated repository.
+      expect(registry.getActiveRepository()).toBeNull();
+      expect(registry.getActiveRepositoryContext().workingDirectory).toBe(workdirB);
+      expect(events.at(-1).repository).toBeNull();
+      expect(events.at(-1).workingDirectory).toBe(workdirB);
+    });
+
+    it("falls back to another repository when the active one is removed and no file is focused", async () => {
+      registry.attachWorkspace(workspace);
+      workspace.setActiveItem(itemFor(path.join(workdirB, "file.txt")));
+      workspace.setActiveItem({});
+      expect(registry.getActiveRepository()).toBe(repoB);
+
+      repositories.splice(repositories.indexOf(repoB), 1);
+      repoB.destroy();
+      await flushMicrotasks();
+
       expect(registry.getActiveRepository()).toBe(repoA);
-      expect(events.map((event) => event.repository)).toEqual([null, repoA]);
+    });
+
+    it("gives a window whose roots hold no repositories an initialize context", async () => {
+      registry.attachWorkspace(workspace);
+      const bareRoot = temp.mkdirSync("active-initialize-root");
+      registry.setProjectRoots([directoryFor(bareRoot)]);
+      await flushMicrotasks();
+
+      expect(registry.getActiveRepository()).toBeNull();
+      expect(registry.getActiveRepositoryContext().workingDirectory).toBe(bareRoot);
+
+      // A repository appearing at the context directory becomes active, as
+      // after an initialize or clone operation completes there.
+      const created = new FakeRepository(bareRoot);
+      repositories.push(created);
+      const registration = await registry.add(path.join(bareRoot, "file.txt"));
+      await flushMicrotasks();
+
+      expect(registration.repository).toBe(created);
+      expect(registry.getActiveRepository()).toBe(created);
+      expect(registry.getActiveRepositoryContext().workingDirectory).toBe(bareRoot);
     });
 
     it("keeps a pinned out-of-project repository alive until it is deactivated", () => {
