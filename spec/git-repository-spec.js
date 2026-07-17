@@ -41,6 +41,27 @@ describe("GitRepository", () => {
     });
   });
 
+  describe(".relativize(path) and .getWorkingDirectory()", () => {
+    it("matches the libgit2 implementation in, at, and outside the working directory", () => {
+      const workingDirectory = copyRepository();
+      repo = new GitRepository(workingDirectory);
+
+      expect(repo.getWorkingDirectory()).toBe(repo.repo.getWorkingDirectory());
+
+      const cases = [
+        path.join(workingDirectory, "a.txt"),
+        path.join(workingDirectory, "dir", "b.txt"),
+        path.join(workingDirectory, "does-not-exist.txt"),
+        workingDirectory,
+        path.resolve(workingDirectory, ".."),
+        "",
+      ];
+      for (const filePath of cases) {
+        expect(repo.relativize(filePath)).toBe(repo.repo.relativize(filePath));
+      }
+    });
+  });
+
   describe(".isPathIgnored(path)", () => {
     it("returns true for an ignored path", () => {
       repo = new GitRepository(path.join(__dirname, "fixtures", "git", "ignore.git"));

@@ -17,6 +17,7 @@ const {
 } = require("./repository-history");
 const { EMPTY_STATUS_SNAPSHOT, parseStatusSnapshot } = require("./repository-status-snapshot");
 const { EMPTY_REFS_SNAPSHOT, parseRefsSnapshot } = require("./repository-refs-snapshot");
+const { relativize: relativizePath } = require("./repository-paths");
 
 let nextId = 0;
 
@@ -130,6 +131,13 @@ module.exports = class GitRepository {
     if (this.repo == null) {
       throw new Error(`No Git repository found searching path: ${path}`);
     }
+
+    // Cache the working directory and filesystem traits once so path routing
+    // (getWorkingDirectory/relativize) needs no native call per query. These are
+    // fixed for the repository's lifetime.
+    this.workingDirectoryPath = this.repo.getWorkingDirectory();
+    this.openedWorkingDirectoryPath = this.repo.openedWorkingDirectory || null;
+    this.caseInsensitiveFs = this.repo.caseInsensitiveFs === true;
 
     this.statusRefreshCount = 0;
     this.statuses = {};
@@ -349,7 +357,7 @@ module.exports = class GitRepository {
 
   // Public: Returns the {String} working directory path of the repository.
   getWorkingDirectory() {
-    return this.getRepo().getWorkingDirectory();
+    return this.workingDirectoryPath;
   }
 
   // Public: Returns true if at the root, false if in a subfolder of the
@@ -364,7 +372,12 @@ module.exports = class GitRepository {
 
   // Public: Makes a path relative to the repository's working directory.
   relativize(path) {
-    return this.getRepo().relativize(path);
+    return relativizePath(
+      path,
+      this.workingDirectoryPath,
+      this.openedWorkingDirectoryPath,
+      this.caseInsensitiveFs,
+    );
   }
 
   // Public: Returns true if the given branch exists.
