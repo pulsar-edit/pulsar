@@ -47,6 +47,17 @@ class GitHostDiffProvider {
   }
 }
 
+class GitHostConfigProvider {
+  getConfigValue(workingDirectory, key, options = {}) {
+    const { signal, rest } = splitSignal(options);
+    return GitHost.instance().request(
+      "configGet",
+      { workingDirectory, key, options: rest },
+      { signal },
+    );
+  }
+}
+
 class GitHostHistoryProvider {
   getLog(workingDirectory, params, options = {}) {
     const { signal, rest } = splitSignal(options);
@@ -88,6 +99,7 @@ class GitHostHistoryProvider {
 module.exports = {
   GitHostStatusProvider,
   GitHostRefsProvider,
+  GitHostConfigProvider,
   GitHostDiffProvider,
   GitHostHistoryProvider,
 };

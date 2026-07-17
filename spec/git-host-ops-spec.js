@@ -101,4 +101,20 @@ describe("git-host ops", () => {
     await ops.lineDiff({ ...payload, text: "a\nZ\nc\n" }, {});
     expect(calls.length).toBe(1);
   });
+
+  it("reads a config value with `config -z --get` and strips the trailing NUL", async () => {
+    const ops = opsReturning({ stdout: "https://example.com/repo.git\0" });
+    const value = await ops.configGet({ workingDirectory: "/repo", key: "remote.origin.url" }, {});
+    expect(value).toBe("https://example.com/repo.git");
+    expect(calls[0].args).toContain("config");
+    expect(calls[0].args).toContain("--get");
+    expect(calls[0].args).toContain("remote.origin.url");
+  });
+
+  it("returns null for an unset config key (git config exit code 1)", async () => {
+    const execute = () => Promise.resolve({ exitCode: 1, stdout: "", stderr: "" });
+    const ops = createGitHostOps(new DugiteRunner({ execute }));
+    const value = await ops.configGet({ workingDirectory: "/repo", key: "branch.x.remote" }, {});
+    expect(value).toBeNull();
+  });
 });

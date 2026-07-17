@@ -64,6 +64,22 @@ module.exports = function createGitHostOps(runner) {
     blame: ({ workingDirectory, relativePosixPath, params, options }, { signal }) =>
       history.getBlame(workingDirectory, relativePosixPath, params, withSignal(options, signal)),
 
+    // Read a single git config value across the local, global, and system
+    // scopes (matching libgit2's default config lookup). Returns the raw value,
+    // or null when the key is unset. Uses `-z` so the value is delimited by a
+    // trailing NUL rather than a newline, preserving any trailing whitespace the
+    // way the libgit2-backed getConfigValue did.
+    configGet: async ({ workingDirectory, key }, { signal }) => {
+      const result = await runner.runResult(["config", "-z", "--get", key], workingDirectory, {
+        signal,
+        allowedExitCodes: [0, 1],
+      });
+      if (result.exitCode !== 0) return null;
+      const value = String(result.stdout);
+      const nul = value.indexOf("\0");
+      return nul === -1 ? value : value.slice(0, nul);
+    },
+
     // Gutter line diff: fetch (and cache) the HEAD blob, then diff it against the
     // buffer text in JS. Returns only the small hunk array, not the blob.
     lineDiff: async (
