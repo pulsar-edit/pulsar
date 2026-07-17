@@ -9,15 +9,12 @@ module.exports = {
     this.branchTile = null;
     this.repositoryListView = null;
     this.branchListView = null;
-    this.switchListView = null;
 
+    // Commands and tile clicks open the same modal pickers.
     this.subscriptions.add(
       atom.commands.add("atom-workspace", {
-        "git-switcher:switch": () => this.getSwitchListView().toggle(),
-        "git-switcher:select-repository": () =>
-          this.getRepositoryListView().toggle(this.repositoryStatusView?.getAnchorElement()),
-        "git-switcher:select-branch": () =>
-          this.getBranchListView().toggle(this.branchStatusView?.getAnchorElement()),
+        "git-switcher:select-repository": () => this.getRepositoryListView().toggle(),
+        "git-switcher:select-branch": () => this.getBranchListView().toggle(),
       }),
     );
   },
@@ -36,28 +33,30 @@ module.exports = {
     this.repositoryListView = null;
     this.branchListView?.destroy();
     this.branchListView = null;
-    this.switchListView?.destroy();
-    this.switchListView = null;
   },
 
   consumeStatusBar(statusBar) {
     const RepositoryStatusView = require("./repository-status-view");
     const BranchStatusView = require("./branch-status-view");
 
-    this.repositoryStatusView = new RepositoryStatusView();
-    this.branchStatusView = new BranchStatusView();
+    this.repositoryStatusView = new RepositoryStatusView({
+      onDidClick: () => this.getRepositoryListView().toggle(),
+    });
+    this.branchStatusView = new BranchStatusView({
+      onDidClick: () => this.getBranchListView().toggle(),
+    });
     this.repositoryStatusView.update();
     this.branchStatusView.update();
 
-    // Higher priority sits further from the right edge: the repository tile
-    // appears immediately left of the branch tile.
-    this.repositoryTile = statusBar.addRightTile({
+    // Lower priorities sit closer to the left edge. File info uses priority 0,
+    // so place the repository immediately before it and the branch after it.
+    this.repositoryTile = statusBar.addLeftTile({
       item: this.repositoryStatusView.element,
-      priority: 1,
+      priority: 10,
     });
-    this.branchTile = statusBar.addRightTile({
+    this.branchTile = statusBar.addLeftTile({
       item: this.branchStatusView.element,
-      priority: 0,
+      priority: 20,
     });
   },
 
@@ -75,13 +74,5 @@ module.exports = {
       this.branchListView = new BranchListView();
     }
     return this.branchListView;
-  },
-
-  getSwitchListView() {
-    if (!this.switchListView) {
-      const SwitchListView = require("./switch-list-view");
-      this.switchListView = new SwitchListView();
-    }
-    return this.switchListView;
   },
 };

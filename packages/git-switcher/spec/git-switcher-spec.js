@@ -58,7 +58,8 @@ describe("git-switcher", () => {
     expect(repositoryView.nameLabel.textContent).toBe(path.basename(repoB.workingDirectory));
 
     atom.repositories.setActiveRepository(repoB.repository, { pin: true });
-    expect(repositoryView.pinIcon.style.display).toBe("");
+    expect(repositoryView.icon.classList.contains("icon-lock")).toBe(true);
+    expect(repositoryView.icon.classList.contains("icon-repo")).toBe(false);
     atom.repositories.setActiveRepository(null);
   });
 
@@ -74,15 +75,66 @@ describe("git-switcher", () => {
     expect(repositoryView.element.style.display).toBe("");
   });
 
+  it("cycles repositories with the mouse wheel and toggles the pin with middle click", () => {
+    const repositoryView = mainModule.repositoryStatusView;
+    const repositories = [repoA.repository, repoB.repository];
+    spyOn(atom.repositories, "getRepositories").andReturn(repositories);
+
+    const wheel = (deltaY) =>
+      repositoryView.element.dispatchEvent(new WheelEvent("wheel", { deltaY, cancelable: true }));
+
+    wheel(120);
+    const second = atom.repositories.getActiveRepository();
+    expect(repositories).toContain(second);
+    expect(second).not.toBe(repoA.repository);
+
+    wheel(120);
+    expect(atom.repositories.getActiveRepository()).toBe(repoA.repository);
+
+    wheel(-120);
+    expect(atom.repositories.getActiveRepository()).toBe(second);
+
+    // Small trackpad deltas accumulate instead of switching per event.
+    wheel(20);
+    expect(atom.repositories.getActiveRepository()).toBe(second);
+
+    const middleClick = () =>
+      repositoryView.element.dispatchEvent(
+        new MouseEvent("auxclick", { button: 1, cancelable: true }),
+      );
+    expect(atom.repositories.isActiveRepositoryPinned()).toBe(false);
+    middleClick();
+    expect(atom.repositories.isActiveRepositoryPinned()).toBe(true);
+    expect(atom.repositories.getActiveRepository()).toBe(second);
+    middleClick();
+    expect(atom.repositories.isActiveRepositoryPinned()).toBe(false);
+  });
+
   it("switches the active repository through the repository picker", async () => {
-    await mainModule.getRepositoryListView().toggle(null);
+    await mainModule.getRepositoryListView().toggle();
     const listView = mainModule.repositoryListView.selectListView;
     expect(listView.isVisible()).toBe(true);
-    const target = listView.props.items.find((item) => item.repository === repoB.repository);
+
+    const items = listView.props.items;
+    expect(items[0].auto).toBe(true);
+    expect(items[0].repoName).toBe("Auto");
+    const autoElement = listView.element.querySelector(".list-group li");
+    expect(autoElement.querySelector(".secondary-line").textContent).toBe(
+      "The active repository is updated based on the active editor.",
+    );
+    expect(items.slice(1).every((item) => item.current)).toBe(true);
+    const target = items.find((item) => item.repository === repoB.repository);
     expect(target).toBeTruthy();
     listView.props.didConfirmSelection(target);
+
     expect(atom.repositories.getActiveRepository()).toBe(repoB.repository);
+    expect(atom.repositories.isActiveRepositoryPinned()).toBe(true);
     expect(listView.isVisible()).toBe(false);
+
+    await mainModule.getRepositoryListView().toggle();
+    const auto = listView.props.items.find((item) => item.auto);
+    listView.props.didConfirmSelection(auto);
+    expect(atom.repositories.isActiveRepositoryPinned()).toBe(false);
   });
 
   it("checks out a branch through the branch picker", async () => {
@@ -90,48 +142,62 @@ describe("git-switcher", () => {
     await repoA.repository.getOperations().checkout("main");
     await repoA.repository.refreshRefsSnapshot();
 
-    await mainModule.getBranchListView().toggle(null);
+    await mainModule.getBranchListView().toggle();
     const listView = mainModule.branchListView.selectListView;
-    const target = listView.props.items.find((item) => item.name === "feature");
-    expect(target).toBeTruthy();
-    listView.props.didConfirmSelection(target);
+    expect(listView.isVisible()).toBe(true);
 
-    await new Promise((resolve) => {
+    const items = listView.props.items;
+    expect(items.slice(0, 3).map((item) => item.branch)).toEqual([
+      "Create new branch...",
+      "Create new branch from...",
+      "Checkout detached...",
+    ]);
+    expect(
+      items.filter((item) => !item.action).every((item) => item.repository === repoA.repository),
+    ).toBe(true);
+    const target = items.find((item) => item.branch === "feature");
+    expect(target).toBeTruthy();
+    const didChangeRefs = new Promise((resolve) => {
       const subscription = repoA.repository.onDidChangeRefsSnapshot(() => {
         subscription.dispose();
         resolve();
       });
     });
+    listView.props.didConfirmSelection(target);
+    await didChangeRefs;
     expect(repoA.repository.getRefsSnapshot().head.name).toBe("feature");
   });
 
-  it("switches repository and branch together through the fuzzy switch list", async () => {
-    await repoB.repository.getOperations().checkout("topic", { createNew: true });
-    await repoB.repository.getOperations().checkout("main");
-    await repoB.repository.refreshRefsSnapshot();
+  it("creates branches from HEAD or another ref and checks out detached", async () => {
+    const branchListView = mainModule.getBranchListView();
+    const operations = repoA.repository.getOperations();
+    spyOn(operations, "checkout").andReturn(Promise.resolve());
 
-    await mainModule.getSwitchListView().toggle();
-    const listView = mainModule.switchListView.selectListView;
-    expect(listView.isVisible()).toBe(true);
+    branchListView.performAction("create");
+    const nameListView = branchListView.branchNameDialog.selectListView;
+    expect(nameListView.props.items).toEqual([]);
+    expect(nameListView.props.infoMessage).toBe("Please provide a new branch name");
+    expect(nameListView.refs.queryEditor.getPlaceholderText()).toBe("Branch name");
+    nameListView.refs.queryEditor.setText("new-branch");
+    await nameListView.props.didConfirmEmptySelection();
+    expect(operations.checkout).toHaveBeenCalledWith("new-branch", { createNew: true });
 
-    const items = listView.props.items;
-    // The active repository's rows come first, current branch first per repo.
-    expect(items[0].repository).toBe(repoA.repository);
-    expect(items[0].current).toBe(true);
-
-    const target = items.find(
-      (item) => item.repository === repoB.repository && item.branch === "topic",
+    await branchListView.showReferenceList("create-from", repoA.repository);
+    const main = branchListView.referenceListView.props.items.find(
+      (item) => item.reference === "main",
     );
-    expect(target).toBeTruthy();
-    listView.props.didConfirmSelection(target);
-
-    expect(atom.repositories.getActiveRepository()).toBe(repoB.repository);
-    await new Promise((resolve) => {
-      const subscription = repoB.repository.onDidChangeRefsSnapshot(() => {
-        subscription.dispose();
-        resolve();
-      });
+    branchListView.confirmReference(main);
+    nameListView.refs.queryEditor.setText("from-main");
+    await nameListView.props.didConfirmEmptySelection();
+    expect(operations.checkout).toHaveBeenCalledWith("from-main", {
+      createNew: true,
+      startPoint: "main",
     });
-    expect(repoB.repository.getRefsSnapshot().head.name).toBe("topic");
+
+    await branchListView.showReferenceList("detach", repoA.repository);
+    branchListView.confirmReference(
+      branchListView.referenceListView.props.items.find((item) => item.reference === "main"),
+    );
+    expect(operations.checkout).toHaveBeenCalledWith("main", { detach: true });
   });
 });

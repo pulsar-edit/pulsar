@@ -1,35 +1,40 @@
 const { SelectListView, highlightMatches } = require("@lumine-code/select-list");
 
-const AnchoredPanel = require("./anchored-panel");
-const { headLabel, repositoryDisplayName, repositoryWorkingDirectory } = require("./helpers");
+const { applySwitchItem, buildSwitchItems } = require("./helpers");
 
-// Compact repository picker, anchored to the repository status bar tile.
-// Selecting a repository makes it the window's active repository (unpinned).
+// Repository picker. Selecting a repository makes it the window's active
+// repository (unpinned).
 module.exports = class RepositoryListView {
   constructor() {
-    this.panel = new AnchoredPanel({ className: "git-switcher-repository-list" });
     this.selectListView = new SelectListView({
-      className: "git-switcher-list",
-      itemsClassList: ["mark-active"],
+      className: "git-switcher-repository-list",
       items: [],
       emptyMessage: "No repositories in this window",
-      filterKeyForItem: (item) => item.name,
+      filterKeyForItem: (item) => item.repoName,
       elementForItem: (item, { matchIndices }) => {
         const element = document.createElement("li");
-        element.classList.add("git-switcher-item", "two-lines");
-        if (item.current) {
-          element.classList.add("active");
+        if (item.auto) {
+          element.classList.add("git-switcher-item", "two-lines");
+          const line = document.createElement("div");
+          line.classList.add("primary-line", "icon", "icon-sync");
+          line.appendChild(highlightMatches(item.repoName, matchIndices));
+          element.appendChild(line);
+
+          const secondary = document.createElement("div");
+          secondary.classList.add("secondary-line");
+          secondary.textContent = "The active repository is updated based on the active editor.";
+          element.appendChild(secondary);
+          return element;
         }
 
+        element.classList.add("git-switcher-item", "two-lines");
         const primary = document.createElement("div");
         primary.classList.add("primary-line", "icon", "icon-repo");
-        primary.appendChild(highlightMatches(item.name, matchIndices));
-        if (item.head) {
-          const head = document.createElement("span");
-          head.classList.add("badge", "badge-info", "pull-right");
-          head.textContent = item.head;
-          primary.appendChild(head);
-        }
+        primary.appendChild(highlightMatches(item.repoName, matchIndices));
+        const badge = document.createElement("span");
+        badge.classList.add("badge", "badge-info", "pull-right");
+        badge.textContent = item.branch;
+        primary.appendChild(badge);
         element.appendChild(primary);
 
         const secondary = document.createElement("div");
@@ -41,45 +46,34 @@ module.exports = class RepositoryListView {
       },
       didConfirmSelection: (item) => {
         this.hide();
-        try {
-          atom.repositories.setActiveRepository(item.repository);
-        } catch {
-          // The repository was destroyed while the picker was open.
+        if (item.auto) {
+          atom.repositories.setActiveRepository(null);
+        } else {
+          applySwitchItem(item, { pin: true });
         }
       },
       didCancelSelection: () => this.hide(),
     });
-    this.panel.setItem(this.selectListView.element);
-    this.panel.onDidDismiss = () => this.hide();
-    // The select list reads `this.panel` directly (getPanel only creates it
-    // lazily), so assign the anchored panel as the pre-created panel.
-    this.selectListView.panel = this.panel;
   }
 
-  async toggle(anchor) {
+  async toggle() {
     if (this.selectListView.isVisible()) {
       this.hide();
       return;
     }
-    this.panel.setAnchor(anchor);
 
-    const active = atom.repositories.getActiveRepository();
-    const items = atom.repositories
-      .getRepositories()
-      .map((repository) => ({
-        repository,
-        name: repositoryDisplayName(repository),
-        workingDirectory: repositoryWorkingDirectory(repository) || "",
-        head: headLabel(repository),
-        current: repository === active,
-      }))
-      .sort((a, b) => {
-        if (a.current !== b.current) return a.current ? -1 : 1;
-        return a.name.localeCompare(b.name);
-      });
-
-    await this.selectListView.update({ items });
+    this.selectListView.reset();
+    await this.selectListView.update({ items: [], loadingMessage: "Loading repositories…" });
     this.selectListView.show();
+
+    const items = [
+      { auto: true, repoName: "Auto" },
+      ...(await buildSwitchItems()).filter((item) => item.current),
+    ];
+    if (!this.selectListView.isVisible()) {
+      return;
+    }
+    await this.selectListView.update({ items, loadingMessage: null });
   }
 
   hide() {
@@ -88,6 +82,5 @@ module.exports = class RepositoryListView {
 
   destroy() {
     this.selectListView.destroy();
-    this.panel.destroy();
   }
 };

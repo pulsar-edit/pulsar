@@ -41,13 +41,13 @@ module.exports = {
     }
 
     this.fileInfo = new FileInfoView();
-    this.statusBar.addLeftTile({ item: this.fileInfo.element, priority: 0 });
+    this.statusBar.addLeftTile({ item: this.fileInfo.element, priority: 40 });
 
     this.cursorPosition = new CursorPositionView();
-    this.statusBar.addLeftTile({ item: this.cursorPosition.element, priority: 1 });
+    this.statusBar.addLeftTile({ item: this.cursorPosition.element, priority: 50 });
 
     this.selectionCount = new SelectionCountView();
-    this.statusBar.addLeftTile({ item: this.selectionCount.element, priority: 2 });
+    this.statusBar.addLeftTile({ item: this.selectionCount.element, priority: 60 });
   },
 
   deactivate() {
