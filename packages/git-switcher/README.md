@@ -14,7 +14,8 @@ Status bar controls for switching the active Git repository and branch.
 Commands available in `atom-workspace`:
 
 - `git-switcher:select-repository`: pick the active repository,
-- `git-switcher:select-branch`: pick a branch of the active repository to check out.
+- `git-switcher:select-branch`: pick a branch of the active repository to check out,
+- `git-switcher:toggle-lock`: pin or unpin the active repository so it stops or resumes following the active editor.
 
 ## Services
 

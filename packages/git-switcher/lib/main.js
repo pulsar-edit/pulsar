@@ -10,13 +10,30 @@ module.exports = {
     this.repositoryListView = null;
     this.branchListView = null;
 
-    // Commands and tile clicks open the same modal pickers.
+    // Commands and tile clicks open the same modal pickers. Toggling the lock
+    // pins the active repository so it stops following the active pane item,
+    // which is the switching workflow git-panel's removed header used to offer.
     this.subscriptions.add(
       atom.commands.add("atom-workspace", {
         "git-switcher:select-repository": () => this.getRepositoryListView().toggle(),
         "git-switcher:select-branch": () => this.getBranchListView().toggle(),
+        "git-switcher:toggle-lock": () => this.toggleActiveRepositoryLock(),
       }),
     );
+  },
+
+  toggleActiveRepositoryLock() {
+    const active = atom.repositories.getActiveRepository();
+    if (!active) {
+      return;
+    }
+    try {
+      atom.repositories.setActiveRepository(active, {
+        pin: !atom.repositories.isActiveRepositoryPinned(),
+      });
+    } catch {
+      // The repository was destroyed while toggling.
+    }
   },
 
   deactivate() {
