@@ -1117,9 +1117,16 @@ module.exports = class GitRepository {
   async checkoutHeadForEditor(editor) {
     const buffer = editor.getBuffer();
     const bufferPath = buffer.getPath();
-    if (bufferPath) {
+    if (!bufferPath) return;
+
+    // Reload the buffer from disk even if the checkout could not run (no
+    // operation provider, or a Git failure), matching the previous behavior
+    // where the reload always followed the checkout attempt.
+    try {
       await this.checkoutHead(bufferPath);
-      return buffer.reload();
+    } catch {
+      // Swallowed: the reload below still discards the in-memory edits.
     }
+    return buffer.reload();
   }
 };
