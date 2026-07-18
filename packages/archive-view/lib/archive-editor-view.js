@@ -24,7 +24,13 @@ export default class ArchiveEditorView {
 
     this.disposables.add(this.file);
     this.disposables.add(this.file.onDidChange(() => this.refresh()));
-    this.disposables.add(this.file.onDidRename(() => this.refresh()));
+    this.disposables.add(
+      this.file.onDidRename((newPath) => {
+        if (newPath) this.path = newPath;
+        this.emitter.emit("did-change-title");
+        this.refresh();
+      }),
+    );
     this.disposables.add(this.file.onDidDelete(() => this.destroy()));
 
     const focusHandler = () => this.focusSelectedFile();
@@ -100,11 +106,6 @@ export default class ArchiveEditorView {
     this.refs.tree.style.display = "none";
     this.refs.loadingMessage.style.display = "";
     this.refs.errorMessage.style.display = "none";
-
-    if (this.path !== this.getPath()) {
-      this.path = this.getPath();
-      this.emitter.emit("did-change-title");
-    }
 
     const originalPath = this.path;
     archive.list(this.path, { tree: true }, (error, entries) => {

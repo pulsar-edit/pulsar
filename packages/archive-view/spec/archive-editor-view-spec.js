@@ -1,4 +1,5 @@
-const { Disposable, File } = require("atom");
+const { Disposable } = require("atom");
+const atomAPI = require("atom");
 const getIconServices = require("../lib/get-icon-services");
 const { conditionPromise } = require("./async-spec-helpers");  
 
@@ -13,25 +14,28 @@ describe("ArchiveEditorView", () => {
   let archiveEditorView, onDidChangeCallback, onDidRenameCallback, onDidDeleteCallback;
 
   beforeEach(async () => {
-    spyOn(File.prototype, "onDidChange").and.callFake(function (callback) {
-      if (/\.tar$/.test(this.getPath())) {
-        onDidChangeCallback = callback;
-      }
-      return new Disposable();
-    });
-
-    spyOn(File.prototype, "onDidRename").and.callFake(function (callback) {
-      if (/\.tar$/.test(this.getPath())) {
-        onDidRenameCallback = callback;
-      }
-      return new Disposable();
-    });
-
-    spyOn(File.prototype, "onDidDelete").and.callFake(function (callback) {
-      if (/\.tar$/.test(this.getPath())) {
-        onDidDeleteCallback = callback;
-      }
-      return new Disposable();
+    // archive-view watches its file via the core `watchFile` helper. Stub it to
+    // capture the callbacks so the tests can drive file events synchronously.
+    spyOn(atomAPI, "watchFile").and.callFake(function (filePath) {
+      const isTar = /\.tar$/.test(filePath);
+      return {
+        onDidChange(callback) {
+          if (isTar) onDidChangeCallback = callback;
+          return new Disposable();
+        },
+        onDidRename(callback) {
+          if (isTar) onDidRenameCallback = callback;
+          return new Disposable();
+        },
+        onDidDelete(callback) {
+          if (isTar) onDidDeleteCallback = callback;
+          return new Disposable();
+        },
+        getStartPromise() {
+          return Promise.resolve();
+        },
+        dispose() {},
+      };
     });
 
     await atom.packages.activatePackage("archive-view");
@@ -150,7 +154,6 @@ describe("ArchiveEditorView", () => {
 
   describe("when the file is renamed", () => {
     it("refreshes the view and updates the title", async () => {
-      spyOn(File.prototype, "getPath").and.returnValue("nested-renamed.tar");
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
       spyOn(archiveEditorView, "refresh").and.callThrough();
       // The view's contract on rename is to refresh and notify title observers
