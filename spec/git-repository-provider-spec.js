@@ -182,25 +182,14 @@ describe("GitRepositoryProvider", () => {
       });
     });
 
-    describe("when specified a Directory without existsSync()", () => {
-      let directory;
-
-      beforeEach(() => {
-        // An implementation of Directory that does not implement existsSync().
-        const subdirectory = {};
-        directory = {
-          getSubdirectory() {},
-          isRoot() {
-            return true;
-          },
-        };
-        spyOn(directory, "getSubdirectory").and.returnValue(subdirectory);
-      });
-
-      it("returns null", () => {
+    describe("when specified a directory-like object exposing only getPath()", () => {
+      it("returns null for a path without a Git repository", () => {
+        // The provider derives the path via `getPath()` and walks the tree with
+        // `fs`; it must not require any other Directory method (existsSync,
+        // getSubdirectory, …) on the value object.
+        const directory = { getPath: () => temp.mkdirSync("dir") };
         const repo = provider.repositoryForDirectorySync(directory);
         expect(repo).toBe(null);
-        expect(directory.getSubdirectory).toHaveBeenCalledWith(".git");
       });
     });
   });

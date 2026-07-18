@@ -18,13 +18,23 @@ function realWait (ms) {
 
 originalProcessPlatform = process.platform
 processPlatform = process.platform
-Object.defineProperty(process, 'platform', {get: () => processPlatform})
 
 // Register the per-spec setup/teardown. Called from within a spec's `describe`
 // so the fake clock and sinon sandbox are scoped to that block rather than the
 // whole lumine suite (which auto-loads no helpers of its own).
 function installHooks () {
   beforeEach(function () {
+    // Re-install the `process.platform` getter each spec. Other lumine specs
+    // (buffered-process, clipboard, grammar-registry, menu-manager, …) redefine
+    // `process.platform` as a fixed data property and restore it the same way,
+    // which clobbers this accessor. Without re-installing it here,
+    // `mockProcessPlatform` becomes a no-op whenever one of those specs has run
+    // first, so the platform-specific keystroke branches read the real OS.
+    processPlatform = originalProcessPlatform
+    Object.defineProperty(process, 'platform', {
+      get: () => processPlatform,
+      configurable: true
+    })
     // Don't wipe `document.body` — lumine's harness owns the test container
     // (`#jasmine-content`). Track our own appended elements and remove them.
     appendedElements = []
@@ -35,7 +45,14 @@ function installHooks () {
   afterEach(function () {
     if (fakeClock) { fakeClock.uninstall(); fakeClock = null }
     sinonSandbox.restore()
-    processPlatform = originalProcessPlatform
+    // Restore a normal writable/configurable data property so later specs can
+    // redefine or plain-assign `process.platform` as they expect.
+    Object.defineProperty(process, 'platform', {
+      value: originalProcessPlatform,
+      writable: true,
+      enumerable: true,
+      configurable: true
+    })
     for (const el of appendedElements) el.remove()
     appendedElements = []
   })
