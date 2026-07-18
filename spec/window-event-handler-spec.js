@@ -1,4 +1,4 @@
-const KeymapManager = require("@lumine-code/atom-keymap");
+const KeymapManager = require("../src/keymap-manager");
 const WindowEventHandler = require("../src/window-event-handler");
 
 describe("WindowEventHandler", () => {
