@@ -33,6 +33,8 @@ function reviveError(serialized) {
   if (serialized.code !== undefined) error.code = serialized.code;
   if (serialized.exitCode !== undefined) error.exitCode = serialized.exitCode;
   if (serialized.stderr !== undefined) error.stderr = serialized.stderr;
+  if (serialized.stdout !== undefined) error.stdout = serialized.stdout;
+  if (serialized.command !== undefined) error.command = serialized.command;
   if (serialized.gitError !== undefined) error.gitError = serialized.gitError;
   return error;
 }

@@ -64,6 +64,18 @@ module.exports = function createGitHostOps(runner) {
     blame: ({ workingDirectory, relativePosixPath, params, options }, { signal }) =>
       history.getBlame(workingDirectory, relativePosixPath, params, withSignal(options, signal)),
 
+    // Run an arbitrary git command in the worker — the write path
+    // (commit/stage/checkout/reset/fetch/pull/push/…) plus raw `executeGit` — so
+    // write operations leave the renderer thread like the reads already have.
+    // `raw` uses the unwrapped exec (no limiter, color config, or exit-code
+    // check, matching the historical `executeGit`); otherwise `runResult`
+    // applies the limiter, color/trust config, and allowed-exit-code check, and
+    // rejects with a DugiteOperationError whose fields cross IPC.
+    exec: ({ workingDirectory, args, options, raw }, { signal }) =>
+      raw
+        ? runner.execute(args, workingDirectory, withSignal(options, signal))
+        : runner.runResult(args, workingDirectory, withSignal(options, signal)),
+
     // Read a single git config value across the local, global, and system
     // scopes (matching libgit2's default config lookup). Returns the raw value,
     // or null when the key is unset. Uses `-z` so the value is delimited by a

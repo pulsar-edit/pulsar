@@ -23,6 +23,8 @@ function serializeError(error) {
     code: error.code,
     exitCode: error.exitCode,
     stderr: error.stderr != null ? String(error.stderr) : undefined,
+    stdout: error.stdout != null ? String(error.stdout) : undefined,
+    command: error.command,
     gitError: error.gitError,
   };
 }

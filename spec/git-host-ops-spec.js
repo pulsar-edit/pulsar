@@ -117,4 +117,39 @@ describe("git-host ops", () => {
     const value = await ops.configGet({ workingDirectory: "/repo", key: "branch.x.remote" }, {});
     expect(value).toBeNull();
   });
+
+  it("runs an arbitrary write command with runResult semantics (exec)", async () => {
+    const ops = opsReturning({ stdout: "done\n" });
+    const result = await ops.exec(
+      { workingDirectory: "/repo", args: ["commit", "--file=-"], options: { stdin: "msg" } },
+      {},
+    );
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe("done\n");
+    expect(calls[0].cwd).toBe("/repo");
+    expect(calls[0].args).toContain("commit");
+    expect(calls[0].options.stdin).toBe("msg");
+  });
+
+  it("runs a raw command without the color config (exec raw)", async () => {
+    const ops = opsReturning();
+    await ops.exec({ workingDirectory: "/repo", args: ["--version"], options: {}, raw: true }, {});
+    expect(calls[0].args).toEqual(["--version"]);
+  });
+
+  it("rejects exec with a DugiteOperationError carrying command and stdout", async () => {
+    const execute = () => Promise.resolve({ exitCode: 1, stdout: "partial", stderr: "boom" });
+    const ops = createGitHostOps(new DugiteRunner({ execute }));
+
+    let error;
+    try {
+      await ops.exec({ workingDirectory: "/repo", args: ["checkout", "x"], options: {} }, {});
+    } catch (caught) {
+      error = caught;
+    }
+    expect(error.name).toBe("DugiteOperationError");
+    expect(error.command).toBe("checkout");
+    expect(error.stdout).toBe("partial");
+    expect(error.exitCode).toBe(1);
+  });
 });
