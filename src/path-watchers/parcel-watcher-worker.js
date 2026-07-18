@@ -61,10 +61,6 @@ function nodejsHandler(instance, eventType, eventPath, oldPath) {
   let payload = { action, path: eventPath };
   if (oldPath) payload.oldPath = oldPath;
 
-  if (/file\.markdown|file2\.md/.test(`${eventPath || ""}${oldPath || ""}`)) {
-    console.error("NWDIAG worker emit", eventType, eventPath, oldPath);
-  }
-
   console.log("Sending events:", [payload]);
 
   emit("watcher:events", {
@@ -143,9 +139,6 @@ async function handleMessage(message) {
           // Single file, or a non-recursive directory watch → reliable
           // parent-directory technique (see nodejs-watcher.js).
           console.log("Watching non-recursively:", normalizedPath);
-          if (/file\.markdown|file2\.md/.test(normalizedPath)) {
-            console.error("NWDIAG worker watch-nonrecursive", normalizedPath);
-          }
           handle = nodejsWatcher.watch(normalizedPath, wrappedNodejsHandler);
         }
         WATCHERS_BY_PATH.set(instance, handle);

@@ -2421,17 +2421,18 @@ class TextBuffer {
       let disposed = false
       const watcherPromise = watchPath(filePath, { recursive: false }, events => {
         for (const event of events) {
-          if (/file\.markdown|file2\.md/.test(filePath)) {
-            console.warn('TBDIAG buffer event', JSON.stringify(event), 'filePath=', filePath)
-          }
           if (event.action === 'deleted') {
             onDidDelete()
-          } else if (event.action === 'renamed' && event.oldPath === filePath) {
+          } else if (event.action === 'renamed') {
+            // A single-file watch only ever reports a rename of the watched file
+            // itself, so `event.path` is its new location. Don't compare
+            // `event.oldPath` to `filePath`: event paths are real-path
+            // normalized while `filePath` may be a symlinked form (e.g. macOS
+            // `/var` vs `/private/var`), so the equality would spuriously fail.
             if (event.path) {
-              // The file was moved to a known new path; follow it (as the
-              // original `File` watcher did) by re-pointing the buffer at the
-              // new path, which re-subscribes the watch and emits
-              // `did-change-path`.
+              // Follow the move (as the original `File` watcher did) by
+              // re-pointing the buffer at the new path, which re-subscribes the
+              // watch and emits `did-change-path`.
               this.setPath(event.path)
             } else {
               // Moved somewhere we can't identify; treat it as a deletion so the
