@@ -3,7 +3,7 @@ const path = require("path");
 const _ = require("@lumine-code/underscore-plus");
 const fs = require("@lumine-code/fs-plus");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
-const TextBuffer = require("@lumine-code/text-buffer");
+const TextBuffer = require("./text-buffer");
 const { watchPath } = require("./path-watcher");
 
 const DefaultDirectoryProvider = require("./default-directory-provider");

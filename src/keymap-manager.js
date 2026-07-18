@@ -17,7 +17,7 @@ const {watchPath} = require('./path-watcher');
 const {Emitter, Disposable} = require('event-kit');
 const {KeyBinding, MATCH_TYPES} = require('./key-binding');
 const CommandEvent = require('./command-event');
-const {normalizeKeystrokes, keystrokeForKeyboardEvent, isBareModifier, keydownEvent, keyupEvent, characterForKeyboardEvent, keystrokesMatch, isKeyup} = require('./helpers');
+const {normalizeKeystrokes, keystrokeForKeyboardEvent, isBareModifier, keydownEvent, keyupEvent, characterForKeyboardEvent, keystrokesMatch, isKeyup} = require('./keymap-helpers');
 const PartialKeyupMatcher = require('./partial-keyup-matcher');
 
 const Platforms = ['darwin', 'freebsd', 'linux', 'sunos', 'win32'];

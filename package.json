@@ -39,7 +39,6 @@
     "@lumine-code/second-mate": "https://github.com/lumine-code/second-mate.git#ec4b75d6daa8d09b922a7f3519b680100c6fc3b6",
     "@lumine-code/service-hub": "https://github.com/lumine-code/service-hub.git#5422895489f0ba2379cdbd0fc6c9ca87d446cd9b",
     "@lumine-code/superstring": "https://github.com/lumine-code/superstring.git#02dc4482caffa94023dd9386d53397b73236b05d",
-    "@lumine-code/text-buffer": "https://github.com/lumine-code/text-buffer.git#f575e4215f29204861b396148c6272369e526991",
     "@lumine-code/get-scrollbar-style": "https://github.com/lumine-code/get-scrollbar-style.git#cde22b12697ec7eadfc28f37eb3e3498f2adf10e",
     "@lumine-code/less-cache": "https://github.com/lumine-code/less-cache.git#760794426fb692107dec032d1515edb3fede48c4",
     "@vscode/ripgrep": "1.18.0",
@@ -178,6 +177,7 @@
     "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274",
     "whitespace": "file:./packages/whitespace",
     "window-title": "file:packages/window-title",
+    "winattr": "^3.0.0",
     "wrap-guide": "file:./packages/wrap-guide",
     "yaml-front-matter": "^4.1.1",
     "yargs": "18.0.0"

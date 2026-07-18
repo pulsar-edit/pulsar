@@ -1,4 +1,4 @@
-const { Point, Range } = require("@lumine-code/text-buffer");
+const { Point, Range } = require("./text-buffer");
 const { pick } = require("@lumine-code/underscore-plus");
 const { Emitter } = require("event-kit");
 

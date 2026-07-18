@@ -1,4 +1,4 @@
-const TextBuffer = require("@lumine-code/text-buffer");
+const TextBuffer = require("../src/text-buffer");
 const { Point, Range } = TextBuffer;
 const { File, Directory } = require("@lumine-code/pathwatcher");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");

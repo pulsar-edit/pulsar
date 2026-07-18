@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const dedent = require("dedent");
-const TextBuffer = require("@lumine-code/text-buffer");
+const TextBuffer = require("../src/text-buffer");
 const { Point } = TextBuffer;
 const CSON = require("@lumine-code/season");
 const TextEditor = require("../src/text-editor");

@@ -1,5 +1,5 @@
 const temp = require("temp").track();
-const TextBuffer = require("@lumine-code/text-buffer");
+const TextBuffer = require("../src/text-buffer");
 const Project = require("../src/project");
 const fs = require("@lumine-code/fs-plus");
 const path = require("path");

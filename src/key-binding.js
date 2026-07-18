@@ -7,7 +7,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 let KeyBinding;
-const {calculateSpecificity, MODIFIERS, isKeyup} = require('./helpers');
+const {calculateSpecificity, MODIFIERS, isKeyup} = require('./keymap-helpers');
 
 const MATCH_TYPES = {
   EXACT: 'exact',

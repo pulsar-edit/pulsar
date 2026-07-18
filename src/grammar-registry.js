@@ -9,7 +9,7 @@ const WASMTreeSitterGrammar = require("./wasm-tree-sitter-grammar");
 const ScopeDescriptor = require("./scope-descriptor");
 const Token = require("./token");
 const fs = require("@lumine-code/fs-plus");
-const { Point, Range } = require("@lumine-code/text-buffer");
+const { Point, Range } = require("./text-buffer");
 
 const PATH_SPLIT_REGEX = new RegExp("[/.]");
 

@@ -1,6 +1,6 @@
 const TextEditorRegistry = require("../src/text-editor-registry");
 const TextEditor = require("../src/text-editor");
-const TextBuffer = require("@lumine-code/text-buffer");
+const TextBuffer = require("../src/text-buffer");
 const { Point, Range } = TextBuffer;
 const dedent = require("dedent");
 const NullGrammar = require("../src/null-grammar");
