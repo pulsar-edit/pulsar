@@ -457,10 +457,16 @@ class PathWatcher {
       this.rejectStartPromise = reject;
     });
 
-    this.normalizedPathPromise = new Promise((resolve, reject) => {
+    this.normalizedPathPromise = new Promise((resolve) => {
       fs.realpath(watchedPath, (err, real) => {
         if (err) {
-          reject(err);
+          // The path may not exist yet — a legitimate case, since a single-file
+          // watch observes the containing directory to detect the file being
+          // created (e.g. a first-run `config.cson`). Fall back to the given
+          // path rather than rejecting, which would escape as an unhandled
+          // rejection through `getNormalizedPathPromise()`.
+          this.normalizedPath = watchedPath;
+          resolve(watchedPath);
           return;
         }
 
@@ -468,7 +474,6 @@ class PathWatcher {
         resolve(real);
       });
     });
-    this.normalizedPathPromise.catch((err) => this.rejectStartPromise(err));
 
     this.emitter = new Emitter();
     this.subs = new CompositeDisposable();
