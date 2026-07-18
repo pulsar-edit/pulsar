@@ -135,15 +135,13 @@ class NodejsWatcher {
       return;
     }
 
-    // File target watched via its parent dir: `fs.watch` reports the child
-    // filename on Linux/Windows; ignore events for siblings. (When watching the
-    // file directly, or when the platform omits the name, we can't filter.)
-    if (!this.watchDirectly && rawName != null && !namesEqual(rawName, this.fileName)) {
-      return;
-    }
+    const nameMatchesOrUnknown =
+      this.watchDirectly || rawName == null || namesEqual(rawName, this.fileName);
 
     if (eventType === "change") {
-      // Content changed in place.
+      // A content change only matters when it names our file (or the platform
+      // omitted the name); ignore edits to siblings in the parent directory.
+      if (!nameMatchesOrUnknown) return;
       if (!this.exists) {
         // The file appeared (created). Capture its identity and report it.
         this.captureIdentity();
@@ -154,12 +152,11 @@ class NodejsWatcher {
       return;
     }
 
-    // A `rename` for our file means it was created, deleted, moved, or replaced.
-    // macOS reports ordinary in-place writes as `rename` too. If the file is
-    // still present, report it immediately (an in-place change or a completed
-    // atomic save) rather than waiting out the rename-verify delay — the delay
-    // is only needed to distinguish a delete from a move, i.e. when the file is
-    // gone from its path.
+    // A `rename` may be our file being created, deleted, moved, or replaced —
+    // and macOS reports ordinary in-place writes as `rename` too. Crucially,
+    // when our file is *moved away* the event can surface under the file's NEW
+    // basename (macOS especially), so we can't rely on the name to decide
+    // relevance. Instead, look at whether our path still exists.
     let existsNow = false;
     try {
       fs.statSync(this.realPath);
@@ -168,13 +165,23 @@ class NodejsWatcher {
       existsNow = false;
     }
     if (existsNow) {
+      // Still present: an in-place change or a completed atomic save. Report it
+      // immediately rather than waiting out the rename-verify delay — but only
+      // when the event concerns our file (a named sibling rename doesn't touch
+      // our contents).
+      if (!nameMatchesOrUnknown) return;
       const wasAbsent = !this.exists;
       this.captureIdentity();
       this.emit(wasAbsent ? "create" : "change", this.path);
       return;
     }
-    // Gone from its path — defer briefly to decide delete vs. move.
-    this.scheduleVerify();
+    // Gone from its path. If our file previously existed it was deleted or
+    // moved (possibly reported under its new name) — defer to distinguish
+    // delete vs. move. If it never existed, an unrelated sibling rename is
+    // irrelevant.
+    if (this.exists) {
+      this.scheduleVerify();
+    }
   }
 
   handleDirEvent(eventType, rawName) {
