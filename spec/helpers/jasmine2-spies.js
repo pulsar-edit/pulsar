@@ -2,7 +2,6 @@ const FindParentDir = require("../../src/find-parent-dir");
 const path = require("path");
 const _ = require("@lumine-code/underscore-plus");
 const TextEditorElement = require("../../src/text-editor-element");
-const pathwatcher = require("@lumine-code/pathwatcher");
 const TextEditor = require("../../src/text-editor");
 const TextMateLanguageMode = require("../../src/text-mate-language-mode");
 const { CompositeDisposable } = require("event-kit");
@@ -63,9 +62,6 @@ exports.register = (jasmineEnv) => {
     // make editor display updates synchronous
     TextEditorElement.prototype.setUpdatedSynchronously(true);
 
-    spyOn(pathwatcher.File.prototype, "detectResurrectionAfterDelay").and.callFake(function () {
-      return this.detectResurrection();
-    });
     spyOn(TextEditor.prototype, "shouldPromptToSave").and.returnValue(false);
 
     // make tokenization synchronous

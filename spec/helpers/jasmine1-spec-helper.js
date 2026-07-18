@@ -15,7 +15,7 @@ const path = require("path");
 const _ = require("@lumine-code/underscore-plus");
 const fs = require("@lumine-code/fs-plus");
 const Grim = require("grim");
-const pathwatcher = require("@lumine-code/pathwatcher");
+const { watchPath, stopAllWatchers } = require("../../src/path-watcher");
 const FindParentDir = require("../../src/find-parent-dir");
 const { CompositeDisposable } = require("event-kit");
 
@@ -141,9 +141,6 @@ beforeEach(function () {
   // make editor display updates synchronous
   TextEditorElement.prototype.setUpdatedSynchronously(true);
 
-  spyOn(pathwatcher.File.prototype, "detectResurrectionAfterDelay").andCallFake(function () {
-    return this.detectResurrection();
-  });
   spyOn(TextEditor.prototype, "shouldPromptToSave").andReturn(false);
 
   // make tokenization synchronous
@@ -195,11 +192,11 @@ afterEach(function () {
 }); // yield to ui thread to make screen update more frequently
 
 var warnIfLeakingPathSubscriptions = function () {
-  const watchedPaths = pathwatcher.getWatchedPaths();
-  if (watchedPaths.length > 0) {
-    console.error("WARNING: Leaking subscriptions for paths: " + watchedPaths.join(", "));
+  const watchers = watchPath.printWatchers();
+  if (watchers && watchers.trim().length > 0) {
+    console.error("WARNING: Leaking path watchers:\n" + watchers);
   }
-  return pathwatcher.closeAllWatchers();
+  return stopAllWatchers();
 };
 
 var ensureNoDeprecatedFunctionCalls = function () {

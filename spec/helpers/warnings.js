@@ -1,13 +1,13 @@
-const pathwatcher = require("@lumine-code/pathwatcher");
+const { watchPath, stopAllWatchers } = require("../../src/path-watcher");
 const _ = require("@lumine-code/underscore-plus");
 const Grim = require("grim");
 
 exports.warnIfLeakingPathSubscriptions = function () {
-  const watchedPaths = pathwatcher.getWatchedPaths();
-  if (watchedPaths.length > 0) {
-    console.error("WARNING: Leaking subscriptions for paths: " + watchedPaths.join(", "));
+  const watchers = watchPath.printWatchers();
+  if (watchers && watchers.trim().length > 0) {
+    console.error("WARNING: Leaking path watchers:\n" + watchers);
   }
-  return pathwatcher.closeAllWatchers();
+  return stopAllWatchers();
 };
 
 exports.ensureNoDeprecatedFunctionCalls = function () {
