@@ -60,7 +60,13 @@ module.exports = class Watcher {
     this.disposables.add(
       new Disposable(() => watcherPromise.then((watcher) => watcher.dispose(), () => {})),
     );
-    this.entities.push({ getPath: () => directoryPath });
+    // Track a lightweight descriptor (PackageWatcher filters `entities` by
+    // `isFile()`/`getPath()` to avoid re-watching known stylesheets).
+    this.entities.push({
+      getPath: () => directoryPath,
+      isFile: () => false,
+      isDirectory: () => true,
+    });
   }
 
   watchFile(filePath) {
@@ -74,7 +80,11 @@ module.exports = class Watcher {
       watcher.onDidDelete(reloadFn),
       watcher.onDidRename(reloadFn),
     );
-    this.entities.push(watcher);
+    this.entities.push({
+      getPath: () => filePath,
+      isFile: () => true,
+      isDirectory: () => false,
+    });
   }
 
   isInAsarArchive(pathToCheck) {
