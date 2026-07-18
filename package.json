@@ -160,6 +160,7 @@
     "settings-view": "file:packages/settings-view",
     "sinon": "22.0.0",
     "snippets": "file:./packages/snippets",
+    "space-pencil": "0.3.0",
     "status-bar": "file:packages/status-bar",
     "styleguide": "file:./packages/styleguide",
     "symbol-provider-ctags": "file:./packages/symbol-provider-ctags",

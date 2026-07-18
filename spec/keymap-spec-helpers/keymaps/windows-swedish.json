@@ -1,0 +1,302 @@
+{
+  "KeyA": {
+    "unmodified": "a",
+    "withShift": "A",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyB": {
+    "unmodified": "b",
+    "withShift": "B",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyC": {
+    "unmodified": "c",
+    "withShift": "C",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyD": {
+    "unmodified": "d",
+    "withShift": "D",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyE": {
+    "unmodified": "e",
+    "withShift": "E",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyF": {
+    "unmodified": "f",
+    "withShift": "F",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyG": {
+    "unmodified": "g",
+    "withShift": "G",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyH": {
+    "unmodified": "h",
+    "withShift": "H",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyI": {
+    "unmodified": "i",
+    "withShift": "I",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyJ": {
+    "unmodified": "j",
+    "withShift": "J",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyK": {
+    "unmodified": "k",
+    "withShift": "K",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyL": {
+    "unmodified": "l",
+    "withShift": "L",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyM": {
+    "unmodified": "m",
+    "withShift": "M",
+    "withAltGraph": "µ",
+    "withAltGraphShift": null
+  },
+  "KeyN": {
+    "unmodified": "n",
+    "withShift": "N",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyO": {
+    "unmodified": "o",
+    "withShift": "O",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyP": {
+    "unmodified": "p",
+    "withShift": "P",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyQ": {
+    "unmodified": "q",
+    "withShift": "Q",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyR": {
+    "unmodified": "r",
+    "withShift": "R",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyS": {
+    "unmodified": "s",
+    "withShift": "S",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyT": {
+    "unmodified": "t",
+    "withShift": "T",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyU": {
+    "unmodified": "u",
+    "withShift": "U",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyV": {
+    "unmodified": "v",
+    "withShift": "V",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyW": {
+    "unmodified": "w",
+    "withShift": "W",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyX": {
+    "unmodified": "x",
+    "withShift": "X",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyY": {
+    "unmodified": "y",
+    "withShift": "Y",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "KeyZ": {
+    "unmodified": "z",
+    "withShift": "Z",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Digit1": {
+    "unmodified": "1",
+    "withShift": "!",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Digit2": {
+    "unmodified": "2",
+    "withShift": "\"",
+    "withAltGraph": "@",
+    "withAltGraphShift": null
+  },
+  "Digit3": {
+    "unmodified": "3",
+    "withShift": "#",
+    "withAltGraph": "£",
+    "withAltGraphShift": null
+  },
+  "Digit4": {
+    "unmodified": "4",
+    "withShift": "¤",
+    "withAltGraph": "$",
+    "withAltGraphShift": null
+  },
+  "Digit5": {
+    "unmodified": "5",
+    "withShift": "%",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Digit6": {
+    "unmodified": "6",
+    "withShift": "&",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Digit7": {
+    "unmodified": "7",
+    "withShift": "/",
+    "withAltGraph": "{",
+    "withAltGraphShift": null
+  },
+  "Digit8": {
+    "unmodified": "8",
+    "withShift": "(",
+    "withAltGraph": "[",
+    "withAltGraphShift": null
+  },
+  "Digit9": {
+    "unmodified": "9",
+    "withShift": ")",
+    "withAltGraph": "]",
+    "withAltGraphShift": null
+  },
+  "Digit0": {
+    "unmodified": "0",
+    "withShift": "=",
+    "withAltGraph": "}",
+    "withAltGraphShift": null
+  },
+  "Space": {
+    "unmodified": " ",
+    "withShift": " ",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Minus": {
+    "unmodified": "+",
+    "withShift": "?",
+    "withAltGraph": "\\",
+    "withAltGraphShift": null
+  },
+  "BracketLeft": {
+    "unmodified": "å",
+    "withShift": "Å",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Backslash": {
+    "unmodified": "'",
+    "withShift": "*",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Semicolon": {
+    "unmodified": "ö",
+    "withShift": "Ö",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Quote": {
+    "unmodified": "ä",
+    "withShift": "Ä",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Backquote": {
+    "unmodified": "§",
+    "withShift": "½",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Comma": {
+    "unmodified": ",",
+    "withShift": ";",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Period": {
+    "unmodified": ".",
+    "withShift": ":",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "Slash": {
+    "unmodified": "-",
+    "withShift": "_",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "NumpadMultiply": {
+    "unmodified": "*",
+    "withShift": "*",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "NumpadSubtract": {
+    "unmodified": "-",
+    "withShift": "-",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "NumpadAdd": {
+    "unmodified": "+",
+    "withShift": "+",
+    "withAltGraph": null,
+    "withAltGraphShift": null
+  },
+  "IntlBackslash": {
+    "unmodified": "<",
+    "withShift": ">",
+    "withAltGraph": "|",
+    "withAltGraphShift": null
+  }
+}

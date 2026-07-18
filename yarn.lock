@@ -5408,6 +5408,11 @@ source-map@^0.6.0, source-map@~0.6.0:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
 
+space-pencil@0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/space-pencil/-/space-pencil-0.3.0.tgz#193c34ef08999ffd6635e34d4d5226bd8508dea7"
+  integrity sha512-MBDbJti7A+GXTd/9uZrk8Hq8vGsUeHuEA2ISiMk6XEWxqxKzBEwUoFlqSUp2tN+692uU2Uxf73nHfT/t8AcYMA==
+
 spdx-correct@^3.0.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/spdx-correct/-/spdx-correct-3.2.0.tgz#4f5ab0668f0059e34f9c00dce331784a12de4e9c"

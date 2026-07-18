@@ -1,0 +1,398 @@
+{
+  "KeyA": {
+    "unmodified": "a",
+    "withShift": "A",
+    "withAltGraph": "å",
+    "withAltGraphShift": "Å"
+  },
+  "KeyB": {
+    "unmodified": "x",
+    "withShift": "X",
+    "withAltGraph": "≈",
+    "withAltGraphShift": "˛"
+  },
+  "KeyC": {
+    "unmodified": "j",
+    "withShift": "J",
+    "withAltGraph": "∆",
+    "withAltGraphShift": "Ô"
+  },
+  "KeyD": {
+    "unmodified": "e",
+    "withShift": "E",
+    "withAltGraph": null,
+    "withAltGraphShift": "´"
+  },
+  "KeyE": {
+    "unmodified": ".",
+    "withShift": ">",
+    "withAltGraph": "≥",
+    "withAltGraphShift": "˘"
+  },
+  "KeyF": {
+    "unmodified": "u",
+    "withShift": "U",
+    "withAltGraph": null,
+    "withAltGraphShift": "¨"
+  },
+  "KeyG": {
+    "unmodified": "i",
+    "withShift": "I",
+    "withAltGraph": null,
+    "withAltGraphShift": "ˆ"
+  },
+  "KeyH": {
+    "unmodified": "d",
+    "withShift": "D",
+    "withAltGraph": "∂",
+    "withAltGraphShift": "Î"
+  },
+  "KeyI": {
+    "unmodified": "c",
+    "withShift": "C",
+    "withAltGraph": "ç",
+    "withAltGraphShift": "Ç"
+  },
+  "KeyJ": {
+    "unmodified": "h",
+    "withShift": "H",
+    "withAltGraph": "˙",
+    "withAltGraphShift": "Ó"
+  },
+  "KeyK": {
+    "unmodified": "t",
+    "withShift": "T",
+    "withAltGraph": "†",
+    "withAltGraphShift": "ˇ"
+  },
+  "KeyL": {
+    "unmodified": "n",
+    "withShift": "N",
+    "withAltGraph": null,
+    "withAltGraphShift": "˜"
+  },
+  "KeyM": {
+    "unmodified": "m",
+    "withShift": "M",
+    "withAltGraph": "µ",
+    "withAltGraphShift": "Â"
+  },
+  "KeyN": {
+    "unmodified": "b",
+    "withShift": "B",
+    "withAltGraph": "∫",
+    "withAltGraphShift": "ı"
+  },
+  "KeyO": {
+    "unmodified": "r",
+    "withShift": "R",
+    "withAltGraph": "®",
+    "withAltGraphShift": "‰"
+  },
+  "KeyP": {
+    "unmodified": "l",
+    "withShift": "L",
+    "withAltGraph": "¬",
+    "withAltGraphShift": "Ò"
+  },
+  "KeyQ": {
+    "unmodified": "'",
+    "withShift": "\"",
+    "withAltGraph": "æ",
+    "withAltGraphShift": "Æ"
+  },
+  "KeyR": {
+    "unmodified": "p",
+    "withShift": "P",
+    "withAltGraph": "π",
+    "withAltGraphShift": "∏"
+  },
+  "KeyS": {
+    "unmodified": "o",
+    "withShift": "O",
+    "withAltGraph": "ø",
+    "withAltGraphShift": "Ø"
+  },
+  "KeyT": {
+    "unmodified": "y",
+    "withShift": "Y",
+    "withAltGraph": "¥",
+    "withAltGraphShift": "Á"
+  },
+  "KeyU": {
+    "unmodified": "g",
+    "withShift": "G",
+    "withAltGraph": "©",
+    "withAltGraphShift": "˝"
+  },
+  "KeyV": {
+    "unmodified": "k",
+    "withShift": "K",
+    "withAltGraph": "˚",
+    "withAltGraphShift": ""
+  },
+  "KeyW": {
+    "unmodified": ",",
+    "withShift": "<",
+    "withAltGraph": "≤",
+    "withAltGraphShift": "¯"
+  },
+  "KeyX": {
+    "unmodified": "q",
+    "withShift": "Q",
+    "withAltGraph": "œ",
+    "withAltGraphShift": "Œ"
+  },
+  "KeyY": {
+    "unmodified": "f",
+    "withShift": "F",
+    "withAltGraph": "ƒ",
+    "withAltGraphShift": "Ï"
+  },
+  "KeyZ": {
+    "unmodified": ";",
+    "withShift": ":",
+    "withAltGraph": "…",
+    "withAltGraphShift": "Ú"
+  },
+  "Digit1": {
+    "unmodified": "1",
+    "withShift": "!",
+    "withAltGraph": "¡",
+    "withAltGraphShift": "⁄"
+  },
+  "Digit2": {
+    "unmodified": "2",
+    "withShift": "@",
+    "withAltGraph": "™",
+    "withAltGraphShift": "€"
+  },
+  "Digit3": {
+    "unmodified": "3",
+    "withShift": "#",
+    "withAltGraph": "£",
+    "withAltGraphShift": "‹"
+  },
+  "Digit4": {
+    "unmodified": "4",
+    "withShift": "$",
+    "withAltGraph": "¢",
+    "withAltGraphShift": "›"
+  },
+  "Digit5": {
+    "unmodified": "5",
+    "withShift": "%",
+    "withAltGraph": "∞",
+    "withAltGraphShift": "ﬁ"
+  },
+  "Digit6": {
+    "unmodified": "6",
+    "withShift": "^",
+    "withAltGraph": "§",
+    "withAltGraphShift": "ﬂ"
+  },
+  "Digit7": {
+    "unmodified": "7",
+    "withShift": "&",
+    "withAltGraph": "¶",
+    "withAltGraphShift": "‡"
+  },
+  "Digit8": {
+    "unmodified": "8",
+    "withShift": "*",
+    "withAltGraph": "•",
+    "withAltGraphShift": "°"
+  },
+  "Digit9": {
+    "unmodified": "9",
+    "withShift": "(",
+    "withAltGraph": "ª",
+    "withAltGraphShift": "·"
+  },
+  "Digit0": {
+    "unmodified": "0",
+    "withShift": ")",
+    "withAltGraph": "º",
+    "withAltGraphShift": "‚"
+  },
+  "Space": {
+    "unmodified": " ",
+    "withShift": " ",
+    "withAltGraph": " ",
+    "withAltGraphShift": " "
+  },
+  "Minus": {
+    "unmodified": "[",
+    "withShift": "{",
+    "withAltGraph": "“",
+    "withAltGraphShift": "”"
+  },
+  "Equal": {
+    "unmodified": "]",
+    "withShift": "}",
+    "withAltGraph": "‘",
+    "withAltGraphShift": "’"
+  },
+  "BracketLeft": {
+    "unmodified": "/",
+    "withShift": "?",
+    "withAltGraph": "÷",
+    "withAltGraphShift": "¿"
+  },
+  "BracketRight": {
+    "unmodified": "=",
+    "withShift": "+",
+    "withAltGraph": "≠",
+    "withAltGraphShift": "±"
+  },
+  "Backslash": {
+    "unmodified": "\\",
+    "withShift": "|",
+    "withAltGraph": "«",
+    "withAltGraphShift": "»"
+  },
+  "Semicolon": {
+    "unmodified": "s",
+    "withShift": "S",
+    "withAltGraph": "ß",
+    "withAltGraphShift": "Í"
+  },
+  "Quote": {
+    "unmodified": "-",
+    "withShift": "_",
+    "withAltGraph": "–",
+    "withAltGraphShift": "—"
+  },
+  "Backquote": {
+    "unmodified": "`",
+    "withShift": "~",
+    "withAltGraph": null,
+    "withAltGraphShift": "`"
+  },
+  "Comma": {
+    "unmodified": "w",
+    "withShift": "W",
+    "withAltGraph": "∑",
+    "withAltGraphShift": "„"
+  },
+  "Period": {
+    "unmodified": "v",
+    "withShift": "V",
+    "withAltGraph": "√",
+    "withAltGraphShift": "◊"
+  },
+  "Slash": {
+    "unmodified": "z",
+    "withShift": "Z",
+    "withAltGraph": "Ω",
+    "withAltGraphShift": "¸"
+  },
+  "NumpadDivide": {
+    "unmodified": "/",
+    "withShift": "/",
+    "withAltGraph": "/",
+    "withAltGraphShift": "/"
+  },
+  "NumpadMultiply": {
+    "unmodified": "*",
+    "withShift": "*",
+    "withAltGraph": "*",
+    "withAltGraphShift": "*"
+  },
+  "NumpadSubtract": {
+    "unmodified": "-",
+    "withShift": "-",
+    "withAltGraph": "-",
+    "withAltGraphShift": "-"
+  },
+  "NumpadAdd": {
+    "unmodified": "+",
+    "withShift": "+",
+    "withAltGraph": "+",
+    "withAltGraphShift": "+"
+  },
+  "Numpad1": {
+    "unmodified": "1",
+    "withShift": "1",
+    "withAltGraph": "1",
+    "withAltGraphShift": "1"
+  },
+  "Numpad2": {
+    "unmodified": "2",
+    "withShift": "2",
+    "withAltGraph": "2",
+    "withAltGraphShift": "2"
+  },
+  "Numpad3": {
+    "unmodified": "3",
+    "withShift": "3",
+    "withAltGraph": "3",
+    "withAltGraphShift": "3"
+  },
+  "Numpad4": {
+    "unmodified": "4",
+    "withShift": "4",
+    "withAltGraph": "4",
+    "withAltGraphShift": "4"
+  },
+  "Numpad5": {
+    "unmodified": "5",
+    "withShift": "5",
+    "withAltGraph": "5",
+    "withAltGraphShift": "5"
+  },
+  "Numpad6": {
+    "unmodified": "6",
+    "withShift": "6",
+    "withAltGraph": "6",
+    "withAltGraphShift": "6"
+  },
+  "Numpad7": {
+    "unmodified": "7",
+    "withShift": "7",
+    "withAltGraph": "7",
+    "withAltGraphShift": "7"
+  },
+  "Numpad8": {
+    "unmodified": "8",
+    "withShift": "8",
+    "withAltGraph": "8",
+    "withAltGraphShift": "8"
+  },
+  "Numpad9": {
+    "unmodified": "9",
+    "withShift": "9",
+    "withAltGraph": "9",
+    "withAltGraphShift": "9"
+  },
+  "Numpad0": {
+    "unmodified": "0",
+    "withShift": "0",
+    "withAltGraph": "0",
+    "withAltGraphShift": "0"
+  },
+  "NumpadDecimal": {
+    "unmodified": ".",
+    "withShift": ".",
+    "withAltGraph": ".",
+    "withAltGraphShift": "."
+  },
+  "IntlBackslash": {
+    "unmodified": "§",
+    "withShift": "±",
+    "withAltGraph": "§",
+    "withAltGraphShift": "±"
+  },
+  "NumpadEqual": {
+    "unmodified": "=",
+    "withShift": "=",
+    "withAltGraph": "=",
+    "withAltGraphShift": "="
+  },
+  "AudioVolumeUp": {
+    "unmodified": null,
+    "withShift": "=",
+    "withAltGraph": null,
+    "withAltGraphShift": "="
+  }
+}

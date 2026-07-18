@@ -1,0 +1,398 @@
+{
+  "KeyA": {
+    "unmodified": "ф",
+    "withShift": "Ф",
+    "withAltGraph": "d",
+    "withAltGraphShift": "d"
+  },
+  "KeyB": {
+    "unmodified": "и",
+    "withShift": "И",
+    "withAltGraph": "і",
+    "withAltGraphShift": "І"
+  },
+  "KeyC": {
+    "unmodified": "с",
+    "withShift": "С",
+    "withAltGraph": "c",
+    "withAltGraphShift": "C"
+  },
+  "KeyD": {
+    "unmodified": "в",
+    "withShift": "В",
+    "withAltGraph": "ћ",
+    "withAltGraphShift": "Ћ"
+  },
+  "KeyE": {
+    "unmodified": "у",
+    "withShift": "У",
+    "withAltGraph": "ў",
+    "withAltGraphShift": "Ў"
+  },
+  "KeyF": {
+    "unmodified": "а",
+    "withShift": "А",
+    "withAltGraph": "÷",
+    "withAltGraphShift": "±"
+  },
+  "KeyG": {
+    "unmodified": "п",
+    "withShift": "П",
+    "withAltGraph": "…",
+    "withAltGraphShift": "√"
+  },
+  "KeyH": {
+    "unmodified": "р",
+    "withShift": "Р",
+    "withAltGraph": "•",
+    "withAltGraphShift": "∞"
+  },
+  "KeyI": {
+    "unmodified": "ш",
+    "withShift": "Ш",
+    "withAltGraph": "ѕ",
+    "withAltGraphShift": "Ѕ"
+  },
+  "KeyJ": {
+    "unmodified": "о",
+    "withShift": "О",
+    "withAltGraph": "∆",
+    "withAltGraphShift": "µ"
+  },
+  "KeyK": {
+    "unmodified": "л",
+    "withShift": "Л",
+    "withAltGraph": "љ",
+    "withAltGraphShift": "Љ"
+  },
+  "KeyL": {
+    "unmodified": "д",
+    "withShift": "Д",
+    "withAltGraph": "l",
+    "withAltGraphShift": "L"
+  },
+  "KeyM": {
+    "unmodified": "ь",
+    "withShift": "Ь",
+    "withAltGraph": "m",
+    "withAltGraphShift": "M"
+  },
+  "KeyN": {
+    "unmodified": "т",
+    "withShift": "Т",
+    "withAltGraph": "ƒ",
+    "withAltGraphShift": "ƒ"
+  },
+  "KeyO": {
+    "unmodified": "щ",
+    "withShift": "Щ",
+    "withAltGraph": "'",
+    "withAltGraphShift": "„"
+  },
+  "KeyP": {
+    "unmodified": "з",
+    "withShift": "З",
+    "withAltGraph": "‘",
+    "withAltGraphShift": "’"
+  },
+  "KeyQ": {
+    "unmodified": "й",
+    "withShift": "Й",
+    "withAltGraph": "ј",
+    "withAltGraphShift": "Ј"
+  },
+  "KeyR": {
+    "unmodified": "к",
+    "withShift": "К",
+    "withAltGraph": "ќ",
+    "withAltGraphShift": "Ќ"
+  },
+  "KeyS": {
+    "unmodified": "ы",
+    "withShift": "Ы",
+    "withAltGraph": "z",
+    "withAltGraphShift": "Z"
+  },
+  "KeyT": {
+    "unmodified": "е",
+    "withShift": "Е",
+    "withAltGraph": "†",
+    "withAltGraphShift": "†"
+  },
+  "KeyU": {
+    "unmodified": "г",
+    "withShift": "Г",
+    "withAltGraph": "ѓ",
+    "withAltGraphShift": "Ѓ"
+  },
+  "KeyV": {
+    "unmodified": "м",
+    "withShift": "М",
+    "withAltGraph": "v",
+    "withAltGraphShift": "V"
+  },
+  "KeyW": {
+    "unmodified": "ц",
+    "withShift": "Ц",
+    "withAltGraph": "џ",
+    "withAltGraphShift": "Џ"
+  },
+  "KeyX": {
+    "unmodified": "ч",
+    "withShift": "Ч",
+    "withAltGraph": "x",
+    "withAltGraphShift": "X"
+  },
+  "KeyY": {
+    "unmodified": "н",
+    "withShift": "Н",
+    "withAltGraph": "њ",
+    "withAltGraphShift": "Њ"
+  },
+  "KeyZ": {
+    "unmodified": "я",
+    "withShift": "Я",
+    "withAltGraph": "ђ",
+    "withAltGraphShift": "Ђ"
+  },
+  "Digit1": {
+    "unmodified": "1",
+    "withShift": "!",
+    "withAltGraph": "!",
+    "withAltGraphShift": "™"
+  },
+  "Digit2": {
+    "unmodified": "2",
+    "withShift": "\"",
+    "withAltGraph": "@",
+    "withAltGraphShift": "§"
+  },
+  "Digit3": {
+    "unmodified": "3",
+    "withShift": "№",
+    "withAltGraph": "#",
+    "withAltGraphShift": "£"
+  },
+  "Digit4": {
+    "unmodified": "4",
+    "withShift": ";",
+    "withAltGraph": "$",
+    "withAltGraphShift": "€"
+  },
+  "Digit5": {
+    "unmodified": "5",
+    "withShift": "%",
+    "withAltGraph": "©",
+    "withAltGraphShift": "®"
+  },
+  "Digit6": {
+    "unmodified": "6",
+    "withShift": ":",
+    "withAltGraph": "^",
+    "withAltGraphShift": "¬"
+  },
+  "Digit7": {
+    "unmodified": "7",
+    "withShift": "?",
+    "withAltGraph": "&",
+    "withAltGraphShift": "¶"
+  },
+  "Digit8": {
+    "unmodified": "8",
+    "withShift": "*",
+    "withAltGraph": "₽",
+    "withAltGraphShift": "°"
+  },
+  "Digit9": {
+    "unmodified": "9",
+    "withShift": "(",
+    "withAltGraph": "(",
+    "withAltGraphShift": "{"
+  },
+  "Digit0": {
+    "unmodified": "0",
+    "withShift": ")",
+    "withAltGraph": ")",
+    "withAltGraphShift": "}"
+  },
+  "Space": {
+    "unmodified": " ",
+    "withShift": " ",
+    "withAltGraph": " ",
+    "withAltGraphShift": " "
+  },
+  "Minus": {
+    "unmodified": "-",
+    "withShift": "_",
+    "withAltGraph": "–",
+    "withAltGraphShift": "—"
+  },
+  "Equal": {
+    "unmodified": "=",
+    "withShift": "+",
+    "withAltGraph": "≠",
+    "withAltGraphShift": "≈"
+  },
+  "BracketLeft": {
+    "unmodified": "х",
+    "withShift": "Х",
+    "withAltGraph": "“",
+    "withAltGraphShift": "”"
+  },
+  "BracketRight": {
+    "unmodified": "ъ",
+    "withShift": "Ъ",
+    "withAltGraph": "«",
+    "withAltGraphShift": "»"
+  },
+  "Backslash": {
+    "unmodified": "\\",
+    "withShift": "/",
+    "withAltGraph": "\\",
+    "withAltGraphShift": "|"
+  },
+  "Semicolon": {
+    "unmodified": "ж",
+    "withShift": "Ж",
+    "withAltGraph": "«",
+    "withAltGraphShift": "»"
+  },
+  "Quote": {
+    "unmodified": "э",
+    "withShift": "Э",
+    "withAltGraph": "є",
+    "withAltGraphShift": "Є"
+  },
+  "Backquote": {
+    "unmodified": "]",
+    "withShift": "[",
+    "withAltGraph": "`",
+    "withAltGraphShift": "~"
+  },
+  "Comma": {
+    "unmodified": "б",
+    "withShift": "Б",
+    "withAltGraph": "≤",
+    "withAltGraphShift": "<"
+  },
+  "Period": {
+    "unmodified": "ю",
+    "withShift": "Ю",
+    "withAltGraph": "≥",
+    "withAltGraphShift": ">"
+  },
+  "Slash": {
+    "unmodified": ".",
+    "withShift": ",",
+    "withAltGraph": "ї",
+    "withAltGraphShift": "Ї"
+  },
+  "NumpadDivide": {
+    "unmodified": "/",
+    "withShift": "/",
+    "withAltGraph": "/",
+    "withAltGraphShift": "/"
+  },
+  "NumpadMultiply": {
+    "unmodified": "*",
+    "withShift": "*",
+    "withAltGraph": "*",
+    "withAltGraphShift": "*"
+  },
+  "NumpadSubtract": {
+    "unmodified": "-",
+    "withShift": "-",
+    "withAltGraph": "-",
+    "withAltGraphShift": "-"
+  },
+  "NumpadAdd": {
+    "unmodified": "+",
+    "withShift": "+",
+    "withAltGraph": "+",
+    "withAltGraphShift": "+"
+  },
+  "Numpad1": {
+    "unmodified": "1",
+    "withShift": "1",
+    "withAltGraph": "1",
+    "withAltGraphShift": "1"
+  },
+  "Numpad2": {
+    "unmodified": "2",
+    "withShift": "2",
+    "withAltGraph": "2",
+    "withAltGraphShift": "2"
+  },
+  "Numpad3": {
+    "unmodified": "3",
+    "withShift": "3",
+    "withAltGraph": "3",
+    "withAltGraphShift": "3"
+  },
+  "Numpad4": {
+    "unmodified": "4",
+    "withShift": "4",
+    "withAltGraph": "4",
+    "withAltGraphShift": "4"
+  },
+  "Numpad5": {
+    "unmodified": "5",
+    "withShift": "5",
+    "withAltGraph": "5",
+    "withAltGraphShift": "5"
+  },
+  "Numpad6": {
+    "unmodified": "6",
+    "withShift": "6",
+    "withAltGraph": "6",
+    "withAltGraphShift": "6"
+  },
+  "Numpad7": {
+    "unmodified": "7",
+    "withShift": "7",
+    "withAltGraph": "7",
+    "withAltGraphShift": "7"
+  },
+  "Numpad8": {
+    "unmodified": "8",
+    "withShift": "8",
+    "withAltGraph": "8",
+    "withAltGraphShift": "8"
+  },
+  "Numpad9": {
+    "unmodified": "9",
+    "withShift": "9",
+    "withAltGraph": "9",
+    "withAltGraphShift": "9"
+  },
+  "Numpad0": {
+    "unmodified": "0",
+    "withShift": "0",
+    "withAltGraph": "0",
+    "withAltGraphShift": "0"
+  },
+  "NumpadDecimal": {
+    "unmodified": ",",
+    "withShift": ",",
+    "withAltGraph": ",",
+    "withAltGraphShift": ","
+  },
+  "IntlBackslash": {
+    "unmodified": "ё",
+    "withShift": "Ё",
+    "withAltGraph": "§",
+    "withAltGraphShift": "±"
+  },
+  "NumpadEqual": {
+    "unmodified": "=",
+    "withShift": "=",
+    "withAltGraph": "=",
+    "withAltGraphShift": "="
+  },
+  "AudioVolumeUp": {
+    "unmodified": null,
+    "withShift": "=",
+    "withAltGraph": null,
+    "withAltGraphShift": "="
+  }
+}
