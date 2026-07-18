@@ -2,8 +2,9 @@
 /** @jsx etch.dom */
 
 import fs from "fs";
+import path from "path";
 import humanize from "humanize-plus";
-import { CompositeDisposable, Disposable, Emitter, File } from "atom";
+import { CompositeDisposable, Disposable, Emitter, watchFile } from "atom";
 import etch from "etch";
 
 import archive from "./archive";
@@ -15,12 +16,13 @@ export default class ArchiveEditorView {
     this.disposables = new CompositeDisposable();
     this.emitter = new Emitter();
     this.path = archivePath;
-    this.file = new File(this.path);
+    this.file = watchFile(this.path);
     this.entries = [];
     etch.initialize(this);
 
     this.refresh();
 
+    this.disposables.add(this.file);
     this.disposables.add(this.file.onDidChange(() => this.refresh()));
     this.disposables.add(this.file.onDidRename(() => this.refresh()));
     this.disposables.add(this.file.onDidDelete(() => this.destroy()));
@@ -82,11 +84,11 @@ export default class ArchiveEditorView {
   }
 
   getPath() {
-    return this.file.getPath();
+    return this.path;
   }
 
   getTitle() {
-    return this.path ? this.file.getBaseName() : "untitled";
+    return this.path ? path.basename(this.path) : "untitled";
   }
 
   getURI() {

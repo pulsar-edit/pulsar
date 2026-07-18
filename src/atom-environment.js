@@ -51,7 +51,7 @@ const { getReleaseChannel } = require("./get-app-details.js");
 const UI = require("./ui/index.js");
 const packagejson = require("../package.json");
 
-const { closeAllWatchers } = require("@lumine-code/pathwatcher");
+const { stopAllWatchers } = require("./path-watcher");
 const GitHost = require("./git-host");
 const stat = util.promisify(fs.stat);
 
@@ -1123,7 +1123,7 @@ class AtomEnvironment {
   }
 
   unloadEditorWindow() {
-    closeAllWatchers();
+    stopAllWatchers();
     GitHost.reset();
     if (!this.project) return;
 

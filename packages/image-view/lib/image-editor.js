@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs");
-const { Emitter, File, CompositeDisposable } = require("atom");
+const { Emitter, watchFile, CompositeDisposable } = require("atom");
 const ImageEditorView = require("./image-editor-view");
 
 // Editor model for an image file
@@ -20,8 +20,10 @@ module.exports = class ImageEditor {
   }
 
   constructor(filePath) {
-    this.file = new File(filePath);
+    this.filePath = filePath;
+    this.file = watchFile(filePath);
     this.subscriptions = new CompositeDisposable();
+    this.subscriptions.add(this.file);
     this.subscriptions.add(
       this.file.onDidDelete(() => {
         const pane = atom.workspace.paneForURI(filePath);
@@ -116,7 +118,7 @@ module.exports = class ImageEditor {
   //
   // Returns a {String} path.
   getPath() {
-    return this.file.getPath();
+    return this.filePath;
   }
 
   // Retrieves the URI of the image.

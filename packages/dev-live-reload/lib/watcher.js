@@ -1,4 +1,4 @@
-const { CompositeDisposable, File, Directory, Emitter } = require("atom");
+const { CompositeDisposable, Disposable, Emitter, watchPath, watchFile: watchSingleFile } = require("atom");
 const path = require("path");
 
 module.exports = class Watcher {
@@ -55,20 +55,26 @@ module.exports = class Watcher {
 
   watchDirectory(directoryPath, callback = () => this.loadAllStylesheets()) {
     if (this.isInAsarArchive(directoryPath)) return;
-    const entity = new Directory(directoryPath);
-    this.disposables.add(entity.onDidChange(callback));
-    this.entities.push(entity);
+    const watcherPromise = watchPath(directoryPath, {}, () => callback());
+    watcherPromise.catch(() => {});
+    this.disposables.add(
+      new Disposable(() => watcherPromise.then((watcher) => watcher.dispose(), () => {})),
+    );
+    this.entities.push({ getPath: () => directoryPath });
   }
 
   watchFile(filePath) {
     if (this.isInAsarArchive(filePath)) return;
-    const reloadFn = () => this.loadStylesheet(entity.getPath());
+    const reloadFn = () => this.loadStylesheet(filePath);
 
-    const entity = new File(filePath);
-    this.disposables.add(entity.onDidChange(reloadFn));
-    this.disposables.add(entity.onDidDelete(reloadFn));
-    this.disposables.add(entity.onDidRename(reloadFn));
-    this.entities.push(entity);
+    const watcher = watchSingleFile(filePath);
+    this.disposables.add(
+      watcher,
+      watcher.onDidChange(reloadFn),
+      watcher.onDidDelete(reloadFn),
+      watcher.onDidRename(reloadFn),
+    );
+    this.entities.push(watcher);
   }
 
   isInAsarArchive(pathToCheck) {

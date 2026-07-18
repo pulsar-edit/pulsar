@@ -1,4 +1,4 @@
-const { BufferedProcess, CompositeDisposable, File, Point } = require("atom");
+const { BufferedProcess, CompositeDisposable, watchFile, Point } = require("atom");
 
 const TagReader = require("./tag-reader");
 const getTagsFile = require("./get-tags-file");
@@ -143,9 +143,10 @@ class CtagsProvider {
     for (let projectPath of atom.project.getPaths()) {
       let tagsFilePath = getTagsFile(projectPath);
       if (!tagsFilePath) continue;
-      let tagsFile = new File(tagsFilePath);
+      let tagsFile = watchFile(tagsFilePath);
 
       this.tagsFileSubscriptions.add(
+        tagsFile,
         tagsFile.onDidChange(reloadTags),
         tagsFile.onDidDelete(reloadTags),
         tagsFile.onDidRename(reloadTags),

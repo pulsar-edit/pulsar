@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { Directory } = require("@lumine-code/pathwatcher");
+const path = require("path");
 const GitRepository = require("./git-repository");
 
 const GIT_FILE_REGEX = RegExp("^gitdir: (.+)");
@@ -34,115 +34,118 @@ function pathFromGitFile(gitFile) {
   });
 }
 
-// Checks whether a valid `.git` directory is contained within the given
-// directory or one of its ancestors. If so, a Directory that corresponds to the
-// `.git` folder will be returned. Otherwise, returns `null`.
-//
-// * `directory` {Directory} to explore whether it is part of a Git repository.
-function findGitDirectorySync(directory) {
-  // TODO: Fix node-pathwatcher/src/directory.coffee so the following methods
-  // can return cached values rather than always returning new objects:
-  // getParent(), getFile(), getSubdirectory().
-  let gitDir = directory.getSubdirectory(".git");
-  if (typeof gitDir.getPath === "function") {
-    const gitDirPath = pathFromGitFileSync(gitDir.getPath());
-    if (gitDirPath) {
-      gitDir = new Directory(directory.resolve(gitDirPath));
-    }
-  }
-  if (
-    typeof gitDir.existsSync === "function" &&
-    gitDir.existsSync() &&
-    isValidGitDirectorySync(gitDir)
-  ) {
-    return gitDir;
-  } else if (directory.isRoot()) {
-    return null;
-  } else {
-    return findGitDirectorySync(directory.getParent());
-  }
+// Resolve a `.git` reference (which may be relative) against the directory that
+// contained it.
+function resolveGitPath(basePath, referencePath) {
+  return path.isAbsolute(referencePath)
+    ? path.normalize(referencePath)
+    : path.normalize(path.join(basePath, referencePath));
+}
+
+// True once `path.dirname` stops making progress — i.e. we've reached a
+// filesystem root.
+function isRootPath(directoryPath) {
+  return path.dirname(directoryPath) === directoryPath;
 }
 
 // Checks whether a valid `.git` directory is contained within the given
-// directory or one of its ancestors. If so, a Directory that corresponds to the
-// `.git` folder will be returned. Otherwise, returns `null`.
+// directory or one of its ancestors. If so, the absolute {String} path of the
+// `.git` folder is returned. Otherwise, returns `null`.
 //
-// Returns a {Promise} that resolves to
-// * `directory` {Directory} to explore whether it is part of a Git repository.
-async function findGitDirectory(directory) {
-  // TODO: Fix node-pathwatcher/src/directory.coffee so the following methods
-  // can return cached values rather than always returning new objects:
-  // getParent(), getFile(), getSubdirectory().
-  let gitDir = directory.getSubdirectory(".git");
-  if (typeof gitDir.getPath === "function") {
-    const gitDirPath = await pathFromGitFile(gitDir.getPath());
-    if (gitDirPath) {
-      gitDir = new Directory(directory.resolve(gitDirPath));
-    }
+// * `directoryPath` {String} to explore whether it is part of a Git repository.
+function findGitDirectorySync(directoryPath) {
+  let gitDir = path.join(directoryPath, ".git");
+  const gitDirPath = pathFromGitFileSync(gitDir);
+  if (gitDirPath) {
+    gitDir = resolveGitPath(directoryPath, gitDirPath);
   }
-  if (
-    typeof gitDir.exists === "function" &&
-    (await gitDir.exists()) &&
-    (await isValidGitDirectory(gitDir))
-  ) {
+  if (fs.existsSync(gitDir) && isValidGitDirectorySync(gitDir)) {
     return gitDir;
-  } else if (directory.isRoot()) {
+  } else if (isRootPath(directoryPath)) {
     return null;
   } else {
-    return findGitDirectory(directory.getParent());
+    return findGitDirectorySync(path.dirname(directoryPath));
   }
 }
 
-// Returns a boolean indicating whether the specified directory represents a Git
-// repository.
+// Returns a {Promise} that resolves to the absolute {String} path of the `.git`
+// folder contained within the given directory or one of its ancestors, or
+// `null` if none is found.
 //
-// * `directory` {Directory} whose base name is `.git`.
-function isValidGitDirectorySync(directory) {
-  // To decide whether a directory has a valid .git folder, we use the heuristic
-  // adopted by libgit2's valid_repository_path() function.
-  const commonDirFile = directory.getSubdirectory("commondir");
+// * `directoryPath` {String} to explore whether it is part of a Git repository.
+async function findGitDirectory(directoryPath) {
+  let gitDir = path.join(directoryPath, ".git");
+  const gitDirPath = await pathFromGitFile(gitDir);
+  if (gitDirPath) {
+    gitDir = resolveGitPath(directoryPath, gitDirPath);
+  }
+  if ((await pathExists(gitDir)) && (await isValidGitDirectory(gitDir))) {
+    return gitDir;
+  } else if (isRootPath(directoryPath)) {
+    return null;
+  } else {
+    return findGitDirectory(path.dirname(directoryPath));
+  }
+}
+
+function pathExists(target) {
+  return fs.promises.access(target).then(
+    () => true,
+    () => false,
+  );
+}
+
+// Returns a boolean indicating whether the specified `.git` directory represents
+// a Git repository. Uses the heuristic adopted by libgit2's
+// `valid_repository_path()`.
+//
+// * `gitDirPath` {String} path whose base name is `.git`.
+function isValidGitDirectorySync(gitDirPath) {
+  const commonDirFile = path.join(gitDirPath, "commondir");
   let commonDir;
-  if (commonDirFile.existsSync()) {
-    const commonDirPathBuff = fs.readFileSync(commonDirFile.getPath());
-    const commonDirPathString = commonDirPathBuff.toString().trim();
-    commonDir = new Directory(directory.resolve(commonDirPathString));
-    if (!commonDir.existsSync()) {
+  if (fs.existsSync(commonDirFile)) {
+    const commonDirPathString = fs.readFileSync(commonDirFile, "utf8").trim();
+    commonDir = resolveGitPath(gitDirPath, commonDirPathString);
+    if (!fs.existsSync(commonDir)) {
       return false;
     }
   } else {
-    commonDir = directory;
+    commonDir = gitDirPath;
   }
   return (
-    directory.getFile("HEAD").existsSync() &&
-    commonDir.getSubdirectory("objects").existsSync() &&
-    commonDir.getSubdirectory("refs").existsSync()
+    fs.existsSync(path.join(gitDirPath, "HEAD")) &&
+    fs.existsSync(path.join(commonDir, "objects")) &&
+    fs.existsSync(path.join(commonDir, "refs"))
   );
 }
 
 // Returns a {Promise} that resolves to a {Boolean} indicating whether the
-// specified directory represents a Git repository.
+// specified `.git` directory represents a Git repository.
 //
-// * `directory` {Directory} whose base name is `.git`.
-async function isValidGitDirectory(directory) {
-  // To decide whether a directory has a valid .git folder, we use the heuristic
-  // adopted by libgit2's valid_repository_path() function.
-  const commonDirFile = directory.getSubdirectory("commondir");
+// * `gitDirPath` {String} path whose base name is `.git`.
+async function isValidGitDirectory(gitDirPath) {
+  const commonDirFile = path.join(gitDirPath, "commondir");
   let commonDir;
-  if (await commonDirFile.exists()) {
-    const commonDirPathBuff = await fs.promises.readFile(commonDirFile.getPath());
-    const commonDirPathString = commonDirPathBuff.toString().trim();
-    commonDir = new Directory(directory.resolve(commonDirPathString));
-    if (!(await commonDir.exists())) {
+  if (await pathExists(commonDirFile)) {
+    const commonDirPathString = (await fs.promises.readFile(commonDirFile, "utf8")).trim();
+    commonDir = resolveGitPath(gitDirPath, commonDirPathString);
+    if (!(await pathExists(commonDir))) {
       return false;
     }
   } else {
-    commonDir = directory;
+    commonDir = gitDirPath;
   }
   return (
-    (await directory.getFile("HEAD").exists()) &&
-    (await commonDir.getSubdirectory("objects").exists()) &&
-    (await commonDir.getSubdirectory("refs").exists())
+    (await pathExists(path.join(gitDirPath, "HEAD"))) &&
+    (await pathExists(path.join(commonDir, "objects"))) &&
+    (await pathExists(path.join(commonDir, "refs")))
   );
+}
+
+// Extract an absolute directory path from either a directory value object (with
+// `getPath`) or a plain {String}.
+function toDirectoryPath(directory) {
+  return typeof directory === "string" ? directory : directory.getPath();
 }
 
 // Provider that conforms to the atom.repository-provider@0.1.0 service.
@@ -162,7 +165,7 @@ class GitRepositoryProvider {
     // Only one GitRepository should be created for each .git folder. Therefore,
     // we must check directory and its parent directories to find the nearest
     // .git folder.
-    const gitDir = await findGitDirectory(directory);
+    const gitDir = await findGitDirectory(toDirectoryPath(directory));
     return this.repositoryForGitDirectory(gitDir);
   }
 
@@ -173,19 +176,18 @@ class GitRepositoryProvider {
     // Only one GitRepository should be created for each .git folder. Therefore,
     // we must check directory and its parent directories to find the nearest
     // .git folder.
-    const gitDir = findGitDirectorySync(directory);
+    const gitDir = findGitDirectorySync(toDirectoryPath(directory));
     return this.repositoryForGitDirectory(gitDir);
   }
 
   // Returns either:
   // * {GitRepository} if the given Git directory has a Git repository.
   // * `null` if the given directory does not have a Git repository.
-  repositoryForGitDirectory(gitDir) {
-    if (!gitDir) {
+  repositoryForGitDirectory(gitDirPath) {
+    if (!gitDirPath) {
       return null;
     }
 
-    const gitDirPath = gitDir.getPath();
     let repo = this.pathToRepository[gitDirPath];
     if (!repo) {
       repo = GitRepository.open(gitDirPath, {

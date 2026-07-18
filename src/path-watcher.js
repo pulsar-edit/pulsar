@@ -819,6 +819,68 @@ function watchPath(rootPath, options, eventCallback) {
   return PathWatcherManager.active().createWatcher(rootPath, eventCallback, options);
 }
 
+// Extended: Watch a single file for changes, deletion, and renaming. This is
+// the replacement for the old `File` watching API: it exposes just the change
+// notifications, backed by {watchPath}.
+//
+// Subscriptions register synchronously, but the underlying watcher is armed
+// asynchronously by the file-watcher worker. Tests that need to observe the
+// very first change should `await handle.getStartPromise()` before writing.
+//
+// * `filePath` {String} absolute path to the file to watch.
+//
+// Returns an {Object} with:
+// * `onDidChange(callback)` invoke `callback` when the file is created or its
+//   contents change. Returns a {Disposable}.
+// * `onDidDelete(callback)` invoke `callback` when the file is deleted (or
+//   renamed away from this path). Returns a {Disposable}.
+// * `onDidRename(callback)` invoke `callback` with the new path when the file
+//   is renamed onto a sibling path. Returns a {Disposable}.
+// * `getStartPromise()` a {Promise} that resolves once the watcher is armed.
+// * `dispose()` stop watching and release the subscription.
+function watchFile(filePath) {
+  const emitter = new Emitter();
+  const watcherPromise = watchPath(filePath, {}, (events) => {
+    for (const event of events) {
+      if (event.action === "deleted") {
+        emitter.emit("did-delete");
+      } else if (event.action === "renamed") {
+        if (event.oldPath === filePath) {
+          emitter.emit("did-delete");
+        } else {
+          emitter.emit("did-rename", event.path);
+        }
+      } else {
+        // "created" or "modified"
+        emitter.emit("did-change");
+      }
+    }
+  });
+  watcherPromise.catch(() => {});
+
+  return {
+    onDidChange(callback) {
+      return emitter.on("did-change", callback);
+    },
+    onDidDelete(callback) {
+      return emitter.on("did-delete", callback);
+    },
+    onDidRename(callback) {
+      return emitter.on("did-rename", callback);
+    },
+    getStartPromise() {
+      return watcherPromise;
+    },
+    dispose() {
+      emitter.dispose();
+      watcherPromise.then(
+        (watcher) => watcher.dispose(),
+        () => {},
+      );
+    },
+  };
+}
+
 // Private: Return a Promise that resolves when all {NativeWatcher} instances
 // associated with a FileSystemManager have stopped listening. This is useful
 // for `afterEach()` blocks in unit tests.
@@ -845,4 +907,4 @@ watchPath.reset = function reset() {
     });
 };
 
-module.exports = { watchPath, stopAllWatchers };
+module.exports = { watchPath, watchFile, stopAllWatchers };

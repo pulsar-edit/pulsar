@@ -1,4 +1,4 @@
-const { CompositeDisposable, Disposable, Emitter, File, Task } = require("atom");
+const { CompositeDisposable, Disposable, Emitter, watchFile, Task } = require("atom");
 const { SelectListView, highlightMatches } = require("@lumine-code/select-list");
 // glob >=9 exports named functions; older hoisted versions expose the callable module
 const globPkg = require("glob");
@@ -20,7 +20,7 @@ class ProjectList {
     this.emitter = new Emitter();
 
     // config file
-    this.configFile = new File(this.getConfigPath());
+    this.configPath = this.getConfigPath();
 
     // create select-list
     this.selectList = new SelectListView({
@@ -233,16 +233,18 @@ class ProjectList {
   }
 
   async ensureConfigFile() {
-    if (!(await this.configFile.exists())) {
-      await this.configFile.create();
-      await this.configFile.write("[]");
+    if (!fs.existsSync(this.configPath)) {
+      await fs.promises.mkdir(path.dirname(this.configPath), { recursive: true });
+      await fs.promises.writeFile(this.configPath, "[]");
     }
   }
 
   async observeConfigFile() {
     await this.ensureConfigFile();
+    const watcher = watchFile(this.configPath);
     this.disposables.add(
-      this.configFile.onDidChange(
+      watcher,
+      watcher.onDidChange(
         debounce(async () => {
           this.clearCache();
           await this.updateViewSchedule();
@@ -459,7 +461,7 @@ class ProjectList {
 
   async buildCache() {
     await this.ensureConfigFile();
-    const configData = CSON.parse(await this.configFile.read());
+    const configData = CSON.parse(await fs.promises.readFile(this.configPath, "utf8"));
     if (configData instanceof Error) {
       throw new Error(configData.message);
     }

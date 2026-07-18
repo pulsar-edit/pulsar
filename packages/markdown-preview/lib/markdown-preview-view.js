@@ -1,7 +1,7 @@
 const path = require("path");
 const morphdom = require("morphdom");
 
-const { Emitter, Disposable, CompositeDisposable, File } = require("atom");
+const { Emitter, Disposable, CompositeDisposable, watchFile } = require("atom");
 const _ = require("@lumine-code/underscore-plus");
 const fs = require("@lumine-code/fs-plus");
 
@@ -97,8 +97,10 @@ module.exports = class MarkdownPreviewView {
   }
 
   subscribeToFilePath(filePath) {
-    this.file = new File(filePath);
+    this.filePath = filePath;
+    this.file = watchFile(filePath);
     this.emitter.emit("did-change-title");
+    this.disposables.add(this.file);
     this.disposables.add(this.file.onDidRename(() => this.emitter.emit("did-change-title")));
     this.handleEvents();
     return this.renderMarkdown();
@@ -283,17 +285,16 @@ module.exports = class MarkdownPreviewView {
   }
 
   getMarkdownSource() {
-    if (this.file && this.file.getPath()) {
-      return this.file
-        .read()
-        .then((source) => {
-          if (source === null) {
-            return Promise.reject(new Error(`${this.file.getBaseName()} could not be found`));
-          } else {
-            return Promise.resolve(source);
+    if (this.file && this.filePath) {
+      return require("fs").promises
+        .readFile(this.filePath, "utf8")
+        .then((source) => Promise.resolve(source))
+        .catch((reason) => {
+          if (reason && reason.code === "ENOENT") {
+            return Promise.reject(new Error(`${path.basename(this.filePath)} could not be found`));
           }
-        })
-        .catch((reason) => Promise.reject(reason));
+          return Promise.reject(reason);
+        });
     } else if (this.editor != null) {
       return Promise.resolve(this.editor.getText());
     } else {
@@ -372,7 +373,7 @@ module.exports = class MarkdownPreviewView {
 
   getPath() {
     if (this.file != null) {
-      return this.file.getPath();
+      return this.filePath;
     } else if (this.editor != null) {
       return this.editor.getPath();
     }

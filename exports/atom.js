@@ -1,12 +1,11 @@
 const TextBuffer = require("../src/text-buffer");
 const { Point, Range } = TextBuffer;
-const { File, Directory } = require("@lumine-code/pathwatcher");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
 const BufferedNodeProcess = require("../src/buffered-node-process");
 const BufferedProcess = require("../src/buffered-process");
 const GitRepository = require("../src/git-repository");
 const Notification = require("../src/notification");
-const { watchPath } = require("../src/path-watcher");
+const { watchPath, watchFile } = require("../src/path-watcher");
 
 const atomExport = {
   BufferedNodeProcess,
@@ -16,12 +15,11 @@ const atomExport = {
   TextBuffer,
   Point,
   Range,
-  File,
-  Directory,
   Emitter,
   Disposable,
   CompositeDisposable,
   watchPath,
+  watchFile,
 };
 
 // Shell integration is required by both Squirrel and Settings-View

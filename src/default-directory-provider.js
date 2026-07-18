@@ -1,4 +1,4 @@
-const { Directory } = require("@lumine-code/pathwatcher");
+const ProjectDirectory = require("./project-directory");
 const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 
@@ -33,8 +33,7 @@ module.exports = class DefaultDirectoryProvider {
     } else {
       directoryPath = normalizedPath;
     }
-    // TODO: Stop normalizing the path in pathwatcher's Directory.
-    const directory = new Directory(directoryPath);
+    const directory = new ProjectDirectory(directoryPath);
     if (host) {
       directory.path = directoryPath;
       if (fs.isCaseInsensitive()) {

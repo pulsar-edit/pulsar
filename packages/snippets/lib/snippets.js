@@ -1,5 +1,5 @@
 const path = require("path");
-const { Emitter, Disposable, CompositeDisposable, File } = require("atom");
+const { Emitter, Disposable, CompositeDisposable, watchFile } = require("atom");
 const _ = require("@lumine-code/underscore-plus");
 const async = require("async");
 const CSON = require("@lumine-code/season");
@@ -271,8 +271,9 @@ module.exports = {
     fs.stat(userSnippetsPath, (_error, stat) => {
       if (stat != null && stat.isFile()) {
         const userSnippetsFileDisposable = new CompositeDisposable();
-        const userSnippetsFile = new File(userSnippetsPath);
+        const userSnippetsFile = watchFile(userSnippetsPath);
         try {
+          userSnippetsFileDisposable.add(userSnippetsFile);
           userSnippetsFileDisposable.add(
             userSnippetsFile.onDidChange(() => this.handleUserSnippetsDidChange()),
           );

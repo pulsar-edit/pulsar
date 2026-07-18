@@ -3,7 +3,7 @@ const path = require("path");
 const { Emitter, Disposable, CompositeDisposable } = require("event-kit");
 const fs = require("@lumine-code/fs-plus");
 const { Minimatch } = require("minimatch");
-const { Directory } = require("@lumine-code/pathwatcher");
+const ProjectDirectory = require("./project-directory");
 const Grim = require("grim");
 const RipgrepDirectorySearcher = require("./ripgrep-directory-searcher");
 const Dock = require("./dock");
@@ -2562,7 +2562,7 @@ module.exports = class Workspace extends Model {
     if (editor.getPath()) {
       const checkoutHead = async () => {
         const repository = await this.project.repositoryForDirectory(
-          new Directory(editor.getDirectoryPath()),
+          new ProjectDirectory(editor.getDirectoryPath()),
         );
         if (repository) await repository.checkoutHeadForEditor(editor);
       };
