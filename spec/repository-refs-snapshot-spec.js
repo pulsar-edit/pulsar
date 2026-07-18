@@ -16,6 +16,9 @@ function refRecord({
   upstreamRef = "",
   upstreamShort = "",
   upstreamTrack = "",
+  pushRef = "",
+  pushShort = "",
+  pushTrack = "",
   headMarker = "",
   symref = "",
 }) {
@@ -28,6 +31,9 @@ function refRecord({
     upstreamRef,
     upstreamShort,
     upstreamTrack,
+    pushRef,
+    pushShort,
+    pushTrack,
     headMarker,
     symref,
   ].join("\0");
@@ -97,6 +103,9 @@ describe("repository refs snapshot", () => {
           upstreamRef: "refs/remotes/origin/feature",
           upstreamShort: "origin/feature",
           upstreamTrack: "ahead 2, behind 1",
+          pushRef: "refs/remotes/fork/feature",
+          pushShort: "fork/feature",
+          pushTrack: "ahead 3",
         }),
         refRecord({
           ref: "refs/heads/orphaned",
@@ -126,6 +135,19 @@ describe("repository refs snapshot", () => {
       );
       expect(branches[2].upstream.gone).toBe(true);
       expect(branches[3].upstream).toBeNull();
+
+      // Push tracking is parsed independently of upstream.
+      expect(branches[0].push).toBeNull();
+      expect(branches[1].push).toEqual(
+        jasmine.objectContaining({
+          ref: "refs/remotes/fork/feature",
+          name: "fork/feature",
+          ahead: 3,
+          behind: 0,
+          gone: false,
+        }),
+      );
+      expect(branches[3].push).toBeNull();
     });
 
     it("distinguishes annotated tags from lightweight tags", () => {

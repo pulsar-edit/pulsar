@@ -422,7 +422,7 @@ describe("GitRepository", () => {
     };
 
     const makeOutputs = (branch) => ({
-      forEachRef: `refs/heads/${branch}\0${branch}\0aaaa\0commit\0\0\0\0\0*\0`,
+      forEachRef: `refs/heads/${branch}\0${branch}\0aaaa\0commit\0\0\0\0\0\0\0\0*\0`,
       remotes: "",
       worktrees: "",
       symbolicHead: `refs/heads/${branch}\n`,
@@ -534,9 +534,9 @@ describe("GitRepository", () => {
     beforeEach(async () => {
       const forEachRef = [
         // main branch, tracking origin/main, 2 ahead and 1 behind, is HEAD
-        "refs/heads/main\0main\0aaaa1111\0commit\0\0refs/remotes/origin/main\0origin/main\0ahead 2, behind 1\0*\0",
-        "refs/remotes/origin/main\0origin/main\0bbbb2222\0commit\0\0\0\0\0\0",
-        "refs/tags/v1\0v1\0cccc3333\0commit\0\0\0\0\0\0",
+        "refs/heads/main\0main\0aaaa1111\0commit\0\0refs/remotes/origin/main\0origin/main\0ahead 2, behind 1\0\0\0\0*\0",
+        "refs/remotes/origin/main\0origin/main\0bbbb2222\0commit\0\0\0\0\0\0\0\0\0",
+        "refs/tags/v1\0v1\0cccc3333\0commit\0\0\0\0\0\0\0\0\0",
       ].join("\n");
       const refsSnapshotProvider = {
         getRefs: () =>

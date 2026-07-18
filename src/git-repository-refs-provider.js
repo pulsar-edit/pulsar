@@ -9,6 +9,9 @@ const FOR_EACH_REF_FORMAT = [
   "%(upstream)",
   "%(upstream:short)",
   "%(upstream:track,nobracket)",
+  "%(push)",
+  "%(push:short)",
+  "%(push:track,nobracket)",
   "%(HEAD)",
   "%(symref)",
 ].join("%00");

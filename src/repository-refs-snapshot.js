@@ -10,7 +10,7 @@ const EMPTY_REFS_SNAPSHOT = Object.freeze({
   worktrees: Object.freeze([]),
 });
 
-const FOR_EACH_REF_FIELD_COUNT = 10;
+const FOR_EACH_REF_FIELD_COUNT = 13;
 
 function parseUpstreamTrack(track) {
   if (track === "gone") return { ahead: 0, behind: 0, gone: true };
@@ -43,6 +43,9 @@ function parseForEachRef(output) {
       upstreamRef,
       upstreamShort,
       upstreamTrack,
+      pushRef,
+      pushShort,
+      pushTrack,
       headMarker,
       symref,
     ] = fields;
@@ -59,6 +62,13 @@ function parseForEachRef(output) {
                 ref: upstreamRef,
                 name: upstreamShort,
                 ...parseUpstreamTrack(upstreamTrack),
+              })
+            : null,
+          push: pushRef
+            ? Object.freeze({
+                ref: pushRef,
+                name: pushShort,
+                ...parseUpstreamTrack(pushTrack),
               })
             : null,
         }),
