@@ -45,7 +45,7 @@ module.exports = class GitRepositoryDiffProvider {
       "--patch",
       "--no-ext-diff",
       "--no-color",
-      "--find-renames",
+      request.detectRenames === false ? "--no-renames" : "--find-renames",
       "--src-prefix=a/",
       "--dst-prefix=b/",
       `--unified=${request.context ?? 3}`,

@@ -872,6 +872,7 @@ module.exports = class GitRepository {
     paths = [],
     context = 3,
     ignoreWhitespace = false,
+    detectRenames = true,
     maxBytes = 10 * 1024 * 1024,
     signal,
   } = {}) {
@@ -882,7 +883,7 @@ module.exports = class GitRepository {
     try {
       rawPatch = await provider.getDiffPatch(
         this.getWorkingDirectory(),
-        { from, to, paths, context, ignoreWhitespace },
+        { from, to, paths, context, ignoreWhitespace, detectRenames },
         { maxBuffer: maxBytes, signal },
       );
     } catch (error) {

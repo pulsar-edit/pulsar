@@ -235,6 +235,16 @@ describe("repository diff", () => {
       expect(calls[3].args.slice(-4)).toEqual(["--no-index", "--", NULL_DEVICE, "untracked.txt"]);
     });
 
+    it("disables rename detection when detectRenames is false", async () => {
+      await provider.getDiffPatch("/repo", {
+        from: { type: "index" },
+        to: { type: "worktree" },
+        detectRenames: false,
+      });
+      expect(calls[0].args).toContain("--no-renames");
+      expect(calls[0].args).not.toContain("--find-renames");
+    });
+
     it("rejects unsupported endpoint pairs and malformed endpoints", async () => {
       await expectAsyncTypeError(() =>
         provider.getDiffPatch("/repo", { from: { type: "worktree" }, to: { type: "index" } }),
