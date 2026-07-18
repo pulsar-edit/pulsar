@@ -3,18 +3,18 @@ const path = require("path");
 
 const temp = require("temp").track();
 
-const DugiteRepositoryOperationProvider = require("../src/dugite-repository-operation-provider");
+const GitRepositoryOperationProvider = require("../src/git-repository-operation-provider");
 
-describe("DugiteRepositoryOperationProvider", () => {
+describe("GitRepositoryOperationProvider", () => {
   it("exposes the embedded Git transport", async () => {
     const calls = [];
-    const provider = new DugiteRepositoryOperationProvider({
+    const provider = new GitRepositoryOperationProvider({
       exec: async (args, workingDirectory, options, raw) => {
         calls.push({ args, workingDirectory, options, raw });
         return { exitCode: 0, stdout: "git version test", stderr: "" };
       },
     });
-    const workingDirectory = temp.mkdirSync("dugite-transport");
+    const workingDirectory = temp.mkdirSync("git-transport");
 
     const result = await provider.executeGit(["--version"], workingDirectory, { env: { A: "B" } });
 
@@ -32,13 +32,13 @@ describe("DugiteRepositoryOperationProvider", () => {
 
   it("maps repository operations to Git commands without placing commit messages in arguments", async () => {
     const calls = [];
-    const provider = new DugiteRepositoryOperationProvider({
+    const provider = new GitRepositoryOperationProvider({
       exec: async (args, workingDirectory, options) => {
         calls.push({ args, workingDirectory, options });
         return { exitCode: 0, stdout: "", stderr: "" };
       },
     });
-    const workingDirectory = path.join(temp.mkdirSync("dugite-command-mapping"), "repo");
+    const workingDirectory = path.join(temp.mkdirSync("git-command-mapping"), "repo");
     const operations = provider.createRepositoryOperations({ workingDirectory });
 
     await operations.stageFiles(["one.txt", "two.txt"]);
@@ -48,7 +48,7 @@ describe("DugiteRepositoryOperationProvider", () => {
     });
 
     // The worker receives the bare argument vector; color/trust config and the
-    // GIT_TERMINAL_PROMPT environment are applied by the worker's DugiteRunner.
+    // GIT_TERMINAL_PROMPT environment are applied by the worker's GitRunner.
     expect(calls[0].args).toEqual(["add", "--", "one.txt", "two.txt"]);
     expect(calls[0].workingDirectory).toBe(workingDirectory);
     expect(calls[1].args).toEqual(["commit", "--file=-", "--amend"]);
@@ -59,7 +59,7 @@ describe("DugiteRepositoryOperationProvider", () => {
 
   it("supports injected configuration, cleanup modes, and merge-file labels", async () => {
     const calls = [];
-    const provider = new DugiteRepositoryOperationProvider({
+    const provider = new GitRepositoryOperationProvider({
       exec: async (args, workingDirectory, options) => {
         calls.push({ args, workingDirectory, options });
         if (args.includes("merge-file")) {
@@ -68,7 +68,7 @@ describe("DugiteRepositoryOperationProvider", () => {
         return { exitCode: 0, stdout: "", stderr: "" };
       },
     });
-    const workingDirectory = temp.mkdirSync("dugite-option-mapping");
+    const workingDirectory = temp.mkdirSync("git-option-mapping");
     const operations = provider.createRepositoryOperations({ workingDirectory });
 
     await operations.commit("Subject", {
@@ -86,7 +86,7 @@ describe("DugiteRepositoryOperationProvider", () => {
     );
 
     // The per-command `-c` config is passed through in options and applied by the
-    // worker's DugiteRunner, not baked into the argument vector here.
+    // worker's GitRunner, not baked into the argument vector here.
     expect(calls[0].args).toEqual(["commit", "--file=-", "--cleanup=strip"]);
     expect(calls[0].options.config).toEqual({ "gpg.program": "/tmp/wrapper.sh" });
     expect(calls[1].args).toEqual([
@@ -109,8 +109,8 @@ describe("DugiteRepositoryOperationProvider", () => {
   });
 
   it("writes merge conflict stages to the index for a tracked file", async () => {
-    const provider = new DugiteRepositoryOperationProvider();
-    const workingDirectory = temp.mkdirSync("dugite-conflict-index");
+    const provider = new GitRepositoryOperationProvider();
+    const workingDirectory = temp.mkdirSync("git-conflict-index");
     await provider.initializeRepository(workingDirectory, { initialBranch: "main" });
     const operations = provider.createRepositoryOperations({ workingDirectory });
     await operations.setConfig("user.name", "Lumine Specs");
@@ -134,8 +134,8 @@ describe("DugiteRepositoryOperationProvider", () => {
   });
 
   it("initializes, writes, and commits through the embedded Git distribution", async () => {
-    const provider = new DugiteRepositoryOperationProvider();
-    const workingDirectory = temp.mkdirSync("dugite-real-repository");
+    const provider = new GitRepositoryOperationProvider();
+    const workingDirectory = temp.mkdirSync("git-real-repository");
 
     await provider.initializeRepository(workingDirectory, { initialBranch: "main" });
     const operations = provider.createRepositoryOperations({ workingDirectory });
@@ -159,9 +159,9 @@ describe("DugiteRepositoryOperationProvider", () => {
   });
 
   it("clones a local repository through the embedded Git distribution", async () => {
-    const provider = new DugiteRepositoryOperationProvider();
-    const sourcePath = temp.mkdirSync("dugite-clone-source");
-    const destinationPath = path.join(temp.mkdirSync("dugite-clone-parent"), "destination");
+    const provider = new GitRepositoryOperationProvider();
+    const sourcePath = temp.mkdirSync("git-clone-source");
+    const destinationPath = path.join(temp.mkdirSync("git-clone-parent"), "destination");
 
     await provider.initializeRepository(sourcePath, { initialBranch: "main" });
     const sourceOperations = provider.createRepositoryOperations({ workingDirectory: sourcePath });
@@ -180,8 +180,8 @@ describe("DugiteRepositoryOperationProvider", () => {
   });
 
   it("returns structured errors for failed Git commands", async () => {
-    const provider = new DugiteRepositoryOperationProvider();
-    const workingDirectory = temp.mkdirSync("dugite-error-repository");
+    const provider = new GitRepositoryOperationProvider();
+    const workingDirectory = temp.mkdirSync("git-error-repository");
     await provider.initializeRepository(workingDirectory);
 
     let error;
@@ -191,15 +191,15 @@ describe("DugiteRepositoryOperationProvider", () => {
       error = caughtError;
     }
 
-    expect(error.name).toBe("DugiteOperationError");
+    expect(error.name).toBe("GitOperationError");
     expect(error.code).toBe("ERR_GIT_COMMAND_FAILED");
     expect(error.command).toBe("checkout");
     expect(error.exitCode).not.toBe(0);
     expect(error.stderr.length).toBeGreaterThan(0);
   });
 
-  it("drives the public repository API with Dugite writes and git-utils reads", async () => {
-    const workingDirectory = temp.mkdirSync("dugite-public-repository-api");
+  it("drives the public repository API with Git writes and git-utils reads", async () => {
+    const workingDirectory = temp.mkdirSync("git-public-repository-api");
     const repository = await atom.repositories.initialize(workingDirectory, {
       initialBranch: "main",
     });

@@ -1,7 +1,7 @@
-const DugiteRepositoryStatusProvider = require("./dugite-repository-status-provider");
-const DugiteRepositoryRefsProvider = require("./dugite-repository-refs-provider");
-const DugiteRepositoryDiffProvider = require("./dugite-repository-diff-provider");
-const DugiteRepositoryHistoryProvider = require("./dugite-repository-history-provider");
+const GitRepositoryStatusProvider = require("./git-repository-status-provider");
+const GitRepositoryRefsProvider = require("./git-repository-refs-provider");
+const GitRepositoryDiffProvider = require("./git-repository-diff-provider");
+const GitRepositoryHistoryProvider = require("./git-repository-history-provider");
 const { computeLineDiffHunks } = require("./line-diff");
 
 // Cap on cached HEAD blobs (keyed by repo+path+headOid). Immutable per key, so a
@@ -11,17 +11,17 @@ const BLOB_CACHE_MAX = 256;
 // The git-host worker's operation registry. Each op receives a structured-clone
 // payload from the renderer plus a worker-local AbortSignal (a real signal
 // cannot cross IPC, so the renderer's cancel is translated here), and returns
-// the SAME raw string / structured value the direct Dugite providers return
+// the SAME raw string / structured value the direct Git providers return
 // today. Parsing stays in the renderer so cache keys hash byte-identical output.
 //
 // This module is intentionally pure: it takes a runner (or, in specs, a fake
 // `execute` via the provider constructors) and is require-able and testable
 // in-process without forking a worker.
 module.exports = function createGitHostOps(runner) {
-  const status = new DugiteRepositoryStatusProvider({ runner });
-  const refs = new DugiteRepositoryRefsProvider({ runner });
-  const diff = new DugiteRepositoryDiffProvider({ runner });
-  const history = new DugiteRepositoryHistoryProvider({ runner });
+  const status = new GitRepositoryStatusProvider({ runner });
+  const refs = new GitRepositoryRefsProvider({ runner });
+  const diff = new GitRepositoryDiffProvider({ runner });
+  const history = new GitRepositoryHistoryProvider({ runner });
 
   const withSignal = (options, signal) => ({ ...options, signal });
 
@@ -70,7 +70,7 @@ module.exports = function createGitHostOps(runner) {
     // `raw` uses the unwrapped exec (no limiter, color config, or exit-code
     // check, matching the historical `executeGit`); otherwise `runResult`
     // applies the limiter, color/trust config, and allowed-exit-code check, and
-    // rejects with a DugiteOperationError whose fields cross IPC.
+    // rejects with a GitOperationError whose fields cross IPC.
     exec: ({ workingDirectory, args, options, raw }, { signal }) =>
       raw
         ? runner.execute(args, workingDirectory, withSignal(options, signal))

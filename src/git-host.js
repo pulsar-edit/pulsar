@@ -1,7 +1,7 @@
 const ChildProcess = require("child_process");
 
 // Renderer-side transport for the git-host worker: one long-lived forked process
-// per window that runs every Dugite `git` command and its output off the
+// per window that runs every Git `git` command and its output off the
 // renderer main thread, VS Code-extension-host style. Requests are correlated by
 // id to their replies; an AbortSignal is translated into an out-of-band cancel;
 // a worker crash rejects all pending requests with a retriable error and the
@@ -102,6 +102,12 @@ class GitHost {
     return value !== false;
   }
 
+  // The configured git binary path (`core.git.path`), passed to the worker so
+  // its runner resolves the same git the renderer would.
+  gitPath() {
+    return globalThis.atom?.config?.get?.("core.git.path") || "";
+  }
+
   childEnv() {
     const compileCachePath = require("./compile-cache").getCacheDirectory();
     return Object.assign({}, process.env, {
@@ -109,6 +115,7 @@ class GitHost {
       ELECTRON_NO_ATTACH_CONSOLE: "1",
       LUMINE_COMPILE_CACHE_PATH: compileCachePath,
       LUMINE_GIT_TRUST_ALL: this.trustAllRepositories() ? "1" : "0",
+      LUMINE_GIT_PATH: this.gitPath(),
     });
   }
 
@@ -116,10 +123,10 @@ class GitHost {
     if (this.readyPromise) return this.readyPromise;
 
     if (!this.shouldFork()) {
-      const DugiteRunner = require("./dugite-runner");
+      const GitRunner = require("./git-runner");
       const createGitHostOps = require("./git-host-ops");
       this.inProcessOps = createGitHostOps(
-        new DugiteRunner({ trustAllRepositories: this.trustAllRepositories() }),
+        new GitRunner({ trustAllRepositories: this.trustAllRepositories() }),
       );
       this.readyPromise = Promise.resolve();
       return this.readyPromise;

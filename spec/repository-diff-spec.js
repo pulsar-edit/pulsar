@@ -4,8 +4,8 @@ const path = require("path");
 const temp = require("temp").track();
 
 const { parseDiffPatch } = require("../src/repository-diff");
-const DugiteRepositoryDiffProvider = require("../src/dugite-repository-diff-provider");
-const DugiteRepositoryOperationProvider = require("../src/dugite-repository-operation-provider");
+const GitRepositoryDiffProvider = require("../src/git-repository-diff-provider");
+const GitRepositoryOperationProvider = require("../src/git-repository-operation-provider");
 const GitRepository = require("../src/git-repository");
 
 const COLOR_CONFIG_ARGUMENT_COUNT = 8;
@@ -186,12 +186,12 @@ describe("repository diff", () => {
     });
   });
 
-  describe("DugiteRepositoryDiffProvider", () => {
+  describe("GitRepositoryDiffProvider", () => {
     let calls, provider;
 
     beforeEach(() => {
       calls = [];
-      provider = new DugiteRepositoryDiffProvider({
+      provider = new GitRepositoryDiffProvider({
         execute: async (args, workingDirectory, options) => {
           calls.push({ args: args.slice(COLOR_CONFIG_ARGUMENT_COUNT), workingDirectory, options });
           return { exitCode: options.__exitCode ?? 0, stdout: "", stderr: "" };
@@ -263,7 +263,7 @@ describe("repository diff", () => {
     let repo, workingDirectory, operations, operationProvider;
 
     beforeEach(async () => {
-      operationProvider = new DugiteRepositoryOperationProvider();
+      operationProvider = new GitRepositoryOperationProvider();
       workingDirectory = temp.mkdirSync("repository-diff-repo");
       await operationProvider.initializeRepository(workingDirectory, { initialBranch: "main" });
       operations = operationProvider.createRepositoryOperations({ workingDirectory });

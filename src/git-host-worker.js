@@ -1,15 +1,15 @@
 // The git-host worker's child-process entry logic. Runs under
 // ELECTRON_RUN_AS_NODE (loaded by git-host-bootstrap.js). Owns a single shared
-// DugiteRunner (whose concurrency limiter bounds the real `git` spawns here, off
+// GitRunner (whose concurrency limiter bounds the real `git` spawns here, off
 // the renderer thread) and an op dispatch table. Every request is tracked by id
 // so an out-of-band `git:cancel` can abort the matching in-flight git child.
 
-const DugiteRunner = require("./dugite-runner");
+const GitRunner = require("./git-runner");
 const createGitHostOps = require("./git-host-ops");
 
 // core.git.trustAllRepositories is passed in the fork environment; trust unless
 // it was explicitly disabled ("0").
-const runner = new DugiteRunner({ trustAllRepositories: process.env.LUMINE_GIT_TRUST_ALL !== "0" });
+const runner = new GitRunner({ trustAllRepositories: process.env.LUMINE_GIT_TRUST_ALL !== "0" });
 const ops = createGitHostOps(runner);
 
 // id -> AbortController for the in-flight request, so git:cancel can abort it.

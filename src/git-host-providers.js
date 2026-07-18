@@ -1,7 +1,7 @@
 const GitHost = require("./git-host");
 
 // Renderer-side client providers. Each mirrors the method signature of its
-// direct Dugite counterpart (dugite-repository-*-provider.js) but forwards the
+// direct Git counterpart (git-repository-*-provider.js) but forwards the
 // call to the git-host worker over RPC, so GitRepository can use them
 // interchangeably and its existing specs (which inject fake providers) are
 // unaffected. The AbortSignal is pulled out of `options` and passed to the

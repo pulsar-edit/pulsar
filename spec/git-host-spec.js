@@ -87,7 +87,7 @@ describe("GitHost transport", () => {
     expect(error.stderr).toBe("bad");
   });
 
-  it("revives an exec DugiteOperationError with its command and stdout", async () => {
+  it("revives an exec GitOperationError with its command and stdout", async () => {
     const pending = host.request("exec", {
       workingDirectory: "/repo",
       args: ["checkout", "missing"],
@@ -100,7 +100,7 @@ describe("GitHost transport", () => {
       id,
       error: {
         message: "Git checkout failed",
-        name: "DugiteOperationError",
+        name: "GitOperationError",
         code: "ERR_GIT_COMMAND_FAILED",
         command: "checkout",
         exitCode: 1,
@@ -115,7 +115,7 @@ describe("GitHost transport", () => {
     } catch (e) {
       error = e;
     }
-    expect(error.name).toBe("DugiteOperationError");
+    expect(error.name).toBe("GitOperationError");
     expect(error.command).toBe("checkout");
     expect(error.stdout).toBe("partial");
     expect(error.exitCode).toBe(1);

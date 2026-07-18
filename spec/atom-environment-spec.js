@@ -65,7 +65,7 @@ describe("AtomEnvironment", () => {
   });
 
   describe("the repository platform", () => {
-    it("installs Dugite as the default operation provider", () => {
+    it("installs Git as the default operation provider", () => {
       expect(atom.repositories.getWorkspaceOperationCapabilities()).toEqual([
         "initialize",
         "clone",

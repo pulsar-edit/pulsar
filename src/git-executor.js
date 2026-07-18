@@ -1,13 +1,12 @@
 const { spawn } = require("child_process");
 
-// Runs the system git binary via child_process, matching the contract
-// DugiteRunner relied on from dugite's GitProcess.exec so the rest of the git
-// stack is unchanged: `exec(args, workingDirectory, options)` resolves to
-// `{exitCode, stdout, stderr}` and rejects with an
-// `ERR_CHILD_PROCESS_STDIO_MAXBUFFER`-coded error when stdout exceeds
-// `maxBuffer` (GitRepository.getDiff maps that to ERR_GIT_DIFF_TOO_LARGE).
-// Supported options: env, stdin, encoding ("buffer" for a Buffer stdout),
-// maxBuffer, signal, killSignal, processCallback.
+// Runs the system git binary via child_process for GitRunner. The exec contract
+// keeps the rest of the git stack unchanged: `exec(args, workingDirectory,
+// options)` resolves to `{exitCode, stdout, stderr}` and rejects with an
+// `ERR_CHILD_PROCESS_STDIO_MAXBUFFER`-coded error when stdout exceeds `maxBuffer`
+// (GitRepository.getDiff maps that to ERR_GIT_DIFF_TOO_LARGE). Supported options:
+// env, stdin, encoding ("buffer" for a Buffer stdout), maxBuffer, signal,
+// killSignal, processCallback.
 
 const MAX_BUFFER_EXCEEDED_CODE = "ERR_CHILD_PROCESS_STDIO_MAXBUFFER";
 const DEFAULT_MAX_BUFFER = 10 * 1024 * 1024;

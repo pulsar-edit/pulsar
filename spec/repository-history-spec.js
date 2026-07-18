@@ -8,7 +8,7 @@ const {
   parseNameStatusTokens,
   parseBlamePorcelain,
 } = require("../src/repository-history");
-const DugiteRepositoryOperationProvider = require("../src/dugite-repository-operation-provider");
+const GitRepositoryOperationProvider = require("../src/git-repository-operation-provider");
 const GitRepository = require("../src/git-repository");
 
 function logRecord({
@@ -68,8 +68,16 @@ describe("repository history", () => {
 
   describe("parseNameStatusTokens", () => {
     it("parses NUL-separated and tab-joined records including renames", () => {
-      const nulSeparated = ["M", "changed.txt", "R100", "old.txt", "new.txt", "A", "born.txt", ""]
-        .join("\0");
+      const nulSeparated = [
+        "M",
+        "changed.txt",
+        "R100",
+        "old.txt",
+        "new.txt",
+        "A",
+        "born.txt",
+        "",
+      ].join("\0");
       const tabJoined = ["M\tchanged.txt", "R100\told.txt", "new.txt", ""].join("\0");
 
       const nulFiles = parseNameStatusTokens(nulSeparated);
@@ -134,7 +142,7 @@ describe("repository history", () => {
     let repo, workingDirectory, operations, operationProvider;
 
     beforeEach(async () => {
-      operationProvider = new DugiteRepositoryOperationProvider();
+      operationProvider = new GitRepositoryOperationProvider();
       workingDirectory = temp.mkdirSync("repository-history-repo");
       await operationProvider.initializeRepository(workingDirectory, { initialBranch: "main" });
       operations = operationProvider.createRepositoryOperations({ workingDirectory });
@@ -197,9 +205,9 @@ describe("repository history", () => {
         status: "renamed",
         similarity: 100,
       });
-      expect(
-        renameCommit.changedFiles.find((file) => file.path === "bin.dat").status,
-      ).toBe("added");
+      expect(renameCommit.changedFiles.find((file) => file.path === "bin.dat").status).toBe(
+        "added",
+      );
 
       const bodyCommit = await repo.getCommit(commits[1].sha);
       expect(bodyCommit.subject).toBe("second");

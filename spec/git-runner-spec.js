@@ -1,5 +1,5 @@
-const DugiteRunner = require("../src/dugite-runner");
-const { Semaphore } = DugiteRunner;
+const GitRunner = require("../src/git-runner");
+const { Semaphore } = GitRunner;
 
 // Flush enough microtask turns for the semaphore's async acquire() handoffs to
 // settle before asserting on in-flight state.
@@ -23,10 +23,10 @@ function trackingExecute() {
   return { execute, state };
 }
 
-describe("DugiteRunner concurrency", () => {
+describe("GitRunner concurrency", () => {
   it("never runs more concurrent executions than the limiter allows", async () => {
     const { execute, state } = trackingExecute();
-    const runner = new DugiteRunner({ execute, limiter: new Semaphore(2) });
+    const runner = new GitRunner({ execute, limiter: new Semaphore(2) });
 
     const all = Promise.all(Array.from({ length: 6 }, () => runner.run(["status"], "/repo")));
 
@@ -48,7 +48,7 @@ describe("DugiteRunner concurrency", () => {
 
   it("bypasses the limiter for interactive (allowPrompt) operations", async () => {
     const { execute, state } = trackingExecute();
-    const runner = new DugiteRunner({ execute, limiter: new Semaphore(2) });
+    const runner = new GitRunner({ execute, limiter: new Semaphore(2) });
 
     const all = Promise.all(
       Array.from({ length: 5 }, () => runner.run(["fetch"], "/repo", { allowPrompt: true })),
@@ -64,7 +64,7 @@ describe("DugiteRunner concurrency", () => {
   });
 });
 
-describe("DugiteRunner repository trust", () => {
+describe("GitRunner repository trust", () => {
   function capturingExecute() {
     const calls = [];
     const execute = (args) => {
@@ -76,7 +76,7 @@ describe("DugiteRunner repository trust", () => {
 
   it("adds -c safe.directory=* when trustAllRepositories is set", async () => {
     const { execute, calls } = capturingExecute();
-    const runner = new DugiteRunner({ execute, trustAllRepositories: true });
+    const runner = new GitRunner({ execute, trustAllRepositories: true });
 
     await runner.run(["status"], "/repo");
 
@@ -90,7 +90,7 @@ describe("DugiteRunner repository trust", () => {
 
   it("does not add safe.directory when trustAllRepositories is not set", async () => {
     const { execute, calls } = capturingExecute();
-    const runner = new DugiteRunner({ execute });
+    const runner = new GitRunner({ execute });
 
     await runner.run(["status"], "/repo");
 

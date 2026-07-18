@@ -170,7 +170,7 @@ module.exports = class GitRepository {
 
     if (options.refreshOnWindowFocus || options.refreshOnWindowFocus == null) {
       const onWindowFocus = () => {
-        // Refresh the Dugite snapshots (subscriber-gated) rather than the
+        // Refresh the Git snapshots (subscriber-gated) rather than the
         // legacy libgit2 status cache when the window regains focus.
         this.scheduleStatusSnapshotRefresh();
         this.scheduleRefsSnapshotRefresh();
@@ -596,7 +596,7 @@ module.exports = class GitRepository {
   }
 
   // Public: Whether the given path is ignored, resolved synchronously from the
-  // Dugite status snapshot's ignored entries. Returns false until the first
+  // Git status snapshot's ignored entries. Returns false until the first
   // snapshot loads.
   //
   // * `filePath` The {String} path to check.
@@ -658,7 +658,7 @@ module.exports = class GitRepository {
     return this.statusEntriesByPath.get(statusPathKey(relativePath)) || null;
   }
 
-  // Public: Refresh the detailed branch and file status snapshot with Dugite.
+  // Public: Refresh the detailed branch and file status snapshot with Git.
   // This is intentionally independent from the synchronous git-utils cache so
   // hot path coloring never waits for a Git subprocess.
   async refreshStatusSnapshot(options = {}) {
@@ -816,7 +816,7 @@ module.exports = class GitRepository {
     }, this.refsSnapshotDebounceMs);
   }
 
-  // Public: Refresh the refs snapshot with Dugite. Reads branches, tags,
+  // Public: Refresh the refs snapshot with Git. Reads branches, tags,
   // remotes, worktrees, and the exact HEAD state in one pass; stale
   // out-of-order responses are discarded and identical raw output does not
   // emit a change event.

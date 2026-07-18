@@ -1,23 +1,25 @@
-const DugiteRunner = require("./dugite-runner");
-const { DugiteOperationError } = DugiteRunner;
+const GitRunner = require("./git-runner");
+const { GitOperationError } = GitRunner;
 
 const LOG_FORMAT = "%H%x00%P%x00%an%x00%ae%x00%aI%x00%cn%x00%ce%x00%cI%x00%s%x00%b";
 
 function isUnbornOrEmptyHistory(stderr) {
-  return /does not have any commits yet|bad default revision|unknown revision/.test(
-    String(stderr),
-  );
+  return /does not have any commits yet|bad default revision|unknown revision/.test(String(stderr));
 }
 
 // Read-side history commands. Every format is machine-stable: NUL-delimited
 // log fields, -z name-status records, and blame porcelain — never
 // human-formatted output.
-module.exports = class DugiteRepositoryHistoryProvider {
+module.exports = class GitRepositoryHistoryProvider {
   constructor({ runner, execute } = {}) {
-    this.runner = runner || new DugiteRunner({ execute });
+    this.runner = runner || new GitRunner({ execute });
   }
 
-  async getLog(workingDirectory, { revision = "HEAD", path = null, limit, skip = 0 }, options = {}) {
+  async getLog(
+    workingDirectory,
+    { revision = "HEAD", path = null, limit, skip = 0 },
+    options = {},
+  ) {
     const args = ["log", "-z", `--format=${LOG_FORMAT}`];
     if (limit != null) args.push(`--max-count=${limit}`);
     if (skip > 0) args.push(`--skip=${skip}`);
@@ -30,7 +32,7 @@ module.exports = class DugiteRepositoryHistoryProvider {
     });
     if (result.exitCode === 0) return result.stdout;
     if (isUnbornOrEmptyHistory(result.stderr)) return "";
-    throw new DugiteOperationError("log", result);
+    throw new GitOperationError("log", result);
   }
 
   getNameStatus(workingDirectory, sha, options = {}) {
@@ -56,7 +58,7 @@ module.exports = class DugiteRepositoryHistoryProvider {
     ) {
       return null;
     }
-    throw new DugiteOperationError("show", result);
+    throw new GitOperationError("show", result);
   }
 
   getBlame(workingDirectory, relativePosixPath, { revision = null } = {}, options = {}) {

@@ -1,4 +1,4 @@
-const DugiteRunner = require("./dugite-runner");
+const GitRunner = require("./git-runner");
 
 const FOR_EACH_REF_FORMAT = [
   "%(refname)",
@@ -16,9 +16,9 @@ const FOR_EACH_REF_FORMAT = [
 // Collects the raw command outputs that repository-refs-snapshot.js parses.
 // Field separators are NUL and records are newline-terminated: refnames can
 // never contain newlines or NUL, so both delimiters are unambiguous.
-module.exports = class DugiteRepositoryRefsProvider {
+module.exports = class GitRepositoryRefsProvider {
   constructor({ runner, execute } = {}) {
-    this.runner = runner || new DugiteRunner({ execute });
+    this.runner = runner || new GitRunner({ execute });
   }
 
   async getRefs(workingDirectory, options = {}) {

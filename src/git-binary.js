@@ -3,11 +3,10 @@ const path = require("path");
 
 const IS_WINDOWS = process.platform === "win32";
 
-// Resolve the git binary Lumine runs, replacing dugite's bundled distribution
-// with the user's system git (like VS Code). An explicit configured path wins
-// (`core.git.path`, à la VS Code's `git.path`); otherwise git is located on
-// PATH. Falls back to the bare command name so spawn surfaces a clear ENOENT
-// when git is genuinely absent.
+// Resolve the git binary Lumine runs: the user's system git, like VS Code. An
+// explicit configured path wins (`core.git.path`, à la VS Code's `git.path`);
+// otherwise git is located on PATH. Falls back to the bare command name so spawn
+// surfaces a clear ENOENT when git is genuinely absent.
 
 function isExecutableFile(candidate) {
   try {

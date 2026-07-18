@@ -1,8 +1,8 @@
-const DugiteRunner = require("./dugite-runner");
+const GitRunner = require("./git-runner");
 
-module.exports = class DugiteRepositoryStatusProvider {
+module.exports = class GitRepositoryStatusProvider {
   constructor({ runner, execute } = {}) {
-    this.runner = runner || new DugiteRunner({ execute });
+    this.runner = runner || new GitRunner({ execute });
   }
 
   getStatus(workingDirectory, options = {}) {

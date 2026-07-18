@@ -332,7 +332,6 @@ let options = {
   asarUnpack: [
     "node_modules/github/bin/*",
     "node_modules/github/lib/*", // Resolves error in console
-    "**/node_modules/dugite/git/**", // Include dugite postInstall output (matching glob used for Atom)
     "**/node_modules/spellchecker/**", // Matching Atom Glob
   ],
 };

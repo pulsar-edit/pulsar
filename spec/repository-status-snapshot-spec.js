@@ -1,4 +1,4 @@
-const DugiteRepositoryStatusProvider = require("../src/dugite-repository-status-provider");
+const GitRepositoryStatusProvider = require("../src/git-repository-status-provider");
 const { EMPTY_STATUS_SNAPSHOT, parseStatusSnapshot } = require("../src/repository-status-snapshot");
 
 describe("Repository status snapshots", () => {
@@ -105,7 +105,7 @@ describe("Repository status snapshots", () => {
     const runner = {
       run: jasmine.createSpy("run").andReturn(Promise.resolve("status")),
     };
-    const provider = new DugiteRepositoryStatusProvider({ runner });
+    const provider = new GitRepositoryStatusProvider({ runner });
 
     await provider.getStatus("C:\\repository");
     await provider.getStatus("C:\\repository", { includeIgnored: true, signal: "signal" });

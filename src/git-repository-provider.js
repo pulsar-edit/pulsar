@@ -198,7 +198,7 @@ class GitRepositoryProvider {
       repo.onDidDestroy(() => delete this.pathToRepository[gitDirPath]);
       this.pathToRepository[gitDirPath] = repo;
       // Do not eagerly refresh here. The render-path status summaries prefer the
-      // Dugite snapshot, which loads lazily on its first subscriber and schedules
+      // Git snapshot, which loads lazily on its first subscriber and schedules
       // its own refresh. Refreshing synchronously at open time would repeat a
       // status pass for every discovered repository at startup.
     }

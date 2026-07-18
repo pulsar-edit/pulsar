@@ -1,4 +1,15 @@
-const { exec, parseError } = require("dugite");
+const { createGitExec } = require("./git-executor");
+const { resolveGitPath } = require("./git-binary");
+
+// Lazily resolve the system git binary (honoring `core.git.path`, passed to the
+// worker as LUMINE_GIT_PATH) and build the shared executor once per process.
+let sharedGitExec = null;
+function defaultGitExec(args, workingDirectory, options) {
+  if (!sharedGitExec) {
+    sharedGitExec = createGitExec(resolveGitPath(process.env.LUMINE_GIT_PATH || ""));
+  }
+  return sharedGitExec(args, workingDirectory, options);
+}
 
 // Bound the number of concurrent `git` child processes across the whole
 // renderer. Opening a project with many repositories otherwise fires a burst of
@@ -44,7 +55,7 @@ class Semaphore {
   }
 }
 
-// Process-wide limiter shared by every DugiteRunner instance.
+// Process-wide limiter shared by every GitRunner instance.
 const sharedGitLimiter = new Semaphore(DEFAULT_MAX_CONCURRENT_GIT);
 
 const COLOR_CONFIG = [
@@ -58,25 +69,24 @@ const COLOR_CONFIG = [
   "color.ui=false",
 ];
 
-class DugiteOperationError extends Error {
+class GitOperationError extends Error {
   constructor(command, result) {
     const stderr = String(result.stderr);
     const stdout = String(result.stdout);
     const detail = stderr.trim() || stdout.trim() || `exit code ${result.exitCode}`;
     super(`Git ${command} failed: ${detail}`);
-    this.name = "DugiteOperationError";
+    this.name = "GitOperationError";
     this.code = "ERR_GIT_COMMAND_FAILED";
     this.command = command;
     this.exitCode = result.exitCode;
     this.stdout = result.stdout;
     this.stderr = result.stderr;
-    this.gitError = parseError(stderr);
   }
 }
 
-class DugiteRunner {
-  constructor({ execute = exec, limiter = sharedGitLimiter, trustAllRepositories = false } = {}) {
-    this.execute = execute;
+class GitRunner {
+  constructor({ execute, limiter = sharedGitLimiter, trustAllRepositories = false } = {}) {
+    this.execute = execute || defaultGitExec;
     this.limiter = limiter;
     // When set, every command runs with `-c safe.directory=*` so Git trusts
     // repositories owned by another user account instead of refusing them with
@@ -118,14 +128,14 @@ class DugiteRunner {
     const result = options.allowPrompt ? await runExec() : await this.limiter.run(runExec);
     const allowedExitCodes = options.allowedExitCodes || [0];
     if (!allowedExitCodes.includes(result.exitCode)) {
-      throw new DugiteOperationError(args[0], result);
+      throw new GitOperationError(args[0], result);
     }
     return result;
   }
 }
 
-module.exports = DugiteRunner;
-module.exports.DugiteOperationError = DugiteOperationError;
+module.exports = GitRunner;
+module.exports.GitOperationError = GitOperationError;
 module.exports.Semaphore = Semaphore;
 module.exports.sharedGitLimiter = sharedGitLimiter;
 module.exports.DEFAULT_MAX_CONCURRENT_GIT = DEFAULT_MAX_CONCURRENT_GIT;

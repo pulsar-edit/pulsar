@@ -1690,14 +1690,14 @@
       "name": "refreshRefsSnapshot",
       "text": null,
       "snippet": "refreshRefsSnapshot(${1:options})",
-      "description": "Refresh the refs snapshot with Dugite. Reads branches, tags,\nremotes, worktrees, and the exact HEAD state in one pass; stale\nout-of-order responses are discarded and identical raw output does not\nemit a change event.",
+      "description": "Refresh the refs snapshot with Git. Reads branches, tags,\nremotes, worktrees, and the exact HEAD state in one pass; stale\nout-of-order responses are discarded and identical raw output does not\nemit a change event.",
       "type": "method"
     },
     {
       "name": "refreshStatusSnapshot",
       "text": null,
       "snippet": "refreshStatusSnapshot(${1:options})",
-      "description": "Refresh the detailed branch and file status snapshot with Dugite.\nThis is intentionally independent from the synchronous git-utils cache so\nhot path coloring never waits for a Git subprocess.",
+      "description": "Refresh the detailed branch and file status snapshot with Git.\nThis is intentionally independent from the synchronous git-utils cache so\nhot path coloring never waits for a Git subprocess.",
       "type": "method"
     },
     {

@@ -1,4 +1,4 @@
-const DugiteRunner = require("./dugite-runner");
+const GitRunner = require("./git-runner");
 
 const NULL_DEVICE = process.platform === "win32" ? "NUL" : "/dev/null";
 
@@ -29,9 +29,9 @@ function unsupportedPair(from, to) {
 }
 
 // Maps endpoint pairs onto git diff invocations and returns the raw patch.
-module.exports = class DugiteRepositoryDiffProvider {
+module.exports = class GitRepositoryDiffProvider {
   constructor({ runner, execute } = {}) {
-    this.runner = runner || new DugiteRunner({ execute });
+    this.runner = runner || new GitRunner({ execute });
   }
 
   getDiffPatch(workingDirectory, request, options = {}) {

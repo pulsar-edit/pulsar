@@ -68,7 +68,6 @@
     "document-register-element": "https://github.com/pulsar-edit/document-register-element.git#4db07dd",
     "diff": "^9.0.0",
     "dompurify": "^3.4.12",
-    "dugite": "3.2.2",
     "encoding-selector": "file:packages/encoding-selector",
     "etch": "0.14.1",
     "event-kit": "2.5.3",
@@ -283,7 +282,7 @@
   "private": true,
   "scripts": {
     "build": "electron-rebuild",
-    "postinstall": "patch-package && node script/ensure-dugite.js",
+    "postinstall": "patch-package",
     "start": "electron --no-sandbox --enable-logging . -f --dev",
     "dist": "node script/electron-builder.js",
     "full": "yarn install && yarn build && yarn dist",

@@ -4,8 +4,8 @@ const path = require("path");
 const temp = require("temp").track();
 
 const { EMPTY_REFS_SNAPSHOT, parseRefsSnapshot } = require("../src/repository-refs-snapshot");
-const DugiteRepositoryRefsProvider = require("../src/dugite-repository-refs-provider");
-const DugiteRepositoryOperationProvider = require("../src/dugite-repository-operation-provider");
+const GitRepositoryRefsProvider = require("../src/git-repository-refs-provider");
+const GitRepositoryOperationProvider = require("../src/git-repository-operation-provider");
 
 function refRecord({
   ref,
@@ -183,7 +183,11 @@ describe("repository refs snapshot", () => {
       const snapshot = parseRefsSnapshot(rawBundle({ remotes }));
 
       expect(snapshot.remotes).toEqual([
-        { name: "origin", fetchUrl: "https://example.com/fetch.git", pushUrl: "https://example.com/push.git" },
+        {
+          name: "origin",
+          fetchUrl: "https://example.com/fetch.git",
+          pushUrl: "https://example.com/push.git",
+        },
         { name: "upstream", fetchUrl: "git@example.com:c.git", pushUrl: "git@example.com:c.git" },
       ]);
     });
@@ -222,9 +226,9 @@ describe("repository refs snapshot", () => {
     });
   });
 
-  describe("DugiteRepositoryRefsProvider", () => {
+  describe("GitRepositoryRefsProvider", () => {
     it("reads refs, remotes, worktrees, and head state from a real repository", async () => {
-      const operationProvider = new DugiteRepositoryOperationProvider();
+      const operationProvider = new GitRepositoryOperationProvider();
       const workingDirectory = temp.mkdirSync("refs-provider-repo");
       const worktreePath = path.join(temp.mkdirSync("refs-provider-worktrees"), "feature");
 
@@ -241,7 +245,7 @@ describe("repository refs snapshot", () => {
       await operations.addRemote("origin", "https://example.com/repo.git");
       await operationProvider.run(["worktree", "add", worktreePath, "feature"], workingDirectory);
 
-      const refsProvider = new DugiteRepositoryRefsProvider();
+      const refsProvider = new GitRepositoryRefsProvider();
       const snapshot = parseRefsSnapshot(await refsProvider.getRefs(workingDirectory));
 
       expect(snapshot.head.name).toBe("main");
@@ -284,11 +288,11 @@ describe("repository refs snapshot", () => {
     });
 
     it("reports an unborn branch in a freshly initialized repository", async () => {
-      const operationProvider = new DugiteRepositoryOperationProvider();
+      const operationProvider = new GitRepositoryOperationProvider();
       const workingDirectory = temp.mkdirSync("refs-provider-unborn");
       await operationProvider.initializeRepository(workingDirectory, { initialBranch: "main" });
 
-      const refsProvider = new DugiteRepositoryRefsProvider();
+      const refsProvider = new GitRepositoryRefsProvider();
       const snapshot = parseRefsSnapshot(await refsProvider.getRefs(workingDirectory));
 
       expect(snapshot.head.unborn).toBe(true);

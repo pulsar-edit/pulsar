@@ -32,7 +32,7 @@ describe("GitRepositoryProvider", () => {
 
       it("does not eagerly refresh status at open time", async () => {
         // The provider no longer forces a status pass when a repository is
-        // discovered; consumers drive refreshes by subscribing to the Dugite
+        // discovered; consumers drive refreshes by subscribing to the Git
         // snapshot. This keeps startup off the per-repo status burst.
         const refreshStatusSnapshot = spyOn(
           GitRepository.prototype,

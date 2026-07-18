@@ -1,13 +1,13 @@
 const fs = require("fs");
 const path = require("path");
-const { resolveGitBinary } = require("dugite");
+const { resolveGitPath } = require("./git-binary");
 
 const GitHost = require("./git-host");
-const DugiteRunner = require("./dugite-runner");
-const { DugiteOperationError } = DugiteRunner;
+const GitRunner = require("./git-runner");
+const { GitOperationError } = GitRunner;
 
 // Send a git command to the git-host worker's `exec` op. The renderer builds the
-// argument vector (in DugiteRepositoryOperations) but the command runs off the
+// argument vector (in GitRepositoryOperations) but the command runs off the
 // renderer thread. `signal` becomes the transport's cancel channel and
 // `processCallback` (streaming progress) cannot cross IPC yet, so both are
 // stripped; everything else is structured-clone-safe.
@@ -35,7 +35,7 @@ function coAuthorTrailer(author) {
   return `Co-authored-by: ${author.name} <${author.email}>`;
 }
 
-class DugiteRepositoryOperations {
+class GitRepositoryOperations {
   constructor(provider, workingDirectory) {
     this.provider = provider;
     this.workingDirectory = workingDirectory;
@@ -307,7 +307,7 @@ class DugiteRepositoryOperations {
   }
 }
 
-module.exports = class DugiteRepositoryOperationProvider {
+module.exports = class GitRepositoryOperationProvider {
   // `exec(args, workingDirectory, options, raw)` runs a git command and resolves
   // to a `{exitCode, stdout, stderr}` result. It defaults to the git-host
   // worker; specs inject a fake to assert on the argument vector.
@@ -328,11 +328,11 @@ module.exports = class DugiteRepositoryOperationProvider {
   }
 
   getGitExecutablePath() {
-    return resolveGitBinary();
+    return resolveGitPath(globalThis.atom?.config?.get("core.git.path") || "");
   }
 
   createRepositoryOperations({ workingDirectory }) {
-    return new DugiteRepositoryOperations(this, workingDirectory);
+    return new GitRepositoryOperations(this, workingDirectory);
   }
 
   async initializeRepository(directoryPath, options = {}) {
@@ -358,5 +358,5 @@ module.exports = class DugiteRepositoryOperationProvider {
   }
 };
 
-module.exports.DugiteOperationError = DugiteOperationError;
-module.exports.DugiteRepositoryOperations = DugiteRepositoryOperations;
+module.exports.GitOperationError = GitOperationError;
+module.exports.GitRepositoryOperations = GitRepositoryOperations;

@@ -1,8 +1,8 @@
-const DugiteRunner = require("../src/dugite-runner");
+const GitRunner = require("../src/git-runner");
 const createGitHostOps = require("../src/git-host-ops");
 
 // Exercises the git-host op registry in-process (no fork) against a fake
-// `execute`, mirroring how dugite-repository-*-provider specs inject execute.
+// `execute`, mirroring how git-repository-*-provider specs inject execute.
 describe("git-host ops", () => {
   let calls;
 
@@ -12,7 +12,7 @@ describe("git-host ops", () => {
       calls.push({ args, cwd, options });
       return Promise.resolve({ exitCode: 0, stdout: "OUT", stderr: "", ...result });
     };
-    return createGitHostOps(new DugiteRunner({ execute }));
+    return createGitHostOps(new GitRunner({ execute }));
   }
 
   it("runs status with porcelain v2 and returns the raw stdout", async () => {
@@ -70,7 +70,7 @@ describe("git-host ops", () => {
         stdout: "",
         stderr: "fatal: path 'x' does not exist in 'HEAD'",
       });
-    const ops = createGitHostOps(new DugiteRunner({ execute }));
+    const ops = createGitHostOps(new GitRunner({ execute }));
     const result = await ops.fileAtRevision(
       { workingDirectory: "/repo", relativePosixPath: "x", revision: "HEAD", options: {} },
       {},
@@ -113,7 +113,7 @@ describe("git-host ops", () => {
 
   it("returns null for an unset config key (git config exit code 1)", async () => {
     const execute = () => Promise.resolve({ exitCode: 1, stdout: "", stderr: "" });
-    const ops = createGitHostOps(new DugiteRunner({ execute }));
+    const ops = createGitHostOps(new GitRunner({ execute }));
     const value = await ops.configGet({ workingDirectory: "/repo", key: "branch.x.remote" }, {});
     expect(value).toBeNull();
   });
@@ -137,9 +137,9 @@ describe("git-host ops", () => {
     expect(calls[0].args).toEqual(["--version"]);
   });
 
-  it("rejects exec with a DugiteOperationError carrying command and stdout", async () => {
+  it("rejects exec with a GitOperationError carrying command and stdout", async () => {
     const execute = () => Promise.resolve({ exitCode: 1, stdout: "partial", stderr: "boom" });
-    const ops = createGitHostOps(new DugiteRunner({ execute }));
+    const ops = createGitHostOps(new GitRunner({ execute }));
 
     let error;
     try {
@@ -147,7 +147,7 @@ describe("git-host ops", () => {
     } catch (caught) {
       error = caught;
     }
-    expect(error.name).toBe("DugiteOperationError");
+    expect(error.name).toBe("GitOperationError");
     expect(error.command).toBe("checkout");
     expect(error.stdout).toBe("partial");
     expect(error.exitCode).toBe(1);

@@ -57,8 +57,6 @@ jobs:
           install || install || install
       - name: Apply patches
         run: npx patch-package
-      - name: Install bundled Git
-        run: node script/ensure-dugite.js
       - name: Download the Electron binary
         run: node ./node_modules/electron/install.js
       - name: Rebuild native modules for Electron
