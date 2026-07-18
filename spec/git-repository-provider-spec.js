@@ -219,40 +219,4 @@ describe("GitRepositoryProvider", () => {
       });
     });
   });
-
-  describe("when GitRepository.open reports a dubious-ownership rejection", () => {
-    const gitDir = { getPath: () => path.join(__dirname, "fixtures", "git", "owned.git") };
-    let dubiousError;
-
-    beforeEach(() => {
-      dubiousError = new Error("repository path is not owned by the current user");
-      dubiousError.code = "DubiousOwnership";
-      spyOn(GitRepository, "open").and.callFake(() => {
-        throw dubiousError;
-      });
-      spyOn(atom.notifications, "addError").and.callThrough();
-    });
-
-    it("returns null instead of throwing, and notifies the user once", () => {
-      expect(provider.repositoryForGitDirectory(gitDir)).toBe(null);
-      expect(provider.repositoryForGitDirectory(gitDir)).toBe(null);
-      expect(atom.notifications.addError.calls.count()).toBe(1);
-      const [message, options] = atom.notifications.addError.calls.mostRecent().args;
-      expect(message).toContain("ownership");
-      expect(options.buttons[0].text).toBe("Silence this session");
-    });
-
-    it("disables ownership validation and re-scans when the bypass button is clicked", () => {
-      const GitUtils = require("@lumine-code/git-utils");
-      spyOn(GitUtils, "setOwnerValidation");
-      spyOn(atom.project.repositoryRegistry, "rescan").and.returnValue(Promise.resolve([]));
-
-      provider.repositoryForGitDirectory(gitDir);
-      const options = atom.notifications.addError.calls.mostRecent().args[1];
-      options.buttons[0].onDidClick();
-
-      expect(GitUtils.setOwnerValidation).toHaveBeenCalledWith(false);
-      expect(atom.project.repositoryRegistry.rescan).toHaveBeenCalled();
-    });
-  });
 });

@@ -1206,13 +1206,6 @@
     "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#742e3e166f56261189ff245a63967b8f1970fadd"
     node-addon-api "^8.9.0"
 
-"@lumine-code/git-utils@https://github.com/lumine-code/git-utils.git#fc23433dca1cbd01a2d489dcf017e9c993e1b42f":
-  version "9.0.0"
-  resolved "https://github.com/lumine-code/git-utils.git#fc23433dca1cbd01a2d489dcf017e9c993e1b42f"
-  dependencies:
-    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#742e3e166f56261189ff245a63967b8f1970fadd"
-    node-addon-api "^8.9.0"
-
 "@lumine-code/jasmine-focused@https://github.com/lumine-code/jasmine-focused.git#4277644b11d1be8fc5ef6625e657256bfb83ccdd":
   version "2.0.0"
   resolved "https://github.com/lumine-code/jasmine-focused.git#4277644b11d1be8fc5ef6625e657256bfb83ccdd"

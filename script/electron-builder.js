@@ -151,7 +151,6 @@ let options = {
     // node_modules of the fuzzy-native package are only required for building it
     "!node_modules/@lumine-code/fuzzy-native/node_modules",
     "!**/node_modules/spellchecker/vendor/hunspell/.*",
-    "!**/git-utils/deps",
     "!**/oniguruma/deps",
     // Modern `less` resolves `require("less")` to dist/less-node.cjs, so only
     // the browser bundles in dist/ are safe to exclude.
