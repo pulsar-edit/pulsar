@@ -370,17 +370,6 @@ class ParcelWatcher extends WorkerProcessWatcher {
   static taskPath = require.resolve("./path-watchers/parcel-watcher-worker.js");
 }
 
-// Private: A file-watcher implementation that uses `nsfw`.
-//
-// This has been the main file-watcher for most of Lumine's existence, but we
-// are moving away from it for a number of reasons. It remains an option,
-// however. It used to run in the renderer process, but we've moved it to a
-// worker to match the other options, and because it makes it more feasible to
-// implement ignored paths.
-class NSFWWatcher extends WorkerProcessWatcher {
-  static taskPath = require.resolve("./path-watchers/nsfw-watcher-worker.js");
-}
-
 // Extended: Manage a subscription to filesystem events that occur beneath a
 // root directory. Construct these by calling `watchPath`. To watch for events
 // within active project directories, use {Project::onDidChangeFiles} instead.
@@ -724,90 +713,37 @@ class PathWatcher {
 }
 
 // Private: Globally tracked state used to de-duplicate related
-// [PathWatchers]{PathWatcher} backed by emulated Lumine events or NSFW.
+// [PathWatchers]{PathWatcher} backed by the `@parcel/watcher` worker.
 class PathWatcherManager {
   // Private: Access the currently active manager instance, creating one if
   // necessary.
   static active() {
     if (!this.activeManager) {
-      this.activeManager = new PathWatcherManager(atom.config.get("core.fileSystemWatcher"));
-      this.sub = atom.config.onDidChange("core.fileSystemWatcher", ({ newValue }) => {
-        this.transitionTo(newValue);
-      });
+      this.activeManager = new PathWatcherManager();
     }
     return this.activeManager;
   }
 
-  // Private: Replace the active {PathWatcherManager} with a new one that
-  // creates [NativeWatchers]{NativeWatcher} based on the value of `setting`.
-  static async transitionTo(setting) {
-    const current = this.active();
-
-    if (this.transitionPromise) {
-      await this.transitionPromise;
-    }
-
-    if (current.setting === setting) {
-      return;
-    }
-    current.isShuttingDown = true;
-
-    let resolveTransitionPromise = () => {};
-    this.transitionPromise = new Promise((resolve) => {
-      resolveTransitionPromise = resolve;
-    });
-
-    const replacement = new PathWatcherManager(setting);
-    this.activeManager = replacement;
-
-    await Promise.all(
-      Array.from(current.live, async ([root, native]) => {
-        const w = await replacement.createWatcher(root, () => {});
-        native.reattachTo(w.native, root, w.native.options || {});
-      }),
-    );
-
-    current.stopAllWatchers();
-
-    resolveTransitionPromise();
-    this.transitionPromise = null;
-  }
-
-  // Private: Initialize global {PathWatcher} state.
-  constructor(setting) {
-    PathWatcherManager.transitionPromise ??= Promise.resolve();
-    this.setting = setting;
+  // Private: Initialize global {PathWatcher} state. All watching is served by
+  // the `@parcel/watcher` worker: recursive trees via `@parcel/watcher` itself
+  // and single files / non-recursive directories via its Node fallback.
+  constructor() {
     this.live = new Map();
-
-    const initLocal = (NativeConstructor) => {
-      this.nativeRegistry = new NativeWatcherRegistry((normalizedPath) => {
-        const nativeWatcher = new NativeConstructor(normalizedPath);
-        this.live.set(normalizedPath, nativeWatcher);
-        const sub = nativeWatcher.onWillStop(() => {
-          this.live.delete(normalizedPath);
-          sub.dispose();
-        });
-
-        return nativeWatcher;
+    this.nativeRegistry = new NativeWatcherRegistry((normalizedPath) => {
+      const nativeWatcher = new ParcelWatcher(normalizedPath);
+      this.live.set(normalizedPath, nativeWatcher);
+      const sub = nativeWatcher.onWillStop(() => {
+        this.live.delete(normalizedPath);
+        sub.dispose();
       });
-    };
 
-    // Look up the proper watcher implementation based on the current value of
-    // the `core.fileSystemWatcher` setting.
-    let WatcherClass = WATCHERS_BY_VALUE[setting] ?? WATCHERS_BY_VALUE["default"];
-    initLocal(WatcherClass);
-
-    this.isShuttingDown = false;
+      return nativeWatcher;
+    });
   }
 
   // Private: Create a {PathWatcher} tied to this global state. See {watchPath}
   // for detailed arguments.
   async createWatcher(rootPath, eventCallback, options) {
-    if (this.isShuttingDown) {
-      await this.constructor.transitionPromise;
-      return PathWatcherManager.active().createWatcher(rootPath, eventCallback, options);
-    }
-
     const w = new PathWatcher(this.nativeRegistry, rootPath, options);
     w.onDidChange(eventCallback);
     await w.getStartPromise();
@@ -895,11 +831,9 @@ watchPath.printWatchers = function printWatchers() {
   return PathWatcherManager.active().print();
 };
 
-// Private: Wait for new watchers to be created after a change to
-// `core.fileSystemWatcher`. This is useful to have in the specs.
-watchPath.waitForTransition = async function waitForTransition() {
-  await PathWatcherManager.transitionPromise;
-};
+// Private: Retained for spec compatibility. Backend switching was removed when
+// `@parcel/watcher` became the only watcher, so there is nothing to wait for.
+watchPath.waitForTransition = async function waitForTransition() {};
 
 // Private: Stop all watchers and reset `PathWatcherManager` to its initial
 // state.
@@ -909,18 +843,6 @@ watchPath.reset = function reset() {
     .then(() => {
       PathWatcherManager.activeManager = null;
     });
-};
-
-// Which implementation to use for each possible value of
-// `core.fileSystemWatcher`.
-//
-// The 'default' value — which is, uh, the default — allows us to switch the
-// default at a later date without affecting users that have opted into a
-// specific watcher.
-const WATCHERS_BY_VALUE = {
-  default: NSFWWatcher,
-  nsfw: NSFWWatcher,
-  parcel: ParcelWatcher,
 };
 
 module.exports = { watchPath, stopAllWatchers };

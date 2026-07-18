@@ -312,28 +312,6 @@ const configSchema = {
         type: "number",
         default: 40,
       },
-      fileSystemWatcher: {
-        order: 17,
-        title: "File System Watcher",
-        description:
-          "Choose the underlying implementation used to watch for filesystem changes. It’s usually best to let Lumine handle this, but if you have issues with filesystem events, you can opt into a specific watcher that may work better for your platform.",
-        type: "string",
-        enum: [
-          {
-            value: "default",
-            description: "Default (let Lumine decide)",
-          },
-          {
-            value: "nsfw",
-            description: "Node Sentinel File Watcher",
-          },
-          {
-            value: "parcel",
-            description: "@parcel/watcher",
-          },
-        ],
-        default: "default",
-      },
       repositoryScanDepth: {
         order: 18,
         title: "Repository Scan Depth",
