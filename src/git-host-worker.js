@@ -7,7 +7,7 @@
 const GitRunner = require("./git-runner");
 const createGitHostOps = require("./git-host-ops");
 
-// core.git.trustAllRepositories is passed in the fork environment; trust unless
+// git.trustAllRepositories is passed in the fork environment; trust unless
 // it was explicitly disabled ("0").
 const runner = new GitRunner({ trustAllRepositories: process.env.LUMINE_GIT_TRUST_ALL !== "0" });
 const ops = createGitHostOps(runner);

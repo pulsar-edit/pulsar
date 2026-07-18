@@ -1,7 +1,7 @@
 const { createGitExec } = require("./git-executor");
 const { resolveGitPath } = require("./git-binary");
 
-// Lazily resolve the system git binary (honoring `core.git.path`, passed to the
+// Lazily resolve the system git binary (honoring `git.path`, passed to the
 // worker as LUMINE_GIT_PATH) and build the shared executor once per process.
 let sharedGitExec = null;
 function defaultGitExec(args, workingDirectory, options) {
@@ -90,7 +90,7 @@ class GitRunner {
     this.limiter = limiter;
     // When set, every command runs with `-c safe.directory=*` so Git trusts
     // repositories owned by another user account instead of refusing them with
-    // its "dubious ownership" check. Controlled by `core.git.trustAllRepositories`.
+    // its "dubious ownership" check. Controlled by `git.trustAllRepositories`.
     this.trustAllRepositories = trustAllRepositories;
   }
 

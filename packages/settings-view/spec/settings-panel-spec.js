@@ -56,17 +56,20 @@ describe("SettingsPanel", () => {
       settingsPanel = new SettingsPanel({ namespace: "foo", includeTitle: false });
     });
 
-    it("sorts settings by order and then alphabetically by the key", () => {
+    it("sorts settings by order, then by schema definition order", () => {
       const settings = atom.config.get("foo");
       expect(_.size(settings)).toBe(7);
       const sortedSettings = settingsPanel.sortSettings("foo", settings);
+      // Explicit `order` wins first, then settings fall back to the order they
+      // are declared in the schema (not alphabetical). `gong` has no schema
+      // entry, so it sinks to the end.
       expect(sortedSettings[0]).toBe("zing");
       expect(sortedSettings[1]).toBe("zang");
       expect(sortedSettings[2]).toBe("bar");
-      expect(sortedSettings[3]).toBe("enum");
-      expect(sortedSettings[4]).toBe("gong");
-      expect(sortedSettings[5]).toBe("haz");
-      expect(sortedSettings[6]).toBe("radio");
+      expect(sortedSettings[3]).toBe("haz");
+      expect(sortedSettings[4]).toBe("enum");
+      expect(sortedSettings[5]).toBe("radio");
+      expect(sortedSettings[6]).toBe("gong");
     });
 
     it("gracefully deals with a null settings object", () => {

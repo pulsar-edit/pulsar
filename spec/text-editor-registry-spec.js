@@ -125,10 +125,10 @@ describe("TextEditorRegistry", function () {
       expect(editor.getEncoding()).toBe("utf8");
       expect(editor2.getEncoding()).toBe("utf8");
 
-      atom.config.set("core.fileEncoding", "utf16le", {
+      atom.config.set("editor.fileEncoding", "utf16le", {
         scopeSelector: ".text.plain.null-grammar",
       });
-      atom.config.set("core.fileEncoding", "utf16be", {
+      atom.config.set("editor.fileEncoding", "utf16be", {
         scopeSelector: ".source.js",
       });
 
@@ -142,13 +142,13 @@ describe("TextEditorRegistry", function () {
         resolveActivatePromise = resolve;
       });
 
-      atom.config.set("core.fileEncoding", "utf16le");
+      atom.config.set("editor.fileEncoding", "utf16le");
 
       registry.maintainConfig(editor);
       await Promise.resolve();
       expect(editor.getEncoding()).toBe("utf8");
 
-      atom.config.set("core.fileEncoding", "utf16be");
+      atom.config.set("editor.fileEncoding", "utf16be");
       await Promise.resolve();
       expect(editor.getEncoding()).toBe("utf8");
 
@@ -163,12 +163,12 @@ describe("TextEditorRegistry", function () {
       registry.maintainConfig(editor);
       await initialPackageActivation;
 
-      atom.config.set("core.fileEncoding", "utf16be", {
+      atom.config.set("editor.fileEncoding", "utf16be", {
         scopeSelector: ".source.js",
       });
       expect(editor.getEncoding()).toBe("utf8");
 
-      atom.config.set("core.fileEncoding", "utf16le", {
+      atom.config.set("editor.fileEncoding", "utf16le", {
         scopeSelector: ".source.js",
       });
       expect(editor.getEncoding()).toBe("utf8");
@@ -177,7 +177,7 @@ describe("TextEditorRegistry", function () {
       await initialPackageActivation;
       expect(editor.getEncoding()).toBe("utf16le");
 
-      atom.config.set("core.fileEncoding", "utf16be", {
+      atom.config.set("editor.fileEncoding", "utf16be", {
         scopeSelector: ".source.js",
       });
       expect(editor.getEncoding()).toBe("utf16be");
@@ -214,10 +214,10 @@ describe("TextEditorRegistry", function () {
       await initialPackageActivation;
 
       expect(editor.getEncoding()).toBe("utf8");
-      atom.config.set("core.fileEncoding", "utf16be", {
+      atom.config.set("editor.fileEncoding", "utf16be", {
         scopeSelector: ".text.plain.null-grammar",
       });
-      atom.config.set("core.fileEncoding", "utf16le", {
+      atom.config.set("editor.fileEncoding", "utf16le", {
         scopeSelector: ".source.js",
       });
       expect(editor.getEncoding()).toBe("utf16be");
@@ -239,14 +239,14 @@ describe("TextEditorRegistry", function () {
       expect(getSubscriptionCount(editor)).toBeGreaterThan(previousSubscriptionCount);
       expect(registry.editorsWithMaintainedConfig.size).toBe(1);
 
-      atom.config.set("core.fileEncoding", "utf16be");
+      atom.config.set("editor.fileEncoding", "utf16be");
       expect(editor.getEncoding()).toBe("utf16be");
-      atom.config.set("core.fileEncoding", "utf8");
+      atom.config.set("editor.fileEncoding", "utf8");
       expect(editor.getEncoding()).toBe("utf8");
 
       disposable.dispose();
 
-      atom.config.set("core.fileEncoding", "utf16be");
+      atom.config.set("editor.fileEncoding", "utf16be");
       expect(editor.getEncoding()).toBe("utf8");
       expect(getSubscriptionCount(editor)).toBe(previousSubscriptionCount);
       expect(retainedEditorCount(registry)).toBe(0);
@@ -256,12 +256,12 @@ describe("TextEditorRegistry", function () {
       editor.update({ encoding: "utf8" });
       expect(editor.getEncoding()).toBe("utf8");
 
-      atom.config.set("core.fileEncoding", "utf16le");
+      atom.config.set("editor.fileEncoding", "utf16le");
       registry.maintainConfig(editor);
       await initialPackageActivation;
       expect(editor.getEncoding()).toBe("utf16le");
 
-      atom.config.set("core.fileEncoding", "utf8");
+      atom.config.set("editor.fileEncoding", "utf8");
       expect(editor.getEncoding()).toBe("utf8");
     });
 

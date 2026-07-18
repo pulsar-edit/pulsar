@@ -95,17 +95,17 @@ class GitHost {
   }
 
   // Whether to trust repositories owned by another user account
-  // (`core.git.trustAllRepositories`, default true). Passed to the worker via
+  // (`git.trustAllRepositories`, default true). Passed to the worker via
   // its fork environment and used directly by the in-process runner.
   trustAllRepositories() {
-    const value = globalThis.atom?.config?.get?.("core.git.trustAllRepositories");
+    const value = globalThis.atom?.config?.get?.("git.trustAllRepositories");
     return value !== false;
   }
 
-  // The configured git binary path (`core.git.path`), passed to the worker so
+  // The configured git binary path (`git.path`), passed to the worker so
   // its runner resolves the same git the renderer would.
   gitPath() {
-    return globalThis.atom?.config?.get?.("core.git.path") || "";
+    return globalThis.atom?.config?.get?.("git.path") || "";
   }
 
   childEnv() {

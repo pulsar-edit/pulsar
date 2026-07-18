@@ -1910,7 +1910,7 @@ describe("TextEditorComponent", () => {
       // registered with atom.textEditors, so their params stay unset.
       const { component } = buildSmoothComponent({ smoothScrolling: undefined });
 
-      atom.config.set("editor.smoothScrolling.enabled", true);
+      atom.config.set("editor.smoothScrolling", true);
       const preventDefault = jasmine.createSpy("preventDefault");
       component.didMouseWheel({ deltaX: 0, deltaY: 20, deltaMode: 0, preventDefault });
       expect(component.scrollAnimator.isAnimating()).toBe(true);
@@ -1918,7 +1918,7 @@ describe("TextEditorComponent", () => {
       driveAnimationToCompletion(component);
       expect(component.getScrollTop()).toBeNear(20 * wheelDeltaParity * 0.25);
 
-      atom.config.set("editor.smoothScrolling.enabled", false);
+      atom.config.set("editor.smoothScrolling", false);
       const scrollTop = component.getScrollTop();
       component.didMouseWheel({ deltaX: 0, deltaY: 20, deltaMode: 0, preventDefault });
       expect(component.scrollAnimator.isAnimating()).toBe(false);

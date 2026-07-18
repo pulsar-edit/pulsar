@@ -421,12 +421,12 @@ class AtomEnvironment {
     );
     if (this.config.get("core.autoHideMenuBar")) this.setAutoHideMenuBar(true);
 
-    // The git-host worker reads core.git.* settings from its fork environment,
+    // The git-host worker reads git.* settings from its fork environment,
     // so restart it when they change; the next Git command lazily re-forks with
     // the new values.
     this.disposables.add(
-      this.config.onDidChange("core.git.trustAllRepositories", () => GitHost.reset()),
-      this.config.onDidChange("core.git.path", () => GitHost.reset()),
+      this.config.onDidChange("git.trustAllRepositories", () => GitHost.reset()),
+      this.config.onDidChange("git.path", () => GitHost.reset()),
     );
   }
 

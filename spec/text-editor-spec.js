@@ -10011,10 +10011,10 @@ describe("TextEditor", () => {
   describe("when the file on disk is changed while we have pending modifications", () => {
     let destination;
     let disposables;
-    let promptOnConflictedFileOutcome;
+    let promptOnSaveConflictedFileOutcome;
     beforeEach(async () => {
       jasmine.useRealClock();
-      atom.config.set("core.promptOnConflictedFile", true);
+      atom.config.set("core.promptOnSaveConflictedFile", true);
       let projectPath = temp.mkdirSync("project-with-file-modification");
       destination = path.resolve(projectPath, "sample.js");
       fs.copyFileSync(path.resolve(__dirname, "fixtures", "sample.js"), destination);
@@ -10025,13 +10025,13 @@ describe("TextEditor", () => {
       buffer = editor.buffer;
       editor.update({ autoIndent: false });
 
-      // Mock `Pane::promptOnConflictedFile` in order to skip the presentation of the
+      // Mock `Pane::promptOnSaveConflictedFile` in order to skip the presentation of the
       // dialog. Instead, we can choose the outcome of the prompt on a per-call
       // basis.
-      promptOnConflictedFileOutcome = Promise.resolve();
-      if (!Pane.prototype.promptOnConflictedFile.calls) {
-        spyOn(Pane.prototype, "promptOnConflictedFile").and.callFake(() => {
-          return promptOnConflictedFileOutcome;
+      promptOnSaveConflictedFileOutcome = Promise.resolve();
+      if (!Pane.prototype.promptOnSaveConflictedFile.calls) {
+        spyOn(Pane.prototype, "promptOnSaveConflictedFile").and.callFake(() => {
+          return promptOnSaveConflictedFileOutcome;
         });
       }
 
@@ -10087,7 +10087,7 @@ describe("TextEditor", () => {
 
       // User should be shown the dialog…
       await conditionPromise(() => {
-        return Pane.prototype.promptOnConflictedFile.calls.count() > 0;
+        return Pane.prototype.promptOnSaveConflictedFile.calls.count() > 0;
       });
 
       await conditionPromise(() => !editor.isModified());
@@ -10112,13 +10112,13 @@ describe("TextEditor", () => {
       let contentsOnDisk = fs.readFileSync(destination, "utf8").toString();
       expect(editor.isInConflict()).toBe(true);
 
-      promptOnConflictedFileOutcome = Promise.reject({ path: destination });
+      promptOnSaveConflictedFileOutcome = Promise.reject({ path: destination });
       let uncommittedContents = editor.getText();
 
       let activePane = atom.workspace.getActivePane();
       activePane.saveItem(editor);
       await conditionPromise(() => {
-        return Pane.prototype.promptOnConflictedFile.calls.count() > 0;
+        return Pane.prototype.promptOnSaveConflictedFile.calls.count() > 0;
       });
 
       expect(fs.readFileSync(destination, "utf8").toString()).toBe(contentsOnDisk);
@@ -10130,14 +10130,14 @@ describe("TextEditor", () => {
       expect(editor.isInConflict()).toBe(true);
     });
 
-    describe("but core.promptOnConflictedFile is false", () => {
+    describe("but core.promptOnSaveConflictedFile is false", () => {
       beforeEach(() => {
-        atom.config.set("core.promptOnConflictedFile", false);
+        atom.config.set("core.promptOnSaveConflictedFile", false);
       });
 
       it("is considered to be in a conflicted state, but will not prompt the user", async () => {
         expect(editor.isInConflict()).toBe(true);
-        expect(atom.config.get("core.promptOnConflictedFile")).toBe(false);
+        expect(atom.config.get("core.promptOnSaveConflictedFile")).toBe(false);
 
         let uncommittedContents = editor.getText();
 
@@ -10149,7 +10149,7 @@ describe("TextEditor", () => {
         await conditionPromise(() => !editor.isModified());
 
         // User should not have been shown the dialog…
-        expect(Pane.prototype.promptOnConflictedFile).not.toHaveBeenCalled();
+        expect(Pane.prototype.promptOnSaveConflictedFile).not.toHaveBeenCalled();
 
         // …yet whatever was in the buffer when we chose to overwrite should
         // match what's now present on disk.

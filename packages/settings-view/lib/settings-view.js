@@ -9,6 +9,7 @@ import { CompositeDisposable, Disposable } from "atom";
 import GeneralPanel from "./general-panel";
 import EditorPanel from "./editor-panel";
 import LanguagesPanel from "./languages-panel";
+import GitSettingsPanel from "./git-settings-panel";
 import PackageDetailView from "./package-detail-view";
 import KeybindingsPanel from "./keybindings-panel";
 import InstallPanel from "./install-panel";
@@ -157,6 +158,7 @@ export default class SettingsView {
     this.addCorePanel("Core", "settings", () => new GeneralPanel());
     this.addCorePanel("Editor", "code", () => new EditorPanel());
     this.addCorePanel("Languages", "globe", () => new LanguagesPanel());
+    this.addCorePanel("Git", "git-branch", () => new GitSettingsPanel());
     if (atom.config.getSchema("core.uriHandlerRegistration").type !== "any") {
       // "feature flag" based on core support for URI handling
       this.addCorePanel("URI Handling", "link", () => new UriHandlerPanel());
@@ -386,6 +388,9 @@ export default class SettingsView {
     } else if (namespace === "language") {
       panelName = "Languages";
       options.uri = "atom://config/languages";
+    } else if (namespace === "git") {
+      panelName = "Git";
+      options.uri = "atom://config/git";
     } else {
       panelName = namespace;
       options = {

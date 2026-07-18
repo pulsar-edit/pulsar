@@ -2567,7 +2567,7 @@ module.exports = class Workspace extends Model {
         if (repository) await repository.checkoutHeadForEditor(editor);
       };
 
-      if (this.config.get("editor.confirmCheckoutHeadRevision")) {
+      if (this.config.get("git.confirmCheckoutHeadRevision")) {
         this.applicationDelegate.confirm(
           {
             message: "Confirm Checkout HEAD Revision",

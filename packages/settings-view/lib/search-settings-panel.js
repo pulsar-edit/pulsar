@@ -6,7 +6,7 @@ import etch from "etch";
 import CollapsibleSectionPanel from "./collapsible-section-panel";
 import SearchSettingView from "./search-setting-view";
 
-const CORE_NAMESPACES = new Set(["core", "editor", "language"]);
+const CORE_NAMESPACES = new Set(["core", "editor", "language", "git"]);
 const MAX_RESULTS = 100;
 
 export default class SearchSettingsPanel extends CollapsibleSectionPanel {

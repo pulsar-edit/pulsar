@@ -4,7 +4,7 @@ const TextEditor = require("./text-editor");
 const ScopeDescriptor = require("./scope-descriptor");
 
 const EDITOR_PARAMS_BY_SETTING_KEY = [
-  ["core.fileEncoding", "encoding"],
+  ["editor.fileEncoding", "encoding"],
   ["language.atomicSoftTabs", "atomicSoftTabs"],
   ["language.showInvisibles", "showInvisibles"],
   ["language.tabLength", "tabLength"],
@@ -22,9 +22,9 @@ const EDITOR_PARAMS_BY_SETTING_KEY = [
   ["editor.scrollPastEnd", "scrollPastEnd"],
   ["editor.undoGroupingInterval", "undoGroupingInterval"],
   ["editor.scrollSensitivity", "scrollSensitivity"],
-  ["editor.smoothScrolling.enabled", "smoothScrolling"],
-  ["editor.smoothScrolling.wheelSmoothness", "wheelSmoothness"],
-  ["editor.smoothScrolling.commandSmoothness", "commandSmoothness"],
+  ["editor.smoothScrolling", "smoothScrolling"],
+  ["editor.wheelSmoothness", "wheelSmoothness"],
+  ["editor.commandSmoothness", "commandSmoothness"],
   ["editor.altWheelMultiplier", "altWheelMultiplier"],
   ["editor.scrollCommandDistance", "scrollCommandDistance"],
 ];

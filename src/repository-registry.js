@@ -72,8 +72,8 @@ module.exports = class RepositoryRegistry {
 
     if (this.config?.onDidChange) {
       this.subscriptions.add(
-        this.config.onDidChange("core.repositoryScanDepth", () => this.rescan()),
-        this.config.onDidChange("core.repositoryExcludedDirectories", () => this.rescan()),
+        this.config.onDidChange("git.scanDepth", () => this.rescan()),
+        this.config.onDidChange("git.excludedDirectories", () => this.rescan()),
       );
     }
 
@@ -1094,7 +1094,7 @@ module.exports = class RepositoryRegistry {
   }
 
   async scanProjectRoots({ generation = this.scanGeneration, depth } = {}) {
-    const scanDepth = depth ?? this.config?.get("core.repositoryScanDepth") ?? 1;
+    const scanDepth = depth ?? this.config?.get("git.scanDepth") ?? 1;
     if (scanDepth < 1) return [];
 
     const discovered = [];
@@ -1157,19 +1157,19 @@ module.exports = class RepositoryRegistry {
 
   getExcludedDirectoryNames() {
     const excluded = new Set(DEFAULT_EXCLUDED_DIRECTORIES);
-    const configured = this.config?.get("core.repositoryExcludedDirectories") || [];
+    const configured = this.config?.get("git.excludedDirectories") || [];
     for (const name of configured) excluded.add(name);
     return excluded;
   }
 
   automaticRepositoryLimitReached() {
-    const maximum = this.config?.get("core.repositoryMaxCount") ?? 100;
+    const maximum = this.config?.get("git.maxCount") ?? 100;
     if (this.entriesById.size < maximum) return false;
 
     if (!this.didNotifyRepositoryLimit) {
       this.didNotifyRepositoryLimit = true;
       this.notificationManager?.addInfo("Repository discovery limit reached", {
-        detail: `Lumine stopped automatic discovery after finding ${maximum} repositories. You can raise core.repositoryMaxCount or add another repository manually.`,
+        detail: `Lumine stopped automatic discovery after finding ${maximum} repositories. You can raise git.maxCount or add another repository manually.`,
         dismissable: true,
       });
     }
@@ -1177,9 +1177,9 @@ module.exports = class RepositoryRegistry {
   }
 
   handleProjectFileChanges(events) {
-    if (!this.config?.get("core.repositoryWatchDiscovery")) return;
+    if (!this.config?.get("git.watchDiscovery")) return;
 
-    const watchDepth = this.config.get("core.repositoryWatchDepth") ?? 1;
+    const watchDepth = this.config.get("git.watchDepth") ?? 1;
     for (const event of events) {
       for (const candidatePath of [event.path, event.oldPath]) {
         if (!candidatePath || path.basename(candidatePath) !== ".git") continue;

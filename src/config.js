@@ -13,111 +13,6 @@ const ScopeDescriptor = require("./scope-descriptor");
 
 const schemaEnforcers = {};
 
-// Settings that moved into the `language` namespace, keyed by the namespace
-// they used to live in.
-const LEGACY_LANGUAGE_KEYS_BY_NAMESPACE = {
-  editor: [
-    "atomicSoftTabs",
-    "autoIndent",
-    "autoIndentOnPaste",
-    "commentDelimiters",
-    "commentEnd",
-    "commentStart",
-    "decreaseIndentPattern",
-    "decreaseNextIndentPattern",
-    "foldEndPattern",
-    "increaseIndentPattern",
-    "largeFileThreshold",
-    "nonWordCharacters",
-    "preferredLineLength",
-    "showIndentGuide",
-    "showInvisibles",
-    "softTabs",
-    "softWrap",
-    "softWrapAtPreferredLineLength",
-    "softWrapHangingIndent",
-    "tabLength",
-    "tabType",
-  ],
-  core: ["useTreeSitterParsers"],
-};
-
-// Rewrites one config-file section (global or scoped) so that legacy entries
-// of moved settings load as `language.*`. Returns a new object when a
-// migration happened; the input is never mutated.
-function migrateLegacyLanguageSettings(settings) {
-  if (settings == null || typeof settings !== "object") return settings;
-
-  let result = settings;
-  for (const namespace in LEGACY_LANGUAGE_KEYS_BY_NAMESPACE) {
-    const namespaceSettings = result[namespace];
-    if (namespaceSettings == null || typeof namespaceSettings !== "object") continue;
-    const movedKeys = LEGACY_LANGUAGE_KEYS_BY_NAMESPACE[namespace].filter(
-      (key) => namespaceSettings[key] !== undefined,
-    );
-    if (movedKeys.length === 0) continue;
-
-    const remaining = Object.assign({}, namespaceSettings);
-    const language = Object.assign({}, result.language);
-    for (const key of movedKeys) {
-      if (language[key] === undefined) language[key] = remaining[key];
-      delete remaining[key];
-    }
-
-    result = Object.assign({}, result, { language });
-    if (Object.keys(remaining).length > 0) {
-      result[namespace] = remaining;
-    } else {
-      delete result[namespace];
-    }
-  }
-  return result;
-}
-
-// Theme settings used to live under `core.*`; they now live under a dedicated
-// `theme.*` namespace with shorter key names. Maps the legacy `core` key to
-// its new `theme` key. The old `core.themes` (the active-pair mirror) is
-// obsolete — the active pair is now derived from the mode and the light/dark
-// pairs — so it is dropped rather than migrated.
-const LEGACY_THEME_KEY_MAP = {
-  themeMode: "mode",
-  themesLight: "light",
-  themesDark: "dark",
-};
-const OBSOLETE_LEGACY_THEME_KEYS = ["themes"];
-
-// Rewrites one config-file section so legacy `core.*` theme entries load under
-// the new `theme.*` scope. Returns a new object when a migration happened; the
-// input is never mutated.
-function migrateLegacyThemeSettings(settings) {
-  if (settings == null || typeof settings !== "object") return settings;
-  const core = settings.core;
-  if (core == null || typeof core !== "object") return settings;
-
-  const movedKeys = Object.keys(LEGACY_THEME_KEY_MAP).filter((key) => core[key] !== undefined);
-  const obsoleteKeys = OBSOLETE_LEGACY_THEME_KEYS.filter((key) => core[key] !== undefined);
-  if (movedKeys.length === 0 && obsoleteKeys.length === 0) return settings;
-
-  const remainingCore = Object.assign({}, core);
-  const theme = Object.assign({}, settings.theme);
-  for (const key of movedKeys) {
-    const newKey = LEGACY_THEME_KEY_MAP[key];
-    if (theme[newKey] === undefined) theme[newKey] = remainingCore[key];
-    delete remainingCore[key];
-  }
-  for (const key of obsoleteKeys) {
-    delete remainingCore[key];
-  }
-
-  const result = Object.assign({}, settings, { theme });
-  if (Object.keys(remainingCore).length > 0) {
-    result.core = remainingCore;
-  } else {
-    delete result.core;
-  }
-  return result;
-}
-
 // Essential: Used to access all of Lumine's configuration details.
 //
 // An instance of this class is always available as the `atom.config` global.
@@ -1101,13 +996,8 @@ class Config {
       const scopedSettings = newSettings;
       newSettings = newSettings["*"];
       delete scopedSettings["*"];
-      for (const selector in scopedSettings) {
-        scopedSettings[selector] = migrateLegacyLanguageSettings(scopedSettings[selector]);
-      }
       this.resetScopedSettings(scopedSettings, { source });
     }
-    newSettings = migrateLegacyLanguageSettings(newSettings);
-    newSettings = migrateLegacyThemeSettings(newSettings);
 
     return this.transact(() => {
       this._clearUnscopedSettingsForSource(source);

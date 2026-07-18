@@ -5159,7 +5159,7 @@ module.exports = class TextEditor {
   // Returns a {Boolean}.
   getSmoothScrolling() {
     if (this.smoothScrolling != null) return this.smoothScrolling;
-    return atom.config.get("editor.smoothScrolling.enabled");
+    return atom.config.get("editor.smoothScrolling");
   }
 
   // Experimental: How gradually does the editor glide toward the target
@@ -5168,7 +5168,7 @@ module.exports = class TextEditor {
   // Returns a positive {Number}.
   getWheelSmoothness() {
     if (this.wheelSmoothness != null) return this.wheelSmoothness;
-    return atom.config.get("editor.smoothScrolling.wheelSmoothness");
+    return atom.config.get("editor.wheelSmoothness");
   }
 
   // Experimental: How gradually does the editor glide when scrolling via the
@@ -5177,7 +5177,7 @@ module.exports = class TextEditor {
   // Returns a positive {Number}.
   getCommandSmoothness() {
     if (this.commandSmoothness != null) return this.commandSmoothness;
-    return atom.config.get("editor.smoothScrolling.commandSmoothness");
+    return atom.config.get("editor.commandSmoothness");
   }
 
   // Experimental: Speed multiplier applied to wheel scrolling while holding

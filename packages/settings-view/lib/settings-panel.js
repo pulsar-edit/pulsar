@@ -405,12 +405,21 @@ let isEditableArray = function (array) {
 };
 
 function sortSettings(namespace, settings) {
+  // Settings render in the order they are declared in the schema. An explicit
+  // `order` field, when present, still takes precedence (community packages rely
+  // on it); settings without one fall back to their schema definition order
+  // rather than being alphabetized.
+  const parent = atom.config.getSchema(namespace);
+  const definitionOrder = parent && parent.properties ? Object.keys(parent.properties) : [];
   return _.chain(settings)
     .keys()
-    .sortBy((name) => name)
+    .sortBy((name) => {
+      const index = definitionOrder.indexOf(name);
+      return index === -1 ? definitionOrder.length : index;
+    })
     .sortBy((name) => {
       const schema = atom.config.getSchema(`${namespace}.${name}`);
-      return schema ? schema.order : null;
+      return schema && schema.order != null ? schema.order : Infinity;
     })
     .value();
 }

@@ -1045,8 +1045,8 @@ describe("RepositoryRegistry", () => {
     registry = new RepositoryRegistry({
       project,
       config: config({
-        "core.repositoryWatchDiscovery": true,
-        "core.repositoryWatchDepth": 1,
+        "git.watchDiscovery": true,
+        "git.watchDepth": 1,
       }),
     });
     const rootPath = temp.mkdirSync("watched-root");

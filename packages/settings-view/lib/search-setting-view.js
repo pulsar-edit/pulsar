@@ -65,6 +65,8 @@ export default class SearchSettingView {
         return "Editor";
       case "language":
         return "Languages";
+      case "git":
+        return "Git";
       default:
         return _.undasherize(_.uncamelcase(namespace));
     }
@@ -80,6 +82,7 @@ export default class SearchSettingView {
     if (namespace === "core") return "atom://config/core";
     if (namespace === "editor") return "atom://config/editor";
     if (namespace === "language") return "atom://config/languages";
+    if (namespace === "git") return "atom://config/git";
     return `atom://config/packages/${namespace}`;
   }
 
@@ -111,6 +114,8 @@ export default class SearchSettingView {
         return "icon icon-code search-result-icon";
       case "language":
         return "icon icon-globe search-result-icon";
+      case "git":
+        return "icon icon-git-branch search-result-icon";
       default:
         return "icon icon-package search-result-icon";
     }

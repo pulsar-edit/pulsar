@@ -328,7 +328,7 @@ module.exports = class GitRepositoryOperationProvider {
   }
 
   getGitExecutablePath() {
-    return resolveGitPath(globalThis.atom?.config?.get("core.git.path") || "");
+    return resolveGitPath(globalThis.atom?.config?.get("git.path") || "");
   }
 
   createRepositoryOperations({ workingDirectory }) {

@@ -3416,7 +3416,7 @@ describe("Workspace", () => {
     let editor = null;
     beforeEach(async () => {
       jasmine.useRealClock();
-      atom.config.set("editor.confirmCheckoutHeadRevision", false);
+      atom.config.set("git.confirmCheckoutHeadRevision", false);
 
       editor = await atom.workspace.open("sample-with-comments.js");
     });

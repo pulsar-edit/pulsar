@@ -114,9 +114,9 @@ describe("AtomApplication", function () {
           });
         });
 
-        describe('with core.restorePreviousWindowsOnStart set to "no"', function () {
+        describe('with core.restorePreviousState set to "no"', function () {
           beforeEach(function () {
-            app.config.set("core.restorePreviousWindowsOnStart", "no");
+            app.config.set("core.restorePreviousState", "no");
           });
 
           it("doesn't restore windows when launched with no arguments", async function () {
@@ -135,9 +135,9 @@ describe("AtomApplication", function () {
           });
         });
 
-        describe('with core.restorePreviousWindowsOnStart set to "yes"', function () {
+        describe('with core.restorePreviousState set to "yes"', function () {
           beforeEach(function () {
-            app.config.set("core.restorePreviousWindowsOnStart", "yes");
+            app.config.set("core.restorePreviousState", "yes");
           });
 
           it("restores windows when launched with no arguments", async function () {
@@ -156,9 +156,9 @@ describe("AtomApplication", function () {
           });
         });
 
-        describe('with core.restorePreviousWindowsOnStart set to "always"', function () {
+        describe('with core.restorePreviousState set to "always"', function () {
           beforeEach(function () {
-            app.config.set("core.restorePreviousWindowsOnStart", "always");
+            app.config.set("core.restorePreviousState", "always");
           });
 
           it("restores windows when launched with no arguments", async function () {
@@ -204,7 +204,7 @@ describe("AtomApplication", function () {
               },
             ],
           });
-          app.config.set("core.restorePreviousWindowsOnStart", "always");
+          app.config.set("core.restorePreviousState", "always");
 
           await scenario.launch({ app });
           await scenario.assert("[a _] [b,c _]");
@@ -218,7 +218,7 @@ describe("AtomApplication", function () {
               },
             ],
           });
-          app.config.set("core.restorePreviousWindowsOnStart", "always");
+          app.config.set("core.restorePreviousState", "always");
 
           await scenario.launch({ app });
           await scenario.assert("[b _]");
