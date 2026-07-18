@@ -2346,6 +2346,10 @@ class TextBuffer {
     }
     this.fileSubscriptions = new CompositeDisposable()
 
+    // Reset each time we resubscribe; the default-data-source branch below
+    // replaces this with the new watcher's arm promise.
+    this.fileWatchStartPromise = Promise.resolve()
+
     const onDidChange = debounce(async () => {
       // On Linux we get change events when the file is deleted. This yields
       // consistent behavior with Mac/Windows.
@@ -2428,15 +2432,23 @@ class TextBuffer {
           }
         }
       })
-      // The worker arms the watcher asynchronously. Reconcile once it is live
-      // so a change that landed during the arm gap is not missed.
-      watcherPromise.then(async () => {
+      // Expose when the watcher is armed so callers (and tests) can wait for it
+      // before relying on external-change detection.
+      this.fileWatchStartPromise = watcherPromise.then(() => {}, () => {})
+
+      // The worker arms the watcher asynchronously. Once it is live, reconcile
+      // the one unambiguous change that could have landed during the arm gap: a
+      // deletion. We deliberately do *not* reconcile content here — comparing
+      // the base text to disk races buffer load/deserialization (which may not
+      // have applied its unsaved state yet), and any real modification is caught
+      // by the live watcher once armed.
+      watcherPromise.then(() => {
         if (disposed || this.destroyed) return
         if (this.outstandingSaveCount > 0) return
-        if (!this.file || !this.file.existsSync()) return
-        const source = this.file.getPath()
-        if (!(await this.buffer.baseTextMatchesFile(source, this.getEncoding()))) {
-          if (!disposed) onDidChange()
+        // Only report a vanished file if it was previously present, so a buffer
+        // for a not-yet-created path doesn't spuriously report a deletion.
+        if (this.file && !this.file.existsSync() && this.didHaveFileOnDisk) {
+          onDidDelete()
         }
       }, () => {})
       this.fileSubscriptions.add(new Disposable(() => {
@@ -2449,6 +2461,15 @@ class TextBuffer {
       this.oldFileSubscriptions.dispose()
       this.oldFileSubscriptions = null
     }
+  }
+
+  // Experimental: Return a {Promise} that resolves once this buffer's file
+  // watcher has been armed and is delivering external-change events. Watching is
+  // served asynchronously by the file-watcher worker; this lets callers wait for
+  // it before relying on external-change detection. Resolves immediately when the
+  // buffer has no path or a custom data source that watches synchronously.
+  getFileWatchStartPromise () {
+    return this.fileWatchStartPromise || Promise.resolve()
   }
 
   createMarkerSnapshot (selectionsMarkerLayer) {
