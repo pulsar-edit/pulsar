@@ -130,17 +130,10 @@
       "type": "boolean",
       "default": true
     },
-    "useRipgrep": {
-      "order": 9,
-      "title": "Use ripgrep",
-      "description": "Use the experimental `ripgrep` search crawler. This will make searches substantially faster on large projects.",
-      "type": "boolean",
-      "default": true
-    },
     "enablePCRE2": {
-      "order": 10,
+      "order": 9,
       "title": "Enable PCRE2 regex engine",
-      "description": "Enable PCRE2 regex engine (applies only to `ripgrep` search). This will enable additional regex features such as lookbehind, but may make searches slower.",
+      "description": "Enable the PCRE2 regex engine. This enables additional regex features such as lookbehind, but may make searches slower.",
       "type": "boolean",
       "default": false
     },

@@ -219,7 +219,6 @@ module.exports = class ResultsModel {
     const leadingContextLineCount = atom.config.get("search-panel.searchContextLineCountBefore");
     const trailingContextLineCount = atom.config.get("search-panel.searchContextLineCountAfter");
 
-    const useRipgrep = atom.config.get("search-panel.useRipgrep");
     const enablePCRE2 = atom.config.get("search-panel.enablePCRE2");
 
     this.inProgressSearchPromise = atom.workspace.scan(
@@ -228,7 +227,6 @@ module.exports = class ResultsModel {
         paths: searchPaths,
         onPathsSearched,
         leadingContextLineCount,
-        ripgrep: useRipgrep,
         PCRE2: enablePCRE2,
         trailingContextLineCount,
       },

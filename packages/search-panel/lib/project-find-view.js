@@ -102,13 +102,6 @@ module.exports = class ProjectFindView {
               }),
             ),
             $.button(
-              { ref: "ripgrepOptionButton", className: "btn option-ripgrep" },
-              $.svg({
-                className: "icon",
-                innerHTML: `<use xlink:href="#search-panel-icon-ripgrep" />`,
-              }),
-            ),
-            $.button(
               { ref: "pcre2OptionButton", className: "btn option-pcre2" },
               $.svg({
                 className: "icon",
@@ -257,10 +250,6 @@ module.exports = class ProjectFindView {
         keyBindingTarget: this.findEditor.element,
       }),
 
-      atom.tooltips.add(this.refs.ripgrepOptionButton, {
-        title: "Use Ripgrep",
-      }),
-
       atom.tooltips.add(this.refs.pcre2OptionButton, {
         title: "Use PCRE2 Regex Engine",
       }),
@@ -359,7 +348,6 @@ module.exports = class ProjectFindView {
     this.refs.regexOptionButton.addEventListener("click", () => this.toggleRegexOption());
     this.refs.caseOptionButton.addEventListener("click", () => this.toggleCaseOption());
     this.refs.wholeWordOptionButton.addEventListener("click", () => this.toggleWholeWordOption());
-    this.refs.ripgrepOptionButton.addEventListener("click", () => this.toggleRipgrepOption());
     this.refs.pcre2OptionButton.addEventListener("click", () => this.togglePCRE2Option());
     this.refs.replaceAllButton.addEventListener("click", () => this.replaceAll());
     this.refs.findAllButton.addEventListener("click", () => this.search());
@@ -693,10 +681,6 @@ module.exports = class ProjectFindView {
 
   updateEngineOptionButtons() {
     this.setOptionButtonState(
-      this.refs.ripgrepOptionButton,
-      atom.config.get("search-panel.useRipgrep"),
-    );
-    this.setOptionButtonState(
       this.refs.pcre2OptionButton,
       atom.config.get("search-panel.enablePCRE2"),
     );
@@ -729,12 +713,6 @@ module.exports = class ProjectFindView {
       onlyRunIfActive: true,
       wholeWord: !this.model.getFindOptions().wholeWord,
     });
-  }
-
-  toggleRipgrepOption() {
-    const newValue = !atom.config.get("search-panel.useRipgrep");
-    atom.config.set("search-panel.useRipgrep", newValue);
-    this.updateEngineOptionButtons();
   }
 
   togglePCRE2Option() {

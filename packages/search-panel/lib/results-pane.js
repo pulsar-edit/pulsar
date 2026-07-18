@@ -351,15 +351,7 @@ module.exports = class ResultsPaneView {
   getSearchProgressText() {
     const fileCount = this.model.getPathCount();
     const matchCount = this.model.getMatchCount();
-    const useRipgrep = atom.config.get("search-panel.useRipgrep");
-
-    if (useRipgrep) {
-      // Ripgrep: "X files with Y matches"
-      return `${fileCount} files with ${matchCount} matches`;
-    } else {
-      // Scandal: "X files with Y matches of Z files"
-      return `${fileCount} files with ${matchCount} matches of ${this.numberOfPathsSearched} files`;
-    }
+    return `${fileCount} files with ${matchCount} matches`;
   }
 
   onFinishedSearching(results) {

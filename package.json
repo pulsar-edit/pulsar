@@ -35,7 +35,6 @@
     "@lumine-code/babel-preset": "https://github.com/lumine-code/babel-preset.git#a80d58111ba850aa4e9b6f6426815f50f3e066b8",
     "@lumine-code/fuzzy-native": "https://github.com/lumine-code/fuzzy-native.git#7284186486868a94675c39ba387ee42f92b94910",
     "@lumine-code/pathwatcher": "https://github.com/lumine-code/node-pathwatcher.git#ffe5b7b29242c9031e11a0df85f7c0d79f6cc990",
-    "@lumine-code/scandal": "https://github.com/lumine-code/scandal.git#cf36060ed1dcb231023ea6caea86a266a6f3fdb6",
     "@lumine-code/scoped-property-store": "https://github.com/lumine-code/scoped-property-store.git#e8921f85773c625dd95d6711969bfa8d1d42369f",
     "@lumine-code/second-mate": "https://github.com/lumine-code/second-mate.git#ec4b75d6daa8d09b922a7f3519b680100c6fc3b6",
     "@lumine-code/service-hub": "https://github.com/lumine-code/service-hub.git#5422895489f0ba2379cdbd0fc6c9ca87d446cd9b",

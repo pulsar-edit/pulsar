@@ -5,7 +5,6 @@ const fs = require("@lumine-code/fs-plus");
 const { Minimatch } = require("minimatch");
 const { Directory } = require("@lumine-code/pathwatcher");
 const Grim = require("grim");
-const DefaultDirectorySearcher = require("./default-directory-searcher");
 const RipgrepDirectorySearcher = require("./ripgrep-directory-searcher");
 const Dock = require("./dock");
 const Model = require("./model");
@@ -347,7 +346,6 @@ module.exports = class Workspace extends Model {
     this.destroyedItemURIs = [];
     this.stoppedChangingActivePaneItemTimeout = null;
 
-    this.scandalDirectorySearcher = new DefaultDirectorySearcher();
     this.ripgrepDirectorySearcher = new RipgrepDirectorySearcher();
     this.consumeServices(this.packageManager);
 
@@ -2249,9 +2247,9 @@ module.exports = class Workspace extends Model {
         continue;
       }
 
-      let searcher = options.ripgrep
-        ? this.ripgrepDirectorySearcher
-        : this.scandalDirectorySearcher;
+      // ripgrep is the built-in searcher; a package-provided directory searcher
+      // (atom.directory-searcher) still takes precedence when it claims the dir.
+      let searcher = this.ripgrepDirectorySearcher;
       for (const directorySearcher of this.directorySearchers) {
         if (directorySearcher.canSearchDirectory(directory)) {
           searcher = directorySearcher;

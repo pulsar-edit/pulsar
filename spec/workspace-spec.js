@@ -1968,8 +1968,10 @@ describe("Workspace", () => {
     });
   });
 
-  for (const ripgrep of [true, false]) {
-    describe(`::scan(regex, options, callback) { ripgrep: ${ripgrep} }`, () => {
+  // ripgrep is the only built-in searcher; the loop is retained so the
+  // ripgrep-specific branch below stays scoped to `ripgrep === true`.
+  for (const ripgrep of [true]) {
+    describe(`::scan(regex, options, callback)`, () => {
       function scan(regex, options, iterator) {
         return atom.workspace.scan(regex, { ...options, ripgrep }, iterator);
       }
@@ -2748,7 +2750,7 @@ describe("Workspace", () => {
               });
             });
 
-            it("can override the DefaultDirectorySearcher on a per-directory basis", async () => {
+            it("can override the built-in directory searcher on a per-directory basis", async () => {
               const foreignFilePath = "ssh://foreign-directory:8080/hello.txt";
               const numPathsSearchedInDir2 = 1;
               const numPathsToPretendToSearchInCustomDirectorySearcher = 10;

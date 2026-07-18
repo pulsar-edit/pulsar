@@ -208,14 +208,6 @@ module.exports = class FindView {
             <rect opacity="0.6" x="2" y="3" width="16" height="2"></rect>
           </symbol>
 
-          <symbol id="search-panel-icon-ripgrep" viewBox="0 0 20 16" stroke="none" fill-rule="evenodd">
-            <circle cx="7" cy="6" r="4" fill="none" stroke="currentColor" stroke-width="2"></circle>
-            <rect x="10" y="9" width="6" height="2" rx="1" transform="rotate(45 13 10)"></rect>
-            <rect x="14" y="4" width="4" height="1.5" rx="0.5"></rect>
-            <rect x="14" y="7" width="3" height="1.5" rx="0.5"></rect>
-            <rect x="14" y="10" width="2" height="1.5" rx="0.5"></rect>
-          </symbol>
-
           <symbol id="search-panel-icon-pcre2" viewBox="0 0 20 16" stroke="none" fill-rule="evenodd">
             <circle cx="4" cy="10" r="1.5"></circle>
             <rect x="7" y="4" width="2" height="8" rx="1"></rect>
