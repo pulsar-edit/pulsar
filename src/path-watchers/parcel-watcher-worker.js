@@ -11,6 +11,7 @@
 
 const watcher = require("@parcel/watcher");
 const fs = require("fs");
+const nodejsWatcher = require("./nodejs-watcher");
 
 // A shim over the real `console` methods so that they send log messages back
 // to the renderer process instead of making us dig into their own console.
@@ -44,24 +45,21 @@ const EVENT_MAP = {
 // runs; elsewhere the probe is windowless and the default order is fine.
 const BACKEND = process.platform === "win32" ? "windows" : undefined;
 
-// A class designed to imitate the object that is returned by `@parcel/watcher`
-// when it watches directories; this one is for when we watch individual files.
-class FileHandle {
-  constructor(controller) {
-    this.controller = controller;
-  }
+// Maps the non-recursive watcher's low-level event types to the normalized
+// action vocabulary the renderer expects.
+const NODE_EVENT_MAP = {
+  change: "updated",
+  create: "created",
+  delete: "deleted",
+  rename: "renamed",
+};
 
-  // Async to match `@parcel/watcher`’s API.
-  async unsubscribe() {
-    return this.controller.abort();
-  }
-}
-
-// Reacts to events on individual files and sends batches back to the renderer
-// process.
-function fileHandler(instance, eventType, normalizedPath) {
-  let action = EVENT_MAP[eventType] ?? `unexpected (${eventType})`;
-  let payload = { action, path: normalizedPath };
+// Reacts to events from the non-recursive `nodejs-watcher` (single files and
+// non-recursive directories) and sends batches back to the renderer process.
+function nodejsHandler(instance, eventType, eventPath, oldPath) {
+  let action = NODE_EVENT_MAP[eventType] ?? `unexpected (${eventType})`;
+  let payload = { action, path: eventPath };
+  if (oldPath) payload.oldPath = oldPath;
 
   console.log("Sending events:", [payload]);
 
@@ -107,33 +105,43 @@ async function handleMessage(message) {
       // `instance` is a unique ID for the watcher instance. We use it when we
       // push filesystem events so that they can be routed back to the correct
       // instance.
-      let { normalizedPath, instance, ignored = [] } = args;
-      // If this instance already exists, then the worker will call
+      let { normalizedPath, instance, ignored = [], recursive = true } = args;
+      // If this instance already exists, then the renderer will call
       // `watcher:update` if it wants to change the exclusions. In this worker,
       // the two commands have the same effect. If there already was a watcher
       // for this instance, we hold onto the existing watcher until the new one
       // has started.
       let existing = WATCHERS_BY_PATH.get(instance);
       let wrappedHandler = (err, events) => handler(instance, err, events);
-      let wrappedFileHandler = (eventType, _) => fileHandler(instance, eventType, normalizedPath);
+      let wrappedNodejsHandler = (eventType, eventPath, oldPath) =>
+        nodejsHandler(instance, eventType, eventPath, oldPath);
       try {
-        let ignore = ignored.reduce((prev, ignoredName) => {
-          prev.push(`${ignoredName}`, `**/${ignoredName}`);
-          return prev;
-        }, []);
-        console.log("Generated ignore globs:", ignore);
-        if (fs.lstatSync(normalizedPath).isDirectory()) {
-          let handle = await watcher.subscribe(normalizedPath, wrappedHandler, {
+        let isDirectory = false;
+        try {
+          isDirectory = fs.statSync(normalizedPath).isDirectory();
+        } catch {
+          // The path may not exist yet (e.g. a config file); the non-recursive
+          // watcher handles that by watching the parent directory.
+        }
+        let handle;
+        if (isDirectory && recursive) {
+          // Recursive tree watch → `@parcel/watcher`.
+          let ignore = ignored.reduce((prev, ignoredName) => {
+            prev.push(`${ignoredName}`, `**/${ignoredName}`);
+            return prev;
+          }, []);
+          console.log("Generated ignore globs:", ignore);
+          handle = await watcher.subscribe(normalizedPath, wrappedHandler, {
             ignore,
             backend: BACKEND,
           });
-          WATCHERS_BY_PATH.set(instance, handle);
         } else {
-          console.log("Watching file path:", normalizedPath);
-          let controller = new AbortController();
-          fs.watch(normalizedPath, { signal: controller.signal }, wrappedFileHandler);
-          WATCHERS_BY_PATH.set(instance, new FileHandle(controller));
+          // Single file, or a non-recursive directory watch → reliable
+          // parent-directory technique (see nodejs-watcher.js).
+          console.log("Watching non-recursively:", normalizedPath);
+          handle = nodejsWatcher.watch(normalizedPath, wrappedNodejsHandler);
         }
+        WATCHERS_BY_PATH.set(instance, handle);
         if (existing) {
           // If there was a pre-existing watcher at this instance, we wait
           // until the new one is up and running before stopping this one.
