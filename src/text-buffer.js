@@ -2421,6 +2421,9 @@ class TextBuffer {
       let disposed = false
       const watcherPromise = watchPath(filePath, { recursive: false }, events => {
         for (const event of events) {
+          if (/file\.markdown|file2\.md/.test(filePath)) {
+            console.warn('TBDIAG buffer event', JSON.stringify(event), 'filePath=', filePath)
+          }
           if (event.action === 'deleted') {
             onDidDelete()
           } else if (event.action === 'renamed' && event.oldPath === filePath) {
