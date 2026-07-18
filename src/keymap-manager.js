@@ -434,6 +434,12 @@ module.exports =
           return this.emitter.emit('did-reload-keymap', {path: filePath});
         }
       } else {
+        // A single delete/rename can surface as several native events (parcel on
+        // Linux in particular coalesces poorly), so only unload — and notify
+        // observers — when this source actually had bindings loaded. This keeps
+        // `did-unload-keymap` single-fire, matching the original File watcher.
+        const hadBindings = this.keyBindings.some(keyBinding => keyBinding.source === filePath);
+        if (!hadBindings) return undefined;
         this.removeBindingsFromSource(filePath);
         return this.emitter.emit('did-unload-keymap', {path: filePath});
       }
