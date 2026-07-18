@@ -64,6 +64,9 @@ module.exports = function createGitHostOps(runner) {
     blame: ({ workingDirectory, relativePosixPath, params, options }, { signal }) =>
       history.getBlame(workingDirectory, relativePosixPath, params, withSignal(options, signal)),
 
+    blob: ({ workingDirectory, oid, options }, { signal }) =>
+      history.getBlob(workingDirectory, oid, withSignal(options, signal)),
+
     // Run an arbitrary git command in the worker — the write path
     // (commit/stage/checkout/reset/fetch/pull/push/…) plus raw `executeGit` — so
     // write operations leave the renderer thread like the reads already have.

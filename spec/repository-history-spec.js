@@ -231,6 +231,22 @@ describe("repository history", () => {
       expect(Buffer.compare(buffer, Buffer.from([0, 1, 2, 255]))).toBe(0);
     });
 
+    it("reads blob contents by object id", async () => {
+      const oid = (
+        await operationProvider.run(["rev-parse", "HEAD:moved.txt"], workingDirectory)
+      ).trim();
+      expect(await repo.getBlob(oid)).toBe("alpha\nBETA\n");
+
+      const binOid = (
+        await operationProvider.run(["rev-parse", "HEAD:bin.dat"], workingDirectory)
+      ).trim();
+      const blob = await repo.getBlob(binOid, { encoding: "buffer" });
+      expect(Buffer.isBuffer(blob)).toBe(true);
+      expect(Buffer.compare(blob, Buffer.from([0, 1, 2, 255]))).toBe(0);
+
+      expect(await repo.getBlob("0000000000000000000000000000000000000000")).toBeNull();
+    });
+
     it("attributes blame lines to the right commits and authors", async () => {
       const blame = await repo.getBlame(path.join(workingDirectory, "moved.txt"));
       expect(blame.lines.length).toBe(2);

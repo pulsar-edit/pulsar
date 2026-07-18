@@ -94,6 +94,11 @@ class GitHostHistoryProvider {
       { signal },
     );
   }
+
+  getBlob(workingDirectory, oid, options = {}) {
+    const { signal, rest } = splitSignal(options);
+    return GitHost.instance().request("blob", { workingDirectory, oid, options: rest }, { signal });
+  }
 }
 
 module.exports = {

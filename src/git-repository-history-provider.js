@@ -61,6 +61,20 @@ module.exports = class GitRepositoryHistoryProvider {
     throw new GitOperationError("show", result);
   }
 
+  // Read a blob's contents by object id (`git cat-file -p <oid>`). Returns the
+  // contents, or null when the oid does not name an object.
+  async getBlob(workingDirectory, oid, options = {}) {
+    const result = await this.runner.runResult(["cat-file", "-p", oid], workingDirectory, {
+      ...options,
+      allowedExitCodes: [0, 128],
+    });
+    if (result.exitCode === 0) return result.stdout;
+    if (/Not a valid object name|bad file|could not get object info/.test(String(result.stderr))) {
+      return null;
+    }
+    throw new GitOperationError("cat-file", result);
+  }
+
   getBlame(workingDirectory, relativePosixPath, { revision = null } = {}, options = {}) {
     const args = ["blame", "--porcelain"];
     if (revision) args.push(revision);

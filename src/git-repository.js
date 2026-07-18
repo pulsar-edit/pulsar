@@ -1003,6 +1003,22 @@ module.exports = class GitRepository {
     );
   }
 
+  // Public: Read a blob's contents by object id (`git cat-file -p <oid>`).
+  //
+  // * `oid` A {String} blob object id.
+  // * `options` An optional {Object}: `encoding` (default `"utf8"`, pass
+  //   `"buffer"` for a {Buffer}) and `signal`.
+  //
+  // Returns a {Promise} resolving to the contents, or `null` when the oid does
+  // not name an object.
+  getBlob(oid, { encoding = "utf8", signal } = {}) {
+    const provider = this.requireHistoryProvider();
+    return provider.getBlob(this.getWorkingDirectory(), oid, {
+      encoding: encoding === "buffer" ? "buffer" : encoding,
+      signal,
+    });
+  }
+
   // Public: Read line-by-line blame for a file.
   //
   // * `filePath` A {String} path, absolute or repository-relative.
