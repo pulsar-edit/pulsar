@@ -1186,30 +1186,12 @@
   dependencies:
     node-addon-api "^8.9.0"
 
-"@lumine-code/jasmine-focused@https://github.com/lumine-code/jasmine-focused.git#4277644b11d1be8fc5ef6625e657256bfb83ccdd":
-  version "2.0.0"
-  resolved "https://github.com/lumine-code/jasmine-focused.git#4277644b11d1be8fc5ef6625e657256bfb83ccdd"
-  dependencies:
-    jasmine "^6.3.0"
-
-"@lumine-code/jasmine-tagged@https://github.com/lumine-code/jasmine-tagged.git#4f1f2119c8557861c7612557097c19a43805a5ef":
-  version "2.0.0"
-  resolved "https://github.com/lumine-code/jasmine-tagged.git#4f1f2119c8557861c7612557097c19a43805a5ef"
-  dependencies:
-    "@lumine-code/jasmine-focused" "https://github.com/lumine-code/jasmine-focused.git#4277644b11d1be8fc5ef6625e657256bfb83ccdd"
-
 "@lumine-code/keyboard-layout@https://github.com/lumine-code/keyboard-layout.git#73b62b1301fd7a18a0c0567ff8c1a6ebe1fa5d94":
   version "4.0.0"
   resolved "https://github.com/lumine-code/keyboard-layout.git#73b62b1301fd7a18a0c0567ff8c1a6ebe1fa5d94"
   dependencies:
     event-kit "^2.5.3"
     node-addon-api "^8.9.0"
-
-"@lumine-code/less-cache@https://github.com/lumine-code/less-cache.git#760794426fb692107dec032d1515edb3fede48c4":
-  version "3.0.0"
-  resolved "https://github.com/lumine-code/less-cache.git#760794426fb692107dec032d1515edb3fede48c4"
-  dependencies:
-    less "^4.6.7"
 
 "@lumine-code/scoped-property-store@https://github.com/lumine-code/scoped-property-store.git#e8921f85773c625dd95d6711969bfa8d1d42369f":
   version "1.0.0"
@@ -1244,13 +1226,6 @@
   dependencies:
     diacritic "^0.0.2"
     etch "^0.14.0"
-
-"@lumine-code/service-hub@https://github.com/lumine-code/service-hub.git#5422895489f0ba2379cdbd0fc6c9ca87d446cd9b":
-  version "1.0.0"
-  resolved "https://github.com/lumine-code/service-hub.git#5422895489f0ba2379cdbd0fc6c9ca87d446cd9b"
-  dependencies:
-    event-kit "^2.5.2"
-    semver "^7.8.5"
 
 "@lumine-code/superstring@https://github.com/lumine-code/superstring.git#02dc4482caffa94023dd9386d53397b73236b05d":
   version "4.0.0"
@@ -3001,7 +2976,7 @@ etch@0.14.1, etch@^0.14.0, etch@^0.14.1:
   resolved "https://registry.yarnpkg.com/etch/-/etch-0.14.1.tgz#48286244c9fc44a9bb097a433a561fb1da6b58c9"
   integrity sha512-+IwqSDBhaQFMUHJu4L/ir0dhDoW5IIihg4Z9lzsIxxne8V0PlSg0gnk2STaKWjGJQnDR4cxpA+a/dORX9kycTA==
 
-event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.5.2, event-kit@^2.5.3:
+event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/event-kit/-/event-kit-2.5.3.tgz#d47e4bc116ec0aacd00263791fa1a55eb5e79ba1"
   integrity sha512-b7Qi1JNzY4BfAYfnIRanLk0DOD1gdkWHT4GISIn8Q2tAf3LpU8SP2CMwWaq40imYoKWbtN4ZhbSRxvsnikooZQ==
@@ -3811,7 +3786,7 @@ jasmine-json@~0.0:
   resolved "https://registry.yarnpkg.com/jasmine-json/-/jasmine-json-0.0.3.tgz#5e2e8fd50aa585700e8f359af696b0ba964f8387"
   integrity sha512-GCXsV6KtPJzhsiv6+0P0rR1/wU9Puzr+dFHT4T5AupC8lkz4rXT5evSYBOJtql3pURrm79FBiTx5elORz7Cmhg==
 
-jasmine@6.3.0, jasmine@^6.3.0:
+jasmine@6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-6.3.0.tgz#da5f5c7e4ddc5e67e634ad357d0a6724e99f642e"
   integrity sha512-u6L7yYtrtS1JALlp7f4k7Wz7o7ZKXauSKKkXc0L3qUkKrdaxYvNiMHhHp5gtTuVZZXVihXRxS7bWwDBX1wJ7EQ==
@@ -4060,7 +4035,7 @@ lazy-val@^1.0.5:
   resolved "https://registry.yarnpkg.com/lazy-val/-/lazy-val-1.0.5.tgz#6cf3b9f5bc31cee7ee3e369c0832b7583dcd923d"
   integrity sha512-0/BnGCCfyUMkBpeDgWihanIAF9JmZhHBgUhEqzvf+adhNGLoP6TaiI5oF8oyb3I45P+PcnrqihSf01M0l0G5+Q==
 
-less@^4.6.7:
+less@4.6.7:
   version "4.6.7"
   resolved "https://registry.yarnpkg.com/less/-/less-4.6.7.tgz#15adef08189a6d06ca16876ab2de174d18e3ac59"
   integrity sha512-o3UxHBPPVY1HtCXx15/z1NlknQiWyafRNbtLEv+6xFaDRI2g2xPKIH43do9dSwt8bGLTsjNSaifa48N3d6odsQ==
