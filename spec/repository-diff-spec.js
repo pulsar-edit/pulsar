@@ -245,6 +245,15 @@ describe("repository diff", () => {
       expect(calls[0].args).not.toContain("--find-renames");
     });
 
+    it("passes a diff filter through when requested", async () => {
+      await provider.getDiffPatch("/repo", {
+        from: { type: "index" },
+        to: { type: "worktree" },
+        diffFilter: "u",
+      });
+      expect(calls[0].args).toContain("--diff-filter=u");
+    });
+
     it("rejects unsupported endpoint pairs and malformed endpoints", async () => {
       await expectAsyncTypeError(() =>
         provider.getDiffPatch("/repo", { from: { type: "worktree" }, to: { type: "index" } }),

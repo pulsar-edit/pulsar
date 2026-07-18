@@ -51,6 +51,7 @@ module.exports = class GitRepositoryDiffProvider {
       `--unified=${request.context ?? 3}`,
     ];
     if (request.ignoreWhitespace) args.push("--ignore-all-space");
+    if (request.diffFilter) args.push(`--diff-filter=${request.diffFilter}`);
 
     let allowedExitCodes = [0];
     if (from.type === "index" && to.type === "worktree") {
