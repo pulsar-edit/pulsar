@@ -130,6 +130,20 @@ describe("TabBarView", () => {
       // to suppress deprecation warning
       return { dispose() {} };
     }
+    isDeleted() {
+      return this._isDeleted === true;
+    }
+    onDidDelete(callback) {
+      if (this.deleteCallbacks == null) {
+        this.deleteCallbacks = [];
+      }
+      this.deleteCallbacks.push(callback);
+      return { dispose: () => _.remove(this.deleteCallbacks, callback) };
+    }
+    emitDeleted() {
+      this._isDeleted = true;
+      return Array.from(this.deleteCallbacks != null ? this.deleteCallbacks : []).map((cb) => cb());
+    }
   }
 
   beforeEach(() => {
@@ -150,6 +164,17 @@ describe("TabBarView", () => {
   });
 
   afterEach(() => deserializerDisposable.dispose());
+
+  describe("when an item reports that its file was deleted on disk", () => {
+    it("toggles the 'deleted' class on the item's tab", () => {
+      const tab = tabBar.tabAtIndex(0);
+      expect(tab.item).toBe(item1);
+      expect(tab.element.classList.contains("deleted")).toBe(false);
+
+      item1.emitDeleted();
+      expect(tab.element.classList.contains("deleted")).toBe(true);
+    });
+  });
 
   describe("when the mouse is moved over the tab bar", () =>
     it("fixes the width on every tab", () => {

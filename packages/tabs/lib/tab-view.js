@@ -44,6 +44,8 @@ class TabView {
     this.updateTitle();
     this.updateIcon();
     this.updateModifiedStatus();
+    this.updateConflictedStatus();
+    this.updateDeletedStatus();
     this.setupTooltip();
 
     if (this.isItemPending()) {
@@ -108,6 +110,9 @@ class TabView {
       this.updateDataAttributes();
       this.updateTitle();
       this.updateTooltip();
+      // A path change means the file exists again (e.g. saved or followed to a
+      // new location), so re-evaluate the deleted indicator.
+      this.updateDeletedStatus();
       if (atom.config.get("tabs.enableVcsColoring")) this.setupVcsStatus();
       return this.updateIcon();
     };
@@ -162,7 +167,12 @@ class TabView {
     }
 
     const modifiedHandler = () => {
-      return this.updateModifiedStatus();
+      this.updateModifiedStatus();
+      // Deletion of the backing file, and resolution of an on-disk conflict,
+      // both surface through a modified-status change, so keep those indicators
+      // in sync here too.
+      this.updateConflictedStatus();
+      return this.updateDeletedStatus();
     };
 
     if (typeof this.item.onDidChangeModified === "function") {
@@ -195,10 +205,22 @@ class TabView {
       }
     }
 
+    if (typeof this.item.onDidDelete === "function") {
+      const onDidDeleteDisposable = this.item.onDidDelete(() => {
+        this.updateDeletedStatus();
+      });
+      if (Disposable.isDisposable(onDidDeleteDisposable)) {
+        this.subscriptions.add(onDidDeleteDisposable);
+      } else {
+        console.warn("::onDidDelete does not return a valid Disposable!", this.item);
+      }
+    }
+
     if (typeof this.item.onDidSave === "function") {
       const onDidSaveDisposable = this.item.onDidSave((event) => {
         this.terminatePendingState();
         this.updateConflictedStatus();
+        this.updateDeletedStatus();
         if (event.path !== this.path) {
           this.path = event.path;
           if (atom.config.get("tabs.enableVcsColoring")) {
@@ -416,6 +438,20 @@ class TabView {
       this.isConflicted = false;
     }
     return this.isConflicted;
+  }
+
+  updateDeletedStatus() {
+    if (typeof this.item.isDeleted === "function" ? this.item.isDeleted() : false) {
+      if (!this.isDeleted) {
+        this.element.classList.add("deleted");
+      }
+      return (this.isDeleted = true);
+    } else {
+      if (this.isDeleted) {
+        this.element.classList.remove("deleted");
+      }
+      return (this.isDeleted = false);
+    }
   }
 
   updateModifiedStatus() {

@@ -1081,6 +1081,16 @@ module.exports = class TextEditor {
     return this.getBuffer().onDidConflict(callback);
   }
 
+  // Extended: Calls your `callback` when the buffer's underlying file is deleted
+  // on disk.
+  //
+  // * `callback` {Function}
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidDelete(callback) {
+    return this.getBuffer().onDidDelete(callback);
+  }
+
   // Extended: Calls your `callback` before text has been inserted.
   //
   // * `callback` {Function}
@@ -1508,6 +1518,13 @@ module.exports = class TextEditor {
     return this.buffer.isModified();
   }
 
+  // Essential: Returns {Boolean} `true` if this editor's buffer previously had a
+  // file on disk that has since been deleted (and has not been recreated or
+  // saved since). The buffer may still be unmodified — see {::isModified}.
+  isDeleted() {
+    return typeof this.buffer.isDeleted === "function" && this.buffer.isDeleted();
+  }
+
   // Essential: Returns {Boolean} `true` if this editor's buffer is in conflict
   // — that is, if the buffer is modified and those changes are based on buffer
   // contents that do not match what is currently written to disk.
@@ -1551,7 +1568,16 @@ module.exports = class TextEditor {
     if (windowCloseRequested && projectHasPaths && atom.stateStore.isConnected()) {
       return this.buffer.isInConflict();
     } else {
-      return this.isModified() && !this.buffer.hasMultipleEditors();
+      // Normally we only prompt when the buffer has unsaved changes. When
+      // `core.promptOnCloseDeletedFile` is enabled, also prompt when the file
+      // has been deleted on disk (even if the buffer was unmodified at deletion
+      // time), so the user can save it back rather than lose it silently.
+      const promptForDeleted =
+        this.isDeleted() &&
+        atom.config.get("core.promptOnCloseDeletedFile", {
+          scope: this.getRootScopeDescriptor(),
+        });
+      return (this.isModified() || promptForDeleted) && !this.buffer.hasMultipleEditors();
     }
   }
 

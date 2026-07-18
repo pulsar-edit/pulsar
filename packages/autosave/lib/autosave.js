@@ -46,7 +46,7 @@ module.exports = {
     if (!paneItem.getPath?.()) return;
     // When conflicted files trigger a prompt, we don't want to attempt to save
     // them automatically.
-    if (atom.config.get("core.promptOnConflict") && paneItem.isInConflict?.()) {
+    if (atom.config.get("core.promptOnConflictedFile") && paneItem.isInConflict?.()) {
       return;
     }
     if (!shouldSave(paneItem)) return;

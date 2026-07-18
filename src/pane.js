@@ -902,10 +902,10 @@ module.exports = class Pane {
   //
   // Resolves with boolean `true` when a save can proceed… or rejects with an
   // error when the save is aborted.
-  promptOnConflict(item) {
+  promptOnConflictedFile(item) {
     return new Promise((resolve, reject) => {
       // Don't prompt if the user hasn't opted into it.
-      if (!atom.config.get("core.promptOnConflict")) return resolve(true);
+      if (!atom.config.get("core.promptOnConflictedFile")) return resolve(true);
 
       // Ensure the item implements an `isInConflict` method, and that it
       // returns `true`.
@@ -990,7 +990,15 @@ module.exports = class Pane {
         );
       };
 
-      saveDialog("Save", this.saveItem, `'${title}' has changes, do you want to save them?`);
+      // A buffer whose file was deleted on disk (while it still had unsaved
+      // changes) gets a clearer, more accurate message than the generic
+      // "has changes" prompt.
+      const deleted = typeof item.isDeleted === "function" && item.isDeleted();
+      const message = deleted
+        ? `'${title}' was deleted on disk. Do you still want to save this file?`
+        : `'${title}' has changes, do you want to save them?`;
+
+      saveDialog("Save", this.saveItem, message);
     });
   }
 
@@ -1040,9 +1048,9 @@ module.exports = class Pane {
         // how to proceed. The user may choose to overwrite (force the save) or
         // cancel.
         let preface = () => promisify(() => item.save());
-        if (conflicted && atom.config.get("core.promptOnConflict")) {
+        if (conflicted && atom.config.get("core.promptOnConflictedFile")) {
           preface = () => {
-            return this.promptOnConflict(item).then(() => item.save());
+            return this.promptOnConflictedFile(item).then(() => item.save());
           };
         }
 

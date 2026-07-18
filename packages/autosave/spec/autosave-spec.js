@@ -5,7 +5,7 @@ describe("Autosave", () => {
   let workspaceElement, initialActiveItem, otherItem1, otherItem2;
 
   beforeEach(async () => {
-    atom.config.set("core.promptOnConflict", true);
+    atom.config.set("core.promptOnConflictedFile", true);
     workspaceElement = atom.views.getView(atom.workspace);
     jasmine.attachToDOM(workspaceElement);
 
@@ -136,9 +136,9 @@ describe("Autosave", () => {
         });
       });
 
-      describe("but core.promptOnConflict is false", () => {
+      describe("but core.promptOnConflictedFile is false", () => {
         beforeEach(() => {
-          atom.config.set("core.promptOnConflict", false);
+          atom.config.set("core.promptOnConflictedFile", false);
         });
 
         it("does try to save the item", async () => {

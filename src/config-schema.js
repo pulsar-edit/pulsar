@@ -101,18 +101,26 @@ const configSchema = {
         description:
           "When a window with no open tabs or panes is given the 'Close Tab' command, close that window.",
         type: "boolean",
-        default: true,
+        default: false,
       },
-      promptOnConflict: {
+      promptOnConflictedFile: {
         order: 11,
-        title: "Experimental: Prompt on Conflict",
+        title: "Prompt on Conflict",
         description:
           "Prompt before saving a file in a conflicted state, as happens when a file’s contents on disk are changed by another program while edits are pending.",
         type: "boolean",
         default: false,
       },
-      fileEncoding: {
+      promptOnCloseDeletedFile: {
         order: 12,
+        title: "Prompt on Close Deleted File",
+        description:
+          "Prompt before closing an editor whose file has been deleted on disk, even when the buffer had no unsaved changes at the time it was deleted. An editor that still had unsaved changes when its file was deleted always prompts. Automatically closing tabs for deleted files is controlled separately by `Close Deleted File Tabs`.",
+        type: "boolean",
+        default: false,
+      },
+      fileEncoding: {
+        order: 13,
         title: "File Encoding",
         description: "Default character set encoding to use when reading and writing files.",
         type: "string",
@@ -281,7 +289,7 @@ const configSchema = {
         default: "utf8",
       },
       openEmptyEditorOnStart: {
-        order: 13,
+        order: 14,
         title: "Open Empty Editor On Start",
         description:
           'When checked opens an untitled editor when loading a blank environment (such as with _File > New Window_ or when "Restore Previous Windows On Start" is unchecked); otherwise no editor is opened when loading a blank environment. This setting has no effect when restoring a previous state.',
@@ -289,7 +297,7 @@ const configSchema = {
         default: true,
       },
       restorePreviousWindowsOnStart: {
-        order: 14,
+        order: 15,
         title: "Restore Previous Windows On Start",
         description:
           "When selected 'no', a blank environment is loaded. When selected 'yes' and Lumine is started from the icon or `lumine` by itself from the command line, restores the last state of all Lumine windows; otherwise a blank environment is loaded. When selected 'always', restores the last state of all Lumine windows always, no matter how Lumine is started.",
@@ -298,7 +306,7 @@ const configSchema = {
         default: "yes",
       },
       allowPendingPaneItems: {
-        order: 15,
+        order: 16,
         title: "Allow Pending Pane Items",
         description:
           "Allow items to be previewed without adding them to a pane permanently, such as when single clicking files in the tree view.",
@@ -306,7 +314,7 @@ const configSchema = {
         default: true,
       },
       warnOnLargeFileLimit: {
-        order: 16,
+        order: 17,
         title: "Warn On Large File Limit",
         description: "Warn before opening files larger than this number of megabytes.",
         type: "number",

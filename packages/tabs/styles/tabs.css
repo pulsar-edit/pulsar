@@ -62,20 +62,60 @@
       cursor: default;
     }
 
-    &.modified:hover .close-icon {
-      color: var(--background-color-info);
-    }
-
-    &.modified:not(:hover) .close-icon {
-      &:before {
+    /* Status indicator — owned by the tabs package so it renders consistently
+       across UI themes rather than each theme reimplementing it. When a tab has
+       a status and is not hovered, the close-icon becomes a small round dot with
+       a left-to-right gradient: the LEFT edge marks unsaved changes
+       (modified = blue) and the RIGHT edge marks the file's on-disk status
+       (deleted = red, conflict = yellow). With a single status both ends take
+       the same color, so it reads as one solid dot; with two statuses it blends
+       across (e.g. modified + deleted = blue → red). Hovering restores the close
+       button. The two ends are driven by --tab-dot-left / --tab-dot-right, set
+       by the state rules below (ordered so deleted wins over conflict). */
+    &.modified:not(:hover) .close-icon,
+    &.deleted:not(:hover) .close-icon,
+    &.conflicted:not(:hover) .close-icon {
+      --tab-dot-left: transparent;
+      --tab-dot-right: transparent;
+      &::before {
         display: none;
       }
+      position: absolute;
       top: 11px;
       right: 11px;
       width: 8px;
       height: 8px;
-      border: 2px solid var(--background-color-info);
-      border-radius: 12px;
+      padding: 0;
+      transform: scale(0.7);
+      border: none;
+      border-radius: 50%;
+      overflow: hidden;
+      background-color: transparent;
+      background-image: linear-gradient(to right, var(--tab-dot-left), var(--tab-dot-right));
+    }
+
+    /* Modified fills both halves (a solid blue dot when it is the only status). */
+    &.modified:not(:hover) .close-icon {
+      --tab-dot-left: var(--text-color-info);
+      --tab-dot-right: var(--text-color-info);
+    }
+
+    /* Conflict paints the status (right) half yellow — and the whole dot when
+       the buffer is unmodified. */
+    &.conflicted:not(:hover) .close-icon {
+      --tab-dot-right: var(--text-color-warning);
+    }
+    &.conflicted:not(.modified):not(:hover) .close-icon {
+      --tab-dot-left: var(--text-color-warning);
+    }
+
+    /* Deleted paints the status (right) half red (declared after conflict so it
+       wins) — and the whole dot when the buffer is unmodified. */
+    &.deleted:not(:hover) .close-icon {
+      --tab-dot-right: var(--text-color-error);
+    }
+    &.deleted:not(.modified):not(:hover) .close-icon {
+      --tab-dot-left: var(--text-color-error);
     }
   }
 

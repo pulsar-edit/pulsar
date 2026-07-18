@@ -110,32 +110,6 @@
     }
   }
 
-  /* Modified icon ---------------------- */
-
-  .tab.modified {
-    &:hover .close-icon {
-      color: var(--accent-color);
-      &:hover {
-        color: var(--accent-bg-text-color);
-      }
-    }
-    &:not(:hover) .close-icon {
-      top: calc((var(--tab-pill-height) - 1.5em) / 2);
-      right: 0.4em;
-      width: 1.5em;
-      height: 1.5em;
-      line-height: 1.5;
-      color: var(--accent-color);
-      border-radius: calc(var(--component-border-radius) - 2px);
-      border: none;
-      transform: scale(1);
-      &::before {
-        content: "\f052";
-        display: inline-block;
-      }
-    }
-  }
-
   /* Dragging ---------------------- */
 
   .tab.is-dragging {

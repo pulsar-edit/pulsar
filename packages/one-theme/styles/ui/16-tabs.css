@@ -119,32 +119,6 @@
     }
   }
 
-  /* Modified icon ---------------------- */
-
-  .tab.modified {
-    &:hover .close-icon {
-      color: var(--accent-color);
-      &:hover {
-        color: var(--accent-bg-text-color);
-      }
-    }
-    &:not(:hover) .close-icon {
-      top: 0.5em;
-      right: 0.5em;
-      width: 1.5em;
-      height: 1.5em;
-      line-height: 1.5;
-      color: var(--accent-color);
-      border-radius: var(--component-border-radius);
-      border: none;
-      transform: scale(1);
-      &::before {
-        content: "\f052";
-        display: inline-block;
-      }
-    }
-  }
-
   /* Tabs in the docks ---------------------- */
 
   atom-dock & {
