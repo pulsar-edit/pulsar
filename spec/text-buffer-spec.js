@@ -1796,20 +1796,22 @@ three\
       bufferToChange.saveAs(newPath);
     });
 
-    it("notifies observers when the buffer's file is moved", function(done) {
+    it("notifies observers when the buffer's file is moved", async function() {
       // FIXME: This doesn't pass on Linux
       if (['linux', 'win32'].includes(process.platform)) {
-        done();
         return;
       }
 
-      bufferToChange.onDidChangePath(function(p) {
-        expect(p).toBe(newPath);
-        done();
-      });
+      // The file watcher arms asynchronously; wait for it before moving the file
+      // so the rename is observed.
+      await bufferToChange.getFileWatchStartPromise();
+
+      const renamed = new Promise((resolve) => bufferToChange.onDidChangePath(resolve));
 
       fs.removeSync(newPath);
       fs.moveSync(filePath, newPath);
+
+      expect(await renamed).toBe(newPath);
     });
   });
 

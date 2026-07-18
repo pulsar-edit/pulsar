@@ -154,8 +154,26 @@ class NodejsWatcher {
       return;
     }
 
-    // A `rename` for our file means it was created, deleted, or replaced. Defer
-    // briefly, then decide based on whether it exists again.
+    // A `rename` for our file means it was created, deleted, moved, or replaced.
+    // macOS reports ordinary in-place writes as `rename` too. If the file is
+    // still present, report it immediately (an in-place change or a completed
+    // atomic save) rather than waiting out the rename-verify delay — the delay
+    // is only needed to distinguish a delete from a move, i.e. when the file is
+    // gone from its path.
+    let existsNow = false;
+    try {
+      fs.statSync(this.realPath);
+      existsNow = true;
+    } catch {
+      existsNow = false;
+    }
+    if (existsNow) {
+      const wasAbsent = !this.exists;
+      this.captureIdentity();
+      this.emit(wasAbsent ? "create" : "change", this.path);
+      return;
+    }
+    // Gone from its path — defer briefly to decide delete vs. move.
     this.scheduleVerify();
   }
 
