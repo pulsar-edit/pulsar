@@ -962,7 +962,7 @@
     minimist "^1.2.6"
     plist "^3.0.5"
 
-"@electron/rebuild@4.2.0", "@electron/rebuild@^4.0.4", "@electron/rebuild@^4.2.0":
+"@electron/rebuild@4.2.0", "@electron/rebuild@^4.0.4":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@electron/rebuild/-/rebuild-4.2.0.tgz#ee7429a97134d13eb37b7f517d737e02d1dea877"
   integrity sha512-RKL/O+jGoXJMxrx/5771y1n0xTKmFuOYGO3gMmwypBM6rsH0kou0mswwdXA2JrhIkE4xyC7v9vGk0n6NPzgOxQ==
@@ -1142,19 +1142,6 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@lumine-code/atom-keymap@https://github.com/lumine-code/atom-keymap.git#3c2908f5a06da40df5bc5f8880cb8120664d5c4c":
-  version "10.0.0"
-  resolved "https://github.com/lumine-code/atom-keymap.git#3c2908f5a06da40df5bc5f8880cb8120664d5c4c"
-  dependencies:
-    "@electron/rebuild" "^4.2.0"
-    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#742e3e166f56261189ff245a63967b8f1970fadd"
-    "@lumine-code/keyboard-layout" "https://github.com/lumine-code/keyboard-layout.git#73b62b1301fd7a18a0c0567ff8c1a6ebe1fa5d94"
-    "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#ffe5b7b29242c9031e11a0df85f7c0d79f6cc990"
-    "@lumine-code/season" "https://github.com/lumine-code/season.git#8cd50d17ce33826ea2e55d18e936b1f1aeb96342"
-    clear-cut "^2"
-    event-kit "^2.5.3"
-    grim "^2.0.3"
-
 "@lumine-code/babel-preset@https://github.com/lumine-code/babel-preset.git#a80d58111ba850aa4e9b6f6426815f50f3e066b8":
   version "6.0.0"
   resolved "https://github.com/lumine-code/babel-preset.git#a80d58111ba850aa4e9b6f6426815f50f3e066b8"
@@ -1224,18 +1211,6 @@
   dependencies:
     less "^4.6.7"
 
-"@lumine-code/pathwatcher@https://github.com/lumine-code/node-pathwatcher.git#ffe5b7b29242c9031e11a0df85f7c0d79f6cc990":
-  version "10.0.0"
-  resolved "https://github.com/lumine-code/node-pathwatcher.git#ffe5b7b29242c9031e11a0df85f7c0d79f6cc990"
-  dependencies:
-    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#742e3e166f56261189ff245a63967b8f1970fadd"
-    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274"
-    async "^3.2.6"
-    event-kit "^2.1.0"
-    grim "^2.0.1"
-    iconv-lite "^0.7.3"
-    node-addon-api "^8.9.0"
-
 "@lumine-code/scoped-property-store@https://github.com/lumine-code/scoped-property-store.git#e8921f85773c625dd95d6711969bfa8d1d42369f":
   version "1.0.0"
   resolved "https://github.com/lumine-code/scoped-property-store.git#e8921f85773c625dd95d6711969bfa8d1d42369f"
@@ -1282,20 +1257,6 @@
   resolved "https://github.com/lumine-code/superstring.git#02dc4482caffa94023dd9386d53397b73236b05d"
   dependencies:
     node-addon-api "^8.9.0"
-
-"@lumine-code/text-buffer@https://github.com/lumine-code/text-buffer.git#f575e4215f29204861b396148c6272369e526991":
-  version "16.0.0"
-  resolved "https://github.com/lumine-code/text-buffer.git#f575e4215f29204861b396148c6272369e526991"
-  dependencies:
-    "@lumine-code/fs-plus" "https://github.com/lumine-code/fs-plus.git#742e3e166f56261189ff245a63967b8f1970fadd"
-    "@lumine-code/pathwatcher" "https://github.com/lumine-code/node-pathwatcher.git#ffe5b7b29242c9031e11a0df85f7c0d79f6cc990"
-    "@lumine-code/superstring" "https://github.com/lumine-code/superstring.git#02dc4482caffa94023dd9386d53397b73236b05d"
-    "@lumine-code/underscore-plus" "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274"
-    diff "^9.0.0"
-    event-kit "^2.5.3"
-    fs-admin "^0.20.0"
-    grim "^2.0.3"
-    winattr "^3.0.0"
 
 "@lumine-code/underscore-plus@https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274":
   version "2.0.0"
@@ -2303,7 +2264,7 @@ ci-info@^4.2.0:
   resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-4.4.0.tgz#7d54eff9f54b45b62401c26032696eb59c8bd18c"
   integrity sha512-77PSwercCZU2Fc4sX94eF8k8Pxte6JAwL4/ICZLFjJLqegs7kCuAsqqj/70NQF6TvDpgFjkubQB2FW2ZZddvQg==
 
-clear-cut@^2, clear-cut@^2.0.2:
+clear-cut@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/clear-cut/-/clear-cut-2.0.2.tgz#082db32ecaa44a358a7b086852fe1d5480bbeed1"
   integrity sha512-WVgn/gSejQ+0aoR8ucbKIdo6icduPZW6AbWwyUmAUgxy63rUYjwa5rj/HeoNPhf0/XPrl82X8bO/hwBkSmsFtg==
@@ -3040,7 +3001,7 @@ etch@0.14.1, etch@^0.14.0, etch@^0.14.1:
   resolved "https://registry.yarnpkg.com/etch/-/etch-0.14.1.tgz#48286244c9fc44a9bb097a433a561fb1da6b58c9"
   integrity sha512-+IwqSDBhaQFMUHJu4L/ir0dhDoW5IIihg4Z9lzsIxxne8V0PlSg0gnk2STaKWjGJQnDR4cxpA+a/dORX9kycTA==
 
-event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.1.0, event-kit@^2.5.2, event-kit@^2.5.3:
+event-kit@2.5.3, event-kit@^2.0.0, event-kit@^2.5.2, event-kit@^2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/event-kit/-/event-kit-2.5.3.tgz#d47e4bc116ec0aacd00263791fa1a55eb5e79ba1"
   integrity sha512-b7Qi1JNzY4BfAYfnIRanLk0DOD1gdkWHT4GISIn8Q2tAf3LpU8SP2CMwWaq40imYoKWbtN4ZhbSRxvsnikooZQ==
@@ -3210,7 +3171,7 @@ form-data@^4.0.5:
     hasown "^2.0.4"
     mime-types "^2.1.35"
 
-fs-admin@0.20.0, fs-admin@^0.20.0:
+fs-admin@0.20.0:
   version "0.20.0"
   resolved "https://registry.yarnpkg.com/fs-admin/-/fs-admin-0.20.0.tgz#ea11d4886e77bb0d12df073d342a0d7076de7956"
   integrity sha512-eE5FP/0huB0g7kfZGJ32c36VuUCKjSNZnKSVUyXHfuJxUPKqIBWk8CYT82nzLPc1+ycFMCtA+7XwsUVvgiBjuw==
@@ -3646,13 +3607,6 @@ iconv-lite@0.6.3, iconv-lite@^0.6.3:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.6.3.tgz#a52f80bf38da1952eb5c681790719871a1a72501"
   integrity sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==
-  dependencies:
-    safer-buffer ">= 2.1.2 < 3.0.0"
-
-iconv-lite@^0.7.3:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.7.3.tgz#84ee12f963e7de50bc01a13e160a078b3b0f415f"
-  integrity sha512-IKXpvIzjnC9XTAUbVBcMfGS0EPaIXtW6v+zr+RRp+hqULEpo0owZax6wyRwPOJbWbzjYspQwusTsfVr0ifh4uQ==
   dependencies:
     safer-buffer ">= 2.1.2 < 3.0.0"
 
@@ -4553,11 +4507,6 @@ node-abi@^4.2.0:
   dependencies:
     semver "^7.6.3"
 
-node-addon-api@*, node-addon-api@^8.5.0:
-  version "8.5.0"
-  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-8.5.0.tgz#c91b2d7682fa457d2e1c388150f0dff9aafb8f3f"
-  integrity sha512-/bRZty2mXUIFY/xU5HLvveNHlswNJej+RnxBjOMkidWfwZzgTbPG1E3K5TOxRLOR+5hX7bSofy8yf1hZevMS8A==
-
 node-addon-api@^4.2.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-4.3.0.tgz#52a1a0b475193e0928e98e0426a0d1254782b77f"
@@ -4567,6 +4516,11 @@ node-addon-api@^7.0.0, node-addon-api@^7.1.0:
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-7.1.1.tgz#1aba6693b0f255258a049d621329329322aad558"
   integrity sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==
+
+node-addon-api@^8.5.0:
+  version "8.5.0"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-8.5.0.tgz#c91b2d7682fa457d2e1c388150f0dff9aafb8f3f"
+  integrity sha512-/bRZty2mXUIFY/xU5HLvveNHlswNJej+RnxBjOMkidWfwZzgTbPG1E3K5TOxRLOR+5hX7bSofy8yf1hZevMS8A==
 
 node-addon-api@^8.9.0:
   version "8.9.0"
@@ -4651,13 +4605,6 @@ npm-run-path@^4.0.1:
   integrity sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==
   dependencies:
     path-key "^3.0.0"
-
-nsfw@2.3.1:
-  version "2.3.1"
-  resolved "https://registry.npmjs.org/nsfw/-/nsfw-2.3.1.tgz#5ffd32b184ee887437411833fe9af26959dd259f"
-  integrity sha512-017wsh/hyyFAeUhmo59N4c1aTRcJa3CFSSDfneYrcA43F5YmVvKnaQWE22nT409ojzsQosJa3dVcy+JKqO2C8A==
-  dependencies:
-    node-addon-api "*"
 
 nth-check@^2.0.1:
   version "2.1.1"
