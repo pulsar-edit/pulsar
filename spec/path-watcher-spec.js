@@ -2,8 +2,6 @@ const temp = require("temp");
 const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 const { promisify } = require("util");
-const { File, Directory } = require("atom");
-const { closeAllWatchers } = require("@lumine-code/pathwatcher");
 const { sep } = path;
 
 const { CompositeDisposable } = require("event-kit");
@@ -27,252 +25,6 @@ const realpath = promisify(fs.realpath);
 const symlink = promisify(fs.symlink);
 
 const tempMkdir = promisify(temp.mkdir);
-
-describe("File", () => {
-  let filePath;
-  let file;
-
-  beforeEach(() => {
-    jasmine.useRealClock();
-    filePath = path.join(__dirname, "fixtures", "file-test.txt");
-    fs.removeSync(filePath);
-    fs.writeFileSync(filePath, "this is old!");
-    file = new File(filePath);
-  });
-
-  afterEach(async () => {
-    file.unsubscribeFromNativeChangeEvents();
-    fs.removeSync(filePath);
-    closeAllWatchers();
-    await watchPath.reset();
-    await wait(100);
-  });
-
-  it("normalizes the specified path", () => {
-    let name = [__dirname, "fixtures", "abc", "..", "file-test.txt"].join(sep);
-    expect(new File(name).getBaseName()).toBe("file-test.txt");
-    expect(new File(name).path.toLowerCase()).toBe(file.path.toLowerCase());
-  });
-
-  it("returns true from isFile()", () => {
-    expect(file.isFile()).toBe(true);
-  });
-
-  it("returns false from isDirectory()", () => {
-    expect(file.isDirectory()).toBe(false);
-  });
-
-  describe("::isSymbolicLink", () => {
-    it("returns false for regular files", () => {
-      expect(file.isSymbolicLink()).toBe(false);
-    });
-
-    it("returns true for symlinked files", () => {
-      let symbolicFile = new File(filePath, true);
-      expect(symbolicFile.isSymbolicLink()).toBe(true);
-    });
-  });
-
-  describe("::getDigestSync", () => {
-    it("computes and returns the SHA-1 digest and caches it", () => {
-      filePath = path.join(temp.mkdirSync("node-pathwatcher-directory"), "file.txt");
-      fs.writeFileSync(filePath, "");
-
-      file = new File(filePath);
-      spyOn(file, "readSync").and.callThrough();
-
-      // debugger;
-      expect(file.getDigestSync()).toBe("da39a3ee5e6b4b0d3255bfef95601890afd80709");
-      expect(file.readSync.calls.count()).toBe(1);
-      expect(file.getDigestSync()).toBe("da39a3ee5e6b4b0d3255bfef95601890afd80709");
-      expect(file.readSync.calls.count()).toBe(1);
-
-      file.writeSync("x");
-
-      expect(file.getDigestSync()).toBe("11f6ad8ec52a2984abaafd7c3b516503785c2072");
-      expect(file.readSync.calls.count()).toBe(1);
-      expect(file.getDigestSync()).toBe("11f6ad8ec52a2984abaafd7c3b516503785c2072");
-      expect(file.readSync.calls.count()).toBe(1);
-    });
-  });
-
-  describe("::create()", () => {
-    let callback;
-    let nonExistentFile;
-    let tempDir;
-
-    beforeEach(() => {
-      tempDir = temp.mkdirSync("node-pathwatcher-directory");
-      callback = jasmine.createSpy("promiseCallback");
-    });
-
-    afterEach(() => {
-      nonExistentFile.unsubscribeFromNativeChangeEvents();
-      fs.removeSync(nonExistentFile.getPath());
-    });
-
-    it("creates file in directory if file does not exist", async () => {
-      let fileName = path.join(tempDir, "file.txt");
-      expect(fs.existsSync(fileName)).toBe(false);
-      nonExistentFile = new File(fileName);
-
-      await nonExistentFile.create().then(callback);
-
-      expect(callback.calls.argsFor(0)[0]).toBe(true);
-      expect(fs.existsSync(fileName)).toBe(true);
-      expect(fs.isFileSync(fileName)).toBe(true);
-      expect(fs.readFileSync(fileName).toString()).toBe("");
-    });
-  });
-
-  describe("when the file has not been read", () => {
-    describe("when the contents of the file change", () => {
-      it("notifies ::onDidChange observers", async () => {
-        jasmine.useRealClock();
-        let changeHandler = jasmine.createSpy("changeHandler");
-        file.onDidChange(changeHandler);
-        fs.writeFileSync(file.getPath(), `this is new!`);
-        await waitsForCondition("change event", () => {
-          return changeHandler.calls.count() > 0;
-        });
-      });
-    });
-
-    describe("when the contents of the file are deleted", () => {
-      it("notifies ::onDidChange observers", async () => {
-        let changeHandler = jasmine.createSpy("changeHandler");
-        file.onDidChange(changeHandler);
-        fs.writeFileSync(file.getPath(), "");
-        await waitsForCondition("change event", () => {
-          return changeHandler.calls.count() > 0;
-        });
-      });
-    });
-  });
-
-  describe("when the file has already been read #darwin", () => {
-    beforeEach(() => file.readSync());
-
-    describe("when the contents of the file change", () => {
-      it("notifies ::onDidChange observers", async () => {
-        jasmine.useRealClock();
-        let lastText = null;
-        file.onDidChange(async () => {
-          let text = await file.read();
-          lastText = text;
-        });
-        fs.writeFileSync(file.getPath(), "this is new!");
-        await waitsForCondition("read after first change event", () => {
-          return lastText === "this is new!";
-        });
-        fs.writeFileSync(file.getPath(), "this is newer!");
-        await waitsForCondition("read after second change event", () => {
-          return lastText === "this is newer!";
-        });
-        expect(file.readSync()).toBe("this is newer!");
-      });
-    });
-
-    describe("when the file is deleted", () => {
-      it("notifies ::onDidDelete observers", async () => {
-        let deleteHandler = jasmine.createSpy("deleteHandler");
-        file.onDidDelete(deleteHandler);
-        fs.removeSync(file.getPath());
-        await waitsForCondition("remove event", () => {
-          return deleteHandler.calls.count() > 0;
-        });
-      });
-    });
-
-    describe("when a file is moved (via the filesystem)", () => {
-      let newPath = null;
-
-      beforeEach(() => {
-        newPath = path.join(path.dirname(filePath), "file-was-moved-test.txt");
-      });
-
-      afterEach(async () => {
-        if (fs.existsSync(newPath)) {
-          fs.removeSync(newPath);
-          let deleteHandler = jasmine.createSpy("deleteHandler");
-          file.onDidDelete(deleteHandler);
-          await waitsForCondition("removeEvent", () => deleteHandler.calls.count() > 0, 30000);
-        }
-        await wait(500);
-      });
-
-      it("updates its path", async () => {
-        jasmine.useRealClock();
-        let moveHandler = jasmine.createSpy("moveHandler");
-        file.onDidRename(moveHandler);
-
-        fs.moveSync(filePath, newPath);
-
-        await waitsForCondition("move event", () => moveHandler.calls.count() > 0, 30000);
-        expect(file.getPath()).toBe(newPath);
-      });
-
-      it("maintains ::onDidChange observers that were subscribed on the previous path", async () => {
-        jasmine.useRealClock();
-        let moveHandler = jasmine.createSpy("moveHandler");
-        let changeHandler = jasmine.createSpy("changeHandler");
-        file.onDidRename(moveHandler);
-        file.onDidChange(changeHandler);
-
-        fs.moveSync(filePath, newPath);
-
-        await waitsForCondition("move event", () => moveHandler.calls.count() > 0);
-        expect(changeHandler).not.toHaveBeenCalled();
-        fs.writeFileSync(file.getPath(), "this is new!");
-
-        await waitsForCondition("change event", () => changeHandler.calls.count() > 0);
-      });
-
-      describe("when a file is deleted and the recreated within a small amount of time (git sometimes does this)", async () => {
-        it("triggers a contents change event if the contents change", async () => {
-          jasmine.useRealClock();
-          let changeHandler = jasmine.createSpy("file changed");
-          let deleteHandler = jasmine.createSpy("file deleted");
-
-          // debugger;
-          file.onDidChange(changeHandler);
-          file.onDidDelete(deleteHandler);
-
-          await wait(1000);
-
-          expect(changeHandler).not.toHaveBeenCalled();
-          fs.removeSync(filePath);
-          expect(changeHandler).not.toHaveBeenCalled();
-
-          // NOTE: Putting this wait(0) here makes this test flakier. We
-          // override the async behavior inside of this spec anyway, so it's
-          // not a great crime to comment this out.
-          //
-          // The alternative is to write a test that's very precise about
-          // timing, but that's a bit hard to do in a non-flaky way for a test
-          // that must pass in a CI environment.
-
-          // await wait(0);
-          fs.writeFileSync(filePath, "HE HAS RISEN!");
-          expect(changeHandler).not.toHaveBeenCalled();
-
-          // await promise;
-          await waitsForCondition("resurrection change event", () => {
-            return changeHandler.calls.count() >= 1;
-          });
-          expect(deleteHandler).not.toHaveBeenCalled();
-          fs.writeFileSync(filePath, "Hallelujah!");
-          changeHandler.calls.reset();
-
-          await waitsForCondition(
-            "post-resurrection change event",
-            () => changeHandler.calls.count() > 0,
-          );
-        });
-      });
-    });
-  });
-});
 
 describe("watchPath", function () {
   let subs;
@@ -308,18 +60,14 @@ describe("watchPath", function () {
     });
   }
 
-  const WATCHER_IMPLEMENTATIONS = ["nsfw", "parcel"];
+  // `@parcel/watcher` is the only watcher backend.
+  const WATCHER_IMPLEMENTATIONS = ["parcel"];
 
   for (let impl of WATCHER_IMPLEMENTATIONS) {
     describe(`watchPath() (${impl} implementation)`, function () {
       let disposables;
       beforeEach(async () => {
         jasmine.useRealClock();
-        atom.config.set("core.fileSystemWatcher", impl);
-        // Changing the config setting will trigger an async transition to new
-        // file-watchers. This helper method lets us wait until that transition
-        // has finished.
-        await watchPath.waitForTransition();
         disposables = new CompositeDisposable();
       });
 
