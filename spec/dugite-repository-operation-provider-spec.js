@@ -5,14 +5,12 @@ const temp = require("temp").track();
 
 const DugiteRepositoryOperationProvider = require("../src/dugite-repository-operation-provider");
 
-const COLOR_CONFIG_ARGUMENT_COUNT = 8;
-
 describe("DugiteRepositoryOperationProvider", () => {
   it("exposes the embedded Git transport", async () => {
     const calls = [];
     const provider = new DugiteRepositoryOperationProvider({
-      execute: async (args, workingDirectory, options) => {
-        calls.push({ args, workingDirectory, options });
+      exec: async (args, workingDirectory, options, raw) => {
+        calls.push({ args, workingDirectory, options, raw });
         return { exitCode: 0, stdout: "git version test", stderr: "" };
       },
     });
@@ -26,6 +24,7 @@ describe("DugiteRepositoryOperationProvider", () => {
         args: ["--version"],
         workingDirectory,
         options: { env: { A: "B" } },
+        raw: true,
       },
     ]);
     expect(path.isAbsolute(provider.getGitExecutablePath())).toBe(true);
@@ -34,12 +33,8 @@ describe("DugiteRepositoryOperationProvider", () => {
   it("maps repository operations to Git commands without placing commit messages in arguments", async () => {
     const calls = [];
     const provider = new DugiteRepositoryOperationProvider({
-      execute: async (args, workingDirectory, options) => {
-        calls.push({
-          args: args.slice(COLOR_CONFIG_ARGUMENT_COUNT),
-          workingDirectory,
-          options,
-        });
+      exec: async (args, workingDirectory, options) => {
+        calls.push({ args, workingDirectory, options });
         return { exitCode: 0, stdout: "", stderr: "" };
       },
     });
@@ -52,20 +47,21 @@ describe("DugiteRepositoryOperationProvider", () => {
       coAuthors: [{ name: "Example User", email: "user@example.com" }],
     });
 
+    // The worker receives the bare argument vector; color/trust config and the
+    // GIT_TERMINAL_PROMPT environment are applied by the worker's DugiteRunner.
     expect(calls[0].args).toEqual(["add", "--", "one.txt", "two.txt"]);
     expect(calls[0].workingDirectory).toBe(workingDirectory);
     expect(calls[1].args).toEqual(["commit", "--file=-", "--amend"]);
     expect(calls[1].options.stdin).toBe(
       "Subject\n\nCo-authored-by: Example User <user@example.com>",
     );
-    expect(calls[1].options.env.GIT_TERMINAL_PROMPT).toBe("0");
   });
 
   it("supports injected configuration, cleanup modes, and merge-file labels", async () => {
     const calls = [];
     const provider = new DugiteRepositoryOperationProvider({
-      execute: async (args, workingDirectory, options) => {
-        calls.push({ args: args.slice(COLOR_CONFIG_ARGUMENT_COUNT), workingDirectory, options });
+      exec: async (args, workingDirectory, options) => {
+        calls.push({ args, workingDirectory, options });
         if (args.includes("merge-file")) {
           return { exitCode: 1, stdout: "<<<<<<< current\n", stderr: "" };
         }
@@ -89,13 +85,10 @@ describe("DugiteRepositoryOperationProvider", () => {
       },
     );
 
-    expect(calls[0].args).toEqual([
-      "-c",
-      "gpg.program=/tmp/wrapper.sh",
-      "commit",
-      "--file=-",
-      "--cleanup=strip",
-    ]);
+    // The per-command `-c` config is passed through in options and applied by the
+    // worker's DugiteRunner, not baked into the argument vector here.
+    expect(calls[0].args).toEqual(["commit", "--file=-", "--cleanup=strip"]);
+    expect(calls[0].options.config).toEqual({ "gpg.program": "/tmp/wrapper.sh" });
     expect(calls[1].args).toEqual([
       "merge-file",
       "--stdout",

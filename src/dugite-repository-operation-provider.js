@@ -2,8 +2,23 @@ const fs = require("fs");
 const path = require("path");
 const { resolveGitBinary } = require("dugite");
 
+const GitHost = require("./git-host");
 const DugiteRunner = require("./dugite-runner");
 const { DugiteOperationError } = DugiteRunner;
+
+// Send a git command to the git-host worker's `exec` op. The renderer builds the
+// argument vector (in DugiteRepositoryOperations) but the command runs off the
+// renderer thread. `signal` becomes the transport's cancel channel and
+// `processCallback` (streaming progress) cannot cross IPC yet, so both are
+// stripped; everything else is structured-clone-safe.
+function workerExec(args, workingDirectory, options = {}, raw = false) {
+  const { signal, processCallback, ...rest } = options; // eslint-disable-line no-unused-vars
+  return GitHost.instance().request(
+    "exec",
+    { workingDirectory, args, options: rest, raw },
+    { signal },
+  );
+}
 
 function pathsFrom(value) {
   if (value == null) return [];
@@ -292,9 +307,24 @@ class DugiteRepositoryOperations {
   }
 }
 
-module.exports = class DugiteRepositoryOperationProvider extends DugiteRunner {
+module.exports = class DugiteRepositoryOperationProvider {
+  // `exec(args, workingDirectory, options, raw)` runs a git command and resolves
+  // to a `{exitCode, stdout, stderr}` result. It defaults to the git-host
+  // worker; specs inject a fake to assert on the argument vector.
+  constructor({ exec } = {}) {
+    this.exec = exec || workerExec;
+  }
+
+  runResult(args, workingDirectory, options = {}) {
+    return this.exec(args, workingDirectory, options, false);
+  }
+
+  run(args, workingDirectory, options = {}) {
+    return this.runResult(args, workingDirectory, options).then((result) => result.stdout);
+  }
+
   executeGit(args, workingDirectory, options = {}) {
-    return this.execute(args, workingDirectory, options);
+    return this.exec(args, workingDirectory, options, true);
   }
 
   getGitExecutablePath() {
