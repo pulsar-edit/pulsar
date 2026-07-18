@@ -40,17 +40,17 @@ function getLanguageIds() {
     // be expensive, but due to the module cache, should be fine afterwards
     // plus only requiring the one needed, should result in less wasted memory
     case "chroma":
-      languageIds = require("./language-ids/chroma.js");
+      languageIds = require("./chroma.js");
       break;
     case "highlightjs":
-      languageIds = require("./language-ids/highlightjs.js");
+      languageIds = require("./highlightjs.js");
       break;
     case "rouge":
-      languageIds = require("./language-ids/rouge.js");
+      languageIds = require("./rouge.js");
       break;
     case "linguist":
     default:
-      languageIds = require("./language-ids/linguist.js");
+      languageIds = require("./linguist.js");
       break;
   }
 

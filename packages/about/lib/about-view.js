@@ -2,7 +2,7 @@ const { Disposable } = require("atom");
 const etch = require("etch");
 const path = require("path");
 const { pathToFileURL } = require("url");
-const EtchComponent = require("../etch-component");
+const EtchComponent = require("./etch-component");
 
 const $ = etch.dom;
 

@@ -1,5 +1,5 @@
 const { CompositeDisposable, Emitter } = require("atom");
-const AboutView = require("./components/about-view");
+const AboutView = require("./about-view");
 
 module.exports = class About {
   constructor(initialState) {
