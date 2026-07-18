@@ -63,3 +63,37 @@ describe("DugiteRunner concurrency", () => {
     await all;
   });
 });
+
+describe("DugiteRunner repository trust", () => {
+  function capturingExecute() {
+    const calls = [];
+    const execute = (args) => {
+      calls.push(args);
+      return Promise.resolve({ exitCode: 0, stdout: "", stderr: "" });
+    };
+    return { execute, calls };
+  }
+
+  it("adds -c safe.directory=* when trustAllRepositories is set", async () => {
+    const { execute, calls } = capturingExecute();
+    const runner = new DugiteRunner({ execute, trustAllRepositories: true });
+
+    await runner.run(["status"], "/repo");
+
+    const args = calls[0];
+    const index = args.indexOf("safe.directory=*");
+    expect(index).toBeGreaterThan(-1);
+    expect(args[index - 1]).toBe("-c");
+    // The bypass precedes the git subcommand.
+    expect(index).toBeLessThan(args.indexOf("status"));
+  });
+
+  it("does not add safe.directory when trustAllRepositories is not set", async () => {
+    const { execute, calls } = capturingExecute();
+    const runner = new DugiteRunner({ execute });
+
+    await runner.run(["status"], "/repo");
+
+    expect(calls[0]).not.toContain("safe.directory=*");
+  });
+});

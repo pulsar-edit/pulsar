@@ -417,6 +417,22 @@ const configSchema = {
         type: "boolean",
         default: true,
       },
+      git: {
+        order: 26,
+        type: "object",
+        title: "Git",
+        description: "Settings for Lumine's built-in Git integration.",
+        properties: {
+          trustAllRepositories: {
+            order: 1,
+            title: "Trust All Repositories",
+            description:
+              "Run Git commands with `safe.directory=*` so repositories owned by another user account — common on Windows for repositories cloned from an elevated terminal — are trusted instead of failing Git's repository ownership check. Disable to enforce the ownership check. Takes effect on the next Git command.",
+            type: "boolean",
+            default: true,
+          },
+        },
+      },
     },
   },
   theme: {

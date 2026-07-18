@@ -92,12 +92,21 @@ class GitHost {
     return !globalThis.atom?.inSpecMode?.();
   }
 
+  // Whether to trust repositories owned by another user account
+  // (`core.git.trustAllRepositories`, default true). Passed to the worker via
+  // its fork environment and used directly by the in-process runner.
+  trustAllRepositories() {
+    const value = globalThis.atom?.config?.get?.("core.git.trustAllRepositories");
+    return value !== false;
+  }
+
   childEnv() {
     const compileCachePath = require("./compile-cache").getCacheDirectory();
     return Object.assign({}, process.env, {
       ELECTRON_RUN_AS_NODE: "1",
       ELECTRON_NO_ATTACH_CONSOLE: "1",
       LUMINE_COMPILE_CACHE_PATH: compileCachePath,
+      LUMINE_GIT_TRUST_ALL: this.trustAllRepositories() ? "1" : "0",
     });
   }
 
@@ -107,7 +116,9 @@ class GitHost {
     if (!this.shouldFork()) {
       const DugiteRunner = require("./dugite-runner");
       const createGitHostOps = require("./git-host-ops");
-      this.inProcessOps = createGitHostOps(new DugiteRunner());
+      this.inProcessOps = createGitHostOps(
+        new DugiteRunner({ trustAllRepositories: this.trustAllRepositories() }),
+      );
       this.readyPromise = Promise.resolve();
       return this.readyPromise;
     }

@@ -75,9 +75,13 @@ class DugiteOperationError extends Error {
 }
 
 class DugiteRunner {
-  constructor({ execute = exec, limiter = sharedGitLimiter } = {}) {
+  constructor({ execute = exec, limiter = sharedGitLimiter, trustAllRepositories = false } = {}) {
     this.execute = execute;
     this.limiter = limiter;
+    // When set, every command runs with `-c safe.directory=*` so Git trusts
+    // repositories owned by another user account instead of refusing them with
+    // its "dubious ownership" check. Controlled by `core.git.trustAllRepositories`.
+    this.trustAllRepositories = trustAllRepositories;
   }
 
   async run(args, workingDirectory, options = {}) {
@@ -93,6 +97,9 @@ class DugiteRunner {
       ...options.env,
     };
     const configArguments = [];
+    if (this.trustAllRepositories) {
+      configArguments.push("-c", "safe.directory=*");
+    }
     for (const [key, value] of Object.entries(options.config || {})) {
       configArguments.push("-c", `${key}=${value}`);
     }

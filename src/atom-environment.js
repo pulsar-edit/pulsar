@@ -420,6 +420,13 @@ class AtomEnvironment {
       }),
     );
     if (this.config.get("core.autoHideMenuBar")) this.setAutoHideMenuBar(true);
+
+    // The git-host worker reads core.git.trustAllRepositories from its fork
+    // environment, so restart it when the setting changes; the next Git command
+    // lazily re-forks with the new value.
+    this.disposables.add(
+      this.config.onDidChange("core.git.trustAllRepositories", () => GitHost.reset()),
+    );
   }
 
   async reset() {

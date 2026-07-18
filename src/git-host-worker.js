@@ -7,7 +7,9 @@
 const DugiteRunner = require("./dugite-runner");
 const createGitHostOps = require("./git-host-ops");
 
-const runner = new DugiteRunner();
+// core.git.trustAllRepositories is passed in the fork environment; trust unless
+// it was explicitly disabled ("0").
+const runner = new DugiteRunner({ trustAllRepositories: process.env.LUMINE_GIT_TRUST_ALL !== "0" });
 const ops = createGitHostOps(runner);
 
 // id -> AbortController for the in-flight request, so git:cancel can abort it.
