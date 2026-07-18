@@ -76,13 +76,17 @@ describe("MarkdownPreviewView", function () {
       expect(newPreview.getPath()).toBe(preview.getPath());
     });
 
-    it("does not recreate a preview when the file no longer exists", function () {
+    it("does not recreate a preview when the file no longer exists", async () => {
       const filePath = path.join(temp.mkdirSync("markdown-preview-"), "foo.md");
       fs.writeFileSync(filePath, "# Hi");
 
       preview.destroy();
       preview = new MarkdownPreviewView({ filePath });
       const serialized = preview.serialize();
+      // The preview eagerly reads the file to render it; let that read finish so
+      // its handle is released, otherwise `removeSync` can't delete the still-open
+      // file on Windows and the "file no longer exists" precondition wouldn't hold.
+      await preview.renderMarkdown().catch(() => {});
       fs.removeSync(filePath);
 
       newPreview = atom.deserializers.deserialize(serialized);

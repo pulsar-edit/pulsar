@@ -672,7 +672,12 @@ class PathWatcher {
         const srcWatched = isWatchedPath(event.oldPath);
         const destWatched = isWatchedPath(event.path);
 
-        if (srcWatched && destWatched) {
+        if (event.oldPath === this.normalizedPath && event.path) {
+          // The watched entry itself (a single file, or a watched directory)
+          // was renamed. Follow it to the new path rather than reporting a
+          // deletion, so single-file watchers can track the moved file.
+          filtered.push(this.denormalizeEvent(event));
+        } else if (srcWatched && destWatched) {
           filtered.push(event);
         } else if (srcWatched && !destWatched) {
           filtered.push(
@@ -734,7 +739,7 @@ class PathWatcherManager {
   // and single files / non-recursive directories via its Node fallback.
   constructor() {
     this.live = new Map();
-    this.nativeRegistry = new NativeWatcherRegistry((normalizedPath) => {
+    const createNative = (normalizedPath) => {
       const nativeWatcher = new ParcelWatcher(normalizedPath);
       this.live.set(normalizedPath, nativeWatcher);
       const sub = nativeWatcher.onWillStop(() => {
@@ -743,13 +748,23 @@ class PathWatcherManager {
       });
 
       return nativeWatcher;
-    });
+    };
+    // Recursive tree watches (e.g. project roots) consolidate onto shared parent
+    // watchers. Single-file / non-recursive watches use a separate registry so
+    // they are never adopted by a recursive parent: a recursive parent is backed
+    // by `@parcel/watcher`, which reports a move as delete+create and so cannot
+    // follow renames or coalesce atomic saves the way the per-file Node watcher
+    // does. Keeping them separate guarantees each file gets its own Node watcher.
+    this.nativeRegistry = new NativeWatcherRegistry(createNative);
+    this.nonRecursiveRegistry = new NativeWatcherRegistry(createNative);
   }
 
   // Private: Create a {PathWatcher} tied to this global state. See {watchPath}
   // for detailed arguments.
   async createWatcher(rootPath, eventCallback, options) {
-    const w = new PathWatcher(this.nativeRegistry, rootPath, options);
+    const registry =
+      options && options.recursive === false ? this.nonRecursiveRegistry : this.nativeRegistry;
+    const w = new PathWatcher(registry, rootPath, options);
     w.onDidChange(eventCallback);
     await w.getStartPromise();
     return w;
@@ -845,29 +860,58 @@ function watchPath(rootPath, options, eventCallback) {
 // * `dispose()` stop watching and release the subscription.
 function watchFile(filePath) {
   const emitter = new Emitter();
-  const watcherPromise = watchPath(filePath, {}, (events) => {
-    for (const event of events) {
-      if (event.action === "deleted") {
-        emitter.emit("did-delete");
-      } else if (event.action === "renamed") {
-        if (event.oldPath === filePath) {
+  // The path currently being watched. Updated when the file is renamed so the
+  // watcher follows it (like the old `File`) and `getPath()` stays accurate.
+  let currentPath = filePath;
+  let watcherPromise = null;
+  let disposed = false;
+
+  const attach = (target) => {
+    const promise = watchPath(target, { recursive: false }, (events) => {
+      for (const event of events) {
+        if (event.action === "deleted") {
           emitter.emit("did-delete");
+        } else if (event.action === "renamed") {
+          if (event.oldPath === currentPath && !event.path) {
+            // Moved somewhere we can't identify: report it as a deletion.
+            emitter.emit("did-delete");
+          } else {
+            // The file was moved to a known new path; follow it by re-pointing
+            // the watch there, then notify. Subsequent changes track the new
+            // path, matching the old `File` watcher's behavior.
+            if (event.path) repoint(event.path);
+            emitter.emit("did-rename", event.path);
+          }
         } else {
-          emitter.emit("did-rename", event.path);
+          // "created" or "modified"
+          emitter.emit("did-change");
         }
-      } else {
-        // "created" or "modified"
-        emitter.emit("did-change");
       }
-    }
-  });
-  watcherPromise.catch(() => {});
+    });
+    promise.catch(() => {});
+    return promise;
+  };
+
+  const repoint = (target) => {
+    if (disposed || target === currentPath) return;
+    currentPath = target;
+    const previous = watcherPromise;
+    watcherPromise = attach(target);
+    if (previous) previous.then((watcher) => watcher.dispose(), () => {});
+  };
+
+  watcherPromise = attach(currentPath);
 
   return {
     // The backing {Emitter}. Exposed (like the old `File`'s emitter) so callers
     // and tests can observe or synthesize `did-change`/`did-delete`/`did-rename`
     // notifications without depending on filesystem timing.
     emitter,
+    // The path currently watched (like the old `File`'s `getPath()`); follows
+    // renames.
+    getPath() {
+      return currentPath;
+    },
     onDidChange(callback) {
       return emitter.on("did-change", callback);
     },
@@ -881,11 +925,11 @@ function watchFile(filePath) {
       return watcherPromise;
     },
     dispose() {
+      disposed = true;
       emitter.dispose();
-      watcherPromise.then(
-        (watcher) => watcher.dispose(),
-        () => {},
-      );
+      if (watcherPromise) {
+        watcherPromise.then((watcher) => watcher.dispose(), () => {});
+      }
     },
   };
 }

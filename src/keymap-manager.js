@@ -409,7 +409,7 @@ module.exports =
         // delete). A single-file `watchPath` is served non-recursively by the
         // Node watcher, so atomic saves of the keymap file are seen reliably.
         const reloadKeymap = () => this.reloadKeymap(filePath, options);
-        const watcherPromise = watchPath(filePath, {}, () => reloadKeymap());
+        const watcherPromise = watchPath(filePath, { recursive: false }, () => reloadKeymap());
         // Record when the (asynchronously armed) watcher is live so callers can
         // wait for it before relying on change detection.
         if (this.watchStartPromises == null) this.watchStartPromises = {};

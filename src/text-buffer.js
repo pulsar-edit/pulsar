@@ -2419,7 +2419,7 @@ class TextBuffer {
       // across atomic saves — see `nodejs-watcher.js`.
       const filePath = this.file.getPath()
       let disposed = false
-      const watcherPromise = watchPath(filePath, {}, events => {
+      const watcherPromise = watchPath(filePath, { recursive: false }, events => {
         for (const event of events) {
           if (event.action === 'deleted') {
             onDidDelete()

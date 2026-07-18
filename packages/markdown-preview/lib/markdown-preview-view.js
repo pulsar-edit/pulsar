@@ -101,7 +101,14 @@ module.exports = class MarkdownPreviewView {
     this.file = watchFile(filePath);
     this.emitter.emit("did-change-title");
     this.disposables.add(this.file);
-    this.disposables.add(this.file.onDidRename(() => this.emitter.emit("did-change-title")));
+    this.disposables.add(
+      this.file.onDidRename((newPath) => {
+        // `watchFile` follows the rename internally; keep our path in sync so
+        // the title and URI reflect the new location.
+        if (newPath) this.filePath = newPath;
+        this.emitter.emit("did-change-title");
+      }),
+    );
     this.handleEvents();
     return this.renderMarkdown();
   }

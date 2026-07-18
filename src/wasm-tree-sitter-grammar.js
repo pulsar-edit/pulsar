@@ -462,7 +462,7 @@ module.exports = class WASMTreeSitterGrammar {
           this.emitter.emit("did-change-query", { filePath, queryType });
         });
       };
-      const watcherPromise = watchPath(filePath, {}, () => onChange());
+      const watcherPromise = watchPath(filePath, { recursive: false }, () => onChange());
       this.subscriptions.add(
         new Disposable(() => watcherPromise.then((watcher) => watcher.dispose())),
       );

@@ -263,6 +263,10 @@ describe("Markdown Preview", function () {
         let listener;
         const titleChangedCallback = jasmine.createSpy("titleChangedCallback");
 
+        // The fallback file watcher arms asynchronously; wait for it before
+        // mutating the file so the first change is observed.
+        waitsForPromise("watcher to arm", () => preview.file.getStartPromise());
+
         runs(() => {
           expect(preview.getTitle()).toBe("file.markdown Preview");
           preview.onDidChangeTitle(titleChangedCallback);
@@ -274,6 +278,10 @@ describe("Markdown Preview", function () {
         runs(() => expect(titleChangedCallback).toHaveBeenCalled());
 
         spyOn(preview, "showLoading");
+
+        // The watch was re-pointed at the renamed file; wait for the new
+        // watcher to arm before writing to it.
+        waitsForPromise("re-pointed watcher to arm", () => preview.file.getStartPromise());
 
         runs(() => fs.writeFileSync(preview.getPath(), "Hey!"));
 
@@ -359,6 +367,12 @@ describe("Markdown Preview", function () {
       );
 
       expectPreviewInSplitPane();
+
+      // The preview follows the editor, whose buffer follows the renamed file
+      // on disk. Wait for the buffer's file watch to arm before renaming.
+      waitsForPromise("buffer watch to arm", () =>
+        atom.workspace.getActiveTextEditor().getBuffer().getFileWatchStartPromise(),
+      );
 
       runs(() => {
         expect(preview.getTitle()).toBe("file.markdown Preview");
