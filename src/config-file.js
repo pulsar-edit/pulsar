@@ -6,10 +6,9 @@ const CSON = require("@lumine-code/season");
 const Path = require("path");
 const asyncQueue = require("async/queue");
 
-// TODO: if we ever decide to change path watchers on the future, this is kinda
-// duplicated because of https://github.com/lumine-code/lumine/issues/76
-const nsfw = require("nsfw");
-const EVENT_TYPES = new Set([nsfw.actions.CREATED, nsfw.actions.MODIFIED, nsfw.actions.RENAMED]);
+// `ConfigFile` runs in the main process, so it watches directly with the
+// non-recursive Node watcher rather than the renderer's `watchPath` worker.
+const { watch } = require("./path-watchers/nodejs-watcher");
 
 module.exports = class ConfigFile {
   static at(path) {
@@ -74,13 +73,14 @@ module.exports = class ConfigFile {
     await this.reload();
 
     try {
-      const watcher = await nsfw(this.path, (events) => {
-        if (events.some((event) => EVENT_TYPES.has(event.action))) {
+      // Watched via the parent directory (see nodejs-watcher.js) so atomic
+      // saves are seen reliably. Reload on any event other than a delete.
+      const watcher = watch(this.path, (eventType) => {
+        if (eventType !== "delete") {
           this.requestLoad();
         }
       });
-      await watcher.start();
-      return { dispose: () => watcher.stop() };
+      return { dispose: () => watcher.close() };
     } catch {
       //TODO_LUMINE: Find out why the atom global variable isn't available at this point
       this.emitter.emit(

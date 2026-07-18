@@ -403,11 +403,9 @@ module.exports = class ThemeManager {
     }
 
     try {
-      // `watchPath` is recursive, even though we don't need it to be. So the
-      // easiest way to be sure our stylesheet is the one that was modified
-      // (rather than some other file called `styles.less` deeper in the tree)
-      // is to determine its real path (without symlinks) before we start the
-      // watcher.
+      // A single-file `watchPath` is served non-recursively by the Node
+      // watcher, which reports the file's real path. Resolve symlinks up front
+      // so our subscription and the reported paths line up.
       let realStylesheetPath = fs.realpathSync(userStylesheetPath);
 
       this.userStylesheetSubscription = await watcher.watchPath(realStylesheetPath, {}, () => {

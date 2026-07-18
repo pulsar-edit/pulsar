@@ -3,8 +3,8 @@ const path = require("path");
 const Grim = require("grim");
 const dedent = require("dedent");
 const { Language, Parser, Query } = require("./web-tree-sitter");
-const { CompositeDisposable, Emitter } = require("event-kit");
-const { File } = require("@lumine-code/pathwatcher");
+const { CompositeDisposable, Disposable, Emitter } = require("event-kit");
+const { watchPath } = require("./path-watcher");
 const { normalizeDelimiters } = require("./comment-utils.js");
 
 // Load the runtime Wasm through Node's `fs` rather than letting the emscripten
@@ -442,28 +442,29 @@ module.exports = class WASMTreeSitterGrammar {
   // re-applied when it changes. Occurs only in dev mode.
   observeQueryFile(filePaths, queryType) {
     for (let filePath of filePaths) {
-      let watcher = new File(filePath);
+      const onChange = () => {
+        let existingQuery = this[queryType];
+        // When any one of the file paths changes, we have to re-concatenate
+        // the whole set.
+        this.loadQueryFile(filePaths, queryType).then(async () => {
+          // Sanity-check the language for errors before we let the buffers know
+          // about this change.
+          try {
+            await this.getQuery(queryType);
+          } catch (error) {
+            atom.beep();
+            console.error(`Error parsing query file: ${queryType}`);
+            console.error(error);
+            this[queryType] = existingQuery;
+            this.queryCache.delete(queryType);
+            return;
+          }
+          this.emitter.emit("did-change-query", { filePath, queryType });
+        });
+      };
+      const watcherPromise = watchPath(filePath, {}, () => onChange());
       this.subscriptions.add(
-        watcher.onDidChange(() => {
-          let existingQuery = this[queryType];
-          // When any one of the file paths changes, we have to re-concatenate
-          // the whole set.
-          this.loadQueryFile(filePaths, queryType).then(async () => {
-            // Sanity-check the language for errors before we let the buffers know
-            // about this change.
-            try {
-              await this.getQuery(queryType);
-            } catch (error) {
-              atom.beep();
-              console.error(`Error parsing query file: ${queryType}`);
-              console.error(error);
-              this[queryType] = existingQuery;
-              this.queryCache.delete(queryType);
-              return;
-            }
-            this.emitter.emit("did-change-query", { filePath, queryType });
-          });
-        }),
+        new Disposable(() => watcherPromise.then((watcher) => watcher.dispose())),
       );
     }
   }
