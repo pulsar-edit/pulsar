@@ -142,9 +142,9 @@ class NodejsWatcher {
       if (!this.exists) {
         // The file appeared (created). Capture its identity and report it.
         this.captureIdentity();
-        this.emit(this.exists ? "create" : "change", this.realPath);
+        this.emit(this.exists ? "create" : "change", this.path);
       } else {
-        this.emit("change", this.realPath);
+        this.emit("change", this.path);
       }
       return;
     }
@@ -158,7 +158,10 @@ class NodejsWatcher {
     // Report events for direct children only. `rename` fires on add/remove/move;
     // `change` fires on a child's content change (Linux/Windows). Consumers
     // filter by basename.
-    let childPath = rawName != null ? path.join(this.realPath, rawName) : this.realPath;
+    // Report paths in the requested (`this.path`) form, but stat/access against
+    // the real path so existence checks work.
+    let childPath = rawName != null ? path.join(this.path, rawName) : this.path;
+    let realChildPath = rawName != null ? path.join(this.realPath, rawName) : this.realPath;
 
     if (eventType === "change") {
       this.emit("change", childPath);
@@ -169,10 +172,10 @@ class NodejsWatcher {
     if (rawName == null) {
       // Platform withheld the name (e.g. macOS). Report a generic change so the
       // consumer re-scans.
-      this.emit("change", this.realPath);
+      this.emit("change", this.path);
       return;
     }
-    fs.access(childPath, (err) => {
+    fs.access(realChildPath, (err) => {
       if (this.closed) return;
       this.emit(err ? "delete" : "change", childPath);
     });
@@ -201,11 +204,11 @@ class NodejsWatcher {
           // look for a sibling with the same inode and report a rename.
           const renamedTo = this.findRenameTarget();
           if (renamedTo) {
-            const oldPath = this.realPath;
+            const oldPath = this.path;
             this.emit("rename", renamedTo, oldPath);
           } else {
             this.exists = false;
-            this.emit("delete", this.realPath);
+            this.emit("delete", this.path);
           }
         } else {
           // Present again. On a direct file watch (macOS) an atomic save
@@ -216,7 +219,7 @@ class NodejsWatcher {
             this.stopHandle();
             this.startWatching();
           }
-          this.emit(wasAbsent ? "create" : "change", this.realPath);
+          this.emit(wasAbsent ? "create" : "change", this.path);
         }
       });
     }, RENAME_VERIFY_DELAY);
@@ -226,15 +229,16 @@ class NodejsWatcher {
   // i.e. the file was moved there. Returns the new path, or null.
   findRenameTarget() {
     if (this.ino == null) return null;
-    const dir = path.dirname(this.realPath);
+    const realDir = path.dirname(this.realPath);
+    const reportDir = path.dirname(this.path);
     let entries;
     try {
-      entries = fs.readdirSync(dir);
+      entries = fs.readdirSync(realDir);
     } catch {
       return null;
     }
     for (const name of entries) {
-      const candidate = path.join(dir, name);
+      const candidate = path.join(realDir, name);
       if (candidate === this.realPath) continue;
       let st;
       try {
@@ -242,7 +246,8 @@ class NodejsWatcher {
       } catch {
         continue;
       }
-      if (st.ino && st.ino === this.ino) return candidate;
+      // Report the moved-to path in the requested (`this.path`) form.
+      if (st.ino && st.ino === this.ino) return path.join(reportDir, name);
     }
     return null;
   }
@@ -257,7 +262,7 @@ class NodejsWatcher {
     // containing directory is gone, so the file is gone too.
     if (this.mode === "file" && err && err.code === "ENOENT") {
       this.exists = false;
-      this.emit("delete", this.realPath);
+      this.emit("delete", this.path);
     }
     this.stopHandle();
   }
