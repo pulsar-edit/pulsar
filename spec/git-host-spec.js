@@ -87,6 +87,41 @@ describe("GitHost transport", () => {
     expect(error.stderr).toBe("bad");
   });
 
+  it("revives an exec DugiteOperationError with its command and stdout", async () => {
+    const pending = host.request("exec", {
+      workingDirectory: "/repo",
+      args: ["checkout", "missing"],
+    });
+    current().emit("message", { event: "git:ready" });
+    await flush();
+    const { id } = current().sent[0];
+    current().emit("message", {
+      event: "git:reply",
+      id,
+      error: {
+        message: "Git checkout failed",
+        name: "DugiteOperationError",
+        code: "ERR_GIT_COMMAND_FAILED",
+        command: "checkout",
+        exitCode: 1,
+        stdout: "partial",
+        stderr: "bad ref",
+      },
+    });
+
+    let error;
+    try {
+      await pending;
+    } catch (e) {
+      error = e;
+    }
+    expect(error.name).toBe("DugiteOperationError");
+    expect(error.command).toBe("checkout");
+    expect(error.stdout).toBe("partial");
+    expect(error.exitCode).toBe(1);
+    expect(error.stderr).toBe("bad ref");
+  });
+
   it("rejects pending requests with a retriable error on crash and re-forks on the next request", async () => {
     const first = host.request("status", { workingDirectory: "/repo", options: {} });
     current().emit("message", { event: "git:ready" });
