@@ -3,7 +3,7 @@ const TextBuffer = require("../src/text-buffer");
 const Project = require("../src/project");
 const fs = require("@lumine-code/fs-plus");
 const path = require("path");
-const { Directory } = require("@lumine-code/pathwatcher");
+const ProjectDirectory = require("../src/project-directory");
 const { stopAllWatchers } = require("../src/path-watcher");
 const GitRepository = require("../src/git-repository");
 const RepositoryRegistry = require("../src/repository-registry");
@@ -483,7 +483,7 @@ describe("Project", () => {
 
       let directories = atom.project.getDirectories();
       expect(directories[0].getPath()).toBe(localPath);
-      expect(directories[0] instanceof Directory).toBe(true);
+      expect(directories[0] instanceof ProjectDirectory).toBe(true);
       expect(directories[1].getPath()).toBe(remotePath);
       expect(directories[1] instanceof DummyDirectory).toBe(true);
 
@@ -621,7 +621,7 @@ describe("Project", () => {
 
   describe(".repositoryForDirectory(directory)", () => {
     it("resolves to null when the directory does not have a repository", async () => {
-      const directory = new Directory("/tmp");
+      const directory = new ProjectDirectory("/tmp");
       const result = await atom.project.repositoryForDirectory(directory);
 
       expect(result).toBeNull();
@@ -630,7 +630,7 @@ describe("Project", () => {
     });
 
     it("resolves to a GitRepository and is cached when the given directory is a Git repo", async () => {
-      const directory = new Directory(path.join(__dirname, ".."));
+      const directory = new ProjectDirectory(path.join(__dirname, ".."));
 
       const promise = atom.project.repositoryForDirectory(directory);
       const result = await promise;
@@ -645,7 +645,7 @@ describe("Project", () => {
 
     it("creates a new repository if a previous one with the same directory had been destroyed", async () => {
       let repository = null;
-      const directory = new Directory(path.join(__dirname, ".."));
+      const directory = new ProjectDirectory(path.join(__dirname, ".."));
 
       repository = await atom.project.repositoryForDirectory(directory);
 
