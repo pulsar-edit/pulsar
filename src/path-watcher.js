@@ -864,6 +864,10 @@ function watchFile(filePath) {
   watcherPromise.catch(() => {});
 
   return {
+    // The backing {Emitter}. Exposed (like the old `File`'s emitter) so callers
+    // and tests can observe or synthesize `did-change`/`did-delete`/`did-rename`
+    // notifications without depending on filesystem timing.
+    emitter,
     onDidChange(callback) {
       return emitter.on("did-change", callback);
     },

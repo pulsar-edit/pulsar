@@ -9,11 +9,12 @@
 // the file's inode and orphans a file-level watch handle so every later edit is
 // missed.
 //
-//   * A *file* is watched via its containing directory on Linux/Windows (the
+//   * A *file* is watched via its containing directory on every platform (the
 //     directory's inode is stable across atomic saves, so no events are lost)
-//     and filtered down to the target basename. On macOS the file is watched
-//     directly, because watching the parent directory there does not reliably
-//     report the child filename (siblings would cross-fire).
+//     and filtered down to the target basename. When the platform withholds the
+//     changed child's name (possible on macOS), the event is reported anyway so
+//     the change is never missed — at worst a sibling change causes a redundant
+//     re-read, which every consumer already tolerates.
 //   * A *directory* is watched directly and reports events for its direct
 //     children only (non-recursive). Used for the config directory.
 //
@@ -90,10 +91,14 @@ class NodejsWatcher {
     } else {
       this.mode = "file";
       this.fileName = path.basename(this.realPath);
-      // Watch the file directly only on macOS and only when it already exists;
-      // in every other case watch the (stable) parent directory and filter.
-      this.watchDirectly = process.platform === "darwin" && this.exists;
-      this.watchRoot = this.watchDirectly ? this.realPath : path.dirname(this.realPath);
+      // Always watch the (stable) parent directory and filter to our basename.
+      // Watching a file directly is unreliable: atomic saves swap the file's
+      // inode and orphan the handle, and macOS `fs.watch` pointed at a file
+      // frequently drops in-place content events entirely. The directory's
+      // inode is stable, so no events are lost. This matches VS Code's
+      // non-recursive watcher, which also watches single files via their parent.
+      this.watchDirectly = false;
+      this.watchRoot = path.dirname(this.realPath);
     }
 
     this.callback = null;

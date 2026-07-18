@@ -2424,9 +2424,17 @@ class TextBuffer {
           if (event.action === 'deleted') {
             onDidDelete()
           } else if (event.action === 'renamed' && event.oldPath === filePath) {
-            // The file was moved away from our path; treat it as a deletion so
-            // the buffer keeps its (now theoretical) file and can be re-saved.
-            onDidDelete()
+            if (event.path) {
+              // The file was moved to a known new path; follow it (as the
+              // original `File` watcher did) by re-pointing the buffer at the
+              // new path, which re-subscribes the watch and emits
+              // `did-change-path`.
+              this.setPath(event.path)
+            } else {
+              // Moved somewhere we can't identify; treat it as a deletion so the
+              // buffer keeps its (now theoretical) file and can be re-saved.
+              onDidDelete()
+            }
           } else {
             onDidChange()
           }
