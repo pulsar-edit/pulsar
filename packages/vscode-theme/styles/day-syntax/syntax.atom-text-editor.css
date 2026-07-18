@@ -64,14 +64,6 @@ atom-text-editor {
       color: var(--syntax-gutter-text-color);
       -webkit-font-smoothing: antialiased;
 
-      &.cursor-line {
-        color: var(--syntax-gutter-text-color-selected);
-        background-color: var(--syntax-gutter-background-color-selected);
-      }
-      &.cursor-line-no-selection {
-        background-color: transparent;
-      }
-
       .icon-right {
         color: var(--syntax-text-color);
       }

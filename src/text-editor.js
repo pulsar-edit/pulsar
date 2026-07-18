@@ -361,16 +361,6 @@ module.exports = class TextEditor {
         class: "cursor-line",
         onlyEmpty: true,
       }),
-      this.decorateMarkerLayer(this.selectionsMarkerLayer, {
-        type: "line-number",
-        class: "cursor-line",
-      }),
-      this.decorateMarkerLayer(this.selectionsMarkerLayer, {
-        type: "line-number",
-        class: "cursor-line-no-selection",
-        onlyHead: true,
-        onlyEmpty: true,
-      }),
     ];
   }
 

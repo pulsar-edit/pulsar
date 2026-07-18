@@ -202,7 +202,6 @@ module.exports = {
 
   mouseMove(event) {
     if (!this.editor || this.pickerFlag) return;
-    this.removeCursorLineDecoration();
     this.addSelectionClass();
     this.context = true;
     this.lastMoveEvent = event;
@@ -327,14 +326,8 @@ module.exports = {
     this.editor.getElement().classList.remove("column-selection");
   },
 
-  removeCursorLineDecoration() {
-    if (!this.editor || this.selecting || !this.editor.cursorLineDecorations) return;
-    for (const decoration of this.editor.cursorLineDecorations) decoration.destroy();
-  },
-
   restoreEditorPresentation() {
     if (!this.editor) return;
-    if (this.selecting) this.editor.decorateCursorLine();
     this.removeSelectionClass();
     this.restoreAtomicSoftTabs();
   },
