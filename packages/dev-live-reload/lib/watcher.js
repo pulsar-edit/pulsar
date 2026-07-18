@@ -55,17 +55,23 @@ module.exports = class Watcher {
 
   watchDirectory(directoryPath, callback = () => this.loadAllStylesheets()) {
     if (this.isInAsarArchive(directoryPath)) return;
-    const watcherPromise = watchPath(directoryPath, {}, () => callback());
+    // Route change notifications through an emitter so tests can synthesize
+    // events (like the old Directory) and callers can subscribe uniformly.
+    const emitter = new Emitter();
+    const watcherPromise = watchPath(directoryPath, {}, () => emitter.emit("did-change"));
     watcherPromise.catch(() => {});
     this.disposables.add(
       new Disposable(() => watcherPromise.then((watcher) => watcher.dispose(), () => {})),
+      emitter.on("did-change", () => callback()),
+      new Disposable(() => emitter.dispose()),
     );
-    // Track a lightweight descriptor (PackageWatcher filters `entities` by
-    // `isFile()`/`getPath()` to avoid re-watching known stylesheets).
+    // PackageWatcher filters `entities` by `isFile()`/`getPath()` to avoid
+    // re-watching known stylesheets; `emitter` mirrors the old Directory API.
     this.entities.push({
       getPath: () => directoryPath,
       isFile: () => false,
       isDirectory: () => true,
+      emitter,
     });
   }
 
@@ -84,6 +90,7 @@ module.exports = class Watcher {
       getPath: () => filePath,
       isFile: () => true,
       isDirectory: () => false,
+      emitter: watcher.emitter,
     });
   }
 
