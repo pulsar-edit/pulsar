@@ -1,0 +1,6 @@
+{
+  "atom-workspace": {
+    "alt-q": "column-selection:sticky",
+    "ctrl-q": "column-selection:picker"
+  }
+}

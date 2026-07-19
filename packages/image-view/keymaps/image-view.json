@@ -1,0 +1,10 @@
+{
+  ".image-view": {
+    "cmdorctrl-+": "image-view:zoom-in",
+    "cmdorctrl-=": "image-view:zoom-in",
+    "cmdorctrl--": "image-view:zoom-out",
+    "cmdorctrl-_": "image-view:zoom-out",
+    "cmdorctrl-9": "image-view:zoom-to-fit",
+    "cmdorctrl-0": "image-view:reset-zoom"
+  }
+}

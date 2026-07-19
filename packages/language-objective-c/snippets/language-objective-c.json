@@ -1,0 +1,72 @@
+{
+  ".source.objc, .source.objcpp": {
+    "#import <>": {
+      "prefix": "Imp",
+      "body": "#import <${1:Cocoa/Cocoa.h}>"
+    },
+    "#import \"\"": {
+      "prefix": "imp",
+      "body": "#import \"$1\""
+    },
+    "NSArray": {
+      "prefix": "array",
+      "body": "NSMutableArray *${1:array} = [NSMutableArray array];"
+    },
+    "NSDictionary": {
+      "prefix": "dict",
+      "body": "NSMutableDictionary *${1:dict} = [NSMutableDictionary dictionary];"
+    },
+    "@selector(…)": {
+      "prefix": "sel",
+      "body": "@selector(${1:method}:)"
+    },
+    "Class Interface": {
+      "prefix": "clh",
+      "body": "@interface $1 : ${2:NSObject}\n{$3\n}\n$0\n@end"
+    },
+    "CoreData": {
+      "prefix": "cdacc",
+      "body": "- (${1:id})${2:attribute}\n{\n\t[self willAccessValueForKey:@\"${2: attribute}\"];\n\t${1:id} value = [self primitiveValueForKey:@\"${2: attribute}\"];\n\t[self didAccessValueForKey:@\"${2: attribute}\"];\n\treturn value;\n}\n\n- (void)set${2/./\\u$0/}:($1)aValue\n{\n\t[self willChangeValueForKey:@\"${2: attribute}\"];\n\t[self setPrimitiveValue:aValue forKey:@\"${2: attribute}\"];\n\t[self didChangeValueForKey:@\"${2: attribute}\"];\n}"
+    },
+    "Detach New NSThread": {
+      "prefix": "thread",
+      "body": "[NSThread detachNewThreadSelector:@selector(${1:method}:) toTarget:${2:aTarget} withObject:${3:anArgument}]"
+    },
+    "Bind Property to Key Path of Object": {
+      "prefix": "bind",
+      "body": "bind:@\"${2:binding}\" toObject:${3:observableController} withKeyPath:@\"${4:keyPath}\" options:${5:nil}"
+    },
+    "Lock Focus": {
+      "prefix": "focus",
+      "body": "[self lockFocus];\n$0\n[self unlockFocus];"
+    },
+    "Autorelease Pool": {
+      "prefix": "pool",
+      "body": "@autoreleasepool {\n    $0\n}"
+    },
+    "NSBezierPath": {
+      "prefix": "bez",
+      "body": "NSBezierPath *${1:path} = [NSBezierPath bezierPath];\n$0"
+    },
+    "NSString With Format": {
+      "prefix": "format",
+      "body": "[NSString stringWithFormat:@\"$1\", $2]$0"
+    },
+    "Read Defaults Value": {
+      "prefix": "getprefs",
+      "body": "[[NSUserDefaults standardUserDefaults] objectForKey:${1:key}];"
+    },
+    "Save and Restore Graphics Context": {
+      "prefix": "gsave",
+      "body": "[NSGraphicsContext saveGraphicsState];\n$0\n[NSGraphicsContext restoreGraphicsState];\n"
+    },
+    "Write Defaults Value": {
+      "prefix": "setprefs",
+      "body": "[[NSUserDefaults standardUserDefaults] setObject:${1:object} forKey:${2:key}];"
+    },
+    "for(… in …)": {
+      "prefix": "forin",
+      "body": "for(${1:id} ${2:item} in ${3:array})\n{\n\t$0\n}"
+    }
+  }
+}

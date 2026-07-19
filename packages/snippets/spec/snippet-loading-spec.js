@@ -186,6 +186,7 @@ describe("Snippet Loading", () => {
         path.join(configDirPath, "snippets.json"),
         `\
 {
+  // JSON comments are supported in user configuration files.
   ".foo": {
     "foo snippet": {
       "prefix": "foo",

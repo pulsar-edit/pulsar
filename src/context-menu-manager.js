@@ -24,7 +24,7 @@ if (
 // An instance of this class is always available as the `atom.contextMenu`
 // global.
 //
-// ## Context Menu CSON Format
+// ## Context Menu Object Format
 //
 // ```coffee
 // 'atom-workspace': [{label: 'Help', command: 'application:open-documentation'}]
@@ -37,7 +37,7 @@ if (
 // }]
 // ```
 //
-// In your package's menu `.cson` file you need to specify it under a
+// In your package's menu JSON, JSONC, or CSON file you need to specify it under a
 // `context-menu` key:
 //
 // ```coffee
@@ -68,7 +68,11 @@ module.exports = class ContextMenuManager {
       return this.add(platformContextMenu, this.devMode || false);
     } else {
       const menusDirPath = path.join(this.resourcePath, "menus");
-      const platformMenuPath = fs.resolve(menusDirPath, process.platform, ["cson", "json"]);
+      const platformMenuPath = fs.resolve(menusDirPath, process.platform, [
+        "json",
+        "jsonc",
+        "cson",
+      ]);
       const map = CSON.readFileSync(platformMenuPath);
       return this.add(map["context-menu"]);
     }

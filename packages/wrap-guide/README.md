@@ -12,19 +12,26 @@ Displays a vertical line in the editor to guide line length.
 
 ## Configuration
 
-Disable the guide for a particular language through scoped configuration in your `config.cson`. For example, to turn it off for GitHub-Flavored Markdown:
+Disable the guide for a particular language through scoped configuration in your `config.json`. For example, to turn it off for GitHub-Flavored Markdown:
 
-```coffeescript
-'.source.gfm':
-  'wrap-guide':
-    'enabled': false
+```jsonc
+{
+  ".source.gfm": {
+    "wrap-guide": {
+      "enabled": false,
+    },
+  },
+}
 ```
 
 Show multiple guide lines by listing the columns. The right-most line acts as your `language.preferredLineLength`:
 
-```coffeescript
-'wrap-guide':
-  'columns': [72, 80, 100, 120]
+```jsonc
+{
+  "wrap-guide": {
+    "columns": [72, 80, 100, 120],
+  },
+}
 ```
 
 ## Customization

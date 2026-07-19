@@ -4,7 +4,7 @@ Quick access and switching between projects.
 
 ## Features
 
-- **Project list**: browse and open projects saved in a `projects.cson` config file.
+- **Project list**: browse and open projects saved in a `projects.json` config file.
 - **Directory scanning**: auto-discover subdirectories as projects with glob patterns.
 - **Glob paths**: wildcard patterns in `paths` expand to all matching directories at load time.
 - **Tags support**: organize and filter projects by tags; a `#tag` query targets tags explicitly.
@@ -34,7 +34,7 @@ Commands available in `.project-list`:
 
 ## Configuration
 
-Projects are defined in `projects.cson` in the Lumine config directory — open it with `project-list:edit`. The file holds an array of project objects:
+Projects are defined in `projects.json` in the Lumine config directory — open it with `project-list:edit`. The file holds an array of project objects:
 
 | Setting    | Type                        | Description                                                                                 | Default                 |
 | ---------- | --------------------------- | ------------------------------------------------------------------------------------------- | ----------------------- |
@@ -46,29 +46,21 @@ Projects are defined in `projects.cson` in the Lumine config directory — open 
 | `devMode`  | `boolean`                   | Open the project in dev mode.                                                               | `false`                 |
 | `safeMode` | `boolean`                   | Open the project in safe mode.                                                              | `false`                 |
 
-Example `projects.cson`:
+Example `projects.json`:
 
-```cson
+```jsonc
 [
   {
-    title: "My Library"
-    paths: [
-      "C:/Work/library/"
-    ]
-    tags: [
-      "work"
-    ]
-    scan: true
+    "title": "My Library",
+    "paths": ["C:/Work/library/"],
+    "tags": ["work"],
+    "scan": true,
   },
   {
-    title: "Packages"
-    paths: [
-      "C:/Work/packages/*"
-    ]
-    tags: [
-      "work"
-    ]
-  }
+    "title": "Packages",
+    "paths": ["C:/Work/packages/*"],
+    "tags": ["work"],
+  },
 ]
 ```
 

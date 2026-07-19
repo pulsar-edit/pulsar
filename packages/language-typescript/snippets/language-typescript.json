@@ -1,0 +1,139 @@
+{
+  ".source.ts, .source.tsx": {
+    "Constructor": {
+      "prefix": "ctor",
+      "body": "/**\n *\n */\nconstructor() {\n\tsuper();\n\t$0\n}",
+      "description": "Constructor"
+    },
+    "Class Definition": {
+      "prefix": "class",
+      "body": "class ${1:name} {\n\tconstructor(${2:parameters}) {\n\t\t$0\n\t}\n}",
+      "description": "Class Definition"
+    },
+    "Public Method Definition": {
+      "prefix": "public method",
+      "body": "/**\n * ${1:name}\n */\npublic ${1:name}() {\n\t$0\n}",
+      "description": "Public Method Definition"
+    },
+    "Private Method Definition": {
+      "prefix": "private method",
+      "body": "private ${1:name}() {\n\t$0\n}",
+      "description": "Private Method Definition"
+    },
+    "Import external module.": {
+      "prefix": "import statement",
+      "body": "import { $0 } from \"${1:module}\";",
+      "description": "Import external module."
+    },
+    "Property getter": {
+      "prefix": "get",
+      "body": "public get ${1:value}() : ${2:string} {\n\t${3:return $0}\n}",
+      "description": "Property getter"
+    },
+    "Log to the console": {
+      "prefix": "log",
+      "body": "console.log($1);\n$0",
+      "description": "Log to the console"
+    },
+    "Define a full property": {
+      "prefix": "prop",
+      "body": "private _${1:value} : ${2:string};\npublic get ${1:value}() : ${2:string} {\n\treturn this._${1:value};\n}\npublic set ${1:value}(v : ${2:string}) {\n\tthis._${1:value} = v;\n}",
+      "description": "Define a full property"
+    },
+    "Triple-slash reference": {
+      "prefix": "ref",
+      "body": "/// <reference path=\"$1\" />\n$0",
+      "description": "Triple-slash reference"
+    },
+    "Return false": {
+      "prefix": "ret0",
+      "body": "return false;$0",
+      "description": "Return false"
+    },
+    "Return true": {
+      "prefix": "ret1",
+      "body": "return true;$0",
+      "description": "Return true"
+    },
+    "Return statement": {
+      "prefix": "ret",
+      "body": "return $1;$0",
+      "description": "Return statement"
+    },
+    "Property setter": {
+      "prefix": "set",
+      "body": "public set ${1:value}(v : ${2:string}) {\n\tthis.$3 = v;\n}",
+      "description": "Property setter"
+    },
+    "Throw Exception": {
+      "prefix": "throw",
+      "body": "throw \"$1\";\n$0",
+      "description": "Throw Exception"
+    },
+    "For Loop": {
+      "prefix": "for",
+      "body": "for (let ${1:index} = 0; ${1:index} < ${2:array}.length; ${1:index}++) {\n\tconst ${3:element} = ${2:array}[${1:index}];\n\t$0\n}",
+      "description": "For Loop"
+    },
+    "For-Each Loop using =>": {
+      "prefix": "foreach =>",
+      "body": "${1:array}.forEach(${2:element} => {\n\t$0\n});",
+      "description": "For-Each Loop using =>"
+    },
+    "For-In Loop": {
+      "prefix": "forin",
+      "body": "for (const ${1:key} in ${2:object}) {\n\tif (${2:object}.hasOwnProperty(${1:key})) {\n\t\tconst ${3:element} = ${2:object}[${1:key}];\n\t\t$0\n\t}\n}",
+      "description": "For-In Loop"
+    },
+    "For-Of Loop": {
+      "prefix": "forof",
+      "body": "for (const ${1:iterator} of ${2:object}) {\n\t$0\n}",
+      "description": "For-Of Loop"
+    },
+    "Function Statement": {
+      "prefix": "function",
+      "body": "function ${1:name}(${2:params}:${3:type}) {\n\t$0\n}",
+      "description": "Function Statement"
+    },
+    "If Statement": {
+      "prefix": "if",
+      "body": "if (${1:condition}) {\n\t$0\n}",
+      "description": "If Statement"
+    },
+    "If-Else Statement": {
+      "prefix": "ifelse",
+      "body": "if (${1:condition}) {\n\t$0\n} else {\n\t\n}",
+      "description": "If-Else Statement"
+    },
+    "New Statement": {
+      "prefix": "new",
+      "body": "const ${1:name} = new ${2:type}(${3:arguments});$0",
+      "description": "New Statement"
+    },
+    "Switch Statement": {
+      "prefix": "switch",
+      "body": "switch (${1:key}) {\n\tcase ${2:value}:\n\t\t$0\n\t\tbreak;\n\n\tdefault:\n\t\tbreak;\n}",
+      "description": "Switch Statement"
+    },
+    "While Statement": {
+      "prefix": "while",
+      "body": "while (${1:condition}) {\n\t$0\n}",
+      "description": "While Statement"
+    },
+    "Do-While Statement": {
+      "prefix": "dowhile",
+      "body": "do {\n\t$0\n} while (${1:condition});",
+      "description": "Do-While Statement"
+    },
+    "Try-Catch Statement": {
+      "prefix": "trycatch",
+      "body": "try {\n\t$0\n} catch (${1:error}) {\n\t\n}",
+      "description": "Try-Catch Statement"
+    },
+    "Set Timeout Function": {
+      "prefix": "settimeout",
+      "body": "setTimeout(() => {\n\t$0\n}, ${1:timeout});",
+      "description": "Set Timeout Function"
+    }
+  }
+}

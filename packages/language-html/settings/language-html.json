@@ -1,0 +1,17 @@
+{
+  ".text.html": {
+    "autocomplete": {
+      "extraWordCharacters": "-"
+    },
+    "language": {
+      "commentStart": "<!-- ",
+      "commentEnd": " -->",
+      "commentDelimiters": {
+        "block": ["<!--", "-->"]
+      },
+      "foldEndPattern": "(?x)\n\t\t(</(?i:head|body|table|thead|tbody|tfoot|tr|div|select|fieldset|style|script|ul|ol|li|form|dl|section|article|header|footer|nav|aside)>\n\t\t|^(?!.*?<!--).*?--\\s*>\n\t\t|^<!--\\ end\\ tminclude\\ -->$\n\t\t|<\\?(?:php)?.*\\bend(if|for(each)?|while)\\b\n\t\t|\\{\\{?/(if|foreach|capture|literal|foreach|php|section|strip)\n\t\t|^[^{]*\\}\n\t\t|^\\s*\\)[,;]\n\t\t)",
+      "increaseIndentPattern": "(?x)\n<(?!\\?|(?:area|base|br|col|frame|hr|html|img|input|link|meta|param)\\b|[^>]*/>)\n([-_\\.A-Za-z0-9]+)(?=\\s|>)\\b[^>]*>(?!.*</\\1>)\n|<!--(?!.*-->)\n|<\\?php.+?\\b(if|else(?:if)?|for(?:each)?|while)\\b.*:(?!.*end\\2)\n|\\{[^}\"']*$",
+      "decreaseIndentPattern": "(?x)\n^\\s*\n(</(?!html)\n  [-_\\.A-Za-z0-9]+\\b[^>]*>\n  |-->\n  |<\\?(php)?\\s+(else(if)?|end(if|for(each)?|while)|\\})\n  |\\}\n)"
+    }
+  }
+}

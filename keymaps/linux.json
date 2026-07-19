@@ -1,0 +1,62 @@
+{
+  // Linux-only bindings. Anything shared with macOS as a cmd/ctrl swap now
+  // lives in base.json as a 'cmdorctrl' binding.
+  "body": {
+    // Lumine Specific
+    "ctrl-shift-f5": "window:reload",
+    "ctrl-shift-i": "window:toggle-dev-tools",
+    "ctrl-shift-y": "window:run-package-specs",
+    "ctrl-shift-o": "application:open-folder",
+    "ctrl-shift-a": "application:add-project-folder",
+    "ctrl-shift-pageup": "pane:move-item-left",
+    "ctrl-shift-pagedown": "pane:move-item-right",
+    "f11": "window:toggle-full-screen",
+    "alt-shift-left": "editor:move-selection-left",
+    "alt-shift-right": "editor:move-selection-right",
+    // Sublime Parity
+    "ctrl-o": "application:open-file",
+    "ctrl-f4": "core:close",
+    "ctrl-insert": "core:copy",
+    "shift-insert": "core:paste",
+    "shift-delete": "core:cut",
+    "ctrl-shift-up": "core:move-up",
+    "ctrl-shift-down": "core:move-down",
+    "alt-1": "pane:show-item-1",
+    "alt-2": "pane:show-item-2",
+    "alt-3": "pane:show-item-3",
+    "alt-4": "pane:show-item-4",
+    "alt-5": "pane:show-item-5",
+    "alt-6": "pane:show-item-6",
+    "alt-7": "pane:show-item-7",
+    "alt-8": "pane:show-item-8",
+    "alt-9": "pane:show-item-9"
+  },
+  "atom-text-editor": {
+    // Platform Bindings
+    "ctrl-left": "editor:move-to-beginning-of-word",
+    "ctrl-right": "editor:move-to-end-of-word",
+    "ctrl-shift-left": "editor:select-to-beginning-of-word",
+    "ctrl-shift-right": "editor:select-to-end-of-word",
+    "ctrl-backspace": "editor:delete-to-beginning-of-word",
+    "ctrl-delete": "editor:delete-to-end-of-word",
+    "ctrl-home": "core:move-to-top",
+    "ctrl-end": "core:move-to-bottom",
+    "ctrl-shift-home": "core:select-to-top",
+    "ctrl-shift-end": "core:select-to-bottom",
+    "alt-left": "editor:move-to-previous-subword-boundary",
+    "alt-right": "editor:move-to-next-subword-boundary",
+    "alt-shift-left": "editor:select-to-previous-subword-boundary",
+    "alt-shift-right": "editor:select-to-next-subword-boundary",
+    "alt-backspace": "editor:delete-to-beginning-of-subword",
+    "alt-delete": "editor:delete-to-end-of-subword"
+  },
+  "atom-workspace atom-text-editor:not([mini])": {
+    // Lumine specific
+    "ctrl-alt-shift-[": "editor:fold-selection",
+    // Sublime Parity
+    "ctrl-up": "editor:move-line-up",
+    "ctrl-down": "editor:move-line-down",
+    "alt-shift-up": "editor:add-selection-above",
+    "alt-shift-down": "editor:add-selection-below"
+  }
+}

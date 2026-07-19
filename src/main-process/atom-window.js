@@ -92,6 +92,7 @@ module.exports = class AtomWindow extends EventEmitter {
         JSON.stringify(
           Object.assign(
             {
+              configFilePath: this.atomApplication.configFile.path,
               userSettings: !this.isSpec ? this.atomApplication.configFile.get() : null,
             },
             this.loadSettings,

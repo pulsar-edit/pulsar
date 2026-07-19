@@ -30,12 +30,16 @@ const OtherPlatforms = Platforms.filter(platform => platform !== process.platfor
 // Key bindings are plain JavaScript objects containing **CSS selectors** as
 // their top level keys, then **keystroke patterns** mapped to commands.
 //
-// ```cson
-// '.workspace':
-//   'ctrl-l': 'package:do-something'
-//   'ctrl-z': 'package:do-something-else'
-// '.mini.editor':
-//   'enter': 'core:confirm'
+// ```jsonc
+// {
+//   ".workspace": {
+//     "ctrl-l": "package:do-something",
+//     "ctrl-z": "package:do-something-else"
+//   },
+//   ".mini.editor": {
+//     "enter": "core:confirm"
+//   }
+// }
 // ```
 //
 // When a keystroke sequence matches a binding in a given context, a custom DOM
@@ -379,7 +383,7 @@ module.exports =
     loadKeymap(bindingsPath, options) {
       const checkIfDirectory = (options != null ? options.checkIfDirectory : undefined) != null ? (options != null ? options.checkIfDirectory : undefined) : true;
       if (checkIfDirectory && fs.isDirectorySync(bindingsPath)) {
-        for (var filePath of Array.from(fs.listSync(bindingsPath, ['.cson', '.json']))) {
+        for (var filePath of Array.from(fs.listSync(bindingsPath, ['.json', '.jsonc', '.cson']))) {
           if (this.filePathMatchesPlatform(filePath)) {
             this.loadKeymap(filePath, {checkIfDirectory: false});
           }
@@ -460,7 +464,8 @@ module.exports =
     }
 
     // Determine if the given path should be loaded on this platform. If the
-    // filename has the pattern '<platform>.cson' or 'foo.<platform>.cson' and
+    // filename has the pattern '<platform>.<extension>' or
+    // 'foo.<platform>.<extension>' and
     // <platform> does not match the current platform, returns false. Otherwise
     // returns true.
     filePathMatchesPlatform(filePath) {

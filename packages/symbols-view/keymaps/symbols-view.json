@@ -1,0 +1,16 @@
+{
+  "atom-text-editor:not([mini])": {
+    "cmdorctrl-r": "symbols-view:toggle-file-symbols"
+  },
+  "body": {
+    "cmdorctrl-shift-r": "symbols-view:toggle-project-symbols"
+  },
+  ".platform-darwin atom-text-editor:not([mini])": {
+    "cmd-alt-down": "symbols-view:go-to-declaration",
+    "cmd-alt-up": "symbols-view:return-from-declaration"
+  },
+  ".platform-win32 atom-text-editor:not([mini]), .platform-linux atom-text-editor:not([mini])": {
+    "ctrl-alt-shift-down": "symbols-view:go-to-declaration",
+    "ctrl-alt-shift-up": "symbols-view:return-from-declaration"
+  }
+}

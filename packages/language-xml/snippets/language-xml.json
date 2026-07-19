@@ -1,0 +1,24 @@
+{
+  ".text.xml": {
+    "CDATA": {
+      "prefix": "cdata",
+      "body": "<![CDATA[$0]]>"
+    },
+    "XML Processing Instruction": {
+      "prefix": "xml",
+      "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    },
+    "Long Attribute Tag": {
+      "prefix": "<a",
+      "body": "<${1:name} ${2:attr}=\"${3:value}\">$4\n</${1:name}>"
+    },
+    "Long Tag": {
+      "prefix": "<",
+      "body": "<${1:name}>$2</${1:name}>"
+    },
+    "Short Tag": {
+      "prefix": ">",
+      "body": "<${1:name} />"
+    }
+  }
+}

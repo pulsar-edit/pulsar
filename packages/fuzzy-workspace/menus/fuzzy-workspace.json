@@ -1,0 +1,18 @@
+{
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Fuzzy Workspace",
+          "submenu": [
+            {
+              "label": "Toggle",
+              "command": "fuzzy-workspace:toggle"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

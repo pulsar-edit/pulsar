@@ -1,0 +1,19 @@
+{
+  "name": "TOML",
+  "scopeName": "source.toml",
+  "type": "modern-tree-sitter",
+  "parser": "tree-sitter-toml",
+  "injectionRegex": "(toml|TOML)$",
+  "treeSitter": {
+    "parserSource": "github:tree-sitter-grammars/tree-sitter-toml#64b56832c2cffe41758f28e05c756a3a98d16f41",
+    "wasmBuildTool": "tree-sitter-cli#v0.26.10",
+    "grammar": "tree-sitter-toml/tree-sitter-toml.wasm",
+    "highlightsQuery": "tree-sitter-toml/highlights.scm",
+    "foldsQuery": "tree-sitter-toml/folds.scm",
+    "tagsQuery": "tree-sitter-toml/tags.scm"
+  },
+  "fileTypes": ["toml"],
+  "comments": {
+    "start": "# "
+  }
+}

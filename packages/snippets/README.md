@@ -8,7 +8,7 @@ Expand snippets matching the current prefix with `tab`.
 - **Tab stops**: cycle through placeholders in the expanded snippet.
 - **Command triggers**: invoke snippets by command name in addition to prefixes.
 - **Variables and transforms**: use LSP and VSCode-style variables with case and sed-style transformations.
-- **User and package snippets**: load snippets from packages and from your user `snippets.cson`.
+- **User and package snippets**: load snippets from packages and from your user `snippets.json`.
 
 ## Commands
 
@@ -21,13 +21,17 @@ Commands available in `atom-text-editor`:
 
 ## Usage
 
-Snippet files live in a package's `snippets/` folder and in your user `snippets.cson`, and may be `.json` or `.cson`. The outermost keys are the scope selectors, the next level are snippet names, and each snippet provides a `body` along with at least one trigger (`prefix` or `command`):
+Snippet files live in a package's `snippets/` folder and in your user `snippets.json`, and may be `.json`, `.jsonc`, or `.cson`. The outermost keys are the scope selectors, the next level are snippet names, and each snippet provides a `body` along with at least one trigger (`prefix` or `command`):
 
-```coffee
-'.source.js':
-  'console.log':
-    'prefix': 'log'
-    'body': 'console.log(${1:"crash"});$2'
+```jsonc
+{
+  ".source.js": {
+    "console.log": {
+      "prefix": "log",
+      "body": "console.log(${1:\"crash\"});$2",
+    },
+  },
+}
 ```
 
 `$` followed by a number marks tab stops that can be cycled with tab once the snippet has expanded. Snippets support a subset of TextMate features plus LSP and VSCode-style variables such as `TM_SELECTED_TEXT`, `TM_FILENAME`, and `CLIPBOARD`, with transformation flags like `/upcase`, `/downcase`, `/camelcase`, and `/kebabcase`.

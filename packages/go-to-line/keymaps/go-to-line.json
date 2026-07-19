@@ -1,0 +1,10 @@
+{
+  "body": {
+    "ctrl-g": "go-to-line:toggle"
+  },
+  ".go-to-line atom-text-editor[mini]": {
+    "enter": "core:confirm",
+    "escape": "core:cancel",
+    "cmdorctrl-w": "core:cancel"
+  }
+}

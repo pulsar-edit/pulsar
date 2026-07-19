@@ -10,6 +10,6 @@
   },
   "repository": "https://github.com/lumine-code/lumine",
   "devDependencies": {
-    "@lumine-code/season": "https://github.com/lumine-code/season.git#8cd50d17ce33826ea2e55d18e936b1f1aeb96342"
+    "@lumine-code/season": "https://github.com/lumine-code/season.git#91bdcdd1009094699db8818c044cff557c9ed947"
   }
 }

@@ -1,8 +1,0 @@
-'.text.git-commit':
-  'commit-message':
-    'prefix': 'comm'
-    'body': """
-      ${1:Subject < 50 chars}
-
-      ${2:Body in detail}
-    """

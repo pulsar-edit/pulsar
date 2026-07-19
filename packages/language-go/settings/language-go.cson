@@ -1,9 +1,0 @@
-'.source.go':
-  'language':
-    'commentStart': '// '
-    'commentDelimiters':
-      'block': ['/*', '*/']
-      'line': '//'
-    'increaseIndentPattern': '^.*(\\bcase\\b.*:|\\bdefault\\b:|(\\b(func|if|else|switch|select|for|struct)\\b.*)?{[^}]*|\\([^)]*)$'
-    'decreaseIndentPattern': '^\\s*(\\bcase\\b.*:|\\bdefault\\b:|}[),]?|\\)[,]?)$'
-    'decreaseNextIndentPattern': '^\\s*[^\\s()}]+(?<m>[^()]*\\((?:\\g<m>[^()]*|[^()]*)\\))*[^()]*\\)[,]?$'

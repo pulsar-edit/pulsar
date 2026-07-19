@@ -1,0 +1,19 @@
+{
+  "atom-text-editor": {
+    "ctrl-f2": "bookmarks:view-all",
+    "f2": "bookmarks:jump-to-next-bookmark",
+    "shift-f2": "bookmarks:jump-to-previous-bookmark"
+  },
+  ".platform-darwin atom-text-editor": {
+    "cmd-f2": "bookmarks:toggle-bookmark",
+    "cmd-shift-f2": "bookmarks:clear-bookmarks"
+  },
+  ".platform-win32 atom-text-editor": {
+    "alt-ctrl-f2": "bookmarks:toggle-bookmark",
+    "ctrl-shift-f2": "bookmarks:clear-bookmarks"
+  },
+  ".platform-linux atom-text-editor": {
+    "ctrl-shift-f2": "bookmarks:toggle-bookmark",
+    "alt-shift-f2": "bookmarks:clear-bookmarks"
+  }
+}

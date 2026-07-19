@@ -462,7 +462,7 @@ class PathWatcher {
         if (err) {
           // The path may not exist yet — a legitimate case, since a single-file
           // watch observes the containing directory to detect the file being
-          // created (e.g. a first-run `config.cson`). Fall back to the given
+          // created (e.g. a first-run `config.json`). Fall back to the given
           // path rather than rejecting, which would escape as an unhandled
           // rejection through `getNormalizedPathPromise()`.
           this.normalizedPath = watchedPath;

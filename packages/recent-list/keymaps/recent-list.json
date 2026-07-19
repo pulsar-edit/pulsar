@@ -1,0 +1,18 @@
+{
+  "atom-workspace": {
+    "alt-f10": "recent-list:toggle"
+  },
+  ".recent-list atom-text-editor[mini]": {
+    "enter": "select-list:open",
+    "alt-enter": "select-list:swap",
+    "ctrl-enter": "select-list:switch",
+    "shift-enter": "select-list:append",
+    "alt-v": "select-list:paste",
+    "alt-d": "select-list:dev",
+    "alt-s": "select-list:safe",
+    "alt-f12": "select-list:external",
+    "ctrl-f12": "select-list:show",
+    "f5": "select-list:update",
+    "alt-delete": "select-list:delete"
+  }
+}

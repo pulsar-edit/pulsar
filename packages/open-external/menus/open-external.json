@@ -1,0 +1,54 @@
+{
+  "context-menu": {
+    ".tree-view .file, .tree-view .directory": [
+      {
+        "label": "Open Externally",
+        "command": "open-external:open"
+      },
+      {
+        "label": "Show in Folder",
+        "command": "open-external:show"
+      },
+      {
+        "type": "separator"
+      }
+    ],
+    ".image-view, .image-editor, .pdf-viewer": [
+      {
+        "label": "Open Externally",
+        "command": "open-external:open"
+      },
+      {
+        "label": "Show in Folder",
+        "command": "open-external:show"
+      },
+      {
+        "type": "separator"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Open External",
+          "submenu": [
+            {
+              "label": "Toggle Automatic Opening",
+              "command": "open-external:toggle"
+            },
+            {
+              "label": "Open Externally",
+              "command": "open-external:open"
+            },
+            {
+              "label": "Show in Folder",
+              "command": "open-external:show"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

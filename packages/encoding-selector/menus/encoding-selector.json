@@ -1,0 +1,21 @@
+{
+  "menu": [
+    {
+      "label": "Edit",
+      "submenu": [
+        {
+          "label": "Select Encoding",
+          "command": "encoding-selector:show"
+        }
+      ]
+    }
+  ],
+  "context-menu": {
+    "atom-text-editor:not([mini])": [
+      {
+        "label": "Change Encoding",
+        "command": "encoding-selector:show"
+      }
+    ]
+  }
+}

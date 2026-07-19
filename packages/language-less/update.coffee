@@ -26,7 +26,7 @@ functionsPromise.then (results) ->
         description: func.description
         descriptionMoreURL: "http://lesscss.org/functions/##{functionType}-#{func.name}"
 
-  configPath = path.join(__dirname, 'settings', 'language-less.cson')
+  configPath = path.join(__dirname, 'settings', 'language-less.json')
   config = CSON.readFileSync(configPath)
   builtins = config['.source.css.less .meta.property-value'].autocomplete.symbols.builtins
   builtins.suggestions = suggestions

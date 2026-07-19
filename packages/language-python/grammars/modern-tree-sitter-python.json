@@ -1,0 +1,34 @@
+{
+  "name": "Python",
+  "scopeName": "source.python",
+  "type": "modern-tree-sitter",
+  "parser": "tree-sitter-python",
+  "injectionRegex": "^(py|PY|python|PYTHON)$",
+  "firstLineRegex": [
+    // shebang line
+    "^#![ \\t]*/.*\\bpython[\\d\\.]*\\b",
+    // vim modeline
+    "vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=python"
+  ],
+  "fileTypes": [
+    "py",
+    "pyi",
+    "pyw",
+    "gyp",
+    "gypi",
+    "SConstruct",
+    "Sconstruct",
+    "sconstruct",
+    "SConscript",
+    "wsgi"
+  ],
+  "treeSitter": {
+    "parserSource": "github:tree-sitter/tree-sitter-python#v0.25.0",
+    "wasmBuildTool": "tree-sitter-cli#v0.26.10",
+    "grammar": "ts/tree-sitter-python.wasm",
+    "highlightsQuery": "ts/highlights.scm",
+    "tagsQuery": "ts/tags.scm",
+    "foldsQuery": "ts/folds.scm",
+    "indentsQuery": "ts/indents.scm"
+  }
+}

@@ -2050,7 +2050,7 @@ describe("KeymapManager", function() {
     });
     describe("if called with a file path", function() {
       it("loads the keybindings from the file at the given path", function() {
-        keymapManager.loadKeymap(path.join(__dirname, 'fixtures', 'a.cson'));
+        keymapManager.loadKeymap(path.join(__dirname, 'fixtures', 'a.json'));
         return assert.equal(keymapManager.findKeyBindings({
           command: 'x'
         }).length, 1);

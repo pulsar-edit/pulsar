@@ -1,0 +1,33 @@
+// Your keymap
+//
+// Lumine keymaps work similarly to style sheets. Just as style sheets use
+// selectors to apply styles to elements, Lumine keymaps use selectors to associate
+// keystrokes with events in specific contexts. Unlike style sheets however,
+// each selector can only be declared once.
+//
+// You can create a new keybinding in this file by typing "key" and then hitting
+// tab.
+//
+// Here's an example taken from Lumine's built-in keymap:
+//
+// {
+//   "atom-text-editor": {
+//     "enter": "editor:newline"
+//   },
+//   "atom-workspace": {
+//     "ctrl-shift-p": "core:move-up",
+//     "ctrl-p": "core:move-down"
+//   }
+// }
+//
+// You can find more information about keymaps in these guides:
+// * https://docs.pulsar-edit.dev/customizing-lumine/customizing-keybindings/
+// * https://docs.pulsar-edit.dev/infrastructure/keymaps-in-depth/
+//
+// If you're having trouble with your keybindings not working, try the
+// Keybinding Resolver: `Cmd+.` on macOS and `Ctrl+.` on other platforms. See the
+// Debugging Guide for more information:
+// * https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#check-your-keybindings
+//
+// This file uses JSON with Comments (JSONC).
+{}

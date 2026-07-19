@@ -1418,13 +1418,13 @@ Until here
 
   it("verifies that regular expressions have explicit count modifiers", function () {
     let source = fs.readFileSync(
-      path.resolve(__dirname, "..", "grammars", "coffeescript.cson"),
+      path.resolve(__dirname, "..", "grammars", "coffeescript.json"),
       "utf8",
     );
     expect(source.search(/{,/)).toEqual(-1);
 
     source = fs.readFileSync(
-      path.resolve(__dirname, "..", "grammars", "coffeescript (literate).cson"),
+      path.resolve(__dirname, "..", "grammars", "coffeescript (literate).json"),
       "utf8",
     );
     expect(source.search(/{,/)).toEqual(-1);

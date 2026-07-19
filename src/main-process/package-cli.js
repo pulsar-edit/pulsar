@@ -106,7 +106,9 @@ async function install(source) {
 
     const read = readMetadata(cloneDir);
     if (!read) {
-      throw new Error("The repository does not contain a package.json or package.cson file.");
+      throw new Error(
+        "The repository does not contain a package.json, package.jsonc, or package.cson file.",
+      );
     }
 
     const { path: metadataPath, metadata } = read;

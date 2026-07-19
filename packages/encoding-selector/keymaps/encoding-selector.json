@@ -1,0 +1,5 @@
+{
+  "atom-text-editor": {
+    "ctrl-shift-u": "encoding-selector:show"
+  }
+}

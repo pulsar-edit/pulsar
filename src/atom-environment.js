@@ -270,7 +270,7 @@ class AtomEnvironment {
     this.blobStore = params.blobStore;
     this.configDirPath = params.configDirPath;
 
-    const { devMode, safeMode, resourcePath, userSettings, projectSpecification } =
+    const { configFilePath, devMode, safeMode, resourcePath, userSettings, projectSpecification } =
       this.getLoadSettings();
 
     this.stateStore.initialize({
@@ -278,7 +278,8 @@ class AtomEnvironment {
     });
 
     this.config.initialize({
-      mainSource: this.enablePersistence && path.join(this.configDirPath, "config.cson"),
+      mainSource:
+        this.enablePersistence && (configFilePath || path.join(this.configDirPath, "config.json")),
     });
     this.config.resetUserSettings(userSettings);
 

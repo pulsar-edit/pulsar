@@ -7,6 +7,7 @@
  */
 const path = require("path");
 const temp = require("temp").track();
+const fs = require("@lumine-code/fs-plus");
 const babelCompiler = require("../src/babel");
 const CoffeeScript = require("coffeescript");
 const CSON = require("@lumine-code/season");
@@ -14,11 +15,13 @@ const TypeScriptTranspiler = require("../src/typescript");
 const CompileCache = require("../src/compile-cache");
 
 describe("CompileCache", () => {
-  let atomHome, fixtures;
+  let atomHome, csonFixturePath, fixtures;
 
   beforeEach(() => {
     fixtures = atom.project.getPaths()[0];
     atomHome = temp.mkdirSync("fake-atom-home");
+    csonFixturePath = path.join(temp.mkdirSync("cson-fixture"), "fixture.cson");
+    fs.writeFileSync(csonFixturePath, "a: 4");
 
     CSON.setCacheDir(null);
     CompileCache.resetCacheStats();
@@ -89,14 +92,14 @@ describe("CompileCache", () => {
         spyOn(CSON, "setCacheDir").and.callThrough();
         spyOn(CSON, "readFileSync").and.callThrough();
 
-        CompileCache.addPathToCache(path.join(fixtures, "cson.cson"), atomHome);
-        expect(CSON.readFileSync).toHaveBeenCalledWith(path.join(fixtures, "cson.cson"));
+        CompileCache.addPathToCache(csonFixturePath, atomHome);
+        expect(CSON.readFileSync).toHaveBeenCalledWith(csonFixturePath);
         expect(CSON.setCacheDir).toHaveBeenCalledWith(path.join(atomHome, "/compile-cache"));
 
         CSON.readFileSync.calls.reset();
         CSON.setCacheDir.calls.reset();
-        CompileCache.addPathToCache(path.join(fixtures, "cson.cson"), atomHome);
-        expect(CSON.readFileSync).toHaveBeenCalledWith(path.join(fixtures, "cson.cson"));
+        CompileCache.addPathToCache(csonFixturePath, atomHome);
+        expect(CSON.readFileSync).toHaveBeenCalledWith(csonFixturePath);
         expect(CSON.setCacheDir).not.toHaveBeenCalled();
       });
     });

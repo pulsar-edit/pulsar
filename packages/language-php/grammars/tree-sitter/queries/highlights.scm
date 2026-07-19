@@ -28,7 +28,7 @@
   ; for `print`.
   "print" @support.function.print.php)
 
-; The list of standard library methods in `php.cson` is… a lot. This is my
+; The list of standard library methods in `php.json` is… a lot. This is my
 ; biased attempt to pare it down to the most important functions.
 
 (function_call_expression

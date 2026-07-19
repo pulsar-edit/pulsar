@@ -1,0 +1,35 @@
+{
+  "name": "YAML",
+  "scopeName": "source.yaml",
+  "type": "modern-tree-sitter",
+  "parser": "tree-sitter-yaml",
+  "injectionRegex": "yml|yaml|YML|YAML",
+  "treeSitter": {
+    "parserSource": "github:tree-sitter-grammars/tree-sitter-yaml#7b03feefd36b5f155465ca736c6304aca983b267",
+    "wasmBuildTool": "tree-sitter-cli#v0.26.10",
+    "grammar": "tree-sitter/tree-sitter-yaml.wasm",
+    "highlightsQuery": "tree-sitter/highlights.scm",
+    "foldsQuery": "tree-sitter/folds.scm",
+    "indentsQuery": "tree-sitter/indents.scm",
+    "tagsQuery": "tree-sitter/tags.scm"
+  },
+  "firstLineRegex": ["^(#cloud-config|---)"],
+  "fileTypes": [
+    "clang-format",
+    "eyaml",
+    "eyml",
+    "yaml",
+    "yamllint",
+    "yaml.erb",
+    "yml",
+    "yml.erb",
+    "sls",
+    "stylelintrc",
+    "sublime-syntax",
+    "Boxfile",
+    "ksy"
+  ],
+  "comments": {
+    "start": "# "
+  }
+}

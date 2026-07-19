@@ -1,0 +1,5 @@
+{
+  "body, .command-palette atom-text-editor": {
+    "cmdorctrl-shift-p": "command-palette:toggle"
+  }
+}

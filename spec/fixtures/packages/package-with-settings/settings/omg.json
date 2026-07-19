@@ -1,0 +1,7 @@
+{
+  ".source.omg": {
+    "language": {
+      "increaseIndentPattern": "^a"
+    }
+  }
+}

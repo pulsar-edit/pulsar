@@ -1,0 +1,14 @@
+{
+  ".source.ts": {
+    "language": {
+      "commentStart": "// ",
+      "commentDelimiters": {
+        "line": "//",
+        "block": ["/*", "*/"]
+      },
+      "foldEndPattern": "^\\s*\\}|^\\s*\\]|^\\s*\\)",
+      "increaseIndentPattern": "(?x) \\{ [^}\"']* $ | \\[ [^\\]\"']* $ | \\( [^)\"']* $",
+      "decreaseIndentPattern": "(?x) ^ \\s* (\\s* /[*] .* [*]/ \\s*)* [}\\])]"
+    }
+  }
+}

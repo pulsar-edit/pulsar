@@ -2,7 +2,7 @@
 ; ========
 
 ; This query file is included for highlights queries for the “JSON” grammar
-; only; it is excluded from the “JSON with Comments” grammar. This is what
+; only; it is excluded from the “JSONC” grammar. This is what
 ; marks comments as illegal _unless_ the user has opted into that behavior via
 ; configuration.
 

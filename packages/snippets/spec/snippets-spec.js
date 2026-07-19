@@ -1664,7 +1664,7 @@ foo\
   });
 
   describe("when atom://.lumine/snippets is opened", () => {
-    it("opens ~/.lumine/snippets.cson", () => {
+    it("opens ~/.lumine/snippets.json", () => {
       jasmine.unspy(Snippets, "getUserSnippetsPath");
       atom.workspace.destroyActivePaneItem();
       const configDirPath = temp.mkdirSync("atom-config-dir-");
@@ -1675,7 +1675,7 @@ foo\
 
       runs(() => {
         expect(atom.workspace.getActiveTextEditor().getURI()).toBe(
-          path.join(configDirPath, "snippets.cson"),
+          path.join(configDirPath, "snippets.json"),
         );
       });
     });

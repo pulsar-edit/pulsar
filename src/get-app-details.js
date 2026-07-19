@@ -36,7 +36,7 @@ function getConfigFilePath(opts = {}) {
   const fs = require("fs");
   const path = require("path");
 
-  let configFilePath = ["config.json", "config.cson"]
+  let configFilePath = ["config.json", "config.jsonc", "config.cson"]
     .map((file) => path.join(process.env.ATOM_HOME, file))
     .find((f) => fs.existsSync(f));
 
@@ -48,7 +48,7 @@ function getConfigFilePath(opts = {}) {
       // the `ConfigFile` instance. Since it must provide a path, even if it turns
       // out the path doesn't exist. By default if the path doesn't exist then
       // `null` is returned.
-      return path.join(process.env.ATOM_HOME, "config.cson");
+      return path.join(process.env.ATOM_HOME, "config.json");
     } else {
       return null;
     }

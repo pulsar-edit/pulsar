@@ -1,8 +1,0 @@
-'.source.clojure':
-  'language':
-    'commentStart': '; '
-    'nonWordCharacters': '/\\()"\':,;~^[]{}`'
-    'commentDelimiters':
-      'line': ';'
-  'autocomplete':
-    'extraWordCharacters': '-'

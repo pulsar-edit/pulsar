@@ -1,0 +1,6 @@
+{
+  ".test-1": {
+    "ctrl-z": "keymap-2",
+    "ctrl-n": "keymap-2"
+  }
+}

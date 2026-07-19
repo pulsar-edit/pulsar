@@ -1,0 +1,102 @@
+{
+  "menu": [
+    {
+      "label": "Search",
+      "submenu": [
+        {
+          "label": "Find in Buffer",
+          "command": "search-panel:show"
+        },
+        {
+          "label": "Replace in Buffer",
+          "command": "search-panel:show-replace"
+        },
+        {
+          "label": "Select Next",
+          "command": "search-panel:select-next"
+        },
+        {
+          "label": "Select All",
+          "command": "search-panel:select-all"
+        },
+        {
+          "label": "Toggle Find in Buffer",
+          "command": "search-panel:toggle"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "label": "Find in Project",
+          "command": "search-panel:project-show"
+        },
+        {
+          "label": "Toggle Find in Project",
+          "command": "search-panel:project-toggle"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "label": "Find All",
+          "command": "search-panel:find-all"
+        },
+        {
+          "label": "Find Next",
+          "command": "search-panel:find-next"
+        },
+        {
+          "label": "Find Previous",
+          "command": "search-panel:find-previous"
+        },
+        {
+          "label": "Replace Next",
+          "command": "search-panel:replace-next"
+        },
+        {
+          "label": "Replace All",
+          "command": "search-panel:replace-all"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "label": "Clear History",
+          "command": "search-panel:clear-history"
+        }
+      ]
+    }
+  ],
+  "context-menu": {
+    ".tree-view li.directory": [
+      {
+        "label": "Search in Folder",
+        "command": "search-panel:project-show-in-current-directory"
+      }
+    ],
+    ".list-item.match-row": [
+      {
+        "label": "Open in New Tab",
+        "command": "search-panel:open-in-new-tab"
+      },
+      {
+        "label": "Copy",
+        "command": "core:copy"
+      },
+      {
+        "label": "Copy Path",
+        "command": "search-panel:copy-path"
+      }
+    ],
+    ".list-item.path-row": [
+      {
+        "label": "Open in New Tab",
+        "command": "search-panel:open-in-new-tab"
+      },
+      {
+        "label": "Copy Path",
+        "command": "search-panel:copy-path"
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "scopeName": "text.junit-test-report",
+  "name": "JUnit Test Report",
+  "firstLineMatch": "^Testsuite:",
+  "patterns": [
+    {
+      "captures": {
+        "1": {
+          "name": "meta.testsuite.label.junit-test-report"
+        },
+        "2": {
+          "name": "entity.name.testsuite.junit-test-report"
+        }
+      },
+      "match": "(Testsuite:) (.+)$\\n",
+      "name": "meta.testsuite.name.junit-test-report"
+    },
+    {
+      "captures": {
+        "1": {
+          "name": "meta.testcase.label.junit-test-report"
+        },
+        "2": {
+          "name": "entity.name.testcase.junit-test-report"
+        }
+      },
+      "match": "(Testcase:) (.+) took ([\\d\\.]+) sec$\\n",
+      "name": "meta.testcase.name.junit-test-report"
+    },
+    {
+      "begin": "at\\s+(?=.+?\\(.+?\\)$)",
+      "end": "$\\n",
+      "name": "meta.stackframe.junit-test-report",
+      "patterns": [
+        {
+          "match": "(?<=\\.)[^\\.]+?(?=\\()",
+          "name": "meta.stackframe.method.junit-test-report"
+        },
+        {
+          "captures": {
+            "1": {
+              "name": "meta.stackframe.source.junit-test-report"
+            },
+            "3": {
+              "name": "meta.stackframe.source.line.junit-test-report"
+            }
+          },
+          "match": "\\((.+)(:)(.+)\\)$"
+        }
+      ]
+    },
+    {
+      "begin": "------------- Standard Output ---------------$\\n",
+      "end": "------------- ---------------- ---------------$\\n",
+      "name": "meta.section.output.junit-test-report",
+      "patterns": [
+        {
+          "begin": "--Output from (.+?)--$\\n",
+          "beginCaptures": {
+            "1": {
+              "name": "entity.name.testcase.junit-test-report"
+            }
+          },
+          "contentName": "meta.output.content.junit-test-report",
+          "end": "(?=--Output from|------------- ---------------- ---------------)",
+          "name": "meta.output.junit-test-report"
+        }
+      ]
+    },
+    {
+      "begin": "------------- Standard Error -----------------$\\n",
+      "contentName": "meta.error.junit-test-report",
+      "end": "------------- ---------------- ---------------$\\n",
+      "name": "meta.section.error.junit-test-report",
+      "patterns": [
+        {
+          "begin": "--Output from (.+?)--$\\n",
+          "beginCaptures": {
+            "1": {
+              "name": "entity.name.testcase.junit-test-report"
+            }
+          },
+          "contentName": "meta.error.content.junit-test-report",
+          "end": "(?=--Output from|------------- ---------------- ---------------)",
+          "name": "meta.error.junit-test-report"
+        }
+      ]
+    }
+  ]
+}

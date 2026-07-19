@@ -1,0 +1,51 @@
+{
+  "name": "Shell Script",
+  "scopeName": "source.shell",
+  "type": "modern-tree-sitter",
+  "parser": "tree-sitter-bash",
+  "fileTypes": [
+    "sh",
+    "bash",
+    "ksh",
+    "zsh",
+    "zsh-theme",
+    "zshenv",
+    "zlogin",
+    "zlogout",
+    "zprofile",
+    "zshrc",
+    "bashrc",
+    "bash_aliases",
+    "bash_profile",
+    "bash_login",
+    "profile",
+    "bash_logout",
+    "npmrc",
+    "PKGBUILD",
+    "install",
+    "cygport",
+    "bats",
+    "ebuild"
+  ],
+  "firstLineRegex": [
+    // shebang line
+    "^#!.*\\b(bash|sh)\\r?\\n",
+    // vim modeline
+    "vim\\b.*\\bset\\b.*\\b(filetype|ft|syntax)=(sh|bash)"
+  ],
+  // Try to match `bash` exactly, or failing that, anything that ends in `sh`
+  // (for zsh/fish/etc.).
+  "injectionRegex": "(^(bash|BASH)$|sh$|SH$)",
+  "treeSitter": {
+    "parserSource": "github:tree-sitter/tree-sitter-bash#8df9ea875d557a150d025d3a15b6e6a58624379a",
+    "wasmBuildTool": "tree-sitter-cli#v0.26.10",
+    "grammar": "tree-sitter/tree-sitter-bash.wasm",
+    "highlightsQuery": "tree-sitter/highlights.scm",
+    "tagsQuery": "tree-sitter/tags.scm",
+    "foldsQuery": "tree-sitter/folds.scm",
+    "indentsQuery": "tree-sitter/indents.scm"
+  },
+  "comments": {
+    "start": "# "
+  }
+}

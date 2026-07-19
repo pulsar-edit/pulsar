@@ -1,0 +1,8 @@
+{
+  "atom-workspace": {
+    "insert": "overtype-mode:toggle-global"
+  },
+  "atom-text-editor": {
+    "alt-insert": "overtype-mode:toggle-editor"
+  }
+}

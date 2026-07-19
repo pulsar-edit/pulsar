@@ -892,13 +892,13 @@ line3\
 
     it("verifies that regular expressions have explicit count modifiers", function () {
       let source = fs.readFileSync(
-        path.resolve(__dirname, "..", "grammars", "javascript.cson"),
+        path.resolve(__dirname, "..", "grammars", "javascript.json"),
         "utf8",
       );
       expect(source.search(/{,/)).toEqual(-1);
 
       source = fs.readFileSync(
-        path.resolve(__dirname, "..", "grammars", "regular expressions (javascript).cson"),
+        path.resolve(__dirname, "..", "grammars", "regular expressions (javascript).json"),
         "utf8",
       );
       expect(source.search(/{,/)).toEqual(-1);

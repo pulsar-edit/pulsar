@@ -1,0 +1,68 @@
+{
+  ".source.perl": {
+    "#!/usr/bin/env perl": {
+      "prefix": "pl",
+      "body": "#!/usr/bin/env perl\n"
+    },
+    "If.…else": {
+      "prefix": "ife",
+      "body": "if ($1) {\n\t${2:# body...}\n} else {\n\t${3:# else...}\n}\n"
+    },
+    "If…elsif…else": {
+      "prefix": "ifee",
+      "body": "if ($1) {\n\t${2:# body...}\n} elsif ($3) {\n\t${4:# elsif...}\n} else {\n\t${5:# else...}\n}\n"
+    },
+    "Unless – One Line": {
+      "prefix": "xunless",
+      "body": "${1:expression} unless ${2:condition};\n"
+    },
+    "If – One Line": {
+      "prefix": "xif",
+      "body": "${1:expression} if ${2:condition};\n"
+    },
+    "Function": {
+      "prefix": "sub",
+      "body": "sub ${1:function_name} {\n\t${2:# body...}\n}\n"
+    },
+    "Foreach –  One Line": {
+      "prefix": "xfore",
+      "body": "${1:expression} foreach @${2:array};\n"
+    },
+    "While – One LIne": {
+      "prefix": "xwhile",
+      "body": "${1:expression} while ${2:condition};\n"
+    },
+    "Test": {
+      "prefix": "test",
+      "body": "#!/usr/bin/perl -w\n\nuse strict;\nuse Test::More tests => ${1:1};\nuse ${2:ModuleName};\n\nok(${3:assertion});\n"
+    },
+    "Package": {
+      "prefix": "class",
+      "body": "package ${1:ClassName};\n\n${2:use base qw(${3:ParentClass});\n\n}sub new {\n\tmy \\$class = shift;\n\t\\$class = ref \\$class if ref \\$class;\n\tmy \\$self = bless {}, \\$class;\n\t\\$self;\n}\n\n1;\n"
+    },
+    "Try/Except": {
+      "prefix": "eval",
+      "body": "eval {\n\t${1:# do something risky...}\n};\nif (\\$@) {\n\t${2:# handle failure...}\n}\n"
+    },
+    "For Loop": {
+      "prefix": "for",
+      "body": "for (my \\$${1:var} = 0; \\$$2 < ${3:expression}; \\$$4++) {\n\t${5:# body...}\n}\n"
+    },
+    "Foreach Loop": {
+      "prefix": "fore",
+      "body": "foreach ${1:my \\$${2:x}} (@${3:array}) {\n\t${4:# body...}\n}\n"
+    },
+    "If": {
+      "prefix": "if",
+      "body": "if ($1) {\n\t${2:# body...}\n}\n"
+    },
+    "Unless": {
+      "prefix": "unless",
+      "body": "unless ($1) {\n\t${2:# body...}\n}\n"
+    },
+    "While": {
+      "prefix": "while",
+      "body": "while ($1) {\n\t${2:# body...}\n}\n"
+    }
+  }
+}

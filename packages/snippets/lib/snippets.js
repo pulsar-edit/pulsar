@@ -27,8 +27,7 @@ function showCommandNameConflictNotification(name, commandName, packageName, sni
     return;
   }
   if (packageName === "snippets") {
-    let extension = snippetsPath.substring(snippetsPath.length - 4);
-    remedy = `Edit your \`snippets.${extension}\` file to resolve this conflict.`;
+    remedy = `Edit your \`${path.basename(snippetsPath)}\` file to resolve this conflict.`;
   } else {
     remedy = `Contact the maintainer of \`${packageName}\` so they can resolve this conflict.`;
   }
@@ -215,7 +214,7 @@ module.exports = {
 
     this.userSnippetsPath = CSON.resolve(path.join(atom.getConfigDirPath(), "snippets"));
     if (this.userSnippetsPath == null) {
-      this.userSnippetsPath = path.join(atom.getConfigDirPath(), "snippets.cson");
+      this.userSnippetsPath = path.join(atom.getConfigDirPath(), "snippets.json");
     }
     return this.userSnippetsPath;
   },
@@ -285,7 +284,7 @@ module.exports = {
           );
         } catch (e) {
           const message = `\
-          Unable to watch path: \`snippets.cson\`. Make sure you have permissions
+          Unable to watch path: \`${path.basename(userSnippetsPath)}\`. Make sure you have permissions
           to the \`~/.lumine\` directory and \`${userSnippetsPath}\`.
 
           On linux there are currently problems with watch sizes. See
@@ -306,7 +305,7 @@ module.exports = {
   // can immediately re-process the snippets it contains.
   handleUserSnippetsDidChange() {
     // TODO: There appear to be scenarios where this method gets invoked more
-    // than once with each change to the user's `snippets.cson`. To prevent
+    // than once with each change to the user's snippets file. To prevent
     // more than one concurrent rescan of the snippets file, we block any
     // additional calls to this method while the first call is still operating.
     const userSnippetsPath = this.getUserSnippetsPath();

@@ -1,0 +1,14 @@
+{
+  "name": "Test Ruby",
+  "type": "modern-tree-sitter",
+  "scopeName": "test.rb",
+  "parser": "tree-sitter-ruby",
+  "firstLineRegex": "^\\#!.*(?:\\s|\\/)(?:testruby)(?:$|\\s)",
+  "fileTypes": [
+    "rb"
+  ],
+  "treeSitter": {
+    "highlightsQuery": "./tree-sitter-empty.scm",
+    "grammar": "./tree-sitter-empty.wasm"
+  }
+}

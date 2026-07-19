@@ -1,0 +1,29 @@
+{
+  "atom-workspace": {
+    "alt-p": "fuzzy-explorer:toggle"
+  },
+  ".fuzzy-explorer atom-text-editor[mini]": {
+    "enter": "select-list:open",
+    "alt-enter": "select-list:open-external",
+    "ctrl-enter": "select-list:show-in-folder",
+    "alt-left": "select-list:split-left",
+    "alt-right": "select-list:split-right",
+    "alt-up": "select-list:split-up",
+    "alt-down": "select-list:split-down",
+    "alt-v alt-a": "select-list:insert-absolute-path",
+    "alt-v": "select-list:insert-relative-path",
+    "alt-v alt-r": "select-list:insert-relative-path",
+    "alt-v alt-n": "select-list:insert-file-name",
+    "alt-c alt-a": "select-list:copy-absolute-path",
+    "alt-c": "select-list:copy-relative-path",
+    "alt-c alt-r": "select-list:copy-relative-path",
+    "alt-c alt-n": "select-list:copy-file-name",
+    "alt-0": "select-list:use-default-separator",
+    "alt-/": "select-list:use-forward-slashes",
+    "alt-\\": "select-list:use-backslashes",
+    "alt-q": "select-list:query-selected-path",
+    "alt-s": "select-list:query-selection",
+    "alt-f": "select-list:claude-chat",
+    "f5": "select-list:refresh-index"
+  }
+}

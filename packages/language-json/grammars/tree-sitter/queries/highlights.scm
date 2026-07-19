@@ -49,7 +49,7 @@
 ; ========
 
 ; Comments are envisioned and tolerated by `tree-sitter-json`. They are always
-; allowed in the “JSON with Comments” grammar, but allowed in the ordinary
+; allowed in the “JSONC” grammar, but allowed in the ordinary
 ; “JSON” grammar only if the user opts into it via settings.
 ;
 ; If they haven’t been opted into, an earlier query will have pre-empted this
@@ -67,12 +67,3 @@
 ((comment) @comment.block.json
   (#match? @comment.block.json "^/\\*")
   (#match? @comment.block.json "\\*/$"))
-
-
-; ERROR HANDLING
-; ==============
-
-; If we mark all errors as invalid, it might be a distraction while typing. For
-; now, let's just mark commas so that we alert the user more subtly.
-
-(ERROR "," @invalid.illegal.comma.json)

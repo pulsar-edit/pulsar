@@ -38,14 +38,10 @@ Commands available in `.fuzzy-explorer`:
 
 ## Configuration
 
-Create a config file at the Lumine config path, `explorer.cson`, with an array of glob patterns:
+Create a config file at the Lumine config path, `explorer.json`, with an array of glob patterns:
 
-```cson
-[
-  "C:/Projects/**"
-  "D:/Work/src/*.ts"
-  "E:/Documents/**/*.md"
-]
+```jsonc
+["C:/Projects/**", "D:/Work/src/*.ts", "E:/Documents/**/*.md"]
 ```
 
 ## Services

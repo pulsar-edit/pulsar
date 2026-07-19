@@ -83,7 +83,7 @@ describe("Hyperlink grammar", function () {
 
   it("does not parse links in a regex string", function () {
     const testGrammar = atom.grammars.loadGrammarSync(
-      path.join(__dirname, "fixtures", "test-grammar.cson"),
+      path.join(__dirname, "fixtures", "test-grammar.json"),
     );
 
     const { tokens } = testGrammar.tokenizeLine("regexp:http://github.com");

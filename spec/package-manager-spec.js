@@ -895,7 +895,7 @@ describe("PackageManager", () => {
 
     describe("keymap loading", () => {
       describe("when the metadata does not contain a 'keymaps' manifest", () => {
-        it("loads all the .cson/.json files in the keymaps directory", async () => {
+        it("loads all supported object files in the keymaps directory", async () => {
           const element1 = createTestElement("test-1");
           const element2 = createTestElement("test-2");
           const element3 = createTestElement("test-3");
@@ -1087,7 +1087,7 @@ describe("PackageManager", () => {
       });
 
       describe("when the metadata does not contain a 'menus' manifest", () => {
-        it("loads all the .cson/.json files in the menus directory", async () => {
+        it("loads all supported object files in the menus directory", async () => {
           const element = createTestElement("test-1");
           expect(atom.contextMenu.templateForElement(element)).toEqual([]);
 

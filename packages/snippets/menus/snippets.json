@@ -1,0 +1,30 @@
+{
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Snippets",
+          "submenu": [
+            {
+              "label": "Expand",
+              "command": "snippets:show"
+            },
+            {
+              "label": "Next Stop",
+              "command": "snippets:next-tab-stop"
+            },
+            {
+              "label": "Previous Stop",
+              "command": "snippets:previous-tab-stop"
+            },
+            {
+              "label": "Available",
+              "command": "snippets:available"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  ".source.clojure": {
+    "ns": {
+      "prefix": "ns",
+      "body": "(ns ${1:name}\n  (:require [${2:libraries}]))\n$0"
+    },
+    "def": {
+      "prefix": "def",
+      "body": "(def ${1:symbol} ${2:value})"
+    },
+    "defn": {
+      "prefix": "defn",
+      "body": "(defn ${1:name}\n  [${2:params}]\n  ${3:body})"
+    },
+    "fn": {
+      "prefix": "fn",
+      "body": "(fn [${1:params}]\n  ${2:body})$0"
+    },
+    "let": {
+      "prefix": "let",
+      "body": "(let [${1:bindings}]\n  ${2:body})"
+    },
+    "if": {
+      "prefix": "if",
+      "body": "(if ${1:test}\n  ${2:then}\n  ${3:else})"
+    },
+    "if-let": {
+      "prefix": "ifl",
+      "body": "(if-let [${1:bindings}]\n  ${2:then}\n  ${3:else})"
+    },
+    "if-not": {
+      "prefix": "ifn",
+      "body": "(if-not ${1:test}\n  ${2:then}\n  ${3:else})"
+    },
+    "when": {
+      "prefix": "when",
+      "body": "(when ${1:test}\n  ${2:body})"
+    },
+    "when-let": {
+      "prefix": "whenl",
+      "body": "(when-let [${1:bindings}]\n  ${2:body})"
+    },
+    "when-not": {
+      "prefix": "whenn",
+      "body": "(when-not ${1:test}\n  ${2:body})"
+    },
+    "map": {
+      "prefix": "map",
+      "body": "(map $1 $2)"
+    },
+    "map lambda": {
+      "prefix": "mapl",
+      "body": "(map #($1) $2)"
+    },
+    "condp": {
+      "prefix": "condp",
+      "body": "(condp ${1:pred} ${2:expr}\n  $0)"
+    },
+    "try": {
+      "prefix": "try",
+      "body": "(try\n  $1\n(catch ${2:exception} e\n  $3))"
+    },
+    "prn": {
+      "prefix": "prn",
+      "body": "(prn $1)"
+    },
+    "println": {
+      "prefix": "prnl",
+      "body": "(println $1)"
+    }
+  }
+}

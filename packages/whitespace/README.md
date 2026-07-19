@@ -23,12 +23,16 @@ Commands available in `atom-workspace`:
 
 ## Configuration
 
-To disable or enable features for a certain language, use syntax-scoped properties in your `config.cson`. For example:
+To disable or enable features for a certain language, use syntax-scoped properties in your `config.json`. For example:
 
-```coffee
-'.slim.text':
-  whitespace:
-    removeTrailingWhitespace: false
+```jsonc
+{
+  ".slim.text": {
+    "whitespace": {
+      "removeTrailingWhitespace": false,
+    },
+  },
+}
 ```
 
 You find the `scope` at the top of a grammar package's settings view. For `.source.jade`, `.source.diff`, `.source.pug` and `.source.patch`, removing trailing whitespace is disabled by default.

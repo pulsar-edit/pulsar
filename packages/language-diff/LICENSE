@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-The TextMate grammar in grammars/diff.cson is adapted from
+The TextMate grammar in grammars/diff.json is adapted from
 textmate/diff.tmbundle. The upstream repository states:
 
 Permission to copy, use, modify, sell and distribute this software is granted.

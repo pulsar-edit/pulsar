@@ -1,0 +1,18 @@
+{
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Styleguide",
+          "submenu": [
+            {
+              "label": "Show",
+              "command": "styleguide:show"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -23,10 +23,10 @@ function resolve(modulePath) {
   return require.resolve(`${PATH}/${modulePath}`);
 }
 
-const jsGrammarPath = resolve("language-javascript/grammars/modern-tree-sitter-javascript.cson");
+const jsGrammarPath = resolve("language-javascript/grammars/modern-tree-sitter-javascript.json");
 let jsConfig = CSON.readFileSync(jsGrammarPath);
 
-const jsRegexGrammarPath = resolve("language-javascript/grammars/modern-tree-sitter-regex.cson");
+const jsRegexGrammarPath = resolve("language-javascript/grammars/modern-tree-sitter-regex.json");
 let jsRegexConfig = CSON.readFileSync(jsRegexGrammarPath);
 
 async function getAllCapturesWithScopeResolver(grammar, languageMode, scopeResolver, layer = null) {

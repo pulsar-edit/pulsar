@@ -1,8 +1,0 @@
-'.source.sql':
-  'language':
-    'commentStart': '-- '
-    'commentDelimiters':
-      'line': '--'
-    'foldEndPattern': '^\\s*\\)'
-    'increaseIndentPattern': '^\\s*(create|grant|insert|delete|update)\\b|\\((?!.*\\))'
-    'decreaseIndentPattern': '^\\s*\\)(?!=.*\\()'

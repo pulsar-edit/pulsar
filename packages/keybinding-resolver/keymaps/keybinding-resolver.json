@@ -1,0 +1,5 @@
+{
+  "body": {
+    "cmdorctrl-.": "key-binding-resolver:toggle"
+  }
+}

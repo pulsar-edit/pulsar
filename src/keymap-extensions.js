@@ -43,7 +43,7 @@ KeymapManager.prototype.getUserKeymapPath = function () {
   if (userKeymapPath) {
     return userKeymapPath;
   }
-  return path.join(this.configDirPath, "keymap.cson");
+  return path.join(this.configDirPath, "keymap.json");
 };
 
 KeymapManager.prototype.loadUserKeymap = function () {

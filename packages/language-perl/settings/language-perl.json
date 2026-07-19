@@ -1,0 +1,26 @@
+{
+  ".source.perl": {
+    "language": {
+      "foldEndPattern": "(\\*/|^\\s*(\\}|\\]|\\)))",
+      "increaseIndentPattern": "^.*\\{\\}?\\s*$",
+      "decreaseIndentPattern": "^\\s*\\}",
+      "commentStart": "# ",
+      "commentDelimiters": {
+        "line": "#"
+      },
+      "nonWordCharacters": "/\\()\"':,.;<>~!#^&*|+=[]{}`?-"
+    }
+  },
+  ".source.perl6": {
+    "language": {
+      "foldEndPattern": "(\\*/|^\\s*(\\}|\\]|\\)))",
+      "increaseIndentPattern": "^.*\\{\\}?\\s*$",
+      "decreaseIndentPattern": "^\\s*\\}",
+      "commentStart": "# ",
+      "commentDelimiters": {
+        "line": "#"
+      },
+      "nonWordCharacters": "/\\()\"':,.;<>~!#^&*|+=[]{}`?-"
+    }
+  }
+}

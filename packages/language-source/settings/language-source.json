@@ -1,0 +1,10 @@
+{
+  ".source": {
+    "language": {
+      "commentStart": "/*",
+      "commentEnd": "*/",
+      "increaseIndentPattern": "^.*(\\{\\}?[^}\"']*|\\([^)\"']*)$",
+      "decreaseIndentPattern": "^(.*\\*/)?\\s*\\}[;\\s]*$"
+    }
+  }
+}

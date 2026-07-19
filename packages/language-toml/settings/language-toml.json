@@ -1,0 +1,10 @@
+{
+  ".source.toml": {
+    "language": {
+      "commentStart": "# ",
+      "commentDelimiters": {
+        "line": "#"
+      }
+    }
+  }
+}

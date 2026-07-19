@@ -194,11 +194,11 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
 
     let defaultValue = atom.config.get(name, params);
     if (this.options.scopeName != null) {
-      // If the unscoped default is the same as the scoped default, check the actual config.cson
+      // If the unscoped default is the same as the scoped default, check the actual config file
       // to make sure that there isn't a non-default value that is overriding the scoped value
       // For example: the default language.tabLength is 2, but if someone sets it to 4
       // the above check still returns 2 and not 4 for a scoped language.tabLength,
-      // because it bypasses config.cson.
+      // because it bypasses the config file.
       if (
         atom.config.get(name, { excludeSources: [atom.config.getUserConfigPath()] }) ===
         defaultValue

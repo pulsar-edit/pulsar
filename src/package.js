@@ -503,10 +503,10 @@ module.exports = class Package {
     const keymapsDirPath = path.join(this.path, "keymaps");
     if (this.metadata.keymaps) {
       return this.metadata.keymaps.map((name) =>
-        fs.resolve(keymapsDirPath, name, ["json", "cson", ""]),
+        fs.resolve(keymapsDirPath, name, ["json", "jsonc", "cson", ""]),
       );
     } else {
-      return fs.listSync(keymapsDirPath, ["cson", "json"]);
+      return fs.listSync(keymapsDirPath, ["json", "jsonc", "cson"]);
     }
   }
 
@@ -514,10 +514,10 @@ module.exports = class Package {
     const menusDirPath = path.join(this.path, "menus");
     if (this.metadata.menus) {
       return this.metadata.menus.map((name) =>
-        fs.resolve(menusDirPath, name, ["json", "cson", ""]),
+        fs.resolve(menusDirPath, name, ["json", "jsonc", "cson", ""]),
       );
     } else {
-      return fs.listSync(menusDirPath, ["cson", "json"]);
+      return fs.listSync(menusDirPath, ["json", "jsonc", "cson"]);
     }
   }
 
@@ -623,7 +623,7 @@ module.exports = class Package {
     if (this.preloadedPackage && this.packageManager.packagesCache[this.name]) {
       ({ grammarPaths } = this.packageManager.packagesCache[this.name]);
     } else {
-      grammarPaths = fs.listSync(path.join(this.path, "grammars"), ["json", "cson"]);
+      grammarPaths = fs.listSync(path.join(this.path, "grammars"), ["json", "jsonc", "cson"]);
     }
 
     for (let grammarPath of grammarPaths) {
@@ -682,7 +682,7 @@ module.exports = class Package {
         const grammarsDirPath = path.join(this.path, "grammars");
         fs.exists(grammarsDirPath, (grammarsDirExists) => {
           if (!grammarsDirExists) return resolve();
-          fs.list(grammarsDirPath, ["json", "cson"], (error, grammarPaths) => {
+          fs.list(grammarsDirPath, ["json", "jsonc", "cson"], (error, grammarPaths) => {
             if (error || !grammarPaths) return resolve();
             asyncEach(grammarPaths, loadGrammar, () => resolve());
           });
@@ -723,7 +723,7 @@ module.exports = class Package {
         const settingsDirPath = path.join(this.path, "settings");
         fs.exists(settingsDirPath, (settingsDirExists) => {
           if (!settingsDirExists) return resolve();
-          fs.list(settingsDirPath, ["json", "cson"], (error, settingsPaths) => {
+          fs.list(settingsDirPath, ["json", "jsonc", "cson"], (error, settingsPaths) => {
             if (error || !settingsPaths) return resolve();
             asyncEach(settingsPaths, loadSettingsFile, () => resolve());
           });

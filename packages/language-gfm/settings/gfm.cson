@@ -1,7 +1,0 @@
-'.source.gfm:not(.markup.code)':
-  'language':
-    'softWrap': true
-    'commentStart': '<!-- '
-    'commentEnd': ' -->'
-    'commentDelimiters':
-      'block': ['<!--', '-->']

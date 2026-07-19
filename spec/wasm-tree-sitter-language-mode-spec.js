@@ -20,17 +20,17 @@ function scm(strings) {
   return strings.join("");
 }
 
-const cGrammarPath = resolve("language-c/grammars/modern-tree-sitter-c.cson");
-const pythonGrammarPath = resolve("language-python/grammars/modern-tree-sitter-python.cson");
-const jsGrammarPath = resolve("language-javascript/grammars/modern-tree-sitter-javascript.cson");
+const cGrammarPath = resolve("language-c/grammars/modern-tree-sitter-c.json");
+const pythonGrammarPath = resolve("language-python/grammars/modern-tree-sitter-python.json");
+const jsGrammarPath = resolve("language-javascript/grammars/modern-tree-sitter-javascript.json");
 
-const jsRegexGrammarPath = resolve("language-javascript/grammars/modern-tree-sitter-regex.cson");
+const jsRegexGrammarPath = resolve("language-javascript/grammars/modern-tree-sitter-regex.json");
 
-const jsdocGrammarPath = resolve("language-javascript/grammars/modern-tree-sitter-jsdoc.cson");
-const htmlGrammarPath = resolve("language-html/grammars/modern-tree-sitter-html.cson");
-const ejsGrammarPath = resolve("language-html/grammars/modern-tree-sitter-ejs.cson");
-const rubyGrammarPath = resolve("language-ruby/grammars/modern-tree-sitter-ruby.cson");
-const rustGrammarPath = resolve("language-rust/grammars/modern-tree-sitter-rust.cson");
+const jsdocGrammarPath = resolve("language-javascript/grammars/modern-tree-sitter-jsdoc.json");
+const htmlGrammarPath = resolve("language-html/grammars/modern-tree-sitter-html.json");
+const ejsGrammarPath = resolve("language-html/grammars/modern-tree-sitter-ejs.json");
+const rubyGrammarPath = resolve("language-ruby/grammars/modern-tree-sitter-ruby.json");
+const rustGrammarPath = resolve("language-rust/grammars/modern-tree-sitter-rust.json");
 
 let jsConfig = CSON.readFileSync(jsGrammarPath);
 let jsRegexConfig = CSON.readFileSync(jsRegexGrammarPath);

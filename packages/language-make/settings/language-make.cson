@@ -1,7 +1,0 @@
-'.source.makefile':
-  'language':
-    'increaseIndentPattern': '^[^\\t ]+:'
-    'commentStart': '# '
-    'commentDelimiters':
-      'line': '#'
-    'tabType': 'hard'

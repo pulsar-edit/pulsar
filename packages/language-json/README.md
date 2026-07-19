@@ -6,7 +6,7 @@ JSON support for Lumine.
 
 - **Grammars**: provides both Tree-sitter and TextMate grammars.
 - **Syntax highlighting**: full grammar coverage for JSON and JSONC files.
-- **Comment tolerance**: an optional grammar and setting for allowing comments in JSON files.
+- **Comment tolerance**: comments are allowed in JSON files by default and can be disabled in settings.
 - **Code folding**: collapse objects and arrays.
 
 ## Services

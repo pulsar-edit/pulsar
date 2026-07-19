@@ -125,7 +125,10 @@ class ProjectList {
   }
 
   getConfigPath() {
-    return path.join(atom.getConfigDirPath(), "projects.cson");
+    return (
+      CSON.resolve(path.join(atom.getConfigDirPath(), "projects")) ||
+      path.join(atom.getConfigDirPath(), "projects.json")
+    );
   }
 
   getCachePath() {
@@ -461,7 +464,7 @@ class ProjectList {
 
   async buildCache() {
     await this.ensureConfigFile();
-    const configData = CSON.parse(await fs.promises.readFile(this.configPath, "utf8"));
+    const configData = CSON.readFileSync(this.configPath);
     if (configData instanceof Error) {
       throw new Error(configData.message);
     }

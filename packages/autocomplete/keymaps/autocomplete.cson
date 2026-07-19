@@ -1,6 +1,0 @@
-'atom-text-editor':
-  'ctrl-space': 'autocomplete:activate'
-
-'atom-text-editor.autocomplete-active':
-  'escape': 'autocomplete:cancel'
-  'f1': 'autocomplete:navigate-to-description-more-link'

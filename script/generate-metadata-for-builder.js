@@ -5,6 +5,12 @@ const fs = require("@lumine-code/fs-plus");
 const normalizePackageData = require("normalize-package-data");
 const path = require("path");
 
+const objectFileExtensions = ["json", "jsonc", "cson"];
+
+function isObjectFile(filePath) {
+  return objectFileExtensions.includes(path.extname(filePath).slice(1));
+}
+
 module.exports = function (packageJSON) {
   return {
     _atomPackages: buildBundledPackagesMetadata(packageJSON),
@@ -75,7 +81,7 @@ function buildBundledPackagesMetadata(packageJSON) {
     if (fs.existsSync(packageKeymapsPath)) {
       for (let packageKeymapName of fs.readdirSync(packageKeymapsPath)) {
         const packageKeymapPath = path.join(packageKeymapsPath, packageKeymapName);
-        if (packageKeymapPath.endsWith(".cson") || packageKeymapPath.endsWith(".json")) {
+        if (isObjectFile(packageKeymapPath)) {
           packageNewMetadata.keymaps[packageKeymapPath] = CSON.readFileSync(packageKeymapPath);
         }
       }
@@ -85,18 +91,18 @@ function buildBundledPackagesMetadata(packageJSON) {
     if (fs.existsSync(packageMenusPath)) {
       for (let packageMenuName of fs.readdirSync(packageMenusPath)) {
         const packageMenuPath = path.join(packageMenusPath, packageMenuName);
-        if (packageMenuPath.endsWith(".cson") || packageMenuPath.endsWith(".json")) {
+        if (isObjectFile(packageMenuPath)) {
           packageNewMetadata.menus[packageMenuPath] = CSON.readFileSync(packageMenuPath);
         }
       }
     }
     const packageGrammarsPath = path.join(packagePath, "grammars");
-    for (let packageGrammarPath of fs.listSync(packageGrammarsPath, ["json", "cson"])) {
+    for (let packageGrammarPath of fs.listSync(packageGrammarsPath, objectFileExtensions)) {
       packageNewMetadata.grammarPaths.push(packageGrammarPath);
     }
 
     const packageSettingsPath = path.join(packagePath, "settings");
-    for (let packageSettingPath of fs.listSync(packageSettingsPath, ["json", "cson"])) {
+    for (let packageSettingPath of fs.listSync(packageSettingsPath, objectFileExtensions)) {
       packageNewMetadata.settings[packageSettingPath] = CSON.readFileSync(packageSettingPath);
     }
 
@@ -135,8 +141,8 @@ function buildBundledPackagesMetadata(packageJSON) {
 }
 
 function buildPlatformMenuMetadata(_packageJSON) {
-  const menuPath = path.join("menus", `${process.platform}.cson`);
-  if (fs.existsSync(menuPath)) {
+  const menuPath = fs.resolve("menus", process.platform, objectFileExtensions);
+  if (menuPath) {
     return CSON.readFileSync(menuPath);
   } else {
     return null;
@@ -151,7 +157,7 @@ function buildPlatformKeymapsMetadata(_packageJSON) {
   const keymaps = {};
   for (let keymapName of fs.readdirSync(keymapsPath)) {
     const keymapPath = path.join(keymapsPath, keymapName);
-    if (keymapPath.endsWith(".cson") || keymapPath.endsWith(".json")) {
+    if (isObjectFile(keymapPath)) {
       const keymapPlatform = path.basename(keymapPath, path.extname(keymapPath));
       if (invalidPlatforms.indexOf(keymapPlatform) === -1) {
         keymaps[path.basename(keymapPath)] = CSON.readFileSync(keymapPath);

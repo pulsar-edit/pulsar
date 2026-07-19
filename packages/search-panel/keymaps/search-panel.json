@@ -1,0 +1,61 @@
+{
+  "atom-workspace": {
+    "cmdorctrl-shift-f": "search-panel:project-show",
+    "cmdorctrl-f": "search-panel:show"
+  },
+  "atom-workspace-axis.vertical atom-text-editor": {
+    "f3": "search-panel:find-next",
+    "shift-f3": "search-panel:find-previous",
+    "cmdorctrl-f3": "search-panel:clear",
+    "shift-f4": "search-panel:replace-current",
+    "f4": "search-panel:replace-next",
+    "cmdorctrl-f4": "search-panel:replace-all",
+    "alt-f": "search-panel:use-selection-as-replace-pattern"
+  },
+  ".search-panel": {
+    "f3": "search-panel:find-next",
+    "shift-f3": "search-panel:find-previous",
+    "cmdorctrl-f3": "search-panel:clear",
+    "shift-f4": "search-panel:replace-current",
+    "f4": "search-panel:replace-next",
+    "cmdorctrl-f4": "search-panel:replace-all",
+    "alt-f": "search-panel:use-selection-as-replace-pattern",
+    "shift-enter": "search-panel:show-previous",
+    "cmdorctrl-enter": "search-panel:confirm",
+    "alt-enter": "search-panel:find-all",
+    "cmdorctrl-alt-/": "search-panel:toggle-regex-option",
+    "cmdorctrl-alt-c": "search-panel:toggle-case-option",
+    "cmdorctrl-alt-s": "search-panel:toggle-selection-option",
+    "cmdorctrl-alt-w": "search-panel:toggle-whole-word-option",
+    "ctrl-shift-c": "search-panel:toggle-case-option"
+  },
+  ".search-panel-project": {
+    "cmdorctrl-f3": "search-panel:clear",
+    "cmdorctrl-f4": "search-panel:project-replace-all",
+    "alt-f": "search-panel:use-selection-as-replace-pattern",
+    "cmdorctrl-enter": "search-panel:project-confirm",
+    "cmdorctrl-alt-/": "search-panel:project-toggle-regex-option",
+    "cmdorctrl-alt-c": "search-panel:project-toggle-case-option",
+    "cmdorctrl-alt-w": "search-panel:project-toggle-whole-word-option",
+    "ctrl-shift-c": "search-panel:project-toggle-case-option"
+  },
+  ".search-panel, .search-panel-project, .search-panel-project .results-view": {
+    "tab": "search-panel:focus-next",
+    "shift-tab": "search-panel:focus-previous"
+  },
+  ".search-panel, .search-panel-project": {
+    "cmdorctrl-shift-x": "search-panel:clear"
+  },
+  ".search-panel .replace-container atom-text-editor": {
+    "cmdorctrl-enter": "search-panel:replace-all"
+  },
+  ".search-panel-project .replace-container atom-text-editor": {
+    "cmdorctrl-enter": "search-panel:project-replace-all"
+  },
+  ".results-view": {
+    "home": "core:move-to-top",
+    "ctrl-home": "core:move-to-top",
+    "end": "core:move-to-bottom",
+    "ctrl-end": "core:move-to-bottom"
+  }
+}

@@ -17,10 +17,10 @@ if (buildMetadata) {
 //
 // An instance of this class is always available as the `atom.menu` global.
 //
-// ## Menu CSON Format
+// ## Menu Object Format
 //
 // Here is an example from Lumine's bundled
-// [tree-view](https://github.com/lumine-code/lumine/blob/master/packages/tree-view/menus/tree-view-plus.cson):
+// [tree-view](https://github.com/lumine-code/lumine/blob/master/packages/tree-view/menus/tree-view-plus.json):
 //
 // ```coffee
 // [
@@ -45,7 +45,7 @@ if (buildMetadata) {
 // ]
 // ```
 //
-// Use in your package's menu `.cson` file requires that you place your menu
+// Use in your package's menu JSON, JSONC, or CSON file requires that you place your menu
 // structure under a `menu` key.
 //
 // ```coffee
@@ -213,7 +213,11 @@ module.exports = class MenuManager {
       return this.add(platformMenu);
     } else {
       const menusDirPath = path.join(this.resourcePath, "menus");
-      const platformMenuPath = fs.resolve(menusDirPath, process.platform, ["cson", "json"]);
+      const platformMenuPath = fs.resolve(menusDirPath, process.platform, [
+        "json",
+        "jsonc",
+        "cson",
+      ]);
       const { menu } = CSON.readFileSync(platformMenuPath);
       return this.add(menu);
     }

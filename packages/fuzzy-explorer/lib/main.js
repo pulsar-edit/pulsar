@@ -1,9 +1,5 @@
 const { CompositeDisposable, Disposable, Task } = require("atom");
-const {
-  SelectListView,
-  createTwoLineItem,
-  highlightMatches,
-} = require("@lumine-code/select-list");
+const { SelectListView, createTwoLineItem, highlightMatches } = require("@lumine-code/select-list");
 const { clipboard, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -131,7 +127,10 @@ module.exports = {
   },
 
   getConfigPath() {
-    return path.join(atom.getConfigDirPath(), "explorer.cson");
+    return (
+      CSON.resolve(path.join(atom.getConfigDirPath(), "explorer")) ||
+      path.join(atom.getConfigDirPath(), "explorer.json")
+    );
   },
 
   getCachePath() {
@@ -185,7 +184,10 @@ module.exports = {
   editConfig() {
     const configPath = this.getConfigPath();
     if (!fs.existsSync(configPath)) {
-      fs.writeFileSync(configPath, '[\n  # Add glob patterns here\n  # "C:/Projects/**/*.js"\n]\n');
+      fs.writeFileSync(
+        configPath,
+        '[\n  // Add glob patterns here\n  // "C:/Projects/**/*.js"\n]\n',
+      );
     }
     atom.workspace.open(configPath);
   },
@@ -194,8 +196,7 @@ module.exports = {
     const configPath = this.getConfigPath();
     if (!fs.existsSync(configPath)) return [];
     try {
-      const content = fs.readFileSync(configPath, "utf8");
-      const patterns = CSON.parse(content);
+      const patterns = CSON.readFileSync(configPath);
       if (!Array.isArray(patterns)) return [];
       return patterns.filter((p) => typeof p === "string" && p.length > 0);
     } catch {

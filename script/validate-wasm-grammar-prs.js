@@ -11,6 +11,8 @@ const path = require("node:path");
 const fs = require("node:fs");
 const CSON = require("@lumine-code/season");
 
+const objectFileExtensions = new Set([".json", ".jsonc", ".cson"]);
+
 // Change this if you want more logs
 let verbose = true;
 
@@ -84,8 +86,8 @@ for (const wasmFile of wasmFilesChanged) {
   }
 
   for (const file of files) {
-    // Only check `cson` files.
-    if (!file.endsWith(".cson")) continue;
+    // Only check supported object-format grammar files.
+    if (!objectFileExtensions.has(path.extname(file))) continue;
 
     const filePath = path.join(wasmPath, "..", file);
     console.log(`Checking: ${filePath}`);

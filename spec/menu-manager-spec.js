@@ -186,7 +186,7 @@ describe("MenuManager", function () {
       "packages",
       "package-with-keymaps",
       "keymaps",
-      "keymap-1.cson",
+      "keymap-1.json",
     );
     atom.keymaps.reloadKeymap(keymapPath);
     expect(menu.update).toHaveBeenCalled();

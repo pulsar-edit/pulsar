@@ -25,19 +25,16 @@ Commands available in `atom-text-editor`:
 
 ## Configuration
 
-Matching pairs can be customized per language through scoped settings in your `config.cson`, overriding the package defaults. Changes take effect immediately. For example:
+Matching pairs can be customized per language through scoped settings in your `config.json`, overriding the package defaults. Changes take effect immediately. For example:
 
-```cson
-".rust.source":
-  "bracket-matcher":
-    autocompleteCharacters: [
-      "()"
-      "[]"
-      "{}"
-      "<>"
-      "\"\""
-      "``"
-    ]
+```jsonc
+{
+  ".rust.source": {
+    "bracket-matcher": {
+      "autocompleteCharacters": ["()", "[]", "{}", "<>", "\"\"", "``"],
+    },
+  },
+}
 ```
 
 ## Services

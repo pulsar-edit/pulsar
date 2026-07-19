@@ -562,7 +562,9 @@ module.exports = class PackageManager {
 
       const metadataFilePath = CSON.resolve(path.join(cloneDir, "package"));
       if (!metadataFilePath) {
-        throw new Error("The repository does not contain a package.json or package.cson file.");
+        throw new Error(
+          "The repository does not contain a package.json, package.jsonc, or package.cson file.",
+        );
       }
 
       const metadata = CSON.readFileSync(metadataFilePath);
