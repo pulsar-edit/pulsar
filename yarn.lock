@@ -5953,6 +5953,11 @@ vscode-oniguruma@^2.0.1:
 "vscode-theme@file:packages/vscode-theme":
   version "1.0.0"
 
+web-tree-sitter@0.26.11:
+  version "0.26.11"
+  resolved "https://registry.yarnpkg.com/web-tree-sitter/-/web-tree-sitter-0.26.11.tgz#4cf91d060f4203b9975bf7f8f66008b1466457d6"
+  integrity sha512-Q5Dm3YTIXSXuH6FxX6RuzX2Qwpc4DPGiYMU87Wg5Z8OIStiQFiUex4zMDc0vBTw78EphaYJacncJghCHzbZptg==
+
 webcrypto-core@^1.9.2:
   version "1.9.2"
   resolved "https://registry.yarnpkg.com/webcrypto-core/-/webcrypto-core-1.9.2.tgz#22dd6a0fb55217b1301eab7151d01d5c68e52ccb"

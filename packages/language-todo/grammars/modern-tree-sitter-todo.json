@@ -5,9 +5,8 @@
   "parser": "tree-sitter-todo",
   "injectionRegex": "^(todo|TODO)$",
   "treeSitter": {
-    "parserSource": "github:Aerijo/tree-sitter-todo#5b789e4cf7909a6fa6358404e7d74a8bb63418c9",
-    "wasmBuildTool": "tree-sitter-cli#v0.26.10",
-    "wasmBuildPatch": "C scanner port for tree-sitter-cli#v0.26.10 WASM builds",
+    "parserSource": "github:lumine-code/tree-sitter-todo#512da3b19920b744eb53d66f533315ce7d731a5d",
+    "wasmBuildTool": "tree-sitter-cli#v0.26.11",
     "grammar": "ts/tree-sitter-todo.wasm",
     "highlightsQuery": "ts/highlights.scm"
   }

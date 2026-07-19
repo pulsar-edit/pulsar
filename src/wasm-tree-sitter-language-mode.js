@@ -1,4 +1,4 @@
-const { Node, Parser } = require("./web-tree-sitter");
+const { Node, Parser } = require("web-tree-sitter");
 const TokenIterator = require("./token-iterator");
 const { Point, Range, spliceArray } = require("./text-buffer");
 const { Patch } = require("@lumine-code/superstring");

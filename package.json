@@ -172,6 +172,7 @@
     "@typescript/typescript6": "6.0.2",
     "vscode-theme": "file:packages/vscode-theme",
     "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274",
+    "web-tree-sitter": "0.26.11",
     "whitespace": "file:./packages/whitespace",
     "window-title": "file:packages/window-title",
     "winattr": "^3.0.0",

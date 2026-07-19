@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const Grim = require("grim");
 const dedent = require("dedent");
-const { Language, Parser, Query } = require("./web-tree-sitter");
+const { Language, Parser, Query } = require("web-tree-sitter");
 const { CompositeDisposable, Disposable, Emitter } = require("event-kit");
 const { watchPath } = require("./path-watcher");
 const { normalizeDelimiters } = require("./comment-utils.js");
@@ -11,10 +11,9 @@ const { normalizeDelimiters } = require("./comment-utils.js");
 // module `fetch` it. In Electron's renderer, `web-tree-sitter` takes its
 // browser code path (process.type === "renderer"), and `fetch` of a `file://`
 // URL is blocked on macOS and Linux, so the parser would never initialize.
+const webTreeSitterWasmPath = require.resolve("web-tree-sitter/web-tree-sitter.wasm");
 const parserInitPromise = Parser.init({
-  wasmBinary: fs.readFileSync(
-    path.join(__dirname, "..", "vendor", "web-tree-sitter", "web-tree-sitter.wasm"),
-  ),
+  wasmBinary: fs.readFileSync(webTreeSitterWasmPath),
 });
 
 function isPosition(obj) {
