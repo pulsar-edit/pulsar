@@ -1,22 +1,29 @@
-const {Emitter, CompositeDisposable, Disposable} = require('event-kit')
-const File = require('./text-buffer-file')
-const {watchPath} = require('./path-watcher')
-const diff = require('diff')
-const _ = require('@lumine-code/underscore-plus')
-const fs = require('fs')
-const path = require('path')
-const crypto = require('crypto')
-const {TextBuffer: NativeTextBuffer} = require('@lumine-code/superstring')
-const Point = require('./point')
-const Range = require('./range')
-const DefaultHistoryProvider = require('./default-history-provider')
-const NullLanguageMode = require('./null-language-mode')
-const Marker = require('./marker')
-const MarkerLayer = require('./marker-layer')
-const DisplayLayer = require('./display-layer')
-const {spliceArray, newlineRegex, patchFromChanges, normalizePatchChanges, extentForText, debounce} = require('./helpers')
-const {traverse, traversal} = require('./point-helpers')
-const Grim = require('grim')
+const { Emitter, CompositeDisposable, Disposable } = require("event-kit");
+const File = require("./text-buffer-file");
+const { watchPath } = require("./path-watcher");
+const diff = require("diff");
+const _ = require("@lumine-code/underscore-plus");
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
+const { TextBuffer: NativeTextBuffer } = require("@lumine-code/superstring");
+const Point = require("./point");
+const Range = require("./range");
+const DefaultHistoryProvider = require("./default-history-provider");
+const NullLanguageMode = require("./null-language-mode");
+const Marker = require("./marker");
+const MarkerLayer = require("./marker-layer");
+const DisplayLayer = require("./display-layer");
+const {
+  spliceArray,
+  newlineRegex,
+  patchFromChanges,
+  normalizePatchChanges,
+  extentForText,
+  debounce,
+} = require("./helpers");
+const { traverse, traversal } = require("./point-helpers");
+const Grim = require("grim");
 
 // Extended: A mutable text container with undo/redo support and the ability to
 // annotate logical regions in the text.
@@ -71,71 +78,74 @@ class TextBuffer {
   //   * `shouldDestroyOnFileDelete` A {Function} that returns a {Boolean}
   //     indicating whether the buffer should be destroyed if its file is
   //     deleted.
-  constructor (params) {
-    if (params == null) params = {}
+  constructor(params) {
+    if (params == null) params = {};
 
-    this.refcount = 0
-    this.conflict = false
-    this.file = null
-    this.fileSubscriptions = null
-    this.oldFileSubscriptions = null
-    this.stoppedChangingTimeout = null
-    this.emitter = new Emitter()
-    this.changesSinceLastStoppedChangingEvent = []
-    this.changesSinceLastDidChangeTextEvent = []
-    this.id = crypto.randomBytes(16).toString('hex')
-    this.buffer = new NativeTextBuffer(typeof params === 'string' ? params : params.text || "")
-    this.debouncedEmitDidStopChangingEvent = debounce(this.emitDidStopChangingEvent.bind(this), this.stoppedChangingDelay)
-    this.maxUndoEntries = params.maxUndoEntries ?? this.defaultMaxUndoEntries
-    this.setHistoryProvider(new DefaultHistoryProvider(this))
-    this.languageMode = new NullLanguageMode()
-    this.nextMarkerLayerId = 0
-    this.nextDisplayLayerId = 0
-    this.defaultMarkerLayer = new MarkerLayer(this, String(this.nextMarkerLayerId++))
-    this.displayLayers = {}
-    this.markerLayers = {}
-    this.markerLayers[this.defaultMarkerLayer.id] = this.defaultMarkerLayer
-    this.markerLayersWithPendingUpdateEvents = new Set()
-    this.selectionsMarkerLayerIds = new Set()
-    this.nextMarkerId = 1
-    this.outstandingSaveCount = 0
-    this.loadCount = 0
-    this.cachedHasAstral = null
-    this._emittedWillChangeEvent = false
+    this.refcount = 0;
+    this.conflict = false;
+    this.file = null;
+    this.fileSubscriptions = null;
+    this.oldFileSubscriptions = null;
+    this.stoppedChangingTimeout = null;
+    this.emitter = new Emitter();
+    this.changesSinceLastStoppedChangingEvent = [];
+    this.changesSinceLastDidChangeTextEvent = [];
+    this.id = crypto.randomBytes(16).toString("hex");
+    this.buffer = new NativeTextBuffer(typeof params === "string" ? params : params.text || "");
+    this.debouncedEmitDidStopChangingEvent = debounce(
+      this.emitDidStopChangingEvent.bind(this),
+      this.stoppedChangingDelay,
+    );
+    this.maxUndoEntries = params.maxUndoEntries ?? this.defaultMaxUndoEntries;
+    this.setHistoryProvider(new DefaultHistoryProvider(this));
+    this.languageMode = new NullLanguageMode();
+    this.nextMarkerLayerId = 0;
+    this.nextDisplayLayerId = 0;
+    this.defaultMarkerLayer = new MarkerLayer(this, String(this.nextMarkerLayerId++));
+    this.displayLayers = {};
+    this.markerLayers = {};
+    this.markerLayers[this.defaultMarkerLayer.id] = this.defaultMarkerLayer;
+    this.markerLayersWithPendingUpdateEvents = new Set();
+    this.selectionsMarkerLayerIds = new Set();
+    this.nextMarkerId = 1;
+    this.outstandingSaveCount = 0;
+    this.loadCount = 0;
+    this.cachedHasAstral = null;
+    this._emittedWillChangeEvent = false;
 
     // Whether a buffer has ever had a backing file, whether or not it exists
     // now.
-    this.didHaveFileOnDisk = false
+    this.didHaveFileOnDisk = false;
 
     // When a buffer's backing file is deleted while the file is unmodified,
     // this trait flips to `true`… and then flips back to `false` if any
     // further edits are made.
-    this.retainsUnmodifiedTraitAfterDeletion = false
+    this.retainsUnmodifiedTraitAfterDeletion = false;
 
-    this.setEncoding(params.encoding)
-    this.setPreferredLineEnding(params.preferredLineEnding)
+    this.setEncoding(params.encoding);
+    this.setPreferredLineEnding(params.preferredLineEnding);
 
-    this.loaded = false
-    this.destroyed = false
-    this.transactCallDepth = 0
-    this.digestWhenLastPersisted = false
+    this.loaded = false;
+    this.destroyed = false;
+    this.transactCallDepth = 0;
+    this.digestWhenLastPersisted = false;
 
-    this.shouldDestroyOnFileDelete = params.shouldDestroyOnFileDelete || (() => false)
+    this.shouldDestroyOnFileDelete = params.shouldDestroyOnFileDelete || (() => false);
 
     if (params.filePath) {
-      this.setPath(params.filePath)
+      this.setPath(params.filePath);
       if (params.load) {
         Grim.deprecate(
-          'The `load` option to the TextBuffer constructor is deprecated. ' +
-          'Get a loaded buffer using TextBuffer.load(filePath) instead.'
-        )
-        this.load({internal: true})
+          "The `load` option to the TextBuffer constructor is deprecated. " +
+            "Get a loaded buffer using TextBuffer.load(filePath) instead.",
+        );
+        this.load({ internal: true });
       }
     }
   }
 
-  toString () {
-    return `<TextBuffer ${this.id}>`
+  toString() {
+    return `<TextBuffer ${this.id}>`;
   }
 
   // Public: Create a new buffer backed by the given file path.
@@ -149,20 +159,20 @@ class TextBuffer {
   //     is deleted.
   //
   // Returns a {Promise} that resolves with a {TextBuffer} instance.
-  static load (source, params) {
-    const buffer = new TextBuffer(params)
-    if (typeof source === 'string') {
-      buffer.setPath(source)
+  static load(source, params) {
+    const buffer = new TextBuffer(params);
+    if (typeof source === "string") {
+      buffer.setPath(source);
     } else {
-      buffer.setFile(source)
+      buffer.setFile(source);
     }
     return buffer
-      .load({clearHistory: true, internal: true, mustExist: params && params.mustExist})
+      .load({ clearHistory: true, internal: true, mustExist: params && params.mustExist })
       .then(() => buffer)
-      .catch(err => {
-        buffer.destroy()
-        throw err
-      })
+      .catch((err) => {
+        buffer.destroy();
+        throw err;
+      });
   }
 
   // Public: Create a new buffer backed by the given file path. For better
@@ -176,16 +186,16 @@ class TextBuffer {
   //     is deleted.
   //
   // Returns a {TextBuffer} instance.
-  static loadSync (filePath, params) {
-    const buffer = new TextBuffer(params)
-    buffer.setPath(filePath)
+  static loadSync(filePath, params) {
+    const buffer = new TextBuffer(params);
+    buffer.setPath(filePath);
     try {
-      buffer.loadSync({internal: true, mustExist: params && params.mustExist})
+      buffer.loadSync({ internal: true, mustExist: params && params.mustExist });
     } catch (e) {
-      buffer.destroy()
-      throw e
+      buffer.destroy();
+      throw e;
     }
-    return buffer
+    return buffer;
   }
 
   // Public: Restore a {TextBuffer} based on an earlier state created using
@@ -194,80 +204,80 @@ class TextBuffer {
   // * `params` An {Object} returned from {TextBuffer::serialize}
   //
   // Returns a {Promise} that resolves with a {TextBuffer} instance.
-  static async deserialize (params) {
-    if (params.version && params.version !== TextBuffer.version) return
+  static async deserialize(params) {
+    if (params.version && params.version !== TextBuffer.version) return;
 
-    delete params.load
+    delete params.load;
 
-    let buffer
+    let buffer;
     if (params.filePath) {
-      buffer = await TextBuffer.load(params.filePath, params)
+      buffer = await TextBuffer.load(params.filePath, params);
       if (buffer.digestWhenLastPersisted === params.digestWhenLastPersisted) {
-        buffer.buffer.deserializeChanges(params.outstandingChanges)
+        buffer.buffer.deserializeChanges(params.outstandingChanges);
       } else {
-        params.history = {}
+        params.history = {};
       }
     } else {
-      buffer = new TextBuffer(params)
+      buffer = new TextBuffer(params);
     }
 
-    buffer.id = params.id
-    buffer.preferredLineEnding = params.preferredLineEnding
-    buffer.nextMarkerId = params.nextMarkerId
-    buffer.nextMarkerLayerId = params.nextMarkerLayerId
-    buffer.nextDisplayLayerId = params.nextDisplayLayerId
-    buffer.historyProvider.deserialize(params.history, buffer)
+    buffer.id = params.id;
+    buffer.preferredLineEnding = params.preferredLineEnding;
+    buffer.nextMarkerId = params.nextMarkerId;
+    buffer.nextMarkerLayerId = params.nextMarkerLayerId;
+    buffer.nextDisplayLayerId = params.nextDisplayLayerId;
+    buffer.historyProvider.deserialize(params.history, buffer);
 
     for (const layerId in params.markerLayers) {
-      const layerState = params.markerLayers[layerId]
-      let layer
+      const layerState = params.markerLayers[layerId];
+      let layer;
       if (layerId === params.defaultMarkerLayerId) {
-        buffer.defaultMarkerLayer.id = layerId
-        buffer.defaultMarkerLayer.deserialize(layerState)
-        layer = buffer.defaultMarkerLayer
+        buffer.defaultMarkerLayer.id = layerId;
+        buffer.defaultMarkerLayer.deserialize(layerState);
+        layer = buffer.defaultMarkerLayer;
       } else {
-        layer = MarkerLayer.deserialize(buffer, layerState)
+        layer = MarkerLayer.deserialize(buffer, layerState);
       }
-      buffer.markerLayers[layerId] = layer
+      buffer.markerLayers[layerId] = layer;
     }
 
     for (const layerId in params.displayLayers) {
-      const layerState = params.displayLayers[layerId]
-      buffer.displayLayers[layerId] = DisplayLayer.deserialize(buffer, layerState)
+      const layerState = params.displayLayers[layerId];
+      buffer.displayLayers[layerId] = DisplayLayer.deserialize(buffer, layerState);
     }
 
-    return buffer
+    return buffer;
   }
 
   // Returns a {String} representing a unique identifier for this {TextBuffer}.
-  getId () {
-    return this.id
+  getId() {
+    return this.id;
   }
 
-  serialize (options) {
-    if (options == null) options = {}
-    if (options.markerLayers == null) options.markerLayers = true
-    if (options.history == null) options.history = true
+  serialize(options) {
+    if (options == null) options = {};
+    if (options.markerLayers == null) options.markerLayers = true;
+    if (options.history == null) options.history = true;
 
-    const markerLayers = {}
+    const markerLayers = {};
     if (options.markerLayers) {
       for (const id in this.markerLayers) {
-        const layer = this.markerLayers[id]
+        const layer = this.markerLayers[id];
         if (layer.persistent) {
-          markerLayers[id] = layer.serialize()
+          markerLayers[id] = layer.serialize();
         }
       }
     }
 
-    const displayLayers = {}
+    const displayLayers = {};
     for (const id in this.displayLayers) {
-      const layer = this.displayLayers[id]
-      displayLayers[id] = layer.serialize()
+      const layer = this.displayLayers[id];
+      displayLayers[id] = layer.serialize();
     }
 
-    let history = {}
+    let history = {};
     if (options.history) {
-      history = this.historyProvider.serialize(options)
+      history = this.historyProvider.serialize(options);
     }
 
     const result = {
@@ -281,20 +291,20 @@ class TextBuffer {
       history,
       encoding: this.getEncoding(),
       preferredLineEnding: this.preferredLineEnding,
-      nextMarkerId: this.nextMarkerId
-    }
+      nextMarkerId: this.nextMarkerId,
+    };
 
-    const filePath = this.getPath()
+    const filePath = this.getPath();
     if (filePath) {
-      if (this.baseTextDigestCache == null) this.baseTextDigestCache = this.buffer.baseTextDigest()
-      result.filePath = filePath
-      result.digestWhenLastPersisted = this.digestWhenLastPersisted
-      result.outstandingChanges = this.buffer.serializeChanges()
+      if (this.baseTextDigestCache == null) this.baseTextDigestCache = this.buffer.baseTextDigest();
+      result.filePath = filePath;
+      result.digestWhenLastPersisted = this.digestWhenLastPersisted;
+      result.outstandingChanges = this.buffer.serializeChanges();
     } else {
-      result.text = this.getText()
+      result.text = this.getText();
     }
 
-    return result
+    return result;
   }
 
   /*
@@ -310,8 +320,8 @@ class TextBuffer {
   // * `callback` {Function} to be called when the buffer changes.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onWillChange (callback) {
-    return this.emitter.on('will-change', callback)
+  onWillChange(callback) {
+    return this.emitter.on("will-change", callback);
   }
 
   // Public: Invoke the given callback synchronously when a transaction
@@ -336,13 +346,13 @@ class TextBuffer {
   //       * `newText`: A {String} representing the inserted text.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidChange (callback) {
-    return this.emitter.on('did-change-text', callback)
+  onDidChange(callback) {
+    return this.emitter.on("did-change-text", callback);
   }
 
   // Public: This is now identical to {::onDidChange}.
-  onDidChangeText (callback) {
-    return this.onDidChange(callback)
+  onDidChangeText(callback) {
+    return this.onDidChange(callback);
   }
 
   // Public: Invoke the given callback asynchronously following one or more
@@ -367,8 +377,8 @@ class TextBuffer {
   //       * `newText`: A {String} representing the inserted text.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidStopChanging (callback) {
-    return this.emitter.on('did-stop-changing', callback)
+  onDidStopChanging(callback) {
+    return this.emitter.on("did-stop-changing", callback);
   }
 
   // Public: Invoke the given callback when the in-memory contents of the
@@ -377,8 +387,8 @@ class TextBuffer {
   // * `callback` {Function} to be called when the buffer enters conflict.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidConflict (callback) {
-    return this.emitter.on('did-conflict', callback)
+  onDidConflict(callback) {
+    return this.emitter.on("did-conflict", callback);
   }
 
   // Public: Invoke the given callback if the value of {::isModified} changes.
@@ -387,8 +397,8 @@ class TextBuffer {
   //   * `modified` {Boolean} indicating whether the buffer is modified.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidChangeModified (callback) {
-    return this.emitter.on('did-change-modified', callback)
+  onDidChangeModified(callback) {
+    return this.emitter.on("did-change-modified", callback);
   }
 
   // Public: Invoke the given callback when all marker `::onDidChange`
@@ -409,8 +419,8 @@ class TextBuffer {
   // * `callback` {Function} to be called after markers are updated.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidUpdateMarkers (callback) {
-    return this.emitter.on('did-update-markers', callback)
+  onDidUpdateMarkers(callback) {
+    return this.emitter.on("did-update-markers", callback);
   }
 
   // Public: Invoke the given callback when a marker is created.
@@ -419,8 +429,8 @@ class TextBuffer {
   //   * `marker` {Marker} that was created.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidCreateMarker (callback) {
-    return this.emitter.on('did-create-marker', callback)
+  onDidCreateMarker(callback) {
+    return this.emitter.on("did-create-marker", callback);
   }
 
   // Public: Invoke the given callback when the value of {::getPath} changes.
@@ -429,8 +439,8 @@ class TextBuffer {
   //   * `path` {String} representing the buffer's current path on disk.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidChangePath (callback) {
-    return this.emitter.on('did-change-path', callback)
+  onDidChangePath(callback) {
+    return this.emitter.on("did-change-path", callback);
   }
 
   // Public: Invoke the given callback when the value of {::getEncoding} changes.
@@ -439,8 +449,8 @@ class TextBuffer {
   //   * `encoding` {String} character set encoding of the buffer.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidChangeEncoding (callback) {
-    return this.emitter.on('did-change-encoding', callback)
+  onDidChangeEncoding(callback) {
+    return this.emitter.on("did-change-encoding", callback);
   }
 
   // Public: Invoke the given callback before the buffer is saved to disk.
@@ -449,8 +459,8 @@ class TextBuffer {
   //   a {Promise}, then the buffer will not be saved until the promise resolves.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onWillSave (callback) {
-    return this.emitter.on('will-save', callback)
+  onWillSave(callback) {
+    return this.emitter.on("will-save", callback);
   }
 
   // Public: Invoke the given callback after the buffer is saved to disk.
@@ -460,8 +470,8 @@ class TextBuffer {
   //     * `path` The path to which the buffer was saved.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidSave (callback) {
-    return this.emitter.on('did-save', callback)
+  onDidSave(callback) {
+    return this.emitter.on("did-save", callback);
   }
 
   // Public: Invoke the given callback after the file backing the buffer is
@@ -470,8 +480,8 @@ class TextBuffer {
   // * `callback` {Function} to be called after the buffer is deleted.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidDelete (callback) {
-    return this.emitter.on('did-delete', callback)
+  onDidDelete(callback) {
+    return this.emitter.on("did-delete", callback);
   }
 
   // Public: Invoke the given callback before the buffer is reloaded from the
@@ -480,8 +490,8 @@ class TextBuffer {
   // * `callback` {Function} to be called before the buffer is reloaded.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onWillReload (callback) {
-    return this.emitter.on('will-reload', callback)
+  onWillReload(callback) {
+    return this.emitter.on("will-reload", callback);
   }
 
   // Public: Invoke the given callback after the buffer is reloaded from the
@@ -490,8 +500,8 @@ class TextBuffer {
   // * `callback` {Function} to be called after the buffer is reloaded.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidReload (callback) {
-    return this.emitter.on('did-reload', callback)
+  onDidReload(callback) {
+    return this.emitter.on("did-reload", callback);
   }
 
   // Public: Invoke the given callback when the buffer is destroyed.
@@ -499,8 +509,8 @@ class TextBuffer {
   // * `callback` {Function} to be called when the buffer is destroyed.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onDidDestroy (callback) {
-    return this.emitter.on('did-destroy', callback)
+  onDidDestroy(callback) {
+    return this.emitter.on("did-destroy", callback);
   }
 
   // Public: Invoke the given callback when there is an error in watching the
@@ -513,16 +523,16 @@ class TextBuffer {
   //       The error will not be thrown if this function is called.
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onWillThrowWatchError (callback) {
-    return this.emitter.on('will-throw-watch-error', callback)
+  onWillThrowWatchError(callback) {
+    return this.emitter.on("will-throw-watch-error", callback);
   }
 
   // Public: Get the number of milliseconds that will elapse without a change
   // before {::onDidStopChanging} observers are invoked following a change.
   //
   // Returns a {Number}.
-  getStoppedChangingDelay () {
-    return this.stoppedChangingDelay
+  getStoppedChangingDelay() {
+    return this.stoppedChangingDelay;
   }
 
   /*
@@ -535,30 +545,30 @@ class TextBuffer {
   // If the buffer is unsaved, always returns `true` unless the buffer is empty.
   //
   // Returns a {Boolean}.
-  isModified () {
+  isModified() {
     if (this.isDeleted()) {
       // We typically consider a deleted file to be modified… unless it was
       // unmodified at the time of deletion and has not been modified since.
-      return !this.retainsUnmodifiedTraitAfterDeletion
+      return !this.retainsUnmodifiedTraitAfterDeletion;
     }
     if (this.file) {
       // Now that all deletion cases are weeded out, the main determination is
       // whether the native buffer reports itself as modified — but we keep the
       // `existsSync` check just to be thorough.
-      return !this.file.existsSync() || this.buffer.isModified()
+      return !this.file.existsSync() || this.buffer.isModified();
     } else {
       // A buffer that never had any backing file on disk is always considered
       // to be modified _unless_ it is completely empty. We should not be
       // prompting users to save untitled buffers with empty contents.
-      return this.buffer.getLength() > 0
+      return this.buffer.getLength() > 0;
     }
   }
 
   // Public: Determine if the buffer is in a deleted state — meaning that it
   // was previously backed by a file on disk, but is no longer.
-  isDeleted () {
-    let hasNoFile = !this.file || !this.file.existsSync()
-    return hasNoFile && this.didHaveFileOnDisk
+  isDeleted() {
+    let hasNoFile = !this.file || !this.file.existsSync();
+    return hasNoFile && this.didHaveFileOnDisk;
   }
 
   // Public: Determine if the in-memory contents of the buffer conflict with
@@ -570,25 +580,25 @@ class TextBuffer {
   // clobber the changes made by the external program.
   //
   // Returns a {Boolean}.
-  isInConflict () {
+  isInConflict() {
     // Deleted files are automatically in conflict if they consider themselves
     // modified.
-    return this.isModified() && (this.fileHasChangedSinceLastLoad || this.isDeleted())
+    return this.isModified() && (this.fileHasChangedSinceLastLoad || this.isDeleted());
   }
 
   // Public: Get the path of the associated file.
   //
   // Returns a {String}.
-  getPath () {
-    return this.file ? this.file.getPath() : undefined
+  getPath() {
+    return this.file ? this.file.getPath() : undefined;
   }
 
   // Public: Set the path for the buffer's associated file.
   //
   // * `filePath` A {String} representing the new file path
-  setPath (filePath) {
-    if (filePath === this.getPath()) return
-    return this.setFile(filePath && new File(filePath))
+  setPath(filePath) {
+    if (filePath === this.getPath()) return;
+    return this.setFile(filePath && new File(filePath));
   }
 
   // Experimental: Set a custom {File} object as the buffer's backing store.
@@ -609,59 +619,59 @@ class TextBuffer {
   //   * `onDidRename` (optional) A {Function} that invokes its callback argument
   //     when the file is renamed. The method should return a {Disposable} that
   //     can be used to prevent further calls to the callback.
-  setFile (file) {
-    if (!this.file && !file) return
-    if (file === this.file) return
+  setFile(file) {
+    if (!this.file && !file) return;
+    if (file === this.file) return;
 
-    this.file = file
+    this.file = file;
     if (this.file) {
-      if (typeof this.file.setEncoding === 'function') {
-        this.file.setEncoding(this.getEncoding())
+      if (typeof this.file.setEncoding === "function") {
+        this.file.setEncoding(this.getEncoding());
       }
-      this.subscribeToFile()
+      this.subscribeToFile();
     }
 
-    this.emitter.emit('did-change-path', this.getPath())
+    this.emitter.emit("did-change-path", this.getPath());
   }
 
   // Public: Sets the character set encoding for this buffer.
   //
   // * `encoding` The {String} encoding to use (default: 'utf8').
-  setEncoding (encoding = 'utf8') {
-    if (encoding === this.getEncoding()) return
+  setEncoding(encoding = "utf8") {
+    if (encoding === this.getEncoding()) return;
 
-    this.encoding = encoding
+    this.encoding = encoding;
     if (this.file) {
-      if (typeof this.file.setEncoding === 'function') {
-        this.file.setEncoding(encoding)
+      if (typeof this.file.setEncoding === "function") {
+        this.file.setEncoding(encoding);
       }
-      this.emitter.emit('did-change-encoding', encoding)
+      this.emitter.emit("did-change-encoding", encoding);
       if (!this.isModified()) {
-        this.load({clearHistory: true, internal: true})
+        this.load({ clearHistory: true, internal: true });
       }
     } else {
-      this.emitter.emit('did-change-encoding', encoding)
+      this.emitter.emit("did-change-encoding", encoding);
     }
   }
 
   // Public: Returns the {String} encoding of this buffer.
-  getEncoding () {
-    return this.encoding || (this.file && this.file.getEncoding())
+  getEncoding() {
+    return this.encoding || (this.file && this.file.getEncoding());
   }
 
-  setPreferredLineEnding (preferredLineEnding = null) {
-    this.preferredLineEnding = preferredLineEnding
+  setPreferredLineEnding(preferredLineEnding = null) {
+    this.preferredLineEnding = preferredLineEnding;
   }
 
-  getPreferredLineEnding () {
-    return this.preferredLineEnding
+  getPreferredLineEnding() {
+    return this.preferredLineEnding;
   }
 
   // Public: Get the path of the associated file.
   //
   // Returns a {String}.
-  getUri () {
-    return this.getPath()
+  getUri() {
+    return this.getPath();
   }
 
   // Get the basename of the associated file.
@@ -670,8 +680,8 @@ class TextBuffer {
   // directories.
   //
   // Returns a {String}.
-  getBaseName () {
-    return this.file && this.file.getBaseName()
+  getBaseName() {
+    return this.file && this.file.getBaseName();
   }
 
   /*
@@ -681,21 +691,21 @@ class TextBuffer {
   // Public: Determine whether the buffer is empty.
   //
   // Returns a {Boolean}.
-  isEmpty () {
-    return this.buffer.getLength() === 0
+  isEmpty() {
+    return this.buffer.getLength() === 0;
   }
 
   // Public: Get the entire text of the buffer. Avoid using this unless you know that the
   // buffer's text is reasonably short.
   //
   // Returns a {String}.
-  getText () {
-    if (this.cachedText == null) this.cachedText = this.buffer.getText()
-    return this.cachedText
+  getText() {
+    if (this.cachedText == null) this.cachedText = this.buffer.getText();
+    return this.cachedText;
   }
 
-  getCharacterAtPosition (position) {
-    return this.buffer.getCharacterAtPosition(Point.fromObject(position))
+  getCharacterAtPosition(position) {
+    return this.buffer.getCharacterAtPosition(Point.fromObject(position));
   }
 
   // Public: Get the text in a range.
@@ -703,23 +713,23 @@ class TextBuffer {
   // * `range` A {Range}
   //
   // Returns a {String}
-  getTextInRange (range) {
-    return this.buffer.getTextInRange(Range.fromObject(range))
+  getTextInRange(range) {
+    return this.buffer.getTextInRange(Range.fromObject(range));
   }
 
   // Public: Get the text of all lines in the buffer, without their line endings.
   //
   // Returns an {Array} of {String}s.
-  getLines () {
-    return this.buffer.getLines()
+  getLines() {
+    return this.buffer.getLines();
   }
 
   // Public: Get the text of the last line of the buffer, without its line
   // ending.
   //
   // Returns a {String}.
-  getLastLine () {
-    return this.lineForRow(this.getLastRow())
+  getLastLine() {
+    return this.lineForRow(this.getLastRow());
   }
 
   // Public: Get the text of the line at the given 0-indexed row, without its
@@ -728,8 +738,8 @@ class TextBuffer {
   // * `row` A {Number} representing the row.
   //
   // Returns a {String}.
-  lineForRow (row) {
-    return this.buffer.lineForRow(row)
+  lineForRow(row) {
+    return this.buffer.lineForRow(row);
   }
 
   // Public: Get the line ending for the given 0-indexed row.
@@ -739,8 +749,8 @@ class TextBuffer {
   // Returns a {String}. The returned newline is represented as a literal string:
   // `'\n'`, `'\r\n'`, or `''` for the last line of the buffer, which
   // doesn't end in a newline.
-  lineEndingForRow (row) {
-    return this.buffer.lineEndingForRow(row)
+  lineEndingForRow(row) {
+    return this.buffer.lineEndingForRow(row);
   }
 
   // Public: Get the length of the line for the given 0-indexed row, without its
@@ -749,8 +759,8 @@ class TextBuffer {
   // * `row` A {Number} indicating the row.
   //
   // Returns a {Number}.
-  lineLengthForRow (row) {
-    return this.buffer.lineLengthForRow(row)
+  lineLengthForRow(row) {
+    return this.buffer.lineLengthForRow(row);
   }
 
   // Public: Determine if the given row contains only whitespace.
@@ -758,8 +768,8 @@ class TextBuffer {
   // * `row` A {Number} representing a 0-indexed row.
   //
   // Returns a {Boolean}.
-  isRowBlank (row) {
-    return !/\S/.test(this.lineForRow(row))
+  isRowBlank(row) {
+    return !/\S/.test(this.lineForRow(row));
   }
 
   // Public: Given a row, find the first preceding row that's not blank.
@@ -767,13 +777,13 @@ class TextBuffer {
   // * `startRow` A {Number} identifying the row to start checking at.
   //
   // Returns a {Number} or `null` if there's no preceding non-blank row.
-  previousNonBlankRow (startRow) {
-    if (startRow === 0) return null
-    startRow = Math.min(startRow, this.getLastRow())
+  previousNonBlankRow(startRow) {
+    if (startRow === 0) return null;
+    startRow = Math.min(startRow, this.getLastRow());
     for (let row = startRow - 1; row >= 0; row--) {
-      if (!this.isRowBlank(row)) return row
+      if (!this.isRowBlank(row)) return row;
     }
-    return null
+    return null;
   }
 
   // Public: Given a row, find the next row that's not blank.
@@ -781,26 +791,26 @@ class TextBuffer {
   // * `startRow` A {Number} identifying the row to start checking at.
   //
   // Returns a {Number} or `null` if there's no next non-blank row.
-  nextNonBlankRow (startRow) {
-    const lastRow = this.getLastRow()
+  nextNonBlankRow(startRow) {
+    const lastRow = this.getLastRow();
     if (startRow < lastRow) {
       for (let row = startRow + 1; row <= lastRow; row++) {
-        if (!this.isRowBlank(row)) return row
+        if (!this.isRowBlank(row)) return row;
       }
     }
-    return null
+    return null;
   }
 
   // Extended: Return true if the buffer contains any astral-plane Unicode characters that
   // are encoded as surrogate pairs.
   //
   // Returns a {Boolean}.
-  hasAstral () {
+  hasAstral() {
     if (this.cachedHasAstral !== null) {
-      return this.cachedHasAstral
+      return this.cachedHasAstral;
     } else {
-      this.cachedHasAstral = this.buffer.hasAstral()
-      return this.cachedHasAstral
+      this.cachedHasAstral = this.buffer.hasAstral();
+      return this.cachedHasAstral;
     }
   }
 
@@ -813,78 +823,82 @@ class TextBuffer {
   // * `text` A {String}
   //
   // Returns a {Range} spanning the new buffer contents.
-  setText (text) {
-    return this.setTextInRange(this.getRange(), text, {normalizeLineEndings: false})
+  setText(text) {
+    return this.setTextInRange(this.getRange(), text, { normalizeLineEndings: false });
   }
 
   // Public: Replace the current buffer contents by applying a diff based on the
   // given text.
   //
   // * `text` A {String} containing the new buffer contents.
-  setTextViaDiff (text) {
-    const changes = this.buffer.diff(text).getChanges()
-    if (changes.length === 0) return
+  setTextViaDiff(text) {
+    const changes = this.buffer.diff(text).getChanges();
+    if (changes.length === 0) return;
 
     // The native differ bounds its edit distance and degrades to a single
     // change replacing the whole buffer when the texts differ too much. Use
     // the line-wise JavaScript diff in that case so markers outside the
     // changed lines are still preserved.
-    const {row: lastRow, column: lastColumn} = this.buffer.getExtent()
-    if (changes.length === 1 &&
-        changes[0].oldStart.row === 0 && changes[0].oldStart.column === 0 &&
-        changes[0].oldEnd.row === lastRow && changes[0].oldEnd.column === lastColumn) {
-      return this.setTextViaLineDiff(text)
+    const { row: lastRow, column: lastColumn } = this.buffer.getExtent();
+    if (
+      changes.length === 1 &&
+      changes[0].oldStart.row === 0 &&
+      changes[0].oldStart.column === 0 &&
+      changes[0].oldEnd.row === lastRow &&
+      changes[0].oldEnd.column === lastColumn
+    ) {
+      return this.setTextViaLineDiff(text);
     }
 
-    const changeOptions = {normalizeLineEndings: false}
+    const changeOptions = { normalizeLineEndings: false };
     this.transact(() => {
       for (let i = changes.length - 1; i >= 0; i--) {
-        const change = changes[i]
-        this.setTextInRange([change.oldStart, change.oldEnd], change.newText, changeOptions)
+        const change = changes[i];
+        this.setTextInRange([change.oldStart, change.oldEnd], change.newText, changeOptions);
       }
-    })
+    });
   }
 
-  setTextViaLineDiff (text) {
-    const currentText = this.getText()
-    if (currentText === text) return
+  setTextViaLineDiff(text) {
+    const currentText = this.getText();
+    if (currentText === text) return;
 
     const computeBufferColumn = function (str) {
-      const newlineIndex = str.lastIndexOf('\n')
+      const newlineIndex = str.lastIndexOf("\n");
       if (newlineIndex === -1) {
-        return str.length
+        return str.length;
       } else {
-        return str.length - newlineIndex - 1
+        return str.length - newlineIndex - 1;
       }
-    }
+    };
 
     this.transact(() => {
-      let row = 0
-      let column = 0
-      const currentPosition = [0, 0]
+      let row = 0;
+      let column = 0;
+      const currentPosition = [0, 0];
 
-      const lineDiff = diff.diffLines(currentText, text)
-      const changeOptions = {normalizeLineEndings: false}
+      const lineDiff = diff.diffLines(currentText, text);
+      const changeOptions = { normalizeLineEndings: false };
 
       for (let change of lineDiff) {
-        const lineCount = change.count
-        currentPosition[0] = row
-        currentPosition[1] = column
+        const lineCount = change.count;
+        currentPosition[0] = row;
+        currentPosition[1] = column;
 
         if (change.added) {
-          row += lineCount
-          column = computeBufferColumn(change.value)
-          this.setTextInRange([currentPosition, currentPosition], change.value, changeOptions)
+          row += lineCount;
+          column = computeBufferColumn(change.value);
+          this.setTextInRange([currentPosition, currentPosition], change.value, changeOptions);
         } else if (change.removed) {
-          const endRow = row + lineCount
-          const endColumn = column + computeBufferColumn(change.value)
-          this.setTextInRange([currentPosition, [endRow, endColumn]], '', changeOptions)
+          const endRow = row + lineCount;
+          const endColumn = column + computeBufferColumn(change.value);
+          this.setTextInRange([currentPosition, [endRow, endColumn]], "", changeOptions);
         } else {
-          row += lineCount
-          column = computeBufferColumn(change.value)
+          row += lineCount;
+          column = computeBufferColumn(change.value);
         }
       }
-    })
+    });
   }
 
   // Public: Set the text in the given range.
@@ -899,29 +913,34 @@ class TextBuffer {
   //     buffer after instead.
   //
   // Returns the {Range} of the inserted text.
-  setTextInRange (range, newText, options) {
-    let normalizeLineEndings, undo
-    if (options) ({normalizeLineEndings, undo} = options)
-    if (normalizeLineEndings == null) normalizeLineEndings = true
+  setTextInRange(range, newText, options) {
+    let normalizeLineEndings, undo;
+    if (options) ({ normalizeLineEndings, undo } = options);
+    if (normalizeLineEndings == null) normalizeLineEndings = true;
     if (undo != null) {
-      Grim.deprecate('The `undo` option is deprecated. Call groupLastChanges() on the TextBuffer afterward instead.')
+      Grim.deprecate(
+        "The `undo` option is deprecated. Call groupLastChanges() on the TextBuffer afterward instead.",
+      );
     }
 
     if (this.transactCallDepth === 0) {
-      const newRange = this.transact(() => this.setTextInRange(range, newText, {normalizeLineEndings}))
-      if (undo === 'skip') this.groupLastChanges()
-      return newRange
+      const newRange = this.transact(() =>
+        this.setTextInRange(range, newText, { normalizeLineEndings }),
+      );
+      if (undo === "skip") this.groupLastChanges();
+      return newRange;
     }
 
-    const oldRange = this.clipRange(range)
-    const oldText = this.getTextInRange(oldRange)
+    const oldRange = this.clipRange(range);
+    const oldText = this.getTextInRange(oldRange);
 
     if (normalizeLineEndings) {
-      const normalizedEnding = this.preferredLineEnding ||
+      const normalizedEnding =
+        this.preferredLineEnding ||
         this.lineEndingForRow(oldRange.start.row) ||
-        this.lineEndingForRow(oldRange.start.row - 1)
+        this.lineEndingForRow(oldRange.start.row - 1);
       if (normalizedEnding) {
-        newText = newText.replace(newlineRegex, normalizedEnding)
+        newText = newText.replace(newlineRegex, normalizedEnding);
       }
     }
 
@@ -931,11 +950,11 @@ class TextBuffer {
       newStart: oldRange.start,
       newEnd: traverse(oldRange.start, extentForText(newText)),
       oldText,
-      newText
-    }
-    const newRange = this.applyChange(change, true)
-    if (undo === 'skip') this.groupLastChanges()
-    return newRange
+      newText,
+    };
+    const newRange = this.applyChange(change, true);
+    if (undo === "skip") this.groupLastChanges();
+    return newRange;
   }
 
   // Public: Insert text at the given position.
@@ -950,8 +969,8 @@ class TextBuffer {
   //     {TextBuffer} afterward instead.
   //
   // Returns the {Range} of the inserted text.
-  insert (position, text, options) {
-    return this.setTextInRange(new Range(position, position), text, options)
+  insert(position, text, options) {
+    return this.setTextInRange(new Range(position, position), text, options);
   }
 
   // Public: Append text to the end of the buffer.
@@ -964,38 +983,38 @@ class TextBuffer {
   //     {TextBuffer} afterward instead.
   //
   // Returns the {Range} of the inserted text
-  append (text, options) {
-    return this.insert(this.getEndPosition(), text, options)
+  append(text, options) {
+    return this.insert(this.getEndPosition(), text, options);
   }
 
   // Applies a change to the buffer based on its old range and new text.
-  applyChange (change, pushToHistory = false) {
-    const {newStart, newEnd, oldStart, oldEnd, oldText, newText} = change
+  applyChange(change, pushToHistory = false) {
+    const { newStart, newEnd, oldStart, oldEnd, oldText, newText } = change;
 
-    const oldExtent = traversal(oldEnd, oldStart)
-    const oldRange = Range(newStart, traverse(newStart, oldExtent))
-    oldRange.freeze()
+    const oldExtent = traversal(oldEnd, oldStart);
+    const oldRange = Range(newStart, traverse(newStart, oldExtent));
+    oldRange.freeze();
 
-    const newExtent = traversal(newEnd, newStart)
-    const newRange = Range(newStart, traverse(newStart, newExtent))
-    newRange.freeze()
+    const newExtent = traversal(newEnd, newStart);
+    const newRange = Range(newStart, traverse(newStart, newExtent));
+    newRange.freeze();
 
     if (pushToHistory) {
-      if (!change.oldExtent) change.oldExtent = oldExtent
-      if (!change.newExtent) change.newExtent = newExtent
+      if (!change.oldExtent) change.oldExtent = oldExtent;
+      if (!change.newExtent) change.newExtent = newExtent;
       if (this.historyProvider) {
-        this.historyProvider.pushChange(change)
+        this.historyProvider.pushChange(change);
       }
     }
 
-    const changeEvent = {oldRange, newRange, oldText, newText}
+    const changeEvent = { oldRange, newRange, oldText, newText };
     for (const id in this.displayLayers) {
-      const displayLayer = this.displayLayers[id]
-      displayLayer.bufferWillChange(changeEvent)
+      const displayLayer = this.displayLayers[id];
+      displayLayer.bufferWillChange(changeEvent);
     }
 
-    this.emitWillChangeEvent()
-    this.buffer.setTextInRange(oldRange, newText)
+    this.emitWillChangeEvent();
+    this.buffer.setTextInRange(oldRange, newText);
 
     if (this.retainsUnmodifiedTraitAfterDeletion) {
       // This buffer is in the "deleted" state but _not_ the "modified" state.
@@ -1005,30 +1024,30 @@ class TextBuffer {
       //
       // But this method introduces a change to the buffer, so we'll clear the
       // flag that is preventing `isModified` from returning `true`.
-      this.retainsUnmodifiedTraitAfterDeletion = false
-      this.emitModifiedStatusChanged(this.isModified())
+      this.retainsUnmodifiedTraitAfterDeletion = false;
+      this.emitModifiedStatusChanged(this.isModified());
     }
 
     if (this.markerLayers) {
       for (const id in this.markerLayers) {
-        const markerLayer = this.markerLayers[id]
-        markerLayer.splice(oldRange.start, oldExtent, newExtent)
-        this.markerLayersWithPendingUpdateEvents.add(markerLayer)
+        const markerLayer = this.markerLayers[id];
+        markerLayer.splice(oldRange.start, oldExtent, newExtent);
+        this.markerLayersWithPendingUpdateEvents.add(markerLayer);
       }
     }
 
-    this.cachedText = null
-    this.changesSinceLastDidChangeTextEvent.push(change)
-    this.changesSinceLastStoppedChangingEvent.push(change)
-    this.emitDidChangeEvent(changeEvent)
-    return newRange
+    this.cachedText = null;
+    this.changesSinceLastDidChangeTextEvent.push(change);
+    this.changesSinceLastStoppedChangingEvent.push(change);
+    this.emitDidChangeEvent(changeEvent);
+    return newRange;
   }
 
-  emitDidChangeEvent (changeEvent) {
+  emitDidChangeEvent(changeEvent) {
     if (!changeEvent.oldRange.isEmpty() || !changeEvent.newRange.isEmpty()) {
-      this.languageMode.bufferDidChange(changeEvent)
+      this.languageMode.bufferDidChange(changeEvent);
       for (const id in this.displayLayers) {
-        this.displayLayers[id].bufferDidChange(changeEvent)
+        this.displayLayers[id].bufferDidChange(changeEvent);
       }
     }
   }
@@ -1038,8 +1057,8 @@ class TextBuffer {
   // * `range` A {Range} in which to delete. The range is clipped before deleting.
   //
   // Returns an empty {Range} starting at the start of deleted range.
-  delete (range) {
-    return this.setTextInRange(range, '')
+  delete(range) {
+    return this.setTextInRange(range, "");
   }
 
   // Public: Delete the line associated with a specified 0-indexed row.
@@ -1047,8 +1066,8 @@ class TextBuffer {
   // * `row` A {Number} representing the row to delete.
   //
   // Returns the {Range} of the deleted text.
-  deleteRow (row) {
-    return this.deleteRows(row, row)
+  deleteRow(row) {
+    return this.deleteRows(row, row);
   }
 
   // Public: Delete the lines associated with the specified 0-indexed row range.
@@ -1060,36 +1079,38 @@ class TextBuffer {
   // * `endRow` A {Number} representing the last row to delete, inclusive.
   //
   // Returns the {Range} of the deleted text.
-  deleteRows (startRow, endRow) {
-    let endPoint, startPoint
-    const lastRow = this.getLastRow()
+  deleteRows(startRow, endRow) {
+    let endPoint, startPoint;
+    const lastRow = this.getLastRow();
 
-    if (startRow > endRow) { [startRow, endRow] = [endRow, startRow] }
+    if (startRow > endRow) {
+      [startRow, endRow] = [endRow, startRow];
+    }
 
     if (endRow < 0) {
-      return new Range(this.getFirstPosition(), this.getFirstPosition())
+      return new Range(this.getFirstPosition(), this.getFirstPosition());
     }
 
     if (startRow > lastRow) {
-      return new Range(this.getEndPosition(), this.getEndPosition())
+      return new Range(this.getEndPosition(), this.getEndPosition());
     }
 
-    startRow = Math.max(0, startRow)
-    endRow = Math.min(lastRow, endRow)
+    startRow = Math.max(0, startRow);
+    endRow = Math.min(lastRow, endRow);
 
     if (endRow < lastRow) {
-      startPoint = new Point(startRow, 0)
-      endPoint = new Point(endRow + 1, 0)
+      startPoint = new Point(startRow, 0);
+      endPoint = new Point(endRow + 1, 0);
     } else {
       if (startRow === 0) {
-        startPoint = new Point(startRow, 0)
+        startPoint = new Point(startRow, 0);
       } else {
-        startPoint = new Point(startRow - 1, this.lineLengthForRow(startRow - 1))
+        startPoint = new Point(startRow - 1, this.lineLengthForRow(startRow - 1));
       }
-      endPoint = new Point(endRow, this.lineLengthForRow(endRow))
+      endPoint = new Point(endRow, this.lineLengthForRow(endRow));
     }
 
-    return this.delete(new Range(startPoint, endPoint))
+    return this.delete(new Range(startPoint, endPoint));
   }
 
   /*
@@ -1110,10 +1131,10 @@ class TextBuffer {
   //   * `role` (optional) A {String} indicating role of this marker layer
   //
   // Returns a {MarkerLayer}.
-  addMarkerLayer (options) {
-    const layer = new MarkerLayer(this, String(this.nextMarkerLayerId++), options)
-    this.markerLayers[layer.id] = layer
-    return layer
+  addMarkerLayer(options) {
+    const layer = new MarkerLayer(this, String(this.nextMarkerLayerId++), options);
+    this.markerLayers[layer.id] = layer;
+    return layer;
   }
 
   // Public: Get a {MarkerLayer} by id.
@@ -1122,8 +1143,8 @@ class TextBuffer {
   //
   // Returns a {MarkerLayer} or `undefined` if no layer exists with the given
   // id.
-  getMarkerLayer (id) {
-    return this.markerLayers[id]
+  getMarkerLayer(id) {
+    return this.markerLayers[id];
   }
 
   // Public: Get the default {MarkerLayer}.
@@ -1132,8 +1153,8 @@ class TextBuffer {
   // layer.
   //
   // Returns a {MarkerLayer}.
-  getDefaultMarkerLayer () {
-    return this.defaultMarkerLayer
+  getDefaultMarkerLayer() {
+    return this.defaultMarkerLayer;
   }
 
   // Public: Create a {Marker} with the given range in the default {MarkerLayer}.
@@ -1169,8 +1190,8 @@ class TextBuffer {
   //     overrides behavior in all circumstances.
   //
   // Returns a {Marker}.
-  markRange (range, properties) {
-    return this.defaultMarkerLayer.markRange(range, properties)
+  markRange(range, properties) {
+    return this.defaultMarkerLayer.markRange(range, properties);
   }
 
   // Public: Create a {Marker} at the given position with no tail in the default
@@ -1200,15 +1221,15 @@ class TextBuffer {
   //     overrides behavior in all circumstances.
   //
   // Returns a {Marker}.
-  markPosition (position, options) {
-    return this.defaultMarkerLayer.markPosition(position, options)
+  markPosition(position, options) {
+    return this.defaultMarkerLayer.markPosition(position, options);
   }
 
   // Public: Get all existing markers on the default marker layer.
   //
   // Returns an {Array} of {Marker}s.
-  getMarkers () {
-    return this.defaultMarkerLayer.getMarkers()
+  getMarkers() {
+    return this.defaultMarkerLayer.getMarkers();
   }
 
   // Public: Get an existing marker by its id from the default marker layer.
@@ -1216,8 +1237,8 @@ class TextBuffer {
   // * `id` {Number} id of the marker to retrieve
   //
   // Returns a {Marker}.
-  getMarker (id) {
-    return this.defaultMarkerLayer.getMarker(id)
+  getMarker(id) {
+    return this.defaultMarkerLayer.getMarker(id);
   }
 
   // Public: Find markers conforming to the given parameters in the default
@@ -1241,61 +1262,61 @@ class TextBuffer {
   //   * `intersectsRow` Only include markers that intersect the given row {Number}.
   //
   // Returns an {Array} of {Marker}s.
-  findMarkers (params) {
-    return this.defaultMarkerLayer.findMarkers(params)
+  findMarkers(params) {
+    return this.defaultMarkerLayer.findMarkers(params);
   }
 
   // Public: Get the number of markers in the default marker layer.
   //
   // Returns a {Number}.
-  getMarkerCount () {
-    return this.defaultMarkerLayer.getMarkerCount()
+  getMarkerCount() {
+    return this.defaultMarkerLayer.getMarkerCount();
   }
 
-  destroyMarker (id) {
-    const marker = this.getMarker(id)
-    if (marker) marker.destroy()
+  destroyMarker(id) {
+    const marker = this.getMarker(id);
+    if (marker) marker.destroy();
   }
 
   /*
   Section: History
   */
 
-  setHistoryProvider (historyProvider) {
-    this.historyProvider = historyProvider
+  setHistoryProvider(historyProvider) {
+    this.historyProvider = historyProvider;
   }
 
-  restoreDefaultHistoryProvider (history) {
-    const provider = new DefaultHistoryProvider(this)
-    provider.restoreFromSnapshot(history)
-    return this.setHistoryProvider(provider)
+  restoreDefaultHistoryProvider(history) {
+    const provider = new DefaultHistoryProvider(this);
+    provider.restoreFromSnapshot(history);
+    return this.setHistoryProvider(provider);
   }
 
-  getHistory (maxEntries) {
+  getHistory(maxEntries) {
     if (this.transactCallDepth > 0) {
-      throw new Error('Cannot build history snapshots within transactions')
+      throw new Error("Cannot build history snapshots within transactions");
     }
 
-    const snapshot = this.historyProvider.getSnapshot(maxEntries)
+    const snapshot = this.historyProvider.getSnapshot(maxEntries);
 
-    const baseTextBuffer = new NativeTextBuffer(this.getText())
+    const baseTextBuffer = new NativeTextBuffer(this.getText());
     for (let i = snapshot.undoStackChanges.length - 1; i >= 0; i--) {
-      const change = snapshot.undoStackChanges[i]
-      const newRange = Range(change.newStart, change.newEnd)
-      baseTextBuffer.setTextInRange(newRange, change.oldText)
+      const change = snapshot.undoStackChanges[i];
+      const newRange = Range(change.newStart, change.newEnd);
+      baseTextBuffer.setTextInRange(newRange, change.oldText);
     }
 
     return {
       baseText: baseTextBuffer.getText(),
       undoStack: snapshot.undoStack,
       redoStack: snapshot.redoStack,
-      nextCheckpointId: snapshot.nextCheckpointId
-    }
+      nextCheckpointId: snapshot.nextCheckpointId,
+    };
   }
 
   // Provide fallback in case people are using this renamed private field in packages.
-  get history () {
-    return this.historyProvider
+  get history() {
+    return this.historyProvider;
   }
 
   // Public: Undo the last operation. If a transaction is in progress, aborts it.
@@ -1305,23 +1326,23 @@ class TextBuffer {
   //     Restore snapshot of selections marker layer to given selectionsMarkerLayer.
   //
   // Returns a {Boolean} of whether or not a change was made.
-  undo (options) {
-    const pop = this.historyProvider.undo()
-    if (!pop) return false
+  undo(options) {
+    const pop = this.historyProvider.undo();
+    if (!pop) return false;
 
-    this.emitWillChangeEvent()
-    this.transactCallDepth++
+    this.emitWillChangeEvent();
+    this.transactCallDepth++;
     try {
       for (const change of pop.textUpdates) {
-        this.applyChange(change)
+        this.applyChange(change);
       }
     } finally {
-      this.transactCallDepth--
+      this.transactCallDepth--;
     }
-    this.restoreFromMarkerSnapshot(pop.markers, options && options.selectionsMarkerLayer)
-    this.emitDidChangeTextEvent()
-    this.emitMarkerChangeEvents(pop.markers)
-    return true
+    this.restoreFromMarkerSnapshot(pop.markers, options && options.selectionsMarkerLayer);
+    this.emitDidChangeTextEvent();
+    this.emitMarkerChangeEvents(pop.markers);
+    return true;
   }
 
   // Public: Redo the last operation
@@ -1331,23 +1352,23 @@ class TextBuffer {
   //     Restore snapshot of selections marker layer to given selectionsMarkerLayer.
   //
   // Returns a {Boolean} of whether or not a change was made.
-  redo (options) {
-    const pop = this.historyProvider.redo()
-    if (!pop) return false
+  redo(options) {
+    const pop = this.historyProvider.redo();
+    if (!pop) return false;
 
-    this.emitWillChangeEvent()
-    this.transactCallDepth++
+    this.emitWillChangeEvent();
+    this.transactCallDepth++;
     try {
       for (const change of pop.textUpdates) {
-        this.applyChange(change)
+        this.applyChange(change);
       }
     } finally {
-      this.transactCallDepth--
+      this.transactCallDepth--;
     }
-    this.restoreFromMarkerSnapshot(pop.markers, options && options.selectionsMarkerLayer)
-    this.emitDidChangeTextEvent()
-    this.emitMarkerChangeEvents(pop.markers)
-    return true
+    this.restoreFromMarkerSnapshot(pop.markers, options && options.selectionsMarkerLayer);
+    this.emitDidChangeTextEvent();
+    this.emitMarkerChangeEvents(pop.markers);
+    return true;
   }
 
   // Public: Batch multiple operations as a single undo/redo step.
@@ -1371,57 +1392,59 @@ class TextBuffer {
   //   transaction is still open for grouping, the two transactions are merged with
   //   respect to undo and redo.
   // * `fn` A {Function} to call inside the transaction.
-  transact (options, fn) {
-    let groupingInterval, result, selectionsMarkerLayer
-    if (typeof options === 'function') {
-      fn = options
-      groupingInterval = 0
-    } else if (typeof options === 'object') {
-      ({groupingInterval, selectionsMarkerLayer} = options)
-      if (groupingInterval == null) { groupingInterval = 0 }
+  transact(options, fn) {
+    let groupingInterval, result, selectionsMarkerLayer;
+    if (typeof options === "function") {
+      fn = options;
+      groupingInterval = 0;
+    } else if (typeof options === "object") {
+      ({ groupingInterval, selectionsMarkerLayer } = options);
+      if (groupingInterval == null) {
+        groupingInterval = 0;
+      }
     } else {
-      groupingInterval = options
+      groupingInterval = options;
     }
 
     const checkpointBefore = this.historyProvider.createCheckpoint({
       markers: this.createMarkerSnapshot(selectionsMarkerLayer),
-      isBarrier: true
-    })
+      isBarrier: true,
+    });
 
     try {
-      this.transactCallDepth++
-      result = fn()
+      this.transactCallDepth++;
+      result = fn();
     } catch (exception) {
-      this.revertToCheckpoint(checkpointBefore, {deleteCheckpoint: true})
-      if (!(exception instanceof TransactionAbortedError)) throw exception
-      return
+      this.revertToCheckpoint(checkpointBefore, { deleteCheckpoint: true });
+      if (!(exception instanceof TransactionAbortedError)) throw exception;
+      return;
     } finally {
-      this.transactCallDepth--
+      this.transactCallDepth--;
     }
 
-    if (this.isDestroyed()) return result
-    const endMarkerSnapshot = this.createMarkerSnapshot(selectionsMarkerLayer)
+    if (this.isDestroyed()) return result;
+    const endMarkerSnapshot = this.createMarkerSnapshot(selectionsMarkerLayer);
     this.historyProvider.groupChangesSinceCheckpoint(checkpointBefore, {
       markers: endMarkerSnapshot,
-      deleteCheckpoint: true
-    })
-    this.historyProvider.applyGroupingInterval(groupingInterval)
-    this.historyProvider.enforceUndoStackSizeLimit()
-    this.emitDidChangeTextEvent()
-    this.emitMarkerChangeEvents(endMarkerSnapshot)
-    return result
+      deleteCheckpoint: true,
+    });
+    this.historyProvider.applyGroupingInterval(groupingInterval);
+    this.historyProvider.enforceUndoStackSizeLimit();
+    this.emitDidChangeTextEvent();
+    this.emitMarkerChangeEvents(endMarkerSnapshot);
+    return result;
   }
 
   // Public: Abort the currently running transaction
   //
   // Only intended to be called within the `fn` option to {::transact}
-  abortTransaction () {
-    throw new TransactionAbortedError('Transaction aborted.')
+  abortTransaction() {
+    throw new TransactionAbortedError("Transaction aborted.");
   }
 
   // Public: Clear the undo stack.
-  clearUndoStack () {
-    return this.historyProvider.clearUndoStack()
+  clearUndoStack() {
+    return this.historyProvider.clearUndoStack();
   }
 
   // Public: Create a pointer to the current state of the buffer for use
@@ -1432,11 +1455,11 @@ class TextBuffer {
   //     When provided, skip taking snapshot for other selections markerLayers except given one.
   //
   // Returns a checkpoint id value.
-  createCheckpoint (options) {
+  createCheckpoint(options) {
     return this.historyProvider.createCheckpoint({
       markers: this.createMarkerSnapshot(options?.selectionsMarkerLayer ?? undefined),
-      isBarrier: false
-    })
+      isBarrier: false,
+    });
   }
 
   // Public: Revert the buffer to the state it was in when the given
@@ -1453,23 +1476,23 @@ class TextBuffer {
   //     Restore snapshot of selections marker layer to given selectionsMarkerLayer.
   //
   // Returns a {Boolean} indicating whether the operation succeeded.
-  revertToCheckpoint (checkpoint, options) {
-    const truncated = this.historyProvider.revertToCheckpoint(checkpoint)
-    if (!truncated) return false
-    this.emitWillChangeEvent()
-    this.transactCallDepth++
+  revertToCheckpoint(checkpoint, options) {
+    const truncated = this.historyProvider.revertToCheckpoint(checkpoint);
+    if (!truncated) return false;
+    this.emitWillChangeEvent();
+    this.transactCallDepth++;
     try {
       for (const change of truncated.textUpdates) {
-        this.applyChange(change)
+        this.applyChange(change);
       }
     } finally {
-      this.transactCallDepth--
+      this.transactCallDepth--;
     }
-    this.restoreFromMarkerSnapshot(truncated.markers, options && options.selectionsMarkerLayer)
-    this.emitDidChangeTextEvent()
-    this.emitter.emit('did-update-markers')
-    this.emitMarkerChangeEvents(truncated.markers)
-    return true
+    this.restoreFromMarkerSnapshot(truncated.markers, options && options.selectionsMarkerLayer);
+    this.emitDidChangeTextEvent();
+    this.emitter.emit("did-update-markers");
+    this.emitMarkerChangeEvents(truncated.markers);
+    return true;
   }
 
   // Public: Group all changes since the given checkpoint into a single
@@ -1484,11 +1507,11 @@ class TextBuffer {
   //     When provided, skip taking snapshot for other selections markerLayers except given one.
   //
   // Returns a {Boolean} indicating whether the operation succeeded.
-  groupChangesSinceCheckpoint (checkpoint, options) {
+  groupChangesSinceCheckpoint(checkpoint, options) {
     return this.historyProvider.groupChangesSinceCheckpoint(checkpoint, {
       markers: this.createMarkerSnapshot(options && options.selectionsMarkerLayer),
-      deleteCheckpoint: false
-    })
+      deleteCheckpoint: false,
+    });
   }
 
   // Public: Group the last two text changes for purposes of undo/redo.
@@ -1497,8 +1520,8 @@ class TextBuffer {
   // stack. It will not group past the beginning of an open transaction.
   //
   // Returns a {Boolean} indicating whether the operation succeeded.
-  groupLastChanges () {
-    return this.historyProvider.groupLastChanges()
+  groupLastChanges() {
+    return this.historyProvider.groupLastChanges();
   }
 
   // Public: Returns a list of changes since the given checkpoint.
@@ -1516,12 +1539,12 @@ class TextBuffer {
   // * `newRange`: The {Range} of the inserted text in the current text.
   // * `oldText`: A {String} representing the deleted text.
   // * `newText`: A {String} representing the inserted text.
-  getChangesSinceCheckpoint (checkpoint) {
-    const changes = this.historyProvider.getChangesSinceCheckpoint(checkpoint)
+  getChangesSinceCheckpoint(checkpoint) {
+    const changes = this.historyProvider.getChangesSinceCheckpoint(checkpoint);
     if (changes) {
-      return normalizePatchChanges(changes)
+      return normalizePatchChanges(changes);
     } else {
-      return []
+      return [];
     }
   }
 
@@ -1550,13 +1573,13 @@ class TextBuffer {
   //   * `replace` Call this {Function} with a {String} to replace the match.
   //   * `leadingContextLines` An {Array} with `leadingContextLineCount` lines before the match.
   //   * `trailingContextLines` An {Array} with `trailingContextLineCount` lines after the match.
-  scan (regex, options = {}, iterator) {
+  scan(regex, options = {}, iterator) {
     if (_.isFunction(options)) {
-      iterator = options
-      options = {}
+      iterator = options;
+      options = {};
     }
 
-    return this.scanInRange(regex, this.getRange(), options, iterator)
+    return this.scanInRange(regex, this.getRange(), options, iterator);
   }
 
   // Public: Scan regular expression matches in the entire buffer in reverse
@@ -1577,13 +1600,13 @@ class TextBuffer {
   //   * `replace` Call this {Function} with a {String} to replace the match.
   //   * `leadingContextLines` An {Array} with `leadingContextLineCount` lines before the match.
   //   * `trailingContextLines` An {Array} with `trailingContextLineCount` lines after the match.
-  backwardsScan (regex, options = {}, iterator) {
+  backwardsScan(regex, options = {}, iterator) {
     if (_.isFunction(options)) {
-      iterator = options
-      options = {}
+      iterator = options;
+      options = {};
     }
 
-    return this.backwardsScanInRange(regex, this.getRange(), options, iterator)
+    return this.backwardsScanInRange(regex, this.getRange(), options, iterator);
   }
 
   // Public: Scan regular expression matches in a given range , calling the given
@@ -1605,44 +1628,48 @@ class TextBuffer {
   //   * `replace` Call this {Function} with a {String} to replace the match.
   //   * `leadingContextLines` An {Array} with `leadingContextLineCount` lines before the match.
   //   * `trailingContextLines` An {Array} with `trailingContextLineCount` lines after the match.
-  scanInRange (regex, range, options = {}, callback, reverse = false) {
+  scanInRange(regex, range, options = {}, callback, reverse = false) {
     if (_.isFunction(options)) {
-      reverse = callback
-      callback = options
-      options = {}
+      reverse = callback;
+      callback = options;
+      options = {};
     }
 
-    range = this.clipRange(range)
-    const matchRanges = this.findAllInRangeSync(regex, range)
-    let startIndex = 0
-    let endIndex = matchRanges.length
-    let increment = 1
-    let previousRow = -1
-    let replacementColumnDelta = 0
+    range = this.clipRange(range);
+    const matchRanges = this.findAllInRangeSync(regex, range);
+    let startIndex = 0;
+    let endIndex = matchRanges.length;
+    let increment = 1;
+    let previousRow = -1;
+    let replacementColumnDelta = 0;
     if (reverse) {
-      startIndex = matchRanges.length - 1
-      endIndex = -1
-      increment = -1
+      startIndex = matchRanges.length - 1;
+      endIndex = -1;
+      increment = -1;
     }
 
     for (let i = startIndex; i !== endIndex; i += increment) {
-      const matchRange = matchRanges[i]
-      if (range.end.isEqual(matchRange.start) && (range.end.column > 0)) continue
+      const matchRange = matchRanges[i];
+      if (range.end.isEqual(matchRange.start) && range.end.column > 0) continue;
       if (matchRange.start.row !== previousRow) {
-        replacementColumnDelta = 0
+        replacementColumnDelta = 0;
       }
-      previousRow = matchRange.start.row
-      matchRange.start.column += replacementColumnDelta
-      matchRange.end.column += replacementColumnDelta
+      previousRow = matchRange.start.row;
+      matchRange.start.column += replacementColumnDelta;
+      matchRange.end.column += replacementColumnDelta;
 
-      const argument = new SearchCallbackArgument(this, Range.fromObject(matchRange), regex, options)
-      callback(argument)
-      if (argument.stopped || !regex.global) break
+      const argument = new SearchCallbackArgument(
+        this,
+        Range.fromObject(matchRange),
+        regex,
+        options,
+      );
+      callback(argument);
+      if (argument.stopped || !regex.global) break;
 
       if (!reverse && argument.replacementText != null) {
         replacementColumnDelta +=
-          (matchRange.start.column + argument.replacementText.length) -
-          matchRange.end.column
+          matchRange.start.column + argument.replacementText.length - matchRange.end.column;
       }
     }
   }
@@ -1664,13 +1691,13 @@ class TextBuffer {
   //   * `range` The {Range} of the match.
   //   * `stop` Call this {Function} to terminate the scan.
   //   * `replace` Call this {Function} with a {String} to replace the match.
-  backwardsScanInRange (regex, range, options = {}, iterator) {
+  backwardsScanInRange(regex, range, options = {}, iterator) {
     if (_.isFunction(options)) {
-      iterator = options
-      options = {}
+      iterator = options;
+      options = {};
     }
 
-    return this.scanInRange(regex, range, options, iterator, true)
+    return this.scanInRange(regex, range, options, iterator, true);
   }
 
   // Public: Replace all regular expression matches in the entire buffer.
@@ -1679,22 +1706,22 @@ class TextBuffer {
   // * `replacementText` A {String} representing the text to replace each match.
   //
   // Returns a {Number} representing the number of replacements made.
-  replace (regex, replacementText) {
-    const doSave = !this.isModified()
-    let replacements = 0
+  replace(regex, replacementText) {
+    const doSave = !this.isModified();
+    let replacements = 0;
 
     this.transact(() => {
-      return this.scan(regex, function ({matchText, replace}) {
-        const text = matchText.replace(regex, replacementText)
-        replacementText = text === matchText ? replacementText : text
-        replace(replacementText)
-        return replacements++
-      })
-    })
+      return this.scan(regex, function ({ matchText, replace }) {
+        const text = matchText.replace(regex, replacementText);
+        replacementText = text === matchText ? replacementText : text;
+        replace(replacementText);
+        return replacements++;
+      });
+    });
 
-    if (doSave) this.save()
+    if (doSave) this.save();
 
-    return replacements
+    return replacements;
   }
 
   // Experimental: Asynchronously search the buffer for a given regex.
@@ -1703,7 +1730,9 @@ class TextBuffer {
   //
   // Returns a {Promise} that resolves with the first {Range} of text that
   // matches the given regex.
-  find (regex) { return this.buffer.find(regex) }
+  find(regex) {
+    return this.buffer.find(regex);
+  }
 
   // Experimental: Asynchronously search a given range of the buffer for a given regex.
   //
@@ -1712,14 +1741,18 @@ class TextBuffer {
   //
   // Returns a {Promise} that resolves with the first {Range} of text that
   // matches the given regex.
-  findInRange (regex, range) { return this.buffer.findInRange(regex, range) }
+  findInRange(regex, range) {
+    return this.buffer.findInRange(regex, range);
+  }
 
   // Experimental: Search the buffer for a given regex.
   //
   // * `regex` A {RegExp} to search for.
   //
   // Returns the first {Range} of text that matches the given regex.
-  findSync (regex) { return this.buffer.findSync(regex) }
+  findSync(regex) {
+    return this.buffer.findSync(regex);
+  }
 
   // Experimental: Search a given range of the buffer for a given regex.
   //
@@ -1727,7 +1760,9 @@ class TextBuffer {
   // * `range` A {Range} to search within.
   //
   // Returns the first {Range} of text that matches the given regex.
-  findInRangeSync (regex, range) { return this.buffer.findInRangeSync(regex, range) }
+  findInRangeSync(regex, range) {
+    return this.buffer.findInRangeSync(regex, range);
+  }
 
   // Experimental: Asynchronously search the buffer for a given regex.
   //
@@ -1735,7 +1770,9 @@ class TextBuffer {
   //
   // Returns a {Promise} that resolves with an {Array} containing every
   // {Range} of text that matches the given regex.
-  findAll (regex) { return this.buffer.findAll(regex) }
+  findAll(regex) {
+    return this.buffer.findAll(regex);
+  }
 
   // Experimental: Asynchronously search a given range of the buffer for a given regex.
   //
@@ -1744,7 +1781,9 @@ class TextBuffer {
   //
   // Returns a {Promise} that resolves with an {Array} containing every
   // {Range} of text that matches the given regex.
-  findAllInRange (regex, range) { return this.buffer.findAllInRange(regex, range) }
+  findAllInRange(regex, range) {
+    return this.buffer.findAllInRange(regex, range);
+  }
 
   // Experimental: Run an regexp search on the buffer
   //
@@ -1752,7 +1791,9 @@ class TextBuffer {
   //
   // Returns an {Array} containing every {Range} of text that matches the given
   // regex.
-  findAllSync (regex) { return this.buffer.findAllSync(regex) }
+  findAllSync(regex) {
+    return this.buffer.findAllSync(regex);
+  }
 
   // Experimental: Search a given range of the buffer for a given regex.
   //
@@ -1761,7 +1802,9 @@ class TextBuffer {
   //
   // Returns an {Array} containing every {Range} of text that matches the given
   // regex.
-  findAllInRangeSync (regex, range) { return this.buffer.findAllInRangeSync(regex, range) }
+  findAllInRangeSync(regex, range) {
+    return this.buffer.findAllInRangeSync(regex, range);
+  }
 
   // Experimental: Search a given range of the buffer for a given regex. Store
   // the matching ranges in the given marker layer.
@@ -1771,23 +1814,23 @@ class TextBuffer {
   // * `range` A {Range} to search within.
   //
   // Returns an {Array} of {Marker}s representing the matches.
-  findAndMarkAllInRangeSync (markerLayer, regex, range, options = {}) {
-    const startId = this.nextMarkerId
-    const exclusive = options.invalidate === 'inside' || !options.tailed
+  findAndMarkAllInRangeSync(markerLayer, regex, range, options = {}) {
+    const startId = this.nextMarkerId;
+    const exclusive = options.invalidate === "inside" || !options.tailed;
     this.nextMarkerId += this.buffer.findAndMarkAllSync(
       markerLayer.index,
       startId,
       exclusive,
       regex,
-      Range.fromObject(range)
-    )
-    const markers = []
+      Range.fromObject(range),
+    );
+    const markers = [];
     for (let id = startId; id < this.nextMarkerId; id++) {
-      const marker = new Marker(id, markerLayer, null, options, true)
-      markerLayer.markersById.set(id, marker)
-      markers.push(marker)
+      const marker = new Marker(id, markerLayer, null, options, true);
+      markerLayer.markersById.set(id, marker);
+      markers.push(marker);
     }
-    return markers
+    return markers;
   }
 
   // Experimental: Find fuzzy match suggestions in the buffer
@@ -1799,8 +1842,8 @@ class TextBuffer {
   //
   // Returns an {Array} containing every {SubsequenceMatch} of text that matches the given
   // query.
-  findWordsWithSubsequence (query, extraWordCharacters, maxCount) {
-    return this.buffer.findWordsWithSubsequence(query, extraWordCharacters, maxCount)
+  findWordsWithSubsequence(query, extraWordCharacters, maxCount) {
+    return this.buffer.findWordsWithSubsequence(query, extraWordCharacters, maxCount);
   }
 
   // Experimental: Find fuzzy match suggestions in the buffer in a given range
@@ -1813,8 +1856,8 @@ class TextBuffer {
   //
   // Returns an {Array} containing every {SubsequenceMatch} of text that matches the given
   // query in the given range.
-  findWordsWithSubsequenceInRange (query, extraWordCharacters, maxCount, range) {
-    return this.buffer.findWordsWithSubsequenceInRange(query, extraWordCharacters, maxCount, range)
+  findWordsWithSubsequenceInRange(query, extraWordCharacters, maxCount, range) {
+    return this.buffer.findWordsWithSubsequenceInRange(query, extraWordCharacters, maxCount, range);
   }
 
   /*
@@ -1824,43 +1867,49 @@ class TextBuffer {
   // Public: Get the range spanning from `[0, 0]` to {::getEndPosition}.
   //
   // Returns a {Range}.
-  getRange () {
-    return new Range(this.getFirstPosition(), this.getEndPosition())
+  getRange() {
+    return new Range(this.getFirstPosition(), this.getEndPosition());
   }
 
   // Public: Get the number of lines in the buffer.
   //
   // Returns a {Number}.
-  getLineCount () { return this.buffer.getLineCount() }
+  getLineCount() {
+    return this.buffer.getLineCount();
+  }
 
   // Public: Get the last 0-indexed row in the buffer.
   //
   // Returns a {Number}.
-  getLastRow () {
-    return this.getLineCount() - 1
+  getLastRow() {
+    return this.getLineCount() - 1;
   }
 
   // Public: Get the first position in the buffer, which is always `[0, 0]`.
   //
   // Returns a {Point}.
-  getFirstPosition () {
-    return new Point(0, 0)
+  getFirstPosition() {
+    return new Point(0, 0);
   }
 
   // Public: Get the maximal position in the buffer, where new text would be
   // appended.
   //
   // Returns a {Point}.
-  getEndPosition () { return Point.fromObject(this.buffer.getExtent()) }
+  getEndPosition() {
+    return Point.fromObject(this.buffer.getExtent());
+  }
 
   // Public: Get the length of the buffer's text.
-  getLength () { return this.buffer.getLength() }
+  getLength() {
+    return this.buffer.getLength();
+  }
 
   // Public: Get the length of the buffer in characters.
   //
   // Returns a {Number}.
-  getMaxCharacterIndex () {
-    return this.characterIndexForPosition(Point.INFINITY)
+  getMaxCharacterIndex() {
+    return this.characterIndexForPosition(Point.INFINITY);
   }
 
   // Public: Get the range for the given row
@@ -1871,13 +1920,13 @@ class TextBuffer {
   //   of the next line. (default: `false`)
   //
   // Returns a {Range}.
-  rangeForRow (row, includeNewline) {
-    row = Math.max(row, 0)
-    row = Math.min(row, this.getLastRow())
+  rangeForRow(row, includeNewline) {
+    row = Math.max(row, 0);
+    row = Math.min(row, this.getLastRow());
     if (includeNewline && row < this.getLastRow()) {
-      return new Range(new Point(row, 0), new Point(row + 1, 0))
+      return new Range(new Point(row, 0), new Point(row + 1, 0));
     } else {
-      return new Range(new Point(row, 0), new Point(row, this.lineLengthForRow(row)))
+      return new Range(new Point(row, 0), new Point(row, this.lineLengthForRow(row)));
     }
   }
 
@@ -1889,8 +1938,8 @@ class TextBuffer {
   // * `position` A {Point} or point-compatible {Array}.
   //
   // Returns a {Number}.
-  characterIndexForPosition (position) {
-    return this.buffer.characterIndexForPosition(Point.fromObject(position))
+  characterIndexForPosition(position) {
+    return this.buffer.characterIndexForPosition(Point.fromObject(position));
   }
 
   // Public: Convert an absolute character offset, inclusive of newlines, to a
@@ -1901,8 +1950,8 @@ class TextBuffer {
   // * `offset` A {Number}.
   //
   // Returns a {Point}.
-  positionForCharacterIndex (offset) {
-    return Point.fromObject(this.buffer.positionForCharacterIndex(offset))
+  positionForCharacterIndex(offset) {
+    return Point.fromObject(this.buffer.positionForCharacterIndex(offset));
   }
 
   // Public: Clip the given range so it starts and ends at valid positions.
@@ -1914,14 +1963,14 @@ class TextBuffer {
   //
   // Returns the given {Range} if it is already in bounds, or a new clipped
   // {Range} if the given range is out-of-bounds.
-  clipRange (range) {
-    range = Range.fromObject(range)
-    const start = this.clipPosition(range.start)
-    const end = this.clipPosition(range.end)
+  clipRange(range) {
+    range = Range.fromObject(range);
+    const start = this.clipPosition(range.start);
+    const end = this.clipPosition(range.end);
     if (range.start.isEqual(start) && range.end.isEqual(end)) {
-      return range
+      return range;
     } else {
-      return new Range(start, end)
+      return new Range(start, end);
     }
   }
 
@@ -1934,24 +1983,29 @@ class TextBuffer {
   //
   // Returns a new {Point} if the given position is invalid, otherwise returns
   // the given position.
-  clipPosition (position, options) {
-    position = Point.fromObject(position)
-    Point.assertValid(position)
-    const {row, column} = position
+  clipPosition(position, options) {
+    position = Point.fromObject(position);
+    Point.assertValid(position);
+    const { row, column } = position;
     if (row < 0) {
-      return this.getFirstPosition()
+      return this.getFirstPosition();
     } else if (row > this.getLastRow()) {
-      return this.getEndPosition()
+      return this.getEndPosition();
     } else if (column < 0) {
-      return Point(row, 0)
+      return Point(row, 0);
     } else {
-      const lineLength = this.lineLengthForRow(row)
-      if (column >= lineLength && row < this.getLastRow() && options && options.clipDirection === 'forward') {
-        return new Point(row + 1, 0)
+      const lineLength = this.lineLengthForRow(row);
+      if (
+        column >= lineLength &&
+        row < this.getLastRow() &&
+        options &&
+        options.clipDirection === "forward"
+      ) {
+        return new Point(row + 1, 0);
       } else if (column > lineLength) {
-        return new Point(row, lineLength)
+        return new Point(row, lineLength);
       } else {
-        return position
+        return position;
       }
     }
   }
@@ -1963,8 +2017,8 @@ class TextBuffer {
   // Public: Save the buffer.
   //
   // Returns a {Promise} that resolves when the save has completed.
-  save () {
-    return this.saveTo(this.file)
+  save() {
+    return this.saveTo(this.file);
   }
 
   // Public: Save the buffer at a specific path.
@@ -1972,104 +2026,104 @@ class TextBuffer {
   // * `filePath` The path to save at.
   //
   // Returns a {Promise} that resolves when the save has completed.
-  saveAs (filePath) {
+  saveAs(filePath) {
     if (!filePath) {
-      throw new Error("Can't save buffer with no file path")
+      throw new Error("Can't save buffer with no file path");
     }
-    let file
+    let file;
     if (this.file?.getPath() === filePath) {
-      file = this.file
+      file = this.file;
     } else {
-      file = new File(filePath)
+      file = new File(filePath);
     }
-    return this.saveTo(file)
+    return this.saveTo(file);
   }
 
-  async saveTo (file) {
-    if (this.destroyed) throw new Error("Can't save destroyed buffer")
-    if (!file) throw new Error("Can't save a buffer with no file")
+  async saveTo(file) {
+    if (this.destroyed) throw new Error("Can't save destroyed buffer");
+    if (!file) throw new Error("Can't save a buffer with no file");
 
-    const filePath = file.getPath()
+    const filePath = file.getPath();
 
-    this.outstandingSaveCount++
+    this.outstandingSaveCount++;
 
     try {
-      let destination
+      let destination;
       if (file instanceof File) {
-        await fs.promises.mkdir(path.dirname(filePath), {recursive: true})
-        destination = filePath
+        await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+        destination = filePath;
       } else {
-        destination = file.createWriteStream()
+        destination = file.createWriteStream();
       }
 
-      await this.emitter.emitAsync('will-save', {path: filePath})
+      await this.emitter.emitAsync("will-save", { path: filePath });
 
       try {
-        await this.buffer.save(destination, this.getEncoding())
-        this.didHaveFileOnDisk = true
+        await this.buffer.save(destination, this.getEncoding());
+        this.didHaveFileOnDisk = true;
       } catch (error) {
-        if (error.code !== 'EACCES' || destination !== filePath) throw error
+        if (error.code !== "EACCES" || destination !== filePath) throw error;
 
-        const isWindows = process.platform === 'win32'
+        const isWindows = process.platform === "win32";
         if (isWindows) {
-          const winattr = getPromisifiedWinattr()
-          const attrs = await winattr.get(filePath)
-          if (!attrs.hidden) throw error
+          const winattr = getPromisifiedWinattr();
+          const attrs = await winattr.get(filePath);
+          if (!attrs.hidden) throw error;
 
           try {
-            await winattr.set(filePath, { hidden: false })
-            await this.buffer.save(filePath, this.getEncoding())
-            await winattr.set(filePath, { hidden: true })
+            await winattr.set(filePath, { hidden: false });
+            await this.buffer.save(filePath, this.getEncoding());
+            await winattr.set(filePath, { hidden: true });
           } catch (_) {
-            throw error
+            throw error;
           }
         } else {
-          const fsAdmin = require('fs-admin')
+          const fsAdmin = require("fs-admin");
           try {
-            await this.buffer.save(fsAdmin.createWriteStream(filePath), this.getEncoding())
+            await this.buffer.save(fsAdmin.createWriteStream(filePath), this.getEncoding());
           } catch (_) {
-            throw error
+            throw error;
           }
         }
       }
     } finally {
-      this.outstandingSaveCount--
+      this.outstandingSaveCount--;
     }
 
-    this.setFile(file)
-    this.fileHasChangedSinceLastLoad = false
-    this.digestWhenLastPersisted = this.buffer.baseTextDigest()
-    this.loaded = true
-    this.emitModifiedStatusChanged(false)
-    this.emitter.emit('did-save', {path: filePath})
-    return this
+    this.setFile(file);
+    this.fileHasChangedSinceLastLoad = false;
+    this.digestWhenLastPersisted = this.buffer.baseTextDigest();
+    this.loaded = true;
+    this.emitModifiedStatusChanged(false);
+    this.emitter.emit("did-save", { path: filePath });
+    return this;
   }
 
   // Public: Reload the file's content from disk.
   //
   // Returns a {Promise} that resolves when the load is complete.
-  reload () {
-    return this.load({discardChanges: true, internal: true})
+  reload() {
+    return this.load({ discardChanges: true, internal: true });
   }
 
   /*
   Section: Display Layers
   */
 
-  addDisplayLayer (params) {
-    const id = this.nextDisplayLayerId++
-    const displayLayer = new DisplayLayer(id, this, params)
-    this.displayLayers[id] = displayLayer
-    return displayLayer
+  addDisplayLayer(params) {
+    const id = this.nextDisplayLayerId++;
+    const displayLayer = new DisplayLayer(id, this, params);
+    this.displayLayers[id] = displayLayer;
+    return displayLayer;
   }
 
-  getDisplayLayer (id) {
-    return this.displayLayers[id]
+  getDisplayLayer(id) {
+    return this.displayLayers[id];
   }
 
-  setDisplayLayers (displayLayers) {
-    this.displayLayers = displayLayers
-     // Used for deserialization
+  setDisplayLayers(displayLayers) {
+    this.displayLayers = displayLayers;
+    // Used for deserialization
   }
 
   /*
@@ -2079,7 +2133,9 @@ class TextBuffer {
   // Experimental: Get the language mode associated with this buffer.
   //
   // Returns a language mode {Object} (See {TextBuffer::setLanguageMode} for its interface).
-  getLanguageMode () { return this.languageMode }
+  getLanguageMode() {
+    return this.languageMode;
+  }
 
   // Experimental: Set the language mode for this buffer.
   //
@@ -2103,18 +2159,21 @@ class TextBuffer {
   //        that end at the current position.
   //     * `getOpenTags` A {Function} that returns an {Array} of {Number}s representing tokens
   //        that begin at the current position.
-  setLanguageMode (languageMode) {
+  setLanguageMode(languageMode) {
     if (languageMode !== this.languageMode) {
-      const oldLanguageMode = this.languageMode
-      if (typeof this.languageMode.destroy === 'function') {
-        this.languageMode.destroy()
+      const oldLanguageMode = this.languageMode;
+      if (typeof this.languageMode.destroy === "function") {
+        this.languageMode.destroy();
       }
-      this.languageMode = languageMode || new NullLanguageMode()
+      this.languageMode = languageMode || new NullLanguageMode();
       for (const id in this.displayLayers) {
-        const displayLayer = this.displayLayers[id]
-        displayLayer.bufferDidChangeLanguageMode(languageMode)
+        const displayLayer = this.displayLayers[id];
+        displayLayer.bufferDidChangeLanguageMode(languageMode);
       }
-      this.emitter.emit('did-change-language-mode', {newMode: this.languageMode, oldMode: oldLanguageMode})
+      this.emitter.emit("did-change-language-mode", {
+        newMode: this.languageMode,
+        oldMode: oldLanguageMode,
+      });
     }
   }
 
@@ -2127,303 +2186,311 @@ class TextBuffer {
   //     for its interface.
   //
   // Returns a {Disposable} that can be used to stop the callback from being called.
-  onDidChangeLanguageMode (callback) {
-    return this.emitter.on('did-change-language-mode', ({newMode, oldMode}) => callback(newMode, oldMode))
+  onDidChangeLanguageMode(callback) {
+    return this.emitter.on("did-change-language-mode", ({ newMode, oldMode }) =>
+      callback(newMode, oldMode),
+    );
   }
 
   /*
   Section: Private Utility Methods
   */
-  registerSelectionsMarkerLayer (markerLayer) {
-    return this.selectionsMarkerLayerIds.add(markerLayer.id)
+  registerSelectionsMarkerLayer(markerLayer) {
+    return this.selectionsMarkerLayerIds.add(markerLayer.id);
   }
 
-  loadSync (options) {
+  loadSync(options) {
     if (!options || !options.internal) {
-      Grim.deprecate('The .loadSync instance method is deprecated. Create a loaded buffer using TextBuffer.loadSync(filePath) instead.')
+      Grim.deprecate(
+        "The .loadSync instance method is deprecated. Create a loaded buffer using TextBuffer.loadSync(filePath) instead.",
+      );
     }
 
-    let patch = null
-    let checkpoint = null
+    let patch = null;
+    let checkpoint = null;
     try {
-      patch = this.buffer.loadSync(
-        this.getPath(),
-        this.getEncoding(),
-        (percentDone, patch) => {
-          if (patch && patch.getChangeCount() > 0) {
-            checkpoint = this.historyProvider.createCheckpoint({
-              markers: this.createMarkerSnapshot(),
-              isBarrier: true
-            })
-            this.emitter.emit('will-reload')
-            this.emitWillChangeEvent()
-          }
+      patch = this.buffer.loadSync(this.getPath(), this.getEncoding(), (percentDone, patch) => {
+        if (patch && patch.getChangeCount() > 0) {
+          checkpoint = this.historyProvider.createCheckpoint({
+            markers: this.createMarkerSnapshot(),
+            isBarrier: true,
+          });
+          this.emitter.emit("will-reload");
+          this.emitWillChangeEvent();
         }
-      )
-      this.finishLoading(checkpoint, patch, options)
+      });
+      this.finishLoading(checkpoint, patch, options);
     } catch (error) {
-      if ((!options || !options.mustExist) && error.code === 'ENOENT') {
-        this.emitter.emit('will-reload')
-        if (options && options.discardChanges) this.setText('')
-        this.emitter.emit('did-reload')
+      if ((!options || !options.mustExist) && error.code === "ENOENT") {
+        this.emitter.emit("will-reload");
+        if (options && options.discardChanges) this.setText("");
+        this.emitter.emit("did-reload");
       } else {
-        throw error
+        throw error;
       }
     }
 
-    return this
+    return this;
   }
 
-  async load (options) {
+  async load(options) {
     if (!options || !options.internal) {
-      Grim.deprecate('The .load instance method is deprecated. Create a loaded buffer using TextBuffer.load(filePath) instead.')
+      Grim.deprecate(
+        "The .load instance method is deprecated. Create a loaded buffer using TextBuffer.load(filePath) instead.",
+      );
     }
 
     if (this.file instanceof File) {
       // The consumer is allowed to set a `File` instance with a path that does
       // not currently exist on disk.
-      this.didHaveFileOnDisk = this.file.existsSync()
+      this.didHaveFileOnDisk = this.file.existsSync();
     }
 
-    const source = this.file instanceof File
-      ? this.file.getPath()
-      : this.file.createReadStream()
+    const source = this.file instanceof File ? this.file.getPath() : this.file.createReadStream();
 
-    const loadCount = ++this.loadCount
+    const loadCount = ++this.loadCount;
 
-    let checkpoint = null
-    let patch
+    let checkpoint = null;
+    let patch;
     try {
-      patch = await this.buffer.load(
-        source,
-        {
-          encoding: this.getEncoding(),
-          force: options && options.discardChanges,
-          patch: this.loaded
-        }
-      )
+      patch = await this.buffer.load(source, {
+        encoding: this.getEncoding(),
+        force: options && options.discardChanges,
+        patch: this.loaded,
+      });
 
       // If this is not the most recent load of this file, then we should bow
       // out and let the newer call to `load` handle the tasks below.
-      if (this.loadCount > loadCount) return
+      if (this.loadCount > loadCount) return;
 
       if (patch) {
         if (patch.getChangeCount() > 0) {
-          checkpoint = this.historyProvider.createCheckpoint({markers: this.createMarkerSnapshot(), isBarrier: true})
-          this.emitter.emit('will-reload')
-          this.emitWillChangeEvent()
+          checkpoint = this.historyProvider.createCheckpoint({
+            markers: this.createMarkerSnapshot(),
+            isBarrier: true,
+          });
+          this.emitter.emit("will-reload");
+          this.emitWillChangeEvent();
         } else if (options && options.discardChanges) {
-          this.emitter.emit('will-reload')
+          this.emitter.emit("will-reload");
         }
       }
-      this.finishLoading(checkpoint, patch, options)
+      this.finishLoading(checkpoint, patch, options);
     } catch (error) {
-      if ((!options || !options.mustExist) && error.code === 'ENOENT') {
-        this.emitter.emit('will-reload')
-        if (options && options.discardChanges) this.setText('')
-        this.emitter.emit('did-reload')
+      if ((!options || !options.mustExist) && error.code === "ENOENT") {
+        this.emitter.emit("will-reload");
+        if (options && options.discardChanges) this.setText("");
+        this.emitter.emit("did-reload");
       } else {
-        throw error
+        throw error;
       }
     }
 
-    return this
+    return this;
   }
 
-  finishLoading (checkpoint, patch, options) {
+  finishLoading(checkpoint, patch, options) {
     if (this.isDestroyed() || (this.loaded && checkpoint == null && patch != null)) {
       if (options && options.discardChanges) {
-        this.emitter.emit('did-reload')
+        this.emitter.emit("did-reload");
       }
-      return
+      return;
     }
 
-    this.fileHasChangedSinceLastLoad = false
-    this.digestWhenLastPersisted = this.buffer.baseTextDigest()
-    this.cachedText = null
+    this.fileHasChangedSinceLastLoad = false;
+    this.digestWhenLastPersisted = this.buffer.baseTextDigest();
+    this.cachedText = null;
 
     if (this.loaded && patch && patch.getChangeCount() > 0) {
-      const changes = patch.getChanges()
+      const changes = patch.getChanges();
 
       if (options && options.clearHistory) {
-        this.historyProvider.clearUndoStack()
+        this.historyProvider.clearUndoStack();
       } else {
         if (this.historyProvider.pushPatch) {
-          this.historyProvider.pushPatch(patch)
+          this.historyProvider.pushPatch(patch);
         } else {
-          this.historyProvider.pushChanges(changes)
+          this.historyProvider.pushChanges(changes);
         }
       }
 
       if (changes) {
-        this.changesSinceLastDidChangeTextEvent.push(...changes)
-        this.changesSinceLastStoppedChangingEvent.push(...changes)
+        this.changesSinceLastDidChangeTextEvent.push(...changes);
+        this.changesSinceLastStoppedChangingEvent.push(...changes);
       }
 
       if (this.markerLayers != null) {
         for (const change of changes) {
           for (const id in this.markerLayers) {
-            const markerLayer = this.markerLayers[id]
+            const markerLayer = this.markerLayers[id];
             markerLayer.splice(
               change.newStart,
               traversal(change.oldEnd, change.oldStart),
-              traversal(change.newEnd, change.newStart)
-            )
+              traversal(change.newEnd, change.newStart),
+            );
           }
         }
       }
 
-      const markersSnapshot = this.createMarkerSnapshot()
+      const markersSnapshot = this.createMarkerSnapshot();
       this.historyProvider.groupChangesSinceCheckpoint(checkpoint, {
         markers: markersSnapshot,
-        deleteCheckpoint: true
-      })
+        deleteCheckpoint: true,
+      });
 
-      this.emitDidChangeEvent(new ChangeEvent(this, changes))
-      this.emitDidChangeTextEvent()
-      this.emitMarkerChangeEvents(markersSnapshot)
-      this.emitModifiedStatusChanged(this.isModified())
+      this.emitDidChangeEvent(new ChangeEvent(this, changes));
+      this.emitDidChangeTextEvent();
+      this.emitMarkerChangeEvents(markersSnapshot);
+      this.emitModifiedStatusChanged(this.isModified());
     }
 
-    this.loaded = true
-    this.emitter.emit('did-reload')
-    return this
+    this.loaded = true;
+    this.emitter.emit("did-reload");
+    return this;
   }
 
-  destroy () {
-    if (this.destroyed) return
-    this.destroyed = true
-    this.emitter.emit('did-destroy')
-    this.emitter.clear()
+  destroy() {
+    if (this.destroyed) return;
+    this.destroyed = true;
+    this.emitter.emit("did-destroy");
+    this.emitter.clear();
 
-    this.fileSubscriptions?.dispose()
+    this.fileSubscriptions?.dispose();
 
     for (const id in this.markerLayers) {
-      const markerLayer = this.markerLayers[id]
-      markerLayer.destroy()
+      const markerLayer = this.markerLayers[id];
+      markerLayer.destroy();
     }
     if (this.outstandingSaveCount === 0) {
-      this.buffer.reset('')
+      this.buffer.reset("");
     } else {
       var subscription = this.onDidSave(() => {
         if (this.outstandingSaveCount === 0) {
-          this.buffer.reset('')
-          subscription.dispose()
+          this.buffer.reset("");
+          subscription.dispose();
         }
-      })
+      });
     }
 
-    this.cachedText = null
-    if (typeof this.historyProvider.clear === 'function') this.historyProvider.clear()
-    if (typeof this.languageMode.destroy === 'function') this.languageMode.destroy()
+    this.cachedText = null;
+    if (typeof this.historyProvider.clear === "function") this.historyProvider.clear();
+    if (typeof this.languageMode.destroy === "function") this.languageMode.destroy();
   }
 
-  isAlive () { return !this.destroyed }
-
-  isDestroyed () { return this.destroyed }
-
-  isRetained () { return this.refcount > 0 }
-
-  retain () {
-    this.refcount++
-    return this
+  isAlive() {
+    return !this.destroyed;
   }
 
-  release () {
-    this.refcount--
-    if (this.refcount <= 0) this.destroy()
-    return this
+  isDestroyed() {
+    return this.destroyed;
   }
 
-  subscribeToFile () {
+  isRetained() {
+    return this.refcount > 0;
+  }
+
+  retain() {
+    this.refcount++;
+    return this;
+  }
+
+  release() {
+    this.refcount--;
+    if (this.refcount <= 0) this.destroy();
+    return this;
+  }
+
+  subscribeToFile() {
     if (this.fileSubscriptions) {
       // If we were to unsubscribe and immediately resubscribe, we might
       // trigger destruction and recreation of a native file watcher — which is
       // costly and unnecessary. We can avoid that cost by overlapping the
       // switch and only disposing of the old `CompositeDisposable` after the
       // new one has attached its subscriptions.
-      this.oldFileSubscriptions = this.fileSubscriptions
+      this.oldFileSubscriptions = this.fileSubscriptions;
     }
-    this.fileSubscriptions = new CompositeDisposable()
+    this.fileSubscriptions = new CompositeDisposable();
 
     // Reset each time we resubscribe; the default-data-source branch below
     // replaces this with the new watcher's arm promise.
-    this.fileWatchStartPromise = Promise.resolve()
+    this.fileWatchStartPromise = Promise.resolve();
 
     const onDidChange = debounce(async () => {
       // On Linux we get change events when the file is deleted. This yields
       // consistent behavior with Mac/Windows.
-      if (!this.file || !this.file.existsSync()) return
-      if (this.outstandingSaveCount > 0) return
-      this.fileHasChangedSinceLastLoad = true
+      if (!this.file || !this.file.existsSync()) return;
+      if (this.outstandingSaveCount > 0) return;
+      this.fileHasChangedSinceLastLoad = true;
 
       if (this.isModified()) {
-        const source = this.file.getPath()
+        const source = this.file.getPath();
         if (!(await this.buffer.baseTextMatchesFile(source, this.getEncoding()))) {
           // Emit `did-conflict` and take no other action. We will keep the
           // current buffer contents so that the user's changes are not lost.
-          this.emitter.emit('did-conflict')
+          this.emitter.emit("did-conflict");
         } else {
           // Despite being modified, we're once again in alignment with what
           // is on disk. This file is not in conflict.
-          this.fileHasChangedSinceLastLoad = false
+          this.fileHasChangedSinceLastLoad = false;
         }
       } else {
         // This buffer was previously in sync with what was on disk, so we
         // can update its contents to match the new contents on disk. By
         // definition, this means there is no conflict, so we'll reset the
         // appropriate flag.
-        this.fileHasChangedSinceLastLoad = false
-        return this.load({internal: true})
+        this.fileHasChangedSinceLastLoad = false;
+        return this.load({ internal: true });
       }
-    }, this.fileChangeDelay)
+    }, this.fileChangeDelay);
 
     const onDidDelete = () => {
       // At this point, asking `isModified` of the native buffer will deliver
       // an accurate result that does not care about whether the file still
       // exists on disk.
-      const modified = this.buffer.isModified()
-      this.retainsUnmodifiedTraitAfterDeletion = !modified
-      this.emitter.emit('did-delete')
+      const modified = this.buffer.isModified();
+      this.retainsUnmodifiedTraitAfterDeletion = !modified;
+      this.emitter.emit("did-delete");
       if (!modified && this.shouldDestroyOnFileDelete()) {
-        return this.destroy()
+        return this.destroy();
       } else {
-        return this.emitModifiedStatusChanged(this.isModified())
+        return this.emitModifiedStatusChanged(this.isModified());
       }
       // We don't set `this.file` to `null` because we still have a
       // _theoretical_ file, even if it's no longer present on disk. In this
       // scenario, we can re-commit the file to disk at its previous path
       // with a simple "Save" command. If we nulled out `file`, the editor
       // would prompt the user again about a save destination.
-    }
+    };
 
     const onDidRename = () => {
-      this.emitter.emit('did-change-path', this.getPath())
-    }
+      this.emitter.emit("did-change-path", this.getPath());
+    };
 
     if (this.file.onDidChange || this.file.onDidDelete || this.file.onDidRename) {
       // A custom data source (see `setFile`) supplies its own change
       // notifications; wire them straight through to the on-disk handlers.
-      if (this.file.onDidChange) this.fileSubscriptions.add(this.file.onDidChange(onDidChange))
-      if (this.file.onDidDelete) this.fileSubscriptions.add(this.file.onDidDelete(onDidDelete))
-      if (this.file.onDidRename) this.fileSubscriptions.add(this.file.onDidRename(onDidRename))
+      if (this.file.onDidChange) this.fileSubscriptions.add(this.file.onDidChange(onDidChange));
+      if (this.file.onDidDelete) this.fileSubscriptions.add(this.file.onDidDelete(onDidDelete));
+      if (this.file.onDidRename) this.fileSubscriptions.add(this.file.onDidRename(onDidRename));
       if (this.file.onWillThrowWatchError) {
-        this.fileSubscriptions.add(this.file.onWillThrowWatchError(error => {
-          this.emitter.emit('will-throw-watch-error', error)
-        }))
+        this.fileSubscriptions.add(
+          this.file.onWillThrowWatchError((error) => {
+            this.emitter.emit("will-throw-watch-error", error);
+          }),
+        );
       }
-    } else if (typeof this.file.getPath === 'function') {
+    } else if (typeof this.file.getPath === "function") {
       // The default data source does no watching of its own, so lumine core
       // watches the path through `watchPath` (served by the file-watcher
       // worker) and drives the same handlers. A single-file watch is reliable
       // across atomic saves — see `nodejs-watcher.js`.
-      const filePath = this.file.getPath()
-      let disposed = false
-      const watcherPromise = watchPath(filePath, { recursive: false }, events => {
+      const filePath = this.file.getPath();
+      let disposed = false;
+      const watcherPromise = watchPath(filePath, { recursive: false }, (events) => {
         for (const event of events) {
-          if (event.action === 'deleted') {
-            onDidDelete()
-          } else if (event.action === 'renamed') {
+          if (event.action === "deleted") {
+            onDidDelete();
+          } else if (event.action === "renamed") {
             // A single-file watch only ever reports a rename of the watched file
             // itself, so `event.path` is its new location. Don't compare
             // `event.oldPath` to `filePath`: event paths are real-path
@@ -2433,20 +2500,23 @@ class TextBuffer {
               // Follow the move (as the original `File` watcher did) by
               // re-pointing the buffer at the new path, which re-subscribes the
               // watch and emits `did-change-path`.
-              this.setPath(event.path)
+              this.setPath(event.path);
             } else {
               // Moved somewhere we can't identify; treat it as a deletion so the
               // buffer keeps its (now theoretical) file and can be re-saved.
-              onDidDelete()
+              onDidDelete();
             }
           } else {
-            onDidChange()
+            onDidChange();
           }
         }
-      })
+      });
       // Expose when the watcher is armed so callers (and tests) can wait for it
       // before relying on external-change detection.
-      this.fileWatchStartPromise = watcherPromise.then(() => {}, () => {})
+      this.fileWatchStartPromise = watcherPromise.then(
+        () => {},
+        () => {},
+      );
 
       // The worker arms the watcher asynchronously. Once it is live, reconcile
       // the one unambiguous change that could have landed during the arm gap: a
@@ -2454,24 +2524,32 @@ class TextBuffer {
       // the base text to disk races buffer load/deserialization (which may not
       // have applied its unsaved state yet), and any real modification is caught
       // by the live watcher once armed.
-      watcherPromise.then(() => {
-        if (disposed || this.destroyed) return
-        if (this.outstandingSaveCount > 0) return
-        // Only report a vanished file if it was previously present, so a buffer
-        // for a not-yet-created path doesn't spuriously report a deletion.
-        if (this.file && !this.file.existsSync() && this.didHaveFileOnDisk) {
-          onDidDelete()
-        }
-      }, () => {})
-      this.fileSubscriptions.add(new Disposable(() => {
-        disposed = true
-        watcherPromise.then(watcher => watcher.dispose(), () => {})
-      }))
+      watcherPromise.then(
+        () => {
+          if (disposed || this.destroyed) return;
+          if (this.outstandingSaveCount > 0) return;
+          // Only report a vanished file if it was previously present, so a buffer
+          // for a not-yet-created path doesn't spuriously report a deletion.
+          if (this.file && !this.file.existsSync() && this.didHaveFileOnDisk) {
+            onDidDelete();
+          }
+        },
+        () => {},
+      );
+      this.fileSubscriptions.add(
+        new Disposable(() => {
+          disposed = true;
+          watcherPromise.then(
+            (watcher) => watcher.dispose(),
+            () => {},
+          );
+        }),
+      );
     }
 
     if (this.oldFileSubscriptions) {
-      this.oldFileSubscriptions.dispose()
-      this.oldFileSubscriptions = null
+      this.oldFileSubscriptions.dispose();
+      this.oldFileSubscriptions = null;
     }
   }
 
@@ -2480,92 +2558,97 @@ class TextBuffer {
   // served asynchronously by the file-watcher worker; this lets callers wait for
   // it before relying on external-change detection. Resolves immediately when the
   // buffer has no path or a custom data source that watches synchronously.
-  getFileWatchStartPromise () {
-    return this.fileWatchStartPromise || Promise.resolve()
+  getFileWatchStartPromise() {
+    return this.fileWatchStartPromise || Promise.resolve();
   }
 
-  createMarkerSnapshot (selectionsMarkerLayer) {
-    const snapshot = {}
+  createMarkerSnapshot(selectionsMarkerLayer) {
+    const snapshot = {};
     for (const markerLayerId in this.markerLayers) {
-      const markerLayer = this.markerLayers[markerLayerId]
-      if (!markerLayer.maintainHistory) continue
+      const markerLayer = this.markerLayers[markerLayerId];
+      if (!markerLayer.maintainHistory) continue;
       if (
         selectionsMarkerLayer &&
-        markerLayer.getRole() === 'selections' &&
+        markerLayer.getRole() === "selections" &&
         markerLayerId !== selectionsMarkerLayer.id
-      ) continue
-      snapshot[markerLayerId] = markerLayer.createSnapshot()
+      )
+        continue;
+      snapshot[markerLayerId] = markerLayer.createSnapshot();
     }
-    return snapshot
+    return snapshot;
   }
 
-  restoreFromMarkerSnapshot (snapshot, selectionsMarkerLayer) {
-    let selectionsSnapshotId
+  restoreFromMarkerSnapshot(snapshot, selectionsMarkerLayer) {
+    let selectionsSnapshotId;
     if (selectionsMarkerLayer != null) {
       // Do selective selections marker restoration only when snapshot includes single selections snapshot.
-      const selectionsSnapshotIds = Object.keys(snapshot).filter(id => this.selectionsMarkerLayerIds.has(id))
+      const selectionsSnapshotIds = Object.keys(snapshot).filter((id) =>
+        this.selectionsMarkerLayerIds.has(id),
+      );
       if (selectionsSnapshotIds.length === 1) {
-        selectionsSnapshotId = selectionsSnapshotIds[0]
+        selectionsSnapshotId = selectionsSnapshotIds[0];
       }
     }
 
     for (const markerLayerId in snapshot) {
-      const layerSnapshot = snapshot[markerLayerId]
+      const layerSnapshot = snapshot[markerLayerId];
       if (markerLayerId === selectionsSnapshotId) {
         this.markerLayers[selectionsMarkerLayer.id].restoreFromSnapshot(
           layerSnapshot,
-          markerLayerId !== selectionsMarkerLayer.id
-        )
+          markerLayerId !== selectionsMarkerLayer.id,
+        );
       } else if (this.markerLayers[markerLayerId]) {
-        this.markerLayers[markerLayerId].restoreFromSnapshot(layerSnapshot)
+        this.markerLayers[markerLayerId].restoreFromSnapshot(layerSnapshot);
       }
     }
   }
 
-  emitMarkerChangeEvents (snapshot) {
+  emitMarkerChangeEvents(snapshot) {
     if (this.transactCallDepth === 0) {
       while (this.markerLayersWithPendingUpdateEvents.size > 0) {
-        const updatedMarkerLayers = Array.from(this.markerLayersWithPendingUpdateEvents)
-        this.markerLayersWithPendingUpdateEvents.clear()
+        const updatedMarkerLayers = Array.from(this.markerLayersWithPendingUpdateEvents);
+        this.markerLayersWithPendingUpdateEvents.clear();
         for (const markerLayer of updatedMarkerLayers) {
-          markerLayer.emitUpdateEvent()
+          markerLayer.emitUpdateEvent();
           if (markerLayer === this.defaultMarkerLayer) {
-            this.emitter.emit('did-update-markers')
+            this.emitter.emit("did-update-markers");
           }
         }
       }
     }
 
     for (const markerLayerId in this.markerLayers) {
-      const markerLayer = this.markerLayers[markerLayerId]
-      markerLayer.emitChangeEvents(snapshot && snapshot[markerLayerId])
+      const markerLayer = this.markerLayers[markerLayerId];
+      markerLayer.emitChangeEvents(snapshot && snapshot[markerLayerId]);
     }
   }
 
-  emitWillChangeEvent () {
+  emitWillChangeEvent() {
     if (!this._emittedWillChangeEvent) {
-      this.emitter.emit('will-change')
-      this._emittedWillChangeEvent = true
+      this.emitter.emit("will-change");
+      this._emittedWillChangeEvent = true;
     }
   }
 
-  emitDidChangeTextEvent () {
-    this.cachedHasAstral = null
+  emitDidChangeTextEvent() {
+    this.cachedHasAstral = null;
     if (this.transactCallDepth === 0) {
       if (this.changesSinceLastDidChangeTextEvent.length > 0) {
-        const compactedChanges = patchFromChanges(this.changesSinceLastDidChangeTextEvent).getChanges()
-        this.changesSinceLastDidChangeTextEvent.length = 0
+        const compactedChanges = patchFromChanges(
+          this.changesSinceLastDidChangeTextEvent,
+        ).getChanges();
+        this.changesSinceLastDidChangeTextEvent.length = 0;
         if (compactedChanges.length > 0) {
-          const changeEvent = new ChangeEvent(this, compactedChanges)
-          this.languageMode.bufferDidFinishTransaction(changeEvent)
-          this.emitter.emit('did-change-text', changeEvent)
+          const changeEvent = new ChangeEvent(this, compactedChanges);
+          this.languageMode.bufferDidFinishTransaction(changeEvent);
+          this.emitter.emit("did-change-text", changeEvent);
         }
-        this.debouncedEmitDidStopChangingEvent()
-        this._emittedWillChangeEvent = false
+        this.debouncedEmitDidStopChangingEvent();
+        this._emittedWillChangeEvent = false;
       }
       for (const id in this.displayLayers) {
-        const displayLayer = this.displayLayers[id]
-        displayLayer.emitDeferredChangeEvents()
+        const displayLayer = this.displayLayers[id];
+        displayLayer.emitDeferredChangeEvents();
       }
     }
   }
@@ -2575,29 +2658,33 @@ class TextBuffer {
   // For example, if the {EditorView} was split.
   //
   // Returns a {Boolean}.
-  hasMultipleEditors () { return this.refcount > 1 }
-
-  emitDidStopChangingEvent () {
-    if (this.destroyed) return
-    const modifiedStatus = this.isModified()
-    const compactedChanges = Object.freeze(normalizePatchChanges(
-      patchFromChanges(this.changesSinceLastStoppedChangingEvent).getChanges()
-    ))
-    this.changesSinceLastStoppedChangingEvent.length = 0
-    this.emitter.emit('did-stop-changing', {changes: compactedChanges})
-    this.emitModifiedStatusChanged(modifiedStatus)
+  hasMultipleEditors() {
+    return this.refcount > 1;
   }
 
-  emitModifiedStatusChanged (modifiedStatus) {
-    if (modifiedStatus === this.previousModifiedStatus) return
-    this.previousModifiedStatus = modifiedStatus
-    return this.emitter.emit('did-change-modified', modifiedStatus)
+  emitDidStopChangingEvent() {
+    if (this.destroyed) return;
+    const modifiedStatus = this.isModified();
+    const compactedChanges = Object.freeze(
+      normalizePatchChanges(
+        patchFromChanges(this.changesSinceLastStoppedChangingEvent).getChanges(),
+      ),
+    );
+    this.changesSinceLastStoppedChangingEvent.length = 0;
+    this.emitter.emit("did-stop-changing", { changes: compactedChanges });
+    this.emitModifiedStatusChanged(modifiedStatus);
   }
 
-  logLines (start = 0, end = this.getLastRow()) {
+  emitModifiedStatusChanged(modifiedStatus) {
+    if (modifiedStatus === this.previousModifiedStatus) return;
+    this.previousModifiedStatus = modifiedStatus;
+    return this.emitter.emit("did-change-modified", modifiedStatus);
+  }
+
+  logLines(start = 0, end = this.getLastRow()) {
     for (let row = start; row <= end; row++) {
-      const line = this.lineForRow(row)
-      console.log(row, line, line.length)
+      const line = this.lineForRow(row);
+      console.log(row, line, line.length);
     }
   }
 
@@ -2605,69 +2692,71 @@ class TextBuffer {
   Section: Private History Delegate Methods
   */
 
-  invertChange (change) {
+  invertChange(change) {
     return Object.freeze({
       oldRange: change.newRange,
       newRange: change.oldRange,
       oldText: change.newText,
-      newText: change.oldText
-    })
+      newText: change.oldText,
+    });
   }
 
-  serializeChange (change) {
+  serializeChange(change) {
     return {
       oldRange: change.oldRange.serialize(),
       newRange: change.newRange.serialize(),
       oldText: change.oldText,
-      newText: change.newText
-    }
+      newText: change.newText,
+    };
   }
 
-  deserializeChange (change) {
+  deserializeChange(change) {
     return {
       oldRange: Range.deserialize(change.oldRange),
       newRange: Range.deserialize(change.newRange),
       oldText: change.oldText,
-      newText: change.newText
-    }
+      newText: change.newText,
+    };
   }
 
-  serializeSnapshot (snapshot, options) {
-    if (!options.markerLayers) return
+  serializeSnapshot(snapshot, options) {
+    if (!options.markerLayers) return;
 
-    return MarkerLayer.serializeSnapshot(snapshot)
+    return MarkerLayer.serializeSnapshot(snapshot);
   }
 
-  deserializeSnapshot (snapshot) {
-    return MarkerLayer.deserializeSnapshot(snapshot)
+  deserializeSnapshot(snapshot) {
+    return MarkerLayer.deserializeSnapshot(snapshot);
   }
 
   /*
   Section: Private MarkerLayer Delegate Methods
   */
 
-  markerLayerDestroyed (markerLayer) {
-    return delete this.markerLayers[markerLayer.id]
+  markerLayerDestroyed(markerLayer) {
+    return delete this.markerLayers[markerLayer.id];
   }
 
-  markerCreated (layer, marker) {
+  markerCreated(layer, marker) {
     if (layer === this.defaultMarkerLayer) {
-      return this.emitter.emit('did-create-marker', marker)
+      return this.emitter.emit("did-create-marker", marker);
     }
   }
 
-  markersUpdated (layer) {
+  markersUpdated(layer) {
     if (this.transactCallDepth === 0) {
-      layer.emitUpdateEvent()
+      layer.emitUpdateEvent();
       if (layer === this.defaultMarkerLayer) {
-        return this.emitter.emit('did-update-markers')
+        return this.emitter.emit("did-update-markers");
       }
     } else {
-      return this.markerLayersWithPendingUpdateEvents.add(layer)
+      return this.markerLayersWithPendingUpdateEvents.add(layer);
     }
   }
 
-  getNextMarkerId () { return this.nextMarkerId++ }
+  getNextMarkerId() {
+    return this.nextMarkerId++;
+  }
 }
 
 Object.assign(TextBuffer, {
@@ -2675,141 +2764,140 @@ Object.assign(TextBuffer, {
   Point: Point,
   Range: Range,
   newlineRegex: newlineRegex,
-  spliceArray: spliceArray
-})
+  spliceArray: spliceArray,
+});
 
 Object.assign(TextBuffer.prototype, {
   stoppedChangingDelay: 300,
   fileChangeDelay: 200,
   backwardsScanChunkSize: 8000,
-  defaultMaxUndoEntries: 10000
-})
+  defaultMaxUndoEntries: 10000,
+});
 
 class TransactionAbortedError extends Error {}
 
 class ChangeEvent {
-  constructor (buffer, changes) {
-    this.changes = Object.freeze(normalizePatchChanges(changes))
+  constructor(buffer, changes) {
+    this.changes = Object.freeze(normalizePatchChanges(changes));
 
-    const start = changes[0].oldStart
-    const {oldEnd, newEnd} = changes[changes.length - 1]
-    this.oldRange = new Range(start, oldEnd).freeze()
-    this.newRange = new Range(start, newEnd).freeze()
+    const start = changes[0].oldStart;
+    const { oldEnd, newEnd } = changes[changes.length - 1];
+    this.oldRange = new Range(start, oldEnd).freeze();
+    this.newRange = new Range(start, newEnd).freeze();
 
-    let oldText = null
-    let newText = null
+    let oldText = null;
+    let newText = null;
 
-    Object.defineProperty(this, 'oldText', {
+    Object.defineProperty(this, "oldText", {
       enumerable: false,
-      get () {
+      get() {
         if (oldText == null) {
-          const oldBuffer = new NativeTextBuffer(this.newText || "")
+          const oldBuffer = new NativeTextBuffer(this.newText || "");
           for (let i = changes.length - 1; i >= 0; i--) {
-            const change = changes[i]
+            const change = changes[i];
             oldBuffer.setTextInRange(
-              new Range(
-                traversal(change.newStart, start),
-                traversal(change.newEnd, start)
-              ),
-              change.oldText
-            )
+              new Range(traversal(change.newStart, start), traversal(change.newEnd, start)),
+              change.oldText,
+            );
           }
-          oldText = oldBuffer.getText()
+          oldText = oldBuffer.getText();
         }
-        return oldText
-      }
-    })
+        return oldText;
+      },
+    });
 
-    Object.defineProperty(this, 'newText', {
+    Object.defineProperty(this, "newText", {
       enumerable: false,
-      get () {
+      get() {
         if (newText == null) {
-          newText = buffer.getTextInRange(this.newRange)
+          newText = buffer.getTextInRange(this.newRange);
         }
-        return newText
-      }
-    })
+        return newText;
+      },
+    });
   }
 
-  isEqual (other) {
+  isEqual(other) {
     return (
-      (this.changes.length === other.changes.length) &&
+      this.changes.length === other.changes.length &&
       this.changes.every((change, i) => change.isEqual(other.changes[i])) &&
       this.oldRange.isEqual(other.oldRange) &&
       this.newRange.isEqual(other.newRange)
-    )
+    );
   }
 }
 
 class SearchCallbackArgument {
-  get row () {
-    return this.range.start.row
+  get row() {
+    return this.range.start.row;
   }
 
-  get lineText () {
-    return this.buffer.lineForRow(this.range.start.row)
+  get lineText() {
+    return this.buffer.lineForRow(this.range.start.row);
   }
 
-  get lineTextOffset () { return 0 }
-
-  get matchText () {
-    return this.buffer.getTextInRange(this.range)
+  get lineTextOffset() {
+    return 0;
   }
 
-  get match () {
-    this.regex.lastIndex = 0
-    return this.regex.exec(this.matchText)
+  get matchText() {
+    return this.buffer.getTextInRange(this.range);
   }
 
-  static addContextLines (argument, options) {
-    argument.leadingContextLines = []
-    let row = Math.max(0, argument.range.start.row - (options.leadingContextLineCount || 0))
+  get match() {
+    this.regex.lastIndex = 0;
+    return this.regex.exec(this.matchText);
+  }
+
+  static addContextLines(argument, options) {
+    argument.leadingContextLines = [];
+    let row = Math.max(0, argument.range.start.row - (options.leadingContextLineCount || 0));
     while (row < argument.range.start.row) {
-      argument.leadingContextLines.push(argument.buffer.lineForRow(row))
-      row += 1
+      argument.leadingContextLines.push(argument.buffer.lineForRow(row));
+      row += 1;
     }
 
-    argument.trailingContextLines = []
+    argument.trailingContextLines = [];
     for (let i = 0, end = options.trailingContextLineCount || 0; i < end; i++) {
-      row = argument.range.start.row + i + 1
-      if (row >= argument.buffer.getLineCount()) break
-      argument.trailingContextLines.push(argument.buffer.lineForRow(row))
+      row = argument.range.start.row + i + 1;
+      if (row >= argument.buffer.getLineCount()) break;
+      argument.trailingContextLines.push(argument.buffer.lineForRow(row));
     }
   }
 
-  constructor (buffer, range, regex, options) {
-    this.replace = this.replace.bind(this)
-    this.stop = this.stop.bind(this)
-    this.buffer = buffer
-    this.range = range
-    this.regex = regex
-    this.stopped = false
-    this.replacementText = null
-    SearchCallbackArgument.addContextLines(this, options)
+  constructor(buffer, range, regex, options) {
+    this.replace = this.replace.bind(this);
+    this.stop = this.stop.bind(this);
+    this.buffer = buffer;
+    this.range = range;
+    this.regex = regex;
+    this.stopped = false;
+    this.replacementText = null;
+    SearchCallbackArgument.addContextLines(this, options);
   }
 
-  replace (text) {
-    this.replacementText = text
-    return this.buffer.setTextInRange(this.range, text)
+  replace(text) {
+    this.replacementText = text;
+    return this.buffer.setTextInRange(this.range, text);
   }
 
-  stop () {
-    this.stopped = true
+  stop() {
+    this.stopped = true;
   }
 }
 
-let _winattr = null
+let _winattr = null;
 const getPromisifiedWinattr = function () {
   if (_winattr === null) {
-    const { promisify } = require('util')
-    const winattr = require('winattr')
+    const { promisify } = require("util");
+    const winattr = require("winattr");
     _winattr = {
       set: promisify(winattr.set),
-      get: promisify(winattr.get)
-    }
+      get: promisify(winattr.get),
+    };
   }
 
-  return _winattr
-}
+  return _winattr;
+};
 
-module.exports = TextBuffer
+module.exports = TextBuffer;

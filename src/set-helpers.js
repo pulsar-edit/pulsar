@@ -1,9 +1,13 @@
 function setEqual(a, b) {
   let next;
-  if (a.size !== b.size) { return false; }
+  if (a.size !== b.size) {
+    return false;
+  }
   const iterator = a.values();
   while (!(next = iterator.next()).done) {
-    if (!b.has(next.value)) { return false; }
+    if (!b.has(next.value)) {
+      return false;
+    }
   }
   return true;
 }
@@ -22,13 +26,13 @@ function subtractSet(set, valuesToRemove) {
   }
 }
 
-function addSet (set, valuesToAdd) {
+function addSet(set, valuesToAdd) {
   for (let value of valuesToAdd) {
     set.add(value);
   }
 }
 
-function intersectSet (set, other) {
+function intersectSet(set, other) {
   for (let value of set) {
     if (!other.has(value)) {
       set.delete(value);
@@ -36,4 +40,4 @@ function intersectSet (set, other) {
   }
 }
 
-module.exports = {setEqual, subtractSet, addSet, intersectSet};
+module.exports = { setEqual, subtractSet, addSet, intersectSet };

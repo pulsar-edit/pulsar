@@ -1,11 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 
-const {
-  UI_VARIABLES,
-  UI_VARIABLES_EXTENDED,
-  SYNTAX_VARIABLES,
-} = require("../src/theme-variables");
+const { UI_VARIABLES, UI_VARIABLES_EXTENDED, SYNTAX_VARIABLES } = require("../src/theme-variables");
 
 // The theme variable contract exists in three places that must stay in sync:
 // the manifest in src/theme-variables.js, the legacy Less fallbacks in

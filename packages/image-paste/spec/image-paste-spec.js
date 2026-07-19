@@ -30,9 +30,9 @@ describe("image-paste", () => {
       toPNG: () => pngBuffer,
     });
 
-    expect(
-      imagePaste.handlePaste({ target: { type: "directory", path: directoryPath } }),
-    ).toBe(true);
+    expect(imagePaste.handlePaste({ target: { type: "directory", path: directoryPath } })).toBe(
+      true,
+    );
     expect(imagePaste.saveDialog.prepare).toHaveBeenCalledWith({
       target: { type: "directory", basePath: directoryPath },
       pngBuffer,
@@ -42,9 +42,9 @@ describe("image-paste", () => {
   it("falls through when the clipboard does not contain an image", () => {
     spyOn(clipboard, "readImage").and.returnValue({ isEmpty: () => true });
 
-    expect(
-      imagePaste.handlePaste({ target: { type: "directory", path: directoryPath } }),
-    ).toBe(false);
+    expect(imagePaste.handlePaste({ target: { type: "directory", path: directoryPath } })).toBe(
+      false,
+    );
     expect(imagePaste.saveDialog.prepare).not.toHaveBeenCalled();
   });
 
@@ -58,9 +58,7 @@ describe("image-paste", () => {
     atom.project.setPaths([]);
     const editor = atom.workspace.buildTextEditor();
 
-    expect(
-      imagePaste.handlePaste({ target: { type: "text-editor", editor } }),
-    ).toBe(true);
+    expect(imagePaste.handlePaste({ target: { type: "text-editor", editor } })).toBe(true);
     expect(atom.notifications.addWarning).toHaveBeenCalledWith(
       "Save the editor or open a project before pasting an image.",
     );

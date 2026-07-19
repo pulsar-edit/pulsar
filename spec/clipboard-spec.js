@@ -95,7 +95,9 @@ describe("Clipboard", () => {
       atom.clipboard.createDataTransferClipboard(clipboardData).write("one\ntwo", metadata);
 
       const otherRendererClipboard = new Clipboard();
-      expect(otherRendererClipboard.createDataTransferClipboard(clipboardData).readWithMetadata()).toEqual({
+      expect(
+        otherRendererClipboard.createDataTransferClipboard(clipboardData).readWithMetadata(),
+      ).toEqual({
         text: clipboardData.getData("text/plain"),
         metadata,
       });
@@ -113,16 +115,18 @@ describe("Clipboard", () => {
         }),
       });
 
-      expect(new Clipboard().createDataTransferClipboard(clipboardData).readWithMetadata()).toEqual({
-        text: "one\ntwo",
-        metadata: {
-          fullLine: true,
-          selections: [
-            { text: "one", fullLine: true },
-            { text: "two", fullLine: true },
-          ],
+      expect(new Clipboard().createDataTransferClipboard(clipboardData).readWithMetadata()).toEqual(
+        {
+          text: "one\ntwo",
+          metadata: {
+            fullLine: true,
+            selections: [
+              { text: "one", fullLine: true },
+              { text: "two", fullLine: true },
+            ],
+          },
         },
-      });
+      );
     });
 
     it("falls back to this window's metadata when the custom formats are stripped", () => {
@@ -159,9 +163,11 @@ describe("Clipboard", () => {
         .write("original", { fullLine: true });
       clipboardData.setData("text/plain", "replacement");
 
-      expect(new Clipboard().createDataTransferClipboard(clipboardData).readWithMetadata()).toEqual({
-        text: "replacement",
-      });
+      expect(new Clipboard().createDataTransferClipboard(clipboardData).readWithMetadata()).toEqual(
+        {
+          text: "replacement",
+        },
+      );
     });
   });
 

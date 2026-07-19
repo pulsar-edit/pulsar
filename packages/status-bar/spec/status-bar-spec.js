@@ -114,6 +114,5 @@ describe("Status Bar package", function () {
       expect(statusBar).not.toContain(dummyView);
       expect(statusBarService.getRightTiles()).not.toContain(tile);
     });
-
   });
 });

@@ -246,7 +246,9 @@ atom-notifications {
 
     code {
       color: hsl(from var(--text-color-error) h s calc(l - 40));
-      background-color: hsl(from hsl(from var(--background-color-error) h s calc(l + 18)) h calc(s - 5) l);
+      background-color: hsl(
+        from hsl(from var(--background-color-error) h s calc(l + 18)) h calc(s - 5) l
+      );
     }
 
     &.icon:before {
@@ -255,13 +257,16 @@ atom-notifications {
     }
 
     .close-all.btn {
-      border: 1px solid rgb(from hsl(from var(--text-color-error) h s calc(l - 40)) r g b / calc(alpha - 0.7));
+      border: 1px solid
+        rgb(from hsl(from var(--text-color-error) h s calc(l - 40)) r g b / calc(alpha - 0.7));
       color: rgb(from hsl(from var(--text-color-error) h s calc(l - 40)) r g b / calc(alpha - 0.4));
       text-shadow: none;
 
       &:hover {
         background: none;
-        border-color: rgb(from hsl(from var(--text-color-error) h s calc(l - 40)) r g b / calc(alpha - 0.2));
+        border-color: rgb(
+          from hsl(from var(--text-color-error) h s calc(l - 40)) r g b / calc(alpha - 0.2)
+        );
         color: hsl(from var(--text-color-error) h s calc(l - 40));
       }
     }
@@ -279,7 +284,9 @@ atom-notifications {
 
     code {
       color: hsl(from var(--text-color-warning) h s calc(l - 40));
-      background-color: hsl(from hsl(from var(--background-color-warning) h s calc(l + 18)) h calc(s - 5) l);
+      background-color: hsl(
+        from hsl(from var(--background-color-warning) h s calc(l + 18)) h calc(s - 5) l
+      );
     }
 
     &.icon:before {
@@ -288,13 +295,18 @@ atom-notifications {
     }
 
     .close-all.btn {
-      border: 1px solid rgb(from hsl(from var(--text-color-warning) h s calc(l - 40)) r g b / calc(alpha - 0.7));
-      color: rgb(from hsl(from var(--text-color-warning) h s calc(l - 40)) r g b / calc(alpha - 0.4));
+      border: 1px solid
+        rgb(from hsl(from var(--text-color-warning) h s calc(l - 40)) r g b / calc(alpha - 0.7));
+      color: rgb(
+        from hsl(from var(--text-color-warning) h s calc(l - 40)) r g b / calc(alpha - 0.4)
+      );
       text-shadow: none;
 
       &:hover {
         background: none;
-        border-color: rgb(from hsl(from var(--text-color-warning) h s calc(l - 40)) r g b / calc(alpha - 0.2));
+        border-color: rgb(
+          from hsl(from var(--text-color-warning) h s calc(l - 40)) r g b / calc(alpha - 0.2)
+        );
         color: hsl(from var(--text-color-warning) h s calc(l - 40));
       }
     }
@@ -312,7 +324,9 @@ atom-notifications {
 
     code {
       color: hsl(from var(--text-color-info) h s calc(l - 40));
-      background-color: hsl(from hsl(from var(--background-color-info) h s calc(l + 18)) h calc(s - 5) l);
+      background-color: hsl(
+        from hsl(from var(--background-color-info) h s calc(l + 18)) h calc(s - 5) l
+      );
     }
 
     &.icon:before {
@@ -321,13 +335,16 @@ atom-notifications {
     }
 
     .close-all.btn {
-      border: 1px solid rgb(from hsl(from var(--text-color-info) h s calc(l - 40)) r g b / calc(alpha - 0.7));
+      border: 1px solid
+        rgb(from hsl(from var(--text-color-info) h s calc(l - 40)) r g b / calc(alpha - 0.7));
       color: rgb(from hsl(from var(--text-color-info) h s calc(l - 40)) r g b / calc(alpha - 0.4));
       text-shadow: none;
 
       &:hover {
         background: none;
-        border-color: rgb(from hsl(from var(--text-color-info) h s calc(l - 40)) r g b / calc(alpha - 0.2));
+        border-color: rgb(
+          from hsl(from var(--text-color-info) h s calc(l - 40)) r g b / calc(alpha - 0.2)
+        );
         color: hsl(from var(--text-color-info) h s calc(l - 40));
       }
     }
@@ -345,7 +362,9 @@ atom-notifications {
 
     code {
       color: hsl(from var(--text-color-success) h s calc(l - 40));
-      background-color: hsl(from hsl(from var(--background-color-success) h s calc(l + 18)) h calc(s - 5) l);
+      background-color: hsl(
+        from hsl(from var(--background-color-success) h s calc(l + 18)) h calc(s - 5) l
+      );
     }
 
     &.icon:before {
@@ -354,13 +373,18 @@ atom-notifications {
     }
 
     .close-all.btn {
-      border: 1px solid rgb(from hsl(from var(--text-color-success) h s calc(l - 40)) r g b / calc(alpha - 0.7));
-      color: rgb(from hsl(from var(--text-color-success) h s calc(l - 40)) r g b / calc(alpha - 0.4));
+      border: 1px solid
+        rgb(from hsl(from var(--text-color-success) h s calc(l - 40)) r g b / calc(alpha - 0.7));
+      color: rgb(
+        from hsl(from var(--text-color-success) h s calc(l - 40)) r g b / calc(alpha - 0.4)
+      );
       text-shadow: none;
 
       &:hover {
         background: none;
-        border-color: rgb(from hsl(from var(--text-color-success) h s calc(l - 40)) r g b / calc(alpha - 0.2));
+        border-color: rgb(
+          from hsl(from var(--text-color-success) h s calc(l - 40)) r g b / calc(alpha - 0.2)
+        );
         color: hsl(from var(--text-color-success) h s calc(l - 40));
       }
     }
@@ -394,7 +418,8 @@ atom-notifications atom-notification {
 @-webkit-keyframes notification-show {
   0% {
     opacity: 0;
-    transform: perspective(var(--notifications-width)) translate(0, calc(-1 * var(--notifications-icon-size))) rotateX(90deg);
+    transform: perspective(var(--notifications-width))
+      translate(0, calc(-1 * var(--notifications-icon-size))) rotateX(90deg);
   }
   100% {
     opacity: 1;

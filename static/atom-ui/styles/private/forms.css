@@ -129,7 +129,9 @@ output {
 .form-control {
   display: block;
   width: 100%;
-  height: var(--input-height-base); /* Make inputs at least the height of their button counterpart (base line-height + padding + border) */
+  height: var(
+    --input-height-base
+  ); /* Make inputs at least the height of their button counterpart (base line-height + padding + border) */
   padding: 6px 12px; /* @padding-base-vertical @padding-base-horizontal */
   font-size: var(--font-size);
   line-height: 1.428571429; /* @line-height-base */
@@ -208,7 +210,9 @@ output {
   margin-bottom: 10px;
 
   label {
-    min-height: var(--line-height-computed); /* Ensure the input doesn't jump when there is no text */
+    min-height: var(
+      --line-height-computed
+    ); /* Ensure the input doesn't jump when there is no text */
     padding-left: 20px;
     margin-bottom: 0;
     font-weight: normal;

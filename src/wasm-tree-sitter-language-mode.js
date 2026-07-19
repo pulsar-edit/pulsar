@@ -864,7 +864,13 @@ class WASMTreeSitterLanguageMode {
         const parseJob = () => {
           try {
             batchCount++;
-            tree = parseWithProgressTimeout(parser, callback, oldTree, includedRanges, timeoutMicros);
+            tree = parseWithProgressTimeout(
+              parser,
+              callback,
+              oldTree,
+              includedRanges,
+              timeoutMicros,
+            );
           } catch (err) {
             return reject(err);
           }

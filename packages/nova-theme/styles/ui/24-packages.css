@@ -78,9 +78,17 @@
   &.has-no-results .find-container atom-text-editor[mini].is-focused {
     border-color: var(--text-color-error);
     box-shadow: 0 0 0 1px var(--text-color-error);
-    background-color: color-mix(in srgb, var(--text-color-error) 10%, var(--input-background-color));
+    background-color: color-mix(
+      in srgb,
+      var(--text-color-error) 10%,
+      var(--input-background-color)
+    );
     .selection .region {
-      background-color: color-mix(in srgb, var(--text-color-error) 50%, var(--input-background-color));
+      background-color: color-mix(
+        in srgb,
+        var(--text-color-error) 50%,
+        var(--input-background-color)
+      );
     }
     .cursor {
       border-color: var(--text-color-error);
@@ -90,9 +98,17 @@
   &.has-results .find-container atom-text-editor[mini].is-focused {
     border-color: var(--text-color-success);
     box-shadow: 0 0 0 1px var(--text-color-success);
-    background-color: color-mix(in srgb, var(--text-color-success) 10%, var(--input-background-color));
+    background-color: color-mix(
+      in srgb,
+      var(--text-color-success) 10%,
+      var(--input-background-color)
+    );
     .selection .region {
-      background-color: color-mix(in srgb, var(--text-color-success) 50%, var(--input-background-color));
+      background-color: color-mix(
+        in srgb,
+        var(--text-color-success) 50%,
+        var(--input-background-color)
+      );
     }
     .cursor {
       border-color: var(--text-color-success);

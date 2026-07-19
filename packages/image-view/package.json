@@ -29,7 +29,11 @@
       "title": "Default Background Color",
       "description": "Background color shown behind transparent images.",
       "type": "string",
-      "enum": ["white", "black", "transparent"],
+      "enum": [
+        "white",
+        "black",
+        "transparent"
+      ],
       "default": "transparent"
     }
   }

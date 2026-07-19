@@ -5,7 +5,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
-const Point = require('./point');
+const Point = require("./point");
 
 exports.compare = function compare(a, b) {
   if (a.row === b.row) {
@@ -25,7 +25,7 @@ function compareNumbers(a, b) {
   }
 }
 
-exports.isEqual = (a, b) => (a.row === b.row) && (a.column === b.column);
+exports.isEqual = (a, b) => a.row === b.row && a.column === b.column;
 
 exports.traverse = function traverse(start, distance) {
   if (distance.row === 0) {

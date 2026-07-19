@@ -25,9 +25,7 @@ export default class StyleguideView {
     // Fill in the resolved value of every theme variable next to its swatch,
     // and keep it current as the active theme changes or sections expand.
     this.disposables = new CompositeDisposable();
-    this.disposables.add(
-      atom.themes.onDidChangeActiveThemes(() => this.updateResolvedValues()),
-    );
+    this.disposables.add(atom.themes.onDidChangeActiveThemes(() => this.updateResolvedValues()));
     this.element.addEventListener("click", (event) => {
       if (event.target.closest(".section-heading")) {
         requestAnimationFrame(() => this.updateResolvedValues());
@@ -103,8 +101,7 @@ export default class StyleguideView {
             <p>
               Use these theme variables in your package's stylesheets so it matches the overall
               look. They are CSS custom properties set by the active themes &mdash; consume them
-              with <code>var()</code>, for example{" "}
-              <code>color: var(--text-color);</code> or{" "}
+              with <code>var()</code>, for example <code>color: var(--text-color);</code> or{" "}
               <code>background-color: var(--accent-bg-color);</code>. The value shown next to each
               name is what the currently active theme resolves it to.
             </p>
@@ -307,10 +304,10 @@ export default class StyleguideView {
             title="Authoring themes"
           >
             <p>
-              A theme sets the variables above. Themes come in two types &mdash; a{" "}
-              <code>ui</code> theme styles the chrome (docks, tabs, panels) and a{" "}
-              <code>syntax</code> theme styles the editor &mdash; and the two are chosen
-              independently, so a UI theme can pair with any syntax theme.
+              A theme sets the variables above. Themes come in two types &mdash; a <code>ui</code>{" "}
+              theme styles the chrome (docks, tabs, panels) and a <code>syntax</code> theme styles
+              the editor &mdash; and the two are chosen independently, so a UI theme can pair with
+              any syntax theme.
             </p>
 
             <h2>The palette</h2>
@@ -370,8 +367,8 @@ export default class StyleguideView {
             </p>
             <p>
               Legacy themes that predate the CSS palette still work: define the classic Less{" "}
-              <code>ui-variables.less</code> / <code>syntax-variables.less</code> and Lumine
-              bridges them to the custom properties above automatically.
+              <code>ui-variables.less</code> / <code>syntax-variables.less</code> and Lumine bridges
+              them to the custom properties above automatically.
             </p>
           </StyleguideSection>
 
@@ -381,8 +378,7 @@ export default class StyleguideView {
             title="Icons"
           >
             <p>
-              Lumine comes bundled with the Octicons. It lets you easily add icons to your
-              packages.
+              Lumine comes bundled with the Octicons. It lets you easily add icons to your packages.
             </p>
             <p>
               Currently version <code>4.4.0</code> is available. In addition some older icons from
@@ -759,8 +755,8 @@ export default class StyleguideView {
 
             <h2>ui-site-* classes</h2>
             <p>
-              These classes only set the background color, no other styles. You can also use the
-              CSS custom properties <code>var(--ui-site-color-#)</code> in your packages where{" "}
+              These classes only set the background color, no other styles. You can also use the CSS
+              custom properties <code>var(--ui-site-color-#)</code> in your packages where{" "}
               <code>#</code> is a number between 1 and 5.
             </p>
             <p>Site colors will always be in the color progression you see here.</p>

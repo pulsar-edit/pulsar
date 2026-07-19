@@ -1,14 +1,14 @@
-const {isEqual} = require('@lumine-code/underscore-plus');
-const {Emitter, Disposable} = require('event-kit');
-const Point = require('./point');
-const Range = require('./range');
+const { isEqual } = require("@lumine-code/underscore-plus");
+const { Emitter, Disposable } = require("event-kit");
+const Point = require("./point");
+const Range = require("./range");
 
-const OptionKeys = new Set(['reversed', 'tailed', 'invalidate', 'exclusive']);
+const OptionKeys = new Set(["reversed", "tailed", "invalidate", "exclusive"]);
 
 // Screen-coordinate translation options accepted by the DisplayMarkerLayer
 // marking methods; they affect coordinate translation only and are never
 // marker state, so they must not be stored as custom properties.
-const TranslationOptionKeys = new Set(['clipDirection', 'skipSoftWrapIndentation']);
+const TranslationOptionKeys = new Set(["clipDirection", "skipSoftWrapIndentation"]);
 
 // Private: Represents a buffer annotation that remains logically stationary
 // even as the buffer changes. This is used to represent cursors, folds, snippet
@@ -36,7 +36,9 @@ class Marker {
         if (OptionKeys.has(key)) {
           outputParams[key] = inputParams[key];
         } else if (!TranslationOptionKeys.has(key)) {
-          if (outputParams.properties == null) { outputParams.properties = {}; }
+          if (outputParams.properties == null) {
+            outputParams.properties = {};
+          }
           outputParams.properties[key] = inputParams[key];
         }
       }
@@ -56,17 +58,29 @@ class Marker {
       valid: this.valid,
       invalidate: this.invalidate,
       exclusive: this.exclusive,
-      properties: this.properties
+      properties: this.properties,
     } = params);
-    this.emitter = new Emitter;
-    if (this.tailed == null) { this.tailed = true; }
-    if (this.reversed == null) { this.reversed = false; }
-    if (this.valid == null) { this.valid = true; }
-    if (this.invalidate == null) { this.invalidate = 'overlap'; }
-    if (this.properties == null) { this.properties = {}; }
+    this.emitter = new Emitter();
+    if (this.tailed == null) {
+      this.tailed = true;
+    }
+    if (this.reversed == null) {
+      this.reversed = false;
+    }
+    if (this.valid == null) {
+      this.valid = true;
+    }
+    if (this.invalidate == null) {
+      this.invalidate = "overlap";
+    }
+    if (this.properties == null) {
+      this.properties = {};
+    }
     this.hasChangeObservers = false;
     Object.freeze(this.properties);
-    if (!exclusivitySet) { this.layer.setMarkerIsExclusive(this.id, this.isExclusive()); }
+    if (!exclusivitySet) {
+      this.layer.setMarkerIsExclusive(this.id, this.isExclusive());
+    }
   }
 
   /*
@@ -80,10 +94,10 @@ class Marker {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy(callback) {
     this.layer.markersWithDestroyListeners.add(this);
-    const subscription = this.emitter.on('did-destroy', callback);
+    const subscription = this.emitter.on("did-destroy", callback);
     return new Disposable(() => {
       subscription.dispose();
-      if (this.emitter.listenerCountForEventName('did-destroy') === 0) {
+      if (this.emitter.listenerCountForEventName("did-destroy") === 0) {
         this.layer.markersWithDestroyListeners.delete(this);
       }
     });
@@ -113,10 +127,10 @@ class Marker {
       this.hasChangeObservers = true;
       this.layer.markersWithChangeListeners.add(this);
     }
-    const subscription = this.emitter.on('did-change', callback);
+    const subscription = this.emitter.on("did-change", callback);
     return new Disposable(() => {
       subscription.dispose();
-      if (this.emitter.listenerCountForEventName('did-change') === 0) {
+      if (this.emitter.listenerCountForEventName("did-change") === 0) {
         this.previousEventState = null;
         this.hasChangeObservers = false;
         this.layer.markersWithChangeListeners.delete(this);
@@ -141,12 +155,14 @@ class Marker {
   //     This defaults to `false` unless the marker's invalidation strategy is
   //     `inside` or the marker has no tail, in which case it defaults to `true`.
   setRange(range, params) {
-    if (params == null) { params = {}; }
+    if (params == null) {
+      params = {};
+    }
     return this.update(this.getRange(), {
       reversed: params.reversed,
       tailed: true,
       range: Range.fromObject(range, true),
-      exclusive: params.exclusive
+      exclusive: params.exclusive,
     });
   }
 
@@ -208,7 +224,7 @@ class Marker {
   setTailPosition(position) {
     position = Point.fromObject(position);
     const oldRange = this.getRange();
-    const params = {tailed: true};
+    const params = { tailed: true };
 
     if (this.reversed) {
       if (position.isLessThan(oldRange.start)) {
@@ -249,7 +265,7 @@ class Marker {
     return this.update(this.getRange(), {
       tailed: false,
       reversed: false,
-      range: Range(headPosition, headPosition)
+      range: Range(headPosition, headPosition),
     });
   }
 
@@ -261,7 +277,7 @@ class Marker {
       const headPosition = this.getHeadPosition();
       return this.update(this.getRange(), {
         tailed: true,
-        range: new Range(headPosition, headPosition)
+        range: new Range(headPosition, headPosition),
       });
     }
   }
@@ -296,7 +312,7 @@ class Marker {
     if (this.exclusive != null) {
       return this.exclusive;
     } else {
-      return (this.getInvalidationStrategy() === 'inside') || !this.hasTail();
+      return this.getInvalidationStrategy() === "inside" || !this.hasTail();
     }
   }
 
@@ -305,12 +321,14 @@ class Marker {
   //
   // * `other` {Marker} other marker
   isEqual(other) {
-    return (this.invalidate === other.invalidate) &&
-      (this.tailed === other.tailed) &&
-      (this.reversed === other.reversed) &&
-      (this.exclusive === other.exclusive) &&
+    return (
+      this.invalidate === other.invalidate &&
+      this.tailed === other.tailed &&
+      this.reversed === other.reversed &&
+      this.exclusive === other.exclusive &&
       isEqual(this.properties, other.properties) &&
-      this.getRange().isEqual(other.getRange());
+      this.getRange().isEqual(other.getRange())
+    );
   }
 
   // Public: Get the invalidation strategy for this marker.
@@ -334,7 +352,7 @@ class Marker {
   // * `properties` {Object}
   setProperties(properties) {
     return this.update(this.getRange(), {
-      properties: {...this.properties, ...properties}
+      properties: { ...this.properties, ...properties },
     });
   }
 
@@ -348,20 +366,22 @@ class Marker {
     return this.layer.createMarker(this.getRange(), {
       ...snapshot,
       ...options,
-      properties: {...snapshot.properties, ...options.properties}
+      properties: { ...snapshot.properties, ...options.properties },
     });
   }
 
   // Public: Destroys the marker, causing it to emit the 'destroyed' event.
   destroy(suppressMarkerLayerUpdateEvents) {
-    if (this.isDestroyed()) { return; }
+    if (this.isDestroyed()) {
+      return;
+    }
 
     if (this.trackDestruction) {
       this.destroyStackTrace = new Error().stack;
     }
 
     this.layer.destroyMarker(this, suppressMarkerLayerUpdateEvents);
-    this.emitter.emit('did-destroy');
+    this.emitter.emit("did-destroy");
     return this.emitter.clear();
   }
 
@@ -400,7 +420,9 @@ class Marker {
   // are the same as {MarkerLayer::findMarkers}.
   matchesParams(params) {
     for (const key of Object.keys(params)) {
-      if (!this.matchesParam(key, params[key])) { return false; }
+      if (!this.matchesParam(key, params[key])) {
+        return false;
+      }
     }
     return true;
   }
@@ -409,40 +431,52 @@ class Marker {
   // The parameters are the same as {MarkerLayer::findMarkers}.
   matchesParam(key, value) {
     switch (key) {
-      case 'startPosition':
+      case "startPosition":
         return this.getStartPosition().isEqual(value);
-      case 'endPosition':
+      case "endPosition":
         return this.getEndPosition().isEqual(value);
-      case 'containsPoint': case 'containsPosition':
+      case "containsPoint":
+      case "containsPosition":
         return this.containsPoint(value);
-      case 'containsRange':
+      case "containsRange":
         return this.containsRange(value);
-      case 'startRow':
+      case "startRow":
         return this.getStartPosition().row === value;
-      case 'endRow':
+      case "endRow":
         return this.getEndPosition().row === value;
-      case 'intersectsRow':
+      case "intersectsRow":
         return this.intersectsRow(value);
-      case 'invalidate': case 'reversed': case 'tailed':
+      case "invalidate":
+      case "reversed":
+      case "tailed":
         return this[key] === value;
-      case 'valid':
+      case "valid":
         return this.isValid() === value;
       default:
         return isEqual(this.properties[key], value);
     }
   }
 
-  update(oldRange, {range, reversed, tailed, valid, exclusive, properties}, textChanged = false, suppressMarkerLayerUpdateEvents = false) {
-    if (this.isDestroyed()) { return; }
+  update(
+    oldRange,
+    { range, reversed, tailed, valid, exclusive, properties },
+    textChanged = false,
+    suppressMarkerLayerUpdateEvents = false,
+  ) {
+    if (this.isDestroyed()) {
+      return;
+    }
 
     oldRange = Range.fromObject(oldRange);
-    if (range != null) { range = Range.fromObject(range); }
+    if (range != null) {
+      range = Range.fromObject(range);
+    }
 
     const wasExclusive = this.isExclusive();
     let updated = false;
     let propertiesChanged = false;
 
-    if ((range != null) && !range.isEqual(oldRange)) {
+    if (range != null && !range.isEqual(oldRange)) {
       this.layer.setMarkerRange(this.id, range);
       // The layer clips the range to the buffer's bounds; re-read it so change
       // events report the marker's actual positions.
@@ -450,22 +484,22 @@ class Marker {
       updated = true;
     }
 
-    if ((reversed != null) && (reversed !== this.reversed)) {
+    if (reversed != null && reversed !== this.reversed) {
       this.reversed = reversed;
       updated = true;
     }
 
-    if ((tailed != null) && (tailed !== this.tailed)) {
+    if (tailed != null && tailed !== this.tailed) {
       this.tailed = tailed;
       updated = true;
     }
 
-    if ((valid != null) && (valid !== this.valid)) {
+    if (valid != null && valid !== this.valid) {
       this.valid = valid;
       updated = true;
     }
 
-    if ((exclusive != null) && (exclusive !== this.exclusive)) {
+    if (exclusive != null && exclusive !== this.exclusive) {
       this.exclusive = exclusive;
       updated = true;
     }
@@ -475,7 +509,7 @@ class Marker {
       updated = true;
     }
 
-    if ((properties != null) && !isEqual(properties, this.properties)) {
+    if (properties != null && !isEqual(properties, this.properties)) {
       this.properties = Object.freeze(properties);
       propertiesChanged = true;
       updated = true;
@@ -496,9 +530,11 @@ class Marker {
       tailed: this.tailed,
       valid: this.valid,
       invalidate: this.invalidate,
-      exclusive: this.exclusive
+      exclusive: this.exclusive,
     };
-    if (includeMarker) { snapshot.marker = this; }
+    if (includeMarker) {
+      snapshot.marker = this;
+    }
     return Object.freeze(snapshot);
   }
 
@@ -516,17 +552,21 @@ class Marker {
 
   emitChangeEvent(currentRange, textChanged, propertiesChanged) {
     let newHeadPosition, newTailPosition, oldHeadPosition, oldTailPosition;
-    if (!this.hasChangeObservers) { return; }
+    if (!this.hasChangeObservers) {
+      return;
+    }
     const oldState = this.previousEventState;
 
-    if (currentRange == null) { currentRange = this.getRange(); }
+    if (currentRange == null) {
+      currentRange = this.getRange();
+    }
 
     if (
       !propertiesChanged &&
-      (oldState.valid === this.valid) &&
-      (oldState.tailed === this.tailed) &&
-      (oldState.reversed === this.reversed) &&
-      (oldState.range.compare(currentRange) === 0)
+      oldState.valid === this.valid &&
+      oldState.tailed === this.tailed &&
+      oldState.reversed === this.reversed &&
+      oldState.range.compare(currentRange) === 0
     ) {
       return false;
     }
@@ -560,7 +600,7 @@ class Marker {
       newHeadPosition,
       oldTailPosition,
       newTailPosition,
-      textChanged
+      textChanged,
     });
     return true;
   }

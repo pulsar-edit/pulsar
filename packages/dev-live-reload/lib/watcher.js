@@ -1,4 +1,10 @@
-const { CompositeDisposable, Disposable, Emitter, watchPath, watchFile: watchSingleFile } = require("atom");
+const {
+  CompositeDisposable,
+  Disposable,
+  Emitter,
+  watchPath,
+  watchFile: watchSingleFile,
+} = require("atom");
 const path = require("path");
 
 module.exports = class Watcher {
@@ -61,7 +67,12 @@ module.exports = class Watcher {
     const watcherPromise = watchPath(directoryPath, {}, () => emitter.emit("did-change"));
     watcherPromise.catch(() => {});
     this.disposables.add(
-      new Disposable(() => watcherPromise.then((watcher) => watcher.dispose(), () => {})),
+      new Disposable(() =>
+        watcherPromise.then(
+          (watcher) => watcher.dispose(),
+          () => {},
+        ),
+      ),
       emitter.on("did-change", () => callback()),
       new Disposable(() => emitter.dispose()),
     );

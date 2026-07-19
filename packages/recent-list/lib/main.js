@@ -1,9 +1,5 @@
 const { Disposable, CompositeDisposable } = require("atom");
-const {
-  SelectListView,
-  highlightMatches,
-  removeDiacritics,
-} = require("@lumine-code/select-list");
+const { SelectListView, highlightMatches, removeDiacritics } = require("@lumine-code/select-list");
 const path = require("path");
 const fs = require("fs");
 

@@ -322,8 +322,7 @@ module.exports = class AtomApplication extends EventEmitter {
       (options.urlsToOpen && options.urlsToOpen.length > 0)
     ) {
       optionsForWindowsToOpen.push(options);
-      shouldReopenPreviousWindows =
-        this.config.get("core.restorePreviousState") === "always";
+      shouldReopenPreviousWindows = this.config.get("core.restorePreviousState") === "always";
     } else {
       shouldReopenPreviousWindows = this.config.get("core.restorePreviousState") !== "no";
     }

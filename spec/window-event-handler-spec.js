@@ -89,9 +89,7 @@ describe("WindowEventHandler", () => {
       link.href = "https://github.com";
       windowEventHandler.handleLinkClick(fakeEvent);
       expect(atom.applicationDelegate.openExternal).toHaveBeenCalled();
-      expect(atom.applicationDelegate.openExternal.calls.argsFor(0)[0]).toBe(
-        "https://github.com",
-      );
+      expect(atom.applicationDelegate.openExternal.calls.argsFor(0)[0]).toBe("https://github.com");
       atom.applicationDelegate.openExternal.calls.reset();
 
       link.href = "";

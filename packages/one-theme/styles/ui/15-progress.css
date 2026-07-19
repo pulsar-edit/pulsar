@@ -30,8 +30,7 @@
     border-color: var(--accent-color) transparent transparent transparent;
   }
   &::after {
-    border-color: transparent hsl(from var(--accent-color) h s calc(l + 15))
-      transparent transparent;
+    border-color: transparent hsl(from var(--accent-color) h s calc(l + 15)) transparent transparent;
     -webkit-animation-delay: 0.6s;
   }
 
@@ -71,8 +70,7 @@
     border-color: var(--accent-color) transparent transparent transparent;
   }
   &::after {
-    border-color: transparent hsl(from var(--accent-color) h s calc(l + 15))
-      transparent transparent;
+    border-color: transparent hsl(from var(--accent-color) h s calc(l + 15)) transparent transparent;
     -webkit-animation-delay: 0.6s;
   }
 
@@ -107,8 +105,7 @@
     border-color: var(--accent-color) transparent transparent transparent;
   }
   &::after {
-    border-color: transparent hsl(from var(--accent-color) h s calc(l + 15))
-      transparent transparent;
+    border-color: transparent hsl(from var(--accent-color) h s calc(l + 15)) transparent transparent;
     -webkit-animation-delay: 0.6s;
   }
 
@@ -143,8 +140,7 @@
     border-color: var(--accent-color) transparent transparent transparent;
   }
   &::after {
-    border-color: transparent hsl(from var(--accent-color) h s calc(l + 15))
-      transparent transparent;
+    border-color: transparent hsl(from var(--accent-color) h s calc(l + 15)) transparent transparent;
     -webkit-animation-delay: 0.6s;
   }
 

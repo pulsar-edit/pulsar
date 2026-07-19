@@ -1,4 +1,3 @@
- 
 const SuggestionListElement = require("../lib/suggestion-list-element");
 const { conditionPromise } = require("./spec-helper");
 

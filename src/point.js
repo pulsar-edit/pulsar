@@ -1,5 +1,5 @@
-function isActualNumber (value) {
-  return (typeof value === 'number') && (!Number.isNaN(value));
+function isActualNumber(value) {
+  return typeof value === "number" && !Number.isNaN(value);
 }
 
 // Public: Represents a point in a buffer in row/column coordinates.
@@ -37,7 +37,7 @@ class Point {
       if (Array.isArray(object)) {
         [row, column] = object;
       } else {
-        ({row, column} = object);
+        ({ row, column } = object);
       }
 
       return new Point(row, column);
@@ -92,7 +92,7 @@ class Point {
   //
   // * `row` {Number} row
   // * `column` {Number} column
-  constructor(row=0, column=0) {
+  constructor(row = 0, column = 0) {
     this.row = row;
     this.column = column;
   }
@@ -126,7 +126,7 @@ class Point {
   //
   // Returns a {Point}.
   translate(other) {
-    const {row, column} = Point.fromObject(other);
+    const { row, column } = Point.fromObject(other);
     return new Point(this.row + row, this.column + column);
   }
 
@@ -157,9 +157,7 @@ class Point {
     if (other.row === 0) {
       column = this.column + other.column;
     } else {
-      ({
-        column
-      } = other);
+      ({ column } = other);
     }
 
     return new Point(row, column);
@@ -168,7 +166,7 @@ class Point {
   traversalFrom(other) {
     other = Point.fromObject(other);
     if (this.row === other.row) {
-      if ((this.column === Infinity) && (other.column === Infinity)) {
+      if (this.column === Infinity && other.column === Infinity) {
         return new Point(0, 0);
       } else {
         return new Point(0, this.column - other.column);
@@ -222,9 +220,11 @@ class Point {
   //
   // * `other` A {Point} or point-compatible {Array}.
   isEqual(other) {
-    if (!other) { return false; }
+    if (!other) {
+      return false;
+    }
     other = Point.fromObject(other);
-    return (this.row === other.row) && (this.column === other.column);
+    return this.row === other.row && this.column === other.column;
   }
 
   // Public: Returns a {Boolean} indicating whether this point precedes the given
@@ -260,7 +260,7 @@ class Point {
   }
 
   isZero() {
-    return (this.row === 0) && (this.column === 0);
+    return this.row === 0 && this.column === 0;
   }
 
   isPositive() {
@@ -306,14 +306,14 @@ class Point {
 // ES5 classes differ from their predecessors in that you are not allowed to
 // call them like ordinary functions. Hence we must write this wrapper function
 // which delegates to `new Point` whether it was called with `new` or not.
-function _Point (...args) {
+function _Point(...args) {
   return new Point(...args);
 }
-_Point.displayName = 'Point';
+_Point.displayName = "Point";
 _Point.prototype = Point.prototype;
 Object.assign(_Point.prototype, {
   row: null,
-  column: null
+  column: null,
 });
 // Make the wrapper inherit the parent's static methods.
 Object.setPrototypeOf(_Point, Point);

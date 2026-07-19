@@ -42,12 +42,30 @@ module.exports = [
       // `atom` and `electron` are provided by the Lumine/Electron runtime, and
       // `season` by the editor's root dependencies — none resolvable from a
       // bundled package's own manifest, so allow them across resolution rules.
-      "n/no-missing-require": ["error", { allowModules: ["atom", "electron", "@lumine-code/season"] }],
-      "n/no-missing-import": ["error", { allowModules: ["atom", "electron", "@lumine-code/season"] }],
-      "n/no-unpublished-require": ["error", { allowModules: ["atom", "electron", "@lumine-code/season"] }],
-      "n/no-unpublished-import": ["error", { allowModules: ["atom", "electron", "@lumine-code/season"] }],
-      "n/no-extraneous-require": ["error", { allowModules: ["atom", "electron", "@lumine-code/season"] }],
-      "n/no-extraneous-import": ["error", { allowModules: ["atom", "electron", "@lumine-code/season"] }],
+      "n/no-missing-require": [
+        "error",
+        { allowModules: ["atom", "electron", "@lumine-code/season"] },
+      ],
+      "n/no-missing-import": [
+        "error",
+        { allowModules: ["atom", "electron", "@lumine-code/season"] },
+      ],
+      "n/no-unpublished-require": [
+        "error",
+        { allowModules: ["atom", "electron", "@lumine-code/season"] },
+      ],
+      "n/no-unpublished-import": [
+        "error",
+        { allowModules: ["atom", "electron", "@lumine-code/season"] },
+      ],
+      "n/no-extraneous-require": [
+        "error",
+        { allowModules: ["atom", "electron", "@lumine-code/season"] },
+      ],
+      "n/no-extraneous-import": [
+        "error",
+        { allowModules: ["atom", "electron", "@lumine-code/season"] },
+      ],
       // `localStorage`/`navigator` here are Chromium (renderer) globals, not
       // Node's newer experimental builtins of the same name.
       "n/no-unsupported-features/node-builtins": [
@@ -94,13 +112,7 @@ module.exports = [
     // suites (dalek's `test/`, the completion-update `*.test.js`) and Atom's
     // async helpers. Also relax dependency-resolution rules: specs require
     // devDependencies and load fixture modules by path the resolver can't follow.
-    files: [
-      "spec/**",
-      "**/spec/**",
-      "**/*-spec.js",
-      "**/*.test.js",
-      "packages/*/test/**",
-    ],
+    files: ["spec/**", "**/spec/**", "**/*-spec.js", "**/*.test.js", "packages/*/test/**"],
     languageOptions: {
       globals: {
         ...globals.jasmine,

@@ -1,4 +1,3 @@
-
 beforeEach(() => {
   spyOn(atom.views, "readDocument").andCallFake((fn) => fn());
   spyOn(atom.views, "updateDocument").andCallFake((fn) => fn());

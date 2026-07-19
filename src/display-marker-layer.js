@@ -1,7 +1,7 @@
-const {Emitter, CompositeDisposable, Disposable} = require('event-kit');
-const DisplayMarker = require('./display-marker');
-const Range = require('./range');
-const Point = require('./point');
+const { Emitter, CompositeDisposable, Disposable } = require("event-kit");
+const DisplayMarker = require("./display-marker");
+const Range = require("./range");
+const Point = require("./point");
 
 // Public: *Experimental:* A container for a related set of markers at the
 // {DisplayLayer} level. Wraps an underlying {MarkerLayer} on the {TextBuffer}.
@@ -16,12 +16,10 @@ class DisplayMarkerLayer {
     this.bufferMarkerLayer.displayMarkerLayers.add(this);
     this.markersById = new Map();
     this.destroyed = false;
-    this.emitter = new Emitter;
-    this.subscriptions = new CompositeDisposable;
-    this.markersWithDestroyListeners = new Set;
-    this.subscriptions.add(
-      this.bufferMarkerLayer.onDidUpdate(this.emitDidUpdate.bind(this))
-    );
+    this.emitter = new Emitter();
+    this.subscriptions = new CompositeDisposable();
+    this.markersWithDestroyListeners = new Set();
+    this.subscriptions.add(this.bufferMarkerLayer.onDidUpdate(this.emitDidUpdate.bind(this)));
   }
 
   /*
@@ -30,16 +28,22 @@ class DisplayMarkerLayer {
 
   // Essential: Destroy this layer.
   destroy() {
-    if (this.destroyed) { return; }
+    if (this.destroyed) {
+      return;
+    }
     this.destroyed = true;
 
-    if (this.ownsBufferMarkerLayer) { this.clear(); }
+    if (this.ownsBufferMarkerLayer) {
+      this.clear();
+    }
     this.subscriptions.dispose();
     this.bufferMarkerLayer.displayMarkerLayers.delete(this);
-    if (this.ownsBufferMarkerLayer) { this.bufferMarkerLayer.destroy(); }
+    if (this.ownsBufferMarkerLayer) {
+      this.bufferMarkerLayer.destroy();
+    }
     this.displayLayer.didDestroyMarkerLayer(this.id);
 
-    this.emitter.emit('did-destroy');
+    this.emitter.emit("did-destroy");
     this.emitter.clear();
   }
 
@@ -70,7 +74,7 @@ class DisplayMarkerLayer {
   //
   // Returns a {Disposable}.
   onDidDestroy(callback) {
-    return this.emitter.on('did-destroy', callback);
+    return this.emitter.on("did-destroy", callback);
   }
 
   // Public: Subscribe to be notified asynchronously whenever markers are
@@ -89,7 +93,7 @@ class DisplayMarkerLayer {
   //
   // Returns a {Disposable}.
   onDidUpdate(callback) {
-    return this.emitter.on('did-update', callback);
+    return this.emitter.on("did-update", callback);
   }
 
   // Public: Subscribe to be notified synchronously whenever markers are created
@@ -104,7 +108,7 @@ class DisplayMarkerLayer {
   //
   // Returns a {Disposable}.
   onDidCreateMarker(callback) {
-    const subscription = this.bufferMarkerLayer.onDidCreateMarker(bufferMarker => {
+    const subscription = this.bufferMarkerLayer.onDidCreateMarker((bufferMarker) => {
       return callback(this.getMarker(bufferMarker.id));
     });
     // Track the subscription so it doesn't outlive this layer when the
@@ -195,9 +199,7 @@ class DisplayMarkerLayer {
   markScreenPosition(screenPosition, options) {
     screenPosition = Point.fromObject(screenPosition);
     const bufferPosition = this.displayLayer.translateScreenPosition(screenPosition, options);
-    return this.getMarker(
-      this.bufferMarkerLayer.markPosition(bufferPosition, options).id
-    );
+    return this.getMarker(this.bufferMarkerLayer.markPosition(bufferPosition, options).id);
   }
 
   // Public: Create a marker with the given buffer range.
@@ -231,9 +233,7 @@ class DisplayMarkerLayer {
   // Returns a {DisplayMarker}.
   markBufferRange(bufferRange, options) {
     bufferRange = Range.fromObject(bufferRange);
-    return this.getMarker(
-      this.bufferMarkerLayer.markRange(bufferRange, options).id
-    );
+    return this.getMarker(this.bufferMarkerLayer.markRange(bufferRange, options).id);
   }
 
   // Public: Create a marker on this layer with its head at the given buffer
@@ -265,10 +265,7 @@ class DisplayMarkerLayer {
   // Returns a {DisplayMarker}.
   markBufferPosition(bufferPosition, options) {
     return this.getMarker(
-      this.bufferMarkerLayer.markPosition(
-        Point.fromObject(bufferPosition),
-        options
-      ).id
+      this.bufferMarkerLayer.markPosition(Point.fromObject(bufferPosition), options).id,
     );
   }
 
@@ -282,7 +279,9 @@ class DisplayMarkerLayer {
   getMarker(id) {
     id = parseInt(id);
     const displayMarker = this.markersById.get(id);
-    if (displayMarker) { return displayMarker; }
+    if (displayMarker) {
+      return displayMarker;
+    }
     const bufferMarker = this.bufferMarkerLayer.getMarker(id);
     if (bufferMarker) {
       const marker = new DisplayMarker(this, bufferMarker);
@@ -295,9 +294,7 @@ class DisplayMarkerLayer {
   //
   // Returns an {Array} of {DisplayMarker}s.
   getMarkers() {
-    return this.bufferMarkerLayer.getMarkers().map(
-      ({ id }) => this.getMarker(id)
-    );
+    return this.bufferMarkerLayer.getMarkers().map(({ id }) => this.getMarker(id));
   }
 
   // Public: Get the number of markers in the marker layer.
@@ -344,9 +341,9 @@ class DisplayMarkerLayer {
   // Returns an {Array} of {DisplayMarker}s
   findMarkers(params) {
     params = this.translateToBufferMarkerLayerFindParams(params);
-    return this.bufferMarkerLayer.findMarkers(params).map(
-      stringMarker => this.getMarker(stringMarker.id)
-    );
+    return this.bufferMarkerLayer
+      .findMarkers(params)
+      .map((stringMarker) => this.getMarker(stringMarker.id));
   }
 
   /*
@@ -370,7 +367,7 @@ class DisplayMarkerLayer {
   }
 
   emitDidUpdate() {
-    return this.emitter.emit('did-update');
+    return this.emitter.emit("did-update");
   }
 
   notifyObserversIfMarkerScreenPositionsChanged() {
@@ -396,88 +393,90 @@ class DisplayMarkerLayer {
     for (let key in params) {
       let value = params[key];
       switch (key) {
-        case 'startBufferPosition':
-          key = 'startPosition';
+        case "startBufferPosition":
+          key = "startPosition";
           break;
-        case 'endBufferPosition':
-          key = 'endPosition';
+        case "endBufferPosition":
+          key = "endPosition";
           break;
-        case 'startScreenPosition':
-          key = 'startPosition';
+        case "startScreenPosition":
+          key = "startPosition";
           value = this.displayLayer.translateScreenPosition(value);
           break;
-        case 'endScreenPosition':
-          key = 'endPosition';
+        case "endScreenPosition":
+          key = "endPosition";
           value = this.displayLayer.translateScreenPosition(value);
           break;
-        case 'startsInBufferRange':
-          key = 'startsInRange';
+        case "startsInBufferRange":
+          key = "startsInRange";
           break;
-        case 'endsInBufferRange':
-          key = 'endsInRange';
+        case "endsInBufferRange":
+          key = "endsInRange";
           break;
-        case 'startsInScreenRange':
-          key = 'startsInRange';
+        case "startsInScreenRange":
+          key = "startsInRange";
           value = this.displayLayer.translateScreenRange(value);
           break;
-        case 'endsInScreenRange':
-          key = 'endsInRange';
+        case "endsInScreenRange":
+          key = "endsInRange";
           value = this.displayLayer.translateScreenRange(value);
           break;
-        case 'startBufferRow':
-          key = 'startRow';
+        case "startBufferRow":
+          key = "startRow";
           break;
-        case 'endBufferRow':
-          key = 'endRow';
+        case "endBufferRow":
+          key = "endRow";
           break;
-        case 'startScreenRow':
-          key = 'startsInRange';
+        case "startScreenRow":
+          key = "startsInRange";
           var startBufferPosition = this.displayLayer.translateScreenPosition(Point(value, 0));
           var endBufferPosition = this.displayLayer.translateScreenPosition(Point(value, Infinity));
           value = Range(startBufferPosition, endBufferPosition);
           break;
-        case 'endScreenRow':
-          key = 'endsInRange';
+        case "endScreenRow":
+          key = "endsInRange";
           startBufferPosition = this.displayLayer.translateScreenPosition(Point(value, 0));
           endBufferPosition = this.displayLayer.translateScreenPosition(Point(value, Infinity));
           value = Range(startBufferPosition, endBufferPosition);
           break;
-        case 'intersectsBufferRowRange':
-          key = 'intersectsRowRange';
+        case "intersectsBufferRowRange":
+          key = "intersectsRowRange";
           break;
-        case 'intersectsScreenRowRange':
-          key = 'intersectsRange';
+        case "intersectsScreenRowRange":
+          key = "intersectsRange";
           var [startScreenRow, endScreenRow] = Array.from(value);
           startBufferPosition = this.displayLayer.translateScreenPosition(Point(startScreenRow, 0));
-          endBufferPosition = this.displayLayer.translateScreenPosition(Point(endScreenRow, Infinity));
+          endBufferPosition = this.displayLayer.translateScreenPosition(
+            Point(endScreenRow, Infinity),
+          );
           value = Range(startBufferPosition, endBufferPosition);
           break;
-        case 'containsBufferRange':
-          key = 'containsRange';
+        case "containsBufferRange":
+          key = "containsRange";
           break;
-        case 'containsScreenRange':
-          key = 'containsRange';
+        case "containsScreenRange":
+          key = "containsRange";
           value = this.displayLayer.translateScreenRange(value);
           break;
-        case 'containsBufferPosition':
-          key = 'containsPosition';
+        case "containsBufferPosition":
+          key = "containsPosition";
           break;
-        case 'containsScreenPosition':
-          key = 'containsPosition';
+        case "containsScreenPosition":
+          key = "containsPosition";
           value = this.displayLayer.translateScreenPosition(value);
           break;
-        case 'containedInBufferRange':
-          key = 'containedInRange';
+        case "containedInBufferRange":
+          key = "containedInRange";
           break;
-        case 'containedInScreenRange':
-          key = 'containedInRange';
+        case "containedInScreenRange":
+          key = "containedInRange";
           value = this.displayLayer.translateScreenRange(value);
           break;
-        case 'intersectsBufferRange':
-          key = 'intersectsRange';
+        case "intersectsBufferRange":
+          key = "intersectsRange";
           break;
-        case 'intersectsScreenRange':
-          key = 'intersectsRange';
+        case "intersectsScreenRange":
+          key = "intersectsRange";
           value = this.displayLayer.translateScreenRange(value);
           break;
       }

@@ -1,9 +1,9 @@
-const {Emitter} = require('event-kit');
+const { Emitter } = require("event-kit");
 const Point = require("./point");
 const Range = require("./range");
 const Marker = require("./marker");
-const {MarkerIndex} = require("@lumine-code/superstring")
-const {intersectSet} = require("./set-helpers");
+const { MarkerIndex } = require("@lumine-code/superstring");
+const { intersectSet } = require("./set-helpers");
 const SerializationVersion = 2;
 
 // Public: *Experimental:* A container for a related set of markers.
@@ -27,7 +27,7 @@ class MarkerLayer {
         markerSnapshot = markerSnapshots[markerId];
         result[layerId][markerId] = {
           ...markerSnapshot,
-          range: Range.fromObject(markerSnapshot.range)
+          range: Range.fromObject(markerSnapshot.range),
         };
       }
     }
@@ -40,12 +40,7 @@ class MarkerLayer {
   constructor(
     delegate,
     id,
-    {
-      destroyInvalidatedMarkers = false,
-      maintainHistory = false,
-      persistent = false,
-      role
-    } = {}
+    { destroyInvalidatedMarkers = false, maintainHistory = false, persistent = false, role } = {},
   ) {
     this.delegate = delegate;
     this.id = id;
@@ -74,7 +69,7 @@ class MarkerLayer {
       destroyInvalidatedMarkers: this.destroyInvalidatedMarkers,
       maintainHistory: this.maintainHistory,
       persistent: this.persistent,
-      role: this.role
+      role: this.role,
     });
     for (let marker of this.markersById.values()) {
       let snapshot = marker.getSnapshot(null);
@@ -93,24 +88,24 @@ class MarkerLayer {
     // display layer that owns this layer calls back into this method.
     this.destroyed = true;
     this.delegate.markerLayerDestroyed(this);
-    this.displayMarkerLayers.forEach(function(displayMarkerLayer) {
+    this.displayMarkerLayers.forEach(function (displayMarkerLayer) {
       return displayMarkerLayer.destroy();
     });
     this.displayMarkerLayers.clear();
-    this.emitter.emit('did-destroy');
+    this.emitter.emit("did-destroy");
     return this.emitter.clear();
   }
 
   // Public: Remove all markers from this layer.
   clear() {
-    this.markersWithDestroyListeners.forEach(function(marker) {
+    this.markersWithDestroyListeners.forEach(function (marker) {
       // Suppress the per-marker update events; a single one is emitted below.
       return marker.destroy(true);
     });
     this.markersWithDestroyListeners.clear();
     this.markersById = new Map();
     this.index = new MarkerIndex();
-    this.displayMarkerLayers.forEach(function(layer) {
+    this.displayMarkerLayers.forEach(function (layer) {
       return layer.didClearBufferMarkerLayer();
     });
     return this.delegate.markersUpdated(this);
@@ -160,53 +155,59 @@ class MarkerLayer {
     for (let [key, value] of Object.entries(params)) {
       let start, end, position;
       switch (key) {
-        case 'startPosition':
-          markerIds = filterSet(
-            markerIds,
-            this.index.findStartingAt(Point.fromObject(value))
-          );
+        case "startPosition":
+          markerIds = filterSet(markerIds, this.index.findStartingAt(Point.fromObject(value)));
           break;
-        case 'endPosition':
-          markerIds = filterSet(
-            markerIds,
-            this.index.findEndingAt(Point.fromObject(value))
-          );
+        case "endPosition":
+          markerIds = filterSet(markerIds, this.index.findEndingAt(Point.fromObject(value)));
           break;
-        case 'startsInRange':
-          ({start, end} = Range.fromObject(value));
+        case "startsInRange":
+          ({ start, end } = Range.fromObject(value));
           markerIds = filterSet(markerIds, this.index.findStartingIn(start, end));
           break;
-        case 'endsInRange':
-          ({start, end} = Range.fromObject(value));
+        case "endsInRange":
+          ({ start, end } = Range.fromObject(value));
           markerIds = filterSet(markerIds, this.index.findEndingIn(start, end));
           break;
-        case 'containsPoint':
-        case 'containsPosition':
+        case "containsPoint":
+        case "containsPosition":
           position = Point.fromObject(value);
           markerIds = filterSet(markerIds, this.index.findContaining(position, position));
           break;
-        case 'containsRange':
-          ({start, end} = Range.fromObject(value));
+        case "containsRange":
+          ({ start, end } = Range.fromObject(value));
           markerIds = filterSet(markerIds, this.index.findContaining(start, end));
           break;
-        case 'intersectsRange':
-          ({start, end} = Range.fromObject(value));
+        case "intersectsRange":
+          ({ start, end } = Range.fromObject(value));
           markerIds = filterSet(markerIds, this.index.findIntersecting(start, end));
           break;
-        case 'startRow':
-          markerIds = filterSet(markerIds, this.index.findStartingIn(Point(value, 0), Point(value, 2e308)));
+        case "startRow":
+          markerIds = filterSet(
+            markerIds,
+            this.index.findStartingIn(Point(value, 0), Point(value, 2e308)),
+          );
           break;
-        case 'endRow':
-          markerIds = filterSet(markerIds, this.index.findEndingIn(Point(value, 0), Point(value, 2e308)));
+        case "endRow":
+          markerIds = filterSet(
+            markerIds,
+            this.index.findEndingIn(Point(value, 0), Point(value, 2e308)),
+          );
           break;
-        case 'intersectsRow':
-          markerIds = filterSet(markerIds, this.index.findIntersecting(Point(value, 0), Point(value, 2e308)));
+        case "intersectsRow":
+          markerIds = filterSet(
+            markerIds,
+            this.index.findIntersecting(Point(value, 0), Point(value, 2e308)),
+          );
           break;
-        case 'intersectsRowRange':
-          markerIds = filterSet(markerIds, this.index.findIntersecting(Point(value[0], 0), Point(value[1], 2e308)));
+        case "intersectsRowRange":
+          markerIds = filterSet(
+            markerIds,
+            this.index.findIntersecting(Point(value[0], 0), Point(value[1], 2e308)),
+          );
           break;
-        case 'containedInRange':
-          ({start, end} = Range.fromObject(value));
+        case "containedInRange":
+          ({ start, end } = Range.fromObject(value));
           markerIds = filterSet(markerIds, this.index.findContainedIn(start, end));
           break;
         default:
@@ -224,7 +225,7 @@ class MarkerLayer {
     }
     // Tiebreak equal ranges by id so the order doesn't depend on the
     // insertion order of `markersById`.
-    result.sort((a, b) => a.compare(b) || (a.id - b.id));
+    result.sort((a, b) => a.compare(b) || a.id - b.id);
     return result;
   }
 
@@ -324,7 +325,7 @@ class MarkerLayer {
 
   // Returns a {Disposable}.
   onDidUpdate(callback) {
-    return this.emitter.on('did-update', callback);
+    return this.emitter.on("did-update", callback);
   }
 
   // Public: Subscribe to be notified synchronously whenever markers are created
@@ -340,14 +341,14 @@ class MarkerLayer {
   // Returns a {Disposable}.
   onDidCreateMarker(callback) {
     this.emitCreateMarkerEvents = true;
-    return this.emitter.on('did-create-marker', callback);
+    return this.emitter.on("did-create-marker", callback);
   }
 
   // Public: Subscribe to be notified synchronously when this layer is destroyed.
 
   // Returns a {Disposable}.
   onDidDestroy(callback) {
-    return this.emitter.on('did-destroy', callback);
+    return this.emitter.on("did-destroy", callback);
   }
 
   /*
@@ -390,7 +391,7 @@ class MarkerLayer {
           this.index.insert(marker.id, range.start, range.end);
           marker.update(marker.getRange(), snapshot, true, true);
           if (this.emitCreateMarkerEvents) {
-            this.emitter.emit('did-create-marker', marker);
+            this.emitter.emit("did-create-marker", marker);
           }
         } else {
           this.createMarker(snapshot.range, snapshot, true);
@@ -416,8 +417,9 @@ class MarkerLayer {
   }
 
   emitChangeEvents(snapshot) {
-    this.markersWithChangeListeners.forEach(function(marker) {
-      if (!marker.isDestroyed()) { // event handlers could destroy markers
+    this.markersWithChangeListeners.forEach(function (marker) {
+      if (!marker.isDestroyed()) {
+        // event handlers could destroy markers
         return marker.emitChangeEvent(snapshot?.[marker.id]?.range, true, false);
       }
     });
@@ -435,7 +437,7 @@ class MarkerLayer {
       role: this.role,
       persistent: this.persistent,
       markersById,
-      version: SerializationVersion
+      version: SerializationVersion,
     };
   }
 
@@ -473,7 +475,7 @@ class MarkerLayer {
       this.index.remove(marker.id);
       this.markersWithChangeListeners.delete(marker);
       this.markersWithDestroyListeners.delete(marker);
-      this.displayMarkerLayers.forEach(function(displayMarkerLayer) {
+      this.displayMarkerLayers.forEach(function (displayMarkerLayer) {
         displayMarkerLayer.destroyMarker(marker.id);
       });
       if (!suppressMarkerLayerUpdateEvents) {
@@ -504,7 +506,7 @@ class MarkerLayer {
 
   setMarkerRange(id, range) {
     id = parseInt(id);
-    let {start, end} = Range.fromObject(range);
+    let { start, end } = Range.fromObject(range);
     start = this.delegate.clipPosition(start);
     end = this.delegate.clipPosition(end);
     this.index.remove(id);
@@ -524,7 +526,7 @@ class MarkerLayer {
     }
     marker.trackDestruction = this.trackDestructionInOnDidCreateMarkerCallbacks ?? false;
     if (this.emitCreateMarkerEvents) {
-      this.emitter.emit('did-create-marker', marker);
+      this.emitter.emit("did-create-marker", marker);
     }
     marker.trackDestruction = false;
     return marker;
@@ -545,10 +547,9 @@ class MarkerLayer {
   }
 
   emitUpdateEvent() {
-    return this.emitter.emit('did-update');
+    return this.emitter.emit("did-update");
   }
-
-};
+}
 
 function filterSet(set1, set2) {
   if (set1) {
@@ -557,6 +558,6 @@ function filterSet(set1, set2) {
   } else {
     return set2;
   }
-};
+}
 
 module.exports = MarkerLayer;

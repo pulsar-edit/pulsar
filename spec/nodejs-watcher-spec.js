@@ -1,11 +1,7 @@
 const temp = require("temp");
 const fs = require("fs");
 const path = require("path");
-const {
-  watch,
-  getWatchedPaths,
-  closeAllNodejsWatchers,
-} = require("../src/nodejs-watcher");
+const { watch, getWatchedPaths, closeAllNodejsWatchers } = require("../src/nodejs-watcher");
 const { conditionPromise } = require("./helpers/async-spec-helpers");
 
 temp.track();
@@ -35,7 +31,9 @@ describe("NodejsWatcher", () => {
   });
 
   function watchFor(target, events) {
-    const w = watch(target, (type, eventPath, oldPath) => events.push({ type, path: eventPath, oldPath }));
+    const w = watch(target, (type, eventPath, oldPath) =>
+      events.push({ type, path: eventPath, oldPath }),
+    );
     watchers.push(w);
     return w;
   }

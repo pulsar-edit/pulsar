@@ -93,10 +93,7 @@ module.exports = class Clipboard {
 
     try {
       const text = clipboardData.getData("text/plain");
-      const lumineData = this.readDataTransferData(
-        clipboardData,
-        LUMINE_TEXT_EDITOR_DATA_FORMAT,
-      );
+      const lumineData = this.readDataTransferData(clipboardData, LUMINE_TEXT_EDITOR_DATA_FORMAT);
       const lumineMetadata = this.metadataFromLumineEditorData(lumineData, text);
       // A Lumine payload that fails validation is stale, and the VS Code copy
       // metadata written alongside it carries no signature, so it is equally
@@ -130,11 +127,7 @@ module.exports = class Clipboard {
     clipboardData.setData("text/plain", text);
     clipboardData.setData(VSCODE_COPY_METADATA_FORMAT, JSON.stringify(copyMetadata));
     if (lumineData) {
-      this.writeDataTransferData(
-        clipboardData,
-        LUMINE_TEXT_EDITOR_DATA_FORMAT,
-        lumineData,
-      );
+      this.writeDataTransferData(clipboardData, LUMINE_TEXT_EDITOR_DATA_FORMAT, lumineData);
     }
 
     this.signatureForMetadata = this.md5(text);
@@ -162,9 +155,7 @@ module.exports = class Clipboard {
       ? selections.length > 0 && selections.every((selection) => selection?.fullLine === true)
       : metadata?.fullLine === true;
     const multicursorText =
-      selections && selections.length > 1
-        ? selections.map((selection) => selection.text)
-        : null;
+      selections && selections.length > 1 ? selections.map((selection) => selection.text) : null;
 
     return {
       defaultPastePayload: {

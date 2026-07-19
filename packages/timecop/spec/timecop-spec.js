@@ -2,7 +2,9 @@ const path = require("path");
 const CompileCache = require(
   path.join(atom.getLoadSettings().resourcePath, "src", "compile-cache"),
 );
-const CSON = require(path.join(atom.getLoadSettings().resourcePath, "node_modules", "@lumine-code", "season"));
+const CSON = require(
+  path.join(atom.getLoadSettings().resourcePath, "node_modules", "@lumine-code", "season"),
+);
 
 const { it, fit, ffit, beforeEach, afterEach } = require("./async-spec-helpers"); // eslint-disable-line no-unused-vars
 

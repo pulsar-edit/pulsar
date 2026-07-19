@@ -36,9 +36,7 @@ module.exports = class ProviderManager {
       ),
     );
     this.subscriptions.add(
-      atom.config.observe("autocomplete.scopeBlacklist", (value) =>
-        this.setGlobalBlacklist(value),
-      ),
+      atom.config.observe("autocomplete.scopeBlacklist", (value) => this.setGlobalBlacklist(value)),
     );
   }
 

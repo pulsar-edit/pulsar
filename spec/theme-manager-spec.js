@@ -423,10 +423,7 @@ h2 {
         let didChangeActiveThemesHandler = jasmine.createSpy();
         atom.themes.onDidChangeActiveThemes(didChangeActiveThemesHandler);
 
-        setActiveThemes([
-          "theme-with-incomplete-ui-variables",
-          "theme-with-syntax-variables",
-        ]);
+        setActiveThemes(["theme-with-incomplete-ui-variables", "theme-with-syntax-variables"]);
 
         await waitForCondition(() => {
           return didChangeActiveThemesHandler.calls.count() > 0;

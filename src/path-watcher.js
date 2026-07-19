@@ -897,7 +897,11 @@ function watchFile(filePath) {
     currentPath = target;
     const previous = watcherPromise;
     watcherPromise = attach(target);
-    if (previous) previous.then((watcher) => watcher.dispose(), () => {});
+    if (previous)
+      previous.then(
+        (watcher) => watcher.dispose(),
+        () => {},
+      );
   };
 
   watcherPromise = attach(currentPath);
@@ -928,7 +932,10 @@ function watchFile(filePath) {
       disposed = true;
       emitter.dispose();
       if (watcherPromise) {
-        watcherPromise.then((watcher) => watcher.dispose(), () => {});
+        watcherPromise.then(
+          (watcher) => watcher.dispose(),
+          () => {},
+        );
       }
     },
   };

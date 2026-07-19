@@ -85,8 +85,7 @@ function parseDiffPatch(patchText) {
 
   for (const rawLine of String(patchText).split("\n")) {
     if (hunk && (rawLine.startsWith("+") || rawLine.startsWith("-") || rawLine.startsWith(" "))) {
-      const kind =
-        rawLine[0] === "+" ? "added" : rawLine[0] === "-" ? "deleted" : "context";
+      const kind = rawLine[0] === "+" ? "added" : rawLine[0] === "-" ? "deleted" : "context";
       hunk.lines.push(Object.freeze({ kind, text: rawLine.slice(1) }));
       continue;
     }

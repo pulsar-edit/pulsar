@@ -167,7 +167,9 @@ mark,
 
   code {
     color: var(--text-color-info);
-    background: rgb(from var(--background-color-info) r g b / calc(alpha - 0.8)); /* fadeout(@background-color-info, 80%) */
+    background: rgb(
+      from var(--background-color-info) r g b / calc(alpha - 0.8)
+    ); /* fadeout(@background-color-info, 80%) */
   }
 
   a,
@@ -307,7 +309,9 @@ mark,
   font-weight: bold;
   border-radius: var(--component-border-radius);
   color: #fff;
-  background-color: rgb(from var(--background-color-info) r g b / calc(alpha - 0.5)); /* fadeout(@background-color-info, 50%) */
+  background-color: rgb(
+    from var(--background-color-info) r g b / calc(alpha - 0.5)
+  ); /* fadeout(@background-color-info, 50%) */
 }
 .highlight-warning {
   font-weight: bold;

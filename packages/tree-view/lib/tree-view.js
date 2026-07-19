@@ -347,8 +347,7 @@ class TreeView {
 
       "tree-view:unfocus": () => this.unfocus(),
 
-      "tree-view:toggle-vcs-ignored-files": () =>
-        toggleConfig(`tree-view.hideVcsIgnoredFiles`),
+      "tree-view:toggle-vcs-ignored-files": () => toggleConfig(`tree-view.hideVcsIgnoredFiles`),
       "tree-view:toggle-ignored-names": () => toggleConfig(`tree-view.hideIgnoredNames`),
       "tree-view:remove-project-folder": (e) => this.removeProjectFolder(e),
     });
@@ -862,8 +861,7 @@ class TreeView {
 
   activateSelectedEmptyViewControl() {
     let control =
-      this.selectedEmptyViewControl() ??
-      this.selectEmptyViewControl(this.emptyViewControls()[0]);
+      this.selectedEmptyViewControl() ?? this.selectEmptyViewControl(this.emptyViewControls()[0]);
     return control?.click();
   }
 

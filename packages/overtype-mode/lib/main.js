@@ -62,9 +62,7 @@ module.exports = {
       editor.setOvertypeMode(true);
     }
     this.updateEditorClass(editor);
-    this.editorSubs.add(
-      editor.onDidChangeOvertypeMode(() => this.updateEditorClass(editor)),
-    );
+    this.editorSubs.add(editor.onDidChangeOvertypeMode(() => this.updateEditorClass(editor)));
   },
 
   /**

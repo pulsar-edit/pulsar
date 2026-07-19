@@ -14,8 +14,7 @@
 // by building a CustomEvent directly, then injecting this object into the
 // prototype chain by setting its __proto__ property.
 let CommandEvent;
-module.exports =
-(CommandEvent = (function() {
+module.exports = CommandEvent = (function () {
   CommandEvent = class CommandEvent extends CustomEvent {
     static initClass() {
       this.prototype.keyBindingAborted = false;
@@ -24,7 +23,7 @@ module.exports =
 
     abortKeyBinding() {
       this.stopImmediatePropagation();
-      return this.keyBindingAborted = true;
+      return (this.keyBindingAborted = true);
     }
 
     stopPropagation() {
@@ -39,4 +38,4 @@ module.exports =
   };
   CommandEvent.initClass();
   return CommandEvent;
-})());
+})();

@@ -63,7 +63,10 @@ describe("ThemesPanel", function () {
       waitsFor(() => reloadedHandler.callCount === 2);
       runs(function () {
         expect(atom.config.get("theme.dark")).toEqual(["one-day-ui", "one-night-syntax"]);
-        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).toEqual(["one-day-ui", "one-night-syntax"]);
+        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).toEqual([
+          "one-day-ui",
+          "one-night-syntax",
+        ]);
       });
     }));
 
@@ -80,7 +83,10 @@ describe("ThemesPanel", function () {
       );
       runs(function () {
         expect(atom.config.get("theme.light")).toEqual(["one-day-ui", "one-night-syntax"]);
-        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).toEqual(["one-night-ui", "one-night-syntax"]);
+        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).toEqual([
+          "one-night-ui",
+          "one-night-syntax",
+        ]);
         expect(reloadedHandler.callCount).toBe(0);
       });
     }));
@@ -93,7 +99,10 @@ describe("ThemesPanel", function () {
       waitsFor(() => reloadedHandler.callCount === 2);
       runs(function () {
         expect(atom.config.get("theme.mode")).toBe("light");
-        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).toEqual(["one-day-ui", "one-day-syntax"]);
+        expect(atom.config.get(atom.themes.getActiveThemesKeyPath())).toEqual([
+          "one-day-ui",
+          "one-day-syntax",
+        ]);
         expect(panel.refs.lightActiveBadge.style.display).toBe("");
         expect(panel.refs.darkActiveBadge.style.display).toBe("none");
       });

@@ -94,10 +94,18 @@ atom-dock.right .settings-view {
   .package-card {
     padding: var(--component-padding);
     font-size: inherit;
-    background-color: color-mix(in srgb, var(--tool-panel-background-color) 25%, var(--base-background-color));
+    background-color: color-mix(
+      in srgb,
+      var(--tool-panel-background-color) 25%,
+      var(--base-background-color)
+    );
 
     &:hover {
-      background-color: color-mix(in srgb, var(--tool-panel-background-color) 75%, var(--base-background-color));
+      background-color: color-mix(
+        in srgb,
+        var(--tool-panel-background-color) 75%,
+        var(--base-background-color)
+      );
     }
 
     .package-name {

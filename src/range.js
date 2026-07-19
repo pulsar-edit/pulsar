@@ -1,4 +1,4 @@
-const Point = require('./point');
+const Point = require("./point");
 let newlineRegex = null;
 
 function __range__(left, right, inclusive) {
@@ -40,11 +40,15 @@ class Range {
   // Returns: A {Range} based on the given object.
   static fromObject(object, copy) {
     if (Array.isArray(object)) {
-      return new (this)(object[0], object[1]);
+      return new this(object[0], object[1]);
     } else if (object instanceof this) {
-      if (copy) { return object.copy(); } else { return object; }
+      if (copy) {
+        return object.copy();
+      } else {
+        return object;
+      }
     } else {
-      return new (this)(object.start, object.end);
+      return new this(object.start, object.end);
     }
   }
 
@@ -59,9 +63,9 @@ class Range {
   // Returns: A {Range}
   static fromText(...args) {
     let startPoint;
-    if (newlineRegex == null) { ({
-      newlineRegex
-    } = require('./helpers')); }
+    if (newlineRegex == null) {
+      ({ newlineRegex } = require("./helpers"));
+    }
 
     if (args.length > 1) {
       startPoint = Point.fromObject(args.shift());
@@ -78,7 +82,7 @@ class Range {
     } else {
       endPoint.column += lines[0].length;
     }
-    return new (this)(startPoint, endPoint);
+    return new this(startPoint, endPoint);
   }
 
   // Returns a {Range} that starts at the given point and ends at the
@@ -92,14 +96,13 @@ class Range {
   static fromPointWithDelta(startPoint, rowDelta, columnDelta) {
     startPoint = Point.fromObject(startPoint);
     const endPoint = new Point(startPoint.row + rowDelta, startPoint.column + columnDelta);
-    return new (this)(startPoint, endPoint);
+    return new this(startPoint, endPoint);
   }
 
   static fromPointWithTraversalExtent(startPoint, extent) {
     startPoint = Point.fromObject(startPoint);
-    return new (this)(startPoint, startPoint.traverse(extent));
+    return new this(startPoint, startPoint.traverse(extent));
   }
-
 
   /*
   Section: Serialization and Deserialization
@@ -110,9 +113,9 @@ class Range {
   // * `array` {Array} of params to pass to the {::constructor}
   static deserialize(array) {
     if (Array.isArray(array)) {
-      return new (this)(array[0], array[1]);
+      return new this(array[0], array[1]);
     } else {
-      return new (this)();
+      return new this();
     }
   }
 
@@ -125,8 +128,12 @@ class Range {
   // * `pointA` {Point} or Point compatible {Array} (default: [0,0])
   // * `pointB` {Point} or Point compatible {Array} (default: [0,0])
   constructor(pointA, pointB) {
-    if (pointA == null) { pointA = new Point(0, 0); }
-    if (pointB == null) { pointB = new Point(0, 0); }
+    if (pointA == null) {
+      pointA = new Point(0, 0);
+    }
+    if (pointB == null) {
+      pointB = new Point(0, 0);
+    }
     if (!(this instanceof Range)) {
       return new Range(pointA, pointB);
     }
@@ -183,7 +190,7 @@ class Range {
   //
   // Returns a {Number}.
   getRowCount() {
-    return (this.end.row - this.start.row) + 1;
+    return this.end.row - this.start.row + 1;
   }
 
   // Public: Returns an array of all rows in the range.
@@ -223,7 +230,9 @@ class Range {
   //
   // Returns a {Range}.
   translate(startDelta, endDelta) {
-    if (endDelta == null) { endDelta = startDelta; }
+    if (endDelta == null) {
+      endDelta = startDelta;
+    }
     return new this.constructor(this.start.translate(startDelta), this.end.translate(endDelta));
   }
 
@@ -266,7 +275,9 @@ class Range {
   //
   // * `other` A {Range} or range-compatible {Array}.
   isEqual(other) {
-    if (other == null) { return false; }
+    if (other == null) {
+      return false;
+    }
     other = this.constructor.fromObject(other);
     return other.start.isEqual(this.start) && other.end.isEqual(this.end);
   }
@@ -276,7 +287,7 @@ class Range {
   //
   // * `other` A {Range} or range-compatible {Array}.
   coversSameRows(other) {
-    return (this.start.row === other.start.row) && (this.end.row === other.end.row);
+    return this.start.row === other.start.row && this.end.row === other.end.row;
   }
 
   // Public: Determines whether this range intersects with the argument.
@@ -288,7 +299,10 @@ class Range {
   // Returns a {Boolean}.
   intersectsWith(otherRange, exclusive) {
     if (exclusive) {
-      return !(this.end.isLessThanOrEqual(otherRange.start) || this.start.isGreaterThanOrEqual(otherRange.end));
+      return !(
+        this.end.isLessThanOrEqual(otherRange.start) ||
+        this.start.isGreaterThanOrEqual(otherRange.end)
+      );
     } else {
       return !(this.end.isLessThan(otherRange.start) || this.start.isGreaterThan(otherRange.end));
     }
@@ -301,7 +315,7 @@ class Range {
   // * `exclusive` (optional) {Boolean} including that the containment should be exclusive of
   //   endpoints. Defaults to false.
   containsRange(otherRange, exclusive) {
-    const {start, end} = this.constructor.fromObject(otherRange);
+    const { start, end } = this.constructor.fromObject(otherRange);
     return this.containsPoint(start, exclusive) && this.containsPoint(end, exclusive);
   }
 
@@ -334,8 +348,10 @@ class Range {
   // * `startRow` {Number} start row
   // * `endRow` {Number} end row
   intersectsRowRange(startRow, endRow) {
-    if (startRow > endRow) { [startRow, endRow] = [endRow, startRow]; }
-    return (this.end.row >= startRow) && (endRow >= this.start.row);
+    if (startRow > endRow) {
+      [startRow, endRow] = [endRow, startRow];
+    }
+    return this.end.row >= startRow && endRow >= this.start.row;
   }
 
   getExtent() {
@@ -366,14 +382,14 @@ class Range {
 // ES5 classes differ from their predecessors in that you are not allowed to
 // call them like ordinary functions. Hence we must write this wrapper function
 // which delegates to `new Range` whether it was called with `new` or not.
-function _Range (...args) {
+function _Range(...args) {
   return new Range(...args);
-};
-_Range.displayName = 'Range';
+}
+_Range.displayName = "Range";
 _Range.prototype = Range.prototype;
 Object.assign(_Range.prototype, {
   start: null,
-  end: null
+  end: null,
 });
 // Make the wrapper inherit the parent's static methods.
 Object.setPrototypeOf(_Range, Range);

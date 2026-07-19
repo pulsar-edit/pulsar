@@ -1520,7 +1520,8 @@ module.exports = class TextEditorComponent {
         pixelWidth = this.getBaseCharacterWidth();
       } else {
         const nextPixelLeft = this.pixelLeftForRowAndColumn(row, column + 1);
-        pixelWidth = nextPixelLeft == null ? this.getBaseCharacterWidth() : nextPixelLeft - pixelLeft;
+        pixelWidth =
+          nextPixelLeft == null ? this.getBaseCharacterWidth() : nextPixelLeft - pixelLeft;
       }
 
       const cursorPosition = {
@@ -1977,8 +1978,7 @@ module.exports = class TextEditorComponent {
       this.props.model.copySelectedText(clipboard);
     }
 
-    const matchesPendingOperation =
-      operation && operation.type === (isCut ? "cut" : "copy");
+    const matchesPendingOperation = operation && operation.type === (isCut ? "cut" : "copy");
     if (clipboard.didWrite() || matchesPendingOperation) {
       event.preventDefault();
       if (matchesPendingOperation) operation.handled = true;
@@ -5059,8 +5059,12 @@ class LineComponent {
   }
 
   destroy() {
-    const { nodePool, lineComponentsByScreenLineId, horizontalPixelPositionsByScreenLineId, screenLine } =
-      this.props;
+    const {
+      nodePool,
+      lineComponentsByScreenLineId,
+      horizontalPixelPositionsByScreenLineId,
+      screenLine,
+    } = this.props;
 
     if (lineComponentsByScreenLineId.get(screenLine.id) === this) {
       lineComponentsByScreenLineId.delete(screenLine.id);

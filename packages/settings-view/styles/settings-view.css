@@ -101,7 +101,11 @@
 
   .alert-info {
     /* .alert-type(@text-color-info; @background-color-info) */
-    --alert-background-color: color-mix(in srgb, var(--background-color-info) 10%, var(--base-background-color));
+    --alert-background-color: color-mix(
+      in srgb,
+      var(--background-color-info) 10%,
+      var(--base-background-color)
+    );
     color: hsl(from var(--text-color-info) h s calc(l - 20));
     border-color: hsl(from var(--alert-background-color) h s calc(l - 10));
     background-color: var(--alert-background-color);
@@ -117,7 +121,11 @@
   }
   .alert-success {
     /* .alert-type(@text-color-success; @background-color-success) */
-    --alert-background-color: color-mix(in srgb, var(--background-color-success) 10%, var(--base-background-color));
+    --alert-background-color: color-mix(
+      in srgb,
+      var(--background-color-success) 10%,
+      var(--base-background-color)
+    );
     color: hsl(from var(--text-color-success) h s calc(l - 20));
     border-color: hsl(from var(--alert-background-color) h s calc(l - 10));
     background-color: var(--alert-background-color);
@@ -133,7 +141,11 @@
   }
   .alert-warning {
     /* .alert-type(@text-color-warning; @background-color-warning) */
-    --alert-background-color: color-mix(in srgb, var(--background-color-warning) 10%, var(--base-background-color));
+    --alert-background-color: color-mix(
+      in srgb,
+      var(--background-color-warning) 10%,
+      var(--base-background-color)
+    );
     color: hsl(from var(--text-color-warning) h s calc(l - 20));
     border-color: hsl(from var(--alert-background-color) h s calc(l - 10));
     background-color: var(--alert-background-color);
@@ -150,7 +162,11 @@
   .alert-error,
   .alert-danger {
     /* .alert-type(@text-color-error; @background-color-error) */
-    --alert-background-color: color-mix(in srgb, var(--background-color-error) 10%, var(--base-background-color));
+    --alert-background-color: color-mix(
+      in srgb,
+      var(--background-color-error) 10%,
+      var(--base-background-color)
+    );
     color: hsl(from var(--text-color-error) h s calc(l - 20));
     border-color: hsl(from var(--alert-background-color) h s calc(l - 10));
     background-color: var(--alert-background-color);
@@ -176,7 +192,11 @@
 
     .error-details {
       /* .alert-type(@text-color-error; @background-color-error) */
-      --alert-background-color: color-mix(in srgb, var(--background-color-error) 10%, var(--base-background-color));
+      --alert-background-color: color-mix(
+        in srgb,
+        var(--background-color-error) 10%,
+        var(--base-background-color)
+      );
       color: hsl(from var(--text-color-error) h s calc(l - 20));
       border-color: hsl(from var(--alert-background-color) h s calc(l - 10));
       background-color: var(--alert-background-color);

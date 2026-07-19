@@ -73,7 +73,13 @@ describe("ModuleCache", function () {
           {
             name: "@lumine-code/underscore-plus",
             version: require("@lumine-code/underscore-plus/package.json").version,
-            path: path.join("node_modules", "@lumine-code", "underscore-plus", "lib", "underscore-plus.js"),
+            path: path.join(
+              "node_modules",
+              "@lumine-code",
+              "underscore-plus",
+              "lib",
+              "underscore-plus.js",
+            ),
           },
         ],
       },
@@ -113,7 +119,13 @@ exports.load = function() { require('@lumine-code/underscore-plus'); };\
           {
             name: "@lumine-code/underscore-plus",
             version: require("@lumine-code/underscore-plus/package.json").version,
-            path: path.join("node_modules", "@lumine-code", "underscore-plus", "lib", "underscore-plus.js"),
+            path: path.join(
+              "node_modules",
+              "@lumine-code",
+              "underscore-plus",
+              "lib",
+              "underscore-plus.js",
+            ),
           },
         ],
       },

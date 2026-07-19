@@ -29,11 +29,7 @@ atom-panel.modal .image-paste.save-dialog atom-text-editor[mini] {
   white-space: nowrap;
   background-color: var(
     --image-paste-warning-background-color,
-    color-mix(
-      in srgb,
-      var(--background-color-warning) 12%,
-      var(--overlay-background-color)
-    )
+    color-mix(in srgb, var(--background-color-warning) 12%, var(--overlay-background-color))
   );
   border: 1px solid color-mix(in srgb, var(--background-color-warning) 55%, transparent);
   border-radius: var(--component-border-radius);
@@ -52,7 +48,7 @@ atom-panel.modal .image-paste.save-dialog atom-text-editor[mini] {
   height: auto;
   max-width: 100%;
 
-  margin-top:1em;
+  margin-top: 1em;
   max-height: var(--image-paste-preview-max-height, calc(100vh - 10rem));
   box-sizing: border-box;
   background-color: var(

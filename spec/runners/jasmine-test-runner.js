@@ -137,31 +137,38 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
         return jasmineEnv[key](name, originalFn, timeout);
       }
 
-      jasmineEnv[key](name, function (done) {
-        installLegacyUserContext(this, jasmineEnv);
-        currentLegacyContext = this;
-        try {
-          if (originalFn.length === 0) {
-            runWithLegacyAsyncQueue(() => originalFn.call(this)).then(() => done(), (error) => {
-              if (isPendingException(error)) {
-                done();
-              } else {
-                failDone(done, error);
-              }
-            });
-          } else {
-            originalFn.call(this, done);
+      jasmineEnv[key](
+        name,
+        function (done) {
+          installLegacyUserContext(this, jasmineEnv);
+          currentLegacyContext = this;
+          try {
+            if (originalFn.length === 0) {
+              runWithLegacyAsyncQueue(() => originalFn.call(this)).then(
+                () => done(),
+                (error) => {
+                  if (isPendingException(error)) {
+                    done();
+                  } else {
+                    failDone(done, error);
+                  }
+                },
+              );
+            } else {
+              originalFn.call(this, done);
+            }
+          } catch (err) {
+            if (isPendingException(err)) {
+              // A test marked itself as pending. Swallow the exception and
+              // proceed.
+              done();
+              return;
+            }
+            throw err;
           }
-        } catch (err) {
-          if (isPendingException(err)) {
-            // A test marked itself as pending. Swallow the exception and
-            // proceed.
-            done();
-            return;
-          }
-          throw err;
-        }
-      }, timeout);
+        },
+        timeout,
+      );
     };
   });
 
@@ -172,13 +179,16 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
         currentLegacyContext = this;
         try {
           if (originalFn.length === 0) {
-            runWithLegacyAsyncQueue(() => originalFn.call(this)).then(() => done(), (error) => {
-              if (isPendingException(error)) {
-                done();
-              } else {
-                failDone(done, error);
-              }
-            });
+            runWithLegacyAsyncQueue(() => originalFn.call(this)).then(
+              () => done(),
+              (error) => {
+                if (isPendingException(error)) {
+                  done();
+                } else {
+                  failDone(done, error);
+                }
+              },
+            );
           } else {
             originalFn.call(this, done);
           }
@@ -298,9 +308,7 @@ const setupLegacyAsyncCompatibility = () => {
   };
 
   window.waits = (timeout = 0) => {
-    return enqueueLegacyAsyncStep(
-      () => new Promise((resolve) => realSetTimeout(resolve, timeout)),
-    );
+    return enqueueLegacyAsyncStep(() => new Promise((resolve) => realSetTimeout(resolve, timeout)));
   };
 
   window.waitsForPromise = (...args) => {
@@ -530,7 +538,10 @@ const decorateSpy = (spy) => {
 };
 
 const isSpy = (value) => {
-  return window.jasmine.isSpy?.(value) || (typeof value === "function" && value.and != null && value.calls != null);
+  return (
+    window.jasmine.isSpy?.(value) ||
+    (typeof value === "function" && value.and != null && value.calls != null)
+  );
 };
 
 const isPendingException = (error) => {

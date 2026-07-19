@@ -81,9 +81,7 @@ module.exports = {
   },
 
   notifyMissingTarget() {
-    atom.notifications.addWarning(
-      "Save the editor or open a project before pasting an image.",
-    );
+    atom.notifications.addWarning("Save the editor or open a project before pasting an image.");
     return true;
   },
 

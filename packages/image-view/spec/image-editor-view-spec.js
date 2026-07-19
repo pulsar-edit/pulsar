@@ -6,7 +6,7 @@ const {
   afterEach,
   conditionPromise,
   timeoutPromise: wait,
-} = require("./async-spec-helpers");  
+} = require("./async-spec-helpers");
 
 const ImageEditorView = require("../lib/image-editor-view");
 const ImageEditor = require("../lib/image-editor");

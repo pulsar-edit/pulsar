@@ -1,4 +1,4 @@
-const {Emitter, Disposable} = require('event-kit');
+const { Emitter, Disposable } = require("event-kit");
 
 // Essential: Represents a buffer annotation that remains logically stationary
 // even as the buffer changes. This is used to represent cursors, folds, snippet
@@ -47,9 +47,9 @@ class DisplayMarker {
   constructor(layer, bufferMarker) {
     this.layer = layer;
     this.bufferMarker = bufferMarker;
-    ({id: this.id} = this.bufferMarker);
+    ({ id: this.id } = this.bufferMarker);
     this.hasChangeObservers = false;
-    this.emitter = new Emitter;
+    this.emitter = new Emitter();
     this.bufferMarkerSubscription = null;
   }
 
@@ -62,7 +62,7 @@ class DisplayMarker {
   }
 
   didDestroyBufferMarker() {
-    this.emitter.emit('did-destroy');
+    this.emitter.emit("did-destroy");
     this.layer.didDestroyMarker(this);
     this.emitter.dispose();
     this.bufferMarkerSubscription?.dispose();
@@ -119,13 +119,15 @@ class DisplayMarker {
       this.oldTailBufferPosition = this.getTailBufferPosition();
       this.oldTailScreenPosition = this.getTailScreenPosition();
       this.wasValid = this.isValid();
-      this.bufferMarkerSubscription = this.bufferMarker.onDidChange(event => this.notifyObservers(event.textChanged));
+      this.bufferMarkerSubscription = this.bufferMarker.onDidChange((event) =>
+        this.notifyObservers(event.textChanged),
+      );
       this.hasChangeObservers = true;
     }
-    const subscription = this.emitter.on('did-change', callback);
+    const subscription = this.emitter.on("did-change", callback);
     return new Disposable(() => {
       subscription.dispose();
-      if (!this.emitter.disposed && this.emitter.listenerCountForEventName('did-change') === 0) {
+      if (!this.emitter.disposed && this.emitter.listenerCountForEventName("did-change") === 0) {
         this.bufferMarkerSubscription?.dispose();
         this.bufferMarkerSubscription = null;
         this.hasChangeObservers = false;
@@ -140,10 +142,10 @@ class DisplayMarker {
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidDestroy(callback) {
     this.layer.markersWithDestroyListeners.add(this);
-    const subscription = this.emitter.on('did-destroy', callback);
+    const subscription = this.emitter.on("did-destroy", callback);
     return new Disposable(() => {
       subscription.dispose();
-      if (!this.emitter.disposed && this.emitter.listenerCountForEventName('did-destroy') === 0) {
+      if (!this.emitter.disposed && this.emitter.listenerCountForEventName("did-destroy") === 0) {
         this.layer.markersWithDestroyListeners.delete(this);
       }
     });
@@ -228,7 +230,9 @@ class DisplayMarker {
   //
   // * `other` {DisplayMarker} other marker
   isEqual(other) {
-    if (!(other instanceof this.constructor)) { return false; }
+    if (!(other instanceof this.constructor)) {
+      return false;
+    }
     return this.bufferMarker.isEqual(other.bufferMarker);
   }
 
@@ -352,7 +356,9 @@ class DisplayMarker {
   //     returns the first valid position closest to an invalid position.
   //     Defaults to `'closest'`. Applies to the start and end of the given range.
   setTailScreenPosition(screenPosition, options) {
-    return this.bufferMarker.setTailPosition(this.layer.translateScreenPosition(screenPosition, options));
+    return this.bufferMarker.setTailPosition(
+      this.layer.translateScreenPosition(screenPosition, options),
+    );
   }
 
   // Extended: Retrieves the buffer position of the marker's start. This will always be
@@ -433,8 +439,12 @@ class DisplayMarker {
   }
 
   notifyObservers(textChanged) {
-    if (!this.hasChangeObservers) { return; }
-    if (textChanged == null) { textChanged = false; }
+    if (!this.hasChangeObservers) {
+      return;
+    }
+    if (textChanged == null) {
+      textChanged = false;
+    }
 
     const newHeadBufferPosition = this.getHeadBufferPosition();
     const newHeadScreenPosition = this.getHeadScreenPosition();
@@ -442,20 +452,28 @@ class DisplayMarker {
     const newTailScreenPosition = this.getTailScreenPosition();
     const isValid = this.isValid();
 
-    if ((isValid === this.wasValid) &&
+    if (
+      isValid === this.wasValid &&
       newHeadBufferPosition.isEqual(this.oldHeadBufferPosition) &&
       newHeadScreenPosition.isEqual(this.oldHeadScreenPosition) &&
       newTailBufferPosition.isEqual(this.oldTailBufferPosition) &&
-      newTailScreenPosition.isEqual(this.oldTailScreenPosition)) { return; }
+      newTailScreenPosition.isEqual(this.oldTailScreenPosition)
+    ) {
+      return;
+    }
 
     const changeEvent = {
-      oldHeadScreenPosition: this.oldHeadScreenPosition, newHeadScreenPosition,
-      oldTailScreenPosition: this.oldTailScreenPosition, newTailScreenPosition,
-      oldHeadBufferPosition: this.oldHeadBufferPosition, newHeadBufferPosition,
-      oldTailBufferPosition: this.oldTailBufferPosition, newTailBufferPosition,
+      oldHeadScreenPosition: this.oldHeadScreenPosition,
+      newHeadScreenPosition,
+      oldTailScreenPosition: this.oldTailScreenPosition,
+      newTailScreenPosition,
+      oldHeadBufferPosition: this.oldHeadBufferPosition,
+      newHeadBufferPosition,
+      oldTailBufferPosition: this.oldTailBufferPosition,
+      newTailBufferPosition,
       textChanged,
       wasValid: this.wasValid,
-      isValid
+      isValid,
     };
 
     this.oldHeadBufferPosition = newHeadBufferPosition;
@@ -464,7 +482,7 @@ class DisplayMarker {
     this.oldTailScreenPosition = newTailScreenPosition;
     this.wasValid = isValid;
 
-    return this.emitter.emit('did-change', changeEvent);
+    return this.emitter.emit("did-change", changeEvent);
   }
 }
 

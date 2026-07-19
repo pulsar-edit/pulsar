@@ -11,7 +11,11 @@
 :root {
   /* File-local: mix(@text-color, @base-background-color, 20%) — used for
      text-less controls like radio, checkboxes etc. */
-  --component-background-color: color-mix(in srgb, var(--text-color) 20%, var(--base-background-color));
+  --component-background-color: color-mix(
+    in srgb,
+    var(--text-color) 20%,
+    var(--base-background-color)
+  );
 }
 
 /*
@@ -104,8 +108,12 @@ input.input-toggle {
       }
       &:after {
         opacity: 1;
-        transform: translate3d(calc(var(--component-icon-size) * -0.14), calc(var(--component-icon-size) * -0.25), 0) rotate(0deg)
-          scale(1);
+        transform: translate3d(
+            calc(var(--component-icon-size) * -0.14),
+            calc(var(--component-icon-size) * -0.25),
+            0
+          )
+          rotate(0deg) scale(1);
         transition-delay: 0;
       }
     }

@@ -83,14 +83,16 @@ describe("PulsarPackageClient", function () {
 
   describe("search", function () {
     it("queries the registry search endpoint and normalizes the results", function () {
-      const fetchImpl = jasmine.createSpy("fetch").andCallFake(() =>
-        Promise.resolve(
-          jsonResponse(200, [
-            { name: "found", repository: { url: "https://github.com/owner/found" } },
-            { name: "no-repo" },
-          ]),
-        ),
-      );
+      const fetchImpl = jasmine
+        .createSpy("fetch")
+        .andCallFake(() =>
+          Promise.resolve(
+            jsonResponse(200, [
+              { name: "found", repository: { url: "https://github.com/owner/found" } },
+              { name: "no-repo" },
+            ]),
+          ),
+        );
       const client = new PulsarPackageClient({ fetchImpl });
 
       waitsForPromise(() =>

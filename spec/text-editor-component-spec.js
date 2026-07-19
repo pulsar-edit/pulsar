@@ -487,9 +487,7 @@ describe("TextEditorComponent", () => {
       editor.setText("a\n".repeat(5));
       await component.getNextUpdatePromise();
 
-      expect(component.getContentHeight()).toBeLessThan(
-        component.getScrollContainerClientHeight(),
-      );
+      expect(component.getContentHeight()).toBeLessThan(component.getScrollContainerClientHeight());
       expect(component.getMaxScrollTop()).toBeGreaterThan(0);
       expect(component.canScrollVertically()).toBe(true);
       expect(component.refs.verticalScrollbar.element.style.visibility).toBe("");

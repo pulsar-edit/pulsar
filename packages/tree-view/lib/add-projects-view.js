@@ -46,11 +46,9 @@ module.exports = class AddProjectView {
   }
 
   getNavigableElements() {
-    return [
-      this.addProjectsButton,
-      this.listProjectsButton,
-      this.reopenProjectButton,
-    ].filter((button) => button.style.display !== "none" && !button.disabled);
+    return [this.addProjectsButton, this.listProjectsButton, this.reopenProjectButton].filter(
+      (button) => button.style.display !== "none" && !button.disabled,
+    );
   }
 
   clearSelection() {

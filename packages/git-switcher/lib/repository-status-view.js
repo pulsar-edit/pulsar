@@ -130,7 +130,9 @@ module.exports = class RepositoryStatusView {
 
     // The focused location is not inside any repository; show where a new one
     // would be initialized or cloned.
-    this.nameLabel.textContent = workingDirectory ? path.basename(workingDirectory) : "No repository";
+    this.nameLabel.textContent = workingDirectory
+      ? path.basename(workingDirectory)
+      : "No repository";
     this.tooltipDisposable = atom.tooltips.add(this.element, {
       title: workingDirectory ? `${workingDirectory} (not a repository)` : "No repository",
     });

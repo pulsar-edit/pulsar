@@ -402,7 +402,7 @@ describe("CommandRegistry", () => {
         () =>
           new Promise((resolve, reject) => {
             setTimeout(() => {
-              reject(3);  
+              reject(3);
             }, 1);
           }),
       );

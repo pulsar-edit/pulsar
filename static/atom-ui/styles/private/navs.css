@@ -115,7 +115,9 @@
       &:hover,
       &:focus {
         color: #555; /* @nav-tabs-active-link-hover-color: @gray */
-        background-color: var(--app-background-color); /* @nav-tabs-active-link-hover-bg: @body-bg */
+        background-color: var(
+          --app-background-color
+        ); /* @nav-tabs-active-link-hover-bg: @body-bg */
         border: 1px solid #ddd; /* @nav-tabs-active-link-hover-border-color */
         border-bottom-color: transparent;
         cursor: default;
@@ -172,7 +174,9 @@
       > .active > a,
       > .active > a:hover,
       > .active > a:focus {
-        border-bottom-color: var(--app-background-color); /* @nav-tabs-justified-active-link-border-color: @body-bg */
+        border-bottom-color: var(
+          --app-background-color
+        ); /* @nav-tabs-justified-active-link-border-color: @body-bg */
       }
     }
   }
@@ -274,7 +278,9 @@
     > .active > a,
     > .active > a:hover,
     > .active > a:focus {
-      border-bottom-color: var(--app-background-color); /* @nav-tabs-justified-active-link-border-color: @body-bg */
+      border-bottom-color: var(
+        --app-background-color
+      ); /* @nav-tabs-justified-active-link-border-color: @body-bg */
     }
   }
 }

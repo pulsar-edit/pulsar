@@ -23,7 +23,9 @@ describe("GitRepositoryProvider", () => {
   describe(".repositoryForDirectory(directory)", () => {
     describe("when specified a Directory with a Git repository", () => {
       it("resolves with a GitRepository", async () => {
-        const directory = new ProjectDirectory(path.join(__dirname, "fixtures", "git", "master.git"));
+        const directory = new ProjectDirectory(
+          path.join(__dirname, "fixtures", "git", "master.git"),
+        );
         const result = await provider.repositoryForDirectory(directory);
         expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();
@@ -38,7 +40,9 @@ describe("GitRepositoryProvider", () => {
           GitRepository.prototype,
           "refreshStatusSnapshot",
         ).and.callThrough();
-        const directory = new ProjectDirectory(path.join(__dirname, "fixtures", "git", "master.git"));
+        const directory = new ProjectDirectory(
+          path.join(__dirname, "fixtures", "git", "master.git"),
+        );
         const result = await provider.repositoryForDirectory(directory);
         expect(result).toEqual(jasmine.any(GitRepository));
         expect(refreshStatusSnapshot).not.toHaveBeenCalled();
@@ -115,7 +119,9 @@ describe("GitRepositoryProvider", () => {
   describe(".repositoryForDirectorySync(directory)", () => {
     describe("when specified a Directory with a Git repository", () => {
       it("resolves with a GitRepository", () => {
-        const directory = new ProjectDirectory(path.join(__dirname, "fixtures", "git", "master.git"));
+        const directory = new ProjectDirectory(
+          path.join(__dirname, "fixtures", "git", "master.git"),
+        );
         const result = provider.repositoryForDirectorySync(directory);
         expect(result).toEqual(jasmine.any(GitRepository));
         expect(provider.pathToRepository[result.getPath()]).toBeTruthy();

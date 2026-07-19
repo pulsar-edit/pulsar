@@ -843,22 +843,18 @@ describe("Autocomplete Manager", () => {
           expect(suggestionList).toExist();
 
           expect(
-            editorView.querySelector(".autocomplete .suggestion-description strong")
-              .textContent,
+            editorView.querySelector(".autocomplete .suggestion-description strong").textContent,
           ).toEqual("mmmmmmmmmmmmmmmmmmmmmmmmmm");
 
           editor.insertText("b");
           editor.insertText("c");
           await waitForAutocomplete(editor);
 
-          suggestionList = editorView.querySelector(
-            ".autocomplete autocomplete-suggestion-list",
-          );
+          suggestionList = editorView.querySelector(".autocomplete autocomplete-suggestion-list");
           expect(suggestionList).toExist();
 
           expect(
-            editorView.querySelector(".autocomplete .suggestion-description strong")
-              .textContent,
+            editorView.querySelector(".autocomplete .suggestion-description strong").textContent,
           ).toEqual("mmmmmmmmmmmmmmmmmmmmmm");
         });
 
@@ -890,9 +886,7 @@ describe("Autocomplete Manager", () => {
           editor.insertText("c");
           await waitForAutocomplete(editor);
 
-          suggestionList = editorView.querySelector(
-            ".autocomplete autocomplete-suggestion-list",
-          );
+          suggestionList = editorView.querySelector(".autocomplete autocomplete-suggestion-list");
           expect(suggestionList).toExist();
 
           let newWidth = parseInt(suggestionList.style.width);
@@ -910,9 +904,7 @@ describe("Autocomplete Manager", () => {
         await waitForAutocomplete(editor);
 
         expect(editorView.querySelector(".autocomplete")).toExist();
-        suggestionList = editorView.querySelector(
-          ".autocomplete autocomplete-suggestion-list",
-        );
+        suggestionList = editorView.querySelector(".autocomplete autocomplete-suggestion-list");
       });
 
       it("binds to custom commands when unset, and binds back to core commands when set", () => {
@@ -944,9 +936,7 @@ describe("Autocomplete Manager", () => {
         await waitForAutocomplete(editor);
 
         expect(editorView.querySelector(".autocomplete")).toExist();
-        suggestionList = editorView.querySelector(
-          ".autocomplete autocomplete-suggestion-list",
-        );
+        suggestionList = editorView.querySelector(".autocomplete autocomplete-suggestion-list");
       });
 
       it("responds to all the custom movement commands and to no core commands", () => {
@@ -1121,9 +1111,7 @@ describe("Autocomplete Manager", () => {
             await waitForAutocomplete(editor);
 
             let word = editorView.querySelector(".autocomplete li span.word");
-            let charMatch = editorView.querySelector(
-              ".autocomplete li span.word .character-match",
-            );
+            let charMatch = editorView.querySelector(".autocomplete li span.word .character-match");
             expect(word.textContent).toBe("ab(c)c");
             expect(charMatch.textContent).toBe("c");
             expect(charMatch.parentNode).toHaveClass("snippet-completion");
@@ -1283,9 +1271,7 @@ describe("Autocomplete Manager", () => {
         expect(overlayElement).toExist();
         expect(overlayElement.style.left).toBe(pixelLeftForBufferPosition([0, 10]));
 
-        let suggestionList = editorView.querySelector(
-          ".autocomplete autocomplete-suggestion-list",
-        );
+        let suggestionList = editorView.querySelector(".autocomplete autocomplete-suggestion-list");
         expect(suggestionList.style["margin-left"]).toBeFalsy();
       });
 
@@ -1363,9 +1349,7 @@ describe("Autocomplete Manager", () => {
         triggerAutocompletion(editor, false, "c");
         await waitForAutocomplete(editor);
 
-        let suggestionList = editorView.querySelector(
-          ".autocomplete autocomplete-suggestion-list",
-        );
+        let suggestionList = editorView.querySelector(".autocomplete autocomplete-suggestion-list");
         let wordContainer = editorView.querySelector(
           ".autocomplete autocomplete-suggestion-list .word-container",
         );
@@ -2230,9 +2214,7 @@ defm`);
         triggerAutocompletion(editor, true, "a");
         await waitForAutocomplete(editor);
 
-        let description = editorView.querySelector(
-          ".autocomplete .suggestion-description-content",
-        );
+        let description = editorView.querySelector(".autocomplete .suggestion-description-content");
 
         // Click the description, expect list to still show
         let mouse = document.createEvent("MouseEvents");

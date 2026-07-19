@@ -322,7 +322,8 @@ class WorkspaceElement extends HTMLElement {
     if (!event.ctrlKey) return;
     if (!this.config.get("editor.ctrlWheelScrollsAllPanes")) return;
     if (!this.paneContainer) return;
-    const sourceEditorElement = event.target.closest && event.target.closest("atom-text-editor:not([mini])");
+    const sourceEditorElement =
+      event.target.closest && event.target.closest("atom-text-editor:not([mini])");
     if (!sourceEditorElement || !this.paneContainer.contains(sourceEditorElement)) return;
 
     // Normalize once against the source editor (its line height and element

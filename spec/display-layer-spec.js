@@ -1,120 +1,122 @@
-const Random = require('random-seed')
-const dedent = require('dedent')
-const TextBuffer = require('../src/text-buffer')
-const Point = require('../src/point')
-const Range = require('../src/range')
-const {buildRandomLines, getRandomBufferRange} = require('./text-buffer-helpers/random')
-const SAMPLE_TEXT = require('./text-buffer-helpers/sample-text')
-const TestLanguageMode = require('./text-buffer-helpers/test-language-mode')
-const {Emitter} = require('event-kit')
+const Random = require("random-seed");
+const dedent = require("dedent");
+const TextBuffer = require("../src/text-buffer");
+const Point = require("../src/point");
+const Range = require("../src/range");
+const { buildRandomLines, getRandomBufferRange } = require("./text-buffer-helpers/random");
+const SAMPLE_TEXT = require("./text-buffer-helpers/sample-text");
+const TestLanguageMode = require("./text-buffer-helpers/test-language-mode");
+const { Emitter } = require("event-kit");
 
-const EOL_INVISIBLE = '¬'
-const CR_INVISIBLE = '¤'
-const LINE_ENDING_INVISIBLES_REGEXP = new RegExp(`${CR_INVISIBLE}?${EOL_INVISIBLE}?$`)
+const EOL_INVISIBLE = "¬";
+const CR_INVISIBLE = "¤";
+const LINE_ENDING_INVISIBLES_REGEXP = new RegExp(`${CR_INVISIBLE}?${EOL_INVISIBLE}?$`);
 
-describe('DisplayLayer', () => {
+describe("DisplayLayer", () => {
   beforeEach(() => {
-    jasmine.addCustomEqualityTester(require('@lumine-code/underscore-plus').isEqual)
-  })
+    jasmine.addCustomEqualityTester(require("@lumine-code/underscore-plus").isEqual);
+  });
 
-  describe('copy()', () => {
-    it('creates a new DisplayLayer having the same settings', () => {
+  describe("copy()", () => {
+    it("creates a new DisplayLayer having the same settings", () => {
       const buffer = new TextBuffer({
-        text: SAMPLE_TEXT
-      })
+        text: SAMPLE_TEXT,
+      });
 
       const displayLayer1 = buffer.addDisplayLayer({
         invisibles: {
-          eol: 'X'
+          eol: "X",
         },
         tabLength: 3,
         softWrapColumn: 20,
         softWrapHangingIndent: 2,
         showIndentGuides: true,
-        foldCharacter: 'Y',
+        foldCharacter: "Y",
         atomicSoftTabs: false,
         ratioForCharacter: () => 3,
-        isWrapBoundary: () => false
-      })
+        isWrapBoundary: () => false,
+      });
 
-      displayLayer1.foldBufferRange(Range(Point(0, 1), Point(1, 1)))
-      const displayLayer2 = displayLayer1.copy()
-      expect(displayLayer2.getText()).toBe(displayLayer1.getText())
-      expect(displayLayer2.foldsMarkerLayer.getMarkers().length).toBe(displayLayer1.foldsMarkerLayer.getMarkers().length)
-      expect(displayLayer2.invisibles).toEqual(displayLayer1.invisibles)
-      expect(displayLayer2.tabLength).toEqual(displayLayer1.tabLength)
-      expect(displayLayer2.softWrapColumn).toEqual(displayLayer1.softWrapColumn)
-      expect(displayLayer2.softWrapHangingIndent).toEqual(displayLayer1.softWrapHangingIndent)
-      expect(displayLayer2.showIndentGuides).toEqual(displayLayer1.showIndentGuides)
-      expect(displayLayer2.foldCharacter).toEqual(displayLayer1.foldCharacter)
-      expect(displayLayer2.atomicSoftTabs).toEqual(displayLayer1.atomicSoftTabs)
-      expect(displayLayer2.ratioForCharacter).toBe(displayLayer1.ratioForCharacter)
-      expect(displayLayer2.isWrapBoundary).toBe(displayLayer1.isWrapBoundary)
-    })
-  })
+      displayLayer1.foldBufferRange(Range(Point(0, 1), Point(1, 1)));
+      const displayLayer2 = displayLayer1.copy();
+      expect(displayLayer2.getText()).toBe(displayLayer1.getText());
+      expect(displayLayer2.foldsMarkerLayer.getMarkers().length).toBe(
+        displayLayer1.foldsMarkerLayer.getMarkers().length,
+      );
+      expect(displayLayer2.invisibles).toEqual(displayLayer1.invisibles);
+      expect(displayLayer2.tabLength).toEqual(displayLayer1.tabLength);
+      expect(displayLayer2.softWrapColumn).toEqual(displayLayer1.softWrapColumn);
+      expect(displayLayer2.softWrapHangingIndent).toEqual(displayLayer1.softWrapHangingIndent);
+      expect(displayLayer2.showIndentGuides).toEqual(displayLayer1.showIndentGuides);
+      expect(displayLayer2.foldCharacter).toEqual(displayLayer1.foldCharacter);
+      expect(displayLayer2.atomicSoftTabs).toEqual(displayLayer1.atomicSoftTabs);
+      expect(displayLayer2.ratioForCharacter).toBe(displayLayer1.ratioForCharacter);
+      expect(displayLayer2.isWrapBoundary).toBe(displayLayer1.isWrapBoundary);
+    });
+  });
 
-  describe('reset()', () => {
-    it('updates the screen lines to reflect the new parameters', () => {
-      const buffer = new TextBuffer({text: 'abc def\nghi jkl\nmno pqr'})
-      const displayLayer = buffer.addDisplayLayer({})
-      expect(displayLayer.translateScreenPosition(Point(1, 3))).toEqual(Point(1, 3))
+  describe("reset()", () => {
+    it("updates the screen lines to reflect the new parameters", () => {
+      const buffer = new TextBuffer({ text: "abc def\nghi jkl\nmno pqr" });
+      const displayLayer = buffer.addDisplayLayer({});
+      expect(displayLayer.translateScreenPosition(Point(1, 3))).toEqual(Point(1, 3));
 
-      displayLayer.reset({softWrapColumn: 4})
-      expect(displayLayer.translateScreenPosition(Point(1, 3))).toEqual(Point(0, 7))
-    })
+      displayLayer.reset({ softWrapColumn: 4 });
+      expect(displayLayer.translateScreenPosition(Point(1, 3))).toEqual(Point(0, 7));
+    });
 
-    it('resets the rightmost screen position', () => {
-      const buffer = new TextBuffer({text: 'abc def\nghi jkl\nmnopqrst'})
-      const displayLayer = buffer.addDisplayLayer({softWrapColumn: 5})
-      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point(0, 0))
-      expect(displayLayer.getRightmostScreenPosition()).toEqual(Point(4, 5))
+    it("resets the rightmost screen position", () => {
+      const buffer = new TextBuffer({ text: "abc def\nghi jkl\nmnopqrst" });
+      const displayLayer = buffer.addDisplayLayer({ softWrapColumn: 5 });
+      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point(0, 0));
+      expect(displayLayer.getRightmostScreenPosition()).toEqual(Point(4, 5));
 
-      displayLayer.reset({softWrapColumn: 4})
-      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point(0, 0))
-      expect(displayLayer.getRightmostScreenPosition()).toEqual(Point(0, 4))
-    })
-  })
+      displayLayer.reset({ softWrapColumn: 4 });
+      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point(0, 0));
+      expect(displayLayer.getRightmostScreenPosition()).toEqual(Point(0, 4));
+    });
+  });
 
-  describe('destroy', function () {
-    it('does not throw exceptions when queried after destruction', function () {
-      const buffer = new TextBuffer({text: 'hi'})
+  describe("destroy", function () {
+    it("does not throw exceptions when queried after destruction", function () {
+      const buffer = new TextBuffer({ text: "hi" });
 
-      const displayLayer = buffer.addDisplayLayer({})
+      const displayLayer = buffer.addDisplayLayer({});
 
-      displayLayer.destroy()
+      displayLayer.destroy();
 
-      expect(displayLayer.isDestroyed()).toBe(true)
-      expect(displayLayer.getText()).toBe('hi')
-      expect(displayLayer.translateScreenPosition(Point(0, 0))).toEqual(Point(0, 0))
-    })
-  })
+      expect(displayLayer.isDestroyed()).toBe(true);
+      expect(displayLayer.getText()).toBe("hi");
+      expect(displayLayer.translateScreenPosition(Point(0, 0))).toEqual(Point(0, 0));
+    });
+  });
 
-  describe('hard tabs', () => {
-    it('expands hard tabs to their tab stops', () => {
+  describe("hard tabs", () => {
+    it("expands hard tabs to their tab stops", () => {
       const buffer = new TextBuffer({
-        text: '\ta\tbc\tdef\tg\nh\t\ti'
-      })
+        text: "\ta\tbc\tdef\tg\nh\t\ti",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
-        tabLength: 4
-      })
+        tabLength: 4,
+      });
 
-      expect(displayLayer.getText()).toBe('    a   bc  def g\nh       i')
+      expect(displayLayer.getText()).toBe("    a   bc  def g\nh       i");
 
       expectTokenBoundaries(displayLayer, [
-        {text: '    ', close: [], open: ['hard-tab leading-whitespace']},
-        {text: 'a', close: ['hard-tab leading-whitespace'], open: []},
-        {text: '   ', close: [], open: ['hard-tab']},
-        {text: 'bc', close: ['hard-tab'], open: []},
-        {text: '  ', close: [], open: ['hard-tab']},
-        {text: 'def', close: ['hard-tab'], open: []},
-        {text: ' ', close: [], open: ['hard-tab']},
-        {text: 'g', close: ['hard-tab'], open: []},
-        {text: 'h', close: [], open: []},
-        {text: '   ', close: [], open: ['hard-tab']},
-        {text: '    ', close: ['hard-tab'], open: ['hard-tab']},
-        {text: 'i', close: ['hard-tab'], open: []}
-      ])
+        { text: "    ", close: [], open: ["hard-tab leading-whitespace"] },
+        { text: "a", close: ["hard-tab leading-whitespace"], open: [] },
+        { text: "   ", close: [], open: ["hard-tab"] },
+        { text: "bc", close: ["hard-tab"], open: [] },
+        { text: "  ", close: [], open: ["hard-tab"] },
+        { text: "def", close: ["hard-tab"], open: [] },
+        { text: " ", close: [], open: ["hard-tab"] },
+        { text: "g", close: ["hard-tab"], open: [] },
+        { text: "h", close: [], open: [] },
+        { text: "   ", close: [], open: ["hard-tab"] },
+        { text: "    ", close: ["hard-tab"], open: ["hard-tab"] },
+        { text: "i", close: ["hard-tab"], open: [] },
+      ]);
 
       expectPositionTranslations(displayLayer, [
         [Point(0, 0), Point(0, 0)],
@@ -148,19 +150,19 @@ describe('DisplayLayer', () => {
         [Point(1, 5), [Point(1, 2), Point(1, 3)]],
         [Point(1, 6), [Point(1, 2), Point(1, 3)]],
         [Point(1, 7), [Point(1, 2), Point(1, 3)]],
-        [Point(1, 8), Point(1, 3)]
-      ])
-    })
+        [Point(1, 8), Point(1, 3)],
+      ]);
+    });
 
-    it('expands hard tabs on soft-wrapped line segments', function () {
+    it("expands hard tabs on soft-wrapped line segments", function () {
       const buffer = new TextBuffer({
-        text: '  abcdef\tgh\tijk'
-      })
+        text: "  abcdef\tgh\tijk",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         tabLength: 4,
-        softWrapColumn: 8
-      })
+        softWrapColumn: 8,
+      });
 
       expectPositionTranslations(displayLayer, [
         [Point(1, 2), Point(0, 8)],
@@ -175,24 +177,24 @@ describe('DisplayLayer', () => {
         [Point(2, 0), [Point(0, 11), Point(0, 12)]],
         [Point(2, 1), [Point(0, 11), Point(0, 12)]],
         [Point(2, 2), Point(0, 12)],
-        [Point(2, 3), Point(0, 13)]
-      ])
-    })
+        [Point(2, 3), Point(0, 13)],
+      ]);
+    });
 
-    it('expands hard tabs on lines with folds', function () {
+    it("expands hard tabs on lines with folds", function () {
       const buffer = new TextBuffer({
-        text: 'a\tbc\ndefg\thij\tk\nlm\tn'
-      })
+        text: "a\tbc\ndefg\thij\tk\nlm\tn",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
-        tabLength: 4
-      })
+        tabLength: 4,
+      });
 
-      displayLayer.foldBufferRange(Range(Point(0, 3), Point(1, 3)))
-      displayLayer.foldBufferRange(Range(Point(1, 3), Point(1, 6)))
-      displayLayer.foldBufferRange(Range(Point(1, 10), Point(2, 2)))
+      displayLayer.foldBufferRange(Range(Point(0, 3), Point(1, 3)));
+      displayLayer.foldBufferRange(Range(Point(1, 3), Point(1, 6)));
+      displayLayer.foldBufferRange(Range(Point(1, 10), Point(2, 2)));
 
-      expect(displayLayer.getText()).toBe('a   b⋯⋯ij   k⋯  n')
+      expect(displayLayer.getText()).toBe("a   b⋯⋯ij   k⋯  n");
 
       expectPositionTranslations(displayLayer, [
         [Point(0, 6), Point(1, 3)],
@@ -206,26 +208,26 @@ describe('DisplayLayer', () => {
         [Point(0, 14), Point(2, 2)],
         [Point(0, 15), [Point(2, 2), Point(2, 3)]],
         [Point(0, 16), Point(2, 3)],
-        [Point(0, 17), Point(2, 4)]
-      ])
-    })
-  })
+        [Point(0, 17), Point(2, 4)],
+      ]);
+    });
+  });
 
-  describe('soft tabs', () => {
-    it('breaks leading whitespace into atomic units corresponding to the tab length', () => {
+  describe("soft tabs", () => {
+    it("breaks leading whitespace into atomic units corresponding to the tab length", () => {
       const buffer = new TextBuffer({
-        text: '          a\n     \n      \t  '
-      })
+        text: "          a\n     \n      \t  ",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         tabLength: 4,
 
         invisibles: {
-          space: '•'
-        }
-      })
+          space: "•",
+        },
+      });
 
-      expect(displayLayer.getText()).toBe('••••••••••a\n•••••\n••••••  ••')
+      expect(displayLayer.getText()).toBe("••••••••••a\n•••••\n••••••  ••");
 
       expectPositionTranslations(displayLayer, [
         [Point(0, 0), Point(0, 0)],
@@ -253,35 +255,35 @@ describe('DisplayLayer', () => {
         [Point(2, 7), [Point(2, 6), Point(2, 7)]],
         [Point(2, 8), Point(2, 7)],
         [Point(2, 9), Point(2, 8)],
-        [Point(2, 10), Point(2, 9)]
-      ])
-    })
+        [Point(2, 10), Point(2, 9)],
+      ]);
+    });
 
-    it('does not treat soft tabs as atomic if the atomicSoftTabs option is false', () => {
+    it("does not treat soft tabs as atomic if the atomicSoftTabs option is false", () => {
       const buffer = new TextBuffer({
-        text: '    a\n        b'
-      })
+        text: "    a\n        b",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         tabLength: 4,
-        atomicSoftTabs: false
-      })
+        atomicSoftTabs: false,
+      });
 
-      expect(displayLayer.clipScreenPosition([0, 2])).toEqual([0, 2])
-      expect(displayLayer.clipScreenPosition([1, 6])).toEqual([1, 6])
+      expect(displayLayer.clipScreenPosition([0, 2])).toEqual([0, 2]);
+      expect(displayLayer.clipScreenPosition([1, 6])).toEqual([1, 6]);
 
-      expect(displayLayer.translateBufferPosition([0, 2])).toEqual([0, 2])
-      expect(displayLayer.translateBufferPosition([1, 6])).toEqual([1, 6])
-    })
-  })
+      expect(displayLayer.translateBufferPosition([0, 2])).toEqual([0, 2]);
+      expect(displayLayer.translateBufferPosition([1, 6])).toEqual([1, 6]);
+    });
+  });
 
-  describe('paired characters', () => {
-    it('treats paired characters as atomic units', () => {
+  describe("paired characters", () => {
+    it("treats paired characters as atomic units", () => {
       const buffer = new TextBuffer({
-        text: 'abc🐲def'
-      })
+        text: "abc🐲def",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
+      const displayLayer = buffer.addDisplayLayer();
 
       expectPositionTranslations(displayLayer, [
         [Point(0, 0), Point(0, 0)],
@@ -292,31 +294,34 @@ describe('DisplayLayer', () => {
         [Point(0, 5), Point(0, 5)],
         [Point(0, 6), Point(0, 6)],
         [Point(0, 7), Point(0, 7)],
-        [Point(0, 8), Point(0, 8)]
-      ])
-    })
+        [Point(0, 8), Point(0, 8)],
+      ]);
+    });
 
     it("doesn't soft wrap when the wrap boundary is between two paired characters", () => {
       const buffer = new TextBuffer({
-        text: 'abcde🐲fghij'
-      })
+        text: "abcde🐲fghij",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 6
-      })
+        softWrapColumn: 6,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('abcde🐲\nfghij'))
-    })
-  })
+      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify("abcde🐲\nfghij"));
+    });
+  });
 
-  describe('folds', () => {
-    it('allows single folds to be created and destroyed', () => {
+  describe("folds", () => {
+    it("allows single folds to be created and destroyed", () => {
       const buffer = new TextBuffer({
-        text: SAMPLE_TEXT
-      })
+        text: SAMPLE_TEXT,
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
-      const foldId = displayLayer.foldBufferRange([[4, 29], [7, 4]])
+      const displayLayer = buffer.addDisplayLayer();
+      const foldId = displayLayer.foldBufferRange([
+        [4, 29],
+        [7, 4],
+      ]);
 
       expect(displayLayer.getText()).toBe(dedent`
         var quicksort = function () {
@@ -329,387 +334,553 @@ describe('DisplayLayer', () => {
 
           return sort(Array.apply(this, arguments));
         };
-      `)
+      `);
 
-      expect(displayLayer.clipScreenPosition([4, 29], {
-        clipDirection: 'forward'
-      })).toEqual([4, 29])
+      expect(
+        displayLayer.clipScreenPosition([4, 29], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([4, 29]);
 
-      expect(displayLayer.translateScreenPosition([4, 29], {
-        clipDirection: 'forward'
-      })).toEqual([4, 29])
+      expect(
+        displayLayer.translateScreenPosition([4, 29], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([4, 29]);
 
-      displayLayer.destroyFold(foldId)
-      expect(displayLayer.getText()).toBe(SAMPLE_TEXT)
-    })
+      displayLayer.destroyFold(foldId);
+      expect(displayLayer.getText()).toBe(SAMPLE_TEXT);
+    });
 
-    it('allows folds that contain other folds to be created and destroyed', () => {
+    it("allows folds that contain other folds to be created and destroyed", () => {
       const buffer = new TextBuffer({
-        text: 'abcd\nefgh\nijkl\nmnop'
-      })
+        text: "abcd\nefgh\nijkl\nmnop",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
-      displayLayer.foldBufferRange([[1, 1], [1, 3]])
-      displayLayer.foldBufferRange([[2, 1], [2, 3]])
-      const outerFoldId = displayLayer.foldBufferRange([[0, 1], [3, 3]])
-      expect(displayLayer.getText()).toBe('a⋯p')
-      displayLayer.destroyFold(outerFoldId)
-      expect(displayLayer.getText()).toBe('abcd\ne⋯h\ni⋯l\nmnop')
-    })
+      const displayLayer = buffer.addDisplayLayer();
+      displayLayer.foldBufferRange([
+        [1, 1],
+        [1, 3],
+      ]);
+      displayLayer.foldBufferRange([
+        [2, 1],
+        [2, 3],
+      ]);
+      const outerFoldId = displayLayer.foldBufferRange([
+        [0, 1],
+        [3, 3],
+      ]);
+      expect(displayLayer.getText()).toBe("a⋯p");
+      displayLayer.destroyFold(outerFoldId);
+      expect(displayLayer.getText()).toBe("abcd\ne⋯h\ni⋯l\nmnop");
+    });
 
-    it('allows folds contained within other folds to be created and destroyed', () => {
+    it("allows folds contained within other folds to be created and destroyed", () => {
       const buffer = new TextBuffer({
-        text: 'abcd\nefgh\nijkl\nmnop'
-      })
+        text: "abcd\nefgh\nijkl\nmnop",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
-      displayLayer.foldBufferRange([[0, 1], [3, 3]])
-      const innerFoldAId = displayLayer.foldBufferRange([[1, 1], [1, 3]])
-      const innerFoldBId = displayLayer.foldBufferRange([[2, 1], [2, 3]])
-      expect(displayLayer.getText()).toBe('a⋯p')
-      displayLayer.destroyFold(innerFoldAId)
-      expect(displayLayer.getText()).toBe('a⋯p')
-      displayLayer.destroyFold(innerFoldBId)
-      expect(displayLayer.getText()).toBe('a⋯p')
-    })
+      const displayLayer = buffer.addDisplayLayer();
+      displayLayer.foldBufferRange([
+        [0, 1],
+        [3, 3],
+      ]);
+      const innerFoldAId = displayLayer.foldBufferRange([
+        [1, 1],
+        [1, 3],
+      ]);
+      const innerFoldBId = displayLayer.foldBufferRange([
+        [2, 1],
+        [2, 3],
+      ]);
+      expect(displayLayer.getText()).toBe("a⋯p");
+      displayLayer.destroyFold(innerFoldAId);
+      expect(displayLayer.getText()).toBe("a⋯p");
+      displayLayer.destroyFold(innerFoldBId);
+      expect(displayLayer.getText()).toBe("a⋯p");
+    });
 
-    it('allows multiple buffer lines to be collapsed to a single screen line by successive folds', () => {
+    it("allows multiple buffer lines to be collapsed to a single screen line by successive folds", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef\nghi\nj'
-      })
+        text: "abc\ndef\nghi\nj",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
+      const displayLayer = buffer.addDisplayLayer();
 
-      displayLayer.foldBufferRange([[0, 1], [1, 1]])
-      expect(displayLayer.getText()).toBe('a⋯ef\nghi\nj')
+      displayLayer.foldBufferRange([
+        [0, 1],
+        [1, 1],
+      ]);
+      expect(displayLayer.getText()).toBe("a⋯ef\nghi\nj");
 
-      displayLayer.foldBufferRange([[1, 2], [2, 1]])
-      expect(displayLayer.getText()).toBe('a⋯e⋯hi\nj')
+      displayLayer.foldBufferRange([
+        [1, 2],
+        [2, 1],
+      ]);
+      expect(displayLayer.getText()).toBe("a⋯e⋯hi\nj");
 
-      displayLayer.foldBufferRange([[2, 2], [3, 0]])
-      expect(displayLayer.getText()).toBe('a⋯e⋯h⋯j')
-    })
+      displayLayer.foldBufferRange([
+        [2, 2],
+        [3, 0],
+      ]);
+      expect(displayLayer.getText()).toBe("a⋯e⋯h⋯j");
+    });
 
-    it('unions folded ranges when folds overlap', () => {
+    it("unions folded ranges when folds overlap", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef\nghi\njkl\nmno'
-      })
+        text: "abc\ndef\nghi\njkl\nmno",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
-      displayLayer.foldBufferRange([[0, 1], [1, 2]])
-      const foldBId = displayLayer.foldBufferRange([[1, 1], [2, 2]])
-      const foldCId = displayLayer.foldBufferRange([[2, 1], [3, 0]])
-      const foldDId = displayLayer.foldBufferRange([[3, 0], [4, 0]])
-      expect(displayLayer.getText()).toBe('a⋯⋯mno')
-      displayLayer.destroyFold(foldCId)
-      expect(displayLayer.getText()).toBe('a⋯i\n⋯mno')
-      displayLayer.destroyFold(foldBId)
-      expect(displayLayer.getText()).toBe('a⋯f\nghi\n⋯mno')
-      displayLayer.destroyFold(foldDId)
-      expect(displayLayer.getText()).toBe('a⋯f\nghi\njkl\nmno')
-    })
+      const displayLayer = buffer.addDisplayLayer();
+      displayLayer.foldBufferRange([
+        [0, 1],
+        [1, 2],
+      ]);
+      const foldBId = displayLayer.foldBufferRange([
+        [1, 1],
+        [2, 2],
+      ]);
+      const foldCId = displayLayer.foldBufferRange([
+        [2, 1],
+        [3, 0],
+      ]);
+      const foldDId = displayLayer.foldBufferRange([
+        [3, 0],
+        [4, 0],
+      ]);
+      expect(displayLayer.getText()).toBe("a⋯⋯mno");
+      displayLayer.destroyFold(foldCId);
+      expect(displayLayer.getText()).toBe("a⋯i\n⋯mno");
+      displayLayer.destroyFold(foldBId);
+      expect(displayLayer.getText()).toBe("a⋯f\nghi\n⋯mno");
+      displayLayer.destroyFold(foldDId);
+      expect(displayLayer.getText()).toBe("a⋯f\nghi\njkl\nmno");
+    });
 
-    it('allows folds intersecting a buffer range to be destroyed', () => {
+    it("allows folds intersecting a buffer range to be destroyed", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef\nghi\nj'
-      })
+        text: "abc\ndef\nghi\nj",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
-      displayLayer.foldBufferRange([[0, 1], [1, 2]])
-      displayLayer.foldBufferRange([[1, 1], [2, 2]])
-      displayLayer.foldBufferRange([[2, 1], [3, 0]])
-      displayLayer.foldBufferRange([[2, 2], [3, 0]])
-      expect(displayLayer.getText()).toBe('a⋯j')
+      const displayLayer = buffer.addDisplayLayer();
+      displayLayer.foldBufferRange([
+        [0, 1],
+        [1, 2],
+      ]);
+      displayLayer.foldBufferRange([
+        [1, 1],
+        [2, 2],
+      ]);
+      displayLayer.foldBufferRange([
+        [2, 1],
+        [3, 0],
+      ]);
+      displayLayer.foldBufferRange([
+        [2, 2],
+        [3, 0],
+      ]);
+      expect(displayLayer.getText()).toBe("a⋯j");
 
       verifyChangeEvent(displayLayer, () => {
-        displayLayer.destroyFoldsIntersectingBufferRange([[1, 1], [2, 1]])
-      })
+        displayLayer.destroyFoldsIntersectingBufferRange([
+          [1, 1],
+          [2, 1],
+        ]);
+      });
 
-      expect(displayLayer.getText()).toBe('abc\ndef\ngh⋯j')
-    })
+      expect(displayLayer.getText()).toBe("abc\ndef\ngh⋯j");
+    });
 
-    it('can destroy folds that contain an array of positions', () => {
+    it("can destroy folds that contain an array of positions", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef\nghi\nj'
-      })
+        text: "abc\ndef\nghi\nj",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
-      displayLayer.foldBufferRange([[0, 1], [1, 2]])
-      displayLayer.foldBufferRange([[1, 1], [2, 2]])
-      displayLayer.foldBufferRange([[2, 1], [3, 0]])
-      displayLayer.foldBufferRange([[2, 2], [3, 0]])
-      expect(displayLayer.getText()).toBe('a⋯j')
+      const displayLayer = buffer.addDisplayLayer();
+      displayLayer.foldBufferRange([
+        [0, 1],
+        [1, 2],
+      ]);
+      displayLayer.foldBufferRange([
+        [1, 1],
+        [2, 2],
+      ]);
+      displayLayer.foldBufferRange([
+        [2, 1],
+        [3, 0],
+      ]);
+      displayLayer.foldBufferRange([
+        [2, 2],
+        [3, 0],
+      ]);
+      expect(displayLayer.getText()).toBe("a⋯j");
 
       // Exclude endpoints
       verifyChangeEvent(displayLayer, () => {
-        displayLayer.destroyFoldsContainingBufferPositions([[1, 1], [2, 1]], true)
-      })
-      expect(displayLayer.getText()).toBe('abc\ndef\ng⋯j')
+        displayLayer.destroyFoldsContainingBufferPositions(
+          [
+            [1, 1],
+            [2, 1],
+          ],
+          true,
+        );
+      });
+      expect(displayLayer.getText()).toBe("abc\ndef\ng⋯j");
 
       // Include endpoints
       verifyChangeEvent(displayLayer, () => {
-        displayLayer.destroyFoldsContainingBufferPositions([[2, 2]], false)
-      })
-      expect(displayLayer.getText()).toBe('abc\ndef\nghi\nj')
+        displayLayer.destroyFoldsContainingBufferPositions([[2, 2]], false);
+      });
+      expect(displayLayer.getText()).toBe("abc\ndef\nghi\nj");
 
       // Clips before checking containment
-      displayLayer.foldBufferRange([[3, 0], [3, 1]])
-      expect(displayLayer.getText()).toBe('abc\ndef\nghi\n⋯')
+      displayLayer.foldBufferRange([
+        [3, 0],
+        [3, 1],
+      ]);
+      expect(displayLayer.getText()).toBe("abc\ndef\nghi\n⋯");
       verifyChangeEvent(displayLayer, () => {
-        displayLayer.destroyFoldsContainingBufferPositions([[3, Infinity]], false)
-      })
-      expect(displayLayer.getText()).toBe('abc\ndef\nghi\nj')
-    })
+        displayLayer.destroyFoldsContainingBufferPositions([[3, Infinity]], false);
+      });
+      expect(displayLayer.getText()).toBe("abc\ndef\nghi\nj");
+    });
 
-    it('allows all folds to be destroyed', () => {
+    it("allows all folds to be destroyed", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef\nghi\njkl\nmno'
-      })
+        text: "abc\ndef\nghi\njkl\nmno",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
-      displayLayer.foldBufferRange([[4, 1], [4, 2]])
-      displayLayer.foldBufferRange([[0, 1], [1, 2]])
-      displayLayer.foldBufferRange([[1, 1], [2, 2]])
-      displayLayer.foldBufferRange([[2, 1], [3, 0]])
-      displayLayer.foldBufferRange([[2, 2], [3, 0]])
-      expect(displayLayer.getText()).toBe('a⋯jkl\nm⋯o')
+      const displayLayer = buffer.addDisplayLayer();
+      displayLayer.foldBufferRange([
+        [4, 1],
+        [4, 2],
+      ]);
+      displayLayer.foldBufferRange([
+        [0, 1],
+        [1, 2],
+      ]);
+      displayLayer.foldBufferRange([
+        [1, 1],
+        [2, 2],
+      ]);
+      displayLayer.foldBufferRange([
+        [2, 1],
+        [3, 0],
+      ]);
+      displayLayer.foldBufferRange([
+        [2, 2],
+        [3, 0],
+      ]);
+      expect(displayLayer.getText()).toBe("a⋯jkl\nm⋯o");
 
       verifyChangeEvent(displayLayer, () => {
-        displayLayer.destroyAllFolds()
-      })
+        displayLayer.destroyAllFolds();
+      });
 
-      expect(displayLayer.getText()).toBe('abc\ndef\nghi\njkl\nmno')
-    })
+      expect(displayLayer.getText()).toBe("abc\ndef\nghi\njkl\nmno");
+    });
 
-    it('automatically destroy folds when they become invalid after a buffer change', () => {
+    it("automatically destroy folds when they become invalid after a buffer change", () => {
       const buffer = new TextBuffer({
-        text: 'abc def\nghi jkl\nmno pqr\nstu vwx'
-      })
+        text: "abc def\nghi jkl\nmno pqr\nstu vwx",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
-      displayLayer.foldBufferRange([[0, 1], [1, 2]])
-      displayLayer.foldBufferRange([[1, 5], [2, 4]])
-      displayLayer.foldBufferRange([[3, 0], [3, 3]])
-      expect(displayLayer.getText()).toBe('a⋯i j⋯pqr\n⋯ vwx')
-      buffer.insert([0, 3], 'y')
-      expect(displayLayer.getText()).toBe('a⋯i j⋯pqr\n⋯ vwx')
-      buffer.setTextInRange([[1, 6], [3, 4]], 'z')
-      expect(displayLayer.getText()).toBe('a⋯i jkzvwx')
-      expect(displayLayer.foldsIntersectingBufferRange([[0, 0], [Infinity, 0]]).length).toBe(1)
-    })
+      const displayLayer = buffer.addDisplayLayer();
+      displayLayer.foldBufferRange([
+        [0, 1],
+        [1, 2],
+      ]);
+      displayLayer.foldBufferRange([
+        [1, 5],
+        [2, 4],
+      ]);
+      displayLayer.foldBufferRange([
+        [3, 0],
+        [3, 3],
+      ]);
+      expect(displayLayer.getText()).toBe("a⋯i j⋯pqr\n⋯ vwx");
+      buffer.insert([0, 3], "y");
+      expect(displayLayer.getText()).toBe("a⋯i j⋯pqr\n⋯ vwx");
+      buffer.setTextInRange(
+        [
+          [1, 6],
+          [3, 4],
+        ],
+        "z",
+      );
+      expect(displayLayer.getText()).toBe("a⋯i jkzvwx");
+      expect(
+        displayLayer.foldsIntersectingBufferRange([
+          [0, 0],
+          [Infinity, 0],
+        ]).length,
+      ).toBe(1);
+    });
 
-    it('accounts for pre-populated folds that end/start on the same row when populating an empty index', () => {
+    it("accounts for pre-populated folds that end/start on the same row when populating an empty index", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef\nghi\njkl\nmno\npqr'
-      })
-      const foldsMarkerLayer = buffer.addMarkerLayer()
-      foldsMarkerLayer.markRange([[1, 2], [2, 1]])
-      foldsMarkerLayer.markRange([[2, 2], [3, 1]])
-      foldsMarkerLayer.markRange([[3, 2], [4, 1]])
-      foldsMarkerLayer.markRange([[4, 2], [5, 1]])
-      const displayLayer = buffer.addDisplayLayer({foldsMarkerLayer})
+        text: "abc\ndef\nghi\njkl\nmno\npqr",
+      });
+      const foldsMarkerLayer = buffer.addMarkerLayer();
+      foldsMarkerLayer.markRange([
+        [1, 2],
+        [2, 1],
+      ]);
+      foldsMarkerLayer.markRange([
+        [2, 2],
+        [3, 1],
+      ]);
+      foldsMarkerLayer.markRange([
+        [3, 2],
+        [4, 1],
+      ]);
+      foldsMarkerLayer.markRange([
+        [4, 2],
+        [5, 1],
+      ]);
+      const displayLayer = buffer.addDisplayLayer({ foldsMarkerLayer });
 
-      expect(displayLayer.indexedBufferRowCount).toBe(0)
-      displayLayer.foldBufferRange([[0, 2], [1, 1]])
-      expect(displayLayer.getText()).toBe('ab⋯e⋯h⋯k⋯n⋯qr')
-    })
+      expect(displayLayer.indexedBufferRowCount).toBe(0);
+      displayLayer.foldBufferRange([
+        [0, 2],
+        [1, 1],
+      ]);
+      expect(displayLayer.getText()).toBe("ab⋯e⋯h⋯k⋯n⋯qr");
+    });
 
-    it('accounts for pre-populated folds with intersecting ranges when populating an empty index', () => {
+    it("accounts for pre-populated folds with intersecting ranges when populating an empty index", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef\nghi\njkl\nmno\npqr'
-      })
-      const foldsMarkerLayer = buffer.addMarkerLayer()
-      foldsMarkerLayer.markRange([[1, 2], [2, 2]])
-      foldsMarkerLayer.markRange([[2, 1], [3, 2]])
-      foldsMarkerLayer.markRange([[3, 1], [4, 2]])
-      foldsMarkerLayer.markRange([[4, 2], [5, 1]])
-      const displayLayer = buffer.addDisplayLayer({foldsMarkerLayer})
+        text: "abc\ndef\nghi\njkl\nmno\npqr",
+      });
+      const foldsMarkerLayer = buffer.addMarkerLayer();
+      foldsMarkerLayer.markRange([
+        [1, 2],
+        [2, 2],
+      ]);
+      foldsMarkerLayer.markRange([
+        [2, 1],
+        [3, 2],
+      ]);
+      foldsMarkerLayer.markRange([
+        [3, 1],
+        [4, 2],
+      ]);
+      foldsMarkerLayer.markRange([
+        [4, 2],
+        [5, 1],
+      ]);
+      const displayLayer = buffer.addDisplayLayer({ foldsMarkerLayer });
 
-      expect(displayLayer.indexedBufferRowCount).toBe(0)
-      displayLayer.foldBufferRange([[0, 2], [1, 1]])
-      expect(displayLayer.getText()).toBe('ab⋯e⋯⋯qr')
-    })
+      expect(displayLayer.indexedBufferRowCount).toBe(0);
+      displayLayer.foldBufferRange([
+        [0, 2],
+        [1, 1],
+      ]);
+      expect(displayLayer.getText()).toBe("ab⋯e⋯⋯qr");
+    });
 
-    it('accounts for random pre-populated folds when populating an empty index', () => {
-      const now = Date.now()
+    it("accounts for random pre-populated folds when populating an empty index", () => {
+      const now = Date.now();
 
       for (let i = 0; i < 100; i++) {
-        let seed = now + i
+        let seed = now + i;
 
         try {
-          const random = new Random(seed)
+          const random = new Random(seed);
           const buffer = new TextBuffer({
-            text: buildRandomLines(random, 40)
-          })
+            text: buildRandomLines(random, 40),
+          });
           const foldsMarkerLayer = buffer.addMarkerLayer({
             maintainHistory: false,
             persistent: true,
-            destroyInvalidatedMarkers: true
-          })
+            destroyInvalidatedMarkers: true,
+          });
           for (let i = 0, n = random(20); i < n; i++) {
-            foldsMarkerLayer.markRange(getRandomBufferRange(random, buffer))
+            foldsMarkerLayer.markRange(getRandomBufferRange(random, buffer));
           }
 
-          const displayLayer = buffer.addDisplayLayer({foldsMarkerLayer})
+          const displayLayer = buffer.addDisplayLayer({ foldsMarkerLayer });
 
-          const randomRange = getRandomBufferRange(random, buffer)
+          const randomRange = getRandomBufferRange(random, buffer);
 
           // In displayLayerCopy, our reference, we'll create a fold after fully populating the spatial index
-          const displayLayerCopy = displayLayer.copy()
-          displayLayerCopy.getText() // force a full index
-          expect(displayLayerCopy.indexedBufferRowCount).toBe(buffer.getLineCount())
-          displayLayerCopy.foldBufferRange(randomRange)
+          const displayLayerCopy = displayLayer.copy();
+          displayLayerCopy.getText(); // force a full index
+          expect(displayLayerCopy.indexedBufferRowCount).toBe(buffer.getLineCount());
+          displayLayerCopy.foldBufferRange(randomRange);
 
           // In displayLayer, we'll create a fold before poulating the spatial index.
-          expect(displayLayer.indexedBufferRowCount).toBe(0)
-          displayLayer.foldBufferRange(randomRange)
+          expect(displayLayer.indexedBufferRowCount).toBe(0);
+          displayLayer.foldBufferRange(randomRange);
 
-          expect(displayLayer.getText()).toBe(displayLayerCopy.getText())
+          expect(displayLayer.getText()).toBe(displayLayerCopy.getText());
         } catch (error) {
-          console.log(`Failing Seed: ${seed}`)
-          throw error
+          console.log(`Failing Seed: ${seed}`);
+          throw error;
         }
       }
-    })
+    });
 
-    it('correctly updates the index for edits fully contained within multi-line folds that appear on soft-wrapped line segments', () => {
+    it("correctly updates the index for edits fully contained within multi-line folds that appear on soft-wrapped line segments", () => {
       const buffer = new TextBuffer({
-        text: 'premillennial alcoholism\nelse\t\nastraphobia stereotomy\nbananas\n'
-      })
+        text: "premillennial alcoholism\nelse\t\nastraphobia stereotomy\nbananas\n",
+      });
       const displayLayer = buffer.addDisplayLayer({
         tabLength: 4,
-        invisibles: {eol: '¬'},
-        softWrapColumn: 10
-      })
-      displayLayer.foldBufferRange([[0, 16], [1, 4]])
-      displayLayer.foldBufferRange([[1, 5], [3, 3]])
-      buffer.setTextInRange([[2, 16], [2, 21]], ' \nunderlinen\ncopybook\t')
-      expect(displayLayer.getText()).toBe('premillenn\nial al⋯ \n⋯anas¬\n')
-    })
-  })
+        invisibles: { eol: "¬" },
+        softWrapColumn: 10,
+      });
+      displayLayer.foldBufferRange([
+        [0, 16],
+        [1, 4],
+      ]);
+      displayLayer.foldBufferRange([
+        [1, 5],
+        [3, 3],
+      ]);
+      buffer.setTextInRange(
+        [
+          [2, 16],
+          [2, 21],
+        ],
+        " \nunderlinen\ncopybook\t",
+      );
+      expect(displayLayer.getText()).toBe("premillenn\nial al⋯ \n⋯anas¬\n");
+    });
+  });
 
-  describe('soft wraps', () => {
-    it('soft wraps the line at the first word start at or preceding the softWrapColumn', () => {
+  describe("soft wraps", () => {
+    it("soft wraps the line at the first word start at or preceding the softWrapColumn", () => {
       let buffer = new TextBuffer({
-        text: 'abc def ghi jkl mno'
-      })
+        text: "abc def ghi jkl mno",
+      });
 
       let displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 8
-      })
+        softWrapColumn: 8,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('abc def \nghi jkl \nmno'))
-
-      buffer = new TextBuffer({
-        text: 'abc defg hij klmno'
-      })
-
-      displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 8
-      })
-
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('abc \ndefg \nhij \nklmno'))
+      expect(JSON.stringify(displayLayer.getText())).toBe(
+        JSON.stringify("abc def \nghi jkl \nmno"),
+      );
 
       buffer = new TextBuffer({
-        text: 'abcdefg hijklmno'
-      })
+        text: "abc defg hij klmno",
+      });
 
       displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 8
-      })
+        softWrapColumn: 8,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('abcdefg \nhijklmno'))
-    })
+      expect(JSON.stringify(displayLayer.getText())).toBe(
+        JSON.stringify("abc \ndefg \nhij \nklmno"),
+      );
 
-    it('soft wraps the line at the softWrapColumn if no word start boundary precedes it', () => {
+      buffer = new TextBuffer({
+        text: "abcdefg hijklmno",
+      });
+
+      displayLayer = buffer.addDisplayLayer({
+        softWrapColumn: 8,
+      });
+
+      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify("abcdefg \nhijklmno"));
+    });
+
+    it("soft wraps the line at the softWrapColumn if no word start boundary precedes it", () => {
       let buffer = new TextBuffer({
-        text: 'abcdefghijklmnopq'
-      })
+        text: "abcdefghijklmnopq",
+      });
 
       let displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 8
-      })
+        softWrapColumn: 8,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('abcdefgh\nijklmnop\nq'))
+      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify("abcdefgh\nijklmnop\nq"));
 
       buffer = new TextBuffer({
-        text: 'abcd        efghijklmno'
-      })
+        text: "abcd        efghijklmno",
+      });
 
       displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 8
-      })
+        softWrapColumn: 8,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('abcd    \n    \nefghijkl\nmno'))
-    })
+      expect(JSON.stringify(displayLayer.getText())).toBe(
+        JSON.stringify("abcd    \n    \nefghijkl\nmno"),
+      );
+    });
 
-    it('does not soft wrap at the first word start boundary after leading whitespace', () => {
+    it("does not soft wrap at the first word start boundary after leading whitespace", () => {
       let buffer = new TextBuffer({
-        text: '    abcdefgh'
-      })
+        text: "    abcdefgh",
+      });
 
       let displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 8
-      })
+        softWrapColumn: 8,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('    abcd\n    efgh'))
+      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify("    abcd\n    efgh"));
 
       buffer = new TextBuffer({
-        text: '            abcdefgh'
-      })
+        text: "            abcdefgh",
+      });
 
       displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 8
-      })
+        softWrapColumn: 8,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('        \n    abcd\n    efgh'))
-    })
+      expect(JSON.stringify(displayLayer.getText())).toBe(
+        JSON.stringify("        \n    abcd\n    efgh"),
+      );
+    });
 
-    it('soft wraps the line according to the isWrapBoundary function', () => {
+    it("soft wraps the line according to the isWrapBoundary function", () => {
       const buffer = new TextBuffer({
-        text: 'abcdefghijk\nlmno'
-      })
+        text: "abcdefghijk\nlmno",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         softWrapColumn: 8,
 
         isWrapBoundary: function (previousCharacter, character) {
-          return character === 'd'
-        }
-      })
+          return character === "d";
+        },
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('abc\ndefghijk\nlmno'))
-    })
+      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify("abc\ndefghijk\nlmno"));
+    });
 
-    it('takes into account character ratios when determining the wrap boundary', () => {
+    it("takes into account character ratios when determining the wrap boundary", () => {
       const ratiosByCharacter = {
-        'ㅅ': 1.3,
-        'ㅘ': 1.3,
-        'ｶ': 0.5,
-        'ﾕ': 0.5,
-        'あ': 2,
-        '繁': 2,
-        '體': 2,
-        '字': 2,
-        ' ': 4
-      }
+        ㅅ: 1.3,
+        ㅘ: 1.3,
+        ｶ: 0.5,
+        ﾕ: 0.5,
+        あ: 2,
+        繁: 2,
+        體: 2,
+        字: 2,
+        " ": 4,
+      };
 
       const buffer = new TextBuffer({
-        text: 'ㅅㅘｶﾕあ繁體字abc def\n 字ｶﾕghi'
-      })
+        text: "ㅅㅘｶﾕあ繁體字abc def\n 字ｶﾕghi",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         softWrapColumn: 7,
-        ratioForCharacter: (c) => ratiosByCharacter[c] || 1
-      })
+        ratioForCharacter: (c) => ratiosByCharacter[c] || 1,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('ㅅㅘｶﾕあ\n繁體字a\nbc \ndef\n 字ｶﾕ\n ghi'))
-    })
+      expect(JSON.stringify(displayLayer.getText())).toBe(
+        JSON.stringify("ㅅㅘｶﾕあ\n繁體字a\nbc \ndef\n 字ｶﾕ\n ghi"),
+      );
+    });
 
-    it('preserves the indent on wrapped segments of the line', () => {
+    it("preserves the indent on wrapped segments of the line", () => {
       const buffer = new TextBuffer({
-        text: '     abc de fgh ijk\n  lmnopqrst'
-      })
+        text: "     abc de fgh ijk\n  lmnopqrst",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         softWrapColumn: 9,
@@ -717,215 +888,221 @@ describe('DisplayLayer', () => {
         tabLength: 2,
 
         invisibles: {
-          space: '•'
-        }
-      })
+          space: "•",
+        },
+      });
 
       expect(JSON.stringify(displayLayer.getText())).toBe(
-        JSON.stringify('•••••abc \n     de \n     fgh \n     ijk\n••lmnopqr\n  st')
-      )
+        JSON.stringify("•••••abc \n     de \n     fgh \n     ijk\n••lmnopqr\n  st"),
+      );
 
       expectTokenBoundaries(displayLayer, [
         {
           close: [],
-          open: ['invisible-character leading-whitespace indent-guide'],
-          text: '••'
+          open: ["invisible-character leading-whitespace indent-guide"],
+          text: "••",
         },
         {
-          close: ['invisible-character leading-whitespace indent-guide'],
-          open: ['invisible-character leading-whitespace indent-guide'],
-          text: '••'
+          close: ["invisible-character leading-whitespace indent-guide"],
+          open: ["invisible-character leading-whitespace indent-guide"],
+          text: "••",
         },
         {
-          close: ['invisible-character leading-whitespace indent-guide'],
-          open: ['invisible-character leading-whitespace indent-guide'],
-          text: '•'
+          close: ["invisible-character leading-whitespace indent-guide"],
+          open: ["invisible-character leading-whitespace indent-guide"],
+          text: "•",
         },
         {
-          close: ['invisible-character leading-whitespace indent-guide'],
+          close: ["invisible-character leading-whitespace indent-guide"],
           open: [],
-          text: 'abc '
+          text: "abc ",
         },
         {
           close: [],
-          open: ['indent-guide'],
-          text: '  '
+          open: ["indent-guide"],
+          text: "  ",
         },
         {
-          close: ['indent-guide'],
-          open: ['indent-guide'],
-          text: '  '
+          close: ["indent-guide"],
+          open: ["indent-guide"],
+          text: "  ",
         },
         {
-          close: ['indent-guide'],
-          open: ['indent-guide'],
-          text: ' '
+          close: ["indent-guide"],
+          open: ["indent-guide"],
+          text: " ",
         },
         {
-          close: ['indent-guide'],
+          close: ["indent-guide"],
           open: [],
-          text: 'de '
+          text: "de ",
         },
         {
           close: [],
-          open: ['indent-guide'],
-          text: '  '
+          open: ["indent-guide"],
+          text: "  ",
         },
         {
-          close: ['indent-guide'],
-          open: ['indent-guide'],
-          text: '  '
+          close: ["indent-guide"],
+          open: ["indent-guide"],
+          text: "  ",
         },
         {
-          close: ['indent-guide'],
-          open: ['indent-guide'],
-          text: ' '
+          close: ["indent-guide"],
+          open: ["indent-guide"],
+          text: " ",
         },
         {
-          close: ['indent-guide'],
+          close: ["indent-guide"],
           open: [],
-          text: 'fgh '
+          text: "fgh ",
         },
         {
           close: [],
-          open: ['indent-guide'],
-          text: '  '
+          open: ["indent-guide"],
+          text: "  ",
         },
         {
-          close: ['indent-guide'],
-          open: ['indent-guide'],
-          text: '  '
+          close: ["indent-guide"],
+          open: ["indent-guide"],
+          text: "  ",
         },
         {
-          close: ['indent-guide'],
-          open: ['indent-guide'],
-          text: ' '
+          close: ["indent-guide"],
+          open: ["indent-guide"],
+          text: " ",
         },
         {
-          close: ['indent-guide'],
+          close: ["indent-guide"],
           open: [],
-          text: 'ijk'
+          text: "ijk",
         },
         {
           close: [],
-          open: ['invisible-character leading-whitespace indent-guide'],
-          text: '••'
+          open: ["invisible-character leading-whitespace indent-guide"],
+          text: "••",
         },
         {
-          close: ['invisible-character leading-whitespace indent-guide'],
+          close: ["invisible-character leading-whitespace indent-guide"],
           open: [],
-          text: 'lmnopqr'
+          text: "lmnopqr",
         },
         {
           close: [],
-          open: ['indent-guide'],
-          text: '  '
+          open: ["indent-guide"],
+          text: "  ",
         },
         {
-          close: ['indent-guide'],
+          close: ["indent-guide"],
           open: [],
-          text: 'st'
-        }
-      ])
-    })
+          text: "st",
+        },
+      ]);
+    });
 
-    it('ignores indents that are greater than or equal to the softWrapColumn', () => {
+    it("ignores indents that are greater than or equal to the softWrapColumn", () => {
       const buffer = new TextBuffer({
-        text: '        abcde fghijk'
-      })
+        text: "        abcde fghijk",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 8
-      })
+        softWrapColumn: 8,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('        \nabcde \nfghijk'))
-    })
+      expect(JSON.stringify(displayLayer.getText())).toBe(
+        JSON.stringify("        \nabcde \nfghijk"),
+      );
+    });
 
-    it('honors the softWrapHangingIndent setting', () => {
+    it("honors the softWrapHangingIndent setting", () => {
       let buffer = new TextBuffer({
-        text: 'abcdef ghi'
-      })
+        text: "abcdef ghi",
+      });
 
       let displayLayer = buffer.addDisplayLayer({
         softWrapColumn: 8,
-        softWrapHangingIndent: 2
-      })
+        softWrapHangingIndent: 2,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('abcdef \n  ghi'))
+      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify("abcdef \n  ghi"));
 
       buffer = new TextBuffer({
-        text: '   abc de fgh ijk'
-      })
+        text: "   abc de fgh ijk",
+      });
 
       displayLayer = buffer.addDisplayLayer({
         softWrapColumn: 8,
-        softWrapHangingIndent: 2
-      })
+        softWrapHangingIndent: 2,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('   abc \n     de \n     fgh\n      \n     ijk'))
+      expect(JSON.stringify(displayLayer.getText())).toBe(
+        JSON.stringify("   abc \n     de \n     fgh\n      \n     ijk"),
+      );
 
       buffer = new TextBuffer({
-        text: '        abcde fghijk'
-      })
+        text: "        abcde fghijk",
+      });
 
       displayLayer = buffer.addDisplayLayer({
         softWrapColumn: 8,
-        softWrapHangingIndent: 2
-      })
+        softWrapHangingIndent: 2,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('        \n  abcde \n  fghijk'))
-    })
+      expect(JSON.stringify(displayLayer.getText())).toBe(
+        JSON.stringify("        \n  abcde \n  fghijk"),
+      );
+    });
 
-    it('correctly soft wraps lines with trailing hard tabs', () => {
+    it("correctly soft wraps lines with trailing hard tabs", () => {
       const buffer = new TextBuffer({
-        text: 'abc def\t\t'
-      })
+        text: "abc def\t\t",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         tabLength: 4,
-        softWrapColumn: 8
-      })
+        softWrapColumn: 8,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('abc \ndef     '))
-    })
+      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify("abc \ndef     "));
+    });
 
-    it('re-expands tabs on soft-wrapped lines', () => {
+    it("re-expands tabs on soft-wrapped lines", () => {
       const buffer = new TextBuffer({
-        text: 'fah\t\t\tcodexelectric valence\t ble'
-      })
+        text: "fah\t\t\tcodexelectric valence\t ble",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         tabLength: 4,
-        softWrapColumn: 12
-      })
+        softWrapColumn: 12,
+      });
 
-      displayLayer.getText()
-      expect(displayLayer.indexedBufferRowCount).toBe(buffer.getLineCount())
-      verifyLineLengths(displayLayer)
-    })
+      displayLayer.getText();
+      expect(displayLayer.indexedBufferRowCount).toBe(buffer.getLineCount());
+      verifyLineLengths(displayLayer);
+    });
 
-    it('correctly soft wraps lines when hard tabs are wider than the softWrapColumn', () => {
+    it("correctly soft wraps lines when hard tabs are wider than the softWrapColumn", () => {
       const buffer = new TextBuffer({
-        text: '\they'
-      })
+        text: "\they",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         tabLength: 10,
-        softWrapColumn: 8
-      })
+        softWrapColumn: 8,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('          \nhey'))
-    })
+      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify("          \nhey"));
+    });
 
-    it('translates points correctly on soft-wrapped lines', () => {
+    it("translates points correctly on soft-wrapped lines", () => {
       {
-        const buffer = new TextBuffer({text: '   abc defgh'})
+        const buffer = new TextBuffer({ text: "   abc defgh" });
         const displayLayer = buffer.addDisplayLayer({
           softWrapColumn: 8,
-          softWrapHangingIndent: 2
-        })
+          softWrapHangingIndent: 2,
+        });
 
-        expect(displayLayer.getText()).toBe('   abc \n     def\n     gh')
+        expect(displayLayer.getText()).toBe("   abc \n     def\n     gh");
         expectPositionTranslations(displayLayer, [
           [Point(0, 0), Point(0, 0)],
           [Point(0, 1), Point(0, 1)],
@@ -953,1920 +1130,2411 @@ describe('DisplayLayer', () => {
           [Point(2, 4), [Point(0, 9), Point(0, 10)]],
           [Point(2, 5), Point(0, 10)],
           [Point(2, 6), Point(0, 11)],
-          [Point(2, 7), Point(0, 12)]
-        ])
+          [Point(2, 7), Point(0, 12)],
+        ]);
       }
 
       {
         // Translating in the middle of an atomic soft tab that has been soft-wrapped.
-        const buffer = new TextBuffer({text: '    '})
-        const displayLayer = buffer.addDisplayLayer({tabLength: 2, softWrapColumn: 3})
+        const buffer = new TextBuffer({ text: "    " });
+        const displayLayer = buffer.addDisplayLayer({ tabLength: 2, softWrapColumn: 3 });
 
-        expect(displayLayer.getText()).toBe('   \n ')
+        expect(displayLayer.getText()).toBe("   \n ");
 
-        expect(displayLayer.translateBufferPosition([0, 3], {clipDirection: 'backward'})).toEqual([0, 2])
-        expect(displayLayer.translateBufferPosition([0, 3], {clipDirection: 'closest'})).toEqual([0, 2])
-        expect(displayLayer.translateBufferPosition([0, 3], {clipDirection: 'forward'})).toEqual([1, 1])
+        expect(displayLayer.translateBufferPosition([0, 3], { clipDirection: "backward" })).toEqual(
+          [0, 2],
+        );
+        expect(displayLayer.translateBufferPosition([0, 3], { clipDirection: "closest" })).toEqual([
+          0, 2,
+        ]);
+        expect(displayLayer.translateBufferPosition([0, 3], { clipDirection: "forward" })).toEqual([
+          1, 1,
+        ]);
 
-        expect(displayLayer.translateScreenPosition([1, 0], {clipDirection: 'backward'})).toEqual([0, 2])
-        expect(displayLayer.translateScreenPosition([1, 0], {clipDirection: 'closest'})).toEqual([0, 2])
-        expect(displayLayer.translateScreenPosition([1, 0], {clipDirection: 'forward'})).toEqual([0, 4])
+        expect(displayLayer.translateScreenPosition([1, 0], { clipDirection: "backward" })).toEqual(
+          [0, 2],
+        );
+        expect(displayLayer.translateScreenPosition([1, 0], { clipDirection: "closest" })).toEqual([
+          0, 2,
+        ]);
+        expect(displayLayer.translateScreenPosition([1, 0], { clipDirection: "forward" })).toEqual([
+          0, 4,
+        ]);
       }
-    })
+    });
 
-    it('prefers the skipSoftWrapIndentation option over clipDirection when translating points', () => {
+    it("prefers the skipSoftWrapIndentation option over clipDirection when translating points", () => {
       const buffer = new TextBuffer({
-        text: '   abc defgh'
-      })
+        text: "   abc defgh",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         softWrapColumn: 8,
-        softWrapHangingIndent: 2
-      })
+        softWrapHangingIndent: 2,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('   abc \n     def\n     gh'))
+      expect(JSON.stringify(displayLayer.getText())).toBe(
+        JSON.stringify("   abc \n     def\n     gh"),
+      );
 
-      expect(displayLayer.clipScreenPosition([1, 0], {
-        clipDirection: 'backward',
-        skipSoftWrapIndentation: true
-      })).toEqual([1, 5])
+      expect(
+        displayLayer.clipScreenPosition([1, 0], {
+          clipDirection: "backward",
+          skipSoftWrapIndentation: true,
+        }),
+      ).toEqual([1, 5]);
 
-      expect(displayLayer.translateScreenPosition([1, 0], {
-        clipDirection: 'backward',
-        skipSoftWrapIndentation: true
-      })).toEqual([0, 7])
-    })
+      expect(
+        displayLayer.translateScreenPosition([1, 0], {
+          clipDirection: "backward",
+          skipSoftWrapIndentation: true,
+        }),
+      ).toEqual([0, 7]);
+    });
 
-    it('renders trailing whitespaces correctly, even when they are wrapped', () => {
+    it("renders trailing whitespaces correctly, even when they are wrapped", () => {
       const buffer = new TextBuffer({
-        text: '  abc                     '
-      })
+        text: "  abc                     ",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 10
-      })
+        softWrapColumn: 10,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('  abc     \n          \n          '))
+      expect(JSON.stringify(displayLayer.getText())).toBe(
+        JSON.stringify("  abc     \n          \n          "),
+      );
 
-      expectTokenBoundaries(displayLayer, [{
-        text: '  ',
-        close: [],
-        open: ['leading-whitespace']
-      }, {
-        text: 'abc',
-        close: ['leading-whitespace'],
-        open: []
-      }, {
-        text: '     ',
-        close: [],
-        open: ['trailing-whitespace']
-      }, {
-        text: '',
-        close: ['trailing-whitespace'],
-        open: []
-      }, {
-        text: '  ',
-        close: [],
-        open: []
-      }, {
-        text: '        ',
-        close: [],
-        open: ['trailing-whitespace']
-      }, {
-        text: '',
-        close: ['trailing-whitespace'],
-        open: []
-      }, {
-        text: '  ',
-        close: [],
-        open: []
-      }, {
-        text: '        ',
-        close: [],
-        open: ['trailing-whitespace']
-      }, {
-        text: '',
-        close: ['trailing-whitespace'],
-        open: []
-      }])
-    })
+      expectTokenBoundaries(displayLayer, [
+        {
+          text: "  ",
+          close: [],
+          open: ["leading-whitespace"],
+        },
+        {
+          text: "abc",
+          close: ["leading-whitespace"],
+          open: [],
+        },
+        {
+          text: "     ",
+          close: [],
+          open: ["trailing-whitespace"],
+        },
+        {
+          text: "",
+          close: ["trailing-whitespace"],
+          open: [],
+        },
+        {
+          text: "  ",
+          close: [],
+          open: [],
+        },
+        {
+          text: "        ",
+          close: [],
+          open: ["trailing-whitespace"],
+        },
+        {
+          text: "",
+          close: ["trailing-whitespace"],
+          open: [],
+        },
+        {
+          text: "  ",
+          close: [],
+          open: [],
+        },
+        {
+          text: "        ",
+          close: [],
+          open: ["trailing-whitespace"],
+        },
+        {
+          text: "",
+          close: ["trailing-whitespace"],
+          open: [],
+        },
+      ]);
+    });
 
-    it('gracefully handles non-positive softWrapColumns', () => {
+    it("gracefully handles non-positive softWrapColumns", () => {
       const buffer = new TextBuffer({
-        text: 'abc'
-      })
+        text: "abc",
+      });
 
       let displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 0
-      })
+        softWrapColumn: 0,
+      });
 
-      expect(displayLayer.getText()).toBe('a\nb\nc')
+      expect(displayLayer.getText()).toBe("a\nb\nc");
 
       displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: -1
-      })
+        softWrapColumn: -1,
+      });
 
-      expect(displayLayer.getText()).toBe('a\nb\nc')
-    })
+      expect(displayLayer.getText()).toBe("a\nb\nc");
+    });
 
-    it('allows soft wraps immediately following folds', () => {
+    it("allows soft wraps immediately following folds", () => {
       const buffer = new TextBuffer({
-        text: 'abcdef\nghijkl'
-      })
+        text: "abcdef\nghijkl",
+      });
 
       let displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 4
-      })
-      displayLayer.foldBufferRange([[0, 3], [1, 3]])
-      expect(displayLayer.getText()).toBe('abc⋯\njkl')
-    })
+        softWrapColumn: 4,
+      });
+      displayLayer.foldBufferRange([
+        [0, 3],
+        [1, 3],
+      ]);
+      expect(displayLayer.getText()).toBe("abc⋯\njkl");
+    });
 
-    it('handles edits following a soft wrap in between adjacent folds ending/starting at column 1', () => {
+    it("handles edits following a soft wrap in between adjacent folds ending/starting at column 1", () => {
       const buffer = new TextBuffer({
-        text: '  abcdef\nghijk\nlmnop'
-      })
+        text: "  abcdef\nghijk\nlmnop",
+      });
 
       let displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 6
-      })
-      displayLayer.foldBufferRange([[0, 5], [1, 1]])
-      displayLayer.foldBufferRange([[1, 1], [2, 1]])
-      buffer.setTextInRange([[2, 2], [2, 3]], 'xyz')
-      expect(displayLayer.getText()).toBe('  abc⋯\n  ⋯mxy\n  zop')
-    })
-  })
+        softWrapColumn: 6,
+      });
+      displayLayer.foldBufferRange([
+        [0, 5],
+        [1, 1],
+      ]);
+      displayLayer.foldBufferRange([
+        [1, 1],
+        [2, 1],
+      ]);
+      buffer.setTextInRange(
+        [
+          [2, 2],
+          [2, 3],
+        ],
+        "xyz",
+      );
+      expect(displayLayer.getText()).toBe("  abc⋯\n  ⋯mxy\n  zop");
+    });
+  });
 
-  describe('invisibles', () => {
-    it('replaces leading whitespaces with the corresponding invisible character, appropriately decorated', () => {
+  describe("invisibles", () => {
+    it("replaces leading whitespaces with the corresponding invisible character, appropriately decorated", () => {
       const buffer = new TextBuffer({
-        text: 'az\n  b c\n   d\n \t e'
-      })
+        text: "az\n  b c\n   d\n \t e",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         tabLength: 4,
 
         invisibles: {
-          space: '•'
-        }
-      })
+          space: "•",
+        },
+      });
 
-      expect(displayLayer.getText()).toBe('az\n••b c\n•••d\n•   •e')
-
-      expectTokenBoundaries(displayLayer, [{
-        text: 'az',
-        close: [],
-        open: []
-      }, {
-        text: '••',
-        close: [],
-        open: ['invisible-character leading-whitespace']
-      }, {
-        text: 'b c',
-        close: ['invisible-character leading-whitespace'],
-        open: []
-      }, {
-        text: '•••',
-        close: [],
-        open: ['invisible-character leading-whitespace']
-      }, {
-        text: 'd',
-        close: ['invisible-character leading-whitespace'],
-        open: []
-      }, {
-        text: '•',
-        close: [],
-        open: ['invisible-character leading-whitespace']
-      }, {
-        text: '   ',
-        close: ['invisible-character leading-whitespace'],
-        open: ['hard-tab leading-whitespace']
-      }, {
-        text: '•',
-        close: ['hard-tab leading-whitespace'],
-        open: ['invisible-character leading-whitespace']
-      }, {
-        text: 'e',
-        close: ['invisible-character leading-whitespace'],
-        open: []
-      }])
-    })
-
-    it('replaces trailing whitespaces with the corresponding invisible character, appropriately decorated', () => {
-      const buffer = new TextBuffer('abcd\n       \nefgh   jkl\nmno  pqr   \nst  uvw  \t  ')
-
-      const displayLayer = buffer.addDisplayLayer({
-        tabLength: 4,
-
-        invisibles: {
-          space: '•'
-        }
-      })
-
-      expect(displayLayer.getText()).toEqual('abcd\n•••••••\nefgh   jkl\nmno  pqr•••\nst  uvw••   ••')
-
-      expectTokenBoundaries(displayLayer, [{
-        text: 'abcd',
-        close: [],
-        open: []
-      }, {
-        text: '•••••••',
-        close: [],
-        open: ['invisible-character trailing-whitespace']
-      }, {
-        text: '',
-        close: ['invisible-character trailing-whitespace'],
-        open: []
-      }, {
-        text: 'efgh   jkl',
-        close: [],
-        open: []
-      }, {
-        text: 'mno  pqr',
-        close: [],
-        open: []
-      }, {
-        text: '•••',
-        close: [],
-        open: ['invisible-character trailing-whitespace']
-      }, {
-        text: '',
-        close: ['invisible-character trailing-whitespace'],
-        open: []
-      }, {
-        text: 'st  uvw',
-        close: [],
-        open: []
-      }, {
-        text: '••',
-        close: [],
-        open: ['invisible-character trailing-whitespace']
-      }, {
-        text: '   ',
-        close: ['invisible-character trailing-whitespace'],
-        open: ['hard-tab trailing-whitespace']
-      }, {
-        text: '••',
-        close: ['hard-tab trailing-whitespace'],
-        open: ['invisible-character trailing-whitespace']
-      }, {
-        text: '',
-        close: ['invisible-character trailing-whitespace'],
-        open: []
-      }])
-    })
-
-    it('decorates hard tabs, leading whitespace, and trailing whitespace, even when no invisible characters are specified', () => {
-      const buffer = new TextBuffer(' \t a\tb \t \n  ')
-
-      const displayLayer = buffer.addDisplayLayer({
-        tabLength: 4
-      })
-
-      expect(displayLayer.getText()).toEqual('     a  b    \n  ')
-
-      expectTokenBoundaries(displayLayer, [{
-        text: ' ',
-        close: [],
-        open: ['leading-whitespace']
-      }, {
-        text: '   ',
-        close: ['leading-whitespace'],
-        open: ['hard-tab leading-whitespace']
-      }, {
-        text: ' ',
-        close: ['hard-tab leading-whitespace'],
-        open: ['leading-whitespace']
-      }, {
-        text: 'a',
-        close: ['leading-whitespace'],
-        open: []
-      }, {
-        text: '  ',
-        close: [],
-        open: ['hard-tab']
-      }, {
-        text: 'b',
-        close: ['hard-tab'],
-        open: []
-      }, {
-        text: ' ',
-        close: [],
-        open: ['trailing-whitespace']
-      }, {
-        text: '  ',
-        close: ['trailing-whitespace'],
-        open: ['hard-tab trailing-whitespace']
-      }, {
-        text: ' ',
-        close: ['hard-tab trailing-whitespace'],
-        open: ['trailing-whitespace']
-      }, {
-        text: '',
-        close: ['trailing-whitespace'],
-        open: []
-      }, {
-        text: '  ',
-        close: [],
-        open: ['trailing-whitespace']
-      }, {
-        text: '',
-        close: ['trailing-whitespace'],
-        open: []
-      }])
-    })
-
-    it('renders invisibles correctly when leading or trailing whitespace intersects folds', () => {
-      const buffer = new TextBuffer('    a    \n    b\nc    \nd')
-
-      const displayLayer = buffer.addDisplayLayer({
-        tabLength: 4,
-
-        invisibles: {
-          space: '•'
-        }
-      })
-
-      displayLayer.foldBufferRange([[0, 2], [0, 7]])
-      displayLayer.foldBufferRange([[1, 2], [2, 2]])
-      displayLayer.foldBufferRange([[2, 4], [3, 0]])
-      expect(displayLayer.getText()).toBe('••⋯••\n••⋯••⋯d')
-
-      expectTokenBoundaries(displayLayer, [{
-        text: '••',
-        close: [],
-        open: ['invisible-character leading-whitespace']
-      }, {
-        text: '⋯',
-        close: ['invisible-character leading-whitespace'],
-        open: ['fold-marker']
-      }, {
-        text: '••',
-        close: ['fold-marker'],
-        open: ['invisible-character trailing-whitespace']
-      }, {
-        text: '',
-        close: ['invisible-character trailing-whitespace'],
-        open: []
-      }, {
-        text: '••',
-        close: [],
-        open: ['invisible-character leading-whitespace']
-      }, {
-        text: '⋯',
-        close: ['invisible-character leading-whitespace'],
-        open: ['fold-marker']
-      }, {
-        text: '••',
-        close: ['fold-marker'],
-        open: ['invisible-character trailing-whitespace']
-      }, {
-        text: '⋯',
-        close: ['invisible-character trailing-whitespace'],
-        open: ['fold-marker']
-      }, {
-        text: 'd',
-        close: ['fold-marker'],
-        open: []
-      }])
-    })
-
-    it('renders tab invisibles, appropriately decorated', () => {
-      const buffer = new TextBuffer({
-        text: 'a\tb\t\n \t d  \t  '
-      })
-
-      const displayLayer = buffer.addDisplayLayer({
-        tabLength: 4,
-
-        invisibles: {
-          tab: '»',
-          space: '•'
-        }
-      })
-
-      expect(displayLayer.getText()).toBe('a»  b»  \n•»  •d••»   ••')
-
-      expectTokenBoundaries(displayLayer, [{
-        text: 'a',
-        close: [],
-        open: []
-      }, {
-        text: '»  ',
-        close: [],
-        open: ['invisible-character hard-tab']
-      }, {
-        text: 'b',
-        close: ['invisible-character hard-tab'],
-        open: []
-      }, {
-        text: '»  ',
-        close: [],
-        open: ['invisible-character hard-tab trailing-whitespace']
-      }, {
-        text: '',
-        close: ['invisible-character hard-tab trailing-whitespace'],
-        open: []
-      }, {
-        text: '•',
-        close: [],
-        open: ['invisible-character leading-whitespace']
-      }, {
-        text: '»  ',
-        close: ['invisible-character leading-whitespace'],
-        open: ['invisible-character hard-tab leading-whitespace']
-      }, {
-        text: '•',
-        close: ['invisible-character hard-tab leading-whitespace'],
-        open: ['invisible-character leading-whitespace']
-      }, {
-        text: 'd',
-        close: ['invisible-character leading-whitespace'],
-        open: []
-      }, {
-        text: '••',
-        close: [],
-        open: ['invisible-character trailing-whitespace']
-      }, {
-        text: '»   ',
-        close: ['invisible-character trailing-whitespace'],
-        open: ['invisible-character hard-tab trailing-whitespace']
-      }, {
-        text: '••',
-        close: ['invisible-character hard-tab trailing-whitespace'],
-        open: ['invisible-character trailing-whitespace']
-      }, {
-        text: '',
-        close: ['invisible-character trailing-whitespace'],
-        open: []
-      }])
-    })
-
-    it('renders end of line invisibles, appropriately decorated', () => {
-      const buffer = new TextBuffer({
-        text: 'a\nb\n\nd e f\r\ngh\r\nij\n\r\n'
-      })
-
-      const displayLayer = buffer.addDisplayLayer({
-        tabLength: 4,
-
-        invisibles: {
-          cr: '¤',
-          eol: '¬'
-        }
-      })
-
-      expect(displayLayer.getText()).toBe('a¬\nb¬\n¬\nd e f¤¬\ngh¤¬\nij¬\n¤¬\n')
+      expect(displayLayer.getText()).toBe("az\n••b c\n•••d\n•   •e");
 
       expectTokenBoundaries(displayLayer, [
         {
-          text: 'a',
+          text: "az",
           close: [],
-          open: []
+          open: [],
         },
         {
-          text: '¬',
+          text: "••",
           close: [],
-          open: ['invisible-character eol']
+          open: ["invisible-character leading-whitespace"],
         },
         {
-          text: '',
-          close: ['invisible-character eol'],
-          open: []
+          text: "b c",
+          close: ["invisible-character leading-whitespace"],
+          open: [],
         },
         {
-          text: 'b',
+          text: "•••",
           close: [],
-          open: []
+          open: ["invisible-character leading-whitespace"],
         },
         {
-          text: '¬',
+          text: "d",
+          close: ["invisible-character leading-whitespace"],
+          open: [],
+        },
+        {
+          text: "•",
           close: [],
-          open: ['invisible-character eol']
+          open: ["invisible-character leading-whitespace"],
         },
         {
-          text: '',
-          close: ['invisible-character eol'],
-          open: []
+          text: "   ",
+          close: ["invisible-character leading-whitespace"],
+          open: ["hard-tab leading-whitespace"],
         },
         {
-          text: '¬',
-          close: [],
-          open: ['invisible-character eol']
+          text: "•",
+          close: ["hard-tab leading-whitespace"],
+          open: ["invisible-character leading-whitespace"],
         },
         {
-          text: '',
-          close: ['invisible-character eol'],
-          open: []
+          text: "e",
+          close: ["invisible-character leading-whitespace"],
+          open: [],
         },
-        {
-          text: 'd e f',
-          close: [],
-          open: []
-        },
-        {
-          text: '¤¬',
-          close: [],
-          open: ['invisible-character eol']
-        },
-        {
-          text: '',
-          close: ['invisible-character eol'],
-          open: []
-        },
-        {
-          text: 'gh',
-          close: [],
-          open: []
-        },
-        {
-          text: '¤¬',
-          close: [],
-          open: ['invisible-character eol']
-        },
-        {
-          text: '',
-          close: ['invisible-character eol'],
-          open: []
-        },
-        {
-          text: 'ij',
-          close: [],
-          open: []
-        },
-        {
-          text: '¬',
-          close: [],
-          open: ['invisible-character eol']
-        },
-        {
-          text: '',
-          close: ['invisible-character eol'],
-          open: []
-        },
-        {
-          text: '¤¬',
-          close: [],
-          open: ['invisible-character eol']
-        },
-        {
-          text: '',
-          close: ['invisible-character eol'],
-          open: []
-        },
-        {
-          text: '',
-          close: [],
-          open: []
-        }
-      ])
+      ]);
+    });
 
-      expect(displayLayer.translateScreenPosition([0, 1], {
-        clipDirection: 'forward'
-      })).toEqual([0, 1])
-
-      expect(displayLayer.clipScreenPosition([0, 1], {
-        clipDirection: 'forward'
-      })).toEqual([0, 1])
-    })
-
-    it('does not clip positions within runs of invisible characters', () => {
-      const buffer = new TextBuffer({
-        text: '   a'
-      })
+    it("replaces trailing whitespaces with the corresponding invisible character, appropriately decorated", () => {
+      const buffer = new TextBuffer("abcd\n       \nefgh   jkl\nmno  pqr   \nst  uvw  \t  ");
 
       const displayLayer = buffer.addDisplayLayer({
+        tabLength: 4,
+
         invisibles: {
-          space: '•'
-        }
-      })
+          space: "•",
+        },
+      });
 
-      expect(displayLayer.clipScreenPosition(Point(0, 2))).toEqual(Point(0, 2))
-    })
-  })
-
-  describe('indent guides', () => {
-    it('decorates tab-stop-aligned regions of leading whitespace with indent guides', () => {
-      const buffer = new TextBuffer({
-        text: '         a      \t  \n  \t\t b\n  \t\t'
-      })
-
-      const displayLayer = buffer.addDisplayLayer({
-        showIndentGuides: true,
-        tabLength: 4
-      })
-
-      expect(displayLayer.getText()).toBe('         a            \n         b\n        ')
+      expect(displayLayer.getText()).toEqual(
+        "abcd\n•••••••\nefgh   jkl\nmno  pqr•••\nst  uvw••   ••",
+      );
 
       expectTokenBoundaries(displayLayer, [
         {
-          text: '    ',
+          text: "abcd",
           close: [],
-          open: ['leading-whitespace indent-guide']
+          open: [],
         },
         {
-          text: '    ',
-          close: ['leading-whitespace indent-guide'],
-          open: ['leading-whitespace indent-guide']
-        },
-        {
-          text: ' ',
-          close: ['leading-whitespace indent-guide'],
-          open: ['leading-whitespace indent-guide']
-        },
-        {
-          text: 'a',
-          close: ['leading-whitespace indent-guide'],
-          open: []
-        },
-        {
-          text: '      ',
+          text: "•••••••",
           close: [],
-          open: ['trailing-whitespace']
+          open: ["invisible-character trailing-whitespace"],
         },
         {
-          text: '    ',
-          close: ['trailing-whitespace'],
-          open: ['hard-tab trailing-whitespace']
+          text: "",
+          close: ["invisible-character trailing-whitespace"],
+          open: [],
         },
         {
-          text: '  ',
-          close: ['hard-tab trailing-whitespace'],
-          open: ['trailing-whitespace']
-        },
-        {
-          text: '',
-          close: ['trailing-whitespace'],
-          open: []
-        },
-        {
-          text: '  ',
+          text: "efgh   jkl",
           close: [],
-          open: ['leading-whitespace indent-guide']
+          open: [],
         },
         {
-          text: '  ',
-          close: ['leading-whitespace indent-guide'],
-          open: ['hard-tab leading-whitespace']
-        },
-        {
-          text: '    ',
-          close: ['hard-tab leading-whitespace'],
-          open: ['hard-tab leading-whitespace indent-guide']
-        },
-        {
-          text: ' ',
-          close: ['hard-tab leading-whitespace indent-guide'],
-          open: ['leading-whitespace indent-guide']
-        },
-        {
-          text: 'b',
-          close: ['leading-whitespace indent-guide'],
-          open: []
-        },
-        {
-          text: '  ',
+          text: "mno  pqr",
           close: [],
-          open: ['trailing-whitespace indent-guide']
+          open: [],
         },
         {
-          text: '  ',
-          close: ['trailing-whitespace indent-guide'],
-          open: ['hard-tab trailing-whitespace']
+          text: "•••",
+          close: [],
+          open: ["invisible-character trailing-whitespace"],
         },
         {
-          text: '    ',
-          close: ['hard-tab trailing-whitespace'],
-          open: ['hard-tab trailing-whitespace indent-guide']
+          text: "",
+          close: ["invisible-character trailing-whitespace"],
+          open: [],
         },
         {
-          text: '',
-          close: ['hard-tab trailing-whitespace indent-guide'],
-          open: []
-        }
-      ])
-    })
+          text: "st  uvw",
+          close: [],
+          open: [],
+        },
+        {
+          text: "••",
+          close: [],
+          open: ["invisible-character trailing-whitespace"],
+        },
+        {
+          text: "   ",
+          close: ["invisible-character trailing-whitespace"],
+          open: ["hard-tab trailing-whitespace"],
+        },
+        {
+          text: "••",
+          close: ["hard-tab trailing-whitespace"],
+          open: ["invisible-character trailing-whitespace"],
+        },
+        {
+          text: "",
+          close: ["invisible-character trailing-whitespace"],
+          open: [],
+        },
+      ]);
+    });
 
-    it('decorates empty lines with the max number of indent guides found on the surrounding non-empty lines', () => {
+    it("decorates hard tabs, leading whitespace, and trailing whitespace, even when no invisible characters are specified", () => {
+      const buffer = new TextBuffer(" \t a\tb \t \n  ");
+
+      const displayLayer = buffer.addDisplayLayer({
+        tabLength: 4,
+      });
+
+      expect(displayLayer.getText()).toEqual("     a  b    \n  ");
+
+      expectTokenBoundaries(displayLayer, [
+        {
+          text: " ",
+          close: [],
+          open: ["leading-whitespace"],
+        },
+        {
+          text: "   ",
+          close: ["leading-whitespace"],
+          open: ["hard-tab leading-whitespace"],
+        },
+        {
+          text: " ",
+          close: ["hard-tab leading-whitespace"],
+          open: ["leading-whitespace"],
+        },
+        {
+          text: "a",
+          close: ["leading-whitespace"],
+          open: [],
+        },
+        {
+          text: "  ",
+          close: [],
+          open: ["hard-tab"],
+        },
+        {
+          text: "b",
+          close: ["hard-tab"],
+          open: [],
+        },
+        {
+          text: " ",
+          close: [],
+          open: ["trailing-whitespace"],
+        },
+        {
+          text: "  ",
+          close: ["trailing-whitespace"],
+          open: ["hard-tab trailing-whitespace"],
+        },
+        {
+          text: " ",
+          close: ["hard-tab trailing-whitespace"],
+          open: ["trailing-whitespace"],
+        },
+        {
+          text: "",
+          close: ["trailing-whitespace"],
+          open: [],
+        },
+        {
+          text: "  ",
+          close: [],
+          open: ["trailing-whitespace"],
+        },
+        {
+          text: "",
+          close: ["trailing-whitespace"],
+          open: [],
+        },
+      ]);
+    });
+
+    it("renders invisibles correctly when leading or trailing whitespace intersects folds", () => {
+      const buffer = new TextBuffer("    a    \n    b\nc    \nd");
+
+      const displayLayer = buffer.addDisplayLayer({
+        tabLength: 4,
+
+        invisibles: {
+          space: "•",
+        },
+      });
+
+      displayLayer.foldBufferRange([
+        [0, 2],
+        [0, 7],
+      ]);
+      displayLayer.foldBufferRange([
+        [1, 2],
+        [2, 2],
+      ]);
+      displayLayer.foldBufferRange([
+        [2, 4],
+        [3, 0],
+      ]);
+      expect(displayLayer.getText()).toBe("••⋯••\n••⋯••⋯d");
+
+      expectTokenBoundaries(displayLayer, [
+        {
+          text: "••",
+          close: [],
+          open: ["invisible-character leading-whitespace"],
+        },
+        {
+          text: "⋯",
+          close: ["invisible-character leading-whitespace"],
+          open: ["fold-marker"],
+        },
+        {
+          text: "••",
+          close: ["fold-marker"],
+          open: ["invisible-character trailing-whitespace"],
+        },
+        {
+          text: "",
+          close: ["invisible-character trailing-whitespace"],
+          open: [],
+        },
+        {
+          text: "••",
+          close: [],
+          open: ["invisible-character leading-whitespace"],
+        },
+        {
+          text: "⋯",
+          close: ["invisible-character leading-whitespace"],
+          open: ["fold-marker"],
+        },
+        {
+          text: "••",
+          close: ["fold-marker"],
+          open: ["invisible-character trailing-whitespace"],
+        },
+        {
+          text: "⋯",
+          close: ["invisible-character trailing-whitespace"],
+          open: ["fold-marker"],
+        },
+        {
+          text: "d",
+          close: ["fold-marker"],
+          open: [],
+        },
+      ]);
+    });
+
+    it("renders tab invisibles, appropriately decorated", () => {
       const buffer = new TextBuffer({
-        text: '\n\n          a\n\n\t \t b\n\n\n'
-      })
+        text: "a\tb\t\n \t d  \t  ",
+      });
+
+      const displayLayer = buffer.addDisplayLayer({
+        tabLength: 4,
+
+        invisibles: {
+          tab: "»",
+          space: "•",
+        },
+      });
+
+      expect(displayLayer.getText()).toBe("a»  b»  \n•»  •d••»   ••");
+
+      expectTokenBoundaries(displayLayer, [
+        {
+          text: "a",
+          close: [],
+          open: [],
+        },
+        {
+          text: "»  ",
+          close: [],
+          open: ["invisible-character hard-tab"],
+        },
+        {
+          text: "b",
+          close: ["invisible-character hard-tab"],
+          open: [],
+        },
+        {
+          text: "»  ",
+          close: [],
+          open: ["invisible-character hard-tab trailing-whitespace"],
+        },
+        {
+          text: "",
+          close: ["invisible-character hard-tab trailing-whitespace"],
+          open: [],
+        },
+        {
+          text: "•",
+          close: [],
+          open: ["invisible-character leading-whitespace"],
+        },
+        {
+          text: "»  ",
+          close: ["invisible-character leading-whitespace"],
+          open: ["invisible-character hard-tab leading-whitespace"],
+        },
+        {
+          text: "•",
+          close: ["invisible-character hard-tab leading-whitespace"],
+          open: ["invisible-character leading-whitespace"],
+        },
+        {
+          text: "d",
+          close: ["invisible-character leading-whitespace"],
+          open: [],
+        },
+        {
+          text: "••",
+          close: [],
+          open: ["invisible-character trailing-whitespace"],
+        },
+        {
+          text: "»   ",
+          close: ["invisible-character trailing-whitespace"],
+          open: ["invisible-character hard-tab trailing-whitespace"],
+        },
+        {
+          text: "••",
+          close: ["invisible-character hard-tab trailing-whitespace"],
+          open: ["invisible-character trailing-whitespace"],
+        },
+        {
+          text: "",
+          close: ["invisible-character trailing-whitespace"],
+          open: [],
+        },
+      ]);
+    });
+
+    it("renders end of line invisibles, appropriately decorated", () => {
+      const buffer = new TextBuffer({
+        text: "a\nb\n\nd e f\r\ngh\r\nij\n\r\n",
+      });
+
+      const displayLayer = buffer.addDisplayLayer({
+        tabLength: 4,
+
+        invisibles: {
+          cr: "¤",
+          eol: "¬",
+        },
+      });
+
+      expect(displayLayer.getText()).toBe("a¬\nb¬\n¬\nd e f¤¬\ngh¤¬\nij¬\n¤¬\n");
+
+      expectTokenBoundaries(displayLayer, [
+        {
+          text: "a",
+          close: [],
+          open: [],
+        },
+        {
+          text: "¬",
+          close: [],
+          open: ["invisible-character eol"],
+        },
+        {
+          text: "",
+          close: ["invisible-character eol"],
+          open: [],
+        },
+        {
+          text: "b",
+          close: [],
+          open: [],
+        },
+        {
+          text: "¬",
+          close: [],
+          open: ["invisible-character eol"],
+        },
+        {
+          text: "",
+          close: ["invisible-character eol"],
+          open: [],
+        },
+        {
+          text: "¬",
+          close: [],
+          open: ["invisible-character eol"],
+        },
+        {
+          text: "",
+          close: ["invisible-character eol"],
+          open: [],
+        },
+        {
+          text: "d e f",
+          close: [],
+          open: [],
+        },
+        {
+          text: "¤¬",
+          close: [],
+          open: ["invisible-character eol"],
+        },
+        {
+          text: "",
+          close: ["invisible-character eol"],
+          open: [],
+        },
+        {
+          text: "gh",
+          close: [],
+          open: [],
+        },
+        {
+          text: "¤¬",
+          close: [],
+          open: ["invisible-character eol"],
+        },
+        {
+          text: "",
+          close: ["invisible-character eol"],
+          open: [],
+        },
+        {
+          text: "ij",
+          close: [],
+          open: [],
+        },
+        {
+          text: "¬",
+          close: [],
+          open: ["invisible-character eol"],
+        },
+        {
+          text: "",
+          close: ["invisible-character eol"],
+          open: [],
+        },
+        {
+          text: "¤¬",
+          close: [],
+          open: ["invisible-character eol"],
+        },
+        {
+          text: "",
+          close: ["invisible-character eol"],
+          open: [],
+        },
+        {
+          text: "",
+          close: [],
+          open: [],
+        },
+      ]);
+
+      expect(
+        displayLayer.translateScreenPosition([0, 1], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 1]);
+
+      expect(
+        displayLayer.clipScreenPosition([0, 1], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 1]);
+    });
+
+    it("does not clip positions within runs of invisible characters", () => {
+      const buffer = new TextBuffer({
+        text: "   a",
+      });
+
+      const displayLayer = buffer.addDisplayLayer({
+        invisibles: {
+          space: "•",
+        },
+      });
+
+      expect(displayLayer.clipScreenPosition(Point(0, 2))).toEqual(Point(0, 2));
+    });
+  });
+
+  describe("indent guides", () => {
+    it("decorates tab-stop-aligned regions of leading whitespace with indent guides", () => {
+      const buffer = new TextBuffer({
+        text: "         a      \t  \n  \t\t b\n  \t\t",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         showIndentGuides: true,
         tabLength: 4,
+      });
+
+      expect(displayLayer.getText()).toBe("         a            \n         b\n        ");
+
+      expectTokenBoundaries(displayLayer, [
+        {
+          text: "    ",
+          close: [],
+          open: ["leading-whitespace indent-guide"],
+        },
+        {
+          text: "    ",
+          close: ["leading-whitespace indent-guide"],
+          open: ["leading-whitespace indent-guide"],
+        },
+        {
+          text: " ",
+          close: ["leading-whitespace indent-guide"],
+          open: ["leading-whitespace indent-guide"],
+        },
+        {
+          text: "a",
+          close: ["leading-whitespace indent-guide"],
+          open: [],
+        },
+        {
+          text: "      ",
+          close: [],
+          open: ["trailing-whitespace"],
+        },
+        {
+          text: "    ",
+          close: ["trailing-whitespace"],
+          open: ["hard-tab trailing-whitespace"],
+        },
+        {
+          text: "  ",
+          close: ["hard-tab trailing-whitespace"],
+          open: ["trailing-whitespace"],
+        },
+        {
+          text: "",
+          close: ["trailing-whitespace"],
+          open: [],
+        },
+        {
+          text: "  ",
+          close: [],
+          open: ["leading-whitespace indent-guide"],
+        },
+        {
+          text: "  ",
+          close: ["leading-whitespace indent-guide"],
+          open: ["hard-tab leading-whitespace"],
+        },
+        {
+          text: "    ",
+          close: ["hard-tab leading-whitespace"],
+          open: ["hard-tab leading-whitespace indent-guide"],
+        },
+        {
+          text: " ",
+          close: ["hard-tab leading-whitespace indent-guide"],
+          open: ["leading-whitespace indent-guide"],
+        },
+        {
+          text: "b",
+          close: ["leading-whitespace indent-guide"],
+          open: [],
+        },
+        {
+          text: "  ",
+          close: [],
+          open: ["trailing-whitespace indent-guide"],
+        },
+        {
+          text: "  ",
+          close: ["trailing-whitespace indent-guide"],
+          open: ["hard-tab trailing-whitespace"],
+        },
+        {
+          text: "    ",
+          close: ["hard-tab trailing-whitespace"],
+          open: ["hard-tab trailing-whitespace indent-guide"],
+        },
+        {
+          text: "",
+          close: ["hard-tab trailing-whitespace indent-guide"],
+          open: [],
+        },
+      ]);
+    });
+
+    it("decorates empty lines with the max number of indent guides found on the surrounding non-empty lines", () => {
+      const buffer = new TextBuffer({
+        text: "\n\n          a\n\n\t \t b\n\n\n",
+      });
+
+      const displayLayer = buffer.addDisplayLayer({
+        showIndentGuides: true,
+        tabLength: 4,
 
         invisibles: {
-          eol: '¬'
-        }
-      })
+          eol: "¬",
+        },
+      });
 
       expect(displayLayer.getText()).toBe(
-        '¬         \n¬         \n          a¬\n¬         \n         b¬\n¬        \n¬        \n         '
-      )
+        "¬         \n¬         \n          a¬\n¬         \n         b¬\n¬        \n¬        \n         ",
+      );
 
       expectTokenBoundaries(displayLayer, [
-        {text: '¬', close: [], open: ['invisible-character eol indent-guide']},
-        {text: '   ', close: ['invisible-character eol indent-guide'], open: []},
-        {text: '    ', close: [], open: ['indent-guide']},
-        {text: '  ', close: ['indent-guide'], open: ['indent-guide']},
-        {text: '', close: ['indent-guide'], open: []},
-        {text: '¬', close: [], open: ['invisible-character eol indent-guide']},
-        {text: '   ', close: ['invisible-character eol indent-guide'], open: []},
-        {text: '    ', close: [], open: ['indent-guide']},
-        {text: '  ', close: ['indent-guide'], open: ['indent-guide']},
-        {text: '', close: ['indent-guide'], open: []},
-        {text: '    ', close: [], open: ['leading-whitespace indent-guide']},
-        {text: '    ', close: ['leading-whitespace indent-guide'], open: ['leading-whitespace indent-guide']},
-        {text: '  ', close: ['leading-whitespace indent-guide'], open: ['leading-whitespace indent-guide']},
-        {text: 'a', close: ['leading-whitespace indent-guide'], open: []},
-        {text: '¬', close: [], open: ['invisible-character eol']},
-        {text: '', close: ['invisible-character eol'], open: []},
-        {text: '¬', close: [], open: ['invisible-character eol indent-guide']},
-        {text: '   ', close: ['invisible-character eol indent-guide'], open: []},
-        {text: '    ', close: [], open: ['indent-guide']},
-        {text: '  ', close: ['indent-guide'], open: ['indent-guide']},
-        {text: '', close: ['indent-guide'], open: []},
-        {text: '    ', close: [], open: ['hard-tab leading-whitespace indent-guide']},
-        {text: ' ', close: ['hard-tab leading-whitespace indent-guide'], open: ['leading-whitespace indent-guide']},
-        {text: '   ', close: ['leading-whitespace indent-guide'], open: ['hard-tab leading-whitespace']},
-        {text: ' ', close: ['hard-tab leading-whitespace'], open: ['leading-whitespace indent-guide']},
-        {text: 'b', close: ['leading-whitespace indent-guide'], open: []},
-        {text: '¬', close: [], open: ['invisible-character eol']},
-        {text: '', close: ['invisible-character eol'], open: []},
-        {text: '¬', close: [], open: ['invisible-character eol indent-guide']},
-        {text: '   ', close: ['invisible-character eol indent-guide'], open: []},
-        {text: '    ', close: [], open: ['indent-guide']},
-        {text: ' ', close: ['indent-guide'], open: ['indent-guide']},
-        {text: '', close: ['indent-guide'], open: []},
-        {text: '¬', close: [], open: ['invisible-character eol indent-guide']},
-        {text: '   ', close: ['invisible-character eol indent-guide'], open: []},
-        {text: '    ', close: [], open: ['indent-guide']},
-        {text: ' ', close: ['indent-guide'], open: ['indent-guide']},
-        {text: '', close: ['indent-guide'], open: []},
-        {text: '    ', close: [], open: ['indent-guide']},
-        {text: '    ', close: ['indent-guide'], open: ['indent-guide']},
-        {text: ' ', close: ['indent-guide'], open: ['indent-guide']},
-        {text: '', close: ['indent-guide'], open: []}
-      ])
+        { text: "¬", close: [], open: ["invisible-character eol indent-guide"] },
+        { text: "   ", close: ["invisible-character eol indent-guide"], open: [] },
+        { text: "    ", close: [], open: ["indent-guide"] },
+        { text: "  ", close: ["indent-guide"], open: ["indent-guide"] },
+        { text: "", close: ["indent-guide"], open: [] },
+        { text: "¬", close: [], open: ["invisible-character eol indent-guide"] },
+        { text: "   ", close: ["invisible-character eol indent-guide"], open: [] },
+        { text: "    ", close: [], open: ["indent-guide"] },
+        { text: "  ", close: ["indent-guide"], open: ["indent-guide"] },
+        { text: "", close: ["indent-guide"], open: [] },
+        { text: "    ", close: [], open: ["leading-whitespace indent-guide"] },
+        {
+          text: "    ",
+          close: ["leading-whitespace indent-guide"],
+          open: ["leading-whitespace indent-guide"],
+        },
+        {
+          text: "  ",
+          close: ["leading-whitespace indent-guide"],
+          open: ["leading-whitespace indent-guide"],
+        },
+        { text: "a", close: ["leading-whitespace indent-guide"], open: [] },
+        { text: "¬", close: [], open: ["invisible-character eol"] },
+        { text: "", close: ["invisible-character eol"], open: [] },
+        { text: "¬", close: [], open: ["invisible-character eol indent-guide"] },
+        { text: "   ", close: ["invisible-character eol indent-guide"], open: [] },
+        { text: "    ", close: [], open: ["indent-guide"] },
+        { text: "  ", close: ["indent-guide"], open: ["indent-guide"] },
+        { text: "", close: ["indent-guide"], open: [] },
+        { text: "    ", close: [], open: ["hard-tab leading-whitespace indent-guide"] },
+        {
+          text: " ",
+          close: ["hard-tab leading-whitespace indent-guide"],
+          open: ["leading-whitespace indent-guide"],
+        },
+        {
+          text: "   ",
+          close: ["leading-whitespace indent-guide"],
+          open: ["hard-tab leading-whitespace"],
+        },
+        {
+          text: " ",
+          close: ["hard-tab leading-whitespace"],
+          open: ["leading-whitespace indent-guide"],
+        },
+        { text: "b", close: ["leading-whitespace indent-guide"], open: [] },
+        { text: "¬", close: [], open: ["invisible-character eol"] },
+        { text: "", close: ["invisible-character eol"], open: [] },
+        { text: "¬", close: [], open: ["invisible-character eol indent-guide"] },
+        { text: "   ", close: ["invisible-character eol indent-guide"], open: [] },
+        { text: "    ", close: [], open: ["indent-guide"] },
+        { text: " ", close: ["indent-guide"], open: ["indent-guide"] },
+        { text: "", close: ["indent-guide"], open: [] },
+        { text: "¬", close: [], open: ["invisible-character eol indent-guide"] },
+        { text: "   ", close: ["invisible-character eol indent-guide"], open: [] },
+        { text: "    ", close: [], open: ["indent-guide"] },
+        { text: " ", close: ["indent-guide"], open: ["indent-guide"] },
+        { text: "", close: ["indent-guide"], open: [] },
+        { text: "    ", close: [], open: ["indent-guide"] },
+        { text: "    ", close: ["indent-guide"], open: ["indent-guide"] },
+        { text: " ", close: ["indent-guide"], open: ["indent-guide"] },
+        { text: "", close: ["indent-guide"], open: [] },
+      ]);
 
-      expect(displayLayer.clipScreenPosition([0, 0], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 0], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 0], {
-        clipDirection: 'forward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 0], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 1], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 1], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 1], {
-        clipDirection: 'forward'
-      })).toEqual([1, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 1], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([1, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 2], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 2], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 2], {
-        clipDirection: 'forward'
-      })).toEqual([1, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 2], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([1, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 4], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 4], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 4], {
-        clipDirection: 'forward'
-      })).toEqual([1, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 4], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([1, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 6], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 6], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 6], {
-        clipDirection: 'forward'
-      })).toEqual([1, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 6], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([1, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 8], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 8], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 8], {
-        clipDirection: 'forward'
-      })).toEqual([1, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 8], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([1, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 9], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 9], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 9], {
-        clipDirection: 'forward'
-      })).toEqual([1, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 9], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([1, 0]);
 
-      expect(displayLayer.clipScreenPosition([7, 3], {
-        clipDirection: 'backward'
-      })).toEqual([7, 0])
+      expect(
+        displayLayer.clipScreenPosition([7, 3], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([7, 0]);
 
-      expect(displayLayer.clipScreenPosition([7, 3], {
-        clipDirection: 'forward'
-      })).toEqual([7, 0])
-    })
+      expect(
+        displayLayer.clipScreenPosition([7, 3], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([7, 0]);
+    });
 
-    it('renders a single indent guide on empty lines surrounded by lines with leading whitespace less than the tab length', () => {
+    it("renders a single indent guide on empty lines surrounded by lines with leading whitespace less than the tab length", () => {
       const buffer = new TextBuffer({
-        text: 'a\n\nb\n  c\n\n'
-      })
+        text: "a\n\nb\n  c\n\n",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         showIndentGuides: true,
-        tabLength: 4
-      })
+        tabLength: 4,
+      });
 
-      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify('a\n\nb\n  c\n  \n  '))
+      expect(JSON.stringify(displayLayer.getText())).toBe(JSON.stringify("a\n\nb\n  c\n  \n  "));
 
       expectTokenBoundaries(displayLayer, [
-        {text: 'a', close: [], open: []},
-        {text: '', close: [], open: []},
-        {text: 'b', close: [], open: []},
-        {text: '  ', close: [], open: ['leading-whitespace indent-guide']},
-        {text: 'c', close: ['leading-whitespace indent-guide'], open: []},
-        {text: '  ', close: [], open: ['indent-guide']},
-        {text: '', close: ['indent-guide'], open: []},
-        {text: '  ', close: [], open: ['indent-guide']},
-        {text: '', close: ['indent-guide'], open: []}
-      ])
-    })
-  })
+        { text: "a", close: [], open: [] },
+        { text: "", close: [], open: [] },
+        { text: "b", close: [], open: [] },
+        { text: "  ", close: [], open: ["leading-whitespace indent-guide"] },
+        { text: "c", close: ["leading-whitespace indent-guide"], open: [] },
+        { text: "  ", close: [], open: ["indent-guide"] },
+        { text: "", close: ["indent-guide"], open: [] },
+        { text: "  ", close: [], open: ["indent-guide"] },
+        { text: "", close: ["indent-guide"], open: [] },
+      ]);
+    });
+  });
 
-  describe('text decorations', () => {
-    it('exposes open and close tags from the language mode in the token iterator', () => {
+  describe("text decorations", () => {
+    it("exposes open and close tags from the language mode in the token iterator", () => {
       const buffer = new TextBuffer({
-        text: 'abcde\nfghij\nklmno'
-      })
+        text: "abcde\nfghij\nklmno",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
+      const displayLayer = buffer.addDisplayLayer();
 
-      buffer.setLanguageMode(new TestLanguageMode([
-        ['aa', [[0, 1], [0, 4]]],
-        ['ab', [[0, 2], [1, 2]]],
-        ['ac', [[0, 3], [1, 2]]],
-        ['ad', [[1, 3], [2, 0]]],
-        ['ae', [[2, 3], [2, 5]]]
-      ]))
+      buffer.setLanguageMode(
+        new TestLanguageMode([
+          [
+            "aa",
+            [
+              [0, 1],
+              [0, 4],
+            ],
+          ],
+          [
+            "ab",
+            [
+              [0, 2],
+              [1, 2],
+            ],
+          ],
+          [
+            "ac",
+            [
+              [0, 3],
+              [1, 2],
+            ],
+          ],
+          [
+            "ad",
+            [
+              [1, 3],
+              [2, 0],
+            ],
+          ],
+          [
+            "ae",
+            [
+              [2, 3],
+              [2, 5],
+            ],
+          ],
+        ]),
+      );
 
       expectTokenBoundaries(displayLayer, [
-        {text: 'a', close: [], open: []},
-        {text: 'b', close: [], open: ['aa']},
-        {text: 'c', close: [], open: ['ab']},
-        {text: 'd', close: [], open: ['ac']},
-        {text: 'e', close: ['ac', 'ab', 'aa'], open: ['ab', 'ac']},
-        {text: '', close: ['ac', 'ab'], open: []},
-        {text: 'fg', close: [], open: ['ab', 'ac']},
-        {text: 'h', close: ['ac', 'ab'], open: []},
-        {text: 'ij', close: [], open: ['ad']},
-        {text: '', close: ['ad'], open: []},
-        {text: 'klm', close: [], open: []},
-        {text: 'no', close: [], open: ['ae']},
-        {text: '', close: ['ae'], open: []}
-      ])
-    })
+        { text: "a", close: [], open: [] },
+        { text: "b", close: [], open: ["aa"] },
+        { text: "c", close: [], open: ["ab"] },
+        { text: "d", close: [], open: ["ac"] },
+        { text: "e", close: ["ac", "ab", "aa"], open: ["ab", "ac"] },
+        { text: "", close: ["ac", "ab"], open: [] },
+        { text: "fg", close: [], open: ["ab", "ac"] },
+        { text: "h", close: ["ac", "ab"], open: [] },
+        { text: "ij", close: [], open: ["ad"] },
+        { text: "", close: ["ad"], open: [] },
+        { text: "klm", close: [], open: [] },
+        { text: "no", close: [], open: ["ae"] },
+        { text: "", close: ["ae"], open: [] },
+      ]);
+    });
 
-    it('includes indent guides and EOL characters within containing decoration tags', function () {
+    it("includes indent guides and EOL characters within containing decoration tags", function () {
       const buffer = new TextBuffer({
         text: [
-          '',   // empty line with no indent guide
-          '1',
-          '  ', // whitespace-only line
-          ''    // empty line with an indent guide
-        ].join('\n')
-      })
+          "", // empty line with no indent guide
+          "1",
+          "  ", // whitespace-only line
+          "", // empty line with an indent guide
+        ].join("\n"),
+      });
 
       const displayLayer = buffer.addDisplayLayer({
         showIndentGuides: true,
-        invisibles: {eol: '¬'}
-      })
+        invisibles: { eol: "¬" },
+      });
 
-      expect(displayLayer.getText().split('\n')).toEqual([
-        '¬',
-        '1¬',
-        '  ¬',
-        '  '
-      ])
+      expect(displayLayer.getText().split("\n")).toEqual(["¬", "1¬", "  ¬", "  "]);
 
-      buffer.setLanguageMode(new TestLanguageMode([
-        ['a', [[0, 0], [4, 0]]]
-      ]))
-
-      expectTokenBoundaries(displayLayer, [
-        {text: '¬', close: [], open: ['a', 'invisible-character eol indent-guide']},
-        {text: '', close: ['invisible-character eol indent-guide', 'a'], open: []},
-        {text: '1', close: [], open: ['a']},
-        {text: '¬', close: [], open: ['invisible-character eol']},
-        {text: '', close: ['invisible-character eol', 'a'], open: []},
-        {text: '  ', close: [], open: ['a', 'trailing-whitespace indent-guide']},
-        {text: '¬', close: ['trailing-whitespace indent-guide'], open: ['invisible-character eol']},
-        {text: '', close: ['invisible-character eol', 'a'], open: []},
-        {text: '  ', close: [], open: ['a', 'indent-guide']},
-        {text: '', close: ['indent-guide', 'a'], open: []}
-      ])
-    })
-
-    it('truncates decoration tags at fold boundaries', () => {
-      const buffer = new TextBuffer({
-        text: 'abcde\nfghij\nklmno'
-      })
-
-      const displayLayer = buffer.addDisplayLayer()
-      displayLayer.foldBufferRange([[0, 3], [2, 2]])
-
-      buffer.setLanguageMode(new TestLanguageMode([
-        ['preceding-fold', [[0, 1], [0, 2]]],
-        ['ending-at-fold-start', [[0, 1], [0, 3]]],
-        ['overlapping-fold-start', [[0, 1], [1, 1]]],
-        ['inside-fold', [[0, 4], [1, 4]]],
-        ['overlapping-fold-end', [[1, 4], [2, 4]]],
-        ['starting-at-fold-end', [[2, 2], [2, 4]]],
-        ['following-fold', [[2, 4], [2, 5]]],
-        ['surrounding-fold', [[0, 1], [2, 5]]]
-      ]))
+      buffer.setLanguageMode(
+        new TestLanguageMode([
+          [
+            "a",
+            [
+              [0, 0],
+              [4, 0],
+            ],
+          ],
+        ]),
+      );
 
       expectTokenBoundaries(displayLayer, [
+        { text: "¬", close: [], open: ["a", "invisible-character eol indent-guide"] },
+        { text: "", close: ["invisible-character eol indent-guide", "a"], open: [] },
+        { text: "1", close: [], open: ["a"] },
+        { text: "¬", close: [], open: ["invisible-character eol"] },
+        { text: "", close: ["invisible-character eol", "a"], open: [] },
+        { text: "  ", close: [], open: ["a", "trailing-whitespace indent-guide"] },
         {
-          text: 'a',
-          close: [],
-          open: []
+          text: "¬",
+          close: ["trailing-whitespace indent-guide"],
+          open: ["invisible-character eol"],
         },
-        {
-          text: 'b',
-          close: [],
-          open: ['preceding-fold', 'ending-at-fold-start', 'overlapping-fold-start', 'surrounding-fold']
-        },
-        {
-          text: 'c',
-          close: ['surrounding-fold', 'overlapping-fold-start', 'ending-at-fold-start', 'preceding-fold'],
-          open: ['ending-at-fold-start', 'overlapping-fold-start', 'surrounding-fold']
-        },
-        {
-          text: '⋯',
-          close: ['surrounding-fold', 'overlapping-fold-start', 'ending-at-fold-start'],
-          open: ['fold-marker']
-        },
-        {
-          text: 'mn',
-          close: ['fold-marker'],
-          open: ['surrounding-fold', 'overlapping-fold-end', 'starting-at-fold-end']
-        },
-        {
-          text: 'o',
-          close: ['starting-at-fold-end', 'overlapping-fold-end'],
-          open: ['following-fold']
-        },
-        {
-          text: '',
-          close: ['following-fold', 'surrounding-fold'],
-          open: []
-        }
-      ])
-    })
+        { text: "", close: ["invisible-character eol", "a"], open: [] },
+        { text: "  ", close: [], open: ["a", "indent-guide"] },
+        { text: "", close: ["indent-guide", "a"], open: [] },
+      ]);
+    });
 
-    it('skips close tags with no matching open tag', () => {
+    it("truncates decoration tags at fold boundaries", () => {
       const buffer = new TextBuffer({
-        text: 'abcde'
-      })
+        text: "abcde\nfghij\nklmno",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
+      const displayLayer = buffer.addDisplayLayer();
+      displayLayer.foldBufferRange([
+        [0, 3],
+        [2, 2],
+      ]);
 
-      const boundaries = [{
-        position: Point(0, 0),
-        closeScopeIds: [],
-        openScopeIds: [1, 3]
-      }, {
-        position: Point(0, 2),
-        closeScopeIds: [5],
-        openScopeIds: []
-      }]
+      buffer.setLanguageMode(
+        new TestLanguageMode([
+          [
+            "preceding-fold",
+            [
+              [0, 1],
+              [0, 2],
+            ],
+          ],
+          [
+            "ending-at-fold-start",
+            [
+              [0, 1],
+              [0, 3],
+            ],
+          ],
+          [
+            "overlapping-fold-start",
+            [
+              [0, 1],
+              [1, 1],
+            ],
+          ],
+          [
+            "inside-fold",
+            [
+              [0, 4],
+              [1, 4],
+            ],
+          ],
+          [
+            "overlapping-fold-end",
+            [
+              [1, 4],
+              [2, 4],
+            ],
+          ],
+          [
+            "starting-at-fold-end",
+            [
+              [2, 2],
+              [2, 4],
+            ],
+          ],
+          [
+            "following-fold",
+            [
+              [2, 4],
+              [2, 5],
+            ],
+          ],
+          [
+            "surrounding-fold",
+            [
+              [0, 1],
+              [2, 5],
+            ],
+          ],
+        ]),
+      );
+
+      expectTokenBoundaries(displayLayer, [
+        {
+          text: "a",
+          close: [],
+          open: [],
+        },
+        {
+          text: "b",
+          close: [],
+          open: [
+            "preceding-fold",
+            "ending-at-fold-start",
+            "overlapping-fold-start",
+            "surrounding-fold",
+          ],
+        },
+        {
+          text: "c",
+          close: [
+            "surrounding-fold",
+            "overlapping-fold-start",
+            "ending-at-fold-start",
+            "preceding-fold",
+          ],
+          open: ["ending-at-fold-start", "overlapping-fold-start", "surrounding-fold"],
+        },
+        {
+          text: "⋯",
+          close: ["surrounding-fold", "overlapping-fold-start", "ending-at-fold-start"],
+          open: ["fold-marker"],
+        },
+        {
+          text: "mn",
+          close: ["fold-marker"],
+          open: ["surrounding-fold", "overlapping-fold-end", "starting-at-fold-end"],
+        },
+        {
+          text: "o",
+          close: ["starting-at-fold-end", "overlapping-fold-end"],
+          open: ["following-fold"],
+        },
+        {
+          text: "",
+          close: ["following-fold", "surrounding-fold"],
+          open: [],
+        },
+      ]);
+    });
+
+    it("skips close tags with no matching open tag", () => {
+      const buffer = new TextBuffer({
+        text: "abcde",
+      });
+
+      const displayLayer = buffer.addDisplayLayer();
+
+      const boundaries = [
+        {
+          position: Point(0, 0),
+          closeScopeIds: [],
+          openScopeIds: [1, 3],
+        },
+        {
+          position: Point(0, 2),
+          closeScopeIds: [5],
+          openScopeIds: [],
+        },
+      ];
 
       const iterator = {
-        getOpenScopeIds () {
-          return boundaries[0].openScopeIds
+        getOpenScopeIds() {
+          return boundaries[0].openScopeIds;
         },
 
-        getCloseScopeIds () {
-          return boundaries[0].closeScopeIds
+        getCloseScopeIds() {
+          return boundaries[0].closeScopeIds;
         },
 
-        getPosition () {
-          return (boundaries[0] && boundaries[0].position) || Point.INFINITY
+        getPosition() {
+          return (boundaries[0] && boundaries[0].position) || Point.INFINITY;
         },
 
-        moveToSuccessor () {
-          return boundaries.shift()
+        moveToSuccessor() {
+          return boundaries.shift();
         },
 
-        seek () {
-          return []
-        }
-      }
+        seek() {
+          return [];
+        },
+      };
 
       buffer.setLanguageMode({
-        buildHighlightIterator () {
-          return iterator
+        buildHighlightIterator() {
+          return iterator;
         },
 
-        onDidChangeHighlighting () {
-          return {dispose () {}}
-        }
-      })
+        onDidChangeHighlighting() {
+          return { dispose() {} };
+        },
+      });
 
-      expect(displayLayer.getScreenLines(0, 1)[0].tags).toEqual([-1, -3, 2, -4, -2, -1, -3, 3, -4, -2])
-    })
+      expect(displayLayer.getScreenLines(0, 1)[0].tags).toEqual([
+        -1, -3, 2, -4, -2, -1, -3, 3, -4, -2,
+      ]);
+    });
 
-    it('emits update events from the display layer when the language mode\'s highlighting changes', () => {
+    it("emits update events from the display layer when the language mode's highlighting changes", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef\nghi\njkl\nmno'
-      })
+        text: "abc\ndef\nghi\njkl\nmno",
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
-      displayLayer.foldBufferRange([[1, 3], [2, 0]])
-      const languageMode = new TestLanguageMode([])
-      buffer.setLanguageMode(languageMode)
-      const allChanges = []
+      const displayLayer = buffer.addDisplayLayer();
+      displayLayer.foldBufferRange([
+        [1, 3],
+        [2, 0],
+      ]);
+      const languageMode = new TestLanguageMode([]);
+      buffer.setLanguageMode(languageMode);
+      const allChanges = [];
 
-      displayLayer.onDidChange((changes) => allChanges.push(...changes))
+      displayLayer.onDidChange((changes) => allChanges.push(...changes));
 
-      languageMode.emitHighlightingChangeEvent([[2, 1], [3, 2]])
+      languageMode.emitHighlightingChangeEvent([
+        [2, 1],
+        [3, 2],
+      ]);
 
-      expect(allChanges).toEqual([{
-        oldRange: Range(Point(1, 0), Point(3, 0)),
-        newRange: Range(Point(1, 0), Point(3, 0))
-      }])
-    })
+      expect(allChanges).toEqual([
+        {
+          oldRange: Range(Point(1, 0), Point(3, 0)),
+          newRange: Range(Point(1, 0), Point(3, 0)),
+        },
+      ]);
+    });
 
-    it('gracefully handles the text decoration iterator reporting decoration boundaries beyond the end of a line', () => {
+    it("gracefully handles the text decoration iterator reporting decoration boundaries beyond the end of a line", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef'
-      })
+        text: "abc\ndef",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
-        tabLength: 2
-      })
+        tabLength: 2,
+      });
 
       const languageMode = new TestLanguageMode([
-        ['a', [[0, 1], [0, 10]]],
-        ['b', [[0, 10], [1, 5]]]
-      ])
-      buffer.setLanguageMode(languageMode)
+        [
+          "a",
+          [
+            [0, 1],
+            [0, 10],
+          ],
+        ],
+        [
+          "b",
+          [
+            [0, 10],
+            [1, 5],
+          ],
+        ],
+      ]);
+      buffer.setLanguageMode(languageMode);
       expectTokenBoundaries(displayLayer, [
         {
-          text: 'a',
+          text: "a",
           close: [],
-          open: []
+          open: [],
         },
         {
-          text: 'bc',
+          text: "bc",
           close: [],
-          open: ['a']
+          open: ["a"],
         },
         {
-          text: '',
-          close: ['a'],
-          open: []
+          text: "",
+          close: ["a"],
+          open: [],
         },
         {
-          text: 'def',
+          text: "def",
           close: [],
-          open: ['b']
+          open: ["b"],
         },
         {
-          text: '',
-          close: ['b'],
-          open: []
-        }
-      ])
-    })
+          text: "",
+          close: ["b"],
+          open: [],
+        },
+      ]);
+    });
 
-    describe('when the language mode emits `onDidChangeHighlighting` events inside `buildHighlightIterator`', () => {
-      it('maintains a stable set of screen line ids unless the buffer changes (regression)', () => {
+    describe("when the language mode emits `onDidChangeHighlighting` events inside `buildHighlightIterator`", () => {
+      it("maintains a stable set of screen line ids unless the buffer changes (regression)", () => {
         const buffer = new TextBuffer({
-          text: 'abc\ndefg'
-        })
+          text: "abc\ndefg",
+        });
 
         buffer.setLanguageMode({
           emitter: new Emitter(),
 
-          bufferDidChange () {
-            this.didChange = true
+          bufferDidChange() {
+            this.didChange = true;
           },
 
-          bufferDidFinishTransaction () {},
+          bufferDidFinishTransaction() {},
 
-          onDidChangeHighlighting (callback) {
-            return this.emitter.on('did-change-highlighting', callback)
+          onDidChangeHighlighting(callback) {
+            return this.emitter.on("did-change-highlighting", callback);
           },
 
-          buildHighlightIterator () {
+          buildHighlightIterator() {
             if (this.didChange) {
-              this.emitter.emit('did-change-highlighting', Range(Point(0, 0), Point(0, 0)))
-              this.didChange = false
+              this.emitter.emit("did-change-highlighting", Range(Point(0, 0), Point(0, 0)));
+              this.didChange = false;
             }
 
             return {
-              seek () { return [] },
-              getOpenScopeIds () { return [] },
-              getCloseScopeIds () { return [] },
-              getPosition () { return Point.INFINITY }
-            }
-          }
-        })
+              seek() {
+                return [];
+              },
+              getOpenScopeIds() {
+                return [];
+              },
+              getCloseScopeIds() {
+                return [];
+              },
+              getPosition() {
+                return Point.INFINITY;
+              },
+            };
+          },
+        });
 
-        const displayLayer = buffer.addDisplayLayer()
-        displayLayer.getScreenLines()
+        const displayLayer = buffer.addDisplayLayer();
+        displayLayer.getScreenLines();
 
-        buffer.insert([1, 4], 'h')
-        const screenLineIds1 = displayLayer.getScreenLines().map(l => l.id)
-        const screenLineIds2 = displayLayer.getScreenLines().map(l => l.id)
-        expect(screenLineIds2).toEqual(screenLineIds1)
-      })
-    })
-  })
+        buffer.insert([1, 4], "h");
+        const screenLineIds1 = displayLayer.getScreenLines().map((l) => l.id);
+        const screenLineIds2 = displayLayer.getScreenLines().map((l) => l.id);
+        expect(screenLineIds2).toEqual(screenLineIds1);
+      });
+    });
+  });
 
-  describe('position translation', () => {
-    it('honors the clip direction when in the middle of an atomic unit', () => {
+  describe("position translation", () => {
+    it("honors the clip direction when in the middle of an atomic unit", () => {
       const buffer = new TextBuffer({
-        text: '    hello world\nhow is it going\ni am good'
-      })
+        text: "    hello world\nhow is it going\ni am good",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
-        tabLength: 4
-      })
+        tabLength: 4,
+      });
 
-      displayLayer.foldBufferRange([[0, 7], [2, 7]])
-      expect(displayLayer.getText()).toBe('    hel⋯od')
+      displayLayer.foldBufferRange([
+        [0, 7],
+        [2, 7],
+      ]);
+      expect(displayLayer.getText()).toBe("    hel⋯od");
 
-      expect(displayLayer.clipScreenPosition([0, 1], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 1], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 1], {
-        clipDirection: 'closest'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 1], {
+          clipDirection: "closest",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 1], {
-        clipDirection: 'forward'
-      })).toEqual([0, 4])
+      expect(
+        displayLayer.clipScreenPosition([0, 1], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 4]);
 
-      expect(displayLayer.clipScreenPosition([0, 2], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 2], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 2], {
-        clipDirection: 'closest'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 2], {
+          clipDirection: "closest",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 2], {
-        clipDirection: 'forward'
-      })).toEqual([0, 4])
+      expect(
+        displayLayer.clipScreenPosition([0, 2], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 4]);
 
-      expect(displayLayer.clipScreenPosition([0, 3], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.clipScreenPosition([0, 3], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.clipScreenPosition([0, 3], {
-        clipDirection: 'closest'
-      })).toEqual([0, 4])
+      expect(
+        displayLayer.clipScreenPosition([0, 3], {
+          clipDirection: "closest",
+        }),
+      ).toEqual([0, 4]);
 
-      expect(displayLayer.clipScreenPosition([0, 3], {
-        clipDirection: 'forward'
-      })).toEqual([0, 4])
+      expect(
+        displayLayer.clipScreenPosition([0, 3], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 4]);
 
-      expect(displayLayer.translateScreenPosition([0, 1], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.translateScreenPosition([0, 1], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.translateScreenPosition([0, 1], {
-        clipDirection: 'closest'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.translateScreenPosition([0, 1], {
+          clipDirection: "closest",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.translateScreenPosition([0, 1], {
-        clipDirection: 'forward'
-      })).toEqual([0, 4])
+      expect(
+        displayLayer.translateScreenPosition([0, 1], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 4]);
 
-      expect(displayLayer.translateScreenPosition([0, 2], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.translateScreenPosition([0, 2], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.translateScreenPosition([0, 2], {
-        clipDirection: 'closest'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.translateScreenPosition([0, 2], {
+          clipDirection: "closest",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.translateScreenPosition([0, 2], {
-        clipDirection: 'forward'
-      })).toEqual([0, 4])
+      expect(
+        displayLayer.translateScreenPosition([0, 2], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 4]);
 
-      expect(displayLayer.translateScreenPosition([0, 3], {
-        clipDirection: 'backward'
-      })).toEqual([0, 0])
+      expect(
+        displayLayer.translateScreenPosition([0, 3], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 0]);
 
-      expect(displayLayer.translateScreenPosition([0, 3], {
-        clipDirection: 'closest'
-      })).toEqual([0, 4])
+      expect(
+        displayLayer.translateScreenPosition([0, 3], {
+          clipDirection: "closest",
+        }),
+      ).toEqual([0, 4]);
 
-      expect(displayLayer.translateScreenPosition([0, 3], {
-        clipDirection: 'forward'
-      })).toEqual([0, 4])
+      expect(
+        displayLayer.translateScreenPosition([0, 3], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 4]);
 
-      expect(displayLayer.translateBufferPosition([0, 12], {
-        clipDirection: 'backward'
-      })).toEqual([0, 7])
+      expect(
+        displayLayer.translateBufferPosition([0, 12], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 7]);
 
-      expect(displayLayer.translateBufferPosition([0, 12], {
-        clipDirection: 'closest'
-      })).toEqual([0, 7])
+      expect(
+        displayLayer.translateBufferPosition([0, 12], {
+          clipDirection: "closest",
+        }),
+      ).toEqual([0, 7]);
 
-      expect(displayLayer.translateBufferPosition([0, 12], {
-        clipDirection: 'forward'
-      })).toEqual([0, 8])
+      expect(
+        displayLayer.translateBufferPosition([0, 12], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 8]);
 
-      expect(displayLayer.translateBufferPosition([1, 7], {
-        clipDirection: 'backward'
-      })).toEqual([0, 7])
+      expect(
+        displayLayer.translateBufferPosition([1, 7], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 7]);
 
-      expect(displayLayer.translateBufferPosition([1, 7], {
-        clipDirection: 'closest'
-      })).toEqual([0, 7])
+      expect(
+        displayLayer.translateBufferPosition([1, 7], {
+          clipDirection: "closest",
+        }),
+      ).toEqual([0, 7]);
 
-      expect(displayLayer.translateBufferPosition([1, 7], {
-        clipDirection: 'forward'
-      })).toEqual([0, 8])
+      expect(
+        displayLayer.translateBufferPosition([1, 7], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 8]);
 
-      expect(displayLayer.translateBufferPosition([1, 8], {
-        clipDirection: 'backward'
-      })).toEqual([0, 7])
+      expect(
+        displayLayer.translateBufferPosition([1, 8], {
+          clipDirection: "backward",
+        }),
+      ).toEqual([0, 7]);
 
-      expect(displayLayer.translateBufferPosition([1, 8], {
-        clipDirection: 'closest'
-      })).toEqual([0, 8])
+      expect(
+        displayLayer.translateBufferPosition([1, 8], {
+          clipDirection: "closest",
+        }),
+      ).toEqual([0, 8]);
 
-      expect(displayLayer.translateBufferPosition([1, 8], {
-        clipDirection: 'forward'
-      })).toEqual([0, 8])
-    })
+      expect(
+        displayLayer.translateBufferPosition([1, 8], {
+          clipDirection: "forward",
+        }),
+      ).toEqual([0, 8]);
+    });
 
-    it('clips to the closest tab stop when translating a screen position that is in the middle of a hard tab', () => {
-      const buffer = new TextBuffer({text: '\t\t\t'})
-      const displayLayer = buffer.addDisplayLayer({tabLength: 4})
+    it("clips to the closest tab stop when translating a screen position that is in the middle of a hard tab", () => {
+      const buffer = new TextBuffer({ text: "\t\t\t" });
+      const displayLayer = buffer.addDisplayLayer({ tabLength: 4 });
 
-      expect(displayLayer.translateScreenPosition([0, 0])).toEqual([0, 0])
-      expect(displayLayer.translateScreenPosition([0, 1])).toEqual([0, 0])
-      expect(displayLayer.translateScreenPosition([0, 2])).toEqual([0, 0])
-      expect(displayLayer.translateScreenPosition([0, 3])).toEqual([0, 1])
-      expect(displayLayer.translateScreenPosition([0, 4])).toEqual([0, 1])
+      expect(displayLayer.translateScreenPosition([0, 0])).toEqual([0, 0]);
+      expect(displayLayer.translateScreenPosition([0, 1])).toEqual([0, 0]);
+      expect(displayLayer.translateScreenPosition([0, 2])).toEqual([0, 0]);
+      expect(displayLayer.translateScreenPosition([0, 3])).toEqual([0, 1]);
+      expect(displayLayer.translateScreenPosition([0, 4])).toEqual([0, 1]);
 
-      expect(displayLayer.translateScreenPosition([0, 8])).toEqual([0, 2])
-      expect(displayLayer.translateScreenPosition([0, 9])).toEqual([0, 2])
-      expect(displayLayer.translateScreenPosition([0, 10])).toEqual([0, 2])
-      expect(displayLayer.translateScreenPosition([0, 11])).toEqual([0, 3])
-      expect(displayLayer.translateScreenPosition([0, 12])).toEqual([0, 3])
-    })
-  })
+      expect(displayLayer.translateScreenPosition([0, 8])).toEqual([0, 2]);
+      expect(displayLayer.translateScreenPosition([0, 9])).toEqual([0, 2]);
+      expect(displayLayer.translateScreenPosition([0, 10])).toEqual([0, 2]);
+      expect(displayLayer.translateScreenPosition([0, 11])).toEqual([0, 3]);
+      expect(displayLayer.translateScreenPosition([0, 12])).toEqual([0, 3]);
+    });
+  });
 
-  describe('.onDidChange', () => {
-    it('calls the given callback when the display layer\'s content changes', () => {
+  describe(".onDidChange", () => {
+    it("calls the given callback when the display layer's content changes", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef\nghi\njkl\nmno'
-      })
+        text: "abc\ndef\nghi\njkl\nmno",
+      });
 
-      const displayLayer = buffer.addDisplayLayer({tabLength: 4})
+      const displayLayer = buffer.addDisplayLayer({ tabLength: 4 });
 
-      const events = []
-      displayLayer.onDidChange((changes) => events.push(...changes))
+      const events = [];
+      displayLayer.onDidChange((changes) => events.push(...changes));
 
-      displayLayer.foldBufferRange(Range(Point(1, 1), Point(2, 2)))
+      displayLayer.foldBufferRange(Range(Point(1, 1), Point(2, 2)));
       expect(events).toEqual([
         {
           oldRange: Range(Point(1, 0), Point(3, 0)),
-          newRange: Range(Point(1, 0), Point(2, 0))
-        }
-      ])
+          newRange: Range(Point(1, 0), Point(2, 0)),
+        },
+      ]);
 
-      events.length = 0
-      displayLayer.foldBufferRange(Range(Point(3, 1), Point(4, 2)))
+      events.length = 0;
+      displayLayer.foldBufferRange(Range(Point(3, 1), Point(4, 2)));
       expect(events).toEqual([
         {
           oldRange: Range(Point(2, 0), Point(4, 0)),
-          newRange: Range(Point(2, 0), Point(3, 0))
-        }
-      ])
+          newRange: Range(Point(2, 0), Point(3, 0)),
+        },
+      ]);
 
-      events.length = 0
-      displayLayer.destroyAllFolds()
+      events.length = 0;
+      displayLayer.destroyAllFolds();
       expect(events).toEqual([
         {
           oldRange: Range(Point(1, 0), Point(3, 0)),
-          newRange: Range(Point(1, 0), Point(5, 0))
-        }
-      ])
+          newRange: Range(Point(1, 0), Point(5, 0)),
+        },
+      ]);
 
       // When multiple changes occur in a transaction, the changes are combined.
-      events.length = 0
+      events.length = 0;
       buffer.transact(() => {
-        displayLayer.foldBufferRange(Range(Point(1, 1), Point(2, 2)))
-        displayLayer.foldBufferRange(Range(Point(3, 1), Point(4, 2)))
-      })
+        displayLayer.foldBufferRange(Range(Point(1, 1), Point(2, 2)));
+        displayLayer.foldBufferRange(Range(Point(3, 1), Point(4, 2)));
+      });
       expect(events).toEqual([
         {
           oldRange: Range(Point(1, 0), Point(5, 0)),
-          newRange: Range(Point(1, 0), Point(3, 0))
-        }
-      ])
-    })
+          newRange: Range(Point(1, 0), Point(3, 0)),
+        },
+      ]);
+    });
 
-    it('calls the callback only one time per text buffer transaction', () => {
+    it("calls the callback only one time per text buffer transaction", () => {
       const buffer = new TextBuffer({
-        text: 'abc\ndef\nghi\njkl\nmno'
-      })
+        text: "abc\ndef\nghi\njkl\nmno",
+      });
 
-      const displayLayer = buffer.addDisplayLayer({tabLength: 4})
+      const displayLayer = buffer.addDisplayLayer({ tabLength: 4 });
 
-      const events = []
-      displayLayer.onDidChange((changes) => events.push(changes))
+      const events = [];
+      displayLayer.onDidChange((changes) => events.push(changes));
 
-      const checkpoint = buffer.createCheckpoint()
+      const checkpoint = buffer.createCheckpoint();
 
       buffer.transact(() => {
-        buffer.setTextInRange([[0, 1], [0, 1]], '\n')
-        buffer.setTextInRange([[4, 2], [4, 2]], '\n')
-        buffer.setTextInRange([[4, 2], [4, 2]], '.')
-        buffer.setTextInRange([[4, 3], [4, 3]], '.')
-        buffer.setTextInRange([[4, 4], [4, 4]], '.')
-      })
-      expect(events).toEqual([[
-        {
-          oldRange: Range(Point(0, 0), Point(1, 0)),
-          newRange: Range(Point(0, 0), Point(2, 0))
-        },
-        {
-          oldRange: Range(Point(3, 0), Point(4, 0)),
-          newRange: Range(Point(4, 0), Point(6, 0))
-        }
-      ]])
+        buffer.setTextInRange(
+          [
+            [0, 1],
+            [0, 1],
+          ],
+          "\n",
+        );
+        buffer.setTextInRange(
+          [
+            [4, 2],
+            [4, 2],
+          ],
+          "\n",
+        );
+        buffer.setTextInRange(
+          [
+            [4, 2],
+            [4, 2],
+          ],
+          ".",
+        );
+        buffer.setTextInRange(
+          [
+            [4, 3],
+            [4, 3],
+          ],
+          ".",
+        );
+        buffer.setTextInRange(
+          [
+            [4, 4],
+            [4, 4],
+          ],
+          ".",
+        );
+      });
+      expect(events).toEqual([
+        [
+          {
+            oldRange: Range(Point(0, 0), Point(1, 0)),
+            newRange: Range(Point(0, 0), Point(2, 0)),
+          },
+          {
+            oldRange: Range(Point(3, 0), Point(4, 0)),
+            newRange: Range(Point(4, 0), Point(6, 0)),
+          },
+        ],
+      ]);
 
-      events.length = 0
-      buffer.undo()
-      expect(events).toEqual([[
-        {
-          oldRange: Range(Point(0, 0), Point(2, 0)),
-          newRange: Range(Point(0, 0), Point(1, 0))
-        },
-        {
-          oldRange: Range(Point(4, 0), Point(6, 0)),
-          newRange: Range(Point(3, 0), Point(4, 0))
-        }
-      ]])
+      events.length = 0;
+      buffer.undo();
+      expect(events).toEqual([
+        [
+          {
+            oldRange: Range(Point(0, 0), Point(2, 0)),
+            newRange: Range(Point(0, 0), Point(1, 0)),
+          },
+          {
+            oldRange: Range(Point(4, 0), Point(6, 0)),
+            newRange: Range(Point(3, 0), Point(4, 0)),
+          },
+        ],
+      ]);
 
-      events.length = 0
-      buffer.redo()
-      expect(events).toEqual([[
-        {
-          oldRange: Range(Point(0, 0), Point(1, 0)),
-          newRange: Range(Point(0, 0), Point(2, 0))
-        },
-        {
-          oldRange: Range(Point(3, 0), Point(4, 0)),
-          newRange: Range(Point(4, 0), Point(6, 0))
-        }
-      ]])
+      events.length = 0;
+      buffer.redo();
+      expect(events).toEqual([
+        [
+          {
+            oldRange: Range(Point(0, 0), Point(1, 0)),
+            newRange: Range(Point(0, 0), Point(2, 0)),
+          },
+          {
+            oldRange: Range(Point(3, 0), Point(4, 0)),
+            newRange: Range(Point(4, 0), Point(6, 0)),
+          },
+        ],
+      ]);
 
-      events.length = 0
-      buffer.revertToCheckpoint(checkpoint)
-      expect(events).toEqual([[
-        {
-          oldRange: Range(Point(0, 0), Point(2, 0)),
-          newRange: Range(Point(0, 0), Point(1, 0))
-        },
-        {
-          oldRange: Range(Point(4, 0), Point(6, 0)),
-          newRange: Range(Point(3, 0), Point(4, 0))
-        }
-      ]])
-    })
-  })
+      events.length = 0;
+      buffer.revertToCheckpoint(checkpoint);
+      expect(events).toEqual([
+        [
+          {
+            oldRange: Range(Point(0, 0), Point(2, 0)),
+            newRange: Range(Point(0, 0), Point(1, 0)),
+          },
+          {
+            oldRange: Range(Point(4, 0), Point(6, 0)),
+            newRange: Range(Point(3, 0), Point(4, 0)),
+          },
+        ],
+      ]);
+    });
+  });
 
-  describe('.getApproximateScreenLineCount()', () => {
-    it('estimates the screen line count based on the currently-indexed portion of the buffer', () => {
+  describe(".getApproximateScreenLineCount()", () => {
+    it("estimates the screen line count based on the currently-indexed portion of the buffer", () => {
       const buffer = new TextBuffer({
-        text: '111 111\n222 222\n3\n4\n5\n6\n7\n8'
-      })
+        text: "111 111\n222 222\n3\n4\n5\n6\n7\n8",
+      });
 
       const displayLayer = buffer.addDisplayLayer({
-        softWrapColumn: 4
-      })
+        softWrapColumn: 4,
+      });
 
-      expect(displayLayer.getApproximateScreenLineCount()).toEqual(buffer.getLineCount())
-      expect(displayLayer.translateBufferPosition(Point(1, Infinity))).toEqual(Point(3, 3))
-      expect(displayLayer.indexedBufferRowCount).toBe(2)
-      expect(displayLayer.getApproximateScreenLineCount()).toEqual(16)
-      expect(displayLayer.translateBufferPosition(Point(3, 1))).toEqual(Point(5, 1))
-      expect(displayLayer.indexedBufferRowCount).toBe(4)
-      expect(displayLayer.getApproximateScreenLineCount()).toEqual(12)
+      expect(displayLayer.getApproximateScreenLineCount()).toEqual(buffer.getLineCount());
+      expect(displayLayer.translateBufferPosition(Point(1, Infinity))).toEqual(Point(3, 3));
+      expect(displayLayer.indexedBufferRowCount).toBe(2);
+      expect(displayLayer.getApproximateScreenLineCount()).toEqual(16);
+      expect(displayLayer.translateBufferPosition(Point(3, 1))).toEqual(Point(5, 1));
+      expect(displayLayer.indexedBufferRowCount).toBe(4);
+      expect(displayLayer.getApproximateScreenLineCount()).toEqual(12);
 
-      expect(displayLayer.translateBufferPosition(Point(3, 1))).toEqual(Point(5, 1))
-      expect(displayLayer.indexedBufferRowCount).toBe(4)
-      expect(displayLayer.getApproximateScreenLineCount()).toEqual(12)
+      expect(displayLayer.translateBufferPosition(Point(3, 1))).toEqual(Point(5, 1));
+      expect(displayLayer.indexedBufferRowCount).toBe(4);
+      expect(displayLayer.getApproximateScreenLineCount()).toEqual(12);
 
-      expect(displayLayer.translateBufferPosition(Point(4, 1))).toEqual(Point(6, 1))
-      expect(displayLayer.indexedBufferRowCount).toBe(5)
-      expect(displayLayer.getApproximateScreenLineCount()).toEqual(11)
+      expect(displayLayer.translateBufferPosition(Point(4, 1))).toEqual(Point(6, 1));
+      expect(displayLayer.indexedBufferRowCount).toBe(5);
+      expect(displayLayer.getApproximateScreenLineCount()).toEqual(11);
 
-      expect(displayLayer.getScreenLineCount()).toBe(10)
-      expect(displayLayer.getApproximateScreenLineCount()).toBe(10)
-    })
-  })
+      expect(displayLayer.getScreenLineCount()).toBe(10);
+      expect(displayLayer.getApproximateScreenLineCount()).toBe(10);
+    });
+  });
 
-  describe('.getApproximateRightmostScreenPosition()', () => {
-    it('returns the rightmost screen position that has been indexed so far', () => {
+  describe(".getApproximateRightmostScreenPosition()", () => {
+    it("returns the rightmost screen position that has been indexed so far", () => {
       const buffer = new TextBuffer({
-        text: '111\n222 222\n333 333 333\n444 444'
-      })
+        text: "111\n222 222\n333 333 333\n444 444",
+      });
 
-      const displayLayer = buffer.addDisplayLayer({})
-      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point.ZERO)
-      displayLayer.translateBufferPosition(Point(1, 0))
-      expect(displayLayer.indexedBufferRowCount).toBe(2)
-      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point(1, 7))
-      displayLayer.translateBufferPosition(Point(2, 0))
-      expect(displayLayer.indexedBufferRowCount).toBe(3)
-      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point(2, 11))
-      displayLayer.translateBufferPosition(Point(3, 0))
-      expect(displayLayer.indexedBufferRowCount).toBe(4)
-      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point(2, 11))
-    })
-  })
+      const displayLayer = buffer.addDisplayLayer({});
+      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point.ZERO);
+      displayLayer.translateBufferPosition(Point(1, 0));
+      expect(displayLayer.indexedBufferRowCount).toBe(2);
+      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point(1, 7));
+      displayLayer.translateBufferPosition(Point(2, 0));
+      expect(displayLayer.indexedBufferRowCount).toBe(3);
+      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point(2, 11));
+      displayLayer.translateBufferPosition(Point(3, 0));
+      expect(displayLayer.indexedBufferRowCount).toBe(4);
+      expect(displayLayer.getApproximateRightmostScreenPosition()).toEqual(Point(2, 11));
+    });
+  });
 
-  describe('.doBackgroundWork(deadline)', () => {
+  describe(".doBackgroundWork(deadline)", () => {
     const fakeDeadline = function (timeRemaining) {
       return {
         timeRemaining: () => {
-          return timeRemaining--
-        }
-      }
-    }
+          return timeRemaining--;
+        },
+      };
+    };
 
-    it('computes additional screen lines, returning true or false', () => {
+    it("computes additional screen lines, returning true or false", () => {
       const buffer = new TextBuffer({
-        text: 'yo\n'.repeat(100)
-      })
+        text: "yo\n".repeat(100),
+      });
 
-      const displayLayer = buffer.addDisplayLayer({})
-      expect(displayLayer.doBackgroundWork(fakeDeadline(11))).toBe(true)
-      expect(displayLayer.indexedBufferRowCount).toBeGreaterThan(0)
-      expect(displayLayer.indexedBufferRowCount).toBeLessThan(buffer.getLineCount())
-      expect(displayLayer.doBackgroundWork(fakeDeadline(1000))).toBe(false)
-      expect(displayLayer.indexedBufferRowCount).toBe(buffer.getLineCount())
-    })
-  })
+      const displayLayer = buffer.addDisplayLayer({});
+      expect(displayLayer.doBackgroundWork(fakeDeadline(11))).toBe(true);
+      expect(displayLayer.indexedBufferRowCount).toBeGreaterThan(0);
+      expect(displayLayer.indexedBufferRowCount).toBeLessThan(buffer.getLineCount());
+      expect(displayLayer.doBackgroundWork(fakeDeadline(1000))).toBe(false);
+      expect(displayLayer.indexedBufferRowCount).toBe(buffer.getLineCount());
+    });
+  });
 
-  describe('.populateSpatialIndexIfNeeded(endBufferRow, endScreenRow, deadline)', () => {
-    it('updates the spatial index correctly when the endBufferRow exceets the buffer row count', () => {
+  describe(".populateSpatialIndexIfNeeded(endBufferRow, endScreenRow, deadline)", () => {
+    it("updates the spatial index correctly when the endBufferRow exceets the buffer row count", () => {
       const buffer = new TextBuffer({
-        text: SAMPLE_TEXT
-      })
+        text: SAMPLE_TEXT,
+      });
 
-      const displayLayer = buffer.addDisplayLayer()
-      displayLayer.foldBufferRange([[4, 29], [7, 4]])
-      const expectedText = displayLayer.getText()
-      displayLayer.clearSpatialIndex()
+      const displayLayer = buffer.addDisplayLayer();
+      displayLayer.foldBufferRange([
+        [4, 29],
+        [7, 4],
+      ]);
+      const expectedText = displayLayer.getText();
+      displayLayer.clearSpatialIndex();
 
-      displayLayer.populateSpatialIndexIfNeeded(Infinity, Infinity)
-      expect(displayLayer.getText()).toBe(expectedText)
-    })
-  })
+      displayLayer.populateSpatialIndexIfNeeded(Infinity, Infinity);
+      expect(displayLayer.getText()).toBe(expectedText);
+    });
+  });
 
-  describe('.bufferRowsForScreenRows(startRow, endRow)', () => {
-    it('returns an array containing the buffer rows for the given screen row range', () => {
-      const buffer = new TextBuffer({text: 'abcde\nfghij\nklmno\npqrst\nuvwxyz'})
-      const displayLayer = buffer.addDisplayLayer({softWrapColumn: 4})
-      const fold1 = displayLayer.foldBufferRange([[0, 1], [1, 1]]) // eslint-disable-line no-unused-vars
-      const fold2 = displayLayer.foldBufferRange([[2, 2], [3, 2]])
-      const fold3 = displayLayer.foldBufferRange([[3, 3], [3, 4]]) // eslint-disable-line no-unused-vars
+  describe(".bufferRowsForScreenRows(startRow, endRow)", () => {
+    it("returns an array containing the buffer rows for the given screen row range", () => {
+      const buffer = new TextBuffer({ text: "abcde\nfghij\nklmno\npqrst\nuvwxyz" });
+      const displayLayer = buffer.addDisplayLayer({ softWrapColumn: 4 });
+      const fold1 = displayLayer.foldBufferRange([
+        [0, 1],
+        [1, 1],
+      ]); // eslint-disable-line no-unused-vars
+      const fold2 = displayLayer.foldBufferRange([
+        [2, 2],
+        [3, 2],
+      ]);
+      const fold3 = displayLayer.foldBufferRange([
+        [3, 3],
+        [3, 4],
+      ]); // eslint-disable-line no-unused-vars
 
-      expect(displayLayer.bufferRowsForScreenRows(2, 5)).toEqual([2, 3, 4])
-      expect(displayLayer.bufferRowsForScreenRows(3, 5)).toEqual([3, 4])
-      expect(displayLayer.bufferRowsForScreenRows(4, 6)).toEqual([4, 4])
-      expect(displayLayer.bufferRowsForScreenRows(0, 7)).toEqual([0, 1, 2, 3, 4, 4, 5])
+      expect(displayLayer.bufferRowsForScreenRows(2, 5)).toEqual([2, 3, 4]);
+      expect(displayLayer.bufferRowsForScreenRows(3, 5)).toEqual([3, 4]);
+      expect(displayLayer.bufferRowsForScreenRows(4, 6)).toEqual([4, 4]);
+      expect(displayLayer.bufferRowsForScreenRows(0, 7)).toEqual([0, 1, 2, 3, 4, 4, 5]);
 
-      displayLayer.destroyFold(fold2)
-      expect(displayLayer.bufferRowsForScreenRows(2, 5)).toEqual([2, 2, 3])
-      expect(displayLayer.bufferRowsForScreenRows(3, 5)).toEqual([2, 3])
-      expect(displayLayer.bufferRowsForScreenRows(4, 6)).toEqual([3, 3])
-      expect(displayLayer.bufferRowsForScreenRows(0, 8)).toEqual([0, 1, 2, 2, 3, 3, 4, 4])
-    })
-  })
+      displayLayer.destroyFold(fold2);
+      expect(displayLayer.bufferRowsForScreenRows(2, 5)).toEqual([2, 2, 3]);
+      expect(displayLayer.bufferRowsForScreenRows(3, 5)).toEqual([2, 3]);
+      expect(displayLayer.bufferRowsForScreenRows(4, 6)).toEqual([3, 3]);
+      expect(displayLayer.bufferRowsForScreenRows(0, 8)).toEqual([0, 1, 2, 2, 3, 3, 4, 4]);
+    });
+  });
 
-  describe('.getScreenLines(startRow, endRow)', () => {
-    it('returns an empty array when the given start row is greater than the screen line count', () => {
+  describe(".getScreenLines(startRow, endRow)", () => {
+    it("returns an empty array when the given start row is greater than the screen line count", () => {
       const buffer = new TextBuffer({
-        text: 'hello'
-      })
+        text: "hello",
+      });
 
-      const displayLayer = buffer.addDisplayLayer({})
-      expect(displayLayer.getScreenLines(1, 2)).toEqual([])
-    })
-  })
+      const displayLayer = buffer.addDisplayLayer({});
+      expect(displayLayer.getScreenLines(1, 2)).toEqual([]);
+    });
+  });
 
-  it('updates the displayed text correctly when the underlying buffer changes', () => {
-    const now = Date.now()
+  it("updates the displayed text correctly when the underlying buffer changes", () => {
+    const now = Date.now();
 
     for (let i = 0; i < 200; i++) {
-      let seed = now + i
+      let seed = now + i;
 
       try {
-        const random = new Random(seed)
+        const random = new Random(seed);
 
         const buffer = new TextBuffer({
-          text: buildRandomLines(random, 20)
-        })
+          text: buildRandomLines(random, 20),
+        });
 
-        const invisibles = {}
+        const invisibles = {};
 
         if (random(2) > 0) {
-          invisibles.space = '•'
+          invisibles.space = "•";
         }
 
         if (random(2) > 0) {
-          invisibles.eol = EOL_INVISIBLE
+          invisibles.eol = EOL_INVISIBLE;
         }
 
         if (random(2) > 0) {
-          invisibles.cr = CR_INVISIBLE
+          invisibles.cr = CR_INVISIBLE;
         }
 
-        const foldIds = []
-        const showIndentGuides = Boolean(random(2))
-        const softWrapColumn = random(2) ? random.intBetween(5, 80) : null
-        const foldsMarkerLayer = random(2) ? createFoldsMarkerLayer(random, buffer, foldIds) : null
+        const foldIds = [];
+        const showIndentGuides = Boolean(random(2));
+        const softWrapColumn = random(2) ? random.intBetween(5, 80) : null;
+        const foldsMarkerLayer = random(2) ? createFoldsMarkerLayer(random, buffer, foldIds) : null;
 
         const displayLayer = buffer.addDisplayLayer({
           tabLength: 4,
           invisibles: invisibles,
           showIndentGuides: showIndentGuides,
           softWrapColumn: softWrapColumn,
-          foldsMarkerLayer: foldsMarkerLayer
-        })
+          foldsMarkerLayer: foldsMarkerLayer,
+        });
 
-        const languageMode = new TestLanguageMode([], buffer, random)
-        buffer.setLanguageMode(languageMode)
-        displayLayer.getText(0, 3)
-        let undoableChanges = 0
-        let redoableChanges = 0
-        const screenLinesById = new Map()
+        const languageMode = new TestLanguageMode([], buffer, random);
+        buffer.setLanguageMode(languageMode);
+        displayLayer.getText(0, 3);
+        let undoableChanges = 0;
+        let redoableChanges = 0;
+        const screenLinesById = new Map();
 
         for (let j = 0; j < 10; j++) {
-          const k = random(11)
+          const k = random(11);
 
           if (k < 2) {
-            createRandomFold(random, displayLayer, foldIds)
+            createRandomFold(random, displayLayer, foldIds);
           } else if (k < 4 && foldIds.length > 0) {
-            destroyRandomFold(random, displayLayer, foldIds)
+            destroyRandomFold(random, displayLayer, foldIds);
           } else if (k < 5 && foldIds.length > 0) {
-            displayLayer.destroyAllFolds()
-            foldIds.length = 0
+            displayLayer.destroyAllFolds();
+            foldIds.length = 0;
           } else if (k < 6 && undoableChanges > 0) {
-            undoableChanges--
-            redoableChanges++
-            performUndo(random, displayLayer)
+            undoableChanges--;
+            redoableChanges++;
+            performUndo(random, displayLayer);
           } else if (k < 7 && redoableChanges > 0) {
-            undoableChanges++
-            redoableChanges--
-            performRedo(random, displayLayer)
+            undoableChanges++;
+            redoableChanges--;
+            performRedo(random, displayLayer);
           } else if (k < 8) {
-            languageMode.emitHighlightingChangeEvent(getRandomBufferRange(random, buffer))
+            languageMode.emitHighlightingChangeEvent(getRandomBufferRange(random, buffer));
           } else if (k < 10) {
-            undoableChanges++
-            performRandomChange(random, displayLayer)
+            undoableChanges++;
+            performRandomChange(random, displayLayer);
           } else {
-            const softWrapColumn = random(2) ? random.intBetween(5, 80) : null
-            displayLayer.reset({softWrapColumn})
+            const softWrapColumn = random(2) ? random.intBetween(5, 80) : null;
+            displayLayer.reset({ softWrapColumn });
           }
 
           if (!hasComputedAllScreenRows(displayLayer)) {
-            performReadOutsideOfIndexedRegion(random, displayLayer)
+            performReadOutsideOfIndexedRegion(random, displayLayer);
           }
 
-          const freshDisplayLayer = displayLayer.copy()
-          freshDisplayLayer.getScreenLines()
+          const freshDisplayLayer = displayLayer.copy();
+          freshDisplayLayer.getScreenLines();
           if (!Number.isFinite(displayLayer.softWrapColumn) && !displayLayer.showIndentGuides) {
-            verifyLineLengths(displayLayer)
+            verifyLineLengths(displayLayer);
           }
-          verifyTokenConsistency(displayLayer)
-          verifyText(random, displayLayer, freshDisplayLayer)
-          verifyRightmostScreenPosition(freshDisplayLayer)
-          verifyScreenLineIds(displayLayer, screenLinesById)
-          verifyPositionTranslations(random, displayLayer)
-
+          verifyTokenConsistency(displayLayer);
+          verifyText(random, displayLayer, freshDisplayLayer);
+          verifyRightmostScreenPosition(freshDisplayLayer);
+          verifyScreenLineIds(displayLayer, screenLinesById);
+          verifyPositionTranslations(random, displayLayer);
         }
       } catch (error) {
-        console.log(`Failing Seed: ${seed}`)
-        throw error
+        console.log(`Failing Seed: ${seed}`);
+        throw error;
       }
     }
-  })
-})
+  });
+});
 
-function performRandomChange (random, displayLayer) {
-  const text = buildRandomLines(random, 4)
-  const range = getRandomBufferRange(random, displayLayer.buffer)
-  log(('buffer change ' + (range) + ' ' + (JSON.stringify(text))))
-
-  verifyChangeEvent(displayLayer, () => {
-    displayLayer.buffer.setTextInRange(range, text)
-  })
-}
-
-function performUndo (random, displayLayer) {
-  log('undo')
+function performRandomChange(random, displayLayer) {
+  const text = buildRandomLines(random, 4);
+  const range = getRandomBufferRange(random, displayLayer.buffer);
+  log("buffer change " + range + " " + JSON.stringify(text));
 
   verifyChangeEvent(displayLayer, () => {
-    displayLayer.buffer.undo()
-  })
+    displayLayer.buffer.setTextInRange(range, text);
+  });
 }
 
-function performRedo (random, displayLayer) {
-  log('redo')
+function performUndo(random, displayLayer) {
+  log("undo");
 
   verifyChangeEvent(displayLayer, () => {
-    displayLayer.buffer.redo()
-  })
+    displayLayer.buffer.undo();
+  });
 }
 
-function createFoldsMarkerLayer (random, buffer, foldIds) {
+function performRedo(random, displayLayer) {
+  log("redo");
+
+  verifyChangeEvent(displayLayer, () => {
+    displayLayer.buffer.redo();
+  });
+}
+
+function createFoldsMarkerLayer(random, buffer, foldIds) {
   const markerLayer = buffer.addMarkerLayer({
     maintainHistory: false,
     persistent: true,
-    destroyInvalidatedMarkers: true
-  })
+    destroyInvalidatedMarkers: true,
+  });
   for (let i = 0, n = random(5); i < n; i++) {
-    foldIds.push(markerLayer.markRange(getRandomBufferRange(random, buffer)).id)
+    foldIds.push(markerLayer.markRange(getRandomBufferRange(random, buffer)).id);
   }
-  return markerLayer
+  return markerLayer;
 }
 
-function createRandomFold (random, displayLayer, foldIds) {
-  const bufferRange = getRandomBufferRange(random, displayLayer.buffer)
-  log('fold ' + bufferRange)
+function createRandomFold(random, displayLayer, foldIds) {
+  const bufferRange = getRandomBufferRange(random, displayLayer.buffer);
+  log("fold " + bufferRange);
 
   verifyChangeEvent(displayLayer, () => {
-    foldIds.push(displayLayer.foldBufferRange(bufferRange))
-  })
+    foldIds.push(displayLayer.foldBufferRange(bufferRange));
+  });
 }
 
-function destroyRandomFold (random, displayLayer, foldIds) {
-  const foldIndex = random(foldIds.length - 1)
-  log('destroy fold ' + foldIndex)
+function destroyRandomFold(random, displayLayer, foldIds) {
+  const foldIndex = random(foldIds.length - 1);
+  log("destroy fold " + foldIndex);
 
   verifyChangeEvent(displayLayer, () => {
-    displayLayer.destroyFold(foldIds.splice(foldIndex, 1)[0])
-  })
+    displayLayer.destroyFold(foldIds.splice(foldIndex, 1)[0]);
+  });
 }
 
-function performReadOutsideOfIndexedRegion (random, displayLayer) {
-  const computedRowCount = getComputedScreenLineCount(displayLayer)
-  const row = random.intBetween(computedRowCount, computedRowCount + 10)
-  log('new-read ' + row)
-  displayLayer.getScreenLines(0, row)
+function performReadOutsideOfIndexedRegion(random, displayLayer) {
+  const computedRowCount = getComputedScreenLineCount(displayLayer);
+  const row = random.intBetween(computedRowCount, computedRowCount + 10);
+  log("new-read " + row);
+  displayLayer.getScreenLines(0, row);
 }
 
-function log (message) {}
+function log(message) {}
 
-function verifyChangeEvent (displayLayer, fn) {
-  let displayLayerCopy = displayLayer.copy()
-  const previousTokenLines = getTokens(displayLayerCopy)
-  displayLayerCopy.destroy()
+function verifyChangeEvent(displayLayer, fn) {
+  let displayLayerCopy = displayLayer.copy();
+  const previousTokenLines = getTokens(displayLayerCopy);
+  displayLayerCopy.destroy();
 
-  const allChanges = []
+  const allChanges = [];
   const disposable = displayLayer.onDidChange((changes) => {
-    allChanges.push(...changes)
-  })
-  fn()
-  disposable.dispose()
+    allChanges.push(...changes);
+  });
+  fn();
+  disposable.dispose();
 
-  displayLayerCopy = displayLayer.copy()
-  const expectedTokenLines = getTokens(displayLayerCopy)
-  updateTokenLines(previousTokenLines, displayLayerCopy, allChanges)
-  displayLayerCopy.destroy()
-  expect(previousTokenLines).toEqual(expectedTokenLines)
+  displayLayerCopy = displayLayer.copy();
+  const expectedTokenLines = getTokens(displayLayerCopy);
+  updateTokenLines(previousTokenLines, displayLayerCopy, allChanges);
+  displayLayerCopy.destroy();
+  expect(previousTokenLines).toEqual(expectedTokenLines);
 }
 
-function verifyText (random, displayLayer, freshDisplayLayer) {
-  const startRow = random(getComputedScreenLineCount(displayLayer))
-  const endRow = random.intBetween(startRow, getComputedScreenLineCount(displayLayer))
-  const text = displayLayer.getText(startRow, endRow)
-  const expectedText = freshDisplayLayer.getText().split('\n').slice(startRow, endRow).join('\n')
-  expect(JSON.stringify(text)).toBe(JSON.stringify(expectedText), `Text for rows ${startRow} - ${endRow}`)
+function verifyText(random, displayLayer, freshDisplayLayer) {
+  const startRow = random(getComputedScreenLineCount(displayLayer));
+  const endRow = random.intBetween(startRow, getComputedScreenLineCount(displayLayer));
+  const text = displayLayer.getText(startRow, endRow);
+  const expectedText = freshDisplayLayer.getText().split("\n").slice(startRow, endRow).join("\n");
+  expect(JSON.stringify(text)).toBe(
+    JSON.stringify(expectedText),
+    `Text for rows ${startRow} - ${endRow}`,
+  );
 }
 
-function verifyLineLengths (displayLayer) {
-  const rowCount = getComputedScreenLineCount(displayLayer)
-  const screenLines = displayLayer.getScreenLines(0, rowCount)
+function verifyLineLengths(displayLayer) {
+  const rowCount = getComputedScreenLineCount(displayLayer);
+  const screenLines = displayLayer.getScreenLines(0, rowCount);
   for (let row = 0; row < rowCount; row++) {
-    let text = screenLines[row].lineText.replace(LINE_ENDING_INVISIBLES_REGEXP, '')
-    expect(displayLayer.lineLengthForScreenRow(row)).toBe(text.length)
+    let text = screenLines[row].lineText.replace(LINE_ENDING_INVISIBLES_REGEXP, "");
+    expect(displayLayer.lineLengthForScreenRow(row)).toBe(text.length);
   }
 }
 
-function verifyTokenConsistency (displayLayer) {
-  const containingTags = []
+function verifyTokenConsistency(displayLayer) {
+  const containingTags = [];
 
-  for (const tokens of getTokenBoundaries(displayLayer, 0, getComputedScreenLineCount(displayLayer))) {
-    for (const {closeTags, openTags} of tokens) {
+  for (const tokens of getTokenBoundaries(
+    displayLayer,
+    0,
+    getComputedScreenLineCount(displayLayer),
+  )) {
+    for (const { closeTags, openTags } of tokens) {
       for (const tag of closeTags) {
-        const mostRecentOpenTag = containingTags.pop()
-        expect(mostRecentOpenTag).toBe(tag)
+        const mostRecentOpenTag = containingTags.pop();
+        expect(mostRecentOpenTag).toBe(tag);
       }
 
-      containingTags.push(...openTags)
+      containingTags.push(...openTags);
     }
 
-    expect(containingTags).toEqual([])
+    expect(containingTags).toEqual([]);
   }
 
-  expect(containingTags).toEqual([])
+  expect(containingTags).toEqual([]);
 }
 
-function verifyRightmostScreenPosition (displayLayer) {
-  let maxLineLength = -1
-  const longestScreenRows = new Set()
+function verifyRightmostScreenPosition(displayLayer) {
+  let maxLineLength = -1;
+  const longestScreenRows = new Set();
 
   for (let row = 0, rowCount = displayLayer.getScreenLineCount(); row < rowCount; row++) {
-    const length = displayLayer.lineLengthForScreenRow(row)
+    const length = displayLayer.lineLengthForScreenRow(row);
 
     if (length > maxLineLength) {
-      longestScreenRows.clear()
-      maxLineLength = length
+      longestScreenRows.clear();
+      maxLineLength = length;
     }
 
     if (length >= maxLineLength) {
-      longestScreenRows.add(row)
+      longestScreenRows.add(row);
     }
   }
 
-  const rightmostScreenPosition = displayLayer.getRightmostScreenPosition()
-  expect(rightmostScreenPosition.column).toBe(maxLineLength)
-  expect(longestScreenRows.has(rightmostScreenPosition.row)).toBe(true)
+  const rightmostScreenPosition = displayLayer.getRightmostScreenPosition();
+  expect(rightmostScreenPosition.column).toBe(maxLineLength);
+  expect(longestScreenRows.has(rightmostScreenPosition.row)).toBe(true);
 }
 
-function verifyScreenLineIds (displayLayer, screenLinesById) {
-  for (const screenLine of displayLayer.getScreenLines(0, getComputedScreenLineCount(displayLayer))) {
+function verifyScreenLineIds(displayLayer, screenLinesById) {
+  for (const screenLine of displayLayer.getScreenLines(
+    0,
+    getComputedScreenLineCount(displayLayer),
+  )) {
     if (screenLinesById.has(screenLine.id)) {
-      expect(screenLinesById.get(screenLine.id)).toEqual(screenLine)
+      expect(screenLinesById.get(screenLine.id)).toEqual(screenLine);
     } else {
-      screenLinesById.set(screenLine.id, screenLine)
+      screenLinesById.set(screenLine.id, screenLine);
     }
   }
 }
 
-function verifyPositionTranslations (random, displayLayer) {
+function verifyPositionTranslations(random, displayLayer) {
   for (let i = 0; i < 20; i++) {
-    const screenRow = random(getComputedScreenLineCount(displayLayer))
-    if (displayLayer.lineLengthForScreenRow(screenRow) === 0) continue
-    const screenColumn = random(displayLayer.lineLengthForScreenRow(screenRow))
-    const screenCharacter = displayLayer.getScreenLines(screenRow, screenRow + 1)[0].lineText[screenColumn]
+    const screenRow = random(getComputedScreenLineCount(displayLayer));
+    if (displayLayer.lineLengthForScreenRow(screenRow) === 0) continue;
+    const screenColumn = random(displayLayer.lineLengthForScreenRow(screenRow));
+    const screenCharacter = displayLayer.getScreenLines(screenRow, screenRow + 1)[0].lineText[
+      screenColumn
+    ];
 
-    if (!/[a-z]/.test(screenCharacter)) continue
+    if (!/[a-z]/.test(screenCharacter)) continue;
 
-    const screenPosition = Point(screenRow, screenColumn)
-    const bufferPosition = displayLayer.translateScreenPosition(screenPosition)
-    const bufferCharacter = displayLayer.buffer.lineForRow(bufferPosition.row)[bufferPosition.column]
+    const screenPosition = Point(screenRow, screenColumn);
+    const bufferPosition = displayLayer.translateScreenPosition(screenPosition);
+    const bufferCharacter = displayLayer.buffer.lineForRow(bufferPosition.row)[
+      bufferPosition.column
+    ];
 
-    expect(bufferCharacter).toBe(screenCharacter, `Screen position: ${screenPosition}, Buffer position: ${bufferPosition}`)
-    expect(displayLayer.translateBufferPosition(bufferPosition)).toEqual(screenPosition, `translateBufferPosition(${bufferPosition})`)
+    expect(bufferCharacter).toBe(
+      screenCharacter,
+      `Screen position: ${screenPosition}, Buffer position: ${bufferPosition}`,
+    );
+    expect(displayLayer.translateBufferPosition(bufferPosition)).toEqual(
+      screenPosition,
+      `translateBufferPosition(${bufferPosition})`,
+    );
 
-    const nextBufferPosition = bufferPosition.traverse(Point(0, 1))
-    const nextScreenPosition = displayLayer.translateBufferPosition(nextBufferPosition)
-    expect(nextScreenPosition.isGreaterThan(screenPosition)).toBe(true, `translateBufferPosition(${nextBufferPosition}) > translateBufferPosition(${bufferPosition})`)
+    const nextBufferPosition = bufferPosition.traverse(Point(0, 1));
+    const nextScreenPosition = displayLayer.translateBufferPosition(nextBufferPosition);
+    expect(nextScreenPosition.isGreaterThan(screenPosition)).toBe(
+      true,
+      `translateBufferPosition(${nextBufferPosition}) > translateBufferPosition(${bufferPosition})`,
+    );
   }
 }
 
-function expectPositionTranslations (displayLayer, tranlations) {
+function expectPositionTranslations(displayLayer, tranlations) {
   for (const [screenPosition, bufferPositions] of tranlations) {
     if (Array.isArray(bufferPositions)) {
-      const [backwardBufferPosition, forwardBufferPosition] = bufferPositions
+      const [backwardBufferPosition, forwardBufferPosition] = bufferPositions;
 
-      expect(displayLayer.translateScreenPosition(screenPosition, {
-        clipDirection: 'backward'
-      })).toEqual(backwardBufferPosition, `translateScreenPosition(Point${screenPosition}, {clipDirection: 'backward'})`)
+      expect(
+        displayLayer.translateScreenPosition(screenPosition, {
+          clipDirection: "backward",
+        }),
+      ).toEqual(
+        backwardBufferPosition,
+        `translateScreenPosition(Point${screenPosition}, {clipDirection: 'backward'})`,
+      );
 
-      expect(displayLayer.translateScreenPosition(screenPosition, {
-        clipDirection: 'forward'
-      })).toEqual(forwardBufferPosition, `translateScreenPosition(Point${screenPosition}, {clipDirection: 'forward'})`)
+      expect(
+        displayLayer.translateScreenPosition(screenPosition, {
+          clipDirection: "forward",
+        }),
+      ).toEqual(
+        forwardBufferPosition,
+        `translateScreenPosition(Point${screenPosition}, {clipDirection: 'forward'})`,
+      );
 
-      expect(displayLayer.clipScreenPosition(screenPosition, {
-        clipDirection: 'backward'
-      })).toEqual(displayLayer.translateBufferPosition(backwardBufferPosition, {
-        clipDirection: 'backward'
-      }), `clipScreenPosition(Point${screenPosition}, {clipDirection: 'backward'})`)
+      expect(
+        displayLayer.clipScreenPosition(screenPosition, {
+          clipDirection: "backward",
+        }),
+      ).toEqual(
+        displayLayer.translateBufferPosition(backwardBufferPosition, {
+          clipDirection: "backward",
+        }),
+        `clipScreenPosition(Point${screenPosition}, {clipDirection: 'backward'})`,
+      );
 
-      expect(displayLayer.clipScreenPosition(screenPosition, {
-        clipDirection: 'forward'
-      })).toEqual(displayLayer.translateBufferPosition(forwardBufferPosition, {
-        clipDirection: 'forward'
-      }), `clipScreenPosition(Point${screenPosition}, {clipDirection: 'forward'})`)
+      expect(
+        displayLayer.clipScreenPosition(screenPosition, {
+          clipDirection: "forward",
+        }),
+      ).toEqual(
+        displayLayer.translateBufferPosition(forwardBufferPosition, {
+          clipDirection: "forward",
+        }),
+        `clipScreenPosition(Point${screenPosition}, {clipDirection: 'forward'})`,
+      );
     } else {
-      const bufferPosition = bufferPositions
-      expect(displayLayer.translateScreenPosition(screenPosition)).toEqual(bufferPosition, `translateScreenPosition(Point${screenPosition})`)
-      expect(displayLayer.translateScreenPosition(screenPosition, {clipDirection: 'forward'})).toEqual(bufferPosition, `translateScreenPosition(Point${screenPosition}, {clipDirection: 'forward'})`)
-      expect(displayLayer.translateScreenPosition(screenPosition, {clipDirection: 'backward'})).toEqual(bufferPosition, `translateScreenPosition(Point${screenPosition}, {clipDirection: 'backward'})`)
-      expect(displayLayer.translateBufferPosition(bufferPosition)).toEqual(screenPosition, `translateScreenPosition(Point${bufferPosition})`)
-      expect(displayLayer.translateBufferPosition(bufferPosition, {clipDirection: 'forward'})).toEqual(screenPosition, `translateScreenPosition(Point${bufferPosition}, {clipDirection: 'forward'})`)
-      expect(displayLayer.translateBufferPosition(bufferPosition, {clipDirection: 'backward'})).toEqual(screenPosition, `translateScreenPosition(Point${bufferPosition}, {clipDirection: 'backward'})`)
+      const bufferPosition = bufferPositions;
+      expect(displayLayer.translateScreenPosition(screenPosition)).toEqual(
+        bufferPosition,
+        `translateScreenPosition(Point${screenPosition})`,
+      );
+      expect(
+        displayLayer.translateScreenPosition(screenPosition, { clipDirection: "forward" }),
+      ).toEqual(
+        bufferPosition,
+        `translateScreenPosition(Point${screenPosition}, {clipDirection: 'forward'})`,
+      );
+      expect(
+        displayLayer.translateScreenPosition(screenPosition, { clipDirection: "backward" }),
+      ).toEqual(
+        bufferPosition,
+        `translateScreenPosition(Point${screenPosition}, {clipDirection: 'backward'})`,
+      );
+      expect(displayLayer.translateBufferPosition(bufferPosition)).toEqual(
+        screenPosition,
+        `translateScreenPosition(Point${bufferPosition})`,
+      );
+      expect(
+        displayLayer.translateBufferPosition(bufferPosition, { clipDirection: "forward" }),
+      ).toEqual(
+        screenPosition,
+        `translateScreenPosition(Point${bufferPosition}, {clipDirection: 'forward'})`,
+      );
+      expect(
+        displayLayer.translateBufferPosition(bufferPosition, { clipDirection: "backward" }),
+      ).toEqual(
+        screenPosition,
+        `translateScreenPosition(Point${bufferPosition}, {clipDirection: 'backward'})`,
+      );
     }
   }
 }
 
-function expectTokenBoundaries (displayLayer, expectedTokens) {
-  const tokenLines = getTokenBoundaries(displayLayer)
+function expectTokenBoundaries(displayLayer, expectedTokens) {
+  const tokenLines = getTokenBoundaries(displayLayer);
 
   for (const [screenRow, tokens] of tokenLines.entries()) {
-    let screenColumn = 0
+    let screenColumn = 0;
 
     for (const token of tokens) {
       if (expectedTokens.length === 0) {
-        throw new Error('There are more tokens than expected.')
+        throw new Error("There are more tokens than expected.");
       }
 
-      const {text, open, close} = expectedTokens.shift()
+      const { text, open, close } = expectedTokens.shift();
 
       expect(token.text).toEqual(
         text,
-        ('Text of token with start position ' + (Point(screenRow, screenColumn)))
-      )
+        "Text of token with start position " + Point(screenRow, screenColumn),
+      );
 
       expect(token.closeTags).toEqual(
         close,
-        ('Close tags of token with start position ' + (Point(screenRow, screenColumn)))
-      )
+        "Close tags of token with start position " + Point(screenRow, screenColumn),
+      );
 
       expect(token.openTags).toEqual(
         open,
-        ('Open tags of token with start position: ' + (Point(screenRow, screenColumn)))
-      )
+        "Open tags of token with start position: " + Point(screenRow, screenColumn),
+      );
 
-      screenColumn += token.text.length
+      screenColumn += token.text.length;
     }
   }
 }
 
-const getTokens = function (displayLayer, startRow = 0, endRow = displayLayer.getScreenLineCount()) {
-  const containingTags = []
-  const tokenLines = []
+const getTokens = function (
+  displayLayer,
+  startRow = 0,
+  endRow = displayLayer.getScreenLineCount(),
+) {
+  const containingTags = [];
+  const tokenLines = [];
 
   for (const line of getTokenBoundaries(displayLayer, startRow, endRow)) {
-    const tokenLine = []
-    for (const {closeTags, openTags, text} of line) {
+    const tokenLine = [];
+    for (const { closeTags, openTags, text } of line) {
       for (let i = 0; i < closeTags.length; i++) {
-        containingTags.pop()
+        containingTags.pop();
       }
 
       for (const openTag of openTags) {
-        containingTags.push(openTag)
+        containingTags.push(openTag);
       }
 
       tokenLine.push({
         tags: containingTags.slice().sort(),
-        text: text
-      })
+        text: text,
+      });
     }
-    tokenLines.push(tokenLine)
+    tokenLines.push(tokenLine);
   }
-  return tokenLines
-}
+  return tokenLines;
+};
 
-function getTokenBoundaries (displayLayer, startRow = 0, endRow = displayLayer.getScreenLineCount()) {
-  const tokenLines = []
+function getTokenBoundaries(
+  displayLayer,
+  startRow = 0,
+  endRow = displayLayer.getScreenLineCount(),
+) {
+  const tokenLines = [];
 
-  for (const {lineText, tags} of displayLayer.getScreenLines(startRow, endRow)) {
-    const tokens = []
-    let startIndex = 0
-    let closeTags = []
-    let openTags = []
+  for (const { lineText, tags } of displayLayer.getScreenLines(startRow, endRow)) {
+    const tokens = [];
+    let startIndex = 0;
+    let closeTags = [];
+    let openTags = [];
 
     for (const tag of tags) {
       if (displayLayer.isCloseTag(tag)) {
-        closeTags.push(displayLayer.classNameForTag(tag))
+        closeTags.push(displayLayer.classNameForTag(tag));
       } else if (displayLayer.isOpenTag(tag)) {
-        openTags.push(displayLayer.classNameForTag(tag))
+        openTags.push(displayLayer.classNameForTag(tag));
       } else {
         tokens.push({
           closeTags: closeTags,
           openTags: openTags,
-          text: lineText.substr(startIndex, tag)
-        })
+          text: lineText.substr(startIndex, tag),
+        });
 
-        startIndex += tag
-        closeTags = []
-        openTags = []
+        startIndex += tag;
+        closeTags = [];
+        openTags = [];
       }
     }
 
@@ -2874,41 +3542,51 @@ function getTokenBoundaries (displayLayer, startRow = 0, endRow = displayLayer.g
       tokens.push({
         closeTags: closeTags,
         openTags: openTags,
-        text: ''
-      })
+        text: "",
+      });
     }
 
-    tokenLines.push(tokens)
+    tokenLines.push(tokens);
   }
 
-  return tokenLines
+  return tokenLines;
 }
 
-function updateTokenLines (tokenLines, displayLayer, changes) {
-  for (const {oldRange, newRange} of changes || []) {
-    const newTokenLines = getTokens(displayLayer, newRange.start.row, newRange.end.row)
-    tokenLines.splice(newRange.start.row, oldRange.end.row - oldRange.start.row, ...newTokenLines)
+function updateTokenLines(tokenLines, displayLayer, changes) {
+  for (const { oldRange, newRange } of changes || []) {
+    const newTokenLines = getTokens(displayLayer, newRange.start.row, newRange.end.row);
+    tokenLines.splice(newRange.start.row, oldRange.end.row - oldRange.start.row, ...newTokenLines);
   }
 }
 
-function logTokens (displayLayer) { // eslint-disable-line
-  let s = 'expectTokenBoundaries(displayLayer, [\n'
+function logTokens(displayLayer) {
+  // eslint-disable-line
+  let s = "expectTokenBoundaries(displayLayer, [\n";
 
   for (const tokens of getTokenBoundaries(displayLayer)) {
-    for (const {text, closeTags, openTags} of tokens) {
-      s += ("  {text: '" + (text) + "', close: " + (JSON.stringify(closeTags)) + ', open: ' + (JSON.stringify(openTags)) + '},\n')
+    for (const { text, closeTags, openTags } of tokens) {
+      s +=
+        "  {text: '" +
+        text +
+        "', close: " +
+        JSON.stringify(closeTags) +
+        ", open: " +
+        JSON.stringify(openTags) +
+        "},\n";
     }
   }
 
-  s += '])'
-  console.log(s)
+  s += "])";
+  console.log(s);
 }
 
-function hasComputedAllScreenRows (displayLayer) {
-  expect(displayLayer.indexedBufferRowCount).not.toBeGreaterThan(displayLayer.buffer.getLineCount())
-  return displayLayer.indexedBufferRowCount === displayLayer.buffer.getLineCount()
+function hasComputedAllScreenRows(displayLayer) {
+  expect(displayLayer.indexedBufferRowCount).not.toBeGreaterThan(
+    displayLayer.buffer.getLineCount(),
+  );
+  return displayLayer.indexedBufferRowCount === displayLayer.buffer.getLineCount();
 }
 
-function getComputedScreenLineCount (displayLayer) {
-  return displayLayer.screenLineLengths.length
+function getComputedScreenLineCount(displayLayer) {
+  return displayLayer.screenLineLengths.length;
 }

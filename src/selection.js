@@ -877,11 +877,7 @@ module.exports = class Selection {
   // * `fullLine` {Boolean} if `true`, the copied text will always be pasted
   //   at the beginning of the line containing the cursor, regardless of the
   //   cursor's horizontal position. (default: false)
-  copy(
-    maintainClipboard = false,
-    fullLine = false,
-    clipboard = this.editor.constructor.clipboard,
-  ) {
+  copy(maintainClipboard = false, fullLine = false, clipboard = this.editor.constructor.clipboard) {
     if (this.isEmpty()) return;
     const { start, end } = this.getBufferRange();
     const selectionText = this.editor.getTextInRange([start, end]);

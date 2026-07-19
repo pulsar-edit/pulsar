@@ -1,1 +1,1 @@
-exports.MAX_BUILT_IN_SCOPE_ID = 256
+exports.MAX_BUILT_IN_SCOPE_ID = 256;

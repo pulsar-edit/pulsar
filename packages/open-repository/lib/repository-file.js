@@ -77,7 +77,9 @@ export default class RepositoryFile {
 
     const snapshot = await this.repo.ensureRefsSnapshot();
     const head = snapshot.head;
-    this.shortHead = head ? head.name || (head.detached && head.oid ? head.oid.slice(0, 7) : null) : null;
+    this.shortHead = head
+      ? head.name || (head.detached && head.oid ? head.oid.slice(0, 7) : null)
+      : null;
     this.headSha = head?.oid ?? null;
 
     const [providerOverride, remoteOverride, branchOverride] = await Promise.all([
@@ -104,8 +106,7 @@ export default class RepositoryFile {
     const remoteName = this.remoteName() ?? "origin";
     const snapshotRemote = snapshot.remotes.find((remote) => remote.name === remoteName);
     this.configCache[`remote.${remoteName}.url`] =
-      snapshotRemote?.fetchUrl ??
-      (await this.repo.getConfigValueAsync(`remote.${remoteName}.url`));
+      snapshotRemote?.fetchUrl ?? (await this.repo.getConfigValueAsync(`remote.${remoteName}.url`));
 
     if (this.gitURL()) {
       const webURL = this.repoWebURL();

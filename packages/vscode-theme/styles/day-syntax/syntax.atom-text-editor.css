@@ -12,7 +12,9 @@ atom-text-editor {
   color: var(--syntax-text-color);
 
   .line.cursor-line {
-    background-color: rgb(from var(--syntax-fg) r g b / 5%); /* needs to be semi-transparent to show search results */
+    background-color: rgb(
+      from var(--syntax-fg) r g b / 5%
+    ); /* needs to be semi-transparent to show search results */
   }
 
   .invisible {

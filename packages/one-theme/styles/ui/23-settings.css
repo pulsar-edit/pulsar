@@ -8,7 +8,8 @@
     min-width: calc(var(--ui-size) * 15);
     max-width: calc(var(--ui-size) * 20);
     border-width: 0 1px 0 0;
-    border-image: linear-gradient(var(--level-2-color) 10px, var(--base-border-color) 200px) 0 1 0 0 stretch;
+    border-image: linear-gradient(var(--level-2-color) 10px, var(--base-border-color) 200px) 0 1 0 0
+      stretch;
     background: var(--level-2-color);
 
     .btn {

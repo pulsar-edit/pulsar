@@ -1,4 +1,3 @@
- 
 const path = require("path");
 const BufferedNodeProcess = require("../src/buffered-node-process");
 
