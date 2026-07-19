@@ -11,7 +11,7 @@ const StartupTime = require("./startup-time");
 
 let ICON_PATH = path.resolve(process.resourcesPath, "lumine.png");
 if (!fs.existsSync(ICON_PATH)) {
-  ICON_PATH = path.resolve(__dirname, "..", "..", "resources", "app-icons", "lumine.png");
+  ICON_PATH = path.resolve(__dirname, "..", "resources", "app-icons", "lumine.png");
 }
 
 let includeShellLoadTime = true;

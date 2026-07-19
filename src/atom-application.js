@@ -1578,7 +1578,7 @@ module.exports = class AtomApplication extends EventEmitter {
       );
     } catch {
       windowInitializationScript = require.resolve(
-        path.resolve(__dirname, "..", "..", "src", "initialize-test-window"),
+        path.resolve(__dirname, "..", "src", "initialize-test-window"),
       );
     }
 
@@ -1683,7 +1683,7 @@ module.exports = class AtomApplication extends EventEmitter {
     try {
       return require.resolve(path.resolve(this.devResourcePath, "spec", "jasmine-test-runner.js"));
     } catch {
-      return require.resolve(path.resolve(__dirname, "..", "..", "spec", "jasmine-test-runner.js"));
+      return require.resolve(path.resolve(__dirname, "..", "spec", "jasmine-test-runner.js"));
     }
   }
 
