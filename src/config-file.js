@@ -8,7 +8,7 @@ const asyncQueue = require("async/queue");
 
 // `ConfigFile` runs in the main process, so it watches directly with the
 // non-recursive Node watcher rather than the renderer's `watchPath` worker.
-const { watch } = require("./path-watchers/nodejs-watcher");
+const { watch } = require("./nodejs-watcher");
 
 module.exports = class ConfigFile {
   static at(path) {

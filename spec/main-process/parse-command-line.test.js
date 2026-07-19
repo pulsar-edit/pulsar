@@ -1,5 +1,5 @@
 const assert = require("./assert");
-const parseCommandLine = require("../../src/main-process/parse-command-line");
+const parseCommandLine = require("../../src/parse-command-line");
 
 describe("parseCommandLine", () => {
   describe("when --uri-handler is not passed", () => {

@@ -1,6 +1,6 @@
 const { app, Menu } = require("electron");
 const _ = require("@lumine-code/underscore-plus");
-const MenuHelpers = require("../menu-helpers");
+const MenuHelpers = require("./menu-helpers");
 
 // Used to manage the global application menu.
 //

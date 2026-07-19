@@ -5,7 +5,7 @@ const {
   watch,
   getWatchedPaths,
   closeAllNodejsWatchers,
-} = require("../src/path-watchers/nodejs-watcher");
+} = require("../src/nodejs-watcher");
 const { conditionPromise } = require("./helpers/async-spec-helpers");
 
 temp.track();

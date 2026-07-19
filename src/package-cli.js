@@ -14,7 +14,7 @@ const os = require("os");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const CSON = require("@lumine-code/season");
-const { resolvePackageSource } = require("../package-source");
+const { resolvePackageSource } = require("./package-source");
 
 function packagesDirectory() {
   return path.join(process.env.ATOM_HOME, "packages");

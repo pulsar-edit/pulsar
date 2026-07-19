@@ -2,13 +2,13 @@ const AtomWindow = require("./atom-window");
 const ApplicationMenu = require("./application-menu");
 const AtomProtocolHandler = require("./atom-protocol-handler");
 const { onDidChangeScrollbarStyle, getScrollbarStyle } = require("./scrollbar-style");
-const StorageFolder = require("../storage-folder");
-const Config = require("../config");
-const ConfigFile = require("../config-file");
+const StorageFolder = require("./storage-folder");
+const Config = require("./config");
+const ConfigFile = require("./config-file");
 const FileRecoveryService = require("./file-recovery-service");
-const StartupTime = require("../startup-time");
-const ipcHelpers = require("../ipc-helpers");
-const { getConfigFilePath } = require("../get-app-details.js");
+const StartupTime = require("./startup-time");
+const ipcHelpers = require("./ipc-helpers");
+const { getConfigFilePath } = require("./get-app-details.js");
 const { BrowserWindow, Menu, app, clipboard, dialog, ipcMain, shell, screen } = require("electron");
 const { CompositeDisposable, Disposable } = require("event-kit");
 const crypto = require("crypto");
@@ -16,13 +16,13 @@ const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 const os = require("os");
 const net = require("net");
-const parseUri = require("../parse-uri");
+const parseUri = require("./parse-uri");
 const { promisify } = require("util");
 const { EventEmitter } = require("events");
 const _ = require("@lumine-code/underscore-plus");
 let FindParentDir = null;
 let Resolve = null;
-const ConfigSchema = require("../config-schema");
+const ConfigSchema = require("./config-schema");
 
 const LocationSuffixRegExp = /(:\d+)(:\d+)?$/;
 const WINDOW_EVENT_CHANNEL = "window-event";
@@ -1283,7 +1283,7 @@ module.exports = class AtomApplication extends EventEmitter {
       }
 
       if (!windowInitializationScript) {
-        windowInitializationScript = require.resolve("../initialize-application-window");
+        windowInitializationScript = require.resolve("./initialize-application-window");
       }
       if (!resourcePath) resourcePath = this.resourcePath;
       if (!windowDimensions) windowDimensions = this.getDimensionsForNewWindow();
@@ -1466,7 +1466,7 @@ module.exports = class AtomApplication extends EventEmitter {
     let bestWindow;
 
     if (parsedUrl.host === "core") {
-      const predicate = require("../core-uri-handlers").windowPredicate(parsedUrl);
+      const predicate = require("./core-uri-handlers").windowPredicate(parsedUrl);
       bestWindow = this.getLastFocusedWindow((win) => !win.isSpecWindow() && predicate(win));
     }
 
@@ -1491,7 +1491,7 @@ module.exports = class AtomApplication extends EventEmitter {
       }
 
       if (!windowInitializationScript) {
-        windowInitializationScript = require.resolve("../initialize-application-window");
+        windowInitializationScript = require.resolve("./initialize-application-window");
       }
 
       const windowDimensions = this.getDimensionsForNewWindow();
@@ -1534,7 +1534,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
   getPackageManager(devMode) {
     if (this.packages == null) {
-      const PackageManager = require("../package-manager");
+      const PackageManager = require("./package-manager");
       this.packages = new PackageManager({});
       this.packages.initialize({
         configDirPath: process.env.ATOM_HOME,
@@ -1620,7 +1620,7 @@ module.exports = class AtomApplication extends EventEmitter {
   }
 
   resolveTestRunnerPath(testPath) {
-    FindParentDir ||= require("../find-parent-dir");
+    FindParentDir ||= require("./find-parent-dir");
 
     let packageRoot = FindParentDir.sync(testPath, "package.json");
 

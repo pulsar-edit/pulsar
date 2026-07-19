@@ -50,7 +50,7 @@ const TextEditorRegistry = require("./text-editor-registry");
 const PasteProviderRegistry = require("./paste-provider-registry");
 const StartupTime = require("./startup-time");
 const { getReleaseChannel } = require("./get-app-details.js");
-const UI = require("./ui/index.js");
+const UI = require("./ui");
 const packagejson = require("../package.json");
 
 const { stopAllWatchers } = require("./path-watcher");

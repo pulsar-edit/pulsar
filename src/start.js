@@ -2,11 +2,11 @@ const { app, crashReporter } = require("electron");
 const path = require("path");
 const temp = require("temp");
 const parseCommandLine = require("./parse-command-line");
-const { getReleaseChannel, getConfigFilePath } = require("../get-app-details.js");
-const atomPaths = require("../atom-paths");
+const { getReleaseChannel, getConfigFilePath } = require("./get-app-details.js");
+const atomPaths = require("./atom-paths");
 const CSON = require("@lumine-code/season");
-const Config = require("../config");
-const StartupTime = require("../startup-time");
+const Config = require("./config");
+const StartupTime = require("./startup-time");
 
 StartupTime.setStartTime();
 
@@ -174,7 +174,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     app.removeListener("open-file", addPathToOpen);
     app.removeListener("open-url", addUrlToOpen);
     const AtomApplication = require(
-      path.join(args.resourcePath, "src", "main-process", "atom-application"),
+      path.join(args.resourcePath, "src", "atom-application"),
     );
     AtomApplication.open(args);
   });

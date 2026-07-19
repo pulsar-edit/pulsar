@@ -20,7 +20,7 @@ const { Emitter } = require("event-kit");
 // subtree) connects back to a local socket owned here in the renderer and
 // exchanges a JSON prompt for a JSON answer that a dialog produced.
 
-const SCRIPT_DIRECTORY = path.join(__dirname, "git-auth");
+const SCRIPT_DIRECTORY = __dirname;
 const HELPER_SCRIPTS = ["askpass.js", "askpass.sh", "ssh-wrapper.sh", "gpg-wrapper.sh"];
 
 // Git's bundled sh on Windows (MSYS) wants forward slashes in the paths it

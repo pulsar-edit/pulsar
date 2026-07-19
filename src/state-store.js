@@ -1,5 +1,5 @@
 "use strict";
-const SQL = require("./state-store/sql");
+const SQL = require("./sql");
 
 module.exports = class StateStore {
   constructor(databaseName, version) {

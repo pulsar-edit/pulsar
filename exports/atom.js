@@ -27,7 +27,7 @@ if (process.platform === "win32") {
   Object.defineProperty(atomExport, "WinShell", {
     enumerable: true,
     get() {
-      return require("../src/main-process/win-shell");
+      return require("../src/win-shell");
     },
   });
 }

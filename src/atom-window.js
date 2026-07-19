@@ -2,12 +2,12 @@ const electronRemote = require("@electron/remote/main");
 electronRemote.initialize();
 
 const { BrowserWindow, app, dialog, ipcMain, nativeImage, webContents } = require("electron");
-const { getAppName } = require("../get-app-details.js");
+const { getAppName } = require("./get-app-details.js");
 const path = require("path");
 const fs = require("fs");
 const url = require("url");
 const { EventEmitter } = require("events");
-const StartupTime = require("../startup-time");
+const StartupTime = require("./startup-time");
 
 let ICON_PATH = path.resolve(process.resourcesPath, "lumine.png");
 if (!fs.existsSync(ICON_PATH)) {

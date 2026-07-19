@@ -9,7 +9,7 @@ const sandbox = require("sinon").createSandbox();
 const dedent = require("dedent");
 const { BrowserWindow, webContents } = require("electron");
 
-const AtomWindow = require("../../src/main-process/atom-window");
+const AtomWindow = require("../../src/atom-window");
 const { emitterEventPromise } = require("../helpers/async-spec-helpers");
 
 describe("AtomWindow", function () {

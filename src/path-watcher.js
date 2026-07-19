@@ -367,7 +367,7 @@ class WorkerProcessWatcher extends NativeWatcher {
 // been fully tracked down. That's fine, though; we can run it in its own
 // long-running task, much like VS Code does.
 class ParcelWatcher extends WorkerProcessWatcher {
-  static taskPath = require.resolve("./path-watchers/parcel-watcher-worker.js");
+  static taskPath = require.resolve("./parcel-watcher-worker.js");
 }
 
 // Extended: Manage a subscription to filesystem events that occur beneath a

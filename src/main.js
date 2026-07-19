@@ -1,5 +1,5 @@
 const startTime = Date.now();
-const StartupTime = require("../startup-time");
+const StartupTime = require("./startup-time");
 StartupTime.setStartTime();
 
 const path = require("path");
@@ -72,5 +72,5 @@ if (args.resourcePath) {
   }
 }
 
-const start = require(path.join(resourcePath, "src", "main-process", "start"));
+const start = require(path.join(resourcePath, "src", "start"));
 start(resourcePath, devResourcePath, startTime);

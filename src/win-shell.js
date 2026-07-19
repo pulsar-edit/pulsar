@@ -1,8 +1,8 @@
-const Registry = require("../win-registry.js");
+const Registry = require("./win-registry.js");
 const { execFile } = require("child_process");
 const Path = require("path");
-const { getAppName } = require("../get-app-details.js");
-const packageMetadata = require("../../package.json");
+const { getAppName } = require("./get-app-details.js");
+const packageMetadata = require("../package.json");
 
 const appName =
   packageMetadata.productName || packageMetadata.branding?.name || packageMetadata.name;

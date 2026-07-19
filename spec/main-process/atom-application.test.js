@@ -7,8 +7,8 @@ const fs = require("@lumine-code/fs-plus");
 const electron = require("electron");
 const sandbox = require("sinon").createSandbox();
 
-const AtomApplication = require("../../src/main-process/atom-application");
-const parseCommandLine = require("../../src/main-process/parse-command-line");
+const AtomApplication = require("../../src/atom-application");
+const parseCommandLine = require("../../src/parse-command-line");
 const { emitterEventPromise, conditionPromise } = require("../helpers/async-spec-helpers");
 
 // These tests use a utility class called LaunchScenario, defined below, to manipulate AtomApplication instances that

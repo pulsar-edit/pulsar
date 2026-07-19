@@ -1,5 +1,5 @@
 const { dialog } = require("electron");
-const FileRecoveryService = require("../../src/main-process/file-recovery-service");
+const FileRecoveryService = require("../../src/file-recovery-service");
 const fs = require("@lumine-code/fs-plus");
 const fsreal = require("fs");
 const EventEmitter = require("events").EventEmitter;
