@@ -3564,7 +3564,11 @@ module.exports = class TextEditorComponent {
     const { model } = this.props;
     if (model.isMini()) return false;
     if (model.getAutoHeight()) return false;
-    return this.getContentHeight() > this.getScrollContainerClientHeight();
+    // Compare against getScrollHeight(), not getContentHeight(), so the
+    // scroll-past-end padding counts as scrollable area. Otherwise a file
+    // shorter than the viewport with scrollPastEnd enabled is scrollable
+    // (getMaxScrollTop > 0) yet the scrollbar thumb stays hidden.
+    return this.getScrollHeight() > this.getScrollContainerClientHeight();
   }
 
   canScrollHorizontally() {

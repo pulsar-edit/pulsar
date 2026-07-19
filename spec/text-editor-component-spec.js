@@ -473,6 +473,28 @@ describe("TextEditorComponent", () => {
       expect(horizontalScrollbar.style.visibility).toBe("hidden");
     });
 
+    it("shows the vertical scrollbar for a short file when scrollPastEnd makes it scrollable (regression)", async () => {
+      const { component, editor } = buildComponent({
+        autoHeight: false,
+        autoWidth: false,
+      });
+      await editor.update({ scrollPastEnd: true });
+      await setEditorHeightInLines(component, 20);
+
+      // A file much shorter than the viewport: the real content does not
+      // overflow, but the scroll-past-end padding still makes the editor
+      // scrollable. The thumb must be visible whenever scrolling is possible.
+      editor.setText("a\n".repeat(5));
+      await component.getNextUpdatePromise();
+
+      expect(component.getContentHeight()).toBeLessThan(
+        component.getScrollContainerClientHeight(),
+      );
+      expect(component.getMaxScrollTop()).toBeGreaterThan(0);
+      expect(component.canScrollVertically()).toBe(true);
+      expect(component.refs.verticalScrollbar.element.style.visibility).toBe("");
+    });
+
     describe("when scrollbar styles change or the editor element is detached and then reattached", () => {
       it("updates the bottom/right of dummy scrollbars and client height/width measurements", async () => {
         const { component, element, editor } = buildComponent({
