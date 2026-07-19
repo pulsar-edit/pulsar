@@ -18,17 +18,26 @@ function promptForGitCredential(query = {}) {
     const element = document.createElement("div");
     element.classList.add("git-credential-dialog");
     element.setAttribute("tabindex", "-1");
+    element.style.padding = "10px";
+    element.style.minWidth = "22em";
 
     const message = document.createElement("div");
     message.classList.add("git-credential-dialog-prompt");
     message.textContent = prompt;
+    message.style.marginBottom = "8px";
 
     const input = document.createElement("input");
     input.type = masked ? "password" : "text";
     input.classList.add("git-credential-dialog-input", "native-key-bindings");
+    input.style.width = "100%";
+    input.style.boxSizing = "border-box";
+    input.style.marginBottom = "10px";
 
     const buttons = document.createElement("div");
     buttons.classList.add("git-credential-dialog-buttons");
+    buttons.style.display = "flex";
+    buttons.style.justifyContent = "flex-end";
+    buttons.style.gap = "8px";
     const okButton = document.createElement("button");
     okButton.classList.add("btn", "btn-primary");
     okButton.textContent = "OK";
