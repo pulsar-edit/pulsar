@@ -1020,6 +1020,54 @@ module.exports = class GitRepository {
     });
   }
 
+  // Public: Describe HEAD as a ref name (`git describe --contains --all
+  // --always`). Returns a {Promise} resolving to the {String} description, or
+  // `""` when the branch is unborn.
+  getDescription() {
+    const provider = this.refsSnapshotProvider;
+    if (!provider || this.isDestroyed()) throw new Error("Repository has been destroyed");
+    return provider.getDescription(this.getWorkingDirectory());
+  }
+
+  // Public: The fully-qualified refnames of branches that contain a commit
+  // (`git branch --contains`).
+  //
+  // * `commit` A {String} commit id or revision.
+  // * `options` An optional {Object}: `showLocal`, `showRemote`, `pattern`.
+  //
+  // Returns a {Promise} resolving to an {Array} of refname {String}s.
+  getBranchesContaining(commit, { showLocal = false, showRemote = false, pattern = null } = {}) {
+    const provider = this.refsSnapshotProvider;
+    if (!provider || this.isDestroyed()) throw new Error("Repository has been destroyed");
+    return provider.getBranchesContaining(this.getWorkingDirectory(), commit, {
+      showLocal,
+      showRemote,
+      pattern,
+    });
+  }
+
+  // Public: The index mode of a path (`git ls-files --stage`).
+  //
+  // * `filePath` A {String} path, absolute or repository-relative.
+  //
+  // Returns a {Promise} resolving to the {String} mode (e.g. `"100644"`), or
+  // `null` when the path is not tracked.
+  getFileMode(filePath) {
+    const provider = this.statusSnapshotProvider;
+    if (!provider || this.isDestroyed()) throw new Error("Repository has been destroyed");
+    return provider.getFileMode(this.getWorkingDirectory(), this.posixRelativePath(filePath));
+  }
+
+  // Public: The repository-relative paths of the repository's submodules
+  // (`git submodule status`).
+  //
+  // Returns a {Promise} resolving to an {Array} of path {String}s.
+  getSubmodulePaths() {
+    const provider = this.statusSnapshotProvider;
+    if (!provider || this.isDestroyed()) throw new Error("Repository has been destroyed");
+    return provider.getSubmodulePaths(this.getWorkingDirectory());
+  }
+
   // Public: Read line-by-line blame for a file.
   //
   // * `filePath` A {String} path, absolute or repository-relative.

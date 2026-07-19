@@ -52,4 +52,31 @@ module.exports = class GitRepositoryRefsProvider {
 
     return { forEachRef, remotes, worktrees, symbolicHead, headOid };
   }
+
+  // Describe HEAD as a ref name (`git describe --contains --all --always`);
+  // returns "" when there is no HEAD yet (unborn branch).
+  async getDescription(workingDirectory, options = {}) {
+    const result = await this.runner.runResult(
+      ["describe", "--contains", "--all", "--always", "HEAD"],
+      workingDirectory,
+      { ...options, allowedExitCodes: [0, 128] },
+    );
+    return result.exitCode === 0 ? String(result.stdout).trim() : "";
+  }
+
+  // The fully-qualified refnames of branches that contain a commit
+  // (`git branch --contains <commit>`).
+  async getBranchesContaining(
+    workingDirectory,
+    commit,
+    { showLocal = false, showRemote = false, pattern = null } = {},
+    options = {},
+  ) {
+    const args = ["branch", "--format=%(refname)", "--contains", commit];
+    if (showLocal && showRemote) args.splice(1, 0, "--all");
+    else if (showRemote) args.splice(1, 0, "--remotes");
+    if (pattern) args.push(pattern);
+    const output = await this.runner.run(args, workingDirectory, options);
+    return output.trim() === "" ? [] : output.trim().split("\n");
+  }
 };

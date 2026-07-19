@@ -247,6 +247,17 @@ describe("repository history", () => {
       expect(await repo.getBlob("0000000000000000000000000000000000000000")).toBeNull();
     });
 
+    it("exposes describe, branch-contains, index file mode, and submodule paths", async () => {
+      const { commits } = await repo.getCommits({ limit: 1 });
+      const head = commits[0].sha;
+
+      expect(await repo.getDescription()).toMatch(/\S/);
+      expect(await repo.getBranchesContaining(head)).toEqual(["refs/heads/main"]);
+      expect(await repo.getFileMode("moved.txt")).toBe("100644");
+      expect(await repo.getFileMode("does-not-exist.txt")).toBeNull();
+      expect(await repo.getSubmodulePaths()).toEqual([]);
+    });
+
     it("attributes blame lines to the right commits and authors", async () => {
       const blame = await repo.getBlame(path.join(workingDirectory, "moved.txt"));
       expect(blame.lines.length).toBe(2);

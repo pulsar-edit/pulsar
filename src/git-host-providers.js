@@ -17,12 +17,44 @@ class GitHostStatusProvider {
     const { signal, rest } = splitSignal(options);
     return GitHost.instance().request("status", { workingDirectory, options: rest }, { signal });
   }
+
+  getFileMode(workingDirectory, relativePosixPath, options = {}) {
+    const { signal, rest } = splitSignal(options);
+    return GitHost.instance().request(
+      "fileMode",
+      { workingDirectory, relativePosixPath, options: rest },
+      { signal },
+    );
+  }
+
+  getSubmodulePaths(workingDirectory, options = {}) {
+    const { signal, rest } = splitSignal(options);
+    return GitHost.instance().request(
+      "submodulePaths",
+      { workingDirectory, options: rest },
+      { signal },
+    );
+  }
 }
 
 class GitHostRefsProvider {
   getRefs(workingDirectory, options = {}) {
     const { signal, rest } = splitSignal(options);
     return GitHost.instance().request("refs", { workingDirectory, options: rest }, { signal });
+  }
+
+  getDescription(workingDirectory, options = {}) {
+    const { signal, rest } = splitSignal(options);
+    return GitHost.instance().request("describe", { workingDirectory, options: rest }, { signal });
+  }
+
+  getBranchesContaining(workingDirectory, commit, params = {}, options = {}) {
+    const { signal, rest } = splitSignal(options);
+    return GitHost.instance().request(
+      "branchesContaining",
+      { workingDirectory, commit, params, options: rest },
+      { signal },
+    );
   }
 }
 

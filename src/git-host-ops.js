@@ -44,6 +44,18 @@ module.exports = function createGitHostOps(runner) {
     refs: ({ workingDirectory, options }, { signal }) =>
       refs.getRefs(workingDirectory, withSignal(options, signal)),
 
+    describe: ({ workingDirectory, options }, { signal }) =>
+      refs.getDescription(workingDirectory, withSignal(options, signal)),
+
+    branchesContaining: ({ workingDirectory, commit, params, options }, { signal }) =>
+      refs.getBranchesContaining(workingDirectory, commit, params, withSignal(options, signal)),
+
+    fileMode: ({ workingDirectory, relativePosixPath, options }, { signal }) =>
+      status.getFileMode(workingDirectory, relativePosixPath, withSignal(options, signal)),
+
+    submodulePaths: ({ workingDirectory, options }, { signal }) =>
+      status.getSubmodulePaths(workingDirectory, withSignal(options, signal)),
+
     diffPatch: ({ workingDirectory, request, options }, { signal }) =>
       diff.getDiffPatch(workingDirectory, request, withSignal(options, signal)),
 
