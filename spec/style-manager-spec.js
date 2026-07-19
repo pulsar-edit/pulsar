@@ -48,7 +48,7 @@ describe("StyleManager", () => {
       const legacyStylesheetPath = path.join(configDirPath, "styles.less");
       fs.writeFileSync(legacyStylesheetPath, "body { color: @text-color; }");
 
-      expect(styleManager.getUserStyleSheetPath()).toBe(legacyStylesheetPath);
+      expect(styleManager.getUserStyleSheetPath()).toBe(fs.realpathSync(legacyStylesheetPath));
     });
 
     it("prefers an existing CSS stylesheet over a legacy Less stylesheet", () => {
@@ -56,7 +56,7 @@ describe("StyleManager", () => {
       fs.writeFileSync(path.join(configDirPath, "styles.less"), "body { color: @text-color; }");
       fs.writeFileSync(cssStylesheetPath, "body { color: var(--text-color); }");
 
-      expect(styleManager.getUserStyleSheetPath()).toBe(cssStylesheetPath);
+      expect(styleManager.getUserStyleSheetPath()).toBe(fs.realpathSync(cssStylesheetPath));
     });
   });
 
