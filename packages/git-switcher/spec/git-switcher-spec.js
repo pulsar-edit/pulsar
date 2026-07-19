@@ -63,7 +63,7 @@ describe("git-switcher", () => {
     atom.repositories.setActiveRepository(null);
   });
 
-  it("stays visible and reflects a context without a repository", () => {
+  it("keeps the repository tile visible but hides the branch tile without a repository", () => {
     const repositoryView = mainModule.repositoryStatusView;
     const branchView = mainModule.branchStatusView;
     const outsideDir = makeWorkdir("git-switcher-outside-");
@@ -80,11 +80,10 @@ describe("git-switcher", () => {
     expect(repositoryView.element.style.display).toBe("");
     expect(repositoryView.element.classList.contains("no-repository")).toBe(true);
     expect(repositoryView.nameLabel.textContent).toBe(path.basename(outsideDir));
-    expect(branchView.element.style.display).toBe("");
-    expect(branchView.element.classList.contains("no-repository")).toBe(true);
-    expect(branchView.branchLabel.textContent).toBe("No repository");
+    // There is no branch to switch, so the branch tile hides entirely.
+    expect(branchView.element.style.display).toBe("none");
 
-    // Returning to a repository clears the no-repo state.
+    // Returning to a repository clears the no-repo state and restores the tile.
     atom.repositories.getActiveRepository.andReturn(repoA.repository);
     atom.repositories.getActiveRepositoryContext.andReturn({
       repository: repoA.repository,
@@ -95,7 +94,7 @@ describe("git-switcher", () => {
     branchView.update();
     expect(repositoryView.element.classList.contains("no-repository")).toBe(false);
     expect(repositoryView.nameLabel.textContent).toBe(path.basename(repoA.workingDirectory));
-    expect(branchView.element.classList.contains("no-repository")).toBe(false);
+    expect(branchView.element.style.display).toBe("");
     expect(branchView.branchLabel.textContent).toBe("main");
   });
 

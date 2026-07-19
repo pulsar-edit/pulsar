@@ -59,19 +59,19 @@ module.exports = class BranchStatusView {
 
     const repository = atom.repositories.getActiveRepository();
     this.subscribeToActiveRepository(repository);
-    this.element.classList.toggle("no-repository", !repository);
 
     if (!repository) {
-      // The active context has no repository; keep the tile visible so the
-      // status bar reflects the "no repo" state explicitly.
-      this.branchArea.style.display = "";
-      this.branchLabel.textContent = "No repository";
+      // The active context has no repository, so there is no branch to show or
+      // switch; hide the tile entirely.
+      this.element.style.display = "none";
+      this.branchLabel.textContent = "";
       this.branchTooltipDisposable?.dispose();
-      this.branchTooltipDisposable = atom.tooltips.add(this.branchArea, {
-        title: "Not a Git repository",
-      });
+      this.branchTooltipDisposable = null;
       return;
     }
+
+    // A repository is active again; make sure the tile is visible.
+    this.element.style.display = "";
 
     const snapshot = repository.getStatusSnapshot();
     const head = headLabel(repository);

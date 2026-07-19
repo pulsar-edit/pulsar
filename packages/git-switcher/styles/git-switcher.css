@@ -1,4 +1,3 @@
-.git-switcher-repository.no-repository a,
-.git-switcher-branch.no-repository a {
+.git-switcher-repository.no-repository a {
   color: var(--text-color-subtle);
 }
