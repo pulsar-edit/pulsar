@@ -117,6 +117,20 @@ describe('MarkdownPreviewView', function () {
       expect(htmlTarget).not.toBeNull()
     })
 
+    it('resets original parser heading ids between renders', async function () {
+      atom.config.set('markdown-preview.useOriginalParser', true)
+      const markdown = ['## Repeated', '', '## Repeated'].join('\n')
+
+      const firstRender = await renderer.toHTML(markdown)
+      const secondRender = await renderer.toHTML(markdown)
+
+      for (const html of [firstRender, secondRender]) {
+        expect(html).toContain('id="user-content-repeated"')
+        expect(html).toContain('id="user-content-repeated-1"')
+        expect(html).not.toContain('id="user-content-repeated-2"')
+      }
+    })
+
     it('prefers the generated prefixed id over a colliding raw id', function () {
       preview.element.innerHTML = [
         '<a href="#user-content-foo">User content foo</a>',

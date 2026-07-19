@@ -4,7 +4,7 @@ const createDOMPurify = require('dompurify')
 const emoji = require('emoji-images')
 const fs = require('fs-plus')
 let marked = null // Defer until used
-let GithubSlugger = null
+let githubSlugger = null
 let innertext = null
 let renderer = null
 let cheerio = null
@@ -174,26 +174,26 @@ exports.toHTML = async function (text, filePath, grammar) {
 function render(text, filePath) {
   if (marked == null || yamlFrontMatter == null || cheerio == null) {
     marked = require('marked')
-    GithubSlugger = require('github-slugger')
+    const GithubSlugger = require('github-slugger')
     innertext = require('innertext')
     yamlFrontMatter = require('yaml-front-matter')
     cheerio = require('cheerio')
 
     renderer = new marked.Renderer()
+    githubSlugger = new GithubSlugger()
     renderer.listitem = function (text, isTask) {
       const listAttributes = isTask ? ' class="task-list-item"' : ''
 
       return `<li ${listAttributes}>${text}</li>\n`
     }
+    renderer.heading = function (text, level) {
+      const headingText = innertext(text)
+      const id = `user-content-${githubSlugger.slug(headingText)}`
+      return `<h${level} id="${id}">${text}</h${level}>\n`
+    }
   }
 
-  const githubSlugger = new GithubSlugger()
-  renderer.heading = function (text, level) {
-    const headingText = innertext(text)
-    const id = `user-content-${githubSlugger.slug(headingText)}`
-    return `<h${level} id="${id}">${text}</h${level}>\n`
-  }
-
+  githubSlugger.reset()
   marked.setOptions({
     breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
     renderer
