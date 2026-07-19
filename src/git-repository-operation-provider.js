@@ -158,7 +158,7 @@ class GitRepositoryOperations {
     return this.run(["checkout", ...(reference ? [reference] : []), "--", ...filePaths], options);
   }
 
-  fetch(remote, reference, options = {}) {
+  async fetch(remote, reference, options = {}) {
     const args = ["fetch"];
     addBooleanFlag(args, options.prune, "--prune");
     addBooleanFlag(args, options.tags, "--tags");
@@ -166,20 +166,20 @@ class GitRepositoryOperations {
     if (options.depth != null) args.push(`--depth=${options.depth}`);
     if (remote) args.push(remote);
     if (reference) args.push(reference);
-    return this.run(args, options);
+    return this.run(args, await this.provider.withAuthEnvironment(this.workingDirectory, options));
   }
 
-  pull(remote, reference, options = {}) {
+  async pull(remote, reference, options = {}) {
     const args = ["pull"];
     addBooleanFlag(args, options.rebase, "--rebase");
     addBooleanFlag(args, options.ffOnly, "--ff-only");
     addBooleanFlag(args, options.noCommit, "--no-commit");
     if (remote) args.push(remote);
     if (options.refSpec || reference) args.push(options.refSpec || reference);
-    return this.run(args, options);
+    return this.run(args, await this.provider.withAuthEnvironment(this.workingDirectory, options));
   }
 
-  push(remote = "origin", reference, options = {}) {
+  async push(remote = "origin", reference, options = {}) {
     const args = ["push"];
     addBooleanFlag(args, options.setUpstream, "--set-upstream");
     addBooleanFlag(args, options.force, "--force");
@@ -188,7 +188,7 @@ class GitRepositoryOperations {
     addBooleanFlag(args, options.delete, "--delete");
     args.push(remote || "origin");
     if (options.refSpec || reference) args.push(options.refSpec || reference);
-    return this.run(args, options);
+    return this.run(args, await this.provider.withAuthEnvironment(this.workingDirectory, options));
   }
 
   reset(mode = "mixed", reference = "HEAD", options = {}) {
@@ -311,8 +311,19 @@ module.exports = class GitRepositoryOperationProvider {
   // `exec(args, workingDirectory, options, raw)` runs a git command and resolves
   // to a `{exitCode, stdout, stderr}` result. It defaults to the git-host
   // worker; specs inject a fake to assert on the argument vector.
-  constructor({ exec } = {}) {
+  constructor({ exec, authBroker } = {}) {
     this.exec = exec || workerExec;
+    this.authBroker = authBroker || null;
+  }
+
+  // Merge the auth broker's askpass environment into a remote operation's
+  // options so git can prompt for credentials/passphrases through the editor.
+  // Harmless for commands that never authenticate.
+  async withAuthEnvironment(workingDirectory, options = {}) {
+    if (!this.authBroker) return options;
+    await this.authBroker.ensureStarted();
+    const { env } = this.authBroker.getEnvironment({ workingDirectory });
+    return { ...options, env: { ...options.env, ...env } };
   }
 
   runResult(args, workingDirectory, options = {}) {
@@ -354,7 +365,8 @@ module.exports = class GitRepositoryOperationProvider {
     if (options.branch) args.push("--branch", options.branch);
     if (options.sourceRemoteName) args.push("--origin", options.sourceRemoteName);
     args.push("--", remoteUrl, destinationPath);
-    return this.run(args, path.dirname(destinationPath), options);
+    const parent = path.dirname(destinationPath);
+    return this.run(args, parent, await this.withAuthEnvironment(parent, options));
   }
 };
 

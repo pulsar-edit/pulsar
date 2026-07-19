@@ -37,6 +37,8 @@ const ProtocolHandlerInstaller = require("./protocol-handler-installer");
 const Project = require("./project");
 const RepositoryRegistry = require("./repository-registry");
 const GitRepositoryOperationProvider = require("./git-repository-operation-provider");
+const GitAuthBroker = require("./git-auth-broker");
+const { promptForGitCredential } = require("./git-credential-dialog");
 const Workspace = require("./workspace");
 const PaneContainer = require("./pane-container");
 const PaneAxis = require("./pane-axis");
@@ -167,9 +169,14 @@ class AtomEnvironment {
       notificationManager: this.notifications,
       packageManager: this.packages,
     });
-    this.repositories.addOperationProvider(new GitRepositoryOperationProvider(), {
-      fallback: true,
-    });
+    // Interactive credential/passphrase prompting for git operations that run in
+    // the git-host worker, so the user's system git credential helpers stay the
+    // source of truth and this only supplies the GUI fallback.
+    this.gitAuthBroker = new GitAuthBroker({ promptForInput: promptForGitCredential });
+    this.repositories.addOperationProvider(
+      new GitRepositoryOperationProvider({ authBroker: this.gitAuthBroker }),
+      { fallback: true },
+    );
     /** @type {Project} */
     this.project = new Project({
       notificationManager: this.notifications,
@@ -1125,6 +1132,7 @@ class AtomEnvironment {
   unloadEditorWindow() {
     stopAllWatchers();
     GitHost.reset();
+    if (this.gitAuthBroker) this.gitAuthBroker.terminate();
     if (!this.project) return;
 
     this.storeWindowBackground();

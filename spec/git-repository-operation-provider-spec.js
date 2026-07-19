@@ -30,6 +30,45 @@ describe("GitRepositoryOperationProvider", () => {
     expect(path.isAbsolute(provider.getGitExecutablePath())).toBe(true);
   });
 
+  it("injects the auth broker environment into remote operations only", async () => {
+    const calls = [];
+    const authBroker = {
+      started: 0,
+      ensureStarted() {
+        this.started++;
+        return Promise.resolve();
+      },
+      getEnvironment({ workingDirectory }) {
+        return {
+          env: { GIT_ASKPASS: "/tmp/askpass.sh", LUMINE_GIT_AUTH_WORKDIR: workingDirectory },
+        };
+      },
+    };
+    const provider = new GitRepositoryOperationProvider({
+      exec: async (args, workingDirectory, options) => {
+        calls.push({ command: args[0], options });
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+      authBroker,
+    });
+    const workingDirectory = temp.mkdirSync("git-auth-env");
+    const operations = provider.createRepositoryOperations({ workingDirectory });
+
+    await operations.fetch("origin", "main");
+    await operations.push("origin", "refs/heads/main");
+    await operations.pull("origin", "main");
+    await operations.stageFiles(["a.txt"]);
+
+    const envFor = (command) => calls.find((call) => call.command === command).options.env;
+    expect(envFor("fetch").GIT_ASKPASS).toBe("/tmp/askpass.sh");
+    expect(envFor("fetch").LUMINE_GIT_AUTH_WORKDIR).toBe(workingDirectory);
+    expect(envFor("push").GIT_ASKPASS).toBe("/tmp/askpass.sh");
+    expect(envFor("pull").GIT_ASKPASS).toBe("/tmp/askpass.sh");
+    // A non-remote operation gets no auth environment.
+    expect(envFor("add")).toBeUndefined();
+    expect(authBroker.started).toBe(3);
+  });
+
   it("maps repository operations to Git commands without placing commit messages in arguments", async () => {
     const calls = [];
     const provider = new GitRepositoryOperationProvider({
