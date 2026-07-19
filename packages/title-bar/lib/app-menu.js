@@ -33,8 +33,12 @@ class ApplicationMenu {
     this.clickHandler = () => this.blur();
     this.keydownHandler = (e) => this.onKeyDown(e);
     this.keyupHandler = (e) => this.onKeyUp(e);
+    this.wheelHandler = (e) => this.onWheel(e);
 
     window.addEventListener("click", this.clickHandler);
+    // Capture phase so an alt-scroll gesture cancels menu activation no matter
+    // where it originates or whether an inner handler stops propagation.
+    window.addEventListener("wheel", this.wheelHandler, { capture: true, passive: true });
     this.paneItemDisposable = atom.workspace.onDidChangeActivePaneItem(() => this.blur());
 
     document.body.addEventListener("keydown", this.keydownHandler);
@@ -344,6 +348,24 @@ class ApplicationMenu {
       default:
         return false;
     }
+  }
+
+  onWheel(e) {
+    // An alt-scroll gesture cancels the pending "Alt activates the menu"
+    // action, mirroring native menu-bar behavior where any intervening action
+    // during the Alt hold aborts activation. Only act while an Alt hold is
+    // actually pending so ordinary scrolling stays a no-op.
+    if (!e.altKey || !(this.attentive || this.showingAltKeys)) {
+      return;
+    }
+    // Gate on the same state the editor uses to amplify alt-wheel scrolling
+    // (`editor.altWheelMultiplier !== 1`). When the multiplier is disabled the
+    // alt+wheel is not an alt-scroll gesture, so leave menu activation intact.
+    if (atom.config.get("editor.altWheelMultiplier") === 1) {
+      return;
+    }
+    this.attentive = false;
+    this.showAltKeys(false);
   }
 
   onKeyUp(e) {
@@ -686,6 +708,7 @@ class ApplicationMenu {
 
   destroy() {
     window.removeEventListener("click", this.clickHandler);
+    window.removeEventListener("wheel", this.wheelHandler, { capture: true });
     document.body.removeEventListener("keydown", this.keydownHandler);
     document.body.removeEventListener("keyup", this.keyupHandler);
     this.paneItemDisposable?.dispose();

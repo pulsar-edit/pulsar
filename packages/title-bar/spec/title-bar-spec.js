@@ -211,5 +211,62 @@ describe("Title Bar package", () => {
       expect(appMenu.getNavigableLabels().length).toBe(4);
       expect(appMenu.overflowLabel.getSubmenu().length).toBe(0);
     });
+
+    describe("alt-scroll cancelling menu activation", () => {
+      const altDown = () => ({
+        key: "Alt",
+        repeat: false,
+        stopPropagation() {},
+        preventDefault() {},
+      });
+      const altUp = () => ({ key: "Alt", stopPropagation() {}, preventDefault() {} });
+
+      beforeEach(() => {
+        atom.config.set("title-bar.altGivesFocus", true);
+        // Alt-wheel amplification enabled unless a test overrides it.
+        atom.config.set("editor.altWheelMultiplier", 7.5);
+      });
+
+      it("focuses the first label when Alt is tapped without an intervening scroll", () => {
+        appMenu = ApplicationMenu.createApplicationMenu(template, parent);
+
+        appMenu.onKeyDown(altDown());
+        appMenu.onKeyUp(altUp());
+
+        expect(appMenu.getFocusedLabel()?.getLabelText()).toBe("&File");
+      });
+
+      it("does not focus the menu when an alt-scroll happens during the Alt hold", () => {
+        appMenu = ApplicationMenu.createApplicationMenu(template, parent);
+
+        appMenu.onKeyDown(altDown());
+        appMenu.onWheel({ altKey: true });
+        appMenu.onKeyUp(altUp());
+
+        expect(appMenu.getFocusedLabel()).toBeNull();
+        expect(appMenu.showingAltKeys).toBe(false);
+      });
+
+      it("still activates the menu when the alt-wheel multiplier is disabled", () => {
+        atom.config.set("editor.altWheelMultiplier", 1);
+        appMenu = ApplicationMenu.createApplicationMenu(template, parent);
+
+        appMenu.onKeyDown(altDown());
+        appMenu.onWheel({ altKey: true });
+        appMenu.onKeyUp(altUp());
+
+        expect(appMenu.getFocusedLabel()?.getLabelText()).toBe("&File");
+      });
+
+      it("ignores wheel events without the Alt modifier", () => {
+        appMenu = ApplicationMenu.createApplicationMenu(template, parent);
+
+        appMenu.onKeyDown(altDown());
+        appMenu.onWheel({ altKey: false });
+        appMenu.onKeyUp(altUp());
+
+        expect(appMenu.getFocusedLabel()?.getLabelText()).toBe("&File");
+      });
+    });
   });
 });
