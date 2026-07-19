@@ -1,4 +1,6 @@
 const temp = require("temp").track();
+const fs = require("@lumine-code/fs-plus");
+const path = require("path");
 const StyleManager = require("../src/style-manager");
 
 describe("StyleManager", () => {
@@ -28,6 +30,34 @@ describe("StyleManager", () => {
     } catch (e) {
       // Do nothing
     }
+  });
+
+  describe("::getUserStyleSheetPath()", () => {
+    let configDirPath;
+
+    beforeEach(() => {
+      configDirPath = temp.mkdirSync("atom-config-styles");
+      styleManager.initialize({ configDirPath });
+    });
+
+    it("uses styles.css for a new user stylesheet", () => {
+      expect(styleManager.getUserStyleSheetPath()).toBe(path.join(configDirPath, "styles.css"));
+    });
+
+    it("continues to use an existing legacy Less stylesheet", () => {
+      const legacyStylesheetPath = path.join(configDirPath, "styles.less");
+      fs.writeFileSync(legacyStylesheetPath, "body { color: @text-color; }");
+
+      expect(styleManager.getUserStyleSheetPath()).toBe(legacyStylesheetPath);
+    });
+
+    it("prefers an existing CSS stylesheet over a legacy Less stylesheet", () => {
+      const cssStylesheetPath = path.join(configDirPath, "styles.css");
+      fs.writeFileSync(path.join(configDirPath, "styles.less"), "body { color: @text-color; }");
+      fs.writeFileSync(cssStylesheetPath, "body { color: var(--text-color); }");
+
+      expect(styleManager.getUserStyleSheetPath()).toBe(cssStylesheetPath);
+    });
   });
 
   describe("::addStyleSheet(source, params)", () => {

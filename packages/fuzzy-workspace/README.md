@@ -25,9 +25,9 @@ Commands available in `.fuzzy-workspace`:
 
 ## Customization
 
-Resize the results panel by adding CSS to your `styles.less`:
+Resize the results panel by adding CSS to your `styles.css`:
 
-```less
+```css
 .fuzzy-workspace {
   font-size: 14px;
   .list-group {

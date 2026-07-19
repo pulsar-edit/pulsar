@@ -20,9 +20,9 @@ Commands available in `atom-text-editor`:
 
 ## Customization
 
-Give the added-line gutter marker a thicker, custom-colored border by adding CSS to your `styles.less`:
+Give the added-line gutter marker a thicker, custom-colored border by adding CSS to your `styles.css`:
 
-```less
+```css
 atom-text-editor .gutter .line-number.git-line-added {
   border-left: 4px solid #98c379;
 }

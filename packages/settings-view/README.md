@@ -37,9 +37,9 @@ Commands available in `atom-workspace`:
 
 ## Customization
 
-Adjust the settings view to taste by adding CSS to your `styles.less`:
+Adjust the settings view to taste by adding CSS to your `styles.css`:
 
-```less
+```css
 .settings-view {
   font-size: 15px;
 }

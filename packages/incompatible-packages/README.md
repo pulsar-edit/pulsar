@@ -20,9 +20,9 @@ Commands available in `atom-workspace`:
 
 ## Customization
 
-Restyle each incompatible-package card by adding CSS to your `styles.less`:
+Restyle each incompatible-package card by adding CSS to your `styles.css`:
 
-```less
+```css
 .incompatible-packages .incompatible-package {
   border-color: #e06c75;
   border-radius: 3px;

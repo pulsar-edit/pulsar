@@ -18,9 +18,9 @@ Commands available in `atom-workspace`:
 
 ## Customization
 
-Adjust the palette's size by adding CSS to your `styles.less`:
+Adjust the palette's size by adding CSS to your `styles.css`:
 
-```less
+```css
 .command-palette {
   font-size: 14px;
   .list-group {

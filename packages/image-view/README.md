@@ -25,9 +25,9 @@ Commands available in `.image-view`:
 
 ## Customization
 
-Change the backdrop behind the image by adding CSS to your `styles.less`:
+Change the backdrop behind the image by adding CSS to your `styles.css`:
 
-```less
+```css
 .image-view {
   background-color: #1e1e1e;
 }

@@ -31,9 +31,9 @@ Commands available in `atom-text-editor:not([mini])`:
 
 ## Customization
 
-Restyle the symbols list by adding CSS to your `styles.less`. For example, to enlarge the entries and loosen their spacing:
+Restyle the symbols list by adding CSS to your `styles.css`. For example, to enlarge the entries and loosen their spacing:
 
-```less
+```css
 .symbols-view .list-group li {
   font-size: 14px;
   padding: 6px 10px;

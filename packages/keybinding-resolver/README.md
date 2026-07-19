@@ -16,9 +16,9 @@ Commands available in `atom-workspace`:
 
 ## Customization
 
-Restyle the resolver panel by adding CSS to your `styles.less`:
+Restyle the resolver panel by adding CSS to your `styles.css`:
 
-```less
+```css
 .key-binding-resolver {
   font-size: 13px;
   .panel-heading {

@@ -56,9 +56,9 @@ Create a config file at the Lumine config path, `explorer.cson`, with an array o
 
 ## Customization
 
-Resize the results panel by adding CSS to your `styles.less`:
+Resize the results panel by adding CSS to your `styles.css`:
 
-```less
+```css
 .fuzzy-explorer {
   font-size: 14px;
   .list-group {

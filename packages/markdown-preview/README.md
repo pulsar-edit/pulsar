@@ -36,9 +36,9 @@ Commands available in `.tree-view .file .name`:
 
 ## Customization
 
-Adjust the preview's typography by adding CSS to your `styles.less`:
+Adjust the preview's typography by adding CSS to your `styles.css`:
 
-```less
+```css
 .markdown-preview {
   font-size: 16px;
   max-width: 800px;

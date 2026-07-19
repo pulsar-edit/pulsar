@@ -24,9 +24,9 @@ Commands available in `atom-workspace`:
 
 ## Customization
 
-Restyle the title bar by adding CSS to your `styles.less`. For example, to give it a custom background and taller height:
+Restyle the title bar by adding CSS to your `styles.css`. For example, to give it a custom background and taller height:
 
-```less
+```css
 .title-bar {
   --title-bar-height: 40px;
   background-color: #1f2430;

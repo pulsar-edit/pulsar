@@ -310,7 +310,7 @@ module.exports = class StyleManager {
       if (fs.isFileSync(stylesheetPath)) {
         return stylesheetPath;
       } else {
-        return path.join(this.configDirPath, "styles.less");
+        return path.join(this.configDirPath, "styles.css");
       }
     }
   }

@@ -18,9 +18,9 @@ Commands available in `atom-workspace`:
 
 ## Customization
 
-Restyle the notification popups by adding CSS to your `styles.less`:
+Restyle the notification popups by adding CSS to your `styles.css`:
 
-```less
+```css
 atom-notifications atom-notification {
   font-size: 1.1em;
   border-radius: 6px;

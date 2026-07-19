@@ -48,9 +48,9 @@ Commands available in `.tab-bar`:
 
 ## Customization
 
-Restyle the tabs by adding CSS to your `styles.less`. For example, to enlarge the labels and give the active tab a coloured underline:
+Restyle the tabs by adding CSS to your `styles.css`. For example, to enlarge the labels and give the active tab a coloured underline:
 
-```less
+```css
 .tab-bar .tab {
   font-size: 13px;
 

@@ -21,9 +21,9 @@ Commands available in `atom-workspace`:
 
 ## Customization
 
-Restyle the status bar by adding CSS to your `styles.less`. For example, to enlarge the text and add a top border:
+Restyle the status bar by adding CSS to your `styles.css`. For example, to enlarge the text and add a top border:
 
-```less
+```css
 status-bar {
   font-size: 13px;
   border-top: 1px solid fade(#000, 20%);

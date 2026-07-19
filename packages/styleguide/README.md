@@ -16,9 +16,9 @@ Commands available in `atom-workspace`:
 
 ## Customization
 
-Tweak the styleguide layout by adding CSS to your `styles.less`:
+Tweak the styleguide layout by adding CSS to your `styles.css`:
 
-```less
+```css
 .styleguide {
   padding: 20px;
   font-size: 14px;

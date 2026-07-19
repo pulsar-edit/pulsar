@@ -21,12 +21,12 @@ Commands available in `atom-text-editor`:
 
 ## Customization
 
-The block cursor style can be adjusted in your `styles.less`:
+The block cursor style can be adjusted in your `styles.css`:
 
-```less
+```css
 atom-text-editor.overtype-cursor .cursors .cursor {
-  border-color: @syntax-cursor-color;
-  background-color: fade(@syntax-cursor-color, 30%);
+  border-color: var(--syntax-cursor-color);
+  background-color: rgb(from var(--syntax-cursor-color) r g b / 30%);
 }
 ```
 

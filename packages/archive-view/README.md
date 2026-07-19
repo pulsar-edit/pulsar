@@ -16,9 +16,9 @@ Browse the files and folders inside archive files in Lumine.
 
 ## Customization
 
-Change the archive browser's background by adding CSS to your `styles.less`:
+Change the archive browser's background by adding CSS to your `styles.css`:
 
-```less
+```css
 .archive-editor {
   background-color: #1e1e1e;
 }

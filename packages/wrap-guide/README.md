@@ -29,9 +29,9 @@ Show multiple guide lines by listing the columns. The right-most line acts as yo
 
 ## Customization
 
-Change the guide's color and width by adding CSS to your `styles.less`:
+Change the guide's color and width by adding CSS to your `styles.css`:
 
-```less
+```css
 atom-text-editor .wrap-guide {
   width: 10px;
   background-color: red;

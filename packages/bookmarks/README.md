@@ -30,9 +30,9 @@ Commands available in `atom-text-editor`:
 
 ## Customization
 
-Change the color of the bookmark marker in the gutter by adding CSS to your `styles.less`:
+Change the color of the bookmark marker in the gutter by adding CSS to your `styles.css`:
 
-```less
+```css
 atom-text-editor .gutter .line-number.bookmarked .icon-right:before {
   color: #e5c07b;
 }

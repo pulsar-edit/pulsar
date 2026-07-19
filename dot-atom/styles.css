@@ -1,0 +1,30 @@
+/*
+ * Your Stylesheet
+ *
+ * This stylesheet is loaded when Lumine starts up and is reloaded automatically
+ * when it is changed and saved.
+ *
+ * Add your own CSS to fully customize Lumine. Theme colors are available as
+ * CSS custom properties such as var(--text-color).
+ */
+
+/*
+ * Examples
+ * (To see them, uncomment and save)
+ */
+
+/* Style the background color of the tree view. */
+.tree-view {
+  /* background-color: whitesmoke; */
+}
+
+/* Style the background and foreground colors of text editors. */
+atom-text-editor {
+  /* color: white; */
+  /* background-color: hsl(180, 24%, 12%); */
+}
+
+/* Style UI elements inside text editors. */
+atom-text-editor .cursor {
+  /* border-color: red; */
+}

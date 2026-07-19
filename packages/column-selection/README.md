@@ -23,9 +23,9 @@ Sticky mode applies column selection to mouse gestures until the mode is disable
 
 ## Customization
 
-The status bar indicator can be adjusted in your `styles.less`:
+The status bar indicator can be adjusted in your `styles.css`:
 
-```less
+```css
 .status-bar .column-selection-icon {
   padding-inline: 0.5em;
   opacity: 0.85;

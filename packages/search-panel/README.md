@@ -72,9 +72,9 @@ Commands available in `.results-view`:
 
 Both find panels share a `search-panel` root class (`search-panel-editor` and
 `search-panel-project` mark the buffer and project panels). Restyle them in your
-`styles.less`:
+`styles.css`:
 
-```less
+```css
 .search-panel {
   .editor-container .editor {
     font-style: italic;

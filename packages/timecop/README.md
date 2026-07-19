@@ -17,9 +17,9 @@ Commands available in `atom-workspace`:
 
 ## Customization
 
-Change the background of the Timecop panel by adding CSS to your `styles.less`:
+Change the background of the Timecop panel by adding CSS to your `styles.css`:
 
-```less
+```css
 .timecop .timecop-panel {
   background-color: #21252b;
 }

@@ -20,9 +20,9 @@ Commands available in `atom-workspace`:
 
 ## Customization
 
-Highlight the stack-trace blocks in the deprecation view by adding CSS to your `styles.less`:
+Highlight the stack-trace blocks in the deprecation view by adding CSS to your `styles.css`:
 
-```less
+```css
 .deprecation-cop .stack-trace {
   background-color: #2c313a;
   border-left: 3px solid #e06c75;

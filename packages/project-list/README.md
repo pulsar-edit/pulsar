@@ -76,16 +76,15 @@ The search query is matched against a combined text string in the format `#tag1 
 
 ## Customization
 
-Tweak the appearance of the list by adding CSS to your `styles.less`:
+Tweak the appearance of the list by adding CSS to your `styles.css`:
 
-```less
-.project-list {
-  .tag {
-    color: @text-color-info;
-  }
-  .list-group {
-    max-height: 20em;
-  }
+```css
+.project-list .tag {
+  color: var(--text-color-info);
+}
+
+.project-list .list-group {
+  max-height: 20em;
 }
 ```
 
