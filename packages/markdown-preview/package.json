@@ -20,6 +20,8 @@
     "emoji-images": "^0.1.1",
     "@lumine-code/fs-plus": "https://github.com/lumine-code/fs-plus.git#742e3e166f56261189ff245a63967b8f1970fadd",
     "github-markdown-css": "^5.5.1",
+    "github-slugger": "^1.1.1",
+    "innertext": "^1.0.1",
     "marked": "18.0.5",
     "morphdom": "^2.7.2",
     "@lumine-code/underscore-plus": "https://github.com/lumine-code/underscore-plus.git#2b75d264c2ca01d27ee69d7cd05610a097011274",

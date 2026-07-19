@@ -4,6 +4,8 @@ const createDOMPurify = require("dompurify");
 const emoji = require("emoji-images");
 const fs = require("@lumine-code/fs-plus");
 let marked = null; // Defer until used
+let githubSlugger = null;
+let innertext = null;
 let renderer = null;
 let cheerio = null;
 let yamlFrontMatter = null;
@@ -105,6 +107,7 @@ function chooseRender(text, filePath) {
       filePath: filePath,
       breaks: atom.config.get("markdown-preview.breakOnSingleNewline"),
       useDefaultEmoji: true,
+      useGitHubHeadings: true,
       sanitizeAllowUnknownProtocols: atom.config.get("markdown-preview.allowUnsafeProtocols"),
     });
     return atom.ui.markdown.convertToDOM(html);
@@ -168,10 +171,13 @@ exports.toHTML = async function (text, filePath, grammar) {
 function render(text, filePath) {
   if (marked == null || yamlFrontMatter == null || cheerio == null) {
     marked = require("marked");
+    const GithubSlugger = require("github-slugger");
+    innertext = require("innertext");
     yamlFrontMatter = require("yaml-front-matter");
     cheerio = require("cheerio");
 
     renderer = new marked.Renderer();
+    githubSlugger = new GithubSlugger();
     // As of `marked` v15+, renderer methods receive a single token object
     // (rather than positional strings) and the inner HTML is no longer
     // pre-rendered for us. Reuse the default `listitem` rendering — which
@@ -182,8 +188,17 @@ function render(text, filePath) {
       const html = baseListitem.call(this, item);
       return item.task ? html.replace(/^<li>/, '<li class="task-list-item">') : html;
     };
+    // Generate GitHub-compatible, DOMPurify-safe heading ids so in-page
+    // fragment links (tables of contents) resolve to the right heading.
+    renderer.heading = function (token) {
+      const html = this.parser.parseInline(token.tokens);
+      const id = `user-content-${githubSlugger.slug(innertext(html))}`;
+      return `<h${token.depth} id="${id}">${html}</h${token.depth}>\n`;
+    };
   }
 
+  // Reset per render so repeated headings get stable, deduplicated ids.
+  githubSlugger.reset();
   marked.setOptions({
     breaks: atom.config.get("markdown-preview.breakOnSingleNewline"),
     renderer,

@@ -26,6 +26,7 @@ export default class PackageReadmeView {
     const markdownOpts = {
       breaks: false,
       taskCheckboxDisabled: true,
+      useGitHubHeadings: true,
     };
 
     if (readmeIsLocal) {
@@ -39,9 +40,35 @@ export default class PackageReadmeView {
     } catch (err) {
       this.packageReadme.innerHTML = "<h3>Error parsing README</h3>";
     }
+
+    // Lumine's global link handler prevents native fragment navigation.
+    this.handleAnchorClick = (event) => {
+      const anchor = event.target.closest('a[href^="#"]');
+      if (anchor == null) return;
+
+      let id = anchor.getAttribute("href").slice(1);
+      try {
+        id = decodeURIComponent(id);
+      } catch (error) {
+        // Fall back to the raw fragment.
+      }
+      if (!id) return;
+
+      // Prefer generated heading ids over colliding raw ids.
+      const prefixedId = `user-content-${id}`;
+      const target =
+        this.packageReadme.querySelector(`[id="${CSS.escape(prefixedId)}"]`) ??
+        this.packageReadme.querySelector(`[id="${CSS.escape(id)}"]`);
+      if (target == null) return;
+
+      event.preventDefault();
+      target.scrollIntoView();
+    };
+    this.packageReadme.addEventListener("click", this.handleAnchorClick);
   }
 
   destroy() {
+    this.packageReadme.removeEventListener("click", this.handleAnchorClick);
     this.element.remove();
   }
 }
