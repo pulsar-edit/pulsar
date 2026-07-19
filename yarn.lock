@@ -1746,10 +1746,10 @@
     unbzip2-stream "^1.4.3"
     yauzl "^3.2.0"
 
-"@pulsar-edit/pathwatcher@9.0.3", "@pulsar-edit/pathwatcher@^9.0.2":
-  version "9.0.3"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/pathwatcher/-/pathwatcher-9.0.3.tgz#13dcbdbf4115904bfdf76509580612cf09e8043c"
-  integrity sha512-S8QwhsUf/x617g6FEuPixdu1c3Mt4kzZsGaTrbogkaCJuY1mMAEkqkp6zEp4MM+UfWFruRszAOkdZYbI5gWW9Q==
+"@pulsar-edit/pathwatcher@9.0.4", "@pulsar-edit/pathwatcher@^9.0.2", "@pulsar-edit/pathwatcher@^9.0.4":
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/pathwatcher/-/pathwatcher-9.0.4.tgz#9363f068c44829a74f676cdf4d1e5743ca15752a"
+  integrity sha512-iOHwtSeB6vdoEXYnz9pVgz0il4ZQ3adShLNmaGivAskpld/RQu+7WIk+hq2iLfKt/Zt3mUGYQT2FcpkE/O/jPQ==
   dependencies:
     async "~0.2.10"
     emissary "^1.3.2"
