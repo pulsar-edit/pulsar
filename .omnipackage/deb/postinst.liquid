@@ -1,0 +1,8 @@
+#!/bin/sh
+# Chromium's setuid sandbox helper must be 4755 root:root or the renderer
+# refuses to start. dh_fixperms strips the bit during build, so set it here.
+set -e
+
+chmod 4755 /usr/lib/{{ package_name }}/chrome-sandbox
+
+exit 0

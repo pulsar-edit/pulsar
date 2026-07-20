@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+# debian.rules — Debian build rules. Indents are TABS, not spaces.
+# -*- makefile -*-
+
+export DESTROOT=$(CURDIR)/debian/{{ package_name }}
+# export DH_VERBOSE=1
+
+%:
+	dh $@ --parallel
+
+# install.sh is shared with the rpm spec; second arg is the package name so
+# /usr/lib/<pkg>/ and the launcher symlinks line up.
+override_dh_auto_install:
+	$(CURDIR)/.omnipackage/install.sh $(DESTROOT) {{ package_name }}
+
+# Pulsar bundles its own dependencies under /usr/lib/<pkg>/. Skipping the
+# default strip pass keeps electron's native helper binaries usable; without
+# this dh_strip mangles libffmpeg/libvk_swiftshader and the editor segfaults
+# on launch.
+override_dh_strip:
+
+# Don't try to mess with the bundled .so/.node files — they're shipped as-is
+# by electron-builder and the binary patcher would otherwise rewrite RPATHs we
+# rely on.
+override_dh_shlibdeps:
+
+# chrome-sandbox needs setuid root at runtime (see postinst). Skip the
+# default fixperms so the bit survives if anything ever sets it pre-package;
+# postinst restores it on install regardless.
+override_dh_fixperms:
+	dh_fixperms -X chrome-sandbox
