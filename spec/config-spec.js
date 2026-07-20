@@ -945,7 +945,7 @@ describe("Config", () => {
     });
 
     it("allows only one change event for the duration of the given promise if it gets resolved", async () => {
-      let promiseResult = null;
+      let promiseResult;
       const transactionPromise = atom.config.transactAsync(() => {
         atom.config.set("foo.bar.baz", 1);
         atom.config.set("foo.bar.baz", 2);

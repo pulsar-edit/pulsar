@@ -244,7 +244,7 @@ describe("PackageManager", () => {
       atom.packages.unloadPackage("package-with-json-config-schema");
       atom.config.clear();
 
-      pack = atom.packages.loadPackage("package-with-json-config-schema");
+      atom.packages.loadPackage("package-with-json-config-schema");
       expect(atom.config.getSchema("package-with-json-config-schema")).toEqual({
         type: "object",
         properties: {

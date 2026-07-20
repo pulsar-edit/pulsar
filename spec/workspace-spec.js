@@ -187,9 +187,9 @@ describe("Workspace", () => {
       describe("when called with a uri", () => {
         describe("when the active pane already has an editor for the given uri", () => {
           it("activates the existing editor on the active pane", async () => {
-            let editor = null;
-            let editor1 = null;
-            let editor2 = null;
+            let editor;
+            let editor1;
+            let editor2;
 
             editor1 = await workspace.open("a");
             editor2 = await workspace.open("b");
@@ -355,8 +355,8 @@ describe("Workspace", () => {
     describe("when the 'searchAllPanes' option is true", () => {
       describe("when an editor for the given uri is already open on an inactive pane", () => {
         it("activates the existing editor on the inactive pane, then activates that pane", async () => {
-          let editor1 = null;
-          let editor2 = null;
+          let editor1;
+          let editor2;
           const pane1 = workspace.getActivePane();
           const pane2 = workspace.getActivePane().splitRight();
 
@@ -496,7 +496,7 @@ describe("Workspace", () => {
 
       describe("when a pane axis is the leftmost sibling of the current pane", () => {
         it("opens the new item in the current pane", async () => {
-          let editor = null;
+          let editor;
           const pane1 = workspace.getActivePane();
           const pane2 = pane1.splitLeft();
           pane2.splitDown();
@@ -512,9 +512,9 @@ describe("Workspace", () => {
 
       describe("when the 'split' option is 'right'", () => {
         it("opens the editor in the rightmost pane of the current pane axis", async () => {
-          let editor = null;
+          let editor;
           const pane1 = workspace.getActivePane();
-          let pane2 = null;
+          let pane2;
 
           editor = await workspace.open("a", { split: "right" });
 
@@ -534,13 +534,13 @@ describe("Workspace", () => {
 
         describe("when a pane axis is the rightmost sibling of the current pane", () => {
           it("opens the new item in a new pane split to the right of the current pane", async () => {
-            let editor = null;
+            let editor;
             const pane1 = workspace.getActivePane();
             const pane2 = pane1.splitRight();
             pane2.splitDown();
             pane1.activate();
             expect(workspace.getActivePane()).toBe(pane1);
-            let pane4 = null;
+            let pane4;
 
             editor = await workspace.open("a", { split: "right" });
 
@@ -577,7 +577,7 @@ describe("Workspace", () => {
 
       describe("when a pane axis is the topmost sibling of the current pane", () => {
         it("opens the new item in the current pane", async () => {
-          let editor = null;
+          let editor;
           const pane1 = workspace.getActivePane();
           const pane2 = pane1.splitUp();
           pane2.splitRight();
@@ -593,9 +593,9 @@ describe("Workspace", () => {
 
       describe("when the 'split' option is 'down'", () => {
         it("opens the editor in the bottommost pane of the current pane axis", async () => {
-          let editor = null;
+          let editor;
           const pane1 = workspace.getActivePane();
-          let pane2 = null;
+          let pane2;
 
           editor = await workspace.open("a", { split: "down" });
 
@@ -615,12 +615,12 @@ describe("Workspace", () => {
 
         describe("when a pane axis is the bottommost sibling of the current pane", () => {
           it("opens the new item in a new pane split to the bottom of the current pane", async () => {
-            let editor = null;
+            let editor;
             const pane1 = workspace.getActivePane();
             const pane2 = pane1.splitDown();
             pane1.activate();
             expect(workspace.getActivePane()).toBe(pane1);
-            let pane4 = null;
+            let pane4;
 
             editor = await workspace.open("a", { split: "down" });
 
@@ -931,8 +931,8 @@ describe("Workspace", () => {
 
     describe("when the file is already open in pending state", () => {
       it("should terminate the pending state", async () => {
-        let editor = null;
-        let pane = null;
+        let editor;
+        let pane;
 
         editor = await atom.workspace.open("sample.js", { pending: true });
         pane = atom.workspace.getActivePane();
@@ -947,8 +947,8 @@ describe("Workspace", () => {
 
     describe("when opening will switch from a pending tab to a permanent tab", () => {
       it("keeps the pending tab open", async () => {
-        let editor1 = null;
-        let editor2 = null;
+        let editor1;
+        let editor2;
 
         editor1 = await atom.workspace.open("sample.txt");
         editor2 = await atom.workspace.open("sample2.txt", { pending: true });
@@ -963,10 +963,10 @@ describe("Workspace", () => {
     describe("when replacing a pending item which is the last item in a second pane", () => {
       it("does not destroy the pane even if core.destroyEmptyPanes is on", async () => {
         atom.config.set("core.destroyEmptyPanes", true);
-        let editor1 = null;
-        let editor2 = null;
+        let editor1;
+        let editor2;
         const leftPane = atom.workspace.getActivePane();
-        let rightPane = null;
+        let rightPane;
 
         editor1 = await atom.workspace.open("sample.js", { pending: true, split: "right" });
         rightPane = atom.workspace.getActivePane();
@@ -2793,7 +2793,7 @@ describe("Workspace", () => {
 
             it("can be cancelled when the object returned by scan() has its cancel() method invoked", async () => {
               const thenable = scan(/aaaa/, {}, () => {});
-              let resultOfPromiseSearch = null;
+              let resultOfPromiseSearch;
 
               expect(fakeSearch.cancelled).toBe(undefined);
               thenable.cancel();
@@ -3017,7 +3017,7 @@ describe("Workspace", () => {
         const filePath = path.join(projectDir, "sample.js");
         fs.copyFileSync(path.join(fixturesDir, "sample.js"), path.join(projectDir, "sample.js"));
 
-        let editor = null;
+        let editor;
         const results = [];
 
         editor = await atom.workspace.open("sample.js");
@@ -3059,7 +3059,7 @@ describe("Workspace", () => {
         const filePath = path.join(projectDir, "sample.js");
         fs.copyFileSync(path.join(fixturesDir, "sample.js"), filePath);
 
-        let editor = null;
+        let editor;
         const results = [];
 
         editor = await atom.workspace.open("sample.js");
@@ -3368,7 +3368,7 @@ describe("Workspace", () => {
 
   describe("when the core.allowPendingPaneItems option is falsy", () => {
     it("does not open item with `pending: true` option as pending", async () => {
-      let pane = null;
+      let pane;
       atom.config.set("core.allowPendingPaneItems", false);
 
       await atom.workspace.open("sample.js", { pending: true });

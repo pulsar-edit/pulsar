@@ -657,7 +657,8 @@ describe("GitHub Flavored Markdown grammar", function () {
   });
 
   it("tokenizes a ``` code block with a language and trailing whitespace", function () {
-    let { tokens, ruleStack } = grammar.tokenizeLine("```  bash");
+    let tokens;
+    let { ruleStack } = grammar.tokenizeLine("```  bash");
     ({ tokens } = grammar.tokenizeLine("```  ", ruleStack));
     expect(tokens[0]).toEqual({
       value: "```  ",
@@ -665,7 +666,7 @@ describe("GitHub Flavored Markdown grammar", function () {
     });
     expect(ruleStack[1].contentScopeName).toBe("source.embedded.shell");
 
-    ({ tokens, ruleStack } = grammar.tokenizeLine("```js  "));
+    ({ ruleStack } = grammar.tokenizeLine("```js  "));
     ({ tokens } = grammar.tokenizeLine("```  ", ruleStack));
     expect(tokens[0]).toEqual({
       value: "```  ",
@@ -675,7 +676,8 @@ describe("GitHub Flavored Markdown grammar", function () {
   });
 
   it("tokenizes a ~~~ code block with a language and trailing whitespace", function () {
-    let { tokens, ruleStack } = grammar.tokenizeLine("~~~  bash");
+    let tokens;
+    let { ruleStack } = grammar.tokenizeLine("~~~  bash");
     ({ tokens } = grammar.tokenizeLine("~~~  ", ruleStack));
     expect(tokens[0]).toEqual({
       value: "~~~  ",
@@ -683,7 +685,7 @@ describe("GitHub Flavored Markdown grammar", function () {
     });
     expect(ruleStack[1].contentScopeName).toBe("source.embedded.shell");
 
-    ({ tokens, ruleStack } = grammar.tokenizeLine("~~~js  "));
+    ({ ruleStack } = grammar.tokenizeLine("~~~js  "));
     ({ tokens } = grammar.tokenizeLine("~~~  ", ruleStack));
     expect(tokens[0]).toEqual({
       value: "~~~  ",
@@ -691,7 +693,7 @@ describe("GitHub Flavored Markdown grammar", function () {
     });
     expect(ruleStack[1].contentScopeName).toBe("source.embedded.js");
 
-    ({ tokens, ruleStack } = grammar.tokenizeLine("~~~ properties  "));
+    ({ ruleStack } = grammar.tokenizeLine("~~~ properties  "));
     ({ tokens } = grammar.tokenizeLine("~~~  ", ruleStack));
     expect(tokens[0]).toEqual({
       value: "~~~  ",

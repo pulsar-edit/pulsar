@@ -450,7 +450,8 @@ describe("ScopeResolver", () => {
       let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
 
       let capture = captures[0];
-      let range = scopeResolver.store(capture);
+      scopeResolver.store(capture);
+      let range;
 
       let matched = [];
       for (let capture of captures) {

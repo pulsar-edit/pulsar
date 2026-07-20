@@ -644,7 +644,7 @@ describe("Project", () => {
     });
 
     it("creates a new repository if a previous one with the same directory had been destroyed", async () => {
-      let repository = null;
+      let repository;
       const directory = new ProjectDirectory(path.join(__dirname, ".."));
 
       repository = await atom.project.repositoryForDirectory(directory);

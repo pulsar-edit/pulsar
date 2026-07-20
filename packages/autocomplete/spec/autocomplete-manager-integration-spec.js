@@ -858,7 +858,7 @@ describe("Autocomplete Manager", () => {
         });
 
         it("adjusts the width when the description changes", async () => {
-          let listWidth = null;
+          let listWidth;
           spyOn(provider, "getSuggestions").andCallFake(({ prefix }) => {
             let list = [
               { text: "ab", description: "mmmmmmmmmmmmmmmmmmmmmmmmmm" },
@@ -1357,7 +1357,7 @@ describe("Autocomplete Manager", () => {
       });
 
       it("keeps the suggestion list planted at the beginning of the prefix when typing", async () => {
-        let overlayElement = null;
+        let overlayElement;
         // Lots of x's to keep the margin offset away from the left of the window
         // See https://github.com/atom/autocomplete-plus/issues/399
         editor.insertText("xxxxxxxxxx xx");
@@ -1399,7 +1399,7 @@ describe("Autocomplete Manager", () => {
       });
 
       it("when broken by a non-word character, the suggestion list is positioned at the beginning of the new word", async () => {
-        let overlayElement = null;
+        let overlayElement;
         editor.insertText("xxxxxxxxxxx");
         editor.insertText(" abc");
         editor.insertText("d");

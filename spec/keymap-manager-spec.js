@@ -3096,7 +3096,7 @@ describe("KeymapManager", function () {
         }),
       );
       assert(handler.callCount > 0);
-      ({ keystrokes, partiallyMatchedBindings, keyboardEventTarget } = handler.firstCall.args[0]);
+      ({ keystrokes } = handler.firstCall.args[0]);
       assert.equal(keystrokes, "a");
       ({ keystrokes, partiallyMatchedBindings, keyboardEventTarget } = handler.getCall(1).args[0]);
       assert.equal(keystrokes, "a c");
