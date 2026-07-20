@@ -153,6 +153,19 @@ class GitAuthBroker {
     return { "gpg.program": this.scriptPath("gpg-wrapper.sh") };
   }
 
+  // The environment and config that route a GPG signing passphrase prompt
+  // through this broker. The gpg wrapper collects the passphrase with
+  // GIT_ASKPASS, so the full askpass environment is required alongside the
+  // `gpg.program` override; LUMINE_GIT_AUTH_GPG_PROMPT enables the wrapper's
+  // passphrase step. Used only for signed commit/merge operations.
+  getSigningEnvironment({ workingDirectory, electronPath } = {}) {
+    const { env } = this.getEnvironment({ workingDirectory, electronPath });
+    return {
+      env: { ...env, LUMINE_GIT_AUTH_GPG_PROMPT: "1" },
+      config: this.getGpgConfig(),
+    };
+  }
+
   async terminate() {
     if (this.server) {
       await new Promise((resolve) => this.server.close(resolve));

@@ -69,6 +69,90 @@ describe("GitRepositoryOperationProvider", () => {
     expect(authBroker.started).toBe(3);
   });
 
+  it("injects the GPG signing environment into commit and merge when enabled", async () => {
+    const calls = [];
+    const authBroker = {
+      started: 0,
+      ensureStarted() {
+        this.started++;
+        return Promise.resolve();
+      },
+      getSigningEnvironment({ workingDirectory }) {
+        return {
+          env: {
+            GIT_ASKPASS: "/tmp/askpass.sh",
+            LUMINE_GIT_AUTH_GPG_PROMPT: "1",
+            LUMINE_GIT_AUTH_WORKDIR: workingDirectory,
+          },
+          config: { "gpg.program": "/tmp/gpg-wrapper.sh" },
+        };
+      },
+    };
+    const provider = new GitRepositoryOperationProvider({
+      exec: async (args, workingDirectory, options) => {
+        calls.push({ command: args[0], options });
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+      authBroker,
+    });
+    const workingDirectory = temp.mkdirSync("git-signing-env");
+    const operations = provider.createRepositoryOperations({ workingDirectory });
+
+    atom.config.set("git.promptForGpgPassphrase", true);
+    try {
+      await operations.commit("Subject");
+      await operations.merge("topic");
+      await operations.stageFiles(["a.txt"]);
+    } finally {
+      atom.config.set("git.promptForGpgPassphrase", false);
+    }
+
+    const optionsFor = (command) => calls.find((call) => call.command === command).options;
+    expect(optionsFor("commit").env.LUMINE_GIT_AUTH_GPG_PROMPT).toBe("1");
+    expect(optionsFor("commit").env.GIT_ASKPASS).toBe("/tmp/askpass.sh");
+    expect(optionsFor("commit").config["gpg.program"]).toBe("/tmp/gpg-wrapper.sh");
+    expect(optionsFor("commit").allowPrompt).toBe(true);
+    // The commit message still rides on stdin, not in the argument vector.
+    expect(optionsFor("commit").stdin).toBe("Subject");
+    expect(optionsFor("merge").config["gpg.program"]).toBe("/tmp/gpg-wrapper.sh");
+    expect(optionsFor("merge").allowPrompt).toBe(true);
+    // A non-signing operation gets no signing environment.
+    expect(optionsFor("add").config).toBeUndefined();
+    expect(authBroker.started).toBe(2);
+  });
+
+  it("leaves commit and merge on the gpg-agent path when the passphrase prompt is disabled", async () => {
+    const calls = [];
+    const authBroker = {
+      ensureStarted() {
+        throw new Error("ensureStarted must not run when the passphrase prompt is disabled");
+      },
+      getSigningEnvironment() {
+        throw new Error(
+          "getSigningEnvironment must not run when the passphrase prompt is disabled",
+        );
+      },
+    };
+    const provider = new GitRepositoryOperationProvider({
+      exec: async (args, workingDirectory, options) => {
+        calls.push({ command: args[0], options });
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+      authBroker,
+    });
+    const workingDirectory = temp.mkdirSync("git-signing-off");
+    const operations = provider.createRepositoryOperations({ workingDirectory });
+
+    atom.config.set("git.promptForGpgPassphrase", false);
+    await operations.commit("Subject");
+    await operations.merge("topic");
+
+    const optionsFor = (command) => calls.find((call) => call.command === command).options;
+    expect(optionsFor("commit").config).toBeUndefined();
+    expect(optionsFor("commit").allowPrompt).toBeUndefined();
+    expect(optionsFor("merge").config).toBeUndefined();
+  });
+
   it("maps repository operations to Git commands without placing commit messages in arguments", async () => {
     const calls = [];
     const provider = new GitRepositoryOperationProvider({

@@ -60,6 +60,18 @@ describe("GitAuthBroker", () => {
     expect(broker.getGpgConfig()["gpg.program"]).toMatch(/gpg-wrapper\.sh$/);
   });
 
+  it("composes a signing environment that routes the passphrase through askpass", async () => {
+    broker = new GitAuthBroker();
+    await broker.ensureStarted();
+
+    const { env, config } = broker.getSigningEnvironment({ workingDirectory: "/repo" });
+    // The wrapper collects the passphrase with GIT_ASKPASS, so the askpass
+    // environment must ride along with the gpg.program override.
+    expect(env.GIT_ASKPASS).toMatch(/askpass\.sh$/);
+    expect(env.LUMINE_GIT_AUTH_GPG_PROMPT).toBe("1");
+    expect(config["gpg.program"]).toMatch(/gpg-wrapper\.sh$/);
+  });
+
   it("answers a prompt with the value the handler produces", async () => {
     const prompts = [];
     broker = new GitAuthBroker({

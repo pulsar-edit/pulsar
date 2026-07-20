@@ -614,6 +614,13 @@ const configSchema = {
         type: "boolean",
         default: true,
       },
+      promptForGpgPassphrase: {
+        title: "Prompt For GPG Signing Passphrase",
+        description:
+          "When a commit or merge is GPG-signed and the signing key needs a passphrase, ask for it in an editor dialog instead of relying on a running gpg-agent. Enable this if signing fails silently because no agent or pinentry program is reachable. When disabled, signing relies on gpg-agent as usual.",
+        type: "boolean",
+        default: false,
+      },
     },
   },
   language: {

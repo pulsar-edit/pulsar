@@ -92,7 +92,7 @@ class GitRepositoryOperations {
     return this.run(args, { ...options, stdin: String(patch) });
   }
 
-  commit(message, options = {}) {
+  async commit(message, options = {}) {
     const reuseExistingMessage = message == null && options.amend;
     const args = ["commit", reuseExistingMessage ? "--no-edit" : "--file=-"];
     addBooleanFlag(args, options.allowEmpty, "--allow-empty");
@@ -115,17 +115,24 @@ class GitRepositoryOperations {
     const commitMessage = trailers.length
       ? `${rawMessage.replace(/\s+$/, "")}\n\n${trailers.join("\n")}`
       : rawMessage;
-    return this.run(args, reuseExistingMessage ? options : { ...options, stdin: commitMessage });
+    const executionOptions = reuseExistingMessage ? options : { ...options, stdin: commitMessage };
+    return this.run(
+      args,
+      await this.provider.withSigningEnvironment(this.workingDirectory, executionOptions),
+    );
   }
 
-  merge(reference, options = {}) {
+  async merge(reference, options = {}) {
     const args = ["merge"];
     addBooleanFlag(args, options.noFastForward, "--no-ff");
     addBooleanFlag(args, options.fastForwardOnly, "--ff-only");
     addBooleanFlag(args, options.squash, "--squash");
     addBooleanFlag(args, options.noCommit, "--no-commit");
     args.push(reference);
-    return this.run(args, options);
+    return this.run(
+      args,
+      await this.provider.withSigningEnvironment(this.workingDirectory, options),
+    );
   }
 
   abortMerge(options = {}) {
@@ -324,6 +331,25 @@ module.exports = class GitRepositoryOperationProvider {
     await this.authBroker.ensureStarted();
     const { env } = this.authBroker.getEnvironment({ workingDirectory });
     return { ...options, env: { ...options.env, ...env } };
+  }
+
+  // Merge the auth broker's askpass environment plus the GPG signing config into
+  // a commit/merge operation, so a passphrase-protected signing key can prompt
+  // through the editor when no gpg-agent is reachable. Gated behind
+  // `git.promptForGpgPassphrase`; when disabled (the default) signing relies on
+  // gpg-agent and the options are returned unchanged. `allowPrompt` keeps the
+  // blocking passphrase dialog off the shared read budget.
+  async withSigningEnvironment(workingDirectory, options = {}) {
+    if (!this.authBroker) return options;
+    if (!globalThis.atom?.config?.get("git.promptForGpgPassphrase")) return options;
+    await this.authBroker.ensureStarted();
+    const { env, config } = this.authBroker.getSigningEnvironment({ workingDirectory });
+    return {
+      ...options,
+      allowPrompt: true,
+      env: { ...options.env, ...env },
+      config: { ...options.config, ...config },
+    };
   }
 
   runResult(args, workingDirectory, options = {}) {

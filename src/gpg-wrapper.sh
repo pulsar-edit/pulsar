@@ -17,7 +17,10 @@ if [ -n "${LUMINE_GIT_AUTH_GPG_PROMPT:-}" ] && [ -n "${GIT_ASKPASS:-}" ]; then
   fi
 
   PASSPHRASE=$(${GIT_ASKPASS} "${PROMPT}")
-  PASSPHRASE_ARG="--passphrase-fd 3"
+  # GnuPG 2.1+ ignores --passphrase-fd unless loopback pinentry is requested,
+  # which is what lets us feed the passphrase collected above instead of the
+  # agent's own pinentry.
+  PASSPHRASE_ARG="--pinentry-mode loopback --passphrase-fd 3"
 fi
 
 exec "${GPG_PROGRAM}" --batch --no-tty --yes ${PASSPHRASE_ARG} "$@" 3<<EOM
