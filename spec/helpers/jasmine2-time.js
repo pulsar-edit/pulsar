@@ -50,7 +50,7 @@ const fakeSetInterval = function (callback, ms) {
   return id;
 };
 
-fakeClearInterval = function (idToClear) {
+const fakeClearInterval = function (idToClear) {
   fakeClearTimeout(intervalTimeouts[idToClear]);
 };
 

@@ -1,5 +1,3 @@
-/* global beforeEach, afterEach */
-
 "use strict";
 
 const FakeTimers = require("@sinonjs/fake-timers");

@@ -18,9 +18,7 @@
   installing this package's dev dependencies.
 */
 
-/* eslint-disable n/no-unpublished-require, n/no-extraneous-require, n/no-process-exit --
-   maintenance-only script that installs joanna/tello (and their babylon dep) on demand
-   and exits non-zero on failure. */
+ 
 
 const fs = require("fs");
 const path = require("path");

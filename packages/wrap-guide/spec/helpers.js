@@ -1,6 +1,6 @@
 const helpers = {
   getWrapGuides() {
-    wrapGuides = [];
+    const wrapGuides = [];
     for (const editor of atom.workspace.getTextEditors()) {
       const guide = editor.getElement().querySelector(".wrap-guide");
       if (guide) wrapGuides.push(guide);

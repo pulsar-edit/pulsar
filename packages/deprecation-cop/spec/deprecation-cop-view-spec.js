@@ -7,8 +7,8 @@ describe("DeprecationCopView", () => {
   let [deprecationCopView, workspaceElement] = [];
 
   beforeEach(() => {
-    spyOn(_, "debounce").andCallFake((func) => () => {
-      return func.apply(this, arguments);
+    spyOn(_, "debounce").andCallFake((func) => (...args) => {
+      return func.apply(this, args);
     });
 
     workspaceElement = atom.views.getView(atom.workspace);

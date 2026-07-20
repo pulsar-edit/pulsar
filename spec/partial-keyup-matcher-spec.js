@@ -1,7 +1,5 @@
 const assert = require("./keymap-spec-helpers/assert");
 /** @babel */
-/* eslint-env mocha */
-/* global assert */
 
 const PartialKeyupMatcher = require("../src/partial-keyup-matcher.js");
 const { KeyBinding } = require("../src/key-binding");

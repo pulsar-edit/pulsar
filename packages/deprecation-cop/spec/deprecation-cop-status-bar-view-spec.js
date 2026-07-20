@@ -9,8 +9,8 @@ describe("DeprecationCopStatusBarView", () => {
   beforeEach(() => {
     // jasmine.Clock.useMock() cannot mock _.debounce
     // http://stackoverflow.com/questions/13707047/spec-for-async-functions-using-jasmine
-    spyOn(_, "debounce").andCallFake((func) => () => {
-      return func.apply(this, arguments);
+    spyOn(_, "debounce").andCallFake((func) => (...args) => {
+      return func.apply(this, args);
     });
 
     jasmine.snapshotDeprecations();

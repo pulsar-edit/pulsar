@@ -501,6 +501,7 @@
             spyOn(atom, "inDevMode").andReturn(false);
             generateFakeFetchResponses();
             try {
+              // eslint-disable-next-line no-undef -- intentional ReferenceError for the test
               a + 1;
             } catch (error1) {
               e = error1;
@@ -763,6 +764,7 @@
             spyOn(atom, "inDevMode").andReturn(false);
             generateFakeFetchResponses();
             try {
+              // eslint-disable-next-line no-undef -- intentional ReferenceError for the test
               a + 1;
             } catch (error1) {
               e = error1;
@@ -797,6 +799,7 @@
             spyOn(atom, "inDevMode").andReturn(false);
             generateFakeFetchResponses();
             try {
+              // eslint-disable-next-line no-undef -- intentional ReferenceError for the test
               a + 1;
             } catch (error1) {
               e = error1;
@@ -881,6 +884,7 @@
               var e;
               generateFakeFetchResponses();
               try {
+                // eslint-disable-next-line no-undef -- intentional ReferenceError for the test
                 return a + 1;
               } catch (error1) {
                 e = error1;
@@ -1170,6 +1174,7 @@
             beforeEach(function () {
               var e, message;
               try {
+                // eslint-disable-next-line no-undef -- intentional ReferenceError for the test
                 return a + 1;
               } catch (error1) {
                 e = error1;

@@ -155,7 +155,7 @@ function sortByLength(obj) {
   let newObj = {};
 
   // Now rebuild the object according to our new keys
-  for (i in keys) {
+  for (const i in keys) {
     newObj[keys[i]] = obj[keys[i]];
   }
 
@@ -174,7 +174,7 @@ async function sortByPopularity(obj) {
 
     let newObj = {};
 
-    for (prop in popularity) {
+    for (const prop in popularity) {
       let property = popularity[prop].property_name;
 
       if (typeof obj[property] === "object") {
@@ -186,7 +186,7 @@ async function sortByPopularity(obj) {
       return newObj;
     }
 
-    for (prop in obj) {
+    for (const prop in obj) {
       if (typeof newObj[prop] !== "object") {
         newObj[prop] = obj[prop];
       }
@@ -396,11 +396,7 @@ function parseValueGroup(valueGroupName, allValues) {
     }
   }
 
-  return getValuesOfProp(
-    resolvedValueGroupString,
-    (allValues = null),
-    (appendImplicitValues = false),
-  );
+  return getValuesOfProp(resolvedValueGroupString, null, false);
 }
 
 async function getTagsHTML() {

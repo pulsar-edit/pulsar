@@ -730,7 +730,7 @@ describe("Marker", function () {
       }
       expect(markersUpdatedCount).toBe(1);
 
-      for (marker of allStrategies) {
+      for (const marker of allStrategies) {
         marker.changes = [];
       }
       changeSubscription.dispose();
@@ -739,7 +739,7 @@ describe("Marker", function () {
       buffer.onDidChange(function (change) {
         changedCount++;
         expect(markersUpdatedCount).toBe(0);
-        for (marker of allStrategies) {
+        for (const marker of allStrategies) {
           expect(marker.getRange()).toEqual([
             [0, 6],
             [0, 9],
@@ -788,7 +788,7 @@ describe("Marker", function () {
           ],
           "ABC",
         );
-        for (marker of allStrategies) {
+        for (const marker of allStrategies) {
           expect(marker.getRange()).toEqual([
             [0, 8],
             [0, 11],
@@ -803,7 +803,7 @@ describe("Marker", function () {
           ],
           "\nDEF",
         );
-        for (marker of allStrategies) {
+        for (const marker of allStrategies) {
           expect(marker.getRange()).toEqual([
             [1, 10],
             [1, 13],
@@ -867,7 +867,7 @@ describe("Marker", function () {
       describe("when the marker has no tail", () => {
         it("interprets the change as being outside the marker for all invalidation strategies", function () {
           let marker;
-          for (marker of allStrategies) {
+          for (const marker of allStrategies) {
             marker.setRange(
               [
                 [0, 6],
@@ -1052,7 +1052,7 @@ describe("Marker", function () {
           "ABC",
         );
 
-        for (marker of allStrategies) {
+        for (const marker of allStrategies) {
           expect(marker.getRange()).toEqual([
             [0, 8],
             [0, 8],
@@ -1078,7 +1078,7 @@ describe("Marker", function () {
           "AB",
         );
 
-        for (marker of allStrategies) {
+        for (const marker of allStrategies) {
           expect(marker.getRange()).toEqual([
             [0, 6],
             [0, 10],

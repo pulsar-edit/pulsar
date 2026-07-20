@@ -10022,7 +10022,7 @@ describe("TextEditor", () => {
       disposables = new CompositeDisposable();
       atom.project.setPaths([projectPath]);
       editor = await atom.workspace.open(destination);
-      buffer = editor.buffer;
+      const buffer = editor.buffer;
       editor.update({ autoIndent: false });
 
       // Mock `Pane::promptOnSaveConflictedFile` in order to skip the presentation of the
@@ -10036,7 +10036,7 @@ describe("TextEditor", () => {
       }
 
       await atom.packages.activatePackage("language-javascript");
-      languageMode = buffer.getLanguageMode();
+      const languageMode = buffer.getLanguageMode();
       if ("useAsyncParsing" in languageMode) {
         languageMode.useAsyncParsing = false;
         languageMode.useAsyncIndent = false;

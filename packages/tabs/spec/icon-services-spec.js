@@ -1,5 +1,3 @@
-/* global waitsForPromise */
-
 const path = require("path");
 const { Disposable } = require("atom");
 

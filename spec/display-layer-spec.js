@@ -3034,7 +3034,7 @@ describe("DisplayLayer", () => {
       const fold1 = displayLayer.foldBufferRange([
         [0, 1],
         [1, 1],
-      ]); // eslint-disable-line no-unused-vars
+      ]);  
       const fold2 = displayLayer.foldBufferRange([
         [2, 2],
         [3, 2],
@@ -3042,7 +3042,7 @@ describe("DisplayLayer", () => {
       const fold3 = displayLayer.foldBufferRange([
         [3, 3],
         [3, 4],
-      ]); // eslint-disable-line no-unused-vars
+      ]);  
 
       expect(displayLayer.bufferRowsForScreenRows(2, 5)).toEqual([2, 3, 4]);
       expect(displayLayer.bufferRowsForScreenRows(3, 5)).toEqual([3, 4]);
@@ -3560,7 +3560,7 @@ function updateTokenLines(tokenLines, displayLayer, changes) {
 }
 
 function logTokens(displayLayer) {
-  // eslint-disable-line
+   
   let s = "expectTokenBoundaries(displayLayer, [\n";
 
   for (const tokens of getTokenBoundaries(displayLayer)) {

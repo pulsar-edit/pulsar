@@ -118,7 +118,10 @@ module.exports = [
         ...globals.jasmine,
         ...globals.mocha,
         test: "readonly",
+        // Grammar-test helpers injected onto `window` by spec/helpers/normalize-comments.js.
         runGrammarTests: "readonly",
+        runFoldsTests: "readonly",
+        normalizeTreeSitterTextData: "readonly",
         advanceClock: "readonly",
         waitsForPromise: "readonly",
         waitsFor: "readonly",

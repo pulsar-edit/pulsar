@@ -32,7 +32,7 @@ describe("Wrap Guide", () => {
     });
 
     it("positions the guide at the configured column", () => {
-      width = editor.getDefaultCharWidth() * wrapGuide.getDefaultColumn();
+      const width = editor.getDefaultCharWidth() * wrapGuide.getDefaultColumn();
       expect(width).toBeGreaterThan(0);
       expect(Math.abs(getLeftPosition(wrapGuide.firstChild) - width)).toBeLessThan(1);
       expect(wrapGuide.firstChild).toBeVisible();

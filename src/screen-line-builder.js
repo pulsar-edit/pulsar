@@ -1,4 +1,4 @@
-/* eslint-disable no-labels */
+ 
 
 const Point = require("./point");
 

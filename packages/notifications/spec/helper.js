@@ -12,6 +12,7 @@ bug report purposes.
     generateException: function () {
       var e, errMsg;
       try {
+        // eslint-disable-next-line no-undef -- intentional ReferenceError for the test
         return a + 1;
       } catch (error) {
         e = error;

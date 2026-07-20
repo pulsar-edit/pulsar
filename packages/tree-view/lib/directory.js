@@ -457,7 +457,7 @@ module.exports = class Directory {
     const squashedDirs = [this.name];
     let contents;
     while (true) {
-      // eslint-disable-line no-constant-condition
+       
       try {
         contents = fs.listSync(fullPath);
       } catch (error) {

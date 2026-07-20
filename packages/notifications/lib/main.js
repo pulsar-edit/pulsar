@@ -90,7 +90,8 @@ If so please open an issue on the package spawning the process.\
       this.subscriptions.add(
         atom.commands.add("atom-workspace", "notifications:trigger-error", function () {
           try {
-            return abc + 2; // nope
+            // eslint-disable-next-line no-undef -- intentional ReferenceError to exercise the error notification
+            return abc + 2;
           } catch (error) {
             const options = {
               detail: error.stack.split("\n")[1],

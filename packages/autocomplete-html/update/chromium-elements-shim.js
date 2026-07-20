@@ -1,6 +1,4 @@
-/* eslint-disable n/no-extraneous-require, n/no-unpublished-require --
-   maintenance-only script that compiles chrome-devtools-frontend's TypeScript
-   data using the repo's Babel toolchain. */
+ 
 
 const fs = require("fs");
 const babel = require("@babel/core");

@@ -1,4 +1,3 @@
-/* global runGrammarTests, runFoldsTests */
 const path = require("path");
 
 function setConfigForLanguageMode(mode) {

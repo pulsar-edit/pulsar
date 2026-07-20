@@ -3493,17 +3493,17 @@ three\
 
       // A '\n' escape sequence
       matchStrings.length = 0;
-      buffer.scan(/{\n  var/, ({ matchText }) => matchStrings.push(matchText));
+      buffer.scan(/{\n {2}var/, ({ matchText }) => matchStrings.push(matchText));
       expect(matchStrings).toEqual(["{\n  var"]);
 
       // A negated character class in the middle of the pattern
       matchStrings.length = 0;
-      buffer.scan(/{[^a]  var/, ({ matchText }) => matchStrings.push(matchText));
+      buffer.scan(/{[^a] {2}var/, ({ matchText }) => matchStrings.push(matchText));
       expect(matchStrings).toEqual(["{\n  var"]);
 
       // A negated character class at the beginning of the pattern
       matchStrings.length = 0;
-      buffer.scan(/[^a]  var/, ({ matchText }) => matchStrings.push(matchText));
+      buffer.scan(/[^a] {2}var/, ({ matchText }) => matchStrings.push(matchText));
       expect(matchStrings).toEqual(["\n  var"]);
     });
   });
