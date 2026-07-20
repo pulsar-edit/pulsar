@@ -153,6 +153,56 @@ describe("GitRepositoryOperationProvider", () => {
     expect(optionsFor("merge").config).toBeUndefined();
   });
 
+  it("layers auth and signing environments onto pull", async () => {
+    const calls = [];
+    const authBroker = {
+      ensureStarted() {
+        return Promise.resolve();
+      },
+      getEnvironment({ workingDirectory }) {
+        return {
+          env: { GIT_ASKPASS: "/tmp/askpass.sh", LUMINE_GIT_AUTH_WORKDIR: workingDirectory },
+        };
+      },
+      getSigningEnvironment() {
+        return {
+          env: { GIT_ASKPASS: "/tmp/askpass.sh", LUMINE_GIT_AUTH_GPG_PROMPT: "1" },
+          config: { "gpg.program": "/tmp/gpg-wrapper.sh" },
+        };
+      },
+    };
+    const provider = new GitRepositoryOperationProvider({
+      exec: async (args, workingDirectory, options) => {
+        calls.push({ command: args[0], options });
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+      authBroker,
+    });
+    const workingDirectory = temp.mkdirSync("git-pull-signing");
+    const operations = provider.createRepositoryOperations({ workingDirectory });
+
+    // A pull fetches (needs credentials) and may sign a merge/rebase commit.
+    atom.config.set("git.promptForGpgPassphrase", false);
+    await operations.pull("origin", "main");
+    atom.config.set("git.promptForGpgPassphrase", true);
+    try {
+      await operations.pull("origin", "main");
+    } finally {
+      atom.config.set("git.promptForGpgPassphrase", false);
+    }
+
+    const [disabled, enabled] = calls;
+    // Disabled: the auth environment, but nothing GPG.
+    expect(disabled.options.env.GIT_ASKPASS).toBe("/tmp/askpass.sh");
+    expect(disabled.options.config).toBeUndefined();
+    expect(disabled.options.allowPrompt).toBeUndefined();
+    // Enabled: the auth environment plus the signing config.
+    expect(enabled.options.env.GIT_ASKPASS).toBe("/tmp/askpass.sh");
+    expect(enabled.options.env.LUMINE_GIT_AUTH_GPG_PROMPT).toBe("1");
+    expect(enabled.options.config["gpg.program"]).toBe("/tmp/gpg-wrapper.sh");
+    expect(enabled.options.allowPrompt).toBe(true);
+  });
+
   it("maps repository operations to Git commands without placing commit messages in arguments", async () => {
     const calls = [];
     const provider = new GitRepositoryOperationProvider({

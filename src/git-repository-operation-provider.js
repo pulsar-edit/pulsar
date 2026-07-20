@@ -183,7 +183,10 @@ class GitRepositoryOperations {
     addBooleanFlag(args, options.noCommit, "--no-commit");
     if (remote) args.push(remote);
     if (options.refSpec || reference) args.push(options.refSpec || reference);
-    return this.run(args, await this.provider.withAuthEnvironment(this.workingDirectory, options));
+    return this.run(
+      args,
+      await this.provider.withAuthAndSigningEnvironment(this.workingDirectory, options),
+    );
   }
 
   async push(remote = "origin", reference, options = {}) {
@@ -350,6 +353,15 @@ module.exports = class GitRepositoryOperationProvider {
       env: { ...options.env, ...env },
       config: { ...options.config, ...config },
     };
+  }
+
+  // Both of the above, layered: the auth environment always (a pull fetches, so
+  // it may prompt for credentials) plus the signing config when enabled (a pull
+  // can produce a GPG-signed merge or rebase commit). withSigningEnvironment is
+  // a no-op when signing is disabled, leaving just the auth environment.
+  async withAuthAndSigningEnvironment(workingDirectory, options = {}) {
+    const authed = await this.withAuthEnvironment(workingDirectory, options);
+    return this.withSigningEnvironment(workingDirectory, authed);
   }
 
   runResult(args, workingDirectory, options = {}) {
