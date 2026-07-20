@@ -57,8 +57,9 @@ jobs:
     # pushes to master, pull requests, manual dispatch, and reusable calls.
     if: github.event_name != 'push' || github.ref == 'refs/heads/master'
     runs-on: ${{ matrix.os }}
-    # Native rebuild plus the full editor and package suites are slow, and the
-    # spec steps may retry once after an intermittent renderer crash.
+    # Native rebuild plus the full editor and package suites are slow, so give
+    # the job a generous ceiling; the individual spec steps have their own
+    # tighter timeouts. Spec steps run once and are never retried.
     timeout-minutes: 150
     strategy:
       fail-fast: false
@@ -144,15 +145,12 @@ jobs:
             pkg="${d#packages/}"
             pkg="${pkg%/spec}"
             echo "::group::$pkg"
-            # Retry once: Windows runners intermittently crash the renderer
-            # with an access violation unrelated to the package under test.
+            # Run once. A failure here is a real regression or a flaky spec;
+            # flaky specs get fixed at the source rather than retried away.
             if ! $guard $prefix yarn start --test "$d"; then
-              echo "Retrying $pkg after failure..."
-              if ! $guard $prefix yarn start --test "$d"; then
-                echo "::error::Package specs failed: $pkg"
-                failed="$failed $pkg"
-                status=1
-              fi
+              echo "::error::Package specs failed: $pkg"
+              failed="$failed $pkg"
+              status=1
             fi
             echo "::endgroup::"
           done

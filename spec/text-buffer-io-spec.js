@@ -597,6 +597,9 @@ describe("TextBuffer IO", () => {
       filePath = temp.openSync("atom").path;
       fs.writeFileSync(filePath, "");
       buffer = await TextBuffer.load(filePath);
+      // Arm the file watcher before each spec so on-disk deletions are observed
+      // through the live watcher rather than raced against its asynchronous arm.
+      await buffer.getFileWatchStartPromise();
       done();
     });
 
@@ -657,8 +660,10 @@ describe("TextBuffer IO", () => {
         it("reports the modified status as false", async () => {
           buffer.setText(`lorem ipsum`);
           await buffer.save();
+          await buffer.getFileWatchStartPromise();
+          const deleted = deletionPromise(buffer);
           fs.unlinkSync(filePath);
-          await wait(500);
+          await deleted;
           expect(buffer.isModified()).toBe(false);
           expect(buffer.isDeleted()).toBe(true);
         });
@@ -666,8 +671,10 @@ describe("TextBuffer IO", () => {
         it("initially reports the modified status as false, but flips it back to true if the user makes further changes", async () => {
           buffer.setText(`lorem ipsum`);
           await buffer.save();
+          await buffer.getFileWatchStartPromise();
+          const deleted = deletionPromise(buffer);
           fs.unlinkSync(filePath);
-          await wait(500);
+          await deleted;
           expect(buffer.isModified()).toBe(false);
           expect(buffer.isDeleted()).toBe(true);
 
@@ -686,8 +693,10 @@ describe("TextBuffer IO", () => {
           it("results in isModified and isDeleted no longer returning true", async () => {
             buffer.setText(`lorem ipsum`);
             await buffer.save();
+            await buffer.getFileWatchStartPromise();
+            const deleted = deletionPromise(buffer);
             fs.unlinkSync(filePath);
-            await wait(500);
+            await deleted;
             buffer.insert([0, 0], "! ");
             expect(buffer.isModified()).toBe(true);
             expect(buffer.isDeleted()).toBe(true);
@@ -704,20 +713,26 @@ describe("TextBuffer IO", () => {
     describe("when the buffer’s file is deleted", () => {
       it("does not report `isModified` as `true` unless the buffer was modified at time of deletion", async () => {
         expect(buffer.isModified()).toBe(false);
+        const deleted = deletionPromise(buffer);
         fs.unlinkSync(filePath);
-        await wait(500);
+        await deleted;
         expect(buffer.isDeleted()).toBe(true);
         expect(buffer.isModified()).toBe(false);
 
-        await wait(500);
         await buffer.save();
         expect(buffer.isDeleted()).toBe(false);
         expect(buffer.isModified()).toBe(false);
 
         buffer.insert([0, 0], "hi");
         expect(buffer.isModified()).toBe(true);
-        fs.unlinkSync(filePath);
+        // Let the watcher observe the file existing again before deleting it a
+        // second time. Re-creating and re-deleting the same path within a single
+        // watcher batch coalesces into no net change, so this transition has no
+        // event to await — the operations must be spaced in wall-clock time.
         await wait(500);
+        const deletedAgain = deletionPromise(buffer);
+        fs.unlinkSync(filePath);
+        await deletedAgain;
         expect(buffer.isDeleted()).toBe(true);
         expect(buffer.isModified()).toBe(true);
       });
@@ -728,21 +743,25 @@ describe("TextBuffer IO", () => {
         buffer.insert([0, 0], "hi");
         expect(buffer.isModified()).toBe(true);
 
+        const deleted = deletionPromise(buffer);
         fs.unlinkSync(filePath);
-        await wait(500);
+        await deleted;
         expect(buffer.isDeleted()).toBe(true);
         expect(buffer.isModified()).toBe(true);
-
-        await wait(500);
 
         await buffer.save();
         expect(buffer.isDeleted()).toBe(false);
         expect(buffer.isModified()).toBe(false);
 
         buffer.insert([0, 0], "hi");
+        // Let the watcher observe the file existing again before deleting it a
+        // second time. Re-creating and re-deleting the same path within a single
+        // watcher batch coalesces into no net change, so this transition has no
+        // event to await — the operations must be spaced in wall-clock time.
         await wait(500);
+        const deletedAgain = deletionPromise(buffer);
         fs.unlinkSync(filePath);
-        await wait(500);
+        await deletedAgain;
         expect(buffer.isDeleted()).toBe(true);
         expect(buffer.isModified()).toBe(true);
         done();
@@ -1309,6 +1328,18 @@ function stopChangingPromise() {
 
 function timeoutPromise(duration) {
   return new Promise((resolve) => setTimeout(resolve, duration));
+}
+
+// Resolve the next time the buffer's file watcher reports its file as deleted.
+// Awaiting the real `did-delete` event is deterministic, unlike sleeping for a
+// fixed interval and hoping the watcher worker has caught up.
+function deletionPromise(buffer) {
+  return new Promise((resolve) => {
+    const subscription = buffer.onDidDelete(() => {
+      subscription.dispose();
+      resolve();
+    });
+  });
 }
 
 function toPlainObject(value) {

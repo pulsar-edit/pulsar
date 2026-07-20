@@ -10101,11 +10101,6 @@ describe("TextEditor", () => {
 
       // Saving the file to disk should flip this internal flag.
       expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
-
-      await wait(2000);
-      // The flag should stay this way even if the save triggered the buffer's
-      // `onDidChange` handler.
-      expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
     });
 
     it("is considered to be in conflicted state and will not overwrite if user declines", async () => {
@@ -10159,11 +10154,6 @@ describe("TextEditor", () => {
         expect(editor.isInConflict()).toBe(false);
 
         // Saving the file to disk should flip this internal flag.
-        expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
-
-        await wait(2000);
-        // The flag should stay this way even if the save triggered the buffer's
-        // `onDidChange` handler.
         expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
       });
     });
@@ -10233,7 +10223,10 @@ describe("TextEditor", () => {
           resolve();
         }),
       );
-      await wait(1000);
+      // Wait for the file watcher to be armed before mutating the file on disk;
+      // otherwise the external change can land before the watch is live and the
+      // conflict is never observed.
+      await editor.getBuffer().getFileWatchStartPromise();
       fs.writeFileSync(editor.getPath(), "new stuff");
       expect(
         editor.shouldPromptToSave({

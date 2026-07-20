@@ -52,7 +52,6 @@ module.exports = function ({ logFile, headless, testPaths, buildAtomEnvironment 
   require("../helpers/attach-to-dom");
   require("../helpers/deprecation-snapshots");
   require("../helpers/platform-filter");
-  installCustomElementsDefineRetryCompatibility();
 
   const jasmineContent = document.createElement("div");
   jasmineContent.setAttribute("id", "jasmine-content");
@@ -62,47 +61,21 @@ module.exports = function ({ logFile, headless, testPaths, buildAtomEnvironment 
     disableFocusMethods();
   }
 
-  return loadSpecsAndRunThem(logFile, headless, testPaths)
-    .then((result) => {
-      // Retrying failures only really makes sense in headless mode,
-      // otherwise the whole HTML view is replaced before the user can inspect the details of the failures
-      if (!headless) return result;
-      // All specs passed, don't need to rerun any of them - pass the results to handle possible Grim deprecations
-      if (result.failedSpecs.length === 0) return result;
+  return loadSpecsAndRunThem(logFile, headless, testPaths).then((result) => {
+    // A spec failed: exit non-zero on the first run. Failures are deliberately
+    // not retried - a flaky spec must be fixed at its source, not masked by
+    // re-running it until it happens to pass.
+    if (result.failedSpecs.length !== 0) return 1;
 
-      console.log("\n", "\n", `Retrying ${result.failedSpecs.length} spec(s)`, "\n", "\n");
+    // Some of the tests had deprecation warnings, we should log them and return with a non-zero exit code
+    if (result.hasDeprecations) {
+      Grim.logDeprecations();
+      return 1;
+    }
 
-      // Gather the full names of the failed specs - this is the closest to be a unique identifier for all specs
-      const fullNamesOfFailedSpecs = result.failedSpecs.map((spec) => {
-        return spec.fullName;
-      });
-
-      // Force-delete the current env - this way Jasmine will reset and we'll be able to re-run failed specs only. The next time the code calls getEnv(), it'll generate a new environment
-      resetJasmineEnv();
-      window.__jasmineRetryingFailures = true;
-
-      // As all the jasmine helpers (it, describe, etc..) were registered to the previous environment, we need to re-set them on window
-      defineJasmineHelpersOnWindow(jasmine.getEnv());
-
-      // Set up a specFilter to disable all passing spec and re-run only the flaky ones
-      setSpecFilter((spec) => fullNamesOfFailedSpecs.includes(getSpecFullName(spec)));
-
-      // Run the specs again - due to the spec filter, only the failed specs will run this time
-      return loadSpecsAndRunThem(logFile, headless, testPaths);
-    })
-    .then((result) => {
-      // Some of the specs failed, we should return with a non-zero exit code
-      if (result.failedSpecs.length !== 0) return 1;
-
-      // Some of the tests had deprecation warnings, we should log them and return with a non-zero exit code
-      if (result.hasDeprecations) {
-        Grim.logDeprecations();
-        return 1;
-      }
-
-      // Everything went good, time to return with a zero exit code
-      return 0;
-    });
+    // Everything went good, time to return with a zero exit code
+    return 0;
+  });
 };
 
 const defineJasmineHelpersOnWindow = (jasmineEnv) => {
@@ -337,25 +310,6 @@ const setupLegacyAsyncCompatibility = () => {
   global.waitsForPromise = window.waitsForPromise;
 };
 
-const installCustomElementsDefineRetryCompatibility = () => {
-  if (window.customElements == null || window.customElements.__retryDefineCompatibility) {
-    return;
-  }
-
-  const originalDefine = window.customElements.define.bind(window.customElements);
-  window.customElements.define = (name, constructor, options) => {
-    if (window.__jasmineRetryingFailures && window.customElements.get(name) != null) {
-      return;
-    }
-
-    return originalDefine(name, constructor, options);
-  };
-
-  Object.defineProperty(window.customElements, "__retryDefineCompatibility", {
-    value: true,
-  });
-};
-
 const runWithLegacyAsyncQueue = (fn) => {
   const previousQueue = currentLegacyAsyncQueue;
   const queue = [];
@@ -556,19 +510,6 @@ const failDone = (done, error) => {
   }
 };
 
-const resetJasmineEnv = () => {
-  if (jasmine.private?.currentEnv_ != null) {
-    jasmine.private.currentEnv_ = null;
-  } else {
-    jasmine.currentEnv_ = null;
-  }
-  specMetadataById.clear();
-};
-
-const setSpecFilter = (specFilter) => {
-  configureJasmineEnv({ specFilter });
-};
-
 const configureJasmineEnv = (config) => {
   const jasmineEnv = jasmine.getEnv();
   if (typeof jasmineEnv.configure === "function") {
@@ -576,10 +517,6 @@ const configureJasmineEnv = (config) => {
   } else {
     Object.assign(jasmineEnv, config);
   }
-};
-
-const getSpecFullName = (spec) => {
-  return spec.result?.fullName ?? spec.fullName ?? spec.getFullName?.();
 };
 
 function disableFocusMethods() {
@@ -616,15 +553,16 @@ const loadSpecsAndRunThem = (logFile, headless, testPaths) => {
     // Add the reporter and register the promise resolve as a callback
     jasmineEnv.addReporter(buildMetadataReporter());
     jasmineEnv.addReporter(buildReporter({ logFile, headless }));
-    jasmineEnv.addReporter(buildRetryReporter(resolve));
+    jasmineEnv.addReporter(buildCompletionReporter(resolve));
 
     // And finally execute the tests
     jasmineEnv.execute();
   });
 };
 
-// This is a helper function to remove a file from the require cache.
-// We are using this to force a re-evaluation of the test files when we need to re-run some flaky tests
+// This is a helper function to remove a file from the require cache, forcing a
+// fresh evaluation of the spec file when the runner is invoked more than once in
+// the same process.
 const unrequire = (requiredPath) => {
   for (const path in require.cache) {
     if (path === requiredPath) {
@@ -709,7 +647,7 @@ const buildReporter = ({ logFile, headless }) => {
   }
 };
 
-const buildRetryReporter = (onCompleteCallback) => {
+const buildCompletionReporter = (onCompleteCallback) => {
   const failedSpecs = [];
 
   return {
