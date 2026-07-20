@@ -20,7 +20,15 @@ module.exports = [
     // `**/fixtures/**` are intentional test fixtures (deliberately broken syntax,
     // asserted-exact content); `.dev/**` is a local developer sandbox (LSP
     // experiments) with deps that aren't installed in the workspace.
-    ignores: ["**/*.ts", "vendor/**", "dist/**", "**/fixtures/**", ".dev/**"],
+    ignores: [
+      "**/*.ts",
+      "vendor/**",
+      "dist/**",
+      "**/fixtures/**",
+      ".dev/**",
+      // PEG.js-generated parser; edit snippet-body.pegjs and regenerate instead.
+      "packages/snippets/lib/snippet-body.js",
+    ],
   },
   js.configs.recommended,
   n.configs["flat/recommended-script"],
