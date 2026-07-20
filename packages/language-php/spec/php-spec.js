@@ -11586,7 +11586,7 @@ invalid*/$a=1;\
 
     return ["n", "r", "t", "v", "e", "f", "$", '"', "\\"].map((escapeCharacter) =>
       it(`tokenizes ${escapeCharacter} as an escape character`, function () {
-        const { tokens } = grammar.tokenizeLine(`\"test \\${escapeCharacter} test\";`);
+        const { tokens } = grammar.tokenizeLine(`"test \\${escapeCharacter} test";`);
 
         expect(tokens[0]).toEqual({
           value: '"',

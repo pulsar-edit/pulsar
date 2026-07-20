@@ -4229,9 +4229,9 @@ BEGIN:
 (
     BEGIN:
     (
-        \# (((\\     Comment
+        # (((\\     Comment
         $Unbalanced (())) ;
-        \# Also a comment ))))))))))))))) Nothing specil
+        # Also a comment ))))))))))))))) Nothing specil
     )
     END:
 )
@@ -5127,7 +5127,7 @@ vim: se filetype=perl:
 # vim:noexpandtab sts=4 ft=perl ts=4
 # vim:noexpandtab:ft=perl
 # vim:ts=4:sts=4 ft=perl:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=perl ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=perl ts=4\
 `;
       for (line of Array.from(valid.split(/\n/))) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

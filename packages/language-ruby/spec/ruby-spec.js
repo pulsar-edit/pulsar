@@ -1095,7 +1095,7 @@ describe("TextMate Ruby grammar", function () {
   });
 
   it("tokenizes %x!! style strings", function () {
-    const { tokens } = grammar.tokenizeLine('%x!\#\{"l" + "s"\}!');
+    const { tokens } = grammar.tokenizeLine('%x!#{"l" + "s"}!');
 
     expect(tokens[0]).toEqual({
       value: "%x!",
@@ -3326,7 +3326,7 @@ vim: se filetype=ruby:
 # vim:noexpandtab sts=4 ft=ruby ts=4
 # vim:noexpandtab:ft=RUBY
 # vim:ts=4:sts=4 ft=ruby:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=ruby ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=ruby ts=4\
 `;
       for (line of Array.from(valid.split(/\n/))) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

@@ -153,7 +153,7 @@ describe("SCSS grammar", function () {
       for (var scope in selectors) {
         var selector = selectors[scope];
         it(`tokenizes complex ${scope} selectors`, function () {
-          let { tokens } = grammar.tokenizeLine(`${selector}legit-#\{$selector}-name\\@sm`);
+          let { tokens } = grammar.tokenizeLine(`${selector}legit-#{$selector}-name\\@sm`);
 
           expect(tokens[0]).toEqual({
             value: selector,
@@ -168,7 +168,7 @@ describe("SCSS grammar", function () {
             scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`],
           });
           expect(tokens[2]).toEqual({
-            value: "#\{",
+            value: "#{",
             scopes: [
               "source.css.scss",
               `entity.other.attribute-name.${scope}.css`,
@@ -211,7 +211,7 @@ describe("SCSS grammar", function () {
             scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`],
           });
 
-          ({ tokens } = grammar.tokenizeLine(`${selector}legit-#\{component.$selector}-name\\@sm`));
+          ({ tokens } = grammar.tokenizeLine(`${selector}legit-#{component.$selector}-name\\@sm`));
 
           expect(tokens[0]).toEqual({
             value: selector,
@@ -226,7 +226,7 @@ describe("SCSS grammar", function () {
             scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`],
           });
           expect(tokens[2]).toEqual({
-            value: "#\{",
+            value: "#{",
             scopes: [
               "source.css.scss",
               `entity.other.attribute-name.${scope}.css`,
@@ -289,7 +289,7 @@ describe("SCSS grammar", function () {
         });
 
         it(`tokenizes invalid identifiers in ${scope} selectors`, function () {
-          let { tokens } = grammar.tokenizeLine(`${selector}legit-#\{$selector}-n}a$me\\@sm`);
+          let { tokens } = grammar.tokenizeLine(`${selector}legit-#{$selector}-n}a$me\\@sm`);
 
           expect(tokens[0]).toEqual({
             value: selector,
@@ -304,7 +304,7 @@ describe("SCSS grammar", function () {
             scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`],
           });
           expect(tokens[2]).toEqual({
-            value: "#\{",
+            value: "#{",
             scopes: [
               "source.css.scss",
               `entity.other.attribute-name.${scope}.css`,
@@ -372,7 +372,7 @@ describe("SCSS grammar", function () {
           });
 
           ({ tokens } = grammar.tokenizeLine(
-            `${selector}legit-#\{component.$selector}-n}a$me\\@sm`,
+            `${selector}legit-#{component.$selector}-n}a$me\\@sm`,
           ));
 
           expect(tokens[0]).toEqual({
@@ -388,7 +388,7 @@ describe("SCSS grammar", function () {
             scopes: ["source.css.scss", `entity.other.attribute-name.${scope}.css`],
           });
           expect(tokens[2]).toEqual({
-            value: "#\{",
+            value: "#{",
             scopes: [
               "source.css.scss",
               `entity.other.attribute-name.${scope}.css`,
@@ -567,7 +567,7 @@ describe("SCSS grammar", function () {
     });
 
     it("tokenizes complex attribute selectors", function () {
-      let { tokens } = grammar.tokenizeLine("[cla#\{$s}^=abc#\{d}e]");
+      let { tokens } = grammar.tokenizeLine("[cla#{$s}^=abc#{d}e]");
 
       expect(tokens[0]).toEqual({
         value: "[",
@@ -586,7 +586,7 @@ describe("SCSS grammar", function () {
         ],
       });
       expect(tokens[2]).toEqual({
-        value: "#\{",
+        value: "#{",
         scopes: [
           "source.css.scss",
           "meta.attribute-selector.scss",
@@ -628,7 +628,7 @@ describe("SCSS grammar", function () {
         ],
       });
       expect(tokens[7]).toEqual({
-        value: "#\{",
+        value: "#{",
         scopes: [
           "source.css.scss",
           "meta.attribute-selector.scss",
@@ -673,7 +673,7 @@ describe("SCSS grammar", function () {
         ],
       });
 
-      ({ tokens } = grammar.tokenizeLine("[cl#\{a.$s}^=abc#\{d}e]"));
+      ({ tokens } = grammar.tokenizeLine("[cl#{a.$s}^=abc#{d}e]"));
 
       expect(tokens[0]).toEqual({
         value: "[",
@@ -692,7 +692,7 @@ describe("SCSS grammar", function () {
         ],
       });
       expect(tokens[2]).toEqual({
-        value: "#\{",
+        value: "#{",
         scopes: [
           "source.css.scss",
           "meta.attribute-selector.scss",
@@ -754,7 +754,7 @@ describe("SCSS grammar", function () {
         ],
       });
       expect(tokens[9]).toEqual({
-        value: "#\{",
+        value: "#{",
         scopes: [
           "source.css.scss",
           "meta.attribute-selector.scss",
@@ -2662,7 +2662,7 @@ body {
     });
 
     it("tokenizes complex pseudo classes", function () {
-      let { tokens } = grammar.tokenizeLine("&:nth-child(#\{$j})");
+      let { tokens } = grammar.tokenizeLine("&:nth-child(#{$j})");
 
       expect(tokens[0]).toEqual({
         value: "&",
@@ -2685,7 +2685,7 @@ body {
         scopes: ["source.css.scss", "punctuation.definition.pseudo-class.begin.bracket.round.css"],
       });
       expect(tokens[4]).toEqual({
-        value: "#\{",
+        value: "#{",
         scopes: [
           "source.css.scss",
           "variable.interpolation.scss",
@@ -2709,7 +2709,7 @@ body {
         scopes: ["source.css.scss", "punctuation.definition.pseudo-class.end.bracket.round.css"],
       });
 
-      ({ tokens } = grammar.tokenizeLine("&:nth-child(#\{m.$j})"));
+      ({ tokens } = grammar.tokenizeLine("&:nth-child(#{m.$j})"));
 
       expect(tokens[0]).toEqual({
         value: "&",
@@ -2732,7 +2732,7 @@ body {
         scopes: ["source.css.scss", "punctuation.definition.pseudo-class.begin.bracket.round.css"],
       });
       expect(tokens[4]).toEqual({
-        value: "#\{",
+        value: "#{",
         scopes: [
           "source.css.scss",
           "variable.interpolation.scss",
@@ -4095,7 +4095,7 @@ $custom-palettes: (
 
   describe("interpolation", function () {
     it("is tokenized within single quotes", function () {
-      let { tokens } = grammar.tokenizeLine("body { font-family: '#\{$family}'; }"); // escaping CoffeeScript's interpolation
+      let { tokens } = grammar.tokenizeLine("body { font-family: '#{$family}'; }"); // escaping CoffeeScript's interpolation
 
       expect(tokens[8]).toEqual({
         value: "#{",
@@ -4131,7 +4131,7 @@ $custom-palettes: (
         ],
       });
 
-      ({ tokens } = grammar.tokenizeLine("body { font-family: '#\{font.$family}'; }")); // escaping CoffeeScript's interpolation
+      ({ tokens } = grammar.tokenizeLine("body { font-family: '#{font.$family}'; }")); // escaping CoffeeScript's interpolation
 
       expect(tokens[8]).toEqual({
         value: "#{",
@@ -4191,7 +4191,7 @@ $custom-palettes: (
     });
 
     it("is tokenized within double quotes", function () {
-      let { tokens } = grammar.tokenizeLine('body { font-family: "#\{$family}"; }');
+      let { tokens } = grammar.tokenizeLine('body { font-family: "#{$family}"; }');
 
       expect(tokens[8]).toEqual({
         value: "#{",
@@ -4227,7 +4227,7 @@ $custom-palettes: (
         ],
       });
 
-      ({ tokens } = grammar.tokenizeLine('body { font-family: "#\{font.$family}"; }'));
+      ({ tokens } = grammar.tokenizeLine('body { font-family: "#{font.$family}"; }'));
 
       expect(tokens[8]).toEqual({
         value: "#{",
@@ -4287,7 +4287,7 @@ $custom-palettes: (
     });
 
     it("is tokenized without quotes", function () {
-      let { tokens } = grammar.tokenizeLine("body { font-family: #\{$family}; }");
+      let { tokens } = grammar.tokenizeLine("body { font-family: #{$family}; }");
 
       expect(tokens[7]).toEqual({
         value: "#{",
@@ -4320,7 +4320,7 @@ $custom-palettes: (
         ],
       });
 
-      ({ tokens } = grammar.tokenizeLine("body { font-family: #\{font.$family}; }"));
+      ({ tokens } = grammar.tokenizeLine("body { font-family: #{font.$family}; }"));
 
       expect(tokens[7]).toEqual({
         value: "#{",
@@ -4375,7 +4375,7 @@ $custom-palettes: (
     });
 
     it("is tokenized as a class name", function () {
-      let { tokens } = grammar.tokenizeLine("body.#\{$class} {}");
+      let { tokens } = grammar.tokenizeLine("body.#{$class} {}");
 
       expect(tokens[2]).toEqual({
         value: "#{",
@@ -4405,7 +4405,7 @@ $custom-palettes: (
         ],
       });
 
-      ({ tokens } = grammar.tokenizeLine("body.#\{special.$class} {}"));
+      ({ tokens } = grammar.tokenizeLine("body.#{special.$class} {}"));
 
       expect(tokens[2]).toEqual({
         value: "#{",
@@ -4455,7 +4455,7 @@ $custom-palettes: (
     });
 
     it("is tokenized as a keyframe", function () {
-      let { tokens } = grammar.tokenizeLine("@keyframes anim { #\{$keyframe} {} }");
+      let { tokens } = grammar.tokenizeLine("@keyframes anim { #{$keyframe} {} }");
 
       expect(tokens[7]).toEqual({
         value: "#{",
@@ -4485,7 +4485,7 @@ $custom-palettes: (
         ],
       });
 
-      ({ tokens } = grammar.tokenizeLine("@keyframes anim { #\{animations.$keyframe} {} }"));
+      ({ tokens } = grammar.tokenizeLine("@keyframes anim { #{animations.$keyframe} {} }"));
 
       expect(tokens[7]).toEqual({
         value: "#{",
@@ -4535,7 +4535,7 @@ $custom-palettes: (
     });
 
     it("does not tokenize anything after the closing bracket as interpolation", function () {
-      const { tokens } = grammar.tokenizeLine("#\{variable}hi");
+      const { tokens } = grammar.tokenizeLine("#{variable}hi");
 
       expect(tokens[3]).not.toEqual({
         value: "hi",

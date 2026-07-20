@@ -208,7 +208,7 @@ function peg$parse(input, options) {
     peg$c29 = function (regex, replace, flags) {
       return { find: new RegExp(regex, flags), replace: replace };
     },
-    peg$c30 = /^[^\/]/,
+    peg$c30 = /^[^/]/,
     peg$c31 = peg$classExpectation(["/"], true, false),
     peg$c32 = function (regex) {
       return regex.join("");

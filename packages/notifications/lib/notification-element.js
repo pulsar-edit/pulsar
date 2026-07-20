@@ -200,7 +200,7 @@ module.exports = NotificationElement = (function () {
       });
 
       if (packageName != null && repoUrl != null) {
-        fatalNotification.innerHTML = `The error was thrown from the <a href=\"${repoUrl}\">${packageName} package</a>. `;
+        fatalNotification.innerHTML = `The error was thrown from the <a href="${repoUrl}">${packageName} package</a>. `;
       } else if (packageName != null) {
         issueButton.remove();
         fatalNotification.textContent = `The error was thrown from the ${packageName} package. `;

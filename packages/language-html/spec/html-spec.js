@@ -2765,7 +2765,7 @@ vim: se filetype=html:
 # vim:noexpandtab sts=4 ft=html ts=4
 # vim:noexpandtab:ft=html
 # vim:ts=4:sts=4 ft=html:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=html ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=html ts=4\
 `;
       for (line of valid.split(/\n/)) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

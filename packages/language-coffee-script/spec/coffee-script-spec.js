@@ -278,7 +278,7 @@ describe("CoffeeScript grammar", function () {
       scopes: ["source.coffee", "comment.line.number-sign.coffee"],
     });
 
-    ({ tokens } = grammar.tokenizeLine("\#{Comment}"));
+    ({ tokens } = grammar.tokenizeLine("#{Comment}"));
 
     expect(tokens[0]).toEqual({
       value: "#",
@@ -4961,7 +4961,7 @@ vim: se filetype=coffee:
 # vim:noexpandtab sts=4 ft=coffEE ts=4
 # vim:noexpandtab:ft=cOFFEe
 # vim:ts=4:sts=4 ft=cofFeE:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=cOFFEe ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=cOFFEe ts=4\
 `;
       for (line of Array.from(valid.split(/\n/))) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

@@ -808,7 +808,7 @@ vim: se filetype=php:
 # vim:noexpandtab sts=4 ft=php ts=4
 # vim:noexpandtab:ft=php
 # vim:ts=4:sts=4 ft=phtml:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=phtml ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=phtml ts=4\
 `;
       for (line of valid.split(/\n/)) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

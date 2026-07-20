@@ -1166,7 +1166,7 @@ vim: se filetype=sh:
 # vim:noexpandtab sts=4 ft=sh ts=4
 # vim:noexpandtab:ft=sh
 # vim:ts=4:sts=4 ft=sh:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=sh ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=sh ts=4\
 `;
       for (line of Array.from(valid.split(/\n/))) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

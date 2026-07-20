@@ -278,7 +278,7 @@ describe("Snippet Body Parser", () => {
               {
                 variable: "TM_FILENAME",
                 substitution: {
-                  find: /(?:\A|_)([A-Za-z0-9]+)(?:\.rb)?/g,
+                  find: /(?:A|_)([A-Za-z0-9]+)(?:\.rb)?/g,
                   replace: [
                     {
                       backreference: 2,
@@ -401,7 +401,7 @@ the quick brown $1fox \${2:jumped \${3:over}
             {
               variable: "TM_FILENAME",
               substitution: {
-                find: /(?:\A|_)([A-Za-z0-9]+)(?:\.rb)?/g,
+                find: /(?:A|_)([A-Za-z0-9]+)(?:\.rb)?/g,
                 replace: [{ escape: "u" }, { backreference: 1 }],
               },
             },

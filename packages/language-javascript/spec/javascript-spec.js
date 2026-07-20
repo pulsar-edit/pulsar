@@ -8165,7 +8165,7 @@ vim: se filetype=javascript:
 # vim:noexpandtab sts=4 ft=javascript ts=4
 # vim:noexpandtab:ft=javascript
 # vim:ts=4:sts=4 ft=javascript:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=javascript ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=javascript ts=4\
 `;
       for (line of Array.from(valid.split(/\n/))) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

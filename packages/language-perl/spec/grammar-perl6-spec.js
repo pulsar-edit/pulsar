@@ -289,7 +289,7 @@ vim: se filetype=perl6:
 # vim:noexpandtab sts=4 ft=perl6 ts=4
 # vim:noexpandtab:ft=perl6
 # vim:ts=4:sts=4 ft=perl6:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=perl6 ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=perl6 ts=4\
 `;
       for (line of Array.from(valid.split(/\n/))) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

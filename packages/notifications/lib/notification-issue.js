@@ -16,7 +16,7 @@ const UserUtilities = require("./user-utilities");
 
 const TITLE_CHAR_LIMIT = 100; // Truncate issue title to 100 characters (including ellipsis)
 
-const FileURLRegExp = new RegExp("file://\w*/(.*)");
+const FileURLRegExp = new RegExp("file://w*/(.*)");
 
 module.exports = class NotificationIssue {
   constructor(notification) {
@@ -263,7 +263,7 @@ ${copyText}\
       return;
     }
 
-    let packageName = __guard__(/\/\.atom\/dev\/packages\/([^\/]+)\//.exec(filePath), (x) => x[1]);
+    let packageName = __guard__(/\/\.atom\/dev\/packages\/([^/]+)\//.exec(filePath), (x) => x[1]);
     if (packageName) {
       return packageName;
     }
@@ -273,7 +273,7 @@ ${copyText}\
       return packageName;
     }
 
-    packageName = __guard__(/\/\.atom\/packages\/([^\/]+)\//.exec(filePath), (x2) => x2[1]);
+    packageName = __guard__(/\/\.atom\/packages\/([^/]+)\//.exec(filePath), (x2) => x2[1]);
     if (packageName) {
       return packageName;
     }

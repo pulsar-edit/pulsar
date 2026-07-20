@@ -1624,7 +1624,7 @@ hi4\
 
       ({ tokens } = grammar.tokenizeLine("=mixin-name($p)"));
       expect(tokens[0]).toEqual({
-        value: "\=",
+        value: "=",
         scopes: [
           "source.sass",
           "meta.variable-declaration.sass.mixin",

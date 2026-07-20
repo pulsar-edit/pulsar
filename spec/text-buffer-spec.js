@@ -3267,7 +3267,7 @@ three\
       const regexps = [
         /\w+/g, // 1 word
         /\w+\n\s*\w+/g, // 2 words separated by an newline (escape sequence)
-        RegExp("\\w+\n\\s*\w+", "g"), // 2 words separated by a newline (literal)
+        RegExp("\\w+\n\\s*w+", "g"), // 2 words separated by a newline (literal)
         /\w+\s+\w+/g, // 2 words separated by some whitespace
         /\w+[^\w]+\w+/g, // 2 words separated by anything
         /\w+\n\s*\w+\n\s*\w+/g, // 3 words separated by newlines (escape sequence)

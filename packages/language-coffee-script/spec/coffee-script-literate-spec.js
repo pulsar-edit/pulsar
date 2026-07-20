@@ -119,7 +119,7 @@ vim: se filetype=litcoffee:
 # vim:noexpandtab sts=4 ft=LitCOffEE ts=4
 # vim:noexpandtab:ft=litcoffee
 # vim:ts=4:sts=4 ft=litcoffee:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=litcoffee ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=litcoffee ts=4\
 `;
       for (line of Array.from(valid.split(/\n/))) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

@@ -440,7 +440,7 @@ a = "abc";\
       scopes: ["source.java", "string.quoted.single"],
     });
     expect(tokens[14][3]).toEqual({
-      value: '\"abc\"',
+      value: '"abc"',
       scopes: ["source.java", "string.quoted.double"],
     });
   });
@@ -2100,7 +2100,7 @@ public @interface A {
       scopes: ["source.java", "meta.interface.annotated.body", "keyword.control"],
     });
     expect(tokens[1][9]).toEqual({
-      value: '\"abc\"',
+      value: '"abc"',
       scopes: ["source.java", "meta.interface.annotated.body", "string.quoted.double"],
     });
     expect(tokens[2][0]).toEqual({
@@ -2233,7 +2233,7 @@ class A { }\
       scopes: ["source.java", "meta.declaration.annotation", "punctuation.bracket.round"],
     });
     expect(tokens[2][3]).toEqual({
-      value: '\"value\"',
+      value: '"value"',
       scopes: ["source.java", "meta.declaration.annotation", "string.quoted.double"],
     });
     expect(tokens[2][4]).toEqual({
@@ -2262,7 +2262,7 @@ class A { }\
       scopes: ["source.java", "meta.declaration.annotation", "keyword.operator.assignment"],
     });
     expect(tokens[3][7]).toEqual({
-      value: '\"value\"',
+      value: '"value"',
       scopes: ["source.java", "meta.declaration.annotation", "string.quoted.double"],
     });
     expect(tokens[3][8]).toEqual({

@@ -672,7 +672,7 @@ describe("Clojure grammar", function () {
 
   it("tokenizes maps", () => testMetaSection("map", "map", "{", "}"));
 
-  it("tokenizes sets", () => testMetaSection("set", "set", "\#{", "}"));
+  it("tokenizes sets", () => testMetaSection("set", "set", "#{", "}"));
 
   it("tokenizes functions in nested sexp", function () {
     const { tokens } = grammar.tokenizeLine("((foo bar) baz)");
@@ -811,7 +811,7 @@ describe("Clojure grammar", function () {
   });
 
   it("tokenizes sets used in functions", function () {
-    const { tokens } = grammar.tokenizeLine("(\#{:foo :bar})");
+    const { tokens } = grammar.tokenizeLine("(#{:foo :bar})");
     expect(tokens[0]).toEqual({
       value: "(",
       scopes: [
@@ -821,7 +821,7 @@ describe("Clojure grammar", function () {
       ],
     });
     expect(tokens[1]).toEqual({
-      value: "\#{",
+      value: "#{",
       scopes: [
         "source.clojure",
         "meta.expression.clojure",
@@ -977,7 +977,7 @@ vim: se filetype=clojure:
 # vim:noexpandtab sts=4 ft=clojure ts=4
 # vim:noexpandtab:ft=clojure
 # vim:ts=4:sts=4 ft=clojure:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=clojure ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=clojure ts=4\
 `;
       for (line of Array.from(valid.split(/\n/))) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

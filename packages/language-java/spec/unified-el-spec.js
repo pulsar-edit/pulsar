@@ -284,7 +284,7 @@ describe("Unified expression language grammar", function () {
     });
 
     it("tokenizes single quoted string literals", function () {
-      const { tokens } = grammar.tokenizeLine("'foo\\n bar \\\'baz'");
+      const { tokens } = grammar.tokenizeLine("'foo\\n bar \\'baz'");
       expect(tokens[0]).toEqual({
         value: "'",
         scopes: [
@@ -332,7 +332,7 @@ describe("Unified expression language grammar", function () {
     });
 
     it("tokenizes double quoted string literals", function () {
-      const { tokens } = grammar.tokenizeLine('"foo\\n bar \\\"baz"');
+      const { tokens } = grammar.tokenizeLine('"foo\\n bar \\"baz"');
       expect(tokens[0]).toEqual({
         value: '"',
         scopes: [
@@ -358,7 +358,7 @@ describe("Unified expression language grammar", function () {
         scopes: ["source.java.el", "string.quoted.double.java.el"],
       });
       expect(tokens[4]).toEqual({
-        value: '\\\"',
+        value: '\\"',
         scopes: [
           "source.java.el",
           "string.quoted.double.java.el",

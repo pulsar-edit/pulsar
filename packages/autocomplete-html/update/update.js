@@ -270,7 +270,7 @@ function sanitizeDescription(input) {
       // ^ Parses special MDN Markdown Links.
       // eg. {{htmlattrxref("title")}} => title
       // Where we still want to keep the text within
-      .replace(/[\*\`\{\}\"]/g, "") // Removes special Markdown based characters
+      .replace(/[*`{}"]/g, "") // Removes special Markdown based characters
       .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, "$1")
   );
   // ^ Parses Markdown links, extracting only the linked text

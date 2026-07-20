@@ -20920,7 +20920,7 @@ vim: se filetype=css:
 # vim:noexpandtab sts=4 ft=css ts=4
 # vim:noexpandtab:ft=css
 # vim:ts=4:sts=4 ft=css:noexpandtab:\x20
-# vim:noexpandtab titlestring=hi\|there\\\\ ft=css ts=4\
+# vim:noexpandtab titlestring=hi|there\\\\ ft=css ts=4\
 `;
       for (line of Array.from(valid.split(/\n/))) {
         expect(grammar.firstLineRegex.findNextMatchSync(line)).not.toBeNull();

@@ -290,11 +290,11 @@ async function getDescriptionOfProp(name) {
         return summaryRaw[i]
           .replace(/\{\{\S+\("(\S+)"\)\}\}/g, "$1")
           .replace(/\*/g, "")
-          .replace(/\`/g, "")
+          .replace(/`/g, "")
           .replace(/\{/g, "")
           .replace(/\}/g, "")
-          .replace(/\"/g, "")
-          .replace(/\_/g, "")
+          .replace(/"/g, "")
+          .replace(/_/g, "")
           .replace(/\[([A-Za-z0-9-_* ]+)\]\(\S+\)/g, "$1");
       }
     }
