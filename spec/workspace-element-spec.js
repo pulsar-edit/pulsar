@@ -805,24 +805,27 @@ describe("WorkspaceElement", () => {
     }
   });
 
-  // Skipped for now. We replaced the `scrollbar-style` module with one that
-  // runs in the main process, so we'd need to change what gets mocked here.
-  xdescribe("the scrollbar visibility class", () => {
+  describe("the scrollbar visibility class", () => {
     it("has a class based on the style of the scrollbar", () => {
-      // let observeCallback;
-      // spyOn(scrollbarStyle, 'observePreferredScrollbarStyle').andCallFake(
-      //   cb => {
-      //     observeCallback = cb;
-      //     return new Disposable(() => {});
-      //   }
-      // );
-      //
-      // const workspaceElement = atom.workspace.getElement();
-      // observeCallback('legacy');
-      // expect(workspaceElement.className).toMatch('scrollbars-visible-always');
-      //
-      // observeCallback('overlay');
-      // expect(workspaceElement).toHaveClass('scrollbars-visible-when-scrolling');
+      const workspaceElement = atom.workspace.getElement();
+      jasmine.attachToDOM(workspaceElement);
+
+      // The initial value is measured from how this window actually renders
+      // scrollbars, so it's platform-dependent — but it's always one of the
+      // two known styles.
+      expect(
+        workspaceElement.classList.contains("scrollbars-visible-always") ||
+          workspaceElement.classList.contains("scrollbars-visible-when-scrolling"),
+      ).toBe(true);
+
+      // Style changes are pushed from the main process over IPC.
+      ipcRenderer.emit("did-change-scrollbar-style", {}, "legacy");
+      expect(workspaceElement).toHaveClass("scrollbars-visible-always");
+      expect(workspaceElement).not.toHaveClass("scrollbars-visible-when-scrolling");
+
+      ipcRenderer.emit("did-change-scrollbar-style", {}, "overlay");
+      expect(workspaceElement).toHaveClass("scrollbars-visible-when-scrolling");
+      expect(workspaceElement).not.toHaveClass("scrollbars-visible-always");
     });
   });
 

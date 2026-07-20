@@ -1,7 +1,7 @@
 const AtomWindow = require("./atom-window");
 const ApplicationMenu = require("./application-menu");
 const AtomProtocolHandler = require("./atom-protocol-handler");
-const { onDidChangeScrollbarStyle, getScrollbarStyle } = require("./scrollbar-style");
+const { onDidChangeScrollbarStyle } = require("./scrollbar-style");
 const StorageFolder = require("./storage-folder");
 const Config = require("./config");
 const ConfigFile = require("./config-file");
@@ -110,10 +110,6 @@ const decryptOptions = (optionsMessage, secret) => {
 
   return JSON.parse(message);
 };
-
-ipcMain.handle("getScrollbarStyle", () => {
-  return getScrollbarStyle();
-});
 
 ipcMain.handle("isDefaultProtocolClient", (_, { protocol, path, args }) => {
   return app.isDefaultProtocolClient(protocol, path, args);

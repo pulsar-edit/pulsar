@@ -1180,12 +1180,6 @@
   dependencies:
     node-addon-api "^8.9.0"
 
-"@lumine-code/get-scrollbar-style@https://github.com/lumine-code/get-scrollbar-style.git#cde22b12697ec7eadfc28f37eb3e3498f2adf10e":
-  version "2.0.0"
-  resolved "https://github.com/lumine-code/get-scrollbar-style.git#cde22b12697ec7eadfc28f37eb3e3498f2adf10e"
-  dependencies:
-    node-addon-api "^8.9.0"
-
 "@lumine-code/keyboard-layout@https://github.com/lumine-code/keyboard-layout.git#73b62b1301fd7a18a0c0567ff8c1a6ebe1fa5d94":
   version "4.0.0"
   resolved "https://github.com/lumine-code/keyboard-layout.git#73b62b1301fd7a18a0c0567ff8c1a6ebe1fa5d94"

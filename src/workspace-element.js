@@ -7,15 +7,29 @@ const fs = require("@lumine-code/fs-plus");
 const { CompositeDisposable, Disposable } = require("event-kit");
 const _ = require("@lumine-code/underscore-plus");
 
-// Asks for the current scrollbar style, then subscribes to a handler so it can
+// Measures how Chromium renders scrollbars in this window: an off-screen
+// scrollable probe reserves no width for overlay scrollbars and a nonzero
+// width for always-visible ones. The probe lives outside `atom-workspace` so
+// the theme's `.scrollbars-visible-* ::-webkit-scrollbar` rules can't affect
+// the measurement.
+function measureScrollbarStyle() {
+  const probe = document.createElement("div");
+  probe.style.cssText =
+    "position: absolute; top: -9999px; width: 50px; height: 50px; overflow: scroll;";
+  document.body.appendChild(probe);
+  const style = probe.offsetWidth - probe.clientWidth === 0 ? "overlay" : "legacy";
+  probe.remove();
+  return style;
+}
+
+// Reports the current scrollbar style, then subscribes to a handler so it can
 // be notified of further changes. Returns a `Disposable`.
 function observeScrollbarStyle(callback) {
   // We want to act like `atom.config.observe`: set up a change handler, but
-  // immediately invoke the callback with the current value as well. Since the
-  // main process knows the answer here, we've got to go async.
-  ipcRenderer.invoke("getScrollbarStyle").then((value) => {
-    if (value) callback(value);
-  });
+  // immediately invoke the callback with the current value as well. Change
+  // notifications come from the main process, which watches the macOS
+  // system setting.
+  callback(measureScrollbarStyle());
   let result = ipcHelpers.on(ipcRenderer, "did-change-scrollbar-style", (_, style) =>
     callback(style),
   );
