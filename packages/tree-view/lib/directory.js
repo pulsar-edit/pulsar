@@ -457,7 +457,6 @@ module.exports = class Directory {
     const squashedDirs = [this.name];
     let contents;
     while (true) {
-       
       try {
         contents = fs.listSync(fullPath);
       } catch (error) {

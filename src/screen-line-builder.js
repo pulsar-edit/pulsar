@@ -1,5 +1,3 @@
- 
-
 const Point = require("./point");
 
 const HARD_TAB = 1 << 0;
