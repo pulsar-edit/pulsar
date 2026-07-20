@@ -251,7 +251,9 @@ export default class InstallPanel {
   }
 
   filterPackages (packages, themes) {
-    return packages.filter(({theme}) => themes ? theme : !theme)
+    return packages.filter((pack) =>
+      themes ? pack.theme || pack.themes : !(pack.theme || pack.themes)
+    )
   }
 
   // Load and display the featured packages that are available to install.
