@@ -14,7 +14,7 @@ module.exports = class AddDialog extends Dialog {
     }
 
     let rootProjectPath;
-    let relativeDirectoryPath = directoryPath;
+    let relativeDirectoryPath;
     [rootProjectPath, relativeDirectoryPath] = atom.project.relativizePath(directoryPath);
     if (relativeDirectoryPath.length > 0) {
       relativeDirectoryPath += path.sep;

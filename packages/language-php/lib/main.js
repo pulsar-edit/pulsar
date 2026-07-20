@@ -73,7 +73,6 @@ function interpret(nodes) {
           range: new Range(currentStart.range.start, Point.INFINITY),
         };
         ranges.push(spec);
-        currentStart = null;
         break;
       }
     }

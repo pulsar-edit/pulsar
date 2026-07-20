@@ -89,8 +89,8 @@ module.exports = class BracketMatcherView {
 
     const { position, matchPosition } = this.findCurrentPair();
 
-    let startRange = null;
-    let endRange = null;
+    let startRange;
+    let endRange;
     let highlightTag = false;
     let highlightPair = false;
     if (position && matchPosition) {
@@ -565,7 +565,7 @@ module.exports = class BracketMatcherView {
 
       if (startRange) {
         if (startRange.compare(endRange) > 0) {
-          [startRange, endRange] = [endRange, startRange];
+          startRange = endRange;
         }
         this.editor.setCursorBufferPosition(startRange.start);
       }

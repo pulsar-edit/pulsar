@@ -2206,7 +2206,7 @@ class TextBuffer {
       );
     }
 
-    let patch = null;
+    let patch;
     let checkpoint = null;
     try {
       patch = this.buffer.loadSync(this.getPath(), this.getEncoding(), (percentDone, patch) => {

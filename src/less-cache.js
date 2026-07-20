@@ -103,7 +103,7 @@ module.exports = class LessCache {
   getImportedFiles(importPaths) {
     let importedFiles = [];
     for (let absoluteImportPath of importPaths) {
-      let importPath = null;
+      let importPath;
       if (this.resourcePath != null) {
         importPath = this.relativize(this.resourcePath, absoluteImportPath);
       } else {
@@ -177,8 +177,8 @@ module.exports = class LessCache {
         relativeFilePath = this.relativize(this.resourcePath, filePath);
       }
       const lessSource = this.lessSourcesByRelativeFilePath[relativeFilePath];
-      let content = null;
-      let digest = null;
+      let content;
+      let digest;
       if (lessSource != null) {
         ({ content } = lessSource);
         ({ digest } = lessSource);
@@ -214,7 +214,7 @@ module.exports = class LessCache {
     if (lessSource != null) {
       return lessSource.digest;
     } else {
-      let absoluteFilePath = null;
+      let absoluteFilePath;
       if (this.resourcePath && !isAbsolute(relativeFilePath)) {
         absoluteFilePath = join(this.resourcePath, relativeFilePath);
       } else {

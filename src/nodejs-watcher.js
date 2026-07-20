@@ -157,7 +157,7 @@ class NodejsWatcher {
     // when our file is *moved away* the event can surface under the file's NEW
     // basename (macOS especially), so we can't rely on the name to decide
     // relevance. Instead, look at whether our path still exists.
-    let existsNow = false;
+    let existsNow;
     try {
       fs.statSync(this.realPath);
       existsNow = true;

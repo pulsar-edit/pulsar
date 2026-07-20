@@ -391,7 +391,7 @@ export default class DeprecationCopView {
       const stacks = deprecation.getStacks();
       stacks.sort((a, b) => b.callCount - a.callCount);
       for (const stack of stacks) {
-        let packageName = null;
+        let packageName;
         if (stack.metadata && stack.metadata.packageName) {
           packageName = stack.metadata.packageName;
         } else {
@@ -413,8 +413,8 @@ export default class DeprecationCopView {
         const deprecation = deprecatedSelectorsBySourcePath[sourcePath];
         const components = sourcePath.split(path.sep);
         const packagesComponentIndex = components.indexOf("packages");
-        let packageName = null;
-        let packagePath = null;
+        let packageName;
+        let packagePath;
         if (packagesComponentIndex === -1) {
           packageName = "Other"; // could be Atom Core or the personal style sheet
           packagePath = "";

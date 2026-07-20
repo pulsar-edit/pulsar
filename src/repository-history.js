@@ -47,7 +47,7 @@ function parseNameStatusTokens(output) {
 
   for (let index = 0; index < tokens.length; index++) {
     let statusToken = tokens[index];
-    let firstPath = null;
+    let firstPath;
 
     const joined = /^([AMDTUX]|[RC]\d*)\t([\s\S]*)$/.exec(statusToken);
     if (joined) {

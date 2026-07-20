@@ -727,7 +727,7 @@ function optionToRadio(option, keyPath) {
   const label = document.createElement("label");
   label.classList.add("input-label");
   let value;
-  let description = "";
+  let description;
   if (Object.hasOwn(option, "value")) {
     value = option.value;
     description = option.description;

@@ -412,7 +412,7 @@ class ContextMenu {
     const menuWidth = naturalRect.width;
 
     let left = x;
-    let top = y;
+    let top;
     let needsScroll = false;
 
     // Priority 1: Try to fit menu without scrolling
