@@ -83,7 +83,7 @@ export default class CachePanelView {
       return require(
         path.join(atom.getLoadSettings().resourcePath, "src", "compile-cache"),
       ).getCacheStats();
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -98,7 +98,7 @@ export default class CachePanelView {
       } else {
         return 0;
       }
-    } catch (error) {
+    } catch {
       return 0;
     }
   }

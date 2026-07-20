@@ -27,7 +27,7 @@ describe("updateProcessEnv(launchEnv)", function () {
     process.platform = originalProcessPlatform;
     try {
       temp.cleanupSync();
-    } catch (e) {
+    } catch {
       // Do nothing
     }
   });

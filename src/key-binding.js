@@ -7,7 +7,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 let KeyBinding;
-const { calculateSpecificity, MODIFIERS, isKeyup } = require("./keymap-helpers");
+const { calculateSpecificity, isKeyup } = require("./keymap-helpers");
 
 const MATCH_TYPES = {
   EXACT: "exact",
@@ -96,7 +96,6 @@ module.exports.KeyBinding = KeyBinding = (function () {
 
       let isPartialMatch = false;
       let bindingRemainderContainsOnlyKeyups = true;
-      const bindingKeystrokeIndex = 0;
       for (var bindingKeystroke of Array.from(this.keystrokeArray)) {
         if (!isPartialMatch) {
           var doesMatch = matchesNextUserKeystroke(bindingKeystroke);

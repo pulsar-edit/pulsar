@@ -96,7 +96,7 @@ module.exports = class MoveDialog extends Dialog {
         oldStat.dev === newStat.dev &&
         oldStat.ino === newStat.ino
       );
-    } catch (error) {
+    } catch {
       return true; // new path does not exist so it is valid
     }
   }

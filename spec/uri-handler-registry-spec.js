@@ -108,7 +108,7 @@ describe("URIHandlerRegistry", () => {
       try {
         await registry.handleURI(uri);
         expect(uri).toBe("throwing an error");
-      } catch (ex) {
+      } catch {
         numErrors++;
       }
     }

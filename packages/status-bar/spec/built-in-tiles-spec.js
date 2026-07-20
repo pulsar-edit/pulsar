@@ -1,7 +1,6 @@
 const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 const os = require("os");
-const process = require("process");
 
 describe("Built-in Status Bar Tiles", function () {
   let [statusBar, workspaceElement, dummyView] = [];

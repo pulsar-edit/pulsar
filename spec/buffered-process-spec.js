@@ -5,10 +5,8 @@ const BufferedProcess = require("../src/buffered-process");
 
 describe("BufferedProcess", function () {
   describe("when a bad command is specified", function () {
-    let windowOnErrorSpy;
-
     beforeEach(function () {
-      windowOnErrorSpy = spyOn(window, "onerror");
+      spyOn(window, "onerror");
     });
 
     describe("when there is an error handler specified", function () {

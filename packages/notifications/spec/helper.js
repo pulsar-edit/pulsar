@@ -6,7 +6,7 @@ bug report purposes.
  */
 
 (function () {
-  var jsonPromise, textPromise;
+  var jsonPromise;
 
   module.exports = {
     generateException: function () {
@@ -59,15 +59,6 @@ bug report purposes.
       ok: true,
       json: function () {
         return Promise.resolve(object);
-      },
-    });
-  };
-
-  textPromise = function (text) {
-    return Promise.resolve({
-      ok: true,
-      text: function () {
-        return Promise.resolve(text);
       },
     });
   };

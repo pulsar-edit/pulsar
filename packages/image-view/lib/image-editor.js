@@ -52,7 +52,7 @@ module.exports = class ImageEditor {
     if (!this.editorView) {
       try {
         this.editorView = new ImageEditorView(this);
-      } catch (e) {
+      } catch {
         console.warn(
           `Could not create ImageEditorView. This can be intentional in the event of an image file being deleted by an external program.`,
         );

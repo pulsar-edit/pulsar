@@ -2,7 +2,6 @@ const _ = require("@lumine-code/underscore-plus");
 const { BufferedProcess, CompositeDisposable, Emitter } = require("atom");
 const CSON = require("@lumine-code/season");
 const fs = require("@lumine-code/fs-plus");
-const gitHubUrlInfo = require("./github-url-info");
 const os = require("os");
 const path = require("path");
 const semver = require("semver");

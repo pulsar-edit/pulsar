@@ -20,7 +20,7 @@ describe("BufferedNodeProcess", function () {
   });
 
   it("suppresses deprecations in the new process", async function () {
-    const exit = jasmine.createSpy("exitCallback");
+    jasmine.createSpy("exitCallback");
     let output = "";
     const stdout = (lines) => (output += lines);
     let error = "";

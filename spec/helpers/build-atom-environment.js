@@ -13,7 +13,7 @@ if (process.env.APM_TEST_PACKAGES) {
 
     try {
       fs.symlinkSync(userPack, loadablePack, "dir");
-    } catch (error) {
+    } catch {
       fs.copySync(userPack, loadablePack);
     }
   }

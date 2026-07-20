@@ -4989,7 +4989,6 @@ function getDisplayText(editor) {
 function expectTokensToEqual(editor, expectedTokenLines) {
   const lastRow = editor.getLastScreenRow();
 
-  let baseScope = editor.getBuffer().getLanguageMode().grammar.scopeName;
   let languageMode = editor.getBuffer().getLanguageMode();
   let layers = languageMode.getAllLanguageLayers();
   let baseScopeClasses = new Set();
@@ -5051,8 +5050,6 @@ function expectTokensToEqual(editor, expectedTokenLines) {
       const expectedTokenLine = expectedTokenLines[row];
 
       for (let i = 0; i < tokenLine.length; i++) {
-        let line = tokenLine[i],
-          expectedLine = expectedTokenLine[i];
         expect(tokenLine[i]).toEqual(
           expectedTokenLine[i],
           `Token ${i}, row: ${row}, startRow: ${startRow}`,

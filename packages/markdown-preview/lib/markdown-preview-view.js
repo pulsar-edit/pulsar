@@ -100,7 +100,7 @@ module.exports = class MarkdownPreviewView {
     let id = anchor.getAttribute("href").slice(1);
     try {
       id = decodeURIComponent(id);
-    } catch (error) {
+    } catch {
       // Fall back to the raw fragment.
     }
     if (!id) return;

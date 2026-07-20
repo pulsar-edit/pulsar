@@ -1416,7 +1416,7 @@ describe("TabBarView", () => {
         expect(pane.getActiveItem()).toBe(item2);
         spyOn(pane, "activate");
 
-        const [dragStartEvent, dropEvent] = Array.from(
+        const [, dropEvent] = Array.from(
           buildDragEvents(tabBar.tabAtIndex(0).element, tabBar.tabAtIndex(0).element),
         );
         tabBar.onDrop(dropEvent);
@@ -1433,7 +1433,7 @@ describe("TabBarView", () => {
 
     describe("when a tab is dragged out of application", () =>
       it("should carry the file's information", () => {
-        const [dragStartEvent, dropEvent] = Array.from(
+        const [dragStartEvent] = Array.from(
           buildDragEvents(tabBar.tabAtIndex(1).element, tabBar.tabAtIndex(1).element),
         );
         tabBar.onDragStart(dragStartEvent);

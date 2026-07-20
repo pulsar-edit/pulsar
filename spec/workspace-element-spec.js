@@ -11,7 +11,7 @@ describe("WorkspaceElement", () => {
   afterEach(() => {
     try {
       temp.cleanupSync();
-    } catch (e) {
+    } catch {
       // Do nothing
     }
   });

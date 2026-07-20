@@ -296,7 +296,7 @@ module.exports = class Directory {
     let names;
     try {
       names = fs.readdirSync(this.path);
-    } catch (error) {
+    } catch {
       names = [];
     }
     names.sort(getSortComparator());
@@ -459,7 +459,7 @@ module.exports = class Directory {
     while (true) {
       try {
         contents = fs.listSync(fullPath);
-      } catch (error) {
+      } catch {
         break;
       }
 

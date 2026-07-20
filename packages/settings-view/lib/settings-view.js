@@ -224,7 +224,7 @@ export default class SettingsView {
 
       try {
         metadata = require(path.join(packagePath, "package.json"));
-      } catch (error) {
+      } catch {
         if (bundledPackageMetadataCache && bundledPackageMetadataCache[packageName]) {
           metadata = bundledPackageMetadataCache[packageName].metadata;
         }

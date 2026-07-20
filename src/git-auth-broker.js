@@ -102,7 +102,7 @@ class GitAuthBroker {
       query = JSON.parse(payload);
       const answer = await this.promptForInput(query);
       await new Promise((resolve) => connection.end(JSON.stringify(answer), "utf8", resolve));
-    } catch (error) {
+    } catch {
       connection.destroy();
       this.emitter.emit("did-cancel", query && query.pid ? { handlerPid: query.pid } : undefined);
     }

@@ -12,10 +12,6 @@ function getEditor() {
   return atom.workspace.getActiveTextEditor();
 }
 
-async function wait(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
-
 let provider;
 
 async function getSymbols(editor, type = "file") {

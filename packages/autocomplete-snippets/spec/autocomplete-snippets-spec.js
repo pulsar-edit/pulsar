@@ -12,7 +12,6 @@ describe("AutocompleteSnippets", () => {
 
     let autocompleteSnippetsMainModule = null;
     let snippetsMainModule = null;
-    const autocompleteManager = null;
 
     waitsForPromise(() =>
       Promise.all([

@@ -95,7 +95,7 @@ module.exports = {
 
         try {
           path = decodeURI(path);
-        } catch (error) {
+        } catch {
           return;
         }
 

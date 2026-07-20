@@ -14,7 +14,7 @@ const Range = require("../src/range");
 const DisplayLayer = require("../src/display-layer");
 const DefaultHistoryProvider = require("../src/default-history-provider");
 const TextBuffer = require("../src/text-buffer");
-const SampleText = fs.readFileSync(join(__dirname, "fixtures", "sample.js"), "utf8");
+fs.readFileSync(join(__dirname, "fixtures", "sample.js"), "utf8");
 const { buildRandomLines, getRandomBufferRange } = require("./text-buffer-helpers/random");
 const NullLanguageMode = require("../src/null-language-mode");
 
@@ -1086,7 +1086,7 @@ describe("TextBuffer", function () {
 
     describe("selections marker layer's selective snapshotting on createCheckpoint, groupChangesSinceCheckpoint", () =>
       it("skips snapshotting of other marker layers with the same role as the selectionsMarkerLayer", function () {
-        const eventHandler = jasmine.createSpy("eventHandler");
+        jasmine.createSpy("eventHandler");
 
         const args = [];
         spyOn(buffer, "createMarkerSnapshot").and.callFake((arg) => args.push(arg));
@@ -2248,7 +2248,7 @@ three\
 
     it("doesn't serialize the default marker layer", function (done) {
       const bufferA = new TextBuffer({ text: "hello\nworld\r\nhow are you doing?" });
-      const markerLayerA = bufferA.getDefaultMarkerLayer();
+      bufferA.getDefaultMarkerLayer();
       const marker1A = bufferA.markRange(
         [
           [0, 1],
@@ -2258,7 +2258,7 @@ three\
       );
 
       TextBuffer.deserialize(bufferA.serialize()).then(function (bufferB) {
-        const markerLayerB = bufferB.getDefaultMarkerLayer();
+        bufferB.getDefaultMarkerLayer();
         expect(bufferB.getMarker(marker1A.id)).toBeUndefined();
         done();
       });
@@ -2433,7 +2433,7 @@ three\
   });
 
   describe("::onDidChangePath()", function () {
-    let filePath, newPath, bufferToChange, eventHandler;
+    let filePath, newPath, bufferToChange;
 
     beforeEach(function () {
       const tempDir = fs.realpathSync(temp.mkdirSync("text-buffer"));
@@ -2510,7 +2510,7 @@ three\
 
     beforeEach(function (done) {
       const filePath = require.resolve("./fixtures/sample.js");
-      const fileContents = fs.readFileSync(filePath, "utf8");
+      fs.readFileSync(filePath, "utf8");
       TextBuffer.load(filePath).then(function (result) {
         buffer = result;
         changeHandler = jasmine.createSpy("changeHandler");
@@ -2906,14 +2906,12 @@ three\
 
     describe("when range spans multiple lines", () =>
       it("returns characters in range (including newlines)", function () {
-        let lineLength = buffer.lineForRow(2).length;
         let range = [
           [2, 0],
           [3, 0],
         ];
         expect(buffer.getTextInRange(range)).toBe("    if (items.length <= 1) return items;\n");
 
-        lineLength = buffer.lineForRow(2).length;
         range = [
           [2, 10],
           [4, 10],

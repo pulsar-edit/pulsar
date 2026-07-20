@@ -1,12 +1,7 @@
 const assert = require("./keymap-spec-helpers/assert");
-var isKeyup, isModifierKeyup, keystrokesMatch, normalizeKeystrokes;
+var isKeyup, isModifierKeyup, normalizeKeystrokes;
 
-({
-  normalizeKeystrokes,
-  keystrokesMatch,
-  isModifierKeyup,
-  isKeyup,
-} = require("../src/keymap-helpers"));
+({ normalizeKeystrokes, isModifierKeyup, isKeyup } = require("../src/keymap-helpers"));
 
 describe(".normalizeKeystrokes(keystrokes)", function () {
   return it("parses and normalizes the keystrokes", function () {

@@ -23,7 +23,7 @@ describe("FileRecoveryService", function () {
     spies.restore();
     try {
       temp.cleanupSync();
-    } catch (e) {
+    } catch {
       // Ignore
     }
   });

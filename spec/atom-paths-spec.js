@@ -100,7 +100,7 @@ describe("AtomPaths", () => {
       fs.removeSync(electronUserDataPath);
       try {
         temp.cleanupSync();
-      } catch (e) {
+      } catch {
         // Ignore
       }
       app.setPath("userData", defaultElectronUserDataPath);

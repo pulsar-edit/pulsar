@@ -60,8 +60,8 @@ xdescribe("Tree-sitter based Java grammar", function () {
       }
 
       if (end.column < line.length) {
-        for (let num of Array.from(iterator.getCloseScopeIds())) {
-          const item = scopes.pop();
+        for (const _num of Array.from(iterator.getCloseScopeIds())) {
+          scopes.pop();
         }
         scopes.push(...iterator.getOpenScopeIds());
         start = end;
@@ -89,27 +89,6 @@ xdescribe("Tree-sitter based Java grammar", function () {
       row += 1;
     }
     return tokens;
-  };
-
-  const printTokens = function (tokens) {
-    console.log();
-    return (() => {
-      const result = [];
-      for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i];
-        for (let j = 0; j < token.length; j++) {
-          const t = token[j];
-          const scopes = Array.from(t.scopes)
-            .map((scope) => `'${scope}'`)
-            .join(", ");
-          console.log(
-            `expect(tokens[${i}][${j}]).toEqual value: '${t.value}', scopes: [${scopes}]`,
-          );
-        }
-        result.push(console.log());
-      }
-      return result;
-    })();
   };
 
   // Unit tests

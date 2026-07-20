@@ -404,8 +404,6 @@ describe("Provider API", () => {
   });
 
   describe("Provider API v5.0.0", () => {
-    const getSuggestions = () =>
-      autocompleteManager.suggestionList.items.map(({ text }) => ({ text }));
     const triggerAutocompletion = () => {
       atom.commands.dispatch(atom.views.getView(editor), "autocomplete:activate");
       return waitForAutocomplete(editor);

@@ -39,7 +39,7 @@ describe("Workspace", () => {
 
     try {
       temp.cleanupSync();
-    } catch (e) {
+    } catch {
       // Do nothing
     }
   });
@@ -89,7 +89,6 @@ describe("Workspace", () => {
         const pane2 = pane1.splitRight({ copyActiveItem: true });
         const pane3 = pane2.splitRight({ copyActiveItem: true });
         let pane4 = null;
-        let editor;
 
         await atom.workspace.open(null).then((editor) => editor.setText("An untitled editor."));
 
@@ -1382,7 +1381,7 @@ describe("Workspace", () => {
       atom.packages.onDidTriggerActivationHook("sample.js:file-name-opened", packageUsed);
 
       expect(packageUsed).not.toHaveBeenCalled();
-      const editor = await atom.workspace.open("sample.js", {
+      await atom.workspace.open("sample.js", {
         autoIndent: false,
       });
       expect(packageUsed).toHaveBeenCalled();

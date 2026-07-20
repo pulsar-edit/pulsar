@@ -4,7 +4,7 @@ const path = require("path");
 function statSyncNoException(filePath) {
   try {
     return fs.statSync(filePath);
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -12,7 +12,7 @@ function statSyncNoException(filePath) {
 function lstatSyncNoException(filePath) {
   try {
     return fs.lstatSync(filePath);
-  } catch (e) {
+  } catch {
     return false;
   }
 }

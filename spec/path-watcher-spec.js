@@ -2,15 +2,10 @@ const temp = require("temp");
 const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 const { promisify } = require("util");
-const { sep } = path;
 
 const { CompositeDisposable } = require("event-kit");
 const { watchPath } = require("../src/path-watcher");
 const { conditionPromise } = require("./helpers/async-spec-helpers");
-
-function waitsForCondition(label, condition) {
-  return conditionPromise(condition, label);
-}
 
 temp.track();
 
@@ -188,7 +183,7 @@ describe("watchPath", function () {
         const realRootDir = await realpath(rootDir);
         const symlinkedPath = temp.path({ suffix: "-symlinked" });
         await symlink(realRootDir, symlinkedPath);
-        const realSymlinkedPath = await realpath(symlinkedPath);
+        await realpath(symlinkedPath);
 
         let events0 = [];
         let watcher0 = await watchPath(realRootDir, { realPaths: true }, (events) => {

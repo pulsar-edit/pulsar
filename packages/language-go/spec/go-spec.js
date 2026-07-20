@@ -1029,11 +1029,6 @@ import (
       expect(token.scopes).toEqual(["source.go", "variable.other.declaration.go"]);
     };
 
-    const testOp = function (token, op) {
-      expect(token.value).toBe(op);
-      expect(token.scopes).toEqual(["source.go", "keyword.operator.go"]);
-    };
-
     const testOpAddress = function (token, op) {
       expect(token.value).toBe(op);
       expect(token.scopes).toEqual(["source.go", "keyword.operator.address.go"]);

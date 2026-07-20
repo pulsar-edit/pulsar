@@ -1768,7 +1768,7 @@ foo\
       it("expands the snippet when the scope matches", () => {
         atom.commands.dispatch(editor.element, "snippets:some-command-snippet");
         let cursor = editor.getLastCursor();
-        let pos = cursor.getBufferPosition();
+        cursor.getBufferPosition();
         expect(cursor.getBufferPosition()).toEqual([0, 18]);
 
         expect(editor.getText()).toBe("lorem ipsum dolor  sit amet");

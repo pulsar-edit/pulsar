@@ -282,7 +282,7 @@ module.exports = {
           userSnippetsFileDisposable.add(
             userSnippetsFile.onDidRename(() => this.handleUserSnippetsDidChange()),
           );
-        } catch (e) {
+        } catch {
           const message = `\
           Unable to watch path: \`${path.basename(userSnippetsPath)}\`. Make sure you have permissions
           to the \`~/.lumine\` directory and \`${userSnippetsPath}\`.

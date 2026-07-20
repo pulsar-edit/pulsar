@@ -98,7 +98,7 @@ window.runGrammarTests = runGrammarTests;
 async function runFoldsTests(fullPath, commentRegex) {
   const editor = await openDocument(fullPath);
   let grouped = {};
-  const normalized = normalizeTreeSitterTextData(editor, commentRegex).forEach((test) => {
+  normalizeTreeSitterTextData(editor, commentRegex).forEach((test) => {
     const [kind, id] = test.expected.split(".");
     if (!kind || !id) {
       throw new Error(

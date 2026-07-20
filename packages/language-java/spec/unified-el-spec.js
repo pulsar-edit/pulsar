@@ -253,8 +253,7 @@ describe("Unified expression language grammar", function () {
     });
 
     it("parses the null literal", function () {
-      let tokens;
-      return ({ tokens } = grammar.tokenizeLine("null"));
+      grammar.tokenizeLine("null");
     });
 
     it("parses numeric literals", function () {

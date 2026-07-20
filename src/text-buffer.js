@@ -2074,14 +2074,14 @@ class TextBuffer {
             await winattr.set(filePath, { hidden: false });
             await this.buffer.save(filePath, this.getEncoding());
             await winattr.set(filePath, { hidden: true });
-          } catch (_) {
+          } catch {
             throw error;
           }
         } else {
           const fsAdmin = require("fs-admin");
           try {
             await this.buffer.save(fsAdmin.createWriteStream(filePath), this.getEncoding());
-          } catch (_) {
+          } catch {
             throw error;
           }
         }

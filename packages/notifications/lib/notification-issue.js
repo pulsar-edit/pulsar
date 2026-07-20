@@ -6,7 +6,6 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
-let NotificationIssue;
 const fs = require("@lumine-code/fs-plus");
 const path = require("path");
 const StackTraceParser = require("stacktrace-parser");

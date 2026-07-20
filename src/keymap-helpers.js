@@ -467,7 +467,7 @@ var buildKeyboardEvent = function (key, eventType, param) {
   if (param == null) {
     param = {};
   }
-  const { ctrl, shift, alt, cmd, keyCode, target, location } = param;
+  const { ctrl, shift, alt, cmd, target } = param;
   const ctrlKey = ctrl != null ? ctrl : false;
   const altKey = alt != null ? alt : false;
   const shiftKey = shift != null ? shift : false;

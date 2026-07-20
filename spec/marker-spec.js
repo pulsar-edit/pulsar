@@ -1,4 +1,4 @@
-const { difference, times, uniq } = require("@lumine-code/underscore-plus");
+const { difference } = require("@lumine-code/underscore-plus");
 const TextBuffer = require("../src/text-buffer");
 
 describe("Marker", function () {
@@ -780,7 +780,6 @@ describe("Marker", function () {
 
     describe("when a change precedes a marker", () => {
       it("shifts the marker based on the characters inserted or removed by the change", function () {
-        let marker;
         buffer.setTextInRange(
           [
             [0, 1],

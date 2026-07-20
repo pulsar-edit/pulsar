@@ -587,7 +587,7 @@ describe("Clojure grammar", function () {
 
   const testMetaSection = function (metaScope, puncScope, startsWith, endsWith) {
     // Entire expression on one line.
-    let adjustedLength1, adjustedLength2, after, token;
+    let adjustedLength1, adjustedLength2, token;
     let { tokens } = grammar.tokenizeLine(`${startsWith}foo, bar${endsWith}`);
 
     let start = tokens[0],
@@ -621,8 +621,7 @@ describe("Clojure grammar", function () {
 
     ((start = tokens[0][0]),
       (adjustedLength1 = Math.max(tokens[0].length, 2)),
-      (mid = tokens[0].slice(1, adjustedLength1 - 1)),
-      (after = tokens[0][adjustedLength1 - 1]));
+      (mid = tokens[0].slice(1, adjustedLength1 - 1)));
 
     expect(start).toEqual({
       value: startsWith,

@@ -1,22 +1,12 @@
-const fs = require("fs");
 const Grim = require("grim");
 const path = require("path");
 const dedent = require("dedent");
 const TextBuffer = require("../src/text-buffer");
 const { Point, Range } = TextBuffer;
 const CSON = require("@lumine-code/season");
-const TextEditor = require("../src/text-editor");
 const ScopeResolver = require("../src/scope-resolver.js");
 const WASMTreeSitterGrammar = require("../src/wasm-tree-sitter-grammar");
 const WASMTreeSitterLanguageMode = require("../src/wasm-tree-sitter-language-mode");
-const Random = require("random-seed");
-const { getRandomBufferRange, buildRandomLines } = require("./helpers/random");
-
-function wait(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 
 let PATH = path.resolve(path.join(__dirname, "..", "packages"));
 function resolve(modulePath) {
@@ -274,7 +264,7 @@ describe("ScopeResolver", () => {
     let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
 
     for (let capture of captures) {
-      let { node, name } = capture;
+      let { name } = capture;
       let result = scopeResolver.store(capture);
       if (name === "_IGNORE_") {
         expect(!!result).toBe(false);
@@ -307,7 +297,7 @@ describe("ScopeResolver", () => {
     let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
 
     for (let capture of captures) {
-      let { node, name } = capture;
+      let { name } = capture;
       let result = scopeResolver.store(capture);
       if (name.startsWith("_IGNORE_")) {
         expect(!!result).toBe(false);
@@ -532,7 +522,7 @@ describe("ScopeResolver", () => {
       let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
 
       for (let capture of captures) {
-        let { node, name } = capture;
+        let { name } = capture;
         let result = scopeResolver.store(capture);
         if (name === "string0") {
           expect(!!result).toBe(true);
@@ -571,7 +561,7 @@ describe("ScopeResolver", () => {
       let { scopeResolver, captures } = await getAllCaptures(grammar, languageMode);
 
       for (let capture of captures) {
-        let { node, name } = capture;
+        let { name } = capture;
         let result = scopeResolver.store(capture);
         if (name === "string0") {
           expect(!!result).toBe(true);
@@ -609,7 +599,7 @@ describe("ScopeResolver", () => {
 
       let first = true;
       for (let capture of captures) {
-        let { node, name } = capture;
+        let { name } = capture;
         let result = scopeResolver.store(capture);
         // First string.other should fail; second should succeed.
         if (name === "string.other") {
@@ -644,7 +634,7 @@ describe("ScopeResolver", () => {
 
       let first = true;
       for (let capture of captures) {
-        let { node, name } = capture;
+        let { name } = capture;
         let result = scopeResolver.store(capture);
         // First string.other should fail; second should succeed.
         if (name === "string.other") {

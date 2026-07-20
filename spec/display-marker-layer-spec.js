@@ -1,6 +1,4 @@
 const TextBuffer = require("../src/text-buffer");
-const Point = require("../src/point");
-const Range = require("../src/range");
 const SampleText = require("./text-buffer-helpers/sample-text");
 
 describe("DisplayMarkerLayer", function () {
@@ -382,8 +380,8 @@ describe("DisplayMarkerLayer", function () {
     const displayLayer1 = buffer.addDisplayLayer({ tabLength: 2 });
     const displayLayer2 = buffer.addDisplayLayer({ tabLength: 4 });
     const bufferMarkerLayer = buffer.addMarkerLayer();
-    const displayMarkerLayer1 = displayLayer1.getMarkerLayer(bufferMarkerLayer.id);
-    const displayMarkerLayer2 = displayLayer2.getMarkerLayer(bufferMarkerLayer.id);
+    displayLayer1.getMarkerLayer(bufferMarkerLayer.id);
+    displayLayer2.getMarkerLayer(bufferMarkerLayer.id);
 
     const bufferMarker = bufferMarkerLayer.markRange([
       [0, 1],
@@ -569,7 +567,7 @@ describe("DisplayMarkerLayer", function () {
         ],
         { class: "a" },
       );
-      const marker2 = markerLayer.markBufferRange(
+      markerLayer.markBufferRange(
         [
           [8, 0],
           [8, 0],
@@ -628,7 +626,7 @@ describe("DisplayMarkerLayer", function () {
     });
 
     it("allows containedInScreenRange to be specified", function () {
-      const marker1 = markerLayer.markBufferRange(
+      markerLayer.markBufferRange(
         [
           [5, 0],
           [5, 0],
@@ -665,7 +663,7 @@ describe("DisplayMarkerLayer", function () {
         ],
         { class: "a" },
       );
-      const marker2 = markerLayer.markBufferRange(
+      markerLayer.markBufferRange(
         [
           [8, 0],
           [8, 0],
@@ -688,7 +686,7 @@ describe("DisplayMarkerLayer", function () {
     });
 
     it("allows intersectsScreenRange to be specified", function () {
-      const marker1 = markerLayer.markBufferRange(
+      markerLayer.markBufferRange(
         [
           [5, 0],
           [5, 0],
@@ -718,7 +716,7 @@ describe("DisplayMarkerLayer", function () {
     });
 
     it("allows containsBufferPosition to be specified", function () {
-      const marker1 = markerLayer.markBufferRange(
+      markerLayer.markBufferRange(
         [
           [5, 0],
           [5, 0],
@@ -742,7 +740,7 @@ describe("DisplayMarkerLayer", function () {
     });
 
     it("allows containsScreenPosition to be specified", function () {
-      const marker1 = markerLayer.markBufferRange(
+      markerLayer.markBufferRange(
         [
           [5, 0],
           [5, 0],
@@ -766,7 +764,7 @@ describe("DisplayMarkerLayer", function () {
     });
 
     it("allows containsBufferRange to be specified", function () {
-      const marker1 = markerLayer.markBufferRange(
+      markerLayer.markBufferRange(
         [
           [5, 0],
           [5, 10],
@@ -796,7 +794,7 @@ describe("DisplayMarkerLayer", function () {
     });
 
     it("allows containsScreenRange to be specified", function () {
-      const marker1 = markerLayer.markBufferRange(
+      markerLayer.markBufferRange(
         [
           [5, 0],
           [5, 10],

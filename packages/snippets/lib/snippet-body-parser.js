@@ -4,7 +4,7 @@ try {
   // pegjs lib/snippet-body.pegjs` to compile the parser. That way end users
   // won't have to pay the cost of runtime evaluation.
   parser = require("./snippet-body");
-} catch (error) {
+} catch {
   // When you're iterating on the parser, rename or delete `snippet-body.js` so
   // you can make changes to the .pegjs file and have them reflected after a
   // window reload.

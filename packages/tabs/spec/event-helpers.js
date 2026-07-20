@@ -47,11 +47,7 @@ const buildMouseEvent = (type, target, param) => {
   return event;
 };
 
-module.exports.triggerMouseEvent = function (type, target, param) {
-  if (param == null) {
-    param = {};
-  }
-  const { which, ctrlKey } = param;
+module.exports.triggerMouseEvent = function (type, target, _param) {
   const event = buildMouseEvent(...arguments);
   target.dispatchEvent(event);
   return event;

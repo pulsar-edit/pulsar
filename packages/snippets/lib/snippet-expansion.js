@@ -179,7 +179,7 @@ module.exports = class SnippetExpansion {
     const inputText = this.editor.getTextInBufferRange(primaryRange);
 
     this.ignoringBufferChanges(() => {
-      for (const [index, insertion] of insertions.entries()) {
+      for (const [, insertion] of insertions.entries()) {
         // Don't transform mirrored tab stops. They have their own cursors, so
         // mirroring happens automatically.
         if (!insertion.isTransformation()) {

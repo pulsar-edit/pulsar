@@ -1,5 +1,5 @@
 describe("Status Bar package", function () {
-  let [editor, statusBar, statusBarService, workspaceElement, mainModule] = [];
+  let [, statusBar, statusBarService, workspaceElement, mainModule] = [];
 
   beforeEach(function () {
     workspaceElement = atom.views.getView(atom.workspace);

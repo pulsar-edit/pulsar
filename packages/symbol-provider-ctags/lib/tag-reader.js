@@ -94,7 +94,7 @@ module.exports = {
         try {
           tags = await findTagsWithPromise(tagsFile, symbol);
           if (!tags) tags = [];
-        } catch (err) {
+        } catch {
           continue;
         }
         if (tags.length === 0) continue;

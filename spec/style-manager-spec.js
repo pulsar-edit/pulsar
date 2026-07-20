@@ -27,7 +27,7 @@ describe("StyleManager", () => {
   afterEach(() => {
     try {
       temp.cleanupSync();
-    } catch (e) {
+    } catch {
       // Do nothing
     }
   });

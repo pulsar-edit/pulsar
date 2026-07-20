@@ -40,7 +40,7 @@ class CSSParser {
   }
 
   parse() {
-    let cur = this.cur();
+    this.cur();
 
     if (this.index === this.value.length || this.index > this.value.length) {
       // We have hit the end of our index. Lets return

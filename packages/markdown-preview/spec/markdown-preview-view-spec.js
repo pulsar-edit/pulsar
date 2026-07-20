@@ -7,7 +7,6 @@
 const path = require("path");
 const fs = require("@lumine-code/fs-plus");
 const temp = require("temp").track();
-const url = require("url");
 const { TextEditor } = require("atom");
 const MarkdownPreviewView = require("../lib/markdown-preview-view");
 const renderer = require("../lib/renderer");

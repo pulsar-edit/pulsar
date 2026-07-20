@@ -3031,7 +3031,7 @@ describe("DisplayLayer", () => {
     it("returns an array containing the buffer rows for the given screen row range", () => {
       const buffer = new TextBuffer({ text: "abcde\nfghij\nklmno\npqrst\nuvwxyz" });
       const displayLayer = buffer.addDisplayLayer({ softWrapColumn: 4 });
-      const fold1 = displayLayer.foldBufferRange([
+      displayLayer.foldBufferRange([
         [0, 1],
         [1, 1],
       ]);
@@ -3039,7 +3039,7 @@ describe("DisplayLayer", () => {
         [2, 2],
         [3, 2],
       ]);
-      const fold3 = displayLayer.foldBufferRange([
+      displayLayer.foldBufferRange([
         [3, 3],
         [3, 4],
       ]);
@@ -3557,26 +3557,6 @@ function updateTokenLines(tokenLines, displayLayer, changes) {
     const newTokenLines = getTokens(displayLayer, newRange.start.row, newRange.end.row);
     tokenLines.splice(newRange.start.row, oldRange.end.row - oldRange.start.row, ...newTokenLines);
   }
-}
-
-function logTokens(displayLayer) {
-  let s = "expectTokenBoundaries(displayLayer, [\n";
-
-  for (const tokens of getTokenBoundaries(displayLayer)) {
-    for (const { text, closeTags, openTags } of tokens) {
-      s +=
-        "  {text: '" +
-        text +
-        "', close: " +
-        JSON.stringify(closeTags) +
-        ", open: " +
-        JSON.stringify(openTags) +
-        "},\n";
-    }
-  }
-
-  s += "])";
-  console.log(s);
 }
 
 function hasComputedAllScreenRows(displayLayer) {

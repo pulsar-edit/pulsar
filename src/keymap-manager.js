@@ -24,7 +24,6 @@ const {
   keydownEvent,
   keyupEvent,
   characterForKeyboardEvent,
-  keystrokesMatch,
   isKeyup,
 } = require("./keymap-helpers");
 const PartialKeyupMatcher = require("./partial-keyup-matcher");

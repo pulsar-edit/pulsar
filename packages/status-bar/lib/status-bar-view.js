@@ -1,4 +1,3 @@
-const { Disposable } = require("atom");
 const Tile = require("./tile");
 
 module.exports = class StatusBarView {

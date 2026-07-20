@@ -1,7 +1,5 @@
 const {
   it,
-  fit,
-  ffit,
   beforeEach,
   afterEach,
   conditionPromise,

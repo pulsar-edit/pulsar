@@ -62,9 +62,9 @@ window.advanceClock = function (delta) {
   const callbacks = [];
 
   timeouts = timeouts.filter(function (...args) {
-    let id, strikeTime;
+    let strikeTime;
     let callback;
-    [id, strikeTime, callback] = Array.from(args[0]);
+    [, strikeTime, callback] = Array.from(args[0]);
     if (strikeTime <= now) {
       callbacks.push(callback);
       return false;

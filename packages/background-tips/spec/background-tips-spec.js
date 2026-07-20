@@ -1,4 +1,4 @@
-const { it, fit, ffit, afterEach, beforeEach } = require("./async-spec-helpers");
+const { it, beforeEach } = require("./async-spec-helpers");
 
 describe("BackgroundTips", () => {
   let workspaceElement;

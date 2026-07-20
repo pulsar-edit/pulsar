@@ -122,7 +122,7 @@ module.exports = class LessCache {
               importedFiles.push(filePath);
             }
           }
-        } catch (error) {
+        } catch {
           continue;
         }
       }
@@ -248,12 +248,11 @@ module.exports = class LessCache {
   }
 
   getCachedCss(filePath, digest) {
-    let cacheEntry, error, fallbackDirUsed;
+    let cacheEntry, fallbackDirUsed;
     let path;
     try {
       cacheEntry = this.readJson(this.getCachePath(this.importsCacheDir, filePath));
-    } catch (error1) {
-      error = error1;
+    } catch {
       if (this.importsFallbackDir != null) {
         try {
           cacheEntry = this.readJson(this.getCachePath(this.importsFallbackDir, filePath));
@@ -273,8 +272,7 @@ module.exports = class LessCache {
         if (this.digestForPath(path) !== digest) {
           return;
         }
-      } catch (error2) {
-        error = error2;
+      } catch {
         return;
       }
     }

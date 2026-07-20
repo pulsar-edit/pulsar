@@ -70,8 +70,7 @@ module.exports = class TagFinder {
     this.editor.backwardsScanInBufferRange(pattern, scanRange, ({ match, range, stop }) => {
       if (this.isRangeCommented(range)) return;
 
-      const [entireMatch, isStartTag, tagName, attributes, suffix, isSelfClosingTag, isEndTag] =
-        match;
+      const [, isStartTag, tagName, , , isSelfClosingTag] = match;
 
       if (isSelfClosingTag) return;
 
@@ -104,8 +103,7 @@ module.exports = class TagFinder {
     this.editor.scanInBufferRange(pattern, scanRange, ({ match, range, stop }) => {
       if (this.isRangeCommented(range)) return;
 
-      const [entireMatch, isStartTag, tagName, attributes, suffix, isSelfClosingTag, isEndTag] =
-        match;
+      const [, isStartTag, , , , isSelfClosingTag] = match;
 
       if (isSelfClosingTag) return;
 
@@ -138,8 +136,7 @@ module.exports = class TagFinder {
       ({ match, range, stop }) => {
         stop();
 
-        const [entireMatch, prefix, isClosingTag, tagName, attributes, suffix, isSelfClosingTag] =
-          Array.from(match);
+        const [, prefix, isClosingTag, tagName, , , isSelfClosingTag] = Array.from(match);
 
         let startRange = range;
         if (!fullRange) {

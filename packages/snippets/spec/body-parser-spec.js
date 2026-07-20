@@ -41,7 +41,7 @@ describe("Snippet Body Parser", () => {
     });
 
     it("parses simple transformations like /upcase", () => {
-      const bodyTree = BodyParser.parse("lorem ipsum ${CLIPBOARD:/upcase} dolor sit amet");
+      BodyParser.parse("lorem ipsum ${CLIPBOARD:/upcase} dolor sit amet");
       expectMatch("lorem ipsum ${CLIPBOARD:/upcase} dolor sit amet", [
         "lorem ipsum ",
         {

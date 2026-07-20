@@ -37,7 +37,7 @@ export default class PackageReadmeView {
 
     try {
       this.packageReadme.innerHTML = atom.ui.markdown.render(readme, markdownOpts);
-    } catch (err) {
+    } catch {
       this.packageReadme.innerHTML = "<h3>Error parsing README</h3>";
     }
 
@@ -49,7 +49,7 @@ export default class PackageReadmeView {
       let id = anchor.getAttribute("href").slice(1);
       try {
         id = decodeURIComponent(id);
-      } catch (error) {
+      } catch {
         // Fall back to the raw fragment.
       }
       if (!id) return;

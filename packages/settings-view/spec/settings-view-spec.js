@@ -1,7 +1,6 @@
 const path = require("path");
 const main = require("../lib/main");
 const PackageManager = require("../lib/package-manager");
-const SettingsView = require("../lib/settings-view");
 const SnippetsProvider = {
   getSnippets() {
     return {};

@@ -18,15 +18,7 @@ const TaggedProvider = require("./fixtures/providers/tagged-provider.js");
 const CacheClearingProvider = require("./fixtures/providers/cache-clearing-provider.js");
 const CompetingExclusiveProvider = require("./fixtures/providers/competing-exclusive-provider.js");
 
-const {
-  it,
-  fit,
-  ffit,
-  fffit,
-  beforeEach,
-  afterEach,
-  conditionPromise,
-} = require("./async-spec-helpers");
+const { it, beforeEach, afterEach, conditionPromise } = require("./async-spec-helpers");
 
 async function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

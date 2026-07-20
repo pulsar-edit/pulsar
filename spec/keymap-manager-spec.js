@@ -4,7 +4,6 @@ var $$,
   appendContent,
   buildKeydownEvent,
   buildKeyupEvent,
-  debounce,
   fs,
   getFakeClock,
   mockProcessPlatform,
@@ -16,19 +15,6 @@ var $$,
   temp;
 
 ({ $$ } = require("space-pencil"));
-
-// Trailing-edge debounce (matches the `debounce` package's default behavior).
-debounce = function (fn, wait) {
-  var timeout;
-  return function () {
-    var context = this,
-      args = arguments;
-    clearTimeout(timeout);
-    timeout = setTimeout(function () {
-      fn.apply(context, args);
-    }, wait);
-  };
-};
 
 fs = require("@lumine-code/fs-plus");
 
@@ -1545,8 +1531,8 @@ describe("KeymapManager", function () {
       return assert.isTrue(event.defaultPrevented);
     });
     return it("returns a disposable allowing the added bindings to be removed", function () {
-      var disposable1, disposable2;
-      disposable1 = keymapManager.add("foo", {
+      var disposable2;
+      keymapManager.add("foo", {
         ".a": {
           "ctrl-a": "x",
         },
@@ -2679,13 +2665,7 @@ describe("KeymapManager", function () {
     });
     return describe("when custom keystroke resolvers are installed", function () {
       return it("resolves to the keystroke string of the most recently-installed resolver returning a defined value", function () {
-        var currentKeymap,
-          currentLayoutName,
-          disposable1,
-          disposable2,
-          disposable3,
-          expectedKeystroke,
-          keydownEvent;
+        var currentKeymap, currentLayoutName, disposable2, expectedKeystroke, keydownEvent;
         mockProcessPlatform("darwin");
         currentKeymap = require("./keymap-spec-helpers/keymaps/mac-swiss-german");
         currentLayoutName = "com.apple.keylayout.SwissGerman";
@@ -2701,12 +2681,7 @@ describe("KeymapManager", function () {
           ctrlKey: true,
           altKey: true,
         });
-        disposable1 = keymapManager.addKeystrokeResolver(function ({
-          keystroke,
-          event,
-          layoutName,
-          keymap,
-        }) {
+        keymapManager.addKeystrokeResolver(function ({ keystroke, event, layoutName, keymap }) {
           assert.equal(keystroke, "ctrl-alt-g");
           assert.equal(event, keydownEvent);
           assert.equal(layoutName, currentLayoutName);
@@ -2722,7 +2697,7 @@ describe("KeymapManager", function () {
           return "alt-ctrl-X";
         });
         expectedKeystroke = "ctrl-alt-shift-X";
-        disposable3 = keymapManager.addKeystrokeResolver(function ({ keystroke }) {
+        keymapManager.addKeystrokeResolver(function ({ keystroke }) {
           assert.equal(keystroke, expectedKeystroke);
           return null;
         });

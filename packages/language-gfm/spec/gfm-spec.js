@@ -1903,7 +1903,7 @@ front: matter
   });
 
   it("tokenizes tables", function () {
-    let emptyLineTokens, headingTokens;
+    let headingTokens;
     let [headerTokens, alignTokens, contentTokens] = Array.from(
       grammar.tokenizeLines(`\
 | Column 1  | Column 2  |
@@ -1978,7 +1978,7 @@ front: matter
       scopes: ["source.gfm", "table.gfm", "border.pipe.outer"],
     });
 
-    [headerTokens, emptyLineTokens, headingTokens] = Array.from(
+    [headerTokens, , headingTokens] = Array.from(
       grammar.tokenizeLines(`\
 | Column 1  | Column 2\t
 

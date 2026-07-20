@@ -714,7 +714,6 @@ module.exports = class SuggestionListElement {
     if (!text?.length || !replacementPrefix?.length) {
       return;
     }
-    const matches = {};
     return (
       atom.ui.fuzzyMatcher.match(text, replacementPrefix, { recordMatchIndexes: true })
         ?.matchIndexes || []

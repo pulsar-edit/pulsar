@@ -6,7 +6,6 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 const os = require("os");
-const fs = require("fs");
 const path = require("path");
 const semver = require("semver");
 const { BufferedProcess } = require("atom");

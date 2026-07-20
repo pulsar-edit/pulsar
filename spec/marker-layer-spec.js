@@ -203,14 +203,14 @@ describe("MarkerLayer", function () {
           [0, 2],
           [0, 3],
         ]);
-        const marker3 = layer3.markRange(
+        layer3.markRange(
           [
             [0, 0],
             [0, 3],
           ],
           { invalidate: "never" },
         );
-        const marker4 = layer3.markRange(
+        layer3.markRange(
           [
             [1, 0],
             [1, 3],

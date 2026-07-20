@@ -40,7 +40,6 @@ describe("JSON grammar", () => {
   it("identifies trailing commas in arrays", () => {
     const baseScopes = ["source.json", "meta.structure.array.json"];
     const numericScopes = [...baseScopes, "constant.numeric.json"];
-    const separatorScopes = [...baseScopes, "punctuation.separator.array.json"];
 
     const { tokens } = grammar.tokenizeLine("[1, ]");
     expect(tokens[0]).toEqual({

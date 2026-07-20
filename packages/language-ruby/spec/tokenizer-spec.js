@@ -1,6 +1,4 @@
-const dedent = require("dedent");
 const path = require("path");
-const { Point } = require("atom");
 
 describe("Ruby grammars", () => {
   beforeEach(async () => {

@@ -457,7 +457,7 @@ class MarkerLayer {
       let range = Range.fromObject(markerState.range);
       // `markerState` is frozen, so instead of deleting its `range` we'll
       // create a new object and copy all properties _except_ `range`.
-      let { range: oldRange, ...params } = markerState;
+      let { ...params } = markerState;
       this.addMarker(id, range, { ...params });
     }
   }

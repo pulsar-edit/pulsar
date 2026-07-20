@@ -143,11 +143,10 @@
         return expect(notification.querySelector(".detail").textContent).toContain("cats,ok");
       });
       it("does not add the has-stack class if a stack is provided without any detail", function () {
-        var notification, notificationElement;
+        var notificationElement;
         atom.notifications.addInfo("A message", {
           stack: "Some stack",
         });
-        notification = notificationContainer.childNodes[0];
         notificationElement = notificationContainer.querySelector("atom-notification.info");
         return expect(notificationElement).not.toHaveClass("has-stack");
       });
@@ -179,8 +178,8 @@
             return atom.workspace.open();
           });
           return runs(function () {
-            var notification, notificationElement;
-            notification = atom.notifications.addSuccess("A message", {
+            var notificationElement;
+            atom.notifications.addSuccess("A message", {
               dismissable: true,
             });
             notificationElement = notificationContainer.querySelector("atom-notification.success");
@@ -194,8 +193,8 @@
           });
         });
         it("is removed when core:cancel is triggered", function () {
-          var notification, notificationElement;
-          notification = atom.notifications.addSuccess("A message", {
+          var notificationElement;
+          atom.notifications.addSuccess("A message", {
             dismissable: true,
           });
           notificationElement = notificationContainer.querySelector("atom-notification.success");
@@ -212,14 +211,13 @@
             return atom.workspace.open();
           });
           return runs(function () {
-            var notification1, notification2, notificationElement1, notificationElement2;
+            var notification1, notificationElement2;
             notification1 = atom.notifications.addSuccess("First message", {
               dismissable: true,
             });
-            notification2 = atom.notifications.addError("Second message", {
+            atom.notifications.addError("Second message", {
               dismissable: true,
             });
-            notificationElement1 = notificationContainer.querySelector("atom-notification.success");
             notificationElement2 = notificationContainer.querySelector("atom-notification.error");
             expect(notificationContainer.childNodes.length).toBe(2);
             notificationElement2.focus();
