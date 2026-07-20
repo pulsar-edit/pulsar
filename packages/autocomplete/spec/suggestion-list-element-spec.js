@@ -97,7 +97,7 @@ describe("Suggestion List Element", () => {
   describe("getDisplayHTML", () => {
     it("uses displayText over text or snippet", () => {
       let text = "abcd()";
-      let snippet;
+      let snippet = undefined;
       let displayText = "acd";
       let replacementPrefix = "a";
       let html = suggestionListElement.getDisplayFragment(
@@ -111,14 +111,14 @@ describe("Suggestion List Element", () => {
 
     it("handles the empty string in the text field", () => {
       let text = "";
-      let snippet;
+      let snippet = undefined;
       let replacementPrefix = "a";
       let html = suggestionListElement.getDisplayFragment(text, snippet, null, replacementPrefix);
       expect(fragmentToHtml(html)).toBe("");
     });
 
     it("handles the empty string in the snippet field", () => {
-      let text;
+      let text = undefined;
       let snippet = "";
       let replacementPrefix = "a";
       let html = suggestionListElement.getDisplayFragment(text, snippet, null, replacementPrefix);
@@ -126,7 +126,7 @@ describe("Suggestion List Element", () => {
     });
 
     it("handles an empty prefix", () => {
-      let text;
+      let text = undefined;
       let snippet = "abc";
       let replacementPrefix = "";
       let html = suggestionListElement.getDisplayFragment(text, snippet, null, replacementPrefix);
@@ -151,7 +151,7 @@ describe("Suggestion List Element", () => {
 
     it("outputs correct html when the text field is used", () => {
       let text = "abc(d, e)f";
-      let snippet;
+      let snippet = undefined;
       let replacementPrefix = "a";
       let html = suggestionListElement.getDisplayFragment(text, snippet, null, replacementPrefix);
       expect(fragmentToHtml(html)).toBe('<span class="character-match">a</span>bc(d, e)f');

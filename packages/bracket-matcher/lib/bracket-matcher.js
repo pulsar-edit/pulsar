@@ -286,11 +286,11 @@ module.exports = class BracketMatcher {
   }
 
   isOpeningBracket(string) {
-    return this.matchManager.pairedCharacters.hasOwnProperty(string);
+    return Object.hasOwn(this.matchManager.pairedCharacters, string);
   }
 
   isClosingBracket(string) {
-    return this.matchManager.pairedCharactersInverse.hasOwnProperty(string);
+    return Object.hasOwn(this.matchManager.pairedCharactersInverse, string);
   }
 
   selectionIsWrappedByMatchingBrackets(selection) {

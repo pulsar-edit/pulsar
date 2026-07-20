@@ -728,7 +728,7 @@ function optionToRadio(option, keyPath) {
   label.classList.add("input-label");
   let value;
   let description = "";
-  if (option.hasOwnProperty("value")) {
+  if (Object.hasOwn(option, "value")) {
     value = option.value;
     description = option.description;
   } else {
@@ -747,7 +747,7 @@ function optionToRadio(option, keyPath) {
 
 function optionToSelect(option, keyPath) {
   const optionElement = document.createElement("option");
-  if (option.hasOwnProperty("value")) {
+  if (Object.hasOwn(option, "value")) {
     optionElement.value = option.value;
     optionElement.textContent = option.description;
   } else {

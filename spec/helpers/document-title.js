@@ -6,6 +6,6 @@ Object.defineProperty(document, "title", {
     return documentTitle;
   },
   set(title) {
-    return (documentTitle = title);
+    documentTitle = title;
   },
 });

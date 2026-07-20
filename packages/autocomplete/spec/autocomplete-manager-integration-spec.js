@@ -8,7 +8,6 @@ const {
   waitForDeferredSuggestions,
   buildIMECompositionEvent,
 } = require("./spec-helper");
-// eslint-disable-next-line node/no-unpublished-require
 let temp = require("temp").track();
 const path = require("path");
 

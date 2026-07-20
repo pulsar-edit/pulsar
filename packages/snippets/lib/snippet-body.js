@@ -66,37 +66,45 @@ peg$SyntaxError.buildMessage = function (expected, found) {
   }
 
   function literalEscape(s) {
-    return s
-      .replace(/\\/g, "\\\\")
-      .replace(/"/g, '\\"')
-      .replace(/\0/g, "\\0")
-      .replace(/\t/g, "\\t")
-      .replace(/\n/g, "\\n")
-      .replace(/\r/g, "\\r")
-      .replace(/[\x00-\x0F]/g, function (ch) {
-        return "\\x0" + hex(ch);
-      })
-      .replace(/[\x10-\x1F\x7F-\x9F]/g, function (ch) {
-        return "\\x" + hex(ch);
-      });
+    return (
+      s
+        .replace(/\\/g, "\\\\")
+        .replace(/"/g, '\\"')
+        .replace(/\0/g, "\\0")
+        .replace(/\t/g, "\\t")
+        .replace(/\n/g, "\\n")
+        .replace(/\r/g, "\\r")
+        // eslint-disable-next-line no-control-regex -- matches literal control characters on purpose
+        .replace(/[\x00-\x0F]/g, function (ch) {
+          return "\\x0" + hex(ch);
+        })
+        // eslint-disable-next-line no-control-regex -- matches literal control characters on purpose
+        .replace(/[\x10-\x1F\x7F-\x9F]/g, function (ch) {
+          return "\\x" + hex(ch);
+        })
+    );
   }
 
   function classEscape(s) {
-    return s
-      .replace(/\\/g, "\\\\")
-      .replace(/\]/g, "\\]")
-      .replace(/\^/g, "\\^")
-      .replace(/-/g, "\\-")
-      .replace(/\0/g, "\\0")
-      .replace(/\t/g, "\\t")
-      .replace(/\n/g, "\\n")
-      .replace(/\r/g, "\\r")
-      .replace(/[\x00-\x0F]/g, function (ch) {
-        return "\\x0" + hex(ch);
-      })
-      .replace(/[\x10-\x1F\x7F-\x9F]/g, function (ch) {
-        return "\\x" + hex(ch);
-      });
+    return (
+      s
+        .replace(/\\/g, "\\\\")
+        .replace(/\]/g, "\\]")
+        .replace(/\^/g, "\\^")
+        .replace(/-/g, "\\-")
+        .replace(/\0/g, "\\0")
+        .replace(/\t/g, "\\t")
+        .replace(/\n/g, "\\n")
+        .replace(/\r/g, "\\r")
+        // eslint-disable-next-line no-control-regex -- matches literal control characters on purpose
+        .replace(/[\x00-\x0F]/g, function (ch) {
+          return "\\x0" + hex(ch);
+        })
+        // eslint-disable-next-line no-control-regex -- matches literal control characters on purpose
+        .replace(/[\x10-\x1F\x7F-\x9F]/g, function (ch) {
+          return "\\x" + hex(ch);
+        })
+    );
   }
 
   function describeExpectation(expectation) {

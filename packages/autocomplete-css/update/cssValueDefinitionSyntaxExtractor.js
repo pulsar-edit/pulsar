@@ -108,7 +108,7 @@ class CSSParser {
   isKeyword() {
     for (const name in this.keywords) {
       if (
-        this.keywords.hasOwnProperty(name) &&
+        Object.hasOwn(this.keywords, name) &&
         this.value.substr(this.index, name.length) === name
       ) {
         return { status: true, who: name };
@@ -120,7 +120,7 @@ class CSSParser {
   isSeparators() {
     for (const name in this.separators) {
       if (
-        this.separators.hasOwnProperty(name) &&
+        Object.hasOwn(this.separators, name) &&
         this.value.substr(this.index, name.length) === name
       ) {
         return { status: true, who: name };

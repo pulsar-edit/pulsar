@@ -163,7 +163,7 @@ module.exports = class Whitespace {
     });
 
     const keepMarkdownLineBreakWhitespace =
-      grammarScopeName === ("source.gfm" || "text.md") &&
+      (grammarScopeName === "source.gfm" || grammarScopeName === "text.md") &&
       atom.config.get("whitespace.keepMarkdownLineBreakWhitespace");
 
     buffer.transact(() => {

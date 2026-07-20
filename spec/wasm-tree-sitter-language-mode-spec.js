@@ -1824,7 +1824,9 @@ describe("WASMTreeSitterLanguageMode", () => {
 
         // Revert the edits, because Tree-sitter's error recovery is somewhat path-dependent,
         // and we want a state where the tree parse result is guaranteed.
-        while (buffer.undo()) {}
+        while (buffer.undo()) {
+          /* revert every edit */
+        }
 
         // Create a fresh buffer and editor with the same text.
         const buffer2 = new TextBuffer(buffer.getText());

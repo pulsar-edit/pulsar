@@ -9,7 +9,9 @@ module.exports = class ImageEditor {
     let fileStats;
     try {
       fileStats = fs.statSync(filePath);
-    } catch (e) {}
+    } catch {
+      /* not statable */
+    }
     if (fileStats?.isFile()) {
       return new ImageEditor(filePath);
     } else {
@@ -54,7 +56,7 @@ module.exports = class ImageEditor {
         console.warn(
           `Could not create ImageEditorView. This can be intentional in the event of an image file being deleted by an external program.`,
         );
-        return;
+        return undefined;
       }
     }
     return this.editorView;

@@ -209,7 +209,9 @@ export default class SettingsView {
         path.join(atom.getLoadSettings().resourcePath, "package.json"),
       );
       bundledPackageMetadataCache = packageMetadata ? packageMetadata._atomPackages : null;
-    } catch (error) {}
+    } catch {
+      /* no bundled package metadata */
+    }
 
     // Include disabled packages so they can be re-enabled from the UI
     const disabledPackages = atom.config.get("core.disabledPackages") || [];

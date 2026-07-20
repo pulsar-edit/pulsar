@@ -102,7 +102,6 @@ module.exports = {
   jruby: "source.ruby",
   macruby: "source.ruby",
   rake: "source.ruby",
-  rb: "source.ruby",
   rbx: "source.ruby",
   text: "text.plain",
   toml: "source.toml",

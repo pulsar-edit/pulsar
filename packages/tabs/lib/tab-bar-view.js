@@ -452,7 +452,7 @@ class TabBarView {
 
   uriHasProtocol(uri) {
     try {
-      return require("url").parse(uri).protocol != null;
+      return new URL(uri).protocol != null;
     } catch (error) {
       return false;
     }

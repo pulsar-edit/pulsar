@@ -69,7 +69,7 @@ module.exports = {
 
     let scopesByFenceName = getLanguageIds();
 
-    return scopesByFenceName.hasOwnProperty(fenceName)
+    return Object.hasOwn(scopesByFenceName, fenceName)
       ? scopesByFenceName[fenceName]
       : `source.${fenceName}`;
   },

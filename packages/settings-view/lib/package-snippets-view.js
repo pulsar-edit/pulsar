@@ -129,7 +129,7 @@ export default class PackageSnippetsView {
         snippetsModule.onDidLoadSnippets(() => callback(this.getSnippetProperties()));
       }
     } else {
-      callback([]); // eslint-disable-line standard/no-callback-literal
+      callback([]);
     }
   }
 

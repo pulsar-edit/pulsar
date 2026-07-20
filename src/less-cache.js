@@ -71,7 +71,9 @@ module.exports = class LessCache {
       ({ importedFiles: this.importedFiles } = this.readJson(
         join(this.importsCacheDir, "imports.json"),
       ));
-    } catch (error) {}
+    } catch {
+      /* no imports cache yet */
+    }
 
     this.setImportPaths(this.importPaths);
 
@@ -146,7 +148,9 @@ module.exports = class LessCache {
         if ((error != null ? error.code : undefined) === "ENOENT") {
           try {
             fs.rmSync(this.importsCacheDir, { recursive: true, force: true }); // Retry once
-          } catch (error1) {}
+          } catch {
+            /* ignore */
+          }
         }
       }
     }
@@ -254,7 +258,9 @@ module.exports = class LessCache {
         try {
           cacheEntry = this.readJson(this.getCachePath(this.importsFallbackDir, filePath));
           fallbackDirUsed = true;
-        } catch (error3) {}
+        } catch {
+          /* fall through to uncached path */
+        }
       }
     }
 

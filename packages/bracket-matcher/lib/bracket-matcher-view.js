@@ -155,8 +155,8 @@ module.exports = class BracketMatcherView {
 
       // check if the character to the left is part of a pair
       if (
-        this.matchManager.pairedCharacters.hasOwnProperty(text) ||
-        this.matchManager.pairedCharactersInverse.hasOwnProperty(text)
+        Object.hasOwn(this.matchManager.pairedCharacters, text) ||
+        Object.hasOwn(this.matchManager.pairedCharactersInverse, text)
       ) {
         let { position, matchPosition, bracket } = this.findCurrentPair();
 
@@ -167,7 +167,7 @@ module.exports = class BracketMatcherView {
           // offset by one to make up for the missing character
           if (
             position.row === matchPosition.row &&
-            this.matchManager.pairedCharactersInverse.hasOwnProperty(bracket)
+            Object.hasOwn(this.matchManager.pairedCharactersInverse, bracket)
           ) {
             position = position.traverse(ONE_CHAR_BACKWARD_TRAVERSAL);
           }

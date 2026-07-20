@@ -185,25 +185,25 @@ class MarkerLayer {
         case "startRow":
           markerIds = filterSet(
             markerIds,
-            this.index.findStartingIn(Point(value, 0), Point(value, 2e308)),
+            this.index.findStartingIn(Point(value, 0), Point(value, Infinity)),
           );
           break;
         case "endRow":
           markerIds = filterSet(
             markerIds,
-            this.index.findEndingIn(Point(value, 0), Point(value, 2e308)),
+            this.index.findEndingIn(Point(value, 0), Point(value, Infinity)),
           );
           break;
         case "intersectsRow":
           markerIds = filterSet(
             markerIds,
-            this.index.findIntersecting(Point(value, 0), Point(value, 2e308)),
+            this.index.findIntersecting(Point(value, 0), Point(value, Infinity)),
           );
           break;
         case "intersectsRowRange":
           markerIds = filterSet(
             markerIds,
-            this.index.findIntersecting(Point(value[0], 0), Point(value[1], 2e308)),
+            this.index.findIntersecting(Point(value[0], 0), Point(value[1], Infinity)),
           );
           break;
         case "containedInRange":

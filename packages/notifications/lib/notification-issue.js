@@ -251,7 +251,9 @@ ${copyText}\
                 ? repo.url
                 : undefined
               : repo;
-        } catch (error) {}
+        } catch {
+          /* ignore */
+        }
       }
     }
 

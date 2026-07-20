@@ -124,7 +124,8 @@ module.exports = {
         exit() {
           let res;
           let info = data.join("\n");
-          info = (res = /OS.Name.\s+(.*)$/im.exec(info)) ? res[1] : "Unknown Windows version";
+          res = /OS.Name.\s+(.*)$/im.exec(info);
+          info = res ? res[1] : "Unknown Windows version";
           return resolve(info);
         },
       });

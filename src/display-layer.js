@@ -1340,12 +1340,12 @@ class DisplayLayer {
 
   setParams(params) {
     let paramsChanged = false;
-    if (params.hasOwnProperty("tabLength") && params.tabLength !== this.tabLength) {
+    if (Object.hasOwn(params, "tabLength") && params.tabLength !== this.tabLength) {
       paramsChanged = true;
       this.tabLength = params.tabLength;
     }
     if (
-      params.hasOwnProperty("invisibles") &&
+      Object.hasOwn(params, "invisibles") &&
       !invisiblesEqual(params.invisibles, this.invisibles)
     ) {
       paramsChanged = true;
@@ -1357,13 +1357,13 @@ class DisplayLayer {
       };
     }
     if (
-      params.hasOwnProperty("showIndentGuides") &&
+      Object.hasOwn(params, "showIndentGuides") &&
       params.showIndentGuides !== this.showIndentGuides
     ) {
       paramsChanged = true;
       this.showIndentGuides = params.showIndentGuides;
     }
-    if (params.hasOwnProperty("softWrapColumn")) {
+    if (Object.hasOwn(params, "softWrapColumn")) {
       let softWrapColumn =
         params.softWrapColumn != null ? Math.max(1, params.softWrapColumn) : Infinity;
       if (softWrapColumn !== this.softWrapColumn) {
@@ -1372,28 +1372,28 @@ class DisplayLayer {
       }
     }
     if (
-      params.hasOwnProperty("softWrapHangingIndent") &&
+      Object.hasOwn(params, "softWrapHangingIndent") &&
       params.softWrapHangingIndent !== this.softWrapHangingIndent
     ) {
       paramsChanged = true;
       this.softWrapHangingIndent = params.softWrapHangingIndent;
     }
     if (
-      params.hasOwnProperty("ratioForCharacter") &&
+      Object.hasOwn(params, "ratioForCharacter") &&
       params.ratioForCharacter !== this.ratioForCharacter
     ) {
       paramsChanged = true;
       this.ratioForCharacter = params.ratioForCharacter;
     }
-    if (params.hasOwnProperty("isWrapBoundary") && params.isWrapBoundary !== this.isWrapBoundary) {
+    if (Object.hasOwn(params, "isWrapBoundary") && params.isWrapBoundary !== this.isWrapBoundary) {
       paramsChanged = true;
       this.isWrapBoundary = params.isWrapBoundary;
     }
-    if (params.hasOwnProperty("foldCharacter") && params.foldCharacter !== this.foldCharacter) {
+    if (Object.hasOwn(params, "foldCharacter") && params.foldCharacter !== this.foldCharacter) {
       paramsChanged = true;
       this.foldCharacter = params.foldCharacter;
     }
-    if (params.hasOwnProperty("atomicSoftTabs") && params.atomicSoftTabs !== this.atomicSoftTabs) {
+    if (Object.hasOwn(params, "atomicSoftTabs") && params.atomicSoftTabs !== this.atomicSoftTabs) {
       paramsChanged = true;
       this.atomicSoftTabs = params.atomicSoftTabs;
     }

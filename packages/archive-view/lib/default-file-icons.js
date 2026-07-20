@@ -9,7 +9,9 @@ class DefaultFileIcons {
     let isSymbolicLinkSync = false;
     try {
       fs.lstatSync(filePath)?.isSymbolicLink();
-    } catch (e) {}
+    } catch {
+      /* not statable */
+    }
     if (isSymbolicLinkSync) return "icon-file-symlink-file";
 
     if (

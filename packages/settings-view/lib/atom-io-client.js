@@ -151,7 +151,9 @@ module.exports = class AtomIoClient {
                 if (fs.existsSync(imagePath)) {
                   fs.unlinkSync(imagePath);
                 }
-              } catch (error1) {}
+              } catch {
+                /* ignore unlink failure */
+              }
               return callback(error);
             }
             callback(null, imagePath);

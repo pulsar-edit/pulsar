@@ -48,7 +48,7 @@ class Marker {
 
   constructor(id, layer, _range, params, exclusivitySet = false) {
     // The `_range` parameter is kept in place just to keep the API stable,
-    // but it's not used; the marker asks its layer for its range later on
+    // but it's not used; the marker asks its layer for its range later on
     // via `::getRange`.
     this.id = id;
     this.layer = layer;

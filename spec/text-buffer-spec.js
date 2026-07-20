@@ -3267,10 +3267,12 @@ three\
       const regexps = [
         /\w+/g, // 1 word
         /\w+\n\s*\w+/g, // 2 words separated by an newline (escape sequence)
+        // eslint-disable-next-line no-control-regex -- matches literal control characters on purpose
         RegExp("\\w+\n\\s*w+", "g"), // 2 words separated by a newline (literal)
         /\w+\s+\w+/g, // 2 words separated by some whitespace
         /\w+[^\w]+\w+/g, // 2 words separated by anything
         /\w+\n\s*\w+\n\s*\w+/g, // 3 words separated by newlines (escape sequence)
+        // eslint-disable-next-line no-control-regex -- matches literal control characters on purpose
         RegExp("\\w+\n\\s*\\w+\n\\s*\\w+", "g"), // 3 words separated by newlines (literal)
         /\w+[^\w]+\w+[^\w]+\w+/g, // 3 words separated by anything
       ];
@@ -3488,6 +3490,7 @@ three\
 
       // A literal newline character
       matchStrings.length = 0;
+      // eslint-disable-next-line no-control-regex, no-regex-spaces -- matches literal control characters on purpose
       buffer.scan(RegExp("{\n  var"), ({ matchText }) => matchStrings.push(matchText));
       expect(matchStrings).toEqual(["{\n  var"]);
 
