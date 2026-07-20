@@ -32,10 +32,9 @@ env:
 
 jobs:
   lint:
-    # Advisory only: the repository carries pre-existing eslint and formatting
-    # debt, so these steps report their findings without failing the run. Once
-    # the debt is cleared, drop the `continue-on-error` flags to make it gate.
-    name: Lint and format (advisory)
+    # Gating: the eslint and formatting debt has been cleared, so these steps
+    # fail the run on any new lint error, warning, or formatting drift.
+    name: Lint and format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -49,10 +48,8 @@ jobs:
         run: yarn install --frozen-lockfile --ignore-scripts
       - name: Lint
         run: yarn lint
-        continue-on-error: true
       - name: Check formatting
         run: yarn format:check
-        continue-on-error: true
 
   test:
     name: Test on ${{ matrix.os }}
