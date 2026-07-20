@@ -926,22 +926,22 @@ describe("KeymapManager", function () {
           }),
         );
         events = [];
-        elementA.addEventListener("y-command", function (e) {
+        elementA.addEventListener("y-command", function (_e) {
           return events.push("y-keydown");
         });
-        elementA.addEventListener("y-command-ctrl-up", function (e) {
+        elementA.addEventListener("y-command-ctrl-up", function (_e) {
           return events.push("y-ctrl-keyup");
         });
-        elementA.addEventListener("x-command-ctrl-up", function (e) {
+        elementA.addEventListener("x-command-ctrl-up", function (_e) {
           return events.push("x-ctrl-keyup");
         });
-        elementA.addEventListener("y-command-y-up-ctrl-up", function (e) {
+        elementA.addEventListener("y-command-y-up-ctrl-up", function (_e) {
           return events.push("y-up-ctrl-keyup");
         });
-        elementA.addEventListener("abc-secret-code-command", function (e) {
+        elementA.addEventListener("abc-secret-code-command", function (_e) {
           return events.push("abc-secret-code");
         });
-        elementA.addEventListener("z-command-d-e-f", function (e) {
+        elementA.addEventListener("z-command-d-e-f", function (_e) {
           return events.push("z-keydown-d-e-f");
         });
         return keymapManager.add("test", {

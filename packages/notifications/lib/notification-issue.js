@@ -73,7 +73,7 @@ module.exports = class NotificationIssue {
         body: `url=${encodeURIComponent(issueUrl)}`,
       })
         .then((r) => r.text())
-        .catch((e) => null),
+        .catch((_e) => null),
     );
   }
 
@@ -108,7 +108,7 @@ module.exports = class NotificationIssue {
   }
 
   getIssueBody() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       if (this.issueBody) {
         return resolve(this.issueBody);
       }

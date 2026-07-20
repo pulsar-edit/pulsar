@@ -500,7 +500,7 @@ describe("Marker", function () {
       });
 
       it("emits the right events when called inside of an ::onDidChange handler", function () {
-        marker.onDidChange(function (change) {
+        marker.onDidChange(function (_change) {
           if (marker.getHeadPosition().isEqual([0, 5])) {
             marker.setHeadPosition([0, 6]);
           }
@@ -688,7 +688,7 @@ describe("Marker", function () {
       }
 
       let changedCount = 0;
-      const changeSubscription = buffer.onDidChange(function (change) {
+      const changeSubscription = buffer.onDidChange(function (_change) {
         changedCount++;
         expect(markersUpdatedCount).toBe(0);
         for (let marker of allStrategies) {
@@ -736,7 +736,7 @@ describe("Marker", function () {
       changeSubscription.dispose();
       changedCount = 0;
       markersUpdatedCount = 0;
-      buffer.onDidChange(function (change) {
+      buffer.onDidChange(function (_change) {
         changedCount++;
         expect(markersUpdatedCount).toBe(0);
         for (const marker of allStrategies) {

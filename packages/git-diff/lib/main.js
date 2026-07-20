@@ -9,7 +9,7 @@ let diffViews = new Set();
 let subscriptions = null;
 
 export default {
-  activate(state) {
+  activate(_state) {
     subscriptions = new CompositeDisposable();
 
     subscriptions.add(

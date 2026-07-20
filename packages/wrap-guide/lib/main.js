@@ -35,7 +35,7 @@ module.exports = {
 
   deactivate() {
     this.subscriptions.dispose();
-    this.wrapGuides.forEach((wrapGuide, editor) => wrapGuide.destroy());
+    this.wrapGuides.forEach((wrapGuide, _editor) => wrapGuide.destroy());
     return this.wrapGuides.clear();
   },
 

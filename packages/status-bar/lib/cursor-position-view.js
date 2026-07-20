@@ -12,7 +12,7 @@ module.exports = class CursorPositionView {
 
     this.formatString = atom.config.get("status-bar.cursorPositionFormat") ?? "%L:%C";
 
-    this.activeItemSubscription = atom.workspace.onDidChangeActiveTextEditor((activeEditor) =>
+    this.activeItemSubscription = atom.workspace.onDidChangeActiveTextEditor((_activeEditor) =>
       this.subscribeToActiveTextEditor(),
     );
 

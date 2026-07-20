@@ -3229,7 +3229,7 @@ function performReadOutsideOfIndexedRegion(random, displayLayer) {
   displayLayer.getScreenLines(0, row);
 }
 
-function log(message) {}
+function log(_message) {}
 
 function verifyChangeEvent(displayLayer, fn) {
   let displayLayerCopy = displayLayer.copy();

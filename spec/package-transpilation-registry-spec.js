@@ -4,11 +4,11 @@ import path from "path";
 import PackageTranspilationRegistry from "../src/package-transpilation-registry";
 
 const originalCompiler = {
-  getCachePath: (sourceCode, filePath) => {
+  getCachePath: (_sourceCode, _filePath) => {
     return "orig-cache-path";
   },
 
-  compile: (sourceCode, filePath) => {
+  compile: (sourceCode, _filePath) => {
     return sourceCode + "-original-compiler";
   },
 
@@ -72,31 +72,31 @@ describe("PackageTranspilationRegistry", () => {
     };
 
     const jsTranspiler = {
-      transpile: (sourceCode, filePath, options) => {
+      transpile: (sourceCode, _filePath, _options) => {
         return { code: sourceCode + "-transpiler-js" };
       },
 
-      getCacheKeyData: (sourceCode, filePath, options) => {
+      getCacheKeyData: (_sourceCode, _filePath, _options) => {
         return "js-transpiler-cache-data";
       },
     };
 
     const coffeeTranspiler = {
-      transpile: (sourceCode, filePath, options) => {
+      transpile: (sourceCode, _filePath, _options) => {
         return { code: sourceCode + "-transpiler-coffee" };
       },
 
-      getCacheKeyData: (sourceCode, filePath, options) => {
+      getCacheKeyData: (_sourceCode, _filePath, _options) => {
         return "coffee-transpiler-cache-data";
       },
     };
 
     const omgTranspiler = {
-      transpile: (sourceCode, filePath, options) => {
+      transpile: (sourceCode, _filePath, _options) => {
         return { code: sourceCode + "-transpiler-omg" };
       },
 
-      getCacheKeyData: (sourceCode, filePath, options) => {
+      getCacheKeyData: (_sourceCode, _filePath, _options) => {
         return "omg-transpiler-cache-data";
       },
     };

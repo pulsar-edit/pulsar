@@ -23,7 +23,7 @@ const fuzzyNative = require("@lumine-code/fuzzy-native");
                      // second position with a lower score
   ```
 */
-function setCandidates(matcherOrCandidates, candidates, options) {
+function setCandidates(matcherOrCandidates, candidates, _options) {
   if (Array.isArray(candidates)) {
     // Reuse an existing {Matcher}. Construction-time options (e.g.
     // `ignoreDiacritics`) already live on it and don't need re-passing.

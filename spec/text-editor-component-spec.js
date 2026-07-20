@@ -334,7 +334,7 @@ describe("TextEditorComponent", () => {
       await component.getNextUpdatePromise();
 
       component.setScrollTop(Infinity);
-      element.onDidChangeScrollTop((newScrollTop) => {
+      element.onDidChangeScrollTop((_newScrollTop) => {
         throw new Error("Scroll top should not have changed");
       });
       component.setScrollTop(component.getScrollTop());
@@ -6655,7 +6655,7 @@ describe("TextEditorComponent", () => {
       let dragging = false;
       function startDragging() {
         component.handleMouseDragUntilMouseUp({
-          didDrag: (event) => {
+          didDrag: (_event) => {
             dragging = true;
           },
           didStopDragging: () => {

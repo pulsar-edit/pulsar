@@ -445,7 +445,7 @@ describe("Pane", () => {
 
     it("has access to the new pending item via ::getPendingItem", () => {
       pane.setPendingItem("fake item one");
-      pane.onItemDidTerminatePendingState(function (item) {
+      pane.onItemDidTerminatePendingState(function (_item) {
         callbackCalled = true;
         expect(pane.getPendingItem()).toEqual("fake item two");
       });

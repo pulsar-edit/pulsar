@@ -159,7 +159,7 @@ module.exports = class SubsequenceProvider {
   Section: Suggesting Completions
   */
 
-  getSuggestions({ editor, bufferPosition, prefix, scopeDescriptor }) {
+  getSuggestions({ editor, bufferPosition: _bufferPosition, prefix, scopeDescriptor }) {
     if (!prefix) {
       return;
     }

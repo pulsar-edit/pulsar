@@ -28,7 +28,7 @@ describe("AtomIoClient", function () {
 
       waitsFor(function (done) {
         spyOn(this.client, "parseJSON").andThrow();
-        return this.client.request("path", function (error, data) {
+        return this.client.request("path", function (error, _data) {
           expect(error).not.toBeNull();
           return done();
         });

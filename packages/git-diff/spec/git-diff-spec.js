@@ -11,7 +11,7 @@ describe("GitDiff package", () => {
       fn();
       screenUpdates++;
     });
-    spyOn(window, "cancelAnimationFrame").andCallFake((i) => null);
+    spyOn(window, "cancelAnimationFrame").andCallFake((_i) => null);
 
     projectPath = temp.mkdirSync("git-diff-spec-");
     const otherPath = temp.mkdirSync("some-other-path-");

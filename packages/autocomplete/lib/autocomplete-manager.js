@@ -204,9 +204,9 @@ module.exports = class AutocompleteManager {
       this.updateCurrentEditor(editor, labels);
     }
 
-    let focusListener = (element) => this.updateCurrentEditor(editor, labels);
+    let focusListener = (_element) => this.updateCurrentEditor(editor, labels);
     view.addEventListener("focus", focusListener);
-    let blurListener = (element) => this.hideSuggestionList();
+    let blurListener = (_element) => this.hideSuggestionList();
     view.addEventListener("blur", blurListener);
 
     let disposable = new Disposable(() => {
@@ -781,7 +781,7 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`);
     this.shouldDisplaySuggestions = false;
   }
 
-  requestHideSuggestionList(command) {
+  requestHideSuggestionList(_command) {
     if (this.hideTimeout == null) {
       this.hideTimeout = setTimeout(() => {
         this.hideSuggestionList();

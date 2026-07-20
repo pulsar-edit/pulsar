@@ -216,7 +216,7 @@ describe("HistoryManager", () => {
         project,
         commands: commandRegistry,
       });
-      spyOn(historyManager2.stateStore, "load").and.callFake((name) =>
+      spyOn(historyManager2.stateStore, "load").and.callFake((_name) =>
         Promise.resolve(savedHistory),
       );
       await historyManager2.loadState();

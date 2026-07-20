@@ -46,7 +46,7 @@ exports.register = (jasmineEnv) => {
     });
 
     jasmineEnv.addMatchers({
-      toHaveLength: function (util, customEqualityTesters) {
+      toHaveLength: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, expected) {
             if (actual == null) {
@@ -64,7 +64,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toExistOnDisk: function (util, customEqualityTesters) {
+      toExistOnDisk: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual) {
             return {
@@ -75,7 +75,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toHaveFocus: function (util, customEqualityTesters) {
+      toHaveFocus: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual) {
             if (!document.hasFocus()) {
@@ -94,7 +94,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toShow: function (util, customEqualityTesters) {
+      toShow: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual) {
             const element = getElement(actual);
@@ -111,7 +111,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toBeVisible: function (util, customEqualityTesters) {
+      toBeVisible: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual) {
             let pass;
@@ -131,7 +131,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toBeHidden: function (util, customEqualityTesters) {
+      toBeHidden: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual) {
             let pass;
@@ -151,7 +151,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toEqualPath: function (util, customEqualityTesters) {
+      toEqualPath: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, expected) {
             const actualPath = path.normalize(actual);
@@ -165,7 +165,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toBeNear: function (util, customEqualityTesters) {
+      toBeNear: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, expected) {
             let acceptedError = 1;
@@ -178,7 +178,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toHaveNearPixels: function (util, customEqualityTesters) {
+      toHaveNearPixels: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, expected) {
             let acceptedError = 1;
@@ -198,7 +198,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toHaveHtml: function (util, customEqualityTesters) {
+      toHaveHtml: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, expected) {
             let actualHTML;
@@ -220,7 +220,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toHaveAttr: function (util, customEqualityTesters) {
+      toHaveAttr: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, attributeName, expectedAttributeValue) {
             let actualAttributeValue;
@@ -238,7 +238,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toHaveId: function (util, customEqualityTesters) {
+      toHaveId: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, id) {
             let actualId;
@@ -256,7 +256,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toHaveData: function (util, customEqualityTesters) {
+      toHaveData: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, key, expectedValue) {
             let actualValue;
@@ -277,7 +277,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toHaveValue: function (util, customEqualityTesters) {
+      toHaveValue: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, value) {
             let actualValue;
@@ -295,7 +295,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toMatchSelector: function (util, customEqualityTesters) {
+      toMatchSelector: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, selector) {
             let pass;
@@ -337,7 +337,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toBeSelected: function (util, customEqualityTesters) {
+      toBeSelected: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual) {
             let pass;
@@ -355,7 +355,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toBeChecked: function (util, customEqualityTesters) {
+      toBeChecked: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual) {
             let pass;
@@ -373,7 +373,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toBeEmpty: function (util, customEqualityTesters) {
+      toBeEmpty: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual) {
             let pass;
@@ -391,7 +391,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toBeDisabled: function (util, customEqualityTesters) {
+      toBeDisabled: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual) {
             let pass;
@@ -409,7 +409,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toNotMatch: function (util, customEqualityTesters) {
+      toNotMatch: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, expected) {
             return {
@@ -420,7 +420,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toHaveClass: function (util, customEqualityTesters) {
+      toHaveClass: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, expected) {
             return {
@@ -431,7 +431,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toHaveText: function (util, customEqualityTesters) {
+      toHaveText: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, expected) {
             return {
@@ -442,7 +442,7 @@ exports.register = (jasmineEnv) => {
         };
       },
 
-      toExist: function (util, customEqualityTesters) {
+      toExist: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual) {
             if (actual instanceof HTMLElement) {
@@ -469,7 +469,7 @@ exports.register = (jasmineEnv) => {
       },
 
       // Legacy jasmine 1.x matcher: the inverse of `toBe`.
-      toNotBe: function (util, customEqualityTesters) {
+      toNotBe: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, expected) {
             return {
@@ -498,7 +498,7 @@ exports.register = (jasmineEnv) => {
       // `toSatisfy(predicate)` calls `predicate(actual, reason)`; the predicate
       // returns whether the assertion passes and may call `reason(message)` to
       // supply the failure message.
-      toSatisfy: function (util, customEqualityTesters) {
+      toSatisfy: function (_util, _customEqualityTesters) {
         return {
           compare: function (actual, predicate) {
             let message = `Expected ${actual} to satisfy predicate`;

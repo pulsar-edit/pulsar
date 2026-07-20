@@ -29,7 +29,7 @@ module.exports = {
 
   // OS version strings lifted from https://github.com/lee-dohm/bug-report
   getOSVersion() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       switch (this.getPlatform()) {
         case "darwin":
           return resolve(this.macVersionText());
@@ -53,7 +53,7 @@ module.exports = {
   },
 
   macVersionInfo() {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve, _reject) {
       let stdout = "";
       const plistBuddy = new BufferedProcess({
         command: "/usr/libexec/PlistBuddy",
@@ -91,7 +91,7 @@ module.exports = {
   },
 
   linuxVersionInfo() {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve, _reject) {
       let stdout = "";
 
       const lsbRelease = new BufferedProcess({
@@ -100,7 +100,7 @@ module.exports = {
         stdout(output) {
           return (stdout += output);
         },
-        exit(exitCode) {
+        exit(_exitCode) {
           const [DistroName, DistroVersion] = Array.from(stdout.trim().split(" "));
           return resolve({ DistroName, DistroVersion });
         },
@@ -114,7 +114,7 @@ module.exports = {
   },
 
   winVersionText() {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve, _reject) {
       const data = [];
       const systemInfo = new BufferedProcess({
         command: "systeminfo",
@@ -142,7 +142,7 @@ module.exports = {
   */
 
   getNonCorePackages() {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve, _reject) {
       const nonCorePackages = atom.packages
         .getAvailablePackageMetadata()
         .filter((p) => !atom.packages.isBundledPackage(p.name));

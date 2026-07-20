@@ -38,7 +38,7 @@ class EditorStore {
     this.buffer.setHistoryProvider(newProvider);
   }
 
-  stopObservingHistory(editor) {
+  stopObservingHistory(_editor) {
     if (this.existingHistoryProvider == null) {
       return;
     }

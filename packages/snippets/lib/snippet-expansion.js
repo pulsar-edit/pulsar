@@ -111,11 +111,11 @@ module.exports = class SnippetExpansion {
 
   // Set a flag on undo or redo so that we know not to re-apply transforms.
   // They're already accounted for in the history.
-  onUndoOrRedo(isUndo) {
+  onUndoOrRedo(_isUndo) {
     this.isUndoingOrRedoing = true;
   }
 
-  cursorMoved({ oldBufferPosition, newBufferPosition, textChanged }) {
+  cursorMoved({ oldBufferPosition: _oldBufferPosition, newBufferPosition, textChanged }) {
     if (this.settingTabStop || textChanged) {
       return;
     }
@@ -140,7 +140,7 @@ module.exports = class SnippetExpansion {
     }
   }
 
-  textChanged(event) {
+  textChanged(_event) {
     if (this.isIgnoringBufferChanges) {
       return;
     }
@@ -205,7 +205,7 @@ module.exports = class SnippetExpansion {
     });
   }
 
-  resolveVariables(startPosition) {
+  resolveVariables(_startPosition) {
     let params = {
       editor: this.editor,
       cursor: this.cursor,
@@ -236,7 +236,7 @@ module.exports = class SnippetExpansion {
     }
   }
 
-  expandVariables(startPosition) {
+  expandVariables(_startPosition) {
     this.editor.transact(() => {
       for (const variable of this.snippet.variables) {
         let marker = this.markersForVariables.get(variable);

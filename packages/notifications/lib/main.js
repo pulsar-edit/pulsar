@@ -18,7 +18,7 @@ const Notifications = {
   duplicateTimeDelay: 500,
   lastNotification: null,
 
-  activate(state) {
+  activate(_state) {
     let notification;
     const CommandLogger = require("./command-logger");
     CommandLogger.start();

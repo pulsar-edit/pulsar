@@ -54,7 +54,7 @@ describe("Provider API", () => {
       it("registers the provider specified by [provider]", () => {
         testProvider = {
           scopeSelector: ".source.js,.source.coffee",
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [{ text: "ohai", replacementPrefix: "ohai" }];
           },
         };
@@ -79,7 +79,7 @@ describe("Provider API", () => {
       it("registers the provider specified by the naked provider", () => {
         testProvider = {
           scopeSelector: ".source.js,.source.coffee",
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [{ text: "ohai", replacementPrefix: "ohai" }];
           },
         };
@@ -106,14 +106,14 @@ describe("Provider API", () => {
       it("registers the provider under the given list of labels, the default being ['workspace-center']", () => {
         testProvider = {
           scopeSelector: ".source.js,.source.coffee",
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [{ text: "ohai", replacementPrefix: "ohai" }];
           },
         };
         testProvider2 = {
           labels: ["testProvider2"],
           scopeSelector: ".source.js,.source.coffee",
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [{ text: "ohai", replacementPrefix: "ohai" }];
           },
         };
@@ -155,7 +155,7 @@ describe("Provider API", () => {
       it("passes the correct parameters to getSuggestions for the version", async () => {
         testProvider = {
           scopeSelector: ".source.js,.source.coffee",
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [{ text: "ohai", replacementPrefix: "ohai" }];
           },
         };
@@ -185,7 +185,7 @@ describe("Provider API", () => {
       it("correctly displays the suggestion options", async () => {
         testProvider = {
           scopeSelector: ".source.js, .source.coffee",
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [
               {
                 text: "ohai",
@@ -222,7 +222,7 @@ describe("Provider API", () => {
       it("favors the `displayText` over text or snippet suggestion options", async () => {
         testProvider = {
           scopeSelector: ".source.js, .source.coffee",
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [
               {
                 text: "ohai",
@@ -251,7 +251,7 @@ describe("Provider API", () => {
       it("correctly displays the suggestion description and More link", async () => {
         testProvider = {
           scopeSelector: ".source.js, .source.coffee",
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [
               {
                 text: "ohai",
@@ -286,7 +286,7 @@ describe("Provider API", () => {
       it("it calls getSuggestionDetailsOnSelect if available and replaces suggestion", async () => {
         testProvider = {
           scopeSelector: ".source.js, .source.coffee",
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [
               {
                 text: "ohai",
@@ -320,7 +320,7 @@ describe("Provider API", () => {
         testProvider = {
           scopeSelector: ".source.js",
           filterSuggestions: true,
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [
               { text: "okwow" },
               { text: "ohai" },
@@ -347,7 +347,7 @@ describe("Provider API", () => {
         testProvider = {
           scopeSelector: ".source.js",
           filterSuggestions: true,
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [
               { text: "ohai" },
               { text: "hai" },
@@ -379,7 +379,7 @@ describe("Provider API", () => {
         testProvider = {
           scopeSelector: ".source.js",
           filterSuggestions: true,
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [
               { text: "ohai" },
               { text: "hai" },
@@ -421,7 +421,7 @@ describe("Provider API", () => {
       testProvider = {
         scopeSelector: ".source.js",
         filterSuggestions: true,
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return [
             {
               text: "ohai",
@@ -462,7 +462,7 @@ describe("Provider API", () => {
         testProvider = {
           scopeSelector: ".source.js",
           filterSuggestions: true,
-          getSuggestions(options) {
+          getSuggestions(_options) {
             return [
               {
                 text: "notmatch/foololohairange",
@@ -507,7 +507,7 @@ describe("Provider API", () => {
       testProvider = {
         scopeSelector: ".source.js",
         filterSuggestions: true,
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return [
             {
               text: "notmatch/anything",

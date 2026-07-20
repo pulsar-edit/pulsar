@@ -278,7 +278,7 @@ describe("ContextMenuManager", function () {
         submenu: [
           {
             label: "C",
-            created(event) {
+            created(_event) {
               this.label = "D";
             },
           },

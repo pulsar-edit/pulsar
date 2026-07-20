@@ -48,11 +48,11 @@ peg$SyntaxError.buildMessage = function (expected, found) {
       return "[" + (expectation.inverted ? "^" : "") + escapedParts + "]";
     },
 
-    any: function (expectation) {
+    any: function (_expectation) {
       return "any character";
     },
 
-    end: function (expectation) {
+    end: function (_expectation) {
       return "end of input";
     },
 

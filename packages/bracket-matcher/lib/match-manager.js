@@ -47,7 +47,7 @@ module.exports = class MatchManager {
     return atom.config.get(key, { scope: this.editor.getRootScopeDescriptor() });
   }
 
-  constructor(editor, editorElement) {
+  constructor(editor, _editorElement) {
     this.destroy = this.destroy.bind(this);
     this.editor = editor;
     this.subscriptions = new CompositeDisposable();

@@ -119,7 +119,7 @@ module.exports = {
     return atom[name]?.constructor?.name;
   },
 
-  loadProperty(propertyName, className, classes, parent) {
+  loadProperty(propertyName, className, classes, _parent) {
     const classCompletions = classes[className];
     if (classCompletions == null) {
       return;

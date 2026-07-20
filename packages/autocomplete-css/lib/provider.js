@@ -431,7 +431,7 @@ module.exports = {
       : undefined;
   },
 
-  getTagCompletions({ bufferPosition, editor, prefix }) {
+  getTagCompletions({ bufferPosition: _bufferPosition, editor: _editor, prefix }) {
     const completions = [];
     if (prefix) {
       for (let tag of Array.from(this.tags)) {

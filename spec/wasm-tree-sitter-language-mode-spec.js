@@ -1723,7 +1723,7 @@ describe("WASMTreeSitterLanguageMode", () => {
 
       it("notifies onDidTokenize listeners the first time all syntax highlighting is done", async () => {
         const promise = new Promise((resolve) => {
-          editor.onDidTokenize((event) => {
+          editor.onDidTokenize((_event) => {
             expectTokensToEqual(editor, [
               [
                 { text: "<", scopes: ["html"] },
@@ -3191,7 +3191,7 @@ describe("WASMTreeSitterLanguageMode", () => {
 
       jsGrammar.addInjectionPoint({
         type: "regex_pattern",
-        language(regex) {
+        language(_regex) {
           return "js-regex-for-test";
         },
         content(regex) {
@@ -3264,7 +3264,7 @@ describe("WASMTreeSitterLanguageMode", () => {
 
       jsGrammar.addInjectionPoint({
         type: "regex_pattern",
-        language(regex) {
+        language(_regex) {
           return "js-regex-for-test";
         },
         content(regex) {
@@ -3621,7 +3621,7 @@ describe("WASMTreeSitterLanguageMode", () => {
 
         jsGrammar.addInjectionPoint({
           type: "regex_pattern",
-          language(regex) {
+          language(_regex) {
             return "js-regex-for-test";
           },
           content(regex) {

@@ -3058,7 +3058,7 @@ three\
             [0, 0],
             [12, 0],
           ],
-          ({ match, range }) => matches.push(match),
+          ({ match, range: _range }) => matches.push(match),
         );
         expect(matches.length).toBe(1);
       }));
@@ -4199,7 +4199,7 @@ three\
       buffer = new TextBuffer();
       const checkpoint = buffer.createCheckpoint();
 
-      buffer.onWillChange(function (change) {
+      buffer.onWillChange(function (_change) {
         expect(buffer.getText()).toBe(expectedText);
         changeCount++;
       });

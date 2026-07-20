@@ -1661,7 +1661,7 @@ describe("TextEditor", () => {
       it("doesn't get stuck in a infinite loop when called from ::onDidAddCursor after the last selection has been destroyed (regression)", () => {
         let callCount = 0;
         editor.getLastSelection().destroy();
-        editor.onDidAddCursor(function (cursor) {
+        editor.onDidAddCursor(function (_cursor) {
           callCount++;
           editor.getLastSelection();
         });
@@ -6519,7 +6519,7 @@ describe("TextEditor", () => {
 
         it("notifies ::onDidInsertText observers", () => {
           const insertedStrings = [];
-          editor.onDidInsertText(({ text, range }) => insertedStrings.push(text));
+          editor.onDidInsertText(({ text, range: _range }) => insertedStrings.push(text));
 
           atom.clipboard.write("hello");
           editor.pasteText();

@@ -232,8 +232,8 @@ describe("TextBuffer IO", () => {
 
     it("emits reload events even if nothing has changed", async (done) => {
       const events = [];
-      buffer.onWillReload((event) => events.push("will-reload"));
-      buffer.onDidReload((event) => events.push("did-reload"));
+      buffer.onWillReload((_event) => events.push("will-reload"));
+      buffer.onDidReload((_event) => events.push("did-reload"));
       await buffer.reload();
       expect(events).toEqual(["will-reload", "did-reload"]);
       done();
@@ -997,13 +997,13 @@ describe("TextBuffer IO", () => {
       const newText = " abc" + newTextSuffix;
 
       const events = [];
-      buffer.onWillReload((event) => events.push(["will-reload"]));
+      buffer.onWillReload((_event) => events.push(["will-reload"]));
       buffer.onWillChange(() => {
         expect(buffer.getText()).toEqual("abcde");
         events.push(["will-change"]);
       });
       buffer.onDidChange((event) => events.push(["did-change", event]));
-      buffer.onDidReload((event) => events.push(["did-reload"]));
+      buffer.onDidReload((_event) => events.push(["did-reload"]));
 
       const markerB = buffer.markRange(Range(Point(0, 1), Point(0, 2)));
       const markerD = buffer.markRange(Range(Point(0, 3), Point(0, 4)));
@@ -1116,7 +1116,7 @@ describe("TextBuffer IO", () => {
       await buffer.getFileWatchStartPromise();
       const changeEvents = [];
       buffer.onWillChange(() => changeEvents.push("will-change"));
-      buffer.onDidChange((event) => changeEvents.push("did-change"));
+      buffer.onDidChange((_event) => changeEvents.push("did-change"));
 
       // We debounce file system change events to avoid redundant loads. But
       // for large files, another file system change event may occur *after* the
@@ -1292,7 +1292,7 @@ class ReverseCaseFile {
   }
 }
 
-function reverseCase(buffer, encoding) {
+function reverseCase(buffer, _encoding) {
   const result = Buffer.alloc(buffer.length);
   for (let i = 0, n = buffer.length; i < n; i++) {
     const character = String.fromCharCode(buffer[i]);

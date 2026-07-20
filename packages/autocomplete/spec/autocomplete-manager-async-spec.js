@@ -40,7 +40,7 @@ describe("Async providers", () => {
   describe("when an async provider is registered", () => {
     beforeEach(() => {
       let testAsyncProvider = {
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return new Promise((resolve) => {
             setTimeout(() => {
               resolve([
@@ -79,7 +79,7 @@ describe("Async providers", () => {
     beforeEach(() => {
       let testAsyncProvider = {
         scopeSelector: ".source.js",
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return new Promise((resolve) => {
             setTimeout(
               () =>

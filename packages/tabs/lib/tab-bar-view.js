@@ -109,7 +109,7 @@ class TabBarView {
     );
 
     this.subscriptions.add(
-      this.pane.onDidChangeActiveItem((item) => {
+      this.pane.onDidChangeActiveItem((_item) => {
         return this.updateActiveTab();
       }),
     );

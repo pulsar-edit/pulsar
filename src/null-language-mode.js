@@ -18,7 +18,7 @@ module.exports = class NullLanguageMode {
 };
 
 class NullHighlightIterator {
-  seek(position) {
+  seek(_position) {
     return EMPTY;
   }
   moveToSuccessor() {

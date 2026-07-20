@@ -185,7 +185,7 @@ module.exports = {
           }
         },
 
-        "snippets:available"(event) {
+        "snippets:available"(_event) {
           const editor = this.getModel();
           const SnippetsAvailable = require("./snippets-available");
           if (snippets.availableSnippetsView == null) {
@@ -547,7 +547,7 @@ module.exports = {
     }
   },
 
-  addCommandForSnippet(attributes, packageName, selector) {
+  addCommandForSnippet(attributes, packageName, _selector) {
     packageName = packageName || "snippets";
     let { name, command } = attributes;
     let commandName = `${packageName}:${command}`;

@@ -165,7 +165,7 @@ export default class SettingsPanel extends CollapsibleSectionPanel {
     // reflected in the settings panel. We use `observe` to hook into any
     // possible changes to our value, but we double-check it by looking up the
     // value ourselves.
-    let wrappedCallback = (nv) => {
+    let wrappedCallback = (_nv) => {
       let params = {};
       if (this.options.scopeName != null) {
         params.scope = [this.options.scopeName];
@@ -553,7 +553,7 @@ function elementForOptions(namespace, name, value, { radio = false }) {
   return fragment;
 }
 
-function elementForCheckbox(namespace, name, value) {
+function elementForCheckbox(namespace, name, _value) {
   let keyPath = `${namespace}.${name}`;
 
   const div = document.createElement("div");
@@ -579,7 +579,7 @@ function elementForCheckbox(namespace, name, value) {
   return div;
 }
 
-function elementForColor(namespace, name, value) {
+function elementForColor(namespace, name, _value) {
   let keyPath = `${namespace}.${name}`;
 
   const div = document.createElement("div");
@@ -637,7 +637,7 @@ function elementForEditor(namespace, name, value) {
   return fragment;
 }
 
-function elementForArray(namespace, name, value) {
+function elementForArray(namespace, name, _value) {
   let keyPath = `${namespace}.${name}`;
 
   const fragment = document.createDocumentFragment();
@@ -745,7 +745,7 @@ function optionToRadio(option, keyPath) {
   return label;
 }
 
-function optionToSelect(option, keyPath) {
+function optionToSelect(option, _keyPath) {
   const optionElement = document.createElement("option");
   if (Object.hasOwn(option, "value")) {
     optionElement.value = option.value;

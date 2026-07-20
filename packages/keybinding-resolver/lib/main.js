@@ -31,7 +31,7 @@ module.exports = {
     atom.workspace.toggle(KEYBINDING_RESOLVER_URI);
   },
 
-  deserializeKeyBindingResolverView(serialized) {
+  deserializeKeyBindingResolverView(_serialized) {
     return new KeyBindingResolverView();
   },
 };

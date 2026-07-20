@@ -10,7 +10,7 @@ describe("Provider Manager", () => {
     providerManager = new ProviderManager();
     providerManager.initialize();
     testProvider = {
-      getSuggestions(options) {
+      getSuggestions(_options) {
         return [
           {
             text: "ohai",
@@ -87,7 +87,7 @@ describe("Provider Manager", () => {
 
     it("can identify a provider with a missing getSuggestions", () => {
       let bogusProvider = {
-        badgetSuggestions(options) {},
+        badgetSuggestions(_options) {},
         scopeSelector: ".source.js",
         dispose() {},
       };
@@ -109,7 +109,7 @@ describe("Provider Manager", () => {
 
     it("can identify a provider with a missing scope selector", () => {
       let bogusProvider = {
-        getSuggestions(options) {},
+        getSuggestions(_options) {},
         aSelector: ".source.js",
         dispose() {},
       };
@@ -119,7 +119,7 @@ describe("Provider Manager", () => {
 
     it("can identify a provider with an invalid scope selector", () => {
       let bogusProvider = {
-        getSuggestions(options) {},
+        getSuggestions(_options) {},
         scopeSelector: "",
         dispose() {},
       };
@@ -127,7 +127,7 @@ describe("Provider Manager", () => {
       expect(providerManager.isValidProvider(testProvider, 3)).toEqual(true);
 
       bogusProvider = {
-        getSuggestions(options) {},
+        getSuggestions(_options) {},
         scopeSelector: false,
         dispose() {},
       };
@@ -285,7 +285,7 @@ describe("Provider Manager", () => {
 
     it("registers a provider with a blacklist", () => {
       testProvider = {
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return [
             {
               text: "ohai",
@@ -343,7 +343,7 @@ describe("Provider Manager", () => {
 
       testProvider1 = {
         scopeSelector: ".source.js",
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return [
             {
               text: "ohai2",
@@ -360,7 +360,7 @@ describe("Provider Manager", () => {
         providerblacklist: {
           "autocomplete-plus-fuzzyprovider": ".source.js .variable.js .comment3",
         },
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return [
             {
               text: "ohai2",
@@ -373,7 +373,7 @@ describe("Provider Manager", () => {
 
       testProvider3 = {
         scopeSelector: "*",
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return [
             {
               text: "ohai3",
@@ -387,7 +387,7 @@ describe("Provider Manager", () => {
       testProvider4 = {
         labels: ["workspace-center", "label1"],
         scopeSelector: ".source.js .comment",
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return [
             {
               text: "ohai4",
@@ -401,7 +401,7 @@ describe("Provider Manager", () => {
       testProvider5 = {
         labels: ["label1"],
         scopeSelector: "*",
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return [
             {
               text: "ohai5",
@@ -571,7 +571,7 @@ describe("Provider Manager", () => {
       accessoryProvider1 = {
         scopeSelector: "*",
         inclusionPriority: 2,
-        getSuggestions(options) {},
+        getSuggestions(_options) {},
         dispose() {},
       };
 
@@ -579,7 +579,7 @@ describe("Provider Manager", () => {
         scopeSelector: ".source.js",
         inclusionPriority: 2,
         excludeLowerPriority: false,
-        getSuggestions(options) {},
+        getSuggestions(_options) {},
         dispose() {},
       };
 
@@ -587,7 +587,7 @@ describe("Provider Manager", () => {
         scopeSelector: ".source.js .comment",
         inclusionPriority: 2,
         excludeLowerPriority: true,
-        getSuggestions(options) {},
+        getSuggestions(_options) {},
         dispose() {},
       };
 
@@ -595,7 +595,7 @@ describe("Provider Manager", () => {
         scopeSelector: ".source.js",
         inclusionPriority: 1,
         excludeLowerPriority: true,
-        getSuggestions(options) {},
+        getSuggestions(_options) {},
         dispose() {},
       };
 
@@ -642,21 +642,21 @@ describe("Provider Manager", () => {
       provider1 = {
         scopeSelector: "*",
         suggestionPriority: 2,
-        getSuggestions(options) {},
+        getSuggestions(_options) {},
         dispose() {},
       };
 
       provider2 = {
         scopeSelector: ".source.js",
         suggestionPriority: 3,
-        getSuggestions(options) {},
+        getSuggestions(_options) {},
         dispose() {},
       };
 
       provider3 = {
         scopeSelector: ".source.js .comment",
         suggestionPriority: 2,
-        getSuggestions(options) {},
+        getSuggestions(_options) {},
         dispose() {},
       };
 

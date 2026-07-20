@@ -70,7 +70,7 @@ describe("Provider API Legacy", () => {
           this.selector = ".source.js,.source.coffee";
           this.blacklist = ".comment";
         }
-        requestHandler(options) {
+        requestHandler(_options) {
           return [{ word: "ohai", prefix: "ohai" }];
         }
       }
@@ -101,7 +101,7 @@ describe("Provider API Legacy", () => {
         constructor() {
           this.selector = ".source.js,.source.coffee";
         }
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return [
             {
               word: "ohai",
@@ -143,7 +143,7 @@ describe("Provider API Legacy", () => {
           this.selector = ".source.js,.source.coffee";
         }
 
-        getSuggestions(options) {
+        getSuggestions(_options) {
           return [
             {
               text: "ohai",
@@ -185,7 +185,7 @@ describe("Provider API Legacy", () => {
 
       testProvider = {
         selector: ".source.js,.source.coffee",
-        requestHandler(options) {
+        requestHandler(_options) {
           return [{ word: "ohai", prefix: "ohai" }];
         },
       };
@@ -218,7 +218,7 @@ describe("Provider API Legacy", () => {
     it("passes the correct parameters to requestHandler", async () => {
       testProvider = {
         selector: ".source.js,.source.coffee",
-        requestHandler(options) {
+        requestHandler(_options) {
           return [{ word: "ohai", prefix: "ohai" }];
         },
       };
@@ -266,7 +266,7 @@ describe("Provider API Legacy", () => {
       ).toEqual(autocompleteManager.providerManager.defaultProvider);
 
       testProvider = {
-        requestHandler(options) {
+        requestHandler(_options) {
           return [
             {
               word: "ohai",
@@ -363,7 +363,7 @@ describe("Provider API Legacy", () => {
       ).toEqual(autocompleteManager.providerManager.defaultProvider);
 
       testProvider = {
-        requestHandler(options) {
+        requestHandler(_options) {
           return [
             {
               word: "ohai",
@@ -499,7 +499,7 @@ describe("Provider API Legacy", () => {
       ).toEqual(autocompleteManager.providerManager.defaultProvider);
 
       testProvider = {
-        requestHandler(options) {
+        requestHandler(_options) {
           return [
             {
               word: "ohai",

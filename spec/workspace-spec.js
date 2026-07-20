@@ -915,7 +915,7 @@ describe("Workspace", () => {
 
       describe("when there is an unhandled error", () => {
         beforeEach(() => {
-          fsOpenSyncSpy.and.callFake((path) => {
+          fsOpenSyncSpy.and.callFake((_path) => {
             throw new Error("I dont even know what is happening right now!!");
           });
         });

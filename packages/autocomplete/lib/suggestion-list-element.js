@@ -119,7 +119,7 @@ module.exports = class SuggestionListElement {
     };
   }
 
-  onScroll(event) {
+  onScroll(_event) {
     atom.views.updateDocument(this.renderExtraItems.bind(this));
   }
 

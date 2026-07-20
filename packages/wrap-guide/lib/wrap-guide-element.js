@@ -63,7 +63,7 @@ module.exports = class WrapGuideElement {
     this.handleConfigEvents();
 
     this.subscriptions.add(
-      this.editor.onDidChangeSoftWrapped(async (wrapped) => {
+      this.editor.onDidChangeSoftWrapped(async (_wrapped) => {
         if (this.when === null) return;
         await this.updateWhen();
       }),
@@ -120,7 +120,7 @@ module.exports = class WrapGuideElement {
       atom.config.onDidChange(
         "language.softWrapAtPreferredLineLength",
         { scope: this.editor.getRootScopeDescriptor() },
-        async ({ newValue }) => {
+        async ({ newValue: _newValue }) => {
           if (this.when === null) return;
           await this.updateWhen();
         },
@@ -186,7 +186,7 @@ module.exports = class WrapGuideElement {
     });
   }
 
-  getGuidesColumns(path, scopeName) {
+  getGuidesColumns(_path, _scopeName) {
     let left;
     const columns =
       (left = atom.config.get("wrap-guide.columns", {

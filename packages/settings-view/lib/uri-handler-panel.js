@@ -144,7 +144,7 @@ export default class UriHandlerPanel {
     );
   }
 
-  renderHistoryRow(item, idx) {
+  renderHistoryRow(item, _idx) {
     return (
       <tr key={item.id} className="">
         <td>{item.uri}</td>

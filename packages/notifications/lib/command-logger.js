@@ -212,7 +212,7 @@ module.exports = CommandLogger = (function () {
     // Private: Initializes the log structure for speed.
     initLog() {
       this.logIndex = 0;
-      return (this.eventLog = __range__(0, this.logSize, false).map((i) => ({
+      return (this.eventLog = __range__(0, this.logSize, false).map((_i) => ({
         name: null,
         count: 0,
         targetNodeName: null,

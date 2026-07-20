@@ -244,7 +244,7 @@ module.exports = class BracketMatcherView {
     return result;
   }
 
-  findMatchingStartBracketWithSyntaxTree(bracketPosition, startBracket, endBracket) {
+  findMatchingStartBracketWithSyntaxTree(bracketPosition, startBracket, _endBracket) {
     let result;
     const bracketEndPosition = bracketPosition.traverse([0, startBracket.length]);
     this.editor.buffer
