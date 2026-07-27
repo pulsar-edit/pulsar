@@ -7,7 +7,7 @@
 ## [Unreleased]
 
 * Fix an issue where opening up git worktree doesn't show any git info on the editor
-* Add a branded sidebar image to the Windows installer
+* Add a branded sidebar image to the Windows installer and improve icon
 
 ## 1.132.1
 
