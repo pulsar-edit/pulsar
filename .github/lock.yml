@@ -6,9 +6,9 @@ daysUntilLock: 180
 lockComment: >
   This issue has been automatically locked since there has not been
   any recent activity after it was closed. If you can still reproduce this issue in
-  [Safe Mode](https://flight-manual.atom.io/hacking-atom/sections/debugging/#using-safe-mode)
+  [Safe Mode](https://docs.pulsar-edit.dev/troubleshooting-pulsar/using-safe-mode/)
   then please open a new issue and fill out
-  [the entire issue template](https://github.com/atom/.github/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)
+  [the entire issue template](https://github.com/pulsar-edit/.github/blob/main/.github/ISSUE_TEMPLATE/bug-report.yml)
   to ensure that we have enough information to address your issue. Thanks!
 # Issues or pull requests with these labels will not be locked
 exemptLabels:

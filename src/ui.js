@@ -137,7 +137,10 @@ function renderMarkdown(content, givenOpts = {}) {
   }
   if (opts.useGitHubHeadings) {
     mdComponents.deps.markdownItGitHubHeadings ??= require("markdown-it-github-headings");
-    md.use(mdComponents.deps.markdownItGitHubHeadings, {});
+    // Keep the default prefix so heading ids survive DOMPurify.
+    md.use(mdComponents.deps.markdownItGitHubHeadings, {
+      enableHeadingLinkIcons: false
+    });
   }
   if (opts.useTaskCheckbox) {
     mdComponents.deps.markdownItTaskCheckbox ??= require("markdown-it-task-checkbox");
@@ -224,7 +227,7 @@ function renderMarkdown(content, givenOpts = {}) {
                     attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(mdComponents.reg.localLinks.currentDir, "")}`;
                   } else if (opts.transformNonFqdnLinks && mdComponents.reg.localLinks.rootDir.test(link)) {
                     attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(mdComponents.reg.localLinks.rootDir, "")}`;
-                  } else if (opts.transformNonFqdnLinks && !link.startsWith("http")) {
+                  } else if (opts.transformNonFqdnLinks && !link.startsWith("http") && !link.startsWith("#")) {
                     attr[1] = `${cleanRootDomain()}/blob/HEAD/${link.replace(".git", "")}`;
                   }
                 }

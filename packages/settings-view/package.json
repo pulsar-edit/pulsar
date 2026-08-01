@@ -17,9 +17,11 @@
     },
     "searchSettingsMinimumScore": {
       "title": "Search Settings Minimum Score to Display Results",
-      "description": "Set the minimum similarity score required for a setting to appear in the search results, when searching for settings.",
-      "type": "integer",
-      "default": 2
+      "description": "Set the minimum similarity score required for a setting to appear in the search results, when searching for settings. Score range is 0.0 to 1.0.",
+      "type": "number",
+      "default": 0.05,
+      "minimum": 0,
+      "maximum": 1
     },
     "searchSettingsMetadata": {
       "title": "Display Search Settings Metadata along with Search Results",

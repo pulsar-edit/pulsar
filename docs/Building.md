@@ -1,11 +1,7 @@
 
 ## Building
 
-There are two ways of building and staring hacking on Pulsar's core. One is following the documentation of the flight manual:
-
-* [Linux](https://flight-manual.atom.io/hacking-atom/sections/hacking-on-atom-core/#platform-linux)
-* [macOS](https://flight-manual.atom.io/hacking-atom/sections/hacking-on-atom-core/#platform-mac)
-* [Windows](https://flight-manual.atom.io/hacking-atom/sections/hacking-on-atom-core/#platform-windows)
+There are two ways of building and starting hacking on Pulsar's core. One is following the [Building Pulsar](https://docs.pulsar-edit.dev/contributing-to-pulsar/building-pulsar/) guide in the Pulsar documentation, which covers Linux, macOS, and Windows.
 
 ### Alternative method
 
@@ -21,7 +17,7 @@ yarn build:apm
 
 _If a Windows user it is recommended to install Pulsar on a path with no Spaces_
 
-This will install the packages, rebuild them for Electron, and build the Atom Package
+This will install the packages, rebuild them for Electron, and build the Pulsar Package
 Manager. Finally, you can run the editor with `yarn start`. This command will accept the
 same arguments as the final binary.
 

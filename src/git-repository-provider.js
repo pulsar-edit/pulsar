@@ -129,7 +129,9 @@ async function isValidGitDirectory(directory) {
   const commonDirFile = directory.getSubdirectory('commondir');
   let commonDir;
   if (await commonDirFile.exists()) {
-    const commonDirPathBuff = await fs.readFile(commonDirFile.getPath());
+    const commonDirPathBuff = await fs.promises.readFile(
+      commonDirFile.getPath()
+    );
     const commonDirPathString = commonDirPathBuff.toString().trim();
     commonDir = new Directory(directory.resolve(commonDirPathString));
     if (!(await commonDir.exists())) {
@@ -141,7 +143,7 @@ async function isValidGitDirectory(directory) {
   return (
     (await directory.getFile('HEAD').exists()) &&
     (await commonDir.getSubdirectory('objects').exists()) &&
-    commonDir.getSubdirectory('refs').exists()
+    (await commonDir.getSubdirectory('refs').exists())
   );
 }
 

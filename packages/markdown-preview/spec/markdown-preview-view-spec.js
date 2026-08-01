@@ -10,6 +10,7 @@ const temp = require('temp').track()
 const url = require('url')
 const { TextEditor } = require('atom')
 const MarkdownPreviewView = require('../lib/markdown-preview-view')
+const renderer = require('../lib/renderer')
 const TextMateLanguageMode = new TextEditor().getBuffer().getLanguageMode()
   .constructor
 const { conditionPromise } = require('./async-spec-helpers')
@@ -61,6 +62,136 @@ describe('MarkdownPreviewView', function () {
 
       await preview.renderMarkdown()
       expect(preview.element.scrollTop).toBe(24)
+    })
+  })
+
+  describe('in-page anchor links', function () {
+    it('uses GitHub-compatible heading ids with the original parser', async function () {
+      atom.config.set('markdown-preview.useOriginalParser', true)
+      const html = await renderer.toHTML(
+        [
+          '[Launch](#-launch)',
+          '',
+          '## 🚀 Launch',
+          '',
+          '[Title](#title)',
+          '',
+          '## Title',
+          '',
+          '[HTML](#hello-world)',
+          '',
+          '## Hello<span>world</span>',
+          '',
+          '[Café](#caf%C3%A9)',
+          '',
+          '## Caf&eacute;'
+        ].join('\n')
+      )
+      preview.element.innerHTML = html
+
+      const launchLink = preview.element.querySelector('a[href="#-launch"]')
+      const launchTarget = preview.element.querySelector(
+        '#user-content--launch'
+      )
+      const titleTarget = preview.element.querySelector('#user-content-title')
+      const htmlTarget = preview.element.querySelector(
+        '#user-content-hello-world'
+      )
+      const entityLink = preview.element.querySelector(
+        'a[href="#caf%C3%A9"]'
+      )
+      const entityTarget = preview.element.querySelector('#user-content-café')
+      spyOn(launchTarget, 'scrollIntoView')
+      spyOn(entityTarget, 'scrollIntoView')
+
+      launchLink.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true })
+      )
+      entityLink.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true })
+      )
+
+      expect(launchTarget.scrollIntoView).toHaveBeenCalled()
+      expect(entityTarget.scrollIntoView).toHaveBeenCalled()
+      expect(titleTarget).not.toBeNull()
+      expect(htmlTarget).not.toBeNull()
+    })
+
+    it('resets original parser heading ids between renders', async function () {
+      atom.config.set('markdown-preview.useOriginalParser', true)
+      const markdown = ['## Repeated', '', '## Repeated'].join('\n')
+
+      const firstRender = await renderer.toHTML(markdown)
+      const secondRender = await renderer.toHTML(markdown)
+
+      for (const html of [firstRender, secondRender]) {
+        expect(html).toContain('id="user-content-repeated"')
+        expect(html).toContain('id="user-content-repeated-1"')
+        expect(html).not.toContain('id="user-content-repeated-2"')
+      }
+    })
+
+    it('prefers the generated prefixed id over a colliding raw id', function () {
+      preview.element.innerHTML = [
+        '<a href="#user-content-foo">User content foo</a>',
+        '<h2 id="user-content-foo">Foo</h2>',
+        '<h2 id="user-content-user-content-foo">User content foo</h2>'
+      ].join('')
+      const anchor = preview.element.querySelector(
+        'a[href="#user-content-foo"]'
+      )
+      const rawTarget = preview.element.querySelector('#user-content-foo')
+      const prefixedTarget = preview.element.querySelector(
+        '#user-content-user-content-foo'
+      )
+      spyOn(rawTarget, 'scrollIntoView')
+      spyOn(prefixedTarget, 'scrollIntoView')
+
+      anchor.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true })
+      )
+
+      expect(prefixedTarget.scrollIntoView).toHaveBeenCalled()
+      expect(rawTarget.scrollIntoView).not.toHaveBeenCalled()
+    })
+
+    it('scrolls to the matching heading when a fragment link is clicked', function () {
+      preview.element.innerHTML =
+        '<p><a href="#install">Install</a></p><h2 id="install">Install</h2>'
+      const anchor = preview.element.querySelector('a[href="#install"]')
+      const target = preview.element.querySelector('#install')
+      spyOn(target, 'scrollIntoView')
+
+      anchor.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true })
+      )
+
+      expect(target.scrollIntoView).toHaveBeenCalled()
+    })
+
+    it('scrolls to a safely prefixed GitHub heading', function () {
+      preview.element.innerHTML =
+        '<p><a href="#title">Title</a></p><h2 id="user-content-title">Title</h2>'
+      const anchor = preview.element.querySelector('a[href="#title"]')
+      const target = preview.element.querySelector('#user-content-title')
+      spyOn(target, 'scrollIntoView')
+
+      anchor.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true })
+      )
+
+      expect(target.scrollIntoView).toHaveBeenCalled()
+    })
+
+    it('does nothing when the fragment has no matching target', function () {
+      preview.element.innerHTML = '<p><a href="#missing">Missing</a></p>'
+      const anchor = preview.element.querySelector('a[href="#missing"]')
+
+      expect(() =>
+        anchor.dispatchEvent(
+          new MouseEvent('click', { bubbles: true, cancelable: true })
+        )
+      ).not.toThrow()
     })
   })
 
