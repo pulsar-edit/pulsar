@@ -5,7 +5,8 @@ module.exports = {
     node: true
   },
   globals: {
-    waitsForPromise: true
+    waitsForPromise: true,
+    advanceClock: true
   },
   rules: {
     "node/no-missing-require": "off",
