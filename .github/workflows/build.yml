@@ -39,13 +39,49 @@ jobs:
       timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
-    # - name: Edit sources.list - Linux
-    #   if: ${{ runner.os == 'Linux' }}
-    #   run: |
-    #     sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
-    #     sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
-    #     sed -i '/security/d' /etc/apt/sources.list
-    #     sed -i '/-updates/d' /etc/apt/sources.list
+      # We want to build against the oldest version of `glibc` that we can get
+      # away with. (As of Electron 32, Electron themselves build with a Debian
+      # 11 image, so the version we target is `glibc` 2.31.) But at some point
+      # in the recent past, V8 started enforcing use of a compiler that
+      # understands C++20, and this started affecting Pulsar once it bumped
+      # past a certain version of Electron.
+      #
+      # Debian 11 gives us the `glibc` we want, but its `gcc` doesn't fit the
+      # bill. (Its C++20 support is experimental and we were never able to make
+      # it play well with Electron after the v32 bump.)
+      #
+      # For this reason, dependencies will build just fine upon initial
+      # installation, but run the risk of failing when we rebuild them for
+      # Electron. Electron's V8 version tends to be driven by Chromium; so even
+      # though Electron 32.2.3 uses Node 20.18.1, it combines it with a much
+      # higher version of V8 than the standalone Node 20.18.1 used. For this
+      # exact reason, even a dependency like `@pulsar-edit/fuzzy-native`, which
+      # builds perfectly well on Node 20.18.1 with C++17, fails at the rebuild
+      # step because of V8's more stringent requirements.
+      #
+      # The way out of this is to decouple the target `glibc` from that of the
+      # host machine — allowing us to use newer `gcc` on Debian 11 without
+      # raising the `glibc` floor above 2.31. To do this, we install
+      # conda-forge's vendored static toolchain.
+      #
+      # And since Electron is the only thing mandating C++20 support at the
+      # moment (the relevant libraries we use still build just fine with C++17
+      # or less), for now we'll only use these vendored tools for the
+      # electron-rebuild step. If we should need to use them more widely after
+      # a future Electron bump, it should be as simple as pointing the relevant
+      # environment variables to `PULSAR_CC`, `PULSAR_CXX`, etc., for whichever
+      # other steps require them.
+      #
+      # (For instance: the version of V8 that first caused rebuild failures for
+      # us was 12.8; Node itself didn't start using a version that high until
+      # 23.0.0. So once we bump to a version of Electron that uses Node 24, I
+      # expect that we'll need to start using the conda-forge compiler
+      # toolchain throughout this workflow file. At that point, we should also
+      # research whether it's worth bumping to a newer Debian image; we don't
+      # want to set a _higher_ `glibc` floor than Electron themselves, but
+      # there's no point in targeting a _lower_ `glibc` floor, either. Ideally,
+      # we'd stay in sync with whatever version of Debian Electron uses for
+      # Linux builds.)
     - name: Install Modern GCC Toolchain - Linux
       if: ${{ runner.os == 'Linux' }}
       run: |
@@ -213,8 +249,6 @@ jobs:
         max_attempts: 3
         retry_on: error
         command: |
-          echo "libx11.so lives at:"
-          dpkg -L libx11-6 | grep '\.so'
           yarn build
 
     - name: Build ppm
