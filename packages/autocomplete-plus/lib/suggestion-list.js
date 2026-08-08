@@ -326,7 +326,8 @@ class SuggestionList {
     } else if (this.overlayDecoration && this.overlayDecoration.destroy) {
       this.overlayDecoration.destroy()
     }
-    const editorElement = atom.views.getView(this.activeEditor)
+    const activeEditor = this.activeEditor
+    const editorElement = atom.views.getView(activeEditor)
     if (editorElement && editorElement.classList) {
       let timestamp = this.lastActiveAt
       atom.views.updateDocument(() => {
@@ -334,6 +335,12 @@ class SuggestionList {
         // shouldn't remove this class name anymore.
         if (this.lastActiveAt > timestamp) return
         editorElement.classList.remove('autocomplete-active')
+        // If the user clicked on the suggestion, focus moved onto the overlay
+        // before it was destroyed, so we'll move it back onto the editor. But
+        // first we ensure that this is still the active editor!
+        if (atom.workspace.getActiveTextEditor() === activeEditor) {
+          editorElement.focus()
+        }
       })
     }
     this.suggestionMarker = undefined
