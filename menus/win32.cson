@@ -171,11 +171,6 @@
   }
 
   {
-    label: 'F&ind'
-    submenu: []
-  }
-
-  {
     label: '&Packages'
     submenu: [
       { label: '%pulsar.menu.settings-view:view-installed-packages%', command: 'settings-view:view-installed-packages' }
