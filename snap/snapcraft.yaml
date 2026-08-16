@@ -1,0 +1,345 @@
+name: pulsar-edit
+# Inherit app details from dev.pulsar_edit.Pulsar.metainfo.xml
+adopt-info: pulsar-edit
+icon: resources/linux/pulsar.svg
+version: 1.130.0
+
+base: core24
+# 'devel' grade indicates this is a development build; change to 'stable'
+# for production releases to candidate/stable channels
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: strict # change to 'devmode' for no confinement
+
+# Minimum snapd version required for features used in this snap
+assumes:
+  - snapd2.54
+
+# Lint overrides for false positives and unavoidable warnings
+lint:
+  ignore:
+    - library:
+      # libGL.so.1 is dynamically loaded by ANGLE via dlopen, which the
+      # linter doesn't detect. It is required for GPU rendering.
+      - usr/lib/**/libGL.so*
+      # libGLX_mesa.so.0 is pulled in by libgl1-mesa-dri and may be
+      # needed for GLX fallback on some systems.
+      - usr/lib/**/libGLX_mesa.so*
+      # libgthread-2.0.so.0 is pulled in by libglib2.0-0t64 and is
+      # part of the GLib core library.
+      - usr/lib/**/libgthread-2.0.so*
+
+# Build and target architecture mapping. Currently only amd64 is supported.
+platforms:
+  amd64:
+    build-on: [amd64]
+    build-for: [amd64]
+
+parts:
+  pulsar-edit:
+    # The 'dump' plugin simply copies files from the source directory without
+    # compilation. We use it because Pulsar's build process is handled by
+    # yarn/npm scripts in the override-build section.
+    plugin: dump
+    # Source is the current directory (project root)
+    source: .
+    # Parse the AppStream metainfo file for inclusion in the snap store
+    parse-info:
+      - resources/linux/dev.pulsar_edit.Pulsar.metainfo.xml
+
+    # Build packages are dependencies needed only during the build process
+    # and are not included in the final snap
+    build-packages:
+      # Node.js runtime for running yarn and build scripts
+      - nodejs
+      # Yarn package manager for installing Node.js dependencies
+      - yarnpkg
+      # GNU C++ compiler for building native Node.js modules
+      - g++
+      # Git version control system for resolving git-based dependencies
+      - git
+      # Wayland development headers for @pulsar-edit/keyboard-layout module
+      - libwayland-dev
+      # XKB common development headers for keyboard layout support
+      - libxkbcommon-x11-dev
+      # XKB file development headers for keyboard layout parsing
+      - libxkbfile-dev
+      # Build automation tool for compiling native modules
+      - make
+      # Node.js native addon build tool for compiling C/C++ extensions
+      - node-gyp
+      # Package configuration tool for finding library dependencies
+      - pkg-config
+      # Python setuptools for building Python-based native modules
+      - python3-setuptools
+      # GLib binary utilities including glib-compile-schemas for compiling
+      # GSettings schemas during the build
+      - libglib2.0-bin
+    override-build: |
+      # Install all Node.js dependencies using yarn with frozen lockfile to
+      # ensure reproducible builds
+      yarnpkg install --frozen-lockfile
+
+      # Run electron-rebuild to compile native Node.js modules for the
+      # Electron version specified in package.json. This rebuilds modules
+      # like @pulsar-edit/fuzzy-native and @pulsar-edit/keyboard-layout
+      # against Electron's V8 headers.
+      yarnpkg build
+
+      # Run the PPM build
+      yarnpkg build:apm
+
+      # Build Pulsar using the custom electron-builder wrapper script.
+      # The 'linux' argument specifies the target platform, and '--target dir'
+      # instructs electron-builder to output only the unpacked application
+      # directory without creating distribution packages (AppImage, deb, etc.).
+      node script/electron-builder.js linux --target dir
+
+      # Copy the unpacked Electron application to the snap install directory
+      cp -a dist/linux-unpacked/* "$SNAPCRAFT_PART_INSTALL/"
+
+      # Copy the upstream pulsar.sh launcher script that handles
+      # command-line arguments, platform detection, and proper execution
+      # of the 'pulsar' binary
+      cp -a pulsar.sh "$SNAPCRAFT_PART_INSTALL/"
+
+    # Stage packages are runtime dependencies that will be included in the final
+    # snap. These are the libraries that Electron and its dependencies link
+    # against at runtime. The list was determined by analyzing the output of:
+    #   objdump -p electron | grep NEEDED
+    stage-packages:
+      # The primary GUI toolkit used by Electron for rendering the application
+      # interface on Linux. GTK 3 is required for all window management,
+      # widgets, and desktop integration.
+      - libgtk-3-0t64
+
+      # GLib is the low-level core library that forms the basis for GTK and
+      # GNOME applications. It provides data structures, main loop, and object
+      # system. Required by Electron for core functionality.
+      - libglib2.0-0t64
+
+      # Pango is a library for laying out and rendering text, with an emphasis
+      # on internationalization. It handles text shaping, font selection, and
+      # rendering for all text displayed in the application.
+      - libpango-1.0-0
+
+      # Cairo is a 2D graphics library used by GTK for rendering vector graphics.
+      # It provides anti-aliased graphics and compositing operations.
+      - libcairo2
+
+      # ATK (Accessibility Toolkit) provides the accessibility API for GTK,
+      # allowing screen readers and other assistive technologies to interact
+      # with the application.
+      - libatk1.0-0t64
+
+      # AT-SPI bridge connects GTK applications to the AT-SPI (Assistive
+      # Technology Service Provider Interface) D-Bus service, enabling
+      # accessibility features like screen readers.
+      - libatk-bridge2.0-0t64
+
+      # AT-SPI library provides the client-side implementation of the
+      # accessibility protocol. Required for accessibility support.
+      - libatspi2.0-0t64
+
+      # X11 client library for communicating with the X Window System display
+      # server. Required for rendering on X11-based desktop environments.
+      - libx11-6
+
+      # XCB (X C Binding) is a modern replacement for Xlib, providing a
+      # lower-level interface to the X Window System protocol.
+      - libxcb1
+
+      # X11 miscellaneous extensions library providing various X11 protocol
+      # extensions not included in the core Xlib.
+      - libxext6
+
+      # X11 fixes extension library for drawing operations that need to be
+      # atomically applied to the screen without flicker.
+      - libxfixes3
+
+      # X11 RandR (Resize and Rotate) extension library for querying and
+      # changing screen resolution and display configuration.
+      - libxrandr2
+
+      # X11 composite extension library for compositing operations, allowing
+      # applications to use hardware-accelerated compositing.
+      - libxcomposite1
+
+      # X11 damage extension library for tracking damaged regions of the screen
+      # that need to be redrawn, improving rendering efficiency.
+      - libxdamage1
+
+      # Keyboard handling library for X11 and Wayland, providing a
+      # platform-independent API for keyboard input handling.
+      - libxkbcommon0
+
+      # X11 keyboard file library for reading and interpreting XKB keyboard
+      # description files. Required for proper keyboard layout support.
+      - libxkbfile1
+
+      # XKB (X Keyboard Extension) data files containing keyboard layout
+      # definitions for all supported languages and keyboard types. Required
+      # for proper keyboard input handling.
+      - xkb-data
+
+      # ALSA (Advanced Linux Sound Architecture) library for audio output.
+      # Required for playing sounds and audio playback in the application.
+      - libasound2t64
+
+      # Generic Buffer Manager for memory allocation of graphics buffers.
+      # Used by Mesa for sharing GPU buffers between processes.
+      - libgbm1
+
+      # Direct Rendering Manager library for direct access to graphics hardware.
+      # Required for hardware-accelerated graphics rendering.
+      - libdrm2
+
+      # OpenGL library providing the standard 3D graphics API. Required by
+      # ANGLE (which Electron uses for OpenGL on Linux) for GPU rendering.
+      # ANGLE dynamically loads this via dlopen, which the linter doesn't detect.
+      - libgl1
+
+      # Mesa DRI (Direct Rendering Infrastructure) drivers for hardware
+      # acceleration. These drivers allow Electron to use the GPU for
+      # rendering instead of software rendering. Without this, the application
+      # would fall back to slower software rendering or fail to render at all.
+      - libgl1-mesa-dri
+
+      # Netscape Portable Runtime provides platform-independent APIs for
+      # system-level operations. Used by NSS for threading and other utilities.
+      - libnspr4
+
+      # Network Security Services provides SSL/TLS and cryptographic services.
+      # Required for secure HTTPS connections and certificate validation.
+      - libnss3
+
+      # Common UNIX Printing System library for printer discovery and job
+      # submission. Required for the print-to-PDF and print functionality.
+      - libcups2t64
+
+      # libsecret is the GNOME keyring library for securely storing passwords
+      # and other secrets. Required by keytar for storing GitHub tokens and
+      # other credentials securely.
+      - libsecret-1-0
+
+      # libcurl is a client-side URL transfer library supporting HTTP, HTTPS,
+      # and other protocols. Required by dugite (bundled git) for git operations
+      # over HTTP/HTTPS such as cloning, pushing, and fetching repositories.
+      - libcurl4t64
+
+      # Expat is a fast, stream-oriented XML parser. Used by various
+      # components for parsing XML configuration files.
+      - libexpat1
+
+      # GDK Pixbuf library for loading and rendering images. GTK uses this for
+      # loading icons, images, and other graphics resources.
+      - libgdk-pixbuf-2.0-0
+
+      # RSVG (Raster SVG) library for rendering SVG images. Required for
+      # displaying SVG icons and graphics in the application.
+      - librsvg2-2
+
+      # RSVG common files including SVG loaders for GDK Pixbuf. Allows GTK
+      # to load SVG images through the standard image loading mechanism.
+      - librsvg2-common
+
+      # Shared MIME Info database containing mappings of file extensions to
+      # MIME types. Required for proper file type detection and icon display.
+      - shared-mime-info
+
+      # Pango Cairo integration library for rendering text with Cairo graphics.
+      # Connects Pango's text layout with Cairo's rendering capabilities.
+      - libpangocairo-1.0-0
+
+      # Thai language support library for complex text rendering in Thai script.
+      # Required for proper display of Thai characters.
+      - libthai0
+
+      # HarfBuzz is an OpenType text shaping engine. It handles complex text
+      # shaping for scripts like Arabic, Indic, and others that require
+      # contextual glyph selection.
+      - libharfbuzz0b
+
+      # FreeType is a font rasterization library that converts font outlines
+      # to bitmaps for display. Required for rendering text on screen.
+      - libfreetype6
+
+      # Fontconfig is a library for font discovery and configuration. It
+      # manages font substitution, matching, and configuration for applications.
+      - libfontconfig1
+
+      # Desktop settings schemas containing default GSettings schemas for
+      # standard desktop applications. Provides schemas for common desktop
+      # settings like font configuration, interface settings, etc.
+      - gsettings-desktop-schemas
+
+    prime:
+      - .
+
+plugs:
+  # Shared memory interface for GPU acceleration. This allows the snap to
+  # access shared memory for hardware-accelerated graphics rendering.
+  # The 'private: true' flag means this plug is not auto-connected and must
+  # be manually connected by the user or the snap store reviewer.
+  shmem:
+    interface: shared-memory
+    private: true
+
+apps:
+  pulsar-edit:
+    # The command to run when the app is launched. We use a wrapper script
+    # to set environment variables that need to be inherited by child
+    # processes (like the GPU process). The wrapper script is created in
+    # the override-build section.
+    command: pulsar.sh
+
+    # The common-id is the desktop entry ID that matches the .desktop file
+    # and AppStream metadata. This allows the snap to integrate properly with
+    # the desktop environment.
+    common-id: dev.pulsar_edit.Pulsar
+
+    # Environment variables set for the application. These are critical for
+    # proper operation within the snap's confined environment.
+    environment:
+      # Set TMPDIR to XDG_RUNTIME_DIR to ensure Chromium/Electron can
+      # create temporary files in a location with proper permissions. The
+      # default /tmp may have issues with the snap's sandbox.
+      TMPDIR: $XDG_RUNTIME_DIR
+
+      PULSAR_PATH: $SNAP
+
+    plugs:
+      # Access to the user's home directory for opening/saving files
+      - home
+
+      # Network access for fetching packages, updates, and web content
+      - network
+
+      # Desktop integration for showing windows, icons, and menus
+      - desktop
+
+      # Legacy desktop integration for older desktop environments
+      - desktop-legacy
+
+      # OpenGL access for hardware-accelerated graphics rendering
+      - opengl
+
+      # X11 display server access for rendering on X11-based desktops
+      - x11
+
+      # Wayland display server access (currently disabled via DISABLE_WAYLAND)
+      - wayland
+
+      # Audio playback for sounds and audio in the application
+      - audio-playback
+
+      # Access to removable media (USB drives, external disks, etc.)
+      - removable-media
+
+      # Unity7 desktop integration for Ubuntu Unity desktop environment
+      - unity7
+
+      # Browser support for embedded web views and OAuth flows
+      - browser-support
+
+      # Network binding for running local servers (e.g., Live Preview)
+      - network-bind
