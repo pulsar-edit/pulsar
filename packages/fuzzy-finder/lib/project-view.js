@@ -6,10 +6,12 @@ const PathLoader = require('./path-loader')
 
 module.exports =
 class ProjectView extends FuzzyFinderView {
-  constructor (paths, metricsReporter) {
-    super(metricsReporter)
+  constructor (paths, ignoredPaths) {
+    super()
     this.disposables = new CompositeDisposable()
     this.paths = paths
+    this.ignoredPaths = ignoredPaths
+    // if no paths were passed in, then we should try to reload them
     this.reloadPaths = !this.paths || this.paths.length === 0
     this.reloadAfterFirstLoad = false
 
@@ -30,8 +32,10 @@ class ProjectView extends FuzzyFinderView {
     this.disposables.add(atom.config.onDidChange('core.ignoredNames', () => { this.reloadPaths = true }))
     this.disposables.add(atom.config.onDidChange('core.excludeVcsIgnoredPaths', () => { this.reloadPaths = true }))
     this.disposables.add(atom.project.onDidChangePaths(() => {
+      // if a project path was changed/added/removed, clear our list and reindex
       this.reloadPaths = true
       this.paths = null
+      this.ignoredPaths = null
     }))
 
     if (!this.reloadPaths) {
@@ -74,7 +78,8 @@ class ProjectView extends FuzzyFinderView {
     })
 
     const localItems = this.projectRelativePathsForFilePaths(this.paths || [])
-    await this.setItems(remoteItems.concat(localItems))
+    const localIgnoredItems = this.projectRelativePathsForFilePaths(this.ignoredPaths || [])
+    await this.setItems(remoteItems.concat(localItems), localIgnoredItems)
   }
 
   async reloadPathsIfNeeded () {
@@ -114,7 +119,8 @@ class ProjectView extends FuzzyFinderView {
         if (task) {
           let pathsFound = 0
           task.on('load-paths:paths-found', (paths) => {
-            pathsFound += paths.length
+            paths = paths || {paths: [], ignoredPaths: []}
+            pathsFound += paths.paths.length + paths.ignoredPaths.length
             this.selectListView.update({loadingMessage: 'Indexing project\u2026', infoMessage: null, loadingBadge: humanize.intComma(pathsFound)})
           })
         }
@@ -178,13 +184,14 @@ class ProjectView extends FuzzyFinderView {
       this.loadPathsTask.terminate()
     }
 
-    this.loadPathsTask = PathLoader.startTask((paths) => {
+    this.loadPathsTask = PathLoader.startTask((paths, ignoredPaths) => {
       this.paths = paths
+      this.ignoredPaths = ignoredPaths
       this.reloadPaths = false
       if (fn) {
         fn()
       }
-    }, this.metricsReporter)
+    })
 
     return this.loadPathsTask
   }

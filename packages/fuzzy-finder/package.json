@@ -36,11 +36,6 @@
       "versions": {
         "1.0.0": "consumeElementIcons"
       }
-    },
-    "metrics-reporter": {
-      "versions": {
-        "^1.1.0": "consumeMetricsReporter"
-      }
     }
   },
   "configSchema": {
@@ -63,6 +58,11 @@
       "type": "boolean",
       "default": true,
       "description": "Use the substantially faster `ripgrep` crawler."
+    },
+    "indexIgnoredPaths": {
+      "type": "boolean",
+      "default": false,
+      "description": "Index VCS ignored paths so that they can be searched when the typed query begins with `!`. (Has no effect if not using the `ripgrep` crawler.)"
     },
     "prefillFromSelection": {
       "type": "boolean",
