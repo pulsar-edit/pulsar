@@ -95,6 +95,15 @@ done < <(find "$ROOT" -name '*.node' -type f -print0)
 echo
 echo "Checked ${checked} native module(s)."
 
+# A guard that silently passes because it looked in the wrong place is worse
+# than no guard at all. If we found nothing to check, that's a bug in how we
+# were invoked, not a clean bill of health.
+if [ "$checked" -eq 0 ]; then
+  echo "error: found no *.node files under '${ROOT}'; expected at least one." >&2
+  echo "       (Has the build run yet? Is the path right?)" >&2
+  exit 1
+fi
+
 if [ "$violations" -gt 0 ]; then
   cat >&2 <<'EOF'
 
