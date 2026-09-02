@@ -504,7 +504,12 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v6
       with:
-        node-version: ${{ env.NODE_VERSION }}
+        # We have plans to align on a node version org-wide, but this might be
+        # the place to skip it. When we bump Electron and need to test with a
+        # new Node, we should use a self-contained source of truth like the
+        # `.nvmrc` file. Then, once we land such a version bump, the org-wide
+        # variable can be updated.
+        node-version-file: '.nvmrc'
 
     - name: Restore Cached Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
