@@ -114,6 +114,29 @@
 ((comment) @comment.block.cs
 	(#match? @comment.block.cs "^/\\*"))
 
+(shebang_directive) @comment.line.shebang.cs
+
+
+; DIRECTIVES
+
+[
+	"#if"
+	"#elif"
+	"#else"
+	"#endif"
+] @keyword.control.directive.conditional.cs
+
+[
+	"#define"
+	"#undef"
+] @keyword.control.directive.definition.cs
+
+"#line" @keyword.control.directive.line.cs
+["#region" "#endregion"] @keyword.control.directive.region.cs
+
+"#pragma" @keyword.control.directive.pragma.cs
+"#nullable" @keyword.control.directive.nullable.cs
+
 ; ENTITIES
 
 (interface_declaration
