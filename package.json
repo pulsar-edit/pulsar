@@ -313,15 +313,14 @@
     "webdriverio": "7.20.9"
   },
   "resolutions": {
-    "node-abi": "^3.92.0",
+    "node-abi": "3.92.0",
     "keytar": "7.9.0",
-    "nan": "^2.27.0",
+    "nan": "2.27.0",
     "ctags": "https://github.com/pulsar-edit/node-ctags.git#c32ca6017dd3f4ea314d53b044225505820abbe3",
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244",
     "@electron/remote": "2.1.2",
     "@pulsar-edit/superstring": "3.0.5",
     "@pulsar-edit/pathwatcher": "9.0.3",
     "**/underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
-  },
-  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
+  }
 }
