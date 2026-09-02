@@ -13,6 +13,16 @@ env:
   # Variables needed for build information
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PYTHON_VERSION: '3.12'
+  # Version of the conda-forge compiler toolchain we use for the Linux
+  # `electron-rebuild` step, and of the `micromamba` we install it with. See
+  # the long comment in the "Install Modern GCC Toolchain" step below.
+  GCC_VERSION: '12'
+  MICROMAMBA_VERSION: '2.9.0-0'
+  # The oldest `glibc`/`libstdc++` we promise to run against, enforced by the
+  # "Verify Linux ABI Floor" step. These correspond to Debian 11 (bullseye),
+  # which is what Electron itself builds its Linux binaries on as of v32.
+  MAX_GLIBC_VERSION: '2.31'
+  MAX_GLIBCXX_VERSION: '3.4.28'
   ROLLING_UPLOAD_TOKEN: ${{ secrets.ROLLING_RELEASE_UPLOAD_TOKEN }}
   # Below variables allow us to quickly control visual tests for each platform
   RUN_WINDOWS_VT: false
@@ -39,6 +49,40 @@ jobs:
       timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
+      # Debian 11's LTS window ended on 2026-08-31. Some time after a release
+      # goes EOL, its packages are removed from `deb.debian.org` and
+      # `security.debian.org` and moved to `archive.debian.org` — at which
+      # point `apt-get update` starts 404ing.
+      #
+      # We can't know in advance exactly when that migration happens, and we
+      # don't want a scheduled build to fail on the day it does, so we detect
+      # it instead of hard-coding it: try the image's stock sources first, and
+      # only rewrite them to point at the archive if that fails. (Archived
+      # `Release` files are also past their `Valid-Until` date, so we have to
+      # tell `apt` to stop caring about that at the same time.)
+      #
+      # Once bullseye _is_ archived, this will take the second branch on every
+      # single build; at that point we could simplify by rewriting `apt`'s
+      # sources unconditionally, the way this workflow used to do for Debian
+      # 10. It's cheap enough to leave as-is, though, and leaving it means the
+      # next Debian bump doesn't have to remember to re-add it.
+    - name: Point apt at the Debian archive if necessary - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        if apt-get update; then
+          echo "Stock apt sources are still live; nothing to do."
+        else
+          echo "apt-get update failed; assuming this Debian release has been archived."
+          SOURCES="/etc/apt/sources.list"
+          if compgen -G "/etc/apt/sources.list.d/*.list" > /dev/null; then
+            SOURCES="$SOURCES /etc/apt/sources.list.d/*.list"
+          fi
+          # shellcheck disable=SC2086
+          sed -i -e s/deb.debian.org/archive.debian.org/g -e s/security.debian.org/archive.debian.org/g $SOURCES
+          echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+          apt-get update
+        fi
+
       # We want to build against the oldest version of `glibc` that we can get
       # away with. (As of Electron 32, Electron themselves build with a Debian
       # 11 image, so the version we target is `glibc` 2.31.) But at some point
@@ -50,14 +94,13 @@ jobs:
       # bill. (Its C++20 support is experimental and we were never able to make
       # it play well with Electron after the v32 bump.)
       #
-      # For this reason, dependencies will build just fine upon initial
-      # installation, but run the risk of failing when we rebuild them for
-      # Electron. Electron's V8 version tends to be driven by Chromium; so even
-      # though Electron 32.2.3 uses Node 20.18.1, it combines it with a much
-      # higher version of V8 than the standalone Node 20.18.1 used. For this
-      # exact reason, even a dependency like `@pulsar-edit/fuzzy-native`, which
-      # builds perfectly well on Node 20.18.1 with C++17, fails at the rebuild
-      # step because of V8's more stringent requirements.
+      # Electron's V8 version tends to be driven by Chromium; so even though
+      # Electron 32.2.3 uses Node 20.18.1, it combines it with a much higher
+      # version of V8 than the standalone Node 20.18.1 used.
+      #
+      # For this reason, even a dependency like `@pulsar-edit/fuzzy-native`,
+      # which builds perfectly well on Node 20.18.1 with C++17, fails at the
+      # rebuild step because of V8's more stringent requirements.
       #
       # The way out of this is to decouple the target `glibc` from that of the
       # host machine — allowing us to use newer `gcc` on Debian 11 without
@@ -82,26 +125,75 @@ jobs:
       # there's no point in targeting a _lower_ `glibc` floor, either. Ideally,
       # we'd stay in sync with whatever version of Debian Electron uses for
       # Linux builds.)
-    - name: Install Modern GCC Toolchain - Linux
+    - name: Restore Modern GCC Toolchain from Cache - Linux
+      id: cache-gcc-toolchain
       if: ${{ runner.os == 'Linux' }}
+      uses: actions/cache@v5
+      with:
+        path: /opt/gcc-toolchain
+        # Solving and downloading the toolchain takes a couple of minutes on
+        # every leg of the matrix, and the result is a pure function of the
+        # inputs named in this key, so we can cache it wholesale. Bump any of
+        # the versions below and you get a fresh toolchain automatically.
+        key: gcc-toolchain-${{ runner.arch }}-conda-forge-gcc${{ env.GCC_VERSION }}-micromamba${{ env.MICROMAMBA_VERSION }}
+
+    - name: Install Modern GCC Toolchain - Linux
+      if: ${{ runner.os == 'Linux' && steps.cache-gcc-toolchain.outputs.cache-hit != 'true' }}
       run: |
-        apt-get update && apt-get install -y curl bzip2
+        # No `apt-get update` needed: the archive-detection step above already
+        # ran one. (`micromamba` unpacks conda's `.tar.bz2` packages itself, so
+        # we don't need a system `bzip2` here.)
+        apt-get install -y curl ca-certificates
         if [ "${{ runner.arch }}" = "ARM64" ]; then
           MAMBA_ARCH=linux-aarch64
+          MAMBA_SHA256=9f93b974adcb4d166996af969b6cd371287d1a3e52733704727884d9b74cb7a7
+        else
+          MAMBA_ARCH=linux-64
+          MAMBA_SHA256=366cd9cd8be14df1ab8ed50352a82111082a36686b2d389fdb79a92c3fafb3e3
+        fi
+        # Pinned by version _and_ by hash: this binary is the root of trust for
+        # the entire compiler toolchain, so we don't want `latest` silently
+        # changing what we build with. To bump it, grab the new version's
+        # published `micromamba-<arch>.sha256` files and paste them above.
+        curl -Lo /usr/local/bin/micromamba --fail --show-error --silent \
+          "https://github.com/mamba-org/micromamba-releases/releases/download/${{ env.MICROMAMBA_VERSION }}/micromamba-${MAMBA_ARCH}"
+        echo "${MAMBA_SHA256}  /usr/local/bin/micromamba" | sha256sum --check --strict
+        chmod +x /usr/local/bin/micromamba
+        export MAMBA_ROOT_PREFIX=/opt/micromamba
+        /usr/local/bin/micromamba create -y -p /opt/gcc-toolchain -c conda-forge \
+          "gcc=${{ env.GCC_VERSION }}" "gxx=${{ env.GCC_VERSION }}"
+
+    - name: Configure Modern GCC Toolchain - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        if [ "${{ runner.arch }}" = "ARM64" ]; then
           CONDA_TARGET=aarch64-conda-linux-gnu
           MULTIARCH=aarch64-linux-gnu
         else
-          MAMBA_ARCH=linux-64
           CONDA_TARGET=x86_64-conda-linux-gnu
           MULTIARCH=x86_64-linux-gnu
         fi
-        curl -Ls "https://micro.mamba.pm/api/micromamba/${MAMBA_ARCH}/latest" | tar -xvj -C /usr/local bin/micromamba
-        /usr/local/bin/micromamba create -y -p /opt/gcc-toolchain -c conda-forge gcc=12 gxx=12
         echo "PULSAR_CC=/opt/gcc-toolchain/bin/${CONDA_TARGET}-gcc" >> "$GITHUB_ENV"
         echo "PULSAR_CXX=/opt/gcc-toolchain/bin/${CONDA_TARGET}-g++" >> "$GITHUB_ENV"
+        # The `-I` flags point the vendored compiler at the _system_ headers,
+        # so that we compile against Debian 11's `glibc` (2.31) instead of the
+        # newer one that ships inside the conda environment.
         echo "PULSAR_CFLAGS=-I/usr/include -I/usr/include/${MULTIARCH}" >> "$GITHUB_ENV"
         echo "PULSAR_CXXFLAGS=-I/usr/include -I/usr/include/${MULTIARCH}" >> "$GITHUB_ENV"
-        echo "PULSAR_LDFLAGS=-L/usr/lib/${MULTIARCH} -L/usr/lib" >> "$GITHUB_ENV"
+        # `-static-libstdc++ -static-libgcc` is the other half of that bargain,
+        # and it's the part that's easy to forget. GCC 12 will happily emit
+        # code that references symbols from its own, much newer `libstdc++`
+        # (`GLIBCXX_3.4.29` and up); Debian 11 ships `GLIBCXX_3.4.28`. Since we
+        # don't ship the conda environment to users, dynamically linking
+        # against it would produce binaries that build and test green here but
+        # fail to load on precisely the older distros this whole dance exists
+        # to support. Linking those two runtimes statically keeps the ABI
+        # surface of our native modules limited to `glibc` itself.
+        #
+        # The "Verify Linux ABI Floor" step below exists to make sure this
+        # actually worked, rather than trusting that it did.
+        echo "PULSAR_LDFLAGS=-static-libstdc++ -static-libgcc -L/usr/lib/${MULTIARCH} -L/usr/lib" >> "$GITHUB_ENV"
+
     - name: Install build dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
       run: apt-get update && apt-get install -y git python3 python3-pip make gcc g++ file libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
@@ -147,7 +239,7 @@ jobs:
 
     - name: Setup Python
       # actions/setup-python's copy of Python is compiled for too new glibc,
-      # which won't work in a Debian 10 Docker image.
+      # which won't work in a Debian 11 Docker image.
       # Get Python from apt repos instead on Linux.
       if: ${{ runner.os != 'Linux' }}
       uses: actions/setup-python@v6
@@ -250,6 +342,16 @@ jobs:
         retry_on: error
         command: |
           yarn build
+
+      # The whole reason we build in an old Debian image is to keep our `glibc`
+      # requirement low. Nothing about the build fails loudly if we
+      # accidentally raise it, though! The failure shows up on a user's
+      # machine, on a distro nothing in CI runs. (Certainly not
+      # `ubuntu-latest`. It's too new! It's right there in the name!) So we
+      # check explicitly.
+    - name: Verify Linux ABI Floor
+      if: ${{ runner.os == 'Linux' }}
+      run: script/check-linux-abi-floor.sh node_modules
 
     - name: Build ppm
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
