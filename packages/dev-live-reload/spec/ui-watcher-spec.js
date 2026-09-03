@@ -275,4 +275,47 @@ describe('UIWatcher', () => {
       await conditionPromise(() => pack.reloadStylesheets.callCount > 0);
     });
   });
+
+  describe('theme variants', () => {
+    beforeEach(async () => {
+      jasmine.useRealClock();
+      atom.packages.loadPackage(
+        path.join(__dirname, 'fixtures', 'theme-with-variants')
+      );
+      atom.config.set('core.themes', [
+        'dev-live-reload-theme-variant-night-ui',
+        'dev-live-reload-theme-variant-night-syntax'
+      ]);
+
+      await atom.themes.activateThemes();
+      uiWatcher = new UIWatcher();
+    });
+
+    afterEach(() => atom.themes.deactivateThemes());
+
+    it('watches all variant stylesheet paths and reloads the variant theme', async () => {
+      const themePath = path.join(__dirname, 'fixtures', 'theme-with-variants');
+      const theme = atom.themes
+        .getActiveThemes()
+        .find(
+          activeTheme =>
+            activeTheme.name === 'dev-live-reload-theme-variant-night-ui'
+        );
+      spyOn(theme, 'reloadStylesheets');
+
+      const watcher = uiWatcher.watchedThemes.get(
+        'dev-live-reload-theme-variant-night-ui'
+      );
+      const watchedPaths = watcher.entities.map(entity => entity.getPath());
+
+      expect(watchedPaths).toContain(path.join(themePath, 'styles', 'night-ui'));
+      expect(watchedPaths).toContain(path.join(themePath, 'styles'));
+
+      watcher.entities
+        .find(entity => entity.getPath().endsWith('shared-ui.less'))
+        .emitter.emit('did-change');
+
+      await conditionPromise(() => theme.reloadStylesheets.callCount > 0);
+    });
+  });
 });

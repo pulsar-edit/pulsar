@@ -550,7 +550,11 @@ module.exports = class PackageManager {
   // pack - The package for which the event is being emitted.
   // error - Any error information to be included in the case of an error.
   emitPackageEvent(eventName, pack, error) {
-    const theme = pack.theme != null ? pack.theme : (pack.metadata != null ? pack.metadata.theme : undefined);
+    const theme = pack.theme != null
+      ? pack.theme
+      : (pack.metadata != null
+          ? pack.metadata.theme || pack.metadata.themes
+          : undefined);
     eventName = theme ? `theme-${eventName}` : `package-${eventName}`;
     return this.emitter.emit(eventName, {pack, error});
   }
