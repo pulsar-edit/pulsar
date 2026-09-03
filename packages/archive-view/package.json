@@ -30,5 +30,8 @@
         "1.0.0": "consumeElementIcons"
       }
     }
+  },
+  "overrides": {
+    "minimist": "1.2.6"
   }
 }
