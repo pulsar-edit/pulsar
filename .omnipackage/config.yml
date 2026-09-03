@@ -1,0 +1,264 @@
+version_extractors:
+  - name: package_json
+    provider: "file"
+    file:
+      file: "package.json"
+      regex: '"version": "(.+)-dev"'
+
+common: &common
+  package_name: "pulsar-dev"
+  maintainer: "Chuck Norris <chuck@norr.is>"
+  homepage: https://pulsar-edit.dev/
+  description: A community-led, hyper-hackable text editor
+
+repositories:
+  - name: R2 test repo
+    provider: s3
+    gpg_private_key_base64: "${GPG_PRIVATE_KEY_BASE64}"
+    <<: *common
+    s3:
+      bucket: repositories-test
+      path_in_bucket: "pulsar-dev"
+      bucket_public_url: "https://repositories-test.omnipackage.org"
+      endpoint: "${CLOUDFLARE_R2_ENDPOINT}"
+      access_key_id: "${CLOUDFLARE_R2_ACCESS_KEY_ID}"
+      secret_access_key: "${CLOUDFLARE_R2_SECRET_ACCESS_KEY}"
+      region: auto
+      force_path_style: true
+      cloudflare_zone_id: "${CLOUDFLARE_ZONE_ID}"
+      cloudflare_api_token: "${CLOUDFLARE_API_TOKEN}"
+
+  - name: Local test
+    <<: *common
+    gpg_private_key_base64: "${GPG_PRIVATE_KEY_BASE64}"
+    provider: localfs
+    localfs:
+      path: /run/media/oleg/c3996ce0-a379-4403-9d64-7d4c0536463f/dev/omnipackage-repos/pulsar-dev
+
+rpm: &rpm
+  <<: *common
+  before_build_script: ".omnipackage/prepare.sh"
+  rpm:
+    spec_template: ".omnipackage/specfile.spec.liquid"
+
+deb: &deb
+  <<: *common
+  before_build_script: ".omnipackage/prepare.sh"
+  deb:
+    debian_templates: ".omnipackage/deb"
+
+# Shared libs are picked up automatically by rpmbuild's dependency generator
+# (and by dpkg-shlibdeps for debs). Only list things ELF scanning can't infer:
+# commands invoked at runtime and services we depend on via pkexec/etc.
+opensuse: &opensuse
+  build_dependencies:
+    [
+      "libsecret-devel",
+      "libX11-devel",
+      "libxkbfile-devel",
+      "gcc",
+      "gcc-c++",
+      "make",
+      "python313-distutils-extra",
+      "wget",
+      "git",
+      "wayland-devel",
+      "libxkbcommon-devel",
+      "libgnome-keyring-devel",
+      "pkg-config",
+    ]
+  runtime_dependencies:
+    [
+      "git",
+      "xdg-utils",
+      "polkit",
+    ]
+  <<: *rpm
+
+# Fedora differs from openSUSE on package names: pkgconf-pkg-config provides
+# pkg-config, and libgnome-keyring-devel was retired (libsecret is enough).
+fedora: &fedora
+  build_dependencies:
+    [
+      "libsecret-devel",
+      "libX11-devel",
+      "libxkbfile-devel",
+      "gcc",
+      "gcc-c++",
+      "make",
+      "python3",
+      "python3-setuptools",
+      "wget",
+      "git",
+      "wayland-devel",
+      "libxkbcommon-devel",
+      "pkgconf-pkg-config",
+    ]
+  runtime_dependencies:
+    [
+      "git",
+      "xdg-utils",
+      "polkit",
+    ]
+  <<: *rpm
+
+debian: &debian
+  build_dependencies:
+    [
+      "build-essential",
+      "git",
+      "wget",
+      "curl",
+      "ca-certificates",
+      "pkg-config",
+      "python3",
+      "python3-setuptools",
+      "libsecret-1-dev",
+      "libx11-dev",
+      "libxkbfile-dev",
+      "libwayland-dev",
+      "libxkbcommon-dev",
+    ]
+  runtime_dependencies:
+    [
+      "git",
+      "xdg-utils",
+      "policykit-1",
+      "libglib2.0-bin | kde-cli-tools | kde-runtime",
+    ]
+  <<: *deb
+
+# RHEL clones (AlmaLinux/RockyLinux). EL9 defaults python3 to 3.9 (works for
+# node-gyp out of the box); EL10 ships 3.12 (the python3-setuptools dep gives
+# us the vendored distutils shim prepare.sh's symlink picks up).
+# libxkbfile-devel is intentionally omitted from build_dependencies because
+# it lives in CRB (disabled by default on AlmaLinux/Rocky). prepare.sh
+# capability-detects the CRB repo file and enables it inline (no-op on
+# Fedora / non-dnf distros).
+redhat: &redhat
+  build_dependencies:
+    [
+      "libsecret-devel",
+      "libX11-devel",
+      "gcc",
+      "gcc-c++",
+      "make",
+      "python3",
+      "python3-setuptools",
+      "wget",
+      "git",
+      "wayland-devel",
+      "libxkbcommon-devel",
+      "pkgconf-pkg-config",
+    ]
+  runtime_dependencies:
+    [
+      "git",
+      "xdg-utils",
+      "polkit",
+    ]
+  <<: *rpm
+
+# Mageia ships -devel headers under the lib64*-devel namespace on x86_64,
+# and uses bare `pkgconf` rather than pkgconf-pkg-config.
+mageia: &mageia
+  build_dependencies:
+    [
+      "lib64secret-devel",
+      "lib64x11-devel",
+      "lib64xkbfile-devel",
+      "gcc",
+      "gcc-c++",
+      "make",
+      "python3",
+      "python3-setuptools",
+      "wget",
+      "git",
+      "lib64wayland-devel",
+      "lib64xkbcommon-devel",
+      "pkgconf",
+    ]
+  runtime_dependencies:
+    [
+      "git",
+      "xdg-utils",
+      "polkit",
+    ]
+  <<: *rpm
+
+builds:
+  - distro: "opensuse_tumbleweed"
+    <<: *opensuse
+
+  - distro: "opensuse_16.0"
+    <<: *opensuse
+
+  - distro: "opensuse_15.6"
+    # Leap 15.6's default python3 is 3.6 (too old for node-gyp); install
+    # python311 explicitly. stdlib distutils is still present in 3.11, so no
+    # setuptools shim or python*-distutils-extra is needed.
+    <<: *opensuse
+    build_dependencies:
+      [
+        "libsecret-devel",
+        "libX11-devel",
+        "libxkbfile-devel",
+        "gcc",
+        "gcc-c++",
+        "make",
+        "python311",
+        "wget",
+        "git",
+        "wayland-devel",
+        "libxkbcommon-devel",
+        "libgnome-keyring-devel",
+        "pkg-config",
+      ]
+
+  - distro: "fedora_42"
+    <<: *fedora
+
+  - distro: "fedora_43"
+    <<: *fedora
+
+  - distro: "fedora_44"
+    <<: *fedora
+
+  - distro: "fedora_rawhide"
+    <<: *fedora
+
+  - distro: "debian_12"
+    <<: *debian
+
+  - distro: "debian_13"
+    <<: *debian
+
+  - distro: "ubuntu_22.04"
+    <<: *debian
+
+  - distro: "ubuntu_24.04"
+    <<: *debian
+
+  - distro: "ubuntu_26.04"
+    <<: *debian
+
+  - distro: "almalinux_9"
+    <<: *redhat
+
+  - distro: "almalinux_10"
+    <<: *redhat
+
+  - distro: "rockylinux_9"
+    <<: *redhat
+
+  - distro: "rockylinux_10"
+    <<: *redhat
+
+  - distro: "mageia_9"
+    <<: *mageia
+
+ignore_source_files:
+  - .git
+  - .env
+  - "*.log"
+  - node_modules
