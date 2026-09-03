@@ -355,6 +355,12 @@ jobs:
           echo "::error::No AppImage in ./binaries — the '${{ matrix.os }}*Binaries' artifact from the build job is missing or empty."
           exit 1
         fi
+        # Artifacts are zipped for transport, and zip doesn't carry the Unix
+        # permission bits: everything comes back as 644, so the AppImage we
+        # just downloaded is not executable. (The cache we used to use for
+        # this handoff was a tarball, which _did_ preserve the executable bit…
+        # hence this step having no ancestor in the cache-based version.)
+        chmod +x ./binaries/*AppImage
         ls -la ./binaries
 
     - name: Restore Cached Pulsar dependencies - Linux
