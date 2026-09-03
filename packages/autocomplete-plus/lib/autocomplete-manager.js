@@ -247,7 +247,7 @@ class AutocompleteManager {
         let descriptionContainer = suggestionListView.querySelector('.suggestion-description')
         if (descriptionContainer !== null && descriptionContainer.style.display === 'block') {
           let descriptionMoreLink = descriptionContainer.querySelector('.suggestion-description-more-link')
-          require('electron').shell.openExternal(descriptionMoreLink.href)
+          atom.openExternal(descriptionMoreLink.href)
         }
       }
     }))

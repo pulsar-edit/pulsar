@@ -24,8 +24,7 @@ module.exports = class About {
 
     this.subscriptions.add(
       atom.commands.add('atom-workspace', 'about:view-release-notes', () => {
-        shell = shell || require('electron').shell;
-        shell.openExternal(
+        atom.openExternal(
           this.state.updateManager.getReleaseNotesURLForCurrentVersion()
         );
       })
