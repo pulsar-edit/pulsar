@@ -488,35 +488,48 @@ class AtomEnvironment {
     // need other disposing objects to be able to check it. We won't need to
     // reset it because another environment will be created.
     this.isDestroying = true;
+    this.emitter.emit('will-destroy');
 
     this.disposables.dispose();
+
     if (this.workspace) this.workspace.destroy();
     this.workspace = null;
     this.themes.workspace = null;
+
     if (this.project) this.project.destroy();
     this.project = null;
+
     this.commands.clear();
+
     if (this.stylesElement) this.stylesElement.remove();
+
     this.uriHandlerRegistry.destroy();
 
     this.uninstallWindowEventHandler();
   }
 
-  /**
-   * @memberof AtomEnvironment
-   * @function onDidBeep
-   * @desc Invoke the given callback whenever {@link ::beep} is called.
-   * @listens ::beep
-   * @param {function} callback - Function to be called whenever {@link ::beep} is called.
-   * @returns {Disposable} on which `.dispose()` can be called to unsubscribe.
-   * @category Event Subscription
-   */
+  // Extend: Invoke the given callback when the environment is destroying, as
+  // happens during window close or reload.
+  //
+  // * `callback` {Function} to be called when the environment starts
+  //   destroying
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onWillDestroy (callback) {
+    return this.emitter.on('will-destroy', callback);
+  }
+
+  // Extended: Invoke the given callback whenever {::beep} is called.
+  //
+  // * `callback` {Function} to be called whenever {::beep} is called
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidBeep(callback) {
     return this.emitter.on('did-beep', callback);
   }
 
   // Extended: Invoke the given callback when there is an unhandled error, but
-  // before the devtools pop open
+  // before the devtools pop open.
   //
   // * `callback` {Function} to be called whenever there is an unhandled error
   //   * `event` {Object}
