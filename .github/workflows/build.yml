@@ -250,13 +250,18 @@ jobs:
       if: ${{ runner.os == 'Linux' && runner.arch == 'ARM64' }}
       run: ./script/fix-linux-appimage.sh ARM_64
 
-    - name: Cache Pulsar Binaries - Linux
-      if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/save@v5
-      with:
-        path: ./binaries
-        key: pulsar-Linux-Binaries-${{ runner.arch }}-${{ github.sha }}-${{ github.workflow }}
-
+    # The Linux binaries used to be saved to the Actions cache here as well, so
+    # that the `test-and-upload-Linux` job below could pick them up. They were
+    # by far our largest cache entries (~800MB per architecture per commit),
+    # and between them they routinely pushed the repo past GitHub's 10GB cache
+    # allowance — at which point GitHub evicts least-recently-used entries and
+    # the test job would find nothing waiting for it.
+    #
+    # The upload below already persists exactly the same files, and artifacts
+    # don't count against the cache allowance, so the test job downloads them
+    # from here instead. Artifacts also outlive the run, which means re-running
+    # just the test job hours later works, where the cached copy would long
+    # since have been evicted.
     - name: Upload Binary Artifacts
       uses: actions/upload-artifact@v7
       with:
@@ -323,12 +328,40 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    - name: Restore Cached Pulsar Binaries - Linux
+    # Download the artifact rather than restoring from cache. We only get so
+    # much cache space!
+    #
+    # `pattern` rather than `name` because the uploading step interpolates an
+    # empty `matrix.node-architecture` into the name, leaving a double space
+    # that's easy to get wrong by hand. Only one artifact per run matches each
+    # of these patterns.
+    - name: Download Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/restore@v5
+      uses: actions/download-artifact@v7
       with:
+        pattern: ${{ matrix.os }}*Binaries
+        merge-multiple: true
         path: ./binaries
-        key: pulsar-Linux-Binaries-${{ runner.arch }}-${{ github.sha }}-${{ github.workflow }}
+
+    # `download-artifact` only errors on a missing artifact when it's given an
+    # exact `name`. With a `pattern` it filters to an empty list and exits
+    # happily. Check explicitly so that a missing binary is reported here
+    # rather than as an inscrutable glob failure in the middle of the test step
+    # below.
+    - name: Verify binaries were downloaded - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        if ! ls ./binaries/*AppImage > /dev/null 2>&1; then
+          echo "::error::No AppImage in ./binaries — the '${{ matrix.os }}*Binaries' artifact from the build job is missing or empty."
+          exit 1
+        fi
+        # Artifacts are zipped for transport, and zip doesn't carry the Unix
+        # permission bits: everything comes back as 644, so the AppImage we
+        # just downloaded is not executable. (The cache we used to use for
+        # this handoff was a tarball, which _did_ preserve the executable bit…
+        # hence this step having no ancestor in the cache-based version.)
+        chmod +x ./binaries/*AppImage
+        ls -la ./binaries
 
     - name: Restore Cached Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
@@ -341,8 +374,16 @@ jobs:
 
     - name: Test Binary - Linux
       if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
+      # We deliberately throw away the Electron that was rebuilt for the app
+      # and let `yarn` reinstall a stock one, since Playwright drives the
+      # packaged binary and needs an `electron` that runs under plain Node.
+      #
+      # `-rf`, not `-R`: the dependency cache above is allowed to miss, and on
+      # a miss there's no `node_modules` at all. Easy recovery: just do another
+      # `yarn install`.
       run: |
-        rm -R node_modules/electron; yarn install --check-files
+        rm -rf node_modules/electron
+        yarn install --check-files
         ./binaries/*AppImage --appimage-extract
         export BINARY_NAME='squashfs-root/pulsar'
         mkdir -p ./tests/videos
