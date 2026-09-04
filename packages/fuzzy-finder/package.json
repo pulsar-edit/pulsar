@@ -43,6 +43,9 @@
       }
     }
   },
+  "backgroundTips": [
+    "You can quickly open files with the Fuzzy Finder using {atom-workspace>fuzzy-finder:toggle-file-finder}"
+  ],
   "configSchema": {
     "ignoredNames": {
       "type": "array",
