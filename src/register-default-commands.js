@@ -691,7 +691,7 @@ var stopEventPropagationAndGroupUndo = function(config, commandListeners) {
     newCommandListeners[commandName] = function(event) {
       event.stopPropagation();
       const model = this.getModel();
-      model.transact(model.getUndoGroupingInterval(),() => commandListener.call(model, event));
+      return model.transact(model.getUndoGroupingInterval(),() => commandListener.call(model, event));
     };
   }
   return newCommandListeners;

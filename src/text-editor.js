@@ -4654,27 +4654,27 @@ module.exports = class TextEditor {
   */
 
   // Essential: For each selection, copy the selected text.
-  copySelectedText() {
+  async copySelectedText() {
     let maintainClipboard = false;
     for (let selection of this.getSelectionsOrderedByBufferPosition()) {
       if (selection.isEmpty()) {
         const previousRange = selection.getBufferRange();
         selection.selectLine();
-        selection.copy(maintainClipboard, true);
+        await selection.copy(maintainClipboard, true);
         selection.setBufferRange(previousRange);
       } else {
-        selection.copy(maintainClipboard, false);
+        await selection.copy(maintainClipboard, false);
       }
       maintainClipboard = true;
     }
   }
 
   // Private: For each selection, only copy highlighted text.
-  copyOnlySelectedText() {
+  async copyOnlySelectedText() {
     let maintainClipboard = false;
     for (let selection of this.getSelectionsOrderedByBufferPosition()) {
       if (!selection.isEmpty()) {
-        selection.copy(maintainClipboard, false);
+        await selection.copy(maintainClipboard, false);
         maintainClipboard = true;
       }
     }
@@ -4684,18 +4684,18 @@ module.exports = class TextEditor {
   //
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor.
-  cutSelectedText(options = {}) {
+  async cutSelectedText(options = {}) {
     if (!this.ensureWritable('cutSelectedText', options)) return;
     let maintainClipboard = false;
-    this.mutateSelectedText(selection => {
+    for (let selection of this.getSelectionsOrderedByBufferPosition()) {
       if (selection.isEmpty()) {
         selection.selectLine();
-        selection.cut(maintainClipboard, true, options.bypassReadOnly);
+        await selection.cut(maintainClipboard, true, options.bypassReadOnly);
       } else {
-        selection.cut(maintainClipboard, false, options.bypassReadOnly);
+        await selection.cut(maintainClipboard, false, options.bypassReadOnly);
       }
       maintainClipboard = true;
-    });
+    }
   }
 
   // Essential: For each selection, replace the selected text with the contents of
@@ -4706,13 +4706,13 @@ module.exports = class TextEditor {
   // corresponding clipboard selection text.
   //
   // * `options` (optional) See {Selection::insertText}.
-  pasteText(options = {}) {
+  async pasteText(options = {}) {
     if (!this.ensureWritable('parseText', options)) return;
     options = Object.assign({}, options);
     let {
       text: clipboardText,
       metadata
-    } = this.constructor.clipboard.readWithMetadata();
+    } = await this.constructor.clipboard.readWithMetadata();
     if (!this.emitWillInsertTextEvent(clipboardText)) return false;
     let languageMode = this.buffer.getLanguageMode();
 
@@ -4807,13 +4807,13 @@ module.exports = class TextEditor {
   //
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor.
-  cutToEndOfLine(options = {}) {
+  async cutToEndOfLine(options = {}) {
     if (!this.ensureWritable('cutToEndOfLine', options)) return;
     let maintainClipboard = false;
-    this.mutateSelectedText(selection => {
-      selection.cutToEndOfLine(maintainClipboard, options);
+    for (let selection of this.getSelectionsOrderedByBufferPosition()) {
+      await selection.cutToEndOfLine(maintainClipboard, options);
       maintainClipboard = true;
-    });
+    }
   }
 
   // Essential: For each selection, if the selection is empty, cut all characters
@@ -4822,13 +4822,13 @@ module.exports = class TextEditor {
   //
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify a read-only editor.
-  cutToEndOfBufferLine(options = {}) {
+  async cutToEndOfBufferLine(options = {}) {
     if (!this.ensureWritable('cutToEndOfBufferLine', options)) return;
     let maintainClipboard = false;
-    this.mutateSelectedText(selection => {
-      selection.cutToEndOfBufferLine(maintainClipboard, options);
+    for (let selection of this.getSelectionsOrderedByBufferPosition()) {
+      await selection.cutToEndOfBufferLine(maintainClipboard, options);
       maintainClipboard = true;
-    });
+    }
   }
 
   /*
