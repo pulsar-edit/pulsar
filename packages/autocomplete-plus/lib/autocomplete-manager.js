@@ -270,12 +270,12 @@ class AutocompleteManager {
     return this.getSuggestionsFromProviders({editor: this.editor, bufferPosition, scopeDescriptor, prefix, legacyPrefix, activatedManually})
   }
 
-  getSuggestionsFromProviders(options) {
+  async getSuggestionsFromProviders(options) {
     let suggestionsPromise
     const providers = this.providerManager.applicableProviders(this.editorLabels, options.scopeDescriptor)
 
     const providerPromises = []
-    providers.forEach(provider => {
+    for (let provider of providers) {
       const apiVersion = this.providerManager.apiVersionForProvider(provider)
 
       let getSuggestions
@@ -304,7 +304,7 @@ class AutocompleteManager {
         }
       }
 
-      return providerPromises.push(Promise.resolve(getSuggestions(upgradedOptions)).then(providerSuggestions => {
+      providerPromises.push(Promise.resolve(getSuggestions(upgradedOptions)).then(providerSuggestions => {
         if (providerSuggestions == null) { return }
 
         // TODO API: remove upgrading when 1.0 support is removed
@@ -361,7 +361,7 @@ class AutocompleteManager {
         }
         return providerSuggestions
       }))
-    })
+    }
 
     if (!providerPromises || !providerPromises.length) {
       return
@@ -369,13 +369,19 @@ class AutocompleteManager {
 
     suggestionsPromise = Promise.all(providerPromises)
     this.currentSuggestionsPromise = suggestionsPromise
+
     return this.currentSuggestionsPromise
       .then(this.mergeSuggestionsFromProviders)
       .then(suggestions => {
         if (this.currentSuggestionsPromise !== suggestionsPromise) { return }
         if (options.activatedManually && this.shouldDisplaySuggestions && this.autoConfirmSingleSuggestionEnabled && suggestions.length === 1) {
-          // When there is one suggestion in manual mode, just confirm it
-          return this.confirm(suggestions[0])
+          // When there is one suggestion in manual mode, just confirm it. But
+          // it might have extra metadata like `additionalTextEdits`, so we
+          // need to resolve that data first.
+          let [suggestion] = suggestions
+          return this.getDetailsOnSelect(suggestion).then(() => {
+            return this.confirm(suggestion)
+          })
         } else {
           return this.displaySuggestions(suggestions, options)
         }
@@ -621,10 +627,12 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
 
   getDetailsOnSelect(suggestion) {
     if (suggestion != null && suggestion.provider && suggestion.provider.getSuggestionDetailsOnSelect) {
-      Promise.resolve(suggestion.provider.getSuggestionDetailsOnSelect(suggestion))
+      return Promise.resolve(suggestion.provider.getSuggestionDetailsOnSelect(suggestion))
         .then(detailedSuggestion => {
           this.suggestionList.replaceItem(suggestion, detailedSuggestion)
         })
+    } else {
+      return Promise.resolve();
     }
   }
 
