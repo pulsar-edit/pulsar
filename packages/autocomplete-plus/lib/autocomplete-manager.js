@@ -379,8 +379,8 @@ class AutocompleteManager {
           // it might have extra metadata like `additionalTextEdits`, so we
           // need to resolve that data first.
           let [suggestion] = suggestions
-          return this.getDetailsOnSelect(suggestion).then(() => {
-            return this.confirm(suggestion)
+          return this.getDetailsOnSelect(suggestion).then(detailedSuggestion => {
+            return this.confirm(detailedSuggestion)
           })
         } else {
           return this.displaySuggestions(suggestions, options)
@@ -626,13 +626,18 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
   }
 
   getDetailsOnSelect(suggestion) {
-    if (suggestion != null && suggestion.provider && suggestion.provider.getSuggestionDetailsOnSelect) {
+    if (typeof suggestion?.provider?.getSuggestionDetailsOnSelect === 'function') {
       return Promise.resolve(suggestion.provider.getSuggestionDetailsOnSelect(suggestion))
         .then(detailedSuggestion => {
+          if (detailedSuggestion == null) { return suggestion }
+          // The provider may have given us a brand-new object; make sure it
+          // can still be traced back to its provider on insertion.
+          detailedSuggestion.provider = detailedSuggestion.provider ?? suggestion.provider
           this.suggestionList.replaceItem(suggestion, detailedSuggestion)
+          return detailedSuggestion
         })
     } else {
-      return Promise.resolve();
+      return Promise.resolve(suggestion)
     }
   }
 
