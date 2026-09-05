@@ -2153,7 +2153,9 @@ class HighlightIterator {
 
     // An iterator can contribute to the list of already open scopes even if it
     // has no boundaries to mark within the range of this highlighting job.
-    openScopesByLayer.set(iterator, openScopes);
+    if (openScopes.size > 0) {
+      openScopesByLayer.set(iterator, openScopes);
+    }
 
     if (result) {
       this.iterators.push(iterator);
@@ -2201,7 +2203,9 @@ class HighlightIterator {
           }
         }
       }
-      openScopesByLayer.set(iterator, openScopes);
+      if (openScopes.size > 0) {
+        openScopesByLayer.set(iterator, openScopes);
+      }
     }
 
     // Sort the iterators so that the last one in the array is the earliest
