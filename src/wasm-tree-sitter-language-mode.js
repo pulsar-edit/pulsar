@@ -2181,6 +2181,11 @@ class HighlightIterator {
         // point when they were opened.
         let ranges = iterator.languageLayer.getCurrentRanges();
         for (let [earlierIterator, earlierOpenScopes] of openScopesByLayer) {
+          // Mid-parsing can cause issues with plug-ins that expect open scopes
+          // to exist, causing `languageLayer` to be `null` and raising an
+          // exception when trying to call `languageScopeId
+          if (earlierOpenScopes.size === 0) { continue; }
+
           // It's possible, though uncommon, for injections to overlap, because
           // there's no mechanism that prevents it. Since we sorted the layers
           // by depth earlier, this iterator won't have a lower depth than the
