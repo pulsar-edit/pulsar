@@ -84,6 +84,181 @@ describe('atom.themes', () => {
       atom.config.set('core.themes', ['definitely-not-a-theme']);
       expect(() => atom.themes.getImportPaths()).not.toThrow();
     });
+
+    it('returns the declared stylesheet directories for theme variants', () => {
+      atom.config.set('core.themes', [
+        'theme-variant-day-ui',
+        'theme-variant-day-syntax'
+      ]);
+
+      const paths = atom.themes.getImportPaths();
+
+      expect(paths.length).toBe(4);
+      expect(paths[0]).toContain('day-syntax');
+      expect(paths[1]).toContain('day-ui');
+      expect(paths[2]).toContain('styles');
+      expect(paths[3]).toContain('styles');
+    });
+
+    it('returns multiple import directories for theme variants', () => {
+      atom.packages.loadPackage('theme-with-variants');
+      atom.config.set('core.themes', [
+        'theme-variant-night-ui',
+        'theme-variant-day-syntax'
+      ]);
+
+      const paths = atom.themes.getImportPaths();
+
+      expect(paths.length).toBe(5);
+      expect(paths[0]).toContain('day-syntax');
+      expect(paths[1]).toContain('night-ui');
+      expect(paths[2]).toContain('styles');
+      expect(paths[3]).toContain('shared');
+      expect(paths[4]).toContain('styles');
+      expect(
+        paths.some(themePath => themePath.includes('night-ui'))
+      ).toBe(true);
+      expect(paths.some(themePath => themePath.includes('shared'))).toBe(true);
+    });
+  });
+
+  describe('theme variants', () => {
+    it('includes variants from loaded theme packages', () => {
+      atom.packages.loadPackage('theme-with-variants');
+
+      const themeNames = atom.themes.getLoadedThemeNames();
+
+      expect(themeNames).toContain('theme-variant-day-ui');
+      expect(themeNames).toContain('theme-variant-night-ui');
+      expect(themeNames).toContain('theme-variant-day-syntax');
+      expect(themeNames).toContain('theme-variant-night-syntax');
+    });
+
+    it('activates variant names from core.themes', async () => {
+      atom.config.set('core.themes', [
+        'theme-variant-day-ui',
+        'theme-variant-day-syntax'
+      ]);
+
+      await atom.themes.activateThemes();
+
+      const activeThemeNames = atom.themes.getActiveThemeNames();
+      expect(activeThemeNames).toContain('theme-variant-day-ui');
+      expect(activeThemeNames).toContain('theme-variant-day-syntax');
+      expect(atom.packages.isPackageActive('theme-with-variants')).toBe(true);
+      expect(atom.packages.isPackageActive('theme-variant-day-ui')).toBe(false);
+
+      const workspaceElement = atom.workspace.getElement();
+      expect(workspaceElement).toHaveClass('theme-theme-variant-day-ui');
+      expect(workspaceElement).toHaveClass('theme-theme-variant-day-syntax');
+
+      const sourcePaths = Array.from(
+        document.querySelectorAll('style[priority="1"]')
+      ).map(styleElement => styleElement.getAttribute('source-path'));
+      expect(
+        sourcePaths.some(sourcePath =>
+          /day-ui[\\/]index\.less$/.test(sourcePath)
+        )
+      ).toBe(true);
+      expect(
+        sourcePaths.some(sourcePath =>
+          /day-syntax[\\/]index\.less$/.test(sourcePath)
+        )
+      ).toBe(true);
+      expect(
+        sourcePaths.some(sourcePath =>
+          /night-ui[\\/]index\.less$/.test(sourcePath)
+        )
+      ).toBe(false);
+      expect(
+        sourcePaths.some(sourcePath =>
+          /night-syntax[\\/]index\.less$/.test(sourcePath)
+        )
+      ).toBe(false);
+    });
+
+    it('uses the active variant stylesheet path when package stylesheets import shared theme files', async () => {
+      atom.config.set('core.themes', [
+        'theme-variant-night-ui',
+        'theme-variant-day-syntax'
+      ]);
+
+      await atom.themes.activateThemes();
+
+      const packageStylesheetPath = path.join(
+        temp.mkdirSync('variant-package-styles'),
+        'package.less'
+      );
+      fs.writeFileSync(packageStylesheetPath, `\
+@import "atom";
+
+.package-probe {
+  color: @app-background-color;
+}
+`);
+
+      const css = atom.themes.loadStylesheet(packageStylesheetPath, true);
+
+      expect(css).toContain('.variant-atom-probe');
+      expect(css).toContain('color: #010203;');
+      expect(css).toContain('.package-probe');
+    });
+
+    it('removes variant classes when themes are deactivated', async () => {
+      atom.config.set('core.themes', [
+        'theme-variant-night-ui',
+        'theme-variant-night-syntax'
+      ]);
+
+      await atom.themes.activateThemes();
+      await atom.themes.deactivateThemes();
+
+      const workspaceElement = atom.workspace.getElement();
+      expect(workspaceElement).not.toHaveClass('theme-theme-variant-night-ui');
+      expect(workspaceElement).not.toHaveClass(
+        'theme-theme-variant-night-syntax'
+      );
+    });
+
+    it('reloads variant stylesheets without disturbing a co-active stock theme', async () => {
+      atom.config.set('core.themes', [
+        'theme-variant-night-ui',
+        'atom-dark-syntax'
+      ]);
+
+      await atom.themes.activateThemes();
+
+      const activeThemeNames = atom.themes.getActiveThemeNames();
+      expect(activeThemeNames).toContain('theme-variant-night-ui');
+      expect(activeThemeNames).toContain('atom-dark-syntax');
+
+      const stockSyntaxSourcePaths = () =>
+        Array.from(document.querySelectorAll('style[priority="1"]'))
+          .map(styleElement => styleElement.getAttribute('source-path'))
+          .filter(
+            sourcePath => sourcePath && sourcePath.includes('atom-dark-syntax')
+          );
+
+      const stockPathsBefore = stockSyntaxSourcePaths();
+      expect(stockPathsBefore.length).toBeGreaterThan(0);
+
+      // Editing a variant stylesheet routes through here. It must not throw when
+      // a non-variant theme is also active, and it must leave the stock theme's
+      // own stylesheets untouched (neither dropped nor duplicated).
+      expect(() =>
+        atom.themes.reloadActiveThemeStylesheets()
+      ).not.toThrow();
+
+      const sourcePaths = Array.from(
+        document.querySelectorAll('style[priority="1"]')
+      ).map(styleElement => styleElement.getAttribute('source-path'));
+      expect(
+        sourcePaths.some(sourcePath =>
+          /night-ui[\\/]index\.less$/.test(sourcePath)
+        )
+      ).toBe(true);
+      expect(stockSyntaxSourcePaths()).toEqual(stockPathsBefore);
+    });
   });
 
   describe('when the core.themes config value changes', () => {

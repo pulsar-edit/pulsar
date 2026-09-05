@@ -194,10 +194,12 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
   }
 
   filterThemes (packages) {
-    packages.dev = packages.dev.filter(({theme}) => theme)
-    packages.user = packages.user.filter(({theme}) => theme)
-    packages.core = packages.core.filter(({theme}) => theme)
-    packages.git = (packages.git || []).filter(({theme}) => theme)
+    packages.dev = packages.dev.filter((pack) => pack.theme || pack.themes)
+    packages.user = packages.user.filter((pack) => pack.theme || pack.themes)
+    packages.core = packages.core.filter((pack) => pack.theme || pack.themes)
+    packages.git = (packages.git || []).filter((pack) =>
+      pack.theme || pack.themes
+    )
 
     for (let packageType of ['dev', 'core', 'user', 'git']) {
       for (let pack of packages[packageType]) {
@@ -262,8 +264,21 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
     }
   }
 
-  hasSettings (packageName) {
-    return this.packageManager.packageHasSettings(packageName)
+  hasSettings (themeName) {
+    return this.packageManager.packageHasSettings(this.getThemePackageName(themeName))
+  }
+
+  getThemePackageName (themeName) {
+    const theme = atom.themes.getLoadedThemes().find((theme) =>
+      theme.name === themeName
+    )
+    return (theme != null ? theme.packageName : null) || themeName
+  }
+
+  getThemePackageMetadata (themeName) {
+    const packageName = this.getThemePackageName(themeName)
+    const pack = atom.packages.getLoadedPackage(packageName)
+    return pack != null ? pack.metadata : null
   }
 
   // Populate the theme menus from the theme manager's active themes
@@ -430,9 +445,9 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
   didClickActiveUiThemeSettings (event) {
     event.stopPropagation()
     const theme = atom.themes.getActiveThemes().find((theme) => theme.metadata.theme === 'ui')
-    const activeUiTheme = theme != null ? theme.metadata : null
+    const activeUiTheme = theme != null ? this.getThemePackageMetadata(theme.name) : null
     if (activeUiTheme != null) {
-      this.settingsView.showPanel(this.activeUiTheme, {
+      this.settingsView.showPanel(this.getThemePackageName(this.activeUiTheme), {
         back: 'Themes',
         pack: activeUiTheme
       })
@@ -442,9 +457,9 @@ export default class ThemesPanel extends CollapsibleSectionPanel {
   didClickActiveSyntaxThemeSettings (event) {
     event.stopPropagation()
     const theme = atom.themes.getActiveThemes().find((theme) => theme.metadata.theme === 'syntax')
-    const activeSyntaxTheme = theme != null ? theme.metadata : null
+    const activeSyntaxTheme = theme != null ? this.getThemePackageMetadata(theme.name) : null
     if (activeSyntaxTheme != null) {
-      this.settingsView.showPanel(this.activeSyntaxTheme, {
+      this.settingsView.showPanel(this.getThemePackageName(this.activeSyntaxTheme), {
         back: 'Themes',
         pack: activeSyntaxTheme
       })

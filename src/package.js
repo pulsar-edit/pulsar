@@ -74,7 +74,10 @@ module.exports = class Package {
   }
 
   isTheme() {
-    return this.metadata && this.metadata.theme;
+    return (
+      this.metadata &&
+      (this.metadata.theme || Array.isArray(this.metadata.themes))
+    );
   }
 
   measure(key, fn) {

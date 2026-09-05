@@ -21,7 +21,7 @@ export default class PackageCard {
     // of malformed package metadata are handled here and in ::content but belt
     // and suspenders, you know
     this.client = this.packageManager.getClient()
-    this.type = this.pack.theme ? 'theme' : 'package'
+    this.type = this.pack.theme || this.pack.themes ? 'theme' : 'package'
     this.name = this.pack.name
     this.onSettingsView = options.onSettingsView
 

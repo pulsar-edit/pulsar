@@ -2,10 +2,11 @@
 
 const path = require('path');
 const _ = require('underscore-plus');
-const { Emitter } = require('event-kit');
+const { CompositeDisposable, Emitter } = require('event-kit');
 const fs = require('fs-plus');
 const LessCompileCache = require('./less-compile-cache');
 const Color = require('./color');
+const ThemeVariant = require('./theme-variant');
 
 // Keeping a reference to the entire object so that it can be mocked more
 // easily in the specs.
@@ -35,6 +36,8 @@ module.exports = class ThemeManager {
     this.viewRegistry = viewRegistry;
     this.emitter = new Emitter();
     this.styleSheetDisposablesBySourcePath = {};
+    this.activeThemeStyleSheetDisposables = new CompositeDisposable();
+    this.activeThemes = [];
     this.lessCache = null;
     this.initialLoadComplete = false;
     this.packageManager.registerPackageActivator(this, ['theme']);
@@ -99,9 +102,16 @@ module.exports = class ThemeManager {
 
   // Public: Returns an {Array} of all the loaded themes.
   getLoadedThemes() {
-    return this.packageManager
-      .getLoadedPackages()
-      .filter(pack => pack.isTheme());
+    const themes = [];
+    for (const pack of this.packageManager.getLoadedPackages()) {
+      if (pack.metadata && pack.metadata.theme) {
+        themes.push(pack);
+      }
+      for (const variant of this.getThemeVariantsForPackage(pack)) {
+        themes.push(variant);
+      }
+    }
+    return themes;
   }
 
   /*
@@ -115,9 +125,12 @@ module.exports = class ThemeManager {
 
   // Public: Returns an {Array} of all the active themes.
   getActiveThemes() {
+    if (this.activeThemes.length > 0) {
+      return this.activeThemes.slice();
+    }
     return this.packageManager
       .getActivePackages()
-      .filter(pack => pack.isTheme());
+      .filter(pack => pack.metadata && pack.metadata.theme);
   }
 
   activatePackages() {
@@ -137,7 +150,7 @@ module.exports = class ThemeManager {
       if (
         !themeName ||
         typeof themeName !== 'string' ||
-        !this.packageManager.resolvePackagePath(themeName)
+        !this.resolveTheme(themeName)
       ) {
         console.warn(`Enabled theme '${themeName}' is not installed.`);
       }
@@ -155,7 +168,7 @@ module.exports = class ThemeManager {
     themeNames = themeNames.filter(
       themeName =>
         typeof themeName === 'string' &&
-        this.packageManager.resolvePackagePath(themeName)
+        this.resolveTheme(themeName)
     );
 
     // Use a built-in syntax and UI theme any time the configured themes are not
@@ -191,6 +204,81 @@ module.exports = class ThemeManager {
   /*
   Section: Private
   */
+
+  getThemeVariantsForPackage(pack) {
+    if (!pack.metadata || !Array.isArray(pack.metadata.themes)) {
+      return [];
+    }
+
+    return pack.metadata.themes
+      .filter(
+        variant =>
+          variant &&
+          typeof variant.name === 'string' &&
+          typeof (variant.theme || variant.type) === 'string'
+      )
+      .map(variant => new ThemeVariant({ pack, variant }));
+  }
+
+  // Resolve a configured theme name to a normalized {ThemeVariant} description,
+  // or null if no matching theme is installed. The description is uniform
+  // whether the name refers to a variant, a classic single-theme package, or a
+  // package that is not currently loaded.
+  resolveTheme(themeName) {
+    for (const theme of this.getLoadedThemes()) {
+      if (theme.name === themeName) {
+        return theme instanceof ThemeVariant
+          ? theme
+          : new ThemeVariant({ pack: theme });
+      }
+    }
+
+    const packagePath = this.packageManager.resolvePackagePath(themeName);
+    if (packagePath) {
+      const metadata = this.packageManager.loadPackageMetadata(
+        packagePath,
+        true
+      );
+      if (metadata && metadata.theme) {
+        return new ThemeVariant({
+          packageName: themeName,
+          packagePath,
+          metadata
+        });
+      }
+    }
+
+    for (const availablePackage of this.packageManager.getAvailablePackages()) {
+      const metadata = this.packageManager.loadPackageMetadata(
+        availablePackage,
+        true
+      );
+      const variant = this.getThemeVariantMetadata(metadata, themeName);
+      if (variant) {
+        return new ThemeVariant({
+          packageName: metadata.name || availablePackage.name,
+          packagePath: availablePackage.path,
+          metadata,
+          variant
+        });
+      }
+    }
+
+    return null;
+  }
+
+  getThemeVariantMetadata(metadata, themeName) {
+    if (!metadata || !Array.isArray(metadata.themes)) {
+      return null;
+    }
+    return metadata.themes.find(
+      variant => variant && variant.name === themeName
+    );
+  }
+
+  getThemeStylesheetsPaths(theme) {
+    return theme ? theme.getStylesheetsPaths() : [];
+  }
 
   // Resolve and apply the stylesheet specified by the path.
   //
@@ -388,6 +476,84 @@ On Linux there are currently problems with watch sizes. See [this document][watc
     return this.styleSheetDisposablesBySourcePath[path];
   }
 
+  applyThemeStylesheets(theme) {
+    for (const sourcePath of theme.getStylesheetPaths()) {
+      const match = path.basename(sourcePath).match(/[^.]*\.([^.]*)\./);
+
+      let context;
+      if (match) {
+        context = match[1];
+      } else if (theme.metadata.theme === 'syntax') {
+        context = 'atom-text-editor';
+      }
+
+      this.activeThemeStyleSheetDisposables.add(
+        this.styleManager.addStyleSheet(
+          this.loadStylesheet(sourcePath, true),
+          {
+            sourcePath,
+            priority: theme.getStyleSheetPriority(),
+            context,
+            skipDeprecatedSelectorsTransformation:
+              theme.bundledPackage
+                ? theme.bundledPackage
+                : !this.config.get(
+                    "core.transformDeprecatedStyleSheetSelectors"
+                  ),
+            skipDeprecatedMathUsageTransformation:
+              theme.bundledPackage
+                ? theme.bundledPackage
+                : !this.config.get(
+                    "core.transformDeprecatedStyleSheetMathExpressions"
+                  )
+          }
+        )
+      );
+    }
+  }
+
+  removeActiveThemeStylesheets() {
+    this.activeThemeStyleSheetDisposables.dispose();
+    this.activeThemeStyleSheetDisposables = new CompositeDisposable();
+  }
+
+  reloadActiveThemeStylesheets() {
+    this.removeActiveThemeStylesheets();
+    this.refreshLessCache();
+    for (const theme of this.getActiveThemes()) {
+      // Only variants have their stylesheets managed here; classic single-theme
+      // packages own their stylesheets through their own package disposables.
+      if (theme instanceof ThemeVariant) {
+        this.applyThemeStylesheets(theme);
+      }
+    }
+  }
+
+  activateTheme(themeName) {
+    const resolvedTheme = this.resolveTheme(themeName);
+    if (!resolvedTheme) {
+      console.warn(
+        `Failed to activate theme '${themeName}' because it isn't installed.`
+      );
+      return Promise.resolve(null);
+    }
+
+    const packageName = resolvedTheme.packageName;
+    return this.packageManager.activatePackage(packageName).then(pack => {
+      const variantMetadata = this.getThemeVariantMetadata(
+        pack.metadata,
+        themeName
+      );
+      if (variantMetadata) {
+        const theme = new ThemeVariant({ pack, variant: variantMetadata });
+        this.applyThemeStylesheets(theme);
+        return theme;
+      } else {
+        return pack;
+      }
+    });
+  }
+
   refreshWindowTheme() {
     let bgColor = Color.parse(getComputedStyle(document.documentElement).backgroundColor);
 
@@ -410,18 +576,12 @@ On Linux there are currently problems with watch sizes. See [this document][watc
           this.warnForNonExistentThemes();
           this.refreshLessCache(); // Update cache for packages in core.themes config
 
-          const promises = [];
-          for (const themeName of this.getEnabledThemeNames()) {
-            if (this.packageManager.resolvePackagePath(themeName)) {
-              promises.push(this.packageManager.activatePackage(themeName));
-            } else {
-              console.warn(
-                `Failed to activate theme '${themeName}' because it isn't installed.`
-              );
-            }
-          }
+          const promises = this.getEnabledThemeNames().map(themeName =>
+            this.activateTheme(themeName)
+          );
 
-          return Promise.all(promises).then(async () => {
+          return Promise.all(promises).then(async activeThemes => {
+            this.activeThemes = _.compact(activeThemes);
             this.addActiveThemeClasses();
             this.refreshLessCache(); // Update cache again now that @getActiveThemes() is populated
             await this.loadUserStylesheet();
@@ -440,9 +600,14 @@ On Linux there are currently problems with watch sizes. See [this document][watc
 
   deactivateThemes() {
     this.removeActiveThemeClasses();
+    this.removeActiveThemeStylesheets();
     this.unwatchUserStylesheet();
-    const results = this.getActiveThemes().map(pack =>
-      this.packageManager.deactivatePackage(pack.name)
+    const packageNames = _.uniq(
+      this.getActiveThemes().map(theme => theme.packageName || theme.name)
+    );
+    this.activeThemes = [];
+    const results = packageNames.map(packageName =>
+      this.packageManager.deactivatePackage(packageName)
     );
     return Promise.all(
       results.filter(r => r != null && typeof r.then === 'function')
@@ -456,16 +621,16 @@ On Linux there are currently problems with watch sizes. See [this document][watc
   addActiveThemeClasses() {
     const workspaceElement = this.viewRegistry.getView(this.workspace);
     if (workspaceElement) {
-      for (const pack of this.getActiveThemes()) {
-        workspaceElement.classList.add(`theme-${pack.name}`);
+      for (const theme of this.getActiveThemes()) {
+        workspaceElement.classList.add(`theme-${theme.name}`);
       }
     }
   }
 
   removeActiveThemeClasses() {
     const workspaceElement = this.viewRegistry.getView(this.workspace);
-    for (const pack of this.getActiveThemes()) {
-      workspaceElement.classList.remove(`theme-${pack.name}`);
+    for (const theme of this.getActiveThemes()) {
+      workspaceElement.classList.remove(`theme-${theme.name}`);
     }
   }
 
@@ -474,27 +639,23 @@ On Linux there are currently problems with watch sizes. See [this document][watc
   }
 
   getImportPaths() {
-    let themePaths;
-    const activeThemes = this.getActiveThemes();
-    if (activeThemes.length > 0) {
-      themePaths = activeThemes
-        .filter(theme => theme)
-        .map(theme => theme.getStylesheetsPath());
-    } else {
-      themePaths = [];
-      for (const themeName of this.getEnabledThemeNames()) {
-        const themePath = this.packageManager.resolvePackagePath(themeName);
-        if (themePath) {
-          const deprecatedPath = path.join(themePath, 'stylesheets');
-          if (fs.isDirectorySync(deprecatedPath)) {
-            themePaths.push(deprecatedPath);
+    const primaryThemePaths = [];
+    const fallbackThemePaths = [];
+    for (const themeName of this.getEnabledThemeNames()) {
+      const themeStylesheetsPaths = this.getThemeStylesheetsPaths(
+        this.resolveTheme(themeName)
+      );
+      for (let index = 0; index < themeStylesheetsPaths.length; index++) {
+        const themePath = themeStylesheetsPaths[index];
+        if (themePath && fs.isDirectorySync(themePath)) {
+          if (index === 0) {
+            primaryThemePaths.push(themePath);
           } else {
-            themePaths.push(path.join(themePath, 'styles'));
+            fallbackThemePaths.push(themePath);
           }
         }
       }
     }
-
-    return themePaths.filter(themePath => fs.isDirectorySync(themePath));
+    return primaryThemePaths.concat(fallbackThemePaths);
   }
 };
