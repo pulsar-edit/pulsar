@@ -5,12 +5,18 @@ const { Emitter } = require('event-kit');
 // Private: Like {Task}, but designed for file-watcher processes. Does not
 // start automatically; once it starts, it expects to run indefinitely.
 class WatcherTask {
+
+  RESTART_WINDOW_MS = 5000;
+  MAX_RESTARTS = 5;
+  terminated = false;
+  restarts = [];
+
   emitter = new Emitter();
   constructor(taskPath) {
     this.taskPath = taskPath;
   }
 
-  createChildProcess () {
+  createChildProcess() {
     let compileCachePath = require('./compile-cache').getCacheDirectory();
     let env = Object.assign({}, process.env, {
       userAgent: navigator.userAgent,
@@ -36,9 +42,19 @@ class WatcherTask {
     this.handleEvents();
   }
 
-  handleEvents () {
+  handleEvents() {
     if (!this.childProcess) return;
     this.childProcess.removeAllListeners();
+
+    let child = this.childProcess;
+    const handleDeath = (error, code, signal) => {
+      child.removeAllListeners();
+      if (this.childProcess !== child) return;
+      this.handleUnexpectedExit(error, code, signal);
+    };
+
+    child.on('exit', (code, signal) => handleDeath(null, code, signal));
+    child.on('error', (error) => handleDeath(error));
     this.childProcess.on('message', ({ event, args }) => {
       if (!this.childProcess) return;
       this.emitter.emit(event, args);
@@ -58,9 +74,11 @@ class WatcherTask {
     }
   }
 
-  start (...args) {
+  start(...args) {
     // Don't spawn any workers during shutdown.
     if (window.atom?.unloading) return;
+    this.startArgs = args;
+    this.terminated = false;
 
     const [callback] = args.splice(-1);
     this.createChildProcess();
@@ -73,24 +91,25 @@ class WatcherTask {
     return;
   }
 
-  send (message) {
+  send(message) {
     this.childProcess?.send(message);
   }
 
-  on (eventName, callback) {
+  on(eventName, callback) {
     return this.emitter.on(eventName, (args = []) => {
       callback(...args);
     });
   }
 
-  once (eventName, callback) {
+  once(eventName, callback) {
     return this.emitter.once(eventName, (args = []) => {
       callback(...args);
     });
   }
 
-  terminate () {
+  terminate() {
     if (!this.childProcess) return false;
+    this.terminated = true;
     this.childProcess.removeAllListeners();
     this.childProcess.stdout?.removeAllListeners();
     this.childProcess.stderr?.removeAllListeners();
@@ -99,12 +118,40 @@ class WatcherTask {
     return true;
   }
 
-  cancel () {
+  cancel() {
     let didForcefullyTerminate = this.terminate();
     if (didForcefullyTerminate) {
       this.emitter.emit('task:cancelled');
     }
     return didForcefullyTerminate;
+  }
+
+  handleUnexpectedExit(error, code, signal) {
+    this.childProcess = null;
+    // `code` could be `0` here; a child process fires `exit` when it exits
+    // successfully. But that's not a guarantee that this exit was unexpected!
+    // Lots of failure cases exist that would result in the worker task making
+    // a clean exit.
+    //
+    // The true test of whether we expected this exit to happen is whether we
+    // explicitly called `terminate` on it. Also, any killed workers during
+    // window teardown are similarly expected.
+    if (this.terminated || window.atom?.unloading) return;
+
+    let now = Date.now();
+    this.restarts = this.restarts.filter(t => now - t < this.RESTART_WINDOW_MS);
+    if (this.restarts.length >= this.MAX_RESTARTS) {
+      let cause = error ?? new Error(`exited with code ${code} and signal ${signal}`);
+      this.emitter.emit('task:failed', [
+        new Error(`File watcher worker exited repeatedly. Last failure: ${cause.message}`, { cause })
+      ]);
+      return;
+    }
+    this.restarts.push(now);
+
+    this.createChildProcess();
+    this.send({ event: 'start', args: this.startArgs });
+    this.emitter.emit('task:respawned', []);
   }
 }
 

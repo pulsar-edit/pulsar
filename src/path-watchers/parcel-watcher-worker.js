@@ -11,6 +11,12 @@
 
 const watcher = require('@parcel/watcher');
 const fs = require('fs');
+const path = require('path');
+
+// How long to collect events for a single-file watch before sending them as a
+// batch. `@parcel/watcher` batches directory events natively and `nsfw`
+// debounces at 200ms; `fs.watch` hands us raw events, so we do it ourselves.
+const FILE_BATCH_INTERVAL_MS = 50;
 
 // A shim over the real `console` methods so that they send log messages back
 // to the renderer process instead of making us dig into their own console.
@@ -31,37 +37,104 @@ const console = {
 };
 
 const EVENT_MAP = {
-  update: 'updated',
+  update: 'modified',
   delete: 'deleted',
-  create: 'created',
-  rename: 'renamed',
-  change: 'updated'
+  create: 'created'
 };
 
 // A class designed to imitate the object that is returned by `@parcel/watcher`
 // when it watches directories; this one is for when we watch individual files.
 class FileHandle {
-  constructor(controller) {
+  constructor(controller, onUnsubscribe) {
     this.controller = controller;
+    this.onUnsubscribe = onUnsubscribe;
   }
 
   // Async to match `@parcel/watcher`’s API.
   async unsubscribe() {
+    this.onUnsubscribe?.();
     return this.controller.abort();
   }
 }
 
-// Reacts to events on individual files and sends batches back to the renderer
-// process.
-function fileHandler(instance, eventType, normalizedPath) {
-  let action = EVENT_MAP[eventType] ?? `unexpected (${eventType})`;
-  let payload = { action, path: normalizedPath };
+// `fs.watch` on a file follows the `inode` rather than the path (at least on
+// some platforms), so an atomic save (as performed by many tools) leaves us
+// watching a file that no longer has a name. Watching the containing directory
+// instead survives the file being replaced, deleted, or recreated.
+//
+// Despite the fact that we're not watching the file directly, we still use
+// `fs.watch` rather than `@parcel/watcher` because the latter has no
+// non-recursive mode. We don't want to pay the cost of a recursive watcher
+// only to discard any events that are reported for descendant paths we don't
+// care about.
+//
+// Note: if an *ancestor* directory is moved or unmounted, this watch can go
+// stale silently. On Linux the `inotify` watch follows the `inode`, so it
+// stays alive while describing a path we no longer care about. Outright
+// deletion is fine (`rm -rf` unlinks the file first, while this watch is still
+// valid).
+//
+// Luckily (?), this is the same "watch root moved" limitation the recursive
+// adapters have at their own roots, not something specific to watching a
+// single file.
+//
+function watchSingleFile(instance, normalizedPath) {
+  const dir = path.dirname(normalizedPath);
+  const base = path.basename(normalizedPath).normalize('NFC');
+  const controller = new AbortController();
 
-  console.log('Sending events:', [payload]);
+  let pending = [];
+  let timer = null;
+  let exists = fs.existsSync(normalizedPath);
 
-  emit('watcher:events', {
-    id: instance,
-    events: [payload]
+  const flush = () => {
+    timer = null;
+    const events = pending;
+    pending = [];
+    if (events.length > 0) {
+      emit('watcher:events', { id: instance, events });
+    }
+  };
+
+  const enqueue = (action) => {
+    // Collapse runs of identical actions — one save can produce several
+    // `change` events — but keep genuine transitions in order, so a consumer
+    // never loses a creation or a deletion to coalescing.
+    const last = pending[pending.length - 1];
+    if (last?.action !== action) {
+      pending.push({ action, path: normalizedPath });
+    }
+    // Deliberately not reset on each event: this is a collection window, not
+    // a debounce, so a file being written continuously still reports on time.
+    timer ??= setTimeout(flush, FILE_BATCH_INTERVAL_MS);
+  };
+
+  let fsWatcher = fs.watch(dir, { signal: controller.signal }, (eventType, filename) => {
+    if (filename != null && filename.normalize('NFC') !== base) return;
+
+    if (eventType === 'change') {
+      enqueue('modified');
+      return;
+    }
+
+    // A `rename` only tells us the directory entry appeared or disappeared;
+    // `fs.watch` can never give us an origin path.
+    const existsNow = fs.existsSync(normalizedPath);
+    enqueue(existsNow ? (exists ? 'modified' : 'created') : 'deleted');
+    exists = existsNow;
+  });
+
+  // Without this, an error on the watched directory (deleted, unmounted,
+  // permissions changed) is thrown as an uncaught exception and takes down the
+  // whole worker along with every unrelated watcher in it.
+  fsWatcher.on('error', (error) => {
+    emit('watcher:error', { id: instance, error: error.message });
+  });
+
+  return new FileHandle(controller, () => {
+    if (timer) clearTimeout(timer);
+    timer = null;
+    pending = [];
   });
 }
 
@@ -110,7 +183,6 @@ async function handleMessage(message) {
       // has started.
       let existing = WATCHERS_BY_PATH.get(instance);
       let wrappedHandler = (err, events) => handler(instance, err, events);
-      let wrappedFileHandler = (eventType, _) => fileHandler(instance, eventType, normalizedPath);
       try {
         let ignore = ignored.reduce((prev, ignoredName) => {
           prev.push(`${ignoredName}`, `**/${ignoredName}`);
@@ -124,9 +196,8 @@ async function handleMessage(message) {
           WATCHERS_BY_PATH.set(instance, handle);
         } else {
           console.log('Watching file path:', normalizedPath);
-          let controller = new AbortController();
-          fs.watch(normalizedPath, { signal: controller.signal }, wrappedFileHandler);
-          WATCHERS_BY_PATH.set(instance, new FileHandle(controller));
+          let handler = watchSingleFile(instance, normalizedPath);
+          WATCHERS_BY_PATH.set(instance, handler);
         }
         if (existing) {
           // If there was a pre-existing watcher at this instance, we wait

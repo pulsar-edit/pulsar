@@ -13,6 +13,7 @@
 const nsfw = require('nsfw');
 const minimatch = require('minimatch');
 const { fdir } = require('fdir');
+const fs = require('fs');
 const path = require('path');
 
 // A shim over the real `console` methods so that they send log messages back
@@ -82,13 +83,22 @@ function handler(instance, events) {
 //
 // This is _painful_! It drives us nuts because what we really want is to give
 // these globs to `nsfw` and have it use them when adding a recursive watcher.
-// (On Linux, it does this by spidering its way through the descendant folders
-// and adding `inotify` watches on each, but it should ignore some altogether!)
+// (On Linux, `nsfw` watches recursively by spidering its way through the
+// descendant folders and adding `inotify` watches on each, but it wastes time
+// on some paths that ought to be ignored, like `node_modules`!)
 //
 // But `nsfw` doesn't take globs; it takes explicit absolute paths. So we have
 // to do the filesystem crawling ourselves.
 async function buildExcludedPaths(normalizedPath, ignoredNames = []) {
   let results = [];
+
+  // Skip this altogether if the watcher didn't ask us to ignore anything.
+  if (ignoredNames.length === 0) return results;
+
+  // Skip this altogether if we're watching a file rather than a directory.
+  let isDirectory = fs.lstatSync(normalizedPath)?.isDirectory();
+  if (!isDirectory) return results;
+
   let _totalTimeSpentMinimatching = 0;
   let start = new Date().valueOf();
   console.log('Beginning generation of exclusions', normalizedPath, ignoredNames, performance.now());
@@ -139,7 +149,7 @@ async function handleMessage(message) {
       // push filesystem events so that they can be routed back to the correct
       // instance.
       let { normalizedPath, instance, ignored } = args;
-      let wrappedHandler = (err, events) => handler(instance, err, events);
+      let wrappedHandler = (events) => handler(instance, events);
       try {
         let excludedPaths = await buildExcludedPaths(normalizedPath, ignored);
         let watcher = await nsfw(normalizedPath, wrappedHandler, {
