@@ -2029,6 +2029,11 @@ class NullLanguageModeHighlightIterator {
 }
 
 class NullLayerHighlightIterator {
+  constructor(languageLayer) {
+    this.languageLayer = languageLayer;
+    this.depth = languageLayer.depth;
+    this.coverShallowerScopes = false;
+  }
   seek() {
     return [false, new OpenScopeMap];
   }
@@ -2153,9 +2158,7 @@ class HighlightIterator {
 
     // An iterator can contribute to the list of already open scopes even if it
     // has no boundaries to mark within the range of this highlighting job.
-    if (openScopes.size > 0) {
-      openScopesByLayer.set(iterator, openScopes);
-    }
+    openScopesByLayer.set(iterator, openScopes);
 
     if (result) {
       this.iterators.push(iterator);
@@ -2203,9 +2206,7 @@ class HighlightIterator {
           }
         }
       }
-      if (openScopes.size > 0) {
-        openScopesByLayer.set(iterator, openScopes);
-      }
+      openScopesByLayer.set(iterator, openScopes);
     }
 
     // Sort the iterators so that the last one in the array is the earliest
@@ -3138,7 +3139,7 @@ class LanguageLayer {
     if (this.tree) {
       return new LayerHighlightIterator(this, this.tree);
     } else {
-      return new NullLayerHighlightIterator();
+      return new NullLayerHighlightIterator(this);
     }
   }
 
