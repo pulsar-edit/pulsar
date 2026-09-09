@@ -190,8 +190,8 @@ let options = {
     "!**/node_modules/.bin",
     "!**/node_modules/native-mate",
     // node_modules of the fuzzy-native package are only required for building it
-    "!node_modules/fuzzy-native/node_modules",
-    "!**/node_modules/spellchecker/vendor/hunspell/.*",
+    "!node_modules/@pulsar-edit/fuzzy-native/node_modules",
+    "!**/node_modules/@pulsar-edit/spellchecker/vendor/hunspell/.*",
     "!**/git-utils/deps",
     "!**/oniguruma/deps",
     "!**/less/dist",
@@ -408,7 +408,7 @@ let options = {
     "node_modules/github/bin/*",
     "node_modules/github/lib/*",       // Resolves error in console
     "**/node_modules/dugite/git/**",   // Include dugite postInstall output (matching glob used for Atom)
-    "**/node_modules/spellchecker/**", // Matching Atom Glob
+    "**/node_modules/@pulsar-edit/spellchecker/**", // Matching Atom Glob
   ]
 };
 
