@@ -73,16 +73,43 @@ class PulsarUpdater {
     } else {
       // This can be a no-op or something that generates an actual notification
       // based on how the update check was invoked.
-      await this.notifyAboutCurrent(latestVersion, manual);
+      this.notifyAboutCurrent(latestVersion, manual);
     }
+  }
+
+  dismissIfDismissedInAnotherWindow(notification) {
+    if (!atom.signal) return;
+    let disposables = new CompositeDisposable();
+    let dismissedInAnotherWindow = false;
+    disposables.add(
+      // If we get this signal from another window, it means this notification
+      // has already been dismissed in that window, so we should dismiss ours
+      // as well.
+      atom.signal.onMessage('pulsar-notifier', message => {
+        if (message.type === 'dismiss') {
+          dismissedInAnotherWindow = true;
+          notification.dismiss();
+        }
+      }),
+
+      notification.onDidDismiss(() => {
+        disposables.dispose();
+        if (!dismissedInAnotherWindow) {
+          // If we haven't gotten a signal from another window, we're the first
+          // one to dismiss, so we should send a signal to all the others.
+          atom.signal.send('pulsar-notifier', { type: 'dismiss' });
+        }
+      })
+    );
   }
 
   notifyAboutCurrent(latestVersion, manual) {
     if (!manual) return;
-    atom.notifications.addInfo(
+    let notification = atom.notifications.addInfo(
       "Pulsar is already up to date.",
       { dismissable: true }
     );
+    this.dismissIfDismissedInAnotherWindow(notification);
   }
 
   async notifyAboutUpdate(latestVersion) {
@@ -138,6 +165,7 @@ class PulsarUpdater {
         ],
       }
     );
+    this.dismissIfDismissedInAnotherWindow(notification);
   }
 
   ignoreForThisVersion(version) {
