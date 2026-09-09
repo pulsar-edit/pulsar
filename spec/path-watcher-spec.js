@@ -538,49 +538,51 @@ describe('watchPath', function () {
           jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
         });
 
-      it('reports only contract-defined actions', async () => {
-        jasmine.useRealClock();
-        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
-        const filePath = path.join(rootDir, 'vocabulary.txt');
+        it('reports only contract-defined actions', async () => {
+          jasmine.useRealClock();
+          const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+          const filePath = path.join(rootDir, 'vocabulary.txt');
 
-        let events = [];
-        const watcher = await watchPath(rootDir, {}, batch => events.push(...batch));
-        disposables.add(watcher);
+          let events = [];
+          const watcher = await watchPath(rootDir, {}, batch => events.push(...batch));
+          disposables.add(watcher);
 
-        const eventsForFile = () => events.filter(e => e.path === filePath);
+          const eventsForFile = () => events.filter(e => e.path === filePath);
 
-        await writeFile(filePath, 'one\n');
-        await conditionPromise(
-          () => eventsForFile().some(e => e.action === 'created'),
-          'a created event'
-        );
+          await writeFile(filePath, 'one\n');
+          await conditionPromise(
+            () => eventsForFile().some(e => e.action === 'created'),
+            'a created event'
+          );
 
-        // Deliberately not asserting `modified` here. On macOS `nsfw` reports
-        // through FSEvents, whose per-path flags are cumulative: a file written
-        // moments after it was created still carries `ItemCreated`, so nsfw
-        // reports `created` a second time rather than `modified`. The contract
-        // guarantees the vocabulary, not that every adapter draws the
-        // create/modify line in the same place — the same way it doesn't
-        // guarantee that every adapter can detect renames.
-        const countBeforeAppend = eventsForFile().length;
-        await appendFile(filePath, 'two\n');
-        await conditionPromise(
-          () => eventsForFile().length > countBeforeAppend,
-          'an event for the append'
-        );
+          // Deliberately not asserting `modified` here. On macOS `nsfw`
+          // reports through `FSEvents`, whose per-path flags are cumulative: a
+          // file written moments after it was created still carries
+          // `ItemCreated`, so `nsfw` reports `created` a second time rather
+          // than `modified`.
+          //
+          // The contract guarantees the vocabulary, not that every adapter
+          // draws the create/modify line in the same place — the same way it
+          // doesn't guarantee that every adapter can detect renames.
+          const countBeforeAppend = eventsForFile().length;
+          await appendFile(filePath, 'two\n');
+          await conditionPromise(
+            () => eventsForFile().length > countBeforeAppend,
+            'an event for the append'
+          );
 
-        await unlink(filePath);
-        await conditionPromise(
-          () => eventsForFile().some(e => e.action === 'deleted'),
-          'a deleted event'
-        );
+          await unlink(filePath);
+          await conditionPromise(
+            () => eventsForFile().some(e => e.action === 'deleted'),
+            'a deleted event'
+          );
 
-        // The actual regression guard: no adapter may invent its own
-        // vocabulary. `@parcel/watcher` previously reported `updated` here.
-        const allowed = ['created', 'modified', 'deleted', 'renamed'];
-        const seen = [...new Set(events.map(e => e.action))];
-        expect(seen.every(a => allowed.includes(a))).toBe(true, `saw: ${seen}`);
-      });
+          // The actual regression guard: no adapter may invent its own
+          // vocabulary. `@parcel/watcher` previously reported `updated` here.
+          const allowed = ['created', 'modified', 'deleted', 'renamed'];
+          const seen = [...new Set(events.map(e => e.action))];
+          expect(seen.every(a => allowed.includes(a))).toBe(true, `saw: ${seen}`);
+        });
       });
 
       it('builds a fresh task after the last watcher goes away', async () => {
@@ -622,9 +624,12 @@ describe('watchPath', function () {
         await native.start();
         const secondTask = IsolatedWatcher.task;
         expect(secondTask).not.toBe(firstTask);
+
         // The regression this guards: re-binding onto a terminated task's
         // emitter, which silently doubled every handler per cycle.
-        expect(secondTask.emitter.listenerCountForEventName('watcher:events')).toBe(1);
+        expect(
+          secondTask.emitter.listenerCountForEventName('watcher:events')
+        ).toBe(1);
 
         await native.stop();
       });
