@@ -49,39 +49,60 @@ jobs:
       timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
-      # Debian 11's LTS window ended on 2026-08-31. Some time after a release
-      # goes EOL, its packages are removed from `deb.debian.org` and
-      # `security.debian.org` and moved to `archive.debian.org` — at which
-      # point `apt-get update` starts 404ing.
+      # Debian 11's LTS window ended on 2026-08-31. An EOL release decays in
+      # two distinct stages, and it's important not to conflate them:
       #
-      # We can't know in advance exactly when that migration happens, and we
-      # don't want a scheduled build to fail on the day it does, so we detect
-      # it instead of hard-coding it: try the image's stock sources first, and
-      # only rewrite them to point at the archive if that fails. (Archived
-      # `Release` files are also past their `Valid-Until` date, so we have to
-      # tell `apt` to stop caring about that at the same time.)
+      # 1. Its `Release` files stop being re-signed, so they sail past their
+      #    `Valid-Until` date within a week or so of the EOL date. The
+      #    packages are all still exactly where they were; `apt` just refuses
+      #    to trust the index. (Bullseye's last `Release` was signed on
+      #    2026-08-31 with a 7-day window, so this began on 2026-09-07.)
+      # 2. Some time later — months, typically — the packages themselves are
+      #    removed from `deb.debian.org` and `security.debian.org` and moved
+      #    to `archive.debian.org`, at which point the stock URLs 404.
       #
-      # Once bullseye _is_ archived, this will take the second branch on every
-      # single build; at that point we could simplify by rewriting `apt`'s
+      # Both stages make `apt-get update` fail, so a nonzero exit tells us
+      # nothing about which one we're in. We therefore escalate: ignore
+      # `Valid-Until` and retry, and only rewrite the sources if that _still_
+      # fails. Rewriting on a stage-1 failure would be actively harmful, for
+      # the reason described in the third step below.
+      #
+      # Once bullseye is properly archived this will run all three stages on
+      # every build; at that point we could simplify by rewriting `apt`'s
       # sources unconditionally, the way this workflow used to do for Debian
       # 10. It's cheap enough to leave as-is, though, and leaving it means the
       # next Debian bump doesn't have to remember to re-add it.
     - name: Point apt at the Debian archive if necessary - Linux
       if: ${{ runner.os == 'Linux' }}
+      # `compgen` is a `bash` builtin, and the container's default shell is
+      # `sh`.
+      shell: bash
       run: |
         if apt-get update; then
           echo "Stock apt sources are still live; nothing to do."
-        else
-          echo "apt-get update failed; assuming this Debian release has been archived."
-          SOURCES="/etc/apt/sources.list"
-          if compgen -G "/etc/apt/sources.list.d/*.list" > /dev/null; then
-            SOURCES="$SOURCES /etc/apt/sources.list.d/*.list"
-          fi
-          # shellcheck disable=SC2086
-          sed -i -e s/deb.debian.org/archive.debian.org/g -e s/security.debian.org/archive.debian.org/g $SOURCES
-          echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
-          apt-get update
+          exit 0
         fi
+
+        echo "apt-get update failed; ignoring Valid-Until and retrying."
+        echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+        if apt-get update; then
+          echo "Stock apt sources are stale but still serving; that's fine."
+          exit 0
+        fi
+
+        echo "Still failing; assuming this Debian release has been archived."
+        SOURCES=(/etc/apt/sources.list)
+        if compgen -G "/etc/apt/sources.list.d/*.list" > /dev/null; then
+          SOURCES+=(/etc/apt/sources.list.d/*.list)
+        fi
+        # `archive.debian.org` carries an archived release's main suites, but
+        # its security updates are republished under `<codename>/updates`
+        # rather than `<codename>-security` (compare `buster/updates`, which
+        # is how the previous release ended up over there). So there is no
+        # host substitution that can salvage those entries, and we drop them
+        # instead of rewriting them into a URL that 404s.
+        sed -i -e '/-security/d' -e 's/deb\.debian\.org/archive.debian.org/g' "${SOURCES[@]}"
+        apt-get update
 
       # We want to build against the oldest version of `glibc` that we can get
       # away with. (As of Electron 32, Electron themselves build with a Debian
