@@ -50,24 +50,29 @@ jobs:
 
     steps:
       # Debian 11's LTS window ended on 2026-08-31. An EOL release decays in
-      # two distinct stages, and it's important not to conflate them:
+      # three distinct stages, and it's important not to conflate them:
       #
       # 1. Its `Release` files stop being re-signed, so they sail past their
       #    `Valid-Until` date within a week or so of the EOL date. The
       #    packages are all still exactly where they were; `apt` just refuses
       #    to trust the index. (Bullseye's last `Release` was signed on
       #    2026-08-31 with a 7-day window, so this began on 2026-09-07.)
-      # 2. Some time later — months, typically — the packages themselves are
-      #    removed from `deb.debian.org` and `security.debian.org` and moved
-      #    to `archive.debian.org`, at which point the stock URLs 404.
+      # 2. The `-security` pool starts being emptied into the archive. The
+      #    `bullseye-security` *index* is frozen as of the EOL date and will
+      #    never be regenerated, so it goes on advertising `.deb`s that have
+      #    already been removed from under it — and those 404 at _download_
+      #    time. `apt-get update` only ever fetches indices, so it keeps
+      #    reporting success right up until `apt-get install` dies.
+      # 3. Eventually the main suites move to `archive.debian.org` too, at
+      #    which point even the index URLs 404.
       #
-      # Both stages make `apt-get update` fail, so a nonzero exit tells us
-      # nothing about which one we're in. We therefore escalate: ignore
-      # `Valid-Until` and retry, and only rewrite the sources if that _still_
-      # fails. Rewriting on a stage-1 failure would be actively harmful, for
-      # the reason described in the third step below.
+      # So a nonzero exit from `apt-get update` tells us very little, and in
+      # stage 2 it tells us nothing at all. What we key on instead is the
+      # expired `Release` file, which is a direct signal that this release is
+      # EOL — and therefore that its security suite is frozen and being
+      # dismantled, whether or not it happens to resolve today.
       #
-      # Once bullseye is properly archived this will run all three stages on
+      # Once bullseye is fully archived this will run all three stages on
       # every build; at that point we could simplify by rewriting `apt`'s
       # sources unconditionally, the way this workflow used to do for Debian
       # 10. It's cheap enough to leave as-is, though, and leaving it means the
@@ -78,30 +83,35 @@ jobs:
       # `sh`.
       shell: bash
       run: |
-        if apt-get update; then
+        UPDATE_LOG="$(mktemp)"
+        apt-get update 2>&1 | tee "$UPDATE_LOG"
+        if [[ ${PIPESTATUS[0]} -eq 0 ]] && ! grep -q 'is expired' "$UPDATE_LOG"; then
           echo "Stock apt sources are still live; nothing to do."
           exit 0
         fi
 
-        echo "apt-get update failed; ignoring Valid-Until and retrying."
-        echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
-        if apt-get update; then
-          echo "Stock apt sources are stale but still serving; that's fine."
-          exit 0
-        fi
-
-        echo "Still failing; assuming this Debian release has been archived."
+        # The security suite is frozen and its pool is being emptied out from
+        # under the index, so entries pointing at it are a download-time
+        # landmine. There's nothing to repoint them _to_ — an archived
+        # release's security updates are republished under `<codename>/updates`
+        # rather than `<codename>-security` (compare `buster/updates`, which is
+        # how the previous release ended up over there), and bullseye hasn't
+        # landed there at all yet. Drop them: `bullseye` main carries all the
+        # same packages, a point release behind.
+        echo "Release is EOL; dropping the frozen security suite."
         SOURCES=(/etc/apt/sources.list)
         if compgen -G "/etc/apt/sources.list.d/*.list" > /dev/null; then
           SOURCES+=(/etc/apt/sources.list.d/*.list)
         fi
-        # `archive.debian.org` carries an archived release's main suites, but
-        # its security updates are republished under `<codename>/updates`
-        # rather than `<codename>-security` (compare `buster/updates`, which
-        # is how the previous release ended up over there). So there is no
-        # host substitution that can salvage those entries, and we drop them
-        # instead of rewriting them into a URL that 404s.
-        sed -i -e '/-security/d' -e 's/deb\.debian\.org/archive.debian.org/g' "${SOURCES[@]}"
+        sed -i '/-security/d' "${SOURCES[@]}"
+        echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+        if apt-get update; then
+          echo "Main suites still live; proceeding without security updates."
+          exit 0
+        fi
+
+        echo "Still failing; assuming the main suites have been archived too."
+        sed -i 's/deb\.debian\.org/archive.debian.org/g' "${SOURCES[@]}"
         apt-get update
 
       # We want to build against the oldest version of `glibc` that we can get
