@@ -29,9 +29,34 @@ class Program {
     Car myCar = new Car();
 //  ^^^ support.storage.type.cs
 //      ^^^^^ variable.other.assignment.cs
+//              ^^^ keyword.operator.new.cs
 
     myCar.honk();
 
     Console.WriteLine(myCar.brand + " " + myCar.modelName);
+//          ^^^^^^^^^ support.other.function.method.cs
+
+    Array.Sort<int>(myNumbers);
+//        ^^^^ support.other.function.method.cs
+//             ^^^ support.storage.type.builtin.cs
+
+    Console.WriteLine($"Doing {noun}...");
+//                    ^^^^^^^^^^^^^^^^^^ string.quoted.double.interpolated.cs
+//                            ^ punctuation.section.embedded.begin.cs
+//                                 ^ punctuation.section.embedded.end.cs
+
+    string json = $$"""
+      {
+        "name": {{name.toUpperCase("foo")}}
+      }
+    """;
+//  ^^^ punctuation.definition.string.end.cs
+
   }
 }
+
+static readonly string[] signinMethods = {
+//     ^^^^^^^^ storage.modifier.readonly.cs
+  "Credentials",
+  "QR Code"
+};

@@ -3,7 +3,7 @@ const path = require('path');
 const Grim = require('grim');
 const dedent = require('dedent');
 const { Language, Parser, Query } = require('./web-tree-sitter');
-const { CompositeDisposable, Emitter } = require('event-kit');
+const { CompositeDisposable, Disposable, Emitter } = require('event-kit');
 const { File } = require('@pulsar-edit/pathwatcher');
 const { normalizeDelimiters } = require('./comment-utils.js');
 
@@ -613,7 +613,7 @@ module.exports = class WASMTreeSitterGrammar {
   */
   /* eslint-disable no-unused-vars */
   onDidUpdate(_callback) {
-    // do nothing
+    return new Disposable(() => {});
   }
 
   tokenizeLines(text, _compatibilityMode = true) {
@@ -621,9 +621,14 @@ module.exports = class WASMTreeSitterGrammar {
   }
 
   tokenizeLine(line, _ruleStack, _firstLine) {
+    // We can't tokenize arbitrary content in isolation. Return as much as we
+    // can; that way code that assumes it's working with a TextMate grammar at
+    // least won't break.
     return {
-      value: line,
-      scopes: [this.scopeName]
+      line,
+      tags: [],
+      tokens: [],
+      ruleStack: []
     };
   }
   /* eslint-enable no-unused-vars */
