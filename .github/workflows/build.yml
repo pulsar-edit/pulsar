@@ -380,6 +380,22 @@ jobs:
 
     - name: Build ppm
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
+      env:
+        # `ppm`'s postinstall downloads a bundled Node into a temp directory
+        # and then `fs.rename`s it into `ppm/bin`. Inside the container `/tmp`
+        # lives on the image's overlay filesystem while the workspace is a
+        # bind mount, so that rename crosses devices and fails with `EXDEV`.
+        # `runner.temp` (`/__w/_temp`) is on the same volume as the workspace,
+        # which keeps the rename local.
+        #
+        # This is a workaround for the environment, not a fix: `mv()` in
+        # `ppm/script/download-node.js` has no `EXDEV` fallback, and its own
+        # comment says it was copied verbatim from `ppm`'s `fs.js`, so the
+        # same bug is probably lurking there too. Worth an upstream PR.
+        #
+        # No platform guard needed: Node only consults `TMPDIR` on POSIX, so
+        # this is inert on Windows (which uses `TEMP`/`TMP`).
+        TMPDIR: ${{ runner.temp }}
       with:
         timeout_minutes: 30
         max_attempts: 3
