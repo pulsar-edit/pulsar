@@ -27,7 +27,7 @@
   "electronVersion": "30.5.1",
   "dependencies": {
     "@atom/source-map-support": "^0.3.4",
-    "@babel/core": "7.18.6",
+    "@babel/core": "7.29.6",
     "@electron/remote": "2.1.2",
     "@formatjs/fast-memoize": "^2.2.6",
     "@pulsar-edit/atom-keymap": "^9.1.0",
