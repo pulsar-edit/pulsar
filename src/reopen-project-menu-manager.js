@@ -110,14 +110,7 @@ module.exports = class ReopenProjectMenuManager {
             .join(', '),
           description: ReopenProjectMenuManager.taskDescription(project.paths),
           program: process.execPath,
-          args: project.paths.map(path => `"${path}"`).join(' '),
-          iconPath: path.join(
-            path.dirname(process.execPath),
-            'resources',
-            'cli',
-            'folder.ico'
-          ),
-          iconIndex: 0
+          args: project.paths.map(path => `"${path}"`).join(' ')
         }))
       },
       { type: 'recent' },

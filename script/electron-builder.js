@@ -119,6 +119,9 @@ const ICONS = {
   svg: `resources/app-icons/${iconName}.svg`,
   icns: `resources/app-icons/${iconName}.icns`
 };
+const WINDOWS_INSTALLER_SIDEBAR = ARGS.next
+  ? 'resources/win/installerSidebar-next.bmp'
+  : 'resources/win/installerSidebar.bmp';
 
 
 let options = {
@@ -387,6 +390,7 @@ let options = {
     runAfterFinish: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
+    installerSidebar: WINDOWS_INSTALLER_SIDEBAR,
     guid: "0949b555-c22c-56b7-873a-a960bdefa81f",
     // The GUID is generated from Electron-Builder based on our AppID.
     // Hardcoding it here means it will always be used as generated from the

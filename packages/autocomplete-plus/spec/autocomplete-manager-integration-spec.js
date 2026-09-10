@@ -17,6 +17,12 @@ const path = require('path')
 
 let NodeTypeText = 3
 
+function simulateClick(element) {
+  element.dispatchEvent(new PointerEvent('mousedown', { bubbles: true, cancelable: true }));
+  element.dispatchEvent(new PointerEvent('mouseup', { bubbles: true, cancelable: true }));
+  element.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true }));
+}
+
 describe('Autocomplete Manager', () => {
   let autocompleteManager, editor, editorView, gutterWidth, mainModule, workspaceElement
 
@@ -141,7 +147,7 @@ describe('Autocomplete Manager', () => {
       expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
     })
 
-    it('it refocuses the editor after pressing enter', async () => {
+    it('refocuses the editor after pressing enter', async () => {
       expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
       editor.insertText('a')
       await waitForAutocomplete(editor)
@@ -1311,6 +1317,30 @@ describe('Autocomplete Manager', () => {
         expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
       })
 
+      it('hides the suggestions list when a suggestion is clicked on', async () => {
+        triggerAutocompletion(editor, false, 'a')
+        await waitForAutocomplete(editor)
+
+        expect(editorView.querySelector('.autocomplete-plus')).toExist()
+
+        // Accept suggestion
+        let suggestionListView = editorView.querySelector('.autocomplete-plus autocomplete-suggestion-list')
+        let firstOption = suggestionListView.querySelector('li')
+
+        // Manually blurring the editor here matches our observation that, when
+        // an actual human clicks on a suggestion, it blurs the editor and ends
+        // up focusing the BODY indirectly.
+        document.activeElement.blur()
+        simulateClick(firstOption)
+
+        // Ensure the menu is closed…
+        expect(editorView.querySelector('.autocomplete-plus')).not.toExist()
+        // …and our editor still has focus.
+        await conditionPromise(() => {
+          return document.activeElement.closest('atom-text-editor') === editorView
+        })
+      })
+
       describe('when the replacementPrefix is empty', () => {
         beforeEach(() => {
           spyOn(provider, 'getSuggestions').andCallFake(() => [{text: 'someMethod()', replacementPrefix: ''}])
@@ -2350,7 +2380,7 @@ defm`
       expect(items[0].innerText.trim()).toEqual('center')
     })
 
-    it('stops providing autocompletions when disposed.', async () => {
+    it('stops providing autocompletions when disposed', async () => {
       autocompleteDisposable.dispose()
       bottomEditorView.focus()
       triggerAutocompletion(bottomEditor)
