@@ -39,9 +39,9 @@ jobs:
           - os: macos-14
             node-architecture: x64
           - os: ubuntu-24.04-arm
-            image: "debian:11"
+            image: "debian:10"
           - os: ubuntu-latest
-            image: "debian:11"
+            image: "debian:10"
       fail-fast: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.image }}
@@ -49,26 +49,35 @@ jobs:
       timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
-      # Debian 11 went EOL on 2026-08-31, so we source its packages from
-      # `archive.debian.org` rather than from the live mirrors:
+      # Debian 10 is long since EOL, so its packages live on
+      # `archive.debian.org` and we repoint `apt` accordingly.
       #
-      #   - Its `Release` files are no longer re-signed and are now past their
-      #     `Valid-Until` date, so `apt` needs telling to stop checking.
-      #   - Its security suite is frozen and its pool is being emptied out from
-      #     under the (never-to-be-regenerated) index, so those entries 404 at
-      #     *download* time — `apt-get update` still reports success, and then
-      #     `apt-get install` dies. There is nowhere to repoint them: the
-      #     archive republishes security as `<codename>/updates`, and bullseye
-      #     isn't there yet. So we drop them. `bullseye` main carries all the
-      #     same packages, a point release behind.
+      # This is deliberately the _fully_ archived release rather than a more
+      # recent one. When a Debian release is properly archived, both `debian`
+      # and `debian-security` move to `archive.debian.org` together, the
+      # `Release` files lose their `Valid-Until` field (so they never expire),
+      # and the suite naming lines up — which is why a plain hostname rewrite
+      # is all that's needed here, with no `Check-Valid-Until` override.
       #
-      # The next Debian bump should delete this step, and re-add it when that
-      # release reaches its own EOL.
-    - name: Point apt at the Debian archive - Linux
+      # We tried Debian 11 and backed out. A release spends a long stretch
+      # after EOL only _half_ archived: its `Release` files expire immediately,
+      # its security pool is emptied out from under a frozen index (so packages
+      # 404 at download time while `apt-get update` still reports success), and
+      # `archive.debian.org` carries only a stale point release that no longer
+      # matches the versions baked into the `debian:11` image. There is no
+      # arrangement of `sed` that survives that; it just has to finish.
+      #
+      # So: prefer an archived release to a recently-EOL one. When bumping,
+      # check that the target is on `archive.debian.org` in full — including
+      # `dists/<codename>` under `debian-security` — before switching to it.
+    - name: Edit sources.list - Linux
       if: ${{ runner.os == 'Linux' }}
       run: |
-        sed -i -e '/-security/d' -e 's/deb\.debian\.org/archive.debian.org/g' /etc/apt/sources.list
-        echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+        sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+        sed -i s/security.debian.org/archive.debian.org/g /etc/apt/sources.list
+        # Unlike master's version of this step, we run `apt-get update` here:
+        # the GCC toolchain step below needs `curl` before "Install build
+        # dependencies" (which does its own update) has run.
         apt-get update
 
       # We want to build against the oldest version of `glibc` that we can get
