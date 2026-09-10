@@ -13,14 +13,15 @@ env:
   # Variables needed for build information
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PYTHON_VERSION: '3.12'
-  # Version of the conda-forge compiler toolchain we use for the Linux
-  # `electron-rebuild` step, and of the `micromamba` we install it with. See
-  # the long comment in the "Install Modern GCC Toolchain" step below.
+  # Version of the conda-forge compiler toolchain we use for Linux compilation,
+  # and of the `micromamba` we install it with. See the long comment in the
+  # "Install Modern GCC Toolchain" step below.
   GCC_VERSION: '12'
   MICROMAMBA_VERSION: '2.9.0-0'
   # The oldest `glibc`/`libstdc++` we promise to run against, enforced by the
-  # "Verify Linux ABI Floor" step. These correspond to Debian 11 (bullseye),
-  # which is what Electron itself builds its Linux binaries on as of v32.
+  # "Verify Linux ABI Floor" step. These correspond to our current `glibc`
+  # support pledge on the website. (We may be able to go lower than this; it's
+  # worth investigating.)
   MAX_GLIBC_VERSION: '2.31'
   MAX_GLIBCXX_VERSION: '3.4.28'
   ROLLING_UPLOAD_TOKEN: ${{ secrets.ROLLING_RELEASE_UPLOAD_TOKEN }}
@@ -52,24 +53,12 @@ jobs:
       # Debian 10 is long since EOL, so its packages live on
       # `archive.debian.org` and we repoint `apt` accordingly.
       #
-      # This is deliberately the _fully_ archived release rather than a more
-      # recent one. When a Debian release is properly archived, both `debian`
-      # and `debian-security` move to `archive.debian.org` together, the
-      # `Release` files lose their `Valid-Until` field (so they never expire),
-      # and the suite naming lines up — which is why a plain hostname rewrite
-      # is all that's needed here, with no `Check-Valid-Until` override.
+      # We had tried building on Debian 11, but it was in the process of being
+      # archived — a process that takes a while and makes that OS hard to
+      # depend on for builds.
       #
-      # We tried Debian 11 and backed out. A release spends a long stretch
-      # after EOL only _half_ archived: its `Release` files expire immediately,
-      # its security pool is emptied out from under a frozen index (so packages
-      # 404 at download time while `apt-get update` still reports success), and
-      # `archive.debian.org` carries only a stale point release that no longer
-      # matches the versions baked into the `debian:11` image. There is no
-      # arrangement of `sed` that survives that; it just has to finish.
-      #
-      # So: prefer an archived release to a recently-EOL one. When bumping,
-      # check that the target is on `archive.debian.org` in full — including
-      # `dists/<codename>` under `debian-security` — before switching to it.
+      # We can still build on such an old OS as long as we use conda-forge's
+      # vendored toolchain.
     - name: Edit sources.list - Linux
       if: ${{ runner.os == 'Linux' }}
       run: |
@@ -81,15 +70,16 @@ jobs:
         apt-get update
 
       # We want to build against the oldest version of `glibc` that we can get
-      # away with. (As of Electron 32, Electron themselves build with a Debian
-      # 11 image, so the version we target is `glibc` 2.31.) But at some point
-      # in the recent past, V8 started enforcing use of a compiler that
-      # understands C++20, and this started affecting Pulsar once it bumped
-      # past a certain version of Electron.
+      # away with. (As of Electron 32, the version we target is `glibc` 2.31,
+      # though it's possible we could go lower than that.)
       #
-      # Debian 11 gives us the `glibc` we want, but its `gcc` doesn't fit the
-      # bill. (Its C++20 support is experimental and we were never able to make
-      # it play well with Electron after the v32 bump.)
+      # But at some point in the recent past, V8 started enforcing use of a
+      # compiler that understands C++20, and this started affecting Pulsar once
+      # it bumped past a certain version of Electron.
+      #
+      # Debian 10 gives us a `glibc` below the ceiling we want, but its builtin
+      # `gcc` doesn't fit the bill. (It runs `gcc` version 8.3.0, much too old
+      # for C++20 support.)
       #
       # Electron's V8 version tends to be driven by Chromium; so even though
       # Electron 32.2.3 uses Node 20.18.1, it combines it with a much higher
@@ -100,28 +90,31 @@ jobs:
       # rebuild step because of V8's more stringent requirements.
       #
       # The way out of this is to decouple the target `glibc` from that of the
-      # host machine — allowing us to use newer `gcc` on Debian 11 without
+      # host machine — allowing us to use newer `gcc` on Debian 10 without
       # raising the `glibc` floor above 2.31. To do this, we install
       # conda-forge's vendored static toolchain.
       #
-      # And since Electron is the only thing mandating C++20 support at the
-      # moment (the relevant libraries we use still build just fine with C++17
-      # or less), for now we'll only use these vendored tools for the
-      # electron-rebuild step. If we should need to use them more widely after
-      # a future Electron bump, it should be as simple as pointing the relevant
-      # environment variables to `PULSAR_CC`, `PULSAR_CXX`, etc., for whichever
-      # other steps require them.
+      # The difference in V8 version used between Node and Electron (even for
+      # an equivalent release of Node) can result in different compilation
+      # outcomes. For instance, there is a combination of `glibc` and `gcc`
+      # that allows `fuzzy-native` to build just fine initially but fail when
+      # being rebuilt for Electron.
       #
-      # (For instance: the version of V8 that first caused rebuild failures for
-      # us was 12.8; Node itself didn't start using a version that high until
-      # 23.0.0. So once we bump to a version of Electron that uses Node 24, I
-      # expect that we'll need to start using the conda-forge compiler
-      # toolchain throughout this workflow file. At that point, we should also
-      # research whether it's worth bumping to a newer Debian image; we don't
-      # want to set a _higher_ `glibc` floor than Electron themselves, but
-      # there's no point in targeting a _lower_ `glibc` floor, either. Ideally,
-      # we'd stay in sync with whatever version of Debian Electron uses for
-      # Linux builds.)
+      # Currently, under Debian 10, we need to use conda-forge in order for our
+      # native modules to compile. If we bump the Debian version in the future,
+      # this may change; it'll be a race between the OS we build on and the
+      # version of Node we implicitly use (which will increase over time as we
+      # catch up with Electron releases).
+      #
+      # But we can decide whether we need conda-forge on a step-by-step basis;
+      # it's as simple as pointing the relevant environment variables to
+      # `PULSAR_CC`, `PULSAR_CXX`, etc., for whichever other steps require
+      # them.
+      #
+      # We should do further research on whether we can get away with a lower
+      # version of `glibc`. It does us no good to aim to support `glibc` lower
+      # than what Electron themselves commit to, but circumstantial evidence
+      # suggests that Electron can still support `glibc` lower than 2.31.
     - name: Restore Modern GCC Toolchain from Cache - Linux
       id: cache-gcc-toolchain
       if: ${{ runner.os == 'Linux' }}
@@ -130,16 +123,14 @@ jobs:
         path: /opt/gcc-toolchain
         # Solving and downloading the toolchain takes a couple of minutes on
         # every leg of the matrix, and the result is a pure function of the
-        # inputs named in this key, so we can cache it wholesale. Bump any of
+        # inputs named in this key… so we can cache it wholesale. Bump any of
         # the versions below and you get a fresh toolchain automatically.
         key: gcc-toolchain-${{ runner.arch }}-conda-forge-gcc${{ env.GCC_VERSION }}-micromamba${{ env.MICROMAMBA_VERSION }}
 
     - name: Install Modern GCC Toolchain - Linux
       if: ${{ runner.os == 'Linux' && steps.cache-gcc-toolchain.outputs.cache-hit != 'true' }}
       run: |
-        # No `apt-get update` needed: the archive-detection step above already
-        # ran one. (`micromamba` unpacks conda's `.tar.bz2` packages itself, so
-        # we don't need a system `bzip2` here.)
+        # No `apt-get update` needed; we ran it in a previous step.
         apt-get install -y curl ca-certificates
         if [ "${{ runner.arch }}" = "ARM64" ]; then
           MAMBA_ARCH=linux-aarch64
@@ -173,14 +164,14 @@ jobs:
         echo "PULSAR_CC=/opt/gcc-toolchain/bin/${CONDA_TARGET}-gcc" >> "$GITHUB_ENV"
         echo "PULSAR_CXX=/opt/gcc-toolchain/bin/${CONDA_TARGET}-g++" >> "$GITHUB_ENV"
         # The `-I` flags point the vendored compiler at the _system_ headers,
-        # so that we compile against Debian 11's `glibc` (2.31) instead of the
-        # newer one that ships inside the conda environment.
+        # so that we compile against Debian 10's `glibc` instead of the newer
+        # one that ships inside the conda environment.
         echo "PULSAR_CFLAGS=-I/usr/include -I/usr/include/${MULTIARCH}" >> "$GITHUB_ENV"
         echo "PULSAR_CXXFLAGS=-I/usr/include -I/usr/include/${MULTIARCH}" >> "$GITHUB_ENV"
         # `-static-libstdc++ -static-libgcc` is the other half of that bargain,
         # and it's the part that's easy to forget. GCC 12 will happily emit
         # code that references symbols from its own, much newer `libstdc++`
-        # (`GLIBCXX_3.4.29` and up); Debian 11 ships `GLIBCXX_3.4.28`. Since we
+        # (`GLIBCXX_3.4.29` and up); Debian 10 ships `GLIBCXX_3.4.25`. Since we
         # don't ship the conda environment to users, dynamically linking
         # against it would produce binaries that build and test green here but
         # fail to load on precisely the older distros this whole dance exists
@@ -235,8 +226,8 @@ jobs:
         architecture: ${{ matrix.node-architecture }}
 
     - name: Setup Python
-      # actions/setup-python's copy of Python is compiled for too new glibc,
-      # which won't work in a Debian 11 Docker image.
+      # actions/setup-python's copy of Python is compiled for too-new `glibc`,
+      # which won't work in a Debian 10 Docker image.
       # Get Python from apt repos instead on Linux.
       if: ${{ runner.os != 'Linux' }}
       uses: actions/setup-python@v6
@@ -245,8 +236,8 @@ jobs:
 
     - name: Install Python setuptools
       # This is needed for Python 3.12+, since many versions of node-gyp
-      # are incompatible with Python 3.12+, which no-longer ships 'distutils'
-      # out of the box. 'setuptools' package provides 'distutils'.
+      # are incompatible with Python 3.12+, which no-longer ships `distutils`
+      # out of the box. `setuptools` package provides `distutils`.
       run: python3 -m pip install setuptools
 
     - name: Install Yarn - Linux
@@ -269,8 +260,8 @@ jobs:
     - name: Set Timestamp for Binary Version - Linux
       id: linux-binary-version
       if: ${{ runner.os == 'Linux' }}
-      # This output is currently only set for the sake of the Rolling binary upload script.
-      # See the "test-and-upload-Linux" job below.
+      # This output is currently only set for the sake of the Rolling binary
+      # upload script. See the "test-and-upload-Linux" job below.
       run: echo "timestamp=`date -u +%Y%m%d%H`" >> "$GITHUB_OUTPUT"
 
     - name: Check Pulsar Version
@@ -283,8 +274,8 @@ jobs:
 
     - name: Reinstall Current Node-GYP NodeJS Headers
       # Overwrite bad headers that get downloaded.
-      # NodeJS versions above 16 should come with `node-gyp@9.4.0` that has a fix
-      # for this issue. At that point this additional step can be removed.
+      # NodeJS versions above 16 should come with `node-gyp@9.4.0` that has a
+      # fix for this issue. At that point this additional step can be removed.
       run: npx node-gyp install ${{ env.NODE_VERSION }}
 
     - name: Explicitly Specify Python Path (Windows)
@@ -303,8 +294,10 @@ jobs:
       working-directory: 'C:\Program Files (x86)\Microsoft Visual Studio\Installer'
       run: |
         .\vs_installer.exe modify --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --quiet --norestart --nocache | Out-Host
-      # Slight funk here, the command will act async if we don't wait for it's result. `--wait` isn't supported on `vs_installer.exe`
-      # So we use the pipe to ensure we wait for output, but for the LIFE (#1350) I can't get output here.
+      # Slight funk here, the command will act async if we don't wait for its
+      # result. `--wait` isn't supported on `vs_installer.exe` So we use the
+      # pipe to ensure we wait for output, but for the LIFE (#1350) I can't get
+      # output here.
 
     - name: Install Pulsar Dependencies (non-Linux)
       if: ${{ runner.os != 'Linux' }}
@@ -370,10 +363,10 @@ jobs:
 
       # The whole reason we build in an old Debian image is to keep our `glibc`
       # requirement low. Nothing about the build fails loudly if we
-      # accidentally raise it, though! The failure shows up on a user's
-      # machine, on a distro nothing in CI runs. (Certainly not
-      # `ubuntu-latest`. It's too new! It's right there in the name!) So we
-      # check explicitly.
+      # accidentally raise it, though! We don't test it in old Debian; we do
+      # smoke tests on `ubuntu-latest`. Hence if we do it wrong, the failure
+      # shows up on a user's machine. So we check explicitly with a script that
+      # verifies we meet the desired `glibc` version floor.
     - name: Verify Linux ABI Floor
       if: ${{ runner.os == 'Linux' }}
       run: script/check-linux-abi-floor.sh node_modules
@@ -498,7 +491,7 @@ jobs:
 
     - name: Test Binary - Windows
       if: runner.os == 'Windows' && env.RUN_WINDOWS_VT == true
-      # TODO: Convert script to PowerShell
+      # TODO: Convert script to PowerShell.
       run: |
         mkdir extracted; tar -xf binaries/*zip -C ./extracted/
         export BINARY_NAME=./extracted/Pulsar.exe
@@ -594,8 +587,9 @@ jobs:
 
     - name: Add binaries to Rolling Release Repo - Linux
       if: ${{ github.event_name == 'push' && runner.os == 'Linux' }}
-      # We only want to upload rolling binaries if they are a commit to master
-      # Otherwise we want to not upload if it's a PR or manually triggered build
+      # We only want to upload rolling binaries if they are a commit to master.
+      # Otherwise we want to skip upload if it's a PR or manually-triggered
+      # build.
       run: |
         cd ./script/rolling-release-scripts
         npm install
