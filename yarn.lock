@@ -4004,9 +4004,9 @@ dompurify@2.0.17:
   integrity sha512-nNwwJfW55r8akD8MSFz6k75bzyT2y6JEa1O3JrZFBf+Y5R9JXXU4OsRl0B9hKoPgHTw2b7ER5yJ5Md97MMUJPg==
 
 dompurify@^3.0.6, dompurify@^3.2.6:
-  version "3.3.3"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.3.3.tgz#680cae8af3e61320ddf3666a3bc843f7b291b2b6"
-  integrity sha512-Oj6pzI2+RqBfFG+qOaOLbFXLQ90ARpcGG6UePL82bJLtdsa6CYJD7nmiU8MW9nQNOtCHV3lZ/Bzq1X0QYbBZCA==
+  version "3.4.15"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.15.tgz#30351b34513894f428c13bddb28bff0a027ae804"
+  integrity sha512-EUBjM+B+lkDE41iE82DDSCfkoPGfXx8IxFxPMjNzm/Uk4xDet77rTN9wqlxlVg71kK7XGuUMv6wUxJUwwv+Xyw==
   optionalDependencies:
     "@types/trusted-types" "^2.0.7"
 
