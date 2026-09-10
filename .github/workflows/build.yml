@@ -306,8 +306,36 @@ jobs:
       # Slight funk here, the command will act async if we don't wait for it's result. `--wait` isn't supported on `vs_installer.exe`
       # So we use the pipe to ensure we wait for output, but for the LIFE (#1350) I can't get output here.
 
-    - name: Install Pulsar Dependencies
+    - name: Install Pulsar Dependencies (non-Linux)
+      if: ${{ runner.os != 'Linux' }}
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        retry_on: error
+        command: yarn install --ignore-engines
+        on_retry_command: rm -R node_modules
+
+      # Debian 10's system `g++` is GCC 8.3, which predates the `-std=c++20`
+      # spelling — it only understands the provisional `-std=c++2a`. And
+      # `fuzzy-native`'s `binding.gyp` asks for `-std=c++20` outright, so the
+      # very first `node-gyp rebuild` fails during plain `yarn install`, long
+      # before `electron-rebuild` gets a chance to use the vendored toolchain.
+      # So we point this step at that toolchain too.
+      #
+      # This step is split by platform rather than given a shared `env:` block
+      # because `PULSAR_CC` and friends are only set on Linux; elsewhere they
+      # would expand to the empty string and hand `node-gyp` a blank compiler
+      # override on platforms that currently build fine.
+    - name: Install Pulsar Dependencies (Linux)
+      if: ${{ runner.os == 'Linux' }}
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
+      env:
+        CC: ${{ env.PULSAR_CC }}
+        CXX: ${{ env.PULSAR_CXX }}
+        CFLAGS: ${{ env.PULSAR_CFLAGS }}
+        CXXFLAGS: ${{ env.PULSAR_CXXFLAGS }}
+        LDFLAGS: ${{ env.PULSAR_LDFLAGS }}
       with:
         timeout_minutes: 30
         max_attempts: 3
