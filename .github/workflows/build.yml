@@ -49,69 +49,26 @@ jobs:
       timestamp: ${{ steps.linux-binary-version.outputs.timestamp }}
 
     steps:
-      # Debian 11's LTS window ended on 2026-08-31. An EOL release decays in
-      # three distinct stages, and it's important not to conflate them:
+      # Debian 11 went EOL on 2026-08-31, so we source its packages from
+      # `archive.debian.org` rather than from the live mirrors:
       #
-      # 1. Its `Release` files stop being re-signed, so they sail past their
-      #    `Valid-Until` date within a week or so of the EOL date. The
-      #    packages are all still exactly where they were; `apt` just refuses
-      #    to trust the index. (Bullseye's last `Release` was signed on
-      #    2026-08-31 with a 7-day window, so this began on 2026-09-07.)
-      # 2. The `-security` pool starts being emptied into the archive. The
-      #    `bullseye-security` *index* is frozen as of the EOL date and will
-      #    never be regenerated, so it goes on advertising `.deb`s that have
-      #    already been removed from under it — and those 404 at _download_
-      #    time. `apt-get update` only ever fetches indices, so it keeps
-      #    reporting success right up until `apt-get install` dies.
-      # 3. Eventually the main suites move to `archive.debian.org` too, at
-      #    which point even the index URLs 404.
+      #   - Its `Release` files are no longer re-signed and are now past their
+      #     `Valid-Until` date, so `apt` needs telling to stop checking.
+      #   - Its security suite is frozen and its pool is being emptied out from
+      #     under the (never-to-be-regenerated) index, so those entries 404 at
+      #     *download* time — `apt-get update` still reports success, and then
+      #     `apt-get install` dies. There is nowhere to repoint them: the
+      #     archive republishes security as `<codename>/updates`, and bullseye
+      #     isn't there yet. So we drop them. `bullseye` main carries all the
+      #     same packages, a point release behind.
       #
-      # So a nonzero exit from `apt-get update` tells us very little, and in
-      # stage 2 it tells us nothing at all. What we key on instead is the
-      # expired `Release` file, which is a direct signal that this release is
-      # EOL — and therefore that its security suite is frozen and being
-      # dismantled, whether or not it happens to resolve today.
-      #
-      # Once bullseye is fully archived this will run all three stages on
-      # every build; at that point we could simplify by rewriting `apt`'s
-      # sources unconditionally, the way this workflow used to do for Debian
-      # 10. It's cheap enough to leave as-is, though, and leaving it means the
-      # next Debian bump doesn't have to remember to re-add it.
-    - name: Point apt at the Debian archive if necessary - Linux
+      # The next Debian bump should delete this step, and re-add it when that
+      # release reaches its own EOL.
+    - name: Point apt at the Debian archive - Linux
       if: ${{ runner.os == 'Linux' }}
-      # `compgen` is a `bash` builtin, and the container's default shell is
-      # `sh`.
-      shell: bash
       run: |
-        UPDATE_LOG="$(mktemp)"
-        apt-get update 2>&1 | tee "$UPDATE_LOG"
-        if [[ ${PIPESTATUS[0]} -eq 0 ]] && ! grep -q 'is expired' "$UPDATE_LOG"; then
-          echo "Stock apt sources are still live; nothing to do."
-          exit 0
-        fi
-
-        # The security suite is frozen and its pool is being emptied out from
-        # under the index, so entries pointing at it are a download-time
-        # landmine. There's nothing to repoint them _to_ — an archived
-        # release's security updates are republished under `<codename>/updates`
-        # rather than `<codename>-security` (compare `buster/updates`, which is
-        # how the previous release ended up over there), and bullseye hasn't
-        # landed there at all yet. Drop them: `bullseye` main carries all the
-        # same packages, a point release behind.
-        echo "Release is EOL; dropping the frozen security suite."
-        SOURCES=(/etc/apt/sources.list)
-        if compgen -G "/etc/apt/sources.list.d/*.list" > /dev/null; then
-          SOURCES+=(/etc/apt/sources.list.d/*.list)
-        fi
-        sed -i '/-security/d' "${SOURCES[@]}"
+        sed -i -e '/-security/d' -e 's/deb\.debian\.org/archive.debian.org/g' /etc/apt/sources.list
         echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
-        if apt-get update; then
-          echo "Main suites still live; proceeding without security updates."
-          exit 0
-        fi
-
-        echo "Still failing; assuming the main suites have been archived too."
-        sed -i 's/deb\.debian\.org/archive.debian.org/g' "${SOURCES[@]}"
         apt-get update
 
       # We want to build against the oldest version of `glibc` that we can get
