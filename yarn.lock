@@ -2597,7 +2597,7 @@ atom-slick@^2, atom-slick@^2.0.0:
   dependencies:
     atom-slick "^2.0.0"
     grim "^2.0.1"
-    minimatch "^3.0.3"
+    minimatch "^5.1.8"
     selector-kit "^0.1.0"
     stable "^0.1.8"
     underscore-plus "^1.7.0"
@@ -5036,7 +5036,7 @@ fuzzaldrin@^2.1.0:
   dependencies:
     atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
-    minimatch "~3.1.0"
+    minimatch "~5.1.0"
     underscore-plus "^1.7.0"
     vscode-ripgrep "^1.2.5"
     wrench "^1.5"
@@ -6972,7 +6972,7 @@ minimatch@0.x:
     lru-cache "2"
     sigmund "~1.0.0"
 
-"minimatch@2 || 3", minimatch@^3.0.3, minimatch@^3.0.4, minimatch@^3.0.5, minimatch@^3.1.1, minimatch@^3.1.2, minimatch@~3.1.0:
+"minimatch@2 || 3", minimatch@^3.0.4, minimatch@^3.0.5, minimatch@^3.1.1, minimatch@^3.1.2:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.5.tgz#580c88f8d5445f2bd6aa8f3cadefa0de79fbd69e"
   integrity sha512-VgjWUsnnT6n+NUk6eZq77zeFdpW2LWDzP6zFGrCbHXiYNul5Dzqk2HHQ5uFH2DNW5Xbp8+jVzaeNt94ssEEl4w==
@@ -7007,6 +7007,13 @@ minimatch@^5.0.0, minimatch@^5.0.1, minimatch@^5.1.0:
   dependencies:
     brace-expansion "^2.0.1"
 
+minimatch@^5.1.8, minimatch@~5.1.0, minimatch@~5.1.8:
+  version "5.1.9"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.9.tgz#1293ef15db0098b394540e8f9f744f9fda8dee4b"
+  integrity sha512-7o1wEA2RyMP7Iu7GNba9vc0RWWGACJOCZBJX2GJWip0ikV+wcOsgVuY9uE8CPiyQhkGFSlhuSkZPavN7u1c2Fw==
+  dependencies:
+    brace-expansion "^2.0.1"
+
 minimatch@^9.0.3:
   version "9.0.9"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-9.0.9.tgz#9b0cb9fcb78087f6fd7eababe2511c4d3d60574e"
@@ -7021,13 +7028,6 @@ minimatch@~0.2.9:
   dependencies:
     lru-cache "2"
     sigmund "~1.0.0"
-
-minimatch@~3.0.0:
-  version "3.0.8"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.8.tgz#5e6a59bd11e2ab0de1cfb843eb2d82e546c321c1"
-  integrity sha512-6FsRAQsxQ61mw+qP1ZzbL9Bc78x2p5OqNgNpnoAFLTrX8n5Kxph0CsnhmKKNXTWjXqU5L0pGPR7hYk+XWZr60Q==
-  dependencies:
-    brace-expansion "^1.1.7"
 
 minimist@^1.2.0, minimist@^1.2.3, minimist@^1.2.5, minimist@^1.2.6:
   version "1.2.8"
@@ -9556,7 +9556,7 @@ tree-kill@1.2.2:
   version "0.229.1"
   dependencies:
     fs-plus "^3.0.0"
-    minimatch "~3.0.0"
+    minimatch "~5.1.8"
     temp "~0.9.0"
     underscore-plus "^1.0.0"
 
