@@ -152,7 +152,7 @@
     "one-light-ui": "file:packages/one-light-ui",
     "open-on-github": "file:packages/open-on-github",
     "package-generator": "file:packages/package-generator",
-    "postcss": "8.4.31",
+    "postcss": "8.5.23",
     "postcss-selector-parser": "6.0.4",
     "pulsar-updater": "file:packages/pulsar-updater",
     "resolve": "1.18.1",
