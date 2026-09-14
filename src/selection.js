@@ -383,6 +383,19 @@ module.exports = class Selection {
     );
   }
 
+  // Public: Modifies the selection to encompass the current subword.
+  //
+  // Returns a {Range}.
+  selectSubword(options = {}) {
+    options.wordRegex = this.cursor.subwordRegExp();
+    this.setBufferRange(
+      this.cursor.getCurrentWordBufferRange(options),
+      options
+    );
+    this.wordwise = true;
+    this.initialScreenRange = this.getScreenRange();
+  }
+
   // Public: Modifies the selection to encompass the current word.
   //
   // Returns a {Range}.

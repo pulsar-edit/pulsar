@@ -1,5 +1,5 @@
 // This is loaded by atom-environment.coffee. See
-// https://atom.io/docs/api/latest/Config for more information about config TODO: Link to Pulsar API site when documented
+// https://docs.pulsar-edit.dev/api/pulsar/latest/ for more information about config
 // schemas.
 const configSchema = {
   core: {
@@ -132,6 +132,12 @@ const configSchema = {
         default: true,
         description:
           "When a window with no open tabs or panes is given the 'Close Tab' command, close that window."
+      },
+      promptOnConflict: {
+        type: 'boolean',
+        title: 'Experimental: Prompt on Conflict',
+        default: false,
+        description: "Prompt before saving a file in a conflicted state, as happens when a file’s contents on disk are changed by another program while edits are pending."
       },
       fileEncoding: {
         description:
@@ -455,6 +461,13 @@ const configSchema = {
         type: ['string', 'null']
       },
       // These can be used as globals or scoped, thus defaults.
+      largeFileThreshold: {
+        description:
+          'Files larger than this size in megabytes will open in large file mode with syntax highlighting disabled. Only applies to TextMate grammars; Tree-sitter grammars handle large files efficiently without this limitation. Set to 0 to always enable syntax highlighting regardless of file size.',
+        type: 'number',
+        default: 2,
+        minimum: 0
+      },
       fontFamily: {
         type: 'string',
         default: 'Menlo, Consolas, DejaVu Sans Mono, monospace',

@@ -23,8 +23,13 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-14, windows-latest ]
+        os: [ macos-14, ubuntu-24.04-arm, ubuntu-latest, windows-2022 ]
+        node-architecture: [ '' ]
         include:
+          - os: macos-14
+            node-architecture: x64
+          - os: ubuntu-24.04-arm
+            image: "debian:10"
           - os: ubuntu-latest
             image: "debian:10"
       fail-fast: false
@@ -47,9 +52,9 @@ jobs:
     - name: Restore Compiled Python from Cache - Linux
       if: ${{ runner.os == 'Linux' }}
       id: compiled-python-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
-        key: ${{ runner.os }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
+        key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
         path: Python-${{ env.PYTHON_VERSION }}.9
 
     - name: Compile Python - Linux
@@ -64,9 +69,9 @@ jobs:
 
     - name: Save Compiled Python to Cache - Linux
       if: ${{ runner.os == 'Linux' && steps.compiled-python-restore.outputs.cache-hit != 'true' }}
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
-        key: ${{ runner.os }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
+        key: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.image }}-Python-${{ env.PYTHON_VERSION }}.9
         path: Python-${{ env.PYTHON_VERSION }}.9
 
     - name: Install Compiled Python - Linux
@@ -74,13 +79,13 @@ jobs:
       run: cd "Python-${PYTHON_VERSION}.9" && make install
 
     - name: Checkout the latest code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Node
       uses: actions/setup-node@v6
       with:
         node-version-file: '.nvmrc'
-        architecture: 'x64'
+        architecture: ${{ matrix.node-architecture }}
 
     - name: Setup Python
       # actions/setup-python's copy of Python is compiled for too new glibc,
@@ -129,12 +134,6 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       run: (Get-Content package.json) -replace '[0-9]*-dev', (date -u +%Y%m%d%H) | Set-Content -Path package.json
 
-    - name: Reinstall Current Node-GYP NodeJS Headers
-      # Overwrite bad headers that get downloaded.
-      # NodeJS versions above 16 should come with `node-gyp@9.4.0` that has a fix
-      # for this issue. At that point this additional step can be removed.
-      run: npx node-gyp install ${{ env.NODE_VERSION }}
-
     - name: Explicitly Specify Python Path (Windows)
       if: ${{ runner.os == 'Windows' }}
       # The Windows image somehow gets confused about which Python it should
@@ -155,7 +154,7 @@ jobs:
       # So we use the pipe to ensure we wait for output, but for the LIFE (#1350) I can't get output here.
 
     - name: Install Pulsar Dependencies
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -164,7 +163,7 @@ jobs:
         on_retry_command: rm -R node_modules
 
     - name: Rebuild Pulsar Dependencies for Electron
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -172,7 +171,7 @@ jobs:
         command: yarn build
 
     - name: Build ppm
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 30
         max_attempts: 3
@@ -181,12 +180,12 @@ jobs:
 
     - name: Cache Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           node_modules
           packages
-        key: Linux-dependencies-${{ github.sha }}-${{ github.workflow }}
+        key: Linux-dependencies-${{ runner.arch }}-${{ github.sha }}-${{ github.workflow }}
 
     # macOS Signing Stuff
     - name: Build Pulsar Binaries (macOS) (Signed)
@@ -200,7 +199,7 @@ jobs:
         APPLEID: ${{ secrets.APPLEID }}
         APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
         TEAM_ID: ${{ secrets.TEAM_ID }}
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 31
         max_attempts: 7
@@ -208,7 +207,7 @@ jobs:
 
     - name: Build Pulsar Binaries (macOS) (Unsigned)
       if: ${{ runner.os == 'macOS' && github.event_name != 'push' }}
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 31
         max_attempts: 7
@@ -216,40 +215,57 @@ jobs:
 
     - name: Build Pulsar Binaries
       if: ${{ runner.os != 'macOS' }}
-      uses: nick-fields/retry@7152eba30c6575329ac0576536151aca5a72780e
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
       with:
         timeout_minutes: 30
         max_attempts: 3
         retry_on: error
         command: yarn dist
 
-    - name: Rename Pulsar Binaries for Regular release (Linux)
-      if: ${{ runner.os == 'Linux' }}
+    - name: Rename Pulsar Binaries for Regular release (ARM64 Linux)
+      if: ${{ runner.os == 'Linux' && runner.arch == 'ARM64' }}
+      run: node ./script/rename.js "ARM.Linux"
+
+    - name: Rename Pulsar Binaries for Regular release (x64 Linux)
+      if: ${{ runner.os == 'Linux' && runner.arch == 'X64' }}
       run: node ./script/rename.js "Linux"
 
-    - name: Rename Pulsar Binaries for Regular release (macOS)
-      if: ${{ runner.os == 'macOS' }}
+    - name: Rename Pulsar Binaries for Regular release (ARM64 macOS)
+      if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && matrix.node-architecture != 'x64' }}
+      run: node ./script/rename.js "Silicon.Mac"
+
+    - name: Rename Pulsar Binaries for Regular release (x64 macOS)
+      if: ${{ runner.os == 'macOS' && ( runner.arch == 'X64' || matrix.node-architecture == 'x64' ) }}
       run: node ./script/rename.js "Intel.Mac"
 
     - name: Rename Pulsar Binaries for Regular release (Windows)
       if: ${{ runner.os == 'Windows' }}
       run: node ./script/rename.js "Windows"
 
-    - name: Fix AppImage target - Linux
-      if: ${{ runner.os == 'Linux' }}
+    - name: Fix AppImage target - x64 Linux
+      if: ${{ runner.os == 'Linux' && runner.arch == 'X64' }}
       run: ./script/fix-linux-appimage.sh x86_64
 
-    - name: Cache Pulsar Binaries - Linux
-      if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/save@v4
-      with:
-        path: ./binaries
-        key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
+    - name: Fix AppImage target - ARM64 Linux
+      if: ${{ runner.os == 'Linux' && runner.arch == 'ARM64' }}
+      run: ./script/fix-linux-appimage.sh ARM_64
 
+    # The Linux binaries used to be saved to the Actions cache here as well, so
+    # that the `test-and-upload-Linux` job below could pick them up. They were
+    # by far our largest cache entries (~800MB per architecture per commit),
+    # and between them they routinely pushed the repo past GitHub's 10GB cache
+    # allowance — at which point GitHub evicts least-recently-used entries and
+    # the test job would find nothing waiting for it.
+    #
+    # The upload below already persists exactly the same files, and artifacts
+    # don't count against the cache allowance, so the test job downloads them
+    # from here instead. Artifacts also outlive the run, which means re-running
+    # just the test job hours later works, where the cached copy would long
+    # since have been evicted.
     - name: Upload Binary Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
-        name: ${{ matrix.os }} Binaries
+        name: ${{ matrix.os }} ${{ matrix.node-architecture }} Binaries
         path: ./binaries/*
 
     - name: Test Binary - Windows
@@ -281,7 +297,7 @@ jobs:
     - name: Upload Video Artifacts
       # Run whether this job passed or failed, unless explicitly cancelled.
       if: ${{ !cancelled() && runner.os != 'Linux' }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.os }} Videos
         path: ./tests/videos/**
@@ -292,7 +308,11 @@ jobs:
     # Debian Docker environment. If anyone can make it work, feel free to
     # re-combine visual testing on Linux back into the main build job above!
     # - DeeDeeG
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-24.04-arm, ubuntu-latest ]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
     needs: build
 
     steps:
@@ -301,33 +321,69 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y git python3 python3-pip make gcc g++ libx11-dev libxkbfile-dev pkg-config libsecret-1-dev rpm xvfb ffmpeg zstd wget squashfs-tools libwayland-dev libwayland-client0 libxkbcommon-dev libxkbcommon-x11-dev libxkbcommon0 xkb-data
 
     - name: Checkout the latest code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Node
       uses: actions/setup-node@v6
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    - name: Restore Cached Pulsar Binaries - Linux
+    # Download the artifact rather than restoring from cache. We only get so
+    # much cache space!
+    #
+    # `pattern` rather than `name` because the uploading step interpolates an
+    # empty `matrix.node-architecture` into the name, leaving a double space
+    # that's easy to get wrong by hand. Only one artifact per run matches each
+    # of these patterns.
+    - name: Download Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/restore@v4
+      uses: actions/download-artifact@v7
       with:
+        pattern: ${{ matrix.os }}*Binaries
+        merge-multiple: true
         path: ./binaries
-        key: pulsar-Linux-Binaries-${{ github.sha }}-${{ github.workflow }}
+
+    # `download-artifact` only errors on a missing artifact when it's given an
+    # exact `name`. With a `pattern` it filters to an empty list and exits
+    # happily. Check explicitly so that a missing binary is reported here
+    # rather than as an inscrutable glob failure in the middle of the test step
+    # below.
+    - name: Verify binaries were downloaded - Linux
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        if ! ls ./binaries/*AppImage > /dev/null 2>&1; then
+          echo "::error::No AppImage in ./binaries — the '${{ matrix.os }}*Binaries' artifact from the build job is missing or empty."
+          exit 1
+        fi
+        # Artifacts are zipped for transport, and zip doesn't carry the Unix
+        # permission bits: everything comes back as 644, so the AppImage we
+        # just downloaded is not executable. (The cache we used to use for
+        # this handoff was a tarball, which _did_ preserve the executable bit…
+        # hence this step having no ancestor in the cache-based version.)
+        chmod +x ./binaries/*AppImage
+        ls -la ./binaries
 
     - name: Restore Cached Pulsar dependencies - Linux
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           node_modules
           packages
-        key: Linux-dependencies-${{ github.sha }}-${{ github.workflow }}
+        key: Linux-dependencies-${{ runner.arch }}-${{ github.sha }}-${{ github.workflow }}
 
     - name: Test Binary - Linux
       if: ${{ (runner.os == 'Linux') && env.RUN_LINUX_VT }}
+      # We deliberately throw away the Electron that was rebuilt for the app
+      # and let `yarn` reinstall a stock one, since Playwright drives the
+      # packaged binary and needs an `electron` that runs under plain Node.
+      #
+      # `-rf`, not `-R`: the dependency cache above is allowed to miss, and on
+      # a miss there's no `node_modules` at all. Easy recovery: just do another
+      # `yarn install`.
       run: |
-        rm -R node_modules/electron; yarn install --check-files
+        rm -rf node_modules/electron
+        yarn install --check-files
         ./binaries/*AppImage --appimage-extract
         export BINARY_NAME='squashfs-root/pulsar'
         mkdir -p ./tests/videos
@@ -351,7 +407,7 @@ jobs:
     - name: Upload Video Artifacts - Linux
       # Run whether this job passed or failed, unless explicitly cancelled.
       if: ${{ !cancelled() && runner.os == 'Linux' }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.os }} Videos
         path: ./tests/videos/**

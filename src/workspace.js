@@ -42,6 +42,35 @@ function filePathMatchesGlob(filePath, matcher) {
   return matcher.negate ? true : false;
 }
 
+// Transform a pattern prior to handing it off to `minimatch`.
+function normalizePattern (rawPath) {
+  // Strip any trailing path separator.
+  // The path separator is `\` on Windows, but we also allow usage of `/`;
+  // hence we check for both here.
+  if (rawPath.endsWith(path.sep) || rawPath.endsWith('/')) {
+    rawPath = rawPath.substring(0, rawPath.length - 1);
+  }
+
+  // Keep any path negation separate from the rest, since it needs to stay at
+  // the beginning no matter what.
+  let negation = '';
+  if (rawPath.startsWith('!')) {
+    rawPath = rawPath.slice(1);
+    negation = '!';
+  }
+
+  // If a user searches for (e.g.) `*.js`, we want to search all `.js` files
+  // anywhere in the project, not just in the root. That means we should treat
+  // patterns as implicitly prepending `**/` if they contain no path separators.
+  //
+  // NOTE: This is stricter than VS Code's approach, which is to prepend `**/`
+  // to _all_ patterns unless the user specifically opts out by starting a
+  // path with `/`. This would make plenty of sense for us, but would be a
+  // change in behavior, so for now we're going with this as a compromise.
+  let prefix = (rawPath.includes(path.sep) || rawPath.includes('/')) ? '' : `**${path.sep}`;
+  return `${negation}${prefix}${rawPath}`;
+}
+
 // Given a path pattern like `foo/bar/baz` and a list of the current root path
 // basenames, reinterprets the path pattern and decides which root(s) it refers
 // to.
@@ -102,7 +131,8 @@ function getBasenamesFromProjectRoots () {
 
 const CACHED_MINIMATCH_INSTANCES = new Map();
 
-function minimatchInstanceForPattern(pattern) {
+function minimatchInstanceForPattern(rawPattern) {
+  let pattern = normalizePattern(rawPattern);
   if (!CACHED_MINIMATCH_INSTANCES.has(pattern)) {
     let instance = new Minimatch(pattern, { flipNegate: true });
     CACHED_MINIMATCH_INSTANCES.set(pattern, instance);
@@ -1289,18 +1319,19 @@ module.exports = class Workspace extends Model {
 
           const container = this.paneContainers[location] || this.getCenter();
           pane = container.getActivePane();
+          const splitParams = { activate: options.activatePane !== false };
           switch (options.split) {
             case 'left':
               pane = pane.findLeftmostSibling();
               break;
             case 'right':
-              pane = pane.findOrCreateRightmostSibling();
+              pane = pane.findOrCreateRightmostSibling(splitParams);
               break;
             case 'up':
               pane = pane.findTopmostSibling();
               break;
             case 'down':
-              pane = pane.findOrCreateBottommostSibling();
+              pane = pane.findOrCreateBottommostSibling(splitParams);
               break;
           }
         }
@@ -2423,9 +2454,13 @@ module.exports = class Workspace extends Model {
 
     const searchPromise = Promise.all(allSearches);
 
-    let defaultMatchers = options.paths ?
-      options.paths.map((inclusion) => minimatchInstanceForPattern(inclusion)) :
-      null;
+    let defaultMatchers = null;
+    if (options.paths) {
+      defaultMatchers = options.paths
+        // Filter out "empty string" ("") path segments that somehow make it here
+        .filter(p => !!p)
+        .map(inclusion => minimatchInstanceForPattern(inclusion));
+    }
 
     const customMatchers = new Map();
     for (let [dir, inclusions] of customInclusionsForDirectory) {

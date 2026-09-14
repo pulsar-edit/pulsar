@@ -327,6 +327,9 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
     'editor:select-word': function() {
       return this.selectWordsContainingCursors();
     },
+    'editor:select-subword': function() {
+      return this.selectSubwordsContainingCursors();
+    },
     'editor:consolidate-selections': function(event) {
       if (!this.consolidateSelections()) {
         return event.abortKeyBinding();

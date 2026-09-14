@@ -689,6 +689,36 @@ describe('Workspace', () => {
           });
         });
       });
+
+      describe("when 'activatePane' is false and the split creates a new pane", () => {
+        it("leaves the original pane active when splitting right", async () => {
+          const pane1 = workspace.getActivePane();
+
+          const editor = await workspace.open('a', {
+            split: 'right',
+            activatePane: false
+          });
+
+          const pane2 = workspace.getPanes().filter(p => p !== pane1)[0];
+          expect(pane2).toBeDefined();
+          expect(pane2.items).toEqual([editor]);
+          expect(workspace.getActivePane()).toBe(pane1);
+        });
+
+        it("leaves the original pane active when splitting down", async () => {
+          const pane1 = workspace.getActivePane();
+
+          const editor = await workspace.open('a', {
+            split: 'down',
+            activatePane: false
+          });
+
+          const pane2 = workspace.getPanes().filter(p => p !== pane1)[0];
+          expect(pane2).toBeDefined();
+          expect(pane2.items).toEqual([editor]);
+          expect(workspace.getActivePane()).toBe(pane1);
+        });
+      });
     });
 
     describe('when an initialLine and initialColumn are specified', () => {
@@ -2247,6 +2277,20 @@ describe('Workspace', () => {
       ).toBe(true);
       expect(
         atom.workspace.filePathMatchesPatterns(pathB1, ['!b-dir/*.js'])
+      ).toBe(false);
+
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, ['*.js'])
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, ['*.js'])
+      ).toBe(true);
+
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, ['!*.js'])
+      ).toBe(false);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, ['!*.js'])
       ).toBe(false);
 
       expect(
