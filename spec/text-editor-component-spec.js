@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const Grim = require('grim');
 const electron = require('electron');
-const clipboard = electron.clipboard;
+const clipboard = require('@electron/remote').clipboard;
 
 // Define a custom scheduler that uses `setTimeout` instead of
 // `requestAnimationFrame` because the latter behaves slowly when the browser
