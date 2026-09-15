@@ -179,6 +179,8 @@
 ;
 ; All this also applies to `elif`.
 ((identifier) @dedent (#match? @dedent "^(elif|else)$"))
+("else" @dedent (#is? test.error))
+("elif" @dedent (#is? test.error))
 
 ; Likewise, typing `case` at the beginning of a line within a match block — in
 ; cases where it's interpreted as an identifier — strongly suggests that we
