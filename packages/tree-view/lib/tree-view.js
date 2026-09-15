@@ -853,9 +853,21 @@ class TreeView {
 
   openSelectedEntryInNewWindow() {
     let pathToOpen = this.selectedEntry()?.getPath();
-    if (pathToOpen) {
-      return atom.open({ pathsToOpen: [pathToOpen], newWindow: true });
-    }
+    if (!pathToOpen) return;
+
+    // Opening a file in a new window should preserve the current project
+    // roots, just as the tab bar's “Open in New Window” does; but opening a
+    // folder means opening that folder _as_ a project, so it stands alone.
+    let pathsToOpen = fs.isDirectorySync(pathToOpen)
+      ? [pathToOpen]
+      : [...atom.project.getPaths(), pathToOpen];
+
+    return atom.open({
+      pathsToOpen,
+      newWindow: true,
+      devMode: atom.devMode,
+      safeMode: atom.safeMode
+    });
   }
 
   copySelectedEntry() {
