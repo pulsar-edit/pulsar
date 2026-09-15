@@ -9,9 +9,11 @@ function makeWindow() {
 }
 
 describe('state-keys', function() {
-  describe('getStateKey', function() {
-    afterEach(() => resetStateKeys());
+  // `USED_KEYS` is module-level state shared by every function under test, so
+  // reset it after each spec rather than only within one block.
+  afterEach(() => resetStateKeys());
 
+  describe('getStateKey', function() {
     it('returns a key with the editor- prefix', function() {
       const win = makeWindow();
       const key = getStateKey(win, ['/some/path']);
@@ -73,18 +75,74 @@ describe('state-keys', function() {
     });
 
     describe('with pathsOnly: true', function() {
-      it('always returns the hash-based key, ignoring what the window is registered as', function() {
+      it('offers the ideal key to the window that already holds it', function() {
+        // Register the window under the hash key for /path/a.
         const win = makeWindow();
-        // Register the window under the hash key for /path/a
-        getStateKey(win, ['/path/a']);
-
-        // Now a second window claims /path/a and takes the hash key...
-        const win2 = makeWindow();
-        getStateKey(win2, ['/path/a']);
-        // ...so win gets a UUID. A pathsOnly call should still return the hash.
-
-        const idealKey = getStateKey(win, ['/path/a'], { pathsOnly: true });
+        const idealKey = getStateKey(win, ['/path/a']);
         assert.match(idealKey, /^editor-[0-9a-f]{40}$/);
+
+        // A second window claiming /path/a gets a UUID, since the hash key is
+        // taken; but `win` is still the holder, so asking about its own paths
+        // returns the hash key rather than being turned away.
+        const win2 = makeWindow();
+        assert.match(getStateKey(win2, ['/path/a']), /^editor-[0-9a-f]{8}-[0-9a-f]{4}-/);
+
+        assert.strictEqual(getStateKey(win, ['/path/a'], { pathsOnly: true }), idealKey);
+      });
+
+      it('declines to offer the ideal key while another window holds it', function() {
+        const win1 = makeWindow();
+        const idealKey = getStateKey(win1, ['/path/a']);
+        assert.match(idealKey, /^editor-[0-9a-f]{40}$/);
+
+        // win2 is asking "is there adoptable state for /path/a?" The answer is
+        // no: that state belongs to win1, which is still open and still
+        // writing to it.
+        const win2 = makeWindow();
+        assert.strictEqual(getStateKey(win2, ['/path/a'], { pathsOnly: true }), null);
+      });
+
+      it('offers the ideal key again once the holding window is released', function() {
+        const win1 = makeWindow();
+        const idealKey = getStateKey(win1, ['/path/a']);
+
+        const win2 = makeWindow();
+        assert.strictEqual(getStateKey(win2, ['/path/a'], { pathsOnly: true }), null);
+
+        // Once win1 closes, its state is genuinely orphaned — and therefore
+        // adoptable again.
+        releaseStateKey(win1);
+        assert.strictEqual(getStateKey(win2, ['/path/a'], { pathsOnly: true }), idealKey);
+      });
+
+      it('declines to offer a key that a restored window has reserved', function() {
+        const probe = makeWindow();
+        const idealKey = getStateKey(probe, ['/path/a'], { pathsOnly: true });
+
+        // A window restored from a previous session reserves its remembered
+        // key instead of computing a fresh one.
+        const win1 = makeWindow();
+        reserveStateKey(win1, idealKey);
+
+        const win2 = makeWindow();
+        assert.strictEqual(getStateKey(win2, ['/path/a'], { pathsOnly: true }), null);
+      });
+
+      it('registers nothing for the asking window even when it declines', function() {
+        const win1 = makeWindow();
+        getStateKey(win1, ['/path/a']);
+
+        const win2 = makeWindow();
+        getStateKey(win2, ['/path/a'], { pathsOnly: true });
+
+        // The probe must not have cached anything for win2; a normal call
+        // should still go through assignment and land on the random fallback.
+        assert.match(getStateKey(win2, ['/path/a']), /^editor-[0-9a-f]{8}-[0-9a-f]{4}-/);
+      });
+
+      it('returns null for an empty path set', function() {
+        const win = makeWindow();
+        assert.strictEqual(getStateKey(win, [], { pathsOnly: true }), null);
       });
 
       it('does not register any key for the window', function() {

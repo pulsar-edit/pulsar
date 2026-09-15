@@ -4,8 +4,8 @@
 // store (IndexedDB or SQLite). Ideally, it is produced by a hash of the sorted
 // root paths for a given project; this allows us to determine the hypothetical
 // state keys for other windows ("is there a state key for a window with paths
-// X and Y?") so that we can adopt an orphaned state into an existing empty
-// window when appropriate.
+// X and Y?") so that we can adopt an orphaned state (from a window that used
+// to exist) into an existing empty window when appropriate.
 //
 // But we also need a fallback case for when the ideal state key is already
 // taken! There is no requirement for uniqueness of project root sets among
@@ -24,8 +24,11 @@ const crypto = require('crypto');
 const USED_KEYS = new Set();
 let STATE_KEYS_BY_WINDOW = new WeakMap();
 
-// Compute the state key used when
-function getIdealStateKey (projectPaths) {
+// Compute the state key that a window with the given project roots would use
+// if it were the only window with those roots. Sorting means the key doesn't
+// depend on the order in which the roots were added. Returns `null` for an
+// empty set of paths, since a window with no project roots has no state key.
+function getIdealStateKey(projectPaths) {
   if (!Array.isArray(projectPaths) || projectPaths.length === 0) {
     return null;
   }
@@ -34,19 +37,38 @@ function getIdealStateKey (projectPaths) {
   return `editor-${hash}`;
 }
 
-function getRandomStateKey () {
+function getRandomStateKey() {
   return `editor-${crypto.randomUUID()}`;
 }
 
 // Given a window and its project paths, retrieves that window's unique key for
 // state serialization purposes, creating one if it does not already exist.
-function getStateKey (win, projectPaths, { pathsOnly = false } = {}) {
+function getStateKey(win, projectPaths, { pathsOnly = false } = {}) {
   if (pathsOnly) {
     // We don't want to know this window's state key; we want to know what the
     // state key of a project window _would_ be if it were computed from the
     // given project paths. (This is used when one window wants to adopt
-    // another window's state.)
-    return getIdealStateKey(projectPaths);
+    // a previous window's state.)
+    let idealKey = getIdealStateKey(projectPaths);
+    // But because this is used when one window wants to adopt another window's
+    // state, we should only deliver the ideal key if it isn't being used by
+    // another window already.
+    if (idealKey && USED_KEYS.has(idealKey) && STATE_KEYS_BY_WINDOW.get(win) !== idealKey) {
+      return null;
+    }
+
+    // NOTE: `null` leaves this branch for two different reasons — either these
+    // paths produce no key at all (an empty project), or the key exists but
+    // belongs to a live window. Both mean “nothing to adopt,” which is the
+    // only question our callers ask, so they needn't tell the two apart.
+    //
+    // But keep that check inside this `pathsOnly` branch. A caller asking for
+    // its _own_ key reads `null` as “this window has no project roots” and
+    // falls back to temporary window state (see `loadState` in
+    // `atom-environment.js`). Returning a `null` that actually meant “another
+    // window holds your key” would send a perfectly good window down that
+    // fallback path and silently lose its state.
+    return idealKey;
   }
 
   let existingKey = STATE_KEYS_BY_WINDOW.get(win);
@@ -74,7 +96,7 @@ function getStateKey (win, projectPaths, { pathsOnly = false } = {}) {
 // windows to restore, since they'll have remembered their state keys from the
 // previous session. This lets us skip generating a new one or re-computing the
 // old one.
-function reserveStateKey (win, requestedStateKey) {
+function reserveStateKey(win, requestedStateKey) {
   let stateKey = requestedStateKey;
   if (USED_KEYS.has(stateKey)) {
     // If this window has already reserved this state key, we can bail early.
@@ -87,13 +109,13 @@ function reserveStateKey (win, requestedStateKey) {
 
 // Unregister a state key for a window. Call this when the window is about to
 // be destroyed so that its state key can be reused by a future window.
-function releaseStateKey (win) {
+function releaseStateKey(win) {
   let stateKey = STATE_KEYS_BY_WINDOW.get(win);
   if (!stateKey) return;
   USED_KEYS.delete(stateKey);
 }
 
-function resetStateKeys () {
+function resetStateKeys() {
   USED_KEYS.clear();
   STATE_KEYS_BY_WINDOW = new WeakMap();
 }
