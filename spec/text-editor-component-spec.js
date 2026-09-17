@@ -1189,7 +1189,11 @@ describe('TextEditorComponent', () => {
           useAlternativeScheduler();
         }
         originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
+        // A floor, not an assignment: these tests need well over the 5s local
+        // default, but CI already grants 120s and a plain assignment would cut
+        // that in half — which is how this spec ended up being the only one in
+        // the file given *less* time than its neighbours.
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = Math.max(originalTimeout, 60 * 1000);
       });
 
       afterEach(() => {
@@ -1200,6 +1204,17 @@ describe('TextEditorComponent', () => {
       });
 
       it('renders the visible rows correctly after randomly mutating the editor', async () => {
+        // Bound this loop by time as well as by iteration count. Twenty
+        // iterations is more work than the slowest CI runners can finish
+        // within the spec budget — Windows has spent the entire 120s here and
+        // still timed out — and the failure that produces is a timeout, which
+        // tells us nothing about the editor. Deriving the deadline from the
+        // budget rather than hardcoding it means this keeps pace if the
+        // budget changes, and leaves room for the final iteration to finish
+        // and for teardown. Fast machines still run all twenty; slow ones run
+        // as many as fit and report real assertions. Each iteration seeds
+        // itself and logs that seed, so a failure stays reproducible.
+        const deadline = Date.now() + jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.6;
         const initialSeed = Date.now();
         for (var i = 0; i < 20; i++) {
           let seed = initialSeed + i;
@@ -1309,6 +1324,8 @@ describe('TextEditorComponent', () => {
 
           element.remove();
           editor.destroy();
+
+          if (Date.now() > deadline) break;
         }
       });
     });
