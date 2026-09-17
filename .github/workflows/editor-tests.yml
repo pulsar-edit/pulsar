@@ -53,3 +53,26 @@ jobs:
     - name: Run Tests with xvfb-run (Linux)
       if: runner.os == 'Linux'
       run: xvfb-run --auto-servernum yarn start --test spec
+
+    # The renderer can die without producing any JS-level output, so we should
+    # grab a crashdump whenever that happens.
+    - name: Collect crash dumps
+      if: failure()
+      shell: bash
+      run: |
+        mkdir -p crash-dumps
+        DUMPS="${ATOM_HOME:-$HOME/.pulsar}/crashdumps"
+        echo "Looking for crash dumps in $DUMPS"
+        if [ -d "$DUMPS" ]; then
+          cp -R "$DUMPS/." crash-dumps/ || true
+        fi
+        ls -la crash-dumps || true
+
+    - name: Upload crash dumps
+      if: failure()
+      uses: actions/upload-artifact@v7
+      with:
+        name: Crash dumps (${{ matrix.os }})
+        path: ./crash-dumps/*
+        if-no-files-found: ignore
+        retention-days: 7
