@@ -463,10 +463,18 @@ describe('watchPath', function () {
 
         // Prove the watcher works *before* we break it, so that a failure
         // below can only mean the respawn didn't work.
-        const before = path.join(rootDir, 'before.txt');
-        await writeFile(before, 'before\n');
+        //
+        // Write repeatedly rather than once: the backend can take a moment to
+        // arm after `watchPath` resolves, and a lone write that lands in that
+        // gap is gone for good, leaving us polling for an event that will never
+        // arrive. (This is the same reason the post-crash check below writes in
+        // a loop.)
+        let writes = 0;
         await conditionPromise(
-          () => events.some(e => e.path === before),
+          async () => {
+            await writeFile(path.join(rootDir, `before-${writes++}.txt`), 'before\n');
+            return events.length > 0;
+          },
           'the pre-crash write to be observed'
         );
 
@@ -525,13 +533,16 @@ describe('watchPath', function () {
       });
 
       // Three round trips through a real filesystem watcher don't reliably fit
-      // in the default 5s spec budget — `nsfw` alone debounces at 200ms on top
-      // of whatever latency the OS adds — so this one gets more room.
+      // in the local 5s spec budget — `nsfw` alone debounces at 200ms on top of
+      // whatever latency the OS adds — so this one gets more room.
       describe('action vocabulary', () => {
         let originalTimeout;
         beforeEach(() => {
           originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-          jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+          // A floor, not an assignment. CI already grants 120s, and a plain
+          // assignment would cut that to an eighth on the very runners slow
+          // enough to need it.
+          jasmine.DEFAULT_TIMEOUT_INTERVAL = Math.max(originalTimeout, 15000);
         });
 
         afterEach(() => {
@@ -983,8 +994,15 @@ describe('watchPath', function () {
       const watcher = await watchPath(rootDir, {}, batch => events.push(...batch));
       subs.add(watcher);
 
-      await writeFile(path.join(rootDir, 'before.txt'), 'before\n');
-      await conditionPromise(() => events.length > 0, 'events before the switch');
+      // Write repeatedly rather than once: the backend can take a moment to arm
+      // after `watchPath` resolves, and a lone write that lands in that gap is
+      // gone for good, leaving us polling for an event that will never arrive.
+      // (Same reason the post-switch check below writes in a loop.)
+      let writes = 0;
+      await conditionPromise(async () => {
+        await writeFile(path.join(rootDir, `before-${writes++}.txt`), 'before\n');
+        return events.length > 0;
+      }, 'events before the switch');
 
       const before = watcher.native.constructor.name;
 

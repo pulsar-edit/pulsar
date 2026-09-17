@@ -44,6 +44,11 @@ const ACTION_MAP = new Map([
 // Organize watchers by unique ID.
 const WATCHERS_BY_PATH = new Map();
 
+// How long to collect events for a single-file watch before sending them as a
+// batch. The directory watchers get batching for free — `nsfw` debounces at
+// 200ms — but `fs.watch` hands us raw events, so we do it ourselves.
+const FILE_BATCH_INTERVAL_MS = 50;
+
 function onError(instance, err) {
   emit('watcher:error', { id: instance, error: err.message });
 }
@@ -76,6 +81,91 @@ function handler(instance, events) {
     id: instance,
     events: normalizedEvents
   });
+}
+
+// `nsfw` accepts a file path, and it works on macOS and Linux, but on Windows
+// modification events for a directly-watched file routinely never arrive. So we
+// watch the containing directory and filter, which is reliable everywhere.
+//
+// That also fixes a subtler bug on every platform: a watch on a file follows the
+// inode rather than the path (at least on some platforms), so an atomic save (as
+// performed by many tools) leaves us watching a file that no longer has a name.
+// Watching the directory survives the file being replaced, deleted, or recreated.
+//
+// Note: if an *ancestor* directory is moved or unmounted, this watch can go
+// stale silently. On Linux the `inotify` watch follows the inode, so it stays
+// alive while describing a path we no longer care about. Outright deletion is
+// fine (`rm -rf` unlinks the file first, while this watch is still valid). This
+// is the same "watch root moved" limitation the recursive adapters have at their
+// own roots, not something specific to watching a single file.
+//
+// NOTE: `parcel-watcher-worker.js` has its own copy of this. The two workers are
+// self-contained scripts and don't share code; if you fix something here, look
+// there too. `path-watcher-spec.js` runs the same single-file specs against both
+// backends, so a divergence should surface as a failure rather than a mystery.
+function watchSingleFile(instance, normalizedPath) {
+  const dir = path.dirname(normalizedPath);
+  const base = path.basename(normalizedPath).normalize('NFC');
+  const controller = new AbortController();
+
+  let pending = [];
+  let timer = null;
+  let exists = fs.existsSync(normalizedPath);
+
+  const flush = () => {
+    timer = null;
+    const events = pending;
+    pending = [];
+    if (events.length > 0) {
+      emit('watcher:events', { id: instance, events });
+    }
+  };
+
+  const enqueue = (action) => {
+    // Collapse runs of identical actions — one save can produce several
+    // `change` events — but keep genuine transitions in order, so a consumer
+    // never loses a creation or a deletion to coalescing.
+    const last = pending[pending.length - 1];
+    if (last?.action !== action) {
+      pending.push({ action, path: normalizedPath });
+    }
+    // Deliberately not reset on each event: this is a collection window, not a
+    // debounce, so a file being written continuously still reports on time.
+    timer ??= setTimeout(flush, FILE_BATCH_INTERVAL_MS);
+  };
+
+  const fsWatcher = fs.watch(dir, { signal: controller.signal }, (eventType, filename) => {
+    if (filename != null && filename.normalize('NFC') !== base) return;
+
+    if (eventType === 'change') {
+      enqueue('modified');
+      return;
+    }
+
+    // A `rename` only tells us the directory entry appeared or disappeared;
+    // `fs.watch` can never give us an origin path.
+    const existsNow = fs.existsSync(normalizedPath);
+    enqueue(existsNow ? (exists ? 'modified' : 'created') : 'deleted');
+    exists = existsNow;
+  });
+
+  // Without this, an error on the watched directory (deleted, unmounted,
+  // permissions changed) is thrown as an uncaught exception and takes down the
+  // whole worker along with every unrelated watcher in it.
+  fsWatcher.on('error', (error) => {
+    emit('watcher:error', { id: instance, error: error.message });
+  });
+
+  // Shaped to match the `nsfw` watcher objects this worker stores alongside it,
+  // so `watcher:unwatch` doesn't need to care which kind it got.
+  return {
+    async stop() {
+      if (timer) clearTimeout(timer);
+      timer = null;
+      pending = [];
+      return controller.abort();
+    }
+  };
 }
 
 // Given a root path and a list of globs, generates a list of excluded paths to
@@ -151,6 +241,12 @@ async function handleMessage(message) {
       let { normalizedPath, instance, ignored } = args;
       let wrappedHandler = (events) => handler(instance, events);
       try {
+        if (!fs.lstatSync(normalizedPath).isDirectory()) {
+          WATCHERS_BY_PATH.set(instance, watchSingleFile(instance, normalizedPath));
+          emit('watcher:reply', { id, args: instance });
+          break;
+        }
+
         let excludedPaths = await buildExcludedPaths(normalizedPath, ignored);
         let watcher = await nsfw(normalizedPath, wrappedHandler, {
           debounceMS: 200,
@@ -175,7 +271,11 @@ async function handleMessage(message) {
         break;
       }
       let excludedPaths = await buildExcludedPaths(normalizedPath, ignored);
-      await watcher.updateExcludedPaths(excludedPaths);
+      // Single-file watches have no exclusions to update — `buildExcludedPaths`
+      // bails out for non-directories anyway.
+      if (watcher.updateExcludedPaths) {
+        await watcher.updateExcludedPaths(excludedPaths);
+      }
       emit('watcher:reply', { id, args: instance });
       break;
     }

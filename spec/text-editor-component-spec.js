@@ -1189,7 +1189,11 @@ describe('TextEditorComponent', () => {
           useAlternativeScheduler();
         }
         originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
+        // A floor, not an assignment: these tests need well over the 5s local
+        // default, but CI already grants 120s and a plain assignment would cut
+        // that in half — which is how this spec ended up being the only one in
+        // the file given *less* time than its neighbours.
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = Math.max(originalTimeout, 60 * 1000);
       });
 
       afterEach(() => {
