@@ -46,6 +46,24 @@ jobs:
     - name: Build Dependencies
       run: yarn build
 
+    # TEMPORARY (troubleshooting): ask Windows Error Reporting to write a local
+    # dump for any process that dies of an unhandled exception. This is
+    # independent of Electron's own crash reporter, which has so far produced
+    # nothing for the `0xC0000005` renderer crashes. Remove once those are
+    # understood.
+    - name: Enable Windows crash dumps
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $dir = "$env:GITHUB_WORKSPACE\wer-dumps"
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        $key = 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps'
+        New-Item -Path $key -Force | Out-Null
+        New-ItemProperty -Path $key -Name DumpFolder -Value $dir -PropertyType ExpandString -Force | Out-Null
+        New-ItemProperty -Path $key -Name DumpCount  -Value 10  -PropertyType DWord -Force | Out-Null
+        New-ItemProperty -Path $key -Name DumpType   -Value 2   -PropertyType DWord -Force | Out-Null
+        Get-ItemProperty -Path $key
+
     - name: Run Tests
       if: runner.os != 'Linux'
       run: yarn start --test spec
@@ -71,6 +89,17 @@ jobs:
         else
           echo "Source directory does NOT exist; listing its parent:"
           ls -la "$(dirname "$DUMPS")" || echo "parent does not exist either"
+        fi
+        # TEMPORARY (troubleshooting): also collect Windows Error Reporting
+        # dumps. Relative path on purpose — $GITHUB_WORKSPACE is a Windows path
+        # and this step runs in that directory anyway.
+        if [ -d wer-dumps ]; then
+          echo "WER dumps found:"
+          ls -laR wer-dumps || true
+          mkdir -p crash-dumps/wer
+          cp -R wer-dumps/. crash-dumps/wer/ || true
+        else
+          echo "No WER dumps at ./wer-dumps"
         fi
         echo "Staged for upload:"
         ls -laR crash-dumps || true
