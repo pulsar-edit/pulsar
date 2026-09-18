@@ -62,11 +62,18 @@ jobs:
       run: |
         mkdir -p crash-dumps
         DUMPS="${ATOM_HOME:-$HOME/.pulsar}/crashdumps"
+        echo "HOME=$HOME ATOM_HOME=${ATOM_HOME:-<unset>}"
         echo "Looking for crash dumps in $DUMPS"
         if [ -d "$DUMPS" ]; then
+          echo "Source directory exists; contents:"
+          ls -laR "$DUMPS" || true
           cp -R "$DUMPS/." crash-dumps/ || true
+        else
+          echo "Source directory does NOT exist; listing its parent:"
+          ls -la "$(dirname "$DUMPS")" || echo "parent does not exist either"
         fi
-        ls -la crash-dumps || true
+        echo "Staged for upload:"
+        ls -laR crash-dumps || true
 
     - name: Upload crash dumps
       if: failure()
