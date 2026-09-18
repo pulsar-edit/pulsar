@@ -3073,18 +3073,6 @@ describe('TextEditorComponent', () => {
   });
 
   describe('block decorations', () => {
-    beforeEach(() => {
-      if (NEEDS_ALTERNATIVE_SCHEDULER) {
-        useAlternativeScheduler();
-      }
-    });
-
-    afterEach(() => {
-      if (NEEDS_ALTERNATIVE_SCHEDULER) {
-        restoreDefaultScheduler();
-      }
-    });
-
     it('renders visible block decorations between the appropriate lines, refreshing and measuring them as needed', async () => {
       const editor = buildEditor({ autoHeight: false });
       const {
@@ -3786,21 +3774,39 @@ describe('TextEditorComponent', () => {
       }
 
       {
-        const { editor, component, element } = buildComponent({
-          autoHeight: false,
-          width: 800
-        });
-        const marker = editor.markScreenPosition([0, 0]);
-        const item = document.createElement('div');
-        item.textContent = 'block decoration that could wrap many times';
-        editor.decorateMarker(marker, {
-          type: 'block',
-          item
-        });
+        // On CI the browser does not consider this editor visible, so the
+        // default `requestAnimationFrame` scheduler never delivers the update
+        // the `await` below waits for, and this spec hangs until it times out.
+        // Drive it through the `setTimeout`-based scheduler instead.
+        //
+        // Deliberately scoped to this block, and to Windows. The sibling
+        // specs assert on measured element geometry, and `setTimeout` does not
+        // guarantee the post-layout timing that `requestAnimationFrame` does,
+        // so swapping the scheduler for the whole describe makes those
+        // measurements run too early — by a couple of pixels, on Linux as well
+        // as Windows. Linux passes this spec on the default scheduler, so it
+        // has no need of the swap either.
+        const needsSwap = process.platform === 'win32';
+        if (needsSwap) useAlternativeScheduler();
+        try {
+          const { editor, component, element } = buildComponent({
+            autoHeight: false,
+            width: 800
+          });
+          const marker = editor.markScreenPosition([0, 0]);
+          const item = document.createElement('div');
+          item.textContent = 'block decoration that could wrap many times';
+          editor.decorateMarker(marker, {
+            type: 'block',
+            item
+          });
 
-        element.style.width = '50px';
-        await component.getNextUpdatePromise();
-        assertLinesAreAlignedWithLineNumbers(component);
+          element.style.width = '50px';
+          await component.getNextUpdatePromise();
+          assertLinesAreAlignedWithLineNumbers(component);
+        } finally {
+          if (needsSwap) restoreDefaultScheduler();
+        }
       }
     });
 
