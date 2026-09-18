@@ -3764,21 +3764,93 @@ describe('TextEditorComponent', () => {
       }
 
       {
-        const { editor, component, element } = buildComponent({
-          autoHeight: false,
-          width: 800
-        });
-        const marker = editor.markScreenPosition([0, 0]);
-        const item = document.createElement('div');
-        item.textContent = 'block decoration that could wrap many times';
-        editor.decorateMarker(marker, {
-          type: 'block',
-          item
-        });
+        // -------------------------------------------------------------------
+        // TEMPORARY DIAGNOSTIC — remove before merge.
+        //
+        // This spec intermittently times out on Windows CI. The `await` below
+        // can only be satisfied by `didResize` reaching `scheduleUpdate`, and
+        // `didResize` silently does nothing if the component reports itself
+        // invisible or if neither client-container dimension *measurably*
+        // changed. A bare timeout therefore tells us nothing; record what
+        // `didResize` actually saw.
+        //
+        // This has to patch the prototype, and it has to happen before the
+        // component attaches: `didAttach` does `this.didResize.bind(this)`, so
+        // the ResizeObserver captures the reference at bind time and patching
+        // the instance afterwards would be a silent no-op.
+        // -------------------------------------------------------------------
+        const resizeCalls = [];
+        let watched = null;
+        const originalDidResize = TextEditorComponent.prototype.didResize;
+        TextEditorComponent.prototype.didResize = function () {
+          const widthBefore = this.measurements.clientContainerWidth;
+          const entry = {
+            watched: this === watched,
+            visible: this.isVisible(),
+            elementWidth: this.element.offsetWidth,
+            clientContainerWidth: this.refs.clientContainer.offsetWidth,
+            lastMeasuredWidth: widthBefore
+          };
+          const result = originalDidResize.call(this);
+          entry.measuredWidthAfter = this.measurements.clientContainerWidth;
+          // `measureClientContainerWidth` only returns true — and so only
+          // reaches `scheduleUpdate` — when it records a new width.
+          entry.scheduledUpdate = entry.measuredWidthAfter !== widthBefore;
+          resizeCalls.push(entry);
+          return result;
+        };
 
-        element.style.width = '50px';
-        await component.getNextUpdatePromise();
-        assertLinesAreAlignedWithLineNumbers(component);
+        let diagnosticTimer;
+        try {
+          const { editor, component, element } = buildComponent({
+            autoHeight: false,
+            width: 800
+          });
+          watched = component;
+          const marker = editor.markScreenPosition([0, 0]);
+          const item = document.createElement('div');
+          item.textContent = 'block decoration that could wrap many times';
+          editor.decorateMarker(marker, {
+            type: 'block',
+            item
+          });
+
+          const snapshot = () =>
+            JSON.stringify({
+              platform: process.platform,
+              isVisible: component.isVisible(),
+              elementWidth: element.offsetWidth,
+              clientContainerWidth: component.refs.clientContainer.offsetWidth,
+              lastMeasuredWidth: component.measurements.clientContainerWidth,
+              scrollWidth: component.getScrollWidth(),
+              resizeCalls
+            });
+
+          element.style.width = '50px';
+
+          // Fail fast with the evidence attached rather than burning the whole
+          // spec budget on a hang. macOS and Linux pass this spec, so the
+          // success log below gives us a healthy trace to compare against in
+          // the very same CI run.
+          const startedAt = Date.now();
+          await Promise.race([
+            component.getNextUpdatePromise(),
+            new Promise((_resolve, reject) => {
+              diagnosticTimer = setTimeout(
+                () => reject(new Error(`[diag] no update after 5000ms: ${snapshot()}`)),
+                5000
+              );
+            })
+          ]);
+          console.log(
+            `[diag] update arrived in ${Date.now() - startedAt}ms: ${snapshot()}`
+          );
+
+          assertLinesAreAlignedWithLineNumbers(component);
+        } finally {
+          clearTimeout(diagnosticTimer);
+          TextEditorComponent.prototype.didResize = originalDidResize;
+        }
       }
     });
 
