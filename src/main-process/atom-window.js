@@ -253,9 +253,18 @@ module.exports = class AtomWindow extends EventEmitter {
       if (result.response === 0) this.browserWindow.destroy();
     });
 
-    this.browserWindow.webContents.on('render-process-gone', async () => {
+    this.browserWindow.webContents.on('render-process-gone', async (_event, details) => {
+      // `details.reason` is the only thing that distinguishes a renderer
+      // killed for memory (`oom`) from one that hit a native fault
+      // (`crashed`) — and the two call for completely different
+      // investigations. Without it, a headless CI run reports nothing but
+      // "crashed" no matter what actually happened, which is also a lie when
+      // the reason is `clean-exit` or `killed`.
       if (this.headless) {
-        console.log('Renderer process crashed, exiting');
+        const reason = details?.reason ?? 'unknown';
+        console.log(
+          `Renderer process gone (reason: ${reason}, exit code: ${details?.exitCode}); exiting`
+        );
         this.atomApplication.exit(100);
         return;
       }
