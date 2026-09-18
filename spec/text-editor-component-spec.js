@@ -3774,39 +3774,44 @@ describe('TextEditorComponent', () => {
       }
 
       {
-        // On CI the browser does not consider this editor visible, so the
-        // default `requestAnimationFrame` scheduler never delivers the update
-        // the `await` below waits for, and this spec hangs until it times out.
-        // Drive it through the `setTimeout`-based scheduler instead.
-        //
-        // Deliberately scoped to this block, and to Windows. The sibling
-        // specs assert on measured element geometry, and `setTimeout` does not
-        // guarantee the post-layout timing that `requestAnimationFrame` does,
-        // so swapping the scheduler for the whole describe makes those
-        // measurements run too early — by a couple of pixels, on Linux as well
-        // as Windows. Linux passes this spec on the default scheduler, so it
-        // has no need of the swap either.
-        const needsSwap = process.platform === 'win32';
-        if (needsSwap) useAlternativeScheduler();
-        try {
-          const { editor, component, element } = buildComponent({
-            autoHeight: false,
-            width: 800
-          });
-          const marker = editor.markScreenPosition([0, 0]);
-          const item = document.createElement('div');
-          item.textContent = 'block decoration that could wrap many times';
-          editor.decorateMarker(marker, {
-            type: 'block',
-            item
-          });
+        const { editor, component, element } = buildComponent({
+          autoHeight: false,
+          width: 800
+        });
+        const marker = editor.markScreenPosition([0, 0]);
+        const item = document.createElement('div');
+        item.textContent = 'block decoration that could wrap many times';
+        editor.decorateMarker(marker, {
+          type: 'block',
+          item
+        });
 
-          element.style.width = '50px';
-          await component.getNextUpdatePromise();
-          assertLinesAreAlignedWithLineNumbers(component);
-        } finally {
-          if (needsSwap) restoreDefaultScheduler();
+        element.style.width = '50px';
+        const updatePromise = component.getNextUpdatePromise();
+
+        if (process.platform === 'win32') {
+          // The spec window is never shown (see `AtomWindow`'s `show: false`),
+          // and on Windows that means `requestAnimationFrame` callbacks are not
+          // delivered. The update that `ViewRegistry::requestDocumentUpdate`
+          // queues in response to the resize above would therefore never run,
+          // and this `await` would hang until the spec timed out.
+          //
+          // Prefer the real thing: wait for the update to arrive on its own,
+          // and only flush the queue by hand if it does not. Flushing also
+          // resets `animationFrameRequest`, which would otherwise stay latched
+          // and silently suppress every subsequent update in the suite.
+          const TIMED_OUT = Symbol('timed out');
+          const winner = await Promise.race([
+            updatePromise,
+            wait(1000).then(() => TIMED_OUT)
+          ]);
+          if (winner === TIMED_OUT) {
+            TextEditorComponent.getScheduler().performDocumentUpdate();
+          }
         }
+
+        await updatePromise;
+        assertLinesAreAlignedWithLineNumbers(component);
       }
     });
 
