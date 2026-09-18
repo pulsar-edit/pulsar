@@ -3806,6 +3806,27 @@ describe('TextEditorComponent', () => {
             wait(1000).then(() => TIMED_OUT)
           ]);
           if (winner === TIMED_OUT) {
+            // Two ways the update can fail to arrive. `didAttach` decides
+            // visibility synchronously from `isVisible()`; if the element had
+            // not been laid out yet at that moment the component marks itself
+            // hidden, and only the (frame-driven, therefore absent)
+            // IntersectionObserver would ever correct it — whereupon
+            // `scheduleUpdate` returns before queuing anything. Or the update
+            // was queued and the frame never came.
+            //
+            // Handle both. `didShow` is a no-op when the component already
+            // knows it is visible, and updates synchronously when it does not.
+            console.log(
+              '[diag] forcing update:',
+              JSON.stringify({
+                visible: component.visible,
+                isVisible: component.isVisible(),
+                updateScheduled: component.updateScheduled,
+                queuedWriters: TextEditorComponent.getScheduler()
+                  .documentWriters.length
+              })
+            );
+            component.didShow();
             TextEditorComponent.getScheduler().performDocumentUpdate();
           }
         }
