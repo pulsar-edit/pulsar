@@ -60,6 +60,22 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     app.commandLine.appendSwitch('disable-background-timer-throttling');
     app.commandLine.appendSwitch('disable-renderer-backgrounding');
     app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
+
+    // The three above govern timer throttling and process priority for a
+    // window Chromium considers backgrounded. They do not govern whether it
+    // bothers producing frames at all: on Windows that is decided by native
+    // occlusion calculation, which treats a never-shown window as covered and
+    // stops compositing it. That is the one that starves
+    // `requestAnimationFrame`, and it is Windows-only — which is exactly the
+    // shape of the problem, since the same suite on Linux and macOS is ~5x
+    // faster.
+    app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion');
+
+    // Log it, so a run can be checked rather than assumed.
+    console.log(
+      'Spec run: disabled background throttling, renderer backgrounding, ' +
+        'occluded-window backgrounding, and native window occlusion.'
+    );
   }
 
   const releaseChannel = getReleaseChannel(app.getVersion());
