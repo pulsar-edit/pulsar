@@ -117,13 +117,18 @@ jobs:
         # Electron derives its default dump path from userData — so sweep the
         # temp tree too, in case the dumps are landing there rather than in
         # ATOM_HOME.
-        TMPDIR_UNIX=$(cygpath -u "$TEMP" 2>/dev/null || echo "${TEMP:-$HOME/AppData/Local/Temp}")
-        echo "Searching $TMPDIR_UNIX for stray dumps:"
-        find "$TMPDIR_UNIX" -maxdepth 4 -iname "*.dmp" -print 2>/dev/null | head -50 || true
-        find "$TMPDIR_UNIX" -maxdepth 4 -type d -iname "Crashpad" -print 2>/dev/null | head -20 || true
+        # Do NOT trust $TEMP here: Git Bash sets it to its own /tmp, not the
+        # Windows temp directory that Node's `temp` package actually uses.
+        # Search every plausible root instead.
         mkdir -p crash-dumps/stray
-        find "$TMPDIR_UNIX" -maxdepth 4 -iname "*.dmp" 2>/dev/null | while read -r dmp; do
-          cp "$dmp" crash-dumps/stray/ || true
+        for root in "$HOME/AppData/Local/Temp" /tmp "$HOME/.pulsar" .; do
+          [ -d "$root" ] || continue
+          echo "--- searching $root"
+          find "$root" -maxdepth 5 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" -print 2>/dev/null | head -50 || true
+          find "$root" -maxdepth 5 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -type d \( -iname "Crashpad" -o -iname "crashdumps" \) -print 2>/dev/null | head -20 || true
+          find "$root" -maxdepth 5 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" 2>/dev/null | while read -r dmp; do
+            cp "$dmp" crash-dumps/stray/ || true
+          done
         done
         echo "Staged for upload:"
         ls -laR crash-dumps || true
