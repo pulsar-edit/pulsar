@@ -114,10 +114,7 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
             finish();
             done();
           } else {
-            originalFn((...args) => {
-              finish();
-              done(...args);
-            });
+            originalFn(wrapDone(done, finish));
           }
         } catch (err) {
           finish();
@@ -148,10 +145,7 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
           finish();
           done();
         } else {
-          originalFn((...args) => {
-            finish();
-            done(...args);
-          });
+          originalFn(wrapDone(done, finish));
         }
       })
     }
@@ -179,9 +173,32 @@ const PHASE = {
   it: { ms: 0, n: 0 },
   afterEach: { ms: 0, n: 0 }
 };
+// Jasmine hands hooks a `done` callback that carries extra properties (notably
+// `done.fail`). Replacing it with a bare arrow function would silently drop
+// those, so copy them across.
+const wrapDone = (done, finish) => {
+  const wrapped = (...args) => {
+    finish();
+    return done(...args);
+  };
+  for (const key of Object.keys(done)) wrapped[key] = done[key];
+  if (typeof done.fail === "function") {
+    wrapped.fail = (...args) => {
+      finish();
+      return done.fail(...args);
+    };
+  }
+  return wrapped;
+};
+
 const recordPhase = (phase, startedAt) => {
   PHASE[phase].ms += Date.now() - startedAt;
   PHASE[phase].n += 1;
+  // Report periodically rather than only at the end: a jasmineDone reporter
+  // that implements just one method does not appear to be dispatched here, and
+  // more importantly the Windows suite crashes often enough that an end-of-run
+  // summary is lost exactly when it is most wanted.
+  if (phase === 'it' && PHASE.it.n % 250 === 0) reportPhases();
 };
 const reportPhases = () => {
   const part = p =>
