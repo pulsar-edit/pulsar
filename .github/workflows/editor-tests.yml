@@ -6,6 +6,11 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ATOM_JASMINE_REPORTER: list
+  # TEMPORARY (troubleshooting): ask Electron to print a stack trace to
+  # stderr when a process crashes, so a fault shows up in the job log even
+  # if no dump is written anywhere. Remove with the rest of the crash
+  # investigation scaffolding.
+  ELECTRON_ENABLE_STACK_DUMPING: "1"
 
 jobs:
   tests:
@@ -61,7 +66,10 @@ jobs:
         New-Item -Path $key -Force | Out-Null
         New-ItemProperty -Path $key -Name DumpFolder -Value $dir -PropertyType ExpandString -Force | Out-Null
         New-ItemProperty -Path $key -Name DumpCount  -Value 10  -PropertyType DWord -Force | Out-Null
-        New-ItemProperty -Path $key -Name DumpType   -Value 2   -PropertyType DWord -Force | Out-Null
+        # DumpType 1 (mini), not 2 (full): a full dump of an Electron renderer
+        # runs to hundreds of MB and WER will quietly decline rather than fail
+        # loudly. A minidump still names the faulting module and stack.
+        New-ItemProperty -Path $key -Name DumpType   -Value 1   -PropertyType DWord -Force | Out-Null
         Get-ItemProperty -Path $key
         # LocalDumps is ignored unless error reporting is enabled globally and
         # WerSvc can run; the runner images ship with both switched off. Guarded
@@ -76,6 +84,41 @@ jobs:
         }
         try { Get-Service WerSvc | Format-List Name, Status, StartType } catch { Write-Host "WerSvc not queryable: $_" }
 
+    # TEMPORARY (troubleshooting): crash a renderer on purpose and report
+    # immediately whether anything captured it. Without this control an empty
+    # dump artifact cannot be told apart from a capture path that has never
+    # worked. Runs before the suite so it reports regardless of how the suite
+    # ends, and cannot fail the job.
+    - name: Crash control
+      if: runner.os == 'Windows'
+      continue-on-error: true
+      shell: bash
+      run: |
+        stash() {
+          mkdir -p "crash-control/$1"
+          [ -d wer-dumps ] && mv wer-dumps/* "crash-control/$1/" 2>/dev/null || true
+          if [ -d "$HOME/.pulsar/crashdumps" ]; then
+            cp -R "$HOME/.pulsar/crashdumps/." "crash-control/$1/" 2>/dev/null || true
+            # Clear the source, so the next phase — and the suite's own
+            # collection later — cannot pick these up and mislabel them.
+            rm -rf "$HOME/.pulsar/crashdumps" || true
+          fi
+          echo "--- captured by the $1 control:"
+          ls -laR "crash-control/$1" || true
+          find "$HOME/AppData" "$HOME/.pulsar" -maxdepth 7 -iname "*.dmp" -print 2>/dev/null | head -20 || true
+        }
+
+        # (a) Same configuration as the suite: the crash reporter is skipped
+        # for spec runs, so only WER can capture. This is the control that
+        # matters, because it matches how the real crash will be handled.
+        yarn start --test spec-crash-control || true
+        stash wer-only
+
+        # (b) Force Crashpad on for one run. Skipping it for spec runs
+        # otherwise costs us the answer to "can Crashpad write anywhere at
+        # all?", which is the question the broadened search was added for.
+        yarn start --test spec-crash-control --crashdump || true
+        stash crashpad
     - name: Run Tests
       if: runner.os != 'Linux'
       run: yarn start --test spec
@@ -87,7 +130,9 @@ jobs:
     # The renderer can die without producing any JS-level output, so we should
     # grab a crashdump whenever that happens.
     - name: Collect crash dumps
-      if: failure()
+      # TEMPORARY: always(), not failure(), so the deliberate crash control
+      # above is collected even on a run where the suite itself passes.
+      if: always()
       shell: bash
       run: |
         mkdir -p crash-dumps
@@ -121,20 +166,26 @@ jobs:
         # Windows temp directory that Node's `temp` package actually uses.
         # Search every plausible root instead.
         mkdir -p crash-dumps/stray
-        for root in "$HOME/AppData/Local/Temp" /tmp "$HOME/.pulsar" .; do
+        for root in "$HOME/AppData" "$HOME/.pulsar" /tmp /c/Windows/Temp .; do
           [ -d "$root" ] || continue
           echo "--- searching $root"
-          find "$root" -maxdepth 5 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" -print 2>/dev/null | head -50 || true
-          find "$root" -maxdepth 5 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -type d \( -iname "Crashpad" -o -iname "crashdumps" \) -print 2>/dev/null | head -20 || true
-          find "$root" -maxdepth 5 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" 2>/dev/null | while read -r dmp; do
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" -print 2>/dev/null | head -50 || true
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -type d \( -iname "Crashpad" -o -iname "crashdumps" \) -print 2>/dev/null | head -20 || true
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" 2>/dev/null | while read -r dmp; do
             cp "$dmp" crash-dumps/stray/ || true
           done
         done
+        if [ -d crash-control ]; then
+          mkdir -p crash-dumps/control
+          cp -R crash-control/. crash-dumps/control/ || true
+        fi
         echo "Staged for upload:"
         ls -laR crash-dumps || true
 
     - name: Upload crash dumps
-      if: failure()
+      # TEMPORARY: always(), not failure(), so the deliberate crash control
+      # above is collected even on a run where the suite itself passes.
+      if: always()
       uses: actions/upload-artifact@v7
       with:
         name: Crash dumps (${{ matrix.os }})
