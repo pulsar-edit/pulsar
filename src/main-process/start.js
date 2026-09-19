@@ -67,7 +67,11 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     crashReporter.start({
       productName: 'Pulsar',
       companyName: 'Pulsar-Edit',
-      submitURL: '',
+      // Nothing is ever uploaded (`uploadToServer` is false below), but some
+      // Electron versions decline to start the Crashpad handler when this is
+      // not a syntactically valid URL — and a handler that never starts writes
+      // no dumps and creates no dump directory.
+      submitURL: 'https://localhost/',
       uploadToServer: false,
       ignoreSystemCrashHandler: false,
       compress: false

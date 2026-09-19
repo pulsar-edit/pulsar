@@ -63,6 +63,18 @@ jobs:
         New-ItemProperty -Path $key -Name DumpCount  -Value 10  -PropertyType DWord -Force | Out-Null
         New-ItemProperty -Path $key -Name DumpType   -Value 2   -PropertyType DWord -Force | Out-Null
         Get-ItemProperty -Path $key
+        # LocalDumps is ignored unless error reporting is enabled globally and
+        # WerSvc can run; the runner images ship with both switched off. Guarded
+        # because `pwsh` steps run with $ErrorActionPreference = stop, and a
+        # failure here must not take the whole job down before the tests run.
+        try {
+          New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting' -Name Disabled -Value 0 -PropertyType DWord -Force | Out-Null
+          Set-Service WerSvc -StartupType Manual
+          Start-Service WerSvc
+        } catch {
+          Write-Host "Could not fully enable WER: $_"
+        }
+        try { Get-Service WerSvc | Format-List Name, Status, StartType } catch { Write-Host "WerSvc not queryable: $_" }
 
     - name: Run Tests
       if: runner.os != 'Linux'
@@ -101,6 +113,18 @@ jobs:
         else
           echo "No WER dumps at ./wer-dumps"
         fi
+        # Spec runs relocate userData to a temp directory (start.js), and
+        # Electron derives its default dump path from userData — so sweep the
+        # temp tree too, in case the dumps are landing there rather than in
+        # ATOM_HOME.
+        TMPDIR_UNIX=$(cygpath -u "$TEMP" 2>/dev/null || echo "${TEMP:-$HOME/AppData/Local/Temp}")
+        echo "Searching $TMPDIR_UNIX for stray dumps:"
+        find "$TMPDIR_UNIX" -maxdepth 4 -iname "*.dmp" -print 2>/dev/null | head -50 || true
+        find "$TMPDIR_UNIX" -maxdepth 4 -type d -iname "Crashpad" -print 2>/dev/null | head -20 || true
+        mkdir -p crash-dumps/stray
+        find "$TMPDIR_UNIX" -maxdepth 4 -iname "*.dmp" 2>/dev/null | while read -r dmp; do
+          cp "$dmp" crash-dumps/stray/ || true
+        done
         echo "Staged for upload:"
         ls -laR crash-dumps || true
 
