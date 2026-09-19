@@ -207,9 +207,69 @@ jobs:
           mkdir -p crash-dumps/control
           cp -R crash-control/. crash-dumps/control/ || true
         fi
+        # Native symbols, so a dump can still be symbolized long after the
+        # runner has been destroyed.
+        mkdir -p crash-dumps/pdb
+        find node_modules -maxdepth 6 -path "*/build/Release/*.pdb" 2>/dev/null | while read -r pdb; do
+          cp "$pdb" crash-dumps/pdb/ || true
+        done || true
         echo "Staged for upload:"
         ls -laR crash-dumps || true
 
+    # TEMPORARY (troubleshooting): resolve dump addresses to functions while
+    # the binaries and PDBs are still on the machine. Only local symbol paths
+    # are used — pulling electron.exe symbols from Microsoft would cost
+    # gigabytes and we only need the native module frames named.
+    - name: Symbolize crash dumps
+      if: always() && runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        # Debugging Tools for Windows is an optional SDK feature and may not be
+        # on the image, so search rather than assume a path, then fall back to
+        # installing it. Chocolatey is preinstalled on GitHub runners.
+        $roots = @('C:\Program Files (x86)\Windows Kits', 'C:\Program Files\Windows Kits', 'C:\Program Files\WindowsApps')
+        function Find-Cdb {
+          foreach ($r in $roots) {
+            if (-not (Test-Path $r)) { continue }
+            $hit = Get-ChildItem $r -Recurse -Filter cdb.exe -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match 'x64' } | Select-Object -First 1
+            if ($hit) { return $hit }
+          }
+          return $null
+        }
+        $cdb = Find-Cdb
+        if (-not $cdb) {
+          Write-Host "cdb.exe not present; attempting to install Debugging Tools..."
+          try {
+            choco install windbg -y --no-progress | Out-String | Write-Host
+            $cdb = Find-Cdb
+          } catch {
+            Write-Host "Install failed: $_"
+          }
+        }
+        if (-not $cdb) {
+          Write-Host "STILL no cdb.exe. The dump and its matching PDBs are both in the artifact;"
+          Write-Host "symbolize offline with WinDbg, or llvm-symbolizer which can read PDBs."
+          exit 0
+        }
+        Write-Host "Using $($cdb.FullName)"
+        $dumps = Get-ChildItem "$env:GITHUB_WORKSPACE\crash-dumps" -Recurse -Filter *.dmp -ErrorAction SilentlyContinue
+        if (-not $dumps) { Write-Host "No dumps to symbolize."; exit 0 }
+        $symDirs = Get-ChildItem "$env:GITHUB_WORKSPACE\node_modules" -Recurse -Depth 6 -Filter *.pdb -ErrorAction SilentlyContinue |
+          Select-Object -ExpandProperty DirectoryName -Unique
+        $symPath = ($symDirs -join ';')
+        Write-Host "PDBs found: $($symDirs.Count) directories"
+        Write-Host "Symbol path: $symPath"
+        if (-not $symDirs) { Write-Host "WARNING: no PDBs found — native frames will not resolve." }
+        foreach ($d in $dumps) {
+          Write-Host ""
+          Write-Host "=============================================================="
+          Write-Host "=== $($d.FullName)"
+          Write-Host "=============================================================="
+          & $cdb.FullName -z $d.FullName -y $symPath -c '.reload; !analyze -v; k 40; lm; q' 2>&1 |
+            Out-String | Write-Host
+        }
     - name: Upload crash dumps
       # TEMPORARY: always(), not failure(), so the deliberate crash control
       # above is collected even on a run where the suite itself passes.
