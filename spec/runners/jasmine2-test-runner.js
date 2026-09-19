@@ -101,14 +101,26 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   ['it', 'fit', 'xit'].forEach((key) => {
     window[key] = (name, originalFn) => {
       jasmineEnv[key](name, async (done) => {
+        const startedAt = Date.now();
+        let recorded = false;
+        const finish = () => {
+          if (recorded) return;
+          recorded = true;
+          recordPhase('it', startedAt);
+        };
         try {
           if (originalFn.length === 0) {
             await originalFn();
+            finish();
             done();
           } else {
-            originalFn(done);
+            originalFn((...args) => {
+              finish();
+              done(...args);
+            });
           }
         } catch (err) {
+          finish();
           if (typeof err === 'string' && err.includes('Pending')) {
             // A test marked itself as pending. Swallow the exception and
             // proceed.
@@ -124,11 +136,22 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   ['beforeEach', 'afterEach'].forEach((key) => {
     window[key] = (originalFn) => {
       jasmineEnv[key](async (done) => {
+        const startedAt = Date.now();
+        let recorded = false;
+        const finish = () => {
+          if (recorded) return;
+          recorded = true;
+          recordPhase(key, startedAt);
+        };
         if (originalFn.length === 0) {
           await originalFn()
+          finish();
           done();
         } else {
-          originalFn(done);
+          originalFn((...args) => {
+            finish();
+            done(...args);
+          });
         }
       })
     }
@@ -144,6 +167,58 @@ function disableFocusMethods() {
     }
   }
 }
+
+// TEMPORARY (troubleshooting): where does the wall-clock actually go? The
+// Windows suite runs ~5x slower than Linux and macOS, and knowing whether
+// that is setup, the spec bodies, or teardown narrows the search far more
+// than any single theory. Teardown is the one to watch: Windows cannot
+// delete a file while a handle is open, so per-spec temp cleanup racing the
+// file watchers would retry with backoff.
+const PHASE = {
+  beforeEach: { ms: 0, n: 0 },
+  it: { ms: 0, n: 0 },
+  afterEach: { ms: 0, n: 0 }
+};
+const recordPhase = (phase, startedAt) => {
+  PHASE[phase].ms += Date.now() - startedAt;
+  PHASE[phase].n += 1;
+};
+const reportPhases = () => {
+  const part = p =>
+    `${p} ${(PHASE[p].ms / 1000).toFixed(1)}s over ${PHASE[p].n}`;
+  console.log(
+    `[phase-timing] platform=${process.platform} ` +
+      [part('beforeEach'), part('it'), part('afterEach')].join('  ')
+  );
+};
+
+// TEMPORARY (troubleshooting): measure how fast frames and timers actually
+// tick in this window. The Windows CI suite runs ~5x slower than Linux and
+// macOS with per-spec times clustering at one- and two-second boundaries,
+// which looks like starved `requestAnimationFrame` — but that has been
+// inferred from timings rather than measured. This measures it directly:
+// count callbacks over a fixed 2s window, so the probe costs the same
+// wall-clock time no matter what the answer is.
+const probeFrameRate = () => {
+  return new Promise(resolve => {
+    let frames = 0;
+    let timers = 0;
+    const started = Date.now();
+    const onFrame = () => { frames++; requestAnimationFrame(onFrame); };
+    const onTimer = () => { timers++; setTimeout(onTimer, 0); };
+    requestAnimationFrame(onFrame);
+    setTimeout(onTimer, 0);
+    setTimeout(() => {
+      const elapsed = Date.now() - started;
+      console.log(
+        `[frame-probe] platform=${process.platform} ` +
+          `rAF=${frames} callbacks in ${elapsed}ms (${(frames / (elapsed / 1000)).toFixed(1)}/s) ` +
+          `setTimeout0=${timers} (${(timers / (elapsed / 1000)).toFixed(1)}/s)`
+      );
+      resolve();
+    }, 2000);
+  });
+};
 
 const loadSpecsAndRunThem = (logFile, headless, testPaths) => {
   return new Promise((resolve) => {
@@ -162,9 +237,11 @@ const loadSpecsAndRunThem = (logFile, headless, testPaths) => {
     // Add the reporter and register the promise resolve as a callback
     jasmineEnv.addReporter(buildReporter({logFile, headless}));
     jasmineEnv.addReporter(buildRetryReporter(resolve));
+    jasmineEnv.addReporter({ jasmineDone: reportPhases });
 
-    // And finally execute the tests
-    jasmineEnv.execute();
+    // And finally execute the tests, after the frame-rate probe above has
+    // reported. TEMPORARY: remove with the rest of the slowness diagnosis.
+    probeFrameRate().then(() => jasmineEnv.execute());
   })
 }
 

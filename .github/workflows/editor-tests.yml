@@ -51,6 +51,25 @@ jobs:
     - name: Build Dependencies
       run: yarn build
 
+    # Windows Defender scans every file this suite touches, and it touches a
+    # great many: temp directories per spec, the compile cache, node_modules,
+    # and a fresh Electron process tree. Excluding those paths and the test
+    # binary is standard practice for Windows CI (pytorch, pipenv and others
+    # do the same).
+    - name: Exclude test paths from Windows Defender
+      if: runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        try {
+          Add-MpPreference -ExclusionPath "$env:GITHUB_WORKSPACE"
+          Add-MpPreference -ExclusionPath "$env:USERPROFILE\.pulsar"
+          Add-MpPreference -ExclusionPath "$env:TEMP"
+          Add-MpPreference -ExclusionProcess "electron.exe"
+          Write-Host "Defender exclusions added."
+        } catch {
+          Write-Host "Could not add Defender exclusions: $_"
+        }
     # TEMPORARY (troubleshooting): attach ProcDump to every Electron process.
     # A debugger is notified of first-chance exceptions BEFORE any in-process
     # handler runs, so it catches faults that Crashpad never reports — which
