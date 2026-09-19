@@ -183,19 +183,21 @@ module.exports = class AtomWindow extends EventEmitter {
 
     this.browserWindow.showSaveDialog = this.showSaveDialog.bind(this);
 
-    if (this.isSpec) this.browserWindow.focusOnWebView();
-
     if (this.isSpec && process.env.CI) {
-      // A hidden window in a headless CI environment will trigger throttling
-      // of `requestAnimationFrame` on Windows. This happens on other
-      // platforms, too, but they have other strategies for working around it.
+      // A window that is never shown has its `requestAnimationFrame`
+      // callbacks throttled on Windows — to roughly 1Hz — regardless of
+      // `backgroundThrottling: false` above. Since editor updates are
+      // scheduled through frame callbacks, that makes the suite crawl.
       //
-      // For Windows we'll use the same technique that VS Code uses: show the
-      // window but keep it unfocused. This makes the unwanted throttling
-      // impossible and prevents Windows editor tests from being ~4-6x slower
-      // than the same tests on macOS and Linux.
-      this.browserWindow.showInactive();
+      // VS Code solves this in its own test harness with `showInactive()`,
+      // but we cannot: several specs assert on `document.hasFocus()`, and
+      // showing a window *without* activating it leaves the document
+      // unfocused. So show it properly and hand focus back to the web view.
+      // There is no user to disturb on CI.
+      this.browserWindow.show();
     }
+
+    if (this.isSpec) this.browserWindow.focusOnWebView();
 
     const hasPathToOpen = !(
       locationsToOpen.length === 1 && locationsToOpen[0].pathToOpen == null

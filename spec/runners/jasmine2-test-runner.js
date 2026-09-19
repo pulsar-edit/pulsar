@@ -236,8 +236,10 @@ const loadSpecsAndRunThem = (logFile, headless, testPaths) => {
 
     // Add the reporter and register the promise resolve as a callback
     jasmineEnv.addReporter(buildReporter({logFile, headless}));
-    jasmineEnv.addReporter(buildRetryReporter(resolve));
+    // Before the retry reporter: that one resolves the run promise, and a
+    // reporter added after it can be cut off before it reports.
     jasmineEnv.addReporter({ jasmineDone: reportPhases });
+    jasmineEnv.addReporter(buildRetryReporter(resolve));
 
     // And finally execute the tests, after the frame-rate probe above has
     // reported. TEMPORARY: remove with the rest of the slowness diagnosis.
