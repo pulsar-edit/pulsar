@@ -51,39 +51,48 @@ jobs:
     - name: Build Dependencies
       run: yarn build
 
-    # TEMPORARY (troubleshooting): ask Windows Error Reporting to write a local
-    # dump for any process that dies of an unhandled exception. This is
-    # independent of Electron's own crash reporter, which has so far produced
-    # nothing for the `0xC0000005` renderer crashes. Remove once those are
-    # understood.
-    - name: Enable Windows crash dumps
+    # TEMPORARY (troubleshooting): attach ProcDump to every Electron process.
+    # A debugger is notified of first-chance exceptions BEFORE any in-process
+    # handler runs, so it catches faults that Crashpad never reports — which
+    # is exactly the situation we are in. Filtered to C0000005 so ordinary
+    # first-chance exceptions are ignored.
+    - name: Arm ProcDump
       if: runner.os == 'Windows'
+      continue-on-error: true
       shell: pwsh
       run: |
-        $dir = "$env:GITHUB_WORKSPACE\wer-dumps"
-        New-Item -ItemType Directory -Force -Path $dir | Out-Null
-        $key = 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps'
-        New-Item -Path $key -Force | Out-Null
-        New-ItemProperty -Path $key -Name DumpFolder -Value $dir -PropertyType ExpandString -Force | Out-Null
-        New-ItemProperty -Path $key -Name DumpCount  -Value 10  -PropertyType DWord -Force | Out-Null
-        # DumpType 1 (mini), not 2 (full): a full dump of an Electron renderer
-        # runs to hundreds of MB and WER will quietly decline rather than fail
-        # loudly. A minidump still names the faulting module and stack.
-        New-ItemProperty -Path $key -Name DumpType   -Value 1   -PropertyType DWord -Force | Out-Null
-        Get-ItemProperty -Path $key
-        # LocalDumps is ignored unless error reporting is enabled globally and
-        # WerSvc can run; the runner images ship with both switched off. Guarded
-        # because `pwsh` steps run with $ErrorActionPreference = stop, and a
-        # failure here must not take the whole job down before the tests run.
+        $tools = "$env:GITHUB_WORKSPACE\crash-tools"
+        $dumps = "$env:GITHUB_WORKSPACE\procdump-dumps"
+        New-Item -ItemType Directory -Force -Path $tools, $dumps | Out-Null
         try {
-          New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting' -Name Disabled -Value 0 -PropertyType DWord -Force | Out-Null
-          Set-Service WerSvc -StartupType Manual
-          Start-Service WerSvc
+          Invoke-WebRequest -Uri 'https://download.sysinternals.com/files/Procdump.zip' -OutFile "$tools\Procdump.zip"
+          Expand-Archive -Path "$tools\Procdump.zip" -DestinationPath $tools -Force
         } catch {
-          Write-Host "Could not fully enable WER: $_"
+          Write-Host "Could not fetch ProcDump: $_"
+          exit 0
         }
-        try { Get-Service WerSvc | Format-List Name, Status, StartType } catch { Write-Host "WerSvc not queryable: $_" }
+        $procdump = "$tools\procdump.exe"
+        if (-not (Test-Path $procdump)) { Write-Host "procdump.exe missing after extract"; exit 0 }
 
+        # The watcher goes in its own file: a single-quoted here-string keeps
+        # PowerShell from interpolating it here, and the two paths are
+        # substituted in afterwards.
+        $watcherPath = "$tools\watch.ps1"
+        @'
+        $seen = @{}
+        while ($true) {
+          Get-Process electron -ErrorAction SilentlyContinue | ForEach-Object {
+            if (-not $seen.ContainsKey($_.Id)) {
+              $seen[$_.Id] = $true
+              Start-Process -FilePath 'PROCDUMP_PATH' -ArgumentList '-accepteula','-ma','-e','1','-f','C0000005','-p',$_.Id,'DUMPS_PATH' -WindowStyle Hidden -ErrorAction SilentlyContinue
+            }
+          }
+          Start-Sleep -Milliseconds 500
+        }
+        '@ -replace 'PROCDUMP_PATH', $procdump -replace 'DUMPS_PATH', $dumps | Set-Content -Path $watcherPath
+
+        Start-Process powershell -ArgumentList '-NoProfile','-WindowStyle','Hidden','-File',$watcherPath -WindowStyle Hidden
+        Write-Host "ProcDump watcher started; dumps -> $dumps"
     # TEMPORARY (troubleshooting): crash a renderer on purpose and report
     # immediately whether anything captured it. Without this control an empty
     # dump artifact cannot be told apart from a capture path that has never
@@ -94,31 +103,20 @@ jobs:
       continue-on-error: true
       shell: bash
       run: |
-        stash() {
-          mkdir -p "crash-control/$1"
-          [ -d wer-dumps ] && mv wer-dumps/* "crash-control/$1/" 2>/dev/null || true
-          if [ -d "$HOME/.pulsar/crashdumps" ]; then
-            cp -R "$HOME/.pulsar/crashdumps/." "crash-control/$1/" 2>/dev/null || true
-            # Clear the source, so the next phase — and the suite's own
-            # collection later — cannot pick these up and mislabel them.
-            rm -rf "$HOME/.pulsar/crashdumps" || true
-          fi
-          echo "--- captured by the $1 control:"
-          ls -laR "crash-control/$1" || true
-          find "$HOME/AppData" "$HOME/.pulsar" -maxdepth 7 -iname "*.dmp" -print 2>/dev/null | head -20 || true
-        }
-
-        # (a) Same configuration as the suite: the crash reporter is skipped
-        # for spec runs, so only WER can capture. This is the control that
-        # matters, because it matches how the real crash will be handled.
+        # Crash a renderer on purpose so that every run proves the dump
+        # pipeline still works. Without this, an empty artifact cannot be
+        # told apart from a capture path that has stopped working.
         yarn start --test spec-crash-control || true
-        stash wer-only
+        mkdir -p crash-control
+        if [ -d "$HOME/.pulsar/crashdumps" ]; then
+          cp -R "$HOME/.pulsar/crashdumps/." crash-control/ 2>/dev/null || true
+          # Clear the source so the suite's own collection later cannot pick
+          # these up and mislabel them as coming from the suite.
+          rm -rf "$HOME/.pulsar/crashdumps" || true
+        fi
+        echo "--- captured by the control crash:"
+        ls -laR crash-control || true
 
-        # (b) Force Crashpad on for one run. Skipping it for spec runs
-        # otherwise costs us the answer to "can Crashpad write anywhere at
-        # all?", which is the question the broadened search was added for.
-        yarn start --test spec-crash-control --crashdump || true
-        stash crashpad
     - name: Run Tests
       if: runner.os != 'Linux'
       run: yarn start --test spec
@@ -129,10 +127,32 @@ jobs:
 
     # The renderer can die without producing any JS-level output, so we should
     # grab a crashdump whenever that happens.
+    # TEMPORARY (troubleshooting): Windows logs an Application Error event
+    # naming the faulting module and offset even when no dump is written, so
+    # this can identify the culprit on its own.
+    - name: Crash diagnostics
+      if: always() && runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        Write-Host "=== Application Error (1000) / WER (1001) events ==="
+        try {
+          Get-WinEvent -FilterHashtable @{ LogName='Application'; Id=1000,1001 } -MaxEvents 20 -ErrorAction Stop |
+            ForEach-Object {
+              Write-Host ("[{0}] Id={1}" -f $_.TimeCreated, $_.Id)
+              Write-Host $_.Message
+              Write-Host ""
+            }
+        } catch {
+          Write-Host "No matching events found: $_"
+        }
+        Write-Host "=== ProcDump output ==="
+        Get-ChildItem "$env:GITHUB_WORKSPACE\procdump-dumps" -ErrorAction SilentlyContinue |
+          Format-Table Name, Length, LastWriteTime | Out-String | Write-Host
     - name: Collect crash dumps
       # TEMPORARY: always(), not failure(), so the deliberate crash control
       # above is collected even on a run where the suite itself passes.
-      if: always()
+      if: always() && runner.os == 'Windows'
       shell: bash
       run: |
         mkdir -p crash-dumps
@@ -146,17 +166,6 @@ jobs:
         else
           echo "Source directory does NOT exist; listing its parent:"
           ls -la "$(dirname "$DUMPS")" || echo "parent does not exist either"
-        fi
-        # TEMPORARY (troubleshooting): also collect Windows Error Reporting
-        # dumps. Relative path on purpose — $GITHUB_WORKSPACE is a Windows path
-        # and this step runs in that directory anyway.
-        if [ -d wer-dumps ]; then
-          echo "WER dumps found:"
-          ls -laR wer-dumps || true
-          mkdir -p crash-dumps/wer
-          cp -R wer-dumps/. crash-dumps/wer/ || true
-        else
-          echo "No WER dumps at ./wer-dumps"
         fi
         # Spec runs relocate userData to a temp directory (start.js), and
         # Electron derives its default dump path from userData — so sweep the
@@ -173,8 +182,12 @@ jobs:
           find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -type d \( -iname "Crashpad" -o -iname "crashdumps" \) -print 2>/dev/null | head -20 || true
           find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" 2>/dev/null | while read -r dmp; do
             cp "$dmp" crash-dumps/stray/ || true
-          done
+          done || true
         done
+        if [ -d procdump-dumps ]; then
+          mkdir -p crash-dumps/procdump
+          cp -R procdump-dumps/. crash-dumps/procdump/ || true
+        fi
         if [ -d crash-control ]; then
           mkdir -p crash-dumps/control
           cp -R crash-control/. crash-dumps/control/ || true
@@ -185,7 +198,7 @@ jobs:
     - name: Upload crash dumps
       # TEMPORARY: always(), not failure(), so the deliberate crash control
       # above is collected even on a run where the suite itself passes.
-      if: always()
+      if: always() && runner.os == 'Windows'
       uses: actions/upload-artifact@v7
       with:
         name: Crash dumps (${{ matrix.os }})

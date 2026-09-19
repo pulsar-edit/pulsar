@@ -61,16 +61,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   //
   // Still, it's nice to have a way to opt into the crash reporter even on
   // macOS. Hence the `--crashdump` command-line switch.
-  // TEMPORARY (troubleshooting): skip the crash reporter during spec runs
-  // unless it was asked for explicitly. Renderer crashes on Windows CI
-  // (`0xC0000005`) have produced no Crashpad dump anywhere on disk, while
-  // Windows Error Reporting — which is configured and running on those
-  // runners — stays silent too, which is what you would expect if Crashpad
-  // installs its exception filter, terminates the process and writes
-  // nothing. Leaving it out of spec runs lets the fault reach WER, which
-  // will write a full dump. Revert once the crash is understood.
-  let shouldStartCrashReporter =
-    args.useCrashReporter || (process.platform !== 'darwin' && !args.test);
+  let shouldStartCrashReporter = args.useCrashReporter || process.platform !== 'darwin';
   if (shouldStartCrashReporter) {
     console.log("Starting crash reporter; crash reports will be saved to", app.getPath('crashDumps'))
     crashReporter.start({
