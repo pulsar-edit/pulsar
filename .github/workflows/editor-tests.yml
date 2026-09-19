@@ -84,6 +84,7 @@ jobs:
           Get-Process electron -ErrorAction SilentlyContinue | ForEach-Object {
             if (-not $seen.ContainsKey($_.Id)) {
               $seen[$_.Id] = $true
+              Add-Content -Path 'DUMPS_PATH\attach.log' -Value ((Get-Date).ToString('s') + ' attaching to pid ' + $_.Id)
               Start-Process -FilePath 'PROCDUMP_PATH' -ArgumentList '-accepteula','-ma','-e','1','-f','C0000005','-p',$_.Id,'DUMPS_PATH' -WindowStyle Hidden -ErrorAction SilentlyContinue
             }
           }
@@ -135,9 +136,9 @@ jobs:
       continue-on-error: true
       shell: pwsh
       run: |
-        Write-Host "=== Application Error (1000) / WER (1001) events ==="
+        Write-Host "=== Application Error / Windows Error Reporting / Application Hang ==="
         try {
-          Get-WinEvent -FilterHashtable @{ LogName='Application'; Id=1000,1001 } -MaxEvents 20 -ErrorAction Stop |
+          Get-WinEvent -FilterHashtable @{ LogName='Application'; ProviderName='Application Error','Windows Error Reporting','Application Hang' } -MaxEvents 20 -ErrorAction Stop |
             ForEach-Object {
               Write-Host ("[{0}] Id={1}" -f $_.TimeCreated, $_.Id)
               Write-Host $_.Message
@@ -146,7 +147,21 @@ jobs:
         } catch {
           Write-Host "No matching events found: $_"
         }
-        Write-Host "=== ProcDump output ==="
+        Write-Host "=== any recent Application event mentioning electron ==="
+        try {
+          Get-WinEvent -LogName Application -MaxEvents 300 -ErrorAction Stop |
+            Where-Object { $_.Message -match 'electron' } |
+            ForEach-Object {
+              Write-Host ("[{0}] {1} Id={2}" -f $_.TimeCreated, $_.ProviderName, $_.Id)
+              Write-Host $_.Message
+              Write-Host ""
+            }
+        } catch {
+          Write-Host "Could not scan the Application log: $_"
+        }
+        Write-Host "=== ProcDump attach log ==="
+        Get-Content "$env:GITHUB_WORKSPACE\procdump-dumps\attach.log" -ErrorAction SilentlyContinue | Write-Host
+        Write-Host "=== ProcDump dumps ==="
         Get-ChildItem "$env:GITHUB_WORKSPACE\procdump-dumps" -ErrorAction SilentlyContinue |
           Format-Table Name, Length, LastWriteTime | Out-String | Write-Host
     - name: Collect crash dumps
